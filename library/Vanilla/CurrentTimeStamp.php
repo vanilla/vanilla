@@ -7,6 +7,7 @@
 
 namespace Vanilla;
 
+use DateTimeImmutable;
 use Vanilla\Formatting\DateTimeFormatter;
 
 /**
@@ -97,5 +98,16 @@ final class CurrentTimeStamp {
      */
     private static function assertTestMode() {
         assert(defined('TESTMODE_ENABLED') && TESTMODE_ENABLED);
+    }
+
+    /**
+     * Get the time difference of date from current time.
+     *
+     * @param DateTimeImmutable $date
+     * @return int
+     */
+    public static function getCurrentTimeDifference(\DateTimeImmutable $date): int {
+        $currentTime = self::getDateTime();
+        return $currentTime->getTimestamp() - $date->getTimestamp();
     }
 }

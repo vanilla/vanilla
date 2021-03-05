@@ -4,7 +4,7 @@
  */
 
 import { INavigationVariableItem } from "@library/headers/navigationVariables";
-import { Box } from "@library/layout/Box";
+import { PageBox } from "@library/layout/PageBox";
 import { quickLinksClasses } from "@library/navigation/QuickLinks.classes";
 import { quickLinksVariables } from "@library/navigation/QuickLinks.variables";
 import SmartLink from "@library/routing/links/SmartLink";
@@ -32,22 +32,24 @@ export function QuickLinksView(props: IProps) {
     });
 
     return (
-        <Box options={variables.box}>
-            <nav className={classNames(classes.root)} aria-labelledby={domID}>
-                <h2 className={classNames(classes.title, "no-css")} id={domID}>
-                    {title}
-                </h2>
-                <ul className={classNames(classes.list, "no-css")}>
-                    {visibleLinks ? (
-                        visibleLinks.map((link) => (
-                            <QuickLink key={link.id} path={link.url} title={link.name} count={link.count} />
-                        ))
-                    ) : (
-                        <></>
-                    )}
-                </ul>
-            </nav>
-        </Box>
+        <div className={classNames(classes.root)} aria-labelledby={domID}>
+            <h2 className={classNames(classes.title, "no-css", variables.box)} id={domID}>
+                {title}
+            </h2>
+            <PageBox options={variables.box}>
+                <nav>
+                    <ul className={classNames(classes.list, "no-css")}>
+                        {visibleLinks ? (
+                            visibleLinks.map((link) => (
+                                <QuickLink key={link.id} path={link.url} title={link.name} count={link.count} />
+                            ))
+                        ) : (
+                            <></>
+                        )}
+                    </ul>
+                </nav>
+            </PageBox>
+        </div>
     );
 }
 interface IQuickLinkProps {
@@ -64,8 +66,8 @@ function QuickLink(props: IQuickLinkProps) {
         <li className={classNames(classes.listItem)}>
             <SmartLink className={classNames(classes.listItemTitle)} to={path}>
                 {t(title)}
-                {count != null && <span className={classNames(classes.count)}>{count}</span>}
             </SmartLink>
+            {count != null && <span className={classNames(classes.count)}>{count}</span>}
         </li>
     );
 }

@@ -120,6 +120,7 @@ abstract class AbstractSearchDriver implements SearchTypeCollectorInterface, Inj
             $siteID = $this->supportsForeignRecords() ? $record['siteID'] ?? '' : '';
             $type = $record['type'] ?? '';
             $recordID = $record['recordID'] ?? '';
+            $highlight = $record['highlight']['bodyPlainText'] ?? '';
             $key = $siteID.$type.$recordID;
             $resultItemForKey = $resultsItemsByTypeAndID[$key] ?? null;
             if ($resultItemForKey !== null) {
@@ -128,7 +129,9 @@ abstract class AbstractSearchDriver implements SearchTypeCollectorInterface, Inj
                     $site = $this->siteProvider->getBySiteID($siteID);
                     $resultItemForKey->setSiteDomain($site->getWebUrl());
                 }
-
+                if ($highlight) {
+                    $resultItemForKey['highlight'] = $highlight;
+                }
                 $resultItemForKey->setSearchScore($record[SearchResultItem::FIELD_SCORE] ?? null);
                 $resultItemForKey->setSubqueryMatchCount($record[SearchResultItem::FIELD_SUBQUERY_COUNT] ?? null);
                 $orderedResultItems[] = $resultItemForKey;

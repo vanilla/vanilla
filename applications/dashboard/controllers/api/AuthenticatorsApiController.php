@@ -53,7 +53,7 @@ class AuthenticatorsApiController extends AbstractApiController  {
      * @return Data
      */
     public function delete(int $id): void {
-        $this->permission("Garden.Setting.Manage");
+        $this->permission("Garden.Settings.Manage");
 
         $in = $this->schema([], "in");
         $out = $this->schema([], "out");
@@ -69,7 +69,7 @@ class AuthenticatorsApiController extends AbstractApiController  {
      * @return Data
      */
     public function get(int $id): Data {
-        $this->permission("Garden.Setting.Manage");
+        $this->permission("Garden.Settings.Manage");
 
         $in = $this->schema([], "in");
         $out = $this->schema(new UserAuthenticationProviderFragmentSchema(), "out");
@@ -86,7 +86,7 @@ class AuthenticatorsApiController extends AbstractApiController  {
      * @return Data
      */
     public function index(array $query = []): Data {
-        $this->permission("Garden.Setting.Manage");
+        $this->permission("Garden.Settings.Manage");
 
         $in = $this->schema([
             'page:i?' => [
@@ -155,7 +155,7 @@ class AuthenticatorsApiController extends AbstractApiController  {
      * @return Data
      */
     public function patch(int $id, array $body): Data {
-        $this->permission("Garden.Setting.Manage");
+        $this->permission("Garden.Settings.Manage");
 
         $in = $this->schema([
             "active",

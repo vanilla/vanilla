@@ -37,12 +37,14 @@ export interface IBannerProps {
     backgroundImage?: string;
     contentImage?: string;
     logoImage?: string;
+    iconImage?: string;
     searchBarNoTopMargin?: boolean;
     forceSearchOpen?: boolean;
     isContentBanner?: boolean;
     scope?: ISearchScopeNoCompact;
     initialQuery?: string; // prepopulate text input
     hideSearch?: boolean;
+    hideIcon?: boolean;
 }
 
 /**
@@ -82,6 +84,13 @@ export default function Banner(props: IBannerProps) {
     let logoImageSrc = props.logoImage || vars.logo.image || null;
     logoImageSrc = logoImageSrc ? assetUrl(logoImageSrc) : null;
 
+    let iconImageSrc: string | null = null;
+
+    if (isContentBanner && (!options.hideIcon || !!props.hideIcon)) {
+        iconImageSrc = props.iconImage || vars.icon.image || null;
+        iconImageSrc = iconImageSrc ? assetUrl(iconImageSrc) : null;
+    }
+
     // Search placement
     const showBottomSearch = options.searchPlacement === "bottom" && !options.hideSearch && !props.hideSearch;
     const showMiddleSearch = options.searchPlacement === "middle" && !options.hideSearch && !props.hideSearch;
@@ -104,12 +113,10 @@ export default function Banner(props: IBannerProps) {
                 isLarge={true}
                 placeholder={t("SearchBoxPlaceHolder", "Search")}
                 inputClass={classes.input}
-                iconClass={classes.icon}
                 buttonLoaderClassName={classNames(classes.buttonLoader)}
                 hideSearchButton={hideButton}
                 contentClass={classes.content}
                 valueContainerClasses={classNames(classes.valueContainer)}
-                iconContainerClasses={classes.iconContainer}
                 resultsAsModalClasses={classes.resultsAsModal}
                 scope={props.scope}
                 initialQuery={props.initialQuery}
@@ -211,7 +218,11 @@ export default function Banner(props: IBannerProps) {
                             <ConditionalWrap
                                 className={classes.contentContainer(!rightImageSrc)}
                                 condition={
-                                    showMiddleSearch || !options.hideTitle || !options.hideDescription || !!logoImageSrc
+                                    showMiddleSearch ||
+                                    !options.hideTitle ||
+                                    !options.hideDescription ||
+                                    !!logoImageSrc ||
+                                    !!iconImageSrc
                                 }
                             >
                                 {!!logoImageSrc && (
@@ -222,38 +233,51 @@ export default function Banner(props: IBannerProps) {
                                         </div>
                                     </div>
                                 )}
-                                {!options.hideTitle && (
-                                    <div className={classes.titleWrap}>
-                                        <FlexSpacer className={classes.titleFlexSpacer} />
-                                        {title && (
-                                            <>
-                                                {options.url ? (
-                                                    <SmartLink to={options.url} className={classes.titleUrlWrap}>
-                                                        {headingTitleLarge}
-                                                    </SmartLink>
-                                                ) : (
-                                                    <>{headingTitleLarge}</>
-                                                )}
-                                                {setRenderedH1(true)}
-                                            </>
-                                        )}
-                                        <div className={classNames(classes.text, classes.titleFlexSpacer)}>
-                                            {action}
+
+                                <div className={classes.iconTextAndSearchContainer}>
+                                    {isContentBanner && iconImageSrc && (
+                                        <div className={classes.iconContainer}>
+                                            <img className={classes.icon} src={iconImageSrc} aria-hidden={true} />
                                         </div>
+                                    )}
+                                    <div className={classes.textAndSearchContainer}>
+                                        {!options.hideTitle && (
+                                            <div className={classes.titleWrap}>
+                                                <FlexSpacer className={classes.titleFlexSpacer} />
+                                                {title && (
+                                                    <>
+                                                        {options.url ? (
+                                                            <SmartLink
+                                                                to={options.url}
+                                                                className={classes.titleUrlWrap}
+                                                            >
+                                                                {headingTitleLarge}
+                                                            </SmartLink>
+                                                        ) : (
+                                                            <>{headingTitleLarge}</>
+                                                        )}
+                                                        {setRenderedH1(true)}
+                                                    </>
+                                                )}
+                                                <div className={classNames(classes.text, classes.titleFlexSpacer)}>
+                                                    {action}
+                                                </div>
+                                            </div>
+                                        )}
+                                        {!options.hideDescription && description && (
+                                            <div className={classes.descriptionWrap}>
+                                                <p
+                                                    className={classNames(classes.description, classes.text)}
+                                                    dangerouslySetInnerHTML={{ __html: description }}
+                                                />
+                                            </div>
+                                        )}
+                                        {showMiddleSearch && searchComponent}
+                                        {Banner.extraAfterSearchBarComponents.map((ComponentName, index) => {
+                                            return <ComponentName {...props} key={index} />;
+                                        })}
                                     </div>
-                                )}
-                                {!options.hideDescription && description && (
-                                    <div className={classes.descriptionWrap}>
-                                        <p
-                                            className={classNames(classes.description, classes.text)}
-                                            dangerouslySetInnerHTML={{ __html: description }}
-                                        />
-                                    </div>
-                                )}
-                                {showMiddleSearch && searchComponent}
-                                {Banner.extraAfterSearchBarComponents.map((ComponentName, index) => {
-                                    return <ComponentName key={index} />;
-                                })}
+                                </div>
                             </ConditionalWrap>
                             {rightImageSrc && <div className={classes.imageElementContainer} />}
                         </div>
@@ -270,14 +294,14 @@ export default function Banner(props: IBannerProps) {
 }
 
 /** Hold the extra after search bar text components before rendering. */
-Banner.extraAfterSearchBarComponents = [] as React.ComponentType[];
+Banner.extraAfterSearchBarComponents = [] as Array<React.ComponentType<IBannerProps>>;
 
 /**
  * Register an extra component to be rendered after the search bar.
  *
  * @param component The component class to be render.
  */
-Banner.registerAfterSearchBar = (component: React.ComponentType) => {
+Banner.registerAfterSearchBar = (component: React.ComponentType<IBannerProps>) => {
     Banner.extraAfterSearchBarComponents.pop();
     Banner.extraAfterSearchBarComponents.push(component);
 };

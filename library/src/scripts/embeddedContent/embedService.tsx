@@ -55,7 +55,7 @@ export function getEmbedForType(embedType: string): EmbedComponentType | null {
 
 export async function mountEmbed(mountPoint: HTMLElement, data: IBaseEmbedProps, inEditor: boolean) {
     ensureBuiltinEmbeds();
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
         const type = data.embedType || null;
         if (type === null) {
             logWarning(`Found embed with data`, data, `and no type on element`, mountPoint);

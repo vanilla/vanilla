@@ -351,7 +351,7 @@ class CommentsApiController extends AbstractApiController {
                     'field' => 'InsertUserID',
                 ],
             ],
-            'expand?' => ApiUtils::getExpandDefinition(['insertUser'])
+            'expand?' => ApiUtils::getExpandDefinition(['insertUser', '-body'])
         ], ['CommentIndex', 'in'])->requireOneOf(['commentID', 'discussionID', 'insertUserID'])->setDescription('List comments.');
 
         $query = $in->validate($query);

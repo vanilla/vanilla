@@ -26,8 +26,9 @@ class TwigRenderer extends \Twig\Environment {
 
         $isDebug = $configuration->get('Debug') === true;
         $envArgs = [
-            'cache' => $isDebug ? false : $enhancer->getCompileCacheDirectory() ?? false, // Null not allowed. Only false or string.
+            'cache' => $enhancer->getCompileCacheDirectory() ?? false, // Null not allowed. Only false or string.
             'debug' => $isDebug,
+            'auto_reload' => $isDebug,
             // Automatically controlled by the debug value.
             // This causes twig to check the FS timestamp before going to cache.
             // It will rebuild that file's cache if an update had occured.

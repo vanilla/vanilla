@@ -191,12 +191,14 @@ $GroupIcon-overlap: #{50px + $utility-baseUnitTriple};
     }
 }
 
-.Group-Box {
-    clear: both;
+@if ($staticVariables) {
+    .Group-Box {
+        clear: both;
 
-    .Meta {
-        margin-right: -$utility-baseUnit;
-        margin-left: -$utility-baseUnit;
+        .Meta {
+            margin-right: -$utility-baseUnit;
+            margin-left: -$utility-baseUnit;
+        }
     }
 }
 
@@ -368,50 +370,54 @@ body.noGroupIcon {
     }
 }
 
-.Group-Meta.Group-Meta {
-    margin: 0 -#{$utility-baseUnitHalf};
-    font-size: $global-small_fontSize;
+@if ($staticVariables) {
 
-    a {
-        font-size: inherit;
-        color: $component-meta-link_color;
+    .Group-Meta.Group-Meta {
+        margin: 0 -#{$utility-baseUnitHalf};
+        font-size: $global-small_fontSize;
 
-        &:focus,
-        &:hover {
-            text-decoration: $theme-link-hover_textDecoration;
-            color: $component-meta-link-hover_color;
+        a {
+            font-size: inherit;
+            color: $component-meta-link_color;
+
+            &:focus,
+            &:hover {
+                text-decoration: $theme-link-hover_textDecoration;
+                color: $component-meta-link-hover_color;
+            }
+        }
+
+        .MItem {
+            margin: 0 $utility-baseUnitHalf;
+        }
+
+        .MItem:nth-child(-n+2) .label {
+            font-weight: $global-bold_fontWeight;
         }
     }
 
-    .MItem {
-        margin: 0 $utility-baseUnitHalf;
-    }
-
-    .MItem:nth-child(-n+2) .label {
-        font-weight: $global-bold_fontWeight;
-    }
-}
-
-.Group-Content {
-    display: inline-block;
-    width: 100%;
-}
-
-.Group-Box .MItem {
-    line-height: $global-base_lineHeight;
-    white-space: normal;
-
-    &.Hidden {
-        display: none;
-    }
-
-    a {
-        @include ellipsis;
-        max-width: 300px;
+    .Group-Content {
         display: inline-block;
-        vertical-align: bottom;
+        width: 100%;
+    }
+
+    .Group-Box .MItem {
+        line-height: $global-base_lineHeight;
+        white-space: normal;
+
+        &.Hidden {
+            display: none;
+        }
+
+        a {
+            @include ellipsis;
+            max-width: 300px;
+            display: inline-block;
+            vertical-align: bottom;
+        }
     }
 }
+
 
 // Over selected on core...
 .Group-Header.Group-Header.Group-Header.NoBanner {

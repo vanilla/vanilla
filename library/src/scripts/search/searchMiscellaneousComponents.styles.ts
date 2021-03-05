@@ -4,6 +4,7 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { metasVariables } from "@library/metas/Metas.variables";
 import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { styleUnit } from "@library/styles/styleUnit";
@@ -22,6 +23,8 @@ export const searchMiscellaneousComponentsVariables = useThemeCache(() => {
 export const searchMiscellaneousComponentsClasses = useThemeCache(() => {
     const style = styleFactory("searchMiscellaneousComponents");
     const globalVars = globalVariables();
+    const metasVars = metasVariables();
+
     const vars = searchMiscellaneousComponentsVariables();
 
     const root = style("root", {
@@ -44,7 +47,7 @@ export const searchMiscellaneousComponentsClasses = useThemeCache(() => {
         alignSelf: "center",
         marginRight: styleUnit(6),
         ...Mixins.font({
-            color: globalVars.meta.text.color,
+            color: metasVars.font.color,
             weight: globalVars.fonts.weights.normal,
         }),
     });

@@ -16,7 +16,10 @@ export class FocusWatcher {
      * @param watchedNode - The watched dom node.
      * @param callback - A callback for when the tree focuses and blurs.
      */
-    public constructor(private watchedNode: Element, private changeHandler: (hasFocus: boolean) => void) {}
+    public constructor(
+        private watchedNode: Element,
+        private changeHandler: (hasFocus: boolean, newActiveElement?: Element) => void,
+    ) {}
 
     /**
      * Register the event listeners from this class.
@@ -78,7 +81,7 @@ export class FocusWatcher {
      *
      * @param watchedNode - The watched node to look in.
      */
-    private checkDomTreeHasFocus(event: FocusEvent, callback: (hasFocus: boolean) => void) {
+    private checkDomTreeHasFocus(event: FocusEvent, callback: (hasFocus: boolean, newActiveElement?: Element) => void) {
         setTimeout(() => {
             const possibleTargets = [
                 // NEEDS TO COME FIRST, because safari will populate relatedTarget on focusin, and its not what we're looking for.
@@ -110,7 +113,7 @@ export class FocusWatcher {
                 // It could happen that our flyout is unmounted in between the setTimeout call.
                 // We might have focused on a modal which can't be in the watched tree.
                 if (isWatchedInBody && isFocusedInBody) {
-                    callback(hasFocus || isModal);
+                    callback(hasFocus || isModal, activeElement as Element);
                 }
             }
         }, 0);

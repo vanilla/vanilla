@@ -6,7 +6,7 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
-import { BorderRadiusProperty } from "csstype";
+import { Property } from "csstype";
 import { ColorHelper } from "csx";
 import { TLength } from "@library/styles/styleShim";
 import { CSSObject } from "@emotion/css";
@@ -25,6 +25,22 @@ interface IShadowSizing {
 export const shadowVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const makeVariables = variableFactory("shadow");
+
+    const button: IShadowSizing = makeVariables("button", {
+        horizontalOffset: 0,
+        verticalOffset: 1,
+        blur: 3,
+        spread: 0,
+        opacity: 0.22,
+    });
+
+    const buttonHover: IShadowSizing = makeVariables("buttonHover", {
+        horizontalOffset: 0,
+        verticalOffset: 2,
+        blur: 4,
+        spread: 0,
+        opacity: 0.22,
+    });
 
     const widget: IShadowSizing = makeVariables("widget", {
         horizontalOffset: 0,
@@ -66,20 +82,45 @@ export const shadowVariables = useThemeCache(() => {
         opacity: 0.5,
     });
 
-    return { widget, widgetHover, dropDown, modal, floatingButton };
+    return { button, buttonHover, widget, widgetHover, dropDown, modal, floatingButton };
 });
 
 export const shadowHelper = useThemeCache(() => {
     const vars = shadowVariables();
     const globalVars = globalVariables();
-    const shadowBaseColor = globalVars.mainColors.fg;
+    const shadowBaseColor = globalVars.elementaryColors.black;
     const makeShadow = (opacity: number = 0.3) => `0 1px 3px 0 ${shadowBaseColor.fade(opacity)}`;
+
+    const button = (baseColor: ColorHelper = shadowBaseColor) => {
+        const { verticalOffset, horizontalOffset, blur, spread, opacity } = vars.button;
+        return {
+            boxShadow: `${horizontalOffset} ${styleUnit(verticalOffset)} ${styleUnit(blur)} ${styleUnit(
+                spread,
+            )} ${baseColor.fade(opacity)}`,
+        };
+    };
+
+    const buttonHover = (baseColor: ColorHelper = shadowBaseColor) => {
+        const { verticalOffset, horizontalOffset, blur, spread, opacity } = vars.buttonHover;
+        return {
+            boxShadow: `${horizontalOffset} ${styleUnit(verticalOffset)} ${styleUnit(blur)} ${styleUnit(
+                spread,
+            )} ${baseColor.darken(0.5).fade(opacity)}`,
+        };
+    };
+
     const embed = (baseColor: ColorHelper = shadowBaseColor) => {
         const { verticalOffset, horizontalOffset, blur, spread, opacity } = vars.widget;
         return {
             boxShadow: `${horizontalOffset} ${styleUnit(verticalOffset)} ${styleUnit(blur)} ${styleUnit(
                 spread,
             )} ${baseColor.fade(opacity)}`,
+        };
+    };
+
+    const embedTooltip = (baseColor: ColorHelper = shadowBaseColor) => {
+        return {
+            boxShadow: `3px -3px 6px ${baseColor.fade(0.1)}`,
         };
     };
 
@@ -122,7 +163,7 @@ export const shadowHelper = useThemeCache(() => {
     const contrast = (
         baseColor: ColorHelper = globalVars.mainColors.fg,
         hasBorder: boolean = false,
-        borderRadius: BorderRadiusProperty<TLength> = 0,
+        borderRadius: Property.BorderRadius<TLength> = 0,
     ) => {
         const shadowColor = baseColor.fade(0.2);
         let border = {};
@@ -140,7 +181,18 @@ export const shadowHelper = useThemeCache(() => {
         };
     };
 
-    return { embed, embedHover, dropDown, modal, contrast, makeShadow, floatingButton };
+    return {
+        button,
+        buttonHover,
+        embed,
+        embedHover,
+        embedTooltip,
+        dropDown,
+        modal,
+        contrast,
+        makeShadow,
+        floatingButton,
+    };
 });
 
 export const shadowOrBorderBasedOnLightness = (

@@ -199,4 +199,40 @@ abstract class AbstractAPIv2Test extends SiteTestCase {
             $this->api()->setUserID($userID);
         }
     }
+
+    /**
+     * Execute api request and check results.
+     *
+     * @param string $api API endpoint to call
+     * @param array $params API params to pass
+     * @param array $expectedFields Mapping of expectedField => expectedValues.
+     * @param bool $strictOrder Whether or not the fields should be returned in a strict order.
+     * @param int|null $count Expected count of result items
+     */
+    public function assertApiResults(string $api, array $params, array $expectedFields, bool $strictOrder = false, int $count = null) {
+        $response = $this->api()->get($api, $params);
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $results = $response->getBody();
+
+        foreach ($expectedFields as $expectedField => $expectedValues) {
+            if ($expectedValues === null) {
+                foreach ($results as $result) {
+                    $this->assertArrayNotHasKey($expectedField, $result);
+                }
+            } else {
+                $actualValues = array_column($results, $expectedField);
+                if (!$strictOrder) {
+                    sort($actualValues);
+                    sort($expectedValues);
+                }
+
+                $this->assertEquals($expectedValues, $actualValues);
+            }
+        }
+
+        if (is_int($count)) {
+            $this->assertEquals($count, count($results));
+        }
+    }
 }

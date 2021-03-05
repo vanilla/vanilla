@@ -9,6 +9,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { componentThemeVariables, styleFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { calc, px } from "csx";
+import { metasVariables } from "@library/metas/Metas.variables";
 
 export const attachmentIconVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -36,6 +37,7 @@ export const attachmentIconsClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = attachmentIconVariables();
     const style = styleFactory("attachmentIcons");
+    const metasVars = metasVariables();
 
     const root = style({
         display: "block",
@@ -52,7 +54,7 @@ export const attachmentIconsClasses = useThemeCache(() => {
         ...Mixins.margin({
             top: -vars.spacing.default,
             left: -vars.spacing.default,
-            right: globalVars.meta.spacing.default,
+            right: metasVars.spacing.horizontal,
         }),
     });
 

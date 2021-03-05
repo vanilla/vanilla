@@ -10,7 +10,7 @@ import { ICrumb } from "@library/navigation/Breadcrumbs";
 import SmartLink from "@library/routing/links/SmartLink";
 import BreadCrumbString from "@library/navigation/BreadCrumbString";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
-import { metasClasses } from "@library/styles/metasStyles";
+import { metasClasses } from "@library/metas/Metas.styles";
 import DateTime from "@library/content/DateTime";
 import classNames from "classnames";
 import { OptionProps } from "react-select/lib/components/Option";

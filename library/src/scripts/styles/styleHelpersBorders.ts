@@ -5,7 +5,7 @@
  */
 
 import { ColorsUtils } from "@library/styles/ColorsUtils";
-import { BorderRadiusProperty } from "csstype";
+import { Property } from "csstype";
 import { TLength } from "@library/styles/styleShim";
 import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
@@ -27,7 +27,7 @@ export enum BorderType {
     SHADOW_AS_BORDER = "shadow_as_border", // Note that is applied on a different element
 }
 
-export type radiusValue = BorderRadiusProperty<TLength> | string;
+export type radiusValue = Property.BorderRadius<TLength> | string;
 
 export interface IMixedRadiusDeclaration extends IRadiusShorthand, IBorderRadiusOutput {}
 
@@ -42,7 +42,7 @@ const typeIsStringOrNumber = (variable: unknown): variable is number | string =>
     }
 };
 
-const setAllRadii = (radius: BorderRadiusProperty<TLength>, options?: IBorderRadiusOptions) => {
+const setAllRadii = (radius: Property.BorderRadius<TLength>, options?: IBorderRadiusOptions) => {
     return {
         borderTopRightRadius: styleUnit(radius, options),
         borderBottomRightRadius: styleUnit(radius, options),

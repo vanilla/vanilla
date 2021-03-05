@@ -31,7 +31,7 @@ function StoryButton() {
             <StoryParagraph>
                 Buttons use a{" "}
                 <strong>
-                    <code>baseClass</code>
+                    <code>buttonType</code>
                 </strong>{" "}
                 to specify the type of button you want. The types are available through the enum{" "}
                 <strong>
@@ -50,27 +50,26 @@ function StoryButton() {
                 </StoryTileAndTextCompact>
 
                 <StoryTileAndTextCompact text={"Primary"}>
-                    <Button baseClass={ButtonTypes.PRIMARY}>Primary</Button>
+                    <Button buttonType={ButtonTypes.PRIMARY}>Primary</Button>
                 </StoryTileAndTextCompact>
-
                 <StoryTileAndTextCompact type="titleBar" text={"For Title Bar (Sign in Button)"}>
-                    <Button baseClass={ButtonTypes.TRANSPARENT}>Transparent</Button>
+                    <Button buttonType={ButtonTypes.TRANSPARENT}>Transparent</Button>
                 </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact type="titleBar" text={"For Title Bar (Register)"}>
-                    <Button baseClass={ButtonTypes.TRANSLUCID}>Translucid</Button>
+                    <Button buttonType={ButtonTypes.TRANSLUCID}>Translucid</Button>
                 </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact text={"Simple text button"}>
-                    <Button baseClass={ButtonTypes.TEXT}>Text</Button>
+                    <Button buttonType={ButtonTypes.TEXT}>Text</Button>
                 </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact text={"Text with primary color"}>
-                    <Button baseClass={ButtonTypes.TEXT_PRIMARY}>Text Primary</Button>
+                    <Button buttonType={ButtonTypes.TEXT_PRIMARY}>Text Primary</Button>
                 </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact
                     text={`Icon (${styleUnit(globalVariables().buttonIcon.size)} x ${styleUnit(
                         globalVariables().buttonIcon.size,
                     )})`}
                 >
-                    <Button baseClass={ButtonTypes.ICON} title={"Icon"}>
+                    <Button buttonType={ButtonTypes.ICON} title={"Icon"}>
                         <CloseCompactIcon />
                     </Button>
                 </StoryTileAndTextCompact>
@@ -79,7 +78,7 @@ function StoryButton() {
                         globalVariables().icon.sizes.default,
                     )})`}
                 >
-                    <Button baseClass={ButtonTypes.ICON_COMPACT}>
+                    <Button buttonType={ButtonTypes.ICON_COMPACT}>
                         <CheckCompactIcon />
                     </Button>
                 </StoryTileAndTextCompact>
@@ -88,7 +87,7 @@ function StoryButton() {
                         globalVariables().icon.sizes.default,
                     )})`}
                 >
-                    <Button disabled baseClass={ButtonTypes.ICON_COMPACT}>
+                    <Button disabled buttonType={ButtonTypes.ICON_COMPACT}>
                         <CheckCompactIcon />
                     </Button>
                 </StoryTileAndTextCompact>
@@ -97,7 +96,7 @@ function StoryButton() {
                         "If you don't want to fight against existing styles and write your own custom button, use the custom class."
                     }
                 >
-                    <Button baseClass={ButtonTypes.CUSTOM}>Custom</Button>
+                    <Button buttonType={ButtonTypes.CUSTOM}>Custom</Button>
                 </StoryTileAndTextCompact>
             </StoryTiles>
             <StoryHeading>Disabled Buttons</StoryHeading>
@@ -106,17 +105,17 @@ function StoryButton() {
                     <Button disabled>Standard (Disabled)</Button>
                 </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact text={"Call to action (Disabled)"}>
-                    <Button disabled baseClass={ButtonTypes.PRIMARY}>
+                    <Button disabled buttonType={ButtonTypes.PRIMARY}>
                         Primary (Disabled)
                     </Button>
                 </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact text={"Simple text button (Disabled)"}>
-                    <Button disabled baseClass={ButtonTypes.TEXT}>
+                    <Button disabled buttonType={ButtonTypes.TEXT}>
                         Text (Disabled)
                     </Button>
                 </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact text={"Text with primary color (Disabled)"}>
-                    <Button disabled baseClass={ButtonTypes.TEXT_PRIMARY}>
+                    <Button disabled buttonType={ButtonTypes.TEXT_PRIMARY}>
                         Text Primary (Disabled)
                     </Button>
                 </StoryTileAndTextCompact>
@@ -125,7 +124,7 @@ function StoryButton() {
                         globalVariables().buttonIcon.size,
                     )})`}
                 >
-                    <Button disabled baseClass={ButtonTypes.ICON} title={"Icon"}>
+                    <Button disabled buttonType={ButtonTypes.ICON} title={"Icon"}>
                         <CloseCompactIcon />
                     </Button>
                 </StoryTileAndTextCompact>
@@ -138,7 +137,7 @@ function StoryButton() {
             </StoryParagraph>
             <StoryTiles>
                 <StoryTileAndTextCompact text={"Icon and Text Example"}>
-                    <Button baseClass={ButtonTypes.STANDARD}>
+                    <Button buttonType={ButtonTypes.STANDARD}>
                         <ComposeIcon className={buttonUtilityClasses().buttonIconRightMargin} />
                         {"Icon and Text"}
                     </Button>
@@ -149,6 +148,42 @@ function StoryButton() {
 }
 
 export const Standard = storyWithConfig({}, () => <StoryButton />);
+
+export const CustomOpacity = storyWithConfig(
+    {
+        themeVars: {
+            button: {
+                primary: {
+                    opacity: 0.8,
+                    state: {
+                        opacity: 1,
+                    },
+                    disabled: {
+                        opacity: 0.4,
+                    },
+                },
+            },
+        },
+    },
+    () => <StoryButton />,
+);
+
+export const PresetsBoxShadow = storyWithConfig(
+    {
+        themeVars: {
+            button: {
+                primary: {
+                    useShadow: true,
+                },
+                standard: {
+                    useShadow: true,
+                },
+            },
+        },
+    },
+    () => <StoryButton />,
+);
+
 export const PresetsOutline = storyWithConfig(
     {
         themeVars: {

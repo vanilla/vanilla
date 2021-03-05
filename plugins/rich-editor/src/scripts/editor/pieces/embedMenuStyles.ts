@@ -13,9 +13,11 @@ import { styleFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { percent } from "csx";
+import { metasVariables } from "@library/metas/Metas.variables";
 
 export const embedMenuClasses = useThemeCache(() => {
     const style = styleFactory("embedMenu");
+    const metasVars = metasVariables();
     const globalVars = globalVariables();
 
     const root = style({
@@ -67,7 +69,7 @@ export const embedMenuClasses = useThemeCache(() => {
                 ...Mixins.font({
                     weight: globalVars.fonts.weights.normal,
                     lineHeight: globalVars.lineHeights.base,
-                    color: globalVars.meta.colors.fg,
+                    color: metasVars.font.color,
                     size: globalVars.fonts.size.medium,
                     align: "left",
                 }),

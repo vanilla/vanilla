@@ -9,6 +9,7 @@ use Garden\Schema\Schema;
 use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
+use Gdn_Session as SessionInterface;
 use Vanilla\Attributes;
 use Vanilla\Web\ApiFilterMiddleware;
 
@@ -29,15 +30,19 @@ class OAuth2Plugin extends Gdn_OAuth2 {
      */
     private $authenticationProviderModel;
 
+    /** @var SessionInterface */
+    private $session;
+
     /**
      * Set the key for saving OAuth settings in GDN_UserAuthenticationProvider.
      * @codeCoverageIgnore
      */
-    public function __construct() {
+    public function __construct(SessionInterface $session) {
         $this->setProviderKey('oauth2');
         $this->settingsView = 'plugins/settings/oauth2';
         $this->setAuthenticationSchemeAlias('oauth2');
         $this->clientIDField = Gdn_AuthenticationProviderModel::COLUMN_KEY;
+        $this->session = $session;
     }
 
     /**
@@ -140,6 +145,26 @@ class OAuth2Plugin extends Gdn_OAuth2 {
     }
 
     /**
+     * Get a schema describing an OAuth2 authentication returned from an API request.
+     *
+     * @return Schema
+     */
+    protected function apiReadSchema(): Schema {
+        // Kludge the provider fragment schema to remove required fields
+        // because of the way oauth2 plugin creates empty connections.
+        $schema = Schema::parse([
+            "secret:s?",
+            "urls:o" => [
+                "authorizeUrl:s?",
+                "profileUrl:s?",
+                "tokenUrl:s?"
+            ]
+        ]);
+        $schema->merge($this->providerFragmentSchema());
+        return $schema;
+    }
+
+    /**
      * Get extended OAuth2 configuration details for an authenticator.
      *
      * @param AuthenticatorsApiController $controller
@@ -150,7 +175,7 @@ class OAuth2Plugin extends Gdn_OAuth2 {
         $controller->permission("Garden.Settings.Manage");
 
         $in = $controller->schema([], "in");
-        $out = $controller->schema($this->providerFragmentSchema(), "out");
+        $out = $controller->schema($this->apiReadSchema(), "out");
 
         $row = $this->getAuthenticationProviderModel()->getID($id, DATASET_TYPE_ARRAY);
         if (empty($row)) {
@@ -176,7 +201,7 @@ class OAuth2Plugin extends Gdn_OAuth2 {
         $controller->permission("Garden.Settings.Manage");
 
         $in = $controller->schema($this->apiWriteSchema(), "in");
-        $out = $controller->schema($this->providerFragmentSchema(), "out");
+        $out = $controller->schema($this->apiReadSchema(), "out");
 
         $body = $in->validate($body, true);
 
@@ -210,7 +235,7 @@ class OAuth2Plugin extends Gdn_OAuth2 {
         $controller->permission("Garden.Settings.Manage");
 
         $in = $controller->schema($this->apiWriteSchema(), "in");
-        $out = $controller->schema($this->providerFragmentSchema(), "out");
+        $out = $controller->schema($this->apiReadSchema(), "out");
 
         $body = $in->validate($body);
 
@@ -255,7 +280,7 @@ class OAuth2Plugin extends Gdn_OAuth2 {
             "ProfileKeyUniqueID" => "/userMappings/uniqueID",
             "ProfileUrl" => "/urls/profileUrl",
             "Prompt" => "/authenticationRequest/prompt",
-            "Secret" => "secret",
+            "AssociationSecret" => "secret",
             "TokenUrl" => "/urls/tokenUrl",
             "BearerToken" => "useBearerToken",
         ]);
@@ -281,14 +306,14 @@ class OAuth2Plugin extends Gdn_OAuth2 {
                 "tokenUrl" => "TokenUrl",
             ],
             "userMappings" => [
-                "ProfileKeyEmail" => "/userMappings/email",
-                "ProfileKeyFullName" => "/userMappings/fullName",
-                "ProfileKeyName" => "/userMappings/name",
-                "ProfileKeyPhoto" => "/userMappings/photoUrl",
-                "ProfileKeyRoles" => "/userMappings/roles",
-                "ProfileKeyUniqueID" => "/userMappings/uniqueID",
+                "email" => "ProfileKeyEmail",
+                "fullName" => "ProfileKeyFullName",
+                "name" => "ProfileKeyName",
+                "photoUrl" => "ProfileKeyPhoto",
+                "roles" => "ProfileKeyRoles",
+                "uniqueID" => "ProfileKeyUniqueID",
             ],
-            "secret" => "Secret",
+            "secret" => "AssociationSecret",
             "useBearerToken" => "BearerToken",
         ]);
 
@@ -496,5 +521,14 @@ class OAuth2Plugin extends Gdn_OAuth2 {
             $r = \Vanilla\Utility\UrlUtils::concatQuery($r, 'client_id='.urlencode($this->getCurrentClientID()));
         }
         return $r;
+    }
+
+    /**
+     * Add the new OAuth2 menu item.
+     *
+     * @param \DashboardNavModule $nav The menu to add the module to.
+     */
+    public function dashboardNavModule_init_handler(\DashboardNavModule $nav) {
+        $nav->addLinkIf('Garden.Settings.Manage', t('OAuth2'), '/oauth2-settings', 'connect.oauth2-settings', '', []);
     }
 }

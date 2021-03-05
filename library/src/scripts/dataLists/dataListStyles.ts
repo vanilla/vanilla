@@ -8,7 +8,7 @@ import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { TextAlignProperty } from "csstype";
+import { Property } from "csstype";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { Mixins } from "@library/styles/Mixins";
 import { Variables } from "@library/styles/Variables";
@@ -24,7 +24,7 @@ export const dataListVariables = useThemeCache((forcedVars?: IThemeVariables) =>
     });
 
     const key = makeThemeVars("key", {
-        textAlignment: "left" as TextAlignProperty,
+        textAlignment: "left" as Property.TextAlign,
         padding: {
             vertical: spacing.padding.vertical,
             right: globalVars.spacer.size,
@@ -37,7 +37,7 @@ export const dataListVariables = useThemeCache((forcedVars?: IThemeVariables) =>
     });
 
     const value = makeThemeVars("value", {
-        textAlignment: "left" as TextAlignProperty,
+        textAlignment: "left" as "left" | "center",
         padding: {
             vertical: spacing.padding.vertical,
         },

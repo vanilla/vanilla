@@ -17,7 +17,6 @@ import { useLastValue } from "@vanilla/react-utils";
 import { hashString } from "@vanilla/utils";
 import React, { useLayoutEffect } from "react";
 import { CoreErrorMessages } from "@library/errorPages/CoreErrorMessages";
-import { IUserCardInfo } from "@library/features/users/ui/PopupUserCard";
 import { IUser } from "@library/@types/api/users";
 import { ALL_CONTENT_DOMAIN_NAME } from "@library/search/searchConstants";
 import { makeSearchUrl } from "@library/search/SearchPageRoute";
@@ -25,13 +24,12 @@ import { formatUrl, t } from "@library/utility/appUtils";
 import qs from "qs";
 import { sprintf } from "sprintf-js";
 import SmartLink from "@library/routing/links/SmartLink";
-import { metasClasses } from "@library/styles/metasStyles";
+import { metasClasses } from "@library/metas/Metas.styles";
 
 interface IProps {}
 
 export function SearchPageResults(props: IProps) {
     const { updateForm, results, form, getCurrentDomain } = useSearchForm<{}>();
-
     const currentDomain = getCurrentDomain();
 
     const status = results.status;
@@ -79,26 +77,6 @@ export function SearchPageResults(props: IProps) {
 }
 
 /**
- * Map userInfo from API to IUserCardInfo
- * @param searchResult
- */
-function mapUserInfo(userInfo?: IUser): IUserCardInfo | undefined {
-    if (!userInfo) return undefined;
-
-    return {
-        email: userInfo.email,
-        userID: userInfo.userID,
-        name: userInfo.name,
-        photoUrl: userInfo.photoUrl,
-        dateLastActive: userInfo.dateLastActive || undefined,
-        dateJoined: userInfo.dateInserted,
-        label: userInfo.label,
-        countDiscussions: userInfo.countDiscussions || 0,
-        countComments: userInfo.countComments || 0,
-    };
-}
-
-/**
  * Map a search API response into what the <SearchResults /> component is expecting.
  *
  * @param searchResult The API search result to map.
@@ -115,7 +93,8 @@ function mapResult(searchResult: ISearchResult): IResult | undefined {
         image: searchResult.image?.url,
         url: searchResult.url,
         location: crumbs,
-        userCardInfo: mapUserInfo(searchResult.userInfo),
+        userInfo: searchResult.userInfo,
+        highlight: searchResult.highlight,
     };
 }
 

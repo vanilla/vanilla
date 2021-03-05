@@ -181,10 +181,17 @@
 }
 
 .card-label-list {
+    width: 100%;
+
+    .card-label-list {
+        padding-left: 16px;
+        padding-top: 4px;
+    }
     li {
         padding-bottom: 4px;
         padding-top: 4px;
         display: flex;
+        flex-wrap: wrap;
         align-items: center;
 
         &:last-child {

@@ -892,6 +892,7 @@ class DiscussionModelTest extends SiteTestCase {
     public function testDiscussionTypes() {
         $discussionTypes = $this->discussionModel::discussionTypes();
         $this->assertSame(['Discussion' => [
+            'apiType' => 'discussion',
             'Singular' => 'Discussion',
             'Plural' => 'Discussions',
             'AddUrl' => '/post/discussion',
@@ -1002,7 +1003,7 @@ class DiscussionModelTest extends SiteTestCase {
     }
 
     /**
-     * Test particpation count.
+     * Test participation count.
      */
     public function testParticipatedCount() {
         $this->resetTable('Comment');

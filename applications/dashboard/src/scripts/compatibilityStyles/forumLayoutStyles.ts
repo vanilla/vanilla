@@ -168,6 +168,7 @@ export const forumLayoutVariables = useThemeCache(() => {
 });
 
 export const forumLayoutCSS = () => {
+    shimPanelPageBoxes();
     const globalVars = globalVariables();
     const vars = forumLayoutVariables();
 
@@ -242,3 +243,18 @@ export const forumLayoutCSS = () => {
         }),
     });
 };
+
+function shimPanelPageBoxes() {
+    document.querySelectorAll(".Panel").forEach((panel) => {
+        const existingParent = panel.parentElement;
+        if (!existingParent) {
+            return;
+        }
+        const newWrapper = document.createElement("div");
+        newWrapper.classList.add("pageBox");
+        Array.from(panel.childNodes).forEach((node) => {
+            newWrapper.appendChild(node);
+        });
+        panel.appendChild(newWrapper);
+    });
+}

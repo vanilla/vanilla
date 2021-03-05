@@ -19,10 +19,15 @@ use Vanilla\Web\JsInterpop\AbstractReactModule;
  */
 abstract class AbstractHomeWidgetModule extends AbstractReactModule {
 
+    use HomeWidgetContainerSchemaTrait;
+
     const CONTENT_TYPE_ICON = "title-description-icon";
     const CONTENT_TYPE_IMAGE = "title-description-image";
     const CONTENT_TYPE_BACKGROUND = "title-background";
     const CONTENT_TYPE_TEXT = "title-description";
+    const ALIGNMENT_LEFT = "left";
+    const ALIGNMENT_CENTER = "center";
+    const DEFAULT_MAX_ITEMS_COUNT = 3;
 
     /** @var string|null */
     public $title = null;
@@ -85,6 +90,11 @@ abstract class AbstractHomeWidgetModule extends AbstractReactModule {
     public $containerOptions = [];
 
     /**
+     * @var int|null
+     */
+    private $maxItemCount = null;
+
+    /**
      * @return array|null
      */
     abstract protected function getData(): ?array;
@@ -97,13 +107,30 @@ abstract class AbstractHomeWidgetModule extends AbstractReactModule {
     }
 
     /**
+     * @return int|null
+     */
+    public function getMaxItemCount(): ?int {
+        return $this->maxItemCount;
+    }
+
+    /**
+     * @param int|null $maxItemCount
+     */
+    public function setMaxItemCount(?int $maxItemCount = null): void {
+        $this->maxItemCount = $maxItemCount;
+    }
+
+
+    /**
      * @return array
      */
     protected function getItemOptions(): array {
         $options = [
             'contentType' => $this->contentType,
             'display' => $this->display,
-            'borderType' => $this->borderType,
+            'box' => [
+                'borderType' => $this->borderType,
+            ],
             'name' => $this->name,
         ];
         if (!empty($this->iconProps)) {
@@ -147,6 +174,7 @@ abstract class AbstractHomeWidgetModule extends AbstractReactModule {
         $props['containerOptions'] = $this->getContainerOptions();
         $props['itemOptions'] = $this->getItemOptions();
         $props['itemData'] = $data;
+        $props['maxItemCount'] = $this->getMaxItemCount();
 
         $props = $this->getSchema()->validate($props);
 
@@ -216,9 +244,17 @@ abstract class AbstractHomeWidgetModule extends AbstractReactModule {
                 ],
             ]),
             'itemOptions' => Schema::parse([
-                'borderType:s?',
-                'borderRadius:s?',
-                'background:?' => $bgSchema,
+                'imagePlacement:s?' => [
+                    'enum' => ['left', 'top'],
+                ],
+                'imagePlacementMobile:s?' => [
+                    'enum' => ['left', 'top'],
+                ],
+                'box?' => [
+                    'borderType:s?',
+                    'border:o?',
+                    'background:?' => $bgSchema,
+                ],
                 'contentType:s?',
                 'fg:s?',
                 'display:?' => Schema::parse([
@@ -245,6 +281,7 @@ abstract class AbstractHomeWidgetModule extends AbstractReactModule {
                     'size:i?',
                 ]),
             ]),
+            'maxItemCount:i?',
             'itemData:a' => Schema::parse([
                 'to:s',
                 'iconUrl:s?',
@@ -264,42 +301,6 @@ abstract class AbstractHomeWidgetModule extends AbstractReactModule {
      */
     public function setSubtitleContent(string $content) {
         $this->subtitle['content'] = $content;
-    }
-
-    /**
-     * @return Schema
-     */
-    public static function widgetTitleSchema(): Schema {
-        return Schema::parse([
-            'title:s?' => [
-                'x-control' => SchemaForm::textBox(new FormOptions('Title', 'Set a custom title.'))
-            ],
-        ]);
-    }
-
-    /**
-     * @return Schema
-     */
-    public static function widgetDescriptionSchema(): Schema {
-        return Schema::parse([
-            'description:s?' => [
-                'x-control' => SchemaForm::textBox(
-                    new FormOptions('Description', 'Set a custom description.'),
-                    'textarea'
-                )
-            ],
-        ]);
-    }
-
-    /**
-     * @return Schema
-     */
-    public static function widgetSubtitleSchema(): Schema {
-        return Schema::parse([
-            'subtitleContent:s?' => [
-                'x-control' => SchemaForm::textBox(new FormOptions('Subtitle', 'Set a custom sub-title.'))
-            ],
-        ]);
     }
 
     /**
@@ -342,6 +343,51 @@ abstract class AbstractHomeWidgetModule extends AbstractReactModule {
                             self::CONTENT_TYPE_BACKGROUND => 'Background'
                         ]
                     )
+                ),
+            ],
+        ]);
+    }
+
+    /**
+     * @return Schema
+     */
+    public static function widgetHeaderAligmentSchema() {
+        return Schema::parse([
+            'headerAlignment:s?' => [
+                'enum' => [self::ALIGNMENT_LEFT, self::ALIGNMENT_CENTER],
+                'default' => self::ALIGNMENT_LEFT,
+                'x-control' => SchemaForm::dropDown(
+                    new FormOptions(
+                        'Header alignment',
+                        'Choose header alignment.'
+                    ),
+                    new StaticFormChoices(
+                        [
+                            self::ALIGNMENT_LEFT => 'Left',
+                            self::ALIGNMENT_CENTER => 'Center',
+                        ]
+                    )
+                ),
+            ],
+        ]);
+    }
+
+    /**
+     * Set Max Count Item widget schema.
+     *
+     * @param int $defaultMaxItemCount
+     * @return Schema
+     */
+    public static function widgetMaxCountItemSchema(int $defaultMaxItemCount = 3) {
+        return Schema::parse([
+            'maxItemCount:i?' => [
+                'default' => $defaultMaxItemCount,
+                'x-control' => SchemaForm::textBox(
+                    new FormOptions(
+                        'Limit',
+                        'Maximum amount of items to display.'
+                    ),
+                    "number"
                 ),
             ],
         ]);

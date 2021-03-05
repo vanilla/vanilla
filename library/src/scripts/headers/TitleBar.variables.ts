@@ -18,7 +18,7 @@ import { CSSObject } from "@emotion/css";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { LogoAlignment } from "./LogoAlignment";
-import { BackgroundProperty } from "csstype";
+import { Property } from "csstype";
 import { IThemeVariables } from "@library/theming/themeReducer";
 
 /**
@@ -76,7 +76,7 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
          * This can be useful to add contrast to a titlebar background that otherwise might not have enough.
          * @default linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.3))
          */
-        background: undefined as BackgroundProperty<TLength> | Array<BackgroundProperty<TLength>> | undefined,
+        background: undefined as Property.Background<TLength> | Array<Property.Background<TLength>> | undefined,
     });
 
     const colorsInit = makeThemeVars("colors", {
@@ -306,6 +306,8 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
 
     const guest = makeThemeVars("guest", {
         spacer: 8,
+        signInButtonType: ButtonTypes.TRANSPARENT,
+        registerButtonType: ButtonTypes.TRANSLUCID,
     });
 
     const buttonSize = globalVars.buttonIcon.size;
@@ -403,6 +405,11 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
             weight: 0.1,
             inverse: true,
         }),
+        border: {
+            ...Variables.border({
+                color: colors.fg,
+            }),
+        },
         hover: {
             bg: ColorsUtils.modifyColorBasedOnLightness({
                 color: globalVars.mainColors.primary,

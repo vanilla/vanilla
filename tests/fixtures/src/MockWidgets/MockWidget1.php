@@ -10,6 +10,7 @@ use Garden\Schema\Schema;
 use Vanilla\Contracts\Addons\WidgetInterface;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
+use Vanilla\Forms\StaticFormChoices;
 use Vanilla\Web\JsInterpop\AbstractReactModule;
 use Vanilla\Widgets\AbstractWidgetModule;
 
@@ -29,9 +30,23 @@ class MockWidget1 extends AbstractWidgetModule {
             'name' => [
                 'type' => 'string',
                 'x-control' => SchemaForm::textBox(
-                    new FormOptions('name', 'name text box description')
+                    new FormOptions('Title', 'name text box description')
                 )
             ],
+            'nested?' => [
+                'type' => 'object',
+                'x-control' => SchemaForm::section(new FormOptions('Nested Params')),
+                'properties' => [
+                    'slotType:s?' => [
+                        'enum' => ['d', 'w', 'm'],
+                        'x-control' => SchemaForm::radio(new FormOptions('Timeframe'), new StaticFormChoices([
+                            'd' => 'Daily',
+                            'w' => 'Weekly',
+                            'm' => 'Monthly',
+                        ]))
+                    ]
+                ]
+            ]
         ]);
     }
 

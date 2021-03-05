@@ -11,7 +11,6 @@ import { IUserSuggestion } from "@library/features/users/suggestion/IUserSuggest
 import UserSuggestionActions from "@library/features/users/suggestion/UserSuggestionActions";
 import ReduxReducer from "@library/redux/ReduxReducer";
 import moment from "moment";
-
 export interface IUserSuggestionState {
     lastSuccessfulUsername: string | null;
     currentUsername: string | null;

@@ -140,6 +140,21 @@ class SiteSectionModel {
     }
 
     /**
+     * Get a site section by from it's ID.
+     *
+     * @param string $siteSectionID
+     * @return mixed|SiteSectionInterface|null
+     */
+    public function getForSectionID(string $siteSectionID) {
+        foreach ($this->getAll() as $siteSection) {
+            if ($siteSection->getSectionID() === $siteSectionID) {
+                return $siteSection;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Returns all sections of the site.
      *
      * @return SiteSectionInterface[]

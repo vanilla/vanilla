@@ -1,8 +1,11 @@
 import { cssRaw, flattenNests } from "@library/styles/styleShim";
-import { CSSObject } from "@emotion/css";
+import { CSSObject, injectGlobal, css } from "@emotion/css";
 
+/**
+ * @deprecated Use injectGlobals instead.
+ */
 export function cssOut(selector: string, ...objects: CSSObject[]): void {
-    cssRaw({
+    injectGlobal({
         [selector]: objects.map(flattenNests),
     });
 }

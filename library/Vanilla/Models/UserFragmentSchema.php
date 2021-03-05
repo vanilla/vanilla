@@ -23,6 +23,7 @@ class UserFragmentSchema extends Schema {
         parent::__construct($this->parseInternal([
             'userID:i', // The ID of the user.
             'name:s', // The username of the user.
+            'title:s?', // The title of the user.
             'url:s?', // Full URL to the user profile page.
             'photoUrl:s', // The URL of the user's avatar picture.
             'dateLastActive:dt|n', // Time the user was last active.

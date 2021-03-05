@@ -5,14 +5,13 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { metasVariables } from "@library/styles/metasStyles";
+import { metasVariables } from "@library/metas/Metas.variables";
 import { negativeUnit, objectFitWithFallback, singleBorder } from "@library/styles/styleHelpers";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
 import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { calc, important, percent } from "csx";
-import { BorderBottomProperty } from "csstype";
 import { CSSObject } from "@emotion/css";
 import { TLength } from "@library/styles/styleShim";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
@@ -50,6 +49,7 @@ export const searchResultsVariables = useThemeCache(() => {
             size: globalVars.fonts.size.large,
             weight: globalVars.fonts.weights.semiBold,
             lineHeight: globalVars.lineHeights.condensed,
+            textDecoration: "none",
         }),
     });
 
@@ -198,7 +198,7 @@ export const searchResultsClasses = useThemeCache((mediaQueries) => {
         borderBottom: singleBorder({
             color: vars.separator.fg,
             width: vars.separator.width,
-        }) as BorderBottomProperty<TLength>,
+        }),
     });
 
     const result = style("result", {
@@ -220,18 +220,21 @@ export const searchResultClasses = useThemeCache((mediaQueries, hasIcon = false)
     const vars = searchResultsVariables();
     const globalVars = globalVariables();
     const style = styleFactory("searchResult");
-    const metaVars = metasVariables();
+    const metasVars = metasVariables();
 
-    const linkColors = Mixins.clickable.itemState({ skipDefault: true });
+    const linkColors = Mixins.clickable.itemState({ skipDefault: true }, { disableTextDecoration: true });
 
     const title = style("title", {
         display: "block",
-        ...Mixins.font(vars.title.font),
         overflow: "hidden",
         flexGrow: 1,
         margin: 0,
         paddingRight: styleUnit(24),
         ...linkColors,
+        ...Mixins.font(vars.title.font),
+        // skipDefault = true so color is undefined
+        // Make sure what we set is applied.
+        ...{ color: vars.title.font?.color?.toString() },
     });
 
     // This is so 100% is the space within the padding of the root element
@@ -352,9 +355,8 @@ export const searchResultClasses = useThemeCache((mediaQueries, hasIcon = false)
     const metas = style("metas", {
         marginTop: styleUnit(2),
         ...Mixins.margin({
-            left: -metaVars.spacing.default,
+            horizontal: negativeUnit(metasVars.spacing.horizontal),
         }),
-        width: calc(`100% + ${styleUnit(metaVars.spacing.default * 2)}`),
     });
 
     const compactExcerpt = style("compactExcerpt", {});
@@ -373,13 +375,17 @@ export const searchResultClasses = useThemeCache((mediaQueries, hasIcon = false)
         },
     });
 
+    const titleColor = vars.title.font?.color?.toString();
+    const defaultLinkColor = titleColor ?? ColorsUtils.colorOut(globalVars.mainColors.fg);
+
     const link = style("link", {
-        color: ColorsUtils.colorOut(globalVars.mainColors.fg),
         ...linkColors,
+        // skipDefault = true so color is undefined
+        ...{ color: defaultLinkColor },
     });
 
     const afterExcerptLink = style("afterExcerptLink", {
-        ...Mixins.font(globalVars.meta.text),
+        ...Mixins.font(metasVars.font),
         ...linkColors,
     });
 

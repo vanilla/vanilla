@@ -4,7 +4,7 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { absolutePosition, flexHelper, singleBorder, userSelect } from "@library/styles/styleHelpers";
+import { flexHelper, singleBorder, userSelect } from "@library/styles/styleHelpers";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
 import { styleFactory, variableFactory } from "@library/styles/styleUtils";
@@ -192,7 +192,7 @@ export const mobileDropDownClasses = useThemeCache(() => {
     const closeWidth =
         Math.floor(globalVars.icon.sizes.xSmall) + 2 * (globalVars.gutter.half + globalVars.gutter.quarter);
     const closeButton = style("closeButton", {
-        ...absolutePosition.middleLeftOfParent(),
+        ...Mixins.absolute.middleLeftOfParent(),
         height: styleUnit(closeWidth),
         width: styleUnit(closeWidth),
         minWidth: styleUnit(closeWidth),

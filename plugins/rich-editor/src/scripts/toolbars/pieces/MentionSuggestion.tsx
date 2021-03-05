@@ -108,7 +108,7 @@ export function MentionSuggestionLoading(props: IMentionLoadingProps) {
             <button type="button" className="atMentionList-suggestion" disabled>
                 <span className="atMentionList-user atMentionList-loader">
                     <span className="PhotoWrap atMentionList-photoWrap">
-                        <img alt={name} className="atMentionList-photo ProfilePhoto" />
+                        <span className="atMentionList-photo ProfilePhoto" />
                     </span>
                     <span className="atMentionList-userName">{t("Loading...")}</span>
                 </span>
@@ -133,7 +133,7 @@ export function MentionSuggestionSpacer() {
             <button type="button" className="atMentionList-suggestion">
                 <span className="atMentionList-user atMentionList-loader">
                     <span className="PhotoWrap atMentionList-photoWrap">
-                        <img alt={name} className="atMentionList-photo ProfilePhoto" />
+                        <span className="atMentionList-photo ProfilePhoto" />
                     </span>
                     <span className="atMentionList-userName" />
                 </span>

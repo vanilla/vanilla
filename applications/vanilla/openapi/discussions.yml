@@ -22,6 +22,16 @@ paths:
       - $ref: '#/components/parameters/DateInserted'
       - $ref: '#/components/parameters/DateUpdated'
       - $ref: '#/components/parameters/DateLastComment'
+      - description: >
+          Filter discussions by site-section-id (subcommunity).
+          The subcommunityID or folder can be used.
+          The query looks like:
+          siteSectionID=$SubcommunityID:{id} ie. 1
+          siteSectionID=$SubcommunityID:{folder} ie. en
+        in: query
+        name: siteSectionID
+        schema:
+          type: string
       - description: Filter by discussion type.
         in: query
         name: type
@@ -620,7 +630,7 @@ paths:
           The target user ID.
         in: path
         name: userID
-        required: true
+        required: false
         schema:
           type: integer
       - $ref: '#/components/parameters/DiscussionExpand'

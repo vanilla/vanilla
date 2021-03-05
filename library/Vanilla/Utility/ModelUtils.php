@@ -231,4 +231,27 @@ class ModelUtils {
         }
         return $result;
     }
+
+    /**
+     * Iterate through a generator until completed until a specified timeout has been reached.
+     *
+     * @param callable $iterable
+     * @param int $timeout
+     * @return bool
+     */
+    public static function iterateWithTimeout(callable $iterable, int $timeout): bool {
+        $horizon = time() + $timeout;
+
+        $memoryLimit = ini_get("memory_limit");
+        $memoryLimit = $memoryLimit == -1 ? null : StringUtils::unformatSize($memoryLimit);
+
+        foreach ($iterable() as $r) {
+            $memoryExceeded = $memoryLimit ? (memory_get_usage() / $memoryLimit) > 0.8 : false;
+            if (time() > $horizon || $memoryExceeded) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

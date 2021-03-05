@@ -564,6 +564,10 @@ components:
           description: When the comment was created.
           format: date-time
           type: string
+        groupID:
+          description: GroupID of the comment if applicable.
+          type: integer
+          nullable: true
         dateUpdated:
           description: When the comment was last updated.
           format: date-time
@@ -571,7 +575,7 @@ components:
           type: string
         categoryID:
           description: The category of the comment.
-          type: number
+          type: integer
         discussionID:
           description: The ID of the discussion.
           type: integer

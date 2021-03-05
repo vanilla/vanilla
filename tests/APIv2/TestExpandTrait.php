@@ -140,11 +140,11 @@ trait TestExpandTrait {
      */
     private function assertLocaleExpanded(array $row): void {
         $locale = $row['locale'] ?? null;
-        $body = $row['body'] ?? null;
+        $body = $row['bodyPlainText'] ?? null;
         $name = $row['name'] ?? null;
 
         if ($locale && $locale !== CrawlableRecordSchema::ALL_LOCALES && $body) {
-            $this->assertArrayHasKey('body_' . $locale, $row);
+            $this->assertArrayHasKey('bodyPlainText_' . $locale, $row);
         }
         if ($locale && $locale !== CrawlableRecordSchema::ALL_LOCALES && $name) {
             $this->assertArrayHasKey('name_' . $locale, $row);

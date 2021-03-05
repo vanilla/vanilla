@@ -164,7 +164,7 @@ export async function autoWrapCollapsableContent() {
 
     return await Promise.all(
         Array.from(jsCollapsables).map((element: HTMLElement) => {
-            return new Promise((resolve) => {
+            return new Promise<void>((resolve) => {
                 const nodes = Array.from(element.childNodes);
                 const className = element.getAttribute("data-className") || undefined;
 

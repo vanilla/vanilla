@@ -22,6 +22,7 @@ interface IProps extends IOptionalComponentID, LinkProps {
     ariaLabel?: string;
     baseClass?: ButtonTypes;
     tabIndex?: number;
+    disabled?: boolean;
     addWrap?: boolean; // Adds wrapper class to help with overflowing text
 }
 
@@ -43,6 +44,7 @@ export default class LinkAsButton extends React.Component<IProps> {
             children,
             tabIndex,
             addWrap = false,
+            disabled,
             ...restProps
         } = this.props;
         const componentClasses = classNames(getButtonStyleFromBaseClass(baseClass || ButtonTypes.STANDARD), className);
@@ -54,7 +56,8 @@ export default class LinkAsButton extends React.Component<IProps> {
                 aria-label={ariaLabel || title || fallbackTitle}
                 tabIndex={tabIndex}
                 role={"button"}
-                to={to}
+                to={disabled ? "" : to}
+                disabled={disabled}
                 {...restProps}
             >
                 <ConditionalWrap className={buttonLabelWrapClass().root} condition={addWrap}>

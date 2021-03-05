@@ -57,6 +57,10 @@ export const paginationCSS = () => {
         },
     );
 
+    cssOut(`.Pager > a, .Pager > a.Highlight`, {
+        textDecoration: "none",
+    });
+
     cssOut(`.Pager .Next`, {
         borderTopRightRadius: globalVars.border.radius,
         borderBottomRightRadius: globalVars.border.radius,
@@ -76,6 +80,7 @@ export const paginationCSS = () => {
             makeImportant: true,
         }),
         opacity: 0.5,
+        textDecoration: "none",
     });
 
     cssOut(`.Content .PageControls`, {

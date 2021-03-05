@@ -7,13 +7,15 @@ import { styleFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { Mixins } from "@library/styles/Mixins";
+import { metasVariables } from "@library/metas/Metas.variables";
 
 export const resultPaginationInfoClasses = useThemeCache(() => {
     const globalVars = globalVariables();
+    const metasVars = metasVariables();
     const style = styleFactory("resultPaginationInfo");
 
     const root = style({
-        ...Mixins.font(globalVars.meta.text),
+        ...Mixins.font(metasVars.font),
         marginTop: globalVars.gutter.half,
     });
 

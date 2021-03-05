@@ -5,7 +5,7 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { absolutePosition, negative, userSelect } from "@library/styles/styleHelpers";
+import { negative, userSelect } from "@library/styles/styleHelpers";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
 import { Mixins } from "@library/styles/Mixins";
@@ -82,7 +82,7 @@ const backLinkClasses = useThemeCache(() => {
     const inHeading = (fontSize?: number | null) => {
         if (fontSize) {
             return style("inHeading", {
-                ...absolutePosition.topLeft(".5em"),
+                ...Mixins.absolute.topLeft(".5em"),
                 fontSize: styleUnit(fontSize),
                 transform: `translateY(-50%)`,
                 marginTop: styleUnit(vars.position.verticalOffset),

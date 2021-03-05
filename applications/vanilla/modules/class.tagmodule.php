@@ -9,6 +9,7 @@
 
 use Garden\Schema\Schema;
 use Vanilla\Widgets\AbstractWidgetModule;
+use Vanilla\Theme\BoxThemeShim;
 
 /**
  * Class TagModule
@@ -172,8 +173,6 @@ class TagModule extends AbstractWidgetModule {
     }
 
     /**
-     *
-     *
      * @return string
      */
     public function inlineDisplay() {
@@ -189,32 +188,7 @@ class TagModule extends AbstractWidgetModule {
             return '';
         }
 
-        $string = '';
-        ob_start();
-        ?>
-        <div class="InlineTags Meta">
-            <?php echo t('Tagged'); ?>:
-            <ul>
-                <?php foreach ($this->_TagData->resultArray() as $tag) :
-?>
-                    <?php if ($tag['Name'] != '') :
-?>
-                        <li><?php
-                            echo anchor(
-                                htmlspecialchars(tagFullName($tag)),
-                                tagUrl($tag, '', '/'),
-                                ['class' => 'Tag_'.str_replace(' ', '_', $tag['Name'])]
-                            );
-                            ?></li>
-                    <?php
-endif; ?>
-                <?php
-endforeach; ?>
-            </ul>
-        </div>
-        <?php
-        $string = ob_get_clean();
-        return $string;
+        return $this->fetchView('taginline');
     }
 
     /**
@@ -235,32 +209,7 @@ endforeach; ?>
             return '';
         }
 
-        $string = '';
-        ob_start();
-        ?>
-        <div class="Box Tags">
-            <?php echo panelHeading(t($this->ParentID > 0 ? 'Tagged' : 'Popular Tags')); ?>
-            <ul class="TagCloud">
-                <?php foreach ($this->_TagData->result() as $tag) :
-?>
-                    <?php if ($tag['Name'] != '') :
-?>
-                        <li class="TagCloud-Item"><?php
-                            echo anchor(
-                                htmlspecialchars(tagFullName($tag)).' '.wrap(number_format($tag['CountDiscussions']), 'span', ['class' => 'Count']),
-                                tagUrl($tag, '', '/'),
-                                ['class' => 'Tag_'.str_replace(' ', '_', $tag['Name'])]
-                            );
-                            ?></li>
-                    <?php
-endif; ?>
-                <?php
-endforeach; ?>
-            </ul>
-        </div>
-        <?php
-        $string = ob_get_clean();
-        return $string;
+        return parent::toString();
     }
 
     /**

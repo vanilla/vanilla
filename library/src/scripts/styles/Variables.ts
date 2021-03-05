@@ -16,6 +16,7 @@ import {
     IContentBoxes,
     ISpacing,
     IStateColors,
+    IPartialBoxOptions,
 } from "@library/styles/cssUtilsTypes";
 import { BorderType } from "@library/styles/styleHelpers";
 import { DeepPartial } from "redux";
@@ -27,7 +28,7 @@ export class Variables {
 
     static spacing = (vars: ISpacing): ISpacing => ({ ...EMPTY_SPACING, ...vars });
 
-    static font = (vars: IFont): IFont => ({ ...EMPTY_FONTS, ...vars });
+    static font = (vars: IFont) => ({ ...EMPTY_FONTS, ...vars });
 
     static border = (vars: Partial<IBorderStyles>): Partial<IBorderStyles> => ({ ...EMPTY_BORDER, ...vars });
 
@@ -35,17 +36,31 @@ export class Variables {
 
     static clickable = (vars: IStateColors): IStateColors => ({ ...EMPTY_STATE_COLORS, ...vars });
 
-    static box = (vars: Partial<IBoxOptions>): IBoxOptions => {
+    static box = (vars: IPartialBoxOptions): IBoxOptions => {
         return {
-            borderType: BorderType.NONE,
-            background: Variables.background(vars.background ?? {}),
-            spacing: Variables.spacing(vars.spacing ?? {}),
-            border: Variables.border(vars.border ?? {}),
-            itemSpacing: vars.itemSpacing ? vars.itemSpacing : 0,
-            itemSpacingOnAllItems: vars.itemSpacingOnAllItems ?? false,
-            ...vars,
+            borderType: vars?.borderType ?? BorderType.NONE,
+            background: Variables.background(vars?.background ?? {}),
+            spacing: Variables.spacing(vars?.spacing ?? {}),
+            border: Variables.border(vars?.border ?? {}),
+            itemSpacing: vars?.itemSpacing ?? 0,
+            itemSpacingOnAllItems: vars?.itemSpacingOnAllItems ?? false,
         };
     };
+
+    static boxHasBackground(box: IBoxOptions): boolean {
+        const hasBackground = (box.background.color || box.background.image) && !box.background.unsetBackground;
+        return !!hasBackground;
+    }
+
+    static boxHasOutline(box: IBoxOptions): boolean {
+        const hasBackground = Variables.boxHasBackground(box);
+
+        // We have a clearly defined box of sometype.
+        // Anything that makes the box stand out from the background on all side
+        // Means we should apply some default behaviours, like paddings, and borderRadius.
+        const hasFullOutline = [BorderType.BORDER, BorderType.SHADOW].includes(box.borderType) || hasBackground;
+        return hasFullOutline;
+    }
 
     static contentBoxes = (vars?: DeepPartial<IContentBoxes>): IContentBoxes => {
         return {

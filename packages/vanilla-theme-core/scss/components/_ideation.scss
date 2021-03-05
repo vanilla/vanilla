@@ -8,11 +8,13 @@
     Styles
 \* -------------------------------------------------------------- */
 
-.ItemIdea.ItemIdea.ItemIdea {
-    .PhotoWrap.IndexPhoto,
-    .idea-counter-module .idea-counter-box {
-        margin: 0;
-        width: $theme-photo_size;
-        height: $theme-photo_size;
+@if $staticVariables {
+    .ItemIdea.ItemIdea.ItemIdea {
+        .PhotoWrap.IndexPhoto,
+        .idea-counter-module .idea-counter-box {
+            margin: 0;
+            width: $theme-photo_size;
+            height: $theme-photo_size;
+        }
     }
 }

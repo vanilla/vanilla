@@ -137,11 +137,14 @@ export default function FlyoutToggle(props: IProps) {
         e.stopPropagation();
     }, []);
 
-    const handleFocusChange = (hasFocus: boolean) => {
-        if (!hasFocus) {
-            setVisibility(false);
-        }
-    };
+    const handleFocusChange = useCallback(
+        (hasFocus: boolean) => {
+            if (!hasFocus) {
+                setVisibility(false);
+            }
+        },
+        [setVisibility],
+    );
 
     // Focus handling
     useFocusWatcher(controllerRef, handleFocusChange, props.openAsModal);

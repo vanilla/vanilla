@@ -8,6 +8,7 @@
 namespace VanillaTests\Models;
 
 use CategoryModel;
+use Garden\Web\Exception\NotFoundException;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Utility\ArrayUtils;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
@@ -40,8 +41,8 @@ class CategoryModelTest extends SiteTestCase {
      * @throws \Garden\Container\ContainerException Throws container exception.
      */
     public function setUp(): void {
-        parent::setUp();
         $this->enableCaching();
+        parent::setUp();
 
         $this->category = $this->insertCategories(1)[0];
         $this->categoryID = $this->category['CategoryID'];
@@ -727,6 +728,55 @@ class CategoryModelTest extends SiteTestCase {
     }
 
     /**
+     * Test that caching works for getDescandants.
+     */
+    public function testGetDescendantsCache() {
+        $this->resetTable('Category');
+        /** @var CategoryModel $categoryModel */
+        $categoryModel = self::container()->get(CategoryModel::class);
+        $category1 = $categoryModel->save([
+            'ParentCategoryID' => -1,
+            'Name' => 'cat1',
+            'UrlCode' => 'cat1',
+            'DisplayAs' => 'Categories',
+        ]);
+        $category1_1 = $categoryModel->save([
+            'ParentCategoryID' => $category1,
+            'Name' => 'cat1_1',
+            'UrlCode' => 'cat1_1',
+            'DisplayAs' => 'Categories',
+        ]);
+
+        $this->assertIDsEqual([$category1_1], $categoryModel->getCategoryDescendantIDs($category1));
+        $this->resetTable('Category');
+        $this->assertIDsEqual([$category1_1], $categoryModel->getCategoryDescendantIDs($category1));
+    }
+
+    /**
+     * Test that we don't infinitely recurse when fetching IDs.
+     */
+    public function testDescendantRecursionGaurd() {
+        $this->resetTable('Category');
+        /** @var CategoryModel $categoryModel */
+        $categoryModel = self::container()->get(CategoryModel::class);
+        $category1 = $categoryModel->save([
+            'ParentCategoryID' => -1,
+            'Name' => 'cat1',
+            'UrlCode' => 'cat1',
+            'DisplayAs' => 'Categories',
+        ]);
+        $category1_1 = $categoryModel->save([
+            'ParentCategoryID' => $category1,
+            'Name' => 'cat1_1',
+            'UrlCode' => 'cat1_1',
+            'DisplayAs' => 'Categories',
+        ]);
+        $categoryModel->setField($category1, 'ParentCategoryID', $category1_1);
+
+        $this->assertIDsEqual([$category1_1, $category1], $categoryModel->getCategoryDescendantIDs($category1));
+    }
+
+    /**
      * Test getting multiple items from the collection.
      */
     public function testCollectionGetMulti() {
@@ -967,5 +1017,148 @@ class CategoryModelTest extends SiteTestCase {
 
         $this->assertNotSame(CategoryModel::categories($id)['Name'], __FUNCTION__);
         $this->assertNotSame(CategoryModel::categories()[$id]['Name'], __FUNCTION__);
+    }
+
+    /**
+     * Verify basic behavior of deleteIDIterator method when deleting a category's contents.
+     */
+    public function testDeleteIDIteratorDelete(): void {
+        $category = $this->createCategory();
+        $categoryID = $category["categoryID"];
+
+        $discussions = [
+            $this->createDiscussion(["categoryID" => $categoryID]),
+            $this->createDiscussion(["categoryID" => $categoryID]),
+            $this->createDiscussion(["categoryID" => $categoryID])
+        ];
+
+        $iterator = $this->categoryModel->deleteIDIterable($categoryID);
+        foreach ($iterator as $iteration) {
+            $this->assertIsBool($iteration);
+        }
+        foreach ($discussions as $discussion) {
+            try {
+                $discussionID = $discussion["discussionID"];
+                $this->api()->get("discussions/{$discussionID}");
+                $this->fail("Discussion not deleted: {$discussionID}");
+            } catch (NotFoundException $e) {
+                $this->assertStringStartsWith("Discussion not found.", $e->getMessage());
+            }
+        }
+
+        $this->expectException(NotFoundException::class);
+        $this->expectExceptionMessage("Category not found.");
+        $this->api()->get("categories/{$categoryID}");
+    }
+
+    /**
+     * Verify basic behavior of deleteIDIterator method when moving a category's contents.
+     */
+    public function testDeleteIDIteratorMove(): void {
+        $category = $this->createCategory();
+        $categoryID = $category["categoryID"];
+
+        $newCategory = $this->createCategory();
+        $newCategoryID = $newCategory["categoryID"];
+
+        $discussions = [
+            $this->createDiscussion(["categoryID" => $categoryID]),
+            $this->createDiscussion(["categoryID" => $categoryID]),
+            $this->createDiscussion(["categoryID" => $categoryID])
+        ];
+
+        $iterator = $this->categoryModel->deleteIDIterable($categoryID, ["newCategoryID" => $newCategoryID]);
+        foreach ($iterator as $iteration) {
+            $this->assertIsBool($iteration);
+        }
+        foreach ($discussions as $discussion) {
+            $discussionID = $discussion["discussionID"];
+            $updatedDiscussion = $this->api()->get("discussions/{$discussionID}");
+            $this->assertSame($newCategoryID, $updatedDiscussion["categoryID"]);
+        }
+
+        $this->expectException(NotFoundException::class);
+        $this->expectExceptionMessage("Category not found.");
+        $this->api()->get("categories/{$categoryID}");
+    }
+
+    /**
+     * Test fetching fields recursively.
+     */
+    public function testGetCategoryFieldRecursive() {
+        $recursesOnSelfID = $this->categoryModel->save($this->newCategory([]));
+        $this->categoryModel->setField($recursesOnSelfID, 'ParentCategoryID', $recursesOnSelfID);
+
+        $parentPhoto = 'https://hello.com/parent.png';
+        $childPhoto = 'https://hello.com/child.png';
+        $parentID = $this->categoryModel->save($this->newCategory([
+            'Photo' => $parentPhoto,
+        ]));
+        $childWithPhotoID = $this->categoryModel->save($this->newCategory([
+            'ParentCategoryID' => $parentID,
+            'Photo' => $childPhoto,
+        ]));
+        $childNoPhotoID = $this->categoryModel->save($this->newCategory([
+            'ParentCategoryID' => $parentID,
+        ]));
+
+        $this->assertEquals(null, $this->categoryModel->getCategoryFieldRecursive($recursesOnSelfID, 'Photo'));
+        $this->assertEquals($parentPhoto, $this->categoryModel->getCategoryFieldRecursive($parentID, 'Photo'));
+        $this->assertEquals($parentPhoto, $this->categoryModel->getCategoryFieldRecursive($childNoPhotoID, 'Photo'));
+        $this->assertEquals($childPhoto, $this->categoryModel->getCategoryFieldRecursive($childWithPhotoID, 'Photo'));
+        $this->assertEquals(null, $this->categoryModel->getCategoryFieldRecursive(null, 'Photo'));
+
+        // Different ways of querying.
+        $parentCat = $this->categoryModel->getID($parentID);
+        // With obj.
+        $this->assertEquals($parentPhoto, $this->categoryModel->getCategoryFieldRecursive($parentCat, 'Photo'));
+        // With slug
+        $this->assertEquals($parentPhoto, $this->categoryModel->getCategoryFieldRecursive($parentCat->UrlCode, 'Photo'));
+        // With array
+        $this->assertEquals($parentPhoto, $this->categoryModel->getCategoryFieldRecursive((array) $parentCat, 'Photo'));
+
+        // Invalid parents
+        $nullParentID = $this->categoryModel->save($this->newCategory([
+            'ParentCategoryID' => null,
+        ]));
+        $unknownParentID = $this->categoryModel->save($this->newCategory([
+            'ParentCategoryID' => 10000,
+        ]));
+        $this->assertEquals(null, $this->categoryModel->getCategoryFieldRecursive($nullParentID, 'Photo'));
+        $this->assertEquals(null, $this->categoryModel->getCategoryFieldRecursive($unknownParentID, 'Photo'));
+
+        // Getting a default value out.
+        $this->assertEquals(
+            'mydefault',
+            $this->categoryModel->getCategoryFieldRecursive($unknownParentID, 'Photo', 'mydefault')
+        );
+    }
+
+    /**
+     * Verify discussions are moved when deleteAndReplace includes a new categoryID.
+     */
+    public function testDeleteAndReplaceMoveDiscussions(): void {
+        $category = $this->createCategory();
+        $categoryID = $category["categoryID"];
+
+        $newCategory = $this->createCategory();
+        $newCategoryID = $newCategory["categoryID"];
+
+        $discussions = [
+            $this->createDiscussion(["categoryID" => $categoryID]),
+            $this->createDiscussion(["categoryID" => $categoryID]),
+            $this->createDiscussion(["categoryID" => $categoryID])
+        ];
+
+        $this->categoryModel->deleteAndReplace($categoryID, $newCategoryID);
+
+        foreach ($discussions as $discussion) {
+            $discussionID = $discussion["discussionID"];
+            $updatedDiscussion = $this->api()->get("discussions/{$discussionID}");
+            $this->assertSame($newCategoryID, $updatedDiscussion["categoryID"]);
+        }
+
+        $deletedRow = $this->categoryModel->getID($categoryID, DATASET_TYPE_ARRAY);
+        $this->assertFalse($deletedRow);
     }
 }

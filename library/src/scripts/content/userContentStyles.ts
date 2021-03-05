@@ -16,7 +16,7 @@ import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { em, important, percent, px, border } from "csx";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
-import { FontSizeProperty } from "csstype";
+import { Property } from "csstype";
 import { blockQuoteVariables } from "@rich-editor/quill/components/blockQuoteStyles";
 import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { media } from "@library/styles/styleShim";
@@ -325,7 +325,7 @@ export const userContentClasses = useThemeCache(() => {
         },
     };
 
-    const headingStyle = (tag: string, fontSize: FontSizeProperty<TLength>): CSSObject => {
+    const headingStyle = (tag: string, fontSize: Property.FontSize<TLength>): CSSObject => {
         return {
             marginTop: styleUnit(vars.spacing.base),
             fontSize,

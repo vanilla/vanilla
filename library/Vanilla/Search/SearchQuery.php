@@ -348,4 +348,14 @@ abstract class SearchQuery {
     public function supportsExtenders(): bool {
         return false;
     }
+
+    /**
+     * Set the matches for the search query.
+     *
+     * @param array $fields
+     * @return array
+     */
+    public function setQueryMatchFields(array $fields = []): array {
+        return $fields;
+    }
 }

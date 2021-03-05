@@ -23,5 +23,7 @@ export const categoryListVariables = useThemeCache(() => {
      */
     const contentBoxes = makeVars("contentBoxes", Variables.contentBoxes(globalVariables().contentBoxes));
 
-    return { contentBoxes };
+    const panelBoxes = makeVars("panelBoxes", Variables.contentBoxes(globalVariables().panelBoxes));
+
+    return { contentBoxes, panelBoxes };
 });

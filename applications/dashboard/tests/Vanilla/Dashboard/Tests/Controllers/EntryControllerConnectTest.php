@@ -424,6 +424,7 @@ class EntryControllerConnectTest extends VanillaTestCase {
     public function testMissingEmail(): void {
         $ssoUser = $this->dummyUser(['UniqueID' => __FUNCTION__, 'Email' => null]);
 
+        $this->config->set('Garden.Registration.AutoConnect', false);
         // The first hit to entry connect should return with a form for the user to fill out.
         $r = $this->entryConnect($ssoUser);
         $this->assertFalse($this->session->isValid());
@@ -438,6 +439,29 @@ class EntryControllerConnectTest extends VanillaTestCase {
         $r2 = $this->entryConnect($ssoUser, $body);
         $this->bessy()->assertNoFormErrors();
         $this->assertSSOUser($body + $ssoUser);
+    }
+
+    /**
+     * An SSO provider that doesn't provide an email address will need to prompt the user.
+     * This process shouldn't allow to takeover another user's account.
+     */
+    public function testMissingEmailCantTakeoverAccount(): void {
+        $existingUser = $this->insertDummyUser();
+        $ssoUser = $this->dummyUser(['UniqueID' => __FUNCTION__, 'Email' => null]);
+
+        $this->config->set('Garden.Registration.AutoConnect', false);
+        // The first hit to entry connect should return with a form for the user to fill out.
+        $r = $this->entryConnect($ssoUser);
+        $this->assertFalse($this->session->isValid());
+        $html = $this->bessy()->getLastHtml();
+        $html->assertContainsString('Add Info &amp; Create Account');
+        $html->assertFormInput('Email');
+        $html->assertFormInput('ConnectName');
+
+        // The user can now fill the form out.
+        $body = ['Email' => $existingUser['Email']];
+        $this->expectExceptionMessage('The email you entered is in use by another member.');
+        $r2 = $this->entryConnect($ssoUser, $body);
     }
 
     //endregion
@@ -624,6 +648,31 @@ class EntryControllerConnectTest extends VanillaTestCase {
             'ConnectEmail' => $existingUser['Email'],
         ], self::PROVIDER_KEY, false);
         $this->bessy()->assertFormErrorMessage('The email you entered is in use by another member.');
+        $this->assertFalse($this->session->isValid());
+        $this->assertNoAuthentication($ssoUser);
+    }
+
+    /**
+     * Make sure an exception is triggered when the SSO provider does not supply an email & autoconnect is enabled.
+     */
+    public function testPreventSSOAutoConnectOnAbsentEmail(): void {
+        $this->config->set('Garden.Registration.AutoConnect', true);
+        $existingUser = $this->insertDummyUser();
+
+        // This SSO user does not have a provided email
+        $ssoUser = [
+            'Name' => $existingUser['Name'],
+            'UniqueID' => __FUNCTION__
+        ];
+
+        $this->expectExceptionMessage('Unable to auto-connect because SSO did not provide an email address.');
+        $r = $this->entryConnect(
+            $ssoUser,
+            [],
+            self::PROVIDER_KEY,
+            false
+        );
+
         $this->assertFalse($this->session->isValid());
         $this->assertNoAuthentication($ssoUser);
     }

@@ -10,7 +10,10 @@
 
 use Garden\Container\Container;
 use Garden\EventManager;
+use Garden\Schema\Schema;
+use Garden\Web\Data;
 use Vanilla\Attributes;
+use Vanilla\OpenAPIBuilder;
 use Vanilla\Web\APIExpandMiddleware;
 
 /**
@@ -96,6 +99,10 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
                     [$this, "getUserProfileValuesChecked"],
                 ]
             );
+
+        // Add the OpenAPI filter to set the field schema.
+        $dic->rule(OpenAPIBuilder::class)
+            ->addCall('addFilter', ['filter' => [$this, 'filterOpenApi']]);
     }
 
     /**
@@ -912,6 +919,90 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             }
         }
         return $values;
+    }
+
+    /**
+     * Return the schema object that represents the API fields.
+     *
+     * This schema is used as the input schema for the `PATCH /users/:id/extended` endpoint and for field expansion schema.
+     *
+     * @param string|null $schemaType
+     * @returns Schema
+     */
+    private function getProfileSchema(?string $schemaType = ''): Schema {
+        $fields = array_column($this->getProfileFields(true), null, 'Name');
+
+        // Dynamically build the schema based on the fields and data types.
+        $schemaArray = [];
+
+        foreach ($fields as $field) {
+            $name = $field['Name'];
+            $types = ['CheckBox' => 'b', "Date" => 'dt'];
+            $dataType = $types[$field['FormType']] ?? 's';
+
+            if ($field['FormType'] === 'Dropdown') {
+                $schemaArray["{$name}:{$dataType}?"] = ['enum' => $field['Options']];
+            } else {
+                $schemaArray[] = "{$name}:{$dataType}?";
+            }
+        }
+
+        $schema = Schema::parse($schemaArray);
+
+        return $schema;
+    }
+
+    /**
+     * The `PATCH /users/:id/extended` endpoint.
+     *
+     * @param UsersApiController $usersApi
+     * @param int $id
+     * @param array $body
+     * @return \Garden\Web\Data
+     */
+    public function usersApiController_patch_extended(UsersApiController $usersApi, int $id, array $body): \Garden\Web\Data {
+        $userID = $usersApi->getSession()->UserID;
+        $userModel = new UserModel();
+        if ($id !== $userID) {
+            $usersApi->permission('Garden.Users.Edit');
+        }
+        $in = $this->getProfileSchema('in');
+        $out = $this->getProfileSchema('out');
+        $body = $in->validate($body, true);
+        $schemaArray = $in->getSchemaArray();
+        // Special handling of the DateOfBirth field, which lives in the User table.
+        $dateOfBirth = isset($schemaArray['properties']['DateOfBirth']);
+        if ($dateOfBirth && isset($body['DateOfBirth'])) {
+            $dob = $body['DateOfBirth']->format('Y-m-d');
+            $userModel->save(['UserID' => $id, 'DateOfBirth' => $dob]);
+        }
+        $this->updateUserFields($id, $body);
+        $row = $this->getUserProfileValuesChecked([$id]);
+        // More special handling of DateOfBirth.
+        if ($dateOfBirth) {
+            $user = $userModel->getId($id);
+            $row[$id]->DateOfBirth = $user->DateOfBirth;
+        }
+        $result = $out->validate($row[$id]);
+        $result = new Data($result);
+        return $result;
+    }
+
+    /**
+     * Augment the generated OpenAPI schema with the profile extender fields.
+     *
+     * Since the profile extender fields are defined at runtime we have to add them to the OpenAPI schema dynamically.
+     *
+     * @param array $openApi
+     */
+    public function filterOpenApi(array &$openApi): void {
+        $schema = $this->getProfileSchema('out');
+
+        \Vanilla\Utility\ArrayUtils::setByPath(
+            'components.schemas.ExtendedUserFields.properties',
+            $openApi,
+            $schema->jsonSerialize()['properties']
+        );
     }
 }
 

@@ -17,6 +17,20 @@ class SchemaForm {
     const TOGGLE_TYPE = 'toggle';
 
     /**
+     * Create a "section" of the form on an object type.
+     *
+     * @param FormOptions $options
+     *
+     * @return array
+     */
+    public static function section(FormOptions $options): array {
+        return [
+            'label' => $options->getLabel(),
+            'description' => $options->getDescription(),
+        ];
+    }
+
+    /**
      * Drop down form element schema.
      *
      * @param FormOptions $options
@@ -82,15 +96,21 @@ class SchemaForm {
      *
      * @param FormOptions $options
      * @param FormChoicesInterface $choices
+     * @param ?FieldMatchConditional $conditions
      *
      * @return array
      */
-    public static function radio(FormOptions $options, FormChoicesInterface $choices) {
-        return [
+    public static function radio(FormOptions $options, FormChoicesInterface $choices, FieldMatchConditional $conditions = null) {
+        $result = [
             'description' => $options->getDescription(),
             'label' => $options->getLabel(),
             'inputType' => self::RADIO_TYPE,
             'choices' => $choices->getChoices(),
         ];
+
+        if ($conditions) {
+            $result['conditions'] = [$conditions->getConditions()];
+        }
+        return $result;
     }
 }

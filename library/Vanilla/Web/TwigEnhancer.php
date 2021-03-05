@@ -18,6 +18,7 @@ use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\LocaleInterface;
 use Vanilla\Dashboard\Models\BannerImageModel;
 use Vanilla\FeatureFlagHelper;
+use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\HtmlUtils;
 
 /**
@@ -325,6 +326,8 @@ class TwigEnhancer {
             'renderHtml' => new TwigFunction('renderHtml', function (?string $body, ?string $format = null) {
                 return Gdn::formatService()->renderHTML((string)$body, $format);
             }, ['is_safe' => ['html']]),
+            'isArray' => [ArrayUtils::class, 'isArray'],
+            'isAssociativeArray' => [ArrayUtils::class, 'isAssociative'],
 
             // Application interaction.
             'renderControllerAsset' => [$this, 'renderControllerAsset'],
@@ -339,6 +342,7 @@ class TwigEnhancer {
             // Session
             'hasPermission' => [$this, 'hasPermission'],
             'inSection' => [\Gdn_Theme::class, 'inSection'],
+            'isSignedIn' => [$this->session, 'isValid'],
 
             // Routing.
             'assetUrl' => [$this, 'assetUrl'],

@@ -93,29 +93,62 @@ class WidgetFactory implements \JsonSerializable {
      * @return string
      */
     public function renderWidgetSummary(array $parameters): string {
+        return $this->renderTwig("@library/Vanilla/Widgets/WidgetFactorySummary.twig", [
+            'widgetName' => $this->getName(),
+            'parameters' => $this->getWidgetSummaryParameters($parameters),
+        ]);
+    }
+
+    /**
+     * Get the parameters for a widget summary.
+     *
+     * @param array $parameters
+     * @return array
+     */
+    public function getWidgetSummaryParameters(array $parameters): array {
         $schema = $this->getSchema();
+        $widgetParameters = $this->getWidgetPropertiesInternal($schema, $parameters);
+        return $widgetParameters;
+    }
+
+    /**
+     * Get the properties to display in the schema.
+     *
+     * @param Schema|array $schema
+     * @param array $parameters
+     * @return array
+     */
+    private function getWidgetPropertiesInternal($schema, array $parameters = []): array {
         $widgetParameters = [];
-        foreach ($schema->getSchemaArray()['properties'] as $fieldName => $property) {
-            $form = $property['x-control'] ?? null;
-            if (!$form) {
+        $schemaArray = is_array($schema) ? $schema : $schema->getSchemaArray();
+        if (!isset($schemaArray['properties'])) {
+            return [];
+        }
+        foreach ($schemaArray['properties'] as $fieldName => $property) {
+            $type = $property['type'] ?? null;
+            $control = $property['x-control'] ?? null;
+            $label = $control['label'] ?? null;
+            if (!$control || !$type || !$label) {
                 continue;
             }
 
-            $label = $form['label'];
-            $actualValue = $parameters[$fieldName] ?? $form['default'] ?? '(Default)';
-            $staticChoices = $form['choices']['staticOptions'] ?? null;
-            if ($staticChoices !== null && isset($staticChoices[$actualValue])) {
-                $actualValue = $staticChoices[$actualValue] ?? '(Unknown)';
+            if ($type === 'object') {
+                $widgetParameters[] = [
+                    'name' => $label,
+                    'value' => $this->getWidgetPropertiesInternal($property, $parameters[$fieldName] ?? []),
+                ];
+            } else {
+                $actualValue = $parameters[$fieldName] ?? $control['default'] ?? '(Default)';
+                $staticChoices = $control['choices']['staticOptions'] ?? null;
+                if ($staticChoices !== null && isset($staticChoices[$actualValue])) {
+                    $actualValue = $staticChoices[$actualValue] ?? '(Unknown)';
+                }
+                $widgetParameters[] = [
+                    'name' => $label,
+                    'value' => $actualValue,
+                ];
             }
-            $widgetParameters[] = [
-                'name' => $label,
-                'value' => $actualValue,
-            ];
         }
-
-        return $this->renderTwig("@library/Vanilla/Widgets/WidgetFactorySummary.twig", [
-            'widgetName' => $this->getName(),
-            'parameters' => $widgetParameters,
-        ]);
+        return $widgetParameters;
     }
 }

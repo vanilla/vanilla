@@ -142,6 +142,7 @@ $BodyExists = $Construct->columnExists('Body');
 $LastCommentIDExists = $Construct->columnExists('LastCommentID');
 $LastCommentUserIDExists = $Construct->columnExists('LastCommentUserID');
 $CountBookmarksExists = $Construct->columnExists('CountBookmarks');
+$hotExists = $Construct->columnExists('hot');
 
 $Construct
     ->primaryKey('DiscussionID')
@@ -168,9 +169,11 @@ $Construct
     ->column('UpdateIPAddress', 'ipaddress', true)
     ->column('DateLastComment', 'datetime', null, ['index', 'index.CategoryPages'])
     ->column('LastCommentUserID', 'int', true)
-    ->column('Score', 'float', null)
+    ->column('Score', 'float', null, ['index'])
     ->column('Attributes', 'text', true)
-    ->column('RegardingID', 'int(11)', true, 'index');
+    ->column('RegardingID', 'int(11)', true, 'index')
+    ->column('hot', 'int(11)', 0, 'index')
+;
 //->column('Source', 'varchar(20)', true)
 
 $Construct
@@ -199,13 +202,13 @@ $Construct->table('UserDiscussion');
 
 $ParticipatedExists = $Construct->columnExists('Participated');
 
-$Construct->column('UserID', 'int', false, 'primary')
+$Construct->column('UserID', 'int', false, ['primary', 'index.UserID_Bookmarked'])
     ->column('DiscussionID', 'int', false, ['primary', 'key'])
     ->column('Score', 'float', null)
     ->column('CountComments', 'int', '0')
     ->column('DateLastViewed', 'datetime', null)// null signals never
     ->column('Dismissed', 'tinyint(1)', '0')// relates to dismissed announcements
-    ->column('Bookmarked', 'tinyint(1)', '0')
+    ->column('Bookmarked', 'tinyint(1)', '0', 'index.UserID_Bookmarked')
     ->column('Participated', 'tinyint(1)', '0')// whether or not the user has participated in the discussion.
     ->set($Explicit, $Drop);
 
@@ -220,10 +223,10 @@ if ($Construct->tableExists()) {
 $Construct
     ->table('Comment')
     ->primaryKey('CommentID')
-    ->column('DiscussionID', 'int', false, 'index.1')
     //->column('Type', 'varchar(10)', true)
     //->column('ForeignID', 'varchar(32)', TRUE, 'index') // For relating foreign records to discussions
-    ->column('InsertUserID', 'int', true, 'key')
+    ->column('InsertUserID', 'int', true, 'index.InsertUserID_DiscussionID')
+    ->column('DiscussionID', 'int', false, ['index.1', 'index.InsertUserID_DiscussionID'])
     ->column('UpdateUserID', 'int', true)
     ->column('DeleteUserID', 'int', true)
     ->column('Body', 'text', false, 'fulltext')
@@ -506,4 +509,10 @@ foreach ($users as $user) {
             ->where('email', $user['Email'])
             ->put();
     }
+}
+
+if (!$hotExists) {
+    $SQL->update('Discussion')
+        ->set('hot', '0 + COALESCE(Score, 0) + COALESCE(CountComments, 0)', false)
+        ->put();
 }

@@ -8,7 +8,6 @@
         ]
     },
     "devDependencies": {
-        "@vanilla/library": "^3.0.1",
         "@vanilla/utils": "^3.0.1",
         "fibers": "4.0.1",
         "grunt": "1.0.4",

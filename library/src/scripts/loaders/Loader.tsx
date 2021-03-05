@@ -11,7 +11,7 @@ import { t } from "@library/utility/appUtils";
 import { loaderClasses } from "@library/loaders/loaderStyles";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { style } from "@library/styles/styleShim";
-import { PaddingProperty } from "csstype";
+import { Property } from "csstype";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import classNames from "classnames";
 
@@ -19,7 +19,7 @@ interface IProps {
     minimumTime?: number;
     loaderStyleClass?: string;
     size?: number;
-    padding?: PaddingProperty<TLength>;
+    padding?: Property.Padding<TLength>;
     small?: boolean;
 }
 

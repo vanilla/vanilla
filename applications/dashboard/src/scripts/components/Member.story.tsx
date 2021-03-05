@@ -7,6 +7,8 @@ import React from "react";
 import Member from "@dashboard/components/Member";
 import { MemberTable } from "@dashboard/components/MemberTable";
 import TwoColumnLayout from "@library/layout/TwoColumnLayout";
+import { IUser } from "@library/@types/api/users";
+import { IResult } from "@library/result/Result";
 
 export default {
     title: "Search/Members",
@@ -17,8 +19,15 @@ export default {
     },
 };
 
+const common: IResult = {
+    name: "common",
+    url: "#",
+    location: [],
+};
+
 const one = {
-    userCardInfo: {
+    ...common,
+    userInfo: {
         email: "test@example.com",
         userID: 1,
         name: "Valérie Robitaille",
@@ -27,11 +36,12 @@ const one = {
         label: "Product Manager",
         countDiscussions: 1001,
         countComments: 120,
-    },
+    } as IUser,
 };
 
 const two = {
-    userCardInfo: {
+    ...common,
+    userInfo: {
         email: "test@example.com",
         userID: 1,
         name: "Valérie Robitaille d'Ontario",
@@ -40,11 +50,12 @@ const two = {
         label: "Product Manager",
         countDiscussions: 1001,
         countComments: 120,
-    },
+    } as IUser,
 };
 
 const badUserName = {
-    userCardInfo: {
+    ...common,
+    userInfo: {
         email: "test@example.com",
         userID: 1,
         name: "Valérie RRRRRRRRR RRRRRRRRRRR RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR",
@@ -53,7 +64,7 @@ const badUserName = {
         label: "Product Manager",
         countDiscussions: 213,
         countComments: 19,
-    },
+    } as IUser,
 };
 
 export const MemberList = () => (

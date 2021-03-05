@@ -11,6 +11,7 @@
  */
 
 use Garden\EventManager;
+use Vanilla\Utility\StringUtils;
 
 /**
  * Handles file uploads.
@@ -235,20 +236,10 @@ class Gdn_Upload extends Gdn_Pluggable {
      *
      * @param string $formatted The formatted filesize.
      * @return int The number of bytes in the string.
+     * @deprecated Use StringUtils::unformatSize
      */
     public static function unformatFileSize($formatted) {
-        $units = ['B' => 1, 'K' => 1024, 'M' => 1024 * 1024, 'G' => 1024 * 1024 * 1024, 'T' => 1024 * 1024 * 1024 * 1024];
-
-        if (preg_match('/([0-9.]+)\s*([A-Z]*)/i', $formatted, $matches)) {
-            $number = floatval($matches[1]);
-            $unit = strtoupper(substr($matches[2], 0, 1));
-            $mult = val($unit, $units, 1);
-
-            $result = round($number * $mult, 0);
-            return $result;
-        } else {
-            return false;
-        }
+        return StringUtils::unformatSize($formatted);
     }
 
     /**

@@ -14,6 +14,7 @@ import { siteUrl } from "@library/utility/appUtils";
 export interface ISmartLinkProps extends NavLinkProps {
     tabIndex?: number;
     to: LocationDescriptor;
+    disabled?: boolean;
 }
 
 /**

@@ -9,7 +9,6 @@ import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { cssRule } from "@library/styles/styleShim";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
-import { absolutePosition } from "@library/styles/styleHelpers";
 import { styleUnit } from "@library/styles/styleUnit";
 import { percent } from "csx";
 import { Mixins } from "@library/styles/Mixins";

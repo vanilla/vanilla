@@ -207,6 +207,6 @@ export function mountPortal(element: ReactElement<any>, containerID: string, asR
     if (asRealPortal) {
         return ReactDOM.createPortal(element, container);
     } else {
-        return new Promise((resolve) => mountReact(element, container!, () => resolve()));
+        return new Promise<void>((resolve) => mountReact(element, container!, () => resolve()));
     }
 }

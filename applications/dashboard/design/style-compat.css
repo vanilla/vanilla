@@ -1116,7 +1116,7 @@ body {
 }
 
 body.hasRichEditor .richEditor ~ .TextBoxWrapper,
-body.hasRichEditor .CommentForm .PreviewButton,
+body.hasRichEditor .PreviewButton,
 body.hasRichEditor #Form_Preview {
   display: none !important;
 }
@@ -1139,7 +1139,7 @@ body.hasRichEditor .richEditor .spoiler .iconButton {
   box-sizing: border-box;
 }
 .Popup.hasRichEditor .richEditor ~ .TextBoxWrapper,
-.Popup.hasRichEditor .CommentForm .PreviewButton,
+.Popup.hasRichEditor .PreviewButton,
 .Popup.hasRichEditor #Form_Preview {
   display: none !important;
 }
@@ -1172,6 +1172,10 @@ body.hasRichEditor .CommentForm .CommentFormWrap .Form-HeaderWrap {
 body.hasRichEditor .CommentForm .CommentFormWrap .FormWrapper {
     padding-right: 0;
     padding-left: 0;
+  }
+  .Popup.hasRichEditor .CommentForm .CommentFormWrap .FormWrapper .Back,
+body.hasRichEditor .CommentForm .CommentFormWrap .FormWrapper .Back {
+    display: none;
   }
   .Popup.hasRichEditor .CommentForm .richEditor,
 body.hasRichEditor .CommentForm .richEditor {

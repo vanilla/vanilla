@@ -55,25 +55,6 @@ export const forumFontsVariables = useThemeCache(() => {
 export const fontCSS = () => {
     const globalVars = globalVariables();
     const vars = forumFontsVariables();
-    const inputVars = inputVariables();
-
-    const mainColors = globalVars.mainColors;
-    const fg = ColorsUtils.colorOut(mainColors.fg);
-    const bg = ColorsUtils.colorOut(mainColors.bg);
-    const primary = ColorsUtils.colorOut(mainColors.primary);
-    const metaFg = ColorsUtils.colorOut(globalVars.meta.colors.fg);
-
-    cssOut(`.Meta .MItem`, {
-        ...Mixins.font(globalVars.meta.text),
-    });
-
-    cssOut(".Meta .MItem:first-of-type", {
-        marginLeft: 0,
-    });
-
-    cssOut(".Meta .MItem.RSS + .MItem", {
-        marginLeft: 0,
-    });
 
     cssOut(
         `

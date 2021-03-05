@@ -10,14 +10,15 @@ import { pointerEvents } from "@library/styles/styleHelpers";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { FillProperty, OpacityProperty, StrokeProperty, StrokeWidthProperty } from "csstype";
+import { Property } from "csstype";
 import { TLength } from "@library/styles/styleShim";
+import { css, cx } from "@emotion/css";
 
 interface IPathState {
-    stroke?: ColorHelper | StrokeProperty;
-    fill?: ColorHelper | FillProperty;
-    opacity?: OpacityProperty;
-    strokeWidth?: StrokeWidthProperty<TLength>;
+    stroke?: ColorHelper | Property.Stroke;
+    fill?: ColorHelper | Property.Fill;
+    opacity?: Property.Opacity;
+    strokeWidth?: Property.StrokeWidth<TLength>;
 }
 
 interface INestedPathState extends IPathState {
@@ -198,10 +199,16 @@ export const iconVariables = useThemeCache(() => {
         height: 16.02,
     });
 
-    const bookmarkIcon = themeVars("bookmarkIcon", {
+    const _bookmarkIcon = themeVars("bookmarkIcon", {
         width: 12,
         height: 16,
         strokeWidth: 1,
+    });
+
+    const bookmarkIcon = themeVars("bookmarkIcon", {
+        width: 24,
+        height: 24,
+        strokeWidth: 1.4,
     });
 
     const newPostMenuIcon = themeVars("newPostMenuIcon", {
@@ -246,13 +253,25 @@ export const iconVariables = useThemeCache(() => {
         width: 18.444,
         height: 16.791,
     });
+
     const typePollsIcon = themeVars("TypePollsIcon", {
         width: 26,
         height: 26,
     });
+
     const typeQuestion = themeVars("TypeQuestion", {
         width: 26,
         height: 26,
+    });
+
+    const downvote = themeVars("downvote", {
+        width: 24,
+        height: 24,
+    });
+
+    const upvote = themeVars("upvote", {
+        width: 24,
+        height: 24,
     });
 
     return {
@@ -281,6 +300,10 @@ export const iconVariables = useThemeCache(() => {
         deleteIcon,
         editIcon,
         documentation,
+        /**
+         * @deprecated Use bookmarkIcon instead.
+         */
+        _bookmarkIcon,
         bookmarkIcon,
         newPostMenuIcon,
         typeAll,
@@ -293,6 +316,8 @@ export const iconVariables = useThemeCache(() => {
         typeQuestion,
         typePlaces,
         typeFlag,
+        downvote,
+        upvote,
     };
 });
 
@@ -487,7 +512,7 @@ export const iconClasses = useThemeCache(() => {
     });
 
     // Goes on link, not SVG to handle states
-    const bookmark = (
+    const _bookmark = (
         props: IBookmarkProps = {
             normalState: undefined as undefined | INestedPathState,
             loadingState: undefined as undefined | INestedPathState,
@@ -499,10 +524,10 @@ export const iconClasses = useThemeCache(() => {
 
         const {
             normalState = {
-                stroke: globalVars.mixPrimaryAndBg(0.7),
+                stroke: globalVars.mainColors.fg,
                 fill: "none",
                 state: {
-                    stroke: mainColors.primary,
+                    stroke: mainColors.statePrimary,
                 },
             },
             loadingState = {
@@ -517,35 +542,41 @@ export const iconClasses = useThemeCache(() => {
         } = props;
 
         return style("bookmark", {
-            width: styleUnit(vars.bookmarkIcon.width),
-            height: styleUnit(vars.bookmarkIcon.height),
-            opacity: 1,
-            display: "block",
-            position: "relative",
-            ...{
-                ".svgBookmark": {
-                    ...pointerEvents(),
-                },
-                ".svgBookmark-mainPath": svgStyles(normalState),
-                "&.Bookmarked:not(.Bookmarking) .svgBookmark-mainPath": svgStyles(bookmarkedState),
-                "&:hover:not(.Bookmarked) .svgBookmark-mainPath": svgStyles(normalState.state),
-                "&:focus:not(.Bookmarked) .svgBookmark-mainPath": svgStyles(normalState.state),
-                "&:active:not(.Bookmarked) .svgBookmark-mainPath": svgStyles(normalState.state),
-                "&:Bookmarking .svgBookmark-mainPath": svgStyles({
-                    fill: important("none"),
-                    opacity: loadingState.opacity,
-                }),
-                "&:Bookmarking .svgBookmark-loadingPath": svgStyles({}),
-                ".svgBookmark-loadingPath": {
-                    display: "none",
-                },
-                "&.Bookmarking .svgBookmark-loadingPath": {
-                    display: "block",
-                    ...svgStyles(loadingState, true),
-                },
+            svg: {
+                width: styleUnit(vars._bookmarkIcon.width),
+                height: styleUnit(vars._bookmarkIcon.height),
+                opacity: 1,
+                display: "block",
+                position: "relative",
+            },
+            ".svgBookmark": {
+                ...pointerEvents(),
+            },
+            ".svgBookmark-mainPath": svgStyles(normalState),
+            "&.Bookmarked:not(.Bookmarking) .svgBookmark-mainPath": svgStyles(bookmarkedState),
+            "&:hover:not(.Bookmarked) .svgBookmark-mainPath": svgStyles(normalState.state),
+            "&:focus:not(.Bookmarked) .svgBookmark-mainPath": svgStyles(normalState.state),
+            "&:active:not(.Bookmarked) .svgBookmark-mainPath": svgStyles(normalState.state),
+            "&:Bookmarking .svgBookmark-mainPath": svgStyles({
+                fill: important("none"),
+                opacity: loadingState.opacity,
+            }),
+            "&:Bookmarking .svgBookmark-loadingPath": svgStyles({}),
+            ".svgBookmark-loadingPath": {
+                display: "none",
+            },
+            "&.Bookmarking .svgBookmark-loadingPath": {
+                display: "block",
+                ...svgStyles(loadingState, true),
             },
         });
     };
+
+    const bookmark = css({
+        width: styleUnit(vars.bookmarkIcon.width),
+        height: styleUnit(vars.bookmarkIcon.height),
+        strokeWidth: styleUnit(vars.bookmarkIcon.strokeWidth),
+    });
 
     const newPostMenuIcon = style("newPostMenuIcon", {
         width: styleUnit(vars.newPostMenuIcon.width),
@@ -613,6 +644,19 @@ export const iconClasses = useThemeCache(() => {
         height: styleUnit(vars.typeQuestion.height),
     });
 
+    const downvote = css({
+        width: styleUnit(vars.downvote.width),
+        height: styleUnit(vars.downvote.height),
+        stroke: ColorsUtils.colorOut(globalVars.mainColors.fg),
+    });
+
+    const upvote = cx(
+        downvote,
+        css({
+            transform: "rotate(180deg)",
+        }),
+    );
+
     return {
         standard,
         newFolder,
@@ -649,6 +693,10 @@ export const iconClasses = useThemeCache(() => {
         external,
         hamburger,
         documentation,
+        /**
+         * @deprecated Use bookmark instead.
+         */
+        _bookmark,
         bookmark,
         newPostMenuIcon,
         itemFlyout,
@@ -664,5 +712,7 @@ export const iconClasses = useThemeCache(() => {
         typeFlag,
         typeGroups,
         typeKnowledgeBase,
+        downvote,
+        upvote,
     };
 });

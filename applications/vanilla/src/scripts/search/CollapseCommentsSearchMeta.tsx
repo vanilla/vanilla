@@ -58,7 +58,7 @@ export default function CollapseCommentSearchMeta(props: IProps) {
 
     const HeadingTag = `h${headingLevel}` as "h1";
     const counts: ICountResult = {
-        count: discussion.data.countComments,
+        count: discussion.data.countComments ?? 0,
         labelCode: "comments",
     };
 

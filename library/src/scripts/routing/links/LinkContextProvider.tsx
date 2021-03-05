@@ -17,6 +17,9 @@ export interface IWithLinkContext {
 }
 
 const defaultMakeHref = (location: LocationDescriptor) => {
+    if (!location) {
+        return "";
+    }
     const stringUrl = typeof location === "string" ? location : createPath(location);
     return formatUrl(stringUrl, true);
 };

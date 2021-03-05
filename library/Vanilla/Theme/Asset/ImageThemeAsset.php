@@ -37,7 +37,7 @@ class ImageThemeAsset extends ThemeAsset {
      */
     public function getContentType(): string {
         $mimeTypes = new MimeTypes();
-        $path = parse_url($mimeTypes, PHP_URL_PATH);
+        $path = parse_url($this->getUrl(), PHP_URL_PATH);
         $ext = pathinfo($path, PATHINFO_EXTENSION);
 
         return $mimeTypes->getMimeType($ext);

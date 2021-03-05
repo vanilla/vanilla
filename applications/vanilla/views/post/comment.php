@@ -38,22 +38,26 @@ BoxThemeShim::startHeading();
                     $this->fireEvent('AfterBodyField');
                     echo '</div>';
 
+
                     echo "<div class=\"Buttons\">\n";
                     $this->fireEvent('BeforeFormButtons');
 
-                    $CancelText = t('Home');
-                    $CancelClass = 'Back';
-                    if (!$NewOrDraft || $Editing) {
-                        $CancelText = t('Cancel');
-                        $CancelClass = 'Cancel';
-                    }
+                    if(!BoxThemeShim::isActive()){
 
-                    echo '<span class="'.$CancelClass.'">';
-                    echo anchor($CancelText, '/');
-                    if ($this->data('Editor.BackLink')) {
-                        echo ' <span class="Bullet">•</span> '.$this->data('Editor.BackLink') ;
+                        $CancelText = t('Home');
+                        $CancelClass = 'Back';
+                        if (!$NewOrDraft || $Editing) {
+                            $CancelText = t('Cancel');
+                            $CancelClass = 'Cancel';
+                        }
+
+                        echo '<span class="'.$CancelClass.'">';
+                        echo anchor($CancelText, '/');
+                        if ($this->data('Editor.BackLink')) {
+                            echo ' <span class="Bullet">•</span> '.$this->data('Editor.BackLink') ;
+                        }
+                        echo '</span>';
                     }
-                    echo '</span>';
 
                     $ButtonOptions = ['class' => 'Button Primary CommentButton'];
 

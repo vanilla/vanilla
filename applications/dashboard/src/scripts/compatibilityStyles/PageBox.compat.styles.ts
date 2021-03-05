@@ -12,12 +12,14 @@ import { Mixins } from "@library/styles/Mixins";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { percent } from "csx/lib/units";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
+import { extendItemContainer } from "@library/styles/styleHelpers";
 
 export const pageBoxCompatStyles = useThemeCache(() => {
     const globalVars = globalVariables();
     const mediaQueries = layoutVariables().mediaQueries();
 
     MixinsFoundation.contentBoxes(globalVars.contentBoxes);
+    MixinsFoundation.contentBoxes(globalVars.panelBoxes, undefined, ".Panel");
 
     // Apply heading boxes
 
@@ -48,6 +50,9 @@ export const pageBoxCompatStyles = useThemeCache(() => {
                 margin: 0,
                 padding: 0,
                 fontSize: globalVars.fonts.size.largeTitle,
+                width: "auto",
+                flex: 1,
+                justifyContent: "flex-start",
                 ...lineHeightAdjustment(),
 
                 "& > a": {
@@ -73,6 +78,32 @@ export const pageBoxCompatStyles = useThemeCache(() => {
         },
         ".pageBox + .PageControls": {
             marginTop: 16,
+        },
+
+        ".GuestBox": {
+            margin: 0,
+            marginBottom: 4,
+
+            "& .GuestBox-buttons": {
+                width: "100%",
+                display: "flex",
+                marginBottom: 4,
+                ...extendItemContainer(4),
+            },
+
+            "& .Button": {
+                flex: 1,
+                margin: 4,
+            },
+        },
+    });
+
+    cssRaw({
+        ".Panel .pageHeadingBox.pageHeadingBox.pageHeadingBox": {
+            ...Mixins.padding(globalVars.panelHeadingBox.spacing),
+            [allHeadings]: {
+                fontSize: globalVars.fonts.size.subTitle,
+            },
         },
     });
 });

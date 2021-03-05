@@ -12,6 +12,7 @@ import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
 import { defaultFontFamily, globalVariables } from "@library/styles/globalStyleVars";
 import { inputVariables } from "@library/forms/inputStyles";
+import { metasVariables } from "@library/metas/Metas.variables";
 import { toolTipClasses } from "@library/toolTip/toolTipStyles";
 import { Mixins } from "@library/styles/Mixins";
 import { Variables } from "@library/styles/Variables";
@@ -143,6 +144,7 @@ export const themeEditorVariables = () => {
 export const themeBuilderClasses = useThemeCache(() => {
     const style = styleFactory("themeBuilder");
     const vars = themeBuilderVariables();
+    const metasVars = metasVariables();
     const globalVars = globalVariables();
 
     const root = style({
@@ -334,9 +336,8 @@ export const themeBuilderClasses = useThemeCache(() => {
     const docBlockTextContainer = style("docBlockTextContainer", {
         display: "block",
         ...Mixins.font({
+            ...metasVars.font,
             size: 12,
-            color: globalVars.meta.text.color,
-            lineHeight: globalVars.meta.text.lineHeight,
         }),
         padding: 0,
         ...Mixins.margin({

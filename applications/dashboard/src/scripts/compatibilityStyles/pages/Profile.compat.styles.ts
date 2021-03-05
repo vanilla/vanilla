@@ -15,13 +15,18 @@ import { important, percent } from "csx";
 import { MixinsFoundation } from "@library/styles/MixinsFoundation";
 import { profileVariables, ProfilePhotoAlignment } from "@dashboard/compatibilityStyles/pages/Profile.variables";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { metasVariables } from "@library/metas/Metas.variables";
+import { injectGlobal } from "@emotion/css";
 
 export const profileCompatCSS = () => {
     const globalVars = globalVariables();
+    const metasVars = metasVariables();
     const vars = profileVariables();
 
     MixinsFoundation.contentBoxes(vars.contentBoxes, "Profile");
     MixinsFoundation.contentBoxes(vars.contentBoxes, "ProfileEdit");
+    MixinsFoundation.contentBoxes(vars.panelBoxes, "Profile", ".Panel");
+    MixinsFoundation.contentBoxes(vars.panelBoxes, "ProfileEdit", ".Panel");
 
     cssOut(`body.Section-Profile .Gloss, body.Section-Profile .Profile-rank`, {
         color: ColorsUtils.colorOut(globalVars.mainColors.primary),
@@ -47,9 +52,15 @@ export const profileCompatCSS = () => {
             vars.badges.alignment === ProfilePhotoAlignment.LEFT ? "flex-start !important" : "center !important",
     });
 
+    injectGlobal({
+        ".pageBox.BadgeGrid .PhotoGrid": {
+            marginLeft: "0 !important",
+        },
+    });
+
     cssOut(`body.Section-Profile .Profile dd, dt`, {
         fontSize: `${unit(globalVars.fonts.size.large)} !important`,
-        lineHeight: `${globalVars.lineHeights.meta * 1.25} !important`,
+        lineHeight: `${(metasVars.font.lineHeight! as number) * 1.25} !important`,
     });
 
     cssOut(
@@ -78,7 +89,7 @@ export const profileCompatCSS = () => {
     );
 
     cssOut(`.DataList.Activities a.CommentLink, .DataList.Activities a.CommentLink:hover`, {
-        color: ColorsUtils.colorOut(globalVars.meta.text.color, {
+        color: ColorsUtils.colorOut(metasVars.font.color, {
             makeImportant: true,
         }),
     });
@@ -133,5 +144,11 @@ export const profileCompatCSS = () => {
         fontSize: styleUnit(20),
         color: ColorsUtils.colorOut(globalVars.elementaryColors.white),
         marginRight: styleUnit(10),
+    });
+
+    injectGlobal({
+        ".Profile .Panel .UserBox a.Username": {
+            color: ColorsUtils.colorOut(globalVars.mainColors.primary),
+        },
     });
 };

@@ -10,7 +10,7 @@ import { t } from "@library/utility/appUtils";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import SmartLink from "@library/routing/links/SmartLink";
 import { meBoxMessageClasses } from "@library/headers/mebox/pieces/meBoxMessageStyles";
-import { metasClasses } from "@library/styles/metasStyles";
+import { metasClasses } from "@library/metas/Metas.styles";
 import Translate from "@library/content/Translate";
 import DateTime from "@library/content/DateTime";
 import classNames from "classnames";

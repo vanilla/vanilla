@@ -484,7 +484,7 @@ class TagModel extends Gdn_Model {
 
         // Handle moving a discussion to a new category.
         foreach ($current_tags as $tag) {
-            if ($tag['CategoryID'] !== -1 && $tag['CategoryID'] !== $category_id) {
+            if ($tag['CategoryID'] !== -1 && $tag['CategoryID'] !== intval($category_id)) {
                 unset($delete_tag_ids[$tag['TagID']]);
                 $this->SQL->update('TagDiscussion')
                     ->set('CategoryID', $category_id)

@@ -55,7 +55,7 @@ export default class UserActions extends ReduxActions {
      */
     public getPermissions = () => {
         const permissions = this.getState().users.permissions;
-        if (permissions.status === LoadStatus.LOADING) {
+        if (permissions.status !== LoadStatus.PENDING) {
             // Don't request the user more than once.
             return;
         }

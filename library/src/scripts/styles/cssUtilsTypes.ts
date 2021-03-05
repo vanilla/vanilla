@@ -3,30 +3,13 @@
  * @license gpl-2.0-only
  */
 import { BorderType } from "@library/styles/styleHelpersBorders";
-import {
-    FontFamilyProperty,
-    FontSizeProperty,
-    FontWeightProperty,
-    LineHeightProperty,
-    TextShadowProperty,
-    TextTransformProperty,
-    TextAlignProperty,
-    LetterSpacingProperty,
-    BackgroundAttachmentProperty,
-    BackgroundImageProperty,
-    BackgroundPositionProperty,
-    BackgroundRepeatProperty,
-    BackgroundSizeProperty,
-    OpacityProperty,
-    BorderRadiusProperty,
-    BorderStyleProperty,
-    BorderWidthProperty,
-} from "csstype";
+import { Property } from "csstype";
 import { ColorHelper } from "csx";
+import { DeepPartial } from "redux";
 
 export type TLength = string | number;
 export type IRadiusValue = IBorderRadiusValue | IRadiusShorthand | IBorderRadiusOutput;
-export type IBorderRadiusValue = BorderRadiusProperty<TLength> | number | string | undefined;
+export type IBorderRadiusValue = Property.BorderRadius<TLength> | number | string | undefined;
 export interface IRadiusShorthand {
     all?: IBorderRadiusValue;
     top?: IBorderRadiusValue;
@@ -54,26 +37,26 @@ export interface ISpacing {
 
 export interface IFont {
     color?: ColorHelper | string;
-    size?: FontSizeProperty<TLength>;
-    weight?: FontWeightProperty | number;
-    lineHeight?: LineHeightProperty<TLength>;
-    shadow?: TextShadowProperty;
-    align?: TextAlignProperty;
-    family?: FontFamilyProperty[];
-    transform?: TextTransformProperty;
-    letterSpacing?: LetterSpacingProperty<TLength>;
-    textDecoration?: "none" | "underline";
+    size?: Property.FontSize<TLength>;
+    weight?: Property.FontWeight | number;
+    lineHeight?: Property.LineHeight<TLength>;
+    shadow?: Property.TextShadow;
+    align?: Property.TextAlign;
+    family?: Property.FontFamily[];
+    transform?: Property.TextTransform;
+    letterSpacing?: Property.LetterSpacing<TLength>;
+    textDecoration?: "none" | "underline" | "auto";
 }
 
 export interface IBackground {
     color?: ColorHelper | string;
-    attachment?: BackgroundAttachmentProperty;
-    position?: BackgroundPositionProperty<TLength>;
-    repeat?: BackgroundRepeatProperty;
-    size?: BackgroundSizeProperty<TLength>;
-    image?: BackgroundImageProperty;
-    fallbackImage?: BackgroundImageProperty;
-    opacity?: OpacityProperty;
+    attachment?: Property.BackgroundAttachment;
+    position?: Property.BackgroundPosition<TLength>;
+    repeat?: Property.BackgroundRepeat;
+    size?: Property.BackgroundSize<TLength>;
+    image?: Property.BackgroundImage;
+    fallbackImage?: Property.BackgroundImage;
+    opacity?: Property.Opacity;
     unsetBackground?: boolean; // do not apply background.
 }
 
@@ -91,8 +74,8 @@ export interface IBorderRadiusOptions {
 
 export interface ISimpleBorderStyle {
     color?: ColorHelper | string;
-    width?: BorderWidthProperty<TLength>;
-    style?: BorderStyleProperty;
+    width?: Property.BorderWidth<TLength>;
+    style?: Property.BorderStyle;
     radius?: IRadiusValue;
 }
 
@@ -193,9 +176,9 @@ export const EMPTY_STATE_COLORS = {
 
 export interface IGlobalBorderStyles extends IBorderRadiusOutput {
     color?: ColorHelper;
-    width?: BorderWidthProperty<TLength> | number;
-    style?: BorderStyleProperty;
-    radius?: BorderRadiusProperty<TLength> | string;
+    width?: Property.BorderWidth<TLength> | number;
+    style?: Property.BorderStyle;
+    radius?: Property.BorderRadius<TLength> | string;
 }
 
 export enum IIconSizes {
@@ -232,6 +215,11 @@ export enum ListSeparation {
     SEPARATOR = "separator",
 }
 
+export enum LinkDecorationType {
+    AUTO = "auto",
+    ALWAYS = "always",
+}
+
 export interface IBoxOptions {
     borderType: BorderType;
     background: IBackground;
@@ -240,6 +228,8 @@ export interface IBoxOptions {
     itemSpacing: number;
     itemSpacingOnAllItems: boolean;
 }
+
+export type IPartialBoxOptions = DeepPartial<IBoxOptions> | undefined;
 
 export interface IContentBoxes {
     depth1: IBoxOptions;

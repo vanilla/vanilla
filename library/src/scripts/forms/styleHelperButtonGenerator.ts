@@ -19,6 +19,7 @@ import { CSSObject } from "@emotion/css";
 import cloneDeep from "lodash/cloneDeep";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { defaultTransition } from "@library/styles/styleHelpersAnimation";
+import { shadowHelper } from "@library/styles/shadowHelpers";
 
 export const generateButtonStyleProperties = (props: {
     buttonTypeVars: IButtonType;
@@ -133,6 +134,24 @@ export const generateButtonStyleProperties = (props: {
               )
             : {};
 
+    const disabledBorder = buttonTypeVars.disabled?.borders
+        ? merge(
+              cloneDeep(defaultBorder),
+              Mixins.border(
+                  { ...buttonTypeVars.disabled.borders },
+                  { fallbackBorderVariables: buttonGlobalVars.border },
+              ),
+          )
+        : {};
+
+    const disabledOpacity = buttonTypeVars.disabled?.opacity;
+    const disabledStyle: CSSObject = {
+        opacity: disabledOpacity,
+        color: ColorsUtils.colorOut(buttonTypeVars.disabled?.colors?.fg ?? undefined),
+        backgroundColor: ColorsUtils.colorOut(buttonTypeVars.disabled?.colors?.bg ?? undefined),
+        ...disabledBorder,
+    };
+
     const fontVars = Variables.font({ ...buttonGlobalVars.font, ...buttonTypeVars.fonts });
 
     const paddingHorizontal =
@@ -180,6 +199,8 @@ export const generateButtonStyleProperties = (props: {
         justifyContent: "center",
         touchAction: "manipulation",
         cursor: "pointer",
+        opacity: buttonTypeVars.opacity,
+        ...(buttonTypeVars.useShadow ? shadowHelper().button() : { boxShadow: "none" }),
         ...defaultTransition("background", "color", "border"),
         ...{
             [`&:not([disabled]):not(.focus-visible)`]: {
@@ -187,6 +208,7 @@ export const generateButtonStyleProperties = (props: {
             },
             [`&:not([disabled]):hover${stateSuffix ?? ""}`]: {
                 zIndex,
+                opacity: buttonTypeVars.hover?.opacity,
                 color: ColorsUtils.colorOut(
                     buttonTypeVars.hover && buttonTypeVars.hover.colors && buttonTypeVars.hover.colors.fg
                         ? buttonTypeVars.hover.colors.fg
@@ -198,9 +220,11 @@ export const generateButtonStyleProperties = (props: {
                         : undefined,
                 ),
                 ...hoverBorder,
+                ...(buttonTypeVars.useShadow ? shadowHelper().buttonHover() : { boxShadow: "none" }),
             },
             [`&:not([disabled]):focus${stateSuffix ?? ""}`]: {
                 zIndex,
+                opacity: buttonTypeVars.focus?.opacity,
                 color: ColorsUtils.colorOut(
                     buttonTypeVars.focus!.colors && buttonTypeVars.focus!.colors.fg
                         ? buttonTypeVars.focus!.colors.fg
@@ -215,6 +239,7 @@ export const generateButtonStyleProperties = (props: {
             },
             [`&:not([disabled]):active${stateSuffix ?? ""}`]: {
                 zIndex,
+                opacity: buttonTypeVars.active?.opacity,
                 color: ColorsUtils.colorOut(
                     buttonTypeVars.active!.colors && buttonTypeVars.active!.colors.fg
                         ? buttonTypeVars.active!.colors.fg
@@ -229,6 +254,7 @@ export const generateButtonStyleProperties = (props: {
             },
             [`&:not([disabled]):focus-visible${stateSuffix ?? ""}`]: {
                 zIndex,
+                opacity: buttonTypeVars.focusAccessible?.opacity,
                 color: ColorsUtils.colorOut(
                     buttonTypeVars.focusAccessible!.colors && buttonTypeVars.focusAccessible!.colors.fg
                         ? buttonTypeVars.focusAccessible!.colors.fg
@@ -241,9 +267,7 @@ export const generateButtonStyleProperties = (props: {
                 ),
                 ...focusAccessibleBorder,
             },
-            "&[disabled]": {
-                opacity: formElementVars.disabled.opacity,
-            },
+            "&[disabled]": disabledStyle,
             ...(buttonTypeVars.extraNested ?? {}),
         },
     };

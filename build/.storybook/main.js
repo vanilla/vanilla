@@ -3,8 +3,6 @@
  * @license GPL-2.0-only
  */
 
-const TsconfigPathsPlugin = require("tsconfig-paths-webpack-plugin");
-
 const path = require("path");
 const fs = require("fs");
 const glob = require("glob");
@@ -57,7 +55,6 @@ module.exports = {
         reactDocgen: "none",
     },
     webpackFinal: (config) => {
-        config.resolve.plugins.push(new TsconfigPathsPlugin({}));
         return config;
     },
 };

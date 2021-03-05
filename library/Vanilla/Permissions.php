@@ -31,6 +31,8 @@ class Permissions implements \JsonSerializable {
         self::CHECK_MODE_RESOURCE_ONLY,
     ];
 
+    public const PERMISSION_SYSTEM = "system";
+
     /** Array of ranked permissions. */
     private const RANKED_PERMISSIONS = [
         'Garden.Admin.Allow' => 6, // virtual permission for isAdmin
@@ -279,7 +281,7 @@ class Permissions implements \JsonSerializable {
             return false;
         }
 
-        if ($this->isAdmin()) {
+        if (!in_array(self::PERMISSION_SYSTEM, $permissions) && $this->isAdmin()) {
             return true;
         }
 

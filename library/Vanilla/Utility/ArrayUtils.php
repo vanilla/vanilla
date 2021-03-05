@@ -125,7 +125,9 @@ final class ArrayUtils {
      * @return bool
      */
     public static function isAssociative($array): bool {
-        self::assertArray($array, __METHOD__ . "() expects argument 1 to be an array or array-like object.");
+        if (!self::isArray($array)) {
+            return false;
+        }
         $result = false;
 
         if (is_array($array)) {
@@ -479,5 +481,15 @@ final class ArrayUtils {
         } else {
             return (array)$array;
         }
+    }
+
+    /**
+     * Given an object, attempt to convert it to an associative array.
+     *
+     * @param object $object
+     * @return array
+     */
+    public static function objToArrayRecursive(object $object): array {
+        return json_decode(json_encode($object), true);
     }
 }

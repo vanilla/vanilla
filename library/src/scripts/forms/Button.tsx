@@ -22,6 +22,10 @@ export interface IButtonProps extends IOptionalComponentID, React.HTMLAttributes
     title?: string;
     submit?: boolean;
     ariaLabel?: string;
+    buttonType?: ButtonTypes;
+    /**
+     * @deprecated Use buttonType instead.
+     */
     baseClass?: ButtonTypes;
     ariaHidden?: boolean;
     tabIndex?: number;
@@ -91,7 +95,7 @@ export default class Button extends React.Component<IButtonProps, IState> {
         disabled: false,
         prefix: "button",
         legacyMode: false,
-        baseClass: ButtonTypes.STANDARD,
+        buttonType: ButtonTypes.STANDARD,
     };
 
     constructor(props) {
@@ -103,7 +107,8 @@ export default class Button extends React.Component<IButtonProps, IState> {
 
     public render() {
         const {
-            baseClass,
+            buttonType: _buttonType,
+            baseClass: _baseClass,
             legacyMode,
             className,
             id,
@@ -114,7 +119,9 @@ export default class Button extends React.Component<IButtonProps, IState> {
             buttonRef,
             ...restProps
         } = this.props;
-        const componentClasses = classNames(getButtonStyleFromBaseClass(baseClass), { Button: legacyMode }, className);
+        const buttonType = _baseClass ?? _buttonType;
+
+        const componentClasses = classNames(getButtonStyleFromBaseClass(buttonType), { Button: legacyMode }, className);
 
         return (
             <button

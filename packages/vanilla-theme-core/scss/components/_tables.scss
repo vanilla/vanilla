@@ -169,14 +169,13 @@
             line-height: $component-meta_lineHeight;
             color: $component-meta_color;
         }
-    }
+        .MItem.Category {
+            @include ellipsis;
+            display: inline;
 
-    .MItem.Category {
-        @include ellipsis;
-        display: inline;
-
-        @include maxWidth {
-            max-width: calc(100% - 21px);
+            @include maxWidth {
+                max-width: calc(100% - 21px);
+            }
         }
     }
 
@@ -263,10 +262,17 @@
                 color: $component-meta-link-hover_color;
             }
         }
+
+        .MItem.Category {
+            margin-top: $utility-baseUnit;
+
+            @include maxWidth {
+                margin-top: $utility-baseUnitDouble;
+            }
+        }
     }
 
-    .Meta,
-    .MItem.Category {
+    .Meta {
         margin-top: $utility-baseUnit;
 
         @include maxWidth {
@@ -940,6 +946,7 @@ body.Section-Group {
 
         a {
             @include ellipsis;
+            display: inline-block;
             color: $component-meta-link_color;
 
             &:focus,

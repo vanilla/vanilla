@@ -7,7 +7,6 @@
 import { keyframes } from "@library/styles/styleShim";
 import { ColorHelper, deg, percent, quote } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { ContentProperty, DisplayProperty, PositionProperty } from "csstype";
 import { defaultTransition } from "@library/styles/styleHelpersAnimation";
 import { styleUnit } from "@library/styles/styleUnit";
 import { CSSObject } from "@emotion/css";
@@ -38,7 +37,7 @@ export function spinnerLoaderAnimationProperties(): CSSObject {
     };
 }
 
-export const spinnerLoader = (props: ISpinnerProps) => {
+export const spinnerLoader = (props: ISpinnerProps): CSSObject => {
     const globalVars = globalVariables();
     const spinnerVars = {
         color: props.color || globalVars.mainColors.primary,
@@ -47,9 +46,9 @@ export const spinnerLoader = (props: ISpinnerProps) => {
         ...props,
     };
     return {
-        position: "relative" as PositionProperty,
-        content: quote("") as ContentProperty,
-        display: "block" as DisplayProperty,
+        position: "relative",
+        content: quote(""),
+        display: "block",
         width: styleUnit(spinnerVars.size),
         height: styleUnit(spinnerVars.size),
         borderRadius: percent(50),

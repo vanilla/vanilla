@@ -12,7 +12,7 @@ import { styleFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent } from "csx";
-import { OverflowProperty, ResizeProperty } from "csstype";
+import { Property } from "csstype";
 import { inputClasses, inputVariables } from "@library/forms/inputStyles";
 import { tokensClasses } from "@library/forms/select/tokensStyles";
 import { CSSObject } from "@emotion/css";
@@ -122,11 +122,11 @@ export const inputBlockClasses = useThemeCache(() => {
         },
     });
 
-    const multiLine = (resize?: ResizeProperty, overflow?: OverflowProperty) => {
+    const multiLine = (resize?: Property.Resize, overflow?: Property.Overflow) => {
         return style("multiLine", {
             ...Mixins.padding({ vertical: 9 }),
-            resize: (resize ? resize : "vertical") as ResizeProperty,
-            overflow: (overflow ? overflow : "auto") as OverflowProperty,
+            resize: (resize ? resize : "vertical") as Property.Resize,
+            overflow: (overflow ? overflow : "auto") as Property.Overflow,
         });
     };
 

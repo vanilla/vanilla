@@ -19,6 +19,7 @@ import { useThemeCache } from "@library/styles/themeCache";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { calc, percent } from "csx";
 import { CSSObject } from "@emotion/css";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
 export interface IHomeWidgetContainerOptions {
     noGutter?: boolean;
     outerBackground?: IBackground;
@@ -36,6 +37,7 @@ export interface IHomeWidgetContainerOptions {
     description?: string;
     headerAlignment?: "left" | "center";
     contentAlignment?: "flex-start" | "center";
+    isGrid?: boolean;
 }
 
 interface IViewAll {
@@ -83,7 +85,7 @@ export const homeWidgetContainerVariables = useThemeCache(
                     ? 4
                     : 3,
                 subtitle: {
-                    type: "standard" as "standard" | "overline",
+                    type: "overline" as "standard" | "overline",
                     content: undefined as string | undefined,
                     padding: Variables.spacing({}),
                     font: Variables.font({}),
@@ -91,9 +93,12 @@ export const homeWidgetContainerVariables = useThemeCache(
                 description: undefined as string | undefined,
                 headerAlignment: "left" as "left" | "center",
                 contentAlignment: "flex-start" as "flex-start" | "center",
+                isGrid: true,
             },
             optionOverrides,
         );
+
+        const isBgLight = ColorsUtils.isLightColor(options.outerBackground.color ?? globalVars.mainColors.bg);
 
         options = makeVars(
             "options",
@@ -126,7 +131,9 @@ export const homeWidgetContainerVariables = useThemeCache(
              * @type string
              * @expand font
              */
-            font: Variables.font({}),
+            font: Variables.font({
+                color: globalVars.getFgForBg(options.outerBackground.color),
+            }),
         });
 
         const navPaddings = navLinksVariables().item.padding;
@@ -152,30 +159,35 @@ export const homeWidgetContainerVariables = useThemeCache(
          * @commonTitle HomeWidget Grid Spacing
          * @expand spacing
          */
-        const itemSpacing = makeVars("itemSpacing", {
-            /**
-             * @var homeWidgetContainer.itemSpacing.horizontal
-             * @description Sets the amount of padding on content in the HomeWidget Container. The higher padding, the more narrow the widget becomes.
-             * @type string | number
-             */
-            horizontal: options.borderType === "navLinks" ? navPaddings.horizontal : globalVars.gutter.size,
+        const itemSpacing = makeVars(
+            "itemSpacing",
+            {
+                /**
+                 * @var homeWidgetContainer.itemSpacing.horizontal
+                 * @description Sets the amount of padding on content in the HomeWidget Container. The higher padding, the more narrow the widget becomes.
+                 * @type string | number
+                 */
+                horizontal: options.borderType === "navLinks" ? navPaddings.horizontal : globalVars.gutter.size,
 
-            /**
-             * @var homeWidgetContainer.itemSpacing.vertical
-             * @description Sets the amount of space underneath the View All button row.
-             * @type string | number
-             */
-            vertical: globalVars.gutter.size / 2,
+                /**
+                 * @var homeWidgetContainer.itemSpacing.vertical
+                 * @description Sets the amount of space underneath the View All button row.
+                 * @type string | number
+                 */
+                vertical: globalVars.gutter.size / 2,
 
-            /**
-             * @var homeWidgetContainer.itemSpacing.mobile
-             * @description Sets the amount of horizontal padding the container has on mobile devices.
-             * @type string | number
-             */
-            mobile: {
-                horizontal: options.borderType === "navLinks" ? mobileNavPaddings.horizontal : globalVars.gutter.size,
+                /**
+                 * @var homeWidgetContainer.itemSpacing.mobile
+                 * @description Sets the amount of horizontal padding the container has on mobile devices.
+                 * @type string | number
+                 */
+                mobile: {
+                    horizontal:
+                        options.borderType === "navLinks" ? mobileNavPaddings.horizontal : globalVars.gutter.size,
+                },
             },
-        });
+            !options.isGrid ? { horizontal: 0, vertical: globalVars.gutter.size / 2, mobile: { horizontal: 0 } } : {},
+        );
 
         const horizontalSpacing = (itemSpacing.horizontal as number) / 2; // Cut in half to account for grid item spacing.
         const horizontalSpacingMobile = (itemSpacing.mobile.horizontal as number) / 2; // Cut in half to account for grid item spacing.
@@ -222,7 +234,10 @@ export const homeWidgetContainerVariables = useThemeCache(
              * @commonTitle Font
              * @expand font
              */
-            font: Variables.font({}),
+            font: Variables.font({
+                size: globalVars.fonts.size.medium,
+                color: globalVars.getFgForBg(options.outerBackground.color),
+            }),
 
             /**
              * @varGroup homeWidgetContainer.description.padding
@@ -233,6 +248,7 @@ export const homeWidgetContainerVariables = useThemeCache(
                 horizontal: calc(`${styleUnit((gridItem.padding.horizontal as number) * 2)}`),
                 vertical: calc(`${styleUnit(gridItem.padding.vertical)}`),
                 top: options.subtitle.content && options.subtitle.type === "standard" ? 0 : undefined,
+                bottom: options.isGrid ? undefined : itemSpacing.vertical * 2,
             }),
 
             /**
@@ -270,6 +286,7 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
         ...(vars.options.borderType === "navLinks"
             ? extendItemContainer(navLinksVariables().linksWithHeadings.paddings.horizontal)
             : extendItemContainer(vars.itemSpacing.horizontal as number)),
+        ...vars.mobileMediaQuery(extendItemContainer(vars.itemSpacing.mobile.horizontal as number)),
     };
 
     const verticalContainer = style("verticalContainer", {

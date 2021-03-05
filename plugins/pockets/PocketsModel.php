@@ -9,7 +9,10 @@ namespace Vanilla\Addons\Pockets;
 
 use Garden\Schema\ValidationException;
 use Psr\SimpleCache\CacheInterface;
+use Vanilla\ApiUtils;
 use Vanilla\BodyFormatValidator;
+use Vanilla\Utility\ArrayUtils;
+use Vanilla\Utility\ModelUtils;
 use Vanilla\Widgets\WidgetService;
 
 /**
@@ -23,11 +26,31 @@ class PocketsModel extends \Gdn_Model {
     const CACHE_KEY_ENABLED = "pocketsEnabled";
     const CACHE_TTL = 60 * 30;
 
+    // Pages
+    const PAGE_HOME = 'home';
+    const PAGE_ACTIVITY = 'activity';
+    const PAGE_COMMENTS = 'comments';
+    const PAGE_DISCUSSIONS = 'discussions';
+    const PAGE_CATEGORIES = 'categories';
+    const PAGE_INBOX = 'inbox';
+    const PAGE_PROFILE = 'profile';
+
     /** @var CacheInterface */
     private $cache;
 
     /** @var WidgetService */
     private $widgetService;
+
+    /** @var array  */
+    public $locations = [
+        'Content' => ['Name' => 'Content'],
+        'Panel' => ['Name' => 'Panel'],
+        'BetweenDiscussions' => ['Name' => 'Between Discussions', 'Wrap' => ['<li>', '</li>']],
+        'BetweenComments' => ['Name' => 'Between Comments', 'Wrap' => ['<li>', '</li>']],
+        'Head' => ['Name' => 'Head'],
+        'Foot' => ['Name' => 'Foot'],
+        'Custom' => ['Name' => 'Custom']
+    ];
 
     /**
      * @inheritdoc
@@ -43,8 +66,130 @@ class PocketsModel extends \Gdn_Model {
      */
     public function getID($id, $datasetType = null, $options = []) {
         $result =  parent::getID($id, DATASET_TYPE_ARRAY, $options);
-        return $this->expandAttributes($result);
+        if ($result) {
+            $result = $this->expandAttributes($result);
+        }
+        return $result;
     }
+
+    /**
+     * Get an array mapping location keys to visual display names.
+     *
+     * @param bool $formatted Return a formatted array to be used by the schema.
+     * @return array
+     */
+    public function getLocationsArray($formatted = false): array {
+        $result = [];
+        if (!$formatted) {
+            $result = [
+                '' => sprintf(t('Select a %s'), t('Location')),
+            ];
+        }
+        foreach ($this->locations as $key => $value) {
+            $result[$key] = val('Name', $value, $key);
+        }
+
+        if ($formatted) {
+            $formattedArray = [];
+            foreach ($result as $key => $formattedValue) {
+                $formattedValue = str_replace(' ', '', $formattedValue);
+                $formattedArray[$key] = $formattedValue;
+            }
+            $formattedArray = array_flip(array_values($formattedArray));
+            $formattedValue = array_flip($formattedArray);
+            $result = $formattedValue;
+        }
+        return $result;
+    }
+
+    /**
+     * Normalize output row.
+     *
+     * @param array $row Database row.
+     * @param array $query Query paramater.
+     */
+    public function normalizeOutput(array $row, array $query) {
+        $query =  ArrayUtils::camelCase($query);
+        $expand = $query['expand']  ?? [];
+        if (!ModelUtils::isExpandOption('body', $expand)) {
+            unset($row['Body']);
+        }
+        $row = ArrayUtils::camelCase($row);
+        return $row;
+    }
+
+    /**
+     * Normalize input fields.
+     *
+     * @param array $body Post body.
+     */
+    public function normalizeInput(array $body): array {
+        if (array_key_exists('repeatType', $body)) {
+            $body = $this->constructRepeatTypes($body);
+        }
+        if (array_key_exists('mobileType', $body) && $body['mobileType'] !== 'default') {
+            $body['mobileOnly'] = $body['mobileType'] === 'only' ? 1 : 0;
+            $body['mobileNever'] = $body['mobileType'] === 'never' ? 1 : 0;
+            unset($body['mobileType']);
+        } else {
+            $body['mobileOnly'] = $body['mobileNever'] = 0;
+        }
+        if (array_key_exists('isDashboard', $body)) {
+            $body['showInDashboard'] = $body['isDashboard'] ?? false;
+            unset($body['isDashboard']);
+        }
+        if (array_key_exists('isEmbeddable', $body)) {
+            $body['embeddedNever'] = $body['isEmbeddable'] ? 0 : 1;
+            unset($body['isEmbeddable']);
+        }
+        if (array_key_exists('isAd', $body)) {
+            $body['type'] = $body['isAd'] ? 'ad' : 'default';
+            unset($body['isAd']);
+        }
+        if (array_key_exists('enabled', $body)) {
+            $body['disabled'] = $body['enabled']  ? 0 : 1;
+        }
+        $body = ArrayUtils::camelCase($body);
+        return $body;
+    }
+
+    /**
+     * Construct for repeatIndex field
+     *
+     * @param array $body Request body.
+     * @return array
+     */
+    private function constructRepeatTypes(array $body): array {
+        if (isset($body['repeatType'])) {
+            if ($body['repeatType'] === 'index') {
+                $body['repeat'] = 'index ';
+                if (isset($body['repeatIndexes'])) {
+                    foreach ($body['repeatIndexes'] as $indexValue) {
+                        if (!is_int($indexValue)) {
+                            break;
+                        } else {
+                            $body['repeat'] .= $indexValue. ',';
+                        }
+                    }
+                    unset($body['repeatIndexes']);
+                    $body['repeat'] = rtrim($body['repeat'], ',');
+                } else {
+                    unset($body['repeat']);
+                }
+            } elseif ($body['repeatType'] === 'every') {
+                if (isset($body['repeatEvery'])) {
+                    $body['repeat'] = 'every '.$body['repeatEvery'];
+                    unset($body['repeatEvery']);
+                }
+            } else {
+                $body['repeat'] = $body['repeatType'];
+            }
+
+            unset($body['repeatType']);
+        }
+        return $body;
+    }
+
 
     /**
      * @inheritdoc
@@ -53,7 +198,8 @@ class PocketsModel extends \Gdn_Model {
         $this->validateWidgetType($formPostValues);
         $row = $this->collapseAttributes($formPostValues);
 
-        return parent::save($row, $settings);
+        $row = parent::save($row, $settings);
+        return $row;
     }
 
     /**
@@ -63,6 +209,24 @@ class PocketsModel extends \Gdn_Model {
         $schema = parent::defineSchema();
         $this->Validation->unapplyRule('Body', 'BodyFormat');
         return $schema;
+    }
+
+    /**
+     * Return list of available pages.
+     *
+     * @return array
+     */
+    public static function getPages(): array {
+        return [
+            self::PAGE_ACTIVITY,
+            self::PAGE_CATEGORIES,
+            self::PAGE_COMMENTS,
+            self::PAGE_DISCUSSIONS,
+            self::PAGE_HOME,
+            self::PAGE_INBOX,
+            self::PAGE_PROFILE,
+            ''
+        ];
     }
 
     /**

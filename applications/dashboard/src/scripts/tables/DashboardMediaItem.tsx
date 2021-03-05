@@ -4,11 +4,13 @@
  */
 
 import React from "react";
+import classNames from "classnames";
 
 interface IProps {
     imgSrc?: string;
     title: string;
     info: string;
+    className?: string;
 }
 
 export function DashboardMediaItem(props: IProps) {
@@ -21,7 +23,7 @@ export function DashboardMediaItem(props: IProps) {
                     </div>
                 </div>
             )}
-            <div className="media-body">
+            <div className={classNames("media-body", props.className, props.className)}>
                 <div className="media-title">{props.title}</div>
                 <div className="info user-email">{props.info}</div>
             </div>

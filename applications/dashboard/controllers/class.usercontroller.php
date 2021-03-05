@@ -140,7 +140,7 @@ class UserController extends DashboardController {
                 $this->setData('_CurrentRecords', 0);
                 if (!Gdn::userModel()->pastUserMegaThreshold()) {
                     // Restoring this semi-optimized counter is our compromise to let non-mega sites know their exact total users.
-                    $this->setData('UserCount', $userModel->getCount());
+                    $this->setData('UserCount', $userModel->getCount(['Deleted' => 0]));
                 } else {
                     // Dang, yo. Get a table status guess instead of really counting.
                     $this->setData('UserEstimate', Gdn::userModel()->countEstimate());

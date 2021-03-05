@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import { absolutePosition, defaultTransition, disabledInput, userSelect } from "@library/styles/styleHelpers";
+import { defaultTransition, disabledInput, userSelect } from "@library/styles/styleHelpers";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
 import { Mixins } from "@library/styles/Mixins";
@@ -144,7 +144,7 @@ export const checkRadioClasses = useThemeCache(() => {
     });
 
     const radioIcon = style("radioIcon", {
-        ...absolutePosition.middleLeftOfParent(),
+        ...Mixins.absolute.middleLeftOfParent(),
         display: "none",
         width: styleUnit(vars.radioButton.icon.width),
         height: styleUnit(vars.radioButton.icon.height),
@@ -152,7 +152,7 @@ export const checkRadioClasses = useThemeCache(() => {
     });
 
     const checkIcon = style("checkBoxIcon", {
-        ...absolutePosition.middleOfParent(),
+        ...Mixins.absolute.middleOfParent(),
         display: "none",
         width: styleUnit(vars.checkBox.check.width),
         height: styleUnit(vars.checkBox.check.height),

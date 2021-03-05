@@ -4,9 +4,12 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { useLayoutEffect, useMemo } from "react";
 import Banner from "@library/banner/Banner";
 import { MemoryRouter } from "react-router";
+import { bannerVariables } from "@library/banner/bannerStyles";
+import { css, CSSObject } from "@emotion/css";
+import { contentBannerVariables } from "@library/banner/contentBannerStyles";
 
 interface IProps {
     title?: string; // Often the message to display isn't the real H1
@@ -16,10 +19,44 @@ interface IProps {
     contentImage?: string;
 }
 
+type BannerOptions = ReturnType<typeof bannerVariables>["options"];
+
+/**
+ * Hook to remove duplicate page titles and descriptions where possible.
+ */
+function useTitleDescriptionDeduplication(props: IProps, options: BannerOptions) {
+    const hasTitle = options.deduplicateTitles && props.title && !options.hideTitle;
+    const hasDescription = options.deduplicateTitles && props.description && !options.hideDescription;
+
+    const cssClass = useMemo(() => {
+        return css({
+            ".Content h1": hasTitle
+                ? {
+                      // This works for now.
+                      // We don't display none, because there can be specific elements
+                      // Like the "Category Following" that is not duplicated.
+                      // It has it's own font size.
+                      fontSize: "0 !important",
+                  }
+                : {},
+            ".Content h1 + .PageDescription": hasDescription ? { display: "none" } : {},
+        });
+    }, [hasTitle, hasDescription]);
+
+    useLayoutEffect(() => {
+        document.body.classList.add(cssClass);
+
+        return () => {
+            document.body.classList.remove(cssClass);
+        };
+    }, [cssClass]);
+}
+
 /**
  * Main banner for the community.
  */
 export function CommunityBanner(props: IProps) {
+    useTitleDescriptionDeduplication(props, bannerVariables().options);
     return (
         <MemoryRouter>
             <Banner {...props} />
@@ -31,6 +68,7 @@ export function CommunityBanner(props: IProps) {
  * Content banner for the community.
  */
 export function CommunityContentBanner(props: IProps) {
+    useTitleDescriptionDeduplication(props, contentBannerVariables().options);
     return (
         <MemoryRouter>
             <Banner {...props} isContentBanner />

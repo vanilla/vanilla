@@ -3,6 +3,8 @@
  * @license GPL-2.0-only
  */
 
+import { ICrumb } from "@library/navigation/Breadcrumbs";
+
 export interface ICategoryFragment {
     categoryID: number;
     name: string;
@@ -23,6 +25,7 @@ export interface ICategory extends ICategoryFragment {
     countAllComments: number;
     followed: boolean;
     depth: number;
+    breadcrumbs?: ICrumb[];
     children: ICategory[];
 }
 

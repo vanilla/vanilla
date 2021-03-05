@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "df0ca7116bf22fd0503f981eeda4e0ab",
+    "content-hash": "d646e0d2122fda082d43b32baae1df5a",
     "packages": [
         {
             "name": "chrisjean/php-ico",
@@ -2181,57 +2181,6 @@
             "time": "2021-02-03T14:03:20+00:00"
         },
         {
-            "name": "vanilla/garden-cli",
-            "version": "v3.0.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/vanilla/garden-cli.git",
-                "reference": "5106872feeebcc52512d26abeccc6e4939b1b022"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/garden-cli/zipball/5106872feeebcc52512d26abeccc6e4939b1b022",
-                "reference": "5106872feeebcc52512d26abeccc6e4939b1b022",
-                "shasum": ""
-            },
-            "require": {
-                "ext-json": "*",
-                "php": ">=7.2",
-                "psr/log": "^1.0"
-            },
-            "require-dev": {
-                "ergebnis/composer-normalize": "^2.8",
-                "phpdocumentor/reflection-docblock": "^4.3",
-                "phpunit/phpunit": "^8",
-                "vanilla/garden-container": "^3.0",
-                "vanilla/standards": "^1.3",
-                "vimeo/psalm": "^3.16"
-            },
-            "suggest": {
-                "ext-pdo": "Required for the DbUtils class.",
-                "phpdocumentor/reflection-docblock": "Required for the CliApplication functionality.",
-                "vanilla/garden-container": "Required for the CliApplication functionality."
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Garden\\Cli\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Todd Burry",
-                    "email": "todd@vanillaforums.com"
-                }
-            ],
-            "description": "A full-featured, yet ridiculously simple commandline parser for your next php cli script. Stop fighting with getopt().",
-            "time": "2020-10-17T19:57:09+00:00"
-        },
-        {
             "name": "vanilla/garden-container",
             "version": "v3.0.4",
             "source": {
@@ -3021,18 +2970,16 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-cache/integration-tests.git",
-                "reference": "e023fbe54c9821dfefbe04db0074ee8682f7f577"
+                "reference": "824633c9547dc3c7ac5faeca03dd82939cdeb73c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-cache/integration-tests/zipball/e023fbe54c9821dfefbe04db0074ee8682f7f577",
-                "reference": "e023fbe54c9821dfefbe04db0074ee8682f7f577",
+                "url": "https://api.github.com/repos/php-cache/integration-tests/zipball/824633c9547dc3c7ac5faeca03dd82939cdeb73c",
+                "reference": "824633c9547dc3c7ac5faeca03dd82939cdeb73c",
                 "shasum": ""
             },
             "require": {
-                "cache/tag-interop": "^1.0",
-                "php": "^5.4|^7",
-                "psr/cache": "~1.0"
+                "php": ">=5.5.9"
             },
             "conflict": {
                 "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0"
@@ -3042,7 +2989,7 @@
                 "illuminate/cache": "^5.4|^5.5|^5.6",
                 "mockery/mockery": "^1.0",
                 "symfony/cache": "^3.4.31|^4.3.4|^5.0",
-                "symfony/phpunit-bridge": "^4.4",
+                "symfony/phpunit-bridge": "^5.1",
                 "tedivm/stash": "^0.14"
             },
             "type": "library",
@@ -3075,7 +3022,7 @@
                 "psr6",
                 "test"
             ],
-            "time": "2019-08-05T15:47:01+00:00"
+            "time": "2021-02-04T19:17:10+00:00"
         },
         {
             "name": "cache/tag-interop",
@@ -5937,16 +5884,16 @@
         },
         {
             "name": "symfony/phpunit-bridge",
-            "version": "v5.1.8",
+            "version": "v5.2.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/phpunit-bridge.git",
-                "reference": "61744927348cd391ac12f7c6b70544991275845c"
+                "reference": "9d85d900c1afe29138a0d5854505eb684bc3ac6d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/phpunit-bridge/zipball/61744927348cd391ac12f7c6b70544991275845c",
-                "reference": "61744927348cd391ac12f7c6b70544991275845c",
+                "url": "https://api.github.com/repos/symfony/phpunit-bridge/zipball/9d85d900c1afe29138a0d5854505eb684bc3ac6d",
+                "reference": "9d85d900c1afe29138a0d5854505eb684bc3ac6d",
                 "shasum": ""
             },
             "require": {
@@ -5956,7 +5903,8 @@
                 "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0|<6.4,>=6.0|9.1.2"
             },
             "require-dev": {
-                "symfony/deprecation-contracts": "^2.1"
+                "symfony/deprecation-contracts": "^2.1",
+                "symfony/error-handler": "^4.4|^5.0"
             },
             "suggest": {
                 "symfony/error-handler": "For tracking deprecated interfaces usages at runtime with DebugClassLoader"
@@ -5996,7 +5944,7 @@
                     "homepage": "https://symfony.com/contributors"
                 }
             ],
-            "description": "Symfony PHPUnit Bridge",
+            "description": "Provides utilities for PHPUnit, especially user deprecation notices management",
             "homepage": "https://symfony.com",
             "funding": [
                 {
@@ -6012,7 +5960,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2020-10-24T15:53:55+00:00"
+            "time": "2021-02-04T18:05:54+00:00"
         },
         {
             "name": "symfony/service-contracts",
@@ -6137,28 +6085,41 @@
             "time": "2020-07-12T23:59:07+00:00"
         },
         {
-            "name": "vanilla/garden-jsont",
-            "version": "v1.2",
+            "name": "vanilla/garden-cli",
+            "version": "v3.0.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/vanilla/garden-jsont.git",
-                "reference": "2486e1f9fe112baefcbc4d35fb32c4c001241c1b"
+                "url": "https://github.com/vanilla/garden-cli.git",
+                "reference": "5106872feeebcc52512d26abeccc6e4939b1b022"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/garden-jsont/zipball/2486e1f9fe112baefcbc4d35fb32c4c001241c1b",
-                "reference": "2486e1f9fe112baefcbc4d35fb32c4c001241c1b",
+                "url": "https://api.github.com/repos/vanilla/garden-cli/zipball/5106872feeebcc52512d26abeccc6e4939b1b022",
+                "reference": "5106872feeebcc52512d26abeccc6e4939b1b022",
                 "shasum": ""
             },
+            "require": {
+                "ext-json": "*",
+                "php": ">=7.2",
+                "psr/log": "^1.0"
+            },
             "require-dev": {
-                "phpunit/phpunit": "^7",
+                "ergebnis/composer-normalize": "^2.8",
+                "phpdocumentor/reflection-docblock": "^4.3",
+                "phpunit/phpunit": "^8",
+                "vanilla/garden-container": "^3.0",
                 "vanilla/standards": "^1.3",
-                "vimeo/psalm": "^3.4"
+                "vimeo/psalm": "^3.16"
+            },
+            "suggest": {
+                "ext-pdo": "Required for the DbUtils class.",
+                "phpdocumentor/reflection-docblock": "Required for the CliApplication functionality.",
+                "vanilla/garden-container": "Required for the CliApplication functionality."
             },
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "Garden\\JSON\\": "src"
+                    "Garden\\Cli\\": "src"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -6171,8 +6132,8 @@
                     "email": "todd@vanillaforums.com"
                 }
             ],
-            "description": "A little JSON transformation library.",
-            "time": "2020-02-23T00:24:25+00:00"
+            "description": "A full-featured, yet ridiculously simple commandline parser for your next php cli script. Stop fighting with getopt().",
+            "time": "2020-10-17T19:57:09+00:00"
         },
         {
             "name": "vanilla/standards",

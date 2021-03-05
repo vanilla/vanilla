@@ -22,39 +22,17 @@ export interface IHomeWidgetContainerProps {
     options?: IHomeWidgetContainerOptions;
     children: React.ReactNode;
     title?: string;
-    isGrid?: boolean;
 }
 
 export function HomeWidgetContainer(props: IHomeWidgetContainerProps) {
-    const isGrid = props.isGrid ?? true;
     const options = homeWidgetContainerVariables(props.options).options;
     const classes = homeWidgetContainerClasses(props.options);
-
-    const firstItemRef = useRef<HTMLDivElement | null>(null);
-    const firstItemMeasure = useMeasure(firstItemRef);
+    const isGrid = options.isGrid;
 
     const grid = isGrid ? (
-        <div className={classes.grid}>
-            {React.Children.map(props.children, (child, i) => {
-                return (
-                    <div
-                        ref={i === 0 ? firstItemRef : undefined}
-                        className={classNames(
-                            classes.gridItem,
-
-                            // Constrain grid items to the same max width in each row.
-                            // Workaround for flex-box limiations.
-                            i !== 0 && classes.gridItemWidthConstraint(firstItemMeasure.width),
-                        )}
-                        key={i}
-                    >
-                        <div className={classes.gridItemContent}>{child}</div>
-                    </div>
-                );
-            })}
-        </div>
+        <HomeWidgetGridContainer {...props}>{props.children}</HomeWidgetGridContainer>
     ) : (
-        props.children
+        <div className={classes.grid}>{props.children}</div>
     );
 
     const gridHasBorder = [BorderType.BORDER, BorderType.SHADOW].includes(options.borderType as BorderType);
@@ -66,7 +44,7 @@ export function HomeWidgetContainer(props: IHomeWidgetContainerProps) {
     );
 
     const subtitle = props.options?.subtitle?.content && (
-        <h2 className={classes.subtitle}>{props.options?.subtitle?.content}</h2>
+        <h3 className={classes.subtitle}>{props.options?.subtitle?.content}</h3>
     );
 
     let content = (
@@ -75,7 +53,10 @@ export function HomeWidgetContainer(props: IHomeWidgetContainerProps) {
                 <hr className={classNames(navLinksClasses().separator, classes.separator)}></hr>
             )}
             <div className={classNames(!options.noGutter && classes.verticalContainer)}>
-                <div className={classes.content}>
+                <div
+                    // We don't want to be extending our content container if we aren't a grid.
+                    className={classes.content}
+                >
                     {options.subtitle.type === "overline" && subtitle}
                     <div className={classes.viewAllContainer}>
                         {props.title && (
@@ -106,4 +87,34 @@ export function HomeWidgetContainer(props: IHomeWidgetContainerProps) {
     }
 
     return <div className={classes.root}>{content}</div>;
+}
+
+export function HomeWidgetGridContainer(props: IHomeWidgetContainerProps) {
+    const options = homeWidgetContainerVariables(props.options).options;
+    const classes = homeWidgetContainerClasses(props.options);
+
+    const firstItemRef = useRef<HTMLDivElement | null>(null);
+    const firstItemMeasure = useMeasure(firstItemRef);
+
+    return (
+        <div className={classes.grid}>
+            {React.Children.map(props.children, (child, i) => {
+                return (
+                    <div
+                        ref={i === 0 ? firstItemRef : undefined}
+                        className={classNames(
+                            classes.gridItem,
+
+                            // Constrain grid items to the same max width in each row.
+                            // Workaround for flex-box limiations.
+                            i !== 0 && classes.gridItemWidthConstraint(firstItemMeasure.width),
+                        )}
+                        key={i}
+                    >
+                        <div className={classes.gridItemContent}>{child}</div>
+                    </div>
+                );
+            })}
+        </div>
+    );
 }

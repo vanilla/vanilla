@@ -4,7 +4,7 @@
  */
 
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
-import DiscussionActions from "@library/features/discussions/DiscussionActions";
+import DiscussionActions, { IPutDiscussionBookmarkedResult } from "@library/features/discussions/DiscussionActions";
 import produce from "immer";
 import { reducerWithInitialState } from "typescript-fsa-reducers";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
@@ -15,10 +15,13 @@ export interface IDiscussionsStoreState {
 
 interface IDiscussionState {
     discussionsByID: Record<number, ILoadable<IDiscussion>>;
+    bookmarkedByID: Record<number, ILoadable<IPutDiscussionBookmarkedResult>>;
+    // TODO: add reactedByID?
 }
 
 export const INITIAL_DISCUSSIONS_STATE: IDiscussionState = {
     discussionsByID: {},
+    bookmarkedByID: {},
 };
 
 /**
@@ -37,11 +40,33 @@ export const discussionsReducer = produce(
                 data: payload.result,
                 status: LoadStatus.SUCCESS,
             };
+
             return state;
         })
         .case(DiscussionActions.getDiscussionByIDACs.failed, (state, payload) => {
             const { discussionID } = payload.params;
             state.discussionsByID[discussionID] = {
+                status: LoadStatus.ERROR,
+                error: payload.error,
+            };
+            return state;
+        })
+        .case(DiscussionActions.putDiscussionBookmarkedACs.started, (state, params) => {
+            const { discussionID } = params;
+            state.bookmarkedByID[discussionID] = { status: LoadStatus.LOADING };
+            return state;
+        })
+        .case(DiscussionActions.putDiscussionBookmarkedACs.done, (state, payload) => {
+            const { discussionID } = payload.params;
+            state.bookmarkedByID[discussionID] = {
+                data: payload.result,
+                status: LoadStatus.SUCCESS,
+            };
+            return state;
+        })
+        .case(DiscussionActions.putDiscussionBookmarkedACs.failed, (state, payload) => {
+            const { discussionID } = payload.params;
+            state.bookmarkedByID[discussionID] = {
                 status: LoadStatus.ERROR,
                 error: payload.error,
             };

@@ -13,13 +13,15 @@ import { componentThemeVariables, styleFactory } from "@library/styles/styleUtil
 import { useThemeCache } from "@library/styles/themeCache";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { important, percent, px } from "csx";
+import { metasVariables } from "@library/metas/Metas.variables";
 
 export const tokensVariables = useThemeCache(() => {
     const globalVars = globalVariables();
+    const metasVars = metasVariables();
     const themeVars = componentThemeVariables("tokens");
 
     const token = {
-        fontSize: globalVars.meta.text.size,
+        fontSize: metasVars.font.size,
         bg: globalVars.mixBgAndFg(0.1),
         textShadow: `${globalVars.mainColors.bg} 0 0 1px`,
         minHeight: 26,

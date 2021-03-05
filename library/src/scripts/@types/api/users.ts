@@ -40,7 +40,7 @@ export interface IUserRoles {
 }
 
 export interface IUser extends IUserFragment, IUserRoles {
-    email: string;
+    email?: string;
     emailConfirmed: boolean;
     showEmail: boolean;
     bypassSpam: boolean;
@@ -55,8 +55,9 @@ export interface IUser extends IUserFragment, IUserRoles {
         name: string;
         userTitle: string;
     };
-    countDiscussions?: number;
-    countComments?: number;
+    label?: string;
+    countDiscussions: number;
+    countComments: number;
 }
 
 export interface IInvitees {

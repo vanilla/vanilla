@@ -12,7 +12,7 @@ import { compatibilityStyles } from "@dashboard/compatibilityStyles";
 import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { applyCompatibilityIcons } from "@dashboard/compatibilityStyles/compatibilityIcons";
 import "../../addons/themes/theme-foundation/src/scss/custom.scss";
-import { applyCompatibilityUserCards } from "@dashboard/compatibilityStyles/compatibilityUserCards";
+import { applyCompatibilityUserCards } from "@library/features/userCard/UserCard.compat";
 import { LoadStatus } from "@library/@types/api/core";
 import { loadedCSS } from "@rich-editor/quill/components/loadedStyles";
 import { initAllUserContent } from "@library/content";
@@ -41,8 +41,6 @@ allContextFiles(
 
 const allHtmls = allContextFiles(require.context("../.storybookAppPages", false, /.*\.html/));
 const allJsons = allContextFiles(require.context("../.storybookAppPages", false, /.*\.json/));
-
-addComponent("HomeWidget", HomeWidget);
 
 const storyOfsByFirstWord = [];
 Object.entries(allHtmls).forEach(([name, htmlModule]) => {

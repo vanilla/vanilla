@@ -7,6 +7,7 @@
 namespace VanillaTests\Fixtures\Scheduler;
 
 use Exception;
+use Vanilla\Scheduler\Descriptor\JobDescriptorInterface;
 use Vanilla\Scheduler\DummyScheduler;
 use Vanilla\Scheduler\Job\JobPriority;
 use Vanilla\Scheduler\TrackingSlipInterface;
@@ -42,6 +43,17 @@ class InstantScheduler extends DummyScheduler {
         int $delay = null
     ): TrackingSlipInterface {
         $result = parent::addJob($jobType, $message, $jobPriority, $delay);
+        return $result;
+    }
+
+    /**
+     * Add a new job descriptor and immediate dispatch the queue.
+     *
+     * @param JobDescriptorInterface $jobDescriptor
+     * @return TrackingSlipInterface
+     */
+    public function addJobDescriptor(JobDescriptorInterface $jobDescriptor): TrackingSlipInterface {
+        $result = parent::addJobDescriptor($jobDescriptor);
 
         if (!$this->isDispatching) {
             // We are already executing a job. The newly queued job is pushed onto the end of the driver slips.

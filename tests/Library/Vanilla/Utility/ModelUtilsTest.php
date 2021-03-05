@@ -33,4 +33,32 @@ class ModelUtilsTest extends TestCase {
         $actual = ModelUtils::validationExceptionToValidationResult($exception);
         $this->assertEquals($expected, $actual);
     }
+
+    /**
+     * Verify iterateWithTimeout times out and returns a value indicating an incomplete run.
+     */
+    public function testTimeoutIterateWithTimeout(): void {
+        $i = 0;
+        $result = ModelUtils::iterateWithTimeout(function () use (&$i) {
+            do {
+                $i++;
+                yield true;
+            } while (true);
+        }, 1);
+        $this->assertGreaterThan(0, $i);
+        $this->assertSame(false, $result);
+    }
+
+    /**
+     * Verify completing all iterations within a timeout returns a successful result.
+     */
+    public function testCompletedIterateWithTimeout(): void {
+        $i = 0;
+        $result = ModelUtils::iterateWithTimeout(function () use (&$i) {
+            $i++;
+            yield true;
+        }, 30);
+        $this->assertSame(1, $i);
+        $this->assertSame(true, $result);
+    }
 }

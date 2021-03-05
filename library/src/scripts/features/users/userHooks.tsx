@@ -6,9 +6,17 @@
 import { useSelector } from "react-redux";
 import { IGetUserByIDQuery, IInviteUsersByGroupIDQuery, useUserActions } from "@library/features/users/UserActions";
 import { IUsersStoreState } from "@library/features/users/userTypes";
-import { useEffect } from "react";
+import { useDebugValue, useEffect } from "react";
 import { LoadStatus } from "@library/@types/api/core";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
+import { ICoreStoreState } from "@library/redux/reducerRegistry";
+import { GUEST_USER_ID } from "@library/features/users/userModel";
+
+export function useCurrentUserSignedIn(): boolean {
+    return useSelector((state: ICoreStoreState) => {
+        return !!(state.users.current.data && state.users.current.data.userID !== GUEST_USER_ID);
+    });
+}
 
 export function useUser(query: IGetUserByIDQuery) {
     const actions = useUserActions();
@@ -29,6 +37,8 @@ export function useUser(query: IGetUserByIDQuery) {
             actions.getUserByID(query);
         }
     }, [status, actions, query]);
+
+    useDebugValue(existingResult);
 
     return existingResult;
 }

@@ -17,6 +17,8 @@ import { storyWithConfig } from "@library/storybook/StoryContext";
 import { HomeWidget } from "@library/homeWidget/HomeWidget";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { StandardNavLinksStory } from "@library/navigation/navLinksWithHeadings.story";
+import { DeepPartial } from "redux";
+import Container from "@library/layout/components/Container";
 
 export default {
     title: "Widgets/Home Widget",
@@ -31,7 +33,7 @@ const iconUrls = {
 };
 
 export function ContentTypeChatBubble() {
-    const itemOptions: IHomeWidgetItemOptions = {
+    const itemOptions: DeepPartial<IHomeWidgetItemOptions> = {
         contentType: HomeWidgetItemContentType.TITLE_CHAT_BUBBLE,
     };
     return (
@@ -65,7 +67,7 @@ export function ContentTypeChatBubble() {
 }
 
 export function ContentTypeText() {
-    const itemOptions: IHomeWidgetItemOptions = {
+    const itemOptions: DeepPartial<IHomeWidgetItemOptions> = {
         contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION,
     };
     return (
@@ -99,7 +101,7 @@ export function ContentTypeText() {
 }
 
 export function ContentTypeImage() {
-    const itemOptions: IHomeWidgetItemOptions = {
+    const itemOptions: DeepPartial<IHomeWidgetItemOptions> = {
         contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
     };
     return (
@@ -139,7 +141,7 @@ export function ContentTypeImage() {
 }
 
 export function ContentTypeIcon() {
-    const itemOptions: IHomeWidgetItemOptions = {
+    const itemOptions: DeepPartial<IHomeWidgetItemOptions> = {
         contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION_ICON,
     };
 
@@ -174,7 +176,7 @@ export function ContentTypeIcon() {
 }
 
 export function ContentTypeBackground() {
-    const itemOptions: IHomeWidgetItemOptions = {
+    const itemOptions: DeepPartial<IHomeWidgetItemOptions> = {
         contentType: HomeWidgetItemContentType.TITLE_BACKGROUND,
     };
 
@@ -209,7 +211,7 @@ export function ContentTypeBackground() {
 }
 
 export function NoMetas() {
-    const itemOptions: IHomeWidgetItemOptions = {
+    const itemOptions: DeepPartial<IHomeWidgetItemOptions> = {
         display: { counts: false },
     };
 
@@ -248,11 +250,9 @@ export function NoMetas() {
     );
 }
 
-export function iconAlignmentLeft() {
-    const itemOptions: IHomeWidgetItemOptions = {
-        iconProps: {
-            placement: "left",
-        },
+export function IconPlacementLeft() {
+    const itemOptions: DeepPartial<IHomeWidgetItemOptions> = {
+        imagePlacement: "left",
     };
 
     return (
@@ -269,7 +269,9 @@ export function iconAlignmentLeft() {
                 itemOptions={{
                     ...itemOptions,
                     display: { counts: false, description: false },
-                    borderType: BorderType.NONE,
+                    box: {
+                        borderType: BorderType.NONE,
+                    },
                 }}
             />
             <HomeWidget
@@ -284,7 +286,9 @@ export function iconAlignmentLeft() {
                 itemOptions={{
                     ...itemOptions,
                     display: { counts: false, description: false },
-                    borderType: BorderType.NONE,
+                    box: {
+                        borderType: BorderType.NONE,
+                    },
                 }}
             />
             <HomeWidget
@@ -319,8 +323,10 @@ export function iconAlignmentLeft() {
                 itemOptions={{
                     ...itemOptions,
                     display: { counts: false },
-                    iconProps: { placement: "left", background: { color: color("#dcd7d1") } },
-                    borderType: BorderType.NONE,
+                    imagePlacement: "left",
+                    box: {
+                        borderType: BorderType.NONE,
+                    },
                 }}
             />
             <HomeWidget
@@ -335,7 +341,9 @@ export function iconAlignmentLeft() {
                 itemOptions={{
                     ...itemOptions,
                     display: { counts: false },
-                    borderType: BorderType.NONE,
+                    box: {
+                        borderType: BorderType.NONE,
+                    },
                 }}
             />
             <HomeWidget
@@ -369,30 +377,130 @@ export function iconAlignmentLeft() {
     );
 }
 
+export const ImagePlacementLeft = storyWithConfig({ useWrappers: false }, () => {
+    const itemOptions: DeepPartial<IHomeWidgetItemOptions> = {
+        imagePlacement: "left",
+        contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
+    };
+
+    const mobileItemOptions: DeepPartial<IHomeWidgetItemOptions> = {
+        imagePlacementMobile: "left",
+        contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
+    };
+
+    const items = [
+        dummyItemProps({ image: true, shortTitle: true }),
+        dummyItemProps({ image: true, shortTitle: true }),
+        dummyItemProps({ image: true, shortTitle: true }),
+        dummyItemProps({ image: true, shortTitle: true }),
+        dummyItemProps({ image: true, shortTitle: true }),
+    ];
+
+    return (
+        <div>
+            <HomeWidget
+                title="Image Alignment Left with short name, no border, no meta"
+                itemData={items}
+                itemOptions={{
+                    ...itemOptions,
+                    display: { counts: false },
+                    box: {
+                        borderType: BorderType.NONE,
+                    },
+                }}
+            />
+            <HomeWidget
+                title="Image Alignment Left with short name, no meta"
+                itemData={items}
+                itemOptions={{
+                    ...itemOptions,
+                    display: { counts: false },
+                    box: {
+                        borderType: BorderType.SHADOW,
+                    },
+                }}
+            />
+            <HomeWidget
+                title="Image Alignment Left with metas"
+                itemData={items}
+                itemOptions={{
+                    ...itemOptions,
+                    box: {
+                        borderType: BorderType.SHADOW,
+                    },
+                }}
+            />
+            <HomeWidget
+                title="Image Alignment Mobile Only Left with short name, no border"
+                itemData={items}
+                itemOptions={{
+                    ...mobileItemOptions,
+                    display: { counts: false },
+                    box: {
+                        borderType: BorderType.NONE,
+                    },
+                }}
+            />
+            <HomeWidget
+                title="Image Alignment Left only on mobile"
+                itemData={items}
+                itemOptions={{
+                    ...mobileItemOptions,
+                    box: {
+                        borderType: BorderType.SHADOW,
+                    },
+                }}
+            />
+        </div>
+    );
+});
+
+ImagePlacementLeft.parameters = {
+    chromatic: {
+        viewports: [1200, 400],
+    },
+};
+
 export function ContentTypeVariants() {
-    const itemOptionsVariantA: IHomeWidgetItemOptions = {
+    const itemOptionsVariantA: DeepPartial<IHomeWidgetItemOptions> = {
         contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION_ICON,
-        borderType: BorderType.SHADOW,
-        borderRadius: "2px",
+        box: {
+            borderType: BorderType.SHADOW,
+            border: {
+                radius: 2,
+            },
+        },
         display: { description: false },
     };
 
-    const itemOptionsVariantB: IHomeWidgetItemOptions = {
+    const itemOptionsVariantB: DeepPartial<IHomeWidgetItemOptions> = {
         contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
-        borderRadius: "2px",
+        box: {
+            border: {
+                radius: 2,
+            },
+        },
         alignment: "left",
         display: { counts: true },
     };
 
-    const itemOptionsVariantC: IHomeWidgetItemOptions = {
+    const itemOptionsVariantC: DeepPartial<IHomeWidgetItemOptions> = {
         contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION_ICON,
-        borderRadius: "2px",
+        box: {
+            border: {
+                radius: 2,
+            },
+        },
     };
 
-    const itemOptionsVariantD: IHomeWidgetItemOptions = {
+    const itemOptionsVariantD: DeepPartial<IHomeWidgetItemOptions> = {
         alignment: "left",
         verticalAlignment: "middle",
-        borderRadius: "6px",
+        box: {
+            border: {
+                radius: 2,
+            },
+        },
     };
 
     return (
@@ -511,8 +619,31 @@ export function ContainerItemEdgeCases() {
     );
 }
 
+export const NestedContainers = storyWithConfig({ useWrappers: false }, () => {
+    return (
+        <Container fullGutter>
+            <div style={{ background: "#eee", padding: 24, marginBottom: 24 }}>
+                <h2>Something in the container</h2>
+                <p>Hello world</p>
+            </div>
+            <HomeWidgetContainer options={{ noGutter: true, maxColumnCount: 4 }} title="Missing image, varying heights">
+                <DummyItem image />
+                <DummyItem image imageMissing />
+                <DummyItem image shortBody />
+                <DummyItem image shortTitle />
+                <DummyItem image />
+            </HomeWidgetContainer>
+        </Container>
+    );
+});
+
+NestedContainers.parameters = {
+    chromatic: {
+        viewports: Object.values(layoutVariables().panelLayoutBreakPoints),
+    },
+};
 export function NotEnoughItems() {
-    function DifferentCounts(props: { options: IHomeWidgetItemOptions; prefix: string }) {
+    function DifferentCounts(props: { options: DeepPartial<IHomeWidgetItemOptions>; prefix: string }) {
         return (
             <>
                 <HomeWidget
@@ -599,7 +730,9 @@ export const ContainerBackgroundVariants = storyWithConfig({ useWrappers: false 
                     viewAll: { to: "#", displayType: ButtonTypes.TRANSPARENT },
                 }}
                 itemOptions={{
-                    borderType: BorderType.SHADOW,
+                    box: {
+                        borderType: BorderType.SHADOW,
+                    },
                     contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION,
                 }}
             />
@@ -670,6 +803,15 @@ export function Items() {
                     options={{ contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE }}
                 ></HomeWidgetItem>
             </ItemIn4Variants>
+            <StoryHeading>Active States</StoryHeading>
+            <ItemIn4Variants>
+                <HomeWidgetItem
+                    to="#"
+                    className={"focus-visible"}
+                    name="Hello Title with a missing Image"
+                    description={STORY_IPSUM_MEDIUM}
+                ></HomeWidgetItem>
+            </ItemIn4Variants>
         </div>
     );
 }
@@ -714,7 +856,7 @@ export const AsNavLinksFullBg = storyWithConfig({ useWrappers: false }, () => {
             <StandardNavLinksStory />
             <HomeWidget
                 itemData={STANDARD_5_ITEMS}
-                title="As Navigation Links"
+                title="After Navigation Links"
                 maxItemCount={3}
                 itemOptions={{
                     contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
@@ -735,18 +877,6 @@ AsNavLinks.parameters = {
         viewports: [500, 1200],
     },
 };
-
-function ContainerWithOptionsAndImage(props: Omit<IHomeWidgetContainerProps, "children">) {
-    return (
-        <HomeWidgetContainer {...props}>
-            <DummyItem image />
-            <DummyItem image />
-            <DummyItem image />
-            <DummyItem image />
-            <DummyItem image />
-        </HomeWidgetContainer>
-    );
-}
 
 interface IDummyItemProps {
     image?: boolean;
@@ -770,7 +900,10 @@ function dummyItemProps(props?: IDummyItemProps): IHomeWidgetItemProps {
                 : props?.icon
                 ? HomeWidgetItemContentType.TITLE_DESCRIPTION_ICON
                 : HomeWidgetItemContentType.TITLE_DESCRIPTION,
-            borderType: props?.noBorder ? BorderType.NONE : undefined,
+
+            box: {
+                borderType: props?.noBorder ? BorderType.NONE : undefined,
+            },
         },
         callToAction: "Learn more",
         url: "https://vanillaforums.com/en/",
@@ -794,19 +927,21 @@ function DummyItem(props: IDummyItemProps) {
 
 function ItemIn4Variants(props: { children: React.ReactElement }) {
     const item1 = React.cloneElement(props.children, {
-        options: { ...props.children.props.options, borderType: BorderType.NONE },
+        options: { ...props.children.props.options, box: { borderType: BorderType.NONE } },
     });
     const item2 = React.cloneElement(props.children, {
-        options: { ...props.children.props.options, borderType: BorderType.BORDER },
+        options: { ...props.children.props.options, box: { borderType: BorderType.BORDER } },
     });
     const item3 = React.cloneElement(props.children, {
-        options: { ...props.children.props.options, borderType: BorderType.SHADOW },
+        options: { ...props.children.props.options, box: { borderType: BorderType.SHADOW } },
     });
     const item4 = React.cloneElement(props.children, {
         options: {
             ...props.children.props.options,
-            borderType: BorderType.SHADOW,
-            background: { image: "linear-gradient(215.7deg, #FCFEFF 16.08%, #fafdff 63.71%)" },
+            box: {
+                borderType: BorderType.SHADOW,
+                background: { image: "linear-gradient(215.7deg, #FCFEFF 16.08%, #f5fdff 63.71%)" },
+            },
         },
     });
     const itemContainer = style({

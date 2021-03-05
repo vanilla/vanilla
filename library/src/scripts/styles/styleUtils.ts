@@ -12,6 +12,7 @@ import { logDebug, logWarning, logError, notEmpty } from "@vanilla/utils";
 import { getThemeVariables } from "@library/theming/getThemeVariables";
 import { isArray } from "util";
 import { IThemeVariables } from "@library/theming/themeReducer";
+import { GlobalVariableMapping, LocalVariableMapping } from "@library/styles/VariableMapping";
 
 // Re-export for compatibility.
 export { useThemeCache } from "@library/styles/themeCache";
@@ -70,6 +71,8 @@ export function styleFactory(componentName: string) {
     return styleCreator;
 }
 
+type Mapping = GlobalVariableMapping | LocalVariableMapping;
+
 /**
  * A helper class for declaring variables while mixing server defined variables from context.
  *
@@ -105,6 +108,7 @@ export function styleFactory(componentName: string) {
 export function variableFactory(
     componentNames: string | string[],
     themeVars?: IThemeVariables,
+    mappings?: Mapping | Mapping[],
     mergeWithGlobals = false,
 ) {
     if (!themeVars) {
@@ -115,11 +119,23 @@ export function variableFactory(
 
     componentNames = typeof componentNames === "string" ? [componentNames] : componentNames;
 
-    const componentThemeVars = componentNames
+    let componentThemeVars = componentNames
         .map((name) => themeVars?.[name] ?? {})
         .reduce((prev, curr) => {
             return merge(prev, curr);
         }, {});
+
+    if (mappings) {
+        mappings = Array.isArray(mappings) ? mappings : [mappings];
+        let initialVars = componentThemeVars;
+        for (const mapping of mappings) {
+            if (mapping instanceof LocalVariableMapping) {
+                componentThemeVars = mapping.map(componentThemeVars, initialVars);
+            } else {
+                componentThemeVars = mapping.map(componentThemeVars, themeVars);
+            }
+        }
+    }
 
     return function makeThemeVars<T extends object>(subElementName: string, declaredVars: T, overrides?: any): T {
         const customVars = componentThemeVars?.[subElementName] ?? null;
@@ -136,11 +152,18 @@ export function variableFactory(
 }
 
 function stripUndefinedKeys(obj: any) {
+    if (!obj || obj instanceof ColorHelper) {
+        return obj;
+    }
     if (typeof obj === "object") {
         const newObj = {};
         for (const [key, value] of Object.entries(obj)) {
-            if (value !== undefined) {
-                newObj[key] = value;
+            if (value !== undefined && value !== null) {
+                if (typeof value === "object") {
+                    newObj[key] = stripUndefinedKeys(value);
+                } else {
+                    newObj[key] = value;
+                }
             }
         }
         return newObj;
@@ -405,4 +428,19 @@ export function getPixelNumber(val: string | number | undefined, fallback: numbe
             return parsed;
         }
     }
+}
+
+/**
+ * Make all active selectors.
+ *
+ * @example
+ * ```
+ * activeSelector("&") -> &:active, &:hover, &:focus, &.focus-visible
+ * activeSelector(".thing", "&")
+ *   -> .thing:active &, .thing:hover &, .thing:focus & .thing.focus-visible &
+ * ```
+ */
+export function activeSelector(baseSelector: string = "&", suffix: string = ""): string {
+    const selectors = [":active", ":hover", ":focus", ".focus-visible"];
+    return selectors.map((selector) => `${baseSelector}${selector} ${suffix}`).join(", ");
 }

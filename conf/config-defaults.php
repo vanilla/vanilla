@@ -184,3 +184,4 @@ $Configuration['Routes']['UpdateMode'] = 'home/updatemode';
 
 // Themes
 $Configuration['Theme']['Banner']['VisibleSections'] = ["DiscussionList", "CategoryDiscussionList", "CategoryList", "NewEventList"];
+$Configuration['Theme']['ContentBanner']['VisibleSections'] = ["Discussion", 'Drafts', 'Profile', 'PostDiscussion'];

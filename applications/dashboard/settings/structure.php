@@ -999,6 +999,16 @@ $Construct
     ->column("dateInserted", "datetime")
     ->set($Explicit, $Drop);
 
+$Construct
+    ->table("remoteResource")
+    ->primaryKey("remoteResourceID")
+    ->column("url", "varchar(255)", false, ["index", "unique"])
+    ->column("content", "text", true)
+    ->column("lastError", "text", true)
+    ->column("dateInserted", "datetime")
+    ->column("dateUpdated", "datetime", false, ["index"])
+    ->set($Explicit, $Drop);
+
 // If the AllIPAddresses column exists, attempt to migrate legacy IP data to the UserIP table.
 if (!$captureOnly && $AllIPAddressesExists) {
     $limit = 10000;
@@ -1138,3 +1148,6 @@ $themeHelper->saveCurrentThemeToVisible();
 /** @var ThemeCache $themeCache */
 $themeCache = Gdn::getContainer()->get(ThemeCache::class);
 $themeCache->clear();
+
+// Ensure we have a secret setup in the site context.
+Gdn::config()->touch("Context.Secret", betterRandomString(32, "Aa0"));

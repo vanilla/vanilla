@@ -125,7 +125,7 @@ export async function _mountComponents(parent: Element) {
         node.removeAttribute("data-props");
 
         awaiting.push(
-            new Promise((resolve) => {
+            new Promise<void>((resolve) => {
                 if (registeredComponent) {
                     mountReact(
                         <registeredComponent.Component {...props} contents={children} />,

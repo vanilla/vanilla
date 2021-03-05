@@ -60,7 +60,9 @@ class CommunityLeadersModule extends AbstractHomeWidgetModule {
         $options = [
             'contentType' => $this->contentType,
             'display' => $this->display,
-            'borderType' => $this->borderType,
+            'box' => [
+                'borderType' => $this->borderType,
+            ],
             'name' => $this->name,
             'alignment' => 'center',
         ];

@@ -31,7 +31,7 @@ import { enableLegacyAnalyticsTick } from "@library/analytics/AnalyticsData";
 import { NEW_SEARCH_PAGE_ENABLED } from "@library/search/searchConstants";
 import { SearchPageRoute } from "@library/search/SearchPageRoute";
 import { notEmpty } from "@vanilla/utils";
-import { applyCompatibilityUserCards } from "@dashboard/compatibilityStyles/compatibilityUserCards";
+import { applyCompatibilityUserCards } from "@library/features/userCard/UserCard.compat";
 import { DashboardImageUploadGroup } from "@dashboard/forms/DashboardImageUploadGroup";
 import { LayoutProvider } from "@library/layout/LayoutContext";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";

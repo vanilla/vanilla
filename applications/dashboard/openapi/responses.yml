@@ -33,3 +33,19 @@ components:
                 type: number
                 description: The HTTP status code for the error.
                 format: int32
+  schemas:
+    BasicError:
+      type: object
+      properties:
+        message:
+          description: Verbose description of the error.
+          type: string
+        status:
+          description: Response status code.
+          type: integer
+        errorType:
+          description: A system error code that further breaks down the error.
+          type: string
+      required:
+        - message
+        - status

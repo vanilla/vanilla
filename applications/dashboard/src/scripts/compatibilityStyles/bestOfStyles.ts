@@ -9,9 +9,11 @@ import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
+import { metasVariables } from "@library/metas/Metas.variables";
 
 export const bestOfCSS = () => {
     const globalVars = globalVariables();
+    const metasVars = metasVariables();
 
     cssOut(`body.Section-BestOf .Container .FilterMenu li.Active a`, {
         color: ColorsUtils.colorOut(globalVars.mainColors.fg),
@@ -38,7 +40,7 @@ export const bestOfCSS = () => {
     `,
         {
             color: ColorsUtils.colorOut(globalVars.links.colors.default),
-            fontSize: styleUnit(globalVars.meta.text.size),
+            fontSize: styleUnit(metasVars.font.size),
         },
     );
 

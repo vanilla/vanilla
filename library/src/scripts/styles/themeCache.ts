@@ -46,5 +46,5 @@ export function useThemeCache<Cb>(callback: Cb): Cb {
         const result = cacheKey + JSON.stringify(args);
         return result;
     };
-    return memoize(callback as any, makeCacheKey);
+    return memoize(callback as any, makeCacheKey) as Cb;
 }

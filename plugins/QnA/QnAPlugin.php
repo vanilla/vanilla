@@ -296,8 +296,10 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
      * @param array $args Event arguments.
      */
     public function base_discussionTypes_handler($sender, $args) {
-        if (!c('Plugins.QnA.UseBigButtons')) {
+        $category = val('Category', $args);
+        if (empty($category) || !c('Plugins.QnA.UseBigButtons')) {
             $args['Types']['Question'] = [
+                'apiType' => 'question',
                 'Singular' => 'Question',
                 'Plural' => 'Questions',
                 'AddUrl' => '/post/question',
@@ -968,7 +970,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
      */
     public function discussionsController_beforeBuildPager_handler($sender, $args) {
         if (Gdn::controller()->RequestMethod == 'unanswered') {
-            $count = $this->getUnansweredCount(true);
+            $count = $this->getUnansweredCount();
             $sender->setData('CountDiscussions', $count);
         }
     }
@@ -976,29 +978,27 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
     /**
      * Return the number of unanswered questions.
      *
-     * @param bool $pager Whether this count affects the pager or not.
      * @return int
      */
-    public function getUnansweredCount($pager = false) {
-        // TODO: Dekludge this when category permissions are refactored (tburry).
-        $cacheKey = Gdn::request()->webRoot().'/QnA-UnansweredCount';
+    public function getUnansweredCount(): int {
+        // Me might have an alternate handler.
+        $eventManager = \Gdn::eventManager();
+        if ($eventManager->hasHandler('getAlternateUnansweredCount')) {
+            $questionCount = $eventManager->fireFilter('getAlternateUnansweredCount', 0);
+            return $questionCount;
+        }
+
+        $cacheKey = 'QnA-UnansweredCount';
         $questionCount = Gdn::cache()->get($cacheKey);
 
         if ($questionCount === Gdn_Cache::CACHEOP_FAILURE) {
             $questionCount = Gdn::sql()
-                ->beginWhereGroup()
-                ->where('QnA', null)
-                ->orWhereIn('QnA', ['Unanswered', 'Rejected'])
-                ->endWhereGroup()
-                ->getCount('Discussion', ['Type' => 'Question']);
-
+                ->where('Type', 'Question')
+                ->whereIn('QnA', ['Unanswered', 'Rejected'])
+                ->getCount('Discussion')
+            ;
             Gdn::cache()->store($cacheKey, $questionCount, [Gdn_Cache::FEATURE_EXPIRY => 15 * 60]);
         }
-
-        // Check to see if another plugin can handle this.
-        $this->EventArguments['questionCount'] = &$questionCount;
-        $this->EventArguments['pagerCount'] = $pager;
-        $this->fireEvent('unansweredCount');
 
         return $questionCount;
     }

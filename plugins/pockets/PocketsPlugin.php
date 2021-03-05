@@ -41,22 +41,26 @@ class PocketsPlugin extends Gdn_Plugin {
     /** @var array */
     private $userRoleIDs = null;
 
+    /** @var PocketsModel  */
+    private $pocketsModel;
+
     /**
      * PocketsPlugin constructor.
      */
-    public function __construct() {
+    public function __construct(PocketsModel $pocketsModel) {
         parent::__construct();
+        $this->pocketsModel = $pocketsModel;
 
         // Switch our HTML wrapper when we're in a table view.
         if (c('Vanilla.Discussions.Layout') == 'table') {
             // Admin checks add a column.
             $useAdminChecks = c('Vanilla.AdminCheckboxes.Use') && Gdn::session()->checkPermission('Garden.Moderation.Manage');
             $colspan = c('Plugins.Pockets.Colspan', ($useAdminChecks) ? 6 : 5);
-            $this->Locations['BetweenDiscussions']['Wrap'] = ['<tr><td colspan="'.$colspan.'">', '</td></tr>'];
+            $this->pocketsModel->locations['BetweenDiscussions']['Wrap'] = ['<tr><td colspan="'.$colspan.'">', '</td></tr>'];
         }
 
         if (Gdn::themeFeatures()->useDataDrivenTheme()) {
-            $this->Locations['AfterBanner'] = ['Name' => 'After Banner'];
+            $this->pocketsModel->locations['AfterBanner'] = ['Name' => 'After Banner'];
         }
     }
 
@@ -460,8 +464,8 @@ class PocketsPlugin extends Gdn_Plugin {
 
         $sender->Form = $form;
 
-        $sender->setData('Locations', $this->Locations);
-        $sender->setData('LocationsArray', $this->getLocationsArray());
+        $sender->setData('Locations', $this->pocketsModel->locations);
+        $sender->setData('LocationsArray', $this->pocketsModel->getLocationsArray());
         $sender->setData('Attributes', json_decode($form->getFormValue("Attributes", '[]')));
         $sender->setData(
             'Pages',
@@ -526,21 +530,6 @@ class PocketsPlugin extends Gdn_Plugin {
 
         $this->_Pockets[$pocket->Location][] = $pocket;
         $this->_PocketNames[$pocket->Name][] = $pocket;
-    }
-
-    /**
-     * Get an array mapping location keys to visual display names.
-     *
-     * @return array
-     */
-    public function getLocationsArray() {
-        $result = [
-            '' => sprintf(t('Select a %s'), t('Location')),
-        ];
-        foreach ($this->Locations as $key => $value) {
-            $result[$key] = val('Name', $value, $key);
-        }
-        return $result;
     }
 
     /**
@@ -654,12 +643,12 @@ class PocketsPlugin extends Gdn_Plugin {
         $data['PageName'] = Pocket::pageName($controller);
         $data['isHomepage'] = $controller->data('isHomepage');
 
-        $locationOptions = val($location, $this->Locations, []);
+        $locationOptions = val($location, $this->pocketsModel->locations, []);
 
         if ($this->ShowPocketLocations &&
-            array_key_exists($location, $this->Locations) &&
+            array_key_exists($location, $this->pocketsModel->locations) &&
             checkPermission('Plugins.Pockets.Manage') && $controller->MasterView != 'admin') {
-            $locationName = val("Name", $this->Locations, $location);
+            $locationName = val("Name", $this->pocketsModel->locations, $location);
             echo
                 valr('Wrap.0', $locationOptions, ''),
                 "<div class=\"TestPocket\"><h3>$locationName ($count)</h3></div>",

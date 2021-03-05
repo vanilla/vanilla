@@ -342,6 +342,46 @@ abstract class AbstractCommunitySearchTests extends AbstractSearchTest {
     }
 
     /**
+     * Test search query matches in the discussion body.
+     */
+    public function testSearchBody() {
+        /** @var DiscussionModel $discussionModel */
+        $discussionModel = self::container()->get(DiscussionModel::class);
+
+        $category = $this->createCategory();
+
+        $discussionTitle = $discussionModel->save([
+            'Name' => 'not related to content',
+            'Body' => 'match is in the body, this should match',
+            'Format' => 'markdown',
+            'CategoryID' => $category['categoryID'],
+        ]);
+
+        $discussionTitle2 = $discussionModel->save([
+            'Name' => 'not related to content pt2',
+            'Body' => 'again match is in the body, this should match again',
+            'Format' => 'markdown',
+            'CategoryID' => $category['categoryID'],
+        ]);
+
+        $discussionModel->save([
+            'Name' => 'Wrong',
+            'Body' => 'Title Query in body',
+            'Format' => 'markdown',
+            'CategoryID' => $category['categoryID'],
+        ]);
+
+        $this->ensureIndexed();
+
+        $this->assertSearchResultIDs(
+            [
+                'query' => 'match',
+            ],
+            [$discussionTitle, $discussionTitle2]
+        );
+    }
+
+    /**
      * Test date ranges for the search query.
      *
      * @depends testSetup

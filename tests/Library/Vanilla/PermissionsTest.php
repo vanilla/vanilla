@@ -482,4 +482,13 @@ class PermissionsTest extends SharedBootstrapTestCase {
         $this->assertSame('', $perms->getRankingPermission());
         $this->assertFalse($perms->hasRanked('Garden.SignIn.Allow'));
     }
+
+    /**
+     * Verify an admin user does not automatically get the system permission.
+     */
+    public function testNoAdminSystem(): void {
+        $perms = new Permissions();
+        $perms->setAdmin(true);
+        $this->assertFalse($perms->has(Permissions::PERMISSION_SYSTEM));
+    }
 }

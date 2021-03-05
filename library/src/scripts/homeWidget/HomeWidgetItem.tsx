@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { useDebugValue } from "react";
 import {
     IHomeWidgetItemOptions,
     homeWidgetItemVariables,
@@ -16,11 +16,15 @@ import Heading from "@library/layout/Heading";
 import TruncatedText from "@library/content/TruncatedText";
 import { ICountResult } from "@library/search/searchTypes";
 import { ResultMeta } from "@library/result/ResultMeta";
-import { metasClasses } from "@library/styles/metasStyles";
+import { metasClasses } from "@library/metas/Metas.styles";
 import classNames from "classnames";
 import { getButtonStyleFromBaseClass } from "@library/forms/Button";
 import { t } from "@library/utility/appUtils";
 import { ArrowIcon } from "@library/icons/common";
+import { DeepPartial } from "redux";
+import { Metas } from "@library/metas/Metas";
+import { Devices, useDevice } from "@library/layout/DeviceContext";
+import { cx } from "@emotion/css";
 
 export interface IHomeWidgetItemProps {
     // Content
@@ -33,9 +37,10 @@ export interface IHomeWidgetItemProps {
     counts?: ICountResult[];
     callToAction?: string;
     url?: string;
+    className?: string;
 
     // Layout options
-    options?: IHomeWidgetItemOptions;
+    options?: DeepPartial<IHomeWidgetItemOptions>;
 }
 
 export function HomeWidgetItem(props: IHomeWidgetItemProps) {
@@ -46,11 +51,16 @@ export function HomeWidgetItem(props: IHomeWidgetItemProps) {
     const iconUrl = props.iconUrl ?? options.defaultIconUrl;
     const hasMetas = props.counts && options.display.counts;
     const isChatBubble = [HomeWidgetItemContentType.TITLE_CHAT_BUBBLE].includes(options.contentType);
-    const hasCTA = props.callToAction && isChatBubble;
-    const classesMeta = metasClasses();
+    useDebugValue({ opts: options });
+
+    const metas = hasMetas && !isChatBubble && (
+        <Metas className={classes.metas}>
+            <ResultMeta counts={props.counts} />
+        </Metas>
+    );
 
     return (
-        <SmartLink to={props.to} className={classes.root}>
+        <SmartLink to={props.to} className={cx(classes.root, props.className)}>
             <div className={classes.backgroundContainer}>
                 {[
                     HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
@@ -66,20 +76,21 @@ export function HomeWidgetItem(props: IHomeWidgetItemProps) {
                     <div className={classes.backgroundScrim}></div>
                 )}
 
-                {HomeWidgetItemContentType.TITLE_DESCRIPTION_ICON === options.contentType && (
+                {HomeWidgetItemContentType.TITLE_DESCRIPTION_ICON === options.contentType && iconUrl && (
                     <div className={classes.iconContainer}>
-                        {iconUrl && <img className={classes.icon} src={iconUrl} alt={props.name} />}
+                        <div className={classes.iconWrap}>
+                            <img className={classes.icon} src={iconUrl} alt={props.name} />
+                        </div>
                     </div>
                 )}
 
-                {isAbsoluteContent ? <HomeWidgetAbsoluteContent {...props} /> : <HomeWidgetStaticContent {...props} />}
+                {isAbsoluteContent ? (
+                    <HomeWidgetAbsoluteContent {...props} />
+                ) : (
+                    <HomeWidgetStaticContent {...props} extraChildren={metas} />
+                )}
             </div>
-            {!isChatBubble && (!isAbsoluteContent || hasMetas) && (
-                <div className={classNames(classesMeta.root, classes.metas)}>
-                    {hasMetas && <ResultMeta counts={props.counts} />}
-                </div>
-            )}
-
+            {isAbsoluteContent && metas}
             {[HomeWidgetItemContentType.TITLE_CHAT_BUBBLE].includes(options.contentType) && (
                 <a href={props.url} className={classes.callToAction}>
                     {props.callToAction}
@@ -90,7 +101,7 @@ export function HomeWidgetItem(props: IHomeWidgetItemProps) {
     );
 }
 
-function HomeWidgetStaticContent(props: IHomeWidgetItemProps) {
+function HomeWidgetStaticContent(props: IHomeWidgetItemProps & { extraChildren?: React.ReactNode }) {
     const options = homeWidgetItemVariables(props.options).options;
     const classes = homeWidgetItemClasses(props.options);
 
@@ -104,11 +115,15 @@ function HomeWidgetStaticContent(props: IHomeWidgetItemProps) {
                 HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
                 HomeWidgetItemContentType.TITLE_DESCRIPTION_ICON,
                 HomeWidgetItemContentType.TITLE_CHAT_BUBBLE,
-            ].includes(options.contentType) && (
-                <TruncatedText maxCharCount={160} tag={"div"} className={classes.description}>
-                    {props.description}
-                </TruncatedText>
-            )}
+            ].includes(options.contentType) &&
+                options.display.description && (
+                    <TruncatedText maxCharCount={160} tag={"div"} className={classes.description}>
+                        {props.description}
+                    </TruncatedText>
+                )}
+            {/* Flex spacer */}
+            <div style={{ flex: 1 }} />
+            {props.extraChildren}
         </div>
     );
 }
@@ -121,7 +136,7 @@ function HomeWidgetAbsoluteContent(props: IHomeWidgetItemProps) {
     return (
         <>
             <div className={classes.absoluteContent}>
-                {!options.name.hidden && (
+                {options.display.name && (
                     <Heading depth={3} className={classes.absoluteName}>
                         {props.name}
                     </Heading>

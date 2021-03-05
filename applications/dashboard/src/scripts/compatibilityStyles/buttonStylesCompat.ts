@@ -18,6 +18,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { important, percent, rgba } from "csx";
 import { ButtonTypes } from "@library/forms/buttonTypes";
+import { injectGlobal } from "@emotion/css";
 
 export const buttonCSS = () => {
     const globalVars = globalVariables();
@@ -90,20 +91,27 @@ export const buttonCSS = () => {
         minWidth: styleUnit(handleSize),
     });
 
-    cssOut(`.Frame .ButtonGroup.Multi.NewDiscussion .Button.Handle.Handle`, {
-        position: "absolute",
-        top: styleUnit(0),
-        right: styleUnit(formElementVars.border.width),
-        bottom: styleUnit(0),
-        minWidth: importantUnit(handleSize),
-        maxWidth: importantUnit(handleSize),
-        maxHeight: importantUnit(handleSize),
-        minHeight: importantUnit(handleSize),
-        height: importantUnit(handleSize),
-        width: importantUnit(handleSize),
-        borderTopRightRadius: styleUnit(buttonBorderRadius),
-        borderBottomRightRadius: styleUnit(buttonBorderRadius),
-        display: "block",
+    injectGlobal({
+        ".Frame .ButtonGroup.Multi.NewDiscussion .Button.Primary": {
+            paddingLeft: importantUnit(handleSize + 4),
+            paddingRight: importantUnit(handleSize + 4),
+        },
+        ".Frame .ButtonGroup.Multi.NewDiscussion .Button.Handle.Handle": {
+            position: "absolute",
+            top: styleUnit(0),
+            right: styleUnit(formElementVars.border.width),
+            bottom: styleUnit(0),
+            minWidth: importantUnit(handleSize),
+            maxWidth: importantUnit(handleSize),
+            maxHeight: importantUnit(handleSize),
+            minHeight: importantUnit(handleSize),
+            height: importantUnit(handleSize),
+            width: importantUnit(handleSize),
+            borderTopRightRadius: styleUnit(buttonBorderRadius),
+            borderBottomRightRadius: styleUnit(buttonBorderRadius),
+            display: "block",
+            boxShadow: "none",
+        },
     });
 
     cssOut(`.Frame .ButtonGroup.Multi.Open .Button.Handle`, {
@@ -168,6 +176,10 @@ export const buttonCSS = () => {
     mixinButton("body.Section-Profile .ProfileOptions .ProfileButtons-BackToProfile", ButtonTypes.STANDARD);
     mixinButton(".Button.Close", ButtonTypes.STANDARD);
     mixinButton(".viewPollResults", ButtonTypes.STANDARD);
+
+    mixinButton(".FormWrapper .Buttons .Button.Cancel", ButtonTypes.STANDARD);
+    mixinButton(".FormWrapper .Buttons .Button.DraftButton", ButtonTypes.STANDARD);
+    mixinButton(".FormWrapper .Buttons .Button.PreviewButton", ButtonTypes.STANDARD);
 
     cssOut(".Panel-main .ApplyButton", {
         width: "auto",

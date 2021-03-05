@@ -10,7 +10,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 import { cssRule } from "@library/styles/styleShim";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
-import { absolutePosition, singleLineEllipsis, userSelect } from "@library/styles/styleHelpers";
+import { singleLineEllipsis, userSelect } from "@library/styles/styleHelpers";
 import { styleUnit } from "@library/styles/styleUnit";
 import { calc, percent } from "csx";
 import { Mixins } from "@library/styles/Mixins";

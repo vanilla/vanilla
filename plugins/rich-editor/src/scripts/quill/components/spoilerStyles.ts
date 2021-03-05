@@ -11,7 +11,7 @@ import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
 import { cssRule } from "@library/styles/styleShim";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
-import { absolutePosition, userSelect } from "@library/styles/styleHelpers";
+import { userSelect } from "@library/styles/styleHelpers";
 import { styleUnit } from "@library/styles/styleUnit";
 import { important, percent } from "csx";
 import { userContentVariables } from "@library/content/userContentStyles";
@@ -160,7 +160,7 @@ export const spoilerCSS = useThemeCache(() => {
                 lineHeight: 1,
             },
             ".spoiler-chevron": {
-                ...absolutePosition.middleRightOfParent(globalVars.embed.text.padding),
+                ...Mixins.absolute.middleRightOfParent(globalVars.embed.text.padding),
                 width: styleUnit(globalVars.icon.sizes.default),
                 height: styleUnit(globalVars.icon.sizes.default),
                 display: "flex",

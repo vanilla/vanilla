@@ -1123,7 +1123,8 @@ class ReactionsPlugin extends Gdn_Plugin {
         Gdn_Theme::section('BestOf');
         // Load all of the reaction types.
         try {
-            $reactionTypes = ReactionModel::getReactionTypes(['Class' => 'Positive', 'Active' => 1]);
+            $reactionTypes = ReactionModel
+                ::getReactionTypes(['Class' => 'Positive', 'Active' => 1]);
 
             $sender->setData('ReactionTypes', $reactionTypes);
         } catch (Exception $ex) {
@@ -1163,10 +1164,29 @@ class ReactionsPlugin extends Gdn_Plugin {
             );
         } else {
             $reactionType = $reactionTypes[$reaction];
+            $reactionModel->fireEvent(
+                'BeforeGet',
+                [
+                    'RecordType' => [
+                        'Discussion' => 'Discussion-Total',
+                        'Comment' => 'Comment-Total'
+                    ],
+                    'ApplyRestrictions' => true
+                ]
+            );
             $data = $reactionModel->getRecordsWhere(
-                ['TagID' => $reactionType['TagID'], 'RecordType' =>['Discussion-Total', 'Comment-Total'], 'Total >=' => 1],
-                'DateInserted', 'desc',
-                $limit + 1, $offset);
+                [
+                    'TagID' => $reactionType['TagID'],
+                    'RecordType' => [
+                        'Discussion-Total', 'Comment-Total'
+                    ],
+                    'Total >=' => 1
+                ],
+                'UserTag.DateInserted',
+                'desc',
+                $limit + 1,
+                $offset
+            );
         }
 
         $sender->setData('_CurrentRecords', count($data));

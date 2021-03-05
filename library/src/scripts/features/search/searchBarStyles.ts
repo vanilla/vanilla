@@ -37,6 +37,7 @@ import { selectBoxClasses } from "@library/forms/select/selectBoxStyles";
 import { SearchBarPresets } from "@library/banner/SearchBarPresets";
 import { IBorderRadiusValue } from "@library/styles/cssUtilsTypes";
 import { searchBarVariables } from "./SearchBar.variables";
+import { metasVariables } from "@library/metas/Metas.variables";
 
 export interface ISearchBarOverwrites {
     borderRadius?: IBorderRadiusValue;
@@ -52,6 +53,7 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
     const { compact = vars.options.compact, borderRadius = vars.border.radius, preset = vars.options.preset } =
         overwrites || {};
     const globalVars = globalVariables();
+    const metasVars = metasVariables();
     const layoutVars = layoutVariables();
     const inputVars = inputVariables();
     const titleBarVars = titleBarVariables();
@@ -196,7 +198,7 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
             }),
         },
         meta: {
-            ...Mixins.font(globalVars.meta.text),
+            ...Mixins.font(metasVars.font),
         },
         excerpt: {
             marginTop: styleUnit(searchResultsVariables().excerpt.margin),

@@ -18,6 +18,8 @@ class DefaultSiteSection implements SiteSectionInterface {
 
     const DEFAULT_ID = 0;
 
+    const DEFAULT_CATEGORY_ID = -1;
+
     const EMPTY_BASE_PATH = "";
 
     const DEFAULT_SECTION_GROUP = "vanilla";
@@ -131,5 +133,14 @@ class DefaultSiteSection implements SiteSectionInterface {
      */
     public function getSectionThemeID() {
         return null;
+    }
+
+    /**
+     * Get categoryID associated to site-section.
+     *
+     * @return int|null
+     */
+    public function getCategoryID() {
+        return self::DEFAULT_CATEGORY_ID;
     }
 }

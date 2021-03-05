@@ -5,6 +5,7 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { metasVariables } from "@library/metas/Metas.variables";
 import { useThemeCache } from "@library/styles/themeCache";
 import { percent } from "csx";
 import { buttonResetMixin } from "@library/forms/buttonMixins";
@@ -14,6 +15,7 @@ import { Mixins } from "@library/styles/Mixins";
 
 export const suggestedTextStyleHelper = useThemeCache((overwrite?: { forDashboard?: boolean }) => {
     const globalVars = globalVariables();
+    const metasVars = metasVariables();
     const { forDashboard = false } = overwrite || {};
     const mediaQueries = layoutVariables().mediaQueries();
 
@@ -35,7 +37,7 @@ export const suggestedTextStyleHelper = useThemeCache((overwrite?: { forDashboar
         ...{
             ".suggestedTextInput-parentTag": {
                 ...Mixins.font({
-                    ...globalVars.meta.text,
+                    ...metasVars.font,
                     lineHeight: "inherit",
                 }),
             },

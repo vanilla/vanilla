@@ -14,7 +14,7 @@ import { DIST_DIRECTORY } from "./env";
  * Run the build. Options are passed as arguments from the command line.
  * @see https://docs.vanillaforums.com/developer/tools/building-frontend/
  */
-void getOptions().then(async options => {
+void getOptions().then(async (options) => {
     const builder = new Builder(options);
     await builder.build();
 
@@ -27,7 +27,7 @@ void getOptions().then(async options => {
             path.join(DIST_DIRECTORY, "admin/shared.min.js"),
         ];
 
-        await spawnChildProcess("npx", ["es-check", "es5", ...filesToCheck], { stdio: "inherit" }).catch(e => {
+        await spawnChildProcess("yarn", ["es-check", "es5", ...filesToCheck], { stdio: "inherit" }).catch((e) => {
             process.exit(1);
         });
     }

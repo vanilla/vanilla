@@ -5,9 +5,10 @@
 
 import { ButtonPreset } from "@library/forms/ButtonPreset";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
-import { IBackground } from "@library/styles/cssUtilsTypes";
+import { IBackground, LinkDecorationType } from "@library/styles/cssUtilsTypes";
 import { fontFallbacks, monoFallbacks } from "@library/styles/fontFallbacks";
 import { BorderType } from "@library/styles/styleHelpersBorders";
+import { ensureColorHelper } from "@library/styles/styleHelpersColors";
 import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { Variables } from "@library/styles/Variables";
@@ -25,8 +26,6 @@ export const FULL_GUTTER = 40;
 export const defaultFontFamily = "Open Sans";
 
 export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
-    // let colorPrimary = color("#0291db");
-    let colorPrimary = color("#037DBC");
     const makeThemeVars = variableFactory("global", forcedVars);
 
     const constants = makeThemeVars("constants", {
@@ -64,10 +63,18 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         { preset: GlobalPreset.LIGHT },
     );
 
+    let colorPrimary = color("#037DBC");
+    if (options.preset === GlobalPreset.DARK) {
+        // given better contrast in the dark preset.
+        colorPrimary = colorPrimary.lighten(0.25);
+    }
+
     const elementaryColors = {
         black: color("#000"),
-        almostBlack: color("#323639"),
+        almostBlack: color("#272A2D"),
+        darkText: color("#555a62"),
         white: color("#fff"),
+        almostWhite: color("#f5f6f7"),
         transparent: rgba(0, 0, 0, 0),
     };
 
@@ -83,7 +90,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
          * @type string
          * @format hex-color
          */
-        fg: options.preset === GlobalPreset.LIGHT ? color("#555a62") : elementaryColors.white,
+        fg: options.preset === GlobalPreset.LIGHT ? elementaryColors.darkText : elementaryColors.almostWhite,
         /**
          * @var global.mainColors.bg
          * @title Main Colors - Background
@@ -162,6 +169,14 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const mainColors = {
         ...initialMainColors,
         ...generatedMainColors,
+    };
+
+    const getFgForBg = (bgColor: ColorHelper | string | undefined) => {
+        bgColor = bgColor ?? mainColors.bg;
+        bgColor = ensureColorHelper(bgColor);
+        const darkFg = options.preset === GlobalPreset.LIGHT ? mainColors.fg : mainColors.bg;
+
+        return ColorsUtils.isLightColor(bgColor) ? darkFg : elementaryColors.almostWhite;
     };
 
     const mixBgAndFg = (weight: number) => {
@@ -263,6 +278,14 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
             active: undefined,
             visited: undefined,
         },
+
+        /**
+         * @var global.links.linkDecorationType
+         * @commonTitle Link Decoration Type
+         * @type string
+         * @enum auto | always
+         */
+        linkDecorationType: LinkDecorationType.AUTO,
     });
 
     // Generated derived colors from mainColors.
@@ -413,10 +436,6 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
          * @var global.lineHeight.excerpt
          */
         excerpt: 1.4,
-        /**
-         * @var global.lineHeight.meta
-         */
-        meta: 1.5,
     });
 
     // Three column
@@ -493,6 +512,10 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
              * @var global.fonts.size.small
              */
             small: 12,
+            /**
+             * @var global.fonts.size.extraSmall
+             */
+            extraSmall: 10,
             /**
              * @var global.fonts.size.largeTitle
              */
@@ -710,55 +733,6 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         },
     });
 
-    /**
-     * @varGroup global.meta
-     * @commonDescription Global meta
-     */
-    const meta = makeThemeVars("meta", {
-        /**
-         * @varGroup global.meta.font
-         * @commonDescription Global meta font
-         * @expand font
-         */
-        text: Variables.font({
-            size: fonts.size.small,
-            color: options.preset === GlobalPreset.LIGHT ? color("#767676") : elementaryColors.white,
-            lineHeight: lineHeights.base,
-        }),
-        /**
-         * @varGroup global.meta.spacing
-         * @commonDescription Global meta spacing
-         */
-        spacing: {
-            /**
-             * @var global.meta.spacing.horizontalMargin
-             */
-            horizontalMargin: 4,
-            /**
-             * @var global.meta.spacing.verticalMargin
-             */
-            verticalMargin: 12,
-            /**
-             * @var global.meta.spacing.default
-             */
-            default: 4,
-        },
-        /**
-         * @varGroup global.meta.colors
-         * @commonDescription Global meta colors
-         */
-        colors: {
-            /**
-             * @var global.meta.colors.fg
-             */
-            fg: mixBgAndFg(0.85),
-        },
-        /**
-         * @var global.meta.display
-         */
-        display: "block",
-    });
-
     const states = makeThemeVars("states", {
         icon: {
             opacity: 0.6,
@@ -953,6 +927,27 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     );
 
     /**
+     * @varGroup global.panelBoxes
+     * @description Global panel box preset that will apply to panel items on every page.
+     * Some panel items may have their own that will need to modified separately.
+     * @expand contentBoxes
+     */
+    const panelBoxes = makeThemeVars(
+        "panelBoxes",
+        Variables.contentBoxes({
+            depth1: {
+                borderType: BorderType.NONE,
+            },
+            depth2: {
+                borderType: BorderType.NONE,
+            },
+            depth3: {
+                borderType: BorderType.NONE,
+            },
+        }),
+    );
+
+    /**
      * @varGroup global.headingBox
      * @description Heading boxes sit above every box.
      * They can have titles, subtitles, descriptions, and sometimes action items in them.
@@ -987,6 +982,25 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         }),
     });
 
+    const panelHeadingBox = makeThemeVars("panelHeadingBox", {
+        /**
+         * @varGroup global.panelHeadingBox.spacing
+         * @expand spacing
+         */
+        spacing: Variables.spacing({
+            bottom: 16,
+            horizontal: 0,
+        }),
+        /**
+         * @varGroup global.panelHeadingBox.mobileSpacing
+         * @expand spacing
+         */
+        mobileSpacing: Variables.spacing({
+            bottom: 16,
+            horizontal: 0,
+        }),
+    });
+
     const itemList = makeThemeVars("itemList", {
         /**
          * @varGroup global.itemList
@@ -1009,7 +1023,6 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         body,
         borderType,
         border,
-        meta,
         gutter,
         panel,
         middleColumn,
@@ -1025,6 +1038,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         states,
         overlay,
         userContent,
+        getFgForBg,
         mixBgAndFg,
         mixPrimaryAndFg,
         mixPrimaryAndBg,
@@ -1037,7 +1051,9 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         foundationalWidths,
         widget,
         headingBox,
+        panelHeadingBox,
         itemList,
         contentBoxes,
+        panelBoxes,
     };
 });

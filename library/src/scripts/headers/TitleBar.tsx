@@ -441,19 +441,20 @@ function DesktopMeBox() {
     const isGuest = isUserGuest(currentUser.data);
     const registerLink = useRegisterLink();
     const signinLink = useSignInLink();
+    const guestVars = titleBarVariables().guest;
 
     if (isGuest) {
         return (
             <TitleBarNav className={classNames("titleBar-nav titleBar-guestNav", classes.nav)}>
                 <TitleBarNavItem
-                    buttonType={ButtonTypes.TRANSPARENT}
+                    buttonType={guestVars.signInButtonType}
                     linkClassName={classNames(classes.signIn, classes.guestButton)}
                     to={signinLink}
                 >
                     {t("Sign In")}
                 </TitleBarNavItem>
                 <TitleBarNavItem
-                    buttonType={ButtonTypes.TRANSLUCID}
+                    buttonType={guestVars.registerButtonType}
                     linkClassName={classNames(classes.register, classes.guestButton)}
                     to={registerLink}
                 >

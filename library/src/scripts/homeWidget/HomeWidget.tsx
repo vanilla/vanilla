@@ -16,11 +16,12 @@ import {
 } from "@library/homeWidget/HomeWidgetContainer.styles";
 import { IHomeWidgetItemProps, HomeWidgetItem } from "@library/homeWidget/HomeWidgetItem";
 import { HomeWidgetContainer } from "@library/homeWidget/HomeWidgetContainer";
+import { DeepPartial } from "redux";
 
 interface IProps {
     // Options
     containerOptions?: IHomeWidgetContainerOptions;
-    itemOptions?: IHomeWidgetItemOptions;
+    itemOptions?: DeepPartial<IHomeWidgetItemOptions>;
     maxItemCount?: number;
 
     // Content

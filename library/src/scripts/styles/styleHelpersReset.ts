@@ -5,10 +5,10 @@
  */
 
 import { CSSObject } from "@emotion/css";
-import { AppearanceProperty } from "csstype";
+import { Property } from "csstype";
 import { important } from "csx";
 
-export const appearance = (value: AppearanceProperty = "none", isImportant: boolean = false): CSSObject => {
+export const appearance = (value: Property.Appearance = "none", isImportant: boolean = false): CSSObject => {
     const val = (isImportant ? important(value) : value) as any;
     return {
         WebkitAppearance: val,

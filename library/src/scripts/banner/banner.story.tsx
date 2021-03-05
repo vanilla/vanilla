@@ -828,6 +828,43 @@ export const ContentBannerLogo = storyWithConfig(
     },
 );
 
+export const ContentBannerIcon = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            global: {
+                body: {
+                    backgroundImage: {
+                        color: color("#efefef"),
+                    },
+                },
+            },
+            contentBanner: {
+                options: {
+                    alignment: "left",
+                    enabled: true,
+                    hideIcon: false,
+                    hideTitle: false,
+                    hideDescription: false,
+                },
+                spacing: {
+                    padding: {
+                        top: 30,
+                        bottom: 30,
+                    },
+                },
+                outerBackground: {
+                    unsetBackground: true,
+                },
+                icon: {
+                    image: "https://us.v-cdn.net/5022541/uploads/341/G35SLM2LBY4G.png",
+                },
+            },
+        },
+    },
+    () => <StoryBannerWithScope title="Content Banner with Icon" isContentBanner onlyOne />,
+);
+
 export const UnifiedBorder = storyWithConfig(
     {
         useWrappers: false,

@@ -8,23 +8,33 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { MixinsFoundation } from "@library/styles/MixinsFoundation";
 import { discussionVariables } from "@dashboard/compatibilityStyles/pages/Discussion.variables";
-import { forumVariables } from "@library/forms/forumStyleVars";
 import { cssOut } from "@dashboard/compatibilityStyles";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
-import { absolutePosition } from "@library/styles/styleHelpersPositioning";
 import { quote, translate } from "csx";
 import { negativeUnit } from "@library/styles/styleHelpers";
 import { userCardDiscussionPlacement } from "@dashboard/compatibilityStyles/userCards";
 import { Mixins } from "@library/styles/Mixins";
+import { injectGlobal } from "@emotion/css";
+import { metasVariables } from "@library/metas/Metas.variables";
 
 export const discussionCompatCSS = () => {
     const vars = discussionVariables();
     const globalVars = globalVariables();
-    const formVars = forumVariables();
-    const userPhotoVars = formVars.userPhoto;
+    const metaVars = metasVariables();
 
     MixinsFoundation.contentBoxes(vars.contentBoxes, "Discussion");
+    MixinsFoundation.contentBoxes(vars.panelBoxes, "Discussion", ".Panel");
+
+    injectGlobal({
+        ".Item-Header .Author .Username": {
+            ...Mixins.font(vars.author.name.font),
+            "&:hover, &:focus, &:active": {
+                ...Mixins.font(vars.author.name.fontState),
+            },
+            marginRight: globalVars.gutter.half,
+        },
+    });
 
     cssOut(
         `
@@ -77,14 +87,6 @@ export const discussionCompatCSS = () => {
         },
     );
 
-    cssOut(
-        ".Meta.Meta-Discussion",
-
-        {
-            display: globalVars.meta.display,
-        },
-    );
-
     cssOut(`.Container .DataTable span.MItem`, {
         display: "inline-block",
     });
@@ -129,7 +131,7 @@ export const discussionCompatCSS = () => {
         .Content a.Bookmarking .svgBookmark,
         .Content a.Bookmarked .svgBookmark`,
         {
-            ...absolutePosition.topLeft("50%", "50%"),
+            ...Mixins.absolute.topLeft("50%", "50%"),
             content: quote(``),
             display: "block",
             width: styleUnit(12),
@@ -171,6 +173,7 @@ export const discussionCompatCSS = () => {
 
         "& .AuthorWrap, & .DiscussionMeta": {
             paddingLeft: 0,
+            display: "block",
         },
     });
 };

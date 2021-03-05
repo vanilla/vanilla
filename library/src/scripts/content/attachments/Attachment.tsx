@@ -9,7 +9,7 @@ import { HumanFileSize } from "@library/utility/fileUtils";
 import { GetAttachmentIcon } from "@library/content/attachments/attachmentUtils";
 import { AttachmentType } from "@library/content/attachments/AttatchmentType";
 import { attachmentClasses } from "@library/content/attachments/attachmentStyles";
-import { metasClasses } from "@library/styles/metasStyles";
+import { metasClasses } from "@library/metas/Metas.styles";
 import Translate from "@library/content/Translate";
 import DateTime from "@library/content/DateTime";
 import { attachmentIconClasses } from "@library/content/attachments/attachmentIconsStyles";

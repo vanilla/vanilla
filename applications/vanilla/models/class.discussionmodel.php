@@ -26,6 +26,7 @@ use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\FormatFieldTrait;
 use Vanilla\Formatting\UpdateMediaTrait;
 use Vanilla\Models\DirtyRecordModel;
+use Vanilla\Models\LegacyModelUtils;
 use Vanilla\Models\UserFragmentSchema;
 use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Scheduler\Job\LocalApiBulkDeleteJob;
@@ -591,6 +592,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
     public static function discussionTypes($category = null) {
         if (self::$discussionTypes === null) {
             $discussionTypes = ['Discussion' => [
+                'apiType' => 'discussion',
                 'Singular' => 'Discussion',
                 'Plural' => 'Discussions',
                 'AddUrl' => '/post/discussion',
@@ -979,6 +981,14 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
 
         $data = $sql->query($finalQuery);
 
+        if (!empty([$orderBy])) {
+            // This is pseudo foreach loop.
+            // We only take the first pair of $orderField => $orderDirection here.
+            // So the loop will only entered ones
+            foreach (array_slice($orderBy, 0, 1, true) as $orderField => $orderDirection) {
+                $this->fixOrder($data, $orderField, $orderDirection);
+            }
+        }
 
         // Change discussions returned based on additional criteria
         $this->addDiscussionColumns($data);
@@ -1198,6 +1208,26 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
         foreach ($result as &$discussion) {
             $this->calculate($discussion);
         }
+    }
+
+    /**
+     * Fix order in sql result set.
+     *
+     * @param Gdn_DataSet $data
+     * @param string $orderField
+     * @param string $orderDirection
+     */
+    public function fixOrder(Gdn_DataSet $data, string $orderField, string $orderDirection) {
+        // Change discussions order.
+        $result = &$data->result();
+        usort($result, function ($a, $b) use ($orderField, $orderDirection) {
+            $order = ($orderDirection === 'asc') ? 1 : -1;
+            if (is_array($a)) {
+                return $order * (($a[$orderField] ?? $a[ucfirst($orderField)]) <=> ($b[$orderField] ?? $b[ucfirst($orderField)]));
+            } else {
+                return $order * (($a->$orderField ?? $a->{ucfirst($orderField)}) <=> ($b->$orderField ?? $b->{ucfirst($orderField)}));
+            }
+        });
     }
 
     /**
@@ -2236,10 +2266,10 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
         }
 
         $this->EventArguments['DiscussionID'] = $rowID;
-        if (!is_array($property)) {
-            $this->EventArguments['SetField'] = [$property => $value];
-        } else {
-            $this->EventArguments['SetField'] = $property;
+        $this->EventArguments['SetField'] = $property;
+
+        if (isset($property['Score'])) {
+            $property['hot'] = ((int)$property['Score']) + ($this->EventArguments['Discussion']->CountComments ?? 0);
         }
 
         $this->addDirtyRecord('discussion', $rowID);
@@ -3319,6 +3349,52 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
     }
 
     /**
+     * Iteratively delete each discussion within a category with a generator.
+     *
+     * This method uses a generator so that it can be timed out if it takes too long to run, in which case it can be
+     * run again, picking up where it left off.
+     *
+     * @param int $categoryID
+     * @param array $options
+     * @return iterable
+     */
+    public function deleteByCategory(int $categoryID, array $options = []): iterable {
+        $discussions = LegacyModelUtils::reduceTable($this, [
+            "d.CategoryID" => $categoryID,
+            "Announce" => "all"
+        ]);
+        foreach ($discussions as $discussion) {
+            $this->deleteID($discussion['DiscussionID'], $options);
+            yield $discussion;
+        }
+    }
+
+    /**
+     * Iteratively move each discussion within a category using a generator.
+     *
+     * This method uses a generator so that it can be timed out if it takes too long to run, in which case it can be
+     * run again, picking up where it left off.
+     *
+     * @param int $categoryID
+     * @param int $newCategoryID
+     * @param array $options
+     * @return iterable
+     */
+    public function moveByCategory(int $categoryID, int $newCategoryID, array $options = []): iterable {
+        $discussions = LegacyModelUtils::reduceTable($this, [
+            "d.CategoryID" => $categoryID,
+            "Announce" => "all"
+        ]);
+        foreach ($discussions as $discussion) {
+            $this->save([
+                "DiscussionID" => $discussion["DiscussionID"],
+                "CategoryID" => $newCategoryID,
+            ], $options);
+            yield $discussion;
+        }
+    }
+
+    /**
      * Convert tags from stored format to user-presentable format.
      *
      * @param string $tags A string encoded with {@link dbencode()}.
@@ -3897,9 +3973,16 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
             $row['DateLastComment'] = $row['DateInserted'];
         }
 
+        if (ModelUtils::isExpandOption('excerpt', $expand)) {
+            $row['excerpt'] = $this->formatterService->renderExcerpt($rawBody, $format);
+        }
+        if (ModelUtils::isExpandOption('-body', $expand)) {
+            unset($row['Body']);
+        }
         if (ModelUtils::isExpandOption(ModelUtils::EXPAND_CRAWL, $expand)) {
             $row['recordCollapseID'] = "site{$this->ownSite->getSiteID()}_discussion{$row['DiscussionID']}";
-            $row['excerpt'] = $this->formatterService->renderExcerpt($rawBody, $format);
+            $row['excerpt'] = $row['excerpt'] ?? $this->formatterService->renderExcerpt($rawBody, $format);
+            $row['bodyPlainText'] = Gdn::formatService()->renderPlainText($rawBody, $format);
             $row['image'] = $this->formatterService->parseImageUrls($rawBody, $format)[0] ?? null;
             $row['scope'] = $this->categoryModel->getRecordScope($row['CategoryID']);
             $row['score'] = $row['Score'] ?? 0;
@@ -3989,11 +4072,17 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
                 'description' => 'The title of the discussion.',
                 'x-localize' => true,
             ],
-            'body:s' => [
+            'body:s?' => [
                 'description' => 'The body of the discussion.',
-                'x-localize' => true,
+            ],
+            'excerpt:s?' => [
+                'description' => 'Plain-text excerpt of the current discussion body.',
             ],
             'bodyRaw:s?',
+            'bodyPlainText:s?' => [
+                'description' => 'The body of the discussion in plain text.',
+                'x-localize' => true,
+            ],
             'categoryID:i' => 'The category the discussion is in.',
             'dateInserted:dt' => 'When the discussion was created.',
             'dateUpdated:dt|n' => 'When the discussion was last updated.',
@@ -4207,7 +4296,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
      * @inheritDoc
      */
     public function getCrawlInfo(): array {
-        $r = \Vanilla\Models\LegacyModelUtils::getCrawlInfoFromPrimaryKey(
+        $r = LegacyModelUtils::getCrawlInfoFromPrimaryKey(
             $this,
             '/api/v2/discussions?pinOrder=mixed&sort=-discussionID&expand[]=crawl&expand[]=tagIDs',
             'discussionID'

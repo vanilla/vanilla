@@ -7,7 +7,7 @@ import React from "react";
 import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
 import SmartLink from "@library/routing/links/SmartLink";
 import classNames from "classnames";
-import { metasClasses } from "@library/styles/metasStyles";
+import { metasClasses } from "@library/metas/Metas.styles";
 import { EmbedContainer } from "@library/embeddedContent/components/EmbedContainer";
 import TruncatedText from "@library/content/TruncatedText";
 import { EmbedTitle } from "@library/embeddedContent/components/EmbedTitle";

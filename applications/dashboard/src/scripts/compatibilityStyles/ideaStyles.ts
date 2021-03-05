@@ -9,11 +9,9 @@ import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
-import { forumVariables } from "@library/forms/forumStyleVars";
 
 export const ideaCSS = () => {
     const globalVars = globalVariables();
-    const forumVars = forumVariables();
 
     cssOut(
         `
@@ -61,8 +59,8 @@ export const ideaCSS = () => {
         .MessageList .ItemIdea.ItemIdea.ItemIdea .PhotoWrap.IndexPhoto
     `,
         {
-            width: styleUnit(forumVars.countBox.width),
-            height: styleUnit(forumVars.countBox.height),
+            width: styleUnit(40),
+            height: styleUnit(40),
         },
     );
 };

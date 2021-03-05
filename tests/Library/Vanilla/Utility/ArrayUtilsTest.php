@@ -163,6 +163,10 @@ class ArrayUtilsTest extends TestCase {
             "mixed" => [["foo" => "bar", "Hello world."], true],
             "empty" => [[], false],
             "ArrayObject" => [new \ArrayObject(["foo" => "bar"]), true],
+            "string" => ["test", false],
+            "number" => [42, false],
+            "null" => [null, false],
+            "object" => [new \stdClass(), false],
         ];
 
         return $result;
@@ -525,5 +529,35 @@ class ArrayUtilsTest extends TestCase {
                 'key'
             )
         );
+    }
+
+    /**
+     * Verify conversion from an object to an array using objToArrayRecursive.
+     *
+     * @param object $obj
+     * @param array $expected
+     * @dataProvider provideObjectsToArrays
+     */
+    public function testObjToArrayRecursive(object $obj, array $expected): void {
+        $actual = ArrayUtils::objToArrayRecursive($obj);
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * Provide data for testing object-to-array conversion.
+     *
+     * @return array
+     */
+    public function provideObjectsToArrays(): array {
+        return [
+            "Basic" => [
+                (object)["a" => 1, "b" => 2],
+                ["a" => 1, "b" => 2],
+            ],
+            "Nested" => [
+                (object)["foo" => (object)["hello" => "world"]],
+                ["foo" => ["hello" => "world"]],
+            ]
+        ];
     }
 }

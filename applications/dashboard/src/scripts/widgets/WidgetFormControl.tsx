@@ -30,7 +30,9 @@ export function WidgetFormControl(props: IProps) {
     switch (formControl.inputType) {
         case "textBox":
             const isMultiline = formControl.type === "textarea";
-            const type = formControl.type === "number" ? "number" : "text";
+            const typeIsNumber = formControl.type === "number";
+            const typeIsUrl = formControl.type === "url";
+            const type = typeIsNumber ? "number" : typeIsUrl ? "url" : "text";
             return (
                 <DashboardInput
                     inputProps={{
@@ -85,7 +87,7 @@ export function WidgetFormControl(props: IProps) {
                 : [];
             return (
                 <DashboardSelect
-                    isClearable={false}
+                    isClearable={!props.isRequired}
                     value={options.find((opt) => {
                         let valueCompare: any = opt.value;
                         if (valueCompare === "true") {

@@ -55,6 +55,9 @@ class ThemesApiController extends AbstractApiController {
      */
     public function get(string $themeKey, array $query = []): Data {
         $this->permission();
+        if (isset($query['revisionID']) && empty($query['revisionID'])) {
+            unset($query['revisionID']);
+        }
         $out = $this->themeResultSchema();
         $in = $this->schema([
             'allowAddonVariables:b?',

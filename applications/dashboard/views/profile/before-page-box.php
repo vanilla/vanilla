@@ -27,7 +27,7 @@ echo '<div class="DismissMessage InfoMessage">', t('This is a system account and
 
 if ($this->User->About != '') {
 echo '<div id="Status" itemprop="description">'.wrap(Gdn_Format::display($this->User->About));
-    if ($this->User->About != '' && ($Session->UserID == $this->User->UserID || $Session->checkPermission('Garden.Users.Edit')))
+    if ($this->User->About != '' && ($Session->UserID == $this->User->UserID || $Session->checkPermission('Garden.Moderation.Manage')))
     echo ' - '.anchor(t('clear'), '/profile/clear/'.$this->User->UserID, 'Hijack');
 
     echo '</div>';

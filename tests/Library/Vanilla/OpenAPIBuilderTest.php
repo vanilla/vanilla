@@ -56,13 +56,16 @@ class OpenAPIBuilderTest extends TestCase {
         $data = $builder->generateFullOpenAPI();
         $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         $path = PATH_ROOT.'/tests/cache/open-api-builder/openapi.json';
-        file_put_contents($path, $json);
+        if (file_put_contents($path, $json) === false) {
+            $this->fail("Unable to write OpenAPI to {$path}");
+        }
 
         $dir = getcwd();
         chdir(PATH_ROOT);
-        exec("npx swagger-cli@2.3.4 validate $path", $output, $result);
+        exec("npx swagger-cli@2.3.4 validate $path 2>&1", $output, $result);
         chdir($dir);
-        $this->assertSame(0, $result, $path);
+
+        $this->assertSame(0, $result, implode(PHP_EOL, $output));
     }
 
     /**

@@ -199,6 +199,9 @@ class BanModel extends Gdn_Model {
             case 'name':
                 $result['u.Name like'] = $ban['BanValue'];
                 break;
+            default:
+                $result = $this->getEventManager()->fireFilter('banModel_banWhere', $result, $ban);
+                break;
         }
         return $result;
     }
@@ -231,7 +234,7 @@ class BanModel extends Gdn_Model {
      */
     public static function checkUser($User, $Validation = null, $UpdateBlocks = false, &$BansFound = null) {
         $Bans = self::allBans();
-        $Fields = ['Name' => 'Name', 'Email' => 'Email', 'IPAddress' => 'LastIPAddress'];
+
         $Banned = [];
 
         if (!$BansFound) {
@@ -244,9 +247,10 @@ class BanModel extends Gdn_Model {
             $Parts = array_map('preg_quote', $Parts);
             $Regex = '`^'.implode('.*', $Parts).'$`i';
 
-            $value = val($Fields[$Ban['BanType']], $User);
             if ($Ban['BanType'] === 'IPAddress') {
-                $value = ipDecode($value);
+                $value = ipDecode(val('LastIPAddress', $User));
+            } else {
+                $value = val($Ban['BanType'], $User);
             }
 
             if (preg_match($Regex, $value)) {

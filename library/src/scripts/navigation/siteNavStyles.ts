@@ -7,7 +7,7 @@
 import { variableFactory, styleFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { negative, allLinkStates } from "@library/styles/styleHelpers";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
@@ -15,6 +15,7 @@ import { percent, px, calc } from "csx";
 import { CSSObject } from "@emotion/css";
 import { trimTrailingCommas } from "@dashboard/compatibilityStyles/trimTrailingCommas";
 import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
+import { Mixins } from "@library/styles/Mixins";
 
 export const siteNavVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -33,8 +34,7 @@ export const siteNavVariables = useThemeCache(() => {
     });
 
     const title = makeThemeVars("title", {
-        fontSize: globalVars.fonts.size.large,
-        fontWeight: globalVars.fonts.weights.bold,
+        ...globalVars.fontSizeAndWeightVars("large", "bold"),
     });
 
     const nodeToggle = makeThemeVars("nodeToggle", {
@@ -53,7 +53,7 @@ export const siteNavVariables = useThemeCache(() => {
 export const siteNavClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = siteNavVariables();
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = panelLayoutVariables().mediaQueries();
 
     const style = styleFactory("siteNav");
 
@@ -62,7 +62,6 @@ export const siteNavClasses = useThemeCache(() => {
             position: "relative",
             display: "block",
             zIndex: 1,
-            marginTop: styleUnit(negative(vars.nodeToggle.height / 2 - vars.node.fontSize / 2)),
         },
         mediaQueries.noBleedDown({
             marginLeft: styleUnit(vars.nodeToggle.width - vars.nodeToggle.iconWidth / 2 - vars.spacer.default),
@@ -70,8 +69,9 @@ export const siteNavClasses = useThemeCache(() => {
     );
 
     const title = style("title", {
-        fontSize: styleUnit(globalVars.fonts.size.large),
-        fontWeight: globalVars.fonts.weights.bold,
+        ...Mixins.font({
+            ...globalVars.fontSizeAndWeightVars("large", "bold"),
+        }),
     });
 
     const children = style("children", {
@@ -85,7 +85,7 @@ export const siteNavClasses = useThemeCache(() => {
 export const siteNavNodeClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = siteNavVariables();
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = panelLayoutVariables().mediaQueries();
 
     const style = styleFactory("siteNavNode");
 
@@ -104,7 +104,9 @@ export const siteNavNodeClasses = useThemeCache(() => {
             paddingLeft: styleUnit(vars.nodeToggle.width - vars.node.borderWidth),
         },
         mediaQueries.oneColumnDown({
-            fontSize: styleUnit(globalVars.fonts.size.large),
+            ...Mixins.font({
+                ...globalVars.fontSizeAndWeightVars("large"),
+            }),
         }),
     );
 
@@ -170,8 +172,9 @@ export const siteNavNodeClasses = useThemeCache(() => {
                         fontWeight: globalVars.fonts.weights.bold,
                     },
                     "&.isFirstLevel": {
-                        fontSize: styleUnit(globalVars.fonts.size.large),
-                        fontWeight: globalVars.fonts.weights.normal,
+                        ...Mixins.font({
+                            ...globalVars.fontSizeAndWeightVars("large", "normal"),
+                        }),
                     },
                 },
             },

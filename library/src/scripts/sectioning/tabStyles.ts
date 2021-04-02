@@ -9,7 +9,7 @@ import { useThemeCache } from "@library/styles/themeCache";
 import { negative, sticky, extendItemContainer, flexHelper, singleBorder } from "@library/styles/styleHelpers";
 import { styleUnit } from "@library/styles/styleUnit";
 import { userSelect } from "@library/styles/styleHelpers";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent, viewHeight, calc, quote, color } from "csx";
@@ -18,6 +18,7 @@ import { CSSObject } from "@emotion/css";
 import { buttonResetMixin } from "@library/forms/buttonMixins";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { Mixins } from "@library/styles/Mixins";
+import { Variables } from "@library/styles/Variables";
 
 interface IListOptions {
     includeBorder?: boolean;
@@ -74,7 +75,7 @@ export const tabsVariables = useThemeCache(() => {
 export const tabStandardClasses = useThemeCache(() => {
     const vars = tabsVariables();
     const style = styleFactory(TabsTypes.STANDARD);
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = panelLayoutVariables().mediaQueries();
     const formElementVariables = formElementsVariables();
     const globalVars = globalVariables();
     const titleBarVars = titleBarVariables();
@@ -229,7 +230,7 @@ export const tabBrowseClasses = useThemeCache(() => {
     const vars = tabsVariables();
     const globalVars = globalVariables();
     const style = styleFactory(TabsTypes.BROWSE);
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = panelLayoutVariables().mediaQueries();
 
     const horizontalPadding = 12;
     const verticalPadding = globalVars.gutter.size / 2;
@@ -268,11 +269,12 @@ export const tabBrowseClasses = useThemeCache(() => {
 
     const tab = useThemeCache((largeTabs?: boolean, legacyButton?: boolean) =>
         style("tab", {
-            ...buttonResetMixin(),
-            textTransform: largeTabs ? "inherit" : "uppercase",
-            fontSize: largeTabs ? globalVars.fonts.size.large : globalVars.fonts.size.small,
-            fontWeight: globalVars.fonts.weights.bold,
             position: "relative",
+            ...buttonResetMixin(),
+            ...Mixins.font({
+                ...globalVars.fontSizeAndWeightVars(largeTabs ? "large" : "small", "bold"),
+                transform: largeTabs ? "inherit" : "uppercase",
+            }),
             ...Mixins.padding({
                 vertical: verticalPadding,
                 horizontal: horizontalPadding,

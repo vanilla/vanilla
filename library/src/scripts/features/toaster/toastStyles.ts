@@ -20,7 +20,9 @@ export const toastClasses = useThemeCache(() => {
 
     const root = () => {
         return style("box", {
-            fontSize: globalVars.fonts.size.medium,
+            ...Mixins.font({
+                ...globalVars.fontSizeAndWeightVars("medium"),
+            }),
             zIndex: 1,
             position: "fixed",
             bottom: 18,
@@ -48,7 +50,9 @@ export const toastClasses = useThemeCache(() => {
 
     const button = style("button", {
         margin: styleUnit("3px"),
-        fontSize: globalVars.fonts.size.medium,
+        ...Mixins.font({
+            ...globalVars.fontSizeAndWeightVars("medium"),
+        }),
     });
 
     return { root, buttons, button };

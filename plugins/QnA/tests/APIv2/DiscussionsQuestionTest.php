@@ -7,7 +7,9 @@
 
 namespace VanillaTests\APIv2;
 
+use CategoryModel;
 use Gdn;
+
 
 /**
  * Test managing questions with the /api/v2/discussions endpoint.
@@ -146,7 +148,7 @@ class DiscussionsQuestionTest extends AbstractAPIv2Test {
         $this->api()->patch("comments/answer/".$answers[0]["commentID"], ["status" => "accepted"]);
         $this->api()->patch("comments/answer/".$answers[1]["commentID"], ["status" => "accepted"]);
 
-        $discussion = $this->api()->get("discussions/".$question['discussionID'])->getBody();
+        $discussion = $this->api()->get("discussions/".$question['discussionID'], ["expand" => ["acceptedAnswers"]])->getBody();
 
         // Verify we have accepted answers.
         $this->assertArrayHasKey("acceptedAnswers", $discussion["attributes"]["question"], "No accepted answers.");
@@ -192,6 +194,49 @@ class DiscussionsQuestionTest extends AbstractAPIv2Test {
         // make a second call to make sure we are not spamming the user, this time it should not send notifications.
         $followUpNoNotifications = $this->api()->post('discussions/question-notifications')->getBody();
         $this->assertEquals(0, $followUpNoNotifications['notificationsSent']);
+    }
+
+    /**
+     * Test getting a discussion with a status.
+     */
+    public function testgetQuestionsStatus(): void {
+        $this->resetTable('Discussion');
+        $this->createQuestionsStatus(1, 'accepted');
+        $this->createQuestionsStatus(1, 'unanswered');
+        $this->createQuestionsStatus(1, 'answered');
+        $acceptedQuestions = count($this->api->get('discussions', ['status' =>'accepted'])->getBody());
+        $answeredQuestions = count($this->api->get('discussions', ['status' =>'answered'])->getBody());
+        $unansweredQuestions = count($this->api->get('discussions', ['status' =>'unanswered'])->getBody());
+        $this->assertEquals(1, $acceptedQuestions);
+        $this->assertEquals(1, $answeredQuestions);
+        $this->assertEquals(1, $unansweredQuestions);
+    }
+
+    /**
+     * Create questions
+     *
+     * @param int $numQuestions Number of questions to create.
+     * @param string $status Question status.
+     */
+    public function createQuestionsStatus(int $numQuestions, $status = ''): void {
+        for ($i = 0; $i < $numQuestions; $i++) {
+            $questions[] = $this->api()->post('discussions/question', [
+                "categoryID" => self::$category["categoryID"],
+                "name" => "Test question",
+                "body" => "question body",
+                "format" => "markdown",
+            ])->getBody();
+            if ($status !== "unanswered") {
+                $answers[] = $this->api()->post("comments", [
+                    "body" => "Hello world.",
+                    "discussionID" => $questions[$i]["discussionID"],
+                    "format" => "Markdown",
+                ])->getBody();
+            }
+            if ($status === "accepted") {
+                $this->api()->patch("comments/answer/".$answers[$i]["commentID"], ["status" => $status]);
+            }
+        }
     }
 
     /**
@@ -242,5 +287,53 @@ class DiscussionsQuestionTest extends AbstractAPIv2Test {
             ->table('Category')
             ->column('QnaFollowUpNotification', 'tinyint(1)', ['Null' => false, 'Default' => 1])
             ->set();
+    }
+
+    /**
+     * Test PUT /discussions/:discussionid/type with QnA
+     */
+    public function testPutDiscussionTypesQnA() {
+        $this->resetTable('Category');
+        $this->resetTable('Discussion');
+
+        $category = $this->createCategory();
+        /** @var CategoryModel $categoryModel */
+        $categoryModel = \Gdn::getContainer()->get(CategoryModel::class);
+        $categoryModel->setField($category["categoryID"], 'AllowedDiscussionTypes', ["Discussion", "Question"]);
+
+        $discussion = $this->createDiscussion();
+
+        $question = $this->api()->put("/discussions/{$discussion["discussionID"]}/type", ["type" => "question"]);
+        $question = $question->getBody();
+        $this->assertEquals("question", $question["type"]);
+
+        $discussion = $this->api()->put("/discussions/{$discussion["discussionID"]}/type", ["type" => "discussion"]);
+        $discussion = $discussion->getBody();
+        $this->assertEquals("discussion", $discussion["type"]);
+    }
+
+    /**
+     * Test PUT /discussions/:discussionid/type status is correct.
+     */
+    public function testPutDiscussionTypesQnAStatusIsCorrect() {
+        $this->resetTable('Category');
+        $this->resetTable('Discussion');
+
+        $category = $this->createCategory();
+        /** @var CategoryModel $categoryModel */
+        $categoryModel = \Gdn::getContainer()->get(CategoryModel::class);
+        $categoryModel->setField($category["categoryID"], 'AllowedDiscussionTypes', ["Discussion", "Question"]);
+
+        $question = $this->createQuestion();
+        $this->createAnswer();
+
+        $discussion = $this->api()->put("/discussions/{$question["discussionID"]}/type", ["type" => "discussion"]);
+        $discussion = $discussion->getBody();
+        $this->assertEquals("discussion", $discussion["type"]);
+
+        $updatedQuestion = $this->api()->put("/discussions/{$question["discussionID"]}/type", ["type" => "question"]);
+        $updatedQuestion = $updatedQuestion->getBody();
+
+        $this->assertEquals('accepted', $updatedQuestion['attributes']['question']['status']);
     }
 }

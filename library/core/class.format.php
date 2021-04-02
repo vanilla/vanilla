@@ -1259,8 +1259,11 @@ class Gdn_Format {
      */
     private static function formatToInternal(&$mixed, $formatMethod, $seen = []) {
         // Process $Mixed based on its type.
+        $formatService = Gdn::formatService();
         if (is_string($mixed)) {
-            if (in_array(strtolower($formatMethod), self::$SanitizedFormats) && method_exists('Gdn_Format', $formatMethod)) {
+            if (is_string($formatMethod) && $formatService->hasFormat($formatMethod)) {
+                $mixed = $formatService->renderHTML($mixed, $formatMethod);
+            } elseif (in_array(strtolower($formatMethod), self::$SanitizedFormats) && method_exists('Gdn_Format', $formatMethod)) {
                 $mixed = self::$formatMethod($mixed);
             } elseif (function_exists('gdn_formatter_'.$formatMethod)) {
                 $formatMethod = 'gdn_formatter_'.$formatMethod;

@@ -18,7 +18,7 @@ class SpyingEventManager extends EventManager {
     private $firedEvents = [];
 
     /** @var object[] */
-    private $dispatchedEvents;
+    private $dispatchedEvents = [];
 
     /**
      * Overridden to track dispatched events.

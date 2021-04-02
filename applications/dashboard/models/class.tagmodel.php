@@ -1,12 +1,19 @@
 <?php
 /**
- * Tagging plugin.
- *
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Tagging
  */
 
+use Garden\Schema\Schema;
+use Garden\Web\Exception\ClientException;
+use Garden\Web\Exception\NotFoundException;
+use Vanilla\ApiUtils;
+use Vanilla\Utility\ArrayUtils;
+
+/**
+ * Tagging plugin.
+ */
 class TagModel extends Gdn_Model {
 
     const IX_EXTENDED = 'x';
@@ -18,6 +25,8 @@ class TagModel extends Gdn_Model {
     protected static $instance;
 
     public $StringTags;
+
+    const FIELD_MAPPINGS = ['urlcode' => 'Name', 'name' => 'FullName'];
 
     /**
      * @param string $name
@@ -300,7 +309,7 @@ class TagModel extends Gdn_Model {
 
         $ids = [];
         foreach ($rows as $row) {
-            $discussionId = val('DiscussionID', $row);
+            $discussionId = val('DiscussionID', $row, null) ?? val('discussionID', $row);
             if ($discussionId) {
                 $ids[] = $discussionId;
             }
@@ -316,7 +325,7 @@ class TagModel extends Gdn_Model {
         $all_tags = Gdn_DataSet::index($all_tags, 'DiscussionID', ['Unique' => false]);
 
         foreach ($rows as &$row) {
-            $discussionId = val('DiscussionID', $row);
+            $discussionId = val('DiscussionID', $row, null) ?? val('discussionID', $row);
             if (isset($all_tags[$discussionId])) {
                 $tags = $all_tags[$discussionId];
 
@@ -337,7 +346,232 @@ class TagModel extends Gdn_Model {
                 }
             }
         }
+    }
 
+    /**
+     * Get the TagFragment Schema.
+     *
+     * @returns Schema
+     */
+    public function getTagFragmentSchema(): Schema {
+        $schema = Schema::parse([
+            'tagID:i',
+            'name:s',
+            'urlcode:s?'
+        ]);
+        return $schema;
+    }
+
+    /**
+     * Get the schema for posting a tag via the API.
+     *
+     * @return Schema
+     */
+    public function getPostTagSchema(): Schema {
+        $schema = Schema::parse([
+            'name:s',
+            'urlcode:s?',
+            'parentTagID:i?',
+            'type:s?'
+        ]);
+        return $schema;
+    }
+
+    /**
+     * Get the schema for patching a tag via the API.
+     */
+    public function getPatchTagSchema(): Schema {
+        $postSchema = $this->getPostTagSchema();
+        $patchSchema = $postSchema->merge(Schema::parse([
+            'name:s?'
+        ]));
+        return $patchSchema;
+    }
+
+    /**
+     * Get the full tag schema.
+     *
+     * @return Schema
+     */
+    public function getFullTagSchema(): Schema {
+        $fragmentSchema = $this->getTagFragmentSchema();
+        $fullSchema = $fragmentSchema->merge(Schema::parse([
+            'urlcode:s',
+            'parentTagID:i?',
+            'type:s?',
+            'insertUserID:i',
+            'dateInserted:dt',
+        ]));
+        return $fullSchema;
+    }
+
+    /**
+     * Get a tag fragment schema.
+     *
+     * @return Schema
+     */
+    public function tagFragmentSchema(): Schema {
+        $schema = Schema::parse([
+            'tagID:i',
+            'name:s',
+            'urcode:s?',
+        ]);
+        return $schema;
+    }
+
+    /**
+     * Get the schema to add tags to a discussion via the API.
+     *
+     * @returns Schema
+     */
+    public function getAddTagSchema(): Schema {
+        $schema = Schema::parse([
+            'tagIDs:a?' => ['items' => ['type' => 'integer']],
+            'urlcodes:a?' => ['items' => ['type' => 'string']]
+        ]);
+        return $schema;
+    }
+
+    /**
+     * Validate a set of tags to add or set on a discussion (sent as the body from the "/discussions/{id}/tags" endpoint).
+     *
+     * @param array $tagSet The set of tags to check against the AddTagSchema.
+     * @return array Returns the validated tag set.
+     * @throws ClientException Throws an exception if an invalid field is given.
+     * @throws \Garden\Schema\ValidationException Throws an error if invalid.
+     */
+    public function validateTagReference(array $tagSet): array {
+        $in = $this->getAddTagSchema();
+        $schemaProperties = array_keys($in->getSchemaArray()['properties']);
+        foreach ($tagSet as $field => $value) {
+            if (!in_array($field, $schemaProperties)) {
+                throw new ClientException(
+                    "{$field} is not a valid field. Fields must be one of: ".implode(', ', $schemaProperties)."."
+                );
+            }
+        }
+        $validatedTagSet = $in->validate($tagSet);
+        return $validatedTagSet;
+    }
+
+    /**
+     * Validates a set of tags to send back as tag fragments.
+     *
+     * @param array $tags The set of tags to validate.
+     * @param Schema|null $out
+     * @return array Returns the validated tag set.
+     */
+    public function validateTagFragmentsOutput(array $tags, $out = null): array {
+        if (!($out instanceof Schema)) {
+            $out = $this->getTagFragmentSchema();
+        }
+        $validatedTags = [];
+        foreach ($tags as $tag) {
+            $validatedTags[] = $out->validate($tag);
+        }
+        return $validatedTags;
+    }
+
+    /**
+     * Takes a set of tagIDs and/or urlcodes and sends back an array of tags.
+     *
+     * @param array $tagReference the set of tagIDs and/or urlcodes (in the form of ["tagIDs" => [tagIDs], "urlcodes" => [urlcodes]]).
+     * @return array Returns an array of tags.
+     * @throws NotFoundException Throws an exception if a tag isn't found.
+     */
+    public function getTagsFromReferences(array $tagReference): array {
+        $codes = [];
+        $ids = [];
+        foreach ($tagReference as $field => $value) {
+            if ($field === 'urlcodes') {
+                $codes = $value;
+            } else {
+                $ids = $value;
+            }
+        }
+        $tags = empty($codes) ? [] : $this->getTagsByUrlCodes($codes);
+        $tags = empty($ids) ? $tags : array_merge($tags, $this->getTagsByIDs($ids));
+        return $tags;
+    }
+
+    /**
+     * Normalize tag input.
+     *
+     * @param array $tags An array of tags to normalize.
+     * @return array
+     */
+    public function normalizeInput(array $tags): array {
+        $normalizedTags = [];
+
+        foreach ($tags as $tag) {
+            $normalizedTags[] = \Vanilla\Models\LegacyModelUtils::normalizeApiInput($tag, self::FIELD_MAPPINGS);
+        }
+
+        return $normalizedTags;
+    }
+
+    /**
+     * Normalize tag output.
+     *
+     * @param array $tags An array of tags to normalize.
+     * @return array
+     */
+    public function normalizeOutput(array $tags): array {
+        $normalizedTags = [];
+
+        foreach ($tags as $tag) {
+            $normalizedTags[] = \Vanilla\Models\LegacyModelUtils::normalizeApiOutput($tag, self::FIELD_MAPPINGS);
+        }
+
+        return $normalizedTags;
+    }
+
+    /**
+     * Get tags given an array of url codes.
+     *
+     * @param array $codes An array of url codes (corresponds to the "Name" column in the Tag table).
+     * @param bool $throw Whether to throw an error if any codes aren't found.
+     * @return array Returns an array of rows from the database.
+     * @throws NotFoundException Throws an exception if any tags aren't found and $throw === true.
+     */
+    public function getTagsByUrlCodes(array $codes, bool $throw = true): array {
+        $tags = $this->SQL->select()
+            ->from('Tag')
+            ->where('Name', $codes)
+            ->get()->resultArray();
+        if (!$throw || count($codes) === count($tags)) {
+            return $tags;
+        } else {
+            $tagNames = array_column($tags, 'Name');
+            $missing = array_diff($codes, $tagNames);
+            $missingTags = ['Urlcodes' => []];
+            foreach ($missing as $field => $value) {
+                array_push($missingTags['Urlcodes'], $value);
+            }
+            throw new NotFoundException('Tag(s)', $missingTags);
+        }
+    }
+
+    /**
+     * Get tags given an array of tag IDs.
+     *
+     * @param array $ids An array of url codes (corresponds to the "Name" column in the Tag table).
+     * @param bool $throw Whether to throw an error if any codes aren't found.
+     * @return array Returns an array of rows from the database.
+     * @throws NotFoundException Throws an exception if any tags aren't found and $throw === true.
+     */
+    public function getTagsByIDs(array $ids, bool $throw = true): array {
+        $tags = $this->SQL->select()
+            ->from('Tag')
+            ->where('TagID', $ids)
+            ->get()->resultArray();
+        if (!$throw || count($ids) === count($tags)) {
+            return $tags;
+        } else {
+            $tagIds = array_column($tags, 'TagID');
+            $missingTags = ['TagIds' => array_diff($ids, $tagIds)];
+            throw new NotFoundException('Tag(s)', $missingTags);
+        }
     }
 
     /**
@@ -365,6 +599,8 @@ class TagModel extends Gdn_Model {
         if ($currentTags) {
             $tagsToAdd = array_diff($tagsToAdd, array_keys($currentTags));
         }
+
+        $this->checkMaxTagsLimit(array_merge($tagsToAdd, $currentTags));
 
         if (!empty($tagsToAdd)) {
             $now = Gdn_Format::toDateTime();
@@ -399,6 +635,9 @@ class TagModel extends Gdn_Model {
      * @throws Exception
      */
     public function saveDiscussion($discussion_id, $tags, $types = [''], $category_id = 0, $new_type = '') {
+        // Make sure we're not adding more than the allowed number of tags.
+        $this->checkMaxTagsLimit($tags);
+
         // First grab all of the current tags.
         $all_tags = $current_tags = $this->getDiscussionTags($discussion_id, TagModel::IX_TAGID);
 
@@ -481,17 +720,6 @@ class TagModel extends Gdn_Model {
         $delete_tag_ids = array_diff_key($current_tags, $tag_ids);
 
         $now = Gdn_Format::toDateTime();
-
-        // Handle moving a discussion to a new category.
-        foreach ($current_tags as $tag) {
-            if ($tag['CategoryID'] !== -1 && $tag['CategoryID'] !== $category_id) {
-                unset($delete_tag_ids[$tag['TagID']]);
-                $this->SQL->update('TagDiscussion')
-                    ->set('CategoryID', $category_id)
-                    ->where('DiscussionID', $discussion_id)
-                    ->put();
-            }
-        }
 
         // Insert the new tag mappings.
         foreach ($insert_tag_ids as $tag_id => $bool) {
@@ -682,6 +910,36 @@ class TagModel extends Gdn_Model {
     }
 
     /**
+     * Expand Tags.
+     *
+     * @param array $rows
+     */
+    public function expandTags(array &$rows): void {
+        if (count($rows) === 0) {
+            return;
+        }
+        $isSingle = ArrayUtils::isAssociative($rows);
+        
+        $tagSchema =  $this->tagFragmentSchema();
+        $populate = function (array &$rows) use ($tagSchema) {
+            $this->joinTags($rows);
+            foreach ($rows as &$row) {
+                $row['Tags'] = $this->normalizeOutput($row['Tags']);
+                $row = ApiUtils::convertOutputKeys($row);
+                unset($row['Tags']);
+                $this->validateTagFragmentsOutput($row['tags'], $tagSchema);
+            }
+        };
+
+        if ($isSingle) {
+            $rowsToPopulate = [&$rows];
+        } else {
+            $rowsToPopulate = &$rows;
+        }
+        $populate($rowsToPopulate);
+    }
+
+    /**
      * Expand tagIDs
      *
      * @param array $rows
@@ -804,9 +1062,9 @@ class TagModel extends Gdn_Model {
     }
 
     /**
+     * Checks to see if the tag type allows new tags to be added to it.
      *
-     *
-     * @param $type
+     * @param string $type
      * @return bool
      */
     public function canAddTagForType($type) {
@@ -818,7 +1076,6 @@ class TagModel extends Gdn_Model {
                 strtolower($typeKey),
                 strtolower($typeMeta['key']),
                 strtolower($typeMeta['name']),
-                strtolower($typeMeta['plural'])
             ];
 
             if (in_array(strtolower($type), $typeChecks)
@@ -869,26 +1126,31 @@ class TagModel extends Gdn_Model {
      *
      * @param string $q
      * @param bool $id
-     * @param bool $parent
-     * @param string $type
+     * @param bool|int|array $parent
+     * @param string|array $type
      * @param array $options
      * @return array
      */
-    public function search($q = '', $id = false, $parent = false, $type = 'default', array $options = []) {
+    public function search($q = '', $id = false, $parent = false, $type = 'tag', array $options = []): array {
         // Allow per-category tags
         $categorySearch = c('Vanilla.Tagging.CategorySearch', false);
         if ($categorySearch) {
             $categoryID = $options['categoryID'] ?? null;
         }
 
-        if ($parent && !is_numeric($parent)) {
-            $parent = Gdn::sql()->getWhere('Tag', ['Name' => $parent])->value('TagID', -1);
+        // Turn the parent(s) into an array of ids.
+        if ($parent) {
+            $parent = (array)$parent;
         }
+
+        // Make sure type is an array.
+        $type = (array)$type;
+
 
         $query = $q;
         $data = [];
         $database = Gdn::database();
-        if ($query || $parent || $type !== 'default') {
+        if ($query || !empty($parent) || !empty($type)) {
             $tagQuery = Gdn::sql()
                 ->select('*')
                 ->from('Tag')
@@ -898,11 +1160,11 @@ class TagModel extends Gdn_Model {
                 $tagQuery->like('FullName', str_replace(['%', '_'], ['\%', '_'], $query), strlen($query) > 2 ? 'both' : 'right');
             }
 
-            if ($type === 'default') {
+            if (in_array('tag', $type)) {
                 $defaultTypes = array_keys(TagModel::instance()->defaultTypes());
                 $tagQuery->where('Type', $defaultTypes); // Other UIs can set a different type
-            } elseif ($type) {
-                $tagQuery->where('Type', $type);
+            } elseif (!in_array('all', $type)) {
+                $tagQuery->whereIn('Type', $type);
             }
 
             // Allow per-category tags
@@ -911,7 +1173,7 @@ class TagModel extends Gdn_Model {
             }
 
             if ($parent) {
-                $tagQuery->where('ParentTagID', $parent);
+                $tagQuery->whereIn('ParentTagID', $parent);
             }
 
             // Run tag search query
@@ -939,5 +1201,40 @@ class TagModel extends Gdn_Model {
         }
         $database->closeConnection();
         return $data;
+    }
+
+    /**
+     * Checks to see if the number of tags being added exceeds the maximum number of tags allowed on the discussion.
+     *
+     * @param array $tags
+     * @throws ClientException Throws an error if there are more tags than are allowed.
+     */
+    private function checkMaxTagsLimit($tags): void {
+        $maxTags = Gdn::config('Vanilla.Tagging.Max', 5);
+        if (count($tags) > $maxTags) {
+            throw new ClientException(
+                sprintf(
+                    'You cannot add more than %1$s %2$s to a discussion',
+                    $maxTags,
+                    plural($maxTags, 'tag', 'tags')
+                ),
+                409
+            );
+        }
+    }
+
+    /**
+     * Check to see what tag types you can allow to a discussion.
+     *
+     * @param array $tags The array of tags to check.
+     * @throws ClientException Throws an exception if a tag type isn't allowed.
+     */
+    public function checkAllowedDiscussionTagTypes(array $tags): void {
+        $allowedTypes = Gdn::config('Tagging.Discussion.AllowedTypes', ['']);
+        foreach ($tags as $tag) {
+            if (!in_array($tag['Type'], $allowedTypes)) {
+                throw new ClientException(sprintf('You cannot add tags with a type of %s to a discussion', $tag['Type']), 409);
+            }
+        }
     }
 }

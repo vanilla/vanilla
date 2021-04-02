@@ -55,7 +55,6 @@ trait HtmlNormalizeTrait {
             $html = preg_replace("/(<svg.*?<\/svg>)/", "<SVG />", $html);
         }
         $html = preg_replace("/\>\</", ">\n<", $html);
-        $html = preg_replace("/ \</", "<", $html);
         $html = preg_replace("/\&nbsp\;/", html_entity_decode("&nbsp;"), $html);
         return $html;
     }

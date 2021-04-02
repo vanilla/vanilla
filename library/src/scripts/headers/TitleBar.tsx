@@ -57,7 +57,7 @@ interface IProps {
     extraBurgerNavigation?: React.ReactNode;
     forceVisibility?: boolean; // For storybook, as it will disable closing the search
     scope?: ISearchScopeNoCompact;
-    forceMenuOpen?: INavigationVariableItem; // For storybook, will force nested menu open
+    forceMenuOpen?: boolean; // For storybook, will force nested menu open
 }
 
 /**
@@ -176,7 +176,6 @@ export default function TitleBar(_props: IProps) {
                             )}
                             {!isSearchOpen && !isCompact && (
                                 <TitleBarNav
-                                    forceMenuOpen={props.forceMenuOpen}
                                     isCentered={vars.navAlignment.alignment === "center"}
                                     containerRef={
                                         vars.navAlignment.alignment === "center" && !isDesktopLogoCentered
@@ -441,25 +440,26 @@ function DesktopMeBox() {
     const isGuest = isUserGuest(currentUser.data);
     const registerLink = useRegisterLink();
     const signinLink = useSignInLink();
+    const guestVars = titleBarVariables().guest;
 
     if (isGuest) {
         return (
-            <TitleBarNav className={classNames("titleBar-nav titleBar-guestNav", classes.nav)}>
+            <div className={classNames("titleBar-nav titleBar-guestNav", classes.nav)}>
                 <TitleBarNavItem
-                    buttonType={ButtonTypes.TRANSPARENT}
+                    buttonType={guestVars.signInButtonType}
                     linkClassName={classNames(classes.signIn, classes.guestButton)}
                     to={signinLink}
                 >
                     {t("Sign In")}
                 </TitleBarNavItem>
                 <TitleBarNavItem
-                    buttonType={ButtonTypes.TRANSLUCID}
+                    buttonType={guestVars.registerButtonType}
                     linkClassName={classNames(classes.register, classes.guestButton)}
                     to={registerLink}
                 >
                     {t("Register")}
                 </TitleBarNavItem>
-            </TitleBarNav>
+            </div>
         );
     } else {
         return (

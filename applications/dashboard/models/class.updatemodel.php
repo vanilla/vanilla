@@ -716,9 +716,10 @@ class UpdateModel extends Gdn_Model {
                         Gdn::session()->start($systemUserID, false, false);
                     }
                 } catch (\Throwable $ex) {
-                    trigger_error("Error running structure: ".$ex->getMessage(), E_USER_WARNING);
                     if (debug()) {
                         throw $ex;
+                    } else {
+                        trigger_error("Error running structure: ".$ex->getMessage(), E_USER_WARNING);
                     }
                 }
             }

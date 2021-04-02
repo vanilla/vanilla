@@ -162,4 +162,24 @@ abstract class AbstractBlot implements NestableItemInterface {
         $this->nextOperation = $nextOperation;
         $this->parseMode = $parseMode;
     }
+
+    /**
+     * Get the operation that corresponds to this blot.
+     *
+     * @return array
+     */
+    public function getCurrentOperation(): array {
+        return $this->currentOperation;
+    }
+
+    /**
+     * For internal use only.
+     *
+     * @param array $previous
+     * @param array $next
+     */
+    public function setPreviousNextOperations(array $previous, array $next): void {
+        $this->previousOperation = $previous;
+        $this->nextOperation = $next;
+    }
 }

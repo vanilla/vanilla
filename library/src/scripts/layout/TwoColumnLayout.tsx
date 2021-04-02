@@ -4,7 +4,7 @@
  */
 import React from "react";
 import PanelLayout, { IPanelLayoutProps } from "@library/layout/PanelLayout";
-import { withLayout, LayoutProvider } from "@library/layout/LayoutContext";
+import { LayoutProvider } from "@library/layout/LayoutContext";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
 
 interface IProps
@@ -24,4 +24,4 @@ function TwoColumnLayout(props: IProps) {
     );
 }
 
-export default withLayout(TwoColumnLayout);
+export default TwoColumnLayout;

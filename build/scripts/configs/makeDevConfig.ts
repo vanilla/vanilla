@@ -45,6 +45,11 @@ export async function makeDevConfig(entryModel: EntryModel, section: string) {
             forceEnable: true,
         }),
     );
+    baseConfig.plugins!.push(
+        new webpack.DefinePlugin({
+            "process.env.NODE_ENV": JSON.stringify("development"),
+        }),
+    );
 
     return baseConfig;
 }

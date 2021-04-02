@@ -9,7 +9,6 @@ import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { cssRule } from "@library/styles/styleShim";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
-import { absolutePosition } from "@library/styles/styleHelpers";
 import { styleUnit } from "@library/styles/styleUnit";
 import { percent } from "csx";
 import { Mixins } from "@library/styles/Mixins";
@@ -36,11 +35,13 @@ export const accessibilityCSS = useThemeCache(() => {
                 position: "absolute",
                 top: styleUnit(50),
                 left: styleUnit(0),
-                textAlign: "left",
                 backgroundColor: ColorsUtils.colorOut(globalVars.elementaryColors.white),
-                color: ColorsUtils.colorOut(globalVars.elementaryColors.black),
                 display: "block",
-                fontSize: styleUnit(globalVars.fonts.size.medium),
+                ...Mixins.font({
+                    ...globalVars.fontSizeAndWeightVars("medium"),
+                    color: ColorsUtils.colorOut(globalVars.elementaryColors.black),
+                    align: "left",
+                }),
                 clip: "auto",
                 margin: styleUnit(0),
                 height: "auto",

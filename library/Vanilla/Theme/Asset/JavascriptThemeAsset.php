@@ -13,6 +13,9 @@ use Vanilla\Theme\ThemeAssetFactory;
  */
 class JavascriptThemeAsset extends ThemeAsset {
 
+    /** @var bool */
+    protected $canMerge = true;
+
     /** @var string Javascript content of this asset. */
     private $data;
 

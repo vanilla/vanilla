@@ -35,9 +35,6 @@ class ModelCache implements InjectableInterface {
     /** @var array */
     private $defaultCacheOptions;
 
-    /** @var int */
-    private $incrementingKey;
-
     /** @var \Gdn_Cache */
     private $cache;
 
@@ -141,19 +138,15 @@ class ModelCache implements InjectableInterface {
             return 0;
         }
 
-        if ($this->incrementingKey === null) {
-            $incrementKeyCacheKey = self::INCREMENTING_KEY_NAMESPACE . '-' . $this->cacheNameSpace;
-            $result = $this->cache->get($incrementKeyCacheKey);
+        $incrementKeyCacheKey = self::INCREMENTING_KEY_NAMESPACE . '-' . $this->cacheNameSpace;
+        $result = $this->cache->get($incrementKeyCacheKey);
 
-            if ($result === \Gdn_Cache::CACHEOP_FAILURE) {
-                $result = 0;
-            }
-            $this->incrementingKey = $result;
-
-            $this->cache->store($incrementKeyCacheKey, $this->incrementingKey);
+        if ($result === \Gdn_Cache::CACHEOP_FAILURE) {
+            $result = 0;
         }
 
-        return $this->incrementingKey;
+        $this->cache->store($incrementKeyCacheKey, $result);
+        return $result;
     }
 
     /**
@@ -172,7 +165,6 @@ class ModelCache implements InjectableInterface {
         }
 
         $incrementKeyCacheKey = self::INCREMENTING_KEY_NAMESPACE . '-' . $this->cacheNameSpace;
-        $this->incrementingKey = $newKey;
         $this->cache->store($incrementKeyCacheKey, $newKey);
     }
 }

@@ -19,7 +19,7 @@ import { CloseTinyIcon } from "@library/icons/common";
 import { t } from "@vanilla/i18n";
 
 interface IProps {
-    title: string;
+    title?: string;
     navItems: INavigationTreeItem[];
     activeRecord: IActiveRecord;
     afterNavSections?: React.ReactNode;
@@ -44,23 +44,25 @@ export function DropDownPanelNav(props: IProps) {
 
     return (
         <>
-            <Heading
-                title={props.title}
-                className={classNames("dropDown-sectionHeading", classes.sectionHeading)}
-                aria-hidden={parentNavItems.length > 0}
-            >
-                <div className={classes.headingContentContainer}>
-                    <div className={classes.headingTitleContainer}> {props.title} </div>
-                    <Button
-                        className={classes.closeButton}
-                        onClick={props.onClose}
-                        baseClass={ButtonTypes.ICON_COMPACT}
-                    >
-                        <ScreenReaderContent>{t("Close")}</ScreenReaderContent>
-                        <CloseTinyIcon />
-                    </Button>
-                </div>
-            </Heading>
+            {props.title && (
+                <Heading
+                    title={props.title}
+                    className={classNames("dropDown-sectionHeading", classes.sectionHeading)}
+                    aria-hidden={parentNavItems.length > 0}
+                >
+                    <div className={classes.headingContentContainer}>
+                        <div className={classes.headingTitleContainer}> {props.title} </div>
+                        <Button
+                            className={classes.closeButton}
+                            onClick={props.onClose}
+                            baseClass={ButtonTypes.ICON_COMPACT}
+                        >
+                            <ScreenReaderContent>{t("Close")}</ScreenReaderContent>
+                            <CloseTinyIcon />
+                        </Button>
+                    </div>
+                </Heading>
+            )}
             <div className={classNames(classes.panel, classes.panelFirst)} aria-hidden={parentNavItems.length > 0}>
                 <PanelNavItems
                     activeRecord={props.activeRecord}

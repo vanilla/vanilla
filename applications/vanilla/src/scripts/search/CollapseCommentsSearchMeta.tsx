@@ -31,7 +31,7 @@ export default function CollapseCommentSearchMeta(props: IProps) {
     const layoutContext = useLayout();
     const [forceLoader] = useState(false);
 
-    const discussion = useDiscussion({ discussionID });
+    const discussion = useDiscussion(discussionID);
 
     // Back link
     const backUrl = useMemo(() => {
@@ -58,7 +58,7 @@ export default function CollapseCommentSearchMeta(props: IProps) {
 
     const HeadingTag = `h${headingLevel}` as "h1";
     const counts: ICountResult = {
-        count: discussion.data.countComments,
+        count: discussion.data.countComments ?? 0,
         labelCode: "comments",
     };
 

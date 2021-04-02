@@ -12,6 +12,7 @@ use Vanilla\Theme\Asset\CssThemeAsset;
 use Vanilla\Theme\Asset\JsonThemeAsset;
 use Vanilla\Theme\Theme;
 use Vanilla\Theme\ThemeAssetFactory;
+use Vanilla\Theme\ThemeService;
 use Vanilla\Theme\ThemeServiceHelper;
 use Vanilla\Theme\ThemeFeatures;
 use VanillaTests\Fixtures\MockAddon;
@@ -71,24 +72,24 @@ class ThemeServiceCurrentTest extends MockThemeTestCase {
         $model = $this->themeService();
 
         $this->assertEquals(self::ADDON_THEME, $model->getCurrentThemeAddon()->getKey());
+
         $this->assertEquals(self::ASSET_THEME, $model->getCurrentTheme()->getThemeID());
-        $this->assertEquals(self::ASSET_THEME, $model->getCurrentTheme()->getAssets()[ThemeAssetFactory::ASSET_STYLES]->__toString());
+        $this->assertEquals(self::ADDON_THEME.self::ASSET_THEME, $model->getCurrentTheme()->getAssets()[ThemeAssetFactory::ASSET_STYLES]->__toString());
 
         /** @var ThemeFeatures $features */
         $features = self::container()->get(ThemeFeatures::class);
         $this->assertEquals(true, $features->useSharedMasterView());
 
         isMobile(true);
-
         // To the old system.
         $this->assertEquals(self::MOBILE_ADDON_THEME, $model->getCurrentThemeAddon()->getKey());
 
         // To the new system.
         $this->assertEquals(self::ASSET_THEME, $model->getCurrentTheme()->getThemeID());
-        $this->assertEquals(self::ASSET_THEME, $model->getCurrentTheme()->getAssets()[ThemeAssetFactory::ASSET_STYLES]->__toString());
+        $this->assertEquals(self::ADDON_THEME.self::ASSET_THEME, $model->getCurrentTheme()->getAssets()[ThemeAssetFactory::ASSET_STYLES]->__toString());
 
         // We have overlayed the new assets on top.
-        $this->assertEquals(self::ASSET_THEME, $model->getCurrentTheme(true)->getAssets()[ThemeAssetFactory::ASSET_STYLES]->__toString());
+        $this->assertEquals(self::ADDON_THEME.self::ASSET_THEME, $model->getCurrentTheme(true)->getAssets()[ThemeAssetFactory::ASSET_STYLES]->__toString());
 
         // Theme features from the mobile theme were properly preserved.
         /** @var ThemeFeatures $features */

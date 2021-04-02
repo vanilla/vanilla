@@ -68,8 +68,9 @@ export const frameHeaderClasses = useThemeCache(() => {
         textOverflow: "ellipsis",
         width: calc(`100% - ${styleUnit(formElVars.sizing.height)}`),
         flexBasis: calc(`100% - ${styleUnit(formElVars.sizing.height)}`),
-        fontWeight: globalVars.fonts.weights.semiBold,
-        fontSize: styleUnit(globalVars.fonts.size.large),
+        ...Mixins.font({
+            ...globalVars.fontSizeAndWeightVars("large", "semiBold"),
+        }),
     });
 
     const headingMinimal = style("headingMinimal", {
@@ -77,8 +78,10 @@ export const frameHeaderClasses = useThemeCache(() => {
         ...Mixins.padding({ horizontal: 24 }),
         ...{
             "& *": {
-                textTransform: "uppercase",
-                fontSize: styleUnit(globalVars.fonts.size.small),
+                ...Mixins.font({
+                    ...globalVars.fontSizeAndWeightVars("small"),
+                    transform: "uppercase",
+                }),
             },
         },
     });
@@ -88,11 +91,12 @@ export const frameHeaderClasses = useThemeCache(() => {
     });
 
     const centred = style("centred", {
-        textAlign: "center",
-        textTransform: "uppercase",
-        fontSize: styleUnit(globalVars.fonts.size.small),
-        color: ColorsUtils.colorOut(globalVars.mixBgAndFg(0.6)),
-        fontWeight: globalVars.fonts.weights.semiBold,
+        ...Mixins.font({
+            ...globalVars.fontSizeAndWeightVars("small", "semiBold"),
+            align: "center",
+            transform: "uppercase",
+            color: ColorsUtils.colorOut(globalVars.mixBgAndFg(0.6)),
+        }),
     });
 
     const spacerWidth = globalVars.icon.sizes.large - (globalVars.gutter.half + globalVars.gutter.quarter);

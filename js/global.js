@@ -719,9 +719,44 @@ jQuery(document).ready(function($) {
                         }
                     }
                     break;
+                case "runJob":
+                    gdn.runJob(item.Data);
             }
         }
     };
+
+    gdn.runJob = function(body) {
+        const date = new Date();
+        console.log("Processing... (" + date.toLocaleString() + ")");
+
+        $.ajax({
+            contentType: "application/system+jwt",
+            data: body,
+            timeout: 60000,
+            type: "POST",
+            url: gdn.url("/api/v2/calls/run"),
+            success: function (data, textStatus, jqXHR) {
+                if ((typeof data) === "object" && data.statusType) {
+                    switch (data.statusType) {
+                        case "complete":
+                            gdn.informMessage("Job complete.");
+                            break;
+                        case "incomplete":
+                            if ((typeof data.body) === "string") {
+                                gdn.runJob(data.body);
+                            } else {
+                                gdn.informError("Invalid job response.");
+                            }
+                    }
+                } else {
+                    gdn.informError("Invalid job response.");
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                gdn.informError("An error occurred while performing the job.");
+            }
+        });
+    }
 
     gdn.requires = function(Library) {
         if (!(Library instanceof Array))
@@ -983,7 +1018,7 @@ jQuery(document).ready(function($) {
             try {
                 var message = response.InformMessages[i].Message;
                 var emptyMessage = message === '';
-                
+
                 message = '<span class="InformMessageBody">' + message + '</span>';
 
                 // Is there a sprite?

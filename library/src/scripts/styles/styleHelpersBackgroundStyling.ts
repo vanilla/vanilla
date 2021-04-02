@@ -4,13 +4,13 @@
  * @license GPL-2.0-only
  */
 
-import { BackgroundImageProperty } from "csstype";
+import { Property } from "csstype";
 import { important, percent, px, quote, url, viewHeight, viewWidth } from "csx";
 import { CSSObject } from "@emotion/css";
 import { assetUrl, themeAsset } from "@library/utility/appUtils";
 import { styleFactory } from "@library/styles/styleUtils";
 
-export const getBackgroundImage = (image?: BackgroundImageProperty) => {
+export const getBackgroundImage = (image?: Property.BackgroundImage) => {
     if (!image) {
         return undefined;
     }

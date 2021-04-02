@@ -11,6 +11,8 @@ use Garden\Schema\Validation;
 use Garden\Schema\ValidationException;
 use Gdn_Locale as LocaleInterface;
 use Gdn_Validation;
+use Iterator;
+use Vanilla\CurrentTimeStamp;
 
 /**
  * Class ModelUtils.
@@ -36,11 +38,11 @@ class ModelUtils {
             // It does not match all, or true.
             return is_array($options) && in_array(self::EXPAND_CRAWL, $options);
         }
-
         $result = false;
+        $isStartWithMinus = str_starts_with($value, '-');
         if ($options === true) {
-            // A boolean true allows everything.
-            $result = true;
+            // A boolean true allows everything except when starting with "-"
+            $result = $isStartWithMinus ? false : true;
         } elseif (is_array($options)) {
             $result = !empty(array_intersect([self::EXPAND_ALL, 'true', '1', $value], $options));
         }
@@ -230,5 +232,28 @@ class ModelUtils {
             }
         }
         return $result;
+    }
+
+    /**
+     * Iterate through a generator until completed until a specified timeout has been reached.
+     *
+     * @param Iterator $iterable
+     * @param int $timeout
+     * @return bool
+     */
+    public static function iterateWithTimeout(Iterator $iterable, int $timeout): bool {
+        $horizon = CurrentTimeStamp::get() + $timeout;
+
+        $memoryLimit = ini_get("memory_limit");
+        $memoryLimit = $memoryLimit == -1 ? null : StringUtils::unformatSize($memoryLimit);
+
+        foreach ($iterable as $r) {
+            $memoryExceeded = $memoryLimit ? (memory_get_usage() / $memoryLimit) > 0.8 : false;
+            if (CurrentTimeStamp::get() >= $horizon || $memoryExceeded) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

@@ -6,8 +6,9 @@
 
 import React, { useLayoutEffect, useRef } from "react";
 
-export function useDomNodeAttachment(domNodes?: Node[]): React.RefObject<any> {
-    const ref = useRef<HTMLElement | null>();
+export function useDomNodeAttachment(domNodes?: Node[], intoRef?: React.RefObject<any>): React.RefObject<any> {
+    const ownRef = useRef<HTMLElement | null>();
+    const ref = intoRef ?? ownRef;
 
     useLayoutEffect(() => {
         if (domNodes && ref.current) {

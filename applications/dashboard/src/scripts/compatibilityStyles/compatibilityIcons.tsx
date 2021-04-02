@@ -5,7 +5,7 @@
 
 import React from "react";
 import ReactDOM from "react-dom";
-import { DropDownMenuIcon, DocumentationIcon, BookmarkIcon } from "@library/icons/common";
+import { DropDownMenuIcon, DocumentationIcon, _BookmarkIcon } from "@library/icons/common";
 import { cssRule } from "@library/styles/styleShim";
 import { important } from "csx";
 import { iconClasses } from "@library/icons/iconStyles";
@@ -35,10 +35,10 @@ export function applyCompatibilityIcons(scope: HTMLElement | Document | undefine
     });
 
     const bookmarks = scope.querySelectorAll(".Bookmark:not(.compatIcons)");
-    const bookmarkLinkClass = iconClasses().bookmark();
+    const bookmarkLinkClass = iconClasses()._bookmark();
     bookmarks.forEach((bookmark) => {
         bookmark.classList.add(bookmarkLinkClass);
         bookmark.classList.add("compatIcons");
-        ReactDOM.render(<BookmarkIcon />, bookmark);
+        ReactDOM.render(<_BookmarkIcon />, bookmark);
     });
 }

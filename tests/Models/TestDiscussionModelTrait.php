@@ -9,6 +9,7 @@ namespace VanillaTests\Models;
 
 use DiscussionModel;
 use PHPUnit\Framework\TestCase;
+use VanillaTests\VanillaTestCase;
 
 /**
  * Useful methods for testing a discussion model.
@@ -35,15 +36,13 @@ trait TestDiscussionModelTrait {
      * @return array
      */
     public function newDiscussion(array $override): array {
-        static $i = 1;
-
-        $r = $override + [
-                'Name' => "How do I test $i?",
+        $r = VanillaTestCase::sprintfCounter($override + [
+                'Name' => "How do I test %s?",
                 'CategoryID' => 1,
-                'Body' => "Foo $i.",
+                'Body' => "Foo %s.",
                 'Format' => 'Text',
                 'DateInserted' => TestDate::mySqlDate(),
-            ];
+            ], __FUNCTION__);
 
         return $r;
     }

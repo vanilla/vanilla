@@ -6,15 +6,20 @@
 
 namespace Vanilla;
 
+use Symfony\Component\Yaml\Yaml;
+
+/**
+ * Utility functions for working with file data.
+ */
 class FileUtils {
 
     /**
      * Check if a file was uploaded in the current request.
      *
-     * @param $filename
+     * @param string $filename
      * @return bool
      */
-    function isUploadedFile($filename) {
+    public function isUploadedFile($filename) {
         $result = is_uploaded_file($filename);
         return $result;
     }
@@ -22,11 +27,11 @@ class FileUtils {
     /**
      * Move an upload to a new location.
      *
-     * @param $filename
-     * @param $destination
+     * @param string $filename
+     * @param string $destination
      * @return bool
      */
-    function moveUploadedFile($filename, $destination) {
+    public function moveUploadedFile($filename, $destination) {
         $result = move_uploaded_file($filename, $destination);
         return $result;
     }
@@ -150,5 +155,54 @@ class FileUtils {
     public static function putExport(string $filename, $value): bool {
         $data = '<?php return '.var_export($value, true).";\n";
         return self::putContents($filename, $data);
+    }
+
+    /**
+     * Load and parse a file into an array based on its file extension.
+     *
+     * @param string $path The path to the file. The path must exist.
+     * @return array Returns the data from the file after parsing.
+     */
+    public static function getArray(string $path): array {
+        switch (pathinfo($path, PATHINFO_EXTENSION)) {
+            case 'json':
+                $result = json_decode(file_get_contents($path), true);
+                break;
+            case 'yml':
+            case 'yaml':
+                try {
+                    $result = Yaml::parseFile($path);
+                } catch (\Throwable $ex) {
+                    throw new \Exception("Error parsing $path: ".$ex->getMessage(), 500, $ex);
+                }
+                break;
+            default:
+                throw new \InvalidArgumentException("Unrecognized file extension for $path", 500);
+        }
+        if (!is_array($result)) {
+            throw new \Exception("Error parsing $path.", 500);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get the data from a file or hydrate the file.
+     *
+     * This is a convenience method for file caching simple PHP structures using `var_export()`. It handles the logic
+     * of whether or not to hydrate the file, but the caller otherwise must handle the hydration.
+     *
+     * @param string $cachePath The path to the cache file.
+     * @param callable $hydrate The function used to hydrate the cache.
+     * @return mixed Returns the data from the cache or the hydration function.
+     */
+    public static function getCached(string $cachePath, callable $hydrate) {
+        if (!file_exists($cachePath)) {
+            $data = $hydrate();
+            self::putExport($cachePath, $data);
+            return $data;
+        } else {
+            return self::getExport($cachePath);
+        }
     }
 }

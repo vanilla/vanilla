@@ -15,6 +15,7 @@ export const conversationCompatCSS = () => {
     const vars = conversationVariables();
 
     MixinsFoundation.contentBoxes(vars.contentBoxes, "Conversation");
+    MixinsFoundation.contentBoxes(vars.panelBoxes, "Conversation", ".Panel");
 
     cssRaw({
         ".Section-Conversation .Panel": {

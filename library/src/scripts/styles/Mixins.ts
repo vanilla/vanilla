@@ -16,23 +16,15 @@ import {
     ISimpleBorderStyle,
     ISpacing,
     TLength,
+    LinkDecorationType,
 } from "@library/styles/cssUtilsTypes";
-import { styleFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { ColorHelper, important, percent, px } from "csx";
-import { CSSObject } from "@emotion/css";
-import {
-    BorderRadiusProperty,
-    BorderStyleProperty,
-    BorderWidthProperty,
-    LeftProperty,
-    PositionProperty,
-    RightProperty,
-    BottomProperty,
-} from "csstype";
+import { css, CSSObject } from "@emotion/css";
+import { Property } from "csstype";
 import merge from "lodash/merge";
 import { getValueIfItExists } from "@library/forms/borderStylesCalculator";
-import { globalVariables } from "@library/styles/globalStyleVars";
+import { GlobalPreset, globalVariables } from "@library/styles/globalStyleVars";
 import { getBackgroundImage } from "@library/styles/styleHelpersBackgroundStyling";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
@@ -42,44 +34,73 @@ import { Variables } from "@library/styles/Variables";
 import { BorderType, singleBorder } from "@library/styles/styleHelpersBorders";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { notEmpty } from "@vanilla/utils";
+import { activeSelector } from "@library/styles/styleUtils";
+import { negativeUnit } from "@library/styles/styleUnit";
+import { internalAbsoluteMixins } from "@library/styles/MixinsAbsolute";
 
 export class Mixins {
     constructor() {
         throw new Error("Not to be instantiated");
     }
 
-    public static box = (boxOptions: IBoxOptions): CSSObject => {
+    public static absolute = internalAbsoluteMixins;
+
+    public static box = (
+        boxOptions: IBoxOptions,
+        config?: { noPaddings?: boolean; onlyPaddings?: boolean; interactiveOutline?: boolean },
+    ): CSSObject => {
         let { background, borderType, spacing, border, itemSpacingOnAllItems } = boxOptions;
         const globalVars = globalVariables();
 
         border = {
-            ...globalVariables().borderType.contentBox,
+            ...globalVars.borderType.contentBox,
             ...border,
         };
-
         const boxHasSetPaddings = Object.values(spacing).filter(notEmpty).length > 0;
 
-        const hasBackground = (background.color || background.image) && !background.unsetBackground;
+        const hasBackground = Variables.boxHasBackground(boxOptions);
+        const hasFullOutline = Variables.boxHasOutline(boxOptions);
+
+        // TODO move some of this logic into a resolver.
+        if (!hasBackground && hasFullOutline) {
+            if (globalVars.options.preset === GlobalPreset.DARK) {
+                background.color = globalVars.mainColors.bg.lighten(0.05);
+            } else {
+                background.color = globalVars.mainColors.bg;
+            }
+        }
+
+        const defaultSpacer = globalVars.spacer.componentInner;
 
         // We have a clearly defined box of sometype.
         // Anything that makes the box stand out from the background on all side
         // Means we should apply some default behaviours, like paddings, and borderRadius.
-        const hasFullOutline = [BorderType.BORDER, BorderType.SHADOW].includes(borderType) || hasBackground;
         if (!boxHasSetPaddings && hasFullOutline) {
-            spacing = { horizontal: 16, vertical: borderType === BorderType.SEPARATOR ? 0 : 16 };
+            spacing = { horizontal: defaultSpacer, vertical: borderType === BorderType.SEPARATOR ? 0 : defaultSpacer };
         }
-        let itemSpacing = boxOptions.itemSpacing || (hasFullOutline ? 16 : 0);
-        return {
-            // Resets
+
+        let itemSpacing = boxOptions.itemSpacing || (hasFullOutline ? defaultSpacer : 0);
+
+        const debuggingProperties: CSSObject = {
+            "--border-type": borderType,
+            "--has-background": hasBackground ? "true" : "false",
+            "--has-full-outline": hasFullOutline ? "true" : "false",
+        };
+        const paddingCss: CSSObject = {
+            ...debuggingProperties,
             padding: 0,
+            ...Mixins.padding(spacing),
+        };
+        const otherCss: CSSObject = {
+            ...debuggingProperties,
+            // Resets
+            listStyle: "none",
             border: "none",
             boxShadow: "none",
             borderRadius: hasFullOutline ? ((border.radius ?? globalVars.border.radius) as any) : 0,
             background: "none",
             clear: "both",
-
-            // Debugging
-            "--border-type": borderType,
+            width: "100%",
 
             "&:before": {
                 display: "none",
@@ -90,15 +111,14 @@ export class Mixins {
 
             // Apply styles
             ...Mixins.background(background),
-            ...Mixins.borderType(borderType, { border }),
-            ...Mixins.padding(spacing),
+            ...Mixins.borderType(borderType, { border, interactiveOutline: config?.interactiveOutline }),
             ...(hasFullOutline || borderType === BorderType.SEPARATOR
                 ? {
-                      "& .pageBox:first-of-type:before": {
+                      "& .pageBox:first-of-type:before, & &:first-of-type:before": {
                           // Hide separator
                           display: "none",
                       },
-                      "& .pageBox:last-of-type:after": {
+                      "& .pageBox:last-of-type:after, & &:last-of-type:after": {
                           // Hide separator
                           display: "none",
                       },
@@ -106,44 +126,66 @@ export class Mixins {
                 : {}),
             ...(hasFullOutline
                 ? {
-                      "& + .pageBox": Mixins.margin({ top: itemSpacing }),
+                      "& + .pageBox, & + &": Mixins.margin({ top: itemSpacing }),
                   }
                 : {}),
             ...(itemSpacingOnAllItems ? Mixins.margin({ vertical: itemSpacing }) : {}),
         };
+        if (config?.noPaddings) {
+            return otherCss;
+        }
+
+        if (config?.onlyPaddings) {
+            return paddingCss;
+        }
+
+        return {
+            ...paddingCss,
+            ...otherCss,
+        };
     };
 
-    public static borderType(borderType: BorderType, options?: { border?: IBorderStyles }): CSSObject {
+    public static borderType(
+        borderType: BorderType,
+        options?: { border?: IBorderStyles; interactiveOutline?: boolean },
+    ): CSSObject {
+        const globalVars = globalVariables();
         switch (borderType) {
             case BorderType.BORDER:
                 return {
                     ...Mixins.border(options?.border),
+                    [activeSelector()]: {
+                        borderColor: options?.interactiveOutline
+                            ? ColorsUtils.colorOut(globalVariables().border.colorHover)
+                            : undefined,
+                    },
                 };
             case BorderType.SHADOW:
                 return {
                     ...shadowHelper().embed(),
+                    [activeSelector()]: options?.interactiveOutline ? shadowHelper().embedHover() : {},
                 };
             case BorderType.SEPARATOR:
                 return {
                     "&:before": {
                         content: `""`,
                         display: "block",
-                        height: 16,
-                        width: "calc(100% + 16px)",
+                        height: globalVars.spacer.componentInner,
+                        width: `calc(100% + ${globalVars.spacer.componentInner}px)`,
                         marginLeft: -8,
                         borderTop: singleBorder(),
                     },
                     "&:after": {
                         content: `""`,
                         display: "block",
-                        height: 16,
-                        width: "calc(100% + 16px)",
+                        height: globalVars.spacer.componentInner,
+                        width: `calc(100% + ${globalVars.spacer.componentInner}px)`,
                         marginLeft: -8,
                         borderBottom: singleBorder(),
                     },
-                    // & + & doesn't work.
+                    // & + & doesn't work for injectGlobals.
                     // https://github.com/emotion-js/emotion/issues/1922
-                    "& + .pageBox:before": {
+                    "& + .pageBox:before, & + &:before": {
                         borderTop: "none",
                     },
                 };
@@ -201,6 +243,38 @@ export class Mixins {
         return spacingVals;
     }
 
+    /**
+     * Space out all the direct children of the component by an even amount _inside_ the component.
+     */
+    static spaceChildrenEvenly(
+        verticalSpacing: number | string | null | undefined | ISpacing = null,
+        horizontalSpacing: number | string | null | undefined = null,
+    ): CSSObject {
+        const globalVars = globalVariables();
+        let vertical: string | number;
+        let horizontal: string | number;
+        if (verticalSpacing != null && typeof verticalSpacing === "object") {
+            const spacing = verticalSpacing;
+            vertical =
+                spacing.vertical ?? spacing.left ?? spacing.right ?? spacing.all ?? globalVars.spacer.componentInner;
+            horizontal = spacing.horizontal ?? spacing.top ?? spacing.bottom ?? spacing.all ?? vertical;
+        } else {
+            vertical = verticalSpacing ?? horizontalSpacing ?? globalVars.spacer.componentInner;
+            horizontal = horizontalSpacing ?? vertical;
+        }
+
+        return {
+            ...Mixins.margin({
+                top: negativeUnit(vertical),
+                left: negativeUnit(horizontal),
+            }),
+            "& > *": Mixins.margin({
+                left: horizontal,
+                top: vertical,
+            }),
+        };
+    }
+
     static padding(spacing: ISpacing): CSSObject {
         return Mixins.spacing("padding", spacing);
     }
@@ -220,8 +294,28 @@ export class Mixins {
             fontFamily: vars.family ? Mixins.fontFamilyWithDefaults(vars.family) : vars.family,
             textTransform: vars.transform,
             letterSpacing: vars.letterSpacing,
-            textDecoration: vars.textDecoration,
+            ...(vars.textDecoration === "auto"
+                ? Mixins.linkDecoration("none")
+                : {
+                      textDecoration: vars.textDecoration,
+                  }),
         };
+    }
+
+    static linkDecoration(fallback?: "underline" | "none"): CSSObject {
+        const linkDecorationType = globalVariables().links.linkDecorationType;
+
+        switch (linkDecorationType) {
+            case "always":
+                return {
+                    textDecoration: "underline",
+                };
+            case "auto":
+            default:
+                return {
+                    textDecoration: fallback ?? "inherit",
+                };
+        }
     }
 
     static fontFamilyWithDefaults(fontFamilies: string[], options: { isMonospaced?: boolean } = {}): string {
@@ -231,7 +325,7 @@ export class Mixins {
             .join(", ");
     }
 
-    private static setAllRadii(radius: BorderRadiusProperty<TLength>, options?: IBorderRadiusOptions) {
+    private static setAllRadii(radius: Property.BorderRadius<TLength>, options?: IBorderRadiusOptions) {
         return {
             borderTopRightRadius: styleUnit(radius, options),
             borderBottomRightRadius: styleUnit(radius, options),
@@ -242,8 +336,8 @@ export class Mixins {
 
     private static setAllBorders = (
         color: string,
-        width: BorderWidthProperty<TLength>,
-        style: BorderStyleProperty,
+        width: Property.BorderWidth<TLength>,
+        style: Property.BorderStyle,
         radius?: IBorderRadiusOutput,
         debug = false as boolean | string,
     ) => {
@@ -283,10 +377,7 @@ export class Mixins {
         return output;
     };
 
-    private static singleBorderStyle(
-        borderStyles: ISimpleBorderStyle,
-        fallbackVariables: IGlobalBorderStyles = globalVariables().border,
-    ) {
+    private static singleBorderStyle(borderStyles: ISimpleBorderStyle) {
         if (!borderStyles) {
             return;
         }
@@ -330,7 +421,7 @@ export class Mixins {
 
         const all = getValueIfItExists(detailedStyles, "all");
         if (all) {
-            const allStyles = Mixins.singleBorderStyle(all, fallbackBorderVariables);
+            const allStyles = Mixins.singleBorderStyle(all);
             if (allStyles) {
                 output.borderTopWidth = allStyles?.width ?? width;
                 output.borderTopStyle = getValueIfItExists(allStyles, "style", style);
@@ -344,7 +435,7 @@ export class Mixins {
 
         const top = getValueIfItExists(detailedStyles, "top");
         if (top) {
-            const topStyles = Mixins.singleBorderStyle(top, fallbackBorderVariables);
+            const topStyles = Mixins.singleBorderStyle(top);
             if (topStyles) {
                 output.borderTopWidth = getValueIfItExists(topStyles, "width", width);
                 output.borderTopStyle = getValueIfItExists(topStyles, "style", style);
@@ -357,7 +448,7 @@ export class Mixins {
         const right = getValueIfItExists(detailedStyles, "right");
 
         if (right) {
-            const rightStyles = Mixins.singleBorderStyle(right, fallbackBorderVariables);
+            const rightStyles = Mixins.singleBorderStyle(right);
             if (rightStyles) {
                 output.borderRightWidth = getValueIfItExists(rightStyles, "width", width);
                 output.borderRightStyle = getValueIfItExists(rightStyles, "style", style);
@@ -370,7 +461,7 @@ export class Mixins {
 
         const bottom = getValueIfItExists(detailedStyles, "bottom");
         if (bottom) {
-            const bottomStyles = Mixins.singleBorderStyle(bottom, fallbackBorderVariables);
+            const bottomStyles = Mixins.singleBorderStyle(bottom);
             if (bottomStyles) {
                 output.borderBottomWidth = getValueIfItExists(bottomStyles, "width", width);
                 output.borderBottomStyle = getValueIfItExists(bottomStyles, "style", style);
@@ -383,7 +474,7 @@ export class Mixins {
         const left = getValueIfItExists(detailedStyles, "left");
 
         if (left) {
-            const leftStyles = Mixins.singleBorderStyle(left, fallbackBorderVariables);
+            const leftStyles = Mixins.singleBorderStyle(left);
             if (leftStyles) {
                 output.borderLeftWidth = getValueIfItExists(leftStyles, "width", width);
                 output.borderLeftStyle = getValueIfItExists(leftStyles, "style", style);
@@ -442,45 +533,53 @@ export class Mixins {
                 visited: Mixins.clickable.linkStyleFallbacks(colors.visited, colors.allStates, linkColors.visited),
             };
 
-            const textDecoration = disableTextDecoration ? important("none") : undefined;
+            const handleTextDecoration = (): CSSObject => {
+                if (disableTextDecoration) {
+                    return { textDecoration: important("none") };
+                } else {
+                    return { ...Mixins.linkDecoration() };
+                }
+            };
 
-            const styles = {
+            const textDecoration = handleTextDecoration();
+
+            const styles: Record<string, CSSObject> = {
                 default: {
                     [cssProperty]: mergedColors.default?.toString(),
-                    textDecoration,
+                    ...textDecoration,
                 },
                 hover: {
                     [cssProperty]: mergedColors.hover?.toString(),
                     cursor: "pointer",
-                    textDecoration,
+                    ...textDecoration,
                 },
                 focus: {
                     [cssProperty]: mergedColors.focus?.toString(),
-                    textDecoration,
+                    ...textDecoration,
                 },
                 clickFocus: {
                     [cssProperty]: mergedColors.focus?.toString(),
-                    textDecoration,
+                    ...textDecoration,
                 },
                 keyboardFocus: {
                     [cssProperty]: mergedColors.keyboardFocus?.toString(),
-                    textDecoration,
+                    ...textDecoration,
                 },
                 active: {
                     [cssProperty]: mergedColors.active?.toString(),
                     cursor: "pointer",
-                    textDecoration,
+                    ...textDecoration,
                 },
                 visited: mergedColors.visited
                     ? {
                           [cssProperty]: mergedColors.visited?.toString(),
-                          textDecoration,
+                          ...textDecoration,
                       }
-                    : undefined,
+                    : { undefined },
             };
 
             const final = {
-                [cssProperty]: styles.default.color?.toString(),
+                ...styles.default,
                 "&:visited": styles.visited ?? undefined,
                 "&:hover": styles.hover,
                 "&:focus, &.isFocused": {
@@ -512,109 +611,6 @@ export class Mixins {
         },
     };
 
-    static absolute = {
-        topRight: (top: string | number = "0", right: RightProperty<TLength> = px(0)): CSSObject => {
-            return {
-                position: "absolute" as PositionProperty,
-                top: styleUnit(top),
-                right: styleUnit(right),
-            };
-        },
-        topLeft: (top: string | number = "0", left: LeftProperty<TLength> = px(0)): CSSObject => {
-            return {
-                position: "absolute" as PositionProperty,
-                top: styleUnit(top),
-                left: styleUnit(left),
-            };
-        },
-        bottomRight: (bottom: BottomProperty<TLength> = px(0), right: RightProperty<TLength> = px(0)): CSSObject => {
-            return {
-                position: "absolute" as PositionProperty,
-                bottom: styleUnit(bottom),
-                right: styleUnit(right),
-            };
-        },
-        bottomLeft: (bottom: BottomProperty<TLength> = px(0), left: LeftProperty<TLength> = px(0)): CSSObject => {
-            return {
-                position: "absolute" as PositionProperty,
-                bottom: styleUnit(bottom),
-                left: styleUnit(left),
-            };
-        },
-        middleOfParent: (shrink: boolean = false): CSSObject => {
-            if (shrink) {
-                return {
-                    position: "absolute" as PositionProperty,
-                    display: "inline-block",
-                    top: percent(50),
-                    left: percent(50),
-                    right: "initial",
-                    bottom: "initial",
-                    transform: "translate(-50%, -50%)",
-                };
-            } else {
-                return {
-                    position: "absolute" as PositionProperty,
-                    display: "block",
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    maxHeight: percent(100),
-                    maxWidth: percent(100),
-                    margin: "auto",
-                };
-            }
-        },
-        middleLeftOfParent: (left: LeftProperty<TLength> = px(0)): CSSObject => {
-            return {
-                position: "absolute" as PositionProperty,
-                display: "block",
-                top: 0,
-                left,
-                bottom: 0,
-                maxHeight: percent(100),
-                maxWidth: percent(100),
-                margin: "auto 0",
-            };
-        },
-        middleRightOfParent: (right: RightProperty<TLength> = px(0)): CSSObject => {
-            return {
-                position: "absolute" as PositionProperty,
-                display: "block",
-                top: 0,
-                right,
-                bottom: 0,
-                maxHeight: percent(100),
-                maxWidth: percent(100),
-                margin: "auto 0",
-            };
-        },
-        fullSizeOfParent: (): CSSObject => {
-            return {
-                display: "block",
-                position: "absolute" as PositionProperty,
-                top: px(0),
-                left: px(0),
-                width: percent(100),
-                height: percent(100),
-            };
-        },
-        srOnly: (): CSSObject => {
-            return {
-                position: important("absolute"),
-                display: important("block"),
-                width: important(px(1).toString()),
-                height: important(px(1).toString()),
-                padding: important(px(0).toString()),
-                margin: important(px(-1).toString()),
-                overflow: important("hidden"),
-                clip: important(`rect(0, 0, 0, 0)`),
-                border: important(px(0).toString()),
-            };
-        },
-    };
-
     static flex = {
         middle: (wrap = false): CSSObject => {
             return {
@@ -643,8 +639,7 @@ export class Mixins {
         },
 
         inheritHeightClass: useThemeCache(() => {
-            const style = styleFactory("inheritHeight");
-            return style({
+            return css({
                 display: "flex",
                 flexDirection: "column",
                 flexGrow: 1,

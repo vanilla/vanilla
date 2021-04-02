@@ -41,6 +41,8 @@ abstract class AbstractSearchIndexTemplate {
         'role',
         'parent',
         'siteSections',
+        'allowedDiscussionTypes',
+        'title'
     ];
 
     /**
@@ -126,10 +128,12 @@ abstract class AbstractSearchIndexTemplate {
             $items = $properties['items'] ?? [];
             $items = ($items instanceof Schema) ? $items->getSchemaArray() : [];
             $items = $items['properties'] ?? [];
+            $items = $this->filterItems($items);
         }
 
         if ($type === 'object') {
             $items = $properties['properties'] ?? [];
+            $items = $this->filterItems($items);
         }
 
         $subItems = [];
@@ -145,5 +149,21 @@ abstract class AbstractSearchIndexTemplate {
             }
         }
         return  $subItems;
+    }
+
+    /**
+     * Filter items list.
+     *
+     * @param array $items
+     *
+     * @return array
+     */
+    protected function filterItems(array $items = []): array {
+        foreach ($items as $key => $item) {
+            if (in_array($key, self::IGNORE_LIST)) {
+                unset($items[$key]);
+            }
+        }
+        return $items;
     }
 }

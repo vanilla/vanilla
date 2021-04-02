@@ -93,7 +93,7 @@ export default class Builder {
      * @param config The config to build.
      */
     private async runBuild(config: Configuration | Configuration[]) {
-        return new Promise((resolve) => {
+        return new Promise<void>((resolve) => {
             const compiler = webpack(config as Configuration);
             compiler.run((err: Error, stats: Stats) => {
                 if (err || stats.hasErrors()) {

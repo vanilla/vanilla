@@ -13,6 +13,7 @@ interface IContextParams {
     setScrollOffset: ScollOffsetSetter;
     resetScrollOffset: () => void;
     scrollOffset: number | null;
+    rawScrollOffset: number | null;
     offsetClass: string;
     getCalcedHashOffset(): number;
     hashOffsetRef: React.RefObject<HTMLDivElement>;
@@ -29,6 +30,7 @@ export const SCROLL_OFFSET_DEFAULTS: IContextParams = {
         logWarning("Reset scroll offset called, but a proper provider was not configured.");
     },
     scrollOffset: null,
+    rawScrollOffset: null,
     topOffset: 0,
     setTopOffset: (pixels: number) => {
         logWarning("Set scroll offset called, but a proper provider was not configured.");
@@ -110,6 +112,7 @@ export class ScrollOffsetProvider extends React.Component<IProps, IState> {
                     setScrollOffset: this.setScrollOffset,
                     resetScrollOffset: this.resetScrollOffset,
                     scrollOffset: isScrolledOff && scrollWatchingEnabled ? scrollOffset : 0,
+                    rawScrollOffset: scrollOffset,
                     topOffset: this.state.topOffset,
                     setTopOffset: this.setTopOffset,
                     offsetClass: scrollWatchingEnabled ? offsetClass : "",

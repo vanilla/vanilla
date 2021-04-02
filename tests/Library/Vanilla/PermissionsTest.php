@@ -6,13 +6,13 @@
 
 namespace VanillaTests\Library\Vanilla;
 
-use VanillaTests\SharedBootstrapTestCase;
+use VanillaTests\BootstrapTestCase;
 use Vanilla\Permissions;
 
 /**
  * Tests for the `Permissions` class.
  */
-class PermissionsTest extends SharedBootstrapTestCase {
+class PermissionsTest extends BootstrapTestCase {
     private const RANKED_PERMISSIONS = [
         'Garden.Admin.Allow', // virtual permission for isAdmin
         'Garden.Settings.Manage',
@@ -40,7 +40,7 @@ class PermissionsTest extends SharedBootstrapTestCase {
                 'JunctionID' => null,
                 'Garden.SignIn.Allow' => 1,
                 'Garden.Settings.Manage' => 0,
-                'Vanilla.Discussions.View' => 1
+                'Vanilla.Discussions.View' => 1,
             ],
             [
                 'PermissionID' => 2,
@@ -48,8 +48,8 @@ class PermissionsTest extends SharedBootstrapTestCase {
                 'JunctionTable' => 'Category',
                 'JunctionColumn' => 'PermissionCategoryID',
                 'JunctionID' => 10,
-                'Vanilla.Discussions.Add' => 1
-            ]
+                'Vanilla.Discussions.Add' => 1,
+            ],
         ];
         $permissions->compileAndLoad($exampleRows);
 
@@ -61,20 +61,101 @@ class PermissionsTest extends SharedBootstrapTestCase {
 
     public function testHasAny() {
         $permissions = new Permissions([
-            'Vanilla.Comments.Add'
+            'Vanilla.Comments.Add',
         ]);
 
         $this->assertTrue($permissions->hasAny([
             'Vanilla.Discussions.Add',
             'Vanilla.Discussions.Edit',
             'Vanilla.Comments.Add',
-            'Vanilla.Comments.Edit'
+            'Vanilla.Comments.Edit',
         ]));
         $this->assertFalse($permissions->hasAny([
             'Garden.Settings.Manage',
             'Garden.Community.Manage',
-            'Garden.Moderation.Manage'
+            'Garden.Moderation.Manage',
         ]));
+    }
+
+    /**
+     * Test that our -1 ID is handled.
+     */
+    public function testGlobalID() {
+        $permissions = new Permissions();
+        $exampleRows = [
+            [
+                'PermissionID' => 1,
+                'RoleID' => 8,
+                'JunctionTable' => 'Category',
+                'JunctionColumn' => 'PermissionCategoryID',
+                'JunctionID' => -1,
+                'Vanilla.Discussions.View' => 1,
+            ],
+        ];
+        $permissions->compileAndLoad($exampleRows);
+
+        $this->assertTrue($permissions->has('Vanilla.Discussions.View'));
+        $this->assertTrue($permissions->has('Vanilla.Discussions.View', null, Permissions::CHECK_MODE_GLOBAL_ONLY));
+        $this->assertTrue($permissions->has('Vanilla.Discussions.View', -1));
+    }
+
+    /**
+     * Test our conditional junction logic.
+     */
+    public function testResourceIfJunction() {
+        $globalPermPos = ['My.Junction.View' => 1];
+        $resourcePermNeg = [
+            'JunctionTable' => 'MyJunction',
+            'JunctionColumn' => 'someColumn',
+            'JunctionID' => 62,
+            'My.Junction.View' => 0,
+        ];
+        $globalPermNeg = ['My.Junction.View' => 0];
+        $resourcePermPos = [
+            'JunctionTable' => 'MyJunction',
+            'JunctionColumn' => 'someColumn',
+            'JunctionID' => 62,
+            'My.Junction.View' => 1,
+        ];
+        $permissions = new Permissions();
+        $permissions->compileAndLoad([$globalPermPos]);
+
+        $this->assertTrue($permissions->has(
+            'My.Junction.View',
+            62,
+            Permissions::CHECK_MODE_RESOURCE_IF_JUNCTION,
+            'MyJunction'
+        ));
+
+        $permissions = new Permissions();
+        $permissions->compileAndLoad([$globalPermPos, $resourcePermNeg]);
+
+        $this->assertFalse($permissions->has(
+            'My.Junction.View',
+            62,
+            Permissions::CHECK_MODE_RESOURCE_IF_JUNCTION,
+            'MyJunction'
+        ));
+
+        $permissions = new Permissions();
+        $permissions->compileAndLoad([$globalPermNeg]);
+
+        $this->assertFalse($permissions->has(
+            'My.Junction.View',
+            62,
+            Permissions::CHECK_MODE_RESOURCE_IF_JUNCTION,
+            'MyJunction'
+        ));
+
+        $permissions = new Permissions();
+        $permissions->compileAndLoad([$globalPermNeg, $resourcePermPos]);
+
+        $this->assertTrue($permissions->has(
+            'My.Junction.View',
+            62,
+            Permissions::CHECK_MODE_RESOURCE_IF_JUNCTION,
+            'MyJunction'
+        ));
     }
 
     public function testHasAll() {
@@ -82,14 +163,14 @@ class PermissionsTest extends SharedBootstrapTestCase {
             'Vanilla.Discussions.Add',
             'Vanilla.Discussions.Edit',
             'Vanilla.Comments.Add',
-            'Vanilla.Comments.Edit'
+            'Vanilla.Comments.Edit',
         ]);
 
         $this->assertTrue($permissions->hasAll([
             'Vanilla.Discussions.Add',
             'Vanilla.Discussions.Edit',
             'Vanilla.Comments.Add',
-            'Vanilla.Comments.Edit'
+            'Vanilla.Comments.Edit',
         ]));
         $this->assertFalse($permissions->hasAll([
             'Vanilla.Discussions.Announce',
@@ -113,7 +194,7 @@ class PermissionsTest extends SharedBootstrapTestCase {
     public function testHas() {
         $permissions = new Permissions([
             'Vanilla.Discussions.View',
-            'Vanilla.Discussions.Add' => [10]
+            'Vanilla.Discussions.Add' => [10],
         ]);
 
         $this->assertTrue($permissions->has('Vanilla.Discussions.View'));
@@ -135,11 +216,11 @@ class PermissionsTest extends SharedBootstrapTestCase {
     public function testMerge() {
         $permissions = new Permissions([
             'Garden.SignIn.Allow',
-            'Vanilla.Discussions.Add' => [10]
+            'Vanilla.Discussions.Add' => [10],
         ]);
         $additionalPermissions = new Permissions([
             'Garden.Profiles.View',
-            'Vanilla.Discussions.Add' => [20, 30]
+            'Vanilla.Discussions.Add' => [20, 30],
         ]);
         $permissions->merge($additionalPermissions);
 
@@ -153,7 +234,7 @@ class PermissionsTest extends SharedBootstrapTestCase {
     public function testOverwrite() {
         $permissions = new Permissions([
             'Garden.Settings.Manage',
-            'Garden.Discussions.Add' => [1, 2, 3]
+            'Garden.Discussions.Add' => [1, 2, 3],
         ]);
 
         $this->assertTrue($permissions->has('Garden.Settings.Manage'));
@@ -175,7 +256,7 @@ class PermissionsTest extends SharedBootstrapTestCase {
     public function testRemove() {
         $permissions = new Permissions([
             'Vanilla.Discussions.Add' => [10],
-            'Vanilla.Discussions.Edit' => [10]
+            'Vanilla.Discussions.Edit' => [10],
         ]);
 
         $permissions->remove('Vanilla.Discussions.Edit', 10);
@@ -198,7 +279,7 @@ class PermissionsTest extends SharedBootstrapTestCase {
             'Vanilla.Discussions.Add',
             'Vanilla.Discussions.Edit',
             'Vanilla.Comments.Add' => [10],
-            'Vanilla.Comments.Edit' => [10]
+            'Vanilla.Comments.Edit' => [10],
         ]);
 
         $this->assertTrue($permissions->has('Garden.SignIn.Allow'));
@@ -327,7 +408,8 @@ class PermissionsTest extends SharedBootstrapTestCase {
     public function testBanAdminException() {
         $perm = new Permissions();
         $perm->setAdmin(true)
-            ->addBan(Permissions::BAN_BANNED, ['except' => 'admin']);
+            ->addBan(Permissions::BAN_BANNED, ['except' => 'admin'])
+        ;
 
         $this->assertTrue($perm->has('any'));
     }
@@ -382,7 +464,7 @@ class PermissionsTest extends SharedBootstrapTestCase {
             'Vanilla.Discussions.Add',
             'Vanilla.Discussions.Edit',
             'Vanilla.Comments.Add' => [10],
-            'Vanilla.Comments.Edit' => [10]
+            'Vanilla.Comments.Edit' => [10],
         ]);
 
         $json = $permissions->jsonSerialize();
@@ -390,7 +472,7 @@ class PermissionsTest extends SharedBootstrapTestCase {
             'discussions.add' => true,
             'discussions.edit' => true,
             'comments.add' => [10],
-            'comments.edit' => [10]
+            'comments.edit' => [10],
         ], $json['permissions']);
     }
 
@@ -430,7 +512,9 @@ class PermissionsTest extends SharedBootstrapTestCase {
     private function createBanned() {
         $perm = new Permissions();
         $perm->set('foo', true)
-            ->addBan(Permissions::BAN_BANNED);
+            ->addBan(Permissions::BAN_BANNED)
+        ;
+
         return $perm;
     }
 
@@ -481,5 +565,98 @@ class PermissionsTest extends SharedBootstrapTestCase {
         $this->assertTrue($perms->hasRanked('foo'));
         $this->assertSame('', $perms->getRankingPermission());
         $this->assertFalse($perms->hasRanked('Garden.SignIn.Allow'));
+    }
+
+    /**
+     * Verify an admin user does not automatically get the system permission.
+     */
+    public function testNoAdminSystem(): void {
+        $perms = new Permissions();
+        $perms->setAdmin(true);
+        $this->assertFalse($perms->has(Permissions::PERMISSION_SYSTEM));
+    }
+
+    /**
+     * Test our API output of permissions.
+     */
+    public function testApiOutput() {
+        $globalPermPos = ['Vanilla.Discussions.View' => 1];
+        $resourcePermNeg = [
+            'JunctionTable' => 'Category',
+            'JunctionColumn' => 'PermissionCategoryID',
+            'JunctionID' => 62,
+            'Vanilla.Discussions.View' => 0,
+        ];
+        $resourcePermPos = [
+            'JunctionTable' => 'Category',
+            'JunctionColumn' => 'PermissionCategoryID',
+            'JunctionID' => 50,
+            'Vanilla.Discussions.View' => 1,
+        ];
+        $permissions = new Permissions();
+        $permissions->compileAndLoad([$globalPermPos, $resourcePermNeg, $resourcePermPos]);
+        $permissions->addJunctionAliases([
+            'Category' => [
+                24 => 62,
+            ],
+        ]);
+        $permissions->addJunctions([
+            'Category' => [100, 101],
+        ]);
+
+        $actual = $permissions->asApiOutput(true);
+        $expected = [
+            'permissions' => [
+                [
+                    'type' => 'global',
+                    'id' => null,
+                    'permissions' => [
+                        'discussions.view' => true,
+                    ],
+                ],
+                [
+                    'type' => 'category',
+                    'id' => 50,
+                    'permissions' => [
+                        'discussions.view' => true,
+                    ],
+                ]
+            ],
+            'isAdmin' => false,
+            'junctions' => [
+                'category' => [62, 50, 100, 101],
+            ],
+            'junctionAliases' => [
+                'category' => [
+                    24 => 62,
+                ],
+            ],
+        ];
+        $this->assertSame($expected, $actual);
+
+        // Empty
+        $permissions = new Permissions();
+        $this->assertEquals([
+            'permissions' => [
+                [
+                    'type' => 'global',
+                    'id' => null,
+                    'permissions' => [],
+                ],
+            ],
+            'isAdmin' => false,
+        ], $permissions->asApiOutput(false));
+        $this->assertEquals([
+            'permissions' => [
+                [
+                    'type' => 'global',
+                    'id' => null,
+                    'permissions' => [],
+                ],
+            ],
+            'isAdmin' => false,
+            'junctions' => new \stdClass(),
+            'junctionAliases' => new \stdClass(),
+        ], $permissions->asApiOutput(true));
     }
 }

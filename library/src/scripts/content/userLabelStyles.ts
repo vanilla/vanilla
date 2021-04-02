@@ -25,8 +25,7 @@ export const userLabelVariables = useThemeCache(() => {
     });
 
     const name = makeThemeVars("name", {
-        fontSize: globalVars.fonts.size.medium,
-        fontWeight: globalVars.fonts.weights.bold,
+        ...globalVars.fontSizeAndWeightVars("medium", "bold"),
     });
 
     return {
@@ -91,12 +90,15 @@ export const userLabelClasses = useThemeCache(() => {
     const userName = style("userName", {
         ...{
             "&&": {
-                fontWeight: globalVars.fonts.weights.bold,
-                fontSize: styleUnit(globalVars.fonts.size.medium),
-                lineHeight: globalVars.lineHeights.condensed,
+                ...Mixins.font({
+                    ...globalVars.fontSizeAndWeightVars("medium", "bold"),
+                    lineHeight: globalVars.lineHeights.condensed,
+                }),
             },
             [`&&.${isCompact}`]: {
-                fontSize: styleUnit(globalVars.fonts.size.small),
+                ...Mixins.font({
+                    ...globalVars.fontSizeAndWeightVars("small"),
+                }),
             },
         },
     });

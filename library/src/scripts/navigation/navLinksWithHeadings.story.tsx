@@ -10,24 +10,24 @@ import { t } from "@library/utility/appUtils";
 import React from "react";
 import { NavLinksPlaceholder } from "@library/navigation/NavLinksPlaceholder";
 import { storyWithConfig } from "@library/storybook/StoryContext";
-import { rgba } from "csx";
 
 export default {
     title: "Navigation/NavLinksWithHeadings",
+    includeStories: ["StandardNavLinksStory", "ThreeColumnsNavLinksStory", "Placeholder"],
 };
 
-export const StandardNavLinksStory = storyWithConfig(
-    {},
-
-    () => (
+export function StoryNavLinks() {
+    return (
         <NavLinksWithHeadingsComponent
             {...navLinksWithHeadingsData}
             depth={2}
             ungroupedTitle={t("Other Articles")}
             ungroupedViewAllUrl={navLinksWithHeadingsData.ungroupedViewAllUrl}
         />
-    ),
-);
+    );
+}
+
+export const StandardNavLinksStory = storyWithConfig({}, StoryNavLinks);
 StandardNavLinksStory.storyName = "Standard";
 
 const global = {
@@ -65,14 +65,7 @@ export const ThreeColumnsNavLinksStory = storyWithConfig(
             },
         },
     },
-    () => (
-        <NavLinksWithHeadingsComponent
-            {...navLinksWithHeadingsData}
-            depth={2}
-            ungroupedTitle={t("Other Articles")}
-            ungroupedViewAllUrl={navLinksWithHeadingsData.ungroupedViewAllUrl}
-        />
-    ),
+    StoryNavLinks,
 );
 
 ThreeColumnsNavLinksStory.storyName = "Three Columns Hidden Hr Tag";

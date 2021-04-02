@@ -18,6 +18,7 @@ import {
     VANILLA_THEMES,
     VANILLA_ADDONS,
     VANILLA_THEMES_LEGACY,
+    EMOTION_DEV_SPEEDUP_FILE,
 } from "../env";
 import { BuildMode, IBuildOptions } from "../buildOptions";
 const readDir = promisify(fs.readdir);
@@ -123,6 +124,8 @@ export default class EntryModel {
      */
     public async getDevEntries(section: string): Promise<string[]> {
         const entries: string[] = [];
+
+        entries.push(EMOTION_DEV_SPEEDUP_FILE);
 
         for (const entryDir of this.entryDirs) {
             const commonEntry = await this.lookupEntry(entryDir, "common");

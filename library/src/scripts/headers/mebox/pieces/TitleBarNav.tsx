@@ -12,10 +12,9 @@ import Permission from "@library/features/users/Permission";
 import { INavigationVariableItem, navigationVariables } from "@library/headers/navigationVariables";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import { IMegaMenuHandle, TitleBarMegaMenu } from "@library/headers/TitleBarMegaMenu";
-import { formatUrl, siteUrl } from "@library/utility/appUtils";
+import { formatUrl, siteUrl, t } from "@library/utility/appUtils";
 import { useLocation } from "react-router";
 import { useMeasure } from "@vanilla/react-utils";
-import { useScrollOffset } from "@library/layout/ScrollOffsetContext";
 
 export interface ITitleBarNavProps {
     className?: string;
@@ -27,7 +26,6 @@ export interface ITitleBarNavProps {
     containerRef?: React.RefObject<HTMLElement | null>;
     isCentered?: boolean;
     afterNode?: React.ReactNode;
-    forceMenuOpen?: INavigationVariableItem; // For storybook, will force nested menu open
 }
 
 /**
@@ -121,7 +119,7 @@ export default function TitleBarNav(props: ITitleBarNavProps) {
                 linkClassName={props.linkClassName}
                 key={key}
             >
-                {item.name}
+                {t(item.name)}
             </TitleBarNavItem>
         );
 

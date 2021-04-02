@@ -10,7 +10,10 @@
 
 use Garden\Container\Container;
 use Garden\Container\Reference;
+use Vanilla\DiscussionTypeHandler;
+use Vanilla\Forum\Modules\DiscussionListModule;
 use Vanilla\Theme\ThemeSectionModel;
+use Vanilla\Widgets\WidgetService;
 
 /**
  * Vanilla's event handlers.
@@ -33,10 +36,17 @@ class VanillaHooks extends Gdn_Plugin {
         $dic->rule(ThemeSectionModel::class)
             ->addCall('registerLegacySection', [t('Forum')]);
 
+        $dic
+            ->rule(\Vanilla\DiscussionTypeConverter::class)
+            ->addCall('addTypeHandler', [new Reference(DiscussionTypeHandler::class)]);
+
         $mf = \Vanilla\Models\ModelFactory::fromContainer($dic);
         $mf->addModel('category', CategoryModel::class, 'cat');
         $mf->addModel('discussion', DiscussionModel::class, 'd');
         $mf->addModel('comment', CommentModel::class, 'c');
+
+        $dic->rule(PermissionModel::class)
+            ->addCall('addJunctionModel', ['Category', new Reference(CategoryModel::class)]);
     }
 
     /**
@@ -110,6 +120,12 @@ class VanillaHooks extends Gdn_Plugin {
      */
     public function deleteUserData($userID, $options = [], &$data = null) {
         $sql = Gdn::sql();
+
+        $deleteMethod = $options['DeleteMethod'] ?? false;
+        $isMethodKeep = $deleteMethod && $deleteMethod === 'keep';
+        if (!$isMethodKeep) {
+            Gdn::userModel()->getDelete('UserPoints', ['UserID' => $userID], $data);
+        }
 
         // Remove discussion watch records and drafts.
         $sql->delete('UserDiscussion', ['UserID' => $userID]);
@@ -313,6 +329,12 @@ class VanillaHooks extends Gdn_Plugin {
         $categoryID = valr('Fields.CategoryID', $sender->EventArguments, 0);
         $rawFormTags = val('Tags', $formPostValues, '');
         $formTags = TagModel::splitTags($rawFormTags);
+
+        // Don't change tags if there's no "Tags" field (this prevents tags from being lost when moving discussion to
+        // a new category).
+        if (!isset($formPostValues['Tags'])) {
+            return;
+        }
 
         // If we're associating with categories
         $categorySearch = c('Vanilla.Tagging.CategorySearch', false);
@@ -619,7 +641,6 @@ class VanillaHooks extends Gdn_Plugin {
         $options = val('Options', $sender->EventArguments, []);
         $options = is_array($options) ? $options : [];
         $content = &$sender->EventArguments['Content'];
-
         $this->deleteUserData($userID, $options, $content);
     }
 

@@ -2,6 +2,7 @@
     "key": "asset-test",
     "name": "Asset Test Theme",
     "type": "theme",
+    "parent": "asset-parent-test",
     "assets": {
         "fonts": {
             "type": "json",

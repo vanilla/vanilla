@@ -85,6 +85,7 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess {
                 'legacyType:s?',
                 'body:s?',
                 'bodyRaw:s?',
+                'bodyPlainText:s?',
                 'excerpt:s?',
                 'image:s?',
                 'recordID:i',
@@ -288,11 +289,36 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess {
     public function getBody(): ?string {
         return $this->data['body'] ?? null;
     }
+
+    /**
+     * @return string|null
+     */
+    public function getBodyPlainText(): ?string {
+        return $this->data['bodyPlainText'] ?? null;
+    }
+
+
     /**
      * @return string|null
      */
     public function getBodyRaw(): ?string {
         return $this->data['bodyRaw'] ?? null;
+    }
+
+    /**
+     * Get the highlighted string.
+     */
+    public function getHighlight() {
+        return $this->data['highlight'] ?? null;
+    }
+
+    /**
+     * Set the highlighted string.
+     *
+     * @param string $highlight
+     */
+    public function setHighlight(string $highlight = '') {
+        $this->data['highlight'] = $highlight;
     }
 
     /**

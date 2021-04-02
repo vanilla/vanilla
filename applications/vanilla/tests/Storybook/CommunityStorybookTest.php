@@ -62,6 +62,16 @@ class CommunityStorybookTest extends StorybookGenerationTestCase {
             'score' => 40,
         ]);
 
+
+        CurrentTimeStamp::mockTime('Dec 3 2019');
+        $this->createDiscussion([
+            'name' => 'Hello Discussion 2',
+            'score' => 100,
+            'body' => 'Dec 3 - 100 score'
+        ]);
+        self::$commentedDiscussionID = $this->lastInsertedDiscussionID;
+        $this->createComment(['name' => 'Hello comment', 'body' => 'This is a comment body. Hello world, ipsum lorem, etc']);
+
         // Make a more complicated category tree.
 
         $headingDepth1 = $this->createCategory([
@@ -73,16 +83,9 @@ class CommunityStorybookTest extends StorybookGenerationTestCase {
             'name' => 'Heading Depth 2',
             'countComments' => 143,
             'displayAs' => 'heading',
+            'parentCategoryID' => $headingDepth1,
         ])['categoryID'];
 
-        CurrentTimeStamp::mockTime('Dec 3 2019');
-        $this->createDiscussion([
-            'name' => 'Hello Discussion 2',
-            'score' => 100,
-            'body' => 'Dec 3 - 100 score'
-        ]);
-        self::$commentedDiscussionID = $this->lastInsertedDiscussionID;
-        $this->createComment(['name' => 'Hello comment', 'body' => 'This is a comment body. Hello world, ipsum lorem, etc']);
         $headingDepth2b = $this->createCategory([
             'name' => 'Heading Depth 2',
             'parentCategoryID' => $headingDepth1,
@@ -90,21 +93,22 @@ class CommunityStorybookTest extends StorybookGenerationTestCase {
             'displayAs' => 'heading',
         ])['categoryID'];
 
-
-
         $discussionsDepth1 = $this->createCategory([
             'name' => 'Discussions Depth 1',
             'parentCategoryID' => -1,
             'displayAs' => 'discussions',
+            'description' => 'This is a category description. This category can have some discussions inside of it.',
         ])['categoryID'];
         $discussionsDepth2a = $this->createCategory([
-            'name' => 'Discussions Depth 2',
+            'name' => 'Discussions Depth 2a',
+            'description' => 'This is a category description. This category is nested and can have some discussions inside of it.',
         ])['categoryID'];
         $this->createDiscussion(['name' => 'Hello Discussion 3']);
         self::$commentedDiscussionID = $this->lastInsertedDiscussionID;
         $this->createComment(['name' => 'Hello comment', 'body' => 'This is a comment body. Hello world, ipsum lorem, etc']);
         $discussionsDepth2b = $this->createCategory([
-            'name' => 'Discussions Depth 2',
+            'name' => 'Discussions Depth 2b',
+            'description' => 'This is a category description. This category is also nested and can have some discussions inside of it.',
             'parentCategoryID' => $discussionsDepth1,
         ])['categoryID'];
 
@@ -142,6 +146,10 @@ class CommunityStorybookTest extends StorybookGenerationTestCase {
             'Table' => [
                 ['Vanilla.Discussions.Layout' => 'modern'],
                 'Discussion List (Modern)',
+            ],
+            'Foundation' => [
+                ['Vanilla.Discussions.Layout' => 'foundation'],
+                'Discussion List (Admin Checks)',
             ],
             'Admin Checks' => [
                 ['Vanilla.AdminCheckboxes.Use' => true],
@@ -181,6 +189,13 @@ class CommunityStorybookTest extends StorybookGenerationTestCase {
             'Mixed' => [
                 ['Vanilla.Categories.Layout' => 'mixed'],
                 'Category List (Mixed)',
+            ],
+            'Mixed & Foundation Discussions' => [
+                [
+                    'Vanilla.Categories.Layout' => 'mixed',
+                    'Vanilla.Discussions.Layout' => 'foundation'
+                ],
+                'Category List (Mixed + Foundation Discussions)',
             ],
             'Foundation' => [
                 ['Vanilla.Categories.Layout' => 'foundation'],

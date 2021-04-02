@@ -35,6 +35,11 @@ class CategoriesModule extends AbstractHomeWidgetModule {
     public $apiParams = [];
 
     /**
+     * @var bool
+     */
+    private $countComments = false;
+
+    /**
      * CategoriesModule constructor.
      *
      * @param \CategoriesApiController $categoriesApi
@@ -59,6 +64,20 @@ class CategoriesModule extends AbstractHomeWidgetModule {
     }
 
     /**
+     * @return bool
+     */
+    public function isCountComments(): bool {
+        return $this->countComments;
+    }
+
+    /**
+     * @param bool $countComments
+     */
+    public function setCountComments(bool $countComments): void {
+        $this->countComments = $countComments;
+    }
+
+    /**
      * @return array|null
      */
     protected function getData(): ?array {
@@ -69,7 +88,12 @@ class CategoriesModule extends AbstractHomeWidgetModule {
             'parentCategoryID' => $contextualCategoryID,
         ], $this->apiParams);
         $data = $this->categoriesApi->index($apiParams)->getData();
-        return array_map([FoundationCategoriesShim::class, 'mapApiCategoryToItem'], $data);
+        $itemOptions = [
+            'countComments' => $this->isCountComments(),
+        ];
+        return array_map(function ($item) use ($itemOptions) {
+            return FoundationCategoriesShim::mapApiCategoryToItem($item, $itemOptions);
+        }, $data);
     }
 
     /**

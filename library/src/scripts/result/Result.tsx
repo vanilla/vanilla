@@ -15,7 +15,7 @@ import { IAttachmentIcon } from "@library/content/attachments/AttachmentIcon";
 import Paragraph from "@library/layout/Paragraph";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
 import { useLayout } from "@library/layout/LayoutContext";
-import { IUserCardInfo } from "@library/features/users/ui/PopupUserCard";
+import { IUser } from "@library/@types/api/users";
 
 export interface IResult {
     name: string;
@@ -23,13 +23,14 @@ export interface IResult {
     meta?: React.ReactNode;
     url: string;
     excerpt?: string;
+    highlight?: string;
     image?: string;
     headingLevel?: 2 | 3;
     attachments?: IAttachmentIcon[];
     location: ICrumb[] | string[];
     afterExcerpt?: React.ReactNode; // Likely SearchLink
     icon?: React.ReactNode;
-    userCardInfo?: IUserCardInfo;
+    userInfo?: IUser;
     rel?: string;
 }
 
@@ -37,7 +38,19 @@ export interface IResult {
  * Generates search result list. Note that this template is used in other contexts, such as the flat category list
  */
 export default function Result(props: IResult) {
-    const { name, className, meta, url, excerpt, image, headingLevel = 2, attachments, afterExcerpt, icon } = props;
+    const {
+        name,
+        className,
+        meta,
+        url,
+        excerpt,
+        image,
+        headingLevel = 2,
+        attachments,
+        afterExcerpt,
+        icon,
+        highlight,
+    } = props;
 
     const hasAttachments = attachments && attachments.length > 0;
     const showImage = image && !hasAttachments;
@@ -74,6 +87,17 @@ export default function Result(props: IResult) {
         </div>
     ) : null;
 
+    const highlightElement = highlight ? (
+        <Paragraph className={classNames(classes.excerpt, { [classes.compactExcerpt]: isCompact })}>
+            <>
+                <TruncatedText maxCharCount={160}>
+                    <div dangerouslySetInnerHTML={{ __html: highlight }}></div>
+                </TruncatedText>
+                {afterExcerpt}
+            </>
+        </Paragraph>
+    ) : null;
+
     const excerptElement =
         excerpt && excerpt.length > 0 ? (
             <Paragraph className={classNames(classes.excerpt, { [classes.compactExcerpt]: isCompact })}>
@@ -83,6 +107,8 @@ export default function Result(props: IResult) {
                 </>
             </Paragraph>
         ) : null;
+
+    const newExcerptElement = highlightElement ?? excerptElement;
 
     return (
         <li className={classNames(classesSearchResults.item, className)}>
@@ -96,10 +122,10 @@ export default function Result(props: IResult) {
                             </SmartLink>
                             {meta && <div className={classes.metas}>{meta}</div>}
                             {isCompact && media}
-                            {!isCompact && excerptElement}
+                            {!isCompact && newExcerptElement}
                         </div>
                         {!isCompact && media}
-                        {isCompact && excerptElement}
+                        {isCompact && newExcerptElement}
                     </div>
                 </div>
             </article>

@@ -825,7 +825,7 @@ class VanillaSettingsController extends Gdn_Controller {
         if ($parentDisplayAs === 'Flat') {
             $categories = $this->CategoryModel->getTreeAsFlat($parentID, $offset, $limit);
         } else {
-            $categories = $collection->getTree($parentID, ['maxdepth' => 10, 'collapsecategories' => true]);
+            $categories = $collection->getTree($parentID, ['maxdepth' => 10, 'collapsecategories' => true, 'permission' => false]);
         }
 
         $this->addJsFile('categoryfilter.js', 'vanilla');

@@ -30,6 +30,9 @@ class Theme implements \JsonSerializable {
 
     use JsonFilterTrait;
 
+    public const MERGE_OVER = "over";
+    public const MERGE_UNDER = "under";
+
     /** @var string */
     private $themeID;
 
@@ -160,6 +163,7 @@ class Theme implements \JsonSerializable {
             'name' => $addon->getName(),
             'version' => $addon->getVersion(),
             'assets' => $assets,
+            'parentTheme' => $addon->getInfoValue('parent', null),
         ]);
 
         $theme->setAddon($addon);
@@ -209,7 +213,6 @@ class Theme implements \JsonSerializable {
         $this->active = $data['active'] ?? true;
         $this->initializeAssets($data['assets']);
         $this->preview = new ThemePreview();
-        $this->preview->addVariablePreview($this->assets['variables']);
     }
 
     /**
@@ -272,6 +275,35 @@ class Theme implements \JsonSerializable {
     }
 
     /**
+     * Merge in assets from parent themes.
+     *
+     * @param Theme[] $parentThemes Passed in descendant order. Eg. Great-GrandParent, GrandParent, Parent.
+     */
+    public function mergeParentAssets(Theme ...$parentThemes) {
+        $assetsByName = [];
+
+        /** @var Theme[] $allThemesInOrder */
+        $allThemesInOrder = array_merge($parentThemes, [$this]);
+
+        // Bucket assets by their name from all of the themes.
+        foreach ($allThemesInOrder as $theme) {
+            foreach ($theme->getAssets() as $assetName => $asset) {
+                if (empty($assetsByName[$assetName])) {
+                    $assetsByName[$assetName] = [];
+                }
+                $assetsByName[$assetName][] = $asset;
+            }
+        }
+
+        // Create new merged assets.
+        $factory = ThemeAssetFactory::instance();
+        foreach ($assetsByName as $assetName => $assets) {
+            $merged = $factory->mergeAssets(...$assets);
+            $this->setAsset($assetName, $merged);
+        }
+    }
+
+    /**
      * Overlay a set of variables on the theme.
      *
      * @param array $variables The variables to overlay.
@@ -292,7 +324,7 @@ class Theme implements \JsonSerializable {
                 });
             }
 
-            // We want to fully replace arrays instead of merging them.
+            // We want to fully replace indexed arrays instead of merging them.
             // This mirrors our frontend variable handling.
             $result = ArrayUtils::mergeRecursive($result, $variables, function ($arr1, $arr2) {
                 return $arr2;
@@ -333,6 +365,18 @@ class Theme implements \JsonSerializable {
             }
         }
 
+        // Mix in logo assets.
+        foreach ($factory->getLogoAssets($this->getAssets()[ThemeAssetFactory::ASSET_VARIABLES] ?? null) as $assetName => $logoAsset) {
+            $this->assets[$assetName] = $logoAsset;
+        }
+    }
+
+    /**
+     * Ensure all default assets are created.
+     */
+    public function ensureDefaultAssets() {
+        $factory = ThemeAssetFactory::instance();
+
         foreach (ThemeAssetFactory::DEFAULT_ASSETS as $assetName => $defaultAsset) {
             if (isset($this->assets[$assetName])) {
                 continue;
@@ -344,11 +388,7 @@ class Theme implements \JsonSerializable {
             $asset = $factory->createAsset($this, $type, $assetName, $data);
             $this->assets[$assetName] = $asset;
         }
-
-        // Mix in logo assets.
-        foreach ($factory->getLogoAssets($this->getAssets()[ThemeAssetFactory::ASSET_VARIABLES] ?? null) as $assetName => $logoAsset) {
-            $this->assets[$assetName] = $logoAsset;
-        }
+        $this->preview->addVariablePreview($this->assets['variables']);
     }
 
     /**
@@ -410,7 +450,7 @@ class Theme implements \JsonSerializable {
     /**
      * @return string|null
      */
-    public function getParentTheme(): ?string {
+    public function getParentThemeKey(): ?string {
         return $this->parentTheme;
     }
 

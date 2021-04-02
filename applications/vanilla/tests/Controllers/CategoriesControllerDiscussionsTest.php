@@ -31,23 +31,6 @@ class CategoriesControllerDiscussionsTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Test that announced discussions are delivered and appear before all other discussions.
-     */
-    public function testAnnouncementsPinnedComeFirst() : void {
-        $category = $this->createCategory();
-        $disc1 = $this->createDiscussion(['pinned' => true, 'categoryID' => $category['categoryID']]);
-        $disc2 = $this->createDiscussion(['pinned' => true, 'categoryID' => $category['categoryID']]);
-        $disc3 = $this->createDiscussion(['pinned' => false, 'categoryID' => $category['categoryID']]);
-        $disc4 = $this->createDiscussion(['pinned' => false, 'categoryID' => $category['categoryID']]);
-
-        $discussions = $this->bessy()->get("/categories")->data("Discussions");
-        $this->assertSame($discussions[0]->DiscussionID, $disc2["discussionID"]);
-        $this->assertSame($discussions[1]->DiscussionID, $disc1["discussionID"]);
-        $this->assertSame($discussions[2]->DiscussionID, $disc4["discussionID"]);
-        $this->assertSame($discussions[3]->DiscussionID, $disc3["discussionID"]);
-    }
-
-    /**
      * Test that only announcement are delivered.
      */
     public function testOnlyAnnouncementsDisplay() : void {
@@ -69,5 +52,22 @@ class CategoriesControllerDiscussionsTest extends AbstractAPIv2Test {
         }
 
         $this->assertNotContains($disc6["discussionID"], $discussionIDs);
+    }
+
+    /**
+     * Test that announced discussions are delivered and appear before all other discussions.
+     */
+    public function testAnnouncementsPinnedComeFirst() : void {
+        $category = $this->createCategory();
+        $disc1 = $this->createDiscussion(['pinned' => true, 'categoryID' => $category['categoryID']]);
+        $disc2 = $this->createDiscussion(['pinned' => true, 'categoryID' => $category['categoryID']]);
+        $disc3 = $this->createDiscussion(['pinned' => false, 'categoryID' => $category['categoryID']]);
+        $disc4 = $this->createDiscussion(['pinned' => false, 'categoryID' => $category['categoryID']]);
+
+        $discussions = $this->bessy()->get("/categories")->data("Discussions");
+        $this->assertSame($discussions[0]->DiscussionID, $disc2["discussionID"]);
+        $this->assertSame($discussions[1]->DiscussionID, $disc1["discussionID"]);
+        $this->assertSame($discussions[2]->DiscussionID, $disc4["discussionID"]);
+        $this->assertSame($discussions[3]->DiscussionID, $disc3["discussionID"]);
     }
 }

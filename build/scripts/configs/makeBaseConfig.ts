@@ -7,11 +7,11 @@
 import chalk from "chalk";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import * as path from "path";
-import PrettierPlugin from "prettier-webpack-plugin";
+import { svgLoader } from "./svgLoader";
 import webpack from "webpack";
 import WebpackBar from "webpackbar";
 import { BuildMode, getOptions } from "../buildOptions";
-import { PRETTIER_FILE, VANILLA_ROOT } from "../env";
+import { VANILLA_ROOT } from "../env";
 import EntryModel from "../utility/EntryModel";
 import { printVerbose } from "../utility/utils";
 const CircularDependencyPlugin = require("circular-dependency-plugin");
@@ -88,17 +88,7 @@ ${chalk.green(aliases)}`;
                     test: /\.html$/,
                     use: "raw-loader",
                 },
-                {
-                    test: /\.svg$/,
-                    use: [
-                        {
-                            loader: "html-loader",
-                            options: {
-                                minimize: true,
-                            },
-                        },
-                    ],
-                },
+                svgLoader(),
                 {
                     test: /\.s?css$/,
                     use: [
@@ -107,7 +97,6 @@ ${chalk.green(aliases)}`;
                             : {
                                   loader: "style-loader",
                                   options: {
-                                      injectType: "singletonStyleTag",
                                       insert: function insertAtTop(element: HTMLElement) {
                                           const staticStylesheets = document.head.querySelectorAll(
                                               'link[rel="stylesheet"][static="1"]',
@@ -164,6 +153,8 @@ ${chalk.green(aliases)}`;
                 "library-scss": path.resolve(VANILLA_ROOT, "library/src/scss"),
                 "react-select": require.resolve("react-select/dist/react-select.esm.js"),
                 typestyle: path.resolve(VANILLA_ROOT, "library/src/scripts/styles/styleShim.ts"),
+                // Legacy mapping that doesn't exist any more. Even has a lint rule against it.
+                "@vanilla/library/src/scripts": path.resolve(VANILLA_ROOT, "library/src/scripts"),
             },
             extensions: [".ts", ".tsx", ".js", ".jsx"],
             // This needs to be true so that the same copy of a node_module gets shared.
@@ -191,9 +182,6 @@ ${chalk.green(aliases)}`;
         );
     }
 
-    if (options.fix) {
-        config.plugins.unshift(getPrettierPlugin());
-    }
     config.plugins.push(
         new WebpackBar({
             name: section,
@@ -217,16 +205,4 @@ ${chalk.green(aliases)}`;
     }
 
     return config;
-}
-
-/**
- * Get a prettier plugin instance. This will autoformat source code as its built.
- */
-function getPrettierPlugin() {
-    const prettierConfig = require(PRETTIER_FILE);
-    return new PrettierPlugin({
-        ...prettierConfig,
-        parser: "typescript",
-        extensions: [".ts", ".tsx"],
-    });
 }

@@ -11,7 +11,7 @@ import { FocusWatcher } from "@vanilla/dom-utils";
  */
 export function useFocusWatcher(
     ref: React.RefObject<Element | null>,
-    changeHandler: (hasFocus: boolean) => void,
+    changeHandler: (hasFocus: boolean, newActiveElement?: Element) => void,
     bypass?: boolean,
 ) {
     useLayoutEffect(() => {

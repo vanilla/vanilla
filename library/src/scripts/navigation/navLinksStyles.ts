@@ -23,7 +23,7 @@ export const navLinksVariables = useThemeCache(() => {
     const item = makeThemeVars("item", {
         fontSize: globalVars.fonts.size.large,
         padding: Variables.spacing({
-            vertical: globalVars.spacer.size * 2,
+            vertical: globalVars.spacer.mainLayout,
             horizontal: containerVariables().spacing.padding * 2,
         }),
         paddingMobile: Variables.spacing({
@@ -39,8 +39,7 @@ export const navLinksVariables = useThemeCache(() => {
 
     const title = makeThemeVars("title", {
         font: Variables.font({
-            size: globalVars.fonts.size.title,
-            weight: globalVars.fonts.weights.bold,
+            ...globalVars.fontSizeAndWeightVars("title", "bold"),
             lineHeight: globalVars.lineHeights.condensed,
             color: undefined,
         }),
@@ -50,8 +49,7 @@ export const navLinksVariables = useThemeCache(() => {
         },
         mobile: {
             font: Variables.font({
-                size: globalVars.fonts.size.large,
-                weight: globalVars.fonts.weights.bold,
+                ...globalVars.fontSizeAndWeightVars("large", "bold"),
             }),
         },
     });

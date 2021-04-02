@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { absolutePosition, objectFitWithFallback, buttonStates, userSelect } from "@library/styles/styleHelpers";
+import { objectFitWithFallback, buttonStates, userSelect } from "@library/styles/styleHelpers";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
@@ -96,7 +96,7 @@ export const meBoxMessageClasses = useThemeCache(() => {
             "&.isUnread": {
                 ...{
                     "&:after": {
-                        ...absolutePosition.middleRightOfParent(),
+                        ...Mixins.absolute.middleRightOfParent(),
                         content: quote(""),
                         height: styleUnit(vars.unreadDot.width),
                         width: styleUnit(vars.unreadDot.width),

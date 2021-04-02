@@ -469,6 +469,7 @@ class EntryController extends Gdn_Controller {
 
         // Allow a provider to not send an email address but require one be manually entered.
         $userProvidedEmail = false;
+        // If we require an email address.
         if (!UserModel::noEmail()) {
             $emailProvided = $this->Form->getFormValue('Email');
             $emailRequested = $this->Form->getFormValue('EmailVisible');
@@ -582,12 +583,18 @@ class EntryController extends Gdn_Controller {
             // Send them on their way.
             $this->_setRedirect(Gdn::request()->get('display') === 'popup');
 
-            // If a name of email has been provided
+            // If a name or email has been provided
         } elseif ($this->Form->getFormValue('Name') || $this->Form->getFormValue('Email')) {
             // Decide how to handle our first time connecting.
             $nameUnique = c('Garden.Registration.NameUnique', true);
             $emailUnique = c('Garden.Registration.EmailUnique', true);
             $autoConnect = c('Garden.Registration.AutoConnect');
+
+            // If we allow autoConnect & the SSO provider didn't supply an email address,
+            // we do not allow the autoConnection by throwing an exception.
+            if ($autoConnect && !$emailProvided) {
+                throw new Gdn_UserException("Unable to auto-connect because SSO did not provide an email address.");
+            }
 
             // Decide which name to search for.
             if ($isPostBack && $this->Form->getFormValue('ConnectName')) {
@@ -1722,7 +1729,7 @@ class EntryController extends Gdn_Controller {
         $emailConfirmed = $this->UserModel->confirmEmail($user, $emailKey);
         $this->Form->setValidationResults($this->UserModel->validationResults());
 
-        $userMatch = ($userID === Gdn::session()->UserID) ? true : false;
+        $userMatch = ((int) $userID === Gdn::session()->UserID) ? true : false;
 
         if (!$userMatch) {
             Gdn::session()->end();

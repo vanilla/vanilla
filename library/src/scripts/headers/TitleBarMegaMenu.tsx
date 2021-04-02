@@ -218,6 +218,7 @@ function TitleBarMegaMenuImpl(props: IProps, ref: React.Ref<IMegaMenuHandle>) {
                 }}
                 style={{ paddingLeft: leftOffset - containerDimensions.left }}
                 className={classes.container}
+                ignoreContext
                 fullGutter
             >
                 {expanded?.children?.map((item, key) => (
@@ -235,7 +236,7 @@ function TitleBarMegaMenuImpl(props: IProps, ref: React.Ref<IMegaMenuHandle>) {
                         )}
 
                         {item.children && (
-                            <ul>
+                            <ul className={classes.menuItemChildren}>
                                 {item.children.map((child, key) => (
                                     <TitleBarMegaMenuChild
                                         className={classes.menuItemChild}
@@ -248,10 +249,6 @@ function TitleBarMegaMenuImpl(props: IProps, ref: React.Ref<IMegaMenuHandle>) {
                             </ul>
                         )}
                     </div>
-                ))}
-                {/* These items ensure that empty space in the row is filled */}
-                {[...Array(6).keys()].map((key) => (
-                    <span key={key} className={classes.fillerItem} />
                 ))}
             </Container>
         </div>

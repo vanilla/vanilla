@@ -71,6 +71,19 @@ class HtmlDocument {
     }
 
     /**
+     * Get the root element of the DOM.
+     *
+     * @return \DOMElement
+     */
+    public function getRoot(): \DOMElement {
+        if ($this->wrap) {
+            return $this->dom->getElementsByTagName('body')->item(0);
+        } else {
+            return $this->dom->parentNode;
+        }
+    }
+
+    /**
      * Return the inner HTML content of the document.
      * We grab everything inside the document body.
      *

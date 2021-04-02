@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 import React from "react";
-import { LayoutProvider, withLayout } from "@library/layout/LayoutContext";
+import { LayoutProvider } from "@library/layout/LayoutContext";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
 import PanelLayout, { IPanelLayoutProps } from "@library/layout/PanelLayout";
 
@@ -17,4 +17,4 @@ function ThreeColumnLayout(props: IProps) {
     );
 }
 
-export default withLayout(ThreeColumnLayout);
+export default ThreeColumnLayout;

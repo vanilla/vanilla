@@ -202,26 +202,27 @@ class UserPointsModel extends Model {
     ) {
         $sql = $this->createSql();
         $sql->select([
-                'SlotType',
-                'TimeSlot',
-                'Source',
-                'CategoryID',
-                'UserID',
-                'Points'
+                'up.SlotType',
+                'up.TimeSlot',
+                'up.Source',
+                'up.CategoryID',
+                'up.UserID',
+                'up.Points'
             ])
-            ->from('UserPoints')
+            ->from('UserPoints up')
+            ->join('User u', 'up.UserID = u.UserID and u.Banned != 1')
             ->where([
-                'TimeSlot' => $timeSlot,
-                'SlotType' => $slotType,
-                'Source' => 'Total',
-                'CategoryID' => $categoryID,
+                'up.TimeSlot' => $timeSlot,
+                'up.SlotType' => $slotType,
+                'up.Source' => 'Total',
+                'up.CategoryID' => $categoryID,
             ])
-            ->orderBy('Points', 'desc')
+            ->orderBy('up.Points', 'desc')
             ->limit($limit)
         ;
 
         if (!empty($excludedUserIDs)) {
-            $sql->whereNotIn('UserID', $excludedUserIDs);
+            $sql->whereNotIn('up.UserID', $excludedUserIDs);
         }
 
         $results = $sql->get()->resultArray();

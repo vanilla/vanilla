@@ -147,6 +147,10 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
 
         $dic->rule(WidgetService::class)
             ->addCall('registerWidget', [QnAModule::class]);
+
+        $dic
+            ->rule(\Vanilla\DiscussionTypeConverter::class)
+            ->addCall('addTypeHandler', [new Reference(QnaTypeHandler::class)]);
     }
 
 
@@ -296,8 +300,10 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
      * @param array $args Event arguments.
      */
     public function base_discussionTypes_handler($sender, $args) {
-        if (!c('Plugins.QnA.UseBigButtons')) {
+        $category = val('Category', $args);
+        if (empty($category) || !c('Plugins.QnA.UseBigButtons')) {
             $args['Types']['Question'] = [
+                'apiType' => 'question',
                 'Singular' => 'Question',
                 'Plural' => 'Questions',
                 'AddUrl' => '/post/question',
@@ -777,7 +783,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
     protected function _discussionOptions($sender, $discussionID) {
         $sender->Form = new Gdn_Form();
 
-        $discussion = $this->discussionModel->getID($discussionID);
+        $discussion = $this->discussionModel->getID($discussionID, DATASET_TYPE_ARRAY);
 
         if (!$discussion) {
             throw notFoundException('Discussion');
@@ -791,23 +797,9 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
         }
 
         if ($sender->Form->authenticatedPostBack()) {
-            $this->discussionModel->setField($discussionID, 'Type', $sender->Form->getFormValue('Type'));
-
-            // Update the QnA field.  Default to "Unanswered" for questions. Null the field for other types.
-            $qna = val('QnA', $discussion);
-            switch ($sender->Form->getFormValue('Type')) {
-                case 'Question':
-                    $this->discussionModel->setField(
-                        $discussionID,
-                        'QnA',
-                        $qna ? $qna : 'Unanswered'
-                    );
-                    break;
-                default:
-                    $this->discussionModel->setField($discussionID, 'QnA', null);
-            }
+            $type = $sender->Form->getFormValue('Type');
+            $this->updateRecordType($discussionID, $discussion, $type);
             $sender->Form->setValidationResults($this->discussionModel->validationResults());
-
             Gdn::controller()->jsonTarget('', '', 'Refresh');
         } else {
             $sender->Form->setData($discussion);
@@ -968,7 +960,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
      */
     public function discussionsController_beforeBuildPager_handler($sender, $args) {
         if (Gdn::controller()->RequestMethod == 'unanswered') {
-            $count = $this->getUnansweredCount(true);
+            $count = $this->getUnansweredCount();
             $sender->setData('CountDiscussions', $count);
         }
     }
@@ -976,29 +968,27 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
     /**
      * Return the number of unanswered questions.
      *
-     * @param bool $pager Whether this count affects the pager or not.
      * @return int
      */
-    public function getUnansweredCount($pager = false) {
-        // TODO: Dekludge this when category permissions are refactored (tburry).
-        $cacheKey = Gdn::request()->webRoot().'/QnA-UnansweredCount';
+    public function getUnansweredCount(): int {
+        // Me might have an alternate handler.
+        $eventManager = \Gdn::eventManager();
+        if ($eventManager->hasHandler('getAlternateUnansweredCount')) {
+            $questionCount = $eventManager->fireFilter('getAlternateUnansweredCount', 0);
+            return $questionCount;
+        }
+
+        $cacheKey = 'QnA-UnansweredCount';
         $questionCount = Gdn::cache()->get($cacheKey);
 
         if ($questionCount === Gdn_Cache::CACHEOP_FAILURE) {
             $questionCount = Gdn::sql()
-                ->beginWhereGroup()
-                ->where('QnA', null)
-                ->orWhereIn('QnA', ['Unanswered', 'Rejected'])
-                ->endWhereGroup()
-                ->getCount('Discussion', ['Type' => 'Question']);
-
+                ->where('Type', 'Question')
+                ->whereIn('QnA', ['Unanswered', 'Rejected'])
+                ->getCount('Discussion')
+            ;
             Gdn::cache()->store($cacheKey, $questionCount, [Gdn_Cache::FEATURE_EXPIRY => 15 * 60]);
         }
-
-        // Check to see if another plugin can handle this.
-        $this->EventArguments['questionCount'] = &$questionCount;
-        $this->EventArguments['pagerCount'] = $pager;
-        $this->fireEvent('unansweredCount');
 
         return $questionCount;
     }
@@ -1328,6 +1318,24 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
     }
 
     /**
+     * Add question status to discussion schema.
+     *
+     * @param Schema $schema
+     */
+    public function discussionIndexSchema_init(Schema $schema) {
+        $schema->merge(Schema::parse([
+            "status:s?" => [
+                "enum" => array_map('strtolower', [
+                    QnaModel::ACCEPTED, QnaModel::ANSWERED, QnaModel::UNANSWERED
+                ]),
+                "x-filter" => [
+                    'field' => 'QnA',
+                    ],
+                ],
+            ]));
+    }
+
+    /**
      * Add question meta data to discussion schema.
      *
      * @param Schema $schema
@@ -1378,6 +1386,14 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
             return $discussion;
         }
 
+        $acceptedAnswers = [];
+        $discussion['attributes']['question'] = [
+            'status' => !empty($discussion['qnA']) ? strtolower($discussion['qnA']) : 'unanswered',
+            'dateAccepted' => $discussion['dateAccepted'],
+            'dateAnswered' => $discussion['dateOfAnswer'],
+            'acceptedAnswers' => $acceptedAnswers
+        ];
+
         if (ModelUtils::isExpandOption(ModelUtils::EXPAND_CRAWL, $options['expand'] ?? [])) {
             if (!empty($discussion[self::QNA_KEY])) {
                 $discussion['labelCodes'][] = $discussion[self::QNA_KEY];
@@ -1386,11 +1402,16 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
         }
 
         $expandAnswers = $discussionsApiController->isExpandField("acceptedAnswers", $options["expand"] ?? []);
-        $acceptedAnswers = [];
+
+        if (!$expandAnswers) {
+            return $discussion;
+        }
+
         $acceptedAnswerRows = $this->commentModel->getWhere([
             "DiscussionID" => $discussion["discussionID"],
             "Qna" => "Accepted"
         ])->resultArray();
+
         foreach ($acceptedAnswerRows as $comment) {
             $answer = [
                 "commentID" => $comment["CommentID"],
@@ -1401,12 +1422,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
             $acceptedAnswers[] = $answer;
         }
 
-        $discussion['attributes']['question'] = [
-            'status' => !empty($discussion['qnA']) ? strtolower($discussion['qnA']) : 'unanswered',
-            'dateAccepted' => $discussion['dateAccepted'],
-            'dateAnswered' => $discussion['dateOfAnswer'],
-            "acceptedAnswers" => $acceptedAnswers,
-        ];
+        $discussion['attributes']['question']['acceptedAnswers'] = $acceptedAnswers;
 
         return $discussion;
     }
@@ -1852,6 +1868,31 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
             'message:s?',
         ]);
         return $schema;
+    }
+
+    /**
+     * Update question record type.
+     *
+     * @param int $discussionID
+     * @param array $discussion
+     * @param string $type
+     */
+    public function updateRecordType(int $discussionID, array $discussion, string $type): void {
+        $this->discussionModel->setField($discussionID, 'Type', $type);
+
+        // Update the QnA field.  Default to "Unanswered" for questions. Null the field for other types.
+        $qna = $discussion['QnA'] ?? '';
+        switch ($type) {
+            case 'Question':
+                $this->discussionModel->setField(
+                    $discussionID,
+                    'QnA',
+                    $qna ? $qna : 'Unanswered'
+                );
+                break;
+            default:
+                $this->discussionModel->setField($discussionID, 'QnA', null);
+        }
     }
 }
 if (!function_exists('validatePositiveNumber')) {

@@ -64,12 +64,13 @@ export const toolTipClasses = useThemeCache(() => {
 
     const box = style("box", {
         position: "absolute",
-        fontSize: styleUnit(globalVars.fonts.size.medium),
+        ...Mixins.font({
+            ...globalVars.fontSizeAndWeightVars("medium"),
+            lineHeight: globalVars.lineHeights.base,
+        }),
         minWidth: styleUnit(vars.sizes.min),
         maxWidth: styleUnit(vars.sizes.max),
-        color: ColorsUtils.colorOut(globalVars.mainColors.fg),
         backgroundColor: ColorsUtils.colorOut(globalVars.mainColors.bg),
-        lineHeight: globalVars.lineHeights.base,
         ...Mixins.border(),
         ...Mixins.padding({
             all: globalVars.fonts.size.medium,

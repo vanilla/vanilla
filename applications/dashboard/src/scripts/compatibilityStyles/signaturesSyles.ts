@@ -32,6 +32,4 @@ export const signaturesCSS = () => {
         }),
         padding: 0,
     });
-
-    cssOut(`.Content .UserSignature`, {});
 };

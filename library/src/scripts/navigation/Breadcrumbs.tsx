@@ -19,7 +19,7 @@ export interface ICrumb {
 export interface IProps {
     children: ICrumb[];
     className?: string;
-    forceDisplay: boolean;
+    forceDisplay?: boolean;
     minimumCrumbCount?: number;
 }
 

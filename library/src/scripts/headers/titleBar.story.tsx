@@ -10,7 +10,7 @@ import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { ISelectBoxItem } from "@library/forms/select/SelectBox";
 import TitleBar, { TitleBar as TitleBarStatic } from "@library/headers/TitleBar";
-import { DownTriangleIcon, GlobeIcon } from "@library/icons/common";
+import { DownTriangleIcon } from "@library/icons/common";
 import Container from "@library/layout/components/Container";
 import PanelArea from "@library/layout/components/PanelArea";
 import PanelWidget from "@library/layout/components/PanelWidget";
@@ -29,6 +29,7 @@ import { Provider } from "react-redux";
 import { MemoryRouter } from "react-router";
 import { INavigationVariableItem } from "@library/headers/navigationVariables";
 import { ScrollOffsetProvider } from "@library/layout/ScrollOffsetContext";
+import { Icon } from "@vanilla/icons";
 
 const localLogoUrl = require("./titleBarStoryLogo.png");
 
@@ -94,12 +95,7 @@ const initialState = testStoreState({
     },
 });
 
-function StoryTitleBar(props: {
-    title: string;
-    openSearch?: boolean;
-    scope?: boolean;
-    forceMenuOpen?: INavigationVariableItem;
-}) {
+function StoryTitleBar(props: { title: string; openSearch?: boolean; scope?: boolean; forceMenuOpen?: boolean }) {
     let dummyData: React.ReactNode[] = [];
     for (let i = 0; i < 350; i++) {
         dummyData.push(<p>Scrollable content</p>);
@@ -339,7 +335,7 @@ export const TitleBarGuestUser = storyWithConfig(
             return (
                 <Button baseClass={ButtonTypes.TITLEBAR_LINK}>
                     <>
-                        <GlobeIcon />
+                        <Icon icon="navigation-languages" />
                         <DownTriangleIcon />
                     </>
                 </Button>
@@ -555,7 +551,7 @@ const navigationItems: INavigationVariableItem[] = [
 
 export const TitleBarWithMegaMenu = storyWithConfig(
     { useWrappers: false, themeVars: { navigation: { navigationItems } } },
-    () => <StoryTitleBar forceMenuOpen={navigationItems[0]} title="With Mega Menu" />,
+    () => <StoryTitleBar forceMenuOpen title="With Mega Menu" />,
 );
 
 export const WithMobileOnlyNavigationItems = storyWithConfig(

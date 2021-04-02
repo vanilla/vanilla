@@ -428,6 +428,8 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface {
             ->addLinkIf('Garden.Settings.Manage', t('Routes'), '/dashboard/routes', 'site-settings.routes', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Statistics'), '/dashboard/statistics', 'site-settings.statistics', '', $sort)
 
+            ->addGroup('API Integrations', 'api', '', ['after' => 'site-settings'])
+
             ->addGroupIf('Garden.Settings.Manage', t('Forum Data'), 'forum-data', '', ['after' => 'site-settings'])
             ->addLinkIf(
                 \Vanilla\FeatureFlagHelper::featureEnabled('Import') && $session->checkPermission('Garden.Import'),
@@ -503,7 +505,7 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface {
         $sender->setData('_Limit', $limit);
 
         if ($search) {
-            $sQL->like('Name', $search, 'right');
+            $sQL->like('FullName', $search, 'right');
         }
 
         $queryType = $type;
@@ -547,7 +549,7 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface {
         $sender->setData('Tags', $data);
 
         if ($search) {
-            $sQL->like('Name', $search, 'right');
+            $sQL->like('FullName', $search, 'right');
         }
 
         // Make sure search uses its own search type, so results appear in their own tab.
@@ -699,9 +701,9 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface {
             throw notFoundException('Discussion');
         }
 
-        $hasPermission = Gdn::session()->checkPermission('Garden.Moderation.Manage');
+        $hasPermission = Gdn::session()->checkPermission('Vanilla.Tagging.Add');
         if (!$hasPermission && $discussion['InsertUserID'] !== GDN::session()->UserID) {
-            throw permissionException('Garden.Moderation.Manage');
+            throw permissionException('Vanilla.Tagging.Add');
         }
         $sender->title('Add Tags');
 

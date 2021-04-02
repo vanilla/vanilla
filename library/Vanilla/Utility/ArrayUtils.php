@@ -29,6 +29,18 @@ final class ArrayUtils {
     }
 
     /**
+     * Ensure the input is iterable.
+     *
+     * @param mixed $input The input to test.
+     * @param string $message The error message for the exception if the input is not iterable.
+     */
+    private static function assertIterable($input, string $message) {
+        if (!is_iterable($input)) {
+            throw new \InvalidArgumentException($message, 400);
+        }
+    }
+
+    /**
      * Escape reserved characters in an associative array key.
      *
      * @param string $key
@@ -125,7 +137,9 @@ final class ArrayUtils {
      * @return bool
      */
     public static function isAssociative($array): bool {
-        self::assertArray($array, __METHOD__ . "() expects argument 1 to be an array or array-like object.");
+        if (!self::isArray($array)) {
+            return false;
+        }
         $result = false;
 
         if (is_array($array)) {
@@ -236,6 +250,52 @@ final class ArrayUtils {
 
         self::assertArray($array, __METHOD__.'() expects argument 1 to be an array or array-like object.');
         $m($array, []);
+    }
+
+    /**
+     * Recursively walk a nested array and filter sub-arrays based on a filter callback.
+     *
+     * This function is similar to `array_filter()`, but it will walk the array recursively and filter based on sub-arrays
+     * and not each value.
+     *
+     * @param array|ArrayAccess $array The nested array to filter.
+     * @param callable $filter The filter function.
+     * @param bool $includeRoot Whether or not to include the root array.
+     * @return array|null Returns the filtered array or null if the root array is filtered out.
+     */
+    public static function filterRecursiveArray($array, callable $filter, bool $includeRoot = false) {
+        $m = function (&$array, array $path) use ($filter, &$m) {
+            $r = [];
+            foreach ($array as $key => $value) {
+                if (static::isArray($value)) {
+                    $subpath = array_merge($path, [$key]);
+                    $include = $filter($value, $subpath);
+
+                    if ($include) {
+                        if (is_iterable($value)) {
+                            $r[$key] = $m($value, $subpath);
+                        } else {
+                            $r[$key] = $value;
+                        }
+                    }
+                } else {
+                    $r[$key] = $value;
+                }
+            }
+            return $r;
+        };
+
+        self::assertArray($array, __METHOD__.'() expects argument 1 to be an array or array-like object.');
+        self::assertIterable($array, __METHOD__.'() expects argument 1 to be iterable.');
+
+        if ($includeRoot) {
+            $include = $filter($array, []);
+            if (!$include) {
+                return null;
+            }
+        }
+
+        return $m($array, []);
     }
 
     /**
@@ -479,5 +539,15 @@ final class ArrayUtils {
         } else {
             return (array)$array;
         }
+    }
+
+    /**
+     * Given an object, attempt to convert it to an associative array.
+     *
+     * @param object $object
+     * @return array
+     */
+    public static function objToArrayRecursive(object $object): array {
+        return json_decode(json_encode($object), true);
     }
 }

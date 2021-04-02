@@ -84,6 +84,8 @@ export function useMeasure(
         const ro = new ResizeObserver(measure);
         if (ref.current) {
             ro.observe(ref.current);
+            // Do the initial undebounced measure.
+            measure();
         } else {
             setContentRect(EMPTY_RECT);
         }

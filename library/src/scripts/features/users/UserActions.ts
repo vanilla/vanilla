@@ -43,7 +43,7 @@ export default class UserActions extends ReduxActions {
         }
         const apiThunk = bindThunkAction(UserActions.getMeACs, async () => {
             const response = await this.api.get("/users/me");
-            return response.data;
+            return response?.data;
         })();
 
         return this.dispatch(apiThunk);
@@ -55,13 +55,13 @@ export default class UserActions extends ReduxActions {
      */
     public getPermissions = () => {
         const permissions = this.getState().users.permissions;
-        if (permissions.status === LoadStatus.LOADING) {
+        if (permissions.status !== LoadStatus.PENDING) {
             // Don't request the user more than once.
             return;
         }
         const apiThunk = bindThunkAction(UserActions.getPermissionsACs, async () => {
-            const response = await this.api.get("/users/$me/permissions");
-            return response.data;
+            const response = await this.api.get("/users/$me/permissions?expand=junctions");
+            return response?.data;
         })();
 
         return this.dispatch(apiThunk);

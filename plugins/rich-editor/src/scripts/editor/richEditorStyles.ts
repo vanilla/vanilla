@@ -5,7 +5,6 @@
  */
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import {
-    absolutePosition,
     appearance,
     singleBorder,
     singleLineEllipsis,
@@ -23,14 +22,14 @@ import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { CSSObject } from "@emotion/css";
 import { buttonResetMixin } from "@library/forms/buttonMixins";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 
 export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
     const globalVars = globalVariables();
     const style = styleFactory("richEditor");
     const vars = richEditorVariables();
     const formVars = formElementsVariables();
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = panelLayoutVariables().mediaQueries();
 
     const root = style({
         position: "relative",
@@ -78,7 +77,7 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
     const iconWrap = style("iconWrap", {
         ...pointerEvents(),
         content: quote(``),
-        ...absolutePosition.middleOfParent(),
+        ...Mixins.absolute.middleOfParent(),
         width: styleUnit(vars.iconWrap.width),
         height: styleUnit(vars.iconWrap.width),
         ...Mixins.border({
@@ -124,7 +123,9 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
     const menuBar = style("menuBar", {
         position: "relative",
         width: styleUnit(vars.menuButton.size * 4),
-        fontSize: styleUnit(globalVars.fonts.size.medium),
+        ...Mixins.font({
+            ...globalVars.fontSizeAndWeightVars("medium"),
+        }),
         overflow: "hidden",
         zIndex: 1,
     });
@@ -362,7 +363,7 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
     });
 
     const close = style("close", {
-        ...absolutePosition.middleRightOfParent(),
+        ...Mixins.absolute.middleRightOfParent(),
         ...userSelect(),
         ...appearance(),
         width: styleUnit(vars.menuButton.size),

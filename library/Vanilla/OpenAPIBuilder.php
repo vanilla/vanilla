@@ -189,7 +189,11 @@ class OpenAPIBuilder {
             }
 
             foreach ($paths as $path) {
-                $data = $this->getFileData($path);
+                $data = FileUtils::getArray($path);
+                if (fnmatch('*.schema.*', $path)) {
+                    $data = $this->jsonSchemaToOpenAPI($data);
+                }
+
                 $this->cleanData($data);
                 $this->annotateData($data, $addon);
                 $results[] = $data;
@@ -208,36 +212,6 @@ class OpenAPIBuilder {
 
         foreach ($this->filters as $callback) {
             $callback($result);
-        }
-
-        return $result;
-    }
-
-
-    /**
-     * Load and parse an OpenAPI file.
-     *
-     * @param string $path The path to the file. The path must exist.
-     * @return array Returns the data from the file after parsing.
-     */
-    private function getFileData(string $path): array {
-        switch (pathinfo($path, PATHINFO_EXTENSION)) {
-            case 'json':
-                $result = json_decode(file_get_contents($path), true);
-                break;
-            case 'yml':
-            case 'yaml':
-                try {
-                    $result = Yaml::parseFile($path);
-                } catch (\Throwable $ex) {
-                    throw new \Exception("Error parsing $path: ".$ex->getMessage(), 500, $ex);
-                }
-                break;
-            default:
-                throw new \InvalidArgumentException("Unrecognized OpenAPI file extension for $path", 500);
-        }
-        if (!is_array($result)) {
-            throw new \Exception("Error parsing $path.", 500);
         }
 
         return $result;
@@ -322,7 +296,7 @@ class OpenAPIBuilder {
             }
         });
 
-        $data['info'] = $data['info'] ?: [];
+        $data['info'] = $data['info'] ?? [];
     }
 
     /**
@@ -347,5 +321,30 @@ class OpenAPIBuilder {
                 unset($this->filters[$i]);
             }
         }
+    }
+
+    /**
+     * Converts a JSON schema file to an Open API schema component.
+     *
+     * @param array $data
+     * @return array
+     */
+    private function jsonSchemaToOpenAPI(array $data): array {
+        $key = $data['$id'];
+        $definitions = $data['definitions'] ?? [];
+        unset($data['$schema'], $data['$id'], $data['definitions']);
+        $result = [
+            'components' => [
+                'schemas' => [$key => $data] + $definitions,
+            ]
+        ];
+
+        array_walk_recursive($result, function (&$value, $key) {
+            if ($key === '$ref') {
+                $value = str_replace('#/definitions/', '#/components/schemas/', $value);
+            }
+        });
+
+        return $result;
     }
 }

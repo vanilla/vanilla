@@ -9,28 +9,176 @@ paths:
         in: query
         schema:
           type: string
+      - name: type
+        description: The type of tags to list.
+        in: query
+        schema:
+          type: array
+          items:
+            type: string
+        style: form
+      - name: parentID
+        description: ID of parent to filter results.
+        in: query
+        schema:
+          type: array
+          items:
+            type: integer
+        style: form
       responses:
         '200':
           content:
             'application/json':
               schema:
-                items:
-                  properties:
-                    id:
-                      description: The ID of the tag.
-                      type: integer
-                    name:
-                      description: The full name of the tag.
-                      type: string
-                    urlCode:
-                      description: The url-code of the tag.
-                      type: string
-                  required:
-                  - id
-                  - name
-                  type: object
                 type: array
+                items:
+                  $ref: '#/components/schemas/LegacyTag'
           description: Success
       tags:
       - Tags
       summary: List tags.
+    post:
+      summary: Add a tag.
+      tags:
+        - Tags
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Tag'
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+        '401':
+          $ref: '#/components/responses/PermissionError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /tags/{id}:
+    parameters:
+      - name: id
+        description: The ID of the tag.
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      summary: Get a single tag.
+      tags:
+        - Tags
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+        '401':
+          $ref: '#/components/responses/PermissionError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      summary: Update a tag.
+      tags:
+        - Tags
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Tag'
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+        '401':
+          $ref: '#/components/responses/PermissionError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      summary: Delete a tag.
+      tags:
+        - Tags
+      responses:
+        '204':
+          description: Success.
+        '401':
+          $ref: '#/components/responses/PermissionError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Tag isn't empty.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BasicError'
+components:
+  schemas:
+    TagFragment:
+      description: A tag that can be applied to content.
+      type: object
+      properties:
+        tagID:
+          type: integer
+          description: The ID of the tag.
+          readOnly: true
+        urlcode:
+          type: string
+          description: The URL slug of the tag.
+        name:
+          type: string
+          description: The full name of the tag.
+      required:
+        - tagID
+        - urlcode
+        - name
+    Tag:
+      description: A full tag.
+      allOf:
+        - $ref: '#/components/schemas/TagFragment'
+        - type: object
+          properties:
+            parentTagID:
+              type: integer
+              description: The parent ID of the tag.
+            type:
+              type: string
+              description: The tag type.
+        - $ref: '#/components/schemas/InsertInfo'
+
+    LegacyTag:
+      description: A backwards compatible tag.
+      allOf:
+        - $ref: '#/components/schemas/TagFragment'
+        - type: object
+          properties:
+            id:
+              type: integer
+              description: The ID of the tag.
+              deprecated: true
+            urlCode:
+              description: The url-code of the tag.
+              type: string
+              deprecated: true
+          required:
+            - id
+            - urlCode
+    TagReference:
+      description: A reference to a tag for assignment to other items.
+      type: object
+      properties:
+        tagIDs:
+          type: array
+          items:
+            type: integer
+          description: You can specify the name of the tag.
+        urlcodes:
+          type: array
+          items:
+            type: string
+          description: You can also specify the url code of the tag.

@@ -1,10 +1,12 @@
-<?php use Vanilla\Theme\BoxThemeShim;if (!defined('APPLICATION')) exit();
+<?php use Vanilla\Forum\Modules\FoundationDiscussionsShim;
+use Vanilla\Theme\BoxThemeShim;if (!defined('APPLICATION')) exit();
 $Session = Gdn::session();
 $isDataDrivenTheme = Gdn::themeFeatures()->useDataDrivenTheme();
 include_once $this->fetchViewLocation('helper_functions', 'discussions', 'vanilla');
 include_once $this->fetchViewLocation('helper_functions', 'categories', 'vanilla');
 
 $checkMark = !$isDataDrivenTheme ? adminCheck(NULL, ['', ' ']) : '';
+BoxThemeShim::startHeading();
 echo '<h1 class="H HomepageTitle">'.
     $checkMark.
     $this->data('Title').
@@ -14,8 +16,9 @@ echo '<h1 class="H HomepageTitle">'.
 $htmlSanitizer = Gdn::getContainer()->get(\Vanilla\Formatting\Html\HtmlSanitizer::class);
 $Description = $htmlSanitizer->filter($this->data('Category.Description', $this->description()));
 echo wrapIf($Description, 'div', ['class' => 'P PageDescription']);
-
 $this->fireEvent('AfterPageTitle');
+BoxThemeShim::endHeading();
+
 
 $subtreeView = $this->fetchViewLocation('subtree', 'categories', 'vanilla', false);
 if ($subtreeView) {
@@ -53,9 +56,16 @@ echo '</div>';
 if ($this->DiscussionData->numRows() > 0 || (isset($this->AnnounceData) && is_object($this->AnnounceData) && $this->AnnounceData->numRows() > 0)) {
     ?>
     <h2 class="sr-only"><?php echo t('Discussion List'); ?></h2>
-    <ul class="DataList Discussions pageBox">
-        <?php include($this->fetchViewLocation('discussions', 'Discussions', 'Vanilla')); ?>
-    </ul>
+    <?php
+    if (!FoundationDiscussionsShim::isEnabled()) {
+        echo '<ul class="DataList Discussions pageBox">';
+    }
+    include($this->fetchViewLocation('discussions', 'Discussions', 'Vanilla'));
+    if (!FoundationDiscussionsShim::isEnabled()) {
+        echo '</ul>';
+
+    }
+    ?>
     <?php $this->fireEvent('AfterDiscussionsList'); ?>
     <?php
 

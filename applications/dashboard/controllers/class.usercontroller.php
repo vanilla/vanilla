@@ -114,9 +114,19 @@ class UserController extends DashboardController {
         $filter['Optimize'] = Gdn::userModel()->pastUserThreshold();
 
         // Sorting
-        if (in_array($order, ['DateInserted', 'DateFirstVisit', 'DateLastActive'])) {
+        $allowedSorting = [
+            'Name' => 'asc',
+            'DateInserted' => 'desc',
+            'DateFirstVisit' => 'desc',
+            'DateLastActive' => 'desc'
+        ];
+
+        $eventManager = Gdn::getContainer()->get(\Garden\EventManager::class);
+        $allowedSorting = $eventManager->fireFilter('userController_usersListAllowedSorting', $allowedSorting);
+
+        if (isset($allowedSorting[$order])) {
+            $orderDir = $allowedSorting[$order];
             $order = 'u.'.$order;
-            $orderDir = 'desc';
         } else {
             $order = 'u.Name';
             $orderDir = 'asc';
@@ -140,7 +150,7 @@ class UserController extends DashboardController {
                 $this->setData('_CurrentRecords', 0);
                 if (!Gdn::userModel()->pastUserMegaThreshold()) {
                     // Restoring this semi-optimized counter is our compromise to let non-mega sites know their exact total users.
-                    $this->setData('UserCount', $userModel->getCount());
+                    $this->setData('UserCount', $userModel->getCount(['Deleted' => 0]));
                 } else {
                     // Dang, yo. Get a table status guess instead of really counting.
                     $this->setData('UserEstimate', Gdn::userModel()->countEstimate());

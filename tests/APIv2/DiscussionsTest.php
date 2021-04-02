@@ -9,17 +9,15 @@ namespace VanillaTests\APIv2;
 
 use CategoryModel;
 use DiscussionModel;
+use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\ForbiddenException;
-use Gdn_Configuration;
-use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\DiscussionTypeConverter;
 use VanillaTests\Models\TestDiscussionModelTrait;
-use VanillaTests\SiteTestTrait;
 
 /**
  * Test the /api/v2/discussions endpoints.
  */
 class DiscussionsTest extends AbstractResourceTest {
-
     use TestExpandTrait;
     use TestPutFieldTrait;
     use AssertLoggingTrait;
@@ -40,8 +38,6 @@ class DiscussionsTest extends AbstractResourceTest {
 
         $this->patchFields = ['body', 'categoryID', 'closed', 'format', 'name', 'pinLocation', 'pinned', 'sink'];
         $this->sortFields = ['dateLastComment', 'dateInserted', 'discussionID'];
-
-
 
         parent::__construct($name, $data, $dataName);
     }
@@ -124,6 +120,7 @@ class DiscussionsTest extends AbstractResourceTest {
         parent::setUp();
         DiscussionModel::categoryPermissions(false, true);
         $this->setupTestDiscussionModel();
+        $this->createUserFixtures();
     }
 
     /**
@@ -288,7 +285,7 @@ class DiscussionsTest extends AbstractResourceTest {
      * @requires testExpandLastPostBody
      */
     public function testExpandLastUser() {
-        $rows = $this->api()->get($this->baseUrl, ['expand' => 'lastPost,lastPost.insertUser']);
+        $rows = $this->api()->get($this->baseUrl, ['expand' => 'lastPost,lastPost.insertUser,-lastUser']);
         $this->assertArrayHasKey('insertUser', $rows[0]['lastPost']);
         $this->assertArrayNotHasKey('lastUser', $rows[0]);
 
@@ -378,6 +375,39 @@ class DiscussionsTest extends AbstractResourceTest {
     }
 
     /**
+     * A member should not be able to delete their own discussion.
+     */
+    public function testNoDeleteOwnDiscussion(): void {
+        $this->getSession()->start($this->memberID);
+        $discussion = $this->insertDiscussions(1)[0];
+        $this->assertFalse(
+            $this->getSession()->getPermissions()->has('Vanilla.Discussions.Delete', $discussion['CategoryID']),
+            'The member should not have permission to delete discussions.'
+        );
+
+        $this->expectException(ForbiddenException::class);
+        $this->api()->delete("/discussions/{$discussion['DiscussionID']}");
+    }
+
+    /**
+     * Test expanding tags.
+     */
+    public function testExpandTags(): void {
+        self::resetTable('Discussion');
+        $discussionA = $this->testPost();
+        $tagA = $this->api()->post('tags', ['name' => 'testa'.__FUNCTION__, 'urlCode'=> 'testa'.__FUNCTION__])->getBody();
+        $this->api()->post("discussions/{$discussionA["discussionID"]}/tags", ["urlcodes" => [$tagA['urlcode']], "tagIDs" => [$tagA['tagID']]]);
+        $discussions = $this->api()->get("discussions", ['expand' => 'tags'])->getBody();
+        foreach ($discussions as $discussion) {
+            $tags = $discussion['tags'];
+            $this->assertEquals($tagA['tagID'], $tags[0]['tagID']);
+        }
+        $discussion = $this->api()->get("discussions/".$discussionA['discussionID'], ['expand' => 'tags'])->getBody();
+        $tags = $discussion['tags'];
+        $this->assertEquals($tagA['tagID'], $tags[0]['tagID']);
+    }
+
+    /**
      * Ensure that there are dirtyRecords for a specific resource.
      */
     protected function triggerDirtyRecords() {
@@ -388,6 +418,54 @@ class DiscussionsTest extends AbstractResourceTest {
         foreach ($ids as $id) {
             $discussionModel->setField($id, 'Announce', 1);
         }
+    }
+
+    /**
+     * Test PUT /discussions/:id/type
+     */
+    public function testPutDiscussionsType() {
+        $discussion = $this->insertDiscussions(1)[0];
+        /** @var DiscussionModel $discussionModel */
+        $discussionModel = \Gdn::getContainer()->get(DiscussionModel::class);
+        $id = $discussion["DiscussionID"];
+        $discussionModel->setField($id, 'Type', "Question");
+
+        $convertedDiscussion = $this->api()->put("/discussions/{$id}/type", ["type" => "discussion"])->getBody();
+        $this->assertEquals("discussion", $convertedDiscussion["type"]);
+    }
+
+    /**
+     * Test PUT /discussions/:id/type with invalid type.
+     */
+    public function testPutDiscussionsTypeInvalidType() {
+        $this->expectException(ClientException::class);
+        $discussion = $this->insertDiscussions(1)[0];
+        $id = $discussion["DiscussionID"];
+
+        $convertedDiscussion = $this->api()->put("/discussions/{$id}/type", ["type" => "poll"])->getBody();
+        $this->assertEquals("discussion", $convertedDiscussion["type"]);
+    }
+
+    /**
+     * Test PUT /discussions/:id/type with restricted type.
+     */
+    public function testPutDiscussionsTypeRestrictedType() {
+        $this->expectException(ClientException::class);
+        $discussion = $this->insertDiscussions(1)[0];
+        $id = $discussion["DiscussionID"];
+
+        $convertedDiscussion = $this->api()->put("/discussions/{$id}/type", ["type" => DiscussionTypeConverter::RESTRICTED_TYPES[0]])->getBody();
+        $this->assertEquals("discussion", $convertedDiscussion["type"]);
+    }
+
+    /**
+     * Test PUT /discussions/:id/type with no record.
+     */
+    public function testPutDiscussionsTypeInvalidRecord() {
+        $this->expectException(ClientException::class);
+        $id = null;
+        $convertedDiscussion = $this->api()->put("/discussions/{$id}/type", ["type" => "discussion"])->getBody();
+        $this->assertEquals("discussion", $convertedDiscussion["type"]);
     }
 
     /**

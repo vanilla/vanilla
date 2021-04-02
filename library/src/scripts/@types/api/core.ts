@@ -14,7 +14,7 @@ export enum LoadStatus {
     ERROR = "ERROR",
 }
 
-export interface ILoadable<T, E = IApiError> {
+export interface ILoadable<T = never, E = IApiError> {
     status: LoadStatus;
     error?: E;
     data?: T;

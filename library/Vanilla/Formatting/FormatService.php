@@ -55,7 +55,6 @@ class FormatService {
             ->filter($content);
     }
 
-
     /**
      * Render a safe, sanitized, short version of some content.
      *
@@ -218,6 +217,19 @@ class FormatService {
     }
 
     /**
+     * Check if we have a registered format.
+     *
+     * @param string|null $formatKey
+     * @return bool
+     */
+    public function hasFormat(?string $formatKey): bool {
+        if ($formatKey === null) {
+            return false;
+        }
+        return array_key_exists(strtolower($formatKey), $this->formats);
+    }
+
+    /**
      * Get an instance of a formatter.
      *
      * @param string $formatKey The key of the format to fetch.
@@ -226,7 +238,7 @@ class FormatService {
      * @return FormatInterface
      * @throws FormatterNotFoundException If $throw === true &&  the formatter that was requested could not be found.
      */
-    private function getFormatter(?string $formatKey, $throw = false): FormatInterface {
+    public function getFormatter(?string $formatKey, $throw = false): FormatInterface {
         $formatKey = strtolower($formatKey) ?? null;
         $instance = $this->formatInstances[$formatKey] ?? null;
 

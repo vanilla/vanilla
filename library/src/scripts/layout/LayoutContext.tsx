@@ -7,7 +7,7 @@
 import { Optionalize } from "@library/@types/utils";
 import throttle from "lodash/throttle";
 import React, { useContext, useEffect, useState } from "react";
-import { IPanelLayoutClasses } from "@library/layout/panelLayoutStyles";
+import { IPanelLayoutClasses } from "@library/layout/PanelLayout.styles";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
 import { mediaQueryFactory } from "@library/layout/types/mediaQueryFactory";
 import { IAllLayoutDevices, ILayoutMediaQueryFunction } from "@library/layout/types/interface.panelLayout";

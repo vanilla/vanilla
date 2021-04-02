@@ -163,6 +163,10 @@ class ArrayUtilsTest extends TestCase {
             "mixed" => [["foo" => "bar", "Hello world."], true],
             "empty" => [[], false],
             "ArrayObject" => [new \ArrayObject(["foo" => "bar"]), true],
+            "string" => ["test", false],
+            "number" => [42, false],
+            "null" => [null, false],
+            "object" => [new \stdClass(), false],
         ];
 
         return $result;
@@ -525,5 +529,99 @@ class ArrayUtilsTest extends TestCase {
                 'key'
             )
         );
+    }
+
+    /**
+     * Verify conversion from an object to an array using objToArrayRecursive.
+     *
+     * @param object $obj
+     * @param array $expected
+     * @dataProvider provideObjectsToArrays
+     */
+    public function testObjToArrayRecursive(object $obj, array $expected): void {
+        $actual = ArrayUtils::objToArrayRecursive($obj);
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * Provide data for testing object-to-array conversion.
+     *
+     * @return array
+     */
+    public function provideObjectsToArrays(): array {
+        return [
+            "Basic" => [
+                (object)["a" => 1, "b" => 2],
+                ["a" => 1, "b" => 2],
+            ],
+            "Nested" => [
+                (object)["foo" => (object)["hello" => "world"]],
+                ["foo" => ["hello" => "world"]],
+            ]
+        ];
+    }
+
+    /**
+     * Test `ArrayUtils::filterRecursiveArray()`.
+     *
+     * @param array $array
+     * @param array $expected
+     * @dataProvider provideFilterRecursiveArrayTests
+     */
+    public function testFilterRecursiveArray($array, $expected): void {
+        $fn = function (&$array) {
+            if (!empty($array['hidden'])) {
+                return false;
+            } else {
+                $array['hidden'] = false;
+                return true;
+            }
+        };
+
+        $actual = ArrayUtils::filterRecursiveArray($array, $fn);
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * Make sure the array can filter itself if desired.
+     */
+    public function testFilterRecursiveArrayRoot(): void {
+        $fn = function ($array) {
+            return isset($array['foo']);
+        };
+
+        $actual = ArrayUtils::filterRecursiveArray(['a'], $fn, true);
+        $this->assertNull($actual);
+    }
+
+    /**
+     * Provide tests for `testFilterRecursiveArray()`.
+     *
+     * @return array
+     */
+    public function provideFilterRecursiveArrayTests(): array {
+        $r = [
+            'flat' => [['a', 'b'], ['a', 'b']],
+            'no-filter' => [[['a'], ['b']], [[0 => 'a', 'hidden' => false], [0 => 'b', 'hidden' => false]]],
+            'one-filter' => [['a', ['hidden' => true]], ['a']],
+            'recursive' => [
+                ['a' => [
+                    'b' => [
+                        'hidden' => true,
+                    ],
+                    'c' => [
+                    ],
+                ]],
+                [
+                    'a' => [
+                        'c' => [
+                            'hidden' => false,
+                        ],
+                        'hidden' => false,
+                    ],
+                ],
+            ],
+        ];
+        return $r;
     }
 }

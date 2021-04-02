@@ -30,9 +30,9 @@ export function TagsInput(props: IProps) {
             }}
             options={data.map((tag) => {
                 return {
-                    value: tag.id,
+                    value: tag.tagID,
                     label: tag.name,
-                    tagCode: tag.urlCode,
+                    tagCode: tag.urlcode,
                 };
             })}
             isLoading={!!text || [LoadStatus.PENDING, LoadStatus.LOADING].includes(status)}

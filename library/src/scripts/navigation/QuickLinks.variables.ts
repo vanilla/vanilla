@@ -24,32 +24,10 @@ export const quickLinksVariables = useThemeCache((forcedVars?: IThemeVariables) 
      * @title Quick Links - Box
      * @expand box
      */
-    const box = makeThemeVars("box", Variables.box({}));
+    const box = makeThemeVars("box", Variables.box(globalVars.panelBoxes.depth2));
 
     const links: INavigationVariableItem[] = makeThemeVars("links", []);
     const counts: Record<string, number | null> = makeThemeVars("counts", {});
-
-    /**
-     * @varGroup quickLinks.title
-     */
-    const title = makeThemeVars("title", {
-        /**
-         * @varGroups quickLinks.title.font
-         * @expand font
-         */
-        font: Variables.font({
-            size: globalVars.fonts.size.subTitle,
-            weight: globalVars.fonts.weights.bold,
-            color: globalVars.mainColors.fg,
-        }),
-        /**
-         * @varGroups quickLinks.title.spacing
-         * @expand spacing
-         */
-        spacing: Variables.spacing({
-            bottom: 16,
-        }),
-    });
 
     /**
      * @varGroup quickLinks.listItem
@@ -89,8 +67,7 @@ export const quickLinksVariables = useThemeCache((forcedVars?: IThemeVariables) 
          * @expand font
          */
         font: Variables.font({
-            size: globalVars.fonts.size.medium,
-            weight: globalVars.fonts.weights.normal,
+            ...globalVars.fontSizeAndWeightVars("medium", "normal"),
         }),
         /**
          * @varGroup quickLinks.listItem.fgColor
@@ -151,7 +128,6 @@ export const quickLinksVariables = useThemeCache((forcedVars?: IThemeVariables) 
     });
 
     return {
-        title,
         listItem,
         listItemTitle,
         count,

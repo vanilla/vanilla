@@ -10,9 +10,9 @@ import { TLength } from "@library/styles/styleShim";
 import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { ColorHelper } from "csx";
-import { FontSizeProperty, MarginProperty, PaddingProperty } from "csstype";
 import { TileAlignment } from "@library/features/tiles/TileAlignment";
 import { tilesVariables } from "@library/features/tiles/Tiles.variables";
+import { Property } from "csstype";
 
 export const tileVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -39,21 +39,21 @@ export const tileVariables = useThemeCache(() => {
     }
 
     const frame = themeVars("frame", {
-        height: frameHeight as PaddingProperty<TLength>,
-        width: frameWidth as PaddingProperty<TLength>,
-        marginBottom: 16 as MarginProperty<TLength>,
+        height: frameHeight as number | Property.Height,
+        width: frameWidth as number | Property.Width,
+        marginBottom: 16,
     });
 
     const title = themeVars("title", {
         font: Variables.font({
-            size: globalVars.fonts.size.large as FontSizeProperty<TLength>,
+            ...globalVars.fontSizeAndWeightVars("large"),
             lineHeight: globalVars.lineHeights.condensed,
         }),
         marginBottom: 6,
     });
 
     const description = themeVars("description", {
-        fontSize: globalVars.fonts.size.medium as FontSizeProperty<TLength>,
+        fontSize: globalVars.fonts.size.medium,
         marginTop: 6,
         lineHeight: globalVars.lineHeights.excerpt,
     });

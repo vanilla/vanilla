@@ -5,7 +5,7 @@
 
 import React from "react";
 import { StoryHeading } from "@library/storybook/StoryHeading";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { MemoryRouter } from "react-router";
 import { BannerContextProvider } from "@library/banner/BannerContext";
 import { TitleBarDeviceProvider } from "@library/layout/TitleBarContext";
@@ -20,9 +20,9 @@ export default {
         chromatic: {
             viewports: [
                 1450,
-                layoutVariables().panelLayoutBreakPoints.twoColumns,
-                layoutVariables().panelLayoutBreakPoints.oneColumn,
-                layoutVariables().panelLayoutBreakPoints.xs,
+                panelLayoutVariables().panelLayoutBreakPoints.twoColumns,
+                panelLayoutVariables().panelLayoutBreakPoints.oneColumn,
+                panelLayoutVariables().panelLayoutBreakPoints.xs,
             ],
         },
     },

@@ -222,11 +222,13 @@
         }
     }
 
-    .Tag,
-    .MItem {
-        margin: {
-            left: $utility-baseUnit;
-            right: $utility-baseUnit;
+    @if ($staticVariables) {
+        .Tag,
+        .MItem {
+            margin: {
+                left: $utility-baseUnit;
+                right: $utility-baseUnit;
+            }
         }
     }
 
@@ -252,15 +254,17 @@
         }
     }
 
-    .MostRecent,
-    .MostRecentBy {
+    @if $staticVariables {
+        .MostRecent,
+        .MostRecentBy {
 
-        > * {
-            white-space: normal;
-        }
+            > * {
+                white-space: normal;
+            }
 
-        a {
-            display: inline;
+            a {
+                display: inline;
+            }
         }
     }
 
@@ -315,8 +319,10 @@
         margin-right: 0;
     }
 
-    .MItem .userCardWrapper-link {
-        margin-left: $utility-baseUnit;
+    @if $staticVariables {
+        .MItem .userCardWrapper-link {
+            margin-left: $utility-baseUnit;
+        }
     }
 
     // overwrite ideation plugin styles
@@ -330,9 +336,11 @@
             }
         }
 
-        .Meta {
-            .ViewCount {
-                margin-left: 0;
+        @if ($staticVariables) {
+            .Meta {
+                .ViewCount {
+                    margin-left: 0;
+                }
             }
         }
     }
@@ -368,23 +376,18 @@
         height: inherit;
     }
 
-    .MItem.MItem-Resolved {
-        display: inline-block;
-        width: 13px;
-        height: 14px;
-        padding: 0;
-        margin-bottom: 0;
-        line-height: inherit;
-        font-size: inherit;
-        vertical-align: middle;
+    @if $staticVariables {
+        .MItem.MItem-Resolved {
+            display: inline-block;
+            width: 13px;
+            height: 14px;
+            padding: 0;
+            margin-bottom: 0;
+            line-height: inherit;
+            font-size: inherit;
+            vertical-align: middle;
+        }
     }
-
-    .resolved2-unresolved,
-    .resolved2-resolved {
-        top: initial;
-        display: block;
-    }
-
     .Hero {
         padding: 0;
     }
@@ -543,11 +546,13 @@
                 border-top-right-radius: $component_borderRadius;
             }
 
-            .PhotoWrap {
-                margin: 0;
-                position: absolute;
-                top: $component-vertical_padding;
-                left: $component-horizontal_padding;
+            @if $staticVariables {
+                .PhotoWrap {
+                    margin: 0;
+                    position: absolute;
+                    top: $component-vertical_padding;
+                    left: $component-horizontal_padding;
+                }
             }
         }
 

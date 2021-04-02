@@ -36,6 +36,7 @@ interface IProps {
     buttonBaseClass: ButtonTypes;
     buttonClassName?: string;
     isVisible?: boolean;
+    forceVisible?: boolean;
     onVisibilityChange?: (isVisible: boolean) => void;
     renderAbove?: boolean;
     renderLeft?: boolean;
@@ -55,7 +56,7 @@ export default function FlyoutToggle(props: IProps) {
 
     const controllerRef = useRef<HTMLDivElement>(null);
     const [ownIsVisible, ownSetVisibility] = useState(false);
-    const isVisible = props.isVisible !== undefined ? props.isVisible : ownIsVisible;
+    const isVisible = props.forceVisible ? true : props.isVisible !== undefined ? props.isVisible : ownIsVisible;
     const setVisibility = useCallback(
         (visibility: boolean) => {
             ownSetVisibility(visibility);
@@ -137,11 +138,14 @@ export default function FlyoutToggle(props: IProps) {
         e.stopPropagation();
     }, []);
 
-    const handleFocusChange = (hasFocus: boolean) => {
-        if (!hasFocus) {
-            setVisibility(false);
-        }
-    };
+    const handleFocusChange = useCallback(
+        (hasFocus: boolean) => {
+            if (!hasFocus) {
+                setVisibility(false);
+            }
+        },
+        [setVisibility],
+    );
 
     // Focus handling
     useFocusWatcher(controllerRef, handleFocusChange, props.openAsModal);

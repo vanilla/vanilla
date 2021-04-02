@@ -19,6 +19,9 @@ components:
                 format: int32
             required:
               - message
+          example:
+            status: 404
+            message: Page Not Found
     PermissionError:
       description: You don't have adequate permissions to access this resource.
       content:
@@ -33,3 +36,22 @@ components:
                 type: number
                 description: The HTTP status code for the error.
                 format: int32
+          example:
+            status: 401
+            message: Permission Problem
+  schemas:
+    BasicError:
+      type: object
+      properties:
+        message:
+          description: Verbose description of the error.
+          type: string
+        status:
+          description: Response status code.
+          type: integer
+        errorType:
+          description: A system error code that further breaks down the error.
+          type: string
+      required:
+        - message
+        - status

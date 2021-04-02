@@ -1430,7 +1430,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
      * @return array Compiled permissions
      */
     public static function compilePermissions($rawPermissions) {
-        $permissions = new Vanilla\Permissions();
+        $permissions = Gdn::permissionModel()->createPermissionInstance();
         $permissions->compileAndLoad($rawPermissions);
         return $permissions->getPermissions();
     }
@@ -2858,6 +2858,9 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
             $row['CountComments'] = 0;
         }
 
+        $name = $row['Name'] ?? '';
+        $row['Name'] = $name ? $row['Name'] : t('(Unspecified Name)');
+
         $row['CountPosts'] = $row['CountComments'] + $row['CountDiscussions'];
         $result = ArrayUtils::camelCase($row);
 
@@ -3272,12 +3275,18 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
                 }
             } else {
                 // Search on the user table.
-                $like = ['u.Name' => $keywords, 'u.Email' => $keywords];
+                $whereCriterias = [
+                    'where' => [],
+                    'like' => ['u.Name' => $keywords, 'u.Email' => $keywords]
+                ];
+
+                $whereCriterias = $this->getEventManager()->fireFilter('userModel_searchKeyWords', $whereCriterias, $keywords);
 
                 $this->SQL
                     ->orOp()
                     ->beginWhereGroup()
-                    ->orLike($like, '', 'right')
+                    ->orLike($whereCriterias['like'] ?? [], '', 'right')
+                    ->orWhere($whereCriterias['where'] ?? [])
                     ->endWhereGroup();
             }
         }
@@ -5616,8 +5625,9 @@ SQL;
      * @return Vanilla\Permissions
      */
     public function getPermissions($userID) {
-        $permissions = new Vanilla\Permissions();
+        $permissions = Gdn::permissionModel()->createPermissionInstance();
         $permissionsKey = '';
+        $user = $this->getID($userID, DATASET_TYPE_ARRAY);
 
         if (Gdn::cache()->activeEnabled()) {
             $permissionsIncrement = $this->getPermissionsIncrement();
@@ -5629,12 +5639,15 @@ SQL;
             $cachedPermissions = Gdn::cache()->get($permissionsKey);
             if ($cachedPermissions !== Gdn_Cache::CACHEOP_FAILURE) {
                 $permissions->setPermissions($cachedPermissions);
+                $permissions->setAdmin($user['Admin'] > 0);
                 return $permissions;
             }
         }
 
         $data = Gdn::permissionModel()->getPermissionsByUser($userID);
         $permissions->setPermissions($data);
+        $admin = $user['Admin'] ?? null;
+        $permissions->setAdmin($admin > 0);
 
         $this->EventArguments['UserID'] = $userID;
         $this->EventArguments['Permissions'] = $permissions;

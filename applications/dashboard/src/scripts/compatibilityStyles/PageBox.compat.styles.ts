@@ -9,20 +9,25 @@ import { MixinsFoundation } from "@library/styles/MixinsFoundation";
 import { useThemeCache } from "@library/styles/themeCache";
 import { cssRaw } from "@library/styles/styleShim";
 import { Mixins } from "@library/styles/Mixins";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { percent } from "csx/lib/units";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
+import { extendItemContainer } from "@library/styles/styleHelpers";
+import { injectGlobal } from "@emotion/css";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
 
 export const pageBoxCompatStyles = useThemeCache(() => {
     const globalVars = globalVariables();
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = panelLayoutVariables().mediaQueries();
 
     MixinsFoundation.contentBoxes(globalVars.contentBoxes);
+    MixinsFoundation.contentBoxes(globalVars.panelBoxes, undefined, ".Panel");
 
     // Apply heading boxes
 
-    const allHeadings = "& h1, & h2, & h3, & h4, & h5, & [role='heading']";
-    cssRaw({
+    const allHeadings =
+        "& h1:not(.subtitle), & h2:not(.subtitle), & h3:not(.subtitle), & h4:not(.subtitle), & h5:not(.subtitle), & [role='heading']:not(.subtitle)";
+    injectGlobal({
         ".pageHeadingBox.pageHeadingBox.pageHeadingBox": {
             margin: 0,
             padding: 0,
@@ -31,9 +36,9 @@ export const pageBoxCompatStyles = useThemeCache(() => {
             flexWrap: "wrap",
             border: "none",
             justifyContent: "space-between",
-            ...Mixins.padding(globalVars.headingBox.spacing),
+            ...Mixins.margin({ bottom: globalVars.spacer.headingBox }),
             ...mediaQueries.oneColumnDown({
-                ...Mixins.padding(globalVars.headingBox.mobileSpacing),
+                ...Mixins.margin({ bottom: globalVars.spacer.headingBoxCompact }),
             }),
 
             "&:first-child": {
@@ -45,27 +50,47 @@ export const pageBoxCompatStyles = useThemeCache(() => {
             },
 
             [allHeadings]: {
-                margin: 0,
                 padding: 0,
-                fontSize: globalVars.fonts.size.largeTitle,
-                ...lineHeightAdjustment(),
 
-                "& > a": {
+                ...Mixins.font({
+                    ...globalVars.fontSizeAndWeightVars("title"),
+                    color: ColorsUtils.colorOut(globalVars.mainColors.fgHeading),
+                }),
+
+                width: "auto",
+                flex: 1,
+                justifyContent: "flex-start",
+                ...Mixins.margin({ all: 0, bottom: globalVars.spacer.headingItem }),
+                ...mediaQueries.oneColumnDown({
+                    fontSize: globalVars.fonts.mobile.size.title,
+                }),
+
+                "& > a:not([role='button'])": {
                     fontSize: "inherit",
                     fontWeight: "inherit",
                     color: "inherit",
                 },
             },
 
+            "&.isLarge": {
+                [allHeadings]: {
+                    ...Mixins.font({
+                        ...globalVars.fontSizeAndWeightVars("largeTitle"),
+                    }),
+                    ...mediaQueries.oneColumnDown({
+                        fontSize: globalVars.fonts.mobile.size.largeTitle,
+                    }),
+                },
+            },
+
             "& > p, & > .userContent, & > .P, & > .PageDescription": {
                 width: "100%",
-                ...Mixins.padding(globalVars.headingBox.descriptionSpacing),
+                padding: 0,
+                ...Mixins.margin({ bottom: globalVars.spacer.headingItem }),
             },
         },
-        ".pageBox .pageHeadingBox.pageHeadingBox.pageHeadingBox, .pageHeadingBox.isSmall.isSmall.isSmall": {
-            [allHeadings]: {
-                fontSize: globalVars.fonts.size.title,
-            },
+        ".MainContent .pageHeadingBox.pageHeadingBox.pageHeadingBox": {
+            ...Mixins.margin({ bottom: globalVars.spacer.headingBoxCompact }),
         },
         ".pageBox .Empty": {
             margin: 0,
@@ -73,6 +98,44 @@ export const pageBoxCompatStyles = useThemeCache(() => {
         },
         ".pageBox + .PageControls": {
             marginTop: 16,
+        },
+
+        ".GuestBox": {
+            margin: 0,
+            marginBottom: 4,
+
+            "& .GuestBox-buttons": {
+                width: "100%",
+                display: "flex",
+                marginBottom: 4,
+                ...extendItemContainer(4),
+            },
+
+            "& .Button": {
+                flex: 1,
+                margin: 4,
+            },
+        },
+    });
+
+    cssRaw({
+        ".Panel .pageHeadingBox.pageHeadingBox.pageHeadingBox.pageHeadingBox.pageHeadingBox": {
+            padding: 0,
+            // Super compact.
+            ...Mixins.margin({ bottom: 0 }),
+            [allHeadings]: {
+                ...Mixins.font({
+                    ...globalVars.fontSizeAndWeightVars("subTitle"),
+                }),
+            },
+            ...mediaQueries.oneColumnDown({
+                ...Mixins.margin({ bottom: 0 }),
+                [allHeadings]: {
+                    ...Mixins.font({
+                        ...globalVars.fontSizeAndWeightVars("subTitle"),
+                    }),
+                },
+            }),
         },
     });
 });

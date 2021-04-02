@@ -412,9 +412,7 @@ EOT;
     public function testDefaultRadio(): void {
         $actual = $this->form->radio('fo>"', 'bar', ['value' => '2']);
         $expected = <<<EOT
-<label>
-    <input id=Form_fo name=fo&gt;&quot; type=radio value=2> bar
-</label>
+<label><input id=Form_fo name=fo&gt;&quot; type=radio value=2> bar</label>
 EOT;
         $this->assertHtmlStringEqualsHtmlString($expected, $actual);
     }
@@ -427,16 +425,10 @@ EOT;
         $expected = <<<EOT
 <ul class="CheckBoxList">
     <li><div class="checkbox">
-        <label for="foo1">
-            <input type="hidden" name="Checkboxes[]" value="foo" />
-            <input type="checkbox" id="foo1" name="foo[]" value="b" class="" /> a
-        </label>
+        <label for="foo1"><input type="hidden" name="Checkboxes[]" value="foo" /><input type="checkbox" id="foo1" name="foo[]" value="b" class="" /> a</label>
     </div></li>
     <li><div class="checkbox">
-        <label for="foo2">
-            <input type="hidden" name="Checkboxes[]" value="foo" />
-            <input type="checkbox" id="foo2" name="foo[]" value="d" class="" /> c
-        </label>
+        <label for="foo2"><input type="hidden" name="Checkboxes[]" value="foo" /><input type="checkbox" id="foo2" name="foo[]" value="d" class="" /> c</label>
     </div></li>
 </ul>
 EOT;
@@ -450,14 +442,9 @@ EOT;
         $actual = $this->form->radioList('foo', ['a' => 'b', 'c' => 'd']);
         $expected = <<<EOT
 <div class="radio">
-    <label>
-        <input type="radio" id="Form_foo" name="foo" value="a" class="" /> b
-    </label>
-</div>
+    <label><input type="radio" id="Form_foo" name="foo" value="a" class="" /> b</label></div>
 <div class="radio">
-    <label>
-        <input type="radio" id="Form_foo1" name="foo" value="c" class="" /> d
-    </label>
+    <label><input type="radio" id="Form_foo1" name="foo" value="c" class="" /> d</label>
 </div>
 EOT;
         $this->assertHtmlStringEqualsHtmlString($expected, $actual);

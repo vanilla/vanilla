@@ -11,8 +11,8 @@ import { cx } from "@library/styles/styleShim";
 
 export interface ICommonHeadingProps {
     id?: string;
-    depth?: 1 | 2 | 3 | 4 | 5 | 6;
-    renderAsDepth?: 1 | 2 | 3 | 4 | 5 | 6;
+    depth?: number;
+    renderAsDepth?: number;
     className?: string;
     title?: React.ReactNode;
 }

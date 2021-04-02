@@ -394,9 +394,8 @@ if (!function_exists('writeCategoryList')):
         }
 
         ?>
+        <h2 class="sr-only"><?php echo t('Category List'); ?></h2>
         <div class="DataListWrap">
-            <h2 class="sr-only"><?php echo t('Category List'); ?></h2>
-
             <?php
                 if (FoundationCategoriesShim::isEnabled()) {
                     FoundationCategoriesShim::printLegacyShim($categories);

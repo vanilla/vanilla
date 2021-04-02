@@ -39,8 +39,7 @@ export const inputVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const font = makeThemeVars(
         "font",
         Variables.font({
-            size: globalVars.fonts.size.large,
-            weight: globalVars.fonts.weights.normal,
+            ...globalVars.fontSizeAndWeightVars("large", "normal"),
             color: colors.fg,
         }),
     );
@@ -71,7 +70,7 @@ export const inputMixin = (vars?: { sizing?: any; font?: any; colors?: any; bord
     const {
         sizing,
         font = Variables.font({
-            size: globalVars.fonts.size.large,
+            ...globalVars.fontSizeAndWeightVars("large"),
         }),
         colors,
         border,

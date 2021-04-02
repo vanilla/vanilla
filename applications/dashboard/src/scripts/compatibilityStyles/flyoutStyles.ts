@@ -41,7 +41,7 @@ export const flyoutCSS = () => {
         {
             background: bg,
             ...Mixins.font({
-                size: globalVars.fonts.size.medium,
+                ...globalVars.fontSizeAndWeightVars("medium"),
             }),
         },
     );

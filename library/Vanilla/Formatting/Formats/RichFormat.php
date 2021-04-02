@@ -13,19 +13,20 @@ use Vanilla\EmbeddedContent\AbstractEmbed;
 use Vanilla\EmbeddedContent\Embeds\FileEmbed;
 use Vanilla\EmbeddedContent\Embeds\ImageEmbed;
 use Vanilla\Contracts\Formatting\HeadingProviderInterface;
-use Vanilla\Formatting\Attachment;
 use Vanilla\Formatting\BaseFormat;
 use Vanilla\Formatting\Exception\FormattingException;
 use Vanilla\Contracts\Formatting\Heading;
+use Vanilla\Formatting\ParsableDOMInterface;
 use Vanilla\Formatting\Quill\Blots\Embeds\ExternalBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\HeadingTerminatorBlot;
+use Vanilla\Formatting\TextDOMInterface;
 use Vanilla\Web\TwigRenderTrait;
 use Vanilla\Formatting\Quill;
 
 /**
  * Format service for the rich editor format. Rendered and parsed using Quill.
  */
-class RichFormat extends BaseFormat {
+class RichFormat extends BaseFormat implements ParsableDOMInterface {
 
     use TwigRenderTrait;
     use StaticCacheTranslationTrait;
@@ -356,5 +357,20 @@ class RichFormat extends BaseFormat {
         }
         $output = json_encode($operations, JSON_UNESCAPED_UNICODE);
         return $output;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function parseDOM(string $content): TextDOMInterface {
+        $content = $this->filterer->filter($content);
+        $operations = Quill\Parser::jsonToOperations($content);
+
+        $blotGroups = $this->parser->parse(
+            $operations,
+            $this->allowExtendedContent ? Quill\Parser::PARSE_MODE_EXTENDED : Quill\Parser::PARSE_MODE_NORMAL
+        );
+
+        return $blotGroups;
     }
 }

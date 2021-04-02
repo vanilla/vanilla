@@ -12,31 +12,12 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { forumLayoutVariables } from "@dashboard/compatibilityStyles/forumLayoutStyles";
 import { calc, important, percent, translateY } from "csx";
-import { variableFactory } from "@library/styles/styleUtils";
-import { useThemeCache } from "@library/styles/themeCache";
-import { forumVariables } from "@library/forms/forumStyleVars";
 import { Mixins } from "@library/styles/Mixins";
-import { FontSizeProperty } from "csstype";
-import { TLength } from "typestyle";
-import { CSSObject } from "@emotion/css";
-import { lineHeightAdjustment } from "@library/styles/textUtils";
-import { userContentVariables } from "@library/content/userContentStyles";
-
-export const forumCategoriesVariables = useThemeCache(() => {
-    const makeThemeVars = variableFactory("forumCategories");
-    const image = makeThemeVars("image", {
-        width: forumVariables().userPhoto.sizing.medium,
-    });
-
-    return {
-        image: image,
-    };
-});
+import { userPhotoVariables } from "@library/headers/mebox/pieces/userPhotoStyles";
 
 export const categoriesCSS = () => {
     const globalVars = globalVariables();
     const layoutVars = forumLayoutVariables();
-    const vars = forumCategoriesVariables();
 
     // Category list
 
@@ -91,11 +72,13 @@ export const categoriesCSS = () => {
         textDecoration: important("none"),
     });
 
+    const photoVars = userPhotoVariables();
+
     cssOut(
         `.Groups .DataTable.CategoryTable tbody td.CategoryName .PhotoWrap, .DataTable.CategoryTable tbody td.CategoryName .PhotoWrap`,
         {
-            width: styleUnit(vars.image.width),
-            height: styleUnit(vars.image.width),
+            width: styleUnit(photoVars.sizing.medium),
+            height: styleUnit(photoVars.sizing.medium),
         },
     );
 
@@ -105,7 +88,7 @@ export const categoriesCSS = () => {
 
     cssOut(`.CategoryBox .H`, {
         ...Mixins.font({
-            size: globalVars.fonts.size.largeTitle,
+            ...globalVars.fontSizeAndWeightVars("largeTitle"),
             lineHeight: globalVars.lineHeights.condensed,
         }),
     });
@@ -136,8 +119,9 @@ export const categoriesCSS = () => {
     cssOut(`.Panel .Box.BoxCategories .PanelInfo.PanelCategories .Heading`, {
         paddingLeft: 0,
         paddingTop: styleUnit(18),
-        fontWeight: globalVars.fonts.weights.bold,
-        fontSize: styleUnit(globalVars.fonts.size.large),
+        ...Mixins.font({
+            ...globalVars.fontSizeAndWeightVars("large", "bold"),
+        }),
     });
 
     cssOut(`.Panel .Box.BoxCategories .PanelInfo.PanelCategories .Heading .Count`, {
@@ -149,8 +133,9 @@ export const categoriesCSS = () => {
     });
 
     cssOut(`.Panel .Box.BoxCategories .PanelInfo.PanelCategories  Li.Depth1 a.ItemLink`, {
-        fontWeight: globalVars.fonts.weights.semiBold,
-        fontSize: styleUnit(globalVars.fonts.size.large),
+        ...Mixins.font({
+            ...globalVars.fontSizeAndWeightVars("large", "semiBold"),
+        }),
     });
 
     cssOut(`.Panel .Box.BoxCategories .PanelInfo.PanelCategories li.Depth2 a.ItemLink`, {

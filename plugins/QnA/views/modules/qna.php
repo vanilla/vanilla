@@ -1,4 +1,5 @@
-<?php use Vanilla\Theme\BoxThemeShim;
+<?php use Vanilla\Forum\Modules\FoundationDiscussionsShim;
+use Vanilla\Theme\BoxThemeShim;
 
 if (!defined('APPLICATION')) return;
 require_once PATH_APPLICATIONS . '/vanilla/views/discussions/helper_functions.php';
@@ -11,7 +12,11 @@ $title = $this->data('title');
     <?php BoxThemeShim::endHeading(); ?>
 <?php endif; ?>
 
-<?php if (count($discussions) > 0): ?>
+<?php if (count($discussions) > 0) {
+    if (FoundationDiscussionsShim::isEnabled()) {
+        FoundationDiscussionsShim::printLegacyShim($discussions);
+    } else {
+    ?>
     <ul class="DataList Discussions pageBox">
         <?php
             foreach ($discussions as $discussion) {
@@ -19,6 +24,7 @@ $title = $this->data('title');
             }
         ?>
     </ul>
-<?php else : ?>
+    <?php } ?>
+<?php } else { ?>
     <div class="Empty"><?php echo t('No discussions were found.'); ?></div>
-<? endif ?>
+<?php } ?>

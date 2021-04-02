@@ -1,0 +1,17 @@
+{
+    "name": "@vanilla/icons",
+    "main": "./index.ts",
+    "module": "./index.ts",
+    "license": "gpl-2.0-only",
+    "version": "3.0.1",
+    "peerDependencies": {
+        "react": "*",
+        "@emotion/css": "*"
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "scripts": {
+        "build:icon-types": "node ./generateIconTypes.js"
+    }
+}

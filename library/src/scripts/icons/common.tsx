@@ -9,6 +9,7 @@ import classNames from "classnames";
 import { t } from "@library/utility/appUtils";
 import { iconClasses } from "@library/icons/iconStyles";
 import { areaHiddenType } from "@library/styles/styleHelpersVisibility";
+import { css, cx } from "@emotion/css";
 
 const currentColorFill = {
     fill: "currentColor",
@@ -717,23 +718,6 @@ export function DiscussionIcon(props: { className?: string; "aria-hidden"?: area
     );
 }
 
-export function GlobeIcon(props: { className?: string; "aria-hidden"?: areaHiddenType; title?: string }) {
-    const classes = iconClasses();
-    return (
-        <svg
-            className={classNames(classes.globeIcon, props.className)}
-            viewBox="0 0 24 24"
-            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
-        >
-            <title>{props.title ? props.title : t("Globe")}</title>
-            <path
-                d="M18.75,6.055A8.983,8.983,0,0,0,12.082,3l-.019,0H12a8.994,8.994,0,0,0-.035,17.988.415.415,0,0,0,.207,0A8.979,8.979,0,0,0,18.689,18a.382.382,0,0,0,.045-.052,8.966,8.966,0,0,0,.016-11.9ZM18.3,17.089a10.836,10.836,0,0,0-1.975-.815,15.225,15.225,0,0,0,.593-4.06h3.215A7.994,7.994,0,0,1,18.3,17.089ZM3.868,12.214H7.083A15.44,15.44,0,0,0,7.676,16.3a10.707,10.707,0,0,0-1.975.762A7.924,7.924,0,0,1,3.868,12.214ZM5.7,6.794a10.707,10.707,0,0,0,1.975.762,15.667,15.667,0,0,0-.589,3.8H3.879A8.027,8.027,0,0,1,5.7,6.794Zm5.844.577a16.12,16.12,0,0,1-2.829-.33C9.4,5.3,10.47,4.108,11.545,3.893Zm0,.857v3.13h-3.6A13.983,13.983,0,0,1,8.478,7.8,15.459,15.459,0,0,0,11.545,8.228Zm0,3.986v3.547a15.492,15.492,0,0,0-3.066.32,14.064,14.064,0,0,1-.537-3.867Zm0,4.4V20.1c-1.075-.215-2.15-1.41-2.829-3.148A16.312,16.312,0,0,1,11.545,16.618Zm.86,0a13.668,13.668,0,0,1,2.7.327c-.653,1.672-1.628,2.842-2.7,3.119V16.62Zm0-.857v-3.55h3.653a13.891,13.891,0,0,1-.625,3.867,15.962,15.962,0,0,0-3.029-.318Zm0-4.407V8.225A15.634,15.634,0,0,0,15.433,7.8a13.924,13.924,0,0,1,.62,3.555H12.405Zm0-3.99V3.922c1.074.277,2.049,1.446,2.7,3.118a13.521,13.521,0,0,1-2.7.327Zm2.153-3.1A8.164,8.164,0,0,1,17.7,6.19a10.084,10.084,0,0,1-1.648.633A7.94,7.94,0,0,0,14.558,4.271ZM7.95,6.823A10.016,10.016,0,0,1,6.3,6.19a8.166,8.166,0,0,1,3.14-1.92A7.95,7.95,0,0,0,7.95,6.823Zm0,10.342a7.952,7.952,0,0,0,1.492,2.553A8.14,8.14,0,0,1,6.3,17.8,10.177,10.177,0,0,1,7.95,17.165Zm8.1,0A10.129,10.129,0,0,1,17.7,17.8a8.14,8.14,0,0,1-3.14,1.919A7.91,7.91,0,0,0,16.05,17.165Zm.863-5.808a15.454,15.454,0,0,0-.589-3.775A10.7,10.7,0,0,0,18.3,6.767a8.107,8.107,0,0,1,1.822,4.59Z"
-                style={{ fill: "currentColor" }}
-            />
-        </svg>
-    );
-}
-
 export function TranslateIcon(props: { className?: string; "aria-hidden"?: areaHiddenType; title?: string }) {
     const classes = iconClasses();
     return (
@@ -925,7 +909,10 @@ export function DocumentationIcon(props: { className?: string; "aria-hidden"?: a
     );
 }
 
-export function BookmarkIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
+/**
+ * @deprecated Use BookmarkIcon instead.
+ */
+export function _BookmarkIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
     return (
         <svg
             className={classNames("svgBookmark", props.className)}
@@ -943,6 +930,20 @@ export function BookmarkIcon(props: { className?: string; "aria-hidden"?: areaHi
                 d="M11.7,0.5H6.4v11.4c0.1,0,0.2,0,0.3,0.1l4.6,3.8c0.1,0.1,0.2,0.1,0.4,0.1c0.3,0,0.5-0.2,0.5-0.6V1.1C12.2,0.7,12,0.5,11.7,0.5z"
                 className={"svgBookmark-loadingPath"}
             />
+        </svg>
+    );
+}
+
+export function BookmarkIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
+    const { bookmark: bookmarkClass } = iconClasses();
+    return (
+        <svg
+            className={classNames(bookmarkClass, props.className)}
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
+            viewBox="0 0 24 24"
+        >
+            <path d="M6.55 4h10.9c.304 0 .55.246.55.55v14.307c0 .304-.246.55-.55.55-.125 0-.246-.042-.343-.12l-4.764-3.802c-.2-.16-.485-.16-.686 0l-4.764 3.802c-.237.19-.583.15-.773-.087-.078-.097-.12-.218-.12-.343V4.55c0-.304.246-.55.55-.55z" />
         </svg>
     );
 }
@@ -1079,26 +1080,6 @@ export function NewPollIcon(props: { className?: string; "area-hidden"?: areaHid
     );
 }
 
-export function ExternalIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
-    const classes = iconClasses();
-    return (
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            className={classNames(classes.external, props.className)}
-            style={{ height: 22, width: 22 }}
-            aria-hidden={props["aria-hidden"]}
-        >
-            <g fill="none" fillRule="evenodd" stroke="#555A62" strokeLinecap="round">
-                <path d="M17.274 12.111v5.614h0c0 .414-.313.749-.699.749H6.095h0c-.385 0-.698-.335-.698-.749V7.245h0c0-.413.313-.748.699-.748h5.589M11.608 12.111l6.737-6.737"></path>
-                <path strokeLinejoin="round" d="M14.602 5.374h3.743v3.743"></path>
-            </g>
-        </svg>
-    );
-}
-
 export function FeatureIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
     const classes = iconClasses();
     return (
@@ -1107,7 +1088,7 @@ export function FeatureIcon(props: { className?: string; "aria-hidden"?: areaHid
             width="24"
             height="24"
             viewBox="0 0 24 24"
-            className={classNames(classes.external, props.className)}
+            className={classNames(classes.featureIcon, props.className)}
             style={{ height: 24, width: 24 }}
             aria-hidden={props["aria-hidden"]}
         >
@@ -1140,4 +1121,22 @@ export function ArrowIcon(props: { className?: string; "aria-hidden"?: areaHidde
             <path fill="currentColor" id="arrow" d="M6,0,4.909,1.091l4.13,4.13H0V6.779H9.039l-4.13,4.13L6,12l6-6Z" />
         </svg>
     );
+}
+
+export function DownvoteIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
+    const classes = iconClasses();
+
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={cx(classes.downvote, props.className)}>
+            <g fillRule="evenodd" strokeLinejoin="round">
+                <path d="M19.087 8.5L12 16.768 4.913 8.5h14.174z" />
+            </g>
+        </svg>
+    );
+}
+
+export function UpvoteIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
+    const classes = iconClasses();
+
+    return <DownvoteIcon aria-hidden={props["aria-hidden"]} className={cx(classes.upvote, props.className)} />;
 }

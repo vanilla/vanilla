@@ -9,14 +9,14 @@ import { MeBoxIcon } from "@library/headers/mebox/pieces/MeBoxIcon";
 import { t } from "@library/utility/appUtils";
 import React from "react";
 import { connect } from "react-redux";
-import { NotificationsIcon } from "@library/icons/titleBar";
+import { Icon } from "@vanilla/icons";
 
 function NotificationsCount(props: IProps) {
     const { count, open, compact } = props;
 
     return (
         <MeBoxIcon count={count} countLabel={t("Notifications") + ": "} compact={compact}>
-            <NotificationsIcon filled={!!open} />
+            {open ? <Icon icon="me-notifications-solid" /> : <Icon icon={"me-notifications"} />}
         </MeBoxIcon>
     );
 }

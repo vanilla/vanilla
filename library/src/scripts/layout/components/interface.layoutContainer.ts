@@ -5,7 +5,7 @@
 
 import { ILayoutProps } from "@library/layout/LayoutContext";
 import React from "react";
-import { IPanelLayoutClasses } from "@library/layout/panelLayoutStyles";
+import { IPanelLayoutClasses } from "@library/layout/PanelLayout.styles";
 import { IPanelLayoutProps } from "@library/layout/PanelLayout";
 
 export interface ILayoutContainer extends ILayoutProps {

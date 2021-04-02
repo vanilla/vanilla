@@ -11,12 +11,10 @@ import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator"
 import { PanelNavItems } from "@library/flyouts/panelNav/PanelNavItems";
 import { INavigationTreeItem } from "@library/@types/api/core";
 import { notEmpty } from "@vanilla/utils";
-import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import { cx } from "@library/styles/styleShim";
+import { DropDownPanelNav } from "@library/flyouts/panelNav/DropDownPanelNav";
 
 export default function MobileOnlyNavigation(props: {}) {
-    const classes = dropDownClasses();
-
     const { mobileOnlyNavigationItems } = navigationVariables();
 
     const [treeItems, activeRecord] = useMemo(() => {
@@ -30,15 +28,7 @@ export default function MobileOnlyNavigation(props: {}) {
             {treeItems.length > 0 && (
                 <>
                     <DropDownItemSeparator />
-                    <div className={cx(classes.panelMobileOnly)}>
-                        <PanelNavItems
-                            navItems={treeItems}
-                            activeRecord={activeRecord}
-                            popParentItem={() => {}}
-                            pushParentItem={(item: INavigationTreeItem) => {}}
-                            isNestable={false}
-                        />
-                    </div>
+                    <DropDownPanelNav navItems={treeItems} activeRecord={activeRecord} isNestable />
                 </>
             )}
         </>

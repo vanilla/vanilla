@@ -54,24 +54,34 @@ export default useThemeCache(() => {
     });
 
     const container = style("container", {
-        overflowY: "auto",
-        maxHeight: `60vh`,
-        display: "flex",
-        flexDirection: "row",
-        flexWrap: "wrap",
-        paddingBottom: 20,
-        ...Mixins.margin({
-            //horizontal: -vars.spacing.menuItemSpacer,
-        }),
+        "&&": {
+            overflowY: "auto",
+            maxHeight: `60vh`,
+            display: "flex",
+            flexDirection: "row",
+            flexWrap: "wrap",
+            paddingBottom: 20,
+        },
     });
 
     const menuItem = style("menuItem", {
+        minWidth: 160,
+        maxWidth: 300,
         ...Mixins.padding({
             horizontal: vars.spacing.menuItemSpacer,
             top: 20,
         }),
-        flex: 1,
-        flexBasis: 160,
+    });
+
+    const menuItemChildren = style("menuItemChildren", {
+        // you may be tempted to put a flex-column w/ wrapping on this.
+        // As of 2021 it doesn't actually work.
+        // Wrapping columns in flex don't extend the width of the container.
+        // @see https://bugs.chromium.org/p/chromium/issues/detail?id=507397
+        //      "This is unlikely to be fixed in 2021. See comment 40 for brief description of the implementation
+        //       difficulty, on top of the difficult compat situation."
+        // @see https://i.stack.imgur.com/Es3ch.gif
+        // Maybe in the future some JS solution would work?
     });
 
     const fillerItem = style("fillerItem", {
@@ -81,32 +91,36 @@ export default useThemeCache(() => {
 
     const menuItemTitle = style("menuItemTitle", {
         display: "block",
-        fontWeight: globalVars.fonts.weights.bold,
-        fontSize: styleUnit(globalVars.fonts.size.medium),
-        lineHeight: styleUnit(`${globalVars.fonts.size.medium * 1.25}`),
+        ...Mixins.font({
+            ...globalVars.fontSizeAndWeightVars("medium", "bold"),
+            lineHeight: styleUnit(`${globalVars.fonts.size.medium * 1.25}`), // FIXME: see if this is necessary
+            color: ColorsUtils.colorOut(vars.colors.fg),
+        }),
         marginBottom: styleUnit(12),
-        color: ColorsUtils.colorOut(vars.colors.fg),
     });
 
     const menuItemChild = style("menuItemChild", {
         fontSize: styleUnit(14),
-        lineHeight: styleUnit(`${globalVars.fonts.size.medium * 1.25}`),
-        marginBottom: styleUnit(12),
+        lineHeight: styleUnit(`${globalVars.fonts.size.medium * 1.25}`), // FIXME: see if this is necessary
         listStyle: "none",
-        ...{
-            a: {
-                color: ColorsUtils.colorOut(vars.colors.fg),
-            },
+        marginBottom: styleUnit(12),
+        "&:last-child": {
+            marginBottom: 0,
+        },
 
-            "a:hover": {
-                color: ColorsUtils.colorOut(globalVars.links.colors.hover),
-            },
+        "& a": {
+            color: ColorsUtils.colorOut(vars.colors.fg),
+        },
+
+        "& a:hover": {
+            color: ColorsUtils.colorOut(globalVars.links.colors.hover),
         },
     });
 
     return {
         wrapper,
         menuItem,
+        menuItemChildren,
         fillerItem,
         container,
         menuItemTitle,

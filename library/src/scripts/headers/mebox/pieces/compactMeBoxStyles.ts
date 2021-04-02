@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { absolutePosition, flexHelper, sticky, negativeUnit } from "@library/styles/styleHelpers";
+import { flexHelper, sticky, negativeUnit } from "@library/styles/styleHelpers";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
@@ -14,6 +14,7 @@ import { calc, percent, viewHeight } from "csx";
 import { buttonResetMixin } from "@library/forms/buttonMixins";
 import { userPhotoVariables } from "@library/headers/mebox/pieces/userPhotoStyles";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
+import { Mixins } from "@library/styles/Mixins";
 
 export const compactMeBoxVariables = useThemeCache(() => {
     const themeVars = variableFactory("compactMeBox");
@@ -53,7 +54,7 @@ export const compactMeBoxClasses = useThemeCache(() => {
     const closeModal = style("closeModal", {
         ...{
             "&&": {
-                ...absolutePosition.topRight(),
+                ...Mixins.absolute.topRight(),
                 width: styleUnit(vars.tab.width),
                 height: styleUnit(vars.tab.height),
             },

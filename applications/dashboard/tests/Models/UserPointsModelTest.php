@@ -147,4 +147,26 @@ class UserPointsModelTest extends SiteTestCase {
         $this->assertCount(3, $this->userPointsModel->getLeaders(UserPointsModel::SLOT_TYPE_YEAR));
         $this->assertCount(4, $this->userPointsModel->getLeaders(UserPointsModel::SLOT_TYPE_ALL));
     }
+
+    /**
+     * Test leader count after banning user.
+     */
+    public function testGetLeadersBanned() {
+        $userBanned = $this->createUser(['name' => 'banned']);
+        $this->givePoints($userBanned, 100000);
+        $this->assertCount(1, $this->userPointsModel->getLeaders(UserPointsModel::SLOT_TYPE_ALL));
+        $this->userModel->ban($userBanned['userID'], ['Reason' => 'testBan']);
+        $this->assertCount(0, $this->userPointsModel->getLeaders(UserPointsModel::SLOT_TYPE_ALL));
+    }
+
+    /**
+     * Test leader count after deleting a user user.
+     */
+    public function testGetLeadersDeleted() {
+        $userDeleted = $this->createUser(['name' => 'deleted']);
+        $this->givePoints($userDeleted, 100000);
+        $this->assertCount(1, $this->userPointsModel->getLeaders(UserPointsModel::SLOT_TYPE_ALL));
+        $this->userModel->deleteID($userDeleted['userID']);
+        $this->assertCount(0, $this->userPointsModel->getLeaders(UserPointsModel::SLOT_TYPE_ALL));
+    }
 }

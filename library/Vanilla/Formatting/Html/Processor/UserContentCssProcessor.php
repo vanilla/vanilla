@@ -21,6 +21,7 @@ class UserContentCssProcessor extends HtmlProcessor {
     public function processDocument(HtmlDocument $document): HtmlDocument {
         $this->cleanupBlockquotes($document);
         $this->cleanupImages($document);
+        $this->cleanupIFrames($document);
         $this->cleanupCodeBlocks($document);
         $this->cleanupInlineCodeBlocks($document);
         return $document;
@@ -90,6 +91,18 @@ class UserContentCssProcessor extends HtmlProcessor {
         foreach ($images as $image) {
             HtmlUtils::appendClass($image, 'embedImage-img');
             HtmlUtils::appendClass($image, 'importedEmbed-img');
+        }
+    }
+
+    /**
+     * Format HTML of iframes imported from other formats.
+     *
+     * @param HtmlDocument $document The document to parse.
+     */
+    private function cleanupIFrames(HtmlDocument $document) {
+        $iFrames = $document->queryXPath(('.//*[self::iframe]'));
+        foreach ($iFrames as $iFrame) {
+            HtmlUtils::appendClass($iFrame, 'importedEmbed-iframe');
         }
     }
 

@@ -8,6 +8,10 @@
  * @since 2.0
  */
 
+use Vanilla\Dashboard\Models\PermissionJunctionModelInterface;
+use Vanilla\Models\ModelCache;
+use Vanilla\Permissions;
+
 /**
  * Handles permission data.
  */
@@ -25,26 +29,95 @@ class PermissionModel extends Gdn_Model {
     /** @var array Permission namespaces from enabled addons. */
     private $namespaces;
 
-    /** @var array $junctionModels */
+    /** @var PermissionJunctionModelInterface[] $junctionModels */
     protected $junctionModels = [];
 
-    public static $permissionsCleared = false;
+    /** @var ModelCache */
+    private $modelCache;
 
     /**
      * Class constructor. Defines the related database table name.
      */
     public function __construct() {
         parent::__construct('Permission');
+        $this->modelCache = new ModelCache('permissions', \Gdn::cache());
+    }
+
+    /**
+     * Invalid the all record cache.
+     */
+    protected function onUpdate() {
+        parent::onUpdate();
+        $this->modelCache->invalidateAll();
+    }
+
+    /**
+     * Create the permissions.
+     *
+     * @return Permissions
+     */
+    public function createPermissionInstance(): Permissions {
+        $permissions = new Permissions();
+        $permissions->addJunctions($this->getAllJunctionTablesAndIDs());
+        foreach ($this->junctionModels as $junctionModel) {
+            $aliases = $junctionModel->getJunctionAliases();
+            if ($aliases !== null) {
+                $permissions->addJunctionAliases($aliases);
+            }
+        }
+        return $permissions;
+    }
+
+    /**
+     * Get a mapping of all junction tables + JunctionIDs.
+     *
+     * @return array
+     *
+     * @example
+     * [
+     *      'Category' => [1, 49, 100],
+     *      'knowledgeBase' => [53, 60, 100],
+     * ]
+     */
+    public function getAllJunctionTablesAndIDs(): array {
+        $result = $this->modelCache->getCachedOrHydrate(['junctionTablesAndIDs' => true], function () {
+            $rows = $this
+                ->createSql()
+                ->select(["p.JunctionTable", "p.JunctionID"])
+                ->where('p.JunctionTable IS NOT NULL')
+                ->where('p.JunctionID IS NOT NULL')
+                ->whereNotIn('p.JunctionID', [Permissions::GLOBAL_JUNCTION_ID])
+                ->get('Permission p')
+                ->resultArray()
+            ;
+
+            $junctions = [];
+            foreach ($rows as $row) {
+                $junctionTable = $row['JunctionTable'];
+                $junctionID = $row['JunctionID'];
+                if (!array_key_exists($junctionTable, $junctions)) {
+                    $junctions[$junctionTable] = [];
+                }
+
+                if (!in_array($junctionID, $junctions[$junctionTable], true)) {
+                    $junctions[$junctionTable][] = $junctionID;
+                }
+            }
+
+            return $junctions;
+        });
+
+        return $result;
     }
 
     /**
      * Add a model related to specific junction table
      *
      * @param string $junctionTable
-     * @param string $modelClass
+     * @param PermissionJunctionModelInterface $model
      */
-    public function addJunctionModel(string $junctionTable, string $modelClass) {
-        $this->junctionModels[$junctionTable] = $modelClass;
+    public function addJunctionModel(string $junctionTable, PermissionJunctionModelInterface $model) {
+        $this->junctionModels[$junctionTable] = $model;
     }
 
     /**
@@ -213,14 +286,10 @@ class PermissionModel extends Gdn_Model {
      * Remove the cached permissions for all users.
      */
     public function clearPermissions() {
-        if (!$this::$permissionsCleared) {
-            Gdn::userModel()->clearPermissions();
-            $this::$permissionsCleared = true;
-            foreach ($this->junctionModels as $table => $modelClass) {
-                /** @var PermissionJunctionModelInterface $model */
-                $model = Gdn::getContainer()->get($modelClass);
-                $model->clearPermissions();
-            }
+        $this->onUpdate();
+        Gdn::userModel()->clearPermissions();
+        foreach ($this->junctionModels as $table => $model) {
+            $model->onPermissionChange();
         }
     }
 
@@ -1352,7 +1421,7 @@ class PermissionModel extends Gdn_Model {
                 $permissions = array_merge($resetValues, $permissions);
 
                 if (strpos($specificity, ':')) {
-                    list($junction, $junctionId) = explode(':', $specificity);
+                    [$junction, $junctionId] = explode(':', $specificity);
                     if ($junction && $junctionId) {
                         switch ($junction) {
                             case 'Category':
@@ -1479,7 +1548,7 @@ class PermissionModel extends Gdn_Model {
 
         // Loop through each permission in the row and place them in the correct place in the grid.
         foreach ($row as $permissionName => $value) {
-            list($namespace, $name, $suffix) = self::splitPermission($permissionName);
+            [$namespace, $name, $suffix] = self::splitPermission($permissionName);
             if (empty($name)) {
                 continue; // was some other column
             }

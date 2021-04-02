@@ -5,7 +5,8 @@
 
 import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
-import { generatePanelLayoutClasses, layoutVariables } from "../panelLayoutStyles";
+import { generatePanelLayoutClasses } from "../PanelLayout.styles";
+import { panelLayoutVariables } from "../PanelLayout.variables";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
 import { fallbackLayoutVariables, IPanelLayoutVariables } from "@library/layout/types/interface.panelLayout";
 import { mediaQueryFactory } from "@library/layout/types/mediaQueryFactory";
@@ -16,7 +17,7 @@ interface IProps extends IPanelLayoutVariables {
 
 export const threeColumnLayoutVariables = useThemeCache(
     (): IProps => {
-        const layoutVars = layoutVariables();
+        const layoutVars = panelLayoutVariables();
         const Devices = fallbackLayoutVariables;
 
         const makeThemeVars = variableFactory("threeColumnLayout");

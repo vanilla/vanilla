@@ -19,15 +19,14 @@ use Vanilla\Community\Events\CommentEvent;
  * Test {@link CommentModel}.
  */
 class CommentModelTest extends SiteTestCase {
-    use TestCommentModelTrait, CommunityApiTestTrait, EventSpyTestTrait;
+    use TestCategoryModelTrait,
+        TestDiscussionModelTrait,
+        TestCommentModelTrait,
+        CommunityApiTestTrait,
+        EventSpyTestTrait;
 
     /** @var CommentEvent */
     private $lastEvent;
-
-    /**
-     * @var \DiscussionModel
-     */
-    private $discussionModel;
 
     /**
      * {@inheritdoc}
@@ -45,7 +44,6 @@ class CommentModelTest extends SiteTestCase {
     public function setup(): void {
         parent::setUp();
 
-        $this->discussionModel = $this->container()->get(\DiscussionModel::class);
         // Make event testing a little easier.
         $this->container()->setInstance(self::class, $this);
         $this->lastEvent = null;

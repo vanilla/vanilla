@@ -1,7 +1,6 @@
 {
     "extends": "@vanilla/tsconfig/base.json",
     "compilerOptions": {
-        "baseUrl": ".",
         "paths": {
             "@library/*": ["./library/src/scripts/*"],
             "@vanilla/addon-vanilla/*": ["./applications/vanilla/src/scripts/*"],
@@ -9,6 +8,7 @@
             "@rich-editor/*": ["./plugins/rich-editor/src/scripts/*"],
             "@openapi-embed/*": ["./plugins/openapi-embed/src/scripts/*"],
             "@knowledge/*": ["./plugins/knowledge/src/scripts/*"],
+            "@oauth2/*": ["./plugins/oauth2/src/scripts/*"],
             "@webhooks/*": ["./plugins/webhooks/src/scripts/*"],
             "@themingapi/*": ["./plugins/themingapi/src/scripts/*"],
             "@subcommunities/*": ["./plugins/subcommunities/src/scripts/*"],
@@ -26,12 +26,25 @@
             "@vanilla/redux-utils": ["./packages/vanilla-redux-utils/*"],
             "@vanilla/theme-core": ["./packages/vanilla-theme-core/*"],
             "@vanilla/tsconfig": ["./packages/vanilla-tsconfig/*"],
-            "@vanilla/utils": ["./packages/vanilla-utils/*"]
+            "@vanilla/utils": ["./packages/vanilla-utils/*"],
+            "@vanilla/icons": ["./packages/vanilla-icons/*"]
         },
         "incremental": true,
         "skipLibCheck": true,
         "skipDefaultLibCheck": true
     },
-    "include": ["**/src/scripts/**/*.ts", "**/src/scripts/**/*.tsx", ".storybookAppPages/*.ts*"],
+    "include": [
+        "library/src/scripts/**/*.ts",
+        "library/src/scripts/**/*.tsx",
+        "applications/*/src/scripts/**/*.ts",
+        "applications/*/src/scripts/**/*.tsx",
+        "plugins/*/src/scripts/**/*.ts",
+        "plugins/*/src/scripts/**/*.tsx",
+        "themes/*/src/scripts/**/*.ts",
+        "themes/*/src/scripts/**/*.tsx",
+        "addons/themes/*/src/scripts/**/*.ts",
+        "addons/themes/*/src/scripts/**/*.tsx",
+        ".storybookAppPages/*.ts*"
+    ],
     "exclude": ["**/*.js", "**/*.jsx", "cloud/**/*", "node_modules/**/*", "node_modules", "packages/*/src/*"]
 }

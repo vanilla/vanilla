@@ -8,12 +8,11 @@ import React from "react";
 import classNames from "classnames";
 import { iconClasses } from "@library/icons/iconStyles";
 import { areaHiddenType } from "@library/styles/styleHelpersVisibility";
-import { SearchIcon } from "./titleBar";
 import { t } from "@vanilla/i18n/src";
+import { Icon } from "@vanilla/icons";
 
-export function TypeAllIcon(props: { className?: string; "aria-hidden"?: areaHiddenType; centred?: boolean }) {
-    const classes = iconClasses();
-    return <SearchIcon {...props} className={classNames(classes.typeAll, props.className)} />;
+export function TypeAllIcon() {
+    return <Icon size="compact" icon="search-search" />;
 }
 
 export function TypeDiscussionsIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {

@@ -6,14 +6,7 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
-import {
-    buttonStates,
-    userSelect,
-    IStateSelectors,
-    absolutePosition,
-    negativeUnit,
-    pointerEvents,
-} from "@library/styles/styleHelpers";
+import { buttonStates, userSelect, IStateSelectors, negativeUnit, pointerEvents } from "@library/styles/styleHelpers";
 import { styleUnit } from "@library/styles/styleUnit";
 import { Mixins } from "@library/styles/Mixins";
 import { Variables } from "@library/styles/Variables";
@@ -22,12 +15,14 @@ import { CSSObject } from "@emotion/css";
 import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { important, percent, rgba } from "csx";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { buttonResetMixin } from "@library/forms/buttonMixins";
+import { metasVariables } from "@library/metas/Metas.variables";
 
 export const notUserContent = "u-notUserContent";
 
 export const dropDownVariables = useThemeCache(() => {
+    const metasVars = metasVariables();
     const globalVars = globalVariables();
     const makeThemeVars = variableFactory("dropDown");
 
@@ -47,8 +42,8 @@ export const dropDownVariables = useThemeCache(() => {
 
     const metas = makeThemeVars("metas", {
         font: Variables.font({
-            size: globalVars.meta.text.size,
-            color: globalVars.meta.text.color,
+            size: metasVars.font.size,
+            color: metasVars.font.color,
         }),
         padding: {
             vertical: 6,
@@ -106,62 +101,63 @@ export const dropDownVariables = useThemeCache(() => {
 
 export const dropDownClasses = useThemeCache(() => {
     const vars = dropDownVariables();
+    const metasVars = metasVariables();
+
     const globalVars = globalVariables();
     const style = styleFactory("dropDown");
     const shadows = shadowHelper();
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = panelLayoutVariables().mediaQueries();
 
     const root = style({
         position: "relative",
         listStyle: "none",
     });
 
+    const contentMixin: CSSObject = {
+        minWidth: styleUnit(vars.sizing.widths.default),
+        backgroundColor: ColorsUtils.colorOut(vars.contents.bg),
+        color: ColorsUtils.colorOut(vars.contents.fg),
+        overflow: "auto",
+        ...Mixins.border(vars.contents.border),
+        ...shadowOrBorderBasedOnLightness(vars.contents.bg, Mixins.border(vars.contents.border), shadows.dropDown()),
+        "&&": {
+            zIndex: 3,
+            ...Mixins.border(vars.contents.border),
+        },
+        "&.isMedium": {
+            width: styleUnit(vars.sizing.widths.medium),
+        },
+    };
+    const contentsBox = style("contentBox", contentMixin);
+
     const contents = style(
         "contents",
         {
             position: "absolute",
-            minWidth: styleUnit(vars.sizing.widths.default),
-            backgroundColor: ColorsUtils.colorOut(vars.contents.bg),
-            color: ColorsUtils.colorOut(vars.contents.fg),
-            overflow: "auto",
-            ...Mixins.border(vars.contents.border),
-            ...shadowOrBorderBasedOnLightness(
-                vars.contents.bg,
-                Mixins.border(vars.contents.border),
-                shadows.dropDown(),
-            ),
-            ...{
-                "&&": {
-                    zIndex: 3,
-                    ...Mixins.border(vars.contents.border),
-                },
-                "&.isMedium": {
-                    width: styleUnit(vars.sizing.widths.medium),
-                },
-                "&.isParentWidth": {
-                    minWidth: "initial",
-                    left: 0,
-                    right: 0,
-                },
-                "&.isOwnWidth": {
-                    width: "initial",
-                },
-                "&.isRightAligned": {
-                    right: 0,
-                    top: 0,
-                },
-                ".frame": {
-                    boxShadow: "none",
-                },
-                "&.noMinWidth": {
-                    minWidth: 0,
-                },
-                "&.hasVerticalPadding": {
-                    ...Mixins.padding({
-                        vertical: 12,
-                        horizontal: important(0),
-                    }),
-                },
+            ...contentMixin,
+            "&.isParentWidth": {
+                minWidth: "initial",
+                left: 0,
+                right: 0,
+            },
+            "&.isOwnWidth": {
+                width: "initial",
+            },
+            "&.isRightAligned": {
+                right: 0,
+                top: 0,
+            },
+            ".frame": {
+                boxShadow: "none",
+            },
+            "&.noMinWidth": {
+                minWidth: 0,
+            },
+            "&.hasVerticalPadding": {
+                ...Mixins.padding({
+                    vertical: 12,
+                    horizontal: important(0),
+                }),
             },
         },
         mediaQueries.oneColumnDown({
@@ -191,7 +187,9 @@ export const dropDownClasses = useThemeCache(() => {
         "items",
         {
             padding: 0,
-            fontSize: styleUnit(globalVars.fonts.size.medium),
+            ...Mixins.font({
+                ...globalVars.fontSizeAndWeightVars("medium"),
+            }),
         },
         mediaQueries.oneColumnDown({
             ...Mixins.padding({
@@ -271,11 +269,12 @@ export const dropDownClasses = useThemeCache(() => {
         backgroundColor: ColorsUtils.colorOut(globalVars.separator.color),
         ...Mixins.margin(vars.spacer.margin),
         border: "none",
-        ...{
-            "&:first-child": {
-                height: 0,
-                ...Mixins.margin({ all: 0, top: vars.spacer.margin.vertical * 1.5 }),
-            },
+        "&:first-child": {
+            height: 0,
+            ...Mixins.margin({ all: 0, top: vars.spacer.margin.vertical * 1.5 }),
+        },
+        "& + &, &:last-child, &:first-child": {
+            display: "none",
         },
     });
 
@@ -286,7 +285,7 @@ export const dropDownClasses = useThemeCache(() => {
 
     const panel = style("panel", {
         backgroundColor: ColorsUtils.colorOut(vars.contents.bg),
-        ...absolutePosition.fullSizeOfParent(),
+        ...Mixins.absolute.fullSizeOfParent(),
         zIndex: 2,
     });
 
@@ -302,8 +301,6 @@ export const dropDownClasses = useThemeCache(() => {
         },
     };
     const panelFirst = style("panelFirst", panelFirstStyle);
-
-    const panelMobileOnly = style("panelMobileOnly", panelFirstStyle);
 
     const panelLast = style("panelLast", {
         ...{
@@ -325,11 +322,12 @@ export const dropDownClasses = useThemeCache(() => {
     const sectionHeading = style("sectionHeading", {
         ...{
             "&&": {
-                color: ColorsUtils.colorOut(globalVars.meta.text.color),
-                fontSize: styleUnit(globalVars.fonts.size.small),
-                textTransform: "uppercase",
-                textAlign: "center",
-                fontWeight: globalVars.fonts.weights.semiBold,
+                ...Mixins.font({
+                    ...globalVars.fontSizeAndWeightVars("small", "semiBold"),
+                    color: ColorsUtils.colorOut(metasVars.font.color),
+                    transform: "uppercase",
+                    align: "center",
+                }),
                 ...Mixins.padding(vars.sectionTitle.padding),
             },
             [`& + .${sectionContents} li:first-child`]: { paddingTop: styleUnit(vars.spacer.margin.vertical) },
@@ -379,7 +377,9 @@ export const dropDownClasses = useThemeCache(() => {
     );
 
     const count = style("count", {
-        fontSize: styleUnit(globalVars.fonts.size.small),
+        ...Mixins.font({
+            ...globalVars.fontSizeAndWeightVars("small"),
+        }),
         paddingLeft: "1em",
         marginLeft: "auto",
     });
@@ -405,10 +405,10 @@ export const dropDownClasses = useThemeCache(() => {
 
     const title = style("title", {
         ...Mixins.font({
-            weight: globalVars.fonts.weights.semiBold,
-            size: globalVars.fonts.size.medium,
+            ...globalVars.fontSizeAndWeightVars("medium", "semiBold"),
             lineHeight: globalVars.lineHeights.condensed,
         }),
+
         ...Mixins.padding({
             all: 0,
         }),
@@ -464,6 +464,7 @@ export const dropDownClasses = useThemeCache(() => {
     return {
         root,
         contents,
+        contentsBox,
         asModal,
         likeDropDownContent,
         items,
@@ -486,7 +487,6 @@ export const dropDownClasses = useThemeCache(() => {
         noVerticalPadding,
         paddedFrame,
         panelFirst,
-        panelMobileOnly,
         panelLast,
         panelNavItems,
         panel,
@@ -509,7 +509,7 @@ export const dropDownClasses = useThemeCache(() => {
 export const actionMixin = (classBasedStates?: IStateSelectors): CSSObject => {
     const vars = dropDownVariables();
     const globalVars = globalVariables();
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = panelLayoutVariables().mediaQueries();
 
     return {
         ...buttonResetMixin(),

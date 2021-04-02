@@ -13,9 +13,15 @@ export interface IPermission {
     permissions: Record<string, boolean>;
 }
 
+type JunctionType = string;
+type JunctionID = number;
+type JunctionAliasID = string; // Generally a stringified number.
+
 export interface IPermissions {
     isAdmin?: boolean;
     permissions: IPermission[];
+    junctions?: Record<JunctionType, JunctionID[]>;
+    junctionAliases?: Record<JunctionType, Record<JunctionAliasID, JunctionID>>;
 }
 export interface IUsersState {
     current: ILoadable<IMe>;

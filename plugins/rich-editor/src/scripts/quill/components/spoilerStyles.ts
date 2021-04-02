@@ -4,27 +4,30 @@
  * @license Proprietary
  */
 
-import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
 import { cssRule } from "@library/styles/styleShim";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
-import { absolutePosition, userSelect } from "@library/styles/styleHelpers";
+import { userSelect } from "@library/styles/styleHelpers";
 import { styleUnit } from "@library/styles/styleUnit";
 import { important, percent } from "csx";
 import { userContentVariables } from "@library/content/userContentStyles";
-import { buttonVariables } from "@library/forms/Button.variables";
 import { Mixins } from "@library/styles/Mixins";
+import { Variables } from "@library/styles/Variables";
 
 export const spoilerVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const makeThemeVars = variableFactory("spoiler");
 
-    const font = makeThemeVars("font", {
-        size: globalVars.fonts.size.large,
-    });
+    const font = makeThemeVars(
+        "font",
+        Variables.font({
+            ...globalVars.fontSizeAndWeightVars("large"),
+        }),
+    );
 
     const colors = makeThemeVars("colors", {
         bg: globalVars.mixBgAndFg(0.95),
@@ -160,7 +163,7 @@ export const spoilerCSS = useThemeCache(() => {
                 lineHeight: 1,
             },
             ".spoiler-chevron": {
-                ...absolutePosition.middleRightOfParent(globalVars.embed.text.padding),
+                ...Mixins.absolute.middleRightOfParent(globalVars.embed.text.padding),
                 width: styleUnit(globalVars.icon.sizes.default),
                 height: styleUnit(globalVars.icon.sizes.default),
                 display: "flex",
@@ -169,8 +172,7 @@ export const spoilerCSS = useThemeCache(() => {
             },
             ".spoiler-warningLabel": {
                 ...Mixins.font({
-                    size: globalVars.fonts.size.medium,
-                    weight: globalVars.fonts.weights.semiBold,
+                    ...globalVars.fontSizeAndWeightVars("medium", "semiBold"),
                 }),
                 marginLeft: styleUnit(6),
             },

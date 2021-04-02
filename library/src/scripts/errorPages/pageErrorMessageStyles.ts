@@ -18,18 +18,15 @@ export const pageErrorMessageClasses = () => {
     });
 
     const title = style("title", {
-        ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("title", "semiBold"),
-            lineHeight: globalVars.lineHeights.condensed,
-            align: "center",
-        }),
+        fontSize: styleUnit(globalVars.fonts.size.title),
+        lineHeight: globalVars.lineHeights.condensed,
+        fontWeight: globalVars.fonts.weights.semiBold,
+        textAlign: "center",
     });
 
     const description = style("description", {
-        ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("large"),
-            align: "center",
-        }),
+        textAlign: "center",
+        fontSize: styleUnit(globalVars.fonts.size.large),
         marginTop: styleUnit(12),
     });
 
@@ -44,9 +41,7 @@ export const pageErrorMessageClasses = () => {
     });
 
     const titleAsParagraph = style("titleAsParagraph", {
-        ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("large"),
-        }),
+        fontSize: globalVars.fonts.size.large,
     });
 
     const errorIcon = style("icon", {

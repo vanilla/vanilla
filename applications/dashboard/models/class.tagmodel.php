@@ -600,8 +600,6 @@ class TagModel extends Gdn_Model {
             $tagsToAdd = array_diff($tagsToAdd, array_keys($currentTags));
         }
 
-        $this->checkMaxTagsLimit(array_merge($tagsToAdd, $currentTags));
-
         if (!empty($tagsToAdd)) {
             $now = Gdn_Format::toDateTime();
 
@@ -635,9 +633,6 @@ class TagModel extends Gdn_Model {
      * @throws Exception
      */
     public function saveDiscussion($discussion_id, $tags, $types = [''], $category_id = 0, $new_type = '') {
-        // Make sure we're not adding more than the allowed number of tags.
-        $this->checkMaxTagsLimit($tags);
-
         // First grab all of the current tags.
         $all_tags = $current_tags = $this->getDiscussionTags($discussion_id, TagModel::IX_TAGID);
 
@@ -1062,9 +1057,9 @@ class TagModel extends Gdn_Model {
     }
 
     /**
-     * Checks to see if the tag type allows new tags to be added to it.
      *
-     * @param string $type
+     *
+     * @param $type
      * @return bool
      */
     public function canAddTagForType($type) {
@@ -1076,6 +1071,7 @@ class TagModel extends Gdn_Model {
                 strtolower($typeKey),
                 strtolower($typeMeta['key']),
                 strtolower($typeMeta['name']),
+                strtolower($typeMeta['plural'])
             ];
 
             if (in_array(strtolower($type), $typeChecks)
@@ -1126,31 +1122,26 @@ class TagModel extends Gdn_Model {
      *
      * @param string $q
      * @param bool $id
-     * @param bool|int|array $parent
-     * @param string|array $type
+     * @param bool $parent
+     * @param string $type
      * @param array $options
      * @return array
      */
-    public function search($q = '', $id = false, $parent = false, $type = 'tag', array $options = []): array {
+    public function search($q = '', $id = false, $parent = false, $type = 'default', array $options = []) {
         // Allow per-category tags
         $categorySearch = c('Vanilla.Tagging.CategorySearch', false);
         if ($categorySearch) {
             $categoryID = $options['categoryID'] ?? null;
         }
 
-        // Turn the parent(s) into an array of ids.
-        if ($parent) {
-            $parent = (array)$parent;
+        if ($parent && !is_numeric($parent)) {
+            $parent = Gdn::sql()->getWhere('Tag', ['Name' => $parent])->value('TagID', -1);
         }
-
-        // Make sure type is an array.
-        $type = (array)$type;
-
 
         $query = $q;
         $data = [];
         $database = Gdn::database();
-        if ($query || !empty($parent) || !empty($type)) {
+        if ($query || $parent || $type !== 'default') {
             $tagQuery = Gdn::sql()
                 ->select('*')
                 ->from('Tag')
@@ -1160,11 +1151,11 @@ class TagModel extends Gdn_Model {
                 $tagQuery->like('FullName', str_replace(['%', '_'], ['\%', '_'], $query), strlen($query) > 2 ? 'both' : 'right');
             }
 
-            if (in_array('tag', $type)) {
+            if ($type === 'default') {
                 $defaultTypes = array_keys(TagModel::instance()->defaultTypes());
                 $tagQuery->where('Type', $defaultTypes); // Other UIs can set a different type
-            } elseif (!in_array('all', $type)) {
-                $tagQuery->whereIn('Type', $type);
+            } elseif ($type) {
+                $tagQuery->where('Type', $type);
             }
 
             // Allow per-category tags
@@ -1173,7 +1164,7 @@ class TagModel extends Gdn_Model {
             }
 
             if ($parent) {
-                $tagQuery->whereIn('ParentTagID', $parent);
+                $tagQuery->where('ParentTagID', $parent);
             }
 
             // Run tag search query
@@ -1201,40 +1192,5 @@ class TagModel extends Gdn_Model {
         }
         $database->closeConnection();
         return $data;
-    }
-
-    /**
-     * Checks to see if the number of tags being added exceeds the maximum number of tags allowed on the discussion.
-     *
-     * @param array $tags
-     * @throws ClientException Throws an error if there are more tags than are allowed.
-     */
-    private function checkMaxTagsLimit($tags): void {
-        $maxTags = Gdn::config('Vanilla.Tagging.Max', 5);
-        if (count($tags) > $maxTags) {
-            throw new ClientException(
-                sprintf(
-                    'You cannot add more than %1$s %2$s to a discussion',
-                    $maxTags,
-                    plural($maxTags, 'tag', 'tags')
-                ),
-                409
-            );
-        }
-    }
-
-    /**
-     * Check to see what tag types you can allow to a discussion.
-     *
-     * @param array $tags The array of tags to check.
-     * @throws ClientException Throws an exception if a tag type isn't allowed.
-     */
-    public function checkAllowedDiscussionTagTypes(array $tags): void {
-        $allowedTypes = Gdn::config('Tagging.Discussion.AllowedTypes', ['']);
-        foreach ($tags as $tag) {
-            if (!in_array($tag['Type'], $allowedTypes)) {
-                throw new ClientException(sprintf('You cannot add tags with a type of %s to a discussion', $tag['Type']), 409);
-            }
-        }
     }
 }

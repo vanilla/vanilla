@@ -57,11 +57,12 @@ export const searchPageCSS = () => {
           .DataList.DataList-Search#search-results .Item.Item-Search h3 a,
       `,
         {
+            textDecoration: "none",
             ...Mixins.font({
                 color: globalVars.mainColors.fg,
-                ...globalVars.fontSizeAndWeightVars("large", "semiBold"),
+                size: globalVars.fonts.size.large,
+                weight: globalVars.fonts.weights.semiBold,
                 lineHeight: globalVars.lineHeights.condensed,
-                textDecoration: "none",
             }),
             ...allLinkStates({
                 hover: {

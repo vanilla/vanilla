@@ -53,8 +53,9 @@ export const messagesVariables = useThemeCache(() => {
 
     const text = themeVars("text", {
         font: Variables.font({
-            ...globalVars.fontSizeAndWeightVars("medium", "normal"),
             color: colors.fg,
+            size: globalVars.fonts.size.medium,
+            weight: globalVars.fonts.weights.normal,
             lineHeight: globalVars.lineHeights.condensed,
         }),
     });
@@ -70,7 +71,8 @@ export const messagesVariables = useThemeCache(() => {
             left: spacing.padding.withoutIcon / 2,
         },
         font: Variables.font({
-            ...globalVars.fontSizeAndWeightVars("medium", "semiBold"),
+            size: globalVars.fonts.size.medium,
+            weight: globalVars.fonts.weights.semiBold,
             color: globalVars.mainColors.fg,
         }),
         minHeight: formElVars.sizing.height,

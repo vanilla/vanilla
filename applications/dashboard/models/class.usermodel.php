@@ -3275,18 +3275,12 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
                 }
             } else {
                 // Search on the user table.
-                $whereCriterias = [
-                    'where' => [],
-                    'like' => ['u.Name' => $keywords, 'u.Email' => $keywords]
-                ];
-
-                $whereCriterias = $this->getEventManager()->fireFilter('userModel_searchKeyWords', $whereCriterias, $keywords);
+                $like = ['u.Name' => $keywords, 'u.Email' => $keywords];
 
                 $this->SQL
                     ->orOp()
                     ->beginWhereGroup()
-                    ->orLike($whereCriterias['like'] ?? [], '', 'right')
-                    ->orWhere($whereCriterias['where'] ?? [])
+                    ->orLike($like, '', 'right')
                     ->endWhereGroup();
             }
         }

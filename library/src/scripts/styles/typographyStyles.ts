@@ -12,28 +12,19 @@ import { styleUnit } from "@library/styles/styleUnit";
 import { containerVariables } from "@library/layout/components/containerStyles";
 import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
-import { ColorsUtils } from "@library/styles/ColorsUtils";
-import { CSSObject } from "@emotion/css";
-import { Mixins } from "@library/styles/Mixins";
 
 export const typographyClasses = useThemeCache(() => {
     const style = styleFactory("typography");
     const globalVars = globalVariables();
     const mediaQueries = panelLayoutVariables().mediaQueries();
 
-    const sharedTitleStyle: CSSObject = {
-        color: ColorsUtils.colorOut(globalVars.mainColors.fgHeading),
-    };
-
     const pageTitle = style(
         "pageTitle",
         {
-            ...sharedTitleStyle,
             width: "100%",
-            ...Mixins.font({
-                ...globalVars.fontSizeAndWeightVars("title"),
-                lineHeight: globalVars.lineHeights.condensed,
-            }),
+            fontSize: styleUnit(globalVars.fonts.size.title),
+            fontWeight: globalVars.fonts.sizeWeight.title ?? undefined,
+            lineHeight: globalVars.lineHeights.condensed,
             transform: `translateX(${em(globalVars.fonts.alignment.headings.horizontalOffset)})`,
             margin: 0,
             ...lineHeightAdjustment(),
@@ -46,11 +37,8 @@ export const typographyClasses = useThemeCache(() => {
     const largeTitle = style(
         "largeTitle",
         {
-            ...sharedTitleStyle,
             width: "100%",
-            ...Mixins.font({
-                ...globalVars.fontSizeAndWeightVars("largeTitle"),
-            }),
+            fontSize: styleUnit(globalVars.fonts.size.largeTitle),
         },
         mediaQueries.oneColumnDown({
             fontSize: styleUnit(globalVars.fonts.mobile.size.largeTitle),
@@ -58,20 +46,13 @@ export const typographyClasses = useThemeCache(() => {
     );
 
     const subTitle = style("subTitle", {
-        ...sharedTitleStyle,
         width: "100%",
-        // fontSize: styleUnit(globalVars.fonts.size.title),
-        ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("title"), // FIXME: check if this is a mistake (seems that font size should be subtitle)
-        }),
+        fontSize: styleUnit(globalVars.fonts.size.title),
     });
 
     const componentSubTitle = style("componentSubTitle", {
-        ...sharedTitleStyle,
         width: "100%",
-        ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("subTitle"),
-        }),
+        fontSize: styleUnit(globalVars.fonts.size.subTitle),
     });
 
     return {

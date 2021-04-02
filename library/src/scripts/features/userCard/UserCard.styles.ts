@@ -133,7 +133,7 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
             textAlign: "center",
         },
         mediaQueries.oneColumnDown({
-            fontSize: (vars.name.size! as number) * 1.25,
+            fontSize: vars.name.size * 1.25,
         }),
     );
 
@@ -159,12 +159,12 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         marginTop: styleUnit(2),
         marginBottom: styleUnit(3),
         ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("small"),
+            size: globalVars.fonts.size.small,
             lineHeight: globalVars.lineHeights.condensed,
         }),
         ...mediaQueries.oneColumnDown({
             ...Mixins.font({
-                ...globalVars.fontSizeAndWeightVars("medium"),
+                size: globalVars.fonts.size.medium,
                 lineHeight: globalVars.lineHeights.condensed,
             }),
         }),
@@ -207,7 +207,7 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         ...linkColors,
         "&&": {
             ...Mixins.font({
-                ...globalVars.fontSizeAndWeightVars("small"),
+                size: globalVars.fonts.size.small,
                 align: "center",
             }),
             display: "inline-flex",

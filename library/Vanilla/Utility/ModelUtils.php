@@ -11,8 +11,6 @@ use Garden\Schema\Validation;
 use Garden\Schema\ValidationException;
 use Gdn_Locale as LocaleInterface;
 use Gdn_Validation;
-use Iterator;
-use Vanilla\CurrentTimeStamp;
 
 /**
  * Class ModelUtils.
@@ -237,19 +235,19 @@ class ModelUtils {
     /**
      * Iterate through a generator until completed until a specified timeout has been reached.
      *
-     * @param Iterator $iterable
+     * @param callable $iterable
      * @param int $timeout
      * @return bool
      */
-    public static function iterateWithTimeout(Iterator $iterable, int $timeout): bool {
-        $horizon = CurrentTimeStamp::get() + $timeout;
+    public static function iterateWithTimeout(callable $iterable, int $timeout): bool {
+        $horizon = time() + $timeout;
 
         $memoryLimit = ini_get("memory_limit");
         $memoryLimit = $memoryLimit == -1 ? null : StringUtils::unformatSize($memoryLimit);
 
-        foreach ($iterable as $r) {
+        foreach ($iterable() as $r) {
             $memoryExceeded = $memoryLimit ? (memory_get_usage() / $memoryLimit) > 0.8 : false;
-            if (CurrentTimeStamp::get() >= $horizon || $memoryExceeded) {
+            if (time() > $horizon || $memoryExceeded) {
                 return false;
             }
         }

@@ -421,7 +421,7 @@ class Gdn_Session {
 
         // Retrieve the authenticated UserID from the Authenticator module.
         $userModel = Gdn::authenticator()->getUserModel();
-        $this->UserID = $userID !== false ? (int) $userID : Gdn::authenticator()->getIdentity();
+        $this->UserID = $userID !== false ? $userID : Gdn::authenticator()->getIdentity();
         $this->User = false;
         $this->loadTransientKey();
 

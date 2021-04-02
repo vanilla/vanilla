@@ -179,7 +179,7 @@ class DomUtilsTest extends TestCase {
             'Heavily nested' => [
                 2,
                 '<div><div><div><div>this</div> is a word</div></div> <b>okay?</b></div>',
-                '<div><div><div><div>this</div> is</div></div></div>'
+                '<div><div><div><div>this </div> is</div></div></div>'
             ],
             'Test default wordCount' => [   //100
                 null,
@@ -303,7 +303,7 @@ EOT;
             ],
             'htmltagsnoescape-multiplematches' => [
                 2,
-                'random', '<div><p><b>test</b> random text random</p></div>','<div><p><b>test</b> <strong>random</strong> text <strong>random</strong></p></div>', false
+                'random', '<div><p><b>test</b> random text random</p></div>','<div><p><b>test</b> <strong>random</strong> text<strong>random</strong></p></div>', false
             ],
 
         ];

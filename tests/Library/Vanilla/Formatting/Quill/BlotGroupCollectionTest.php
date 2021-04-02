@@ -9,7 +9,6 @@ namespace VanillaTests\Library\Vanilla\Formatting\Quill;
 use Vanilla\Formatting\Formats\RichFormat;
 use Vanilla\Formatting\Quill\Parser;
 use VanillaTests\BootstrapTestCase;
-use VanillaTests\Fixtures\Formatting\FormatFixtureFactory;
 
 /**
  * Verify basic functionality of BlotGroupCollection.
@@ -51,21 +50,28 @@ class BlotGroupCollectionTest extends BootstrapTestCase {
     /**
      * Provide data for testing the stringify method.
      *
-     * @return array<string, string[]>
+     * @return array[]
      */
     public function provideStringifyContent(): array {
-        $factory = new FormatFixtureFactory("rich");
-        $fixtures = $factory->getAllFixtures();
-
-        $data = [];
-        foreach ($fixtures as $fixture) {
-            $name = $fixture->getName();
-            $expected = $fixture->getHtml();
-
-            if ($expected !== null) {
-                $data[$name] = [$fixture->getInput()];
-            }
-        }
-        return $data;
+        return [
+            "Basic inline and block" => [json_encode([
+                ["insert" => "Hello "],
+                [
+                    "attributes" => ["italic" => true],
+                    "insert" => "world",
+                ],
+                ["insert" => ".\nQuote "],
+                [
+                    "attributes" => ["bold" => true],
+                    "insert" => "me",
+                ],
+                ["insert" => "."],
+                [
+                    "attributes" => ["blockquote-line" => true],
+                    "insert" => "\n",
+                ],
+                ["insert" => "This is a test.\n"]
+            ])],
+        ];
     }
 }

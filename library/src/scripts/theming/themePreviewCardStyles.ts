@@ -236,9 +236,8 @@ export const themeCardClasses = useThemeCache(() => {
     });
 
     const title = style("title", {
-        ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("medium", "semiBold"),
-        }),
+        fontSize: globalVars.fonts.size.medium,
+        fontWeight: globalVars.fonts.weights.semiBold,
         ...flexHelper().middleLeft(),
     });
 

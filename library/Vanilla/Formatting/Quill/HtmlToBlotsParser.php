@@ -8,8 +8,6 @@
 namespace Vanilla\Formatting\Quill;
 
 use Vanilla\Formatting\Html\HtmlDocument;
-use Vanilla\Formatting\Quill\Blots\Lines\AbstractLineTerminatorBlot;
-use Vanilla\Formatting\Quill\Blots\TextBlot;
 
 /**
  * Utility functions for parsing HTML into bots.
@@ -19,22 +17,24 @@ class HtmlToBlotsParser {
      * Parse an HTML fragment into blots.
      *
      * @param string $html The HTML to parse.
+     * @param BlotGroup $group The blot group that this is a part of.
      * @param BlotGroupCollection $parent The document the group is a part of.
-     * @param AbstractLineTerminatorBlot $terminator An optional terminator for the operations.
-     * @return array<TextBlot>
+     * @return BlotGroup
      */
-    public static function parseInlineHtml(string $html, BlotGroupCollection $parent, AbstractLineTerminatorBlot $terminator = null): array {
+    public static function parseInlineHtml(string $html, BlotGroup $group, BlotGroupCollection $parent): BlotGroup {
         $dom = new HtmlDocument($html);
         $root = $dom->getRoot();
 
         $operations = static::parseDOMElementOperations($root);
+
+        $terminator = $group->getTerminatorBlot();
         if ($terminator !== null) {
             $operations[] = $terminator->getCurrentOperation();
         }
 
         $new = new BlotGroupCollection($operations, $parent->getAllowedBlotClasses(), $parent->getParseMode());
 
-        return $new->getGroups()[0]->getBlotsAndGroups();
+        return $new->getGroups()[0];
     }
 
     /**
@@ -52,7 +52,7 @@ class HtmlToBlotsParser {
                 $op['insert'] = $node->nodeValue;
                 $result[] = $op;
             } elseif ($node instanceof \DOMElement) {
-                $op = array_replace_recursive($op, static::attributesFromElement($node));
+                $op += array_replace_recursive($op, static::attributesFromElement($node));
                 $blots = static::parseDOMElementOperations($node, $op);
                 $result = array_merge($result, $blots);
             }
@@ -77,16 +77,6 @@ class HtmlToBlotsParser {
             case 'i':
             case 'em':
                 $op['attributes']['italic'] = true;
-                break;
-            case 's':
-            case 'strike':
-                $op['attributes']['strike'] = true;
-                break;
-            case 'code':
-                $op['attributes']['code'] = true;
-                break;
-            case 'a':
-                $op['attributes']['link'] = (string)$node->getAttribute('href');
                 break;
         }
         return $op;

@@ -206,12 +206,13 @@ export const mobileDropDownClasses = useThemeCache(() => {
         justifyContent: "center",
         textTransform: "uppercase",
         minHeight: styleUnit(titleBarVars.sizing.height - 4),
+        fontSize: styleUnit(globalVars.fonts.size.small),
         textOverflow: "ellipsis",
         ...Mixins.padding({
             vertical: styleUnit(4),
         }),
         ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("small"),
+            size: globalVars.fonts.size.small,
             transform: "uppercase",
             color: globalVars.mixBgAndFg(0.6),
         }),

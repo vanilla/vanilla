@@ -107,7 +107,8 @@ export const compactSearchVariables = useThemeCache((forcedVars?: IThemeVariable
         },
         fonts: {
             color: fgColor,
-            ...globalVars.fontSizeAndWeightVars("large", "semiBold"),
+            size: globalVars.fonts.size.large,
+            weight: globalVars.fonts.weights.semiBold,
         },
         hover: {
             colors: {

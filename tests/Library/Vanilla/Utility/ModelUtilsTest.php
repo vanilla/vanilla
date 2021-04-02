@@ -9,7 +9,6 @@ namespace VanillaTests\Library\Vanilla\Utility;
 use Gdn_Validation;
 use Garden\Schema\Validation;
 use Garden\Schema\ValidationException;
-use Iterator;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Utility\ModelUtils;
 
@@ -40,13 +39,12 @@ class ModelUtilsTest extends TestCase {
      */
     public function testTimeoutIterateWithTimeout(): void {
         $i = 0;
-        $iterator = function () use (&$i): Iterator {
+        $result = ModelUtils::iterateWithTimeout(function () use (&$i) {
             do {
                 $i++;
                 yield true;
             } while (true);
-        };
-        $result = ModelUtils::iterateWithTimeout($iterator(), 1);
+        }, 1);
         $this->assertGreaterThan(0, $i);
         $this->assertSame(false, $result);
     }
@@ -56,11 +54,10 @@ class ModelUtilsTest extends TestCase {
      */
     public function testCompletedIterateWithTimeout(): void {
         $i = 0;
-        $iterator = function () use (&$i): Iterator {
+        $result = ModelUtils::iterateWithTimeout(function () use (&$i) {
             $i++;
             yield true;
-        };
-        $result = ModelUtils::iterateWithTimeout($iterator(), 30);
+        }, 30);
         $this->assertSame(1, $i);
         $this->assertSame(true, $result);
     }

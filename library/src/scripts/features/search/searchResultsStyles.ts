@@ -45,8 +45,9 @@ export const searchResultsVariables = useThemeCache(() => {
          * @expand font
          */
         font: Variables.font({
-            ...globalVars.fontSizeAndWeightVars("large", "semiBold"),
             color: colors.fg,
+            size: globalVars.fonts.size.large,
+            weight: globalVars.fonts.weights.semiBold,
             lineHeight: globalVars.lineHeights.condensed,
             textDecoration: "none",
         }),

@@ -114,19 +114,9 @@ class UserController extends DashboardController {
         $filter['Optimize'] = Gdn::userModel()->pastUserThreshold();
 
         // Sorting
-        $allowedSorting = [
-            'Name' => 'asc',
-            'DateInserted' => 'desc',
-            'DateFirstVisit' => 'desc',
-            'DateLastActive' => 'desc'
-        ];
-
-        $eventManager = Gdn::getContainer()->get(\Garden\EventManager::class);
-        $allowedSorting = $eventManager->fireFilter('userController_usersListAllowedSorting', $allowedSorting);
-
-        if (isset($allowedSorting[$order])) {
-            $orderDir = $allowedSorting[$order];
+        if (in_array($order, ['DateInserted', 'DateFirstVisit', 'DateLastActive'])) {
             $order = 'u.'.$order;
+            $orderDir = 'desc';
         } else {
             $order = 'u.Name';
             $orderDir = 'asc';

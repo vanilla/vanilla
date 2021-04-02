@@ -63,12 +63,10 @@ export const placesSearchListingClasses = useThemeCache(() => {
     });
 
     const link = style("link", {
-        ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("small"),
-            color: ColorsUtils.colorOut(vars.colors.fg),
-        }),
+        fontSize: important(globalVars.fonts.size.small),
         display: important("flex"),
         alignItems: important("center"),
+        color: ColorsUtils.colorOut(vars.colors.fg),
         marginRight: styleUnit(24),
         padding: "6px 0",
         ...linkColors,

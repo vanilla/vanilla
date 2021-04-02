@@ -693,18 +693,7 @@ class SettingsController extends DashboardController {
                         $this->Form->setData($banModel->getID($iD));
                     }
                 }
-
-                $banTypes = [
-                    'IPAddress' => t('IP Address'),
-                    'Email' => t('Email'),
-                    'Name' => t('Name'),
-                ];
-
-                $eventManager = Gdn::getContainer()->get(\Garden\EventManager::class);
-                $banTypes = $eventManager->fireFilter('settingsController_listBanTypes', $banTypes);
-
-                $this->setData('_BanTypes', $banTypes);
-
+                $this->setData('_BanTypes', ['IPAddress' => t('IP Address'), 'Email' => t('Email'), 'Name' => t('Name')]);
                 $this->View = 'Ban';
                 break;
             case 'delete':

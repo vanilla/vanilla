@@ -28,8 +28,8 @@ export const suggestedTextStyleHelper = useThemeCache((overwrite?: { forDashboar
             horizontal: 12,
         }),
         ...Mixins.font({
-            ...(forDashboard ? globalVars.fontSizeAndWeightVars("medium") : globalVars.fontSizeAndWeightVars("large")),
             color: globalVars.mainColors.fg,
+            size: forDashboard ? globalVars.fonts.size.medium : globalVars.fonts.size.large,
         }),
         textAlign: "left",
         display: "block",

@@ -103,9 +103,8 @@ export const tokensClasses = useThemeCache(() => {
             },
             ".tokens__multi-value__label": {
                 paddingLeft: px(6),
-                ...Mixins.font({
-                    ...globalVars.fontSizeAndWeightVars("small", "normal"),
-                }),
+                fontWeight: globalVars.fonts.weights.normal,
+                fontSize: globalVars.fonts.size.small,
             },
             ".tokens--is-disabled": {
                 opacity: formElVars.disabled.opacity,

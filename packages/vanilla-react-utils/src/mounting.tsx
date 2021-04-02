@@ -147,24 +147,21 @@ export function mountReact(
 export interface IMountable {
     target: HTMLElement;
     component: React.ReactElement;
-    overwrite?: boolean;
 }
 
 export function mountReactMultiple(components: IMountable[], callback?: () => void, options?: IComponentMountOptions) {
     if (!components.length) {
-        callback && callback();
         return;
     }
 
     let toCleanup: Array<{ target: HTMLElement; cleanup: HTMLElement }> = [];
-    components.forEach((mountable) => {
-        const { component, target } = mountable;
+    components.forEach(({ component, target }) => {
         let mountPoint = target;
         if (options?.clearContents) {
             target.innerHTML = "";
         }
 
-        if (options?.overwrite || mountable.overwrite) {
+        if (options && options.overwrite) {
             const container = document.createElement("span");
             toCleanup.push({
                 target,

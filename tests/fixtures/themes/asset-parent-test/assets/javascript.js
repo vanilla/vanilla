@@ -1,1 +1,1 @@
-console.log("Hello FS parent");
+console.log("JavaScript asset loaded.");

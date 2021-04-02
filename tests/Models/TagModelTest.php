@@ -9,23 +9,21 @@ namespace VanillaTests\Models;
 
 use PHPUnit\Framework\TestCase;
 use VanillaTests\SiteTestTrait;
-use VanillaTests\VanillaTestCase;
 
 /**
  * Tests for the tag model.
  */
-class TagModelTest extends VanillaTestCase {
+class TagModelTest extends TestCase {
 
     use SiteTestTrait;
     use ModelTestTrait;
     use TestCategoryModelTrait;
-    use TestDiscussionModelTrait;
-
-    /** @var int */
-    protected static $tagCount = 0;
 
     /** @var \TagModel */
     private $tagModel;
+
+    /** @var \DiscussionModel */
+    private $discussionModel;
 
     /**
      * @inheritdoc
@@ -36,54 +34,25 @@ class TagModelTest extends VanillaTestCase {
         $this->categoryModel = self::container()->get(\CategoryModel::class);
         $this->tagModel = self::container()->get(\TagModel::class);
         $this->tagModel->SQL->truncate('Tag');
-
-        $config = self::container()->get(\Gdn_Configuration::class);
-        $config->saveToConfig('Vanilla.Tagging.Max', 5);
-    }
-
-    /**
-     * Create a test tag.
-     *
-     * @param array $override Array of fields to override.
-     * @return array
-     */
-    public function newTag(array $override): array {
-        $tag = $override + self::sprintfCounter([
-                'Name' => 'tag-%s',
-                'FullName' => 'Tag %s',
-            ]);
-
-
-        return $tag;
-    }
-
-    /**
-     * Insert test records and return them.
-     *
-     * @param int $count The number of tags to insert.
-     * @param array $overrides An array of row overrides.
-     * @return array
-     */
-    public function insertTags(int $count, array $overrides = []): array {
-        $ids = [];
-        for ($i = 0; $i < $count; $i++) {
-            $ids[] = $this->tagModel->save($this->newTag($overrides));
-        }
-        $rows = $this->tagModel->getWhere(['TagID' => $ids])->resultArray();
-        TestCase::assertCount($count, $rows, "Not enough test discussions were inserted.");
-
-        return $rows;
     }
 
     /**
      * Test getting tagIDs by their tag name.
      */
     public function testGetTagIDsByName() {
-        $tags = $this->insertTags(2, ['Type' => 'Status']);
-        $tagNames = array_column($tags, 'Name');
-        $tagIDs = array_column($tags, 'TagID');
+        $tag1 = $this->tagModel->save([
+            'Name' => 'Test1',
+            'FullName' => 'Test 1 Full',
+            'Type' => 'Status',
+        ]);
 
-        $this->assertIDsEqual($tagIDs, $this->tagModel->getTagIDsByName($tagNames));
+        $tag2 = $this->tagModel->save([
+            'Name' => 'Test2',
+            'FullName' => 'Test 2 Full',
+            'Type' => 'Status',
+        ]);
+
+        $this->assertIDsEqual([$tag1, $tag2], $this->tagModel->getTagIDsByName(['Test1', 'Test2']));
     }
 
     /**
@@ -91,7 +60,7 @@ class TagModelTest extends VanillaTestCase {
      */
     public function testSaveMovedDiscussion() {
         $categories = $this->insertCategories(2);
-        $taggedDiscussion = $this->insertDiscussions(1, [
+        $taggedDiscussionID = $this->discussionModel->save([
             'Name' => "TagTest",
             'CategoryID' => $categories[0]['CategoryID'],
             'Body' => "TagTest",
@@ -99,8 +68,6 @@ class TagModelTest extends VanillaTestCase {
             'DateInserted' => TestDate::mySqlDate(),
             'Tags' => 'xxx'
         ]);
-
-        $taggedDiscussionID = $taggedDiscussion[0]['DiscussionID'];
 
         $this->api()->patch('/discussions/'.$taggedDiscussionID, ['CategoryID' => $categories[1]['CategoryID']]);
         $tagInfo = $this->tagModel->getDiscussionTags($taggedDiscussionID);
@@ -128,19 +95,27 @@ class TagModelTest extends VanillaTestCase {
      */
     public function testGetTagsFromReference() {
         // Make the tags.
-        $tags = $this->insertTags(2);
+        $tag1 = $this->tagModel->save([
+            'Name' => 'tag1',
+            'FullName' => 'Tag 1 Full'
+        ]);
+
+        $tag2 = $this->tagModel->save([
+            'Name' => 'tag2',
+            'FullName' => 'Tag 2 Full'
+        ]);
 
         // Create a valid tag reference.
-        $tagReference = ["urlcodes" => [$tags[0]['Name']], "tagIDs" => [$tags[1]['TagID']]];
+        $tagReference = ["urlcodes" => ["tag1"], "tagIDs" => [$tag2]];
 
         // We should get the tags back.
-        $tagsFromRef = $this->tagModel->getTagsFromReferences($tagReference);
+        $tags = $this->tagModel->getTagsFromReferences($tagReference);
 
         //Make sure that we actually do.
-        $this->assertCount(2, $tagsFromRef);
-        $tagIDs = array_column($tagsFromRef, "TagID");
-        $this->assertContains($tags[0]['TagID'], $tagIDs);
-        $this->assertContains($tags[1]['TagID'], $tagIDs);
+        $this->assertCount(2, $tags);
+        $tagIDs = array_column($tags, "TagID");
+        $this->assertContains($tag1, $tagIDs);
+        $this->assertContains($tag2, $tagIDs);
     }
 
     /**
@@ -162,32 +137,41 @@ class TagModelTest extends VanillaTestCase {
      * Test setting tags on a discussion.
      */
     public function testPutDiscussionTags() {
-        $tags = $this->insertTags(3);
+        $category = $this->insertCategories(1)[0];
+        $tag1 = $this->tagModel->save([
+            'Name' => 'Put1',
+            'FullName' => 'Put 1 Full'
+        ]);
+        $tag2 = $this->tagModel->save([
+            'Name' => 'Put2',
+            'FullName' => 'Put 2 Full'
+        ]);
+        $tag3 = $this->tagModel->save([
+            'Name' => 'Put3',
+            'FullName' => 'Put 3 Full'
+        ]);
 
         // Set the tags.
-        $putTagsDiscussion = $this->insertDiscussions(1, [
+        $putTagsDiscussionID = $this->discussionModel->save([
             'Name' => "PutTest",
+            'CategoryID' => $category['CategoryID'],
             'Body' => "PutTest",
             'Format' => 'Text',
             'DateInserted' => TestDate::mySqlDate(),
         ]);
 
-        $tagUrlCodes = array_column($tags, 'Name');
-
-        $putTagsDiscussionID = $putTagsDiscussion[0]['DiscussionID'];
-
         // This should set the first two tags on the discussion.
-        $tagFrags = $this->api()->put("/discussions/{$putTagsDiscussionID}/tags", ["urlcodes" => [$tagUrlCodes[0], $tagUrlCodes[1]]])->getBody();
+        $tagFrags = $this->api()->put("/discussions/{$putTagsDiscussionID}/tags", ["urlcodes" => ["Put1", "Put2"]])->getBody();
         $this->assertCount(2, $tagFrags);
         $tagFragNames = array_column($tagFrags, "urlcode");
-        $this->assertContains($tagUrlCodes[0], $tagFragNames);
-        $this->assertContains($tagUrlCodes[1], $tagFragNames);
+        $this->assertContains("Put1", $tagFragNames);
+        $this->assertContains("Put2", $tagFragNames);
 
         // When we set tags 2 and 3 on the discussion, they should be the only ones associated with it (tag1 should go away).
-        $tagFrags2 = $this->api()->put("/discussions/{$putTagsDiscussionID}/tags", ["urlcodes" => [$tagUrlCodes[1], $tagUrlCodes[2]]])->getBody();
+        $tagFrags2 = $this->api()->put("/discussions/{$putTagsDiscussionID}/tags", ["urlcodes" => ["Put2", "Put3"]])->getBody();
         $this->assertCount(2, $tagFrags2);
         $tagFragNames2 = array_column($tagFrags2, "urlcode");
-        $this->assertNotContains($tagUrlCodes[0], $tagFragNames2);
+        $this->assertNotContains("Put1", $tagFragNames2);
 
         // Test adding a tag that doesn't exist. We should get a "Not Found" error.
         $this->expectExceptionCode(404);
@@ -198,118 +182,41 @@ class TagModelTest extends VanillaTestCase {
      * Test adding tags to a discussion.
      */
     public function testPostDiscussionTags() {
-        $tags = $this->insertTags(3);
+        $category = $this->insertCategories(1)[0];
+        $tag1 = $this->tagModel->save([
+            'Name' => 'Post1',
+            'FullName' => 'Post 1 Full'
+        ]);
+        $tag2 = $this->tagModel->save([
+            'Name' => 'Post2',
+            'FullName' => 'Post 2 Full'
+        ]);
+        $tag3 = $this->tagModel->save([
+            'Name' => 'Post3',
+            'FullName' => 'Post 3 Full'
+        ]);
 
-        $tagUrlCodes = array_column($tags, 'Name');
-
-        $postTagsDiscussion = $this->insertDiscussions(1, [
+        $postTagsDiscussionID = $this->discussionModel->save([
             'Name' => "PostTest",
+            'CategoryID' => $category['CategoryID'],
             'Body' => "PostTest",
             'Format' => 'Text',
             'DateInserted' => TestDate::mySqlDate(),
         ]);
 
-        $postTagsDiscussionID = $postTagsDiscussion[0]['DiscussionID'];
-
         // Add the first two tags to the discussion and make sure they've been added.
-        $tagFrags = $this->api()->post("/discussions/{$postTagsDiscussionID}/tags", ["urlcodes" => [$tagUrlCodes[0], $tagUrlCodes[1]]])->getBody();
+        $tagFrags = $this->api()->post("/discussions/{$postTagsDiscussionID}/tags", ["urlcodes" => ["Post1", "Post2"]])->getBody();
         $this->assertCount(2, $tagFrags);
         $tagFragNames = array_column($tagFrags, "urlcode");
-        $this->assertContains($tagUrlCodes[0], $tagFragNames);
-        $this->assertContains($tagUrlCodes[1], $tagFragNames);
+        $this->assertContains("Post1", $tagFragNames);
+        $this->assertContains("Post2", $tagFragNames);
 
         // Add the third tag and make sure we get that's been added and that the first two are still associated with the discussion.
-        $tagFrags2 = $this->api()->post("/discussions/{$postTagsDiscussionID}/tags", ["urlcodes" => [$tagUrlCodes[2]]])->getBody();
+        $tagFrags2 = $this->api()->post("/discussions/{$postTagsDiscussionID}/tags", ["urlcodes" => ["Post3"]])->getBody();
         $this->assertCount(3, $tagFrags2);
         $tagFragNames2 = array_column($tagFrags2, "urlcode");
-        $this->assertContains($tagUrlCodes[2], $tagFragNames2);
-        $this->assertContains($tagUrlCodes[0], $tagFragNames2);
-        $this->assertContains($tagUrlCodes[1], $tagFragNames2);
-    }
-
-    /**
-     * Test adding more than max tags allowed for a discussion.
-     */
-    public function testExceedMaxTagsPost(): void {
-        $tags = $this->insertTags(2);
-        $tagCodes = array_column($tags, 'Name');
-
-        $maxTagsDiscussion = $this->insertDiscussions(1, [
-            'Name' => "PostMaxTagsTest",
-            'Body' => "PostMaxTagsTest",
-            'Format' => 'Text',
-            'DateInserted' => TestDate::mySqlDate(),
-        ]);
-
-        $maxTagsDiscussionID = $maxTagsDiscussion[0]['DiscussionID'];
-
-        $config = $this->container()->get(\Gdn_Configuration::class);
-        $config->saveToConfig('Vanilla.Tagging.Max', 1);
-
-        // Post 1 tag.
-        $discussionTags = $this->api()->post("/discussions/{$maxTagsDiscussionID}/tags", ["urlcodes" => [$tagCodes[0]]])->getBody();
-        $this->assertCount(1, $discussionTags);
-
-        // Try posting one too many tags.
-        $this->expectExceptionCode(409);
-        $this->expectExceptionMessage('You cannot add more than 1 tag to a discussion');
-        $this->api()->post("/discussions/{$maxTagsDiscussionID}/tags", ["urlcodes" => [$tagCodes[1]]]);
-    }
-
-    /**
-     * Test adding more tags than are allowed through the put endpoint.
-     */
-    public function testExceedMaxTagsPut(): void {
-        // Add the tags.
-        $tags = $this->insertTags(2);
-        $tagCodes = array_column($tags, 'Name');
-
-        $maxTagsDiscussion = $this->insertDiscussions(1, [
-            'Name' => "PutMaxTagsTest",
-            'Body' => "PutMaxTagsTest",
-            'Format' => 'Text',
-            'DateInserted' => TestDate::mySqlDate(),
-        ]);
-
-        $maxTagsDiscussionID = $maxTagsDiscussion[0]['DiscussionID'];
-
-        $config = $this->container()->get(\Gdn_Configuration::class);
-        $config->saveToConfig('Vanilla.Tagging.Max', 1);
-
-        // Try using post to add too many tags.
-        $this->expectExceptionCode(409);
-        $this->expectExceptionMessage('You cannot add more than 1 tag to a discussion');
-        $this->api()->put("/discussions/{$maxTagsDiscussionID}/tags", ["urlcodes" => $tagCodes]);
-    }
-
-    /**
-     * Test adding a restricted tag type to a discussion (all types are restricted by default).
-     */
-    public function testAddingTagOfRestrictedTypeToDiscussion(): void {
-        // Add a tag.
-        $tags = $this->insertTags(1, ['Type' => 'RESTRICTED']);
-
-        $restrictedTagTypeDiscussion = $this->insertDiscussions(1, [
-            'Name' => "RestrictedTagsTest",
-            'Body' => "RestrictedTagsTest",
-            'Format' => 'Text',
-            'DateInserted' => TestDate::mySqlDate(),
-        ]);
-
-        $restrictedTagTypeDiscussionID = $restrictedTagTypeDiscussion[0]['DiscussionID'];
-
-        $this->expectExceptionCode(409);
-        $this->expectExceptionMessage('You cannot add tags with a type of RESTRICTED to a discussion');
-        $this->api()->put("/discussions/{$restrictedTagTypeDiscussionID}/tags", ["urlcodes" => [$tags[0]['Name']]]);
-    }
-
-    /**
-     * Test search() method where parent is false. This test ensures that the search method works when you pass
-     * the boolean false to the search() method.
-     */
-    public function testSearchWithNoParent() {
-        $this->insertTags(2);
-        $searchedTags = $this->tagModel->search('tag', false, false);
-        $this->assertCount(2, $searchedTags);
+        $this->assertContains("Post3", $tagFragNames2);
+        $this->assertContains("Post2", $tagFragNames2);
+        $this->assertContains("Post1", $tagFragNames2);
     }
 }

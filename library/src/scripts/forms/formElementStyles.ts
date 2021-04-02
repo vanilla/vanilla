@@ -11,7 +11,6 @@ import { styleUnit } from "@library/styles/styleUnit";
 import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { IThemeVariables } from "@library/theming/themeReducer";
-import { Mixins } from "@library/styles/Mixins";
 
 export const formElementsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const vars = globalVariables(forcedVars);
@@ -108,10 +107,8 @@ export const accessibleErrorClasses = useThemeCache(() => {
         alignItems: "center",
     });
     const paragraph = style("paragraph", {
-        ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("small", "normal"),
-            color: ColorsUtils.colorOut(globalVars.messageColors.error.fg),
-        }),
+        color: ColorsUtils.colorOut(globalVars.messageColors.error.fg),
+        fontSize: styleUnit(globalVars.fonts.size.small),
     });
 
     return {

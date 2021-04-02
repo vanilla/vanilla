@@ -10,7 +10,6 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { themeCardVariables } from "./themePreviewCardStyles";
 import { percent, color, px } from "csx";
 import { Mixins } from "@library/styles/Mixins";
-import { ColorsUtils } from "@library/styles/ColorsUtils";
 
 export const currentThemeVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("currentThemeInfo");
@@ -113,10 +112,8 @@ export const currentThemeClasses = useThemeCache(() => {
     });
 
     const name = style("name", {
-        ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("large"),
-            color: globalVars.mainColors.fg.toString(),
-        }),
+        fontSize: styleUnit(globalVars.fonts.size.large),
+        color: globalVars.mainColors.fg.toString(),
         marginBottom: styleUnit(vars.flag.margin.bottom - 6),
         ...{
             ["& h5"]: {
@@ -126,10 +123,9 @@ export const currentThemeClasses = useThemeCache(() => {
     });
 
     const authorName = style("authorName", {
-        ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("small", "normal"),
-            color: ColorsUtils.colorOut(globalVars.mainColors.primary),
-        }),
+        fontSize: styleUnit(globalVars.fonts.size.small),
+        fontWeight: globalVars.fonts.weights.normal,
+        color: globalVars.mainColors.primary.toString(),
         paddingBottom: styleUnit(vars.authorName.padding.bottom),
         ...{
             ["& span"]: {
@@ -139,11 +135,10 @@ export const currentThemeClasses = useThemeCache(() => {
     });
 
     const description = style("description", {
-        ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("medium", "normal"),
-            color: globalVars.mainColors.fg.toString(),
-            lineHeight: styleUnit(20),
-        }),
+        fontSize: styleUnit(globalVars.fonts.size.medium),
+        fontWeight: globalVars.fonts.weights.normal,
+        color: globalVars.mainColors.fg.toString(),
+        lineHeight: styleUnit(20),
     });
 
     const themeActionButtons = style("themeActionButtons", {

@@ -68,9 +68,8 @@ export const frameHeaderClasses = useThemeCache(() => {
         textOverflow: "ellipsis",
         width: calc(`100% - ${styleUnit(formElVars.sizing.height)}`),
         flexBasis: calc(`100% - ${styleUnit(formElVars.sizing.height)}`),
-        ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("large", "semiBold"),
-        }),
+        fontWeight: globalVars.fonts.weights.semiBold,
+        fontSize: styleUnit(globalVars.fonts.size.large),
     });
 
     const headingMinimal = style("headingMinimal", {
@@ -78,10 +77,8 @@ export const frameHeaderClasses = useThemeCache(() => {
         ...Mixins.padding({ horizontal: 24 }),
         ...{
             "& *": {
-                ...Mixins.font({
-                    ...globalVars.fontSizeAndWeightVars("small"),
-                    transform: "uppercase",
-                }),
+                textTransform: "uppercase",
+                fontSize: styleUnit(globalVars.fonts.size.small),
             },
         },
     });
@@ -91,12 +88,11 @@ export const frameHeaderClasses = useThemeCache(() => {
     });
 
     const centred = style("centred", {
-        ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("small", "semiBold"),
-            align: "center",
-            transform: "uppercase",
-            color: ColorsUtils.colorOut(globalVars.mixBgAndFg(0.6)),
-        }),
+        textAlign: "center",
+        textTransform: "uppercase",
+        fontSize: styleUnit(globalVars.fonts.size.small),
+        color: ColorsUtils.colorOut(globalVars.mixBgAndFg(0.6)),
+        fontWeight: globalVars.fonts.weights.semiBold,
     });
 
     const spacerWidth = globalVars.icon.sizes.large - (globalVars.gutter.half + globalVars.gutter.quarter);

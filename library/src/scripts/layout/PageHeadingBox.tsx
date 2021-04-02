@@ -6,7 +6,7 @@
 
 import { cx } from "@emotion/css";
 import Heading from "@library/layout/Heading";
-import { useCalculatedDepth } from "@library/layout/PageBox.context";
+import { usePageBoxDepthContext } from "@library/layout/PageBox.context";
 import PageHeading from "@library/layout/PageHeading";
 import { pageHeadingBoxClasses } from "@library/layout/PageHeadingBox.styles";
 import {
@@ -15,7 +15,7 @@ import {
     SubtitleType,
 } from "@library/layout/PageHeadingBox.variables";
 import { useWidgetLayoutClasses } from "@library/layout/WidgetLayout.context";
-import React, { useRef } from "react";
+import React from "react";
 
 interface IProps {
     title: React.ReactNode;
@@ -31,11 +31,8 @@ export function PageHeadingBox(props: IProps) {
     const options = pageHeadingBoxVariables(props.options).options;
     const classes = pageHeadingBoxClasses(props.options);
     const { subtitleType } = options;
+    const { depth = 2 } = usePageBoxDepthContext();
     const contextClasses = useWidgetLayoutClasses();
-
-    const wrapperRef = useRef<HTMLDivElement | null>(null);
-    const depth = useCalculatedDepth(wrapperRef);
-
     if (!title && !description && !subtitle && !actions) {
         return <></>;
     }
@@ -49,7 +46,7 @@ export function PageHeadingBox(props: IProps) {
     );
 
     return (
-        <div ref={wrapperRef} className={cx(classes.root, contextClasses.headingBlockClass, "pageHeadingBox")}>
+        <div className={cx(classes.root, contextClasses.headingBlockClass, "pageHeadingBox")}>
             {subtitleType === SubtitleType.OVERLINE && subtitleView}
             <div className={classes.titleWrap}>
                 <PageHeading depth={depth} actions={actions} includeBackLink={includeBackLink ?? false}>

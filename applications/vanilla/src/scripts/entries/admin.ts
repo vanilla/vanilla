@@ -3,10 +3,6 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import { mountModal } from "@library/modal/Modal";
-import { delegateEvent } from "@vanilla/dom-utils";
-import { DeleteCategoryModal } from "@vanilla/addon-vanilla/categories/DeleteCategoryModal";
 import { onReady, onContent } from "@library/utility/appUtils";
 import { suggestedTextStyleHelper } from "@library/features/search/suggestedTextStyles";
 import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
@@ -41,18 +37,3 @@ function handleImageUploadInputDisplay() {
         });
     }
 }
-
-delegateEvent("click", ".dropdown-menu-link-delete-delete", (event, triggeringElement) => {
-    event.preventDefault();
-    const categoryID = triggeringElement.getAttribute("data-categoryid");
-    const discussionsCount = triggeringElement.getAttribute("data-countDiscussions");
-    if (categoryID === null) {
-        return;
-    }
-    mountModal(
-        <DeleteCategoryModal
-            categoryID={parseInt(categoryID)}
-            discussionsCount={discussionsCount !== null ? parseInt(discussionsCount) : undefined}
-        />,
-    );
-});

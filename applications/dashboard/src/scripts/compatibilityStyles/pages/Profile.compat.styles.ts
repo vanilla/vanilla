@@ -35,9 +35,7 @@ export const profileCompatCSS = () => {
 
     cssOut(`body.Section-Profile .About a`, {
         display: "inline",
-        ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("large"),
-        }),
+        fontSize: globalVars.fonts.size.large,
     });
 
     cssOut(`body.Section-Profile .DataCounts`, {
@@ -61,11 +59,8 @@ export const profileCompatCSS = () => {
     });
 
     cssOut(`body.Section-Profile .Profile dd, dt`, {
-        ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("large"),
-            size: `${unit(globalVars.fontSizeAndWeightVars("large").size)} !important`,
-            lineHeight: `${(metasVars.font.lineHeight! as number) * 1.25} !important`,
-        }),
+        fontSize: `${unit(globalVars.fonts.size.large)} !important`,
+        lineHeight: `${(metasVars.font.lineHeight! as number) * 1.25} !important`,
     });
 
     cssOut(

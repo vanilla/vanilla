@@ -91,17 +91,16 @@ export default useThemeCache(() => {
 
     const menuItemTitle = style("menuItemTitle", {
         display: "block",
-        ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("medium", "bold"),
-            lineHeight: styleUnit(`${globalVars.fonts.size.medium * 1.25}`), // FIXME: see if this is necessary
-            color: ColorsUtils.colorOut(vars.colors.fg),
-        }),
+        fontWeight: globalVars.fonts.weights.bold,
+        fontSize: styleUnit(globalVars.fonts.size.medium),
+        lineHeight: styleUnit(`${globalVars.fonts.size.medium * 1.25}`),
         marginBottom: styleUnit(12),
+        color: ColorsUtils.colorOut(vars.colors.fg),
     });
 
     const menuItemChild = style("menuItemChild", {
         fontSize: styleUnit(14),
-        lineHeight: styleUnit(`${globalVars.fonts.size.medium * 1.25}`), // FIXME: see if this is necessary
+        lineHeight: styleUnit(`${globalVars.fonts.size.medium * 1.25}`),
         listStyle: "none",
         marginBottom: styleUnit(12),
         "&:last-child": {

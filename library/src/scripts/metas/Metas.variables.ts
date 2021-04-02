@@ -28,9 +28,9 @@ export const metasVariables = useThemeCache(() => {
     const font = makeThemeVars(
         "font",
         Variables.font({
-            ...globalVars.fontSizeAndWeightVars("small"),
             color:
                 globalVars.options.preset === GlobalPreset.LIGHT ? color("#767676") : globalVars.elementaryColors.white,
+            size: globalVars.fonts.size.small,
             lineHeight: globalVars.lineHeights.base,
         }),
     );

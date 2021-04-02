@@ -1,7 +1,3 @@
 {
-    "fsParentTheme": false,
-    "fsChildTheme": true,
-    "nested": {
-        "fsChild": true
-    }
+    "foo": "bar"
 }

@@ -50,22 +50,19 @@ export const nextPreviousClasses = useThemeCache(() => {
 
     const directionLabel = style("directionLabel", {
         display: "block",
-        ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("small"),
-            lineHeight: globalVars.lineHeights.condensed,
-            color: ColorsUtils.colorOut(vars.colors.label),
-        }),
+        fontSize: px(globalVars.fonts.size.small),
+        lineHeight: globalVars.lineHeights.condensed,
+        color: ColorsUtils.colorOut(vars.colors.label),
         marginBottom: styleUnit(2),
     });
 
     const title = style("title", {
         display: "block",
         position: "relative",
-        ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("medium", "semiBold"),
-            lineHeight: globalVars.lineHeights.condensed,
-            color: ColorsUtils.colorOut(globalVars.mainColors.fg),
-        }),
+        fontSize: px(globalVars.fonts.size.medium),
+        lineHeight: globalVars.lineHeights.condensed,
+        fontWeight: globalVars.fonts.weights.semiBold,
+        color: ColorsUtils.colorOut(globalVars.mainColors.fg),
     });
 
     const chevron = style("chevron", {

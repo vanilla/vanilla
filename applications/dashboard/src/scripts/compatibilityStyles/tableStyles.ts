@@ -118,10 +118,8 @@ export const tableCSS = () => {
     cssOut(
         `.Groups .DataTable .Excerpt, .Groups .DataTable .CategoryDescription, .DataTable .Excerpt, .DataTable .CategoryDescription`,
         {
-            ...Mixins.font({
-                ...vars.fontSizeAndWeightVars("medium"),
-                color: ColorsUtils.colorOut(vars.mainColors.fg),
-            }),
+            color: ColorsUtils.colorOut(vars.mainColors.fg),
+            fontSize: styleUnit(vars.fonts.size.medium),
         },
     );
 

@@ -30,7 +30,8 @@ export const noticeVariables = useThemeCache(() => {
     const fontInit = makeThemeVars(
         "font",
         Variables.font({
-            ...globalVars.fontSizeAndWeightVars("extraSmall", "semiBold"),
+            size: globalVars.fonts.size.extraSmall,
+            weight: globalVars.fonts.weights.semiBold,
             color: globalVars.mainColors.primary,
         }),
     );

@@ -39,7 +39,8 @@ export const navLinksVariables = useThemeCache(() => {
 
     const title = makeThemeVars("title", {
         font: Variables.font({
-            ...globalVars.fontSizeAndWeightVars("title", "bold"),
+            size: globalVars.fonts.size.title,
+            weight: globalVars.fonts.weights.bold,
             lineHeight: globalVars.lineHeights.condensed,
             color: undefined,
         }),
@@ -49,7 +50,8 @@ export const navLinksVariables = useThemeCache(() => {
         },
         mobile: {
             font: Variables.font({
-                ...globalVars.fontSizeAndWeightVars("large", "bold"),
+                size: globalVars.fonts.size.large,
+                weight: globalVars.fonts.weights.bold,
             }),
         },
     });

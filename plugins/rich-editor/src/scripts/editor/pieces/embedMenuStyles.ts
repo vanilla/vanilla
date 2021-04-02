@@ -67,9 +67,10 @@ export const embedMenuClasses = useThemeCache(() => {
                     top: importantUnit(globalVars.gutter.quarter),
                 }),
                 ...Mixins.font({
-                    ...globalVars.fontSizeAndWeightVars("medium", "normal"),
+                    weight: globalVars.fonts.weights.normal,
                     lineHeight: globalVars.lineHeights.base,
                     color: metasVars.font.color,
+                    size: globalVars.fonts.size.medium,
                     align: "left",
                 }),
             },

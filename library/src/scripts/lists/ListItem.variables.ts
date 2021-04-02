@@ -54,7 +54,8 @@ export const listItemVariables = useThemeCache(() => {
          * @description Font variables for the default state of the title.
          */
         font: Variables.font({
-            ...globalVars.fontSizeAndWeightVars("large", "bold"),
+            weight: globalVars.fonts.weights.bold,
+            size: globalVars.fonts.size.large,
             color: globalVars.mainColors.fg,
         }),
     });

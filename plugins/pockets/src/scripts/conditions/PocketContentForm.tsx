@@ -111,11 +111,7 @@ export function PocketContentForm(props: IProps) {
                                 "Enter the text of the pocket. This will be output exactly as you type it so make sure that you enter valid HTML.",
                             )}
                         >
-                            <DashboardCodeEditor.Uncontrolled
-                                key={mountCounter}
-                                inputName={"Body"}
-                                initialValue={body}
-                            />
+                            <DashboardCodeEditor key={mountCounter} inputName={"Body"} initialValue={body} />
                         </DashboardFormGroup>
                     ) : (
                         <>

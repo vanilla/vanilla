@@ -187,9 +187,7 @@ export const dropDownClasses = useThemeCache(() => {
         "items",
         {
             padding: 0,
-            ...Mixins.font({
-                ...globalVars.fontSizeAndWeightVars("medium"),
-            }),
+            fontSize: styleUnit(globalVars.fonts.size.medium),
         },
         mediaQueries.oneColumnDown({
             ...Mixins.padding({
@@ -322,12 +320,11 @@ export const dropDownClasses = useThemeCache(() => {
     const sectionHeading = style("sectionHeading", {
         ...{
             "&&": {
-                ...Mixins.font({
-                    ...globalVars.fontSizeAndWeightVars("small", "semiBold"),
-                    color: ColorsUtils.colorOut(metasVars.font.color),
-                    transform: "uppercase",
-                    align: "center",
-                }),
+                color: ColorsUtils.colorOut(metasVars.font.color),
+                fontSize: styleUnit(globalVars.fonts.size.small),
+                textTransform: "uppercase",
+                textAlign: "center",
+                fontWeight: globalVars.fonts.weights.semiBold,
                 ...Mixins.padding(vars.sectionTitle.padding),
             },
             [`& + .${sectionContents} li:first-child`]: { paddingTop: styleUnit(vars.spacer.margin.vertical) },
@@ -377,9 +374,7 @@ export const dropDownClasses = useThemeCache(() => {
     );
 
     const count = style("count", {
-        ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("small"),
-        }),
+        fontSize: styleUnit(globalVars.fonts.size.small),
         paddingLeft: "1em",
         marginLeft: "auto",
     });
@@ -405,10 +400,10 @@ export const dropDownClasses = useThemeCache(() => {
 
     const title = style("title", {
         ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("medium", "semiBold"),
+            weight: globalVars.fonts.weights.semiBold,
+            size: globalVars.fonts.size.medium,
             lineHeight: globalVars.lineHeights.condensed,
         }),
-
         ...Mixins.padding({
             all: 0,
         }),

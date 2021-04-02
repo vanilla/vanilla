@@ -42,7 +42,7 @@ const DiscussionOptionsDelete: FunctionComponent<{ discussion: IDiscussion }> = 
             </DropDownItemButton>
             <ModalConfirm
                 isVisible={isVisible}
-                size={ModalSizes.MEDIUM}
+                size={ModalSizes.LARGE}
                 title={t("Delete Discussion")}
                 onCancel={close}
                 onConfirm={handleDeleteConfirm}

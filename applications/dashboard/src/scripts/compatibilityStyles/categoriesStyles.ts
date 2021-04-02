@@ -88,7 +88,7 @@ export const categoriesCSS = () => {
 
     cssOut(`.CategoryBox .H`, {
         ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("largeTitle"),
+            size: globalVars.fonts.size.largeTitle,
             lineHeight: globalVars.lineHeights.condensed,
         }),
     });
@@ -119,9 +119,8 @@ export const categoriesCSS = () => {
     cssOut(`.Panel .Box.BoxCategories .PanelInfo.PanelCategories .Heading`, {
         paddingLeft: 0,
         paddingTop: styleUnit(18),
-        ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("large", "bold"),
-        }),
+        fontWeight: globalVars.fonts.weights.bold,
+        fontSize: styleUnit(globalVars.fonts.size.large),
     });
 
     cssOut(`.Panel .Box.BoxCategories .PanelInfo.PanelCategories .Heading .Count`, {
@@ -133,9 +132,8 @@ export const categoriesCSS = () => {
     });
 
     cssOut(`.Panel .Box.BoxCategories .PanelInfo.PanelCategories  Li.Depth1 a.ItemLink`, {
-        ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("large", "semiBold"),
-        }),
+        fontWeight: globalVars.fonts.weights.semiBold,
+        fontSize: styleUnit(globalVars.fonts.size.large),
     });
 
     cssOut(`.Panel .Box.BoxCategories .PanelInfo.PanelCategories li.Depth2 a.ItemLink`, {

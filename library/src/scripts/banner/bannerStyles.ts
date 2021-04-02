@@ -470,7 +470,8 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
          */
         font: Variables.font({
             ...font,
-            ...globalVars.fontSizeAndWeightVars("largeTitle", "semiBold"),
+            size: globalVars.fonts.size.largeTitle,
+            weight: globalVars.fonts.weights.semiBold,
         }),
         /**
          * @varGroup banner.title.fontMobile
@@ -479,8 +480,7 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
          */
         fontMobile: Variables.font({
             ...font,
-            ...globalVars.fontSizeAndWeightVars("title"),
-            weight: font.weight,
+            size: globalVars.fonts.size.title,
         }),
         /**
          * @varGroup banner.title.margins
@@ -506,8 +506,7 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
          */
         font: Variables.font({
             ...font,
-            ...globalVars.fontSizeAndWeightVars("large"),
-            weight: font.weight,
+            size: globalVars.fonts.size.large,
         }),
         maxWidth: 400,
         /**
@@ -565,11 +564,10 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
             ...searchBarInit.sizing,
             heightMinusBorder: searchBarInit.sizing.height - searchBarInit.border.width * 2,
         },
-        font: Variables.font({
-            ...globalVars.fontSizeAndWeightVars("large"),
-            weight: font.weight,
+        font: {
             color: searchBarInit.input.fg,
-        }),
+            size: globalVars.fonts.size.large,
+        },
         margin: Variables.spacing({
             top: 24,
         }),
@@ -661,7 +659,8 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
             },
         },
         fonts: {
-            ...globalVars.fontSizeAndWeightVars("large", "bold"),
+            size: globalVars.fonts.size.large,
+            weight: globalVars.fonts.weights.bold,
         },
         state: buttonStateStyles,
     });
@@ -679,7 +678,8 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
         },
         borders: buttonBorderStyles,
         fonts: {
-            ...globalVars.fontSizeAndWeightVars("large", "bold"),
+            size: globalVars.fonts.size.large,
+            weight: globalVars.fonts.weights.bold,
         },
         state: buttonStateStyles,
     };

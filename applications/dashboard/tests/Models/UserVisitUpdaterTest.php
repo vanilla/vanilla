@@ -196,21 +196,4 @@ class UserVisitUpdaterTest extends AbstractAPIv2Test {
             CurrentTimeStamp::coerceDateTime($actual)->format(DATE_RFC3339)
         );
     }
-
-    /**
-     * Test visitUpdater is updating dateLastActive when its the first user's visit.
-     */
-    public function testVistUpdateFirstVisit(): void {
-        $startTime = CurrentTimeStamp::mockTime('Dec 19 2019');
-        $user1 = $this->createUser();
-        $this->api()->setUserID($user1['userID']);
-        $this->userModel->update(['DateLastActive' => null], ['UserID' => $user1['userID']]);
-        $this->visitUpdater()->updateVisit($user1['userID']);
-        $fetchedUser = $this->api()->get("/users/{$user1['userID']}")->getBody();
-        $this->assertDatesEqual($startTime, $fetchedUser['dateLastActive']);
-        $updatedTime = CurrentTimeStamp::mockTime('Dec 20 2019');
-        $this->visitUpdater()->updateVisit($user1['userID']);
-        $fetchedUser = $this->api()->get("/users/{$user1['userID']}")->getBody();
-        $this->assertDatesEqual($updatedTime, $fetchedUser['dateLastActive']);
-    }
 }

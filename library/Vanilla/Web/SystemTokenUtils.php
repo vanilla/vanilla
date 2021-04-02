@@ -8,7 +8,6 @@ namespace Vanilla\Web;
 
 use Firebase\JWT\JWT;
 use Garden\Web\RequestInterface;
-use Gdn_Session;
 use UnexpectedValueException;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Utility\ArrayUtils;
@@ -29,17 +28,13 @@ class SystemTokenUtils {
     /** @var string */
     private $secret;
 
-    /** @var Gdn_Session */
-    private $session;
-
     /**
      * SystemTokenModel constructor.
      *
      * @param string $secret
      */
-    public function __construct(string $secret, Gdn_Session $session) {
+    public function __construct(string $secret) {
         $this->secret = $secret;
-        $this->session = $session;
     }
 
     /**
@@ -71,16 +66,17 @@ class SystemTokenUtils {
     /**
      * Generate a system JWT token.
      *
+     * @param int $userID
      * @param array|null $body
      * @param array|null $query
      * @return string
      */
-    public function encode(?array $body = null, ?array $query = null): string {
+    public function encode(int $userID, ?array $body = null, ?array $query = null): string {
         $timestamp = CurrentTimeStamp::get();
         $payload = [
             "exp" => $timestamp + self::TOKEN_TTL,
             "iat" => $timestamp,
-            "sub" => $this->session->UserID
+            "sub" => $userID
         ];
 
         if (is_array($body)) {

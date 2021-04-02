@@ -5,7 +5,7 @@
 
 import { ButtonPreset } from "@library/forms/ButtonPreset";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
-import { IBackground, IFont, LinkDecorationType } from "@library/styles/cssUtilsTypes";
+import { IBackground, LinkDecorationType } from "@library/styles/cssUtilsTypes";
 import { fontFallbacks, monoFallbacks } from "@library/styles/fontFallbacks";
 import { BorderType } from "@library/styles/styleHelpersBorders";
 import { ensureColorHelper } from "@library/styles/styleHelpersColors";
@@ -82,7 +82,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
      * @varGroup global.mainColors
      * @commonDescription Global main colors
      */
-    const mainColorsInit = makeThemeVars("mainColors", {
+    const initialMainColors = makeThemeVars("mainColors", {
         /**
          * @var global.mainColors.fg
          * @title Main Colors - Foreground
@@ -91,7 +91,6 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
          * @format hex-color
          */
         fg: options.preset === GlobalPreset.LIGHT ? elementaryColors.darkText : elementaryColors.almostWhite,
-
         /**
          * @var global.mainColors.bg
          * @title Main Colors - Background
@@ -132,18 +131,6 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
          * @format hex-color
          */
         secondaryContrast: elementaryColors.white, // for good contrast with text.
-    });
-
-    const initialMainColors = makeThemeVars("mainColors", {
-        ...mainColorsInit,
-        /**
-         * @var global.mainColors.fgHeading
-         * @title Main Colors - Foreground Heading
-         * @description Sets the foreground color of headings
-         * @type string
-         * @format hex-color
-         */
-        fgHeading: mainColorsInit.fg,
     });
 
     colorPrimary = initialMainColors.primary;
@@ -543,7 +530,6 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
             subTitle: 18,
         },
         sizeWeight: {
-            // Intentinlaly undocumented until stabilized.
             large: undefined as undefined | number,
             medium: undefined as undefined | number,
             small: undefined as undefined | number,
@@ -622,16 +608,6 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
             },
         },
     });
-
-    const fontSizeAndWeightVars = (
-        size: keyof typeof fonts.size,
-        weight?: keyof typeof fonts.weights,
-    ): Pick<IFont, "size" | "weight"> => {
-        return {
-            size: fonts.size[size],
-            weight: weight ? fonts.weights[weight] : fonts.sizeWeight[size],
-        };
-    };
 
     /**
      * @varGroup global.icon
@@ -1088,6 +1064,5 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         itemList,
         contentBoxes,
         panelBoxes,
-        fontSizeAndWeightVars,
     };
 });

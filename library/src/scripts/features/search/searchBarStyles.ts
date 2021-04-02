@@ -191,7 +191,8 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
     const searchResultsStyles = {
         title: {
             ...Mixins.font({
-                ...globalVars.fontSizeAndWeightVars("large", "semiBold"),
+                size: globalVars.fonts.size.large,
+                weight: globalVars.fonts.weights.semiBold,
                 lineHeight: globalVars.lineHeights.condensed,
             }),
         },
@@ -201,7 +202,7 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
         excerpt: {
             marginTop: styleUnit(searchResultsVariables().excerpt.margin),
             ...Mixins.font({
-                ...globalVars.fontSizeAndWeightVars("medium"),
+                size: globalVars.fonts.size.medium,
                 color: vars.results.fg,
                 lineHeight: globalVars.lineHeights.excerpt,
             }),

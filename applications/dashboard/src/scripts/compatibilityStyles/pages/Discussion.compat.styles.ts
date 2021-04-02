@@ -43,10 +43,8 @@ export const discussionCompatCSS = () => {
         .MessageList.Discussion
         `,
         {
-            ...Mixins.font({
-                ...globalVars.fontSizeAndWeightVars("medium"),
-                color: ColorsUtils.colorOut(globalVars.mainColors.fg),
-            }),
+            color: ColorsUtils.colorOut(globalVars.mainColors.fg),
+            fontSize: styleUnit(globalVars.fonts.size.medium),
         },
     );
 

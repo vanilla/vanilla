@@ -76,11 +76,10 @@ export const quoteEmbedClasses = useThemeCache(() => {
         }),
         display: "block",
         width: percent(100),
-        ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("medium", "bold"),
-            color: important(ColorsUtils.colorOut(globalVars.mainColors.fg) as string),
-            lineHeight: globalVars.lineHeights.condensed,
-        }),
+        color: important(ColorsUtils.colorOut(globalVars.mainColors.fg) as string),
+        fontSize: globalVars.fonts.size.medium,
+        fontWeight: globalVars.fonts.weights.bold,
+        lineHeight: globalVars.lineHeights.condensed,
     });
 
     const isPadded = style("isPadded", {});
@@ -209,9 +208,7 @@ export const quoteEmbedClasses = useThemeCache(() => {
         ...{
             ".userContent": {
                 ...lineHeightAdjustment(),
-                ...Mixins.font({
-                    ...globalVars.fontSizeAndWeightVars("medium"),
-                }),
+                fontSize: styleUnit(globalVars.fonts.size.medium),
             },
         },
     });

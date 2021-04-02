@@ -21,10 +21,8 @@ export const pageTitleClasses = useThemeCache(() => {
     const style = styleFactory("pageTitle");
 
     const root = style({
-        ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("title"),
-            lineHeight: vars.font.lineHeight,
-        }),
+        fontSize: globalVars.fonts.size.title,
+        lineHeight: vars.font.lineHeight,
         display: "block",
         ...Mixins.margin({
             vertical: 0,

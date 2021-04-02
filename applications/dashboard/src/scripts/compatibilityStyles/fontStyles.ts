@@ -131,11 +131,9 @@ export const fontCSS = () => {
             .Panel.Panel-main .Box .Heading[aria-level='${i}'],
         `,
             {
-                ...Mixins.font({
-                    ...globalVars.fontSizeAndWeightVars(styleUnit(i === 1 ? "medium" : "small")),
-                    color: ColorsUtils.colorOut(globalVars.mainColors.fg),
-                }),
+                fontSize: styleUnit(i === 1 ? globalVars.fonts.size.medium : globalVars.fonts.size.small),
                 paddingLeft: offset,
+                color: ColorsUtils.colorOut(globalVars.mainColors.fg),
             },
         );
 
@@ -145,11 +143,7 @@ export const fontCSS = () => {
             .Panel.Panel-main .Box .Heading.Heading[aria-level='${i}'],
         `,
             {
-                ...Mixins.font({
-                    ...(i === 1
-                        ? globalVars.fontSizeAndWeightVars("large")
-                        : globalVars.fontSizeAndWeightVars("small")),
-                }),
+                fontSize: i === 1 ? styleUnit(globalVars.fonts.size.large) : styleUnit(globalVars.fonts.size.small),
                 paddingLeft: offset,
             },
         );

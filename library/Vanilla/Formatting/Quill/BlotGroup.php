@@ -251,30 +251,6 @@ class BlotGroup implements NestableItemInterface, NestingParentInterface {
     }
 
     /**
-     * Render a part of a line group starting at an index.
-     *
-     * This method will loop through the blots and render the inner content of the group.
-     *
-     * @param int $from The index to start from.
-     * @return string
-     */
-    public function renderPartialLineGroupContent(int $from = 0): string {
-        $result = "";
-
-        for ($i = $from; $i < count($this->blotsAndGroups); $i++) {
-            $blot = $this->blotsAndGroups[$i];
-            if ($blot instanceof AbstractLineTerminatorBlot) {
-                break;
-            } else {
-                // Render out inline blots.
-                $result .= $blot->render();
-            }
-        }
-
-        return $result;
-    }
-
-    /**
      * Get all of the line terminators in the group.
      *
      * @return array
@@ -435,21 +411,18 @@ class BlotGroup implements NestableItemInterface, NestingParentInterface {
     /**
      * Get the line terminator for this blot group.
      *
-     * @param int|null $from The index to search from.
      * @return AbstractLineTerminatorBlot|null
      */
-    public function getTerminatorBlot(int $from = null): ?AbstractLineTerminatorBlot {
+    public function getTerminatorBlot(): ?AbstractLineTerminatorBlot {
         if ($this->isEmpty()) {
             return null;
         }
-        $from = $from ?? count($this->blotsAndGroups) - 1;
-        for ($i = $from; $i < count($this->blotsAndGroups); $i++) {
-            $blot = $this->blotsAndGroups[$i];
-            if ($blot instanceof AbstractLineTerminatorBlot) {
-                return $blot;
-            }
+        $last = $this->blotsAndGroups[count($this->blotsAndGroups) - 1];
+        if ($last instanceof AbstractLineTerminatorBlot) {
+            return $last;
+        } else {
+            return null;
         }
-        return null;
     }
 
     /**
@@ -464,15 +437,6 @@ class BlotGroup implements NestableItemInterface, NestingParentInterface {
             if ($blot instanceof AbstractBlot) {
                 $result[] = $blot->getCurrentOperation();
             }
-
-            if ($blot instanceof NestingParentRendererInterface) {
-                $children = $blot->getNestedGroups();
-                foreach ($children as $child) {
-                    /** @var BlotGroup $child */
-                    $result = array_merge($result, $child->getOperations());
-                }
-            }
-
             // TODO Account for additional blot types.
         }
 
@@ -482,30 +446,9 @@ class BlotGroup implements NestableItemInterface, NestingParentInterface {
     /**
      * Replace the blots in the group with those in a new group.
      *
-     * @param array<TextBlot> $new The blot with the new operations.
-     * @param int $from
-     * @param int|null $to
+     * @param BlotGroup $new The blot with the new operations.
      */
-    public function replace(array $new, int $from = 0, int $to = null): void {
-        if ($to === null) {
-            $to = count($this->getBlotsAndGroups());
-        }
-        array_splice($this->blotsAndGroups, $from, $to - $from + 1, $new);
-
-        // Re-wire all of the operation blots.
-        foreach ($this->blotsAndGroups as $i => $blot) {
-            if (!$blot instanceof AbstractBlot) {
-                continue;
-            }
-            $previous = [];
-            if (isset($this->blotsAndGroups[$i - 1]) && $this->blotsAndGroups[$i - 1] instanceof AbstractBlot) {
-                $previous = $this->blotsAndGroups[$i - 1]->getCurrentOperation();
-            }
-            $next = [];
-            if (isset($this->blotsAndGroups[$i + 1]) && $this->blotsAndGroups[$i + 1] instanceof AbstractBlot) {
-                $next = $this->blotsAndGroups[$i + 1]->getCurrentOperation();
-            }
-            $blot->setPreviousNextOperations($previous, $next);
-        }
+    public function replace(BlotGroup $new): void {
+        $this->blotsAndGroups = $new->blotsAndGroups;
     }
 }

@@ -34,7 +34,8 @@ export const buttonGlobalVariables = useThemeCache((forcedVars?: IThemeVariables
     const font = makeThemeVars(
         "font",
         Variables.font({
-            ...globalVars.fontSizeAndWeightVars("medium", "semiBold"),
+            size: globalVars.fonts.size.medium,
+            weight: globalVars.fonts.weights.semiBold,
         }),
     );
 

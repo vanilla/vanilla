@@ -30,7 +30,8 @@ export const dataListVariables = useThemeCache((forcedVars?: IThemeVariables) =>
             right: globalVars.spacer.size,
         },
         font: Variables.font({
-            ...globalVars.fontSizeAndWeightVars("small", "bold"),
+            size: globalVars.fonts.size.small,
+            weight: globalVars.fonts.weights.bold,
             lineHeight: globalVars.lineHeights.condensed,
         }),
     });

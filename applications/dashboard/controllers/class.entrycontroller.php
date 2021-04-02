@@ -1729,7 +1729,7 @@ class EntryController extends Gdn_Controller {
         $emailConfirmed = $this->UserModel->confirmEmail($user, $emailKey);
         $this->Form->setValidationResults($this->UserModel->validationResults());
 
-        $userMatch = ((int) $userID === Gdn::session()->UserID) ? true : false;
+        $userMatch = ($userID === Gdn::session()->UserID) ? true : false;
 
         if (!$userMatch) {
             Gdn::session()->end();

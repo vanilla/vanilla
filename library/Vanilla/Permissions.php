@@ -414,7 +414,7 @@ class Permissions implements \JsonSerializable {
             return false;
         }
 
-        if (!in_array(self::PERMISSION_SYSTEM, $permissions) && $this->isAdmin()) {
+        if ($this->isAdmin()) {
             return true;
         }
 

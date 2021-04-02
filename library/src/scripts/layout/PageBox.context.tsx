@@ -43,7 +43,7 @@ export function usePageBoxDepthContext() {
     return useContext(depthContext);
 }
 
-export function useCalculatedDepth(currentBoxRef?: React.RefObject<HTMLElement>) {
+function useCalculatedDepth(currentBoxRef?: React.RefObject<HTMLElement>) {
     const parentContext = usePageBoxDepthContext();
     const [calcedDepth, setCalcedDepth] = useState<number>(parentContext.depth ? parentContext.depth + 1 : 2);
 

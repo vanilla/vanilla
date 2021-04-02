@@ -72,7 +72,7 @@ export const pageHeadingClasses = useThemeCache(() => {
         alignItems: "center",
 
         "& > *": {
-            marginLeft: globalVars.gutter.size,
+            paddingLeft: globalVars.gutter.size,
         },
     });
 

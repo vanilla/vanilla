@@ -64,7 +64,8 @@ export const filterPanelClasses = useThemeCache((mediaQueries) => {
         ...{
             "&&": {
                 ...Mixins.font({
-                    ...globalVars.fontSizeAndWeightVars("large", "bold"),
+                    size: globalVars.fonts.size.large,
+                    weight: globalVars.fonts.weights.bold,
                 }),
             },
         },

@@ -29,7 +29,7 @@ class TagsTest extends AbstractResourceTest {
     protected $pk = 'tagID';
 
     /** @var string[] */
-    protected $patchFields = ["name", "type"];
+    protected $patchFields = ["name", "type", "parentTagID"];
 
     /**
      * @inheritDoc
@@ -54,9 +54,6 @@ class TagsTest extends AbstractResourceTest {
             "name" => "random",
             "fullName" => "random"
         ]);
-
-        $config = $this->container()->get(\Gdn_Configuration::class);
-        $config->saveToConfig('Tagging.Discussion.AllowedTypes', '');
     }
 
     /**
@@ -71,6 +68,7 @@ class TagsTest extends AbstractResourceTest {
         $record = [
             "name" => $name,
             "type" => "someType",
+            "parentTagID" => 1000
         ];
         return $record;
     }
@@ -110,7 +108,7 @@ class TagsTest extends AbstractResourceTest {
             "fullName" => $reactionTag["Name"] . "1"
         ]);
 
-        $results = $this->api()->get("/tags", ["query" => $reactionTag["Name"], "type" => "tag"])->getBody();
+        $results = $this->api()->get("/tags", ["query" => $reactionTag["Name"]])->getBody();
         $this->assertEquals(1, count($results));
         $this->assertNotEquals($reactionTag["Name"], $results[0]["name"]);
     }
@@ -152,10 +150,6 @@ class TagsTest extends AbstractResourceTest {
         // Create a discussion.
         $discussion = $this->createDiscussion();
 
-        // Set the config to allow the discussion type.
-        $config = $this->container()->get(\Gdn_Configuration::class);
-        $config->saveToConfig('Tagging.Discussion.AllowedTypes', ['', 'someType']);
-
         // Tag it.
         $this->api()->post("discussions/{$discussion["discussionID"]}/tags", ["tagIDs" =>[$tagToDelete["tagID"]]]);
 
@@ -166,29 +160,10 @@ class TagsTest extends AbstractResourceTest {
     }
 
     /**
-     * Overrides the AbstractResourcesTest's testIndex() method, as our index call has a limit of 20, so the
-     * paging test doesn't pass.
+     * Overrides the AbstractResourcesTest's testIndex() method, as our index call doesn't function the same way.
      */
     public function testIndex() {
-        $indexUrl = $this->indexUrl();
-        $originalIndex = $this->api()->get($indexUrl, ['limit' => 100]);
-        $this->assertEquals(200, $originalIndex->getStatusCode());
-
-        $originalRows = $originalIndex->getBody();
-        $rows = $this->generateIndexRows();
-        $newIndex = $this->api()->get($indexUrl, ['limit' => count($originalRows) + count($rows) + 1]);
-
-        $newRows = $newIndex->getBody();
-        $this->assertEquals(count($originalRows) + count($rows), count($newRows));
-        // The index should be a proper indexed array.
-        $count = 0;
-        foreach ($newRows as $i => $row) {
-            $this->assertSame($count, $i);
-            $count++;
-        }
-
-        // There's not much we can really test here so just return and let subclasses do some more assertions.
-        return [$rows, $newRows];
+        $this->markTestSkipped();
     }
 
     /**
@@ -219,6 +194,7 @@ class TagsTest extends AbstractResourceTest {
 
         $result = $this->api()->get($this->baseUrl, [
             "parentID" => $parent["tagID"],
+            "query" => __FUNCTION__, // TODO Ditch this when we remove the required query parameter.
         ])->getBody();
 
         $this->assertSame(
@@ -252,25 +228,12 @@ class TagsTest extends AbstractResourceTest {
 
         $result = $this->api()->get($this->baseUrl, [
             "type" => $type,
+            "query" => __FUNCTION__, // TODO Ditch this when we remove the required query parameter.
         ])->getBody();
 
         $this->assertSame(
             array_column($tags, "tagID"),
             array_column($result, "tagID")
         );
-    }
-
-    /**
-     * Test getting an error for an invalid parent tag ID.
-     */
-    public function testAbsenteeParent() {
-        $tag = [
-            'name' => 'absenteeParent',
-            'parentTagID' => 100000,
-        ];
-
-        $this->expectExceptionCode(400);
-        $this->expectExceptionMessage('Parent tag not found.');
-        $this->api()->post($this->baseUrl, $tag);
     }
 }

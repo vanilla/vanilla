@@ -62,7 +62,7 @@ export const radioInputAsTabVariables = useThemeCache(() => {
     const font = makeVars(
         "font",
         Variables.font({
-            ...globalVars.fontSizeAndWeightVars("small"),
+            size: globalVars.fonts.size.small,
             align: "center",
             lineHeight: styleUnit(sizing.height),
         }),

@@ -13,18 +13,12 @@ paths:
         description: The type of tags to list.
         in: query
         schema:
-          type: array
-          items:
-            type: string
-        style: form
+          type: string
       - name: parentID
         description: ID of parent to filter results.
         in: query
         schema:
-          type: array
-          items:
-            type: integer
-        style: form
+          type: integer
       responses:
         '200':
           content:

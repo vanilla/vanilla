@@ -8,14 +8,21 @@ namespace VanillaTests\Library\Vanilla\Theme;
 
 use Vanilla\Theme\VariableProviders\QuickLink;
 use VanillaTests\SiteTestCase;
-use VanillaTests\VanillaTestCase;
 
 /**
  * Class QuickLinksTest
  *
  * @package VanillaTests\Library\Vanilla\Theme
  */
-class QuickLinksTest extends VanillaTestCase {
+class QuickLinksTest extends SiteTestCase {
+
+    /**
+     * Setup.
+     */
+    public static function setUpBeforeClass(): void {
+        self::$addons = ['vanilla'];
+        parent::setUpBeforeClass();
+    }
 
     /**
      * Test quickLink methods.

@@ -346,7 +346,7 @@ class CategoryCollection {
 
         $category = $this->get($categoryID);
 
-        if (!$category) {
+        if ($category === null) {
             return $result;
         }
 

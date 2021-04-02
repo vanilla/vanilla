@@ -212,3 +212,5 @@ export function StoryWidgetFormGenerator() {
     });
     return <WidgetFormGenerator schema={widgetSchema} instance={instance} onChange={setInstance} />;
 }
+
+StoryWidgetFormGenerator.name = "WidgetFormGenerator";

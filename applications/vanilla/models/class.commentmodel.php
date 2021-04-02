@@ -19,7 +19,6 @@ use Vanilla\Formatting\Formats\RichFormat;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\FormatFieldTrait;
 use Vanilla\Formatting\UpdateMediaTrait;
-use Vanilla\Models\CrawlableRecordSchema;
 use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Models\UserFragmentSchema;
 use Vanilla\SchemaFactory;
@@ -196,10 +195,7 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
         $this->SQL->select('c.*')
             ->select(['d.CategoryID', 'd.Name as DiscussionName'])
             ->join('Discussion d', 'c.DiscussionID = d.DiscussionID')
-            ->from('Comment c')
-            ->where('d.DiscussionID is not NULL')
-            ->where('d.CategoryID is not NUll')
-        ;
+            ->from('Comment c');
 
         $extraSelects = \Gdn::eventManager()->fireFilter("commentModel_extraSelects", []);
         if (!empty($extraSelects)) {
@@ -1257,8 +1253,6 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
 
         // Validate the form posted values
         if ($this->validate($formPostValues, $insert)) {
-            $prevDiscussionID = false;
-
             // Backward compatible check for flood control
             if (!val('SpamCheck', $this, true)) {
                 deprecated('DiscussionModel->SpamCheck attribute', 'FloodControlTrait->setFloodControlEnabled()');
@@ -1307,10 +1301,6 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
                 }
 
                 if ($insert === false) {
-                    // Fetch the discussion's data before we save, for comparison's sake.
-                    $previousDiscussion = $this->getID($commentID, DATASET_TYPE_ARRAY);
-                    $prevDiscussionID = $previousDiscussion['DiscussionID'] ?? false;
-
                     // Log the save.
                     LogModel::logChange('Edit', 'Comment', array_merge($fields, ['CommentID' => $commentID]));
 
@@ -1358,14 +1348,7 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
 
             // Update discussion's comment count.
             if (isset($formPostValues['DiscussionID']) && $isValidUser) {
-                // If we have a previous discussion ID & it's different from the current one, it's been changed.
-                $discussionIDChanged = $prevDiscussionID && ($formPostValues['DiscussionID'] !== $prevDiscussionID);
-                if ($insert || !$discussionIDChanged) {
-                    $this->updateCommentCount($formPostValues['DiscussionID'], ['Slave' => false]);
-                } else {
-                    $newDiscussion = $this->discussionModel->getID($formPostValues['DiscussionID'], DATASET_TYPE_ARRAY);
-                    $this->incrementCountsMovedComment($commentData, $previousDiscussion, $newDiscussion);
-                }
+                $this->updateCommentCount($formPostValues['DiscussionID'], ['Slave' => false]);
             }
         }
         $comment = $commentID ? $this->getID($commentID, DATASET_TYPE_ARRAY) : false;
@@ -1378,27 +1361,6 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
             $this->getEventManager()->dispatch($commentEvent);
         }
         return $commentID;
-    }
-
-    /**
-     * Increments count values for the discussion to which a comment has recently been moved to.
-     * Decrement count values  for the discussion from which a comment was removed from.
-     *
-     * @param array $comment
-     * @param array $prevDiscussion
-     * @param array $newDiscussion
-     */
-    private function incrementCountsMovedComment(array $comment, array $prevDiscussion, array $newDiscussion): void {
-        $prevDiscussionID = $prevDiscussion['DiscussionID'] ?? null;
-        $newDiscussionID = $comment['DiscussionID'] ?? null;
-        Assert::notNull($prevDiscussionID, "Expected \$prevDiscussion['DiscussionID']");
-        Assert::notNull($newDiscussionID, "Expected \$comment['DiscussionID']");
-
-        // If either the previous or current discussion id is null OR they are the same, it ends here.
-        // The comment is being moved to a different discussion.
-        $this->discussionModel->adjustLastComment($newDiscussion, $comment, 1, $prevDiscussion['CategoryID'] != $newDiscussion['CategoryID']);
-
-        $this->discussionModel->adjustLastComment($prevDiscussion, $comment, -1, $prevDiscussion['CategoryID'] != $newDiscussion['CategoryID']);
     }
 
     /**
@@ -1644,27 +1606,14 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
         $this->fireEvent('BeforeUpdateCommentCountQuery');
 
         $this->options($options);
-
-        $sql = clone $this->SQL;
-        $sql->reset();
-
-        $firstComment = $sql
-            ->orderBy(['DateInserted', 'CommentID'])
-            ->limit(1)
-            ->getWhere('Comment', ['DiscussionID' => $discussionID])->firstRow(DATASET_TYPE_ARRAY);
-
-        $lastComment = $sql
-            ->orderBy(['-DateInserted', '-CommentID'])
-            ->limit(1)
-            ->getWhere('Comment', ['DiscussionID' => $discussionID])->firstRow(DATASET_TYPE_ARRAY);
-
-        $data = [
-            'FirstCommentID' => $firstComment['CommentID'] ?? false,
-            'LastCommentID' => $lastComment['CommentID'] ?? false,
-            'LastCommentUserID' => $lastComment['InsertUserID'] ?? false,
-            'DateLastComment' => $lastComment['DateInserted'] ?? false,
-            'CountComments' => $this->getCount(['DiscussionID' => $discussionID])
-        ];
+        $data = $this->SQL
+            ->select('c.CommentID', 'min', 'FirstCommentID')
+            ->select('c.CommentID', 'max', 'LastCommentID')
+            ->select('c.DateInserted', 'max', 'DateLastComment')
+            ->select('c.CommentID', 'count', 'CountComments')
+            ->from('Comment c')
+            ->where('c.DiscussionID', $discussionID)
+            ->get()->firstRow(DATASET_TYPE_ARRAY);
 
         $this->EventArguments['Discussion'] =& $discussion;
         $this->EventArguments['Counts'] =& $data;

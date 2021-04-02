@@ -26,7 +26,6 @@ use Vanilla\SchemaFactory;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Utility\InstanceValidatorSchema;
 use Vanilla\Utility\ModelUtils;
-use Vanilla\Web\SystemCallableInterface;
 use Webmozart\Assert\Assert;
 use Garden\Events\EventFromRowInterface;
 use Vanilla\Contracts\Models\CrawlableInterface;
@@ -39,7 +38,7 @@ use Vanilla\Dashboard\Models\BannerImageModel;
 /**
  * Manages discussion categories' data.
  */
-class CategoryModel extends Gdn_Model implements EventFromRowInterface, CrawlableInterface, PermissionJunctionModelInterface, SystemCallableInterface {
+class CategoryModel extends Gdn_Model implements EventFromRowInterface, CrawlableInterface, PermissionJunctionModelInterface {
 
     use LegacyDirtyRecordTrait;
 
@@ -1281,20 +1280,13 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
                 'actions.add'
             );
 
-        if (val('CanDelete', $category, true) && $category["CountCategories"] === 0) {
+        if (val('CanDelete', $category, true)) {
             $cdd->addGroup('', 'delete')
                 ->addLink(
                     t('Delete'),
                     "/vanilla/settings/deletecategory?categoryid={$category['CategoryID']}",
                     'delete.delete',
-                    '',
-                    [],
-                    [
-                        'attributes' => [
-                            'data-categoryid' => $category['CategoryID'],
-                            'data-countDiscussions' => $category['CountDiscussions'],
-                        ]
-                    ]
+                    'js-modal'
                 );
         }
 
@@ -1741,9 +1733,8 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
         $db = static::postDBFields($discussion, $comment);
 
         $categories = self::instance()->collection->getAncestors($categoryID, true);
-
         foreach ($categories as $row) {
-            $currentCategoryID = $row['CategoryID'] ?? false;
+            $currentCategoryID = val('CategoryID', $row);
             self::instance()->setField($currentCategoryID, $db);
             CategoryModel::setCache($currentCategoryID, $cache);
         }
@@ -2188,7 +2179,6 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
      * @param int $categoryID
      * @param array $options
      * @return iterable
-     * @system-callable
      */
     public function deleteIDIterable(int $categoryID, array $options = []): iterable {
         $options += [
@@ -4081,12 +4071,8 @@ SQL;
         if ($categoryID) {
             $categories = self::instance()->collection->getAncestors($categoryID, true);
 
-            if (empty($categories)) {
-                return;
-            }
-
             foreach ($categories as $current) {
-                $targetID = $current['CategoryID'] ?? false;
+                $targetID = val('CategoryID', $current);
                 $updatedCategories[] = $targetID;
 
                 Gdn::sql()->update('Category');

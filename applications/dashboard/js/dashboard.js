@@ -667,11 +667,9 @@ var DashboardModal = (function() {
                 },
                 dataType: 'json',
                 success: function(json, sender) {
-                    const elem = $('#' + self.id).first();
-
                     self.settings.afterSuccess(json, sender);
                     gdn.inform(json);
-                    gdn.processTargets(json.Targets, elem);
+                    gdn.processTargets(json.Targets);
 
                     if (json.FormSaved === true) {
                         self.handleSuccess(json);

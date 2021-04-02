@@ -271,15 +271,11 @@ export const groupsCSS = () => {
     );
 
     cssOut(`.Section-Group .Group-Title`, {
-        ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("title"),
-        }),
+        fontSize: globalVars.fonts.size.title,
     });
 
     cssOut(`.Section-Group .Group-Box .H`, {
-        ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("subTitle"),
-        }),
+        fontSize: globalVars.fonts.size.subTitle,
     });
 
     cssOut(

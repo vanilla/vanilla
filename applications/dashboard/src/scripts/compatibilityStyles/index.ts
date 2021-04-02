@@ -65,7 +65,6 @@ compatibilityStyles = useThemeCache(() => {
     const layoutVars = forumLayoutVariables();
     const mainColors = vars.mainColors;
     const fg = ColorsUtils.colorOut(mainColors.fg);
-    const fgHeading = ColorsUtils.colorOut(mainColors.fgHeading);
     const bg = ColorsUtils.colorOut(mainColors.bg);
     const primary = ColorsUtils.colorOut(mainColors.primary);
     const userPhotoVars = userPhotoVariables();
@@ -104,7 +103,7 @@ compatibilityStyles = useThemeCache(() => {
         color: primary,
     });
 
-    cssOut(".Box h4", { color: fgHeading });
+    cssOut(".Box h4", { color: fg });
 
     const panelSelectors = `
         .About a,
@@ -164,10 +163,8 @@ compatibilityStyles = useThemeCache(() => {
         .MenuItems a
         `,
         {
-            ...Mixins.font({
-                ...vars.fontSizeAndWeightVars("large"),
-                color: fg,
-            }),
+            color: fg,
+            fontSize: styleUnit(vars.fonts.size.large),
         },
     );
 
@@ -347,7 +344,8 @@ compatibilityStyles = useThemeCache(() => {
 
     cssOut(`.HomepageTitle, .pageNotFoundTitle`, {
         ...Mixins.font({
-            ...vars.fontSizeAndWeightVars("largeTitle", "bold"),
+            size: vars.fonts.size.largeTitle,
+            weight: vars.fonts.weights.bold,
         }),
     });
 

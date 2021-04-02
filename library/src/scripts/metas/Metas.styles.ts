@@ -64,10 +64,8 @@ export const metaLinkItemStyle = useThemeCache(() => {
         },
         "&.isFlexed": flexed,
         "&.usernameAsMetaTitle": {
-            ...Mixins.font({
-                ...globalVars.fontSizeAndWeightVars("medium"),
-                color: colorOut(globalVars.mainColors.fg),
-            }),
+            color: colorOut(globalVars.mainColors.fg),
+            fontSize: globalVars.fonts.size.medium,
         },
     };
 

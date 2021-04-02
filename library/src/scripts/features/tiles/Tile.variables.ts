@@ -46,7 +46,7 @@ export const tileVariables = useThemeCache(() => {
 
     const title = themeVars("title", {
         font: Variables.font({
-            ...globalVars.fontSizeAndWeightVars("large"),
+            size: globalVars.fonts.size.large,
             lineHeight: globalVars.lineHeights.condensed,
         }),
         marginBottom: 6,

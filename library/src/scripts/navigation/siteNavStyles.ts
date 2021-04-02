@@ -15,7 +15,6 @@ import { percent, px, calc } from "csx";
 import { CSSObject } from "@emotion/css";
 import { trimTrailingCommas } from "@dashboard/compatibilityStyles/trimTrailingCommas";
 import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
-import { Mixins } from "@library/styles/Mixins";
 
 export const siteNavVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -34,7 +33,8 @@ export const siteNavVariables = useThemeCache(() => {
     });
 
     const title = makeThemeVars("title", {
-        ...globalVars.fontSizeAndWeightVars("large", "bold"),
+        fontSize: globalVars.fonts.size.large,
+        fontWeight: globalVars.fonts.weights.bold,
     });
 
     const nodeToggle = makeThemeVars("nodeToggle", {
@@ -69,9 +69,8 @@ export const siteNavClasses = useThemeCache(() => {
     );
 
     const title = style("title", {
-        ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("large", "bold"),
-        }),
+        fontSize: styleUnit(globalVars.fonts.size.large),
+        fontWeight: globalVars.fonts.weights.bold,
     });
 
     const children = style("children", {
@@ -104,9 +103,7 @@ export const siteNavNodeClasses = useThemeCache(() => {
             paddingLeft: styleUnit(vars.nodeToggle.width - vars.node.borderWidth),
         },
         mediaQueries.oneColumnDown({
-            ...Mixins.font({
-                ...globalVars.fontSizeAndWeightVars("large"),
-            }),
+            fontSize: styleUnit(globalVars.fonts.size.large),
         }),
     );
 
@@ -172,9 +169,8 @@ export const siteNavNodeClasses = useThemeCache(() => {
                         fontWeight: globalVars.fonts.weights.bold,
                     },
                     "&.isFirstLevel": {
-                        ...Mixins.font({
-                            ...globalVars.fontSizeAndWeightVars("large", "normal"),
-                        }),
+                        fontSize: styleUnit(globalVars.fonts.size.large),
+                        fontWeight: globalVars.fonts.weights.normal,
                     },
                 },
             },

@@ -423,18 +423,6 @@ if (!function_exists('validateInteger')) {
     }
 }
 
-if (!function_exists('validatePositiveNumber')) {
-    /**
-     * Validate if number is positive
-     *
-     * @param int|string $number
-     * @return bool
-     */
-    function validatePositiveNumber($number): bool {
-        return (is_numeric($number) && (int)$number > 0);
-    }
-}
-
 if (!function_exists('validateBoolean')) {
     /**
      * Validate that a value can be converted into a boolean (true or false).

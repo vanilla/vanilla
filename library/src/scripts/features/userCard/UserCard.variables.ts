@@ -35,7 +35,8 @@ export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) =>
     });
 
     const name = makeVars("name", {
-        ...globalVars.fontSizeAndWeightVars("large", "bold"),
+        size: globalVars.fonts.size.large,
+        weight: globalVars.fonts.weights.bold,
     });
 
     const label = makeVars("label", {

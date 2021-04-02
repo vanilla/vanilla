@@ -266,7 +266,7 @@ class RenderFunctionsTest extends TestCase {
                 "
                 <header class=header-block>
                     <div class=title-block>
-                    <h1>Hello! <dont-escape-me></dont-escape-me> me once</h1></div>
+                    <h1>Hello!<dont-escape-me></dont-escape-me> me once</h1></div>
                 </header>",
             ],
             'title with return' => [
@@ -325,7 +325,7 @@ class RenderFunctionsTest extends TestCase {
             <<<EOT
 <div class="PageControls-filters">
     <span class="ToggleFlyout selectBox selectBox-following">
-        <span class="selectBox-label">View: </span>
+        <span class="selectBox-label">View:</span>
         <span class="selectBox-main">
             <a class="FlyoutButton selectBox-toggle" href="#" rel="nofollow" role="button" tabindex="0">
                 <span class="selectBox-selected">All</span>
@@ -338,11 +338,11 @@ class RenderFunctionsTest extends TestCase {
                             <title>✓</title>
                             <polygon fill="currentColor" points="1.938,8.7 0.538,10.1 5.938,15.5 17.337,3.9 15.938,2.5 5.938,12.8"></polygon>
                         </svg>
-                        <span class="selectBox-selectedText">All </span>
+                        <span class="selectBox-selectedText">All</span>
                     </a>
                 </li>
                 <li class="selectBox-item" role="menuitem">
-                    <a class="dropdown-menu-link selectBox-link" href="/renderfunctionstest/discussions?followed=1&amp;save=1&amp;TransientKey=0" tabindex="0">Following </a>
+                    <a class="dropdown-menu-link selectBox-link" href="/renderfunctionstest/discussions?followed=1&amp;save=1&amp;TransientKey=0" tabindex="0">Following</a>
                 </li>
             </ul>
         </span>
@@ -373,7 +373,7 @@ EOT
             <<<EOT
 <div class="PageControls-filters">
     <span class="ToggleFlyout selectBox selectBox-following">
-        <span class="selectBox-label">View: </span>
+        <span class="selectBox-label">View:</span>
         <span class="selectBox-main">
             <a class="FlyoutButton selectBox-toggle" href=# rel=nofollow role=button tabindex="0">
                 <span class="selectBox-selected">All</span>
@@ -386,11 +386,11 @@ EOT
                             <title>✓</title>
                             <polygon fill="currentColor" points="1.938,8.7 0.538,10.1 5.938,15.5 17.337,3.9 15.938,2.5 5.938,12.8"></polygon>
                         </svg>
-                        <span class="selectBox-selectedText">All </span>
+                        <span class="selectBox-selectedText">All</span>
                     </a>
                 </li>
                 <li class="selectBox-item" role="menuitem">
-                    <a class="dropdown-menu-link selectBox-link" href="/renderfunctionstest/categories?followed=1&amp;save=1&amp;TransientKey=0" tabindex="0">Following </a>
+                    <a class="dropdown-menu-link selectBox-link" href="/renderfunctionstest/categories?followed=1&amp;save=1&amp;TransientKey=0" tabindex="0">Following</a>
                 </li>
             </ul>
         </span>

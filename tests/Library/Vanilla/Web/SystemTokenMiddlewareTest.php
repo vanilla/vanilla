@@ -26,8 +26,6 @@ use VanillaTests\Fixtures\Request;
  */
 class SystemTokenMiddlewareTest extends TestCase {
 
-    private const CONTEXT_SECRET = "abc123";
-
     /** @var SystemTokenMiddleware */
     private $middleware;
 
@@ -35,7 +33,7 @@ class SystemTokenMiddlewareTest extends TestCase {
     private $session;
 
     /** @var SystemTokenUtils */
-    private $tokenUtils;
+    private $tokenModel;
 
     /**
      * Call the middleware.
@@ -62,8 +60,8 @@ class SystemTokenMiddlewareTest extends TestCase {
         $this->session = $this->getMockBuilder(Gdn_Session::class)
             ->onlyMethods(["setPermission", "start", "validateTransientKey"])
             ->getMock();
-        $this->tokenUtils = new SystemTokenUtils(self::CONTEXT_SECRET, $this->session);
-        $this->middleware = new SystemTokenMiddleware("/", $this->tokenUtils, $this->session);
+        $this->tokenModel = new SystemTokenUtils("abc123");
+        $this->middleware = new SystemTokenMiddleware("/", $this->tokenModel, $this->session);
     }
 
     /**
@@ -71,7 +69,7 @@ class SystemTokenMiddlewareTest extends TestCase {
      */
     public function testExpiredToken(): void {
         CurrentTimeStamp::mockTime(time() - SystemTokenUtils::TOKEN_TTL - 10);
-        $expiredToken = $this->tokenUtils->encode();
+        $expiredToken = $this->tokenModel->encode(31337);
         CurrentTimeStamp::clearMockTime();
         $request = new Request();
         $request->setHeader("Content-Type", SystemTokenMiddleware::AUTH_CONTENT_TYPE);
@@ -104,11 +102,7 @@ class SystemTokenMiddlewareTest extends TestCase {
      * @dataProvider provideValidTokens
      */
     public function testValidToken(?array $body = null, ?array $query = null): void {
-        // Tokens would usually be generated in a separate request (or session), so simulate that here.
         $userID = 1337;
-        $tokenSession = $this->createMock(Gdn_Session::class);
-        $tokenSession->UserID = $userID;
-        $tokenUtils = new SystemTokenUtils(self::CONTEXT_SECRET, $tokenSession);
 
         $this->session->expects($this->once())->method("start")
             ->with($userID, false, false);
@@ -117,7 +111,7 @@ class SystemTokenMiddlewareTest extends TestCase {
         $this->session->expects($this->once())->method("validateTransientKey")
             ->with(true, true);
 
-        $token = $tokenUtils->encode($body, $query);
+        $token = $this->tokenModel->encode($userID, $body, $query);
         $request = new Request();
         $request->setHeader("Content-Type", SystemTokenMiddleware::AUTH_CONTENT_TYPE);
         $request->setBody($token);
@@ -147,7 +141,7 @@ class SystemTokenMiddlewareTest extends TestCase {
      * Verify a valid token fails when the current request query does not match.
      */
     public function testValidTokenInvalidQuery(): void {
-        $token = $this->tokenUtils->encode(null, ["foo" => "bar"]);
+        $token = $this->tokenModel->encode(1337, null, ["foo" => "bar"]);
         $request = new Request();
         $request->setHeader("Content-Type", SystemTokenMiddleware::AUTH_CONTENT_TYPE);
         $request->setBody($token);
@@ -161,7 +155,7 @@ class SystemTokenMiddlewareTest extends TestCase {
      * Verify a valid token fails when the current request query does not contain the same values.
      */
     public function testValidTokenIncompatibleQuery(): void {
-        $token = $this->tokenUtils->encode(null, ["foo" => "bar"]);
+        $token = $this->tokenModel->encode(1337, null, ["foo" => "bar"]);
         $request = new Request();
         $request->setHeader("Content-Type", SystemTokenMiddleware::AUTH_CONTENT_TYPE);
         $request->setQuery(["foo" => "baz"]);
@@ -185,7 +179,7 @@ class SystemTokenMiddlewareTest extends TestCase {
      * Verify an error is reported if the token utils does not have a proper secret configured.
      */
     public function testNoSecretConfigured(): void {
-        $tokenUtils = new SystemTokenUtils("", $this->session);
+        $tokenUtils = new SystemTokenUtils("");
         $middleware = new SystemTokenMiddleware("/", $tokenUtils, $this->session);
 
         $request = new Request();

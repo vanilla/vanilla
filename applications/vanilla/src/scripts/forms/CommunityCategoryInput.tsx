@@ -95,7 +95,7 @@ export function CommunityCategoryInput(props: IProps) {
     );
 }
 
-export function useCategorySuggestions(query: string, forceSearch?: boolean): ILoadable<ICategory[]> {
+function useCategorySuggestions(query: string, forceSearch?: boolean): ILoadable<ICategory[]> {
     const actions = useReduxActions(CategorySuggestionActions);
     const suggestions = useSelector((state: IForumStoreState) => {
         return state.forum.categories.suggestionsByQuery[query] ?? { status: LoadStatus.PENDING };

@@ -914,9 +914,6 @@ class DiscussionsApiController extends AbstractApiController {
         // Get the tags.
         $tags = $this->tagModel->getTagsFromReferences($validatedBody);
 
-        // Make sure each tag is of an allowed type and throw an error if not.
-        $this->tagModel->checkAllowedDiscussionTagTypes($tags);
-
         // Add the tags to the discussion.
         $this->tagModel->addDiscussion($id, array_column($tags, 'TagID'));
 
@@ -950,9 +947,6 @@ class DiscussionsApiController extends AbstractApiController {
 
         // Get the tags.
         $tags = $this->tagModel->getTagsFromReferences($validatedBody);
-
-        // Make sure each tag is of an allowed type and throw an error if not.
-        $this->tagModel->checkAllowedDiscussionTagTypes($tags);
 
         // Set the tags on the discussion.
         $this->tagModel->saveDiscussion($id, array_column($tags, 'TagID'));

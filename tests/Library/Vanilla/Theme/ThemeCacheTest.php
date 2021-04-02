@@ -22,6 +22,15 @@ class ThemeCacheTest extends MockThemeTestCase {
     private $service;
 
     /**
+     * Configure the container.
+     */
+    public function setUp(): void {
+        parent::setUp();
+
+        self::container()->setInstance(\Gdn_Cache::class, new \Gdn_Dirtycache());
+    }
+
+    /**
      * Test simple caching.
      */
     public function testCacheSuccess() {

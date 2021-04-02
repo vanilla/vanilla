@@ -2870,61 +2870,6 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
     }
 
     /**
-     * Given a comment, update it's discussion last post info and counts.
-     *
-     * Usually, this method shouldn't be called directly. It is meant mainly to be called from other models.
-     *
-     * @param array $discussion The discussion being incremented.
-     * @param array $comment The comment that prompted the increment.
-     * @param int $offset Pass 1 if the comment was added to the discussion or -1 if it was removed.
-     * @param bool $updateCategory Whether or not to update aggregates on the category too.
-     */
-    public function adjustLastComment(array $discussion, array $comment, int $offset = 1, $updateCategory = true) {
-        $this->incrementCommentCount($discussion, $offset, $updateCategory);
-
-        // Update the cached last post info with whatever we have.
-        $this->updateLastComment($comment, $updateCategory);
-    }
-
-    /**
-     * Recursively increment counts for a discussion & it's ancestors.
-     *
-     * @param array $discussion
-     * @param int $offset
-     * @param bool $updateCategory
-     */
-    private function incrementCommentCount(array $discussion, int $offset = 1, bool $updateCategory = true) {
-        $discussionID = $discussion['DiscussionID'];
-        $this->SQL->put('Discussion', ['CountComments+' => $offset], ['DiscussionID' => $discussionID]);
-
-        $categoryID = $discussion['CategoryID'] ?? false;
-
-        if ($updateCategory && $categoryID) {
-            if ($offset > 0) {
-                CategoryModel::incrementAggregateCount($categoryID, CategoryModel::AGGREGATE_COMMENT, $offset);
-            } else {
-                CategoryModel::decrementAggregateCount($categoryID, CategoryModel::AGGREGATE_COMMENT, -$offset);
-            }
-        }
-    }
-
-    /**
-     * Update the latest post info for a Discussion
-     *
-     * @param array $comment
-     * @param bool $updateCategory Whether or not to check the categories for the comment.
-     */
-    private function updateLastComment(array $comment, bool $updateCategory = true) {
-        $discussionID = $comment['DiscussionID'] ?? false;
-
-        // TODO: Update the last comment on the discussion itself.
-
-        if ($updateCategory) {
-            CategoryModel::updateLastPost($discussionID, $comment);
-        }
-    }
-
-    /**
      * Update a user's discussion count.
      *
      * @param int $userID The user to calculate.
@@ -3375,7 +3320,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
             // Decrement CountAllDiscussions for category and its parents.
             CategoryModel::decrementAggregateCount($categoryID, CategoryModel::AGGREGATE_DISCUSSION);
 
-            // Decrement CountAllComments for category and its parents.
+            // Decrement CountAllDiscussions for category and its parents.
             if ($totalComments > 0) {
                 CategoryModel::decrementAggregateCount($categoryID, CategoryModel::AGGREGATE_COMMENT, $totalComments);
             }
@@ -3684,130 +3629,6 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
             throw new \InvalidArgumentException("DiscussionModel::setArchiveDate() expects a string or DateTimeInterface");
         }
         $this->archiveDate = $archiveDate;
-    }
-
-    /**
-     * Merge two discussions.
-     *
-     * @param array|integer $sourceDiscussion
-     * @param array|integer $destDiscussion
-     * @param bool $redirectLink
-     * @param array $options
-     */
-    public function merge($sourceDiscussion, $destDiscussion, bool $redirectLink = false, array $options = []): void {
-        // We set both $sourceDiscussion & $sourceDiscussionID based on the provided parameters.
-        [$sourceDiscussionID, $sourceDiscussion] = $this->resolveDiscussionArg($sourceDiscussion);
-        [$destDiscussionID, $destDiscussion] = $this->resolveDiscussionArg($destDiscussion);
-
-        $discussions = [$sourceDiscussion, $destDiscussion];
-        // If either the previous or current discussion id is null OR they are the same, it ends here.
-        if ($sourceDiscussionID == $destDiscussionID) {
-            throw new \Gdn_UserException('You can\'t merge a discussion with itself.', 400);
-        } else {
-            // Make sure none of the provided discussions are ghost redirects.
-            $discussionTypes = array_column($discussions, 'Type');
-            if (in_array('redirect', $discussionTypes)) {
-                throw new Gdn_UserException('You cannot merge redirects.', 400);
-            }
-        }
-
-        // Check that the user has permission to edit all discussions
-        foreach ($discussions as $discussion) {
-            if (!DiscussionModel::canEdit($discussion)) {
-                throw permissionException('@'.t('You do not have permission to edit all of the posts you are trying to merge.'));
-            }
-        }
-
-        $this->defineSchema();
-        $maxNameLength = $this->Schema->getField('Name')->Length;
-
-        while (!$this->moveComments($sourceDiscussionID, $destDiscussionID));
-
-        // Once every comment has been moved to the new discussion, we create a comment out of the 'old' discussion.
-        $comment = arrayTranslate(
-            $sourceDiscussion,
-            [
-                'Body',
-                'Format',
-                'DateInserted',
-                'InsertUserID',
-                'InsertIPAddress',
-                'DateUpdated',
-                'UpdateUserID',
-                'UpdateIPAddress',
-                'Attributes',
-                'Spam',
-                'Likes',
-                'Abuse'
-            ]
-        );
-        $comment['DiscussionID'] = $destDiscussionID;
-
-        $commentModel = new CommentModel();
-        $commentModel->Validation->results(true);
-        $commentID = $commentModel->save($comment);
-        if ($commentID) {
-            $comment['CommentID'] = $commentID;
-
-            $this->adjustLastComment($destDiscussion, $comment, 1, true);
-
-            $this->EventArguments['SourceDiscussion'] = $sourceDiscussion;
-            $this->EventArguments['TargetComment'] = $comment;
-            $this->fireEvent('TransformDiscussionToComment');
-
-            if ($redirectLink) {
-                // The discussion needs to be changed to a moved link.
-                $redirectDiscussion = [
-                    'Name' => sliceString(sprintf(t('Merged: %s'), $sourceDiscussion['Name']), $maxNameLength),
-                    'Type' => 'redirect',
-                    'Body' => formatString(
-                        t('This discussion has been <a href="{url,html}">merged</a>.'),
-                        ['url' => discussionUrl($destDiscussion)]
-                    ),
-                    'Format' => 'Html'
-                ];
-                $this->setField($sourceDiscussion['DiscussionID'], $redirectDiscussion);
-                $commentModel->removePageCache($sourceDiscussion['DiscussionID']);
-            } else {
-                // Delete discussion that was merged.
-                $this->deleteID($sourceDiscussion['DiscussionID']);
-            }
-        }
-        // Update the comments counts for the destination's Discussion ID
-        $commentModel->updateCommentCount($destDiscussionID);
-        $commentModel->removePageCache($destDiscussionID);
-
-        // Update the Discussions counts value on the category based on the destination's CategoryID
-        $this->updateDiscussionCount($destDiscussion['CategoryID']);
-    }
-
-    /**
-     * Move "every" comments from a discussion to another.
-     *
-     * @param int $sourceDiscussionID
-     * @param int $destDiscussionID
-     * @param int $limit
-     * @return bool
-     */
-    private function moveComments(int $sourceDiscussionID, int $destDiscussionID, $limit = 100): bool {
-        $done = false;
-
-        $commentModel = new CommentModel();
-
-        // Obtain the comments for the discussion.
-        $comments = $commentModel->getByDiscussion($sourceDiscussionID, $limit)->result(DATASET_TYPE_ARRAY);
-
-        if (count($comments) > 0) {
-            foreach ($comments as $comment) {
-                $comment = (array)$comment;
-                $comment['DiscussionID'] = $destDiscussionID;
-                $commentModel->save($comment);
-            }
-        } else {
-            $done = true;
-        }
-
-        return $done;
     }
 
     /**
@@ -4556,23 +4377,5 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
         }
 
         return url($result, $withDomain);
-    }
-
-    /**
-     * Resolve a discussion argument that could be either a discussion ID or a discussion row.
-     *
-     * @param array|int $discussion The discussion to resolve.
-     * @return array Returns an array in the form `[$discussionID, $discussion]`.
-     */
-    public function resolveDiscussionArg($discussion): array {
-        if (is_numeric($discussion)) {
-            $discussionID = $discussion;
-            $discussion = $this->getID($discussionID, DATASET_TYPE_ARRAY);
-        } elseif (is_array($discussion)) {
-            $discussionID = $discussion['DiscussionID'] ?? null;
-        } else {
-            throw new \InvalidArgumentException("DiscussionModel::resolveDiscussionArg() expects an integer or array.", 400);
-        }
-        return [$discussionID, $discussion];
     }
 }

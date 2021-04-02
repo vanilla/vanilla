@@ -31,7 +31,8 @@ export const embedContainerVariables = useThemeCache(() => {
     });
 
     const title = makeThemeVars("title", {
-        ...globalVars.fontSizeAndWeightVars("medium", "bold"),
+        size: globalVars.fonts.size.medium,
+        weight: globalVars.fonts.weights.bold,
     });
 
     const dimensions = makeThemeVars("dimensions", {
@@ -80,14 +81,12 @@ export const embedContainerClasses = useThemeCache(() => {
 
     const makeRootClass = (size: EmbedContainerSize, inEditor: boolean, withPadding: boolean = true) =>
         style(size, {
-            ...Mixins.font({
-                ...globalVars.fontSizeAndWeightVars("medium"),
-                color: ColorsUtils.colorOut(vars.colors.fg),
-                textDecoration: "none",
-            }),
+            fontSize: styleUnit(globalVars.fonts.size.medium),
             background: ColorsUtils.colorOut(vars.colors.bg),
             display: "block",
             position: "relative",
+            textDecoration: "none",
+            color: ColorsUtils.colorOut(vars.colors.fg),
             margin: "auto",
             padding: withPadding ? vars.spacing.padding : 0,
             ...(inEditor ? userSelect() : {}),

@@ -224,7 +224,8 @@ export const userSpotlightVariables = useThemeCache(
              * @expand font
              */
             font: Variables.font({
-                ...globalVars.fontSizeAndWeightVars("subTitle", "bold"),
+                size: globalVars.fonts.size.subTitle,
+                weight: globalVars.fonts.weights.bold,
                 color: globalVars.mainColors.fg,
             }),
 

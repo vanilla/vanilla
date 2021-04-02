@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import { variableFactory } from "@library/styles/styleUtils";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
@@ -15,19 +15,16 @@ import { userSelect } from "@library/styles/styleHelpers";
 import { styleUnit } from "@library/styles/styleUnit";
 import { important, percent } from "csx";
 import { userContentVariables } from "@library/content/userContentStyles";
+import { buttonVariables } from "@library/forms/Button.variables";
 import { Mixins } from "@library/styles/Mixins";
-import { Variables } from "@library/styles/Variables";
 
 export const spoilerVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const makeThemeVars = variableFactory("spoiler");
 
-    const font = makeThemeVars(
-        "font",
-        Variables.font({
-            ...globalVars.fontSizeAndWeightVars("large"),
-        }),
-    );
+    const font = makeThemeVars("font", {
+        size: globalVars.fonts.size.large,
+    });
 
     const colors = makeThemeVars("colors", {
         bg: globalVars.mixBgAndFg(0.95),
@@ -172,7 +169,8 @@ export const spoilerCSS = useThemeCache(() => {
             },
             ".spoiler-warningLabel": {
                 ...Mixins.font({
-                    ...globalVars.fontSizeAndWeightVars("medium", "semiBold"),
+                    size: globalVars.fonts.size.medium,
+                    weight: globalVars.fonts.weights.semiBold,
                 }),
                 marginLeft: styleUnit(6),
             },

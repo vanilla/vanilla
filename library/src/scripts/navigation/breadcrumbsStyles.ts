@@ -42,8 +42,8 @@ export const breadcrumbsVariables = useThemeCache(() => {
          * @expand font
          */
         font: Variables.font({
-            ...globalVars.fontSizeAndWeightVars("small"),
             color: ensureColorHelper(globalVars.links.colors.default),
+            size: globalVars.fonts.size.small,
             lineHeight: globalVars.lineHeights.condensed,
             transform: "uppercase",
             textDecoration: globalVars.links.linkDecorationType === LinkDecorationType.ALWAYS ? "underline" : "none",
@@ -89,10 +89,8 @@ export const breadcrumbsClasses = useThemeCache(() => {
     const crumb = style("crumb", {
         ...singleLineEllipsis(),
         display: "inline-flex",
-        ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("small"),
-            lineHeight: globalVars.lineHeights.condensed,
-        }),
+        fontSize: styleUnit(globalVars.fonts.size.small),
+        lineHeight: globalVars.lineHeights.condensed,
         overflow: "hidden",
     });
 

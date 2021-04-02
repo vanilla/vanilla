@@ -2,6 +2,7 @@
     "key": "asset-parent-test",
     "name": "Asset Test Theme",
     "type": "theme",
+    "inheritAssets": true,
     "assets": {
         "fonts": {
             "type": "json",

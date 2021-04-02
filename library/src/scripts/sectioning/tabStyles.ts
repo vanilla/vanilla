@@ -18,7 +18,6 @@ import { CSSObject } from "@emotion/css";
 import { buttonResetMixin } from "@library/forms/buttonMixins";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { Mixins } from "@library/styles/Mixins";
-import { Variables } from "@library/styles/Variables";
 
 interface IListOptions {
     includeBorder?: boolean;
@@ -269,12 +268,11 @@ export const tabBrowseClasses = useThemeCache(() => {
 
     const tab = useThemeCache((largeTabs?: boolean, legacyButton?: boolean) =>
         style("tab", {
-            position: "relative",
             ...buttonResetMixin(),
-            ...Mixins.font({
-                ...globalVars.fontSizeAndWeightVars(largeTabs ? "large" : "small", "bold"),
-                transform: largeTabs ? "inherit" : "uppercase",
-            }),
+            textTransform: largeTabs ? "inherit" : "uppercase",
+            fontSize: largeTabs ? globalVars.fonts.size.large : globalVars.fonts.size.small,
+            fontWeight: globalVars.fonts.weights.bold,
+            position: "relative",
             ...Mixins.padding({
                 vertical: verticalPadding,
                 horizontal: horizontalPadding,

@@ -334,9 +334,10 @@ export const homeWidgetItemVariables = useThemeCache(
              * @expand font
              */
             font: Variables.font({
-                ...globalVars.fontSizeAndWeightVars("large", "semiBold"),
                 color: options.fg,
+                size: globalVars.fonts.size.large,
                 textDecoration: "none",
+                weight: globalVars.fonts.weights.semiBold,
             }),
 
             fontState: Variables.font({
@@ -377,13 +378,15 @@ export const homeWidgetItemVariables = useThemeCache(
              */
             font: Variables.font({
                 ...name.font,
-                ...globalVars.fontSizeAndWeightVars("small", "semiBold"),
                 transform: "uppercase",
+                size: globalVars.fonts.size.small,
+                weight: globalVars.fonts.weights.semiBold,
             }),
             fontState: Variables.font({
                 ...name.fontState,
-                ...globalVars.fontSizeAndWeightVars("small", "semiBold"),
                 transform: "uppercase",
+                size: globalVars.fonts.size.small,
+                weight: globalVars.fonts.weights.semiBold,
             }),
         });
 

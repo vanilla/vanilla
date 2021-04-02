@@ -4,7 +4,6 @@
  * @license gpl-2.0-only
  */
 
-import { DashboardCodeEditor } from "@dashboard/forms/DashboardCodeEditor";
 import { DashboardInput } from "@dashboard/forms/DashboardInput";
 import { DashboardRadioButton } from "@dashboard/forms/DashboardRadioButton";
 import { DashboardRadioGroup } from "@dashboard/forms/DashboardRadioGroups";
@@ -26,7 +25,7 @@ interface IProps {
 export function WidgetFormControl(props: IProps) {
     const { formControl, schema, onChange } = props;
     const value = props.value ?? schema.default;
-    const inputName = useUniqueID("input");
+    const radioName = useUniqueID("radioInput");
 
     switch (formControl.inputType) {
         case "textBox":
@@ -53,22 +52,13 @@ export function WidgetFormControl(props: IProps) {
                     }
                 />
             );
-        case "codeBox":
-            return (
-                <DashboardCodeEditor
-                    value={value}
-                    onChange={onChange}
-                    language={formControl.language || "text/html"}
-                    jsonSchemaUri={formControl.jsonSchemaUri}
-                />
-            );
         case "radio":
             return (
                 <DashboardRadioGroup value={value} onChange={onChange}>
                     {Object.entries(formControl.choices.staticOptions ?? []).map(
                         ([optionValue, label]: [string, string]) => (
                             <DashboardRadioButton
-                                name={inputName}
+                                name={radioName}
                                 key={optionValue}
                                 label={label}
                                 value={optionValue}

@@ -57,9 +57,7 @@ export const actionBarClasses = useThemeCache(() => {
                 justifyContent: "flex-end",
                 ...{
                     "& button": {
-                        ...Mixins.font({
-                            ...globalVars.fontSizeAndWeightVars("medium"),
-                        }),
+                        fontSize: globalVars.fonts.size.medium,
                     },
                 },
             },
@@ -70,9 +68,7 @@ export const actionBarClasses = useThemeCache(() => {
         marginLeft: styleUnit(globalVars.gutter.half),
         ...{
             "& button": {
-                ...Mixins.font({
-                    ...globalVars.fontSizeAndWeightVars("medium"),
-                }),
+                fontSize: globalVars.fonts.size.medium,
             },
         },
     });

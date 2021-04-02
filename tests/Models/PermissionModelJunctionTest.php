@@ -23,7 +23,6 @@ class PermissionModelJunctionTest extends SiteTestCase {
      * @var \PermissionModel
      */
     private $permissionModel;
-
     /**
      *  Test setup.
      */

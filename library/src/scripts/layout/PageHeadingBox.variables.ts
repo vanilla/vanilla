@@ -42,13 +42,15 @@ export const pageHeadingBoxVariables = useThemeCache((overrideOptions?: Partial<
         font: Variables.font(
             options.subtitleType === SubtitleType.OVERLINE
                 ? {
-                      ...globalVars.fontSizeAndWeightVars("small", "normal"),
                       letterSpacing: 1,
                       transform: "uppercase",
+                      size: globalVars.fonts.size.small,
                       color: globalVars.mainColors.primary,
+                      weight: globalVars.fonts.weights.normal,
                   }
                 : {
-                      ...globalVars.fontSizeAndWeightVars("subTitle", "semiBold"),
+                      size: globalVars.fonts.size.subTitle,
+                      weight: globalVars.fonts.weights.semiBold,
                   },
         ),
     });

@@ -67,7 +67,8 @@ export const quickLinksVariables = useThemeCache((forcedVars?: IThemeVariables) 
          * @expand font
          */
         font: Variables.font({
-            ...globalVars.fontSizeAndWeightVars("medium", "normal"),
+            size: globalVars.fonts.size.medium,
+            weight: globalVars.fonts.weights.normal,
         }),
         /**
          * @varGroup quickLinks.listItem.fgColor

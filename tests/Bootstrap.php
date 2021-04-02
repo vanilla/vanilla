@@ -46,7 +46,6 @@ use Vanilla\Site\OwnSiteProvider;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Theme\FsThemeProvider;
 use Vanilla\Web\Middleware\LogTransactionMiddleware;
-use Vanilla\Web\SystemTokenUtils;
 use Vanilla\Web\TwigEnhancer;
 use Vanilla\Web\TwigRenderer;
 use Vanilla\Web\UASniffer;
@@ -491,11 +490,6 @@ class Bootstrap {
             ->addCall('registerWidget', [CategoriesModule::class])
             ->addCall('registerWidget', [TagModule::class])
             ->addCall('registerWidget', [CallToActionModule::class])
-
-            ->rule(SystemTokenUtils::class)
-            ->setConstructorArgs([
-                ContainerUtils::config("Context.Secret", "")
-            ])
         ;
 
         $container

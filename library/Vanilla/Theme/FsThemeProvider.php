@@ -32,9 +32,6 @@ class FsThemeProvider implements ThemeProviderInterface {
     /** @var string|null A theme option value if set in the form of '%s_optionName' */
     private $themeOptionValue;
 
-    /** @var ThemeService */
-    private $themeService;
-
     /**
      * FsThemeProvider constructor.
      *
@@ -54,13 +51,6 @@ class FsThemeProvider implements ThemeProviderInterface {
         $this->config = $config;
         $this->themeOptionValue = $this->config->get('Garden.ThemeOptions.Styles.Value', '');
         $this->themeHelper = $themeHelper;
-    }
-
-    /**
-     * @param ThemeService $themeService
-     */
-    public function setThemeService(ThemeService $themeService): void {
-        $this->themeService = $themeService;
     }
 
     /**

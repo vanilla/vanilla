@@ -244,10 +244,8 @@ export const inputCSS = () => {
     });
 
     cssOut(`.FormWrapper label`, {
-        ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("medium"),
-            color: ColorsUtils.colorOut(globalVars.mainColors.fg),
-        }),
+        fontSize: globalVars.fonts.size.medium,
+        color: ColorsUtils.colorOut(globalVars.mainColors.fg),
     });
 
     cssOut(`.js-datetime-picker`, {

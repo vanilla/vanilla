@@ -8,7 +8,6 @@
 namespace Vanilla\Theme;
 
 use Vanilla\Contracts\ConfigurationInterface;
-use VanillaTests\Fixtures\NullCache;
 
 /**
  * Implement caching for the theme service.
@@ -27,21 +26,20 @@ class ThemeCache {
     /** @var \Gdn_Cache */
     private $cache;
 
+    /** @var bool */
+    private $isEnabled;
+
     /**
      * DI.
      *
      * @param \Gdn_Cache $cache
+     * @param ConfigurationInterface $config
      */
-    public function __construct(\Gdn_Cache $cache) {
-        if ($cache instanceof NullCache) {
-            // We have to have a functioning cache of some type.
-            $cache = new \Gdn_Dirtycache();
-        } elseif (debug()) {
-            // In debug mode don't want theme developers seeing stale theme assets.
-            $cache = new \Gdn_Dirtycache();
-        }
-
+    public function __construct(\Gdn_Cache $cache, ConfigurationInterface $config) {
         $this->cache = $cache;
+
+        // Disable caching while in debug mode.
+        $this->isEnabled = !$config->get('Debug', false);
     }
 
     /**
@@ -51,6 +49,9 @@ class ThemeCache {
      * @return array|null
      */
     public function get(string $key): ?Theme {
+        if (!$this->isEnabled) {
+            return null;
+        }
         $cacheResult = $this->cache->get($key);
         if ($cacheResult) {
             $theme = unserialize($cacheResult) ?: null;

@@ -80,9 +80,7 @@ export const inputBlockClasses = useThemeCache(() => {
 
     const errors = style("errors", {
         display: "block",
-        ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("small"),
-        }),
+        fontSize: styleUnit(globalVars.fonts.size.small),
     });
 
     const errorsPadding = style("errorsPadding", inputClasses().inputPaddingMixin);
@@ -98,17 +96,15 @@ export const inputBlockClasses = useThemeCache(() => {
     });
     const labelNote = style("labelNote", {
         display: "block",
-        ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("small", "normal"),
-        }),
+        fontSize: styleUnit(globalVars.fonts.size.small),
+        fontWeight: globalVars.fonts.weights.normal,
         opacity: 0.6,
     });
 
     const labelText = style("labelText", {
         display: "block",
-        ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("medium", "semiBold"),
-        }),
+        fontWeight: globalVars.fonts.weights.semiBold,
+        fontSize: styleUnit(globalVars.fonts.size.medium),
         marginBottom: styleUnit(formElementVars.spacing.margin),
     });
 

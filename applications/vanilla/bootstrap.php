@@ -8,9 +8,7 @@
 use Garden\Container\Reference;
 use Vanilla\Community\CallToActionModule;
 use Vanilla\Community\RSSModule;
-use Vanilla\Community\SearchWidgetModule;
 use Vanilla\EmbeddedContent\EmbedService;
-use Vanilla\FeatureFlagHelper;
 use Vanilla\Forum\EmbeddedContent\Factories\CommentEmbedFactory;
 use Vanilla\Forum\EmbeddedContent\Factories\DiscussionEmbedFactory;
 use \Garden\Container;
@@ -63,10 +61,4 @@ if (Gdn::config('Tagging.Discussions.Enabled', false)) {
     Gdn::getContainer()
         ->rule(WidgetService::class)
         ->addCall('registerWidget', [TagModule::class]);
-}
-
-if (FeatureFlagHelper::featureEnabled("SearchWidget")) {
-    Gdn::getContainer()
-        ->rule(WidgetService::class)
-        ->addCall('registerWidget', [SearchWidgetModule::class]);
 }

@@ -15,7 +15,7 @@ use VanillaTests\SiteTestTrait;
 /**
  * Test count updating around categories, discussions, and comments.
  */
-abstract class AbstractCountsTest extends SiteTestCase {
+abstract class CountsTest extends SiteTestCase {
     use TestCategoryModelTrait, TestDiscussionModelTrait, TestCommentModelTrait;
 
     /**
@@ -76,34 +76,6 @@ abstract class AbstractCountsTest extends SiteTestCase {
                     $this->comments += array_column($comments, null, 'CommentID');
                 }
             }
-        }
-        // Reload Categories, Discussions & Comments to ensure counts "fresh".
-        $this->reloadCategoriesDiscussionsComments();
-    }
-
-    /**
-     * Reloads Categories, Discussions & Comments to the classes members.
-     */
-    public function reloadCategoriesDiscussionsComments():void {
-        // Reload categories.
-        $categoriesRows = $this->categoryModel->getWhere(['CategoryID' => array_keys($this->categories)])->resultArray();
-        $this->categories = [];
-        foreach ($categoriesRows as $categoriesRow) {
-            $this->categories[$categoriesRow['CategoryID']] = $categoriesRow;
-        }
-
-        // Reload discussions
-        $discussionsRows = $this->discussionModel->getWhere(['DiscussionID' => array_keys($this->discussions)])->resultArray();
-        $this->discussions = [];
-        foreach ($discussionsRows as $discussionsRow) {
-            $this->discussions[$discussionsRow['DiscussionID']] = $discussionsRow;
-        }
-
-        // Reload comments
-        $commentsRows = $this->commentModel->getWhere(['CommentID' => array_keys($this->comments)])->resultArray();
-        $this->comments = [];
-        foreach ($commentsRows as $commentsRow) {
-            $this->comments[$commentsRow['CommentID']] = $commentsRow;
         }
     }
 

@@ -58,7 +58,8 @@ export const callToActionVariables = useThemeCache(
              * @expand font
              */
             font: Variables.font({
-                ...globalVars.fontSizeAndWeightVars("subTitle", "bold"),
+                size: globalVars.fonts.size.subTitle,
+                weight: globalVars.fonts.weights.bold,
                 color: globalVars.mainColors.fg,
             }),
             /**
@@ -79,7 +80,8 @@ export const callToActionVariables = useThemeCache(
              * @expand font
              */
             font: Variables.font({
-                ...globalVars.fontSizeAndWeightVars("medium", "normal"),
+                size: globalVars.fonts.size.medium,
+                weight: globalVars.fonts.weights.normal,
                 color: globalVars.mainColors.fg,
             }),
             /**

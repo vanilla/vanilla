@@ -8,9 +8,7 @@ namespace VanillaTests\Models;
 
 use League\Uri\Http;
 use Vanilla\Utility\ModelUtils;
-use VanillaTests\APIv0\TestDispatcher;
 use VanillaTests\Bootstrap;
-use VanillaTests\EventSpyTestTrait;
 use VanillaTests\SiteTestCase;
 use Garden\EventManager;
 use Vanilla\Dashboard\Events\UserEvent;
@@ -22,7 +20,6 @@ use ActivityModel;
  * Test {@link UserModel}.
  */
 class UserModelTest extends SiteTestCase {
-    use EventSpyTestTrait;
 
     public static $addons = ['vanilla', 'dashboard', 'conversations'];
 
@@ -71,6 +68,7 @@ class UserModelTest extends SiteTestCase {
             EventManager $eventManager,
             \Gdn_Configuration $config
         ) {
+            $eventManager->unbindClass(self::class);
             $eventManager->addListenerMethod(self::class, "handleUserEvent");
             $this->config = $config;
         });
@@ -101,72 +99,6 @@ class UserModelTest extends SiteTestCase {
     public function handleUserEvent(UserEvent $e): UserEvent {
         $this->lastEvent = $e;
         return $e;
-    }
-
-    /**
-     * Adds crypted "password" to the allowed banTypes of the "Ban Rules" dashboard interface.
-     *
-     * @param array $banTypes
-     * @return array
-     */
-    public function settingsController_listBanTypes(array $banTypes): array {
-        $banTypes['Password'] = t('Password');
-        return $banTypes;
-    }
-
-    /**
-     * Add ordering users by Email in the dashboard's users list.
-     *
-     * @param array $allowedSorting
-     * @return array
-     */
-    public function userController_usersListAllowedSorting(array $allowedSorting): array {
-        $allowedSorting['Password'] = 'desc';
-        return $allowedSorting;
-    }
-
-    /**
-     * Add crypted password string to the dashboard's users list search query.
-     *
-     * @param array $whereCriterias
-     * @param string $keywords
-     * @return array
-     */
-    public function userModel_searchKeyWords_handler(array $whereCriterias, string $keywords): array {
-        $whereCriterias['where']['u.Password'] = $keywords;
-
-        return $whereCriterias;
-    }
-
-    /**
-     * Add uncrypted "Password" to the possible ban query.
-     *
-     * @param array $result
-     * @param array $ban
-     * @return array
-     */
-    public function banModel_banWhere_handler(array $result, array $ban): array {
-        switch (strtolower($ban['BanType'])) {
-            case 'password':
-                $result['u.Password'] = $ban['BanValue'];
-                break;
-        }
-        return $result;
-    }
-
-    /**
-     * Either add "Password" row header or a crypted password to the dashboard's list of users.
-     *
-     * @param \Gdn_Controller $sender
-     * @param array $args
-     */
-    public function base_userCell_handler($sender, $args) {
-        // If we have user data, we create a cell containing the crypted password.
-        if (isset($args['User'])) {
-            echo '<td>' . $args['User']->Password ?? '' . '</td>';
-        } else {
-            echo '<th class="column-md">' . t('Password') . '</th>';
-        }
     }
 
     /**
@@ -622,82 +554,5 @@ class UserModelTest extends SiteTestCase {
         $this->assertEquals($discussionCountBefore + $discussionCountAfter, $actualDiscussionCount);
         $this->assertEquals($commentCountBefore + $commentCountAfter, $actualCommentCount);
         $this->assertNotEmpty($result['MergeID']);
-    }
-
-    /**
-     * Test the moderation dashboard's user list for a crypted password column.
-     */
-    public function testDashboardUserListPassword(): void {
-        // As an admin...
-        $this->getSession()->start($this->adminID);
-
-        $html = $this->bessy()->getHtml('/dashboard/user', [], ['deliveryType' => DELIVERY_TYPE_ALL]);
-
-        // There should be a "Password" column.
-        $html->assertCssSelectorTextContains('#Users.table-data', 'Password');
-    }
-
-    /**
-     * Test ban by crypted password in the user moderation dashboard.
-     */
-    public function testDashboardAddUndecodedPasswordCustomBan(): void {
-        // Load users.
-        $users = $this->userModel->getLike()->resultArray();
-
-        // We pick a user to ban.
-        $userToBan = end($users);
-
-        $this->assertNotEmpty($userToBan['Password']);
-        $this->assertEquals(0, $userToBan['Banned']);
-
-        // As an admin...
-        $this->getSession()->start($this->adminID);
-
-        $formValues = [
-            'BanType' => 'Password',
-            'BanValue' => $userToBan['Password'],
-            'Notes' => 'We are banning '.$userToBan['Password']
-        ];
-
-        $this->bessy()->post('/settings/bans/add', $formValues);
-
-        // Reload the data of the banned user, for verification's sake.
-        $bannedUser = $this->userModel->getID($userToBan['UserID'], DATASET_TYPE_ARRAY);
-
-        $this->assertEquals(2, $bannedUser['Banned']);
-    }
-
-    /**
-     * Test user lookup by undecoded password in the user moderation dashboard.
-     */
-    public function testSearchDashboardUserByPassword(): void {
-        // Load users.
-        $users = $this->userModel->getLike()->resultArray();
-
-        // We pick 2 users with different Passwords
-        $firstUser = reset($users);
-        $lastUser = end($users);
-        $this->assertNotEquals($firstUser['Password'], $lastUser['Password']);
-
-        // As an admin...
-        $this->getSession()->start($this->adminID);
-
-        // We do a search for one, confirm the other is not listed.
-        $formValues = [
-            'Keywords' => $firstUser['Password'],
-        ];
-
-        $html = $this->bessy()->getHtml('/dashboard/user/browse', $formValues, ['deliveryType' => DELIVERY_TYPE_ALL]);
-        $html->assertCssSelectorTextContains('#Users.table-data', $firstUser['Name']);
-        $html->assertCssSelectorNotTextContains('#Users.table-data', $lastUser['Name']);
-
-        // We do a search for the other one & confirm the first one is not listed.
-        $formValues = [
-            'Keywords' => $lastUser['Password'],
-        ];
-
-        $html = $this->bessy()->getHtml('/dashboard/user/browse', $formValues, ['deliveryType' => DELIVERY_TYPE_ALL]);
-        $html->assertCssSelectorTextContains('#Users.table-data', $lastUser['Name']);
-        $html->assertCssSelectorNotTextContains('#Users.table-data', $firstUser['Name']);
     }
 }

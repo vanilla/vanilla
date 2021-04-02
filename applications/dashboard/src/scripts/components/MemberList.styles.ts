@@ -121,7 +121,7 @@ export const memberListClasses = useThemeCache(() => {
     const linkColors = Mixins.clickable.itemState({ default: globalVars.mainColors.fg });
     const profileLink = style("profileLink", {
         ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("large"),
+            size: globalVars.fonts.size.large,
         }),
         marginRight: styleUnit(globalVars.gutter.size),
         ...linkColors,
@@ -151,7 +151,7 @@ export const memberListClasses = useThemeCache(() => {
 
     const date = style("date", {
         ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("large"),
+            size: globalVars.fonts.size.large,
             color: metasVars.font.color,
             lineHeight: globalVars.lineHeights.condensed,
         }),
@@ -160,10 +160,8 @@ export const memberListClasses = useThemeCache(() => {
     });
 
     const postsUserSection = style("postsUserSection", {
-        ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("small"),
-            transform: "uppercase",
-        }),
+        fontSize: globalVars.fonts.size.small,
+        textTransform: "uppercase",
     });
 
     const label = style("label", {
@@ -195,7 +193,8 @@ export const memberListClasses = useThemeCache(() => {
     const head = style("head", {
         ...Mixins.padding(vars.head.padding),
         ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("medium", "semiBold"),
+            size: globalVars.fonts.size.medium,
+            weight: globalVars.fonts.weights.semiBold,
             transform: "uppercase",
         }),
         whiteSpace: "nowrap",

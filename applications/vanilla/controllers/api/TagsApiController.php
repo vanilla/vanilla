@@ -57,38 +57,29 @@ class TagsApiController extends AbstractApiController {
         $in = $this->schema(
             [
                 'query:s?',
-                "type:a?" => [
-                    'items' => [
-                        'type' => 'string',
-                    ],
-                    'style' => 'form',
-                ],
-                "parentID:a?" => [
-                    'items' => [
-                        'type' => 'integer',
-                    ],
-                    'style' => 'form',
-                ],
+                "type:s" => ["default" => "default"],
+                "parentID:i?",
             ]
         );
 
         $query = $in->validate($query);
-        $query["type"] = $query["type"] ?? ['all'];
 
         $out = $this->schema([':a?' => $this->fullSchema()], 'out');
         $options['extraFields'] = true;
 
         $tags = [];
         $searchTerm = $query['query'] ?? '';
+        if ($searchTerm) {
             $tags = $this->tagModel->search(
                 $searchTerm,
                 true,
-                $query["parentID"] ?? [],
+                $query["parentID"] ?? false,
                 $query["type"],
                 $options
             );
+        }
 
-        $allowedTypes = $query["type"] === ["tag"] ? [] : $query["type"];
+        $allowedTypes = $query["type"] === "default" ? [] : [$query["type"]];
         $tags = $this->normalizeTags($tags, $allowedTypes);
         $tags = $out->validate($tags);
 
@@ -112,7 +103,7 @@ class TagsApiController extends AbstractApiController {
      * @throws \Vanilla\Exception\PermissionException Throws an exception if the user doesn't have the Vanilla.Tagging.Add permission.
      */
     public function get(int $id): Data {
-        $this->permission();
+        $this->permission('Vanilla.Tagging.Add');
         $tag = $this->getTagFormattedForOutput($id);
         $result = new Data($tag);
         return $result;
@@ -132,15 +123,6 @@ class TagsApiController extends AbstractApiController {
         $this->permission('Garden.Community.Manage');
         $in = $this->tagModel->getPostTagSchema();
         $validatedBody = $in->validate($body);
-
-        // If we're specifying a type, make sure we're allowed to add tags to that type.
-        if (isset($validatedBody['type'])) {
-            $this->checkTypeAddSetting($validatedBody['type']);
-        }
-
-        if (isset($validatedBody['parentTagID'])) {
-            $this->parentExists($validatedBody['parentTagID']);
-        }
 
         // Create the slug. The tag model's save() method requires it.
         $validatedBody['urlcode'] = $validatedBody['urlcode'] ?? $this->tagModel->tagSlug($validatedBody['name']);
@@ -176,15 +158,6 @@ class TagsApiController extends AbstractApiController {
         $this->permission('Garden.Community.Manage');
         $in = $this->tagModel->getPatchTagSchema();
         $validatedBody = $in->validate($body, true);
-
-        // If we're specifying a type, make sure we're allowed to add tags to that type.
-        if (isset($validatedBody['type'])) {
-            $this->checkTypeAddSetting($validatedBody['type']);
-        }
-
-        if (isset($validatedBody['parentTagID'])) {
-            $this->parentExists($validatedBody['parentTagID']);
-        }
 
         // Get the tag and throw a Not Found error if nothing comes back.
         $tags = $this->tagModel->getWhere(['TagID' => $id])->resultArray();
@@ -224,8 +197,7 @@ class TagsApiController extends AbstractApiController {
             throw new \Garden\Web\Exception\NotFoundException('Tag');
         } else {
             $tag = $tags[0];
-
-            // Make sure the tag doesn't have any children or associated discussions.
+            // Do we need to do something if the tag we're deleting is the Parent tag of some other tags?
             $isParent = $this->tagModel->getChildTags($id);
             if (!empty($isParent)) {
                 throw new \Garden\Web\Exception\ClientException('You cannot delete tags that have associated child tags.', 409);
@@ -249,11 +221,9 @@ class TagsApiController extends AbstractApiController {
             // we should remove tags that aren't explicitly whitelisted.
             // in-case they some how are returned by the search.
             $type = $tag['type'] ?? '';
-            if (!in_array('all', $allowedTypes)) {
-                if ($type !== '' && !in_array($type, $allowedTypes)) {
-                    array_splice($tags, $key, 1);
-                    continue;
-                }
+            if ($type !== '' && !in_array($type, $allowedTypes)) {
+                array_splice($tags, $key, 1);
+                continue;
             }
             $tag['urlCode'] = $tag['urlcode'] = $tag['name'] ?? "";
             $tag['name'] = $tag['fullName'] ?? "";
@@ -276,34 +246,5 @@ class TagsApiController extends AbstractApiController {
         $normalizedTag = $this->tagModel->normalizeOutput($tagFromDB)[0];
         $validatedTag = $out->validate($normalizedTag);
         return $validatedTag;
-    }
-
-    /**
-     * Check to see if you can add a tag of this specified type and throw an error if you can't.
-     *
-     * @param string $type
-     * @throws \Garden\Web\Exception\ClientException Throws an error if you can't add tags of this type.
-     */
-    private function checkTypeAddSetting(string $type): void {
-        // Get all the tag types.
-        $allTypes = array_change_key_case($this->tagModel->getTagTypes(), 0);
-
-        // Check to see if the type is an existing one, and if it isn't make sure you're allowed to add tags to it.
-        if (in_array(strtolower($type), array_keys($allTypes)) && !$this->tagModel->canAddTagForType($type)) {
-            throw new \Garden\Web\Exception\ClientException(sprintf("You cannot add tags with the type '%s'.", $type));
-        }
-    }
-
-    /**
-     * Checks to make sure the parent tag exists and throws an error if it doesn't.
-     *
-     * @param int $parentTagID The ID of the tag to check.
-     * @throws \Garden\Web\Exception\NotFoundException Throws an exception if the parent tag isn't found.
-     */
-    private function parentExists(int $parentTagID): void {
-        $parentExists = $this->tagModel->getID($parentTagID);
-        if (!$parentExists) {
-            throw new \Garden\Web\Exception\ClientException('Parent tag not found.');
-        }
     }
 }

@@ -14,7 +14,6 @@ import { percent } from "csx/lib/units";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { extendItemContainer } from "@library/styles/styleHelpers";
 import { injectGlobal } from "@emotion/css";
-import { ColorsUtils } from "@library/styles/ColorsUtils";
 
 export const pageBoxCompatStyles = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -51,12 +50,7 @@ export const pageBoxCompatStyles = useThemeCache(() => {
 
             [allHeadings]: {
                 padding: 0,
-
-                ...Mixins.font({
-                    ...globalVars.fontSizeAndWeightVars("title"),
-                    color: ColorsUtils.colorOut(globalVars.mainColors.fgHeading),
-                }),
-
+                fontSize: globalVars.fonts.size.title,
                 width: "auto",
                 flex: 1,
                 justifyContent: "flex-start",
@@ -74,9 +68,7 @@ export const pageBoxCompatStyles = useThemeCache(() => {
 
             "&.isLarge": {
                 [allHeadings]: {
-                    ...Mixins.font({
-                        ...globalVars.fontSizeAndWeightVars("largeTitle"),
-                    }),
+                    fontSize: globalVars.fonts.size.largeTitle,
                     ...mediaQueries.oneColumnDown({
                         fontSize: globalVars.fonts.mobile.size.largeTitle,
                     }),
@@ -124,16 +116,12 @@ export const pageBoxCompatStyles = useThemeCache(() => {
             // Super compact.
             ...Mixins.margin({ bottom: 0 }),
             [allHeadings]: {
-                ...Mixins.font({
-                    ...globalVars.fontSizeAndWeightVars("subTitle"),
-                }),
+                fontSize: globalVars.fonts.size.subTitle,
             },
             ...mediaQueries.oneColumnDown({
                 ...Mixins.margin({ bottom: 0 }),
                 [allHeadings]: {
-                    ...Mixins.font({
-                        ...globalVars.fontSizeAndWeightVars("subTitle"),
-                    }),
+                    fontSize: globalVars.fonts.size.subTitle,
                 },
             }),
         },

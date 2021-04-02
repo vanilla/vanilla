@@ -4,6 +4,7 @@
  * @license gpl-2.0-only
  */
 
+import { metasVariables } from "@library/metas/Metas.variables";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
@@ -16,6 +17,22 @@ import { Variables } from "@library/styles/Variables";
  */
 export const discussionVariables = useThemeCache(() => {
     const makeVars = variableFactory("discussion");
+    const globalVars = globalVariables();
+    const metaVars = metasVariables();
+
+    const author = makeVars("author", {
+        name: {
+            font: Variables.font({
+                color: globalVars.mainColors.fg,
+                size: metaVars.linkFont.size,
+                weight: globalVars.fonts.weights.bold,
+                textDecoration: "none",
+            }),
+            fontState: Variables.font({
+                color: globalVars.mainColors.primary,
+            }),
+        },
+    });
 
     /**
      * @varGroup discussion.contentBoxes
@@ -24,5 +41,7 @@ export const discussionVariables = useThemeCache(() => {
      */
     const contentBoxes = makeVars("contentBoxes", Variables.contentBoxes(globalVariables().contentBoxes));
 
-    return { contentBoxes };
+    const panelBoxes = makeVars("panelBoxes", Variables.contentBoxes(globalVariables().panelBoxes));
+
+    return { contentBoxes, panelBoxes, author };
 });

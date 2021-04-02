@@ -6,8 +6,8 @@ import { t } from "@vanilla/i18n/src";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { useUniqueID } from "@library/utility/idUtils";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
-import { SearchIcon } from "@library/icons/titleBar";
 import { useDevice, Devices } from "@library/layout/DeviceContext";
+import { Icon } from "@vanilla/icons";
 
 export function SearchScope(props: {
     className?: string;
@@ -43,7 +43,7 @@ export function SearchScope(props: {
                 horizontalOffset={false}
                 afterButton={separator}
                 // The intention here is by default, we'll get the compact value from the layout context if undefined, or a value from props.
-                overwriteButtonContents={compact ? <SearchIcon className={classes.compactIcon} /> : undefined}
+                overwriteButtonContents={compact ? <Icon size="compact" icon="search-search" /> : undefined}
             />
         </div>
     );

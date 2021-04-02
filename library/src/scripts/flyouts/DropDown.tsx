@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { useRef, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import DropDownContents, { DropDownContentSize } from "@library/flyouts/DropDownContents";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { useUniqueID } from "@library/utility/idUtils";
@@ -80,6 +80,20 @@ export interface IState {
     selectedText: string;
 }
 
+export interface IDropDownContext {
+    isForcedOpen: boolean;
+    setIsForcedOpen: (newValue: boolean) => void;
+}
+
+export const DropdownContext = React.createContext<IDropDownContext>({
+    isForcedOpen: false,
+    setIsForcedOpen: () => {},
+});
+
+export function useDropdownContext() {
+    return useContext(DropdownContext);
+}
+
 /**
  * Creates a drop down menu
  */
@@ -96,6 +110,7 @@ export default function DropDown(props: IDropDownProps) {
     const ownContentRef = props.contentRef ?? contentRef;
     const ID = useUniqueID("flyout");
 
+    const [isForcedOpen, setIsForcedOpen] = useState(false);
     const [ownIsVisible, setOwnIsVisible] = useState(false);
     const isVisible = props.isVisible ?? (preferredDirection ? ownIsVisible : undefined);
     const onVisibilityChange = props.onVisibilityChange ?? (preferredDirection ? setOwnIsVisible : undefined);
@@ -127,6 +142,7 @@ export default function DropDown(props: IDropDownProps) {
             buttonRef={ownButtonRef}
             toggleButtonClassName={props.toggleButtonClassName}
             isVisible={isVisible}
+            forceVisible={isForcedOpen}
             onVisibilityChange={onVisibilityChange}
             openAsModal={openAsModal}
             initialFocusElement={props.initialFocusElement}
@@ -135,57 +151,65 @@ export default function DropDown(props: IDropDownProps) {
         >
             {(params) => {
                 return (
-                    <ConditionalWrap
-                        condition={(!isVisible || positionHidden) && !openAsModal && !!preferredDirection}
-                        className={classes.positioning}
+                    <DropdownContext.Provider
+                        value={{
+                            isForcedOpen,
+                            setIsForcedOpen,
+                        }}
                     >
-                        <DropDownContents
-                            {...params}
-                            contentRef={ownContentRef}
-                            id={contentID}
-                            className={classNames(props.contentsClassName)}
-                            renderCenter={[
-                                DropDownOpenDirection.ABOVE_CENTER,
-                                DropDownOpenDirection.BELOW_CENTER,
-                            ].includes(openDirection)}
-                            renderLeft={[DropDownOpenDirection.ABOVE_LEFT, DropDownOpenDirection.BELOW_LEFT].includes(
-                                openDirection,
-                            )}
-                            renderAbove={[
-                                DropDownOpenDirection.ABOVE_RIGHT,
-                                DropDownOpenDirection.ABOVE_LEFT,
-                                DropDownOpenDirection.ABOVE_CENTER,
-                            ].includes(openDirection)}
-                            openAsModal={openAsModal}
-                            selfPadded={
-                                props.selfPadded !== undefined
-                                    ? props.selfPadded
-                                    : props.flyoutType === FlyoutType.FRAME
-                            }
-                            size={
-                                props.flyoutType === FlyoutType.FRAME && !props.isSmall
-                                    ? DropDownContentSize.MEDIUM
-                                    : DropDownContentSize.SMALL
-                            }
-                            horizontalOffset={props.horizontalOffset}
+                        <ConditionalWrap
+                            condition={(!isVisible || positionHidden) && !openAsModal && !!preferredDirection}
+                            className={classes.positioning}
                         >
-                            {!openAsModal && title && (
-                                <FrameHeader title={title} closeFrame={params.closeMenuHandler} />
-                            )}
-                            {openAsModal && mobileTitle && (
-                                <FrameHeaderMinimal onClose={params.closeMenuHandler}>
-                                    {mobileTitle ?? title}
-                                </FrameHeaderMinimal>
-                            )}
-                            {openAsModal && props.flyoutType === FlyoutType.FRAME ? (
-                                props.children
-                            ) : (
-                                <ContentTag className={classNames("dropDownItems", classes.items)}>
-                                    {props.children}
-                                </ContentTag>
-                            )}
-                        </DropDownContents>
-                    </ConditionalWrap>
+                            <DropDownContents
+                                {...params}
+                                contentRef={ownContentRef}
+                                id={contentID}
+                                className={classNames(props.contentsClassName)}
+                                renderCenter={[
+                                    DropDownOpenDirection.ABOVE_CENTER,
+                                    DropDownOpenDirection.BELOW_CENTER,
+                                ].includes(openDirection)}
+                                renderLeft={[
+                                    DropDownOpenDirection.ABOVE_LEFT,
+                                    DropDownOpenDirection.BELOW_LEFT,
+                                ].includes(openDirection)}
+                                renderAbove={[
+                                    DropDownOpenDirection.ABOVE_RIGHT,
+                                    DropDownOpenDirection.ABOVE_LEFT,
+                                    DropDownOpenDirection.ABOVE_CENTER,
+                                ].includes(openDirection)}
+                                openAsModal={openAsModal}
+                                selfPadded={
+                                    props.selfPadded !== undefined
+                                        ? props.selfPadded
+                                        : props.flyoutType === FlyoutType.FRAME
+                                }
+                                size={
+                                    props.flyoutType === FlyoutType.FRAME && !props.isSmall
+                                        ? DropDownContentSize.MEDIUM
+                                        : DropDownContentSize.SMALL
+                                }
+                                horizontalOffset={props.horizontalOffset}
+                            >
+                                {!openAsModal && title && (
+                                    <FrameHeader title={title} closeFrame={params.closeMenuHandler} />
+                                )}
+                                {openAsModal && mobileTitle && (
+                                    <FrameHeaderMinimal onClose={params.closeMenuHandler}>
+                                        {mobileTitle ?? title}
+                                    </FrameHeaderMinimal>
+                                )}
+                                {openAsModal && props.flyoutType === FlyoutType.FRAME ? (
+                                    props.children
+                                ) : (
+                                    <ContentTag className={classNames("dropDownItems", classes.items)}>
+                                        {props.children}
+                                    </ContentTag>
+                                )}
+                            </DropDownContents>
+                        </ConditionalWrap>
+                    </DropdownContext.Provider>
                 );
             }}
         </FlyoutToggle>

@@ -42,7 +42,9 @@ trait PermissionsTranslationTrait {
             "discussions.announce",
             "discussions.sink",
             "discussions.close",
-            "discussions.delete"
+            "discussions.delete",
+            "events.view",
+            "events.manage",
         ],
     ];
 

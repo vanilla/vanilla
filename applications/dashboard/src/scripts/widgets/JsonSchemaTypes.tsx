@@ -46,8 +46,13 @@ interface ITextBoxControl extends ICommonControl {
     inputType: "textBox";
     type?: string;
 }
+interface ICodeBoxControl extends ICommonControl {
+    inputType: "codeBox";
+    language?: string;
+    jsonSchemaUri?: string;
+}
 
-export type IFormControl = IDropdownControl | IRadioControl | ITextBoxControl | ICheckBoxControl;
+export type IFormControl = IDropdownControl | IRadioControl | ITextBoxControl | ICheckBoxControl | ICodeBoxControl;
 
 interface ICommonSchema {
     default?: string;

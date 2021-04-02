@@ -11,9 +11,9 @@ import get from "lodash/get";
 import { IJsonSchema } from "@dashboard/widgets/JsonSchemaTypes";
 import { t } from "@library/utility/appUtils";
 import { notEmpty } from "@vanilla/utils";
+import { DashboardFormSubheading } from "@dashboard/forms/DashboardFormSubheading";
 
 interface IPartialProps {
-    path: string;
     schema: IJsonSchema;
 
     // The value of the subset of the form.
@@ -26,24 +26,33 @@ interface IPartialProps {
 }
 
 function WidgetPartialSchemaForm(props: IPartialProps) {
-    const { schema, path, instance, rootInstance, onChange } = props;
+    let { schema, instance, rootInstance, onChange } = props;
     if (schema.type === "object") {
+        instance = instance ?? {};
         const requiredProperties = schema.required ?? [];
+        let sectionTitle: string | null = null;
+        if (!Array.isArray(schema["x-control"]) && schema["x-control"]?.label) {
+            sectionTitle = schema["x-control"]?.label;
+        }
         return (
             <>
-                {Object.entries(schema.properties).map(([key, value]) => (
-                    <WidgetPartialSchemaForm
-                        key={key}
-                        path={`${path}.${key}`}
-                        schema={value}
-                        instance={instance[key]}
-                        rootInstance={rootInstance}
-                        onChange={(value) => {
-                            onChange({ ...instance, [key]: value });
-                        }}
-                        isRequired={requiredProperties.includes(key)}
-                    />
-                ))}
+                {sectionTitle && <DashboardFormSubheading>{sectionTitle}</DashboardFormSubheading>}
+                {Object.entries(schema.properties).map(([key, value]) => {
+                    return (
+                        <>
+                            <WidgetPartialSchemaForm
+                                key={key}
+                                schema={value}
+                                instance={instance[key]}
+                                rootInstance={rootInstance}
+                                onChange={(value) => {
+                                    onChange({ ...instance, [key]: value });
+                                }}
+                                isRequired={requiredProperties.includes(key)}
+                            />
+                        </>
+                    );
+                })}
             </>
         );
     }
@@ -87,5 +96,5 @@ export function WidgetFormGenerator(props: IProps) {
         return <div>{t("There are no configuration options for this widget.")}</div>;
     }
 
-    return <WidgetPartialSchemaForm path="instance" rootInstance={props.instance} {...props} />;
+    return <WidgetPartialSchemaForm rootInstance={props.instance} {...props} />;
 }

@@ -37,7 +37,8 @@
 .DataTable {
     margin: 0 0 $utility-baseUnitTriple;
     table-layout: fixed;
-    width: 100%;
+    width: calc(100% + #{$component-horizontal_padding * 2});
+    margin-left: -$component-horizontal_padding;
 
     .Item {
         @include TableItem;
@@ -169,14 +170,13 @@
             line-height: $component-meta_lineHeight;
             color: $component-meta_color;
         }
-    }
+        .MItem.Category {
+            @include ellipsis;
+            display: inline;
 
-    .MItem.Category {
-        @include ellipsis;
-        display: inline;
-
-        @include maxWidth {
-            max-width: calc(100% - 21px);
+            @include maxWidth {
+                max-width: calc(100% - 21px);
+            }
         }
     }
 
@@ -263,10 +263,17 @@
                 color: $component-meta-link-hover_color;
             }
         }
+
+        .MItem.Category {
+            margin-top: $utility-baseUnit;
+
+            @include maxWidth {
+                margin-top: $utility-baseUnitDouble;
+            }
+        }
     }
 
-    .Meta,
-    .MItem.Category {
+    .Meta {
         margin-top: $utility-baseUnit;
 
         @include maxWidth {
@@ -511,6 +518,11 @@
 
         td.DiscussionName {
             width: 100%;
+
+            .Title {
+                width: calc(100% - 52px);
+            }
+
         }
 
         //ideation styles
@@ -940,6 +952,7 @@ body.Section-Group {
 
         a {
             @include ellipsis;
+            display: inline-block;
             color: $component-meta-link_color;
 
             &:focus,

@@ -1,11 +1,27 @@
 <?php if (!defined('APPLICATION')) exit();
+
+if (!function_exists('replaceCommentBlockQuotes')) :
+    /**
+     * Replace <blockquote> in comments body with (Quote)
+     *
+     * @param $comment - The comment object
+     *
+     * @return string
+     */
+    function replaceCommentBlockQuotes($comment) {
+        $reg = '/<blockquote(.*)<\/blockquote>/s';
+        $parsedBody = Gdn::formatService()->renderHTML($comment->Body, $comment->Format);
+        return preg_replace($reg, "\n(Quote)\n", $parsedBody);
+    }
+endif;
+
 foreach ($this->data('Comments') as $Comment) {
     $Permalink = commentUrl($Comment);
     $User = userBuilder($Comment, 'Insert');
     $this->EventArguments['User'] = $User;
     /** @var \Vanilla\Formatting\Html\HtmlSanitizer $htmlSanitizer */
     $htmlSanitizer = Gdn::getContainer()->get(\Vanilla\Formatting\Html\HtmlSanitizer::class);
-    $sanitizedBody = Gdn::formatService()->renderPlainText($Comment->Body, $Comment->Format);
+    $sanitizedBody = replaceCommentBlockQuotes($Comment);
     $sanitizedBody = $htmlSanitizer->filter($sanitizedBody);
     ?>
     <li id="<?php echo 'Comment_'.$Comment->CommentID; ?>" class="Item">
@@ -13,7 +29,7 @@ foreach ($this->data('Comments') as $Comment) {
         <div class="ItemContent">
             <div class="Message">
                 <?php
-                    echo sliceString($sanitizedBody, 250);
+                echo sliceString($sanitizedBody, 250);
                 ?>
             </div>
             <div class="Meta">

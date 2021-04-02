@@ -135,21 +135,29 @@ class FoundationCategoriesShim {
      * Utility for for mapping category data into a widget item.
      *
      * @param array $category
+     * @param array|null $options
      * @return array
      */
-    public static function mapApiCategoryToItem(array $category): array {
+    public static function mapApiCategoryToItem(array $category, ?array $options = null): array {
+        $counts = [
+            [
+                'labelCode' => 'Discussions',
+                'count' => (int) $category['countAllDiscussions'] ?? 0,
+            ]
+        ];
+        if ($options['countComments'] ?? false) {
+            $counts[] = [
+                'labelCode' => 'Comments',
+                'count' => (int) $category['countAllComments'] ?? 0,
+            ];
+        }
         return [
             'to' => $category['url'],
             'iconUrl' => $category['iconUrl'] ?? null,
             'imageUrl' => $category['bannerUrl'] ?? null,
             'name' => $category['name'],
             'description' => $category['description'] ?? '',
-            'counts' => [
-                [
-                    'labelCode' => 'Discussions',
-                    'count' => $category['countAllDiscussions'] ?? 0,
-                ]
-            ]
+            'counts' => $counts
         ];
     }
 }

@@ -6,7 +6,6 @@
 
 import { ColorHelper, important, percent, px } from "csx";
 import { styleUnit } from "@library/styles/styleUnit";
-import { MaxWidthProperty, OverflowXProperty, TextOverflowProperty, WhiteSpaceProperty } from "csstype";
 import { CSSObject } from "@emotion/css";
 import { TLength } from "@library/styles/styleShim";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
@@ -101,12 +100,12 @@ export const autoFillReset = (fg?: ColorHelper, bg?: ColorHelper) => {
     };
 };
 
-export const singleLineEllipsis = () => {
+export const singleLineEllipsis = (): CSSObject => {
     return {
-        whiteSpace: "nowrap" as WhiteSpaceProperty,
-        textOverflow: "ellipsis" as TextOverflowProperty,
-        overflow: "hidden" as OverflowXProperty,
-        maxWidth: percent(100) as MaxWidthProperty<TLength>,
+        whiteSpace: "nowrap",
+        textOverflow: "ellipsis",
+        overflow: "hidden",
+        maxWidth: "100%",
     };
 };
 

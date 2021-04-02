@@ -12,7 +12,7 @@ import { styleFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent } from "csx";
-import { OverflowProperty, ResizeProperty } from "csstype";
+import { Property } from "csstype";
 import { inputClasses, inputVariables } from "@library/forms/inputStyles";
 import { tokensClasses } from "@library/forms/select/tokensStyles";
 import { CSSObject } from "@emotion/css";
@@ -80,7 +80,9 @@ export const inputBlockClasses = useThemeCache(() => {
 
     const errors = style("errors", {
         display: "block",
-        fontSize: styleUnit(globalVars.fonts.size.small),
+        ...Mixins.font({
+            ...globalVars.fontSizeAndWeightVars("small"),
+        }),
     });
 
     const errorsPadding = style("errorsPadding", inputClasses().inputPaddingMixin);
@@ -96,15 +98,17 @@ export const inputBlockClasses = useThemeCache(() => {
     });
     const labelNote = style("labelNote", {
         display: "block",
-        fontSize: styleUnit(globalVars.fonts.size.small),
-        fontWeight: globalVars.fonts.weights.normal,
+        ...Mixins.font({
+            ...globalVars.fontSizeAndWeightVars("small", "normal"),
+        }),
         opacity: 0.6,
     });
 
     const labelText = style("labelText", {
         display: "block",
-        fontWeight: globalVars.fonts.weights.semiBold,
-        fontSize: styleUnit(globalVars.fonts.size.medium),
+        ...Mixins.font({
+            ...globalVars.fontSizeAndWeightVars("medium", "semiBold"),
+        }),
         marginBottom: styleUnit(formElementVars.spacing.margin),
     });
 
@@ -122,11 +126,11 @@ export const inputBlockClasses = useThemeCache(() => {
         },
     });
 
-    const multiLine = (resize?: ResizeProperty, overflow?: OverflowProperty) => {
+    const multiLine = (resize?: Property.Resize, overflow?: Property.Overflow) => {
         return style("multiLine", {
             ...Mixins.padding({ vertical: 9 }),
-            resize: (resize ? resize : "vertical") as ResizeProperty,
-            overflow: (overflow ? overflow : "auto") as OverflowProperty,
+            resize: (resize ? resize : "vertical") as Property.Resize,
+            overflow: (overflow ? overflow : "auto") as Property.Overflow,
         });
     };
 

@@ -4,6 +4,7 @@
  * @license gpl-2.0-only
  */
 
+import { DashboardCodeEditor } from "@dashboard/forms/DashboardCodeEditor";
 import { DashboardInput } from "@dashboard/forms/DashboardInput";
 import { DashboardRadioButton } from "@dashboard/forms/DashboardRadioButton";
 import { DashboardRadioGroup } from "@dashboard/forms/DashboardRadioGroups";
@@ -25,12 +26,14 @@ interface IProps {
 export function WidgetFormControl(props: IProps) {
     const { formControl, schema, onChange } = props;
     const value = props.value ?? schema.default;
-    const radioName = useUniqueID("radioInput");
+    const inputName = useUniqueID("input");
 
     switch (formControl.inputType) {
         case "textBox":
             const isMultiline = formControl.type === "textarea";
-            const type = formControl.type === "number" ? "number" : "text";
+            const typeIsNumber = formControl.type === "number";
+            const typeIsUrl = formControl.type === "url";
+            const type = typeIsNumber ? "number" : typeIsUrl ? "url" : "text";
             return (
                 <DashboardInput
                     inputProps={{
@@ -50,13 +53,22 @@ export function WidgetFormControl(props: IProps) {
                     }
                 />
             );
+        case "codeBox":
+            return (
+                <DashboardCodeEditor
+                    value={value}
+                    onChange={onChange}
+                    language={formControl.language || "text/html"}
+                    jsonSchemaUri={formControl.jsonSchemaUri}
+                />
+            );
         case "radio":
             return (
                 <DashboardRadioGroup value={value} onChange={onChange}>
                     {Object.entries(formControl.choices.staticOptions ?? []).map(
                         ([optionValue, label]: [string, string]) => (
                             <DashboardRadioButton
-                                name={radioName}
+                                name={inputName}
                                 key={optionValue}
                                 label={label}
                                 value={optionValue}
@@ -71,6 +83,7 @@ export function WidgetFormControl(props: IProps) {
                 return (
                     <DashboardSelectLookup
                         isClearable={!props.isRequired}
+                        placeholder={formControl.placeholder || undefined}
                         value={value}
                         onChange={(option) => onChange(option?.value)}
                         api={api}
@@ -85,7 +98,7 @@ export function WidgetFormControl(props: IProps) {
                 : [];
             return (
                 <DashboardSelect
-                    isClearable={false}
+                    isClearable={!props.isRequired}
                     value={options.find((opt) => {
                         let valueCompare: any = opt.value;
                         if (valueCompare === "true") {
@@ -95,6 +108,7 @@ export function WidgetFormControl(props: IProps) {
                         }
                         return valueCompare == value;
                     })}
+                    placeholder={formControl.placeholder || undefined}
                     onChange={(option) => onChange(option?.value)}
                     options={options}
                 />

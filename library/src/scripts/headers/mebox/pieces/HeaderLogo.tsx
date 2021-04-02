@@ -12,6 +12,7 @@ import { titleBarLogoClasses } from "@library/headers/titleBarStyles";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import classNames from "classnames";
 import { navigationVariables } from "@library/headers/navigationVariables";
+import { TitleBarDevices, useTitleBarDevice } from "@library/layout/TitleBarContext";
 
 export interface IHeaderLogo {
     className?: string;
@@ -24,29 +25,32 @@ export interface IHeaderLogo {
 /**
  * Implements Logo component
  */
-export default class HeaderLogo extends React.Component<IHeaderLogo> {
-    public render() {
-        const { doubleLogoStrategy } = titleBarVariables().logo;
-        const classes = titleBarLogoClasses();
-        const desktopOrMobileClass = this.props.logoType === LogoType.MOBILE ? classes.mobileLogo : classes.logo;
-        const logoClassName = classNames("headerLogo-logo", this.props.logoClassName, desktopOrMobileClass);
-        const url = navigationVariables().logo.url;
+export default function HeaderLogo(props: IHeaderLogo) {
+    const { doubleLogoStrategy } = titleBarVariables().logo;
+    const classes = titleBarLogoClasses();
+    const desktopOrMobileClass = props.logoType === LogoType.MOBILE ? classes.mobileLogo : classes.logo;
+    const logoClassName = classNames("headerLogo-logo", props.logoClassName, desktopOrMobileClass);
+    const url = navigationVariables().logo.url;
+    const device = useTitleBarDevice();
 
-        if (doubleLogoStrategy === "hidden") {
-            return null;
-        }
-
-        return (
-            <SmartLink to={url} className={classNames("headerLogo", this.props.className)}>
-                <span className={classNames("headerLogo-logoFrame", classes.logoFrame)}>
-                    <ThemeLogo
-                        overwriteLogo={this.props.overwriteLogo}
-                        alt={t("Vanilla")}
-                        className={logoClassName}
-                        type={this.props.logoType}
-                    />
-                </span>
-            </SmartLink>
-        );
+    if (device === TitleBarDevices.FULL && doubleLogoStrategy === "mobile-only") {
+        return <></>;
     }
+
+    if (doubleLogoStrategy === "hidden") {
+        return <></>;
+    }
+
+    return (
+        <SmartLink to={url} className={classNames("headerLogo", props.className)}>
+            <span className={classNames("headerLogo-logoFrame", classes.logoFrame)}>
+                <ThemeLogo
+                    overwriteLogo={props.overwriteLogo}
+                    alt={t("Vanilla")}
+                    className={logoClassName}
+                    type={props.logoType}
+                />
+            </span>
+        </SmartLink>
+    );
 }

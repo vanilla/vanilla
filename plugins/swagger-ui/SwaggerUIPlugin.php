@@ -28,7 +28,7 @@ class SwaggerUIPlugin extends Gdn_Plugin {
             'settings',
             t('API'),
             '/settings/swagger',
-            'site-settings.swagger-ui',
+            'api.swagger-ui',
             'nav-swagger-ui',
             ['after' => 'security'],
             ['badge' => 'v2']

@@ -336,6 +336,26 @@ class ReactionsReactTest extends AbstractAPIv2Test {
     }
 
     /**
+     * Test expand reactions hasReacted.
+     */
+    public function testExpandDiscussionReactionsSelf() {
+        $discussion = $this->createDiscussion(1, 'Test Discussion Reaction');
+        $this->api()->post("/discussions/{$discussion['discussionID']}/reactions", [
+            'reactionType' => 'Like'
+        ]);
+        $getResponse = $this->api()->get("/discussions/{$discussion['discussionID']}", ['expand' => 'reactions']);
+        $getBody = $getResponse->getBody();
+        $reactionExpanded = $getBody['reactions'];
+        foreach ($reactionExpanded as $reaction) {
+            if ($reaction['name'] === 'Like') {
+                $this->assertTrue($reaction['hasReacted']);
+            } else {
+                $this->assertFalse($reaction['hasReacted']);
+            }
+        }
+    }
+
+    /**
      * Get the count for a type from a summary array.
      *
      * @param string $type The URL code of a type.

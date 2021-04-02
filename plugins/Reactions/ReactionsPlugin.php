@@ -589,14 +589,21 @@ class ReactionsPlugin extends Gdn_Plugin {
         $result = array_key_exists('discussionID', $result) ? [$result] : $result;
         $rows = array_key_exists('discussionID', $rows) ? [$rows] : $rows;
 
-        if ($sender->isExpandField('reactions', $expand)) {
+        if ($sender->isExpandField('reactions', $expand) && !empty($result)) {
             $attributes = array_column($rows, 'attributes', 'discussionID');
             $schema = $this->getReactionSummaryFragment();
-            array_walk($result, function (&$row) use ($attributes, $schema) {
+            $discussionIDs = array_column($result, 'discussionID');
+            $userReactions = $this->reactionModel->getUserDiscussionTags(Gdn::session()->UserID, $discussionIDs);
+            array_walk($result, function (&$row) use ($attributes, $schema, $userReactions) {
                 $withAttributes = $this->addAttributes($row, $attributes[$row['discussionID']]);
                 $summary = $this->reactionModel->getRecordSummary($withAttributes);
                 // This is added so we don't get 422 errors when reaction name is empty.
                 foreach ($summary as &$reaction) {
+                    $userReactionRecord = [
+                        'TagID' => $reaction['TagID'],
+                        'RecordID' => $row['discussionID']
+                    ];
+                    $reaction['hasReacted'] = in_array($userReactionRecord, $userReactions);
                     $reaction['Name'] = $reaction['Name'] ?: $this->locale->translate('None');
                 }
                 $summary = $schema->validate($summary);
@@ -1123,7 +1130,8 @@ class ReactionsPlugin extends Gdn_Plugin {
         Gdn_Theme::section('BestOf');
         // Load all of the reaction types.
         try {
-            $reactionTypes = ReactionModel::getReactionTypes(['Class' => 'Positive', 'Active' => 1]);
+            $reactionTypes = ReactionModel
+                ::getReactionTypes(['Class' => 'Positive', 'Active' => 1]);
 
             $sender->setData('ReactionTypes', $reactionTypes);
         } catch (Exception $ex) {
@@ -1163,10 +1171,29 @@ class ReactionsPlugin extends Gdn_Plugin {
             );
         } else {
             $reactionType = $reactionTypes[$reaction];
+            $reactionModel->fireEvent(
+                'BeforeGet',
+                [
+                    'RecordType' => [
+                        'Discussion' => 'Discussion-Total',
+                        'Comment' => 'Comment-Total'
+                    ],
+                    'ApplyRestrictions' => true
+                ]
+            );
             $data = $reactionModel->getRecordsWhere(
-                ['TagID' => $reactionType['TagID'], 'RecordType' =>['Discussion-Total', 'Comment-Total'], 'Total >=' => 1],
-                'DateInserted', 'desc',
-                $limit + 1, $offset);
+                [
+                    'TagID' => $reactionType['TagID'],
+                    'RecordType' => [
+                        'Discussion-Total', 'Comment-Total'
+                    ],
+                    'Total >=' => 1
+                ],
+                'UserTag.DateInserted',
+                'desc',
+                $limit + 1,
+                $offset
+            );
         }
 
         $sender->setData('_CurrentRecords', count($data));

@@ -5,7 +5,7 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { absolutePosition, negative, userSelect } from "@library/styles/styleHelpers";
+import { negative, userSelect } from "@library/styles/styleHelpers";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
 import { Mixins } from "@library/styles/Mixins";
@@ -13,7 +13,7 @@ import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { important, percent, px, translateY } from "csx";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 
 const backLinkVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -38,7 +38,7 @@ const backLinkVariables = useThemeCache(() => {
 
 const backLinkClasses = useThemeCache(() => {
     const globalVars = globalVariables();
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = panelLayoutVariables().mediaQueries();
     const style = styleFactory("backLink");
     const titleBarVars = titleBarVariables();
     const vars = backLinkVariables();
@@ -82,7 +82,7 @@ const backLinkClasses = useThemeCache(() => {
     const inHeading = (fontSize?: number | null) => {
         if (fontSize) {
             return style("inHeading", {
-                ...absolutePosition.topLeft(".5em"),
+                ...Mixins.absolute.topLeft(".5em"),
                 fontSize: styleUnit(fontSize),
                 transform: `translateY(-50%)`,
                 marginTop: styleUnit(vars.position.verticalOffset),

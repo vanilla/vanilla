@@ -9,7 +9,7 @@ import { IThemeVariables } from "@library/theming/themeReducer";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { percent } from "csx";
 import { styleUnit } from "@library/styles/styleUnit";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 
 export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeVars = variableFactory("inviteUserCard", forcedVars);
@@ -45,7 +45,7 @@ export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) =>
 
 export const userCardClasses = useThemeCache((props: { compact?: boolean } = {}) => {
     const style = styleFactory("inviteUserCard");
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = panelLayoutVariables().mediaQueries();
     const vars = userCardVariables();
 
     const body = style("body", {

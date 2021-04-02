@@ -76,7 +76,7 @@ export default class DateTime extends Component<IDateTimeProps> {
         });
     }
 
-    private get options() {
+    private get options(): Intl.DateTimeFormatOptions {
         switch (this.props.type) {
             case DateFormats.EXTENDED:
                 return {

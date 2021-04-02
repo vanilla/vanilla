@@ -10,20 +10,23 @@
 
 use Garden\EventManager;
 use Garden\Schema\Schema;
-use Vanilla\Events\DirtyRecordTrait;
+use Vanilla\Dashboard\Models\PermissionJunctionModelInterface;
 use Vanilla\Events\LegacyDirtyRecordTrait;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Models\CrawlableRecordSchema;
 use Vanilla\Models\DirtyRecordModel;
+use Vanilla\Models\ModelCache;
 use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Permissions;
+use Vanilla\Scheduler\Descriptor\NormalJobDescriptor;
 use Vanilla\Scheduler\Job\CallbackJob;
 use Vanilla\Scheduler\SchedulerInterface;
 use Vanilla\SchemaFactory;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Utility\InstanceValidatorSchema;
 use Vanilla\Utility\ModelUtils;
+use Vanilla\Web\SystemCallableInterface;
 use Webmozart\Assert\Assert;
 use Garden\Events\EventFromRowInterface;
 use Vanilla\Contracts\Models\CrawlableInterface;
@@ -36,7 +39,7 @@ use Vanilla\Dashboard\Models\BannerImageModel;
 /**
  * Manages discussion categories' data.
  */
-class CategoryModel extends Gdn_Model implements EventFromRowInterface, CrawlableInterface {
+class CategoryModel extends Gdn_Model implements EventFromRowInterface, CrawlableInterface, PermissionJunctionModelInterface, SystemCallableInterface {
 
     use LegacyDirtyRecordTrait;
 
@@ -64,6 +67,9 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
 
     /** Flag for aggregating discussion counts. */
     const AGGREGATE_DISCUSSION = 'discussion';
+
+    /** Default execution timeout for iterative category content deletes. */
+    private const DELETE_TIMEOUT_DEFAULT = 10;
 
     /* Constants for category display options. */
     const DISPLAY_FLAT = 'Flat';
@@ -128,6 +134,9 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
     /** @var Schema */
     private $schemaInstance;
 
+    /** @var ModelCache */
+    private $modelCache;
+
     /**
      * Class constructor. Defines the related database table name.
      *
@@ -138,6 +147,46 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
         parent::__construct('Category');
         $this->collection = $this->createCollection();
         $this->eventManager = Gdn::getContainer()->get(EventManager::class);
+        $this->modelCache = new ModelCache('CategoryModel', Gdn::cache());
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function onPermissionChange(): void {
+        // This model doesn't currently keep any cache of permissions.
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getJunctionAliases(): ?array {
+        try {
+            $this->defineSchema();
+        } catch (Throwable $e) {
+            // It's possible we may be starting a session to try and structure the category.
+            // If that's the case we can't let this fail.
+            // In any case without a structured category table we are in no position to start enforcing permissions from them.
+            return null;
+        }
+
+        $aliases = $this->modelCache->getCachedOrHydrate(['junctionAliases'], function () {
+            $rows = $this->createSql()
+                ->select(['c.CategoryID', 'c.PermissionCategoryID'])
+                ->where('c.CategoryID <>', 'c.PermissionCategoryID', false, false)
+                ->where('c.PermissionCategoryID <>', Permissions::GLOBAL_JUNCTION_ID)  // Exclude ones pointing to the root.
+                ->get('Category c')
+                ->resultArray()
+            ;
+
+            $aliases = array_column($rows, 'PermissionCategoryID', 'CategoryID');
+
+            return [
+                'Category' => $aliases
+            ];
+        });
+
+        return $aliases;
     }
 
     /**
@@ -149,7 +198,7 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
      */
     public function getRecordScope(int $categoryID): string {
         if (!$this->guestPermissions) {
-            if (!\Gdn::config('Garden.Installed')) {
+            if (!Gdn::config('Garden.Installed')) {
                 // Everything is "public" until the site is actually setup.
                 // This ensures initial site records are created properly.
                 return CrawlableRecordSchema::SCOPE_PUBLIC;
@@ -170,7 +219,7 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
      * @return CategoryModel Returns the instance.
      */
     public static function instance() {
-        return \Gdn::getContainer()->get(CategoryModel::class);
+        return Gdn::getContainer()->get(CategoryModel::class);
     }
 
 
@@ -342,15 +391,14 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
         $resultIDs = $this->getVisibleCategoryIDs($categoryFilter);
 
         if ($followedCategories) {
-            $followedCategories = $this->getFollowed(\Gdn::session()->UserID);
+            $followedCategories = $this->getFollowed(Gdn::session()->UserID);
             $followCategoryIDs = array_column($followedCategories, 'CategoryID');
             $resultIDs = array_intersect($resultIDs, $followCategoryIDs);
         }
 
         if ($categoryID !== null) {
             if ($includeChildCategories) {
-                $subcategories = CategoryModel::getSubtree($categoryID, true);
-                $selectedCategoryIDs = array_column($subcategories, 'CategoryID');
+                $selectedCategoryIDs = array_merge($this->getCategoryDescendantIDs($categoryID), [$categoryID]);
             } else {
                 $selectedCategoryIDs = [$categoryID];
             }
@@ -862,8 +910,10 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
      */
     public static function clearCache(bool $schedule = false) {
         $doClear = function () {
+            $instance = self::instance();
+            $instance->modelCache->invalidateAll();
             Gdn::cache()->remove(self::CACHE_KEY);
-            self::instance()->collection->flushCache();
+            $instance->collection->flushCache();
         };
 
         if ($schedule) {
@@ -1042,7 +1092,7 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
         $single = is_string(key($rows));
 
         $populate = function (array &$row, string $field) {
-            $categoryID = $row['CategoryID'] ?? $row['ParentRecordID'] ?? false;
+            $categoryID = $row['CategoryID'] ??  $row['categoryID'] ?? $row['ParentRecordID'] ?? false;
             if ($categoryID) {
                 $category = self::categories($categoryID);
                 if ($categoryID === -1) {
@@ -1111,17 +1161,18 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
             $category = static::categories($category);
         }
         if (is_array($category)) {
-            $permissionCategoryID = ($category['PermissionCategoryID'] ?? -1);
             $categoryID = ($category['CategoryID'] ?? false);
         } else {
-            $permissionCategoryID = ($category->PermissionCategoryID ?? -1);
             $categoryID = ($category->CategoryID ?? false);
         }
 
-        $result = Gdn::session()->checkPermission($permission, $fullMatch, 'Category', $permissionCategoryID)
-            || Gdn::session()->checkPermission($permission, $fullMatch, 'Category', $categoryID);
-
-        return $result;
+        return Gdn::session()->checkPermission(
+            $permission,
+            $fullMatch,
+            'Category',
+            $categoryID,
+            Permissions::CHECK_MODE_RESOURCE_IF_JUNCTION
+        );
     }
 
     /**
@@ -1230,13 +1281,20 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
                 'actions.add'
             );
 
-        if (val('CanDelete', $category, true)) {
+        if (val('CanDelete', $category, true) && $category["CountCategories"] === 0) {
             $cdd->addGroup('', 'delete')
                 ->addLink(
                     t('Delete'),
                     "/vanilla/settings/deletecategory?categoryid={$category['CategoryID']}",
                     'delete.delete',
-                    'js-modal'
+                    '',
+                    [],
+                    [
+                        'attributes' => [
+                            'data-categoryid' => $category['CategoryID'],
+                            'data-countDiscussions' => $category['CountDiscussions'],
+                        ]
+                    ]
                 );
         }
 
@@ -1257,15 +1315,19 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
 
 
     /**
-     * Get the ID's of a descendant.
+     * Get the descendant categoryIDs that the user has permission to view.
      *
      * @param int $categoryID
-     * @param array $options
      * @return array
      */
-    public function getCategoryDescendantIDs(int $categoryID, array $options = []): array {
-        $result = $this->collection->getDescendantIDs($categoryID, $options);
-        return $result;
+    public function getCategoryDescendantIDs(int $categoryID): array {
+        $descendantIDs = $this->collection->getDescendantIDs($categoryID);
+        $visibleIDs = $this->getVisibleCategoryIDs();
+        if ($visibleIDs === true) {
+            return $descendantIDs;
+        } else {
+            return array_values(array_intersect($descendantIDs, $visibleIDs));
+        }
     }
 
 
@@ -1679,8 +1741,9 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
         $db = static::postDBFields($discussion, $comment);
 
         $categories = self::instance()->collection->getAncestors($categoryID, true);
+
         foreach ($categories as $row) {
-            $currentCategoryID = val('CategoryID', $row);
+            $currentCategoryID = $row['CategoryID'] ?? false;
             self::instance()->setField($currentCategoryID, $db);
             CategoryModel::setCache($currentCategoryID, $cache);
         }
@@ -2076,10 +2139,18 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
         if ($dbRecord['ParentCategoryID'] <= 0) {
             $dbRecord['ParentCategoryID'] = null;
         }
+
+        $dbRecord['Name'] = empty($dbRecord['Name']) ? t('Untitled') : $dbRecord['Name'];
+        $dbRecord['UrlCode'] = empty($dbRecord['UrlCode']) ? ' ' : $dbRecord['UrlCode'];
         $dbRecord['CustomPermissions'] = ($dbRecord['PermissionCategoryID'] === $dbRecord['CategoryID']);
         $dbRecord['Description'] = $dbRecord['Description'] ?: '';
-        $dbRecord['DisplayAs'] = strtolower($dbRecord['DisplayAs']);
-
+        $displayAs = $dbRecord['DisplayAs'] ?? '';
+        $dbRecord['DisplayAs'] =  $displayAs ? strtolower($displayAs) : 'discussions';
+        $dbRecord['AllowedDiscussionTypes'] = array_map(
+            'strtolower',
+            is_array($dbRecord['AllowedDiscussionTypes']) ? $dbRecord['AllowedDiscussionTypes'] :
+                ['Discussion']
+        );
         if (!empty($dbRecord['Children']) && is_array($dbRecord['Children'])) {
             $dbRecord['Children'] = array_map([$this, 'normalizeRow'], $dbRecord['Children']);
         }
@@ -2108,6 +2179,36 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
         return $schemaRecord;
     }
 
+    /**
+     * Delete a category and all its discussions, individually.
+     *
+     * This method acts as a generator, yielding boolean false values until all discussions have been processed, at
+     * which point the method will yield a boolean true.
+     *
+     * @param int $categoryID
+     * @param array $options
+     * @return iterable
+     * @system-callable
+     */
+    public function deleteIDIterable(int $categoryID, array $options = []): iterable {
+        $options += [
+            "newCategoryID" => null,
+        ];
+        /** @var DiscussionModel $discussionModel */
+        $discussionModel = Gdn::getContainer()->get(DiscussionModel::class);
+        if ($options["newCategoryID"]) {
+            foreach ($discussionModel->moveByCategory($categoryID, $options['newCategoryID']) as $d) {
+                yield false;
+            }
+        } else {
+            foreach ($discussionModel->deleteByCategory($categoryID) as $d) {
+                yield false;
+            }
+        }
+        $this->prepareForDelete($categoryID);
+        $this->deleteInternal($categoryID, true);
+        yield true;
+    }
 
     /**
      * Delete a category.
@@ -2118,12 +2219,10 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
      * @since 2.0.0
      * @access public
      *
-     * @param object $category The category to delete
+     * @param int|object $category The category to delete
      * @param int $newCategoryID ID of the category that will replace this one.
      */
     public function deleteAndReplace($category, $newCategoryID) {
-        static $recursionLevel = 0;
-
         // Coerce the category into an object for deletion.
         if (is_numeric($category)) {
             $category = $this->getID($category, DATASET_TYPE_OBJECT);
@@ -2144,115 +2243,34 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
             throw new \InvalidArgumentException(t('Invalid category for deletion.'), 400);
         }
 
-        // Remove permissions related to category
-        $permissionModel = Gdn::permissionModel();
-        $permissionModel->delete(null, 'Category', 'CategoryID', $category->CategoryID);
+        $this->legacyDelete($category->CategoryID, $newCategoryID);
+    }
+
+    /**
+     * Legacy method of deleting a category via direct database queries.
+     *
+     * @param int $categoryID
+     * @param int $newCategoryID
+     */
+    private function legacyDelete($categoryID, $newCategoryID): void {
+        static $recursionLevel = 0;
 
         // If there is a replacement category...
         if ($newCategoryID > 0) {
-            // Update children categories
-            $this->SQL
-                ->update('Category')
-                ->set('ParentCategoryID', $newCategoryID)
-                ->where('ParentCategoryID', $category->CategoryID)
-                ->put();
-
-            // Update permission categories.
-            $this->SQL
-                ->update('Category')
-                ->set('PermissionCategoryID', $newCategoryID)
-                ->where('PermissionCategoryID', $category->CategoryID)
-                ->where('CategoryID <>', $category->CategoryID)
-                ->put();
-
-            // Update discussions
-            $this->SQL
-                ->update('Discussion')
-                ->set('CategoryID', $newCategoryID)
-                ->where('CategoryID', $category->CategoryID)
-                ->put();
-
-            // Update the discussion count
-            $count = $this->SQL
-                ->select('DiscussionID', 'count', 'DiscussionCount')
-                ->from('Discussion')
-                ->where('CategoryID', $newCategoryID)
-                ->get()
-                ->firstRow()
-                ->DiscussionCount;
-
-            if (!is_numeric($count)) {
-                $count = 0;
-            }
-
-            $this->SQL
-                ->update('Category')->set('CountDiscussions', $count)
-                ->where('CategoryID', $newCategoryID)
-                ->put();
-
-            // Update tags
-            $this->SQL
-                ->update('Tag')
-                ->set('CategoryID', $newCategoryID)
-                ->where('CategoryID', $category->CategoryID)
-                ->put();
-
-            $this->SQL
-                ->update('TagDiscussion')
-                ->set('CategoryID', $newCategoryID)
-                ->where('CategoryID', $category->CategoryID)
-                ->put();
+            $this->replaceCategory($categoryID, $newCategoryID, true);
         } else {
-            // Delete comments in this category
-            $this->SQL
-                ->from('Comment c')
-                ->join('Discussion d', 'c.DiscussionID = d.DiscussionID')
-                ->where('d.CategoryID', $category->CategoryID)
-                ->delete();
-
-            // Delete discussions in this category
-            $this->SQL->delete('Discussion', ['CategoryID' => $category->CategoryID]);
-
-            // Make inherited permission local permission
-            $this->SQL
-                ->update('Category')
-                ->set('PermissionCategoryID', 0)
-                ->where('PermissionCategoryID', $category->CategoryID)
-                ->where('CategoryID <>', $category->CategoryID)
-                ->put();
-
-            // Delete tags
-            $this->SQL->delete('Tag', ['CategoryID' => $category->CategoryID]);
-            $this->SQL->delete('TagDiscussion', ['CategoryID' => $category->CategoryID]);
+            $this->prepareForDelete($categoryID);
 
             // Recursively delete child categories and their content.
-            $children = self::flattenTree($this->collection->getTree($category->CategoryID));
+            $children = self::flattenTree($this->collection->getTree($categoryID));
             $recursionLevel++;
             foreach ($children as $child) {
-                self::deleteAndReplace($child, 0);
+                self::legacyDelete($child, 0);
             }
             $recursionLevel--;
         }
 
-        $eventCategory = self::categories($category->CategoryID);
-        $deleteEvent = $this->eventFromRow(
-            $eventCategory,
-            ResourceEvent::ACTION_DELETE,
-            Gdn::userModel()->currentFragment()
-        );
-
-        // Delete the category
-        $this->SQL->delete('Category', ['CategoryID' => $category->CategoryID]);
-        $this->eventManager->dispatch($deleteEvent);
-
-        // Make sure to reorganize the categories after deletes
-        if ($recursionLevel === 0) {
-            $this->rebuildTree();
-        }
-
-        // Let the world know we completed our mission.
-        $this->EventArguments['CategoryID'] = $category->CategoryID;
-        $this->fireEvent('AfterDeleteCategory');
+        $this->deleteInternal($categoryID, $recursionLevel === 0);
     }
 
     /**
@@ -3574,6 +3592,7 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
         // Set the cache.
         self::setCache($rowID, $property);
         $this->addDirtyRecord('category', $rowID);
+
         return $property;
     }
 
@@ -3876,7 +3895,7 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
             return url('/categories', $withDomain);
         }
         // Custom category url's through events.
-        $eventManager = \Gdn::eventManager();
+        $eventManager = Gdn::eventManager();
         if ($eventManager->hasHandler('customCategoryUrl')) {
             return $eventManager->fireFilter('customCategoryUrl', '', $category, $page, $withDomain);
         }
@@ -3891,6 +3910,68 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
             $result .= '/p'.$page;
         }
         return url($result, $withDomain);
+    }
+
+    /**
+     * Get a category field from a category or one of it's parents if it's not present.
+     *
+     * @param array|object|string|int $category A category object/array, slug, or ID.
+     * @param string $field The field to look at.
+     * @param mixed $default
+     *
+     * @return mixed
+     */
+    public function getCategoryFieldRecursive($category, string $field, $default = null) {
+        if (is_null($category)) {
+            return $default;
+        }
+        if (is_int($category) || is_string($category)) {
+            // If we have an ID or slug, go fetch the category
+            $category = CategoryModel::categories($category);
+            if (!$category) {
+                return $default;
+            }
+        }
+
+        if (is_object($category)) {
+            $category = (array) $category;
+        }
+
+
+        /** @var int[] $seenIDs */
+        $seenIDs = [];
+        $emptyValues = [null, ""];
+        $getCategoryField = function (array $category) use ($field, $default, &$seenIDs, $emptyValues, &$getCategoryField) {
+            $categoryID = $category['CategoryID'];
+            if ($categoryID < 1) {
+                // We've reached the root of the category tree and didn't find anything.
+                return $default;
+            }
+
+            $fieldValue = $category[$field] ?? null;
+            // Sometimes our DB uses empty strings.
+            if (!in_array($fieldValue, $emptyValues, true)) {
+                // we have a value.
+                return $fieldValue;
+            }
+
+            // Maybe we have a parent.
+            $parentID = $category['ParentCategoryID'] ?? null;
+            if ($parentID === null || $parentID === $categoryID || in_array($parentID, $seenIDs)) {
+                // Infinite recursion guard.
+                return $default;
+            } else {
+                $seenIDs[] = $categoryID;
+                $parent = CategoryModel::categories($parentID);
+                if (!$parent) {
+                    return $default;
+                }
+                return $getCategoryField($parent);
+            }
+        };
+
+        // Now we haver an array category for sure.
+        return $getCategoryField($category);
     }
 
     /**
@@ -4000,8 +4081,12 @@ SQL;
         if ($categoryID) {
             $categories = self::instance()->collection->getAncestors($categoryID, true);
 
+            if (empty($categories)) {
+                return;
+            }
+
             foreach ($categories as $current) {
-                $targetID = val('CategoryID', $current);
+                $targetID = $current['CategoryID'] ?? false;
                 $updatedCategories[] = $targetID;
 
                 Gdn::sql()->update('Category');
@@ -4392,6 +4477,7 @@ SQL;
                 'followed:b?' => 'Is the category being followed by the current user?',
                 "breadcrumbs:a?" => new InstanceValidatorSchema(Breadcrumb::class),
                 'featured:b?' => 'Featured category.',
+                'allowedDiscussionTypes:a',
             ]);
         }
         return $this->schemaInstance;
@@ -4454,5 +4540,141 @@ SQL;
         self::$ShardCache = false;
         self::$toLazySet = [];
         self::instance()->getCollection()->reset();
+    }
+
+    /**
+     * Permanently remove a category.
+     *
+     * @param int $categoryID
+     * @param bool $rebuildTree
+     */
+    private function deleteInternal(int $categoryID, bool $rebuildTree): void {
+        $eventCategory = self::categories($categoryID);
+        $deleteEvent = $this->eventFromRow(
+            $eventCategory,
+            ResourceEvent::ACTION_DELETE,
+            Gdn::userModel()->currentFragment()
+        );
+
+        // Delete the category
+        $this->SQL->delete('Category', ['CategoryID' => $categoryID]);
+        $this->eventManager->dispatch($deleteEvent);
+
+        if ($rebuildTree) {
+            $this->rebuildTree();
+        }
+
+        // Let the world know we completed our mission.
+        $this->EventArguments['CategoryID'] = $categoryID;
+        $this->fireEvent('AfterDeleteCategory');
+    }
+
+    /**
+     * Cleanup associated records in preparation for deleting a category.
+     *
+     * @param int $categoryID
+     */
+    private function prepareForDelete(int $categoryID): void {
+        $this->deletePermissions($categoryID);
+
+        // Delete comments in this category
+        $this->SQL
+            ->from('Comment c')
+            ->join('Discussion d', 'c.DiscussionID = d.DiscussionID')
+            ->where('d.CategoryID', $categoryID)
+            ->delete();
+
+        // Delete discussions in this category
+        $this->SQL->delete('Discussion', ['CategoryID' => $categoryID]);
+
+        // Make inherited permission local permission
+        $this->SQL
+            ->update('Category')
+            ->set('PermissionCategoryID', 0)
+            ->where('PermissionCategoryID', $categoryID)
+            ->where('CategoryID <>', $categoryID)
+            ->put();
+
+        // Delete tags
+        $this->SQL->delete('Tag', ['CategoryID' => $categoryID]);
+        $this->SQL->delete('TagDiscussion', ['CategoryID' => $categoryID]);
+    }
+
+    /**
+     * Update references to one category with another.
+     *
+     * @param int $categoryID
+     * @param int $newCategoryID
+     * @param bool $updateCounts
+     */
+    private function replaceCategory(int $categoryID, int $newCategoryID, bool $updateCounts): void {
+        $this->deletePermissions($categoryID);
+
+        // Update children categories
+        $this->SQL
+            ->update('Category')
+            ->set('ParentCategoryID', $newCategoryID)
+            ->where('ParentCategoryID', $categoryID)
+            ->put();
+
+        // Update permission categories.
+        $this->SQL
+            ->update('Category')
+            ->set('PermissionCategoryID', $newCategoryID)
+            ->where('PermissionCategoryID', $categoryID)
+            ->where('CategoryID <>', $categoryID)
+            ->put();
+
+        // Update discussions
+        $this->SQL
+            ->update('Discussion')
+            ->set('CategoryID', $newCategoryID)
+            ->where('CategoryID', $categoryID)
+            ->put();
+
+        // Update tags
+        $this->SQL
+            ->update('Tag')
+            ->set('CategoryID', $newCategoryID)
+            ->where('CategoryID', $categoryID)
+            ->put();
+
+        $this->SQL
+            ->update('TagDiscussion')
+            ->set('CategoryID', $newCategoryID)
+            ->where('CategoryID', $categoryID)
+            ->put();
+
+        if ($updateCounts) {
+            // Update the discussion count
+            $count = $this->SQL
+                ->select('DiscussionID', 'count', 'DiscussionCount')
+                ->from('Discussion')
+                ->where('CategoryID', $newCategoryID)
+                ->get()
+                ->firstRow()
+                ->DiscussionCount;
+
+            if (!is_numeric($count)) {
+                $count = 0;
+            }
+
+            $this->SQL
+                ->update('Category')
+                ->set('CountDiscussions', $count)
+                ->where('CategoryID', $newCategoryID)
+                ->put();
+        }
+    }
+
+    /**
+     * Delete permission entries associated with a particular category.
+     *
+     * @param int $categoryID
+     */
+    private function deletePermissions(int $categoryID): void {
+        // Remove permissions related to category
+        $permissionModel = Gdn::permissionModel();
+        $permissionModel->delete(null, 'Category', 'CategoryID', $categoryID);
     }
 }

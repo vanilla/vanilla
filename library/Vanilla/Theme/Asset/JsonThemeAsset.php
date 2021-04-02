@@ -8,8 +8,9 @@ namespace Vanilla\Theme\Asset;
 
 use Garden\Web\Exception\ClientException;
 use Vanilla\Theme\ThemeAssetFactory;
+use Vanilla\Utility\ArrayUtils;
 
- /**
+/**
   * JSON theme asset.
   */
 class JsonThemeAsset extends ThemeAsset {
@@ -171,5 +172,12 @@ class JsonThemeAsset extends ThemeAsset {
      */
     public function get(string $key, $default) {
         return valr($key, $this->data, $default);
+    }
+
+    /**
+     * @return bool
+     */
+    public function canMerge(): bool {
+        return true;
     }
 }

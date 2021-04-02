@@ -8,6 +8,7 @@ use Garden\Schema\Schema;
 use Garden\Web\Exception\ForbiddenException;
 use Vanilla\Dashboard\Models\BannerImageModel;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
+use Vanilla\LongRunner;
 use Vanilla\Models\CrawlableRecordSchema;
 use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Navigation\BreadcrumbModel;
@@ -41,18 +42,24 @@ class CategoriesApiController extends AbstractApiController {
     /** @var BreadcrumbModel */
     private $breadcrumbModel;
 
+    /** @var LongRunner */
+    private $runner;
+
     /**
      * CategoriesApiController constructor.
      *
      * @param CategoryModel $categoryModel
      * @param BreadcrumbModel $breadcrumbModel
+     * @param LongRunner $runner
      */
     public function __construct(
         CategoryModel $categoryModel,
-        BreadcrumbModel $breadcrumbModel
+        BreadcrumbModel $breadcrumbModel,
+        LongRunner $runner
     ) {
         $this->categoryModel = $categoryModel;
         $this->breadcrumbModel = $breadcrumbModel;
+        $this->runner = $runner;
     }
 
     /**
@@ -105,16 +112,21 @@ class CategoriesApiController extends AbstractApiController {
      * Delete a category.
      *
      * @param int $id The ID of the category.
+     * @return Data Returns the result of the response.
      * @throws NotFoundException if the category cannot be found.
      * @throws ServerException if the category has its CanDelete flag set to false.
      * @throws ServerException if the category has children.
      */
-    public function delete($id) {
+    public function delete($id, array $query = []): Data {
         $this->permission('Garden.Settings.Manage');
 
-        $in = $this->idParamSchema('in')->setDescription('Delete a category.');
+        $in = $this->schema([
+            "batch:b?" => ["default" => false],
+            "newCategoryID:i?"
+        ], "in");
         $out = $this->schema([], 'out');
 
+        $query = $in->validate($query);
         $row = $this->category($id);
         $children = $this->categoryModel->getChildTree($row['CategoryID']);
         if (!$row['CanDelete']) {
@@ -123,7 +135,20 @@ class CategoriesApiController extends AbstractApiController {
         if (count($children) > 0) {
             throw new ServerException('Cannot delete categories with children.', 500);
         }
-        $this->categoryModel->deleteID($id);
+
+        $options = [];
+        if ($query["batch"]) {
+            $options[LongRunner::OPT_LOCAL_JOB] = false;
+        }
+
+        $deleteOptions = [];
+        if (array_key_exists("newCategoryID", $query)) {
+            $deleteOptions["newCategoryID"] = $query["newCategoryID"];
+        }
+        $args = [$id, $deleteOptions];
+
+        $response = $this->runner->runApi(CategoryModel::class, 'deleteIDIterable', $args, $options);
+        return $response;
     }
 
     /**

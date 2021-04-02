@@ -366,16 +366,24 @@ class UsersApiController extends AbstractApiController {
      * Get a user's permissions.
      *
      * @param int $id The user's ID.
+     * @param array $query Query parameters.
      *
      * @return Data
      */
-    public function get_permissions(int $id): Data {
+    public function get_permissions(int $id, array $query = []): Data {
         $requestedUserID = $id;
         $this->permission();
+        $in = Schema::parse([
+            'expand?' => ApiUtils::getExpandDefinition(['junctions'])
+        ]);
         $out = $this->schema([
             "isAdmin:b",
             'permissions:a' => new PermissionFragmentSchema(),
+            'junctions?',
+            'junctionAliases?',
         ]);
+
+        $query = $in->validate($query);
 
         if (is_object($this->getSession()->User)) {
             $sessionUser = (array)$this->getSession()->User;
@@ -394,18 +402,11 @@ class UsersApiController extends AbstractApiController {
             ]);
         }
 
-        $requestedUser = $requestedUserID === UserModel::GUEST_USER_ID
-            ? $this->getGuestFragment()
-            : $this->normalizeOutput($this->userByID($requestedUserID));
-
         // Build the permissions
         // This endpoint is heavily used (every page request), so we rely on caching in the model.
         $permissions = $this->userModel->getPermissions($requestedUserID);
 
-        $result = ([
-            'isAdmin' => $requestedUser['isAdmin'],
-            'permissions' => $permissions->asPermissionFragments(),
-        ]);
+        $result = $permissions->asApiOutput(ModelUtils::isExpandOption('junctions', $query['expand'] ?? []));
         $result = $out->validate($result);
 
         return Data::box($result);

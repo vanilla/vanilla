@@ -13,7 +13,6 @@ import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { ClearButton } from "@library/forms/select/ClearButton";
 import * as selectOverrides from "@library/forms/select/overwrites";
-import { SearchIcon } from "@library/icons/titleBar";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import Heading from "@library/layout/Heading";
 import ButtonLoader from "@library/loaders/ButtonLoader";
@@ -29,6 +28,7 @@ import { MenuProps } from "react-select/lib/components/Menu";
 import { ActionMeta, InputActionMeta } from "react-select/lib/types";
 import { useSearchScope } from "@library/features/search/SearchScopeContext";
 import { PLACES_CATEGORY_TYPE, PLACES_KNOWLEDGE_BASE_TYPE, PLACES_GROUP_TYPE } from "@library/search/searchConstants";
+import { Icon } from "@vanilla/icons";
 
 // Re-exported after being moved.
 export { IComboBoxOption };
@@ -417,7 +417,7 @@ function SearchBarControl(props: IControlProps) {
                         tabIndex={-1}
                         title={t("Search")}
                     >
-                        <SearchIcon aria-hidden={true} className={classNames("searchBar-icon", classes.icon)} />
+                        <Icon size="compact" icon="search-search" />
                     </Button>
                 )}
                 {hasScope && (

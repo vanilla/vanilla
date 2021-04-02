@@ -26,7 +26,7 @@ class WidgetsApiTest extends AbstractAPIv2Test {
      */
     public function testWidgetsIndex() {
         $widgets = $this->api()->get('widgets')->getBody();
-        $this->assertEquals(6, count($widgets));
+        $this->assertEquals(7, count($widgets));
     }
 
     /**

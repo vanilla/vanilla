@@ -1,10 +1,15 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php use Vanilla\Theme\BoxThemeShim;
+
+if (!defined('APPLICATION')) exit();
     $dataDriven = \Gdn::themeFeatures()->useDataDrivenTheme();
 ?>
 <div class="Box GuestBox">
+    <?php BoxThemeShim::startHeading(); ?>
     <h4 class="GuestBox-title">
         <?php echo t('Howdy, Stranger!'); ?>
     </h4>
+    <?php BoxThemeShim::endHeading(); ?>
+    <?php BoxThemeShim::startBox(); ?>
     <p class="GuestBox-message">
         <?php echo t($this->MessageCode, $this->MessageDefault); ?>
     </p>
@@ -15,7 +20,7 @@
 
     <?php
     if ($this->data('signInUrl')) {
-        echo '<div class="P">';
+        echo '<div class="P GuestBox-buttons">';
         echo anchor(t('Sign In'), $this->data('signInUrl'), 'Button Primary'.(signInPopup() ? ' SignInPopup' : ''), ['rel' => 'nofollow', 'aria-label' => t("Sign In Now")]);
 
         if ($this->data('registerUrl')) {
@@ -26,4 +31,5 @@
     }
     ?>
     <?php $this->fireEvent('AfterSignInButton'); ?>
+    <?php BoxThemeShim::endBox(); ?>
 </div>

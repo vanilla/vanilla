@@ -12,12 +12,28 @@ import merge from "lodash/merge";
 import clone from "lodash/clone";
 import { IMediaQueryFunction } from "@library/layout/types/interface.panelLayout";
 import { Variables } from "@library/styles/Variables";
+import { cx, css } from "@emotion/css";
+import { styleUnit } from "@library/styles/styleUnit";
 
 export const CONTENT_BANNER_MAX_HEIGHT = 180;
 export const CONTENT_BANNER_MIN_HEIGHT = 80;
 
 export const contentBannerVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeVars = variableFactory("contentBanner", forcedVars);
+
+    const normalBannerVars = bannerVariables(forcedVars, "contentBanner");
+
+    const options = makeVars("options", {
+        ...normalBannerVars.options,
+        enabled: false,
+        alignment: BannerAlignment.CENTER,
+        mobileAlignment: BannerAlignment.LEFT,
+        overlayTitleBar: false,
+        hideDescription: true,
+        hideTitle: true,
+        hideSearch: true,
+        hideIcon: true,
+    });
 
     const dimensions = makeVars("dimensions", {
         minHeight: 120,
@@ -29,14 +45,22 @@ export const contentBannerVariables = useThemeCache((forcedVars?: IThemeVariable
     const minHeight = clamp(dimensions.minHeight, CONTENT_BANNER_MIN_HEIGHT, CONTENT_BANNER_MAX_HEIGHT);
     const minHeightMobile = clamp(dimensions.mobile.minHeight, CONTENT_BANNER_MIN_HEIGHT, CONTENT_BANNER_MAX_HEIGHT);
 
-    const options = makeVars("options", {
-        enabled: false,
-        alignment: BannerAlignment.CENTER,
-        mobileAlignment: BannerAlignment.LEFT,
-        overlayTitleBar: false,
+    const icon = makeVars("icon", {
+        image: undefined,
+        width: 100,
+        height: 100,
+        borderRadius: "100%",
+        margins: Variables.spacing({
+            top: normalBannerVars.title.margins.top, //make the icon align with the title
+            right: 20,
+        }),
+        mobile: {
+            width: 80,
+            height: 80,
+        },
     });
 
-    const contentContainer = makeVars("contentContainer", {
+    const spacing = makeVars("spacing", {
         padding: Variables.spacing({}),
         mobile: {
             padding: Variables.spacing({
@@ -46,22 +70,11 @@ export const contentBannerVariables = useThemeCache((forcedVars?: IThemeVariable
         },
     });
 
-    const normalBannerVars = bannerVariables(forcedVars, "contentBanner");
-
     const forced = merge(clone(forcedVars), {
         contentBanner: {
-            options: {
-                ...options,
-                hideDescription: true,
-                hideTitle: true,
-                hideSearch: true,
-            },
-            dimensions: {
-                minHeight: minHeight,
-                mobile: {
-                    minHeight: minHeightMobile,
-                },
-            },
+            options,
+            dimensions,
+            spacing,
             logo: {
                 height: minHeight - (normalBannerVars.logo.padding.all as number) * 2,
                 width: "auto",
@@ -69,13 +82,7 @@ export const contentBannerVariables = useThemeCache((forcedVars?: IThemeVariable
                     height: minHeightMobile - (normalBannerVars.logo.padding.all as number) * 2,
                 },
             },
-            spacing: {
-                padding: {
-                    top: 0,
-                    bottom: 0,
-                },
-            },
-            contentContainer,
+            icon,
         },
     });
     return bannerVariables(forced, "contentBanner");
@@ -83,6 +90,17 @@ export const contentBannerVariables = useThemeCache((forcedVars?: IThemeVariable
 
 export const contentBannerClasses = useThemeCache(
     (mediaQueries: IMediaQueryFunction, options?: { debug?: boolean | string }) => {
-        return bannerClasses(mediaQueries, contentBannerVariables(), "contentBanner", options);
+        const vars = contentBannerVariables();
+        const classes = bannerClasses(mediaQueries, vars, "contentBanner", options);
+        return {
+            ...classes,
+            textAndSearchContainer: cx(
+                classes.textAndSearchContainer,
+                css({
+                    flexBasis: styleUnit(vars.searchBar.sizing.maxWidth),
+                    flexGrow: 1,
+                }),
+            ),
+        };
     },
 );

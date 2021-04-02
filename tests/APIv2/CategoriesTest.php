@@ -8,7 +8,13 @@
 namespace VanillaTests\APIv2;
 
 use CategoryModel;
+use Garden\Web\Exception\NotFoundException;
+use PHPUnit\Framework\MockObject\MockObject;
+use Psr\Container\ContainerInterface;
+use Vanilla\LongRunner;
 use Vanilla\Models\DirtyRecordModel;
+use Vanilla\Scheduler\SchedulerInterface;
+use Vanilla\Web\SystemTokenUtils;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 
 /**
@@ -50,6 +56,25 @@ class CategoriesTest extends AbstractResourceTest {
 
     /** {@inheritdoc} */
     protected $testPagingOnIndex = false;
+
+    /** @var MockObject&LongRunner */
+    private $longRunner;
+
+    /**
+     * @inheritDoc
+     */
+    public function setUp(): void {
+        parent::setUp();
+        $this->container()->call(function (ContainerInterface $container, SystemTokenUtils $tokenUtils, SchedulerInterface $scheduler) {
+            $this->longRunner = $this->getMockBuilder(LongRunner::class)
+                ->enableOriginalConstructor()
+                ->setConstructorArgs([$container, $tokenUtils, $scheduler])
+                ->enableProxyingToOriginalMethods()
+                ->onlyMethods(["runApi"])
+                ->getMock();
+        });
+        $this->container()->setInstance(LongRunner::class, $this->longRunner);
+    }
 
     /**
      * Fix some container setup issues of the breadcrumb model.
@@ -432,5 +457,116 @@ class CategoriesTest extends AbstractResourceTest {
     public function testOnlyOneOfIndexQuery(): void {
         $this->expectExceptionMessage('Only one of categoryID, archived, followed, featured are allowed.');
         $r = $this->api()->get($this->baseUrl, ['categoryID' => 123, 'followed' => true]);
+    }
+
+    /**
+     * Verify behavior of deleting a category while moving its discussions to a new category.
+     */
+    public function testDeleteNewCategory(): void {
+        $origCategory = $this->createCategory(["parentCategoryID" => CategoryModel::ROOT_ID]);
+        $newCategory = $this->createCategory(["parentCategoryID" => CategoryModel::ROOT_ID]);
+
+        $discussions = [];
+        $discussions[] = $this->createDiscussion(["categoryID" => $origCategory["categoryID"]]);
+        $discussions[] = $this->createDiscussion(["categoryID" => $origCategory["categoryID"]]);
+        $discussions[] = $this->createDiscussion(["categoryID" => $origCategory["categoryID"]]);
+        $discussions[] = $this->createDiscussion(["categoryID" => $origCategory["categoryID"]]);
+        $discussions[] = $this->createDiscussion(["categoryID" => $origCategory["categoryID"]]);
+
+        $origDiscussions = $this->api()->get("discussions", ["categoryID" => $origCategory["categoryID"]])->getBody();
+        $this->assertCount(count($discussions), $origDiscussions);
+
+        $this->longRunner->expects($this->once())
+            ->method("runApi")
+            ->with(
+                CategoryModel::class,
+                "deleteIDIterable",
+                [
+                    $origCategory["categoryID"],
+                    ["newCategoryID" => $newCategory["categoryID"]],
+                ],
+                []
+            );
+
+        $this->api()->delete(
+            "{$this->baseUrl}/" . $origCategory["categoryID"],
+            ["newCategoryID" => $newCategory["categoryID"]]
+        );
+
+        $newDiscussions = $this->api()->get("discussions", ["categoryID" => $newCategory["categoryID"]])->getBody();
+        $this->assertCount(count($discussions), $newDiscussions);
+
+        $this->expectException(NotFoundException::class);
+        $this->api()->get("{$this->baseUrl}/" . $origCategory["categoryID"]);
+    }
+
+    /**
+     * Verify ability to delete category content in batches.
+     */
+    public function testDeleteBatch(): void {
+        $category = $this->createCategory(["parentCategoryID" => CategoryModel::ROOT_ID]);
+
+        $this->longRunner->expects($this->once())
+            ->method("runApi")
+            ->with(
+                CategoryModel::class,
+                "deleteIDIterable",
+                [
+                    $category["categoryID"],
+                    [],
+                ],
+                [LongRunner::OPT_LOCAL_JOB => false]
+            );
+
+        $this->api()->delete(
+            "{$this->baseUrl}/" . $category["categoryID"],
+            ["batch" => true]
+        );
+
+        $this->expectException(NotFoundException::class);
+        $this->api()->get("{$this->baseUrl}/" . $category["categoryID"]);
+    }
+
+    /**
+     * Verify ability to delete a category while moving its content in batches.
+     */
+    public function testDeleteNewCategoryBatch(): void {
+        $origCategory = $this->createCategory(["parentCategoryID" => CategoryModel::ROOT_ID]);
+        $newCategory = $this->createCategory(["parentCategoryID" => CategoryModel::ROOT_ID]);
+
+        $discussions = [];
+        $discussions[] = $this->createDiscussion(["categoryID" => $origCategory["categoryID"]]);
+        $discussions[] = $this->createDiscussion(["categoryID" => $origCategory["categoryID"]]);
+        $discussions[] = $this->createDiscussion(["categoryID" => $origCategory["categoryID"]]);
+        $discussions[] = $this->createDiscussion(["categoryID" => $origCategory["categoryID"]]);
+        $discussions[] = $this->createDiscussion(["categoryID" => $origCategory["categoryID"]]);
+
+        $origDiscussions = $this->api()->get("discussions", ["categoryID" => $origCategory["categoryID"]])->getBody();
+        $this->assertCount(count($discussions), $origDiscussions);
+
+        $this->longRunner->expects($this->once())
+            ->method("runApi")
+            ->with(
+                CategoryModel::class,
+                "deleteIDIterable",
+                [
+                    $origCategory["categoryID"],
+                    ["newCategoryID" => $newCategory["categoryID"]],
+                ],
+                [LongRunner::OPT_LOCAL_JOB => false]
+            );
+
+        $this->api()->delete(
+            "{$this->baseUrl}/" . $origCategory["categoryID"],
+            [
+                "batch" => true,
+                "newCategoryID" => $newCategory["categoryID"]
+            ]
+        );
+        $newDiscussions = $this->api()->get("discussions", ["categoryID" => $newCategory["categoryID"]])->getBody();
+        $this->assertCount(count($discussions), $newDiscussions);
+
+        $this->expectException(NotFoundException::class);
+        $this->api()->get("{$this->baseUrl}/" . $origCategory["categoryID"]);
     }
 }

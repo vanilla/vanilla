@@ -7,7 +7,6 @@
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import {
-    absolutePosition,
     allButtonStates,
     BorderType,
     flexHelper,
@@ -40,8 +39,9 @@ import { CSSObject } from "@emotion/css";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { buttonResetMixin } from "@library/forms/buttonMixins";
 import generateButtonClass from "@library/forms/styleHelperButtonGenerator";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { titleBarVariables } from "./TitleBar.variables";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 
 export const titleBarClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -78,6 +78,9 @@ export const titleBarClasses = useThemeCache(() => {
         maxWidth: percent(100),
         color: ColorsUtils.colorOut(vars.colors.fg),
         position: "relative",
+        ...mediaQueries.compact({
+            color: ColorsUtils.colorOut(vars.mobileColors.fg),
+        }),
         ...getBorderVars(),
         ...{
             ".searchBar__control": {
@@ -126,27 +129,39 @@ export const titleBarClasses = useThemeCache(() => {
             ? { boxShadow: `0 ${styleUnit(vars.border.width)} 0 ${ColorsUtils.colorOut(vars.border.color)}` }
             : {};
 
-    const bg1 = style("bg1", {
-        willChange: "opacity",
-        ...absolutePosition.fullSizeOfParent(),
-        backgroundColor: ColorsUtils.colorOut(vars.fullBleed.enabled ? vars.fullBleed.bgColor : vars.colors.bg),
-        ...shadowAsBorder,
-        overflow: "hidden",
-        ...{
+    const bg1 = style(
+        "bg1",
+        {
+            willChange: "opacity",
+            ...Mixins.absolute.fullSizeOfParent(),
+            backgroundColor: ColorsUtils.colorOut(vars.fullBleed.enabled ? vars.fullBleed.bgColor : vars.colors.bg),
+            ...shadowAsBorder,
+            overflow: "hidden",
             [`&.${swoop}`]: swoopStyles,
         },
-    });
+        mediaQueries.compact({
+            backgroundColor: ColorsUtils.colorOut(
+                vars.fullBleed.enabled ? vars.fullBleed.bgColor : vars.mobileColors.bg,
+            ),
+        }),
+    );
 
-    const bg2 = style("bg2", {
-        willChange: "opacity",
-        ...absolutePosition.fullSizeOfParent(),
-        backgroundColor: ColorsUtils.colorOut(vars.colors.bg),
-        ...shadowAsBorder,
-        overflow: "hidden",
-        ...{
-            [`&.${swoop}`]: swoopStyles,
+    const bg2 = style(
+        "bg2",
+        {
+            willChange: "opacity",
+            ...Mixins.absolute.fullSizeOfParent(),
+            backgroundColor: ColorsUtils.colorOut(vars.colors.bg),
+            ...shadowAsBorder,
+            overflow: "hidden",
+            ...{
+                [`&.${swoop}`]: swoopStyles,
+            },
         },
-    });
+        mediaQueries.compact({
+            backgroundColor: ColorsUtils.colorOut(vars.mobileColors.bg),
+        }),
+    );
 
     const container = style("container", {
         position: "relative",
@@ -156,7 +171,7 @@ export const titleBarClasses = useThemeCache(() => {
     });
 
     const bgContainer = style("bgContainer", {
-        ...absolutePosition.fullSizeOfParent(),
+        ...Mixins.absolute.fullSizeOfParent(),
         height: percent(100),
         width: percent(100),
         ...Mixins.padding(vars.spacing.padding),
@@ -165,7 +180,7 @@ export const titleBarClasses = useThemeCache(() => {
     });
 
     const bgImage = style("bgImage", {
-        ...absolutePosition.fullSizeOfParent(),
+        ...Mixins.absolute.fullSizeOfParent(),
         objectFit: "cover",
     });
 
@@ -234,22 +249,19 @@ export const titleBarClasses = useThemeCache(() => {
         {
             display: "inline-flex",
             alignSelf: "center",
-            color: ColorsUtils.colorOut(vars.colors.fg),
             marginRight: styleUnit(vars.logo.offsetRight),
             justifyContent: vars.logo.justifyContent,
             ...logoOffsetDesktop,
             maxHeight: percent(100),
-            ...{
-                "&&": {
-                    color: ColorsUtils.colorOut(vars.colors.fg),
-                },
-                "&.focus-visible": {
-                    ...{
-                        "&.headerLogo-logoFrame": {
-                            outline: `5px solid ${vars.buttonContents.state.bg}`,
-                            background: ColorsUtils.colorOut(vars.buttonContents.state.bg),
-                            borderRadius: vars.button.borderRadius,
-                        },
+            "&&": {
+                color: ColorsUtils.colorOut(vars.colors.fg),
+            },
+            "&.focus-visible": {
+                ...{
+                    "&.headerLogo-logoFrame": {
+                        outline: `5px solid ${vars.buttonContents.state.bg}`,
+                        background: ColorsUtils.colorOut(vars.buttonContents.state.bg),
+                        borderRadius: vars.button.borderRadius,
                     },
                 },
             },
@@ -258,6 +270,9 @@ export const titleBarClasses = useThemeCache(() => {
             height: px(vars.sizing.mobile.height),
             marginRight: styleUnit(0),
             ...logoOffsetMobile,
+            "&&": {
+                color: ColorsUtils.colorOut(vars.mobileColors.fg),
+            },
         }),
     );
 
@@ -347,7 +362,7 @@ export const titleBarClasses = useThemeCache(() => {
                 },
             },
         },
-        layoutVariables()
+        panelLayoutVariables()
             .mediaQueries()
             .xs({
                 ...{
@@ -417,60 +432,66 @@ export const titleBarClasses = useThemeCache(() => {
             minWidth: px(vars.button.size),
             maxWidth: percent(100),
             padding: px(0),
-            color: ColorsUtils.colorOut(vars.colors.fg),
-            ...{
-                "&&": {
-                    ...allButtonStates(
-                        {
-                            allStates: {
-                                color: ColorsUtils.colorOut(vars.colors.fg),
-                                ...{
-                                    ".meBox-buttonContent": {
-                                        backgroundColor: ColorsUtils.colorOut(vars.buttonContents.state.bg),
-                                    },
-                                },
-                            },
-                            keyboardFocus: {
-                                outline: 0,
-                                color: ColorsUtils.colorOut(vars.colors.fg),
-                                ...{
-                                    ".meBox-buttonContent": {
-                                        borderColor: ColorsUtils.colorOut(vars.colors.fg),
-                                        backgroundColor: ColorsUtils.colorOut(vars.buttonContents.state.bg),
-                                    },
-                                },
-                            },
-                        },
-                        {
+            "&&": {
+                ...allButtonStates(
+                    {
+                        allStates: {
+                            color: ColorsUtils.colorOut(vars.colors.fg),
                             ".meBox-buttonContent": {
-                                ...Mixins.border({
-                                    width: 1,
-                                    color: rgba(0, 0, 0, 0),
-                                }),
-                            },
-                            "&.isOpen": {
-                                color: ColorsUtils.colorOut(vars.colors.fg),
-                                ...{
-                                    ".meBox-buttonContent": {
-                                        backgroundColor: ColorsUtils.colorOut(vars.buttonContents.state.bg),
-                                    },
-                                    "&:focus": {
-                                        color: ColorsUtils.colorOut(vars.colors.fg),
-                                    },
-                                    "&.focus-visible": {
-                                        color: ColorsUtils.colorOut(vars.colors.fg),
-                                    },
-                                },
+                                backgroundColor: ColorsUtils.colorOut(vars.buttonContents.state.bg),
                             },
                         },
-                    ),
-                },
+                        keyboardFocus: {
+                            outline: 0,
+                            color: ColorsUtils.colorOut(vars.colors.fg),
+                            ".meBox-buttonContent": {
+                                borderColor: ColorsUtils.colorOut(vars.colors.fg),
+                                backgroundColor: ColorsUtils.colorOut(vars.buttonContents.state.bg),
+                            },
+                        },
+                    },
+                    {
+                        ".meBox-buttonContent": {
+                            ...Mixins.border({
+                                width: 1,
+                                color: rgba(0, 0, 0, 0),
+                            }),
+                        },
+                        "&.isOpen": {
+                            color: ColorsUtils.colorOut(vars.colors.fg),
+                            ".meBox-buttonContent": {
+                                backgroundColor: ColorsUtils.colorOut(vars.buttonContents.state.bg),
+                            },
+                            "&:focus": {
+                                color: ColorsUtils.colorOut(vars.colors.fg),
+                            },
+                            "&.focus-visible": {
+                                color: ColorsUtils.colorOut(vars.colors.fg),
+                            },
+                        },
+                    },
+                ),
             },
         },
         mediaQueries.compact({
             height: px(vars.sizing.mobile.height),
             width: px(vars.sizing.mobile.width),
             minWidth: px(vars.sizing.mobile.width),
+
+            "&&": {
+                ...allButtonStates({
+                    allStates: {
+                        color: ColorsUtils.colorOut(vars.mobileColors.fg),
+                    },
+                    keyboardFocus: {
+                        outline: 0,
+                        color: ColorsUtils.colorOut(vars.mobileColors.fg),
+                        ".meBox-buttonContent": {
+                            borderColor: ColorsUtils.colorOut(vars.mobileColors.fg),
+                        },
+                    },
+                }),
+            },
         }),
     );
 
@@ -563,22 +584,20 @@ export const titleBarClasses = useThemeCache(() => {
         flexBasis: px(vars.endElements.mobile.flexBasis),
     });
 
-    const signIn = style("signIn", {
-        marginLeft: styleUnit(vars.guest.spacer),
-        marginRight: styleUnit(vars.guest.spacer),
-        ...{
+    const signIn = style(
+        "signIn",
+        vars.guest.signInButtonType === ButtonTypes.TRANSPARENT && {
             "&&&": {
                 color: ColorsUtils.colorOut(vars.signIn.fg),
-                borderColor: ColorsUtils.colorOut(vars.colors.fg),
+                borderColor: ColorsUtils.colorOut(vars.signIn.border.color),
             },
         },
-    });
+    );
 
-    const register = style("register", {
-        marginLeft: styleUnit(vars.guest.spacer),
-        marginRight: styleUnit(vars.guest.spacer),
-        backgroundColor: ColorsUtils.colorOut(vars.resister.bg),
-        ...{
+    const register = style(
+        "register",
+        vars.guest.signInButtonType === ButtonTypes.TRANSLUCID && {
+            backgroundColor: ColorsUtils.colorOut(vars.resister.bg),
             "&&": {
                 // Ugly solution, but not much choice until: https://github.com/vanilla/knowledge/issues/778
                 ...allButtonStates({
@@ -604,19 +623,24 @@ export const titleBarClasses = useThemeCache(() => {
                 }),
             },
         },
-    });
+    );
 
-    const clearButtonClass = style("clearButtonClass", {
-        // opacity: 0.7,
-        //     "&:hover, &:focus": {
-        //         opacity: 1,
-        //     },
-        // },
-    });
+    const clearButtonClass = style("clearButtonClass", {});
 
     const guestButton = style("guestButton", {
-        minWidth: styleUnit(vars.button.guest.minWidth),
-        borderRadius: styleUnit(vars.button.borderRadius),
+        "&&": {
+            marginLeft: styleUnit(vars.guest.spacer),
+            marginRight: styleUnit(vars.guest.spacer),
+            minWidth: styleUnit(vars.button.guest.minWidth),
+            borderRadius: styleUnit(vars.button.borderRadius),
+            ...Mixins.font({
+                textDecoration: "none",
+            }),
+
+            "&:last-child": {
+                marginRight: 0,
+            },
+        },
     });
 
     const desktopNavWrap = style("desktopNavWrap", {
@@ -626,7 +650,7 @@ export const titleBarClasses = useThemeCache(() => {
     });
 
     const logoCenterer = style("logoCenterer", {
-        ...absolutePosition.middleOfParent(true),
+        ...Mixins.absolute.middleOfParent(true),
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
@@ -640,10 +664,11 @@ export const titleBarClasses = useThemeCache(() => {
         justifyContent: "flex-start",
     });
 
-    const hamburger = style("hamburger", {
-        marginRight: styleUnit(12),
-        marginLeft: negativeUnit(globalVars.buttonIcon.offset),
-        ...{
+    const hamburger = style(
+        "hamburger",
+        {
+            marginRight: styleUnit(12),
+            marginLeft: negativeUnit(globalVars.buttonIcon.offset),
             "&&": {
                 ...allButtonStates({
                     allStates: {
@@ -652,7 +677,16 @@ export const titleBarClasses = useThemeCache(() => {
                 }),
             },
         },
-    });
+        mediaQueries.compact({
+            "&&": {
+                ...allButtonStates({
+                    allStates: {
+                        color: ColorsUtils.colorOut(vars.mobileColors.fg),
+                    },
+                }),
+            },
+        }),
+    );
 
     const isSticky = style("isSticky", {
         ...sticky(),
@@ -666,7 +700,7 @@ export const titleBarClasses = useThemeCache(() => {
     });
 
     const overlay = style("overlay", {
-        ...absolutePosition.fullSizeOfParent(),
+        ...Mixins.absolute.fullSizeOfParent(),
         background: vars.overlay.background,
     });
 
@@ -794,7 +828,6 @@ export const titleBarLogoClasses = useThemeCache(() => {
             display: "block",
             maxHeight: styleUnit(getLogoMaxHeight(vars, false)),
             maxWidth: styleUnit(vars.logo.maxWidth),
-            width: "auto",
             ...{
                 "&.isCentred": {
                     margin: "auto",
@@ -823,7 +856,7 @@ export const titleBarLogoClasses = useThemeCache(() => {
 export const addGradientsToHintOverflow = (width: number | string, color: ColorHelper) => {
     return {
         "&:after": {
-            ...absolutePosition.topRight(),
+            ...Mixins.absolute.topRight(),
             background: linearGradient(
                 "right",
                 `${ColorsUtils.colorOut(color.fade(0))} 0%`,
@@ -832,7 +865,7 @@ export const addGradientsToHintOverflow = (width: number | string, color: ColorH
             ),
         },
         "&:before": {
-            ...absolutePosition.topLeft(),
+            ...Mixins.absolute.topLeft(),
             background: linearGradient(
                 "left",
                 `${ColorsUtils.colorOut(color.fade(0))} 0%`,

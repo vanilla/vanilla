@@ -7,7 +7,8 @@ import { CSSObject } from "@emotion/css";
 import { media } from "@library/styles/styleShim";
 import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
-import { generatePanelLayoutClasses, layoutVariables } from "../panelLayoutStyles";
+import { generatePanelLayoutClasses } from "../PanelLayout.styles";
+import { panelLayoutVariables } from "../PanelLayout.variables";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
 import { ITwoColumnLayoutMediaQueries, twoColumnLayoutDevices } from "@library/layout/types/interface.twoColumns";
 import { IPanelLayoutVariables } from "@library/layout/types/interface.panelLayout";
@@ -15,7 +16,7 @@ import { mediaQueryFactory } from "@library/layout/types/mediaQueryFactory";
 
 export const twoColumnLayoutVariables = useThemeCache(
     (): IPanelLayoutVariables => {
-        const layoutVars = layoutVariables();
+        const layoutVars = panelLayoutVariables();
         const Devices = twoColumnLayoutDevices;
         const { fullGutter } = layoutVars.foundationalWidths;
 

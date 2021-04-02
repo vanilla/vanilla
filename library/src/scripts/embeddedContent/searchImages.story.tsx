@@ -5,7 +5,7 @@
 
 import React from "react";
 import { StoryHeading } from "@library/storybook/StoryHeading";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryListItem } from "@library/storybook/StoryListItem";
 import { StoryBookImageTypeSearchResult } from "@library/embeddedContent/storybook/attachments/StorybookImageTypeSearchResult";
@@ -19,9 +19,9 @@ export default {
         chromatic: {
             viewports: [
                 1450,
-                layoutVariables().panelLayoutBreakPoints.twoColumns,
-                layoutVariables().panelLayoutBreakPoints.oneColumn,
-                layoutVariables().panelLayoutBreakPoints.xs,
+                panelLayoutVariables().panelLayoutBreakPoints.twoColumns,
+                panelLayoutVariables().panelLayoutBreakPoints.oneColumn,
+                panelLayoutVariables().panelLayoutBreakPoints.xs,
             ],
         },
     },

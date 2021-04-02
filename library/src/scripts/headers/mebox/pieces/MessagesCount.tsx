@@ -5,10 +5,10 @@
  */
 
 import { MeBoxIcon } from "@library/headers/mebox/pieces/MeBoxIcon";
-import { MessagesIcon } from "@library/icons/titleBar";
 import { t } from "@library/utility/appUtils";
 import React from "react";
 import { useUsersState } from "@library/features/users/userModel";
+import { Icon } from "@vanilla/icons";
 
 interface IProps {
     open?: boolean;
@@ -25,7 +25,7 @@ export default function MessagesCount(props: IProps) {
 
     return (
         <MeBoxIcon count={count} countLabel={t("Messages") + ": "} compact={compact}>
-            <MessagesIcon filled={!!open} />
+            <Icon icon={open ? "me-messages-solid" : "me-messages"} />
         </MeBoxIcon>
     );
 }

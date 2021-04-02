@@ -7,7 +7,6 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
-import { absolutePosition } from "@library/styles/styleHelpers";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
 import { shadowHelper } from "@library/styles/shadowHelpers";
@@ -112,7 +111,7 @@ export const newPostMenuClasses = useThemeCache(() => {
     });
 
     const itemFocus = style("itemFocus", {
-        ...absolutePosition.fullSizeOfParent(),
+        ...Mixins.absolute.fullSizeOfParent(),
         margin: styleUnit(1),
         maxWidth: calc(`100% - 2px`),
         maxHeight: calc(`100% - 2px`),
@@ -141,7 +140,7 @@ export const newPostMenuClasses = useThemeCache(() => {
     });
 
     const toggleFocus = style("toggleFocus", {
-        ...absolutePosition.fullSizeOfParent(),
+        ...Mixins.absolute.fullSizeOfParent(),
         margin: styleUnit(1),
         maxWidth: calc(`100% - 2px`),
         maxHeight: calc(`100% - 2px`),

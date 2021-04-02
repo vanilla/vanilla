@@ -256,6 +256,27 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface {
         return $result;
     }
 
+
+    /**
+     * Get a discussion's tagIDs.
+     *
+     * @param int $userID The user ID.
+     * @param array $recordIDs Unique record IDs.
+     * @return array
+     */
+    public function getUserDiscussionTags(int $userID, array $recordIDs): array {
+        $row = $this->SQL
+            ->select('TagID')
+            ->select('RecordID')
+            ->from('UserTag')
+            ->where('UserID', $userID)
+            ->where('RecordType', 'Discussion')
+            ->whereIn('RecordID', $recordIDs)
+            ->get()
+            ->resultArray();
+        return $row;
+    }
+
     /**
      *
      *
@@ -1709,7 +1730,8 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface {
                 'tagID:i',
                 'urlcode:s',
                 'name:s',
-                'class:s'
+                'class:s',
+                'hasReacted:b?'
             ]);
         }
 

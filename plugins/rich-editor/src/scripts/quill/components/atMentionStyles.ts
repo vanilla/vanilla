@@ -4,24 +4,27 @@
  * @license Proprietary
  */
 
-import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 import { cssRule } from "@library/styles/styleShim";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
-import { absolutePosition, singleLineEllipsis, userSelect } from "@library/styles/styleHelpers";
+import { singleLineEllipsis, userSelect } from "@library/styles/styleHelpers";
 import { styleUnit } from "@library/styles/styleUnit";
 import { calc, percent } from "csx";
 import { Mixins } from "@library/styles/Mixins";
+import { Variables } from "@library/styles/Variables";
 
 export const atMentionVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const makeThemeVars = variableFactory("atMention");
 
-    const font = makeThemeVars("font", {
-        size: globalVars.fonts.size.large,
-    });
+    const font = makeThemeVars(
+        "font",
+        Variables.font({
+            ...globalVars.fontSizeAndWeightVars("large"),
+        }),
+    );
 
     const avatar = makeThemeVars("avatar", {
         width: 30,

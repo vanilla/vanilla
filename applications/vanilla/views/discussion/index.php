@@ -18,7 +18,7 @@ $writeDiscussionPageHeader = function ($sender) {
     };
 
     // Write the page title.
-    echo '<div id="Item_0" class="PageTitle pageHeadingBox">';
+    echo '<div id="Item_0" class="PageTitle pageHeadingBox isLarge">';
         if (!BoxThemeShim::isActive()) {
             $writeOptionsMenu();
         }

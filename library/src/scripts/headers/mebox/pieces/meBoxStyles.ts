@@ -11,14 +11,14 @@ import { styleFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 
 export const meBoxClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const formVars = formElementsVariables();
     const titleBarVars = titleBarVariables();
     const debug = debugHelper("meBox");
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = panelLayoutVariables().mediaQueries();
     const flex = flexHelper();
     const style = styleFactory("meBox");
 

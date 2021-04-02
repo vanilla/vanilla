@@ -311,6 +311,17 @@ class UsersTest extends AbstractResourceTest {
     }
 
     /**
+     * To catch this regression.
+     * @see https://github.com/vanilla/support/issues/4039
+     */
+    public function testNoJunctionsPermissions() {
+        // There should not be an error.
+        $userID = $this->api()->getUserID();
+        $this->api()->get("/users/$userID/permissions", ['expand' => 'junctions']);
+        $this->assertTrue(true);
+    }
+
+    /**
      * Test the users me endpoint with some custom roles.
      */
     public function testPermissions() {

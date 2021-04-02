@@ -6,7 +6,7 @@
 
 import { cx } from "@emotion/css";
 import * as React from "react";
-import { metasClasses } from "@library/styles/metasStyles";
+import { metasClasses } from "@library/metas/Metas.styles";
 import { PageHeading } from "@library/layout/PageHeading";
 import { pageTitleClasses } from "@library/layout/pageTitleStyles";
 import { useFontSizeCalculator } from "@library/layout/pageHeadingContext";

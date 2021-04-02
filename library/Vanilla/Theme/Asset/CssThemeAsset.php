@@ -13,6 +13,9 @@ use Vanilla\Theme\ThemeAssetFactory;
  */
 class CssThemeAsset extends ThemeAsset {
 
+    /** @var bool */
+    protected $canMerge = true;
+
     /** @var string CSS content of this asset. */
     private $data;
 
@@ -60,5 +63,19 @@ class CssThemeAsset extends ThemeAsset {
      */
     public function __toString(): string {
         return $this->data;
+    }
+
+    /**
+     * @return string
+     */
+    public function getData(): string {
+        return $this->data;
+    }
+
+    /**
+     * @param string $data
+     */
+    public function setData(string $data): void {
+        $this->data = $data;
     }
 }

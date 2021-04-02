@@ -29,6 +29,7 @@ export const frameBodyClasses = useThemeCache(() => {
         }),
         ...{
             "&.isSelfPadded": {
+                overflowX: "hidden",
                 ...Mixins.padding({
                     left: 0,
                     right: 0,

@@ -7,6 +7,8 @@
 
 namespace Vanilla\Models;
 
+use Gdn_Model;
+
 /**
  * Utility functions that operate on models.
  */
@@ -49,5 +51,65 @@ final class LegacyModelUtils {
         } else {
             return [$field, 'asc'];
         }
+    }
+
+    /**
+     * Continuously get the first page of a model until there are no more rows.
+     *
+     * This method is a little odd, so it's important to understand how it's used. Its main purpose is to delete the
+     * rows from a table one at a time. You iterate through the model using this function calling the deletes until they
+     * are complete.
+     *
+     * @param Gdn_Model $model The model to iterate.
+     * @param array $where The where clause for the iteration.
+     * @param int $limit The number of records per page.
+     * @return iterable
+     */
+    public static function reduceTable(Gdn_Model $model, array $where, int $limit = 50): iterable {
+        do {
+            $rows = $model->getWhere($where, $model->PrimaryKey, 'asc', $limit)->resultArray();
+            yield from $rows;
+        } while (count($rows) >= $limit);
+    }
+
+    /**
+     * Alters the keys of an array to make it suitable to save to the DB.
+     *
+     * @param array $row The row to save.
+     * @param array $mappings The path mappings to change the keys to the correct column names.
+     * @return array
+     */
+    public static function normalizeApiInput(array $row, array $mappings = []): array {
+        $result = [];
+
+        foreach ($row as $key => $value) {
+            if (isset($mappings[$key])) {
+                $result[$mappings[$key]] = $value;
+            } else {
+                $result[ucfirst($key)] = $value;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Alters the keys of an array to make it suitable for output.
+     *
+     * @param array $row
+     * @param array $mappings
+     * @return array
+     */
+    public static function normalizeApiOutput(array $row, array $mappings = []): array {
+        $result = [];
+        $flippedMap = array_flip($mappings);
+
+        foreach ($row as $key => $value) {
+            if (isset($flippedMap[$key])) {
+                $result[lcfirst($flippedMap[$key])] = $value;
+            } else {
+                $result[lcfirst($key)] = $value;
+            }
+        }
+        return $result;
     }
 }

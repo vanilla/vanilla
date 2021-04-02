@@ -13,6 +13,7 @@ use Vanilla\Theme\Asset\ThemeAsset;
 use Vanilla\Theme\Theme;
 use Vanilla\Theme\ThemeProviderInterface;
 use Vanilla\Theme\ThemeProviderWriteInterface;
+use Vanilla\Theme\ThemeService;
 use VanillaTests\Fixtures\MockAddon;
 
 /**
@@ -25,6 +26,9 @@ class MockThemeProvider implements ThemeProviderInterface, ThemeProviderWriteInt
 
     /** @var Theme[] */
     private $themeDataByID = [];
+
+    /** @var ThemeService */
+    private $themeService;
 
     ///
     /// ThemeProviderInterface
@@ -77,7 +81,7 @@ class MockThemeProvider implements ThemeProviderInterface, ThemeProviderWriteInt
      */
     public function getMasterThemeKey($themeKey): string {
         $theme = $this->getTheme($themeKey);
-        return $theme->getParentTheme() ?? $theme->getThemeID();
+        return $theme->getParentThemeKey() ?? $theme->getThemeID();
     }
 
     /**
@@ -153,7 +157,7 @@ class MockThemeProvider implements ThemeProviderInterface, ThemeProviderWriteInt
      * @return Theme
      */
     public function addTheme(array $body, Addon $addon): Theme {
-        $themeID = $body['themeID'] ?? count($this->themesByID);
+        $themeID = $body['themeID'] ?? ('mock-' . count($this->themesByID));
         $this->themeDataByID[$themeID] = [$body, $addon];
 
         $body = array_replace_recursive([
@@ -169,5 +173,12 @@ class MockThemeProvider implements ThemeProviderInterface, ThemeProviderWriteInt
         $theme->setAddon($addon);
         $this->themesByID[$themeID] = $theme;
         return $theme;
+    }
+
+    /**
+     * @param ThemeService $themeService
+     */
+    public function setThemeService(ThemeService $themeService): void {
+        $this->themeService = $themeService;
     }
 }

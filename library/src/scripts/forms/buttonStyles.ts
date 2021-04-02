@@ -7,7 +7,7 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { allButtonStates, flexHelper, spinnerLoaderAnimationProperties } from "@library/styles/styleHelpers";
 import { styleUnit } from "@library/styles/styleUnit";
-import { CSSObject } from "@emotion/css";
+import { CSSObject, css } from "@emotion/css";
 import { styleFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { formElementsVariables } from "@library/forms/formElementStyles";
@@ -15,7 +15,7 @@ import { important, percent } from "csx";
 import merge from "lodash/merge";
 import generateButtonClass from "./styleHelperButtonGenerator";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { buttonResetMixin } from "./buttonMixins";
 import { buttonVariables, buttonGlobalVariables } from "./Button.variables";
@@ -55,7 +55,7 @@ export const buttonUtilityClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const formElementVars = formElementsVariables();
     const style = styleFactory("buttonUtils");
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = panelLayoutVariables().mediaQueries();
 
     const pushLeft = style("pushLeft", {
         marginRight: important("auto"),
@@ -128,7 +128,7 @@ export const buttonUtilityClasses = useThemeCache(() => {
         },
     });
 
-    const buttonAsTextPrimary = style("asTextPrimary", asTextStyles, {
+    const buttonAsTextPrimary = css(asTextStyles, {
         ...{
             "&&": {
                 color: ColorsUtils.colorOut(globalVars.links.colors.default),

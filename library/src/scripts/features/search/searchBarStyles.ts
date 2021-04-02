@@ -25,7 +25,7 @@ import { calc, important, percent, px, translateX } from "csx";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { buttonGlobalVariables } from "@library/forms/Button.variables";
 import { buttonResetMixin } from "@library/forms/buttonMixins";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import { CSSObject } from "@emotion/css";
@@ -37,6 +37,7 @@ import { selectBoxClasses } from "@library/forms/select/selectBoxStyles";
 import { SearchBarPresets } from "@library/banner/SearchBarPresets";
 import { IBorderRadiusValue } from "@library/styles/cssUtilsTypes";
 import { searchBarVariables } from "./SearchBar.variables";
+import { metasVariables } from "@library/metas/Metas.variables";
 
 export interface ISearchBarOverwrites {
     borderRadius?: IBorderRadiusValue;
@@ -52,7 +53,8 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
     const { compact = vars.options.compact, borderRadius = vars.border.radius, preset = vars.options.preset } =
         overwrites || {};
     const globalVars = globalVariables();
-    const layoutVars = layoutVariables();
+    const metasVars = metasVariables();
+    const layoutVars = panelLayoutVariables();
     const inputVars = inputVariables();
     const titleBarVars = titleBarVariables();
     const formElementVars = formElementsVariables();
@@ -157,10 +159,8 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
                 lineHeight: styleUnit(globalVars.lineHeights.base * globalVars.fonts.size.medium),
                 fontSize: styleUnit(inputVars.font.size),
                 height: styleUnit(calculatedHeight),
-                ...{
-                    "& > div": {
-                        width: percent(100),
-                    },
+                "& > div": {
+                    width: percent(100),
                 },
             },
             ".searchBar__indicators": {
@@ -170,6 +170,7 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
                 width: percent(100),
             },
             ".searchBar__input input": {
+                margin: 0,
                 height: "auto",
                 minHeight: 0,
                 width: important(`100%`),
@@ -190,18 +191,17 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
     const searchResultsStyles = {
         title: {
             ...Mixins.font({
-                size: globalVars.fonts.size.large,
-                weight: globalVars.fonts.weights.semiBold,
+                ...globalVars.fontSizeAndWeightVars("large", "semiBold"),
                 lineHeight: globalVars.lineHeights.condensed,
             }),
         },
         meta: {
-            ...Mixins.font(globalVars.meta.text),
+            ...Mixins.font(metasVars.font),
         },
         excerpt: {
             marginTop: styleUnit(searchResultsVariables().excerpt.margin),
             ...Mixins.font({
-                size: globalVars.fonts.size.medium,
+                ...globalVars.fontSizeAndWeightVars("medium"),
                 color: vars.results.fg,
                 lineHeight: globalVars.lineHeights.excerpt,
             }),

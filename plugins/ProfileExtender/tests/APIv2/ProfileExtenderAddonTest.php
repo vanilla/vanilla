@@ -6,6 +6,7 @@
 
 namespace Vanilla\ProfileExtender\Tests\APIv2;
 
+use Exception;
 use Vanilla\Attributes;
 
 /**
@@ -47,9 +48,16 @@ class ProfileExtenderAddonTest extends \VanillaTests\SiteTestCase {
         ]);
 
         $this->bessy()->post('/settings/profile-field-add-edit', [
-            'Name' => 'birthday',
+            'Name' => 'DateOfBirth',
             'Label' => 'Birthday',
             'FormType' => 'DateOfBirth'
+        ]);
+
+        $this->bessy()->post('/settings/profile-field-add-edit', [
+            'Name' => 'dropdown',
+            'Label' => 'Dropdown',
+            'FormType' => 'Dropdown',
+            'Options' => "Option1\nOption2"
         ]);
 
         $this->createUserFixtures();
@@ -105,5 +113,98 @@ class ProfileExtenderAddonTest extends \VanillaTests\SiteTestCase {
 
         $result = $this->bessy()->getHtml("profile/edit");
         $result->assertFormInput("text", __FUNCTION__);
+    }
+
+    /**
+     * Test editing Profile Extender fields over the APIv2 users/{id}/extended endpoint.
+     *
+     * @param string $field
+     * @param string|bool $value
+     * @param string $fieldToCheck
+     * @param string|bool $expectedValue
+     * @dataProvider provideTestPatchUsersExtendedEndpointData
+     */
+    public function testPatchUsersExtendedEndpoint($field, $value, $fieldToCheck, $expectedValue) {
+        $id = $this->memberID;
+        $result = $this->api()->patch("/users/{$id}/extended", [$field => $value])->getBody();
+        $this->assertSame($result[$fieldToCheck], $expectedValue);
+    }
+
+    /**
+     * Provides an array of data for testPatchUsersExtendedEndpoint().
+     *
+     * @return array
+     */
+    public function provideTestPatchUsersExtendedEndpointData(): array {
+        $data = [
+            'testTextInput' => [
+                'text',
+                'sometext',
+                'text',
+                'sometext'
+            ],
+            'testCheckboxInput' => [
+                'check',
+                true,
+                'check',
+                true,
+            ],
+            'textDropdown' => [
+                'dropdown',
+                'Option2',
+                'dropdown',
+                'Option2',
+            ]
+        ];
+
+        return $data;
+    }
+
+    /**
+     * Test patching multiple fields from
+     */
+    public function testPatchingMultipleFieldsFromExtendedEndpoint(): void {
+        $id = $this->memberID;
+        $fieldsToPatch = [
+            'text' => 'foo',
+            'check' => false,
+            'DateOfBirth' => '1980-06-17',
+            'dropdown' => 'Option1'
+        ];
+        $result = $this->api()->patch("/users/{$id}/extended", $fieldsToPatch)->getBody();
+        $formattedDate = new \DateTimeImmutable($result['DateOfBirth']);
+        $result['DateOfBirth'] = $formattedDate->format('Y-m-d');
+        $this->assertEquals($fieldsToPatch, $result);
+    }
+
+    /**
+     * Test patching invalid data.
+     */
+    public function testPatchWithBadValues(): void {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage("DateOfBirth is not a valid datetime.");
+        $this->expectExceptionMessage("dropdown must be one of: Option1, Option2.");
+        $this->expectExceptionMessage("text is not a valid string.");
+        $id = $this->memberID;
+        $fieldsToPatch = [
+            'text' => false,
+            'DateOfBirth' => true,
+            'dropdown' => 'Option3'
+        ];
+        $this->api()->patch("/users/{$id}/extended", $fieldsToPatch);
+    }
+
+    /**
+     * Test schema.
+     */
+    public function testSchemaExists(): void {
+        $openApi = $this->api()->get('/open-api/v3')->getBody();
+        $schemaProperties = $openApi['components']['schemas']['ExtendedUserFields']['properties'];
+        $this->assertSame($schemaProperties['text']['type'], 'string');
+        $this->assertSame($schemaProperties['check']['type'], 'boolean');
+        $this->assertSame($schemaProperties['DateOfBirth']['type'], 'string');
+        $this->assertSame($schemaProperties['DateOfBirth']['format'], 'date-time');
+        $this->assertSame($schemaProperties['dropdown']['type'], 'string');
+        $this->assertSame(count($schemaProperties['dropdown']['enum']), 2);
     }
 }

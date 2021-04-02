@@ -12,10 +12,9 @@ import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonG
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 import { compactSearchVariables } from "@library/headers/mebox/pieces/compactSearchStyles";
 import { containerVariables } from "@library/layout/components/containerStyles";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import {
-    absolutePosition,
     EMPTY_BORDER_RADIUS,
     ensureColorHelper,
     importantUnit,
@@ -25,11 +24,9 @@ import {
 import { styleUnit } from "@library/styles/styleUnit";
 import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
-import { widgetVariables } from "@library/styles/widgetStyleVars";
 import { IThemeVariables } from "@library/theming/themeReducer";
-import { BackgroundColorProperty, PaddingProperty } from "csstype";
-import { calc, important, percent, px, quote, rgba, translateX, translateY, ColorHelper, color, viewWidth } from "csx";
-import { media, TLength } from "@library/styles/styleShim";
+import { calc, important, percent, px, quote, rgba, translateX, translateY, ColorHelper, viewWidth } from "csx";
+import { media } from "@library/styles/styleShim";
 import { CSSObject } from "@emotion/css";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { breakpointVariables } from "@library/styles/styleHelpersBreakpoints";
@@ -37,12 +34,14 @@ import { t } from "@vanilla/i18n";
 import { getMeta } from "@library/utility/appUtils";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
 import { IMediaQueryFunction } from "@library/layout/types/interface.panelLayout";
-import { ButtonTypes } from "@library/forms/buttonTypes";
 import { Mixins } from "@library/styles/Mixins";
 import { Variables } from "@library/styles/Variables";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { SearchBarPresets } from "./SearchBarPresets";
 import { IBorderRadiusOutput } from "@library/styles/cssUtilsTypes";
+import { Property } from "csstype";
+import { lineHeightAdjustment } from "@library/styles/textUtils";
+import { inputVariables } from "@library/forms/inputStyles";
 
 export enum BannerAlignment {
     LEFT = "left",
@@ -58,9 +57,8 @@ export type SearchPlacement = "middle" | "bottom";
  * Defaults include a title, description, and a searchbar.
  */
 export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altName?: string) => {
-    const makeThemeVars = variableFactory(altName ?? ["banner", "splash"], forcedVars, !!altName);
+    const makeThemeVars = variableFactory(altName ?? ["banner", "splash"], forcedVars, undefined, !!altName);
     const globalVars = globalVariables(forcedVars);
-    const widgetVars = widgetVariables(forcedVars);
     const compactSearchVars = compactSearchVariables(forcedVars);
     const searchBarVars = searchBarVariables(forcedVars);
 
@@ -159,6 +157,14 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
         hideSearch: false,
 
         /**
+         * @var banner.options.hideIcon
+         * @title Hide Icon
+         * @description Hide icon in banner. Defaults to true.
+         * @type boolean
+         */
+        hideIcon: true,
+
+        /**
          * @var banner.options.searchPlacement
          * @title SearchBar Placement
          * @description Place the search bar in different parts of the banner.
@@ -175,12 +181,10 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
          * @type string
          */
         url: "" as string,
-    });
 
-    const topPadding = 69;
-    const horizontalPadding = styleUnit(
-        widgetVars.spacing.inner.horizontalPadding + globalVars.gutter.quarter,
-    ) as PaddingProperty<TLength>;
+        // Not publicly documented yet. Currently just an escape hatch in case we have issues on deployment.
+        deduplicateTitles: true,
+    });
 
     const spacing = makeThemeVars("spacing", {
         /**
@@ -189,22 +193,10 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
          * @expand spacing
          */
         padding: Variables.spacing({
-            top: topPadding,
-            bottom: 40,
-            horizontal: horizontalPadding,
+            top: globalVars.spacer.pageComponent * 1.5,
+            bottom: globalVars.spacer.pageComponent,
+            horizontal: globalVars.gutter.half,
         }),
-        mobile: {
-            /**
-             * @varGroup banner.mobile.padding
-             * @commonTitle Banner Spacing (Mobile)
-             * @expand spacing
-             */
-            padding: Variables.spacing({
-                top: 0,
-                bottom: globalVars.gutter.size,
-                horizontal: horizontalPadding,
-            }),
-        },
     });
 
     const dimensions = makeThemeVars("dimensions", {
@@ -295,8 +287,8 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
         }),
         mobile: {
             padding: Variables.spacing({
-                top: 12,
-                bottom: 12,
+                top: globalVars.spacer.componentInner * 2,
+                bottom: globalVars.spacer.componentInner,
             }),
         },
     });
@@ -321,6 +313,64 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
         mobile: {
             height: undefined as number | string | undefined,
             width: undefined as number | string | undefined,
+        },
+    });
+
+    /**
+     * @varGroup banner.icon
+     * @title Icon
+     * @description The icon (of the current category, for example) appearing in the Content banner
+     */
+    const iconDefaultVars = {
+        /**
+         * @var banner.icon.width
+         * @title Width
+         * @description Choose the width of the icon
+         * @type number|string
+         */
+        width: undefined as number | string | undefined,
+        /**
+         * @var banner.icon.height
+         * @title Height
+         * @description Choose the height of the icon
+         * @type number|string
+         */
+        height: undefined as number | string | undefined,
+        /**
+         * @varGroup banner.icon.margins
+         * @title Margins
+         * @description Set the margins around the icon
+         * @expand spacing
+         */
+        margins: Variables.spacing({}),
+        /**
+         * @var banner.icon.image
+         * @title Image
+         * @description The URL where the icon image is hosted
+         * @type string
+         */
+        image: undefined as string | undefined,
+        /**
+         * @var banner.icon.borderRadius
+         * @title Border Radius
+         * @description Choose the border radius of the icon
+         * @type number|string
+         */
+        borderRadius: undefined as number | string | undefined,
+    };
+
+    const iconInit = makeThemeVars("icon", {
+        ...iconDefaultVars,
+    });
+
+    const icon = makeThemeVars("icon", {
+        ...iconInit,
+        /**
+         * * @varGroup banner.icon.mobile
+         * FIXME: document icon.mobile vargroup whose options are the same as those above
+         */
+        mobile: {
+            ...iconInit,
         },
     });
 
@@ -420,8 +470,7 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
          */
         font: Variables.font({
             ...font,
-            size: globalVars.fonts.size.largeTitle,
-            weight: globalVars.fonts.weights.semiBold,
+            ...globalVars.fontSizeAndWeightVars("largeTitle", "semiBold"),
         }),
         /**
          * @varGroup banner.title.fontMobile
@@ -430,7 +479,8 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
          */
         fontMobile: Variables.font({
             ...font,
-            size: globalVars.fonts.size.title,
+            ...globalVars.fontSizeAndWeightVars("title"),
+            weight: font.weight,
         }),
         /**
          * @varGroup banner.title.margins
@@ -438,8 +488,7 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
          * @expand spacing
          */
         margins: Variables.spacing({
-            top: 18,
-            bottom: 8,
+            bottom: globalVars.spacer.headingItem,
         }),
         text: getMeta("ui.siteName", t("How can we help you?")),
     });
@@ -457,7 +506,8 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
          */
         font: Variables.font({
             ...font,
-            size: globalVars.fonts.size.large,
+            ...globalVars.fontSizeAndWeightVars("large"),
+            weight: font.weight,
         }),
         maxWidth: 400,
         /**
@@ -498,7 +548,7 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
              * @title Height
              * @description Height of the banner searchbar.
              */
-            height: 40,
+            height: Math.max(40, inputVariables().sizing.height),
         },
         border: {
             color: !isBordered ? colors.bg : colors.primary,
@@ -515,10 +565,11 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
             ...searchBarInit.sizing,
             heightMinusBorder: searchBarInit.sizing.height - searchBarInit.border.width * 2,
         },
-        font: {
+        font: Variables.font({
+            ...globalVars.fontSizeAndWeightVars("large"),
+            weight: font.weight,
             color: searchBarInit.input.fg,
-            size: globalVars.fonts.size.large,
-        },
+        }),
         margin: Variables.spacing({
             top: 24,
         }),
@@ -587,9 +638,9 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
 
     buttonBorderStyles.borderRadius = standardizeBorderRadius(buttonBorderStyles.borderRadius);
 
-    const searchButtonDropDown = makeThemeVars("searchButton", {
+    const searchButtonDropDown: IButtonType = makeThemeVars("searchButton", {
         name: "searchButton",
-        preset: { style: presets.button.preset },
+        presetName: presets.button.preset,
         spinnerColor: colors.primaryContrast,
         sizing: {
             minHeight: searchBar.sizing.height,
@@ -610,26 +661,25 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
             },
         },
         fonts: {
-            size: globalVars.fonts.size.large,
-            weight: globalVars.fonts.weights.bold,
+            ...globalVars.fontSizeAndWeightVars("large", "bold"),
         },
         state: buttonStateStyles,
-    } as IButtonType);
+    });
 
-    const searchButtonType = {
+    const buttonColorSolidBordered = colors.fg ?? font.color;
+    const searchButtonType: IButtonType = {
         name: "searchButton",
-        preset: { style: presets.button.preset },
+        presetName: presets.button.preset,
         sizing: {
             minHeight: searchBar.sizing.height,
         },
         colors: {
             bg: isSolidBordered ? colors.bg : searchButtonBg,
-            fg: isSolidButton && isBordered ? font.color : colors.bg,
+            fg: isSolidButton && isBordered ? buttonColorSolidBordered : colors.bg,
         },
         borders: buttonBorderStyles,
         fonts: {
-            size: globalVars.fonts.size.large,
-            weight: globalVars.fonts.weights.bold,
+            ...globalVars.fontSizeAndWeightVars("large", "bold"),
         },
         state: buttonStateStyles,
     };
@@ -640,14 +690,14 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
         const buttonVars = buttonVariables();
         searchButton.state = {
             ...searchButton.state,
-            ...buttonVars.primary.state,
+            ...buttonVars.primary!.state,
         };
-        searchButton.colors = buttonVars.primary.colors;
-        searchButton.borders!.color = buttonVars.primary.borders.color;
+        searchButton.colors = buttonVars.primary!.colors;
+        searchButton.borders!.color = buttonVars.primary.borders!.color;
 
         searchButtonDropDown.state = buttonVars.primary.state;
         searchButtonDropDown.colors = buttonVars.primary.colors;
-        searchButtonDropDown.borders!.color = buttonVars.primary.borders.color;
+        searchButtonDropDown.borders!.color = buttonVars.primary.borders!.color;
     }
 
     const buttonShadow = makeThemeVars("shadow", {
@@ -666,7 +716,7 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
             }),
         )
             .fade(0.1)
-            .toString() as BackgroundColorProperty,
+            .toString(),
     });
 
     /**
@@ -695,7 +745,7 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
             bottom: 12,
         }),
         mobile: {
-            bg: undefined as BackgroundColorProperty | undefined,
+            bg: undefined as Property.BackgroundColor | undefined,
             minHeight: undefined as "string" | number | undefined,
             offset: undefined as "string" | number | undefined,
             padding: Variables.spacing({
@@ -729,6 +779,7 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
         isTransparentButton,
         searchStrip,
         logo,
+        icon,
         searchButtonDropDown,
         searchButtonBg,
     };
@@ -836,7 +887,7 @@ export const bannerClasses = useThemeCache(
         });
 
         const defaultBannerSVG = style("defaultBannerSVG", {
-            ...absolutePosition.fullSizeOfParent(),
+            ...Mixins.absolute.fullSizeOfParent(),
         });
 
         const backgroundOverlay = style("backgroundOverlay", {
@@ -935,7 +986,31 @@ export const bannerClasses = useThemeCache(
             },
         });
 
-        const icon = style("icon", {});
+        const iconContainer = style("iconContainer", {
+            ...lineHeightAdjustment(),
+            ...Mixins.margin(vars.icon.margins),
+        });
+
+        const icon = style("icon", {
+            width: styleUnit(vars.icon.width),
+            maxWidth: styleUnit(vars.icon.width),
+            height: styleUnit(vars.icon.height),
+            maxHeight: styleUnit(vars.icon.height),
+            borderRadius: vars.icon.borderRadius,
+
+            ...mediaQueries({
+                [LayoutTypes.THREE_COLUMNS]: {
+                    oneColumnDown: {
+                        width: styleUnit(vars.icon.mobile.width),
+                        maxWidth: styleUnit(vars.icon.mobile.width),
+                        height: styleUnit(vars.icon.mobile.height),
+                        maxHeight: styleUnit(vars.icon.mobile.height),
+                        borderRadius: vars.icon.mobile.borderRadius,
+                    },
+                },
+            }),
+        });
+
         const input = style("input", {});
 
         const buttonLoader = style("buttonLoader", {});
@@ -955,25 +1030,33 @@ export const bannerClasses = useThemeCache(
             },
         });
 
-        const textWrapMixin: CSSObject = {
+        const titleAction = style("titleAction", {});
+
+        const iconTextAndSearchContainer = style("iconTextAndSearchContainer", {
+            display: "flex",
+            flexDirection: "row",
+            flexWrap: "wrap",
+            width: percent(100),
+        });
+
+        const textAndSearchContainer = style("textAndSearchContainer", {
+            display: "flex",
+            flexDirection: "column",
+            width: percent(100),
+            flexBasis: styleUnit(vars.searchBar.sizing.maxWidth),
+            flexGrow: 0,
+
+            marginLeft: isCentered ? "auto" : undefined,
+            marginRight: isCentered ? "auto" : undefined,
+        });
+
+        const titleWrap = style("titleWrap", {
+            ...Mixins.margin(vars.title.margins),
             display: "flex",
             flexWrap: "nowrap",
             alignItems: "center",
-            maxWidth: styleUnit(vars.searchBar.sizing.maxWidth),
-            width: percent(100),
-            marginLeft: isCentered ? "auto" : undefined,
-            marginRight: isCentered ? "auto" : undefined,
-            ...mediaQueries({
-                [LayoutTypes.THREE_COLUMNS]: {
-                    oneColumnDown: {
-                        maxWidth: percent(100),
-                    },
-                },
-            }),
-        };
+        });
 
-        const titleAction = style("titleAction", {});
-        const titleWrap = style("titleWrap", { ...Mixins.margin(vars.title.margins), ...textWrapMixin });
         const titleUrlWrap = style("titleUrlWrap", {
             marginLeft: isCentered ? "auto" : undefined,
             marginRight: isCentered ? "auto" : undefined,
@@ -989,7 +1072,7 @@ export const bannerClasses = useThemeCache(
             ...{
                 ".searchBar-actionButton:after": {
                     content: quote(""),
-                    ...absolutePosition.middleOfParent(),
+                    ...Mixins.absolute.middleOfParent(),
                     width: px(20),
                     height: px(20),
                     backgroundColor: ColorsUtils.colorOut(vars.buttonShadow.background),
@@ -1009,7 +1092,9 @@ export const bannerClasses = useThemeCache(
 
         const descriptionWrap = style("descriptionWrap", {
             ...Mixins.margin(vars.description.margins),
-            ...textWrapMixin,
+            display: "flex",
+            flexWrap: "nowrap",
+            alignItems: "center",
         });
 
         const description = style("description", {
@@ -1048,7 +1133,7 @@ export const bannerClasses = useThemeCache(
             {
                 alignSelf: "stretch",
                 maxWidth: makeImageMinWidth(
-                    layoutVariables().contentWidth,
+                    panelLayoutVariables().contentWidth,
                     containerVariables().spacing.padding * 2 * 2,
                 ),
                 flexGrow: 1,
@@ -1056,12 +1141,12 @@ export const bannerClasses = useThemeCache(
                 overflow: "hidden",
             },
             media(
-                { maxWidth: layoutVariables().contentWidth },
+                { maxWidth: panelLayoutVariables().contentWidth },
                 {
                     minWidth: makeImageMinWidth("100vw", containerVariables().spacing.padding * 2),
                 },
             ),
-            layoutVariables()
+            panelLayoutVariables()
                 .mediaQueries()
                 .oneColumnDown({
                     minWidth: makeImageMinWidth("100vw", containerVariables().spacing.mobile.padding * 2),
@@ -1116,7 +1201,7 @@ export const bannerClasses = useThemeCache(
         const rightImage = style(
             "rightImage",
             {
-                ...absolutePosition.fullSizeOfParent(),
+                ...Mixins.absolute.fullSizeOfParent(),
                 minWidth: styleUnit(vars.rightImage.minWidth),
                 objectPosition: "100% 50%",
                 objectFit: "contain",
@@ -1160,7 +1245,7 @@ export const bannerClasses = useThemeCache(
 
         // Use this for cutting of the right image with overflow hidden.
         const overflowRightImageContainer = style("overflowRightImageContainer", {
-            ...absolutePosition.fullSizeOfParent(),
+            ...Mixins.absolute.fullSizeOfParent(),
             overflow: "hidden",
         });
 
@@ -1168,12 +1253,10 @@ export const bannerClasses = useThemeCache(
             height: percent(100),
         });
 
-        const iconContainer = style("iconContainer", {});
-
         const resultsAsModal = style("resultsAsModal", {
             "&&": {
                 top: styleUnit(vars.searchBar.sizing.height + 2),
-                ...layoutVariables()
+                ...panelLayoutVariables()
                     .mediaQueries()
                     .xs({
                         width: viewWidth(100),
@@ -1236,12 +1319,13 @@ export const bannerClasses = useThemeCache(
             contentContainer,
             valueContainer,
             text,
-            icon,
             defaultBannerSVG,
             searchContainer,
             searchButton,
             input,
             buttonLoader,
+            iconTextAndSearchContainer,
+            textAndSearchContainer,
             title,
             titleAction,
             titleFlexSpacer,
@@ -1251,6 +1335,7 @@ export const bannerClasses = useThemeCache(
             descriptionWrap,
             content,
             iconContainer,
+            icon,
             resultsAsModal,
             backgroundOverlay,
             imageElementContainer,

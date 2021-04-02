@@ -18,7 +18,7 @@ import { CSSObject } from "@emotion/css";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { LogoAlignment } from "./LogoAlignment";
-import { BackgroundProperty } from "csstype";
+import { Property } from "csstype";
 import { IThemeVariables } from "@library/theming/themeReducer";
 
 /**
@@ -76,7 +76,7 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
          * This can be useful to add contrast to a titlebar background that otherwise might not have enough.
          * @default linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.3))
          */
-        background: undefined as BackgroundProperty<TLength> | Array<BackgroundProperty<TLength>> | undefined,
+        background: undefined as Property.Background<TLength> | Array<Property.Background<TLength>> | undefined,
     });
 
     const colorsInit = makeThemeVars("colors", {
@@ -144,6 +144,8 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
         },
     });
 
+    const mobileColors = makeThemeVars("mobileColors", colors);
+
     /**
      * @varGroup titleBar.border
      * @title TitleBar - Border
@@ -164,12 +166,9 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
     // If spacing.paddingBottom is set, this value will be different than the height. To be used if you need to get the full height, not just the contents height.
     const fullHeight =
         getPixelNumber(sizing.height) +
-            getPixelNumber(spacing.padding.bottom) +
-            getPixelNumber(spacing.padding.top) +
-            border.type ==
-        BorderType.SHADOW_AS_BORDER
-            ? getPixelNumber(border.width)
-            : 0;
+        getPixelNumber(spacing.padding.bottom) +
+        getPixelNumber(spacing.padding.top) +
+        (border.type == BorderType.SHADOW_AS_BORDER ? getPixelNumber(border.width) : 0);
 
     /**
      * @varGroup titleBar.swoop
@@ -306,6 +305,8 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
 
     const guest = makeThemeVars("guest", {
         spacer: 8,
+        signInButtonType: ButtonTypes.TRANSPARENT,
+        registerButtonType: ButtonTypes.TRANSLUCID,
     });
 
     const buttonSize = globalVars.buttonIcon.size;
@@ -403,6 +404,11 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
             weight: 0.1,
             inverse: true,
         }),
+        border: {
+            ...Variables.border({
+                color: colors.fg,
+            }),
+        },
         hover: {
             bg: ColorsUtils.modifyColorBasedOnLightness({
                 color: globalVars.mainColors.primary,
@@ -444,10 +450,10 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
          * - hidden - Hide the logo in the titlebar.
          * - fade-in - Fade the logo in after the custom theme header scrolls of the page.
          * @type string
-         * @enum visible | hidden | fade-in
+         * @enum visible | hidden | fade-in | mobile-only
          * @default visible
          */
-        doubleLogoStrategy: "visible" as "hidden" | "visible" | "fade-in",
+        doubleLogoStrategy: "visible" as "hidden" | "visible" | "fade-in" | "mobile-only",
         /**
          * @var titleBar.logo.offsetRight
          * @title Right Margin
@@ -562,6 +568,7 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
         border,
         sizing,
         colors,
+        mobileColors,
         overlay,
         signIn,
         resister,

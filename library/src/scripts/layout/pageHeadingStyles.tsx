@@ -9,6 +9,7 @@ import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleUnit } from "@library/styles/styleUnit";
+import { css } from "@emotion/css";
 
 export const pageHeadingVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -36,16 +37,15 @@ export const pageHeadingVariables = useThemeCache(() => {
 export const pageHeadingClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = pageHeadingVariables();
-    const style = styleFactory("pageHeading");
 
-    const root = style({
+    const root = css({
         display: "flex",
         width: percent(100),
         lineHeight: vars.font.lineHeight,
-        alignItems: "flex-start",
+        alignItems: "center",
     });
 
-    const main = style("main", {
+    const main = css({
         display: "flex",
         flexWrap: "nowrap",
         position: "relative",
@@ -53,64 +53,34 @@ export const pageHeadingClasses = useThemeCache(() => {
         flexGrow: 1,
     });
 
-    const titleBar = style("titleBar", {
+    const titleBar = css({
         display: "flex",
         position: "relative",
         alignItems: "center",
     });
 
-    const actions = (fontSize?: number | null) => {
-        return style(
-            "actions",
-            {
-                display: "flex",
-                marginLeft: styleUnit(vars.cta.margin),
-                position: "relative",
-                alignSelf: "flex-start",
-                zIndex: 1,
-            },
-            fontSize
-                ? {
-                      top: ".5em",
-                      fontSize: styleUnit(fontSize),
-                      transform: `translateY(-50%)`,
-                  }
-                : {},
-        );
-    };
-
-    const link = style("link", {
-        display: "block",
-        height: styleUnit(globalVars.icon.sizes.default),
-        width: styleUnit(globalVars.icon.sizes.default),
-        color: "inherit",
-    });
-
-    const titleWrap = style("titleWrap", {
+    const titleWrap = css({
         position: "relative",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        flex: 1,
     });
 
-    const actionButton = style("actionIcon", {
-        width: px(20),
-        height: px(20),
-    });
+    const actions = css({
+        display: "flex",
+        alignItems: "center",
 
-    const lineHeightCentering = (lineHeight: number) => {
-        // px value of line height
-        return style("lineHeightCentering", {
-            top: styleUnit(lineHeight / 2),
-            transform: `translateY(-50%)`,
-        });
-    };
+        "& > *": {
+            marginLeft: globalVars.gutter.size,
+        },
+    });
 
     return {
         root,
         main,
         titleBar,
-        actions,
-        link,
         titleWrap,
-        actionButton,
-        lineHeightCentering,
+        actions,
     };
 });

@@ -16,7 +16,7 @@ import { percent, translate, em } from "csx";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { relative } from "path";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 
@@ -53,9 +53,8 @@ export const messagesVariables = useThemeCache(() => {
 
     const text = themeVars("text", {
         font: Variables.font({
+            ...globalVars.fontSizeAndWeightVars("medium", "normal"),
             color: colors.fg,
-            size: globalVars.fonts.size.medium,
-            weight: globalVars.fonts.weights.normal,
             lineHeight: globalVars.lineHeights.condensed,
         }),
     });
@@ -71,8 +70,7 @@ export const messagesVariables = useThemeCache(() => {
             left: spacing.padding.withoutIcon / 2,
         },
         font: Variables.font({
-            size: globalVars.fonts.size.medium,
-            weight: globalVars.fonts.weights.semiBold,
+            ...globalVars.fontSizeAndWeightVars("medium", "semiBold"),
             color: globalVars.mainColors.fg,
         }),
         minHeight: formElVars.sizing.height,
@@ -93,7 +91,7 @@ export const messagesClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const style = styleFactory("messages");
     const titleBarVars = titleBarVariables();
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = panelLayoutVariables().mediaQueries();
     const shadows = shadowHelper();
 
     const hasIcon = style("hasIcon", {});

@@ -4,7 +4,9 @@
  */
 
 import React from "react";
-import { IUserFragment } from "@library/@types/api/users";
+import { IMe, IUser, IUserFragment } from "@library/@types/api/users";
+import { ICrumb } from "@library/navigation/Breadcrumbs";
+import { ITag } from "@library/features/tags/TagsReducer";
 
 export const STORY_IMAGE = require("./storyDataImage.png");
 export const STORY_ICON = require("./storyDataImage.png");
@@ -21,12 +23,36 @@ export const STORY_IPSUM_SHORT = STORY_IPSUM_LONG.slice(0, 50) + "…";
 
 export const STORY_DATE = "2019-05-05T15:51:23+00:00";
 
-export const STORY_USER: IUserFragment = {
+export const STORY_USER: IUser = {
     userID: 1,
-    name: "Joe",
+    name: "Joe Walsh",
     dateLastActive: "2016-07-25 17:51:15",
     photoUrl: "https://user-images.githubusercontent.com/1770056/74098133-6f625100-4ae2-11ea-8a9d-908d70030647.png",
-    label: "User Label",
+    label: "SuperModerator",
+    title: "Manager",
+    email: "joe.walsh@example.com",
+    countDiscussions: 207,
+    countComments: 3456,
+    emailConfirmed: true,
+    showEmail: true,
+    bypassSpam: false,
+    banned: 0,
+    dateInserted: "2012-07-25 17:51:15",
+    hidden: false,
+    roles: [
+        {
+            roleID: 0,
+            name: "Moderator",
+        },
+    ],
+};
+
+export const STORY_ME_ADMIN: IMe = {
+    ...STORY_USER,
+    isAdmin: true,
+    permissions: [],
+    countUnreadConversations: 0,
+    countUnreadNotifications: 0,
 };
 
 export const StoryTextContent = (props: { firstTitle?: string }) => {
@@ -39,3 +65,34 @@ export const StoryTextContent = (props: { firstTitle?: string }) => {
         </div>
     );
 };
+
+export const STORY_CRUMBS: ICrumb[] = [
+    { name: "Success", url: "https://dev.vanilla.localhost/en-hutch/kb/success" },
+    {
+        name: "Appearance (Theming)",
+        url: "https://dev.vanilla.localhost/en-hutch/kb/categories/37-appearance-theming",
+    },
+];
+
+export const STORY_TAGS: ITag[] = [
+    {
+        tagID: 1,
+        name: "UserTag",
+        urlcode: "usertag",
+    },
+    {
+        tagID: 2,
+        name: "User Tag2",
+        urlcode: "usertag2",
+    },
+    {
+        tagID: 3,
+        name: "User Tag 3",
+        urlcode: "usertag3",
+    },
+    {
+        tagID: 3,
+        name: "UserTag4",
+        urlcode: "usertag4",
+    },
+];

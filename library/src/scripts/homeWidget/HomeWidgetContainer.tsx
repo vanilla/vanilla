@@ -3,37 +3,100 @@
  * @license GPL-2.0-only
  */
 
-import React, { useRef } from "react";
+import { cx } from "@emotion/css";
 import {
-    IHomeWidgetContainerOptions,
     homeWidgetContainerClasses,
     homeWidgetContainerVariables,
+    IHomeWidgetContainerOptions,
 } from "@library/homeWidget/HomeWidgetContainer.styles";
+import Container from "@library/layout/components/Container";
+import { PageHeadingBox } from "@library/layout/PageHeadingBox";
+import { useWidgetLayoutClasses } from "@library/layout/WidgetLayout.context";
+import { navLinksClasses } from "@library/navigation/navLinksStyles";
+import LinkAsButton from "@library/routing/LinkAsButton";
+import { BorderType } from "@library/styles/styleHelpers";
+import { Variables } from "@library/styles/Variables";
+import { t } from "@vanilla/i18n";
 import { useMeasure } from "@vanilla/react-utils";
 import classNames from "classnames";
-import Heading from "@library/layout/Heading";
-import { BorderType } from "@library/styles/styleHelpers";
-import LinkAsButton from "@library/routing/LinkAsButton";
-import { t } from "@vanilla/i18n";
-import Container from "@library/layout/components/Container";
-import { navLinksClasses } from "@library/navigation/navLinksStyles";
+import React, { useMemo, useRef } from "react";
 
 export interface IHomeWidgetContainerProps {
     options?: IHomeWidgetContainerOptions;
     children: React.ReactNode;
     title?: string;
-    isGrid?: boolean;
+    subtitle?: string;
+    description?: string;
 }
 
 export function HomeWidgetContainer(props: IHomeWidgetContainerProps) {
-    const isGrid = props.isGrid ?? true;
-    const options = homeWidgetContainerVariables(props.options).options;
+    const vars = homeWidgetContainerVariables(props.options);
+    const { options } = vars;
+    const classes = homeWidgetContainerClasses(props.options);
+    const isGrid = options.isGrid;
+    const widgetClasses = useWidgetLayoutClasses();
+
+    const content = isGrid ? (
+        <HomeWidgetGridContainer {...props}>{props.children}</HomeWidgetGridContainer>
+    ) : (
+        props.children
+    );
+
+    const viewAllButton = options?.viewAll?.to && (
+        <LinkAsButton to={options?.viewAll?.to} baseClass={options.viewAll.displayType}>
+            {options?.viewAll?.name ?? t("View All")}
+        </LinkAsButton>
+    );
+
+    const hasOuterBg = Variables.boxHasBackground(Variables.box({ background: options.outerBackground }));
+
+    const isNavLinks = options.borderType === "navLinks";
+    const widgetClass = hasOuterBg ? widgetClasses.widgetWithContainerClass : widgetClasses.widgetClass;
+
+    return (
+        <>
+            {isNavLinks && (
+                <Container fullGutter narrow>
+                    <div className={classes.separator}>
+                        <hr className={classNames(navLinksClasses().separator)}></hr>
+                        {/* Needed to bypass a :last-child check that hides these */}
+                        <span></span>
+                    </div>
+                </Container>
+            )}
+            <div className={cx(!isNavLinks && widgetClass, classes.root)}>
+                <Container fullGutter narrow={options.maxColumnCount <= 2 || isNavLinks}>
+                    <div className={classes.container}>
+                        <PageHeadingBox
+                            title={props.title}
+                            actions={options.viewAll.position === "top" && viewAllButton}
+                            description={props.subtitle ?? options.description}
+                            subtitle={props.subtitle ?? options?.subtitle?.content}
+                            options={{
+                                subtitleType: options.subtitle.type,
+                                alignment: options.headerAlignment,
+                            }}
+                        />
+                        <div className={classes.content}>
+                            <div className={classes.itemWrapper}>{content}</div>
+                            {viewAllButton && options.viewAll.position === "bottom" && (
+                                <div className={classes.viewAllContainer}>{viewAllButton}</div>
+                            )}
+                        </div>
+                    </div>
+                </Container>
+            </div>
+        </>
+    );
+}
+
+export function HomeWidgetGridContainer(props: IHomeWidgetContainerProps) {
     const classes = homeWidgetContainerClasses(props.options);
 
     const firstItemRef = useRef<HTMLDivElement | null>(null);
     const firstItemMeasure = useMeasure(firstItemRef);
 
-    const grid = isGrid ? (
+    return (
         <div className={classes.grid}>
             {React.Children.map(props.children, (child, i) => {
                 return (
@@ -53,57 +116,5 @@ export function HomeWidgetContainer(props: IHomeWidgetContainerProps) {
                 );
             })}
         </div>
-    ) : (
-        props.children
     );
-
-    const gridHasBorder = [BorderType.BORDER, BorderType.SHADOW].includes(options.borderType as BorderType);
-
-    const viewAllButton = options?.viewAll?.to && (
-        <LinkAsButton to={options?.viewAll?.to} baseClass={options.viewAll.displayType} className={classes.viewAll}>
-            {options?.viewAll?.name ?? t("View All")}
-        </LinkAsButton>
-    );
-
-    const subtitle = props.options?.subtitle?.content && (
-        <h2 className={classes.subtitle}>{props.options?.subtitle?.content}</h2>
-    );
-
-    let content = (
-        <div className={classes.container}>
-            {options.borderType === "navLinks" && (
-                <hr className={classNames(navLinksClasses().separator, classes.separator)}></hr>
-            )}
-            <div className={classNames(!options.noGutter && classes.verticalContainer)}>
-                <div className={classes.content}>
-                    {options.subtitle.type === "overline" && subtitle}
-                    <div className={classes.viewAllContainer}>
-                        {props.title && (
-                            <Heading className={classes.title} renderAsDepth={1}>
-                                {props.title}
-                            </Heading>
-                        )}
-                        {options.viewAll.position === "top" && viewAllButton}
-                    </div>
-                    {options.subtitle.type === "standard" && subtitle}
-                    {props.options?.description && (
-                        <div className={classes.description}>{props.options.description}</div>
-                    )}
-                    {!gridHasBorder && grid}
-                </div>
-                {gridHasBorder && <div className={classes.borderedContent}>{grid}</div>}
-                {viewAllButton && options.viewAll.position === "bottom" && (
-                    <div className={classes.viewAllContent}>
-                        <div className={classes.viewAllContainer}>{viewAllButton}</div>{" "}
-                    </div>
-                )}
-            </div>
-        </div>
-    );
-
-    if (!options.noGutter) {
-        content = <Container fullGutter>{content}</Container>;
-    }
-
-    return <div className={classes.root}>{content}</div>;
 }

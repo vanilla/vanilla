@@ -150,4 +150,13 @@ class MockSiteSection implements SiteSectionInterface {
     public function getSectionThemeID() {
         return $this->themeID;
     }
+
+    /**
+     * Get categoryID associated to site-section.
+     *
+     * @return int|null
+     */
+    public function getCategoryID() {
+        return -1;
+    }
 }

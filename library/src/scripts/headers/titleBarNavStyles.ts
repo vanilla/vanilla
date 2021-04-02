@@ -6,7 +6,7 @@
 
 import { percent, px, calc, quote, rgba } from "csx";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
-import { absolutePosition, flexHelper, negative, userSelect } from "@library/styles/styleHelpers";
+import { flexHelper, negative, userSelect } from "@library/styles/styleHelpers";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
 import { styleFactory, variableFactory } from "@library/styles/styleUtils";
@@ -15,9 +15,17 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { LogoAlignment } from "@library/headers/LogoAlignment";
 import { Mixins } from "@library/styles/Mixins";
+import { Variables } from "@library/styles/Variables";
+import { LocalVariableMapping } from "@library/styles/VariableMapping";
 
 export const titleBarNavigationVariables = useThemeCache(() => {
-    const makeThemeVars = variableFactory("titleBarNavigation");
+    const makeThemeVars = variableFactory(
+        "titleBarNavigation",
+        undefined,
+        new LocalVariableMapping({
+            "navLinks.font.size": "navLinks.fontSize",
+        }),
+    );
     const globalVars = globalVariables();
     const varsFormElements = formElementsVariables();
     const titleBarVars = titleBarVariables();
@@ -42,8 +50,24 @@ export const titleBarNavigationVariables = useThemeCache(() => {
         maxWidth: 40,
     });
 
+    /**
+     * @varGroup titleBarNavigation.navLinks
+     * @description Variables for styling titlebar navigation links
+     */
     const navLinks = makeThemeVars("navLinks", {
-        fontSize: 14,
+        /**
+         * @varGroup titleBarNavigation.navLinks.font
+         * @expand font
+         */
+        font: Variables.font({
+            size: 14,
+            color: titleBarVars.colors.fg,
+            textDecoration: "auto",
+        }),
+        /**
+         * @varGroup titleBarNavigation.navLinks.padding
+         * @expand spacing
+         */
         padding: {
             left: 8,
             right: 8,
@@ -88,15 +112,17 @@ const titleBarNavClasses = useThemeCache(() => {
 
     const navigation = style(
         "navigation",
-        titleBarVars.logo.doubleLogoStrategy === "hidden" || titleBarVars.logo.justifyContent === LogoAlignment.CENTER
+        titleBarVars.logo.doubleLogoStrategy === "hidden" ||
+            titleBarVars.logo.doubleLogoStrategy === "mobile-only" ||
+            titleBarVars.logo.justifyContent === LogoAlignment.CENTER
             ? {
-                  marginLeft: styleUnit(-(vars.padding.horizontal + vars.navLinks.padding.left)),
+                  marginLeft: styleUnit(-(vars.padding.horizontal * 2 + vars.navLinks.padding.left)),
               }
             : {},
     );
 
     const navigationCentered = style("navigationCentered", {
-        ...absolutePosition.middleOfParent(true),
+        ...Mixins.absolute.middleOfParent(true),
         display: "inline-flex",
     });
 
@@ -116,18 +142,16 @@ const titleBarNavClasses = useThemeCache(() => {
 
     const link = style("link", {
         ...userSelect(),
-        color: ColorsUtils.colorOut(titleBarVars.colors.fg),
         whiteSpace: "nowrap",
         lineHeight: globalVars.lineHeights.condensed,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         minHeight: styleUnit(vars.item.size),
-        textDecoration: "none",
         alignSelf: "center",
         paddingLeft: styleUnit(vars.navLinks.padding.left),
         paddingRight: styleUnit(vars.navLinks.padding.right),
-        fontSize: styleUnit(vars.navLinks.fontSize),
+        ...Mixins.font(vars.navLinks.font),
         ...{
             "&.focus-visible": {
                 color: ColorsUtils.colorOut(titleBarVars.colors.state.fg),
@@ -149,7 +173,7 @@ const titleBarNavClasses = useThemeCache(() => {
     const linkActive = style("linkActive", {
         ...{
             "&:after": {
-                ...absolutePosition.topLeft(
+                ...Mixins.absolute.topLeft(
                     `calc(50% - ${styleUnit(vars.linkActive.height + vars.linkActive.bottomSpace)})`,
                 ),
                 maxWidth: styleUnit(vars.linkActive.maxWidth),

@@ -13,7 +13,7 @@ import { useThemeCache } from "@library/styles/themeCache";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { color, important, percent, rgba } from "csx";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 import { bannerVariables } from "@library/banner/bannerStyles";
 import { SearchBarPresets } from "@library/banner/SearchBarPresets";
@@ -107,8 +107,7 @@ export const compactSearchVariables = useThemeCache((forcedVars?: IThemeVariable
         },
         fonts: {
             color: fgColor,
-            size: globalVars.fonts.size.large,
-            weight: globalVars.fonts.weights.semiBold,
+            ...globalVars.fontSizeAndWeightVars("large", "semiBold"),
         },
         hover: {
             colors: {
@@ -169,7 +168,7 @@ export const compactSearchClasses = useThemeCache(() => {
     const titleBarVars = titleBarVariables();
     const vars = compactSearchVariables();
     const style = styleFactory("compactSearch");
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = panelLayoutVariables().mediaQueries();
     inputClasses().applyInputCSSRules();
 
     const root = style({

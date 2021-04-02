@@ -13,6 +13,7 @@ use Vanilla\AddonManager;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Http\InternalClient;
 use Vanilla\Web\Asset\DeploymentCacheBuster;
+use Vanilla\Theme\ThemeAssetFactory;
 
 /**
  * Test the /api/v2/themes endpoints.
@@ -31,8 +32,8 @@ class ThemesTest extends AbstractAPIv2Test {
         parent::setupBeforeClass();
 
         /** @var AddonManager */
-        $theme = new Addon("/tests/fixtures/themes/asset-test");
-
+        $theme = new Addon("/tests/fixtures/themes/asset-test-no-parent");
+        /** @var AddonManager */
         static::container()
             ->get(AddonManager::class)
             ->add($theme);
@@ -46,13 +47,13 @@ class ThemesTest extends AbstractAPIv2Test {
     public function provideAssetTypes(): array {
         $fixturesDir = PATH_ROOT . "/tests/fixtures";
         return [
-            ["asset-test", "fonts.json", trim(file_get_contents("{$fixturesDir}/themes/asset-test/assets/fonts.json")), "application/json"],
-            ["asset-test", "footer.html", file_get_contents("{$fixturesDir}/themes/asset-test/assets/footer.html"), "text/html"],
-            ["asset-test", "header.html", file_get_contents("{$fixturesDir}/themes/asset-test/assets/header.html"), "text/html"],
-            ["asset-test", "javascript.js", file_get_contents("{$fixturesDir}/themes/asset-test/assets/javascript.js"), "application/javascript"],
-            ["asset-test", "scripts.json", trim(file_get_contents("{$fixturesDir}/themes/asset-test/assets/scripts.json")), "application/json"],
-            ["asset-test", "styles.css", file_get_contents("{$fixturesDir}/themes/asset-test/assets/styles.css"), "text/css"],
-            ["asset-test", "variables.json", trim(file_get_contents("{$fixturesDir}/themes/asset-test/assets/variables.json")), "application/json"],
+            ["asset-test-no-parent", "fonts.json", trim(file_get_contents("{$fixturesDir}/themes/asset-test-no-parent/assets/fonts.json")), "application/json"],
+            ["asset-test-no-parent", "footer.html", file_get_contents("{$fixturesDir}/themes/asset-test-no-parent/assets/footer.html"), "text/html"],
+            ["asset-test-no-parent", "header.html", file_get_contents("{$fixturesDir}/themes/asset-test-no-parent/assets/header.html"), "text/html"],
+            ["asset-test-no-parent", "javascript.js", file_get_contents("{$fixturesDir}/themes/asset-test-no-parent/assets/javascript.js"), "application/javascript"],
+            ["asset-test-no-parent", "scripts.json", trim(file_get_contents("{$fixturesDir}/themes/asset-test-no-parent/assets/scripts.json")), "application/json"],
+            ["asset-test-no-parent", "styles.css", file_get_contents("{$fixturesDir}/themes/asset-test-no-parent/assets/styles.css"), "text/css"],
+            ["asset-test-no-parent", "variables.json", trim(file_get_contents("{$fixturesDir}/themes/asset-test-no-parent/assets/variables.json")), "application/json"],
         ];
     }
 
@@ -78,10 +79,10 @@ class ThemesTest extends AbstractAPIv2Test {
      * @return array
      */
     public function provideAssetTypesNoExt(): array {
-        $assetRoot = PATH_ROOT . "/tests/fixtures/themes/asset-test/assets";
+        $assetRoot = PATH_ROOT . "/tests/fixtures/themes/asset-test-no-parent/assets";
         return [
             'fonts' => [
-                "asset-test",
+                "asset-test-no-parent",
                 "fonts",
                 [
                     'type' => 'json',
@@ -90,7 +91,7 @@ class ThemesTest extends AbstractAPIv2Test {
                 ],
             ],
             'variables' => [
-                "asset-test",
+                "asset-test-no-parent",
                 "variables",
                 [
                     'type' => 'json',
@@ -99,7 +100,7 @@ class ThemesTest extends AbstractAPIv2Test {
                 ],
             ],
             'scripts' => [
-                "asset-test",
+                "asset-test-no-parent",
                 "scripts",
                 [
                     'type' => 'json',
@@ -108,7 +109,7 @@ class ThemesTest extends AbstractAPIv2Test {
                 ],
             ],
             'header' => [
-                "asset-test",
+                "asset-test-no-parent",
                 "header",
                 [
                     'type' => 'html',
@@ -117,7 +118,7 @@ class ThemesTest extends AbstractAPIv2Test {
                 ],
             ],
             'footer' => [
-                "asset-test",
+                "asset-test-no-parent",
                 "footer",
                 [
                     'type' => 'html',
@@ -126,7 +127,7 @@ class ThemesTest extends AbstractAPIv2Test {
                 ],
             ],
             'javascript' => [
-                "asset-test",
+                "asset-test-no-parent",
                 "javascript",
                 [
                     'type' => 'js',
@@ -135,7 +136,7 @@ class ThemesTest extends AbstractAPIv2Test {
                 ],
             ],
             'styles' => [
-                "asset-test",
+                "asset-test-no-parent",
                 "styles",
                 [
                     'type' => 'css',
@@ -171,13 +172,13 @@ class ThemesTest extends AbstractAPIv2Test {
      * Test getting a theme by its name.
      */
     public function testGetByName() {
-        $response = $this->api()->get("themes/asset-test");
+        $response = $this->api()->get("themes/asset-test-no-parent");
 
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertStringStartsWith("application/json", $response->getHeader("Content-Type"));
 
         $body = json_decode($response->getRawBody(), true);
-        $this->assertEquals("asset-test", $body["themeID"]);
+        $this->assertEquals("asset-test-no-parent", $body["themeID"]);
         $this->assertEquals("themeFile", $body["type"]);
         $this->assertNotEmpty($body["assets"]);
 
@@ -213,7 +214,7 @@ class ThemesTest extends AbstractAPIv2Test {
         $logo = "logo.png";
         self::container()->get(Gdn_Configuration::class)->set("Garden.Logo", $logo);
 
-        $response = $this->api()->get("themes/asset-test");
+        $response = $this->api()->get("themes/asset-test-no-parent");
         $body = json_decode($response->getRawBody(), true);
         $this->assertEquals($body["assets"]["logo"]["url"], Gdn_Upload::url($logo) . "?v=$cacheBuster");
     }
@@ -228,7 +229,7 @@ class ThemesTest extends AbstractAPIv2Test {
         $mobileLogo = "mobileLogo.png";
         self::container()->get(Gdn_Configuration::class)->set("Garden.MobileLogo", $mobileLogo);
 
-        $response = $this->api()->get("themes/asset-test");
+        $response = $this->api()->get("themes/asset-test-no-parent");
         $body = json_decode($response->getRawBody(), true);
         $this->assertEquals($body["assets"]["mobileLogo"]["url"], Gdn_Upload::url($mobileLogo) . "?v=$cacheBuster");
     }

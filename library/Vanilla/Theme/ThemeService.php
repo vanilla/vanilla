@@ -21,6 +21,8 @@ use VanillaTests\Fixtures\QuickLinks\MockQuickLinksVariableProvider;
  */
 class ThemeService {
 
+    private const MAX_PARENT_DEPTH = 3;
+
     /**
      * When fetching the current theme, accurate assets will be prioritized. CurrentTheme > MobileTheme
      */
@@ -136,6 +138,7 @@ class ThemeService {
      * @param ThemeProviderInterface $provider
      */
     public function addThemeProvider(ThemeProviderInterface $provider) {
+        $provider->setThemeService($this);
         $this->themeProviders[] = $provider;
     }
 
@@ -153,11 +156,54 @@ class ThemeService {
             return $this->normalizeTheme($result);
         }
 
-        $provider = $this->getThemeProvider($themeKey);
-        $theme = $provider->getTheme($themeKey, $query);
+        $theme = $this->lookupTheme($themeKey, $query);
+        $parentThemes = $this->lookupParentThemes($theme);
+
+        if (!empty($parentThemes)) {
+            $theme->mergeParentAssets(...$parentThemes);
+        }
+
         $theme = $this->normalizeTheme($theme);
         $this->cache->set($cacheKey, $theme);
         return $theme;
+    }
+
+    /**
+     * Lookup a theme with the correct provider.
+     *
+     * @param string $themeKey
+     * @param array $query
+     *
+     * @return Theme
+     */
+    private function lookupTheme(string $themeKey, array $query = []): Theme {
+        $provider = $this->getThemeProvider($themeKey);
+        $theme = $provider->getTheme($themeKey, $query);
+        return $theme;
+    }
+
+    /**
+     * Find all parent themes of the current theme to our max depth.
+     *
+     * @param Theme $theme
+     * @return Theme[]
+     */
+    private function lookupParentThemes(Theme $theme): array {
+        $parents = [];
+
+        $currentChild = $theme;
+        $depth = 1;
+        while ($parentKey = $currentChild->getParentThemeKey()) {
+            if ($depth >= self::MAX_PARENT_DEPTH) {
+                break;
+            }
+
+            $newParent = $this->lookupTheme($parentKey);
+            $parents[] = $newParent;
+            $currentChild = $newParent;
+            $depth++;
+        }
+        return $parents;
     }
 
     /**
@@ -191,7 +237,7 @@ class ThemeService {
         // Clear the cache.
         $this->cache->clear();
 
-        $theme = $this->normalizeTheme($theme);
+        $theme = $this->getTheme($theme->getThemeID());
         return $theme;
     }
 
@@ -416,6 +462,7 @@ class ThemeService {
                 $this->getTheme(self::FALLBACK_THEME_KEY);
             }
         } catch (\Exception $e) {
+            throw $e;
             trigger_error($e->getMessage(), E_USER_WARNING);
             // If we had some exception during this, fallback to the default.
             $this->getTheme(self::FALLBACK_THEME_KEY);
@@ -545,6 +592,7 @@ class ThemeService {
      * @return Theme Updated theme data.
      */
     private function normalizeTheme(Theme $theme): Theme {
+        $theme->ensureDefaultAssets();
         // Apply supported sections.
         $supportedSections = $this->themeSections->getModernSections();
         if ($theme->getFeatures()->useDataDrivenTheme()) {

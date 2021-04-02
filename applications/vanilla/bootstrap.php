@@ -6,7 +6,11 @@
  */
 
 use Garden\Container\Reference;
+use Vanilla\Community\CallToActionModule;
+use Vanilla\Community\RSSModule;
+use Vanilla\Community\SearchWidgetModule;
 use Vanilla\EmbeddedContent\EmbedService;
+use Vanilla\FeatureFlagHelper;
 use Vanilla\Forum\EmbeddedContent\Factories\CommentEmbedFactory;
 use Vanilla\Forum\EmbeddedContent\Factories\DiscussionEmbedFactory;
 use \Garden\Container;
@@ -47,13 +51,22 @@ Gdn::getContainer()
 
     ->rule(WidgetService::class)
     ->addCall('registerWidget', [\Vanilla\Community\CategoriesModule::class])
+    ->addCall('registerWidget', [\Vanilla\Community\UserSpotlightModule::class])
+    ->addCall('registerWidget', [RSSModule::class])
     ->rule(QuickLinksVariableProvider::class)
     ->addCall('addQuickLinkProvider', [new Reference(ForumQuickLinksProvider::class)])
+    ->rule(PermissionModel::class)
+    ->addCall('addJunctionModel', ['Category', new Reference(CategoryModel::class)]);
 ;
-
 
 if (Gdn::config('Tagging.Discussions.Enabled', false)) {
     Gdn::getContainer()
         ->rule(WidgetService::class)
         ->addCall('registerWidget', [TagModule::class]);
+}
+
+if (FeatureFlagHelper::featureEnabled("SearchWidget")) {
+    Gdn::getContainer()
+        ->rule(WidgetService::class)
+        ->addCall('registerWidget', [SearchWidgetModule::class]);
 }

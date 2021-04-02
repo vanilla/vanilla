@@ -7,17 +7,16 @@
 import React from "react";
 import { makeProfileUrl } from "../utility/appUtils";
 import classNames from "classnames";
-import { UserCardModuleLazyLoad } from "@library/features/users/modules/UserCardModuleLazyLoad";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import { hasPermission } from "@library/features/users/Permission";
+import { UserCardPopup, useUserCardTrigger } from "@library/features/userCard/UserCard";
+import { IUserFragment } from "@library/@types/api/users";
+import SmartLink from "@library/routing/links/SmartLink";
 
 interface IProps {
-    username: string;
-    userID: number;
+    userFragment: Partial<IUserFragment> & Pick<IUserFragment, "userID" | "name">;
     className?: string;
     children?: React.ReactNode;
     isUserCard?: boolean;
-    cardAsModal?: boolean;
     buttonType?: ButtonTypes;
 }
 
@@ -25,25 +24,38 @@ interface IProps {
  * Class representing a link to a users profile. This will do a full page refresh.
  */
 export default function ProfileLink(props: IProps) {
-    const { username, isUserCard = true, cardAsModal } = props;
-    const children = props.children || username;
-    const profileURL = makeProfileUrl(username);
-    if (isUserCard && hasPermission("profiles.view")) {
-        return (
-            <UserCardModuleLazyLoad
-                buttonType={props.buttonType}
-                buttonContent={children}
-                openAsModal={cardAsModal}
-                userID={props.userID}
-                buttonClass={props.className}
-                userURL={profileURL}
-            />
-        );
-    } else {
-        return (
-            <a href={profileURL} className={classNames(props.className)}>
-                {children}
-            </a>
-        );
+    const { userFragment, isUserCard = true } = props;
+
+    const link = <InnerLink {...props} />;
+
+    if (!isUserCard) {
+        return link;
     }
+
+    return (
+        <UserCardPopup userID={userFragment.userID} userFragment={userFragment}>
+            {link}
+        </UserCardPopup>
+    );
+}
+
+/**
+ * Class representing a link to a users profile. This will do a full page refresh.
+ */
+function InnerLink(props: IProps) {
+    const { userFragment, isUserCard = true } = props;
+    const children = props.children || userFragment.name;
+    const profileURL = makeProfileUrl(userFragment.name);
+    const context = useUserCardTrigger();
+
+    return (
+        <SmartLink
+            {...context.props}
+            ref={context.triggerRef as any}
+            to={profileURL}
+            className={classNames(props.className)}
+        >
+            {children}
+        </SmartLink>
+    );
 }

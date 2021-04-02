@@ -176,7 +176,7 @@ body {
 // Styles that only take affect when the rich editor is enabled.
 body.hasRichEditor {
     .richEditor ~ .TextBoxWrapper,
-    .CommentForm .PreviewButton,
+    .PreviewButton,
     #Form_Preview {
         // The text box wrapper can have $.show() called on it which adds an inline `display: block`.
         display: none !important;
@@ -203,7 +203,7 @@ body.hasRichEditor {
     }
 
     .richEditor ~ .TextBoxWrapper,
-    .CommentForm .PreviewButton,
+    .PreviewButton,
     #Form_Preview {
         // The text box wrapper can have $.show() called on it which adds an inline `display: block`.
         display: none !important;

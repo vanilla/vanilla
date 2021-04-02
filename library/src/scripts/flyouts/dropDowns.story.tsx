@@ -16,7 +16,7 @@ import { FlyoutType } from "@library/flyouts/DropDown";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import StoryExampleMessagesDropDown from "@library/flyouts/StoryExampleDropDownMessages";
 import StorybookExampleNotificationsDropDown from "@library/headers/mebox/pieces/StorybookExampleNotificationsDropDown";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 
 const story = storiesOf("Components/Dropdowns", module);
 
@@ -61,7 +61,10 @@ story.add(
     },
     {
         chromatic: {
-            viewports: [layoutVariables().panelLayoutBreakPoints.noBleed, layoutVariables().panelLayoutBreakPoints.xs],
+            viewports: [
+                panelLayoutVariables().panelLayoutBreakPoints.noBleed,
+                panelLayoutVariables().panelLayoutBreakPoints.xs,
+            ],
         },
     },
 );

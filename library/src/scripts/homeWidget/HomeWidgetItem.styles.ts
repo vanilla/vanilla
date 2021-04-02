@@ -5,19 +5,21 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { shadowHelper } from "@library/styles/shadowHelpers";
-import { absolutePosition, BorderType, flexHelper } from "@library/styles/styleHelpers";
+import { BorderType, flexHelper } from "@library/styles/styleHelpers";
 import { styleUnit } from "@library/styles/styleUnit";
-import { ISimpleBorderStyle, IFont, IBackground } from "@library/styles/cssUtilsTypes";
+import { ISimpleBorderStyle, IFont, IBackground, IBoxOptions, ISpacing } from "@library/styles/cssUtilsTypes";
 import { Variables } from "@library/styles/Variables";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { Mixins } from "@library/styles/Mixins";
-import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { activeSelector, styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
-import { CSSObject } from "@emotion/css";
+import { css, CSSObject } from "@emotion/css";
 import { percent, ColorHelper, calc, color, rgba } from "csx";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { IThemeVariables } from "@library/theming/themeReducer";
+import { LocalVariableMapping } from "@library/styles/VariableMapping";
+import { DeepPartial } from "redux";
 
 const defaultIcon = require("!file-loader!./widgetDefaultIcon.svg").default;
 
@@ -27,82 +29,158 @@ export enum HomeWidgetItemContentType {
     TITLE_DESCRIPTION_IMAGE = "title-description-image",
     TITLE_DESCRIPTION_ICON = "title-description-icon",
     TITLE_BACKGROUND = "title-background",
+    TITLE_BACKGROUND_DESCRIPTION = "title-background-description",
     TITLE_CHAT_BUBBLE = "title-chat-bubble",
 }
 
 export interface IHomeWidgetItemOptions {
-    borderType?: BorderType;
-    borderRadius?: string | number;
-    background?: IBackground;
-    contentType?: HomeWidgetItemContentType;
-    fg?: string | ColorHelper;
-    display?: {
-        description?: boolean;
-        counts?: boolean;
+    box: IBoxOptions;
+    contentType: HomeWidgetItemContentType;
+    fg: string | ColorHelper;
+    display: {
+        name: boolean;
+        description: boolean;
+        counts: boolean;
+        cta: boolean;
     };
-    name?: {
-        hidden?: boolean;
-        font?: IFont;
-        states?: any; //FIXME
+    verticalAlignment: "top" | "middle" | "bottom" | string;
+    alignment: "center" | "left";
+    viewMore: {
+        labelCode: string;
+        buttonType: ButtonTypes;
     };
-    verticalAlignment?: "top" | "middle" | "bottom" | string;
-    alignment?: "center" | "left";
-    viewMore?: {
-        labelCode?: string;
-        buttonType?: ButtonTypes;
-    };
-    defaultIconUrl?: string;
-    defaultImageUrl?: string;
-    iconProps?: {
-        placement?: "top" | "left";
-        background?: IBackground;
-        border?: ISimpleBorderStyle;
-        size?: number;
-    };
+    defaultIconUrl: string | undefined;
+    defaultImageUrl: string | undefined;
+    imagePlacement: "top" | "left";
+    imagePlacementMobile: "top" | "left";
+    /** @deprecated */
+    iconProps?: any;
 }
 
 export const homeWidgetItemVariables = useThemeCache(
-    (optionOverrides?: IHomeWidgetItemOptions, itemVars?: IThemeVariables) => {
-        const makeVars = variableFactory("homeWidgetItem", itemVars);
+    (optionOverrides?: DeepPartial<IHomeWidgetItemOptions>, itemVars?: IThemeVariables) => {
+        const makeVars = variableFactory("homeWidgetItem", itemVars, [
+            new LocalVariableMapping({
+                "icon.border": "options.iconProps.border",
+                "icon.background": "options.iconProps.background",
+                "icon.backgroundState.color": "iconContainer.hoverBackgroundColor",
+                "icon.padding": "iconContainer.padding",
+                "icon.border.radius": "iconContainer.borderRadius",
+                "icon.size": "options.iconProps.size",
+                "options.imagePlacement": "options.iconProps.placement",
+                "options.box.background": "options.background",
+                "options.box.borderType": "options.borderType",
+                "options.box.border.radius": "options.borderRadius",
+                "options.box.spacing": "spacing.contentPadding",
+                "name.font": "options.name.font",
+            }),
+        ]);
         const globalVars = globalVariables(itemVars);
-        const layoutVars = layoutVariables(itemVars);
+        const layoutVars = panelLayoutVariables(itemVars);
 
         /**
          * @varGroup homeWidgetItem.options
          * @commonTitle Options
          * @description Within a HomeWidget, an item is an individual grid item. These items could represent a discussion, article, category etc.
          */
-        let options = makeVars(
+        let options: IHomeWidgetItemOptions = makeVars(
             "options",
             {
-                display: {
-                    description: true,
-                    counts: true,
-                },
-                name: {
-                    hidden: false,
-                    font: Variables.font({}),
-                    states: Variables.clickable({}),
-                },
+                /**
+                 * @varGroup homeWidgetItem.options.box
+                 * @expand box
+                 */
+                box: Variables.box({
+                    borderType: BorderType.NONE,
+                    border: globalVars.border,
+                }),
+                /**
+                 * @var homeWidgetItem.options.contentType
+                 * @description Choose the content and layout of the items.
+                 * @type string
+                 * @enum title-description | title-description-image | title-description-icon | title-background |title-background-description
+                 */
                 contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION_ICON,
-                borderType: BorderType.NONE,
-                borderRadius: globalVars.border.radius,
-                background: Variables.background({}),
+                /**
+                 * @varGroup homeWidgetItem.options.display
+                 * @description Hide and show different parts of the widget.
+                 */
+                display: {
+                    /**
+                     * @var homeWidgetItem.options.display.name
+                     * @type boolean
+                     */
+                    name: true,
+                    /**
+                     * @var homeWidgetItem.options.display.description
+                     * @type boolean
+                     */
+                    description: true,
+                    /**
+                     * @var homeWidgetItem.options.display.counts
+                     * @type boolean
+                     */
+                    counts: true,
+
+                    /**
+                     * @var homeWidgetItem.options.display.cta
+                     * @type boolean
+                     */
+                    cta: true,
+                },
+                /**
+                 * @var homeWidgetItem.options.fg
+                 * @title Foreground Color
+                 * @description Choose the color of the foreground content in the widget. Defaults to have contrast with the box background.
+                 * @type string
+                 * @format hex-string
+                 */
                 fg: globalVars.mainColors.fg,
+                verticalAlignment: "middle",
+                /**
+                 * @var homeWidgetItem.options.alignment
+                 * @description Configure the horizontal alignment of content in the widget
+                 * @type string
+                 * @enum left | center
+                 */
+                alignment: "left",
                 viewMore: {
                     buttonType: ButtonTypes.TRANSPARENT,
                     labelCode: "View More",
                 },
-                verticalAlignment: "middle",
-                alignment: "left" as "left" | "center",
-                defaultIconUrl: defaultIcon as string | undefined,
-                defaultImageUrl: undefined as string | undefined,
+                /**
+                 * @var homeWidgetItem.options.defaultIconUrl
+                 * @type string
+                 * @format url
+                 */
+                defaultIconUrl: defaultIcon,
+                /**
+                 * @var homeWidgetItem.options.defaultIconUrl
+                 * @type string
+                 * @format url
+                 */
+                defaultImageUrl: undefined,
+                /**
+                 * @var homeWidgetItem.options.imagePlacement
+                 * @type string
+                 * @description Choose the positioning of the icon or image in icon and image variants.
+                 * @enum top | left
+                 */
+                imagePlacement: "top",
+                /**
+                 * @var homeWidgetItem.options.imagePlacement
+                 * @type string
+                 * @description Choose the positioning of the icon or image in icon and image variants
+                 * on mobile device sizes.
+                 * @enum top | left
+                 */
+                imagePlacementMobile: "top",
+
+                /// Legacy Kludge. Because it's options, it can't be mapped.
                 iconProps: {
-                    placement: "top" as "top" | "left",
+                    placement: undefined as string | undefined,
                     background: Variables.background({}),
-                    border: Variables.border({
-                        width: 0,
-                    }),
+                    border: Variables.border({}),
                     size: undefined as number | undefined,
                 },
             },
@@ -110,36 +188,42 @@ export const homeWidgetItemVariables = useThemeCache(
         );
 
         const hasImage = options.contentType === HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE;
-        const hasBackground = options.contentType === HomeWidgetItemContentType.TITLE_BACKGROUND;
+        const hasBackground = [
+            HomeWidgetItemContentType.TITLE_BACKGROUND,
+            HomeWidgetItemContentType.TITLE_BACKGROUND_DESCRIPTION,
+        ].includes(options.contentType);
         const hasIcon = options.contentType === HomeWidgetItemContentType.TITLE_DESCRIPTION_ICON;
-        const iconPlacementLeft = options.iconProps.placement === "left";
         const hasChatBubble = options.contentType === HomeWidgetItemContentType.TITLE_CHAT_BUBBLE;
 
         options = makeVars(
             "options",
             {
                 ...options,
-                overflow: hasChatBubble ? "visible" : "hidden",
-                fg:
-                    !options.background.color || ColorsUtils.isLightColor(options.background.color)
-                        ? globalVars.mainColors.fg
-                        : globalVars.mainColors.bg,
-                borderType:
-                    options.background?.color || hasImage || hasBackground || hasIcon
-                        ? BorderType.SHADOW
-                        : options.borderType,
-                alignment: !iconPlacementLeft && (hasIcon || hasBackground) ? "center" : "left",
+                imagePlacement: options.iconProps?.placement ?? options.imagePlacement,
+                imagePlacementMobile: options.iconProps?.placement ?? options.imagePlacementMobile,
+                fg: globalVars.getFgForBg(options.box.background.color),
+                box: {
+                    ...options.box,
+                    borderType:
+                        options.box.background?.color || hasImage || hasBackground || hasIcon || hasChatBubble
+                            ? BorderType.SHADOW
+                            : options.box.borderType,
+                },
+                alignment: hasIcon || hasBackground ? "center" : "left",
             },
             optionOverrides,
         );
+        const boxHasBorder = Variables.boxHasOutline(options.box);
 
         options = makeVars(
             "options",
             {
                 ...options,
-                background: {
-                    alignment: hasIcon ? "center" : "left",
-                    color: options.borderType !== BorderType.NONE ? globalVars.mainColors.bg : undefined,
+                box: {
+                    ...options.box,
+                    spacing: {
+                        all: boxHasBorder || hasChatBubble ? (hasChatBubble ? 24 : 16) : undefined,
+                    },
                 },
             },
             optionOverrides,
@@ -155,71 +239,58 @@ export const homeWidgetItemVariables = useThemeCache(
             minWidth: layoutVars.contentSizes.full / 4 - layoutVars.gutter.size * 5, // Min width allows 4 items to fit.
         });
 
-        const hasBorder = [BorderType.BORDER, BorderType.SHADOW].includes(options.borderType);
-
-        const spacing = makeVars("spacing", {
-            /**
-             * @varGroup homeWidgetItem.spacing.contentPadding
-             * @commonTitle Content Padding
-             * @expand spacing
-             */
-            contentPadding: Variables.spacing({
-                vertical: hasBorder || hasImage ? 24 : 0,
-                top:
-                    iconPlacementLeft && (!options.iconProps.background.color || !options.display.description)
-                        ? 8
-                        : hasIcon
-                        ? 0
-                        : undefined,
-                bottom: hasIcon || hasBorder ? 8 : 0,
-                horizontal: iconPlacementLeft ? 8 : hasBorder ? (hasIcon || hasBackground ? 24 : 16) : 0,
-            }),
-        });
-
-        const iconContainer = makeVars("iconContainer", {
-            /**
-             * @var homeWidgetItem.iconContainer.padding
-             * @title IconContainer Padding
-             * @type number | string
-             * @expand spacing
-             */
-            padding: iconPlacementLeft ? 8 : 24,
-
-            /**
-             * @var homeWidgetItem.iconContainer.borderRadius
-             * @title Homewidget Item IconContainer Border Radius
-             * @type number
-             * @description The border radius of icon container
-             */
-            borderRadius: options.iconProps.background ? globalVars.border.radius : undefined,
-            hoverBackgroundColor: options.iconProps.background.color
-                ? ColorsUtils.modifyColorBasedOnLightness({
-                      color: options.iconProps.background.color,
-                      weight: 0.1,
-                  })
-                : undefined,
-        });
-
-        const icon = makeVars("icon", {
-            /**
-             * @var homeWidgetItem.icon.size
-             * @title HomeWidgetItem Icon Size
-             * @type number | string
-             * @description Sets the size of homewidget icons i
-             */
-            size: options.iconProps.size ? options.iconProps.size : iconPlacementLeft ? 48 : 72,
+        const iconInit = makeVars("icon", {
             /**
              * @varGroup homeWidgetItem.icon.background
              * @description Background properties to apply to the icon of the widget item.
              * @expand background
              */
-            background: Variables.background({}),
+            background: Variables.background(options.iconProps.background ?? {}),
+
+            /**
+             * @var homeWidgetItem.icon.size
+             * @title HomeWidgetItem Icon Size
+             * @type number | string
+             * @description Sets the size of the icon.
+             */
+            size: 72,
+        });
+
+        const icon = makeVars("icon", {
+            ...iconInit,
+            /**
+             * @var homeWidgetItem.icon.padding
+             * @title IconContainer Padding
+             * @type number | string
+             * @expand spacing
+             */
+            padding: 16,
+
+            size: options.iconProps.size ?? (options.imagePlacement === "left" ? 48 : iconInit.size),
+            sizeMobile: options.iconProps.size ?? (options.imagePlacementMobile === "left" ? 48 : iconInit.size),
+
+            /**
+             * @varGroup homeWidgetItem.icon.border
+             * @description Apply a border around the icon.
+             * @expand border
+             */
+            border: Variables.border({
+                radius: options.iconProps.border.radius ?? globalVars.border.radius,
+                width: options.iconProps.border.width ?? 0,
+            }),
             /**
              * @varGroup homeWidgetItem.icon.background
              * @description Background properties to apply to the icon of the widget item when the item is hovered, focused or active.
              * @expand background
              */
-            backgroundState: Variables.background({}),
+            backgroundState: Variables.background({
+                color: iconInit.background.color
+                    ? ColorsUtils.modifyColorBasedOnLightness({
+                          color: iconInit.background.color,
+                          weight: 0.1,
+                      })
+                    : undefined,
+            }),
         });
 
         let background = makeVars("background", {
@@ -263,35 +334,15 @@ export const homeWidgetItemVariables = useThemeCache(
              * @expand font
              */
             font: Variables.font({
-                color: options.name.font.color ?? options.fg,
-                size: (() => {
-                    if (options.name.font.size) {
-                        return options.name.font.size;
-                    }
-                    // else if (hasBackground) {
-                    //     return globalVars.fonts.size.title;
-                    // }
-                    return undefined;
-                })(),
-                weight: (() => {
-                    if (options.name.font.weight) {
-                        return options.name.font.weight;
-                    } else if (hasBackground) {
-                        return globalVars.fonts.weights.semiBold;
-                    }
-                    return undefined;
-                })(),
+                ...globalVars.fontSizeAndWeightVars("large", "semiBold"),
+                color: options.fg,
+                textDecoration: "none",
             }),
 
-            /**
-             * @varGroup homeWidgetItem.name.background
-             * @commonTitle Name Background
-             * @expand background
-             */
-            background: Variables.background({
-                color: color("#fff"),
+            fontState: Variables.font({
+                // Since we don't have a border to interact with, the name gets the interactive state.
+                color: !boxHasBorder || hasChatBubble ? globalVars.mainColors.statePrimary : undefined,
             }),
-
             /**
              * @var homeWidgetItem.name.afterContent
              * @description Indicates whether there is content that appears after the HomeWidget Name
@@ -305,16 +356,7 @@ export const homeWidgetItemVariables = useThemeCache(
              * @commonTitle Name Spacing
              * @expand spacing
              */
-            spacing: hasChatBubble
-                ? Variables.spacing({
-                      vertical: 50,
-                      horizontal: 38,
-                  })
-                : Variables.spacing({}),
-            states: Variables.clickable({
-                hover: options.name.states.hover ?? undefined,
-                focus: options.name.states.focus ?? undefined,
-            }),
+            spacing: Variables.spacing({}),
         });
 
         const callToAction = makeVars("callToAction", {
@@ -324,8 +366,8 @@ export const homeWidgetItemVariables = useThemeCache(
              * @expand spacing
              */
             padding: {
-                ...name.spacing,
-                top: 20,
+                ...options.box.spacing,
+                top: 16,
             },
 
             /**
@@ -334,10 +376,14 @@ export const homeWidgetItemVariables = useThemeCache(
              * @expand font
              */
             font: Variables.font({
+                ...name.font,
+                ...globalVars.fontSizeAndWeightVars("small", "semiBold"),
                 transform: "uppercase",
-                color: options.fg,
-                size: 13,
-                weight: globalVars.fonts.weights.semiBold,
+            }),
+            fontState: Variables.font({
+                ...name.fontState,
+                ...globalVars.fontSizeAndWeightVars("small", "semiBold"),
+                transform: "uppercase",
             }),
         });
 
@@ -348,7 +394,7 @@ export const homeWidgetItemVariables = useThemeCache(
              * @expand spacing
              */
             spacing: Variables.spacing({
-                ...name.spacing,
+                ...(hasChatBubble ? options.box.spacing : {}),
                 top: 0,
                 bottom: 0,
             }),
@@ -397,163 +443,133 @@ export const homeWidgetItemVariables = useThemeCache(
             maxHeight: hasBackground ? 400 : 250,
         });
 
-        return { options, sizing, name, callToAction, description, spacing, image, icon, iconContainer, background };
+        return { options, sizing, name, callToAction, description, image, icon, background };
     },
 );
 
-export const homeWidgetItemClasses = useThemeCache((optionOverrides?: IHomeWidgetItemOptions) => {
+export const homeWidgetItemClasses = useThemeCache((optionOverrides?: DeepPartial<IHomeWidgetItemOptions>) => {
     const vars = homeWidgetItemVariables(optionOverrides);
     const globalVars = globalVariables();
     const style = styleFactory("homeWidgetItem");
+    const mobileQuery = panelLayoutVariables().mediaQueries().oneColumnDown;
+    const isImageLeft = vars.options.imagePlacement === "left";
+    const isImageLeftMobile = vars.options.imagePlacementMobile === "left";
+    const boxHasBorder = Variables.boxHasOutline(vars.options.box);
 
-    const borderStyling = ((): CSSObject => {
-        switch (vars.options.borderType) {
-            case BorderType.BORDER:
-                return {
-                    ...Mixins.border({
-                        radius: vars.options.borderRadius,
-                    }),
-                    ...{
-                        "&:hover, &:focus": {
-                            ...Mixins.border({
-                                color: globalVars.border.colorHover,
-                                radius: vars.options.borderRadius,
-                            }),
-                        },
-                    },
-                };
-            case BorderType.SHADOW:
-                return {
-                    borderRadius: vars.options.borderRadius,
-                    ...shadowHelper().embed(),
-                    ...{
-                        "&:hover, &:focus": {
-                            ...shadowHelper().embedHover(),
-                        },
-                    },
-                };
-            case BorderType.SHADOW_AS_BORDER:
-            case BorderType.NONE:
-            default:
-                return {
-                    borderRadius: vars.options.borderRadius,
-                };
-        }
-    })();
-
-    const buttonStateStyles = vars.name.states.hover
-        ? Mixins.clickable.itemState(vars.name.states)
-        : Mixins.clickable.itemState();
-    const isIconLeft = vars.options.iconProps.placement === "left";
-    const isIconLeftAndDescriptionHidden = isIconLeft && !vars.options.display.description;
     const hasChatBubble = vars.options.contentType === HomeWidgetItemContentType.TITLE_CHAT_BUBBLE;
-    const hasBubbleShadow = hasChatBubble && vars.options.borderType === BorderType.SHADOW;
+    // const hasBubbleShadow = hasChatBubble && vars.options.box.borderType === BorderType.SHADOW;
 
     const bubbleTriangle: CSSObject =
         vars.name.afterContent === "triangle"
             ? {
-                  ...(hasChatBubble ? Mixins.background(vars.name.background) : {}),
-                  boxShadow: hasChatBubble ? "4px 4px 7px rgba(0,0,0, .05)" : undefined,
+                  ...(() => {
+                      switch (vars.options.box.borderType) {
+                          case BorderType.SHADOW:
+                              return shadowHelper().embedTooltip();
+                          case BorderType.BORDER:
+                      }
+                  })(),
+                  ...Mixins.background({ color: vars.options.box.background.color ?? globalVars.mainColors.bg }),
+                  //   ...Mixins.borderType(vars.options.box.borderType),
                   content: "''",
                   width: 20,
                   height: 20,
                   position: "absolute",
                   top: `calc(100% - ${10}px)`,
-                  transform: `rotate(45deg)`,
+                  transform: `rotate(135deg)`,
                   left: 30,
+                  display: "block !important",
               }
             : {};
 
-    const linkState = Mixins.clickable.itemState({
-        default: vars.name.font.color,
-        allStates: ColorsUtils.offsetLightness(vars.name.font.color!, 0.05),
-    });
+    const root = style(
+        {
+            "--content-type": vars.options.contentType,
+            height: percent(100),
+            color: ColorsUtils.colorOut(vars.options.fg),
+            overflow: hasChatBubble ? "visible" : "hidden",
+            minWidth: styleUnit(vars.sizing.minWidth),
+            display: "flex",
+            flexDirection: "column",
+        },
+        !hasChatBubble && Mixins.box(vars.options.box, { noPaddings: true, interactiveOutline: true }),
+    );
 
     const name = style(
         "name",
         {
             ...Mixins.padding(vars.name.spacing),
             ...Mixins.font(vars.name.font),
-            ...Mixins.background(vars.name.background),
-            marginBottom: isIconLeftAndDescriptionHidden
-                ? 0
-                : hasChatBubble
-                ? styleUnit(30)
-                : styleUnit(globalVars.gutter.half),
-            boxShadow: hasChatBubble ? "0 0px 15px rgba(0,0,0, .15)" : "none",
-            position: "relative",
-            ...{
-                "&:after": bubbleTriangle,
-            },
         },
-        linkState,
+        hasChatBubble
+            ? {
+                  ...Mixins.box(vars.options.box),
+                  marginBottom: 30,
+                  position: "relative",
+                  "&:after": hasChatBubble ? bubbleTriangle : undefined,
+              }
+            : {
+                  [activeSelector(`.${root}`, "&")]: Mixins.font(vars.name.fontState),
+              },
     );
 
-    const nestedStyles = buttonStateStyles;
-
-    const root = style(
+    const bgContainerLeftStyles: CSSObject = {
+        alignItems: vars.options.display.description ? "flex-start" : "center",
+        flexDirection: "row",
+    };
+    const backgroundContainer = style(
+        "backgroundContainer",
         {
-            height: percent(100),
-            ...Mixins.background(vars.options.background),
-            color: ColorsUtils.colorOut(vars.options.fg),
-            overflow: hasChatBubble ? "visible" : "hidden",
-            minWidth: styleUnit(vars.sizing.minWidth),
+            position: "relative",
+            ...Mixins.background(vars.background.bg),
+            flex: "0 1 auto",
             display: "flex",
             flexDirection: "column",
-            ...{
-                [`&:hover .${name}`]: nestedStyles && nestedStyles["&&:hover"] ? nestedStyles["&&:hover"] : undefined,
-                [`&:focus .${name}`]: nestedStyles && nestedStyles["&&:focus"] ? nestedStyles["&&:focus"] : undefined,
-                [`&:focus-visible .${name}`]:
-                    nestedStyles && nestedStyles["&&:focus-visible"] ? nestedStyles["&&:focus-visible"] : undefined,
-                [`&:active .${name}`]:
-                    nestedStyles && nestedStyles["&&:active"] ? nestedStyles["&&:active"] : undefined,
-            },
         },
-        borderStyling,
+        isImageLeft && bgContainerLeftStyles,
+        isImageLeftMobile && mobileQuery(bgContainerLeftStyles),
     );
 
-    const backgroundContainer = style("backgroundContainer", {
-        position: "relative",
-        ...Mixins.background(vars.background.bg),
-        flex: 1,
-        display: isIconLeft ? "flex" : undefined,
-        alignItems: isIconLeft ? (vars.options.display.description ? "flex-start" : "center") : undefined,
-        paddingTop: isIconLeft ? 8 : undefined,
-        paddingLeft: isIconLeft ? 8 : undefined,
-    });
-
     const backgroundScrim = style("backgroundScrim", {
-        ...absolutePosition.fullSizeOfParent(),
+        ...Mixins.absolute.fullSizeOfParent(),
         ...Mixins.background(vars.background.scrim),
     });
 
+    const textAlignment: CSSObject = {
+        "&&": {
+            textAlign: isImageLeft ? "left" : vars.options.alignment,
+        },
+    };
+
     const content = style(
         "content",
-        {
-            textAlign: vars.options.alignment,
-        },
-        Mixins.padding(vars.spacing.contentPadding),
+        { flex: 1, display: "flex", flexDirection: "column" },
+        !hasChatBubble && Mixins.box(vars.options.box, { onlyPaddings: true }),
+        textAlignment,
     );
 
-    const absoluteContent = style("absoluteContent", {
-        ...absolutePosition.fullSizeOfParent(),
-        ...(vars.options.alignment === "left" ? flexHelper().middleLeft() : flexHelper().middle()),
-        flexDirection: "column",
-        ...Mixins.padding(vars.spacing.contentPadding),
-        paddingTop: 16,
-        paddingBottom: 16,
-        justifyContent: (() => {
-            switch (vars.options.verticalAlignment) {
-                case "top":
-                    return "flex-start";
-                case "bottom":
-                    return "flex-end";
-                default:
-                    return "center";
-            }
-        })(),
-        textAlign: vars.options.alignment,
-    });
+    const absoluteContent = style(
+        "absoluteContent",
+        {
+            ...Mixins.absolute.fullSizeOfParent(),
+            ...(vars.options.alignment === "left" ? flexHelper().middleLeft() : flexHelper().middle()),
+            flexDirection: "column",
+            ...Mixins.box(vars.options.box, { onlyPaddings: true }),
+            paddingTop: 16,
+            paddingBottom: 16,
+            justifyContent: (() => {
+                switch (vars.options.verticalAlignment) {
+                    case "top":
+                        return "flex-start";
+                    case "bottom":
+                        return "flex-end";
+                    default:
+                        return "center";
+                }
+            })(),
+        },
+        textAlignment,
+    );
 
     const absoluteName = style("absoluteName", {
         ...Mixins.font(vars.name.font),
@@ -563,68 +579,136 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: IHomeWidge
 
     const imageAspectRatio = percent((vars.image.ratio.height / vars.image.ratio.width) * 100);
 
-    const imageContainer = style("imageContainer", {
-        background: ColorsUtils.colorOut(globalVars.mixPrimaryAndBg(0.08)),
-        width: percent(100),
-        paddingTop: imageAspectRatio,
-        position: "relative",
-    });
+    const imageContainerLeftStyles: CSSObject = {
+        height: "100%",
+    };
+    const imageContainer = style(
+        "imageContainer",
+        {
+            background: ColorsUtils.colorOut(globalVars.mixPrimaryAndBg(0.08)),
+            width: percent(100),
+            paddingTop: imageAspectRatio,
+            position: "relative",
+        },
+        isImageLeft && imageContainerLeftStyles,
+        isImageLeftMobile && mobileQuery(imageContainerLeftStyles),
+    );
 
-    const imageContainerWrapper = style("imageContainerWrapper", {
-        maxHeight: styleUnit(vars.image.maxHeight),
-        overflow: "hidden",
-    });
+    const boxSpacing = vars.options.box.spacing;
+    const imageContainerWrapperLeftStyles: CSSObject = {
+        maxWidth: 200,
+        height: 120,
+        flexBasis: "33%",
+        alignSelf: "stretch",
+        minHeight: "100%",
+        [`& + .${content}`]: {
+            paddingLeft: boxSpacing.left ?? boxSpacing.horizontal ?? boxSpacing.all ?? 16,
+            paddingTop: !boxHasBorder ? 0 : undefined,
+        },
+    };
+    const imageContainerWrapper = style(
+        "imageContainerWrapper",
+        {
+            maxHeight: styleUnit(vars.image.maxHeight),
+            overflow: "hidden",
+        },
+        !boxHasBorder &&
+            !isImageLeft && {
+                [`& + .${content}`]: {
+                    paddingTop: boxSpacing.top ?? boxSpacing.vertical ?? boxSpacing.all ?? 16,
+                },
+            },
+        isImageLeft && imageContainerWrapperLeftStyles,
+        isImageLeftMobile && mobileQuery(imageContainerWrapperLeftStyles),
+    );
 
     const image = style("image", {
-        ...absolutePosition.fullSizeOfParent(),
+        ...Mixins.absolute.fullSizeOfParent(),
         objectFit: "cover",
         objectPosition: "center center",
     });
 
-    const iconContainer = style("iconContainer", {
-        ...(vars.options.alignment === "left" ? flexHelper().middleLeft() : flexHelper().middle()),
-        padding: vars.iconContainer.padding,
-        ...Mixins.background(vars.options.iconProps.background),
-        borderRadius: vars.iconContainer.borderRadius ?? undefined,
-        ...{
-            "&:hover, &:focus": {
-                backgroundColor: vars.options.iconProps.background.color
-                    ? ColorsUtils.colorOut(vars.iconContainer.hoverBackgroundColor)
-                    : undefined,
+    const iconContainer = style(
+        "iconContainer",
+        {
+            display: "flex",
+            justifyContent: vars.options.alignment === "left" ? "left" : "center",
+            padding: vars.icon.padding,
+            ...Mixins.padding(
+                !boxHasBorder && isImageLeft
+                    ? {
+                          top: 0,
+                          left: 0,
+                          bottom: 0,
+                      }
+                    : {},
+            ),
+            [`& + .${content}`]: {
+                // We provide the padding downwards.
+                paddingTop: isImageLeft ? undefined : 0,
+                paddingLeft: isImageLeft ? 0 : undefined,
             },
         },
-    });
+        mobileQuery({
+            [`& + .${content}`]: {
+                // We provide the padding downwards.
+                paddingTop: isImageLeftMobile ? undefined : 0,
+                paddingLeft: isImageLeftMobile ? 0 : undefined,
+            },
+        }),
+    );
 
-    const icon = style("icon", {
-        height: vars.icon.size,
+    const iconHasBG = !!vars.icon.background.color;
+    const iconHeight = vars.icon.size + (iconHasBG ? vars.icon.padding * 2 : 0);
+    const iconWrap = style("iconWrap", {
+        height: iconHeight,
+        padding: iconHasBG ? vars.icon.padding : 0,
         ...Mixins.background(vars.icon.background),
-        // Width not set so that the aspect ratio of wider icons is preserved.
-        ...Mixins.border(vars.options.iconProps.border),
-        [`.${root}:hover &, .${root}:active &, .${root}:focus &`]: {
+        ...Mixins.border(vars.icon.border),
+        [activeSelector(`.${root}`, "&")]: {
             ...Mixins.background(vars.icon.backgroundState),
         },
     });
 
-    const iconLeftPadding = calc(
-        `${styleUnit(vars.icon.size + (vars.spacing.contentPadding.horizontal as number) * 4)}`,
+    const icon = style(
+        "icon",
+        {
+            // Width not set so that the aspect ratio of wider icons is preserved.
+            height: vars.icon.size,
+            maxHeight: vars.icon.size,
+        },
+        mobileQuery({
+            height: vars.icon.sizeMobile,
+            maxHeight: vars.icon.sizeMobile,
+        }),
     );
 
-    const metas = style("metas", {
-        ...Mixins.padding({
-            ...vars.name.spacing,
-        }),
-        ...{
+    const metas = css(
+        {
             "&&": {
                 position: "relative",
-                textAlign: vars.options.alignment,
-                ...Mixins.padding({
-                    ...vars.spacing.contentPadding,
-                    top: 10,
-                    bottom: 10,
-                    left: isIconLeft ? iconLeftPadding : hasChatBubble ? "none" : undefined,
-                }),
+                paddingTop: 4,
             },
         },
+        textAlignment,
+        [HomeWidgetItemContentType.TITLE_BACKGROUND, HomeWidgetItemContentType.TITLE_BACKGROUND_DESCRIPTION].includes(
+            vars.options.contentType,
+        ) && {
+            "&&": {
+                // Get our horizontal paddings.
+                ...Mixins.box(vars.options.box, { onlyPaddings: true }),
+                paddingTop: 4,
+                paddingBottom: 4,
+                textAlign: "left",
+                flex: 1,
+                display: "flex",
+                alignItems: "center",
+            },
+        },
+    );
+
+    const metaDescription = css({
+        whiteSpace: "normal",
     });
 
     const callToAction = style("callToAction", {
@@ -632,15 +716,14 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: IHomeWidge
             ...vars.callToAction.padding,
         }),
         ...Mixins.font(vars.callToAction.font),
-        ...{
-            svg: {
-                marginLeft: 10,
-            },
+        "& svg": {
+            marginLeft: 10,
         },
+        [activeSelector(`.${root}`, "&")]: Mixins.font(vars.callToAction.fontState),
     });
 
     const description = style("description", {
-        display: vars.options.display.description ? undefined : "none",
+        marginTop: globalVars.gutter.half,
         ...Mixins.padding(vars.description.spacing),
         ...Mixins.font(vars.description.font),
     });
@@ -651,6 +734,7 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: IHomeWidge
         callToAction,
         absoluteName,
         metas,
+        metaDescription,
         content,
         backgroundScrim,
         backgroundContainer,
@@ -660,6 +744,7 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: IHomeWidge
         image,
         description,
         icon,
+        iconWrap,
         iconContainer,
     };
 });

@@ -36,7 +36,8 @@ class TextFormat extends BaseFormat {
         $result = htmlspecialchars($result, ENT_NOQUOTES, 'UTF-8', false);
 
         if ($this->formatConfig->shouldReplaceNewLines()) {
-            $result = nl2br(trim($result));
+            // Added this because nl2br() doesn't replace 2nd new line if there are 2 in a row.
+            $result = str_replace(["\r\n", "\n\r", "\r", "\n"], "<br /> ", trim($result));
         }
 
         $result = $this->applyHtmlProcessors($result);

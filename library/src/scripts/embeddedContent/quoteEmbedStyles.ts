@@ -14,6 +14,7 @@ import { important, percent } from "csx";
 import { embedContainerVariables } from "@library/embeddedContent/components/embedStyles";
 import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { Mixins } from "@library/styles/Mixins";
+import { metasVariables } from "@library/metas/Metas.variables";
 
 export const quoteEmbedVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -37,6 +38,7 @@ export const quoteEmbedVariables = useThemeCache(() => {
 export const quoteEmbedClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const embedVars = embedContainerVariables();
+    const metasVars = metasVariables();
     const vars = quoteEmbedVariables();
 
     const style = styleFactory("quoteEmbed");
@@ -70,14 +72,15 @@ export const quoteEmbedClasses = useThemeCache(() => {
         ...Mixins.margin({
             horizontal: importantUnit(0),
             top: importantUnit(0),
-            bottom: importantUnit(globalVars.meta.spacing.default),
+            bottom: importantUnit(metasVars.spacing.horizontal),
         }),
         display: "block",
         width: percent(100),
-        color: important(ColorsUtils.colorOut(globalVars.mainColors.fg) as string),
-        fontSize: globalVars.fonts.size.medium,
-        fontWeight: globalVars.fonts.weights.bold,
-        lineHeight: globalVars.lineHeights.condensed,
+        ...Mixins.font({
+            ...globalVars.fontSizeAndWeightVars("medium", "bold"),
+            color: important(ColorsUtils.colorOut(globalVars.mainColors.fg) as string),
+            lineHeight: globalVars.lineHeights.condensed,
+        }),
     });
 
     const isPadded = style("isPadded", {});
@@ -206,7 +209,9 @@ export const quoteEmbedClasses = useThemeCache(() => {
         ...{
             ".userContent": {
                 ...lineHeightAdjustment(),
-                fontSize: styleUnit(globalVars.fonts.size.medium),
+                ...Mixins.font({
+                    ...globalVars.fontSizeAndWeightVars("medium"),
+                }),
             },
         },
     });

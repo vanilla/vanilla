@@ -13,7 +13,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { iconVariables } from "@library/icons/iconStyles";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 
 export const storyBookVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -176,6 +176,7 @@ export const storyBookClasses = useThemeCache(() => {
     const link = style("link", {});
 
     const containerOuter = style("containerOuter", {
+        minHeight: "100vh",
         position: "relative",
         display: "block",
         maxWidth: percent(100),
@@ -211,7 +212,7 @@ export const storyBookClasses = useThemeCache(() => {
         flexWrap: "wrap",
         width: calc(`100% + ${styleUnit(vars.gaps.tile * 8)}`),
         transform: translateX(`-${styleUnit(vars.gaps.tile * 3.5)}`),
-        ...layoutVariables()
+        ...panelLayoutVariables()
             .mediaQueries()
             .oneColumnDown({
                 display: "block",

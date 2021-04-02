@@ -7,6 +7,7 @@
 import webpack, { Configuration } from "webpack";
 import { makeBaseConfig } from "./makeBaseConfig";
 import EntryModel from "../utility/EntryModel";
+import { svgLoader } from "./svgLoader";
 
 /**
  * Create the storybook configuration.
@@ -64,6 +65,13 @@ export async function makeStoryConfig(baseStorybookConfig: Configuration, entryM
             name: "[path][name]-[hash].[ext]",
         },
     });
+
+    const fileLoaderRule = baseStorybookConfig.module?.rules?.find((rule) => (rule?.test as any)?.test?.(".svg"));
+    if (fileLoaderRule) {
+        fileLoaderRule.exclude = /vanilla-icons/;
+    }
+
+    baseStorybookConfig.module?.rules?.unshift(svgLoader());
 
     baseStorybookConfig.module?.rules.push({
         test: /\.html$/,

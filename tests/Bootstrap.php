@@ -22,6 +22,7 @@ use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\Authenticator\PasswordAuthenticator;
 use Vanilla\Cache\CacheCacheAdapter;
+use Vanilla\Community\CallToActionModule;
 use Vanilla\Community\CategoriesModule;
 use Vanilla\Contracts\Addons\EventListenerConfigInterface;
 use Vanilla\Contracts\ConfigurationInterface;
@@ -45,6 +46,7 @@ use Vanilla\Site\OwnSiteProvider;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Theme\FsThemeProvider;
 use Vanilla\Web\Middleware\LogTransactionMiddleware;
+use Vanilla\Web\SystemTokenUtils;
 use Vanilla\Web\TwigEnhancer;
 use Vanilla\Web\TwigRenderer;
 use Vanilla\Web\UASniffer;
@@ -122,6 +124,8 @@ class Bootstrap {
     public function initialize(Container $container) {
         // Set up the dependency injection container.
         Gdn::setContainer($container);
+
+        touchFolder(PATH_ROOT.'/tests/cache/bootstrap');
 
         $container
             ->setInstance('@baseUrl', $this->getBaseUrl())
@@ -486,6 +490,12 @@ class Bootstrap {
             ->addCall('registerWidget', [MockWidget3::class])
             ->addCall('registerWidget', [CategoriesModule::class])
             ->addCall('registerWidget', [TagModule::class])
+            ->addCall('registerWidget', [CallToActionModule::class])
+
+            ->rule(SystemTokenUtils::class)
+            ->setConstructorArgs([
+                ContainerUtils::config("Context.Secret", "")
+            ])
         ;
 
         $container

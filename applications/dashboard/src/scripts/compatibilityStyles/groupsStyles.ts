@@ -14,7 +14,9 @@ import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { forumLayoutVariables } from "./forumLayoutStyles";
 import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
-import { metaContainerStyles, metaItemStyle } from "@library/styles/metasStyles";
+import { metaContainerStyle } from "@library/metas/Metas.styles";
+import { metasVariables } from "@library/metas/Metas.variables";
+
 import { Mixins } from "@library/styles/Mixins";
 
 export const groupVariables = useThemeCache(() => {
@@ -37,6 +39,7 @@ export const groupVariables = useThemeCache(() => {
 export const groupsCSS = () => {
     const vars = groupVariables();
     const globalVars = globalVariables();
+    const metasVars = metasVariables();
     const layoutVars = forumLayoutVariables();
     const mediaQueries = layoutVars.mediaQueries();
 
@@ -115,7 +118,7 @@ export const groupsCSS = () => {
     });
 
     cssOut(`.GroupWrap .DataTable .Title-Icon`, {
-        color: ColorsUtils.colorOut(globalVars.meta.colors.fg),
+        color: ColorsUtils.colorOut(metasVars.font.color),
     });
 
     cssOut(`.Groups .Name.Group-Name .Options .Button`, {
@@ -157,11 +160,6 @@ export const groupsCSS = () => {
 
     cssOut(`.Event-Title`, {
         marginTop: styleUnit(75),
-    });
-
-    cssOut(`body.Groups .Group-Content .Meta`, metaContainerStyles());
-    cssOut(`body.Groups .Group-Content .Meta .MItem`, {
-        ...metaItemStyle(),
     });
 
     cssOut(
@@ -273,11 +271,15 @@ export const groupsCSS = () => {
     );
 
     cssOut(`.Section-Group .Group-Title`, {
-        fontSize: globalVars.fonts.size.title,
+        ...Mixins.font({
+            ...globalVars.fontSizeAndWeightVars("title"),
+        }),
     });
 
     cssOut(`.Section-Group .Group-Box .H`, {
-        fontSize: globalVars.fonts.size.subTitle,
+        ...Mixins.font({
+            ...globalVars.fontSizeAndWeightVars("subTitle"),
+        }),
     });
 
     cssOut(
@@ -286,6 +288,7 @@ export const groupsCSS = () => {
     `,
         mediaQueries.mobileDown({
             display: "block",
+            marginTop: 12,
             ...{
                 [`.Button`]: {
                     marginRight: "auto",

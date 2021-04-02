@@ -7,13 +7,19 @@
 
 namespace Vanilla\Formatting\Quill;
 
+use Vanilla\Formatting\Formats\RichFormat;
+use Vanilla\Formatting\FormatText;
 use Vanilla\Formatting\Quill\Blots\AbstractBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\AbstractLineTerminatorBlot;
+use Vanilla\Formatting\Quill\Nesting\NestingParentInterface;
+use Vanilla\Formatting\Quill\Nesting\NestingParentRendererInterface;
+use Vanilla\Formatting\TextDOMInterface;
+use Vanilla\Formatting\TextFragmentInterface;
 
 /**
  * Class for sorting operations into blots and groups.
  */
-class BlotGroupCollection implements \IteratorAggregate {
+class BlotGroupCollection implements \IteratorAggregate, TextDOMInterface {
 
     /** @var array[] The operations to parse. */
     private $operations;
@@ -180,5 +186,97 @@ class BlotGroupCollection implements \IteratorAggregate {
         }
 
         return new $blotClass($this->currentOp, $this->prevOp, $this->nextOp, $this->parseMode);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getFragments(): array {
+        $result = [];
+        foreach ($this->groups as $i => $group) {
+            $this->getFragmentsBlotGroup($group, $result);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Extract the text fragments from a blot group.
+     *
+     * @param BlotGroup $group
+     * @param array $result Working result array.
+     */
+    private function getFragmentsBlotGroup(BlotGroup $group, array &$result = []) {
+        if ($group->getBlotsAndGroups() instanceof AbstractBlot) {
+            $result[] = new BlotGroupTextFragment($group, $this);
+        } else {
+            $from = 0;
+            foreach ($group->getBlotsAndGroups() as $j => $blot) {
+                /** @var AbstractBlot $blot */
+                if ($blot instanceof AbstractLineTerminatorBlot) {
+                    $result[] = new BlotGroupTextFragment($group, $this, $from, $j);
+                    $from = $j + 1;
+                }
+
+                if ($blot instanceof NestingParentRendererInterface) {
+                    /** @var BlotGroup[] $children */
+                    $children = $blot->getNestedGroups();
+                    foreach ($children as $child) {
+                        $this->getFragmentsBlotGroup($child, $result);
+                    }
+                }
+            }
+            // This is a sanity check to make sure all of the blots have been properly captured as fragments.
+            if ($from !== count($group->getBlotsAndGroups())) {
+                trigger_error("The blot group was not properly parsed into fragments.", E_USER_NOTICE);
+            }
+        }
+    }
+
+    /**
+     * Get the allowed blot classes.
+     *
+     * @return string[]
+     */
+    public function getAllowedBlotClasses(): array {
+        return $this->allowedBlotClasses;
+    }
+
+    /**
+     * Get the blot parse mode.
+     *
+     * @return string
+     */
+    public function getParseMode(): string {
+        return $this->parseMode;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function renderHTML(): string {
+        $renderer = new Renderer();
+        $result = $renderer->render($this);
+        return $result;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function stringify(): FormatText {
+        $result = [];
+        foreach ($this->groups as $group) {
+            $result = array_merge($result, $group->getOperations());
+        }
+        return new FormatText(json_encode($result), RichFormat::FORMAT_KEY);
+    }
+
+    /**
+     * Get the blot groups array.
+     *
+     * @return BlotGroup[]
+     */
+    public function getGroups(): array {
+        return $this->groups;
     }
 }

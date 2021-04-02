@@ -10,7 +10,7 @@ import { negativeUnit } from "@library/styles/styleHelpers";
 import { styleUnit } from "@library/styles/styleUnit";
 import { Mixins } from "@library/styles/Mixins";
 import { userSelect } from "@library/styles/styleHelpers";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { IRadioInputAsButtonClasses } from "@library/forms/radioAsButtons/RadioInputAsButton";
 import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
 import { buttonVariables } from "@library/forms/Button.variables";
@@ -18,7 +18,7 @@ import { calc } from "csx";
 
 export const radioInputAsButtonsClasses = useThemeCache(() => {
     const style = styleFactory("radioInputAsButtons");
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = panelLayoutVariables().mediaQueries();
     const globalVars = globalVariables();
 
     const root = style({

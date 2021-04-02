@@ -147,21 +147,24 @@ export function mountReact(
 export interface IMountable {
     target: HTMLElement;
     component: React.ReactElement;
+    overwrite?: boolean;
 }
 
 export function mountReactMultiple(components: IMountable[], callback?: () => void, options?: IComponentMountOptions) {
     if (!components.length) {
+        callback && callback();
         return;
     }
 
     let toCleanup: Array<{ target: HTMLElement; cleanup: HTMLElement }> = [];
-    components.forEach(({ component, target }) => {
+    components.forEach((mountable) => {
+        const { component, target } = mountable;
         let mountPoint = target;
         if (options?.clearContents) {
             target.innerHTML = "";
         }
 
-        if (options && options.overwrite) {
+        if (options?.overwrite || mountable.overwrite) {
             const container = document.createElement("span");
             toCleanup.push({
                 target,
@@ -207,6 +210,6 @@ export function mountPortal(element: ReactElement<any>, containerID: string, asR
     if (asRealPortal) {
         return ReactDOM.createPortal(element, container);
     } else {
-        return new Promise((resolve) => mountReact(element, container!, () => resolve()));
+        return new Promise<void>((resolve) => mountReact(element, container!, () => resolve()));
     }
 }

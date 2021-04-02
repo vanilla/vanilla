@@ -542,7 +542,7 @@ class SettingsController extends DashboardController {
             'Garden.BannerImage' => [
                 'Label' => t('Banner Image'),
                 'Control' => 'imageUploadReact',
-                'Description' => t('The default banner image across the site. This can be overriden on a per category basis.'),
+                'Description' => t('The default banner image across the site. This can be overridden on a per category basis.'),
             ],
             'Garden.FavIcon' => [
                 'LabelCode' => t('Favicon'),
@@ -693,7 +693,18 @@ class SettingsController extends DashboardController {
                         $this->Form->setData($banModel->getID($iD));
                     }
                 }
-                $this->setData('_BanTypes', ['IPAddress' => t('IP Address'), 'Email' => t('Email'), 'Name' => t('Name')]);
+
+                $banTypes = [
+                    'IPAddress' => t('IP Address'),
+                    'Email' => t('Email'),
+                    'Name' => t('Name'),
+                ];
+
+                $eventManager = Gdn::getContainer()->get(\Garden\EventManager::class);
+                $banTypes = $eventManager->fireFilter('settingsController_listBanTypes', $banTypes);
+
+                $this->setData('_BanTypes', $banTypes);
+
                 $this->View = 'Ban';
                 break;
             case 'delete':

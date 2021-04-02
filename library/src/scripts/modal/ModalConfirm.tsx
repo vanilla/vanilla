@@ -30,6 +30,7 @@ interface IProps {
     confirmTitle?: string;
     children: React.ReactNode;
     isConfirmLoading?: boolean;
+    isConfirmDisabled?: boolean;
     elementToFocusOnExit?: HTMLElement;
     size?: ModalSizes;
     isVisible: boolean;
@@ -43,7 +44,7 @@ export default class ModalConfirm extends React.Component<IProps> {
     private id = uniqueIDFromPrefix("confirmModal");
 
     public render() {
-        const { onConfirm, srOnlyTitle, isConfirmLoading, title, children, size } = this.props;
+        const { onConfirm, srOnlyTitle, isConfirmLoading, isConfirmDisabled, title, children, size } = this.props;
         const onCancel = this.handleCancel;
         const classesFrameBody = frameBodyClasses();
         const classFrameFooter = frameFooterClasses();
@@ -86,7 +87,7 @@ export default class ModalConfirm extends React.Component<IProps> {
                                 className={classFrameFooter.actionButton}
                                 onClick={onConfirm}
                                 baseClass={ButtonTypes.TEXT_PRIMARY}
-                                disabled={isConfirmLoading}
+                                disabled={isConfirmLoading || isConfirmDisabled}
                             >
                                 {isConfirmLoading ? <ButtonLoader /> : this.props.confirmTitle || t("OK")}
                             </Button>

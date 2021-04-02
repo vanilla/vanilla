@@ -4,13 +4,14 @@
  */
 
 import { percent, color, rgba, px } from "csx";
-import { defaultTransition, flexHelper, absolutePosition } from "@library/styles/styleHelpers";
+import { defaultTransition, flexHelper } from "@library/styles/styleHelpers";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
 import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { shadowHelper } from "@library/styles/shadowHelpers";
+import { Mixins } from "@library/styles/Mixins";
 
 export const themeCardVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("themePreviewCard");
@@ -97,14 +98,14 @@ export const themeCardClasses = useThemeCache(() => {
     });
 
     const overlay = style("overlay", {
-        ...absolutePosition.fullSizeOfParent(),
+        ...Mixins.absolute.fullSizeOfParent(),
         opacity: 0,
         ...flexHelper().middle(),
         ...defaultTransition("opacity"),
     });
 
     const overlayBg = style("overlayBg", {
-        ...absolutePosition.fullSizeOfParent(),
+        ...Mixins.absolute.fullSizeOfParent(),
         backgroundColor: ColorsUtils.colorOut(vars.colors.overlayBg),
     });
 
@@ -128,7 +129,7 @@ export const themeCardClasses = useThemeCache(() => {
     });
 
     const container = style("container", {
-        ...absolutePosition.fullSizeOfParent(),
+        ...Mixins.absolute.fullSizeOfParent(),
         borderRadius: styleUnit(2),
         ...{
             [`&:hover .${overlay}`]: {
@@ -144,12 +145,12 @@ export const themeCardClasses = useThemeCache(() => {
     });
 
     const previewContainer = style("container", {
-        ...absolutePosition.fullSizeOfParent(),
+        ...Mixins.absolute.fullSizeOfParent(),
         overflow: "hidden",
     });
 
     const svg = style("svg", {
-        ...absolutePosition.fullSizeOfParent(),
+        ...Mixins.absolute.fullSizeOfParent(),
         top: styleUnit(vars.menuBar.height),
     });
 
@@ -235,8 +236,9 @@ export const themeCardClasses = useThemeCache(() => {
     });
 
     const title = style("title", {
-        fontSize: globalVars.fonts.size.medium,
-        fontWeight: globalVars.fonts.weights.semiBold,
+        ...Mixins.font({
+            ...globalVars.fontSizeAndWeightVars("medium", "semiBold"),
+        }),
         ...flexHelper().middleLeft(),
     });
 

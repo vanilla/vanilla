@@ -19,6 +19,7 @@ use Vanilla\Theme\Asset\JsonThemeAsset;
 use Vanilla\Theme\Asset\NeonThemeAsset;
 use Vanilla\Theme\Asset\ThemeAsset;
 use Vanilla\Theme\Asset\TwigThemeAsset;
+use Vanilla\Utility\ArrayUtils;
 use Vanilla\Web\Asset\DeploymentCacheBuster;
 
 /**
@@ -171,6 +172,75 @@ class ThemeAssetFactory {
             default:
                 return null;
         }
+    }
+
+    /**
+     * Create a new theme asset from a group of existing theme assets, merged in order.
+     *
+     * @param ThemeAsset $min1ThemeAsset At least one theme asset must be passed.
+     * @param ThemeAsset[] $restAssets
+     *
+     * @return ThemeAsset
+     */
+    public function mergeAssets(ThemeAsset $min1ThemeAsset, ThemeAsset ...$restAssets): ThemeAsset {
+        $assets = array_merge([$min1ThemeAsset], $restAssets);
+        $lastAsset = $assets[count($assets) - 1] ?? $min1ThemeAsset;
+        if (!$lastAsset->canMerge()) {
+            return $lastAsset;
+        }
+
+        if ($this->assetsAreInstancesOf($assets, CssThemeAsset::class)) {
+            $concattedValue = '';
+            /** @var CssThemeAsset $asset */
+            foreach ($assets as $asset) {
+                $concattedValue .= $asset->getValue();
+            }
+
+            return new CssThemeAsset($concattedValue, $lastAsset->getUrl());
+        } elseif ($this->assetsAreInstancesOf($assets, JavascriptThemeAsset::class)) {
+            $concattedValue = '';
+            /** @var JavascriptThemeAsset $asset */
+            foreach ($assets as $asset) {
+                $concattedValue .= $asset->getValue();
+            }
+
+            return new JavascriptThemeAsset($concattedValue, $lastAsset->getUrl());
+        } elseif ($this->assetsAreInstancesOf($assets, JsonThemeAsset::class)) {
+            $result = [];
+
+            /** @var JsonThemeAsset $asset */
+            foreach ($assets as $asset) {
+                $result = ArrayUtils::mergeRecursive($result, $asset->getValue(), function ($arr1, $arr2) {
+                    // We want to fully replace indexed arrays instead of merging them.
+                    // This mirrors our frontend variable handling.
+                    return $arr2;
+                });
+            }
+
+            return new JsonThemeAsset(json_encode($result, JSON_UNESCAPED_UNICODE), $lastAsset->getUrl());
+        } else {
+            // Just take the last assets.
+            // These can't be merged, just use the last one.
+            return $lastAsset;
+        }
+    }
+
+    /**
+     * Check if an array of assets are all of a particular type.
+     *
+     * @param ThemeAsset[] $assets
+     * @param string $class The class to check instanceof.
+     *
+     * @return bool
+     */
+    private function assetsAreInstancesOf(array $assets, string $class): bool {
+        foreach ($assets as $asset) {
+            if (!($asset instanceof $class)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

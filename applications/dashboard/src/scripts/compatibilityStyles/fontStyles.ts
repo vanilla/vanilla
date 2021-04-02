@@ -55,25 +55,6 @@ export const forumFontsVariables = useThemeCache(() => {
 export const fontCSS = () => {
     const globalVars = globalVariables();
     const vars = forumFontsVariables();
-    const inputVars = inputVariables();
-
-    const mainColors = globalVars.mainColors;
-    const fg = ColorsUtils.colorOut(mainColors.fg);
-    const bg = ColorsUtils.colorOut(mainColors.bg);
-    const primary = ColorsUtils.colorOut(mainColors.primary);
-    const metaFg = ColorsUtils.colorOut(globalVars.meta.colors.fg);
-
-    cssOut(`.Meta .MItem`, {
-        ...Mixins.font(globalVars.meta.text),
-    });
-
-    cssOut(".Meta .MItem:first-of-type", {
-        marginLeft: 0,
-    });
-
-    cssOut(".Meta .MItem.RSS + .MItem", {
-        marginLeft: 0,
-    });
 
     cssOut(
         `
@@ -84,18 +65,6 @@ export const fontCSS = () => {
             ...forumTitleMixin(),
         },
     );
-
-    // Panel Headings
-    cssOut(`.Panel h4:not(.no-css), .Panel h3:not(.no-css), .Panel h2:not(.no-css)`, {
-        ...Mixins.padding({
-            vertical: 0,
-        }),
-        marginBottom: styleUnit(panelListVariables().offset.default),
-        ...Mixins.font({
-            size: vars.fonts.sizes.title,
-            weight: globalVars.fonts.weights.bold,
-        }),
-    });
 
     // Categories, top level
     cssOut(
@@ -162,9 +131,11 @@ export const fontCSS = () => {
             .Panel.Panel-main .Box .Heading[aria-level='${i}'],
         `,
             {
-                fontSize: styleUnit(i === 1 ? globalVars.fonts.size.medium : globalVars.fonts.size.small),
+                ...Mixins.font({
+                    ...globalVars.fontSizeAndWeightVars(styleUnit(i === 1 ? "medium" : "small")),
+                    color: ColorsUtils.colorOut(globalVars.mainColors.fg),
+                }),
                 paddingLeft: offset,
-                color: ColorsUtils.colorOut(globalVars.mainColors.fg),
             },
         );
 
@@ -174,7 +145,11 @@ export const fontCSS = () => {
             .Panel.Panel-main .Box .Heading.Heading[aria-level='${i}'],
         `,
             {
-                fontSize: i === 1 ? styleUnit(globalVars.fonts.size.large) : styleUnit(globalVars.fonts.size.small),
+                ...Mixins.font({
+                    ...(i === 1
+                        ? globalVars.fontSizeAndWeightVars("large")
+                        : globalVars.fontSizeAndWeightVars("small")),
+                }),
                 paddingLeft: offset,
             },
         );

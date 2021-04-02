@@ -16,23 +16,25 @@ import {
 } from "@library/homeWidget/HomeWidgetContainer.styles";
 import { IHomeWidgetItemProps, HomeWidgetItem } from "@library/homeWidget/HomeWidgetItem";
 import { HomeWidgetContainer } from "@library/homeWidget/HomeWidgetContainer";
+import { DeepPartial } from "redux";
 
 interface IProps {
     // Options
     containerOptions?: IHomeWidgetContainerOptions;
-    itemOptions?: IHomeWidgetItemOptions;
+    itemOptions?: DeepPartial<IHomeWidgetItemOptions>;
     maxItemCount?: number;
 
     // Content
     title?: string;
+    subtitle?: string;
+    description?: string;
     itemData: IHomeWidgetItemProps[];
-    callToAction?: string;
-    url?: string;
 }
 
 export function HomeWidget(props: IProps) {
     const itemOptions = homeWidgetItemVariables(props.itemOptions).options;
-    const containerOptions = homeWidgetContainerVariables(props.containerOptions).options;
+    const containerOptionsWithDefaults = { ...props.containerOptions, isGrid: true };
+    const containerOptions = homeWidgetContainerVariables(containerOptionsWithDefaults).options;
     const containerClasses = homeWidgetContainerClasses(props.containerOptions);
 
     let items = props.itemData;
@@ -45,6 +47,7 @@ export function HomeWidget(props: IProps) {
     if (
         [
             HomeWidgetItemContentType.TITLE_BACKGROUND,
+            HomeWidgetItemContentType.TITLE_BACKGROUND_DESCRIPTION,
             HomeWidgetItemContentType.TITLE_DESCRIPTION_ICON,
             HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
         ].includes(itemOptions.contentType) &&
@@ -54,7 +57,12 @@ export function HomeWidget(props: IProps) {
     }
 
     return (
-        <HomeWidgetContainer options={props.containerOptions} title={props.title}>
+        <HomeWidgetContainer
+            subtitle={props.subtitle}
+            description={props.description}
+            options={containerOptionsWithDefaults}
+            title={props.title}
+        >
             {items.map((item, i) => {
                 return <HomeWidgetItem key={i} {...item} options={props.itemOptions} />;
             })}

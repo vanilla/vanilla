@@ -83,8 +83,9 @@ class UserVisitUpdater {
 
         $fields = [];
 
-        if ($user['DateLastActive'] && DateTimeFormatter::dateTimeToTimeStamp($user['DateLastActive']) < strtotime('5 minutes ago')) {
-            // We only update the last active date once every 5 minutes to cut down on DB activity.
+        // Update DateLastActive if this is the first time the user is active, or if the user was last active for more than 5 mins.
+        if ($user['DateLastActive'] === null ||
+            ($user['DateLastActive'] !== null && DateTimeFormatter::dateTimeToTimeStamp($user['DateLastActive']) < strtotime('5 minutes ago'))) {
             $fields['DateLastActive'] = DateTimeFormatter::timeStampToDateTime(CurrentTimeStamp::get());
         }
 

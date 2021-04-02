@@ -19,46 +19,41 @@ export const panelAreaClasses = useThemeCache((mediaQueries) => {
     const globalVars = globalVariables();
     const style = styleFactory("panelArea");
     const classesPanelWidget = panelWidgetClasses(mediaQueries);
+    const overflowSize = globalVars.spacer.mainLayout;
 
     const root = style({
         width: percent(100),
         ...Mixins.padding({
             horizontal: globalVariables().widget.padding,
-            vertical: globalVariables().widget.padding / 5,
         }),
-        ...{
-            ".heading": {
-                ...lineHeightAdjustment(),
-            },
-            [`&.inheritHeight > .${classesPanelWidget.root}`]: {
-                flexGrow: 1,
-            },
-            "&.hasNoVerticalPadding": {
-                ...Mixins.padding({ vertical: 0 }),
-            },
-            "&.hasNoHorizontalPadding": {
-                ...Mixins.padding({ horizontal: 0 }),
-            },
-            "&.isSelfPadded": {
-                ...Mixins.padding({ all: 0 }),
-            },
-            ...mediaQueries({
-                [LayoutTypes.TWO_COLUMNS]: {
-                    oneColumnDown: {
-                        ...Mixins.padding({
-                            horizontal: 0,
-                        }),
-                    },
-                },
-                [LayoutTypes.THREE_COLUMNS]: {
-                    oneColumnDown: {
-                        ...Mixins.padding({
-                            horizontal: 0,
-                        }),
-                    },
-                },
-            }),
+        "& .heading": {
+            ...lineHeightAdjustment(),
         },
+        [`&.inheritHeight > .${classesPanelWidget.root}`]: {
+            flexGrow: 1,
+        },
+        "&.hasNoVerticalPadding": {
+            ...Mixins.padding({ vertical: 0 }),
+        },
+        "&.hasNoHorizontalPadding": {
+            ...Mixins.padding({ horizontal: 0 }),
+        },
+        ...mediaQueries({
+            [LayoutTypes.TWO_COLUMNS]: {
+                oneColumnDown: {
+                    ...Mixins.padding({
+                        horizontal: 0,
+                    }),
+                },
+            },
+            [LayoutTypes.THREE_COLUMNS]: {
+                oneColumnDown: {
+                    ...Mixins.padding({
+                        horizontal: 0,
+                    }),
+                },
+            },
+        }),
     });
 
     const overflowFull = useThemeCache((offset: number) =>
@@ -67,9 +62,9 @@ export const panelAreaClasses = useThemeCache((mediaQueries) => {
             overflow: "auto",
             position: "relative",
             minHeight: 100,
-            paddingBottom: 50,
-            paddingTop: 50,
-            marginTop: -50,
+            paddingBottom: overflowSize,
+            paddingTop: overflowSize,
+            marginTop: -overflowSize,
         }),
     );
 
@@ -86,7 +81,7 @@ export const panelAreaClasses = useThemeCache((mediaQueries) => {
             left: 0,
             right: 0,
             position: "absolute",
-            height: 50,
+            height: overflowSize,
             background: linearGradient(
                 "to top",
                 ColorsUtils.colorOut(gradientColor.fade(0))!,
@@ -105,7 +100,7 @@ export const panelAreaClasses = useThemeCache((mediaQueries) => {
             left: 0,
             right: 0,
             position: "absolute",
-            height: 50,
+            height: overflowSize,
             background: linearGradient(
                 "to bottom",
                 ColorsUtils.colorOut(gradientColor.fade(0))!,

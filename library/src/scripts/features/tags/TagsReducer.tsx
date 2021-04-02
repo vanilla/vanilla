@@ -10,9 +10,9 @@ import { TagsAction } from "@library/features/tags/TagsAction";
 import { useSelector } from "react-redux";
 
 export interface ITag {
-    id: number;
+    tagID: number;
     name: string;
-    urlCode: string;
+    urlcode: string;
 }
 
 export interface ITagState {

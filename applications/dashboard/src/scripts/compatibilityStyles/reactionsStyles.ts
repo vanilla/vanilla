@@ -5,15 +5,18 @@
  * @license GPL-2.0-only
  */
 
-import { allLinkStates, negative } from "@library/styles/styleHelpers";
+import { allLinkStates, importantUnit, negative } from "@library/styles/styleHelpers";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { calc, important } from "csx";
 import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
+import { metasVariables } from "@library/metas/Metas.variables";
+import { Mixins } from "@library/styles/Mixins";
 
 export const reactionsCSS = () => {
     const vars = globalVariables();
+    const metasVars = metasVariables();
 
     cssOut(`.Reactions`, {
         display: "flex",
@@ -21,9 +24,11 @@ export const reactionsCSS = () => {
         flexWrap: "wrap",
         alignItems: "center",
         justifyContent: "flex-start",
-        marginLeft: important(styleUnit(negative(vars.meta.spacing.default)) as string),
-        width: calc(`100% + ${styleUnit(vars.meta.spacing.default * 2)}`),
-        padding: styleUnit(vars.meta.spacing.default),
+        marginLeft: importantUnit(negative(metasVars.spacing.horizontal)),
+        width: calc(`100% + ${styleUnit((metasVars.spacing.horizontal! as number) * 2)}`),
+        ...Mixins.padding({
+            all: styleUnit(metasVars.spacing.horizontal),
+        }),
     });
 
     cssOut(
@@ -35,13 +40,14 @@ export const reactionsCSS = () => {
         .MessageList .Reactions .ReactButton
     `,
         {
-            fontSize: styleUnit(vars.meta.text.size),
-            margin: styleUnit(vars.meta.spacing.default),
+            fontSize: styleUnit(metasVars.font.size),
+            ...Mixins.margin({ all: styleUnit(metasVars.spacing.horizontal) }),
             textDecoration: "none",
         },
     );
 
     cssOut(".Item.Item .Reactions a, .Item:hover .Reactions a", {
+        textDecoration: "none",
         width: "initial",
     });
 
@@ -50,7 +56,7 @@ export const reactionsCSS = () => {
     });
 
     cssOut(`.Reactions .ReactButton`, {
-        color: ColorsUtils.colorOut(vars.meta.colors.fg),
+        color: ColorsUtils.colorOut(metasVars.font.color),
         ...allLinkStates({
             // noState: {
             //     color: ColorsUtils.colorOut(vars.links.colors.default),

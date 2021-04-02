@@ -5,18 +5,16 @@
 
 import React from "react";
 import PanelLayout from "@library/layout/PanelLayout";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { NO_WRAPPER_CONFIG, storyWithConfig } from "@library/storybook/StoryContext";
 import ThreeColumnLayout from "./ThreeColumnLayout";
 import PanelWidget from "./components/PanelWidget";
+import TitleBar from "@library/headers/TitleBar";
+import { MemoryRouter } from "react-router";
+import Container from "@library/layout/components/Container";
 
 export default {
     title: "Layout/PanelLayout",
-    parameters: {
-        chromatic: {
-            viewports: Object.values(layoutVariables().panelLayoutBreakPoints),
-        },
-    },
 };
 
 const smallIpsum = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse ac arcu massa. Cras lobortis orci turpis, non viverra ex laoreet a. Sed dolor nisi, condimentum tincidunt gravida nec, pellentesque at felis. Phasellus vitae efficitur nibh, at ultricies tortor. Curabitur mauris lectus, luctus non est sit amet, elementum consectetur augue. Nullam non erat at tellus tincidunt ultricies quis non mi. Quisque vestibulum, nibh a sodales porta, neque diam iaculis lorem, in interdum tortor erat ut eros. Suspendisse magna lorem, euismod at bibendum id, semper non massa. Sed tempus orci dignissim molestie tempus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nam eget dolor ut ex consequat egestas quis eget sem. Nulla sit amet orci porta, feugiat nisl scelerisque, ultrices lorem. Suspendisse potenti. Cras et arcu vitae libero congue porta et vel orci. Morbi tincidunt massa et euismod sodales. Aliquam vel massa facilisis, volutpat massa sit amet, laoreet risus.`;
@@ -53,6 +51,50 @@ export const LargeContent = storyWithConfig(NO_WRAPPER_CONFIG, () => {
         />
     );
 });
+
+LargeContent.parameters = {
+    chromatic: {
+        viewports: Object.values(panelLayoutVariables().panelLayoutBreakPoints),
+    },
+};
+
+export const WithThingsAbove = storyWithConfig(NO_WRAPPER_CONFIG, () => {
+    return (
+        <>
+            <MemoryRouter>
+                <TitleBar />
+                <div
+                    style={{
+                        background: "#f1f1f1",
+                        padding: 24,
+                        minHeight: 200,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "#333",
+                        marginBottom: 24,
+                    }}
+                >
+                    <Container fullGutter>Arbitrary Sized height</Container>
+                </div>
+                <ThreeColumnLayout
+                    leftTop={<DummyPanel>Left Top</DummyPanel>}
+                    leftBottom={<DummyPanel>Left Bottom</DummyPanel>}
+                    middleTop={<DummyPanel>Middle Top</DummyPanel>}
+                    middleBottom={<DummyPanel>Middle Bottom{largeIpsum}</DummyPanel>}
+                    rightTop={<DummyPanel>Right Top</DummyPanel>}
+                    rightBottom={<DummyPanel>Right bottom</DummyPanel>}
+                />
+            </MemoryRouter>
+        </>
+    );
+});
+
+WithThingsAbove.parameters = {
+    chromatic: {
+        viewports: Object.values(panelLayoutVariables().panelLayoutBreakPoints),
+    },
+};
 
 export const LargeLeftPanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
     return (
@@ -111,9 +153,15 @@ export const LargeEverything = storyWithConfig(NO_WRAPPER_CONFIG, () => {
     );
 });
 
+LargeEverything.parameters = {
+    chromatic: {
+        viewports: Object.values(panelLayoutVariables().panelLayoutBreakPoints),
+    },
+};
+
 export const DarkMode = storyWithConfig(
     {
-        ...NO_WRAPPER_CONFIG,
+        useWrappers: false,
         themeVars: {
             global: {
                 mainColors: {

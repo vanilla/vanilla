@@ -149,25 +149,29 @@ class SmokeTest extends BaseTest {
      * @large
      */
     public function testCreateRestrictedCategory() {
-        $r = $this->api()->post('/vanilla/settings/addcategory.json', [
-            'Name' => 'Moderators Only',
-            'UrlCode' => 'moderators-only',
-            'DisplayAs' => 'Discussions',
-            'CustomPermissions' => 1,
-            'Permission' => http_build_query([
-                'Category/PermissionCategoryID/0/32//Vanilla.Comments.Add',
-                'Category/PermissionCategoryID/0/32//Vanilla.Comments.Delete',
-                'Category/PermissionCategoryID/0/32//Vanilla.Comments.Edit',
-                'Category/PermissionCategoryID/0/32//Vanilla.Discussions.Add',
-                'Category/PermissionCategoryID/0/32//Vanilla.Discussions.Announce',
-                'Category/PermissionCategoryID/0/32//Vanilla.Comments.Add',
-                'Category/PermissionCategoryID/0/32//Vanilla.Discussions.Close',
-                'Category/PermissionCategoryID/0/32//Vanilla.Discussions.Delete',
-                'Category/PermissionCategoryID/0/32//Vanilla.Discussions.Edit',
-                'Category/PermissionCategoryID/0/32//Vanilla.Discussions.Sink',
-                'Category/PermissionCategoryID/0/32//Vanilla.Discussions.View'
-            ])
-        ]);
+        $r = $this->api()->post(
+            '/vanilla/settings/addcategory.json',
+            [
+                'Name' => 'Moderators Only',
+                'UrlCode' => 'moderators-only',
+                'DisplayAs' => 'Discussions',
+                'CustomPermissions' => 1,
+                'Permission' => [
+                    'Category/PermissionCategoryID/0/32//Vanilla.Comments.Add',
+                    'Category/PermissionCategoryID/0/32//Vanilla.Comments.Delete',
+                    'Category/PermissionCategoryID/0/32//Vanilla.Comments.Edit',
+                    'Category/PermissionCategoryID/0/32//Vanilla.Discussions.Add',
+                    'Category/PermissionCategoryID/0/32//Vanilla.Discussions.Announce',
+                    'Category/PermissionCategoryID/0/32//Vanilla.Comments.Add',
+                    'Category/PermissionCategoryID/0/32//Vanilla.Discussions.Close',
+                    'Category/PermissionCategoryID/0/32//Vanilla.Discussions.Delete',
+                    'Category/PermissionCategoryID/0/32//Vanilla.Discussions.Edit',
+                    'Category/PermissionCategoryID/0/32//Vanilla.Discussions.Sink',
+                    'Category/PermissionCategoryID/0/32//Vanilla.Discussions.View'
+                ]
+            ],
+            ['content-type' => 'application/json']
+        );
 
         $body = $r->getBody();
         $category = $body['Category'];

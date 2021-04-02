@@ -4,7 +4,7 @@
  */
 
 import { resetThemeCache } from "@library/styles/themeCache";
-import { IComponentMountOptions, mountReact } from "@vanilla/react-utils";
+import { IComponentMountOptions, IMountable, mountReact, mountReactMultiple } from "@vanilla/react-utils";
 import { logDebug, logWarning } from "@vanilla/utils";
 import React from "react";
 
@@ -44,6 +44,7 @@ const _components: {
 } = {};
 
 let _pageComponent: React.ComponentType<any> | null = null;
+let _mountedPage = false;
 
 /**
  * Register a component in the Components registry.
@@ -98,9 +99,18 @@ export function getComponent(name: string): IRegisteredComponent | undefined {
 export async function _mountComponents(parent: Element) {
     const awaiting: Array<Promise<any>> = [];
     const parentPage = parent.querySelector("#app");
-    if (parentPage instanceof HTMLElement && _pageComponent !== null) {
-        mountReact(<_pageComponent />, parentPage);
+    let mountables: IMountable[] = [];
+
+    if (parentPage instanceof HTMLElement && _pageComponent !== null && !_mountedPage) {
+        _mountedPage = true;
+        let PageComponentToMount = _pageComponent;
+        mountables.push({
+            target: parentPage,
+            component: <PageComponentToMount />,
+        });
     }
+
+    let elementsToUnhide: Element[] = [];
 
     parent.querySelectorAll("[data-react]").forEach((node) => {
         if (!(node instanceof HTMLElement)) {
@@ -124,27 +134,37 @@ export async function _mountComponents(parent: Element) {
         node.removeAttribute("data-react");
         node.removeAttribute("data-props");
 
-        awaiting.push(
-            new Promise((resolve) => {
-                if (registeredComponent) {
-                    mountReact(
-                        <registeredComponent.Component {...props} contents={children} />,
-                        node,
-                        () => {
-                            if (node.getAttribute("data-unhide") === "true") {
-                                node.removeAttribute("style");
-                            }
-                            resolve();
-                        },
-                        registeredComponent.mountOptions,
-                    );
-                } else {
-                    logDebug("Could not find component %s.", name);
-                    resolve();
-                }
-            }),
-        );
+        if (node.getAttribute("data-unhide") === "true") {
+            elementsToUnhide.push(node);
+        }
+
+        const reactNode = <registeredComponent.Component {...props} contents={children} />;
+
+        if (registeredComponent.mountOptions?.bypassPortalManager) {
+            awaiting.push(
+                new Promise<void>((resolve) => {
+                    mountReact(reactNode, node, () => resolve(), registeredComponent.mountOptions);
+                }),
+            );
+        } else {
+            mountables.push({
+                component: reactNode,
+                target: node,
+                overwrite: registeredComponent.mountOptions?.overwrite ?? false,
+            });
+        }
     });
+
+    awaiting.push(
+        new Promise<void>((resolve) => {
+            mountReactMultiple(mountables, () => {
+                elementsToUnhide.forEach((element) => {
+                    element.removeAttribute("style");
+                });
+                resolve();
+            });
+        }),
+    );
 
     await Promise.all(awaiting);
 }

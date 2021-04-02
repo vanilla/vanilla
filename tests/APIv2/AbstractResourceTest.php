@@ -11,6 +11,9 @@ use Garden\Http\HttpResponse;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Formatting\FormatCompatibilityService;
 
+/**
+ * A base test class for testing any API v2 RESTful resource.
+ */
 abstract class AbstractResourceTest extends AbstractAPIv2Test {
 
     /**

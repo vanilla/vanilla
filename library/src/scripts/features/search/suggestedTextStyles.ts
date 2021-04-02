@@ -5,17 +5,19 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { metasVariables } from "@library/metas/Metas.variables";
 import { useThemeCache } from "@library/styles/themeCache";
 import { percent } from "csx";
 import { buttonResetMixin } from "@library/forms/buttonMixins";
 import { CSSObject } from "@emotion/css";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { Mixins } from "@library/styles/Mixins";
 
 export const suggestedTextStyleHelper = useThemeCache((overwrite?: { forDashboard?: boolean }) => {
     const globalVars = globalVariables();
+    const metasVars = metasVariables();
     const { forDashboard = false } = overwrite || {};
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = panelLayoutVariables().mediaQueries();
 
     // The styles have been split here so they can be exported to the compatibility styles.
     const option: CSSObject = {
@@ -26,8 +28,8 @@ export const suggestedTextStyleHelper = useThemeCache((overwrite?: { forDashboar
             horizontal: 12,
         }),
         ...Mixins.font({
+            ...(forDashboard ? globalVars.fontSizeAndWeightVars("medium") : globalVars.fontSizeAndWeightVars("large")),
             color: globalVars.mainColors.fg,
-            size: forDashboard ? globalVars.fonts.size.medium : globalVars.fonts.size.large,
         }),
         textAlign: "left",
         display: "block",
@@ -35,7 +37,7 @@ export const suggestedTextStyleHelper = useThemeCache((overwrite?: { forDashboar
         ...{
             ".suggestedTextInput-parentTag": {
                 ...Mixins.font({
-                    ...globalVars.meta.text,
+                    ...metasVars.font,
                     lineHeight: "inherit",
                 }),
             },

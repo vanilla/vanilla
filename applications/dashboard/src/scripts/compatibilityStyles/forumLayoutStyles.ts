@@ -7,7 +7,7 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { containerMainMediaQueries, containerMainStyles } from "@library/layout/components/containerStyles";
-import { CSSObject } from "@emotion/css";
+import { CSSObject, injectGlobal } from "@emotion/css";
 import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { calc, important, percent } from "csx";
@@ -15,7 +15,7 @@ import { styleUnit } from "@library/styles/styleUnit";
 import { media } from "@library/styles/styleShim";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { Mixins } from "@library/styles/Mixins";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 
 export const forumLayoutVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -24,12 +24,12 @@ export const forumLayoutVariables = useThemeCache(() => {
     // Important variables that will be used to calculate other variables
     const foundationalWidths = makeThemeVars("foundationalWidths", {
         fullGutter: globalVars.constants.fullGutter,
-        panelWidth: 220, // main calculated based on panel width
+        panelWidth: 242, // main calculated based on panel width
         breakPoints: {
             // Other break points are calculated
             oneColumn: 1200,
             tablet: 991,
-            mobile: 768,
+            mobile: 806,
             xs: 576,
         },
     });
@@ -168,15 +168,32 @@ export const forumLayoutVariables = useThemeCache(() => {
 });
 
 export const forumLayoutCSS = () => {
+    shimPanelPageBoxes();
     const globalVars = globalVariables();
     const vars = forumLayoutVariables();
 
-    const mainColors = globalVars.mainColors;
     const mediaQueries = vars.mediaQueries();
+
+    injectGlobal({
+        ".Frame-content": {
+            ...Mixins.margin({
+                vertical: globalVars.spacer.mainLayout,
+            }),
+            ...mediaQueries.oneColumnDown({
+                ...Mixins.margin({
+                    vertical: globalVars.spacer.pageComponentCompact,
+                }),
+            }),
+        },
+        ".Breadcrumbs": {
+            marginBottom: 24,
+            padding: 0,
+        },
+    });
 
     cssOut(
         `.Container, body.Section-Event.NoPanel .Frame-content > .Container`,
-        mediaQueries.tablet({
+        mediaQueries.mobileDown({
             ...Mixins.padding({
                 horizontal: 12,
             }),
@@ -207,7 +224,7 @@ export const forumLayoutCSS = () => {
         {
             width: styleUnit(vars.main.width),
             ...Mixins.padding({
-                all: globalVars.gutter.half,
+                vertical: globalVars.gutter.half,
             }),
         },
         mediaQueries.oneColumnDown({
@@ -222,7 +239,7 @@ export const forumLayoutCSS = () => {
         flexWrap: "nowrap",
         justifyContent: "space-between",
         ...Mixins.padding({
-            all: globalVars.gutter.half,
+            horizontal: globalVars.gutter.half,
         }),
         "& > *": {
             ...Mixins.padding({
@@ -231,14 +248,26 @@ export const forumLayoutCSS = () => {
         },
         ...mediaQueries.oneColumnDown({
             flexWrap: important("wrap"),
-            ...Mixins.padding({
-                horizontal: 0,
-            }),
         }),
-        ...mediaQueries.tablet({
+        ...mediaQueries.mobileDown({
             ...Mixins.padding({
                 horizontal: 0,
             }),
         }),
     });
 };
+
+function shimPanelPageBoxes() {
+    document.querySelectorAll(".Panel").forEach((panel) => {
+        const existingParent = panel.parentElement;
+        if (!existingParent) {
+            return;
+        }
+        const newWrapper = document.createElement("div");
+        newWrapper.classList.add("pageBox");
+        Array.from(panel.childNodes).forEach((node) => {
+            newWrapper.appendChild(node);
+        });
+        panel.appendChild(newWrapper);
+    });
+}

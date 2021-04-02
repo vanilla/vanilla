@@ -892,6 +892,7 @@ class DiscussionModelTest extends SiteTestCase {
     public function testDiscussionTypes() {
         $discussionTypes = $this->discussionModel::discussionTypes();
         $this->assertSame(['Discussion' => [
+            'apiType' => 'discussion',
             'Singular' => 'Discussion',
             'Plural' => 'Discussions',
             'AddUrl' => '/post/discussion',
@@ -1002,7 +1003,7 @@ class DiscussionModelTest extends SiteTestCase {
     }
 
     /**
-     * Test particpation count.
+     * Test participation count.
      */
     public function testParticipatedCount() {
         $this->resetTable('Comment');
@@ -1018,5 +1019,23 @@ class DiscussionModelTest extends SiteTestCase {
 
         $this->assertEquals(0, $this->discussionModel->getCountParticipated());
         $this->assertEquals(2, $this->discussionModel->getCountParticipated($user2['userID']));
+    }
+
+    /**
+     * Smoke test `DiscussionModel::resolveDiscussionArg()`.
+     */
+    public function testResolveDiscussionArg(): void {
+        $expected = $this->insertDiscussions(1)[0];
+
+        [$id, $actual] = $this->discussionModel->resolveDiscussionArg($expected);
+        $this->assertSame($expected, $actual);
+        $this->assertSame($expected['DiscussionID'], $id);
+
+        // These fields aren't necessary for comparison and are inconsistent between `DiscussionModel::getWhere()` and `DiscussionModel::getID()`.
+        unset($expected['FirstEmail'], $expected['FirstName'], $expected['FirstPhoto'], $expected['WatchUserID']);
+
+        [$id2, $actual2] = $this->discussionModel->resolveDiscussionArg($expected['DiscussionID']);
+        $this->assertArraySubsetRecursive($expected, $actual2);
+        $this->assertSame($expected['DiscussionID'], $id2);
     }
 }

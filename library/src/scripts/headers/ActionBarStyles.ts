@@ -10,14 +10,14 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { em, percent, px } from "csx";
 import { Mixins } from "@library/styles/Mixins";
 
 export const actionBarClasses = useThemeCache(() => {
     const style = styleFactory("actionBar");
     const titleBarVars = titleBarVariables();
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = panelLayoutVariables().mediaQueries();
     const globalVars = globalVariables();
 
     const items = style(
@@ -57,7 +57,9 @@ export const actionBarClasses = useThemeCache(() => {
                 justifyContent: "flex-end",
                 ...{
                     "& button": {
-                        fontSize: globalVars.fonts.size.medium,
+                        ...Mixins.font({
+                            ...globalVars.fontSizeAndWeightVars("medium"),
+                        }),
                     },
                 },
             },
@@ -68,7 +70,9 @@ export const actionBarClasses = useThemeCache(() => {
         marginLeft: styleUnit(globalVars.gutter.half),
         ...{
             "& button": {
-                fontSize: globalVars.fonts.size.medium,
+                ...Mixins.font({
+                    ...globalVars.fontSizeAndWeightVars("medium"),
+                }),
             },
         },
     });

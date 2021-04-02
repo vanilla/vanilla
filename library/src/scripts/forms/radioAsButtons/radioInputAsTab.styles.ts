@@ -6,7 +6,7 @@
 
 import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { userSelect } from "@library/styles/styleHelpersFeedback";
 import { borderRadii, negative } from "@library/styles/styleHelpers";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
@@ -62,7 +62,7 @@ export const radioInputAsTabVariables = useThemeCache(() => {
     const font = makeVars(
         "font",
         Variables.font({
-            size: globalVars.fonts.size.small,
+            ...globalVars.fontSizeAndWeightVars("small"),
             align: "center",
             lineHeight: styleUnit(sizing.height),
         }),
@@ -95,7 +95,7 @@ export const radioInputAsTabVariables = useThemeCache(() => {
 
 export const radioInputAsTabClasses = useThemeCache(() => {
     const style = styleFactory("radioInputAsTab");
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = panelLayoutVariables().mediaQueries();
     const vars = radioInputAsTabVariables();
     const formElementVariables = formElementsVariables();
 

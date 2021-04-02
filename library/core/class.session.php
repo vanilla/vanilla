@@ -100,22 +100,36 @@ class Gdn_Session {
      * If false, the user only needs one of the specified permissions.
      * @param string $junctionTable The name of the junction table for a junction permission.
      * @param int|string $junctionID The JunctionID associated with $Permission (ie. A discussion category identifier).
+     * @param string $mode One of the permission modes.
+     *
      * @return boolean Returns **true** if the user has permission or **false** otherwise.
      */
-    public function checkPermission($permission, $fullMatch = true, $junctionTable = '', $junctionID = '') {
-        if ($junctionID === 'any' || $junctionID === '' || empty($junctionTable) ||
+    public function checkPermission(
+        $permission,
+        $fullMatch = true,
+        $junctionTable = '',
+        $junctionID = '',
+        string $mode = Permissions::CHECK_MODE_GLOBAL_OR_RESOURCE
+    ) {
+        if ($junctionID === 'any' || $junctionID === '' ||
             self::c("Garden.Permissions.Disabled.{$junctionTable}")) {
+            $junctionID = null;
+            $junctionTable = null;
+        }
+
+        if ($junctionTable === '') {
+            $junctionTable = null;
             $junctionID = null;
         }
 
         if (is_array($permission)) {
             if ($fullMatch) {
-                return $this->permissions->hasAll($permission, $junctionID);
+                return $this->permissions->hasAll($permission, $junctionID, $mode, $junctionTable);
             } else {
-                return $this->permissions->hasAny($permission, $junctionID);
+                return $this->permissions->hasAny($permission, $junctionID, $mode, $junctionTable);
             }
         } else {
-            return $this->permissions->has($permission, $junctionID);
+            return $this->permissions->has($permission, $junctionID, $mode, $junctionTable);
         }
     }
 
@@ -403,11 +417,11 @@ class Gdn_Session {
             return;
         }
 
-        $this->permissions = new Permissions();
+        $this->permissions = Gdn::permissionModel()->createPermissionInstance();
 
         // Retrieve the authenticated UserID from the Authenticator module.
         $userModel = Gdn::authenticator()->getUserModel();
-        $this->UserID = $userID !== false ? $userID : Gdn::authenticator()->getIdentity();
+        $this->UserID = $userID !== false ? (int) $userID : Gdn::authenticator()->getIdentity();
         $this->User = false;
         $this->loadTransientKey();
 

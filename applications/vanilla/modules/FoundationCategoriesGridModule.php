@@ -27,7 +27,6 @@ class FoundationCategoriesGridModule extends CategoriesModule {
      */
     public function __construct(\CategoriesApiController $categoriesApi, SiteSectionModel $siteSectionModel) {
         parent::__construct($categoriesApi, $siteSectionModel);
-        $this->noGutter = true;
         $this->title = null;
     }
 

@@ -23,6 +23,7 @@ import { ErrorPage } from "@library/errorPages/ErrorComponent";
 import { BannerContextProviderNoHistory } from "@library/banner/BannerContext";
 import { SearchFormContextProvider } from "@library/search/SearchFormContextProvider";
 import { EntryLinkContextProvider } from "@library/contexts/EntryLinkContext";
+import { WidgetLayout } from "@library/layout/WidgetLayout";
 
 interface IProps {
     children: React.ReactNode;

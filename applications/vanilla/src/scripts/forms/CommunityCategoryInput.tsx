@@ -6,19 +6,19 @@ import apiv2 from "@library/apiv2";
 import { t } from "@library/utility/appUtils";
 import CategorySuggestionActions from "@vanilla/addon-vanilla/categories/CategorySuggestionActions";
 import { IForumStoreState } from "@vanilla/addon-vanilla/redux/state";
-import React from "react";
-import { connect } from "react-redux";
+import React, { useEffect, useState } from "react";
+import { connect, useSelector } from "react-redux";
 import { OptionProps } from "react-select/lib/components/Option";
 import { NoOptionsMessage } from "@library/forms/select/overwrites";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import Tokens, { ITokenProps } from "@library/forms/select/Tokens";
 import SelectOne from "@library/forms/select/SelectOne";
+import { useReduxActions } from "@library/redux/ReduxActions";
+import { ICategory } from "@vanilla/addon-vanilla/@types/api/categories";
 
 interface IProps {
     multiple?: boolean;
-    lookup: (value: string, first?: boolean) => {};
-    suggestions: ILoadable<any>;
     onChange: (tokens: IComboBoxOption[]) => void;
     value: IComboBoxOption[];
     label: string | null;
@@ -26,105 +26,91 @@ interface IProps {
     disabled?: boolean;
     className?: string;
     placeholder?: string;
-    isLoading: boolean;
     hideTitle?: boolean;
 }
 
 /**
  * Form component for searching/selecting a category.
  */
-export class CommunityCategoryInput extends React.Component<IProps> {
-    public static defaultProps: Partial<IProps> = {
-        isLoading: false,
-        suggestions: {
-            status: LoadStatus.PENDING,
-        },
+export function CommunityCategoryInput(props: IProps) {
+    const [query, setQuery] = useState<string>("");
+    const [hasBeenFocused, setHasBeenFocused] = useState(false);
+
+    const suggestions = useCategorySuggestions(query, hasBeenFocused);
+
+    const setFocused = () => {
+        setHasBeenFocused(true);
     };
 
-    lookupOnFocus = () => {
-        if (!this.props.suggestions.data || this.props.suggestions.data.length === 0) {
-            this.props.lookup("", true);
-        }
-    };
+    const { multiple } = props;
+    let options: IComboBoxOption[] | undefined;
+    if (suggestions.status === LoadStatus.SUCCESS && suggestions.data) {
+        options = suggestions.data.map((suggestion) => {
+            let parentLabel;
+            const crumbLength = suggestion.breadcrumbs?.length ?? 0;
+            if (crumbLength > 1) {
+                parentLabel = suggestion.breadcrumbs?.[crumbLength - 2]?.name;
+            }
 
-    public render() {
-        const { suggestions, multiple } = this.props;
-        let options: IComboBoxOption[] | undefined;
-        if (suggestions.status === LoadStatus.SUCCESS && suggestions.data) {
-            options = suggestions.data.map((suggestion) => {
-                let parentLabel;
-                const crumbLength = suggestion.breadcrumbs?.length ?? 0;
-                if (crumbLength > 1) {
-                    parentLabel = suggestion.breadcrumbs[crumbLength - 2].name;
-                }
+            return {
+                value: suggestion.categoryID,
+                label: suggestion.name,
+                data: {
+                    parentLabel,
+                },
+            };
+        });
+    }
 
-                return {
-                    value: suggestion.categoryID,
-                    label: suggestion.name,
-                    data: {
-                        parentLabel,
-                    },
-                };
-            });
-        }
+    const isLoading = suggestions.status === LoadStatus.LOADING;
 
-        if (multiple) {
-            return (
-                <Tokens
-                    onFocus={this.lookupOnFocus}
-                    placeholder={t("Search...")}
-                    {...this.props}
-                    label={this.props.label ?? t("Community Category")}
-                    showIndicator
-                    options={options}
-                />
-            );
-        }
+    if (multiple) {
         return (
-            <SelectOne
-                onFocus={this.lookupOnFocus}
+            <Tokens
+                onFocus={setFocused}
+                {...props}
                 placeholder={t("Search...")}
-                {...this.props}
-                onChange={(option) => {
-                    if (this.props.onChange) this.props.onChange([option]);
-                }}
+                isLoading={isLoading}
+                onInputChange={setQuery}
+                label={props.label ?? t("Community Category")}
+                showIndicator
                 options={options}
-                label={this.props.label ?? t("Community Category")}
-                value={(options || [])[0]}
             />
         );
     }
+    return (
+        <SelectOne
+            onFocus={setFocused}
+            {...props}
+            placeholder={t("Search...")}
+            onInputChange={setQuery}
+            isLoading={isLoading}
+            onChange={(option) => {
+                if (props.onChange) props.onChange([option]);
+            }}
+            options={options}
+            label={props.label ?? t("Community Category")}
+            value={(props.value ?? [])[0]}
+        />
+    );
+}
 
-    private noOptionsMessage(props: OptionProps<any>): JSX.Element | null {
-        let text = "";
-        if (props.selectProps.inputValue === "") {
-            text = t("Search for a category");
-        } else {
-            text = t("No categories found");
+export function useCategorySuggestions(query: string, forceSearch?: boolean): ILoadable<ICategory[]> {
+    const actions = useReduxActions(CategorySuggestionActions);
+    const suggestions = useSelector((state: IForumStoreState) => {
+        return state.forum.categories.suggestionsByQuery[query] ?? { status: LoadStatus.PENDING };
+    });
+
+    useEffect(() => {
+        if (!query && !forceSearch) {
+            // Don't do anything with empty queries.
+            return;
         }
-        return <NoOptionsMessage {...props}>{text}</NoOptionsMessage>;
-    }
+
+        actions.loadCategories(query);
+    }, [query, forceSearch]);
+
+    return suggestions;
 }
 
-function mapStateToProps(state: IForumStoreState, ownProps: IProps) {
-    return {
-        isLoading: state.forum.categories.suggestions.status === LoadStatus.LOADING,
-        suggestions: state.forum.categories.suggestions,
-    };
-}
-
-function mapDispatchToProps(dispatch: any) {
-    const categorySuggestionActions = new CategorySuggestionActions(dispatch, apiv2);
-
-    return {
-        lookup: (query: string, first = false) => {
-            query = query.trim();
-            if (!first && !query) return;
-            categorySuggestionActions.loadCategories(query);
-        },
-    };
-}
-
-const withRedux = connect(mapStateToProps, mapDispatchToProps);
-
-export default withRedux(CommunityCategoryInput);
+export default CommunityCategoryInput;

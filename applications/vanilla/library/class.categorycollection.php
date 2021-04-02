@@ -7,6 +7,7 @@
 
 use Garden\EventManager;
 use Vanilla\Models\DirtyRecordModel;
+use Vanilla\Utility\ArrayUtils;
 
 /**
  * Manages categories as a whole.
@@ -345,7 +346,7 @@ class CategoryCollection {
 
         $category = $this->get($categoryID);
 
-        if ($category === null) {
+        if (!$category) {
             return $result;
         }
 
@@ -502,47 +503,43 @@ class CategoryCollection {
      * Get the id's of a category's descendants.
      *
      * @param int $parentID
-     * @param array $options
      *
      * @return array
      */
-    public function getDescendantIDs(int $parentID = -1, array $options = []): array {
-        $cachedIDs = $this->cache->get($this->cacheKey(self::$CACHE_CATEGORY_DESCENDANTS, $parentID)) ?? [];
-        $parentIDs = [$parentID];
-        $defaultOptions = [
-            'maxDepth' => 3,
-            'permission' => 'PermsDiscussionsView'
-        ];
-        $options = $options + $defaultOptions;
-
-        $ids = [];
-        if (!$cachedIDs) {
-            for ($i = 0; $i < $options['maxDepth']; $i++) {
-                $childCategories = $this->getChildrenByParents($parentIDs, $options['permission']);
-                if (empty($childCategories)) {
-                    break;
-                }
-                if (count($childCategories) === 1) {
-                    $childCategories = reset($childCategories);
-                    $childCategoryID = [$childCategories['CategoryID']]?? [];
-                    $ids = array_merge($ids, $childCategoryID);
-                    $parentIDs = $childCategoryID;
-                } else {
-                    $childCategoriesIDs = array_column($childCategories, 'CategoryID');
-                    $ids = array_merge($ids, $childCategoriesIDs) ;
-                    $parentIDs = $childCategoriesIDs;
-                }
-            }
-        } else {
-            $ids = $cachedIDs;
+    public function getDescendantIDs(int $parentID = -1): array {
+        $cacheKey = $this->cacheKey(self::$CACHE_CATEGORY_DESCENDANTS, $parentID);
+        $cachedIDs = $this->cache->get($this->cacheKey(self::$CACHE_CATEGORY_DESCENDANTS, $parentID));
+        if ($cachedIDs !== Gdn_Cache::CACHEOP_FAILURE) {
+            return $cachedIDs;
         }
 
-        $this->cacheStore(
-            $this->cacheKey(self::$CACHE_CATEGORY_DESCENDANTS, $parentID),
-            $ids
-        );
+        $resultIDs = [];
+        $seenParentIDs = [];
 
-        return $ids;
+        $sql = clone $this->sql;
+        $sql->reset();
+        $allIDs = $sql->select("CategoryID, ParentCategoryID")->get("Category")->resultArray();
+        $categoryIDByParentID = ArrayUtils::arrayColumnArrays($allIDs, "CategoryID", "ParentCategoryID");
+
+        $getChildren = function (int $categoryID) use (&$resultIDs, &$seenParentIDs, &$categoryIDByParentID, &$getChildren) {
+            if (in_array($categoryID, $seenParentIDs)) {
+                return;
+            } else {
+                $seenParentIDs[] = $categoryID;
+            }
+
+            $children = $categoryIDByParentID[$categoryID] ?? [];
+            foreach ($children as $childID) {
+                $resultIDs[] = $childID;
+
+                $getChildren($childID);
+            }
+        };
+
+        $getChildren($parentID);
+
+        $this->cacheStore($cacheKey, $resultIDs);
+        return $resultIDs;
     }
 
     /**

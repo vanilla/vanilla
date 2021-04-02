@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
- namespace Vanilla\Dashboard\Models;
+namespace Vanilla\Dashboard\Models;
 
 /**
   * Dumb data object representing an email notification for an activity.

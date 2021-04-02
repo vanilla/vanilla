@@ -11,7 +11,7 @@ import { AttachmentType } from "@library/content/attachments/AttatchmentType";
 import { EMBED_FOCUS_CLASS } from "@library/embeddedContent/embedConstants";
 import { t } from "@library/utility/appUtils";
 import { attachmentClasses } from "@library/content/attachments/attachmentStyles";
-import { metasClasses } from "@library/styles/metasStyles";
+import { metasClasses } from "@library/metas/Metas.styles";
 import { attachmentIconClasses } from "@library/content/attachments/attachmentIconsStyles";
 import classNames from "classnames";
 import { EmbedContainer } from "@library/embeddedContent/components/EmbedContainer";

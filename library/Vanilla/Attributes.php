@@ -30,6 +30,8 @@ class Attributes extends \ArrayObject implements \JsonSerializable {
             $input = [];
         }
 
+        $input = is_array($input) ? $input : [];
+
         parent::__construct($input, \ArrayObject::ARRAY_AS_PROPS);
     }
 

@@ -639,8 +639,8 @@ var DashboardModal = (function() {
                 formCloseTag = '</form>';
                 var formHtml = $form.prop('outerHTML');
                 formTag = formHtml.split('>')[0] += '>';
-                body = body.replace(formTag, '');
-                body = body.replace('</form>', '');
+                var formInner = $form.html();
+                body = body.replace(formHtml, formInner);
             }
 
             return {
@@ -667,9 +667,11 @@ var DashboardModal = (function() {
                 },
                 dataType: 'json',
                 success: function(json, sender) {
+                    const elem = $('#' + self.id).first();
+
                     self.settings.afterSuccess(json, sender);
                     gdn.inform(json);
-                    gdn.processTargets(json.Targets);
+                    gdn.processTargets(json.Targets, elem);
 
                     if (json.FormSaved === true) {
                         self.handleSuccess(json);

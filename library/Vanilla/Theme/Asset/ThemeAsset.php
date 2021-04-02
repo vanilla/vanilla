@@ -19,6 +19,9 @@ abstract class ThemeAsset implements \JsonSerializable {
     /** @var string */
     protected $url = '';
 
+    /** @var boolean */
+    protected $canMerge = false;
+
     /**
      * Get the type of the asset.
      *
@@ -123,5 +126,19 @@ abstract class ThemeAsset implements \JsonSerializable {
      */
     public function jsonSerialize() {
         return $this->asArray();
+    }
+
+    /**
+     * @return bool
+     */
+    public function canMerge(): bool {
+        return $this->canMerge;
+    }
+
+    /**
+     * @param bool $canMerge
+     */
+    public function setCanMerge(bool $canMerge): void {
+        $this->canMerge = $canMerge;
     }
 }

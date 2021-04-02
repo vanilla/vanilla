@@ -1,17 +1,17 @@
 /**
  * Compatibility styles, using the color variables.
  *
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import { defaultTransition, userSelect, negative } from "@library/styles/styleHelpers";
+import { negative } from "@library/styles/styleHelpers";
 import { Mixins } from "@library/styles/Mixins";
-import { trimTrailingCommas } from "@dashboard/compatibilityStyles/trimTrailingCommas";
 import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
-import { tagVariables, TagType } from "@library/styles/tagStyles";
-import { globalVariables } from "@library/styles/globalStyleVars";
+import { tagVariables, TagType } from "@library/metas/Tag.variables";
 import { important, percent } from "csx";
+import { CSSObject, injectGlobal } from "@emotion/css";
+import { metaLabelStyle } from "@library/metas/Metas.styles";
 
 export const forumTagCSS = () => {
     const vars = tagVariables();
@@ -31,19 +31,26 @@ export const forumTagCSS = () => {
         },
     );
 
-    cssOut(".Panel.Panel li.TagCloud-Item.TagCloud-Item", {
+    cssOut("li.TagCloud-Item.TagCloud-Item.TagCloud-Item", {
         padding: 0,
+        margin: 0,
         width: tagItemWidth,
         maxWidth: percent(100),
-        ...Mixins.margin(vars.tagItem.margin),
         "& a": {
             ...tagItemListStyle,
+            ...Mixins.margin(vars.tagItem.margin),
             ...Mixins.font(vars.tagItem.font),
             ...Mixins.background(vars.tagItem.background),
+            ...Mixins.border(vars.tagItem.border),
+
+            ".Count": {
+                display: vars.tagItem.showCount ? "inherit" : "none",
+            },
         },
-        "&  a:hover, a:active, a:focus": {
+        "& a:hover, a:active, a:focus": {
             ...Mixins.font(vars.tagItem.fontState),
             ...Mixins.background(vars.tagItem.backgroundState),
+            ...Mixins.border(vars.tagItem.borderState),
         },
     });
 
@@ -51,40 +58,20 @@ export const forumTagCSS = () => {
         textDecoration: important("none"),
     });
 
-    mixinTag(`.TagCloud a`);
-    mixinTag(`.Tag`);
-    mixinTag(`.DataTableWrap a.Tag`);
-    mixinTag(`.Container .MessageList .ItemComment .MItem.RoleTracker a.Tag`);
-    mixinTag(
-        `
+    injectGlobal({
+        [`.TagCloud a,
+        .Container .MessageList .ItemComment .MItem.RoleTracker a.Tag,
         .MessageList .ItemComment .MItem.RoleTracker a.Tag,
-        .MessageList .ItemDiscussion .MItem.RoleTracker a.Tag
-        `,
-    );
+        .MessageList .ItemDiscussion .MItem.RoleTracker a.Tag`]: tagLinkStyle(),
+    });
 };
 
-function mixinTag(selector: string, overwrite?: {}) {
-    selector = trimTrailingCommas(selector);
-    const selectors = selector.split(",") || [];
-
-    if (selectors.length === 0) {
-        selectors.push(selector);
-    }
+export function tagLinkStyle(): CSSObject {
     const vars = tagVariables();
-    selectors.map((s) => {
-        cssOut(selector, {
-            maxWidth: percent(100),
-            display: "inline-block",
-            whiteSpace: "normal",
-            textDecoration: important("none"),
-            textOverflow: "ellipsis",
-            ...userSelect(),
-            ...Mixins.padding(vars.padding),
-            ...Mixins.border(vars.border),
-            ...Mixins.font(vars.font),
-            ...defaultTransition("border"),
-            ...Mixins.margin(vars.margin),
-            ...vars.nested,
-        });
-    });
+
+    return {
+        ...metaLabelStyle(),
+        borderColor: vars.nested.color,
+        ...vars.nested,
+    };
 }

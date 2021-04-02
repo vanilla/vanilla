@@ -12,7 +12,7 @@ import { color, linearGradient } from "csx";
 import Banner, { IBannerProps } from "@library/banner/Banner";
 import { BannerAlignment, bannerVariables, SearchPlacement } from "@library/banner/bannerStyles";
 import { SearchBarPresets } from "@library/banner/SearchBarPresets";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { ButtonPreset } from "@library/forms/ButtonPreset";
 import { STORY_LOGO_BLACK, STORY_LOGO_WHITE } from "@library/storybook/storyData";
 import { LayoutProvider } from "@library/layout/LayoutContext";
@@ -508,7 +508,12 @@ export const LogoAndRightImage = storyWithConfig(
 
 ImageAsElement.parameters = {
     chromatic: {
-        viewports: [1400, layoutVariables().contentWidth, layoutVariables().panelLayoutBreakPoints.oneColumn, 400],
+        viewports: [
+            1400,
+            panelLayoutVariables().contentWidth,
+            panelLayoutVariables().panelLayoutBreakPoints.oneColumn,
+            400,
+        ],
     },
 };
 
@@ -788,7 +793,7 @@ export const bannerImageOnly = storyWithConfig(
 
 ImageAsElementWide.parameters = {
     chromatic: {
-        viewports: [1450, 1350, layoutVariables().panelLayoutBreakPoints.oneColumn, 400],
+        viewports: [1450, 1350, panelLayoutVariables().panelLayoutBreakPoints.oneColumn, 400],
     },
 };
 
@@ -826,6 +831,43 @@ export const ContentBannerLogo = storyWithConfig(
     () => {
         return <StoryBannerWithScope title="Should not appear" isContentBanner onlyOne={true} />;
     },
+);
+
+export const ContentBannerIcon = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            global: {
+                body: {
+                    backgroundImage: {
+                        color: color("#efefef"),
+                    },
+                },
+            },
+            contentBanner: {
+                options: {
+                    alignment: "left",
+                    enabled: true,
+                    hideIcon: false,
+                    hideTitle: false,
+                    hideDescription: false,
+                },
+                spacing: {
+                    padding: {
+                        top: 30,
+                        bottom: 30,
+                    },
+                },
+                outerBackground: {
+                    unsetBackground: true,
+                },
+                icon: {
+                    image: "https://us.v-cdn.net/5022541/uploads/341/G35SLM2LBY4G.png",
+                },
+            },
+        },
+    },
+    () => <StoryBannerWithScope title="Content Banner with Icon" isContentBanner onlyOne />,
 );
 
 export const UnifiedBorder = storyWithConfig(

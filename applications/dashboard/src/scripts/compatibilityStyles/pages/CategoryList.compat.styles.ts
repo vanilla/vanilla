@@ -14,4 +14,5 @@ export const categoryListCompatCSS = () => {
     const vars = categoryListVariables();
 
     MixinsFoundation.contentBoxes(vars.contentBoxes, "CategoryList");
+    MixinsFoundation.contentBoxes(vars.panelBoxes, "CategoryList", ".Panel");
 };

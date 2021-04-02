@@ -3,12 +3,9 @@
  * @license GPL-2.0-only
  */
 
-const TsconfigPathsPlugin = require("tsconfig-paths-webpack-plugin");
-
 const path = require("path");
 const fs = require("fs");
 const glob = require("glob");
-
 const VANILLA_ROOT = path.resolve(__dirname, "../../");
 
 const sectionEnv = process.env.STORYBOOK_SECTION;
@@ -55,9 +52,5 @@ module.exports = {
     typescript: {
         check: false,
         reactDocgen: "none",
-    },
-    webpackFinal: (config) => {
-        config.resolve.plugins.push(new TsconfigPathsPlugin({}));
-        return config;
-    },
+    }
 };

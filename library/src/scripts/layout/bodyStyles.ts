@@ -24,7 +24,7 @@ export const bodyCSS = useThemeCache(() => {
     const htmlBodyMixin: CSSObject = {
         background: ColorsUtils.colorOut(globalVars.body.backgroundImage.color),
         ...Mixins.font({
-            size: globalVars.fonts.size.medium,
+            ...globalVars.fontSizeAndWeightVars("medium"),
             family: globalVars.fonts.families.body,
             color: globalVars.mainColors.fg,
         }),
@@ -42,6 +42,7 @@ export const bodyCSS = useThemeCache(() => {
     cssRule("h1, h2, h3, h4, h5, h6", {
         display: "block",
         lineHeight: globalVars.lineHeights.condensed,
+        color: ColorsUtils.colorOut(globalVars.mainColors.fgHeading),
         ...Mixins.margin({
             all: 0,
         }),

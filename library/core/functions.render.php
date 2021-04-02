@@ -1136,6 +1136,7 @@ if (!function_exists('linkDropDown')) {
         $extraClasses = trim($extraClasses);
         $linkName = val('name', $selectedLink);
         $downChevronLabel = t("Down Arrow");
+        $label = t($label);
 
         $output .= <<<EOT
         <span class="ToggleFlyout selectBox {$extraClasses}">

@@ -14,6 +14,7 @@ import { ListSeparation } from "@library/styles/cssUtilsTypes";
 export default {
     title: "Components/QuickLinks",
     parameters: {},
+    includeStories: ["Standard", "ListSeparatorBorder", "ListItemColors", "Borders", "LineSeparator"],
 };
 
 const dummyData = [
@@ -72,10 +73,14 @@ const dummyData = [
     },
 ];
 
+export function StoryQuickLinks(props: { title?: string }) {
+    return <QuickLinksView {...props} links={dummyData} />;
+}
+
 export const Standard = storyWithConfig({}, () => (
     <StoryContent>
         <StoryHeading depth={1}>Quick Links</StoryHeading>
-        <QuickLinksView title="Quick Links" links={dummyData} />
+        <StoryQuickLinks title="Quick Links" />
     </StoryContent>
 ));
 
@@ -93,7 +98,7 @@ export const ListSeparatorBorder = storyWithConfig(
         return (
             <StoryContent>
                 <StoryHeading depth={1}>Border Separator</StoryHeading>
-                <QuickLinksView title="Quick Links" links={dummyData} />
+                <StoryQuickLinks title="Quick Links" />
             </StoryContent>
         );
     },
@@ -117,7 +122,7 @@ export const ListItemColors = storyWithConfig(
         return (
             <StoryContent>
                 <StoryHeading depth={1}>Border Separator</StoryHeading>
-                <QuickLinksView title="Quick Links" links={dummyData} />
+                <StoryQuickLinks title="Quick Links" />
             </StoryContent>
         );
     },
@@ -137,7 +142,7 @@ export const LineSeparator = storyWithConfig(
         return (
             <StoryContent>
                 <StoryHeading depth={1}>Line Separator</StoryHeading>
-                <QuickLinksView title="Quick Links" links={dummyData} />
+                <StoryQuickLinks title="Quick Links" />
             </StoryContent>
         );
     },
@@ -152,12 +157,6 @@ export const Borders = storyWithConfig(
                         color: "#071fba",
                     },
                     borderType: BorderType.BORDER,
-                },
-                title: {
-                    font: {
-                        color: "#07ba82",
-                        size: 22,
-                    },
                 },
                 listItem: {
                     font: {
@@ -187,7 +186,7 @@ export const Borders = storyWithConfig(
     () => (
         <StoryContent>
             <StoryHeading depth={1}>Quick Links</StoryHeading>
-            <QuickLinksView title="Quick Links With Borders" links={dummyData} />
+            <StoryQuickLinks title="Quick Links With Borders" />
         </StoryContent>
     ),
 );

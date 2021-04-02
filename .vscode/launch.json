@@ -15,6 +15,22 @@
                 "webpack:///./~/*": "${webRoot}/node_modules/*",
                 "webpack:///./*": "${webRoot}/*"
             }
+        },
+        {
+            "name": "Listen for XDebug",
+            "type": "php",
+            "request": "launch",
+            "port": 9000,
+            "pathMappings": {
+                "/srv/vanilla-repositories/vanilla": "${workspaceFolder}",
+                "/srv/vanilla-repositories/vanilla/cloud/plugins": "${workspaceFolder}/plugins"
+            },
+            "xdebugSettings": {
+                "max_data": 65535,
+                "show_hidden": 1,
+                "max_children": 100,
+                "max_depth": 5
+            }
         }
     ]
 }

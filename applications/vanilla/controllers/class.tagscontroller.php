@@ -32,7 +32,7 @@ class TagsController extends VanillaController {
      * @param string $type
      * @throws Exception
      */
-    public function search($q = '', $id = false, $parent = false, $type = 'default') {
+    public function search($q = '', $id = false, $parent = false, $type = 'userTag') {
         $categoryID = getIncomingValue('CategoryID');
         $options["categoryID"] = $categoryID;
         $data = $this->tagModel->search($q, $id, $parent, $type, $options);

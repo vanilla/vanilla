@@ -4,13 +4,14 @@
  * @license GPL-2.0-only
  */
 
-import { absolutePosition, flexHelper, ISpinnerProps, spinnerLoader } from "@library/styles/styleHelpers";
+import { flexHelper, ISpinnerProps, spinnerLoader } from "@library/styles/styleHelpers";
 import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { TLength } from "@library/styles/styleShim";
 import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { percent } from "csx";
+import { Mixins } from "@library/styles/Mixins";
 
 export const loaderVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -62,7 +63,7 @@ export const loaderClasses = useThemeCache(() => {
         zIndex: 1,
     });
     const mediumLoader = style("mediumLoader", {
-        ...absolutePosition.fullSizeOfParent(),
+        ...Mixins.absolute.fullSizeOfParent(),
         ...flex.middle(),
         height: percent(100),
         width: percent(100),

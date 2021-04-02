@@ -220,10 +220,11 @@ export function onReady(callback: PromiseOrNormalCallback) {
  *
  * @returns A Promise when the events have all fired.
  */
-export function _executeReady(): Promise<any[]> {
+export function _executeReady(before?: () => void | Promise<void>): Promise<any[]> {
     return new Promise((resolve) => {
         const handlerPromises = _readyHandlers.map((handler) => handler());
         const exec = () => {
+            before?.();
             return Promise.all(handlerPromises).then(resolve);
         };
 

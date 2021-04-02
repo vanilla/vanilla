@@ -69,6 +69,7 @@ export interface ISearchResult {
     searchScore?: number;
     siteID?: number;
     siteDomain?: string;
+    highlight?: string;
 }
 
 export interface ISearchResults {

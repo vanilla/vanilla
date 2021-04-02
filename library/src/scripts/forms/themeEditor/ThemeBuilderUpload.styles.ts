@@ -8,7 +8,7 @@ import { themeBuilderVariables } from "@library/forms/themeEditor/ThemeBuilder.s
 import { styleFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { percent } from "csx";
-import { flexHelper, absolutePosition, importantUnit } from "@library/styles/styleHelpers";
+import { flexHelper, importantUnit } from "@library/styles/styleHelpers";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { Mixins } from "@library/styles/Mixins";
 import { inputMixin } from "@library/forms/inputStyles";
@@ -83,7 +83,7 @@ export const themeBuilderUploadClasses = useThemeCache(() => {
         borderRadius: themeBuilderVars.border.radius,
     });
     const imagePreview = style("imagePreview", {
-        ...absolutePosition.fullSizeOfParent(),
+        ...Mixins.absolute.fullSizeOfParent(),
         filter: "brightness(0.7)",
         objectFit: "cover",
         objectPosition: "center",

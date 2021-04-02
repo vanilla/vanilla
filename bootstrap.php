@@ -315,6 +315,7 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->addCall('addMiddleware', [new Reference(\Vanilla\Web\ContentSecurityPolicyMiddleware::class)])
     ->addCall('addMiddleware', [new Reference(\Vanilla\Web\HttpStrictTransportSecurityMiddleware::class)])
     ->addCall('addMiddleware', [new Reference(\Vanilla\Web\Middleware\LogTransactionMiddleware::class)])
+    ->addCall('addMiddleware', [new Reference(\Vanilla\Web\Middleware\SystemTokenMiddleware::class)])
 
     ->rule(\Vanilla\Web\Middleware\LogTransactionMiddleware::class)
     ->setShared(true)
@@ -349,6 +350,18 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->setConstructorArgs([
         "/api/v2/",
         ContainerUtils::config("Garden.api.ssoIDPermission", Permissions::RANK_COMMUNITY_MANAGER)
+    ])
+    ->setShared(true)
+
+    ->rule(\Vanilla\Web\Middleware\SystemTokenMiddleware::class)
+    ->setConstructorArgs([
+        "/api/v2/",
+    ])
+    ->setShared(true)
+
+    ->rule(\Vanilla\Web\SystemTokenUtils::class)
+    ->setConstructorArgs([
+        ContainerUtils::config("Context.Secret", "")
     ])
     ->setShared(true)
 

@@ -20,15 +20,14 @@ class ExpandTest extends TestCase {
     /**
      * Test our expand defintions.
      *
-     * @param Schema $schema
+     * @param Schema|null $schema
      * @param array $passedExpand
      * @param string[] $expectedExpands Fields that are expected to be "expanded".
      * @param string[] $expectedNotExpands Fields that are expected not to be "expanded".
-     *
      * @dataProvider provideExpandDefinitions
      */
-    public function testGetExpand(Schema $schema, array $passedExpand, array $expectedExpands, array $expectedNotExpands) {
-        $validated = $schema->validate($passedExpand)['expand'];
+    public function testGetExpand(?Schema $schema, array $passedExpand, array $expectedExpands, array $expectedNotExpands) {
+        $validated = $schema ? $schema->validate($passedExpand)['expand'] : $passedExpand['expand'];
         foreach ($expectedExpands as $expectedExpand) {
             $this->assertTrue(
                 ModelUtils::isExpandOption($expectedExpand, $validated),
@@ -79,7 +78,7 @@ class ExpandTest extends TestCase {
                 $negativeSchema,
                 ['expand' => true],
                 ['field1', 'field2', 'field3.val'],
-                [],
+                ['-field1', '-field2']
             ],
             'negativeExpandDefaulted' => [
                 $negativeSchema,
@@ -92,6 +91,18 @@ class ExpandTest extends TestCase {
                 ['expand' => ['-field2']],
                 ['field1'],
                 ['field3.val', 'field2'],
+            ],
+            'expand fields with negative from expand options all' => [
+                $negativeSchema,
+                ['expand' => true],
+                ['field3.val'],
+                ['-field1'],
+            ],
+            'no schema + negative value + expand true' => [
+                null,
+                ['expand' => true],
+                ['anyPositiveField', 'anyPositiveField', 'anyPositiveFieldAtAll'],
+                ['-field1', '-anyOtherField', '-an.negative.at.all'],
             ],
             'false' => [
                 $negativeSchema,

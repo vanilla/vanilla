@@ -4,21 +4,23 @@
  * @license gpl-2.0-only
  */
 
-import React, { useEffect } from "react";
-import { storiesOf } from "@storybook/react";
-import { useStoryConfig, NO_WRAPPER_CONFIG } from "@library/storybook/StoryContext";
-import classNames from "classnames";
 import { compatibilityStyles } from "@dashboard/compatibilityStyles";
-import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { applyCompatibilityIcons } from "@dashboard/compatibilityStyles/compatibilityIcons";
-import "../../addons/themes/theme-foundation/src/scss/custom.scss";
-import { applyCompatibilityUserCards } from "@dashboard/compatibilityStyles/compatibilityUserCards";
+import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { LoadStatus } from "@library/@types/api/core";
-import { loadedCSS } from "@rich-editor/quill/components/loadedStyles";
 import { initAllUserContent } from "@library/content";
+import { applyCompatibilityUserCards } from "@library/features/userCard/UserCard.compat";
+import { NO_WRAPPER_CONFIG, useStoryConfig } from "@library/storybook/StoryContext";
 import { setMeta } from "@library/utility/appUtils";
-import { addComponent } from "@library/utility/componentRegistry";
-import { HomeWidget } from "@library/homeWidget/HomeWidget";
+import { loadedCSS } from "@rich-editor/quill/components/loadedStyles";
+import { storiesOf } from "@storybook/react";
+import { applySharedPortalContext } from "@vanilla/react-utils";
+import classNames from "classnames";
+import React, { useEffect, useRef } from "react";
+import "../../addons/themes/theme-foundation/src/scss/custom.scss";
+import "../../applications/vanilla/src/scripts/entries/forum";
+import { Provider } from "react-redux";
+import getStore from "@library/redux/getStore";
 
 ///
 /// These imports are just so that the files get loaded into storybook.
@@ -41,8 +43,6 @@ allContextFiles(
 
 const allHtmls = allContextFiles(require.context("../.storybookAppPages", false, /.*\.html/));
 const allJsons = allContextFiles(require.context("../.storybookAppPages", false, /.*\.json/));
-
-addComponent("HomeWidget", HomeWidget);
 
 const storyOfsByFirstWord = [];
 Object.entries(allHtmls).forEach(([name, htmlModule]) => {
@@ -81,6 +81,14 @@ function HtmlRenderComponent(props: { html: string; data: IHtmlData }) {
         },
     });
 
+    const ref = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        applySharedPortalContext((props) => {
+            return <Provider store={getStore()}>{props.children}</Provider>;
+        });
+    }, []);
+
     useEffect(() => {
         compatibilityStyles();
         applyCompatibilityIcons();
@@ -109,7 +117,7 @@ function HtmlRenderComponent(props: { html: string; data: IHtmlData }) {
         // Copy body classes.
         document.body.className = classNames(document.body.className, data.bodyClasses);
     }, []);
-    return <div dangerouslySetInnerHTML={{ __html: html }} />;
+    return <div ref={ref} dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
 type ContextFiles = Record<string, any>;

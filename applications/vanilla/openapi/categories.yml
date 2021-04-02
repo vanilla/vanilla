@@ -142,6 +142,9 @@ paths:
                             description: The URL code of the category.
                             minLength: 1
                             type: string
+                          allowedDiscussionTypes:
+                            description: Allowed category discussion types.
+                            type: array
                         required:
                         - categoryID
                         - name

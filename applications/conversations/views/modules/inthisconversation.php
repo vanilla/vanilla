@@ -1,9 +1,15 @@
 <?php if (!defined('APPLICATION')) exit();
 /** @var InThisConversationModule $this */
+use Vanilla\Theme\BoxThemeShim;
 ?>
 <div class="Box InThisConversation">
-    <?php echo panelHeading(t('In this Conversation')); ?>
-    <ul class="PanelInfo">
+
+    <?php
+        BoxThemeShim::startHeading();
+        echo panelHeading(t('In this Conversation'));
+        BoxThemeShim::endHeading();
+    ?>
+    <ul class="PanelInfo  <?php BoxThemeShim::activeHtml(' pageBox')?>">
         <?php foreach ($this->data('Participants') as $User): ?>
             <li>
                 <?php

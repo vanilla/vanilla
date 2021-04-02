@@ -40,7 +40,7 @@ export const resetActionAC = (newState: ICoreStoreState) => {
     };
 };
 
-function createRootReducer() {
+export function createRootReducer() {
     const appReducer = combineReducers(getReducers());
 
     return (state, action) => {
@@ -50,6 +50,10 @@ function createRootReducer() {
             return appReducer(state, action);
         }
     };
+}
+
+export function hasStore(): boolean {
+    return store != null;
 }
 
 export default function getStore<S = ICoreStoreState>(initialState?: DeepPartial<S>, force?: boolean): Store<S, any> {

@@ -8,8 +8,8 @@ import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { TextAlignProperty } from "csstype";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { Property } from "csstype";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { Mixins } from "@library/styles/Mixins";
 import { Variables } from "@library/styles/Variables";
 
@@ -24,20 +24,19 @@ export const dataListVariables = useThemeCache((forcedVars?: IThemeVariables) =>
     });
 
     const key = makeThemeVars("key", {
-        textAlignment: "left" as TextAlignProperty,
+        textAlignment: "left" as Property.TextAlign,
         padding: {
             vertical: spacing.padding.vertical,
             right: globalVars.spacer.size,
         },
         font: Variables.font({
-            size: globalVars.fonts.size.small,
-            weight: globalVars.fonts.weights.bold,
+            ...globalVars.fontSizeAndWeightVars("small", "bold"),
             lineHeight: globalVars.lineHeights.condensed,
         }),
     });
 
     const value = makeThemeVars("value", {
-        textAlignment: "left" as TextAlignProperty,
+        textAlignment: "left" as "left" | "center",
         padding: {
             vertical: spacing.padding.vertical,
         },
@@ -54,7 +53,7 @@ export const dataListClasses = useThemeCache((layoutMediaQueries?: { xs: any }) 
     const style = styleFactory("dataList");
     const vars = dataListVariables();
     const globalVars = globalVariables();
-    const mediaQueries = layoutMediaQueries ?? layoutVariables().mediaQueries();
+    const mediaQueries = layoutMediaQueries ?? panelLayoutVariables().mediaQueries();
 
     const root = style({});
 

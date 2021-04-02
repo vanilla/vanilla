@@ -8,7 +8,7 @@
 
             foreach ($this->getSortData() as $sort) {
                 $sortLinks[] = [
-                    'name' => val('name', $sort),
+                    'name' => t(val('name', $sort)),
                     'url' => url('/'.val('url', $sort)),
                     'active' => val('active', $sort),
                 ];

@@ -16,7 +16,10 @@ export class FocusWatcher {
      * @param watchedNode - The watched dom node.
      * @param callback - A callback for when the tree focuses and blurs.
      */
-    public constructor(private watchedNode: Element, private changeHandler: (hasFocus: boolean) => void) {}
+    public constructor(
+        private watchedNode: Element,
+        private changeHandler: (hasFocus: boolean, newActiveElement?: Element) => void,
+    ) {}
 
     /**
      * Register the event listeners from this class.
@@ -65,11 +68,21 @@ export class FocusWatcher {
      * Determine whether or not our DOM tree was clicked.
      */
     private checkDomTreeWasClicked(clickedElement: Element) {
+        const elementIsInModal = this.isElementInModal(clickedElement);
+
         return (
-            this.watchedNode &&
-            clickedElement &&
-            (this.watchedNode.contains(clickedElement as Element) || this.watchedNode === clickedElement)
+            elementIsInModal ||
+            (this.watchedNode &&
+                clickedElement &&
+                (this.watchedNode.contains(clickedElement as Element) || this.watchedNode === clickedElement))
         );
+    }
+
+    /**
+     * Determine whether or not an element is nested in the modals container
+     */
+    private isElementInModal(element: Element) {
+        return Boolean(document.getElementById("modals")?.contains(element));
     }
 
     /**
@@ -78,7 +91,7 @@ export class FocusWatcher {
      *
      * @param watchedNode - The watched node to look in.
      */
-    private checkDomTreeHasFocus(event: FocusEvent, callback: (hasFocus: boolean) => void) {
+    private checkDomTreeHasFocus(event: FocusEvent, callback: (hasFocus: boolean, newActiveElement?: Element) => void) {
         setTimeout(() => {
             const possibleTargets = [
                 // NEEDS TO COME FIRST, because safari will populate relatedTarget on focusin, and its not what we're looking for.
@@ -98,7 +111,7 @@ export class FocusWatcher {
             if (activeElement !== null) {
                 const isWatchedInBody = document.body.contains(this.watchedNode);
                 const isFocusedInBody = document.body.contains(activeElement);
-                const isModal = Boolean(document.getElementById("modals")?.contains(activeElement));
+                const isInModal = this.isElementInModal(activeElement);
                 const hasFocus = Boolean(
                     this.watchedNode &&
                         activeElement &&
@@ -110,7 +123,7 @@ export class FocusWatcher {
                 // It could happen that our flyout is unmounted in between the setTimeout call.
                 // We might have focused on a modal which can't be in the watched tree.
                 if (isWatchedInBody && isFocusedInBody) {
-                    callback(hasFocus || isModal);
+                    callback(hasFocus || isInModal, activeElement as Element);
                 }
             }
         }, 0);

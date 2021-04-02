@@ -136,6 +136,9 @@ class SiteMeta implements \JsonSerializable {
     /** @var string */
     private $defaultSearchScope;
 
+    /** @var int */
+    private $editContentTimeout = -1;
+
     /**
      * SiteMeta constructor.
      *
@@ -219,6 +222,10 @@ class SiteMeta implements \JsonSerializable {
         $this->defaultSearchScope = $config->get('Search.DefaultScope', 'site');
         $this->supportsSearchScope = (bool) $config->get('Search.SupportsScope', false);
 
+
+        $editContentTimeout = $config->get('Garden.EditContentTimeout');
+        $this->editContentTimeout = intval($editContentTimeout);
+
         if ($favIcon = $config->get("Garden.FavIcon")) {
             $this->favIcon = \Gdn_Upload::url($favIcon);
         }
@@ -275,6 +282,7 @@ class SiteMeta implements \JsonSerializable {
                 'mobileAddressBarColor' => $this->mobileAddressBarColor,
                 'fallbackAvatar' => UserModel::getDefaultAvatarUrl(),
                 'currentUser' => $this->userModel->currentFragment(),
+                'editContentTimeout' => $this->editContentTimeout,
             ],
             'search' => [
                 'defaultScope' => $this->defaultSearchScope,

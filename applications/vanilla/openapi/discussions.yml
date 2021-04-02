@@ -22,6 +22,16 @@ paths:
       - $ref: '#/components/parameters/DateInserted'
       - $ref: '#/components/parameters/DateUpdated'
       - $ref: '#/components/parameters/DateLastComment'
+      - description: >
+          Filter discussions by site-section-id (subcommunity).
+          The subcommunityID or folder can be used.
+          The query looks like:
+          siteSectionID=$SubcommunityID:{id} ie. 1
+          siteSectionID=$SubcommunityID:{folder} ie. en
+        in: query
+        name: siteSectionID
+        schema:
+          type: string
       - description: Filter by discussion type.
         in: query
         name: type
@@ -29,6 +39,13 @@ paths:
           type: string
         x-filter:
           field: d.Type
+      - description: Filter questions by status (accepted, answered, unanswered).
+        in: query
+        name: status
+        schema:
+          type: string
+        x-filter:
+          field: d.QnA
       - description: >
           Only fetch discussions from followed categories. Pinned
           discussions are mixed in.
@@ -295,7 +312,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DiscussionPost'
+              $ref: '#/components/schemas/DiscussionPatch'
         required: true
       summary: Update a discussion.
   '/discussions/{id}/bookmark':
@@ -356,6 +373,37 @@ paths:
       tags:
       - Discussions
       summary: Get a discussion for editing.
+  '/discussions/{id}/type':
+    put:
+      parameters:
+      - description: The discussion ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Discussion'
+          description: Success
+      tags:
+      - Discussions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                type:
+                  description: record type to convert to.
+                  type: string
+              required:
+              - recordType
+              type: object
+        required: true
+      summary: Change a discussion type.
   '/discussions/{id}/idea':
     x-addon: ideation
     patch:
@@ -630,6 +678,23 @@ paths:
       tags:
       - Discussions
       summary: Remove a user's reaction.
+  '/discussions/{id}/reactions/':
+    x-addon: reactions
+    delete:
+      parameters:
+        - description: |
+            The discussion ID.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Success
+      tags:
+        - Discussions
+      summary: Remove user's own reaction.
   '/discussions/{id}/canonical-url':
     put:
       parameters:
@@ -681,6 +746,58 @@ paths:
       tags:
       - Discussions
       summary: Remove custom canonical url for a discussion.
+  /discussions/{id}/tags:
+    parameters:
+      - name: id
+        description: The discussion ID
+        in: path
+        required: true
+        schema:
+          type: integer
+    put:
+      summary: Set the tags on a discussion.
+      tags:
+        - Discussions
+      requestBody:
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/TagReference'
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TagFragment'
+        '401':
+          $ref: '#/components/responses/PermissionError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      summary: Add tags to a discussion.
+      tags:
+        - Discussions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TagReference'
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TagFragment'
+        '401':
+          $ref: '#/components/responses/PermissionError'
+        '404':
+          $ref: '#/components/responses/NotFound'
 components:
   parameters:
     DateLastComment:
@@ -709,6 +826,8 @@ components:
           - lastPost.body
           - lastPost.insertUser
           - reactions
+          - tagsIDs
+          - tags
       style: form
   schemas:
     CategoryFragment:
@@ -1010,6 +1129,47 @@ components:
       - body
       - format
       type: object
+    DiscussionPatch:
+        properties:
+            body:
+                description: The body of the discussion.
+                minLength: 1
+                type: string
+            categoryID:
+                description: The category the discussion is in.
+                type: integer
+            closed:
+                description: Whether the discussion is closed or open.
+                type: boolean
+            format:
+                $ref: '../../dashboard/openapi/schemas.yml#/components/schemas/Format'
+            groupID:
+                x-addon: groups
+                description: The group the discussion is in.
+                nullable: true
+                type: integer
+            name:
+                description: The title of the discussion.
+                minLength: 1
+                type: string
+            pinLocation:
+                description: >-
+                    The location for the discussion, if pinned. "category" are pinned to
+                    their own category. "recent" are pinned to the recent discussions
+                    list, as well as their own category.
+                enum:
+                    - category
+                    - recent
+                minLength: 1
+                nullable: true
+                type: string
+            pinned:
+                description: Whether or not the discussion has been pinned.
+                type: boolean
+            sink:
+                description: Whether or not the discussion has been sunk.
+                type: boolean
+        type: object
     PostFragment:
       properties:
         discussionID:

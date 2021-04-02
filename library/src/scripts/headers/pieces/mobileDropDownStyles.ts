@@ -4,14 +4,14 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { absolutePosition, flexHelper, singleBorder, userSelect } from "@library/styles/styleHelpers";
+import { flexHelper, singleBorder, userSelect } from "@library/styles/styleHelpers";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
 import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { border, calc, percent, px, translateX } from "csx";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { frameVariables } from "@library/layout/frame/frameStyles";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { Mixins } from "@library/styles/Mixins";
@@ -59,7 +59,7 @@ export const mobileDropDownClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const frameVars = frameVariables();
     const titleBarVars = titleBarVariables();
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = panelLayoutVariables().mediaQueries();
     const flex = flexHelper();
     const style = styleFactory("mobileDropDown");
 
@@ -192,7 +192,7 @@ export const mobileDropDownClasses = useThemeCache(() => {
     const closeWidth =
         Math.floor(globalVars.icon.sizes.xSmall) + 2 * (globalVars.gutter.half + globalVars.gutter.quarter);
     const closeButton = style("closeButton", {
-        ...absolutePosition.middleLeftOfParent(),
+        ...Mixins.absolute.middleLeftOfParent(),
         height: styleUnit(closeWidth),
         width: styleUnit(closeWidth),
         minWidth: styleUnit(closeWidth),
@@ -206,13 +206,12 @@ export const mobileDropDownClasses = useThemeCache(() => {
         justifyContent: "center",
         textTransform: "uppercase",
         minHeight: styleUnit(titleBarVars.sizing.height - 4),
-        fontSize: styleUnit(globalVars.fonts.size.small),
         textOverflow: "ellipsis",
         ...Mixins.padding({
             vertical: styleUnit(4),
         }),
         ...Mixins.font({
-            size: globalVars.fonts.size.small,
+            ...globalVars.fontSizeAndWeightVars("small"),
             transform: "uppercase",
             color: globalVars.mixBgAndFg(0.6),
         }),

@@ -13,7 +13,8 @@ import { forumLayoutVariables } from "@dashboard/compatibilityStyles/forumLayout
 import { ISearchBarOverwrites, searchBarClasses } from "@library/features/search/searchBarStyles";
 import { searchResultsVariables } from "@library/features/search/searchResultsStyles";
 import { important, percent } from "csx";
-import { metaContainerStyles, metaItemStyle } from "@library/styles/metasStyles";
+import { metasVariables } from "@library/metas/Metas.variables";
+import { metaItemStyle } from "@library/metas/Metas.styles";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { suggestedTextStyleHelper } from "@library/features/search/suggestedTextStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
@@ -25,6 +26,7 @@ export const searchPageCSS = () => {
     const globalVars = globalVariables();
     const layoutVars = forumLayoutVariables();
     const formElementVars = formElementsVariables();
+    const metasVars = metasVariables();
 
     cssOut(`.DataList.DataList-Search .Item.Item-Search .Img.PhotoWrap`, {
         top: styleUnit(layoutVars.cell.paddings.vertical),
@@ -45,8 +47,8 @@ export const searchPageCSS = () => {
         `,
         {
             textDecoration: "none",
-            color: ColorsUtils.colorOut(globalVars.meta.text.color),
-            fontSize: styleUnit(globalVars.meta.text.size),
+            color: ColorsUtils.colorOut(metasVars.font.color),
+            fontSize: styleUnit(metasVars.font.size),
         },
     );
 
@@ -55,12 +57,11 @@ export const searchPageCSS = () => {
           .DataList.DataList-Search#search-results .Item.Item-Search h3 a,
       `,
         {
-            textDecoration: "none",
             ...Mixins.font({
                 color: globalVars.mainColors.fg,
-                size: globalVars.fonts.size.large,
-                weight: globalVars.fonts.weights.semiBold,
+                ...globalVars.fontSizeAndWeightVars("large", "semiBold"),
                 lineHeight: globalVars.lineHeights.condensed,
+                textDecoration: "none",
             }),
             ...allLinkStates({
                 hover: {
@@ -84,10 +85,6 @@ export const searchPageCSS = () => {
 
     cssOut(`.Item.Item-Search .Meta .Bullet`, {
         display: important("none"),
-    });
-
-    cssOut(`#search-results.DataList.DataList-Search .Item.Item-Search .Media-Body .Meta`, {
-        ...metaContainerStyles(),
     });
 
     cssOut(`#search-results.DataList.DataList-Search .Item.Item-Search .Media-Body .Bullet`, {
@@ -153,11 +150,10 @@ export const searchPageCSS = () => {
         textTransform: "none",
     });
 
-    cssOut(`#search-results .Item-Body .Meta`, metaContainerStyles());
     cssOut(`#search-results .Item-Body .Meta > *`, metaItemStyle());
 
     cssOut(`#search-results .Meta-Body.Meta .Breadcrumbs a`, {
-        fontSize: styleUnit(globalVars.meta.text.size),
+        fontSize: styleUnit(metasVars.font.size),
         textTransform: "initial",
     });
 

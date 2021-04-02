@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { ReactNode } from "react";
 import { t } from "@library/utility/appUtils";
 import { IOptionalComponentID, useUniqueID } from "@library/utility/idUtils";
 import { checkRadioClasses } from "@library/forms/checkRadioStyles";
@@ -16,12 +16,13 @@ interface IProps extends IOptionalComponentID {
     checked?: boolean;
     disabled?: boolean;
     onChange?: any;
-    label: string;
+    label: string | ReactNode;
     name?: string;
     isHorizontal?: boolean;
     note?: string;
     defaultChecked?: boolean;
     fakeFocus?: boolean;
+    value?: string;
 }
 
 interface IState {
@@ -52,6 +53,7 @@ export default function RadioButton(props: IProps) {
                     defaultChecked={props.defaultChecked}
                     tabIndex={0}
                     aria-describedby={note ? noteID : undefined}
+                    value={props.value}
                 />
                 <span aria-hidden={true} className={classNames(classes.iconContainer, classes.disk)}>
                     <svg className={classes.diskIcon}>

@@ -12,6 +12,7 @@ import React, { useMemo, useRef, useState, useLayoutEffect, useCallback } from "
 import ScrollLock, { TouchScrollable } from "react-scrolllock";
 import { EntranceAnimation, ITargetTransform, FromDirection } from "@library/animation/EntranceAnimation";
 import { useLastValue } from "@vanilla/react-utils";
+import { useDropdownContext } from "../flyouts/DropDown";
 
 interface IProps {
     id?: string;
@@ -37,11 +38,17 @@ interface IProps {
 export function ModalView(props: IProps) {
     const { titleID, label, size, isVisible, onDestroyed } = props;
     const [isAnimatingOut, setIsAnimatingOut] = useState(false);
+    const dropdownContext = useDropdownContext();
 
     const lastVisible = useLastValue(isVisible);
     useLayoutEffect(() => {
         if (lastVisible && !isVisible) {
+            // Lose visibility
             setIsAnimatingOut(true);
+            dropdownContext.setIsForcedOpen(false);
+        } else if (!lastVisible && isVisible) {
+            // Gain visibility
+            dropdownContext.setIsForcedOpen(true);
         }
     }, [isVisible, lastVisible]);
 

@@ -17,8 +17,8 @@ class TestAddonManager extends AddonManager {
         if ($scanDirs === null) {
             $root = '/tests/fixtures';
             $scanDirs = [
-                Addon::TYPE_ADDON => ["$root/addons", "$root/applications", "$root/plugins"],
-                Addon::TYPE_THEME => "$root/themes",
+                Addon::TYPE_ADDON => ["$root/addons/addons", "$root/applications", "$root/plugins"],
+                Addon::TYPE_THEME => ["$root/addons/themes", "$root/themes"],
                 Addon::TYPE_LOCALE => "$root/locales"
             ];
         }

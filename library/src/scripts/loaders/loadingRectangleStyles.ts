@@ -36,20 +36,22 @@ export const loadingRectangleVariables = useThemeCache(() => {
 });
 
 const style = styleFactory("loadingRectangle");
-export const loadingRectangleClass = useThemeCache((height: string | number, width: string | number = "100%") => {
-    const vars = loadingRectangleVariables();
-    return style({
-        display: "block",
-        borderRadius: 2,
-        background: ColorsUtils.colorOut(vars.colors.bg),
-        height: styleUnit(height),
-        width: styleUnit(width),
-        animationName: vars.loadingAnimation,
-        animationDuration: "4s",
-        animationIterationCount: "infinite",
-        maxWidth: percent(100),
-    });
-});
+export const loadingRectangleClass = useThemeCache(
+    (height: string | number, width: string | number = "100%", inline?: boolean) => {
+        const vars = loadingRectangleVariables();
+        return style({
+            display: inline ? "inline-block" : "block",
+            borderRadius: 2,
+            background: ColorsUtils.colorOut(vars.colors.bg),
+            height: styleUnit(height),
+            width: styleUnit(width),
+            animationName: vars.loadingAnimation,
+            animationDuration: "4s",
+            animationIterationCount: "infinite",
+            maxWidth: percent(100),
+        });
+    },
+);
 
 export const loadingSpacerClass = useThemeCache((height: string | number) => {
     return style({
@@ -59,9 +61,10 @@ export const loadingSpacerClass = useThemeCache((height: string | number) => {
     });
 });
 
-export const loadingCircleClass = useThemeCache((height: string | number) => {
+export const loadingCircleClass = useThemeCache((height: string | number, inline?: boolean) => {
     const vars = loadingRectangleVariables();
     return style({
+        display: inline ? "inline-block" : "block",
         height: styleUnit(50),
         width: styleUnit(50),
         background: ColorsUtils.colorOut(vars.colors.bg),

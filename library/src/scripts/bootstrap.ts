@@ -22,6 +22,7 @@ import { hasPermission } from "@library/features/users/Permission";
 // Has some side effects of creating globals.
 import "@library/gdn";
 import { loadedCSS } from "@rich-editor/quill/components/loadedStyles";
+import { loadThemeShadowDom } from "@library/theming/loadThemeShadowDom";
 
 if (!getMeta("featureFlags.useFocusVisible.Enabled", true)) {
     document.body.classList.add("hasNativeFocus");
@@ -71,7 +72,9 @@ onPageView((params: { history: History }) => {
 });
 
 logDebug("Bootstrapping");
-_executeReady()
+
+// Make sure we mount our header/footer shadow doms before anything else happens.
+_executeReady(loadThemeShadowDom)
     .then(() => {
         logDebug("Bootstrapping complete.");
         // Mount all data-react components.

@@ -38,7 +38,7 @@ class CurrentUserPreloadProvider implements ReduxActionProviderInterface {
      */
     public function createActions(): array {
         $user = $this->usersApi->get_me([]);
-        $permissions = $this->usersApi->get_permissions($this->session->UserID);
+        $permissions = $this->usersApi->get_permissions($this->session->UserID, ['expand' => 'junctions']);
         return [
             new ReduxAction(\UsersApiController::ME_ACTION_CONSTANT, Data::box($user), []),
             new ReduxAction(\UsersApiController::PERMISSIONS_ACTION_CONSTANT, Data::box($permissions), [])

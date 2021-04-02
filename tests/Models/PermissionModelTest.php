@@ -8,6 +8,7 @@
 namespace VanillaTests\Models;
 
 use VanillaTests\Bootstrap;
+use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\SetupTraitsTrait;
 use VanillaTests\SiteTestCase;
 use VanillaTests\SiteTestTrait;
@@ -17,6 +18,7 @@ use VanillaTests\SiteTestTrait;
  */
 class PermissionModelTest extends SiteTestCase {
     use TestCategoryModelTrait;
+    use CommunityApiTestTrait;
 
     /**
      * @var \PermissionModel
@@ -37,6 +39,7 @@ class PermissionModelTest extends SiteTestCase {
      *  Test setup.
      */
     public function setUp(): void {
+        $this->enableCaching();
         parent::setUp();
 
         $this->permissionModel = $this->container()->get(\PermissionModel::class);
@@ -167,46 +170,6 @@ class PermissionModelTest extends SiteTestCase {
             26 => 'Vanilla.Comments.Edit',
             27 => 'Vanilla.Comments.Delete',
             28 => 'Conversations.Conversations.Add',
-            'Vanilla.Discussions.View' =>
-                [
-                    0 => -1,
-                ],
-            'Vanilla.Discussions.Add' =>
-                [
-                    0 => -1,
-                ],
-            'Vanilla.Discussions.Edit' =>
-                [
-                    0 => -1,
-                ],
-            'Vanilla.Discussions.Announce' =>
-                [
-                    0 => -1,
-                ],
-            'Vanilla.Discussions.Sink' =>
-                [
-                    0 => -1,
-                ],
-            'Vanilla.Discussions.Close' =>
-                [
-                    0 => -1,
-                ],
-            'Vanilla.Discussions.Delete' =>
-                [
-                    0 => -1,
-                ],
-            'Vanilla.Comments.Add' =>
-                [
-                    0 => -1,
-                ],
-            'Vanilla.Comments.Edit' =>
-                [
-                    0 => -1,
-                ],
-            'Vanilla.Comments.Delete' =>
-                [
-                    0 => -1,
-                ],
         ];
 
         $this->assertSame($expected, $permissions);
@@ -221,10 +184,6 @@ class PermissionModelTest extends SiteTestCase {
             0 => 'Garden.Activity.View',
             1 => 'Garden.Profiles.View',
             2 => 'Vanilla.Discussions.View',
-            'Vanilla.Discussions.View' =>
-                [
-                    0 => -1,
-                ],
         ];
 
         $this->assertSame($expected, $permissions);

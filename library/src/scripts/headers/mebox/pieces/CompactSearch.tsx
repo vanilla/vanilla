@@ -13,7 +13,6 @@ import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { compactSearchClasses } from "@library/headers/mebox/pieces/compactSearchStyles";
 import { titleBarClasses } from "@library/headers/titleBarStyles";
-import { SearchIcon } from "@library/icons/titleBar";
 import { useLinkContext } from "@library/routing/links/LinkContextProvider";
 import { t } from "@library/utility/appUtils";
 import { useUniqueID } from "@library/utility/idUtils";
@@ -29,6 +28,7 @@ import {
 } from "@library/features/search/SearchScopeContext";
 import { AsyncCreatable } from "react-select";
 import { cx } from "@library/styles/styleShim";
+import { Icon } from "@vanilla/icons";
 
 export interface ICompactSearchProps {
     className?: string;
@@ -133,7 +133,7 @@ export function CompactSearch(props: ICompactSearchProps) {
                     buttonRef={openSearchButtonRef}
                 >
                     <div className={classNames(props.buttonContentClassName)}>
-                        <SearchIcon />
+                        <Icon icon="search-search" />
                     </div>
                 </Button>
             )}

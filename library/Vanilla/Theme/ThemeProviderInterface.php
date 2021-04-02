@@ -79,4 +79,12 @@ interface ThemeProviderInterface {
      * @return bool
      */
     public function themeExists($themeKey): bool;
+
+    /**
+     * Set the theme service instance.
+     *
+     * @param ThemeService $themeService
+     */
+    public function setThemeService(ThemeService $themeService): void;
+
 }

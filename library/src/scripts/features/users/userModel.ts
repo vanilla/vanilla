@@ -14,6 +14,7 @@ import NotificationsActions from "@library/features/notifications/NotificationsA
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
 import { IUsersState, IInjectableUserState } from "./userTypes";
+import clone from "lodash/clone";
 
 const suggestionReducer = new UserSuggestionModel().reducer;
 
@@ -45,7 +46,7 @@ export function isUserGuest(user: IUserFragment | null | undefined) {
  * Reducer for user related data.
  */
 export const usersReducer = produce(
-    reducerWithInitialState(INITIAL_USERS_STATE)
+    reducerWithInitialState(clone(INITIAL_USERS_STATE))
         .case(UserActions.getMeACs.started, (state) => {
             state.current.status = LoadStatus.LOADING;
             return state;

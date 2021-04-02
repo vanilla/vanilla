@@ -423,4 +423,5 @@ class DateFilterSchema extends Schema {
     private static function currentDayEnd(DateTimeImmutable $date): DateTimeImmutable {
         return $date->setTime(23, 59, 59);
     }
+
 }

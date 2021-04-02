@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { ColorHelper, important, px } from "csx";
+import { ColorHelper, px } from "csx";
 import isNumeric from "validator/lib/isNumeric";
 export * from "@library/styles/styleHelpersAnimation";
 export * from "@library/styles/styleHelpersBackgroundStyling";
@@ -20,8 +20,14 @@ export * from "@library/styles/styleHelpersReset";
 export * from "@library/styles/styleHelpersSpinner";
 export * from "@library/styles/styleHelpersTypography";
 export * from "@library/styles/styleHelpersVisibility";
+export * from "@library/styles/styleUnit";
+
 import { styleUnit } from "@library/styles/styleUnit";
+import { internalAbsoluteMixins } from "@library/styles/MixinsAbsolute";
 export const unit = styleUnit;
+
+/** @deprecated Use Mixins.absolute instead */
+export const absolutePosition = internalAbsoluteMixins;
 
 /*
  * Helper to generate human readable classes generated from TypeStyle
@@ -63,35 +69,6 @@ export const processValue = (variable) => {
         value,
         isImportant,
     };
-};
-
-export const importantUnit = (val: string | number | undefined, unitFunction = px) => {
-    const withUnit = styleUnit(val);
-    return withUnit ? important(withUnit.toString()) : withUnit;
-};
-
-export const negativeImportantUnit = (val: string | number | undefined, unitFunction = px) => {
-    const withUnit = styleUnit(val);
-    return withUnit ? important(negative(withUnit).toString()) : withUnit;
-};
-
-export const negativeUnit = (val: string | number | undefined, unitFunction = px) => {
-    return negative(styleUnit(val));
-};
-
-export const negative = (val) => {
-    if (typeof val === "string") {
-        val = val.trim();
-        if (val.startsWith("-")) {
-            return val.substring(1, val.length).trim();
-        } else {
-            return `-${val}`;
-        }
-    } else if (!!val && !isNaN(val)) {
-        return val * -1;
-    } else {
-        return val;
-    }
 };
 
 export const unitIfDefined = (val: string | number | undefined, unitFunction = px) => {

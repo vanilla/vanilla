@@ -19,16 +19,17 @@ import * as RevisionIcons from "@library/icons/revision";
 import * as SearchIcons from "@library/icons/searchIcons";
 import { StoryTiles } from "@library/storybook/StoryTiles";
 import { color } from "csx";
+import { iconRegistry } from "@vanilla/icons";
 
 const story = storiesOf("Components", module);
 
 const invert = ["NewPostMenuIcon"];
 
-function IconSet({ icons }) {
+function IconSet({ icons, shouldFilter = true }) {
     return (
         <StoryTiles>
             {Object.entries(icons)
-                .filter(([name]) => name.endsWith("Icon") || name.endsWith("Logo"))
+                .filter(([name]) => !shouldFilter || name.endsWith("Icon") || name.endsWith("Logo"))
                 .map(([name, Icon]: [string, any]) => (
                     <StoryTileAndTextCompact
                         key={name}
@@ -51,7 +52,8 @@ story.add("Icons", () => {
                 versions, which just means they have less padding for tighter spaces. Most icons render in a box 24px by
                 24px.
             </StoryParagraph>
-
+            <StoryHeading>@vanilla/icons</StoryHeading>
+            <IconSet shouldFilter={false} icons={iconRegistry.getAllIcons()} />
             <StoryHeading>Common</StoryHeading>
             <IconSet icons={CommonIcons} />
             <StoryHeading>Editor</StoryHeading>

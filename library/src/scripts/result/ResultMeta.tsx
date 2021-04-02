@@ -11,11 +11,11 @@ import { capitalizeFirstLetter } from "@vanilla/utils";
 import { t } from "@library/utility/appUtils";
 import { PublishStatus } from "@library/@types/api/core";
 import BreadCrumbString, { ICrumbString } from "@library/navigation/BreadCrumbString";
-import { metasClasses } from "@library/styles/metasStyles";
+import { metasClasses } from "@library/metas/Metas.styles";
 import Translate from "@library/content/Translate";
 import DateTime from "@library/content/DateTime";
 import ProfileLink from "@library/navigation/ProfileLink";
-import { ExternalIcon } from "@library/icons/common";
+import { Icon } from "@vanilla/icons";
 import { ICountResult } from "@library/search/searchTypes";
 import NumberFormatted from "@library/content/NumberFormatted";
 
@@ -41,7 +41,7 @@ export function ResultMeta(props: IProps) {
             <Translate
                 source="<0/> by <1/>"
                 c0={type ? t(capitalizeFirstLetter(type)) : undefined}
-                c1={<ProfileLink className={classesMetas.meta} username={updateUser.name} userID={updateUser.userID} />}
+                c1={<ProfileLink className={classesMetas.meta} userFragment={updateUser} />}
             />
         ) : type ? (
             t(capitalizeFirstLetter(type))
@@ -88,7 +88,7 @@ export function ResultMeta(props: IProps) {
 
             {isForeign && (
                 <span className={classesMetas.metaIcon}>
-                    <ExternalIcon />
+                    <Icon icon="meta-external" />
                 </span>
             )}
 

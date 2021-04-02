@@ -15,6 +15,21 @@ class SchemaForm {
     const RADIO_TYPE = 'radio';
     const TEXT_TYPE = 'textBox';
     const TOGGLE_TYPE = 'toggle';
+    const CODE_EDITOR_TYPE = 'codeBox';
+
+    /**
+     * Create a "section" of the form on an object type.
+     *
+     * @param FormOptions $options
+     *
+     * @return array
+     */
+    public static function section(FormOptions $options): array {
+        return [
+            'label' => $options->getLabel(),
+            'description' => $options->getDescription(),
+        ];
+    }
 
     /**
      * Drop down form element schema.
@@ -28,7 +43,7 @@ class SchemaForm {
         FormOptions $options,
         FormChoicesInterface $choices,
         FieldMatchConditional $conditions = null
-    ) {
+    ): array {
 
         $result = [
             'description' => $options->getDescription(),
@@ -39,7 +54,7 @@ class SchemaForm {
         ];
 
         if ($conditions) {
-            $result['conditions'] =  [$conditions->getConditions()];
+            $result['conditions'] = [$conditions->getConditions()];
         }
 
         return $result;
@@ -53,13 +68,37 @@ class SchemaForm {
      *
      * @return array
      */
-    public static function textBox(FormOptions $options, string $type = 'text') {
+    public static function textBox(FormOptions $options, string $type = 'text'): array {
         return [
             'description' => $options->getDescription(),
             'label' => $options->getLabel(),
             'inputType' => self::TEXT_TYPE,
             'placeholder' => $options->getPlaceHolder(),
             'type' => $type,
+        ];
+    }
+
+    /**
+     * Code box form element schema.
+     *
+     * @param FormOptions $options
+     * @param string $language "text/html", "application/json".
+     * @param string $jsonSchemaUri
+     *
+     * @return array
+     */
+    public static function codeBox(
+        FormOptions $options,
+        string $language = 'text/html',
+        ?string $jsonSchemaUri = null
+    ): array {
+        return [
+            'description' => $options->getDescription(),
+            'label' => $options->getLabel(),
+            'inputType' => self::CODE_EDITOR_TYPE,
+            'placeholder' => $options->getPlaceHolder(),
+            'language' => $language,
+            'jsonSchemaUri' => $jsonSchemaUri,
         ];
     }
 
@@ -82,15 +121,22 @@ class SchemaForm {
      *
      * @param FormOptions $options
      * @param FormChoicesInterface $choices
+     * @param ?FieldMatchConditional $conditions
      *
      * @return array
      */
-    public static function radio(FormOptions $options, FormChoicesInterface $choices) {
-        return [
+    public static function radio(FormOptions $options, FormChoicesInterface $choices, FieldMatchConditional $conditions = null) {
+        $result = [
             'description' => $options->getDescription(),
             'label' => $options->getLabel(),
             'inputType' => self::RADIO_TYPE,
             'choices' => $choices->getChoices(),
         ];
+
+        if ($conditions) {
+            $result['conditions'] = [$conditions->getConditions()];
+        }
+
+        return $result;
     }
 }

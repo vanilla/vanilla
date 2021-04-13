@@ -10,7 +10,7 @@ class LocaleChooserModule extends Gdn_Module {
     public $Links = '';
 
     public function assetTarget() {
-        return 'Foot';
+        return 'Panel';
     }
 
     /**

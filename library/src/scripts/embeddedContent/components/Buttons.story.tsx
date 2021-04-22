@@ -48,9 +48,11 @@ function StoryButton() {
                 <StoryTileAndTextCompact type="titleBar" text={"Standard"}>
                     <Button>Standard</Button>
                 </StoryTileAndTextCompact>
-
                 <StoryTileAndTextCompact text={"Primary"}>
                     <Button buttonType={ButtonTypes.PRIMARY}>Primary</Button>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact text={"Outline"}>
+                    <Button baseClass={ButtonTypes.OUTLINE}>Outline</Button>
                 </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact type="titleBar" text={"For Title Bar (Sign in Button)"}>
                     <Button buttonType={ButtonTypes.TRANSPARENT}>Transparent</Button>

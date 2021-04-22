@@ -24,6 +24,8 @@ import { DiscussionOptionsClose } from "@library/features/discussions/Discussion
 import { DiscussionOptionsSink } from "@library/features/discussions/DiscussionOptionsSink";
 import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
 import { DiscussionOptionsChangeLog } from "@library/features/discussions/DiscussionOptionsChangeLog";
+import DiscussionChangeType from "@library/features/discussions/DiscussionOptionsChangeType";
+import { NON_CHANGE_TYPE } from "@library/features/discussions/DiscussionOptionsChangeType";
 
 interface IDiscussionOptionItem {
     permission?: IPermission;
@@ -56,6 +58,13 @@ const DiscussionOptionsMenu: FunctionComponent<{ discussion: IDiscussion }> = ({
     const canDelete = hasPermission("discussions.manage", permOptions);
     const items: React.ReactNode[] = [];
 
+    const allowedDiscussionTypes = discussion?.category?.allowedDiscussionTypes ?? [];
+    const filteredDiscussionTypes = allowedDiscussionTypes.filter((type) => {
+        return !NON_CHANGE_TYPE.includes(type);
+    });
+
+    const canChangeType = filteredDiscussionTypes.length > 1 && canEdit;
+
     if (canEdit) {
         items.push(
             <DropDownItemLink to={`/post/editdiscussion/${discussion.discussionID}`}>{t("Edit")}</DropDownItemLink>,
@@ -79,6 +88,10 @@ const DiscussionOptionsMenu: FunctionComponent<{ discussion: IDiscussion }> = ({
 
     if (canClose) {
         items.push(<DiscussionOptionsClose discussion={discussion} />);
+    }
+
+    if (canChangeType) {
+        items.push(<DiscussionChangeType discussion={discussion} />);
     }
 
     items.push(<DropDownItemSeparator />);

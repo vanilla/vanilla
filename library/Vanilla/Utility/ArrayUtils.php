@@ -159,6 +159,34 @@ final class ArrayUtils {
     }
 
     /**
+     * Check if something will serialize as a numeric array.
+     *
+     * - All keys are numeric.
+     * - Keys are in order.
+     * - There are no holes.
+     *
+     * @param mixed $array
+     *
+     * @return bool
+     */
+    public static function serializesAsNumericArray($array): bool {
+        if (!is_array($array)) {
+            return false;
+        }
+
+        reset($array);
+        $expectedIndex = 0;
+        foreach ($array as $key => $value) {
+            if ($key !== $expectedIndex) {
+                return false;
+            }
+            $expectedIndex++;
+        }
+
+        return true;
+    }
+
+    /**
      * Get the keys of an array or array like object.
      *
      * This method is similar to `array_keys()`, but works on objects that act like arrays.
@@ -210,8 +238,11 @@ final class ArrayUtils {
             }
 
             $nextKeys = array_slice($keys, 1);
-            if (count($nextKeys) > 0) {
+            if (count($nextKeys) > 1) {
                 $array[$currentKey] = $search($array[$currentKey], $nextKeys);
+            } elseif (count($nextKeys) === 1) {
+                $nextKey = reset($nextKeys);
+                $array[$currentKey][$nextKey] = $value;
             } else {
                 $array[$currentKey] = $value;
             }

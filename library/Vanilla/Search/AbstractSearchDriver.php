@@ -56,7 +56,7 @@ abstract class AbstractSearchDriver implements SearchTypeCollectorInterface, Inj
      *
      * @return bool
      */
-    protected function supportsForeignRecords(): bool {
+    public function supportsForeignRecords(): bool {
         return false;
     }
 

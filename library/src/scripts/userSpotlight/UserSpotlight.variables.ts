@@ -12,8 +12,8 @@ import { CSSObject } from "@emotion/css";
 import { IBoxOptions, ISpacing } from "@library/styles/cssUtilsTypes";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { BorderType } from "@library/styles/styleHelpers";
-import { media } from "../styles/styleShim";
 import { UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
+import { media } from "@library/styles/styleShim";
 
 export interface IUserSpotlightOptions {
     box: IBoxOptions;

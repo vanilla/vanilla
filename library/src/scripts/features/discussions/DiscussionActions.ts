@@ -70,6 +70,11 @@ export interface IDeleteDiscussion {
     discussionID: IDiscussion["discussionID"];
 }
 
+export interface IPutDiscussionType {
+    discussionID: IDiscussion["discussionID"];
+    type: string;
+}
+
 export default class DiscussionActions extends ReduxActions {
     public static getDiscussionListACs = createAction.async<IGetDiscussionListParams, IDiscussion[], IApiError>(
         "GET_DISCUSSION_LIST",
@@ -120,6 +125,21 @@ export default class DiscussionActions extends ReduxActions {
             const reponse = await this.api.patch(`/discussions/${discussionID}`, query, requestConfig);
             return reponse.data;
         })(_query);
+        return this.dispatch(thunk);
+    };
+
+    public static putDiscussionTypeACs = createAction.async<IPutDiscussionType, IDiscussion, IApiError>(
+        "PUT_DISCUSSION_TYPE",
+    );
+
+    public putDiscussionType = (query: IPutDiscussionType) => {
+        const { discussionID, type } = query;
+        const thunk = bindThunkAction(DiscussionActions.putDiscussionTypeACs, async () => {
+            const reponse = await this.api.put(`/discussions/${discussionID}/type`, {
+                type,
+            });
+            return reponse.data;
+        })({ discussionID, type });
         return this.dispatch(thunk);
     };
 

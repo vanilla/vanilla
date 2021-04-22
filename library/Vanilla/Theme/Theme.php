@@ -335,6 +335,49 @@ class Theme implements \JsonSerializable {
     }
 
     /**
+     * Some of our arrays may have corrupted.
+     *
+     * Here we force them to be numeric arrays if they exist.
+     *
+     * @see https://github.com/vanilla/support/issues/4133
+     *
+     */
+    private function fixCorruptedVariables() {
+        // Get the base variables asset.
+        $variablesAsset = $this->getAssets()[ThemeAssetFactory::ASSET_VARIABLES] ?? null;
+
+        $forcedNumericArraysPaths = [
+            'quickLinks.links',
+            'navigation.navigationItems',
+            'navigation.mobileOnlyNavigationItems',
+        ];
+
+        if ($variablesAsset instanceof JsonThemeAsset) {
+            $variableData = $variablesAsset->getValue();
+
+            $wasTouched = false;
+            // Cleanup some values.
+            foreach ($forcedNumericArraysPaths as $forcedNumericArrayPath) {
+                $found = ArrayUtils::getByPath($forcedNumericArrayPath, $variableData);
+                if ($found !== null && is_array($found) && !empty($found)) {
+                    // We have a non-empty array here.
+
+                    if (!ArrayUtils::serializesAsNumericArray($found)) {
+                        ArrayUtils::setByPath($forcedNumericArrayPath, $variableData, array_values($found));
+                        $wasTouched = true;
+                    }
+                }
+            }
+
+            if ($wasTouched) {
+                $newAsset = new JsonThemeAsset(json_encode($variableData, JSON_UNESCAPED_UNICODE), $variablesAsset->getUrl());
+                $this->assets[ThemeAssetFactory::ASSET_VARIABLES] = $newAsset;
+            }
+        }
+    }
+
+
+    /**
      * Initialize the assets of the theme.
      *
      * @param array $assets
@@ -369,6 +412,8 @@ class Theme implements \JsonSerializable {
         foreach ($factory->getLogoAssets($this->getAssets()[ThemeAssetFactory::ASSET_VARIABLES] ?? null) as $assetName => $logoAsset) {
             $this->assets[$assetName] = $logoAsset;
         }
+
+        $this->fixCorruptedVariables();
     }
 
     /**

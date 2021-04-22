@@ -14,6 +14,26 @@ export enum LoadStatus {
     ERROR = "ERROR",
 }
 
+export type Loadable<T, E = any> =
+    | {
+          status: LoadStatus.PENDING | LoadStatus.LOADING;
+          error?: undefined;
+          data?: undefined;
+      }
+    | {
+          status: LoadStatus.SUCCESS;
+          error?: undefined;
+          data: T;
+      }
+    | {
+          status: LoadStatus.ERROR;
+          error: E;
+          data?: undefined;
+      };
+
+/**
+ * @deprecated use Loadable instead. It has stricter types.
+ */
 export interface ILoadable<T = never, E = IApiError> {
     status: LoadStatus;
     error?: E;
@@ -55,7 +75,7 @@ export type MultiTypeRecord<T, Subtract extends keyof T, TypeName extends string
 
 export interface INavigationItem {
     name: string;
-    url: string;
+    url?: string;
     parentID: RecordID;
     recordID: RecordID;
     sort: number | null;

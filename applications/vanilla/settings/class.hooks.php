@@ -328,11 +328,12 @@ class VanillaHooks extends Gdn_Plugin {
         $discussionID = val('DiscussionID', $sender->EventArguments, 0);
         $categoryID = valr('Fields.CategoryID', $sender->EventArguments, 0);
         $rawFormTags = val('Tags', $formPostValues, '');
+        $newDiscussion = $formPostValues['IsNewDiscussion'] ?? false;
         $formTags = TagModel::splitTags($rawFormTags);
 
         // Don't change tags if there's no "Tags" field (this prevents tags from being lost when moving discussion to
         // a new category).
-        if (!isset($formPostValues['Tags'])) {
+        if (!isset($formPostValues['Tags']) && !$newDiscussion) {
             return;
         }
 

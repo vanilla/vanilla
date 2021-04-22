@@ -177,3 +177,29 @@ export function useDiscussionPatch(discussionID: number, patchID: string | null 
         patchDiscussion: patchDiscussion,
     };
 }
+
+function useDiscussionPutTypeStatus(discussionID: number): LoadStatus {
+    return useSelector((state: IDiscussionsStoreState) => {
+        return state.discussions.changeTypeByID[discussionID]?.status ?? LoadStatus.PENDING;
+    });
+}
+
+export function useDiscussionPutType(discussionID: number) {
+    const isLoading = useDiscussionPutTypeStatus(discussionID) === LoadStatus.LOADING;
+    const actions = useDiscussionActions();
+
+    const putDiscussionType = useCallback(
+        (query: Omit<Parameters<typeof actions.putDiscussionType>[0], "discussionID">) => {
+            return actions.putDiscussionType({
+                discussionID,
+                ...query,
+            });
+        },
+        [actions, discussionID],
+    );
+
+    return {
+        isLoading,
+        putDiscussionType: putDiscussionType,
+    };
+}

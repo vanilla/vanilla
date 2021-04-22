@@ -49,7 +49,7 @@ class ObjectUtilsTest extends TestCase {
         };
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionCode(403);
+        $this->expectExceptionCode(400);
         ObjectUtils::hydrate($a, ['a' => 'a']);
     }
 

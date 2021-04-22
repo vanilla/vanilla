@@ -112,7 +112,7 @@ export function loadThemeFonts() {
     } else if (forceGoogleFont) {
         const webFontConfig: WebFont.Config = {
             google: {
-                families: [getGoogleFontUrl({ name: googleFontFamily })],
+                families: [`${getGoogleFontUrl({ name: googleFontFamily })}&display=swap`],
             },
         };
         WebFont.load(webFontConfig);

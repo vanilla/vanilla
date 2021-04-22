@@ -70,7 +70,7 @@ function useApiLookup(
     const transformApiToOption = useCallback(
         (result: any): IComboBoxOption => {
             const label = get(result, labelKey, t("(Untitled)"));
-            const value = get(result, valueKey, "");
+            const value = valueKey === "." ? result : get(result, valueKey, "");
             return {
                 label,
                 value,

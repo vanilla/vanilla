@@ -6,12 +6,19 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
-import { buttonStates, userSelect, IStateSelectors, negativeUnit, pointerEvents } from "@library/styles/styleHelpers";
+import {
+    buttonStates,
+    userSelect,
+    IStateSelectors,
+    negativeUnit,
+    pointerEvents,
+    colorOut,
+} from "@library/styles/styleHelpers";
 import { styleUnit } from "@library/styles/styleUnit";
 import { Mixins } from "@library/styles/Mixins";
 import { Variables } from "@library/styles/Variables";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
-import { CSSObject } from "@emotion/css";
+import { css, CSSObject } from "@emotion/css";
 import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { important, percent, rgba } from "csx";
@@ -461,6 +468,39 @@ export const dropDownClasses = useThemeCache(() => {
         paddingLeft: globalVars.gutter.size,
     });
 
+    const thumbnailItemLabel = css({
+        display: "inline-block",
+        marginTop: 8,
+    });
+
+    const thumbnailItemThumbnail = css({
+        display: "inline-block",
+        border: "1px solid #dddee0",
+        borderRadius: 6,
+    });
+
+    const thumbnailItem = css({
+        width: 220,
+        height: 186,
+        padding: 6,
+        borderRadius: 6,
+        display: "inline-block",
+        cursor: "pointer",
+
+        [`&:hover`]: {
+            background: ColorsUtils.colorOut(globalVars.mainColors.primary.fade(0.1)),
+        },
+
+        [`&:hover .${thumbnailItemThumbnail}`]: {
+            borderColor: ColorsUtils.colorOut(globalVars.mainColors.primary),
+        },
+    });
+
+    const gridItem = css({
+        width: 680,
+        padding: "0 10px",
+    });
+
     return {
         root,
         contents,
@@ -501,6 +541,10 @@ export const dropDownClasses = useThemeCache(() => {
         itemButton,
         headingContentContainer,
         headingTitleContainer,
+        thumbnailItem,
+        thumbnailItemLabel,
+        thumbnailItemThumbnail,
+        gridItem,
     };
 });
 
@@ -529,7 +573,9 @@ export const actionMixin = (classBasedStates?: IStateSelectors): CSSObject => {
             color: rgba(0, 0, 0, 0),
             radius: 0,
         }),
-        color: ColorsUtils.colorOut(vars.item.colors.fg),
+        // Override legacy style.scss with global variables by making it important.
+        // ".MenuItems a, .MenuItems a:link, .MenuItems a:visited, .MenuItems a:active "
+        color: ColorsUtils.colorOut(vars.item.colors.fg, { makeImportant: true }),
         ...userSelect("none"),
         ...buttonStates(
             {

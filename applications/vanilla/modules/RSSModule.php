@@ -317,7 +317,6 @@ class RSSModule extends AbstractHomeWidgetModule {
     public static function getWidgetSchema(): Schema {
         $widgetSchema = Schema::parse([
             'url:s' => [
-                'required' => true,
                 'x-control' => SchemaForm::textBox(
                     new FormOptions(
                         'URL',
@@ -325,7 +324,7 @@ class RSSModule extends AbstractHomeWidgetModule {
                     ),
                     "url"
                 ),
-            ],
+            ]
         ]);
 
         return SchemaUtils::composeSchemas(

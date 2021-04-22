@@ -266,6 +266,43 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         preset: EMPTY_LEGACY_BUTTON_PRESET, //LEGACY
     });
 
+    const outline = makeThemeVars("outline", {
+        name: ButtonTypes.OUTLINE,
+        preset: { style: ButtonPreset.SOLID },
+        colors: {
+            bg: globalVars.mainColors.bg,
+            fg: globalVars.mainColors.primary,
+        },
+        borders: {
+            ...globalVars.borderType.formElements.buttons,
+            color: globalVars.mainColors.primary,
+        },
+        hover: {
+            colors: {
+                bg: globalVars.mainColors.primary,
+                fg: globalVars.mainColors.bg,
+            },
+        },
+        active: {
+            colors: {
+                bg: globalVars.mainColors.primary,
+                fg: globalVars.mainColors.bg,
+            },
+        },
+        focus: {
+            colors: {
+                bg: globalVars.mainColors.primary,
+                fg: globalVars.mainColors.bg,
+            },
+        },
+        focusAccessible: {
+            colors: {
+                bg: globalVars.mainColors.primary,
+                fg: globalVars.mainColors.bg,
+            },
+        },
+    });
+
     const primaryInit = makeThemeVars("primary", {
         ...primaryLegacyInit,
         presetName: primaryLegacyInit.preset.style ?? ButtonPreset.SOLID,
@@ -401,6 +438,7 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     return {
         standard,
         primary,
+        outline,
         transparent,
         translucid,
         notStandard,

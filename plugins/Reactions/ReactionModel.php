@@ -1459,7 +1459,10 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface {
             }
 
             $count++;
-            $strippedRecordType = getValue(0, explode('-', $row['RecordType'], 2));
+
+            $type = $row['RecordType'] ?? '';
+            $type = explode('-', $type, 2);
+            $strippedRecordType = $type[0] ?? '';
             $newRecord = $strippedRecordType != $recordType || $row['RecordID'] != $recordID;
 
             if ($newRecord) {
@@ -1686,7 +1689,8 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface {
                 'sort:i|n' => 'Display order when listing types.',
                 'active:b' => 'Is this type available for use?',
                 'custom:b' => 'Is this a non-standard type?',
-                'hidden:b' => 'Should this type be hidden from the UI?'
+                'hidden:b' => 'Should this type be hidden from the UI?',
+                'reactionValue:i?' => 'The reaction value.'
             ]);
         }
 
@@ -1731,7 +1735,8 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface {
                 'urlcode:s',
                 'name:s',
                 'class:s',
-                'hasReacted:b?'
+                'hasReacted:b?',
+                'reactionValue:i?'
             ]);
         }
 
@@ -1763,11 +1768,10 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface {
      */
     public function normalizeTypeRow(array $row) {
         $row = $this->normalizeAttributes($row);
-
         if (!array_key_exists('Points', $row)) {
             $row['Points'] = 0;
         }
-
+        $row['ReactionValue'] = $row['IncrementValue'] ?? 0;
         $camelCaseSchema = new CamelCaseScheme();
         $row = $camelCaseSchema->convertArrayKeys($row);
         return $row;

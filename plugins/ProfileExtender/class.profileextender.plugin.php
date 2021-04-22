@@ -562,6 +562,30 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Reorder ProfileFields according to the sequence in config.
+     *
+     * @param array $profileFields
+     * @return array
+     */
+    public function reorderProfileFields(array $profileFields): array {
+        $orderedFields = $this->getProfileFields();
+        $orderedFieldsNamesAsKey = array_column($orderedFields, "Name");
+
+        //the new array will have the right order
+        $reordered = [];
+        foreach ($orderedFieldsNamesAsKey as $name) {
+            if (array_key_exists($name, $profileFields)) {
+                $reordered[$name] = $profileFields[$name];
+            }
+        }
+
+        //if the user has fields and they are not in config, we still need to include them
+        $leftovers = array_diff_key($profileFields, $reordered);
+
+        return array_merge($reordered, $leftovers);
+    }
+
+    /**
      * Display custom fields on Profile.
      *
      * @param UserInfoModule $Sender
@@ -574,6 +598,8 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
         try {
             // Get the custom fields
             $ProfileFields = Gdn::userModel()->getMeta($Sender->User->UserID, 'Profile.%', 'Profile.');
+
+            $ProfileFields = $this->reorderProfileFields($ProfileFields);
 
             Gdn::controller()->setData('ExtendedFields', $ProfileFields);
 
@@ -624,7 +650,6 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
 
             // Display all non-hidden fields
             require_once Gdn::controller()->fetchViewLocation('helper_functions', '', 'plugins/ProfileExtender', true, false);
-            $ProfileFields = array_reverse($ProfileFields, true);
             extendedProfileFields($ProfileFields, $AllFields, $this->MagicLabels);
         } catch (Exception $ex) {
             // No errors

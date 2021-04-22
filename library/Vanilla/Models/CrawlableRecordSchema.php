@@ -7,6 +7,7 @@
 
 namespace Vanilla\Models;
 
+use Gdn;
 use Garden\Schema\Schema;
 use LocaleModel;
 use Vanilla\Contracts\Site\AbstractSiteProvider;
@@ -205,7 +206,16 @@ final class CrawlableRecordSchema {
      */
     public static function applyExpandedSchema(Schema $schema, string $defaultType, $expand = []): Schema {
         if (ModelUtils::isExpandOption(ModelUtils::EXPAND_CRAWL, $expand)) {
-            return self::localize(self::schema($defaultType)->merge($schema));
+            $mergedSchema = self::schema($defaultType)->merge($schema);
+            $localizedSchema = self::localize($mergedSchema);
+
+            return Gdn::eventManager()->fireFilter(
+                'crawlableRecordSchema_applyExpandedSchema',
+                $localizedSchema,
+                $schema,
+                $defaultType,
+                $expand
+            );
         } else {
             return $schema;
         }

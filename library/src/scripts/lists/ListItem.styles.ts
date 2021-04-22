@@ -15,6 +15,7 @@ import { useThemeCache } from "@library/styles/themeCache";
 
 export const listItemClasses = useThemeCache(() => {
     const globalVars = globalVariables();
+    const vars = listItemVariables();
 
     const item = css({
         display: "flex",
@@ -71,7 +72,9 @@ export const listItemClasses = useThemeCache(() => {
 
     const title = css({
         flex: 1,
+        ...Mixins.font(vars.title.font),
     });
+
     const titleContainer = css({
         display: "flex",
         alignItems: "flex-start",

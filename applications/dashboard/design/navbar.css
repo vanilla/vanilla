@@ -1,0 +1,2437 @@
+@charset "UTF-8";
+.fade {
+  opacity: 0;
+  transition: opacity 0.15s linear;
+}
+.fade.in {
+  opacity: 1;
+}
+
+.collapse {
+  display: none;
+}
+.collapse.in {
+  display: block;
+}
+
+.collapsing {
+  position: relative;
+  height: 0;
+  overflow: hidden;
+  transition-timing-function: ease;
+  transition-duration: 0.35s;
+  transition-property: height;
+}
+
+.nav-adventure {
+  margin-top: -1px;
+}
+.nav-adventure .nav-item {
+  display: block;
+  margin-left: -18px;
+  margin-right: -18px;
+  border-bottom: 1px solid #e7e8e9;
+}
+.nav-adventure .nav-item:first-child {
+  border-top: 1px solid #e7e8e9;
+}
+.nav-adventure .nav-item-title {
+  line-height: 1;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.nav-adventure .nav-item-description {
+  margin-bottom: -5px;
+}
+.nav-adventure .nav-link {
+  position: relative;
+  display: flex;
+  justify-items: flex-start;
+  align-items: center;
+  padding: 3px 18px;
+  line-height: 20px;
+  color: #555a62;
+  transition: background-color 0.1s;
+}
+.nav-adventure .nav-link > * {
+  z-index: 1;
+}
+.nav-adventure .nav-link svg {
+  display: block;
+  height: 24px;
+}
+.nav-adventure .nav-link:hover {
+  background-color: #f9fdfe;
+}
+.nav-adventure .nav-link:hover::before {
+  width: 100%;
+}
+.nav-adventure .nav-item-icon {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid #e7e8e9;
+  border-radius: 6px;
+  margin-right: 18px;
+}
+.nav-adventure .nav-item-arrow {
+  margin-left: auto;
+}
+
+.nav-stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.nav-stats-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+  padding: 9px 18px 0;
+  color: rgba(25, 25, 25, 0.2);
+}
+
+.nav-stats-link > * {
+  cursor: pointer;
+}
+
+.nav-stats-title {
+  font-weight: 400;
+  padding: 9px 0 4.5px;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+.nav-stats-value {
+  font-weight: 300;
+  font-size: 40px;
+}
+
+.nav-heading {
+  margin-top: 9px;
+  margin-bottom: 9px;
+}
+.nav-heading a {
+  display: block;
+  padding-top: 16px;
+  padding-bottom: 16px;
+  padding-left: 12px;
+  border-bottom: 1px dotted rgba(0, 0, 0, 0.0875);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+.nav-heading a::before {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  margin-right: 4px;
+  margin-left: 4px;
+  vertical-align: middle;
+  content: "";
+  border-top: 0.375em solid;
+  border-right: 0.375em solid transparent;
+  border-left: 0.375em solid transparent;
+  position: relative;
+  top: -1px;
+  -webkit-transform: rotate(0deg);
+  tranform: rotate(0deg);
+  margin-left: -16px;
+  margin-right: 8px;
+  transition: all 0.1s ease-out;
+}
+.nav-heading a.collapsed::before {
+  -webkit-transform: rotate(-90deg);
+  tranform: rotate(-90deg);
+}
+
+.nav-inline {
+  font-size: 0;
+}
+.nav-inline .nav-item {
+  display: inline-block;
+}
+.nav-inline .nav-item + .nav-item,
+.nav-inline .nav-link + .nav-link {
+  margin-left: 16px;
+}
+
+.panel-nav a {
+  color: #949aa2;
+}
+.panel-nav .title {
+  display: block;
+  margin-bottom: 18px;
+}
+.panel-nav .badge {
+  font-size: 11px;
+}
+.panel-nav .globals-sign-out {
+  display: none;
+}
+@media (max-width: 991px) {
+  .panel-nav .globals-sign-out {
+    display: block;
+    margin-top: 36px;
+  }
+}
+.panel-nav .nav-pill {
+  color: #f6f9fb;
+  background: rgba(148, 154, 162, 0.6);
+  display: inline-block;
+  font-size: 8px;
+  line-height: 1;
+  padding: 2px 4px;
+  border-radius: 3px;
+  vertical-align: middle;
+}
+.panel-nav .nav-link.active {
+  border-radius: 6px 0 0 6px;
+}
+.panel-nav .nav-link.active, .panel-nav .nav-link.active:hover {
+  color: #fff;
+  background-color: #0291db;
+}
+.panel-nav .nav-link.active .nav-pill, .panel-nav .nav-link.active:hover .nav-pill {
+  color: #0291db;
+  background-color: rgba(255, 255, 255, 0.7);
+}
+.panel-nav .nav-link:hover, .panel-nav .nav-link.hover {
+  color: #949aa2;
+  background-color: #e8ecf2;
+}
+.panel-nav .nav-stacked .nav-item + .nav-item {
+  margin-top: 0;
+}
+
+.nav-link, .nav-link.active, .nav-link:active, .nav-link.hover, .nav-link:hover {
+  cursor: pointer;
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0;
+  color: #fff;
+  background-color: #0291db;
+  border: 1px solid rgba(0, 0, 0, 0.125);
+}
+.navbar .vanilla-logo {
+  width: 65px;
+}
+.navbar .title {
+  color: #fff;
+}
+.navbar .logo + .title {
+  margin-left: 18px;
+}
+.navbar img {
+  height: 36px;
+}
+.navbar .nav-item {
+  text-align: center;
+  border-right: 1px solid rgba(0, 0, 0, 0.125);
+}
+.navbar .nav-item + .nav-item {
+  margin: 0;
+}
+.navbar .nav-item:first-child {
+  border-left: 1px solid rgba(0, 0, 0, 0.125);
+}
+.navbar .nav {
+  height: 100%;
+}
+.navbar .nav-link {
+  position: relative;
+  min-width: 180px;
+  color: #fff;
+  border-radius: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.navbar .nav-link.active, .navbar .nav-link.active:hover {
+  background-color: #04a8fd;
+}
+.navbar .nav-link.active > *, .navbar .nav-link.active:hover > * {
+  color: #fff;
+}
+.navbar .nav-link:hover {
+  background-color: #04a8fd;
+}
+@media (max-width: 1199px) {
+  .navbar .navbar-brand,
+.navbar .navbar-memenu {
+    min-width: inherit;
+  }
+}
+@media (max-width: 991px) {
+  .navbar {
+    justify-content: flex-start;
+  }
+  .navbar .nav {
+    display: flex;
+    flex-grow: 1;
+    justify-content: space-between;
+  }
+  .navbar .nav-item {
+    width: 100%;
+  }
+  .navbar .nav-link {
+    min-width: inherit;
+    width: 100%;
+    font-size: 12px;
+  }
+  .navbar .nav-link-description {
+    display: none;
+  }
+  .navbar .navbar-memenu,
+.navbar .navbar-brand {
+    display: none;
+  }
+}
+
+.drawer-toggle {
+  color: #fff;
+  font-size: 18px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+.drawer-toggle:hover, .drawer-toggle:active, .drawer-toggle:focus {
+  color: #fff;
+  text-decoration: none;
+  outline: 0;
+}
+.drawer-toggle:hover, .drawer-toggle:active {
+  background-color: #04a8fd;
+}
+
+.navbar-memenu,
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 240px;
+}
+
+.navbar-profile {
+  cursor: pointer;
+}
+.navbar-profile .icon-caret-down {
+  border-top-color: #ceeeff;
+  display: inline-block;
+  width: 0;
+  height: 0;
+  margin-right: 4px;
+  margin-left: 4px;
+  vertical-align: middle;
+  content: "";
+  border-top: 0.375em solid;
+  border-right: 0.375em solid transparent;
+  border-left: 0.375em solid transparent;
+}
+
+.nav-icons {
+  margin-right: 18px;
+  color: #fff;
+}
+.nav-icons svg {
+  display: block;
+  height: 31.3333333333px;
+}
+.nav-icons .nav-link {
+  min-width: inherit;
+}
+
+/*!
+ * @author Adam Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/*!
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/* -------------------------------------------------------------- *\
+    Utility Variables
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *\
+    Globals
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *\
+    States
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *\
+    Password Strength Colors
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *\
+    Third Party Colors
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *\
+    Typography
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *\
+    Animation
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *\
+    Icons
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *\
+    User Photo
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *\
+    Layout
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *\
+    Components
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *\
+    Form Elements
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *\
+    Overlays (Menus, flyouts and Modals)
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *\
+    Buttons
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *\
+      Meta
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *\
+      Thumbnails
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *\
+    Separators
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *\
+    SelectBox
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *\
+    DropDown
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *\
+    Header
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *\
+    Compact Me Box
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *\
+    Footer
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *\
+    user content
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *\
+    Etc
+\* -------------------------------------------------------------- */
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/* ------------------------------- *\
+    Third Party Colors
+\* ------------------------------- */
+/*!
+ * @author Adam Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+@keyframes spinnerLoader {
+  0% {
+    transform: rotate(73deg);
+  }
+  100% {
+    transform: rotate(433deg);
+  }
+}
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/*!
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/*!
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+em {
+  font-style: italic;
+}
+
+body.js-focus-visible:not(.hasNativeFocus) :focus:not(.focus-visible) {
+  outline: none;
+}
+
+caption {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  border: 0 !important;
+}
+
+/*!
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  border: 0 !important;
+}
+
+.isCentered {
+  text-align: center;
+}
+
+.isHidden {
+  display: none !important;
+}
+
+/*!
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/** Hides the image cropper on mobile themes. This image cropper is not mobile compatible. */
+body.isMobile .box-crop .box-source {
+  display: none;
+}
+body.isMobile .change-picture .change-picture-instructions {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .box-crop .box-source {
+    display: none;
+  }
+
+  .change-picture .change-picture-instructions {
+    display: none;
+  }
+}
+/*!
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+button.Close {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border: 0;
+}
+
+.Close-x {
+  color: #000;
+  font-family: arial;
+  font-size: 22px;
+  font-weight: bold;
+  padding: 0;
+}
+
+.buttonIcon {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border: 0;
+  cursor: pointer;
+  background: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  width: 36px;
+  min-width: 36px;
+  padding: 0;
+  color: #74787e;
+}
+.buttonIcon:visited {
+  color: #74787e;
+}
+.buttonIcon .icon {
+  display: block;
+}
+.buttonIcon.isOpen {
+  color: #0291db;
+}
+.buttonIcon:focus, .buttonIcon:hover {
+  color: #0291db;
+}
+
+.icon-close {
+  display: block;
+  margin: auto;
+  width: 12px;
+  height: 12px;
+}
+
+/*!
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+.categoryList-heading + .DataTableWrap > .categoryList-genericHeading {
+  display: none;
+}
+
+/*!
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+.Title-Icon {
+  display: inline-block;
+  margin-left: 0.15em;
+  margin-right: 0.15em;
+}
+
+.Title-PrivateIcon {
+  height: 0.8em;
+  width: 0.8em;
+  vertical-align: -0.05;
+  opacity: 0.4;
+}
+
+.Title-SecretIcon {
+  height: 0.8em;
+  width: 1.1em;
+  vertical-align: -0.1em;
+  opacity: 0.4;
+}
+
+/*!
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+.Popup .Content > h1:first-child, .Popup .Content > h2:first-child, .Popup .Content > h3:first-child {
+  font-size: 20px;
+  margin-top: 0;
+  margin-bottom: 14px;
+}
+
+.authenticateUserCol {
+  padding: 0 26px;
+  margin: auto;
+  width: 386px;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.authenticateUserCol .pageTitle {
+  text-align: center;
+  margin-bottom: 18px;
+}
+.authenticateUserCol .button.button-fullWidth {
+  margin-bottom: 18px;
+}
+.authenticateUserCol .button.button-fullWidth.button-sso {
+  margin-bottom: 12px;
+}
+.authenticateUserCol .icon {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  vertical-align: middle;
+}
+.authenticateUserCol .iconLarge {
+  width: 32px;
+  height: 32px;
+}
+
+.authenticateUser-photoCrop,
+.authenticateUser-imageWrap {
+  display: block;
+  width: 100%;
+  max-width: 117px;
+}
+
+.authenticateUser-photoCrop {
+  overflow: hidden;
+  border-radius: 50%;
+}
+
+.authenticateUser-imageWrap {
+  position: relative;
+  margin: auto;
+}
+
+.authenticateUser-icon {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  display: block;
+  width: 42px;
+  height: 42px;
+  background-color: #fff;
+  border-style: solid;
+  border-width: 3px;
+  border-color: #fff;
+  border-radius: 50%;
+}
+
+.authenticateUser-photo {
+  display: block;
+  max-width: 100%;
+  width: 100%;
+  height: auto;
+}
+
+.authenticateUser-arrowDown {
+  display: block;
+  margin: 18px auto;
+  opacity: 0.6;
+}
+
+.authenticateUser-name {
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.authenticateUser-userName {
+  font-size: 12px;
+  opacity: 0.6;
+  text-align: center;
+}
+
+.rememberMeAndForgot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  font-size: 12px;
+}
+.rememberMeAndForgot a {
+  font-size: inherit;
+  color: #0291db;
+}
+
+.rememberMeAndForgot-rememberMe {
+  flex-grow: 1;
+  padding-right: 6px;
+}
+
+.authenticateUser-divider {
+  text-align: center;
+}
+
+.authenticateUser-footer {
+  text-align: center;
+}
+
+.authenticateUser-ssoLabel {
+  display: inline;
+  margin-left: 12px;
+}
+
+.button.Button.Primary.buttonCTA, .button.Button.button-sso {
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-image: none;
+  box-sizing: border-box;
+  text-decoration: none !important;
+}
+.button.Button.button-sso {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+}
+
+.button-ssoLabel {
+  margin-left: 12px;
+  margin-right: 12px;
+  font-size: 14px;
+  font-weight: normal;
+  text-shadow: none;
+}
+
+.ssoMethod-icon {
+  width: 24px;
+  height: auto;
+}
+.ssoMethod-icon.ssoMethod-iconSpacer {
+  display: block;
+  visibility: hidden;
+  height: 24px;
+}
+
+.button-ssoContents {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  width: 100%;
+  max-width: 100%;
+}
+
+.ssoMethods {
+  margin-bottom: 18px;
+}
+
+.authenticateUser-paragraph {
+  word-break: break-word;
+}
+.authenticateUser-paragraph.isError {
+  color: #ff3933;
+}
+
+.followButton {
+  white-space: nowrap;
+  font-size: 10px;
+  text-transform: uppercase;
+  vertical-align: middle;
+  font-weight: 400;
+  padding: 0 5px;
+  text-decoration: none;
+}
+.followButton.isFollowing:not(:hover) {
+  opacity: 0.7;
+}
+
+.followButton-icon {
+  width: 14px;
+  height: 14px;
+  margin-right: 5px;
+  vertical-align: sub;
+}
+
+.selectBox {
+  display: inline-block;
+  position: relative;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.PageControls .selectBox {
+  margin-right: 15px;
+  float: left;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.selectBox-label {
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+  margin-right: 5px;
+}
+
+.selectBox-main {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+}
+
+.selectBox-content {
+  display: none;
+  left: 100%;
+  margin-left: -29px;
+  margin-top: 10px;
+}
+
+.selectBox-toggle {
+  position: relative;
+  display: inline-block;
+  vertical-align: inherit;
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  white-space: nowrap;
+  max-height: 100%;
+}
+.selectBox-toggle:active {
+  text-decoration: none;
+}
+
+.selectBox-item {
+  position: relative;
+  display: block;
+}
+.selectBox-item .dropdown-menu-link.selectBox-link {
+  position: relative;
+  padding-left: 30px;
+}
+.selectBox-item.isActive .selectBox-link {
+  pointer-events: none;
+  cursor: default;
+}
+
+.selectBox-link {
+  display: block;
+  box-sizing: border-box;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  text-decoration: none !important;
+  text-align: left;
+}
+
+.selectBox-selectedIcon {
+  position: absolute;
+  left: 5px;
+  top: 0;
+  bottom: 0;
+  margin: auto 0;
+  width: 18px;
+  height: 18px;
+}
+
+.menu-separator {
+  background: none;
+  border-bottom: 1px solid #eeefef;
+  margin: 6px 0;
+}
+.menu-separator hr {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  border: 0 !important;
+}
+
+.PageControls {
+  position: relative;
+}
+
+body.Categories.isMobile .PageControls.Top {
+  display: block;
+}
+
+.ButtonGroup.discussion-sort-filter-module {
+  display: flex;
+  align-items: center;
+}
+
+.inputBlock {
+  display: block;
+  margin-bottom: 24px;
+}
+.inputBlock .checkbox {
+  display: flex;
+  align-items: center;
+}
+.inputBlock.inputBlock-tighter {
+  margin-top: -12px;
+}
+.inputBlock.hasError .inputText {
+  border-color: #ff3933;
+  background-color: #ffebeb;
+  color: #ff3933;
+}
+.inputBlock ::-ms-clear {
+  display: none;
+}
+
+.inputBlock-errors,
+.inputBlock-labelAndDescription {
+  display: block;
+}
+
+.inputBlock-labelText {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  line-height: 1.428571429;
+}
+
+.InputBox.inputText {
+  width: 100%;
+}
+
+.inputBlock-error {
+  word-break: break-word;
+  display: block;
+  color: #ff3933;
+  line-height: 1.428571429;
+  font-size: 12px;
+  margin-top: 3px;
+}
+.inputBlock-error:first-letter {
+  text-transform: capitalize;
+}
+.inputBlock-error + .inputBlock-error {
+  margin-top: 6px;
+}
+
+.inputBlock-inputWrap {
+  display: block;
+}
+
+.inputBlock-labelNote {
+  display: block;
+  font-size: 12px;
+  line-height: 1.428571429;
+  opacity: 0.6;
+}
+.inputBlock-labelNote + .inputBlock-inputWrap {
+  margin-top: 6px;
+}
+
+.inputBlock-inputText {
+  box-sizing: border-box;
+}
+
+.label-wrap img {
+  max-width: 50%;
+  max-height: 180px;
+  margin-top: 3px;
+  margin-bottom: 3px;
+}
+
+.FormWrapper .form-group {
+  margin-top: 6px;
+  margin-bottom: 6px;
+}
+.FormWrapper .file-upload {
+  display: flex;
+  align-items: flex-start;
+  position: relative;
+  width: 100%;
+  font-weight: 400;
+  min-height: 36px;
+  cursor: pointer;
+  margin-bottom: 0;
+}
+.FormWrapper .file-upload input {
+  padding: 0;
+  margin: 0;
+  filter: alpha(opacity=0);
+  opacity: 0;
+  width: 0;
+}
+.FormWrapper .file-upload input:disabled, .FormWrapper .file-upload input.disabled {
+  opacity: 0;
+}
+.FormWrapper .file-upload-browse {
+  display: inline-block;
+  position: relative;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  touch-action: manipulation;
+  min-width: 96px;
+  line-height: 36px;
+  height: 36px;
+  font-weight: 400;
+  user-select: none;
+  overflow: hidden;
+  cursor: pointer;
+  background-color: #fff;
+  color: #555a62;
+  border-width: 1px;
+  border-radius: 6px;
+  border-style: solid;
+  border-color: #d6d7d9;
+  order: -1;
+  margin-right: 6px;
+}
+.FormWrapper .file-upload-choose {
+  line-height: 36px;
+  height: 36px;
+  font-size: 14px;
+  font-weight: 400;
+  font-family: "Open Sans", "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif;
+}
+
+.checkbox-box {
+  display: none;
+}
+
+label.checkbox input.checkbox-input {
+  float: none;
+  margin: 0;
+}
+
+.checkbox-label {
+  user-select: none;
+  margin-left: 6px;
+  line-height: inherit;
+}
+
+.button.button-fullWidth {
+  width: 100%;
+  max-width: 100%;
+}
+
+::-moz-focus-inner {
+  border: 0;
+}
+
+.passwordStrength-bar {
+  position: relative;
+  width: 100%;
+}
+
+.StrengthText.passwordStrength-gaugeLabel {
+  margin-right: 0;
+}
+
+.passwordStrength.PasswordStrength {
+  padding: 0;
+}
+
+.pageHeading {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.pageHeading .pageHeading-title {
+  display: block;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.pageHeading-main {
+  position: relative;
+  display: block;
+  max-width: 100%;
+  flex-grow: 1;
+}
+
+.pageHeading-actions {
+  display: flex;
+  align-self: center;
+  max-width: 100%;
+}
+
+.stickyHeaderWrap {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.stickyHeader {
+  position: relative;
+  width: 100%;
+  left: 0;
+  display: block;
+  z-index: 100;
+}
+.stickyHeader.isAtTop {
+  position: relative;
+}
+.stickyHeader.isScrollingDown {
+  position: absolute;
+}
+
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+.accessibility-jumpTo {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border: 0;
+}
+
+/*!
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+body {
+  visibility: hidden;
+}
+
+.richEditor blockquote {
+  display: block;
+  margin: 0;
+}
+.richEditor .richEditorParagraphMenu {
+  left: 0;
+}
+.richEditor.isDisabled,
+.richEditor.isDisabled .richEditor-button {
+  cursor: progress !important;
+}
+.richEditor .ReactVirtualized__Grid {
+  min-width: 252px;
+}
+.richEditor .richEditor-menuItems {
+  border-bottom: 0;
+}
+.richEditor .richEditor-frame {
+  height: initial;
+  min-height: 275px;
+}
+
+.userContent {
+  line-height: 1.5;
+}
+.userContent.Message {
+  margin-top: 14px;
+}
+.userContent h1,
+.userContent h2,
+.userContent h3,
+.userContent h4,
+.userContent h5,
+.userContent h6 {
+  line-height: 1.25;
+  color: #555a62;
+}
+.userContent > *:not(.emoji):not(:last-child):not(br) {
+  margin-bottom: 14px;
+}
+.userContent > *:not(.emoji):first-child:not(br):not(.embedExternal) {
+  margin-top: -0.25em !important;
+}
+.userContent .embedResponsive {
+  margin-bottom: 0 !important;
+}
+.userContent .float-left, .userContent .float-right {
+  margin: 0 !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+.userContent .float-left .embedExternal-content, .userContent .float-right .embedExternal-content {
+  margin-bottom: 14px;
+}
+.userContent .embedExternal {
+  margin-bottom: 14px;
+}
+.userContent,
+.userContent h1,
+.userContent h2,
+.userContent h3,
+.userContent h4,
+.userContent h5,
+.userContent h6,
+.userContent span,
+.userContent div,
+.userContent td,
+.userContent th,
+.userContent a,
+.userContent p {
+  word-break: break-word;
+  text-overflow: ellipsis;
+}
+.userContent .CommentHeader {
+  margin-bottom: 14px;
+}
+.userContent li,
+.userContent li *:first-child {
+  margin-top: 0;
+}
+.userContent li,
+.userContent li *:last-child {
+  margin-bottom: 0;
+}
+.userContent .metas {
+  display: block;
+  line-height: 1.5;
+  color: #6f737a;
+  width: calc(100% + 12px);
+  overflow: hidden;
+  text-align: left;
+  margin-left: -6px;
+  margin-right: 6px;
+}
+.userContent .metas.isFlexed {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+}
+.userContent .meta {
+  display: inline-block;
+  margin: 0 6px;
+  font-size: 12px;
+  color: #6f737a;
+}
+.userContent .meta .meta {
+  margin: 0;
+}
+
+.richEditor-menu {
+  box-shadow: 0 1px 3px 0 rgba(85, 90, 98, 0.3);
+  background-color: #fff;
+  border-radius: 6px;
+  border-color: #d6d7d9;
+  border-style: solid;
+  border-width: 1px;
+}
+
+.richEditor-button {
+  user-select: none;
+  cursor: pointer;
+}
+
+body.hasRichEditor .richEditor ~ .TextBoxWrapper,
+body.hasRichEditor .CommentForm .PreviewButton,
+body.hasRichEditor #Form_Preview {
+  display: none !important;
+}
+body.hasRichEditor .richEditor .buttonClose {
+  appearance: none;
+  border: 0;
+}
+body.hasRichEditor .richEditor .spoiler .iconButton {
+  justify-content: center;
+  display: flex;
+}
+
+.Popup.hasRichEditor .Border {
+  box-sizing: border-box;
+}
+.Popup.hasRichEditor .richEditor ~ .TextBoxWrapper,
+.Popup.hasRichEditor .CommentForm .PreviewButton,
+.Popup.hasRichEditor #Form_Preview {
+  display: none !important;
+}
+
+@media (max-width: 700px) {
+  .Popup.hasRichEditor .Border {
+    width: 100%;
+  }
+}
+@media (min-width: 700px) {
+  .Popup.hasRichEditor.Section-PostDiscussion #DiscussionForm select,
+body.hasRichEditor.Section-PostDiscussion #DiscussionForm select {
+    max-width: 100%;
+  }
+  .Popup.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper,
+body.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper {
+    padding-left: 36px;
+    padding-right: 36px;
+  }
+  .Popup.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper .richEditor,
+body.hasRichEditor.Section-PostDiscussion #DiscussionForm .FormWrapper .richEditor {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .Popup.hasRichEditor .CommentForm .CommentFormWrap .Form-HeaderWrap,
+body.hasRichEditor .CommentForm .CommentFormWrap .Form-HeaderWrap {
+    display: none;
+  }
+  .Popup.hasRichEditor .CommentForm .CommentFormWrap .FormWrapper,
+body.hasRichEditor .CommentForm .CommentFormWrap .FormWrapper {
+    padding-right: 0;
+    padding-left: 0;
+  }
+  .Popup.hasRichEditor .CommentForm .richEditor,
+body.hasRichEditor .CommentForm .richEditor {
+    padding-left: 36px;
+    padding-right: 36px;
+  }
+  .Popup.hasRichEditor .CommentForm .richEditor .richEditor,
+body.hasRichEditor .CommentForm .richEditor .richEditor {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .Popup.hasRichEditor .CommentForm .Buttons,
+body.hasRichEditor .CommentForm .Buttons {
+    padding-right: 36px;
+  }
+  .Popup.hasRichEditor #EventAddEditForm .Form-HeaderWrap,
+.Popup.hasRichEditor #GroupForm .Form-HeaderWrap,
+.Popup.hasRichEditor #MessageForm .Form-HeaderWrap,
+.Popup.hasRichEditor #ConversationForm .Form-HeaderWrap,
+body.hasRichEditor #EventAddEditForm .Form-HeaderWrap,
+body.hasRichEditor #GroupForm .Form-HeaderWrap,
+body.hasRichEditor #MessageForm .Form-HeaderWrap,
+body.hasRichEditor #ConversationForm .Form-HeaderWrap {
+    display: none;
+  }
+  .Popup.hasRichEditor #EventAddEditForm .FormWrapper,
+.Popup.hasRichEditor #GroupForm .FormWrapper,
+.Popup.hasRichEditor #MessageForm .FormWrapper,
+.Popup.hasRichEditor #ConversationForm .FormWrapper,
+body.hasRichEditor #EventAddEditForm .FormWrapper,
+body.hasRichEditor #GroupForm .FormWrapper,
+body.hasRichEditor #MessageForm .FormWrapper,
+body.hasRichEditor #ConversationForm .FormWrapper {
+    padding-left: 36px;
+    padding-right: 36px;
+  }
+  .Popup.hasRichEditor #EventAddEditForm .FormWrapper .richEditor,
+.Popup.hasRichEditor #GroupForm .FormWrapper .richEditor,
+.Popup.hasRichEditor #MessageForm .FormWrapper .richEditor,
+.Popup.hasRichEditor #ConversationForm .FormWrapper .richEditor,
+body.hasRichEditor #EventAddEditForm .FormWrapper .richEditor,
+body.hasRichEditor #GroupForm .FormWrapper .richEditor,
+body.hasRichEditor #MessageForm .FormWrapper .richEditor,
+body.hasRichEditor #ConversationForm .FormWrapper .richEditor {
+    padding-right: 0;
+    padding-left: 0;
+  }
+  .Popup.hasRichEditor.Profile .FormWrapper.FormWrapper-Condensed,
+body.hasRichEditor.Profile .FormWrapper.FormWrapper-Condensed {
+    padding-right: 36px;
+    padding-left: 0;
+  }
+  .Popup.hasRichEditor.Profile .FormWrapper.FormWrapper-Condensed .Activity .Buttons,
+body.hasRichEditor.Profile .FormWrapper.FormWrapper-Condensed .Activity .Buttons {
+    padding-left: 36px;
+  }
+  .Popup.hasRichEditor.Section-Conversation .CommentForm .Buttons,
+body.hasRichEditor.Section-Conversation .CommentForm .Buttons {
+    padding-right: 0;
+  }
+  .Popup.hasRichEditor .Popup.hasRichEditor .Border,
+body.hasRichEditor .Popup.hasRichEditor .Border {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  .Popup.hasRichEditor .Popup.hasRichEditor .Content > h1,
+body.hasRichEditor .Popup.hasRichEditor .Content > h1 {
+    padding-left: 36px;
+  }
+  .Popup.hasRichEditor .Popup.hasRichEditor .FormWrapper,
+body.hasRichEditor .Popup.hasRichEditor .FormWrapper {
+    background: none;
+    padding-top: 3px;
+    padding-left: 36px;
+    padding-right: 36px;
+  }
+  .Popup.hasRichEditor .Popup.hasRichEditor .richEditor,
+body.hasRichEditor .Popup.hasRichEditor .richEditor {
+    padding-left: 0;
+  }
+  .Popup.hasRichEditor .NoteForm.FormWrapper,
+body.hasRichEditor .NoteForm.FormWrapper {
+    padding-left: 36px;
+    padding-right: 36px;
+  }
+  .Popup.hasRichEditor .NoteForm.FormWrapper .richEditor,
+body.hasRichEditor .NoteForm.FormWrapper .richEditor {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+.richEditor-text {
+  overflow: visible;
+  min-height: 200px;
+  padding-top: 12px;
+  padding-right: 12px;
+  padding-bottom: 12px;
+  padding-left: 12px;
+  border-radius: 6px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.ql-clipboard {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  border: 0 !important;
+  position: fixed;
+}
+
+.richEditor-upload {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  border: 0 !important;
+}
+
+body.isMobile .embedDialogue {
+  position: static;
+}
+body.isMobile .u-richEditorHiddenOnMobile {
+  display: none !important;
+}
+body.isMobile .richEditor {
+  padding-left: 0;
+}
+body.isMobile .richEditor-menu.richEditorFlyout {
+  left: 0;
+  width: calc(100% + 4px);
+}
+body.isMobile .richEditor-embedBarMobileBorder {
+  display: block;
+}
+body.isMobile .FormWrapper {
+  padding-left: 18px;
+  padding-right: 18px;
+}
+body.isMobile .richEditorParagraphMenu {
+  display: none !important;
+}
+body.isMobile .Popup.hasRichEditor .Border {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 700px) {
+  .embedDialogue {
+    position: static;
+  }
+
+  .u-richEditorHiddenOnMobile {
+    display: none !important;
+  }
+
+  .richEditor {
+    padding-left: 0;
+  }
+
+  .richEditor-menu.richEditorFlyout {
+    left: 0;
+    width: calc(100% + 4px);
+  }
+
+  .richEditor-embedBarMobileBorder {
+    display: block;
+  }
+
+  .FormWrapper {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .richEditorParagraphMenu {
+    display: none !important;
+  }
+
+  .Popup.hasRichEditor .Border {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+.richEditor-menu.richEditorFlyout {
+  bottom: 100%;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.richEditor-textWrap {
+  min-height: 236px;
+}
+
+.richEditor-close.richEditor-close {
+  display: block;
+}
+
+@media screen and (-ms-high-contrast: active), screen and (-ms-high-contrast: none) {
+  .richEditorFlyout .richEditorFlyout-header.richEditorFlyout-header {
+    display: table;
+  }
+  .richEditorFlyout .richEditorFlyout-title.richEditorFlyout-title {
+    display: table-cell;
+    vertical-align: middle;
+  }
+}
+/*!
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/*!
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/*!
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+.embedResponsive {
+  position: relative;
+  text-align: center;
+}
+
+.embedResponsive-initialLink {
+  text-align: start;
+  padding: 14px;
+}
+
+.embedExternal {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  width: 640px;
+  position: relative;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  clear: both;
+}
+
+.embedExternal-content {
+  position: relative;
+  margin: auto;
+  width: 100%;
+  max-width: 100%;
+  text-align: center;
+  box-sizing: border-box;
+}
+.embedExternal-content iframe {
+  display: block;
+  box-sizing: border-box !important;
+}
+.embedExternal-content > * {
+  margin: auto !important;
+}
+
+.embedExternal-ratio {
+  position: relative;
+  display: block;
+  margin: 0;
+  width: 100%;
+  box-sizing: border-box;
+  padding-left: 0;
+  padding-right: 0;
+  padding-bottom: 0;
+}
+
+.embedLinkLoader {
+  text-align: left;
+  display: block;
+}
+
+.embedLinkLoader-failIcon {
+  display: inline-block;
+  height: 1em;
+  width: 1em;
+  margin: 0;
+  vertical-align: -0.14em;
+  user-select: none;
+}
+
+.embedLinkLoader-loader {
+  transition-property: opacity;
+  transition-duration: 0.15s;
+  transition-timing-function: ease-out;
+  display: block;
+  width: 1em;
+  height: 1em;
+  border-radius: 50%;
+  border-top: 3px solid #0291db;
+  border-right: 3px solid rgba(2, 145, 219, 0.3);
+  border-bottom: 3px solid rgba(2, 145, 219, 0.3);
+  border-left: 3px solid rgba(2, 145, 219, 0.3);
+  transform: translateZ(0);
+  animation: spinnerLoader 0.7s infinite ease-in-out;
+  display: inline-block;
+  vertical-align: -0.14em;
+}
+.embedLinkLoader-loader::after {
+  border-radius: 50%;
+  width: 1em;
+  height: 1em;
+}
+
+.embedLinkLoader-link {
+  position: relative;
+  display: inline-block;
+  white-space: normal;
+  padding: 2px 4px;
+}
+
+.embed-focusableElement.focus-visible {
+  outline: none !important;
+}
+
+.richEditor .embedExternal {
+  user-select: none;
+}
+.richEditor .embedExternal-content,
+.richEditor .embedLinkLoader-link {
+  cursor: pointer;
+}
+.richEditor .embedExternal-content:after,
+.richEditor .embedLinkLoader-link:after {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  content: "";
+  transition: 0.2s ease box-shadow;
+  pointer-events: none;
+}
+.richEditor .embedExternal-content:hover:after,
+.richEditor .embedLinkLoader-link:hover:after {
+  box-shadow: 0 0 0 2px rgba(2, 145, 219, 0.5) inset;
+}
+.richEditor .embedImage .embedExternal-content:after {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  content: "";
+  cursor: "pointer";
+  z-index: 2;
+  transition: 0.2s ease box-shadow;
+  pointer-events: all;
+}
+.richEditor .embed-isSelected .embedExternal-content:after,
+.richEditor .embed-isSelected .embedLinkLoader-link:after {
+  box-shadow: 0 0 0 2px #0291db inset;
+}
+
+.embed-focusableElement {
+  cursor: pointer;
+}
+
+/*!
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/*!
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+.embedVideo .embedExternal-content {
+  position: relative;
+  display: block;
+  width: 640px;
+  max-width: 100%;
+  margin: auto;
+}
+.embedVideo .embedExternal-content:focus .embedVideo-playIcon, .embedVideo .embedExternal-content:hover .embedVideo-playIcon {
+  transform: scale(1.1);
+}
+
+.richEditor .embedVideo .embedExternal-content:focus .embedVideo-playIcon, .richEditor .embedVideo .embedExternal-content:hover .embedVideo-playIcon {
+  transform: scale(1);
+}
+
+.embedVideo-iframe,
+.embedVideo-thumbnail {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.embedVideo-thumbnail {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: auto;
+  height: auto;
+  width: 100%;
+  background-color: black;
+}
+@supports (object-fit: cover) {
+  .embedVideo-thumbnail {
+    object-fit: cover;
+    object-position: center;
+    height: 100%;
+  }
+}
+
+.embedVideo-ratio {
+  position: relative;
+  display: block;
+  background-color: #000000;
+  margin: 0;
+  width: 100%;
+  padding-left: 0;
+  padding-right: 0;
+  padding-bottom: 0;
+}
+.embedVideo-ratio.is21by9 {
+  padding-top: 42.8571428571%;
+}
+.embedVideo-ratio.is16by9 {
+  padding-top: 56.25%;
+}
+.embedVideo-ratio.is4by3 {
+  padding-top: 75%;
+}
+.embedVideo-ratio.is1by1 {
+  padding-top: 100%;
+}
+
+.embedVideo-playButton {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  cursor: pointer;
+  overflow: hidden;
+  border: none;
+}
+
+.embedVideo-playIconWrap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  width: 80px;
+  height: 80px;
+  display: block;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
+  border-radius: 50%;
+}
+
+.embedVideo-playIcon {
+  color: white;
+}
+
+.embedVideo-playIconPath {
+  stroke: rgba(0, 0, 0, 0.1);
+}
+
+/*!
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+.embedImage {
+  width: 100%;
+  max-width: 100%;
+  display: block;
+}
+@media (min-width: 550px) {
+  .embedImage:after {
+    content: "";
+    display: block;
+    height: 1px;
+  }
+  .embedImage.display-small .embedExternal-content {
+    max-width: calc(33.333% - 1px);
+  }
+  .embedImage.display-medium .embedExternal-content {
+    max-width: calc(66.666% - 1px);
+  }
+  .embedImage.float-left .embedExternal-content {
+    float: left;
+    margin-right: 20px;
+  }
+  .embedImage.float-right .embedExternal-content {
+    float: right;
+    margin-left: 20px;
+  }
+}
+
+.Message img .embedImage-img,
+.embedImage-img {
+  display: inline-flex;
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 100%;
+  max-height: none;
+}
+
+.bbcode_left .embedImage-img {
+  margin-left: 0;
+  display: inline-block;
+}
+
+.bbcode_right .embedImage-img {
+  margin-right: 0;
+  display: inline-block;
+}
+
+.embedImage-link {
+  display: inline-flex;
+  flex-direction: column;
+}
+
+/*!
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+.embedText-body {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  text-align: left;
+  pointer-events: initial !important;
+}
+
+.embedText-main {
+  padding: 14px;
+  box-sizing: border-box;
+}
+
+.embedText-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+.embedText-titleLink {
+  margin: 0;
+  color: inherit;
+}
+
+.embedText .embedText-titleLink,
+.embedText .embedText-title {
+  margin-top: 0;
+  margin-bottom: 4px;
+  display: block;
+  width: 100%;
+  padding: 0;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #555a62;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.richEditor .embedText-titleLink {
+  pointer-events: none;
+}
+
+/*!
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+.embedLink-image {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  margin-top: auto;
+  margin-bottom: auto;
+  width: 225px;
+}
+@supports (object-fit: cover) {
+  .embedLink-image {
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+}
+.embedLink-image + .embedText-main {
+  margin-left: auto;
+  width: calc(100% - 225px);
+  border-left-style: solid;
+  border-left-width: 1px;
+  border-left-color: rgba(85, 90, 98, 0.1);
+}
+@media (max-width: 550px) {
+  .embedLink-image {
+    position: relative;
+    width: 100%;
+    padding-top: 0;
+  }
+  .embedLink-image + .embedText-main {
+    width: 100%;
+    border-right: none;
+  }
+}
+
+.embedLink-source {
+  font-size: 12px;
+  color: #6f737a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+}
+
+.embedLink-excerpt {
+  color: #555A62;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+  max-width: 100%;
+  font-size: 14px;
+  margin-top: 4px;
+  line-height: 1.4;
+  max-height: 58.8px;
+  white-space: normal;
+}
+
+/*!
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/*!
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+.embedLoader-icon {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  flex-basis: 24px;
+}
+
+.embedLoader {
+  display: block;
+  position: relative;
+}
+
+.embedLoader-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #FFFFFF;
+  box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.3);
+  width: 135px;
+  height: 135px;
+  margin: auto;
+  overflow: hidden;
+}
+
+.embedLoader-loader {
+  transition-property: opacity;
+  transition-duration: 0.15s;
+  transition-timing-function: ease-out;
+  display: block;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border-top: 3px solid #0291db;
+  border-right: 3px solid rgba(2, 145, 219, 0.3);
+  border-bottom: 3px solid rgba(2, 145, 219, 0.3);
+  border-left: 3px solid rgba(2, 145, 219, 0.3);
+  transform: translateZ(0);
+  animation: spinnerLoader 0.7s infinite ease-in-out;
+}
+.embedLoader-loader::after {
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+}
+
+.embedLoader-error {
+  box-shadow: 0 1px 3px 0 rgba(85, 90, 98, 0.3);
+  display: flex;
+  overflow: hidden;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 15px;
+  background: #ffebeb;
+  transition: 0.2s ease box-shadow;
+  cursor: pointer;
+}
+.embedLoader-error:hover {
+  box-shadow: 0 0 0 2px rgba(2, 145, 219, 0.5) inset;
+}
+.embedLoader-error:focus {
+  box-shadow: 0 0 0 2px #0291db inset;
+}
+.embedLoader-error + .embedLoader-error {
+  margin-top: 12px;
+}
+.embedLoader-error .embedLoader-warningIcon {
+  align-self: flex-start;
+}
+.embedLoader-error .closeButton {
+  opacity: 0.7;
+  width: 24px;
+  height: 24px;
+  flex-basis: 24px;
+  align-self: flex-start;
+  margin: 0 0 0 auto;
+  cursor: pointer;
+  position: relative;
+}
+.embedLoader-error .closeButton, .embedLoader-error .closeButton:hover, .embedLoader-error .closeButton:focus {
+  background: none !important;
+  border: 0 !important;
+  color: inherit !important;
+  line-height: normal;
+  overflow: hidden;
+  padding: 0 !important;
+  -webkit-appearance: button !important;
+  /* for input */
+  -webkit-user-select: none !important;
+  /* for button */
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+}
+.embedLoader-error .closeButton:hover, .embedLoader-error .closeButton:focus {
+  opacity: 1;
+}
+.embedLoader-error .closeButton .embedLoader-icon {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.userContent .embedLoader-errorMessage {
+  max-width: calc(100% - 72px);
+  width: 100%;
+  padding-left: 24px;
+}
+
+.embedIFrame {
+  position: relative;
+  display: block;
+  max-width: 100%;
+  margin: auto;
+}
+.embedIFrame .embedIFrame-iframe {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
+
+/*!
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+.embedGetty {
+  position: relative;
+  display: block;
+  max-width: 100%;
+  margin: auto;
+}
+.embedGetty .getty {
+  display: block !important;
+  background-color: white;
+}
+
+/*!
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+.embedGiphy {
+  position: relative;
+  display: block;
+  max-width: 100%;
+  margin: auto;
+  box-shadow: none !important;
+}
+.embedGiphy .embedGiphy-iframe {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
+
+/*!
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+.embedInstagram {
+  width: auto;
+}
+
+.instagram-media {
+  margin-bottom: 0 !important;
+  width: 100% !important;
+}
+
+/*!
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+.embedImgur .embedExternal-content {
+  width: auto;
+}
+.embedImgur iframe {
+  max-width: 100%;
+}
+
+/*!
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+.embedSoundcloud {
+  position: relative;
+  width: 640px;
+}
+
+/*!
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+.embedInstagram {
+  width: auto;
+}
+
+.instagram-media {
+  margin-bottom: 0 !important;
+  width: 100% !important;
+}
+
+/**
+ * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+.icon {
+  display: inline-block;
+  vertical-align: middle;
+}
+.icon.isSmall {
+  width: 16px;
+  height: 16px;
+}
+.icon.isLarge {
+  width: 32px;
+  height: 32px;
+}
+
+.icon-close {
+  display: block;
+  margin: auto;
+  width: 12px;
+  height: 12px;
+}
+
+.icon-triangleDown,
+.icon-triangleRight {
+  display: block;
+  margin: auto;
+  width: 8px;
+  height: 8px;
+}
+
+.icon-help {
+  width: 16px;
+  height: 16px;
+}
+
+.icon-search {
+  width: 18px;
+  height: 24px;
+}
+
+.icon-notifications {
+  width: 18px;
+  height: 24px;
+}
+
+.icon-messages {
+  width: 20px;
+  height: 20px;
+}
+
+.icon-fake {
+  font-family: arial, sans-serif;
+}
+
+.icon-compose {
+  width: 20px;
+  height: 20px;
+}
+
+.icon-settings {
+  width: 18px;
+  height: 20px;
+}
+
+.icon-user {
+  width: 20px;
+}
+
+.icon-noUserPhoto {
+  width: 100%;
+  height: auto;
+}
+
+.icon-chevronUp {
+  width: 51px;
+  height: 17px;
+}
+
+.icon-folderOpen {
+  width: 18.612px;
+  height: 14px;
+}
+
+.icon-folderClosed {
+  width: 16px;
+  height: 14px;
+}
+
+.VideoWrap video {
+  max-width: 100%;
+}
+
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+@keyframes fadein {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+.collapsableContent {
+  transition: max-height 0.2s ease;
+}
+.collapsableContent *:last-child {
+  margin-bottom: 0;
+}
+
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+.userContent ul,
+.userContent ol {
+  margin: 1em 0 1em 2em;
+}
+
+.userContent ol > li {
+  list-style: decimal !important;
+}
+.userContent ol ol > li {
+  list-style: lower-alpha !important;
+}
+.userContent ol ol ol > li {
+  list-style: lower-roman !important;
+}
+.userContent ol ol ol ol > li {
+  list-style: decimal !important;
+}
+.userContent ol ol ol ol ol > li {
+  list-style: lower-alpha !important;
+}
+.userContent ol ol ol ol ol ol > li {
+  list-style: lower-roman !important;
+}
+.userContent ol ol ol ol ol ol ol > li {
+  list-style: decimal !important;
+}
+.userContent ol ol,
+.userContent ol ul {
+  margin: 0 0 0 1em;
+}
+.userContent ul > li {
+  list-style: disc !important;
+}
+.userContent ul ol,
+.userContent ul ul {
+  margin: 0 0 0 1em;
+}
+
+.userContent li,
+.userContent.userContent ul li {
+  margin: 5px 0;
+}
+
+body:not(.dashboard) svg {
+  pointer-events: none !important;
+}
+
+/*# sourceMappingURL=navbar.css.map */

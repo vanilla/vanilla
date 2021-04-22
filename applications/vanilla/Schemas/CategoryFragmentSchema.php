@@ -20,6 +20,7 @@ class CategoryFragmentSchema extends Schema {
             'categoryID:i' => 'The ID of the category.',
             'name:s' => 'The name of the category.',
             'url:s' => 'Full URL to the category.',
+            'allowedDiscussionTypes:a?'
         ]));
     }
 }

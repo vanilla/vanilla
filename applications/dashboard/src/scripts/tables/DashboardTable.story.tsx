@@ -22,85 +22,78 @@ const { HeadItem } = DashboardTable;
 const puppyImage = require("../../../styleguide/public/resources/images/smart-puppy.jpg");
 const chickImage = require("../../../styleguide/public/resources/images/little-chick.jpg");
 
-const formsStory = storiesOf("Dashboard", module).addDecorator(dashboardCssDecorator);
+export default {
+    title: "Dashboard/Legacy",
+    decorators: [dashboardCssDecorator],
+};
 
-formsStory.add("Tables", () =>
-    (() => {
-        const OptionsCell = () => {
-            return (
-                <td>
-                    <DashboardTableOptions>
-                        <Button baseClass={ButtonTypes.ICON_COMPACT}>
-                            <EditIcon />
-                        </Button>
-                        <Button baseClass={ButtonTypes.ICON_COMPACT}>
-                            <DeleteIcon />
-                        </Button>
-                    </DashboardTableOptions>
-                </td>
-            );
-        };
+export function Tables() {
+    const OptionsCell = () => {
         return (
-            <StoryContent>
-                <StoryHeading depth={1}>Dashboard Tables</StoryHeading>
-                <DashboardToolbar>
-                    <DashboardToolbarButtons>
-                        <Button baseClass={ButtonTypes.PRIMARY} legacyMode={true}>
-                            Button
-                        </Button>
-                        <Button baseClass={ButtonTypes.PRIMARY} legacyMode={true}>
-                            Button
-                        </Button>
-                    </DashboardToolbarButtons>
-                    <DashboardPagerArea>
-                        <DashboardPager page={7} pageCount={7} />
-                    </DashboardPagerArea>
-                </DashboardToolbar>
-                <DashboardTable
-                    head={
-                        <tr>
-                            <HeadItem size={TableColumnSize.LG}>Username</HeadItem>
-                            <HeadItem>Roles</HeadItem>
-                            <HeadItem size={TableColumnSize.MD}>First Visit</HeadItem>
-                            <HeadItem size={TableColumnSize.MD}>Last Visit</HeadItem>
-                            <HeadItem>Last IP</HeadItem>
-                            <HeadItem>Options</HeadItem>
-                        </tr>
-                    }
-                    body={
-                        <>
-                            <tr>
-                                <td>
-                                    <DashboardMediaItem
-                                        imgSrc={puppyImage}
-                                        title="Smart Puppy"
-                                        info="puppy@email.com"
-                                    />
-                                </td>
-                                <td>Member, Moderater</td>
-                                <td>April 2</td>
-                                <td>April 26</td>
-                                <td>10.0.10.1</td>
-                                <OptionsCell />
-                            </tr>
-                            <tr>
-                                <td>
-                                    <DashboardMediaItem
-                                        imgSrc={chickImage}
-                                        title="Little Chick"
-                                        info="chick@email.com"
-                                    />
-                                </td>
-                                <td>Member</td>
-                                <td>April 2</td>
-                                <td>April 26</td>
-                                <td>10.0.10.1</td>
-                                <OptionsCell />
-                            </tr>
-                        </>
-                    }
-                />
-            </StoryContent>
+            <td>
+                <DashboardTableOptions>
+                    <Button baseClass={ButtonTypes.ICON_COMPACT}>
+                        <EditIcon />
+                    </Button>
+                    <Button baseClass={ButtonTypes.ICON_COMPACT}>
+                        <DeleteIcon />
+                    </Button>
+                </DashboardTableOptions>
+            </td>
         );
-    })(),
-);
+    };
+    return (
+        <StoryContent>
+            <StoryHeading depth={1}>Dashboard Tables</StoryHeading>
+            <DashboardToolbar>
+                <DashboardToolbarButtons>
+                    <Button baseClass={ButtonTypes.PRIMARY} legacyMode={true}>
+                        Button
+                    </Button>
+                    <Button baseClass={ButtonTypes.PRIMARY} legacyMode={true}>
+                        Button
+                    </Button>
+                </DashboardToolbarButtons>
+                <DashboardPagerArea>
+                    <DashboardPager page={7} pageCount={7} />
+                </DashboardPagerArea>
+            </DashboardToolbar>
+            <DashboardTable
+                head={
+                    <tr>
+                        <HeadItem size={TableColumnSize.LG}>Username</HeadItem>
+                        <HeadItem>Roles</HeadItem>
+                        <HeadItem size={TableColumnSize.MD}>First Visit</HeadItem>
+                        <HeadItem size={TableColumnSize.MD}>Last Visit</HeadItem>
+                        <HeadItem>Last IP</HeadItem>
+                        <HeadItem>Options</HeadItem>
+                    </tr>
+                }
+                body={
+                    <>
+                        <tr>
+                            <td>
+                                <DashboardMediaItem imgSrc={puppyImage} title="Smart Puppy" info="puppy@email.com" />
+                            </td>
+                            <td>Member, Moderater</td>
+                            <td>April 2</td>
+                            <td>April 26</td>
+                            <td>10.0.10.1</td>
+                            <OptionsCell />
+                        </tr>
+                        <tr>
+                            <td>
+                                <DashboardMediaItem imgSrc={chickImage} title="Little Chick" info="chick@email.com" />
+                            </td>
+                            <td>Member</td>
+                            <td>April 2</td>
+                            <td>April 26</td>
+                            <td>10.0.10.1</td>
+                            <OptionsCell />
+                        </tr>
+                    </>
+                }
+            />
+        </StoryContent>
+    );
+}

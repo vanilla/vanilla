@@ -12,7 +12,7 @@ import Container from "@library/layout/components/Container";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import Heading from "@library/layout/Heading";
 import { useBannerContainerDivRef, useBannerContext } from "@library/banner/BannerContext";
-import { bannerClasses, bannerVariables } from "@library/banner/bannerStyles";
+import { bannerClasses, bannerVariables, IBannerOptions } from "@library/banner/bannerStyles";
 import { SearchBarPresets } from "@library/banner/SearchBarPresets";
 import { assetUrl, t } from "@library/utility/appUtils";
 import classNames from "classnames";
@@ -45,6 +45,7 @@ export interface IBannerProps {
     initialQuery?: string; // prepopulate text input
     hideSearch?: boolean;
     hideIcon?: boolean;
+    options?: Partial<IBannerOptions>;
 }
 
 /**
@@ -58,7 +59,7 @@ export default function Banner(props: IBannerProps) {
     const varsTitleBar = titleBarVariables();
     const classesTitleBar = titleBarClasses();
     const classes = isContentBanner ? contentBannerClasses(mediaQueries) : bannerClasses(mediaQueries);
-    const vars = isContentBanner ? contentBannerVariables() : bannerVariables();
+    const vars = isContentBanner ? contentBannerVariables(props.options) : bannerVariables(props.options);
     const { options } = vars;
     const device = useDevice();
 
@@ -240,6 +241,9 @@ export default function Banner(props: IBannerProps) {
                                             <img className={classes.icon} src={iconImageSrc} aria-hidden={true} />
                                         </div>
                                     )}
+                                    {Banner.extraBeforeSearchBarComponents.map((ComponentName, index) => {
+                                        return <ComponentName {...props} key={index} />;
+                                    })}
                                     <div className={classes.textAndSearchContainer}>
                                         {!options.hideTitle && (
                                             <div className={classes.titleWrap}>
@@ -302,6 +306,9 @@ export default function Banner(props: IBannerProps) {
 /** Hold the extra after search bar text components before rendering. */
 Banner.extraAfterSearchBarComponents = [] as Array<React.ComponentType<IBannerProps>>;
 
+/** Hold the extra before search bar text components before rendering. */
+Banner.extraBeforeSearchBarComponents = [] as Array<React.ComponentType<IBannerProps>>;
+
 /**
  * Register an extra component to be rendered after the search bar.
  *
@@ -310,4 +317,14 @@ Banner.extraAfterSearchBarComponents = [] as Array<React.ComponentType<IBannerPr
 Banner.registerAfterSearchBar = (component: React.ComponentType<IBannerProps>) => {
     Banner.extraAfterSearchBarComponents.pop();
     Banner.extraAfterSearchBarComponents.push(component);
+};
+
+/**
+ * Register an extra component to be rendered before the search bar.
+ *
+ * @param component The component class to be render.
+ */
+Banner.registerBeforeSearchBar = (component: React.ComponentType<IBannerProps>) => {
+    Banner.extraBeforeSearchBarComponents.pop();
+    Banner.extraBeforeSearchBarComponents.push(component);
 };

@@ -10,11 +10,13 @@ namespace Vanilla\Formatting\Quill;
 use Vanilla\Formatting\Formats\RichFormat;
 use Vanilla\Formatting\FormatText;
 use Vanilla\Formatting\Quill\Blots\AbstractBlot;
+use Vanilla\Formatting\Quill\Blots\Embeds\ExternalBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\AbstractLineTerminatorBlot;
 use Vanilla\Formatting\Quill\Nesting\NestingParentInterface;
 use Vanilla\Formatting\Quill\Nesting\NestingParentRendererInterface;
 use Vanilla\Formatting\TextDOMInterface;
 use Vanilla\Formatting\TextFragmentInterface;
+use Vanilla\Formatting\TextFragmentType;
 
 /**
  * Class for sorting operations into blots and groups.
@@ -216,6 +218,9 @@ class BlotGroupCollection implements \IteratorAggregate, TextDOMInterface {
                 if ($blot instanceof AbstractLineTerminatorBlot) {
                     $result[] = new BlotGroupTextFragment($group, $this, $from, $j);
                     $from = $j + 1;
+                } elseif ($blot instanceof ExternalBlot) {
+                    $result[] = $this->makeExternalBlotFragments($blot);
+                    $from = $j + 1;
                 }
 
                 if ($blot instanceof NestingParentRendererInterface) {
@@ -278,5 +283,29 @@ class BlotGroupCollection implements \IteratorAggregate, TextDOMInterface {
      */
     public function getGroups(): array {
         return $this->groups;
+    }
+
+    /**
+     * Create text fragments from an instance of ExternalBlot.
+     *
+     * @param ExternalBlot $blot
+     */
+    private function makeExternalBlotFragments(ExternalBlot $blot) {
+        $result = new TextFragmentCollection();
+
+        $validFragments = [
+            "url" => TextFragmentType::URL,
+            "name" => TextFragmentType::TEXT,
+            "body" => TextFragmentType::TEXT,
+        ];
+        foreach ($validFragments as $field => $type) {
+            $path = "insert.embed-external.data.{$field}";
+            $value = $blot->getCurrentOperationField($path, null);
+            if (is_string($value)) {
+                $result[$field] = new BlotPointerTextFragment($blot, $path, $type);
+            }
+        }
+
+        return $result;
     }
 }

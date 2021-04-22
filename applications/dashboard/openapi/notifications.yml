@@ -87,6 +87,24 @@ paths:
               schema:
                 $ref: '#/components/schemas/NotificationSchema'
           description: Success
+  '/notifications/{id}/read':
+      put:
+          summary: Mark a notification read.
+          tags:
+              - Notifications
+          parameters:
+              - in: path
+                name: id
+                required: true
+                schema:
+                    type: integer
+          responses:
+              '200':
+                  content:
+                      application/json:
+                          schema:
+                              $ref: '#/components/schemas/NotificationSchema'
+                  description: Success
 components:
   requestBodies:
     NotificationSchema:
@@ -127,6 +145,9 @@ components:
         url:
           description: The target of the notification.
           type: string
+        readUrl:
+            description: Url to read the notification.
+            type: string
       required:
       - notificationID
       - body

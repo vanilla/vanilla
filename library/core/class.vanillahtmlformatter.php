@@ -27,6 +27,7 @@ class VanillaHtmlFormatter {
         'CodeBlock',
         'codeInline',
         'CodeInline',
+        'emoji',
         'P',
         'post-clear-both',
         'post-clear-left',

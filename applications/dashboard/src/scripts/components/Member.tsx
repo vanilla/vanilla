@@ -25,6 +25,10 @@ export default function Member(props: IProps) {
     const user = props.userInfo;
     const { isCompact } = useLayout();
 
+    if (user == null) {
+        return <></>;
+    }
+
     const classes = memberListClasses();
     return (
         <tr className={classes.root}>

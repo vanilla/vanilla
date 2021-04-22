@@ -7,85 +7,12 @@
 import React from "react";
 import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
 import { WidgetFormControl } from "@dashboard/widgets/WidgetFormControl";
-import get from "lodash/get";
-import { IJsonSchema } from "@dashboard/widgets/JsonSchemaTypes";
 import { t } from "@library/utility/appUtils";
-import { notEmpty } from "@vanilla/utils";
 import { DashboardFormSubheading } from "@dashboard/forms/DashboardFormSubheading";
-
-interface IPartialProps {
-    schema: IJsonSchema;
-
-    // The value of the subset of the form.
-    instance: any;
-    isRequired?: boolean;
-
-    // The root value of the form.
-    rootInstance: any;
-    onChange(instance: any): void;
-}
-
-function WidgetPartialSchemaForm(props: IPartialProps) {
-    let { schema, instance, rootInstance, onChange } = props;
-    if (schema.type === "object") {
-        instance = instance ?? {};
-        const requiredProperties = schema.required ?? [];
-        let sectionTitle: string | null = null;
-        if (!Array.isArray(schema["x-control"]) && schema["x-control"]?.label) {
-            sectionTitle = schema["x-control"]?.label;
-        }
-        return (
-            <>
-                {sectionTitle && <DashboardFormSubheading>{sectionTitle}</DashboardFormSubheading>}
-                {Object.entries(schema.properties).map(([key, value]) => {
-                    return (
-                        <>
-                            <WidgetPartialSchemaForm
-                                key={key}
-                                schema={value}
-                                instance={instance[key]}
-                                rootInstance={rootInstance}
-                                onChange={(value) => {
-                                    onChange({ ...instance, [key]: value });
-                                }}
-                                isRequired={requiredProperties.includes(key)}
-                            />
-                        </>
-                    );
-                })}
-            </>
-        );
-    }
-    const control = schema["x-control"];
-    const controls = Array.isArray(control) ? control : [control];
-    return (
-        <>
-            {controls.filter(notEmpty).map((singleControl, index) => {
-                const { label, description, conditions } = singleControl;
-                if (conditions) {
-                    const evaluated: boolean[] = conditions.map(({ fieldName, values }) =>
-                        values.includes(get(rootInstance, fieldName, schema.default)),
-                    );
-                    if (evaluated.some((ev) => !ev)) return null;
-                }
-                return (
-                    <DashboardFormGroup key={index} label={label ?? t("(Untitled)")} description={description}>
-                        <WidgetFormControl
-                            formControl={singleControl}
-                            value={instance}
-                            schema={schema}
-                            onChange={onChange}
-                            isRequired={props.isRequired}
-                        />
-                    </DashboardFormGroup>
-                );
-            })}
-        </>
-    );
-}
+import { JsonSchema, JsonSchemaForm } from "@vanilla/json-schema-forms";
 
 interface IProps {
-    schema: IJsonSchema;
+    schema: JsonSchema;
     // The full value of the form.
     instance: any;
     onChange(instance: any): void;
@@ -95,6 +22,26 @@ export function WidgetFormGenerator(props: IProps) {
     if (Object.entries(props.schema).length === 0) {
         return <div>{t("There are no configuration options for this widget.")}</div>;
     }
-
-    return <WidgetPartialSchemaForm rootInstance={props.instance} {...props} />;
+    return (
+        <JsonSchemaForm
+            {...props}
+            FormSection={({ title, children }) => (
+                <>
+                    {title && <DashboardFormSubheading>{title}</DashboardFormSubheading>}
+                    {children}
+                </>
+            )}
+            FormControl={({ instance, schema, onChange, control, required: isRequired }) => (
+                <DashboardFormGroup label={control.label ?? t("(Untitled)")} description={control.description}>
+                    <WidgetFormControl
+                        formControl={control}
+                        value={instance}
+                        schema={schema}
+                        onChange={onChange}
+                        isRequired={isRequired}
+                    />
+                </DashboardFormGroup>
+            )}
+        />
+    );
 }

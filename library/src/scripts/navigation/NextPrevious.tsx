@@ -10,6 +10,7 @@ import AdjacentLink, { LeftRight } from "@library/navigation/AdjacentLink";
 import Heading from "@library/layout/Heading";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { nextPreviousClasses } from "@library/navigation/nextPreviousStyles";
+import { IKbNavigationItem } from "@knowledge/navigation/state/NavigationModel";
 
 interface IUrlItem {
     name: string;
@@ -19,8 +20,8 @@ interface IUrlItem {
 interface IProps {
     className?: string;
     accessibleTitle: string;
-    prevItem?: IUrlItem | null;
-    nextItem?: IUrlItem | null;
+    prevItem?: IUrlItem | IKbNavigationItem | null;
+    nextItem?: IUrlItem | IKbNavigationItem | null;
 }
 
 /**
@@ -44,7 +45,7 @@ export default class NextPrevious extends React.Component<IProps> {
                         className={classes.previous}
                         classes={classes}
                         direction={LeftRight.LEFT}
-                        to={prevItem.url}
+                        to={prevItem.url || ""}
                         title={prevItem.name}
                     />
                 )}
@@ -54,7 +55,7 @@ export default class NextPrevious extends React.Component<IProps> {
                         className={classes.next}
                         classes={classes}
                         direction={LeftRight.RIGHT}
-                        to={nextItem.url}
+                        to={nextItem.url || ""}
                         title={nextItem.name}
                     />
                 )}

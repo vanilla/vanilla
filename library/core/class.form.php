@@ -13,6 +13,9 @@
 use Garden\Schema\Validation;
 use Garden\Schema\ValidationException;
 use Vanilla\Utility\ModelUtils;
+use Vanilla\Web\TwigStaticRenderer;
+use Vanilla\Forum\Navigation\ForumCategoryRecordType;
+use Vanilla\Navigation\BreadcrumbModel;
 
 /**
  * Form validation layer
@@ -565,11 +568,20 @@ class Gdn_Form extends Gdn_Pluggable {
         }
 
         // Opening select tag
+        $idAttr = $this->_idAttribute($fieldName, $options);
+        $nameAttr = $this->_nameAttribute($fieldName, $options);
+
         $return = '<select';
-        $return .= $this->_idAttribute($fieldName, $options);
-        $return .= $this->_nameAttribute($fieldName, $options);
+        $return .= $idAttr;
+        $return .= $nameAttr;
         $return .= $this->_attributesToString($options);
         $return .= ">\n";
+
+        //this one is for react component
+        $selectAttributes = [
+            'id' => $idAttr,
+            'name' => $nameAttr,
+        ];
 
         // Get value from attributes
         if ($value === false) {
@@ -584,14 +596,20 @@ class Gdn_Form extends Gdn_Pluggable {
 
         // Start with null option?
         $includeNull = val('IncludeNull', $options);
+        $defaultItemValue  = "";
+        $defaultItemLabel  = t('Select a category...');
         if ($includeNull === true) {
             $return .= '<option value="">'.t('Select a category...').'</option>';
-        } elseif (is_array($includeNull))
+        } elseif (is_array($includeNull)) {
             $return .= "<option value=\"{$includeNull[0]}\">{$includeNull[1]}</option>\n";
-        elseif ($includeNull)
+            $defaultItemValue = $includeNull[0];
+            $defaultItemLabel = $includeNull[1];
+        } elseif ($includeNull) {
             $return .= "<option value=\"\">$includeNull</option>\n";
-        elseif (!$hasValue)
+            $defaultItemLabel = $includeNull;
+        } elseif (!$hasValue) {
             $return .= '<option value=""></option>';
+        }
 
         // Show root categories as headings (ie. you can't post in them)?
         $doHeadings = val('Headings', $options, c('Vanilla.Categories.DoHeadings'));
@@ -603,6 +621,10 @@ class Gdn_Form extends Gdn_Pluggable {
 
         // Write out the category options.
         $enableHeadings = $options['EnableHeadings'] ?? false;
+
+        // This one is for react props
+        $items = [];
+
         if (is_array($safeCategoryData)) {
             foreach ($safeCategoryData as $categoryID => $category) {
                 $depth = val('Depth', $category, 0);
@@ -621,10 +643,12 @@ class Gdn_Form extends Gdn_Pluggable {
                 }
 
                 $return .= '<option value="'.$categoryID.'"';
+                $initialValue = "";
                 if ($disabled) {
                     $return .= ' disabled="disabled"';
                 } elseif ($selected) {
                     $return .= ' selected="selected"'; // only allow selection if NOT disabled
+                    $initialValue = $categoryID;
                 }
 
                 $name = htmlspecialchars(val('Name', $category, 'Blank Category Name'));
@@ -633,9 +657,58 @@ class Gdn_Form extends Gdn_Pluggable {
                 }
 
                 $return .= '>'.$name."</option>\n";
+
+                $breadCrumbModel = Gdn::getContainer()->get(BreadcrumbModel::class);
+                $breadcrumbs = $breadCrumbModel->getForRecord(new ForumCategoryRecordType($category['CategoryID']));
+
+                array_push($items, [
+                    'label' => $category['Name'],
+                    'value' => $category['CategoryID'],
+                    'description' => $category['Description'],
+                    'depth' => $category['Depth'],
+                    'disabled'=> $disabled,
+                    'breadcrumbs' => $breadcrumbs
+                ]);
             }
         }
-        return $return.'</select>';
+
+        $props =  [
+            'selectAttributes' => $selectAttributes,
+            'initialValue' => $initialValue,
+            'defaultItem' => [
+                'value' => $defaultItemValue,
+                'label' => $defaultItemLabel,
+                'breadcrumbs' => null
+            ],
+            'items' => $items,
+        ];
+
+        if (Gdn::themeFeatures()->get("NewCategoryDropdown")) {
+            return TwigStaticRenderer::renderReactModule('CategoryPicker', $props);
+        } else {
+            return $return.'</select>';
+        }
+    }
+
+    /**
+     * Returns structure for CategoryPicker react component, will be used to render Category Info(name, description) only.
+     *
+     * @param array $category Category data.
+     * @return array Structure for the component.
+     */
+    public function getSingleCategoryInfoProps(array $category): array {
+        $items = [[
+            'value' => $category['CategoryID'],
+            'label' => $category['Name'],
+            'depth' => $category['Depth'],
+            'description' => $category['Description'],
+        ]];
+
+        return $props = [
+            'categoryInfoOnly' => true,
+            'items' => $items,
+            'initialValue' => $category['CategoryID'],
+        ];
     }
 
     /**

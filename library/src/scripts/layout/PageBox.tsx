@@ -30,7 +30,7 @@ export const PageBox = React.forwardRef(function Box(_props: IProps, passedRef: 
         <Component
             {...props}
             ref={ref as React.Ref<HTMLDivElement>}
-            className={cx("pageBox", boxClass, props.className)}
+            className={cx("pageBoxNoCompat", boxClass, props.className)}
         >
             <PageBoxDepthContextProvider boxRef={ref as any}>{children}</PageBoxDepthContextProvider>
         </Component>

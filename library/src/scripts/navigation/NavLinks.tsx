@@ -51,7 +51,7 @@ export default function NavLinks(props: IProps) {
             ? items.map((item, i) => {
                   return (
                       <li className={classes.item} key={i}>
-                          <SmartLink to={item.url} className={classes.link} title={item.name}>
+                          <SmartLink to={item.url || ""} className={classes.link} title={item.name}>
                               {item.name}
                           </SmartLink>
                       </li>

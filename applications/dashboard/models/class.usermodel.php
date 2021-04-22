@@ -3302,6 +3302,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
         }
 
         $data = $this->SQL
+            ->andOp()
             ->where('u.Deleted', 0)
             ->orderBy($orderFields, $orderDirection)
             ->limit($limit, $offset)
@@ -4296,6 +4297,8 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
             ->set([
                 'Name' => t('[Deleted User]'),
                 'Photo' => null,
+                'Title' => null,
+                'Location' => null,
                 'Password' => randomString('10'),
                 'HashMethod' => 'Random',
                 'About' => '',
@@ -4318,7 +4321,11 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
                 ]),
                 'DateSetInvitations' => null,
                 'DateOfBirth' => null,
+                'DateFirstVisit' => null,
+                'DateLastActive' => null,
                 'DateUpdated' => DateTimeFormatter::getCurrentDateTime(),
+                'InsertIPAddress' => null,
+                'LastIPAddress' => null,
                 'HourOffset' => '0',
                 'Score' => null,
                 'Admin' => 0,

@@ -541,9 +541,9 @@ export function PlusCircleIcon(props: { className?: string; "aria-hidden"?: area
             <g fill="none" fillRule="evenodd">
                 <g>
                     <g transform="translate(-969 -413) translate(970 414)">
-                        <circle cx="7" cy="7" r="7" stroke="#555A62" strokeWidth=".778" />
-                        <path fill="#555A62" d="M6.3 3.5H7.699999999999999V10.5H6.3z" />
-                        <path fill="#555A62" d="M6.3 3.5L7.7 3.5 7.7 10.5 6.3 10.5z" transform="rotate(90 7 7)" />
+                        <circle cx="7" cy="7" r="7" stroke="currentColor" strokeWidth=".778" />
+                        <path fill="currentColor" d="M6.3 3.5H7.699999999999999V10.5H6.3z" />
+                        <path fill="currentColor" d="M6.3 3.5L7.7 3.5 7.7 10.5 6.3 10.5z" transform="rotate(90 7 7)" />
                     </g>
                 </g>
             </g>

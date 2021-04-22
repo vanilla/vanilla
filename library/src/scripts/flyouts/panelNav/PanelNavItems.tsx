@@ -110,7 +110,7 @@ export function PanelNavItems(props: IPanelNavItemsProps) {
                                         className={classes.itemButton}
                                         isActive={isActive}
                                         key={i}
-                                        to={navItem.url}
+                                        to={navItem.url || ""}
                                     >
                                         <span className={classes.text}>{navItem.name}</span>
                                         <RightChevronIcon className={classes.arrow} />
@@ -120,7 +120,7 @@ export function PanelNavItems(props: IPanelNavItemsProps) {
                                         className={classes.itemButton}
                                         isActive={isActive}
                                         key={i}
-                                        to={navItem.url}
+                                        to={navItem.url || ""}
                                     >
                                         {navItem.name}
                                     </DropDownItemLink>

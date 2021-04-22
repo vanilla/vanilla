@@ -46,8 +46,8 @@ export const textLinkCSS = () => {
         `,
     );
     mixinClickInput(`
-        ..userContent a,
-        ..UserContent a
+        .userContent a,
+        .UserContent a
     `);
     mixinClickInput(".BreadcrumbsBox .Breadcrumbs a", {
         default: globalVars.links.colors.default,
@@ -58,12 +58,10 @@ export const textLinkCSS = () => {
     mixinTextLinkNoDefaultLinkAppearance(".ItemContent a");
     mixinTextLinkNoDefaultLinkAppearance(`
         .Content .DataList .DiscussionMeta a,
-        .Content .DataList .Item-BodyWrap a,
         .Content .DataList .CommentMeta a,
         .Content .DataList-Search a,
         .Content .Breadcrumbs a,
         .Content .MessageList .DiscussionMeta a,
-        .Content .MessageList .Item-BodyWrap a,
         .Content .MessageList .CommentMeta a,
         .Content .DataTableWrap a,
         .Content .Container .Frame-contentWrap .ChildCategories a,

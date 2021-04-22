@@ -85,6 +85,7 @@ class OAuth2Plugin extends Gdn_OAuth2 {
                 }
             }
         }
+        \Gdn::config()->saveToConfig('OAuth2.Flags.SendScopeOnTokenRequest', $this->getSendScopeOnTokenRequest());
     }
 
     /**

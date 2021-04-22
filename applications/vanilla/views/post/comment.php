@@ -10,11 +10,12 @@ $this->EventArguments['FormCssClass'] = &$formCssClass;
 $this->fireEvent('BeforeCommentForm');
 BoxThemeShim::inactiveHtml("<div class='$formCssClass'>");
 BoxThemeShim::startHeading();
+$pageBoxClasses= BoxThemeShim::isActive() ? $formCssClass . 'CommentFormWrap pageBox' : 'CommentFormWrap';
 ?>
     <h2 class="H"><?php echo t($Editing ? 'Edit Comment' : 'Leave a Comment'); ?></h2>
     <?php BoxThemeShim::endHeading(); ?>
 
-    <div class="CommentFormWrap pageBox">
+    <div class="<?php echo $pageBoxClasses; ?>">
         <?php if (Gdn::session()->isValid()) : ?>
             <div class="Form-HeaderWrap">
                 <div class="Form-Header">

@@ -21,7 +21,7 @@ import FrameHeaderWithAction from "@library/layout/frame/FrameHeaderWithAction";
 import { frameFooterClasses } from "@library/layout/frame/frameFooterStyles";
 import Loader from "@library/loaders/Loader";
 import LinkAsButton from "@library/routing/LinkAsButton";
-import { accessibleLabel, t } from "@library/utility/appUtils";
+import { accessibleLabel, getMeta, t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React from "react";
 import { connect } from "react-redux";
@@ -153,13 +153,15 @@ function mapStateToProps(state: INotificationsStoreState) {
         data:
             notificationsByID.status === LoadStatus.SUCCESS && notificationsByID.data
                 ? Object.values(notificationsByID.data).map((notification) => {
+                      const transientQueryParams = new URLSearchParams({ transientKey: getMeta("TransientKey") });
+                      const transientQuery = "?" + transientQueryParams.toString();
                       return {
                           message: notification.body,
                           photo: notification.photoUrl || null,
                           photoAlt: notification.activityName
                               ? accessibleLabel(t(`User: "%s"`), [notification.activityName])
                               : undefined,
-                          to: notification.url,
+                          to: notification.read ? notification.url : notification.readUrl + transientQuery,
                           recordID: notification.notificationID,
                           timestamp: notification.dateUpdated,
                           unread: !notification.read,

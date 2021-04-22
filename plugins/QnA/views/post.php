@@ -1,4 +1,7 @@
 <?php if (!defined('APPLICATION')) { exit(); }
+
+use Vanilla\Web\TwigStaticRenderer;
+
 $Session = Gdn::session();
 $CancelUrl = $this->data('_CancelUrl');
 if (!$CancelUrl) {
@@ -19,6 +22,8 @@ if (!$CancelUrl) {
         echo $this->Form->errors();
         $this->fireEvent('BeforeFormInputs');
 
+        $newCategoryDropdown = Gdn::themeFeatures()->get("NewCategoryDropdown");
+
         if ($this->ShowCategorySelector === true) {
             $options = [
                 'Value' => val('CategoryID', $this->Category),
@@ -26,12 +31,22 @@ if (!$CancelUrl) {
                 'PermFilter' => ['AllowedDiscussionTypes' => 'Question'],
                 'DiscussionType' => 'Question',
             ];
-            echo '<div class="P">';
-                echo '<div class="Category">';
-                echo $this->Form->label('Category', 'CategoryID'), ' ';
-                echo $this->Form->categoryDropDown('CategoryID', $options);
-                echo '</div>';
-            echo '</div>';
+
+           if ($newCategoryDropdown) {
+               echo $this->Form->categoryDropDown('CategoryID', $options);
+           } else {
+               echo '<div class="P">';
+               echo '<div class="Category">';
+               echo $this->Form->label('Category', 'CategoryID'), ' ';
+               echo $this->Form->categoryDropDown('CategoryID', $options);
+               echo '</div>';
+               echo '</div>';
+           }
+        } elseif ($newCategoryDropdown && isset($this->Category)) {
+            $category = (array) $this->Category;
+            $props = $this->Form->getSingleCategoryInfoProps( $category);
+
+            echo TwigStaticRenderer::renderReactModule('CategoryPicker', $props);
         }
 
         echo '<div class="P">';

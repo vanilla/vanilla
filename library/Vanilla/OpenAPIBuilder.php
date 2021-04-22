@@ -133,6 +133,10 @@ class OpenAPIBuilder {
 
         $result = FileUtils::getExport($this->cachePath);
 
+        foreach ($this->filters as $callback) {
+            $callback($result);
+        }
+
         // Reapply URL even after pulling from cache.
         // A site may be accessed from multiple URLs and share the same cache.
         $result = $this->applyRequestBasedApiBasePath($result);
@@ -209,10 +213,6 @@ class OpenAPIBuilder {
         }
 
         $result = $this->applyRequestBasedApiBasePath($result);
-
-        foreach ($this->filters as $callback) {
-            $callback($result);
-        }
 
         return $result;
     }

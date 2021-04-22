@@ -6,6 +6,8 @@
 import { styleFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { css } from "@emotion/css";
+import { extendItemContainer } from "@library/styles/styleHelpersSpacing";
 
 export const dashboardClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -13,6 +15,10 @@ export const dashboardClasses = useThemeCache(() => {
 
     const formList = style({
         padding: 0,
+    });
+
+    const extendRow = css({
+        ...extendItemContainer(18),
     });
 
     const helpAsset = style("helpAsset", {
@@ -37,5 +43,6 @@ export const dashboardClasses = useThemeCache(() => {
         helpAsset,
         tokenInput,
         selectOne,
+        extendRow,
     };
 });

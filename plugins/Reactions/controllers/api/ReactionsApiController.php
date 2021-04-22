@@ -185,9 +185,11 @@ class ReactionsApiController extends AbstractApiController {
      */
     public function reactionByUrlCode($urlCode) {
         $row = ReactionModel::reactionTypes($urlCode);
+
         if (!$row) {
             throw new NotFoundException('Reaction');
         }
+        $row['reactionValue'] = $row['IncrementValue'] ?? 0;
         return $row;
     }
 }

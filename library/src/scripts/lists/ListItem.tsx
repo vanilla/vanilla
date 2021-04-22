@@ -18,18 +18,23 @@ import {
     listItemVariables,
 } from "@library/lists/ListItem.variables";
 import TruncatedText from "@library/content/TruncatedText";
+import Heading from "@library/layout/Heading";
+import Paragraph from "@library/layout/Paragraph";
 
 export interface IListItemProps {
     className?: string;
-    url: string;
+    url?: string;
     name?: React.ReactNode;
     nameClassName?: string;
     description?: React.ReactNode;
+    descriptionClassName?: string;
+    descriptionMaxCharCount?: number;
     icon?: React.ReactNode;
     metas?: React.ReactNode;
     mediaItem?: React.ReactNode;
     actions?: React.ReactNode;
     as?: keyof JSX.IntrinsicElements;
+    headingDepth?: number;
 }
 
 export function ListItem(props: IListItemProps) {
@@ -40,6 +45,8 @@ export function ListItem(props: IListItemProps) {
     const iconPosition = listItemVariables().options.iconPosition;
 
     const isMobileMedia = measure.width <= 600;
+
+    const { headingDepth = 3, descriptionClassName, descriptionMaxCharCount = 320 } = props;
 
     const media = props.mediaItem && (
         <div className={isMobileMedia ? classes.mobileMediaContainer : classes.mediaContainer}>{props.mediaItem}</div>
@@ -54,11 +61,11 @@ export function ListItem(props: IListItemProps) {
         </Metas>
     );
     const descriptionView = props.description && (
-        <div className={classes.description}>
-            <TruncatedText maxCharCount={320} lines={2}>
+        <Paragraph className={cx(classes.description, descriptionClassName)}>
+            <TruncatedText maxCharCount={descriptionMaxCharCount} lines={2}>
                 {props.description}
             </TruncatedText>
-        </div>
+        </Paragraph>
     );
 
     return (
@@ -69,11 +76,16 @@ export function ListItem(props: IListItemProps) {
                 )}
                 <div className={classes.contentContainer}>
                     <div className={classes.titleContainer}>
-                        <h3 className={cx(classes.title)}>
-                            <SmartLink to={props.url} className={cx(classes.titleLink, props.nameClassName)}>
-                                {props.name}
-                            </SmartLink>
-                        </h3>
+                        <Heading className={classes.title} depth={headingDepth}>
+                            {props.url ? (
+                                <SmartLink to={props.url} className={cx(classes.titleLink, props.nameClassName)}>
+                                    {props.name}
+                                </SmartLink>
+                            ) : (
+                                <span className={cx(props.nameClassName)}>{props.name}</span>
+                            )}
+                        </Heading>
+
                         {props.actions && <div className={classes.actionsContainer}>{props.actions}</div>}
                     </div>
                     <div className={classes.mediaWrapContainer}>

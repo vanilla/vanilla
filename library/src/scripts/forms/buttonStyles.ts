@@ -38,6 +38,7 @@ export const buttonClasses = useThemeCache(() => {
     return {
         primary: generateButtonClass(vars.primary),
         standard: generateButtonClass(vars.standard),
+        outline: generateButtonClass(vars.outline),
         transparent: generateButtonClass(vars.transparent),
         translucid: generateButtonClass(vars.translucid),
         icon: buttonUtilityClasses().buttonIcon,

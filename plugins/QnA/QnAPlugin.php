@@ -471,9 +471,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
         }
 
         // Recalculate the Question state.
-        if (!empty($args['Insert'])) {
-            $this->recalculateDiscussionQnA($discussion);
-        }
+        $this->recalculateDiscussionQnA($discussion);
     }
 
     /**

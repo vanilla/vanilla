@@ -15,7 +15,7 @@ import { makeProdConfig } from "./configs/makeProdConfig";
 import { DIST_DIRECTORY, VANILLA_ROOT } from "./env";
 import { BuildMode, getOptions, IBuildOptions } from "./buildOptions";
 import EntryModel from "./utility/EntryModel";
-import { copyMonacoEditorModule, installLerna } from "./utility/moduleUtils";
+import { copyMonacoEditorModule, installYarn } from "./utility/moduleUtils";
 import { fail, print } from "./utility/utils";
 
 /**
@@ -44,7 +44,7 @@ export default class Builder {
      */
     public async installOnly() {
         await this.entryModel.init();
-        await installLerna();
+        await installYarn();
     }
 
     /**
@@ -52,7 +52,7 @@ export default class Builder {
      */
     public async build() {
         await this.entryModel.init();
-        await installLerna();
+        await installYarn();
         switch (this.options.mode) {
             case BuildMode.PRODUCTION:
             case BuildMode.ANALYZE:

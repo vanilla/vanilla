@@ -41,6 +41,7 @@ use Vanilla\OpenAPIBuilder;
 use Vanilla\Permissions;
 use Vanilla\SchemaFactory;
 use Vanilla\Search\GlobalSearchType;
+use Vanilla\Search\SearchService;
 use Vanilla\Search\SearchTypeCollectorInterface;
 use Vanilla\Site\OwnSiteProvider;
 use Vanilla\Site\SiteSectionModel;
@@ -127,23 +128,11 @@ class Bootstrap {
 
         touchFolder(PATH_ROOT.'/tests/cache/bootstrap');
 
+        \Vanilla\Bootstrap::configureContainer($container);
+
         $container
-            ->setInstance('@baseUrl', $this->getBaseUrl())
             ->setInstance(Container::class, $container)
-
-            ->rule(\Psr\Container\ContainerInterface::class)
-            ->setAliasOf(Container::class)
-
-            ->rule(\Interop\Container\ContainerInterface::class)
-            ->setClass(\Vanilla\InteropContainer::class)
-
-            // Base classes that want to support DI without polluting their constructor implement this.
-            ->rule(InjectableInterface::class)
-            ->addCall('setDependencies')
-
-            ->rule(\DateTimeInterface::class)
-            ->setAliasOf(\DateTimeImmutable::class)
-            ->setConstructorArgs([null, null])
+            ->setInstance('@baseUrl', $this->getBaseUrl())
 
             ->rule(\Vanilla\Web\Asset\DeploymentCacheBuster::class)
             ->setShared(true)
@@ -157,10 +146,6 @@ class Bootstrap {
             ->rule(\Gdn_Cache::class)
             ->setAliasOf(NullCache::class)
             ->addAlias('Cache')
-
-            ->rule(CacheInterface::class)
-            ->setShared(true)
-            ->setClass(CacheCacheAdapter::class)
 
             // Configuration
             ->rule(ConfigurationInterface::class)
@@ -260,9 +245,6 @@ class Bootstrap {
             ])
             ->setShared(true)
 
-            ->rule(InjectableInterface::class)
-            ->addCall('setDependencies')
-
             ->rule(\Gdn_Request::class)
             ->setShared(true)
             ->addAlias('Request')
@@ -333,7 +315,8 @@ class Bootstrap {
             ->addCall('registerAuthenticatorClass', [PasswordAuthenticator::class])
             ->addCall('registerAuthenticatorClass', [MockAuthenticator::class])
             ->addCall('registerAuthenticatorClass', [MockSSOAuthenticator::class])
-
+            ->rule(SearchService::class)
+            ->addCall('registerActiveDriver', [new Reference(\Vanilla\Search\MysqlSearchDriver::class)])
             ->rule(MockEmail::class)
             ->addAlias(\Gdn_Email::class)
 

@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { FocusEvent, useRef, useState } from "react";
+import React, { useState } from "react";
 import * as Reach from "@reach/combobox";
 import "@reach/combobox/styles.css";
 import { InputSize } from "../../types";
@@ -12,8 +12,8 @@ import { InputSize } from "../../types";
 interface IAutoCompleteContext {
     size?: InputSize;
     onClear?(): void;
-    value?: string;
     setValue?(value: string): void;
+    value?: string;
 }
 
 /** @internal */
@@ -36,7 +36,6 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(
 ) {
     const { size, ...otherProps } = props;
     // We need to control the value to be able to clear it.
-    const [hasFocus, setHasFocus] = useState<boolean>(false);
     const [controlledValue, setControlledValue] = useState<string | undefined>();
     const onClear = () => {
         setControlledValue("");
@@ -46,7 +45,6 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(
         setControlledValue(value);
         props.onSelect && props.onSelect(value);
     };
-
     return (
         <AutoCompleteContext.Provider value={{ onClear, value: controlledValue, setValue: setControlledValue, size }}>
             <Reach.Combobox {...otherProps} onSelect={onSelect} ref={forwardedRef}>

@@ -276,16 +276,6 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase {
     }
 
     /**
-     * Test parseImageUrls excludes emojis.
-     */
-    public function testParseImageUrlsExcludeEmojis() {
-        $formatService = $this->prepareFormatter();
-        $content = '<img class="emoji" src="http://dev.vanilla.localhost/resources/emoji/smile.png" title=":)" alt=":)" height="20">';
-        $result = $formatService->parseImageUrls($content);
-        $this->assertEquals([], $result);
-    }
-
-    /**
      * Generate a PHPUnit data provider.
      *
      * @param string $methodToCall The name of the method to call on the fixture for getting the expected output.

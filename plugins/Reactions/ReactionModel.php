@@ -1689,8 +1689,7 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface {
                 'sort:i|n' => 'Display order when listing types.',
                 'active:b' => 'Is this type available for use?',
                 'custom:b' => 'Is this a non-standard type?',
-                'hidden:b' => 'Should this type be hidden from the UI?',
-                'reactionValue:i?' => 'The reaction value.'
+                'hidden:b' => 'Should this type be hidden from the UI?'
             ]);
         }
 
@@ -1735,8 +1734,7 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface {
                 'urlcode:s',
                 'name:s',
                 'class:s',
-                'hasReacted:b?',
-                'reactionValue:i?'
+                'hasReacted:b?'
             ]);
         }
 
@@ -1768,10 +1766,11 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface {
      */
     public function normalizeTypeRow(array $row) {
         $row = $this->normalizeAttributes($row);
+
         if (!array_key_exists('Points', $row)) {
             $row['Points'] = 0;
         }
-        $row['ReactionValue'] = $row['IncrementValue'] ?? 0;
+
         $camelCaseSchema = new CamelCaseScheme();
         $row = $camelCaseSchema->convertArrayKeys($row);
         return $row;

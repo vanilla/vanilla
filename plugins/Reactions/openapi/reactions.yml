@@ -145,9 +145,6 @@ components:
           description: A URL-safe identifier.
           minLength: 1
           type: string
-        reactionValue:
-          description: The reaction's value.
-          type: integer
       required:
       - urlCode
       - name

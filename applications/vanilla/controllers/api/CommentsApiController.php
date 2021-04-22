@@ -490,10 +490,6 @@ class CommentsApiController extends AbstractApiController {
         if (!$canView && !$isAdmin) {
             throw permissionException('Vanilla.Discussions.View');
         }
-        // Only users with 'Moderation.Manage' perms should be able to add a comment to a closed discussion.
-        if ($discussion['Closed'] && !$isAdmin) {
-            throw new Gdn_UserException(t('This discussion has been closed.'));
-        }
         $id = $this->commentModel->save($commentData);
         $this->validateModel($this->commentModel);
         if (!$id) {

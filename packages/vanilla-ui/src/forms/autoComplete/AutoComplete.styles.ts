@@ -37,8 +37,6 @@ export const autoCompleteClasses = ({ size = "default" }: AutoCompleteClassesPro
             border: 0,
             borderRadius: 6,
             boxShadow: "0 5px 10px 0 rgba(0, 0, 0, 0.3)",
-            maxHeight: "300px",
-            overflow: "auto",
         },
     }),
     option: css({
@@ -57,12 +55,6 @@ export const autoCompleteClasses = ({ size = "default" }: AutoCompleteClassesPro
             "&:hover": {
                 background: "rgba(3,125,188,0.03)",
             },
-        },
-        "[data-suggested-value]": {
-            fontWeight: "inherit",
-        },
-        "[data-user-value]": {
-            fontWeight: 600,
         },
     }),
     autoCompleteArrow: css({

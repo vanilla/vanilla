@@ -10,4 +10,3 @@ export * from "./AutoCompleteList";
 export * from "./AutoCompleteOption";
 export * from "./AutoCompleteOptionText";
 export * from "./AutoCompletePopover";
-export * from "./utils";

@@ -22,6 +22,7 @@ class GetUserByTest extends SharedBootstrapTestCase {
     use SiteTestTrait {
         SiteTestTrait::setUpBeforeClass as siteSetUpBeforeClass;
     }
+    use InvokeMethodTrait;
 
     /** @var SSOModel */
     private static $ssoModel;

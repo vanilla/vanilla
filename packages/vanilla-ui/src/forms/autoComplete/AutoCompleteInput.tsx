@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { ChangeEvent, FocusEvent, useContext, useEffect, useRef, useState } from "react";
+import React, { ChangeEvent, useContext, useEffect, useRef, useState } from "react";
 import { mergeRefs } from "@vanilla/react-utils";
 import { cx } from "@emotion/css";
 import { ComboboxInput, useComboboxContext } from "@reach/combobox";
@@ -13,6 +13,7 @@ import { DropDownArrow } from "../shared/DropDownArrow";
 import { ClearIcon } from "../shared/ClearIcon";
 import { AutoCompleteContext } from "./AutoComplete";
 import { inputClasses } from "../shared/input.styles";
+import { InputSize } from "../../types";
 
 export interface IAutoCompleteInputProps extends React.ComponentProps<typeof ComboboxInput> {
     arrow?: boolean | React.ReactNode;

@@ -128,11 +128,23 @@ class Bootstrap {
 
         touchFolder(PATH_ROOT.'/tests/cache/bootstrap');
 
-        \Vanilla\Bootstrap::configureContainer($container);
-
         $container
-            ->setInstance(Container::class, $container)
             ->setInstance('@baseUrl', $this->getBaseUrl())
+            ->setInstance(Container::class, $container)
+
+            ->rule(\Psr\Container\ContainerInterface::class)
+            ->setAliasOf(Container::class)
+
+            ->rule(\Interop\Container\ContainerInterface::class)
+            ->setClass(\Vanilla\InteropContainer::class)
+
+            // Base classes that want to support DI without polluting their constructor implement this.
+            ->rule(InjectableInterface::class)
+            ->addCall('setDependencies')
+
+            ->rule(\DateTimeInterface::class)
+            ->setAliasOf(\DateTimeImmutable::class)
+            ->setConstructorArgs([null, null])
 
             ->rule(\Vanilla\Web\Asset\DeploymentCacheBuster::class)
             ->setShared(true)
@@ -146,6 +158,10 @@ class Bootstrap {
             ->rule(\Gdn_Cache::class)
             ->setAliasOf(NullCache::class)
             ->addAlias('Cache')
+
+            ->rule(CacheInterface::class)
+            ->setShared(true)
+            ->setClass(CacheCacheAdapter::class)
 
             // Configuration
             ->rule(ConfigurationInterface::class)
@@ -244,6 +260,9 @@ class Bootstrap {
                 '*',
             ])
             ->setShared(true)
+
+            ->rule(InjectableInterface::class)
+            ->addCall('setDependencies')
 
             ->rule(\Gdn_Request::class)
             ->setShared(true)

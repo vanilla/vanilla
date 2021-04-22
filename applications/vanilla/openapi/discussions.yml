@@ -114,13 +114,6 @@ paths:
         schema:
           type: integer
         allowEmptyValue: true
-      - description: Filter by resolved status.
-        in: query
-        name: resolved
-        schema:
-            type: boolean
-        x-filter:
-            field: d.Resolved
       responses:
         '200':
           content:
@@ -1019,10 +1012,6 @@ components:
         url:
           description: The full URL to the discussion.
           type: string
-        resolved:
-          x-addon: resolved2
-          description: Whether or not the discussion should has been resolved.
-          type: boolean
       required:
       - discussionID
       - type
@@ -1135,10 +1124,6 @@ components:
         sink:
           description: Whether or not the discussion has been sunk.
           type: boolean
-        resolved:
-          x-addon: resolved2
-          description: Whether or not the discussion should has been resolved.
-          type: boolean
       required:
       - name
       - body
@@ -1183,10 +1168,6 @@ components:
                 type: boolean
             sink:
                 description: Whether or not the discussion has been sunk.
-                type: boolean
-            resolved:
-                x-addon: resolved2
-                description: Whether or not the discussion should has been resolved.
                 type: boolean
         type: object
     PostFragment:

@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { useContext } from "react";
+import * as React from "react";
 import { ComboboxList } from "@reach/combobox";
 
 export interface IAutoCompleteListProps extends React.ComponentProps<typeof ComboboxList> {}

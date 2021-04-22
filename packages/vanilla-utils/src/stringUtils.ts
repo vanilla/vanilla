@@ -56,7 +56,7 @@ export function labelize(str: string): string {
     label = label.replace(/\s+/, " ");
     let parts = label.split(" ");
     label = parts.map((s) => s.charAt(0).toLocaleUpperCase() + s.slice(1)).join(" ");
-    return label.trim();
+    return label;
 }
 
 /**

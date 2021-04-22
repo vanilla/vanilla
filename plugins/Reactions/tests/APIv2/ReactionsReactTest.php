@@ -336,24 +336,19 @@ class ReactionsReactTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Test expand reactions.
+     * Test expand reactions hasReacted.
      */
     public function testExpandDiscussionReactionsSelf() {
-        $this->setAdminApiUser();
-        $this->api()->patch("/reactions/dislike", ["active" => true]);
-        $userMember = $this->createUserFixture(self::ROLE_MEMBER);
         $discussion = $this->createDiscussion(1, 'Test Discussion Reaction');
-        $this->api()->setUserID($userMember);
         $this->api()->post("/discussions/{$discussion['discussionID']}/reactions", [
-            'reactionType' => 'dislike'
+            'reactionType' => 'Like'
         ]);
-        $reactionScore = ReactionModel::getReactionTypes()['dislike']['IncrementValue'];
-        $responseBody = $this->api()->get("/discussions/{$discussion['discussionID']}", ['expand' => 'reactions'])->getBody();
-        foreach ($responseBody['reactions'] as $reaction) {
-            if ($reaction['name'] === 'Dislike') {
+        $getResponse = $this->api()->get("/discussions/{$discussion['discussionID']}", ['expand' => 'reactions']);
+        $getBody = $getResponse->getBody();
+        $reactionExpanded = $getBody['reactions'];
+        foreach ($reactionExpanded as $reaction) {
+            if ($reaction['name'] === 'Like') {
                 $this->assertTrue($reaction['hasReacted']);
-                $this->assertEquals($reactionScore, $reaction['reactionValue']);
-                $this->assertTrue($reaction['reactionValue'] < 0);
             } else {
                 $this->assertFalse($reaction['hasReacted']);
             }

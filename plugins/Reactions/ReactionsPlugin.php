@@ -605,7 +605,6 @@ class ReactionsPlugin extends Gdn_Plugin {
                     ];
                     $reaction['hasReacted'] = in_array($userReactionRecord, $userReactions);
                     $reaction['Name'] = $reaction['Name'] ?: $this->locale->translate('None');
-                    $reaction['ReactionValue'] = $reaction['IncrementValue'] ?? 0;
                 }
                 $summary = $schema->validate($summary);
                 $row['reactions'] = $summary;

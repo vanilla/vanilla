@@ -5,5 +5,4 @@
  */
 
 export * from "./src/Icon";
-export * from "./src/IconType";
 export * from "./src/IconRegistry";

@@ -494,7 +494,7 @@ SQL;
             }
             if ($html) {
                 $users[] = userAnchor($row);
-            } else if (!is_null(val('Name', $row))) {
+            } else {
                 $users[] = val('Name', $row);
             }
 

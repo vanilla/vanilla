@@ -1727,32 +1727,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
     }
 
     /**
-     * Add category IDs to the current user's category-view permissions.
-     *
-     * @param int[] $categoryIDs
-     * @return array|bool
-     */
-    public static function addCategoryPermissions(array $categoryIDs) {
-        $permissions = self::categoryPermissions();
-
-        if (!is_array($permissions)) {
-            return $permissions;
-        }
-
-        $permissions = array_merge($permissions, $categoryIDs);
-        self::$categoryPermissions = array_unique($permissions);
-        return self::$categoryPermissions;
-    }
-
-    /**
-     * Clear the category-view permissions cache.
-     */
-    public static function clearCategoryPermissions(): void {
-        self::$categoryPermissions = null;
-    }
-
-    /**
-     * Identify current user's category-view permissions and set as local array.
+     * Identify current user's category permissions and set as local array.
      *
      * @since 2.0.0
      * @access public

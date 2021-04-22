@@ -10,18 +10,17 @@ import AdjacentLink, { LeftRight } from "@library/navigation/AdjacentLink";
 import Heading from "@library/layout/Heading";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { nextPreviousClasses } from "@library/navigation/nextPreviousStyles";
-import { IKbNavigationItem } from "@knowledge/navigation/state/NavigationModel";
 
 interface IUrlItem {
     name: string;
-    url: string;
+    url?: string;
 }
 
 interface IProps {
     className?: string;
     accessibleTitle: string;
-    prevItem?: IUrlItem | IKbNavigationItem | null;
-    nextItem?: IUrlItem | IKbNavigationItem | null;
+    prevItem?: IUrlItem | null;
+    nextItem?: IUrlItem | null;
 }
 
 /**

@@ -83,7 +83,9 @@ export const leaderboardVariables = useThemeCache((forcedVars?: IThemeVariables)
              * @commonTitle Padding
              * @expand spacing
              */
-            padding: Variables.spacing({}),
+            padding: box.enabled
+                ? Variables.spacing({ all: globalVars.gutter.size, bottom: 0 })
+                : Variables.spacing({}),
         },
         /**
          * @var leaderboard.title.alignment
@@ -95,7 +97,7 @@ export const leaderboardVariables = useThemeCache((forcedVars?: IThemeVariables)
     });
 
     const list = makeThemeVars("list", {
-        spacing: Variables.spacing({}),
+        spacing: box.enabled ? Variables.spacing({ all: globalVars.gutter.size }) : Variables.spacing({}),
     });
 
     const listItem = makeThemeVars("listItem", {

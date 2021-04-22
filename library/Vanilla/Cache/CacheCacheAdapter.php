@@ -138,4 +138,13 @@ class CacheCacheAdapter implements CacheInterface {
     public function clear() {
         return $this->cache->flush();
     }
+
+    /**
+     * Get the underlying cache object.
+     *
+     * @return Gdn_Cache
+     */
+    public function getCache(): Gdn_Cache {
+        return $this->cache;
+    }
 }

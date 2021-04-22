@@ -12,7 +12,7 @@ namespace Vanilla\Search;
  */
 class SearchOptions {
 
-    const DEFAULT_LIMIT = 30;
+    const DEFAULT_LIMIT = 10;
 
     /** @var int */
     private $offset;

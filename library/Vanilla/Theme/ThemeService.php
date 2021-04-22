@@ -203,7 +203,7 @@ class ThemeService {
             $currentChild = $newParent;
             $depth++;
         }
-        return $parents;
+        return array_reverse($parents);
     }
 
     /**
@@ -606,6 +606,7 @@ class ThemeService {
             ?: $this->config->get(ThemeServiceHelper::CONFIG_DESKTOP_THEME);
         $isCurrent = $currentThemeID == $theme->getThemeID();
         $theme->setCurrent($isCurrent);
+
 
         $this->overlayAddonVariables($theme);
         return $theme;

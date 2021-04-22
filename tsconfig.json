@@ -8,6 +8,7 @@
             "@rich-editor/*": ["./plugins/rich-editor/src/scripts/*"],
             "@openapi-embed/*": ["./plugins/openapi-embed/src/scripts/*"],
             "@knowledge/*": ["./plugins/knowledge/src/scripts/*"],
+            "@vanillaanalytics/*": ["./plugins/vanillaanalytics/src/scripts/*"],
             "@oauth2/*": ["./plugins/oauth2/src/scripts/*"],
             "@webhooks/*": ["./plugins/webhooks/src/scripts/*"],
             "@themingapi/*": ["./plugins/themingapi/src/scripts/*"],
@@ -29,7 +30,9 @@
             "@vanilla/utils": ["./packages/vanilla-utils/*"],
             "@vanilla/icons": ["./packages/vanilla-icons/*"]
         },
-        "incremental": true,
+        // Turning incremental on add 10+ minutes of emit time (because it requires emitting declarations).
+        // Our typecheck time is ~30 seconds. When we emit it takes much longer.
+        "incremental": false,
         "skipLibCheck": true,
         "skipDefaultLibCheck": true
     },

@@ -167,6 +167,13 @@ class TagModel extends Gdn_Model {
     }
 
     /**
+     * Unset tag types.
+     */
+    public function resetTypes() {
+        $this->Types = null;
+    }
+
+    /**
      *
      *
      * @return array
@@ -919,7 +926,7 @@ class TagModel extends Gdn_Model {
             return;
         }
         $isSingle = ArrayUtils::isAssociative($rows);
-        
+
         $tagSchema =  $this->tagFragmentSchema();
         $populate = function (array &$rows) use ($tagSchema) {
             $this->joinTags($rows);
@@ -1146,7 +1153,6 @@ class TagModel extends Gdn_Model {
         // Make sure type is an array.
         $type = (array)$type;
 
-
         $query = $q;
         $data = [];
         $database = Gdn::database();
@@ -1236,5 +1242,53 @@ class TagModel extends Gdn_Model {
                 throw new ClientException(sprintf('You cannot add tags with a type of %s to a discussion', $tag['Type']), 409);
             }
         }
+    }
+
+    /**
+     * Given an array of discussion IDs, get all their tags, indexed by discussion ID.
+     *
+     * @param int[] $discussionIDs
+     * @param int[] $tagIDs
+     * @return array
+     */
+    public function getTagsByDiscussionIDs(array $discussionIDs, array $tagIDs = []): array {
+        if (empty($discussionIDs)) {
+            return [];
+        }
+
+        $validateIDs = function (array $input, string $exceptionMessage): array {
+            $values = array_values($input);
+            array_walk($values, function ($discussionID) use ($exceptionMessage) {
+                if (filter_var($discussionID, FILTER_VALIDATE_INT) === false) {
+                    throw new InvalidArgumentException($exceptionMessage, 400);
+                }
+            });
+            return $values;
+        };
+
+        $discussionIDs = $validateIDs($discussionIDs, "Invalid discussion ID array specified.");
+        $tagIDs = $validateIDs($tagIDs, "Invalid tag ID array specified.");
+
+        $query = Gdn::sql()
+            ->select("td.DiscussionID")
+            ->select("t.*")
+            ->from("TagDiscussion td")
+            ->join("Tag t", "td.TagID = t.TagID")
+            ->whereIn("td.DiscussionID", $discussionIDs);
+
+        if (!empty($tagIDs)) {
+            $query->whereIn("td.TagID", $tagIDs);
+        }
+
+        $tags = $query->get()->resultArray();
+
+        $result = [];
+        foreach ($tags as $tag) {
+            $discussionID = $tag["DiscussionID"];
+            unset($tag["DiscussionID"]);
+            $tagID = $tag["TagID"];
+            $result[$discussionID][$tagID] = $tag;
+        }
+        return $result;
     }
 }

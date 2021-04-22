@@ -47,8 +47,12 @@ export const groupsCSS = () => {
         height: styleUnit(vars.banner.height),
     });
 
+    cssOut(`.groupSearch`, {
+        marginBottom: styleUnit(16),
+    });
+
     cssOut(`.groupToolbar`, {
-        marginTop: styleUnit(32),
+        marginTop: styleUnit(16),
     });
 
     cssOut(

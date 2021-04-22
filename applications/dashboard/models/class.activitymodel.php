@@ -2352,6 +2352,9 @@ class ActivityModel extends Gdn_Model {
         $row["notificationID"] = $row["ActivityID"];
         $row["photoUrl"] = $row["Photo"];
         $row["read"] = $row["Notified"] === ActivityModel::SENT_OK;
+        if (!$row["read"]) {
+            $row["readUrl"] = self::getReadUrl($row["notificationID"]);
+        }
         $row["activityName"] = $row["ActivityName"];
 
         $body = formatString($row["Headline"], $row);
@@ -2361,6 +2364,18 @@ class ActivityModel extends Gdn_Model {
         $scheme = new CamelCaseScheme();
         $result = $scheme->convertArrayKeys($row);
         return $result;
+    }
+
+    /**
+     * Get url to mark notification as read.
+     *
+     * @param int $notificationID
+     * @return string
+     */
+    public static function getReadUrl(int $notificationID) {
+        $urlFormat = '/activity/%d/mark-read-and-redirect';
+        $url = sprintf($urlFormat, $notificationID);
+        return url($url, true);
     }
 
     /**
@@ -2385,6 +2400,7 @@ class ActivityModel extends Gdn_Model {
             "dateInserted" => ["type" => "datetime"],
             "dateUpdated" => ["type" => "datetime"],
             "read" => ["type" => "boolean"],
+            "readUrl?" => ["type" => "string"],
         ]);
 
         return $result;

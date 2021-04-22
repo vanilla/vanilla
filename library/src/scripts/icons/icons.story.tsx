@@ -19,17 +19,21 @@ import * as RevisionIcons from "@library/icons/revision";
 import * as SearchIcons from "@library/icons/searchIcons";
 import { StoryTiles } from "@library/storybook/StoryTiles";
 import { color } from "csx";
-import { iconRegistry } from "@vanilla/icons";
+import { Icon, iconRegistry } from "@vanilla/icons";
+import { css } from "@emotion/css";
+import groupBy from "lodash/groupBy";
+import { labelize } from "@vanilla/utils";
+import { IconType } from "@vanilla/icons";
 
 const story = storiesOf("Components", module);
 
 const invert = ["NewPostMenuIcon"];
 
-function IconSet({ icons, shouldFilter = true }) {
+function IconSet({ icons }) {
     return (
         <StoryTiles>
             {Object.entries(icons)
-                .filter(([name]) => !shouldFilter || name.endsWith("Icon") || name.endsWith("Logo"))
+                .filter(([name]) => name.endsWith("Icon") || name.endsWith("Logo"))
                 .map(([name, Icon]: [string, any]) => (
                     <StoryTileAndTextCompact
                         key={name}
@@ -43,6 +47,48 @@ function IconSet({ icons, shouldFilter = true }) {
     );
 }
 
+const vanillaIconsStyle = css({
+    display: "flex",
+    maxHeight: 600, // Adjust this to fit more icons.
+    flexFlow: "column wrap",
+    width: "calc(100% + 240px)",
+    transform: "translateX(-105px)",
+
+    h3: { marginBottom: 8, fontWeight: "bold", fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.75px" },
+    section: { margin: 16 },
+    li: { display: "flex", alignItems: "center", margin: "16px 0", fontSize: "14px" },
+    svg: { marginRight: 16 },
+    input: { appearance: "none", border: 0 },
+});
+
+function VanillaIconsSet({ icons }) {
+    const iconTypes = Object.keys(icons) as IconType[];
+    const grouped = groupBy(iconTypes, (icon) => icon.split("-")[0]);
+    return (
+        <div className={vanillaIconsStyle}>
+            {Object.entries(grouped).map(([key, values]) => {
+                return (
+                    <section key={key}>
+                        <h3>{labelize(key)}</h3>
+                        <ul>
+                            {values.map((value) => (
+                                <li key={value}>
+                                    <Icon icon={value} />
+                                    <input
+                                        type="text"
+                                        onClick={(event) => (event.target as HTMLInputElement).select()}
+                                        value={value}
+                                    />
+                                </li>
+                            ))}
+                        </ul>
+                    </section>
+                );
+            })}
+        </div>
+    );
+}
+
 story.add("Icons", () => {
     return (
         <StoryContent>
@@ -53,7 +99,7 @@ story.add("Icons", () => {
                 24px.
             </StoryParagraph>
             <StoryHeading>@vanilla/icons</StoryHeading>
-            <IconSet shouldFilter={false} icons={iconRegistry.getAllIcons()} />
+            <VanillaIconsSet icons={iconRegistry.getAllIcons()} />
             <StoryHeading>Common</StoryHeading>
             <IconSet icons={CommonIcons} />
             <StoryHeading>Editor</StoryHeading>

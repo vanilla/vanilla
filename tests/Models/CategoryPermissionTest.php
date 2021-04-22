@@ -7,6 +7,7 @@
 
 namespace VanillaTests\Models;
 
+use Vanilla\Utility\ModelUtils;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\SiteTestCase;
 use VanillaTests\UsersAndRolesApiTestTrait;
@@ -59,6 +60,35 @@ class CategoryPermissionTest extends SiteTestCase {
      */
     private function assertCategoryPermission(array $category, string $permission, bool $expected) {
         $actual = \CategoryModel::checkPermission($category['categoryID'], $permission);
-        $this->assertEquals($actual, $expected);
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * Test situations when permission rows are left behind and orphaned in the permission table.
+     *
+     * @see https://github.com/vanilla/support/issues/4070
+     */
+    public function testOrphanedPermissionRow() {
+        $role = $this->createRole();
+        $member = $this->createUser([
+            'roleID' => [\RoleModel::MEMBER_ID],
+        ]);
+        $category = $this->createPermissionedCategory(['name' => 'Oprhaned Role Access'], [$role['roleID']]);
+
+        // No-one should have access to this now.
+        $this->runWithUser(function () use ($category) {
+            $this->assertCategoryPermission($category, 'Vanilla.Discussions.View', false);
+        }, $member);
+
+        // Remove custom permissions (but don't clear permission table).
+        $categoryModel = \CategoryModel::instance();
+        $categoryModel->setField($category['categoryID'], 'PermissionCategoryID', -1);
+        \Gdn::userModel()->clearPermissions();
+        \CategoryModel::clearCache();
+
+        // User should have permissions now.
+        $this->runWithUser(function () use ($category) {
+            $this->assertCategoryPermission($category, 'Vanilla.Discussions.View', true);
+        }, $member);
     }
 }

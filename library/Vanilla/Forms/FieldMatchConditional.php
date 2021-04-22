@@ -6,6 +6,8 @@
 
 namespace Vanilla\Forms;
 
+use Garden\Schema\Schema;
+
 /**
  * Class FieldMatchConditional
  *
@@ -14,27 +16,27 @@ namespace Vanilla\Forms;
 class FieldMatchConditional implements FormFieldMatchInterface {
 
     /**
-     * @var string $fieldName
+     * @var string $field
      */
-    private $fieldName;
+    private $field;
 
     /**
-     * @var array $values
+     * @var Schema $schema
      */
-    private $values;
+    private $schema;
 
     /**
      * FieldMatchConditional constructor.
      *
      * @param string $field
-     * @param array $values
+     * @param Schema $schema
      */
     public function __construct(
-        string $field = '',
-        array $values = []
+        string $field,
+        Schema $schema
     ) {
-        $this->fieldName = $field;
-        $this->values = $values;
+        $this->field = $field;
+        $this->schema = $schema;
     }
 
     /**
@@ -42,11 +44,9 @@ class FieldMatchConditional implements FormFieldMatchInterface {
      *
      * @return array
      */
-    public function getConditions(): array {
+    public function getCondition(): array {
         return [
-
-                'fieldName' => $this->fieldName,
-                'values' => $this->values,
-        ];
+            'field' => $this->field,
+        ] + $this->schema->getSchemaArray();
     }
 }

@@ -10,6 +10,7 @@ import { singleLineEllipsis } from "@library/styles/styleHelpers";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { px } from "csx";
 import { CSSObject } from "@emotion/css";
+import { BorderType } from "@library/styles/styleHelpers";
 
 export const leaderboardCSS = () => {
     const vars = leaderboardVariables();
@@ -37,7 +38,8 @@ export const leaderboardCSS = () => {
     };
 
     const listStyles = {
-        ...Mixins.margin(vars.list.spacing),
+        ...Mixins.padding(vars.list.spacing),
+        ...Mixins.border({ style: BorderType.NONE }),
     };
 
     const listItemStyles = {
@@ -66,6 +68,7 @@ export const leaderboardCSS = () => {
 
     const userStyles: CSSObject = {
         whiteSpace: "nowrap",
+        display: "flex",
     };
 
     const usernameStyles = {
@@ -86,12 +89,15 @@ export const leaderboardCSS = () => {
         overflow: "hidden",
         width: vars.profilePhoto.size,
         height: vars.profilePhoto.size,
+        flexShrink: 0,
     };
 
     cssOut(".Leaderboard", rootStyles, {
-        "h4.Leaderboard__title": titleStyles,
+        "h4.Leaderboard__title.Leaderboard__title.Leaderboard__title": titleStyles,
         ".Leaderboard__user-list": {
-            ...listStyles,
+            "&.Leaderboard__user-list.Leaderboard__user-list": {
+                ...listStyles,
+            },
             ".Leaderboard__user-list__item": listItemStyles,
             ...{
                 a: linkStyles,

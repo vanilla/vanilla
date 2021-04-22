@@ -8,7 +8,7 @@ import React from "react";
 import qs from "qs";
 import { withRouter, RouteComponentProps } from "react-router";
 import isEqual from "lodash/isEqual";
-import throttle from "lodash/throttle";
+import debounce from "lodash/debounce";
 
 interface IStringMap {
     [key: string]: any;
@@ -75,7 +75,7 @@ class QueryString extends React.Component<IProps> {
      *
      * This is throttle and put in request animation frame so that it does not take priority over the UI.
      */
-    private updateQueryString = throttle(() => {
+    private updateQueryString = debounce(() => {
         const query = qs.stringify(this.getFilteredValue(this.props.value, this.props.defaults || {}));
         this.props.history.replace({
             ...this.props.location,

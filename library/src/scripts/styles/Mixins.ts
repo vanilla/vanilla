@@ -114,11 +114,11 @@ export class Mixins {
             ...Mixins.borderType(borderType, { border, interactiveOutline: config?.interactiveOutline }),
             ...(hasFullOutline || borderType === BorderType.SEPARATOR
                 ? {
-                      "& .pageBox:first-of-type:before, & &:first-of-type:before": {
+                      "& &:first-of-type:before, & .pageBox:first-of-type:before, & .pageBoxNoCompat:first-of-type:before": {
                           // Hide separator
                           display: "none",
                       },
-                      "& .pageBox:last-of-type:after, & &:last-of-type:after": {
+                      "& &:last-of-type:after, & .pageBox:last-of-type:after, & .pageBoxNoCompat:last-of-type:after": {
                           // Hide separator
                           display: "none",
                       },
@@ -126,7 +126,7 @@ export class Mixins {
                 : {}),
             ...(hasFullOutline
                 ? {
-                      "& + .pageBox, & + &": Mixins.margin({ top: itemSpacing }),
+                      "& + &, & + .pageBox, & + .pageBoxNoCompat": Mixins.margin({ top: itemSpacing }),
                   }
                 : {}),
             ...(itemSpacingOnAllItems ? Mixins.margin({ vertical: itemSpacing }) : {}),
@@ -185,7 +185,7 @@ export class Mixins {
                     },
                     // & + & doesn't work for injectGlobals.
                     // https://github.com/emotion-js/emotion/issues/1922
-                    "& + .pageBox:before, & + &:before": {
+                    "& + .pageBox:before, & + .pageBoxNoCompat:before": {
                         borderTop: "none",
                     },
                 };

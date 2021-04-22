@@ -414,7 +414,7 @@ abstract class Gdn_SQLDriver {
 
     /**
      * End a bracketed group in the where clause.
-     * <b>Note</b>: If no items where added to the group then no barackets will appear in the final statement.
+     * <b>Note</b>: If no items where added to the group then no brackets will appear in the final statement.
      *
      * @return $this
      */

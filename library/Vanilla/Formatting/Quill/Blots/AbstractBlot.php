@@ -10,6 +10,7 @@ namespace Vanilla\Formatting\Quill\Blots;
 use Vanilla\Formatting\Quill\BlotGroup;
 use Vanilla\Formatting\Quill\Parser;
 use Vanilla\Formatting\Quill\Nesting\NestableItemInterface;
+use Vanilla\Utility\ArrayUtils;
 
 /**
  * All blots extend AbstractBlot. Even formats. Blots map lightly to quill blots.
@@ -170,6 +171,29 @@ abstract class AbstractBlot implements NestableItemInterface {
      */
     public function getCurrentOperation(): array {
         return $this->currentOperation;
+    }
+
+    /**
+     * Set a field on the current operation.
+     *
+     * @param string $path
+     * @param mixed $default
+     * @return mixed
+     */
+    public function getCurrentOperationField(string $path, $default = null) {
+        return ArrayUtils::getByPath($path, $this->currentOperation, $default);
+    }
+
+    /**
+     * Get a field on the current operation.
+     *
+     * @param string $path
+     * @param mixed $value
+     * @return $this
+     */
+    public function setCurrentOperationField(string $path, $value): self {
+        ArrayUtils::setByPath($path, $this->currentOperation, $value);
+        return $this;
     }
 
     /**

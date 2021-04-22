@@ -117,6 +117,7 @@ class OAuth2PluginTest extends SiteTestCase {
                 'ProfileUrl' => "https://example.com/$id/profile",
                 'RegisterUrl' => "https://example.com/$id/register",
                 'AllowAccessTokens' => true,
+                'AcceptedScope' => "openid"
             ];
             if ($defaultFirst && $id === self::CLIENT_ID1) {
                 $provider['IsDefault'] = true;

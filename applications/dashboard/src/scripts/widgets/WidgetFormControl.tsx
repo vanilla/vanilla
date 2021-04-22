@@ -11,13 +11,13 @@ import { DashboardRadioGroup } from "@dashboard/forms/DashboardRadioGroups";
 import { DashboardSelect } from "@dashboard/forms/DashboardSelect";
 import { DashboardSelectLookup } from "@dashboard/forms/DashboardSelectLookup";
 import { DashboardToggle } from "@dashboard/forms/DashboardToggle";
-import { IFormControl, IJsonSchema } from "@dashboard/widgets/JsonSchemaTypes";
 import { useUniqueID } from "@library/utility/idUtils";
+import { IFormControl, JsonSchema } from "@vanilla/json-schema-forms";
 import React from "react";
 
 interface IProps {
     formControl: IFormControl;
-    schema: IJsonSchema;
+    schema: JsonSchema;
     value: any;
     onChange: (value: any) => void;
     isRequired?: boolean;

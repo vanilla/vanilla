@@ -24,6 +24,8 @@ final class ObjectUtils {
      * @return object Returns the same class or a new one in the case of with methods.
      */
     public static function hydrate(object $object, array $data): object {
+        $errors = [];
+
         foreach ($data as $key => $value) {
             try {
                 if (method_exists($object, $setter = "set$key")) {
@@ -31,12 +33,17 @@ final class ObjectUtils {
                 } elseif (property_exists($object, $key)) {
                     $object->$key = $value;
                 } else {
-                    throw new \InvalidArgumentException("Object doesn't have a $key property.", 400);
+                    $errors[] = $key;
                 }
             } catch (\Error $ex) {
-                // Private access error, change to an exception.
-                throw new \InvalidArgumentException("Could not set the $key property.", 403);
+                    // Private access error, change to an exception.
+                    $errors[] = $key;
             }
+        }
+
+        if (!empty($errors)) {
+            $msg = "Could not set properties: ".implode(', ', $errors);
+            throw new \InvalidArgumentException($msg, 400);
         }
 
         return $object;

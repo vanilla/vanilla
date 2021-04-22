@@ -160,6 +160,39 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
     /**
      * @inheritdoc
      */
+    public function getJunctions(): ?array {
+        try {
+            $this->defineSchema();
+        } catch (Throwable $e) {
+            // It's possible we may be starting a session to try and structure the category.
+            // If that's the case we can't let this fail.
+            // In any case without a structured category table we are in no position to start enforcing permissions from them.
+            return null;
+        }
+        $ids = $this->modelCache->getCachedOrHydrate(
+            ['junctionExclusions' => true],
+            function () {
+                $rows = $this->createSql()
+                    ->select('c.CategoryID')
+                    ->from('Category c')
+                    ->where('c.PermissionCategoryID', 'c.CategoryID', true, false)
+                    ->where('c.CategoryID >', 0)
+                    ->get()
+                    ->resultArray()
+                ;
+
+                return array_column($rows, 'CategoryID');
+            }
+        );
+
+        return [
+            'Category' => $ids,
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getJunctionAliases(): ?array {
         try {
             $this->defineSchema();
@@ -1073,6 +1106,7 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
         $category['Name'] = !empty($name) ? $name : 'Vanilla';
         $category['Url'] = Gdn::request()->getSimpleUrl('/categories');
         $category['UrlCode'] = '';
+        $category['AllowedDiscussionTypes'] = [];
         return $category;
     }
 
@@ -1093,11 +1127,17 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
 
         $populate = function (array &$row, string $field) {
             $categoryID = $row['CategoryID'] ??  $row['categoryID'] ?? $row['ParentRecordID'] ?? false;
+
             if ($categoryID) {
                 $category = self::categories($categoryID);
                 if ($categoryID === -1) {
                     setValue($field, $row, $this->getRootCategoryForDisplay());
                 } elseif ($category) {
+                    $discussionTypes = is_array($category) ?
+                        $this->getCategoryAllowedDiscussionTypes($category) :
+                        ['Discussion'];
+                    $discussionTypes = array_map('lcfirst', $discussionTypes);
+                    $category['AllowedDiscussionTypes'] = $discussionTypes;
                     setValue($field, $row, $category);
                 }
             }
@@ -1111,6 +1151,25 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
                 $populate($row, $field);
             }
         }
+    }
+
+    /**
+     * Get a categories allowed discussion types.
+     *
+     * This respects enabled types and the category record.
+     *
+     * @param array $row
+     *
+     * @return array
+     */
+    public function getCategoryAllowedDiscussionTypes(array &$row): array {
+        $categoryAllowedDiscussionTypes = $row['AllowedDiscussionTypes'] ?? [];
+        $allowedDiscussionTypes = self::allowedDiscussionTypes($row);
+        $allowedDiscussionTypes = array_keys($allowedDiscussionTypes);
+
+        $discussionTypes = array_intersect($allowedDiscussionTypes, $categoryAllowedDiscussionTypes);
+
+        return $discussionTypes ?? [];
     }
 
     /**

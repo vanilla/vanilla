@@ -8,6 +8,7 @@
 namespace Vanilla\Forum\Modules;
 
 use Garden\Container\Container;
+use Garden\EventManager;
 use Garden\JsonFilterTrait;
 use Garden\Schema\ValidationException;
 use Vanilla\Web\TwigStaticRenderer;
@@ -34,6 +35,10 @@ class FoundationDiscussionsShim {
     /** @var \TagModel */
     private $tagModel;
 
+    /** @var EventManager */
+    private $eventManager;
+
+
     /**
      * DI.
      *
@@ -42,19 +47,22 @@ class FoundationDiscussionsShim {
      * @param \UserModel $userModel
      * @param \CategoryModel $categoryModel
      * @param \TagModel $tagModel
+     * @param EventManager $eventManager
      */
     public function __construct(
         \DiscussionsApiController $discussionsApiController,
         Container $container,
         \UserModel $userModel,
         \CategoryModel $categoryModel,
-        \TagModel $tagModel
+        \TagModel $tagModel,
+        EventManager $eventManager
     ) {
         $this->discussionsApiController = $discussionsApiController;
         $this->container = $container;
         $this->userModel = $userModel;
         $this->categoryModel = $categoryModel;
         $this->tagModel = $tagModel;
+        $this->eventManager = $eventManager;
     }
 
 
@@ -158,6 +166,17 @@ class FoundationDiscussionsShim {
 
         $result = array_values(array_filter($normalized));
         $this->tagModel->expandTags($result);
+
+        // If reactions is enabled expand them on the results.
+        $result = $this->eventManager->fireFilter(
+            'discussionsApiController_getOutput',
+            $result,
+            $this->discussionsApiController,
+            $schema,
+            ['expand' => ['reactions']],
+            $discussions
+        );
+
         return $result;
     }
 }

@@ -136,6 +136,9 @@ class SiteMeta implements \JsonSerializable {
     /** @var string */
     private $defaultSearchScope;
 
+    /** @var string */
+    private $activeDriver;
+
     /** @var int */
     private $editContentTimeout = -1;
 
@@ -220,8 +223,10 @@ class SiteMeta implements \JsonSerializable {
         $this->desktopThemeKey = $config->get('Garden.Theme', ThemeService::FALLBACK_THEME_KEY);
         $this->themePreview = $themeService->getPreviewTheme();
         $this->defaultSearchScope = $config->get('Search.DefaultScope', 'site');
-        $this->supportsSearchScope = (bool) $config->get('Search.SupportsScope', false);
 
+        $activeDriverInstance = $searchService->getActiveDriver();
+        $this->supportsSearchScope = (bool) $config->get('Search.SupportsScope', false) && $activeDriverInstance->supportsForeignRecords();
+        $this->activeDriver = $activeDriverInstance->getName();
 
         $editContentTimeout = $config->get('Garden.EditContentTimeout');
         $this->editContentTimeout = intval($editContentTimeout);
@@ -287,6 +292,7 @@ class SiteMeta implements \JsonSerializable {
             'search' => [
                 'defaultScope' => $this->defaultSearchScope,
                 'supportsScope' => $this->supportsSearchScope,
+                'activeDriver' => $this->activeDriver,
             ],
             'upload' => [
                 'maxSize' => $this->maxUploadSize,
@@ -296,6 +302,7 @@ class SiteMeta implements \JsonSerializable {
             'signOutUrl' => $this->signOutUrl,
             'featureFlags' => $this->featureFlags,
             'themeFeatures' => $this->themeFeatures->allFeatures(),
+            'addonFeatures' => $this->themeFeatures->allAddonFeatures(),
             'siteSection' => $this->currentSiteSection,
             'themePreview' => $this->themePreview,
             'reCaptchaKey' => $this->reCaptchaKey,

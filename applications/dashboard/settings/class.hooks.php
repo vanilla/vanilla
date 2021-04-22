@@ -420,6 +420,7 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface {
             ->addGroup(t('Addons'), 'add-ons', '', ['after' => 'connect'])
             ->addLinkIf('Garden.Settings.Manage', t('Plugins'), '/dashboard/settings/plugins', 'add-ons.plugins', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Applications'), '/dashboard/settings/applications', 'add-ons.applications', '', $sort)
+            ->addLinkIf('Garden.Settings.Manage', t('Labs'), '/settings/labs', 'add-ons.labs', '', $sort, ['badge' => 'New'])
 
             ->addGroup(t('Technical'), 'site-settings', '', ['after' => 'reputation'])
             ->addLinkIf('Garden.Settings.Manage', t('Locales'), '/settings/locales', 'site-settings.locales', '', $sort)
@@ -496,11 +497,6 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface {
             saveToConfig('Tagging.Discussions.Enabled', $formValue);
         }
 
-        // Get all tag types
-        $tagModel = TagModel::instance();
-        $tagTypes = $tagModel->getTagTypes();
-
-
         [$offset, $limit] = offsetLimit($page, 100);
         $sender->setData('_Limit', $limit);
 
@@ -524,6 +520,9 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface {
             $sQL->where('Type', $queryType);
         }
 
+        // Get all tag types
+        $tagModel = TagModel::instance();
+        $tagTypes = $tagModel->getTagTypes();
         $tagTypes = array_change_key_case($tagTypes, CASE_LOWER);
 
         // Store type for view
@@ -536,7 +535,6 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface {
         // Determine if new tags can be added for the current type.
         $canAddTags = (!empty($tagTypes[$type]['addtag']) && $tagTypes[$type]['addtag']) ? 1 : 0;
         $canAddTags &= checkPermission('Vanilla.Tagging.Add');
-
         $sender->setData('_CanAddTags', $canAddTags);
 
         $data = $sQL

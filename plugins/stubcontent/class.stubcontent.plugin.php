@@ -223,6 +223,7 @@ class StubContentPlugin extends Gdn_Plugin {
                         'Photo'             => $content['photo'],
                         'Password'          => betterRandomString(24),
                         'HashMethod'        => 'Random',
+                        'Verified' => true,
                         'RoleID'            => [
                             $role['RoleID']
                         ],

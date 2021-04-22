@@ -331,3 +331,165 @@ export const tabBrowseClasses = useThemeCache(() => {
         extraButtons,
     };
 });
+
+export const tabGroupClasses = useThemeCache(() => {
+    const vars = tabsVariables();
+    const style = styleFactory(TabsTypes.GROUP);
+    const mediaQueries = panelLayoutVariables().mediaQueries();
+    const formElementVariables = formElementsVariables();
+    const globalVars = globalVariables();
+    const titleBarVars = titleBarVariables();
+
+    const root = useThemeCache(() =>
+        style(
+            {
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "stretch",
+                height: calc(`100% - ${styleUnit(vars.navHeight.height)}`),
+            },
+            mediaQueries.oneColumnDown({
+                height: calc(`100% - ${styleUnit(titleBarVars.sizing.mobile.height)}`),
+            }),
+        ),
+    );
+
+    const tabsHandles = style("tabsHandles", {
+        display: "flex",
+        position: "relative",
+        flexWrap: "nowrap",
+        alignItems: "center",
+        justifyContent: "stretch",
+        width: "100%",
+    });
+
+    const tabList = useThemeCache((options?: IListOptions) =>
+        style("tabList", {
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "stretch",
+            background: ColorsUtils.colorOut(vars.colors.bg),
+            ...sticky(),
+            top: 0,
+            zIndex: 1,
+            // Rounded corners for the outer borders.
+            ...{
+                "button:first-child": {
+                    borderTopLeftRadius: globalVars.border.radius,
+                    borderBottomLeftRadius: globalVars.border.radius,
+                },
+                "button:last-child": {
+                    borderTopRightRadius: globalVars.border.radius,
+                    borderBottomRightRadius: globalVars.border.radius,
+                },
+            },
+            ...(options?.isLegacy
+                ? {
+                      width: `calc(100% + 36px)`,
+                      marginLeft: "-18px",
+                  }
+                : undefined),
+        }),
+    );
+
+    const tab = useThemeCache((largeTabs?: boolean, legacyButton?: boolean) =>
+        style(
+            "tab",
+            {
+                ...userSelect(),
+                position: "relative",
+                cursor: "pointer",
+                flex: 1,
+                fontWeight: globalVars.fonts.weights.semiBold,
+                textAlign: "center",
+                border: singleBorder({ color: globalVars.mixBgAndFg(0.35).saturate(0.1) }),
+                borderTop: legacyButton ? "none" : undefined,
+                padding: "2px 0",
+                color: ColorsUtils.colorOut(vars.colors.fg),
+                backgroundColor: ColorsUtils.colorOut(globalVars.elementaryColors.white),
+                minHeight: styleUnit(28),
+                fontSize: styleUnit(13),
+                transition: "color 0.3s ease",
+                ...flexHelper().middle(),
+                ...{
+                    "& > *": {
+                        ...Mixins.padding({ horizontal: globalVars.gutter.half }),
+                    },
+                    "& + &": {
+                        marginLeft: styleUnit(negative(vars.border.width)),
+                    },
+                    "&[data-selected]": {
+                        background: ColorsUtils.colorOut(globalVars.elementaryColors.white),
+                        color: ColorsUtils.colorOut(globalVars.mainColors.primary),
+                        borderColor: ColorsUtils.colorOut(globalVars.mainColors.primary),
+                    },
+                    "&[data-selected] + *": {
+                        borderLeftColor: ColorsUtils.colorOut(globalVars.mainColors.primary),
+                    },
+                    "&:hover:not(&[data-selected]), &:focus:not(&[data-selected]), &:active:not(&[data-selected])": {
+                        border: singleBorder({ color: color("#bfcbd8") }),
+                        borderTop: legacyButton ? "none" : undefined,
+                        color: ColorsUtils.colorOut(globalVars.mainColors.primary),
+                        zIndex: 1,
+                    },
+                    "&&:not(.focus-visible)": {
+                        outline: 0,
+                    },
+                    "&[disabled]": {
+                        pointerEvents: "initial",
+                        color: ColorsUtils.colorOut(vars.colors.fg),
+                        backgroundColor: ColorsUtils.colorOut(vars.colors.bg),
+                    },
+                },
+            },
+
+            mediaQueries.oneColumnDown({
+                ...{
+                    label: {
+                        minHeight: styleUnit(formElementVariables.sizing.height),
+                        lineHeight: styleUnit(formElementVariables.sizing.height),
+                    },
+                },
+            }),
+        ),
+    );
+
+    const tabPanels = style("tabPanels", {
+        flexGrow: 1,
+        height: percent(100),
+        flexDirection: "column",
+        position: "relative",
+    });
+
+    const panel = useThemeCache(() =>
+        style("panel", {
+            flexGrow: 1,
+            height: percent(100),
+            flexDirection: "column",
+        }),
+    );
+
+    const isActive = style("isActive", {
+        backgroundColor: ColorsUtils.colorOut(
+            ColorsUtils.modifyColorBasedOnLightness({
+                color: vars.colors.bg,
+                weight: 0.65,
+                inverse: true,
+                flipWeightForDark: true,
+            }),
+        ),
+    });
+
+    const extraButtons = style("extraButtons", {});
+
+    return {
+        root,
+        tabsHandles,
+        tabList,
+        tab,
+        tabPanels,
+        panel,
+        isActive,
+        extraButtons,
+    };
+});

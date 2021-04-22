@@ -1,6 +1,6 @@
 import React, { ReactElement, useState } from "react";
 import { Tabs as ReachTabs, TabList, Tab, TabPanels, TabPanel } from "@reach/tabs";
-import { tabStandardClasses, tabBrowseClasses } from "@library/sectioning/tabStyles";
+import { tabStandardClasses, tabBrowseClasses, tabGroupClasses } from "@library/sectioning/tabStyles";
 import classNames from "classnames";
 import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
 import { WarningIcon } from "@library/icons/common";
@@ -9,6 +9,7 @@ import { TabsTypes } from "@library/sectioning/TabsTypes";
 import { DomNodeAttacher } from "@vanilla/react-utils";
 
 export interface ITabData {
+    tabID?: string | number;
     label: string;
     contents?: React.ReactNode;
     contentNodes?: Node[];
@@ -33,25 +34,30 @@ interface IProps {
 export function Tabs(props: IProps) {
     const { data, tabType, defaultTabIndex, includeBorder = true, includeVerticalPadding = true } = props;
     const [activeTab, setActiveTab] = useState(defaultTabIndex ?? 0);
-    const classes = tabType && tabType === TabsTypes.BROWSE ? tabBrowseClasses() : tabStandardClasses();
+    const classVariants = new Map([
+        [TabsTypes.STANDARD, tabStandardClasses()],
+        [TabsTypes.BROWSE, tabBrowseClasses()],
+        [TabsTypes.GROUP, tabGroupClasses()],
+    ]);
+    const classes = tabType && classVariants.get(tabType) ? classVariants.get(tabType) : tabStandardClasses();
 
     return (
         <ReachTabs
             index={activeTab}
-            className={classes.root(props.extendContainer)}
+            className={classes?.root(props.extendContainer)}
             onChange={(index) => {
                 setActiveTab(index);
                 props.onChange?.(props.data[index]);
             }}
         >
-            <TabList className={classes.tabList({ includeBorder, isLegacy: props.legacyButtons })}>
+            <TabList className={classes?.tabList({ includeBorder, isLegacy: props.legacyButtons })}>
                 {data.map((tab, index) => {
                     const isActive = activeTab === index;
                     return (
                         <Tab
                             key={index}
-                            className={classNames(classes.tab(props.largeTabs, props.legacyButtons), {
-                                [classes.isActive]: isActive,
+                            className={classNames(classes?.tab(props.largeTabs, props.legacyButtons), {
+                                [classes!.isActive]: isActive,
                             })}
                             disabled={tab.disabled}
                         >
@@ -70,12 +76,12 @@ export function Tabs(props: IProps) {
                         </Tab>
                     );
                 })}
-                {props.extraButtons && <div className={classes.extraButtons}>{props.extraButtons}</div>}
+                {props.extraButtons && <div className={classes?.extraButtons}>{props.extraButtons}</div>}
             </TabList>
-            <TabPanels className={classes.tabPanels}>
+            <TabPanels className={classes?.tabPanels}>
                 {data.map((tab, index) => {
                     return (
-                        <TabPanel className={classes.panel({ includeVerticalPadding })} key={index}>
+                        <TabPanel className={classes?.panel({ includeVerticalPadding })} key={index}>
                             {tab.contents && tab.contents}
                             {tab.contentNodes && <DomNodeAttacher nodes={tab.contentNodes} />}
                         </TabPanel>

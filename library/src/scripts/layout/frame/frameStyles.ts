@@ -16,8 +16,19 @@ export const frameVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const makeThemeVars = variableFactory("frame");
 
+    /**
+     * @varGroup frame.colors
+     * @commonDescription Frame colors
+     */
     const colors = makeThemeVars("colors", {
-        bg: globalVars.body.backgroundImage.color,
+        /**
+         * @var frame.colors.bg
+         * @title Frame Colors - Background
+         * @description Sets the background color
+         * @type string
+         * @format hex-color
+         */
+        bg: undefined,
         fg: globalVars.mainColors.fg,
     });
 

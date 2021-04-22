@@ -7,12 +7,14 @@
 
 namespace VanillaTests\Library\Vanilla\Formatting\TextFragments;
 
+use Vanilla\EmbeddedContent\EmbedService;
 use Vanilla\Formatting\Formats\RichFormat;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\TextFragmentCollectionInterface;
 use Vanilla\Formatting\TextFragmentInterface;
 use Vanilla\Formatting\TextFragmentType;
 use VanillaTests\BootstrapTestCase;
+use VanillaTests\Fixtures\Html\TestHtmlDocument;
 use VanillaTests\Library\Vanilla\Formatting\HtmlNormalizeTrait;
 
 /**
@@ -31,9 +33,68 @@ class RichTextFragmentTest extends BootstrapTestCase {
      */
     public function setUp(): void {
         parent::setUp();
+        $this->container()->rule(EmbedService::class)->addCall("addCoreEmbeds");
         $this->container()->call(function (FormatService $formatService) {
             $this->formatter = $formatService->getFormatter(RichFormat::FORMAT_KEY);
         });
+    }
+
+    /**
+     * A basic assertion that replaces the word "foo" with "bar" through the rich DOM and then makes sure the changes serialize.
+     *
+     * @param string $rich A rich JSON string to test.
+     * @param int $expectedReplacements The expected total of replacements to be made.
+     */
+    private function assertFooSmoke(string $rich, int $expectedReplacements): void {
+        $expected = json_decode($rich, true);
+        $dom = $this->formatter->parseDOM($rich);
+
+        $stringified = json_decode($dom->stringify()->text, true);
+        $this->assertArraySubsetRecursive($expected, $stringified);
+
+        $actualReplacements = 0;
+        $fn = function (TextFragmentInterface $text) use (&$actualReplacements) {
+            $content = $text->getInnerContent();
+            $replacementCount = 0;
+            $new = str_replace('foo', 'bar', $content, $replacementCount);
+            $actualReplacements += $replacementCount;
+            $text->setInnerContent($new);
+        };
+
+        $fragments = $dom->getFragments();
+        $this->debugFragments($fragments);
+        foreach ($fragments as $fragment) {
+            if ($fragment instanceof TextFragmentInterface) {
+                $fn($fragment);
+            } elseif ($fragment instanceof TextFragmentCollectionInterface) {
+                foreach ($fragment->getFragments() as $subFragment) {
+                    $fn($subFragment);
+                }
+            }
+        }
+
+        array_walk_recursive($expected, function (&$str) {
+            if (is_string($str)) {
+                $str = str_replace('foo', 'bar', $str);
+            }
+        });
+
+        $actual = json_decode($dom->stringify()->text, true);
+        self::assertArraySubsetRecursive($expected, $actual);
+        $this->assertSame($expectedReplacements, $actualReplacements);
+    }
+
+    /**
+     * List all of the fragment content in an array to aid debugging.
+     *
+     * @param array $fragments
+     * @return array
+     */
+    private function debugFragments(array $fragments): array {
+        $debug = array_map(function (TextFragmentInterface $f) {
+            return $f->getInnerContent();
+        }, $fragments);
+        return $debug;
     }
 
     /**
@@ -438,59 +499,130 @@ HTML;
   }
 ]
 JSON;
-            $this->assertFooSmoke($json);
+            $this->assertFooSmoke($json, 9);
     }
 
     /**
-     * A basic assertion that replaces the word "foo" with "bar" through the rich DOM and then makes sure the changes serialize.
-     *
-     * @param string $rich A rich JSON string to test.
+     * Verify ability to modify text attributes of an image.
      */
-    private function assertFooSmoke(string $rich): void {
-        $expected = json_decode($rich, true);
-        $dom = $this->formatter->parseDOM($rich);
-
-        $stringified = json_decode($dom->stringify()->text, true);
-        $this->assertArraySubsetRecursive($expected, $stringified);
-
-        $fn = function (TextFragmentInterface $text) {
-            $content = $text->getInnerContent();
-            $new = str_replace('foo', 'bar', $content);
-            $text->setInnerContent($new);
-        };
+    public function testImageFragment(): void {
+        $text = $this->getExampleWithImage();
+        $dom = $this->formatter->parseDOM($text);
 
         $fragments = $dom->getFragments();
-        $this->debugFragments($fragments);
-        foreach ($fragments as $fragment) {
-            if ($fragment instanceof TextFragmentInterface) {
-                $fn($fragment);
-            } elseif ($fragment instanceof TextFragmentCollectionInterface) {
-                foreach ($fragment->getFragments() as $subFragment) {
-                    $fn($subFragment);
-                }
-            }
-        }
 
-        array_walk_recursive($expected, function (&$str) {
-            if (is_string($str)) {
-                $str = str_replace('foo', 'bar', $str);
-            }
-        });
+        $expectedName = __FUNCTION__ . "-name";
+        $expectedUrl = "https://example.com/" . strtolower(__FUNCTION__);
 
-        $actual = json_decode($dom->stringify()->text, true);
-        self::assertArraySubsetRecursive($expected, $actual);
+        $fragment = $fragments[0];
+        $fragment["name"]->setInnerContent($expectedName);
+        $fragment["url"]->setInnerContent($expectedUrl);
+
+        // Re-run everything through formatting to verify potential changes persist.
+        $actual = $this->formatter->parseImages($dom->stringify()->text);
+        $this->assertSame($expectedName, $actual[0]["alt"]);
+        $this->assertSame($expectedUrl, $actual[0]["url"]);
     }
 
     /**
-     * List all of the fragment content in an array to aid debugging.
-     *
-     * @param array $fragments
-     * @return array
+     * Verify ability to modify text attributes of an image.
      */
-    private function debugFragments(array $fragments): array {
-        $debug = array_map(function (TextFragmentInterface $f) {
-            return $f->getInnerContent();
-        }, $fragments);
-        return $debug;
+    public function testEmbedFragment(): void {
+        $text = $this->getExampleWithEmbed();
+        $dom = $this->formatter->parseDOM($text);
+
+        $fragments = $dom->getFragments();
+
+        $expectedName = __FUNCTION__ . "-name";
+        $expectedBody = __FUNCTION__ . "-body";
+        $expectedUrl = "https://example.com/" . strtolower(__FUNCTION__);
+
+        $fragment = $fragments[0];
+        $fragment["body"]->setInnerContent($expectedBody);
+        $fragment["name"]->setInnerContent($expectedName);
+        $fragment["url"]->setInnerContent($expectedUrl);
+
+        // Re-run everything through formatting to verify potential changes persist.
+        $doc = new TestHtmlDocument($this->formatter->renderHTML($dom->stringify()->text));
+        $doc->assertCssSelectorExists("a[href=\"$expectedUrl\"]");
+
+        $actual = json_decode($doc->queryCssSelector("div.js-embed")
+            ->item(0)
+            ->getAttribute("data-embedjson"), true);
+        $this->assertSame($expectedBody, $actual["body"]);
+        $this->assertSame($expectedName, $actual["name"]);
+        $this->assertSame($expectedUrl, $actual["url"]);
+    }
+
+    /**
+     * Get an example rich post with an image.
+     *
+     * @return string
+     */
+    private function getExampleWithImage(): string {
+        return /** @lang JSON */ <<<'JSON'
+[
+  {
+    "insert": {
+      "embed-external": {
+        "data": {
+          "url": "https://example.com/foo.png",
+          "name": "foo text here",
+          "type": "image/png",
+          "size": 26734,
+          "width": 290,
+          "height": 290,
+          "displaySize": "medium",
+          "float": "none",
+          "mediaID": 136016,
+          "dateInserted": "2021-04-08T18:24:13+00:00",
+          "insertUserID": 1,
+          "foreignType": "embed",
+          "foreignID": 1,
+          "embedType": "image"
+        },
+        "loaderData": {
+          "type": "image"
+        }
+      }
+    }
+  },
+  {
+    "insert": "\n"
+  }
+]
+JSON;
+    }
+
+    /**
+     * Get an example rich post with an external site embed.
+     *
+     * @return string
+     */
+    private function getExampleWithEmbed(): string {
+        return /** @lang JSON */ <<<'RICH'
+[
+  {
+    "insert": {
+      "embed-external": {
+        "data": {
+          "body": "I am an example of an external embed.",
+          "photoUrl": "https:\/\/example.com\/photo.jpg",
+          "url": "https:\/\/example.com\/embed.htm",
+          "embedType": "link",
+          "name": "Hello world!"
+        },
+        "loaderData": {
+          "type": "link",
+          "link": "https:\/\/example.com\/embed.htm"
+        }
+      }
+    }
+  },
+  {
+    "insert": "\n"
+  }
+]
+RICH;
     }
 }

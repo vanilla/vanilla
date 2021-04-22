@@ -25,36 +25,39 @@ class ThemeFeatures implements \JsonSerializable {
 
     private $forcedFeatures = [];
 
-    const FEATURE_DEFAULTS = [
+    private const FEATURE_NAMES = [
         // Used for keystone and newer to allow flyouts to convert to Modals o mobile.
-        'NewFlyouts' => false,
+        'NewFlyouts',
 
         // Use twig master templates. You do not have access to the full master view.
-        'SharedMasterView' => false,
+        'SharedMasterView',
 
         // Used foundation and some other themes, adds extra header information on top of the profile page.
-        'ProfileHeader' => false,
+        'ProfileHeader',
 
         // Applies the Variabler driven CSS across the forum. (Eg. foundation based).
-        'DataDrivenTheme' => false,
+        'DataDrivenTheme',
 
         // Turn on user cards.
-        'UserCards' => false,
+        'UserCards',
 
         // Disable legacy based variables.json.
-        'DisableKludgedVars' => false,
+        'DisableKludgedVars',
 
         // Use the new event list page, and new event view page.
-        'NewEventsPage' => false,
+        'NewEventsPage',
 
         // Enable the new search UI (member directory, places, new interface).
-        SearchRootController::ENABLE_FLAG => false,
+        SearchRootController::ENABLE_FLAG,
 
         // Make backwards-incompatbile view changes for better accessibility.
-        'EnhancedAccessibility' => false,
+        'EnhancedAccessibility',
 
         // Use the new themeable quicklinks.
-        'NewQuickLinks' => false,
+        'NewQuickLinks',
+
+        // New button style dropdown
+        'NewCategoryDropdown',
     ];
 
     /**
@@ -84,56 +87,47 @@ class ThemeFeatures implements \JsonSerializable {
         return $this->allFeatures();
     }
 
+    /**
+     * Get theme features pulled directly from the addon.
+     */
+    public function allAddonFeatures(): array {
+        $rawInfoFeatures = [];
+        if ($this->theme !== null) {
+            $rawInfoFeatures = $this->theme->getInfoValue('Features', []);
+        }
+        $defaultEnabled = (bool) ($rawInfoFeatures['DataDrivenTheme'] ?? false);
+
+        $addonFeatures = [];
+        foreach (self::FEATURE_NAMES as $featureName) {
+            $addonFeatures[$featureName] = (bool) ($rawInfoFeatures[$featureName] ?? $defaultEnabled);
+        }
+
+        return $addonFeatures;
+    }
 
     /**
      * Get all of the current theme features.
      */
     public function allFeatures(): array {
-        if ($this->theme === null) {
-            return self::FEATURE_DEFAULTS;
-        }
-        $configValues = [
-            'NewFlyouts' => $this->config->get('Feature.NewFlyouts.Enabled'),
-        ];
-        $rawThemeValues = $this->theme->getInfoValue('Features', []);
-        $themeValues = $rawThemeValues;
-        if ($themeValues['DataDrivenTheme'] ?? false) {
-            // Data driven themes automatically enables other theme features.
-            $themeValues['DisableKludgedVars'] = true;
-            $themeValues['ProfileHeader'] = true;
-            $themeValues['SharedMasterView'] = true;
-            $themeValues['NewFlyouts'] = true;
-            $themeValues['NewEventsPage'] = true;
-            $themeValues['UserCards'] = true;
-            $themeValues[SearchRootController::ENABLE_FLAG] = true;
-            $themeValues['EnhancedAccessibility'] = true;
-            $themeValues['NewQuickLinks'] = true;
+        $addonFeatures = $this->allAddonFeatures();
+
+        $featureFlagEnabledFeatures = [];
+        foreach (self::FEATURE_NAMES as $featureName) {
+            if (FeatureFlagHelper::featureEnabled($featureName)) {
+                $featureFlagEnabledFeatures[$featureName] = true;
+            }
         }
 
-        // If someone has explicitly opted out with a false we want that to apply.
-        $themeValues = array_merge($themeValues, $rawThemeValues);
+        $features = array_merge(
+            // Features from the theme first.
+            $addonFeatures,
+            // A feature flags that may have been turned on in the config or through Vanilla Labs.
+            $featureFlagEnabledFeatures,
+            // Feature flags that were dynamically forced at runtime.
+            $this->forcedFeatures
+        );
 
-        if (FeatureFlagHelper::featureEnabled('NewEventsPage')) {
-            $themeValues['NewEventsPage'] = true;
-        }
-
-        if (FeatureFlagHelper::featureEnabled('NewQuickLinks')) {
-            $themeValues['NewQuickLinks'] = true;
-        }
-
-        if (FeatureFlagHelper::featureEnabled(SearchRootController::ENABLE_FLAG)) {
-            $themeValues[SearchRootController::ENABLE_FLAG] = true;
-        }
-
-        if (FeatureFlagHelper::featureEnabled('UserCards')) {
-            $themeValues['UserCards'] = true;
-        }
-
-        if (FeatureFlagHelper::featureEnabled('EnhancedAccessibility')) {
-            $themeValues['EnhancedAccessibility'] = true;
-        }
-
-        return array_merge(self::FEATURE_DEFAULTS, $configValues, $themeValues, $this->forcedFeatures);
+        return $features;
     }
 
     /**

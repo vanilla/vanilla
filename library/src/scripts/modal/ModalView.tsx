@@ -22,7 +22,7 @@ interface IProps {
     description?: string;
     titleID?: string;
     label?: string;
-    className?: boolean;
+    className?: string;
     scrollable?: boolean;
     size: ModalSizes;
     modalRef?: React.RefObject<HTMLDivElement>;

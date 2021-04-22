@@ -35,6 +35,7 @@ export const inputBlockClasses = useThemeCache(() => {
     const labelAndDescription = style("labelAndDescription", {
         display: "block",
         width: percent(100),
+        color: ColorsUtils.colorOut(formElementVars.colors.fg),
     });
 
     const root = style({

@@ -28,10 +28,10 @@ class ThemeServiceParentTest extends BootstrapTestCase {
         /** @var ThemeService $themeService */
         $themeService = self::container()->get(ThemeService::class);
 
-        $basicThemeAddon = $testAddonManager->lookupTheme('asset-test');
+        $basicThemeAddon = $testAddonManager->lookupTheme('asset-test2');
         $this->assertInstanceOf(Addon::class, $basicThemeAddon);
 
-        $basicTheme = $themeService->getTheme('asset-test');
+        $basicTheme = $themeService->getTheme('asset-test2');
         $this->assertEquals($basicThemeAddon, $basicTheme->getAddon());
 
         $this->assertAssetContents(
@@ -47,7 +47,7 @@ class ThemeServiceParentTest extends BootstrapTestCase {
         );
 
         $this->assertAssetContents(
-            "console.log(\"Hello FS parent\");\nconsole.log(\"Hello FS child\");\n",
+            "console.log(\"Hello FS parent\");\nconsole.log(\"Hello FS child\");\nconsole.log(\"Hello FS child2\");\n",
             $basicTheme->getAsset('javascript')
         );
         $css = <<<CSS
@@ -56,6 +56,9 @@ body {
 }
 body {
   :--fs-child-theme: #fff;
+}
+body {
+  :--fs-child-theme2: #fff;
 }
 
 CSS;

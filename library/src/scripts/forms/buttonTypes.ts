@@ -1,6 +1,7 @@
 export enum ButtonTypes {
     STANDARD = "standard",
     PRIMARY = "primary",
+    OUTLINE = "outline",
     TRANSPARENT = "transparent",
     TRANSLUCID = "translucid",
     CUSTOM = "custom",

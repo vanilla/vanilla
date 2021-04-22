@@ -16,11 +16,11 @@ import { DIST_DIRECTORY, VANILLA_ROOT } from "../env";
  *
  * @param options
  */
-export async function installLerna() {
+export async function installYarn() {
     const options = await getOptions();
 
     try {
-        print(`Installing node_modules with lerna.`);
+        print(`Installing node_modules with yarn.`);
         const spawnOptions = options.verbose ? { stdio: "inherit" } : {};
         await spawnChildProcess("yarn", ["bootstrap"], spawnOptions);
     } catch (err) {

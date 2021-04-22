@@ -14,9 +14,9 @@ namespace Vanilla\Forms;
 interface FormFieldMatchInterface {
 
     /**
-     * Get all conditions.
+     * Get condition array.
      *
      * @return array
      */
-    public function getConditions(): array;
+    public function getCondition(): array;
 }

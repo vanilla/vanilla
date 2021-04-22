@@ -26,4 +26,14 @@ interface PermissionJunctionModelInterface {
      * ]
      */
     public function getJunctionAliases(): ?array;
+
+    /**
+     * Get IDs that should never be included as junctionIDs.
+     *
+     * @return array
+     * [
+     *     JUNCTION_TABLE => [JUNCTION_IDS]
+     * ]
+     */
+    public function getJunctions(): ?array;
 }

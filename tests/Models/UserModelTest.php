@@ -7,6 +7,7 @@
 namespace VanillaTests\Models;
 
 use League\Uri\Http;
+use Vanilla\CurrentTimeStamp;
 use Vanilla\Utility\ModelUtils;
 use VanillaTests\APIv0\TestDispatcher;
 use VanillaTests\Bootstrap;
@@ -699,5 +700,44 @@ class UserModelTest extends SiteTestCase {
         $html = $this->bessy()->getHtml('/dashboard/user/browse', $formValues, ['deliveryType' => DELIVERY_TYPE_ALL]);
         $html->assertCssSelectorTextContains('#Users.table-data', $lastUser['Name']);
         $html->assertCssSelectorNotTextContains('#Users.table-data', $firstUser['Name']);
+    }
+
+    /**
+     * PII should be blanked when a user is soft-deleted.
+     */
+    public function testRemovePseudoPIIOnDelete(): void {
+        $id = $this->createUserFixture(static::ROLE_MEMBER);
+        $date = CurrentTimeStamp::getMySQL();
+        CurrentTimeStamp::mockTime($date);
+        $ip = '127.0.0.1';
+
+        $set = [
+            'Photo' => 'https://example.com/test.jpg',
+            'Title' => 'Foo',
+            'Location' => 'Bar',
+            'About' => 'A simple story.',
+            'DiscoveryText' => 'test',
+            'DateOfBirth' => $date,
+            'DateFirstVisit' => $date,
+            'DateLastActive' => $date,
+            'InsertIPAddress' => $ip,
+            'LastIPAddress' => $ip,
+        ];
+
+        $this->userModel->setField($id, $set);
+
+        $user = $this->userModel->getID($id, DATASET_TYPE_ARRAY);
+        $this->assertArraySubsetRecursive($set, $user);
+
+        $r = $this->userModel->deleteID($id);
+        $this->assertTrue($r);
+
+        $deletedUser = $this->userModel->getID($id, DATASET_TYPE_ARRAY);
+        foreach ($set as $field => $value) {
+            $this->assertEmpty($deletedUser[$field]);
+        }
+
+        $this->assertSame(t('[Deleted User]'), $deletedUser['Name']);
+        CurrentTimeStamp::clearMockTime();
     }
 }

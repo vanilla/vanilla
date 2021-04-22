@@ -41,4 +41,13 @@ abstract class AbstractWidgetModule extends Gdn_Module implements WidgetInterfac
     public static function getWidgetID():string {
         return slugify(static::getWidgetName());
     }
+
+    /**
+     * Default is required. You should probably manually place your module.
+     *
+     * @return string
+     */
+    public function assetTarget() {
+        return 'Content';
+    }
 }

@@ -14,7 +14,6 @@ import { metasVariables } from "@library/metas/Metas.variables";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { calc, percent } from "csx";
 import { userPhotoVariables } from "@library/headers/mebox/pieces/userPhotoStyles";
-import { TLength } from "@library/styles/styleShim";
 
 export const memberListVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeVars = variableFactory("memberList", forcedVars);

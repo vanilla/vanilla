@@ -12,6 +12,7 @@ use Garden\Web\Data;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\FileUtils;
 use Vanilla\OpenAPIBuilder;
+use Vanilla\Utility\ArrayUtils;
 use Vanilla\Web\Controller;
 
 /**
@@ -128,18 +129,33 @@ final class ConfigApiController extends Controller {
     public function patch(array $body): Data {
         $in = $this->getConfigSchema();
 
+        // ApiKey => ConfigKey
+        $propertyMapping = [];
         // Make sure the user has all necessary permissions.
         $permissions = [];
         foreach ($in->getField('properties') as $key => $item) {
             if (array_key_exists($key, $body)) {
                 $permissions[$this->realPermissionName($item['x-write'] ?? self::PERM_ADMIN)] = true;
             }
+
+            $actualConfigKey = $item['x-key'] ?? $key;
+            if ($actualConfigKey !== $key) {
+                $propertyMapping[$key] = $actualConfigKey;
+            }
         }
         $this->permission(array_keys($permissions));
 
         $in->setFlag(Schema::VALIDATE_EXTRA_PROPERTY_EXCEPTION, true);
+
         $valid = $in->validate($body, true);
-        $this->config->saveToConfig($valid);
+
+        $mapped = [];
+        foreach ($valid as $key => $value) {
+            $configKey = $propertyMapping[$key] ?? $key;
+            $mapped[$configKey] = $value;
+        }
+
+        $this->config->saveToConfig($mapped);
 
         return new Data(null);
     }

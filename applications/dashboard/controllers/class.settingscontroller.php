@@ -57,6 +57,14 @@ class SettingsController extends DashboardController {
     }
 
     /**
+     * Render the labs page.
+     */
+    public function labs() {
+        $this->permission('Garden.Settings.Manage');
+        $this->render('labs');
+    }
+
+    /**
      * Highlight menu path. Automatically run on every use.
      *
      * @since 2.0.0

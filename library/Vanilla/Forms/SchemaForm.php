@@ -54,7 +54,7 @@ class SchemaForm {
         ];
 
         if ($conditions) {
-            $result['conditions'] = [$conditions->getConditions()];
+            $result['conditions'] = [$conditions->getCondition()];
         }
 
         return $result;
@@ -134,7 +134,7 @@ class SchemaForm {
         ];
 
         if ($conditions) {
-            $result['conditions'] = [$conditions->getConditions()];
+            $result['conditions'] = [$conditions->getCondition()];
         }
 
         return $result;

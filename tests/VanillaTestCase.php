@@ -48,6 +48,40 @@ class VanillaTestCase extends TestCase {
     }
 
     /**
+     * Call protected/private method of a class.
+     *
+     * Do not abuse this since it's not super fast!
+     *
+     * @param object|string $target Instantiated object or class that we will run method on.
+     * @param string $methodName Method name to call
+     * @param array $parameters Array of parameters to pass into method.
+     *
+     * @return mixed Method return.
+     * @throws \ReflectionException Throws an exception if the `$target` isn't a real class.
+     */
+    public static function invokeMethod($target, $methodName, array $parameters = []) {
+        $reflection = new \ReflectionClass($target);
+
+        if (is_object($target)) {
+            $instance = $target;
+        } else {
+            $instance = null;
+        }
+
+        $method = $reflection->getMethod($methodName);
+        $method->setAccessible(true);
+
+        if ($method->isStatic()) {
+            return $method->invokeArgs(null, $parameters);
+        } else {
+            if (!isset($instance)) {
+                throw new \Exception('Cannot call an instance method on a class.');
+            }
+            return $method->invokeArgs($target, $parameters);
+        }
+    }
+
+    /**
      * Call `sprintf()` on each string array value while increasing the counter for the next call.
      *
      * This helper is useful for generating unique record values for repeatedly inserting test data with tests. Wrap

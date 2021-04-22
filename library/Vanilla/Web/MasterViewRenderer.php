@@ -7,10 +7,12 @@
 
 namespace Vanilla\Web;
 
+use Garden\EventManager;
 use Garden\Web\Data;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Models\SiteMeta;
 use Vanilla\Theme\ThemePreloadProvider;
+use Vanilla\Web\Events\PageRenderBeforeEvent;
 
 /**
  * Class for mapping data inside of a Gdn_Controller for the twig master view.
@@ -36,17 +38,27 @@ class MasterViewRenderer {
     /** @var ConfigurationInterface */
     private $config;
 
+    /** @var EventManager */
+    private $eventManager;
+
     /**
      * DI.
      *
      * @param ThemePreloadProvider $themePreloader
      * @param SiteMeta $siteMeta
      * @param ConfigurationInterface $config
+     * @param EventManager $eventManager
      */
-    public function __construct(ThemePreloadProvider $themePreloader, SiteMeta $siteMeta, ConfigurationInterface $config) {
+    public function __construct(
+        ThemePreloadProvider $themePreloader,
+        SiteMeta $siteMeta,
+        ConfigurationInterface $config,
+        EventManager $eventManager
+    ) {
         $this->themePreloader = $themePreloader;
         $this->siteMeta = $siteMeta;
         $this->config = $config;
+        $this->eventManager = $eventManager;
     }
 
     /**
@@ -58,6 +70,9 @@ class MasterViewRenderer {
      * @return string
      */
     public function renderPage(Page $page, array $viewData): string {
+        $head = $page->getHead();
+        $this->eventManager->fire('pageRenderBefore', new PageRenderBeforeEvent($head, $page));
+
         $extraData = [
             'seoContent' => new \Twig\Markup($page->getSeoContent(), 'utf-8'),
             'cssClasses' => 'isLoading',

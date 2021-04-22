@@ -70,6 +70,7 @@ class FoundationDiscussionShimTest extends SiteTestCase {
                     'categoryID' => -1,
                     'name' => 'FoundationDiscussionShimTest',
                     'url' => 'http://vanilla.test/foundationdiscussionshimtest/categories',
+                    'allowedDiscussionTypes' => []
                 ],
                 'tags' => [],
             ]

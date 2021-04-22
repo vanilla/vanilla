@@ -14,6 +14,7 @@ use Garden\Web\Exception\ServerException;
 use Psr\Container\ContainerExceptionInterface;
 use Vanilla\Models\UserAuthenticationProviderFragmentSchema;
 use Vanilla\Permissions;
+use Vanilla\Contracts\ConfigurationInterface;
 
 /**
  * Class Gdn_OAuth2
@@ -86,6 +87,11 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
     private $container;
 
     /**
+     * @var bool Include `scope` in the Access Token request params.
+     */
+    protected $sendScopeOnTokenRequest;
+
+    /**
      * Set up OAuth2 access properties.
      *
      * @param string $providerKey Fixed key set in child class.
@@ -98,6 +104,23 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
             // We passed in a connection
             $this->accessToken = $accessToken;
         }
+        $this->setSendScopeOnTokenRequest();
+    }
+
+    /**
+     * Gets the $sendScopOnTokenRequest variable.
+     *
+     * @return bool
+     */
+    public function getSendScopeOnTokenRequest(): bool {
+        return $this->sendScopeOnTokenRequest ?? \Gdn::config()->get('OAuth2.Flags.SendScopeOnTokenRequest', true);
+    }
+
+    /**
+     * Sets the sendScopeOnTokenRequest variable.
+     */
+    public function setSendScopeOnTokenRequest():void {
+        $this->sendScopeOnTokenRequest = \Gdn::config()->get('OAuth2.Flags.SendScopeOnTokenRequest', true);
     }
 
     /**
@@ -155,7 +178,7 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
     public function structure() {
         // Make sure we have the OAuth2 provider.
         $provider = $this->provider();
-        if (!val('AuthenticationKey', $provider)) {
+        if (!$provider['AuthenticationKey']) {
             $model = new Gdn_AuthenticationProviderModel();
             $provider = [
                 'AuthenticationKey' => $this->providerKey,
@@ -172,6 +195,7 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
 
             $model->save($provider);
         }
+        Gdn::config()->saveToConfig('OAuth2.Flags.SendScopeOnTokenRequest', $this->getSendScopeOnTokenRequest());
     }
 
     /**
@@ -790,7 +814,7 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
      */
     public function requestAccessToken($code, $refresh = false) {
         $provider = $this->provider();
-        $uri = val('TokenUrl', $provider);
+        $uri = $provider['TokenUrl'];
 
         //When requesting the AccessToken using the RefreshToken the params are different.
         if ($refresh) {
@@ -803,10 +827,13 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
                 'code' => $code,
                 'client_id' => $provider[$this->clientIDField] ?? 'not-found',
                 'redirect_uri' => url('/entry/'. $this->getProviderKey(), true),
-                'client_secret' => val('AssociationSecret', $provider),
-                'grant_type' => 'authorization_code',
-                'scope' => val('AcceptedScope', $provider)
+                'client_secret' => $provider['AssociationSecret'],
+                'grant_type' => 'authorization_code'
             ];
+        }
+
+        if ($this->getSendScopeOnTokenRequest()) {
+            $defaultParams['scope'] = $provider['AcceptedScope'];
         }
 
         // Merge any parameters inherited parameters, remove any empty parameters before sending them in the request.
@@ -1078,7 +1105,6 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
         $this->ssoUtils = $ssoUtils;
         $this->sessionModel = $sessionModel;
         $this->container = $container;
-
         $this->container->setInstance(static::containerKey($this->providerKey), $this);
     }
 

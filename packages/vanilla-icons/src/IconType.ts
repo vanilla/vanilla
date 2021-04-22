@@ -1,14 +1,38 @@
+
 /**
  * @copyright 2009-2021 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
-type MeIconType = "me-messages-solid" | "me-messages" | "me-notifications-solid" | "me-notifications";
 
-type NavigationIconType = "navigation-languages";
+type MeIconType =
+    | "me-messages-solid"
+    | "me-messages"
+    | "me-notifications-solid"
+    | "me-notifications"
+;
 
-type SearchIconType = "search-search";
+type MetaIconType =
+    | "meta-comment"
+    | "meta-external"
+    | "meta-like"
+    | "meta-smile"
+    | "meta-time"
+    | "meta-view"
+;
 
-type MetaIconType = "meta-comment" | "meta-view" | "meta-time" | "meta-smile" | "meta-like" | "meta-external";
+type NavigationIconType =
+    | "navigation-languages"
+;
 
-export type IconType = MeIconType | NavigationIconType | SearchIconType | MetaIconType;
+type SearchIconType =
+    | "search-events"
+    | "search-search"
+;
+
+export type IconType =
+    | MeIconType
+    | MetaIconType
+    | NavigationIconType
+    | SearchIconType
+;

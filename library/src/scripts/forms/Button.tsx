@@ -60,6 +60,8 @@ export const getButtonStyleFromBaseClass = (type: ButtonTypes | undefined) => {
                 return classes.primary;
             case ButtonTypes.TRANSPARENT:
                 return classes.transparent;
+            case ButtonTypes.OUTLINE:
+                return classes.outline;
             case ButtonTypes.TRANSLUCID:
                 return classes.translucid;
             case ButtonTypes.TITLEBAR_LINK:

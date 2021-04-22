@@ -7,6 +7,7 @@
 namespace Vanilla\ProfileExtender\Tests\APIv2;
 
 use Exception;
+use Gdn_Configuration;
 use Vanilla\Attributes;
 
 /**
@@ -17,6 +18,7 @@ class ProfileExtenderAddonTest extends \VanillaTests\SiteTestCase {
      * @var \ProfileExtenderPlugin
      */
     protected $profileExtender;
+
 
     /**
      * {@inheritdoc}
@@ -206,5 +208,46 @@ class ProfileExtenderAddonTest extends \VanillaTests\SiteTestCase {
         $this->assertSame($schemaProperties['DateOfBirth']['format'], 'date-time');
         $this->assertSame($schemaProperties['dropdown']['type'], 'string');
         $this->assertSame(count($schemaProperties['dropdown']['enum']), 2);
+    }
+
+    /**
+     * Test profile fields reordering.
+     */
+    public function testProfileFieldsReordering(): void {
+        $id = $this->memberID;
+        $fieldsToPatch = [
+            'text' => 'foo',
+            'check' => false,
+            'DateOfBirth' => '1980-06-17',
+            'dropdown' => 'Option1'
+        ];
+
+        $this->api()->patch("/users/{$id}/extended", $fieldsToPatch);
+        $profileFields = $this->profileExtender->getUserFields($this->memberID);
+        $config = self::container()->get(Gdn_Configuration::class);
+        $fieldsInConfig = $config->get('ProfileExtender.Fields');
+        $configFieldsNamesAsKey = array_flip(array_column($fieldsInConfig, "Name"));
+
+        //order is not the same
+        $this->assertNotEquals(array_key_first($profileFields), array_key_first($configFieldsNamesAsKey));
+        $reorderedProfileFields = $this->profileExtender->reorderProfileFields($profileFields);
+        $this->assertIsArray($reorderedProfileFields);
+        $this->assertCount(count($profileFields), $reorderedProfileFields);
+        //reorder array should be the same as the initial one, only order is changed
+        $this->assertEquals($profileFields, $reorderedProfileFields);
+
+        //and order should match with the one in config
+        $this->assertEquals(array_key_first($reorderedProfileFields), array_key_first($configFieldsNamesAsKey));
+
+        //scenario when user has more profile fields than in config
+        $newFieldsInConfig = array_splice($fieldsInConfig, 0, 3);
+        $config->set('ProfileExtender.Fields', $newFieldsInConfig);
+        $newFieldsInConfig = $config->get('ProfileExtender.Fields');
+        $newConfigFieldsNamesAsKey = array_flip(array_column($newFieldsInConfig, "Name"));
+        $this->assertNotEquals(array_key_first($profileFields), array_key_first($newConfigFieldsNamesAsKey));
+        $newReorderedProfileFields = $this->profileExtender->reorderProfileFields($profileFields);
+
+        //should still be the same as the initial one, even if in the config now we have less fields
+        $this->assertEquals($profileFields, $newReorderedProfileFields);
     }
 }

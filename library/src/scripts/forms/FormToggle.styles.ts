@@ -98,18 +98,21 @@ export const formToggleClasses = useThemeCache((forcedVars?: IThemeVariables) =>
             [`&.isIndeterminate .${slider}`]: {
                 left: vars.slider.width / 2 + vars.sizing.gutter,
             },
-            [`&.isFocused:not(.isDisabled):not(.isFocused) .${well}, &:not(.isDisabled):hover .${well}`]: {
+            [`&.isFocused .${well}, &:not(.isDisabled):hover .${well}`]: {
                 ...Mixins.border({ ...vars.slider.border, color: vars.well.colorActive }),
             },
-            [`&.isFocused:not(.isDisabled):not(.isFocused) .${slider}, &:not(.isDisabled):hover .${slider}`]: {
+            [`&.isFocused .${slider}, &:not(.isDisabled):hover .${slider}`]: {
                 ...Mixins.border({ ...vars.slider.border, color: vars.well.colorActive }),
             },
-            [`&.isOn.isFocused:not(.isDisabled):not(.isFocused) .${well}, &.isOn:not(.isDisabled):hover .${well}`]: {
+            [`&.isOn.isFocused .${well}, &.isOn:not(.isDisabled):hover .${well}`]: {
                 ...Mixins.border({ ...vars.well.border, color: vars.well.colorActiveState }),
                 backgroundColor: ColorsUtils.colorOut(vars.well.colorActiveState),
             },
-            [`&.isOn.isFocused:not(.isDisabled):not(.isFocused) .${slider}, &.isOn:not(.isDisabled):hover .${slider}`]: {
+            [`&.isOn:.isFocused .${slider}, &.isOn:not(.isDisabled):hover .${slider}`]: {
                 ...Mixins.border({ ...vars.slider.border, color: vars.slider.color }),
+            },
+            [`&.isFocused .${well}`]: {
+                boxShadow: `0 0 0 2px ${ColorsUtils.colorOut(vars.well.colorActive)}`,
             },
             [`&.isDisabled`]: {
                 cursor: important("default"),

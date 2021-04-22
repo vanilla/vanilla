@@ -15,18 +15,21 @@ import { INavigationTreeItem } from "@library/@types/api/core";
 import { TabHandler } from "@vanilla/dom-utils";
 import { panelListClasses } from "@library/layout/panelListStyles";
 import { useLayout } from "@library/layout/LayoutContext";
+import { SiteNavNodeTypes } from "@library/navigation/SiteNavNodeTypes";
 
 interface IProps {
-    activeRecord: IActiveRecord;
+    activeRecord?: IActiveRecord;
     id?: string;
     className?: string;
     children: INavigationTreeItem[];
     collapsible: boolean;
     bottomCTA?: React.ReactNode;
+    onSelectItem?(item: INavigationTreeItem);
     onItemHover?(item: INavigationTreeItem);
     title?: string;
     hiddenTitle?: boolean;
     clickableCategoryLabels?: boolean;
+    siteNavNodeTypes?: SiteNavNodeTypes;
 }
 
 /**
@@ -38,7 +41,7 @@ export function SiteNav(props: IProps) {
 
     const titleID = id + "-title";
 
-    const { activeRecord, collapsible, onItemHover, children } = props;
+    const { activeRecord, collapsible, onItemHover, onSelectItem, children, siteNavNodeTypes } = props;
     const hasChildren = children && children.length > 0;
     const classes = siteNavClasses();
     const classesPanelList = panelListClasses(useLayout().mediaQueries);
@@ -54,8 +57,10 @@ export function SiteNav(props: IProps) {
                       key={child.recordType + child.recordID}
                       titleID={titleID}
                       depth={0}
+                      onSelectItem={onSelectItem}
                       onItemHover={onItemHover}
                       clickableCategoryLabels={!!props.clickableCategoryLabels}
+                      siteNavNodeTypes={siteNavNodeTypes}
                   />
               );
           })

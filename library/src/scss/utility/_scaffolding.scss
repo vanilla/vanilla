@@ -37,6 +37,10 @@ input {
 input,
 select,
 textarea {
+    /* Omitting radio inputs since they are generally inline if not overwritten */
+    &[type="radio"], &[type="checkbox"] {
+        width: inherit;
+    }
     width: 100%;
 }
 

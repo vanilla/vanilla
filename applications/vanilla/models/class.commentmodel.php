@@ -1443,6 +1443,7 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
         $row['Url'] = commentUrl($row);
         $row['Attributes'] = new Attributes($row['Attributes']);
         $row['InsertUserID'] = $row['InsertUserID'] ?? 0;
+        $row['DateInserted'] = $row['DateInserted'] ?? $row['DateUpdated'] ?? new DateTime();
         $scheme = new CamelCaseScheme();
         $result = $scheme->convertArrayKeys($row);
         if (ModelUtils::isExpandOption(ModelUtils::EXPAND_CRAWL, $expand)) {
@@ -1739,27 +1740,30 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
      * @param int $userID Unique ID of the user to be updated.
      */
     public function updateUser($userID, $inc = false) {
+        $user = $this->userModel->getID($userID, DATASET_TYPE_ARRAY);
         if ($inc) {
-            // Just increment the comment count.
-            $this->SQL
-                ->update('User')
-                ->set('CountComments', 'CountComments + 1', false)
-                ->where('UserID', $userID)
-                ->put();
-            $this->addDirtyRecord('user', $userID);
-        } else {
-            // Retrieve a comment count
-            $countComments = $this->SQL
-                ->select('c.CommentID', 'count', 'CountComments')
-                ->from('Comment c')
-                ->where('c.InsertUserID', $userID)
-                ->get()
-                ->firstRow()
-                ->CountComments;
+            $countComments = val('CountComments', $user);
+            // Increment if 100 or greater; Recalculate on 120, 140 etc.
+            if ($countComments >= 100 && $countComments % 20 !== 0) {
+                $this->SQL->update('User')
+                    ->set('CountComments', 'CountComments + 1', false)
+                    ->where('UserID', $userID)
+                    ->put();
 
-            // Save to the attributes column of the user table for this user.
-            $this->userModel->setField($userID, 'CountComments', $countComments);
+                $this->userModel->updateUserCache($userID, 'CountComments', $countComments + 1);
+                $this->addDirtyRecord('user', $userID);
+                return;
+            }
         }
+
+        $countComments = $this->SQL
+            ->select('CommentID', 'count', 'CountComments')
+            ->from('Comment')
+            ->where('InsertUserID', $userID)
+            ->get()->value('CountComments', 0);
+
+        // Save the count to the user table
+        $this->userModel->setField($userID, 'CountComments', $countComments);
     }
 
     /**

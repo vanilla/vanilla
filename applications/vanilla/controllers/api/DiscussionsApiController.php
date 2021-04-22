@@ -853,7 +853,9 @@ class DiscussionsApiController extends AbstractApiController {
         $this->discussionTypeConverter->convert($from, $toType);
         $record = $this->discussionModel->getID($id, DATASET_TYPE_ARRAY);
         $result = $this->normalizeOutput($record);
-        return $out->validate($result);
+        $result = $out->validate($result);
+        $this->tagModel->expandTags($result);
+        return $result;
     }
 
     /**

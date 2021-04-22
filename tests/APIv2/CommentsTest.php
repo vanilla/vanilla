@@ -114,6 +114,39 @@ class CommentsTest extends AbstractResourceTest {
     }
 
     /**
+     * Test commenting on a closed discussion.
+     */
+    public function testCommentClosedDiscussion() {
+        $discussion = $this->createDiscussion();
+        $discussionID = $discussion['discussionID'];
+        $this->api()->patch("/discussions/{$discussionID}", ["closed" => 1]);
+        $this->api()->post('/comments', [
+            "body" => "an admin can post a comment on a closed discussion.",
+            "discussionID" => $discussionID,
+            "format" => "text",
+        ]);
+        $comments = $this->api()->get("/comments?discussionID={$discussionID}&sort=-dateInserted")->getBody();
+        $commentBody = $comments[0]['body'];
+        $this->assertSame("an admin can post a comment on a closed discussion.", $commentBody);
+
+        // Create a member-level user and try the same thing.
+        $username = substr(__FUNCTION__, 0, 20);
+        $user = $this->api()->post('users', [
+            'name' => $username,
+            'email' => $username.'@example.com',
+            'password' => 'vanilla'
+        ])->getBody();
+
+        $this->api()->setUserID($user['userID']);
+        $this->expectExceptionMessage('This discussion has been closed.');
+        $this->api()->post('/comments', [
+            "body" => "a member cannot post on a closed discussion.",
+            "discussionID" => $discussionID,
+            "format" => "markdown",
+        ]);
+    }
+
+    /**
      * Ensure that there are dirtyRecords for a specific resource.
      */
     protected function triggerDirtyRecords() {

@@ -126,13 +126,7 @@ class BBCode extends Gdn_Pluggable {
         if (isset($params['name'])) {
             $username = trim($params['name']);
             $username = html_entity_decode($username, ENT_QUOTES, 'UTF-8');
-
-            $User = Gdn::userModel()->getByUsername($username);
-            if ($User) {
-                $userAnchor = userAnchor($User);
-            } else {
-                $userAnchor = anchor(htmlspecialchars($username, null, 'UTF-8'), '/profile/' . rawurlencode($username));
-            }
+            $userAnchor = anchor(htmlspecialchars($username, null, 'UTF-8'), '/profile/' . rawurlencode($username));
 
             $title = concatSep(' ', $title, $userAnchor, t('Quote wrote', 'wrote'));
         }

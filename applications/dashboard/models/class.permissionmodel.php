@@ -58,11 +58,16 @@ class PermissionModel extends Gdn_Model {
      */
     public function createPermissionInstance(): Permissions {
         $permissions = new Permissions();
-        $permissions->addJunctions($this->getAllJunctionTablesAndIDs());
+
         foreach ($this->junctionModels as $junctionModel) {
             $aliases = $junctionModel->getJunctionAliases();
             if ($aliases !== null) {
                 $permissions->addJunctionAliases($aliases);
+            }
+
+            $junctions = $junctionModel->getJunctions();
+            if ($junctions !== null) {
+                $permissions->addJunctions($junctions);
             }
         }
         return $permissions;

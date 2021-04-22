@@ -52,6 +52,7 @@ import { conversationCompatCSS } from "@dashboard/compatibilityStyles/pages/Conv
 import { metasCSS } from "@dashboard/compatibilityStyles/Metas.compat.styles";
 import { discussionListCompatCSS } from "@library/features/discussions/DiscussionList.compat.styles";
 import { widgetLayoutCompactCSS } from "@library/layout/WidgetLayout.compat.styles";
+import { onlineUserWrapCSS } from "@dashboard/compatibilityStyles/onlineUserStyles";
 export { cssOut };
 
 // Re-export for compatibility.
@@ -392,6 +393,7 @@ compatibilityStyles = useThemeCache(() => {
     signaturesCSS();
     signInMethodsCSS();
     leaderboardCSS();
+    onlineUserWrapCSS();
 });
 
 export const mixinCloseButton = (selector: string) => {

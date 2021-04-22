@@ -17,6 +17,7 @@ import NotificationsModel from "@library/features/notifications/NotificationsMod
 import ConversationsModel from "@library/features/conversations/ConversationsModel";
 import { tagsReducer } from "@library/features/tags/TagsReducer";
 import { discussionsReducer } from "@library/features/discussions/discussionsReducer";
+import { configSlice, IConfigState } from "@library/config/configReducer";
 
 let dynamicReducers = {};
 
@@ -36,6 +37,7 @@ export function registerReducer(name: string, reducer: Reducer) {
 export interface ICoreStoreState extends IUsersStoreState {
     theme: IThemeState;
     locales: ILocaleState;
+    config: IConfigState;
 }
 
 export function getReducers(): ReducersMapObject<any, any> {
@@ -48,6 +50,7 @@ export function getReducers(): ReducersMapObject<any, any> {
         notifications: new NotificationsModel().reducer,
         conversations: new ConversationsModel().reducer,
         theme: themeReducer,
+        [configSlice.name]: configSlice.reducer,
         ...dynamicReducers,
     };
 }

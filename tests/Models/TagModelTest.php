@@ -7,16 +7,16 @@
 
 namespace VanillaTests\Models;
 
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use VanillaTests\SiteTestTrait;
-use VanillaTests\VanillaTestCase;
+use TagModel;
+use VanillaTests\APIv0\TestDispatcher;
+use Garden\EventManager;
 
 /**
  * Tests for the tag model.
  */
-class TagModelTest extends VanillaTestCase {
-
-    use SiteTestTrait;
+class TagModelTest extends \VanillaTests\SiteTestCase {
     use ModelTestTrait;
     use TestCategoryModelTrait;
     use TestDiscussionModelTrait;
@@ -24,7 +24,7 @@ class TagModelTest extends VanillaTestCase {
     /** @var int */
     protected static $tagCount = 0;
 
-    /** @var \TagModel */
+    /** @var TagModel */
     private $tagModel;
 
     /**
@@ -32,10 +32,19 @@ class TagModelTest extends VanillaTestCase {
      */
     public function setUp(): void {
         $this->setupSiteTestTrait();
+        $this->createUserFixtures();
+
+        TagModel::instance()->resetTypes();
+
         $this->discussionModel = self::container()->get(\DiscussionModel::class);
         $this->categoryModel = self::container()->get(\CategoryModel::class);
-        $this->tagModel = self::container()->get(\TagModel::class);
+        $this->tagModel = self::container()->get(TagModel::class);
         $this->tagModel->SQL->truncate('Tag');
+
+        /** @var EventManager */
+        $eventManager = $this->container()->get(EventManager::class);
+        $eventManager->unbindClass(self::class);
+        $eventManager->bind('tagModel_types', [$this, 'tagModel_types_handler']);
 
         $config = self::container()->get(\Gdn_Configuration::class);
         $config->saveToConfig('Vanilla.Tagging.Max', 5);
@@ -311,5 +320,175 @@ class TagModelTest extends VanillaTestCase {
         $this->insertTags(2);
         $searchedTags = $this->tagModel->search('tag', false, false);
         $this->assertCount(2, $searchedTags);
+    }
+
+    /**
+     * Test that the dashboard's UI shows the "Add Tag" button where/when appropriate.
+     */
+    public function testCustomTagTypesDashboardUI(): void {
+        // See tagModel_types_handler() for the custom tag types.
+
+        // As an admin...
+        $this->getSession()->start($this->adminID);
+        // We set ourselves tagging permissions.
+        $this->getSession()->addPermissions(['Vanilla.Tagging.Add']);
+
+        $html = $this->bessy()->getHtml('/settings/tagging/?type=usablecustomtype');
+        // Checks that the appropriate "Add Tag" button is there.
+        $html->assertCssSelectorExists('.header-block a.btn-primary[href*="add?type=usablecustomtype"]');
+
+        $html = $this->bessy()->getHtml('/settings/tagging/?type=unusablecustomtype');
+        // Checks that there is no "Add Tag" button.
+        $html->assertCssSelectorNotExists('.header-block a.btn-primary[href*="add"]');
+        $this->getSession()->end();
+    }
+
+    /**
+     * Add Types to TagModel.
+     *
+     * @param TagModel $sender
+     */
+    public function tagModel_types_handler($sender) {
+        // Create 2 custom tag types: One that's usable, one that's unusable.
+        $sender->addType(
+            'usablecustomtype',
+            [
+                'key' => 'usablecustomtype',
+                'name' => 'Usable Custom Type',
+                'plural' => 'Usable Custom Type(plural)',
+                'addtag' => true,
+                'default' => false
+            ]
+        );
+
+        $sender->addType(
+            'unusablecustomtype',
+            [
+                'key' => 'UnusableCustomType',
+                'name' => 'Unusable Custom Type',
+                'plural' => 'Unusable Custom Type(plural)',
+                'addtag' => false,
+                'default' => false
+            ]
+        );
+    }
+
+    /**
+     * Check if we can Add Tags of a certain type(has addtag set to true). Also, we shouldn't be able to add tags for
+     * tag types that have addtag set to false.
+     */
+    public function testAddCustomTagTypesThroughDashboard(): void {
+        // See tagModel_types_handler() for the custom tag types.
+
+        // As an admin...
+        $this->getSession()->start($this->adminID);
+        // We set ourselves tagging permissions.
+        $this->getSession()->addPermissions(['Vanilla.Tagging.Add']);
+
+        $this->bessy()->post(
+            '/settings/tags/add?type=usablecustomtype',
+            ['FullName' => 'A New Tag', 'Name' => 'a-new-tag', 'Type' => 'usablecustomtype']
+        );
+
+        // Checks that the newly created "A New Tag" tag is there.
+        $html = $this->bessy()->getHtml('/settings/tagging/?type=usablecustomtype');
+        $html->assertCssSelectorTextContains('.plank-container', 'A New Tag');
+
+        $html = $this->bessy()->getHtml('/settings/tagging/?type=unusablecustomtype');
+        // Checks that there is no "Add Tag" button.
+        $html->assertCssSelectorNotExists('.header-block a.btn-primary[href*="add"]');
+
+        // we try to add a new tag anyway (This should fail).
+        $this->bessy()->post(
+            '/settings/tags/add?type=unusablecustomtype',
+            ['FullName' => 'Another New Tag', 'Name' => 'another-new-tag', 'Type' => 'unusablecustomtype'],
+            [TestDispatcher::OPT_THROW_FORM_ERRORS => false]
+        );
+        $this->bessy()->assertFormErrorMessage('That type does not accept manually adding new tags.');
+    }
+
+    /**
+     * Verify retrieving a set of tags on a set of discussions.
+     *
+     * @param bool $doTagFilter Include assertions for the $tagID parameter.
+     * @dataProvider provideGetTagsByDiscussionIDsParams
+     */
+    public function testGetTagsByDiscussionIDs(bool $doTagFilter): void {
+        $primaryTags = array_column($this->insertTags(3), null, "TagID");
+        $secondaryTags = array_column($this->insertTags(2), null, "TagID");
+
+        $expectedDiscussions = $this->insertDiscussions(5);
+        foreach ($expectedDiscussions as $taggedDiscussion) {
+            $this->api()->put(
+                "/discussions/" . $taggedDiscussion["DiscussionID"] . "/tags",
+                [
+                    "urlcodes" => array_column(
+                        $doTagFilter ? array_merge($primaryTags, $secondaryTags) : $primaryTags,
+                        "Name"
+                    )
+                ]
+            );
+        }
+
+        // Make sure we have some naked discussions to verify proper filtering.
+        $this->insertDiscussions(5);
+
+        $actual = $this->tagModel->getTagsByDiscussionIDs(
+            array_column($expectedDiscussions, "DiscussionID"),
+            $doTagFilter ? array_column($primaryTags, "TagID") : []
+        );
+
+        $expectedDiscussionIDs = array_keys($expectedDiscussions);
+        $actualDiscussionIDs = array_keys($actual);
+        $this->assertSame(
+            sort($expectedDiscussionIDs),
+            sort($actualDiscussionIDs)
+        );
+
+        $tagAssertFilter = function ($tag): array {
+            unset($tag["CountDiscussions"]);
+            return $tag;
+        };
+        $expectedTags = array_map($tagAssertFilter, $primaryTags);
+        foreach ($actual as $discussionTags) {
+            $actualTags = array_map($tagAssertFilter, $discussionTags);
+            $this->assertSame($expectedTags, $actualTags);
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function provideGetTagsByDiscussionIDsParams(): array {
+        return [
+            "Filter by discussion and tag" => [true],
+            "Filter by discussion" => [false],
+        ];
+    }
+
+    /**
+     * Verify no discussion IDs means an empty result.
+     */
+    public function testGetTagsByDiscussionIDsNoDiscussions(): void {
+        $actual = $this->tagModel->getTagsByDiscussionIDs([]);
+        $this->assertSame([], $actual);
+    }
+
+    /**
+     * Verify a proper exception is thrown when an invalid discussion ID array is passed to getTagsByDiscussionIDs.
+     */
+    public function testGetTagsByDiscussionIDsInvalidDiscussionIDs(): void {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Invalid discussion ID array specified.");
+        $this->tagModel->getTagsByDiscussionIDs([1, 2, "foo"]);
+    }
+
+    /**
+     * Verify a proper exception is thrown when an invalid tag ID array is passed to getTagsByDiscussionIDs.
+     */
+    public function testGetTagsByDiscussionIDsInvalidTagIDs(): void {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Invalid tag ID array specified.");
+        $this->tagModel->getTagsByDiscussionIDs([1, 2, 3], [4, 5, "foo"]);
     }
 }

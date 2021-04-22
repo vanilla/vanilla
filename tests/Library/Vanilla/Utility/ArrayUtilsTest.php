@@ -173,6 +173,42 @@ class ArrayUtilsTest extends TestCase {
     }
 
     /**
+     * Verify testIsAssociative method.
+     *
+     * @param array|ArrayAccess $array
+     * @param bool $expected
+     * @dataProvider provideSerializesAsNumericArray
+     */
+    public function testSerializesAsNumericArray($array, bool $expected): void {
+        $actual = ArrayUtils::serializesAsNumericArray($array);
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * Provide test data for the isAssociative method.
+     *
+     * @return array
+     */
+    public function provideSerializesAsNumericArray(): array {
+        $result = [
+            "associative" => [["foo" => "bar"], false],
+            "indexed" => [["Hello world."], true],
+            "explicit indexed" => [[0 => "Hello world.", 1 => 'foo'], true],
+            "mixed" => [["foo" => "bar", "Hello world."], false],
+            "empty" => [[], true],
+            "ArrayObject" => [new \ArrayObject(["foo" => "bar"]), false],
+            "string" => ["test", false],
+            "number" => [42, false],
+            "null" => [null, false],
+            "object" => [new \stdClass(), false],
+            "holes" => [[0 => 'foo', 2 => 'bar'], false],
+            'out of order' => [[1 => 'foo', 0 => 'bar'], false],
+        ];
+
+        return $result;
+    }
+
+    /**
      * Verify setByPath method.
      *
      * @param mixed $value
@@ -193,13 +229,19 @@ class ArrayUtilsTest extends TestCase {
      */
     public function provideSetByPathTests(): array {
         $result = [
-            "simple" => [
+            "new leaf" => [
                 "foo.bar.baz",
                 ["foo" => ["bar" => []]],
                 "Hello world.",
                 ["foo" => ["bar" => ["baz" => "Hello world."]]],
             ],
-            "deep" => [
+            "existing leaf" => [
+                "foo.bar.baz",
+                ["foo" => ["bar" => ["baz" => "Hello world."]]],
+                "Hello again!",
+                ["foo" => ["bar" => ["baz" => "Hello again!"]]],
+            ],
+            "new branch" => [
                 "foo.bar.baz",
                 ["foo" => []],
                 "Hello world.",

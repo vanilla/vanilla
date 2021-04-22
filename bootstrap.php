@@ -65,36 +65,12 @@ if (!class_exists('Gdn')) {
 $dic = new Container();
 Gdn::setContainer($dic);
 
-$dic->setInstance(Garden\Container\Container::class, $dic)
-    ->rule(\Psr\Container\ContainerInterface::class)
-    ->setAliasOf(Garden\Container\Container::class)
+\Vanilla\Bootstrap::configureContainer($dic);
 
-    ->rule(\Interop\Container\ContainerInterface::class)
-    ->setClass(\Vanilla\InteropContainer::class)
-    ->setShared(true)
-
-    ->rule(InjectableInterface::class)
-    ->addCall('setDependencies')
-
-    ->rule(DateTimeInterface::class)
-    ->setAliasOf(DateTimeImmutable::class)
-    ->setConstructorArgs([null, null])
-
-    ->rule(DateTimeFormatter::class)
-    ->setShared(true)
-
-    // Cache
-    ->rule('Gdn_Cache')
-    ->setShared(true)
-    ->setFactory(['Gdn_Cache', 'initialize'])
-    ->addAlias('Cache')
-
-    ->rule(\Psr\SimpleCache\CacheInterface::class)
-    ->setShared(true)
-    ->setClass(\Vanilla\Cache\CacheCacheAdapter::class)
+$dic->setInstance(Container::class, $dic)
 
     // Configuration
-    ->rule(Gdn_Configuration::class)
+    ->rule('Gdn_Configuration')
     ->setShared(true)
     ->addAlias('Config')
     ->addAlias(Contracts\ConfigurationInterface::class)
@@ -745,7 +721,7 @@ register_shutdown_function(function () use ($dic) {
         \Psr\Log\LoggerInterface $log,
         \Vanilla\Utility\Timers $timers
     ) {
-        // Trigger SchedulerDispatch event
+    // Trigger SchedulerDispatch event
         $eventManager->fire('SchedulerDispatch');
 
         // Logs timers

@@ -124,7 +124,7 @@ export function getActiveRecord(navTreeItems: INavigationTreeItem[]): IPanelNavI
     let currentItemID: string | null = null;
 
     for (const item of navTreeItems) {
-        if (window.location.href.includes(item.url.replace("~", ""))) {
+        if (window.location.href.includes(item && item.url ? item.url.replace("~", "") : "")) {
             currentItemID = `${item.recordID}`;
         }
     }

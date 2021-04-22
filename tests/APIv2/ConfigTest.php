@@ -130,4 +130,18 @@ class ConfigTest extends AbstractAPIv2Test {
             }
         }
     }
+
+    /**
+     * Test that properties are mapped correctly when writing.
+     */
+    public function testPatchCorrectName() {
+        $this->assertConfigValue('Feature.useNewSearchPage.Enabled', null);
+
+        $this->api->patch('/config', [
+            'labs.newSearchPage' => true,
+        ]);
+
+        $this->assertConfigValue('Feature.useNewSearchPage.Enabled', true);
+        $this->assertConfigValue('labs.newSearchPage', null);
+    }
 }

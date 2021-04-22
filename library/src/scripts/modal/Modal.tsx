@@ -87,6 +87,7 @@ export default class Modal extends React.Component<IProps, IState> {
             <>
                 <ModalView
                     id={this.props.id}
+                    className={this.props.className}
                     onDestroyed={this.handleDestroyed}
                     scrollable={this.props.scrollable}
                     onKeyDown={this.handleTabbing}

@@ -10,6 +10,6 @@ namespace Vanilla\Analytics;
  * Action constants for analytics operations.
  */
 class ActionConstants {
-    public const GET_CONFIG = "@@analytics/GET_CONFIG";
-    public const GET_EVENT_DEFAULTS = "@@analytics/GET_EVENT_DEFAULTS";
+    public const GET_CONFIG = "@@vanillaanalytics/GET_CONFIG";
+    public const GET_EVENT_DEFAULTS = "@@vanillaanalytics/GET_EVENT_DEFAULTS";
 }

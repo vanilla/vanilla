@@ -10,11 +10,13 @@ import { INITIAL_USERS_STATE } from "@library/features/users/userModel";
 import getStore, { resetActionAC } from "@library/redux/getStore";
 import { INITIAL_LOCALE_STATE } from "@library/locales/localeReducer";
 import { INITIAL_THEME_STATE } from "@library/theming/themeReducer";
+import { INITIAL_CONFIG_STATE } from "@library/config/configReducer";
 
 const DEFAULT_STATE: ICoreStoreState = {
     users: INITIAL_USERS_STATE,
     theme: INITIAL_THEME_STATE,
     locales: INITIAL_LOCALE_STATE,
+    config: INITIAL_CONFIG_STATE,
 };
 
 export function testStoreState(state: DeepPartial<ICoreStoreState>) {

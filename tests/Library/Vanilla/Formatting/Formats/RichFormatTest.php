@@ -35,4 +35,14 @@ class RichFormatTest extends AbstractFormatTestCase {
     protected function prepareFixtures(): array {
         return (new FormatFixtureFactory('rich'))->getAllFixtures();
     }
+
+    /**
+     * Test parseImageUrls excludes emojis.
+     */
+    public function testParseImageUrlsExcludeEmojis() {
+        $formatService = $this->prepareFormatter();
+        $content = '[{"insert":{"emoji":{"emojiChar":"😀"}}},{"insert":"\n"}]';
+        $result = $formatService->parseImageUrls($content);
+        $this->assertEquals([], $result);
+    }
 }

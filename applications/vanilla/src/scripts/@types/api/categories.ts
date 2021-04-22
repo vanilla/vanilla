@@ -9,6 +9,7 @@ export interface ICategoryFragment {
     categoryID: number;
     name: string;
     url: string;
+    allowedDiscussionTypes?: string[];
 }
 
 export interface ICategory extends ICategoryFragment {

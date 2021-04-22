@@ -118,3 +118,31 @@ export function TabBrowseLarge() {
         />
     );
 }
+
+export function TabGroup(tabProps?: Partial<React.ComponentProps<typeof Tabs>>) {
+    return (
+        <>
+            <StoryContent>
+                <StoryHeading>Group Tab Styles</StoryHeading>
+            </StoryContent>
+            <Tabs
+                {...tabProps}
+                tabType={TabsTypes.GROUP}
+                data={[
+                    {
+                        label: "Tab 1",
+                        contents: <StoryTextContent firstTitle={"Hello Tab 1"} />,
+                    },
+                    {
+                        label: "Tab 2",
+                        contents: <StoryTextContent firstTitle={"Hello Tab 2"} />,
+                    },
+                    {
+                        label: "Tab 3",
+                        contents: <StoryTextContent firstTitle={"Hello Tab 3"} />,
+                    },
+                ]}
+            />
+        </>
+    );
+}

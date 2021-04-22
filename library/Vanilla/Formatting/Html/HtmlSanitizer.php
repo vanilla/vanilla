@@ -94,7 +94,7 @@ class HtmlSanitizer {
         }
         return preg_replace_callback('`<code([^>]*)>(.+?)<\/code>`si', function ($matches) {
             $result = "<code{$matches[1]}>" .
-                htmlspecialchars($matches[2]) .
+                htmlspecialchars(htmlspecialchars_decode($matches[2])) .
                 '</code>';
             return $result;
         }, $value);

@@ -148,4 +148,55 @@ class NotificationsApiTest extends AbstractAPIv2Test {
         $this->assertEquals($id, $updatedNotification["notificationID"]);
         $this->assertEquals(true, $updatedNotification["read"]);
     }
+
+    /**
+     * Test get notification response and return the body.
+     *
+     * @param int $id
+     * @return array
+     */
+    private function getNotification(int $id) {
+        $getResponse = $this->api()->get("/notifications/{$id}");
+        $this->assertEquals(200, $getResponse->getStatusCode());
+        return $getResponse->getBody();
+    }
+
+    /**
+     * Test PUT /notifications/<id>.
+     */
+    public function testPutRead() {
+        $id = $this->addNotification();
+
+        // Verify the new notification is unread.
+        $notification = $this->getNotification($id);
+        $this->assertEquals($id, $notification["notificationID"]);
+        $this->assertFalse($notification["read"]);
+
+        // Flag the notification as read.
+        $patchReadResponse = $this->api()->put("/notifications/{$id}/read");
+        $this->assertEquals(200, $patchReadResponse->getStatusCode());
+        $this->assertTrue($patchReadResponse['read']);
+        $notification = $this->getNotification($id);
+        $this->assertTrue($notification["read"]);
+    }
+
+    /**
+     * Test readUrl on unread notification.
+     */
+    public function testReadUrl() {
+        $id = $this->addNotification();
+        // Get the notification
+        $getResponse = $this->api()->get("/notifications/{$id}");
+        $notification = $getResponse->getBody();
+        $this->assertEquals($id, $notification["notificationID"]);
+        $this->assertEquals(false, $notification["read"]);
+        $this->assertEquals(ActivityModel::getReadUrl($id), $notification["readUrl"]);
+        // Flag the notification as read.
+        $patchReadResponse = $this->api()->put("/notifications/{$id}/read");
+        $this->assertEquals(200, $patchReadResponse->getStatusCode());
+        $this->assertTrue($patchReadResponse['read']);
+        $this->assertArrayNotHasKey('readUrl', $patchReadResponse);
+        $notification = $this->getNotification($id);
+        $this->assertArrayNotHasKey('readUrl', $notification);
+    }
 }

@@ -9,7 +9,7 @@ import React, { useState } from "react";
 import { WidgetFormGenerator } from "./WidgetFormGenerator";
 import keyBy from "lodash/keyBy";
 import mapValues from "lodash/mapValues";
-import { IJsonSchema } from "@dashboard/widgets/JsonSchemaTypes";
+import { JsonSchema } from "@vanilla/json-schema-forms";
 
 export default {
     title: "Dashboard/Widgets",
@@ -82,7 +82,7 @@ const mockGroups = [
     },
 ];
 
-const widgetSchema: IJsonSchema = {
+const widgetSchema: JsonSchema = {
     type: "object",
     properties: {
         name: {
@@ -126,7 +126,7 @@ const widgetSchema: IJsonSchema = {
                             labelKey: "name",
                         },
                     },
-                    conditions: [{ fieldName: "recordType", values: ["group"] }],
+                    conditions: [{ ref: "/recordType", type: "string", const: "group" }],
                 },
                 {
                     inputType: "dropDown",
@@ -140,7 +140,7 @@ const widgetSchema: IJsonSchema = {
                             labelKey: "name",
                         },
                     },
-                    conditions: [{ fieldName: "recordType", values: ["category"] }],
+                    conditions: [{ ref: "/recordType", type: "string", const: "category" }],
                 },
             ],
         },

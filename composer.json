@@ -51,7 +51,7 @@
         "psr/log": "~1.0",
         "ralouphie/mimey": "^2.1",
         "ramsey/uuid": "^3.0",
-        "smarty/smarty": "3.1.36p1",
+        "smarty/smarty": "3.1.39p1",
         "symfony/polyfill-intl-idn": "^1.12",
         "symfony/yaml": "^3.2",
         "tburry/pquery": "~1.1",
@@ -98,7 +98,8 @@
         "johnkary/phpunit-speedtrap": "^3.2",
         "vimeo/psalm": "^3.13",
         "cache/integration-tests": "dev-master",
-        "symfony/phpunit-bridge": "^5.1"
+        "symfony/phpunit-bridge": "^5.1",
+        "symfony/cache": "^4.4"
     },
     "provide": {
         "ext-gd": "*"

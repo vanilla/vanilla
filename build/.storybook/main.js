@@ -11,6 +11,7 @@ const VANILLA_ROOT = path.resolve(__dirname, "../../");
 const sectionEnv = process.env.STORYBOOK_SECTION;
 const hasModern = !sectionEnv || sectionEnv === "modern";
 const hasFoundation = !sectionEnv || sectionEnv === "foundation";
+const hasUI = !sectionEnv || sectionEnv === "ui";
 
 const globs = [];
 
@@ -34,6 +35,9 @@ if (hasModern) {
 }
 if (hasFoundation) {
     globs.push(path.resolve(__dirname, "../entries/generatedStories.story.tsx"));
+}
+if (hasUI) {
+    globs.push(path.resolve(VANILLA_ROOT, "packages/vanilla-ui/src/**/*.story.@(ts|js|jsx|tsx|mdx)"));
 }
 
 module.exports = {

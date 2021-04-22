@@ -41,7 +41,6 @@ export function FormToggle(props: IProps) {
         ...IDs
     } = props;
     const [isFocused, setIsFocused] = useState(false);
-    const [isHovered, setIsHovered] = useState(false);
 
     if (IDs.labelID == null && accessibleLabel == null && visibleLabel == null) {
         throw new Error("Either a labelID or accessibleLabel must be passed to <FormToggle />");
@@ -57,28 +56,17 @@ export function FormToggle(props: IProps) {
 
     const well = (
         <WellContainer
-            onClick={(e) => {
-                if (disabled !== undefined && !disabled) {
-                    e.stopPropagation();
-                    e.preventDefault();
-                }
-            }}
-            tabIndex={0}
-            className={classNames(
-                props.className,
-                classes.root,
-                enabled && "isOn",
-                indeterminate && "isIndeterminate",
+            className={classNames(props.className, classes.root, {
+                isOn: enabled,
+                isIndeterminate: indeterminate,
                 isFocused,
-                isHovered,
-                {
-                    isDisabled: disabled,
-                },
-            )}
+                isDisabled: disabled,
+            })}
         >
             <ScreenReaderContent>
                 {!visibleLabel && accessibleLabel && <span id={labelID}>{accessibleLabel}</span>}
                 <input
+                    className="exclude-icheck"
                     onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}
                     disabled={disabled}

@@ -5,6 +5,7 @@
 
 export * from "./createContextProvider";
 export * from "./Hoverable";
+export * from "./mergeRefs";
 export * from "./mounting";
 export * from "./useAsync";
 export * from "./useAsyncFn";

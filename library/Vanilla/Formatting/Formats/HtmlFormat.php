@@ -176,7 +176,7 @@ class HtmlFormat extends BaseFormat implements InjectableInterface {
      * @inheritdoc
      */
     public function parseImageUrls(string $content): array {
-        $rendered = $this->renderHtml($content);
+        $rendered = $this->renderHtml($content, false);
         $document = new HtmlDocument($rendered);
         return $this->imageHtmlProcessor->getImageURLs($document);
     }
@@ -185,7 +185,7 @@ class HtmlFormat extends BaseFormat implements InjectableInterface {
      * @inheritdoc
      */
     public function parseImages(string $content): array {
-        $rendered = $this->renderHtml($content);
+        $rendered = $this->renderHtml($content, false);
         $document = new HtmlDocument($rendered);
         return $this->imageHtmlProcessor->getImages($document);
     }

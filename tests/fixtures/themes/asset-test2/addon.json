@@ -1,0 +1,36 @@
+{
+    "key": "asset-test2",
+    "name": "Asset Test Theme2",
+    "type": "theme",
+    "parent": "asset-test",
+    "assets": {
+        "fonts": {
+            "type": "json",
+            "file": "fonts.json"
+        },
+        "footer": {
+            "type": "html",
+            "file": "footer.html"
+        },
+        "header": {
+            "type": "html",
+            "file": "header.html"
+        },
+        "javascript": {
+            "type": "js",
+            "file": "javascript.js"
+        },
+        "scripts": {
+            "type": "json",
+            "file": "scripts.json"
+        },
+        "styles": {
+            "type": "css",
+            "file": "styles.css"
+        },
+        "variables": {
+            "type": "json",
+            "file": "variables.json"
+        }
+    }
+}

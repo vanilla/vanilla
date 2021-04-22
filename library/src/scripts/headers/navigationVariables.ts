@@ -10,6 +10,7 @@ import { ITitleBarNav } from "./mebox/pieces/TitleBarNavItem";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { getThemeVariables } from "@library/theming/getThemeVariables";
 import { uuidv4 } from "@vanilla/utils";
+import { DeepPartial } from "redux";
 
 export interface INavigationVariableItem {
     id: string;
@@ -32,9 +33,11 @@ export function registerDefaultNavItem(navItemGetter: INavItemGenerator) {
 export const navigationVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeVars = variableFactory("navigation", forcedVars);
 
-    const navigationItems: INavigationVariableItem[] = makeVars("navigationItems", getDefaultNavItems());
+    let navigationItems: INavigationVariableItem[] = makeVars("navigationItems", getDefaultNavItems());
+    navigationItems = navigationItems.filter(filterBadNavLinks);
 
-    const mobileOnlyNavigationItems: INavigationVariableItem[] = makeVars("mobileOnlyNavigationItems", []);
+    let mobileOnlyNavigationItems: INavigationVariableItem[] = makeVars("mobileOnlyNavigationItems", []);
+    mobileOnlyNavigationItems = mobileOnlyNavigationItems.filter(getDefaultNavItems);
 
     const logo = makeVars("logo", {
         url: "/",
@@ -42,6 +45,14 @@ export const navigationVariables = useThemeCache((forcedVars?: IThemeVariables) 
 
     return { navigationItems, mobileOnlyNavigationItems, logo };
 });
+
+function filterBadNavLinks(link: DeepPartial<INavigationVariableItem>): boolean {
+    if (!link.name || !link.url) {
+        return false;
+    }
+
+    return true;
+}
 
 function getDefaultNavItems() {
     // Existing custom nav links.

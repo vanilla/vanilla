@@ -23,6 +23,7 @@ interface IDiscussionState {
 
     fullRecordStatusesByID: Record<number, ILoadable>;
     bookmarkStatusesByID: Record<number, ILoadable>;
+    changeTypeByID: Record<number, ILoadable>;
     patchStatusByPatchID: Record<string, ILoadable>;
     deleteStatusesByID: Record<number, ILoadable>;
 }
@@ -35,6 +36,7 @@ export const INITIAL_DISCUSSIONS_STATE: IDiscussionState = {
     bookmarkStatusesByID: {},
     patchStatusByPatchID: {},
     deleteStatusesByID: {},
+    changeTypeByID: {},
 };
 
 /**
@@ -77,6 +79,30 @@ export const discussionsReducer = produce(
             state.discussionsByID[discussionID] = {
                 ...state.discussionsByID[discussionID],
                 bookmarked: payload.result.bookmarked,
+            };
+            return state;
+        })
+        .case(DiscussionActions.putDiscussionTypeACs.started, (state, params) => {
+            const { discussionID } = params;
+            state.changeTypeByID[discussionID] = { status: LoadStatus.LOADING };
+            return state;
+        })
+        .case(DiscussionActions.putDiscussionTypeACs.done, (state, payload) => {
+            const { discussionID } = payload.params;
+            state.changeTypeByID[discussionID] = {
+                status: LoadStatus.SUCCESS,
+            };
+            state.discussionsByID[discussionID] = {
+                ...state.discussionsByID[discussionID],
+                ...payload.result,
+            };
+            return state;
+        })
+        .case(DiscussionActions.putDiscussionTypeACs.failed, (state, payload) => {
+            const { discussionID } = payload.params;
+            state.changeTypeByID[discussionID] = {
+                status: LoadStatus.ERROR,
+                error: payload.error,
             };
             return state;
         })

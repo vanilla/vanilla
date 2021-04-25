@@ -69,9 +69,10 @@ class MessagesController extends ConversationsController {
             $this->setData('MaxRecipients', $maxRecipients);
         }
 
+        $recipientUserIDs = explode(',', $this->Form->getFormValue('To', ''));
+
         // Sending a new conversation.
         if ($this->Form->authenticatedPostBack()) {
-            $recipientUserIDs = explode(',', $this->Form->getFormValue('To', ''));
             // Enforce MaxRecipients
             if (!$this->ConversationModel->addUserAllowed(0, count($recipientUserIDs))) {
                 // Reuse the Info message now as an error.

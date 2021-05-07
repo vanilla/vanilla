@@ -655,7 +655,7 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface {
                         $sender->Form->addError('@'.t('ValidateTag', 'Tags cannot contain commas or underscores.'));
                     }
 
-                    $tagType = $sender->Form->getFormValue('Type');
+                    $tagType = $tagType ?? $sender->Form->getFormValue('Type') ?? '';
                     if (!$tagModel->canAddTagForType($tagType)) {
                         $sender->Form->addError('@'.t('ValidateTagType', 'That type does not accept manually adding new tags.'));
                     }

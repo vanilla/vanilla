@@ -41,6 +41,10 @@ if (hasUI) {
 }
 
 module.exports = {
+    core: {
+        // Needed until storybook 6.3 w/ webpack5 as the default.
+        builder: "webpack5",
+    },
     stories: globs,
     addons: [
         {
@@ -56,5 +60,5 @@ module.exports = {
     typescript: {
         check: false,
         reactDocgen: "none",
-    }
+    },
 };

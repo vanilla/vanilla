@@ -87,3 +87,30 @@ export function ManyItems() {
         />
     );
 }
+
+export function ItemsWithoutChildren() {
+    return (
+        <TitleBarMegaMenu
+            expanded={makeNavItem("Top Item", [
+                makeNavItem("Item without children 1"),
+                makeNavItem("Item without children 2"),
+                makeNavItem("Item without children 3"),
+                makeNavItem("Item without children 4"),
+            ])}
+        />
+    );
+}
+
+export function ItemsWithAndWithoutChildren() {
+    return (
+        <TitleBarMegaMenu
+            expanded={makeNavItem("Top Item", [
+                makeNavItem("Item with children 1", [makeNavItem("Child"), makeNavItem("Child")]),
+                makeNavItem("Item without children 1"),
+                makeNavItem("Item without children 2"),
+                makeNavItem("Item with children 2", [makeNavItem("Child"), makeNavItem("Child")]),
+                makeNavItem("Item without children 3"),
+            ])}
+        />
+    );
+}

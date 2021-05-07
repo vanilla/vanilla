@@ -112,7 +112,7 @@ export class Flyout extends React.Component<IProps, IState> {
                     {screenReaderDescription}
 
                     <CloseButton
-                        baseClass={ButtonTypes.ICON}
+                        buttonType={ButtonTypes.ICON}
                         onClick={this.props.onCloseClick}
                         className={classNames("richEditor-close", classesRichEditor.close)}
                     />

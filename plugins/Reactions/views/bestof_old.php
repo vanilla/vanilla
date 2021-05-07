@@ -15,18 +15,18 @@ function reactionFilterButton($name, $code, $currentReactionType) {
    $cssClass = '';
    if ($currentReactionType == $lCode)
       $cssClass .= ' Selected';
-   
+
    $result = <<<EOT
 <div class="CountItemWrap">
 <div class="CountItem$cssClass">
    <a href="$url">
-      <span class="CountTotal"><img src="$imgSrc" /></span>
+      <span class="CountTotal"><img src="$imgSrc" loading="lazy" /></span>
       <span class="CountLabel">$name</span>
    </a>
 </div>
 </div>
 EOT;
-   
+
    return $result;
 }
 

@@ -9,8 +9,7 @@ import { makeTestConfig } from "./configs/makeTestConfig";
 import { VANILLA_ROOT, TEST_FILE_ROOTS, PACKAGES_TEST_ENTRY } from "./env";
 import { IBuildOptions, BuildMode } from "./buildOptions";
 import EntryModel from "./utility/EntryModel";
-// tslint:disable-next-line
-const Karma = require("karma");
+import Karma from "karma";
 
 const TS_PROCESSORS = ["webpack", "sourcemap"];
 
@@ -57,7 +56,7 @@ export class KarmaRunner {
             files: this.files,
             // base path, that will be used to resolve files and exclude
             basePath: VANILLA_ROOT,
-            frameworks: ["mocha", "chai", "viewport"],
+            frameworks: ["mocha", "chai", "viewport", "webpack"],
             reporters: ["mocha"],
             // reporter options
             mochaReporter: {

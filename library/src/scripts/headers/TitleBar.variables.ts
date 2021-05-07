@@ -15,7 +15,7 @@ import { useThemeCache } from "@library/styles/themeCache";
 import { color, px, rgba, viewHeight } from "csx";
 import { media, TLength } from "@library/styles/styleShim";
 import { CSSObject } from "@emotion/css";
-import { IButtonType } from "@library/forms/styleHelperButtonInterface";
+import { IButton } from "@library/forms/styleHelperButtonInterface";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { LogoAlignment } from "./LogoAlignment";
 import { Property } from "csstype";
@@ -329,7 +329,7 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
         state: ColorsUtils.offsetLightness(colors.bg, 0.04),
     });
 
-    const linkButtonDefaults: IButtonType = {
+    const linkButtonDefaults = Variables.button({
         name: ButtonTypes.TITLEBAR_LINK,
         colors: {
             bg: rgba(0, 0, 0, 0),
@@ -369,8 +369,9 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
                 bg: generatedColors.state,
             },
         },
-    };
-    const linkButton: IButtonType = makeThemeVars("linkButton", linkButtonDefaults);
+    });
+
+    const linkButton = makeThemeVars("linkButton", linkButtonDefaults);
 
     const count = makeThemeVars("count", {
         size: 18,

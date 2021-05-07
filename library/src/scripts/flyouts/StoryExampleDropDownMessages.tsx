@@ -322,7 +322,7 @@ export default class StoryExampleMessagesDropDown extends React.Component<IProps
                             <LinkAsButton
                                 title={t("New Message")}
                                 to={"#"}
-                                baseClass={ButtonTypes.ICON}
+                                buttonType={ButtonTypes.ICON}
                                 className={classNames(buttonUtils.pushRight)}
                             >
                                 <ComposeIcon />
@@ -344,7 +344,7 @@ export default class StoryExampleMessagesDropDown extends React.Component<IProps
                             <LinkAsButton
                                 className={classNames(buttonUtils.pushLeft)}
                                 to={"/messages/inbox"}
-                                baseClass={ButtonTypes.TEXT_PRIMARY}
+                                buttonType={ButtonTypes.TEXT_PRIMARY}
                             >
                                 {t("All Messages")}
                             </LinkAsButton>

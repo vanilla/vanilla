@@ -77,7 +77,7 @@ if ($Session->isValid()):
 
     if ($useNewFlyouts) {
         $imgUrl = userPhotoUrl($User);
-        $triggerIcon = "<img class='ProfilePhoto ProfilePhotoSmall' src='$imgUrl'/>";
+        $triggerIcon = "<img class='ProfilePhoto ProfilePhotoSmall' src='$imgUrl' loading='lazy'/>";
     } else {
         $triggerIcon = sprite('SpOptions', 'Sprite Sprite16', $triggerTitle);
     }

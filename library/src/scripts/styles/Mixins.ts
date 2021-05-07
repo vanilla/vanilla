@@ -37,6 +37,8 @@ import { notEmpty } from "@vanilla/utils";
 import { activeSelector } from "@library/styles/styleUtils";
 import { negativeUnit } from "@library/styles/styleUnit";
 import { internalAbsoluteMixins } from "@library/styles/MixinsAbsolute";
+import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
+import { IButton } from "@library/forms/styleHelperButtonInterface";
 
 export class Mixins {
     constructor() {
@@ -44,6 +46,12 @@ export class Mixins {
     }
 
     public static absolute = internalAbsoluteMixins;
+
+    public static button = (buttonTypeVars: IButton): CSSObject => {
+        return generateButtonStyleProperties({
+            buttonTypeVars,
+        });
+    };
 
     public static box = (
         boxOptions: IBoxOptions,

@@ -67,7 +67,6 @@ class LocalesApiController extends Controller {
      */
     private function getEnabledLocales(): array {
         $locales = $this->localeModel->enabledLocalePacks(true);
-
         $hasEnLocale = false;
         $result = [];
         foreach ($locales as $localeID => $locale) {
@@ -115,6 +114,13 @@ class LocalesApiController extends Controller {
                 $displayName = (empty($displayNameRegion)) ? $displayName : $displayName . " ($displayNameRegion)";
                 // Standardize capitalization
                 $displayName = mb_convert_case($displayName, MB_CASE_TITLE);
+
+                // If I set the translation key
+                // localeOverrides.zh.* = Override in all other langauges
+                // localeOverrides.zh.zh_TW = Override in one specific language.
+                $wildCardOverrideKey = "localeOverrides.{$row["localeKey"]}.*";
+                $specificOverrideKey = "localeOverrides.{$row["localeKey"]}.$locale";
+                $displayName = c($specificOverrideKey, c($wildCardOverrideKey, $displayName));
 
                 $displayNames[$locale] = $displayName;
             }

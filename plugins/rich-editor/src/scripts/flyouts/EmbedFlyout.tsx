@@ -12,7 +12,7 @@ import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";
 import FrameFooter from "@library/layout/frame/FrameFooter";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
-import { t } from "@library/utility/appUtils";
+import { t, isURL } from "@library/utility/appUtils";
 import { useUniqueID } from "@library/utility/idUtils";
 import { useEditor } from "@rich-editor/editor/context";
 import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap";
@@ -27,7 +27,6 @@ import debounce from "lodash/debounce";
 import KeyboardModule from "quill/modules/keyboard";
 import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { style } from "@library/styles/styleShim";
-import { isURL } from "validator";
 
 interface IProps {
     disabled?: boolean;
@@ -189,7 +188,7 @@ export default function EmbedFlyout(props: IProps) {
                         <IconForButtonWrap icon={<EmbedIcon />} />
                     </>
                 }
-                buttonBaseClass={ButtonTypes.CUSTOM}
+                buttonType={ButtonTypes.CUSTOM}
                 renderAbove={!!props.renderAbove}
                 renderLeft={!!props.renderLeft}
                 initialFocusElement={inputRef.current}
@@ -229,7 +228,7 @@ export default function EmbedFlyout(props: IProps) {
                         <FrameFooter>
                             <Button
                                 className={classNames("insertMedia-insert", classesInsertMedia.button)}
-                                baseClass={ButtonTypes.TEXT_PRIMARY}
+                                buttonType={ButtonTypes.TEXT_PRIMARY}
                                 disabled={!isInputValid}
                                 onClick={buttonClickHandler}
                             >

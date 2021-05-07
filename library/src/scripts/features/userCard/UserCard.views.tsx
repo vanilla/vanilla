@@ -4,7 +4,6 @@
  */
 
 import { IUser, IUserFragment } from "@library/@types/api/users";
-import DateTime from "@library/content/DateTime";
 import NumberFormatted from "@library/content/NumberFormatted";
 import Permission, { PermissionMode } from "@library/features/users/Permission";
 import { userCardClasses } from "@library/features/userCard/UserCard.styles";
@@ -20,6 +19,7 @@ import { getMeta, makeProfileUrl, t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React from "react";
 import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
+import DateTime from "@library/content/DateTime";
 
 interface IProps {
     user: IUser;
@@ -40,7 +40,7 @@ export function UserCardView(props: IProps) {
         <>
             <div className={classes.header}>
                 {isCompact && (
-                    <Button className={classes.close} onClick={props.onClose} baseClass={ButtonTypes.ICON}>
+                    <Button className={classes.close} onClick={props.onClose} buttonType={ButtonTypes.ICON}>
                         <>
                             <CloseCompactIcon />
                             <ScreenReaderContent>{t("Close")}</ScreenReaderContent>
@@ -126,7 +126,7 @@ export function UserCardSkeleton(props: ISkeletonProps) {
         <>
             <div className={classes.header}>
                 {isCompact && (
-                    <Button className={classes.close} onClick={props.onClose} baseClass={ButtonTypes.ICON}>
+                    <Button className={classes.close} onClick={props.onClose} buttonType={ButtonTypes.ICON}>
                         <>
                             <CloseCompactIcon />
                             <ScreenReaderContent>{t("Close")}</ScreenReaderContent>
@@ -199,7 +199,7 @@ function CardButton(props: { disabled?: boolean; to?: string; children?: React.R
             <LinkAsButton
                 disabled={props.disabled}
                 to={props.to}
-                baseClass={ButtonTypes.STANDARD}
+                buttonType={ButtonTypes.STANDARD}
                 className={classes.button}
             >
                 {props.children}

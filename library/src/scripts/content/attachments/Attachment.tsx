@@ -11,7 +11,6 @@ import { AttachmentType } from "@library/content/attachments/AttatchmentType";
 import { attachmentClasses } from "@library/content/attachments/attachmentStyles";
 import { metasClasses } from "@library/metas/Metas.styles";
 import Translate from "@library/content/Translate";
-import DateTime from "@library/content/DateTime";
 import { attachmentIconClasses } from "@library/content/attachments/attachmentIconsStyles";
 import classNames from "classnames";
 import SmartLink from "@library/routing/links/SmartLink";
@@ -19,6 +18,7 @@ import { EmbedContainer } from "@library/embeddedContent/components/EmbedContain
 import { EmbedContainerSize } from "@library/embeddedContent/components/EmbedContainerSize";
 import { EmbedContent } from "@library/embeddedContent/components/EmbedContent";
 import { useEmbedContext } from "@library/embeddedContent/IEmbedContext";
+import DateTime from "@library/content/DateTime";
 
 export interface IFileAttachment {
     name: string; // File name

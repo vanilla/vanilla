@@ -11,7 +11,6 @@ import { t } from "@library/utility/appUtils";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { useDomNodeAttachment, useMeasure } from "@vanilla/react-utils";
 import classNames from "classnames";
-import { nextTick } from "q";
 import React, { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { animated, useSpring } from "react-spring";
 import ReactDOM from "react-dom";
@@ -65,9 +64,9 @@ export function CollapsableContent(props: IProps) {
     const measurements = useMeasure(ref);
 
     useLayoutEffect(() => {
-        nextTick(() => {
+        setTimeout(() => {
             scrollRef.current!.scrollTo({ top: 0 });
-        });
+        }, 0);
     });
 
     const toggleCollapse = () => {
@@ -140,7 +139,7 @@ export function CollapsableContent(props: IProps) {
                         id={toggleID}
                         title={title}
                         className={classes.collapser}
-                        baseClass={ButtonTypes.CUSTOM}
+                        buttonType={ButtonTypes.CUSTOM}
                         onClick={toggleCollapse}
                         controls={contentID}
                     >

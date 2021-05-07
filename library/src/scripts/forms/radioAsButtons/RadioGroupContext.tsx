@@ -11,12 +11,12 @@ import { IRadioInputAsButtonClasses } from "@library/forms/radioAsButtons/RadioI
 import { RecordID } from "@vanilla/utils";
 
 export interface IRadioGroupProps {
-    setData: (data: any) => void;
+    setData?: (data: any) => void;
     groupID?: string;
     activeItem?: RecordID;
     buttonActiveClass?: string;
     buttonClass?: string;
-    classes: IRadioInputAsButtonClasses;
+    classes?: IRadioInputAsButtonClasses;
 }
 
 const RadioGroupContext = React.createContext<IRadioGroupProps>({} as any);

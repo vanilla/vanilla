@@ -9,9 +9,7 @@ import { trimTrailingCommas } from "@dashboard/compatibilityStyles/trimTrailingC
 import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { buttonUtilityClasses } from "@library/forms/buttonStyles";
 import { buttonGlobalVariables, buttonVariables } from "@library/forms/Button.variables";
-import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
 import { absolutePosition, importantUnit } from "@library/styles/styleHelpers";
-import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
 import { Mixins } from "@library/styles/Mixins";
 import { globalVariables } from "@library/styles/globalStyleVars";
@@ -206,9 +204,9 @@ export const mixinButton = (selector: string, buttonType: ButtonTypes = ButtonTy
     selector = trimTrailingCommas(selector);
 
     if (buttonType === ButtonTypes.PRIMARY) {
-        cssOut(selector, generateButtonStyleProperties({ buttonTypeVars: vars.primary }));
+        injectGlobal({ [selector]: Mixins.button(vars.primary) });
     } else if (buttonType === ButtonTypes.STANDARD) {
-        cssOut(selector, generateButtonStyleProperties({ buttonTypeVars: vars.standard }));
+        injectGlobal({ [selector]: Mixins.button(vars.standard) });
     } else if (buttonType === ButtonTypes.ICON_COMPACT) {
         cssOut(selector, buttonUtilityClasses().iconMixin(buttonGlobalVariables().sizing.compactHeight));
     } else {

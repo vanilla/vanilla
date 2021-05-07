@@ -78,6 +78,7 @@ module.exports = {
 
         // A11Y
         "jsx-a11y/html-has-lang": "off", // https://github.com/evcohen/eslint-plugin-jsx-a11y/issues/565
+        "react/jsx-no-target-blank": "off", // Our <SmartLink /> handles this. Detection is janky.
 
         // I want to be able to turn these on the future.
         // but they each have a lot of files to fix and should be their own PR.

@@ -6,7 +6,6 @@
 import { isInstanceOfOneOf } from "./typeUtils";
 
 it("isInstanceOfOneOf", () => {
-    /* tslint:disable:max-classes-per-file */
     class Thing1 {}
     class Thing2 {}
     class Thing3 {}

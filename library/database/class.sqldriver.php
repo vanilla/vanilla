@@ -1784,7 +1784,9 @@ abstract class Gdn_SQLDriver {
      * @throws Exception Throws an exception if the query has an error.
      */
     public function query($sql, $type = 'select') {
-        $queryOptions = ['Type' => $type, 'Slave' => val('Slave', $this->_Options, null)];
+        $queryOptions = $this->_Options;
+        $queryOptions['Type'] = $type;
+        $queryOptions['Slave'] = val('Slave', $queryOptions, null);
 
         switch ($type) {
             case 'insert':

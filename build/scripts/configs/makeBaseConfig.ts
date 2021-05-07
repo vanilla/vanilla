@@ -15,6 +15,7 @@ import { VANILLA_ROOT } from "../env";
 import EntryModel from "../utility/EntryModel";
 import { printVerbose } from "../utility/utils";
 const CircularDependencyPlugin = require("circular-dependency-plugin");
+import globby from "globby";
 
 /**
  * Create the core webpack config.
@@ -45,18 +46,33 @@ ${chalk.green(aliases)}`;
         babelPlugins.push([require.resolve("react-refresh/babel"), { skipEnvCheck: true }]);
     }
 
-    // Leaving this out until we get the docs actually generating. Huge slowdown.
-    // const storybookLoaders = section === "storybook" ? [require.resolve("react-docgen-typescript-loader")] : [];
-    const storybookLoaders: never[] = [];
-
     const config: any = {
         context: VANILLA_ROOT,
+        // Currently have some memory issues from this.
+        // cache: {
+        //     type: "filesystem",
+        //     buildDependencies: {
+        //         config: [...globby.sync(path.resolve(__dirname, "*")), path.resolve(VANILLA_ROOT, "yarn.lock")],
+        //     },
+        //     name: `${section}-${options.mode}`,
+        // },
         module: {
             rules: [
                 {
                     test: /\.(jsx?|tsx?)$/,
                     exclude: (modulePath: string) => {
-                        const modulesRequiringTranspilation = ["quill", "p-debounce", "@vanilla/.*"];
+                        const modulesRequiringTranspilation = [
+                            "quill",
+                            "p-debounce",
+                            "@vanilla/.*",
+                            "@monaco-editor/react.*",
+                            "ajv.*",
+                            "d3-.*",
+                            "@reduxjs/toolkit.*",
+                            "@?react-spring.*",
+                            "delaunator.*",
+                            "buffer",
+                        ];
                         const exclusionRegex = new RegExp(`node_modules/(${modulesRequiringTranspilation.join("|")})/`);
 
                         if (modulePath.includes("core-js")) {
@@ -81,7 +97,6 @@ ${chalk.green(aliases)}`;
                                 cacheDirectory: true,
                             },
                         },
-                        ...storybookLoaders,
                     ],
                 },
                 {
@@ -121,8 +136,8 @@ ${chalk.green(aliases)}`;
                             loader: "postcss-loader",
                             options: {
                                 sourceMap: true,
-                                config: {
-                                    path: path.resolve(__dirname),
+                                postcssOptions: {
+                                    config: path.resolve(VANILLA_ROOT, "build/scripts/configs/postcss.config.js"),
                                 },
                             },
                         },
@@ -146,7 +161,7 @@ ${chalk.green(aliases)}`;
         ] as any[],
         resolve: {
             modules: modulePaths,
-            mainFields: ["browser", "main"],
+            mainFields: ["browser", "module", "main"],
             alias: {
                 ...hotAliases,
                 ...entryModel.aliases,
@@ -177,10 +192,20 @@ ${chalk.green(aliases)}`;
     if (options.mode === BuildMode.PRODUCTION) {
         config.plugins.push(
             new MiniCssExtractPlugin({
-                filename: "[name].min.css?[chunkhash]",
+                filename: "[name].[contenthash].min.css",
+                chunkFilename: "[name].[contenthash].min.css",
             }),
         );
     }
+
+    // Fix modules like swagger-ui that need buffer.
+    // Webpack no-longer applies it automatically with webpack 5.
+    // https://github.com/webpack/changelog-v5/issues/10#issuecomment-615877593
+    config.plugins.push(
+        new webpack.ProvidePlugin({
+            Buffer: ["buffer", "Buffer"],
+        }),
+    );
 
     config.plugins.push(
         new WebpackBar({

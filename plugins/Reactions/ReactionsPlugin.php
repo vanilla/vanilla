@@ -15,7 +15,9 @@
  */
 
 use Garden\Container\Container;
+use Garden\Web\Exception\NotFoundException;
 use Garden\Schema\Schema;
+use Garden\Web\Data;
 use Vanilla\ApiUtils;
 use Vanilla\Contracts\LocaleInterface;
 use Vanilla\Theme\BoxThemeShim;
@@ -23,6 +25,7 @@ use Vanilla\Theme\VariableProviders\QuickLink;
 use Vanilla\Theme\VariableProviders\QuickLinkProviderInterface;
 use Gdn_Session as SessionInterface;
 use Vanilla\Theme\VariableProviders\QuickLinksVariableProvider;
+use Vanilla\Utility\ModelUtils;
 
 /**
  * Class ReactionsPlugin
@@ -393,7 +396,7 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param Schema $schema
      */
     public function commentGetSchema_init(Schema $schema) {
-        $this->updateSchemaExpand($schema);
+        $this->updatePostSchemaExpand($schema);
     }
 
     /**
@@ -402,7 +405,7 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param Schema $schema
      */
     public function commentIndexSchema_init(Schema $schema) {
-        $this->updateSchemaExpand($schema);
+        $this->updatePostSchemaExpand($schema);
     }
 
     /**
@@ -422,7 +425,7 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param Schema $schema
      */
     public function discussionGetSchema_init(Schema $schema) {
-        $this->updateSchemaExpand($schema);
+        $this->updatePostSchemaExpand($schema);
     }
 
     /**
@@ -431,7 +434,7 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param Schema $schema
      */
     public function discussionIndexSchema_init(Schema $schema) {
-        $this->updateSchemaExpand($schema);
+        $this->updatePostSchemaExpand($schema);
         $schema->merge(Schema::parse([
             'reactionType:s?'
         ]));
@@ -605,7 +608,7 @@ class ReactionsPlugin extends Gdn_Plugin {
                     ];
                     $reaction['hasReacted'] = in_array($userReactionRecord, $userReactions);
                     $reaction['Name'] = $reaction['Name'] ?: $this->locale->translate('None');
-                    $reaction['ReactionValue'] = $reaction['IncrementValue'] ?? 0;
+                    $reaction['ReactionValue'] = $reaction['IncrementValue'] ?? $reaction['Points'] ?? 0;
                 }
                 $summary = $schema->validate($summary);
                 $row['reactions'] = $summary;
@@ -848,12 +851,14 @@ class ReactionsPlugin extends Gdn_Plugin {
 
         $heading = '<h2 class="H">'.t('Reactions').'</h2>';
         if (BoxThemeShim::isActive()) {
+            BoxThemeShim::startWidget();
             BoxThemeShim::startHeading();
             echo $heading;
             BoxThemeShim::endHeading();
             BoxThemeShim::startBox('ReactionsWrap');
             writeProfileCounts();
             BoxThemeShim::endBox();
+            BoxThemeShim::endWidget();
         } else {
             echo '<div class="ReactionsWrap">';
             echo $heading;
@@ -874,6 +879,128 @@ class ReactionsPlugin extends Gdn_Plugin {
             $args['CssClass'] .= ' '.$cssClass;
             setValue('_CssClass', $args['Object'], $cssClass);
         }
+    }
+
+    /**
+     * Get all the comments and discussions a user has posted that have received a certain reaction.
+     *
+     * @param UsersApiController $sender
+     * @param int $userID
+     * @param array $query
+     * @return Data
+     * @throws Gdn_UserException Throws an exception if the user isn't found.
+     * @throws \Garden\Schema\ValidationException Throws validation exception.
+     * @throws \Garden\Web\Exception\HttpException Http exception.
+     * @throws \Garden\Web\Exception\NotFoundException Throws an exception if the reaction isn't found.
+     * @throws \Vanilla\Exception\PermissionException Permission exception.
+     */
+    public function usersApiController_get_reacted(
+        UsersApiController $sender,
+        int $userID,
+        array $query = []
+    ): Data {
+        $sender->permission('Garden.Profiles.View');
+
+        // Make the schemas
+        $in = Schema::parse([
+            'reactionUrlcode:s',
+            'expand' => ApiUtils::getExpandDefinition(['all', 'insertUser', 'updateUser', 'reactions']),
+            'page:i?' => [
+                'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
+                'default' => 1,
+                'minimum' => 1,
+            ],
+            'limit:i?' => [
+                'description' => 'Desired number of items per page.',
+                'default' => $this->reactionModel->getDefaultLimit(),
+                'minimum' => 1,
+                'maximum' => ApiUtils::getMaxLimit(100),
+            ],
+        ]);
+
+        $out = Schema::parse([
+            ':a' => [
+                'name:s',
+                'body:s',
+                'format:s',
+                'insertUserID:i',
+                'updateUserID:i?',
+                'dateUpdated:dt?',
+                'recordID:i',
+                'recordType:s',
+                'url:s',
+                'reactions?' => $this->getReactionSummaryFragment(),
+                'insertUser?' => $sender->getUserFragmentSchema(),
+                'updateUser?' => $sender->getUserFragmentSchema(),
+            ],
+        ]);
+
+        $validatedQuery = $in->validate($query);
+
+        // Throws not found exception if no user found.
+        $user = $sender->userByID($userID);
+
+        // Get the reaction and throw an error if it isn't found.
+        $reactionType = ReactionModel::reactionTypes($validatedQuery['reactionUrlcode']);
+        if (!$reactionType) {
+            throw new NotFoundException('Reaction');
+        }
+
+        $where = [
+            'UserID' => $user['UserID'],
+            'RecordType' => ['Discussion-Total', 'Comment-Total'],
+            'TagID' => $reactionType['TagID'],
+            'Total >' => 0,
+        ];
+        [$offset, $limit] = offsetLimit("p{$validatedQuery['page']}", $validatedQuery['limit']);
+        $pascalData = $this->reactionModel->getRecordsWhere(
+            $where,
+            'DateInserted',
+            'desc',
+            $limit,
+            $offset
+        );
+
+        $expand = $validatedQuery['expand'] ?? [];
+
+        // Convert the array keys for api output.
+        $data = [];
+        foreach ($pascalData as &$datum) {
+            $data[] = ApiUtils::convertOutputKeys($datum);
+        }
+
+        // Add the user data, if requested.
+        ModelUtils::leftJoin(
+            $data,
+            ModelUtils::expandedFields(['insertUser', 'updateUser'], $expand),
+            [$this->userModel, 'fetchFragments']
+        );
+
+        // Add the reaction data, if requested.
+        if (ModelUtils::expandedFields(['reactions'], $expand)) {
+            $attributes = array_column($pascalData, 'Attributes', 'RecordID');
+            array_walk($data, function (&$data) use ($attributes) {
+                $withAttributes = $this->addAttributes($data, $attributes[$data['recordID']]);
+                $summary = ApiUtils::convertOutputKeys($this->reactionModel->getRecordSummary($withAttributes));
+                $data['reactions'] = $summary;
+            });
+        }
+
+        // Render the body in html.
+        foreach ($data as &$record) {
+            $record['body'] = Gdn::formatService()->renderHTML($record['body'], $record['format']);
+        }
+        $data = $out->validate($data);
+
+        // Get the paging info.
+        $paging = ApiUtils::morePagerInfo(
+            $data,
+            'url',
+            ['page' => $validatedQuery['page'], 'limit' => $validatedQuery['limit']],
+            $in
+        );
+
+        return new Data($data, ['paging' => $paging]);
     }
 
     /**
@@ -1406,11 +1533,11 @@ class ReactionsPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Alter a schema's expand parameter to include reactions.
+     * Alter a post schema's expand parameter to include reactions.
      *
      * @param Schema $schema
      */
-    private function updateSchemaExpand(Schema $schema) {
+    private function updatePostSchemaExpand(Schema $schema) {
         /** @var Schema $expand */
         $expandEnum = $schema->getField('properties.expand.items.enum');
         if (is_array($expandEnum)) {
@@ -1421,6 +1548,26 @@ class ReactionsPlugin extends Gdn_Plugin {
         } else {
             $schema->merge(Schema::parse([
                 'expand?' => ApiUtils::getExpandDefinition(['reactions'])
+            ]));
+        }
+    }
+
+    /**
+     * Alter a user's expand parameter to include reactions.
+     *
+     * @param Schema $schema
+     */
+    private function updateUserSchemaExpand(Schema $schema) {
+        /** @var Schema $expand */
+        $expandEnum = $schema->getField("properties.expand.items.enum");
+        if (is_array($expandEnum)) {
+            if (!in_array("reactionsReceived", $expandEnum)) {
+                $expandEnum[] = "reactionsReceived";
+                $schema->setField("properties.expand.items.enum", $expandEnum);
+            }
+        } else {
+            $schema->merge(Schema::parse([
+                "expand?" => ApiUtils::getExpandDefinition(["reactionsReceived"])
             ]));
         }
     }
@@ -1453,6 +1600,83 @@ class ReactionsPlugin extends Gdn_Plugin {
             $args['ReservedTags'][] = $tagName;
         }
 
+    }
+
+    /**
+     * Update the /users/{id} input schema.
+     *
+     * @param Schema $schema
+     */
+    public function userGetSchema_init(Schema $schema): void {
+        $this->updateUserSchemaExpand($schema);
+    }
+
+    /**
+     * Update the /users index input schema.
+     *
+     * @param Schema $schema
+     */
+    public function userIndexSchema_init(Schema $schema): void {
+        $this->updateUserSchemaExpand($schema);
+    }
+
+    /**
+     * Modify the output of the users index.
+     *
+     * @param array $result
+     * @param UsersApiController $sender
+     * @param Schema $inputSchema
+     * @param array $query
+     * @param array $rows
+     */
+    public function usersApiController_getOutput(array $result, UsersApiController $sender, Schema $inputSchema, array $query, array $rows): array {
+        $expand = $query["expand"] ?? [];
+
+        if (!$sender->isExpandField("reactionsReceived", $expand)) {
+            return $result;
+        }
+
+        $expanded = $this->expandUserReactionsReceived([$result]);
+        return reset($expanded);
+    }
+
+    /**
+     * Modify the output of the users index.
+     *
+     * @param array $result
+     * @param UsersApiController $sender
+     * @param Schema $inputSchema
+     * @param array $query
+     * @param array $rows
+     */
+    public function usersApiController_indexOutput(array $result, UsersApiController $sender, Schema $inputSchema, array $query, array $rows): array {
+        $expand = $query["expand"] ?? [];
+
+        if (!$sender->isExpandField("reactionsReceived", $expand)) {
+            return $result;
+        }
+
+        return $this->expandUserReactionsReceived($result);
+    }
+
+    /**
+     * Given an array of user rows, expand the reactions received by that user.
+     *
+     * @param array $users
+     * @return array
+     */
+    private function expandUserReactionsReceived(array $users): array {
+        $userIDs = array_column($users, "userID");
+        $reactionsByUser = $this->reactionModel->getReceivedByUser($userIDs);
+
+        $schema = $this->reactionModel->compoundTypeFragmentSchema(true);
+        foreach ($users as &$userRow) {
+            if (!array_key_exists($userRow["userID"], $reactionsByUser)) {
+                continue;
+            }
+            $userRow["reactionsReceived"] = $schema->validate($reactionsByUser[$userRow["userID"]]);
+        }
+        return $users;
     }
 }
 

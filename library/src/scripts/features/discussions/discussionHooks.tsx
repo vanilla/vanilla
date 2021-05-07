@@ -61,13 +61,22 @@ export function useToggleDiscussionBookmarked(discussionID: IPutDiscussionBookma
     return toggleDiscussionBookmarked;
 }
 
+export function useCurrentDiscussionReaction(discussionID: IDiscussion["discussionID"]) {
+    return useSelector(function (state: IDiscussionsStoreState) {
+        return state.discussions.discussionsByID[discussionID]?.reactions?.find(({ hasReacted }) => hasReacted);
+    });
+}
+
 export function useReactToDiscussion(discussionID: IPostDiscussionReaction["discussionID"]) {
     const { postDiscussionReaction } = useDiscussionActions();
 
-    async function reactToDiscussion(reactionType: IPostDiscussionReaction["reactionType"]) {
+    const currentReaction = useCurrentDiscussionReaction(discussionID);
+
+    async function reactToDiscussion(reaction: IPostDiscussionReaction["reaction"]) {
         return await postDiscussionReaction({
             discussionID,
-            reactionType,
+            reaction,
+            currentReaction,
         });
     }
 
@@ -77,9 +86,12 @@ export function useReactToDiscussion(discussionID: IPostDiscussionReaction["disc
 export function useRemoveDiscussionReaction(discussionID: IDeleteDiscussionReaction["discussionID"]) {
     const { deleteDiscussionReaction } = useDiscussionActions();
 
+    const currentReaction = useCurrentDiscussionReaction(discussionID)!;
+
     async function removeDiscussionReaction() {
         return await deleteDiscussionReaction({
             discussionID,
+            currentReaction,
         });
     }
 

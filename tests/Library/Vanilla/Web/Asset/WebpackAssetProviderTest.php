@@ -12,12 +12,14 @@ use Vanilla\Theme\FsThemeProvider;
 use Vanilla\Theme\ThemeService;
 use Vanilla\Theme\ThemeServiceHelper;
 use Vanilla\Web\Asset\LocaleAsset;
+use Vanilla\Web\Asset\WebpackAsset;
 use Vanilla\Web\Asset\WebpackAssetProvider;
 use VanillaTests\Fixtures\MockAddon;
 use VanillaTests\Fixtures\MockAddonManager;
 use VanillaTests\Fixtures\MockConfig;
 use VanillaTests\Fixtures\Request;
 use VanillaTests\MinimalContainerTestCase;
+use Webmozart\PathUtil\Path;
 
 /**
  * Tests for the asset provider.
@@ -100,7 +102,7 @@ class WebpackAssetProviderTest extends MinimalContainerTestCase {
         $scripts = $provider->getScripts('someSection');
         $this->assertNotInstanceOf(
             LocaleAsset::class,
-            $scripts[0],
+            $scripts[0] ?? null,
             "The first asset is a not locale asset if the locale key has not been specified"
         );
 
@@ -128,22 +130,6 @@ class WebpackAssetProviderTest extends MinimalContainerTestCase {
      */
     public function testAddonAssets() {
         $section = "test";
-
-        $structure = [
-            "dist" => [
-                $section => [
-                    'addons' => [
-                        'everything.min.js' => '',
-                        'everything.min.css' => '',
-                        'js-only.min.js' => '',
-                        'css-only.min.css' => '',
-                        'disabled.min.js' => '',
-                        'disabled.min.css' => '',
-                    ],
-                ],
-            ],
-        ];
-
         $mockAddons = [
             new MockAddon('everything'),
             new MockAddon('js-only'),
@@ -152,27 +138,77 @@ class WebpackAssetProviderTest extends MinimalContainerTestCase {
             // Note there is no disabled
         ];
 
-        $fileSystem = vfsStream::create($structure);
         $provider = $this->getWebpackAssetProvider($mockAddons);
-        $provider->setFsRoot($fileSystem->url());
-        $buster = 'buster12345';
-        $provider->setCacheBusterKey($buster);
-        $root = 'http://example.com/dist/test/';
-        $addonRoot = $root . 'addons/';
+        $provider->setFsRoot(PATH_TEST_CACHE);
+
+        $this->writeTestDist();
 
         // Stylesheets
         $styleSheets = $provider->getStylesheets($section);
-        $this->assertCount(2, $styleSheets);
-        $this->assertEquals($addonRoot . "everything.min.css?h=$buster", $styleSheets[0]->getWebPath());
-        $this->assertEquals($addonRoot . "css-only.min.css?h=$buster", $styleSheets[1]->getWebPath());
+        $this->assertAssetUrls(
+            [
+                "/path/to/vendor1.min.css",
+                "/path/to/everything.min.css",
+                "/path/to/css-only.min.css",
+            ],
+            $styleSheets
+        );
+
+        // For code coverage of reloading from cache.
+        $provider->clearCollections();
 
         // Scripts
         $scripts = $provider->getScripts($section);
-        $this->assertCount(5, $scripts);
-        $this->assertEquals($root . "runtime.min.js?h=$buster", $scripts[0]->getWebPath());
-        $this->assertEquals($root . "vendors.min.js?h=$buster", $scripts[1]->getWebPath());
-        $this->assertEquals($addonRoot . "everything.min.js?h=$buster", $scripts[2]->getWebPath());
-        $this->assertEquals($addonRoot . "js-only.min.js?h=$buster", $scripts[3]->getWebPath());
-        $this->assertEquals($root . "bootstrap.min.js?h=$buster", $scripts[4]->getWebPath());
+        $this->assertAssetUrls(
+            [
+                "/path/to/runtime.min.js",
+                "/path/to/vendor1.min.js",
+                "/path/to/addons/everything.min.js",
+                "/path/to/addons/js-only.min.js",
+                "/path/to/bootstrap.min.js",
+            ],
+            $scripts
+        );
+    }
+
+    /**
+     * Assert an array of asset urls in order.
+     *
+     * @param string[] $expected
+     * @param WebpackAsset[] $assets
+     */
+    private function assertAssetUrls(array $expected, array $assets) {
+        $webroot = 'http://example.com/dist/test/';
+        $actual = array_map(function (WebpackAsset $asset) {
+            return $asset->getWebPath();
+        }, $assets);
+        $expected = array_map(function (string $path) use ($webroot) {
+            return Path::join($webroot, $path);
+        }, $expected);
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @return string
+     */
+    private function writeTestDist(): string {
+        $someHash = 'a1e34123';
+        $root = '/dist/test/path/to';
+
+        $manifest = [
+            "vendor-$someHash.js" => $root."/vendor1.min.js",
+            "vendor-$someHash.css" => $root."/vendor1.min.css",
+            'runtime.js' => $root.'/runtime.min.js',
+            'bootstrap.js' => $root.'/bootstrap.min.js',
+            "addons/everything.js" => $root."/addons/everything.min.js",
+            "addons/everything-$someHash.css" => $root."/everything.min.css",
+            "addons/js-only-$someHash.js" => $root."/addons/js-only.min.js",
+            "addons/css-only-$someHash.css" => $root."/css-only.min.css",
+        ];
+        $path = Path::join(PATH_TEST_CACHE, 'dist/test/manifest.json');
+        $dirname = dirname($path);
+        mkdir($dirname, 0777, true);
+        file_put_contents($path, json_encode($manifest));
+        return $path;
     }
 }

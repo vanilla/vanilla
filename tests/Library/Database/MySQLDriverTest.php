@@ -8,6 +8,7 @@
 namespace VanillaTests\Library\Database;
 
 use PHPUnit\Framework\TestCase;
+use Gdn_Database;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Database\SetLiterals\Increment;
 use Vanilla\Database\SetLiterals\MinMax;
@@ -430,5 +431,33 @@ SQL;
         $this->assertSame($dateString, $updateParams[':DateUpdated']);
         $this->assertSame($userId, $updateParams[':UpdateUserID']);
         CurrentTimeStamp::clearMockTime();
+    }
+
+    /**
+     * Tests that query custom options are passed down to {@link Gdn_Database::query} properly
+     */
+    public function testCustomQueryOptions() {
+        $sql = 'SELECT :param1 AS `value1`';
+        $options = [
+            'testOption' => 'testValue'
+        ];
+
+        $mock = $this->createMock(Gdn_Database::class);
+        $mock->expects($this->exactly(1))
+            ->method('query')
+            ->with(
+                $sql,
+                [':param1' => 42],
+                $this->callback(function ($options) {
+                    $this->assertArrayHasKey('Type', $options);
+                    $this->assertArrayHasKey('Slave', $options);
+                    $this->assertEquals('testValue', $options['testOption']);
+                    return true;
+                })
+            );
+
+        $this->sql->Database = $mock;
+        $this->sql->namedParameter('param1', false, 42);
+        $this->sql->options($options)->query($sql);
     }
 }

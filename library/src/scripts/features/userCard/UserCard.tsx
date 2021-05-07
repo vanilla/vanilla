@@ -12,7 +12,7 @@ import { useUser } from "@library/features/users/userHooks";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import ErrorMessages from "@library/forms/ErrorMessages";
 import { useDevice, Devices } from "@library/layout/DeviceContext";
-import Modal from "@library/modal/Modal";
+import LazyModal from "@library/modal/LazyModal";
 import ModalSizes from "@library/modal/ModalSizes";
 import { UserCardContext, useUserCardContext } from "@library/features/userCard/UserCard.context";
 import { UserCardSkeleton, UserCardView } from "@library/features/userCard/UserCard.views";
@@ -100,7 +100,7 @@ export function UserCardPopup(props: React.PropsWithChildren<IProps> & { forceOp
             )}
             {forceModal && (
                 // On mobile we are forced into a modal, which is controlled by the `isVisible` param instead of conditional rendering.
-                <Modal
+                <LazyModal
                     isVisible={isOpen}
                     size={ModalSizes.SMALL}
                     exitHandler={() => {
@@ -113,7 +113,7 @@ export function UserCardPopup(props: React.PropsWithChildren<IProps> & { forceOp
                             setIsOpen(false);
                         }}
                     />
-                </Modal>
+                </LazyModal>
             )}
         </UserCardContext.Provider>
     );

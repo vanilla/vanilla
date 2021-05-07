@@ -407,7 +407,7 @@ function SearchBarControl(props: IControlProps) {
             >
                 {!(compact && hasScope) && (
                     <Button
-                        baseClass={ButtonTypes.CUSTOM}
+                        buttonType={ButtonTypes.CUSTOM}
                         onClick={() => {
                             focusInput();
                             props.onSearch();
@@ -477,12 +477,12 @@ function SearchBarControl(props: IControlProps) {
                 <Button
                     submit={true}
                     id={searchButtonID}
-                    baseClass={props.buttonBaseClass}
+                    buttonType={props.buttonType}
                     className={classNames("searchBar-submitButton", props.buttonClassName ?? classes.actionButton)}
                     tabIndex={!searchButtonIsVisible ? 0 : -1}
                 >
                     {props.isLoading ? (
-                        <ButtonLoader className={props.buttonLoaderClassName} buttonType={props.buttonBaseClass} />
+                        <ButtonLoader className={props.buttonLoaderClassName} buttonType={props.buttonType} />
                     ) : (
                         props.buttonText || t("Search")
                     )}

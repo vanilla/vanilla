@@ -1,19 +1,15 @@
-/* eslint-disable no-console */
 /**
  * @copyright 2009-2020 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import { ILoadable, LoadStatus } from "@library/@types/api/core";
-import DiscussionActions, {
-    IPutDiscussionBookmarkedResult,
-    IPatchDiscussionResult,
-} from "@library/features/discussions/DiscussionActions";
+import { ILoadable, Loadable, LoadStatus } from "@library/@types/api/core";
+import DiscussionActions from "@library/features/discussions/DiscussionActions";
 import produce from "immer";
 import { reducerWithInitialState } from "typescript-fsa-reducers";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
 import { stableObjectHash } from "@vanilla/utils";
-
+import { IReaction } from "@dashboard/@types/api/reaction";
 export interface IDiscussionsStoreState {
     discussions: IDiscussionState;
 }
@@ -26,6 +22,8 @@ interface IDiscussionState {
     changeTypeByID: Record<number, ILoadable>;
     patchStatusByPatchID: Record<string, ILoadable>;
     deleteStatusesByID: Record<number, ILoadable>;
+    postReactionStatusesByID: Record<number, ILoadable<{}>>;
+    deleteReactionStatusesByID: Record<number, ILoadable<{}>>;
 }
 
 export const INITIAL_DISCUSSIONS_STATE: IDiscussionState = {
@@ -37,7 +35,31 @@ export const INITIAL_DISCUSSIONS_STATE: IDiscussionState = {
     patchStatusByPatchID: {},
     deleteStatusesByID: {},
     changeTypeByID: {},
+    postReactionStatusesByID: {},
+    deleteReactionStatusesByID: {},
 };
+
+function setDiscussionReaction(
+    state: IDiscussionState,
+    discussionID: IDiscussion["discussionID"],
+    params: {
+        removeReaction?: IReaction;
+        addReaction?: IReaction;
+    },
+): IDiscussionState {
+    const decrementBy = params.removeReaction?.reactionValue ?? 0;
+    const incrementBy = params.addReaction?.reactionValue ?? 0;
+    const newScore = state.discussionsByID[discussionID]!.score - decrementBy + incrementBy;
+    state.discussionsByID[discussionID].score = newScore;
+    state.discussionsByID[discussionID]!.reactions = state.discussionsByID[discussionID]!.reactions!.map(
+        (reaction) => ({
+            ...reaction,
+            //assumes the user can only have one reaction to a discussion
+            hasReacted: reaction.urlcode === params.addReaction?.urlcode ?? false,
+        }),
+    );
+    return state;
+}
 
 /**
  * Reducer for discussion related data.
@@ -187,6 +209,66 @@ export const discussionsReducer = produce(
                 status: LoadStatus.ERROR,
                 error: payload.error,
             };
+            return state;
+        })
+        .case(DiscussionActions.postDiscussionReactionACs.started, (state, params) => {
+            const { discussionID, reaction: newReaction, currentReaction } = params;
+            state.postReactionStatusesByID[discussionID] = { status: LoadStatus.PENDING };
+
+            setDiscussionReaction(state, discussionID, {
+                removeReaction: currentReaction,
+                addReaction: newReaction,
+            });
+
+            return state;
+        })
+        .case(DiscussionActions.postDiscussionReactionACs.done, (state, payload) => {
+            const { discussionID } = payload.params;
+
+            state.postReactionStatusesByID[discussionID] = { status: LoadStatus.SUCCESS };
+
+            return state;
+        })
+        .case(DiscussionActions.postDiscussionReactionACs.failed, (state, payload) => {
+            const { discussionID, reaction, currentReaction } = payload.params;
+
+            state.postReactionStatusesByID[discussionID] = { status: LoadStatus.ERROR, error: payload.error };
+
+            setDiscussionReaction(state, discussionID, {
+                removeReaction: reaction,
+                addReaction: currentReaction,
+            });
+
+            return state;
+        })
+        .case(DiscussionActions.deleteDiscussionReactionACs.started, (state, params) => {
+            const { discussionID, currentReaction } = params;
+
+            state.deleteReactionStatusesByID[discussionID] = { status: LoadStatus.PENDING };
+
+            setDiscussionReaction(state, discussionID, {
+                removeReaction: currentReaction,
+            });
+
+            return state;
+        })
+
+        .case(DiscussionActions.deleteDiscussionReactionACs.done, (state, payload) => {
+            const { discussionID } = payload.params;
+
+            state.deleteReactionStatusesByID[discussionID] = { status: LoadStatus.SUCCESS };
+
+            return state;
+        })
+        .case(DiscussionActions.deleteDiscussionReactionACs.failed, (state, payload) => {
+            const { discussionID, currentReaction } = payload.params;
+
+            state.deleteReactionStatusesByID[discussionID] = { status: LoadStatus.ERROR, error: payload.error };
+
+            setDiscussionReaction(state, discussionID, {
+                addReaction: currentReaction,
+            });
+
             return state;
         }),
 );

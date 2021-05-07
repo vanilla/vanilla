@@ -10,7 +10,6 @@ import merge from "lodash/merge";
 import { color, rgba, rgb, hsla, hsl, ColorHelper } from "csx";
 import { logDebug, logWarning, logError, notEmpty } from "@vanilla/utils";
 import { getThemeVariables } from "@library/theming/getThemeVariables";
-import { isArray } from "util";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { GlobalVariableMapping, LocalVariableMapping } from "@library/styles/VariableMapping";
 
@@ -187,7 +186,7 @@ const hexRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
  */
 function normalizeVariables(customVariable: any, defaultVariable: any) {
     try {
-        if (Array.isArray(customVariable) && isArray(defaultVariable)) {
+        if (Array.isArray(customVariable) && Array.isArray(defaultVariable)) {
             // We currently can't pre-process arrays.
             return customVariable;
         }

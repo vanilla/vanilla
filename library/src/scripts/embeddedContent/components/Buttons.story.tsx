@@ -14,7 +14,6 @@ import { StoryParagraph } from "@library/storybook/StoryParagraph";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleUnit } from "@library/styles/styleUnit";
 import { buttonUtilityClasses } from "@library/forms/buttonStyles";
-import { ButtonPreset } from "@library/forms/ButtonPreset";
 import { CheckCompactIcon, CloseCompactIcon, ComposeIcon } from "@library/icons/common";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import { ButtonTypes } from "@library/forms/buttonTypes";
@@ -52,7 +51,7 @@ function StoryButton() {
                     <Button buttonType={ButtonTypes.PRIMARY}>Primary</Button>
                 </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact text={"Outline"}>
-                    <Button baseClass={ButtonTypes.OUTLINE}>Outline</Button>
+                    <Button buttonType={ButtonTypes.OUTLINE}>Outline</Button>
                 </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact type="titleBar" text={"For Title Bar (Sign in Button)"}>
                     <Button buttonType={ButtonTypes.TRANSPARENT}>Transparent</Button>
@@ -179,40 +178,6 @@ export const PresetsBoxShadow = storyWithConfig(
                 },
                 standard: {
                     useShadow: true,
-                },
-            },
-        },
-    },
-    () => <StoryButton />,
-);
-
-export const PresetsOutline = storyWithConfig(
-    {
-        themeVars: {
-            global: {
-                buttonPreset: {
-                    style: ButtonPreset.OUTLINE,
-                },
-            },
-            button: {
-                primary: {
-                    colors: {
-                        fg: globalVariables().mainColors.primary,
-                        bg: "#fff",
-                    },
-                },
-            },
-        },
-    },
-    () => <StoryButton />,
-);
-
-export const PresetsSolid = storyWithConfig(
-    {
-        themeVars: {
-            global: {
-                buttonPreset: {
-                    style: ButtonPreset.SOLID,
                 },
             },
         },

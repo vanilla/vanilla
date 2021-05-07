@@ -80,7 +80,7 @@ export default function BackLink(props: IProps) {
     if (props.onClick) {
         content = (
             <Button
-                baseClass={ButtonTypes.RESET}
+                buttonType={ButtonTypes.RESET}
                 className={className}
                 aria-label={title as string}
                 title={title as string}
@@ -93,7 +93,7 @@ export default function BackLink(props: IProps) {
         // We can go back.
         content = (
             <Button
-                baseClass={ButtonTypes.RESET}
+                buttonType={ButtonTypes.RESET}
                 className={className}
                 aria-label={title as string}
                 title={title as string}

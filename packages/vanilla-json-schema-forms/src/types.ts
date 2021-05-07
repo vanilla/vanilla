@@ -4,10 +4,8 @@
  * @license GPL-2.0-only
  */
 
-import { JSONSchemaType } from "ajv";
-import { ErrorObject } from "ajv/dist/core";
-import { SomeJSONSchema } from "ajv/dist/types/json-schema";
 import React from "react";
+import type { SomeJSONSchema } from "ajv/dist/types/json-schema";
 
 export type Path = Array<string | number>;
 
@@ -83,7 +81,6 @@ export interface IBaseSchemaFormProps {
     rootSchema: JsonSchema;
     instance: any;
     rootInstance: any;
-    validation?: IValidationResult;
 }
 
 export interface IForm {
@@ -125,7 +122,6 @@ export interface IControlProps extends IBaseSchemaFormProps {
 
 export interface IValidationResult {
     isValid: boolean;
-    errors?: ErrorObject[] | null;
 }
 
 export interface ISchemaRenderProps {

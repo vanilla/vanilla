@@ -84,7 +84,7 @@ class Emoji {
      * - %1$s: The emoji path.
      * - %2$s: The emoji code.
      */
-    protected $format = '<img class="emoji" src="%1$s" title="%2$s" alt="%2$s" height="20" />';
+    protected $format = '<img class="emoji" src="%1$s" title="%2$s" alt="%2$s" height="20" loading="lazy" />';
 
     /** @var Emoji The singleton instance of this class. */
     public static $instance;

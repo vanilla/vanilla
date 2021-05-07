@@ -11,11 +11,11 @@ import SmartLink from "@library/routing/links/SmartLink";
 import BreadCrumbString from "@library/navigation/BreadCrumbString";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { metasClasses } from "@library/metas/Metas.styles";
-import DateTime from "@library/content/DateTime";
 import classNames from "classnames";
 import { OptionProps } from "react-select/lib/components/Option";
 import { PlacesSearchListingItem } from "@library/search/PlacesSearchListingContainer";
 import { searchBarClasses } from "@library/features/search/searchBarStyles";
+import DateTime from "@library/content/DateTime";
 
 export interface ISearchOptionData {
     crumbs: ICrumb[];

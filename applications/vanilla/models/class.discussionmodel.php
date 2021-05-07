@@ -4134,6 +4134,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
      * @return array
      */
     public function normalizeRow(array $row, $expand = []): array {
+        $this->fixRow($row);
         $session = \Gdn::session();
         if ($session->User) {
             $row['unread'] = $row['CountUnreadComments'] !== 0
@@ -4153,6 +4154,9 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
 
         $row['Announce'] = (bool)$row['Announce'];
         $row['Url'] = discussionUrl($row);
+        $row['CanonicalUrl'] = (isset($row['CanonicalUrl']) && is_string($row['CanonicalUrl'])) ?
+            $row['CanonicalUrl'] :
+            $row['Url'];
 
         $rawBody = $row['Body'];
         $format = $row['Format'];
@@ -4253,7 +4257,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
      * @param array $row The discussion record to fix.
      * @return array
      */
-    public function fixRow(array $row): array {
+    public function fixRow(array &$row): array {
         if (array_key_exists('Name', $row)) {
             $row['Name'] = htmlspecialchars_decode($row['Name']);
         }

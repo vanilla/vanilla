@@ -5,10 +5,10 @@
 
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import MultiUserInput from "@library/features/users/MultiUserInput";
-import DateRange from "@library/forms/DateRange";
 import { dateRangeClasses } from "@library/forms/dateRangeStyles";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import InputTextBlock from "@library/forms/InputTextBlock";
+import LazyDateRange from "@library/forms/LazyDateRange";
 import { FilterFrame } from "@library/search/panels/FilterFrame";
 import { useSearchForm } from "@library/search/SearchContext";
 import { t } from "@vanilla/i18n";
@@ -42,7 +42,7 @@ export function FilterPanelAll(props: IProps) {
                 }}
                 value={form.authors ?? []}
             />
-            <DateRange
+            <LazyDateRange
                 onStartChange={(date: string) => {
                     updateForm({ startDate: date });
                 }}

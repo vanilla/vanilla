@@ -83,19 +83,7 @@ paths:
             - -dateLastActive
             - -name
             - -userID
-      - description: >
-          Expand associated records using one or more valid field names. A
-          value of "all" will expand all expandable fields.
-        in: query
-        name: expand
-        schema:
-          items:
-            enum:
-            - rank
-            - all
-            type: string
-          type: array
-        style: form
+      - $ref: '#/components/parameters/UserExpand'
       responses:
         '200':
           content:
@@ -658,6 +646,47 @@ paths:
               - photo
               type: object
         required: true
+  '/users/{id}/badges':
+
+    x-addon: badges
+    get:
+      summary: Get user badges.
+      tags:
+        - Users
+      parameters:
+        - description: The user ID.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - description: |
+            Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).
+          in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+            maximum: 100
+            minimum: 1
+        - description: |
+            Desired number of items per page.
+          in: query
+          name: limit
+          schema:
+            type: integer
+            default: 30
+            maximum: 100
+            minimum: 1
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/UserBadges'
+                type: array
+          description: Success
   '/users/{id}/rank':
     x-addon: ranks
     put:
@@ -698,6 +727,21 @@ paths:
                 type: object
           description: Success
 components:
+  parameters:
+    UserExpand:
+      description: >
+        Expand associated records using one or more valid field names. A
+        value of "all" will expand all expandable fields.
+      in: query
+      name: expand
+      schema:
+        items:
+          enum:
+            - rank
+            - all
+          type: string
+        type: array
+      style: form
   schemas:
     User:
       properties:
@@ -862,3 +906,20 @@ components:
       - password
       - emailConfirmed
       - bypassSpam
+    UserBadges:
+      type: object
+      properties:
+          badgeID:
+            description: ID of the badge.
+            type: integer
+          name:
+            description: Name of the badge.
+            type: string
+          photoUrl:
+            description: Badge photo.
+            type: string
+          url:
+            description: URL to the badge photo.
+            type: string
+
+

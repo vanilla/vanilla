@@ -4,6 +4,7 @@
  */
 
 import { cx } from "@emotion/css";
+import Button from "@library/forms/Button";
 import {
     homeWidgetContainerClasses,
     homeWidgetContainerVariables,
@@ -19,7 +20,7 @@ import { Variables } from "@library/styles/Variables";
 import { t } from "@vanilla/i18n";
 import { useMeasure } from "@vanilla/react-utils";
 import classNames from "classnames";
-import React, { useMemo, useRef } from "react";
+import React, { ReactNode, useMemo, useRef } from "react";
 
 export interface IHomeWidgetContainerProps {
     options?: IHomeWidgetContainerOptions;
@@ -42,11 +43,25 @@ export function HomeWidgetContainer(props: IHomeWidgetContainerProps) {
         props.children
     );
 
-    const viewAllButton = options?.viewAll?.to && (
-        <LinkAsButton to={options?.viewAll?.to} baseClass={options.viewAll.displayType}>
-            {options?.viewAll?.name ?? t("View All")}
-        </LinkAsButton>
-    );
+    let viewAllLinkOrButton: ReactNode;
+
+    if (options?.viewAll) {
+        const label = t(options?.viewAll?.name ?? "View All");
+        if (options?.viewAll.onClick) {
+            viewAllLinkOrButton = (
+                <Button onClick={options?.viewAll?.onClick} buttonType={options.viewAll.displayType}>
+                    {label}
+                </Button>
+            );
+        }
+        if (options?.viewAll.to) {
+            viewAllLinkOrButton = (
+                <LinkAsButton to={options?.viewAll?.to} buttonType={options.viewAll.displayType}>
+                    {label}
+                </LinkAsButton>
+            );
+        }
+    }
 
     const hasOuterBg = Variables.boxHasBackground(Variables.box({ background: options.outerBackground }));
 
@@ -69,7 +84,7 @@ export function HomeWidgetContainer(props: IHomeWidgetContainerProps) {
                     <div className={classes.container}>
                         <PageHeadingBox
                             title={props.title}
-                            actions={options.viewAll.position === "top" && viewAllButton}
+                            actions={options.viewAll.position === "top" && viewAllLinkOrButton}
                             description={props.subtitle ?? options.description}
                             subtitle={props.subtitle ?? options?.subtitle?.content}
                             options={{
@@ -79,8 +94,8 @@ export function HomeWidgetContainer(props: IHomeWidgetContainerProps) {
                         />
                         <div className={classes.content}>
                             <div className={classes.itemWrapper}>{content}</div>
-                            {viewAllButton && options.viewAll.position === "bottom" && (
-                                <div className={classes.viewAllContainer}>{viewAllButton}</div>
+                            {viewAllLinkOrButton && options.viewAll.position === "bottom" && (
+                                <div className={classes.viewAllContainer}>{viewAllLinkOrButton}</div>
                             )}
                         </div>
                     </div>

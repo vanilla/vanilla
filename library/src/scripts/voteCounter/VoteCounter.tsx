@@ -10,7 +10,7 @@ import { voteCounterClasses } from "@library/voteCounter/VoteCounter.styles";
 import { cx } from "@emotion/css";
 import ActsAsCheckbox from "@library/forms/ActsAsCheckbox";
 
-interface IProps {
+export interface IProps {
     upvoted?: boolean;
     onToggleUpvoted?: () => Promise<void>;
     downvoted?: boolean;

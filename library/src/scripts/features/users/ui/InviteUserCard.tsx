@@ -9,7 +9,7 @@ import { ButtonTypes } from "@library/forms/buttonTypes";
 import Frame from "@library/layout/frame/Frame";
 import FrameHeader from "@library/layout/frame/FrameHeader";
 import FrameBody from "@library/layout/frame/FrameBody";
-import Modal from "@library/modal/Modal";
+import LazyModal from "@library/modal/LazyModal";
 import ModalSizes from "@library/modal/ModalSizes";
 import { t } from "@vanilla/i18n";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
@@ -48,7 +48,7 @@ export default function InviteUserCard(props: IProps) {
 
     const classes = userCardClasses();
     return (
-        <Modal
+        <LazyModal
             isVisible={visible}
             size={ModalSizes.MEDIUM}
             exitHandler={() => {
@@ -114,7 +114,7 @@ export default function InviteUserCard(props: IProps) {
                         <div className={classes.buttonGroup}>
                             <Button
                                 className={classes.button}
-                                baseClass={ButtonTypes.STANDARD}
+                                buttonType={ButtonTypes.STANDARD}
                                 onClick={() => {
                                     setBoxChecked(false);
                                     closeModal();
@@ -125,7 +125,7 @@ export default function InviteUserCard(props: IProps) {
                             <Button
                                 disabled={hasEmailInvitePermission && !!inputEmails.trim() && !boxChecked}
                                 className={classes.button}
-                                baseClass={ButtonTypes.PRIMARY}
+                                buttonType={ButtonTypes.PRIMARY}
                                 onClick={() => {
                                     setBoxChecked(false);
                                     sentInvitations();
@@ -137,6 +137,6 @@ export default function InviteUserCard(props: IProps) {
                     </FrameBody>
                 }
             />
-        </Modal>
+        </LazyModal>
     );
 }

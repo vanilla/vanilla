@@ -25,7 +25,7 @@ export const formGroupClasses = ({ sideBySide }: FormGroupClassesProps) => ({
     }),
     label: css({
         display: "inline-block",
-        fontSize: "14px",
+        fontSize: "13px",
         fontWeight: 600,
 
         ...(sideBySide ? {} : { marginBottom: 8 }),

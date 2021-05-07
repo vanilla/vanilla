@@ -10,7 +10,7 @@ import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { INavigationVariableItem, navigationVariables } from "@library/headers/navigationVariables";
 import { CloseTinyIcon, HamburgerIcon } from "@library/icons/common";
-import Modal from "@library/modal/Modal";
+import LazyModal from "@library/modal/LazyModal";
 import ModalSizes from "@library/modal/ModalSizes";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
@@ -55,7 +55,7 @@ export default function Hamburger(props: IProps) {
     return (
         <>
             <Button
-                baseClass={ButtonTypes.ICON}
+                buttonType={ButtonTypes.ICON}
                 className={classNames(classes.root, props.className)}
                 onClick={toggleDrawer}
             >
@@ -64,11 +64,16 @@ export default function Hamburger(props: IProps) {
                     <ScreenReaderContent>{t("Menu")}</ScreenReaderContent>
                 </>
             </Button>
-            <Modal scrollable isVisible={isOpen} size={ModalSizes.MODAL_AS_SIDE_PANEL_LEFT} exitHandler={closeDrawer}>
+            <LazyModal
+                scrollable
+                isVisible={isOpen}
+                size={ModalSizes.MODAL_AS_SIDE_PANEL_LEFT}
+                exitHandler={closeDrawer}
+            >
                 {showCloseIcon && (
                     <Button
                         className={classes.closeButton}
-                        baseClass={ButtonTypes.ICON_COMPACT}
+                        buttonType={ButtonTypes.ICON_COMPACT}
                         onClick={() => {
                             setIsOpen(false);
                         }}
@@ -86,7 +91,7 @@ export default function Hamburger(props: IProps) {
                         <GroupComponent key={i} />
                     ))}
                 </div>
-            </Modal>
+            </LazyModal>
         </>
     );
 }

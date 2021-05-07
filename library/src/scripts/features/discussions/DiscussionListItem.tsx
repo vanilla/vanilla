@@ -5,7 +5,6 @@
 
 import { IDiscussion } from "@dashboard/@types/api/discussion";
 import { cx } from "@emotion/css";
-import DateTime from "@library/content/DateTime";
 import Translate from "@library/content/Translate";
 import DiscussionBookmarkToggle from "@library/features/discussions/DiscussionBookmarkToggle";
 import { discussionListClasses } from "@library/features/discussions/DiscussionList.classes";
@@ -22,9 +21,12 @@ import SmartLink from "@library/routing/links/SmartLink";
 import { t } from "@vanilla/i18n";
 import React from "react";
 import DiscussionOptionsMenu from "@library/features/discussions/DiscussionOptionsMenu";
-import { Variables } from "@library/styles/Variables";
+import DiscussionVoteCounter from "@library/features/discussions/DiscussionVoteCounter";
 import qs from "qs";
 import { Icon } from "@vanilla/icons";
+import { hasPermission, PermissionMode } from "@library/features/users/Permission";
+import { ReactionUrlCode } from "@dashboard/@types/api/reaction";
+import DateTime from "@library/content/DateTime";
 
 interface IProps {
     discussion: IDiscussion;
@@ -36,25 +38,45 @@ export default function DiscussionListItem(props: IProps) {
     const variables = discussionListVariables();
     const currentUserSignedIn = useCurrentUserSignedIn();
 
-    let icon = <UserPhoto userInfo={discussion.insertUser} size={variables.profilePhoto.size} />;
+    let iconView = <UserPhoto userInfo={discussion.insertUser} size={variables.profilePhoto.size} />;
 
     if (discussion.insertUser) {
-        icon = <ProfileLink userFragment={discussion.insertUser}>{icon}</ProfileLink>;
+        iconView = <ProfileLink userFragment={discussion.insertUser}>{iconView}</ProfileLink>;
     }
 
-    // if (discussion.type === "idea") {
-    //     icon = (
-    //         <>
-    //             {icon}
-    //             <DiscussionVoteCounter discussion={discussion} className={classes.counterPosition} />
-    //         </>
-    //     );
-    // }
+    let icon = <div>{iconView}</div>;
+
+    let iconWrapperClass;
+
+    if (
+        currentUserSignedIn &&
+        discussion.type === "idea" &&
+        discussion.reactions?.some(({ urlcode }) => [ReactionUrlCode.UP, ReactionUrlCode.DOWN].includes(urlcode))
+    ) {
+        const availableReactionsCount = discussion.reactions.filter(({ urlcode }) =>
+            [ReactionUrlCode.UP, ReactionUrlCode.DOWN].includes(urlcode),
+        ).length;
+
+        iconWrapperClass = classes.iconAndVoteCounterWrapper(availableReactionsCount as 1 | 2 | undefined);
+
+        icon = (
+            <div>
+                {icon}
+                <div className={classes.voteCounterContainer}>
+                    <DiscussionVoteCounter discussion={discussion} />
+                </div>
+            </div>
+        );
+    }
 
     const actions = (
         <>
-            {currentUserSignedIn && <DiscussionBookmarkToggle discussion={discussion} />}
-            <DiscussionOptionsMenu discussion={discussion} />
+            {currentUserSignedIn && (
+                <>
+                    <DiscussionBookmarkToggle discussion={discussion} />
+                    <DiscussionOptionsMenu discussion={discussion} />
+                </>
+            )}
         </>
     );
     return (
@@ -66,6 +88,7 @@ export default function DiscussionListItem(props: IProps) {
             metas={<DiscussionListItemMeta {...discussion} />}
             actions={actions}
             icon={icon}
+            iconWrapperClass={iconWrapperClass}
         ></ListItem>
     );
 }
@@ -93,8 +116,6 @@ function DiscussionListItemMeta(props: IDiscussion) {
 
     const classes = discussionListClasses();
     const variables = discussionListVariables();
-    //Check if icon is positioned in metalist
-    const iconPositionMeta = listItemVariables().options.iconPosition === ListItemIconPosition.META;
 
     const {
         pinned,
@@ -110,6 +131,7 @@ function DiscussionListItemMeta(props: IDiscussion) {
         attributes,
         tags,
         score,
+        resolved,
     } = props;
 
     const displayUnreadCount = unread || (countUnread !== undefined && countUnread > 0 && display.unreadCount);
@@ -136,8 +158,19 @@ function DiscussionListItemMeta(props: IDiscussion) {
     const shouldShowUserTags: boolean =
         !!tags && tags.length > 0 && display.userTags && variables.userTags.maxNumber > 0;
 
+    const canResolve = hasPermission("staff.allow", { mode: PermissionMode.GLOBAL_OR_RESOURCE });
+    const displayResolved = resolved !== undefined && canResolve && display.resolved;
+
     return (
         <>
+            {displayResolved && (
+                <MetaIcon className={classes.resolved}>
+                    <Icon
+                        icon={resolved ? "meta-resolved" : "meta-unresolved"}
+                        aria-label={resolved ? t("Resolved") : t("Unresolved")}
+                    />
+                </MetaIcon>
+            )}
             {closed && <Tag>{t("Closed")}</Tag>}
 
             {pinned && <Tag>{t("Announcement")}</Tag>}
@@ -208,7 +241,7 @@ function DiscussionListItemMeta(props: IDiscussion) {
                 </MetaItem>
             )}
 
-            {displayLastCommentDate && !renderLastCommentDateAsIcon && (
+            {displayLastCommentDate && !renderLastCommentDateAsIcon && dateLastComment && (
                 <MetaItem>
                     <DateTime timestamp={dateLastComment} />
                 </MetaItem>
@@ -220,7 +253,7 @@ function DiscussionListItemMeta(props: IDiscussion) {
                 </MetaIcon>
             )}
 
-            {renderLastCommentDateAsIcon && (
+            {renderLastCommentDateAsIcon && dateLastComment && (
                 <MetaIcon>
                     <Icon icon="meta-time" aria-label={t("Last comment")} /> <DateTime timestamp={dateLastComment} />
                 </MetaIcon>

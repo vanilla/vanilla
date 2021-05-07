@@ -77,7 +77,7 @@ export default class StorybookExampleNotificationsDropDown extends React.Compone
                     canGrow={true}
                     header={
                         <FrameHeaderWithAction className="hasAction" title={title}>
-                            <LinkAsButton title={t("Notification Preferences")} baseClass={ButtonTypes.ICON} to={`#`}>
+                            <LinkAsButton title={t("Notification Preferences")} buttonType={ButtonTypes.ICON} to={`#`}>
                                 <SettingsIcon />
                             </LinkAsButton>
                         </FrameHeaderWithAction>
@@ -97,7 +97,7 @@ export default class StorybookExampleNotificationsDropDown extends React.Compone
                             <LinkAsButton
                                 className={classNames(buttonUtils.pushLeft)}
                                 to={"/profile/notifications"}
-                                baseClass={ButtonTypes.TEXT}
+                                buttonType={ButtonTypes.TEXT}
                             >
                                 {t("All Notifications")}
                             </LinkAsButton>
@@ -105,7 +105,7 @@ export default class StorybookExampleNotificationsDropDown extends React.Compone
                                 onClick={() => {
                                     return;
                                 }}
-                                baseClass={ButtonTypes.TEXT_PRIMARY}
+                                buttonType={ButtonTypes.TEXT_PRIMARY}
                                 className={classNames("frameFooter-markRead", classesFrameFooter.markRead)}
                             >
                                 {t("Mark All Read")}

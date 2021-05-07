@@ -168,18 +168,36 @@ trait EventSpyTestTrait {
         }
     }
 
+
+    /**
+     * Looks for a fired event & returns either true if it's found or false if it's not.
+     *
+     * @param string $event
+     * @return bool
+     */
+    private function lookForEventFired(string $event): bool {
+        $event = strtolower($event);
+        $firedEvents = array_column($this->getEventManager()->getFiredEvents(), 0);
+        $firedEvents = array_map("strtolower", $firedEvents);
+        return in_array($event, $firedEvents);
+    }
+
     /**
      * Assert an event was fired.
      *
      * @param string $event
      */
     public function assertEventFired(string $event): void {
-        $event = strtolower($event);
-        $firedEvents = array_column($this->getEventManager()->getFiredEvents(), 0);
-        $firedEvents = array_map("strtolower", $firedEvents);
-        $eventFired = in_array($event, $firedEvents);
+        TestCase::assertTrue($this->lookForEventFired($event));
+    }
 
-        TestCase::assertTrue($eventFired);
+    /**
+     * Assert an event wasn't fired.
+     *
+     * @param string $event
+     */
+    public function assertEventNotFired(string $event): void {
+        TestCase::assertFalse($this->lookForEventFired($event));
     }
 
     /**

@@ -7,7 +7,7 @@
 import React from "react";
 import classNames from "classnames";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import { getButtonStyleFromBaseClass } from "@library/forms/Button";
+import { getClassForButtonType } from "@library/forms/Button";
 import SmartLink from "@library/routing/links/SmartLink";
 import { IOptionalComponentID } from "@library/utility/idUtils";
 import { LinkProps } from "react-router-dom";
@@ -20,7 +20,7 @@ interface IProps extends IOptionalComponentID, LinkProps {
     to: string;
     title?: string;
     ariaLabel?: string;
-    baseClass?: ButtonTypes;
+    buttonType?: ButtonTypes;
     tabIndex?: number;
     disabled?: boolean;
     addWrap?: boolean; // Adds wrapper class to help with overflowing text
@@ -36,7 +36,7 @@ export default class LinkAsButton extends React.Component<IProps> {
 
     public render() {
         const {
-            baseClass,
+            buttonType = ButtonTypes.STANDARD,
             className,
             title,
             ariaLabel,
@@ -47,7 +47,8 @@ export default class LinkAsButton extends React.Component<IProps> {
             disabled,
             ...restProps
         } = this.props;
-        const componentClasses = classNames(getButtonStyleFromBaseClass(baseClass || ButtonTypes.STANDARD), className);
+        const componentClasses = classNames(getClassForButtonType(buttonType), className);
+
         const fallbackTitle = typeof children === "string" ? children : undefined;
         return (
             <SmartLink

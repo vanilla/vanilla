@@ -923,13 +923,6 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         offset: (buttonIconSize - icon.sizes.default) / 2,
     });
 
-    // Sets global "style" for buttons. Use "ButtonPreset" enum to select. By default we use both "bordered" (default) and "solid" (primary) button styles
-    // The other button styles are all "advanced" and need to be overwritten manually because they can't really be converted without completely changing
-    // the style of them.
-    const buttonPreset = makeThemeVars("buttonPreset", {
-        style: undefined as ButtonPreset | undefined,
-    });
-
     /**
      * @varGroup global.separator
      * @commonDescription Sets color and size of separator
@@ -1082,7 +1075,6 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         findColorMatch,
         constants,
         getRatioBasedOnBackgroundDarkness,
-        buttonPreset,
         foundationalWidths,
         widget,
         itemList,

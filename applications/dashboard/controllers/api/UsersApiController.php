@@ -178,7 +178,7 @@ class UsersApiController extends AbstractApiController {
     }
 
     /**
-     * Check if current session user has just Profile.View perission
+     * Check if current session user has just Profile.View permission
      * or advanced permissions as well
      *
      * @return bool

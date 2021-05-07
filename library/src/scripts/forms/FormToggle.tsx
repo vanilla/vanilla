@@ -93,7 +93,7 @@ export function FormToggle(props: IProps) {
 
                     {visibleLabelUrl && (
                         <LinkAsButton
-                            baseClass={ButtonTypes.ICON_COMPACT}
+                            buttonType={ButtonTypes.ICON_COMPACT}
                             to={visibleLabelUrl}
                             ariaLabel={t("More information")}
                         >

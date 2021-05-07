@@ -3,6 +3,9 @@
  * @license gpl-2.0-only
  */
 
+import { buttonGlobalVariables } from "@library/forms/Button.variables";
+import { ButtonTypes } from "@library/forms/buttonTypes";
+import { IButton } from "@library/forms/styleHelperButtonInterface";
 import {
     EMPTY_BACKGROUND,
     EMPTY_BORDER,
@@ -25,6 +28,66 @@ export class Variables {
     constructor() {
         throw new Error("Not to be instantiated");
     }
+
+    static button = (vars: IButton): IButton => {
+        const buttonGlobalVars = buttonGlobalVariables();
+
+        const colors: IButton["colors"] = {
+            ...{
+                fg: buttonGlobalVars.colors.fg,
+                bg: buttonGlobalVars.colors.bg,
+            },
+            ...vars.colors,
+        };
+
+        const fonts: IButton["fonts"] = Variables.font({
+            ...buttonGlobalVars.font,
+            ...vars.fonts,
+            color: vars.fonts?.color ?? colors.fg,
+        });
+
+        const sizing: IButton["sizing"] = {
+            minHeight: undefined,
+            minWidth: undefined,
+            ...vars.sizing,
+        };
+
+        const state: IButton["state"] = vars.state ?? {};
+        const hover: IButton["hover"] = vars.hover ?? state;
+        const focus: IButton["focus"] = vars.focus ?? state;
+        const active: IButton["active"] = vars.active ?? state;
+        const focusAccessible: IButton["focusAccessible"] = vars.focusAccessible ?? state;
+
+        const disabled: IButton["disabled"] = vars.disabled ?? {};
+
+        const borders: IButton["borders"] = Variables.border({
+            ...buttonGlobalVars.border,
+            ...(vars.borders?.color ? vars.borders : {}),
+        });
+
+        const padding: IButton["padding"] = {
+            horizontal: buttonGlobalVars.padding.horizontal,
+            ...vars.padding,
+        };
+
+        return {
+            name: vars.name ?? ButtonTypes.STANDARD,
+            useShadow: vars.useShadow ?? false,
+            skipDynamicPadding: vars.skipDynamicPadding ?? false,
+            opacity: vars.opacity ?? undefined,
+            extraNested: vars.extraNested ?? undefined,
+            colors,
+            fonts,
+            borders,
+            sizing,
+            padding,
+            hover,
+            focus,
+            active,
+            disabled,
+            focusAccessible,
+        };
+    };
 
     static spacing = (vars: ISpacing): ISpacing => ({ ...EMPTY_SPACING, ...vars });
 

@@ -14,6 +14,7 @@ use Vanilla\Contracts;
 use Vanilla\Web\TwigRenderTrait;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Theme\ThemeService;
+use Webmozart\PathUtil\Path;
 
 /**
  * Class to provide assets from the webpack build process.
@@ -49,6 +50,12 @@ class WebpackAssetProvider {
     /** @var string */
     private $fsRoot = PATH_ROOT;
 
+    /** @var WebpackAssetDefinitionCollection[] */
+    private $collectionForSection = [];
+
+    /** @var string[] */
+    private $enabledAddonKeys = null;
+
     /**
      * WebpackAssetProvider constructor.
      *
@@ -70,6 +77,13 @@ class WebpackAssetProvider {
         $this->session = $session;
         $this->config = $config;
         $this->themeService = $themeService;
+    }
+
+    /**
+     * Clear the collections in memory.
+     */
+    public function clearCollections() {
+        $this->collectionForSection = [];
     }
 
     /**
@@ -135,52 +149,45 @@ class WebpackAssetProvider {
             return $scripts;
         }
 
-        // A couple of required assets.
-        $scripts[] = $this->makeScript($section, 'runtime');
-        $scripts[] = $this->makeScript($section, 'vendors');
-
-        // The library chunk is not always created if there is nothing shared between entry-points.
-        $shared = $this->makeScript($section, 'shared');
-        if ($shared->existsOnFs()) {
-            $scripts[] = $shared;
-        }
-
-        // Grab all of the addon based assets.
-        foreach ($this->addonManager->getEnabled() as $addon) {
-            $addon = $this->checkReplacePreview($addon);
-            // See if we have a common bundle
-            $commonAsset = new WebpackAddonAsset(
-                $this->request,
-                WebpackAsset::SCRIPT_EXTENSION,
-                $section,
-                $addon,
-                $this->cacheBustingKey,
-                true
-            );
-            $commonAsset->setFsRoot($this->fsRoot);
-
-            if ($commonAsset->existsOnFs()) {
-                $scripts[] = $commonAsset;
-            }
-
-            $asset = new WebpackAddonAsset(
-                $this->request,
-                WebpackAsset::SCRIPT_EXTENSION,
-                $section,
-                $addon,
-                $this->cacheBustingKey
-            );
-            $asset->setFsRoot($this->fsRoot);
-
-            if ($asset->existsOnFs()) {
-                $scripts[] = $asset;
-            }
-        }
-
-        // The bootstrap asset ties everything together.
-        $scripts[] = $this->makeScript($section, 'bootstrap');
-
+        $collection = $this->getCollectionForSection($section);
+        $scripts =
+            array_merge($scripts, $collection->createAssets($this->request, $this->getEnabledAddonKeys(), 'js'));
         return $scripts;
+    }
+
+    /**
+     * Get a colleciton for the current section.
+     *
+     * @param string $section
+     *
+     * @return WebpackAssetDefinitionCollection
+     */
+    private function getCollectionForSection(string $section): WebpackAssetDefinitionCollection {
+        if (!isset($this->collectionForSection[$section])) {
+            $distPath = Path::join($this->fsRoot, 'dist');
+            if (WebpackAssetDefinitionCollection::sectionExists($section, $distPath)) {
+                $this->collectionForSection[$section] = WebpackAssetDefinitionCollection::loadFromDist($section, $distPath);
+            } else {
+                $this->collectionForSection[$section] = new WebpackAssetDefinitionCollection($section);
+            }
+        }
+        return $this->collectionForSection[$section];
+    }
+
+    /**
+     * Get the enabled addon keys.
+     *
+     * @return string[]
+     */
+    private function getEnabledAddonKeys(): array {
+        if ($this->enabledAddonKeys === null) {
+            $this->enabledAddonKeys = [];
+            foreach ($this->addonManager->getEnabled() as $addon) {
+                $addon = $this->checkReplacePreview($addon);
+                $this->enabledAddonKeys[] = $addon->getKey();
+            }
+        }
+        return $this->enabledAddonKeys;
     }
 
     /**
@@ -193,14 +200,10 @@ class WebpackAssetProvider {
         if ($addon->getType() !== 'theme') {
             return $addon;
         }
-        $currentConfigThemeKey = $this->config->get('Garden.CurrentTheme', $this->config->get('Garden.Theme'));
-        $currentThemeKey = $this->themeService->getMasterThemeKey($currentConfigThemeKey);
         if ($previewThemeKey = $this->session->getPreference('PreviewThemeKey')) {
-            if ($addon->getKey() === $currentThemeKey) {
-                $addonKey = $this->themeService->getMasterThemeKey($previewThemeKey);
-                if ($previewTheme = $this->addonManager->lookupTheme($addonKey)) {
-                    $addon = $previewTheme;
-                }
+            $addonKey = $this->themeService->getMasterThemeKey($previewThemeKey);
+            if ($previewTheme = $this->addonManager->lookupTheme($addonKey)) {
+                $addon = $previewTheme;
             }
         }
         return $addon;
@@ -219,49 +222,8 @@ class WebpackAssetProvider {
             return [];
         }
 
-        $styles = [];
-
-        $sharedStyles = new WebpackAsset(
-            $this->request,
-            WebpackAsset::STYLE_EXTENSION,
-            $section,
-            'shared',
-            $this->cacheBustingKey
-        );
-
-        $vendorStyles = new WebpackAsset(
-            $this->request,
-            WebpackAsset::STYLE_EXTENSION,
-            $section,
-            'vendors',
-            $this->cacheBustingKey
-        );
-
-        if ($sharedStyles->existsOnFs()) {
-            $styles[] = $sharedStyles;
-        }
-
-        if ($vendorStyles->existsOnFs()) {
-            $styles[] = $vendorStyles;
-        }
-
-        // Grab all of the addon based assets.
-        foreach ($this->addonManager->getEnabled() as $addon) {
-            $addon = $this->checkReplacePreview($addon);
-            $asset = new WebpackAddonAsset(
-                $this->request,
-                WebpackAsset::STYLE_EXTENSION,
-                $section,
-                $addon,
-                $this->cacheBustingKey
-            );
-            $asset->setFsRoot($this->fsRoot);
-
-            if ($asset->existsOnFs()) {
-                $styles[] = $asset;
-            }
-        }
-
+        $collection = $this->getCollectionForSection($section);
+        $styles = $collection->createAssets($this->request, $this->getEnabledAddonKeys(), 'css');
         return $styles;
     }
 
@@ -274,26 +236,6 @@ class WebpackAssetProvider {
      */
     public function setFsRoot(string $fsRoot) {
         $this->fsRoot = $fsRoot;
-    }
-
-    /**
-     * Make a script asset.
-     *
-     * @param string $section The section of the script.
-     * @param string $name The name of the script.
-     *
-     * @return WebpackAsset A webpack script asset.
-     */
-    private function makeScript(string $section, string $name): WebpackAsset {
-        $asset = new WebpackAsset(
-            $this->request,
-            WebpackAsset::SCRIPT_EXTENSION,
-            $section,
-            $name,
-            $this->cacheBustingKey
-        );
-        $asset->setFsRoot($this->fsRoot);
-        return $asset;
     }
 
     /**

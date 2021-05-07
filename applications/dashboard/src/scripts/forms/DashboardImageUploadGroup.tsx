@@ -52,10 +52,10 @@ export function DashboardImageUploadGroup(props: IProps) {
                 afterDescription={
                     imagePreviewSrc && (
                         <>
-                            <div>{<img src={imagePreviewSrc} />}</div>
+                            <div>{<img src={imagePreviewSrc} loading="lazy" />}</div>
                             <div>
                                 <Button
-                                    baseClass={ButtonTypes.TEXT_PRIMARY}
+                                    buttonType={ButtonTypes.TEXT_PRIMARY}
                                     onClick={() => {
                                         setPreviewUrl(null);
                                         if (isStillOriginalValue) {

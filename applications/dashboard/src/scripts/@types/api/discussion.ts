@@ -3,6 +3,7 @@
  * @license GPL-2.0-only
  */
 
+import { IReaction } from "@dashboard/@types/api/reaction";
 import { IUserFragment } from "@library/@types/api/users";
 import { ITag } from "@library/features/tags/TagsReducer";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
@@ -25,6 +26,7 @@ export interface IDiscussion {
     closed: boolean;
     score: number;
     sink?: boolean;
+    resolved?: boolean;
     countViews: number;
     countComments: number;
     attributes?: any;
@@ -45,6 +47,8 @@ export interface IDiscussion {
     unread?: boolean;
     countUnread?: number;
     bookmarked?: boolean;
+
+    reactions?: IReaction[];
 }
 
 export interface IDiscussionEdit {

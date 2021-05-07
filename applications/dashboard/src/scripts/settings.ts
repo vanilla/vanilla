@@ -4,6 +4,17 @@
  * @license GPL-2.0-only
  */
 
+import { onReady } from "@library/utility/appUtils";
+
+/**
+ * Adds event listeners to toggle a children element when data-children is specified on a toggle
+ */
+export const bindToggleChildrenEventListeners = () => {
+    onReady(() => {
+        document.addEventListener("change", triggerChildElements);
+    });
+};
+
 /**
  * Trigger to activate/deactivate child elements
  *

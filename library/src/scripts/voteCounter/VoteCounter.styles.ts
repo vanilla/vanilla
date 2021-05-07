@@ -31,10 +31,16 @@ export const voteCounterClasses = useThemeCache(() => {
 
     const count = css({
         fontSize: "0.35em",
-        lineHeight: 1.43,
         fontWeight: globalVars.fonts.weights.semiBold,
+
         [`&:first-child`]: {
+            // the count is first child when there is only an 'up' vote arrow.
+            lineHeight: 1.43,
             marginBottom: percent(-20),
+        },
+        [`&:nth-child(2)`]: {
+            // the count is second child when there there are 'up' and 'down' vote arrows.
+            lineHeight: 0.72,
         },
     });
 

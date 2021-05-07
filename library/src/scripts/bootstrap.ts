@@ -80,10 +80,10 @@ _executeReady(loadThemeShadowDom)
         // Mount all data-react components.
         onContent((e) => {
             _mountComponents(e.target as HTMLElement).finally(() => {
-                setImmediate(() => {
+                setTimeout(() => {
                     // Without setImmediate there is a FOUC
                     loadedCSS();
-                });
+                }, 0);
             });
             blotCSS();
             mountInputs();

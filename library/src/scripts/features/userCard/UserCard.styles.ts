@@ -6,7 +6,6 @@
 import { buttonVariables } from "@library/forms/Button.variables";
 import { buttonResetMixin } from "@library/forms/buttonMixins";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
 import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { Mixins } from "@library/styles/Mixins";
@@ -78,11 +77,6 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
 
     const avatar = style("avatar", {
         ...buttonResetMixin(),
-    });
-
-    // Fetch button styles
-    const buttonStyles = generateButtonStyleProperties({
-        buttonTypeVars: buttonVariables().standard,
     });
 
     const button = style(

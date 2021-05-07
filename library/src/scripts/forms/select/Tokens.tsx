@@ -14,7 +14,6 @@ import Paragraph from "@library/layout/Paragraph";
 import classNames from "classnames";
 import * as selectOverrides from "@library/forms/select/overwrites";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
-import MutationObserver from "react-mutation-observer";
 
 export interface ITokenProps extends IOptionalComponentID {
     label: string | null;
@@ -100,22 +99,13 @@ export default class Tokens extends React.Component<ITokenProps, IState> {
                             onBlur={this.onBlur}
                         />
                     </div>
-
-                    <MutationObserver
-                        onAttributeChange={(e) => {
-                            if (e.to && e.to !== e.from) {
-                                this.props.onChange(JSON.parse(e.to));
-                            }
-                        }}
-                    >
-                        <input
-                            className={"js-" + this.prefix + "-tokenInput"}
-                            aria-hidden={true}
-                            value={JSON.stringify(this.props.value)}
-                            type="hidden"
-                            tabIndex={-1}
-                        />
-                    </MutationObserver>
+                    <input
+                        className={"js-" + this.prefix + "-tokenInput"}
+                        aria-hidden={true}
+                        value={JSON.stringify(this.props.value)}
+                        type="hidden"
+                        tabIndex={-1}
+                    />
                 </div>
             </>
         );

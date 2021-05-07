@@ -33,10 +33,10 @@ export function AuthenticatorTableRow(props: IProps) {
             <td>{clientID}</td>
             <td>
                 <DashboardTableOptions>
-                    <Button className="btn-icon" onClick={onEditClick} baseClass={ButtonTypes.ICON_COMPACT}>
+                    <Button className="btn-icon" onClick={onEditClick} buttonType={ButtonTypes.ICON_COMPACT}>
                         <EditIcon />
                     </Button>
-                    <Button className="btn-icon" onClick={onDeleteClick} baseClass={ButtonTypes.ICON_COMPACT}>
+                    <Button className="btn-icon" onClick={onDeleteClick} buttonType={ButtonTypes.ICON_COMPACT}>
                         <DeleteIcon />
                     </Button>
                     <DashboardToggle disabled={disableToggle} onChange={onChangeActive} checked={isActive} />

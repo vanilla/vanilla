@@ -2,7 +2,8 @@
 
 if (!defined('APPLICATION')) exit();
 
-BoxThemeShim::inactiveHtml('<div class="DataListWrap">');
+
+echo '<div class="DataListWrap widget-dontUseCssOnMe">';
 BoxThemeShim::startHeading();
 echo '<h2 class="H">'.t('Activity').'</h2>';
 BoxThemeShim::endHeading();
@@ -32,4 +33,4 @@ $this->setData('activityBoxIsSet', true);
 // Include the activities
 include($this->fetchViewLocation('index', 'activity', 'dashboard'));
 BoxThemeShim::endBox();
-BoxThemeShim::inactiveHtml('</div>');
+echo '</div>';

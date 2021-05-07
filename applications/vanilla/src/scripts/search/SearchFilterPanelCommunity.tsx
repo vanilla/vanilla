@@ -4,7 +4,6 @@
  */
 
 import { IComboBoxOption } from "@library/features/search/SearchBar";
-import DateRange from "@library/forms/DateRange";
 import { dateRangeClasses } from "@library/forms/dateRangeStyles";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import InputTextBlock from "@library/forms/InputTextBlock";
@@ -19,6 +18,7 @@ import MultiUserInput from "@library/features/users/MultiUserInput";
 import CheckboxGroup from "@library/forms/CheckboxGroup";
 import { CommunityPostTypeFilter } from "@vanilla/addon-vanilla/search/CommunityPostTypeFilter";
 import { TagsInput } from "@library/features/tags/TagsInput";
+import LazyDateRange from "@library/forms/LazyDateRange";
 
 /**
  * Implement search filter panel for discussions
@@ -48,7 +48,7 @@ export function SearchFilterPanelCommunity() {
                 }}
                 value={form.authors ?? []}
             />
-            <DateRange
+            <LazyDateRange
                 onStartChange={(date: string) => {
                     updateForm({ startDate: date });
                 }}

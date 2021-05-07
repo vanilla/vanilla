@@ -8,7 +8,7 @@ import ReduxActions, { bindThunkAction, useReduxActions } from "@library/redux/R
 import { actionCreatorFactory } from "typescript-fsa";
 import { IDiscussion, IGetDiscussionListParams } from "@dashboard/@types/api/discussion";
 import { IUser } from "@library/@types/api/users";
-import { Reaction } from "@dashboard/@types/api/reaction";
+import { IReaction } from "@dashboard/@types/api/reaction";
 
 const createAction = actionCreatorFactory("@@discussions");
 
@@ -38,10 +38,18 @@ export interface ISinkDiscussionParams {
     sink?: IDiscussion["sink"];
 }
 
+export interface IResolveDiscussionParams {
+    resolved?: IDiscussion["resolved"];
+}
+
 // this interface should extend every set of parameters that is accepted in the patch discussion endpoint
 interface IPatchDiscussionRequest
     extends Partial<
-        IAnnounceDiscussionParams & IMoveDiscussionParams & ICloseDiscussionParams & ISinkDiscussionParams
+        IAnnounceDiscussionParams &
+            IMoveDiscussionParams &
+            ICloseDiscussionParams &
+            ISinkDiscussionParams &
+            IResolveDiscussionParams
     > {
     patchStatusID?: string;
     discussionID: IDiscussion["discussionID"];
@@ -51,19 +59,15 @@ export type IPatchDiscussionResult = IDiscussion;
 
 export interface IPostDiscussionReaction {
     discussionID: IDiscussion["discussionID"];
-    reactionType: Reaction;
+    reaction: IReaction;
+    currentReaction?: IReaction;
 }
 
-export interface IPostDiscussionReactionResult {
-    //fixme
-}
+type IPostDiscussionReactionResult = IReaction[];
 
 export interface IDeleteDiscussionReaction {
     discussionID: IDiscussion["discussionID"];
-}
-
-export interface IDeleteDiscussionReactionResult {
-    // fixme
+    currentReaction: IReaction;
 }
 
 export interface IDeleteDiscussion {
@@ -167,28 +171,26 @@ export default class DiscussionActions extends ReduxActions {
     >("POST_DISCUSSION_REACTION");
 
     public postDiscussionReaction = (query: IPostDiscussionReaction) => {
-        const { discussionID, reactionType } = query;
+        const { discussionID, reaction } = query;
         const thunk = bindThunkAction(DiscussionActions.postDiscussionReactionACs, async () => {
             const reponse = await this.api.post(`/discussions/${discussionID}/reactions`, {
-                reactionType,
+                reactionType: reaction.urlcode,
             });
             return reponse.data;
-        })({ discussionID, reactionType });
+        })(query);
         return this.dispatch(thunk);
     };
 
-    public static deleteDiscussionReactionACs = createAction.async<
-        IDeleteDiscussionReaction,
-        IDeleteDiscussionReactionResult,
-        IApiError
-    >("DELETE_DISCUSSION_REACTION");
+    public static deleteDiscussionReactionACs = createAction.async<IDeleteDiscussionReaction, {}, IApiError>(
+        "DELETE_DISCUSSION_REACTION",
+    );
 
     public deleteDiscussionReaction = (query: IDeleteDiscussionReaction) => {
         const { discussionID } = query;
         const thunk = bindThunkAction(DiscussionActions.deleteDiscussionReactionACs, async () => {
             const reponse = await this.api.delete(`/discussions/${discussionID}/reactions`);
             return reponse.data;
-        })({ discussionID });
+        })(query);
         return this.dispatch(thunk);
     };
 

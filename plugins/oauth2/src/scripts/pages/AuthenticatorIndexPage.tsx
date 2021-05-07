@@ -20,7 +20,7 @@ import Loader from "@library/loaders/Loader";
 import { EmptyAuthenticatorResults } from "@oauth2/components/EmptyAuthenticatorResults";
 import { IAuthenticator } from "@oauth2/AuthenticatorTypes";
 import OAuth2AddEdit from "@oauth2/pages/AuthenticatorAddEdit";
-import Modal from "@library/modal/Modal";
+import LazyModal from "@library/modal/LazyModal";
 import ModalSizes from "@library/modal/ModalSizes";
 import Button from "@library/forms/Button";
 import { modalClasses } from "@library/modal/modalStyles";
@@ -57,7 +57,7 @@ export default function ConnectionsIndexPage(props: IOwnProps) {
                     <>
                         <Button
                             style={{ marginLeft: "auto" }}
-                            baseClass={ButtonTypes.DASHBOARD_PRIMARY}
+                            buttonType={ButtonTypes.DASHBOARD_PRIMARY}
                             onClick={() => {
                                 setEditingID(0);
                                 setFormVisible(true);
@@ -71,7 +71,7 @@ export default function ConnectionsIndexPage(props: IOwnProps) {
                     </>
                 }
             />
-            <Modal
+            <LazyModal
                 isVisible={isFormVisible}
                 size={ModalSizes.LARGE}
                 className={modalClasses().frameWrapper}
@@ -84,7 +84,7 @@ export default function ConnectionsIndexPage(props: IOwnProps) {
                         setFormVisible(false);
                     }}
                 />
-            </Modal>
+            </LazyModal>
             {deleteID !== undefined && (
                 <AuthenticatorDeleteModal
                     authenticatorID={deleteID}

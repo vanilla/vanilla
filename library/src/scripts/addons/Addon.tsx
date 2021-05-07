@@ -50,7 +50,7 @@ const Addon = function (props: IProps) {
 
     const forceWrap = measure.width > 0 && measure.width < 600;
 
-    const image = <img className={previewImage} src={props.imageUrl} />;
+    const image = <img className={previewImage} src={props.imageUrl} loading="lazy" />;
 
     let toggle = (
         <FormToggle

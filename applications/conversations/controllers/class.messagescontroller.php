@@ -68,7 +68,7 @@ class MessagesController extends ConversationsController {
             $this->addDefinition('MaxRecipients', $maxRecipients);
             $this->setData('MaxRecipients', $maxRecipients);
         }
-
+        $recipientUserIDs = [];
         // Sending a new conversation.
         if ($this->Form->authenticatedPostBack()) {
             $recipientUserIDs = explode(',', $this->Form->getFormValue('To', ''));

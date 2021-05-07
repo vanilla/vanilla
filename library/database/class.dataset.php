@@ -12,10 +12,13 @@
  * @since 2.0
  */
 
+use Vanilla\InjectableInterface;
+use Garden\EventManager;
+
 /**
  * Class Gdn_DataSet
  */
-class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
+class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable, InjectableInterface {
 
     /** Inner join. */
     const JOIN_INNER = 'inner';
@@ -52,13 +55,20 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
     /** @var array An array of either objects or associative arrays with the data in this dataset. */
     protected $_Result;
 
+    /** @var EventManager the event manager for plugin hooks */
+    protected $eventManager;
+
+    /** @var array of query options from Gdn_Database->query */
+    protected $queryOptions;
+
     /**
      * Gdn_DataSet constructor.
      *
      * @param array|null $result
      * @param string $dataSetType
+     * @param array $queryOptions optional query options array that was used to get this DataSet
      */
-    public function __construct($result = null, $dataSetType = null) {
+    public function __construct($result = null, $dataSetType = null, array $queryOptions = []) {
         // Set defaults
         $this->Connection = null;
         $this->cursor = -1;
@@ -72,6 +82,17 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
                 $this->_DatasetType = DATASET_TYPE_ARRAY;
             }
         }
+        $this->queryOptions = $queryOptions;
+        $this->eventManager = Gdn::eventManager();
+    }
+
+    /**
+     * Sets this class' dependencies for DI
+     *
+     * @param EventManager $eventManager the event manager
+     */
+    public function setDependencies(EventManager $eventManager = null) {
+        $this->eventManager = $eventManager;
     }
 
     /**
@@ -203,12 +224,20 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
         // Calling fetchAll on insert/update/delete queries will raise an error!
         if (preg_match('/^(insert|update|delete)/', trim(strtolower($this->pdoStatement->queryString))) !== 1) {
             $result = $this->pdoStatement->fetchAll($this->_DatasetType == DATASET_TYPE_ARRAY ? PDO::FETCH_ASSOC : PDO::FETCH_OBJ);
-        } else {
-            $this->_Result = $result;
+        }
+
+        $this->_Result = $result;
+
+        if ($this->eventManager) {
+            $this->_Result = $this->eventManager->fireFilter(
+                'database_query_result_after',
+                $this->_Result,
+                $this->pdoStatement->queryString,
+                $this->queryOptions
+            );
         }
 
         $this->freePDOStatement(true);
-        $this->_Result = $result;
     }
 
     /**
@@ -714,5 +743,23 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
         $result = $this->resultArray();
         jsonFilter($result);
         return $result;
+    }
+
+    /**
+     * Returns the query options that created this DataSet
+     *
+     * @return array query options array or null
+     */
+    public function getQueryOptions(): array {
+        return $this->queryOptions;
+    }
+
+    /**
+     * Sets the query options that produced this DataSet
+     *
+     * @param array $options query options
+     */
+    public function setQueryOptions(array $options) {
+        $this->queryOptions = $options;
     }
 }

@@ -63,7 +63,7 @@ export default class SiteNavNode extends React.Component<IProps> {
         if (this.props.clickableCategoryLabels && collapsible) {
             linkContents = (
                 <Button
-                    baseClass={ButtonTypes.CUSTOM}
+                    buttonType={ButtonTypes.CUSTOM}
                     onKeyDownCapture={this.handleKeyDown}
                     className={linkContentClasses}
                     onClick={this.handleToggleClick as any}
@@ -157,7 +157,7 @@ export default class SiteNavNode extends React.Component<IProps> {
                             title={t("Toggle Category")}
                             ariaLabel={t("Toggle Category")}
                             onClick={this.handleToggleClick as any}
-                            baseClass={ButtonTypes.CUSTOM}
+                            buttonType={ButtonTypes.CUSTOM}
                             className={classNames("siteNavNode-toggle", classes.toggle)}
                         >
                             {this.isOpen ? (

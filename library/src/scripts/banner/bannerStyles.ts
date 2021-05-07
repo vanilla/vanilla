@@ -9,7 +9,7 @@ import { buttonGlobalVariables, buttonVariables } from "@library/forms/Button.va
 import { ButtonPreset } from "@library/forms/ButtonPreset";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
-import { IButtonType } from "@library/forms/styleHelperButtonInterface";
+import { IButton } from "@library/forms/styleHelperButtonInterface";
 import { compactSearchVariables } from "@library/headers/mebox/pieces/compactSearchStyles";
 import { containerVariables } from "@library/layout/components/containerStyles";
 import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
@@ -631,7 +631,7 @@ export const bannerVariables = useThemeCache(
             },
         });
 
-        let buttonStateStyles = {
+        let buttonStateStyles: IButton["state"] = {
             colors: {
                 fg: isSolidBordered ? colors.primary : colors.primaryContrast,
                 bg: isSolidBordered
@@ -665,36 +665,38 @@ export const bannerVariables = useThemeCache(
 
         buttonBorderStyles.borderRadius = standardizeBorderRadius(buttonBorderStyles.borderRadius);
 
-        const searchButtonDropDown: IButtonType = makeThemeVars("searchButton", {
-            name: "searchButton",
-            presetName: presets.button.preset,
-            spinnerColor: colors.primaryContrast,
-            sizing: {
-                minHeight: searchBar.sizing.height,
-            },
-            colors: {
-                bg: isSolidBordered ? colors.bg : searchButtonBg,
-                fg: isSolidBordered ? colors.fg : colors.bg,
-            },
-            borders: {
-                left: {
-                    radius: border.radius,
-                    color: colors.bg,
+        const searchButtonDropDown = makeThemeVars(
+            "searchButton",
+            Variables.button({
+                name: "searchButton",
+                presetName: presets.button.preset,
+                sizing: {
+                    minHeight: searchBar.sizing.height,
                 },
-                right: {
-                    color: searchBar.border.color,
-                    width: searchBar.border.width,
-                    radius: 0,
+                colors: {
+                    bg: isSolidBordered ? colors.bg : searchButtonBg,
+                    fg: isSolidBordered ? colors.fg : colors.bg,
                 },
-            },
-            fonts: {
-                ...globalVars.fontSizeAndWeightVars("large", "bold"),
-            },
-            state: buttonStateStyles,
-        });
+                borders: {
+                    left: {
+                        radius: border.radius,
+                        color: colors.bg,
+                    },
+                    right: {
+                        color: searchBar.border.color,
+                        width: searchBar.border.width,
+                        radius: 0,
+                    },
+                },
+                fonts: {
+                    ...globalVars.fontSizeAndWeightVars("large", "bold"),
+                },
+                state: buttonStateStyles,
+            }),
+        );
 
         const buttonColorSolidBordered = colors.fg ?? font.color;
-        const searchButtonType: IButtonType = {
+        const searchButtonVars = {
             name: "searchButton",
             presetName: presets.button.preset,
             sizing: {
@@ -711,13 +713,13 @@ export const bannerVariables = useThemeCache(
             state: buttonStateStyles,
         };
 
-        const searchButton = makeThemeVars("searchButton", searchButtonType);
+        const searchButton = makeThemeVars("searchButton", Variables.button(searchButtonVars));
 
         if (isSolidButton && !isBordered) {
             const buttonVars = buttonVariables();
             searchButton.state = {
                 ...searchButton.state,
-                ...buttonVars.primary!.state,
+                ...buttonVars.primary.state,
             };
             searchButton.colors = buttonVars.primary!.colors;
             searchButton.borders!.color = buttonVars.primary.borders!.color;
@@ -840,9 +842,6 @@ export const bannerClasses = useThemeCache(
                 "&.searchBar-submitButton": {
                     ...generateButtonStyleProperties({
                         buttonTypeVars: vars.searchButton,
-                        globalVars,
-                        formElementVars,
-                        buttonGlobalVars,
                         debug: true,
                     }),
                     ...{
@@ -869,12 +868,7 @@ export const bannerClasses = useThemeCache(
         } as CSSObject); //FIXME: avoid type assertion (once the '&&&&'-style overrides are cleaned up)
 
         const searchDropDownButton = style("searchDropDown", {
-            ...generateButtonStyleProperties({
-                buttonTypeVars: vars.searchButtonDropDown,
-                globalVars,
-                formElementVars,
-                buttonGlobalVars,
-            }),
+            ...Mixins.button(vars.searchButtonDropDown),
         });
 
         const valueContainer = style("valueContainer", {});

@@ -728,6 +728,36 @@ class CategoryModelTest extends SiteTestCase {
     }
 
     /**
+     * Test CategoryModel::getCategoryDescendantIDs.
+     */
+    public function testGetCategoriesDescendantIDs(): void {
+        \Gdn::sql()->truncate('Category');
+        /** @var CategoryModel $categoryModel */
+        $categoryModel = self::container()->get(CategoryModel::class);
+
+        $cat1 = $categoryModel->save([
+            'ParentCategoryID' => -1,
+            'Name' => 'Category 1',
+            'UrlCode' => 'cat1',
+            'DisplayAs' => 'Categories',
+        ]);
+
+        $cat2 = $categoryModel->save([
+            'ParentCategoryID' => $cat1,
+            'Name' => 'Category 2',
+            'UrlCode' => 'cat1_2',
+            'DisplayAs' => 'Categories',
+        ]);
+        $cat3 = $categoryModel->save([
+            'ParentCategoryID' => $cat2,
+            'Name' => 'Category 3',
+            'UrlCode' => 'cat1_3',
+            'DisplayAs' => 'Categories',
+        ]);
+        $result = $categoryModel->getCategoriesDescendantIDs([$cat2, $cat1]);
+        $this->assertEqualsCanonicalizing([$cat1, $cat2, $cat3], $result);
+    }
+    /**
      * Test that caching works for getDescandants.
      */
     public function testGetDescendantsCache() {

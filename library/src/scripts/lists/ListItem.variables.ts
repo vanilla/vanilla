@@ -30,19 +30,27 @@ export interface IListItemOptions {
     layout: ListItemLayout;
 }
 
+export interface IListItemComponentOptions {
+    iconPosition: ListItemIconPosition;
+}
+
 export enum ListItemLayout {
     TITLE_DESCRIPTION_METAS = "title-description-metas",
     TITLE_METAS_DESCRIPTION = "title-metas-description",
     TITLE_METAS = "title-metas",
 }
 
-export const listItemVariables = useThemeCache(() => {
+export const listItemVariables = useThemeCache((componentOptions?: Partial<IListItemComponentOptions>) => {
     const makeVars = variableFactory("listItem");
     const globalVars = globalVariables();
 
-    const options = makeVars("options", {
-        iconPosition: ListItemIconPosition.DEFAULT,
-    });
+    const options = makeVars(
+        "options",
+        {
+            iconPosition: ListItemIconPosition.DEFAULT,
+        },
+        componentOptions,
+    );
 
     /**
      * @varGroup listItem.title

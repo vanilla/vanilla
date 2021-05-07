@@ -567,6 +567,22 @@ abstract class AbstractCommunitySearchTests extends AbstractSearchTest {
         $results = $response->getBody();
         $this->assertEquals(2, count($results));
         $this->assertEquals(true, 'discussion 2' === $results[1]['name'] || 'discussion 2' === $results[0]['name']);
+
+        $params = [
+            'query' => 'discussion',
+            'categoryIDs' =>  [$parentCategory['categoryID']],
+            'includeChildCategories' => true,
+        ];
+        $response = $this->api()->get('/search?' . http_build_query($params));
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $results = $response->getBody();
+        $this->assertEquals(2, count($results));
+        $this->assertEquals(
+            true,
+            'discussion 1' === $results[0]['name'] && 'discussion 2' === $results[1]['name'] ||
+            'discussion 1' === $results[1]['name'] && 'discussion 2' === $results[0]['name']
+        );
     }
 
     /**

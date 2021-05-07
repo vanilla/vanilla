@@ -58,6 +58,10 @@ class ThemeFeatures implements \JsonSerializable {
 
         // New button style dropdown
         'NewCategoryDropdown',
+
+
+        // New button style dropdown
+        'NewBadgesModule',
     ];
 
     /**

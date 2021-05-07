@@ -151,7 +151,7 @@ export function ThemeInputNumber(_props: IProps) {
                                 inputProps.disabled || (max != undefined && ensureInteger(generatedValue!) >= max)
                             }
                             className={classes.stepUp}
-                            baseClass={ButtonTypes.CUSTOM}
+                            buttonType={ButtonTypes.CUSTOM}
                         >
                             +
                         </Button>
@@ -160,7 +160,7 @@ export function ThemeInputNumber(_props: IProps) {
                             {...stepDownIntervalProps}
                             disabled={inputProps.disabled || ensureInteger(generatedValue!) <= min}
                             className={classes.stepDown}
-                            baseClass={ButtonTypes.CUSTOM}
+                            buttonType={ButtonTypes.CUSTOM}
                         >
                             -
                         </Button>

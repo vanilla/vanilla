@@ -45,7 +45,7 @@ export function ThemeBuilderRevert(_props: IProps) {
         <Button
             {...props}
             className={classes.resetButton}
-            baseClass={ButtonTypes.ICON_COMPACT}
+            buttonType={ButtonTypes.ICON_COMPACT}
             title={t("Reset")}
             onClick={() => {
                 setValue(initialValue ?? null); // Passing undefined doesn't clear a variable is initital wasn't set, we need to revert to null.

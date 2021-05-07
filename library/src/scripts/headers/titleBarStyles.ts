@@ -35,10 +35,9 @@ import {
     viewWidth,
 } from "csx";
 import backLinkClasses from "@library/routing/links/backLinkStyles";
-import { CSSObject } from "@emotion/css";
+import { css, CSSObject } from "@emotion/css";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { buttonResetMixin } from "@library/forms/buttonMixins";
-import generateButtonClass from "@library/forms/styleHelperButtonGenerator";
 import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { titleBarVariables } from "./TitleBar.variables";
 import { ButtonTypes } from "@library/forms/buttonTypes";
@@ -495,7 +494,7 @@ export const titleBarClasses = useThemeCache(() => {
         }),
     );
 
-    const linkButton = generateButtonClass(vars.linkButton);
+    const linkButton = css(Mixins.button(vars.linkButton));
 
     const buttonOffset = style("buttonOffset", {
         transform: `translateX(6px)`,

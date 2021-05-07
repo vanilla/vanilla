@@ -1,0 +1,8 @@
+{
+    "vendor-abcd1234.js": "/path/to/vendor1.min.js",
+    "vendor-abcd1234.css": "/path/to/vendor1.min.css",
+    "addons/everything.js": "/path/to/addons/everything.min.js",
+    "addons/everything-abcd1234.css": "/path/to/everything.min.css",
+    "addons/js-only-abcd1234.js": "/path/to/addons/js-only.min.js",
+    "addons/css-only-abcd1234.css": "/path/to/css-only.min.css"
+}

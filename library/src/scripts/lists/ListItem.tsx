@@ -6,12 +6,13 @@
 
 import { cx } from "@emotion/css";
 import { listItemClasses } from "@library/lists/ListItem.styles";
-import { Metas } from "@library/metas/Metas";
+import { MetaItem, Metas } from "@library/metas/Metas";
 import SmartLink from "@library/routing/links/SmartLink";
 import React, { useContext, useRef } from "react";
 import { useMeasure } from "@vanilla/react-utils";
 import { PageBox } from "@library/layout/PageBox";
 import {
+    IListItemComponentOptions,
     IListItemOptions,
     ListItemIconPosition,
     ListItemLayout,
@@ -30,11 +31,14 @@ export interface IListItemProps {
     descriptionClassName?: string;
     descriptionMaxCharCount?: number;
     icon?: React.ReactNode;
+    iconWrapperClass?: string;
     metas?: React.ReactNode;
+    metasWrapperClass?: string;
     mediaItem?: React.ReactNode;
     actions?: React.ReactNode;
     as?: keyof JSX.IntrinsicElements;
     headingDepth?: number;
+    options?: Partial<IListItemComponentOptions>;
 }
 
 export function ListItem(props: IListItemProps) {
@@ -42,7 +46,10 @@ export function ListItem(props: IListItemProps) {
     const selfRef = useRef<HTMLDivElement>(null);
     const measure = useMeasure(selfRef);
     const { layout } = useContext(ListItemContext);
-    const iconPosition = listItemVariables().options.iconPosition;
+    const listItemVars = listItemVariables(props.options);
+    const {
+        options: { iconPosition },
+    } = listItemVars;
 
     const isMobileMedia = measure.width <= 600;
 
@@ -52,14 +59,17 @@ export function ListItem(props: IListItemProps) {
         <div className={isMobileMedia ? classes.mobileMediaContainer : classes.mediaContainer}>{props.mediaItem}</div>
     );
 
-    const metaView = props.metas && (
-        <Metas className={classes.metasContainer}>
-            {iconPosition === ListItemIconPosition.META && (
-                <div className={cx(classes.iconContainer, classes.iconContainerInline)}>{props.icon}</div>
-            )}
-            {props.metas}
-        </Metas>
-    );
+    let metas = <Metas className={classes.metasContainer}>{props.metas}</Metas>;
+
+    if (iconPosition === ListItemIconPosition.META) {
+        metas = (
+            <div className={cx(classes.inlineIconAndMetasContainer, props.metasWrapperClass)}>
+                <div className={cx(classes.inlineIconContainer, props.iconWrapperClass)}>{props.icon}</div>
+                {metas}
+            </div>
+        );
+    }
+
     const descriptionView = props.description && (
         <Paragraph className={cx(classes.description, descriptionClassName)}>
             <TruncatedText maxCharCount={descriptionMaxCharCount} lines={2}>
@@ -72,7 +82,7 @@ export function ListItem(props: IListItemProps) {
         <PageBox as={props.as ?? "li"} ref={selfRef} className={cx(props.className)}>
             <div className={classes.item}>
                 {iconPosition === ListItemIconPosition.DEFAULT && props.icon && (
-                    <div className={classes.iconContainer}>{props.icon}</div>
+                    <div className={cx(classes.iconContainer, props.iconWrapperClass)}>{props.icon}</div>
                 )}
                 <div className={classes.contentContainer}>
                     <div className={classes.titleContainer}>
@@ -92,11 +102,11 @@ export function ListItem(props: IListItemProps) {
                         {!isMobileMedia && media}
                         <div className={classes.metaDescriptionContainer}>
                             {[ListItemLayout.TITLE_METAS, ListItemLayout.TITLE_METAS_DESCRIPTION].includes(layout) &&
-                                metaView}
+                                metas}
                             {layout === ListItemLayout.TITLE_DESCRIPTION_METAS && descriptionView}
                             {isMobileMedia && media}
                             {layout === ListItemLayout.TITLE_METAS_DESCRIPTION && descriptionView}
-                            {layout === ListItemLayout.TITLE_DESCRIPTION_METAS && metaView}
+                            {layout === ListItemLayout.TITLE_DESCRIPTION_METAS && metas}
                         </div>
                     </div>
                 </div>

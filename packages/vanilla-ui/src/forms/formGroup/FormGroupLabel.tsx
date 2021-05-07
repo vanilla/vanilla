@@ -5,12 +5,10 @@
  */
 
 import { cx } from "@emotion/css";
-import { labelize } from "@vanilla/utils";
-import React, { HTMLProps, useContext, useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import * as Polymorphic from "../../polymorphic";
 import { FormGroupContext } from "./FormGroup";
 import { formGroupClasses } from "./FormGroup.styles";
-import { FormGroupLabelText } from "./FormGroupLabelText";
 
 export interface IFormGroupLabelProps {}
 
@@ -20,26 +18,31 @@ export interface IFormGroupLabelProps {}
  * It is possible to customize the component used to render this label with the `as` property.
  */
 export const FormGroupLabel = React.forwardRef(function FormGroupLabelImpl(props, forwardedRef) {
-    const { as: Comp = "label", children, ...otherProps } = props;
-    const { inputID, labelID, setLabelID, sideBySide } = useContext(FormGroupContext);
+    const { as: Comp = "label", children, id, ...otherProps } = props;
+    const { inputID, labelID, setLabelID, setLabel, sideBySide } = useContext(FormGroupContext);
     const classes = formGroupClasses({ sideBySide });
-    const id = props.id ?? `${inputID}_label`;
 
     useEffect(() => {
-        if (id !== labelID) {
+        if (id && id !== labelID) {
             setLabelID(id);
         }
     }, [id, labelID, setLabelID]);
 
+    useEffect(() => {
+        if (children && typeof children === "string") {
+            setLabel(children);
+        }
+    }, [children]);
+
     return (
         <Comp
             htmlFor={inputID}
-            id={id}
+            id={id || labelID}
             {...otherProps}
             ref={forwardedRef}
             className={cx(classes.label, props.className)}
         >
-            {children ?? <FormGroupLabelText />}
+            {children}
         </Comp>
     );
 }) as Polymorphic.ForwardRefComponent<"label", IFormGroupLabelProps>;

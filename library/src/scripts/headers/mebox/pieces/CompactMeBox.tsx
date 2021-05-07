@@ -21,7 +21,7 @@ import Tabs from "@library/navigation/tabs/Tabs";
 import { IInjectableUserState } from "@library/features/users/userTypes";
 import UserDropDownContents from "@library/headers/mebox/pieces/UserDropDownContents";
 import classNames from "classnames";
-import Modal from "@library/modal/Modal";
+import LazyModal from "@library/modal/LazyModal";
 import ModalSizes from "@library/modal/ModalSizes";
 import { titleBarClasses } from "@library/headers/titleBarStyles";
 import { MeBoxIcon } from "@library/headers/mebox/pieces/MeBoxIcon";
@@ -64,11 +64,11 @@ export default class CompactMeBox extends React.Component<IProps, IState> {
                     className={classNames(classes.openButton, titleBarVars.centeredButton, titleBarVars.button)}
                     onClick={this.open}
                     buttonRef={this.buttonRef}
-                    baseClass={ButtonTypes.CUSTOM}
+                    buttonType={ButtonTypes.CUSTOM}
                 >
                     <UserPhoto userInfo={userInfo} className="meBox-user" size={UserPhotoSize.SMALL} />
                 </Button>
-                <Modal
+                <LazyModal
                     isVisible={this.state.open}
                     size={ModalSizes.MODAL_AS_SIDE_PANEL_RIGHT}
                     elementToFocusOnExit={this.buttonRef.current!}
@@ -123,7 +123,7 @@ export default class CompactMeBox extends React.Component<IProps, IState> {
                             },
                         ]}
                     />
-                </Modal>
+                </LazyModal>
             </div>
         );
     }

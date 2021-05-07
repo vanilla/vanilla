@@ -8,7 +8,6 @@ import React, { useRef } from "react";
 import FlyoutToggle, { IFlyoutToggleChildParameters } from "@library/flyouts/FlyoutToggle";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
-import EmojiPicker from "@rich-editor/flyouts/pieces/EmojiPicker";
 import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import { forceSelectionUpdate } from "@rich-editor/quill/utility";
 import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap";
@@ -16,6 +15,7 @@ import { ButtonTypes } from "@library/forms/buttonTypes";
 import { EmojiIcon } from "@library/icons/editorIcons";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { useUniqueID } from "@library/utility/idUtils";
+import EmojiPicker from "@rich-editor/flyouts/pieces/EmojiPicker";
 
 interface IProps {
     disabled?: boolean;
@@ -50,7 +50,7 @@ export function EmojiFlyout(props: IProps) {
                     <IconForButtonWrap icon={<EmojiIcon />} />
                 </>
             }
-            buttonBaseClass={ButtonTypes.ICON}
+            buttonType={ButtonTypes.ICON}
             renderAbove={props.renderAbove}
             renderLeft={props.renderLeft}
             openAsModal={false}

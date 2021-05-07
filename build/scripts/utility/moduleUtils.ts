@@ -22,7 +22,7 @@ export async function installYarn() {
     try {
         print(`Installing node_modules with yarn.`);
         const spawnOptions = options.verbose ? { stdio: "inherit" } : {};
-        await spawnChildProcess("yarn", ["bootstrap"], spawnOptions);
+        await spawnChildProcess("yarn", ["install"], spawnOptions);
     } catch (err) {
         fail(`\nNode module installation failed.\n    ${err}\n`);
     }

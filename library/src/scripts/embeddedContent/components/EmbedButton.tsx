@@ -67,7 +67,7 @@ export function EmbedButton(props: PropsWithChildren<IProps>) {
                 }
                 if (onKeyDown) onKeyDown(e);
             }}
-            baseClass={ButtonTypes.CUSTOM}
+            buttonType={ButtonTypes.CUSTOM}
             className={classNames({ [classes.button]: true, isActive })}
             {...otherProps}
         >

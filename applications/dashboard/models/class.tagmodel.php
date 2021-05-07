@@ -149,7 +149,7 @@ class TagModel extends Gdn_Model {
                     'name' => 'All',
                     'plural' => 'All',
                     'default' => true,
-                    'addtag' => false
+                    'addtag' => true
                 ],
                 'tags' => [
                     'key' => 'tags',
@@ -1167,8 +1167,8 @@ class TagModel extends Gdn_Model {
             }
 
             if (in_array('tag', $type)) {
-                $defaultTypes = array_keys(TagModel::instance()->defaultTypes());
-                $tagQuery->where('Type', $defaultTypes); // Other UIs can set a different type
+                $searchableTypes = $this->getAllowedTagTypes();
+                $tagQuery->where('Type', $searchableTypes); // Other UIs can set a different type
             } elseif (!in_array('all', $type)) {
                 $tagQuery->whereIn('Type', $type);
             }
@@ -1236,7 +1236,7 @@ class TagModel extends Gdn_Model {
      * @throws ClientException Throws an exception if a tag type isn't allowed.
      */
     public function checkAllowedDiscussionTagTypes(array $tags): void {
-        $allowedTypes = Gdn::config('Tagging.Discussion.AllowedTypes', ['']);
+        $allowedTypes = Gdn::config('Tagging.Discussions.AllowedTypes', ['']);
         foreach ($tags as $tag) {
             if (!in_array($tag['Type'], $allowedTypes)) {
                 throw new ClientException(sprintf('You cannot add tags with a type of %s to a discussion', $tag['Type']), 409);
@@ -1290,5 +1290,17 @@ class TagModel extends Gdn_Model {
             $result[$discussionID][$tagID] = $tag;
         }
         return $result;
+    }
+
+    /**
+     * Get all the tag types for which a user can add the tags to a discussion.
+     *
+     * @return array
+     */
+    public function getAllowedTagTypes(): array {
+        $defaultTypes = array_keys(TagModel::instance()->defaultTypes());
+        $allowedTypes = (array) Gdn::config('Tagging.Discussions.AllowedTypes', []);
+        $searchableTypes = array_unique(array_merge($allowedTypes, $defaultTypes));
+        return $searchableTypes;
     }
 }

@@ -38,7 +38,7 @@ export default class Tile extends React.Component<IProps> {
             <div className={classNames(className, classes.root)}>
                 <SmartLink className={classNames(classes.link(columns))} to={url}>
                     <div className={classNames(classes.frame)}>
-                        {icon && <img className={classNames(classes.icon)} src={icon} alt={alt} />}
+                        {icon && <img className={classNames(classes.icon)} src={icon} alt={alt} loading="lazy" />}
                         {!icon && (this.props.fallbackIcon ? this.props.fallbackIcon : "")}
                     </div>
                     <H className={classNames(classes.title)}>{title}</H>

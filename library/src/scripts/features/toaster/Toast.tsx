@@ -39,7 +39,7 @@ export default class Toast extends React.Component<IProps> {
                     {links.map((link, i) => (
                         <Button
                             key={i}
-                            baseClass={link.type}
+                            buttonType={link.type}
                             title={link.name}
                             className={classNames(classes.button)}
                             onClick={link.onClick}

@@ -60,7 +60,7 @@ export default function getStore<S = ICoreStoreState>(initialState?: DeepPartial
     if (store === undefined || force) {
         // Get our reducers.
         const reducer = createRootReducer();
-        store = createStore(reducer, initialState || {}, enhancer);
+        store = createStore(reducer, initialState || ({} as any), enhancer);
 
         // Dispatch initial actions returned from the server.
         initialActions.forEach(store.dispatch);

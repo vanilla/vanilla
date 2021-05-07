@@ -110,7 +110,7 @@ export default function Banner(props: IBannerProps) {
                 forceMenuOpen={props.forceSearchOpen}
                 buttonClass={classes.searchButton}
                 buttonDropDownClass={classes.searchDropDownButton}
-                buttonBaseClass={ButtonTypes.CUSTOM}
+                buttonType={ButtonTypes.CUSTOM}
                 isLarge={true}
                 placeholder={t("SearchBoxPlaceHolder", "Search")}
                 inputClass={classes.input}

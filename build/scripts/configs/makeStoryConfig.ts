@@ -8,6 +8,7 @@ import webpack, { Configuration } from "webpack";
 import { makeBaseConfig } from "./makeBaseConfig";
 import EntryModel from "../utility/EntryModel";
 import { svgLoader } from "./svgLoader";
+import WebpackBar from "webpackbar";
 
 /**
  * Create the storybook configuration.
@@ -28,7 +29,7 @@ export async function makeStoryConfig(baseStorybookConfig: Configuration, entryM
     );
 
     // We need to process SCSS files.
-    baseStorybookConfig.module?.rules.push({
+    baseStorybookConfig.module?.rules?.push({
         test: /\.scss$/,
         use: [
             {
@@ -58,22 +59,24 @@ export async function makeStoryConfig(baseStorybookConfig: Configuration, entryM
         ],
     });
 
-    baseStorybookConfig.module?.rules.unshift({
+    baseStorybookConfig.module?.rules?.unshift({
         test: /\/(design|resources)\/.*\.(css|ttf)$/,
         loader: "file-loader",
         options: {
-            name: "[path][name]-[hash].[ext]",
+            name: "[path][name]-[contenthash].[ext]",
         },
     });
 
-    const fileLoaderRule = baseStorybookConfig.module?.rules?.find((rule) => (rule?.test as any)?.test?.(".svg"));
+    const fileLoaderRule = baseStorybookConfig.module?.rules?.find((rule) =>
+        ((rule as any)?.test as any)?.test?.(".svg"),
+    );
     if (fileLoaderRule) {
-        fileLoaderRule.exclude = /vanilla-icons/;
+        (fileLoaderRule as any).exclude = /vanilla-icons/;
     }
 
     baseStorybookConfig.module?.rules?.unshift(svgLoader());
 
-    baseStorybookConfig.module?.rules.push({
+    baseStorybookConfig.module?.rules?.push({
         test: /\.html$/,
         use: "raw-loader",
     });

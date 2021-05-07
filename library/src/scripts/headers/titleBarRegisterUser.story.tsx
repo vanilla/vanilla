@@ -84,7 +84,7 @@ function TestTitleBar(props: { hasConversations: boolean }) {
     useEffect(() => {
         TitleBarStatic.registerBeforeMeBox(() => {
             return (
-                <Button baseClass={ButtonTypes.TITLEBAR_LINK}>
+                <Button buttonType={ButtonTypes.TITLEBAR_LINK}>
                     <>
                         English
                         <DownTriangleIcon />

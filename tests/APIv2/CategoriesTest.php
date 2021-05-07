@@ -569,4 +569,20 @@ class CategoriesTest extends AbstractResourceTest {
         $this->expectException(NotFoundException::class);
         $this->api()->get("{$this->baseUrl}/" . $origCategory["categoryID"]);
     }
+
+    /**
+     * Test GET /categories/search.
+     */
+    public function testGetCategoriesSearch() {
+        $this->resetTable('Category');
+        $this->createCategory(['name' => 'category 1']);
+        $this->createCategory(['name' => 'category 2']);
+        $this->createCategory(['name' => 'not related']);
+        $this->createCategory(['name' => 'not related']);
+
+        $response = $this->api()->get("{$this->baseUrl}/search", ["query" => "category"])->getBody();
+
+        $this->assertEquals(2, count($response));
+        $this->assertIsArray($response);
+    }
 }

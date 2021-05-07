@@ -18,6 +18,10 @@ import clone from "lodash/clone";
 
 const suggestionReducer = new UserSuggestionModel().reducer;
 
+export interface IUsersStoreState {
+    users: IUsersState;
+}
+
 export const INITIAL_USERS_STATE: IUsersState = {
     current: {
         status: LoadStatus.PENDING,
@@ -167,6 +171,7 @@ export const usersReducer = produce(
             };
             return state;
         })
+
         .default((state, action) => {
             if (action.type === NotificationsActions.MARK_ALL_READ_RESPONSE) {
                 if (state.current.data) {

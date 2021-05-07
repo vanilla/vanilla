@@ -7,11 +7,14 @@
 import { css } from "@emotion/css";
 import { listItemVariables } from "@library/lists/ListItem.variables";
 import { metasVariables } from "@library/metas/Metas.variables";
+import { tagVariables } from "@library/metas/Tag.variables";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { Mixins } from "@library/styles/Mixins";
 import { extendItemContainer } from "@library/styles/styleHelpers";
+import { getPixelNumber } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
+import { forceInt } from "@vanilla/utils";
 
 export const listItemClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -52,23 +55,43 @@ export const listItemClasses = useThemeCache(() => {
         flexBasis: 160,
         marginTop: 8,
         maxWidth: 160,
+        alignSelf: "flex-end",
     });
 
     const iconContainer = css({
-        position: "relative",
         marginRight: globalVars.spacer.componentInner,
     });
 
-    const iconContainerInline = css({
-        display: "inline-block",
-        verticalAlign: "middle",
-        // icon is inside metas row
+    const metasContainer = css({});
+
+    // Some delicate math required to vertically align the user icon and the first row of metas.
+    const metasVars = metasVariables();
+    const tagVars = tagVariables();
+    const metaItemHeightIncludingMargins = Math.round(
+        getPixelNumber(metasVars.font.size) * forceInt(metasVars.font?.lineHeight, 1) +
+            getPixelNumber(metasVars.spacing.vertical) * 2 +
+            getPixelNumber(tagVars.border.width) * 2,
+    );
+
+    const inlineIconContainer = css({
         ...Mixins.margin({
-            ...metasVariables().spacing,
+            right: getPixelNumber(metasVars.spacing.horizontal) * 2,
         }),
+        [`& > *:first-child`]: {
+            position: "relative",
+            ...Mixins.margin({
+                top: `calc((${metaItemHeightIncludingMargins}px - 100%)/2)`,
+            }),
+        },
     });
 
-    const metasContainer = css({});
+    const inlineIconAndMetasContainer = css({
+        display: "flex",
+        alignItems: "start",
+        ...Mixins.margin({
+            top: 18,
+        }),
+    });
 
     const title = css({
         flex: 1,
@@ -101,7 +124,8 @@ export const listItemClasses = useThemeCache(() => {
         item,
         contentContainer,
         iconContainer,
-        iconContainerInline,
+        inlineIconAndMetasContainer,
+        inlineIconContainer,
         metasContainer,
         mediaContainer,
         mobileMediaContainer,

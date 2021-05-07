@@ -14,12 +14,13 @@ import { formElementsVariables } from "@library/forms/formElementStyles";
 import { color, important, percent, rgba } from "csx";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
-import { IButtonType } from "@library/forms/styleHelperButtonInterface";
+import { IButton } from "@library/forms/styleHelperButtonInterface";
 import { bannerVariables } from "@library/banner/bannerStyles";
 import { SearchBarPresets } from "@library/banner/SearchBarPresets";
 import { ButtonPreset } from "@library/forms/ButtonPreset";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { inputClasses } from "@library/forms/inputStyles";
+import { Variables } from "@library/styles/Variables";
 
 export const compactSearchVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const globalVars = globalVariables(forcedVars);
@@ -82,93 +83,14 @@ export const compactSearchVariables = useThemeCache((forcedVars?: IThemeVariable
         },
     });
 
-    const searchButton: IButtonType = makeThemeVars("searchButton", {
-        name: "heroSearchButton",
-        spinnerColor: colors.contrast,
-        colors: {
-            fg: fgColor,
-            bg: bgColor,
-        },
-        borders: {
-            ...(isTransparentButton
-                ? {
-                      color: colors.contrast,
-                      width: 1,
-                  }
-                : { color: colors.bg, width: 0 }),
-            left: {
-                color: searchBar.border.leftColor,
-                width: searchBar.border.width,
-            },
-            radius: {
-                // left: important(0),
-                // right: important(unit(borders.borderRadius) as string),
-            },
-        },
-        fonts: {
-            color: fgColor,
-            ...globalVars.fontSizeAndWeightVars("large", "semiBold"),
-        },
-        hover: {
-            colors: {
-                fg: colors.contrast,
-                bg: bgColorActive,
-            },
-            borders: {
-                color: activeBorderColor,
-            },
-            fonts: {
-                color: colors.contrast,
-            },
-        },
-        active: {
-            colors: {
-                fg: colors.contrast,
-                bg: bgColorActive,
-            },
-            borders: {
-                color: activeBorderColor,
-            },
-            fonts: {
-                color: colors.contrast,
-            },
-        },
-        focus: {
-            colors: {
-                fg: colors.contrast,
-                bg: bgColorActive,
-            },
-            borders: {
-                color: activeBorderColor,
-            },
-            fonts: {
-                color: colors.contrast,
-            },
-        },
-        focusAccessible: {
-            colors: {
-                fg: colors.contrast,
-                bg: bgColorActive,
-            },
-            borders: {
-                color: activeBorderColor,
-            },
-            fonts: {
-                color: colors.contrast,
-            },
-        },
-    });
-
-    return { colors, searchBar, searchButton, backgrounds };
+    return { colors, searchBar, backgrounds };
 });
 
 export const compactSearchClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const formElementsVars = formElementsVariables();
-    const titleBarVars = titleBarVariables();
     const vars = compactSearchVariables();
     const style = styleFactory("compactSearch");
-    const mediaQueries = panelLayoutVariables().mediaQueries();
     inputClasses().applyInputCSSRules();
 
     const root = style({

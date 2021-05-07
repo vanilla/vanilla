@@ -173,7 +173,7 @@ function SearchPage(props: IProps) {
                                                     }
                                                 }}
                                                 disableAutocomplete={true}
-                                                buttonBaseClass={ButtonTypes.PRIMARY}
+                                                buttonType={ButtonTypes.PRIMARY}
                                                 needsPageTitle={false}
                                                 overwriteSearchBar={{
                                                     preset: SearchBarPresets.BORDER,

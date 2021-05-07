@@ -56,7 +56,7 @@ function ActionItem(props: IProps) {
         <animated.li id={aid} role="menuitem" style={style} className={classNames(classes.item)}>
             {type === PostTypes.BUTTON ? (
                 <Button
-                    baseClass={ButtonTypes.CUSTOM}
+                    buttonType={ButtonTypes.CUSTOM}
                     className={classNames(className, classes.action)}
                     onClick={action as () => void}
                 >
@@ -64,7 +64,7 @@ function ActionItem(props: IProps) {
                 </Button>
             ) : (
                 <LinkAsButton
-                    baseClass={ButtonTypes.CUSTOM}
+                    buttonType={ButtonTypes.CUSTOM}
                     className={classNames(className, classes.action)}
                     to={action as string}
                 >
@@ -353,7 +353,7 @@ export default function NewPostMenu(props: { items: IAddPost[] }) {
                                 .interpolate((o) => `${o}`),
                             transform: interpolate([d], (d) => `rotate(${d}deg)`),
                         }}
-                        baseClass={ButtonTypes.CUSTOM}
+                        buttonType={ButtonTypes.CUSTOM}
                         onClick={() => dispatch({ type: "toggle_open" })}
                         className={classNames(classes.toggle)}
                     >

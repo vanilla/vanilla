@@ -3,7 +3,13 @@
  * @license GPL-2.0-only
  */
 
-export enum Reaction {
+export enum ReactionUrlCode {
     UP = "Up",
     DOWN = "Down",
+}
+
+export interface IReaction {
+    urlcode: ReactionUrlCode;
+    reactionValue: number;
+    hasReacted?: boolean;
 }

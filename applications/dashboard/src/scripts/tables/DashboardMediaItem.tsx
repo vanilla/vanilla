@@ -19,7 +19,7 @@ export function DashboardMediaItem(props: IProps) {
             {props.imgSrc !== undefined && (
                 <div className="media-left">
                     <div className="media-image-wrap">
-                        <img src={props.imgSrc} />
+                        <img src={props.imgSrc} loading="lazy" />
                     </div>
                 </div>
             )}

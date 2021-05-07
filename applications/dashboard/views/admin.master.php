@@ -82,7 +82,7 @@ Gdn_Theme::assetEnd();
         <div class="navbar-memenu">
             <?php
             if (Gdn::session()->isValid()) {
-                $photo = '<img src="'.userPhotoUrl($user).'">';
+                $photo = '<img src="'.userPhotoUrl($user).'" loading="lazy">';
                 $attr = [
                     'class' => 'navbar-profile js-drop',
                     'data-content-id' => 'cardUserContent',

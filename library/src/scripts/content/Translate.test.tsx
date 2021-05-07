@@ -11,8 +11,6 @@ import Translate from "@library/content/Translate";
 import { render } from "enzyme";
 import { expect } from "chai";
 
-// tslint:disable:jsx-use-translation-function
-
 describe("<Translate />", () => {
     it("renders nothing when given an empty string source", () => {
         const rendered = render(<Translate source="" />);

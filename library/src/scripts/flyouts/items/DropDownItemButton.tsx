@@ -41,7 +41,7 @@ export default function DropDownItemButton(props: IProps) {
                 title={props.name}
                 onClick={props.onClick}
                 className={classNames(buttonClassName, classes.action, props.isActive && classes.actionActive)}
-                baseClass={ButtonTypes.CUSTOM}
+                buttonType={ButtonTypes.CUSTOM}
                 disabled={disabled}
                 aria-current={props.current ? "true" : "false"}
                 lang={props.lang}

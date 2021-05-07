@@ -19,15 +19,12 @@ void getOptions().then(async (options) => {
     await builder.build();
 
     if (options.mode === BuildMode.PRODUCTION) {
-        const filesToCheck = [
-            path.join(DIST_DIRECTORY, "polyfills.min.js"),
-            path.join(DIST_DIRECTORY, "forum/vendors.min.js"),
-            path.join(DIST_DIRECTORY, "forum/shared.min.js"),
-            path.join(DIST_DIRECTORY, "admin/vendors.min.js"),
-            path.join(DIST_DIRECTORY, "admin/shared.min.js"),
-        ];
+        const vendorFiles = path.join(DIST_DIRECTORY, "*", "vendors*.js");
+        const libFiles = path.join(DIST_DIRECTORY, "*", "library*.js");
 
-        await spawnChildProcess("yarn", ["es-check", "es5", ...filesToCheck], { stdio: "inherit" }).catch((e) => {
+        await spawnChildProcess("yarn", ["es-check", "es5", vendorFiles, libFiles], {
+            stdio: "inherit",
+        }).catch((e) => {
             process.exit(1);
         });
     }

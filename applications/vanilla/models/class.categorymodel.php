@@ -437,6 +437,9 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
             }
             $resultIDs = array_intersect($selectedCategoryIDs, $resultIDs);
         } elseif (!empty($categoryIDs)) {
+            if ($includeChildCategories) {
+                $categoryIDs = $this->getCategoriesDescendantIDs($categoryIDs);
+            }
             $resultIDs = array_intersect($categoryIDs, $resultIDs);
         }
 
@@ -444,6 +447,23 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
         $resultIDs[] = 0;
 
         return $resultIDs;
+    }
+
+    /**
+     * Get descendant categories.
+     *
+     * @param array $categoryIDs
+     * @return array CategoryIDs.
+     */
+    public function getCategoriesDescendantIDs(array $categoryIDs): array {
+        $mergedCategories = [];
+        foreach ($categoryIDs as $categoryID) {
+            $selectedCategoryIDs = $this->getCategoryDescendantIDs($categoryID);
+            if (!empty($selectedCategoryIDs)) {
+                $mergedCategories += array_merge($selectedCategoryIDs, [$categoryID]);
+            }
+        }
+        return !empty($mergedCategories) ? $mergedCategories : $categoryIDs;
     }
 
     /**

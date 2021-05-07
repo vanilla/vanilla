@@ -353,12 +353,12 @@ export default class KeyboardBindings {
                 if (blot && blotOffset === blot.length() - 1) {
                     // We're at the end of line. Don't allow inline formats to pass onto the next line.
 
-                    setImmediate(() => {
+                    setTimeout(() => {
                         // Set Immediate needed to run after quill's built-in enter handler.
                         Formatter.INLINE_FORMAT_NAMES.forEach((formatName) => {
                             this.quill.format(formatName, false, Quill.sources.API);
                         });
-                    });
+                    }, 0);
                 }
                 return true;
             },

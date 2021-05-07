@@ -86,4 +86,25 @@ final class BoxThemeShim {
             echo "</div>";
         }
     }
+
+    /**
+     * Start a widget tag.
+     *
+     * @param string|null $cssClass
+     */
+    public static function startWidget(?string $cssClass = '') {
+        if (self::isActive()) {
+            $cssClasses = htmlspecialchars(HtmlUtils::classNames('widget-dontUseCssOnMe', $cssClass));
+            echo "<section class=\"$cssClasses\">";
+        }
+    }
+
+    /**
+     * End a widget tag.
+     */
+    public static function endWidget() {
+        if (self::isActive()) {
+            echo "</section>";
+        }
+    }
 }

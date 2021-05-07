@@ -58,7 +58,7 @@
         "vanilla/cloud-interops": "^2.0",
         "vanilla/garden-container": "^3.0.3",
         "vanilla/garden-jsont": "^1.2",
-        "vanilla/garden-http": "~2.1",
+        "vanilla/garden-http": "~2.4",
         "vanilla/garden-schema": "~1.10.2",
         "vanilla/garden-password": "~1.0",
         "vanilla/htmlawed": "~2.0",
@@ -83,7 +83,8 @@
         "symfony/css-selector": "^4.4",
         "delight-im/cookie": "^3.4",
         "dragonmantank/cron-expression": "^3.0",
-        "league/html-to-markdown": "^4.10"
+        "league/html-to-markdown": "^4.10",
+        "webmozart/path-util": "^2.3"
     },
     "require-dev": {
         "exussum12/coverage-checker": "~0.10",

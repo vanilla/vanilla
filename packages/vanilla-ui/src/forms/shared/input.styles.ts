@@ -46,4 +46,44 @@ export const inputClasses = ({ size = "default" }: InputClassesProps) => ({
             outline: "none",
         },
     }),
+    numberContainer: css({
+        display: "inline-block",
+        position: "relative",
+    }),
+    spinner: css({
+        position: "absolute",
+        top: 0,
+        right: 0,
+        display: "flex",
+        flexDirection: "column",
+        width: "50%",
+        height: "100%",
+
+        ...{
+            small: {
+                maxWidth: 20,
+            },
+            default: {
+                maxWidth: 27,
+            },
+        }[size],
+
+        "& > button": {
+            borderLeft: "solid 1px #bfcbd8",
+            height: "50%",
+            lineHeight: 1,
+            fontSize: 11,
+            "&:hover": {
+                background: "#bfcbd82e",
+            },
+            "&:first-of-type": {
+                borderBottom: "solid 1px #bfcbd8",
+                borderRadius: "0 6 0 0",
+            },
+            "&:last-of-type": {
+                borderRadius: "0 0 6 0",
+                marginTop: "-2px",
+            },
+        },
+    }),
 });

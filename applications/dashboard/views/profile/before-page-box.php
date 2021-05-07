@@ -3,6 +3,7 @@
 use Vanilla\Theme\BoxThemeShim;
 
 $Session = Gdn::session();
+BoxThemeShim::startWidget();
 BoxThemeShim::startHeading();
 echo '<h1 class="H">';
     echo htmlspecialchars($this->User->Name);
@@ -34,3 +35,4 @@ echo '<div id="Status" itemprop="description">'.wrap(Gdn_Format::display($this->
 }
 
 echo Gdn_Theme::module('UserBanModule', ['UserID' => $this->User->UserID]);
+BoxThemeShim::endWidget();

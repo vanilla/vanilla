@@ -12,7 +12,7 @@ interface IProps {
     id: string;
     ariaControls: string;
     ariaSelected: boolean;
-    baseClass: ButtonTypes;
+    buttonType?: ButtonTypes;
     className: string;
     tabIndex: number;
     children: React.ReactNode;
@@ -26,13 +26,13 @@ interface IProps {
  */
 export default class TabButton extends React.Component<IProps> {
     public render() {
-        const { id, ariaControls, ariaSelected, baseClass, className, tabIndex, children } = this.props;
+        const { id, ariaControls, ariaSelected, className, buttonType, tabIndex, children } = this.props;
         return (
             <Button
                 id={id}
                 aria-controls={ariaControls}
                 aria-selected={ariaSelected}
-                baseClass={baseClass}
+                buttonType={buttonType}
                 className={className}
                 role="tab"
                 tabIndex={tabIndex}

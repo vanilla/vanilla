@@ -94,7 +94,7 @@ export function ActionBar(props: IProps) {
                         onClick={props.handleAnotherSubmit}
                         title={props.anotherCallToActionTitle}
                         disabled={props.anotherCallToActionDisabled}
-                        baseClass={ButtonTypes.TEXT_PRIMARY}
+                        buttonType={ButtonTypes.TEXT_PRIMARY}
                         className={classNames(classes.callToAction, classes.itemMarginLeft)}
                     >
                         {props.anotherCallToActionLoading ? <ButtonLoader /> : props.anotherCallToActionTitle}
@@ -110,7 +110,7 @@ export function ActionBar(props: IProps) {
                     submit={true}
                     title={props.callToActionTitle}
                     disabled={props.isCallToActionDisabled}
-                    baseClass={ButtonTypes.TEXT_PRIMARY}
+                    buttonType={ButtonTypes.TEXT_PRIMARY}
                     className={classNames(classes.callToAction, classes.itemMarginLeft)}
                 >
                     {props.isCallToActionLoading ? <ButtonLoader /> : props.callToActionTitle}

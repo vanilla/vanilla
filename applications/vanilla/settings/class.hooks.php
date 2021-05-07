@@ -418,7 +418,7 @@ class VanillaHooks extends Gdn_Plugin {
                 // The tags should be set on the data.
                 $tags = array_column($Sender->data('Tags', []), 'FullName', 'TagID');
                 $xtags = $Sender->data('XTags', []);
-                foreach (TagModel::instance()->defaultTypes() as $key => $row) {
+                foreach (TagModel::instance()->getAllowedTagTypes() as $key) {
                     if (isset($xtags[$key])) {
                         $xtags2 = array_column($xtags[$key], 'FullName', 'TagID');
                         foreach ($xtags2 as $id => $name) {

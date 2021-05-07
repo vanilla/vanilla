@@ -128,7 +128,7 @@ export function CompactSearch(props: ICompactSearchProps) {
                     title={t("Search")}
                     aria-expanded={false}
                     aria-haspopup="true"
-                    baseClass={ButtonTypes.CUSTOM}
+                    buttonType={ButtonTypes.CUSTOM}
                     aria-controls={id}
                     buttonRef={openSearchButtonRef}
                 >
@@ -183,7 +183,7 @@ export function CompactSearch(props: ICompactSearchProps) {
                         aria-expanded={true}
                         aria-haspopup="true"
                         aria-controls={id}
-                        baseClass={ButtonTypes.CUSTOM}
+                        buttonType={ButtonTypes.CUSTOM}
                     >
                         <div className={classNames(props.cancelContentClassName, classes.cancelContents)}>
                             {t("Cancel")}

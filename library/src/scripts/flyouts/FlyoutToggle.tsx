@@ -7,7 +7,7 @@
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import Modal from "@library/modal/Modal";
+import LazyModal from "@library/modal/LazyModal";
 import ModalSizes from "@library/modal/ModalSizes";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
@@ -33,7 +33,7 @@ interface IProps {
     disabled?: boolean;
     children: (props: IFlyoutToggleChildParameters) => JSX.Element;
     onClose?: () => void;
-    buttonBaseClass: ButtonTypes;
+    buttonType?: ButtonTypes;
     buttonClassName?: string;
     isVisible?: boolean;
     forceVisible?: boolean;
@@ -48,7 +48,7 @@ interface IProps {
 }
 
 export default function FlyoutToggle(props: IProps) {
-    const { initialFocusElement, onVisibilityChange, onClose, id, contentID } = props;
+    const { initialFocusElement, onVisibilityChange, onClose, id, contentID, buttonType } = props;
 
     // Focus management & visibility
     const ownButtonRef = useRef<HTMLButtonElement>(null);
@@ -190,7 +190,7 @@ export default function FlyoutToggle(props: IProps) {
                 aria-expanded={isVisible}
                 aria-haspopup="true"
                 disabled={props.disabled}
-                baseClass={props.buttonBaseClass}
+                buttonType={buttonType}
                 buttonRef={buttonRef}
             >
                 {props.name && <ScreenReaderContent>{props.name}</ScreenReaderContent>}
@@ -199,7 +199,7 @@ export default function FlyoutToggle(props: IProps) {
 
             <React.Fragment>
                 {props.openAsModal ? (
-                    <Modal
+                    <LazyModal
                         id={contentID}
                         label={t("title")}
                         size={ModalSizes.SMALL}
@@ -209,7 +209,7 @@ export default function FlyoutToggle(props: IProps) {
                         onKeyPress={onKeyPress}
                     >
                         {props.children(childrenData)}
-                    </Modal>
+                    </LazyModal>
                 ) : (
                     isContentVisible && props.children(childrenData)
                 )}

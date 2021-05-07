@@ -11,7 +11,7 @@ import Container from "@library/layout/components/Container";
 import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";
 import FrameFooter from "@library/layout/frame/FrameFooter";
-import Modal from "@library/modal/Modal";
+import LazyModal from "@library/modal/LazyModal";
 import ModalSizes from "@library/modal/ModalSizes";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
@@ -56,7 +56,7 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
                     className={classNames(classes.toggleButton, buttonClass)}
                     onClick={props.onClick}
                     buttonRef={this.buttonRef}
-                    baseClass={ButtonTypes.CUSTOM}
+                    buttonType={ButtonTypes.CUSTOM}
                 >
                     <span className={classNames(classes.buttonContents)}>
                         <span className={classes.title}>{this.props.title}</span>
@@ -73,7 +73,7 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
                     icon={<DownTriangleIcon className={"mobileDropDown-downTriangle"} />}
                     onClick={this.open}
                 />
-                <Modal
+                <LazyModal
                     isVisible={this.state.open}
                     size={ModalSizes.MODAL_AS_DROP_DOWN}
                     label={t("Menu")}
@@ -108,7 +108,7 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
                             <FrameFooter>
                                 <Button
                                     onClick={this.close}
-                                    baseClass={ButtonTypes.CUSTOM}
+                                    buttonType={ButtonTypes.CUSTOM}
                                     className={classes.closeModal}
                                 >
                                     <ChevronUpIcon className={classes.closeModalIcon} />
@@ -116,7 +116,7 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
                             </FrameFooter>
                         }
                     />
-                </Modal>
+                </LazyModal>
             </div>
         ) : (
             <div className={classes.toggleButton}>

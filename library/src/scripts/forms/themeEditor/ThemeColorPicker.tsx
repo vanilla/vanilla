@@ -248,7 +248,7 @@ function Picker(props: { onChange: (newColor: string) => void; validColorString:
             aria-hidden={true}
             className={classes.swatch}
             tabIndex={-1}
-            baseClass={ButtonTypes.CUSTOM}
+            buttonType={ButtonTypes.CUSTOM}
         >
             <ScreenReaderContent>{props.validColorString}</ScreenReaderContent>
         </Button>

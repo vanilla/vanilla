@@ -370,6 +370,8 @@ class BBCode extends Gdn_Pluggable {
             $nbbc->setEnableSmileys(false);
             $nbbc->setAllowAmpersand(true);
 
+            $nbbc->setDebug(false);
+
             $nbbc->addRule('attach', [
                 'allow_in' => ['listitem', 'block', 'columns', 'inline', 'link'],
                 'class' => "image",

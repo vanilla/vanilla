@@ -43,7 +43,6 @@ function TitleBarMegaMenuChildImpl(props: IChildProps, ref: React.Ref<IMegaMenuC
         </li>
     );
 }
-
 interface IProps {
     expanded?: INavigationVariableItem;
     leftOffset?: number;
@@ -73,6 +72,14 @@ function TitleBarMegaMenuImpl(props: IProps, ref: React.Ref<IMegaMenuHandle>) {
 
     const menuHeight = containerDimensions.height;
     const yBounds = getCalcedHashOffset() + menuHeight;
+    const itemsWithNoChildren: INavigationVariableItem[] = [];
+
+    //pulling out items with no children to group them together in separate menuItem
+    expanded?.children?.map((item) => {
+        if (!item.children?.length) {
+            itemsWithNoChildren.push(item);
+        }
+    });
 
     useEffect(() => {
         onCloseRef.current = onClose;
@@ -200,6 +207,22 @@ function TitleBarMegaMenuImpl(props: IProps, ref: React.Ref<IMegaMenuHandle>) {
         }
     }
 
+    function generateMegaMenuList(items: INavigationVariableItem[]) {
+        return (
+            <ul className={classes.menuItemChildren}>
+                {items.map((item, key) => (
+                    <TitleBarMegaMenuChild
+                        className={classes.menuItemChild}
+                        url={item.url}
+                        text={item.name}
+                        key={key}
+                        onKeyDown={(e) => handleKeyPress(e)}
+                    />
+                ))}
+            </ul>
+        );
+    }
+
     return (
         <div
             className={classes.wrapper}
@@ -221,35 +244,19 @@ function TitleBarMegaMenuImpl(props: IProps, ref: React.Ref<IMegaMenuHandle>) {
                 ignoreContext
                 fullGutter
             >
-                {expanded?.children?.map((item, key) => (
-                    <div key={key} className={classes.menuItem}>
-                        {!item.children?.length ? (
-                            <TitleBarMegaMenuChild
-                                className={classes.menuItemChild}
-                                url={item.url}
-                                text={item.name}
-                                key={key}
-                                onKeyDown={(e) => handleKeyPress(e)}
-                            />
-                        ) : (
+                {expanded?.children?.map((item, key) =>
+                    !item.children?.length ? (
+                        <React.Fragment key={key} />
+                    ) : (
+                        <div key={key} className={classes.menuItem}>
                             <span className={classes.menuItemTitle}>{item.name}</span>
-                        )}
-
-                        {item.children && (
-                            <ul className={classes.menuItemChildren}>
-                                {item.children.map((child, key) => (
-                                    <TitleBarMegaMenuChild
-                                        className={classes.menuItemChild}
-                                        url={child.url}
-                                        text={child.name}
-                                        key={key}
-                                        onKeyDown={(e) => handleKeyPress(e)}
-                                    />
-                                ))}
-                            </ul>
-                        )}
-                    </div>
-                ))}
+                            {item.children && generateMegaMenuList(item.children)}
+                        </div>
+                    ),
+                )}
+                {itemsWithNoChildren.length && (
+                    <div className={classes.menuItem}>{generateMegaMenuList(itemsWithNoChildren)}</div>
+                )}
             </Container>
         </div>
     );

@@ -15,7 +15,6 @@ import { guessOperatingSystem, OS } from "@vanilla/utils";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import { dayPickerClasses } from "@library/forms/datePickerStyles";
 import classNames from "classnames";
-import { formatDate, parseDate } from "react-day-picker/moment";
 import { LeftChevronIcon, RightChevronIcon } from "@library/icons/common";
 import RelativePortal from "react-relative-portal";
 import "@library/forms/DatePicker.libStyles.scss";
@@ -67,8 +66,6 @@ export default class DatePicker extends React.PureComponent<IProps, IState> {
                 <DayPickerInput
                     format="YYYY-MM-DD"
                     placeholder={t(`yyyy-mm-dd`)}
-                    formatDate={formatDate}
-                    parseDate={parseDate}
                     value={value}
                     overlayComponent={this.CustomOverlay}
                     onDayChange={this.handleDayPickerChange}
@@ -204,10 +201,10 @@ export default class DatePicker extends React.PureComponent<IProps, IState> {
             <div className={classNames("datePicker-header", classes.header)}>
                 <h3 className={classNames("datePicker-title", classes.title)}>{title}</h3>
                 <span className={classNames("datePicker-navigation", className, classes.navigation)}>
-                    <Button baseClass={ButtonTypes.ICON} onClick={prev}>
+                    <Button buttonType={ButtonTypes.ICON} onClick={prev}>
                         <LeftChevronIcon centred={true} />
                     </Button>
-                    <Button baseClass={ButtonTypes.ICON} onClick={next}>
+                    <Button buttonType={ButtonTypes.ICON} onClick={next}>
                         <RightChevronIcon centred={true} />
                     </Button>
                 </span>

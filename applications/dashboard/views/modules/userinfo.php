@@ -4,9 +4,7 @@ if (!defined('APPLICATION')) exit();
 $Session = Gdn::session();
 if (Gdn::config('Garden.Profile.ShowAbout')) {
     require_once Gdn::controller()->fetchViewLocation('helper_functions', 'Profile', 'Dashboard');
-    if (!BoxThemeShim::isActive()) {
-        echo '<div class="About P">';
-    }
+    echo '<div class="About P widget-dontUseCssOnMe">';
         BoxThemeShim::startHeading();
         echo '<h2 class="H">' . t('About') . '</h2>';
         BoxThemeShim::endHeading();
@@ -84,9 +82,7 @@ if (Gdn::config('Garden.Profile.ShowAbout')) {
         <?php  $this->fireEvent('AfterAboutList');  ?>
         <?php
             BoxThemeShim::endBox();
-            if (!BoxThemeShim::isActive()) {
-                echo '</div>'; // We don't render the wrapping "div.About.P" if we are using the shim.
-            }
+            echo '</div>';
         ?>
 <?php
 }

@@ -18,9 +18,11 @@ const voteCounterVariables = useThemeCache(() => {
         fg: globalVars.mainColors.fg,
     });
 
-    const sizing = makeThemeVars("sizing", {
+    const sizing = {
         height: 32,
-    });
+        width: 32,
+        magicOffset: 16,
+    };
 
     return {
         colors,

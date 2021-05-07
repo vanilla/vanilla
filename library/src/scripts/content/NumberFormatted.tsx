@@ -6,7 +6,6 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import numeral from "numeral";
 import { numberFormattedClasses } from "@library/content/NumberFormatted.styles";
 
 interface IProps {
@@ -29,17 +28,42 @@ function stripTrailingZeros(value: string): string {
 }
 
 /**
+ * Convert number to human readable value.
+ *
+ * @param value
+ * @param precision
+ * @returns string
+ */
+export function humanReadableNumber(value: number, precision: number = 1): string {
+    const valueAbs = Math.abs(value);
+    const negativeValue = value < 0 ? "-" : "";
+    if (valueAbs < 1e3) return valueAbs.toFixed(precision);
+    if (valueAbs >= 1e3 && valueAbs < 1e6) return negativeValue + (valueAbs / 1e3).toFixed(precision) + "k";
+    if (valueAbs >= 1e6 && valueAbs < 1e9) return negativeValue + (valueAbs / 1e6).toFixed(precision) + "m";
+    if (valueAbs >= 1e9 && valueAbs < 1e12) return negativeValue + (valueAbs / 1e9).toFixed(precision) + "b";
+    return negativeValue + (valueAbs / 1e12).toFixed(precision) + "t";
+}
+/**
+ * Convert number to string with commas
+ *
+ * @param value
+ * @param precision
+ * @returns
+ */
+export function numberWithCommas(value: number, precision: number = 0): string {
+    return value.toFixed(precision).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+/**
  * Format a compact value of a number.
  *
  * @param props
  */
 export function formatNumberText(props: { value: number }) {
     const { value } = props;
-    numeral.localeData("en");
-    const initialValue = numeral(value);
-    const compactValue = stripTrailingZeros(initialValue.format("0a.0"));
-    const fullValue = initialValue.format();
-    const isAbbreviated = fullValue.toString() !== initialValue.value().toString();
+    const compactValue = stripTrailingZeros(humanReadableNumber(value));
+    const fullValue = numberWithCommas(value);
+    const isAbbreviated = fullValue !== value.toString();
 
     return {
         compactValue,

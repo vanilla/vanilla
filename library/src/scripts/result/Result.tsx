@@ -64,6 +64,7 @@ export default function Result(props: IResult) {
             className={classNames("searchResult-image", classes.image)}
             alt={t("Thumbnail for: " + name)}
             aria-hidden={true}
+            loading="lazy"
         />
     ) : null;
 

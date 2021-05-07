@@ -48,6 +48,7 @@ class TagModelTest extends \VanillaTests\SiteTestCase {
 
         $config = self::container()->get(\Gdn_Configuration::class);
         $config->saveToConfig('Vanilla.Tagging.Max', 5);
+        $config->saveToConfig('Tagging.Discussions.AllowedTypes', ['AllowedType', '']);
     }
 
     /**
@@ -313,6 +314,25 @@ class TagModelTest extends \VanillaTests\SiteTestCase {
     }
 
     /**
+     * Test adding a tag of a type that has been specifically allowed.
+     */
+    public function testAddingTagOfAllowedType() {
+        // We've added "AllowedType" to the list of allowed types through the config setting "Tagging.Discussions.AllowedTypes" in the setup method.
+        // Let's add a tag of that type and see if we can apply it to a discussion.
+        $tags = $this->insertTags(1, ['Type' => 'AllowedType']);
+        $discussions = $this->insertDiscussions(1);
+        $discussionID = $discussions[0]['DiscussionID'];
+
+        $tagFrags = $this->api()->post("/discussions/{$discussionID}/tags", ["urlcodes" => [$tags[0]['Name']]])->getBody();
+        // Discussion should have 1 tag.
+        $this->assertCount(1, $tagFrags);
+        $returnedTagID = $tagFrags[0]['tagID'];
+        $fullTagData = $this->api()->get("/tags/{$returnedTagID}")->getBody();
+        // It should have a type of "AllowedType"
+        $this->assertSame($fullTagData['type'], 'AllowedType');
+    }
+
+    /**
      * Test search() method where parent is false. This test ensures that the search method works when you pass
      * the boolean false to the search() method.
      */
@@ -405,6 +425,12 @@ class TagModelTest extends \VanillaTests\SiteTestCase {
             [TestDispatcher::OPT_THROW_FORM_ERRORS => false]
         );
         $this->bessy()->assertFormErrorMessage('That type does not accept manually adding new tags.');
+
+        $this->bessy()->post(
+            '/settings/tags/add?type=usablecustomtype',
+            ['FullName' => 'A New Tag', 'Name' => 'a-new-custom-tag']
+        );
+        $this->bessy()->assertNoFormErrors();
     }
 
     /**

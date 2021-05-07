@@ -15,7 +15,7 @@ import { Devices, useDevice } from "@library/layout/DeviceContext";
 import { DropDownMenuIcon } from "@library/icons/common";
 import FrameHeader from "@library/layout/frame/FrameHeader";
 import { FrameHeaderMinimal } from "@library/layout/frame/FrameHeaderMinimal";
-import { useMeasure } from "@vanilla/react-utils";
+import { Hoverable, useMeasure } from "@vanilla/react-utils";
 
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 
@@ -50,7 +50,7 @@ export interface IDropDownProps extends IOpenDirectionProps {
     contentsClassName?: string;
     buttonContents?: React.ReactNode;
     buttonClassName?: string;
-    buttonBaseClass?: ButtonTypes;
+    buttonType?: ButtonTypes;
     disabled?: boolean;
     toggleButtonClassName?: string;
     initialFocusElement?: HTMLElement | null;
@@ -69,6 +69,7 @@ export interface IDropDownProps extends IOpenDirectionProps {
     horizontalOffset?: boolean;
     tag?: string;
     accessibleLabel?: string;
+    onHover?: () => void;
 }
 
 export enum FlyoutType {
@@ -100,6 +101,7 @@ export function useDropdownContext() {
 export default function DropDown(props: IDropDownProps) {
     const device = useDevice();
     const { title, preferredDirection } = props;
+
     const mobileTitle = props.mobileTitle ?? title;
     const classes = dropDownClasses();
     const ContentTag = props.flyoutType === FlyoutType.FRAME ? "div" : "ul";
@@ -130,13 +132,15 @@ export default function DropDown(props: IDropDownProps) {
     const handleID = props.handleID ?? ID + "-handle";
     const contentID = props.contentID ?? ID + "-contents";
 
+    const buttonContents = props.buttonContents || <DropDownMenuIcon />;
+
     return (
         <FlyoutToggle
             id={handleID}
             className={classNames(props.className)}
-            buttonBaseClass={props.buttonBaseClass || ButtonTypes.ICON}
+            buttonType={props.buttonType ?? ButtonTypes.ICON}
             name={props.name!}
-            buttonContents={props.buttonContents || <DropDownMenuIcon />}
+            buttonContents={buttonContents}
             buttonClassName={props.buttonClassName}
             disabled={props.disabled}
             buttonRef={ownButtonRef}

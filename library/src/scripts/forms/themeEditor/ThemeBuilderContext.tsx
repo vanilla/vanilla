@@ -15,7 +15,6 @@ import { bannerVariables } from "@library/banner/bannerStyles";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { contentBannerVariables } from "@library/banner/contentBannerStyles";
 import { userContentVariables, userContentClasses } from "@library/content/userContentStyles";
-import { all } from "q";
 import { navigationVariables } from "@library/headers/navigationVariables";
 import { homeWidgetItemVariables } from "@library/homeWidget/HomeWidgetItem.styles";
 import { homeWidgetContainerVariables } from "@library/homeWidget/HomeWidgetContainer.styles";

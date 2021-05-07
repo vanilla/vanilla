@@ -12,8 +12,8 @@ import UserSuggestionModel, {
     IInjectableSuggestionsProps,
 } from "@library/features/users/suggestion/UserSuggestionModel";
 import apiv2 from "@library/apiv2";
-import Tokens from "@library/forms/select/Tokens";
 import { connect } from "react-redux";
+import { LazyTokens } from "@library/forms/select/LazyTokens";
 
 interface IProps extends IInjectableSuggestionsProps {
     suggestionActions: UserSuggestionActions;
@@ -40,7 +40,7 @@ export class MultiUserInput extends React.Component<IProps> {
         }
 
         return (
-            <Tokens
+            <LazyTokens
                 label={label ? t(label) : t("Author")}
                 options={options}
                 isLoading={suggestions.status === LoadStatus.LOADING || suggestions.status === LoadStatus.PENDING}

@@ -1055,7 +1055,7 @@ if (!function_exists('img')) {
             $image = smartAsset($image, $withDomain);
         }
 
-        return '<img src="'.htmlspecialchars($image, ENT_QUOTES).'"'.$attributes.' />';
+        return '<img src="'.htmlspecialchars($image, ENT_QUOTES).'"'.$attributes.' loading="lazy" />';
     }
 }
 

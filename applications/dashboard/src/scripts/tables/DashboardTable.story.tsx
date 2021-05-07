@@ -32,10 +32,10 @@ export function Tables() {
         return (
             <td>
                 <DashboardTableOptions>
-                    <Button baseClass={ButtonTypes.ICON_COMPACT}>
+                    <Button buttonType={ButtonTypes.ICON_COMPACT}>
                         <EditIcon />
                     </Button>
-                    <Button baseClass={ButtonTypes.ICON_COMPACT}>
+                    <Button buttonType={ButtonTypes.ICON_COMPACT}>
                         <DeleteIcon />
                     </Button>
                 </DashboardTableOptions>
@@ -47,10 +47,10 @@ export function Tables() {
             <StoryHeading depth={1}>Dashboard Tables</StoryHeading>
             <DashboardToolbar>
                 <DashboardToolbarButtons>
-                    <Button baseClass={ButtonTypes.PRIMARY} legacyMode={true}>
+                    <Button buttonType={ButtonTypes.PRIMARY} legacyMode={true}>
                         Button
                     </Button>
-                    <Button baseClass={ButtonTypes.PRIMARY} legacyMode={true}>
+                    <Button buttonType={ButtonTypes.PRIMARY} legacyMode={true}>
                         Button
                     </Button>
                 </DashboardToolbarButtons>

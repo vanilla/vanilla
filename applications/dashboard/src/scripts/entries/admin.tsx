@@ -26,8 +26,8 @@ import { RoleRequestReducer } from "@dashboard/roleRequests/state/roleRequestRed
 import { mountDashboardTabs } from "@dashboard/forms/mountDashboardTabs";
 import { mountDashboardCodeEditors } from "@dashboard/forms/DashboardCodeEditor";
 import { TextEditorContextProvider } from "@library/textEditor/TextEditor";
-import { WidgetFormGenerator } from "@dashboard/widgets/WidgetFormGenerator";
 import { VanillaLabsPage } from "@dashboard/pages/VanillaLabsPage";
+import { bindToggleChildrenEventListeners } from "@dashboard/settings";
 
 addComponent("imageUploadGroup", DashboardImageUploadGroup, { overwrite: true });
 addComponent("VanillaLabsPage", VanillaLabsPage);
@@ -80,3 +80,5 @@ onReady(render);
 
 onContent(mountDashboardTabs);
 onContent(mountDashboardCodeEditors);
+
+bindToggleChildrenEventListeners();

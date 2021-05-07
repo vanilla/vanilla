@@ -40,7 +40,7 @@ interface IButtonOptions {
     useShadow?: boolean;
     opacity?: number;
 }
-export interface IButtonType extends IButtonOptions {
+export interface IButton extends IButtonOptions {
     name: ButtonTypes | string;
     preset?: ILegacyButtonPresetOptions;
     presetName?: ButtonPreset;
@@ -57,8 +57,8 @@ export interface IButtonType extends IButtonOptions {
     hover?: IButtonOptions;
     focus?: IButtonOptions;
     active?: IButtonOptions;
-    disabled?: IButtonOptions;
     focusAccessible?: IButtonOptions;
+    disabled?: IButtonOptions;
     skipDynamicPadding?: boolean;
     extraNested?: CSSObject; // special case CSS
 }

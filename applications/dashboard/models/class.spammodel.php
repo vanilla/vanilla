@@ -66,6 +66,12 @@ class SpamModel extends Gdn_Pluggable {
         } else {
             touchValue('InsertUserID', $data, Gdn::session()->UserID);
 
+            // Check moderation permissions for the user in session.
+            if (Gdn::session()->getPermissions()->hasRanked('Garden.Moderation.Manage')) {
+                // The user has moderation permissions and isn't a spammer.
+                return false;
+            }
+
             $user = Gdn::userModel()->getID(val('InsertUserID', $data), DATASET_TYPE_ARRAY);
 
             if ($user) {

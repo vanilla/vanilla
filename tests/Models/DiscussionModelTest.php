@@ -1038,4 +1038,17 @@ class DiscussionModelTest extends SiteTestCase {
         $this->assertArraySubsetRecursive($expected, $actual2);
         $this->assertSame($expected['DiscussionID'], $id2);
     }
+
+    /**
+     * Assert that HTML encoded titles directly out of the models are fixed in the API.
+     *
+     * @see https://github.com/vanilla/support/issues/4044
+     */
+    public function testDiscussionEncoding() {
+        $in = 'Hello name with "quotes" & ampersand';
+        $this->createDiscussion(['name' => $in]);
+        $fetchedBack = $this->api()->get("/discussions/{$this->lastInsertedDiscussionID}")->getBody();
+        $this->assertEquals($in, $fetchedBack['name']);
+    }
+
 }

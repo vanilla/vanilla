@@ -11,6 +11,9 @@ import { STORY_IPSUM_MEDIUM, STORY_USER, STORY_ME_ADMIN, STORY_TAGS } from "@lib
 import { ListItemIconPosition } from "@library/lists/ListItem.variables";
 import { BorderType } from "@library/styles/styleHelpersBorders";
 import { LoadStatus } from "@library/@types/api/core";
+import { ReactionUrlCode } from "@dashboard/@types/api/reaction";
+
+import keyBy from "lodash/keyBy";
 
 export default {
     title: "Components/DiscussionLists",
@@ -42,23 +45,24 @@ export const fakeDiscussions = [
         ...commonFields,
         url: "#",
         canonicalUrl: "#",
-        name: "With everything",
+        name: "Unresolved Discussion",
         excerpt: STORY_IPSUM_MEDIUM,
         discussionID: 10,
         countViews: 10,
         countComments: 0,
-        dateLastComment: new Date(new Date().getTime() - 60 * 60 * 1000).toString(), //one hour ago
+        dateLastComment: "2021-02-17 17:51:15",
         dateInserted: "2021-02-11 17:51:15",
         dateUpdated: "2021-02-2 17:51:15",
         type: "discussion",
         pinned: true,
         score: 2,
+        resolved: false,
     },
     {
         ...commonFields,
         url: "#",
         canonicalUrl: "#",
-        name: "With everything",
+        name: "Resolved Discussion",
         excerpt: STORY_IPSUM_MEDIUM,
         discussionID: 2,
         countViews: 200,
@@ -69,6 +73,7 @@ export const fakeDiscussions = [
             name: "Product Ideas",
             url: "#",
         },
+        resolved: true,
     },
     {
         ...commonFields,
@@ -83,6 +88,11 @@ export const fakeDiscussions = [
         dateInserted: "2021-02-11 17:51:15",
         dateUpdated: "2021-02-11 17:51:15",
         unread: true,
+        type: "idea",
+        reactions: [
+            { urlcode: ReactionUrlCode.UP, reactionValue: 1, hasReacted: false },
+            { urlcode: ReactionUrlCode.DOWN, reactionValue: -1, hasReacted: true },
+        ],
         score: 22,
     },
     {
@@ -98,7 +108,8 @@ export const fakeDiscussions = [
         dateUpdated: "2021-02-11 17:51:15",
         unread: true,
         type: "idea",
-        score: 98,
+        reactions: [{ urlcode: ReactionUrlCode.UP, reactionValue: 1, hasReacted: false }],
+        score: 333,
     },
 ];
 
@@ -115,6 +126,13 @@ const loggedInStoreState = {
             },
         },
     },
+    discussions: {
+        discussionsByID: keyBy(fakeDiscussions, "discussionID"),
+    },
+};
+
+const chromaticParams = {
+    chromatic: { diffThreshold: 0.1 },
 };
 
 export const Default = storyWithConfig(
@@ -130,6 +148,8 @@ export const Default = storyWithConfig(
         );
     },
 );
+
+Default.parameters = chromaticParams;
 
 export const Theme = storyWithConfig(
     {
@@ -244,6 +264,8 @@ export const UserIconInMetas = storyWithConfig(
         );
     },
 );
+
+UserIconInMetas.parameters = chromaticParams;
 
 export const UserIconInMetasWithBorder = storyWithConfig(
     {

@@ -4,40 +4,70 @@
  * @license gpl-2.0-only
  */
 
-import React, { FunctionComponent, useState } from "react";
+import React, { FunctionComponent } from "react";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
-import { useReactToDiscussion, useRemoveDiscussionReaction } from "@library/features/discussions/discussionHooks";
-import VoteCounter from "@library/voteCounter/VoteCounter";
-import { Reaction } from "@dashboard/@types/api/reaction";
+import {
+    useCurrentDiscussionReaction,
+    useReactToDiscussion,
+    useRemoveDiscussionReaction,
+} from "@library/features/discussions/discussionHooks";
+import VoteCounter, { IProps as VoteCounterProps } from "@library/voteCounter/VoteCounter";
+import { ReactionUrlCode } from "@dashboard/@types/api/reaction";
 
 interface IProps {
     discussion: IDiscussion;
     className?: string;
 }
 
-const DiscussionVoteCounter: FunctionComponent<IProps> = ({ discussion, className }) => {
-    const reactToDiscussion = useReactToDiscussion(discussion.discussionID);
-    const removeDiscussionReaction = useRemoveDiscussionReaction(discussion.discussionID);
+const DiscussionVoteCounter: FunctionComponent<IProps> = ({
+    discussion: { discussionID, reactions, score },
+    className,
+}) => {
+    const reactToDiscussion = useReactToDiscussion(discussionID);
+    const removeDiscussionReaction = useRemoveDiscussionReaction(discussionID);
 
-    const [score, setScore] = useState(discussion.score ?? 0);
+    const currentReaction = useCurrentDiscussionReaction(discussionID);
 
-    // FIXME: get current user's current reaction from hook / store state
-    const [reaction, setReaction] = useState<Reaction | undefined>(undefined);
-    const upvoted = reaction === Reaction.UP;
+    const hasUpvoted = currentReaction?.urlcode == ReactionUrlCode.UP;
+    const hasDownvoted = currentReaction?.urlcode == ReactionUrlCode.DOWN;
 
-    async function handleToggleUpvoted() {
-        if (upvoted) {
-            await removeDiscussionReaction();
-            setReaction(undefined); //fixme: read user's current reaction from store state
-            setScore(score - 1); //fixme: read score from store state
-        } else {
-            await reactToDiscussion(Reaction.UP);
-            setReaction(Reaction.UP); //fixme: read user's current reaction from store state
-            setScore(score + 1); //fixme: read score from store state
-        }
+    let handleToggleUpvoted: VoteCounterProps["onToggleUpvoted"];
+
+    const upvoteReaction = reactions!.find((reaction) => reaction.urlcode === ReactionUrlCode.UP);
+    if (upvoteReaction) {
+        handleToggleUpvoted = async function () {
+            const callback = hasUpvoted ? removeDiscussionReaction : async () => reactToDiscussion(upvoteReaction);
+            try {
+                callback();
+            } catch (error) {
+                // absorb error
+            }
+        };
     }
 
-    return <VoteCounter className={className} onToggleUpvoted={handleToggleUpvoted} score={score} upvoted={upvoted} />;
+    let handleToggleDownvoted: VoteCounterProps["onToggleDownvoted"];
+    const downvoteReaction = reactions!.find((reaction) => reaction.urlcode === ReactionUrlCode.DOWN);
+    if (downvoteReaction) {
+        handleToggleDownvoted = async function () {
+            const callback = hasDownvoted ? removeDiscussionReaction : async () => reactToDiscussion(downvoteReaction);
+            try {
+                callback();
+            } catch (error) {
+                //absorb error
+            }
+        };
+    }
+
+    return (
+        <VoteCounter
+            className={className}
+            onToggleUpvoted={handleToggleUpvoted}
+            onToggleDownvoted={handleToggleDownvoted}
+            score={score}
+            upvoted={hasUpvoted}
+            downvoted={hasDownvoted}
+        />
+    );
 };
 
 export default DiscussionVoteCounter;

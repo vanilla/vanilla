@@ -27,7 +27,7 @@ export function LinkEmbed(props: IProps) {
 
     let linkImage: JSX.Element | null = null;
     if (photoUrl) {
-        linkImage = <img src={photoUrl} className="embedLink-image" aria-hidden="true" />;
+        linkImage = <img src={photoUrl} className="embedLink-image" aria-hidden="true" loading="lazy" />;
     }
 
     return (

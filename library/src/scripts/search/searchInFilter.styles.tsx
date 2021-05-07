@@ -14,7 +14,6 @@ import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { calc, translate } from "csx";
-import { CSSObject } from "@emotion/css";
 
 export const searchInFilterVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeThemeVars = variableFactory("searchInFilter", forcedVars);
@@ -65,9 +64,7 @@ export const searchInFilterClasses = useThemeCache(() => {
     });
 
     // Style "button"
-    const labelStateStyles = generateButtonStyleProperties({
-        buttonTypeVars: buttonVariables().radio,
-    });
+    const labelStateStyles = Mixins.button(buttonVariables().radio);
 
     const label = style("label", {
         ...labelStateStyles,

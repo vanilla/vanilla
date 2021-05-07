@@ -12,10 +12,10 @@ import SmartLink from "@library/routing/links/SmartLink";
 import { meBoxMessageClasses } from "@library/headers/mebox/pieces/meBoxMessageStyles";
 import { metasClasses } from "@library/metas/Metas.styles";
 import Translate from "@library/content/Translate";
-import DateTime from "@library/content/DateTime";
 import classNames from "classnames";
 import { NoUserPhotoIcon } from "@library/icons/titleBar";
 import { userPhotoClasses } from "@library/headers/mebox/pieces/userPhotoStyles";
+import DateTime from "@library/content/DateTime";
 
 export enum MeBoxItemType {
     NOTIFICATION = "notification",
@@ -83,7 +83,7 @@ export default class MeBoxDropDownItem extends React.Component<IProps> {
                 <SmartLink to={to} className={classNames("meBoxMessage-link", classesMeBoxMessage.link)} tabIndex={0}>
                     <div className={classNames(classesMeBoxMessage.imageContainer, userPhotoClasses().root)}>
                         {photo ? (
-                            <img className={classesMeBoxMessage.image} src={photo} alt={photoAlt} />
+                            <img className={classesMeBoxMessage.image} src={photo} alt={photoAlt} loading="lazy" />
                         ) : (
                             <NoUserPhotoIcon className={classesMeBoxMessage.image} photoAlt={photoAlt} />
                         )}

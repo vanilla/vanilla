@@ -43,6 +43,7 @@ export interface IHomeWidgetContainerOptions {
 interface IViewAll {
     position?: "top" | "bottom";
     to?: string;
+    onClick?: (e) => void;
     name?: string;
     displayType?: ButtonTypes;
 }
@@ -72,6 +73,7 @@ export const homeWidgetContainerVariables = useThemeCache(
                 borderType: BorderType.NONE as BorderType | "navLinks",
                 maxWidth: "100%",
                 viewAll: {
+                    onClick: undefined,
                     to: undefined as string | undefined,
                     position: "bottom" as "top" | "bottom",
                     displayType: ButtonTypes.TEXT_PRIMARY,

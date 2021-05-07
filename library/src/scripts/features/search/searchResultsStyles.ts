@@ -321,6 +321,7 @@ export const searchResultClasses = useThemeCache((mediaQueries, hasIcon = false)
         width: styleUnit(vars.mediaElement.width),
         height: styleUnit(vars.mediaElement.height),
         overflow: "hidden",
+        alignSelf: "flex-end",
         ...{
             [`&.${compactMediaElement}`]: {
                 overflow: "hidden",

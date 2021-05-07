@@ -78,7 +78,7 @@ export default function ThemePreviewCard(props: IProps) {
                             ))}
                         </div>
                         {preview?.imageUrl ? (
-                            <img className={classes.previewImage} src={preview.imageUrl} />
+                            <img className={classes.previewImage} src={preview.imageUrl} loading="lazy" />
                         ) : (
                             <svg
                                 className={classes.svg}
@@ -323,7 +323,7 @@ export default function ThemePreviewCard(props: IProps) {
                             {(props.canEdit || props.canDelete) && (
                                 <div className={classes.actionDropdown}>
                                     <DropDown
-                                        buttonBaseClass={ButtonTypes.ICON}
+                                        buttonType={ButtonTypes.ICON}
                                         flyoutType={FlyoutType.LIST}
                                         renderLeft={true}
                                     >

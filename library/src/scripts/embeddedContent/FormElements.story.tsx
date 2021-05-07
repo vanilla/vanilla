@@ -14,7 +14,6 @@ import InputBlock from "@library/forms/InputBlock";
 import InputTextBlock from "@library/forms/InputTextBlock";
 import MultiUserInput from "@library/features/users/MultiUserInput";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
-import DateRange from "@library/forms/DateRange";
 import Checkbox from "@library/forms/Checkbox";
 import StoryExampleDropDownSearch from "@library/flyouts/StoryExampleDropDownSearch";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
@@ -27,6 +26,7 @@ import { FormToggle } from "@library/forms/FormToggle";
 import { flexHelper } from "@library/styles/styleHelpers";
 import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { suggestedTextStyleHelper } from "@library/features/search/suggestedTextStyles";
+import LazyDateRange from "@library/forms/LazyDateRange";
 
 const story = storiesOf("Forms/User Facing", module);
 
@@ -130,7 +130,7 @@ story.add("Elements", () => {
             <StoryExampleDropDownSearch />
             <StoryHeading>Date Range</StoryHeading>
             <StorySmallContent>
-                <DateRange onStartChange={doNothing} onEndChange={doNothing} start={undefined} end={undefined} />
+                <LazyDateRange onStartChange={doNothing} onEndChange={doNothing} start={undefined} end={undefined} />
             </StorySmallContent>
         </StoryContent>
     );

@@ -10,8 +10,8 @@ import DropDownItemMetas from "@library/flyouts/items/DropDownItemMetas";
 import DropDownItemMeta from "@library/flyouts/items/DropDownItemMeta";
 import { metasClasses } from "@library/metas/Metas.styles";
 import Translate from "@library/content/Translate";
-import DateTime from "@library/content/DateTime";
 import ProfileLink from "@library/navigation/ProfileLink";
+import DateTime from "@library/content/DateTime";
 
 interface IProps {
     dateInserted: string;

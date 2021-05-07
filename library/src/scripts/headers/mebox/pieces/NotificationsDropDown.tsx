@@ -5,15 +5,15 @@
  */
 
 import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
-import NotificationsContents, { INotificationsProps } from "@library/headers/mebox/pieces/NotificationsContents";
+import NotificationsContents from "@library/headers/mebox/pieces/NotificationsContents";
+import type NotificationsContentsImpl from "@library/headers/mebox/pieces/NotificationsContentsImpl";
 import NotificationsCount from "@library/headers/mebox/pieces/NotificationsCount";
 import { titleBarClasses } from "@library/headers/titleBarStyles";
 import { t } from "@library/utility/appUtils";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import React from "react";
-import { Devices, useDevice } from "@library/layout/DeviceContext";
 
-interface IProps extends INotificationsProps {
+interface IProps extends React.ComponentProps<typeof NotificationsContentsImpl> {
     countUnread: number;
     userSlug: string;
 }
@@ -51,6 +51,7 @@ export default class NotificationsDropDown extends React.Component<IProps, IStat
                 buttonContents={<NotificationsCount open={this.state.open} compact={false} />}
                 onVisibilityChange={this.setOpen}
                 flyoutType={FlyoutType.FRAME}
+                onHover={NotificationsContents.preload}
             >
                 <NotificationsContents userSlug={userSlug} />
             </DropDown>

@@ -3,6 +3,7 @@
  * @license GPL-2.0-only
  */
 
+import { notEmpty } from "@vanilla/utils";
 import yargs from "yargs";
 import { getVanillaConfig } from "./utility/configUtils";
 
@@ -46,6 +47,11 @@ yargs
         default: false,
         boolean: true,
     })
+    .options("section", {
+        alias: "s",
+        string: true,
+        default: "",
+    })
     .options("debug", { default: false, boolean: true });
 
 export interface IBuildOptions {
@@ -60,6 +66,7 @@ export interface IBuildOptions {
     devIp: string;
     debug: boolean;
     circular: boolean;
+    sections: string[] | null;
 }
 
 /**
@@ -101,6 +108,17 @@ export async function getOptions(): Promise<IBuildOptions> {
         enabledAddonKeys = parseEnabledAddons(config);
     }
 
+    let sections: string[] | null = null;
+    if (typeof yargs.argv.sections === "string") {
+        const splitSections = yargs.argv.sections
+            .split(",")
+            .map((section) => section.trim())
+            .filter(notEmpty);
+        if (splitSections.length > 0) {
+            sections = splitSections;
+        }
+    }
+
     return {
         mode: yargs.argv.mode as BuildMode,
         verbose: yargs.argv.verbose as boolean,
@@ -113,5 +131,6 @@ export async function getOptions(): Promise<IBuildOptions> {
         devIp,
         debug: yargs.argv.debug as boolean,
         circular: yargs.argv.circular as boolean,
+        sections,
     };
 }

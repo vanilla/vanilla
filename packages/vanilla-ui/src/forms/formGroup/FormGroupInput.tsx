@@ -9,7 +9,7 @@ import React, { useContext } from "react";
 import * as Polymorphic from "../../polymorphic";
 import { FormGroupContext } from "./FormGroup";
 
-type RenderProp = (props: { id: string; placeholder: string; "aria-labelledby": string }) => React.ReactNode;
+type RenderProp = (props: { id: string; placeholder?: string; "aria-labelledby": string }) => React.ReactNode;
 
 export interface IFormGroupInputProps {
     as?: keyof JSX.IntrinsicElements;
@@ -23,12 +23,11 @@ export interface IFormGroupInputProps {
  */
 export const FormGroupInput = React.forwardRef(function FormGroupInputImpl(props, forwardedRef) {
     const { as: Comp = "div", children, ...otherProps } = props;
-    const { inputID, labelID } = useContext(FormGroupContext);
-    const placeholder = labelize(inputID);
+    const { inputID, labelID, label } = useContext(FormGroupContext);
     return (
         <Comp {...otherProps} ref={forwardedRef}>
             {typeof children === "function"
-                ? (children as RenderProp)({ id: inputID, placeholder, "aria-labelledby": labelID })
+                ? (children as RenderProp)({ id: inputID, placeholder: label, "aria-labelledby": labelID })
                 : children}
         </Comp>
     );

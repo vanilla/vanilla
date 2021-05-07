@@ -581,7 +581,7 @@ class APIv0 extends HttpClient {
         $adm->startAddonsByKey(['dashboard' => true, 'vanilla' => true, 'conversations' => true], Addon::TYPE_ADDON);
         spl_autoload_register([$adm, 'autoload']);
 
-        $db = new TestDatabase($this->getPDO());
+        $db = $dic->getArgs(TestDatabase::class, [$this->getPDO()]);
 
         $dic->setInstance(AddonManager::class, $adm)
             ->setInstance(Gdn::AliasDatabase, $db)

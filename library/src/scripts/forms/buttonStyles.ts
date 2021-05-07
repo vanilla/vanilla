@@ -12,26 +12,11 @@ import { styleFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { important, percent } from "csx";
-import merge from "lodash/merge";
 import generateButtonClass from "./styleHelperButtonGenerator";
-import { IButtonType } from "@library/forms/styleHelperButtonInterface";
 import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { buttonResetMixin } from "./buttonMixins";
 import { buttonVariables, buttonGlobalVariables } from "./Button.variables";
-
-export const overwriteButtonClass = (
-    buttonTypeVars: IButtonType,
-    overwriteVars: IButtonType,
-    setZIndexOnState = false,
-) => {
-    const buttonVars = merge(buttonTypeVars, overwriteVars);
-    // append names for debugging purposes
-    buttonVars.name = `${buttonTypeVars.name}-${overwriteVars.name}`;
-    return generateButtonClass(buttonVars, {
-        setZIndexOnState,
-    });
-};
 
 export const buttonClasses = useThemeCache(() => {
     const vars = buttonVariables();

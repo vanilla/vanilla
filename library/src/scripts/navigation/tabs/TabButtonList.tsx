@@ -53,7 +53,7 @@ export default class TabButtonList extends React.Component<IProps, IState> {
                     ariaControls={getTabPanelID(index)}
                     ariaSelected={isSelected}
                     key={`tabButton-${index}`}
-                    baseClass={ButtonTypes.CUSTOM}
+                    buttonType={ButtonTypes.CUSTOM}
                     className={classNames(isSelected, buttonClass, classes.button)}
                     tabIndex={isSelected || this.state.setAllTabIndexes ? 0 : -1}
                     index={index}

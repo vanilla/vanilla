@@ -145,6 +145,12 @@ export const discussionListVariables = useThemeCache(() => {
                  * @type boolean
                  */
                 userTags: true,
+                /**
+                 * @var discussionList.item.metas.display.resolved
+                 * @description Display the resolved icon, if applicable.
+                 * @type boolean
+                 */
+                resolved: true,
             },
         },
     });

@@ -189,7 +189,7 @@ class ReactionsApiController extends AbstractApiController {
         if (!$row) {
             throw new NotFoundException('Reaction');
         }
-        $row['reactionValue'] = $row['IncrementValue'] ?? 0;
+        $row['reactionValue'] = $row['IncrementValue'] ?? $row['Points'] ?? 0;
         return $row;
     }
 }

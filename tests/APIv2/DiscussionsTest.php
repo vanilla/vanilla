@@ -12,6 +12,7 @@ use DiscussionModel;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\ForbiddenException;
 use Vanilla\DiscussionTypeConverter;
+use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\Models\TestDiscussionModelTrait;
 
 /**

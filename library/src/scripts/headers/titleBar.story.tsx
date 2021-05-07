@@ -333,7 +333,7 @@ export const TitleBarGuestUser = storyWithConfig(
     () => {
         TitleBarStatic.registerBeforeMeBox(() => {
             return (
-                <Button baseClass={ButtonTypes.TITLEBAR_LINK}>
+                <Button buttonType={ButtonTypes.TITLEBAR_LINK}>
                     <>
                         <Icon icon="navigation-languages" />
                         <DownTriangleIcon />

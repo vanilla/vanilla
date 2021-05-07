@@ -22,7 +22,6 @@ import { DashboardTableOptions } from "@dashboard/tables/DashboardTableOptions";
 import Button from "@library/forms/Button";
 import { ApproveIcon, ErrorIcon, PendingIcon } from "@library/icons/common";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import DateTime from "@library/content/DateTime";
 import FilterDropDown from "@library/dataLists/FilterDropDown";
 import { forceInt, labelize } from "@vanilla/utils";
 import { DashboardPagerArea, DashboardToolbar, DashboardToolbarButtons } from "@dashboard/components/DashboardToolbar";
@@ -31,6 +30,7 @@ import { LoadStatus } from "@library/@types/api/core";
 import { useRoleRequestActions } from "@dashboard/roleRequests/state/roleRequestActions";
 import { DashboardPager } from "@dashboard/components/DashboardPager";
 import { PageLoadStatus } from "@library/loaders/PageLoadStatus";
+import DateTime from "@library/content/DateTime";
 
 interface IProps extends RouteComponentProps {}
 
@@ -211,7 +211,7 @@ function RoleRequestButtons({ roleRequest, onClick }: { roleRequest: IRoleReques
         <>
             <Button
                 className="btn-icon"
-                baseClass={ButtonTypes.ICON}
+                buttonType={ButtonTypes.ICON}
                 title={t("Approve")}
                 disabled={disabled}
                 onClick={() => handleClick(RoleRequestStatus.APPROVED)}
@@ -221,7 +221,7 @@ function RoleRequestButtons({ roleRequest, onClick }: { roleRequest: IRoleReques
             {roleRequest.status === RoleRequestStatus.PENDING && (
                 <Button
                     className="btn-icon"
-                    baseClass={ButtonTypes.ICON_COMPACT}
+                    buttonType={ButtonTypes.ICON_COMPACT}
                     title={t("Deny")}
                     disabled={disabled}
                     onClick={() => handleClick(RoleRequestStatus.DENIED)}
@@ -232,7 +232,7 @@ function RoleRequestButtons({ roleRequest, onClick }: { roleRequest: IRoleReques
             {roleRequest.status === RoleRequestStatus.DENIED && (
                 <Button
                     className="btn-icon"
-                    baseClass={ButtonTypes.ICON_COMPACT}
+                    buttonType={ButtonTypes.ICON_COMPACT}
                     title={t("Mark Pending")}
                     disabled={disabled}
                     onClick={() => handleClick(RoleRequestStatus.PENDING)}

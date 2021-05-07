@@ -56,6 +56,7 @@ export default class MessagesDropDown extends React.Component<IProps, IState> {
                 buttonContents={<MessagesCount open={this.state.open} compact={false} />}
                 onVisibilityChange={this.setOpen}
                 flyoutType={FlyoutType.FRAME}
+                onHover={MessagesContents.preload}
             >
                 <MessagesContents countClass={this.props.countClass} />
             </DropDown>

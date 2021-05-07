@@ -61,7 +61,7 @@ export function PanelNavItems(props: IPanelNavItemsProps) {
                             {props.canGoBack && (
                                 <Button
                                     buttonRef={buttonRef}
-                                    baseClass={ButtonTypes.ICON_COMPACT}
+                                    buttonType={ButtonTypes.ICON_COMPACT}
                                     onClick={props.popParentItem}
                                     className={classes.backButton}
                                 >
@@ -72,7 +72,7 @@ export function PanelNavItems(props: IPanelNavItemsProps) {
                             <Button
                                 className={classes.closeButton}
                                 onClick={props.onClose}
-                                baseClass={ButtonTypes.ICON_COMPACT}
+                                buttonType={ButtonTypes.ICON_COMPACT}
                             >
                                 <ScreenReaderContent>{t("Close")}</ScreenReaderContent>
                                 <CloseTinyIcon />

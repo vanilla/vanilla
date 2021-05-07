@@ -168,6 +168,11 @@ export default class EntryModel {
 
         names = Array.from(new Set(names));
 
+        const { sections } = this.options;
+        if (sections != null) {
+            names = names.filter((name) => sections.includes(name));
+        }
+
         return names;
     }
 

@@ -8,7 +8,7 @@ import React from "react";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import titleBarNavClasses from "@library/headers/titleBarNavStyles";
 import SmartLink from "@library/routing/links/SmartLink";
-import { getButtonStyleFromBaseClass } from "@library/forms/Button";
+import { getClassForButtonType } from "@library/forms/Button";
 import classNames from "classnames";
 import TitleBarListItem from "@library/headers/mebox/pieces/TitleBarListItem";
 
@@ -52,11 +52,7 @@ export const TitleBarNavItem = React.forwardRef(function TitleBarNavItem(
                 {...passthru}
                 ref={ref}
                 to={to}
-                className={classNames(
-                    linkClassName,
-                    classes.link,
-                    buttonType ? getButtonStyleFromBaseClass(buttonType) : "",
-                )}
+                className={classNames(linkClassName, classes.link, buttonType ? getClassForButtonType(buttonType) : "")}
             >
                 <div
                     className={classNames({

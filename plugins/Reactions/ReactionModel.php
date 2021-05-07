@@ -590,6 +590,7 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface {
                 ->select('DateInserted')
                 ->from('UserTag')
                 ->where('RecordType', $rT)
+                ->where('UserID >', 0)
                 ->whereIn('RecordID', array_keys($in))
                 ->orderBy('DateInserted')
                 ->get()->resultArray();
@@ -864,9 +865,13 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface {
             $args[':Total'] = -$row['Total'];
             $args[':Total2'] = $args[':Total'];
 
-            // Increment the record total.
-            $args[':RecordType'] = $recordType.'-Total';
-            $args[':UserID'] = $record['InsertUserID'];
+            // Increment the record total. Check first if a record of the total exists to assign the right UserID.
+            $userTotal = $this->SQL
+                ->getWhere('UserTag', ['RecordType' => $recordType.'-Total', 'RecordID' => $row['RecordID'], 'TagID' => $row['TagID']])
+                ->nextRow('array') ?? $record['InsertUserID'];
+
+            $args[':RecordType'] = $recordType . '-Total';
+            $args[':UserID'] = $userTotal['UserID'] ?? $record['InsertUserID'];
             $this->SQL->Database->query($sql, $args);
 
             // Increment the user total.
@@ -1724,23 +1729,43 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface {
     /**
      * Get a simple schema for returning a reaction.
      *
+     * @param bool $includeCount
      * @return Schema
      */
-    public function typeFragmentSchema(): Schema {
-        static $typeFragment;
-
-        if ($typeFragment === null) {
-            $typeFragment = Schema::parse([
-                'tagID:i',
-                'urlcode:s',
-                'name:s',
-                'class:s',
-                'hasReacted:b?',
-                'reactionValue:i?'
-            ]);
+    public function typeFragmentSchema(bool $includeCount = false): Schema {
+        $config = [
+            "tagID:i",
+            "urlcode:s",
+            "name:s",
+            "class:s",
+            "hasReacted:b?",
+            "reactionValue:i?",
+        ];
+        if ($includeCount) {
+            $config[] = "count:i";
         }
 
-        return $typeFragment;
+        $result = Schema::parse($config);
+        return $result;
+    }
+
+    /**
+     * Get a schema for all types, each represented as fragments.
+     *
+     * @param bool $includeCount
+     * @param bool $includeInactive
+     * @return Schema
+     */
+    public function compoundTypeFragmentSchema(bool $includeCount = false, bool $includeInactive = false): Schema {
+        $schemaConfig = [];
+        foreach (self::reactionTypes() as $reactionType) {
+            if (!$reactionType["Active"] && !$includeInactive) {
+                continue;
+            }
+            $schemaConfig[$reactionType["UrlCode"]] = $this->typeFragmentSchema($includeCount);
+        }
+        $result = Schema::parse([":o" => $schemaConfig]);
+        return $result;
     }
 
     /**
@@ -1771,7 +1796,7 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface {
         if (!array_key_exists('Points', $row)) {
             $row['Points'] = 0;
         }
-        $row['ReactionValue'] = $row['IncrementValue'] ?? 0;
+        $row['ReactionValue'] = $row['IncrementValue'] ?? $row['Points']  ?? 0;
         $camelCaseSchema = new CamelCaseScheme();
         $row = $camelCaseSchema->convertArrayKeys($row);
         return $row;
@@ -1819,5 +1844,47 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface {
             ->where($where)
             ->orderBy($orderFields, $orderDirection);
         return $userTagQuery;
+    }
+
+    /**
+     * Get count of reactions received by one or more users.
+     *
+     * @param int[] $userIDs
+     * @param bool $includeInactive
+     */
+    public function getReceivedByUser(array $userIDs, bool $includeInactive = false): array {
+        $totals = $this->buildUserTagQuery([
+            "RecordID" => $userIDs,
+            "RecordType" => "User",
+            "UserID" => ReactionModel::USERID_OTHER,
+        ])->get()->resultArray();
+
+        $totalsByUser = [];
+        foreach ($totals as $totalRow) {
+            $totalUserID = $totalRow["RecordID"];
+            $totalTagID = $totalRow["TagID"];
+            $totalsByUser[$totalUserID][$totalTagID] = $totalRow["Total"];
+        }
+
+        $types = array_column(self::reactionTypes(), null, "TagID");
+
+        $result = [];
+        foreach ($userIDs as $userID) {
+            $result[$userID] = [];
+            foreach ($types as $tagID => $type) {
+                if (!$type["Active"] && !$includeInactive) {
+                    continue;
+                }
+
+                $count = $totalsByUser[$userID][$tagID] ?? 0;
+                $result[$userID][$type["UrlCode"]] = $type + [
+                    "Count" => $count,
+                    "Total" => $count,
+                    "urlcode" => $type["UrlCode"],
+                ];
+            }
+        }
+
+        return $result;
     }
 }

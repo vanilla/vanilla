@@ -7,7 +7,6 @@
 
 import gdn from "@library/gdn";
 import { PromiseOrNormalCallback } from "@vanilla/utils";
-import isUrl from "validator/lib/isURL";
 import { ensureScript } from "@vanilla/dom-utils";
 import { sprintf } from "sprintf-js";
 
@@ -68,6 +67,26 @@ export function setMeta(key: string, value: any) {
 }
 
 /**
+ * @see https://stackoverflow.com/questions/5717093/check-if-a-javascript-string-is-a-url#answer-5717133
+ * @param url
+ */
+export function isURL(url: string, requireTLD: boolean = true) {
+    const tld = requireTLD ? "" : "?";
+    const pattern = new RegExp(
+        "^(https?:\\/\\/)?" + // protocol
+        "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
+        "((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
+        "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
+        "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
+            "(\\#[-a-z\\d_]*)" +
+            tld +
+            "$",
+        "i",
+    ); // fragment locator
+    return pattern.test(url);
+}
+
+/**
  * Determine if a string is an allowed URL.
  *
  * In the future this may be extended to check if we want to whitelist/blacklist various URLs.
@@ -75,17 +94,7 @@ export function setMeta(key: string, value: any) {
  * @param input - The string to check.
  */
 export function isAllowedUrl(input: string): boolean {
-    // Options https://github.com/chriso/validator.js#validators
-    const options = {
-        protocols: ["http", "https"],
-        require_tld: true,
-        require_protocol: true,
-        require_host: true,
-        require_valid_protocol: true,
-        allow_trailing_dot: false,
-        allow_protocol_relative_urls: false,
-    };
-    return isUrl(input, options);
+    return isURL(input);
 }
 
 interface ISiteSection {

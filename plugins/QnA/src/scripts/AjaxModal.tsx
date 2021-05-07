@@ -6,14 +6,14 @@
 
 import React, { ReactNode, useEffect, useState } from "react";
 import apiv2 from "@library/apiv2";
-import Modal from "@library/modal/Modal";
+import LazyModal from "@library/modal/LazyModal";
 import ModalSizes from "@library/modal/ModalSizes";
 import FrameBody from "@library/layout/frame/FrameBody";
 import Frame from "@library/layout/frame/Frame";
 import FrameHeader from "@library/layout/frame/FrameHeader";
 import { t } from "@vanilla/i18n/src";
-import DateTime from "@library/content/DateTime";
 import Translate from "@library/content/Translate";
+import DateTime from "@library/content/DateTime";
 
 interface IProps {
     url: string;
@@ -74,11 +74,11 @@ export function AjaxModal(props: IProps) {
     });
 
     return (
-        <Modal isVisible={isVisible} size={props.size} exitHandler={close}>
+        <LazyModal isVisible={isVisible} size={props.size} exitHandler={close}>
             <Frame
                 header={props.title ? <FrameHeader title={props.title} closeFrame={close} /> : null}
                 body={<FrameBody selfPadded={true}>{loading ? props.loader : message}</FrameBody>}
             />
-        </Modal>
+        </LazyModal>
     );
 }

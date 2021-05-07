@@ -62,6 +62,7 @@ export function UserDropDown(props: IProps) {
             }
             flyoutType={FlyoutType.FRAME}
             onVisibilityChange={setOpen}
+            onHover={UserDropDownContents.preload}
         >
             <UserDropDownContents />
         </DropDown>

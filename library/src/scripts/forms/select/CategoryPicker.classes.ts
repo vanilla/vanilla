@@ -20,6 +20,7 @@ export const categoryPickerClasses = useThemeCache(() => {
     const pickerButton = css({
         "&&": {
             display: "inline-flex",
+            cursor: "pointer",
         },
     });
 
@@ -30,8 +31,14 @@ export const categoryPickerClasses = useThemeCache(() => {
             border: "none",
             outline: "none",
             appearance: "none",
-            fontSize: 0,
+            color: "transparent",
+            opacity: 0,
+            zIndex: 1,
             cursor: "pointer",
+        },
+
+        "& option": {
+            color: "initial",
         },
         ...{
             [`

@@ -56,7 +56,7 @@ class TagsTest extends AbstractResourceTest {
         ]);
 
         $config = $this->container()->get(\Gdn_Configuration::class);
-        $config->saveToConfig('Tagging.Discussion.AllowedTypes', '');
+        $config->saveToConfig('Tagging.Discussions.AllowedTypes', ['']);
     }
 
     /**
@@ -154,7 +154,7 @@ class TagsTest extends AbstractResourceTest {
 
         // Set the config to allow the discussion type.
         $config = $this->container()->get(\Gdn_Configuration::class);
-        $config->saveToConfig('Tagging.Discussion.AllowedTypes', ['', 'someType']);
+        $config->saveToConfig('Tagging.Discussions.AllowedTypes', ['', 'someType']);
 
         // Tag it.
         $this->api()->post("discussions/{$discussion["discussionID"]}/tags", ["tagIDs" =>[$tagToDelete["tagID"]]]);

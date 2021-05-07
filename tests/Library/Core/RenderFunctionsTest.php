@@ -127,7 +127,7 @@ class RenderFunctionsTest extends TestCase {
                 null,
                 '<a title="System" href="/renderfunctionstest/profile/System" class="PhotoWrap js-userCard" aria-label="User: &quot;'.
                 'System&quot;" data-userid="1"><img src="https://vanilla.test/renderfunctionstest/applications/dashboard/design/images/usericon.png"'.
-                ' alt="System" class="ProfilePhoto ProfilePhotoMedium" data-fallback="avatar" /></a>'
+                ' alt="System" class="ProfilePhoto ProfilePhotoMedium" data-fallback="avatar" loading="lazy" /></a>'
             ],
             "User array no id" => [
                 [
@@ -136,7 +136,7 @@ class RenderFunctionsTest extends TestCase {
                 null,
                 '<a title="Unknown" href="/renderfunctionstest/profile/" class="PhotoWrap js-userCard" aria-label="User: &quot;Unknown&quot;"'.
                 ' data-userid=""><img src="http://vanilla.test/renderfunctionstest/applications/dashboard/design/images/defaulticon.png"'.
-                ' alt="Unknown" class="ProfilePhoto ProfilePhotoMedium" data-fallback="avatar" /></a>'
+                ' alt="Unknown" class="ProfilePhoto ProfilePhotoMedium" data-fallback="avatar" loading="lazy" /></a>'
             ],
             "User object" => [
                 (object)[
@@ -146,7 +146,7 @@ class RenderFunctionsTest extends TestCase {
                 null,
                 '<a title="System" href="/renderfunctionstest/profile/System" class="PhotoWrap js-userCard" aria-label="User: &quot;'.
                 'System&quot;" data-userid="1"><img src="https://vanilla.test/renderfunctionstest/applications/dashboard/design/images/usericon.png"'.
-                ' alt="System" class="ProfilePhoto ProfilePhotoMedium" data-fallback="avatar" /></a>'
+                ' alt="System" class="ProfilePhoto ProfilePhotoMedium" data-fallback="avatar" loading="lazy" /></a>'
             ],
             "User object no id" => [
                 (object)[
@@ -155,7 +155,7 @@ class RenderFunctionsTest extends TestCase {
                 null,
                 '<a title="Unknown" href="/renderfunctionstest/profile/" class="PhotoWrap js-userCard" aria-label="User: &quot;Unknown&quot;"'.
                 ' data-userid=""><img src="http://vanilla.test/renderfunctionstest/applications/dashboard/design/images/defaulticon.png"'.
-                ' alt="Unknown" class="ProfilePhoto ProfilePhotoMedium" data-fallback="avatar" /></a>'
+                ' alt="Unknown" class="ProfilePhoto ProfilePhotoMedium" data-fallback="avatar" loading="lazy" /></a>'
             ]
         ];
         return $result;

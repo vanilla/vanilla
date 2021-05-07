@@ -15,6 +15,7 @@
             "@subcommunities/*": ["./plugins/subcommunities/src/scripts/*"],
             "@groups/*": ["./applications/groups/src/scripts/*"],
             "@Ranks/*": ["./plugins/Ranks/src/scripts/*"],
+            "@badges/*": ["./plugins/badges/src/scripts/*"],
             "@ElasticSearch/*": ["./plugins/ElasticSearch/src/scripts/*"],
             "typestyle": ["./library/src/scripts/styles/styleShim.ts"],
             "@vanilla/babel-preset": ["./packages/vanilla-babel-preset/*"],
@@ -37,6 +38,7 @@
         "skipDefaultLibCheck": true
     },
     "include": [
+        "build/scripts/**/*.ts",
         "library/src/scripts/**/*.ts",
         "library/src/scripts/**/*.tsx",
         "applications/*/src/scripts/**/*.ts",

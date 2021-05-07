@@ -38,7 +38,7 @@ export interface ISearchBarProps extends IOptionalComponentID {
     disableAutocomplete?: boolean;
     clearButtonClass?: string;
     contentClass?: string;
-    buttonBaseClass?: ButtonTypes;
+    buttonType?: ButtonTypes;
     valueContainerClasses?: string;
     iconContainerClasses?: string;
     resultsAsModalClasses?: string;

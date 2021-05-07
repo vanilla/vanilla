@@ -62,7 +62,7 @@ story.add("Search Box", () => {
                         <div className={classesSearch.searchContainer}>
                             <IndependentSearch
                                 buttonClass={classesSearch.searchButton}
-                                buttonBaseClass={ButtonTypes.CUSTOM}
+                                buttonType={ButtonTypes.CUSTOM}
                                 isLarge={true}
                                 placeholder={t("Search")}
                                 inputClass={classesSearch.input}

@@ -12,8 +12,6 @@ import { EmbedContext } from "@library/embeddedContent/IEmbedContext";
 
 const story = storiesOf("Embeds", module);
 
-// tslint:disable:jsx-use-translation-function
-
 const ipsum = `
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce blandit lorem ac dui porta, scelerisque placerat felis finibus. Fusce vitae porttitor augue. Integer sagittis justo vitae nibh aliquet, a viverra ipsum laoreet. Interdum et malesuada fames ac ante ipsum primis in faucibus. Curabitur elit ligula, fermentum nec felis vel, aliquam interdum justo. Suspendisse et egestas neque. Vivamus volutpat odio eget enim tincidunt, in pretium arcu consectetur. Nulla sodales molestie pharetra.
 `;

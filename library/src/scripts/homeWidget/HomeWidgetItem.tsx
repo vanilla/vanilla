@@ -18,7 +18,7 @@ import { ICountResult } from "@library/search/searchTypes";
 import { ResultMeta } from "@library/result/ResultMeta";
 import { metasClasses } from "@library/metas/Metas.styles";
 import classNames from "classnames";
-import { getButtonStyleFromBaseClass } from "@library/forms/Button";
+import { getClassForButtonType } from "@library/forms/Button";
 import { t } from "@library/utility/appUtils";
 import { ArrowIcon } from "@library/icons/common";
 import { DeepPartial } from "redux";
@@ -84,7 +84,9 @@ export function HomeWidgetItem(props: IHomeWidgetItemProps) {
                 ].includes(options.contentType) && (
                     <div className={classes.imageContainerWrapper}>
                         <div className={classes.imageContainer}>
-                            {imageUrl && <img className={classes.image} src={imageUrl} alt={props.name} />}
+                            {imageUrl && (
+                                <img className={classes.image} src={imageUrl} alt={props.name} loading="lazy" />
+                            )}
                         </div>
                     </div>
                 )}
@@ -96,7 +98,7 @@ export function HomeWidgetItem(props: IHomeWidgetItemProps) {
                 {HomeWidgetItemContentType.TITLE_DESCRIPTION_ICON === options.contentType && iconUrl && (
                     <div className={classes.iconContainer}>
                         <div className={classes.iconWrap}>
-                            <img className={classes.icon} src={iconUrl} alt={props.name} />
+                            <img className={classes.icon} src={iconUrl} alt={props.name} loading="lazy" />
                         </div>
                     </div>
                 )}
@@ -161,9 +163,7 @@ function HomeWidgetAbsoluteContent(props: IHomeWidgetItemProps) {
                 )}
                 {options.display.cta && (
                     <div>
-                        <span className={getButtonStyleFromBaseClass(options.viewMore?.buttonType)}>
-                            {t(viewMoreCode)}
-                        </span>
+                        <span className={getClassForButtonType(options.viewMore?.buttonType)}>{t(viewMoreCode)}</span>
                     </div>
                 )}
             </div>

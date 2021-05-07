@@ -114,7 +114,7 @@ export function TabBrowseLarge() {
         <TabBrowse
             largeTabs
             extendContainer
-            extraButtons={<Button baseClass={ButtonTypes.PRIMARY}>Extra Button</Button>}
+            extraButtons={<Button buttonType={ButtonTypes.PRIMARY}>Extra Button</Button>}
         />
     );
 }

@@ -102,6 +102,12 @@ paths:
           schema:
             type: string
 components:
+  parameters:
+    UserExpand:
+      schema:
+        items:
+          enum:
+            - reactionsReceived
   schemas:
     ReactionType:
       properties:

@@ -63,6 +63,7 @@ export function UserPhoto(props: IProps) {
                     onError={(e) => {
                         setBadImage(true);
                     }}
+                    loading="lazy"
                 />
             ) : (
                 <UserIcon

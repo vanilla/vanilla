@@ -58,7 +58,7 @@ export function parseErrorCode(errorCode?: string | number): IError {
                 message,
                 description: t("The page you were looking for could not be found."),
                 actionItem: (
-                    <LinkAsButton baseClass={ButtonTypes.PRIMARY} to={"/"}>
+                    <LinkAsButton buttonType={ButtonTypes.PRIMARY} to={"/"}>
                         {t("Back to home page")}
                     </LinkAsButton>
                 ),

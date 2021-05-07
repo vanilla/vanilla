@@ -89,7 +89,7 @@ export default function Message(props: IMessageProps) {
                             </div>
                             {props.onCancel && (
                                 <Button
-                                    baseClass={ButtonTypes.TEXT}
+                                    buttonType={ButtonTypes.TEXT}
                                     onClick={props.onCancel}
                                     className={classes.actionButton}
                                     disabled={!!props.isActionLoading}
@@ -99,7 +99,7 @@ export default function Message(props: IMessageProps) {
                             )}
                             {props.onConfirm && (
                                 <Button
-                                    baseClass={ButtonTypes.TEXT}
+                                    buttonType={ButtonTypes.TEXT}
                                     onClick={props.onConfirm}
                                     className={classNames(classes.actionButton, classes.actionButtonPrimary)}
                                     disabled={!!props.isActionLoading}

@@ -78,7 +78,7 @@ class Akismet {
     private $akismetServer;
     private $akismetVersion;
 
-    // This prevents some potentially sensitive information from being sent accross the wire.
+    // This prevents some potentially sensitive information from being sent across the wire.
     private $ignore = ['HTTP_COOKIE',
         'HTTP_X_FORWARDED_FOR',
         'HTTP_X_FORWARDED_HOST',
@@ -117,7 +117,7 @@ class Akismet {
 
         /*
          * This is necessary if the server PHP5 is running on has been set up to run PHP4 and
-         * PHP5 concurently and is actually running through a separate proxy al a these instructions:
+         * PHP5 concurrently and is actually running through a separate proxy al a these instructions:
          * http://www.schlitt.info/applications/blog/archives/83_How_to_run_PHP4_and_PHP_5_parallel.html
          * and http://wiki.coggeshall.org/37.html
          * Otherwise the user_ip appears as the IP address of the PHP4 server passing the requests to the

@@ -26,19 +26,7 @@ export async function makeDevConfig(entryModel: EntryModel, section: string) {
         chunkFilename: `[name]-[chunkhash]-${section}.chunk.js`,
         publicPath: `https://webpack.vanilla.localhost:3030/`,
     };
-    baseConfig.optimization = {
-        namedModules: true,
-        namedChunks: true,
-        splitChunks: false,
-    };
-    baseConfig.devServer = {
-        host: "webpack.vanilla.localhost",
-        port: 3030,
-        public: "webpack.vanilla.localhost:3030",
-        headers: {
-            "Access-Control-Allow-Origin": "*",
-        },
-    };
+
     baseConfig.plugins!.push(new webpack.HotModuleReplacementPlugin());
     baseConfig.plugins!.push(
         new ReactRefreshPlugin({

@@ -29,18 +29,16 @@ export function FormGroup() {
         <article className={storyStyle}>
             <h3>Default</h3>
             <section>
-                <UI.FormGroup for="firstName">
-                    <UI.FormGroupLabel />
+                <UI.FormGroup>
+                    <UI.FormGroupLabel>First Name</UI.FormGroupLabel>
                     <UI.FormGroupInput>{(props) => <UI.TextBox {...props} />}</UI.FormGroupInput>
                 </UI.FormGroup>
-                <UI.FormGroup for="lastName">
-                    <UI.FormGroupLabel />
+                <UI.FormGroup>
+                    <UI.FormGroupLabel>Last Name</UI.FormGroupLabel>
                     <UI.FormGroupInput>{(props) => <UI.TextBox {...props} />}</UI.FormGroupInput>
                 </UI.FormGroup>
-                <UI.FormGroup for="city">
-                    <UI.FormGroupLabel>
-                        🏠 <UI.FormGroupLabelText />
-                    </UI.FormGroupLabel>
+                <UI.FormGroup>
+                    <UI.FormGroupLabel>City</UI.FormGroupLabel>
                     <UI.FormGroupInput>
                         {(props) => (
                             <UI.AutoComplete openOnFocus>
@@ -59,18 +57,16 @@ export function FormGroup() {
             </section>
             <h3>Side-by-side</h3>
             <section>
-                <UI.FormGroup sideBySide for="firstName">
-                    <UI.FormGroupLabel />
+                <UI.FormGroup sideBySide>
+                    <UI.FormGroupLabel>First Name</UI.FormGroupLabel>
                     <UI.FormGroupInput>{(props) => <UI.TextBox {...props} />}</UI.FormGroupInput>
                 </UI.FormGroup>
-                <UI.FormGroup sideBySide for="lastName">
-                    <UI.FormGroupLabel />
+                <UI.FormGroup sideBySide>
+                    <UI.FormGroupLabel>Last Name</UI.FormGroupLabel>
                     <UI.FormGroupInput>{(props) => <UI.TextBox {...props} />}</UI.FormGroupInput>
                 </UI.FormGroup>
-                <UI.FormGroup sideBySide for="city">
-                    <UI.FormGroupLabel>
-                        🏠 <UI.FormGroupLabelText />
-                    </UI.FormGroupLabel>
+                <UI.FormGroup sideBySide>
+                    <UI.FormGroupLabel>City</UI.FormGroupLabel>
                     <UI.FormGroupInput>
                         {(props) => (
                             <UI.AutoComplete openOnFocus>

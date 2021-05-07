@@ -9,12 +9,15 @@
  * @since 2.0
  */
 
+use Vanilla\InjectableInterface;
+use Garden\EventManager;
+
 /**
  * The Database object contains connection and engine information for a single database.
  *
  * It also allows a database to execute string sql statements against that database.
  */
-class Gdn_Database {
+class Gdn_Database implements InjectableInterface {
 
     /** @var string The instance name of this class or the class that inherits from this class. */
     public $ClassName;
@@ -79,6 +82,9 @@ class Gdn_Database {
     /** @var int Maximum number of milliseconds we want to wait before attempting a new DB connection*/
     protected $SmoothWaitMaxMillis;
 
+    /** @var EventManager the event manager for plugin interactions */
+    protected $eventManager;
+
     /**
      * @var \Vanilla\Utility\Timers
      */
@@ -95,6 +101,16 @@ class Gdn_Database {
         $this->init($config);
         $this->ConnectRetries = 1;
         $this->timers = Gdn::getContainer()->get(\Vanilla\Utility\Timers::class);
+        $this->eventManager = Gdn::eventManager();
+    }
+
+    /**
+     * Sets this class' dependencies for DI
+     *
+     * @param EventManager $eventManager the event manager
+     */
+    public function setDependencies(EventManager $eventManager = null) {
+        $this->eventManager = $eventManager;
     }
 
     /**
@@ -432,6 +448,15 @@ class Gdn_Database {
                 $this->LastInfo['connection'] = 'master';
             }
 
+            if ($this->eventManager) {
+                $inputParameters = $this->eventManager->fireFilter(
+                    'database_query_before',
+                    $inputParameters,
+                    $sql,
+                    $options
+                );
+            }
+
             for ($try = 0; $try < $tries; $try++) {
                 // Make sure other unbufferred queries are not open
                 if (is_object($this->_CurrentResultSet)) {
@@ -506,9 +531,10 @@ class Gdn_Database {
             } else {
                 if ($returnType === 'DataSet') {
                     // Create a DataSet to manage the resultset
-                    $this->_CurrentResultSet = new Gdn_DataSet();
+                    $this->_CurrentResultSet = Gdn::getContainer()->get(Gdn_DataSet::class);
                     $this->_CurrentResultSet->Connection = $pDO;
                     $this->_CurrentResultSet->pdoStatement($pDOStatement);
+                    $this->_CurrentResultSet->setQueryOptions($options);
                 } elseif (is_a($pDOStatement, 'PDOStatement')) {
                     $pDOStatement->closeCursor();
                 }

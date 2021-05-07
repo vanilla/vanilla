@@ -55,7 +55,7 @@ export function DropDownPanelNav(props: IProps) {
                         <Button
                             className={classes.closeButton}
                             onClick={props.onClose}
-                            baseClass={ButtonTypes.ICON_COMPACT}
+                            buttonType={ButtonTypes.ICON_COMPACT}
                         >
                             <ScreenReaderContent>{t("Close")}</ScreenReaderContent>
                             <CloseTinyIcon />

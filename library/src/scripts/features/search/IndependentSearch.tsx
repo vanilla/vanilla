@@ -38,7 +38,7 @@ export interface IIndependentSearchProps extends IWithSearchProps, RouteComponen
     valueContainerClasses?: string;
     hideSearchButton?: boolean;
     isLarge?: boolean;
-    buttonBaseClass?: ButtonTypes;
+    buttonType?: ButtonTypes;
     iconContainerClasses?: string;
     resultsAsModalClasses?: string;
     forceMenuOpen?: boolean;
@@ -113,7 +113,7 @@ export function IndependentSearch(props: IIndependentSearchProps) {
                 resultsRef={resultsRef}
                 buttonClassName={props.buttonClass}
                 buttonDropDownClassName={props.buttonDropDownClass}
-                buttonBaseClass={props.buttonBaseClass}
+                buttonType={props.buttonType}
                 buttonLoaderClassName={props.buttonLoaderClassName}
                 hideSearchButton={props.hideSearchButton || hasScope}
                 contentClass={props.contentClass}

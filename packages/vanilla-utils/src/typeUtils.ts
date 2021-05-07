@@ -58,7 +58,10 @@ export function ensureString(maybeString: any) {
     return maybeString;
 }
 
-export function forceInt(value: string | null, fallback: number): number {
+export function forceInt(value: string | number | undefined | null, fallback: number): number {
+    if (typeof value === "number") {
+        return value;
+    }
     let result = Number.parseInt(value ?? "", 10);
     return Number.isNaN(result) ? fallback : result;
 }

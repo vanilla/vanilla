@@ -8,14 +8,13 @@ import CategorySuggestionActions from "@vanilla/addon-vanilla/categories/Categor
 import { IForumStoreState } from "@vanilla/addon-vanilla/redux/state";
 import React, { useEffect, useState } from "react";
 import { connect, useSelector } from "react-redux";
-import { OptionProps } from "react-select/lib/components/Option";
 import { NoOptionsMessage } from "@library/forms/select/overwrites";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
-import Tokens, { ITokenProps } from "@library/forms/select/Tokens";
 import SelectOne from "@library/forms/select/SelectOne";
 import { useReduxActions } from "@library/redux/ReduxActions";
 import { ICategory } from "@vanilla/addon-vanilla/@types/api/categories";
+import { LazyTokens } from "@library/forms/select/LazyTokens";
 
 interface IProps {
     multiple?: boolean;
@@ -66,7 +65,7 @@ export function CommunityCategoryInput(props: IProps) {
 
     if (multiple) {
         return (
-            <Tokens
+            <LazyTokens
                 onFocus={setFocused}
                 {...props}
                 placeholder={t("Search...")}

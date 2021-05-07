@@ -174,7 +174,7 @@ trait SiteTestTrait {
         $enabledLocales =[];
         foreach (static::$enabledLocales as $localeKey => $locale) {
             $enabledLocales["test_$localeKey"] = $locale;
-            $localeDir = PATH_ROOT."/locales/test_$localeKey";
+            $localeDir = PATH_ROOT."/locales/$localeKey";
             if (!(file_exists($localeDir) && is_dir($localeDir))) {
                 mkdir($localeDir);
             }

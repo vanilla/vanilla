@@ -14,8 +14,6 @@ import classNames from "classnames";
 
 const story = storiesOf("Embeds", module);
 
-// tslint:disable:jsx-use-translation-function
-
 const date = "2019-06-05 20:59:01";
 
 function EditorContent({ children }) {

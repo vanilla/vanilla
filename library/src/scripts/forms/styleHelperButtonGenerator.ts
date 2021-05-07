@@ -4,135 +4,72 @@
  * @license GPL-2.0-only
  */
 
-import { buttonGlobalVariables } from "@library/forms/Button.variables";
+import { buttonGlobalVariables, buttonVariables } from "@library/forms/Button.variables";
 import { buttonResetMixin, buttonSizing } from "@library/forms/buttonMixins";
-import { ButtonPreset } from "@library/forms/ButtonPreset";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { IButtonType } from "@library/forms/styleHelperButtonInterface";
+import { IButton } from "@library/forms/styleHelperButtonInterface";
 import { Mixins } from "@library/styles/Mixins";
-import { Variables } from "@library/styles/Variables";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleFactory } from "@library/styles/styleUtils";
 import { percent } from "csx";
 import merge from "lodash/merge";
 import { CSSObject } from "@emotion/css";
 import cloneDeep from "lodash/cloneDeep";
-import { globalVariables } from "@library/styles/globalStyleVars";
 import { defaultTransition } from "@library/styles/styleHelpersAnimation";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 
 export const generateButtonStyleProperties = (props: {
-    buttonTypeVars: IButtonType;
+    buttonTypeVars: IButton;
     setZIndexOnState?: boolean;
     stateSuffix?: string;
     debug?: boolean | string;
-    globalVars?: any;
-    formElementVars?: any;
-    buttonGlobalVars?: any;
 }) => {
-    const {
-        setZIndexOnState = false,
-        stateSuffix,
-        globalVars = globalVariables(),
-        formElementVars = formElementsVariables(),
-        buttonGlobalVars = buttonGlobalVariables(),
-        debug = false,
-    } = props;
+    const { setZIndexOnState = false, stateSuffix, debug = false } = props;
+    const formElementVars = formElementsVariables();
+    const buttonGlobalVars = buttonGlobalVariables();
 
     const zIndex = setZIndexOnState ? 1 : undefined;
-    const buttonDimensions = props.buttonTypeVars.sizing || {};
 
-    const state = props.buttonTypeVars.state ?? {};
-    const colors = props.buttonTypeVars.colors ?? {
-        bg: globalVars.mainColors.bg,
-        fg: globalVars.mainColors.fg,
-    };
+    const { buttonTypeVars } = props;
 
-    // Make sure we have the second level, if it was empty
-    const buttonTypeVars = merge(
-        {
-            preset: ButtonPreset.ADVANCED,
-            colors,
-            state,
-            hover: state,
-            focus: state,
-            active: state,
-            focusAccessible: state,
-        },
-        props.buttonTypeVars,
-    );
-
-    let backgroundColor =
-        buttonTypeVars.colors && buttonTypeVars.colors.bg ? buttonTypeVars.colors.bg : buttonGlobalVars.colors.bg;
-
-    let fontColor =
-        buttonTypeVars.fonts && buttonTypeVars.fonts.color
-            ? buttonTypeVars.fonts.color
-            : buttonTypeVars.colors && buttonTypeVars.colors.fg
-            ? buttonTypeVars.colors.fg
-            : undefined;
-
-    if (!buttonTypeVars.borders) {
-        buttonTypeVars.borders = {};
-    }
-
-    if (!buttonTypeVars.borders.color) {
-        buttonTypeVars.borders = {};
-    }
-
-    const borderVars = {
-        ...buttonGlobalVars.borders,
-        ...buttonTypeVars.borders,
-    };
-
-    const defaultBorder = Mixins.border(borderVars, {
+    const defaultBorder = Mixins.border(buttonTypeVars.borders, {
         fallbackBorderVariables: buttonGlobalVars.border,
         debug,
     });
 
-    const hoverBorder =
-        buttonTypeVars.hover && buttonTypeVars.hover.borders
-            ? merge(
-                  cloneDeep(defaultBorder),
-                  Mixins.border(
-                      { ...buttonTypeVars.hover.borders },
-                      { fallbackBorderVariables: buttonGlobalVars.border },
-                  ),
-              )
-            : {};
+    const hoverBorder = buttonTypeVars.hover?.borders
+        ? merge(
+              cloneDeep(defaultBorder),
+              Mixins.border({ ...buttonTypeVars.hover.borders }, { fallbackBorderVariables: buttonGlobalVars.border }),
+          )
+        : {};
 
-    const activeBorder =
-        buttonTypeVars.active && buttonTypeVars.active.borders
-            ? merge(
-                  cloneDeep(defaultBorder),
-                  Mixins.border(
-                      { ...buttonTypeVars.active.borders },
-                      { fallbackBorderVariables: buttonGlobalVars.border },
-                  ),
-              )
-            : {};
+    const activeBorder = buttonTypeVars.active?.borders
+        ? merge(
+              cloneDeep(defaultBorder),
+              Mixins.border({ ...buttonTypeVars.active.borders }, { fallbackBorderVariables: buttonGlobalVars.border }),
+          )
+        : {};
 
-    const focusBorder =
-        buttonTypeVars.focus && buttonTypeVars.focus.borders
-            ? merge(
-                  cloneDeep(defaultBorder),
-                  Mixins.border(
-                      { ...(buttonTypeVars.focus && buttonTypeVars.focus.borders) },
-                      { fallbackBorderVariables: buttonGlobalVars.border },
-                  ),
-              )
-            : defaultBorder;
+    const focusBorder = buttonTypeVars.focus?.borders
+        ? merge(
+              cloneDeep(defaultBorder),
+              Mixins.border(
+                  { ...(buttonTypeVars.focus && buttonTypeVars.focus.borders) },
+                  { fallbackBorderVariables: buttonGlobalVars.border },
+              ),
+          )
+        : defaultBorder;
 
-    const focusAccessibleBorder =
-        buttonTypeVars.focusAccessible && buttonTypeVars.focusAccessible.borders
-            ? merge(
-                  cloneDeep(defaultBorder),
-                  Mixins.border(
-                      { ...buttonTypeVars.focusAccessible.borders },
-                      { fallbackBorderVariables: buttonGlobalVars.border },
-                  ),
-              )
-            : {};
+    const focusAccessibleBorder = buttonTypeVars.focusAccessible?.borders
+        ? merge(
+              cloneDeep(defaultBorder),
+              Mixins.border(
+                  { ...buttonTypeVars.focusAccessible.borders },
+                  { fallbackBorderVariables: buttonGlobalVars.border },
+              ),
+          )
+        : {};
 
     const disabledBorder = buttonTypeVars.disabled?.borders
         ? merge(
@@ -152,43 +89,24 @@ export const generateButtonStyleProperties = (props: {
         ...disabledBorder,
     };
 
-    const fontVars = Variables.font({ ...buttonGlobalVars.font, ...buttonTypeVars.fonts });
-
-    const paddingHorizontal =
-        buttonTypeVars.padding && buttonTypeVars.padding.horizontal !== undefined
-            ? buttonTypeVars.padding.horizontal
-            : buttonGlobalVars.padding.horizontal;
-    const fontSize =
-        buttonTypeVars.fonts && buttonTypeVars.fonts.size !== undefined
-            ? buttonTypeVars.fonts.size
-            : buttonGlobalVars.font.size;
-
-    const { minHeight, minWidth } = buttonDimensions;
-    const { skipDynamicPadding = false } = buttonTypeVars;
-
     const result: CSSObject = {
         ...buttonResetMixin(),
         textOverflow: "ellipsis",
         overflow: "hidden",
         width: "auto",
         maxWidth: percent(100),
-        backgroundColor: ColorsUtils.colorOut(backgroundColor),
-        ...Mixins.font({
-            ...fontVars,
-            size: fontSize,
-            color: fontColor,
-            weight: fontVars.weight ?? undefined,
-        }),
+        backgroundColor: ColorsUtils.colorOut(buttonTypeVars.colors?.bg),
+        ...Mixins.font({ ...buttonTypeVars.fonts }),
         WebkitFontSmoothing: "antialiased",
         ...defaultBorder,
         ...buttonSizing({
-            minHeight,
-            minWidth,
-            fontSize,
-            paddingHorizontal,
+            minHeight: buttonTypeVars.sizing?.minHeight,
+            minWidth: buttonTypeVars.sizing?.minWidth,
+            fontSize: buttonTypeVars.fonts?.size,
+            paddingHorizontal: buttonTypeVars.padding?.horizontal,
             formElementVars: formElementVars,
-            borderRadius: borderVars["radius"] ?? undefined,
-            skipDynamicPadding,
+            borderRadius: buttonTypeVars.borders?.radius,
+            skipDynamicPadding: buttonTypeVars.skipDynamicPadding ?? false,
         }),
         display: "inline-flex",
         alignItems: "center",
@@ -209,62 +127,30 @@ export const generateButtonStyleProperties = (props: {
             [`&:not([disabled]):hover${stateSuffix ?? ""}`]: {
                 zIndex,
                 opacity: buttonTypeVars.hover?.opacity,
-                color: ColorsUtils.colorOut(
-                    buttonTypeVars.hover && buttonTypeVars.hover.colors && buttonTypeVars.hover.colors.fg
-                        ? buttonTypeVars.hover.colors.fg
-                        : undefined,
-                ),
-                backgroundColor: ColorsUtils.colorOut(
-                    buttonTypeVars.hover && buttonTypeVars.hover.colors && buttonTypeVars.hover.colors.bg
-                        ? buttonTypeVars.hover.colors.bg
-                        : undefined,
-                ),
+                color: ColorsUtils.colorOut(buttonTypeVars.hover?.colors?.fg),
+                backgroundColor: ColorsUtils.colorOut(buttonTypeVars.hover?.colors?.bg),
                 ...hoverBorder,
                 ...(buttonTypeVars.useShadow ? shadowHelper().buttonHover() : { boxShadow: "none" }),
             },
             [`&:not([disabled]):focus${stateSuffix ?? ""}`]: {
                 zIndex,
                 opacity: buttonTypeVars.focus?.opacity,
-                color: ColorsUtils.colorOut(
-                    buttonTypeVars.focus!.colors && buttonTypeVars.focus!.colors.fg
-                        ? buttonTypeVars.focus!.colors.fg
-                        : undefined,
-                ),
-                backgroundColor: ColorsUtils.colorOut(
-                    buttonTypeVars.focus!.colors && buttonTypeVars.focus!.colors.bg
-                        ? buttonTypeVars.focus!.colors.bg
-                        : undefined,
-                ),
+                color: ColorsUtils.colorOut(buttonTypeVars.focus?.colors?.fg),
+                backgroundColor: ColorsUtils.colorOut(buttonTypeVars.focus?.colors?.bg),
                 ...focusBorder,
             },
             [`&:not([disabled]):active${stateSuffix ?? ""}`]: {
                 zIndex,
                 opacity: buttonTypeVars.active?.opacity,
-                color: ColorsUtils.colorOut(
-                    buttonTypeVars.active!.colors && buttonTypeVars.active!.colors.fg
-                        ? buttonTypeVars.active!.colors.fg
-                        : undefined,
-                ),
-                backgroundColor: ColorsUtils.colorOut(
-                    buttonTypeVars.active!.colors && buttonTypeVars.active!.colors.bg
-                        ? buttonTypeVars.active!.colors.bg
-                        : undefined,
-                ),
+                color: ColorsUtils.colorOut(buttonTypeVars.active?.colors?.fg),
+                backgroundColor: ColorsUtils.colorOut(buttonTypeVars.active?.colors?.bg),
                 ...activeBorder,
             },
             [`&:not([disabled]):focus-visible${stateSuffix ?? ""}`]: {
                 zIndex,
                 opacity: buttonTypeVars.focusAccessible?.opacity,
-                color: ColorsUtils.colorOut(
-                    buttonTypeVars.focusAccessible!.colors && buttonTypeVars.focusAccessible!.colors.fg
-                        ? buttonTypeVars.focusAccessible!.colors.fg
-                        : undefined,
-                ),
-                backgroundColor: ColorsUtils.colorOut(
-                    buttonTypeVars.focusAccessible!.colors && buttonTypeVars.focusAccessible!.colors.bg
-                        ? buttonTypeVars.focusAccessible!.colors.bg
-                        : undefined,
-                ),
+                color: ColorsUtils.colorOut(buttonTypeVars.focusAccessible?.colors?.fg),
+                backgroundColor: ColorsUtils.colorOut(buttonTypeVars.focusAccessible?.colors?.bg),
                 ...focusAccessibleBorder,
             },
             "&[disabled]": disabledStyle,
@@ -276,7 +162,7 @@ export const generateButtonStyleProperties = (props: {
 };
 
 const generateButtonClass = (
-    buttonTypeVars: IButtonType,
+    buttonTypeVars: IButton,
     options?: { setZIndexOnState?: boolean; debug?: boolean | string },
 ) => {
     const { setZIndexOnState = false, debug = false } = options || {};

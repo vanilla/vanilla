@@ -4,10 +4,11 @@
  */
 
 import React from "react";
-import Tokens, { ITokenProps } from "@library/forms/select/Tokens";
+import { ITokenProps } from "@library/forms/select/Tokens";
 import { useRoles, useRoleSelectOptions } from "@dashboard/roles/roleHooks";
 import { LoadStatus } from "@library/@types/api/core";
 import { notEmpty } from "@vanilla/utils";
+import { LazyTokens } from "@library/forms/select/LazyTokens";
 
 interface IProps extends Omit<ITokenProps, "options" | "isLoading" | "value" | "onChange"> {
     value: number[];
@@ -20,7 +21,7 @@ export function MultiRoleInput(props: IProps) {
     const roleOptions = useRoleSelectOptions();
 
     return (
-        <Tokens
+        <LazyTokens
             {...props}
             value={props.value
                 .map((roleID) => {

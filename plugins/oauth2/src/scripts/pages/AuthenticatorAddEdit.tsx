@@ -116,7 +116,7 @@ export default function OAuth2AddEdit(props: IProps) {
                 }
                 footer={
                     <div className="Buttons form-footer padded-right">
-                        <Button submit={true} baseClass={ButtonTypes.DASHBOARD_PRIMARY} disabled={isLoading}>
+                        <Button submit={true} buttonType={ButtonTypes.DASHBOARD_PRIMARY} disabled={isLoading}>
                             {isLoading ? <ButtonLoader /> : t("Save")}
                         </Button>
                     </div>

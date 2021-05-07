@@ -70,7 +70,7 @@ export function VideoEmbed(props: IProps) {
 function VideoThumbnail(props: { name?: string; onClick: React.MouseEventHandler; photoUrl: string }) {
     return (
         <button type="button" aria-label={props.name} className="embedVideo-playButton" onClick={props.onClick}>
-            <img src={props.photoUrl} role="presentation" className="embedVideo-thumbnail" />
+            <img src={props.photoUrl} role="presentation" className="embedVideo-thumbnail" loading="lazy" />
             <span className="embedVideo-playIconWrap">
                 <PlayIcon />
             </span>

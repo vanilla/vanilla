@@ -8,7 +8,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { EMPTY_LEGACY_BUTTON_PRESET, IButtonType } from "@library/forms/styleHelperButtonInterface";
+import { EMPTY_LEGACY_BUTTON_PRESET, IButton } from "@library/forms/styleHelperButtonInterface";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { Variables } from "@library/styles/Variables";
@@ -20,17 +20,54 @@ export const buttonGlobalVariables = useThemeCache((forcedVars?: IThemeVariables
     // Fetch external global variables
     const globalVars = globalVariables(forcedVars);
     const formElVars = formElementsVariables(forcedVars);
+
+    /**
+     * @varGroup buttonGlobals
+     * @commonTitle Button Globals
+     * @description Variables affecting buttons globally
+     */
+
     const makeThemeVars = variableFactory("buttonGlobals", forcedVars);
 
+    /**
+     * @varGroup buttonGlobals.fonts
+     * @commonTitle  Fonts
+     */
     let colors = makeThemeVars("colors", {
+        /**
+         * @var buttonGlobals.colors.fg
+         * @title Foreground color
+         * @type string
+         * @format hex-string
+         */
         fg: globalVars.mainColors.fg,
+        /**
+         * @var buttonGlobals.colors.bg
+         * @title Background color
+         * @type string
+         * @format hex-string
+         */
         bg: globalVars.mainColors.bg,
+        /**
+         * @var buttonGlobals.colors.primary
+         * @title Primary color
+         * @type string
+         * @format hex-string
+         */
         primary: globalVars.mainColors.primary,
+        /**
+         * @var buttonGlobals.colors.primaryContrast
+         * @title Primary contrast color
+         * @type string
+         * @format hex-string
+         */
         primaryContrast: globalVars.mainColors.primaryContrast,
-        standard: globalVars.mainColors.secondary,
-        standardContrast: globalVars.mainColors.primaryContrast,
     });
 
+    /**
+     * @varGroup buttonGlobals.font
+     * @expand font
+     */
     const font = makeThemeVars(
         "font",
         Variables.font({
@@ -38,6 +75,10 @@ export const buttonGlobalVariables = useThemeCache((forcedVars?: IThemeVariables
         }),
     );
 
+    /**
+     * @varGroup buttonGlobals.padding
+     * @commonTitle Padding
+     */
     const padding = makeThemeVars("padding", {
         top: 2,
         bottom: 3,
@@ -47,12 +88,20 @@ export const buttonGlobalVariables = useThemeCache((forcedVars?: IThemeVariables
         },
     });
 
+    /**
+     * @varGroup buttonGlobals.sizing
+     * @commonTitle Sizing
+     */
     const sizing = makeThemeVars("sizing", {
         minHeight: formElVars.sizing.height,
         minWidth: 104,
         compactHeight: 24,
     });
 
+    /**
+     * @varGroup buttonGlobals.border
+     * @commonTitle Border
+     */
     const border = makeThemeVars("border", globalVars.borderType.formElements.buttons);
 
     const constants = makeThemeVars("constants", {
@@ -69,16 +118,16 @@ export const buttonGlobalVariables = useThemeCache((forcedVars?: IThemeVariables
     };
 });
 
-interface IInitialButtonVars extends Partial<IButtonType> {
-    presetName: NonNullable<IButtonType["presetName"]>;
+interface IInitialButtonVars extends Partial<IButton> {
+    presetName: NonNullable<IButton["presetName"]>;
 }
 
 const generateButtonVarsFromPreset = function (
-    name: IButtonType["name"],
+    name: IButton["name"],
     varFactory: ReturnType<typeof variableFactory>,
     initialButtonVars: IInitialButtonVars,
     forcedVars?: IThemeVariables,
-): IButtonType {
+): IButton {
     const globalVars = globalVariables(forcedVars);
     const { almostBlack, white } = globalVars.elementaryColors;
     const buttonGlobals = buttonGlobalVariables(forcedVars);
@@ -95,8 +144,8 @@ const generateButtonVarsFromPreset = function (
             colors: { fg, bg },
         } = varFactory(name, {
             colors: {
-                fg: _preset?.fg ?? globalVars.mainColors.primaryContrast,
-                bg: _preset?.bg ?? globalVars.mainColors.primary,
+                fg: _preset?.fg ?? buttonGlobals.colors.primaryContrast,
+                bg: _preset?.bg ?? buttonGlobals.colors.primary,
             },
         });
 
@@ -185,13 +234,13 @@ const generateButtonVarsFromPreset = function (
             },
         } = varFactory(name, {
             colors: {
-                fg: _preset?.fg ?? globalVars.mainColors.fg,
-                bg: _preset?.bg ?? globalVars.mainColors.bg,
+                fg: _preset?.fg ?? buttonGlobals.colors.fg,
+                bg: _preset?.bg ?? buttonGlobals.colors.bg,
             },
             state: {
                 colors: {
-                    bg: _preset?.bgState ?? globalVars.mainColors.primary,
-                    fg: _preset?.fgState ?? globalVars.mainColors.primaryContrast,
+                    bg: _preset?.bgState ?? buttonGlobals.colors.primary,
+                    fg: _preset?.fgState ?? buttonGlobals.colors.primaryContrast,
                 },
             },
         });
@@ -201,7 +250,7 @@ const generateButtonVarsFromPreset = function (
                 ...buttonGlobals.border,
                 color:
                     _preset?.borders ??
-                    ensureColorHelper(fg!).mix(globalVars.mainColors.bg, buttonGlobals.constants.borderMixRatio),
+                    ensureColorHelper(fg!).mix(buttonGlobals.colors.bg, buttonGlobals.constants.borderMixRatio),
             },
         });
 
@@ -259,48 +308,33 @@ const generateButtonVarsFromPreset = function (
 
 export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const globalVars = globalVariables(forcedVars);
+
     const makeThemeVars = variableFactory("button", forcedVars);
     const buttonGlobals = buttonGlobalVariables(forcedVars);
 
-    const primaryLegacyInit = makeThemeVars("primary", {
-        preset: EMPTY_LEGACY_BUTTON_PRESET, //LEGACY
+    const outlineInit = makeThemeVars("outline", {
+        preset: {
+            fg: buttonGlobals.colors.primary,
+            borders: buttonGlobals.colors.primary,
+            fgState: buttonGlobals.colors.bg,
+        },
+        presetName: ButtonPreset.OUTLINE,
     });
 
-    const outline = makeThemeVars("outline", {
-        name: ButtonTypes.OUTLINE,
-        preset: { style: ButtonPreset.SOLID },
-        colors: {
-            bg: globalVars.mainColors.bg,
-            fg: globalVars.mainColors.primary,
-        },
-        borders: {
-            ...globalVars.borderType.formElements.buttons,
-            color: globalVars.mainColors.primary,
-        },
-        hover: {
-            colors: {
-                bg: globalVars.mainColors.primary,
-                fg: globalVars.mainColors.bg,
-            },
-        },
-        active: {
-            colors: {
-                bg: globalVars.mainColors.primary,
-                fg: globalVars.mainColors.bg,
-            },
-        },
-        focus: {
-            colors: {
-                bg: globalVars.mainColors.primary,
-                fg: globalVars.mainColors.bg,
-            },
-        },
-        focusAccessible: {
-            colors: {
-                bg: globalVars.mainColors.primary,
-                fg: globalVars.mainColors.bg,
-            },
-        },
+    /**
+     * @varGroup button.outline
+     * @commonTitle Outlined button
+     * @expand button
+     */
+    const outline = makeThemeVars(
+        "outline",
+        Variables.button({
+            ...generateButtonVarsFromPreset("outline", makeThemeVars, outlineInit, forcedVars),
+        }),
+    );
+
+    const primaryLegacyInit = makeThemeVars("primary", {
+        preset: EMPTY_LEGACY_BUTTON_PRESET, //LEGACY
     });
 
     const primaryInit = makeThemeVars("primary", {
@@ -308,9 +342,17 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         presetName: primaryLegacyInit.preset.style ?? ButtonPreset.SOLID,
     });
 
-    const primary = makeThemeVars("primary", {
-        ...generateButtonVarsFromPreset("primary", makeThemeVars, primaryInit, forcedVars),
-    });
+    /**
+     * @varGroup button.primary
+     * @commonTitle Primary button
+     * @expand button
+     */
+    const primary = makeThemeVars(
+        "primary",
+        Variables.button({
+            ...generateButtonVarsFromPreset("primary", makeThemeVars, primaryInit, forcedVars),
+        }),
+    );
 
     const standardLegacyInit = makeThemeVars("standard", {
         preset: EMPTY_LEGACY_BUTTON_PRESET, //LEGACY
@@ -321,68 +363,97 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         presetName: standardLegacyInit.preset.style ?? ButtonPreset.OUTLINE,
     });
 
-    const standard = makeThemeVars("standard", {
-        ...generateButtonVarsFromPreset("standard", makeThemeVars, standardInit, forcedVars),
-    });
+    /**
+     * @varGroup button.standard
+     * @commonTitle Standard button
+     * @expand button
+     */
+    const standard = makeThemeVars(
+        "standard",
+        Variables.button({
+            ...generateButtonVarsFromPreset("standard", makeThemeVars, standardInit, forcedVars),
+        }),
+    );
 
-    const transparent: IButtonType = makeThemeVars("transparent", {
-        name: ButtonTypes.TRANSPARENT,
-        presetName: ButtonPreset.ADVANCED,
-        colors: {
-            fg: globalVars.mainColors.bg,
-            bg: globalVars.mainColors.fg.fade(0.1),
-        },
-        borders: {
-            ...globalVars.borderType.formElements.buttons,
-            color: globalVars.mainColors.bg,
-        },
-        state: {
+    /**
+     * @varGroup button.transparent
+     * @commonTitle Transparent button
+     * @expand button
+     */
+    const transparent = makeThemeVars(
+        "transparent",
+        Variables.button({
+            name: ButtonTypes.TRANSPARENT,
             colors: {
-                bg: globalVars.mainColors.fg.fade(0.2),
-            },
-        },
-    });
-
-    const translucid: IButtonType = makeThemeVars("translucid", {
-        name: ButtonTypes.TRANSLUCID,
-        presetName: ButtonPreset.ADVANCED,
-        colors: {
-            bg: globalVars.mainColors.bg,
-            fg: globalVars.mainColors.primary,
-        },
-        borders: {
-            ...globalVars.borderType.formElements.buttons,
-            color: globalVars.mainColors.bg,
-        },
-        state: {
-            colors: {
-                bg: globalVars.mainColors.bg.fade(0.8),
-            },
-        },
-    });
-
-    const notStandard: IButtonType = makeThemeVars("notStandard", {
-        name: ButtonTypes.NOT_STANDARD,
-        presetName: ButtonPreset.ADVANCED,
-        colors: {
-            bg: globalVars.mainColors.bg,
-            fg: globalVars.mainColors.primary,
-        },
-        borders: {
-            ...globalVars.borderType.formElements.buttons,
-            color: globalVars.mainColors.bg,
-        },
-        state: {
-            colors: {
-                bg: globalVars.mainColors.bg,
-                fg: globalVars.mainColors.primary,
+                fg: buttonGlobals.colors.bg,
+                bg: buttonGlobals.colors.fg.fade(0.1),
             },
             borders: {
-                radius: buttonGlobals.border.radius,
-                color: globalVars.mainColors.bg,
+                ...buttonGlobals.border,
+                color: buttonGlobals.colors.bg,
             },
-        },
-    });
+            state: {
+                colors: {
+                    bg: buttonGlobals.colors.fg.fade(0.2),
+                },
+            },
+        }),
+    );
+
+    /**
+     * @varGroup button.translucid
+     * @commonTitle Translucid button
+     * @expand button
+     */
+    const translucid = makeThemeVars(
+        "translucid",
+        Variables.button({
+            name: ButtonTypes.TRANSLUCID,
+            colors: {
+                bg: buttonGlobals.colors.bg,
+                fg: buttonGlobals.colors.primary,
+            },
+            borders: {
+                ...buttonGlobals.border,
+                color: buttonGlobals.colors.bg,
+            },
+            state: {
+                colors: {
+                    bg: buttonGlobals.colors.bg.fade(0.8),
+                },
+            },
+        }),
+    );
+
+    /**
+     * @varGroup button.notStandard
+     * @commonTitle Non-standard button
+     * @expand button
+     */
+    const notStandard = makeThemeVars(
+        "notStandard",
+        Variables.button({
+            name: ButtonTypes.NOT_STANDARD,
+            colors: {
+                bg: buttonGlobals.colors.bg,
+                fg: buttonGlobals.colors.primary,
+            },
+            borders: {
+                ...buttonGlobals.border,
+                color: buttonGlobals.colors.bg,
+            },
+            state: {
+                colors: {
+                    bg: buttonGlobals.colors.bg,
+                    fg: buttonGlobals.colors.primary,
+                },
+                borders: {
+                    radius: buttonGlobals.border.radius,
+                    color: buttonGlobals.colors.bg,
+                },
+            },
+        }),
+    );
 
     const radioPresetInit1 = makeThemeVars("radio", {
         sizing: {
@@ -398,10 +469,10 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         },
         state: {
             colors: {
-                fg: globalVars.mainColors.primary,
+                fg: buttonGlobals.colors.primary,
             },
             borders: {
-                color: globalVars.mainColors.primary,
+                color: buttonGlobals.colors.primary,
                 radius: radioPresetInit1.sizing.minHeight / 2,
             },
         },
@@ -411,29 +482,31 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         },
     });
 
-    const radio: IButtonType = makeThemeVars("radio", {
-        name: ButtonTypes.RADIO,
-        presetName: ButtonPreset.ADVANCED,
-        colors: {
-            fg: globalVars.mainColors.fg,
-            bg: globalVars.mainColors.bg,
-        },
-        padding: {
-            horizontal: 12,
-        },
-        borders: radioPresetInit2.borders,
-        state: radioPresetInit2.state,
-        sizing: {
-            minHeight: radioPresetInit2.sizing.minHeight,
-        },
-        extraNested: {
-            ["&.isActive"]: {
-                borderColor: ColorsUtils.colorOut(radioPresetInit2.active.color),
-                backgroundColor: ColorsUtils.colorOut(radioPresetInit2.active.color),
+    const radio = makeThemeVars(
+        "radio",
+        Variables.button({
+            name: ButtonTypes.RADIO,
+            colors: {
+                fg: buttonGlobals.colors.fg,
+                bg: buttonGlobals.colors.bg,
             },
-        },
-        skipDynamicPadding: true,
-    });
+            padding: {
+                horizontal: 12,
+            },
+            borders: radioPresetInit2.borders,
+            state: radioPresetInit2.state,
+            sizing: {
+                minHeight: radioPresetInit2.sizing.minHeight,
+            },
+            extraNested: {
+                ["&.isActive"]: {
+                    borderColor: ColorsUtils.colorOut(radioPresetInit2.active.color),
+                    backgroundColor: ColorsUtils.colorOut(radioPresetInit2.active.color),
+                },
+            },
+            skipDynamicPadding: true,
+        }),
+    );
 
     return {
         standard,

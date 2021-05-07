@@ -76,14 +76,11 @@ export default class Builder {
             makePolyfillConfig(this.entryModel),
         ]);
 
-        if (this.options.lowMemory) {
-            // In low memory environments we build sequentially instead of in parallel.
-            for (const config of configs) {
-                await this.runBuild(config);
-            }
-        } else {
-            // Otherwise we build all configs at once.
-            await this.runBuild(configs);
+        // Running the builds individually is actually faster since webpack 5
+        // We can parellize many function per build and saturate the CPU.
+        // This also lets you see individual sections errors faster.
+        for (const config of configs) {
+            await this.runBuild(config);
         }
     }
 
@@ -102,7 +99,9 @@ export default class Builder {
                 }
 
                 print(stats.toString(this.statOptions));
-                resolve();
+                compiler.close(() => {
+                    resolve();
+                });
             });
         });
     }

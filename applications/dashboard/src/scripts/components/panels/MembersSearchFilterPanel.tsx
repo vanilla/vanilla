@@ -8,11 +8,11 @@ import { FilterFrame } from "@library/search/panels/FilterFrame";
 import InputTextBlock from "@library/forms/InputTextBlock";
 import { t } from "@vanilla/i18n";
 import { useSearchForm } from "@library/search/SearchContext";
-import DateRange from "@library/forms/DateRange";
 import { dateRangeClasses } from "@library/forms/dateRangeStyles";
 import Permission, { PermissionMode } from "@library/features/users/Permission";
 import { MultiRoleInput } from "@dashboard/roles/MultiRoleInput";
 import { IMemberSearchTypes } from "@dashboard/components/panels/memberSearchTypes";
+import LazyDateRange from "@library/forms/LazyDateRange";
 
 interface IProps {}
 
@@ -45,7 +45,7 @@ export function MembersSearchFilterPanel(props: IProps) {
                 ></InputTextBlock>
             </Permission>
 
-            <DateRange
+            <LazyDateRange
                 label={t("Registered")}
                 onStartChange={(date: string) => {
                     updateForm({ startDate: date });

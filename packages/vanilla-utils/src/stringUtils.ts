@@ -17,7 +17,6 @@ import mergeWith from "lodash/mergeWith";
  */
 export function hashString(str: string): number {
     function hashReduce(prevHash, currVal) {
-        // tslint:disable-next-line:no-bitwise
         return (prevHash << 5) - prevHash + currVal.charCodeAt(0);
     }
     return str.split("").reduce(hashReduce, 0);

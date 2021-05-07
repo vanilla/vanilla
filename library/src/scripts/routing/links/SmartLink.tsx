@@ -66,7 +66,7 @@ export default React.forwardRef(function SmartLink(props: ISmartLinkProps, ref: 
                 href={sanitizeUrl(href)}
                 tabIndex={props.tabIndex ? props.tabIndex : 0}
                 target={isForeign ? "_blank" : undefined}
-                rel={isForeign ? "noopener" : props.rel}
+                rel={isForeign ? "noopener noreferrer" : props.rel}
             />
         );
     }

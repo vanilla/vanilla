@@ -7,4 +7,3 @@
 export * from "./FormGroup";
 export * from "./FormGroupInput";
 export * from "./FormGroupLabel";
-export * from "./FormGroupLabelText";

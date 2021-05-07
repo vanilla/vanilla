@@ -25,7 +25,8 @@ import { DiscussionOptionsSink } from "@library/features/discussions/DiscussionO
 import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
 import { DiscussionOptionsChangeLog } from "@library/features/discussions/DiscussionOptionsChangeLog";
 import DiscussionChangeType from "@library/features/discussions/DiscussionOptionsChangeType";
-import { NON_CHANGE_TYPE } from "@library/features/discussions/DiscussionOptionsChangeType";
+import { NON_CHANGE_TYPE } from "@library/features/discussions/forms/ChangeTypeDiscussionForm";
+import { DiscussionOptionsResolve } from "@library/features/discussions/DiscussionOptionsResolve";
 
 interface IDiscussionOptionItem {
     permission?: IPermission;
@@ -56,6 +57,8 @@ const DiscussionOptionsMenu: FunctionComponent<{ discussion: IDiscussion }> = ({
 
     const canMove = hasPermission("community.moderate", { mode: PermissionMode.GLOBAL });
     const canDelete = hasPermission("discussions.manage", permOptions);
+    const canResolve = hasPermission("staff.allow", { mode: PermissionMode.GLOBAL_OR_RESOURCE });
+
     const items: React.ReactNode[] = [];
 
     const allowedDiscussionTypes = discussion?.category?.allowedDiscussionTypes ?? [];
@@ -101,6 +104,10 @@ const DiscussionOptionsMenu: FunctionComponent<{ discussion: IDiscussion }> = ({
     }
 
     items.push(<DropDownItemSeparator />);
+
+    if (discussion.resolved !== undefined && canResolve) {
+        items.push(<DiscussionOptionsResolve discussion={discussion} />);
+    }
 
     // Do the extras
     additionalDiscussionOptions.forEach((option) => {

@@ -6,10 +6,10 @@
 
 import React from "react";
 import { currentThemeClasses } from "./currentThemeStyles";
-import DateTime from "@library/content/DateTime";
 import { ThemePreviewTitle } from "@library/theming/ThemePreviewTitle";
 import { ITheme } from "@library/theming/themeReducer";
 import { t } from "@vanilla/i18n";
+import DateTime from "@library/content/DateTime";
 
 export interface IThemeInfo {
     [key: string]: {

@@ -23,10 +23,6 @@ export interface IButtonProps extends IOptionalComponentID, React.HTMLAttributes
     submit?: boolean;
     ariaLabel?: string;
     buttonType?: ButtonTypes;
-    /**
-     * @deprecated Use buttonType instead.
-     */
-    baseClass?: ButtonTypes;
     ariaHidden?: boolean;
     tabIndex?: number;
     lang?: string;
@@ -41,7 +37,7 @@ interface IState {
     id?: string;
 }
 
-export const getButtonStyleFromBaseClass = (type: ButtonTypes | undefined) => {
+export const getClassForButtonType = (type: ButtonTypes | undefined) => {
     if (type) {
         const buttonUtils = buttonUtilityClasses();
         const classes = buttonClasses();
@@ -109,8 +105,7 @@ export default class Button extends React.Component<IButtonProps, IState> {
 
     public render() {
         const {
-            buttonType: _buttonType,
-            baseClass: _baseClass,
+            buttonType,
             legacyMode,
             className,
             id,
@@ -121,9 +116,8 @@ export default class Button extends React.Component<IButtonProps, IState> {
             buttonRef,
             ...restProps
         } = this.props;
-        const buttonType = _baseClass ?? _buttonType;
 
-        const componentClasses = classNames(getButtonStyleFromBaseClass(buttonType), { Button: legacyMode }, className);
+        const componentClasses = classNames(getClassForButtonType(buttonType), { Button: legacyMode }, className);
 
         return (
             <button

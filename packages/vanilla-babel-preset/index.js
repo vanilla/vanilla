@@ -5,25 +5,27 @@
 
 const { resolve } = require;
 
-module.exports = api => {
+module.exports = (api) => {
     const isTest = api.env("test");
     const isJest = !!process.env.JEST;
 
     let envOptions = {
         useBuiltIns: false,
-        modules: false,
+        modules: "auto",
+        forceAllTransforms: true
     };
 
-    const runtimePlugins = isTest || isJest
-        ? []
-        : [
-              [
-                  resolve("@babel/plugin-transform-runtime"),
-                  {
-                      useESModules: true,
-                  },
-              ],
-          ];
+    const runtimePlugins =
+        isTest || isJest
+            ? []
+            : [
+                  [
+                      resolve("@babel/plugin-transform-runtime"),
+                      {
+                          useESModules: true,
+                      },
+                  ],
+              ];
 
     if ((process.env.NODE_ENV = "production" || process.env.DEV_COMPAT === "compat")) {
         envOptions.targets = "ie > 10, last 4 versions, not dead, safari 8";
@@ -38,16 +40,20 @@ module.exports = api => {
     }
 
     const preset = {
+        sourceType: 'unambiguous',
         presets: [
             [resolve("@babel/preset-env"), envOptions],
-            resolve("@babel/preset-react"),
+            [resolve("@babel/preset-react", { useBuiltIns: true })],
             resolve("@babel/preset-typescript"),
         ],
         plugins: [
-            ["@emotion", {
-                autoLabel: "always",
-                labelFormat: "[filename]-[local]"
-            }],
+            [
+                "@emotion",
+                {
+                    autoLabel: "always",
+                    labelFormat: "[filename]-[local]",
+                },
+            ],
             resolve("@babel/plugin-proposal-class-properties"),
             resolve("@babel/plugin-proposal-object-rest-spread"),
             resolve("@babel/plugin-syntax-dynamic-import"),

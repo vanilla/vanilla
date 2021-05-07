@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php use Vanilla\Theme\BoxThemeShim;if (!defined('APPLICATION')) exit();
 $dataDriven = \Gdn::themeFeatures()->useDataDrivenTheme();
 $User = val('User', Gdn::controller());
 if (!$User && Gdn::session()->isValid()) {
@@ -26,7 +26,7 @@ if ($User->Banned) {
 }
 
 if ($Photo) : ?>
-    <div class="Photo PhotoWrap PhotoWrapLarge <?php echo val('_CssClass', $User); ?>">
+    <div class="Photo PhotoWrap PhotoWrapLarge widget-dontUseCssOnMe <?php echo val('_CssClass', $User); ?>">
         <?php
         $canEditPhotos = Gdn::session()->checkRankedPermission(c('Garden.Profile.EditPhotos', true)) || checkPermission('Garden.Users.Edit');
 

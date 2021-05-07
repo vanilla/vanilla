@@ -1106,6 +1106,15 @@ class Gdn_Controller extends Gdn_Pluggable {
     }
 
     /**
+     * Get Inform messages.
+     *
+     * @return array
+     */
+    public function getInformMessages(): array {
+        return $this->_InformMessages;
+    }
+
+    /**
      * Get all of the variable imports.
      * @deprecated
      */

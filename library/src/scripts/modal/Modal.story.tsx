@@ -26,7 +26,7 @@ export function DismissableModal() {
     return (
         <>
             <StoryContent>
-                <Button onClick={() => setIsVisible(true)} baseClass={ButtonTypes.PRIMARY}>
+                <Button onClick={() => setIsVisible(true)} buttonType={ButtonTypes.PRIMARY}>
                     Open Modal
                 </Button>
             </StoryContent>

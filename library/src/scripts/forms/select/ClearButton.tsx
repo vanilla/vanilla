@@ -22,7 +22,7 @@ interface IProps {
 export function ClearButton(props: IProps) {
     return (
         <Button
-            baseClass={ButtonTypes.ICON}
+            buttonType={ButtonTypes.ICON}
             className={classNames("suggestedTextInput-clear", "searchBar-clear", props.className)}
             onClick={props.onClick}
             title={t("Clear")}

@@ -20,7 +20,7 @@ foreach ($Controller->ProfileTabs as $TabCode => $TabInfo) {
         $SortOrder[] = $TabCode;
 }
 ?>
-<div class="BoxFilter BoxProfileFilter">
+<div class="BoxFilter BoxProfileFilter widget-dontUseCssOnMe">
     <ul class="FilterMenu <?php BoxThemeShim::activeHtml('pageBox') ?>">
         <?php
         // Get sorted filter links

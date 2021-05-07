@@ -6,15 +6,18 @@
 
 import { css } from "@emotion/css";
 import { discussionListVariables } from "@library/features/discussions/DiscussionList.variables";
+import { ListItemIconPosition, listItemVariables } from "@library/lists/ListItem.variables";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { Mixins } from "@library/styles/Mixins";
 import { useThemeCache } from "@library/styles/themeCache";
-import { percent } from "csx";
 import { styleUnit } from "../../styles/styleUnit";
+import voteCounterVariables from "@library/voteCounter/VoteCounter.variables";
 
 export const discussionListClasses = useThemeCache(() => {
     const vars = discussionListVariables();
     const globalVars = globalVariables();
+
+    const listItemVars = listItemVariables();
 
     const title = css({
         ...Mixins.font(vars.item.title.font),
@@ -27,16 +30,43 @@ export const discussionListClasses = useThemeCache(() => {
         },
     });
 
-    const counterPosition = css({
+    const voteCounterPosition =
+        listItemVars.options.iconPosition === ListItemIconPosition.META
+            ? {
+                  top: "20%",
+                  left: "75%",
+              }
+            : {
+                  top: "72.5%",
+                  left: "35%",
+              };
+
+    const voteCounterContainer = css({
         position: "absolute",
-        top: percent(72.5),
-        left: percent(35),
+        ...voteCounterPosition,
     });
+
     const options = {
         move: css({
             minHeight: styleUnit(200),
         }),
     };
+
+    type AvailableReactionsCount = 1 | 2;
+
+    const voteCounterVars = voteCounterVariables();
+
+    const iconAndVoteCounterWrapper = useThemeCache((availableReactionsCount: AvailableReactionsCount = 1) => {
+        return css({
+            position: "relative",
+            ...(listItemVars.options.iconPosition === ListItemIconPosition.META
+                ? Mixins.margin({
+                      right: voteCounterVars.sizing.width,
+                      bottom: availableReactionsCount > 1 ? voteCounterVars.sizing.magicOffset : 0,
+                  })
+                : {}),
+        });
+    });
 
     const userTag = css({
         "&:hover, &:focus, &:active": {
@@ -46,5 +76,16 @@ export const discussionListClasses = useThemeCache(() => {
         },
     });
 
-    return { title, counterPosition, options, userTag };
+    const resolved = css({
+        margin: 0,
+    });
+
+    return {
+        title,
+        iconAndVoteCounterWrapper,
+        voteCounterContainer,
+        options,
+        userTag,
+        resolved,
+    };
 });

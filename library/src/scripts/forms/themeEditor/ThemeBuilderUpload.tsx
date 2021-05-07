@@ -85,7 +85,11 @@ export function ThemeBuilderUpload(props: IProps) {
                 <span className={classes.optionContainer}>
                     <span className={classes.imagePreviewContainer}>
                         {(previewImage ?? rawValue) && (
-                            <img className={classes.imagePreview} src={previewImage ?? rawValue ?? undefined} />
+                            <img
+                                className={classes.imagePreview}
+                                src={previewImage ?? rawValue ?? undefined}
+                                loading="lazy"
+                            />
                         )}
                     </span>
                     {isLoading ? (

@@ -130,6 +130,7 @@ export function ImageEmbed(props: IProps) {
                         src={props.url}
                         alt={accessibleLabel(t(`User: "%s"`), [props.name])}
                         tabIndex={props.inEditor ? -1 : undefined}
+                        loading="lazy"
                     />
                 </div>
             </EmbedContent>
@@ -144,9 +145,9 @@ export function ImageEmbed(props: IProps) {
                 initialAlt={props.name}
                 onClose={() => {
                     setIsOpen(false);
-                    setImmediate(() => {
+                    setTimeout(() => {
                         props.selectSelf?.();
-                    });
+                    }, 0);
                 }}
             />
         </EmbedContainer>

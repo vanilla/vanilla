@@ -42,8 +42,23 @@ class AddPeopleModule extends Gdn_Module {
             if (!$this->AddUserAllowed || !checkPermission('Conversations.Conversations.Add')) {
                 throw permissionException();
             }
-            $newRecipientUserIDs = explode(',', $this->Form->getFormValue('AddPeople', ''));
-            if ($sender->ConversationModel->addUserToConversation($this->Conversation->ConversationID, $newRecipientUserIDs)) {
+            $addPeopleFormValue = $this->Form->getFormValue('AddPeople', '');
+            $newRecipientUserIDs = empty($addPeopleFormValue) ? [] : explode(',', $addPeopleFormValue);
+            $userModel = Gdn::getContainer()->get(UserModel::class);
+            // Unset invalid users.
+            foreach ($newRecipientUserIDs as $key => $value) {
+                if (is_numeric($value)) {
+                    $user = $userModel->getID($value);
+                    if (!$user) {
+                        unset($newRecipientUserIDs[$key]);
+                    }
+                } else {
+                    throw new Gdn_UserException("Invalid recipient.");
+                }
+            }
+            if (empty($newRecipientUserIDs)) {
+                $sender->informMessage(t('You must provide at least one recipient.'));
+            } elseif ($sender->ConversationModel->addUserToConversation($this->Conversation->ConversationID, $newRecipientUserIDs)) {
                 $sender->informMessage(t('Your changes were saved.'));
             } else {
                 $maxRecipients = ConversationModel::getMaxRecipients();

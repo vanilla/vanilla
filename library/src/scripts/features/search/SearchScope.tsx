@@ -35,7 +35,7 @@ export function SearchScope(props: {
                 {...selectBoxProps}
                 className={classes.scopeSelect}
                 verticalPadding={false}
-                buttonBaseClass={ButtonTypes.CUSTOM}
+                buttonType={ButtonTypes.CUSTOM}
                 buttonClassName={classes.scopeToggle}
                 describedBy={labelID}
                 renderLeft={false}

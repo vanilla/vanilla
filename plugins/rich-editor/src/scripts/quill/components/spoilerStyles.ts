@@ -7,8 +7,6 @@
 import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { IButtonType } from "@library/forms/styleHelperButtonInterface";
-import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
 import { cssRule } from "@library/styles/styleShim";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { userSelect } from "@library/styles/styleHelpers";
@@ -39,19 +37,22 @@ export const spoilerVariables = useThemeCache(() => {
         radius: 2,
     });
 
-    const button: IButtonType = makeThemeVars("spoilerButton", {
-        name: "spoiler",
-        colors: {
-            bg: globalVars.elementaryColors.transparent,
-        },
-        fonts: {
-            color: globalVars.mainColors.fg,
-        },
-        borders: {
-            width: 0,
-            radius: 0,
-        },
-    } as IButtonType);
+    const button = makeThemeVars(
+        "spoilerButton",
+        Variables.button({
+            name: "spoiler",
+            colors: {
+                bg: globalVars.elementaryColors.transparent,
+            },
+            fonts: {
+                color: globalVars.mainColors.fg,
+            },
+            borders: {
+                width: 0,
+                radius: 0,
+            },
+        }),
+    );
 
     return {
         font,
@@ -64,9 +65,7 @@ export const spoilerVariables = useThemeCache(() => {
 export const spoilerCSS = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = spoilerVariables();
-    const spoilerStyles = generateButtonStyleProperties({
-        buttonTypeVars: vars.button,
-    });
+    const spoilerStyles = Mixins.button(vars.button);
     const userContentVars = userContentVariables();
     cssRule(".spoiler-icon", {
         position: "relative",

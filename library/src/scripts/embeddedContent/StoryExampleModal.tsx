@@ -80,7 +80,7 @@ export function StoryExampleModal(props: IProps) {
                         <FrameFooter justifyRight={true}>
                             <Button
                                 className={classFrameFooter.actionButton}
-                                baseClass={ButtonTypes.TEXT}
+                                buttonType={ButtonTypes.TEXT}
                                 buttonRef={cancelRef}
                                 onClick={() => {
                                     /* do something before closing */
@@ -95,7 +95,7 @@ export function StoryExampleModal(props: IProps) {
                                     /* do something before closing */
                                     setOpen(false);
                                 }}
-                                baseClass={ButtonTypes.TEXT_PRIMARY}
+                                buttonType={ButtonTypes.TEXT_PRIMARY}
                             >
                                 {"Save"}
                             </Button>

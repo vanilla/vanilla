@@ -31,7 +31,7 @@ export interface ISelectBoxProps {
     value?: ISelectBoxItem;
     onChange?: (value: ISelectBoxItem) => void;
     buttonClassName?: string;
-    buttonBaseClass?: ButtonTypes;
+    buttonType?: ButtonTypes;
     widthOfParent?: boolean;
     openAsModal?: boolean;
     renderLeft?: boolean;
@@ -74,6 +74,7 @@ export default function SelectBox(props: ISelectBoxProps) {
 
     const classes = selectBoxClasses();
     const classesDropDown = dropDownClasses();
+
     return (
         <div aria-describedby={props.describedBy} className={classNames("selectBox", props.className)}>
             <DropDown
@@ -109,7 +110,7 @@ export default function SelectBox(props: ISelectBoxProps) {
                 }
                 buttonClassName={classNames(props.buttonClassName, classes.toggle)}
                 contentsClassName={classNames({ isParentWidth: props.widthOfParent })}
-                buttonBaseClass={props.buttonBaseClass}
+                buttonType={props.buttonType}
                 openAsModal={props.openAsModal}
                 flyoutType={FlyoutType.LIST}
                 renderLeft={renderLeft}
@@ -126,7 +127,7 @@ export default function SelectBox(props: ISelectBoxProps) {
 
 SelectBox.defaultProps = {
     selectedIndex: 0,
-    buttonBaseClass: ButtonTypes.TEXT,
+    buttonType: ButtonTypes.TEXT,
 };
 
 function SelectBoxButton(props: {

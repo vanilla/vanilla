@@ -9,11 +9,11 @@ import { Configuration } from "webpack";
 import { DIST_DIRECTORY } from "../env";
 import { getOptions, BuildMode } from "../buildOptions";
 import { makeBaseConfig } from "./makeBaseConfig";
-import { SourceMapDevToolPlugin } from "webpack";
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
 import TerserWebpackPlugin from "terser-webpack-plugin";
-import OptimizeCSSAssetsPlugin from "optimize-css-assets-webpack-plugin";
 import EntryModel from "../utility/EntryModel";
+import CssMinimizerPlugin from "css-minimizer-webpack-plugin";
+const { WebpackManifestPlugin } = require("webpack-manifest-plugin");
 
 let analyzePort = 8888;
 
@@ -29,97 +29,89 @@ export async function makeProdConfig(entryModel: EntryModel, section: string) {
 
     baseConfig.mode = "production";
     baseConfig.entry = forumEntries;
-    // These outputs are expected to have the directory of the addon they belong to in their "[name]".
+    baseConfig.devtool = false;
+    baseConfig.target = ["web", "es5"];
+    // These outputs are expected to have the directory of the addon they beng to in their "[name]".
     // Webpack does not along a function for name here.
     baseConfig.output = {
-        filename: "[name].min.js",
-        chunkFilename: "[name].min.js?[chunkhash]",
-        publicPath: `/dist/${section}`,
+        filename: "[name].[contenthash].min.js",
+        chunkFilename: "async/[name].[contenthash].min.js",
+        publicPath: `/dist/${section}/`,
         path: path.join(DIST_DIRECTORY, section),
         library: `vanilla${section}`,
     };
     baseConfig.optimization = {
-        noEmitOnErrors: true,
-        namedModules: options.debug,
-        namedChunks: options.debug,
+        emitOnErrors: false,
+        chunkIds: options.debug ? "named" : undefined,
+        moduleIds: options.debug ? "named" : undefined,
         // Create a single runtime chunk per section.
         runtimeChunk: {
             name: `runtime`,
         },
         // We want to split
         splitChunks: {
+            usedExports: true,
+            maxInitialSize: 200000,
+            maxInitialRequests: 20,
             chunks: "all",
-            minSize: 10000000, // This should prevent webpack from creating extra chunks.
+            // minSize: 10000000, // This should prevent webpack from creating extra chunks.
             cacheGroups: {
-                vendors: {
-                    test: /[\\/]node_modules[\\/](?!quill)/,
-                    minSize: 30000,
+                library: {
+                    test: /[\\/]library[\\/]/,
+                    name: "library",
+                    chunks: "initial",
                     reuseExistingChunk: true,
-                    // If name is explicitly specified many different vendors~someOtherChunk combined
-                    // chunk bundles will get outputted.
+                },
+                packages: {
+                    test: /[\\/]packages\/vanilla[\\/]/,
+                    name: "packages",
+                    chunks: "initial",
+                    reuseExistingChunk: true,
+                },
+                vendors: {
+                    test: /[\\/]node_modules[\\/]/,
+                    priority: -10,
                     name: "vendors",
-                    chunks: "all",
-                    minChunks: 2,
+                    chunks: "initial",
+                    reuseExistingChunk: true,
                 },
-                shared: {
-                    // Our library files currently only come from the dashboard.
-                    test: /([\\/]library[\\/]src[\\/]scripts[\\/]|@vanilla[\\/])/,
-                    minSize: 30000,
-                    // If name is explicitly specified many different shared~someOtherChunk combined
-                    // chunk bundles will get outputted.
-                    name: "shared",
-                    // We currently NEED every library file to be shared among everything.
-                    // Many of these files have common global state that is not exposed on the window object.
+                react: {
+                    test: /[\\/]node_modules[\\/](react|react-dom|react-redux|redux)[\\/]/,
+                    name: "react",
                     chunks: "all",
-                    minChunks: 2,
-                },
-                // Allow async chunks to be split however webpack wants to split them.
-                async: {
-                    minSize: 50000,
-                    chunks: "async",
+                    priority: -5,
                 },
             },
         },
         minimize: !options.debug,
         minimizer: options.debug
             ? []
-            : [
+            : ([
                   new TerserWebpackPlugin({
-                      cache: true,
-                      // Exclude swagger-ui from minification which is a large bundle and costly to minify.
-                      exclude: /swagger-ui/,
+                      parallel: options.lowMemory ? 1 : true,
                       terserOptions: {
-                          warnings: false,
-                          ie8: false,
-                          output: {
+                          format: {
                               comments: false,
                           },
                       },
-                      parallel: process.env.PARALLEL_CORES ? parseInt(process.env.PARALLEL_CORES, 10) : true,
-                      sourceMap: true, // set to true if you want JS source maps
+                      extractComments: false,
                   }),
-                  new OptimizeCSSAssetsPlugin({
-                      cssProcessorOptions: { map: { inline: false, annotations: true } },
-                      cssProcessorPluginOptions: {
-                          preset: ["default", { discardComments: { removeAll: true } }],
+                  new CssMinimizerPlugin({
+                      parallel: options.lowMemory ? 1 : true,
+                      minify: (CssMinimizerPlugin as any).cssoMinify,
+                      minimizerOptions: {
+                          preset: [
+                              "default",
+                              {
+                                  discardComments: { removeAll: true },
+                              },
+                          ],
                       },
                   }),
-              ],
+              ] as any),
     };
 
-    baseConfig.plugins!.push(
-        new SourceMapDevToolPlugin({
-            namespace: `vanilla-${section}`,
-            filename: `sourcemaps/`.concat(
-                Math.random()
-                    .toString(36)
-                    .slice(-5),
-                "/",
-                "[chunkhash]",
-            ),
-            publicPath: `/api/v2/sourcemaps/${section}/`, // PHP-FPM will serve these files with some permission checks in SourcemapsApiController.
-        } as any),
-    );
+    baseConfig.plugins?.push(new WebpackManifestPlugin({}));
 
     // Spawn a bundle size analyzer. This is super usefull if you find a bundle has jumped up in size.
     if (options.mode === BuildMode.ANALYZE) {

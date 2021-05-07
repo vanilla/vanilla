@@ -26,18 +26,7 @@ export async function makePolyfillConfig(entryModel: EntryModel) {
     };
     baseConfig.optimization = {
         splitChunks: false,
-        minimize: !options.debug,
-        namedChunks: options.debug,
-        namedModules: options.debug,
-        minimizer: options.debug
-            ? []
-            : [
-                  new TerserWebpackPlugin({
-                      cache: true,
-                      parallel: true,
-                      sourceMap: true, // set to true if you want JS source maps
-                  }),
-              ],
+        minimizer: options.debug ? [] : [new TerserWebpackPlugin()],
     };
 
     return baseConfig;

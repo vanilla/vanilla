@@ -45,7 +45,7 @@ export function CallToAction(props: IProps) {
             const linkButtonType = ctaLink.linkButtonType ?? options.linkButtonType;
             return (
                 <div key={"cta-link-" + index} className={ctaClasses.link}>
-                    <LinkAsButton baseClass={linkButtonType} to={ctaLink.to}>
+                    <LinkAsButton buttonType={linkButtonType} to={ctaLink.to}>
                         {t(ctaLink.textCTA)}
                     </LinkAsButton>
                 </div>
@@ -65,7 +65,7 @@ export function CallToAction(props: IProps) {
                         )}
                     >
                         <div className={ctaClasses.imageContainerWrapper}>
-                            <img className={ctaClasses.image} src={props.imageUrl} alt={props.title} />
+                            <img className={ctaClasses.image} src={props.imageUrl} alt={props.title} loading="lazy" />
                         </div>
                     </div>
                 )}
@@ -76,7 +76,7 @@ export function CallToAction(props: IProps) {
 
                     {props.description && <div className={ctaClasses.description}>{props.description}</div>}
                     {!multipleLinks && (
-                        <LinkAsButton baseClass={options.linkButtonType} to={props.to}>
+                        <LinkAsButton buttonType={options.linkButtonType} to={props.to}>
                             {t(props.textCTA)}
                         </LinkAsButton>
                     )}

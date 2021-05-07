@@ -217,6 +217,193 @@ class ReactionsReactTest extends AbstractAPIv2Test {
         $this->assertEquals(2, $logCountB);
     }
 
+    /**
+     * Post some records and return data to test the endpoint for getting a user's posts that have been reacted to.
+     *
+     * @return array
+     */
+    private function prepareReactedRecordsData() {
+
+        // Post a discussion and a comment.
+        $discussion = $this->createDiscussion(1, 'testReactedRecordsDiscussion');
+        $discussionID = $discussion['discussionID'];
+        $this->generateComments(3, $discussionID);
+
+        // Post some reactions.
+
+        $type1 = 'Like';
+        $type2 = 'Dislike';
+        $this->api()->post(
+            "/discussions/{$discussionID}/reactions",
+            ['reactionType' => $type1]
+        );
+        $comments = $this->api()->get("/comments", ['discussionID' => $discussionID])->getBody();
+        $this->api()->post(
+            "/comments/{$comments[0]['commentID']}/reactions",
+            ['reactionType' => $type1]
+        );
+        $this->api()->post(
+            "/comments/{$comments[1]['commentID']}/reactions",
+            ['reactionType' => $type2]
+        );
+
+        // Edit the title of the disliked record (so we can test expanding updateUser).
+        $this->api()->patch("/comments/{$comments[1]['commentID']}", ["body" => "edited!"]);
+
+        $returnData = [
+            'userID' => self::$siteInfo['adminUserID'],
+            'type1' => $type1,
+            'type2' => $type2,
+            'discussion' => $discussion,
+            'comments' => $comments
+        ];
+        return $returnData;
+    }
+
+    /**
+     * Test getting a user's records that have a specific reactions.
+     */
+    public function testGetReactedRecords() {
+        // Get the records by reaction and make sure the correct records come back.
+        $prepData = $this->prepareReactedRecordsData();
+        ['userID' => $userID, 'type1' => $type1, 'type2' => $type2, 'discussion' => $discussion, 'comments' => $comments] = $prepData;
+
+        $likedRecords = $this->api()->get(
+            "/users/{$userID}/reacted",
+            ["reactionUrlcode" => $type1]
+        )->getBody();
+        $this->assertCount(2, $likedRecords);
+        $recordIDs = array_column($likedRecords, 'recordID');
+        $this->assertContains($discussion['discussionID'], $recordIDs);
+        $this->assertContains($comments[0]['commentID'], $recordIDs);
+
+        $dislikedRecords = $this->api()->get(
+            "/users/{$userID}/reacted",
+            ["reactionUrlCode" => $type2]
+        )->getBody();
+        $this->assertCount(1, $dislikedRecords);
+        $this->assertSame($comments[1]['commentID'], $dislikedRecords[0]['recordID']);
+    }
+
+    /**
+     * Test expanding the reacted-to records by insertUser.
+     */
+    public function testGetReactedExpandInsertUser() {
+        $prepData = $this->prepareReactedRecordsData();
+        ['userID' => $userID, 'type2' => $type2] = $prepData;
+
+        // Expand insertUser
+        $dislikedExpandedUser = $this->api()->get(
+            "users/{$userID}/reacted",
+            ["reactionUrlcode" => $type2, "expand" => 'insertUser']
+        )->getBody();
+        $expandedUserInfo = $dislikedExpandedUser[0]['insertUser'];
+        $expandUserFields = ['userID', 'name', 'url', 'photoUrl', 'dateLastActive'];
+        foreach ($expandUserFields as $field) {
+            $this->assertArrayHasKey($field, $expandedUserInfo);
+        }
+    }
+
+    /**
+     * Test expanding the reacted-to records by updateUser.
+     */
+    public function testGetReactedExpandUpdateUser() {
+        $prepData = $this->prepareReactedRecordsData();
+        ['userID' => $userID, 'type2' => $type2] = $prepData;
+
+        $dislikedExpandedUpdateUser = $this->api()->get(
+            "users/{$userID}/reacted",
+            ["reactionUrlcode" => $type2, "expand" => 'updateUser']
+        )->getBody();
+        $expandedUpdateUserInfo = $dislikedExpandedUpdateUser[0]['updateUser'];
+        $expandUpdateUserFields = ['userID', 'name', 'url', 'photoUrl', 'dateLastActive'];
+        foreach ($expandUpdateUserFields as $field) {
+            $this->assertArrayHasKey($field, $expandedUpdateUserInfo);
+        }
+    }
+
+    /**
+     * Test expanding the reacted-to records by reactions.
+     */
+    public function testGetReactedExpandReactions() {
+        $prepData = $this->prepareReactedRecordsData();
+        ['userID' => $userID, 'type2' => $type2] = $prepData;
+
+        // Expand reactions
+        $dislikedExpandReactions = $this->api()->get(
+            "users/{$userID}/reacted",
+            ["reactionUrlcode" => $type2, "expand" => 'reactions']
+        )->getBody();
+        $expandReactionsInfo = $dislikedExpandReactions[0]['reactions'];
+        $expandReactionFields = ['tagID', 'urlcode', 'name', 'class', 'count'];
+        foreach ($expandReactionFields as $field) {
+            $this->assertArrayHasKey($field, $expandReactionsInfo[0]);
+        }
+    }
+
+    /**
+     * Test expanding everything on the reacted-to records
+     */
+    public function testGetReactedExpandAll() {
+        $prepData = $this->prepareReactedRecordsData();
+        ['userID' => $userID, 'type2' => $type2] = $prepData;
+
+        $expandUserFields = ['userID', 'name', 'url', 'photoUrl', 'dateLastActive'];
+        $expandReactionFields = ['tagID', 'urlcode', 'name', 'class', 'count'];
+
+        // Expand all
+        $dislikeExpandAll = $this->api()->get(
+            "users/{$userID}/reacted",
+            ["reactionUrlcode" => $type2, "expand" => 'all']
+        )->getBody();
+
+        $expandAllUserInfo = $dislikeExpandAll[0]['insertUser'];
+        foreach ($expandUserFields as $field) {
+            $this->assertArrayHasKey($field, $expandAllUserInfo);
+        }
+
+        $expandAllUpdateUserInfo = $dislikeExpandAll[0]['updateUser'];
+        foreach ($expandUserFields as $field) {
+            $this->assertArrayHasKey($field, $expandAllUpdateUserInfo);
+        }
+
+        $expandAllReactionInfo = $dislikeExpandAll[0]['reactions'];
+        foreach ($expandReactionFields as $field) {
+            $this->assertArrayHasKey($field, $expandAllReactionInfo[0]);
+        }
+    }
+
+    /**
+     * Test getting records by a reaction the user's posts have never received.
+     */
+    public function testGetReactedNoRecords() {
+        $prepData = $this->prepareReactedRecordsData();
+        ['userID' => $userID] = $prepData;
+
+        // If no discussions match, we should get an empty array back.
+        $awesomePosts = $this->api()->get(
+            "users/{$userID}/reacted",
+            ["reactionUrlcode" => 'Awesome']
+        )->getBody();
+        $this->assertEmpty($awesomePosts);
+    }
+
+    /**
+     * Test getting records by a reaction that doesn't exist.
+     */
+    public function testGetReactedPhantomReaction() {
+        $prepData = $this->prepareReactedRecordsData();
+        ['userID' => $userID] = $prepData;
+
+        // If the reactionUrlcode doesn't correspond to any reaction, we should get an error.
+        $this->expectException(\Garden\Web\Exception\NotFoundException::class);
+        $this->expectExceptionMessage("Reaction not found.");
+        $this->api()->get(
+            "users/{$userID}/reacted",
+            ["reactionUrlcode" => 'Phantom']
+        );
+    }
+
 
     /**
      * Create discussion.
@@ -358,6 +545,21 @@ class ReactionsReactTest extends AbstractAPIv2Test {
                 $this->assertFalse($reaction['hasReacted']);
             }
         }
+    }
+
+    /**
+     * Test promoting a discussion to make sure an unknown user and blank reaction type doesn't show up in the logs.
+     * see https://github.com/vanilla/support/issues/3410
+     */
+    public function testPromotedLogs() {
+        $discussion = $this->createDiscussion(1, 'Test Promoted');
+        $this->bessy()->post("/react/discussion/promote?id={$discussion['discussionID']}");
+        $loggedReactions = $this->bessy()->get("/reactions/logged/discussion/{$discussion['discussionID']}")->Data;
+        $userTags = $loggedReactions['UserTags'];
+        // Make sure the "Promoted" reaction tag doesn't come through.
+        $this->assertCount(1, $userTags);
+        // Make sure the userID is a real user.
+        $this->assertSame($this->getSession()->UserID, $userTags[0]['UserID']);
     }
 
     /**

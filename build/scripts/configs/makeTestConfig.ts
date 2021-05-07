@@ -21,7 +21,13 @@ export async function makeTestConfig(entryModel: EntryModel) {
     };
     baseConfig.plugins?.push(
         new webpack.DefinePlugin({
+            // Currently a warning with this. karma defines one of "development" giving a conflcit warning.
+            // We have quite a few things depending on this being "test".
             ["process.env.NODE_ENV"]: "'test'",
+        }),
+        // Shim node builtins for some tests in the browser.
+        new webpack.ProvidePlugin({
+            process: "process/browser",
         }),
     );
 

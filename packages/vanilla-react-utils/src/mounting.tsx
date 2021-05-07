@@ -113,7 +113,7 @@ export function mountReact(
         if (options?.unmountBeforeRender) {
             ReactDOM.unmountComponentAtNode(target);
         }
-        setImmediate(doRender);
+        setTimeout(doRender, 0);
         return;
     }
 

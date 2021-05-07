@@ -13,6 +13,7 @@ import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { LiveMessage } from "react-aria-live";
 import { sprintf } from "sprintf-js";
 import { RecordID } from "@vanilla/utils";
+import { radioInputAsButtonsClasses } from "@library/forms/radioAsButtons/radioInputAsButtons.styles";
 
 export interface IBaseRadioProps {
     label: string;
@@ -43,15 +44,15 @@ interface IRadioInputAsButtonInGroup extends IBaseRadioProps, IRadioGroupProps {
 /**
  * Implement what looks like buttons, but what is semantically radio button. To be used in the RadioButtonsAsTabs component
  */
-export function RadioInputAsButton(props: IRadioInputAsButtonInGroup) {
+function RadioInputAsButton(props: IRadioInputAsButtonInGroup) {
     const { data, icon, buttonAutoMinWidth = false } = props;
-    const activeItem = props["activeItem"];
-    const classes = props["classes"] || { item: null, input: null, label: null };
+    const activeItem = props.activeItem;
+    const classes = props.classes || radioInputAsButtonsClasses();
 
-    const buttonAutoMinWidthClass = classes.buttonAutoMinWidth || "";
+    const buttonAutoMinWidthClass = classes?.buttonAutoMinWidth || "";
 
     const onClick = (event) => {
-        props.setData(props.data);
+        props.setData && props.setData(props.data);
     };
 
     const handleOnChange = (event) => {
@@ -63,7 +64,7 @@ export function RadioInputAsButton(props: IRadioInputAsButtonInGroup) {
             case "Enter":
             case "Spacebar":
             case " ":
-                props.setData(props.data);
+                props.setData && props.setData(props.data);
                 break;
         }
     };
@@ -72,9 +73,9 @@ export function RadioInputAsButton(props: IRadioInputAsButtonInGroup) {
     const disabled = props.disabled || props.isLoading;
 
     return (
-        <label className={classNames(props.className, classes.item)}>
+        <label className={classNames(props.className, classes?.item)}>
             <input
-                className={classNames(visibility().visuallyHidden, classes.input)}
+                className={classNames(visibility().visuallyHidden, classes?.input)}
                 type="radio"
                 onClick={onClick}
                 onKeyDown={onKeyDown}
@@ -87,7 +88,7 @@ export function RadioInputAsButton(props: IRadioInputAsButtonInGroup) {
             <span
                 className={classNames(
                     { isDisabled: props.disabled || props.isLoading },
-                    classes.label,
+                    classes?.label,
                     active ? classNames(props["buttonActiveClass"], "isActive") : props["buttonClass"],
                     { [buttonAutoMinWidthClass]: buttonAutoMinWidth },
                 )}
@@ -97,11 +98,11 @@ export function RadioInputAsButton(props: IRadioInputAsButtonInGroup) {
                 ) : (
                     <>
                         {icon && (
-                            <span aria-hidden={true} className={classes["iconWrap"] ?? undefined}>
+                            <span aria-hidden={true} className={classes?.iconWrap}>
                                 {icon}
                             </span>
                         )}
-                        <ConditionalWrap condition={!!icon} className={classes["labelWrap"]}>
+                        <ConditionalWrap condition={!!icon} className={classes?.labelWrap}>
                             {props.label}
                         </ConditionalWrap>
                     </>

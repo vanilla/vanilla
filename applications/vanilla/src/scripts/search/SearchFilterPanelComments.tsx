@@ -11,7 +11,7 @@ import { FilterFrame } from "@library/search/panels/FilterFrame";
 import { t } from "@library/utility/appUtils";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import MultiUserInput from "@library/features/users/MultiUserInput";
-import DateRange from "@library/forms/DateRange";
+import LazyDateRange from "@library/forms/LazyDateRange";
 
 interface IProps {}
 
@@ -31,7 +31,7 @@ export function SearchFilterPanelComments(props: IProps) {
                 }}
                 value={form.authors ?? []}
             />
-            <DateRange
+            <LazyDateRange
                 onStartChange={(date: string) => {
                     updateForm({ startDate: date });
                 }}

@@ -237,28 +237,31 @@ class CategoriesApiController extends AbstractApiController {
             ],
             'expand?' => ApiUtils::getExpandDefinition(['parent', 'breadcrumbs'])
         ])->setDescription('Search categories.');
-        $out = $this->schema([':a' => $this->schemaWithParent($query['expand'])], 'out');
+        $expand =  $query['expand'] ?? [];
+        $out = $this->schema([':a' => $this->schemaWithParent($expand)], 'out');
 
         $query = $in->validate($query);
 
         [$offset, $limit] = offsetLimit("p{$query['page']}", $query['limit']);
+
         $rows = $this->categoryModel->searchByName(
             $query['query'],
-            $this->isExpandField('parent', $query['expand']),
+            $this->isExpandField('parent', $expand),
             $limit,
             $offset,
-            $this->isExpandField('breadcrumbs', $query['expand']) ? ['breadcrumbs'] : []
+            $this->isExpandField('breadcrumbs', $expand) ? ['breadcrumbs'] : []
         );
 
-        foreach ($rows as $key => &$row) {
+        $results = [];
+        foreach ($rows as $key => $row) {
             $row = $this->normalizeOutput($row);
             $hasPermission = categoryModel::checkPermission($row['categoryID'], 'Vanilla.Discussions.View');
-            if (!$hasPermission) {
-                unset($rows[$key]);
+            if ($hasPermission) {
+                $results[] = $row;
             }
         }
 
-        $result = $out->validate($rows);
+        $result = $out->validate($results);
 
         $paging = ApiUtils::morePagerInfo($result, '/api/v2/comments', $query, $in);
 

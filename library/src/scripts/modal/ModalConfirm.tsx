@@ -12,7 +12,7 @@ import FrameFooter from "@library/layout/frame/FrameFooter";
 import FrameHeader from "@library/layout/frame/FrameHeader";
 import SmartAlign from "@library/layout/SmartAlign";
 import ButtonLoader from "@library/loaders/ButtonLoader";
-import Modal, { MODAL_CONTAINER_ID } from "@library/modal/Modal";
+import LazyModal from "@library/modal/LazyModal";
 import ModalSizes from "@library/modal/ModalSizes";
 import { t } from "@library/utility/appUtils";
 import { getRequiredID, uniqueIDFromPrefix } from "@library/utility/idUtils";
@@ -49,7 +49,7 @@ export default class ModalConfirm extends React.Component<IProps> {
         const classesFrameBody = frameBodyClasses();
         const classFrameFooter = frameFooterClasses();
         return (
-            <Modal
+            <LazyModal
                 isVisible={this.props.isVisible}
                 size={size ? size : ModalSizes.SMALL}
                 elementToFocus={this.cancelRef.current as HTMLElement}
@@ -77,7 +77,7 @@ export default class ModalConfirm extends React.Component<IProps> {
                         <FrameFooter justifyRight={true}>
                             <Button
                                 className={classFrameFooter.actionButton}
-                                baseClass={ButtonTypes.TEXT}
+                                buttonType={ButtonTypes.TEXT}
                                 buttonRef={this.cancelRef}
                                 onClick={onCancel}
                             >
@@ -86,7 +86,7 @@ export default class ModalConfirm extends React.Component<IProps> {
                             <Button
                                 className={classFrameFooter.actionButton}
                                 onClick={onConfirm}
-                                baseClass={ButtonTypes.TEXT_PRIMARY}
+                                buttonType={ButtonTypes.TEXT_PRIMARY}
                                 disabled={isConfirmLoading || isConfirmDisabled}
                             >
                                 {isConfirmLoading ? <ButtonLoader /> : this.props.confirmTitle || t("OK")}
@@ -94,7 +94,7 @@ export default class ModalConfirm extends React.Component<IProps> {
                         </FrameFooter>
                     }
                 />
-            </Modal>
+            </LazyModal>
         );
     }
 

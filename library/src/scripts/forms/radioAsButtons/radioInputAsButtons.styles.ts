@@ -58,7 +58,7 @@ export const radioInputAsButtonsClasses = useThemeCache(() => {
         }),
     );
 
-    const labelStateStyles = generateButtonStyleProperties({ buttonTypeVars: buttonVariables().primary });
+    const labelStateStyles = Mixins.button(buttonVariables().primary);
     const label = style("label", {
         ...userSelect(),
         display: "inline-flex",

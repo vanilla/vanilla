@@ -4,27 +4,18 @@
  * @license Proprietary
  */
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import { searchWidgetClasses } from "./SearchWidget.classes";
 import SelectOne from "@library/forms/select/SelectOne";
-import { IComboBoxOption } from "@library/features/search/ISearchBarProps";
 import { Tabs } from "@library/sectioning/Tabs";
 import { TabsTypes } from "@library/sectioning/TabsTypes";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import {
-    IControlProps,
-    IForm,
-    IJsonSchemaFormHandle,
-    IValidationResult,
-    JsonSchema,
-    JsonSchemaForm,
-} from "@vanilla/json-schema-forms";
+import { IControlProps, IForm, JsonSchema, JsonSchemaForm } from "@vanilla/json-schema-forms";
 import { SelectLookup } from "@library/forms/select/SelectLookup";
 import { useWidgetLayoutClasses } from "@library/layout/WidgetLayout.context";
 import { PageHeadingBox } from "@library/layout/PageHeadingBox";
 import { ISearchWidgetOptions, searchWidgetVariables } from "@library/searchWidget/SearchWidget.variables";
-import SmartLink from "@library/routing/links/SmartLink";
 import { t } from "@vanilla/i18n";
 
 interface ISearchWidgetProps {
@@ -112,11 +103,7 @@ export function SearchWidget(props: ISearchWidgetProps) {
                         <>
                             {props.children}
                             <div className={classes.tabFooter}>
-                                <LinkAsButton
-                                    disabled={!props.validation?.isValid}
-                                    to={buildFormUrl(props.form)}
-                                    baseClass={ButtonTypes.PRIMARY}
-                                >
+                                <LinkAsButton to={buildFormUrl(props.form)} buttonType={ButtonTypes.PRIMARY}>
                                     {t(props.form.submitButtonText ?? "Submit")}
                                 </LinkAsButton>
                             </div>

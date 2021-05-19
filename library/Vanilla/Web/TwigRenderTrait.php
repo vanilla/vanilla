@@ -40,7 +40,8 @@ trait TwigRenderTrait {
             $this->twig = $this->prepareTwig();
         }
         // Ensure that we don't duplicate our root path in the path view.
-        $path = str_replace(PATH_ROOT, '', $path);
+        $path = preg_replace('/^' . preg_quote(PATH_ROOT, '/') . '/', '', $path, 1);
+
         return $this->twig->render($path, $data);
     }
 

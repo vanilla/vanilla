@@ -133,13 +133,13 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
 
             // Add the screenshot.
             if (array_key_exists('screenshot', $themeFiles)) {
-                $relativeScreenshot = ltrim(str_replace(PATH_ROOT, '', val('screenshot', $themeFiles)), '/');
+                $relativeScreenshot = ltrim(preg_replace('/^' . preg_quote(PATH_ROOT, '/') . '/', '', val('screenshot', $themeFiles), 1), '/');
                 $searchThemeInfo['ScreenshotUrl'] = $this->asset($relativeScreenshot, true);
             }
 
             // Add the mobile screenshot.
             if (array_key_exists('mobilescreenshot', $themeFiles)) {
-                $relativeScreenshot = ltrim(str_replace(PATH_ROOT, '', val('mobilescreenshot', $themeFiles)), '/');
+                $relativeScreenshot = ltrim(preg_replace('/^' . preg_quote(PATH_ROOT, '/') . '/', '', val('mobilescreenshot', $themeFiles), 1), '/');
                 $searchThemeInfo['MobileScreenshotUrl'] = $this->asset($relativeScreenshot, true);
             }
 

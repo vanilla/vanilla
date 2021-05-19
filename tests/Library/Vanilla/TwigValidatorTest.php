@@ -47,7 +47,7 @@ class TwigValidatorTest extends MinimalContainerTestCase {
             $twig->parse($twig->tokenize(new \Twig\Source($contents, "template", $templatePath)));
             $this->assertSame(true, true);
         } catch (SyntaxError $e) {
-            $shortPath = str_replace(PATH_ROOT, "", $templatePath);
+            $shortPath = preg_replace('/^' . preg_quote(PATH_ROOT, '/') . '/', '', $templatePath, 1);
             throw new \Exception("Failed to validate twig template at: " . $shortPath, 0, $e);
         }
     }
@@ -60,7 +60,7 @@ class TwigValidatorTest extends MinimalContainerTestCase {
 
         $paths = glob(PATH_ROOT . "/{,*/,*/*/,*/*/*/}*.twig", \GLOB_BRACE);
         foreach ($paths as $path) {
-            $shortPath = str_replace(PATH_ROOT, "", $path);
+            $shortPath = preg_replace('/^' . preg_quote(PATH_ROOT, '/') . '/', '', $path, 1);
             $paramSets[$shortPath] = [$path];
         }
         return $paramSets;

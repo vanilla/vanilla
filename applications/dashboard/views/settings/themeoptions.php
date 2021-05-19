@@ -46,7 +46,7 @@ echo $this->Form->errors();
                 ));
 
                 if (is_array($Screenshot) && count($Screenshot) > 0) {
-                    $Screenshot = str_replace(PATH_ROOT, '', $Screenshot[0]);
+                    $Screenshot = preg_replace('/^' . preg_quote(PATH_ROOT, '/') . '/', '', $Screenshot[0], 1);
                 } else {
                     $Screenshot = '/applications/dashboard/design/images/theme-placeholder.svg';
                 }

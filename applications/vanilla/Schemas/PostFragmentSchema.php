@@ -24,6 +24,7 @@ class PostFragmentSchema extends Schema {
             'commentID:i?' => 'The comment ID of the post, if any.',
             'name:s' => 'The title of the post.',
             'body:s?' => 'The HTML body of the post.',
+            'type:s?' => 'The discussion type.',
             'url:s' => 'The URL of the post.',
             'dateInserted:dt' => 'The date of the post.',
             'insertUserID:i' => 'The author of the post.',

@@ -245,17 +245,19 @@ function TitleBarMegaMenuImpl(props: IProps, ref: React.Ref<IMegaMenuHandle>) {
                 fullGutter
             >
                 {expanded?.children?.map((item, key) =>
-                    !item.children?.length ? (
-                        <React.Fragment key={key} />
-                    ) : (
+                    item.children?.length ? (
                         <div key={key} className={classes.menuItem}>
                             <span className={classes.menuItemTitle}>{item.name}</span>
                             {item.children && generateMegaMenuList(item.children)}
                         </div>
+                    ) : (
+                        <React.Fragment key={key} />
                     ),
                 )}
-                {itemsWithNoChildren.length && (
+                {itemsWithNoChildren.length ? (
                     <div className={classes.menuItem}>{generateMegaMenuList(itemsWithNoChildren)}</div>
+                ) : (
+                    <React.Fragment />
                 )}
             </Container>
         </div>

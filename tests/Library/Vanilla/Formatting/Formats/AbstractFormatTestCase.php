@@ -58,7 +58,6 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase {
         );
     }
 
-
     /**
      * PHPUnit data provider.
      *

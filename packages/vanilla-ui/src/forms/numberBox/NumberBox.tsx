@@ -5,13 +5,20 @@
  */
 
 import { cx } from "@emotion/css";
+import { forceInt } from "@vanilla/utils";
+import { isInteger } from "lodash";
 import React from "react";
+import { number } from "yargs";
 import { InputSize } from "../../types";
 import { inputClasses } from "../shared/input.styles";
 
-export interface INumberBoxProps extends Omit<React.HTMLProps<HTMLInputElement>, "type" | "ref" | "size"> {
+export interface INumberBoxProps
+    extends Omit<React.HTMLProps<HTMLInputElement>, "type" | "ref" | "size" | "value" | "min" | "max"> {
     size?: InputSize;
     container?: string;
+    value: number;
+    min?: number;
+    max?: number;
     onValueChange?(value): void;
 }
 
@@ -25,46 +32,15 @@ export const NumberBox = React.forwardRef(function NumberBoxImpl(
     props: INumberBoxProps,
     forwardedRef: React.Ref<HTMLInputElement>,
 ) {
-    const { size, value, onValueChange, ...otherProps } = props;
+    const { size, value, onValueChange, min, max, ...otherProps } = props;
     const classes = inputClasses({ size });
-    const [controlledValue, setControlledValue] = React.useState(value || 0);
-
-    React.useEffect(() => {
-        setControlledValue(value || 0);
-    }, [value]);
-
-    React.useEffect(() => {
-        onValueChange && onValueChange(controlledValue);
-    }, [controlledValue]);
 
     const handleIncrement = () => {
-        setControlledValue((prevState) => {
-            const { max } = props;
-            const val = typeof prevState === "number" ? prevState : 0;
-            if (max) {
-                if (val + 1 <= max) {
-                    return val + 1;
-                }
-                return val;
-            } else {
-                return val + 1;
-            }
-        });
+        onValueChange && onValueChange(Math.min(value + 1, max ?? Number.MAX_SAFE_INTEGER));
     };
 
     const handleDecrement = () => {
-        setControlledValue((prevState) => {
-            const { min } = props;
-            const val = typeof prevState === "number" ? prevState : 0;
-            if (min !== undefined) {
-                if (val - 1 >= min) {
-                    return val - 1;
-                }
-                return val;
-            } else {
-                return val - 1;
-            }
-        });
+        onValueChange && onValueChange(Math.max(value - 1, min ?? 0));
     };
 
     return (
@@ -75,8 +51,8 @@ export const NumberBox = React.forwardRef(function NumberBoxImpl(
                 ref={forwardedRef}
                 type="number"
                 role="spinbutton"
-                value={controlledValue}
-                onChange={(e) => setControlledValue(e.target.value)}
+                value={value}
+                onChange={(e) => onValueChange && onValueChange(e.target.value)}
                 className={cx(classes.input, props.className)}
             />
             <div className={cx(classes.spinner)}>

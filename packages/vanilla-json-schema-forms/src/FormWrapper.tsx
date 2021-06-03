@@ -8,8 +8,8 @@ import * as React from "react";
 import produce from "immer";
 import get from "lodash/get";
 import set from "lodash/set";
-import { IFormProps, ISchemaRenderProps } from "./types";
-import { findAllReferences } from "./utils";
+import { IControlProps, IFormProps, ISchemaRenderProps } from "./types";
+import { findAllReferences, validateConditions } from "./utils";
 import { stableObjectHash } from "@vanilla/utils";
 
 /**

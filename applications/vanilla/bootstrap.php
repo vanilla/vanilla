@@ -6,7 +6,6 @@
  */
 
 use Garden\Container\Reference;
-use Vanilla\Community\CallToActionModule;
 use Vanilla\Community\RSSModule;
 use Vanilla\Community\SearchWidgetModule;
 use Vanilla\EmbeddedContent\EmbedService;
@@ -17,8 +16,6 @@ use \Garden\Container;
 use Vanilla\Forum\Models\ForumQuickLinksProvider;
 use Vanilla\Forum\Search\CommentSearchType;
 use Vanilla\Forum\Search\DiscussionSearchType;
-use Vanilla\Models\FragmentService;
-use Vanilla\Search\AbstractSearchDriver;
 use Vanilla\Search\SearchTypeCollectorInterface;
 use Vanilla\Theme\VariableProviders\QuickLinksVariableProvider;
 use Vanilla\Widgets\WidgetService;
@@ -52,6 +49,8 @@ Gdn::getContainer()
     ->rule(WidgetService::class)
     ->addCall('registerWidget', [\Vanilla\Community\CategoriesModule::class])
     ->addCall('registerWidget', [\Vanilla\Community\UserSpotlightModule::class])
+    ->addCall('registerWidget', [\Vanilla\Forum\Modules\DiscussionWidgetModule::class])
+    ->addCall('registerWidget', [\Vanilla\Forum\Modules\AnnouncementWidgetModule::class])
     ->addCall('registerWidget', [RSSModule::class])
     ->rule(QuickLinksVariableProvider::class)
     ->addCall('addQuickLinkProvider', [new Reference(ForumQuickLinksProvider::class)])

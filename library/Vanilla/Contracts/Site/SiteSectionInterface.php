@@ -107,4 +107,11 @@ interface SiteSectionInterface extends \JsonSerializable {
      * @return int|null
      */
     public function getCategoryID();
+
+    /**
+     * Get banner image link associated to site-section.
+     *
+     * @return string
+     */
+    public function getBannerImageLink(): string;
 }

@@ -7,7 +7,7 @@ import React, { useRef } from "react";
 
 import { FormToggle } from "@library/forms/FormToggle";
 import { addonClasses } from "@library/addons/Addons.styles";
-import { cx } from "@library/styles/styleShim";
+import { cx } from "@emotion/css";
 import { useUniqueID } from "@library/utility/idUtils";
 import { ListItem } from "@library/lists/ListItem";
 import { useMeasure } from "@vanilla/react-utils";

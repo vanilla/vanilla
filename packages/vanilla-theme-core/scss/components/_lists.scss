@@ -685,8 +685,8 @@
     @if $staticVariables {
         .ItemComment {
             .Options {
-                margin-top: $gutter-base;
-                margin-right: $gutter-base;
+                margin-top: $component-vertical_padding;
+                margin-right: $component-vertical_padding;
             }
         }
     }
@@ -737,6 +737,11 @@
             @include maxWidth {
                 position: absolute;
             }
+        }
+    }
+    .ActivityComment {
+        .PhotoWrap {
+            @include photoWrap;
         }
     }
 }

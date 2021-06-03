@@ -39,6 +39,11 @@ class MockSiteSection implements SiteSectionInterface {
     private $apps;
 
     /**
+     * @var string
+     */
+    private $bannerImageLink;
+
+    /**
      * MockSiteSection constructor.
      *
      * @param string $sectionName
@@ -48,6 +53,7 @@ class MockSiteSection implements SiteSectionInterface {
      * @param string $sectionGroup
      * @param array $defaultRoute
      * @param string $themeID
+     * @param string $bannerImageLink
      */
     public function __construct(
         string $sectionName,
@@ -56,7 +62,8 @@ class MockSiteSection implements SiteSectionInterface {
         string $sectionID,
         string $sectionGroup,
         array $defaultRoute = [],
-        string $themeID = null
+        string $themeID = null,
+        string $bannerImageLink = ''
     ) {
         $this->sectionName = $sectionName;
         $this->locale = $locale;
@@ -66,6 +73,7 @@ class MockSiteSection implements SiteSectionInterface {
         $this->defaultRoute = $defaultRoute;
         $this->apps = ['forum' => true];
         $this->themeID = $themeID;
+        $this->bannerImageLink = $bannerImageLink;
     }
     /**
      * @inheritdoc
@@ -158,5 +166,12 @@ class MockSiteSection implements SiteSectionInterface {
      */
     public function getCategoryID() {
         return -1;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getBannerImageLink(): string {
+        return $this->bannerImageLink;
     }
 }

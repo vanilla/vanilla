@@ -10,8 +10,8 @@ import { t } from "@library/utility/appUtils";
 import { simplifyFraction } from "@vanilla/utils";
 import classNames from "classnames";
 import React, { useCallback, useState } from "react";
-import { style } from "@library/styles/styleShim";
 import { percent } from "csx";
+import { css } from "@emotion/css";
 
 interface IProps extends IBaseEmbedProps {
     height: number;
@@ -46,7 +46,7 @@ export function VideoEmbed(props: IProps) {
             ratioClass = "is16by9";
             break;
         default:
-            ratioClass = style({
+            ratioClass = css({
                 label: "isCustomRatio",
                 paddingTop: percent(((height || 3) / (width || 4)) * 100),
             });

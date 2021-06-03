@@ -115,16 +115,22 @@ class HomeController extends Gdn_Controller {
     }
 
     /**
+     * Present the user with a confirmation page that they are leaving the site.
+     *
      * @param string $target
+     * @param bool $allowTrusted
      *
      * @throws Gdn_UserException Throw an exception if the domain is invalid.
      */
-    public function leaving($target = '') {
+    public function leaving($target = '', $allowTrusted = false) {
         $target = str_replace("\xE2\x80\xAE", '', $target);
         try {
             $target = UrlUtils::domainAsAscii($target);
         } catch (Exception $e) {
             throw new Gdn_UserException(t('Url is invalid.'));
+        }
+        if ($allowTrusted && isTrustedDomain($target)) {
+            redirectTo($target, 302, false);
         }
         $this->setData('Target', anchor(htmlspecialchars($target), $target, '', ['rel' => 'nofollow']));
         $this->title(t('Leaving'));

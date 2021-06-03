@@ -13,7 +13,6 @@ import FlexSpacer from "@library/layout/FlexSpacer";
 import Heading from "@library/layout/Heading";
 import { useBannerContainerDivRef, useBannerContext } from "@library/banner/BannerContext";
 import { bannerClasses, bannerVariables, IBannerOptions } from "@library/banner/bannerStyles";
-import { SearchBarPresets } from "@library/banner/SearchBarPresets";
 import { assetUrl, t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import { titleBarClasses } from "@library/headers/titleBarStyles";
@@ -54,7 +53,7 @@ export interface IBannerProps {
 export default function Banner(props: IBannerProps) {
     const { isCompact, mediaQueries } = useLayout();
     const bannerContextRef = useBannerContainerDivRef();
-    const { setOverlayTitleBar, setRenderedH1 } = useBannerContext();
+    const { setOverlayTitleBar } = useBannerContext();
     const { action, className, isContentBanner } = props;
     const varsTitleBar = titleBarVariables();
     const classesTitleBar = titleBarClasses();
@@ -66,7 +65,6 @@ export default function Banner(props: IBannerProps) {
     const { title = vars.title.text } = props;
 
     useComponentDebug({ vars });
-
     useEffect(() => {
         setOverlayTitleBar(options.overlayTitleBar);
     }, [options.overlayTitleBar]);
@@ -92,9 +90,13 @@ export default function Banner(props: IBannerProps) {
         iconImageSrc = iconImageSrc ? assetUrl(iconImageSrc) : null;
     }
 
+    const hideSearchOnMobile = isCompact && options.hideSearchOnMobile;
+
     // Search placement
-    const showBottomSearch = options.searchPlacement === "bottom" && !options.hideSearch && !props.hideSearch;
-    const showMiddleSearch = options.searchPlacement === "middle" && !options.hideSearch && !props.hideSearch;
+    const showBottomSearch =
+        options.searchPlacement === "bottom" && !options.hideSearch && !props.hideSearch && !hideSearchOnMobile;
+    const showMiddleSearch =
+        options.searchPlacement === "middle" && !options.hideSearch && !props.hideSearch && !hideSearchOnMobile;
     const searchAloneInContainer =
         showBottomSearch || (showMiddleSearch && options.hideDescription && options.hideTitle);
 
@@ -173,7 +175,6 @@ export default function Banner(props: IBannerProps) {
                                         <Heading className={visibility().visuallyHidden} depth={1}>
                                             {title}
                                         </Heading>
-                                        {setRenderedH1(true)}
                                     </>
                                 )}
                                 <ConditionalWrap
@@ -209,12 +210,9 @@ export default function Banner(props: IBannerProps) {
                         <div className={classes.imagePositioner}>
                             {/*For SEO & accessibility*/}
                             {options.hideTitle && (
-                                <>
-                                    <Heading className={visibility().visuallyHidden} depth={1}>
-                                        {title}
-                                    </Heading>
-                                    {setRenderedH1(true)}
-                                </>
+                                <Heading className={visibility().visuallyHidden} depth={1}>
+                                    {title}
+                                </Heading>
                             )}
                             <ConditionalWrap
                                 className={classes.contentContainer(!rightImageSrc)}
@@ -260,7 +258,6 @@ export default function Banner(props: IBannerProps) {
                                                         ) : (
                                                             <>{headingTitleLarge}</>
                                                         )}
-                                                        {setRenderedH1(true)}
                                                     </>
                                                 )}
                                                 <div className={classNames(classes.text, classes.titleFlexSpacer)}>

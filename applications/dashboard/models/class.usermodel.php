@@ -3435,15 +3435,13 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
 
         // Preserve existing % by escaping.
         $name = trim($name);
-        $name = $this->escapeField($name);
-        if ($wildcardSearch) {
-            $name = rtrim($name, '*');
-        }
 
         // Avoid potential pollution by resetting.
         $this->SQL->reset();
         $this->SQL->from('User');
         if ($wildcardSearch) {
+            $name = $this->escapeField($name);
+            $name = rtrim($name, '*');
             $this->SQL->like('Name', $name, 'right');
         } else {
             $this->SQL->where('Name', $name);
@@ -5635,7 +5633,7 @@ SQL;
         $permissions = Gdn::permissionModel()->createPermissionInstance();
         $permissionsKey = '';
         $user = $this->getID($userID, DATASET_TYPE_ARRAY);
-
+        $isAdmin = $user && $user['Admin'] > 0;
         if (Gdn::cache()->activeEnabled()) {
             $permissionsIncrement = $this->getPermissionsIncrement();
             $permissionsKey = formatString(self::USERPERMISSIONS_KEY, [
@@ -5646,15 +5644,14 @@ SQL;
             $cachedPermissions = Gdn::cache()->get($permissionsKey);
             if ($cachedPermissions !== Gdn_Cache::CACHEOP_FAILURE) {
                 $permissions->setPermissions($cachedPermissions);
-                $permissions->setAdmin($user['Admin'] > 0);
+                $permissions->setAdmin($isAdmin);
                 return $permissions;
             }
         }
 
         $data = Gdn::permissionModel()->getPermissionsByUser($userID);
         $permissions->setPermissions($data);
-        $admin = $user['Admin'] ?? null;
-        $permissions->setAdmin($admin > 0);
+        $permissions->setAdmin($isAdmin);
 
         $this->EventArguments['UserID'] = $userID;
         $this->EventArguments['Permissions'] = $permissions;

@@ -9,7 +9,7 @@ import { useCallback, useEffect, useRef } from "react";
 /**
  * Returns a function which returns true if the component is currently mounted.
  */
-export default function useMountedState(): () => boolean {
+export function useMountedState(): () => boolean {
     const mountedRef = useRef<boolean>(false);
     const get = useCallback(() => mountedRef.current, []);
 

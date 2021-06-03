@@ -24,6 +24,7 @@ export const signaturesCSS = () => {
         ...Mixins.margin({
             vertical: 0,
         }),
+        clear: "both",
     });
 
     cssOut(`.Content .MessageList .Signature.UserSignature.userContent  > p`, {

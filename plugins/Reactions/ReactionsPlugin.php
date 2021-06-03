@@ -849,6 +849,22 @@ class ReactionsPlugin extends Gdn_Plugin {
         // Fetch the view helper functions.
         include_once Gdn::controller()->fetchViewLocation('reaction_functions', '', 'plugins/Reactions');
 
+        $reactionsModuleEnabled = \Gdn::themeFeatures()->get('NewReactionsModule');
+        if ($reactionsModuleEnabled) {
+            /** @var ReactionsModule $reactionModule */
+            $reactionModule = Gdn::getContainer()->get(ReactionsModule::class);
+            echo $reactionModule;
+        } else {
+            $this->displayProfileCounts();
+        }
+    }
+
+    /**
+     * Display legacy profile Counts.
+     *
+     * @see writeProfileCounts()
+     */
+    public function displayProfileCounts() {
         $heading = '<h2 class="H">'.t('Reactions').'</h2>';
         if (BoxThemeShim::isActive()) {
             BoxThemeShim::startWidget();
@@ -1669,7 +1685,7 @@ class ReactionsPlugin extends Gdn_Plugin {
         $userIDs = array_column($users, "userID");
         $reactionsByUser = $this->reactionModel->getReceivedByUser($userIDs);
 
-        $schema = $this->reactionModel->compoundTypeFragmentSchema(true);
+        $schema = $this->reactionModel->compoundTypeFragmentSchema();
         foreach ($users as &$userRow) {
             if (!array_key_exists($userRow["userID"], $reactionsByUser)) {
                 continue;

@@ -24,7 +24,7 @@
                         ) }}
                     </div>
                 </div>
-                {{ form.textBoxWrap('Name') }}
+                {{ form.textBoxWrap('Name', {placeholder: t('Untitled')}) }}
             </li>
         </ul>
         <div data-react="PocketContentForm" data-props="{{ contentProps|default("{}") }}"></div>

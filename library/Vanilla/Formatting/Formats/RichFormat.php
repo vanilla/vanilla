@@ -9,6 +9,7 @@ namespace Vanilla\Formatting\Formats;
 
 use Garden\Schema\ValidationException;
 use Garden\StaticCacheTranslationTrait;
+use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\EmbeddedContent\AbstractEmbed;
 use Vanilla\EmbeddedContent\Embeds\FileEmbed;
 use Vanilla\EmbeddedContent\Embeds\ImageEmbed;
@@ -16,6 +17,7 @@ use Vanilla\Contracts\Formatting\HeadingProviderInterface;
 use Vanilla\Formatting\BaseFormat;
 use Vanilla\Formatting\Exception\FormattingException;
 use Vanilla\Contracts\Formatting\Heading;
+use Vanilla\Formatting\Html\Processor\ExternalLinksProcessor;
 use Vanilla\Formatting\ParsableDOMInterface;
 use Vanilla\Formatting\Quill\Blots\Embeds\ExternalBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\HeadingTerminatorBlot;
@@ -57,6 +59,7 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface {
         $this->renderer = $renderer;
         $this->filterer = $filterer;
     }
+
 
     /**
      * @inheritdoc

@@ -11,6 +11,7 @@ use Garden\Web\Exception\NotFoundException;
 use Vanilla\ApiUtils;
 use Garden\Container\Container;
 use Vanilla\Formatting\DateTimeFormatter;
+use Vanilla\Forum\Modules\QnAWidgetModule;
 use Vanilla\QnA\Models\AnswerSearchType;
 use Vanilla\QnA\Models\QuestionSearchType;
 use Vanilla\QnA\Models\AnswerModel;
@@ -146,7 +147,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
             ->addCall('addQuickLinkProvider', [$this]);
 
         $dic->rule(WidgetService::class)
-            ->addCall('registerWidget', [QnAModule::class]);
+            ->addCall('registerWidget', [QnAWidgetModule::class]);
 
         $dic
             ->rule(\Vanilla\DiscussionTypeConverter::class)

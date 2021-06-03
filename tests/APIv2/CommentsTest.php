@@ -10,6 +10,7 @@ namespace VanillaTests\APIv2;
 use CommentModel;
 use DiscussionModel;
 use Gdn_Configuration;
+use Vanilla\Exception\PermissionException;
 use Vanilla\Models\DirtyRecordModel;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 
@@ -111,6 +112,46 @@ class CommentsTest extends AbstractResourceTest {
         ])->getBody();
 
         $this->assertEquals($comments, $updatedComments);
+    }
+
+    /**
+     * Verify that a user cannot delete their own comment via the API.
+     */
+    public function testDeletingOwnCommentNotAllowed() {
+        $userID = $this->createUserFixture(self::ROLE_MEMBER);
+        $this->api()->setUserID($userID);
+        $comment = $this->api()->post('comments', [
+            'body' => 'You can\'t delete this',
+            'format' => 'text',
+            'discussionID' => 1
+        ])->getBody();
+
+        $this->expectExceptionCode(403);
+        $this->expectExceptionMessage("Permission Problem");
+
+        $this->api()->delete("comments/{$comment['commentID']}");
+    }
+
+    /**
+     * Verify that a user can delete their own comment if the "AllowSelfDelete" config setting is true.
+     */
+    public function testDeletingOwnCommentAllowed() {
+        $this->runWithConfig(['Vanilla.Comments.AllowSelfDelete' => true], function () {
+            $userID = $this->createUserFixture(self::ROLE_MEMBER);
+            $this->api()->setUserID($userID);
+            $comment = $this->api()->post('comments', [
+                'body' => 'You can\'t delete this',
+                'format' => 'text',
+                'discussionID' => 1
+            ])->getBody();
+
+            $this->api()->delete("comments/{$comment['commentID']}");
+
+            $this->expectExceptionCode(404);
+            $this->expectExceptionMessage("Comment not found.");
+
+            $this->api()->get("comments/{$comment['commentID']}");
+        });
     }
 
     /**

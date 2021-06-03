@@ -71,6 +71,9 @@ class AddonsApiController extends Controller {
                     'description' => 'An array of addons that are required to enable the addon.',
                     'items' => $requirementSchema,
                 ],
+                'attributes:o' => [
+                    'locale:s?',
+                ],
                 'conflict:a?' => [
                     'type' => 'array',
                     'description' => 'An array of addons that conflict with this addon.',
@@ -108,6 +111,10 @@ class AddonsApiController extends Controller {
         }
         if (!empty($r['conflict'])) {
             $r['conflict'] = $this->filterRequirements($r['conflict']);
+        }
+        $r['attributes'] = new \Vanilla\Attributes();
+        if ($addon->getType() === Addon::TYPE_LOCALE) {
+            $r['attributes']['locale'] = $r['locale'];
         }
 
         return $r;

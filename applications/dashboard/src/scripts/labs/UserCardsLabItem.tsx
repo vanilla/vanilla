@@ -24,7 +24,7 @@ export function UserCardsLabItem() {
             notes={
                 <LabThemeEditorNote
                     translatedLabName={t("Usercards")}
-                    docsUrl="https://success.vanillaforums.com/kb/articles/365-customizing-the-quick-links-menu"
+                    docsUrl="https://success.vanillaforums.com/kb/articles/322-user-cards"
                 />
             }
         />

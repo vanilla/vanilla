@@ -17,7 +17,6 @@ export default class CategorySuggestionActions extends ReduxActions<IForumStoreS
     public static loadCategories = createAction.async<{ query: string }, ICategory[], IApiError>("GET");
 
     private internalLoadCategories = (query: string) => {
-        const searchLimit = 10;
         const { suggestionsByQuery } = this.getState().forum.categories;
         const existingLoadable = suggestionsByQuery[query] ?? { status: LoadStatus.PENDING };
         if (existingLoadable.status === LoadStatus.LOADING || existingLoadable.status === LoadStatus.SUCCESS) {
@@ -26,7 +25,7 @@ export default class CategorySuggestionActions extends ReduxActions<IForumStoreS
         }
         const apiThunk = bindThunkAction(CategorySuggestionActions.loadCategories, async () => {
             // See if we have an existing item.
-            const params = { query, expand: ["breadcrumbs"], limit: searchLimit };
+            const params = { query, expand: ["breadcrumbs"] };
 
             const response = await this.api.get("/categories/search", { params });
             return response.data;

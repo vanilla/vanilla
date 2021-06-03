@@ -40,6 +40,7 @@
 
 .Message img .embedImage-img, // Compatibility
 .embedImage-img {
+    height: auto;
     display: inline-flex; // https://github.com/vanilla/support/issues/3336
     position: relative;
     margin: {

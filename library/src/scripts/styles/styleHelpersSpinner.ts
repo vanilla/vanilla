@@ -4,12 +4,11 @@
  * @license GPL-2.0-only
  */
 
-import { keyframes } from "@library/styles/styleShim";
 import { ColorHelper, deg, percent, quote } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { defaultTransition } from "@library/styles/styleHelpersAnimation";
 import { styleUnit } from "@library/styles/styleUnit";
-import { CSSObject } from "@emotion/css";
+import { CSSObject, keyframes } from "@emotion/css";
 
 const spinnerOffset = 73;
 const spinnerLoaderAnimation = keyframes({

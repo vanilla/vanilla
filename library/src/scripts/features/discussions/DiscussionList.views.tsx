@@ -8,6 +8,7 @@ import { discussionListVariables } from "@library/features/discussions/Discussio
 import DiscussionListItem from "@library/features/discussions/DiscussionListItem";
 import { PageBox } from "@library/layout/PageBox";
 import { List } from "@library/lists/List";
+import { ListItemLayout } from "@library/lists/ListItem.variables";
 import { t } from "@vanilla/i18n";
 import React from "react";
 
@@ -23,6 +24,7 @@ export function DiscussionListView(props: IProps) {
             options={{
                 box: variables.contentBoxes.depth1,
                 itemBox: variables.contentBoxes.depth2,
+                itemLayout: !variables.item.excerpt.display ? ListItemLayout.TITLE_METAS : undefined,
             }}
             {...props}
         >

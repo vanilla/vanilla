@@ -27,7 +27,7 @@ import { useThemeCache } from "@library/styles/themeCache";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { calc, important, percent, px, quote, rgba, translateX, translateY, ColorHelper, viewWidth } from "csx";
 import { media } from "@library/styles/styleShim";
-import { CSSObject } from "@emotion/css";
+import { css, CSSObject } from "@emotion/css";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { breakpointVariables } from "@library/styles/styleHelpersBreakpoints";
 import { t } from "@vanilla/i18n";
@@ -174,6 +174,13 @@ export const bannerVariables = useThemeCache(
                  * @type boolean
                  */
                 hideSearch: false,
+
+                /**
+                 * @var banner.options.hideSearchOnMobile
+                 * @title Hide SearchBar on mobile views.
+                 * @type boolean
+                 */
+                hideSearchOnMobile: false,
 
                 /**
                  * @var banner.options.hideIcon
@@ -481,6 +488,20 @@ export const bannerVariables = useThemeCache(
         );
 
         /**
+         * @varGroup banner.textAndSearchContainer
+         * @title Banner textAndSearchContainer
+         * @description In cases when we want banner text width to be different from the searchbar.
+         */
+        const textAndSearchContainer = makeThemeVars("textAndSearchContainer", {
+            /**
+             * @var banner.textAndSearchContainer.maxWidth
+             * @title maxWidth
+             * @type number|string
+             */
+            maxWidth: 705 as number | string | undefined,
+        });
+
+        /**
          * @varGroup banner.title
          * @title Banner Title
          */
@@ -568,7 +589,7 @@ export const bannerVariables = useThemeCache(
                  * @title Max Width
                  * @description Maximum width for the banner searchbar.
                  */
-                maxWidth: 705,
+                maxWidth: textAndSearchContainer.maxWidth,
 
                 /**
                  * @var banner.searchBar.sizing.height
@@ -811,6 +832,7 @@ export const bannerVariables = useThemeCache(
             icon,
             searchButtonDropDown,
             searchButtonBg,
+            textAndSearchContainer,
         };
     },
 );
@@ -826,9 +848,7 @@ export const bannerClasses = useThemeCache(
         const vars = alternativeVariables ?? bannerVars;
         const formElementVars = formElementsVariables();
         const globalVars = globalVariables();
-        const buttonGlobalVars = buttonGlobalVariables();
         const { searchBar } = vars;
-        const style = styleFactory(altName ?? "banner");
         const isCentered = vars.options.alignment === "center";
         const borderRadius =
             vars.searchBar.border.radius !== undefined ? vars.searchBar.border.radius : vars.border.radius;
@@ -836,7 +856,7 @@ export const bannerClasses = useThemeCache(
         const isBordered = vars.presets.input.preset === SearchBarPresets.BORDER;
         const isSolidBordered = isBordered && vars.presets.button.preset === ButtonPreset.SOLID;
 
-        const searchButton = style("searchButton", {
+        const searchButton = css({
             height: styleUnit(vars.searchBar.sizing.height),
             ...{
                 "&.searchBar-submitButton": {
@@ -867,11 +887,11 @@ export const bannerClasses = useThemeCache(
             },
         } as CSSObject); //FIXME: avoid type assertion (once the '&&&&'-style overrides are cleaned up)
 
-        const searchDropDownButton = style("searchDropDown", {
+        const searchDropDownButton = css({
             ...Mixins.button(vars.searchButtonDropDown),
         });
 
-        const valueContainer = style("valueContainer", {});
+        const valueContainer = css({});
 
         const outerBackground = useThemeCache((url?: string) => {
             const finalUrl = url ?? vars.outerBackground.image ?? undefined;
@@ -882,7 +902,7 @@ export const bannerClasses = useThemeCache(
                 image: finalUrl,
             };
 
-            return style("outerBackground", {
+            return css({
                 position: "absolute",
                 top: 0,
                 left: 0,
@@ -908,11 +928,11 @@ export const bannerClasses = useThemeCache(
             });
         });
 
-        const defaultBannerSVG = style("defaultBannerSVG", {
+        const defaultBannerSVG = css({
             ...Mixins.absolute.fullSizeOfParent(),
         });
 
-        const backgroundOverlay = style("backgroundOverlay", {
+        const backgroundOverlay = css({
             display: "block",
             position: "absolute",
             top: px(0),
@@ -923,8 +943,7 @@ export const bannerClasses = useThemeCache(
         });
 
         const contentContainer = (hasFullWidth = false) => {
-            return style(
-                "contentContainer",
+            return css(
                 {
                     display: "flex",
                     flexDirection: "column",
@@ -962,11 +981,11 @@ export const bannerClasses = useThemeCache(
             );
         };
 
-        const text = style("text", {
+        const text = css({
             color: ColorsUtils.colorOut(vars.colors.primaryContrast),
         });
 
-        const noTopMargin = style("noTopMargin", {});
+        const noTopMargin = css({});
 
         const conditionalUnifiedBorder = isUnifiedBorder
             ? {
@@ -977,7 +996,7 @@ export const bannerClasses = useThemeCache(
               }
             : {};
 
-        const searchContainer = style("searchContainer", {
+        const searchContainer = css({
             position: "relative",
             width: percent(100),
             maxWidth: styleUnit(searchBar.sizing.maxWidth),
@@ -1008,12 +1027,12 @@ export const bannerClasses = useThemeCache(
             },
         });
 
-        const iconContainer = style("iconContainer", {
+        const iconContainer = css({
             ...lineHeightAdjustment(),
             ...Mixins.margin(vars.icon.margins),
         });
 
-        const icon = style("icon", {
+        const icon = css({
             width: styleUnit(vars.icon.width),
             maxWidth: styleUnit(vars.icon.width),
             height: styleUnit(vars.icon.height),
@@ -1033,11 +1052,11 @@ export const bannerClasses = useThemeCache(
             }),
         });
 
-        const input = style("input", {});
+        const input = css({});
 
-        const buttonLoader = style("buttonLoader", {});
+        const buttonLoader = css({});
 
-        const title = style("title", {
+        const title = css({
             "&&&": {
                 display: "block",
                 ...Mixins.font(vars.title.font),
@@ -1052,39 +1071,38 @@ export const bannerClasses = useThemeCache(
             },
         });
 
-        const titleAction = style("titleAction", {});
+        const titleAction = css({});
 
-        const iconTextAndSearchContainer = style("iconTextAndSearchContainer", {
+        const iconTextAndSearchContainer = css({
             display: "flex",
             flexDirection: "row",
             flexWrap: "wrap",
             width: percent(100),
         });
 
-        const textAndSearchContainer = style("textAndSearchContainer", {
+        const textAndSearchContainer = css({
             display: "flex",
             flexDirection: "column",
             width: percent(100),
-            flexBasis: styleUnit(vars.searchBar.sizing.maxWidth),
+            flexBasis: styleUnit(vars.textAndSearchContainer.maxWidth),
             flexGrow: 0,
-
             marginLeft: isCentered ? "auto" : undefined,
             marginRight: isCentered ? "auto" : undefined,
         });
 
-        const titleWrap = style("titleWrap", {
+        const titleWrap = css({
             ...Mixins.margin(vars.title.margins),
             display: "flex",
             flexWrap: "nowrap",
             alignItems: "center",
         });
 
-        const titleUrlWrap = style("titleUrlWrap", {
+        const titleUrlWrap = css({
             marginLeft: isCentered ? "auto" : undefined,
             marginRight: isCentered ? "auto" : undefined,
         });
 
-        const titleFlexSpacer = style("titleFlexSpacer", {
+        const titleFlexSpacer = css({
             display: isCentered ? "block" : "none",
             position: "relative",
             height: styleUnit(formElementVars.sizing.height),
@@ -1112,20 +1130,20 @@ export const bannerClasses = useThemeCache(
             },
         });
 
-        const descriptionWrap = style("descriptionWrap", {
+        const descriptionWrap = css({
             ...Mixins.margin(vars.description.margins),
             display: "flex",
             flexWrap: "nowrap",
             alignItems: "center",
         });
 
-        const description = style("description", {
+        const description = css({
             display: "block",
             ...Mixins.font(vars.description.font),
             flexGrow: 1,
         });
 
-        const content = style("content", {
+        const content = css({
             boxSizing: "border-box",
             flexGrow: 1,
             zIndex: 1,
@@ -1133,7 +1151,7 @@ export const bannerClasses = useThemeCache(
             minHeight: styleUnit(vars.searchBar.sizing.height),
         });
 
-        const imagePositioner = style("imagePositioner", {
+        const imagePositioner = css({
             display: "flex",
             flexDirection: "row",
             flexWrap: "nowrap",
@@ -1150,8 +1168,7 @@ export const bannerClasses = useThemeCache(
         };
 
         // const innerBreak = vars.contentContainer.minWidth + vars.contentContainer.padding.horizontal + ;
-        const imageElementContainer = style(
-            "imageElementContainer",
+        const imageElementContainer = css(
             {
                 alignSelf: "stretch",
                 maxWidth: makeImageMinWidth(
@@ -1181,7 +1198,7 @@ export const bannerClasses = useThemeCache(
             ),
         );
 
-        const logoContainer = style("logoContainer", {
+        const logoContainer = css({
             display: "flex",
             width: percent(100),
             height: styleUnit(vars.logo.height),
@@ -1201,11 +1218,11 @@ export const bannerClasses = useThemeCache(
             }),
         });
 
-        const logoSpacer = style("logoSpacer", {
+        const logoSpacer = css({
             ...Mixins.padding(vars.logo.padding),
         });
 
-        const logo = style("logo", {
+        const logo = css({
             height: styleUnit(vars.logo.height),
             width: styleUnit(vars.logo.width),
             maxHeight: percent(100),
@@ -1220,8 +1237,7 @@ export const bannerClasses = useThemeCache(
             }),
         });
 
-        const rightImage = style(
-            "rightImage",
+        const rightImage = css(
             {
                 ...Mixins.absolute.fullSizeOfParent(),
                 minWidth: styleUnit(vars.rightImage.minWidth),
@@ -1243,7 +1259,7 @@ export const bannerClasses = useThemeCache(
         // NOTE FOR FUTURE
         // Do no apply overflow hidden here.
         // It will cut off the search box in the banner.
-        const root = style(
+        const root = css(
             {
                 position: "relative",
                 zIndex: 1, // To make sure it sites on top of panel layout overflow indicators.
@@ -1261,21 +1277,21 @@ export const bannerClasses = useThemeCache(
                 : {},
         );
 
-        const bannerContainer = style("bannerContainer", {
+        const bannerContainer = css({
             position: "relative",
         });
 
         // Use this for cutting of the right image with overflow hidden.
-        const overflowRightImageContainer = style("overflowRightImageContainer", {
+        const overflowRightImageContainer = css({
             ...Mixins.absolute.fullSizeOfParent(),
             overflow: "hidden",
         });
 
-        const fullHeight = style("fullHeight", {
+        const fullHeight = css({
             height: percent(100),
         });
 
-        const resultsAsModal = style("resultsAsModal", {
+        const resultsAsModal = css({
             "&&": {
                 top: styleUnit(vars.searchBar.sizing.height + 2),
                 ...panelLayoutVariables()
@@ -1295,7 +1311,7 @@ export const bannerClasses = useThemeCache(
             },
         });
 
-        const middleContainer = style("middleContainer", {
+        const middleContainer = css({
             height: percent(100),
             position: "relative",
             minHeight: styleUnit(vars.dimensions.minHeight),
@@ -1308,7 +1324,7 @@ export const bannerClasses = useThemeCache(
             }),
         });
 
-        const searchStrip = style("searchStrip", {
+        const searchStrip = css({
             position: "relative",
             display: "flex",
             alignItems: "center",

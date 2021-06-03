@@ -15,7 +15,7 @@ import DiscussionActions, {
 import { IDiscussionsStoreState } from "@library/features/discussions/discussionsReducer";
 import { useDispatch, useSelector } from "react-redux";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { IDiscussion, IGetDiscussionListParams } from "@dashboard/@types/api/discussion";
 import { stableObjectHash } from "@vanilla/utils";
 import { useCurrentUserID } from "@library/features/users/userHooks";
@@ -29,10 +29,9 @@ export function useDiscussion(discussionID: IGetDiscussionByID["discussionID"]):
 
     const existingResult = useSelector((state: IDiscussionsStoreState) => {
         return {
-            status:
-                (!!state.discussions.discussionsByID[discussionID] && LoadStatus.SUCCESS) ??
-                state.discussions.fullRecordStatusesByID[discussionID].status ??
-                LoadStatus.PENDING,
+            status: state.discussions.discussionsByID[discussionID]
+                ? LoadStatus.SUCCESS
+                : state.discussions.fullRecordStatusesByID[discussionID]?.status ?? LoadStatus.PENDING,
             data: state.discussions.discussionsByID[discussionID],
         };
     });
@@ -214,4 +213,21 @@ export function useDiscussionPutType(discussionID: number) {
         isLoading,
         putDiscussionType: putDiscussionType,
     };
+}
+
+export function usePutDiscussionTags(discussionID: number) {
+    const actions = useDiscussionActions();
+
+    async function putDiscussionTags(tagIDs: number[]) {
+        try {
+            await actions.putDiscussionTags({
+                discussionID,
+                tagIDs,
+            });
+        } catch (error) {
+            throw new Error(error.description); //fixme: what we really want is an object that we can pass wholesale to formik's setError() function
+        }
+    }
+
+    return putDiscussionTags;
 }

@@ -15,7 +15,6 @@ import { styleUnit } from "@library/styles/styleUnit";
 import { media } from "@library/styles/styleShim";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { Mixins } from "@library/styles/Mixins";
-import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 
 export const forumLayoutVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -24,7 +23,7 @@ export const forumLayoutVariables = useThemeCache(() => {
     // Important variables that will be used to calculate other variables
     const foundationalWidths = makeThemeVars("foundationalWidths", {
         fullGutter: globalVars.constants.fullGutter,
-        panelWidth: 242, // main calculated based on panel width
+        panelWidth: 288, // main calculated based on panel width
         breakPoints: {
             // Other break points are calculated
             oneColumn: 1200,

@@ -11,6 +11,7 @@ use Garden\Schema\Schema;
 use Vanilla\ApiUtils;
 use Vanilla\DateFilterSchema;
 use Vanilla\Forms\ApiFormChoices;
+use Vanilla\Forms\FieldMatchConditional;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
 use Vanilla\Forms\StaticFormChoices;
@@ -33,15 +34,11 @@ class DiscussionsApiIndexSchema extends Schema {
                 'x-filter' => [
                     'field' => 'd.CategoryID'
                 ],
-                'x-control' => SchemaForm::dropDown(
-                    new FormOptions('Category', 'Display discussions from this category.'),
-                    new ApiFormChoices(
-                        "/api/v2/categories?query=%s&limit=30",
-                        "/api/v2/categories/%s",
-                        "categoryID",
-                        "name"
-                    )
-                ),
+                'x-control' => self::getCategoryIDFormOptions()
+            ],
+            'includeChildCategories:b?' => [
+                'default' => false,
+                'description' => 'Filter by a category.',
             ],
             'dateInserted?' => new DateFilterSchema([
                 'description' => 'When the discussion was created.',
@@ -108,35 +105,14 @@ class DiscussionsApiIndexSchema extends Schema {
             ],
             'sort:s?' => [
                 'enum' => ApiUtils::sortEnum('dateLastComment', 'dateInserted', 'discussionID', 'score', 'hot'),
-                'x-control' => SchemaForm::dropDown(
-                    new FormOptions(
-                        'Sort Order',
-                        'Choose the order items are sorted.'
-                    ),
-                    new StaticFormChoices([
-                        '-dateLastComment' => 'Recently commented',
-                        '-dateInserted' => 'Recently added',
-                        '-score' => 'Top',
-                        '-hot' => 'Hot (score + activity)'
-                    ])
-                )
+                'x-control' => self::getSortFormOptions()
             ],
             'limit:i?' => [
                 'description' => 'Desired number of items per page.',
                 'default' => $defaultLimit,
                 'minimum' => 1,
                 'maximum' => ApiUtils::getMaxLimit(),
-                'x-control' => SchemaForm::dropDown(
-                    new FormOptions(
-                        'Limit',
-                        'Choose how many discussions to display.'
-                    ),
-                    new StaticFormChoices([
-                        '3' => 3,
-                        '5' => 5,
-                        '10' => 10,
-                    ])
-                )
+                'x-control' => self::getLimitFormOptions()
             ],
             'insertUserID:i?' => [
                 'description' => 'Filter by author.',
@@ -146,6 +122,69 @@ class DiscussionsApiIndexSchema extends Schema {
             ],
             'expand?' => \DiscussionExpandSchema::commonExpandDefinition()
         ]));
+    }
+
+    /**
+     * Get sort form options.
+     *
+     * @param FieldMatchConditional|null $conditional
+     * @return array
+     */
+    public static function getSortFormOptions(FieldMatchConditional $conditional = null): array {
+        return SchemaForm::dropDown(
+            new FormOptions(
+                t('Sort Order'),
+                t('Choose the order records are sorted.')
+            ),
+            new StaticFormChoices([
+                '-dateLastComment' => t('Recently Commented'),
+                '-dateInserted' => t('Recently Added'),
+                '-score' => t('Top'),
+                '-hot' => t('Hot (score + activity)')
+            ]),
+            $conditional
+        );
+    }
+
+    /**
+     * Get CategoryID form options.
+     *
+     * @param FieldMatchConditional|null $conditional
+     *
+     * @return array
+     */
+    public static function getCategoryIDFormOptions(FieldMatchConditional $conditional = null): array {
+        return SchemaForm::dropDown(
+            new FormOptions(t('Category'), t('Display records from this category.')),
+            new ApiFormChoices(
+                "/api/v2/categories/search?query=%s&limit=30",
+                "/api/v2/categories/%s",
+                "categoryID",
+                "name"
+            ),
+            $conditional
+        );
+    }
+
+    /**
+     * Get limit form options.
+     *
+     * @param FieldMatchConditional|null $conditional
+     * @return array
+     */
+    public static function getLimitFormOptions(FieldMatchConditional $conditional = null): array {
+        return SchemaForm::dropDown(
+            new FormOptions(
+                t('Limit'),
+                t('Choose how many records to display.')
+            ),
+            new StaticFormChoices([
+                '3' => 3,
+                '5' => 5,
+                '10' => 10,
+            ]),
+            $conditional
+        );
     }
 
     /**

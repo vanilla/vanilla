@@ -8,9 +8,11 @@ if (!function_exists('WriteComment'))
 
 
 $writeDiscussionPageHeader = function ($sender) {
-    $writeOptionsMenu = function () use ($sender) {
+    $writeOptionsMenu = function ($withFireEvent = true) use ($sender) {
         echo '<div class="Options">';
-        $sender->fireEvent('BeforeDiscussionOptions');
+        if ($withFireEvent) {
+            $sender->fireEvent('BeforeDiscussionOptions');
+        }
         writeBookmarkLink();
         echo getDiscussionOptionsDropdown();
         writeAdminCheck();
@@ -22,9 +24,13 @@ $writeDiscussionPageHeader = function ($sender) {
         if (!BoxThemeShim::isActive()) {
             $writeOptionsMenu();
         }
+        //this is for data driven themes, to add the resolved status/icon before title
+        if (BoxThemeShim::isActive()) {
+            $sender->fireEvent('BeforeDiscussionOptions');
+        }
         echo '<h1>'.($sender->data('Discussion.displayName') ? $sender->data('Discussion.displayName') : $sender->data('Discussion.Name')).'</h1>';
         if (BoxThemeShim::isActive()) {
-            $writeOptionsMenu();
+            $writeOptionsMenu(false);
         }
     echo "</div>";
 

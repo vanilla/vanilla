@@ -8,7 +8,7 @@ import { loadingCircleClass, loadingRectangleClass, loadingSpacerClass } from "@
 import classNames from "classnames";
 
 interface IProps extends DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
-    height: string | number;
+    height?: string | number;
     width?: string | number;
     inline?: boolean;
 }

@@ -1,0 +1,113 @@
+/**
+ * @author Maneesh Chiba <maneesh.chiba@vanillaforums.com>
+ * @copyright 2009-2021 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
+import { LanguageSettingsFormControls } from "@dashboard/languages/LanguageSettingsFormControls";
+import { ITranslationService } from "@dashboard/languages/LanguageSettingsTypes";
+import { cx } from "@emotion/css";
+import Button from "@library/forms/Button";
+import { ButtonTypes } from "@library/forms/buttonTypes";
+import Frame from "@library/layout/frame/Frame";
+import FrameBody from "@library/layout/frame/FrameBody";
+import { frameBodyClasses } from "@library/layout/frame/frameBodyStyles";
+import FrameFooter from "@library/layout/frame/FrameFooter";
+import { frameFooterClasses } from "@library/layout/frame/frameFooterStyles";
+import FrameHeader from "@library/layout/frame/FrameHeader";
+import LazyModal from "@library/modal/LazyModal";
+import ModalSizes from "@library/modal/ModalSizes";
+import { useUniqueID } from "@library/utility/idUtils";
+import { t } from "@vanilla/i18n";
+import { JsonSchemaForm } from "@vanilla/json-schema-forms";
+import React, { useEffect, useState } from "react";
+
+export interface IProps {
+    isVisible: boolean;
+    service: ITranslationService | null;
+    onExit(): void;
+    setConfiguration(newConfig: any): void;
+    modalSize?: ModalSizes; // Will need this for the language config
+}
+
+export const ConfigurationModal = (props: IProps) => {
+    const { isVisible, onExit, service, setConfiguration, modalSize } = props;
+    const titleID = useUniqueID("configureLanguage_Modal");
+    const classFrameFooter = frameFooterClasses();
+    const classesFrameBody = frameBodyClasses();
+    const [value, setValue] = useState({});
+
+    useEffect(() => {
+        if (service) {
+            setValue(() =>
+                Object.keys(service.configSchema.properties).reduce(
+                    (obj, key) => ({ ...obj, [key]: service[key] }),
+                    {},
+                ),
+            );
+        }
+    }, [service]);
+
+    return (
+        <LazyModal
+            isVisible={isVisible}
+            size={modalSize ? modalSize : ModalSizes.SMALL}
+            exitHandler={() => {
+                onExit();
+            }}
+            titleID={titleID}
+        >
+            <Frame
+                header={
+                    <FrameHeader
+                        titleID={titleID}
+                        closeFrame={() => {
+                            onExit();
+                        }}
+                        title={service && service.name}
+                    />
+                }
+                body={
+                    service &&
+                    service.configSchema && (
+                        <FrameBody>
+                            <div className={cx("frameBody-contents", classesFrameBody.contents)}>
+                                <JsonSchemaForm
+                                    schema={service && service.configSchema}
+                                    instance={value}
+                                    onChange={setValue}
+                                    FormControl={LanguageSettingsFormControls}
+                                    Form={(props) => {
+                                        return <>{props.children}</>;
+                                    }}
+                                />
+                            </div>
+                        </FrameBody>
+                    )
+                }
+                footer={
+                    <FrameFooter justifyRight={true}>
+                        <Button
+                            className={classFrameFooter.actionButton}
+                            buttonType={ButtonTypes.TEXT}
+                            onClick={() => {
+                                onExit();
+                            }}
+                        >
+                            {t("Cancel")}
+                        </Button>
+                        <Button
+                            className={classFrameFooter.actionButton}
+                            onClick={() => {
+                                service && setConfiguration(value);
+                            }}
+                            buttonType={ButtonTypes.TEXT_PRIMARY}
+                        >
+                            {t("Save")}
+                        </Button>
+                    </FrameFooter>
+                }
+            />
+        </LazyModal>
+    );
+};

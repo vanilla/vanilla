@@ -10,10 +10,10 @@ import { TLength } from "@library/styles/styleShim";
 import { t } from "@library/utility/appUtils";
 import { loaderClasses } from "@library/loaders/loaderStyles";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
-import { style } from "@library/styles/styleShim";
 import { Property } from "csstype";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import classNames from "classnames";
+import { css } from "@emotion/css";
 
 interface IProps {
     minimumTime?: number;
@@ -47,7 +47,7 @@ export default class Loader extends React.Component<IProps, IState> {
                 <ConditionalWrap
                     condition={!!this.props.padding || !!this.props.size}
                     className={classNames(
-                        this.props.padding && style({ padding: styleUnit(this.props.padding) }),
+                        this.props.padding && css({ padding: styleUnit(this.props.padding) }),
                         this.props.size && loaderClasses().loaderContainer(this.props.size),
                     )}
                 >

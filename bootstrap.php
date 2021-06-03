@@ -8,11 +8,13 @@ use Vanilla\BodyFormatValidator;
 use Vanilla\Contracts\Web\UASnifferInterface;
 use Vanilla\Controllers\SearchRootController;
 use Vanilla\EmbeddedContent\LegacyEmbedReplacer;
+use Vanilla\Formatting\BaseFormat;
 use Vanilla\Formatting\DateTimeFormatter;
 use Vanilla\Formatting\FormatConfig;
 use Vanilla\Formatting\Html\HtmlEnhancer;
 use Vanilla\Formatting\Html\HtmlPlainTextConverter;
 use Vanilla\Formatting\Html\HtmlSanitizer;
+use Vanilla\Formatting\Html\Processor\ExternalLinksProcessor;
 use Vanilla\InjectableInterface;
 use Vanilla\Contracts;
 use Vanilla\Models\CurrentUserPreloadProvider;
@@ -497,6 +499,9 @@ $dic->setInstance(Container::class, $dic)
     ->addCall('registerBuiltInFormats')
     ->setInherit(true)
     ->setShared(true)
+
+    ->rule(BaseFormat::class)
+    ->addCall("addHtmlProcessor", [new Reference(ExternalLinksProcessor::class)])
 
     ->rule(LegacyEmbedReplacer::class)
     ->setShared(true)

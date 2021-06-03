@@ -8,7 +8,7 @@ import { styleUnit } from "@library/styles/styleUnit";
 import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { themeCardVariables } from "./themePreviewCardStyles";
+import previewCardVariables from "@library/theming/PreviewCard.variables";
 import { percent, color } from "csx";
 import { Mixins } from "@library/styles/Mixins";
 
@@ -49,8 +49,8 @@ export const addThemeClasses = useThemeCache(() => {
     const button = style("button", {
         padding: 0,
         minHeight: 200,
-        minWidth: themeCardVariables().container.minWidth,
-        maxWidth: themeCardVariables().container.maxWidth,
+        minWidth: previewCardVariables().container.minWidth,
+        maxWidth: previewCardVariables().container.maxWidth,
         ...{
             "&&": {
                 width: styleUnit(vars.addTheme.width),

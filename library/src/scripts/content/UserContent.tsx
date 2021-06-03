@@ -9,7 +9,7 @@ import { userContentClasses } from "@library/content/userContentStyles";
 // import classNames from "classnames";
 import React, { useMemo } from "react";
 
-import { cx } from "@library/styles/styleShim";
+import { cx } from "@emotion/css";
 
 interface IProps {
     className?: string;

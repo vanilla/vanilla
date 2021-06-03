@@ -12,7 +12,7 @@ import { IBoxOptions } from "@library/styles/cssUtilsTypes";
 import { DeepPartial } from "redux";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
-import { media } from "typestyle";
+import { media } from "@library/styles/styleShim";
 
 export interface ICallToActionOptions {
     box: IBoxOptions;

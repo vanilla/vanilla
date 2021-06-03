@@ -89,7 +89,6 @@ class Gdn_Model extends Gdn_Pluggable {
      */
     public $Validation;
 
-
     /**
      * Class constructor. Defines the related database table name.
      *

@@ -10,8 +10,8 @@ import { t } from "@vanilla/i18n";
 import { ThemeToggle } from "@library/forms/themeEditor/ThemeToggle";
 import { logWarning } from "@vanilla/utils";
 import { Spring, animated, config as springConfig } from "react-spring/renderprops";
-import { style } from "@library/styles/styleShim";
 import { ThemeBuilderUpload } from "@library/forms/themeEditor/ThemeBuilderUpload";
+import { css } from "@emotion/css";
 
 interface IProps {
     baseKey: string;
@@ -69,7 +69,7 @@ export function ThemeBuilderBreakpoints(props: IProps) {
             >
                 {({ height }) => {
                     return (
-                        <animated.div style={{ height }} className={style({ overflow: "hidden" })}>
+                        <animated.div style={{ height }} className={css({ overflow: "hidden" })}>
                             {breakpoints &&
                                 Object.entries(breakpoints).map(([breakpointKey, value]) => {
                                     const variableKey = `${baseKey}.breakpoints.${breakpointKey}.${responsiveKey}`;

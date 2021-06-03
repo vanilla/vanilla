@@ -1,8 +1,8 @@
-import { cssRaw, flattenNests } from "@library/styles/styleShim";
-import { CSSObject, injectGlobal, css } from "@emotion/css";
+import { flattenNests } from "@library/styles/styleShim";
+import { CSSObject, injectGlobal } from "@emotion/css";
 
 /**
- * @deprecated Use injectGlobals instead.
+ * @deprecated Use injectGlobal instead.
  */
 export function cssOut(selector: string, ...objects: CSSObject[]): void {
     injectGlobal({

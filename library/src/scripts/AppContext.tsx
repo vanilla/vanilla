@@ -14,7 +14,6 @@ import { LiveAnnouncer } from "react-aria-live";
 import { Provider } from "react-redux";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
 import classNames from "classnames";
-import { style } from "@library/styles/styleShim";
 import { percent } from "csx";
 import { LocaleProvider, ContentTranslationProvider } from "@vanilla/i18n";
 import { SearchContextProvider } from "@library/contexts/SearchContext";
@@ -23,7 +22,7 @@ import { ErrorPage } from "@library/errorPages/ErrorComponent";
 import { BannerContextProviderNoHistory } from "@library/banner/BannerContext";
 import { SearchFormContextProvider } from "@library/search/SearchFormContextProvider";
 import { EntryLinkContextProvider } from "@library/contexts/EntryLinkContext";
-import { WidgetLayout } from "@library/layout/WidgetLayout";
+import { css } from "@emotion/css";
 
 interface IProps {
     children: React.ReactNode;
@@ -54,7 +53,7 @@ function composeProviders(providers: Composable[], children) {
 export function AppContext(props: IProps) {
     const store = useMemo(() => getStore<ICoreStoreState>(), []);
 
-    const rootStyle = style({
+    const rootStyle = css({
         label: "appContext",
         width: percent(100),
     });

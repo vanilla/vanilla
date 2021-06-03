@@ -764,6 +764,7 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
         display: "block",
         position: "relative",
         height: styleUnit(vars.sizing.height),
+        marginBottom: styleUnit(globalVars.gutter.size),
     });
 
     const firstItemBorderTop = style("firstItemBorderTop", {

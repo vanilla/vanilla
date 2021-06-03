@@ -307,7 +307,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     // Will default to variation of links.colors.default (which is by default the secondary color)
     Object.keys(links.colors).forEach((state) => {
         if (state !== "default" && state !== "visited") {
-            if (!links[state]) {
+            if (!links.colors[state]) {
                 links.colors[state] =
                     generatedMainColors.stateSecondary ?? ColorsUtils.offsetLightness(links.colors.default, 0.008);
             }

@@ -11,12 +11,15 @@
  * @since 2.0
  */
 
+use Garden\Container\ContainerException;
+use Garden\Container\NotFoundException;
 use Garden\EventManager;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Formatting\DateTimeFormatter;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Scheduler\SchedulerInterface;
 use Vanilla\Theme\ThemeFeatures;
+use Vanilla\Utility\Timers;
 
 /**
  * Framework superobject.
@@ -250,7 +253,7 @@ class Gdn {
 
             $result = $dic->getArgs($alias, (array)$args);
             return $result;
-        } catch (\Garden\Container\NotFoundException $ex) {
+        } catch (NotFoundException $ex) {
             return null;
         }
     }
@@ -646,5 +649,31 @@ class Gdn {
         self::$_Request = null;
         self::$_PluginManager = null;
         self::$_Session = null;
+    }
+
+    /**
+     * GetTimers
+     *
+     * @return Timers
+     */
+    public static function getTimers(): Timers {
+        try {
+            return self::getContainer()->get(Timers::class);
+        } catch (Throwable $e) {
+            throw new RuntimeException('error instantiating Timers');
+        }
+    }
+
+    /**
+     * GetScheduler
+     *
+     * @return SchedulerInterface
+     */
+    public static function getScheduler(): SchedulerInterface {
+        try {
+            return self::getContainer()->get(SchedulerInterface::class);
+        } catch (Throwable $e) {
+            throw new RuntimeException('error instantiating SchedulerInterface');
+        }
     }
 }

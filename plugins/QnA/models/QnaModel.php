@@ -7,6 +7,7 @@ class QnaModel extends Gdn_Model {
     const ACCEPTED = 'Accepted';
     const ANSWERED = 'Answered';
     const UNANSWERED = 'Unanswered';
+    const TYPE = 'Question';
 
     /**
      * Update Q&A counts through the dba/counts endpoint.

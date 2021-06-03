@@ -77,4 +77,35 @@ class DraftsTest extends AbstractResourceTest {
         ];
         parent::testPost($data);
     }
+
+    /**
+     * Verify only the author and admins can view a draft (see https://github.com/vanilla/vanilla-patches/issues/726).
+     */
+    public function testViewingDraftComment() {
+        $posterID = $this->createUserFixture(self::ROLE_MEMBER);
+        $memberID = $this->createUserFixture(self::ROLE_MEMBER);
+        $adminID = $this->createUserFixture(self::ROLE_ADMIN);
+        $session = $this->getSession();
+        $session->start($posterID);
+        $record = [
+            'recordType' => 'comment',
+            'parentRecordID' => 1,
+            'attributes' => [
+                'body' => 'I am a comment and in draft form only my author and admins should be able to see me.',
+                'format' => 'Markdown'
+            ]
+        ];
+        $draftComment = $this->api()->post($this->baseUrl, $record)->getBody();
+
+        // An admin should be able to view the draft.
+        $session->start($adminID);
+        $viewedDraftData = $this->bessy()->getHtml("post/editcomment?CommentID=&DraftID={$draftComment['draftID']}")->getInnerHtml();
+        $this->assertStringContainsString($record['attributes']['body'], $viewedDraftData);
+
+        // Another user should get a permission error.
+        $session->start($memberID);
+        $this->expectExceptionCode(403);
+        $this->expectExceptionMessage(t("ErrorPermission"));
+        $this->bessy()->get("post/editcomment?CommentID=&DraftID={$draftComment['draftID']}");
+    }
 }

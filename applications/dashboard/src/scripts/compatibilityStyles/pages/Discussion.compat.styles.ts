@@ -153,6 +153,15 @@ export const discussionCompatCSS = () => {
         },
     );
 
+    cssOut("body.Discussion .MItem-Resolved", {
+        width: 20,
+        height: 14,
+        padding: 0,
+        marginBottom: 0,
+        verticalAlign: "middle",
+        display: "inline-flex",
+    });
+
     userCardDiscussionPlacement();
 
     cssOut(".Discussion", {

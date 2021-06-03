@@ -27,10 +27,14 @@ import { mountDashboardTabs } from "@dashboard/forms/mountDashboardTabs";
 import { mountDashboardCodeEditors } from "@dashboard/forms/DashboardCodeEditor";
 import { TextEditorContextProvider } from "@library/textEditor/TextEditor";
 import { VanillaLabsPage } from "@dashboard/pages/VanillaLabsPage";
+import { LayoutPage } from "@dashboard/layout/pages/LayoutPage";
 import { bindToggleChildrenEventListeners } from "@dashboard/settings";
+import { LanguageSettingsPage } from "@dashboard/pages/LanguageSettingsPage";
 
 addComponent("imageUploadGroup", DashboardImageUploadGroup, { overwrite: true });
 addComponent("VanillaLabsPage", VanillaLabsPage);
+addComponent("LayoutPage", LayoutPage);
+addComponent("LanguageSettingsPage", LanguageSettingsPage);
 
 disableComponentTheming();
 onContent(() => initAllUserContent());

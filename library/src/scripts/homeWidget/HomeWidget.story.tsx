@@ -3,6 +3,7 @@
  * @license GPL-2.0-only
  */
 
+import { css } from "@emotion/css";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import TitleBar from "@library/headers/TitleBar";
 import { HomeWidget } from "@library/homeWidget/HomeWidget";
@@ -12,6 +13,7 @@ import {
     STORY_WIDGET_ITEMS,
 } from "@library/homeWidget/HomeWidget.storyItems";
 import { HomeWidgetContainer } from "@library/homeWidget/HomeWidgetContainer";
+import { IHomeWidgetContainerOptions } from "@library/homeWidget/HomeWidgetContainer.styles";
 import { HomeWidgetItem } from "@library/homeWidget/HomeWidgetItem";
 import { HomeWidgetItemContentType, IHomeWidgetItemOptions } from "@library/homeWidget/HomeWidgetItem.styles";
 import Container from "@library/layout/components/Container";
@@ -22,7 +24,6 @@ import { storyWithConfig } from "@library/storybook/StoryContext";
 import { STORY_IMAGE, STORY_IPSUM_MEDIUM, STORY_IPSUM_SHORT } from "@library/storybook/storyData";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { BorderType } from "@library/styles/styleHelpers";
-import { style } from "@library/styles/styleShim";
 import { color } from "csx";
 import React from "react";
 import { MemoryRouter } from "react-router";
@@ -297,6 +298,71 @@ export function NoMetas() {
         </div>
     );
 }
+
+export const Carousel = storyWithConfig({ useWrappers: false }, () => {
+    const itemOptions: DeepPartial<IHomeWidgetItemOptions> = {
+        display: { counts: false },
+    };
+    const containerOptions: DeepPartial<IHomeWidgetContainerOptions> = {
+        isCarousel: true,
+    };
+
+    return (
+        <div>
+            <HomeWidget
+                title="Carousel with Background"
+                itemData={STORY_WIDGET_ITEMS}
+                containerOptions={containerOptions}
+                itemOptions={{
+                    ...itemOptions,
+                    contentType: HomeWidgetItemContentType.TITLE_BACKGROUND,
+                }}
+            />
+            <HomeWidget
+                title="Carousel with Icon"
+                itemData={STORY_WIDGET_ITEMS}
+                containerOptions={containerOptions}
+                itemOptions={{ ...itemOptions, contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION_ICON }}
+            />
+            <HomeWidget
+                title="Carousel with Image"
+                itemData={STORY_WIDGET_ITEMS}
+                containerOptions={containerOptions}
+                itemOptions={{
+                    ...itemOptions,
+                    contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
+                }}
+            />
+            <HomeWidget
+                title="Carousel with Text"
+                itemData={STORY_WIDGET_ITEMS}
+                containerOptions={containerOptions}
+                itemOptions={{
+                    ...itemOptions,
+                    contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION,
+                }}
+            />
+            <HomeWidget
+                title="Carousel 4 columns"
+                itemData={STORY_WIDGET_ITEMS}
+                containerOptions={{ ...containerOptions, maxColumnCount: 4 }}
+                itemOptions={{
+                    ...itemOptions,
+                    contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
+                }}
+            />
+            <HomeWidget
+                title="Carousel 2 columns"
+                itemData={STORY_WIDGET_ITEMS}
+                containerOptions={{ ...containerOptions, maxColumnCount: 2 }}
+                itemOptions={{
+                    ...itemOptions,
+                    contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
+                }}
+            />
+        </div>
+    );
+});
 
 export function IconPlacementLeft() {
     const itemOptions: DeepPartial<IHomeWidgetItemOptions> = {
@@ -929,7 +995,7 @@ function ItemIn4Variants(props: { children: React.ReactElement }) {
             },
         },
     });
-    const itemContainer = style({
+    const itemContainer = css({
         flex: 1,
         display: "flex",
         flexDirection: "column",
@@ -941,7 +1007,7 @@ function ItemIn4Variants(props: { children: React.ReactElement }) {
         },
     });
 
-    const root = style({
+    const root = css({
         display: "flex",
     });
 

@@ -21,6 +21,7 @@ interface IProps {
     value: any;
     onChange: (value: any) => void;
     isRequired?: boolean;
+    disabled?: boolean;
 }
 
 export function WidgetFormControl(props: IProps) {
@@ -37,6 +38,7 @@ export function WidgetFormControl(props: IProps) {
             return (
                 <DashboardInput
                     inputProps={{
+                        disabled: props.disabled,
                         value: value ?? "",
                         onChange: (event) => onChange(event.target.value),
                         maxLength: schema.type === "string" ? schema.maxLength : undefined,
@@ -68,6 +70,7 @@ export function WidgetFormControl(props: IProps) {
                     {Object.entries(formControl.choices.staticOptions ?? []).map(
                         ([optionValue, label]: [string, string]) => (
                             <DashboardRadioButton
+                                disabled={props.disabled}
                                 name={inputName}
                                 key={optionValue}
                                 label={label}
@@ -82,6 +85,7 @@ export function WidgetFormControl(props: IProps) {
             if (api) {
                 return (
                     <DashboardSelectLookup
+                        disabled={props.disabled}
                         isClearable={!props.isRequired}
                         placeholder={formControl.placeholder || undefined}
                         value={value}
@@ -98,6 +102,7 @@ export function WidgetFormControl(props: IProps) {
                 : [];
             return (
                 <DashboardSelect
+                    disabled={props.disabled}
                     isClearable={!props.isRequired}
                     value={options.find((opt) => {
                         let valueCompare: any = opt.value;
@@ -115,7 +120,7 @@ export function WidgetFormControl(props: IProps) {
             );
         case "checkBox":
         case "toggle":
-            return <DashboardToggle checked={value} onChange={onChange} />;
+            return <DashboardToggle disabled={props.disabled} checked={value} onChange={onChange} />;
         default:
             return <div>{(formControl as any).inputType} is not supported</div>;
     }

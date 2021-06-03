@@ -571,6 +571,82 @@ class CategoriesTest extends AbstractResourceTest {
     }
 
     /**
+     * Verify Category's countCategories
+     */
+    public function testCountCategories() {
+        $firstGeneration = [];
+        $secondGeneration = [];
+        $thirdGeneration = [];
+
+        $firstGenerationNumber = 2;
+        $secondGenerationNumber = 3;
+        $thirdGenerationNumber = 1;
+
+        $parentCategoryId = $this->createCategory(["parentCategoryID" => CategoryModel::ROOT_ID])["categoryID"];
+
+        for ($i = 0; $i < $firstGenerationNumber; $i++) {
+            $firstGeneration[] = $childId = $this->createCategory(["parentCategoryID" => $parentCategoryId])["categoryID"];
+            for ($j = 0; $j < $secondGenerationNumber; $j++) {
+                $secondGeneration[] = $child2Id = $this->createCategory(["parentCategoryID" => $childId])["categoryID"];
+                for ($k = 0; $k < $thirdGenerationNumber; $k++) {
+                    $thirdGeneration[] = $this->createCategory(["parentCategoryID" => $child2Id])["categoryID"];
+                }
+            }
+        }
+
+        $verifications = [
+            ['value' => $secondGenerationNumber, 'ids' => $firstGeneration],
+            ['value' => $thirdGenerationNumber, 'ids' => $secondGeneration],
+            ['value' => 0, 'ids' => $thirdGeneration],
+        ];
+
+        foreach ($verifications as $verification) {
+            foreach ($verification['ids'] as $id) {
+                $category = $this->api()->get("/categories/$id", [])->getBody();
+                self::assertEquals($verification['value'], $category['countCategories']);
+            }
+        }
+    }
+
+    /**
+     * Verify Category's countDiscussions
+     */
+    public function testCountDiscussions() {
+        $categoryIds = [];
+        $numCategories = 5;
+        $numDiscussions = 5;
+
+        for ($i = 0; $i < $numCategories; $i++) {
+            $categoryIds[] = $id = $this->createCategory($i === 0 ? ["parentCategoryID" => CategoryModel::ROOT_ID] : [])["categoryID"];
+            $category = $this->api()->get("/categories/$id", [])->getBody();
+            self::assertEquals(0, $category['countDiscussions']);
+            self::assertEquals(0, $category['countAllDiscussions']);
+        }
+
+        $bottomCategoryId = end($categoryIds); // redundant, but resilient
+
+        for ($i = 0; $i < $numDiscussions; $i++) {
+            $this->createDiscussion(["categoryID" => $bottomCategoryId]);
+        }
+
+        foreach ($categoryIds as $id) {
+            $category = $this->api()->get("/categories/$id", [])->getBody();
+            self::assertEquals($id === $bottomCategoryId ? $numDiscussions : 0, $category['countDiscussions']);
+            self::assertEquals($numDiscussions, $category['countAllDiscussions']);
+        }
+    }
+
+    /**
+     * TestGetAllCategories
+     */
+    public function testGetAllCategories() {
+        $categoriesBefore = count(CategoryModel::categories());
+        $this->createCategory();
+        $categoriesAfter = count(CategoryModel::categories());
+        self::assertTrue($categoriesAfter === $categoriesBefore + 1);
+    }
+
+    /*
      * Test GET /categories/search.
      */
     public function testGetCategoriesSearch() {

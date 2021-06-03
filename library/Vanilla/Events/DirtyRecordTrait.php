@@ -6,7 +6,10 @@
 
 namespace Vanilla\Events;
 
+use Gdn;
 use Gdn_SQLDriver;
+use RuntimeException;
+use Throwable;
 use Vanilla\Models\DirtyRecordModel;
 
 /**
@@ -38,7 +41,11 @@ trait DirtyRecordTrait {
      */
     public function addDirtyRecord(string $recordType, int $recordID) {
         /** @var DirtyRecordModel $dirtyRecordModel */
-        $dirtyRecordModel = \Gdn::getContainer()->get(DirtyRecordModel::class);
+        try {
+            $dirtyRecordModel = Gdn::getContainer()->get(DirtyRecordModel::class);
+        } catch (Throwable $e) {
+            throw new RuntimeException("Couldn't instantiate DirtyRecordModel::class");
+        }
         $set = [
             'recordType' => $recordType,
             'recordID' => $recordID,
@@ -46,7 +53,7 @@ trait DirtyRecordTrait {
 
         try {
             $dirtyRecordModel->insert($set);
-        } catch (\Exception $e) {
+        } catch (Throwable $e) {
             trigger_error(
                 "Unable to insert new dirtyRecord for recordType: $recordType, recordID: $recordID",
                 E_USER_NOTICE
@@ -69,7 +76,7 @@ trait DirtyRecordTrait {
         return [
             "tableName" => "dirtyRecord dr",
             "on" => "$primaryKey = dr.recordID",
-            "join" => "right"
+            "join" => "right",
         ];
     }
 
@@ -83,8 +90,7 @@ trait DirtyRecordTrait {
      */
     public function transformPrimaryKey($primaryKey, string $prefix) {
         $primaryKey = is_array($primaryKey) ? reset($primaryKey) : $primaryKey;
-        $primaryKey = $prefix ? "$prefix.$primaryKey" : $primaryKey;
 
-        return $primaryKey;
+        return $prefix ? "$prefix.$primaryKey" : $primaryKey;
     }
 }

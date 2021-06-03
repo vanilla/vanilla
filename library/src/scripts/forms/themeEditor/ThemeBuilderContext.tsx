@@ -19,6 +19,8 @@ import { navigationVariables } from "@library/headers/navigationVariables";
 import { homeWidgetItemVariables } from "@library/homeWidget/HomeWidgetItem.styles";
 import { homeWidgetContainerVariables } from "@library/homeWidget/HomeWidgetContainer.styles";
 import { quickLinksVariables } from "@library/navigation/QuickLinks.variables";
+import { discussionListVariables } from "@library/features/discussions/DiscussionList.variables";
+import { listItemVariables } from "@library/lists/ListItem.variables";
 
 ///
 /// Types
@@ -206,6 +208,8 @@ function variableGenerator(variables: IThemeVariables) {
         homeWidgetItem: homeWidgetItemVariables({}, variables),
         homeWidgetContainer: homeWidgetContainerVariables({}, variables),
         quickLinks: quickLinksVariables(variables),
+        discussionList: discussionListVariables(variables),
+        listItem: listItemVariables(undefined, variables),
     };
 
     // Mix in the addons generator variables.

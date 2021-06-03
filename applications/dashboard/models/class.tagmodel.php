@@ -378,8 +378,8 @@ class TagModel extends Gdn_Model {
         $schema = Schema::parse([
             'name:s',
             'urlcode:s?',
-            'parentTagID:i?',
-            'type:s?'
+            'parentTagID:i|n?',
+            'type:s|n?',
         ]);
         return $schema;
     }

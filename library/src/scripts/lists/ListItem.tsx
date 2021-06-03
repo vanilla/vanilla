@@ -6,7 +6,7 @@
 
 import { cx } from "@emotion/css";
 import { listItemClasses } from "@library/lists/ListItem.styles";
-import { MetaItem, Metas } from "@library/metas/Metas";
+import { Metas } from "@library/metas/Metas";
 import SmartLink from "@library/routing/links/SmartLink";
 import React, { useContext, useRef } from "react";
 import { useMeasure } from "@vanilla/react-utils";
@@ -30,6 +30,7 @@ export interface IListItemProps {
     description?: React.ReactNode;
     descriptionClassName?: string;
     descriptionMaxCharCount?: number;
+    truncateDescription?: boolean;
     icon?: React.ReactNode;
     iconWrapperClass?: string;
     metas?: React.ReactNode;
@@ -53,7 +54,7 @@ export function ListItem(props: IListItemProps) {
 
     const isMobileMedia = measure.width <= 600;
 
-    const { headingDepth = 3, descriptionClassName, descriptionMaxCharCount = 320 } = props;
+    const { headingDepth = 3, descriptionClassName, truncateDescription = true, descriptionMaxCharCount = 320 } = props;
 
     const media = props.mediaItem && (
         <div className={isMobileMedia ? classes.mobileMediaContainer : classes.mediaContainer}>{props.mediaItem}</div>
@@ -70,13 +71,17 @@ export function ListItem(props: IListItemProps) {
         );
     }
 
-    const descriptionView = props.description && (
+    const descriptionView = props.description ? (
         <Paragraph className={cx(classes.description, descriptionClassName)}>
-            <TruncatedText maxCharCount={descriptionMaxCharCount} lines={2}>
-                {props.description}
-            </TruncatedText>
+            {truncateDescription ? (
+                <TruncatedText maxCharCount={descriptionMaxCharCount} lines={2}>
+                    {props.description}
+                </TruncatedText>
+            ) : (
+                props.description
+            )}
         </Paragraph>
-    );
+    ) : null;
 
     return (
         <PageBox as={props.as ?? "li"} ref={selfRef} className={cx(props.className)}>
@@ -86,7 +91,7 @@ export function ListItem(props: IListItemProps) {
                 )}
                 <div className={classes.contentContainer}>
                     <div className={classes.titleContainer}>
-                        <Heading className={classes.title} depth={headingDepth}>
+                        <Heading custom className={classes.title} depth={headingDepth}>
                             {props.url ? (
                                 <SmartLink to={props.url} className={cx(classes.titleLink, props.nameClassName)}>
                                     {props.name}

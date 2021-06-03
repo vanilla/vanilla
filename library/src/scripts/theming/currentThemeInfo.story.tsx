@@ -38,7 +38,7 @@ story.add("Current Theme", () => {
 
             <div style={{ display: "flex" }}>
                 <div style={{ width: 400 }}>
-                    <ThemePreviewCard preview={preview} isActiveTheme={true} />
+                    <ThemePreviewCard preview={preview} />
                 </div>
                 <CurrentThemeInfo
                     theme={{

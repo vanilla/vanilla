@@ -25,7 +25,6 @@ import { Mixins } from "@library/styles/Mixins";
 export const searchPageCSS = () => {
     const globalVars = globalVariables();
     const layoutVars = forumLayoutVariables();
-    const formElementVars = formElementsVariables();
     const metasVars = metasVariables();
 
     cssOut(`.DataList.DataList-Search .Item.Item-Search .Img.PhotoWrap`, {

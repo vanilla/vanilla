@@ -216,6 +216,8 @@ class UserPointsModel extends Model {
                 'up.SlotType' => $slotType,
                 'up.Source' => 'Total',
                 'up.CategoryID' => $categoryID,
+                'up.Points > ' => 0,
+
             ])
             ->orderBy('up.Points', 'desc')
             ->limit($limit)

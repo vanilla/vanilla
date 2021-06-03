@@ -678,12 +678,12 @@ jQuery(document).ready(function($) {
                     $target.replaceWithTrigger(item.Data);
                     break;
                 case 'SlideUp':
-                    let removeTarget = false;
+                    var removeTarget = false;
                     if ((typeof item.Data === "object" && item.Data !== null) && item.Data.remove !== "undefined") {
                         removeTarget = !!item.Data.remove;
                     }
 
-                    let slideUpComplete = (function (remove) {
+                    var slideUpComplete = (function (remove) {
                         return function () {
                             if (remove) {
                                 $(this).remove();
@@ -726,7 +726,7 @@ jQuery(document).ready(function($) {
     };
 
     gdn.runJob = function(body) {
-        const date = new Date();
+        var date = new Date();
         console.log("Processing... (" + date.toLocaleString() + ")");
 
         $.ajax({

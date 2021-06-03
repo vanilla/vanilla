@@ -25,8 +25,8 @@ import { forceInt } from "@vanilla/utils";
 import classNames from "classnames";
 import debounce from "lodash/debounce";
 import KeyboardModule from "quill/modules/keyboard";
-import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { style } from "@library/styles/styleShim";
+import React, { useCallback, useMemo, useRef, useState } from "react";
+import { css } from "@emotion/css";
 
 interface IProps {
     disabled?: boolean;
@@ -198,7 +198,7 @@ export default function EmbedFlyout(props: IProps) {
                 <Frame
                     body={
                         <FrameBody>
-                            <p id={descriptionID} className={style({ marginTop: 12, marginBottom: 6 })}>
+                            <p id={descriptionID} className={css({ marginTop: 12, marginBottom: 6 })}>
                                 {t("Paste the URL of the media you want.")}
                                 {supportsFrames() && <> {t("You can also use an <iframe /> embed code here.")}</>}
                             </p>

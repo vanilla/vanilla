@@ -132,6 +132,7 @@ components:
           description: The URL slug of the tag.
         name:
           type: string
+          nullable: true
           description: The full name of the tag.
       required:
         - tagID
@@ -146,8 +147,11 @@ components:
             parentTagID:
               type: integer
               description: The parent ID of the tag.
+              nullable: true
             type:
               type: string
+              nullable: true
+              default: null
               description: The tag type.
         - $ref: '#/components/schemas/InsertInfo'
 

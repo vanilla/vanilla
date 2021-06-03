@@ -10,6 +10,7 @@ import { reducerWithInitialState } from "typescript-fsa-reducers";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
 import { stableObjectHash } from "@vanilla/utils";
 import { IReaction } from "@dashboard/@types/api/reaction";
+import { ITag } from "@library/features/tags/TagsReducer";
 export interface IDiscussionsStoreState {
     discussions: IDiscussionState;
 }
@@ -24,6 +25,7 @@ interface IDiscussionState {
     deleteStatusesByID: Record<number, ILoadable>;
     postReactionStatusesByID: Record<number, ILoadable<{}>>;
     deleteReactionStatusesByID: Record<number, ILoadable<{}>>;
+    putTagsByID: Record<number, ILoadable<{}>>;
 }
 
 export const INITIAL_DISCUSSIONS_STATE: IDiscussionState = {
@@ -37,6 +39,7 @@ export const INITIAL_DISCUSSIONS_STATE: IDiscussionState = {
     changeTypeByID: {},
     postReactionStatusesByID: {},
     deleteReactionStatusesByID: {},
+    putTagsByID: {},
 };
 
 function setDiscussionReaction(
@@ -268,6 +271,34 @@ export const discussionsReducer = produce(
             setDiscussionReaction(state, discussionID, {
                 addReaction: currentReaction,
             });
+
+            return state;
+        })
+        .case(DiscussionActions.putDiscussionTagsACs.started, (state, params) => {
+            const { discussionID } = params;
+            state.putTagsByID[discussionID] = { status: LoadStatus.LOADING };
+            return state;
+        })
+        .case(DiscussionActions.putDiscussionTagsACs.done, (state, payload) => {
+            const { discussionID } = payload.params;
+
+            state.putTagsByID[discussionID] = {
+                status: LoadStatus.SUCCESS,
+            };
+            state.discussionsByID[discussionID] = {
+                ...state.discussionsByID[discussionID],
+                tags: payload.result,
+            };
+
+            return state;
+        })
+        .case(DiscussionActions.putDiscussionTagsACs.failed, (state, payload) => {
+            const { discussionID } = payload.params;
+
+            state.putTagsByID[discussionID] = {
+                status: LoadStatus.ERROR,
+                error: payload.error,
+            };
 
             return state;
         }),

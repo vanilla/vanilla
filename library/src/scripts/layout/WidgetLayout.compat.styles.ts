@@ -20,6 +20,7 @@ export function widgetLayoutCompactCSS() {
         .Content .DataList,
         .Content .Empty,
         .Content .DataTable,
+        .Content .DataListWrap,
         .Trace,
         .Content .MessageList`;
 
@@ -27,19 +28,14 @@ export function widgetLayoutCompactCSS() {
         [`.Frame-body .${EMPTY_WIDGET_LAYOUT.widgetClass}`]: classes.widgetMixin,
         [`.Frame-body .${EMPTY_WIDGET_LAYOUT.widgetWithContainerClass}`]: classes.widgetWithContainerMixin,
 
-        [`.Content .${EMPTY_WIDGET_LAYOUT.widgetClass},
-          .Content .DataList,
-          .Content .Empty,
-          .Content .DataTable,
-          .Trace,
-          .Content .MessageList
-        `]: panelLayoutClasses.mainPanelWidgetMixin,
+        [mainBodySelectors]: panelLayoutClasses.mainPanelWidgetMixin,
 
         [`.pageHeadingBox + .DataList,
           .pageHeadingBox + .Empty,
           .pageHeadingBox + .DataTable,
           .Content h2 + .${EMPTY_WIDGET_LAYOUT.widgetClass},
           .Content h2 + .DataList,
+          .Content h2 + .DataListWrap,
           .Content h2 + .Empty,
           .Content h2 + .DataTable`]: {
             marginTop: 0,

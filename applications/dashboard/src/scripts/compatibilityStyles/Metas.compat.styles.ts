@@ -47,6 +47,10 @@ export const metasCSS = () => {
             marginBottom: 0,
             verticalAlign: "middle",
         },
+        //e.g. in categorylist, a case when discussion name is very long, enable its wrapping on smaller views
+        "& .MostRecent > *, & .MostRecentBy > *": {
+            whiteSpace: "normal",
+        },
     });
 
     cssOut(`.Meta.Meta .MItem a`, {

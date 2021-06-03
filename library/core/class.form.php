@@ -491,6 +491,7 @@ class Gdn_Form extends Gdn_Pluggable {
      *                  display.
      *   Headings       Whether or not do display headings.
      *   EnableHeadings Whether or not headings should be enabled for selection.
+     *   FancyDisplay   Whether or not to try to use NewCategoryDropdown
      *
      * @return string
      */
@@ -682,8 +683,9 @@ class Gdn_Form extends Gdn_Pluggable {
             ],
             'items' => $items,
         ];
-
-        if (Gdn::themeFeatures()->get("NewCategoryDropdown")) {
+        $canUseFancyDisplay = $options['FancyDisplay'] ?? !inSection('Dashboard');
+        $useNewCategoryDropdown = $canUseFancyDisplay && Gdn::themeFeatures()->get("NewCategoryDropdown");
+        if ($useNewCategoryDropdown) {
             return TwigStaticRenderer::renderReactModule('CategoryPicker', $props);
         } else {
             return $return.'</select>';

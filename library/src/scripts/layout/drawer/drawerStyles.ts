@@ -4,12 +4,12 @@
  * @license GPL-2.0-only
  */
 
+import { css } from "@emotion/css";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { debugHelper } from "@library/styles/styleHelpers";
 import { styleUnit } from "@library/styles/styleUnit";
 import { componentThemeVariables } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
-import { style } from "@library/styles/styleShim";
 import { percent } from "csx";
 
 export const drawerVariables = useThemeCache(() => {
@@ -41,26 +41,26 @@ export const drawerClasses = useThemeCache(() => {
     const vars = drawerVariables();
     const debug = debugHelper("drawer");
 
-    const root = style({
+    const root = css({
         display: "block",
         position: "relative",
         ...debug.name(),
     });
 
-    const contents = style({
+    const contents = css({
         position: "relative",
         width: percent(100),
         ...debug.name("contents"),
     });
 
-    const toggle = style({
+    const toggle = css({
         fontWeight: vars.fonts.weight,
         padding: `${styleUnit(vars.spacing.button.padding)} 0`,
         width: percent(100),
         textAlign: "left",
         ...debug.name("toggle"),
     });
-    const icon = style({
+    const icon = css({
         display: "inline-flex",
         minWidth: styleUnit(vars.sizing.icon),
         fontSize: styleUnit(vars.fonts.size),

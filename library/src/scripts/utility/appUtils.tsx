@@ -70,20 +70,16 @@ export function setMeta(key: string, value: any) {
  * @see https://stackoverflow.com/questions/5717093/check-if-a-javascript-string-is-a-url#answer-5717133
  * @param url
  */
-export function isURL(url: string, requireTLD: boolean = true) {
-    const tld = requireTLD ? "" : "?";
-    const pattern = new RegExp(
-        "^(https?:\\/\\/)?" + // protocol
-        "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
-        "((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
-        "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
-        "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
-            "(\\#[-a-z\\d_]*)" +
-            tld +
-            "$",
-        "i",
-    ); // fragment locator
-    return pattern.test(url);
+export function isURL(url: string): boolean {
+    let constructed;
+
+    try {
+        constructed = new URL(url);
+    } catch (_) {
+        return false;
+    }
+
+    return constructed.protocol === "http:" || constructed.protocol === "https:";
 }
 
 /**

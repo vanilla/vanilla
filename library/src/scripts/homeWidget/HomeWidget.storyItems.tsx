@@ -28,7 +28,6 @@ export interface IDummyWidgetItemProps {
     noCounts?: boolean;
     noBorder?: boolean;
     iconBackground?: boolean;
-    callToAction?: string;
 }
 
 export function dummyWidgetItemProps(props?: IDummyWidgetItemProps): IHomeWidgetItemProps {
@@ -44,7 +43,6 @@ export function dummyWidgetItemProps(props?: IDummyWidgetItemProps): IHomeWidget
                 borderType: props?.noBorder ? BorderType.NONE : undefined,
             },
         },
-        callToAction: "Learn more",
         url: "https://vanillaforums.com/en/",
         imageUrl: props?.imageMissing ? undefined : STORY_IMAGE,
         iconUrl: props?.imageMissing ? undefined : props?.iconCustomUrl ? props.iconCustomUrl : STORY_ICON,

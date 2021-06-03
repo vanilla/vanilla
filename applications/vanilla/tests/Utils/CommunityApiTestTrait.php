@@ -96,7 +96,7 @@ trait CommunityApiTestTrait {
         $categoryID = $overrides['categoryID'] ?? $this->lastInsertedCategoryID ?? -1;
 
         if ($categoryID === null) {
-            throw new \Exception('Could not insert a test discussion because no category was specified.');
+            throw new \RuntimeException('Could not insert a test discussion because no category was specified.');
         }
 
         $params = $overrides + [

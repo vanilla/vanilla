@@ -5,19 +5,17 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "@library/styles/globalStyleVars";
 import { MixinsFoundation } from "@library/styles/MixinsFoundation";
 import { conversationVariables } from "@dashboard/compatibilityStyles/pages/Conversation.variables";
-import { cssRaw } from "@library/styles/styleShim";
+import { injectGlobal } from "@emotion/css";
 
 export const conversationCompatCSS = () => {
-    const globalVars = globalVariables();
     const vars = conversationVariables();
 
     MixinsFoundation.contentBoxes(vars.contentBoxes, "Conversation");
     MixinsFoundation.contentBoxes(vars.panelBoxes, "Conversation", ".Panel");
 
-    cssRaw({
+    injectGlobal({
         ".Section-Conversation .Panel": {
             "& .Button + .Button": {
                 // fix excesive margins on the New message + Leave conversation buttons.

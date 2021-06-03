@@ -65,6 +65,14 @@ class SettingsController extends DashboardController {
     }
 
     /**
+     * Render the language settings page.
+     */
+    public function language() {
+        $this->permission('Garden.Settings.Manage');
+        $this->render('language');
+    }
+
+    /**
      * Highlight menu path. Automatically run on every use.
      *
      * @since 2.0.0
@@ -743,67 +751,7 @@ class SettingsController extends DashboardController {
      */
     public function layout() {
         $this->permission('Garden.Settings.Manage');
-
-        // Page setup
-        $this->setHighlightRoute('dashboard/settings/layout');
-        $this->title(t('Homepage'));
-
-        $currentRoute = val('Destination', Gdn::router()->getRoute('DefaultController'), '');
-        $this->setData('CurrentTarget', $currentRoute);
-        if (!$this->Form->authenticatedPostBack()) {
-            $this->Form->setData([
-                'Target' => $currentRoute
-            ]);
-        } else {
-            $newRoute = val('Target', $this->Form->formValues(), '');
-            Gdn::router()->deleteRoute('DefaultController');
-            Gdn::router()->setRoute('DefaultController', $newRoute, 'Internal');
-            $this->setData('CurrentTarget', $newRoute);
-
-            // Save the preferred layout setting
-            saveToConfig([
-                'Vanilla.Discussions.Layout' => val('DiscussionsLayout', $this->Form->formValues(), ''),
-                'Vanilla.Categories.Layout' => val('CategoriesLayout', $this->Form->formValues(), '')
-            ]);
-
-            $this->informMessage(t("Your changes were saved successfully."));
-        }
-
-        /** @var \Vanilla\Site\SiteSectionModel $siteSectionModel */
-        $siteSectionModel = Gdn::getContainer()->get(\Vanilla\Site\SiteSectionModel::class);
-        $this->setData('defaultRouteOptions', $siteSectionModel->getDefaultRoutes());
-
-        // Add warnings for layouts that have been specified by the theme.
-        $themeManager = Gdn::themeManager();
-        $theme = $themeManager->enabledThemeInfo();
-        $layout = val('Layout', $theme);
-
-        $warningText = t('Your theme has specified the layout selected below. Changing the layout may make your theme look broken.');
-        $warningAlert = wrap($warningText, 'div', ['class' => 'alert alert-warning padded']);
-        $dangerText = t('Your theme recommends the %s layout, but you\'ve selected the %s layout. This may make your theme look broken.');
-        $dangerAlert = wrap($dangerText, 'div', ['class' => 'alert alert-danger padded']);
-
-        if (val('Discussions', $layout)) {
-            $dicussionsLayout = strtolower(val('Discussions', $layout));
-            if ($dicussionsLayout != c('Vanilla.Discussions.Layout')) {
-                $discussionsAlert = sprintf($dangerAlert, $dicussionsLayout, c('Vanilla.Discussions.Layout'));
-            } else {
-                $discussionsAlert = $warningAlert;
-            }
-            $this->setData('DiscussionsAlert', $discussionsAlert);
-        }
-
-        if (val('Categories', $layout)) {
-            $categoriesLayout = strtolower(val('Categories', $layout));
-            if ($categoriesLayout != c('Vanilla.Categories.Layout')) {
-                $categoriesAlert = sprintf($dangerAlert, $categoriesLayout, c('Vanilla.Categories.Layout'));
-            } else {
-                $categoriesAlert = $warningAlert;
-            }
-            $this->setData('CategoriesAlert', $categoriesAlert);
-        }
-
-        $this->render();
+        $this->render('layout');
     }
 
     /**
@@ -831,7 +779,6 @@ class SettingsController extends DashboardController {
         $configurationModel->setField([
             self::CONFIG_TRUSTED_DOMAINS,
             self::CONFIG_CSP_DOMAINS,
-            'Garden.Format.WarnLeaving',
             HstsModel::MAX_AGE_KEY,
             HstsModel::INCLUDE_SUBDOMAINS_KEY,
             HstsModel::PRELOAD_KEY,

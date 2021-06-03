@@ -10,8 +10,10 @@ import { DeleteCategoryModal } from "@vanilla/addon-vanilla/categories/DeleteCat
 import { onReady, onContent } from "@library/utility/appUtils";
 import { suggestedTextStyleHelper } from "@library/features/search/suggestedTextStyles";
 import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
+import { CategoryPicker } from "@library/forms/select/CategoryPicker";
+import { addComponent } from "@library/utility/componentRegistry";
 cssOut(`.suggestedTextInput-option`, suggestedTextStyleHelper({ forDashboard: true }).option);
-
+addComponent("CategoryPicker", CategoryPicker, { overwrite: true });
 onReady(handleImageUploadInputDisplay);
 onContent(handleImageUploadInputDisplay);
 

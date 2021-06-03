@@ -28,12 +28,11 @@ import { styleUnit } from "@library/styles/styleUnit";
 import { Mixins } from "@library/styles/Mixins";
 import { IMenuBarRadioButton } from "@rich-editor/menuBar/paragraph/items/ParagraphMenuBarRadioGroup";
 import ParagraphMenuSpecialBlockTabContent from "@rich-editor/menuBar/paragraph/tabs/ParagraphMenuSpecialBlockTabContent";
-import { style } from "@library/styles/styleShim";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { IParagraphMenuState } from "@rich-editor/menuBar/paragraph/formats/formatting";
 import Formatter from "@rich-editor/quill/Formatter";
 import { TabHandler } from "@vanilla/dom-utils";
-import ScreenReaderContent from "@library/layout/ScreenReaderContent";
+import { css } from "@emotion/css";
 
 interface IProps {
     className?: string;
@@ -98,7 +97,7 @@ export default class ParagraphMenuBar extends React.PureComponent<IProps, IState
         const { menuActiveFormats, formatter } = this.props;
         const classes = richEditorClasses(this.props.legacyMode);
         const globalStyles = globalVariables();
-        const iconStyle = style({
+        const iconStyle = css({
             width: styleUnit(globalStyles.icon.sizes.default),
             height: styleUnit(globalStyles.icon.sizes.default),
         });
@@ -220,7 +219,7 @@ export default class ParagraphMenuBar extends React.PureComponent<IProps, IState
                 <div
                     id={MyContent.get}
                     role="menu"
-                    className={!menu.open ? style(Mixins.absolute.srOnly()) : undefined}
+                    className={!menu.open ? css(Mixins.absolute.srOnly()) : undefined}
                     aria-hidden={!menu.open}
                     key={`menuBarPanel-${index}`}
                 >

@@ -22,30 +22,96 @@ class CategoryValidationConflictsTest extends AbstractAPIv2Test {
     /**
      * Test get categories api index conflicting params: featured, followed, categoryID etc
      *
-     * @param array $params
-     * @param array|null $results
-     * @param string|null $exception
      * @depends testPrepareCategories
-     * @dataProvider categoriesProvider
      */
-    public function testCategories(array $params, ?array $results, ?string $exception) {
+    public function testCategories() {
+        /**
+         * All data providers are executed before both the call to the setUpBeforeClass() static method
+         * and the first call to the setUp() method.
+         * Because of that you can’t access any variables you create there from within a data provider.
+         * This is required in order for PHPUnit to be able to compute the total number of tests.
+         */
+        $provider = [
+            'No params' => [
+                [],
+                ['1'],
+                null
+            ],
+            'categoryID' => [
+                ['categoryID' => self::$data['1']['categoryID']],
+                ['1'],
+                null
+            ],
+            'featured' => [
+                ['featured' => true],
+                ['1.2'],
+                null
+            ],
+            'followed' => [
+                ['followed' => true],
+                ['1.1'],
+                null
+            ],
+            'archived' => [
+                ['archived' => true],
+                [],
+                null
+            ],
+            'categoryID & featured' => [
+                [
+                    'categoryID' => 100,
+                    'featured' => true
+                ],
+                null,
+                ClientException::class
+            ],
+            'categoryID & followed' => [
+                [
+                    'categoryID' => 100,
+                    'followed' => true
+                ],
+                null,
+                ClientException::class
+            ],
+            'categoryID & archived' => [
+                [
+                    'categoryID' => 100,
+                    'archived' => false
+                ],
+                null,
+                ClientException::class
+            ],
+            'featured & followed' => [
+                [
+                    'followed' => true,
+                    'featured' => true
+                ],
+                null,
+                ClientException::class
+            ],
+        ];
 
-        if ($results !== null) {
-            $categories = $this->api()->get('/categories', $params)->getBody();
-            $this->assertEquals(count($results), count($categories));
-            foreach ($results as $key) {
-                $found = false;
-                foreach ($categories as $category) {
-                    if ($category['categoryID'] === self::$data[$key]['categoryID']) {
-                        $found = true;
-                        break;
+        foreach ($provider as $key => $item) {
+            $params = $item[0];
+            $results= $item[1];
+            $exception = $item[2];
+            if ($results !== null) {
+                $categories = $this->api()->get('/categories', $params)->getBody();
+                $this->assertEquals(count($results), count($categories), "[$key] assertEquals failed");
+                foreach ($results as $key) {
+                    $found = false;
+                    foreach ($categories as $category) {
+                        if ($category['categoryID'] === self::$data[$key]['categoryID']) {
+                            $found = true;
+                            break;
+                        }
                     }
+                    $this->assertTrue($found, "[$key] Expected category: ".self::$data[$key]['categoryID'].' not found in api result set.');
                 }
-                $this->assertTrue($found, 'Expected category: '.self::$data[$key]['categoryID'].' not found in api result set.');
+            } else {
+                $this->expectException($exception);
+                $this->api()->get('/categories', $params)->getBody();
             }
-        } else {
-            $this->expectException($exception);
-            $categories = $this->api()->get('/categories', $params)->getBody();
         }
     }
 

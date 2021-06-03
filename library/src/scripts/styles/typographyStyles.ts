@@ -1,23 +1,20 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import { styleFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { color, em, percent } from "csx";
+import { em } from "csx";
 import { styleUnit } from "@library/styles/styleUnit";
-import { containerVariables } from "@library/layout/components/containerStyles";
 import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
-import { CSSObject } from "@emotion/css";
+import { css, CSSObject } from "@emotion/css";
 import { Mixins } from "@library/styles/Mixins";
 
 export const typographyClasses = useThemeCache(() => {
-    const style = styleFactory("typography");
     const globalVars = globalVariables();
     const mediaQueries = panelLayoutVariables().mediaQueries();
 
@@ -25,8 +22,7 @@ export const typographyClasses = useThemeCache(() => {
         color: ColorsUtils.colorOut(globalVars.mainColors.fgHeading),
     };
 
-    const pageTitle = style(
-        "pageTitle",
+    const pageTitle = css(
         {
             ...sharedTitleStyle,
             width: "100%",
@@ -43,8 +39,7 @@ export const typographyClasses = useThemeCache(() => {
         }),
     );
 
-    const largeTitle = style(
-        "largeTitle",
+    const largeTitle = css(
         {
             ...sharedTitleStyle,
             width: "100%",
@@ -57,7 +52,7 @@ export const typographyClasses = useThemeCache(() => {
         }),
     );
 
-    const subTitle = style("subTitle", {
+    const subTitle = css({
         ...sharedTitleStyle,
         width: "100%",
         // fontSize: styleUnit(globalVars.fonts.size.title),
@@ -66,7 +61,7 @@ export const typographyClasses = useThemeCache(() => {
         }),
     });
 
-    const componentSubTitle = style("componentSubTitle", {
+    const componentSubTitle = css({
         ...sharedTitleStyle,
         width: "100%",
         ...Mixins.font({

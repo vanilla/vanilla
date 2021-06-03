@@ -25,6 +25,7 @@ export function WidgetFormGenerator(props: IProps) {
     return (
         <JsonSchemaForm
             {...props}
+            autoValidate
             FormSection={({ title, children }) => (
                 <>
                     {title && <DashboardFormSubheading>{title}</DashboardFormSubheading>}

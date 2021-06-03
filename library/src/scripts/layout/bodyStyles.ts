@@ -7,11 +7,11 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { percent, viewHeight } from "csx";
-import { cssRule, style } from "@library/styles/styleShim";
+import { cssRule } from "@library/styles/styleShim";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { homePageVariables } from "@library/layout/homePageStyles";
 import isEmpty from "lodash/isEmpty";
-import { CSSObject } from "@emotion/css";
+import { css, CSSObject } from "@emotion/css";
 import { Mixins } from "@library/styles/Mixins";
 
 export const bodyCSS = useThemeCache(() => {
@@ -31,7 +31,7 @@ export const bodyCSS = useThemeCache(() => {
         wordBreak: "break-word",
     };
 
-    const bodyClass = style({ ...htmlBodyMixin, label: "vanillaBodyReset" });
+    const bodyClass = css({ ...htmlBodyMixin, label: "vanillaBodyReset" });
     document.body.classList.add(bodyClass);
 
     cssRule("*", {

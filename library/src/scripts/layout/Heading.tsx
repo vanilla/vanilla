@@ -7,7 +7,7 @@
 import React from "react";
 import classNames from "classnames";
 import { typographyClasses } from "@library/styles/typographyStyles";
-import { cx } from "@library/styles/styleShim";
+import { cx } from "@emotion/css";
 
 export interface ICommonHeadingProps {
     id?: string;
@@ -15,6 +15,7 @@ export interface ICommonHeadingProps {
     renderAsDepth?: number;
     className?: string;
     title?: React.ReactNode;
+    custom?: boolean;
 }
 
 export interface IHeadingProps extends ICommonHeadingProps, Omit<React.HTMLAttributes<HTMLHeadingElement>, "title"> {
@@ -26,7 +27,7 @@ export interface IHeadingProps extends ICommonHeadingProps, Omit<React.HTMLAttri
  * A component representing a element.
  */
 const Heading = React.forwardRef<HTMLHeadingElement, IHeadingProps>(function Heading(props: IHeadingProps, ref) {
-    const { children, title, depth, renderAsDepth, className, isLarge, ...restProps } = props;
+    const { children, title, depth, renderAsDepth, className, isLarge, custom, ...restProps } = props;
     const finalDepth = depth ?? 2;
     const finalRenderDepth = renderAsDepth ?? finalDepth;
 
@@ -43,13 +44,13 @@ const Heading = React.forwardRef<HTMLHeadingElement, IHeadingProps>(function Hea
             ref={ref}
             className={cx(
                 {
-                    [classes.pageTitle]: isPageTitle,
-                    [classes.largeTitle]: isLarge,
-                    [classes.subTitle]: isSubTitle,
-                    [classes.componentSubTitle]: isComponentSubTitle,
+                    [classes.pageTitle]: isPageTitle && !custom,
+                    [classes.largeTitle]: isLarge && !custom,
+                    [classes.subTitle]: isSubTitle && !custom,
+                    [classes.componentSubTitle]: isComponentSubTitle && !custom,
                 },
-                "heading",
-                `heading-${finalRenderDepth}`,
+                !custom && "heading",
+                !custom && `heading-${finalRenderDepth}`,
                 className,
             )}
         >

@@ -39,7 +39,7 @@
                             ?>
                         </div>
                         <div class="Summary">
-                            <?php echo $Row['Summary']; ?>
+                            <?php echo htmlspecialchars($Row['Summary']); ?>
                         </div>
                         <?php
                         $Count = val('Count', $Row);

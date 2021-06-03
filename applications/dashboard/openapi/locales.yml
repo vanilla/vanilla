@@ -1,7 +1,7 @@
 openapi: 3.0.2
 info:
 paths:
-  '/locales':
+  /locales:
     get:
       summary: Get all enabled locales on the site.
       tags:
@@ -15,7 +15,33 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Locale'
-  '/locales/translations/{locale}':
+  /locales/{locale}:
+    get:
+      summary: Get single locale
+      tags:
+        - Locales
+      parameters:
+        - $ref: '#/components/parameters/LocaleCodeParameter'
+      responses:
+        '200':
+          description: The specified locale information
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/LocaleConfig'
+    patch:
+      tags:
+        - Locales
+      parameters:
+        - $ref: '#/components/parameters/LocaleCodeParameter'
+      responses:
+        '200':
+          description: The specified locale information
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/LocaleConfig'
+  /locales/translations/{locale}:
     get:
       summary: Get all of the application's translation strings.
       tags:
@@ -33,7 +59,7 @@ paths:
                 additionalProperties:
                   type: string
           description: Success
-  '/locales/translations/{locale}.js':
+  /locales/translations/{locale}.js:
     get:
       summary: Get the application's translations strings as a javascrpt file.
       description: |
@@ -89,3 +115,6 @@ components:
           description: Translatable names of the
           example: { "en": "French", "fr": "Français", "de": "Französisch" }
       type: object
+    LocaleConfig:
+      allOf:
+        - $ref: '#/components/schemas/Locale'

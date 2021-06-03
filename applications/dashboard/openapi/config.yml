@@ -77,6 +77,15 @@ components:
                     x-key: Garden.HomepageTitle
                     x-read: public
                     x-write: community.manage
+                "garden.locale":
+                    description: |
+                      The default locale for your site. This will be the source language for your community.
+                    type: string
+                    default: "en"
+                    maxLength: 100
+                    x-key: Garden.Locale
+                    x-read: public
+                    x-write: site.manage
                 "garden.orgName":
                     description: |
                         Your organization name is used for SEO microdata and JSON+LD.
@@ -133,5 +142,43 @@ components:
                     default: false
                     example: true
                     x-key: Feature.NewQuickLinks.Enabled
+                    x-read: public
+                    x-write: site.manage
+                "discussions.layout":
+                    description: |
+                        Choose the preferred layout for lists of discussions.
+                    type: string
+                    default: "foundation"
+                    enum:
+                        - "modern"
+                        - "table"
+                        - "foundation"
+                    x-key: Vanilla.Discussions.Layout
+                    x-read: public
+                    x-write: site.manage
+                "categories.layout":
+                    description: |
+                        Choose the preferred layout for lists of categories.
+                    type: string
+                    default: "modern"
+                    enum:
+                        - "modern"
+                        - "table"
+                        - "mixed"
+                        - "foundation"
+                    x-key: Vanilla.Categories.Layout
+                    x-read: public
+                    x-write: site.manage
+                "routes.defaultController":
+                    type: array
+                    minItems: 2
+                    maxItems: 2
+                    items:
+                        type: string
+                    description: >-
+                        Define the routing rule for the home page.
+                        The first item is the URL or route to send the home page to.
+                        The second item is the type of redirect to perform. It must be one of "Internal", "Temporary" and "Permanent"
+                    x-key: Routes.DefaultController
                     x-read: public
                     x-write: site.manage

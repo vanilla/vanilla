@@ -4,13 +4,13 @@
  */
 
 import { styleUnit } from "@library/styles/styleUnit";
-import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { themeCardVariables } from "./themePreviewCardStyles";
 import { percent, color, px } from "csx";
 import { Mixins } from "@library/styles/Mixins";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { css } from "@emotion/css";
 
 export const currentThemeVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("currentThemeInfo");
@@ -65,9 +65,7 @@ export const currentThemeClasses = useThemeCache(() => {
     const vars = currentThemeVariables();
     const globalVars = globalVariables();
 
-    const style = styleFactory("currentThemeInfo");
-
-    const root = style({
+    const root = css({
         display: "flex",
         flexWrap: "wrap",
         backgroundColor: "#f6f9fb",
@@ -79,12 +77,12 @@ export const currentThemeClasses = useThemeCache(() => {
         marginRight: -18,
     });
 
-    const cardContainer = style("cardContainer", {
+    const cardContainer = css({
         maxWidth: percent(100),
         width: styleUnit(400),
     });
 
-    const themeContainer = style("themeContainer", {
+    const themeContainer = css({
         display: "flex",
         flex: 1,
         ...Mixins.margin({
@@ -97,7 +95,7 @@ export const currentThemeClasses = useThemeCache(() => {
         position: "relative",
     });
 
-    const flag = style("flag", {
+    const flag = css({
         display: "inline-block",
         paddingLeft: styleUnit(vars.flag.padding.left),
         paddingRight: styleUnit(vars.flag.padding.right),
@@ -112,7 +110,7 @@ export const currentThemeClasses = useThemeCache(() => {
         marginBottom: styleUnit(vars.flag.margin.bottom - 2),
     });
 
-    const name = style("name", {
+    const name = css({
         ...Mixins.font({
             ...globalVars.fontSizeAndWeightVars("large"),
             color: globalVars.mainColors.fg.toString(),
@@ -125,7 +123,7 @@ export const currentThemeClasses = useThemeCache(() => {
         },
     });
 
-    const authorName = style("authorName", {
+    const authorName = css({
         ...Mixins.font({
             ...globalVars.fontSizeAndWeightVars("small", "normal"),
             color: ColorsUtils.colorOut(globalVars.mainColors.primary),
@@ -138,7 +136,7 @@ export const currentThemeClasses = useThemeCache(() => {
         },
     });
 
-    const description = style("description", {
+    const description = css({
         ...Mixins.font({
             ...globalVars.fontSizeAndWeightVars("medium", "normal"),
             color: globalVars.mainColors.fg.toString(),
@@ -146,14 +144,14 @@ export const currentThemeClasses = useThemeCache(() => {
         }),
     });
 
-    const themeActionButtons = style("themeActionButtons", {
+    const themeActionButtons = css({
         flexDirection: "column",
         display: "flex",
         flex: 0,
         marginTop: styleUnit(vars.themeContainer.margin.top + 10),
     });
 
-    const themeActionButton = style("themeActionButton", {
+    const themeActionButton = css({
         ...{
             "&&": {
                 marginBottom: styleUnit(vars.flag.margin.bottom),
@@ -162,7 +160,7 @@ export const currentThemeClasses = useThemeCache(() => {
         },
     });
 
-    const themeInfo = style("themeInfo", {
+    const themeInfo = css({
         flex: 1,
         width: percent(100),
         minWidth: px(220),

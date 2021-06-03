@@ -37,7 +37,6 @@ class QuoteEmbedFilter implements EmbedFilterInterface {
         $this->userProvider = $userProvider;
     }
 
-
     /**
      * @inheritdoc
      */

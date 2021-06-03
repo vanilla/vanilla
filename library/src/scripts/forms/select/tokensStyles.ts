@@ -125,7 +125,7 @@ export const tokensClasses = useThemeCache(() => {
         },
     });
 
-    const inputWrap = style("inputWrarp", {
+    const inputWrap = style("inputWrap", {
         ...{
             "&.hasFocus .inputBlock-inputText": {
                 ...Mixins.border({

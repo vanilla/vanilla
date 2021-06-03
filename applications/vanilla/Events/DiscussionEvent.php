@@ -35,6 +35,8 @@ class DiscussionEvent extends ResourceEvent implements LoggableEventInterface {
         $context = LoggerUtils::resourceEventLogContext($this);
         $context['discussion'] = array_intersect_key($this->payload["discussion"] ?? [], [
             "discussionID" => true,
+            "categoryID" => true,
+            "type" => true,
             "dateInserted" => true,
             "dateUpdated" => true,
             "updateUserID" => true,

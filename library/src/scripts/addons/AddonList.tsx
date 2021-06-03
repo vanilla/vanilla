@@ -5,7 +5,6 @@
 
 import React from "react";
 
-import Addon, { IAddon } from "@library/addons/Addon";
 import { List } from "@library/lists/List";
 import { PageBox } from "@library/layout/PageBox";
 import { BorderType } from "@library/styles/styleHelpersBorders";

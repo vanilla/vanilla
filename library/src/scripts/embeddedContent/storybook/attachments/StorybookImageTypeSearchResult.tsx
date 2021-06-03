@@ -4,7 +4,6 @@ import { ResultMeta } from "@library/result/ResultMeta";
 import { PublishStatus } from "@library/@types/api/core";
 import { TypeDiscussionsIcon } from "@library/icons/searchIcons";
 import React from "react";
-import Result from "@library/result/Result";
 
 const dummyUserFragment = {
     userID: 1,
@@ -37,7 +36,6 @@ export function StoryBookImageTypeSearchResult(props: {
         <>
             <StoryHeading>{`Image type: "${props.type}" with ratio (${ratio})`}</StoryHeading>
             <ResultList
-                result={Result}
                 results={[
                     {
                         name: `Example search result - Big Image {"${props.type}"} with ratio (${ratio})`,

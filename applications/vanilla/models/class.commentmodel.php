@@ -14,7 +14,10 @@ use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use Psr\SimpleCache\CacheInterface;
 use Vanilla\Attributes;
+use Vanilla\Community\Schemas\PostFragmentSchema;
 use Vanilla\Events\LegacyDirtyRecordTrait;
+use Vanilla\Exception\Database\NoResultsException;
+use Vanilla\Exception\PermissionException;
 use Vanilla\Formatting\Formats\RichFormat;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\FormatFieldTrait;
@@ -1411,8 +1414,10 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
      */
     public function eventFromRow(array $row, string $action, ?array $sender = null): ResourceEvent {
         $this->userModel->expandUsers($row, ["InsertUserID"]);
+        $row = $this->addDiscussionData($row);
         $comment = $this->normalizeRow($row);
-        $comment = $this->schema()->validate($comment);
+        $out = $this->schema()->merge(Schema::parse(['discussion:o' => SchemaFactory::get(PostFragmentSchema::class, "PostFragment")]));
+        $comment = $out->validate($comment);
 
         if ($sender) {
             $senderSchema = new UserFragmentSchema();
@@ -1870,6 +1875,34 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
     }
 
     /**
+     * Check if the user has the correct permissions to delete a comment. Throws an error if not.
+     *
+     * @param int $commentID
+     *
+     * @throws NoResultsException If the record wasn't found.
+     * @throws PermissionException If the user doesn't have permission to delete.
+     */
+    public function checkCanDelete(int $commentID) {
+        $comment = $this->getID($commentID);
+        if ($comment === false) {
+            throw new NoResultsException('Comment');
+        }
+
+        $discussion = $this->discussionModel->getID($comment->DiscussionID);
+        if ($discussion === false) {
+            throw new NoResultsException('Discussion');
+        }
+
+        $allowsSelfDelete = Gdn::config('Vanilla.Comments.AllowSelfDelete');
+        $isOwnPost = $comment->InsertUserID === Gdn::session()->UserID;
+
+
+        if (!$allowsSelfDelete || !$isOwnPost) {
+            $this->discussionModel->categoryPermission('Vanilla.Comments.Delete', $discussion->CategoryID);
+        }
+    }
+
+    /**
      * Modifies comment data before it is returned.
      *
      * @since 2.1a32
@@ -2007,5 +2040,17 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
         $comment = (object)$comment;
         $result = "/discussion/comment/{$comment->CommentID}#Comment_{$comment->CommentID}";
         return url($result, $withDomain);
+    }
+
+    /**
+     * Add a 'discussion' field to the comment that contains the discussion data.
+     *
+     * @param array $row The row of comment data.
+     * @return array
+     */
+    private function addDiscussionData(array $row): array {
+        $row['discussion'] = $this->discussionModel->getID($row['DiscussionID'], DATASET_TYPE_ARRAY);
+        $row['discussion']['Type'] = $row['discussion']['Type'] ?? 'discussion';
+        return $row;
     }
 }

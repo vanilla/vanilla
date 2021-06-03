@@ -16,7 +16,7 @@ import { getOptions } from "../buildOptions";
  * @param section - The section of the app to build. Eg. forum | admin | knowledge.
  */
 export async function makeDevConfig(entryModel: EntryModel, section: string) {
-    const baseConfig: Configuration = await makeBaseConfig(entryModel, section);
+    const baseConfig: Configuration = await makeBaseConfig(entryModel, section, true);
     const sectionEntries = await entryModel.getDevEntries(section);
     baseConfig.mode = "development";
     baseConfig.entry = sectionEntries;

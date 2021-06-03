@@ -26,7 +26,7 @@ export const twoColumnLayoutVariables = useThemeCache(
         const foundationalWidths = makeThemeVars("foundationalWidths", {
             fullGutter,
             minimalMiddleColumnWidth: 600,
-            panelWidth: 343,
+            panelWidth: 292,
             breakPoints: {
                 xs: layoutVars.foundationalWidths.breakPoints.xs,
             }, // Other break point are calculated

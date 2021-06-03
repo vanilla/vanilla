@@ -33,7 +33,7 @@ interface IProps {
 
 export function HomeWidget(props: IProps) {
     const itemOptions = homeWidgetItemVariables(props.itemOptions).options;
-    const containerOptionsWithDefaults = { ...props.containerOptions, isGrid: true };
+    const containerOptionsWithDefaults = { ...props.containerOptions, isGrid: !props.containerOptions?.isCarousel };
     const containerOptions = homeWidgetContainerVariables(containerOptionsWithDefaults).options;
     const containerClasses = homeWidgetContainerClasses(props.containerOptions);
 
@@ -51,7 +51,8 @@ export function HomeWidget(props: IProps) {
             HomeWidgetItemContentType.TITLE_DESCRIPTION_ICON,
             HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
         ].includes(itemOptions.contentType) &&
-        props.itemData.length < containerOptions.maxColumnCount
+        props.itemData.length < containerOptions.maxColumnCount &&
+        !containerOptions.isCarousel
     ) {
         extraSpacerItemCount = containerOptions.maxColumnCount - props.itemData.length;
     }

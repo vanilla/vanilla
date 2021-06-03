@@ -40,6 +40,17 @@ class UrlUtils {
     }
 
     /**
+     * Verify if domain string is Ascii.
+     *
+     * @param string $domain
+     * @return bool
+     */
+    public static function isAsciiDomain(string $domain): bool {
+        // detect if any character falls out of the Ascii chars list.
+        return (preg_match('/[^\x20-\x7e]/', $domain) == 0);
+    }
+
+    /**
      * Generate a new URI by replacing querystring elements from an existing URI.
      *
      * @param UriInterface $uri The base URI.

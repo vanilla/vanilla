@@ -127,7 +127,7 @@ trait FloodControlTrait {
      * @return string
      */
     public function getKeyLastDateChecked() {
-        return $this->keyLastDateChecked ?: $this->getDefaultKeyLastDateChecked;
+        return $this->keyLastDateChecked ?: $this->getDefaultKeyLastDateChecked();
     }
 
     /**

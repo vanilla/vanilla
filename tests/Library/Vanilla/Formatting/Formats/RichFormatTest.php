@@ -7,17 +7,22 @@
 
 namespace VanillaTests\Library\Vanilla\Formatting\Formats;
 
+use PHPUnit\Framework\TestCase;
 use Vanilla\Contracts\Formatting\FormatInterface;
 use Vanilla\EmbeddedContent\Embeds\ImageEmbed;
 use Vanilla\EmbeddedContent\EmbedService;
 use Vanilla\Formatting\Formats\RichFormat;
-use Vanilla\Formatting\Quill\Parser;
+use VanillaTests\EventSpyTestTrait;
 use VanillaTests\Fixtures\Formatting\FormatFixtureFactory;
+use VanillaTests\SiteTestTrait;
 
 /**
  * Tests for the RichFormat.
  */
-class RichFormatTest extends AbstractFormatTestCase {
+class RichFormatTest extends TestCase {
+
+    use SiteTestTrait;
+    use EventSpyTestTrait;
 
     /**
      * @inheritDoc

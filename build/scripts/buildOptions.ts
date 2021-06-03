@@ -28,6 +28,10 @@ yargs
     .options("config", {
         default: "config.php",
     })
+    .options("clean-cache", {
+        default: false,
+        boolean: true,
+    })
     .options("fix", {
         alias: "f",
         default: false,
@@ -52,12 +56,18 @@ yargs
         string: true,
         default: "",
     })
-    .options("debug", { default: false, boolean: true });
+    .options("debug", { default: false, boolean: true })
+    .options("modern", {
+        alias: "m",
+        default: false,
+        boolean: true,
+    });
 
 export interface IBuildOptions {
     mode: BuildMode;
     verbose: boolean;
     fix: boolean;
+    cleanCache: boolean;
     install: boolean;
     lowMemory: boolean;
     enabledAddonKeys: string[];
@@ -67,6 +77,7 @@ export interface IBuildOptions {
     debug: boolean;
     circular: boolean;
     sections: string[] | null;
+    modern: boolean;
 }
 
 /**
@@ -122,6 +133,7 @@ export async function getOptions(): Promise<IBuildOptions> {
     return {
         mode: yargs.argv.mode as BuildMode,
         verbose: yargs.argv.verbose as boolean,
+        cleanCache: yargs.argv["clean-cache"] as boolean,
         enabledAddonKeys,
         lowMemory: yargs.argv["low-memory"] as boolean,
         configFile: yargs.argv.config as string,
@@ -132,5 +144,6 @@ export async function getOptions(): Promise<IBuildOptions> {
         debug: yargs.argv.debug as boolean,
         circular: yargs.argv.circular as boolean,
         sections,
+        modern: yargs.argv.modern as boolean,
     };
 }

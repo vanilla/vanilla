@@ -16,7 +16,7 @@ import { DIST_DIRECTORY, VANILLA_ROOT } from "./env";
 import { BuildMode, getOptions, IBuildOptions } from "./buildOptions";
 import EntryModel from "./utility/EntryModel";
 import { copyMonacoEditorModule, installYarn } from "./utility/moduleUtils";
-import { fail, print } from "./utility/utils";
+import { fail, print, printSection } from "./utility/utils";
 
 /**
  * A class to build frontend assets.
@@ -51,6 +51,10 @@ export default class Builder {
      * Run the build based on the provided options.
      */
     public async build() {
+        if (this.options.cleanCache) {
+            await fse.emptyDir(path.join(VANILLA_ROOT, "node_modules/.cache"));
+        }
+
         await this.entryModel.init();
         await installYarn();
         switch (this.options.mode) {
@@ -71,10 +75,19 @@ export default class Builder {
         await fse.emptyDir(path.join(DIST_DIRECTORY));
         copyMonacoEditorModule();
         const sections = await this.entryModel.getSections();
-        const configs = await Promise.all([
-            ...sections.map((section) => makeProdConfig(this.entryModel, section)),
-            makePolyfillConfig(this.entryModel),
-        ]);
+        let configs: webpack.Configuration[];
+        if (this.options.modern) {
+            configs = await Promise.all([
+                ...sections.map((section) => makeProdConfig(this.entryModel, section, false)),
+                ...sections.map((section) => makeProdConfig(this.entryModel, section, true)),
+                makePolyfillConfig(this.entryModel),
+            ]);
+        } else {
+            configs = await Promise.all([
+                ...sections.map((section) => makeProdConfig(this.entryModel, section, true)),
+                makePolyfillConfig(this.entryModel),
+            ]);
+        }
 
         // Running the builds individually is actually faster since webpack 5
         // We can parellize many function per build and saturate the CPU.

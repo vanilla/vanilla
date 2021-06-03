@@ -403,7 +403,12 @@ HTML
         );
 
         $r->assertCssSelectorText('a', 'foo');
-        $r->assertCssSelectorExists('a[href="http://example.com"]');
+
+        $expectedHref = url("/home/leaving?" . http_build_query([
+            "allowTrusted" => 1,
+            "target" => "http://example.com",
+        ]));
+        $r->assertCssSelectorExists('a[href="' . $expectedHref . '"]');
     }
 
     /**
@@ -416,7 +421,12 @@ HTML
         );
 
         $r->assertCssSelectorText('a', 'foo');
-        $r->assertCssSelectorExists('a[href="http://example.com"]');
+
+        $expectedHref = url("/home/leaving?" . http_build_query([
+                "allowTrusted" => 1,
+                "target" => "http://example.com",
+            ]));
+        $r->assertCssSelectorExists('a[href="' . $expectedHref . '"]');
     }
 
     /**

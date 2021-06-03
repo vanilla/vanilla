@@ -6,8 +6,7 @@
 
 import React from "react";
 import classNames from "classnames";
-import { flexHelper } from "@library/styles/styleHelpers";
-import { style } from "@library/styles/styleShim";
+import { css } from "@emotion/css";
 
 interface IProps {
     className?: string;
@@ -16,7 +15,7 @@ interface IProps {
     actualSpacer?: boolean;
 }
 
-const flexSpacer = style({
+const flexSpacer = css({
     label: "flexSpacer",
     flex: 1,
 });

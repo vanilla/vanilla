@@ -18,6 +18,7 @@ import {
     IRadiusValue,
     ISimpleBorderStyle,
 } from "@library/styles/cssUtilsTypes";
+import { t } from "@vanilla/i18n";
 
 export enum BorderType {
     BORDER = "border",
@@ -25,6 +26,20 @@ export enum BorderType {
     NONE = "none",
     SHADOW = "shadow",
     SHADOW_AS_BORDER = "shadow_as_border", // Note that is applied on a different element
+}
+
+export function borderTypeToLabel(type: BorderType): string {
+    switch (type) {
+        case BorderType.BORDER:
+            return t("Solid");
+        case BorderType.SEPARATOR:
+            return t("Separator");
+        case BorderType.SHADOW:
+        case BorderType.SHADOW_AS_BORDER:
+            return t("Shadow");
+        case BorderType.NONE:
+            return t("None");
+    }
 }
 
 export type radiusValue = Property.BorderRadius<TLength> | string;

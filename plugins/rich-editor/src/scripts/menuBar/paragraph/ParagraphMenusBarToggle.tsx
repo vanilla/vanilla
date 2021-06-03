@@ -29,12 +29,12 @@ import ActiveFormatIcon from "@rich-editor/toolbars/pieces/ActiveFormatIcon";
 import classNames from "classnames";
 import Quill, { RangeStatic } from "quill/core";
 import React from "react";
-import { style } from "@library/styles/styleShim";
 import uniqueId from "lodash/uniqueId";
 import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 import { FocusWatcher, TabHandler } from "@vanilla/dom-utils";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
+import { css } from "@emotion/css";
 
 export enum IMenuBarItemTypes {
     CHECK = "checkbox",
@@ -165,7 +165,7 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
                     id={this.menuID}
                     className={classNames(
                         this.dropDownClasses,
-                        this.isMenuVisible ? "" : style(Mixins.absolute.srOnly()),
+                        this.isMenuVisible ? "" : css(Mixins.absolute.srOnly()),
                     )}
                     style={this.toolbarStyles}
                     role="menu"

@@ -605,6 +605,9 @@ class Gdn_Controller extends Gdn_Pluggable {
      */
     public function definitionList($wrap = true) {
         $session = Gdn::session();
+        /** @var \Vanilla\Models\SiteMeta $siteMeta */
+        $siteMeta = Gdn::getContainer()->get(\Vanilla\Models\SiteMeta::class);
+        $siteValue = $siteMeta->value();
         if (!array_key_exists('TransportError', $this->_Definitions)) {
             $this->_Definitions['TransportError'] = t(
                 'Transport error: %s',
@@ -614,6 +617,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
         if (!array_key_exists('TransientKey', $this->_Definitions)) {
             $this->_Definitions['TransientKey'] = $session->transientKey();
+            unset($siteValue['TransientKey']);
         }
 
         if (!array_key_exists('WebRoot', $this->_Definitions)) {
@@ -699,9 +703,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             'ui' => []
         ];
 
-        /** @var \Vanilla\Models\SiteMeta $siteMeta */
-        $siteMeta = Gdn::getContainer()->get(\Vanilla\Models\SiteMeta::class);
-        $this->_Definitions = array_merge_recursive($this->_Definitions, $siteMeta->value());
+        $this->_Definitions = array_merge_recursive($this->_Definitions, $siteValue);
 
         $this->_Definitions['useNewFlyouts'] = \Vanilla\FeatureFlagHelper::featureEnabled('NewFlyouts');
 

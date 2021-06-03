@@ -44,6 +44,9 @@ export const quickLinksClasses = useThemeCache(() => {
         },
     );
 
+    const listItemTitleDecorationFallback =
+        vars.listItemTitle.font.textDecoration === "underline" ? "underline" : undefined;
+
     const listItemTitle = style(
         "listItemTitle",
         {
@@ -53,7 +56,7 @@ export const quickLinksClasses = useThemeCache(() => {
             alignItems: "center",
             ...Mixins.padding(vars.listItem.padding),
             ...Mixins.font(vars.listItemTitle.font),
-            ...Mixins.linkDecoration(),
+            ...Mixins.linkDecoration(listItemTitleDecorationFallback),
         },
         listSeparation === ListSeparation.BORDER &&
             Mixins.border({

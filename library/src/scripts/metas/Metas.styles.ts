@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { CSSObject } from "@emotion/css";
+import { css, CSSObject } from "@emotion/css";
 import { iconVariables } from "@library/icons/iconStyles";
 import { metasVariables } from "@library/metas/Metas.variables";
 import { tagVariables } from "@library/metas/Tag.variables";
@@ -113,7 +113,7 @@ export const metasClasses = useThemeCache(() => {
         (vars.font.size as number) * (vars.font.lineHeight! as number) + (tagVars.border.width! as number) * 2,
     );
 
-    const metaIcon = style("metaIcon", {
+    const metaIcon = css({
         ...metaItemStyle(),
         maxHeight: metaItemHeight,
         ...{

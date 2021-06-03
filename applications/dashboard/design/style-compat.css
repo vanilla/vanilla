@@ -1702,6 +1702,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 .Message img .embedImage-img,
 .embedImage-img {
   display: -webkit-inline-flex;
+  height: auto;
   display: -ms-inline-flexbox;
   display: inline-flex;
   position: relative;

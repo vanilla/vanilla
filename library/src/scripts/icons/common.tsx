@@ -139,6 +139,48 @@ export function BottomChevronIcon(props: {
     );
 }
 
+export function RightChevronSmallIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
+    const title = `↑`;
+    const classes = iconClasses();
+    return (
+        <svg
+            className={classNames(classes.standard, "icon-chevronUp", props.className)}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
+        >
+            <title>{title}</title>
+            <path
+                transform="translate(0 50%)"
+                fill="currentColor"
+                d="M13.8,12l-6,6c-0.4,0.4-0.4,1.2,0,1.6c0.4,0.4,1.2,0.4,1.6,0l6.8-6.9c0.4-0.4,0.4-1.2,0-1.6L9.4,4.3
+				C9,3.9,8.3,3.9,7.8,4.3C7.4,4.8,7.4,5.5,7.8,6L13.8,12z"
+            />
+        </svg>
+    );
+}
+
+export function LeftChevronSmallIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
+    const title = `↑`;
+    const classes = iconClasses();
+    return (
+        <svg
+            className={classNames(classes.standard, "icon-chevronUp", props.className)}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
+        >
+            <title>{title}</title>
+            <path
+                transform="translate(0 50%)"
+                fill="currentColor"
+                d="M9.2,12l6-6c0.4-0.4,0.4-1.2,0-1.6c-0.4-0.4-1.2-0.4-1.6,0l-6.8,6.9c-0.4,0.4-0.4,1.2,0,1.6l6.8,6.9
+				c0.4,0.4,1.2,0.4,1.6,0c0.4-0.4,0.4-1.2,0-1.6L9.2,12z"
+            />
+        </svg>
+    );
+}
+
 export function CloseIcon(props: { className?: string; "aria-hidden"?: areaHiddenType; compact?: boolean }) {
     const title = t("Close");
     const viewBox = props.compact ? "0 0 16 16" : "0 0 24 24";

@@ -7,11 +7,9 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { MixinsFoundation } from "@library/styles/MixinsFoundation";
 import { useThemeCache } from "@library/styles/themeCache";
-import { cssRaw } from "@library/styles/styleShim";
 import { Mixins } from "@library/styles/Mixins";
 import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { percent } from "csx/lib/units";
-import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { extendItemContainer } from "@library/styles/styleHelpers";
 import { injectGlobal } from "@emotion/css";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
@@ -118,7 +116,7 @@ export const pageBoxCompatStyles = useThemeCache(() => {
         },
     });
 
-    cssRaw({
+    injectGlobal({
         ".Panel .pageHeadingBox.pageHeadingBox.pageHeadingBox.pageHeadingBox.pageHeadingBox": {
             padding: 0,
             // Super compact.

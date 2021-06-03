@@ -113,3 +113,4 @@ lerna-debug.log
 git-diff.txt
 phpcs-diff.json
 .phpunit.result.cache
+*.cookiejar

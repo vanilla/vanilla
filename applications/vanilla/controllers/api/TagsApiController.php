@@ -131,6 +131,8 @@ class TagsApiController extends AbstractApiController {
     public function post(array $body): Data {
         $this->permission('Garden.Community.Manage');
         $in = $this->tagModel->getPostTagSchema();
+        // A null type should be saved as an empty string in the DB.
+        $body['type'] = $body['type'] ?? '';
         $validatedBody = $in->validate($body);
 
         // If we're specifying a type, make sure we're allowed to add tags to that type.
@@ -174,6 +176,8 @@ class TagsApiController extends AbstractApiController {
      */
     public function patch(int $id, array $body): Data {
         $this->permission('Garden.Community.Manage');
+        // A null type should be saved as an empty string in the DB.
+        $body['type'] = $body['type'] ?? '';
         $in = $this->tagModel->getPatchTagSchema();
         $validatedBody = $in->validate($body, true);
 
@@ -272,8 +276,10 @@ class TagsApiController extends AbstractApiController {
      */
     private function getTagFormattedForOutput(int $tagID): array {
         $out = $this->tagModel->getFullTagSchema();
-        $tagFromDB = $this->tagModel->getTagsByIDs([$tagID]);
-        $normalizedTag = $this->tagModel->normalizeOutput($tagFromDB)[0];
+        $tagFromDB = $this->tagModel->getTagsByIDs([$tagID])[0];
+        // Return type with the value of an empty string as null.
+        $tagFromDB['Type'] = $tagFromDB['Type'] === '' ? null : $tagFromDB['Type'];
+        $normalizedTag = $this->tagModel->normalizeOutput([$tagFromDB])[0];
         $validatedTag = $out->validate($normalizedTag);
         return $validatedTag;
     }

@@ -21,6 +21,8 @@ import { DashboardFormList } from "@dashboard/forms/DashboardFormList";
 import { DashboardFormSubheading } from "@dashboard/forms/DashboardFormSubheading";
 import { t } from "@library/utility/appUtils";
 import Translate from "@library/content/Translate";
+import { DashboardFormListItem } from "@dashboard/forms/DashboardFormListItem";
+import { Icon } from "@vanilla/icons";
 
 export default {
     title: "Dashboard/Forms",
@@ -238,6 +240,31 @@ export function BlurEnableForm() {
                     <SimpleInputItems />
                 </DashboardFormList>
             </form>
+        </StoryContent>
+    );
+}
+
+export function ListItemsWithStatus() {
+    const [isEnabled, setIsEnabled] = useState(false);
+    return (
+        <StoryContent>
+            <StoryHeading depth={1}>List Items with Status</StoryHeading>
+            <DashboardFormList>
+                <DashboardFormListItem
+                    title={"Google Translate"}
+                    status={"Configured"}
+                    action={(e) => e}
+                    actionLabel={"Edit Google translate"}
+                    actionIcon={<Icon icon={"dashboard-edit"} />}
+                />
+                <DashboardFormListItem title={"Deep L"} status={"Not Configured"} />
+                <DashboardFormListItem
+                    title={"Transifex"}
+                    action={(e) => e}
+                    actionLabel={"Edit Transifex"}
+                    actionIcon={<Icon icon={"dashboard-edit"} />}
+                />
+            </DashboardFormList>
         </StoryContent>
     );
 }

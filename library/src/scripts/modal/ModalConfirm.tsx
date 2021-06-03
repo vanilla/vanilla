@@ -20,13 +20,15 @@ import classNames from "classnames";
 import React from "react";
 import { frameBodyClasses } from "@library/layout/frame/frameBodyStyles";
 import { frameFooterClasses } from "@library/layout/frame/frameFooterStyles";
+import LinkAsButton from "@library/routing/LinkAsButton";
 
 interface IProps {
     title: React.ReactNode; // required for accessibility
     srOnlyTitle?: boolean;
     className?: string;
     onCancel?: (e: Event) => void;
-    onConfirm: (e: Event) => void;
+    onConfirm?: (e: Event) => void;
+    confirmLinkTo?: string;
     confirmTitle?: string;
     children: React.ReactNode;
     isConfirmLoading?: boolean;
@@ -44,7 +46,16 @@ export default class ModalConfirm extends React.Component<IProps> {
     private id = uniqueIDFromPrefix("confirmModal");
 
     public render() {
-        const { onConfirm, srOnlyTitle, isConfirmLoading, isConfirmDisabled, title, children, size } = this.props;
+        const {
+            onConfirm,
+            confirmLinkTo,
+            srOnlyTitle,
+            isConfirmLoading,
+            isConfirmDisabled,
+            title,
+            children,
+            size,
+        } = this.props;
         const onCancel = this.handleCancel;
         const classesFrameBody = frameBodyClasses();
         const classFrameFooter = frameFooterClasses();
@@ -83,14 +94,26 @@ export default class ModalConfirm extends React.Component<IProps> {
                             >
                                 {t("Cancel")}
                             </Button>
-                            <Button
-                                className={classFrameFooter.actionButton}
-                                onClick={onConfirm}
-                                buttonType={ButtonTypes.TEXT_PRIMARY}
-                                disabled={isConfirmLoading || isConfirmDisabled}
-                            >
-                                {isConfirmLoading ? <ButtonLoader /> : this.props.confirmTitle || t("OK")}
-                            </Button>
+                            {!!onConfirm && (
+                                <Button
+                                    className={classFrameFooter.actionButton}
+                                    onClick={onConfirm}
+                                    buttonType={ButtonTypes.TEXT_PRIMARY}
+                                    disabled={isConfirmLoading || isConfirmDisabled}
+                                >
+                                    {isConfirmLoading ? <ButtonLoader /> : this.props.confirmTitle || t("OK")}
+                                </Button>
+                            )}
+                            {!!confirmLinkTo && (
+                                <LinkAsButton
+                                    className={classFrameFooter.actionButton}
+                                    to={confirmLinkTo}
+                                    buttonType={ButtonTypes.TEXT_PRIMARY}
+                                    disabled={isConfirmLoading || isConfirmDisabled}
+                                >
+                                    {this.props.confirmTitle || t("OK")}
+                                </LinkAsButton>
+                            )}
                         </FrameFooter>
                     }
                 />

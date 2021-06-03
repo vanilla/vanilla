@@ -780,7 +780,7 @@ class Gdn_Format {
                 $inTag--;
             }
 
-            if (c('Garden.Format.WarnLeaving', false) && isset($matches[4]) && $inTag && $inAnchor) {
+            if (isset($matches[4]) && $inTag && $inAnchor) {
                 // This is a the href url value in an anchor tag.
                 $url = $matches[4];
                 $domain = parse_url($url, PHP_URL_HOST);
@@ -789,7 +789,10 @@ class Gdn_Format {
                     if ($isHtml) {
                         $url = htmlspecialchars_decode($url);
                     }
-                    return url('/home/leaving?target='.urlencode($url)).'" class="Popup';
+                    return url("/home/leaving?" . http_build_query([
+                        "allowTrusted" => 1,
+                        "target" => $url,
+                    ]));
                 }
             }
 
@@ -839,16 +842,14 @@ class Gdn_Format {
 
             $nofollow = (self::$DisplayNoFollow) ? ' rel="nofollow"' : '';
 
-            if (c('Garden.Format.WarnLeaving', false)) {
-                // This is a plaintext url we're converting into an anchor.
-                $domain = parse_url($url, PHP_URL_HOST);
-                if (!isTrustedDomain($domain)) {
-                    // If this is valid HTMl, the link text's HTML special characters should be encoded. Decode them to their raw state for URL encoding.
-                    if ($isHtml) {
-                        $url = htmlspecialchars_decode($url);
-                    }
-                    return '<a href="'.url('/home/leaving?target='.urlencode($url)).'" class="Popup">'.$text.'</a>'.$punc;
-                }
+            // If this is valid HTMl, the link text's HTML special characters should be encoded. Decode them to their raw state for URL encoding.
+            $plainUrl = !$isHtml ? $url : htmlspecialchars_decode($url);
+            if (isExternalUrl($plainUrl)) {
+                $href = "/home/leaving?" . http_build_query([
+                    "allowTrusted" => 1,
+                    "target" => $plainUrl,
+                ]);
+                return anchor($text, $href) . $punc;
             }
 
             return '<a href="'.$url.'"'.$nofollow.'>'.$text.'</a>'.$punc;

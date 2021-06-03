@@ -7,12 +7,10 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { mixinClickInput } from "@dashboard/compatibilityStyles/clickableItemHelpers";
-import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { Mixins } from "@library/styles/Mixins";
 import { breadcrumbsVariables } from "@library/navigation/breadcrumbsStyles";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
-import { CSSObject, injectGlobal } from "@emotion/css";
-import { listItemVariables } from "@library/lists/ListItem.variables";
+import { injectGlobal } from "@emotion/css";
 import { mixinListItemTitleLink } from "@library/lists/ListItem.styles";
 
 export const textLinkCSS = () => {
@@ -92,27 +90,42 @@ export const textLinkCSS = () => {
     mixinTextLinkNoDefaultLinkAppearance(`.DataTable .Meta .MItem`);
     mixinTextLinkNoDefaultLinkAppearance(`.Panel .InThisConversation a`);
     mixinTextLinkNoDefaultLinkAppearance(`.Panel .PanelInThisDiscussion a`);
+    mixinTextLinkNoDefaultLinkAppearance(".ShowTags a");
 
-    cssOut(`.Panel.Panel-main .PanelInfo.PanelInThisDiscussion .Aside`, {
-        paddingLeft: 0,
-        paddingRight: "1ex",
-        display: "inline",
+    injectGlobal({
+        [`.Panel.Panel-main .PanelInfo.PanelInThisDiscussion .Aside`]: {
+            paddingLeft: 0,
+            paddingRight: "1ex",
+            display: "inline",
+        },
     });
 
-    cssOut(`.Panel.Panel-main .PanelInfo.PanelInThisDiscussion .Username`, {
-        fontWeight: globalVars.fonts.weights.semiBold,
+    injectGlobal({
+        [`.Panel.Panel-main .PanelInfo.PanelInThisDiscussion .Username`]: {
+            fontWeight: globalVars.fonts.weights.semiBold,
+        },
     });
 
-    cssOut(`.BreadcrumbsBox .Breadcrumbs a`, {
-        marginRight: "0.5ex",
-        color: ColorsUtils.colorOut(vars.link.font.color),
-        ...Mixins.font(vars.link.font),
+    injectGlobal({
+        [`.BreadcrumbsBox .Breadcrumbs a`]: {
+            marginRight: "0.5ex",
+            color: ColorsUtils.colorOut(vars.link.font.color),
+            ...Mixins.font(vars.link.font),
+        },
     });
 
-    cssOut(`.BreadcrumbsBox  .Crumb`, {
-        marginLeft: vars.separator.spacing,
-        marginRight: vars.separator.spacing,
-        ...Mixins.font(vars.separator.font),
+    injectGlobal({
+        [`.BreadcrumbsBox  .Crumb`]: {
+            marginLeft: vars.separator.spacing,
+            marginRight: vars.separator.spacing,
+            ...Mixins.font(vars.separator.font),
+        },
+    });
+
+    injectGlobal({
+        [`.userContent a, .UserContent a`]: {
+            fontSize: "inherit",
+        },
     });
 };
 

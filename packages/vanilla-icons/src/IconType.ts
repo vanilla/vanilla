@@ -19,4 +19,6 @@ type NavigationIconType = "navigation-languages";
 
 type SearchIconType = "search-events" | "search-search";
 
-export type IconType = MeIconType | MetaIconType | NavigationIconType | SearchIconType;
+type DashboardIconType = "dashboard-edit";
+
+export type IconType = MeIconType | MetaIconType | NavigationIconType | SearchIconType | DashboardIconType;

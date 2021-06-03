@@ -510,7 +510,7 @@ input.BigInput {
 }
 
 textarea {
-  line-height: 128%;
+  line-height: 128% !important;
 }
 
 select {

@@ -273,4 +273,42 @@ class TagsTest extends AbstractResourceTest {
         $this->expectExceptionMessage('Parent tag not found.');
         $this->api()->post($this->baseUrl, $tag);
     }
+
+    /**
+     * Test patching a null parentID.
+     */
+    public function testPatchingNullParentID() {
+        $tag = [
+            'name' => 'nullifyParent',
+            'parentTagID' => 1,
+        ];
+
+        $returnedTag = $this->api()->post($this->baseUrl, $tag)->getBody();
+        $tagWithParent = $this->api()->get($this->baseUrl."/".$returnedTag['tagID'])->getBody();
+        // Make sure the parent tag ID is there.
+        $this->assertSame($tagWithParent['parentTagID'], 1);
+        $this->api()->patch($this->baseUrl."/".$returnedTag['tagID'], ['parentTagID' => null]);
+        $nullifiedParentTag = $this->api()->get($this->baseUrl."/".$returnedTag['tagID'])->getBody();
+        // The parent tag ID only comes back if there is one, which there shouldn't be in this case.
+        $this->assertArrayNotHasKey('parentTagID', $nullifiedParentTag);
+    }
+
+    /**
+     * Test patching a tag type to an empty string (the default user type).
+     */
+    public function testPatchTypeOfEmptyString() {
+        $tag = [
+            'name' => 'revertToEmptyString',
+            'type' => 'thisStringIsNotEmpty',
+        ];
+
+        $returnedTag = $this->api()->post($this->baseUrl, $tag)->getBody();
+        $tagWithTypeNonEmptyString = $this->api()->get($this->baseUrl."/".$returnedTag['tagID'])->getBody();
+        // Check that the type was applied.
+        $this->assertSame($tag['type'], $tagWithTypeNonEmptyString['type']);
+        $this->api()->patch($this->baseUrl."/".$returnedTag['tagID'], ['type' => '']);
+        $tagWithTypeEmptyString = $this->api()->get($this->baseUrl."/".$returnedTag['tagID'])->getBody();
+        // The type should not come through because it's returned as a null value.
+        $this->assertArrayNotHasKey('type', $tagWithTypeEmptyString);
+    }
 }

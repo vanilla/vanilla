@@ -35,12 +35,13 @@ class NormalJobDescriptor implements JobDescriptorInterface {
      * NormalJobDescriptor constructor
      *
      * @param string $jobType
+     * @param array $message
      */
-    public function __construct(string $jobType) {
+    public function __construct(string $jobType, array $message = []) {
         $this->jobType = $jobType;
         $this->priority = JobPriority::normal();
         $this->delay = 0;
-        $this->message = [];
+        $this->message = $message;
     }
 
     /**

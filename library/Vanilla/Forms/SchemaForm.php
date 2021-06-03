@@ -106,14 +106,21 @@ class SchemaForm {
      * Toggle form element schema.
      *
      * @param FormOptions $options
+     * @param FieldMatchConditional|null $conditions
      * @return array
      */
-    public static function toggle(FormOptions $options) {
-        return [
+    public static function toggle(FormOptions $options, FieldMatchConditional $conditions = null) {
+        $result = [
             'description' => $options->getDescription(),
             'label' => $options->getLabel(),
             'inputType' => self::TOGGLE_TYPE,
         ];
+
+        if ($conditions) {
+            $result['conditions'] = [$conditions->getCondition()];
+        }
+
+        return $result;
     }
 
     /**

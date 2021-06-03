@@ -5,7 +5,7 @@
  */
 
 import { DependencyList, useCallback, useRef, useState } from "react";
-import useMountedState from "./useMountedState";
+import { useMountedState } from "./useMountedState";
 
 export type FnReturningPromise = (...args: any[]) => Promise<any>;
 type PromiseType<P extends Promise<any>> = P extends Promise<infer T> ? T : never;

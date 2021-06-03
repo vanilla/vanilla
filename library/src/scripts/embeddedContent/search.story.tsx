@@ -34,7 +34,6 @@ import { t } from "@vanilla/i18n/src";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { useLayout } from "@library/layout/LayoutContext";
 import classNames from "classnames";
-import Result from "@library/result/Result";
 import { PlacesResultMeta } from "@dashboard/components/panels/registerPlaceSearchDomain";
 
 const story = storiesOf("Search", module);
@@ -84,7 +83,6 @@ story.add("Search Results", () => {
         <StoryContent>
             <StoryHeading depth={1}>Search Results</StoryHeading>
             <ResultList
-                result={Result}
                 results={[
                     {
                         name: "External Result",
@@ -100,7 +98,7 @@ story.add("Search Results", () => {
                                 isForeign={true}
                             />
                         ),
-                        attachments: [{ name: "My File", type: AttachmentType.WORD }],
+                        // attachments: [{ name: "My File", type: AttachmentType.WORD }],
                         icon: <TypeDiscussionsIcon />,
                     },
                     {
@@ -118,7 +116,7 @@ story.add("Search Results", () => {
                                 type={"Article"}
                             />
                         ),
-                        attachments: [{ name: "My File", type: AttachmentType.WORD }],
+                        // attachments: [{ name: "My File", type: AttachmentType.WORD }],
                         icon: <TypeDiscussionsIcon />,
                     },
                     {
@@ -268,7 +266,6 @@ story.add("Search Results", () => {
             />
             <StoryHeading>Category result (used on categories page)</StoryHeading>
             <ResultList
-                result={Result}
                 results={[
                     {
                         name: "Example category result",
@@ -287,7 +284,6 @@ story.add("Search Results for Places", () => {
         <StoryContent>
             <StoryHeading depth={1}> Search Results for Places</StoryHeading>
             <ResultList
-                result={Result}
                 results={[
                     {
                         name: "Categories Search Result",

@@ -10,6 +10,7 @@ import React, { useMemo } from "react";
 
 interface IProps {
     title?: string;
+    forcedCounts?: Record<string, number>;
 }
 
 export function QuickLinks(props: IProps) {
@@ -17,7 +18,7 @@ export function QuickLinks(props: IProps) {
     // Get counts which are dynamically injected into the theme variables.
 
     const linksWithCounts = useMemo(() => {
-        const counts = getThemeVariables()?.quickLinks?.counts;
+        const counts = props.forcedCounts ?? getThemeVariables()?.quickLinks?.counts;
         if (!counts) {
             return links;
         }
@@ -28,7 +29,7 @@ export function QuickLinks(props: IProps) {
             }
         }
         return links;
-    }, [links]);
+    }, [links, props.forcedCounts]);
 
     return <QuickLinksView title={props.title} links={linksWithCounts} />;
 }

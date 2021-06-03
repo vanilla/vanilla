@@ -60,8 +60,11 @@ class ThemeFeatures implements \JsonSerializable {
         'NewCategoryDropdown',
 
 
-        // New button style dropdown
+        // New badges module.
         'NewBadgesModule',
+
+        // NewReactionsModule (icons and count) to replace writeProfileCounts()
+        'NewReactionsModule',
     ];
 
     /**

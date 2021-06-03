@@ -121,8 +121,8 @@ class OAuth2Plugin extends Gdn_OAuth2 {
             "urls:o" => [
                 "authorizeUrl:s",
                 "profileUrl:s",
-                "registerUrl:s?",
-                "signOutUrl:s?",
+                "registerUrl:s" => ["default" => null],
+                "signOutUrl:s" => ["default" => null],
                 "tokenUrl:s",
             ],
             "authenticationRequest:o?" => [

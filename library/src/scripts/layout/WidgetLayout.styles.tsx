@@ -15,6 +15,7 @@ export const widgetLayoutClasses = useThemeCache(() => {
     const layoutVars = panelLayoutVariables();
 
     const widgetMixin: CSSObject = {
+        clear: "both", // Some old themes have weird floating elements.
         ...Mixins.margin({
             vertical: globalVars.spacer.pageComponent,
         }),
@@ -27,6 +28,7 @@ export const widgetLayoutClasses = useThemeCache(() => {
     const widget = css(widgetMixin);
 
     const widgetWithContainerMixin = css({
+        clear: "both", // Some old themes have weird floating elements.
         ...Mixins.padding({
             vertical: globalVars.spacer.pageComponent,
         }),
@@ -39,6 +41,7 @@ export const widgetLayoutClasses = useThemeCache(() => {
     const widgetWithContainer = css(widgetWithContainerMixin);
 
     const headingBlock = css({
+        clear: "both", // Some old themes have weird floating elements.
         marginBottom: globalVars.spacer.headingBox,
     });
 

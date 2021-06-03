@@ -407,6 +407,18 @@ class UsersTest extends AbstractResourceTest {
     }
 
     /**
+     * Test name search exact match.
+     */
+    public function testNameSearch(): void {
+        $user1 = $this->createUser(['name' => 'test1_test1']);
+        $user2 = $this->createUser(['name' => 'test1_test']);
+        $result = $this->api()->get('/users/by-names', ['name' => $user1['name']])->getBody();
+        $this->assertEquals(1, count($result));
+        $result = $this->api()->get('/users/by-names', ['name' => "{$user2['name']}*"])->getBody();
+        $this->assertEquals(2, count($result));
+    }
+
+    /**
      * Test partial-name filtering with GET /users/by-names.
      */
     public function testNamesWildcard() {

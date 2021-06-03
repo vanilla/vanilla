@@ -27,7 +27,7 @@ import {
     SEARCH_SCOPE_EVERYWHERE,
 } from "@library/features/search/SearchScopeContext";
 import { AsyncCreatable } from "react-select";
-import { cx } from "@library/styles/styleShim";
+import { cx } from "@emotion/css";
 import { Icon } from "@vanilla/icons";
 
 export interface ICompactSearchProps {

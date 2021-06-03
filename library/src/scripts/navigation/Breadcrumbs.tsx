@@ -7,9 +7,9 @@
 import React from "react";
 import { t } from "@library/utility/appUtils";
 import Breadcrumb from "@library/navigation/Breadcrumb";
-import { style } from "@library/styles/styleShim";
 import classNames from "classnames";
 import { breadcrumbsClasses } from "@library/navigation/breadcrumbsStyles";
+import { css } from "@emotion/css";
 
 export interface ICrumb {
     name: string;
@@ -39,7 +39,7 @@ export default class Breadcrumbs extends React.Component<IProps> {
 
         content = this.props.children.map((crumb, index) => {
             const lastElement = index === crumbCount - 1;
-            const crumbSeparator = `›`;
+            const crumbSeparator = t("Breadcrumbs Crumb", `›`);
             return (
                 <React.Fragment key={`breadcrumb-${index}`}>
                     <Breadcrumb lastElement={lastElement} name={crumb.name} url={crumb.url} />
@@ -54,7 +54,7 @@ export default class Breadcrumbs extends React.Component<IProps> {
 
         const hasForcedCrumb = crumbCount === 0 && this.props.forceDisplay;
         if (hasForcedCrumb) {
-            const cssClass = style({
+            const cssClass = css({
                 minHeight: 22,
                 display: "inline-block",
             });

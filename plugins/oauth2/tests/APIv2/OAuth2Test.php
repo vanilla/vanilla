@@ -112,6 +112,33 @@ class OAuth2Test extends AbstractAPIv2Test {
     }
 
     /**
+     * Verify inability to create connection with empty url strings.
+     */
+    public function testPostInvalid(): void {
+        $body = [
+            "name" => __FUNCTION__ ,
+            "clientID" => "clientID-".__FUNCTION__,
+            "secret" => "secret123",
+            "urls" => [
+                "authorizeUrl" => "https://example.com/authorize",
+                "profileUrl" => "https://example.com/profile",
+                "tokenUrl" => "https://example.com/token",
+                "signoutUrl" => "",
+                "registerUrl" => ""
+            ],
+        ];
+        // Makes sure the invalid row doesn't get posted.
+        $rowBefore = $this->api()->get("authenticators")->getBody();
+        try {
+            $this->api()->post("authenticators/oauth2", $body);
+        } catch (ClientException $e) {
+            $this->assertEquals(422, $e->getCode());
+            $rowAfter = $this->api()->get("authenticators")->getBody();
+            $this->assertRowsEqual($rowBefore, $rowAfter);
+        }
+    }
+
+    /**
      * Verify inability to create two connections with the same client ID.
      */
     public function testPostDuplicate(): void {

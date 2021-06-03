@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { keyframes } from "@library/styles/styleShim";
+import { keyframes } from "@emotion/css";
 
 export const standardAnimations = () => {
     return {

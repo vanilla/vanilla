@@ -1155,6 +1155,26 @@ if (!function_exists('isUrl')) {
     }
 }
 
+if (!function_exists('isExternalUrl')) {
+    /**
+     * Determine if provided url is external.
+     *
+     * @param string $url
+     * @return bool
+     */
+    function isExternalUrl(string $url): bool {
+        $urlHost = parse_url($url, PHP_URL_HOST);
+
+        // If the link doesn't specify a host, the link is internal.
+        if ($urlHost == null) {
+            return false;
+        } else {
+            // If the link's url is different from the host, it's external.
+            return ($urlHost !== Gdn::Request()->host());
+        }
+    }
+}
+
 if (!function_exists('isWritable')) {
     /**
      * Determine whether or not a path is writable.

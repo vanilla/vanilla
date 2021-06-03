@@ -4,8 +4,8 @@
  * @license GPL-2.0-only
  */
 
+import React, { useState } from "react";
 import { style } from "@library/styles/styleShim";
-import React from "react";
 import * as UI from "./";
 
 export default {
@@ -26,7 +26,8 @@ const storyStyle = style({
 });
 
 function StoryNumberBox(extraProps: Partial<UI.INumberBoxProps>) {
-    return <UI.NumberBox {...extraProps} />;
+    const [value, setValue] = useState(0);
+    return <UI.NumberBox value={value} onValueChange={setValue} {...extraProps} />;
 }
 
 export function NumberBox() {

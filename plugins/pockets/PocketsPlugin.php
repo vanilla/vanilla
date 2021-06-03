@@ -369,6 +369,12 @@ class PocketsPlugin extends Gdn_Plugin {
                 $form->setFormValue('PocketID', $pocketID);
             }
 
+            $name = $form->getValue('Name');
+            if (empty($name)) {
+                $form->setFormValue('Name', t('Untitled'));
+            }
+
+
             // Convert the form data into a format digestable by the database.
             $repeat = $form->getFormValue('RepeatType');
             $location = $form->getFormValue("Location");
@@ -433,9 +439,8 @@ class PocketsPlugin extends Gdn_Plugin {
                 return Gdn::dispatcher()->dispatch('Default404');
             }
 
-            // Convert some of the pocket data into a format digestable by the form.
+            // Convert some of the pocket data into a format digestible by the form.
             [$repeatType, $repeatFrequency] = Pocket::parseRepeat($pocket['Repeat']);
-            $repeatFrequency += [1, 1];
 
             $pocket['RepeatType'] = $repeatType;
             $pocket['EveryFrequency'] = $repeatFrequency[0];

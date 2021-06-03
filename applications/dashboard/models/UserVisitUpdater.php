@@ -93,6 +93,7 @@ class UserVisitUpdater {
         if ($userID == $this->session->UserID) {
             $ip = \Gdn::request()->getIP();
             $fields['LastIPAddress'] = ipEncode($ip);
+            $this->userModel->saveIP($userID, $ip);
 
             if ($this->session->newVisit()) {
                 $fields['CountVisits'] = val('CountVisits', $user, 0) + 1;

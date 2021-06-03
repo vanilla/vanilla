@@ -1740,6 +1740,7 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface {
             "class:s",
             "hasReacted:b?",
             "reactionValue:i?",
+            "photoUrl:s?"
         ];
         if ($includeCount) {
             $config[] = "count:i";
@@ -1756,13 +1757,13 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface {
      * @param bool $includeInactive
      * @return Schema
      */
-    public function compoundTypeFragmentSchema(bool $includeCount = false, bool $includeInactive = false): Schema {
+    public function compoundTypeFragmentSchema(bool $includeInactive = false): Schema {
         $schemaConfig = [];
         foreach (self::reactionTypes() as $reactionType) {
             if (!$reactionType["Active"] && !$includeInactive) {
                 continue;
             }
-            $schemaConfig[$reactionType["UrlCode"]] = $this->typeFragmentSchema($includeCount);
+            $schemaConfig[$reactionType["UrlCode"]] = $this->typeFragmentSchema(true);
         }
         $result = Schema::parse([":o" => $schemaConfig]);
         return $result;
@@ -1869,6 +1870,7 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface {
         $types = array_column(self::reactionTypes(), null, "TagID");
 
         $result = [];
+
         foreach ($userIDs as $userID) {
             $result[$userID] = [];
             foreach ($types as $tagID => $type) {
@@ -1882,6 +1884,9 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface {
                     "Total" => $count,
                     "urlcode" => $type["UrlCode"],
                 ];
+                $code =strtolower($type["UrlCode"]);
+                $photoUrl = "https://badges.v-cdn.net/reactions/50/$code.png";
+                $result[$userID][$type["UrlCode"]]["PhotoUrl"] = $photoUrl;
             }
         }
 

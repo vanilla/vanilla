@@ -36,9 +36,9 @@ export interface IHomeWidgetItemProps {
     description?: string;
     metas?: string;
     counts?: ICountResult[];
-    callToAction?: string;
     url?: string;
     className?: string;
+    tabIndex?: number;
 
     // Layout options
     options?: DeepPartial<IHomeWidgetItemOptions>;
@@ -75,7 +75,7 @@ export function HomeWidgetItem(props: IHomeWidgetItemProps) {
     );
 
     return (
-        <SmartLink to={props.to} className={cx(classes.root, props.className)}>
+        <SmartLink to={props.to} className={cx(classes.root, props.className)} tabIndex={props.tabIndex}>
             <div className={classes.backgroundContainer}>
                 {[
                     HomeWidgetItemContentType.TITLE_BACKGROUND_DESCRIPTION,
@@ -112,7 +112,7 @@ export function HomeWidgetItem(props: IHomeWidgetItemProps) {
             {isAbsoluteContent && metas}
             {[HomeWidgetItemContentType.TITLE_CHAT_BUBBLE].includes(options.contentType) && (
                 <span className={classes.callToAction}>
-                    {props.callToAction}
+                    <span>{t(options.callToActionText)}</span>
                     <ArrowIcon />
                 </span>
             )}

@@ -94,6 +94,9 @@ abstract class AbstractHomeWidgetModule extends AbstractReactModule {
      */
     private $maxItemCount = null;
 
+    /** @var bool */
+    private $isCarousel = false;
+
     /**
      * @return array|null
      */
@@ -151,6 +154,7 @@ abstract class AbstractHomeWidgetModule extends AbstractReactModule {
             'contentAlignment' => $this->contentAlignment,
             'maxWidth' => $this->maxWidth,
             'noGutter' => $this->noGutter,
+            'isCarousel' => $this->isCarousel,
         ], $this->containerOptions);
 
         return $this->containerOptions;
@@ -242,6 +246,7 @@ abstract class AbstractHomeWidgetModule extends AbstractReactModule {
                 'contentAlignment:s?' => [
                     'enum' => ['center', 'flex-start']
                 ],
+                'isCarousel:b?',
             ]),
             'itemOptions' => Schema::parse([
                 'imagePlacement:s?' => [
@@ -294,6 +299,13 @@ abstract class AbstractHomeWidgetModule extends AbstractReactModule {
                 ])
             ]),
         ]);
+    }
+
+    /**
+     * @param bool $isCarousel
+     */
+    public function setIsCarousel(bool $isCarousel) {
+        $this->isCarousel = $isCarousel;
     }
 
     /**
@@ -394,6 +406,25 @@ abstract class AbstractHomeWidgetModule extends AbstractReactModule {
     }
 
     /**
+     * Get a schema for the carousel.
+     *
+     * @return Schema
+     */
+    public static function getCarouselSchema() {
+        return Schema::parse([
+            'isCarousel:b?' => [
+                'default' => false,
+                'x-control' => SchemaForm::toggle(
+                    new FormOptions(
+                        'As Carousel',
+                        'Display the widget as a carousel.'
+                    )
+                ),
+            ],
+        ]);
+    }
+
+    /**
      * @return Schema
      */
     public static function getWidgetSchema(): Schema {
@@ -402,7 +433,8 @@ abstract class AbstractHomeWidgetModule extends AbstractReactModule {
             self::widgetDescriptionSchema(),
             self::widgetSubtitleSchema(),
             self::widgetColumnSchema(),
-            self::widgetContentTypeSchema()
+            self::widgetContentTypeSchema(),
+            self::getCarouselSchema()
         );
     }
 }

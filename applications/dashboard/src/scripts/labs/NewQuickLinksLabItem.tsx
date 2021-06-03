@@ -24,7 +24,7 @@ export function NewQuickLinksLabItem() {
             notes={
                 <LabThemeEditorNote
                     translatedLabName={t("New Quick Links")}
-                    docsUrl="https://success.vanillaforums.com/kb/articles/322-user-cards"
+                    docsUrl="https://success.vanillaforums.com/kb/articles/365-customizing-the-quick-links-menu"
                 />
             }
         />

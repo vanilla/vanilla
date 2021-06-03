@@ -1,22 +1,16 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { metasVariables } from "@library/metas/Metas.variables";
-import { negativeUnit, objectFitWithFallback, singleBorder } from "@library/styles/styleHelpers";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
-import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
-import { calc, important, percent } from "csx";
-import { CSSObject } from "@emotion/css";
-import { TLength } from "@library/styles/styleShim";
-import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
-import { Mixins } from "@library/styles/Mixins";
 import { Variables } from "@library/styles/Variables";
+import { css } from "@emotion/css";
 
 /**
  * @varGroup searchResults
@@ -159,237 +153,10 @@ export const searchResultsVariables = useThemeCache(() => {
     };
 });
 
-export const searchResultsClasses = useThemeCache((mediaQueries) => {
+export const searchResultClasses = useThemeCache(() => {
     const vars = searchResultsVariables();
-    const globalVars = globalVariables();
-    const style = styleFactory("searchResults");
 
-    const root = style({
-        display: "block",
-        position: "relative",
-        borderTop: singleBorder({
-            color: vars.separator.fg,
-            width: vars.separator.width,
-        }),
-        marginTop: negativeUnit(globalVars.gutter.half),
-        ...mediaQueries({
-            [LayoutTypes.TWO_COLUMNS]: {
-                oneColumnDown: {
-                    borderTop: 0,
-                },
-            },
-            [LayoutTypes.THREE_COLUMNS]: {
-                oneColumnDown: {
-                    borderTop: 0,
-                },
-            },
-        }),
-    });
-
-    const noResults = style("noResults", {
-        fontSize: globalVars.userContent.font.sizes.default,
-    });
-
-    const item = style("item", {
-        position: "relative",
-        display: "block",
-        userSelect: "none",
-        borderBottom: singleBorder({
-            color: vars.separator.fg,
-            width: vars.separator.width,
-        }),
-    });
-
-    const result = style("result", {
-        position: "relative",
-        display: "flex",
-        alignItems: "flex-start",
-        width: percent(100),
-    });
-
-    return {
-        root,
-        noResults,
-        item,
-        result,
-    };
-});
-
-export const searchResultClasses = useThemeCache((mediaQueries, hasIcon = false) => {
-    const vars = searchResultsVariables();
-    const globalVars = globalVariables();
-    const style = styleFactory("searchResult");
-    const metasVars = metasVariables();
-
-    const linkColors = Mixins.clickable.itemState({ skipDefault: true }, { disableTextDecoration: true });
-
-    const title = style("title", {
-        display: "block",
-        overflow: "hidden",
-        flexGrow: 1,
-        margin: 0,
-        paddingRight: styleUnit(24),
-        ...linkColors,
-        ...Mixins.font(vars.title.font),
-        // skipDefault = true so color is undefined
-        // Make sure what we set is applied.
-        ...{ color: vars.title.font?.color?.toString() },
-    });
-
-    // This is so 100% is the space within the padding of the root element
-    const content = style("contents", {
-        display: "flex",
-        alignItems: "stretch",
-        justifyContent: "space-between",
-        width: percent(100),
-        color: ColorsUtils.colorOut(vars.title.font.color),
-        ...mediaQueries({
-            [LayoutTypes.TWO_COLUMNS]: {
-                oneColumnDown: {
-                    flexWrap: "wrap",
-                },
-            },
-            [LayoutTypes.THREE_COLUMNS]: {
-                oneColumnDown: {
-                    flexWrap: "wrap",
-                },
-            },
-        }),
-    });
-
-    const root = style({
-        display: "block",
-        width: percent(100),
-        ...Mixins.padding(vars.spacing.padding),
-    });
-
-    const mediaWidth = vars.mediaElement.width + vars.mediaElement.margin;
-    const iconWidth = hasIcon ? vars.icon.size + (vars.spacing.padding.left as number) : 0;
-
-    const mainCompactStyles = {
-        ...{
-            "&.hasMedia": {
-                width: percent(100),
-            },
-            "&.hasIcon": {
-                width: calc(`100% - ${styleUnit(iconWidth)}`),
-            },
-            "&.hasMedia.hasIcon": {
-                width: calc(`100% - ${styleUnit(iconWidth)}`),
-            },
-        },
-    };
-
-    const main = style("main", {
-        display: "block",
-        width: percent(100),
-        ...{
-            "&.hasMedia": {
-                width: calc(`100% - ${styleUnit(mediaWidth)}`),
-            },
-            "&.hasIcon": {
-                width: calc(`100% - ${styleUnit(iconWidth)}`),
-            },
-            "&.hasMedia.hasIcon": {
-                width: calc(`100% - ${styleUnit(mediaWidth + iconWidth)}`),
-            },
-            ...mediaQueries({
-                [LayoutTypes.TWO_COLUMNS]: {
-                    oneColumnDown: mainCompactStyles,
-                },
-                [LayoutTypes.THREE_COLUMNS]: {
-                    oneColumnDown: mainCompactStyles,
-                },
-            }),
-        },
-    });
-
-    const image = style("image", {
-        ...objectFitWithFallback(),
-    });
-
-    const compactMediaElement = style("compactMediaElement", {
-        ...{
-            [`.${image}`]: {
-                position: important("absolute"),
-            },
-        },
-    });
-
-    const mediaElement = style("mediaElement", {
-        position: "relative",
-        width: styleUnit(vars.mediaElement.width),
-        height: styleUnit(vars.mediaElement.height),
-        overflow: "hidden",
-        alignSelf: "flex-end",
-        ...{
-            [`&.${compactMediaElement}`]: {
-                overflow: "hidden",
-                position: "relative",
-                marginTop: styleUnit(globalVars.gutter.size),
-                paddingTop: percent(vars.mediaElement.compact.ratio),
-                width: percent(100),
-            },
-        },
-    });
-
-    const attachmentCompactStyles: CSSObject = {
-        flexWrap: "wrap",
-        width: percent(100),
-        marginTop: styleUnit(12),
-    };
-
-    const attachments = style("attachments", {
-        display: "flex",
-        flexWrap: "nowrap",
-        ...mediaQueries({
-            [LayoutTypes.TWO_COLUMNS]: {
-                oneColumnDown: attachmentCompactStyles,
-            },
-            [LayoutTypes.THREE_COLUMNS]: {
-                oneColumnDown: attachmentCompactStyles,
-            },
-        }),
-    });
-
-    const metas = style("metas", {
-        marginTop: styleUnit(2),
-        ...Mixins.margin({
-            horizontal: negativeUnit(metasVars.spacing.horizontal),
-        }),
-    });
-
-    const compactExcerpt = style("compactExcerpt", {});
-
-    const excerpt = style("excerpt", {
-        marginTop: styleUnit(vars.excerpt.margin),
-        color: ColorsUtils.colorOut(vars.excerpt.fg),
-        lineHeight: globalVars.lineHeights.excerpt,
-        ...{
-            [`&.${compactExcerpt}`]: {
-                ...Mixins.margin({
-                    top: globalVars.gutter.size,
-                    left: iconWidth,
-                }),
-            },
-        },
-    });
-
-    const titleColor = vars.title.font?.color?.toString();
-    const defaultLinkColor = titleColor ?? ColorsUtils.colorOut(globalVars.mainColors.fg);
-
-    const link = style("link", {
-        ...linkColors,
-        // skipDefault = true so color is undefined
-        ...{ color: defaultLinkColor },
-    });
-
-    const afterExcerptLink = style("afterExcerptLink", {
-        ...Mixins.font(metasVars.font),
-        ...linkColors,
-    });
-
-    const iconWrap = style("iconWrap", {
+    const iconWrap = css({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -397,30 +164,11 @@ export const searchResultClasses = useThemeCache((mediaQueries, hasIcon = false)
         borderRadius: "50%",
         width: styleUnit(vars.icon.size),
         height: styleUnit(vars.icon.size),
+        flexShrink: 0,
         cursor: "pointer",
     });
 
-    const commentWrap = style("commentWrap", {
-        display: "flex",
-        marginTop: styleUnit(globalVars.gutter.size),
-    });
-
     return {
-        root,
-        main,
-        mediaElement,
-        compactMediaElement,
-        image,
-        title,
-        attachments,
-        metas,
-        excerpt,
-        compactExcerpt,
-        afterExcerptLink,
-        attachmentCompactStyles,
-        link,
         iconWrap,
-        commentWrap,
-        content,
     };
 });

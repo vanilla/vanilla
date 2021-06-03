@@ -154,6 +154,10 @@ components:
         reactionValue:
           description: The reaction's value.
           type: integer
+        photoUrl:
+          description: The URL of the reaction icon.
+          type: string
+          format: uri
       required:
       - urlCode
       - name
@@ -166,4 +170,5 @@ components:
       - active
       - custom
       - hidden
+      - photoUrl
       type: object

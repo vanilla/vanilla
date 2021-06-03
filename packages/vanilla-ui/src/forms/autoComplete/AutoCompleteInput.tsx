@@ -90,7 +90,7 @@ export const AutoCompleteInput = React.forwardRef(function AutoCompleteInputImpl
                 ref={mergeRefs(forwardedRef, inputRef)}
                 onChange={onChange}
                 value={value ?? props.value}
-                className={cx(classesInput.input, props.className)}
+                className={cx(classesInput.input, classes.input, props.className)}
             />
             <div className={classes.inputActions}>
                 {arrow && <AutoCompleteArrow>{typeof arrow === "boolean" ? null : arrow}</AutoCompleteArrow>}

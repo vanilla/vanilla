@@ -9,6 +9,11 @@ namespace VanillaTests\Dashboard\Models;
 
 use PHPUnit\Framework\TestCase;
 use Vanilla\Dashboard\Models\BannerImageModel;
+use Vanilla\Site\DefaultSiteSection;
+use VanillaTests\BootstrapTrait;
+use VanillaTests\Fixtures\MockConfig;
+use VanillaTests\Fixtures\MockSiteSection;
+use VanillaTests\Fixtures\MockSiteSectionProvider;
 use VanillaTests\SiteTestTrait;
 
 /**
@@ -35,6 +40,11 @@ class BannerImageModelTest extends TestCase {
 
     /** @var array */
     private $cat2_2_1;
+
+    /**
+     * @var MockSiteSectionProvider;
+     */
+    protected $siteSectionProvider;
 
     /**
      * Setup some categories.
@@ -78,6 +88,8 @@ class BannerImageModelTest extends TestCase {
             'ParentCategoryID' => $this->cat2_2,
             'UrlCode' => randomString(10),
         ]);
+        /** @var MockSiteSectionProvider $siteSectionProvider */
+        $this->siteSectionProvider = self::container()->get(MockSiteSectionProvider::class);
     }
 
     /**
@@ -108,7 +120,11 @@ class BannerImageModelTest extends TestCase {
      */
     public function testGetCurrent() {
         $uploadPrefix = 'http://vanilla.test/bannerimagemodeltest/uploads/';
-
+        $router = self::container()->get(\Gdn_Router::class);
+        $defaultSection = new DefaultSiteSection(new MockConfig([
+            BannerImageModel::DEFAULT_CONFIG_KEY => $uploadPrefix.'default.png',
+        ]), $router);
+        $this->siteSectionProvider->setCurrentSiteSection($defaultSection);
         // No controller
         $this->assertEquals(
             $uploadPrefix.'default.png',

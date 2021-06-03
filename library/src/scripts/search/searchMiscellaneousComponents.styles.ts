@@ -13,7 +13,7 @@ import { Mixins } from "@library/styles/Mixins";
 export const searchMiscellaneousComponentsVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("searchComponents");
     const spacing = makeThemeVars("spacing", {
-        margin: 12,
+        margin: 4,
     });
     return {
         spacing,

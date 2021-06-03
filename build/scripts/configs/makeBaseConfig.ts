@@ -22,14 +22,15 @@ import globby from "globby";
  *
  * @param section - The section of the app to build. Eg. forum | admin | knowledge.
  */
-export async function makeBaseConfig(entryModel: EntryModel, section: string) {
+export async function makeBaseConfig(entryModel: EntryModel, section: string, isLegacy: boolean = true) {
     const options = await getOptions();
 
-    const modulePaths = [
-        "node_modules",
+    const customModulePaths = [
         ...entryModel.addonDirs.map((dir) => path.resolve(dir, "node_modules")),
         path.join(VANILLA_ROOT, "node_modules"),
     ];
+
+    const modulePaths = ["node_modules", ...customModulePaths];
 
     const aliases = Object.keys(entryModel.aliases).join(", ");
     const message = `Building section ${chalk.yellowBright(section)} with the following aliases
@@ -46,20 +47,26 @@ ${chalk.green(aliases)}`;
         babelPlugins.push([require.resolve("react-refresh/babel"), { skipEnvCheck: true }]);
     }
 
+    section = isLegacy ? section : `${section}-modern`;
     const config: any = {
         context: VANILLA_ROOT,
-        // Currently have some memory issues from this.
-        // cache: {
-        //     type: "filesystem",
-        //     buildDependencies: {
-        //         config: [...globby.sync(path.resolve(__dirname, "*")), path.resolve(VANILLA_ROOT, "yarn.lock")],
-        //     },
-        //     name: `${section}-${options.mode}`,
-        // },
+        parallelism: 50, // Intentionally brought down from 50 to reduce memory usage.
+        cache: {
+            type: "filesystem",
+            allowCollectingMemory: true, // Required to keep memory usage down.
+            buildDependencies: {
+                config: [...globby.sync(path.resolve(__dirname, "*"))],
+            },
+            // This will cause cache inconsistencies if manually modifying these without
+            // changing the package.json (which is used to avoid hashing node_modules).
+            managedPaths: customModulePaths,
+            name: `${section}-${options.mode}-${options.debug}`,
+            maxMemoryGenerations: options.lowMemory ? 3 : Infinity,
+        },
         module: {
             rules: [
                 {
-                    test: /\.(jsx?|tsx?)$/,
+                    test: /\.(m?jsx?|tsx?)$/,
                     exclude: (modulePath: string) => {
                         const modulesRequiringTranspilation = [
                             "quill",
@@ -72,15 +79,16 @@ ${chalk.green(aliases)}`;
                             "@?react-spring.*",
                             "delaunator.*",
                             "buffer",
+                            "rafz",
+                            "highlight.js",
+                            "@reach/.*",
+                            "react-markdown",
+                            "@simonwep.*",
+                            "swagger-ui-react",
                         ];
                         const exclusionRegex = new RegExp(`node_modules/(${modulesRequiringTranspilation.join("|")})/`);
 
                         if (modulePath.includes("core-js")) {
-                            return true;
-                        }
-
-                        if (modulePath.includes("swagger-ui-react")) {
-                            // Do not do additional transpilation of swagger-ui.
                             return true;
                         }
 
@@ -92,7 +100,14 @@ ${chalk.green(aliases)}`;
                         {
                             loader: "babel-loader",
                             options: {
-                                presets: [require.resolve("@vanilla/babel-preset")],
+                                presets: [
+                                    [
+                                        require.resolve("@vanilla/babel-preset"),
+                                        {
+                                            isLegacy,
+                                        },
+                                    ],
+                                ],
                                 plugins: babelPlugins,
                                 cacheDirectory: true,
                             },
@@ -104,6 +119,7 @@ ${chalk.green(aliases)}`;
                     use: "raw-loader",
                 },
                 svgLoader(),
+                { test: /\.(png|jpg|jpeg|gif)$/i, type: "asset/resource" },
                 {
                     test: /\.s?css$/,
                     use: [
@@ -138,6 +154,7 @@ ${chalk.green(aliases)}`;
                                 sourceMap: true,
                                 postcssOptions: {
                                     config: path.resolve(VANILLA_ROOT, "build/scripts/configs/postcss.config.js"),
+                                    isLegacy,
                                 },
                             },
                         },
@@ -193,7 +210,7 @@ ${chalk.green(aliases)}`;
         config.plugins.push(
             new MiniCssExtractPlugin({
                 filename: "[name].[contenthash].min.css",
-                chunkFilename: "[name].[contenthash].min.css",
+                chunkFilename: "async/[name].[contenthash].min.css",
             }),
         );
     }

@@ -9,7 +9,7 @@ import { useLayout, withLayout } from "@library/layout/LayoutContext";
 import { ILayoutContainer } from "@library/layout/components/interface.layoutContainer";
 import { panelWidgetClasses } from "@library/layout/panelWidgetStyles";
 
-export function PanelWidgetHorizontalPadding(props: ILayoutContainer) {
+function PanelWidgetHorizontalPadding(props: ILayoutContainer) {
     const classes = panelWidgetClasses(useLayout().mediaQueries);
     return <div className={classNames(classes.root, "hasNoVerticalPadding", props.className)}>{props.children}</div>;
 }

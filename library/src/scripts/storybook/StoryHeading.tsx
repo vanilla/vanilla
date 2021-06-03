@@ -6,7 +6,7 @@
 
 import React from "react";
 import { storyBookClasses } from "@library/storybook/StoryBookStyles";
-import { cx } from "@library/styles/styleShim";
+import { cx } from "@emotion/css";
 
 export interface IStoryHeadingProps {
     depth?: number;

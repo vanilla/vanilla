@@ -214,7 +214,7 @@
         "pre-push": "yarn build && yarn test && yarn check-types",
         "build": "yarn run build:assets && yarn build:variable-docs",
         "build:assets": "ts-node -P build/tsconfig.json build/scripts/build.ts",
-        "build:dev": "yarn run build:assets --mode=development",
+        "build:dev": "yarn run build:assets --mode=development --m",
         "build:analyze": "yarn run build:assets --mode=analyze",
         "build:variable-docs": "ts-node -P build/tsconfig.json build/scripts/variables/buildVariableDocs.ts",
         "update:tsconfig": "node ./packages/updateTsconfig.js",

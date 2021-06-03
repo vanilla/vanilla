@@ -11,7 +11,7 @@ import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator"
 import { PanelNavItems } from "@library/flyouts/panelNav/PanelNavItems";
 import { INavigationTreeItem } from "@library/@types/api/core";
 import { notEmpty } from "@vanilla/utils";
-import { cx } from "@library/styles/styleShim";
+import { cx } from "@emotion/css";
 import { DropDownPanelNav } from "@library/flyouts/panelNav/DropDownPanelNav";
 
 export default function MobileOnlyNavigation(props: {}) {

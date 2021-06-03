@@ -145,6 +145,12 @@ export function DeleteCategoryModal(props: IProps) {
                             onChange={(option) => {
                                 setReplacementCategoryID(option?.value);
                             }}
+                            /**
+                             * This height depends on the height of the modal, ideally we
+                             * want to allow the menu options to break out of the modal
+                             * but those styles would be bigger kludge than this one.
+                             */
+                            maxHeight={150}
                         ></DashboardSelect>
                     </DashboardFormGroup>
                 )}

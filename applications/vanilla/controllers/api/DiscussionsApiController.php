@@ -502,14 +502,18 @@ class DiscussionsApiController extends AbstractApiController {
         $followed = $query['followed'] ?? false;
         $siteSectionID = $query["siteSectionID"] ?? '';
 
-        if (array_key_exists('categoryID', $where)) {
-            $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $where['categoryID']);
+        if (array_key_exists('d.CategoryID', $where)) {
+            $includeChildCategories = $query['includeChildCategories'] ?? false;
+            if ($includeChildCategories) {
+                $where['d.CategoryID'] = $this->getNestedCategoriesIDs($where['d.CategoryID'], $followed);
+            } else {
+                $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $where['d.CategoryID']);
+            }
         } elseif ($siteSectionID) {
             $siteSection = $this->siteSectionModel->getForSectionID($query['siteSectionID']);
             $categoryID = ($siteSection) ? $siteSection->getCategoryID() : null;
             if ($categoryID) {
-                $categoryIDs = $this->categoryModel->getSearchCategoryIDs($categoryID, $followed, true);
-                $where['d.CategoryID'] = $categoryIDs;
+                $where['d.CategoryID'] = $this->getNestedCategoriesIDs($categoryID, $followed);
             }
         }
 
@@ -982,5 +986,22 @@ class DiscussionsApiController extends AbstractApiController {
         if ($row['InsertUserID'] !== $this->getSession()->UserID) {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.Edit', $row['CategoryID']);
         }
+    }
+
+    /**
+     * Get all nested categoryIDs.
+     *
+     * @param int|null $categoryID
+     * @param bool $followed
+     *
+     * @return array
+     */
+    protected function getNestedCategoriesIDs(?int $categoryID, bool $followed): array {
+        $categoryIDs = $this->categoryModel->getSearchCategoryIDs(
+            $categoryID,
+            $followed,
+            true
+        );
+        return $categoryIDs;
     }
 }

@@ -10,6 +10,7 @@ use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\DateFilterSchema;
 use Vanilla\ApiUtils;
+use Vanilla\Exception\PermissionException;
 use Vanilla\Formatting\Formats\RichFormat;
 use Vanilla\Models\CrawlableRecordSchema;
 use Vanilla\Models\DirtyRecordModel;
@@ -113,17 +114,12 @@ class CommentsApiController extends AbstractApiController {
      *
      * @param int $id The ID of the comment.
      */
-    public function delete($id) {
+    public function delete(int $id) {
         $this->permission('Garden.SignIn.Allow');
 
-        $in = $this->idParamSchema()->setDescription('Delete a comment.');
-        $out = $this->schema([], 'out');
+        // Throws if the user can't delete.
+        $this->commentModel->checkCanDelete($id);
 
-        $comment = $this->commentByID($id);
-        if ($comment['InsertUserID'] !== $this->getSession()->UserID) {
-            $discussion = $this->discussionByID($comment['DiscussionID']);
-            $this->discussionModel->categoryPermission('Vanilla.Comments.Delete', $discussion['CategoryID']);
-        }
         $this->commentModel->deleteID($id);
     }
 

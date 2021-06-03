@@ -1,25 +1,24 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 import React from "react";
-import classNames from "classnames";
-import { searchResultsClasses } from "@library/features/search/searchResultsStyles";
 import Translate from "@library/content/Translate";
 import Paragraph from "@library/layout/Paragraph";
 import { t } from "@vanilla/i18n/src";
-import { useLayout } from "@library/layout/LayoutContext";
-import PanelWidget from "@library/layout/components/PanelWidget";
+import { List } from "@library/lists/List";
+import { ListItemLayout } from "@library/lists/ListItem.variables";
+import { PageBox } from "@library/layout/PageBox";
+import Result from "@library/result/Result";
 
 interface IProps {
     className?: string;
     searchTerm?: string;
     results: any[];
-    result: React.ComponentType<any>;
+    resultComponent?: React.ComponentType<any>;
     emptyMessage?: string;
-    headingLevel?: 2 | 3;
     ResultWrapper?: React.ComponentType<any>;
     rel?: string;
 }
@@ -33,40 +32,37 @@ export default function ResultList(props: IProps) {
         searchTerm,
         results,
         emptyMessage = t("No results found."),
-        headingLevel,
+        resultComponent = Result,
         ResultWrapper,
-        result,
     } = props;
 
     const hasResults = results && results.length > 0;
 
     let content;
-    const classes = searchResultsClasses(useLayout().mediaQueries);
 
     if (hasResults) {
-        const Result = result;
+        const ResultComponent = resultComponent;
         content = results.map((result, i) => {
-            return <Result {...result} key={i} headingLevel={headingLevel} rel={props.rel} />;
+            return <ResultComponent {...result} key={i} rel={props.rel} />;
         });
     } else {
-        let message =
-            searchTerm === undefined || searchTerm === "" ? (
-                emptyMessage
-            ) : (
-                <Translate source="No results for '<0/>'." c0={searchTerm} />
-            );
-
         content = (
-            <PanelWidget>
-                <Paragraph className={classNames("searchResults-noResults", classes.noResults)}>{message}</Paragraph>
-            </PanelWidget>
+            <PageBox>
+                <Paragraph>
+                    {searchTerm ? <Translate source="No results for '<0/>'." c0={searchTerm} /> : emptyMessage}
+                </Paragraph>
+            </PageBox>
         );
     }
 
     if (ResultWrapper) {
         return <ResultWrapper>{content}</ResultWrapper>;
     } else {
-        const Tag = hasResults ? `ul` : `div`;
-        return <Tag className={classNames("searchResults", classes.root, className)}>{content}</Tag>;
+        const tag = hasResults ? `ul` : `div`;
+        return (
+            <List as={tag} options={{ itemLayout: ListItemLayout.TITLE_METAS_DESCRIPTION }} className={className}>
+                {content}
+            </List>
+        );
     }
 }

@@ -1,22 +1,19 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 import React from "react";
-import classNames from "classnames";
 import AttachmentIcons from "@library/content/attachments/AttachmentIcons";
 import { t } from "@library/utility/appUtils";
 import TruncatedText from "@library/content/TruncatedText";
-import SmartLink from "@library/routing/links/SmartLink";
-import { searchResultClasses, searchResultsClasses } from "@library/features/search/searchResultsStyles";
+import { searchResultClasses } from "@library/features/search/searchResultsStyles";
 import { IAttachmentIcon } from "@library/content/attachments/AttachmentIcon";
-import Paragraph from "@library/layout/Paragraph";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
-import { useLayout } from "@library/layout/LayoutContext";
 import { IUser } from "@library/@types/api/users";
-
+import { ListItem } from "@library/lists/ListItem";
+import { ListItemMedia } from "@library/lists/ListItemMedia";
 export interface IResult {
     name: string;
     className?: string;
@@ -25,111 +22,48 @@ export interface IResult {
     excerpt?: string;
     highlight?: string;
     image?: string;
-    headingLevel?: 2 | 3;
     attachments?: IAttachmentIcon[];
     location: ICrumb[] | string[];
-    afterExcerpt?: React.ReactNode; // Likely SearchLink
     icon?: React.ReactNode;
     userInfo?: IUser;
     rel?: string;
 }
 
-/**
- * Generates search result list. Note that this template is used in other contexts, such as the flat category list
- */
 export default function Result(props: IResult) {
-    const {
-        name,
-        className,
-        meta,
-        url,
-        excerpt,
-        image,
-        headingLevel = 2,
-        attachments,
-        afterExcerpt,
-        icon,
-        highlight,
-    } = props;
-
-    const hasAttachments = attachments && attachments.length > 0;
-    const showImage = image && !hasAttachments;
+    const { name, className, meta, url, excerpt, image, attachments, icon, highlight } = props;
+    const hasAttachments = !!(attachments && attachments.length > 0);
+    const showImage = !!image && !hasAttachments;
     const hasMedia = hasAttachments || showImage;
-    const layoutContext = useLayout();
-    const classesSearchResults = searchResultsClasses(layoutContext.mediaQueries);
-    const classes = searchResultClasses(layoutContext.mediaQueries, !!icon);
-    const imageComponent = showImage ? (
-        <img
-            src={image}
-            className={classNames("searchResult-image", classes.image)}
-            alt={t("Thumbnail for: " + name)}
-            aria-hidden={true}
-            loading="lazy"
-        />
-    ) : null;
-
-    let attachmentOutput;
-    if (hasAttachments && attachments) {
-        attachmentOutput = <AttachmentIcons attachments={attachments} />;
-    }
-    const HeadingTag = `h${headingLevel}` as "h1";
-
-    const { isCompact } = useLayout();
+    const classes = searchResultClasses();
 
     const media = hasMedia ? (
-        <div
-            className={classNames(classes.mediaElement, {
-                hasImage: showImage,
-                [classes.compactMediaElement]: isCompact,
-            })}
-        >
-            {showImage && imageComponent}
-            {attachmentOutput}
-        </div>
+        showImage ? (
+            <ListItemMedia src={image!} alt={t("Thumbnail for: " + name)} />
+        ) : hasAttachments ? (
+            <AttachmentIcons attachments={attachments!} />
+        ) : null
     ) : null;
 
     const highlightElement = highlight ? (
-        <Paragraph className={classNames(classes.excerpt, { [classes.compactExcerpt]: isCompact })}>
-            <>
-                <TruncatedText maxCharCount={160}>
-                    <div dangerouslySetInnerHTML={{ __html: highlight }}></div>
-                </TruncatedText>
-                {afterExcerpt}
-            </>
-        </Paragraph>
+        <TruncatedText maxCharCount={160} lines={2}>
+            <div dangerouslySetInnerHTML={{ __html: highlight }}></div>
+        </TruncatedText>
     ) : null;
 
-    const excerptElement =
-        excerpt && excerpt.length > 0 ? (
-            <Paragraph className={classNames(classes.excerpt, { [classes.compactExcerpt]: isCompact })}>
-                <>
-                    <TruncatedText maxCharCount={160}>{excerpt}</TruncatedText>
-                    {afterExcerpt}
-                </>
-            </Paragraph>
-        ) : null;
-
-    const newExcerptElement = highlightElement ?? excerptElement;
+    const excerptElement = excerpt && excerpt?.length > 0 ? excerpt : null;
 
     return (
-        <li className={classNames(classesSearchResults.item, className)}>
-            <article className={classesSearchResults.result}>
-                <div className={classNames(classes.root)}>
-                    <div className={classes.content}>
-                        {icon && <div className={classes.iconWrap}>{icon}</div>}
-                        <div className={classNames(classes.main, { hasMedia: !!media, hasIcon: !!icon })}>
-                            <SmartLink to={url} tabIndex={0} className={classes.link} rel={props.rel}>
-                                <HeadingTag className={classes.title}>{name}</HeadingTag>
-                            </SmartLink>
-                            {meta && <div className={classes.metas}>{meta}</div>}
-                            {isCompact && media}
-                            {!isCompact && newExcerptElement}
-                        </div>
-                        {!isCompact && media}
-                        {isCompact && newExcerptElement}
-                    </div>
-                </div>
-            </article>
-        </li>
+        <ListItem
+            className={className}
+            url={url}
+            name={name}
+            icon={icon}
+            iconWrapperClass={classes.iconWrap}
+            description={highlightElement ?? excerptElement}
+            truncateDescription={!!highlightElement}
+            descriptionMaxCharCount={160}
+            metas={meta}
+            mediaItem={media}
+        />
     );
 }

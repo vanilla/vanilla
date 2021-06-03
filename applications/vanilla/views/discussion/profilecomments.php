@@ -19,18 +19,12 @@ foreach ($this->data('Comments') as $Comment) {
     $Permalink = commentUrl($Comment);
     $User = userBuilder($Comment, 'Insert');
     $this->EventArguments['User'] = $User;
-    /** @var \Vanilla\Formatting\Html\HtmlSanitizer $htmlSanitizer */
-    $htmlSanitizer = Gdn::getContainer()->get(\Vanilla\Formatting\Html\HtmlSanitizer::class);
-    $sanitizedBody = replaceCommentBlockQuotes($Comment);
-    $sanitizedBody = $htmlSanitizer->filter($sanitizedBody);
     ?>
     <li id="<?php echo 'Comment_'.$Comment->CommentID; ?>" class="Item">
         <?php $this->fireEvent('BeforeItemContent'); ?>
         <div class="ItemContent">
             <div class="Message">
-                <?php
-                echo sliceString($sanitizedBody, 250);
-                ?>
+                <?php echo htmlspecialchars(Gdn::formatService()->renderExcerpt($Comment->Body, $Comment->Format)); ?>
             </div>
             <div class="Meta">
                 <span class="MItem"><?php echo t('Comment in', 'in').' '; ?>

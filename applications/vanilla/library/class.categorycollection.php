@@ -178,7 +178,7 @@ class CategoryCollection {
     /**
      * Lookup a category by either ID or slug.
      *
-     * @param int $categoryID The category ID to get.
+     * @param int|string $categoryID The category ID to get.
      * @return array|null Returns a category or **null** if one isn't found.
      */
     public function get($categoryID) {

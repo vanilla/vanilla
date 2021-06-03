@@ -55,7 +55,7 @@ export function PlacesSearchTypeFilter(props: IProps) {
 
     const classesInputBlock = inputBlockClasses();
     return (
-        <CheckboxGroup label={t("What to search")} grid={true} tight={true}>
+        <CheckboxGroup label={t("What to search")} tight={true}>
             {registeredTypes.map((registeredType, i) => {
                 const valueSet = new Set(registeredType.values);
 

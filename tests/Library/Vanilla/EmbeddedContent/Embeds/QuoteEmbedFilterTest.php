@@ -12,6 +12,7 @@ use Vanilla\EmbeddedContent\Embeds\QuoteEmbedDisplayOptions;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbedFilter;
 use Vanilla\EmbeddedContent\EmbedService;
 use Vanilla\Formatting\Formats\RichFormat;
+use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\Quill\Parser;
 use VanillaTests\Fixtures\EmbeddedContent\LegacyEmbedFixtures;
 use VanillaTests\Fixtures\EmbeddedContent\MockEmbed;
@@ -24,6 +25,9 @@ use VanillaTests\MinimalContainerTestCase;
 class QuoteEmbedFilterTest extends MinimalContainerTestCase {
 
     use HtmlNormalizeTrait;
+
+    /** @var RichFormat */
+    private $richFormatter;
 
     /**
      * Test that user's are properly replace with clean content.
@@ -45,6 +49,15 @@ class QuoteEmbedFilterTest extends MinimalContainerTestCase {
         $data = $embed->getData();
         $this->assertSame($realUser, $embed->getData()['insertUser'], "User was not properly replaced");
         $this->assertSame(\Gdn::formatService()->renderHTML($data['bodyRaw'], $data['format']), $data['body'], "Body was not re-rendered");
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setUp(): void {
+        parent::setUp();
+        $this->richFormatter = $this->container()->get(RichFormat::class);
+        $this->container()->get(FormatService::class)->registerFormat(RichFormat::FORMAT_KEY, $this->richFormatter);
     }
 
     /**
@@ -97,6 +110,7 @@ HTML;
     public function testFullContentFiltering() {
         self::container()->rule(EmbedService::class)
             ->addCall('registerEmbed', [MockEmbed::class, MockEmbed::TYPE]);
+
         /** @var QuoteEmbedFilter $filter */
         $filter = self::container()->get(QuoteEmbedFilter::class);
 

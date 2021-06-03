@@ -8,14 +8,16 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
 import { Variables } from "@library/styles/Variables";
 import { listItemVariables } from "@library/lists/ListItem.variables";
+import { IThemeVariables } from "@library/theming/themeReducer";
 
-export const discussionListVariables = useThemeCache(() => {
+export const discussionListVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     /**
      * @varGroup discussionList
      * @description Variables affecting discussion lists
      */
     const makeThemeVars = variableFactory("discussionList");
-    const listItemVars = listItemVariables();
+    const listItemVars = listItemVariables(undefined, forcedVars);
+    const globalVars = globalVariables(forcedVars);
 
     /**
      * @varGroup discussionList.profilePhoto
@@ -30,9 +32,9 @@ export const discussionListVariables = useThemeCache(() => {
      * @description Content boxes for the discussion list page.
      * @expand contentBoxes
      */
-    const contentBoxes = makeThemeVars("contentBoxes", Variables.contentBoxes(globalVariables().contentBoxes));
+    const contentBoxes = makeThemeVars("contentBoxes", Variables.contentBoxes(globalVars.contentBoxes));
 
-    const panelBoxes = makeThemeVars("panelBoxes", Variables.contentBoxes(globalVariables().panelBoxes));
+    const panelBoxes = makeThemeVars("panelBoxes", Variables.contentBoxes(globalVars.panelBoxes));
 
     /**
      * @varGroup discussionList.userTags
@@ -47,6 +49,23 @@ export const discussionListVariables = useThemeCache(() => {
      * @description A single discussion item.
      */
     const item = makeThemeVars("item", {
+        /**
+         * @var discussionList.item.options.iconPosition
+         * @description Choose where the icon of the list item is placed.
+         * @type string
+         * @enum default | meta | hidden
+         */
+        options: {
+            iconPosition: listItemVars.options.iconPosition,
+        },
+        excerpt: {
+            /**
+             * @var discussionList.item.excerpt.display
+             * @type boolean
+             * @description Whether or not the excerpt in a discussion should display.
+             */
+            display: true,
+        },
         title: {
             /**
              * @varGroup discussionList.item.title.font
@@ -58,7 +77,7 @@ export const discussionListVariables = useThemeCache(() => {
              * @description Font variables for the "read" state of the title. (When the discussion has already been read).
              */
             fontRead: Variables.font({
-                weight: globalVariables().fonts.weights.normal,
+                weight: globalVars.fonts.weights.normal,
             }),
             /**
              * @varGroup discussionList.item.title.font

@@ -38,6 +38,7 @@ export interface IHomeWidgetContainerOptions {
     headerAlignment?: "left" | "center";
     contentAlignment?: "flex-start" | "center";
     isGrid?: boolean;
+    isCarousel?: boolean;
 }
 
 interface IViewAll {
@@ -95,6 +96,7 @@ export const homeWidgetContainerVariables = useThemeCache(
                 headerAlignment: pageHeadingVars.options.alignment as "left" | "center",
                 contentAlignment: "flex-start" as "flex-start" | "center",
                 isGrid: false,
+                isCarousel: false,
             },
             optionOverrides,
         );
@@ -107,6 +109,7 @@ export const homeWidgetContainerVariables = useThemeCache(
                     options.innerBackground.color || options.innerBackground.image
                         ? BorderType.SHADOW
                         : BorderType.NONE,
+                isGrid: options.isCarousel ? false : options.isGrid,
             },
             optionOverrides,
         );

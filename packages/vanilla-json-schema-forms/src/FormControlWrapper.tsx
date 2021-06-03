@@ -9,7 +9,7 @@ import produce from "immer";
 import get from "lodash/get";
 import set from "lodash/set";
 import { IControlProps, ISchemaRenderProps } from "./types";
-import { findAllReferences } from "./utils";
+import { findAllReferences, validateConditions } from "./utils";
 import { stableObjectHash } from "@vanilla/utils";
 
 /**
@@ -19,6 +19,7 @@ import { stableObjectHash } from "@vanilla/utils";
 export function FormControlWrapper(props: Omit<IControlProps, "disabled"> & Pick<ISchemaRenderProps, "FormControl">) {
     const { FormControl, ...controlProps } = props;
     const { control, rootInstance, path } = controlProps;
+    const { conditions } = control;
     // References are stable, they never change as the control stays the same.
     const references = React.useMemo(() => findAllReferences(control), [control]);
     // This array should change every time a value changes in rootInstance.
@@ -53,5 +54,10 @@ export function FormControlWrapper(props: Omit<IControlProps, "disabled"> & Pick
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [stableObjectHash(unrefValues), references],
     );
-    return <FormControl {...controlProps} control={stableUnwrappedControl} />;
+    const conditionsValidation = validateConditions(conditions ?? [], rootInstance);
+    const disabled = conditionsValidation.conditions.some((c) => c.disable);
+    if (!disabled && !conditionsValidation.isValid) {
+        return null;
+    }
+    return <FormControl {...controlProps} disabled={disabled} control={stableUnwrappedControl} />;
 }

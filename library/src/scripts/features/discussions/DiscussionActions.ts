@@ -9,6 +9,7 @@ import { actionCreatorFactory } from "typescript-fsa";
 import { IDiscussion, IGetDiscussionListParams } from "@dashboard/@types/api/discussion";
 import { IUser } from "@library/@types/api/users";
 import { IReaction } from "@dashboard/@types/api/reaction";
+import { ITag } from "@library/features/tags/TagsReducer";
 
 const createAction = actionCreatorFactory("@@discussions");
 
@@ -77,6 +78,10 @@ export interface IDeleteDiscussion {
 export interface IPutDiscussionType {
     discussionID: IDiscussion["discussionID"];
     type: string;
+}
+export interface IPutDiscussionTags {
+    discussionID: IDiscussion["discussionID"];
+    tagIDs: number[];
 }
 
 export default class DiscussionActions extends ReduxActions {
@@ -205,6 +210,21 @@ export default class DiscussionActions extends ReduxActions {
         };
 
         const thunk = bindThunkAction(DiscussionActions.deleteDiscussionACs, deleteDiscussionApi)({ discussionID });
+        return this.dispatch(thunk);
+    };
+
+    public static putDiscussionTagsACs = createAction.async<IPutDiscussionTags, ITag[], IApiError>(
+        "PUT_DISCUSSION_TAGS",
+    );
+
+    public putDiscussionTags = (query: IPutDiscussionTags) => {
+        const { discussionID, tagIDs } = query;
+        const thunk = bindThunkAction(DiscussionActions.putDiscussionTagsACs, async () => {
+            const reponse = await this.api.put(`/discussions/${discussionID}/tags`, {
+                tagIDs,
+            });
+            return reponse.data;
+        })({ discussionID, tagIDs });
         return this.dispatch(thunk);
     };
 }

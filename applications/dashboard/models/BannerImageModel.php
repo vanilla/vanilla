@@ -11,6 +11,7 @@ use Gdn;
 use Vanilla\AliasLoader;
 use Vanilla\Formatting\Formats\HtmlFormat;
 use Vanilla\Formatting\FormatService;
+use Vanilla\Site\SiteSectionModel;
 
 /**
  * Banner Image Model.
@@ -121,10 +122,16 @@ class BannerImageModel {
      */
     public static function getCurrentBannerImageLink(): string {
         $controller = \Gdn::controller();
+        /** @var SiteSectionModel $siteSectionModel */
+        $siteSectionModel = Gdn::getContainer()->get(SiteSectionModel::class);
+        $currentSection = $siteSectionModel->getCurrentSiteSection();
+        $siteSectionBanner = $currentSection->getBannerImageLink();
         $categoryID = $controller
             ? $controller->data('Category.CategoryID', $controller->data('ContextualCategoryID'))
             : null;
-        $field = self::getCategoryField($categoryID, 'BannerImage', c(self::DEFAULT_CONFIG_KEY));
+        $isRootSiteSection = $categoryID === $currentSection->getCategoryID();
+        $defaultBanner = $siteSectionBanner ?: Gdn::config(BannerImageModel::DEFAULT_CONFIG_KEY);
+        $field = !$isRootSiteSection ? self::getCategoryField($categoryID, 'BannerImage', $defaultBanner) : $siteSectionBanner;
         return $field ? \Gdn_Upload::url($field) : $field;
     }
 

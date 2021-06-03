@@ -4,24 +4,22 @@
  * @license gpl-2.0-only
  */
 
-import { IDiscussion } from "@dashboard/@types/api/discussion";
+import React from "react";
 import { PageBox } from "@library/layout/PageBox";
 import { PageBoxContextProvider } from "@library/layout/PageBox.context";
 import { IListOptions, listVariables } from "@library/lists/List.variables";
-import { ListItem, ListItemContext } from "@library/lists/ListItem";
-import { IListItemOptions } from "@library/lists/ListItem.variables";
-import { IBoxOptions, IPartialBoxOptions } from "@library/styles/cssUtilsTypes";
-import React from "react";
-
+import { ListItemContext } from "@library/lists/ListItem";
 export interface IListProps {
     options?: Partial<IListOptions>;
     children?: React.ReactNode;
+    className?: string;
+    as?: keyof JSX.IntrinsicElements;
 }
 
 export function List(props: IListProps) {
     const options = listVariables(props.options).options;
     return (
-        <PageBox options={options.box}>
+        <PageBox as={props.as ?? "ul"} options={options.box} className={props.className}>
             <PageBoxContextProvider options={options.itemBox}>
                 <ListItemContext.Provider value={{ layout: options.itemLayout }}>
                     {props.children}

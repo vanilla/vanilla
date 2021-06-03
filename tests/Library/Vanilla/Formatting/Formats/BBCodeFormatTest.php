@@ -36,7 +36,11 @@ class BBCodeFormatTest extends AbstractFormatTestCase {
     public function testUmlautLinks(): void {
         $bbcode = '[url=https://de.wikipedia.org/wiki/Prüfsumme]a[/url]';
         $actual = $this->prepareFormatter()->renderHTML($bbcode);
-        $expected = '<a href="https://de.wikipedia.org/wiki/Prüfsumme" rel="nofollow">a</a>';
+        $expectedHref = url("/home/leaving?" . http_build_query([
+            "allowTrusted" => 1,
+            "target" => "https://de.wikipedia.org/wiki/Prüfsumme",
+        ]));
+        $expected = '<a href="' . htmlspecialchars($expectedHref). '" rel="nofollow">a</a>';
         $this->assertHtmlStringEqualsHtmlString($expected, $actual);
     }
 }

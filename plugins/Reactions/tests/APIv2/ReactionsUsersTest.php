@@ -41,7 +41,7 @@ class ReactionsUsersTest extends AbstractAPIv2Test {
         $response = $this->api()->get("users", ["expand" => "reactionsReceived"])->getBody();
         $user = reset($response);
         $actual = $user["reactionsReceived"];
-        $expected = $this->reactionModel->compoundTypeFragmentSchema(true)->validate($actual);
+        $expected = $this->reactionModel->compoundTypeFragmentSchema()->validate($actual);
         $this->assertSame($expected, $actual);
     }
 
@@ -75,7 +75,7 @@ class ReactionsUsersTest extends AbstractAPIv2Test {
 
         // Verify the shape.
         $actual = $response["reactionsReceived"];
-        $expected = $this->reactionModel->compoundTypeFragmentSchema(true)->validate($actual);
+        $expected = $this->reactionModel->compoundTypeFragmentSchema()->validate($actual);
         $this->assertSame($expected, $actual);
 
         // Verify we received our one reaction and not another.

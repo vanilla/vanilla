@@ -341,6 +341,9 @@ class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface {
      * @return string
      */
     public function translate($code, $default = false) {
+        if (!is_string($code)) {
+            $code = '';
+        }
         if ($default === false) {
             $default = $code;
         }

@@ -54,7 +54,7 @@ trait HomeWidgetContainerSchemaTrait {
     public static function widgetSubtitleSchema(): Schema {
         return Schema::parse([
             'subtitleContent:s?' => [
-                'x-control' => SchemaForm::textBox(new FormOptions('Subtitle', 'Set a custom sub-title.'))
+                'x-control' => SchemaForm::textBox(new FormOptions('Subtitle', 'Set a custom subtitle.'))
             ],
         ]);
     }

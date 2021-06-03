@@ -624,6 +624,11 @@ class PostController extends VanillaController {
         if (!is_numeric($DraftID) && $DraftID !== '') {
             throw new Gdn_UserException("Invalid draft ID.");
         }
+        if ($DraftID !== '') {
+            if ($Session->UserID !== $this->Comment->InsertUserID && !$Session->checkPermission('Garden.Settings.Manage')) {
+                throw new \Garden\Web\Exception\ForbiddenException(t('ErrorPermission'));
+            }
+        }
         $this->EventArguments['CommentID'] = $CommentID;
         $this->EventArguments['DraftID'] = $DraftID;
 

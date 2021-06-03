@@ -104,6 +104,7 @@ export const listItemClasses = useThemeCache(() => {
     });
     const titleLink = css(mixinListItemTitleLink());
     const description = css({
+        ...Mixins.font(vars.description.font),
         [`.${metasContainer} + &`]: {
             marginTop: 4,
         },

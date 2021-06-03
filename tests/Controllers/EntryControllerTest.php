@@ -7,6 +7,7 @@
 
 namespace VanillaTests\Controllers;
 
+use BanModel;
 use League\Uri\Http;
 use VanillaTests\SetupTraitsTrait;
 use VanillaTests\SiteTestTrait;
@@ -25,6 +26,8 @@ class EntryControllerTest extends VanillaTestCase {
      */
     private $controller;
 
+    private $userData;
+
     /**
      * @inheritDoc
      */
@@ -36,6 +39,8 @@ class EntryControllerTest extends VanillaTestCase {
         $this->controller->getImports();
         $this->controller->Request = $this->container()->get(\Gdn_Request::class);
         $this->controller->initialize();
+
+        $this->userData = $this->insertDummyUser();
     }
 
     /**
@@ -128,5 +133,59 @@ class EntryControllerTest extends VanillaTestCase {
             $this->assertTrue($r2->data('EmailConfirmed'));
             $this->assertSame((int)$r->data('UserID'), \Gdn::session()->UserID);
         });
+    }
+
+    /**
+     * If account has been banned by a ban rule.
+     */
+    public function testBannedAutomaticSignin(): void {
+        $postBody = ['Email' => $this->userData['Email'], 'Password' => $this->userData['Email'], 'RememberMe' => 1];
+
+        $this->userData = $this->userModel->getID($this->userData['UserID'], DATASET_TYPE_ARRAY);
+        $banned = val('Banned', $this->userData, 0);
+        $userData = [
+            "UserID" => $this->userData['UserID'],
+            "Banned" => BanModel::setBanned($banned, true, BanModel::BAN_AUTOMATIC)
+        ];
+        $this->userModel->save($userData);
+
+        $this->expectExceptionMessage(t('This account has been banned.'));
+        $r = $this->bessy()->post('/entry/signin', $postBody);
+    }
+
+    /**
+     * If account has been banned manually.
+     */
+    public function testBannedManualSignin(): void {
+        $postBody = ['Email' => $this->userData['Email'], 'Password' => $this->userData['Email'], 'RememberMe' => 1];
+
+        $this->userData = $this->userModel->getID($this->userData['UserID'], DATASET_TYPE_ARRAY);
+        $banned = val('Banned', $this->userData, 0);
+        $userData = [
+            "UserID" => $this->userData['UserID'],
+            "Banned" => BanModel::setBanned($banned, true, BanModel::BAN_MANUAL)
+        ];
+        $this->userModel->save($userData);
+
+        $this->expectExceptionMessage(t('This account has been banned.'));
+        $r = $this->bessy()->post('/entry/signin', $postBody);
+    }
+
+    /**
+     * If account has been banned by the "Warnings and notes" plugin or similar.
+     */
+    public function testBannedWarningSignin(): void {
+        $postBody = ['Email' => $this->userData['Email'], 'Password' => $this->userData['Email'], 'RememberMe' => 1];
+
+        $this->userData = $this->userModel->getID($this->userData['UserID'], DATASET_TYPE_ARRAY);
+        $banned = val('Banned', $this->userData, 0);
+        $userData = [
+            "UserID" => $this->userData['UserID'],
+            "Banned" => BanModel::setBanned($banned, true, BanModel::BAN_WARNING)
+        ];
+        $this->userModel->save($userData);
+
+        $this->expectExceptionMessage(t('This account has been temporarily banned.'));
+        $r = $this->bessy()->post('/entry/signin', $postBody);
     }
 }

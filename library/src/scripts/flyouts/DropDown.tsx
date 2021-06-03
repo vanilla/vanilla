@@ -268,7 +268,7 @@ const resolveOpenDirection = (data: IResolveDirectionProps): DropDownOpenDirecti
     }
 
     // Early bailout if we aren't auto.
-    if (props.openDirection === DropDownOpenDirection.AUTO || !renderAbove || !renderLeft) {
+    if (props.openDirection === DropDownOpenDirection.AUTO || (!props.openDirection && (!renderAbove || !renderLeft))) {
         if (!renderAbove) {
             const documentHeight = document.body.clientHeight;
             const centerY = (buttonRect.top + buttonRect.bottom) / 2; // center Y position of button

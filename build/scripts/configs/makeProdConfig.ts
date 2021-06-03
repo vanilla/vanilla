@@ -22,8 +22,8 @@ let analyzePort = 8888;
  *
  * @param section - The section of the app to build. Eg. forum | admin | knowledge.
  */
-export async function makeProdConfig(entryModel: EntryModel, section: string) {
-    const baseConfig: Configuration = await makeBaseConfig(entryModel, section);
+export async function makeProdConfig(entryModel: EntryModel, section: string, isLegacy: boolean = true) {
+    const baseConfig: Configuration = await makeBaseConfig(entryModel, section, isLegacy);
     const forumEntries = await entryModel.getProdEntries(section);
     const options = await getOptions();
 
@@ -31,6 +31,9 @@ export async function makeProdConfig(entryModel: EntryModel, section: string) {
     baseConfig.entry = forumEntries;
     baseConfig.devtool = false;
     baseConfig.target = ["web", "es5"];
+    if (options.modern) {
+        baseConfig.target = isLegacy ? ["web", "es5"] : ["web"];
+    }
     // These outputs are expected to have the directory of the addon they beng to in their "[name]".
     // Webpack does not along a function for name here.
     baseConfig.output = {
@@ -40,6 +43,10 @@ export async function makeProdConfig(entryModel: EntryModel, section: string) {
         path: path.join(DIST_DIRECTORY, section),
         library: `vanilla${section}`,
     };
+    if (options.modern) {
+        baseConfig.output.publicPath = isLegacy ? `/dist/${section}/` : `/dist/${section}-modern/`;
+        baseConfig.output.path = path.join(DIST_DIRECTORY, isLegacy ? section : `${section}-modern`);
+    }
     baseConfig.optimization = {
         emitOnErrors: false,
         chunkIds: options.debug ? "named" : undefined,
@@ -80,6 +87,12 @@ export async function makeProdConfig(entryModel: EntryModel, section: string) {
                     name: "react",
                     chunks: "all",
                     priority: -5,
+                },
+                swagger: {
+                    test: /[\\/]node_modules[\\/]swagger-ui.*/,
+                    name: "swagger-ui",
+                    chunks: "all",
+                    priority: -1,
                 },
             },
         },

@@ -35,7 +35,6 @@ import { photoGridCSS } from "@dashboard/compatibilityStyles/photoGridStyles";
 import { messagesCSS } from "@dashboard/compatibilityStyles/messagesStyles";
 import { blockColumnCSS } from "@dashboard/compatibilityStyles/blockColumnStyles";
 import { signaturesCSS } from "./signaturesSyles";
-import { searchResultsVariables } from "@library/features/search/searchResultsStyles";
 import { forumTagCSS } from "@dashboard/compatibilityStyles/forumTagStyles";
 import { signInMethodsCSS } from "@dashboard/compatibilityStyles/signInMethodStyles";
 import { suggestedTextStyleHelper } from "@library/features/search/suggestedTextStyles";
@@ -215,9 +214,6 @@ compatibilityStyles = useThemeCache(() => {
         backgroundColor: bg,
         color: fg,
     });
-
-    // Items
-    const resultVars = searchResultsVariables();
 
     cssOut(`.DataList .Item ~ .CategoryHeading::before, .MessageList .Item ~ .CategoryHeading::before`, {
         marginTop: styleUnit(vars.gutter.size * 2.5),

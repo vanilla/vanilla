@@ -12,7 +12,6 @@ import { discussionListVariables } from "@library/features/discussions/Discussio
 import { useCurrentUserSignedIn } from "@library/features/users/userHooks";
 import { UserPhoto } from "@library/headers/mebox/pieces/UserPhoto";
 import { ListItem } from "@library/lists/ListItem";
-import { ListItemIconPosition, listItemVariables } from "@library/lists/ListItem.variables";
 import { MetaIcon, MetaItem } from "@library/metas/Metas";
 import Notice from "@library/metas/Notice";
 import { Tag } from "@library/metas/Tags";
@@ -37,6 +36,7 @@ export default function DiscussionListItem(props: IProps) {
     const classes = discussionListClasses();
     const variables = discussionListVariables();
     const currentUserSignedIn = useCurrentUserSignedIn();
+    const hasUnread = discussion.unread || (discussion.countUnread !== undefined && discussion.countUnread > 0);
 
     let iconView = <UserPhoto userInfo={discussion.insertUser} size={variables.profilePhoto.size} />;
 
@@ -83,12 +83,13 @@ export default function DiscussionListItem(props: IProps) {
         <ListItem
             url={discussion.url}
             name={discussion.name}
-            nameClassName={cx(classes.title, { isRead: !discussion.unread && currentUserSignedIn })}
+            nameClassName={cx(classes.title, { isRead: !hasUnread && currentUserSignedIn })}
             description={discussion.excerpt}
             metas={<DiscussionListItemMeta {...discussion} />}
             actions={actions}
             icon={icon}
             iconWrapperClass={iconWrapperClass}
+            options={variables.item.options}
         ></ListItem>
     );
 }
@@ -134,12 +135,16 @@ function DiscussionListItemMeta(props: IDiscussion) {
         resolved,
     } = props;
 
-    const displayUnreadCount = unread || (countUnread !== undefined && countUnread > 0 && display.unreadCount);
+    const currentUserSignedIn = useCurrentUserSignedIn();
+
+    const displayUnreadCount =
+        currentUserSignedIn && (unread || (countUnread !== undefined && countUnread > 0 && display.unreadCount));
 
     const displayCategory = !!category && display.category;
 
-    const displayStartedByUser = !!insertUser && !(countComments > 0) && display.startedByUser;
-    const displayLastUser = !displayStartedByUser && !!lastUser && display.lastUser;
+    const displayStartedByUser = !!insertUser && display.startedByUser;
+    // By default "lastUser" is "insertUser", we don't want ot display it twice if no-one has commented.
+    const displayLastUser = countComments > 0 && !!lastUser && display.lastUser;
 
     const displayQnaStatus = !!attributes?.question?.status && display.qnaStatus;
 
@@ -227,6 +232,12 @@ function DiscussionListItemMeta(props: IDiscussion) {
                 </MetaItem>
             )}
 
+            {displayLastCommentDate && !renderLastCommentDateAsIcon && dateLastComment && (
+                <MetaItem>
+                    <DateTime timestamp={dateLastComment} />
+                </MetaItem>
+            )}
+
             {displayCategory && (
                 <MetaItem>
                     <SmartLink to={category!.url}>{category!.name}</SmartLink>
@@ -238,12 +249,6 @@ function DiscussionListItemMeta(props: IDiscussion) {
                     <Notice>
                         {unread ? <Translate source="New" /> : <Translate source="<0/> new" c0={props.countUnread} />}
                     </Notice>
-                </MetaItem>
-            )}
-
-            {displayLastCommentDate && !renderLastCommentDateAsIcon && dateLastComment && (
-                <MetaItem>
-                    <DateTime timestamp={dateLastComment} />
                 </MetaItem>
             )}
 

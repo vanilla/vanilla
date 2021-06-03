@@ -46,6 +46,7 @@ import { LinkContextProvider } from "@library/routing/links/LinkContextProvider"
 import History from "history";
 import { Backgrounds } from "@library/layout/Backgrounds";
 import { PlacesSearchTypeFilter } from "@dashboard/components/panels/PlacesSearchTypeFilter";
+import PanelWidgetVerticalPadding from "@library/layout/components/PanelWidgetVerticalPadding";
 
 interface IProps {
     placeholder?: string;
@@ -180,9 +181,9 @@ function SearchPage(props: IProps) {
                                                 }}
                                             />
                                         </div>
-                                        {hasSpecificRecord && hasSpecificRecordID ? (
+                                        {hasSpecificRecord && hasSpecificRecordID && (
                                             <SpecificRecordComponent discussionID={specificRecordID} />
-                                        ) : null}
+                                        )}
                                     </ConditionalWrap>
                                     {!hasSpecificRecord && (
                                         <SearchInFilter

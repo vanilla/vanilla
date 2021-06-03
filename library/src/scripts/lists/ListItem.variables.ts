@@ -9,6 +9,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { Variables } from "@library/styles/Variables";
+import { IThemeVariables } from "@library/theming/themeReducer";
 
 export enum ListItemIconPosition {
     /**
@@ -40,50 +41,73 @@ export enum ListItemLayout {
     TITLE_METAS = "title-metas",
 }
 
-export const listItemVariables = useThemeCache((componentOptions?: Partial<IListItemComponentOptions>) => {
-    const makeVars = variableFactory("listItem");
-    const globalVars = globalVariables();
+export const listItemVariables = useThemeCache(
+    (componentOptions?: Partial<IListItemComponentOptions>, forcedVars?: IThemeVariables) => {
+        const makeVars = variableFactory("listItem");
+        const globalVars = globalVariables();
 
-    const options = makeVars(
-        "options",
-        {
-            iconPosition: ListItemIconPosition.DEFAULT,
-        },
-        componentOptions,
-    );
-
-    /**
-     * @varGroup listItem.title
-     * @description The title of a single discussion item.
-     */
-    const titleInit = makeVars("title", {
         /**
-         * @varGroup listItem.title.font
-         * @description Font variables for the default state of the title.
+         * @varGroup listItem.options
          */
-        font: Variables.font({
-            ...globalVars.fontSizeAndWeightVars("large", "semiBold"),
-            color: globalVars.mainColors.fg,
-        }),
-    });
+        const options = makeVars(
+            "options",
+            {
+                /**
+                 * @var listItem.options.iconPosition
+                 * @description Choose where the icon of the list item is placed.
+                 * @type string
+                 * @enum default | meta | hidden
+                 */
+                iconPosition: ListItemIconPosition.DEFAULT,
+            },
+            componentOptions,
+        );
 
-    const isDefaultFontColor = titleInit.font.color === globalVars.mainColors.fg;
-
-    const title = makeVars("title", {
-        ...titleInit,
         /**
-         * @varGroup listItem.title.font
-         * @description Font variables title when it is being interacted with. (hover, active, focus).
+         * @varGroup listItem.title
+         * @description The title of a single discussion item.
          */
-        fontState: Variables.font({
-            color: isDefaultFontColor
-                ? globalVars.mainColors.primary
-                : ColorsUtils.offsetLightness(titleInit.font.color!, 0.04),
-        }),
-    });
+        const titleInit = makeVars("title", {
+            /**
+             * @varGroup listItem.title.font
+             * @description Font variables for the default state of the title.
+             */
+            font: Variables.font({
+                ...globalVars.fontSizeAndWeightVars("large", "semiBold"),
+                color: globalVars.mainColors.fg,
+            }),
+        });
 
-    return {
-        title,
-        options,
-    };
-});
+        const isDefaultFontColor = titleInit.font.color === globalVars.mainColors.fg;
+
+        const title = makeVars("title", {
+            ...titleInit,
+            /**
+             * @varGroup listItem.title.font
+             * @description Font variables title when it is being interacted with. (hover, active, focus).
+             */
+            fontState: Variables.font({
+                color: isDefaultFontColor
+                    ? globalVars.mainColors.primary
+                    : ColorsUtils.offsetLightness(titleInit.font.color!, 0.04),
+            }),
+        });
+
+        const description = makeVars("description", {
+            /**
+             * @varGroup listItem.description.font
+             * @description Font variables for the default state of the title.
+             */
+            font: Variables.font({
+                size: globalVars.fonts.size.medium,
+                color: globalVars.mainColors.fg,
+            }),
+        });
+
+        return {
+            title,
+            options,
+            description,
+        };
+    },
+);

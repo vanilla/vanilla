@@ -9,7 +9,7 @@ import { rgba, percent, linearGradient } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
-import { keyframes } from "@library/styles/styleShim";
+import { keyframes } from "@emotion/css";
 
 export const loadingRectangleVariables = useThemeCache(() => {
     const makeVars = variableFactory("loadingRectatngle");
@@ -37,13 +37,13 @@ export const loadingRectangleVariables = useThemeCache(() => {
 
 const style = styleFactory("loadingRectangle");
 export const loadingRectangleClass = useThemeCache(
-    (height: string | number, width: string | number = "100%", inline?: boolean) => {
+    (height?: string | number, width: string | number = "100%", inline?: boolean) => {
         const vars = loadingRectangleVariables();
         return style({
             display: inline ? "inline-block" : "block",
             borderRadius: 2,
             background: ColorsUtils.colorOut(vars.colors.bg),
-            height: styleUnit(height),
+            height: height ? styleUnit(height) : "1em",
             width: styleUnit(width),
             animationName: vars.loadingAnimation,
             animationDuration: "4s",
@@ -53,22 +53,23 @@ export const loadingRectangleClass = useThemeCache(
     },
 );
 
-export const loadingSpacerClass = useThemeCache((height: string | number) => {
+export const loadingSpacerClass = useThemeCache((height?: string | number) => {
     return style({
         display: "block",
-        height: styleUnit(height),
+        height: height ? styleUnit(height) : "1em",
         width: percent(100),
     });
 });
 
-export const loadingCircleClass = useThemeCache((height: string | number, inline?: boolean) => {
+export const loadingCircleClass = useThemeCache((_height?: string | number, inline?: boolean) => {
     const vars = loadingRectangleVariables();
+    const height = styleUnit(_height ?? 50);
     return style({
         display: inline ? "inline-block" : "block",
-        height: styleUnit(50),
-        width: styleUnit(50),
+        height,
+        width: height,
+        borderRadius: height,
         background: ColorsUtils.colorOut(vars.colors.bg),
         margin: 20,
-        borderRadius: 50,
     });
 });

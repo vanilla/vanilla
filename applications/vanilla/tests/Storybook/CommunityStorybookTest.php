@@ -103,7 +103,7 @@ class CommunityStorybookTest extends StorybookGenerationTestCase {
             'name' => 'Discussions Depth 2a',
             'description' => 'This is a category description. This category is nested and can have some discussions inside of it.',
         ])['categoryID'];
-        $this->createDiscussion(['name' => 'Hello Discussion 3']);
+        $this->createDiscussion(['name' => 'Hello Discussion 3 with a very very very very very very very very very very very very long title.']);
         self::$commentedDiscussionID = $this->lastInsertedDiscussionID;
         $this->createComment(['name' => 'Hello comment', 'body' => 'This is a comment body. Hello world, ipsum lorem, etc']);
         $discussionsDepth2b = $this->createCategory([

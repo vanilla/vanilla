@@ -443,8 +443,6 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess {
         $dateString = $date ? $date->format(\DateTime::ATOM) : null;
         $dateHtml = $dateString ? \Gdn::dateTimeFormatter()->formatDate($dateString) : null;
         $summary = $this->getExcerpt();
-        // These have emoji converted.
-        $summary = \Emoji::instance()->translateToHtml($summary);
 
         $notes = null;
         if (debug()) {
@@ -460,7 +458,7 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess {
             'Format' => HtmlFormat::FORMAT_KEY, // Forced to HTML for compatibility.
             'Summary' => $summary,
             'Url' => $this->getUrl(),
-            'Title' => htmlspecialchars($this->getName()), // Encoded for legacy reasons.
+            'Title' => $this->getName(),
 
             'Notes' => $notes,
 

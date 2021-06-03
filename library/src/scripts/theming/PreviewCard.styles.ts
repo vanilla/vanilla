@@ -1,65 +1,24 @@
 /*
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import { percent, color, rgba, px } from "csx";
+import { percent, px } from "csx";
 import { defaultTransition, flexHelper } from "@library/styles/styleHelpers";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
-import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { Mixins } from "@library/styles/Mixins";
+import previewCardVariables from "@library/theming/PreviewCard.variables";
+import { css } from "@emotion/css";
 
-export const themeCardVariables = useThemeCache(() => {
-    const makeThemeVars = variableFactory("themePreviewCard");
-
-    const colors = makeThemeVars("colors", {
-        fg: color("#adb2bb"),
-        white: color("#ffffff"),
-        imgColor: color("#0291db"),
-        btnTextColor: color("#555a62"),
-        overlayBg: rgba(0, 0, 0, 0.4),
-    });
-
-    const container = makeThemeVars("container", {
-        maxWidth: 600,
-        minWidth: 220,
-        ratioHeight: 2,
-        ratioWidth: 3,
-    });
-
-    const menuBar = makeThemeVars("menuBar", {
-        height: 10,
-        padding: {
-            top: 0,
-            horizontal: 10,
-        },
-        dotSize: 4,
-    });
-
-    const actionDropdown = makeThemeVars("actionDropdown", {
-        state: {
-            bg: ColorsUtils.offsetLightness(colors.overlayBg, 0.04),
-        },
-    });
-
-    return {
-        colors,
-        container,
-        menuBar,
-        actionDropdown,
-    };
-});
-
-export const themeCardClasses = useThemeCache(() => {
-    const vars = themeCardVariables();
-    const style = styleFactory("themePreviewCard");
+const previewCardClasses = useThemeCache(() => {
+    const vars = previewCardVariables();
     const globalVars = globalVariables();
 
-    const menuBar = style("menuBar", {
+    const menuBar = css({
         background: ColorsUtils.colorOut(globalVars.mainColors.bg),
         height: styleUnit(vars.menuBar.height),
         display: "flex",
@@ -69,7 +28,7 @@ export const themeCardClasses = useThemeCache(() => {
         zIndex: 1,
     });
 
-    const menuBarDots = style("menuBarDots", {
+    const menuBarDots = css({
         height: styleUnit(vars.menuBar.dotSize),
         width: styleUnit(vars.menuBar.dotSize),
         backgroundColor: "#bbb",
@@ -77,7 +36,7 @@ export const themeCardClasses = useThemeCache(() => {
         marginRight: styleUnit(3),
     });
 
-    const actionButtons = style("actionButtons", {
+    const actionButtons = css({
         textAlign: "center",
         margin: "44px 0",
         paddingTop: styleUnit(vars.menuBar.height),
@@ -85,7 +44,7 @@ export const themeCardClasses = useThemeCache(() => {
         flexDirection: "column",
     });
 
-    const actionButton = style("actionButton", {
+    const actionButton = css({
         marginBottom: styleUnit(globalVars.gutter.half),
         ...{
             "&&": {
@@ -97,64 +56,80 @@ export const themeCardClasses = useThemeCache(() => {
         },
     });
 
-    const overlay = style("overlay", {
+    const overlay = css({
         ...Mixins.absolute.fullSizeOfParent(),
         opacity: 0,
         ...flexHelper().middle(),
         ...defaultTransition("opacity"),
+        zIndex: 3,
     });
 
-    const overlayBg = style("overlayBg", {
+    const overlayBg = css({
         ...Mixins.absolute.fullSizeOfParent(),
         backgroundColor: ColorsUtils.colorOut(vars.colors.overlayBg),
     });
 
-    const wrapper = style("wrapper", {
+    const wrapper = css({
         height: percent(100),
         display: "flex",
         flexDirection: "column",
     });
 
-    const constraintContainer = style("constrainContainer", {
+    const constraintContainer = css({
         maxWidth: styleUnit(vars.container.maxWidth),
         minWidth: styleUnit(vars.container.minWidth),
         maxHeight: (vars.container.maxWidth * vars.container.ratioHeight) / vars.container.ratioWidth,
         ...shadowHelper().embed(),
+        borderRadius: styleUnit(2),
+        overflow: "hidden",
     });
 
-    const ratioContainer = style("ratioContainer", {
+    const constraintContainerActive = css({
+        border: "2px solid #0291db",
+    });
+
+    const ratioContainer = css({
         position: "relative",
         width: "auto",
         paddingTop: percent((vars.container.ratioHeight / vars.container.ratioWidth) * 100),
     });
 
-    const container = style("container", {
+    const activeOverlay = css({
         ...Mixins.absolute.fullSizeOfParent(),
-        borderRadius: styleUnit(2),
+        backgroundColor: "rgba(103, 105, 109, 0.2)",
+        opacity: 1,
+        zIndex: 2,
+    });
+
+    const flagSizeAndPosition = css({
+        fontSize: 11,
+        position: "absolute",
+        top: "11%",
+        left: 0,
+    });
+
+    const container = css({
+        ...Mixins.absolute.fullSizeOfParent(),
         ...{
-            [`&:hover .${overlay}`]: {
-                opacity: 1,
-            },
-            [`&.forceHover .${overlay}`]: {
-                opacity: 1,
-            },
-            [`&:focus .${overlay}`]: {
-                opacity: 1,
+            [`:hover, :focus`]: {
+                [`.${overlay}`]: {
+                    opacity: 1,
+                },
             },
         },
     });
 
-    const previewContainer = style("container", {
+    const previewContainer = css({
         ...Mixins.absolute.fullSizeOfParent(),
         overflow: "hidden",
     });
 
-    const svg = style("svg", {
+    const svg = css({
         ...Mixins.absolute.fullSizeOfParent(),
         top: styleUnit(vars.menuBar.height),
     });
 
-    const isFocused = style("isFocused", {
+    const isFocused = css({
         ...{
             [`.${overlay}`]: {
                 opacity: 1,
@@ -162,17 +137,14 @@ export const themeCardClasses = useThemeCache(() => {
         },
     });
 
-    const previewImage = style("previewImage", {
+    const previewImage = css({
         objectPosition: "center top",
-        position: "absolute",
+        objectFit: "cover",
+        ...Mixins.absolute.fullSizeOfParent(),
         top: styleUnit(vars.menuBar.height),
-        left: 0,
-        right: 0,
-        bottom: 0,
-        width: percent(100),
     });
 
-    const actionDropdown = style("actionDropdown", {
+    const actionDropdown = css({
         position: "absolute",
         top: styleUnit(vars.menuBar.height),
         right: styleUnit(vars.menuBar.height),
@@ -196,17 +168,17 @@ export const themeCardClasses = useThemeCache(() => {
         },
     });
 
-    const itemLabel = style("itemLabel", {
+    const itemLabel = css({
         display: "block",
         flexGrow: 1,
     });
 
-    const toolTipBox = style("toolTipBox", {
+    const toolTipBox = css({
         width: "20px",
         height: "20px",
     });
 
-    const actionLink = style("actionLink", {
+    const actionLink = css({
         textDecoration: "none",
         paddingBottom: styleUnit(4),
         paddingLeft: styleUnit(14),
@@ -227,7 +199,7 @@ export const themeCardClasses = useThemeCache(() => {
         },
     });
 
-    const action = style("dropDown-item", {
+    const action = css({
         ...{
             "&&:hover, &&:focus, &&active": {
                 textDecoration: "none",
@@ -235,7 +207,7 @@ export const themeCardClasses = useThemeCache(() => {
         },
     });
 
-    const title = style("title", {
+    const title = css({
         "&&": {
             ...Mixins.font({
                 ...globalVars.fontSizeAndWeightVars("medium", "semiBold"),
@@ -244,7 +216,7 @@ export const themeCardClasses = useThemeCache(() => {
         ...flexHelper().middleLeft(),
     });
 
-    const titleIcon = style("titleIcon", {
+    const titleIcon = css({
         marginLeft: globalVars.gutter.half,
     });
 
@@ -255,7 +227,10 @@ export const themeCardClasses = useThemeCache(() => {
         ratioContainer,
         previewContainer,
         container,
+        activeOverlay,
+        flagSizeAndPosition,
         constraintContainer,
+        constraintContainerActive,
         actionButtons,
         actionButton,
         previewImage,
@@ -273,4 +248,4 @@ export const themeCardClasses = useThemeCache(() => {
     };
 });
 
-export default themeCardClasses;
+export default previewCardClasses;

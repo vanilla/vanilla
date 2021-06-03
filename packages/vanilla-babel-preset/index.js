@@ -5,31 +5,19 @@
 
 const { resolve } = require;
 
-module.exports = (api) => {
-    const isTest = api.env("test");
+module.exports = (api, options) => {
+
+    const { isLegacy } = options;
+    const legacyBrowserList = "ie > 10, last 4 versions, not dead, safari 8";
+    const modernBrowserList = "Edge >= 83, Firefox >= 78, FirefoxAndroid  >= 78, Chrome >= 80, ChromeAndroid >= 80, Opera >= 67, OperaMobile >= 67, Safari >= 13.1, iOS >= 13.4";
     const isJest = !!process.env.JEST;
 
     let envOptions = {
         useBuiltIns: false,
         modules: "auto",
-        forceAllTransforms: true
     };
 
-    const runtimePlugins =
-        isTest || isJest
-            ? []
-            : [
-                  [
-                      resolve("@babel/plugin-transform-runtime"),
-                      {
-                          useESModules: true,
-                      },
-                  ],
-              ];
-
-    if ((process.env.NODE_ENV = "production" || process.env.DEV_COMPAT === "compat")) {
-        envOptions.targets = "ie > 10, last 4 versions, not dead, safari 8";
-    }
+    let runtimePlugins = [];
 
     if (isJest) {
         envOptions = {
@@ -37,6 +25,17 @@ module.exports = (api) => {
                 node: "current",
             }
         };
+    } else if (isLegacy) {
+        runtimePlugins.push([
+            resolve("@babel/plugin-transform-runtime"),
+            {
+                useESModules: true,
+            },
+        ]);
+        envOptions.targets = legacyBrowserList;
+    } else {
+        // Modern targets
+        envOptions.targets = modernBrowserList;
     }
 
     const preset = {

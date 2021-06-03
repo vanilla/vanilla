@@ -67,3 +67,21 @@ export function useConfigPatcher<T extends ConfigValues = ConfigValues>() {
         isLoading: existing.status === LoadStatus.LOADING,
     };
 }
+
+export const useLanguageConfig = (serviceType: string | undefined) => {
+    const translationServices = useSelector((state: ICoreStoreState) => state.config.machineTranslation.services.data);
+    const { getAllTranslationServicesThunk, putTranslationServiceThunk } = useConfigActions();
+
+    const setTranslationService = (newConfig: any) => {
+        serviceType && putTranslationServiceThunk({ values: serviceType, newConfig });
+    };
+
+    useEffect(() => {
+        getAllTranslationServicesThunk && getAllTranslationServicesThunk();
+    }, [getAllTranslationServicesThunk]);
+
+    return {
+        setTranslationService,
+        translationServices,
+    };
+};

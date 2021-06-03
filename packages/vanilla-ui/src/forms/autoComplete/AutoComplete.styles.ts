@@ -73,4 +73,7 @@ export const autoCompleteClasses = ({ size = "default" }: AutoCompleteClassesPro
         display: "flex",
         cursor: "pointer",
     }),
+    input: css({
+        cursor: "default",
+    }),
 });

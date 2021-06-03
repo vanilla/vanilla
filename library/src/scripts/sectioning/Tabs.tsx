@@ -1,4 +1,4 @@
-import React, { ReactElement, useState } from "react";
+import React, { useState } from "react";
 import { Tabs as ReachTabs, TabList, Tab, TabPanels, TabPanel } from "@reach/tabs";
 import { tabStandardClasses, tabBrowseClasses, tabGroupClasses } from "@library/sectioning/tabStyles";
 import classNames from "classnames";
@@ -7,6 +7,7 @@ import { WarningIcon } from "@library/icons/common";
 import { iconClasses } from "@library/icons/iconStyles";
 import { TabsTypes } from "@library/sectioning/TabsTypes";
 import { DomNodeAttacher } from "@vanilla/react-utils";
+import { cx } from "@emotion/css";
 
 export interface ITabData {
     tabID?: string | number;
@@ -29,10 +30,20 @@ interface IProps {
     defaultTabIndex?: number;
     includeBorder?: boolean;
     includeVerticalPadding?: boolean;
+    tabListClasses?: string;
+    tabPanelClasses?: string;
 }
 
 export function Tabs(props: IProps) {
-    const { data, tabType, defaultTabIndex, includeBorder = true, includeVerticalPadding = true } = props;
+    const {
+        data,
+        tabType,
+        defaultTabIndex,
+        includeBorder = true,
+        includeVerticalPadding = true,
+        tabListClasses,
+        tabPanelClasses,
+    } = props;
     const [activeTab, setActiveTab] = useState(defaultTabIndex ?? 0);
     const classVariants = new Map([
         [TabsTypes.STANDARD, tabStandardClasses()],
@@ -50,7 +61,7 @@ export function Tabs(props: IProps) {
                 props.onChange?.(props.data[index]);
             }}
         >
-            <TabList className={classes?.tabList({ includeBorder, isLegacy: props.legacyButtons })}>
+            <TabList className={cx(classes?.tabList({ includeBorder, isLegacy: props.legacyButtons }), tabListClasses)}>
                 {data.map((tab, index) => {
                     const isActive = activeTab === index;
                     return (
@@ -78,7 +89,7 @@ export function Tabs(props: IProps) {
                 })}
                 {props.extraButtons && <div className={classes?.extraButtons}>{props.extraButtons}</div>}
             </TabList>
-            <TabPanels className={classes?.tabPanels}>
+            <TabPanels className={cx(classes?.tabPanels, tabPanelClasses)}>
                 {data.map((tab, index) => {
                     return (
                         <TabPanel className={classes?.panel({ includeVerticalPadding })} key={index}>

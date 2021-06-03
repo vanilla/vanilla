@@ -25,6 +25,8 @@ class CommentEvent extends ResourceEvent implements LoggableEventInterface {
         $context['comment'] = array_intersect_key($this->payload["comment"] ?? [], [
             "commentID" => true,
             "discussionID" => true,
+            "categoryID" => true,
+            "discussion" => true,
             "dateInserted" => true,
             "dateUpdated" => true,
             "updateUserID" => true,

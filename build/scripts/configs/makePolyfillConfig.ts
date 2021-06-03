@@ -20,6 +20,7 @@ export async function makePolyfillConfig(entryModel: EntryModel) {
     baseConfig.mode = "production";
     baseConfig.devtool = "source-map";
     baseConfig.entry = POLYFILL_SOURCE_FILE;
+    baseConfig.target = ["web", "es5"];
     baseConfig.output = {
         filename: `polyfills.min.js`,
         path: DIST_DIRECTORY,

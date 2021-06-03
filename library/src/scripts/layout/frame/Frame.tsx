@@ -9,7 +9,7 @@ import { frameClasses } from "@library/layout/frame/frameStyles";
 import classNames from "classnames";
 import { TouchScrollable } from "react-scrolllock";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
-import { cx } from "@library/styles/styleShim";
+import { cx } from "@emotion/css";
 
 interface IProps {
     className?: string;

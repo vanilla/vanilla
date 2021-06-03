@@ -360,7 +360,7 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface {
         $nav
             ->addGroupToSection('Moderation', t('Requests'), 'requests')
             ->addLinkToSectionIf(
-                $session->checkPermission('Garden.Users.Approve') && (c('Garden.Registration.Method') == 'Approval'),
+                $session->checkPermission('Garden.Users.Approve'),
                 'Moderation',
                 t('Applicants'),
                 '/dashboard/user/applicants',
@@ -424,6 +424,16 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface {
 
             ->addGroup(t('Technical'), 'site-settings', '', ['after' => 'reputation'])
             ->addLinkIf('Garden.Settings.Manage', t('Locales'), '/settings/locales', 'site-settings.locales', '', $sort)
+            ->addLinkIf(
+                \Vanilla\FeatureFlagHelper::featureEnabled('MachineTranslation') &&
+                $session->checkPermission('Garden.Settings.Manage'),
+                t('Language Settings'),
+                '/settings/language',
+                'site-settings.languages',
+                '',
+                $sort,
+                ['badge' => 'New']
+            )
             ->addLinkIf('Garden.Settings.Manage', t('Outgoing Email'), '/dashboard/settings/email', 'site-settings.email', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Security'), '/dashboard/settings/security', 'site-settings.security', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Routes'), '/dashboard/routes', 'site-settings.routes', '', $sort)
@@ -645,6 +655,7 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface {
                 // are the same.
                 $tagType = Gdn::request()->get('type');
                 if (strtolower($tagType) != 'tags' && $tagModel->canAddTagForType($tagType)) {
+                    $tagType = strtolower($tagType) === "all" ? "" : $tagType;
                     $sender->Form->addHidden('Type', $tagType, true);
                 }
 

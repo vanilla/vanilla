@@ -306,6 +306,7 @@ class SiteMeta implements \JsonSerializable {
             'siteSection' => $this->currentSiteSection,
             'themePreview' => $this->themePreview,
             'reCaptchaKey' => $this->reCaptchaKey,
+            'TransientKey' => $this->session->transientKey(),
         ];
     }
 

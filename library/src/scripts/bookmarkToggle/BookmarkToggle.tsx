@@ -5,10 +5,11 @@
  */
 
 import React, { FunctionComponent } from "react";
-import { BookmarkIcon } from "@library/icons/common";
 import { bookmarkToggleClasses } from "@library/bookmarkToggle/BookmarkToggle.styles";
 import ActsAsCheckbox from "@library/forms/ActsAsCheckbox";
 import { cx } from "@emotion/css";
+import { t } from "@vanilla/i18n";
+import { Icon } from "@vanilla/icons";
 
 interface IProps {
     bookmarked: boolean;
@@ -19,9 +20,10 @@ const BookmarkToggle: FunctionComponent<IProps> = ({ bookmarked, onToggleBookmar
     const { icon, iconChecked, iconDisabled } = bookmarkToggleClasses();
 
     return (
-        <ActsAsCheckbox checked={bookmarked} onChange={onToggleBookmarked}>
+        <ActsAsCheckbox checked={bookmarked} onChange={onToggleBookmarked} title={t("Bookmark")}>
             {({ disabled }) => (
-                <BookmarkIcon
+                <Icon
+                    icon="discussion-bookmark"
                     className={cx(icon, {
                         [iconChecked]: bookmarked && !disabled,
                         [iconDisabled]: disabled,

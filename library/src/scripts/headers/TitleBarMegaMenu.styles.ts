@@ -7,53 +7,110 @@ import { Mixins } from "@library/styles/Mixins";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
-import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { IThemeVariables } from "@library/theming/themeReducer";
+import { Variables } from "@library/styles/Variables";
+import { LocalVariableMapping } from "@library/styles/VariableMapping";
+import { css } from "@emotion/css";
 
+/**
+ * @varGroup titleBarMegaMenu
+ * @title MegaMenu (TitleBar)
+ * @description The mega menu is used when you have navigation items that are nested inside of the titlebar on desktop screen sizes.
+ */
 export const titleBarMegaMenuVariables = useThemeCache((forcedVars?: IThemeVariables) => {
-    const makeThemeVars = variableFactory("titleBarMegaMenu", forcedVars);
+    const globalVars = globalVariables();
 
-    const options = makeThemeVars("options", {});
+    const makeThemeVars = variableFactory("titleBarMegaMenu", forcedVars, [
+        new LocalVariableMapping({
+            "item.spacer": "spacing.menuItemSpacer",
+            "item.font.color": "colors.fg",
+            "wrapper.background.color": "colors.bg",
+        }),
+    ]);
 
-    const colors = makeThemeVars("colors", {
-        fg: "#555a62",
-        bg: "#fff",
+    /**
+     * @varGroup titleBarMegaMenu.item
+     * @description Item is used to set menu item font properties and spacing
+     */
+    const item = makeThemeVars("item", {
+        /**
+         * @varGroup titleBarMegaMenu.item.spacer
+         * @description Spacing units for menu item
+         * @title Content Spacing
+         * @type number
+         */
+        spacer: 10,
+        /**
+         * @varGroup titleBarMegaMenu.item.font
+         * @expand font
+         */
+        font: Variables.font({
+            size: 14,
+            color: globalVars.mainColors.fg,
+        }),
     });
 
+    /**
+     * @varGroup titleBarMegaMenu.title
+     * @description Title is used to set the font properties of the menu items that have children
+     */
+    const title = makeThemeVars("title", {
+        /**
+         * @varGroup titleBarMegaMenu.title.font
+         * @expand font
+         */
+        font: Variables.font({
+            ...globalVars.fontSizeAndWeightVars("medium", "bold"),
+            color: item.font.color,
+            lineHeight: 1.25,
+        }),
+    });
+
+    /**
+     * @varGroup titleBarMegaMenu.wrapper
+     * @description Wrapper is used to set the themed background and shadow of the mega menu
+     */
     const wrapper = makeThemeVars("wrapper", {
-        shadow: "0 5px 5px 0 rgba(0, 0, 0, 0.3)",
-        backgroundColor: colors.bg,
-    });
-
-    const spacing = makeThemeVars("spacing", {
-        menuItemSpacer: styleUnit(10),
+        /**
+         * @varGroup titleBarMegaMenu.wrapper.shadow
+         * @description Shadow detail at the bottom of the mega menu
+         * @title Shadow
+         * @type string
+         */
+        shadow: `0 5px 5px 0 ${ColorsUtils.colorOut(globalVars.elementaryColors.black.fade(0.3))}`,
+        /**
+         * @varGroup titleBarMegaMenu.wrapper.background
+         * @expand background
+         */
+        background: Variables.background({
+            color: globalVars.mainColors.bg,
+        }),
     });
 
     return {
-        options,
+        title,
         wrapper,
-        colors,
-        spacing,
+        item,
     };
 });
 
 export default useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = titleBarMegaMenuVariables();
-    const style = styleFactory("titleBarMegaMenu");
 
-    const wrapper = style("wrapper", {
+    const wrapper = css({
         position: "fixed",
         left: 0,
         right: 0,
-        backgroundColor: vars.wrapper.backgroundColor,
+        ...Mixins.background(vars.wrapper.background),
         boxShadow: vars.wrapper.shadow,
         overflow: "hidden",
         transition: "height 200ms",
     });
 
-    const container = style("container", {
+    const container = css({
         "&&": {
             overflowY: "auto",
             maxHeight: `60vh`,
@@ -64,16 +121,16 @@ export default useThemeCache(() => {
         },
     });
 
-    const menuItem = style("menuItem", {
+    const menuItem = css({
         minWidth: 160,
         maxWidth: 300,
         ...Mixins.padding({
-            horizontal: vars.spacing.menuItemSpacer,
+            horizontal: vars.item.spacer,
             top: 20,
         }),
     });
 
-    const menuItemChildren = style("menuItemChildren", {
+    const menuItemChildren = css({
         // you may be tempted to put a flex-column w/ wrapping on this.
         // As of 2021 it doesn't actually work.
         // Wrapping columns in flex don't extend the width of the container.
@@ -84,24 +141,20 @@ export default useThemeCache(() => {
         // Maybe in the future some JS solution would work?
     });
 
-    const fillerItem = style("fillerItem", {
+    const fillerItem = css({
         flex: 1,
         flexBasis: 160,
     });
 
-    const menuItemTitle = style("menuItemTitle", {
+    const menuItemTitle = css({
         display: "block",
-        ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("medium", "bold"),
-            lineHeight: styleUnit(`${globalVars.fonts.size.medium * 1.25}`), // FIXME: see if this is necessary
-            color: ColorsUtils.colorOut(vars.colors.fg),
-        }),
+        ...Mixins.font(vars.title.font),
         marginBottom: styleUnit(12),
     });
 
-    const menuItemChild = style("menuItemChild", {
+    const menuItemChild = css({
         fontSize: styleUnit(14),
-        lineHeight: styleUnit(`${globalVars.fonts.size.medium * 1.25}`), // FIXME: see if this is necessary
+        lineHeight: 1.25,
         listStyle: "none",
         marginBottom: styleUnit(12),
         "&:last-child": {
@@ -109,7 +162,7 @@ export default useThemeCache(() => {
         },
 
         "& a": {
-            color: ColorsUtils.colorOut(vars.colors.fg),
+            ...Mixins.font(vars.item.font),
         },
 
         "& a:hover": {

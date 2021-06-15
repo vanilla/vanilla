@@ -12,6 +12,7 @@ use Garden\EventManager;
 use Garden\Events\ResourceEvent;
 use Garden\Events\EventFromRowInterface;
 use Garden\Schema\Schema;
+use Garden\StaticCacheConfigTrait;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Dashboard\Events\UserEvent;
 use Vanilla\Contracts\ConfigurationInterface;
@@ -37,6 +38,7 @@ use Vanilla\Utility\ModelUtils;
 class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRowInterface, CrawlableInterface, FragmentFetcherInterface {
 
     use LegacyDirtyRecordTrait;
+    use StaticCacheConfigTrait;
 
     /** @var int */
     const GUEST_USER_ID = 0;
@@ -1335,6 +1337,13 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
                     if ($user) {
                         // Make sure all user records have a valid photo.
                         $photo = val('Photo', $user);
+                        $banned = $user['Banned'] ?? 0;
+
+                        if ($banned) {
+                            $bannedPhoto = c('Garden.BannedPhoto', '/applications/dashboard/design/images/banned.png');
+                            $photo = asset($bannedPhoto, true);
+                        }
+
                         if ($photo && !isUrl($photo)) {
                             $photoBase = changeBasename($photo, 'n%s');
                             $photo = Gdn_Upload::url($photoBase);
@@ -2467,6 +2476,12 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
             $formPostValues['Verified'] = forceBool($formPostValues['Verified'], '0', '1', '0');
         }
 
+        $private = [];
+        if (array_key_exists('Private', $formPostValues)) {
+            $private = ["Private" => forceBool($formPostValues['Private'], '0', '1', '0')];
+            unset($formPostValues['Private']);
+        }
+
         // Do not allowing setting this via general save.
         unset($formPostValues['Admin']);
 
@@ -2541,6 +2556,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
             $roleIDs = val('RoleID', $fields, 0);
             $username = val('Name', $fields);
             $email = val('Email', $fields, '');
+            $attributes = false;
 
             // Only fields that are present in the schema
             $fields = $this->Validation->schemaValidationFields();
@@ -2564,7 +2580,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
                 $currentUserEmailIsBeingChanged =
                     $validSession
                     && $userID == $this->session->UserID
-                    && $fields['Email'] != $this->session->User->Email
+                    && ($emailIsSet && $fields['Email'] != $this->session->User->Email)
                     && !$this->session->checkPermission('Garden.Users.Edit');
 
                 // Email address has changed
@@ -2643,6 +2659,28 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
 
                     if (array_key_exists('Preferences', $fields) && !is_string($fields['Preferences'])) {
                         $fields['Preferences'] = dbencode($fields['Preferences']);
+                    }
+
+                    // user attributes have already been retrieved.
+                    if ($attributes && $private && !$insert) {
+                        if (is_string($attributes)) {
+                            $attributes = dbdecode($attributes);
+                            $attributes = array_merge($attributes, $private);
+                            $fields['Attributes'] = dbencode($attributes);
+                        } elseif (is_array($attributes)) {
+                            $attributes = array_merge($attributes, $private);
+                            $fields['Attributes'] = dbencode($attributes);
+                        }
+                    }
+
+                    // user attributes haven't been retrieved yet
+                    if (!$attributes && $private && !$insert) {
+                        $user = $this->getID($userID, DATASET_TYPE_ARRAY);
+                        if ($user) {
+                            $usersAttributes = self::attributes($user);
+                            $attributes = array_merge($usersAttributes, $private);
+                            $fields['Attributes'] = dbencode($attributes);
+                        }
                     }
 
                     if (array_key_exists('Attributes', $fields) && !is_string($fields['Attributes'])) {
@@ -2824,15 +2862,21 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
      * @return array
      */
     public function normalizeRow(array $row, $expand = []): array {
-        if (array_key_exists('UserID', $row) && !array_key_exists('Roles', $row) && !array_key_exists('roles', $row)) {
-            $userID = $row['UserID'];
+        $userID = $row['UserID'] ?? null;
+        if ($userID && !array_key_exists('Roles', $row) && !array_key_exists('roles', $row)) {
             $roles = $this->getRoles($userID, false)->resultArray();
             $row['roles'] = $roles;
         }
+        $row['email'] = !empty($row['Email']) ? $row['Email'] : null;
         if (array_key_exists('Photo', $row)) {
             $photo = userPhotoUrl($row);
             $row['Photo'] = $photo;
             $row['photoUrl'] = $photo;
+            $banned = $row['Banned'] ?? 0;
+            if ($banned) {
+                $bannedPhoto = c('Garden.BannedPhoto', '/applications/dashboard/design/images/banned.png');
+                $row['photoUrl'] = asset($bannedPhoto, true);
+            }
         }
         if (array_key_exists('Verified', $row)) {
             $row['bypassSpam'] = $row['Verified'];
@@ -2862,6 +2906,13 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
         $row['Name'] = $name ? $row['Name'] : t('(Unspecified Name)');
 
         $row['CountPosts'] = $row['CountComments'] + $row['CountDiscussions'];
+        if (!empty($row['Attributes'])) {
+            if (!is_array($row['Attributes'])) {
+                $row['Attributes'] = dbdecode($row['Attributes']);
+            }
+        }
+        $row['Private'] = (bool) ($row['Attributes']['Private'] ?? false);
+
         $result = ArrayUtils::camelCase($row);
 
         if (ModelUtils::isExpandOption(ModelUtils::EXPAND_CRAWL, $expand)) {
@@ -2900,6 +2951,10 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
             'points:i',
             'emailConfirmed:b' => 'Has the email address for this user been confirmed?',
             'showEmail:b' => 'Is the email address visible to other users?',
+            'private:b' => [
+                'description' => 'Is the user profile private',
+                'default' => false
+            ],
             'bypassSpam:b' => 'Should submissions from this user bypass SPAM checks?',
             'banned:i' => 'Is the user banned?',
             'dateInserted:dt' => 'When the user was created.',
@@ -2941,6 +2996,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
                 "countComments?",
                 "countPosts?",
                 "label?",
+                "private?" => ["default" => false]
             ]);
             $result->add($this->schema());
 
@@ -3322,6 +3378,59 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
         return $data;
     }
 
+    /**
+     * Get a private user record.
+     *
+     * @param array $rowOrRows The user record.
+     */
+    public function filterPrivateUserRecord(array &$rowOrRows) {
+        if ($this->session->checkPermission('Garden.PersonalInfo.View')) {
+            return;
+        }
+        $isPrivateBansEnabled = self::c('Vanilla.BannedUsers.PrivateProfiles');
+
+        $filterRow = function (&$row) use ($isPrivateBansEnabled) {
+            $isUserPrivate = $row['private'] ?? false;
+
+            $isPrivateBanned = $row['banned'] && $isPrivateBansEnabled;
+            if ($isUserPrivate || $isPrivateBanned) {
+                $row = ArrayUtils::pluck($row, [
+                    'userID',
+                    'name',
+                    'banned',
+                    'photoUrl',
+                    'private',
+                ]);
+            }
+        };
+
+        if (ArrayUtils::isAssociative($rowOrRows)) {
+            $filterRow($rowOrRows);
+        } else {
+            foreach ($rowOrRows as &$row) {
+                $filterRow($row);
+            }
+        }
+    }
+
+    /**
+     * Checks if a private user record should be returned.
+     *
+     * @param array $userRow User record.
+     * @return bool If private records should be included.
+     */
+    public function shouldIncludePrivateRecord(array $userRow): bool {
+        $shouldIncludePrivateRecords = true;
+        $hasPermission = $this->session->checkPermission('Garden.PersonalInfo.View');
+        if (!$hasPermission) {
+            $isPrivateBannedEnabled = self::c('Vanilla.BannedUsers.PrivateProfiles');
+            $private = $userRow['private'] ?? false;
+            if ($private || ($userRow['banned'] && $isPrivateBannedEnabled)) {
+                $shouldIncludePrivateRecords = false;
+            }
+        }
+        return $shouldIncludePrivateRecords;
+    }
 
     /**
      * Appends filters to the current SQL object. Filters users with a given IP Address in the UserIP table. Extends

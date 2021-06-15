@@ -92,6 +92,51 @@ export const dashboardClasses = useThemeCache(() => {
         },
     });
 
+    const mediaAddonListItem = css({
+        minHeight: 102,
+        display: "flex",
+        padding: "16px 0",
+        alignItems: "center",
+        borderBottom: singleBorder(),
+
+        "& .mediaAddonListItem_icon": {
+            marginRight: 14,
+            borderRadius: 4,
+            /**
+             * The color "f6f9fb" already exists in dashboard/scss/src/_variables.scss,
+             * We may need to move them into globalVars or create a shared "dashboardVars"
+             */
+            backgroundColor: "#f6f9fb",
+            overflow: "hidden",
+            "& img": {
+                maxHeight: 84,
+                width: "auto",
+                minWidth: 84,
+            },
+        },
+
+        "& .mediaAddonListItem_details": {
+            maxWidth: "80ch",
+            marginRight: "auto",
+            "& h3": {
+                fontSize: globalVars.fonts.size.medium,
+                marginBottom: globalVars.spacer.headingItem,
+            },
+        },
+
+        "& .mediaAddonListItem_config": {
+            marginRight: 19,
+        },
+    });
+
+    const disabled = css({
+        opacity: 0.5,
+        cursor: "not-allowed",
+        '& div[class^="toggle"]': {
+            cursor: "not-allowed",
+        },
+    });
+
     return {
         formList,
         helpAsset,
@@ -103,5 +148,7 @@ export const dashboardClasses = useThemeCache(() => {
         formListItemStatus,
         formListItemAction,
         extendBottomBorder,
+        mediaAddonListItem,
+        disabled,
     };
 });

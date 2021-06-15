@@ -45,6 +45,17 @@ export const STORY_USER: IUser = {
             name: "Moderator",
         },
     ],
+    private: false,
+};
+
+export const STORY_USER_BANNED: IUser = {
+    ...STORY_USER,
+    banned: 1,
+};
+
+export const STORY_USER_PRIVATE: IUser = {
+    ...STORY_USER,
+    private: true,
 };
 
 export const STORY_ME_ADMIN: IMe = {

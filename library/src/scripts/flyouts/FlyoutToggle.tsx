@@ -10,10 +10,10 @@ import { ButtonTypes } from "@library/forms/buttonTypes";
 import LazyModal from "@library/modal/LazyModal";
 import ModalSizes from "@library/modal/ModalSizes";
 import { t } from "@library/utility/appUtils";
-import classNames from "classnames";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useFocusWatcher, useEscapeListener } from "@vanilla/react-utils";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
+import { cx } from "@emotion/css";
 
 export interface IFlyoutToggleChildParameters {
     id: string;
@@ -86,7 +86,7 @@ export default function FlyoutToggle(props: IProps) {
         (e) => {
             e.stopPropagation();
             setVisibility(!isVisible);
-            e.toElement.focus();
+            e.toElement?.focus();
         },
         [isVisible, setVisibility],
     );
@@ -156,7 +156,7 @@ export default function FlyoutToggle(props: IProps) {
     });
 
     const classes = dropDownClasses();
-    const buttonClasses = classNames(props.buttonClassName, props.toggleButtonClassName, {
+    const buttonClasses = cx(props.buttonClassName, props.toggleButtonClassName, {
         isOpen: isVisible,
     });
 
@@ -169,13 +169,13 @@ export default function FlyoutToggle(props: IProps) {
         renderLeft: props.renderLeft,
     };
 
-    const classesDropDown = !props.openAsModal ? classNames("flyouts", classes.root) : null;
+    const classesDropDown = !props.openAsModal ? cx("flyouts", classes.root) : null;
     const Tag = (props.tag ?? `div`) as "div";
 
     const isContentVisible = !props.disabled && isVisible;
     return (
         <Tag
-            className={classNames(classesDropDown, props.className, {
+            className={cx(classesDropDown, props.className, {
                 asModal: props.openAsModal,
             })}
             ref={controllerRef}

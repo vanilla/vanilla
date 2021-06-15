@@ -18,12 +18,14 @@ use Vanilla\Formatting\Html\Processor\AttachmentHtmlProcessor;
 use Vanilla\Formatting\Html\Processor\HeadingHtmlProcessor;
 use Vanilla\Formatting\Html\Processor\ImageHtmlProcessor;
 use Vanilla\Formatting\Html\Processor\UserContentCssProcessor;
+use Vanilla\Formatting\ParsableDOMInterface;
+use Vanilla\Formatting\TextDOMInterface;
 use Vanilla\InjectableInterface;
 
 /**
  * Format definition for HTML based formats.
  */
-class HtmlFormat extends BaseFormat implements InjectableInterface {
+class HtmlFormat extends BaseFormat implements InjectableInterface, ParsableDOMInterface {
 
     const FORMAT_KEY = "html";
 
@@ -275,5 +277,14 @@ class HtmlFormat extends BaseFormat implements InjectableInterface {
         }
 
         return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function parseDOM(string $content): TextDOMInterface {
+        $html = $this->renderHtml($content, false);
+        $dom = new HtmlDocument($html);
+        return $dom;
     }
 }

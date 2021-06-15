@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import { LanguageSettingsFormControls } from "@dashboard/languages/LanguageSettingsFormControls";
+import { DashboardFormControl, DashboardFormControlGroup } from "@dashboard/forms/DashboardFormControl";
 import { ITranslationService } from "@dashboard/languages/LanguageSettingsTypes";
 import { cx } from "@emotion/css";
 import Button from "@library/forms/Button";
@@ -30,7 +30,7 @@ export interface IProps {
     modalSize?: ModalSizes; // Will need this for the language config
 }
 
-export const ConfigurationModal = (props: IProps) => {
+export const MachineTranslationConfigurationModal = (props: IProps) => {
     const { isVisible, onExit, service, setConfiguration, modalSize } = props;
     const titleID = useUniqueID("configureLanguage_Modal");
     const classFrameFooter = frameFooterClasses();
@@ -76,10 +76,8 @@ export const ConfigurationModal = (props: IProps) => {
                                     schema={service && service.configSchema}
                                     instance={value}
                                     onChange={setValue}
-                                    FormControl={LanguageSettingsFormControls}
-                                    Form={(props) => {
-                                        return <>{props.children}</>;
-                                    }}
+                                    FormControlGroup={DashboardFormControlGroup}
+                                    FormControl={DashboardFormControl}
                                 />
                             </div>
                         </FrameBody>

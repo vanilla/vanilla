@@ -8,8 +8,10 @@
 namespace VanillaTests\Addons\Pockets;
 
 use Vanilla\Addons\Pockets\PocketsModel;
+use Vanilla\Widgets\AbstractWidgetModule;
 use VanillaTests\APIv0\TestDispatcher;
 use VanillaTests\APIv2\AbstractAPIv2Test;
+use VanillaTests\EventSpyTestTrait;
 use VanillaTests\Fixtures\MockWidgets\MockWidget1;
 use VanillaTests\Fixtures\MockWidgets\MockWidget2;
 
@@ -18,7 +20,13 @@ use VanillaTests\Fixtures\MockWidgets\MockWidget2;
  */
 class PocketsRenderTest extends AbstractAPIv2Test {
 
+    use EventSpyTestTrait;
     public static $addons = ['vanilla', 'pockets'];
+
+    /**
+     * @var null|string
+     */
+    private static $currentOnPage = null;
 
     /** @var PocketsModel */
     private $pocketsModel;
@@ -28,6 +36,7 @@ class PocketsRenderTest extends AbstractAPIv2Test {
      */
     public function setUp(): void {
         parent::setUp();
+        self::$currentOnPage = null;
         $this->pocketsModel = $this->container()->get(PocketsModel::class);
         $this->resetTable('Pocket');
         \PocketsPlugin::instance()->resetState();
@@ -48,9 +57,12 @@ class PocketsRenderTest extends AbstractAPIv2Test {
             'Disabled' => \Pocket::ENABLED,
         ]);
 
+        self::$currentOnPage = 'discussions';
         $html = $this->bessy()->getHtml('/discussions', [], [TestDispatcher::OPT_DELIVERY_TYPE => DELIVERY_TYPE_ALL]);
         $html->assertCssSelectorText("#htmlpocket", "hello custom");
         $html->assertCssSelectorText(".mockWidget", "My Widget 1");
+        $countItems = $html->queryCssSelector('.mockWidget')->count();
+        $this->assertEquals(1, $countItems);
     }
 
     /**
@@ -151,5 +163,17 @@ class PocketsRenderTest extends AbstractAPIv2Test {
         ];
 
         return $r;
+    }
+
+    /**
+     * Event handler to add widget mock.
+     *
+     * @param \Gdn_Controller $sender
+     */
+    public function base_render_before(\Gdn_Controller $sender) {
+        if (self::$currentOnPage && $sender->SelfUrl == self::$currentOnPage) {
+            $module = new MockWidget1();
+            $sender->addModule($module, 'Content');
+        }
     }
 }

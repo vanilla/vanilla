@@ -307,4 +307,32 @@ HTML;
     private function leavingUrl(string $url): string {
         return url("/home/leaving?allowTrusted=1&target=" . urlencode($url));
     }
+
+    /**
+     * Verify links only affects anchors.
+     *
+     * This test only exists as a smoke test for existing behavior. That behavior may ultimately be wrong. If this test
+     * fails because of another fix, the established behavior may be the issue. Gdn_Format::links and its usages are
+     * in dire need of an overhaul.
+     */
+    public function testLinksLeavingAnchors(): void {
+        $content = /** @lang HTML */ <<<'HTML'
+<a href="https://example.com">
+    <img src="https://example.com/image.bmp" alt="I am an image.">
+</a>
+<a href="https://example.com/link-2">Link Two</a>
+HTML;
+
+        $hrefA = $this->leavingUrl("https://example.com");
+        $hrefB = $this->leavingUrl("https://example.com/link-2");
+        $expected = /** @lang HTML */ <<<HTML
+<a href="{$hrefA}">
+    <img src="https://example.com/image.bmp" alt="I am an image.">
+</a>
+<a href="{$hrefB}">Link Two</a>
+HTML;
+
+        $actual = Gdn_Format::links($content);
+        $this->assertSame($expected, $actual);
+    }
 }

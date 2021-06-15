@@ -17,7 +17,7 @@ use VanillaTests\UsersAndRolesApiTestTrait;
  *
  * @package VanillaTests\Modules
  */
-class ReactionModuleTest extends StorybookGenerationTestCase {
+class ReactionModuleStoryBookTest extends StorybookGenerationTestCase {
 
     use EventSpyTestTrait;
     use CommunityApiTestTrait;

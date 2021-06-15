@@ -33,6 +33,10 @@ class FormatService {
      * @return string
      */
     public function renderHTML(string $content, ?string $format): string {
+        if (empty($content) && empty($format)) {
+            return '';
+        }
+
         return $this
             ->getFormatter($format)
             ->renderHTML($content);
@@ -64,6 +68,10 @@ class FormatService {
      * @return string
      */
     public function renderExcerpt(string $content, ?string $format): string {
+        if (empty($format) && empty($content)) {
+            return '';
+        }
+
         return $this
             ->getFormatter($format)
             ->renderExcerpt($content);

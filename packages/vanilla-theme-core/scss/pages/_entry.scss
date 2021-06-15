@@ -103,7 +103,19 @@ body.Section-Entry {
     width: 100%;
 }
 
+.SignInPopup li.Buttons,
+body.Entry li.Buttons {
+    @include maxWidth($theme-breakpoint_mobile) {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: start;
+    }
+}
+
 .MultipleEntryMethods {
+
+
 
     .Methods {
         margin-left: 0;
@@ -111,8 +123,6 @@ body.Section-Entry {
         float: left;
 
         @include maxWidth {
-            float: none;
-
             b {
                 display: inline-block;
                 margin: $utility-baseUnitTriple 0 0;

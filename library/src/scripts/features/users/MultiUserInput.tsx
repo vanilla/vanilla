@@ -21,6 +21,7 @@ interface IProps extends IInjectableSuggestionsProps {
     value: IComboBoxOption[];
     className?: string;
     label?: string;
+    maxHeight?: number;
 }
 
 /**
@@ -48,6 +49,7 @@ export class MultiUserInput extends React.Component<IProps> {
                 value={this.props.value}
                 onInputChange={this.onInputChange}
                 className={this.props.className}
+                maxHeight={this.props.maxHeight}
             />
         );
     }

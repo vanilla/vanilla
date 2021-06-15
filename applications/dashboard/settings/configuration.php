@@ -7,3 +7,4 @@
 
 $Configuration['Garden']['Profile']['EditUsernames'] = false;
 $Configuration['Garden']['Activities']['PerPage'] = 30;
+$Configuration['Garden']['Format']['WarnLeaving'] = true;

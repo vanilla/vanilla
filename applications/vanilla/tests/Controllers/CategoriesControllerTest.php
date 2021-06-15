@@ -84,4 +84,44 @@ class CategoriesControllerTest extends TestCase {
         $data = $this->bessy()->get('/categories/general')->Data;
         $this->assertEquals(2, count($data['CategoryTree']));
     }
+
+    /**
+     * Test most recent discussion join with permissions.
+     *
+     * @param string $role
+     * @param string $prefix
+     * @param mixed $expected
+     * @dataProvider providerMostRecentDataProvider
+     */
+    public function testMostRecentWithPermissions(string $role, string $prefix, $expected) {
+        $this->createUserFixtures($prefix);
+        $this->resetTable('Category');
+        $this->resetTable('Discussion');
+        $this->resetTable('Comment');
+        $parentCategory = $this->createCategory(["name" => "join recent test"]);
+        $publicChildCategory = $this->createCategory(["parentCategoryID" => $parentCategory['categoryID'], "name" => "public"]);
+        $adminChildCategory = $this->createPermissionedCategory(["parentCategoryID" => $parentCategory['categoryID'], "name" => "private"], [16]);
+
+        $user = $expected['userID'] === 'apiUser' ? $this->api()->getUserID() : null;
+        $discussionInPublic = $this->createDiscussion(["categoryID" => $publicChildCategory["categoryID"], "name" => "publicDiscussion"]);
+        $discussionInPrivate = $this->createDiscussion(["categoryID" => $adminChildCategory["categoryID"], "name" => "privateDiscussion"]);
+        $id = $role === 'member' ? $this->memberID : $this->adminID;
+
+        $this->getSession()->start($id);
+        $data = $this->bessy()->get("/categories")->data('CategoryTree');
+        $category = $data[0];
+        $this->assertEquals($expected['title'], $category["LastTitle"]);
+        $this->assertEquals($user, $category["LastUserID"]);
+    }
+
+    /**
+     * Provides test cases for the most recent join with permission test.
+     */
+    public function providerMostRecentDataProvider() {
+        // $role, $prefix, $expect
+        return [
+            ['member', 'mem', ['title' => '', 'userID' => null]],
+            ['admin', 'admin', ['title' => 'privateDiscussion', 'userID' => 'apiUser']]
+        ];
+    }
 }

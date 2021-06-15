@@ -4,15 +4,22 @@
  * @license gpl-2.0-only
  */
 
-import { cx } from "@emotion/css";
 import { metasClasses } from "@library/metas/Metas.styles";
 import React from "react";
+import { cx } from "@emotion/css";
+import classNames from "classnames";
+import { Tag } from "@library/metas/Tags";
+import { TagPreset, tagsVariables } from "@library/metas/Tags.variables";
+import { Icon } from "@vanilla/icons";
+import { iconVariables } from "@library/icons/iconStyles";
+import SmartLink from "@library/routing/links/SmartLink";
 
 interface IProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function Metas(props: IProps) {
     const classes = metasClasses();
-    return <div {...props} className={cx(classes.root, props.className)} />;
+    // note: using cx to compose the class name breaks the sibling selectors required to ensure spacing between list item metas & description
+    return <div {...props} className={classNames(props.className, classes.root)} />;
 }
 
 export function MetaItem(props: IProps) {
@@ -20,7 +27,46 @@ export function MetaItem(props: IProps) {
     return <div {...props} className={cx(classes.meta, props.className)} />;
 }
 
-export function MetaIcon(props: IProps) {
+export function MetaLink(props: React.ComponentProps<typeof SmartLink>) {
     const classes = metasClasses();
-    return <div {...props} className={cx(classes.metaIcon, props.className)} />;
+
+    return (
+        <MetaItem>
+            <SmartLink {...props} className={cx(classes.metaLink, props.className)} />
+        </MetaItem>
+    );
+}
+
+export function MetaTag(
+    props: {
+        tagPreset?: TagPreset;
+    } & React.ComponentProps<typeof Tag>,
+) {
+    const { tagPreset, ...rest } = props;
+    const { height } = tagsVariables();
+    const classes = metasClasses();
+
+    return (
+        <MetaItem>
+            <Tag
+                {...rest}
+                preset={props.tagPreset}
+                className={cx(classes.alignVerticallyInMetaItem(height), props.className)}
+            />
+        </MetaItem>
+    );
+}
+
+export function MetaIcon(props: React.ComponentProps<typeof Icon>) {
+    const { className, children, ...rest } = props;
+    const {
+        standard: { height: iconHeight },
+    } = iconVariables();
+    const classes = metasClasses();
+
+    return (
+        <MetaItem className={className}>
+            <Icon {...rest} className={classes.alignVerticallyInMetaItem(iconHeight)} /> {children}
+        </MetaItem>
+    );
 }

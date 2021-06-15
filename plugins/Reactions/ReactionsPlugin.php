@@ -1687,7 +1687,7 @@ class ReactionsPlugin extends Gdn_Plugin {
 
         $schema = $this->reactionModel->compoundTypeFragmentSchema();
         foreach ($users as &$userRow) {
-            if (!array_key_exists($userRow["userID"], $reactionsByUser)) {
+            if (!array_key_exists($userRow["userID"], $reactionsByUser) || !$this->userModel->shouldIncludePrivateRecord($userRow)) {
                 continue;
             }
             $userRow["reactionsReceived"] = $schema->validate($reactionsByUser[$userRow["userID"]]);

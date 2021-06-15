@@ -879,6 +879,29 @@ class VanillaSettingsController extends Gdn_Controller {
     }
 
     /**
+     * Banned users private profiles.
+     */
+    public function banSettings() {
+        $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
+        $this->setHighlightRoute('vanilla/settings/bansettings');
+
+        $cf = new ConfigurationModule($this);
+
+        $cf->initialize([
+            'Vanilla.BannedUsers.PrivateProfiles' => [
+                'LabelCode' => 'Private Profiles',
+                'Control' => 'toggle',
+                'Description' => t(
+                    'When enabled, Banned user profiles will be private. Private profiles can only be viewed by authorized users.'
+                )
+            ],
+        ]);
+
+        $this->setData('Title', t('Advanced Ban Settings'));
+        $cf->renderAll();
+    }
+
+    /**
      * Move through the category's parents to determine the proper management page URL.
      *
      * @param array|object $category

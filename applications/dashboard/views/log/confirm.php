@@ -94,7 +94,7 @@
             </div>
             <div class="modal-footer">
                 <?php
-                echo anchor(t("No, get me outta here!"), '#', ['class' => 'btn btn-text ConfirmNo']);
+                echo anchor(t("No, get me outta here!"), '/dashboard/log/spam', ['class' => 'btn btn-text ConfirmNo']);
                 echo $this->Form->button('Yes, continue', ['class' => 'btn btn-primary ConfirmYes']);
                 ?>
             </div>

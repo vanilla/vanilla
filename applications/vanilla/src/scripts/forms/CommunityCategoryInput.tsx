@@ -26,6 +26,7 @@ interface IProps {
     className?: string;
     placeholder?: string;
     hideTitle?: boolean;
+    maxHeight?: number;
 }
 
 /**
@@ -74,6 +75,7 @@ export function CommunityCategoryInput(props: IProps) {
                 label={props.label ?? t("Community Category")}
                 showIndicator
                 options={options}
+                maxHeight={props.maxHeight}
             />
         );
     }
@@ -90,6 +92,7 @@ export function CommunityCategoryInput(props: IProps) {
             options={options}
             label={props.label ?? t("Community Category")}
             value={(props.value ?? [])[0]}
+            maxHeight={props.maxHeight}
         />
     );
 }

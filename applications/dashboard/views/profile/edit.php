@@ -71,6 +71,14 @@ use Vanilla\Utility\HtmlUtils;
             </li>
         <?php endif ?>
 
+        <?php if ($this->data('_CanSetPrivateProfile')): ?>
+            <li class="User-ConfirmEmail" role="presentation">
+                <?php
+                echo $this->Form->checkBox('Private', t("Private Profile: Private profiles can only be viewed by authorized users."));
+                ?>
+            </li>
+        <?php endif; ?>
+
         <?php if ($this->data('_CanAddEditTitle')): ?>
             <li class="User-Title" role="presentation">
                 <?php

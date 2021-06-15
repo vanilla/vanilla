@@ -1,11 +1,11 @@
 .TestPocket {
-    border: 1px solid #FC3;
-    background: #F6C;
+    border: 1px solid #fc3;
+    background: #f6c;
     color: #036;
     padding: 4px 6px !important;
 
     /* default background colour, for all layout engines that don't implement gradients */
-    background: #FFE768;
+    background: #ffe768;
 
     /* gecko based browsers */
     background: -moz-linear-gradient(top, #ff9, #fc3);
@@ -17,10 +17,13 @@
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
 
+    box-shadow: 0px 0px 10px #999;
+    -moz-box-shadow: 0px 0px 10px #999;
+    -webkit-box-shadow: 0px 0px 10px #999;
 
-	box-shadow: 0px 0px 10px #999;
-	-moz-box-shadow: 0px 0px 10px #999;
-	-webkit-box-shadow: 0px 0px 10px #999;
+    /* Fixed pockets hiding underneath the compatibility page background layer */
+    z-index: 1;
+    position: relative;
 }
 
 .TestPocket h3 {

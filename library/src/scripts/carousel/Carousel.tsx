@@ -60,15 +60,9 @@ export function Carousel(props: IProps) {
     const measureSectionWrapper = useMeasure(sectionWrapper);
     const measureSliderWrapper = useMeasure(sliderWrapper);
     const slides = React.Children.toArray(children);
-    const maxSlidesToShow = clamp(props.maxSlidesToShow ?? 4, 2, slides.length);
+    const maxSlidesToShow = clamp(props.maxSlidesToShow ?? 5, 2, slides.length);
 
-    //Manage borwser size/resize BreakPoints are based on main section wrapper width
-    const breakPointsSetup = useMemo(() => getBreakPoints(measureSectionWrapper.width, maxSlidesToShow), [
-        measureSectionWrapper.width,
-        maxSlidesToShow,
-    ]);
-
-    const toShow: number = breakPointsSetup.slidesToShow;
+    const toShow: number = getBreakPoints(measureSectionWrapper.width, maxSlidesToShow);
 
     //Carousel Children Size flex/responsive updating based on sliderWrapper width
     //values to be removed from sliderWrapper width

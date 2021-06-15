@@ -109,9 +109,11 @@ export const ListItemColors = storyWithConfig(
         themeVars: {
             quickLinks: {
                 listItem: {
-                    fgColor: {
-                        default: "#03526C",
-                        allStates: "#013D51",
+                    font: {
+                        color: "#03526C",
+                    },
+                    fontState: {
+                        color: "#013D51",
                     },
                     listSeparation: ListSeparation.SEPARATOR,
                 },
@@ -161,12 +163,12 @@ export const Borders = storyWithConfig(
                 listItem: {
                     font: {
                         size: 16,
+                        color: "#fff",
+                    },
+                    fontState: {
+                        color: "#fff",
                     },
                     listSeparation: ListSeparation.SEPARATOR,
-                    fgColor: {
-                        default: "#fff",
-                        allStates: "#fff",
-                    },
                     spacing: {
                         vertical: 5,
                     },

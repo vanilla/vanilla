@@ -68,16 +68,10 @@ export const discussionListClasses = useThemeCache(() => {
         });
     });
 
-    const userTag = css({
-        "&:hover, &:focus, &:active": {
-            "& span": {
-                ...Mixins.font({ color: globalVars.mainColors.primary }),
-            },
-        },
-    });
-
     const resolved = css({
-        margin: 0,
+        ...Mixins.margin({
+            horizontal: 0,
+        }),
     });
 
     return {
@@ -85,7 +79,6 @@ export const discussionListClasses = useThemeCache(() => {
         iconAndVoteCounterWrapper,
         voteCounterContainer,
         options,
-        userTag,
         resolved,
     };
 });

@@ -8,6 +8,8 @@ import React from "react";
 import { INavigationVariableItem } from "@library/headers/navigationVariables";
 import { TitleBarMegaMenu } from "@library/headers/TitleBarMegaMenu";
 import { slugify } from "@vanilla/utils";
+import { storyWithConfig } from "@library/storybook/StoryContext";
+import { GlobalPreset } from "@library/styles/globalStyleVars";
 
 export default {
     title: "Headers/Mega Menu",
@@ -114,3 +116,16 @@ export function ItemsWithAndWithoutChildren() {
         />
     );
 }
+
+export const ItemsWithAndWithoutChildrenDark = storyWithConfig(
+    {
+        themeVars: {
+            global: {
+                options: {
+                    preset: GlobalPreset.DARK,
+                },
+            },
+        },
+    },
+    ItemsWithAndWithoutChildren,
+);

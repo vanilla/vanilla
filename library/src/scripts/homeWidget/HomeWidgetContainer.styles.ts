@@ -72,7 +72,7 @@ export const homeWidgetContainerVariables = useThemeCache(
                 outerBackground: Variables.background({}),
                 innerBackground: Variables.background({}),
                 borderType: BorderType.NONE as BorderType | "navLinks",
-                maxWidth: "100%",
+                maxWidth: undefined as "string" | "number" | undefined,
                 viewAll: {
                     onClick: undefined,
                     to: undefined as string | undefined,
@@ -216,6 +216,8 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
     const container = style(
         "container",
         {
+            // Backwards compatibility.
+            clear: "both",
             maxWidth: styleUnit(vars.options.maxWidth),
             margin: "0 auto",
             width: "100%",

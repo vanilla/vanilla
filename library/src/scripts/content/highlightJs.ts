@@ -7,7 +7,7 @@
 import hljs from "highlight.js/lib/highlight.js";
 
 // Supported languages
-// Serving all langauges is pretty huge, so ideally we should only serve common languages.
+// Serving all languages is pretty huge, so ideally we should only serve common languages.
 // This is the list of all languages from highlight.js/lib/index.js
 // Less commonly used languages are commented out.
 // Extra languages may be uncommented here by PR or customer request
@@ -170,7 +170,7 @@ hljs.registerLanguage("scss", require("highlight.js/lib/languages/scss"));
 // hljs.registerLanguage("smalltalk", require("highlight.js/lib/languages/smalltalk"));
 // hljs.registerLanguage("sml", require("highlight.js/lib/languages/sml"));
 // hljs.registerLanguage("sqf", require("highlight.js/lib/languages/sqf"));
-// hljs.registerLanguage("sql", require("highlight.js/lib/languages/sql"));
+hljs.registerLanguage("sql", require("highlight.js/lib/languages/sql"));
 // hljs.registerLanguage("stan", require("highlight.js/lib/languages/stan"));
 // hljs.registerLanguage("stata", require("highlight.js/lib/languages/stata"));
 // hljs.registerLanguage("step21", require("highlight.js/lib/languages/step21"));

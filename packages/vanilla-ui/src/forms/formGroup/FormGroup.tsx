@@ -21,6 +21,7 @@ export interface IFormGroupContext {
 
 export interface IFormGroupProps {
     sideBySide?: boolean;
+    compact?: boolean;
     inputID?: string;
 }
 
@@ -34,11 +35,11 @@ export const FormGroupContext = React.createContext<IFormGroupContext>({} as nev
  * It is possible to customize the component used to render this label with the `as` property.
  */
 export const FormGroup = React.forwardRef(function FormGroupImpl(props, forwardedRef) {
-    const { as: Comp = "div", inputID: propsInputID, children, sideBySide, ...otherProps } = props;
+    const { as: Comp = "div", inputID: propsInputID, children, sideBySide, compact, ...otherProps } = props;
     const inputID = useMemo(() => propsInputID || uuidv4(), [propsInputID]);
     const [label, setLabel] = useState<string | undefined>();
     const [labelID, setLabelID] = useState(`${inputID}_label`);
-    const classes = formGroupClasses({ sideBySide });
+    const classes = formGroupClasses({ sideBySide, compact });
 
     return (
         <Comp {...otherProps} className={cx(classes.formGroup, props.className)} ref={forwardedRef}>

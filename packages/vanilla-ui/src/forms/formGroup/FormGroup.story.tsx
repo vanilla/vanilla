@@ -41,15 +41,10 @@ export function FormGroup() {
                     <UI.FormGroupLabel>City</UI.FormGroupLabel>
                     <UI.FormGroupInput>
                         {(props) => (
-                            <UI.AutoComplete openOnFocus>
-                                <UI.AutoCompleteInput {...props} arrow clear />
-                                <UI.AutoCompletePopover>
-                                    <UI.AutoCompleteList>
-                                        <UI.AutoCompleteOption value="Montreal" />
-                                        <UI.AutoCompleteOption value="Detroit" />
-                                        <UI.AutoCompleteOption value="Toronto" />
-                                    </UI.AutoCompleteList>
-                                </UI.AutoCompletePopover>
+                            <UI.AutoComplete {...props} clear>
+                                <UI.AutoCompleteOption value="Montreal" />
+                                <UI.AutoCompleteOption value="Detroit" />
+                                <UI.AutoCompleteOption value="Toronto" />
                             </UI.AutoComplete>
                         )}
                     </UI.FormGroupInput>
@@ -69,15 +64,10 @@ export function FormGroup() {
                     <UI.FormGroupLabel>City</UI.FormGroupLabel>
                     <UI.FormGroupInput>
                         {(props) => (
-                            <UI.AutoComplete openOnFocus>
-                                <UI.AutoCompleteInput {...props} arrow clear />
-                                <UI.AutoCompletePopover>
-                                    <UI.AutoCompleteList>
-                                        <UI.AutoCompleteOption value="Montreal" />
-                                        <UI.AutoCompleteOption value="Detroit" />
-                                        <UI.AutoCompleteOption value="Toronto" />
-                                    </UI.AutoCompleteList>
-                                </UI.AutoCompletePopover>
+                            <UI.AutoComplete {...props} clear>
+                                <UI.AutoCompleteOption value="Montreal" />
+                                <UI.AutoCompleteOption value="Detroit" />
+                                <UI.AutoCompleteOption value="Toronto" />
                             </UI.AutoComplete>
                         )}
                     </UI.FormGroupInput>

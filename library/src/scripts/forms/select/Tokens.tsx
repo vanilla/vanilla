@@ -29,6 +29,7 @@ export interface ITokenProps extends IOptionalComponentID {
     onInputChange?: (value: string) => void;
     menuPlacement?: string;
     showIndicator?: boolean;
+    maxHeight?: number;
 }
 
 interface IState {
@@ -97,6 +98,7 @@ export default class Tokens extends React.Component<ITokenProps, IState> {
                             isMulti={true}
                             onFocus={this.onFocus}
                             onBlur={this.onBlur}
+                            maxMenuHeight={this.props.maxHeight}
                         />
                     </div>
                     <input

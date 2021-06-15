@@ -19,6 +19,8 @@ class ProfileController extends Gdn_Controller {
 
     const AVATAR_FOLDER = 'userpics';
 
+    const PRIVATE_PROFILE = "This user's profile is private.";
+
     /** @var array Models to automatically instantiate. */
     public $Uses = ['Form', 'UserModel'];
 
@@ -380,6 +382,9 @@ class ProfileController extends Gdn_Controller {
 
         // Set up form
         $user = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
+        $canSetPrivateProfile =  Gdn::session()->checkPermission('Garden.Profiles.Edit') || Gdn::session()->checkPermission('Garden.Users.Edit');
+        $this->setData('_CanSetPrivateProfile', $canSetPrivateProfile);
+        $user["Private"] = forceBool(Gdn::userModel()->getAttribute($userID, 'Private', '0'), '0', '1', '0');
         $this->Form->setModel(Gdn::userModel());
         $this->Form->setData($user);
 
@@ -435,7 +440,6 @@ class ProfileController extends Gdn_Controller {
             if ($user['UserID'] === $sessionUserID && self::$isAuthenticated !== true) {
                 $this->reauth($authOptions);
             }
-
             // If the Form was reloaded because of reauth, reset the the form values to the original submission values.
             $originalFormValues = (isset($originalSubmission))
                 ? json_decode($originalSubmission, true)
@@ -537,6 +541,7 @@ class ProfileController extends Gdn_Controller {
 
             if ($this->Form->save($settings) !== false) {
                 $user = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
+                $user["Private"] = forceBool(Gdn::userModel()->getAttribute($userID, 'Private', '0'), '0', '1', '0');
                 $this->setData('Profile', $user);
 
                 $this->informMessage(sprite('Check', 'InformSprite').t('Your changes have been saved.'), 'Dismissable AutoDismiss HasSprite');
@@ -1963,7 +1968,16 @@ EOT;
         if ($checkPermissions && Gdn::session()->UserID != $this->User->UserID) {
             $this->permission(['Garden.Users.Edit', 'Moderation.Profiles.Edit'], false);
         }
-
+        $hasPersonalInfo = checkPermission('Garden.PersonalInfo.View');
+        // User Banned, PrivateProfiles enabled or User opted to set their profile as private.
+        if (!$hasPersonalInfo) {
+            $isOwnProfile = Gdn::session()->UserID === $this->User->UserID;
+            $private = $this->UserModel->getAttribute($this->User->UserID, 'Private', "0");
+            $hasPrivateProfile =  (bool)$private;
+            if (($this->User->Banned && gdn::config('Vanilla.BannedUsers.PrivateProfiles') || $hasPrivateProfile) && !$isOwnProfile) {
+                throw permissionException('@'.t(self::PRIVATE_PROFILE));
+            }
+        }
         $this->addSideMenu();
         $this->_UserInfoRetrieved = true;
         return true;

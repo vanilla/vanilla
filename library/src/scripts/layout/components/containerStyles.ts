@@ -72,7 +72,7 @@ export function containerMainMediaQueries() {
     });
 }
 
-export const containerClasses = useThemeCache((options?: { desktopSpacing?: ISpacing; maxWidth?: number }) => {
+export const containerClasses = useThemeCache((options?: { desktopSpacing?: ISpacing; maxWidth?: number | string }) => {
     const style = styleFactory("container");
     const mediaQueries = panelLayoutVariables().mediaQueries();
     const vars = containerVariables();

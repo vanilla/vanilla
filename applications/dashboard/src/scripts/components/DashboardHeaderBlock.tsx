@@ -9,6 +9,7 @@ import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { t } from "@library/utility/appUtils";
 import BackLink from "@library/routing/links/BackLink";
+import { cx } from "@emotion/css";
 
 interface IProps {
     showBackLink?: boolean;
@@ -16,12 +17,13 @@ interface IProps {
     actionButtons?: React.ReactNode;
     /** @deprecated use useFallbackBackUrl("/action"); instead */
     onBackClick?: () => void;
+    className?: string;
 }
 
 export function DashboardHeaderBlock(props: IProps) {
     const history = useHistory();
     return (
-        <header className="header-block">
+        <header className={cx("header-block", props.className)}>
             <div className="title-block">
                 {props.showBackLink && history && <BackLink aria-label={t("Return")} onClick={props.onBackClick} />}
                 <h1>{props.title}</h1>

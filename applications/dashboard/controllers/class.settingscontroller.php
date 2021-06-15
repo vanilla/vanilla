@@ -779,6 +779,7 @@ class SettingsController extends DashboardController {
         $configurationModel->setField([
             self::CONFIG_TRUSTED_DOMAINS,
             self::CONFIG_CSP_DOMAINS,
+            "Garden.Format.WarnLeaving",
             HstsModel::MAX_AGE_KEY,
             HstsModel::INCLUDE_SUBDOMAINS_KEY,
             HstsModel::PRELOAD_KEY,

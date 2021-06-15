@@ -1,13 +1,12 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import { useBannerContext } from "@library/banner/BannerContext";
 import { isUserGuest, useUsersState } from "@library/features/users/userModel";
 import Hamburger from "@library/flyouts/Hamburger";
-import { ButtonTypes } from "@library/forms/buttonTypes";
 import MeBox from "@library/headers/mebox/MeBox";
 import CompactMeBox from "@library/headers/mebox/pieces/CompactMeBox";
 import CompactSearch from "@library/headers/mebox/pieces/CompactSearch";
@@ -17,7 +16,7 @@ import TitleBarNav from "@library/headers/mebox/pieces/TitleBarNav";
 import { TitleBarNavItem } from "@library/headers/mebox/pieces/TitleBarNavItem";
 import { titleBarClasses, titleBarLogoClasses } from "@library/headers/titleBarStyles";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
-import { SignInIcon } from "@library/icons/common";
+import { Icon } from "@vanilla/icons";
 import Container from "@library/layout/components/Container";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import FlexSpacer from "@library/layout/FlexSpacer";
@@ -38,9 +37,7 @@ import { SearchPageRoute } from "@library/search/SearchPageRoute";
 import { useRegisterLink, useSignInLink } from "@library/contexts/EntryLinkContext";
 import titleBarNavClasses from "@library/headers/titleBarNavStyles";
 import { ISearchScopeNoCompact } from "@library/features/search/SearchScopeContext";
-import { useMeasure } from "@vanilla/react-utils/src";
 import { SkipNavLink, SkipNavContent } from "@reach/skip-nav";
-import { INavigationVariableItem } from "@library/headers/navigationVariables";
 import { LogoAlignment } from "@library/headers/LogoAlignment";
 
 interface IProps {
@@ -452,13 +449,15 @@ function DesktopMeBox() {
                 >
                     {t("Sign In")}
                 </TitleBarNavItem>
-                <TitleBarNavItem
-                    buttonType={guestVars.registerButtonType}
-                    linkClassName={classNames(classes.register, classes.guestButton)}
-                    to={registerLink}
-                >
-                    {t("Register")}
-                </TitleBarNavItem>
+                {registerLink && (
+                    <TitleBarNavItem
+                        buttonType={guestVars.registerButtonType}
+                        linkClassName={classNames(classes.register, classes.guestButton)}
+                        to={registerLink}
+                    >
+                        {t("Register")}
+                    </TitleBarNavItem>
+                )}
             </div>
         );
     } else {
@@ -485,9 +484,10 @@ function MobileMeBox() {
         return (
             <SmartLink
                 className={classNames(classes.centeredButton, classes.button, classes.signInIconOffset)}
+                title={t("Sign In")}
                 to={signinLink}
             >
-                <SignInIcon className={"titleBar-signInIcon"} />
+                <Icon icon="me-sign-in" />
             </SmartLink>
         );
     } else {

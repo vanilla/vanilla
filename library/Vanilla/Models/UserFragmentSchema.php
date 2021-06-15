@@ -26,7 +26,9 @@ class UserFragmentSchema extends Schema {
             'title:s?', // The title of the user.
             'url:s?', // Full URL to the user profile page.
             'photoUrl:s', // The URL of the user's avatar picture.
-            'dateLastActive:dt|n', // Time the user was last active.
+            'dateLastActive:dt|n?', // Time the user was last active.
+            'banned:b?', // The banned status of the user
+            'private:b?', // The private profile status of the user
             'label:s?'
         ]));
     }
@@ -62,6 +64,9 @@ class UserFragmentSchema extends Schema {
         }
         $dbRecord['url'] = url(userUrl($dbRecord), true);
         $dbRecord['Name'] = empty($dbRecord['Name']) ? 'unknown' : $dbRecord['Name'];
+        $privateProfile = \UserModel::getRecordAttribute($dbRecord, 'Private', "0");
+        $dbRecord['Private'] = (bool)$privateProfile;
+        $dbRecord['Banned'] = $dbRecord['Banned'] ?? 0;
 
         $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
         $schemaRecord = self::instance()->validate($schemaRecord);

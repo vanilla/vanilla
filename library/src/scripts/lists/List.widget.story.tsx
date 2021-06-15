@@ -14,6 +14,7 @@ import { List } from "@library/lists/List";
 import { ListItem } from "@library/lists/ListItem";
 import { StoryListItems } from "@library/lists/ListItem.story";
 import { MetaItem } from "@library/metas/Metas";
+import { metasClasses } from "@library/metas/Metas.styles";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import { STORY_IPSUM_LONG } from "@library/storybook/storyData";
 import { globalVariables } from "@library/styles/globalStyleVars";
@@ -32,7 +33,7 @@ export const WithContainer = storyWithConfig({ useWrappers: false }, () => {
                 options={{
                     maxWidth: 1000,
                     subtitle: {
-                        content: "800px Max Width",
+                        content: "1000px Max Width",
                         type: SubtitleType.OVERLINE,
                     },
                     description: "This is the description of the widget.",
@@ -54,7 +55,7 @@ export const WithContainer = storyWithConfig({ useWrappers: false }, () => {
                     },
                     maxWidth: 1000,
                     subtitle: {
-                        content: "800px Max Width",
+                        content: "1000px Max Width",
                         type: SubtitleType.OVERLINE,
                     },
                     description: "This is the description of the widget.",
@@ -76,7 +77,7 @@ export const WithContainer = storyWithConfig({ useWrappers: false }, () => {
                     },
                     maxWidth: 1000,
                     subtitle: {
-                        content: "800px Max Width",
+                        content: "1000px Max Width",
                         type: SubtitleType.OVERLINE,
                     },
                     description: "This is the description of the widget.",
@@ -163,7 +164,10 @@ function MinimalListItem() {
                 <>
                     <MetaItem>Posted: Dec 12 2020</MetaItem>
                     <MetaItem>
-                        By <a href="">Adam Charron</a>
+                        By{" "}
+                        <a href="" className={metasClasses().metaLink}>
+                            Adam Charron
+                        </a>
                     </MetaItem>
                 </>
             }

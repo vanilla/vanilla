@@ -503,6 +503,9 @@ $dic->setInstance(Container::class, $dic)
     ->rule(BaseFormat::class)
     ->addCall("addHtmlProcessor", [new Reference(ExternalLinksProcessor::class)])
 
+    ->rule(ExternalLinksProcessor::class)
+    ->addCall("setWarnLeaving", [ContainerUtils::config("Garden.Format.WarnLeaving")])
+
     ->rule(LegacyEmbedReplacer::class)
     ->setShared(true)
 

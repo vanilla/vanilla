@@ -13,15 +13,12 @@ import { homePageVariables } from "@library/layout/homePageStyles";
 import isEmpty from "lodash/isEmpty";
 import { css, CSSObject } from "@emotion/css";
 import { Mixins } from "@library/styles/Mixins";
+import { useEffect } from "react";
 
-export const bodyCSS = useThemeCache(() => {
+export const bodyStyleMixin = useThemeCache(() => {
     const globalVars = globalVariables();
 
-    cssRule("html", {
-        msOverflowStyle: "-ms-autohiding-scrollbar",
-    });
-
-    const htmlBodyMixin: CSSObject = {
+    const style: CSSObject = {
         background: ColorsUtils.colorOut(globalVars.body.backgroundImage.color),
         ...Mixins.font({
             ...globalVars.fontSizeAndWeightVars("medium"),
@@ -29,10 +26,32 @@ export const bodyCSS = useThemeCache(() => {
             color: globalVars.mainColors.fg,
         }),
         wordBreak: "break-word",
+
+        "h1, h2, h3, h4, h5, h6": {
+            lineHeight: globalVars.lineHeights.condensed,
+            color: ColorsUtils.colorOut(globalVars.mainColors.fgHeading),
+        },
     };
 
-    const bodyClass = css({ ...htmlBodyMixin, label: "vanillaBodyReset" });
-    document.body.classList.add(bodyClass);
+    return style;
+});
+
+export const useBodyClass = () => {
+    const globals = globalVariables();
+    useEffect(() => {
+        const bodyClass = css({ ...bodyStyleMixin(), label: "vanillaBodyReset" });
+        document.body.classList.add(bodyClass);
+
+        return function cleanup() {
+            document.body.classList.remove(bodyClass);
+        };
+    }, [globals]);
+};
+
+export const globalCSS = useThemeCache(() => {
+    cssRule("html", {
+        msOverflowStyle: "-ms-autohiding-scrollbar",
+    });
 
     cssRule("*", {
         // For Mobile Safari -> https://developer.mozilla.org/en-US/docs/Web/CSS/overscroll-behavior
@@ -41,8 +60,6 @@ export const bodyCSS = useThemeCache(() => {
 
     cssRule("h1, h2, h3, h4, h5, h6", {
         display: "block",
-        lineHeight: globalVars.lineHeights.condensed,
-        color: ColorsUtils.colorOut(globalVars.mainColors.fgHeading),
         ...Mixins.margin({
             all: 0,
         }),

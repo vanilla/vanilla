@@ -8,6 +8,8 @@
 
 namespace VanillaTests\Library\Vanilla\Utility;
 
+use DOMDocument;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Formatting\Html\HtmlDocument;
 use Vanilla\Formatting\Html\DomUtils;
@@ -20,6 +22,56 @@ use VanillaTests\Library\Vanilla\Formatting\AssertsFixtureRenderingTrait;
  */
 class DomUtilsTest extends TestCase {
     use AssertsFixtureRenderingTrait;
+
+    /** @var DOMDocument */
+    private $doc;
+
+    /**
+     * Reset the simple test doc.
+     */
+    private function resetDoc(): void {
+        $html = /** @lang HTML */ <<<'HTML'
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Hello World.</title>
+    </head>
+    <body id="body">
+        <p id="p1">foo</p>
+        <p id="p2">bar</p>
+        <p id="p3">     <span id="p3span1">Hello world.</span>      </p>
+        <ul id="ul1">
+            <li id="ul1li1">One</li>
+            <li id="ul1li2">Two</li>
+            <li id="ul1li3">Three</li>
+        </ul>
+        <!-- Blame Colossal Cave Adventure -->
+        <a href="https://example.com/cca.htm" id="a1" title="A maze of twisty little passages">
+            <img alt="xyzzy" id="img1" src="https://example.com/maze.bmp" />
+        </a>
+        <iframe id="iframe1" src="https://example.com/embed"></iframe>
+        <div id="div1">
+            <div id="div1div1">
+                <div id="div1div1div1"></div>
+            </div>
+        </div>
+        <div id="div2"></div>
+    </body>
+</html>
+HTML;
+
+        $doc = new DOMDocument();
+        $doc->loadHTML($html);
+        $this->doc = $doc;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setUp(): void {
+        parent::setUp();
+        $this->resetDoc();
+    }
 
     /**
      * Test truncating words.
@@ -255,19 +307,19 @@ EOT;
      * Test preg replace with unescaped HTML.
      *
      * @param int $expectedCount
-     * @param string|string[] $patternText
+     * @param string|string[] $pattern
      * @param string $input
      * @param string $expected
-     * @param bool $escapeHtml
+     * @param bool $escape
      * @dataProvider providePregReplaceCallbackTestsUnescapedHTML
      */
-    public function testPregReplaceCallbackUnescapedHtml(int $expectedCount, string $patternText, string $input, string $expected, bool $escapeHtml): void {
+    public function testPregReplaceCallbackUnescapedHtml(int $expectedCount, string $pattern, string $input, string $expected, bool $escape): void {
         $domDocument = new HtmlDocument($input);
         $dom = $domDocument->getDom();
-        $pattern = ['/'.$patternText.'/'];
+        $pattern = ['/'.$pattern.'/'];
         $count = DomUtils::pregReplaceCallback($dom, $pattern, function (array $matches): string {
             return HtmlUtils::formatTags("<0>{$matches[0]}</0>", 'strong');
-        }, $escapeHtml);
+        }, $escape);
         $actual = $domDocument->getInnerHtml();
         $this->assertHtmlStringEqualsHtmlString($expected, $actual);
         $this->assertSame($expectedCount, $count);
@@ -342,5 +394,147 @@ EOT;
             'count' => [3, 'a+', '<p>a aaa is</p><p>aaa</p>', '<p>*** *** is</p><p>***</p>']
         ];
         return $r;
+    }
+
+    /**
+     * Verify basic ability of getHtmlRange to get HTML between a range of sibling document nodes.
+     */
+    public function testGetHtmlRange(): void {
+        $from = $this->doc->getElementById("p1");
+        $to = $this->doc->getElementById("p3");
+
+        $expected = /** @lang HTML */ <<<'HTML'
+<p id="p1">foo</p>
+<p id="p2">bar</p>
+<p id="p3">      <span id="p3span1">Hello world.</span>      </p>
+HTML;
+        $actual = DomUtils::getHtmlRange($from, $to);
+
+        $this->assertHtmlStringEqualsHtmlString($expected, $actual);
+    }
+
+    /**
+     * Verify an exception is thrown when nodes passed to getHtmlRange are not siblings.
+     */
+    public function testGetHtmlRangeNotSiblings(): void {
+        $from = $this->doc->getElementById("p3");
+        $to = $this->doc->getElementById("p3span1");
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(DomUtils::class . '::getHtmlRange() expects $from and $to to be siblings.');
+        DomUtils::getHtmlRange($from, $to);
+    }
+
+    /**
+     * Verify ability to extract content as an HTML string from a node.
+     */
+    public function testGetInnerHtml(): void {
+        $node = $this->doc->getElementById("div1");
+
+        $expected = /** @lang HTML */ <<<'HTML'
+<div id="div1div1">
+    <div id="div1div1div1"></div>
+</div>
+HTML;
+
+        $actual = DomUtils::getInnerHTML($node);
+        $this->assertHtmlStringEqualsHtmlString($expected, $actual);
+    }
+
+    /**
+     * Verify getInnerHtml will return an empty string when no child nodes are present.
+     */
+    public function testGetInnerHtmlEmptyNode(): void {
+        $node = $this->doc->getElementById("div2");
+
+        $actual = DomUtils::getInnerHTML($node);
+        $this->assertHtmlStringEqualsHtmlString("", $actual);
+    }
+
+    /**
+     * Verify basic ability to replace a range of nodes using an HTML string.
+     */
+    public function testSetHtmlRange(): void {
+        $from = $this->doc->getElementById("ul1li2");
+        $to = $this->doc->getElementById("ul1li3");
+
+        $content = /** @lang HTML */ <<<'HTML'
+<li id="ul1foo">foo</li>
+HTML;
+
+        $expected = /** @lang HTML */ <<<HTML
+<li id="ul1li1">One</li>
+{$content}
+HTML;
+        DomUtils::setHtmlRange($from, $to, $content);
+
+        $actual = "";
+        foreach ($this->doc->getElementById("ul1")->childNodes as $child) {
+            $actual .= $this->doc->saveHTML($child);
+        }
+        $this->assertHtmlStringEqualsHtmlString($expected, $actual);
+    }
+
+    /**
+     * Verify an exception is thrown when nodes passed to setHtmlRange are not siblings.
+     */
+    public function testSetHtmlRangeNotSiblings(): void {
+        $from = $this->doc->getElementById("p3");
+        $to = $this->doc->getElementById("p3span1");
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(DomUtils::class . '::setHtmlRange() expects $from and $to to be siblings.');
+        DomUtils::setHtmlRange($from, $to, '<meta content="bar" name="foo">');
+    }
+
+    /**
+     * Verify basic ability to set the inner HTML of a node.
+     */
+    public function testSetInnerHtml(): void {
+        $node = $this->doc->getElementById("div1");
+
+        $expected = /** @lang HTML */ <<<'HTML'
+<ul>
+    <li>foo</li>
+    <li>bar</li>
+    <li>baz</li>
+</ul>
+HTML;
+
+        DomUtils::setInnerHTML($node, $expected);
+
+        $actual = "";
+        foreach ($node->childNodes as $child) {
+            $actual .= $node->ownerDocument->saveHTML($child);
+        }
+        $this->assertHtmlStringEqualsHtmlString($expected, $actual);
+    }
+
+    /**
+     * Verify trimming whitespace text nodes from a range.
+     */
+    public function testTrimRange(): void {
+        $p = $this->doc->getElementById("p3");
+        $from = $p->firstChild;
+        $to = $p->lastChild;
+
+        $this->assertEmpty(trim($from->nodeValue));
+        $this->assertEmpty(trim($to->nodeValue));
+        [$trimFrom, $trimTo] = DomUtils::trimRange($from, $to);
+
+        $this->assertSame($this->doc->getElementById("p3span1"), $trimFrom);
+        $this->assertSame($this->doc->getElementById("p3span1"), $trimTo);
+    }
+
+    /**
+     * Verify an exception is thrown when nodes passed to trimRange are not siblings.
+     */
+    public function testTrimRangeNotSiblings(): void {
+        $from = $this->doc->getElementById("p3");
+        $to = $this->doc->getElementById("p3span1");
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(DomUtils::class . '::trimRange() expects $from and $to to be siblings.');
+        DomUtils::trimRange($from, $to);
     }
 }

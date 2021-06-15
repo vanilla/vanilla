@@ -1,14 +1,15 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import React from "react";
 import ReactDOM from "react-dom";
-import { DropDownMenuIcon, DocumentationIcon, _BookmarkIcon } from "@library/icons/common";
+import { DocumentationIcon, _BookmarkIcon } from "@library/icons/common";
 import { cssRule } from "@library/styles/styleShim";
 import { important } from "csx";
 import { iconClasses } from "@library/icons/iconStyles";
+import { Icon } from "@vanilla/icons";
 
 export function applyCompatibilityIcons(scope: HTMLElement | Document | undefined = document) {
     if (scope === undefined) {
@@ -20,7 +21,7 @@ export function applyCompatibilityIcons(scope: HTMLElement | Document | undefine
     const cogWheels = scope.querySelectorAll(".Arrow.SpFlyoutHandle:not(.compatIcons)");
     cogWheels.forEach((wheel) => {
         wheel.classList.add("compatIcons");
-        ReactDOM.render(<DropDownMenuIcon />, wheel);
+        ReactDOM.render(<Icon icon="navigation-ellipsis" />, wheel);
     });
 
     const docLinks = scope.querySelectorAll("a.documentationLink");

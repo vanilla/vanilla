@@ -19,9 +19,9 @@ if ($Photo) {
 }
 
 if ($User->Banned) {
-    $BannedPhoto = c('Garden.BannedPhoto', 'https://images.v-cdn.net/banned_large.png');
+    $BannedPhoto = c('Garden.BannedPhoto', '/applications/dashboard/design/images/banned.png');
     if ($BannedPhoto) {
-        $Photo = Gdn_Upload::url($BannedPhoto);
+        $Photo = asset($BannedPhoto, true);
     }
 }
 

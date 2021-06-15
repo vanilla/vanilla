@@ -228,9 +228,9 @@ export const homeWidgetItemVariables = useThemeCache(
                 ...options,
                 box: {
                     ...options.box,
-                    spacing: {
+                    spacing: Variables.spacing({
                         all: boxHasBorder || hasChatBubble ? (hasChatBubble ? 24 : 16) : undefined,
-                    },
+                    }),
                 },
             },
             optionOverrides,
@@ -715,6 +715,10 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: DeepPartia
         },
     );
 
+    const longMetaItem = css({
+        maxHeight: "none",
+    });
+
     const metaDescription = css({
         whiteSpace: "normal",
     });
@@ -744,6 +748,7 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: DeepPartia
         callToAction,
         absoluteName,
         metas,
+        longMetaItem,
         metaDescription,
         content,
         backgroundScrim,

@@ -18,7 +18,7 @@ import Loader from "@library/loaders/Loader";
 import { LoadingRectangle, LoadingSpacer } from "@library/loaders/LoadingRectangle";
 import { t } from "@vanilla/i18n";
 import { Icon } from "@vanilla/icons";
-import React, { useEffect, useState } from "react";
+import React, { useMemo } from "react";
 export interface IMachineTranslationProps {
     services: ITranslationService[];
     configureService(service: ITranslationService): void;
@@ -31,6 +31,10 @@ export const MachineTranslationSettings = (props: IMachineTranslationProps) => {
     const classes = dashboardClasses();
     const languageClasses = languageSettingsStyles();
 
+    const isDefaultConfigured = useMemo(() => {
+        return services.find((service) => service.isDefault)?.isConfigured ?? false;
+    }, [services]);
+
     return (
         <>
             <form>
@@ -40,8 +44,16 @@ export const MachineTranslationSettings = (props: IMachineTranslationProps) => {
                     description={t(
                         "Enable Machine Translation and configure your translation service provides to translate Knowledge Base articles.",
                     )}
+                    afterDescription={
+                        !isDefaultConfigured &&
+                        isEnabled && (
+                            <span className={languageClasses.warning}>
+                                {t("You must configure Google Translate to use machine translations.")}
+                            </span>
+                        )
+                    }
                 >
-                    <DashboardToggle checked={isEnabled} onChange={setEnabled} />
+                    <DashboardToggle checked={!!isEnabled} onChange={setEnabled} />
                 </DashboardFormGroup>
                 <DashboardFormList isBlurred={!isEnabled}>
                     <Heading depth={3}>{t("Translation Service Providers")}</Heading>

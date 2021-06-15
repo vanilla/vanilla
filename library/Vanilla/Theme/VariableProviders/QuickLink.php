@@ -27,6 +27,9 @@ class QuickLink implements \JsonSerializable {
     /** @var int|null */
     private $sort;
 
+    /** @var int|null */
+    private $countLimit;
+
     /**
      * Constructor.
      *
@@ -56,6 +59,7 @@ class QuickLink implements \JsonSerializable {
             'name' => $this->name,
             'url' => $this->url,
             'id' => $this->id,
+            'countLimit' => $this->countLimit,
         ];
     }
 
@@ -64,6 +68,15 @@ class QuickLink implements \JsonSerializable {
      */
     public function getCount(): ?int {
         return $this->count;
+    }
+
+    /**
+     * Get the limit used when obtaining the count, if any.
+     *
+     * @return int|null
+     */
+    public function getCountLimit(): ?int {
+        return $this->countLimit;
     }
 
     /**
@@ -78,5 +91,14 @@ class QuickLink implements \JsonSerializable {
      */
     public function getSort(): int {
         return $this->sort ?? 0;
+    }
+
+    /**
+     * Set a hint for indicating the count was limited and does not potentially represent a true count.
+     *
+     * @param int $countLimit
+     */
+    public function setCountLimit(int $countLimit): void {
+        $this->countLimit = $countLimit;
     }
 }

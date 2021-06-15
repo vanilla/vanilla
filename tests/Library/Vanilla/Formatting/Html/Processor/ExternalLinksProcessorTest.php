@@ -97,4 +97,23 @@ HTML;
 HTML;
         $this->assertHtmlStringEqualsHtmlString($expected, $actual);
     }
+
+    /**
+     * Verify ability to disable rewriting external link URLs through the leaving page.
+     */
+    public function testDisableWarnLeaving(): void {
+        $this->processor->setWarnLeaving(false);
+        $expected = "https://example.com";
+        $html = /** @lang HTML */ <<<HTML
+<p>
+    <a href="{$expected}" id="a1">foo</a>
+</p>
+HTML;
+        $document = new HtmlDocument($html);
+        $this->processor->processDocument($document);
+        $actual = $document->getDom()
+            ->getElementById("a1")
+            ->getAttribute("href");
+        $this->assertSame($expected, $actual);
+    }
 }

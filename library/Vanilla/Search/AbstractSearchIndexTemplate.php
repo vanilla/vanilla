@@ -42,7 +42,8 @@ abstract class AbstractSearchIndexTemplate {
         'parent',
         'siteSections',
         'allowedDiscussionTypes',
-        'title'
+        'title',
+        'private'
     ];
 
     /**

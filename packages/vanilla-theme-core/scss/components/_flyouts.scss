@@ -465,10 +465,10 @@ $flyout-progress_size:                  24px !default;
         border-radius: $flyout_borderRadius;
         background-color: $flyout_bg;
     }
-    z-index: 1;
+    z-index: 2;
 
     @include maxWidth {
-        z-index: 1;
+        z-index: 2;
     }
 
     &::before,

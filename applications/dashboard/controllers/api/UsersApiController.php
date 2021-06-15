@@ -221,10 +221,9 @@ class UsersApiController extends AbstractApiController {
         $query = $in->validate($query);
         $expand = $query['expand'] ?? [];
         $outSchema = $showFullSchema ? $this->userSchema() : $this->viewProfileSchema();
+        $row = $this->userByID($id);
         $outSchema = CrawlableRecordSchema::applyExpandedSchema($outSchema, 'user', $expand);
         $out =  $this->schema($outSchema, 'out');
-
-        $row = $this->userByID($id);
         $row = $this->normalizeOutput($row, $expand);
 
         $showEmail = $row['showEmail'] ?? false;
@@ -232,8 +231,8 @@ class UsersApiController extends AbstractApiController {
             unset($row['email']);
         }
 
+        $this->userModel->filterPrivateUserRecord($row);
         $result = $out->validate($row);
-
 
         // Allow addons to modify the result.
         $result = $this->getEventManager()->fireFilter('usersApiController_getOutput', $result, $this, $in, $query, $row);
@@ -355,6 +354,8 @@ class UsersApiController extends AbstractApiController {
         foreach ($rows as &$row) {
             $row = $this->normalizeOutput($row);
         }
+
+        $this->userModel->filterPrivateUserRecord($rows);
         $result = $out->validate($rows);
 
         $paging = ApiUtils::morePagerInfo($result, '/api/v2/users/names', $query, $in);
@@ -588,9 +589,8 @@ class UsersApiController extends AbstractApiController {
             }
         }
 
+        $this->userModel->filterPrivateUserRecord($rows);
         $result = $out->validate($rows);
-
-
 
         // Determine if we are gonna use the "numbered" or "more" pageInfo.
         if (empty($where)) {
@@ -613,6 +613,7 @@ class UsersApiController extends AbstractApiController {
 
         // Allow addons to modify the result.
         $result = $this->getEventManager()->fireFilter('usersApiController_indexOutput', $result, $this, $in, $query, $rows);
+
         return new Data($result, ['paging' => $paging, 'api-allow' => ['email']]);
     }
 
@@ -1054,11 +1055,13 @@ class UsersApiController extends AbstractApiController {
                 'photoUrl:s?',
                 'url:s?',
                 'roles:a?',
-                'dateInserted',
-                'dateLastActive:dt',
+                'dateInserted?',
+                'dateLastActive:dt?',
                 'countDiscussions?',
                 'countComments?',
-                'label:s?'
+                'label:s?',
+                'banned:i?',
+                'private:b?' => ['default' => false]
         ])->add($this->fullSchema()), 'ViewProfile');
     }
 }

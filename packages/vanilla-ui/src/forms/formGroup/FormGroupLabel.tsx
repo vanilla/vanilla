@@ -10,15 +10,23 @@ import * as Polymorphic from "../../polymorphic";
 import { FormGroupContext } from "./FormGroup";
 import { formGroupClasses } from "./FormGroup.styles";
 
-export interface IFormGroupLabelProps {}
+export interface IFormGroupLabelProps {
+    id?: string;
+    className?: string;
+    children?: React.ReactNode | React.ReactNode[];
+    description?: React.ReactNode;
+}
 
 /**
  * Renders <label> with a labelized inputID and the proper aria attributes.
  * When no children are specified, <FormGroupLabelText /> is rendered.
  * It is possible to customize the component used to render this label with the `as` property.
  */
-export const FormGroupLabel = React.forwardRef(function FormGroupLabelImpl(props, forwardedRef) {
-    const { as: Comp = "label", children, id, ...otherProps } = props;
+export const FormGroupLabel = React.forwardRef(function FormGroupLabelImpl(
+    props: IFormGroupLabelProps,
+    forwardedRef: React.Ref<HTMLLabelElement>,
+) {
+    const { children, description, id, ...otherProps } = props;
     const { inputID, labelID, setLabelID, setLabel, sideBySide } = useContext(FormGroupContext);
     const classes = formGroupClasses({ sideBySide });
 
@@ -35,14 +43,15 @@ export const FormGroupLabel = React.forwardRef(function FormGroupLabelImpl(props
     }, [children]);
 
     return (
-        <Comp
+        <label
             htmlFor={inputID}
             id={id || labelID}
             {...otherProps}
             ref={forwardedRef}
-            className={cx(classes.label, props.className)}
+            className={cx(classes.labelContainer, props.className)}
         >
-            {children}
-        </Comp>
+            <span className={classes.label}>{children}</span>
+            {description && <p className={classes.description}>{description}</p>}
+        </label>
     );
-}) as Polymorphic.ForwardRefComponent<"label", IFormGroupLabelProps>;
+});

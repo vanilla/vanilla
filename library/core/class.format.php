@@ -759,7 +759,8 @@ class Gdn_Format {
             return $mixed;
         }
 
-        $linksCallback = function ($matches) use ($isHtml, $doEmbeds) {
+        $warnLeaving = (bool)Gdn::config("Garden.Format.WarnLeaving", true);
+        $linksCallback = function ($matches) use ($isHtml, $doEmbeds, $warnLeaving) {
             static $inTag = 0;
             static $inAnchor = false;
 
@@ -768,9 +769,7 @@ class Gdn_Format {
 
             if ($inOut == '<') {
                 $inTag++;
-                if ($tag == 'a') {
-                    $inAnchor = true;
-                }
+                $inAnchor = $tag == 'a';
             } elseif ($inOut == '</') {
                 $inTag++;
                 if ($tag == 'a') {
@@ -784,7 +783,7 @@ class Gdn_Format {
                 // This is a the href url value in an anchor tag.
                 $url = $matches[4];
                 $domain = parse_url($url, PHP_URL_HOST);
-                if (!isTrustedDomain($domain)) {
+                if ($warnLeaving && !isTrustedDomain($domain)) {
                     // If this is valid HTMl, the link text's HTML special characters should be encoded. Decode them to their raw state for URL encoding.
                     if ($isHtml) {
                         $url = htmlspecialchars_decode($url);
@@ -844,7 +843,7 @@ class Gdn_Format {
 
             // If this is valid HTMl, the link text's HTML special characters should be encoded. Decode them to their raw state for URL encoding.
             $plainUrl = !$isHtml ? $url : htmlspecialchars_decode($url);
-            if (isExternalUrl($plainUrl)) {
+            if ($warnLeaving && isExternalUrl($plainUrl)) {
                 $href = "/home/leaving?" . http_build_query([
                     "allowTrusted" => 1,
                     "target" => $plainUrl,

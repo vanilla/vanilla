@@ -1,17 +1,16 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import DropDownItem from "@library/flyouts/items/DropDownItem";
-import ModalLink from "@library/modal/ModalLink";
 import SmartLink from "@library/routing/links/SmartLink";
 import classNames from "classnames";
 import { LocationDescriptor } from "history";
 import React from "react";
-import { CheckIcon, DropDownMenuIcon, CheckCompactIcon } from "@library/icons/common";
+import { CheckCompactIcon } from "@library/icons/common";
 
 export interface IDropDownItemLink {
     to: LocationDescriptor;

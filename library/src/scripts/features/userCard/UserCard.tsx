@@ -15,12 +15,15 @@ import { useDevice, Devices } from "@library/layout/DeviceContext";
 import LazyModal from "@library/modal/LazyModal";
 import ModalSizes from "@library/modal/ModalSizes";
 import { UserCardContext, useUserCardContext } from "@library/features/userCard/UserCard.context";
-import { UserCardSkeleton, UserCardView } from "@library/features/userCard/UserCard.views";
+import { UserCardMinimal, UserCardSkeleton, UserCardView } from "@library/features/userCard/UserCard.views";
 import { useUniqueID } from "@library/utility/idUtils";
 import Popover, { positionDefault } from "@reach/popover";
 import { t } from "@vanilla/i18n";
 import { useFocusWatcher } from "@vanilla/react-utils";
 import React, { useCallback, useRef, useState } from "react";
+import { UserCardError } from "@library/features/userCard/UserCard.views";
+import { hasPermission } from "@library/features/users/Permission";
+import { getMeta } from "@library/utility/appUtils";
 
 interface IProps {
     /** UserID of the user being loaded. */
@@ -225,6 +228,11 @@ function UserCardFlyout(props: React.ComponentProps<typeof UserCard>) {
                     context.triggerRef.current?.focus();
                 }
             }}
+            onClick={(e) => {
+                e.stopPropagation();
+                e.nativeEvent.stopPropagation();
+                e.nativeEvent.stopImmediatePropagation();
+            }}
         >
             <UserCard {...props} />
         </div>
@@ -235,18 +243,29 @@ function UserCardFlyout(props: React.ComponentProps<typeof UserCard>) {
  * Wrapper around `UserCardView` that loads the data dynamically.
  */
 function UserCardDynamic(props: IProps) {
+    const { userFragment } = props;
     const user = useUser({ userID: props.userID });
+    const hasPersonalInfoView = hasPermission("personalInfo.view");
+    let bannedPrivateProfile = getMeta("ui.bannedPrivateProfile", "0");
+    bannedPrivateProfile = bannedPrivateProfile === "" ? "0" : "1";
+    const privateBannedProfileEnabled = bannedPrivateProfile !== "0";
+    let banned = userFragment?.banned ?? 0;
+    let isBanned = banned === 1;
 
-    if (user.status === LoadStatus.PENDING || user.status === LoadStatus.LOADING) {
-        return <UserCardSkeleton userFragment={props.userFragment} onClose={props.onClose} />;
+    if ((userFragment?.private || (privateBannedProfileEnabled && isBanned)) && !hasPersonalInfoView) {
+        return <UserCardMinimal userFragment={userFragment} onClose={props.onClose} />;
     }
 
-    if (user.error) {
-        return <ErrorMessages errors={[user.error]} />;
+    if (user.status === LoadStatus.PENDING || user.status === LoadStatus.LOADING) {
+        return <UserCardSkeleton userFragment={userFragment} onClose={props.onClose} />;
+    }
+
+    if (user.error && user?.error?.response.status === 404) {
+        return <UserCardError onClose={props.onClose} />;
     }
 
     if (!user.data || user.status === LoadStatus.ERROR) {
-        return <ErrorMessages errors={[{ message: t("Failed to load user") }]} />;
+        return <UserCardError error={t("Failed to load user")} onClose={props.onClose} />;
     }
 
     return <UserCardView user={user.data} onClose={props.onClose} />;

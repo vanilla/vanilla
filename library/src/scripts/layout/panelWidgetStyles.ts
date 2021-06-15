@@ -16,6 +16,7 @@ export const panelWidgetClasses = useThemeCache((mediaQueries) => {
     const globalVars = globalVariables();
 
     const root = css({
+        clear: "both",
         position: "relative",
         width: percent(100),
         ...Mixins.padding({

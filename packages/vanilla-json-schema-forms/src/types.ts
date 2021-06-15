@@ -73,6 +73,8 @@ export type IFormControl =
     | ICodeBoxControl
     | ITabsControl;
 
+export type IFormControlType = IFormControl["inputType"];
+
 export type JsonSchema = Partial<SomeJSONSchema>;
 
 export type Condition = { field: string; disable?: boolean } & JsonSchema;

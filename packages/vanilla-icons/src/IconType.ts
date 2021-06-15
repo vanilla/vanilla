@@ -3,7 +3,7 @@
  * @license gpl-2.0-only
  */
 
-type MeIconType = "me-messages-solid" | "me-messages" | "me-notifications-solid" | "me-notifications";
+type MeIconType = "me-messages-solid" | "me-messages" | "me-notifications-solid" | "me-notifications" | "me-sign-in";
 
 type MetaIconType =
     | "meta-comment"
@@ -15,10 +15,18 @@ type MetaIconType =
     | "meta-resolved"
     | "meta-unresolved";
 
-type NavigationIconType = "navigation-languages";
+type NavigationIconType = "navigation-languages" | "navigation-ellipsis";
 
 type SearchIconType = "search-events" | "search-search";
 
 type DashboardIconType = "dashboard-edit";
 
-export type IconType = MeIconType | MetaIconType | NavigationIconType | SearchIconType | DashboardIconType;
+type DiscussionIconType = "discussion-bookmark";
+
+export type IconType =
+    | MeIconType
+    | MetaIconType
+    | NavigationIconType
+    | SearchIconType
+    | DashboardIconType
+    | DiscussionIconType;

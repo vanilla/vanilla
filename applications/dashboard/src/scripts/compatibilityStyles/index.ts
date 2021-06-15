@@ -21,7 +21,6 @@ import { buttonCSS } from "@dashboard/compatibilityStyles/buttonStylesCompat";
 import { inputCSS } from "@dashboard/compatibilityStyles/inputStyles";
 import { flyoutCSS } from "@dashboard/compatibilityStyles/flyoutStyles";
 import { textLinkCSS } from "@dashboard/compatibilityStyles/textLinkStyles";
-import { forumMetaCSS } from "@dashboard/compatibilityStyles/forumMetaStyles";
 import { paginationCSS } from "@dashboard/compatibilityStyles/paginationStyles";
 import { fontCSS, forumFontsVariables } from "./fontStyles";
 import { forumLayoutCSS, forumLayoutVariables } from "@dashboard/compatibilityStyles/forumLayoutStyles";
@@ -35,7 +34,8 @@ import { photoGridCSS } from "@dashboard/compatibilityStyles/photoGridStyles";
 import { messagesCSS } from "@dashboard/compatibilityStyles/messagesStyles";
 import { blockColumnCSS } from "@dashboard/compatibilityStyles/blockColumnStyles";
 import { signaturesCSS } from "./signaturesSyles";
-import { forumTagCSS } from "@dashboard/compatibilityStyles/forumTagStyles";
+import { forumMetaCSS, metasCSS } from "@library/metas/Metas.compat.styles";
+import { forumTagCSS } from "@library/metas/Tags.compat.styles";
 import { signInMethodsCSS } from "@dashboard/compatibilityStyles/signInMethodStyles";
 import { suggestedTextStyleHelper } from "@library/features/search/suggestedTextStyles";
 import { dropDownVariables } from "@library/flyouts/dropDownStyles";
@@ -48,10 +48,10 @@ import { discussionCompatCSS } from "@dashboard/compatibilityStyles/pages/Discus
 import { categoryListCompatCSS } from "@dashboard/compatibilityStyles/pages/CategoryList.compat.styles";
 import { conversationListCompatCSS } from "@dashboard/compatibilityStyles/pages/ConversationList.compat.styles";
 import { conversationCompatCSS } from "@dashboard/compatibilityStyles/pages/Conversation.compat.styles";
-import { metasCSS } from "@dashboard/compatibilityStyles/Metas.compat.styles";
 import { discussionListCompatCSS } from "@library/features/discussions/DiscussionList.compat.styles";
 import { widgetLayoutCompactCSS } from "@library/layout/WidgetLayout.compat.styles";
 import { onlineUserWrapCSS } from "@dashboard/compatibilityStyles/onlineUserStyles";
+import { bodyStyleMixin } from "@library/layout/bodyStyles";
 export { cssOut };
 
 // Re-export for compatibility.
@@ -73,6 +73,7 @@ compatibilityStyles = useThemeCache(() => {
     fullBackgroundCompat();
 
     cssOut("body", {
+        ...bodyStyleMixin(),
         backgroundColor: bg,
         color: fg,
     });

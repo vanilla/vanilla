@@ -25,10 +25,7 @@ $popup_paddingHorizontal:              18px;
 \* -------------------------------------------------------------- */
 
 div.Popup {
-    top: 50vh !important;
-    left: 50vw !important;
     position: fixed;
-    transform: translateX(-50%) translateY(-50%);
 
     .Border {
         background: none;

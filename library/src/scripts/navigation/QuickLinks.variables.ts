@@ -3,12 +3,13 @@
  * @license GPL-2.0-only
  */
 import { INavigationVariableItem } from "@library/headers/navigationVariables";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { ListSeparation } from "@library/styles/cssUtilsTypes";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
+import { LocalVariableMapping } from "@library/styles/VariableMapping";
 import { Variables } from "@library/styles/Variables";
-import { getThemeVariables } from "@library/theming/getThemeVariables";
 import { IThemeVariables } from "@library/theming/themeReducer";
 
 /**
@@ -16,7 +17,12 @@ import { IThemeVariables } from "@library/theming/themeReducer";
  * @description Quick links are a component of customizable links, normally appearing in a side panel.
  */
 export const quickLinksVariables = useThemeCache((forcedVars?: IThemeVariables) => {
-    const makeThemeVars = variableFactory("quickLinks", forcedVars);
+    const makeThemeVars = variableFactory("quickLinks", forcedVars, [
+        new LocalVariableMapping({
+            "listItem.font.color": "listItem.fgColor.default",
+            "listItem.fontState.color": "listItem.fgColor.allStates",
+        }),
+    ]);
     const globalVars = globalVariables(forcedVars);
 
     /**
@@ -56,27 +62,36 @@ export const quickLinksVariables = useThemeCache((forcedVars?: IThemeVariables) 
          * @type number
          */
         listSeparationWidth: globalVars.border.width,
+
+        /**
+         * @varGroup quickLinks.listItem.font
+         * @Title Font
+         * @commonDescription The font applied to the list items
+         * @expand font
+         */
+        font: Variables.font({
+            ...globalVars.fontSizeAndWeightVars("medium", "normal"),
+            color: globalVars.mainColors.fg,
+            textDecoration: "auto",
+        }),
     });
 
     const isBorderSep = listInit.listSeparation === ListSeparation.BORDER;
     const isLineSep = listInit.listSeparation === ListSeparation.SEPARATOR;
     const listItem = makeThemeVars("listItem", {
         ...listInit,
+
         /**
-         * @varGroup quickLinks.listItem.font
+         * @varGroup quickLinks.listItem.fontState
+         * @Title Font (state)
+         * @commonDescription The font applied to the links when hovered, focused, or active
          * @expand font
          */
-        font: Variables.font({
-            ...globalVars.fontSizeAndWeightVars("medium", "normal"),
-        }),
-        /**
-         * @varGroup quickLinks.listItem.fgColor
-         * @title Text Color
-         * @expand clickable
-         */
-        fgColor: Variables.clickable({
-            default: globalVars.mainColors.fg,
-            allStates: globalVars.mainColors.stateSecondary,
+        fontState: Variables.font({
+            color:
+                listInit.font.color === globalVars.mainColors.fg
+                    ? globalVars.mainColors.stateSecondary
+                    : ColorsUtils.offsetLightness(listInit.font.color!, 0.05),
         }),
 
         /**
@@ -102,18 +117,6 @@ export const quickLinksVariables = useThemeCache((forcedVars?: IThemeVariables) 
         }),
     });
 
-    const listItemTitle = makeThemeVars("listItemTitle", {
-        /**
-         * @varGroup quickLinks.listItemTitle.font
-         * @title QuickLinks - Title Font
-         * @expand font
-         */
-        font: {
-            ...listItem.font,
-            color: globalVars.mainColors.fg,
-        },
-    });
-
     /**
      * @varGroup quickLinks.count.font
      * @title QuickLinks - Count Font
@@ -129,7 +132,6 @@ export const quickLinksVariables = useThemeCache((forcedVars?: IThemeVariables) 
 
     return {
         listItem,
-        listItemTitle,
         count,
         box,
         links,

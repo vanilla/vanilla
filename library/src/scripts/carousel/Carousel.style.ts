@@ -86,7 +86,7 @@ export const carouselClasses = useThemeCache(() => {
         flexWrap: "nowrap",
         alignItems: "center",
         position: "relative",
-        zIndex: 2,
+        zIndex: 0,
         overflow: "hidden",
         width: percent(100),
     });

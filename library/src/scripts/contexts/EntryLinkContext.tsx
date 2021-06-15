@@ -5,6 +5,7 @@
 
 import React, { useContext, useEffect, useState } from "react";
 import qs from "qs";
+import { formatUrl, getMeta, siteUrl } from "@library/utility/appUtils";
 
 // The name of the custom event that we fire when an update happens.
 const EVENT_NAME = "X-Apply-Entry-Link-Parameters";
@@ -58,25 +59,52 @@ export function applyEntryLinkParameters(newParameters: IEntryLinkContext) {
  */
 export function useSignInLink(): string {
     const contextQuery = useEntryLinkContext();
-
-    const query = {
-        ...contextQuery,
-        target: window.location.href,
-    };
-
-    return `/entry/signin?${qs.stringify(query)}`;
+    const metaUrl = getMeta("signInUrl", "/entry/signin");
+    return makeContextualAuthLink(metaUrl, contextQuery);
 }
 
 /**
  * Get the current register link.
  */
-export function useRegisterLink(): string {
+export function useRegisterLink(): string | null {
     const contextQuery = useEntryLinkContext();
+    const metaUrl = getMeta("registerUrl", "/entry/register");
 
+    if (!metaUrl) {
+        // We don't have a register URL.
+        return null;
+    }
+
+    return makeContextualAuthLink(metaUrl, contextQuery);
+}
+
+/**
+ * Get the current signOut link.
+ */
+export function useSignOutLink(): string {
+    const contextQuery = useEntryLinkContext();
+    const metaUrl = getMeta("signOutUrl", "/entry/signout");
+
+    return makeContextualAuthLink(metaUrl, contextQuery);
+}
+
+export function makeContextualAuthLink(baseUrl: string, extraQueryParams: Record<string, any>): string {
+    const url = formatUrl(baseUrl, true);
+
+    const urlObject = new URL(url);
+    const existingParams = Object.fromEntries(urlObject.searchParams.entries());
     const query = {
-        ...contextQuery,
-        target: window.location.href,
+        ...existingParams,
+        ...extraQueryParams,
     };
 
-    return `/entry/register?${qs.stringify(query)}`;
+    if (!window.location.href.includes("/entry")) {
+        query.target = window.location.href;
+    }
+
+    for (const [key, value] of Object.entries(query)) {
+        urlObject.searchParams.set(key, value);
+    }
+
+    return urlObject.toString();
 }

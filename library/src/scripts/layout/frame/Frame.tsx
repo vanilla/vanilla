@@ -39,7 +39,7 @@ export default function Frame(props: IProps) {
     }
 
     return (
-        <section className={cx("frame", classes.root, props.className, props.canGrow && inheritHeightClass())}>
+        <section className={cx("frame", classes.root, props.canGrow && inheritHeightClass(), props.className)}>
             {props.header && <div className={classes.headerWrap}> {props.header}</div>}
             {content}
             <div className={classes.footerWrap}>{props.footer}</div>

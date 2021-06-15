@@ -68,9 +68,6 @@
 .Reactions .ReactHandle {
    display: none;
 }
-.Item:hover .Reactions a {
-   width: inherit;
-}
 .Reactions a.HasCount {
    display: inline-block;
 }

@@ -5,11 +5,12 @@
  */
 
 import { GlobalPreset, globalVariables } from "@library/styles/globalStyleVars";
-import { variableFactory } from "@library/styles/styleUtils";
+import { getPixelNumber, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { color } from "csx";
 import { Variables } from "@library/styles/Variables";
 import { LinkDecorationType } from "@library/styles/cssUtilsTypes";
+import { forceInt } from "@vanilla/utils";
 
 /**
  * @varGroup metas
@@ -62,7 +63,6 @@ export const metasVariables = useThemeCache(() => {
     const linkFontState = makeThemeVars(
         "linkFontState",
         Variables.font({
-            ...linkFont,
             color: globalVars.mainColors.primary,
         }),
     );
@@ -84,9 +84,11 @@ export const metasVariables = useThemeCache(() => {
         "spacing",
         Variables.spacing({
             horizontal: globalVars.gutter.quarter,
-            vertical: 1,
+            vertical: 2,
         }),
     );
+
+    const height = Math.round(getPixelNumber(font.size) * forceInt(font.lineHeight, 1));
 
     return {
         font,
@@ -94,5 +96,6 @@ export const metasVariables = useThemeCache(() => {
         linkFontState,
         specialFonts,
         spacing,
+        height,
     };
 });

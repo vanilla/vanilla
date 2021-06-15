@@ -62,7 +62,7 @@ export function HomeWidgetItem(props: IHomeWidgetItemProps) {
     const metas = (hasMetas || hasMetaDescription) && !isChatBubble && (
         <Metas className={classes.metas}>
             {hasMetaDescription ? (
-                <MetaItem>
+                <MetaItem className={classes.longMetaItem}>
                     <span className={cx(buttonClasses().textPrimary, classes.metaDescription)}>
                         {props.description}
                         {props.description && " ➔"}

@@ -185,6 +185,7 @@ export default function ThemePreviewCard(props: IProps) {
     const dropdownContent = (props.canEdit || props.canDelete) && (
         <DropDown
             buttonType={ButtonTypes.ICON}
+            toggleButtonClassName={classes.actionDropdownButton}
             flyoutType={FlyoutType.LIST}
             openDirection={DropDownOpenDirection.BELOW_LEFT}
         >

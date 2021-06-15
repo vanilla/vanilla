@@ -125,7 +125,7 @@ $Configuration['Garden']['Profile']['Public']= true;
 $Configuration['Garden']['Profile']['ShowAbout'] = true;
 $Configuration['Garden']['Profile']['EditPhotos'] = true; // false to disable user photo editing
 $Configuration['Garden']['Profile']['EditUsernames'] = false;
-$Configuration['Garden']['BannedPhoto'] = 'https://images.v-cdn.net/banned_large.png';
+$Configuration['Garden']['BannedPhoto'] = '/applications/dashboard/design/images/banned.png';
 
 // Embedding forum & comments.
 $Configuration['Garden']['Embed']['CommentsPerPage'] = 50;

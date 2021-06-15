@@ -13,6 +13,8 @@ export interface IUserFragment {
     dateLastActive: string | null;
     label?: string;
     title?: string;
+    banned?: number;
+    private?: boolean;
 }
 
 export interface IUserFragmentAndRoles extends IUserFragment, IUserRoles {}
@@ -59,6 +61,7 @@ export interface IUser extends IUserFragment, IUserRoles {
     label?: string;
     countDiscussions: number;
     countComments: number;
+    private: boolean;
 }
 
 export interface IInvitees {

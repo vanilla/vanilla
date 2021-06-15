@@ -16,8 +16,8 @@ export interface IContainer {
     fullGutter?: boolean; // Use when a component wants a full mobile/desktop gutter.
     // Useful for components that don't provide their own padding.
     narrow?: boolean;
-    style?: object;
-    maxWidth?: number;
+    style?: React.CSSProperties;
+    maxWidth?: number | string;
     gutterSpacing?: ISpacing;
     ignoreContext?: boolean;
 }
@@ -43,6 +43,10 @@ export const Container = React.forwardRef(function Container(props: IContainer, 
     const ownRef = useRef<HTMLElement>(null);
     ref = ref ?? ownRef;
     const { hasParentContainer } = useContext(containerContext);
+
+    if (props.maxWidth) {
+        style.maxWidth = props.maxWidth;
+    }
 
     const [hasLegacyParentContainer, setHasLegacyParentContainer] = useState(false);
     useLayoutEffect(() => {

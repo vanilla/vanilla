@@ -150,9 +150,6 @@ const previewCardClasses = useThemeCache(() => {
         right: styleUnit(vars.menuBar.height),
         color: ColorsUtils.colorOut(globalVars.elementaryColors.white),
         ...{
-            ".icon-dropDownMenu": {
-                color: ColorsUtils.colorOut(globalVars.elementaryColors.white),
-            },
             "&.focus-visible": {
                 borderRadius: "2px",
                 backgroundColor: ColorsUtils.colorOut(vars.actionDropdown.state.bg),
@@ -166,6 +163,10 @@ const previewCardClasses = useThemeCache(() => {
                 backgroundColor: ColorsUtils.colorOut(vars.actionDropdown.state.bg),
             },
         },
+    });
+
+    const actionDropdownButton = css({
+        color: `${ColorsUtils.colorOut(globalVars.elementaryColors.white)} !important`,
     });
 
     const itemLabel = css({
@@ -239,6 +240,7 @@ const previewCardClasses = useThemeCache(() => {
         overlayBg,
         isFocused,
         actionDropdown,
+        actionDropdownButton,
         itemLabel,
         toolTipBox,
         actionLink,

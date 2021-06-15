@@ -10,6 +10,7 @@ export interface ILocale {
     displayNames: {
         [localeKey: string]: string;
     };
+    translationService: string | null;
 }
 
 let currentLocale = "en";
@@ -36,7 +37,7 @@ export function onLocaleChange(callback: () => void) {
  */
 export function setCurrentLocale(localeKey: string) {
     currentLocale = localeKey;
-    callbacks.forEach(callback => callback());
+    callbacks.forEach((callback) => callback());
 }
 
 /**
@@ -61,7 +62,7 @@ export function getJSLocaleKey() {
  */
 export function loadLocales(locales: ILocale[]) {
     localeStore = [...localeStore, ...locales];
-    callbacks.forEach(callback => callback());
+    callbacks.forEach((callback) => callback());
 }
 
 /**
@@ -69,5 +70,5 @@ export function loadLocales(locales: ILocale[]) {
  */
 export function clearLocales() {
     localeStore = [];
-    callbacks.forEach(callback => callback());
+    callbacks.forEach((callback) => callback());
 }

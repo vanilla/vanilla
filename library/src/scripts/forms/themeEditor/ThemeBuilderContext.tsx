@@ -120,8 +120,7 @@ export function ThemeBuilderContextProvider(props: IProps) {
         let cloned = cloneDeep(rawValueRef.current);
         rawValueRef.current = cloned;
 
-        if ((value === "" || value === undefined) && !allowEmpty) {
-            // Null does not clear this. Null is a valid value.
+        if ((value === "" || value == null) && !allowEmpty) {
             unset(cloned, variableKey);
         } else {
             cloned = set(cloned, variableKey, value);

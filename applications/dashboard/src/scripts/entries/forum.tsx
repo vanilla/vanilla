@@ -74,8 +74,8 @@ onReady(() => {
 });
 
 addComponent("title-bar-hamburger", TitleBarHamburger);
-addComponent("community-banner", CommunityBanner);
-addComponent("community-content-banner", CommunityContentBanner);
+addComponent("community-banner", CommunityBanner, { overwrite: true });
+addComponent("community-content-banner", CommunityContentBanner, { overwrite: true });
 
 const applyReactElementsInForum = (props: {
     metaPermissionKey: string;

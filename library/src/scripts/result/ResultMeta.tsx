@@ -11,13 +11,14 @@ import { capitalizeFirstLetter } from "@vanilla/utils";
 import { t } from "@library/utility/appUtils";
 import { PublishStatus } from "@library/@types/api/core";
 import BreadCrumbString, { ICrumbString } from "@library/navigation/BreadCrumbString";
-import { metasClasses } from "@library/metas/Metas.styles";
 import Translate from "@library/content/Translate";
 import ProfileLink from "@library/navigation/ProfileLink";
-import { Icon } from "@vanilla/icons";
 import { ICountResult } from "@library/search/searchTypes";
 import NumberFormatted from "@library/content/NumberFormatted";
 import DateTime from "@library/content/DateTime";
+import { MetaIcon, MetaItem, MetaTag } from "@library/metas/Metas";
+import { metasClasses } from "@library/metas/Metas.styles";
+import { discussionListVariables } from "@library/features/discussions/DiscussionList.variables";
 
 interface IProps {
     updateUser?: IUserFragment;
@@ -34,14 +35,13 @@ interface IProps {
 export function ResultMeta(props: IProps) {
     const { dateUpdated, updateUser, labels, crumbs, status, type, isForeign, counts, extra } = props;
     const isDeleted = status === PublishStatus.DELETED;
-    const classesMetas = metasClasses();
 
-    const typeMeta =
+    const typeMetaContents =
         type && updateUser?.userID != null ? (
             <Translate
                 source="<0/> by <1/>"
                 c0={type ? t(capitalizeFirstLetter(type)) : undefined}
-                c1={<ProfileLink className={classesMetas.meta} userFragment={updateUser} />}
+                c1={<ProfileLink className={metasClasses().metaLink} userFragment={updateUser} />}
             />
         ) : type ? (
             t(capitalizeFirstLetter(type))
@@ -59,47 +59,47 @@ export function ResultMeta(props: IProps) {
                 labelCode = labelCode.replace(p, m && m[0] === "ies" ? "y" : "");
             }
             return (
-                <span className={classesMetas.meta} key={i}>
+                <MetaItem key={i}>
                     <Translate source={`<0/> ${labelCode}`} c0={<NumberFormatted value={count} />} />
-                </span>
+                </MetaItem>
             );
         });
 
     return (
-        <React.Fragment>
+        <>
             {labels &&
                 labels.map((label) => (
-                    <span className={classesMetas.metaLabel} key={label}>
+                    <MetaTag key={label} tagPreset={discussionListVariables().labels.tagPreset}>
                         {t(label)}
-                    </span>
+                    </MetaTag>
                 ))}
 
-            {typeMeta && (
-                <span className={classNames(classesMetas.meta)}>
+            {typeMetaContents && (
+                <MetaItem>
                     {isDeleted ? (
                         <span className={classNames("meta-inline", "isDeleted")}>
                             <Translate source="Deleted <0/>" c0={type} />
                         </span>
                     ) : (
-                        typeMeta
+                        typeMetaContents
                     )}
-                </span>
+                </MetaItem>
             )}
 
-            {isForeign && (
-                <span className={classesMetas.metaIcon}>
-                    <Icon icon="meta-external" />
-                </span>
-            )}
+            {isForeign && <MetaIcon icon="meta-external" />}
 
             {dateUpdated && (
-                <span className={classesMetas.meta}>
+                <MetaItem>
                     <Translate source="Last Updated: <0/>" c0={<DateTime timestamp={dateUpdated} />} />
-                </span>
+                </MetaItem>
             )}
             {countMeta}
-            {crumbs && crumbs.length > 0 && <BreadCrumbString className={classesMetas.meta} crumbs={crumbs} />}
+            {crumbs && crumbs.length > 0 && (
+                <MetaItem>
+                    <BreadCrumbString crumbs={crumbs} />
+                </MetaItem>
+            )}
             {extra}
-        </React.Fragment>
+        </>
     );
 }

@@ -45,7 +45,7 @@ class ReactionsModule extends AbstractReactModule {
      */
     public function getData(): array {
         $data = [];
-        $this->user = !$this->user ? $this->data('User', Gdn::session()->User): $this->user;
+        $this->user = !$this->user ? $this->_Sender->User ?? $this->data('User', Gdn::session()->User): $this->user;
         $isValid = ($this->user->UserID ?? 0) > 0;
         if ($isValid) {
             $userID = $this->user->UserID;

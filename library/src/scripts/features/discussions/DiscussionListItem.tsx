@@ -12,20 +12,18 @@ import { discussionListVariables } from "@library/features/discussions/Discussio
 import { useCurrentUserSignedIn } from "@library/features/users/userHooks";
 import { UserPhoto } from "@library/headers/mebox/pieces/UserPhoto";
 import { ListItem } from "@library/lists/ListItem";
-import { MetaIcon, MetaItem } from "@library/metas/Metas";
+import { MetaIcon, MetaItem, MetaLink, MetaTag } from "@library/metas/Metas";
 import Notice from "@library/metas/Notice";
-import { Tag } from "@library/metas/Tags";
 import ProfileLink from "@library/navigation/ProfileLink";
-import SmartLink from "@library/routing/links/SmartLink";
 import { t } from "@vanilla/i18n";
 import React from "react";
 import DiscussionOptionsMenu from "@library/features/discussions/DiscussionOptionsMenu";
 import DiscussionVoteCounter from "@library/features/discussions/DiscussionVoteCounter";
 import qs from "qs";
-import { Icon } from "@vanilla/icons";
 import { hasPermission, PermissionMode } from "@library/features/users/Permission";
 import { ReactionUrlCode } from "@dashboard/@types/api/reaction";
 import DateTime from "@library/content/DateTime";
+import { metasClasses } from "@library/metas/Metas.styles";
 
 interface IProps {
     discussion: IDiscussion;
@@ -33,6 +31,7 @@ interface IProps {
 
 export default function DiscussionListItem(props: IProps) {
     const { discussion } = props;
+
     const classes = discussionListClasses();
     const variables = discussionListVariables();
     const currentUserSignedIn = useCurrentUserSignedIn();
@@ -169,18 +168,21 @@ function DiscussionListItemMeta(props: IDiscussion) {
     return (
         <>
             {displayResolved && (
-                <MetaIcon className={classes.resolved}>
-                    <Icon
-                        icon={resolved ? "meta-resolved" : "meta-unresolved"}
-                        aria-label={resolved ? t("Resolved") : t("Unresolved")}
-                    />
-                </MetaIcon>
+                <MetaIcon
+                    className={classes.resolved}
+                    icon={resolved ? "meta-resolved" : "meta-unresolved"}
+                    aria-label={resolved ? t("Resolved") : t("Unresolved")}
+                />
             )}
-            {closed && <Tag>{t("Closed")}</Tag>}
+            {closed && <MetaTag tagPreset={variables.labels.tagPreset}>{t("Closed")}</MetaTag>}
 
-            {pinned && <Tag>{t("Announcement")}</Tag>}
+            {pinned && <MetaTag tagPreset={variables.labels.tagPreset}>{t("Announcement")}</MetaTag>}
 
-            {displayQnaStatus && <Tag>{t(`${qnaStatus(attributes!.question!.status!)}`)}</Tag>}
+            {displayQnaStatus && (
+                <MetaTag tagPreset={variables.labels.tagPreset}>
+                    {t(`${qnaStatus(attributes!.question!.status!)}`)}
+                </MetaTag>
+            )}
 
             {shouldShowUserTags &&
                 tags?.slice(0, variables.userTags.maxNumber).map((tag, i) => {
@@ -196,9 +198,9 @@ function DiscussionListItemMeta(props: IDiscussion) {
                     });
                     const searchUrl = `/search?${query}`;
                     return (
-                        <SmartLink to={searchUrl} key={i} className={classes.userTag}>
-                            <Tag>{tag.name}</Tag>
-                        </SmartLink>
+                        <MetaTag to={searchUrl} key={i} tagPreset={variables.userTags.tagPreset}>
+                            {tag.name}
+                        </MetaTag>
                     );
                 })}
 
@@ -222,13 +224,19 @@ function DiscussionListItemMeta(props: IDiscussion) {
 
             {displayStartedByUser && (
                 <MetaItem>
-                    <Translate source="Started by <0/>" c0={<ProfileLink userFragment={insertUser!} />} />
+                    <Translate
+                        source="Started by <0/>"
+                        c0={<ProfileLink userFragment={insertUser!} className={metasClasses().metaLink} />}
+                    />
                 </MetaItem>
             )}
 
             {displayLastUser && (
                 <MetaItem>
-                    <Translate source="Most recent by <0/>" c0={<ProfileLink userFragment={lastUser!} />} />
+                    <Translate
+                        source="Most recent by <0/>"
+                        c0={<ProfileLink userFragment={lastUser!} className={metasClasses().metaLink} />}
+                    />
                 </MetaItem>
             )}
 
@@ -238,11 +246,7 @@ function DiscussionListItemMeta(props: IDiscussion) {
                 </MetaItem>
             )}
 
-            {displayCategory && (
-                <MetaItem>
-                    <SmartLink to={category!.url}>{category!.name}</SmartLink>
-                </MetaItem>
-            )}
+            {displayCategory && <MetaLink to={category!.url}> {category!.name} </MetaLink>}
 
             {displayUnreadCount && (
                 <MetaItem>
@@ -253,26 +257,26 @@ function DiscussionListItemMeta(props: IDiscussion) {
             )}
 
             {renderViewCountAsIcon && (
-                <MetaIcon>
-                    <Icon icon="meta-view" aria-label={t("Views")} /> {countViews}
+                <MetaIcon icon="meta-view" aria-label={t("Views")}>
+                    {countViews}
                 </MetaIcon>
             )}
 
             {renderLastCommentDateAsIcon && dateLastComment && (
-                <MetaIcon>
-                    <Icon icon="meta-time" aria-label={t("Last comment")} /> <DateTime timestamp={dateLastComment} />
+                <MetaIcon icon="meta-time" aria-label={t("Last comment")}>
+                    <DateTime timestamp={dateLastComment} />
                 </MetaIcon>
             )}
 
             {renderScoreAsIcon && (
-                <MetaIcon>
-                    <Icon icon="meta-like" aria-label={t("Score")} /> {score ?? 0}
+                <MetaIcon icon="meta-like" aria-label={t("Score")}>
+                    {score ?? 0}
                 </MetaIcon>
             )}
 
             {renderCommentCountAsIcon && (
-                <MetaIcon>
-                    <Icon icon="meta-comment" aria-label={t("Comments")} /> {countComments}
+                <MetaIcon icon="meta-comment" aria-label={t("Comments")}>
+                    {countComments}
                 </MetaIcon>
             )}
         </>

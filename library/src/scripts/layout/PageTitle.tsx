@@ -41,11 +41,13 @@ export function PageTitle(props: IPageTitle) {
     } = props;
     const { setFontSize } = useFontSizeCalculator();
 
-    if (isLarge) {
-        setFontSize(globalVars.fonts.size.largeTitle);
-    } else {
-        setFontSize(globalVars.fonts.size.title);
-    }
+    React.useEffect(() => {
+        if (isLarge) {
+            setFontSize(globalVars.fonts.size.largeTitle);
+        } else {
+            setFontSize(globalVars.fonts.size.title);
+        }
+    }, [isLarge]);
 
     const classes = pageTitleClasses();
     const classesMetas = metasClasses();

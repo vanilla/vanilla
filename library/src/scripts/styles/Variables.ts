@@ -71,6 +71,7 @@ export class Variables {
         };
 
         return {
+            ...vars,
             name: vars.name ?? ButtonTypes.STANDARD,
             useShadow: vars.useShadow ?? false,
             skipDynamicPadding: vars.skipDynamicPadding ?? false,
@@ -91,7 +92,7 @@ export class Variables {
 
     static spacing = (vars: ISpacing): ISpacing => ({ ...EMPTY_SPACING, ...vars });
 
-    static font = (vars: IFont) => ({ ...EMPTY_FONTS, ...vars });
+    static font = (vars: IFont): IFont => ({ ...EMPTY_FONTS, ...vars });
 
     static border = (vars: Partial<IBorderStyles>): Partial<IBorderStyles> => ({ ...EMPTY_BORDER, ...vars });
 

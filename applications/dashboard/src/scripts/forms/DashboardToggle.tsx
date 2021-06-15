@@ -10,6 +10,8 @@ import classNames from "classnames";
 import { visibility } from "@library/styles/styleHelpers";
 import { IFieldError } from "@library/@types/api/core";
 import ErrorMessages from "@library/forms/ErrorMessages";
+import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
+import { cx } from "@emotion/css";
 
 interface IProps {
     checked: boolean;
@@ -22,11 +24,13 @@ interface IProps {
 export function DashboardToggle(props: IProps) {
     const formGroup = useContext(FormGroupContext);
 
+    const classes = dashboardClasses();
+
     const { inputID, labelType } = formGroup || {};
     const rootClass = labelType === DashboardLabelType.WIDE ? "input-wrap-right" : "input-wrap";
 
     return (
-        <div className={rootClass}>
+        <div className={cx(rootClass, props.disabled && classes.disabled)}>
             <label
                 className={classNames("toggle-wrap", {
                     "toggle-wrap-on": props.checked,

@@ -8,6 +8,7 @@ import classNames from "classnames";
 import { metasClasses } from "@library/metas/Metas.styles";
 import { ICategoryFragment } from "@vanilla/addon-vanilla/@types/api/categories";
 import DateTime from "@library/content/DateTime";
+import { MetaItem, MetaLink } from "@library/metas/Metas";
 
 /**
  * Contains, user avatar, name, and optionnal meta data
@@ -34,28 +35,25 @@ export function UserLabel(props: IUserLabel) {
     const classes = userLabelClasses();
     const classesMeta = metasClasses();
 
-    const dateComponent =
-        dateLink && date ? (
-            <SmartLink to={dateLink} className={classNames(classesMeta.meta)}>
-                <DateTime timestamp={date} className={classNames(classesMeta.metaStyle)} />
-            </SmartLink>
-        ) : date ? (
-            <DateTime timestamp={date} className={classNames(classesMeta.meta)} />
-        ) : null;
-
-    const categoryComponent =
-        showCategory && category ? (
-            <SmartLink to={category.url} className={classesMeta.meta}>
-                {category.name}
-            </SmartLink>
-        ) : null;
+    const dateComponent = (
+        <MetaItem>
+            {dateLink && date ? (
+                <SmartLink to={dateLink}>
+                    <DateTime timestamp={date} />
+                </SmartLink>
+            ) : date ? (
+                <DateTime timestamp={date} />
+            ) : null}
+        </MetaItem>
+    );
+    const categoryComponent = showCategory && category ? <MetaLink to={category.url}>{category.name}</MetaLink> : null;
 
     if (compact) {
         return (
             <div className={classNames(classes.compact, classesMeta.root, { [classes.fixLineHeight]: fixLineHeight })}>
-                <SmartLink to={userUrl} className={classNames(classes.userName, classes.isCompact, classesMeta.meta)}>
+                <MetaLink to={userUrl} className={classNames(classes.userName, classes.isCompact)}>
                     {user.name}
-                </SmartLink>
+                </MetaLink>
                 {dateComponent}
                 {categoryComponent}
             </div>
@@ -68,9 +66,9 @@ export function UserLabel(props: IUserLabel) {
                 </SmartLink>
                 <div className={classes.main}>
                     <div className={classNames(classesMeta.root, "isFlexed", classes.topRow)}>
-                        <SmartLink to={userUrl} className={classNames(classes.userName, classesMeta.meta)}>
+                        <MetaLink to={userUrl} className={classes.userName}>
                             {user.name}
-                        </SmartLink>
+                        </MetaLink>
                         {showRole && user.label && <Roles roles={[{ roleID: 0, name: user.label }]} wrapper={false} />}
                     </div>
                     <div className={classNames(classesMeta.root, "isFlexed", classes.bottomRow)}>

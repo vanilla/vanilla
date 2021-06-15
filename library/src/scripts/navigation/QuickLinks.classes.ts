@@ -4,18 +4,15 @@
  * @license GPL-2.0-only
  */
 
-import { CSSObject } from "@emotion/css";
 import { quickLinksVariables } from "@library/navigation/QuickLinks.variables";
 import { ListSeparation } from "@library/styles/cssUtilsTypes";
-import { globalVariables } from "@library/styles/globalStyleVars";
 import { Mixins } from "@library/styles/Mixins";
-import { colorOut, singleBorder } from "@library/styles/styleHelpers";
+import { singleBorder } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 
 export const quickLinksClasses = useThemeCache(() => {
     const vars = quickLinksVariables();
     const style = styleFactory("quickLinks");
-    const globals = globalVariables();
 
     const root = style({
         border: "none",
@@ -31,7 +28,8 @@ export const quickLinksClasses = useThemeCache(() => {
             width: "100%",
             display: "flex",
             alignItems: "center",
-            ...Mixins.padding(vars.listItem.spacing),
+            justifyContent: "space-between",
+            ...Mixins.margin(vars.listItem.spacing),
         },
         listSeparation === ListSeparation.SEPARATOR && {
             borderBottom: singleBorder({
@@ -42,22 +40,6 @@ export const quickLinksClasses = useThemeCache(() => {
                 borderBottom: "none",
             },
         },
-    );
-
-    const listItemTitleDecorationFallback =
-        vars.listItemTitle.font.textDecoration === "underline" ? "underline" : undefined;
-
-    const listItemTitle = style(
-        "listItemTitle",
-        {
-            width: "100%",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            ...Mixins.padding(vars.listItem.padding),
-            ...Mixins.font(vars.listItemTitle.font),
-            ...Mixins.linkDecoration(listItemTitleDecorationFallback),
-        },
         listSeparation === ListSeparation.BORDER &&
             Mixins.border({
                 width: vars.listItem.listSeparationWidth,
@@ -65,17 +47,26 @@ export const quickLinksClasses = useThemeCache(() => {
             }),
     );
 
+    const link = style("link", {
+        ...Mixins.padding(vars.listItem.padding),
+        ...Mixins.font(vars.listItem.font),
+        "&:hover, &:focus, &:active, &.focus-visible": {
+            ...Mixins.font(vars.listItem.fontState),
+        },
+    });
+
     const count = style("count", {
         whiteSpace: "nowrap", //Prevents count value from stacking.
         textAlign: "right",
         ...Mixins.font(vars.count.font),
+        ...Mixins.padding(vars.listItem.padding),
     });
 
     return {
         root,
         list,
         listItem,
-        listItemTitle,
+        link,
         count,
     };
 });

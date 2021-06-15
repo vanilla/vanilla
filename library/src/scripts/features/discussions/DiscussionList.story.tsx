@@ -169,11 +169,6 @@ export const Theme = storyWithConfig(
                 border: {
                     style: "none",
                 },
-                listItem: {
-                    icon: {
-                        position: "default",
-                    },
-                },
             },
         },
         storeState: loggedInStoreState,

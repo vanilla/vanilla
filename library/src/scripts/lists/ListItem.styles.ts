@@ -7,14 +7,12 @@
 import { css } from "@emotion/css";
 import { listItemVariables } from "@library/lists/ListItem.variables";
 import { metasVariables } from "@library/metas/Metas.variables";
-import { tagVariables } from "@library/metas/Tag.variables";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { Mixins } from "@library/styles/Mixins";
 import { extendItemContainer } from "@library/styles/styleHelpers";
 import { getPixelNumber } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
-import { forceInt } from "@vanilla/utils";
 
 export const listItemClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -66,12 +64,7 @@ export const listItemClasses = useThemeCache(() => {
 
     // Some delicate math required to vertically align the user icon and the first row of metas.
     const metasVars = metasVariables();
-    const tagVars = tagVariables();
-    const metaItemHeightIncludingMargins = Math.round(
-        getPixelNumber(metasVars.font.size) * forceInt(metasVars.font?.lineHeight, 1) +
-            getPixelNumber(metasVars.spacing.vertical) * 2 +
-            getPixelNumber(tagVars.border.width) * 2,
-    );
+    const metaItemHeight = Math.round(metasVars.height + getPixelNumber(metasVars.spacing.vertical) * 2);
 
     const inlineIconContainer = css({
         ...Mixins.margin({
@@ -80,7 +73,7 @@ export const listItemClasses = useThemeCache(() => {
         [`& > *:first-child`]: {
             position: "relative",
             ...Mixins.margin({
-                top: `calc((${metaItemHeightIncludingMargins}px - 100%)/2)`,
+                top: `calc((${metaItemHeight}px - 100%)/2)`,
             }),
         },
     });

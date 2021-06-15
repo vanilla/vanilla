@@ -4,27 +4,44 @@
  * @license GPL-2.0-only
  */
 
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { cx } from "@emotion/css";
-import { ComboboxOption } from "@reach/combobox";
+import { ComboboxOption, ComboboxOptionText } from "@reach/combobox";
 import { autoCompleteClasses } from "./AutoComplete.styles";
-import { AutoCompleteContext } from "./AutoComplete";
+import { AutoCompleteContext } from "./AutoCompleteContext";
+import { Checkmark } from "../shared/Checkmark";
 
-export interface IAutoCompleteOptionProps extends React.ComponentProps<typeof ComboboxOption> {}
+export interface IAutoCompleteOption {
+    value: any;
+    label?: string;
+    data?: any;
+}
+
+export interface IAutoCompleteOptionProps
+    extends IAutoCompleteOption,
+        Omit<React.ComponentProps<typeof ComboboxOption>, "as" | "value"> {}
 
 /**
  * Renders a list element and provides a value for the searchable dropdown.
  * See ReachUI's ComboboxOption: https://reach.tech/combobox#comboboxoption
  */
-export const AutoCompleteOption = React.forwardRef(function AutoCompleteOptionImpl(
-    props: IAutoCompleteOptionProps,
-    forwardedRef: React.Ref<HTMLLIElement>,
-) {
-    const { size } = useContext(AutoCompleteContext);
+export const AutoCompleteOption = React.forwardRef(function AutoCompleteOptionImpl(props: IAutoCompleteOptionProps) {
+    const { value, label = value, ...otherProps } = props;
+    const { size, value: autoCompleteValue } = useContext(AutoCompleteContext);
     const classes = autoCompleteClasses({ size });
+    const selected = value == autoCompleteValue;
+
     return (
-        <ComboboxOption {...props} className={cx(classes.option, props.className)} ref={forwardedRef}>
-            {props.children}
+        <ComboboxOption
+            {...otherProps}
+            className={cx(classes.option, props.className)}
+            data-autocomplete-selected={selected || undefined}
+            value={label}
+        >
+            <div className={classes.optionText}>
+                <ComboboxOptionText />
+            </div>
+            {selected && <Checkmark />}
         </ComboboxOption>
     );
 });

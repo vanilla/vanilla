@@ -7,15 +7,38 @@
 
 namespace Vanilla\Formatting\Html;
 
-use Vanilla\Formatting\Html\Processor\HtmlProcessor;
+use Vanilla\Formatting\Formats\WysiwygFormat;
+use Vanilla\Formatting\FormatText;
 use Vanilla\Formatting\Html\Processor\HtmlProcessorTrait;
+use Vanilla\Formatting\HtmlDomAttributeFragment;
+use Vanilla\Formatting\HtmlDomRangeFragment;
+use Vanilla\Formatting\TextDOMInterface;
+use Vanilla\Formatting\TextFragmentInterface;
 
 /**
  * Class for parsing and modifying HTML.
  */
-class HtmlDocument {
+class HtmlDocument implements TextDOMInterface {
 
     use HtmlProcessorTrait;
+
+    /**
+     * @var string[]
+     */
+    const FRAGMENT_ATTRIBUTES = ['alt', 'title'];
+
+    /** @var string[]  */
+    private const TAG_INLINE_TEXT = [
+        'a', 'abbr', 'acronym', 'b', 'bdo', 'big', 'br', 'cite', 'code', 'dfn', 'em', 'i',  'kbd', 'q',
+        'samp', 'small', 'strong', 'sub', 'sup', 'time', 'tt', 'var',
+    ];
+
+    /**
+     * @var string[]
+     */
+    private const TAG_STOP = [
+        'iframe', 'object', 'head', 'video', 'style', 'img', 'pre'
+    ];
 
     /** @var \DOMDocument */
     private $dom;
@@ -123,5 +146,100 @@ HTML;
      */
     private function getDocumentSuffix() {
         return "</body></html>";
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function stringify(): FormatText {
+        $r = new FormatText($this->renderHTML(), WysiwygFormat::FORMAT_KEY);
+        return $r;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function renderHTML(): string {
+        return $this->getInnerHtml();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getFragments(): array {
+        $fragments = [];
+        $this->domToFragments($this->getRoot(), $fragments);
+        return $fragments;
+    }
+
+    /**
+     * Parse a parent node into text fragments.
+     *
+     * This method recursively iterates over the DOM tree and creates a fragment that consists of only inline format
+     * nodes.
+     *
+     * @param \DOMElement $node The parent node to parse.
+     * @param TextFragmentInterface[] $fragments A working array of fragments.
+     * @psalm-suppress ConflictingReferenceConstraint I tried to see if this was really a bug, but I can't for the life of me see it.
+     */
+    private function domToFragments(\DOMElement $node, array &$fragments): void {
+        $this->attributesToFragments($node, $fragments);
+        if (in_array($node->tagName, self::TAG_STOP, true)) {
+            return;
+        }
+
+        $elementCount = 0;
+        $from = $to = null;
+        foreach ($node->childNodes as $child) {
+            /** @var \DOMNode $child */
+            switch ($child->nodeType) {
+                case XML_TEXT_NODE:
+                    // This is an inline node.
+                    if ($from === null) {
+                        $from = $child;
+                    } else {
+                        $to = $child;
+                    }
+                    $elementCount++;
+                    break;
+                case XML_ELEMENT_NODE:
+                    $elementCount++;
+                    /** @var \DOMElement $child */
+                    $isInline = in_array($child->tagName, self::TAG_INLINE_TEXT, true);
+                    if (!$isInline) {
+                        if ($from !== null) {
+                            $range = DomUtils::trimRange($from, $to ?? $from);
+                            if ($range) {
+                                $fragments[] = new HtmlDomRangeFragment(...$range);
+                            }
+                            $from = $to = null;
+                        }
+                        $this->domToFragments($child, $fragments);
+                    } elseif ($from === null) {
+                        $from = $child;
+                    } else {
+                        $to = $child;
+                    }
+                    break;
+            }
+        }
+        if ($from !== null && ($range = DomUtils::trimRange($from, $to ?? $from))) {
+            $fragments[] = new HtmlDomRangeFragment(...$range);
+        }
+    }
+
+    /**
+     * Make fragments out of a node's attributes.
+     *
+     * @param \DOMElement $node
+     * @param array $fragments
+     */
+    private function attributesToFragments(\DOMElement $node, array &$fragments) {
+        foreach ($node->attributes as $key => $attr) {
+            /** @var \DOMAttr $attr */
+            if (in_array($key, self::FRAGMENT_ATTRIBUTES)) {
+                $fragments[] = new HtmlDomAttributeFragment($attr);
+            }
+        }
     }
 }

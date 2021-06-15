@@ -18,7 +18,7 @@ import React from "react";
 
 interface IProps {
     title?: string;
-    links: Array<INavigationVariableItem & { count?: number }>;
+    links: Array<INavigationVariableItem & { count?: number; countLimit?: number | null }>;
 }
 
 /**
@@ -43,7 +43,13 @@ export function QuickLinksView(props: IProps) {
                     <ul className={classNames(classes.list, "no-css")}>
                         {visibleLinks ? (
                             visibleLinks.map((link) => (
-                                <QuickLink key={link.id} path={link.url} title={link.name} count={link.count} />
+                                <QuickLink
+                                    key={link.id}
+                                    path={link.url}
+                                    title={link.name}
+                                    count={link.count}
+                                    countLimit={link.countLimit}
+                                />
                             ))
                         ) : (
                             <></>
@@ -58,18 +64,26 @@ interface IQuickLinkProps {
     path: string;
     title: string;
     count?: number;
+    countLimit?: number | null;
     isHidden?: boolean;
 }
 
 function QuickLink(props: IQuickLinkProps) {
     const classes = quickLinksClasses();
-    const { path, title, count, isHidden } = props;
+    const { path, title, count, countLimit, isHidden } = props;
+    const displayCount = React.useMemo(() => {
+        if (count && countLimit && count >= countLimit) {
+            return `${countLimit}+`;
+        }
+        return count;
+    }, [count, countLimit]);
+
     return (
         <li className={classNames(classes.listItem)}>
-            <SmartLink className={classNames(classes.listItemTitle)} to={path}>
+            <SmartLink className={classNames(classes.link)} to={path}>
                 {t(title)}
             </SmartLink>
-            {count != null && <span className={classNames(classes.count)}>{count}</span>}
+            {displayCount != null && <span className={classNames(classes.count)}>{displayCount}</span>}
         </li>
     );
 }

@@ -4,10 +4,8 @@
  * @license gpl-2.0-only
  */
 
-import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonTypes";
-import { _BookmarkIcon, DropDownMenuIcon } from "@library/icons/common";
-import { iconClasses } from "@library/icons/iconStyles";
+import BookmarkToggle from "@library/bookmarkToggle/BookmarkToggle";
+import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import { ListItem, ListItemContext } from "@library/lists/ListItem";
 import { ListItemLayout } from "@library/lists/ListItem.variables";
 import { ListItemMedia } from "@library/lists/ListItemMedia";
@@ -27,12 +25,10 @@ export function StoryListItems(props: { as?: string; withTitles?: boolean }) {
     const { withTitles } = props;
     const actions = (
         <>
-            <Button buttonType={ButtonTypes.ICON_COMPACT} className={iconClasses()._bookmark()}>
-                <_BookmarkIcon />
-            </Button>
-            <Button buttonType={ButtonTypes.ICON_COMPACT}>
-                <DropDownMenuIcon />
-            </Button>
+            <BookmarkToggle bookmarked={false} onToggleBookmarked={() => {}} />
+            <DropDown name="Options" flyoutType={FlyoutType.LIST}>
+                <></>
+            </DropDown>
         </>
     );
     const as = props.as ?? "div";

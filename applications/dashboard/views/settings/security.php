@@ -9,6 +9,11 @@ echo $form->open();
 echo $form->errors();
 ?>
     <ul>
+        <li class="form-group"><?php
+            $leavingLabel = 'Warn users if a link in a post will cause them to leave the forum';
+            $leavingDesc = '@'.t('Alert users if they click external link.');
+            echo $form->toggle('Garden.Format.WarnLeaving', $leavingLabel, [], $leavingDesc);
+        ?></li>
         <li class="form-group">
             <div class="label-wrap">
             <?php echo $form->label('Trusted Domains', 'Garden.TrustedDomains'); ?>

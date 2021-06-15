@@ -880,12 +880,12 @@ export const bannerClasses = useThemeCache(
                             borderColor: isSolidBordered ? ColorsUtils.colorOut(vars.colors.primary) : undefined,
                             color: isSolidBordered
                                 ? ColorsUtils.colorOut(vars.colors.primary)
-                                : vars.searchButton!.colors!.fg,
+                                : ColorsUtils.colorOut(vars.searchButton!.colors!.fg),
                         },
                     },
                 },
             },
-        } as CSSObject); //FIXME: avoid type assertion (once the '&&&&'-style overrides are cleaned up)
+        });
 
         const searchDropDownButton = css({
             ...Mixins.button(vars.searchButtonDropDown),

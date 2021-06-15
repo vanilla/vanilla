@@ -9,7 +9,6 @@ namespace QnA\Tests;
 
 use Vanilla\QnA\Models\AnswerModel;
 use VanillaTests\APIv2\QnaApiTestTrait;
-use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\SetupTraitsTrait;
 use VanillaTests\SiteTestTrait;
 use VanillaTests\EventSpyTestTrait;
@@ -27,8 +26,14 @@ class QnAEventsTest extends VanillaTestCase {
     /** @var AnswerModel */
     private $answerModel;
 
+    /** @var int */
+    private $categoryID;
+
     /** @var \DiscussionModel */
     private $discussionModel;
+
+    /** @var \QnAPlugin */
+    private $plugin;
 
     /**
      * Get the names of addons to install.
@@ -46,9 +51,12 @@ class QnAEventsTest extends VanillaTestCase {
         parent::setUp();
         $this->setUpTestTraits();
 
-        $this->container()->call(function (AnswerModel $answerModel, \DiscussionModel $discussionModel) {
+        $this->categoryID = $this->createCategory()["categoryID"];
+
+        $this->container()->call(function (\QnAPlugin $plugin, AnswerModel $answerModel, \DiscussionModel $discussionModel) {
             $this->answerModel = $answerModel;
             $this->discussionModel = $discussionModel;
+            $this->plugin = $plugin;
         });
     }
 
@@ -64,9 +72,8 @@ class QnAEventsTest extends VanillaTestCase {
      * Tests event upon an answer to a question is chosen.
      */
     public function testQnaChosenAnswerEvent() {
-        $category = $this->createCategory();
         $question = $this->createQuestion([
-            'categoryID' => $category['categoryID'],
+            'categoryID' => $this->categoryID,
             'name' => 'Question 1',
             'body' => 'Question 1'
         ]);
@@ -103,5 +110,23 @@ class QnAEventsTest extends VanillaTestCase {
                 ]
             )
         );
+    }
+
+    /**
+     * Verify basic functionality of count limiting for unanswered questions.
+     */
+    public function testUnansweredLimit(): void {
+        $previousLimit = $this->plugin->getUnansweredCountLimit();
+        try {
+            $limit = 3;
+            $this->plugin->setUnansweredCountLimit($limit);
+            $this->createQuestion();
+            $this->createQuestion();
+            $this->createQuestion();
+            $result = $this->bessy()->getJsonData("/discussions/unansweredcount");
+            $this->assertSame("{$limit}+", $result["UnansweredCount"]);
+        } finally {
+            $this->plugin->setUnansweredCountLimit($previousLimit);
+        }
     }
 }

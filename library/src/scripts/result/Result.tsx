@@ -60,7 +60,7 @@ export default function Result(props: IResult) {
             icon={icon}
             iconWrapperClass={classes.iconWrap}
             description={highlightElement ?? excerptElement}
-            truncateDescription={!!highlightElement}
+            truncateDescription={!highlightElement}
             descriptionMaxCharCount={160}
             metas={meta}
             mediaItem={media}

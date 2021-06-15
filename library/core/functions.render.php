@@ -1553,7 +1553,9 @@ if (!function_exists('userPhotoUrl')) {
 
         $photo = $user['Photo'];
         if ($user && $user['Banned']) {
-            $photo = c('Garden.BannedPhotoSmall', c('Garden.BannedPhoto', 'https://images.v-cdn.net/banned_100.png'));
+            $bannedPhoto = c('Garden.BannedPhoto', '/applications/dashboard/design/images/banned.png');
+            $photo = asset($bannedPhoto, true);
+            return $photo;
         }
 
         if ($photo) {

@@ -269,6 +269,7 @@ class RolesApiController extends AbstractApiController {
     public function index(array $query) {
         $session = $this->getSession();
         $showFullSchema = false;
+        $canViewPersonalInfo = $session->checkPermission('Garden.PersonalInfo.View');
         if ($session->checkPermission('Garden.Settings.Manage')) {
             $showFullSchema = true;
         }
@@ -282,10 +283,12 @@ class RolesApiController extends AbstractApiController {
         $query = $in->validate($query);
 
         $rows = $this->roleModel->getWithRankPermissions()->resultArray();
+        $rows = $canViewPersonalInfo ? $rows : array_filter($rows, 'RoleModel::filterPersonalInfo');
         foreach ($rows as &$row) {
             $row = $this->normalizeOutput($row, $query['expand']);
         }
 
+        $rows = array_values($rows);
         $result = $out->validate($rows);
         return $result;
     }

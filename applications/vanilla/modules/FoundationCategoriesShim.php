@@ -141,13 +141,13 @@ class FoundationCategoriesShim {
     public static function mapApiCategoryToItem(array $category, ?array $options = null): array {
         $counts = [
             [
-                'labelCode' => 'Discussions',
+                'labelCode' => t('Discussions'),
                 'count' => (int) $category['countAllDiscussions'] ?? 0,
             ]
         ];
         if ($options['countComments'] ?? false) {
             $counts[] = [
-                'labelCode' => 'Comments',
+                'labelCode' => t('Comments'),
                 'count' => (int) $category['countAllComments'] ?? 0,
             ];
         }

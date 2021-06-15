@@ -12,6 +12,7 @@ use Vanilla\ApiUtils;
 use Garden\Container\Container;
 use Vanilla\Formatting\DateTimeFormatter;
 use Vanilla\Forum\Modules\QnAWidgetModule;
+use Vanilla\Models\LegacyModelUtils;
 use Vanilla\QnA\Models\AnswerSearchType;
 use Vanilla\QnA\Models\QuestionSearchType;
 use Vanilla\QnA\Models\AnswerModel;
@@ -44,6 +45,9 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
 
     /** @var int  */
     private const ANSWERED_LIMIT = 100;
+
+    /** @var int Maximum unanswered ideas to be counted. */
+    public const UNANSWERED_COUNT_LIMIT_DEFAULT = 100;
 
     /** @var int Interval in which follow up feature triggers */
     private $followUpInterval = 7;
@@ -83,6 +87,9 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
 
     /** @var SessionInterface */
     private $session;
+
+    /** @var int */
+    private $unansweredCountLimit = self::UNANSWERED_COUNT_LIMIT_DEFAULT;
 
     /**
      * QnAPlugin constructor.
@@ -876,16 +883,17 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
      * @param GDN_Controller $sender Sending controller instance
      */
     public function base_afterDiscussionFilters_handler($sender) {
-        $count = Gdn::cache()->get('QnA-UnansweredCount');
-        if ($count === Gdn_Cache::CACHEOP_FAILURE) {
+        $cached = Gdn::cache()->get('QnA-UnansweredCount');
+        if ($cached === Gdn_Cache::CACHEOP_FAILURE) {
             $count =
                 '<span class="Aside">'
                 .'<span class="Popin Count" rel="/discussions/unansweredcount"></span>'
                 .'</span>';
         } else {
+            $total = $cached < $this->unansweredCountLimit ? $cached : $this->unansweredCountLimit . "+";
             $count =
                 '<span class="Aside">'
-                .'<span class="Count">'.$count.'</span>'
+                .'<span class="Count">'.$total.'</span>'
                 .'</span>';
         }
 
@@ -959,13 +967,12 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
      */
     public function discussionsController_beforeBuildPager_handler($sender, $args) {
         if (Gdn::controller()->RequestMethod == 'unanswered') {
-            $count = $this->getUnansweredCount();
-            $sender->setData('CountDiscussions', $count);
+            $sender->setData('CountDiscussions', false);
         }
     }
 
     /**
-     * Return the number of unanswered questions.
+     * Return a limited count of unanswered questions.
      *
      * @return int
      */
@@ -973,7 +980,11 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
         // Me might have an alternate handler.
         $eventManager = \Gdn::eventManager();
         if ($eventManager->hasHandler('getAlternateUnansweredCount')) {
-            $questionCount = $eventManager->fireFilter('getAlternateUnansweredCount', 0);
+            $questionCount = $eventManager->fireFilter(
+                'getAlternateUnansweredCount',
+                0,
+                $this->unansweredCountLimit
+            );
             return $questionCount;
         }
 
@@ -981,11 +992,10 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
         $questionCount = Gdn::cache()->get($cacheKey);
 
         if ($questionCount === Gdn_Cache::CACHEOP_FAILURE) {
-            $questionCount = Gdn::sql()
-                ->where('Type', 'Question')
-                ->whereIn('QnA', ['Unanswered', 'Rejected'])
-                ->getCount('Discussion')
-            ;
+            $questionCount = LegacyModelUtils::getLimitedCount($this->discussionModel, [
+                "Type" => "Question",
+                "QnA" => ["Unanswered", "Rejected"],
+            ], $this->unansweredCountLimit);
             Gdn::cache()->store($cacheKey, $questionCount, [Gdn_Cache::FEATURE_EXPIRY => 15 * 60]);
         }
 
@@ -1032,6 +1042,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
      */
     public function discussionsController_unansweredCount_create($sender, $args) {
         $count = $this->getUnansweredCount();
+        $count = $count < $this->unansweredCountLimit ? $count : $this->unansweredCountLimit . "+";
 
         $sender->setData('UnansweredCount', $count);
         $sender->setData('_Value', $count);
@@ -1892,6 +1903,24 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
             default:
                 $this->discussionModel->setField($discussionID, 'QnA', null);
         }
+    }
+
+    /**
+     * Get the limit used when getting the total number of unanswered questions.
+     *
+     * @return int
+     */
+    public function getUnansweredCountLimit(): int {
+        return $this->unansweredCountLimit;
+    }
+
+    /**
+     * Set a limited used when querying the total of unanswered questions.
+     *
+     * @param int $unansweredCountLimit
+     */
+    public function setUnansweredCountLimit(int $unansweredCountLimit): void {
+        $this->unansweredCountLimit = $unansweredCountLimit;
     }
 }
 if (!function_exists('validatePositiveNumber')) {

@@ -9,6 +9,7 @@ import { UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
 import { Variables } from "@library/styles/Variables";
 import { listItemVariables } from "@library/lists/ListItem.variables";
 import { IThemeVariables } from "@library/theming/themeReducer";
+import { TagPreset } from "@library/metas/Tags.variables";
 
 export const discussionListVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     /**
@@ -37,11 +38,20 @@ export const discussionListVariables = useThemeCache((forcedVars?: IThemeVariabl
     const panelBoxes = makeThemeVars("panelBoxes", Variables.contentBoxes(globalVars.panelBoxes));
 
     /**
-     * @varGroup discussionList.userTags
-     * @description If userTags shown/hide and number to show on discussion, hodden by default.
+     * @var discussionList.labels.tagPreset
+     * @enum standard | primary | greyscale | colored
+     */
+    const labels = makeThemeVars("labels", {
+        tagPreset: TagPreset.GREYSCALE,
+    });
+
+    /**
+     * @var discussionList.userTags.tagPreset
+     * @enum standard | primary | greyscale | colored
      */
     const userTags = makeThemeVars("userTags", {
         maxNumber: 3,
+        tagPreset: TagPreset.STANDARD,
     });
 
     /**
@@ -179,6 +189,7 @@ export const discussionListVariables = useThemeCache((forcedVars?: IThemeVariabl
         panelBoxes,
         contentBoxes,
         item,
+        labels,
         userTags,
     };
 });

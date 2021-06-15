@@ -34,7 +34,8 @@ class HtmlToBlotsParser {
 
         $new = new BlotGroupCollection($operations, $parent->getAllowedBlotClasses(), $parent->getParseMode());
 
-        return $new->getGroups()[0]->getBlotsAndGroups();
+        $group = $new->getGroups()[0] ?? null;
+        return $group ? $group->getBlotsAndGroups() : [];
     }
 
     /**

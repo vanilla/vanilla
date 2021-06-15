@@ -14,7 +14,7 @@ paths:
       - description: |
           Restrict the search to the specified main type(s) of records.
         in: query
-        name: recordTypes
+        name: recordTypes[]
         schema:
           items:
             enum:
@@ -28,7 +28,7 @@ paths:
       - description: |
           Restrict the search to the specified type(s) of records.
         in: query
-        name: types
+        name: types[]
         schema:
           items:
             enum:
@@ -90,7 +90,7 @@ paths:
       - description: |
           Filter the records by KnowledgeCategory ID
         in: query
-        name: knowledgeCategoryIDs
+        name: knowledgeCategoryIDs[]
         schema:
           items:
             type: integer
@@ -127,7 +127,7 @@ paths:
       - description: |
           Filter the records by inserted user names.
         in: query
-        name: insertUserNames
+        name: insertUserNames[]
         schema:
           items:
             type: string
@@ -137,7 +137,7 @@ paths:
       - description: |
           Filter the records by inserted userIDs.
         in: query
-        name: insertUserIDs
+        name: insertUserIDs[]
         schema:
           items:
             type: integer
@@ -148,7 +148,7 @@ paths:
       - description: |
           Filter discussions by matching tags.
         in: query
-        name: tags
+        name: tags[]
         schema:
           items:
             type: string
@@ -187,7 +187,7 @@ paths:
           Expand associated records using one or more valid field names. A
           value of "all" will expand all expandable fields.
         in: query
-        name: expand
+        name: expand[]
         schema:
           items:
             enum:

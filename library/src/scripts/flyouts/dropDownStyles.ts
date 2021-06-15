@@ -140,8 +140,9 @@ export const dropDownClasses = useThemeCache(() => {
     const contents = style(
         "contents",
         {
-            position: "absolute",
             ...contentMixin,
+            overflow: "initial",
+            position: "absolute",
             "&.isParentWidth": {
                 minWidth: "initial",
                 left: 0,

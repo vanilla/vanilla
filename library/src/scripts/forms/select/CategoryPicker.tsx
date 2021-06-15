@@ -83,9 +83,10 @@ export function CategoryPicker(props: IProps) {
             <select value={selectedValue} id={id} name={name} onChange={handleChange} className={classes.select}>
                 {defaultItem?.label && <option value={defaultItem.value}>{defaultItem.label}</option>}
                 {items.map((item, i) => {
+                    let itemDepth = item.depth > 0 ? item.depth : 0;
                     return (
                         <option key={i} value={item.value} disabled={item.disabled}>
-                            {String.fromCharCode(160).repeat(4 * (item.depth - 1)) + item.label}
+                            {String.fromCharCode(160).repeat(4 * (itemDepth - 1)) + item.label}
                         </option>
                     );
                 })}

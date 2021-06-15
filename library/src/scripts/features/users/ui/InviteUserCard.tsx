@@ -76,6 +76,11 @@ export default function InviteUserCard(props: IProps) {
                                 updateStoreInvitees(invitees);
                             }}
                             value={defaultUsers}
+                            /** FIXME: This maxHeight value prevents blur by stopping
+                             * dropdowns from overflowing with the modal
+                             * Remove with https://github.com/vanilla/vanilla-cloud/issues/3155
+                             */
+                            maxHeight={200}
                         />
 
                         <Permission permission={"emailInvitations.add"} mode={PermissionMode.GLOBAL}>

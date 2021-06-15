@@ -120,6 +120,13 @@ describe("labelize()", () => {
         ["fooURL", "Foo URL"],
         ["foo_bar", "Foo Bar"],
         ["foo-bar", "Foo Bar"],
+        ["foo-bar-baz", "Foo Bar Baz"],
+        ["foo bar   baz", "Foo Bar Baz"],
+        [
+            `foo bar
+        baz`,
+            "Foo Bar Baz",
+        ],
     ];
     tests.forEach(([str, expected]) => {
         it("str", () => {

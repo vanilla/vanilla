@@ -51,8 +51,8 @@ export function labelize(str: string): string {
      */
     let label = str.replace(/([^A-Z0-9])([A-Z0-9])/, "$1 $2");
     label = label.replace(/([A-Z0-9])(?=[a-z])/, " $1");
-    label = label.replace(/[_-]/, " ");
-    label = label.replace(/\s+/, " ");
+    label = label.replace(/[_-]/g, " ");
+    label = label.replace(/\s+/g, " ");
     let parts = label.split(" ");
     label = parts.map((s) => s.charAt(0).toLocaleUpperCase() + s.slice(1)).join(" ");
     return label.trim();

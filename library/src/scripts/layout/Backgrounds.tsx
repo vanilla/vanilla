@@ -5,7 +5,7 @@
  */
 
 import React, { ReactNode, useContext, useEffect, useState } from "react";
-import { fullBackgroundClasses, bodyCSS } from "@library/layout/bodyStyles";
+import { fullBackgroundClasses, globalCSS, useBodyClass } from "@library/layout/bodyStyles";
 import { useHistory } from "react-router";
 
 interface IProps {
@@ -16,7 +16,8 @@ interface IProps {
  * Creates a drop down menu
  */
 export const Backgrounds = () => {
-    bodyCSS(); // set styles on body tag
+    useBodyClass();
+    globalCSS();
     const backgroundInfo = useBackgroundContext();
     const classes = fullBackgroundClasses(backgroundInfo.isHomePage);
     return <div className={classes.root} />;
@@ -56,7 +57,7 @@ const COMPAT_BG_ID = "vanillaCompatBodyBg";
 
 export function fullBackgroundCompat(isHomePage = false) {
     if (!document.getElementById(COMPAT_BG_ID)) {
-        bodyCSS(); // set styles on body tag
+        globalCSS();
 
         // Make a backwards compatible body background (absolute positioned).
         const classes = fullBackgroundClasses(!!isHomePage);

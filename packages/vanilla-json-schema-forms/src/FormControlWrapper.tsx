@@ -56,8 +56,5 @@ export function FormControlWrapper(props: Omit<IControlProps, "disabled"> & Pick
     );
     const conditionsValidation = validateConditions(conditions ?? [], rootInstance);
     const disabled = conditionsValidation.conditions.some((c) => c.disable);
-    if (!disabled && !conditionsValidation.isValid) {
-        return null;
-    }
     return <FormControl {...controlProps} disabled={disabled} control={stableUnwrappedControl} />;
 }

@@ -43,6 +43,9 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
 
     use LegacyDirtyRecordTrait;
 
+    public const PERM_DISCUSSION_VIEW = "Vanilla.Discussions.View";
+    public const PERM_JUNCTION_TABLE = "Category";
+
     private const ADJUST_COUNT_DECREMENT = "decrement";
 
     private const ADJUST_COUNT_INCREMENT = "increment";
@@ -1902,15 +1905,25 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
         $discussionIDs = array_unique(array_column($ids, 'DiscussionID'));
         $commentIDs = array_filter(array_unique(array_column($ids, 'CommentID')));
 
+        $categoryIDs =  $this->getVisibleCategoryIDs();
+        $discussionsWhere = is_array($categoryIDs) ?
+            [
+                'DiscussionID' => $discussionIDs,
+                'CategoryID' => $categoryIDs
+            ] :
+            [
+                'DiscussionID' => $discussionIDs
+            ];
         if (!empty($discussionIDs)) {
-            $discussions = $this->SQL->getWhere('Discussion', ['DiscussionID' => $discussionIDs])->resultArray();
+            $discussions = $this->SQL->getWhere('Discussion', $discussionsWhere)->resultArray();
             $discussions = array_column($discussions, null, 'DiscussionID');
         } else {
             $discussions = [];
         }
 
         if (!empty($commentIDs)) {
-            $comments = $this->SQL->getWhere('Comment', ['CommentID' => $commentIDs])->resultArray();
+            $commentModel = Gdn::getContainer()->get(CommentModel::class);
+            $comments = $commentModel->lookup(['CommentID' => $commentIDs], true)->resultArray();
             $comments = array_column($comments, null, 'CommentID');
         } else {
             $comments = [];

@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -16,6 +16,7 @@ import { OptionProps } from "react-select/lib/components/Option";
 import { PlacesSearchListingItem } from "@library/search/PlacesSearchListingContainer";
 import { searchBarClasses } from "@library/features/search/searchBarStyles";
 import DateTime from "@library/content/DateTime";
+import { MetaTag } from "@library/metas/Metas";
 
 export interface ISearchOptionData {
     crumbs: ICrumb[];
@@ -84,12 +85,7 @@ export default function SearchOption(props: IProps) {
                     </span>
                     <span className="suggestedTextInput-main">
                         <span className={classNames("isFlexed", classesMetas.root)}>
-                            {labels &&
-                                labels.map((label) => (
-                                    <span key={label} className={classesMetas.metaLabel}>
-                                        {label}
-                                    </span>
-                                ))}
+                            {labels && labels.map((label) => <MetaTag key={label}>{label}</MetaTag>)}
                             {dateUpdated && (
                                 <span className={classesMetas.meta}>
                                     <DateTime className={classesMetas.meta} timestamp={dateUpdated} />

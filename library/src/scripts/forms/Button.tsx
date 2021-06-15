@@ -7,9 +7,9 @@
 import React from "react";
 import { getOptionalID, IOptionalComponentID } from "@library/utility/idUtils";
 import { buttonClasses, buttonUtilityClasses } from "../forms/buttonStyles";
-import classNames from "classnames";
 import { titleBarClasses } from "@library/headers/titleBarStyles";
 import { ButtonTypes } from "@library/forms/buttonTypes";
+import { cx } from "@emotion/css";
 
 export interface IButtonProps extends IOptionalComponentID, React.HTMLAttributes<HTMLButtonElement> {
     children: React.ReactNode;
@@ -117,7 +117,7 @@ export default class Button extends React.Component<IButtonProps, IState> {
             ...restProps
         } = this.props;
 
-        const componentClasses = classNames(getClassForButtonType(buttonType), { Button: legacyMode }, className);
+        const componentClasses = cx(getClassForButtonType(buttonType), { Button: legacyMode }, className);
 
         return (
             <button

@@ -2,61 +2,74 @@
 
 This library describes standard components used in the dashboard.
 
+## Design goals
+
+-   Easy to use: Be able to declare a component with a minimum of properties and quickly iterate work
+-   Accessible: All of the components should be accessible
+-   Styled: Every component should have a style making it instantly usable
+-   Generic: Components should serve a broad purpose
+
 ## General Guidelines
 
 The following guidelines should be followed when creating components in this package.
 
-**Generic**
+**Generic components can be used anywhere**
 
 Instead of creating controls for specific situations, make sure your control can adapt to any use.
 
 ```tsx
-// ❌  Renders a very specific control for very few usages
+// ❌  We can only select fruits with this? Nonsense
 <LargeFruitSelector value={fruit} onChange={setFruit} />
 
 // ✅  Renders a large dropdown with fruits as options
 <ListBox size="large" value={fruit} onChange={setFruit}>
-    <ListBox.Item value="apple">Apples</ListBox.Item>
-    <ListBox.Item value="banana">Banana</ListBox.Item>
+    <ListBoxItem value="apple">Apples</ListBoxItem>
+    <ListBoxItem value="banana">Banana</ListBoxItem>
 </ListBox>
 ```
 
-**Declarative**
+**Components over lists and objects**
 
 Whenever possible, use the declarative form when specifying values or different parts of the control.
 
+This makes them easier to customize and readable.
+
 ```tsx
-// ❌  Makes it hard to style subcomponents of the ListBox
-<ListBox items={[{ value: "apple" }], { value: "banana" }} className="myClass" itemClassName="myItemClass" />
+// ❌  Makes it hard to style subcomponents
+<AutoComplete items={[{ value: "apple" }], { value: "banana" }} className="myClass" itemClassName="myItemClass" />
 
 // ✅  Composition gives us more flexibility and readability.
-<ListBox className="myClass">
-    <ListBox.Item value="apple" className="myItemClass" />
-    <ListBox.Item value="banana" className="myItemClass" />
-</ListBox>
+<AutoComplete className="myClass">
+    <AutoCompleteOption value="apple" className="myItemClass" />
+    <AutoCompleteOption value="banana" className="myItemClass" />
+</AutoComplete>
 ```
 
-**Composable**
+**Composability over adding properties**
+
+Whenever possible, it is always preferable to create a higher-order component or a hook to customize an existing component, as opposed to adding properties and unnecessary complexity.
 
 ```tsx
-// ❌  Overly complicates the ListBox component
-<ComboBox apiFetchItems={{ url: "api/v2/fruits" }} />
+// ❌  Too many properties hide the real purpose of AutoComplete
+<AutoComplete apiFetchItems={{ url: "api/v2/fruits" }} />
 
 // ✅  Gives the responsibility of fetching and searching fruits to another component.
 <ApiItemFetcher url="api/v2/fruits" searchUrl="api/v2/fruits?q=%s">
     {(items, onSearch) => (
-        <ComboBox onSearch={onSearch}>
+        <AutoComplete onSearch={onSearch}>
             {items.map(({ value, label }) => (
-                <ListBox.Item value={value}>{label}</ListBox.Item>
+                <AutoCompleteOption value={value} label={label}/>
             ))}
-        </ComboBox>
+        </AutoComplete>
     )}
 </ApiItemFetcher>
 ```
 
 **Ready-To-Use**
 
-All components should provide sane defaults for each property. With a minimal amount of confugration the component should still render properly.
+All components should provide sane defaults for each property. With a minimal amount of configuration the component should still render properly.
+
+This makes it possible to quickly iterate an interface and add features incrementally.
 
 ```tsx
 // ❌  Unnecessary complexity when we want to quickly prototype a view.
@@ -67,10 +80,10 @@ All components should provide sane defaults for each property. With a minimal am
 <ListBox />
 ```
 
-**Styled**
+**Styled by default**
 
 Components should provide their own styles by default but make it possible to override those styles if necessary. Styles for components should be declared in a file named `ComponentName.styles.ts`
 
-**Documented**
+**Documented through storybook**
 
 Stories should document every component and it's options

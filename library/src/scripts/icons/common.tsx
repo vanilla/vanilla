@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -9,7 +9,8 @@ import classNames from "classnames";
 import { t } from "@library/utility/appUtils";
 import { iconClasses } from "@library/icons/iconStyles";
 import { areaHiddenType } from "@library/styles/styleHelpersVisibility";
-import { css, cx } from "@emotion/css";
+import { cx } from "@emotion/css";
+import { Icon } from "@vanilla/icons";
 
 const currentColorFill = {
     fill: "currentColor",
@@ -264,25 +265,6 @@ export function CheckIcon(props: { className?: string; "aria-hidden"?: areaHidde
         >
             <title>{title}</title>
             <polygon fill="currentColor" points="5,12.7 3.6,14.1 9,19.5 20.4,7.9 19,6.5 9,16.8" />
-        </svg>
-    );
-}
-
-export function DropDownMenuIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
-    const title = `…`;
-    const classes = iconClasses();
-    return (
-        <svg
-            className={classNames(classes.standard, "icon-dropDownMenu", props.className)}
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
-        >
-            <title>{title}</title>
-            <path
-                fill="currentColor"
-                d="M5.5 12.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm8 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm8 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"
-            />
         </svg>
     );
 }
@@ -588,30 +570,6 @@ export function PlusCircleIcon(props: { className?: string; "aria-hidden"?: area
                         <path fill="currentColor" d="M6.3 3.5L7.7 3.5 7.7 10.5 6.3 10.5z" transform="rotate(90 7 7)" />
                     </g>
                 </g>
-            </g>
-        </svg>
-    );
-}
-
-export function SignInIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
-    const title = t("Sign In");
-    const classes = iconClasses();
-    return (
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="-4 0 24 18"
-            className={classNames(classes.signIn, "icon-signIn", props.className)}
-            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
-            role="img"
-        >
-            <title>{title}</title>
-            <g fill="none" fillRule="evenodd" stroke="currentColor" strokeLinecap="round" strokeWidth="1.5">
-                <path strokeLinejoin="round" d="M7.243 12.417L10.92 8.74 7.243 5.063" />
-                <path d="M10.617 8.74H.843" />
-                <path
-                    strokeLinejoin="round"
-                    d="M2 5.07V1.235C2.051.411 2.451 0 3.2 0h11.507C15.57.033 16 .593 16 1.681v15.136c-.058.789-.346 1.183-.865 1.183H3.2c-.8-.01-1.2-.404-1.2-1.183v-4.12"
-                />
             </g>
         </svg>
     );
@@ -975,21 +933,6 @@ export function _BookmarkIcon(props: { className?: string; "aria-hidden"?: areaH
         </svg>
     );
 }
-
-export function BookmarkIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
-    const { bookmark: bookmarkClass } = iconClasses();
-    return (
-        <svg
-            className={classNames(bookmarkClass, props.className)}
-            xmlns="http://www.w3.org/2000/svg"
-            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
-            viewBox="0 0 24 24"
-        >
-            <path d="M6.55 4h10.9c.304 0 .55.246.55.55v14.307c0 .304-.246.55-.55.55-.125 0-.246-.042-.343-.12l-4.764-3.802c-.2-.16-.485-.16-.686 0l-4.764 3.802c-.237.19-.583.15-.773-.087-.078-.097-.12-.218-.12-.343V4.55c0-.304.246-.55.55-.55z" />
-        </svg>
-    );
-}
-
 export function NewPostMenuIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
     return (
         <svg

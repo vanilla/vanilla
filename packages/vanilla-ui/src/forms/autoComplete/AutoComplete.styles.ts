@@ -18,6 +18,7 @@ export const autoCompleteClasses = ({ size = "default" }: AutoCompleteClassesPro
     }),
     inputActions: css({
         display: "flex",
+        pointerEvents: "none",
         flexDirection: "row-reverse",
         alignItems: "stretch",
         position: "absolute",
@@ -40,22 +41,21 @@ export const autoCompleteClasses = ({ size = "default" }: AutoCompleteClassesPro
             maxHeight: "300px",
             overflow: "auto",
         },
+        "&[data-autocomplete-state=selected] [data-user-value]": {
+            fontWeight: "inherit",
+        },
     }),
     option: css({
-        "&[data-reach-combobox-option]": {
-            borderBottom: "1px solid #dddee0",
+        display: "flex",
 
+        "&[data-reach-combobox-option]": {
             ...{
                 small: { padding: "6px 8px", fontSize: "13px" },
                 default: { padding: "8px 12px", fontSize: "16px" },
             }[size],
 
-            "&:last-child": {
-                borderBottom: 0,
-            },
-
-            "&:hover": {
-                background: "rgba(3,125,188,0.03)",
+            "&:hover, &[data-highlighted]": {
+                background: "rgba(3,125,188,0.08)",
             },
         },
         "[data-suggested-value]": {
@@ -64,13 +64,24 @@ export const autoCompleteClasses = ({ size = "default" }: AutoCompleteClassesPro
         "[data-user-value]": {
             fontWeight: 600,
         },
+        svg: {
+            position: "relative",
+
+            ...{
+                small: { width: 18, right: -3 },
+                default: { width: 24, right: -4 },
+            }[size],
+        },
+    }),
+    optionText: css({
+        flex: 1,
     }),
     autoCompleteArrow: css({
         display: "flex",
-        pointerEvents: "none",
     }),
     autoCompleteClear: css({
         display: "flex",
+        pointerEvents: "auto",
         cursor: "pointer",
     }),
     input: css({

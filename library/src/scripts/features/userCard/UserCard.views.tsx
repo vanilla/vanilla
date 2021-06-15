@@ -20,11 +20,21 @@ import classNames from "classnames";
 import React from "react";
 import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
 import DateTime from "@library/content/DateTime";
+import { hasPermission } from "@library/features/users/Permission";
+import { formatUrl } from "@library/utility/appUtils";
 
 interface IProps {
     user: IUser;
     onClose?: () => void;
 }
+
+const DELETED_USER_MSG = "This user has been deleted.";
+const BANNED_USER_MSG = "This user has been banned.";
+const PRIVATE_USER_MSG = "This user's profile is private.";
+const BANNED = "Banned";
+const PRIVATE = "Private";
+const ERROR = "ERROR";
+const DELETED = "DELETED";
 
 export function UserCardView(props: IProps) {
     const classes = userCardClasses();
@@ -34,8 +44,21 @@ export function UserCardView(props: IProps) {
     const photoSize: UserPhotoSize = isCompact ? UserPhotoSize.XLARGE : UserPhotoSize.LARGE;
     const isConversationsEnabled = getMeta("context.conversationsEnabled", false);
 
-    const label = user.title ?? user.label;
+    let label = user.title ?? user.label;
+    const privateProfile = user?.private ?? false;
+    const hasPersonalInfoView = hasPermission("personalInfo.view");
+    const banned = user?.banned ?? 0;
+    const isBanned = banned === 1;
+    let bannedPrivateProfile = getMeta("ui.bannedPrivateProfile", "0");
+    bannedPrivateProfile = bannedPrivateProfile === "" ? "0" : "1";
+    const privateBannedProfileEnabled = bannedPrivateProfile !== "0";
+    const showPrivateBannedProfile = isBanned && privateBannedProfileEnabled;
 
+    label = isBanned ? t(BANNED) : label;
+
+    if ((privateProfile || showPrivateBannedProfile) && !hasPersonalInfoView) {
+        return <UserCardMinimal user={user} onClose={props.onClose} />;
+    }
     return (
         <>
             <div className={classes.header}>
@@ -79,11 +102,15 @@ export function UserCardView(props: IProps) {
                     </Permission>
                 )}
             </div>
-
+            {isBanned && (
+                <div className={classNames(classes.row, classes.msg)}>
+                    <div>{t(BANNED_USER_MSG)}</div>
+                </div>
+            )}
             <div className={classNames(classes.container, classes.actionContainer)}>
                 <CardButton to={makeProfileUrl(user.name)}>{t("View Profile")}</CardButton>
                 <Permission permission={"conversations.add"}>
-                    {isConversationsEnabled && (
+                    {isConversationsEnabled && !banned && (
                         <CardButton to={`/messages/add/${user.name}`}>{t("Message")}</CardButton>
                     )}
                 </Permission>
@@ -187,6 +214,79 @@ export function UserCardSkeleton(props: ISkeletonProps) {
                     </MetaItem>
                 </Metas>
             </Container>
+        </>
+    );
+}
+
+interface IMinimalProps {
+    user?: IUser;
+    userFragment?: Partial<IUserFragment>;
+    onClose?: () => void;
+}
+
+export function UserCardMinimal(props: IMinimalProps) {
+    const { user, userFragment } = props;
+    const classes = userCardClasses();
+    const device = useDevice();
+
+    const isCompact = device === Devices.MOBILE || device === Devices.XS;
+    const photoSize: UserPhotoSize = isCompact ? UserPhotoSize.XLARGE : UserPhotoSize.LARGE;
+
+    let banned = user?.banned ?? userFragment?.banned ?? 0;
+    let isBanned = banned === 1;
+    let labelText = isBanned ? t(BANNED) : t(PRIVATE);
+    let msg = isBanned ? t(BANNED_USER_MSG) : t(PRIVATE_USER_MSG);
+    let name = user?.name ?? userFragment?.name;
+    let userInfo = user ?? userFragment;
+
+    return (
+        <>
+            <div className={classes.header} />
+            <UserPhoto userInfo={userInfo} size={photoSize} className={classes.userPhoto} />
+            <div className={classes.metaContainer}>
+                <div className={classes.row}>
+                    <div className={classes.name}>{name}</div>
+                </div>
+                <div className={classes.row}>
+                    <div className={classes.label}>{labelText}</div>
+                </div>
+                <div className={classNames(classes.row, classes.msgMinimal)}>
+                    <div>{msg}</div>
+                </div>
+            </div>
+        </>
+    );
+}
+
+interface IUserCardErrorProps {
+    error?: string | null;
+    onClose?: () => void;
+}
+
+export function UserCardError(props: IUserCardErrorProps) {
+    const classes = userCardClasses();
+    const device = useDevice();
+
+    const isCompact = device === Devices.MOBILE || device === Devices.XS;
+    const photoSize: UserPhotoSize = isCompact ? UserPhotoSize.XLARGE : UserPhotoSize.LARGE;
+    const user = {
+        photoUrl: formatUrl("/applications/dashboard/design/images/banned.png", true),
+    };
+    const msg = props.error ? props.error : DELETED_USER_MSG;
+    const label = props.error ? t(ERROR) : t(DELETED);
+
+    return (
+        <>
+            <div className={classes.header} />
+            <UserPhoto userInfo={user} size={photoSize} className={classes.userPhoto} />
+            <div className={classes.metaContainer}>
+                <div className={classes.row}>
+                    <div className={classes.label}>{label}</div>
+                </div>
+                <div className={classNames(classes.row, classes.msgMinimal)}>
+                    <div>{msg}</div>
+                </div>
+            </div>
         </>
     );
 }

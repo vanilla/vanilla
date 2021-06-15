@@ -149,11 +149,6 @@ export const iconVariables = useThemeCache(() => {
         height: 13,
     });
 
-    const signIn = themeVars("signIn", {
-        width: 24,
-        height: 18,
-    });
-
     const chevronUp = themeVars("selectedCategory", {
         width: 51,
         height: 17,
@@ -189,12 +184,6 @@ export const iconVariables = useThemeCache(() => {
         width: 12,
         height: 16,
         strokeWidth: 1,
-    });
-
-    const bookmarkIcon = themeVars("bookmarkIcon", {
-        width: 24,
-        height: 24,
-        strokeWidth: 1.4,
     });
 
     const newPostMenuIcon = themeVars("newPostMenuIcon", {
@@ -276,7 +265,6 @@ export const iconVariables = useThemeCache(() => {
         closeTiny,
         chevronLeftCompact,
         selectedCategory,
-        signIn,
         chevronUp,
         plusCircle,
         categoryIcon,
@@ -284,10 +272,9 @@ export const iconVariables = useThemeCache(() => {
         editIcon,
         documentation,
         /**
-         * @deprecated Use bookmarkIcon instead.
+         * @deprecated
          */
         _bookmarkIcon,
-        bookmarkIcon,
         newPostMenuIcon,
         typeAll,
         typeDiscussions,
@@ -309,7 +296,7 @@ export const iconClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const style = styleFactory("icon");
 
-    const standard = style("defaultIcon", {
+    const standard = css({
         width: styleUnit(vars.standard.width),
         height: styleUnit(vars.standard.height),
     });
@@ -406,11 +393,6 @@ export const iconClasses = useThemeCache(() => {
     const selectedCategory = style("selectedCategory", {
         width: styleUnit(vars.selectedCategory.width),
         height: styleUnit(vars.selectedCategory.height),
-    });
-
-    const signIn = style("signIn", {
-        width: styleUnit(vars.signIn.width),
-        height: styleUnit(vars.signIn.height),
     });
 
     const chevronUp = style("chevronUp", {
@@ -535,12 +517,6 @@ export const iconClasses = useThemeCache(() => {
         });
     };
 
-    const bookmark = css({
-        width: styleUnit(vars.bookmarkIcon.width),
-        height: styleUnit(vars.bookmarkIcon.height),
-        strokeWidth: styleUnit(vars.bookmarkIcon.strokeWidth),
-    });
-
     const newPostMenuIcon = style("newPostMenuIcon", {
         width: styleUnit(vars.newPostMenuIcon.width),
         height: styleUnit(vars.newPostMenuIcon.height),
@@ -641,7 +617,6 @@ export const iconClasses = useThemeCache(() => {
         chevronLeftCompact,
         chevronLeftSmallCompact,
         selectedCategory,
-        signIn,
         chevronUp,
         plusCircle,
         categoryIcon,
@@ -653,10 +628,9 @@ export const iconClasses = useThemeCache(() => {
         featureIcon,
         documentation,
         /**
-         * @deprecated Use bookmark instead.
+         * @deprecated
          */
         _bookmark,
-        bookmark,
         newPostMenuIcon,
         itemFlyout,
         typeAll,

@@ -13,6 +13,9 @@ use Gdn_Model;
  * Utility functions that operate on models.
  */
 final class LegacyModelUtils {
+
+    public const COUNT_LIMIT_DEFAULT = 100;
+
     /**
      * Get the crawl information for a model.
      *
@@ -110,6 +113,39 @@ final class LegacyModelUtils {
                 $result[lcfirst($key)] = $value;
             }
         }
+        return $result;
+    }
+
+    /**
+     * Get the count of matching rows in a table with a hard limit.
+     *
+     * A simple query is executed to get rows matching the criteria, with an arbitrary limit. This query is used as a
+     * subquery to another "count" query that is intended to solely return the limited count from the database server.
+     * This method can be useful when a true count is only necessary to a point, before a relative count is acceptable
+     * (i.e. "8", "21", "100+").
+     *
+     * @param Gdn_Model $model
+     * @param array $where
+     * @param int $limit
+     * @return int
+     */
+    public static function getLimitedCount(Gdn_Model $model, array $where, int $limit = self::COUNT_LIMIT_DEFAULT): int {
+        $sql = clone $model->SQL;
+        $subquery = $sql->reset()
+            ->select($model->PrimaryKey)
+            ->from($model->Name)
+            ->where($where)
+            ->limit($limit)
+            ->getSelect();
+
+        $query = /** @lang MySQL */ <<<SQL
+select count(*) as rowCount
+from ($subquery) as subquery
+SQL;
+        $result = $sql->Database->query(
+            $query,
+            $sql->namedParameters()
+        )->value("rowCount");
         return $result;
     }
 }

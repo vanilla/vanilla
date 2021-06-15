@@ -297,4 +297,24 @@ class RolesTest extends AbstractResourceTest {
             $this->assertArrayNotHasKey('personalInfo', $role);
         }
     }
+
+    /**
+     * Test that a user without the Garden.PersonalInfo.View permission cannot view roles that are flagged as personal info.
+     */
+    public function testFilterPersonalInfoRoles() {
+        // Make a role that is personal Info.
+        $record = $this->testPost(["name" => "personalInfo", "personalInfo" => true]);
+
+        // And admin has the Garden.PersonalInfo.View permission, so the role should be returned.
+        $allRoles = $this->api()->get($this->baseUrl)->getBody();
+        $allRoleIDs = array_column($allRoles, 'roleID');
+        $this->assertContains($record['roleID'], $allRoleIDs);
+
+        // A regular old member doesn't have the Garden.PersonInfo.View permission, so the role should be filtered out.
+        $member = $this->createUser();
+        $this->api()->setUserID($member['userID']);
+        $filteredRoles = $this->api()->get($this->baseUrl)->getBody();
+        $filteredRoleIDs = array_column($filteredRoles, 'roleID');
+        $this->assertNotContains($record['roleID'], $filteredRoleIDs);
+    }
 }

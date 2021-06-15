@@ -45,13 +45,15 @@ trait UsersAndRolesApiTestTrait {
         $role = $this->createRole([
             'permissions' => array_merge([$globalPermissions], $otherPermissions),
         ]);
+
         $user = $this->createUser([
             'roleID' => [$this->lastRoleID],
-        ]);
+        ]) ?? [];
         $result = $this->runWithUser($callback, $user);
 
+        $id = $user['userID'] ?? $this->lastUserID;
         // Cleanup.
-        $this->api()->deleteWithBody("/users/{$user['userID']}");
+        $this->api()->deleteWithBody("/users/{$id}");
         $this->api()->delete("/roles/{$role['roleID']}");
         return $result;
     }

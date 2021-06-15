@@ -14,6 +14,7 @@ export const tagDiscussionFormClasses = useThemeCache(() => {
 
     // Using !important here to override the 'auto' overflow style
     // to allow suggestions to be rendered outside of the modal frame
+    // This should be fixed by https://github.com/vanilla/vanilla-cloud/issues/3046
     const modalSuggestionOverride = css(`
         overflow-y: visible!important
     `);

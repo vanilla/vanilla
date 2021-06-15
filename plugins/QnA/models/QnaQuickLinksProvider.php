@@ -33,12 +33,12 @@ class QnaQuickLinksProvider implements QuickLinkProviderInterface {
      * @return QuickLink[]
      */
     public function provideQuickLinks(): array {
-        return [
-            new QuickLink(
-                t('Unanswered'),
-                '/discussions/unanswered',
-                $this->qnaPlugin->getUnansweredCount() ?? 0
-            )
-        ];
+        $quickLink = new QuickLink(
+            t('Unanswered'),
+            '/discussions/unanswered',
+            $this->qnaPlugin->getUnansweredCount() ?? 0
+        );
+        $quickLink->setCountLimit($this->qnaPlugin->getUnansweredCountLimit());
+        return [$quickLink];
     }
 }

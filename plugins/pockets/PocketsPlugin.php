@@ -45,11 +45,17 @@ class PocketsPlugin extends Gdn_Plugin {
     private $pocketsModel;
 
     /**
+     * @var WidgetService
+     */
+    private $widgetService;
+
+    /**
      * PocketsPlugin constructor.
      */
-    public function __construct(PocketsModel $pocketsModel) {
+    public function __construct(PocketsModel $pocketsModel, WidgetService $widgetService) {
         parent::__construct();
         $this->pocketsModel = $pocketsModel;
+        $this->widgetService = $widgetService;
 
         // Switch our HTML wrapper when we're in a table view.
         if (c('Vanilla.Discussions.Layout') == 'table') {
@@ -608,6 +614,78 @@ class PocketsPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Remove default Module if pocket will use them.
+     *
+     * @param Gdn_Controller $sender
+     */
+    public function base_afterAddModule_handler(Gdn_Controller $sender) {
+        $this->removeAssetsFromController($sender);
+    }
+
+    /**
+     * Remove existing assets from controller if pocket will use the widget.
+     *
+     * @param Gdn_Controller $sender
+     */
+    private function removeAssetsFromController(Gdn_Controller $sender) {
+        $this->_loadState();
+        foreach ($sender->Assets as $location => $modules) {
+            if (array_key_exists($location, $this->_Pockets)) {
+                foreach ($this->_Pockets[$location] as $pocket) {
+                    // @see base_afterRenderAsset_handler
+                    // @see base_beforeRenderAsset_handler
+                    foreach ([null, Pocket::REPEAT_BEFORE, Pocket::REPEAT_AFTER] as $countHint) {
+                        $data = $this->generateDataForPocket($sender, $location, $countHint);
+                        /** @var Pocket $pocket */
+                        if (!$pocket->canRender($data)) {
+                            continue;
+                        }
+                        $widgetID = $pocket->Data['WidgetID'] ?? null;
+                        /** @var WidgetFactory | null $widget */
+                        $widgetFactory = $widgetID ? $this->widgetService->getFactoryByID($widgetID) : null;
+                        $definition = $widgetFactory ? $widgetFactory->getDefinition() : null;
+                        $widgetClass = $definition['widgetClass'] ?? null;
+                        $modulesInLocation = array_keys($modules);
+                        if (in_array($widgetClass, $modulesInLocation)) {
+                            unset($sender->Assets[$location][$widgetClass]);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Get data for pocket.
+     *
+     * @param Gdn_Controller $controller
+     * @param string $location
+     * @param null $countHint
+     * @return array
+     */
+    private function generateDataForPocket(Gdn_Controller $controller, string $location, $countHint = null) {
+        // Build up the data for filtering.
+        $data = [];
+        $data['Request'] = Gdn::request();
+
+        // Increment the counter.
+        if ($countHint != null) {
+            $count = $countHint;
+        } elseif (array_key_exists($location, $this->_Counters)) {
+            $count = $this->_Counters[$location] + 1;
+            $this->_Counters[$location] = $count;
+        } else {
+            $count = $this->_Counters[$location] = 1;
+        }
+
+        $data['Count'] = $count;
+        $data['PageName'] = Pocket::pageName($controller);
+        $data['isHomepage'] = $controller->data('isHomepage');
+
+        return $data;
+    }
+
+    /**
      * Gather all of the pockets for a particular page.
      *
      * @param Gdn_Controller $sender The controller instance.
@@ -629,24 +707,9 @@ class PocketsPlugin extends Gdn_Plugin {
 
         // Since plugins can't currently maintain their state we have to stash it in the Gdn object.
         $this->_loadState();
+        $data = $this->generateDataForPocket($controller, $location, $countHint);
+        $count = $data['Count'];
 
-        // Build up the data for filtering.
-        $data = [];
-        $data['Request'] = Gdn::request();
-
-        // Increment the counter.
-        if ($countHint != null) {
-            $count = $countHint;
-        } elseif (array_key_exists($location, $this->_Counters)) {
-            $count = $this->_Counters[$location] + 1;
-            $this->_Counters[$location] = $count;
-        } else {
-            $count = $this->_Counters[$location] = 1;
-        }
-
-        $data['Count'] = $count;
-        $data['PageName'] = Pocket::pageName($controller);
-        $data['isHomepage'] = $controller->data('isHomepage');
 
         $locationOptions = val($location, $this->pocketsModel->locations, []);
 
@@ -667,7 +730,7 @@ class PocketsPlugin extends Gdn_Plugin {
         // Process all of the pockets.
         if (array_key_exists($location, $this->_Pockets)) {
             foreach ($this->_Pockets[$location] as $pocket) {
-                /** @var Pocket $Pocket */
+                /** @var Pocket $pocket */
 
                 if ($pocket->canRender($data)) {
                     $wrap = val('Wrap', $locationOptions, []);

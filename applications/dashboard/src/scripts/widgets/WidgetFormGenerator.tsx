@@ -5,8 +5,7 @@
  */
 
 import React from "react";
-import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
-import { WidgetFormControl } from "@dashboard/widgets/WidgetFormControl";
+import { DashboardFormControl, DashboardFormControlGroup } from "@dashboard/forms/DashboardFormControl";
 import { t } from "@library/utility/appUtils";
 import { DashboardFormSubheading } from "@dashboard/forms/DashboardFormSubheading";
 import { JsonSchema, JsonSchemaForm } from "@vanilla/json-schema-forms";
@@ -32,17 +31,8 @@ export function WidgetFormGenerator(props: IProps) {
                     {children}
                 </>
             )}
-            FormControl={({ instance, schema, onChange, control, required: isRequired }) => (
-                <DashboardFormGroup label={control.label ?? t("(Untitled)")} description={control.description}>
-                    <WidgetFormControl
-                        formControl={control}
-                        value={instance}
-                        schema={schema}
-                        onChange={onChange}
-                        isRequired={isRequired}
-                    />
-                </DashboardFormGroup>
-            )}
+            FormControl={DashboardFormControl}
+            FormControlGroup={(props) => <DashboardFormControlGroup {...props} sideBySide />}
         />
     );
 }

@@ -51,18 +51,20 @@ ${chalk.green(aliases)}`;
     const config: any = {
         context: VANILLA_ROOT,
         parallelism: 50, // Intentionally brought down from 50 to reduce memory usage.
-        cache: {
-            type: "filesystem",
-            allowCollectingMemory: true, // Required to keep memory usage down.
-            buildDependencies: {
-                config: [...globby.sync(path.resolve(__dirname, "*"))],
-            },
-            // This will cause cache inconsistencies if manually modifying these without
-            // changing the package.json (which is used to avoid hashing node_modules).
-            managedPaths: customModulePaths,
-            name: `${section}-${options.mode}-${options.debug}`,
-            maxMemoryGenerations: options.lowMemory ? 3 : Infinity,
-        },
+        cache: options.lowMemory
+            ? false
+            : {
+                  type: "filesystem",
+                  allowCollectingMemory: true, // Required to keep memory usage down.
+                  buildDependencies: {
+                      config: [...globby.sync(path.resolve(__dirname, "*"))],
+                  },
+                  // This will cause cache inconsistencies if manually modifying these without
+                  // changing the package.json (which is used to avoid hashing node_modules).
+                  managedPaths: customModulePaths,
+                  name: `${section}-${options.mode}-${options.debug}`,
+                  maxMemoryGenerations: options.lowMemory ? 3 : Infinity,
+              },
         module: {
             rules: [
                 {

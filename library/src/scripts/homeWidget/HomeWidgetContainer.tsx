@@ -86,7 +86,12 @@ export function HomeWidgetContainer(props: IHomeWidgetContainerProps) {
                 </Container>
             )}
             <div className={cx(!isNavLinks && widgetClass, classes.root)}>
-                <Container fullGutter narrow={options.maxColumnCount <= 2 || isNavLinks}>
+                <Container
+                    // Our own container will be setting the maximum width.
+                    maxWidth={options.maxWidth ? "100%" : undefined}
+                    fullGutter
+                    narrow={options.maxColumnCount <= 2 || isNavLinks}
+                >
                     <div className={classes.container}>
                         <PageHeadingBox
                             title={props.title}

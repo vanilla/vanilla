@@ -40,10 +40,12 @@ class LocalesApiController extends Controller {
      */
     public function index(): array {
         $this->permission();
-        $out = $this->schema([":a" => $this->localeSchema()], 'out');
+        $schema = $this->schema($this->localeSchema(), ['LocaleConfig', 'out']);
+        $out = $this->schema([":a" => $schema], 'out');
         $enabled = $this->getEnabledLocales();
         $this->expandDisplayNames($enabled, array_column($enabled, 'localeKey'));
-        $locales = $out->validate($enabled);
+        $locales = $this->getEventManager()->fireFilter('localesApiController_getOutput', $enabled, false);
+        $locales = $out->validate($locales);
 
         return $locales;
     }
@@ -154,7 +156,7 @@ class LocalesApiController extends Controller {
         $locale = array_column($allLocales, null, 'localeID')[$id];
         $this->expandDisplayNames($locale, array_column($allLocales, 'localeKey'));
 
-        $locale = $this->getEventManager()->fireFilter('localesApiController_getOutput', $locale);
+        $locale = $this->getEventManager()->fireFilter('localesApiController_getOutput', $locale, true);
         $locale = \Vanilla\ApiUtils::convertOutputKeys($locale);
         $out->validate($locale);
         return new Data($locale);

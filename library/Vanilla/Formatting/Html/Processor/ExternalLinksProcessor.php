@@ -19,6 +19,9 @@ class ExternalLinksProcessor extends HtmlProcessor {
     /** @var Gdn_Request */
     private $request;
 
+    /** @var bool */
+    private $warnLeaving = true;
+
     /**
      * Setup the class.
      *
@@ -38,12 +41,12 @@ class ExternalLinksProcessor extends HtmlProcessor {
     }
 
     /**
-     * Setter to enable/disable the Ex
+     * Should external links be redirected through the leaving page?
      *
-     * @param bool $value
+     * @param bool $warnLeaving
      */
-    public function setEnabled(bool $value = true) {
-        $this->enabled = $value;
+    public function setWarnLeaving(bool $warnLeaving): void {
+        $this->warnLeaving = $warnLeaving;
     }
 
     /**
@@ -53,6 +56,11 @@ class ExternalLinksProcessor extends HtmlProcessor {
      * @return HtmlDocument
      */
     public function processDocument(HtmlDocument $document): HtmlDocument {
+        // Currently, this processor only redirects external links to the leaving page. If we aren't doing that, bail.
+        if ($this->warnLeaving === false) {
+            return $document;
+        }
+
         $linkNodes = $document->getDom()->getElementsByTagName('a');
 
         if ($linkNodes->length > 0) {

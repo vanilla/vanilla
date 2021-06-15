@@ -12,9 +12,10 @@ interface IProps {
     checked?: boolean;
     onChange: () => any;
     children: (props: { checked: boolean; disabled: boolean }) => JSX.Element;
+    title?: string;
 }
 
-const ActsAsCheckbox: FunctionComponent<IProps> = ({ checked = false, onChange, children }) => {
+const ActsAsCheckbox: FunctionComponent<IProps> = ({ checked = false, onChange, title, children }) => {
     const classes = actsAsCheckboxClasses();
 
     const [disabled, setDisabled] = useState(false);
@@ -27,7 +28,7 @@ const ActsAsCheckbox: FunctionComponent<IProps> = ({ checked = false, onChange, 
     const id = useUniqueID();
 
     return (
-        <label htmlFor={id} className={classes.label}>
+        <label htmlFor={id} className={classes.label} title={title}>
             <input
                 id={id}
                 type="checkbox"
@@ -35,6 +36,7 @@ const ActsAsCheckbox: FunctionComponent<IProps> = ({ checked = false, onChange, 
                 onChange={handleChange}
                 checked={checked}
                 disabled={disabled}
+                aria-label={title}
             />
             {children({
                 checked,

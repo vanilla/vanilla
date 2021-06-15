@@ -752,8 +752,6 @@ class UsersTest extends AbstractResourceTest {
         $this->assertArrayHasKey('dateLastActive', $response);
         $this->assertArrayHasKey('countDiscussions', $response);
         $this->assertArrayHasKey('countComments', $response);
-
-        $this->assertArrayNotHasKey('banned', $response);
     }
 
     /**

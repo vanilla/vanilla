@@ -127,7 +127,11 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
         // GDN cache has local caching by default.
         $result = $cache->get(self::DEFAULT_CACHE_KEY);
         if ($result === Gdn_Cache::CACHEOP_FAILURE) {
-            $rows = self::getWhereStatic(['IsDefault' => 1]);
+            try {
+                $rows = self::getWhereStatic(['IsDefault' => 1]);
+            } catch (\Exception $e) {
+                $rows = [];
+            }
             if (empty($rows)) {
                 $result = false;
             } else {

@@ -31,3 +31,39 @@ export const putTranslationServiceThunk = createAsyncThunk(
         return response.data;
     },
 );
+
+export const getAddonsByTypeThunk = createAsyncThunk("@@config/get-addons", async (params: { values: string }) => {
+    const response = await apiv2.get(`/addons?type=${params.values}`, {});
+    return response.data;
+});
+
+export const patchAddonByIdThunk = createAsyncThunk(
+    "@@config/patch-addon",
+    async (params: { values: string; newConfig: { enabled: boolean; type: string } }) => {
+        const response = await apiv2.patch(`addons/${params.values}`, params.newConfig);
+        return response.data;
+    },
+);
+
+export const getAvailableLocalesThunk = createAsyncThunk("@@config/get-available-locales", async () => {
+    const response = await apiv2.get(`/locales`, {});
+    return response.data;
+});
+
+export const getServicesByLocaleThunk = createAsyncThunk(
+    "@@config/get-service-by-locale",
+    async (params: { localeID: string }) => {
+        const response = await apiv2.get(`/locales/${params.localeID}`, {});
+        return response.data;
+    },
+);
+
+export const patchServicesByLocaleThunk = createAsyncThunk(
+    "@@config/patch-service-by-locale",
+    async (params: { localeID: string; service: string }) => {
+        const response = await apiv2.patch(`/locales/${params.localeID}`, {
+            translationService: params.service,
+        });
+        return response.data;
+    },
+);

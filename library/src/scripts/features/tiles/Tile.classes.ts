@@ -15,6 +15,7 @@ import { useThemeCache } from "@library/styles/themeCache";
 import { percent } from "csx";
 import { TileAlignment } from "@library/features/tiles/TileAlignment";
 import { tileVariables } from "./Tile.variables";
+import { css } from "@emotion/css";
 
 export const tileClasses = useThemeCache(() => {
     const vars = tileVariables();
@@ -49,7 +50,7 @@ export const tileClasses = useThemeCache(() => {
                 minHeight = 0;
         }
 
-        return style("link", {
+        return css({
             ...defaultTransition("box-shadow", "border"),
             ...Mixins.padding(vars.link.padding),
             display: "block",
@@ -89,12 +90,12 @@ export const tileClasses = useThemeCache(() => {
         });
     });
 
-    const main = style("main", {
+    const main = css({
         position: "relative",
     });
 
     const { height, width } = vars.frame;
-    const frame = style("iconFrame", {
+    const frame = css({
         display: "flex",
         alignItems: "center",
         justifyContent: vars.options.alignment,
@@ -107,7 +108,7 @@ export const tileClasses = useThemeCache(() => {
         marginBottom: styleUnit(vars.frame.marginBottom),
     });
 
-    const icon = style("icon", {
+    const icon = css({
         display: "block",
         position: "absolute",
         top: 0,
@@ -120,13 +121,13 @@ export const tileClasses = useThemeCache(() => {
         maxHeight: percent(100),
     });
 
-    const title = style("title", {
+    const title = css({
         ...Mixins.font(vars.title.font),
         textAlign: vars.options.alignment,
         marginBottom: styleUnit(vars.title.marginBottom),
     });
 
-    const description = style("description", {
+    const description = css({
         position: "relative",
         marginTop: styleUnit(vars.description.marginTop),
         fontSize: styleUnit(vars.description.fontSize),
@@ -134,8 +135,7 @@ export const tileClasses = useThemeCache(() => {
         textAlign: vars.options.alignment,
     });
 
-    const fallBackIcon = style(
-        "fallbackIcon",
+    const fallBackIcon = css(
         {
             width: styleUnit(vars.fallBackIcon.width),
             height: styleUnit(vars.fallBackIcon.height),

@@ -10,14 +10,14 @@ import { ButtonTypes } from "@library/forms/buttonTypes";
 import { useUniqueID } from "@library/utility/idUtils";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import FlyoutToggle from "@library/flyouts/FlyoutToggle";
-import classNames from "classnames";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
-import { DropDownMenuIcon } from "@library/icons/common";
+import { Icon } from "@vanilla/icons";
 import FrameHeader from "@library/layout/frame/FrameHeader";
 import { FrameHeaderMinimal } from "@library/layout/frame/FrameHeaderMinimal";
 import { Hoverable, useMeasure } from "@vanilla/react-utils";
 
 import ConditionalWrap from "@library/layout/ConditionalWrap";
+import { cx } from "@emotion/css";
 
 export enum DropDownOpenDirection {
     ABOVE_LEFT = "aboveLeft",
@@ -132,12 +132,12 @@ export default function DropDown(props: IDropDownProps) {
     const handleID = props.handleID ?? ID + "-handle";
     const contentID = props.contentID ?? ID + "-contents";
 
-    const buttonContents = props.buttonContents || <DropDownMenuIcon />;
+    const buttonContents = props.buttonContents || <Icon icon="navigation-ellipsis" />;
 
     return (
         <FlyoutToggle
             id={handleID}
-            className={classNames(props.className)}
+            className={cx(props.className)}
             buttonType={props.buttonType ?? ButtonTypes.ICON}
             name={props.name!}
             buttonContents={buttonContents}
@@ -169,7 +169,7 @@ export default function DropDown(props: IDropDownProps) {
                                 {...params}
                                 contentRef={ownContentRef}
                                 id={contentID}
-                                className={classNames(props.contentsClassName)}
+                                className={cx(props.contentsClassName)}
                                 renderCenter={[
                                     DropDownOpenDirection.ABOVE_CENTER,
                                     DropDownOpenDirection.BELOW_CENTER,
@@ -207,7 +207,7 @@ export default function DropDown(props: IDropDownProps) {
                                 {openAsModal && props.flyoutType === FlyoutType.FRAME ? (
                                     props.children
                                 ) : (
-                                    <ContentTag className={classNames("dropDownItems", classes.items)}>
+                                    <ContentTag className={cx("dropDownItems", classes.items)}>
                                         {props.children}
                                     </ContentTag>
                                 )}

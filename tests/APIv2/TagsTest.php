@@ -82,6 +82,7 @@ class TagsTest extends AbstractResourceTest {
         $results = $this->api()->get("/tags", ["query" => "tag"])->getBody();
         $this->assertEquals(3, count($results));
     }
+
     /**
      * Test GET /tags endpoint.
      */
@@ -99,7 +100,7 @@ class TagsTest extends AbstractResourceTest {
         /** @var \TagModel $tagModel */
         $tagModel = \Gdn::getContainer()->get(\TagModel::class);
 
-        $reactionTag =  $this->createTag([
+        $reactionTag = $this->createTag([
             "name" => "Like",
             "fullName" => "Like",
             "type" => "Reaction"
@@ -139,7 +140,7 @@ class TagsTest extends AbstractResourceTest {
         // Should get an Error.
         $this->expectExceptionCode(409);
         $this->expectExceptionMessage('You cannot delete tags that have associated child tags.');
-        $this->api()->delete($this->baseUrl."/{$tagToDelete['tagID']}");
+        $this->api()->delete($this->baseUrl . "/{$tagToDelete['tagID']}");
     }
 
     /**
@@ -157,12 +158,12 @@ class TagsTest extends AbstractResourceTest {
         $config->saveToConfig('Tagging.Discussions.AllowedTypes', ['', 'someType']);
 
         // Tag it.
-        $this->api()->post("discussions/{$discussion["discussionID"]}/tags", ["tagIDs" =>[$tagToDelete["tagID"]]]);
+        $this->api()->post("discussions/{$discussion["discussionID"]}/tags", ["tagIDs" => [$tagToDelete["tagID"]]]);
 
         // Should get an Error.
         $this->expectExceptionCode(409);
         $this->expectExceptionMessage('You cannot delete tags that have associated discussions.');
-        $this->api()->delete($this->baseUrl."/{$tagToDelete['tagID']}");
+        $this->api()->delete($this->baseUrl . "/{$tagToDelete['tagID']}");
     }
 
     /**
@@ -284,11 +285,11 @@ class TagsTest extends AbstractResourceTest {
         ];
 
         $returnedTag = $this->api()->post($this->baseUrl, $tag)->getBody();
-        $tagWithParent = $this->api()->get($this->baseUrl."/".$returnedTag['tagID'])->getBody();
+        $tagWithParent = $this->api()->get($this->baseUrl . "/" . $returnedTag['tagID'])->getBody();
         // Make sure the parent tag ID is there.
         $this->assertSame($tagWithParent['parentTagID'], 1);
-        $this->api()->patch($this->baseUrl."/".$returnedTag['tagID'], ['parentTagID' => null]);
-        $nullifiedParentTag = $this->api()->get($this->baseUrl."/".$returnedTag['tagID'])->getBody();
+        $this->api()->patch($this->baseUrl . "/" . $returnedTag['tagID'], ['parentTagID' => null]);
+        $nullifiedParentTag = $this->api()->get($this->baseUrl . "/" . $returnedTag['tagID'])->getBody();
         // The parent tag ID only comes back if there is one, which there shouldn't be in this case.
         $this->assertArrayNotHasKey('parentTagID', $nullifiedParentTag);
     }
@@ -303,12 +304,53 @@ class TagsTest extends AbstractResourceTest {
         ];
 
         $returnedTag = $this->api()->post($this->baseUrl, $tag)->getBody();
-        $tagWithTypeNonEmptyString = $this->api()->get($this->baseUrl."/".$returnedTag['tagID'])->getBody();
+        $tagWithTypeNonEmptyString = $this->api()->get($this->baseUrl . "/" . $returnedTag['tagID'])->getBody();
         // Check that the type was applied.
         $this->assertSame($tag['type'], $tagWithTypeNonEmptyString['type']);
-        $this->api()->patch($this->baseUrl."/".$returnedTag['tagID'], ['type' => '']);
-        $tagWithTypeEmptyString = $this->api()->get($this->baseUrl."/".$returnedTag['tagID'])->getBody();
+        $this->api()->patch($this->baseUrl . "/" . $returnedTag['tagID'], ['type' => '']);
+        $tagWithTypeEmptyString = $this->api()->get($this->baseUrl . "/" . $returnedTag['tagID'])->getBody();
         // The type should not come through because it's returned as a null value.
         $this->assertArrayNotHasKey('type', $tagWithTypeEmptyString);
+    }
+
+    /**
+     * Test that tags with types in the Tagging.Discussions.AllowedTypes config array are editable.
+     *
+     * @throws \Garden\Container\ContainerException Container Exception.
+     * @throws \Garden\Container\NotFoundException Not Found Exception.
+     */
+    public function testCanEditAllowedTypes() {
+        $config = \Gdn::getContainer()->get(\Gdn_Configuration::class);
+        $config->saveToConfig('Tagging.Discussions.AllowedTypes', ['', 'allowed', 'notAllowed']);
+        $config->saveToConfig('Tagging.Discussions.Enabled', true);
+        $allowedTag = [
+            'name' => 'allowed tag',
+            'type' => 'allowed',
+        ];
+        $notAllowedTag = [
+            'name' => 'not allowed tag',
+            'type' => 'notAllowed',
+        ];
+        $returnedAllowed = $this->api()->post($this->baseUrl, $allowedTag)->getBody();
+        $returnedNotAllowed = $this->api()->post($this->baseUrl, $notAllowedTag)->getBody();
+        $tagSettingsHtml = $this->bessy()->getHtml("/settings/tagging")->getInnerHtml();
+        $this->assertStringContainsString($this->createEditLink($returnedAllowed['tagID']), $tagSettingsHtml);
+        $this->assertStringContainsString($this->createEditLink($returnedNotAllowed['tagID']), $tagSettingsHtml);
+
+        // Now we're going to remove the "notAllowed" tag from the allowed types, and only the 'allowed tag' should be returned.
+        $config->saveToConfig('Tagging.Discussions.AllowedTypes', ['', 'allowed']);
+        $updatedTagSettingsHtml = $this->bessy()->getHtml("/settings/tagging")->getInnerHtml();
+        $this->assertStringContainsString($this->createEditLink($returnedAllowed['tagID']), $updatedTagSettingsHtml);
+        $this->assertStringNotContainsString($this->createEditLink($returnedNotAllowed['tagID']), $updatedTagSettingsHtml);
+    }
+
+    /**
+     * Create the edit link with the appropriateTagID for the
+     *
+     * @param int $tagID
+     * @return string
+     */
+    public function createEditLink(int $tagID): string {
+        return 'href="/tagstest/settings/tags/edit/' . $tagID . '"';
     }
 }

@@ -8,9 +8,10 @@ import { css } from "@emotion/css";
 
 interface FormGroupClassesProps {
     sideBySide?: boolean;
+    compact?: boolean;
 }
 
-export const formGroupClasses = ({ sideBySide }: FormGroupClassesProps) => ({
+export const formGroupClasses = ({ sideBySide, compact }: FormGroupClassesProps) => ({
     formGroup: css({
         margin: "8px 0",
 
@@ -20,14 +21,34 @@ export const formGroupClasses = ({ sideBySide }: FormGroupClassesProps) => ({
                   flexDirection: "row",
                   alignItems: "center",
                   justifyContent: "space-between",
+
+                  ...(compact
+                      ? {}
+                      : {
+                            borderBottom: "1px dotted #e7e8e9",
+                            padding: "16px 0",
+
+                            "&:last-of-type": {
+                                borderBottom: 0,
+                            },
+                        }),
               }
             : {}),
     }),
+    inputContainer: css({
+        ...(sideBySide ? { flex: 12 } : {}),
+    }),
+    labelContainer: css({
+        ...(sideBySide ? { flex: 10 } : { marginBottom: 8 }),
+    }),
     label: css({
-        display: "inline-block",
-        fontSize: "13px",
+        fontSize: "14px",
         fontWeight: 600,
-
-        ...(sideBySide ? {} : { marginBottom: 8 }),
+        marginBottom: 2,
+    }),
+    description: css({
+        fontSize: "12px",
+        color: "#949aa2",
+        marginBottom: 0,
     }),
 });

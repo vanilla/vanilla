@@ -9,7 +9,7 @@ import { formElementsVariables } from "@library/forms/formElementStyles";
 import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { Mixins } from "@library/styles/Mixins";
-import { pointerEvents, singleBorder } from "@library/styles/styleHelpers";
+import { pointerEvents, singleBorder, unit } from "@library/styles/styleHelpers";
 import { styleUnit } from "@library/styles/styleUnit";
 import { styleFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
@@ -245,6 +245,22 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         },
     });
 
+    const msg = style("msg", {
+        fontSize: globalVars.fonts.size.small,
+        ...Mixins.margin({
+            top: unit(4),
+            bottom: unit(4),
+        }),
+    });
+
+    const msgMinimal = style("msgMinimal", {
+        fontSize: globalVars.fonts.size.small,
+        ...Mixins.margin({
+            top: unit(10),
+            bottom: unit(14),
+        }),
+    });
+
     return {
         container,
         containerWithBorder,
@@ -268,5 +284,7 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         metaContainer,
         row,
         metas,
+        msg,
+        msgMinimal,
     };
 });

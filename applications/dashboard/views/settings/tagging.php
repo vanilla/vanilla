@@ -79,9 +79,10 @@ $enabled = c('Tagging.Discussions.Enabled');
         <?php foreach ($tags as $tag) :
             $count = val('CountDiscussions', $tag, 0);
             $displayName = tagFullName($tag);
+            $allowedTypes = Gdn::config('Tagging.Discussions.AllowedTypes', ['']);
             $dropdown = '';
 
-            if ((val('Type', $tag, '') == '')) {
+            if (in_array(val('Type', $tag, ''), $allowedTypes)) {
                 // add dropdown
                 $dropdown = new DropdownModule('dropdown', '', '', 'dropdown-menu-right');
                 $dropdown->setView('dropdown-twbs')

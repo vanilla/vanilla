@@ -917,6 +917,9 @@ body.Section-Group {
 .DataTable-ReactionsLog {
     border-radius: 4px;
     overflow: hidden;
+    width: 100%;
+    margin: 0!important;
+    border-collapse: collapse;
 
     tbody {
         border-spacing: 0 $component-item_spacing;
@@ -935,16 +938,21 @@ body.Section-Group {
     .Item {
         background-color: $component_bg;
 
+        &:not(:last-of-type) {
+            border-bottom: 1px solid $global-color_whitesmoke;
+        }
+
         td {
             border: 0 !important;
             border-radius: 0 !important;
-            background-color: $theme-hover_color;
-            vert-align: middle;
+            vertical-align: middle;
+            padding: 4px 0!important;
         }
     }
 
     .ReactionsLog-Date {
         width: 16ex;
+        text-indent: 4px;
     }
 
     .ReactionsLog-User {
@@ -952,7 +960,7 @@ body.Section-Group {
 
         a {
             @include ellipsis;
-            display: inline-block;
+            display: inline;
             color: $component-meta-link_color;
 
             &:focus,

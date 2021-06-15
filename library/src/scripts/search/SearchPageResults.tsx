@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -22,9 +22,8 @@ import { makeSearchUrl } from "@library/search/SearchPageRoute";
 import { formatUrl, t } from "@library/utility/appUtils";
 import qs from "qs";
 import { sprintf } from "sprintf-js";
-import SmartLink from "@library/routing/links/SmartLink";
-import { metasClasses } from "@library/metas/Metas.styles";
 import PanelWidgetHorizontalPadding from "@library/layout/components/PanelWidgetHorizontalPadding";
+import { MetaLink } from "@library/metas/Metas";
 
 interface IProps {}
 
@@ -137,11 +136,10 @@ function MetaFactory(props: { searchResult: ISearchResult }) {
         const url = `${root}${searchPath}?${queryString}`;
         const text = sprintf(t("%s results"), searchResult.subqueryMatchCount);
 
-        const classesMeta = metasClasses();
         extraResults = (
-            <SmartLink to={url} className={classesMeta.metaLink} style={{ fontWeight: "bold" }}>
+            <MetaLink to={url} style={{ fontWeight: "bold" }}>
                 {text}
-            </SmartLink>
+            </MetaLink>
         );
     }
 

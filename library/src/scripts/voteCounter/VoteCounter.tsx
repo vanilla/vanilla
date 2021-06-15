@@ -9,6 +9,7 @@ import { DownvoteIcon, UpvoteIcon } from "@library/icons/common";
 import { voteCounterClasses } from "@library/voteCounter/VoteCounter.styles";
 import { cx } from "@emotion/css";
 import ActsAsCheckbox from "@library/forms/ActsAsCheckbox";
+import { t } from "@vanilla/i18n";
 
 export interface IProps {
     upvoted?: boolean;
@@ -38,7 +39,7 @@ const VoteCounter: FunctionComponent<IProps> = ({
 
     if (onToggleUpvoted) {
         upvote = (
-            <ActsAsCheckbox checked={upvoted} onChange={onToggleUpvoted}>
+            <ActsAsCheckbox checked={upvoted} onChange={onToggleUpvoted} title={t("Upvote")}>
                 {({ disabled }) => (
                     <UpvoteIcon
                         className={cx(icon, {
@@ -54,7 +55,7 @@ const VoteCounter: FunctionComponent<IProps> = ({
 
     if (onToggleDownvoted) {
         downvote = (
-            <ActsAsCheckbox checked={downvoted} onChange={onToggleDownvoted}>
+            <ActsAsCheckbox checked={downvoted} onChange={onToggleDownvoted} title={t("Downvote")}>
                 {({ disabled }) => (
                     <DownvoteIcon
                         className={cx(icon, {

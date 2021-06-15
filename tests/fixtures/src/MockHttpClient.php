@@ -42,7 +42,7 @@ class MockHttpClient extends HttpClient {
      * @inheritdoc
      */
     public function request(string $method, string $uri, $body, array $headers = [], array $options = []) {
-        $key = $this->makeMockResponseKey($uri, $method);
+        $key = $this->makeMockResponseKey($uri, $method, $body);
 
         // Lookup an existing mock response or send back a 404.
         $this->currentResponse = $this->mockedResponses[$key] ?? new HttpResponse(404);

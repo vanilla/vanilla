@@ -251,6 +251,13 @@ export class Mixins {
         return spacingVals;
     }
 
+    static verticallyAlignInContainer(height: number, containerHeight: number): CSSObject {
+        return {
+            transform: `translateY(-${Math.abs((containerHeight - height) / 2)}px)`,
+            verticalAlign: "top",
+        };
+    }
+
     /**
      * Space out all the direct children of the component by an even amount _inside_ the component.
      */

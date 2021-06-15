@@ -124,14 +124,18 @@ class HomeController extends Gdn_Controller {
      */
     public function leaving($target = '', $allowTrusted = false) {
         $target = str_replace("\xE2\x80\xAE", '', $target);
+
+        $canAutoRedirect = $allowTrusted && $this->canAutoRedirect($target);
+        if ($canAutoRedirect) {
+            redirectTo($target, 302, false);
+        }
+
         try {
             $target = UrlUtils::domainAsAscii($target);
         } catch (Exception $e) {
             throw new Gdn_UserException(t('Url is invalid.'));
         }
-        if ($allowTrusted && isTrustedDomain($target)) {
-            redirectTo($target, 302, false);
-        }
+
         $this->setData('Target', anchor(htmlspecialchars($target), $target, '', ['rel' => 'nofollow']));
         $this->title(t('Leaving'));
         $this->removeCssFile('admin.css');
@@ -255,5 +259,37 @@ class HomeController extends Gdn_Controller {
         } else {
             $this->renderException(permissionException());
         }
+    }
+
+    /**
+     * Can a URL be safely redirect to? Compares the target URL domain against trusted and upload domains.
+     *
+     * @param string $target
+     * @return bool
+     */
+    private function canAutoRedirect(string $target): bool {
+        $targetDomain = parse_url($target, PHP_URL_HOST);
+
+        if ($target === null) {
+            return true;
+        }
+
+        if (!is_string($target)) {
+            return false;
+        }
+
+        if (isTrustedDomain($targetDomain)) {
+            return true;
+        }
+
+        $upload = new \Gdn_Upload();
+        foreach ($upload->getUploadWebPaths() as $uploadPath) {
+            $uploadDomain = parse_url($uploadPath, PHP_URL_HOST);
+            if ($targetDomain === $uploadDomain) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

@@ -16,6 +16,7 @@ use VanillaTests\SiteTestCase;
 use Garden\EventManager;
 use Vanilla\Dashboard\Events\UserEvent;
 use \UserModel;
+use VanillaTests\UsersAndRolesApiTestTrait;
 use VanillaTests\VanillaTestCase;
 use ActivityModel;
 
@@ -24,6 +25,7 @@ use ActivityModel;
  */
 class UserModelTest extends SiteTestCase {
     use EventSpyTestTrait;
+    use UsersAndRolesApiTestTrait;
 
     public static $addons = ['vanilla', 'dashboard', 'conversations'];
 

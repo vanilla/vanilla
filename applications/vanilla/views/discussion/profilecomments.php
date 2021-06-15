@@ -20,7 +20,7 @@ foreach ($this->data('Comments') as $Comment) {
     $User = userBuilder($Comment, 'Insert');
     $this->EventArguments['User'] = $User;
     ?>
-    <li id="<?php echo 'Comment_'.$Comment->CommentID; ?>" class="Item">
+    <li id="<?php echo 'Comment_'.$Comment->CommentID; ?>" class="Item pageBox">
         <?php $this->fireEvent('BeforeItemContent'); ?>
         <div class="ItemContent">
             <div class="Message">

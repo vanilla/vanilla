@@ -5,9 +5,5 @@
  */
 
 export * from "./AutoComplete";
-export * from "./AutoCompleteInput";
-export * from "./AutoCompleteList";
 export * from "./AutoCompleteOption";
-export * from "./AutoCompleteOptionText";
-export * from "./AutoCompletePopover";
-export * from "./utils";
+export * from "./AutoCompleteLookupOptions";

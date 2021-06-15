@@ -6,7 +6,7 @@
 
 import apiv2 from "@library/apiv2";
 import gdn from "@library/gdn";
-import Permission from "@library/features/users/Permission";
+import Permission, { hasPermission } from "@library/features/users/Permission";
 import UserActions from "@library/features/users/UserActions";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
@@ -15,19 +15,20 @@ import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator"
 import DropDownSection from "@library/flyouts/items/DropDownSection";
 import DropDownUserCard from "@library/flyouts/items/DropDownUserCard";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
-import { getSiteSection, t } from "@library/utility/appUtils";
+import { getMeta, getSiteSection, t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React from "react";
 import { connect } from "react-redux";
 import { DropDownEditProfileLink } from "@library/flyouts/items/DropDownEditProfileLink";
 import { extraUserDropDownComponents } from "@library/headers/mebox/pieces/UserDropdownExtras";
+import { useSignOutLink } from "@library/contexts/EntryLinkContext";
 
 /**
  * Implements User Drop down for header
  */
 function UserDropDownContentsImpl(props: IProps) {
     const { userInfo } = props;
-    const signOutUrl = gdn.meta.signOutUrl ?? `/entry/signout?target=${window.location.href}`;
+    const signOutUrl = useSignOutLink();
     const siteSection = getSiteSection();
     if (!userInfo) {
         return null;
@@ -39,6 +40,8 @@ function UserDropDownContentsImpl(props: IProps) {
     };
 
     const classesDropDown = dropDownClasses();
+
+    const reportUrl = getMeta("reporting.url", null);
 
     return (
         <ul className={classNames(classesDropDown.verticalPadding, props.className)}>
@@ -81,6 +84,7 @@ function UserDropDownContentsImpl(props: IProps) {
                         name={t("Moderation Queue")}
                         count={getCountByName("ModerationQueue")}
                     />
+                    {reportUrl && <DropDownItemLinkWithCount to={reportUrl} name={t("Reported Posts")} />}
                 </DropDownSection>
             </Permission>
             <DropDownItemSeparator />

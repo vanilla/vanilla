@@ -8,20 +8,21 @@ import SmartLink from "@library/routing/links/SmartLink";
 import React from "react";
 import { LocationDescriptor } from "history";
 import { cx } from "@emotion/css";
-import { metasClasses } from "@library/metas/Metas.styles";
+import { tagClasses } from "@library/metas/Tags.styles";
+import { TagPreset } from "@library/metas/Tags.variables";
 
 interface IProps extends React.HTMLAttributes<HTMLSpanElement> {
     to?: LocationDescriptor;
+    preset?: TagPreset;
 }
 
-export function Tag(_props: IProps) {
-    const { to, className, ...props } = _props;
-    const classes = metasClasses();
-    const componentClasses = cx(classes.metaLabel, className);
+export function Tag(props: IProps) {
+    const { to, className, preset = TagPreset.STANDARD, ...rest } = props;
+    const classes = tagClasses();
 
     if (to) {
-        return <SmartLink {...props} to={to} className={componentClasses}></SmartLink>;
+        return <SmartLink {...rest} to={to} className={cx([classes[preset](true), className])}></SmartLink>;
     } else {
-        return <span {...props} className={componentClasses}></span>;
+        return <span {...rest} className={cx(classes[preset](false), className)}></span>;
     }
 }

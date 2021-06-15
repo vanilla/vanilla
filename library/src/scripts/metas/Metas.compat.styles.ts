@@ -1,15 +1,22 @@
 /**
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * Compatibility styles, using the color variables.
+ *
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
+
+import { styleUnit } from "@library/styles/styleUnit";
 import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
-import { metaContainerStyle, metaItemStyle, metaLabelStyle, metaLinkItemStyle } from "@library/metas/Metas.styles";
+import { metaContainerStyle, metaItemStyle, metaLinkItemStyle } from "@library/metas/Metas.styles";
+import { tagMixin } from "@library/metas/Tags.styles";
 import { metasVariables } from "@library/metas/Metas.variables";
 import { Mixins } from "@library/styles/Mixins";
-import { tagLinkStyle } from "@dashboard/compatibilityStyles/forumTagStyles";
+
+import { tagPresetVariables, tagsVariables } from "@library/metas/Tags.variables";
 
 export const metasCSS = () => {
-    const vars = metasVariables();
+    const metasVars = metasVariables();
+    const presets = tagPresetVariables();
 
     cssOut(`.Meta.Meta, .AuthorInfo`, {
         ...metaContainerStyle(),
@@ -28,11 +35,13 @@ export const metasCSS = () => {
             },
         },
         "& .Tag": {
-            ...metaLabelStyle(),
+            ...tagMixin(tagsVariables(), presets.standard, false),
+            ...Mixins.margin(metasVars.spacing),
             background: "none",
         },
         "& a.Tag": {
-            ...tagLinkStyle(),
+            ...tagMixin(tagsVariables(), presets.standard, true),
+            ...Mixins.margin(metasVars.spacing),
         },
 
         "& .MItem > .Tag": {
@@ -63,7 +72,7 @@ export const metasCSS = () => {
     cssOut(".BlockColumn.BlockColumn", {
         "& .Meta > *": {
             marginLeft: 0,
-            marginRight: (vars.spacing.horizontal! as number) * 2,
+            marginRight: (metasVars.spacing.horizontal! as number) * 2,
         },
     });
 
@@ -78,7 +87,51 @@ export const metasCSS = () => {
     // Look at category list view.
     cssOut(".ChildCategories", {
         ...Mixins.margin({
-            horizontal: vars.spacing.horizontal,
+            horizontal: metasVars.spacing.horizontal,
+        }),
+    });
+};
+
+function mixinMetaLinkContainer(selector: string): void {
+    cssOut(selector, {
+        a: {
+            ...metaLinkItemStyle(),
+            fontSize: "inherit",
+            textDecoration: "underline",
+        },
+    });
+}
+
+export const forumMetaCSS = () => {
+    mixinMetaLinkContainer(`.Container .Frame-contentWrap .ChildCategories`);
+
+    cssOut(`.Tag`, {
+        background: "none",
+    });
+
+    cssOut(`.MItem.RoleTracker`, {
+        ...Mixins.margin({ all: 0 }),
+        ...Mixins.padding({ all: 0 }),
+        ...{
+            "& a:not(.Tag)": {
+                ...Mixins.margin({ all: 0 }),
+                ...Mixins.padding({ all: 0 }),
+            },
+        },
+    });
+
+    const linkColors = Mixins.clickable.itemState();
+    const inlineTagSelector = `.InlineTags.Meta a`;
+    cssOut(inlineTagSelector, {
+        ...linkColors,
+    });
+
+    // FIXME: Where is this?
+    cssOut(`.MItem img`, {
+        width: "auto",
+        height: styleUnit(12),
+        ...Mixins.padding({
+            left: 12,
         }),
     });
 };

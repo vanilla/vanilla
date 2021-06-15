@@ -46,7 +46,7 @@ import { LinkContextProvider } from "@library/routing/links/LinkContextProvider"
 import History from "history";
 import { Backgrounds } from "@library/layout/Backgrounds";
 import { PlacesSearchTypeFilter } from "@dashboard/components/panels/PlacesSearchTypeFilter";
-import PanelWidgetVerticalPadding from "@library/layout/components/PanelWidgetVerticalPadding";
+import moment from "moment";
 
 interface IProps {
     placeholder?: string;
@@ -235,7 +235,7 @@ function SearchPage(props: IProps) {
 }
 
 function useInitialQueryParamSync() {
-    const { updateForm, resetForm, form, search } = useSearchForm<{}>();
+    const { updateForm, resetForm, form } = useSearchForm<{}>();
     const history = useHistory();
     const location = useLocation();
     const searchScope = useSearchScope();
@@ -270,7 +270,11 @@ function useInitialQueryParamSync() {
                 queryForm[key] = false;
             }
 
-            if (typeof value === "string" && Number.isInteger(parseInt(value, 10))) {
+            if (
+                typeof value === "string" &&
+                !moment(value, "YYYY-MM-DD", true).isValid() && //don't replace dates in the query
+                Number.isInteger(parseInt(value, 10))
+            ) {
                 queryForm[key] = parseInt(value, 10);
             }
 

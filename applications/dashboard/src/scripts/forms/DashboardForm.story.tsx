@@ -23,6 +23,7 @@ import { t } from "@library/utility/appUtils";
 import Translate from "@library/content/Translate";
 import { DashboardFormListItem } from "@dashboard/forms/DashboardFormListItem";
 import { Icon } from "@vanilla/icons";
+import { DashboardMediaAddonListItem } from "@dashboard/forms/DashboardMediaAddonListItem";
 
 export default {
     title: "Dashboard/Forms",
@@ -266,5 +267,50 @@ export function ListItemsWithStatus() {
                 />
             </DashboardFormList>
         </StoryContent>
+    );
+}
+
+export function MediaAddonListItems() {
+    const [isEnabled, setIsEnabled] = useState({
+        one: true,
+        two: false,
+        three: true,
+    });
+    return (
+        <>
+            <StoryHeading depth={1}>Media Addon List Items</StoryHeading>
+            <DashboardFormList>
+                <DashboardMediaAddonListItem
+                    iconUrl={"https://staff.vanillaforums.com/locales/vf_en_GB/en_GB.svg"}
+                    title={"English (United Kingdom)"}
+                    description={
+                        "Official English (United Kingdom) language translations for Vanilla. Help contribute to this translation by going to its translation site here. This locale is for British English. If you want to use the default American English you don't need to enable a specific locale pack."
+                    }
+                    isEnabled={isEnabled.one}
+                    onChange={(bool) => setIsEnabled((prevState) => ({ ...prevState, one: bool }))}
+                    action={() => null}
+                    actionLabel={"Configure"}
+                    actionIcon={<Icon icon={"dashboard-edit"} />}
+                />
+                <DashboardMediaAddonListItem
+                    title={"A Locale Pack without and icon"}
+                    description={"Custom translations made for a specific client"}
+                    isEnabled={isEnabled.two}
+                    onChange={(bool) => setIsEnabled((prevState) => ({ ...prevState, two: bool }))}
+                />
+                <DashboardMediaAddonListItem
+                    iconUrl={"https://staff.vanillaforums.com/locales/vf_fr_CA/fr_CA.svg"}
+                    title={"Français (Canada) / French (Canada)"}
+                    description={
+                        "Official French (Canada) language translations for Vanilla. Help contribute to this translation by going to its translation site here."
+                    }
+                    isEnabled={isEnabled.three}
+                    onChange={(bool) => setIsEnabled((prevState) => ({ ...prevState, three: bool }))}
+                    action={() => null}
+                    actionLabel={"Configure"}
+                    actionIcon={<Icon icon={"dashboard-edit"} />}
+                />
+            </DashboardFormList>
+        </>
     );
 }

@@ -33,6 +33,8 @@ use Vanilla\Web\APIExpandMiddleware;
 class ProfileExtenderPlugin extends Gdn_Plugin {
     const FIELD_EXTENDED = "extended";
 
+    const EXPORT_PROFILE_CHUNK = 50000;
+
     /** @var array */
     public $MagicLabels = ['Twitter', 'Google', 'Facebook', 'LinkedIn', 'GitHub', 'Instagram', 'Website', 'Real Name'];
 
@@ -149,8 +151,12 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
         }
         $ProfileFields = $this->getProfileFields();
         $sender->RegistrationFields = [];
+        $isOnConnect = $sender->Request->getPath() === '/entry/connect';
         foreach ($ProfileFields as $Name => $Field) {
-            if (val('OnRegister', $Field) && val('FormType', $Field) != 'CheckBox') {
+            $isCheckBox = $Field['FormType'] === 'CheckBox';
+            // CheckBox can be displayed through "registerBeforePassword" event only on connect.
+            $isCheckBoxOnConnect = $isOnConnect && $isCheckBox;
+            if (val('OnRegister', $Field) && (!$isCheckBox || $isCheckBoxOnConnect)) {
                 $sender->RegistrationFields[$Name] = $Field;
             }
         }
@@ -747,27 +753,17 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
         return $values[$userID] ?? [];
     }
 
+
     /**
-     * Endpoint to export basic user data along with all custom fields into CSV.
+     * Create the query to export profiles.
      *
-     * @param UtilityController $sender
+     * @param array $columnNames
+     * @param array $fields
+     * @return Gdn_SQLDriver
      */
-    public function utilityController_exportProfiles_create($sender) {
-        // Clear our ability to do this.
-        $sender->permission('Garden.Settings.Manage');
-        if (Gdn::userModel()->pastUserMegaThreshold()) {
-            throw new Gdn_UserException('You have too many users to export automatically.');
-        }
-
-        // Determine profile fields we need to add.
-        $fields = $this->getProfileFields();
-        $columnNames = [
-            'Name', 'Email', 'Joined', 'Last Seen', 'LastIPAddress', 'Discussions', 'Comments', 'Visits', 'Points',
-            'InviteUserID', 'InvitedByName', 'Location', 'Roles'
-        ];
-
+    private function exportProfilesQuery(array $columnNames, array $fields) {
         // Set up our basic query.
-        Gdn::sql()
+        $exportProfilesSQL = Gdn::sql()
             ->select([
                 'u.Name',
                 'u.Email',
@@ -789,22 +785,23 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             ->join('Role r', 'r.RoleID = ur.RoleID')
             ->where('u.Deleted', 0)
             ->where('u.Admin <', 2)
-            ->groupBy('u.UserID');
+            ->groupBy('u.UserID')
+        ;
 
         if (val('DateOfBirth', $fields)) {
             $columnNames[] = 'Birthday';
-            Gdn::sql()->select('u.DateOfBirth');
+            $exportProfilesSQL->select('u.DateOfBirth');
             unset($fields['DateOfBirth']);
         }
 
         if (Gdn::addonManager()->isEnabled('Ranks', \Vanilla\Addon::TYPE_ADDON)) {
             $columnNames[] = 'Rank';
-            Gdn::sql()
+            $exportProfilesSQL
                 ->select('ra.Name as Rank')
                 ->leftJoin('Rank ra', 'ra.RankID = u.RankID');
         }
 
-        $lowerCaseColumnNames =  array_map('strtolower', $columnNames);
+        $lowerCaseColumnNames = array_map('strtolower', $columnNames);
         $i = 0;
         foreach ($fields as $fieldData) {
             $slugName = $fieldData['Name'];
@@ -816,22 +813,55 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             $columnNames[] = val('Label', $fieldData, $slugName);
 
             // Add this field to the query.
-            $quoted = Gdn::sql()->quote("Profile.$slugName");
-            Gdn::sql()
-                ->join('UserMeta a' . $i, "u.UserID = a$i.UserID and a$i.Name = $quoted", 'left')
-                ->select('a' . $i . '.Value', '', $slugName);
+            $quoted = $exportProfilesSQL->quote("Profile.$slugName");
+            $exportProfilesSQL
+                ->join('UserMeta a'.$i, "u.UserID = a$i.UserID and a$i.Name = $quoted", 'left')
+                ->select('a'.$i.'.Value', '', $slugName)
+            ;
             $i++;
         }
 
+        return $exportProfilesSQL;
+    }
+
+    /**
+     * Endpoint to export basic user data along with all custom fields into CSV.
+     *
+     * @param UtilityController $sender
+     */
+    public function utilityController_exportProfiles_create($sender) {
+        // Clear our ability to do this.
+        $sender->permission('Garden.Settings.Manage');
+        if (Gdn::userModel()->pastUserMegaThreshold()) {
+            throw new Gdn_UserException('You have too many users to export automatically.');
+        }
+
+        // Determine profile fields we need to add.
+        $fields = $this->getProfileFields();
+        $columnNames = [
+            'Name', 'Email', 'Joined', 'Last Seen', 'LastIPAddress', 'Discussions', 'Comments', 'Visits', 'Points',
+            'InviteUserID', 'InvitedByName', 'Location', 'Roles',
+        ];
+        $output = fopen("php://output", 'w');
+        header("Content-Type:application/csv");
+        header("Content-Disposition:attachment;filename=profiles_export.csv");
+        fputcsv($output, $columnNames);
+
         // Get our user data.
-        $users = Gdn::sql()->get()->resultArray();
-
-        // Serve a CSV of the results.
-        exportCSV($columnNames, $users);
+        $offset = 0;
+        do {
+            $exportProfilesQuery = $this->exportProfilesQuery($columnNames, $fields);
+            $userDataset = $exportProfilesQuery->limit(self::EXPORT_PROFILE_CHUNK, $offset)->get();
+            while ($user = $userDataset->nextRow(DATASET_TYPE_ARRAY)) {
+                if ($user) {
+                    fputcsv($output, $user);
+                }
+            }
+            // Go to the next chunk.
+            $offset += self::EXPORT_PROFILE_CHUNK;
+        } while ($userDataset->count());
+        fclose($output);
         die();
-
-        // Useful for query debug.
-        // $sender->render('blank');
     }
 
     /**

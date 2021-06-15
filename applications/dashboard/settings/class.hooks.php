@@ -423,17 +423,7 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface {
             ->addLinkIf('Garden.Settings.Manage', t('Labs'), '/settings/labs', 'add-ons.labs', '', $sort, ['badge' => 'New'])
 
             ->addGroup(t('Technical'), 'site-settings', '', ['after' => 'reputation'])
-            ->addLinkIf('Garden.Settings.Manage', t('Locales'), '/settings/locales', 'site-settings.locales', '', $sort)
-            ->addLinkIf(
-                \Vanilla\FeatureFlagHelper::featureEnabled('MachineTranslation') &&
-                $session->checkPermission('Garden.Settings.Manage'),
-                t('Language Settings'),
-                '/settings/language',
-                'site-settings.languages',
-                '',
-                $sort,
-                ['badge' => 'New']
-            )
+            ->addLinkIf('Garden.Settings.Manage', t('Language Settings'), '/settings/language', 'site-settings.languages', '', $sort, ['badge' => 'New'])
             ->addLinkIf('Garden.Settings.Manage', t('Outgoing Email'), '/dashboard/settings/email', 'site-settings.email', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Security'), '/dashboard/settings/security', 'site-settings.security', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Routes'), '/dashboard/routes', 'site-settings.routes', '', $sort)

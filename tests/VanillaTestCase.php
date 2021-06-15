@@ -242,4 +242,63 @@ class VanillaTestCase extends TestCase {
         static::assertSame($re->getDomainAndPath(), $ra->getDomainAndPath(), $message);
         static::assertArraySubsetRecursive($re->getQuery(), $ra->getQuery(), $message);
     }
+
+    /**
+     * Provide the contents of the files in a directory for generating test data.
+     *
+     * This method takes a base directory and an array of file suffixes (including extensions). The file suffixes are
+     * used to group files together so that several files can be used as arguments for a single test.
+     *
+     * It is often much easier to put test data into files so that you can take advantage of syntax highlighting and code formatting.
+     *
+     * Example
+     *
+     * ```
+     * $r = VanillaTestCase::provideFileTests(PATH_FIXTURES.'/foo', '-input.txt', '-expected.txt');
+     * ```
+     *
+     * In this example the directory will provide data for a test method that takes two arguments. The first argument
+     * is populated from files ending in "-input.txt" while the second argument is populated from files ending in "-expected.txt".
+     *
+     * Note: Files ending in .json will be decoded.
+     *
+     * @param string $dir The base directory of the test files.
+     * @param string[] $suffixes The argument suffixes.
+     * @return array Returns a data provider array keyed by the base name of each file without any suffixes.
+     */
+    public static function provideFileTests(string $dir, ...$suffixes): array {
+        if (empty($suffixes)) {
+            $suffixes = [''];
+        }
+        $whitelist = [];
+        if (is_array($suffixes[count($suffixes) - 1])) {
+            $whitelist = array_pop($suffixes);
+        }
+
+        $result = [];
+        $defaults = array_fill(0, count($suffixes), '');
+        foreach ($suffixes as $i => $suffix) {
+            $files = glob("$dir/*$suffix");
+            foreach ($files as $file) {
+                $basename = basename($file);
+                $prefix = substr($basename, 0, -strlen($suffix));
+                if (!empty($whitelist) && !in_array($prefix, $whitelist)) {
+                    continue;
+                }
+
+                $contents = file_get_contents($file);
+
+                switch (pathinfo($file, PATHINFO_EXTENSION)) {
+                    case 'json':
+                        $contents = json_decode($contents, true);
+                        break;
+                }
+
+                $result[$prefix][$i] = $contents;
+                $result[$prefix] += $defaults;
+            }
+        }
+
+        return $result;
+    }
 }

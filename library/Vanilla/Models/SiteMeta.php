@@ -19,6 +19,7 @@ use Vanilla\Search\SearchService;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Theme\ThemeFeatures;
 use Vanilla\Theme\ThemeService;
+use Vanilla\Utility\ArrayUtils;
 use Vanilla\Web\Asset\DeploymentCacheBuster;
 use Vanilla\Formatting\FormatService;
 
@@ -142,6 +143,12 @@ class SiteMeta implements \JsonSerializable {
     /** @var int */
     private $editContentTimeout = -1;
 
+    /** @var bool  */
+    private $bannedPrivateProfiles = false;
+
+    /** @var SiteMetaExtra[] */
+    private $extraMetas = [];
+
     /**
      * SiteMeta constructor.
      *
@@ -209,9 +216,6 @@ class SiteMeta implements \JsonSerializable {
         $this->session = $session;
         $this->userModel = $userModel;
 
-        //Sign Out URL
-        $this->signOutUrl = $session->isValid() ? signOutUrl() : null;
-
         // Theming
         $currentTheme = $themeService->getCurrentTheme();
         $currentThemeAddon = $themeService->getCurrentThemeAddon();
@@ -248,6 +252,15 @@ class SiteMeta implements \JsonSerializable {
         $this->mobileAddressBarColor = $config->get("Garden.MobileAddressBarColor", null);
 
         $this->reCaptchaKey = $config->get("RecaptchaV3.PublicKey", '');
+
+        $this->bannedPrivateProfiles = $config->get("Vanilla.BannedUsers.PrivateProfiles", false);
+    }
+
+    /**
+     * @param SiteMetaExtra $extra
+     */
+    public function addExtra(SiteMetaExtra $extra) {
+        $this->extraMetas[] = $extra;
     }
 
     /**
@@ -261,7 +274,11 @@ class SiteMeta implements \JsonSerializable {
      * @return array
      */
     public function value(): array {
-        return [
+        $extras = array_map(function (SiteMetaExtra $extra) {
+            return $extra->getValue();
+        }, $this->extraMetas);
+
+        return array_replace_recursive([
             'context' => [
                 'host' => $this->assetPath,
                 'basePath' => $this->basePath,
@@ -288,6 +305,7 @@ class SiteMeta implements \JsonSerializable {
                 'fallbackAvatar' => UserModel::getDefaultAvatarUrl(),
                 'currentUser' => $this->userModel->currentFragment(),
                 'editContentTimeout' => $this->editContentTimeout,
+                'bannedPrivateProfile' => $this->bannedPrivateProfiles,
             ],
             'search' => [
                 'defaultScope' => $this->defaultSearchScope,
@@ -299,7 +317,9 @@ class SiteMeta implements \JsonSerializable {
                 'maxUploads' => $this->maxUploads,
                 'allowedExtensions' => $this->allowedExtensions,
             ],
-            'signOutUrl' => $this->signOutUrl,
+            'registrationUrl' => registerUrl(),
+            'signInUrl' => signInUrl(),
+            'signOutUrl' => signOutUrl(),
             'featureFlags' => $this->featureFlags,
             'themeFeatures' => $this->themeFeatures->allFeatures(),
             'addonFeatures' => $this->themeFeatures->allAddonFeatures(),
@@ -307,7 +327,7 @@ class SiteMeta implements \JsonSerializable {
             'themePreview' => $this->themePreview,
             'reCaptchaKey' => $this->reCaptchaKey,
             'TransientKey' => $this->session->transientKey(),
-        ];
+        ], ...$extras);
     }
 
     /**
@@ -440,5 +460,14 @@ class SiteMeta implements \JsonSerializable {
      */
     public function setDynamicPathFolder(string $dynamicPathFolder) {
         $this->dynamicPathFolder = $dynamicPathFolder;
+    }
+
+    /**
+     * Get the configured banned profile setting.
+     *
+     * @return bool
+     */
+    public function getBannedPrivateProfiles(): bool {
+        return $this->bannedPrivateProfiles;
     }
 }

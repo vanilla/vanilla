@@ -21,11 +21,18 @@ trait MockResponseTrait {
      *
      * @param string $uri
      * @param string $method
+     * @param string|array|null $body
      *
      * @return string
      */
-    private function makeMockResponseKey(string $uri, string $method = HttpRequest::METHOD_GET): string {
-        return $method . '-' . $uri;
+    private function makeMockResponseKey(
+        string $uri,
+        string $method = HttpRequest::METHOD_GET,
+        $body = null
+    ): string {
+        $queryBody = is_array($body) ? serialize($body) : $body;
+        $bodyHash = $queryBody ? '-'.md5($queryBody) : '';
+        return $method.'-'.$uri.$bodyHash;
     }
 
     /**
@@ -34,15 +41,16 @@ trait MockResponseTrait {
      * @param string $uri
      * @param HttpResponse $response
      * @param string $method
-     *
+     * @param string|null $bodyRequest
      * @return $this
      */
     public function addMockResponse(
         string $uri,
         HttpResponse $response,
-        string $method = HttpRequest::METHOD_GET
+        string $method = HttpRequest::METHOD_GET,
+        ?string $bodyRequest = null
     ) {
-        $key = $this->makeMockResponseKey($uri, $method);
+        $key = $this->makeMockResponseKey($uri, $method, $bodyRequest);
         $this->mockedResponses[$key] = $response;
         return $this;
     }

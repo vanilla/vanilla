@@ -126,12 +126,13 @@ class BannerImageModel {
         $siteSectionModel = Gdn::getContainer()->get(SiteSectionModel::class);
         $currentSection = $siteSectionModel->getCurrentSiteSection();
         $siteSectionBanner = $currentSection->getBannerImageLink();
+        $siteSectionCategory = $currentSection->getCategoryID();
+        // Use category ID from site section when there is no Category ID or ContextualCategoryID in the controller.
         $categoryID = $controller
-            ? $controller->data('Category.CategoryID', $controller->data('ContextualCategoryID'))
-            : null;
-        $isRootSiteSection = $categoryID === $currentSection->getCategoryID();
+            ? $controller->data('Category.CategoryID', $controller->data('ContextualCategoryID', $siteSectionCategory))
+            : $siteSectionCategory;
         $defaultBanner = $siteSectionBanner ?: Gdn::config(BannerImageModel::DEFAULT_CONFIG_KEY);
-        $field = !$isRootSiteSection ? self::getCategoryField($categoryID, 'BannerImage', $defaultBanner) : $siteSectionBanner;
+        $field = $categoryID ? self::getCategoryField($categoryID, 'BannerImage', $defaultBanner) : $defaultBanner;
         return $field ? \Gdn_Upload::url($field) : $field;
     }
 

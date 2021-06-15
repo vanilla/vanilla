@@ -184,7 +184,10 @@ const hexRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
  *
  * - Strings starting with `#` get wrapped in `color()`;
  */
-function normalizeVariables(customVariable: any, defaultVariable: any) {
+export function normalizeVariables(customVariable: any, defaultVariable: any) {
+    const customVariableType: string = Array.isArray(customVariable) === false ? typeof customVariable : "array";
+    const defaultVariableType: string = Array.isArray(defaultVariable) === false ? typeof defaultVariable : "array";
+    const argumentTypes = [...new Set([customVariableType, defaultVariableType])];
     try {
         if (Array.isArray(customVariable) && Array.isArray(defaultVariable)) {
             // We currently can't pre-process arrays.
@@ -202,17 +205,20 @@ function normalizeVariables(customVariable: any, defaultVariable: any) {
                 const color = colorStringToInstance(customVariable, defaultVariable instanceof ColorHelper);
                 return color;
             }
-        } else if (
-            typeof customVariable === "object" &&
-            typeof defaultVariable === "object" &&
-            defaultVariable !== null
-        ) {
+        } else if (customVariableType === "object" && defaultVariableType === "object" && defaultVariable !== null) {
             const newObj: any = {};
             for (const [key, defaultValue] of Object.entries(defaultVariable)) {
                 const mergedValue = key in customVariable ? customVariable[key] : defaultValue;
                 newObj[key] = normalizeVariables(mergedValue, defaultValue);
             }
             return newObj;
+        } else if (
+            argumentTypes.length > 1 &&
+            argumentTypes.includes("object") &&
+            argumentTypes.includes("array") &&
+            defaultVariable !== null
+        ) {
+            return defaultVariable;
         } else {
             return customVariable;
         }

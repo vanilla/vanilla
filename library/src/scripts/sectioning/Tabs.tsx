@@ -3,7 +3,7 @@ import { Tabs as ReachTabs, TabList, Tab, TabPanels, TabPanel } from "@reach/tab
 import { tabStandardClasses, tabBrowseClasses, tabGroupClasses } from "@library/sectioning/tabStyles";
 import classNames from "classnames";
 import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
-import { WarningIcon } from "@library/icons/common";
+import { InformationIcon, WarningIcon } from "@library/icons/common";
 import { iconClasses } from "@library/icons/iconStyles";
 import { TabsTypes } from "@library/sectioning/TabsTypes";
 import { DomNodeAttacher } from "@vanilla/react-utils";
@@ -81,6 +81,13 @@ export function Tabs(props: IProps) {
                                                 tab.error ? iconClasses().errorFgColor : iconClasses().warningFgColor
                                             }
                                         />
+                                    </ToolTipIcon>
+                                </ToolTip>
+                            )}
+                            {tab.info && (
+                                <ToolTip label={tab.info}>
+                                    <ToolTipIcon>
+                                        <InformationIcon />
                                     </ToolTipIcon>
                                 </ToolTip>
                             )}

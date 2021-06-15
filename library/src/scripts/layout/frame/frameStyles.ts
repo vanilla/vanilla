@@ -11,6 +11,7 @@ import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { percent, viewHeight } from "csx";
 import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
+import { css } from "@emotion/css";
 
 export const frameVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -69,26 +70,25 @@ export const frameVariables = useThemeCache(() => {
 
 export const frameClasses = useThemeCache(() => {
     const vars = frameVariables();
-    const style = styleFactory("frame");
     const mediaQueries = panelLayoutVariables().mediaQueries();
 
-    const headerWrap = style("headerWrap", {
+    const headerWrap = css({
         background: ColorsUtils.colorOut(vars.colors.bg),
         zIndex: 2,
         willChange: "height",
     });
-    const bodyWrap = style("bodyWrap", {
+    const bodyWrap = css({
         position: "relative",
         background: ColorsUtils.colorOut(vars.colors.bg),
         width: percent(100),
     });
-    const footerWrap = style("footerWrap", {
+    const footerWrap = css({
         background: ColorsUtils.colorOut(vars.colors.bg),
         zIndex: 2,
         willChange: "height",
     });
 
-    const root = style(
+    const root = css(
         {
             backgroundColor: ColorsUtils.colorOut(vars.colors.bg),
             maxHeight: viewHeight(80),
@@ -99,11 +99,9 @@ export const frameClasses = useThemeCache(() => {
             display: "flex",
             flexDirection: "column",
             minHeight: 0, // https://bugs.chromium.org/p/chromium/issues/detail?id=927066
-            ...{
-                [`.${bodyWrap}`]: {
-                    flexGrow: 1,
-                    overflowY: "auto",
-                },
+            [`.${bodyWrap}`]: {
+                flexGrow: 1,
+                overflowY: "auto",
             },
         },
         mediaQueries.xs({

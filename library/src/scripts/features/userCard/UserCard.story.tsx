@@ -11,11 +11,16 @@ import { DeviceProvider } from "@library/layout/DeviceContext";
 import { PageBox } from "@library/layout/PageBox";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { storyWithConfig } from "@library/storybook/StoryContext";
-import { STORY_USER } from "@library/storybook/storyData";
+import { STORY_USER, STORY_USER_BANNED, STORY_USER_PRIVATE } from "@library/storybook/storyData";
 import { IPartialBoxOptions } from "@library/styles/cssUtilsTypes";
 import { BorderType } from "@library/styles/styleHelpers";
 import { UserCardPopup, useUserCardTrigger } from "@library/features/userCard/UserCard";
-import { UserCardSkeleton, UserCardView } from "@library/features/userCard/UserCard.views";
+import {
+    UserCardSkeleton,
+    UserCardView,
+    UserCardMinimal,
+    UserCardError,
+} from "@library/features/userCard/UserCard.views";
 import React from "react";
 
 export default {
@@ -81,11 +86,26 @@ const BasicStory = () => (
     </DeviceProvider>
 );
 
+const BannedWithPermissionStory = () => (
+    <DeviceProvider>
+        <StoryContent>
+            <div className={css({ display: "flex", "& > *": { flex: 1, margin: 24 } })}>
+                <PageBox className={css({ maxWidth: 400, margin: "0 auto" })} options={boxOptions}>
+                    <UserCardView user={STORY_USER_BANNED} />
+                </PageBox>
+            </div>
+        </StoryContent>
+    </DeviceProvider>
+);
+
 export const Basic = storyWithConfig(viewCardConfig, BasicStory);
 
 export const WithPermissions = storyWithConfig(adminConfig, BasicStory);
 
+export const BannedWithPermission = storyWithConfig(adminConfig, BannedWithPermissionStory);
+
 export const Skeletons = storyWithConfig(viewCardConfig, () => {
+    // @ts-ignore
     return (
         <DeviceProvider>
             <div
@@ -110,6 +130,18 @@ export const Skeletons = storyWithConfig(viewCardConfig, () => {
                             label: undefined,
                         }}
                     />
+                </PageBox>
+                <PageBox className={css({ maxWidth: 400, margin: "0 auto" })} options={boxOptions}>
+                    <UserCardMinimal user={STORY_USER_BANNED} />
+                </PageBox>
+                <PageBox className={css({ maxWidth: 400, margin: "0 auto" })} options={boxOptions}>
+                    <UserCardMinimal user={STORY_USER_PRIVATE} />
+                </PageBox>
+                <PageBox className={css({ maxWidth: 400, margin: "0 auto" })} options={boxOptions}>
+                    <UserCardError />
+                </PageBox>
+                <PageBox className={css({ maxWidth: 400, margin: "0 auto" })} options={boxOptions}>
+                    <UserCardError error={"Failed to load user"} />
                 </PageBox>
             </div>
         </DeviceProvider>

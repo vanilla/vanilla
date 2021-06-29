@@ -244,6 +244,56 @@ describe("ClipboardModule", () => {
                     OpUtils.newline(),
                 ]);
             });
+            it("pasted images retain dimensions", () => {
+                const html = `
+                    <p><img src="/image1.png" alt="image-1" width="100px" height="150px"></p>
+                    <img src="/image-no-alt.jpg" width="350px" height="720px">
+                    <div class="js-embed embedResponsive" contenteditable="false">
+                        <div class="embedExternal embedImage">
+                            <div class="embed-focusableElement embedExternal-content" aria-label="External embed content - image" tabindex="-1">
+                                <a class="embedImage-link" href="/embed-image.jpg" rel="nofollow noopener">
+                                    <img class="embedImage-img" src="/embed-image.jpg" alt="image">
+                                </a>
+                            </div>
+                        </div>
+                        <span class="sr-only">Embed Description</span>
+                    </div>
+                `;
+                clipboard.dangerouslyPasteHTML(html);
+
+                expect(quill.getContents().ops).deep.eq([
+                    OpUtils.image("/image1.png", "image-1", "150px", "100px"),
+                    OpUtils.newline(),
+                    OpUtils.image("/image-no-alt.jpg", null, "720px", "350px"),
+                    OpUtils.image("/embed-image.jpg", "image"),
+                    OpUtils.newline(),
+                ]);
+            });
+            it("pasted images retain vanilla data attributes", () => {
+                const html = `
+                    <p><img src="/image1.png" alt="image-1" width="100px" height="150px" data-display-size="large" data-float="none"></p>
+                    <img src="/image-no-alt.jpg" width="350px" height="720px" data-display-size="medium" data-float="left">
+                    <div class="js-embed embedResponsive" contenteditable="false">
+                        <div class="embedExternal embedImage">
+                            <div class="embed-focusableElement embedExternal-content" aria-label="External embed content - image" tabindex="-1">
+                                <a class="embedImage-link" href="/embed-image.jpg" rel="nofollow noopener">
+                                    <img class="embedImage-img" src="/embed-image.jpg" alt="image" data-display-size="small" data-float="right" data-some-additional-attribute="some-value">
+                                </a>
+                            </div>
+                        </div>
+                        <span class="sr-only">Embed Description</span>
+                    </div>
+                `;
+                clipboard.dangerouslyPasteHTML(html);
+
+                expect(quill.getContents().ops).deep.eq([
+                    OpUtils.image("/image1.png", "image-1", "150px", "100px", "large", "none"),
+                    OpUtils.newline(),
+                    OpUtils.image("/image-no-alt.jpg", null, "720px", "350px", "medium", "left"),
+                    OpUtils.image("/embed-image.jpg", "image", null, null, "small", "right"),
+                    OpUtils.newline(),
+                ]);
+            });
         });
     });
 

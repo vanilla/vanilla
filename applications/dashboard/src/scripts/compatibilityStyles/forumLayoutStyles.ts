@@ -174,6 +174,16 @@ export const forumLayoutCSS = () => {
     const mediaQueries = vars.mediaQueries();
 
     injectGlobal({
+        ".Frame": {
+            // DO NOT use 100vh here.
+            // It causes embedded sites to grow constantly.
+            // https://github.com/vanilla/support/issues/4334
+            // https://github.com/vanilla/support/issues/3802
+            minHeight: "initial",
+            // ".page" has a min-height 100vh and also contains the titlebar
+            // It is flexed so this will cause us to use the rest of the space.
+            flex: "1 0 auto",
+        },
         ".Frame-content": {
             ...Mixins.margin({
                 vertical: globalVars.spacer.mainLayout,

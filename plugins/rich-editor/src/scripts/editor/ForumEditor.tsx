@@ -21,6 +21,8 @@ import EditorDescriptions from "@rich-editor/editor/pieces/EditorDescriptions";
 interface IProps {
     legacyTextArea: HTMLInputElement;
     descriptionID?: string;
+    uploadEnabled?: boolean;
+    placeholder?: string;
 }
 
 /**
@@ -32,6 +34,7 @@ export function ForumEditor(props: IProps) {
     const store = getStore();
     const classes = richEditorClasses(true);
     const [hasFocus, setHasFocus] = useState(false);
+    const uploadEnabled = props.uploadEnabled ?? true;
     return (
         <Provider store={store}>
             <DeviceProvider>
@@ -52,10 +55,10 @@ export function ForumEditor(props: IProps) {
                         )}
                     >
                         {props.descriptionID && <EditorDescriptions id={props.descriptionID} />}
-                        <EditorContent legacyTextArea={props.legacyTextArea} />
+                        <EditorContent placeholder={props.placeholder} legacyTextArea={props.legacyTextArea} />
                         <EditorParagraphMenu />
                         <EditorInlineMenus />
-                        <EditorEmbedBar />
+                        <EditorEmbedBar uploadEnabled={uploadEnabled} />
                     </div>
                 </Editor>
             </DeviceProvider>

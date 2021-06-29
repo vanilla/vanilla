@@ -463,6 +463,7 @@ $PermissionModel->define([
     'Garden.Activity.View' => 1,
     'Garden.Profiles.View' => 1,
     'Garden.Profiles.Edit' => 'Garden.SignIn.Allow',
+    'Garden.ProfilePicture.Edit' => 'Garden.Profiles.Edit',
     'Garden.Curation.Manage' => 'Garden.Moderation.Manage',
     'Garden.Moderation.Manage',
     'Garden.PersonalInfo.View' => 'Garden.Moderation.Manage',

@@ -22,6 +22,7 @@ import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
 import DateTime from "@library/content/DateTime";
 import { hasPermission } from "@library/features/users/Permission";
 import { formatUrl } from "@library/utility/appUtils";
+import { useCurrentUserID } from "@library/features/users/userHooks";
 
 interface IProps {
     user: IUser;
@@ -44,6 +45,9 @@ export function UserCardView(props: IProps) {
     const photoSize: UserPhotoSize = isCompact ? UserPhotoSize.XLARGE : UserPhotoSize.LARGE;
     const isConversationsEnabled = getMeta("context.conversationsEnabled", false);
 
+    const currentUseID = useCurrentUserID();
+    const isOwnUser = user.userID === currentUseID;
+
     let label = user.title ?? user.label;
     const privateProfile = user?.private ?? false;
     const hasPersonalInfoView = hasPermission("personalInfo.view");
@@ -56,7 +60,7 @@ export function UserCardView(props: IProps) {
 
     label = isBanned ? t(BANNED) : label;
 
-    if ((privateProfile || showPrivateBannedProfile) && !hasPersonalInfoView) {
+    if ((privateProfile || showPrivateBannedProfile) && !hasPersonalInfoView && !isOwnUser) {
         return <UserCardMinimal user={user} onClose={props.onClose} />;
     }
     return (

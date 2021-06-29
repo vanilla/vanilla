@@ -150,7 +150,7 @@ class BaseDiscussionWidgetModule extends AbstractReactModule {
 
         // Force some common expands
         // Default sort.
-        $apiParams['sort'] = $apiParams['sort'] ?? 'dateLastComment';
+        $apiParams['sort'] = $apiParams['sort'] ?? '-dateLastComment';
         $apiParams['expand'] = ['category', 'insertUser', 'lastUser', '-body', 'excerpt', 'tags'];
 
         return $apiParams;

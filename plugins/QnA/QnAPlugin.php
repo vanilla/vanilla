@@ -1484,6 +1484,20 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
     }
 
     /**
+     * Apply expand query params for api queries.
+
+     * @param string $recordType
+     * @return array
+     */
+    public function discussionArticleModel_applyExpand(string $recordType = ''): array {
+        $expand = [];
+        if ($recordType === 'question') {
+            $expand ['expand'] = 'acceptedAnswers';
+        }
+        return $expand;
+    }
+
+    /**
      * Add answer meta data to comment record.
      *
      * @param array $comment

@@ -35,8 +35,7 @@ echo $this->Form->open();
                   </div>
                   <?php
                }
-
-               echo $this->Form->bodyBox('Body', ['ImageUpload' => true]);
+               echo $this->Form->bodyBox('Body', ['ImageUpload' => true, 'UploadEnabled' => $this->data('UploadEnabled')]);
             } else {
                echo t("You don't have permission to use a signature.");
             } ?>

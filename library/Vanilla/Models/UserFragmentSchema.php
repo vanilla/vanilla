@@ -27,7 +27,7 @@ class UserFragmentSchema extends Schema {
             'url:s?', // Full URL to the user profile page.
             'photoUrl:s', // The URL of the user's avatar picture.
             'dateLastActive:dt|n?', // Time the user was last active.
-            'banned:b?', // The banned status of the user
+            'banned:i?', // The banned status of the user
             'private:b?', // The private profile status of the user
             'label:s?'
         ]));

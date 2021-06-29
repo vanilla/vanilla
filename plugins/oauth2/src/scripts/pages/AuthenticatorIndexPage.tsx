@@ -71,12 +71,7 @@ export default function ConnectionsIndexPage(props: IOwnProps) {
                     </>
                 }
             />
-            <LazyModal
-                isVisible={isFormVisible}
-                size={ModalSizes.LARGE}
-                className={modalClasses().frameWrapper}
-                exitHandler={closeFormModal}
-            >
+            <LazyModal isVisible={isFormVisible} size={ModalSizes.LARGE} exitHandler={closeFormModal}>
                 <OAuth2AddEdit
                     authenticatorID={editingID}
                     onClose={() => {

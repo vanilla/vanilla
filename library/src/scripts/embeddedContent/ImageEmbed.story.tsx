@@ -1,6 +1,6 @@
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -9,7 +9,7 @@ import { storiesOf } from "@storybook/react";
 import React from "react";
 import { ImageEmbed } from "@library/embeddedContent/ImageEmbed";
 import { EmbedContext } from "@library/embeddedContent/IEmbedContext";
-import { userContentClasses } from "@library/content/userContentStyles";
+import { userContentClasses } from "@library/content/UserContent.styles";
 import classNames from "classnames";
 
 const story = storiesOf("Embeds", module);

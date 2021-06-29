@@ -4,7 +4,7 @@
  * @license gpl-2.0-only
  */
 
-import { userContentClasses } from "@library/content/userContentStyles";
+import { userContentClasses } from "@library/content/UserContent.styles";
 import { HomeWidgetContainer } from "@library/homeWidget/HomeWidgetContainer";
 import Container from "@library/layout/components/Container";
 import { PanelWidget } from "@library/layout/components/PanelWidget";

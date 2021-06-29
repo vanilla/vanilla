@@ -20,7 +20,7 @@ import ModalSizes from "@library/modal/ModalSizes";
 import { useUniqueID } from "@library/utility/idUtils";
 import { t } from "@vanilla/i18n";
 import { JsonSchemaForm } from "@vanilla/json-schema-forms";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 export interface IProps {
     isVisible: boolean;
@@ -31,11 +31,12 @@ export interface IProps {
 }
 
 export const MachineTranslationConfigurationModal = (props: IProps) => {
-    const { isVisible, onExit, service, setConfiguration, modalSize } = props;
+    const { isVisible, onExit, service, setConfiguration } = props;
     const titleID = useUniqueID("configureLanguage_Modal");
     const classFrameFooter = frameFooterClasses();
     const classesFrameBody = frameBodyClasses();
     const [value, setValue] = useState({});
+    const [modalSize, setModalSize] = useState(props.modalSize ?? ModalSizes.MEDIUM);
 
     useEffect(() => {
         if (service) {
@@ -48,10 +49,21 @@ export const MachineTranslationConfigurationModal = (props: IProps) => {
         }
     }, [service]);
 
+    useEffect(() => {
+        if (service) {
+            setModalSize(() => {
+                return Object.keys(service.configSchema.properties).length > 1 ? ModalSizes.LARGE : ModalSizes.MEDIUM;
+            });
+        }
+        if (props.modalSize) {
+            setModalSize(props.modalSize);
+        }
+    }, [props.modalSize, service]);
+
     return (
         <LazyModal
             isVisible={isVisible}
-            size={modalSize ? modalSize : ModalSizes.SMALL}
+            size={modalSize}
             exitHandler={() => {
                 onExit();
             }}

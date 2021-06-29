@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -12,7 +12,7 @@ import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { userSelect } from "@library/styles/styleHelpers";
 import { styleUnit } from "@library/styles/styleUnit";
 import { important, percent } from "csx";
-import { userContentVariables } from "@library/content/userContentStyles";
+import { userContentVariables } from "@library/content/UserContent.variables";
 import { Mixins } from "@library/styles/Mixins";
 import { Variables } from "@library/styles/Variables";
 

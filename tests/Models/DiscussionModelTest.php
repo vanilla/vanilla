@@ -13,6 +13,8 @@ use Garden\EventManager;
 use Garden\Events\BulkUpdateEvent;
 use Gdn;
 use Vanilla\Community\Events\DiscussionEvent;
+use Vanilla\Formatting\Formats\RichFormat;
+use Vanilla\Scheduler\Job\LocalApiBulkDeleteJob;
 use VanillaTests\APIv2\TestSortingTrait;
 use VanillaTests\Bootstrap;
 use VanillaTests\EventSpyTestTrait;
@@ -26,7 +28,8 @@ use VanillaTests\VanillaTestCase;
  * Some basic tests for the `DiscussionModel`.
  */
 class DiscussionModelTest extends SiteTestCase {
-    use ExpectExceptionTrait, TestDiscussionModelTrait, EventSpyTestTrait, TestCategoryModelTrait, CommunityApiTestTrait, UsersAndRolesApiTestTrait;
+    use ExpectExceptionTrait, TestDiscussionModelTrait, EventSpyTestTrait,
+        TestCategoryModelTrait, CommunityApiTestTrait, UsersAndRolesApiTestTrait, TestCommentModelTrait;
 
     /** @var DiscussionEvent */
     private $lastEvent;
@@ -1049,6 +1052,38 @@ class DiscussionModelTest extends SiteTestCase {
         $this->createDiscussion(['name' => $in]);
         $fetchedBack = $this->api()->get("/discussions/{$this->lastInsertedDiscussionID}")->getBody();
         $this->assertEquals($in, $fetchedBack['name']);
+    }
+
+    /**
+     * Assert that discussion is deleted when we go through discussion + comments bulk deletion.
+     */
+    public function testDeleteDiscussionWithCommentBulkDeletion() {
+        $discussionRow = $this->createDiscussion(['name' => 'My discussion with 30 comments']);
+        $discussionID = $discussionRow['discussionID'];
+        $this->insertComments(
+            60,
+            [
+                'DiscussionID' => $discussionID,
+                'Body' => "[{\"insert\":\"Hello World\"}]",
+                'Format' => RichFormat::FORMAT_KEY]
+        );
+        $discussion = $this->api()->get('/discussions/'.$discussionID)->getBody();
+        $this->assertEquals(60, $discussion['countComments']);
+        $jobToDelete = new LocalApiBulkDeleteJob();
+        $request = \Gdn::request();
+        $jobToDelete->setMessage([
+            'iteratorUrl' => $request->getSimpleUrl("/api/v2/comments?discussionID=${discussionID}"),
+            'recordIDField' => 'commentID',
+            'deleteUrlPattern' => $request->getSimpleUrl("/api/v2/comments/:recordID"),
+            'finalDeleteUrl' => $request->getSimpleUrl("/api/v2/discussions/${discussionID}"),
+        ]);
+        $clientHttp = clone $this->api();
+        $jobToDelete->setDependencies($clientHttp);
+        Gdn::config()->saveToConfig('Vanilla.Comments.PerPage', 10, false);
+        $jobStatus = $jobToDelete->run();
+        $this->assertEquals('complete', $jobStatus->getStatus());
+        $response = $this->api()->setThrowExceptions(false)->get('/discussions/'.$discussionID);
+        $this->assertEquals(404, $response->getStatusCode());
     }
 
 }

@@ -75,4 +75,17 @@ class ModerationControllerTest extends SiteTestCase {
         $r = $this->moveDiscussion(null, $this->category, ['discussionIDs' => array_column($this->discussions, 'DiscussionID')]);
         $this->assertCount(count($this->discussions), $r);
     }
+
+    /**
+     * Test moving a discussion out of an archived category.
+     */
+    public function testMoveFromArchivedCategory(): void {
+        $discussion = $this->discussions[0];
+        $categoryToArchive = $this->categoryModel->getID($discussion['CategoryID'], DATASET_TYPE_ARRAY);
+        $this->categoryModel->setField($categoryToArchive['CategoryID'], ['Archived' => 1]);
+        $archivedCategory = $this->categoryModel->getID($discussion['CategoryID'], DATASET_TYPE_ARRAY);
+        $this->assertSame($archivedCategory['Archived'], 1);
+        $discussions = $this->moveDiscussion($discussion['DiscussionID'], $this->category);
+        $this->assertTrue(in_array($discussion['DiscussionID'], array_column($discussions, 'DiscussionID')));
+    }
 }

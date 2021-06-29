@@ -323,11 +323,13 @@ TEMPLATE;
      * Create a few test users and set them on the class.
      *
      * @param ?string $sx The suffix to use for the usernames and email addresses.
+     *
+     * @deprecated Use UsersAndRolesApiTest
      */
     protected function createUserFixtures(?string $sx = null): void {
         // Create some users to help.
         if ($sx === null) {
-            $sx = (string)(time() . mt_rand(1000, 9999));
+            $sx = round(microtime(true) * 1000) . mt_rand(1000, 9999);
         }
 
         $this->adminID = $this->createUserFixture(Bootstrap::ROLE_ADMIN, $sx);
@@ -341,6 +343,8 @@ TEMPLATE;
      * @param string $role
      * @param string|null $sx
      * @return int
+     *
+     * @deprecated Use UsersAndRolesApiTest
      */
     protected function createUserFixture(string $role, string $sx = null): int {
         static $count = 1;

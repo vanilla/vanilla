@@ -10,6 +10,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { percent } from "csx";
 import { styleUnit } from "@library/styles/styleUnit";
 import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
+import { css } from "@emotion/css";
 
 export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeVars = variableFactory("inviteUserCard", forcedVars);
@@ -44,16 +45,14 @@ export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) =>
 });
 
 export const userCardClasses = useThemeCache((props: { compact?: boolean } = {}) => {
-    const style = styleFactory("inviteUserCard");
     const mediaQueries = panelLayoutVariables().mediaQueries();
     const vars = userCardVariables();
 
-    const body = style("body", {
+    const body = css({
         padding: vars.body.padding.size,
     });
 
-    const button = style(
-        "button",
+    const button = css(
         {},
         mediaQueries.oneColumnDown({
             ...{
@@ -64,8 +63,7 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         }),
     );
 
-    const buttonGroup = style(
-        "buttonGroup",
+    const buttonGroup = css(
         {
             display: "flex",
             justifyContent: "flex-end",
@@ -89,13 +87,13 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         }),
     );
 
-    const message = style("message", {
+    const message = css({
         paddingBottom: vars.message.padding.bottom,
     });
 
-    const textbox = style("textbox", {});
+    const textbox = css({});
 
-    const users = style("users", {
+    const users = css({
         maxHeight: styleUnit(100),
         overflowY: "scroll",
     });

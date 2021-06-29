@@ -912,7 +912,7 @@ export function Items() {
 
 export const AsNavLinks = storyWithConfig({ useWrappers: false }, () => {
     return (
-        <div>
+        <Container fullGutter narrow>
             <StoryNavLinks />
             <HomeWidget
                 itemData={STORY_WIDGET_ITEMS}
@@ -940,7 +940,7 @@ export const AsNavLinks = storyWithConfig({ useWrappers: false }, () => {
                     contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION,
                 }}
             />
-        </div>
+        </Container>
     );
 });
 

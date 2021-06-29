@@ -5,6 +5,7 @@
 
 import { IReaction } from "@Reactions/types/Reaction";
 
+const reactionBaseUrl = "https://badges.v-cdn.net/reactions/50/";
 export const dummyReactionsData: { [key: string]: IReaction } = {
     Promote: {
         tagID: 3,
@@ -12,7 +13,7 @@ export const dummyReactionsData: { [key: string]: IReaction } = {
         name: "Promote",
         class: "Positive",
         count: 2456,
-        photoUrl: "https://badges.v-cdn.net/reactions/50/promote.png",
+        photoUrl: reactionBaseUrl + "promote.svg",
         url: "",
     },
     Disagree: {
@@ -21,7 +22,7 @@ export const dummyReactionsData: { [key: string]: IReaction } = {
         name: "Disagree",
         class: "Negative",
         count: 65,
-        photoUrl: "https://badges.v-cdn.net/reactions/50/disagree.png",
+        photoUrl: reactionBaseUrl + "disagree.svg",
         url: "",
     },
     Agree: {
@@ -30,7 +31,7 @@ export const dummyReactionsData: { [key: string]: IReaction } = {
         name: "Agree",
         class: "Positive",
         count: 2,
-        photoUrl: "https://badges.v-cdn.net/reactions/50/agree.png",
+        photoUrl: reactionBaseUrl + "agree.svg",
         url: "",
     },
     Like: {
@@ -39,7 +40,7 @@ export const dummyReactionsData: { [key: string]: IReaction } = {
         name: "Like",
         class: "Positive",
         count: 1023,
-        photoUrl: "https://badges.v-cdn.net/reactions/50/like.png",
+        photoUrl: reactionBaseUrl + "like.svg",
         url: "",
     },
     LOL: {
@@ -48,7 +49,7 @@ export const dummyReactionsData: { [key: string]: IReaction } = {
         name: "LOL",
         class: "Positive",
         count: 13245,
-        photoUrl: "https://badges.v-cdn.net/reactions/50/lol.png",
+        photoUrl: reactionBaseUrl + "lol.svg",
         url: "",
     },
     Spam: {
@@ -57,7 +58,7 @@ export const dummyReactionsData: { [key: string]: IReaction } = {
         name: "Spam",
         class: "Flag",
         count: 1,
-        photoUrl: "https://badges.v-cdn.net/reactions/50/spam.png",
+        photoUrl: reactionBaseUrl + "spam.svg",
         url: "",
     },
     Abuse: {
@@ -66,7 +67,7 @@ export const dummyReactionsData: { [key: string]: IReaction } = {
         name: "Abuse",
         class: "Flag",
         count: 29,
-        photoUrl: "https://badges.v-cdn.net/reactions/50/abuse.png",
+        photoUrl: reactionBaseUrl + "abuse.svg",
         url: "",
     },
 };

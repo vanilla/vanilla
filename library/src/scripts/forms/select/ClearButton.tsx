@@ -10,6 +10,8 @@ import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import classNames from "classnames";
 import { ClearIcon } from "@library/icons/common";
+import { sprintf } from "sprintf-js";
+import Translate from "@library/content/Translate";
 
 interface IProps {
     onClick: (event: React.SyntheticEvent) => void;
@@ -20,13 +22,15 @@ interface IProps {
  * Overwrite for the ClearIndicator component in React Select
  */
 export function ClearButton(props: IProps) {
+    const clearText = sprintf(t("Clear %s"), t("Search"));
+
     return (
         <Button
             buttonType={ButtonTypes.ICON}
             className={classNames("suggestedTextInput-clear", "searchBar-clear", props.className)}
             onClick={props.onClick}
-            title={t("Clear")}
-            aria-label={t("Clear")}
+            title={clearText}
+            aria-label={clearText}
         >
             <ClearIcon />
         </Button>

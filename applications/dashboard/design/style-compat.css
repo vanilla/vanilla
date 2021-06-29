@@ -148,24 +148,12 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-@-webkit-keyframes spinnerLoader {
-  0% {
-    -webkit-transform: rotate(73deg);
-            transform: rotate(73deg);
-  }
-  100% {
-    -webkit-transform: rotate(433deg);
-            transform: rotate(433deg);
-  }
-}
 @keyframes spinnerLoader {
   0% {
-    -webkit-transform: rotate(73deg);
-            transform: rotate(73deg);
+    transform: rotate(73deg);
   }
   100% {
-    -webkit-transform: rotate(433deg);
-            transform: rotate(433deg);
+    transform: rotate(433deg);
   }
 }
 /**
@@ -285,15 +273,12 @@ button.Close {
   border: 0;
   cursor: pointer;
   background: none;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
-  -webkit-justify-content: center;
-      -ms-flex-pack: center;
-          justify-content: center;
+  -ms-flex-align: center;
+      align-items: center;
+  -ms-flex-pack: center;
+      justify-content: center;
   height: 36px;
   width: 36px;
   min-width: 36px;
@@ -447,15 +432,12 @@ button.Close {
 }
 
 .rememberMeAndForgot {
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-flex-wrap: wrap;
-      -ms-flex-wrap: wrap;
-          flex-wrap: wrap;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  -ms-flex-align: center;
+      align-items: center;
   font-size: 12px;
 }
 .rememberMeAndForgot a {
@@ -464,9 +446,8 @@ button.Close {
 }
 
 .rememberMeAndForgot-rememberMe {
-  -webkit-flex-grow: 1;
-      -ms-flex-positive: 1;
-          flex-grow: 1;
+  -ms-flex-positive: 1;
+      flex-grow: 1;
   padding-right: 6px;
 }
 
@@ -485,18 +466,14 @@ button.Close {
 
 .button.Button.Primary.buttonCTA, .button.Button.button-sso {
   -webkit-user-select: none;
-     -moz-user-select: none;
       -ms-user-select: none;
           user-select: none;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
-  -webkit-justify-content: center;
-      -ms-flex-pack: center;
-          justify-content: center;
+  -ms-flex-align: center;
+      align-items: center;
+  -ms-flex-pack: center;
+      justify-content: center;
   background-image: none;
   box-sizing: border-box;
   text-decoration: none !important;
@@ -524,18 +501,14 @@ button.Close {
 }
 
 .button-ssoContents {
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
-  -webkit-justify-content: space-between;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
-  -webkit-flex-wrap: wrap;
-      -ms-flex-wrap: wrap;
-          flex-wrap: wrap;
+  -ms-flex-align: center;
+      align-items: center;
+  -ms-flex-pack: justify;
+      justify-content: space-between;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
   width: 100%;
   max-width: 100%;
 }
@@ -581,41 +554,33 @@ button.Close {
 .PageControls .selectBox {
   margin-right: 15px;
   float: left;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
-  -webkit-justify-content: flex-start;
-      -ms-flex-pack: start;
-          justify-content: flex-start;
+  -ms-flex-align: center;
+      align-items: center;
+  -ms-flex-pack: start;
+      justify-content: flex-start;
 }
 
 .selectBox-label {
   position: relative;
   cursor: pointer;
   -webkit-user-select: none;
-     -moz-user-select: none;
       -ms-user-select: none;
           user-select: none;
   margin-right: 5px;
 }
 
 .selectBox-main {
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-justify-content: flex-start;
-      -ms-flex-pack: start;
-          justify-content: flex-start;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
+  -ms-flex-pack: start;
+      justify-content: flex-start;
+  -ms-flex-align: center;
+      align-items: center;
   position: relative;
   cursor: pointer;
   -webkit-user-select: none;
-     -moz-user-select: none;
       -ms-user-select: none;
           user-select: none;
 }
@@ -633,7 +598,6 @@ button.Close {
   vertical-align: inherit;
   cursor: pointer;
   -webkit-user-select: none;
-     -moz-user-select: none;
       -ms-user-select: none;
           user-select: none;
   outline: none;
@@ -705,12 +669,10 @@ body.Categories.isMobile .PageControls.Top {
 }
 
 .ButtonGroup.discussion-sort-filter-module {
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
+  -ms-flex-align: center;
+      align-items: center;
 }
 
 .inputBlock {
@@ -718,12 +680,10 @@ body.Categories.isMobile .PageControls.Top {
   margin-bottom: 24px;
 }
 .inputBlock .checkbox {
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
+  -ms-flex-align: center;
+      align-items: center;
 }
 .inputBlock.inputBlock-tighter {
   margin-top: -12px;
@@ -798,12 +758,10 @@ body.Categories.isMobile .PageControls.Top {
   margin-bottom: 6px;
 }
 .FormWrapper .file-upload {
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-align-items: flex-start;
-      -ms-flex-align: start;
-          align-items: flex-start;
+  -ms-flex-align: start;
+      align-items: flex-start;
   position: relative;
   width: 100%;
   font-weight: 400;
@@ -834,7 +792,6 @@ body.Categories.isMobile .PageControls.Top {
   height: 36px;
   font-weight: 400;
   -webkit-user-select: none;
-     -moz-user-select: none;
       -ms-user-select: none;
           user-select: none;
   overflow: hidden;
@@ -845,9 +802,8 @@ body.Categories.isMobile .PageControls.Top {
   border-radius: 6px;
   border-style: solid;
   border-color: #d6d7d9;
-  -webkit-order: -1;
-      -ms-flex-order: -1;
-          order: -1;
+  -ms-flex-order: -1;
+      order: -1;
   margin-right: 6px;
 }
 .FormWrapper .file-upload-choose {
@@ -869,7 +825,6 @@ label.checkbox input.checkbox-input {
 
 .checkbox-label {
   -webkit-user-select: none;
-     -moz-user-select: none;
       -ms-user-select: none;
           user-select: none;
   margin-left: 6px;
@@ -899,16 +854,13 @@ label.checkbox input.checkbox-input {
 }
 
 .pageHeading {
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   width: 100%;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
-  -webkit-flex-wrap: wrap;
-      -ms-flex-wrap: wrap;
-          flex-wrap: wrap;
+  -ms-flex-align: center;
+      align-items: center;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
 }
 .pageHeading .pageHeading-title {
   display: block;
@@ -920,18 +872,15 @@ label.checkbox input.checkbox-input {
   position: relative;
   display: block;
   max-width: 100%;
-  -webkit-flex-grow: 1;
-      -ms-flex-positive: 1;
-          flex-grow: 1;
+  -ms-flex-positive: 1;
+      flex-grow: 1;
 }
 
 .pageHeading-actions {
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-align-self: center;
-      -ms-flex-item-align: center;
-          align-self: center;
+  -ms-flex-item-align: center;
+      align-self: center;
   max-width: 100%;
 }
 
@@ -1075,18 +1024,14 @@ body {
   margin-right: 6px;
 }
 .userContent .metas.isFlexed {
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-flex-wrap: wrap;
-      -ms-flex-wrap: wrap;
-          flex-wrap: wrap;
-  -webkit-justify-content: flex-start;
-      -ms-flex-pack: start;
-          justify-content: flex-start;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  -ms-flex-pack: start;
+      justify-content: flex-start;
+  -ms-flex-align: center;
+      align-items: center;
 }
 .userContent .meta {
   display: inline-block;
@@ -1109,7 +1054,6 @@ body {
 
 .richEditor-button {
   -webkit-user-select: none;
-     -moz-user-select: none;
       -ms-user-select: none;
           user-select: none;
   cursor: pointer;
@@ -1127,10 +1071,8 @@ body.hasRichEditor .richEditor .buttonClose {
   border: 0;
 }
 body.hasRichEditor .richEditor .spoiler .iconButton {
-  -webkit-justify-content: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  display: -webkit-flex;
+  -ms-flex-pack: center;
+      justify-content: center;
   display: -ms-flexbox;
   display: flex;
 }
@@ -1173,10 +1115,6 @@ body.hasRichEditor .CommentForm .CommentFormWrap .FormWrapper {
     padding-right: 0;
     padding-left: 0;
   }
-  .Popup.hasRichEditor .CommentForm .CommentFormWrap .FormWrapper .Back,
-body.hasRichEditor .CommentForm .CommentFormWrap .FormWrapper .Back {
-    display: none;
-  }
   .Popup.hasRichEditor .CommentForm .richEditor,
 body.hasRichEditor .CommentForm .richEditor {
     padding-left: 36px;
@@ -1190,6 +1128,23 @@ body.hasRichEditor .CommentForm .richEditor .richEditor {
   .Popup.hasRichEditor .CommentForm .Buttons,
 body.hasRichEditor .CommentForm .Buttons {
     padding-right: 36px;
+  }
+  .Popup.hasRichEditor .Activities ul.DataList,
+body.hasRichEditor .Activities ul.DataList {
+    margin-left: 36px;
+  }
+  .Popup.hasRichEditor .ActivityComment + .CommentForm,
+body.hasRichEditor .ActivityComment + .CommentForm {
+    margin-top: 12px;
+  }
+  .Popup.hasRichEditor .ActivityComment + .CommentForm .richEditor,
+body.hasRichEditor .ActivityComment + .CommentForm .richEditor {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .Popup.hasRichEditor .ActivityComment + .CommentForm .Buttons.Buttons,
+body.hasRichEditor .ActivityComment + .CommentForm .Buttons.Buttons {
+    padding-right: 0;
   }
   .Popup.hasRichEditor #EventAddEditForm .Form-HeaderWrap,
 .Popup.hasRichEditor #GroupForm .Form-HeaderWrap,
@@ -1417,12 +1372,10 @@ body.isMobile .Popup.hasRichEditor .Border {
   max-width: 100%;
   width: 640px;
   position: relative;
-  -webkit-justify-content: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
+  -ms-flex-pack: center;
+      justify-content: center;
+  -ms-flex-align: center;
+      align-items: center;
   box-sizing: border-box;
   clear: both;
 }
@@ -1466,7 +1419,6 @@ body.isMobile .Popup.hasRichEditor .Border {
   margin: 0;
   vertical-align: -0.14em;
   -webkit-user-select: none;
-     -moz-user-select: none;
       -ms-user-select: none;
           user-select: none;
 }
@@ -1483,10 +1435,8 @@ body.isMobile .Popup.hasRichEditor .Border {
   border-right: 3px solid rgba(2, 145, 219, 0.3);
   border-bottom: 3px solid rgba(2, 145, 219, 0.3);
   border-left: 3px solid rgba(2, 145, 219, 0.3);
-  -webkit-transform: translateZ(0);
-          transform: translateZ(0);
-  -webkit-animation: spinnerLoader 0.7s infinite ease-in-out;
-          animation: spinnerLoader 0.7s infinite ease-in-out;
+  transform: translateZ(0);
+  animation: spinnerLoader 0.7s infinite ease-in-out;
   display: inline-block;
   vertical-align: -0.14em;
 }
@@ -1509,7 +1459,6 @@ body.isMobile .Popup.hasRichEditor .Border {
 
 .richEditor .embedExternal {
   -webkit-user-select: none;
-     -moz-user-select: none;
       -ms-user-select: none;
           user-select: none;
 }
@@ -1571,15 +1520,13 @@ body.isMobile .Popup.hasRichEditor .Border {
   margin: auto;
 }
 .embedVideo .embedExternal-content:focus .embedVideo-playIcon, .embedVideo .embedExternal-content:hover .embedVideo-playIcon {
-  -webkit-transform: scale(1.1);
-      -ms-transform: scale(1.1);
-          transform: scale(1.1);
+  -ms-transform: scale(1.1);
+      transform: scale(1.1);
 }
 
 .richEditor .embedVideo .embedExternal-content:focus .embedVideo-playIcon, .richEditor .embedVideo .embedExternal-content:hover .embedVideo-playIcon {
-  -webkit-transform: scale(1);
-      -ms-transform: scale(1);
-          transform: scale(1);
+  -ms-transform: scale(1);
+      transform: scale(1);
 }
 
 .embedVideo-iframe,
@@ -1701,7 +1648,6 @@ body.isMobile .Popup.hasRichEditor .Border {
 
 .Message img .embedImage-img,
 .embedImage-img {
-  display: -webkit-inline-flex;
   height: auto;
   display: -ms-inline-flexbox;
   display: inline-flex;
@@ -1723,12 +1669,10 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedImage-link {
-  display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
   display: inline-flex;
-  -webkit-flex-direction: column;
-      -ms-flex-direction: column;
-          flex-direction: column;
+  -ms-flex-direction: column;
+      flex-direction: column;
 }
 
 /*!
@@ -1749,18 +1693,14 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedText-header {
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-flex-wrap: wrap;
-      -ms-flex-wrap: wrap;
-          flex-wrap: wrap;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
-  -webkit-justify-content: flex-start;
-      -ms-flex-pack: start;
-          justify-content: flex-start;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  -ms-flex-align: center;
+      align-items: center;
+  -ms-flex-pack: start;
+      justify-content: flex-start;
   font-size: 14px;
   line-height: 1.25;
 }
@@ -1864,9 +1804,8 @@ body.isMobile .Popup.hasRichEditor .Border {
   display: inline-block;
   width: 24px;
   height: 24px;
-  -webkit-flex-basis: 24px;
-      -ms-flex-preferred-size: 24px;
-          flex-basis: 24px;
+  -ms-flex-preferred-size: 24px;
+      flex-basis: 24px;
 }
 
 .embedLoader {
@@ -1875,15 +1814,12 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedLoader-box {
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
-  -webkit-justify-content: center;
-      -ms-flex-pack: center;
-          justify-content: center;
+  -ms-flex-align: center;
+      align-items: center;
+  -ms-flex-pack: center;
+      justify-content: center;
   background: #FFFFFF;
   box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.3);
   width: 135px;
@@ -1904,10 +1840,8 @@ body.isMobile .Popup.hasRichEditor .Border {
   border-right: 3px solid rgba(2, 145, 219, 0.3);
   border-bottom: 3px solid rgba(2, 145, 219, 0.3);
   border-left: 3px solid rgba(2, 145, 219, 0.3);
-  -webkit-transform: translateZ(0);
-          transform: translateZ(0);
-  -webkit-animation: spinnerLoader 0.7s infinite ease-in-out;
-          animation: spinnerLoader 0.7s infinite ease-in-out;
+  transform: translateZ(0);
+  animation: spinnerLoader 0.7s infinite ease-in-out;
 }
 .embedLoader-loader::after {
   border-radius: 50%;
@@ -1917,13 +1851,11 @@ body.isMobile .Popup.hasRichEditor .Border {
 
 .embedLoader-error {
   box-shadow: 0 1px 3px 0 rgba(85, 90, 98, 0.3);
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   overflow: hidden;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
+  -ms-flex-align: center;
+      align-items: center;
   list-style: none;
   margin: 0;
   padding: 15px;
@@ -1941,20 +1873,17 @@ body.isMobile .Popup.hasRichEditor .Border {
   margin-top: 12px;
 }
 .embedLoader-error .embedLoader-warningIcon {
-  -webkit-align-self: flex-start;
-      -ms-flex-item-align: start;
-          align-self: flex-start;
+  -ms-flex-item-align: start;
+      align-self: flex-start;
 }
 .embedLoader-error .closeButton {
   opacity: 0.7;
   width: 24px;
   height: 24px;
-  -webkit-flex-basis: 24px;
-      -ms-flex-preferred-size: 24px;
-          flex-basis: 24px;
-  -webkit-align-self: flex-start;
-      -ms-flex-item-align: start;
-          align-self: flex-start;
+  -ms-flex-preferred-size: 24px;
+      flex-basis: 24px;
+  -ms-flex-item-align: start;
+      align-self: flex-start;
   margin: 0 0 0 auto;
   cursor: pointer;
   position: relative;
@@ -2184,14 +2113,6 @@ body.isMobile .Popup.hasRichEditor .Border {
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-@-webkit-keyframes fadein {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
 @keyframes fadein {
   0% {
     opacity: 0;

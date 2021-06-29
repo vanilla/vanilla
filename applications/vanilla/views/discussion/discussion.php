@@ -31,8 +31,13 @@ $this->fireEvent('BeforeDiscussionDisplay');
 <div id="<?php echo 'Discussion_'.$Discussion->DiscussionID; ?>" class="<?php echo $CssClass; ?> pageBox">
     <div class="Discussion">
         <div class="Item-Header DiscussionHeader">
-            <?php BoxThemeShim::activeHtml(userPhoto($Author)); ?>
+            <?php
+                if (!$this->data('noAuthor')) {
+                    BoxThemeShim::activeHtml(userPhoto($Author));
+                }
+            ?>
             <?php BoxThemeShim::activeHtml('<div class="Item-HeaderContent">'); ?>
+            <?php if (!$this->data('noAuthor')) { ?>
             <div class="AuthorWrap">
                 <span class="Author">
                     <?php
@@ -54,6 +59,7 @@ $this->fireEvent('BeforeDiscussionDisplay');
                     ?>
                 </span>
             </div>
+            <?php } ?>
             <div class="Meta DiscussionMeta">
                 <span class="MItem DateCreated">
                     <?php

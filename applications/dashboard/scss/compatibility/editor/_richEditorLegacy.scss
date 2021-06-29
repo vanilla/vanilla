@@ -261,7 +261,6 @@ body.hasRichEditor {
                 padding: {
                     left: $richEditor_horizontalPadding;
                     right: $richEditor_horizontalPadding;
-
                 }
 
                 .richEditor {
@@ -272,6 +271,24 @@ body.hasRichEditor {
 
             .Buttons {
                 padding-right: $richEditor_horizontalPadding;
+            }
+        }
+
+        .Activities ul.DataList {
+            margin-left: $richEditor_horizontalPadding;
+        }
+
+        .ActivityComment + .CommentForm {
+            margin-top: $richEditor_verticalPadding;
+            .richEditor {
+                padding: {
+                    left: 0;
+                    right: 0;
+                }
+            }
+
+            .Buttons.Buttons {
+                padding-right: 0;
             }
         }
 

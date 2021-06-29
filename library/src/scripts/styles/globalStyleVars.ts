@@ -623,6 +623,11 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         },
     });
 
+    if (fonts.customFont.name && fonts.customFont.url) {
+        fonts.forceGoogleFont = false;
+        fonts.googleFontFamily = "custom";
+    }
+
     const fontSizeAndWeightVars = (
         size: keyof typeof fonts.size,
         weight?: keyof typeof fonts.weights,
@@ -884,26 +889,6 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         spacer: 32,
     });
 
-    const userContent = makeThemeVars("userContent", {
-        font: {
-            sizes: {
-                default: fonts.size.medium,
-                h1: "2em",
-                h2: "1.5em",
-                h3: "1.25em",
-                h4: "1em",
-                h5: ".875em",
-                h6: ".85em",
-            },
-        },
-        list: {
-            margin: "2em",
-            listDecoration: {
-                minWidth: "2em",
-            },
-        },
-    });
-
     const buttonIconSize = 36;
 
     /**
@@ -939,17 +924,6 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
          * @type number
          */
         size: 1,
-    });
-
-    // https://medium.com/@clagnut/all-you-need-to-know-about-hyphenation-in-css-2baee2d89179
-    // Requires language set on <html> tag
-    const userContentHyphenation = makeThemeVars("userContentHyphenation", {
-        minimumCharactersToHyphenate: 6,
-        minimumCharactersBeforeBreak: 3,
-        minimumCharactersAfterBreak: 3,
-        maximumConsecutiveBrokenLines: 2,
-        avoidLastWordToBeBroken: true,
-        hyphenationZone: "6em",
     });
 
     // This function should not be used in production, but is helpful for development.
@@ -1065,13 +1039,11 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         embed,
         states,
         overlay,
-        userContent,
         getFgForBg,
         mixBgAndFg,
         mixPrimaryAndFg,
         mixPrimaryAndBg,
         separator,
-        userContentHyphenation,
         findColorMatch,
         constants,
         getRatioBasedOnBackgroundDarkness,

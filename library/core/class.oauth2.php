@@ -572,7 +572,12 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
      * @return string Endpoint of the provider.
      */
     protected function realAuthorizeUri(array $state = []): string {
-        $r = $this->generateAuthorizeUriWithStateToken($this->provider()['AuthorizeUrl'], $state);
+        $url = $this->provider()['AuthorizeUrl'] ?? null;
+        if (empty($url)) {
+            throw new Gdn_UserException('The OAuth provider does not have an authorization URL configured.', 400);
+        }
+
+        $r = $this->generateAuthorizeUriWithStateToken($url, $state);
         return $r;
     }
 

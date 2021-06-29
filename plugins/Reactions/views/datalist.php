@@ -1,11 +1,11 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 
-<ul class="DataList Compact BlogList">
+<ul class="DataList Compact BlogList pageBox">
    <?php
    foreach ($this->data('Data', []) as $Row):
       $this->setData('Record', $Row);
    ?>
-   <li id="<?php echo "{$Row['RecordType']}_{$Row['RecordID']}" ?>" class="Item">
+   <li id="<?php echo "{$Row['RecordType']}_{$Row['RecordID']}" ?>" class="Item pageBox">
       <?php
       if ($Name = getValue('Name', $Row)) {
          echo wrap(
@@ -18,7 +18,7 @@
             <span class="Author">
                <?php
                echo userPhoto($Row, ['Px' => 'Insert']);
-               echo userAnchor($Row, ['Px' => 'Insert']);
+               echo userAnchor($Row, 'Username', ['Px' => 'Insert']);
                ?>
             </span>
 <!--            <span class="AuthorInfo">
@@ -51,17 +51,22 @@
                $trimmedContent = sliceString($bodyContent, 200);
 
                echo $trimmedContent;
-               echo $moreLink;
+
+               if (!Gdn::themeFeatures()->useDataDrivenTheme()) {
+                   echo $moreLink;
+               }
                ?>
             </div>
          </div>
       </div>
 
       <?php
-      $RowObject = (object)$Row;
-      Gdn::controller()->EventArguments['Object'] = $RowObject;
-      Gdn::controller()->EventArguments[$Row['RecordType']] = $RowObject;
-      Gdn::controller()->fireAs('DiscussionController')->fireEvent("After{$Row['RecordType']}Body");
+      if (!Gdn::themeFeatures()->useDataDrivenTheme()) {
+          $RowObject = (object)$Row;
+          Gdn::controller()->EventArguments['Object'] = $RowObject;
+          Gdn::controller()->EventArguments[$Row['RecordType']] = $RowObject;
+          Gdn::controller()->fireAs('DiscussionController')->fireEvent("After{$Row['RecordType']}Body");
+      }
 
       writeReactions($Row);
       ?>

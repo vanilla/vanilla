@@ -46,7 +46,10 @@ export class JsonSchemaFlatAdapter {
             properties: {},
         };
 
-        for (const variable of this.variables) {
+        const orderedVars = this.variables.sort((a, b) => {
+            return a.key.localeCompare(b.key);
+        });
+        for (const variable of orderedVars) {
             schema.properties![variable.key] = JsonSchemaFlatAdapter.varAsSchema(variable);
         }
 

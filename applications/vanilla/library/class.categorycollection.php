@@ -7,6 +7,7 @@
 
 use Garden\EventManager;
 use Vanilla\Models\DirtyRecordModel;
+use Vanilla\Models\ModelCache;
 use Vanilla\Utility\ArrayUtils;
 
 /**
@@ -21,19 +22,22 @@ class CategoryCollection {
     /**
      * @var string The cache key prefix that stores categories by ID.
      */
-    private static $CACHE_CATEGORY = '/cat/';
+    private const CACHE_CATEGORY = '/cat/';
 
     /**
      * @var string The cache key prefix that stores category IDs by slug (URL code).
      */
-    private static $CACHE_CATEGORY_SLUG = '/catslug/';
+    private const CACHE_CATEGORY_SLUG = '/catslug/';
 
     /**
      * @var string The cache key prefix that stores category descendant IDs by slug (URL code).
      */
-    private static $CACHE_CATEGORY_DESCENDANTS = '/catdescendants/';
+    private const CACHE_CATEGORY_DESCENDANTS = '/catdescendants/';
 
     /**
+     * @var string The cache key prefix that stores category descendant IDs by slug (URL code).
+     */
+    private const CACHE_CATEGORY_CHILD_IDS = '/cat_child_ids/';
 
     /**
      * @var int The absolute select limit of the categories.
@@ -44,6 +48,9 @@ class CategoryCollection {
      * @var Gdn_Cache The cache dependency.
      */
     private $cache;
+
+    /** @var ModelCache */
+    private $modelCache;
 
     /** @var bool */
     private $cacheReadOnly = false;
@@ -102,14 +109,24 @@ class CategoryCollection {
         }
         $this->sql = $sql;
 
-        if ($cache === null) {
-            $cache = Gdn::cache();
-        }
-        $this->cache = $cache;
+        $this->cache = $cache ?? Gdn::cache() ?? new Gdn_Dirtycache();
+        $this->modelCache = new ModelCache("/catcollection/", $this->cache);
+
         $this->setStaticCalculator([$this, 'defaultCalculator']);
         $this->setUserCalculator(function (&$category) {
             // do nothing
         });
+    }
+
+    /**
+     * Get a clean SQL driver instance.
+     *
+     * @return \Gdn_SQLDriver
+     */
+    protected function createSql(): \Gdn_SQLDriver {
+        $sql = clone $this->sql;
+        $sql->reset();
+        return $sql;
     }
 
     /**
@@ -138,7 +155,8 @@ class CategoryCollection {
     public function flushCache() {
         $this->categories = [];
         $this->categorySlugs = [];
-        $this->cache->increment(self::$CACHE_CATEGORY.'inc', 1, [Gdn_Cache::FEATURE_INITIAL => 1]);
+        $this->modelCache->invalidateAll();
+        $this->cache->increment(self::CACHE_CATEGORY.'inc', 1, [Gdn_Cache::FEATURE_INITIAL => 1]);
         $this->cacheInc = null;
         /** @var EventManager $eventManager */
         $eventManager = \Gdn::getContainer()->get(EventManager::class);
@@ -191,7 +209,7 @@ class CategoryCollection {
             $id = $this->categorySlugs[strtolower($categoryID)];
         } else {
             // The ID still might not be found here.
-            $id = $this->cache->get($this->cacheKey(self::$CACHE_CATEGORY_SLUG, $categoryID));
+            $id = $this->cache->get($this->cacheKey(self::CACHE_CATEGORY_SLUG, $categoryID));
         }
 
         if ($id) {
@@ -200,7 +218,7 @@ class CategoryCollection {
             if (isset($this->categories[$id])) {
                 return $this->categories[$id];
             } else {
-                $cacheKey = $this->cacheKey(self::$CACHE_CATEGORY, $id);
+                $cacheKey = $this->cacheKey(self::CACHE_CATEGORY, $id);
                 $category = $this->cache->get($cacheKey);
 
                 if (!empty($category)) {
@@ -221,11 +239,11 @@ class CategoryCollection {
             $this->calculateStatic($category);
 
             $this->cacheStore(
-                $this->cacheKey(self::$CACHE_CATEGORY, $category['CategoryID']),
+                $this->cacheKey(self::CACHE_CATEGORY, $category['CategoryID']),
                 $category
             );
             $this->cacheStore(
-                $this->cacheKey(self::$CACHE_CATEGORY_SLUG, $category['UrlCode']),
+                $this->cacheKey(self::CACHE_CATEGORY_SLUG, $category['UrlCode']),
                 (int)$category['CategoryID']
             );
 
@@ -272,21 +290,16 @@ class CategoryCollection {
      * All cache keys should be generated using this function to support cache increments.
      *
      * @param string $type One of the **$CACHE_*** pseudo-constants.
-     * @param string|int $id The identifier in the cache.
+     * @param string|int|array $id The identifier in the cache.
      * @return string Returns the cache key.
      */
-    private function cacheKey($type, $id) {
-        switch ($type) {
-            case self::$CACHE_CATEGORY:
-            case self::$CACHE_CATEGORY_DESCENDANTS:
-                $r = $this->getCacheInc().$type.$id;
-                return $r;
-            case self::$CACHE_CATEGORY_SLUG;
-                $r = $this->getCacheInc().$type.strtolower($id);
-                return $r;
-            default:
-                throw new \InvalidArgumentException("Cache type '$type' is invalid.'", 500);
+    private function cacheKey(string $type, $id): string {
+        if (is_string($id)) {
+            $id = strtolower($id);
+        } elseif (is_array($id)) {
+            $id = strtolower(implode($id));
         }
+        return $this->getCacheInc().$type.$id;
     }
 
     /**
@@ -294,9 +307,9 @@ class CategoryCollection {
      *
      * The cache is flushed after major operations by incrementing a scoped key.
      */
-    private function getCacheInc() {
+    private function getCacheInc(): int {
         if ($this->cacheInc === null) {
-            $this->cacheInc = (int)$this->cache->get(self::$CACHE_CATEGORY.'inc');
+            $this->cacheInc = (int)$this->cache->get(self::CACHE_CATEGORY.'inc');
         }
         return $this->cacheInc;
     }
@@ -388,7 +401,7 @@ class CategoryCollection {
         // Look in the global cache.
         $keys = [];
         foreach (array_diff_key($categories, $internalCategories) as $id => $null) {
-            $keys[] = $this->cacheKey(self::$CACHE_CATEGORY, $id);
+            $keys[] = $this->cacheKey(self::CACHE_CATEGORY, $id);
         }
         if (!empty($keys)) {
             $cacheCategories = $this->cache->get($keys);
@@ -416,11 +429,11 @@ class CategoryCollection {
                 $this->calculateStatic($category);
 
                 $this->cacheStore(
-                    $this->cacheKey(self::$CACHE_CATEGORY, $category['CategoryID']),
+                    $this->cacheKey(self::CACHE_CATEGORY, $category['CategoryID']),
                     $category
                 );
                 $this->cacheStore(
-                    $this->cacheKey(self::$CACHE_CATEGORY_SLUG, $category['UrlCode']),
+                    $this->cacheKey(self::CACHE_CATEGORY_SLUG, $category['UrlCode']),
                     (int)$category['CategoryID']
                 );
 
@@ -507,8 +520,8 @@ class CategoryCollection {
      * @return array
      */
     public function getDescendantIDs(int $parentID = -1): array {
-        $cacheKey = $this->cacheKey(self::$CACHE_CATEGORY_DESCENDANTS, $parentID);
-        $cachedIDs = $this->cache->get($this->cacheKey(self::$CACHE_CATEGORY_DESCENDANTS, $parentID));
+        $cacheKey = $this->cacheKey(self::CACHE_CATEGORY_DESCENDANTS, $parentID);
+        $cachedIDs = $this->cache->get($this->cacheKey(self::CACHE_CATEGORY_DESCENDANTS, $parentID));
         if ($cachedIDs !== Gdn_Cache::CACHEOP_FAILURE) {
             return $cachedIDs;
         }
@@ -543,6 +556,38 @@ class CategoryCollection {
     }
 
     /**
+     * Build a SQL query to select childCategories. Defaults to only selecting IDs.
+     *
+     * @param int[] $parentIDs
+     * @param string $selects Set specific selects for the query.
+     *
+     * @return Gdn_SQLDriver
+     */
+    private function makeGetChildQuery(array $parentIDs, string $selects = "*"): Gdn_SQLDriver {
+        return $this->createSql()
+            ->from('Category')
+            ->select($selects)
+            ->where("ParentCategoryID", $parentIDs)
+            ->where("CategoryID >", 0)
+            ->limit($this->absoluteLimit)
+            ->orderBy('ParentCategoryID, Sort');
+    }
+
+    /**
+     * Get child IDs of some parents.
+     *
+     * @param int[] $parentIDs
+     *
+     * @return int[]
+     */
+    private function getChildIDs(array $parentIDs): array {
+        return $this->modelCache->getCachedOrHydrate(['getChildIDs' => true, 'parentIDs' => $parentIDs], function () use ($parentIDs) {
+            $rows = $this->makeGetChildQuery($parentIDs, "CategoryID")->get()->resultArray();
+            return array_column($rows, 'CategoryID');
+        });
+    }
+
+    /**
      * Get all of the children of a parent category.
      *
      * @param int[] $parentIDs The IDs of the parent categories.
@@ -550,45 +595,30 @@ class CategoryCollection {
      * @param array $options
      * @return array Returns an array of child categories.
      */
-    private function getChildrenByParents(array $parentIDs, $permission = 'PermsDiscussionsView', array $options = []) {
-        if (!$this->cache instanceof Gdn_Dirtycache) {
-            $select = 'CategoryID';
+    private function getChildrenByParents(array $parentIDs, $permission = 'PermsDiscussionsView', array $options = []): array {
+        $needsDirtyJoin = $options[DirtyRecordModel::DIRTY_RECORD_OPT] ?? false;
+
+        if ($needsDirtyJoin) {
+            $sql = $this->makeGetChildQuery($parentIDs);
+            $this->joinDirtyRecordTable($sql, 'CategoryID', 'category');
+            $children = $sql
+                ->get()
+                ->resultArray();
+            array_walk($children, [$this, 'calculateStatic']);
+            array_walk($children, [$this, 'calculateDynamic']);
         } else {
-            $select = '*';
-        }
-
-        $dirtyRecords = $options[DirtyRecordModel::DIRTY_RECORD_OPT] ?? false;
-
-        if ($dirtyRecords) {
-            $this->joinDirtyRecordTable($this->sql, 'CategoryID', 'category');
-        }
-
-        $data = $this
-            ->sql
-            ->select($select)
-            ->from('Category')
-            ->where('ParentCategoryID', $parentIDs)
-            ->where('CategoryID >', 0)
-            ->limit($this->absoluteLimit)
-            ->orderBy('ParentCategoryID, Sort')
-            ->get()->resultArray();
-
-        if (!$this->cache instanceof Gdn_Dirtycache) {
-            $ids = array_column($data, 'CategoryID');
-            $data = $this->getMulti($ids);
-        } else {
-            array_walk($data, [$this, 'calculateStatic']);
-            array_walk($data, [$this, 'calculateDynamic']);
+            $childIDs = $this->getChildIDs($parentIDs);
+            $children = $this->getMulti($childIDs);
         }
 
         // Remove categories without permission.
         if ($permission) {
-            $data = array_filter($data, function ($category) use ($permission) {
+            $children = array_filter($children, function ($category) use ($permission) {
                 return (bool)val($permission, $category);
             });
         }
 
-        return $data;
+        return $children;
     }
 
     /**
@@ -711,11 +741,11 @@ class CategoryCollection {
         if ($category) {
             $this->calculateStatic($category);
             $this->cacheStore(
-                $this->cacheKey(self::$CACHE_CATEGORY, $category['CategoryID']),
+                $this->cacheKey(self::CACHE_CATEGORY, $category['CategoryID']),
                 $category
             );
             $this->cacheStore(
-                $this->cacheKey(self::$CACHE_CATEGORY_SLUG, $category['UrlCode']),
+                $this->cacheKey(self::CACHE_CATEGORY_SLUG, $category['UrlCode']),
                 (int)$category['CategoryID']
             );
             $this->calculateDynamic($category);

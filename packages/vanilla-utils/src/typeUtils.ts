@@ -67,3 +67,27 @@ export function forceInt(value: string | number | undefined | null, fallback: nu
 }
 
 export type RecordID = string | number;
+
+/**
+ * Coerce a value into a boolean.
+ *
+ * @param maybeBool
+ * @returns
+ */
+export function forceBool(maybeBool: any): boolean {
+    if (typeof maybeBool === "boolean") {
+        return maybeBool;
+    }
+
+    if (typeof maybeBool === "string") {
+        if (maybeBool === "true") {
+            return true;
+        } else if (maybeBool === "false") {
+            return false;
+        } else {
+            return !!maybeBool;
+        }
+    }
+
+    return !!maybeBool;
+}

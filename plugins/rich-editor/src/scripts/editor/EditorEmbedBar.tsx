@@ -18,6 +18,7 @@ import { EmojiFlyout } from "@rich-editor/flyouts/EmojiFlyout";
 interface IProps {
     className?: string;
     contentRef?: React.RefObject<HTMLDivElement>;
+    uploadEnabled?: boolean;
 }
 
 export function EditorEmbedBar(props: IProps) {
@@ -27,7 +28,7 @@ export function EditorEmbedBar(props: IProps) {
     }
     const mimeTypes = getMeta("upload.allowedExtensions");
     const classesRichEditor = richEditorClasses(legacyMode);
-
+    const uploadEnabled = props.uploadEnabled ?? true;
     return (
         <div
             ref={props.contentRef}
@@ -59,19 +60,23 @@ export function EditorEmbedBar(props: IProps) {
                         <EmojiFlyout disabled={isLoading} renderAbove={legacyMode} legacyMode={legacyMode} />
                     </li>
                 )}
-                <Permission permission="uploads.add">
-                    <li className={classNames("richEditor-menuItem", classesRichEditor.menuItem)} role="menuitem">
-                        <EditorUploadButton disabled={isLoading} type="image" allowedMimeTypes={mimeTypes} />
-                    </li>
-                </Permission>
+                {uploadEnabled && (
+                    <Permission permission="uploads.add">
+                        <li className={classNames("richEditor-menuItem", classesRichEditor.menuItem)} role="menuitem">
+                            <EditorUploadButton disabled={isLoading} type="image" allowedMimeTypes={mimeTypes} />
+                        </li>
+                    </Permission>
+                )}
                 <li className={classNames("richEditor-menuItem", classesRichEditor.menuItem)} role="menuitem">
                     <EmbedFlyout disabled={isLoading} renderAbove={legacyMode} />
                 </li>
-                <Permission permission="uploads.add">
-                    <li className={classNames("richEditor-menuItem", classesRichEditor.menuItem)} role="menuitem">
-                        <EditorUploadButton disabled={isLoading} type="file" allowedMimeTypes={mimeTypes} />
-                    </li>
-                </Permission>
+                {uploadEnabled && (
+                    <Permission permission="uploads.add">
+                        <li className={classNames("richEditor-menuItem", classesRichEditor.menuItem)} role="menuitem">
+                            <EditorUploadButton disabled={isLoading} type="file" allowedMimeTypes={mimeTypes} />
+                        </li>
+                    </Permission>
+                )}
                 {getExtraComponents().length > 0 && (
                     <li className={classNames("richEditor-menuItem", classesRichEditor.menuItem)} role="separator">
                         <hr className={classesRichEditor.embedBarSeparator} />

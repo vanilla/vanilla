@@ -55,7 +55,20 @@ export function scrollToCurrentHash(offset?: number, beforeScrollHandler?: () =>
 }
 
 export function initHashScrolling(offset: number = 0, beforeScrollHandler?: () => void) {
-    scrollToCurrentHash(offset, beforeScrollHandler);
+    /**
+     * Dragons be here
+     * This function will be called only when the page is initially loaded.
+     * It needs to be called twice because images (and other media) lazy load
+     * The first scrollToCurrentHash will trigger the loading of the media, upon
+     * loading, the content will shift, so the second scrollToCurrentHash will
+     * correct for it.
+     */
+    window.onload = () => {
+        scrollToCurrentHash(offset, beforeScrollHandler);
+        setTimeout(() => {
+            scrollToCurrentHash(offset, beforeScrollHandler);
+        }, 500); // A generous delay for assets to complete loading
+    };
     const hashChangeHandler = (e: HashChangeEvent) => {
         e.preventDefault();
         scrollToCurrentHash(offset, beforeScrollHandler);

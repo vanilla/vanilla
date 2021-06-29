@@ -183,8 +183,8 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
                     display: "block",
                     color: ColorsUtils.colorOut(vars.text.placeholder.color),
                     position: "absolute",
-                    top: vars.text.offset,
-                    left: 0,
+                    top: 9,
+                    left: 12,
                     cursor: "text",
                 },
             },
@@ -205,30 +205,23 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
         margin: 0,
         zIndex: 1,
         overflow: "visible",
-        ...{
-            ".richEditor-menuItem": {
+        ".richEditor-menuItem": {
+            ".richEditor-button": {
                 display: "block",
-                padding: 0,
-                margin: 0,
+                width: styleUnit(vars.menuButton.size),
+                fontSize: styleUnit((vars.menuButton.size * 24) / 39),
+                lineHeight: styleUnit(vars.menuButton.size),
                 ...{
-                    ".richEditor-button": {
-                        display: "block",
-                        width: styleUnit(vars.menuButton.size),
-                        fontSize: styleUnit((vars.menuButton.size * 24) / 39),
-                        lineHeight: styleUnit(vars.menuButton.size),
-                        ...{
-                            "&.emojiChar-🇺🇳": {
-                                fontSize: styleUnit(10),
-                            },
-                        },
-                    },
-                    "&:first-child .richEditor-embedButton": {
-                        borderBottomLeftRadius: styleUnit(globalVars.border.radius),
-                    },
-                    "&.isRightAligned": {
-                        marginLeft: "auto",
+                    "&.emojiChar-🇺🇳": {
+                        fontSize: styleUnit(10),
                     },
                 },
+            },
+            "&:first-child .richEditor-embedButton": {
+                borderBottomLeftRadius: styleUnit(globalVars.border.radius),
+            },
+            "&.isRightAligned": {
+                marginLeft: "auto",
             },
         },
     });
@@ -295,26 +288,28 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
     });
 
     const menuItem = style("menuItem", {
-        display: "block",
-        padding: 0,
-        margin: 0,
         overflow: "visible",
-        ...{
-            ".richEditor-button, &.richEditor-button": {
-                width: styleUnit(vars.menuButton.size),
-                height: styleUnit(vars.menuButton.size),
-                maxWidth: styleUnit(vars.menuButton.size),
-                fontSize: styleUnit((vars.menuButton.size * 24) / 39),
-                lineHeight: styleUnit(vars.menuButton.size),
-                ...{
-                    "&.emojiChar-🇺🇳": {
-                        fontSize: styleUnit(14),
-                    },
+        // fix activity page old bad selector.
+        "&&&": {
+            background: "none",
+            display: "block",
+            padding: 0,
+            margin: 0,
+        },
+        ".richEditor-button, &.richEditor-button": {
+            width: styleUnit(vars.menuButton.size),
+            height: styleUnit(vars.menuButton.size),
+            maxWidth: styleUnit(vars.menuButton.size),
+            fontSize: styleUnit((vars.menuButton.size * 24) / 39),
+            lineHeight: styleUnit(vars.menuButton.size),
+            ...{
+                "&.emojiChar-🇺🇳": {
+                    fontSize: styleUnit(14),
                 },
             },
-            "&.isRightAligned": {
-                marginLeft: "auto",
-            },
+        },
+        "&.isRightAligned": {
+            marginLeft: "auto",
         },
     });
 

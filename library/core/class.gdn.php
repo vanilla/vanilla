@@ -187,8 +187,8 @@ class Gdn {
      * @param Gdn_Controller $value
      * @return Gdn_Controller
      */
-    public static function controller($value = null) {
-        if ($value !== null) {
+    public static function controller($value = null): ?Gdn_Controller {
+        if ($value instanceof Gdn_Controller) {
             self::$controller = $value;
         }
 

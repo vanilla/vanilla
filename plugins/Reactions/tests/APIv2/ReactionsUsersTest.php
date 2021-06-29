@@ -91,4 +91,30 @@ class ReactionsUsersTest extends AbstractAPIv2Test {
         $actual = $this->api()->get("users/{$user['UserID']}")->getBody();
         $this->assertArrayNotHasKey("reactionsReceived", $actual);
     }
+
+    /**
+     * Test that the profile reactions page is not in edit mode.
+     */
+    public function testReactionProfilePage(): void {
+        $discussion = null;
+
+        $user = $this->createUser();
+        $this->runWithUser(function () use (&$discussion) {
+            $discussion = $this->createDiscussion(["categoryID" => 1]);
+        }, $this->lastUserID);
+        $this->runWithUser(function () use ($discussion) {
+            $this->api->post(
+                "discussions/{$discussion['discussionID']}/reactions",
+                ["reactionType" => "Like"]
+            );
+        }, $this->adminID);
+
+        $profileController = $this->bessy()->get("/profile/reactions/{$user['name']}?reaction=like");
+        // Make sure the profile options module doesn't come through.
+        $this->assertIsNotObject($profileController->getAsset('Content'));
+        // Make sure we aren't, and never have been, in edit mode.
+        $this->assertFalse($profileController->EditMode);
+        // The Css class will be "EditMode Profile" if edit mode has been set to true.
+        $this->assertSame($profileController->CssClass, " Profile");
+    }
 }

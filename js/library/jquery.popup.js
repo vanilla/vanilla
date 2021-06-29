@@ -126,11 +126,6 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
       var pagesize = $.popup.getPageSize();
       $('div.Overlay').css({height: pagesize[1]});
 
-      var pagePos = $.popup.getPagePosition();
-      $('#'+settings.popupId).css({
-         top: pagePos.top,
-         left: pagePos.left
-      });
       $('#'+settings.popupId).show();
 
       $('#'+settings.popupId+' .Body').css({

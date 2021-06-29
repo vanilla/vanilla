@@ -286,7 +286,8 @@ class ActivityController extends Gdn_Controller {
                 $activityComment = [
                     'ActivityID' => $activityID,
                     'Body' => $body,
-                    'Format' => 'Text'];
+                    'Format' => $this->Form->getValue('Format', '')
+                ];
 
                 $iD = $this->ActivityModel->comment($activityComment);
 

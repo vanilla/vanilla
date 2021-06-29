@@ -26,6 +26,9 @@ import { IUserFragment } from "@library/@types/api/users";
 import { connect } from "react-redux";
 import { ComposeIcon } from "@library/icons/titleBar";
 import { IDeviceProps, withDevice } from "@library/layout/DeviceContext";
+import Permission from "@library/features/users/Permission";
+import { frameBodyClasses } from "@library/layout/frame/frameBodyStyles";
+import { CoreErrorMessages } from "@library/errorPages/CoreErrorMessages";
 
 /**
  * Implements Messages Contents to be included in drop down or tabs
@@ -41,14 +44,16 @@ export class MessagesContents extends React.Component<IProps> {
                 canGrow={true}
                 header={
                     <FrameHeaderWithAction title={title}>
-                        <LinkAsButton
-                            title={t("New Message")}
-                            to={"/messages/add"}
-                            buttonType={ButtonTypes.ICON}
-                            className={classNames(buttonUtils.pushRight)}
-                        >
-                            <ComposeIcon />
-                        </LinkAsButton>
+                        <Permission permission="conversations.add">
+                            <LinkAsButton
+                                title={t("New Message")}
+                                to={"/messages/add"}
+                                buttonType={ButtonTypes.ICON}
+                                className={classNames(buttonUtils.pushRight)}
+                            >
+                                <ComposeIcon />
+                            </LinkAsButton>
+                        </Permission>
                     </FrameHeaderWithAction>
                 }
                 body={<FrameBody className={classNames("isSelfPadded")}>{this.renderContents()}</FrameBody>}
@@ -77,7 +82,17 @@ export class MessagesContents extends React.Component<IProps> {
     }
 
     private renderContents(): React.ReactNode {
-        const { status, data } = this.props;
+        const classesFrameBody = frameBodyClasses();
+        const { status, data, error } = this.props;
+
+        if (status === LoadStatus.ERROR || error) {
+            return (
+                <div className={classesFrameBody.noContentMessage}>
+                    <CoreErrorMessages apiError={error} />
+                </div>
+            );
+        }
+
         if (status !== LoadStatus.SUCCESS || !data) {
             return <Loader small minimumTime={0} padding={10} />;
         }
@@ -157,6 +172,7 @@ function mapStateToProps(state: IConversationsStoreState) {
         countUnread,
         data,
         status: conversationsByID.status,
+        error: conversationsByID.error,
     };
 }
 

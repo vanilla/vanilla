@@ -172,12 +172,16 @@ $GroupIcon-overlap: #{50px + $utility-baseUnitTriple};
 
         @include maxWidth {
             display: flex;
-            flex-direction: column;
+            flex-direction: row-reverse;
+            flex-wrap: wrap;
+            align-items: flex-start;
+            justify-content: space-between;
 
-            .Options {
-                position: absolute;
-                margin-top: 0;
-                right: 0;
+
+            .ItemContent {
+                flex: 1;
+                padding-left: 0;
+                padding-right: 0;
             }
 
             .Excerpt {
@@ -269,23 +273,24 @@ $GroupIcon-overlap: #{50px + $utility-baseUnitTriple};
         }
     }
 
-    .Button:nth-child(2) {
-        margin-left: $utility-baseUnitHalf;
-        background-color: transparent;
-        border-color: $global-color_primary;
-        color: $global-color_primary;
+    @if ($staticVariables) {
 
-        @if ($staticVariables) {
+        .Button:nth-child(2) {
+            margin-left: $utility-baseUnitHalf;
+            background-color: transparent;
+            border-color: $global-color_primary;
+            color: $global-color_primary;
+
             &:focus,
             &:hover {
                 border-color: $global-color_primary;
                 background-color: $global-color_primary;
                 color: $global-color_white;
             }
-        }
 
-        @include maxWidth {
-            margin-left: 0;
+            @include maxWidth {
+                margin-left: 0;
+            }
         }
     }
 }
@@ -301,12 +306,12 @@ $GroupIcon-overlap: #{50px + $utility-baseUnitTriple};
 }
 
 .Group-Icon-Big-Wrap {
-    position: absolute;
-    top: $GroupBanner-height;
-    height: $GroupIcon-size;
-    width: $GroupIcon-size;
-    background-color: $global-color_white;
     @if ($staticVariables) {
+        position: absolute;
+        top: $GroupBanner-height;
+        height: $GroupIcon-size;
+        width: $GroupIcon-size;
+        background-color: $global-color_white;
         margin: -$GroupIcon-overlap $utility-baseUnitTriple $utility-baseUnitTriple $utility-baseUnitTriple;
         border-radius: $component_borderRadius;
         box-shadow: 0 0 0 1px rgba($global-color_black, 0.2);
@@ -321,8 +326,10 @@ $GroupIcon-overlap: #{50px + $utility-baseUnitTriple};
         }
     }
 
-    @include maxWidth {
-        display: none;
+    @if ($staticVariables) {
+        @include maxWidth {
+            display: none;
+        }
     }
 }
 
@@ -348,8 +355,10 @@ $GroupIcon-overlap: #{50px + $utility-baseUnitTriple};
 .Group-Description {
     margin-bottom: $utility-baseUnitTriple;
 
-    @include maxWidth {
-        display: none;
+    @if ($staticVariables) {
+        @include maxWidth {
+            display: none;
+        }
     }
 }
 
@@ -466,11 +475,11 @@ body.noGroupIcon {
 
         @include maxWidth {
             display: flex;
-            flex-direction: column;
+            flex-direction: row-reverse;
+            flex-wrap: wrap;
 
-            .Options {
-                order: 2;
-            }
+            align-items: flex-start;
+            justify-content: space-between;
 
             @if ($staticVariables) {
                 .PhotoWrap {

@@ -1,16 +1,16 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license Proprietary
  */
 
-import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { cssRule } from "@library/styles/styleShim";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { em, percent } from "csx";
-import { userContentVariables } from "@library/content/userContentStyles";
+import { userContentVariables } from "@library/content/UserContent.variables";
 import { Mixins } from "@library/styles/Mixins";
 
 export const codeBlockVariables = useThemeCache(() => {
@@ -52,7 +52,7 @@ export const codeBlockVariables = useThemeCache(() => {
             radius: borderRadius.default,
         },
         paddings: {
-            all: globalVars.userContent.font.sizes.default,
+            all: globalVars.fonts.size.medium,
         },
     });
 

@@ -13,7 +13,7 @@ if ($Session->checkPermission('Garden.Profiles.Edit')) {
     BoxThemeShim::endHeading();
     echo $this->Form->open(['action' => url('/activity/post/'.$this->data('Filter')), 'class' => 'Activity']);
     echo $this->Form->errors();
-    echo $this->Form->bodyBox('Comment', ['Wrap' => true]);
+    echo $this->Form->bodyBox('Comment', ['Wrap' => true, 'placeholder' => t('Write a comment')]);
 
     echo '<div class="Buttons">';
     echo $this->Form->button('Share', ['class' => 'Button Primary']);

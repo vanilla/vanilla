@@ -15,8 +15,8 @@ class PhpAsJsVariable {
     /** @var string */
     private $variableName;
 
-    /** @var array|object */
-    private $data;
+    /** @var string */
+    private $encodedData;
 
     /**
      * Constructor.
@@ -26,7 +26,7 @@ class PhpAsJsVariable {
      */
     public function __construct(string $variableName, $data) {
         $this->variableName = $variableName;
-        $this->data = $data;
+        $this->encodedData = json_encode($data);
     }
 
     /**
@@ -35,6 +35,6 @@ class PhpAsJsVariable {
      * @return string
      */
     public function __toString() {
-        return 'window["' . $this->variableName . '"]=' . json_encode($this->data) . ";\n";
+        return 'window["' . $this->variableName . '"]=' . $this->encodedData . ";\n";
     }
 }

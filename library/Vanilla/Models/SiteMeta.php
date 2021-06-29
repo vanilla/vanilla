@@ -271,6 +271,23 @@ class SiteMeta implements \JsonSerializable {
     }
 
     /**
+     * Make a method call and catch any throwables it provides.
+     *
+     * @param callable $fn
+     * @param mixed $fallback
+     *
+     * @return mixed
+     */
+    private function tryWithFallback(callable $fn, $fallback) {
+        try {
+            return call_user_func($fn);
+        } catch (\Throwable $t) {
+            logException($t);
+            return $fallback;
+        }
+    }
+
+    /**
      * @return array
      */
     public function value(): array {
@@ -317,9 +334,11 @@ class SiteMeta implements \JsonSerializable {
                 'maxUploads' => $this->maxUploads,
                 'allowedExtensions' => $this->allowedExtensions,
             ],
-            'registrationUrl' => registerUrl(),
-            'signInUrl' => signInUrl(),
-            'signOutUrl' => signOutUrl(),
+
+            // In case there is a some failure here we don't want the site to crash.
+            'registrationUrl' => $this->tryWithFallback('registerUrl', ''),
+            'signInUrl' => $this->tryWithFallback('signInUrl', ''),
+            'signOutUrl' => $this->tryWithFallback('signOutUrl', ''),
             'featureFlags' => $this->featureFlags,
             'themeFeatures' => $this->themeFeatures->allFeatures(),
             'addonFeatures' => $this->themeFeatures->allAddonFeatures(),

@@ -31,8 +31,8 @@ export const MachineTranslationSettings = (props: IMachineTranslationProps) => {
     const classes = dashboardClasses();
     const languageClasses = languageSettingsStyles();
 
-    const isDefaultConfigured = useMemo(() => {
-        return services.find((service) => service.isDefault)?.isConfigured ?? false;
+    const isAnyConfigured = useMemo(() => {
+        return services.map((service) => service.isConfigured).some((bool) => bool);
     }, [services]);
 
     return (
@@ -45,10 +45,10 @@ export const MachineTranslationSettings = (props: IMachineTranslationProps) => {
                         "Enable Machine Translation and configure your translation service provides to translate Knowledge Base articles.",
                     )}
                     afterDescription={
-                        !isDefaultConfigured &&
+                        !isAnyConfigured &&
                         isEnabled && (
                             <span className={languageClasses.warning}>
-                                {t("You must configure Google Translate to use machine translations.")}
+                                {t("You must configure at least one service provider to use machine translations.")}
                             </span>
                         )
                     }

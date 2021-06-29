@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -82,27 +82,4 @@ export function lineHeightAdjustment(
     }
 
     return result;
-}
-
-export function defaultHyphenation(): CSSObject {
-    const vars = globalVariables().userContentHyphenation;
-    return {
-        msHyphens: "auto",
-        WebkitHyphens: "auto",
-        hyphens: "auto",
-        /* legacy properties */
-        "-webkit-hyphenate-limit-before": vars.minimumCharactersBeforeBreak,
-        "-webkit-hyphenate-limit-after": vars.minimumCharactersAfterBreak,
-        /* current proposal */
-        "-moz-hyphenate-limit-chars": `${vars.minimumCharactersToHyphenate} ${vars.minimumCharactersBeforeBreak} ${vars.minimumCharactersAfterBreak}` /* not yet supported */,
-        "-webkit-hyphenate-limit-chars": `${vars.minimumCharactersToHyphenate} ${vars.minimumCharactersBeforeBreak} ${vars.minimumCharactersAfterBreak}` /* not yet supported */,
-        msHyphenateLimitChars: `${vars.minimumCharactersToHyphenate} ${vars.minimumCharactersBeforeBreak} ${vars.minimumCharactersAfterBreak}`,
-        hyphenateLimitChars: `${vars.minimumCharactersToHyphenate} ${vars.minimumCharactersBeforeBreak} ${vars.minimumCharactersAfterBreak}`,
-        // Maximum consecutive lines to have hyphenation
-        msHyphenateLimitLines: vars.maximumConsecutiveBrokenLines,
-        "-webkit-hyphenate-limit-lines": vars.maximumConsecutiveBrokenLines,
-        "hyphenate-limit-lines": vars.maximumConsecutiveBrokenLines,
-        // Limit "zone" to hyphenate
-        "hyphenate-limit-zone": styleUnit(vars.hyphenationZone),
-    };
 }

@@ -31,9 +31,6 @@ export type Loadable<T, E = any> =
           data?: undefined;
       };
 
-/**
- * @deprecated use Loadable instead. It has stricter types.
- */
 export interface ILoadable<T = never, E = IApiError> {
     status: LoadStatus;
     error?: E;

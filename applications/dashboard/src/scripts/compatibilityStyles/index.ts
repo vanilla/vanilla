@@ -1,7 +1,7 @@
 /**
  * Compatibility styles, using the color variables.
  *
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -52,6 +52,7 @@ import { discussionListCompatCSS } from "@library/features/discussions/Discussio
 import { widgetLayoutCompactCSS } from "@library/layout/WidgetLayout.compat.styles";
 import { onlineUserWrapCSS } from "@dashboard/compatibilityStyles/onlineUserStyles";
 import { bodyStyleMixin } from "@library/layout/bodyStyles";
+import { userContentCompatCSS } from "@library/content/UserContent.compat.styles";
 export { cssOut };
 
 // Re-export for compatibility.
@@ -340,7 +341,7 @@ compatibilityStyles = useThemeCache(() => {
     });
 
     cssOut(".selectBox-item .selectBox-selectedIcon", {
-        color: ColorsUtils.colorOut(dropDownVariables().item.colors.fg),
+        color: ColorsUtils.colorOut(dropDownVariables().contents.fg),
     });
 
     cssOut(`.HomepageTitle, .pageNotFoundTitle`, {
@@ -381,6 +382,7 @@ compatibilityStyles = useThemeCache(() => {
     groupsCSS();
     profileCompatCSS();
     discussionCompatCSS();
+    userContentCompatCSS();
     discussionListCompatCSS();
     categoryListCompatCSS();
     conversationListCompatCSS();

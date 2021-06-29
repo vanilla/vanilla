@@ -1,12 +1,11 @@
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import { useHashScrolling } from "@library/content/hashScrolling";
-import { userContentClasses } from "@library/content/userContentStyles";
-// import classNames from "classnames";
+import { userContentClasses } from "@library/content/UserContent.styles";
 import React, { useMemo } from "react";
 
 import { cx } from "@emotion/css";

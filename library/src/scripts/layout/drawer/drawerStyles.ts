@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -24,13 +24,13 @@ export const drawerVariables = useThemeCache(() => {
     };
 
     const fonts = {
-        size: globalVars.userContent.font.sizes.default,
+        size: globalVars.fonts.size.medium,
         weight: globalVars.fonts.weights.semiBold,
         ...themeVars.subComponentStyles("fonts"),
     };
 
     const sizing = {
-        icon: globalVars.userContent.font.sizes.default,
+        icon: globalVars.fonts.size.medium,
         ...themeVars.subComponentStyles("sizing"),
     };
 

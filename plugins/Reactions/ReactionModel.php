@@ -28,6 +28,8 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface {
     /** Cache grace. */
     const CACHE_GRACE = 60;
 
+    const ICON_BASE_URL = 'https://badges.v-cdn.net/reactions/50/';
+
     /** @var null  */
     public static $ReactionTypes = null;
 
@@ -1885,7 +1887,7 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface {
                     "urlcode" => $type["UrlCode"],
                 ];
                 $code =strtolower($type["UrlCode"]);
-                $photoUrl = "https://badges.v-cdn.net/reactions/50/$code.png";
+                $photoUrl = self::ICON_BASE_URL . "$code.svg";
                 $result[$userID][$type["UrlCode"]]["PhotoUrl"] = $photoUrl;
             }
         }

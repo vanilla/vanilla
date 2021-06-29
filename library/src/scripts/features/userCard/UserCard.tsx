@@ -8,7 +8,7 @@ import { cx } from "@emotion/css";
 import { LoadStatus } from "@library/@types/api/core";
 import { IUser, IUserFragment } from "@library/@types/api/users";
 import { hasUserViewPermission } from "@library/features/users/modules/hasUserViewPermission";
-import { useUser } from "@library/features/users/userHooks";
+import { useUser, useCurrentUserID } from "@library/features/users/userHooks";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import ErrorMessages from "@library/forms/ErrorMessages";
 import { useDevice, Devices } from "@library/layout/DeviceContext";
@@ -245,6 +245,8 @@ function UserCardFlyout(props: React.ComponentProps<typeof UserCard>) {
 function UserCardDynamic(props: IProps) {
     const { userFragment } = props;
     const user = useUser({ userID: props.userID });
+    const currentUseID = useCurrentUserID();
+    const isOwnUser = userFragment?.userID === currentUseID;
     const hasPersonalInfoView = hasPermission("personalInfo.view");
     let bannedPrivateProfile = getMeta("ui.bannedPrivateProfile", "0");
     bannedPrivateProfile = bannedPrivateProfile === "" ? "0" : "1";
@@ -252,7 +254,7 @@ function UserCardDynamic(props: IProps) {
     let banned = userFragment?.banned ?? 0;
     let isBanned = banned === 1;
 
-    if ((userFragment?.private || (privateBannedProfileEnabled && isBanned)) && !hasPersonalInfoView) {
+    if ((userFragment?.private || (privateBannedProfileEnabled && isBanned)) && !hasPersonalInfoView && !isOwnUser) {
         return <UserCardMinimal userFragment={userFragment} onClose={props.onClose} />;
     }
 

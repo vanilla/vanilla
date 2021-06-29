@@ -64,7 +64,6 @@ class ContentSecurityPolicyModel {
 
         $policies = [];
 
-        if (!$this->config->get('HotReload.Enabled', false)) {
             // Note:
             // In modern browsers that support `nonce-` unsafe-inline is ignored.
             // Older browsers need unsafe inline applied.
@@ -74,6 +73,8 @@ class ContentSecurityPolicyModel {
             foreach ($this->providers as $provider) {
                 $policies = array_merge($policies, $provider->getPolicies());
             }
+        if ($this->config->get('HotReload.Enabled', false)) {
+            $policies[] = new Policy(Policy::SCRIPT_SRC, "'unsafe-eval' 'https://webpack.vanilla.localhost'");
         }
         return $policies;
     }

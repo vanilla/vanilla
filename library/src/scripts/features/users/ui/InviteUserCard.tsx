@@ -18,7 +18,8 @@ import InputTextBlock, { InputTextBlockBaseClass } from "@library/forms/InputTex
 import Checkbox from "@library/forms/Checkbox";
 import { userCardClasses } from "@library/features/users/ui/inviteUserCardStyles";
 import Permission, { hasPermission, PermissionMode } from "@library/features/users/Permission";
-import { IError } from "@library/errorPages/CoreErrorMessages";
+import { IApiError } from "@library/@types/api/core";
+import ErrorMessages from "@library/forms/ErrorMessages";
 
 interface IProps {
     defaultUsers: IComboBoxOption[];
@@ -28,7 +29,7 @@ interface IProps {
     sentInvitations: () => void;
     visible: boolean;
     closeModal: () => void;
-    errors?: Record<string, IError[]>;
+    errors?: IApiError | undefined;
 }
 
 export default function InviteUserCard(props: IProps) {
@@ -47,6 +48,7 @@ export default function InviteUserCard(props: IProps) {
     const [boxChecked, setBoxChecked] = useState(false);
 
     const classes = userCardClasses();
+
     return (
         <LazyModal
             isVisible={visible}
@@ -82,7 +84,6 @@ export default function InviteUserCard(props: IProps) {
                              */
                             maxHeight={200}
                         />
-
                         <Permission permission={"emailInvitations.add"} mode={PermissionMode.GLOBAL}>
                             {hasEmailInvitePermission && (
                                 <InputTextBlock
@@ -103,7 +104,7 @@ export default function InviteUserCard(props: IProps) {
                                         rows: 5,
                                         maxRows: 5,
                                     }}
-                                    errors={props.errors?.emails}
+                                    errors={errors?.response.data?.errors?.emails}
                                 />
                             )}
                             {inputEmails.trim() && (
@@ -115,7 +116,9 @@ export default function InviteUserCard(props: IProps) {
                                 />
                             )}
                         </Permission>
-
+                        {!errors?.response.data?.errors && errors?.response.data?.message && (
+                            <ErrorMessages padded errors={[{ message: errors?.response.data?.message }]} />
+                        )}
                         <div className={classes.buttonGroup}>
                             <Button
                                 className={classes.button}

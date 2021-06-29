@@ -589,9 +589,8 @@ body:not(.dataDriven) .Button:active {
   border-width: 0 0 100px 200px;
   opacity: 0;
   filter: alpha(opacity=0);
-  -webkit-transform: translate(-300px, 0) scale(4);
-      -ms-transform: translate(-300px, 0) scale(4);
-          transform: translate(-300px, 0) scale(4);
+  -ms-transform: translate(-300px, 0) scale(4);
+      transform: translate(-300px, 0) scale(4);
   direction: ltr;
   cursor: pointer;
 }
@@ -1099,7 +1098,6 @@ body > #Frame > .Head {
 
 .OptionsTitle {
   -webkit-user-select: none;
-     -moz-user-select: none;
       -ms-user-select: none;
           user-select: none;
   background: url("images/ui_sprites.png") no-repeat 0 -101px;
@@ -5995,14 +5993,6 @@ Styleguide Attachments
 }
 
 /* Effects */
-@-webkit-keyframes highlight {
-  0% {
-    background-color: #ff9;
-  }
-  10% {
-    background-color: #ff9;
-  }
-}
 @keyframes highlight {
   0% {
     background-color: #ff9;
@@ -6012,8 +6002,7 @@ Styleguide Attachments
   }
 }
 .highlight-effect {
-  -webkit-animation: highlight 0.8s;
-          animation: highlight 0.8s;
+  animation: highlight 0.8s;
 }
 
 /* Groups section tweaks */
@@ -6073,9 +6062,8 @@ Styleguide Attachments
   width: 100%;
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
-  -moz-user-select: none;
-   -ms-user-select: none;
-       user-select: none;
+  -ms-user-select: none;
+      user-select: none;
   -webkit-user-select: none;
 }
 
@@ -6235,15 +6223,12 @@ img.jcrop-preview {
 }
 
 .flex {
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-justify-content: space-between;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
+  -ms-flex-pack: justify;
+      justify-content: space-between;
+  -ms-flex-align: center;
+      align-items: center;
 }
 .flex > * {
   margin-right: 4.5px;
@@ -6253,33 +6238,28 @@ img.jcrop-preview {
 }
 
 .flex-wrap {
-  -webkit-flex-wrap: wrap;
-      -ms-flex-wrap: wrap;
-          flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
 }
 
 .shrink {
-  -webkit-flex-shrink: 1;
-      -ms-flex-negative: 1;
-          flex-shrink: 1;
+  -ms-flex-negative: 1;
+      flex-shrink: 1;
 }
 
 .grow {
-  -webkit-flex-grow: 1;
-      -ms-flex-positive: 1;
-          flex-grow: 1;
+  -ms-flex-positive: 1;
+      flex-grow: 1;
 }
 
 .no-shrink {
-  -webkit-flex-shrink: 0;
-      -ms-flex-negative: 0;
-          flex-shrink: 0;
+  -ms-flex-negative: 0;
+      flex-shrink: 0;
 }
 
 .no-grow {
-  -webkit-flex-grow: 0;
-      -ms-flex-positive: 0;
-          flex-grow: 0;
+  -ms-flex-positive: 0;
+      flex-grow: 0;
 }
 
 .pull-left {
@@ -6305,7 +6285,6 @@ img.jcrop-preview {
 }
 .foggy input {
   -webkit-user-select: none;
-     -moz-user-select: none;
       -ms-user-select: none;
           user-select: none;
 }

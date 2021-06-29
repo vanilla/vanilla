@@ -115,7 +115,7 @@ function gdn_ExceptionHandler($Exception) {
         @ob_end_clean();
         // prevent headers already sent error
         if (!headers_sent()) {
-            if ($ErrorNumber >= 100 && $ErrorNumber < 600) {
+            if ($ErrorNumber >= 400 && $ErrorNumber < 600) {
                 $Code = $ErrorNumber;
             } else {
                 $Code = 500;

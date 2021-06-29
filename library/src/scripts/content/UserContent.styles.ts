@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -8,328 +8,37 @@ import { singleBorder } from "@library/styles/styleHelpers";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
 import { Mixins } from "@library/styles/Mixins";
-import { Variables } from "@library/styles/Variables";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
-import { CSSObject } from "@emotion/css";
+import { css, CSSObject } from "@emotion/css";
 import { TLength } from "@library/styles/styleShim";
-import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
-import { em, important, percent, px, border } from "csx";
+import { em, important, percent } from "csx";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { Property } from "csstype";
 import { blockQuoteVariables } from "@rich-editor/quill/components/blockQuoteStyles";
-import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { media } from "@library/styles/styleShim";
-import { IThemeVariables } from "@library/theming/themeReducer";
-
-export enum TableStyle {
-    HORIZONTAL_BORDER = "horizontalBorder",
-    HORIZONTAL_BORDER_STRIPED = "horizontalBorderStriped",
-    VERTICAL_BORDER = "verticalBorder",
-    VERTICAL_BORDER_STRIPED = "verticalBorderStriped",
-}
-
-/**
- * @varGroup userContent
- * @commonTitle User Content
- * @description Variables affecting content created by users of the site.
- * If you input it through a text editor, it's likely user content.
- */
-export const userContentVariables = useThemeCache((forcedVars?: IThemeVariables) => {
-    const makeThemeVars = variableFactory("userContent", forcedVars);
-    const globalVars = globalVariables(forcedVars);
-    const { mainColors } = globalVars;
-
-    /**
-     * @varGroup userContent.fonts
-     */
-    const fonts = makeThemeVars("fonts", {
-        /**
-         * @var userContent.fonts.size
-         * @description Default font size for user content.
-         */
-        size: globalVars.fonts.size.large,
-
-        /**
-         * @varGroup userContent.fonts.headings
-         * @commonDescription These are best specified as a relative units. (Eg. "1.5em", "2em").
-         */
-        headings: {
-            /**
-             * @var userContent.fonts.headings.h1
-             */
-            h1: "2em",
-            /**
-             * @var userContent.fonts.headings.h2
-             */
-            h2: "1.5em",
-            /**
-             * @var userContent.fonts.headings.h3
-             */
-            h3: "1.25em",
-            /**
-             * @var userContent.fonts.headings.h4
-             */
-            h4: "1em",
-            /**
-             * @var userContent.fonts.headings.h5
-             */
-            h5: ".875em",
-            /**
-             * @var userContent.fonts.headings.h6
-             */
-            h6: ".85em",
-        },
-    });
-
-    /**
-     * @varGroup userContent.tables
-     * @title User Content - Tables
-     */
-    const tableInit = makeThemeVars("tables", {
-        /**
-         * @var userContent.tables.style
-         * @description Choose a preset for the table styles.
-         * @type string
-         * @enum horizontalBorder|horizontalBorderStriped|verticalBorder|verticalBorderStriped
-         */
-        style: TableStyle.HORIZONTAL_BORDER_STRIPED,
-        /**
-         * @varGroup userContent.tables.borders
-         * @title User Content - Tables - Borders
-         * @expand border
-         */
-        borders: globalVars.border,
-
-        cell: {
-            /**
-             * @var userContent.tables.cell.alignment
-             * @title Cell Alignment
-             * @description Choose the alignment of table cells.
-             * @type string
-             * @enum "center" | "left" | "right",
-             */
-            alignment: "left" as "center" | "left" | "right",
-        },
-
-        /**
-         * @var userContent.tables.mobileBreakpoint
-         * @title Mobile Breakpoint
-         * @description The device width (pixels) where the table switches to a mobile layout.
-         */
-        mobileBreakpoint: 600,
-    });
-
-    const tables = makeThemeVars("tables", {
-        ...tableInit,
-        striped: [TableStyle.HORIZONTAL_BORDER_STRIPED, TableStyle.VERTICAL_BORDER_STRIPED].includes(tableInit.style),
-        stripeColor: globalVars.mixBgAndFg(0.05),
-        outerBorderRadius: [TableStyle.VERTICAL_BORDER_STRIPED, TableStyle.VERTICAL_BORDER].includes(tableInit.style)
-            ? 4
-            : 0,
-        horizontalBorders: {
-            enabled: true, // All current variants have horizontal borders.
-            borders: tableInit.borders,
-        },
-        verticalBorders: {
-            enabled: [TableStyle.VERTICAL_BORDER_STRIPED, TableStyle.VERTICAL_BORDER].includes(tableInit.style),
-            borders: tableInit.borders,
-        },
-    });
-
-    const blocks = makeThemeVars("blocks", {
-        margin: fonts.size,
-        fg: mainColors.fg,
-        bg: globalVars.mixBgAndFg(0.035),
-    });
-
-    /**
-     * @varGroup userContent.embeds
-     * @title User Content - Embeds
-     */
-    const embeds = makeThemeVars("embeds", {
-        /**
-         * @var userContent.embeds.bg
-         * @title Background
-         * @type string
-         * @format hex-color
-         */
-        bg: mainColors.bg,
-        /**
-         * @var userContent.embeds.fg
-         * @title Text Color
-         * @type string
-         * @format hex-color
-         */
-        fg: mainColors.fg,
-
-        /**
-         * @var userContent.embeds.borderRadius
-         * @title Border Radius
-         * @description Border radius of an embed in pixels.
-         * @type string|number
-         */
-        borderRadius: px(2),
-    });
-
-    /**
-     * @varGroup userContent.code
-     * @title User Content - Code
-     * @commonDescription Applies to inline and block style code items.
-     */
-    const code = makeThemeVars("code", {
-        /**
-         * @var userContent.code.fontSize
-         * @type string|number
-         */
-        fontSize: em(0.85),
-        /**
-         * @var userContent.code.borderRadius
-         * @type string|number
-         */
-        borderRadius: 2,
-    });
-
-    /**
-     * @varGroup userContent.codeInline
-     * @title User Content - Code (Inline)
-     * @commonDescription Applies only to inline code elements. Not Blocks.
-     */
-    const codeInline = makeThemeVars("codeInline", {
-        /**
-         * @var userContent.codeInline.borderRadius
-         * @type string|number
-         */
-        borderRadius: code.borderRadius,
-
-        // TODO: replace with Variables.spacing()
-        paddingVertical: em(0.2),
-        // TODO: replace with Variables.spacing()
-        paddingHorizontal: em(0.4),
-
-        /**
-         * @var userContent.codeInline.fg
-         * @title Text Color
-         * @type string
-         * @format hex-color
-         */
-        fg: blocks.fg,
-        /**
-         * @var userContent.codeInline.bg
-         * @title Background
-         * @type string
-         * @format hex-color
-         */
-        bg: blocks.bg,
-    });
-
-    /**
-     * @varGroup userContent.codeBlock
-     * @title User Content - Code (Block)
-     * @commonDescription Applies only to code block elements. Not inline code.
-     */
-    const codeBlock = makeThemeVars("codeBlock", {
-        /**
-         * @var userContent.codeBlock.borderRadius
-         * @type string|number
-         */
-        borderRadius: globalVars.border.radius,
-
-        // TODO: replace with Variables.spacing()
-        paddingVertical: fonts.size,
-        // TODO: replace with Variables.spacing()
-        paddingHorizontal: fonts.size,
-
-        /**
-         * @var userContent.codeBlock.lineHeight
-         * @type number
-         */
-        lineHeight: 1.45,
-        /**
-         * @var userContent.codeBlock.fg
-         * @title Text Color
-         * @type string
-         * @format hex-color
-         */
-        fg: blocks.fg,
-        /**
-         * @var userContent.codeBlock.bg
-         * @title Background
-         * @type string
-         * @format hex-color
-         */
-        bg: blocks.bg,
-    });
-
-    /**
-     * @varGroup userContent.list
-     * @title User Content - Lists
-     */
-    const list = makeThemeVars("list", {
-        /**
-         * @varGroup userContent.list.spacing
-         * @title User Content - List - Spacing
-         * @expand spacing
-         */
-        spacing: Variables.spacing({
-            top: em(0.5),
-            left: em(2),
-        }),
-        listDecoration: {
-            minWidth: em(2),
-        },
-        nestedList: {
-            margin: "0 0 0 1em",
-        },
-    });
-
-    const spacing = makeThemeVars("spacing", {
-        base: 2 * Math.ceil((globalVars.spacer.size * 5) / 8),
-    });
-
-    return {
-        fonts,
-        list,
-        blocks,
-        code,
-        codeInline,
-        codeBlock,
-        embeds,
-        spacing,
-        tables,
-    };
-});
+import { userContentVariables } from "@library/content/UserContent.variables";
+import { LinkDecorationType } from "@library/styles/cssUtilsTypes";
 
 /**
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-export const userContentClasses = useThemeCache(() => {
-    const style = styleFactory("userContent");
+export function userContentMixin(): CSSObject {
     const vars = userContentVariables();
     const globalVars = globalVariables();
-
-    const listItem: CSSObject = {
-        position: "relative",
-        ...Mixins.margin({
-            top: vars.list.spacing.top,
-            left: vars.list.spacing.left,
-        }),
-        ...{
-            "&:first-child": {
-                marginTop: 0,
-            },
-            "&:last-child": {
-                marginBottom: 0,
-            },
-        },
-    };
 
     const headingStyle = (tag: string, fontSize: Property.FontSize<TLength>): CSSObject => {
         return {
             marginTop: styleUnit(vars.spacing.base),
             fontSize,
+            ...Mixins.font({
+                size: fontSize,
+                color: ColorsUtils.colorOut(globalVars.mainColors.fg),
+                weight: globalVars.fonts.weights.bold,
+            }),
             ...lineHeightAdjustment(),
+            lineHeight: globalVars.lineHeights.condensed,
         };
     };
 
@@ -438,7 +147,9 @@ export const userContentClasses = useThemeCache(() => {
     const linkColors = Mixins.clickable.itemState();
     const linkStyle = {
         "& a": {
+            fontSize: "inherit",
             color: ColorsUtils.colorOut(linkColors.color as string),
+            textDecoration: globalVars.links.linkDecorationType === LinkDecorationType.ALWAYS ? "underline" : undefined,
         },
         "& a:hover": {
             color: ColorsUtils.colorOut(globalVars.links.colors.hover),
@@ -472,12 +183,7 @@ export const userContentClasses = useThemeCache(() => {
         },
         "&& .codeInline": {
             whiteSpace: "normal",
-            ...Mixins.padding({
-                top: vars.codeInline.paddingVertical,
-                bottom: vars.codeInline.paddingVertical,
-                left: vars.codeInline.paddingHorizontal,
-                right: vars.codeInline.paddingHorizontal,
-            }),
+            ...Mixins.padding(vars.codeInline.padding),
             color: ColorsUtils.colorOut(vars.codeInline.fg),
             backgroundColor: ColorsUtils.colorOut(vars.codeInline.bg),
             borderRadius: vars.codeInline.borderRadius,
@@ -496,12 +202,7 @@ export const userContentClasses = useThemeCache(() => {
             whiteSpace: "pre",
             color: ColorsUtils.colorOut(vars.codeBlock.fg),
             backgroundColor: ColorsUtils.colorOut(vars.codeBlock.bg),
-            ...Mixins.padding({
-                top: vars.codeBlock.paddingVertical,
-                bottom: vars.codeBlock.paddingVertical,
-                left: vars.codeBlock.paddingHorizontal,
-                right: vars.codeBlock.paddingHorizontal,
-            }),
+            ...Mixins.padding(vars.codeBlock.padding),
         },
     };
 
@@ -716,15 +417,18 @@ export const userContentClasses = useThemeCache(() => {
         },
     );
 
-    const root = style(
-        {
+    const root: CSSObject = {
+        ...{
             // These CAN'T be flexed. That breaks margin collapsing.
             display: important("block"),
             position: "relative",
             width: percent(100),
             wordBreak: "break-word",
-            lineHeight: globalVars.lineHeights.base,
-            fontSize: vars.fonts.size,
+            ...Mixins.font({
+                size: vars.fonts.size,
+                lineHeight: globalVars.lineHeights.base,
+                color: ColorsUtils.colorOut(globalVars.mainColors.fg),
+            }),
             marginTop: lineHeightAdjustment()["::before"]?.marginTop,
             ...{
                 // A placeholder might be put in a ::before element. Make sure we match the line-height adjustment.
@@ -742,25 +446,15 @@ export const userContentClasses = useThemeCache(() => {
                 ...linkStyle,
             },
         },
-        tableOuterRadiusQuery,
-        tableMobileQuery,
-    );
+        ...tableOuterRadiusQuery,
+        ...tableMobileQuery,
+    };
 
-    return { root };
+    return root;
+}
+
+export const userContentClasses = useThemeCache(() => {
+    return {
+        root: css(userContentMixin()),
+    };
 });
-
-export const userContentCSS = () => {
-    const globalVars = globalVariables();
-    cssOut(
-        `
-        .Container .userContent h1,
-        .Container .userContent h2,
-        .Container.userContent h3,
-        .Container .userContent h4,
-        .Container .userContent h5,
-        .Container .userContent h6`,
-        {
-            color: ColorsUtils.colorOut(globalVars.mainColors.fg),
-        },
-    );
-};

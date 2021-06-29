@@ -324,11 +324,9 @@ export const ImageAsElement = storyWithConfig(
                     image:
                         "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
                 },
-                spacing: {
-                    padding: {
-                        top: 87,
-                        bottom: 87,
-                    },
+                padding: {
+                    top: 87,
+                    bottom: 87,
                 },
                 presets: {
                     button: {
@@ -385,11 +383,9 @@ export const LogoLarge = storyWithConfig(
                     image: "https://us.v-cdn.net/5022541/uploads/594/57SO4ULTV3HP.png",
                     width: "50%",
                 },
-                spacing: {
-                    padding: {
-                        top: 87,
-                        bottom: 87,
-                    },
+                padding: {
+                    top: 87,
+                    bottom: 87,
                 },
             },
         },
@@ -438,11 +434,9 @@ export const LogoSmall = storyWithConfig(
                     width: 150,
                     image: STORY_LOGO_BLACK,
                 },
-                spacing: {
-                    padding: {
-                        top: 87,
-                        bottom: 87,
-                    },
+                padding: {
+                    top: 87,
+                    bottom: 87,
                 },
             },
         },
@@ -494,11 +488,9 @@ export const LogoAndRightImage = storyWithConfig(
                     width: 150,
                     image: STORY_LOGO_BLACK,
                 },
-                spacing: {
-                    padding: {
-                        top: 87,
-                        bottom: 87,
-                    },
+                padding: {
+                    top: 87,
+                    bottom: 87,
                 },
             },
         },
@@ -552,11 +544,9 @@ export const ImageAsElementWide = storyWithConfig(
                     image:
                         "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
                 },
-                spacing: {
-                    padding: {
-                        top: 87,
-                        bottom: 87,
-                    },
+                padding: {
+                    top: 87,
+                    bottom: 87,
                 },
                 presets: {
                     button: {
@@ -615,11 +605,9 @@ export const SearchShadowNoSearchButton = storyWithConfig(
                     image:
                         "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
                 },
-                spacing: {
-                    padding: {
-                        top: 87,
-                        bottom: 87,
-                    },
+                padding: {
+                    top: 87,
+                    bottom: 87,
                 },
                 presets: {
                     button: {

@@ -9,15 +9,14 @@ import { absolutePosition, negativeUnit } from "@library/styles/styleHelpers";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { calc, important, percent, translateX } from "csx";
-import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
+import { calc, percent, translateX } from "csx";
 import { forumLayoutVariables } from "./forumLayoutStyles";
 import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
-import { metaContainerStyle } from "@library/metas/Metas.styles";
 import { metasVariables } from "@library/metas/Metas.variables";
 
 import { Mixins } from "@library/styles/Mixins";
+import { injectGlobal } from "@emotion/css";
 
 export const groupVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("groups");
@@ -43,261 +42,231 @@ export const groupsCSS = () => {
     const layoutVars = forumLayoutVariables();
     const mediaQueries = layoutVars.mediaQueries();
 
-    cssOut(`.Group-Banner`, {
-        height: styleUnit(vars.banner.height),
-    });
-
-    cssOut(`.groupSearch`, {
-        marginBottom: styleUnit(16),
-    });
-
-    cssOut(`.groupToolbar`, {
-        marginTop: styleUnit(16),
-    });
-
-    cssOut(
-        `
-        .ButtonGroup.Open .Button.GroupOptionsTitle::before,
-        .Button.GroupOptionsTitle::before,
-        .Button.GroupOptionsTitle:active::before,
-        .Button.GroupOptionsTitle:focus::before
-        `,
-        {
-            color: "inherit",
-            marginRight: styleUnit(6),
+    injectGlobal({
+        ".groupSearch": {
+            marginBottom: styleUnit(16),
         },
-    );
-
-    cssOut(`.Group-Header.NoBanner .Group-Header-Info`, {
-        paddingLeft: styleUnit(0),
-    });
-
-    cssOut(`.Group-Header`, {
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "center",
-        flexWrap: "wrap",
-    });
-
-    cssOut(`a.ChangePicture`, {
-        ...absolutePosition.fullSizeOfParent(),
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        opacity: 0,
-    });
-
-    cssOut(`.DataTableContainer.Group-Box.ApplicantList .PageControls .H`, {
-        position: "relative",
-    });
-
-    cssOut(`body.Section-Event .Group-Banner`, {
-        flexGrow: 1,
-        width: percent(100),
-    });
-
-    cssOut(`.PhotoWrap.PhotoWrapLarge.Group-Icon-Big-Wrap`, {
-        width: styleUnit(vars.logo.height),
-        height: styleUnit(vars.logo.height),
-        flexBasis: styleUnit(vars.logo.height),
-        top: styleUnit(vars.banner.height - vars.logo.height / 2),
-        background: "transparent",
-        zIndex: 1,
-    });
-
-    cssOut(`.Group-Header.NoBanner .Group-Icon-Big-Wrap`, {
-        position: "relative",
-        top: "auto",
-        float: "none",
-        marginBottom: 0,
-    });
-
-    cssOut(`.Group-Header.NoBanner`, {
-        alignItems: "center",
-    });
-
-    cssOut(`.GroupOptions`, {
-        top: calc(`100% + ${styleUnit(globalVars.gutter.size)}`),
-        marginLeft: "auto",
-    });
-
-    cssOut(`.GroupWrap .DataTable .Title-Icon`, {
-        color: ColorsUtils.colorOut(metasVars.font.color),
-    });
-
-    cssOut(`.Groups .Name.Group-Name .Options .Button`, {
-        minWidth: 0,
-        marginLeft: styleUnit(globalVars.gutter.size),
-    });
-
-    cssOut(`.DataTableContainer.Group-Box`, {
-        marginTop: styleUnit(globalVars.gutter.size * 3),
-    });
-
-    cssOut(
-        `
-        .Group-Box .PageControls
-        `,
-        {
+        ".groupToolbar": {
+            marginTop: styleUnit(16),
+        },
+        ".Group-Header": {
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            flexWrap: "wrap",
+        },
+        ".Group-Header.NoBanner": {
+            alignItems: "center",
+        },
+        ".Group-Banner": {
+            height: styleUnit(vars.banner.height),
+        },
+        ".Group-Header.HasBanner .Group-Banner": {
+            ...mediaQueries.mobileDown({
+                marginBottom: styleUnit(vars.logo.height / 2 + 10),
+            }),
+        },
+        ".Group-Icon-Big-Wrap": {
+            width: styleUnit(vars.logo.height),
+            height: styleUnit(vars.logo.height),
+            flexBasis: styleUnit(vars.logo.height),
+            top: 0,
+            background: ColorsUtils.colorOut(globalVars.mainColors.fg),
+            zIndex: 1,
+            ...Mixins.margin({
+                top: 0,
+                right: 15,
+                left: 0,
+                bottom: 10,
+            }),
+        },
+        ".Group-Header.HasBanner .Group-Icon-Big-Wrap": {
+            ...mediaQueries.mobileDown({
+                position: "absolute",
+                top: styleUnit(vars.banner.height - vars.logo.height / 2),
+                marginBottom: 0,
+                marginLeft: 15,
+            }),
+        },
+        "Group-Header.NoBanner .Group-Icon-Big-Wrap": {
+            position: "relative",
+            top: "auto",
+            marginBottom: 0,
+        },
+        ".Group-Header-Info": {
+            flex: 1,
+        },
+        ".Group-Header.NoBanner .Group-Header-Info": {
+            paddingLeft: styleUnit(0),
+        },
+        ".Group-Header.HasBanner .Group-Header-Info": {
+            paddingLeft: styleUnit(0),
+            ...mediaQueries.mobileDown({
+                flex: "unset",
+            }),
+        },
+        ...{
+            [`
+                .ButtonGroup.Open .Button.GroupOptionsTitle::before,
+                .Button.GroupOptionsTitle::before,
+                .Button.GroupOptionsTitle:active::before,
+                .Button.GroupOptionsTitle:focus::before
+            `]: {
+                color: "inherit",
+                marginRight: styleUnit(6),
+            },
+        },
+        "a.ChangePicture": {
+            ...absolutePosition.fullSizeOfParent(),
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            opacity: 0,
+        },
+        ".DataTableContainer.Group-Box.ApplicantList .PageControls .H": {
+            position: "relative",
+        },
+        "body.Section-Event .Group-Banner": {
+            flexGrow: 1,
+            width: percent(100),
+        },
+        ".GroupOptions": {
+            top: calc(`100% + ${styleUnit(globalVars.gutter.size)}`),
+            marginLeft: "auto",
+        },
+        ".GroupWrap .DataTable .Title-Icon": {
+            color: ColorsUtils.colorOut(metasVars.font.color),
+        },
+        ".Groups .Name.Group-Name .Options .Button": {
+            minWidth: 0,
+            marginLeft: styleUnit(globalVars.gutter.size),
+        },
+        ".DataTableContainer.Group-Box": {
+            marginTop: styleUnit(globalVars.gutter.size * 3),
+        },
+        ".Group-Box .PageControls": {
             position: "relative",
             flexDirection: "row",
         },
-    );
-
-    cssOut(`.Group-Box .PageControls .H`, {
-        margin: 0,
-    });
-
-    cssOut(`.Group-Box.Group-MembersPreview .H`, {
-        position: "relative",
-    });
-
-    cssOut(`.GroupWrap .DataTable .Buttons`, {
-        display: "flex",
-        flexWrap: "wrap",
-        justifyContent: "flex-end",
-    });
-
-    cssOut(`.groupsMemberFilter`, {
-        marginTop: styleUnit(100),
-    });
-
-    cssOut(`.Event-Title`, {
-        marginTop: styleUnit(75),
-    });
-
-    cssOut(
-        `
-        body.Groups .NavButton.Handle.GroupOptionsTitle .Sprite
-    `,
-        {
+        ".Group-Box .PageControls .H": {
+            margin: 0,
+        },
+        ".Group-Box.Group-MembersPreview .H": {
+            position: "relative",
+        },
+        ".GroupWrap .DataTable .Buttons": {
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "flex-end",
+        },
+        ".groupsMemberFilter": {
+            marginTop: styleUnit(100),
+        },
+        ".Event-Title": {
+            marginTop: styleUnit(75),
+        },
+        "body.Groups .NavButton.Handle.GroupOptionsTitle .Sprite": {
             marginRight: negativeUnit(2),
             transform: translateX(`5px`),
         },
-    );
-
-    cssOut(`body.Groups .StructuredForm .Buttons-Confirm`, {
-        textAlign: "left",
-    });
-
-    // Group Box
-    cssOut(`.Group-Box .Item:not(tr)`, {
-        width: percent(100),
-    });
-
-    cssOut(`.Group-Box .ItemContent`, {
-        flexGrow: 1,
-    });
-
-    cssOut(`.Groups .DataList .Item > .PhotoWrap`, {
-        ...absolutePosition.topLeft(13, 8),
-        float: "none",
-    });
-
-    cssOut(`.Groups .DataList .Item.hasPhotoWrap .ItemContent`, {
-        paddingLeft: styleUnit(58),
-    });
-
-    cssOut(`.Groups .DataList .Item.noPhotoWrap .ItemContent`, {
-        paddingLeft: styleUnit(0),
-        paddingRight: styleUnit(70),
-    });
-
-    cssOut(`.Group-Box .Item .Options .Buttons`, {
-        display: "flex",
-        flexWrap: "nowrap",
-        alignItems: "center",
-    });
-
-    cssOut(`.Group-Box .Item .Options .Buttons a:first-child`, {
-        marginRight: styleUnit(4),
-    });
-
-    cssOut(`.DataList .Item.Event.event .DateTile`, {
-        order: 2,
-    });
-
-    cssOut(`.DataList .Item.Event.event .DateTile + .Options`, {
-        order: 1,
-        ...{
-            [`.ToggleFlyout.OptionsMenu`]: {
-                display: "flex",
-                alignItems: "center",
+        "body.Groups .StructuredForm .Buttons-Confirm": {
+            textAlign: "left",
+        },
+        // Group Box
+        ".Group-Box .Item:not(tr)": {
+            width: percent(100),
+        },
+        ".Group-Box .ItemContent": {
+            flexGrow: 1,
+        },
+        ".Groups .DataList .Item > .PhotoWrap": {
+            ...absolutePosition.topLeft(13, 8),
+            float: "none",
+        },
+        ".Groups .DataList .Item.hasPhotoWrap .ItemContent": {
+            paddingLeft: styleUnit(58),
+        },
+        ".Groups .DataList .Item.noPhotoWrap .ItemContent": {
+            paddingLeft: styleUnit(0),
+            paddingRight: styleUnit(70),
+        },
+        ".Group-Box .Item .Options .Buttons": {
+            display: "flex",
+            flexWrap: "nowrap",
+            alignItems: "center",
+        },
+        ".Group-Box .Item .Options .Buttons a:first-child": {
+            marginRight: styleUnit(4),
+        },
+        ".DataList .Item.Event.event .DateTile": {
+            order: 2,
+        },
+        ".DataList .Item.Event.event .DateTile + .Options": {
+            order: 1,
+            ...{
+                [`.ToggleFlyout.OptionsMenu`]: {
+                    display: "flex",
+                    alignItems: "center",
+                },
             },
         },
-    });
+        ".Group-Box .PageControls .Button-Controls": {
+            ...mediaQueries.aboveMobile({
+                maxHeight: percent(100),
+                maxWidth: percent(100),
+                margin: "auto 0",
+            }),
+            ".ButtonGroup + .Button": {
+                marginTop: 10,
+                display: "block",
+            },
+        },
+        ".Group-Box": {
+            marginBottom: styleUnit(36),
+        },
 
-    cssOut(
-        `.Group-Box .PageControls .Button-Controls`,
-        mediaQueries.aboveMobile({
-            maxHeight: percent(100),
-            maxWidth: percent(100),
-            margin: "auto 0",
-        }),
-    );
-
-    cssOut(`.Group-Box`, {
-        marginBottom: styleUnit(36),
-    });
-
-    cssOut(`.Group-Header-Actions`, {
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        width: percent(100),
-        ...Mixins.margin({
-            vertical: styleUnit(globalVars.gutter.size),
-        }),
-    });
-    cssOut(
-        `
-        .Group-Header-Actions .Group-Buttons,
-        .Group-Header-Actions .ButtonGroup,
-    `,
-        {
+        ".Group-Header-Actions": {
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: percent(100),
+            ...Mixins.margin({
+                vertical: styleUnit(globalVars.gutter.size),
+            }),
+        },
+        [`.Group-Header-Actions .Group-Buttons, .Group-Header-Actions .ButtonGroup,`]: {
             position: "relative",
             top: "auto",
         },
-    );
-
-    cssOut(
-        `.Section-Group .Group-Box .H,
-        .Section-Group .Group-Box .EmptyMessage`,
-        {
+        [`.Section-Group .Group-Box .H, .Section-Group .Group-Box .EmptyMessage`]: {
             textAlign: "left",
+            ...mediaQueries.tabletDown({
+                textAlign: "left",
+            }),
+            ...mediaQueries.mobileDown({
+                marginBottom: styleUnit(6),
+            }),
         },
-        mediaQueries.tabletDown({
-            textAlign: "left",
-        }),
-        mediaQueries.mobileDown({
-            marginBottom: styleUnit(6),
-        }),
-    );
-
-    cssOut(`.Section-Group .Group-Title`, {
-        ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("title"),
-        }),
-    });
-
-    cssOut(`.Section-Group .Group-Box .H`, {
-        ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("subTitle"),
-        }),
-    });
-
-    cssOut(
-        `
-        .Button-Controls.Button-Controls
-    `,
-        mediaQueries.mobileDown({
-            display: "block",
-            marginTop: 12,
-            ...{
-                [`.Button`]: {
-                    marginRight: "auto",
+        ".Section-Group .Group-Title": {
+            ...Mixins.font({
+                ...globalVars.fontSizeAndWeightVars("title"),
+            }),
+        },
+        ".Section-Group .Group-Box .H": {
+            ...Mixins.font({
+                ...globalVars.fontSizeAndWeightVars("subTitle"),
+            }),
+        },
+        ".Button-Controls.Button-Controls": {
+            ...mediaQueries.mobileDown({
+                display: "block",
+                marginTop: 12,
+                ...{
+                    [`.Button`]: {
+                        marginRight: "auto",
+                    },
                 },
-            },
-        }),
-    );
+            }),
+        },
+    });
 };

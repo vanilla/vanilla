@@ -12,7 +12,10 @@
     @if ($theme_stickFooter) {
         display: flex;
         flex-direction: column;
-        min-height: 100vh;
+
+        @if ($staticVariables) {
+            min-height: 100vh;
+        }
 
         @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
             /* IE10+ CSS styles go here */

@@ -170,10 +170,40 @@
         margin-top: -1px;
     }
 
-    .MostRecentBy,
-    .LatestPostTitle {
-        @include ellipsis;
-        display: inline-block;
+
+    .LastCommentBy,
+    .MostRecent,
+    .MostRecentBy {
+        > * {
+            white-space: normal;
+        }
+        a {
+            display: inline;
+        }
+    }
+
+    .MostRecentBy {
+        display: inherit;
+    }
+
+
+    @if $staticVariables {
+        .MostRecentBy,
+        .LatestPostTitle {
+            @include ellipsis;
+            display: inline-block;
+        }
+    }
+
+    .MItem.Category {
+        display: inline;
+        a {
+            white-space: normal;
+            @if $staticVariables {
+                @include ellipsis;
+                display: inherit;
+            }
+        }
     }
 
     @if ($staticVariables) {
@@ -243,33 +273,6 @@
 
     .MItem.DiscussionAuthor {
         display: none;
-    }
-
-    .MItem.Category {
-        display: inline;
-
-        a {
-            @include ellipsis;
-            display: inherit;
-        }
-    }
-
-    @if $staticVariables {
-        .MostRecent,
-        .MostRecentBy {
-
-            > * {
-                white-space: normal;
-            }
-
-            a {
-                display: inline;
-            }
-        }
-    }
-
-    .MostRecentBy {
-        display: inherit;
     }
 
     .MItem.RSS {

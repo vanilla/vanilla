@@ -61,7 +61,6 @@ export const textLinkCSS = () => {
         .Content .Breadcrumbs a,
         .Content .MessageList .DiscussionMeta a,
         .Content .MessageList .CommentMeta a,
-        .Content .DataTableWrap a,
         .Content .Container .Frame-contentWrap .ChildCategories a,
         .Content .Item.Application .Meta a,
         .Content .Meta.Group-Meta.Group-Info a
@@ -119,12 +118,6 @@ export const textLinkCSS = () => {
             marginLeft: vars.separator.spacing,
             marginRight: vars.separator.spacing,
             ...Mixins.font(vars.separator.font),
-        },
-    });
-
-    injectGlobal({
-        [`.userContent a, .UserContent a`]: {
-            fontSize: "inherit",
         },
     });
 };

@@ -63,7 +63,7 @@ export const metasClasses = useThemeCache(() => {
 
     const root = css({ ...metaContainerStyle() });
 
-    const metaLink = css({});
+    const metaLink = css(metaLinkItemStyle());
 
     const meta = css({
         ...metaItemStyle(),

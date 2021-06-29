@@ -57,6 +57,10 @@ body.hasRichEditor {
         }
     }
 
+    .ActivityComments .CommentForm .Buttons {
+        padding-right: 36px;
+    }
+
     .embedDialogue.embedDialogue {
 
         @include maxWidth {

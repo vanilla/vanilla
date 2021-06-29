@@ -42,6 +42,7 @@ import { IBorderRadiusOutput } from "@library/styles/cssUtilsTypes";
 import { Property } from "csstype";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { inputVariables } from "@library/forms/inputStyles";
+import { LocalVariableMapping } from "@library/styles/VariableMapping";
 
 export enum BannerAlignment {
     LEFT = "left",
@@ -72,7 +73,14 @@ export interface IBannerOptions {
  */
 export const bannerVariables = useThemeCache(
     (optionOverrides?: Partial<IBannerOptions>, forcedVars?: IThemeVariables, altName?: string) => {
-        const makeThemeVars = variableFactory(altName ?? ["banner", "splash"], forcedVars, undefined, !!altName);
+        const makeThemeVars = variableFactory(
+            altName ?? ["banner", "splash"],
+            forcedVars,
+            new LocalVariableMapping({
+                [`padding`]: "spacing.padding",
+            }),
+            !!altName,
+        );
         const globalVars = globalVariables(forcedVars);
         const compactSearchVars = compactSearchVariables(forcedVars);
         const searchBarVars = searchBarVariables(forcedVars);
@@ -214,18 +222,19 @@ export const bannerVariables = useThemeCache(
             optionOverrides,
         );
 
-        const spacing = makeThemeVars("spacing", {
-            /**
-             * @varGroup banner.padding
-             * @commonTitle Banner Spacing
-             * @expand spacing
-             */
-            padding: Variables.spacing({
+        /**
+         * @varGroup banner.padding
+         * @commonTitle Banner Padding
+         * @expand spacing
+         */
+        const padding = makeThemeVars(
+            "padding",
+            Variables.spacing({
                 top: globalVars.spacer.pageComponent * 1.5,
                 bottom: globalVars.spacer.pageComponent,
                 horizontal: globalVars.gutter.half,
             }),
-        });
+        );
 
         const dimensions = makeThemeVars("dimensions", {
             /**
@@ -309,8 +318,8 @@ export const bannerVariables = useThemeCache(
         const contentContainer = makeThemeVars("contentContainer", {
             minWidth: 550,
             padding: Variables.spacing({
-                top: spacing.padding.top,
-                bottom: spacing.padding.bottom,
+                top: padding.top,
+                bottom: padding.bottom,
                 horizontal: 0,
             }),
             mobile: {
@@ -810,7 +819,7 @@ export const bannerVariables = useThemeCache(
             options,
             outerBackground,
             backgrounds,
-            spacing,
+            padding,
             innerBackground,
             contentContainer,
             dimensions,

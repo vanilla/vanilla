@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -7,7 +7,7 @@ import ReactDOM from "react-dom";
 import React from "react";
 import { logWarning } from "@vanilla/utils";
 import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
-import { userContentClasses } from "@library/content/userContentStyles";
+import { userContentClasses } from "@library/content/UserContent.styles";
 import classNames from "classnames";
 
 interface IProps {

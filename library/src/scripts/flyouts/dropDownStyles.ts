@@ -6,20 +6,13 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
-import {
-    buttonStates,
-    userSelect,
-    IStateSelectors,
-    negativeUnit,
-    pointerEvents,
-    colorOut,
-} from "@library/styles/styleHelpers";
+import { buttonStates, userSelect, IStateSelectors, negativeUnit, pointerEvents } from "@library/styles/styleHelpers";
 import { styleUnit } from "@library/styles/styleUnit";
 import { Mixins } from "@library/styles/Mixins";
 import { Variables } from "@library/styles/Variables";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { css, CSSObject } from "@emotion/css";
-import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { important, percent, rgba } from "csx";
 import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
@@ -28,17 +21,41 @@ import { metasVariables } from "@library/metas/Metas.variables";
 
 export const notUserContent = "u-notUserContent";
 
+/**
+ * @varGroup dropDown
+ * @title DropDown
+ * @description The DropDown is used to organise lists of links and buttons into a toggleable overlay.
+ */
 export const dropDownVariables = useThemeCache(() => {
     const metasVars = metasVariables();
     const globalVars = globalVariables();
     const makeThemeVars = variableFactory("dropDown");
 
+    /**
+     * @varGroup dropDown.sizing
+     * @description Configure the size of the dropdowns.
+     */
     const sizing = makeThemeVars("sizing", {
+        /**
+         * @varGroup dropDown.sizing.widths
+         * @description Container width for different sizes.
+         */
         widths: {
+            /**
+             * @varGroup dropDown.sizing.widths.default
+             * @description The default sizing is used on menus like discussion options.
+             * @title Default
+             * @type number
+             */
             default: 250,
+            /**
+             * @varGroup dropDown.sizing.widths.medium
+             * @description The medium sizing is used on items like the MeBox.
+             * @title Medium
+             * @type number
+             */
             medium: 350,
         },
-        minHeight: 600,
     });
 
     const spacer = makeThemeVars("spacer", {
@@ -59,15 +76,11 @@ export const dropDownVariables = useThemeCache(() => {
     });
 
     const item = makeThemeVars("item", {
-        colors: {
-            fg: globalVars.mainColors.fg,
-        },
         minHeight: 30,
         mobile: {
             minHeight: 44,
             fontSize: 16,
         },
-
         padding: {
             top: 6,
             horizontal: 14,
@@ -85,8 +98,26 @@ export const dropDownVariables = useThemeCache(() => {
         color: globalVars.mainColors.fg,
     });
 
+    /**
+     * @varGroup dropDown.contents
+     * @description User Dropdown contents section
+     */
     const contents = makeThemeVars("contents", {
+        /**
+         * @varGroup dropDown.contents.bg
+         * @description Background color for user menu
+         * @title User Menu Background Color
+         * @type string
+         * @format hex-color
+         */
         bg: globalVars.mainColors.bg,
+        /**
+         * @varGroup dropDown.contents.fg
+         * @description Foreground color for user menu
+         * @title User Menu Foreground Color
+         * @type string
+         * @format hex-color
+         */
         fg: globalVars.mainColors.fg,
         border: globalVars.borderType.dropDowns,
         padding: {
@@ -109,13 +140,11 @@ export const dropDownVariables = useThemeCache(() => {
 export const dropDownClasses = useThemeCache(() => {
     const vars = dropDownVariables();
     const metasVars = metasVariables();
-
     const globalVars = globalVariables();
-    const style = styleFactory("dropDown");
     const shadows = shadowHelper();
     const mediaQueries = panelLayoutVariables().mediaQueries();
 
-    const root = style({
+    const root = css({
         position: "relative",
         listStyle: "none",
     });
@@ -135,14 +164,12 @@ export const dropDownClasses = useThemeCache(() => {
             width: styleUnit(vars.sizing.widths.medium),
         },
     };
-    const contentsBox = style("contentBox", contentMixin);
+    const contentsBox = css(contentMixin);
 
-    const contents = style(
-        "contents",
+    const contents = css(
         {
-            ...contentMixin,
-            overflow: "initial",
             position: "absolute",
+            ...contentMixin,
             "&.isParentWidth": {
                 minWidth: "initial",
                 left: 0,
@@ -177,7 +204,7 @@ export const dropDownClasses = useThemeCache(() => {
         }),
     );
 
-    const asModal = style("asModal", {
+    const asModal = css({
         ...{
             "&.hasVerticalPadding": Mixins.padding({
                 vertical: 12,
@@ -185,14 +212,13 @@ export const dropDownClasses = useThemeCache(() => {
         },
     });
 
-    const likeDropDownContent = style("likeDropDownContent", {
+    const likeDropDownContent = css({
         ...shadows.dropDown(),
         backgroundColor: ColorsUtils.colorOut(globalVars.mainColors.bg),
         ...Mixins.border(vars.contents.border),
     });
 
-    const items = style(
-        "items",
+    const items = css(
         {
             padding: 0,
             ...Mixins.font({
@@ -206,7 +232,7 @@ export const dropDownClasses = useThemeCache(() => {
         }),
     );
 
-    const metaItems = style("metaItems", {
+    const metaItems = css({
         ...{
             "&&": {
                 display: "block",
@@ -215,7 +241,7 @@ export const dropDownClasses = useThemeCache(() => {
         ...Mixins.padding(vars.metas.padding),
     });
 
-    const metaItem = style("metaItem", {
+    const metaItem = css({
         ...{
             "& + &": {
                 paddingTop: styleUnit(vars.item.padding.top),
@@ -225,7 +251,7 @@ export const dropDownClasses = useThemeCache(() => {
     });
 
     // wrapping element
-    const item = style("item", {
+    const item = css({
         ...userSelect("none"),
         display: "flex",
         alignItems: "center",
@@ -237,11 +263,11 @@ export const dropDownClasses = useThemeCache(() => {
         lineHeight: globalVars.lineHeights.condensed,
     });
 
-    const section = style("section", {
+    const section = css({
         display: "block",
     });
 
-    const toggleButtonIcon = style("toggleButtonIcon", {
+    const toggleButtonIcon = css({
         ...{
             ...buttonStates({
                 allStates: {
@@ -251,13 +277,13 @@ export const dropDownClasses = useThemeCache(() => {
         },
     });
 
-    const action = style("action", {
+    const action = css({
         ...{
             "&&": actionMixin(),
         },
     });
 
-    const actionActive = style("actionActive", {
+    const actionActive = css({
         ...{
             "&&": {
                 color: important(ColorsUtils.colorOut(globalVars.links.colors.active)!),
@@ -266,12 +292,12 @@ export const dropDownClasses = useThemeCache(() => {
         },
     });
 
-    const text = style("text", {
+    const text = css({
         display: "block",
         flex: 1,
     });
 
-    const separator = style("separator", {
+    const separator = css({
         listStyle: "none",
         height: styleUnit(globalVars.separator.size),
         backgroundColor: ColorsUtils.colorOut(globalVars.separator.color),
@@ -286,12 +312,12 @@ export const dropDownClasses = useThemeCache(() => {
         },
     });
 
-    const panelNavItems = style("panelNavItems", {
+    const panelNavItems = css({
         display: "flex",
         alignItems: "flex-start",
     });
 
-    const panel = style("panel", {
+    const panel = css({
         backgroundColor: ColorsUtils.colorOut(vars.contents.bg),
         ...Mixins.absolute.fullSizeOfParent(),
         zIndex: 2,
@@ -308,26 +334,26 @@ export const dropDownClasses = useThemeCache(() => {
             zIndex: 0,
         },
     };
-    const panelFirst = style("panelFirst", panelFirstStyle);
+    const panelFirst = css(panelFirstStyle);
 
-    const panelLast = style("panelLast", {
+    const panelLast = css({
         ...{
             "&&": {},
         },
     });
 
-    const panelContent = style("panelContent", {
+    const panelContent = css({
         flex: 1,
         ...{
             "&.isNested": {},
         },
     });
-    const sectionContents = style("sectionContents", {
+    const sectionContents = css({
         display: "block",
         position: "relative",
     });
 
-    const sectionHeading = style("sectionHeading", {
+    const sectionHeading = css({
         ...{
             "&&": {
                 ...Mixins.font({
@@ -342,17 +368,17 @@ export const dropDownClasses = useThemeCache(() => {
         },
     });
 
-    const headingContentContainer = style("headingContentContainer", {
+    const headingContentContainer = css({
         display: "flex",
         alignItems: "center",
         height: styleUnit(44),
     });
 
-    const headingTitleContainer = style("headingTitleContainer", {
+    const headingTitleContainer = css({
         flex: "auto",
     });
 
-    const arrow = style("arrow", {
+    const arrow = css({
         ...{
             "&&": {
                 padding: styleUnit(globalVars.gutter.quarter),
@@ -360,12 +386,11 @@ export const dropDownClasses = useThemeCache(() => {
         },
     });
 
-    const actionIcon = style("actionIcon", {
+    const actionIcon = css({
         marginRight: globalVars.gutter.half,
     });
 
-    const backButton = style(
-        "backButton",
+    const backButton = css(
         {
             ...{
                 "&&": {
@@ -384,7 +409,7 @@ export const dropDownClasses = useThemeCache(() => {
         }),
     );
 
-    const count = style("count", {
+    const count = css({
         ...Mixins.font({
             ...globalVars.fontSizeAndWeightVars("small"),
         }),
@@ -392,8 +417,7 @@ export const dropDownClasses = useThemeCache(() => {
         marginLeft: "auto",
     });
 
-    const verticalPadding = style(
-        "verticalPadding",
+    const verticalPadding = css(
         {
             ...Mixins.padding({
                 vertical: vars.contents.padding.vertical,
@@ -407,11 +431,11 @@ export const dropDownClasses = useThemeCache(() => {
         }),
     );
 
-    const noVerticalPadding = style("noVerticalPadding", {
+    const noVerticalPadding = css({
         ...Mixins.padding({ vertical: 0 }),
     });
 
-    const title = style("title", {
+    const title = css({
         ...Mixins.font({
             ...globalVars.fontSizeAndWeightVars("medium", "semiBold"),
             lineHeight: globalVars.lineHeights.condensed,
@@ -428,11 +452,11 @@ export const dropDownClasses = useThemeCache(() => {
         color: ColorsUtils.colorOut(vars.title.color),
     });
 
-    const paddedFrame = style("paddedFrame", {
+    const paddedFrame = css({
         ...Mixins.padding(vars.contents.padding),
     });
 
-    const check = style("check", {
+    const check = css({
         color: ColorsUtils.colorOut(globalVars.mainColors.primary),
 
         /// Check to fix icon alignment.
@@ -441,31 +465,31 @@ export const dropDownClasses = useThemeCache(() => {
 
     const flyoutOffset = vars.item.padding.horizontal + globalVars.border.width;
 
-    const contentOffsetCenter = style("contentOffsetCenter", {
+    const contentOffsetCenter = css({
         transform: `translateX(-50%)`,
     });
 
-    const contentOffsetLeft = style("contentOffsetLeft", {
+    const contentOffsetLeft = css({
         transform: `translateX(${styleUnit(flyoutOffset)})`,
     });
 
-    const contentOffsetRight = style("contentOffsetRight", {
+    const contentOffsetRight = css({
         transform: `translateX(${negativeUnit(flyoutOffset)})`,
     });
 
     // Used to figure out the position of the flyout,
     // without it being visible to the user until the calculation is complete
-    const positioning = style("positioning", {
+    const positioning = css({
         ...pointerEvents(),
         ...Mixins.absolute.srOnly(),
     });
 
-    const closeButton = style("closeButtonOffsetRight", {
+    const closeButton = css({
         display: "inline-block",
         marginRight: styleUnit(12),
     });
 
-    const itemButton = style("itemButton", {
+    const itemButton = css({
         paddingLeft: globalVars.gutter.size,
     });
 
@@ -576,7 +600,7 @@ export const actionMixin = (classBasedStates?: IStateSelectors): CSSObject => {
         }),
         // Override legacy style.scss with global variables by making it important.
         // ".MenuItems a, .MenuItems a:link, .MenuItems a:visited, .MenuItems a:active "
-        color: ColorsUtils.colorOut(vars.item.colors.fg, { makeImportant: true }),
+        color: ColorsUtils.colorOut(vars.contents.fg, { makeImportant: true }),
         ...userSelect("none"),
         ...buttonStates(
             {

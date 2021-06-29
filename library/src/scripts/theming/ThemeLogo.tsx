@@ -8,6 +8,7 @@ import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import React from "react";
 import { connect } from "react-redux";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
+import { t } from "@library/utility/appUtils";
 
 export enum LogoType {
     DESKTOP = "logo",
@@ -26,7 +27,7 @@ class ThemeLogo extends React.Component<IProps> {
         const finalUrl = this.props.overwriteLogo ?? themeUrl ?? this.props.logoUrl;
 
         if (finalUrl) {
-            content = <img className={this.props.className} src={finalUrl} />;
+            content = <img className={this.props.className} src={finalUrl} alt={t("Home")} />;
         } else {
             content = <VanillaLogo className={this.props.className} isMobile={!isDesktop} />;
         }

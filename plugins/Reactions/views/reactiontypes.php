@@ -29,9 +29,16 @@ echo heading($this->data('Title'));
       $State = $ReactionType['Active'] ? 'Active' : 'InActive';
 
       $reactionBlock = new MediaItemModule(t($ReactionType['Name']), '', $ReactionType['Description']);
+      switch (strtolower($ReactionType['UrlCode'])) {
+          case 'wtf':
+              $urlImgReaction = ReactionModel::ICON_BASE_URL.strtolower($UrlCode).'.png';
+              break;
+          default:
+              $urlImgReaction = ReactionModel::ICON_BASE_URL.strtolower($UrlCode).'.svg';
+      }
       $reactionBlock->setView('media-sm')
          ->addCssClass('image-wrap', 'media-image-wrap-no-border')
-         ->setImage('https://badges.v-cdn.net/reactions/50/'.strtolower($ReactionType['UrlCode']).'.png');
+         ->setImage($urlImgReaction);
 
       ?>
       <tr id="ReactionType_<?php echo $ReactionType['UrlCode']; ?>" class="<?php echo $State; ?>">

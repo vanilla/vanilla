@@ -158,6 +158,7 @@ export const modalClasses = useThemeCache(() => {
         // See also https://www.w3.org/TR/2009/WD-css3-2d-transforms-20091201/#introduction
         // This is why fullscreen unsets the transforms.
         transform: translate(`-50%`, `-50%`),
+        perspective: 1,
         ...Mixins.margin({ all: "auto" }),
         ...{
             "&&.isFullScreen": {
@@ -230,6 +231,7 @@ export const modalClasses = useThemeCache(() => {
             ".form-group": {
                 marginLeft: styleUnit(-16),
                 marginRight: styleUnit(-16),
+                width: `calc(100% + (${styleUnit(16)} * 2))`,
             },
         },
     });

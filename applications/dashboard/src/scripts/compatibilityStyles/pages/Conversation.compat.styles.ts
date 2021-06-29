@@ -37,6 +37,7 @@ export const conversationCompatCSS = () => {
 
             "& .ConversationMessage-content": {
                 flex: 1,
+                maxWidth: "100%",
             },
         },
     });

@@ -3387,13 +3387,16 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
         if ($this->session->checkPermission('Garden.PersonalInfo.View')) {
             return;
         }
+
         $isPrivateBansEnabled = self::c('Vanilla.BannedUsers.PrivateProfiles');
 
         $filterRow = function (&$row) use ($isPrivateBansEnabled) {
+            $userID = $row['userID'] ?? null;
+            $isOwnProfile = Gdn::session()->UserID === $userID;
             $isUserPrivate = $row['private'] ?? false;
 
             $isPrivateBanned = $row['banned'] && $isPrivateBansEnabled;
-            if ($isUserPrivate || $isPrivateBanned) {
+            if (($isUserPrivate || $isPrivateBanned) && !$isOwnProfile) {
                 $row = ArrayUtils::pluck($row, [
                     'userID',
                     'name',
@@ -3421,8 +3424,9 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
      */
     public function shouldIncludePrivateRecord(array $userRow): bool {
         $shouldIncludePrivateRecords = true;
+        $isOwnRecord = $this->session->UserID === $userRow['userID'];
         $hasPermission = $this->session->checkPermission('Garden.PersonalInfo.View');
-        if (!$hasPermission) {
+        if (!$hasPermission && !$isOwnRecord) {
             $isPrivateBannedEnabled = self::c('Vanilla.BannedUsers.PrivateProfiles');
             $private = $userRow['private'] ?? false;
             if ($private || ($userRow['banned'] && $isPrivateBannedEnabled)) {

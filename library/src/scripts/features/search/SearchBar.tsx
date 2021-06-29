@@ -29,6 +29,7 @@ import { ActionMeta, InputActionMeta } from "react-select/lib/types";
 import { useSearchScope } from "@library/features/search/SearchScopeContext";
 import { PLACES_CATEGORY_TYPE, PLACES_KNOWLEDGE_BASE_TYPE, PLACES_GROUP_TYPE } from "@library/search/searchConstants";
 import { Icon } from "@vanilla/icons";
+import { sprintf } from "sprintf-js";
 
 // Re-exported after being moved.
 export { IComboBoxOption };
@@ -211,7 +212,7 @@ export default React.forwardRef(function SearchBar(
             classNamePrefix={prefix}
             className={classNames(classes.wrap, props.className)}
             placeholder={props.placeholder ?? t("Search")}
-            aria-label={t("Search")}
+            aria-label={sprintf(t("Search %s"), t("Text"))}
             escapeClearsValue={true}
             pageSize={20}
             theme={getReactSelectTheme}
@@ -380,7 +381,7 @@ function SearchBarControl(props: IControlProps) {
     };
 
     return (
-        <form className={classNames(classes.form, classes.root)} onSubmit={onFormSubmit}>
+        <form role="search" className={classNames(classes.form, classes.root)} onSubmit={onFormSubmit}>
             {props.needsPageTitle && (
                 <Heading
                     depth={1}
@@ -403,7 +404,6 @@ function SearchBarControl(props: IControlProps) {
                     withButton: searchButtonIsVisible,
                     withoutButton: !searchButtonIsVisible,
                 })}
-                role="search"
             >
                 {!(compact && hasScope) && (
                     <Button
@@ -414,7 +414,6 @@ function SearchBarControl(props: IControlProps) {
                         }}
                         className={classes.iconContainer(hasScope)}
                         ariaLabel={t("Search")}
-                        tabIndex={-1}
                         title={t("Search")}
                     >
                         <Icon size="compact" icon="search-search" />
@@ -425,7 +424,7 @@ function SearchBarControl(props: IControlProps) {
                         selectBoxProps={{ options: optionsItems, value: value, onChange: onChange }}
                         compact={compact}
                         overwriteSearchBar={overwriteSearchBar}
-                        separator={!isHovered ? <div className={classes.scopeSeparator} role="decoration" /> : null}
+                        separator={!isHovered ? <div className={classes.scopeSeparator} role="presentation" /> : null}
                     />
                 )}
                 <div
@@ -442,7 +441,6 @@ function SearchBarControl(props: IControlProps) {
                     })}
                 >
                     <div
-                        aria-labelledby={buttonID}
                         className={classNames(
                             "suggestedTextInput-inputText",
                             "inputText",
@@ -479,7 +477,6 @@ function SearchBarControl(props: IControlProps) {
                     id={searchButtonID}
                     buttonType={props.buttonType}
                     className={classNames("searchBar-submitButton", props.buttonClassName ?? classes.actionButton)}
-                    tabIndex={!searchButtonIsVisible ? 0 : -1}
                 >
                     {props.isLoading ? (
                         <ButtonLoader className={props.buttonLoaderClassName} buttonType={props.buttonType} />

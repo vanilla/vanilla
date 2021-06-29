@@ -99,7 +99,7 @@ export function useInviteUsers(params: { userID: number; groupID: number; onSucc
     };
 
     const errors = useSelector((state: IUsersStoreState) => {
-        return state.users.usersInvitationsByID[userID]?.results?.error?.response?.data?.errors;
+        return state.users.usersInvitationsByID[userID]?.results?.error;
     });
 
     const status = useSelector((state: IUsersStoreState) => {

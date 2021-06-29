@@ -196,16 +196,18 @@ body.Section-BestOf {
         .Author {
             display: block;
 
-            a {
-                line-height: inherit;
-                color: $component-meta-link_color;
-                font-size: $component-meta_fontSize;
-                font-weight: $component-meta_fontWeight;
+            @if ($staticVariables) {
+                a {
+                    line-height: inherit;
+                    color: $component-meta-link_color;
+                    font-size: $component-meta_fontSize;
+                    font-weight: $component-meta_fontWeight;
 
-                &:hover,
-                &:focus,
-                &:active {
-                    color: $component-meta-link-hover_color;
+                    &:hover,
+                    &:focus,
+                    &:active {
+                        color: $component-meta-link-hover_color;
+                    }
                 }
             }
 

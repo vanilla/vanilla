@@ -1036,6 +1036,7 @@ class ReactionsPlugin extends Gdn_Plugin {
             throw notFoundException();
         }
 
+        $sender->editMode(false);
         $sender->getUserInfo($userReference, $username);
         $userID = val('UserID', $sender->User);
 

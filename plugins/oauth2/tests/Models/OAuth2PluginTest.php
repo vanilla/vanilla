@@ -491,4 +491,32 @@ class OAuth2PluginTest extends SiteTestCase {
             $this->assertUrlSubset($url, $location);
         }
     }
+
+    /**
+     * Getting the sign in redirect with no providers should be a user exception.
+     */
+    public function testRedirectNoProvider(): void {
+        $this->providerModel->delete([\Gdn_AuthenticationProviderModel::COLUMN_ALIAS => $this->oauth2Plugin->getProviderKey()]);
+        $this->expectException(\Gdn_UserException::class);
+        $this->expectExceptionMessage('There are no configured OAuth authenticators');
+        $r = $this->bessy()->get('/entry/'.$this->oauth2Plugin->getProviderKey().'-redirect');
+    }
+
+    /**
+     * Doing a sign in redirect with a null URL should be a user exception.
+     *
+     * This is testing an error that was clogging up the logs:
+     *
+     * > Uncaught TypeError: Argument 1 passed to Gdn_OAuth2::generateAuthorizeUriWithStateToken() must be of the type string, null given
+     */
+    public function testRedirectNullAuthorizeUri(): void {
+        $this->providerModel->update(
+            ['AuthorizeUrl' => null],
+            [\Gdn_AuthenticationProviderModel::COLUMN_ALIAS => $this->oauth2Plugin->getProviderKey()]
+        );
+
+        $this->expectException(\Gdn_UserException::class);
+        $this->expectExceptionMessage('The OAuth provider does not have an authorization URL configured');
+        $r = $this->bessy()->get('/entry/'.$this->oauth2Plugin->getProviderKey().'-redirect');
+    }
 }

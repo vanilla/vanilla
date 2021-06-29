@@ -833,7 +833,8 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface {
      * Check the access token.
      */
     private function checkAccessToken() {
-        if (!stringBeginsWith(Gdn::request()->getPath(), '/api/')) {
+        $pattern = '/^\/?(?:[^\/]+\/)?api/';
+        if (!preg_match($pattern, Gdn::request()->getPath())) {
             return;
         }
 

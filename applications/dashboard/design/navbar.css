@@ -1360,7 +1360,7 @@ body {
 }
 
 body.hasRichEditor .richEditor ~ .TextBoxWrapper,
-body.hasRichEditor .CommentForm .PreviewButton,
+body.hasRichEditor .PreviewButton,
 body.hasRichEditor #Form_Preview {
   display: none !important;
 }
@@ -1377,7 +1377,7 @@ body.hasRichEditor .richEditor .spoiler .iconButton {
   box-sizing: border-box;
 }
 .Popup.hasRichEditor .richEditor ~ .TextBoxWrapper,
-.Popup.hasRichEditor .CommentForm .PreviewButton,
+.Popup.hasRichEditor .PreviewButton,
 .Popup.hasRichEditor #Form_Preview {
   display: none !important;
 }
@@ -1424,6 +1424,23 @@ body.hasRichEditor .CommentForm .richEditor .richEditor {
   .Popup.hasRichEditor .CommentForm .Buttons,
 body.hasRichEditor .CommentForm .Buttons {
     padding-right: 36px;
+  }
+  .Popup.hasRichEditor .Activities ul.DataList,
+body.hasRichEditor .Activities ul.DataList {
+    margin-left: 36px;
+  }
+  .Popup.hasRichEditor .ActivityComment + .CommentForm,
+body.hasRichEditor .ActivityComment + .CommentForm {
+    margin-top: 12px;
+  }
+  .Popup.hasRichEditor .ActivityComment + .CommentForm .richEditor,
+body.hasRichEditor .ActivityComment + .CommentForm .richEditor {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .Popup.hasRichEditor .ActivityComment + .CommentForm .Buttons.Buttons,
+body.hasRichEditor .ActivityComment + .CommentForm .Buttons.Buttons {
+    padding-right: 0;
   }
   .Popup.hasRichEditor #EventAddEditForm .Form-HeaderWrap,
 .Popup.hasRichEditor #GroupForm .Form-HeaderWrap,
@@ -1919,6 +1936,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 
 .Message img .embedImage-img,
 .embedImage-img {
+  height: auto;
   display: inline-flex;
   position: relative;
   margin-left: auto;

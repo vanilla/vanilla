@@ -1,9 +1,9 @@
 /**
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import React, { useMemo, useContext, useState, useCallback, useDebugValue, useRef, useEffect } from "react";
+import React, { useMemo, useContext, useState, useDebugValue, useRef } from "react";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { buttonVariables, buttonGlobalVariables } from "@library/forms/Button.variables";
@@ -14,7 +14,7 @@ import unset from "lodash/unset";
 import { bannerVariables } from "@library/banner/bannerStyles";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { contentBannerVariables } from "@library/banner/contentBannerStyles";
-import { userContentVariables, userContentClasses } from "@library/content/userContentStyles";
+import { userContentVariables } from "@library/content/UserContent.variables";
 import { navigationVariables } from "@library/headers/navigationVariables";
 import { homeWidgetItemVariables } from "@library/homeWidget/HomeWidgetItem.styles";
 import { homeWidgetContainerVariables } from "@library/homeWidget/HomeWidgetContainer.styles";

@@ -331,6 +331,7 @@ class SignaturesPlugin extends Gdn_Plugin {
         }
 
         $sender->setData('SignatureRules', implode(' ', $rules));
+        $sender->setData('UploadEnabled', $imagesAllowed);
     }
 
 

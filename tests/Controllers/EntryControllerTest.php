@@ -7,6 +7,7 @@
 
 namespace VanillaTests\Controllers;
 
+use AccessTokenModel;
 use BanModel;
 use League\Uri\Http;
 use VanillaTests\SetupTraitsTrait;
@@ -27,7 +28,7 @@ class EntryControllerTest extends VanillaTestCase {
     private $controller;
 
     private $userData;
-
+    
     /**
      * @inheritDoc
      */
@@ -39,7 +40,6 @@ class EntryControllerTest extends VanillaTestCase {
         $this->controller->getImports();
         $this->controller->Request = $this->container()->get(\Gdn_Request::class);
         $this->controller->initialize();
-
         $this->userData = $this->insertDummyUser();
     }
 
@@ -187,5 +187,49 @@ class EntryControllerTest extends VanillaTestCase {
 
         $this->expectExceptionMessage(t('This account has been temporarily banned.'));
         $r = $this->bessy()->post('/entry/signin', $postBody);
+    }
+
+    /**
+     * Test checkAccessToken().
+     *
+     * @param string $path
+     * @param bool $valid
+     * @dataProvider providePathData
+     */
+    public function testTokenAuthentication(string $path, bool $valid): void {
+        /** @var \Gdn_Session $session */
+        $session = self::container()->get(\Gdn_Session::class);
+        $session->start([1]);
+        $userID = $this->createUserFixture(VanillaTestCase::ROLE_MEMBER);
+        /** @var \AccessTokenModel $tokenModel */
+        $tokenModel = $this->container()->get(\AccessTokenModel::class);
+        $tokenModel->issue($userID);
+        $accessToken = $tokenModel->getWhere(['UserID' => $userID])->firstRow(DATASET_TYPE_ARRAY);
+        $signedToken = $tokenModel->signTokenRow($accessToken);
+        $_SERVER['HTTP_AUTHORIZATION'] = 'Bearer '.$signedToken;
+        $session->end();
+        \Gdn::request()->setPath($path);
+        /** @var \Gdn_Auth $auth */
+        $auth = $this->container()->get(\Gdn_Auth::class);
+        $auth->startAuthenticator();
+        if ($valid) {
+            $this->assertEquals($userID, \Gdn::session()->UserID);
+        } else {
+            $this->assertEquals(0, \Gdn::session()->UserID);
+        }
+    }
+
+    /**
+     * Provide path data.
+     *
+     * @return array
+     */
+    public function providePathData(): array {
+        return [
+            'valid-path' => ['api/v2', true],
+            'valid-path-subc' => ['subc/api/v2', true],
+            'invalid-path' => ['/invalid', false],
+            'invalid-path-subc' => ['/subc1/subc2/api/v2', false],
+        ];
     }
 }

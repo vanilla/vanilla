@@ -210,7 +210,7 @@ export function UserIcon(props: { styleType?: UserIconTypes; className?: string;
 
     return (
         <svg
-            role={"image"}
+            role={"img"}
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 20 20"
             className={classNames(classes.user, className)}

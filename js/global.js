@@ -1019,7 +1019,7 @@ jQuery(document).ready(function($) {
                 var message = response.InformMessages[i].Message;
                 var emptyMessage = message === '';
 
-                message = '<span class="InformMessageBody">' + message + '</span>';
+                message = '<span aria-label="polite" class="InformMessageBody">' + message + '</span>';
 
                 // Is there a sprite?
                 if (sprite !== '')
@@ -1030,7 +1030,7 @@ jQuery(document).ready(function($) {
                     message = '<a href="#" onclick="return false;" tabindex="0" class="Close"><span>&times;</span></a>' + message;
 
                 var messageID = gdn.generateString(10);
-                message = '<div class="InformMessage" id="'+messageID+'">' + message + '</div>';
+                message = '<div role="alert" class="InformMessage" id="'+messageID+'">' + message + '</div>';
 
                 // Insert any transient keys into the message (prevents csrf attacks in follow-on action urls).
                 message = message.replace(/{TransientKey}/g, gdn.definition('TransientKey'));

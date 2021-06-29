@@ -96,6 +96,9 @@ export default class ClipboardModule extends ClipboardBase {
     public imageMatcher = (node: HTMLImageElement, delta: DeltaStatic) => {
         const src = node.getAttribute("src");
         const alt = node.getAttribute("alt") || "";
+        const height = node.getAttribute("height") || "";
+        const width = node.getAttribute("width") || "";
+        const { displaySize, float } = node.dataset || {}; // De-structure so that only specific attributes are stored
         if (src) {
             const imageData: IEmbedValue = {
                 loaderData: {
@@ -105,6 +108,10 @@ export default class ClipboardModule extends ClipboardBase {
                     embedType: "image",
                     url: src,
                     name: alt,
+                    height,
+                    width,
+                    displaySize,
+                    float,
                 },
             };
             return new Delta().insert({

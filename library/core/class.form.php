@@ -502,6 +502,8 @@ class Gdn_Form extends Gdn_Pluggable {
 
         $value = arrayValueI('Value', $options); // The selected category id
         $categoryData = val('CategoryData', $options);
+        $includeArchived = $options['IncludeArchived'] ?? false;
+        $filterArchived = $includeArchived ? [] : ['Archived' => 0];
 
         if (!$categoryData && val('Context', $options)) {
             $categoryData = val('Context', $options);
@@ -523,7 +525,7 @@ class Gdn_Form extends Gdn_Pluggable {
             $categoryData = CategoryModel::getByPermission(
                 'Discussions.View',
                 $value,
-                val('Filter', $options, ['Archived' => 0]),
+                val('Filter', $options, $filterArchived),
                 val('PermFilter', $options, [])
             );
         }

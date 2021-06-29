@@ -17,6 +17,9 @@ import { mountReact } from "@vanilla/react-utils";
 export default function mountEditor(containerSelector: string | Element, descriptionID?: string) {
     const container = ensureHtmlElement(containerSelector);
     const bodybox = container.closest("form")!.querySelector(".BodyBox");
+    const placeholder = bodybox?.getAttribute("placeholder") ?? undefined;
+
+    const uploadEnabled = container.dataset.uploadenabled as boolean | undefined;
 
     if (!bodybox) {
         throw new Error("Could not find the BodyBox to mount editor to.");
@@ -26,7 +29,12 @@ export default function mountEditor(containerSelector: string | Element, descrip
 
     if (initialFormat === "Rich" || initialFormat === "rich") {
         mountReact(
-            <ForumEditor legacyTextArea={bodybox as HTMLInputElement} descriptionID={descriptionID ?? undefined} />,
+            <ForumEditor
+                placeholder={placeholder}
+                legacyTextArea={bodybox as HTMLInputElement}
+                descriptionID={descriptionID ?? undefined}
+                uploadEnabled={uploadEnabled}
+            />,
             container,
             () => {
                 container.classList.remove("isDisabled");

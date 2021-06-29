@@ -6,14 +6,12 @@
  */
 
 import { ColorsUtils } from "@library/styles/ColorsUtils";
-import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { metasVariables } from "@library/metas/Metas.variables";
 
 export const bestOfCSS = () => {
     const globalVars = globalVariables();
-    const metasVars = metasVariables();
 
     cssOut(`body.Section-BestOf .Container .FilterMenu li.Active a`, {
         color: ColorsUtils.colorOut(globalVars.mainColors.fg),
@@ -25,52 +23,7 @@ export const bestOfCSS = () => {
         color: ColorsUtils.colorOut(globalVars.mainColors.fg),
     });
 
-    cssOut(`body.Section-BestOf .Tile .Title, body.Section-BestOf .Tile .Title a`, {
-        color: ColorsUtils.colorOut(globalVars.mainColors.fg),
+    cssOut(`body.Section-BestOf .DataList .Title`, {
+        marginBottom: globalVars.spacer.headingItem,
     });
-
-    cssOut(`body.Section-BestOf .Tile .Message`, {
-        overflow: "auto",
-    });
-
-    cssOut(
-        `
-    body.Section-BestOf .Tile .Author a,
-    body.Section-BestOf .Item .Author a
-    `,
-        {
-            color: ColorsUtils.colorOut(globalVars.links.colors.default),
-            fontSize: styleUnit(metasVars.font.size),
-        },
-    );
-
-    cssOut(
-        `
-    body.Section-BestOf .Tile .Author a:hover,
-    body.Section-BestOf .Item .Author a:hover,
-    `,
-        {
-            color: ColorsUtils.colorOut(globalVars.links.colors.hover),
-        },
-    );
-
-    cssOut(
-        `
-    body.Section-BestOf .Tile .Author a:focus,
-    body.Section-BestOf .Item .Author a:focus,
-    `,
-        {
-            color: ColorsUtils.colorOut(globalVars.links.colors.focus),
-        },
-    );
-
-    cssOut(
-        `
-    body.Section-BestOf .Tile .Author a:active,
-    body.Section-BestOf .Item .Author a:active
-    `,
-        {
-            color: ColorsUtils.colorOut(globalVars.links.colors.active),
-        },
-    );
 };

@@ -39,7 +39,7 @@ class FoundationDiscussionShimTest extends SiteTestCase {
             'name' => 'circleci',
             'url' => 'http://vanilla.test/foundationdiscussionshimtest/profile/circleci',
             'photoUrl' => 'http://vanilla.test/foundationdiscussionshimtest/applications/dashboard/design/images/defaulticon.png',
-            'banned' => false,
+            'banned' => 0,
             'private' => false,
         ];
 

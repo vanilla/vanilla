@@ -1,12 +1,12 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import { LoadStatus } from "@library/@types/api/core";
 import { bannerVariables } from "@library/banner/bannerStyles";
 import { CallToAction } from "@library/callToAction/CallToAction";
-import { userContentVariables } from "@library/content/userContentStyles";
+import { userContentVariables } from "@library/content/UserContent.variables";
 import { tileVariables } from "@library/features/tiles/Tile.variables";
 import { tilesVariables } from "@library/features/tiles/Tiles.variables";
 import { inputClasses } from "@library/forms/inputStyles";
@@ -24,11 +24,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { resetThemeCache } from "@library/styles/themeCache";
 import { ThemeProvider } from "@library/theming/ThemeProvider";
 import { addComponent, _mountComponents } from "@library/utility/componentRegistry";
-import { resetStoreState } from "@library/__tests__/testStoreState";
 import { blotCSS } from "@rich-editor/quill/components/blotStyles";
-import { applySharedPortalContext } from "@vanilla/react-utils";
-import { stableObjectHash } from "@vanilla/utils";
-import isEqual from "lodash/isEqual";
 import merge from "lodash/merge";
 import React, { useCallback, useContext, useLayoutEffect, useState } from "react";
 import { Provider } from "react-redux";

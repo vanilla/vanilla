@@ -35,6 +35,7 @@ if ($CountNotAllowed > 0) {
                 'Value' => $this->Data('CategoryID'),
                 'IncludeNull' => true,
                 'DiscussionType' => $this->Data('DiscussionType'),
+                'IncludeArchived' => true,
             ];
             echo $this->Form->categoryDropDown('CategoryID', $options);
             echo '</div></p>';

@@ -1800,7 +1800,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
      */
     public function fetchFragments(array $ids, array $options = []): array {
         $ids = array_values($ids);
-        $rows = $this->getWhere(["DiscussionID" => $ids])->resultArray();
+        $rows = $this->getWhere(["DiscussionID" => $ids, "Announce" => "all"])->resultArray();
         $fragments = [];
 
         $schema = SchemaFactory::get(PostFragmentSchema::class);

@@ -8,9 +8,8 @@
 namespace Vanilla\Scheduler\Job;
 
 use Garden\Schema\Schema;
-use Garden\Web\Exception\HttpException;
 use Vanilla\Web\Middleware\LogTransactionMiddleware;
-use Vanilla\Web\Pagination\ApiPaginationIterator;
+use Vanilla\Web\Pagination\WebLinking;
 
 /**
  * A local job for handling bulk deletes.
@@ -37,15 +36,19 @@ class LocalApiBulkDeleteJob extends LocalApiJob {
      */
     public function run(): JobExecutionStatus {
         $this->vanillaClient->setDefaultHeader(LogTransactionMiddleware::HEADER_NAME, \LogModel::generateTransactionID());
-        $iterator = new ApiPaginationIterator($this->vanillaClient, $this->iteratorUrl);
-        foreach ($iterator as $apiResults) {
+        do {
+            $response = $this->vanillaClient->get($this->iteratorUrl);
+            $header = $response->getHeader(WebLinking::HEADER_NAME);
+            $linkHeaders = WebLinking::parseLinkHeaders($header);
+            $nextPage = $linkHeaders['next'] ?? null;
+            $apiResults = $response->getBody();
             // Loop through each one and delete it.
             foreach ($apiResults as $apiResult) {
                 $id = $apiResult[$this->recordIDField];
                 $deleteUrl = str_replace(":recordID", $id, $this->deleteUrlPattern);
                 $this->vanillaClient->delete($deleteUrl);
             }
-        }
+        } while ($nextPage !== null);
 
         if ($this->finalDeleteUrl) {
             $this->vanillaClient->delete($this->finalDeleteUrl);

@@ -910,8 +910,9 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      *
      * @param string|array $name The name of the config key or an array of config key value pairs.
      * @param mixed $default The default value to set in the config.
+     * @param bool $persist Whether or not the configurations should be persisted.
      */
-    public function touch($name, $default = null) {
+    public function touch($name, $default = null, bool $persist = true) {
         if (!is_array($name)) {
             $name = [$name => $default];
         }
@@ -924,7 +925,7 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
         }
 
         if (!empty($save)) {
-            $this->saveToConfig($save);
+            $this->saveToConfig($save, null, $persist);
         }
     }
 
@@ -944,6 +945,16 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
         foreach ($this->sources as $source) {
             $source->shutdown();
         }
+    }
+
+    /**
+     * Get the dynamic source.
+     *
+     * @internal
+     * @return Gdn_ConfigurationSource
+     */
+    public function getDynamic(): Gdn_ConfigurationSource {
+        return $this->dynamic;
     }
 
     /**

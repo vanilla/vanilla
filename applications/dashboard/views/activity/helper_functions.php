@@ -120,7 +120,7 @@ function writeActivity($activity, $sender, $session) {
             $commentForm->addHidden('ActivityID', $activity->ActivityID);
             $commentForm->addHidden('Return', Gdn_Url::request());
             echo $commentForm->open(['action' => url('/dashboard/activity/comment'), 'class' => 'Hidden']);
-            echo '<div class="TextBoxWrapper">'.$commentForm->textBox('Body', ['MultiLine' => true, 'value' => '']).'</div>';
+            echo '<div class="TextBoxWrapper">'.$commentForm->bodyBox('Body', ['MultiLine' => true, 'value' => '', 'placeholder' => t('Write a comment')]).'</div>';
 
             echo '<div class="Buttons">';
             echo $commentForm->button('Comment', ['class' => 'Button Primary']);

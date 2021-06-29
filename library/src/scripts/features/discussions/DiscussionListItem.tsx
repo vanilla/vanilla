@@ -78,9 +78,11 @@ export default function DiscussionListItem(props: IProps) {
             )}
         </>
     );
+
+    const discussionUrl = currentUserSignedIn ? `${discussion.url}#latest` : discussion.url;
     return (
         <ListItem
-            url={discussion.url}
+            url={discussionUrl}
             name={discussion.name}
             nameClassName={cx(classes.title, { isRead: !hasUnread && currentUserSignedIn })}
             description={discussion.excerpt}

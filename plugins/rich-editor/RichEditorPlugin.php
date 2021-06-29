@@ -107,6 +107,7 @@ class RichEditorPlugin extends Gdn_Plugin {
                 'editorID' => $editorID,
                 'editorDescriptionID' => 'richEditor-'.$editorID.'-description',
                 'hasUploadPermission' => checkPermission('uploads.add'),
+                'uploadEnabled' => $args['Attributes']['UploadEnabled'] ?? true,
             ]);
 
             // Render the editor view.

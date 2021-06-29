@@ -9,12 +9,15 @@ namespace VanillaTests\Controllers;
 
 use Vanilla\Utility\ArrayUtils;
 use VanillaTests\SiteTestCase;
+use VanillaTests\UsersAndRolesApiTestTrait;
 use VanillaTests\VanillaTestCase;
 
 /**
  * Tests for the `ProfileController`
  */
 class ProfileControllerTest extends SiteTestCase {
+    use UsersAndRolesApiTestTrait;
+
     const REDIRECT_URL = 'https://example.com/{name}?id={userID}';
 
     /**
@@ -207,5 +210,23 @@ class ProfileControllerTest extends SiteTestCase {
             [['a.b' => 'c'], '<a.b>c</a.b>']
         ];
         return $r;
+    }
+
+    /**
+     * Test changing ability to change a profile picture with only the profilePicture.edit permission.
+     */
+    public function testChangeProfilePicture(): void {
+        $roleID  = $this->roleID("Member");
+        // If the user has the profilePicture.edit permission, they shouldn't need the profiles.edit permission.
+        $this->api()->patch(
+            "/roles/{$roleID}/permissions",
+            [
+                ["permissions" => ["profilePicture.edit" => true, "profiles.edit" => false], "type" => "global"]
+            ]
+        );
+        $session = $this->getSession();
+        $session->start($this->memberID);
+        $uploadForm = $this->bessy()->getHtml("/profile/picture?userid={$this->memberID}")->getInnerHtml();
+        $this->assertStringContainsString("Upload New Picture", $uploadForm);
     }
 }

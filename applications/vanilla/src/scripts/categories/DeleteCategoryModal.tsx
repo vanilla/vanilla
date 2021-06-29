@@ -19,6 +19,7 @@ import { IComboBoxOption } from "@library/features/search/ISearchBarProps";
 import { MenuPlacement } from "@library/forms/select/SelectOne";
 import { RecordID } from "@vanilla/utils";
 import apiv2 from "@library/apiv2";
+import debounce from "lodash/debounce";
 
 interface IProps {
     categoryID: number;
@@ -47,7 +48,8 @@ export function DeleteCategoryModal(props: IProps) {
         }
         return state;
     }, 0);
-    const suggestions = useCategorySuggestions("", true);
+    const [searchFilter, setSearchFilter] = useState<string>("");
+    const suggestions = useCategorySuggestions(searchFilter, true);
 
     const filteredSuggestions = useMemo(
         () => suggestions.data?.filter((category) => category.categoryID !== categoryID),
@@ -98,6 +100,10 @@ export function DeleteCategoryModal(props: IProps) {
     const isConfirmDisabled = (actionType == "move" && isMoveValid) || (actionType === "delete" && isDeleteValid);
     const isFormDisabled = performDeleteCounter > 0;
 
+    const handleSearchFilter = debounce((value) => {
+        setSearchFilter(value);
+    }, 100);
+
     return (
         <ModalConfirm
             isVisible={isVisible}
@@ -144,6 +150,9 @@ export function DeleteCategoryModal(props: IProps) {
                             })}
                             onChange={(option) => {
                                 setReplacementCategoryID(option?.value);
+                            }}
+                            onInputChange={(value) => {
+                                handleSearchFilter(value);
                             }}
                             /**
                              * This height depends on the height of the modal, ideally we

@@ -1,7 +1,7 @@
 /**
  * Compatibility styles, using the color variables.
  *
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -16,12 +16,10 @@ import { negativeUnit } from "@library/styles/styleHelpers";
 import { userCardDiscussionPlacement } from "@dashboard/compatibilityStyles/userCards";
 import { Mixins } from "@library/styles/Mixins";
 import { injectGlobal } from "@emotion/css";
-import { metasVariables } from "@library/metas/Metas.variables";
 
 export const discussionCompatCSS = () => {
     const vars = discussionVariables();
     const globalVars = globalVariables();
-    const metaVars = metasVariables();
 
     MixinsFoundation.contentBoxes(vars.contentBoxes, "Discussion");
     MixinsFoundation.contentBoxes(vars.panelBoxes, "Discussion", ".Panel");
@@ -35,34 +33,6 @@ export const discussionCompatCSS = () => {
             marginRight: globalVars.gutter.half,
         },
     });
-
-    cssOut(
-        `
-        .userContent,
-        .UserContent,
-        .MessageList.Discussion
-        `,
-        {
-            ...Mixins.font({
-                ...globalVars.fontSizeAndWeightVars("medium"),
-                color: ColorsUtils.colorOut(globalVars.mainColors.fg),
-            }),
-        },
-    );
-
-    cssOut(
-        `
-        .userContent.userContent h1,
-        .userContent.userContent h2,
-        .userContent.userContent h3,
-        .userContent.userContent h4,
-        .userContent.userContent h5,
-        .userContent.userContent h6
-    `,
-        {
-            color: ColorsUtils.colorOut(globalVars.mainColors.fg),
-        },
-    );
 
     // Polls
 

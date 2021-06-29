@@ -14,13 +14,13 @@ import { pageHeadingVariables } from "./pageHeadingStyles";
 import backLinkClasses from "@library/routing/links/backLinkStyles";
 import { iconVariables } from "@library/icons/iconStyles";
 import { Mixins } from "@library/styles/Mixins";
+import { css } from "@emotion/css";
 
 export const pageTitleClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = pageHeadingVariables();
-    const style = styleFactory("pageTitle");
 
-    const root = style({
+    const root = css({
         ...Mixins.font({
             ...globalVars.fontSizeAndWeightVars("title"),
             lineHeight: vars.font.lineHeight,
@@ -34,14 +34,12 @@ export const pageTitleClasses = useThemeCache(() => {
 
     const iconSizing = iconVariables().chevronLeftCompact(true);
 
-    const smallBackLink = style("smallBackLink", {
-        ...{
-            [`.${backLinkClasses().root}`]: {
-                height: styleUnit(iconSizing.height),
-            },
-            [`.${backLinkClasses().link}`]: {
-                height: styleUnit(iconSizing.height),
-            },
+    const smallBackLink = css({
+        [`.${backLinkClasses().root}`]: {
+            height: styleUnit(iconSizing.height),
+        },
+        [`.${backLinkClasses().link}`]: {
+            height: styleUnit(iconSizing.height),
         },
     });
 

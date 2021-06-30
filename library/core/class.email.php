@@ -448,7 +448,7 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface {
      * @return Gdn_Email
      */
     public function subject($subject) {
-        $this->PhpMailer->Subject = mb_encode_mimeheader($subject, $this->PhpMailer->CharSet);
+        $this->PhpMailer->Subject = $subject;
         return $this;
     }
 

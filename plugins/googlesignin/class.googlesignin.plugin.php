@@ -42,7 +42,9 @@ class GoogleSignInPlugin extends Gdn_OAuth2 {
             $this->provider['AcceptedScope'] = self::ACCEPTED_SCOPE;
 
             // Translate claims coming back from Google.
-            $this->provider['ProfileKeyName'] = self::PROFILE_NAME;
+            if ($this->provider['UseGoogleNames'] ?? true) {
+                $this->provider['ProfileKeyName'] = self::PROFILE_NAME;
+            }
             $this->provider['ProfileKeyUniqueID'] = 'sub';
             $this->provider['ProfileKeyFullName'] = null;
 
@@ -87,6 +89,7 @@ class GoogleSignInPlugin extends Gdn_OAuth2 {
         if (!$form->authenticatedPostBack()) {
             $provider = $this->provider();
             $form->setData($provider);
+            $form->setValue('UseGoogleNames', $provider['UseGoogleNames'] ?? true);
         } else {
             $form->setFormValue('AuthenticationKey', $this->getProviderKey());
 
@@ -110,9 +113,9 @@ class GoogleSignInPlugin extends Gdn_OAuth2 {
         $formFields = [
             'AssociationKey' =>  ['LabelCode' => 'Client ID', 'Description' => t('Unique ID of the authentication application.')],
             'AssociationSecret' =>  ['LabelCode' => 'Secret', 'Description' => t('Secret provided by the authentication provider.')],
+            'IsDefault' => ['LabelCode' => t('Make this connection your default signin method.'), 'Control' => 'checkbox'],
+            'UseGoogleNames' => ['LabelCode' => t('Use Google names for usernames.'), 'Control' => 'checkbox']
         ];
-
-        $formFields['IsDefault'] = ['LabelCode' => t('Make this connection your default signin method.'), 'Control' => 'checkbox'];
 
         $sender->setData([
             'formData' => $formFields,

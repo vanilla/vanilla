@@ -44,8 +44,12 @@ class DBAModel extends Gdn_Model {
      * @return Gdn_Model
      */
     public function createModel($table) {
+        $container = Gdn::getContainer();
         $modelName = $table.'Model';
-        if (class_exists($modelName)) {
+
+        if ($container->hasRule($modelName)) {
+            return $container->get($modelName);
+        } elseif (class_exists($modelName)) {
             return new $modelName();
         } else {
             return new Gdn_Model($table);

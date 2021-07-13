@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -10,7 +10,7 @@ import { MockSearchData } from "@library/contexts/DummySearchContext";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import { color, linearGradient } from "csx";
 import Banner, { IBannerProps } from "@library/banner/Banner";
-import { BannerAlignment, bannerVariables, SearchPlacement } from "@library/banner/bannerStyles";
+import { BannerAlignment, SearchPlacement } from "@library/banner/Banner.variables";
 import { SearchBarPresets } from "@library/banner/SearchBarPresets";
 import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { ButtonPreset } from "@library/forms/ButtonPreset";
@@ -151,10 +151,8 @@ export const SquareRadius = storyWithConfig(
         useWrappers: false,
         themeVars: {
             banner: {
-                searchBar: {
-                    border: {
-                        radius: 0,
-                    },
+                border: {
+                    radius: 0,
                 },
             },
         },
@@ -167,10 +165,8 @@ export const RoundRadius = storyWithConfig(
         useWrappers: false,
         themeVars: {
             banner: {
-                searchBar: {
-                    border: {
-                        radius: 20,
-                    },
+                border: {
+                    radius: 20,
                 },
             },
         },
@@ -891,10 +887,8 @@ export const UnifiedBorderSquare = storyWithConfig(
                         preset: SearchBarPresets.UNIFIED_BORDER,
                     },
                 },
-                searchBar: {
-                    border: {
-                        radius: 0,
-                    },
+                border: {
+                    radius: 0,
                 },
                 backgrounds: {
                     useOverlay: true,
@@ -919,10 +913,8 @@ export const UnifiedBorderRound = storyWithConfig(
                         preset: SearchBarPresets.UNIFIED_BORDER,
                     },
                 },
-                searchBar: {
-                    border: {
-                        radius: 20,
-                    },
+                border: {
+                    radius: 20,
                 },
                 backgrounds: {
                     useOverlay: true,
@@ -942,6 +934,10 @@ export const SearchOnBgColor = storyWithConfig(
         useWrappers: false,
         themeVars: {
             banner: {
+                colors: {
+                    bg: globalVars.mainColors.bg,
+                    fg: globalVars.mainColors.fg,
+                },
                 font: {
                     color: globalVars.mainColors.fg,
                     shadow: "none",
@@ -979,6 +975,10 @@ export const SearchOnBgColorRound = storyWithConfig(
         useWrappers: false,
         themeVars: {
             banner: {
+                colors: {
+                    bg: globalVars.mainColors.bg,
+                    fg: globalVars.mainColors.fg,
+                },
                 font: {
                     color: globalVars.mainColors.fg,
                     shadow: "none",
@@ -998,10 +998,8 @@ export const SearchOnBgColorRound = storyWithConfig(
                         preset: SearchBarPresets.BORDER,
                     },
                 },
-                searchBar: {
-                    border: {
-                        radius: 20,
-                    },
+                border: {
+                    radius: 20,
                 },
             },
         },

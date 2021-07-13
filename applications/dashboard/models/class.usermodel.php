@@ -5455,6 +5455,7 @@ SQL;
      * @return bool
      */
     public static function rateLimit($user) {
+        $loginRate = (int)Gdn::config('Garden.User.RateLimit', self::LOGIN_RATE);
         // Make sure $user is an object
         $user = (object) $user;
         if (Gdn::cache()->activeEnabled()) {
@@ -5463,26 +5464,26 @@ SQL;
             $userRate = (int)Gdn::cache()->get($userRateKey);
             $userRate += 1;
             Gdn::cache()->store($userRateKey, 1, [
-                Gdn_Cache::FEATURE_EXPIRY => self::LOGIN_RATE
+                Gdn_Cache::FEATURE_EXPIRY => $loginRate
             ]);
 
             $sourceRateKey = formatString(self::LOGIN_RATE_KEY, ['Source' => Gdn::request()->ipAddress()]);
             $sourceRate = (int)Gdn::cache()->get($sourceRateKey);
             $sourceRate += 1;
             Gdn::cache()->store($sourceRateKey, 1, [
-                Gdn_Cache::FEATURE_EXPIRY => self::LOGIN_RATE
+                Gdn_Cache::FEATURE_EXPIRY => $loginRate
             ]);
         } elseif (c('Garden.Apc', false) && function_exists('apc_store')) {
             // Rate limit using the APC data store.
             $userRateKey = formatString(self::LOGIN_RATE_KEY, ['Source' => $user->UserID]);
             $userRate = (int)apc_fetch($userRateKey);
             $userRate += 1;
-            apc_store($userRateKey, 1, self::LOGIN_RATE);
+            apc_store($userRateKey, 1, $loginRate);
 
             $sourceRateKey = formatString(self::LOGIN_RATE_KEY, ['Source' => Gdn::request()->ipAddress()]);
             $sourceRate = (int)apc_fetch($sourceRateKey);
             $sourceRate += 1;
-            apc_store($sourceRateKey, 1, self::LOGIN_RATE);
+            apc_store($sourceRateKey, 1, $loginRate);
         } else {
             // Rate limit using user attributes.
             $now = time();
@@ -5491,7 +5492,7 @@ SQL;
             $userRate = $userModel->getAttribute($user->UserID, 'LoginRate', 0);
             $userRate += 1;
 
-            if ($lastLoginAttempt + self::LOGIN_RATE < $now) {
+            if ($lastLoginAttempt + $loginRate < $now) {
                 $userRate = 0;
             }
 

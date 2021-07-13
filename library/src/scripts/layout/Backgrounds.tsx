@@ -5,7 +5,7 @@
  */
 
 import React, { ReactNode, useContext, useEffect, useState } from "react";
-import { fullBackgroundClasses, globalCSS, useBodyClass } from "@library/layout/bodyStyles";
+import { fullBackgroundClasses, globalCSS, useBodyCSS } from "@library/layout/bodyStyles";
 import { useHistory } from "react-router";
 
 interface IProps {
@@ -16,7 +16,7 @@ interface IProps {
  * Creates a drop down menu
  */
 export const Backgrounds = () => {
-    useBodyClass();
+    useBodyCSS();
     globalCSS();
     const backgroundInfo = useBackgroundContext();
     const classes = fullBackgroundClasses(backgroundInfo.isHomePage);

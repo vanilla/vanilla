@@ -39,7 +39,7 @@ export const carouselClasses = useThemeCache(() => {
             "&:focus, &:active": {
                 // This is over the icon and we want it to be a little further to the left of the main nav
                 left: styleUnit(0),
-                width: styleUnit(144),
+                width: styleUnit(165),
                 height: styleUnit(38),
                 clip: "auto",
             },
@@ -92,12 +92,17 @@ export const carouselClasses = useThemeCache(() => {
     });
 
     const slider = style("slider", {
-        transition: "left 500ms ease 0s",
+        willChange: "transform",
         position: "absolute",
+        right: "auto",
         display: "flex",
         flexDirection: "row",
         padding: "0 2px",
-        "> * + *": {
+        ".swipable": {
+            display: "flex",
+            flexDirection: "row",
+        },
+        ".swipable > * + *": {
             marginLeft: 16,
         },
     });

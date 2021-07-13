@@ -11,7 +11,7 @@ import get from "lodash/get";
 import set from "lodash/set";
 import cloneDeep from "lodash/cloneDeep";
 import unset from "lodash/unset";
-import { bannerVariables } from "@library/banner/bannerStyles";
+import { bannerVariables } from "@library/banner/Banner.variables";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { contentBannerVariables } from "@library/banner/contentBannerStyles";
 import { userContentVariables } from "@library/content/UserContent.variables";

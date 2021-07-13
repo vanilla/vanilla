@@ -11,10 +11,11 @@ import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { selectBoxClasses } from "@library/forms/select/selectBoxStyles";
 import { useUniqueID } from "@library/utility/idUtils";
-import classNames from "classnames";
 import React, { useState, useRef } from "react";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { NBSP, DownTriangleIcon, CheckCompactIcon } from "@library/icons/common";
+import classNames from "classnames";
+import { cx } from "@emotion/css";
 
 export interface ISelectBoxItem {
     value: string;
@@ -76,7 +77,7 @@ export default function SelectBox(props: ISelectBoxProps) {
     const classesDropDown = dropDownClasses();
 
     return (
-        <div aria-describedby={props.describedBy} className={classNames("selectBox", props.className)}>
+        <div aria-describedby={props.describedBy} className={cx("selectBox", props.className)}>
             <DropDown
                 isVisible={isVisible}
                 onVisibilityChange={(val) => {
@@ -90,14 +91,10 @@ export default function SelectBox(props: ISelectBoxProps) {
                 buttonRef={buttonRef}
                 contentID={id + "-content"}
                 handleID={id + "-handle"}
-                className={classNames(
-                    "selectBox-dropDown",
-                    {
-                        "dropDownItem-verticalPadding": verticalPadding,
-                        [classesDropDown.verticalPadding]: verticalPadding,
-                    },
-                    { [classes.offsetPadding]: props.offsetPadding },
-                )}
+                className={cx(classes.selectBoxDropdown, {
+                    [classesDropDown.verticalPadding]: verticalPadding,
+                    [classes.offsetPadding]: props.offsetPadding,
+                })}
                 buttonContents={
                     <>
                         <SelectBoxButton
@@ -108,8 +105,8 @@ export default function SelectBox(props: ISelectBoxProps) {
                         {afterButton}
                     </>
                 }
-                buttonClassName={classNames(props.buttonClassName, classes.toggle)}
-                contentsClassName={classNames({ isParentWidth: props.widthOfParent })}
+                buttonClassName={cx(classes.toggle, props.buttonClassName)}
+                contentsClassName={cx({ isParentWidth: props.widthOfParent })}
                 buttonType={props.buttonType}
                 openAsModal={props.openAsModal}
                 flyoutType={FlyoutType.LIST}
@@ -144,7 +141,7 @@ function SelectBoxButton(props: {
                 {overwriteButtonContents ?? (activeItem.content || activeItem.name)}
             </ConditionalWrap>
             {NBSP}
-            <DownTriangleIcon className={classNames("selectBox-buttonIcon", classes.buttonIcon)} />
+            <DownTriangleIcon className={cx(classes.buttonIcon)} />
         </React.Fragment>
     ) : null;
 }
@@ -153,7 +150,7 @@ function SelectBoxItem(props: { item: ISelectBoxItem; isSelected: boolean; onCli
     const { item, isSelected, onClick } = props;
     if ("url" in item) {
         return (
-            <DropDownItemLink className={classNames({ isSelected: isSelected })} name={item.name} to={item.url || ""}>
+            <DropDownItemLink className={cx({ isSelected: isSelected })} name={item.name} to={item.url || ""}>
                 <SelectBoxContents item={item} isSelected={isSelected} />
             </DropDownItemLink>
         );
@@ -162,10 +159,10 @@ function SelectBoxItem(props: { item: ISelectBoxItem; isSelected: boolean; onCli
         const classesDropDown = dropDownClasses();
         return (
             <DropDownItemButton
-                className={classNames({ isSelected: isSelected })}
+                className={cx({ isSelected: isSelected })}
                 onClick={() => onClick(item)}
                 aria-current={isSelected}
-                buttonClassName={classNames(classesDropDown.action, classes.buttonItem)}
+                buttonClassName={cx(classesDropDown.action, classes.buttonItem)}
             >
                 <SelectBoxContents item={item} isSelected={isSelected} />
             </DropDownItemButton>
@@ -179,11 +176,11 @@ function SelectBoxContents(props: { item: ISelectBoxItem; isSelected: boolean })
 
     return (
         <>
-            <span className={classNames("selectBox-itemLabel", classes.itemLabel)}>{item.content || item.name}</span>
-            <span className={classNames("sc-only", classes.checkContainer)}>
+            <span className={cx("selectBox-itemLabel", classes.itemLabel)}>{item.content || item.name}</span>
+            <span className={cx("sc-only", classes.checkContainer)}>
                 {isSelected && <CheckCompactIcon className={"selectBox-isSelectedIcon"} />}
                 {!isSelected && (
-                    <span className={classNames("selectBox-spacer", classes.spacer)} aria-hidden={true}>
+                    <span className={cx("selectBox-spacer", classes.spacer)} aria-hidden={true}>
                         {` `}
                     </span>
                 )}

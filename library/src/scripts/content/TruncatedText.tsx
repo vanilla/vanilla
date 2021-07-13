@@ -4,9 +4,10 @@
  * @license GPL-2.0-only
  */
 
+import { cx } from "@emotion/css";
+import { truncatedTextClasses } from "@library/content/TruncatedText.styles";
 import { useMeasure } from "@vanilla/react-utils";
-import React, { useEffect, useRef } from "react";
-import shave from "shave";
+import React, { useEffect, useRef, useState } from "react";
 
 interface IProps {
     tag?: string;
@@ -14,7 +15,6 @@ interface IProps {
     children: React.ReactNode;
     useMaxHeight?: boolean;
     lines?: number;
-    expand?: boolean;
     maxCharCount?: number;
 }
 
@@ -26,54 +26,33 @@ const TruncatedText = React.memo(function TruncatedText(_props: IProps) {
         ..._props,
     };
 
+    // This state is used to track the number of lines to display.
+    // Its values should match https://www.w3.org/TR/css-overflow-3/#propdef--webkit-line-clamp
+    const [linesToClamp, setLinesToClamp] = useState<number | "none">(props.lines || "none");
+    const classes = truncatedTextClasses({ lineClamp: linesToClamp });
+
     const measure = useMeasure(ref);
 
     useEffect(() => {
-        truncate();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [measure]);
-
-    function truncate() {
         if (props.useMaxHeight) {
-            truncateTextBasedOnMaxHeight();
-        } else {
-            truncateBasedOnLines();
+            setLinesToClamp(() => calculateLinesToClamp(ref.current));
         }
-    }
+    }, [measure, props.useMaxHeight]);
 
     /**
-     * Truncate element text based on a certain number of lines.
-     *
-     * @param excerpt - The excerpt to truncate.
+     * This function calculates the number of lines to display by dividing the maximum defined height
+     * by the line-height and returning the closest integer that will fit into that space.
      */
-    function truncateBasedOnLines() {
-        const lineHeight = calculateLineHeight();
-        if (lineHeight !== null && !Number.isNaN(lineHeight)) {
-            const maxHeight = props.lines! * lineHeight;
-            shave(ref.current!, maxHeight);
-        }
-    }
-
-    /**
-     * Truncate element text based on max-height
-     *
-     * @param excerpt - The excerpt to truncate.
-     */
-    function truncateTextBasedOnMaxHeight() {
-        const element = ref.current!;
-        const maxHeight = parseInt(getComputedStyle(element)["max-height"], 10);
-        if (maxHeight && maxHeight > 0) {
-            shave(element, maxHeight);
-        }
-    }
-
-    function calculateLineHeight(): number | null {
+    const calculateLinesToClamp = (element: HTMLDivElement | null): number | "none" => {
         if (ref.current) {
-            return parseInt(getComputedStyle(ref.current)["line-height"], 10);
-        } else {
-            return null;
+            const lineHeight = parseInt(getComputedStyle(ref.current)["line-height"], 10);
+            const maxHeight = parseInt(getComputedStyle(ref.current)["max-height"], 10);
+            if (!Object.is(lineHeight, NaN) && !Object.is(maxHeight, NaN)) {
+                return parseInt((maxHeight / lineHeight).toFixed(0)) - 1;
+            }
         }
-    }
+        return "none";
+    };
 
     const Tag = (props.tag || "span") as "span";
 
@@ -89,7 +68,7 @@ const TruncatedText = React.memo(function TruncatedText(_props: IProps) {
     }
 
     return (
-        <Tag className={props.className} ref={ref}>
+        <Tag className={cx(classes.truncated, props.className)} ref={ref}>
             {children}
         </Tag>
     );

@@ -211,6 +211,32 @@ class CategoriesApiController extends AbstractApiController {
     }
 
     /**
+     * Get a user's preferences for a single category.
+     *
+     * @param int $id
+     * @param int $userID
+     * @return Data
+     */
+    public function get_preferences(int $id, int $userID): Data {
+        if ($this->getSession()->UserID === $userID) {
+            $permission = "Garden.SignIn.Allow";
+        } else {
+            $permission = ["Garden.Users.Edit", "Moderation.Profiles.Edit"];
+        }
+        $this->permission($permission);
+
+        $in = $this->schema([]);
+        $out = $this->categoryModel->preferencesSchema();
+
+        $this->category($id);
+
+        $preferences = $this->categoryModel->getPreferencesByCategoryID($userID, $id);
+        $result = $out->validate($preferences);
+
+        return new Data($result);
+    }
+
+    /**
      * Search categories.
      *
      * @param array $query The query string.
@@ -440,6 +466,32 @@ class CategoriesApiController extends AbstractApiController {
     }
 
     /**
+     * Get a user's category preferences.
+     *
+     * @param int $userID
+     * @return Data
+     */
+    public function index_preferences(int $userID): Data {
+        if ($this->getSession()->UserID === $userID) {
+            $permission = "Garden.SignIn.Allow";
+        } else {
+            $permission = ["Garden.Users.Edit", "Moderation.Profiles.Edit"];
+        }
+        $this->permission($permission);
+
+        $in = $this->schema([]);
+        $out = $this->schema([
+            ":a" => [
+                "items" => $this->categoryModel->fragmentWithPreferencesSchema(),
+            ],
+        ]);
+
+        $preferences = $this->categoryModel->getPreferences($userID);
+        $result = $out->validate(array_values($preferences));
+        return new Data($result);
+    }
+
+    /**
      * Recursively filter a list of categories by their archived flag.
      *
      * @param array $categories
@@ -506,6 +558,38 @@ class CategoriesApiController extends AbstractApiController {
         $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
         return $result;
+    }
+
+    /**
+     * Set a user's category preferences.
+     *
+     * @param int $id
+     * @param int $userID
+     * @param array $body
+     * @return Data
+     */
+    public function patch_preferences(int $id, int $userID, array $body): Data {
+        if ($this->getSession()->UserID === $userID) {
+            $permission = "Garden.SignIn.Allow";
+        } else {
+            $permission = ["Garden.Users.Edit", "Moderation.Profiles.Edit"];
+        }
+        $this->permission($permission);
+
+        $in = $this->schema([
+            CategoryModel::PREFERENCE_KEY_NOTIFICATION
+        ])->add($this->categoryModel->preferencesSchema());
+        $out = $this->categoryModel->preferencesSchema();
+
+        $this->category($id);
+
+        $body = $in->validate($body, true);
+
+        $this->categoryModel->setPreferences($userID, $id, $body);
+
+        $preferences = $this->categoryModel->getPreferencesByCategoryID($userID, $id);
+        $result = $out->validate($preferences);
+        return new Data($result);
     }
 
     /**

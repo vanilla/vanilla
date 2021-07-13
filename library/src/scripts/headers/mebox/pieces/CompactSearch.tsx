@@ -6,7 +6,7 @@
 
 import { useSearch } from "@library/contexts/SearchContext";
 import SearchBar from "@library/features/search/SearchBar";
-import { ISearchBarOverwrites, searchBarClasses } from "@library/features/search/searchBarStyles";
+import { ISearchBarOverwrites, searchBarClasses } from "@library/features/search/SearchBar.styles";
 import SearchOption from "@library/features/search/SearchOption";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import Button from "@library/forms/Button";

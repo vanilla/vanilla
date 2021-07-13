@@ -1,11 +1,10 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { styleFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
@@ -28,7 +27,7 @@ import { buttonResetMixin } from "@library/forms/buttonMixins";
 import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
-import { CSSObject } from "@emotion/css";
+import { css, CSSObject } from "@emotion/css";
 import { inputVariables } from "@library/forms/inputStyles";
 import { suggestedTextStyleHelper } from "@library/features/search/suggestedTextStyles";
 import { searchResultsVariables } from "@library/features/search/searchResultsStyles";
@@ -46,7 +45,6 @@ export interface ISearchBarOverwrites {
 }
 
 export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites) => {
-    const style = styleFactory("searchBar");
     const shadow = shadowHelper();
     const classesInputBlock = inputBlockClasses();
     const vars = searchBarVariables();
@@ -58,7 +56,6 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
     const inputVars = inputVariables();
     const titleBarVars = titleBarVariables();
     const formElementVars = formElementsVariables();
-    const scopeMinWidth = compact ? vars.search.compact.minWidth : vars.search.minWidth;
     const mediaQueries = layoutVars.mediaQueries();
     const borderStyle = overwrites && overwrites.preset ? overwrites.preset : vars.options.preset;
 
@@ -67,7 +64,7 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
 
     const borderColor = isInsetBordered ? vars.input.bg : vars.border.color;
 
-    const independentRoot = style("independentRoot", {
+    const independentRoot = css({
         display: "block",
         height: percent(100),
     });
@@ -88,7 +85,7 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
         side: "right",
     });
 
-    const root = style({
+    const root = css({
         cursor: "pointer",
         ...{
             ".searchBar__placeholder": {
@@ -117,23 +114,6 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
                         width: percent(100),
                     },
                 },
-            },
-            ".searchBar-submitButton": {
-                position: "relative",
-                minWidth: styleUnit(scopeMinWidth + 2),
-                flexBasis: styleUnit(scopeMinWidth),
-                minHeight: styleUnit(vars.sizing.height),
-                margin: styleUnit(-1),
-                ...{
-                    "&:hover, &:focus": {
-                        zIndex: 2,
-                    },
-                },
-                borderTopLeftRadius: important(0),
-                borderBottomLeftRadius: important(0),
-                borderBottomRightRadius: importantUnit(borderRadius),
-                borderTopRightRadius: importantUnit(borderRadius),
-                paddingRight: importantUnit(buttonGlobalVariables().padding.horizontal + paddingOffset.right),
             },
             ".wrap__control": {
                 width: percent(100),
@@ -177,14 +157,19 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
                 borderRadius: important(0),
                 lineHeight: styleUnit(globalVars.lineHeights.base * globalVars.fonts.size.medium),
             },
-            ...mediaQueries.oneColumnDown({
-                ...{
-                    ".searchBar-submitButton": {
-                        minWidth: 0,
-                    },
-                },
-            }),
         },
+    });
+
+    const submitButton = css({
+        ...Mixins.button(compact ? vars.compactSubmitButton : vars.submitButton),
+        margin: "-1px",
+        "&:hover, &:focus": {
+            zIndex: 2,
+        },
+        paddingRight: importantUnit(buttonGlobalVariables().padding.horizontal + paddingOffset.right),
+        ...mediaQueries.oneColumnDown({
+            minWidth: 0,
+        }),
     });
 
     // The styles have been split here so they can be exported to the compatibility styles.
@@ -208,7 +193,7 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
         },
     };
 
-    const results = style("results", {
+    const results = css({
         position: "absolute",
         width: percent(100),
         backgroundColor: ColorsUtils.colorOut(vars.results.bg),
@@ -253,9 +238,9 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
                 fontWeight: globalVars.fonts.weights.normal,
             },
         },
-    } as CSSObject);
+    });
 
-    const resultsAsModal = style("resultsAsModal", {
+    const resultsAsModal = css({
         position: "absolute",
         top: styleUnit(vars.sizing.height),
         left: 0,
@@ -265,7 +250,7 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
         zIndex: 2,
     });
 
-    const clear = style("clear", {
+    const clear = css({
         position: "relative",
         display: "flex",
         boxSizing: "border-box",
@@ -293,7 +278,7 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
           }
         : {};
 
-    const main = style("main", {
+    const main = css({
         flexGrow: 1,
         position: "relative",
         borderRadius: 0,
@@ -344,7 +329,7 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
               height: percent(100),
           };
 
-    const valueContainer = style("valueContainer", {
+    const valueContainer = css({
         ...{
             "&&&": {
                 ...valueContainerConditionalStyles,
@@ -366,7 +351,7 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
                 }),
             },
             "&&&:not(.isFocused)": {
-                borderColor: isInsetBordered ? ColorsUtils.colorOut(vars.input.bg) : vars.border.color,
+                borderColor: ColorsUtils.colorOut(isInsetBordered ? vars.input.bg : vars.border.color),
             },
             "&&&:not(.isFocused).isHovered": {
                 borderColor: ColorsUtils.colorOut(vars.stateColors.hover),
@@ -420,7 +405,7 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
     } as CSSObject);
 
     // Has a search button attached.
-    const compoundValueContainer = style("compoundValueContainer", {
+    const compoundValueContainer = css({
         ...{
             "&&": {
                 borderTopRightRadius: important(0),
@@ -429,11 +414,11 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
         },
     });
 
-    const actionButton = style("actionButton", {
+    const actionButton = css({
         marginLeft: -borderVars.width,
     });
 
-    const label = style("label", {
+    const label = css({
         display: "flex",
         alignItems: "center",
         justifyContent: "flex-start",
@@ -454,9 +439,9 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
               }),
           };
 
-    const scopeSeparator = style("scopeSeparator", scopeSeparatorStyle);
+    const scopeSeparator = css(scopeSeparatorStyle);
 
-    const content = style("content", {
+    const content = css({
         display: "flex",
         alignItems: "stretch",
         justifyContent: "flex-start",
@@ -492,7 +477,7 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
     });
 
     // special selector
-    const heading = style("heading", {
+    const heading = css({
         ...{
             "&&": {
                 marginBottom: styleUnit(vars.heading.margin),
@@ -500,7 +485,7 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
         },
     });
 
-    const icon = style("icon", {});
+    const icon = css({});
 
     const iconContainer = (alignRight?: boolean) => {
         const { compact = false } = overwrites || {};
@@ -514,9 +499,8 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
                   left: horizontalPosition,
               };
 
-        return style("iconContainer", {
+        return css({
             ...buttonResetMixin(),
-            // ...pointerEvents(), // messes with hover of input. It'll click on the input anyways
             position: "absolute",
             top: 0,
             bottom: 0,
@@ -546,7 +530,7 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
         });
     };
 
-    const iconContainerBigInput = style("iconContainerBig", {
+    const iconContainerBigInput = css({
         ...{
             "&&": {
                 height: styleUnit(vars.sizing.height),
@@ -554,7 +538,7 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
         },
     });
 
-    const menu = style("menu", {
+    const menu = css({
         display: "flex",
         alignItems: "flex-start",
         justifyContent: "flex-start",
@@ -591,14 +575,16 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
         },
     });
 
-    const scopeSelect = style("scopeSelect", {
+    const { selectBoxDropdown, buttonIcon } = selectBoxClasses();
+
+    const scopeSelect = css({
         display: "flex",
         width: calc("100%"),
         height: calc("100%"),
         justifyContent: "center",
         alignItems: "stretch",
         ...{
-            ".selectBox-dropDown": {
+            [`.${selectBoxDropdown}`]: {
                 position: "relative",
                 padding: isInsetBordered ? styleUnit(vars.border.width) : undefined,
                 width: percent(100),
@@ -607,7 +593,7 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
         },
     });
 
-    const scopeToggleConditionalStyles = isInsetBordered
+    const scopeToggleConditionalStyles: CSSObject = isInsetBordered
         ? {
               position: "absolute",
               top: 0,
@@ -621,7 +607,7 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
               height: percent(100),
           };
 
-    const scopeToggle = style("scopeToggle", {
+    const scopeToggle = css({
         display: "flex",
         justifyContent: "stretch",
         alignItems: "center",
@@ -642,7 +628,7 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
             right: 0,
         }),
         ...{
-            [`.${selectBoxClasses().buttonIcon}`]: {
+            [`.${buttonIcon}`]: {
                 width: styleUnit(vars.scopeIcon.width),
                 flexBasis: styleUnit(vars.scopeIcon.width),
                 height: styleUnit(vars.scopeIcon.width * vars.scopeIcon.ratio),
@@ -670,9 +656,9 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
                 display: "none",
             },
         },
-    } as CSSObject);
+    });
 
-    const scopeLabelWrap = style("scopeLabelWrap", {
+    const scopeLabelWrap = css({
         display: "flex",
         textOverflow: "ellipsis",
         whiteSpace: "nowrap",
@@ -681,7 +667,7 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
         color: ColorsUtils.colorOut(vars.input.fg),
     });
 
-    const scope = style("scope", {
+    const scope = css({
         position: "relative",
         minHeight: styleUnit(vars.sizing.height),
         width: styleUnit(compact ? vars.scope.compact.width : vars.scope.width),
@@ -704,18 +690,6 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
             `]: {
                 display: "none",
             },
-            [`.${scopeSelect}`]: {
-                ...borderRadii({
-                    left: borderRadius,
-                    right: 0,
-                }),
-            },
-            [`.selectBox-dropDown`]: {
-                ...borderRadii({
-                    left: borderRadius,
-                    right: 0,
-                }),
-            },
             [`.${scopeToggle}`]: {
                 ...borderRadii({
                     left: borderRadius,
@@ -733,25 +707,25 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
         },
     });
 
-    const wrap = style("wrap", {
+    const wrap = css({
         display: "flex",
         height: percent(100),
         width: percent(100),
     });
 
-    const form = style("form", {
+    const form = css({
         display: "flex",
         width: percent(100),
         flexWrap: "nowrap",
         alignItems: "center",
     });
 
-    const closeButton = style("closeButton", {
+    const closeButton = css({
         marginLeft: styleUnit(6),
         borderRadius: "6px",
     });
 
-    const compactIcon = style("compactIcon", {
+    const compactIcon = css({
         ...{
             "&&": {
                 width: styleUnit(vars.searchIcon.width),
@@ -760,19 +734,20 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
         },
     });
 
-    const standardContainer = style("standardContainer", {
+    const standardContainer = css({
         display: "block",
         position: "relative",
         height: styleUnit(vars.sizing.height),
         marginBottom: styleUnit(globalVars.gutter.size),
     });
 
-    const firstItemBorderTop = style("firstItemBorderTop", {
+    const firstItemBorderTop = css({
         borderTop: `solid 1px ${globalVars.border.color.toString()}`,
     });
 
     return {
         root,
+        submitButton,
         independentRoot,
         compoundValueContainer,
         valueContainer,

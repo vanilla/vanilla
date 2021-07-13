@@ -77,6 +77,9 @@ export const buttonUtilityClasses = useThemeCache(() => {
             },
         }),
         color: "inherit",
+        "&&.focus-visible": {
+            outline: "-webkit-focus-ring-color auto 1px",
+        },
     });
 
     const buttonIcon = style(

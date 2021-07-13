@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
@@ -52,17 +52,16 @@ export class Variables {
             ...vars.sizing,
         };
 
-        const state: IButton["state"] = vars.state ?? {};
-        const hover: IButton["hover"] = vars.hover ?? state;
-        const focus: IButton["focus"] = vars.focus ?? state;
-        const active: IButton["active"] = vars.active ?? state;
-        const focusAccessible: IButton["focusAccessible"] = vars.focusAccessible ?? state;
+        const hover: IButton["hover"] = vars.state ?? vars.hover ?? {};
+        const focus: IButton["focus"] = vars.state ?? vars.focus ?? {};
+        const active: IButton["active"] = vars.state ?? vars.active ?? {};
+        const focusAccessible: IButton["focusAccessible"] = vars.state ?? vars.focusAccessible ?? {};
 
         const disabled: IButton["disabled"] = vars.disabled ?? {};
 
         const borders: IButton["borders"] = Variables.border({
             ...buttonGlobalVars.border,
-            ...(vars.borders?.color ? vars.borders : {}),
+            ...vars.borders,
         });
 
         const padding: IButton["padding"] = {

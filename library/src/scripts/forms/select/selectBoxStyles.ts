@@ -1,20 +1,23 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { styleFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { percent, px } from "csx";
 import { styleUnit } from "@library/styles/styleUnit";
+import { css } from "@emotion/css";
 
 export const selectBoxClasses = useThemeCache(() => {
     const globalVars = globalVariables();
-    const style = styleFactory("selectBox");
 
-    const toggle = style("toggle", {
+    const buttonIcon = css({
+        marginRight: "auto",
+    });
+
+    const toggle = css({
         display: "flex",
         alignItems: "center",
         justifyContent: "flex-start",
@@ -25,7 +28,7 @@ export const selectBoxClasses = useThemeCache(() => {
             "&.minimalStyles": {
                 justifyContent: "center",
                 ...{
-                    ".selectBox-buttonIcon": {
+                    [`.${buttonIcon}`]: {
                         marginRight: 0,
                     },
                 },
@@ -33,7 +36,7 @@ export const selectBoxClasses = useThemeCache(() => {
         },
     });
 
-    const buttonItem = style("buttonItem", {
+    const buttonItem = css({
         display: "flex",
         overflow: "hidden",
         alignItems: "center",
@@ -49,22 +52,9 @@ export const selectBoxClasses = useThemeCache(() => {
         },
     });
 
-    const buttonIcon = style("buttonIcon", {
-        marginRight: "auto",
-    });
+    const selectBoxDropdown = css({});
 
-    const outdated = style("outdated", {
-        marginLeft: "auto",
-        lineHeight: "inherit",
-        whiteSpace: "nowrap",
-    });
-
-    const dropDownContents = style("dropDownContents", {
-        paddingTop: px(6),
-        paddingBottom: px(6),
-    });
-
-    const checkContainer = style("checkContainer", {
+    const checkContainer = css({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -75,18 +65,18 @@ export const selectBoxClasses = useThemeCache(() => {
         marginLeft: "auto",
     });
 
-    const spacer = style("spacer", {
+    const spacer = css({
         display: "block",
         width: px(18),
         height: px(18),
     });
 
-    const itemLabel = style("itemLabel", {
+    const itemLabel = css({
         display: "block",
         flexGrow: 1,
     });
 
-    const offsetPadding = style("offsetPadding", {
+    const offsetPadding = css({
         paddingTop: styleUnit(0),
         paddingBottom: styleUnit(0),
     });
@@ -95,8 +85,7 @@ export const selectBoxClasses = useThemeCache(() => {
         toggle,
         buttonItem,
         buttonIcon,
-        outdated,
-        dropDownContents,
+        selectBoxDropdown,
         checkContainer,
         spacer,
         itemLabel,

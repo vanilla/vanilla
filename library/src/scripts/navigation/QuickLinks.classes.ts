@@ -18,7 +18,7 @@ export const quickLinksClasses = useThemeCache(() => {
         border: "none",
     });
 
-    const list = style("list", {});
+    const list = style("list", { ...Mixins.margin(vars.list.spacing) });
 
     const { listSeparation } = vars.listItem;
 

@@ -25,7 +25,7 @@ import { DeepPartial } from "redux";
 import { MetaItem, Metas } from "@library/metas/Metas";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
 import { cx } from "@emotion/css";
-import { buttonClasses } from "@library/forms/buttonStyles";
+import { buttonClasses } from "@library/forms/Button.styles";
 
 export interface IHomeWidgetItemProps {
     // Content

@@ -1,6 +1,6 @@
 /*
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -8,17 +8,12 @@ import { objectFitWithFallback } from "@library/styles/styleHelpers";
 import { styleUnit } from "@library/styles/styleUnit";
 import { Mixins } from "@library/styles/Mixins";
 import { Variables } from "@library/styles/Variables";
-import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { IThemeVariables } from "@library/theming/themeReducer";
-import { CSSObject } from "@emotion/css";
+import { css, CSSObject } from "@emotion/css";
 import { important, percent } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
-
-/**
- * @copyright 2009-2019 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */
 
 export const userPhotoVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeThemeVars = variableFactory("userPhoto", forcedVars);
@@ -99,18 +94,18 @@ export const userPhotoMixins = (vars = userPhotoVariables()) => {
 
 export const userPhotoClasses = useThemeCache(() => {
     const vars = userPhotoVariables();
-    const style = styleFactory("userPhoto");
+
     // I'm doing this so we can import the styles in the compatibility styles.
     const mixinStyles = userPhotoMixins(vars);
 
-    const root = style(mixinStyles.root as CSSObject);
-    const photo = style("photo", mixinStyles.photo);
-    const small = style("small", mixinStyles.small);
-    const medium = style("medium", mixinStyles.medium);
-    const large = style("large", mixinStyles.large);
-    const xlarge = style("large", mixinStyles.xlarge);
+    const root = css(mixinStyles.root);
+    const photo = css(mixinStyles.photo);
+    const small = css(mixinStyles.small);
+    const medium = css(mixinStyles.medium);
+    const large = css(mixinStyles.large);
+    const xlarge = css(mixinStyles.xlarge);
 
-    const noPhoto = style("noPhoto", {
+    const noPhoto = css({
         display: "block",
         ...{
             "&&": {

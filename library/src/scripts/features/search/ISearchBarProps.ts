@@ -6,7 +6,7 @@
 
 import { IOptionalComponentID } from "@library/utility/idUtils";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import { ISearchBarOverwrites } from "@library/features/search/searchBarStyles";
+import { ISearchBarOverwrites } from "@library/features/search/SearchBar.styles";
 import { ISearchScopeNoCompact } from "./SearchScopeContext";
 import { RecordID } from "@vanilla/utils";
 
@@ -26,7 +26,6 @@ export interface ISearchBarProps extends IOptionalComponentID {
     optionComponent?: React.ComponentType<any>;
     getRef?: any;
     buttonClassName?: string;
-    buttonDropDownClassName?: string;
     buttonLoaderClassName?: string;
     hideSearchButton?: boolean;
     triggerSearchOnClear?: boolean;

@@ -96,6 +96,12 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
     /** @var array */
     private static $discussionTypes = null;
 
+    // Maximum number of seconds a batch of deletes should last before a new batch needs to be scheduled.
+    public const MAX_TIME_BATCH = 10;
+
+    // Maximum number of discussions to delete.
+    private const MAX_DELETE_LIMIT = 30;
+
     /**
      * @deprecated 2.6
      * @var bool
@@ -3323,6 +3329,64 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
     }
 
     /**
+     * Given a list of discussionIDs, filter out discussions the user does not have category permissions on.
+     *
+     * @param array $discussionIDs
+     * @param string $categoryPermission
+     * @return array
+     */
+    public function filterCategoryPermissions(array $discussionIDs, string $categoryPermission): array {
+        $allowedDiscussions = [];
+        $discussionData = $this->SQL
+            ->select('DiscussionID, CategoryID')
+            ->from('Discussion')
+            ->whereIn('DiscussionID', $discussionIDs)
+            ->get()
+            ->resultArray();
+        foreach ($discussionData as $discussion) {
+            if (CategoryModel::checkPermission($discussion['CategoryID'], $categoryPermission)) {
+                $allowedDiscussions[] = $discussion['DiscussionID'];
+            }
+        }
+        return $allowedDiscussions;
+    }
+
+    /**
+     * Delete discussions.
+     *
+     * @param array $discussionIDs Discussions to delete.
+     * @param bool $filtered If discussions have already been category permission filtered.
+     */
+    public function deleteDiscussions(array $discussionIDs, bool $filtered = false): array {
+        $result = [];
+        $startTime = time();
+        /**
+         * @var \Gdn_Session $session
+         */
+        $result['invalidDiscussions'] = [];
+
+        $session = Gdn::getContainer()->get(Gdn_Session::class);
+        $session->checkPermission('Vanilla.Discussions.Delete', true, 'Category', 'any');
+        if (!$filtered) {
+            $discussionsCopy = $discussionIDs;
+            $discussionIDs = $this->filterCategoryPermissions($discussionIDs, 'Vanilla.Discussions.Delete');
+        }
+        if (isset($discussionsCopy)) {
+            $result['invalidDiscussions'] = array_diff($discussionsCopy, $discussionIDs);
+        }
+        $checkedDiscussions = array_combine($discussionIDs, $discussionIDs);
+        foreach ($discussionIDs as $key => $value) {
+            $this->deleteID($value);
+            unset($checkedDiscussions[$value]);
+            $elapsedTime = time() - $startTime;
+            if ($elapsedTime > self::MAX_TIME_BATCH || $key + 1 >= self::MAX_DELETE_LIMIT) {
+                break;
+            }
+        }
+        return array_merge($checkedDiscussions, $result['invalidDiscussions']);
+    }
+
+    /**
      * Delete a discussion. Update and/or delete all related data.
      *
      * Events: DeleteDiscussion.
@@ -3387,7 +3451,6 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
             $transactionID = LogModel::beginTransaction();
             LogModel::insert($log, 'Discussion', $data, $logOptions);
             LogModel::endTransaction();
-
             // Delete the discussion
             $this->SQL->delete('Discussion', ['DiscussionID' => $id]);
 

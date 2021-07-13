@@ -14,7 +14,7 @@ import classNames from "classnames";
 import Frame from "@library/layout/frame/Frame";
 import FrameHeaderWithAction from "@library/layout/frame/FrameHeaderWithAction";
 import LinkAsButton from "@library/routing/LinkAsButton";
-import { buttonUtilityClasses } from "@library/forms/buttonStyles";
+import { buttonUtilityClasses } from "@library/forms/Button.styles";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { ComposeIcon } from "@library/icons/titleBar";
 import FrameBody from "@library/layout/frame/FrameBody";

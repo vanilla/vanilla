@@ -11,7 +11,9 @@ use CategoryModel;
 use DiscussionModel;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\ForbiddenException;
+use Garden\Web\Exception\NotFoundException;
 use Vanilla\DiscussionTypeConverter;
+use Vanilla\Exception\PermissionException;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\Models\TestDiscussionModelTrait;
 
@@ -457,6 +459,41 @@ class DiscussionsTest extends AbstractResourceTest {
 
         $convertedDiscussion = $this->api()->put("/discussions/{$id}/type", ["type" => DiscussionTypeConverter::RESTRICTED_TYPES[0]])->getBody();
         $this->assertEquals("discussion", $convertedDiscussion["type"]);
+    }
+
+    /**
+     * Test DELETE /discussions/list
+     */
+    public function testDeleteDiscussionsList(): void {
+
+        $discussionData = [
+            'name' => 'Test Discussion',
+            'format' => 'text',
+            'body' => 'Hello Discussion',
+            'categoryID' => 1,
+        ];
+        $countBefore = count($this->api()->get('/discussions')->getBody());
+        $discussion1 = $this->api()->post('/discussions', $discussionData)->getBody();
+        $discussion2 = $this->api()->post('/discussions', $discussionData)->getBody();
+        // Delete 2 valid discussions.
+        $this->api()->deleteWithBody("/discussions/list", ['discussionIDs' => [$discussion1['discussionID'], $discussion2['discussionID']]]);
+        $countAfter = count($this->api()->get('/discussions')->getBody());
+        $this->assertEquals($countBefore, $countAfter);
+        $discussion3 = $this->api()->post('/discussions', $discussionData)->getBody();
+        $rd = rand(5000, 60000);
+        // Delete an invalid discussion.
+        try {
+            $this->api()->deleteWithBody("/discussions/list", ["discussionIDs" => [$discussion3['discussionID'], $rd]])->getBody();
+        } catch (ClientException $e) {
+            $this->assertEquals($countBefore, $countAfter);
+            $this->assertEquals(400, $e->getCode());
+        }
+        $this->api()->setUserID(\UserModel::GUEST_USER_ID);
+        try {
+            $this->api()->deleteWithBody("/discussions/list", ["discussionIDs" => [$discussion1['discussionID'], $discussion2['discussionID']]]);
+        } catch (\Exception $e) {
+            $this->assertEquals(403, $e->getCode());
+        }
     }
 
     /**

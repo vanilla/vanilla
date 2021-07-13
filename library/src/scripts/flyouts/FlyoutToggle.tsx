@@ -14,6 +14,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useFocusWatcher, useEscapeListener } from "@vanilla/react-utils";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { cx } from "@emotion/css";
+import classNames from "classnames";
 
 export interface IFlyoutToggleChildParameters {
     id: string;
@@ -175,7 +176,7 @@ export default function FlyoutToggle(props: IProps) {
     const isContentVisible = !props.disabled && isVisible;
     return (
         <Tag
-            className={cx(classesDropDown, props.className, {
+            className={classNames(classesDropDown, props.className, {
                 asModal: props.openAsModal,
             })}
             ref={controllerRef}

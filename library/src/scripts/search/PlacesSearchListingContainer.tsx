@@ -7,7 +7,7 @@ import React from "react";
 import { placesSearchListingClasses } from "@library/search/placesSearchListing.styles";
 import { SearchService } from "@library/search/SearchService";
 import { TypeQuestionIcon } from "@library/icons/searchIcons";
-import { buttonUtilityClasses } from "@library/forms/buttonStyles";
+import { buttonUtilityClasses } from "@library/forms/Button.styles";
 import classNames from "classnames";
 import SmartLink from "@library/routing/links/SmartLink";
 

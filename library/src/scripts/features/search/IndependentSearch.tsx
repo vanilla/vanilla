@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -11,9 +11,8 @@ import { IWithSearchProps, withSearch } from "@library/contexts/SearchContext";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import SearchBar from "@library/features/search/SearchBar";
 import { useUniqueID } from "@library/utility/idUtils";
-import { ISearchBarOverwrites, searchBarClasses } from "@library/features/search/searchBarStyles";
+import { ISearchBarOverwrites, searchBarClasses } from "@library/features/search/SearchBar.styles";
 import { RouteComponentProps, withRouter } from "react-router";
-import classNames from "classnames";
 import { useLinkContext } from "@library/routing/links/LinkContextProvider";
 import {
     useSearchScope,
@@ -23,6 +22,7 @@ import {
 import { ISearchScopeNoCompact } from "@library/features/search/SearchScopeContext";
 import merge from "lodash/merge";
 import clone from "lodash/clone";
+import { cx } from "@emotion/css";
 
 export interface IIndependentSearchProps extends IWithSearchProps, RouteComponentProps<{}> {
     className?: string;
@@ -94,7 +94,7 @@ export function IndependentSearch(props: IIndependentSearchProps) {
     );
 
     return (
-        <div className={classNames(classesSearchBar.independentRoot, props.className)}>
+        <div className={cx(classesSearchBar.independentRoot, props.className)}>
             <SearchBar
                 id={id}
                 forceMenuOpen={props.forceMenuOpen}
@@ -112,7 +112,6 @@ export function IndependentSearch(props: IIndependentSearchProps) {
                 triggerSearchOnClear={false}
                 resultsRef={resultsRef}
                 buttonClassName={props.buttonClass}
-                buttonDropDownClassName={props.buttonDropDownClass}
                 buttonType={props.buttonType}
                 buttonLoaderClassName={props.buttonLoaderClassName}
                 hideSearchButton={props.hideSearchButton || hasScope}
@@ -124,7 +123,7 @@ export function IndependentSearch(props: IIndependentSearchProps) {
             />
             <div
                 ref={resultsRef}
-                className={classNames("search-results", {
+                className={cx("search-results", {
                     [classesSearchBar.results]: !!query,
                     [classesSearchBar.resultsAsModal]: !!query,
                     [props.resultsAsModalClasses ?? ""]: !!query,

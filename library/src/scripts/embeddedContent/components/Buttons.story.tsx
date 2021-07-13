@@ -13,7 +13,7 @@ import { StoryTileAndTextCompact } from "@library/storybook/StoryTileAndTextComp
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleUnit } from "@library/styles/styleUnit";
-import { buttonUtilityClasses } from "@library/forms/buttonStyles";
+import { buttonUtilityClasses } from "@library/forms/Button.styles";
 import { CheckCompactIcon, CloseCompactIcon, ComposeIcon } from "@library/icons/common";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import { ButtonTypes } from "@library/forms/buttonTypes";

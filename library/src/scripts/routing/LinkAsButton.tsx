@@ -12,7 +12,7 @@ import SmartLink from "@library/routing/links/SmartLink";
 import { IOptionalComponentID } from "@library/utility/idUtils";
 import { LinkProps } from "react-router-dom";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
-import { buttonLabelWrapClass } from "@library/forms/buttonStyles";
+import { buttonLabelWrapClass } from "@library/forms/Button.styles";
 
 interface IProps extends IOptionalComponentID, LinkProps {
     children: React.ReactNode;

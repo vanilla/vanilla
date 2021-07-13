@@ -5,7 +5,7 @@
 
 import { css } from "@emotion/css";
 import { LoadStatus } from "@library/@types/api/core";
-import { buttonClasses } from "@library/forms/buttonStyles";
+import { buttonClasses } from "@library/forms/Button.styles";
 import gdn from "@library/gdn";
 import { DeviceProvider } from "@library/layout/DeviceContext";
 import { PageBox } from "@library/layout/PageBox";

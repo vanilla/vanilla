@@ -7,11 +7,10 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { percent, viewHeight } from "csx";
-import { cssRule } from "@library/styles/styleShim";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { homePageVariables } from "@library/layout/homePageStyles";
 import isEmpty from "lodash/isEmpty";
-import { css, CSSObject } from "@emotion/css";
+import { CSSObject, injectGlobal } from "@emotion/css";
 import { Mixins } from "@library/styles/Mixins";
 import { useEffect } from "react";
 
@@ -36,93 +35,125 @@ export const bodyStyleMixin = useThemeCache(() => {
     return style;
 });
 
-export const useBodyClass = () => {
-    const globals = globalVariables();
+export const useBodyCSS = () => {
+    const globalVars = globalVariables();
+
     useEffect(() => {
-        const bodyClass = css({ ...bodyStyleMixin(), label: "vanillaBodyReset" });
-        document.body.classList.add(bodyClass);
+        const bodyStyle = bodyStyleMixin();
+        const stylesheet = document.createElement("style");
+        stylesheet.innerHTML = `
+            body {
+                background: ${bodyStyle.background};
+                font-size: ${bodyStyle.fontSize};
+                font-family: ${bodyStyle.fontFamily};
+                color: ${bodyStyle.color};
+                word-break: ${bodyStyle.wordBreak};
+            }
+
+            h1, h2, h3, h4, h5, h6 {
+                line-height: ${globalVars.lineHeights.condensed};
+                color: ${ColorsUtils.colorOut(globalVars.mainColors.fgHeading)};
+            }
+        `;
+
+        document.head.prepend(stylesheet);
 
         return function cleanup() {
-            document.body.classList.remove(bodyClass);
+            document.head.removeChild(stylesheet);
         };
-    }, [globals]);
+    }, [globalVars]);
 };
 
 export const globalCSS = useThemeCache(() => {
-    cssRule("html", {
-        msOverflowStyle: "-ms-autohiding-scrollbar",
+    injectGlobal({
+        html: {
+            msOverflowStyle: "-ms-autohiding-scrollbar",
+        },
     });
 
-    cssRule("*", {
-        // For Mobile Safari -> https://developer.mozilla.org/en-US/docs/Web/CSS/overscroll-behavior
-        WebkitOverflowScrolling: "touch",
+    injectGlobal({
+        "*": {
+            // For Mobile Safari -> https://developer.mozilla.org/en-US/docs/Web/CSS/overscroll-behavior
+            WebkitOverflowScrolling: "touch",
+        },
     });
 
-    cssRule("h1, h2, h3, h4, h5, h6", {
-        display: "block",
-        ...Mixins.margin({
-            all: 0,
-        }),
-        ...Mixins.padding({
-            all: 0,
-        }),
+    injectGlobal({
+        "h1, h2, h3, h4, h5, h6": {
+            display: "block",
+            ...Mixins.margin({
+                all: 0,
+            }),
+            ...Mixins.padding({
+                all: 0,
+            }),
+        },
     });
 
-    cssRule("p", {
-        ...Mixins.margin({
-            all: 0,
-        }),
-        ...Mixins.padding({
-            all: 0,
-        }),
+    injectGlobal({
+        p: {
+            ...Mixins.margin({
+                all: 0,
+            }),
+            ...Mixins.padding({
+                all: 0,
+            }),
+        },
     });
 
-    cssRule(".page", {
-        display: "flex",
-        overflow: "visible",
-        flexDirection: "column",
-        width: percent(100),
-        minHeight: viewHeight(100),
-        position: "relative",
-        zIndex: 0,
+    injectGlobal({
+        ".page": {
+            display: "flex",
+            overflow: "visible",
+            flexDirection: "column",
+            width: percent(100),
+            minHeight: viewHeight(100),
+            position: "relative",
+            zIndex: 0,
+        },
     });
 
-    cssRule("button", {
-        WebkitAppearance: "none",
-        MozAppearance: "none",
+    injectGlobal({
+        button: {
+            WebkitAppearance: "none",
+            MozAppearance: "none",
+        },
     });
 
-    cssRule(".page-minHeight", {
-        flexGrow: 1,
-        display: "flex",
-        flexDirection: "column",
+    injectGlobal({
+        ".page-minHeight": {
+            flexGrow: 1,
+            display: "flex",
+            flexDirection: "column",
+        },
     });
 
-    cssRule(`input[type="number"]`, {
-        WebkitAppearance: "none",
-        MozAppearance: "textfield",
-        ...{
-            [`&::-webkit-inner-spin-button`]: {
-                WebkitAppearance: "none",
-                margin: 0,
-            },
-            [`&::-webkit-outer-spin-button`]: {
-                WebkitAppearance: "none",
-                margin: 0,
+    injectGlobal({
+        [`input[type="number"]`]: {
+            WebkitAppearance: "none",
+            MozAppearance: "textfield",
+            ...{
+                [`&::-webkit-inner-spin-button`]: {
+                    WebkitAppearance: "none",
+                    margin: 0,
+                },
+                [`&::-webkit-outer-spin-button`]: {
+                    WebkitAppearance: "none",
+                    margin: 0,
+                },
             },
         },
     });
 
-    cssRule(
-        `input::-webkit-search-decoration,
+    injectGlobal({
+        [`input::-webkit-search-decoration,
         input::-webkit-search-cancel-button,
         input::-webkit-search-results-button,
         input::-webkit-search-results-decoration,
-        input::-ms-clear`,
-        {
+        input::-ms-clear`]: {
             display: "none",
         },
-    );
+    });
 });
 
 export const fullBackgroundClasses = useThemeCache((isRootPage = false) => {

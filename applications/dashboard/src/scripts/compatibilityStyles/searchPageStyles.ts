@@ -10,7 +10,7 @@ import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { allLinkStates, singleBorder } from "@library/styles/styleHelpers";
 import { styleUnit } from "@library/styles/styleUnit";
 import { forumLayoutVariables } from "@dashboard/compatibilityStyles/forumLayoutStyles";
-import { ISearchBarOverwrites, searchBarClasses } from "@library/features/search/searchBarStyles";
+import { ISearchBarOverwrites, searchBarClasses } from "@library/features/search/SearchBar.styles";
 import { searchResultsVariables } from "@library/features/search/searchResultsStyles";
 import { important, percent } from "csx";
 import { metasVariables } from "@library/metas/Metas.variables";

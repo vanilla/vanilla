@@ -4,7 +4,7 @@
  */
 
 import { LoadStatus } from "@library/@types/api/core";
-import { bannerVariables } from "@library/banner/bannerStyles";
+import { bannerVariables } from "@library/banner/Banner.variables";
 import { CallToAction } from "@library/callToAction/CallToAction";
 import { userContentVariables } from "@library/content/UserContent.variables";
 import { tileVariables } from "@library/features/tiles/Tile.variables";

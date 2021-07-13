@@ -14,28 +14,26 @@ export const bookmarkToggleClasses = useThemeCache(() => {
     const globalVars = globalVariables();
 
     const iconCheckedStyle: CSSObject = {
-        stroke: ColorsUtils.colorOut(globalVars.mainColors.primary),
-        fillOpacity: 1,
+        color: ColorsUtils.colorOut(globalVars.mainColors.primary),
+        fill: "currentColor",
     };
 
     const iconDefaultStyle: CSSObject = {
-        fill: iconCheckedStyle.stroke,
-        fillOpacity: 0,
-        stroke: ColorsUtils.colorOut(globalVars.mainColors.fg),
+        color: "inherit",
+        fill: "transparent",
     };
 
     const iconHoverStyle: CSSObject = {
-        stroke: iconCheckedStyle.stroke,
+        color: iconCheckedStyle.color,
     };
 
     const iconDisabledStyle: CSSObject = {
         ...iconCheckedStyle,
-        fillOpacity: 0.5,
     };
 
     const icon = css({
         ...iconDefaultStyle,
-        ...defaultTransition("fill-opacity"),
+        ...defaultTransition("color", "fill", "stroke"),
         [`label:hover &, input[type='checkbox']:active + &, input[type='checkbox']:focus + &`]: iconHoverStyle,
     });
 

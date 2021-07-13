@@ -33,13 +33,26 @@ allContextFiles(
     "applications",
 );
 allContextFiles(
+    require.context("!file-loader?name=[path][name].[ext]!../../cloud/applications", true, /\/design\/.*\.css$/),
+    "cloud/applications",
+);
+allContextFiles(
     require.context("!file-loader?name=[path][name].[ext]!../../plugins", true, /\/design\/.*\.css$/),
     "plugins",
+);
+allContextFiles(
+    require.context("!file-loader?name=[path][name].[ext]!../../cloud/plugins", true, /\/design\/.*\.css$/),
+    "cloud/plugins",
 );
 allContextFiles(
     require.context("!file-loader?name=[path][name].[ext]!../../resources", true, /\/design\/.*\.css$/),
     "resources",
 );
+
+const specialSymlinkedCSS = [
+    "/applications/groups",
+    "/plugins/privatediscussions",
+];
 
 const allHtmls = allContextFiles(require.context("../.storybookAppPages", false, /.*\.html/));
 const allJsons = allContextFiles(require.context("../.storybookAppPages", false, /.*\.json/));
@@ -101,6 +114,11 @@ function HtmlRenderComponent(props: { html: string; data: IHtmlData }) {
         const dynamicCssFiles = data.cssFiles;
 
         dynamicCssFiles.reverse().forEach((file) => {
+            for (const specialDir of specialSymlinkedCSS) {
+                if (file.startsWith(specialDir)) {
+                    file = `/cloud${file}`;
+                }
+            }
             const existingStylesheet = document.querySelector(`link[href="${file}"]`);
             if (existingStylesheet) {
                 return;

@@ -1,6 +1,6 @@
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
@@ -11,6 +11,9 @@ import { formElementsVariables } from "@library/forms/formElementStyles";
 import { IStateColors } from "@library/styles/styleHelpers";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { SearchBarPresets } from "@library/banner/SearchBarPresets";
+import { Variables } from "@library/styles/Variables";
+import { ButtonPreset } from "@library/forms/ButtonPreset";
+import { buttonVariables } from "@library/forms/Button.variables";
 
 export const searchBarVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const globalVars = globalVariables(forcedVars);
@@ -113,6 +116,43 @@ export const searchBarVariables = useThemeCache((forcedVars?: IThemeVariables) =
         preset: SearchBarPresets.NO_BORDER,
     });
 
+    const primaryButtonVars = buttonVariables().primary;
+
+    const submitButton = Variables.button({
+        ...primaryButtonVars,
+        name: "searchSubmitButton",
+        borders: {
+            ...primaryButtonVars.borders,
+            radius: border.radius,
+            left: {
+                ...primaryButtonVars.borders?.left,
+                radius: 0,
+            },
+        },
+        sizing: {
+            minHeight: sizing.height,
+            minWidth: search.minWidth + 2,
+        },
+        state: {
+            ...primaryButtonVars.state,
+            borders: {
+                ...primaryButtonVars.state?.borders,
+                radius: border.radius,
+                left: {
+                    ...primaryButtonVars.state?.borders?.left,
+                    radius: 0,
+                },
+            },
+        },
+    });
+
+    const compactSubmitButton = Variables.button({
+        ...submitButton,
+        sizing: {
+            minWidth: search.compact.minWidth + 2,
+        },
+    });
+
     return {
         search,
         noBorder,
@@ -128,5 +168,7 @@ export const searchBarVariables = useThemeCache((forcedVars?: IThemeVariables) =
         scopeIcon,
         stateColors,
         options,
+        submitButton,
+        compactSubmitButton,
     };
 });

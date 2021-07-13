@@ -49,7 +49,7 @@ class UserModelTest extends SiteTestCase {
     private $discussionModel;
 
     /** @var \CommentModel */
-     private $commentModel;
+    private $commentModel;
 
     /** @var \ConversationModel */
     private $conversationModel;
@@ -103,6 +103,7 @@ class UserModelTest extends SiteTestCase {
      */
     public function handleUserEvent(UserEvent $e): UserEvent {
         $this->lastEvent = $e;
+
         return $e;
     }
 
@@ -183,6 +184,7 @@ class UserModelTest extends SiteTestCase {
             ['Name' => 'user%s', 'Email' => "user%s@example.com", 'Password' => 'foo123'],
             $overrides
         ));
+
         return $user;
     }
 
@@ -311,25 +313,27 @@ class UserModelTest extends SiteTestCase {
             'wildcard search left' => ['', '%searcha', 2],
             'wildcard search right' => ['', 'searcha%', 1],
             'wildcard both username with space' => ['', '%search a%', 1],
-            'wildcard left username with space'=> ['', '%search a', 1],
+            'wildcard left username with space' => ['', '%search a', 1],
             'wildcard right username with space' => ['', 'search a%', 1],
             'wildcard right multiple users' => ['', 'search%', 3],
-            ];
+        ];
     }
 
     /**
      * Create  User.
      *
      * @param string $userName
+     * @return int|bool
      */
-    private function createUser(string $userName): void {
+    private function createUser(string $userName) {
         $rand = rand(10, 1000);
         $user = [
             "Name" => $userName,
-            "Email" => $rand."test@example.com",
+            "Email" => $rand . "test@example.com",
             "Password" => "vanilla"
         ];
-        $this->userModel->save($user);
+
+        return $this->userModel->save($user);
     }
 
     /**
@@ -450,7 +454,7 @@ class UserModelTest extends SiteTestCase {
         $this->assertGreaterThan(0, $id);
 
         // Here we shouldn't get an email or password required error.
-        $r = $this->userModel->save(['UserID' => $id, 'Name' => $user['Name'].'Updated']);
+        $r = $this->userModel->save(['UserID' => $id, 'Name' => $user['Name'] . 'Updated']);
         ModelUtils::validationResultToValidationException($this->userModel, \Gdn::locale());
         $this->assertNotFalse($r);
 
@@ -510,7 +514,7 @@ class UserModelTest extends SiteTestCase {
         $userIDA = $this->userModel->save($userA);
         $this->userModel->save($userB);
 
-        $result = $this->userModel->searchByName($userA['Name'].'*');
+        $result = $this->userModel->searchByName($userA['Name'] . '*');
         $row = $result->firstRow(DATASET_TYPE_ARRAY);
         $this->assertEquals($userIDA, $row['UserID']);
         $this->assertEquals(1, $result->numRows());
@@ -659,7 +663,7 @@ class UserModelTest extends SiteTestCase {
         $formValues = [
             'BanType' => 'Password',
             'BanValue' => $userToBan['Password'],
-            'Notes' => 'We are banning '.$userToBan['Password']
+            'Notes' => 'We are banning ' . $userToBan['Password']
         ];
 
         $this->bessy()->post('/settings/bans/add', $formValues);
@@ -741,5 +745,31 @@ class UserModelTest extends SiteTestCase {
 
         $this->assertSame(t('[Deleted User]'), $deletedUser['Name']);
         CurrentTimeStamp::clearMockTime();
+    }
+
+    /**
+     * Test UserModel::RateLimit()
+     */
+    public function testRateLimit(): void {
+        $this->runWithConfig([
+            'Cache.Enabled' => false,
+        ], function () {
+            $rd = rand(1, 1000);
+            $userIDA = $this->createUser("userA$rd");
+            $userIDB = $this->createUser("userB$rd");
+            $userA = $this->userModel->getID($userIDA, DATASET_TYPE_ARRAY);
+            $userB = $this->userModel->getID($userIDB, DATASET_TYPE_ARRAY);
+            $this->config->set('Garden.User.RateLimit', 1);
+            $this->userModel->saveAttribute($userIDA, ['LoginRate' => 1]);
+            $result = UserModel::rateLimit($userA);
+            $this->assertTrue($result);
+            $this->config->set('Garden.User.RateLimit', 100);
+            $this->userModel->saveAttribute($userIDB, ['LastLoginAttempt' => now()]);
+            try {
+                UserModel::rateLimit($userB);
+            } catch (\Gdn_UserException $e) {
+                $this->assertEquals('You are trying to log in too often. Slow down!.', $e->getMessage());
+            }
+        });
     }
 }

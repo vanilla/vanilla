@@ -1,9 +1,9 @@
 /**
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import { BannerAlignment } from "@library/banner/bannerStyles";
+import { BannerAlignment } from "@library/banner/Banner.variables";
 import { ThemeBuilderBlock } from "@library/forms/themeEditor/ThemeBuilderBlock";
 import { ThemeBuilderCheckBox } from "@library/forms/themeEditor/ThemeBuilderCheckBox";
 import { ThemeBuilderContextProvider } from "@library/forms/themeEditor/ThemeBuilderContext";

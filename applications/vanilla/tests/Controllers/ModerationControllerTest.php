@@ -41,7 +41,7 @@ class ModerationControllerTest extends SiteTestCase {
         /** @var \Gdn_Configuration $config */
         $config = $this->container()->get(\Gdn_Configuration::class);
         $config->saveToConfig('Vanilla.Categories.Use', true);
-        $this->discussions = $this->insertDiscussions(3);
+        $this->discussions = $this->insertDiscussions(6);
         $this->category = $this->insertCategories(1)[0];
     }
 
@@ -87,5 +87,31 @@ class ModerationControllerTest extends SiteTestCase {
         $this->assertSame($archivedCategory['Archived'], 1);
         $discussions = $this->moveDiscussion($discussion['DiscussionID'], $this->category);
         $this->assertTrue(in_array($discussion['DiscussionID'], array_column($discussions, 'DiscussionID')));
+    }
+
+    /**
+     * Test ModerationController::DiscussionDeletes()
+     */
+    public function testConfirmDiscussionDeletes(): void {
+        $discussion1 = $this->discussions[3];
+        $discussion2 = $this->discussions[4];
+        $discussionIDs = [$discussion1['DiscussionID'], $discussion2['DiscussionID']];
+        $data = [
+            'discussionIDs' => $discussionIDs
+        ];
+        $response = $this->bessy()->post('/moderation/confirmdiscussiondeletes', $data);
+        $result = $this->discussionModel->getIn($discussionIDs)->resultArray();
+        $this->assertEquals(0, count($result));
+        $this->assertEquals(2, $response->Data['CountCheckedDiscussions']);
+        $this->assertEquals(2, $response->Data['CountAllowed']);
+        $this->assertEquals(0, $response->Data['CountNotAllowed']);
+        $discussionIDs = [rand(3000, 4000), rand(3000, 4000)];
+        $data = [
+            'discussionIDs' => $discussionIDs
+        ];
+        $response = $this->bessy()->post('/moderation/confirmdiscussiondeletes', $data);
+        $this->assertEquals(2, $response->Data['CountCheckedDiscussions']);
+        $this->assertEquals(0, $response->Data['CountAllowed']);
+        $this->assertEquals(2, $response->Data['CountNotAllowed']);
     }
 }

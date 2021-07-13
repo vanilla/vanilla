@@ -1,13 +1,13 @@
 import SelectBox, { ISelectBoxItem, ISelectBoxProps } from "@library/forms/select/SelectBox";
 import React, { useState } from "react";
-import classNames from "classnames";
-import { ISearchBarOverwrites, searchBarClasses } from "@library/features/search/searchBarStyles";
+import { ISearchBarOverwrites, searchBarClasses } from "@library/features/search/SearchBar.styles";
 import { t } from "@vanilla/i18n/src";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { useUniqueID } from "@library/utility/idUtils";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { useDevice, Devices } from "@library/layout/DeviceContext";
 import { Icon } from "@vanilla/icons";
+import { cx } from "@emotion/css";
 
 export function SearchScope(props: {
     className?: string;
@@ -24,7 +24,7 @@ export function SearchScope(props: {
 
     return (
         <div
-            className={classNames(classes.scope, className, {
+            className={cx(classes.scope, className, {
                 isCompact: compact,
             })}
         >

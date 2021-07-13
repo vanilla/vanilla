@@ -22,7 +22,7 @@ if (!defined('APPLICATION')) {
 if (!defined('APPLICATION_VERSION')) {
     // Rules for the versioning
     // {Release version}-{? SNAPSHOT if it's a dev build}
-    define('APPLICATION_VERSION', '2021.013');
+    define('APPLICATION_VERSION', '2021.014');
 }
 if (!defined('DS')) {
     define('DS', DIRECTORY_SEPARATOR);

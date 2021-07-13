@@ -36,6 +36,19 @@ export const quickLinksVariables = useThemeCache((forcedVars?: IThemeVariables) 
     const counts: Record<string, number | null> = makeThemeVars("counts", {});
 
     /**
+     * @varGroup quickLinks.list
+     */
+    const list = makeThemeVars("list", {
+        /**
+         * @varGroup quickLinks.list.spacing
+         * @title Margin
+         * @description Will be used in cases when we want to change the default space between title and list.
+         * @expand spacing
+         */
+        spacing: Variables.spacing({}),
+    });
+
+    /**
      * @varGroup quickLinks.listItem
      */
     const listInit = makeThemeVars("listItem", {
@@ -131,6 +144,7 @@ export const quickLinksVariables = useThemeCache((forcedVars?: IThemeVariables) 
     });
 
     return {
+        list,
         listItem,
         count,
         box,

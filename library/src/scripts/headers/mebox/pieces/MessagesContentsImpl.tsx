@@ -9,7 +9,7 @@ import ConversationsActions from "@library/features/conversations/ConversationsA
 import FrameHeaderWithAction from "@library/layout/frame/FrameHeaderWithAction";
 import { IConversationsStoreState } from "@library/features/conversations/ConversationsModel";
 import Loader from "@library/loaders/Loader";
-import { buttonUtilityClasses } from "@library/forms/buttonStyles";
+import { buttonUtilityClasses } from "@library/forms/Button.styles";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import apiv2 from "@library/apiv2";
 import { IMeBoxMessageItem, MeBoxItemType } from "@library/headers/mebox/pieces/MeBoxDropDownItem";

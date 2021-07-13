@@ -1,13 +1,13 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import React, { useLayoutEffect, useMemo } from "react";
 import Banner from "@library/banner/Banner";
 import { MemoryRouter } from "react-router";
-import { bannerVariables } from "@library/banner/bannerStyles";
+import { bannerVariables } from "@library/banner/Banner.variables";
 import { css, CSSObject } from "@emotion/css";
 import { contentBannerVariables } from "@library/banner/contentBannerStyles";
 import { NoDescription } from "@library/banner/banner.story";

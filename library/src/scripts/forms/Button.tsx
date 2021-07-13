@@ -6,7 +6,7 @@
 
 import React from "react";
 import { getOptionalID, IOptionalComponentID } from "@library/utility/idUtils";
-import { buttonClasses, buttonUtilityClasses } from "../forms/buttonStyles";
+import { buttonClasses, buttonUtilityClasses } from "./Button.styles";
 import { titleBarClasses } from "@library/headers/titleBarStyles";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { cx } from "@emotion/css";

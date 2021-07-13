@@ -322,6 +322,25 @@ paths:
               $ref: '#/components/schemas/DiscussionPatch'
         required: true
       summary: Update a discussion.
+  '/discussions/list':
+    delete:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: An array of discussion IDs.
+              properties:
+                discussionIDs:
+                  type: array
+                  items:
+                    type: integer
+      responses:
+        '204':
+          description: Success
+      tags:
+        - Discussions
+      summary: Delete a list of discussions.
   '/discussions/{id}/bookmark':
     put:
       parameters:

@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -10,10 +10,9 @@ import { formElementsVariables } from "@library/forms/formElementStyles";
 import { IButton } from "@library/forms/styleHelperButtonInterface";
 import { Mixins } from "@library/styles/Mixins";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
-import { styleFactory } from "@library/styles/styleUtils";
 import { percent } from "csx";
 import merge from "lodash/merge";
-import { CSSObject } from "@emotion/css";
+import { css, CSSObject } from "@emotion/css";
 import cloneDeep from "lodash/cloneDeep";
 import { defaultTransition } from "@library/styles/styleHelpersAnimation";
 import { shadowHelper } from "@library/styles/shadowHelpers";
@@ -96,7 +95,7 @@ export const generateButtonStyleProperties = (props: {
         width: "auto",
         maxWidth: percent(100),
         backgroundColor: ColorsUtils.colorOut(buttonTypeVars.colors?.bg),
-        ...Mixins.font({ ...buttonTypeVars.fonts }),
+        ...Mixins.font({ ...buttonTypeVars.fonts, color: buttonTypeVars.colors?.fg ?? buttonTypeVars.fonts?.color }),
         WebkitFontSmoothing: "antialiased",
         ...defaultBorder,
         ...buttonSizing({
@@ -166,12 +165,11 @@ const generateButtonClass = (
     options?: { setZIndexOnState?: boolean; debug?: boolean | string },
 ) => {
     const { setZIndexOnState = false, debug = false } = options || {};
-    const style = styleFactory(`button-${buttonTypeVars.name}`);
     const buttonStyles = generateButtonStyleProperties({
         buttonTypeVars,
         setZIndexOnState,
     });
-    const buttonClass = style(buttonStyles);
+    const buttonClass = css({ ...buttonStyles, label: `button-${buttonTypeVars.name}` });
     return buttonClass;
 };
 

@@ -1,6 +1,6 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -12,7 +12,8 @@ import Container from "@library/layout/components/Container";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import Heading from "@library/layout/Heading";
 import { useBannerContainerDivRef, useBannerContext } from "@library/banner/BannerContext";
-import { bannerClasses, bannerVariables, IBannerOptions } from "@library/banner/bannerStyles";
+import { bannerVariables, IBannerOptions } from "@library/banner/Banner.variables";
+import { bannerClasses } from "@library/banner/Banner.styles";
 import { assetUrl, t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import { titleBarClasses } from "@library/headers/titleBarStyles";
@@ -111,15 +112,11 @@ export default function Banner(props: IBannerProps) {
             <IndependentSearch
                 forceMenuOpen={props.forceSearchOpen}
                 buttonClass={classes.searchButton}
-                buttonDropDownClass={classes.searchDropDownButton}
-                buttonType={ButtonTypes.CUSTOM}
+                buttonType={ButtonTypes.PRIMARY}
                 isLarge={true}
                 placeholder={t("SearchBoxPlaceHolder", "Search")}
-                inputClass={classes.input}
-                buttonLoaderClassName={classNames(classes.buttonLoader)}
                 hideSearchButton={hideButton}
                 contentClass={classes.content}
-                valueContainerClasses={classNames(classes.valueContainer)}
                 resultsAsModalClasses={classes.resultsAsModal}
                 scope={props.scope}
                 initialQuery={props.initialQuery}

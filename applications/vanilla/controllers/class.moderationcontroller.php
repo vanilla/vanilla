@@ -16,9 +16,6 @@ use Webmozart\Assert\Assert;
 class ModerationController extends VanillaController {
     use \Vanilla\Web\TwigRenderTrait;
 
-    // Maximum number of seconds a batch of deletes should last before a new batch needs to be scheduled.
-    private const MAX_TIME_BATCH = 10;
-
     /** @var \Garden\EventManager */
     private $eventManager;
 
@@ -324,15 +321,11 @@ class ModerationController extends VanillaController {
      * discussions (and has permission to do so).
      */
     public function confirmDiscussionDeletes() {
-        $startTime = time();
         $session = Gdn::session();
         $this->Form = new Gdn_Form();
-        $discussionModel = new DiscussionModel();
-
-        // Verify that the user has permission to perform the deletes
-        $this->permission('Vanilla.Discussions.Delete', true, 'Category', 'any');
+        /** @var DiscussionModel $discussionModel */
+        $discussionModel = Gdn::getContainer()->get(DiscussionModel::class);
         $this->title(t('Confirm'));
-
         $checkedDiscussions = $this->Request->post('discussionIDs', null);
 
         if ($checkedDiscussions === null) {
@@ -349,42 +342,22 @@ class ModerationController extends VanillaController {
         $countCheckedDiscussions = count($discussionIDs);
         $this->setData('CountCheckedDiscussions', $countCheckedDiscussions);
 
-        // Check permissions on each discussion to make sure the user has permission to delete them
-        $allowedDiscussions = [];
-        $discussionData = $discussionModel->SQL
-            ->select('DiscussionID, CategoryID')
-            ->from('Discussion')
-            ->whereIn('DiscussionID', $discussionIDs)
-            ->get();
-        foreach ($discussionData->result() as $discussion) {
-            $countCheckedDiscussions = $discussionData->numRows();
-            if (CategoryModel::checkPermission(val('CategoryID', $discussion), 'Vanilla.Discussions.Delete')) {
-                $allowedDiscussions[] = $discussion->DiscussionID;
-            }
-        }
-        $this->setData('CountAllowed', count($allowedDiscussions));
-        $countNotAllowed = $countCheckedDiscussions - count($allowedDiscussions);
+        $filteredDiscussions = $discussionModel->filterCategoryPermissions($discussionIDs, 'Vanilla.Discussions.Delete');
+        $this->setData('CountAllowed', count($filteredDiscussions));
+        $countNotAllowed = $countCheckedDiscussions - count($filteredDiscussions);
         $this->setData('CountNotAllowed', $countNotAllowed);
 
         if ($this->Request->isAuthenticatedPostBack(true)) {
-            $checkedDiscussions = array_combine($allowedDiscussions, $allowedDiscussions);
-
-            foreach ($allowedDiscussions as $discussionID) {
-                $discussionModel->deleteID($discussionID);
-                unset($checkedDiscussions[$discussionID]);
+            $result = $discussionModel->deleteDiscussions($filteredDiscussions, true);
+            foreach ($filteredDiscussions as $discussionID) {
                 Gdn::userModel()->saveAttribute(
-                    $session->UserID,
+                    Gdn::session()->UserID,
                     'CheckedDiscussions',
                     array_values($checkedDiscussions)
                 );
                 $this->jsonTarget("#Discussion_$discussionID", ["remove" => true], 'SlideUp');
-
-                $elapsedTime = time() - $startTime;
-                if ($elapsedTime > self::MAX_TIME_BATCH) {
-                    break;
-                }
             }
-            if (!empty($checkedDiscussions)) {
+            if (!empty($result)) {
                 $this->jsonTarget('', [
                     'url' => '/moderation/confirmdiscussiondeletes',
                     'reprocess' => true,
@@ -407,10 +380,8 @@ class ModerationController extends VanillaController {
                 $this->jsonTarget("!element", "", "closePopup");
                 $this->setFormSaved(true);
             }
-
             ModerationController::informCheckedDiscussions($this, true);
         }
-
         $this->render();
     }
 
@@ -553,7 +524,7 @@ class ModerationController extends VanillaController {
                     );
 
                     $elapsedTime = time() - $startTime;
-                    if ($elapsedTime > self::MAX_TIME_BATCH) {
+                    if ($elapsedTime > DiscussionModel::MAX_TIME_BATCH) {
                         break;
                     }
                 }

@@ -173,4 +173,51 @@ export const signInMethodsCSS = useThemeCache(() => {
             paddingBottom: styleUnit(4),
         },
     );
+
+    //Accessibility colour contrast on register form
+    cssOut(`.TextBoxWrapper .PasswordStrength`, {
+        width: "100% !important",
+        marginTop: "4",
+        marginBottom: "10",
+    });
+
+    cssOut(`.PasswordStrength.Score-0 .StrengthText`, {
+        color: "#949499",
+    });
+    cssOut(`.PasswordStrength.Score-2 .Strength`, {
+        backgroundColor: "#949499",
+    });
+    cssOut(`.PasswordStrength .Background`, {
+        backgroundColor: "#949499",
+    });
+    cssOut(`.PasswordStrength.Score-1 .StrengthText`, {
+        color: "#c81818",
+    });
+    cssOut(`.PasswordStrength.Score-1 .Strength`, {
+        backgroundColor: "#c81818",
+    });
+    cssOut(`.PasswordStrength.Score-2 .StrengthText`, {
+        color: "#c81818",
+    });
+    cssOut(`.PasswordStrength.Score-2 .Strength`, {
+        backgroundColor: "#c81818",
+    });
+    cssOut(`.PasswordStrength.Score-3 .StrengthText`, {
+        color: "#DE7802",
+    });
+    cssOut(`.PasswordStrength.Score-3 .Strength`, {
+        backgroundColor: "#DE7802",
+    });
+    cssOut(`.PasswordStrength.Score-4 .StrengthText`, {
+        color: "#05A882",
+    });
+    cssOut(`.PasswordStrength.Score-4 .Strength`, {
+        backgroundColor: "#05A882",
+    });
+    cssOut(`.PasswordStrength.Score-5 .StrengthText`, {
+        color: "#049372",
+    });
+    cssOut(`.PasswordStrength.Score-5 .Strength`, {
+        backgroundColor: "#049372",
+    });
 });

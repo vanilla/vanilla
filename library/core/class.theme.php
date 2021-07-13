@@ -9,6 +9,8 @@
  * @since 2.0
  */
 
+use Vanilla\Site\SiteSectionModel;
+
 /**
  * Allows access to theme controls from within views, to give themers a unified
  * toolset for interacting with Vanilla from within views.
@@ -89,13 +91,15 @@ class Gdn_Theme {
             array_pop($data);
         }
 
-        $defaultRoute = ltrim(val('Destination', Gdn::router()->getRoute('DefaultController'), ''), '/');
-
+        /** @var  SiteSectionModel $siteSectionModel */
+        $siteSectionModel = Gdn::getContainer()->get(SiteSectionModel::class);
+        $currentSection = $siteSectionModel->getCurrentSiteSection();
+        $defaultRoute = ltrim($currentSection->getDefaultRoute()['Destination']?? '', '/');
         $count = 0;
         $dataCount = 0;
-        $homeLinkFound = false;
         $position = 1;
         $displayStructuredData = false;
+        $homeLinkFound = false;
 
         foreach ($data as $row) {
             $dataCount++;

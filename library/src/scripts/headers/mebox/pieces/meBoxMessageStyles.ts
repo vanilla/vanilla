@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -8,10 +8,11 @@ import { objectFitWithFallback, buttonStates, userSelect } from "@library/styles
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { calc, percent, quote } from "csx";
 import { Mixins } from "@library/styles/Mixins";
+import { css } from "@emotion/css";
 
 export const meBoxMessageVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("meBoxMessage");
@@ -39,9 +40,8 @@ export const meBoxMessageVariables = useThemeCache(() => {
 export const meBoxMessageClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = meBoxMessageVariables();
-    const style = styleFactory("meBoxMessage");
 
-    const root = style({
+    const root = css({
         display: "block",
         ...{
             "& + &": {
@@ -50,7 +50,7 @@ export const meBoxMessageClasses = useThemeCache(() => {
         },
     });
 
-    const link = style("link", {
+    const link = css({
         ...userSelect(),
         display: "flex",
         flexWrap: "nowrap",
@@ -72,7 +72,7 @@ export const meBoxMessageClasses = useThemeCache(() => {
         }),
     });
 
-    const imageContainer = style("imageContainer", {
+    const imageContainer = css({
         position: "relative",
         width: styleUnit(vars.imageContainer.width),
         height: styleUnit(vars.imageContainer.width),
@@ -82,13 +82,13 @@ export const meBoxMessageClasses = useThemeCache(() => {
         border: `solid 1px ${globalVars.border.color.toString()}`,
     });
 
-    const image = style("image", {
+    const image = css({
         width: styleUnit(vars.imageContainer.width),
         height: styleUnit(vars.imageContainer.width),
         ...objectFitWithFallback(),
     });
 
-    const status = style("status", {
+    const status = css({
         position: "relative",
         width: styleUnit(vars.unreadDot.width),
         flexBasis: styleUnit(vars.unreadDot.width),
@@ -108,7 +108,7 @@ export const meBoxMessageClasses = useThemeCache(() => {
         },
     });
 
-    const contents = style("contents", {
+    const contents = css({
         flexGrow: 1,
         ...Mixins.padding({
             left: vars.spacing.padding.left,
@@ -117,7 +117,7 @@ export const meBoxMessageClasses = useThemeCache(() => {
         maxWidth: calc(`100% - ${styleUnit(vars.unreadDot.width + vars.imageContainer.width)}`),
     });
 
-    const message = style("message", {
+    const message = css({
         lineHeight: globalVars.lineHeights.excerpt,
         color: ColorsUtils.colorOut(globalVars.mainColors.fg),
     });

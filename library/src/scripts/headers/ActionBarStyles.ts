@@ -1,27 +1,25 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license Proprietary
  */
 
-import { styleFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
 import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
-import { em, percent, px } from "csx";
+import { percent, px } from "csx";
 import { Mixins } from "@library/styles/Mixins";
+import { css } from "@emotion/css";
 
 export const actionBarClasses = useThemeCache(() => {
-    const style = styleFactory("actionBar");
     const titleBarVars = titleBarVariables();
     const mediaQueries = panelLayoutVariables().mediaQueries();
     const globalVars = globalVariables();
 
-    const items = style(
-        "items",
+    const items = css(
         {
             display: "flex",
             flexWrap: "nowrap",
@@ -37,7 +35,7 @@ export const actionBarClasses = useThemeCache(() => {
         }),
     );
 
-    const item = style("item", {
+    const item = css({
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
@@ -66,7 +64,7 @@ export const actionBarClasses = useThemeCache(() => {
         },
     });
 
-    const itemMarginLeft = style("itemMarginLeft", {
+    const itemMarginLeft = css({
         marginLeft: styleUnit(globalVars.gutter.half),
         ...{
             "& button": {
@@ -77,25 +75,25 @@ export const actionBarClasses = useThemeCache(() => {
         },
     });
 
-    const centreColumn = style("centreColumn", {
+    const centreColumn = css({
         flexGrow: 1,
         ...Mixins.margin({
             horizontal: styleUnit(globalVars.spacer.size),
         }),
     });
 
-    const callToAction = style("callToAction", {
+    const callToAction = css({
         color: ColorsUtils.colorOut(globalVars.mainColors.primary),
         fontWeight: globalVars.fonts.weights.semiBold,
         whiteSpace: "nowrap",
     });
 
-    const split = style("split", {
+    const split = css({
         flexGrow: 1,
         height: px(1),
     });
 
-    const backLink = style("backLink", {
+    const backLink = css({
         ...{
             "&&": {
                 marginRight: "auto",
@@ -108,12 +106,12 @@ export const actionBarClasses = useThemeCache(() => {
         },
     });
 
-    const backSpacer = style("backSpacer", {
+    const backSpacer = css({
         position: "relative",
         visibility: "hidden",
     });
 
-    const fullWidth = style("fullWidth", {
+    const fullWidth = css({
         boxSizing: "border-box",
         display: "flex",
         flexDirection: "column",
@@ -125,7 +123,7 @@ export const actionBarClasses = useThemeCache(() => {
         width: "100%",
     });
 
-    const anotherCallToAction = style("anotherCallToAction", {
+    const anotherCallToAction = css({
         paddingRight: styleUnit(10),
     });
 

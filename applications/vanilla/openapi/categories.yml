@@ -773,6 +773,64 @@ paths:
               - followed
               type: object
         required: true
+  /categories/preferences/{userID}:
+    parameters:
+      - in: "path"
+        name: "userID"
+        required: true
+        schema:
+          type: integer
+    get:
+      summary: "List a user's category preferences."
+      tags:
+        - Categories
+      responses:
+        "200":
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/CategoryPreferencesMulti"
+          description: "Success"
+  /categories/{id}/preferences/{userID}:
+    parameters:
+      - in: "path"
+        name: "id"
+        description: "The category ID."
+        required: true
+        schema:
+          type: integer
+      - in: "path"
+        name: "userID"
+        required: true
+        schema:
+          type: integer
+    get:
+      tags:
+        - Categories
+      summary: "List a user's category preferences."
+      responses:
+        "200":
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/CategoryPreferences"
+          description: "Success"
+    patch:
+      tags:
+        - Categories
+      summary: "Set a user's category preferences."
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CategoryPreferences"
+      responses:
+        "200":
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/CategoryPreferences"
+          description: "Success"
 components:
   requestBodies:
     CategoryPost:
@@ -817,3 +875,22 @@ components:
       - name
       - urlcode
       type: object
+    CategoryPreferences:
+      type: object
+      properties:
+        postNotifications:
+          nullable: true
+          type: string
+          enum:
+            - follow
+            - discussions
+            - all
+    CategoryPreferencesMulti:
+      type: array
+      items:
+        allOf:
+          - $ref: "#/components/schemas/CategoryFragment"
+          - type: object
+            properties:
+              preferences:
+                $ref: "#/components/schemas/CategoryPreferences"

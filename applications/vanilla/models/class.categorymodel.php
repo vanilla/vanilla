@@ -50,6 +50,27 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
 
     private const ADJUST_COUNT_INCREMENT = "increment";
 
+    /** Category preference key for communicating a user's post notification preferences. */
+    public const PREFERENCE_KEY_NOTIFICATION = "postNotifications";
+
+    /** UserMeta key for determining whether a user should receive in-app discussion notifications for a category. */
+    private const PREFERENCE_DISCUSSION_APP = "Preferences.Popup.NewDiscussion.%d";
+
+    /** UserMeta key for determining whether a user should receive email discussion notifications for a category. */
+    private const PREFERENCE_DISCUSSION_EMAIL = "Preferences.Email.NewDiscussion.%d";
+
+    /** UserMeta key for determining whether a user should receive in-app comment notifications for a category. */
+    private const PREFERENCE_COMMENT_APP = "Preferences.Popup.NewComment.%d";
+
+    /** UserMeta key for determining whether a user should receive in-app comment notifications for a category. */
+    private const PREFERENCE_COMMENT_EMAIL = "Preferences.Email.NewComment.%d";
+
+    public const NOTIFICATION_ALL = "all";
+
+    public const NOTIFICATION_DISCUSSIONS = "discussions";
+
+    public const NOTIFICATION_FOLLOW = "follow";
+
     /** Cache key. */
     const CACHE_KEY = 'Categories';
 
@@ -4083,6 +4104,242 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
      */
     public function getMaxDisplayDepth() {
         return (int)c('Vanilla.Categories.MaxDisplayDepth', 3);
+    }
+
+    /**
+     * Get category-specific user meta data (e.g. preferences).
+     *
+     * @param int $userID
+     * @param int|null $categoryID
+     * @return array
+     */
+    private function getUserMeta(int $userID, ?int $categoryID = null): array {
+        $names = [
+            self::PREFERENCE_DISCUSSION_APP,
+            self::PREFERENCE_DISCUSSION_EMAIL,
+            self::PREFERENCE_COMMENT_APP,
+            self::PREFERENCE_COMMENT_EMAIL,
+        ];
+        $userMetaModel = Gdn::userMetaModel();
+        $sql = $userMetaModel->createSql()->where("UserID", $userID);
+        $sql->beginWhereGroup();
+        foreach ($names as $name) {
+            if ($categoryID !== null) {
+                $sql->orWhere("Name", sprintf($name, $categoryID));
+            } else {
+                $sql->orLike("Name", str_replace("%d", "%", $name), null);
+            }
+        }
+        $sql->endWhereGroup();
+        $result = array_column($sql->get($userMetaModel->Name)->resultArray(), null, "Name");
+        return $result;
+    }
+
+    /**
+     * Compile legacy notification settings from UserMeta and UserCategory into a standard notification flag.
+     *
+     * @param int $categoryID
+     * @param array $userMeta
+     * @param array $userCategory
+     * @return string|null
+     */
+    private function notificationFromLegacy(int $categoryID, array $userMeta, array $userCategory): ?string {
+        $following = $userCategory[$categoryID]["Followed"] ?? false;
+
+        $discussionApp = sprintf(self::PREFERENCE_DISCUSSION_APP, $categoryID);
+        $discussionEmail = sprintf(self::PREFERENCE_DISCUSSION_EMAIL, $categoryID);
+        $discussions = $userMeta[$discussionEmail] ?? $userMeta[$discussionApp] ?? false;
+
+        $commentApp = sprintf(self::PREFERENCE_COMMENT_APP, $categoryID);
+        $commentEmail = sprintf(self::PREFERENCE_COMMENT_EMAIL, $categoryID);
+        $comments = $userMeta[$commentEmail] ?? $userMeta[$commentApp] ?? false;
+
+        if ($comments) {
+            $result = self::NOTIFICATION_ALL;
+        } elseif ($discussions) {
+            $result = self::NOTIFICATION_DISCUSSIONS;
+        } elseif ($following) {
+            $result = self::NOTIFICATION_FOLLOW;
+        } else {
+            $result = null;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get all of a user's category preferences.
+     *
+     * @param int $userID
+     * @return array[]
+     */
+    public function getPreferences(int $userID): array {
+        $userMeta = $this->getUserMeta($userID);
+        $userCategory = array_column($this->getUserCategories($userID), null, "CategoryID");
+
+        $categoryIDs = array_keys($userCategory);
+        $categoryIDs = array_combine($categoryIDs, $categoryIDs);
+        foreach ($userMeta as $name => $value) {
+            $id = substr(strrchr($name, "."), "-1");
+            if (empty($id) || ($id = filter_var($id, FILTER_VALIDATE_INT)) === false) {
+                continue;
+            }
+            $categoryIDs[$id] = $id;
+        }
+
+        $result = [];
+        foreach ($categoryIDs as $id) {
+            $category = self::categories($id);
+            if (!is_array($category)) {
+                continue;
+            }
+
+            $preferences = $this->generatePreferences($id, $userMeta, $userCategory);
+
+            // Currently only tracking notification preferences. If there's nothing to add, skip the row.
+            $postNotifications = $preferences["postNotifications"] ?? null;
+            if ($postNotifications === null) {
+                continue;
+            }
+
+            $result[$id] = [
+                "categoryID" => $id,
+                "name" => $category["Name"],
+                "url" => $category["Url"],
+                "preferences" => $preferences,
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get a user's preferences for a single category.
+     *
+     * @param int $userID
+     * @param int $categoryID
+     * @return array
+     */
+    public function getPreferencesByCategoryID(int $userID, int $categoryID): array {
+        $userMeta = $this->getUserMeta($userID, $categoryID);
+        $userCategory = array_column($this->getUserCategories($userID), null, "CategoryID");
+        $result = $this->generatePreferences($categoryID, $userMeta, $userCategory);
+        return $result;
+    }
+
+    /**
+     * Set a user's preferences for a single category.
+     *
+     * @param int $userID
+     * @param int $categoryID
+     * @param array $preferences
+     */
+    public function setPreferences(int $userID, int $categoryID, array $preferences): void {
+        if (array_key_exists(self::PREFERENCE_KEY_NOTIFICATION, $preferences)) {
+            $this->setNotificationPreference($userID, $categoryID, $preferences[self::PREFERENCE_KEY_NOTIFICATION]);
+        }
+    }
+
+    /**
+     * Set the notification preference for a single user.
+     *
+     * @param int $userID
+     * @param int $categoryID
+     * @param string|null $notificationPreference One of the NOTIFICATION_* constants or `null` to disable notifications.
+     */
+    private function setNotificationPreference(int $userID, int $categoryID, ?string $notificationPreference): void {
+        switch ($notificationPreference) {
+            case self::NOTIFICATION_ALL:
+                $following = true;
+                $discussionApp = true;
+                $discussionEmail = true;
+                $commentApp = true;
+                $commentEmail = true;
+                break;
+            case self::NOTIFICATION_DISCUSSIONS:
+                $following = true;
+                $discussionApp = true;
+                $discussionEmail = true;
+                $commentApp = null;
+                $commentEmail = null;
+                break;
+            case self::NOTIFICATION_FOLLOW:
+                $following = true;
+                $discussionApp = null;
+                $discussionEmail = null;
+                $commentApp = null;
+                $commentEmail = null;
+                break;
+            case null:
+                $following = false;
+                $discussionApp = null;
+                $discussionEmail = null;
+                $commentApp = null;
+                $commentEmail = null;
+                break;
+            default:
+                throw new InvalidArgumentException("Unknown preference: {$notificationPreference}");
+        }
+
+        $this->follow($userID, $categoryID, $following);
+        $userMeta = [
+            sprintf(self::PREFERENCE_COMMENT_APP, $categoryID) => $commentApp,
+            sprintf(self::PREFERENCE_COMMENT_EMAIL, $categoryID) => $commentEmail,
+            sprintf(self::PREFERENCE_DISCUSSION_APP, $categoryID) => $discussionApp,
+            sprintf(self::PREFERENCE_DISCUSSION_EMAIL, $categoryID) => $discussionEmail,
+        ];
+        UserModel::setMeta($userID, $userMeta);
+        self::clearUserCache($userID);
+    }
+
+    /**
+     * Given a user's UserMeta and UserCategory rows, generate their preferences for a single category.
+     *
+     * @param int $categoryID
+     * @param array $userMeta
+     * @param array $userCategory
+     * @return array
+     */
+    private function generatePreferences(int $categoryID, array $userMeta, array $userCategory): array {
+        $postNotifications = $this->notificationFromLegacy($categoryID, $userMeta, $userCategory);
+
+        return [
+            "postNotifications" => $postNotifications,
+        ];
+    }
+
+    /**
+     * Create a schema instance representing a user's category preferences.
+     *
+     * @return Schema
+     */
+    public function preferencesSchema(): Schema {
+        $result = SchemaFactory::parse([
+            "postNotifications" => [
+                "allowNull" => true,
+                "type" => "string",
+                "enum" => [
+                    CategoryModel::NOTIFICATION_ALL,
+                    CategoryModel::NOTIFICATION_DISCUSSIONS,
+                    CategoryModel::NOTIFICATION_FOLLOW,
+                ],
+            ]
+        ], "CategoryPreferences");
+        return $result;
+    }
+
+    /**
+     * Get a category fragment schema with the addition of a user preferences field.
+     *
+     * @return Schema
+     */
+    public function fragmentWithPreferencesSchema(): Schema {
+        $fragmentSchema = $this->fragmentSchema();
+        $preferencesSchema = SchemaFactory::parse([
+            "preferences" => $this->preferencesSchema()
+        ], "CategoryFragmentPreferences");
+        $result = $preferencesSchema->merge($fragmentSchema);
+        return $result;
     }
 
     /**

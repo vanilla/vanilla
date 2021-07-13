@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -16,7 +16,7 @@ import { ResultMeta } from "@library/result/ResultMeta";
 import { PublishStatus } from "@library/@types/api/core";
 import { AttachmentType } from "@library/content/attachments/AttatchmentType";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { bannerClasses } from "@library/banner/bannerStyles";
+import { bannerClasses } from "@library/banner/Banner.styles";
 import {
     TypeAllIcon,
     TypeArticlesIcon,
@@ -64,11 +64,8 @@ story.add("Search Box", () => {
                                 buttonType={ButtonTypes.CUSTOM}
                                 isLarge={true}
                                 placeholder={t("Search")}
-                                inputClass={classesSearch.input}
                                 iconClass={classesSearch.icon}
-                                buttonLoaderClassName={classesSearch.buttonLoader}
                                 contentClass={classesSearch.content}
-                                valueContainerClasses={classNames(classesSearch.valueContainer)}
                             />
                         </div>
                     </div>

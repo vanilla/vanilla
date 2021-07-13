@@ -1,13 +1,13 @@
 /**
  * Compatibility styles, using the color variables.
  *
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import { trimTrailingCommas } from "@dashboard/compatibilityStyles/trimTrailingCommas";
 import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
-import { buttonUtilityClasses } from "@library/forms/buttonStyles";
+import { buttonUtilityClasses } from "@library/forms/Button.styles";
 import { buttonGlobalVariables, buttonVariables } from "@library/forms/Button.variables";
 import { absolutePosition, importantUnit } from "@library/styles/styleHelpers";
 import { styleUnit } from "@library/styles/styleUnit";
@@ -52,7 +52,7 @@ export const buttonCSS = () => {
     mixinButton(".ButtonGroup.Multi .Button.Handle .Sprite.SpDropdownHandle", ButtonTypes.PRIMARY);
     mixinButton(".AdvancedSearch .InputAndButton .bwrap .Button", ButtonTypes.PRIMARY);
 
-    const buttonBorderRadius = parseInt(globalVars.borderType.formElements.buttons.toString(), 10);
+    const buttonBorderRadius = buttonVars.border.radius;
     const borderOffset = buttonVars.border.width * 2;
     const handleSize = buttonVars.sizing.minHeight - borderOffset;
 

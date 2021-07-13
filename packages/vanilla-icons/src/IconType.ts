@@ -21,7 +21,7 @@ type SearchIconType = "search-events" | "search-search";
 
 type DashboardIconType = "dashboard-edit";
 
-type DiscussionIconType = "discussion-bookmark";
+type DiscussionIconType = "discussion-bookmark" | "discussion-bookmark-solid";
 
 export type IconType =
     | MeIconType

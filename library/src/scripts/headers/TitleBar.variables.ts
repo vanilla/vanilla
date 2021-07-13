@@ -349,22 +349,7 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
             style: "none",
             color: rgba(0, 0, 0, 0),
         },
-        hover: {
-            colors: {
-                bg: generatedColors.state,
-            },
-        },
-        focus: {
-            colors: {
-                bg: generatedColors.state,
-            },
-        },
-        focusAccessible: {
-            colors: {
-                bg: generatedColors.state,
-            },
-        },
-        active: {
+        state: {
             colors: {
                 bg: generatedColors.state,
             },

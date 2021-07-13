@@ -27,10 +27,13 @@ export const dayPickerVariables = useThemeCache(() => {
     const colors = makeThemeVars("colors", {
         today: globalVars.mainColors.primary,
         selected: {
-            color: globalVars.states.selected.highlight,
+            color: globalVars.mainColors.primary,
+            bg: globalVars.states.hover.highlight,
         },
         hover: {
             bg: globalVars.states.hover.highlight,
+            //fix accessibility
+            color: globalVars.elementaryColors.darkText,
         },
     });
 
@@ -70,15 +73,25 @@ export const dayPickerClasses = useThemeCache(() => {
                 },
             },
             ".DayPicker-Day--selected:not(.DayPicker-Day--disabled):not(.DayPicker-Day--outside)": {
-                backgroundColor: vars.colors.selected.color.toString(),
+                backgroundColor: vars.colors.selected.bg.toString(),
+                color: vars.colors.selected.color.toString(),
+                //fix accessibility
+                fontWeight: "bold",
                 ...{
                     "&:hover": {
-                        backgroundColor: vars.colors.selected.color.toString(),
+                        backgroundColor: vars.colors.selected.bg.toString(),
+                        //fix accessibility
+                        color: vars.colors.hover.color.toString(),
+                        fontWeight: "normal",
                     },
                 },
             },
             ".DayPicker-Day.DayPicker-Day--today": {
                 color: ColorsUtils.colorOut(vars.colors.today),
+            },
+            //fix accessibility
+            ".DayPicker-Weekday, .DayPicker-Day--outside": {
+                color: "#767676",
             },
         },
     });

@@ -5,7 +5,7 @@
 
 import { LoadStatus } from "@library/@types/api/core";
 import { isUserGuest, useUsersState } from "@library/features/users/userModel";
-import { buttonClasses } from "@library/forms/buttonStyles";
+import { buttonClasses } from "@library/forms/Button.styles";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { SearchErrorIcon } from "@library/icons/common";
 import Heading from "@library/layout/Heading";

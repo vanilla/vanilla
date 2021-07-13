@@ -73,7 +73,12 @@ export const panelAreaClasses = useThemeCache((mediaQueries) => {
     });
 
     const areaOverlayBefore = useThemeCache((color?: ColorHelper, side?: "left" | "right") => {
-        let gradientColor = color ?? globalVars.mainColors.bg;
+        let bodyBgColor = globalVars.body.backgroundImage.color;
+        let gradientColor = color
+            ? color
+            : bodyBgColor && bodyBgColor instanceof ColorHelper
+            ? bodyBgColor
+            : globalVars.mainColors.bg;
 
         return style("areaOverlayBefore", {
             zIndex: 3,
@@ -92,7 +97,12 @@ export const panelAreaClasses = useThemeCache((mediaQueries) => {
     });
 
     const areaOverlayAfter = useThemeCache((color?: ColorHelper, side?: "left" | "right") => {
-        let gradientColor = color ?? globalVars.mainColors.bg;
+        let bodyBgColor = globalVars.body.backgroundImage.color;
+        let gradientColor = color
+            ? color
+            : bodyBgColor && bodyBgColor instanceof ColorHelper
+            ? bodyBgColor
+            : globalVars.mainColors.bg;
 
         return style("areaOverlayAfter", {
             zIndex: 1,

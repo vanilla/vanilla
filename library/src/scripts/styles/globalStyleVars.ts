@@ -339,7 +339,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
          */
         color: mixBgAndFg(0.2),
         /**
-         * @var global.border.width
+         * @var global.border.colorHover
          * @title Border Hover Color
          * @description Choose the hover color of the border.
          * @type string

@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -9,7 +9,7 @@ import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { flexHelper, negative, userSelect } from "@library/styles/styleHelpers";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
-import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { formElementsVariables } from "@library/forms/formElementStyles";
@@ -17,6 +17,7 @@ import { LogoAlignment } from "@library/headers/LogoAlignment";
 import { Mixins } from "@library/styles/Mixins";
 import { Variables } from "@library/styles/Variables";
 import { LocalVariableMapping } from "@library/styles/VariableMapping";
+import { css } from "@emotion/css";
 
 export const titleBarNavigationVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory(
@@ -97,9 +98,8 @@ const titleBarNavClasses = useThemeCache(() => {
 
     const mediaQueries = titleBarVars.mediaQueries();
     const flex = flexHelper();
-    const style = styleFactory("titleBarNav");
 
-    const root = style(
+    const root = css(
         {
             ...flex.middleLeft(),
             position: "relative",
@@ -110,8 +110,7 @@ const titleBarNavClasses = useThemeCache(() => {
         }),
     );
 
-    const navigation = style(
-        "navigation",
+    const navigation = css(
         titleBarVars.logo.doubleLogoStrategy === "hidden" ||
             titleBarVars.logo.doubleLogoStrategy === "mobile-only" ||
             titleBarVars.logo.justifyContent === LogoAlignment.CENTER
@@ -121,13 +120,12 @@ const titleBarNavClasses = useThemeCache(() => {
             : {},
     );
 
-    const navigationCentered = style("navigationCentered", {
+    const navigationCentered = css({
         ...Mixins.absolute.middleOfParent(true),
         display: "inline-flex",
     });
 
-    const items = style(
-        "items",
+    const items = css(
         {
             ...flex.middleLeft(),
             height: styleUnit(titleBarVars.sizing.height),
@@ -140,7 +138,7 @@ const titleBarNavClasses = useThemeCache(() => {
         }),
     );
 
-    const link = style("link", {
+    const link = css({
         ...userSelect(),
         whiteSpace: "nowrap",
         lineHeight: globalVars.lineHeights.condensed,
@@ -170,7 +168,7 @@ const titleBarNavClasses = useThemeCache(() => {
 
     const offsetWidth = vars.linkActive.offset * 2;
 
-    const linkActive = style("linkActive", {
+    const linkActive = css({
         ...{
             "&:after": {
                 ...Mixins.absolute.topLeft(
@@ -188,18 +186,18 @@ const titleBarNavClasses = useThemeCache(() => {
         },
     });
 
-    const firstItem = style("lastItem", {
+    const firstItem = css({
         zIndex: 2,
     });
 
-    const lastItem = style("lastItem", {
+    const lastItem = css({
         zIndex: 2,
     });
-    const navContiner = style("navContiner", {
+    const navContiner = css({
         paddingBottom: styleUnit(vars.navPadding.padding.bottom),
     });
 
-    const navLinks = style("navLinks", {});
+    const navLinks = css({});
 
     return {
         root,

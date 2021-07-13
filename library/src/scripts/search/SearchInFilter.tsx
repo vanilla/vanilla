@@ -8,7 +8,7 @@ import React from "react";
 import RadioInputAsButton from "@library/forms/radioAsButtons/RadioInputAsButton";
 import { RadioGroup } from "@library/forms/radioAsButtons/RadioGroup";
 import { searchInFilterClasses } from "@library/search/searchInFilter.styles";
-import { buttonClasses } from "@library/forms/buttonStyles";
+import { buttonClasses } from "@library/forms/Button.styles";
 
 export interface ISearchInButton {
     label: string;

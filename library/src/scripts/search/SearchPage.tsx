@@ -5,7 +5,7 @@
 
 import { LoadStatus } from "@library/@types/api/core";
 import SearchBar from "@library/features/search/SearchBar";
-import { searchBarClasses } from "@library/features/search/searchBarStyles";
+import { searchBarClasses } from "@library/features/search/SearchBar.styles";
 import SearchOption from "@library/features/search/SearchOption";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import TitleBar from "@library/headers/TitleBar";
@@ -150,7 +150,7 @@ function SearchPage(props: IProps) {
                                             classes.smallBackLink,
                                         )}
                                         headingClassName={classNames(typographyClasses().pageTitle)}
-                                        title={"Search"}
+                                        title={t("Search")}
                                         includeBackLink={true}
                                         isCompactHeading={true}
                                     />

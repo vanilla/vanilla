@@ -1086,4 +1086,35 @@ class DiscussionModelTest extends SiteTestCase {
         $this->assertEquals(404, $response->getStatusCode());
     }
 
+    /**
+     * Test DiscussionModel::DeleteDiscussions().
+     */
+    public function testDeleteDiscussions(): void {
+        $discussion1 = $this->createDiscussion();
+        $discussion2 = $this->createDiscussion();
+        $result = $this->discussionModel->deleteDiscussions([$discussion1['discussionID'], $discussion2['discussionID']]);
+        $this->assertEmpty($result);
+        $rd = rand(6000, 8000);
+        $result = $this->discussionModel->deleteDiscussions([$rd]);
+        $this->assertEquals($rd, $result[0]);
+    }
+
+    /**
+     * Test DiscussionModel::FilterCategoryPermissions().
+     */
+    public function testFilterCategoryPermissions(): void {
+        $discussion1 = $this->createDiscussion();
+        $discussion2 = $this->createDiscussion();
+        $discussionIDs =  [
+            $discussion1['discussionID'],
+            $discussion2['discussionID']
+        ];
+        $result = $this->discussionModel->filterCategoryPermissions($discussionIDs, 'Vanilla.Discussions.Delete');
+        $this->assertEquals($discussionIDs, $result);
+        $userGuest = $this->createUser(['RoleID'=> \RoleModel::GUEST_ID]);
+        $result = $this->runWithUser(function () use ($discussionIDs) {
+            return $this->discussionModel->filterCategoryPermissions($discussionIDs, 'Vanilla.Discussions.Delete');
+        }, $userGuest);
+        $this->assertEmpty($result);
+    }
 }

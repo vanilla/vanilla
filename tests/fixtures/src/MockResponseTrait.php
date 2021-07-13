@@ -30,7 +30,7 @@ trait MockResponseTrait {
         string $method = HttpRequest::METHOD_GET,
         $body = null
     ): string {
-        $queryBody = is_array($body) ? serialize($body) : $body;
+        $queryBody = $body && is_array($body) ? serialize($body) : $body;
         $bodyHash = $queryBody ? '-'.md5($queryBody) : '';
         return $method.'-'.$uri.$bodyHash;
     }

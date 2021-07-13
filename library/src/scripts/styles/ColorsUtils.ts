@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 import { logDebugConditionnal, logError } from "@vanilla/utils";
@@ -23,6 +23,10 @@ export class ColorsUtils {
         const result = Math.sqrt(0.299 * r * r + 0.587 * g * g + 0.114 * b * b);
         // Values in the range of 128-150 seem to give acceptable results.
         return result >= 150;
+    };
+
+    static isDarkColor = (referenceColor: ColorHelper | string): boolean => {
+        return !ColorsUtils.isLightColor(referenceColor);
     };
 
     static ensureColorHelper = (colorValue: string | ColorHelper): ColorHelper => {

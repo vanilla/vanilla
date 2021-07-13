@@ -175,10 +175,10 @@ export const EMPTY_STATE_COLORS = {
 };
 
 export interface IGlobalBorderStyles extends IBorderRadiusOutput {
-    color?: ColorHelper;
+    color?: ColorHelper | string;
     width?: Property.BorderWidth<TLength> | number;
     style?: Property.BorderStyle;
-    radius?: Property.BorderRadius<TLength> | string;
+    radius?: IRadiusValue;
 }
 
 export enum IIconSizes {

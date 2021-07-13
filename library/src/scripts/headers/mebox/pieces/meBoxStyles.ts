@@ -1,17 +1,17 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { debugHelper, flexHelper } from "@library/styles/styleHelpers";
 import { styleUnit } from "@library/styles/styleUnit";
-import { styleFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
+import { css } from "@emotion/css";
 
 export const meBoxClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -20,9 +20,8 @@ export const meBoxClasses = useThemeCache(() => {
     const debug = debugHelper("meBox");
     const mediaQueries = panelLayoutVariables().mediaQueries();
     const flex = flexHelper();
-    const style = styleFactory("meBox");
 
-    const root = style(
+    const root = css(
         {
             ...debug.name(),
             display: "flex",
@@ -34,7 +33,7 @@ export const meBoxClasses = useThemeCache(() => {
         }),
     );
 
-    const buttonContent = style("buttonContent", {
+    const buttonContent = css({
         ...flex.middle(),
         width: styleUnit(formVars.sizing.height),
         maxWidth: styleUnit(formVars.sizing.height),

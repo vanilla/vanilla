@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -8,19 +8,16 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
 import { Mixins } from "@library/styles/Mixins";
-import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { color, important, percent, rgba } from "csx";
+import { important, percent, rgba } from "csx";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
-import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
-import { IButton } from "@library/forms/styleHelperButtonInterface";
-import { bannerVariables } from "@library/banner/bannerStyles";
 import { SearchBarPresets } from "@library/banner/SearchBarPresets";
 import { ButtonPreset } from "@library/forms/ButtonPreset";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { inputClasses } from "@library/forms/inputStyles";
-import { Variables } from "@library/styles/Variables";
+import { css } from "@emotion/css";
 
 export const compactSearchVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const globalVars = globalVariables(forcedVars);
@@ -90,10 +87,9 @@ export const compactSearchClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const formElementsVars = formElementsVariables();
     const vars = compactSearchVariables();
-    const style = styleFactory("compactSearch");
     inputClasses().applyInputCSSRules();
 
-    const root = style({
+    const root = css({
         ...{
             ".searchBar": {
                 flexGrow: 1,
@@ -128,7 +124,7 @@ export const compactSearchClasses = useThemeCache(() => {
         },
     });
 
-    const contents = style("contents", {
+    const contents = css({
         display: "flex",
         alignItems: "center",
         flexWrap: "nowrap",
@@ -138,7 +134,7 @@ export const compactSearchClasses = useThemeCache(() => {
         position: "relative",
     });
 
-    const close = style("close", {
+    const close = css({
         color: "inherit",
         whiteSpace: "nowrap",
         fontWeight: globalVars.fonts.weights.semiBold,
@@ -153,9 +149,9 @@ export const compactSearchClasses = useThemeCache(() => {
         }),
     });
 
-    const cancelContents = style("cancelContents", {});
+    const cancelContents = css({});
 
-    const searchAndResults = style("searchAndResults", {
+    const searchAndResults = css({
         flex: 1,
         position: "relative",
         width: percent(100),
@@ -167,7 +163,7 @@ export const compactSearchClasses = useThemeCache(() => {
         }),
     });
 
-    const valueContainer = style("valueContainer", {});
+    const valueContainer = css({});
 
     return {
         root,

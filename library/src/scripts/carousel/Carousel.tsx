@@ -60,9 +60,15 @@ export function Carousel(props: IProps) {
     const measureSectionWrapper = useMeasure(sectionWrapper);
     const measureSliderWrapper = useMeasure(sliderWrapper);
     const slides = React.Children.toArray(children);
-    const maxSlidesToShow = clamp(props.maxSlidesToShow ?? 5, 2, slides.length);
+    const maxSlidesToShow = clamp(props.maxSlidesToShow ?? 4, 2, slides.length);
 
-    const toShow: number = getBreakPoints(measureSectionWrapper.width, maxSlidesToShow);
+    //Manage borwser size/resize BreakPoints are based on main section wrapper width
+    const breakPointsSetup = useMemo(() => getBreakPoints(measureSectionWrapper.width, maxSlidesToShow), [
+        measureSectionWrapper.width,
+        maxSlidesToShow,
+    ]);
+
+    const toShow: number = breakPointsSetup.slidesToShow;
 
     //Carousel Children Size flex/responsive updating based on sliderWrapper width
     //values to be removed from sliderWrapper width
@@ -74,10 +80,15 @@ export function Carousel(props: IProps) {
             : (measureSliderWrapper.width - 16 * (toShow - 1) - 4) / toShow;
 
     //Carousel Sliders position update
-    const { activeIndex, desiredIndex, actions, sliderLeftPosiion } = useCarousel(slides.length, {
-        slidesToShow: toShow,
-        childWidth,
-    });
+    const { activeIndex, desiredIndex, actions, handlers, sliderPosition } = useCarousel(
+        slides.length,
+        measureSliderWrapper.width,
+        {
+            toShow,
+            childWidth,
+            sliderWrapper,
+        },
+    );
 
     //PagingDots update currentPagingDot
     const [state, setState] = useState(initCarouselState);
@@ -92,7 +103,7 @@ export function Carousel(props: IProps) {
 
         window.addEventListener("resize", handleResize);
         return () => window.removeEventListener("resize", handleResize);
-    }, [actions, toShow]);
+    }, [actions, toShow, sliderPosition]);
 
     //Navigate via Dots
     const handleDotClick = (e) => {
@@ -131,8 +142,8 @@ export function Carousel(props: IProps) {
 
     return (
         <CarouselSectionSliderWrapper sectionWrapperRef={sectionWrapper}>
-            <a className={classes.skipCarousel} href="#Discussion_1">
-                {t("Skip to Discussions")}
+            <a className={classes.skipCarousel} href="#carouselEnd">
+                {t("Skip to end of Carousel")}
             </a>
 
             <CarouselHeaderAccessibility title={t(`${carouselTitle}`)} />
@@ -155,13 +166,18 @@ export function Carousel(props: IProps) {
 
                 <CarouselSlider
                     sliderWrapperRef={sliderWrapper}
-                    sliderPosition={sliderLeftPosiion}
-                    slidesWidth={childWidth ? childWidth : 0}
+                    childWidth={childWidth ? childWidth : 0}
+                    slideDesiredIndex={desiredIndex}
                     numberOfSlidesToShow={toShow}
-                    slideActiveIndex={desiredIndex}
+                    sliderPosition={sliderPosition}
+                    enableSwipe={true}
+                    preventDefaultTouchmoveEvent={true}
+                    enableMouseSwipe={true}
+                    handlers={handlers}
                 >
                     {children}
                 </CarouselSlider>
+
                 {measureSectionWrapper.width >= 765 && state.numberOfDots.length > 1 && (
                     <CarouselArrowNav
                         disabled={desiredIndex + toShow >= slides.length}
@@ -206,6 +222,10 @@ export function Carousel(props: IProps) {
                     {t(`${toShow} Slides on display, initial Slide ${desiredIndex + 1} of ${slides.length}`)}
                 </div>
             </ScreenReaderContent>
+
+            <span id="carouselEnd" className="sr-only">
+                End of Carousel
+            </span>
         </CarouselSectionSliderWrapper>
     );
 }

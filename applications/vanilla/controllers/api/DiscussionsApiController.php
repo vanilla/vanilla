@@ -14,6 +14,7 @@ use Vanilla\DateFilterSchema;
 use Vanilla\ApiUtils;
 use Vanilla\Community\Schemas\CategoryFragmentSchema;
 use Vanilla\DiscussionTypeConverter;
+use Vanilla\Exception\PermissionException;
 use Vanilla\Formatting\Formats\RichFormat;
 use Vanilla\Forum\Controllers\Api\DiscussionsApiIndexSchema;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
@@ -178,6 +179,29 @@ class DiscussionsApiController extends AbstractApiController {
         $row = $this->discussionByID($id);
         $this->discussionModel->categoryPermission('Vanilla.Discussions.Delete', $row['CategoryID']);
         $this->discussionModel->deleteID($id);
+    }
+
+    /**
+     * Delete a list of discussions.
+     *
+     * @param array $body The discussion's ids.
+     * @throws ClientException If a discussion could not be deleted.
+     */
+    public function delete_list(array $body) {
+        $this->permission('Garden.SignIn.Allow');
+        $in = $this->schema([
+            'discussionIDs:a' => [
+                'items' => [
+                    'type' => 'integer',
+                ],
+                'description' => 'List of discussion IDs to delete.',
+            ],
+        ], 'in');
+        $in->validate($body);
+        $result = $this->discussionModel->deleteDiscussions($body['discussionIDs']);
+        if (!empty($result)) {
+            throw new ClientException('Some discussions could not be deleted.', 400, ['discussionIDs' => implode($result, ',')]);
+        }
     }
 
     /**
@@ -376,7 +400,7 @@ class DiscussionsApiController extends AbstractApiController {
      *
      * @throws NotFoundException If the record with the given ID can't be found.
      * @throws \Exception Throws an exception if no session is available.
-     * @throws \Vanilla\Exception\PermissionException Throws an exception if the user does not have the specified permission(s).
+     * @throws PermissionException Throws an exception if the user does not have the specified permission(s).
      * @throws \Garden\Schema\ValidationException If the output schema is configured incorrectly.
      */
     public function get_quote($id) {
@@ -908,7 +932,7 @@ class DiscussionsApiController extends AbstractApiController {
      * @throws \Garden\Schema\ValidationException Throws a validation exception.
      * @throws ClientException Throws an exception if you try to add a tag that's there already.
      * @throws \Garden\Web\Exception\HttpException Http Exception.
-     * @throws \Vanilla\Exception\PermissionException Permission Exception.
+     * @throws PermissionException Permission Exception.
      */
     public function post_tags(int $id, array $body): Data {
         $this->permission('Vanilla.Tagging.Add');
@@ -943,7 +967,7 @@ class DiscussionsApiController extends AbstractApiController {
      * @param int $id The discussion ID.
      * @param array $body The tags to set.
      * @return Data
-     * @throws \Vanilla\Exception\PermissionException Permission Exception.
+     * @throws PermissionException Permission Exception.
      * @throws NotFoundException Throws an exception if a tag isn't found.
      * @throws \Garden\Schema\ValidationException Throws a validation exception.
      */
@@ -979,7 +1003,7 @@ class DiscussionsApiController extends AbstractApiController {
      *
      * @param int $id The discussion ID to check permissions for.
      * @throws NotFoundException Throws an exception if the discussion can't be found.
-     * @throws \Vanilla\Exception\PermissionException Throws an exception if no permission.
+     * @throws PermissionException Throws an exception if no permission.
      */
     public function canEditDiscussion(int $id): void {
         $row = $this->discussionByID($id);

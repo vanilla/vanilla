@@ -1,9 +1,10 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 import React from "react";
-import { bannerClasses, bannerVariables } from "@library/banner/bannerStyles";
+import { bannerVariables } from "@library/banner/Banner.variables";
+import { bannerClasses } from "@library/banner/Banner.styles";
 import { ensureColorHelper } from "@library/styles/styleHelpers";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { contentBannerClasses, contentBannerVariables } from "@library/banner/contentBannerStyles";

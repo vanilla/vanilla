@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -19,7 +19,6 @@ import {
 import { styleUnit } from "@library/styles/styleUnit";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { Mixins } from "@library/styles/Mixins";
-import { styleFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import {
     calc,
@@ -48,7 +47,6 @@ export const titleBarClasses = useThemeCache(() => {
     const formElementVars = formElementsVariables();
     const mediaQueries = vars.mediaQueries();
     const flex = flexHelper();
-    const style = styleFactory("titleBar");
 
     const getBorderVars = (): CSSObject => {
         switch (vars.border.type) {
@@ -73,7 +71,7 @@ export const titleBarClasses = useThemeCache(() => {
         }
     };
 
-    const root = style({
+    const root = css({
         maxWidth: percent(100),
         color: ColorsUtils.colorOut(vars.colors.fg),
         position: "relative",
@@ -121,15 +119,14 @@ export const titleBarClasses = useThemeCache(() => {
         borderRadius: `0 0 100% 100%/0 0 ${percent(vars.swoop.amount)} ${percent(vars.swoop.amount)}`,
     };
 
-    const swoop = style("swoop", {});
+    const swoop = css({});
 
     const shadowAsBorder =
         vars.border.type === BorderType.SHADOW_AS_BORDER
             ? { boxShadow: `0 ${styleUnit(vars.border.width)} 0 ${ColorsUtils.colorOut(vars.border.color)}` }
             : {};
 
-    const bg1 = style(
-        "bg1",
+    const bg1 = css(
         {
             willChange: "opacity",
             ...Mixins.absolute.fullSizeOfParent(),
@@ -145,8 +142,7 @@ export const titleBarClasses = useThemeCache(() => {
         }),
     );
 
-    const bg2 = style(
-        "bg2",
+    const bg2 = css(
         {
             willChange: "opacity",
             ...Mixins.absolute.fullSizeOfParent(),
@@ -162,14 +158,14 @@ export const titleBarClasses = useThemeCache(() => {
         }),
     );
 
-    const container = style("container", {
+    const container = css({
         position: "relative",
         height: percent(100),
         width: percent(100),
         ...Mixins.padding(vars.spacing.padding),
     });
 
-    const bgContainer = style("bgContainer", {
+    const bgContainer = css({
         ...Mixins.absolute.fullSizeOfParent(),
         height: percent(100),
         width: percent(100),
@@ -178,13 +174,12 @@ export const titleBarClasses = useThemeCache(() => {
         overflow: "hidden",
     });
 
-    const bgImage = style("bgImage", {
+    const bgImage = css({
         ...Mixins.absolute.fullSizeOfParent(),
         objectFit: "cover",
     });
 
-    const bannerPadding = style(
-        "bannerPadding",
+    const bannerPadding = css(
         {
             paddingTop: px(vars.sizing.height / 2),
         },
@@ -193,8 +188,7 @@ export const titleBarClasses = useThemeCache(() => {
         }),
     );
 
-    const negativeSpacer = style(
-        "negativeSpacer",
+    const negativeSpacer = css(
         {
             marginTop: px(-vars.sizing.height),
         },
@@ -203,8 +197,7 @@ export const titleBarClasses = useThemeCache(() => {
         }),
     );
 
-    const spacer = style(
-        "spacer",
+    const spacer = css(
         {
             height: px(vars.sizing.height),
         },
@@ -213,8 +206,7 @@ export const titleBarClasses = useThemeCache(() => {
         }),
     );
 
-    const bar = style(
-        "bar",
+    const bar = css(
         {
             display: "flex",
             justifyContent: "flex-start",
@@ -243,8 +235,7 @@ export const titleBarClasses = useThemeCache(() => {
           }
         : {};
 
-    const logoContainer = style(
-        "logoContainer",
+    const logoContainer = css(
         {
             display: "inline-flex",
             alignSelf: "center",
@@ -275,16 +266,15 @@ export const titleBarClasses = useThemeCache(() => {
         }),
     );
 
-    const logoFlexBasis = style("logoFlexBasis", {
+    const logoFlexBasis = css({
         flexBasis: vars.endElements.flexBasis,
     });
 
-    const meBox = style("meBox", {
+    const meBox = css({
         justifyContent: "flex-end",
     });
 
-    const nav = style(
-        "nav",
+    const nav = css(
         {
             display: "flex",
             flexWrap: "wrap",
@@ -301,8 +291,7 @@ export const titleBarClasses = useThemeCache(() => {
         mediaQueries.compact({ height: px(vars.sizing.mobile.height) }),
     );
 
-    const locales = style(
-        "locales",
+    const locales = css(
         {
             height: px(vars.sizing.height),
             ...{
@@ -321,16 +310,15 @@ export const titleBarClasses = useThemeCache(() => {
         mediaQueries.compact({ height: px(vars.sizing.mobile.height) }),
     );
 
-    const messages = style("messages", {
+    const messages = css({
         color: vars.colors.fg.toString(),
     });
 
-    const notifications = style("notifications", {
+    const notifications = css({
         color: "inherit",
     });
 
-    const compactSearch = style(
-        "compactSearch",
+    const compactSearch = css(
         {
             display: "flex",
             alignItems: "center",
@@ -349,8 +337,7 @@ export const titleBarClasses = useThemeCache(() => {
         mediaQueries.compact({ height: px(vars.sizing.mobile.height) }),
     );
 
-    const compactSearchResults = style(
-        "compactSearchResults",
+    const compactSearchResults = css(
         {
             position: "absolute",
             top: styleUnit(formElementVars.sizing.height + 2),
@@ -381,7 +368,7 @@ export const titleBarClasses = useThemeCache(() => {
             }),
     );
 
-    const extraMeBoxIcons = style("extraMeBoxIcons", {
+    const extraMeBoxIcons = css({
         display: "flex",
         alignItems: "center",
         justifyContent: "flex-end",
@@ -396,8 +383,7 @@ export const titleBarClasses = useThemeCache(() => {
         },
     });
 
-    const topElement = style(
-        "topElement",
+    const topElement = css(
         {
             color: vars.colors.fg.toString(),
             padding: `0 ${px(vars.sizing.spacer / 2)}`,
@@ -409,8 +395,7 @@ export const titleBarClasses = useThemeCache(() => {
         }),
     );
 
-    const localeToggle = style(
-        "localeToggle",
+    const localeToggle = css(
         {
             height: px(vars.sizing.height),
         },
@@ -419,12 +404,11 @@ export const titleBarClasses = useThemeCache(() => {
         }),
     );
 
-    const languages = style("languages", {
+    const languages = css({
         marginLeft: "auto",
     });
 
-    const button = style(
-        "button",
+    const button = css(
         {
             ...buttonResetMixin(),
             height: px(vars.button.size),
@@ -496,15 +480,15 @@ export const titleBarClasses = useThemeCache(() => {
 
     const linkButton = css(Mixins.button(vars.linkButton));
 
-    const buttonOffset = style("buttonOffset", {
+    const buttonOffset = css({
         transform: `translateX(6px)`,
     });
 
-    const centeredButton = style("centeredButton", {
+    const centeredButton = css({
         ...flex.middle(),
     });
 
-    const searchCancel = style("searchCancel", {
+    const searchCancel = css({
         ...buttonResetMixin(),
         ...userSelect(),
         height: px(formElementVars.sizing.height),
@@ -533,7 +517,7 @@ export const titleBarClasses = useThemeCache(() => {
         },
     };
 
-    const tabButton = style("tabButton", {
+    const tabButton = css({
         display: "block",
         height: percent(100),
         padding: px(0),
@@ -544,7 +528,7 @@ export const titleBarClasses = useThemeCache(() => {
         },
     });
 
-    const dropDownContents = style("dropDownContents", {
+    const dropDownContents = css({
         ...{
             "&&&": {
                 minWidth: styleUnit(vars.dropDownContents.minWidth),
@@ -553,15 +537,14 @@ export const titleBarClasses = useThemeCache(() => {
         },
     });
 
-    const count = style("count", {
+    const count = css({
         height: px(vars.count.size),
         fontSize: px(vars.count.fontSize),
         backgroundColor: vars.count.bg.toString(),
         color: vars.count.fg.toString(),
     });
 
-    const rightFlexBasis = style(
-        "rightFlexBasis",
+    const rightFlexBasis = css(
         {
             display: "flex",
             height: px(vars.sizing.height),
@@ -577,14 +560,13 @@ export const titleBarClasses = useThemeCache(() => {
         }),
     );
 
-    const leftFlexBasis = style("leftFlexBasis", {
+    const leftFlexBasis = css({
         ...flex.middleLeft(),
         flexShrink: 1,
         flexBasis: px(vars.endElements.mobile.flexBasis),
     });
 
-    const signIn = style(
-        "signIn",
+    const signIn = css(
         vars.guest.signInButtonType === ButtonTypes.TRANSPARENT && {
             "&&&": {
                 color: ColorsUtils.colorOut(vars.signIn.fg),
@@ -593,8 +575,7 @@ export const titleBarClasses = useThemeCache(() => {
         },
     );
 
-    const register = style(
-        "register",
+    const register = css(
         vars.guest.signInButtonType === ButtonTypes.TRANSLUCID && {
             backgroundColor: ColorsUtils.colorOut(vars.resister.bg),
             "&&": {
@@ -624,9 +605,9 @@ export const titleBarClasses = useThemeCache(() => {
         },
     );
 
-    const clearButtonClass = style("clearButtonClass", {});
+    const clearButtonClass = css({});
 
-    const guestButton = style("guestButton", {
+    const guestButton = css({
         "&&": {
             marginLeft: styleUnit(vars.guest.spacer),
             marginRight: styleUnit(vars.guest.spacer),
@@ -642,20 +623,20 @@ export const titleBarClasses = useThemeCache(() => {
         },
     });
 
-    const desktopNavWrap = style("desktopNavWrap", {
+    const desktopNavWrap = css({
         position: "relative",
         flexGrow: 1,
         ...(addGradientsToHintOverflow(globalVars.gutter.half * 4, vars.colors.bg) as any),
     });
 
-    const logoCenterer = style("logoCenterer", {
+    const logoCenterer = css({
         ...Mixins.absolute.middleOfParent(true),
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
     });
 
-    const logoLeftAligned = style("logoLeftAligned", {
+    const logoLeftAligned = css({
         position: "relative",
         height: percent(100),
         display: "flex",
@@ -663,8 +644,7 @@ export const titleBarClasses = useThemeCache(() => {
         justifyContent: "flex-start",
     });
 
-    const hamburger = style(
-        "hamburger",
+    const hamburger = css(
         {
             marginRight: styleUnit(12),
             marginLeft: negativeUnit(globalVars.buttonIcon.offset),
@@ -687,31 +667,31 @@ export const titleBarClasses = useThemeCache(() => {
         }),
     );
 
-    const isSticky = style("isSticky", {
+    const isSticky = css({
         ...sticky(),
         top: 0,
         zIndex: 10,
     });
 
-    const logoAnimationWrap = style("logoAnimationWrap", {
+    const logoAnimationWrap = css({
         display: "inline-flex",
         alignItems: "center",
     });
 
-    const overlay = style("overlay", {
+    const overlay = css({
         ...Mixins.absolute.fullSizeOfParent(),
         background: vars.overlay.background,
     });
 
-    const signInIconOffset = style("signInIconOffset", {
+    const signInIconOffset = css({
         marginRight: negativeUnit(globalVars.buttonIcon.offset + 3),
     });
 
-    const titleBarContainer = style("titleBarContainer", {
+    const titleBarContainer = css({
         ...Mixins.border(vars.titleBarContainer.border),
     });
 
-    const skipNav = style("skipNav", {
+    const skipNav = css({
         position: "absolute",
         backgroundColor: ColorsUtils.colorOut(globalVars.mainColors.bg),
         color: "gray",
@@ -805,10 +785,9 @@ const getLogoMaxHeight = (vars, mobile: boolean) => {
 
 export const titleBarLogoClasses = useThemeCache(() => {
     const vars = titleBarVariables();
-    const style = styleFactory("titleBarLogo");
     const mediaQueries = vars.mediaQueries();
 
-    const logoFrame = style("logoFrame", {
+    const logoFrame = css({
         display: "inline-flex",
         alignSelf: "center",
         justifyContent: "center",
@@ -821,8 +800,7 @@ export const titleBarLogoClasses = useThemeCache(() => {
         maxWidth: styleUnit(vars.logo.mobile.maxWidth ?? vars.logo.maxWidth),
     };
 
-    const logo = style(
-        "logo",
+    const logo = css(
         {
             display: "block",
             maxHeight: styleUnit(getLogoMaxHeight(vars, false)),
@@ -836,9 +814,9 @@ export const titleBarLogoClasses = useThemeCache(() => {
         mediaQueries.compact(mobileLogoStyles),
     );
 
-    const mobileLogo = style("mobileLogo", mobileLogoStyles);
+    const mobileLogo = css(mobileLogoStyles);
 
-    const isCenter = style("isCenter", {
+    const isCenter = css({
         position: "absolute",
         left: percent(50),
         transform: translate(`-50%`, `-50%`),

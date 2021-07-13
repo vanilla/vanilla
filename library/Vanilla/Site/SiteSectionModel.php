@@ -228,6 +228,13 @@ class SiteSectionModel {
     }
 
     /**
+     * Reset the current site section.
+     */
+    public function resetCurrentSiteSection() {
+        $this->currentSiteSection = null;
+    }
+
+    /**
      * Register application available
      *
      * @param string $app

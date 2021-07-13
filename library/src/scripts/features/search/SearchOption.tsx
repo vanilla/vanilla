@@ -14,7 +14,7 @@ import { metasClasses } from "@library/metas/Metas.styles";
 import classNames from "classnames";
 import { OptionProps } from "react-select/lib/components/Option";
 import { PlacesSearchListingItem } from "@library/search/PlacesSearchListingContainer";
-import { searchBarClasses } from "@library/features/search/searchBarStyles";
+import { searchBarClasses } from "@library/features/search/SearchBar.styles";
 import DateTime from "@library/content/DateTime";
 import { MetaTag } from "@library/metas/Metas";
 

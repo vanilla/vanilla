@@ -6,7 +6,7 @@
 
 import Translate from "@library/content/Translate";
 import { IComboBoxOption, ISearchBarProps } from "@library/features/search/ISearchBarProps";
-import { ISearchBarOverwrites, searchBarClasses } from "@library/features/search/searchBarStyles";
+import { ISearchBarOverwrites, searchBarClasses } from "@library/features/search/SearchBar.styles";
 import { searchBarVariables } from "@library/features/search/SearchBar.variables";
 import { SearchScope } from "@library/features/search/SearchScope";
 import Button from "@library/forms/Button";
@@ -29,6 +29,7 @@ import { ActionMeta, InputActionMeta } from "react-select/lib/types";
 import { useSearchScope } from "@library/features/search/SearchScopeContext";
 import { PLACES_CATEGORY_TYPE, PLACES_KNOWLEDGE_BASE_TYPE, PLACES_GROUP_TYPE } from "@library/search/searchConstants";
 import { Icon } from "@vanilla/icons";
+import { cx } from "@emotion/css";
 import { sprintf } from "sprintf-js";
 
 // Re-exported after being moved.
@@ -476,7 +477,8 @@ function SearchBarControl(props: IControlProps) {
                     submit={true}
                     id={searchButtonID}
                     buttonType={props.buttonType}
-                    className={classNames("searchBar-submitButton", props.buttonClassName ?? classes.actionButton)}
+                    className={cx(classes.submitButton, props.buttonClassName ?? classes.actionButton)}
+                    tabIndex={!searchButtonIsVisible ? 0 : -1}
                 >
                     {props.isLoading ? (
                         <ButtonLoader className={props.buttonLoaderClassName} buttonType={props.buttonType} />

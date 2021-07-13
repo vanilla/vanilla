@@ -1,11 +1,12 @@
 /**
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
-import { bannerVariables, bannerClasses, BannerAlignment } from "@library/banner/bannerStyles";
+import { bannerVariables, BannerAlignment, IBannerOptions } from "@library/banner/Banner.variables";
+import { bannerClasses } from "@library/banner/Banner.styles";
 import clamp from "lodash/clamp";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import merge from "lodash/merge";
@@ -14,7 +15,6 @@ import { IMediaQueryFunction } from "@library/layout/types/interface.panelLayout
 import { Variables } from "@library/styles/Variables";
 import { cx, css } from "@emotion/css";
 import { styleUnit } from "@library/styles/styleUnit";
-import { IBannerOptions } from "./bannerStyles";
 
 export const CONTENT_BANNER_MAX_HEIGHT = 180;
 export const CONTENT_BANNER_MIN_HEIGHT = 80;
@@ -98,7 +98,7 @@ export const contentBannerVariables = useThemeCache(
 export const contentBannerClasses = useThemeCache(
     (mediaQueries: IMediaQueryFunction, options?: { debug?: boolean | string }) => {
         const vars = contentBannerVariables();
-        const classes = bannerClasses(mediaQueries, vars, "contentBanner", options);
+        const classes = bannerClasses(mediaQueries, vars);
         return {
             ...classes,
             textAndSearchContainer: cx(

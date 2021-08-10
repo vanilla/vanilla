@@ -1,6 +1,6 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -9,6 +9,7 @@ import { t } from "@library/utility/appUtils";
 import { IOptionalComponentID, useUniqueID } from "@library/utility/idUtils";
 import { checkRadioClasses } from "@library/forms/checkRadioStyles";
 import classNames from "classnames";
+import { cx } from "@emotion/css";
 
 interface IProps extends IOptionalComponentID {
     id?: string;
@@ -41,9 +42,9 @@ export default function RadioButton(props: IProps) {
 
     return (
         <>
-            <label className={classNames(classes.root, props.className, { isHorizontal })}>
+            <label className={cx(classes.root, { isHorizontal }, props.className)}>
                 <input
-                    className={classNames(classes.input, "exclude-icheck", props.fakeFocus && "focus-visible")}
+                    className={cx(classes.input, "exclude-icheck", { "focus-visible": props.fakeFocus })}
                     onChange={props.onChange}
                     aria-disabled={props.disabled}
                     name={props.name}

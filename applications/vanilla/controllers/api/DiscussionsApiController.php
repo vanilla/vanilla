@@ -20,6 +20,7 @@ use Vanilla\Forum\Controllers\Api\DiscussionsApiIndexSchema;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Models\CrawlableRecordSchema;
 use Vanilla\Models\DirtyRecordModel;
+use Vanilla\Models\Model;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\SchemaFactory;
 use Vanilla\Search\SearchOptions;
@@ -32,7 +33,6 @@ use Vanilla\Web\SmartIDMiddleware;
  * API Controller for the `/discussions` resource.
  */
 class DiscussionsApiController extends AbstractApiController {
-
     use CommunitySearchSchemaTrait;
     use \Vanilla\Formatting\FormatCompatTrait;
 
@@ -79,6 +79,9 @@ class DiscussionsApiController extends AbstractApiController {
      */
     private $discussionPatchSchema;
 
+    /** @var RecordStatusModel */
+    private $recordStatusModel;
+
     /**
      * DiscussionsApiController constructor.
      *
@@ -90,6 +93,7 @@ class DiscussionsApiController extends AbstractApiController {
      * @param SiteSectionModel $siteSectionModel
      * @param DiscussionTypeConverter $discussionTypeConverter
      * @param DiscussionExpandSchema $discussionExpandableSchema
+     * @param RecordStatusModel $recordStatusModel
      */
     public function __construct(
         DiscussionModel $discussionModel,
@@ -99,7 +103,8 @@ class DiscussionsApiController extends AbstractApiController {
         TagModel $tagModel,
         SiteSectionModel $siteSectionModel,
         DiscussionTypeConverter $discussionTypeConverter,
-        DiscussionExpandSchema $discussionExpandableSchema
+        DiscussionExpandSchema $discussionExpandableSchema,
+        RecordStatusModel $recordStatusModel
     ) {
         $this->categoryModel = $categoryModel;
         $this->discussionModel = $discussionModel;
@@ -109,6 +114,7 @@ class DiscussionsApiController extends AbstractApiController {
         $this->siteSectionModel = $siteSectionModel;
         $this->discussionTypeConverter = $discussionTypeConverter;
         $this->discussionExpandSchema = $discussionExpandableSchema;
+        $this->recordStatusModel = $recordStatusModel;
     }
 
     /**
@@ -184,8 +190,7 @@ class DiscussionsApiController extends AbstractApiController {
     /**
      * Delete a list of discussions.
      *
-     * @param array $body The discussion's ids.
-     * @throws ClientException If a discussion could not be deleted.
+     * @param array $body The request body.
      */
     public function delete_list(array $body) {
         $this->permission('Garden.SignIn.Allow');
@@ -198,10 +203,54 @@ class DiscussionsApiController extends AbstractApiController {
             ],
         ], 'in');
         $in->validate($body);
-        $result = $this->discussionModel->deleteDiscussions($body['discussionIDs']);
-        if (!empty($result)) {
-            throw new ClientException('Some discussions could not be deleted.', 400, ['discussionIDs' => implode($result, ',')]);
-        }
+        $this->discussionModel->deleteDiscussions($body['discussionIDs']);
+    }
+
+    /**
+     * Move a list of discussions.
+     *
+     * @param array $body The request body.
+     */
+    public function patch_move(array $body) {
+        $this->permission('Garden.Moderation.Manage');
+        $in = $this->schema([
+            'discussionIDs:a' => [
+                'items' => [
+                    'type' => 'integer',
+                ],
+                'description' => 'List of discussion IDs to move.',
+            ],
+            'categoryID:i',
+            'isRedirect:b?'
+        ], 'in');
+        $body = $in->validate($body);
+        $categoryID = $body['categoryID'];
+        $isRedirect = $body['isRedirect'] ?? false;
+        $this->discussionModel->moveDiscussions($body['discussionIDs'], $categoryID, $isRedirect);
+    }
+
+    /**
+     * Merge discussions.
+     *
+     * @param array $body The request's body.
+     */
+    public function patch_merge(array $body) {
+        $this->permission('Garden.Moderation.Manage');
+        $in = $this->schema([
+            'discussionsIDs:a' => [
+                'items' => [
+                    'type' => 'integer',
+                ],
+                'description' => 'List of discussions to merge.',
+            ],
+            'destinationDiscussionID:i',
+            'isRedirect:b?'
+        ], 'in');
+        $in->validate($body);
+        $sourceDiscussionIDs = $body['discussionsIDs'];
+        $destinationDiscussionID = $body['destinationDiscussionID'];
+        $isRedirect = $body['isRedirect'] ?? false;
+        $this->discussionModel->mergeDiscussions($sourceDiscussionIDs, $destinationDiscussionID, $isRedirect);
     }
 
     /**
@@ -559,7 +608,7 @@ class DiscussionsApiController extends AbstractApiController {
             $announceWhere = array_merge($where, ['d.Announce >' => '0']);
             $rows = $this->discussionModel->getAnnouncements($announceWhere, $offset, $limit, $query['sort'] ?? '')->resultArray();
         } else {
-            $pinOrder = array_key_exists('pinOrder', $query) ? $query['pinOrder'] : null;
+            $pinOrder = $query['pinOrder'] ?? null;
             [$orderField, $orderDirection] = \Vanilla\Models\LegacyModelUtils::orderFieldDirection($query['sort'] ?? '');
             if ($pinOrder == 'first') {
                 $announcements = $this->discussionModel->getAnnouncements($where, $offset, $limit, $query['sort'] ?? '')->resultArray();
@@ -603,14 +652,140 @@ class DiscussionsApiController extends AbstractApiController {
         return new Data($result, ['paging' => $paging]);
     }
 
+    // region Status Management
+
+    /**
+     * Delete a single status by its numeric ID.
+     *
+     * @param int $statusID
+     * @return Data
+     */
+    public function delete_statuses(int $statusID): Data {
+        $this->permission("Garden.Settings.Manage");
+
+        $where = [
+            "recordType" => "discussion",
+            "statusID" => $statusID,
+        ];
+        $this->recordStatusModel->selectSingle($where);
+        $this->recordStatusModel->delete($where, [Model::OPT_LIMIT => 1]);
+
+        return new Data(null);
+    }
+
+    /**
+     * Get a single status by its numeric ID.
+     *
+     * @param int $statusID
+     * @return Data
+     */
+    public function get_statuses(int $statusID): Data {
+        $this->permission();
+
+        $in = $this->schema([]);
+        $out = $this->schema($this->recordStatusModel->getSchema());
+
+        $where = [
+            "recordType" => "discussion",
+            "statusID" => $statusID,
+        ];
+        $row = $this->recordStatusModel->selectSingle($where);
+
+        $result = $out->validate($row);
+        return new Data($result);
+    }
+
+    /**
+     * Get all available statuses.
+     *
+     * @param array $query
+     * @return Data
+     */
+    public function index_statuses($query = []): Data {
+        $this->permission();
+
+        $in = $this->schema([
+            "state",
+            "subType",
+        ])->add($this->recordStatusModel->getSchema());
+        $out = $this->schema([":a" => $this->recordStatusModel->getSchema()]);
+
+        $where = $in->validate($query, true) + ["recordType" => "discussion"];
+        $rows = $this->recordStatusModel->select($where);
+
+        $result = $out->validate($rows);
+        return new Data($result);
+    }
+
+    /**
+     * Update a single status by its numeric ID.
+     *
+     * @param int $statusID
+     * @param array $body
+     * @return Data
+     */
+    public function patch_statuses(int $statusID, array $body = []): Data {
+        $this->permission("Garden.Settings.Manage");
+
+        $in = $this->schema(Schema::parse([
+            "isDefault",
+            "name",
+            "state",
+            "recordSubtype",
+        ])->add($this->recordStatusModel->getSchema()));
+        $out = $this->schema($this->recordStatusModel->getSchema());
+
+        $body = $in->validate($body, true);
+
+        $where = [
+            "recordType" => "discussion",
+            "statusID" => $statusID,
+        ];
+        $this->recordStatusModel->selectSingle($where);
+
+        $this->recordStatusModel->update($body, $where, [Model::OPT_LIMIT => 1]);
+        $row = $this->recordStatusModel->selectSingle($where);
+
+        $result = $out->validate($row);
+        return new Data($result);
+    }
+
+    /**
+     * Create a new status.
+     *
+     * @param array $body
+     * @return Data
+     */
+    public function post_statuses(array $body = []): Data {
+        $this->permission("Garden.Settings.Manage");
+
+        $in = $this->schema(Schema::parse([
+            "name",
+            "isDefault?",
+            "state?",
+            "recordSubtype?",
+        ])->add($this->recordStatusModel->getSchema()));
+        $out = $this->schema($this->recordStatusModel->getSchema());
+
+        $body = $in->validate($body) + ["recordType" => "discussion"];
+        $statusID = $this->recordStatusModel->insert($body);
+        $row = $this->recordStatusModel->selectSingle(["statusID" => $statusID]);
+
+        $result = $out->validate($row);
+        return new Data($result, 201);
+    }
+
+    // endregion
+
     /**
      * Update a discussion.
      *
      * @param int $id The ID of the discussion.
      * @param array $body The request body.
      * @param array $query The request query.
-     * @throws NotFoundException if unable to find the discussion.
      * @return array
+     * @throws ClientException If discussion editing is not allowed.
+     * @throws NotFoundException If unable to find the discussion.
      */
     public function patch($id, array $body, array $query = []) {
         $this->permission('Garden.SignIn.Allow');
@@ -622,6 +797,10 @@ class DiscussionsApiController extends AbstractApiController {
         $body = $in->validate($body, true);
 
         $row = $this->discussionByID($id);
+        $canEdit = $this->discussionModel::canEdit($row);
+        if (!$canEdit) {
+            throw new ClientException('Editing discussions is not allowed.');
+        }
         $discussionData = ApiUtils::convertInputKeys($body);
         $discussionData['DiscussionID'] = $id;
         $categoryID = $row['CategoryID'];
@@ -668,8 +847,9 @@ class DiscussionsApiController extends AbstractApiController {
      *
      * @param array $body The request body.
      * @param array $query The request query.
-     * @throws ServerException if the discussion could not be created.
      * @return array
+     * @throws NotFoundException If a category is not found.
+     * @throws ServerException If the discussion could not be created.
      */
     public function post(array $body, array $query = []) {
         $this->permission('Garden.SignIn.Allow');
@@ -679,6 +859,10 @@ class DiscussionsApiController extends AbstractApiController {
 
         $body = $in->validate($body);
         $categoryID = $body['categoryID'];
+        $category = CategoryModel::categories($categoryID);
+        if (!$category) {
+            throw new NotFoundException('Category');
+        }
         $categoryPermissionID = self::getPermissionID($categoryID);
         $this->discussionModel->categoryPermission('Vanilla.Discussions.Add', $categoryID);
         $this->fieldPermission($body, 'closed', 'Vanilla.Discussions.Close', $categoryPermissionID);

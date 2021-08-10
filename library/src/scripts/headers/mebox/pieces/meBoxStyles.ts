@@ -12,6 +12,7 @@ import { formElementsVariables } from "@library/forms/formElementStyles";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { css } from "@emotion/css";
+import { Mixins } from "@library/styles/Mixins";
 
 export const meBoxClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -42,8 +43,22 @@ export const meBoxClasses = useThemeCache(() => {
         borderRadius: styleUnit(globalVars.border.radius),
     });
 
+    const meboxItem = css({
+        display: "flex",
+        alignItems: "center",
+        flexDirection: "column",
+    });
+
+    const label = css({
+        ...Mixins.font({ ...titleBarVars.meBox.label.font }),
+        ...Mixins.margin({ ...titleBarVars.meBox.label.spacing }),
+        whiteSpace: "nowrap",
+    });
+
     return {
         root,
         buttonContent,
+        meboxItem,
+        label,
     };
 });

@@ -878,6 +878,9 @@ components:
     CategoryPreferences:
       type: object
       properties:
+        useEmailNotifications:
+          nullable: true
+          type: boolean
         postNotifications:
           nullable: true
           type: string

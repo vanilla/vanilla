@@ -20,6 +20,7 @@ interface IProps extends IOptionalComponentID {
     onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
     label: React.ReactNode;
     labelBold?: boolean;
+    hideLabel?: boolean;
     isHorizontal?: boolean;
     fakeFocus?: boolean;
     defaultChecked?: boolean;
@@ -63,9 +64,14 @@ export default function CheckBox(props: IProps) {
             {props.label && (
                 <span
                     id={labelID}
-                    className={classNames(classes.label, props.tooltipLabel && visibility().visuallyHidden, {
-                        [classes.labelBold]: labelBold,
-                    })}
+                    className={classNames(
+                        classes.label,
+                        props.tooltipLabel && visibility().visuallyHidden,
+                        props.hideLabel === true && visibility().visuallyHidden,
+                        {
+                            [classes.labelBold]: labelBold,
+                        },
+                    )}
                 >
                     {props.label}
                 </span>

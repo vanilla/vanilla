@@ -502,11 +502,10 @@ export const iconClasses = useThemeCache(() => {
             "&:hover:not(.Bookmarked) .svgBookmark-mainPath": svgStyles(normalState.state),
             "&:focus:not(.Bookmarked) .svgBookmark-mainPath": svgStyles(normalState.state),
             "&:active:not(.Bookmarked) .svgBookmark-mainPath": svgStyles(normalState.state),
-            "&:Bookmarking .svgBookmark-mainPath": svgStyles({
+            "&.Bookmarking .svgBookmark-mainPath": svgStyles({
                 fill: important("none"),
                 opacity: loadingState.opacity,
             }),
-            "&:Bookmarking .svgBookmark-loadingPath": svgStyles({}),
             ".svgBookmark-loadingPath": {
                 display: "none",
             },

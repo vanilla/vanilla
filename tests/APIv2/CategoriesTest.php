@@ -745,6 +745,7 @@ class CategoriesTest extends AbstractResourceTest {
      */
     public function testNotificationPreferencesSet(
         ?string $postNotifications,
+        ?bool $useEmailNotifications,
         ?bool $expectedFollowing,
         ?bool $expectedDiscussionsApp,
         ?bool $expectedDiscussionsEmail,
@@ -757,9 +758,13 @@ class CategoriesTest extends AbstractResourceTest {
         $userID = $user["userID"];
         $this->api()->setUserID($userID);
 
+        $request = [CategoryModel::PREFERENCE_KEY_NOTIFICATION => $postNotifications];
+        if (is_bool($useEmailNotifications)) {
+            $request[CategoryModel::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS] = $useEmailNotifications;
+        }
         $this->api()->patch(
             "{$this->baseUrl}/{$categoryID}/preferences/{$userID}",
-            [CategoryModel::PREFERENCE_KEY_NOTIFICATION => $postNotifications]
+            $request
         );
 
         $actualFollowing = self::$categoryModel->isFollowed($userID, $categoryID);
@@ -768,10 +773,10 @@ class CategoriesTest extends AbstractResourceTest {
         /** @var \UserMetaModel $userMetaModel */
         $userMetaModel = $this->container()->get(\UserMetaModel::class);
         $preferences = [
-            2 => "Preferences.Popup.NewDiscussion.%d",
-            3 => "Preferences.Email.NewDiscussion.%d",
-            4 => "Preferences.Popup.NewComment.%d",
-            5 => "Preferences.Email.NewComment.%d",
+            3 => "Preferences.Popup.NewDiscussion.%d",
+            4 => "Preferences.Email.NewDiscussion.%d",
+            5 => "Preferences.Popup.NewComment.%d",
+            6 => "Preferences.Email.NewComment.%d",
         ];
         foreach ($preferences as $arg => $preference) {
             $expected = func_get_arg($arg);
@@ -781,7 +786,8 @@ class CategoriesTest extends AbstractResourceTest {
             $actual = $meta[$key];
             $this->assertSame(
                 $expected,
-                $actual === null ? $actual : (bool)$actual
+                $actual === null ? $actual : (bool)$actual,
+                "{$key} was not set as expected."
             );
         }
     }
@@ -793,11 +799,104 @@ class CategoriesTest extends AbstractResourceTest {
      */
     public function providePostNotificationsData(): array {
         return [
-            CategoryModel::NOTIFICATION_ALL => [CategoryModel::NOTIFICATION_ALL, true, true, true, true, true],
-            CategoryModel::NOTIFICATION_DISCUSSIONS => [CategoryModel::NOTIFICATION_DISCUSSIONS, true, true, true, null, null],
-            CategoryModel::NOTIFICATION_FOLLOW => [CategoryModel::NOTIFICATION_FOLLOW, true, null, null, null, null],
-            "null" => [null, false, null, null, null, null],
+            CategoryModel::NOTIFICATION_ALL => [
+                CategoryModel::NOTIFICATION_ALL, null, true, true, null, true, null
+            ],
+            CategoryModel::NOTIFICATION_DISCUSSIONS => [
+                CategoryModel::NOTIFICATION_DISCUSSIONS, null, true, true, null, null, null
+            ],
+            CategoryModel::NOTIFICATION_FOLLOW => [
+                CategoryModel::NOTIFICATION_FOLLOW, null, true, null, null, null, null
+            ],
+            CategoryModel::NOTIFICATION_ALL . ", opt into emails" => [
+                CategoryModel::NOTIFICATION_ALL, true, true, true, true, true, true
+            ],
+            CategoryModel::NOTIFICATION_DISCUSSIONS . ", opt into emails" => [
+                CategoryModel::NOTIFICATION_DISCUSSIONS, true, true, true, true, null, null
+            ],
+            CategoryModel::NOTIFICATION_ALL . ", opt out of emails" => [
+                CategoryModel::NOTIFICATION_ALL, false, true, true, null, true, null
+            ],
+            CategoryModel::NOTIFICATION_DISCUSSIONS . ", opt out of emails" => [
+                CategoryModel::NOTIFICATION_DISCUSSIONS, false, true, true, null, null, null
+            ],
+            "null" => [
+                null, null, false, null, null, null, null
+            ],
         ];
+    }
+
+    /**
+     * Provide data for testing the useEmailNotifications field, specifically.
+     *
+     * @return array
+     */
+    public function provideUseEmailNotificationsData(): array {
+        $data = $this->providePostNotificationsData();
+        $result = array_filter($data, function ($data) {
+            return is_bool($data[1]);
+        });
+
+        return $result;
+    }
+
+    /**
+     * Verify ability to update a user's legacy notification settings via the postNotifications preference.
+     *
+     * @param string|null $postNotifications
+     * @param bool $useEmailNotifications
+     * @param bool|null $expectedFollowing
+     * @param bool|null $expectedDiscussionsApp
+     * @param bool|null $expectedDiscussionsEmail
+     * @param bool|null $expectedCommentsApp
+     * @param bool|null $expectedCommentsEmail
+     * @dataProvider provideUseEmailNotificationsData
+     */
+    public function testUseEmailNotificationsSet(
+        ?string $postNotifications,
+        bool $useEmailNotifications,
+        ?bool $expectedFollowing,
+        ?bool $expectedDiscussionsApp,
+        ?bool $expectedDiscussionsEmail,
+        ?bool $expectedCommentsApp,
+        ?bool $expectedCommentsEmail
+    ): void {
+        $category = $this->createCategory();
+        $categoryID = $category["categoryID"];
+        $user = $this->createUser();
+        $userID = $user["userID"];
+        $this->api()->setUserID($userID);
+
+        // Setup notifications in a separate request, before attempting to modify email notification settings.
+        $this->api()->patch(
+            "{$this->baseUrl}/{$categoryID}/preferences/{$userID}",
+            [CategoryModel::PREFERENCE_KEY_NOTIFICATION => $postNotifications]
+        );
+        $this->api()->patch(
+            "{$this->baseUrl}/{$categoryID}/preferences/{$userID}",
+            [CategoryModel::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS => $useEmailNotifications]
+        );
+
+        /** @var \UserMetaModel $userMetaModel */
+        $userMetaModel = $this->container()->get(\UserMetaModel::class);
+        $preferences = [
+            3 => "Preferences.Popup.NewDiscussion.%d",
+            4 => "Preferences.Email.NewDiscussion.%d",
+            5 => "Preferences.Popup.NewComment.%d",
+            6 => "Preferences.Email.NewComment.%d",
+        ];
+        foreach ($preferences as $arg => $preference) {
+            $expected = func_get_arg($arg);
+
+            $key = sprintf($preference, $categoryID);
+            $meta = $userMetaModel->getUserMeta($userID, $key);
+            $actual = $meta[$key];
+            $this->assertSame(
+                $expected,
+                $actual === null ? $actual : (bool)$actual,
+                "{$key} was not set as expected."
+            );
+        }
     }
 
     /**
@@ -817,7 +916,10 @@ class CategoriesTest extends AbstractResourceTest {
 
         $actual = array_shift($response);
         $this->assertSame([
-            "preferences" => [CategoryModel::PREFERENCE_KEY_NOTIFICATION => CategoryModel::NOTIFICATION_FOLLOW],
+            "preferences" => [
+                CategoryModel::PREFERENCE_KEY_NOTIFICATION => CategoryModel::NOTIFICATION_FOLLOW,
+                CategoryModel::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS => false,
+            ],
             "categoryID" => $categoryID,
             "name" => $category["name"],
             "url" => $category["url"],

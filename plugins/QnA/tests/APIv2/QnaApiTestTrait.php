@@ -38,10 +38,7 @@ trait QnaApiTestTrait {
      * @return array
      */
     public function createQuestion(array $overrides = []): array {
-        $categoryID = $overrides['categoryID'] ?? $this->lastInsertedCategoryID;
-        if ($categoryID === null) {
-            throw new \Exception('Could not insert a test discussion because no category was specified.');
-        }
+        $categoryID = $overrides['categoryID'] ?? $this->lastInsertedCategoryID ?? -1;
         $question = $this->api()->post('discussions/question', $overrides + [
             'categoryID' => $categoryID,
             'name' => 'Question',

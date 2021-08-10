@@ -52,6 +52,9 @@ class SiteMeta implements \JsonSerializable {
     /** @var UserModel $userModel */
     private $userModel;
 
+    /** @var Contracts\ConfigurationInterface */
+    private $config;
+
     /** @var string[] */
     private $allowedExtensions;
 
@@ -153,7 +156,7 @@ class SiteMeta implements \JsonSerializable {
      * SiteMeta constructor.
      *
      * @param RequestInterface $request The request to gather data from.
-     * @param Contracts\ConfigurationInterface $config The configuration object.
+     * @param Contracts\ConfigurationInterface $config The config object.
      * @param SiteSectionModel $siteSectionModel
      * @param DeploymentCacheBuster $deploymentCacheBuster
      * @param ThemeFeatures $themeFeatures
@@ -178,7 +181,7 @@ class SiteMeta implements \JsonSerializable {
         SearchService $searchService
     ) {
         $this->host = $request->getHost();
-
+        $this->config = $config;
         $this->formatService = $formatService;
 
         // We the roots from the request in the form of "" or "/asd" or "/asdf/asdf"
@@ -323,6 +326,7 @@ class SiteMeta implements \JsonSerializable {
                 'currentUser' => $this->userModel->currentFragment(),
                 'editContentTimeout' => $this->editContentTimeout,
                 'bannedPrivateProfile' => $this->bannedPrivateProfiles,
+                'useAdminCheckboxes' => boolval($this->config->get('Vanilla.AdminCheckboxes.Use', false)),
             ],
             'search' => [
                 'defaultScope' => $this->defaultSearchScope,

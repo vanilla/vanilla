@@ -37,10 +37,11 @@ export const frameFooterClasses = useThemeCache(() => {
     });
 
     const justifiedRight = style("justifiedRight", {
-        ...{
-            "&&": {
-                justifyContent: "flex-end",
-            },
+        "&&": {
+            justifyContent: "flex-end",
+        },
+        "& > *": {
+            marginLeft: globalVars.spacer.componentInner,
         },
     });
 

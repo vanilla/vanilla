@@ -7,11 +7,17 @@
 
 namespace VanillaTests\Library\Core;
 
-use VanillaTests\SharedBootstrapTestCase;
 use VanillaTests\Fixtures\FooBarController;
 use VanillaTests\Fixtures\UnitTestGdnDispatcher;
+use VanillaTests\SiteTestCase;
+use VanillaTests\UsersAndRolesApiTestTrait;
 
-class DispatcherTest extends SharedBootstrapTestCase {
+/**
+ * Tests for GdnDispatcher.
+ */
+class DispatcherTest extends SiteTestCase {
+
+    use UsersAndRolesApiTestTrait;
 
     /**
      * Test **Gdn_Dispatcher::filterName()**.
@@ -123,5 +129,43 @@ class DispatcherTest extends SharedBootstrapTestCase {
         ];
 
         return array_column($r, null, 0);
+    }
+
+    /**
+     * Test endpoints that can't be blocked by private communities.
+     *
+     * @param string $method
+     * @param string $url
+     *
+     * @dataProvider provideCantBlockUrls
+     */
+    public function testCantBlockRequests(string $method, string $url) {
+        \Gdn::config()->saveToConfig('Garden.PrivateCommunity', true);
+        $this->runWithUser(function () use ($method, $url) {
+            $dispatcher = \Gdn::dispatcher();
+            $request = \Gdn_Request::create()->fromEnvironment()->setMethod($method)->setUrl($url);
+            $canBlock = $dispatcher->getCanBlock($request);
+            $this->assertEquals(\Gdn_Dispatcher::BLOCK_NEVER, $canBlock);
+        }, \UserModel::GUEST_USER_ID);
+    }
+
+    /**
+     * @return array
+     */
+    public function provideCantBlockUrls() {
+        return [
+            ['POST', '/api/v2/applicants'],
+            ['POST', '/api/v2/applicants/apply-somehow'],
+            ['GET', '/api/v2/applicants/my-application'],
+            ['GET', '/api/v2/locales/en.js'],
+            ['GET', '/api/v2/locales/fr'],
+            ['GET', '/dist'],
+            ['GET', '/dist/forum/anything/at/all.min.js'],
+            ['GET', '/dist/forum/anything/at/all.min.js?Asdfasdf'],
+            ['GET', '/asset/someasset.font'],
+            ['POST', '/authenticate/to/somewhere'],
+            ['GET', '/utility/update'],
+            ['POST', '/utility/update'],
+        ];
     }
 }

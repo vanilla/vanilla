@@ -1,0 +1,151 @@
+openapi: 3.0.2
+info:
+paths:
+  /discussions/statuses:
+    get:
+      description: Get known discussion statuses.
+      tags:
+        - Statuses
+      parameters:
+        - name: subType
+          in: query
+          schema:
+            type: string
+        - name: state
+          in: query
+          schema:
+            type: string
+            enum:
+              - open
+              - closed
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RecordStatus'
+        '400':
+          description: Bad Request
+    post:
+      description: Create a new discussion status.
+      tags:
+        - Statuses
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecordStatusPost'
+        required: true
+      responses:
+        '201':
+          $ref: '#/components/responses/RecordStatusResponse'
+        '400':
+          description: Bad Request
+        '404':
+          description: Not found
+  /discussions/statuses/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      description: Get a discussion status by its ID.
+      tags:
+        - Statuses
+      responses:
+        '200':
+          $ref: '#/components/responses/RecordStatusResponse'
+        '404':
+          description: Not Found
+    patch:
+      description: Update a discussion status.
+      tags:
+        - Statuses
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecordStatusPatch'
+      responses:
+        '200':
+          $ref: '#/components/responses/RecordStatusResponse'
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+    delete:
+      description: Delete a discussion status.
+      tags:
+        - Statuses
+      responses:
+        '204':
+          description: OK
+        '404':
+          description: Not Found
+components:
+  responses:
+    RecordStatusResponse:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RecordStatus'
+  schemas:
+    RecordStatus:
+      type: object
+      properties:
+        statusID:
+          type: string
+        name:
+          type: string
+        state:
+          type: string
+          enum:
+            - open
+            - closed
+        recordType:
+          type: string
+          minLength: 1
+        recordSubtype:
+          type: string
+          nullable: true
+        isDefault:
+          type: boolean
+          default: false
+    RecordStatusPatch:
+      type: object
+      properties:
+        name:
+          type: string
+        isDefault:
+          type: boolean
+        state:
+          type: string
+          enum:
+            - open
+            - closed
+        recordSubtype:
+          type: string
+          nullable: true
+    RecordStatusPost:
+      type: object
+      properties:
+        name:
+          type: string
+        isDefault:
+          type: boolean
+        state:
+          type: string
+          enum:
+            - open
+            - closed
+        recordSubtype:
+          type: string
+          nullable: true
+      required:
+        - name

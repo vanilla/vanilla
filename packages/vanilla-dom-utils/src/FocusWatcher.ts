@@ -100,7 +100,7 @@ export class FocusWatcher {
                 (event as any).explicitOriginalTarget, // Firefox
             ];
 
-            let activeElement = null;
+            let activeElement: HTMLElement | null = null;
             for (const target of possibleTargets) {
                 if (target && target !== document.body) {
                     activeElement = target;
@@ -112,6 +112,13 @@ export class FocusWatcher {
                 const isWatchedInBody = document.body.contains(this.watchedNode);
                 const isFocusedInBody = document.body.contains(activeElement);
                 const isInModal = this.isElementInModal(activeElement);
+                const isReachComboxBox =
+                    activeElement.matches("[data-reach-popover]") || activeElement.closest("[data-reach-popover");
+                if (isReachComboxBox || isInModal) {
+                    // do nothing.
+                    return;
+                }
+
                 const hasFocus = Boolean(
                     this.watchedNode &&
                         activeElement &&
@@ -123,7 +130,7 @@ export class FocusWatcher {
                 // It could happen that our flyout is unmounted in between the setTimeout call.
                 // We might have focused on a modal which can't be in the watched tree.
                 if (isWatchedInBody && isFocusedInBody) {
-                    callback(hasFocus || isInModal, activeElement as Element);
+                    callback(hasFocus, activeElement as Element);
                 }
             }
         }, 0);

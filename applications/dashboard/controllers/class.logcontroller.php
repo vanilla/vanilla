@@ -211,13 +211,18 @@ class LogController extends DashboardController {
      *
      * @param string $recordType
      * @param int $recordID
+     * @throws Gdn_UserException If non-system user accesses recordType configuration.
      */
     public function record($recordType, $recordID, $page = '') {
         $this->permission('Garden.Moderation.Manage');
+
         list($offset, $limit) = offsetLimit($page, 10);
         $this->setData('Title', t('Change Log'));
 
         $recordType = ucfirst($recordType);
+        if ($recordType === 'Configuration' && Gdn::session()->User->Admin !== 2) {
+            throw forbiddenException('@'.t('You do not have permission to access the requested resource.'));
+        }
         $where = [
             'Operation' => ['Edit', 'Delete', 'Ban'],
             'RecordType' => $recordType,

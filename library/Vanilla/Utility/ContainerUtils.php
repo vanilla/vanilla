@@ -9,6 +9,7 @@ namespace Vanilla\Utility;
 
 use Garden\Container\Callback;
 use Garden\Container\Container;
+use Garden\Container\Reference;
 use Garden\Container\ReferenceInterface;
 use Psr\Container\ContainerInterface;
 use Vanilla\Contracts\ConfigurationInterface;

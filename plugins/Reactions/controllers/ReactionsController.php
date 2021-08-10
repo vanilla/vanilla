@@ -157,7 +157,7 @@ class ReactionsController extends DashboardController {
     public function edit($urlCode) {
         $this->permission('Garden.Community.Manage');
         $this->title('Edit Reaction');
-        $this->addSideMenu('reactions');
+        $this->setHighlightRoute('reactions');
 
         $reaction = ReactionModel::reactionTypes($urlCode);
         if (!$reaction) {
@@ -200,6 +200,12 @@ class ReactionsController extends DashboardController {
                 $this->Form->setFormValue('Custom', 1);
             }
 
+            // Save image and populate the Photo field with the saved image filename.
+            if (isset($formPostValues['Photo']) && $formPostValues['Photo'] !== "") {
+                $image = $this->savePhoto($urlCode);
+                $this->Form->setFormValue("Photo", $image);
+            }
+
             if ($this->Form->save() !== false) {
                 $reaction = ReactionModel::reactionTypes($urlCode);
                 $this->setData('Reaction', $reaction);
@@ -214,6 +220,65 @@ class ReactionsController extends DashboardController {
         }
 
         $this->render('addedit', '', 'plugins/Reactions');
+    }
+
+    /**
+     * Save a photo and return the temp name.
+     *
+     * @param string $urlCode The reaction Url code.
+     * @return string
+     * @throws \Garden\Container\ContainerException Container Exception.
+     * @throws \Garden\Container\NotFoundException Not Found Exception.
+     */
+    public function savePhoto(string $urlCode): string {
+        // Upload image
+        $uploadImage = Gdn::getContainer()->get(Gdn_UploadSvg::class);
+
+        // Validate the upload
+        $tmpImage = $uploadImage->validateUpload('Photo', true);
+
+        if ($tmpImage) {
+            // Generate the target image name.
+            $targetImage = $uploadImage->generateTargetName(PATH_UPLOADS.'/reactions', '', true);
+            $basename = pathinfo($targetImage, PATHINFO_BASENAME);
+
+            // Delete any previously uploaded image.
+            $reaction = ReactionModel::reactionTypes($urlCode);
+            if ($reaction && isset($reaction['Photo'])) {
+                $uploadImage->delete($reaction['Photo']);
+            }
+
+            // Save the uploaded image
+            $props = $uploadImage->saveAs(
+                $tmpImage,
+                "reactions/$basename"
+            );
+            return sprintf($props['SaveFormat'], "reactions/$basename");
+        }
+    }
+
+    /**
+     * Remove a reaction photo.
+     *
+     * @param string $reactionUrl The reaction code.
+     * @throws \Garden\Web\Exception\ResponseException Response Exception.
+     */
+    public function removePhoto(string $reactionUrl): void {
+        $this->permission('Garden.Community.Manage');
+        $reactionModel = new ReactionModel();
+        $reaction = ReactionModel::reactionTypes($reactionUrl);
+        $photo = $reaction['Photo'];
+
+        // Only attempt to delete a physical file, not a URL.
+        if (!isUrl($photo)) {
+            $reactionPhoto = changeBasename($photo, 'p%s');
+            $upload = new Gdn_Upload();
+            $upload->delete($reactionPhoto);
+        }
+
+        $reaction['Photo'] = null;
+        $reactionModel->save($reaction);
+        redirectTo('/reactions');
     }
 
     /**

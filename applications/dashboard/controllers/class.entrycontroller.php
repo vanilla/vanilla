@@ -29,6 +29,11 @@ class EntryController extends Gdn_Controller {
     protected $_RealDeliveryType;
 
     /**
+     * @var bool
+     */
+    private $connectSynchronizeErrors = false;
+
+    /**
      * Setup error message & override MasterView for popups.
      *
      * @since 2.0.0
@@ -398,13 +403,16 @@ class EntryController extends Gdn_Controller {
         // Basic page setup.
         $this->addJsFile('entry.js');
         $this->View = 'connect';
-        $this->addDefinition('Username already exists.', t('Username already exists.'));
         $this->addDefinition('Choose a name to identify yourself on the site.', t('Choose a name to identify yourself on the site.'));
         $this->setHeader('Cache-Control', \Vanilla\Web\CacheControlMiddleware::NO_CACHE);
         $this->setHeader('Vary', \Vanilla\Web\CacheControlMiddleware::VARY_COOKIE);
         // Determine what step in the process we're at.
-        $isPostBack = $this->Form->isPostBack() && $this->Form->getFormValue('Connect', null) !== null;
+        $isPostBack = $this->isConnectPostBack();
         $userSelect = $this->Form->getFormValue('UserSelect');
+
+        $nameUnique = c('Garden.Registration.NameUnique', true);
+        $emailUnique = c('Garden.Registration.EmailUnique', true);
+        $autoConnect = c('Garden.Registration.AutoConnect');
 
         /**
          * When a user is connecting through SSO she is prompted to choose a username.
@@ -413,6 +421,7 @@ class EntryController extends Gdn_Controller {
          */
         $allowConnect = c('Garden.Registration.AllowConnect', true);
         $this->setData('AllowConnect', $allowConnect);
+        $this->setData('HidePassword', true);
         $this->addDefinition('AllowConnect', $allowConnect);
 
         if (!$isPostBack) {
@@ -455,7 +464,8 @@ class EntryController extends Gdn_Controller {
             // Your SSO magic said no.
             $this->Form->addError($ex);
 
-            return $this->render('ConnectError');
+            $this->render('ConnectError');
+            return;
         } catch (Exception $ex) {
             // Your SSO magic blew up.
             if (debug()) {
@@ -464,21 +474,48 @@ class EntryController extends Gdn_Controller {
                 $this->Form->addError('There was an error fetching the connection data.');
             }
 
-            return $this->render('ConnectError');
+            $this->render('ConnectError');
+            return;
+        }
+
+        if (!$this->data('Verified')) {
+            // Whatever event handler catches this must set the data 'Verified' = true
+            // to prevent a random site from connecting without credentials.
+            // This must be done EVERY postback and is VERY important.
+            throw new Gdn_UserException(t('The connection data has not been verified.'));
+        }
+
+        // If we allow autoConnect & the SSO provider didn't supply an email address, then panick because this is a vulnerability.
+        if ($autoConnect && !$this->Form->getFormValue('Email')) {
+            throw new Gdn_UserException("Unable to auto-connect because SSO did not provide an email address.");
+        }
+
+        $userModel = $this->UserModel;
+
+        // Find an existing user associated with this provider & uniqueid.
+        $auth = $userModel->getAuthentication($this->Form->getFormValue('UniqueID'), $this->Form->getFormValue('Provider')) ?: [];
+        $userID = $auth['UserID'] ?? false;
+        $alreadyConnected = !empty($userID);
+
+
+        // Hide form controls for already connected users.
+        if ($alreadyConnected) {
+            $this->setData('NoConnectName', true);
+            $this->setData('HidePassword', true);
         }
 
         // Allow a provider to not send an email address but require one be manually entered.
         $userProvidedEmail = false;
         // If we require an email address.
-        if (!UserModel::noEmail()) {
+        if (!UserModel::noEmail() && !$alreadyConnected) {
             $emailProvided = $this->Form->getFormValue('Email');
             $emailRequested = $this->Form->getFormValue('EmailVisible');
             if (!$emailProvided || $emailRequested) {
                 $this->Form->setFormValue('EmailVisible', true);
                 $this->Form->addHidden('EmailVisible', true);
 
-                if ($isPostBack) {
-                    $this->Form->setFormValue('Email', val('Email', $currentData));
+                if ($isPostBack && !empty($currentData['Email'])) {
+                    $this->Form->setFormValue('Email', $currentData['Email']);
                     $userProvidedEmail = true;
                 }
             }
@@ -486,6 +523,15 @@ class EntryController extends Gdn_Controller {
                 $this->Form->validateRule('Email', 'ValidateRequired');
                 $this->Form->validateRule('Email', 'ValidateEmail');
             }
+        } else {
+            // Hide the email field for already connected users or when there are no emails.
+            $this->Form->setFormValue('EmailVisible', false);
+        }
+
+        // Allow a provider to not send a username.
+        if ($isPostBack && !$alreadyConnected && empty($this->Form->getFormValue('Name')) && empty($this->Form->getFormValue('UserSelect'))) {
+            $this->Form->validateRule('ConnectName', 'ValidateRequired');
+            $this->Form->validateRule('ConnectName', 'ValidateUsername');
         }
 
         // Make sure the minimum required data has been provided by the connection.
@@ -494,13 +540,6 @@ class EntryController extends Gdn_Controller {
         }
         if (!$this->Form->getFormValue('UniqueID')) {
             $this->Form->addError('ValidateRequired', t('UniqueID'));
-        }
-
-        if (!$this->data('Verified')) {
-            // Whatever event handler catches this must set the data 'Verified' = true
-            // to prevent a random site from connecting without credentials.
-            // This must be done EVERY postback and is VERY important.
-            $this->Form->addError(t('The connection data has not been verified.'));
         }
 
         // If we've accrued errors, stop here and show them.
@@ -537,37 +576,13 @@ class EntryController extends Gdn_Controller {
             $saveRolesRegister = false;
         }
 
-        $userModel = Gdn::userModel();
-
-        // Find an existing user associated with this provider & uniqueid.
-        $auth = $userModel->getAuthentication($this->Form->getFormValue('UniqueID'), $this->Form->getFormValue('Provider'));
-        $userID = val('UserID', $auth);
-
         // The user is already in the UserAuthentication table
         if ($userID) {
-            $this->Form->setFormValue('UserID', $userID);
-
             // Update their info.
-            if (c('Garden.Registration.ConnectSynchronize', true)) {
-                $user = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
-                $data = $this->Form->formValues();
-
-                // Don't overwrite the user photo if the user uploaded a new one.
-                $photo = val('Photo', $user);
-                if ($photo && !isUrl($photo)) {
-                    unset($data['Photo']);
-                }
-
-                // Synchronize the user's data.
-                $userModel->save($data, [
-                    UserModel::OPT_NO_CONFIRM_EMAIL => true,
-                    UserModel::OPT_FIX_UNIQUE => true,
-                    UserModel::OPT_SAVE_ROLES => $saveRoles,
-                    UserModel::OPT_VALIDATE_NAME => !$isTrustedProvider,
-                    UserModel::OPT_ROLE_SYNC => $userModel->getConnectRoleSync(),
-                ]);
-                $this->EventArguments['UserID'] = $userID;
-                $this->fireEvent('AfterConnectSave');
+            $this->Form->setFormValue('UserID', $userID);
+            $user = $this->syncConnectUser($userID, $this->Form->formValues(), $saveRoles, $isTrustedProvider);
+            if ($user === false) {
+                return;
             }
 
             // Always save the attributes because they may contain authorization information.
@@ -584,17 +599,8 @@ class EntryController extends Gdn_Controller {
             $this->_setRedirect(Gdn::request()->get('display') === 'popup');
 
             // If a name or email has been provided
-        } elseif ($this->Form->getFormValue('Name') || $this->Form->getFormValue('Email')) {
+        } elseif ($this->Form->getFormValue('Name') || $this->Form->getFormValue('ConnectName') || $this->Form->getFormValue('Email')) {
             // Decide how to handle our first time connecting.
-            $nameUnique = c('Garden.Registration.NameUnique', true);
-            $emailUnique = c('Garden.Registration.EmailUnique', true);
-            $autoConnect = c('Garden.Registration.AutoConnect');
-
-            // If we allow autoConnect & the SSO provider didn't supply an email address,
-            // we do not allow the autoConnection by throwing an exception.
-            if ($autoConnect && !$emailProvided) {
-                throw new Gdn_UserException("Unable to auto-connect because SSO did not provide an email address.");
-            }
 
             // Decide which name to search for.
             if ($isPostBack && $this->Form->getFormValue('ConnectName')) {
@@ -641,26 +647,11 @@ class EntryController extends Gdn_Controller {
                             // Add the UserID to the form, then get the unified user data set from it.
                             $userID = $row['UserID'];
                             $this->Form->setFormValue('UserID', $userID);
-                            $data = $this->Form->formValues();
 
                             // User synchronization.
-                            if (c('Garden.Registration.ConnectSynchronize', true)) {
-                                // Don't overwrite a photo if the user has already uploaded one.
-                                $photo = val('Photo', $row);
-                                if (!val('Photo', $data) || ($photo && !stringBeginsWith($photo, 'http'))) {
-                                    unset($data['Photo']);
-                                }
-
-                                // Update the user.
-                                $userModel->save($data, [
-                                    UserModel::OPT_NO_CONFIRM_EMAIL => true,
-                                    UserModel::OPT_FIX_UNIQUE => true,
-                                    UserModel::OPT_SAVE_ROLES => $saveRoles,
-                                    UserModel::OPT_VALIDATE_NAME => !$isTrustedProvider,
-                                    UserModel::OPT_ROLE_SYNC => $userModel->getConnectRoleSync(),
-                                ]);
-                                $this->EventArguments['UserID'] = $userID;
-                                $this->fireEvent('AfterConnectSave');
+                            $user = $this->syncConnectUser($userID, $this->Form->formValues(), $saveRoles, $isTrustedProvider);
+                            if ($user === false) {
+                                return;
                             }
 
                             // Always save the attributes because they may contain authorization information.
@@ -735,6 +726,9 @@ class EntryController extends Gdn_Controller {
 
             // Set our final answer on matched users.
             $this->setData('ExistingUsers', $existingUsers);
+            if (!empty($existingUsers)) {
+                $this->setData('HidePassword', false);
+            }
 
             // Validate our email address if we have one.
             if (UserModel::noEmail()) {
@@ -882,6 +876,12 @@ class EntryController extends Gdn_Controller {
                                     } else {
                                         $this->addCredentialErrorToForm('The password you entered is incorrect.');
                                     }
+                                } else {
+                                    // Update their info.
+                                    $user = $this->syncConnectUser($user['UserID'], $this->Form->formValues(), $saveRoles, $isTrustedProvider);
+                                    if ($user === false) {
+                                        return;
+                                    }
                                 }
                             } catch (Gdn_UserException $ex) {
                                 $this->Form->addError($ex);
@@ -898,7 +898,7 @@ class EntryController extends Gdn_Controller {
             } elseif ($this->Form->errorCount() == 0) {
                 // The user doesn't exist so we need to add another user.
                 $user = $this->Form->formValues();
-                $user['Name'] = $user['ConnectName'] ?? $user['Name'];
+                $user['Name'] = $user['ConnectName'] ?? ($user['Name'] ?? '');
                 $user['Password'] = randomString(16); // Required field.
                 $user['HashMethod'] = 'Random';
                 $userID = $userModel->register($user, [
@@ -952,6 +952,59 @@ class EntryController extends Gdn_Controller {
         } // End of user choice processing.
 
         $this->render();
+    }
+
+    /**
+     * Synchronize a user's information from SSO to an existing user.
+     *
+     * Note: This method should ONLY be called from within `connect()`. This method will render the current view if there
+     * is an error as a kludge around `connect()`'s deep code paths.
+     *
+     * @param int $userID The ID of the user to synchronize.
+     * @param array $data The user data from the submitted form.
+     * @param bool $saveRoles Whether or not to save roles.
+     * @param bool $isTrustedProvider Whether or not the SSO provider is trusted.
+     * @return array|bool Returns the user if connect can continue or **false** if it should bail and return immediately.
+     */
+    private function syncConnectUser(int $userID, array $data, bool $saveRoles, bool $isTrustedProvider) {
+        $userModel = $this->UserModel;
+        $user = $userModel->getID($userID, DATASET_TYPE_ARRAY);
+
+        // This function will synchronize the user
+        if (!c('Garden.Registration.ConnectSynchronize', true)) {
+            return $user;
+        }
+
+        // Don't overwrite the user photo if the user uploaded a new one.
+        $photo = val('Photo', $user);
+        if ($photo && !isUrl($photo)) {
+            unset($data['Photo']);
+        }
+
+        // Synchronize the user's data.
+        $userModel->Validation->reset();
+        $saved = $userModel->save(['UserID' => $userID] + $data, [
+            UserModel::OPT_NO_CONFIRM_EMAIL => true,
+            UserModel::OPT_FIX_UNIQUE => true,
+            UserModel::OPT_SAVE_ROLES => $saveRoles,
+            UserModel::OPT_VALIDATE_NAME => !$isTrustedProvider,
+            UserModel::OPT_ROLE_SYNC => $userModel->getConnectRoleSync(),
+        ]);
+
+        // If the user failed to save then force a rendering of the connect form.
+        if (!$saved && $this->getShowConnectSynchronizeErrors()) {
+            $this->Form->removeFormValue('UserID');
+            $this->setData('NoConnectName', true);
+            $this->Form->setValidationResults($userModel->validationResults());
+            $this->render();
+            return false;
+        }
+
+        $this->EventArguments['UserID'] = $userID;
+        $this->fireEvent('AfterConnectSave');
+        // Do a quick overwrite of the DB user with saved data.
+        $user = $data + $user;
+        return $user;
     }
 
     /**
@@ -1267,6 +1320,38 @@ class EntryController extends Gdn_Controller {
         }
 
         return "register{$registrationMethod}";
+    }
+
+    /**
+     * Return whether or not the entry/connect page is in a postback state.
+     *
+     * The entry/connect page supports an HTTP POST for its initial request. This was originally done to support SSO for
+     * for SAML, but is a core feature now. Basically, we check to make sure the actual "Connect" button was pressed to
+     * determine a "real" postback.
+     *
+     * @return bool
+     */
+    public function isConnectPostBack(): bool {
+        $isPostBack = $this->Form->isPostBack() && $this->Form->getFormValue('Connect', null) !== null;
+        return $isPostBack;
+    }
+
+    /**
+     * Whether or not to halt SSO if there is an error synchronizing user information.
+     *
+     * @return bool
+     */
+    public function getShowConnectSynchronizeErrors(): bool {
+        return $this->connectSynchronizeErrors;
+    }
+
+    /**
+     * Set whether or not to halt SSO if there is an error synchronizing user information.
+     *
+     * @param bool $connectSynchronizeErrors
+     */
+    public function setShowConnectSynchronizeErrors(bool $connectSynchronizeErrors): void {
+        $this->connectSynchronizeErrors = $connectSynchronizeErrors;
     }
 
     /**

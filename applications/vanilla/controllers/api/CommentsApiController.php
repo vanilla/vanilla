@@ -17,6 +17,7 @@ use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Search\SearchOptions;
 use Vanilla\Search\SearchResultItem;
 use Vanilla\Search\SearchService;
+use Garden\Web\Exception\ClientException;
 
 /**
  * API Controller for the `/comments` resource.
@@ -427,6 +428,7 @@ class CommentsApiController extends AbstractApiController {
      * @param int $id The ID of the comment.
      * @param array $body The request body.
      * @return array
+     * @throws ClientException If comment editing is not allowed.
      */
     public function patch($id, array $body) {
         $this->permission('Garden.SignIn.Allow');
@@ -439,6 +441,10 @@ class CommentsApiController extends AbstractApiController {
         $commentData = ApiUtils::convertInputKeys($body);
         $commentData['CommentID'] = $id;
         $row = $this->commentByID($id);
+        $canEdit = CommentModel::canEdit($row);
+        if (!$canEdit) {
+            throw new ClientException('Editing comments is not allowed.');
+        }
         if ($row['InsertUserID'] !== $this->getSession()->UserID) {
             $discussion = $this->discussionByID($row['DiscussionID']);
             $this->discussionModel->categoryPermission('Vanilla.Comments.Edit', $discussion['CategoryID']);
@@ -471,7 +477,6 @@ class CommentsApiController extends AbstractApiController {
      */
     public function post(array $body) {
         $this->permission('Garden.SignIn.Allow');
-
         $in = $this->commentPostSchema('in')->setDescription('Add a comment.');
         $out = $this->commentSchema('out');
 

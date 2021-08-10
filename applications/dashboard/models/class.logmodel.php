@@ -22,6 +22,14 @@ class LogModel extends Gdn_Pluggable {
 
     use PrunableTrait;
 
+    const TYPE_EDIT = 'Edit';
+    const TYPE_DELETE = 'Delete';
+    const TYPE_SPAM = 'Spam';
+    const TYPE_MODERATE = 'Moderate';
+    const TYPE_PENDING = 'Pending';
+    const TYPE_BAN = 'Ban';
+    const TYPE_ERROR = 'Error';
+
     /** @var int Timestamp of when to prune delete logs. */
     private $deletePruneAfter;
 
@@ -175,14 +183,14 @@ class LogModel extends Gdn_Pluggable {
         $this->delete(
             [
                 $this->getPruneField().' <' => $dateCommonPrune->format('Y-m-d H:i:s'),
-                'Operation' => ['Edit','Spam','Moderate','Error'],
+                'Operation' => [self::TYPE_EDIT, self::TYPE_SPAM, self::TYPE_MODERATE, self::TYPE_ERROR],
             ],
             $options
         );
         $this->delete(
             [
                 $this->getPruneField().' <' => $dateDeletePrune->format('Y-m-d H:i:s'),
-                'Operation' => 'Delete',
+                'Operation' => self::TYPE_DELETE,
             ],
             $options
         );
@@ -206,7 +214,7 @@ class LogModel extends Gdn_Pluggable {
 
         foreach ($logs as $log) {
             $recordType = $log['RecordType'];
-            if (in_array($log['Operation'], ['Spam', 'Moderate']) && array_key_exists($recordType, $models)) {
+            if (in_array($log['Operation'], [self::TYPE_SPAM, self::TYPE_MODERATE]) && array_key_exists($recordType, $models)) {
                 /** @var Gdn_Model $model */
                 $model = $models[$recordType];
                 $recordID = $log['RecordID'];
@@ -916,7 +924,7 @@ class LogModel extends Gdn_Pluggable {
         }
 
         switch ($log['Operation']) {
-            case 'Edit':
+            case self::TYPE_EDIT:
                 // We are restoring an edit so just update the record.
                 $iDColumn = $log['RecordType'].'ID';
                 $where = [$iDColumn => $log['RecordID']];
@@ -928,11 +936,11 @@ class LogModel extends Gdn_Pluggable {
                 );
 
                 break;
-            case 'Delete':
-            case 'Spam':
-            case 'Moderate':
-            case 'Pending':
-            case 'Ban':
+            case self::TYPE_DELETE:
+            case self::TYPE_SPAM:
+            case self::TYPE_MODERATE:
+            case self::TYPE_PENDING:
+            case self::TYPE_BAN:
                 if (!$log['RecordID']) {
                     // This log entry was never in the table.
                     if (isset($set['DateInserted'])) {
@@ -941,7 +949,7 @@ class LogModel extends Gdn_Pluggable {
                 }
 
                 // Insert the record back into the db.
-                if ($log['Operation'] == 'Spam' && $log['RecordType'] == 'Registration') {
+                if ($log['Operation'] == self::TYPE_SPAM && $log['RecordType'] == 'Registration') {
                     saveToConfig(['Garden.Registration.NameUnique' => false, 'Garden.Registration.EmailUnique' => false], '', false);
                     if (isset($data['Username'])) {
                         $set['Name'] = $data['Username'];
@@ -984,7 +992,7 @@ class LogModel extends Gdn_Pluggable {
                     }
 
                     // Unban a user.
-                    if ($log['RecordType'] == 'User' && $log['Operation'] == 'Ban') {
+                    if ($log['RecordType'] == 'User' && $log['Operation'] == self::TYPE_BAN) {
                         Gdn::userModel()->save(["UserID" => $iD, "Banned" => 0]);
                     }
 
@@ -999,7 +1007,7 @@ class LogModel extends Gdn_Pluggable {
                             break;
                     }
 
-                    if ($log['Operation'] == 'Pending') {
+                    if ($log['Operation'] == self::TYPE_PENDING) {
                         switch ($log['RecordType']) {
                             case 'Discussion':
                                 if (val('UserDiscussion', $this->recalcIDs) && val($log['RecordUserID'], $this->recalcIDs['UserDiscussion'])) {
@@ -1055,6 +1063,5 @@ class LogModel extends Gdn_Pluggable {
         if ($deleteLog) {
             Gdn::sql()->delete('Log', ['LogID' => $log['LogID']]);
         }
-
     }
 }

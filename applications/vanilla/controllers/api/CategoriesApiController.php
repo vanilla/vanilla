@@ -577,7 +577,8 @@ class CategoriesApiController extends AbstractApiController {
         $this->permission($permission);
 
         $in = $this->schema([
-            CategoryModel::PREFERENCE_KEY_NOTIFICATION
+            CategoryModel::PREFERENCE_KEY_NOTIFICATION,
+            CategoryModel::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS,
         ])->add($this->categoryModel->preferencesSchema());
         $out = $this->categoryModel->preferencesSchema();
 

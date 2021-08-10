@@ -230,7 +230,7 @@
         "prepare-storybook-legacy": "./vendor/bin/phpunit -c phpunit.xml --testsuite=\"Storybook\"",
         "storybook:ui": "STORYBOOK_SECTION=ui yarn storybook",
         "storybook:foundation": "yarn prepare-storybook-legacy && STORYBOOK_SECTION=foundation yarn storybook",
-        "storybook": "NODE_OPTIONS=--max_old_space_size=2048 NODE_ENV=test node ./node_modules/.bin/start-storybook -p 9001 -c build/.storybook",
+        "storybook": "NODE_OPTIONS=--max_old_space_size=2500 NODE_ENV=test node ./node_modules/.bin/start-storybook -p 9001 -c build/.storybook",
         "storybook:modern": "STORYBOOK_SECTION=modern yarn storybook",
         "build-storybook": "yarn prepare-storybook-legacy && node --max-old-space-size=2048 ./node_modules/.bin/build-storybook -c build/.storybook -o build/.out",
         "chromatic": "chromatic test"

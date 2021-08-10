@@ -9,6 +9,7 @@ namespace VanillaTests\Controllers;
 use CategoryModel;
 use PermissionModel;
 use RoleModel;
+use TagModel;
 use VanillaTests\SiteTestCase;
 
 /**
@@ -24,6 +25,9 @@ class VanillaSettingsControllerTest extends SiteTestCase {
 
     /** @var PermissionModel */
     private $permissionModel;
+
+    /** TagModel */
+    private $tagModel;
 
     /**
      * Grab an array of category permissions, indexed by role ID.
@@ -48,9 +52,10 @@ class VanillaSettingsControllerTest extends SiteTestCase {
      */
     public function setUp(): void {
         parent::setUp();
-        $this->container()->call(function (CategoryModel $categoryModel, PermissionModel $permissionModel) {
+        $this->container()->call(function (CategoryModel $categoryModel, PermissionModel $permissionModel, TagModel $tagModel) {
             $this->categoryModel = $categoryModel;
             $this->permissionModel = $permissionModel;
+            $this->tagModel = $tagModel;
         });
     }
 
@@ -168,5 +173,26 @@ class VanillaSettingsControllerTest extends SiteTestCase {
             $discussionsView,
             (bool)$resultPermissions[RoleModel::MEMBER_ID]["Vanilla.Discussions.View"]
         );
+    }
+
+    /**
+     * Test deleting a reserved tag.
+     */
+    public function testDeleteTags(): void {
+        $tagIDReserved = $this->tagModel->save([
+            'Name' => 'test tag1',
+            'FullName' => 'test tag1',
+            'Type' => 'reaction'
+        ]);
+        $tagID = $this->tagModel->save([
+            'Name' => 'test tag2',
+            'FullName' => 'test tag2',
+        ]);
+        $this->bessy()->post("/settings/tags/delete/{$tagID}");
+        $this->bessy()->post("/settings/tags/delete/{$tagIDReserved}");
+        $resultReserved = $this->tagModel->getID($tagIDReserved, DATASET_TYPE_ARRAY);
+        $resultNotReserved = $this->tagModel->getID($tagID, DATASET_TYPE_ARRAY);
+        $this->assertNotEmpty($resultReserved);
+        $this->assertFalse($resultNotReserved);
     }
 }

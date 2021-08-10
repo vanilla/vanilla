@@ -773,6 +773,42 @@ class IgnorePlugin extends Gdn_Plugin {
     }
 
     /**
+     * Filter ignored users from a conversation.
+     *
+     * @param array $recipientIDs Conversation userIDs.
+     */
+    public function filterIgnoredUsers(array &$recipientIDs) {
+        $userID = Gdn::session()->UserID;
+        foreach ($recipientIDs as $key => $value) {
+            if ($this->ignored($userID, $value)) {
+                unset($recipientIDs[$key]);
+            }
+        }
+    }
+
+    /**
+     * Check for ignored users before saving a conversation.
+     *
+     * @param ConversationModel $sender
+     * @param array $args
+     */
+    public function conversationModel_beforeSaveValidation_handler(ConversationModel $sender, array $args) {
+        $recipientIDs = $args['FormPostValues']['RecipientUserID'] ?? false;
+        if ($recipientIDs) {
+            $recipientsCopy = $recipientIDs;
+            $this->filterIgnoredUsers($recipientIDs);
+            $result = array_diff($recipientsCopy, $recipientIDs);
+            if (!empty($result)) {
+                $result = implode(',', $result);
+                $sender->Validation->addValidationResult(
+                    'recipientUsers',
+                    sprintf(t(' You cannot start a conversation with the following users because they ignored you. %s'), $result)
+                );
+            }
+        }
+    }
+
+    /**
      * @param UserController $sender
      */
     public function userController_ignoreList_create($sender) {

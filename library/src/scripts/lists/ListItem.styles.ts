@@ -57,7 +57,19 @@ export const listItemClasses = useThemeCache(() => {
     });
 
     const iconContainer = css({
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
         marginRight: globalVars.spacer.componentInner,
+    });
+
+    const checkboxContainer = css({
+        marginRight: "8px",
+    });
+    const checkboxLabelAdjustment = css({
+        "& > label": {
+            paddingTop: "2px",
+        },
     });
 
     const metasContainer = css({});
@@ -118,6 +130,8 @@ export const listItemClasses = useThemeCache(() => {
         item,
         contentContainer,
         iconContainer,
+        checkboxContainer,
+        checkboxLabelAdjustment,
         inlineIconAndMetasContainer,
         inlineIconContainer,
         metasContainer,

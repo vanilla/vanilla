@@ -57,7 +57,7 @@ class FileUtils {
                 $name = randomString(12);
             }
             if ($chunk) {
-                $subdir = randomString(12).'/';
+                $subdir = sprintf('%03d', mt_rand(0, 999)).'/';
             }
             $path = "${targetDirectory}/{$subdir}${name}.${extension}";
         } while (file_exists($path));

@@ -11,13 +11,15 @@ import UserDropdown from "@library/headers/mebox/pieces/UserDropdown";
 import MessagesDropDown from "@library/headers/mebox/pieces/MessagesDropDown";
 import { IInjectableUserState } from "@library/features/users/userTypes";
 import NotificationsDropDown from "@library/headers/mebox/pieces/NotificationsDropDown";
-
+import { t } from "@library/utility/appUtils";
 export interface IMeBoxProps extends IInjectableUserState {
     countClass?: string;
     className?: string;
     countsClass?: string;
     buttonClassName?: string;
     contentClassName?: string;
+    withSeparator?: boolean;
+    withLabel?: boolean;
 }
 
 /**
@@ -30,11 +32,25 @@ export default class MeBox extends React.Component<IMeBoxProps> {
             return null;
         }
         const classes = meBoxClasses();
+        const separator = this.props.withSeparator && <span>|</span>;
+        const withLabel = this.props.withLabel;
         return (
             <div className={classNames("meBox", this.props.className, classes.root)}>
-                <NotificationsDropDown userSlug={userInfo.name} countUnread={userInfo.countUnreadNotifications} />
-                <MessagesDropDown />
-                <UserDropdown />
+                {separator}
+                <div className={classes.meboxItem}>
+                    <NotificationsDropDown userSlug={userInfo.name} countUnread={userInfo.countUnreadNotifications} />
+                    {withLabel && <div className={classes.label}>{t("Notifications")}</div>}
+                </div>
+                {separator}
+                <div className={classes.meboxItem}>
+                    <MessagesDropDown />
+                    {withLabel && <div className={classes.label}>{t("Messages")}</div>}
+                </div>
+                {separator}
+                <div className={classes.meboxItem}>
+                    <UserDropdown />
+                    {withLabel && <div className={classes.label}>{t("Profile")}</div>}
+                </div>
             </div>
         );
     }

@@ -50,7 +50,7 @@ class Bootstrap {
             ->rule(\DateTimeInterface::class)
             ->setAliasOf(\DateTimeImmutable::class)
             ->setConstructorArgs([null, null])
-            ;
+        ;
 
         // Caches
         $container

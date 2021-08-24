@@ -142,6 +142,8 @@ class TestDispatcher {
 
         $ex = null;
         try {
+            $this->lastOutput = null;
+
             // Capture output.
             ob_start();
             $dispatcher->dispatch($request, $options[self::OPT_PERMANENT]);
@@ -206,6 +208,15 @@ class TestDispatcher {
         TestCase::assertIsString($this->lastOutput, 'Control must output HTML');
         $document = new TestHtmlDocument($this->lastOutput);
         return $document;
+    }
+
+    /**
+     * Test whether or not there is a last HTML output.
+     *
+     * @return bool
+     */
+    public function hasLastHtml(): bool {
+        return $this->lastOutput !== null;
     }
 
     /**
@@ -310,6 +321,20 @@ class TestDispatcher {
         $form = $controller->Form;
         $message = \Gdn_Validation::resultsAsText($form->validationResults());
         TestCase::assertStringContainsString($partialMessage, $message);
+    }
+
+    /**
+     * Assert that a particular form field has an error.
+     *
+     * @param string $name The name of the form field.
+     */
+    public function assertFormFieldError(string $name): void {
+        $controller = $this->lastController;
+        TestCase::assertNotNull($controller, "The controller was not properly set to assert.");
+
+        /** @var \Gdn_Form $form */
+        $results = $controller->Form->validationResults();
+        TestCase::assertArrayHasKey($name, $results, "The form should have an error on the $name field.");
     }
 
     /**

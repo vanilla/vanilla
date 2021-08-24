@@ -19,6 +19,7 @@ use Vanilla\Community\Schemas\PostFragmentSchema;
 use Vanilla\Contracts\Formatting\FormatFieldInterface;
 use Vanilla\Contracts\Models\CrawlableInterface;
 use Vanilla\Contracts\Models\FragmentFetcherInterface;
+use Vanilla\CurrentTimeStamp;
 use Vanilla\Events\LegacyDirtyRecordTrait;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Formatting\DateTimeFormatter;
@@ -2299,12 +2300,18 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
         $this->EventArguments['DiscussionID'] = $rowID;
         $this->EventArguments['SetField'] = $property;
 
-        if (isset($property['Score'])) {
-            $property['hot'] = ((int)$property['Score']) + ($this->EventArguments['Discussion']->CountComments ?? 0);
-        }
-
         $this->addDirtyRecord('discussion', $rowID);
         parent::setField($rowID, $property, $value);
+
+        if (isset($property['Score']) || isset($property['CountComments'])) {
+            $px = $this->Database->DatabasePrefix;
+            $sql = <<<SQL
+    UPDATE {$px}Discussion d
+    SET d.hot = d.CountComments + COALESCE(d.Score, 0)
+    WHERE d.DiscussionID = :discussionID
+SQL;
+            $this->Database->query($sql, [":discussionID" => $rowID]);
+        }
         $this->fireEvent('AfterSetField');
     }
 
@@ -2803,18 +2810,10 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
         $categoryID = $discussion["CategoryID"] ?? null;
         $insertUserID = $discussion["InsertUserID"] ?? null;
 
-        // Figure out the category that governs this notification preference.
+        // Make sure the category exists.
         $category = CategoryModel::categories($categoryID);
         if ($category === null) {
             return;
-        }
-        $i = 0;
-        while ($category["Depth"] > 2 && $i < 20) {
-            if (!$category || $category["Archived"]) {
-                return;
-            }
-            $i++;
-            $category = CategoryModel::categories($category["ParentCategoryID"]);
         }
 
         // Grab all of the users that need to be notified.
@@ -2839,9 +2838,9 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
             }
 
             $name = $row["Name"];
-            if (strpos($name, ".Email.") !== false) {
+            if (str_contains($name, ".Email.")) {
                 $notifyUsers[$userID]["Emailed"] = ActivityModel::SENT_PENDING;
-            } elseif (strpos($name, ".Popup.") !== false) {
+            } elseif (str_contains($name, ".Popup.")) {
                 $notifyUsers[$userID]["Notified"] = ActivityModel::SENT_PENDING;
             }
         }
@@ -3359,7 +3358,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
      */
     public function deleteDiscussions(array $discussionIDs, bool $filtered = false): array {
         $result = [];
-        $startTime = time();
+        $startTime = CurrentTimeStamp::get();
         /**
          * @var \Gdn_Session $session
          */
@@ -3378,7 +3377,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
         foreach ($discussionIDs as $key => $value) {
             $this->deleteID($value);
             unset($checkedDiscussions[$value]);
-            $elapsedTime = time() - $startTime;
+            $elapsedTime = CurrentTimeStamp::get() - $startTime;
             if ($elapsedTime > self::MAX_TIME_BATCH || $key + 1 >= self::MAX_DELETE_LIMIT) {
                 break;
             }
@@ -3640,7 +3639,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
         $userModel = $this->userModel;
         // Get category permission.
         $categoryID = val('CategoryID', $discussion);
-        if ($userID && Gdn::session()->UserID === $userID) {
+        if ($userID && Gdn::session()->UserID === $userID && $categoryID) {
             $hasPermission = CategoryModel::checkPermission($categoryID, $permission);
         } else {
             $hasPermission = $userID && $userModel->getCategoryViewPermission($userID, $categoryID, $permission);

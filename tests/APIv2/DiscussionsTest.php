@@ -16,6 +16,7 @@ use Vanilla\DiscussionTypeConverter;
 use Vanilla\Exception\PermissionException;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\Models\TestDiscussionModelTrait;
+use VanillaTests\UsersAndRolesApiTestTrait;
 
 /**
  * Test the /api/v2/discussions endpoints.
@@ -28,6 +29,7 @@ class DiscussionsTest extends AbstractResourceTest {
     use TestSortingTrait;
     use TestDiscussionModelTrait;
     use TestFilterDirtyRecordsTrait;
+    use UsersAndRolesApiTestTrait;
 
     /** @var array */
     private static $categoryIDs = [];
@@ -494,6 +496,48 @@ class DiscussionsTest extends AbstractResourceTest {
         } catch (\Exception $e) {
             $this->assertEquals(403, $e->getCode());
         }
+    }
+
+    /**
+     * Test posting a discussion with a non-existing categoryID.
+     */
+    public function testPostInvalidCategory(): void {
+        $this->expectException(NotFoundException::class);
+        $discussionData = [
+            'name' => __FUNCTION__,
+            'categoryID' => rand(5000, 6000),
+            'format' => 'text',
+            'body' => __FUNCTION__
+        ];
+        $this->api()->post('/discussions', $discussionData);
+    }
+
+    /**
+     * Test editing a discussion.
+     */
+    public function testDiscussionCanEdit(): void {
+        $user = $this->createUser();
+        $discussion = $this->runWithUser(function () {
+            $data = [
+                "name" => "test discussion",
+                "body" => "Test discussion body",
+                "format" => "text",
+                "categoryID" => -1
+            ];
+            $discussion = $this->api()->post("/discussions", $data)->getBody();
+            $this->api()->post("/discussions/{$discussion['discussionID']}", ["body" => 'edited discussion']);
+            $result = $this->api()->get("/discussions/{$discussion['discussionID']}")->getBody();
+            $this->assertEquals("edited discussion", $result['body']);
+            return $discussion;
+        }, $user);
+        $this->runWithConfig([
+            'Garden.EditContentTimeout' => '0'
+        ], function () use ($user, $discussion) {
+            \Gdn::session()->start($user['userID']);
+            $this->expectExceptionMessage('Editing discussions is not allowed.');
+            $this->expectExceptionCode(400);
+            $this->api()->post("/discussions/{$discussion['discussionID']}", ["body" => 'edited discussion2']);
+        });
     }
 
     /**

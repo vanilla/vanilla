@@ -15,6 +15,7 @@ use Gdn;
 use Vanilla\Community\Events\DiscussionEvent;
 use Vanilla\Formatting\Formats\RichFormat;
 use Vanilla\Scheduler\Job\LocalApiBulkDeleteJob;
+use Vanilla\Utility\ArrayUtils;
 use VanillaTests\APIv2\TestSortingTrait;
 use VanillaTests\Bootstrap;
 use VanillaTests\EventSpyTestTrait;
@@ -1116,5 +1117,21 @@ class DiscussionModelTest extends SiteTestCase {
             return $this->discussionModel->filterCategoryPermissions($discussionIDs, 'Vanilla.Discussions.Delete');
         }, $userGuest);
         $this->assertEmpty($result);
+    }
+
+    /**
+     * Test DiscussionModel::CheckPermission().
+     */
+    public function testCheckPermission(): void {
+        $category = $this->createCategory();
+        $discussion =  $this->createDiscussion(['categoryID' => $category['categoryID']]);
+        $discussion = ArrayUtils::pascalCase($discussion);
+        $result = $this->discussionModel->checkPermission($discussion, 'Vanilla.Discussions.View');
+        $this->assertTrue($result);
+        $result = $this->discussionModel->checkPermission($discussion, 'View');
+        $this->assertTrue($result);
+        unset($discussion['CategoryID']);
+        $result = $this->discussionModel->checkPermission($discussion, 'Vanilla.Discussions.View');
+        $this->assertFalse($result);
     }
 }

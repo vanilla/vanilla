@@ -419,7 +419,7 @@ $DateInsertedExists = $Construct->columnExists('DateInserted');
 
 $Construct
     ->column('TagID', 'int', false, 'primary')
-    ->column('DiscussionID', 'int', false, 'primary')
+    ->column('DiscussionID', 'int', false, ['primary', 'index.DiscussionID'])
     ->column('CategoryID', 'int', false, 'index')
     ->column('DateInserted', 'datetime', !$DateInsertedExists)
     ->engine('InnoDB')

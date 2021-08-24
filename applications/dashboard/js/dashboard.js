@@ -739,7 +739,7 @@ var DashboardModal = (function() {
                 // We'll only reload if there are no targets set. If there are targets set, we can
                 // assume that the page doesn't need to be reloaded, since we'll ajax remove/edit
                 // the page.
-                if (this.settings.reloadPageOnSave && (json.Targets.length === 0)) {
+                if (this.settings.reloadPageOnSave && !json.Targets || (json.Targets.length === 0)) {
                     document.location.replace(window.location.href);
                 }
             }

@@ -1540,11 +1540,11 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
             if ($Discussion->CategoryID > 0) {
                 CategoryModel::instance()->incrementLastComment($Fields);
             }
-            $this->notifyNewComment(
-                $Fields ? (array)$Fields : null,
-                $Discussion ? (array)$Discussion : null
-            );
         }
+        $this->notifyNewComment(
+            $Fields ? (array)$Fields : null,
+            $Discussion ? (array)$Discussion : null
+        );
     }
 
     /**
@@ -1562,19 +1562,10 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
 
         $categoryID = val('CategoryID', $discussion);
 
-        // Figure out the category that governs this notification preference.
-        $i = 0;
+        // Make sure the category actually exists.
         $category = CategoryModel::categories($categoryID);
         if (!$category) {
             return;
-        }
-
-        while ($category['Depth'] > 2 && $i < 20) {
-            if (!$category || $category['Archived']) {
-                return;
-            }
-            $i++;
-            $category = CategoryModel::categories($category['ParentCategoryID']);
         }
 
         // Grab all of the users that need to be notified.
@@ -1596,9 +1587,9 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
             }
 
             $name = $row['Name'];
-            if (strpos($name, '.Email.') !== false) {
+            if (str_contains($name, '.Email.')) {
                 $notifyUsers[$userID]['Emailed'] = ActivityModel::SENT_PENDING;
-            } elseif (strpos($name, '.Popup.') !== false) {
+            } elseif (str_contains($name, '.Popup.')) {
                 $notifyUsers[$userID]['Notified'] = ActivityModel::SENT_PENDING;
             }
         }

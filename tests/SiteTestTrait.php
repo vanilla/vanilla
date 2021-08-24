@@ -460,7 +460,7 @@ TEMPLATE;
      * @param int $userID The user to check.
      * @param array $roles The expected roles.
      */
-    private function assertUserHasRoles(int $userID, array $roles) {
+    protected function assertUserHasRoles(int $userID, array $roles) {
         $userRoles = $this->userModel->getRoleIDs($userID);
         foreach ($roles as $role) {
             if (!is_numeric($role)) {
@@ -469,5 +469,14 @@ TEMPLATE;
 
             $this->assertContains($role, $userRoles);
         }
+    }
+
+    /**
+     * Make sure that there is no active session.
+     *
+     * @param string $message
+     */
+    public static function assertNotSignedIn($message = ''): void {
+        TestCase::assertFalse(\Gdn::session()->isValid(), $message ?: "There shouldn't be a user signed in right now.");
     }
 }

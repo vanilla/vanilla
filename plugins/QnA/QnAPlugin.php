@@ -1913,6 +1913,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
                     'QnA',
                     $qna ? $qna : 'Unanswered'
                 );
+                $this->recalculateDiscussionQnA($discussion);
                 break;
             default:
                 $this->discussionModel->setField($discussionID, 'QnA', null);

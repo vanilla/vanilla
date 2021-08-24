@@ -1657,6 +1657,10 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface {
      */
     public function save($formPostValues, $settings = false) {
         $primaryKeyValue = val($this->PrimaryKey, $formPostValues);
+        if (isset($formPostValues['Photo']) && $formPostValues['Photo'] === '') {
+            unset($formPostValues['Photo']);
+        }
+
         $isFormValid = $this->validate($formPostValues);
         if (!$primaryKeyValue || !$isFormValid) {
             return false;
@@ -1887,7 +1891,7 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface {
                     "urlcode" => $type["UrlCode"],
                 ];
                 $code =strtolower($type["UrlCode"]);
-                $photoUrl = self::ICON_BASE_URL . "$code.svg";
+                $photoUrl = isset($type['Photo']) ? Gdn_Upload::url($type['Photo']): self::ICON_BASE_URL . "$code.svg";
                 $result[$userID][$type["UrlCode"]]["PhotoUrl"] = $photoUrl;
             }
         }

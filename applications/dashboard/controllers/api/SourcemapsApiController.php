@@ -39,7 +39,7 @@ class SourcemapsApiController extends AbstractApiController {
 
         $result = new Data('');
         if ($sourceMapsEnabled) {
-            $fullPath = PATH_ROOT.DS.'dist'.DS.ltrim($path, '/');
+            $fullPath = PATH_ROOT.DS.PATH_DIST_NAME.DS.ltrim($path, '/');
             $realPath  = realpath($fullPath);
             if ($fullPath === $realPath) {
                 $result->setData(file_get_contents($fullPath));

@@ -37,10 +37,11 @@ trait CommunityApiTestTrait {
      * Create a category.
      *
      * @param array $overrides Fields to override on the insert.
+     * @param array $extras Extra category fields.
      *
      * @return array
      */
-    public function createCategory(array $overrides = []): array {
+    public function createCategory(array $overrides = [], array $extras = []): array {
         $salt = '-' . round(microtime(true) * 1000) . rand(1, 1000);
         $name = "Test Category $salt";
         $categoryID = $overrides['parentCategoryID'] ?? $this->lastInsertedCategoryID;
@@ -55,6 +56,10 @@ trait CommunityApiTestTrait {
             ];
         $result = $this->api()->post('/categories', $params)->getBody();
         $this->lastInsertedCategoryID = $result['categoryID'];
+        $categoryModel = \CategoryModel::instance();
+        if (!empty($extras)) {
+            $categoryModel->setField($this->lastInsertedCategoryID, $extras);
+        }
         return $result;
     }
 
@@ -89,10 +94,11 @@ trait CommunityApiTestTrait {
      * Create a discussion.
      *
      * @param array $overrides Fields to override on the insert.
+     * @param array $extras Extra fields to set directly in the model.
      *
      * @return array
      */
-    public function createDiscussion(array $overrides = []): array {
+    public function createDiscussion(array $overrides = [], array $extras = []): array {
         $categoryID = $overrides['categoryID'] ?? $this->lastInsertedCategoryID ?? -1;
 
         if ($categoryID === null) {
@@ -105,11 +111,24 @@ trait CommunityApiTestTrait {
             'body' => 'Hello Discussion',
             'categoryID' => $categoryID,
         ];
-        $result = $this->api()->post('/discussions', $params)->getBody();
+
+        $type = $overrides['type'] ?? 'discussion';
+        $apiUrl = '/discussions';
+        if ($type !== 'discussion') {
+            $apiUrl .= '/' . strtolower($type);
+        }
+
+        $result = $this->api()->post($apiUrl, $params)->getBody();
         $this->lastInsertedDiscussionID = $result['discussionID'];
 
         if (isset($overrides['score'])) {
             $this->setDiscussionScore($this->lastInsertedDiscussionID, $overrides['score']);
+        }
+
+        if (!empty($extras)) {
+            /** @var \DiscussionModel $discussionModel */
+            $discussionModel = \Gdn::getContainer()->get(\DiscussionModel::class);
+            $discussionModel->setField($this->lastInsertedDiscussionID, $extras);
         }
         return $result;
     }

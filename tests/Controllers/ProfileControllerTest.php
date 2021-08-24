@@ -199,6 +199,46 @@ class ProfileControllerTest extends SiteTestCase {
     }
 
     /**
+     * Test that preferences can be set in bulk.
+     */
+    public function testBulkPreferences() {
+        // Needed so preferences don't get stripped off.
+        \Gdn::config()->saveToConfig('Api.Clean', false);
+        $user = $this->createUser([
+            'name' => 'preference_user',
+        ]);
+        $this->api()->setUserID($user['userID']);
+
+        $url = '/profile/preferences/preference_user.json';
+
+        $initialPrefs = $this->bessy()->getJsonData($url)['Preferences'];
+        $this->assertEquals(1, $initialPrefs['Popup.ActivityComment']);
+        $this->assertEquals(1, $initialPrefs['Popup.WallComment']);
+
+        // Pref defaults can be configured.
+        $this->runWithConfig(['Preferences.Popup.ActivityComment' => 0], function () use ($url) {
+            $withConfigDefaults = $this->bessy()->getJsonData($url)['Preferences'];
+            $this->assertEquals(0, $withConfigDefaults['Popup.ActivityComment']);
+        });
+
+        // Modify a couple at the same time.
+        $this->bessy()->postJsonData($url, [
+            'Popup-dot-ActivityComment' => 0,
+        ]);
+
+        $this->bessy()->postJsonData($url, [
+            'Popup-dot-WallComment' => 0,
+            // Won't save.
+            'Popup-dot-NotDefined' => 1,
+        ]);
+        $result = $this->bessy()->getJsonData($url)['Preferences'];
+
+        $this->assertEquals(0, $result['Popup.ActivityComment']);
+        $this->assertEquals(0, $result['Popup.WallComment']);
+        $this->assertArrayNotHasKey('Popup.NotDefined', $result);
+    }
+
+    /**
      * Provide test preference data.
      *
      * @return array

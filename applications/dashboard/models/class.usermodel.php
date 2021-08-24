@@ -2517,6 +2517,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
             }
         }
 
+        $this->EventArguments['ExistingUser'] = $user;
         $this->EventArguments['FormPostValues'] = $formPostValues;
         $this->fireEvent('BeforeSaveValidation');
 
@@ -5455,7 +5456,11 @@ SQL;
      * @return bool
      */
     public static function rateLimit($user) {
+        // Garden.User.RateLimit = 0 disables rate limit.
         $loginRate = (int)Gdn::config('Garden.User.RateLimit', self::LOGIN_RATE);
+        if ($loginRate === 0) {
+            return true;
+        }
         // Make sure $user is an object
         $user = (object) $user;
         if (Gdn::cache()->activeEnabled()) {

@@ -146,4 +146,19 @@ class SchemaForm {
 
         return $result;
     }
+
+    /**
+     * Used for rendering custom react form controls.
+     *
+     * @param string $componentName
+     * @param array $componentProps
+     *
+     * @return array
+     */
+    public static function custom(string $componentName, array $componentProps): array {
+        return [
+            'componentName' => $componentName,
+            'componentProps' => $componentProps,
+        ];
+    }
 }

@@ -7,7 +7,7 @@ import ReduxActions, { bindThunkAction } from "@library/redux/ReduxActions";
 import actionCreatorFactory from "typescript-fsa";
 import { IApiError, LoadStatus } from "@library/@types/api/core";
 import debounce from "lodash/debounce";
-import { ICategory } from "@vanilla/addon-vanilla/@types/api/categories";
+import { ICategory } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import { IForumStoreState } from "@vanilla/addon-vanilla/redux/state";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 

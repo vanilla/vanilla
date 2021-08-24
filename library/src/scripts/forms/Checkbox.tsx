@@ -18,7 +18,8 @@ interface IProps extends IOptionalComponentID {
     checked?: boolean;
     disabled?: boolean;
     onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
-    label: React.ReactNode;
+    label?: React.ReactNode;
+    "aria-labelledby"?: string;
     labelBold?: boolean;
     isHorizontal?: boolean;
     fakeFocus?: boolean;
@@ -28,7 +29,8 @@ interface IProps extends IOptionalComponentID {
 }
 
 export default function CheckBox(props: IProps) {
-    const labelID = useUniqueID("checkbox_label");
+    const ownLabelID = useUniqueID("checkbox_label");
+    const labelID = props["aria-labelledby"] ?? ownLabelID;
     const classes = checkRadioClasses();
 
     const { isHorizontal, labelBold = true } = props;

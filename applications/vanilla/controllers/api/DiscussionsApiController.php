@@ -559,7 +559,7 @@ class DiscussionsApiController extends AbstractApiController {
             $announceWhere = array_merge($where, ['d.Announce >' => '0']);
             $rows = $this->discussionModel->getAnnouncements($announceWhere, $offset, $limit, $query['sort'] ?? '')->resultArray();
         } else {
-            $pinOrder = array_key_exists('pinOrder', $query) ? $query['pinOrder'] : null;
+            $pinOrder = $query['pinOrder'] ?? null;
             [$orderField, $orderDirection] = \Vanilla\Models\LegacyModelUtils::orderFieldDirection($query['sort'] ?? '');
             if ($pinOrder == 'first') {
                 $announcements = $this->discussionModel->getAnnouncements($where, $offset, $limit, $query['sort'] ?? '')->resultArray();
@@ -609,8 +609,9 @@ class DiscussionsApiController extends AbstractApiController {
      * @param int $id The ID of the discussion.
      * @param array $body The request body.
      * @param array $query The request query.
-     * @throws NotFoundException if unable to find the discussion.
      * @return array
+     * @throws ClientException If discussion editing is not allowed.
+     * @throws NotFoundException If unable to find the discussion.
      */
     public function patch($id, array $body, array $query = []) {
         $this->permission('Garden.SignIn.Allow');
@@ -622,6 +623,10 @@ class DiscussionsApiController extends AbstractApiController {
         $body = $in->validate($body, true);
 
         $row = $this->discussionByID($id);
+        $canEdit = $this->discussionModel::canEdit($row);
+        if (!$canEdit) {
+            throw new ClientException('Editing discussions is not allowed.');
+        }
         $discussionData = ApiUtils::convertInputKeys($body);
         $discussionData['DiscussionID'] = $id;
         $categoryID = $row['CategoryID'];
@@ -668,8 +673,9 @@ class DiscussionsApiController extends AbstractApiController {
      *
      * @param array $body The request body.
      * @param array $query The request query.
-     * @throws ServerException if the discussion could not be created.
      * @return array
+     * @throws NotFoundException If a category is not found.
+     * @throws ServerException If the discussion could not be created.
      */
     public function post(array $body, array $query = []) {
         $this->permission('Garden.SignIn.Allow');
@@ -679,6 +685,10 @@ class DiscussionsApiController extends AbstractApiController {
 
         $body = $in->validate($body);
         $categoryID = $body['categoryID'];
+        $category = CategoryModel::categories($categoryID);
+        if (!$category) {
+            throw new NotFoundException('Category');
+        }
         $categoryPermissionID = self::getPermissionID($categoryID);
         $this->discussionModel->categoryPermission('Vanilla.Discussions.Add', $categoryID);
         $this->fieldPermission($body, 'closed', 'Vanilla.Discussions.Close', $categoryPermissionID);

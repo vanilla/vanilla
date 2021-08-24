@@ -86,8 +86,6 @@ export const buttonUtilityClasses = useThemeCache(() => {
         "buttonIcon",
         iconMixin(formElementVars.sizing.height),
         mediaQueries.oneColumnDown({
-            height: vars.sizing.compactHeight,
-            width: vars.sizing.compactHeight,
             minWidth: vars.sizing.compactHeight,
         }),
     );

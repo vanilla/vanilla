@@ -34,7 +34,7 @@ echo heading($this->data('Title'));
               $urlImgReaction = ReactionModel::ICON_BASE_URL.strtolower($UrlCode).'.png';
               break;
           default:
-              $urlImgReaction = ReactionModel::ICON_BASE_URL.strtolower($UrlCode).'.svg';
+              $urlImgReaction = isset($ReactionType['Photo']) ? Gdn_Upload::url($ReactionType['Photo']) : ReactionModel::ICON_BASE_URL.strtolower($UrlCode).'.svg';
       }
       $reactionBlock->setView('media-sm')
          ->addCssClass('image-wrap', 'media-image-wrap-no-border')

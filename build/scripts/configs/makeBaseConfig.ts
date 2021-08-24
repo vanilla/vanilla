@@ -11,7 +11,7 @@ import { svgLoader } from "./svgLoader";
 import webpack from "webpack";
 import WebpackBar from "webpackbar";
 import { BuildMode, getOptions } from "../buildOptions";
-import { VANILLA_ROOT } from "../env";
+import { DIST_DIRECTORY, DIST_NAME, VANILLA_ROOT } from "../env";
 import EntryModel from "../utility/EntryModel";
 import { printVerbose } from "../utility/utils";
 const CircularDependencyPlugin = require("circular-dependency-plugin");
@@ -175,6 +175,7 @@ ${chalk.green(aliases)}`;
         plugins: [
             new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /en/),
             new webpack.DefinePlugin({
+                __DIST__NAME__: JSON.stringify(DIST_NAME),
                 __BUILD__SECTION__: JSON.stringify(section),
             }),
         ] as any[],

@@ -167,6 +167,19 @@ class TagsTest extends AbstractResourceTest {
     }
 
     /**
+     * Test deleting tags.
+     */
+    public function testDelete(): void {
+        $tagNotReserved = $this->createTag();
+        $result = $this->api()->delete("/tags/{$tagNotReserved['TagID']}");
+        $this->assertEquals(204, $result->getStatusCode());
+        $this->expectExceptionCode(409);
+        $this->expectExceptionMessage('You cannot delete a reserved tag.');
+        $tagReserved = $this->createTag(['type' => 'reaction']);
+        $this->api()->delete("/tags/{$tagReserved['TagID']}");
+    }
+
+    /**
      * Overrides the AbstractResourcesTest's testIndex() method, as our index call has a limit of 20, so the
      * paging test doesn't pass.
      */

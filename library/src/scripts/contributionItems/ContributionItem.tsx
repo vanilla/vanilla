@@ -5,20 +5,24 @@
 
 import React from "react";
 import SmartLink from "@library/routing/links/SmartLink";
-import { badgeClasses } from "@library/badge/Badge.classes";
+import { contributionItemClasses } from "@library/contributionItems/ContributionItem.classes";
 import Count from "@library/content/Count";
+import { t } from "@library/utility/appUtils";
+import { contributionItemVariables } from "@library/contributionItems/ContributionItem.variables";
 
-export interface IBadge {
+export interface IContributionItem {
     name: string;
     url: string;
     photoUrl: string;
     count?: number;
 }
 
-export function Badge(props: IBadge) {
-    const { name, photoUrl, url, count } = props;
+export function ContributionItem(
+    props: IContributionItem & { themingVariables: ReturnType<typeof contributionItemVariables> },
+) {
+    const { name, photoUrl, url, count, themingVariables } = props;
+    const classes = contributionItemClasses(themingVariables);
 
-    const classes = badgeClasses();
     return (
         <SmartLink to={url} title={name} className={classes.link}>
             <div className={count && count > 0 ? classes.itemHasCount : ""}>
@@ -27,6 +31,7 @@ export function Badge(props: IBadge) {
                     <Count label={name} count={count} className={classes.count} useFormatted={true} useMax={false} />
                 )}
             </div>
+            {themingVariables.name.display && <div className={classes.name}>{t(name)}</div>}
         </SmartLink>
     );
 }

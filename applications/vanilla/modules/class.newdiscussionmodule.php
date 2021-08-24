@@ -9,6 +9,7 @@
  */
 
 use Vanilla\Contracts\LocaleInterface;
+use Vanilla\Web\TwigStaticRenderer;
 
 /**
  * Renders the "Start a New Discussion" button.
@@ -68,10 +69,11 @@ class NewDiscussionModule extends Gdn_Module {
      *
      * @param string $text
      * @param string $url
+     * @param string $icon Icon name to use
      * @param bool $asOwnButton Whether to display as a separate button or not.
      */
-    public function addButton($text, $url, $asOwnButton = false) {
-        $this->Buttons[] = ['Text' => $text, 'Url' => $url, 'asOwnButton' => $asOwnButton];
+    public function addButton($text, $url, $icon, $asOwnButton = false) {
+        $this->Buttons[] = ['Text' => $text, 'Url' => $url, 'Icon' => $icon, 'asOwnButton' => $asOwnButton];
     }
 
     /**
@@ -121,6 +123,8 @@ class NewDiscussionModule extends Gdn_Module {
                 continue;
             }
 
+            $icon = $type['AddIcon'] ?? "";
+
             $hasQuery = strpos($url, '?') !== false;
 
             if (!$hasQuery) {
@@ -139,6 +143,7 @@ class NewDiscussionModule extends Gdn_Module {
             $this->addButton(
                 $this->locale->translate($type['AddText'] ?? ''),
                 $url,
+                $icon,
                 $asOwnButton
             );
         }
@@ -149,8 +154,41 @@ class NewDiscussionModule extends Gdn_Module {
                 $row['Url'] .= (strpos($row['Url'], '?') !== false ? '&' : '?').$this->QueryString;
             }
         }
+        $newPostMenu = Gdn::themeFeatures()->get("NewPostMenu");
+        $assetName = $this->_Sender->EventArguments["AssetName"];
 
-        return parent::toString();
+        //we don't render NewPostMenu in content
+        if ($newPostMenu && $assetName === "Panel") {
+            $items = [];
+            foreach ($this->Buttons as $button) {
+                array_push($items, [
+                    'label' => $button["Text"],
+                    'action' => $button["Url"],
+                    'type' => "link",
+                    'id' => str_replace(' ', '-', strtolower($button["Text"])),
+                    'icon' => $button["Icon"]
+                ]);
+            }
+
+            $props =  [
+                'items' =>  $items
+            ];
+            $html = TwigStaticRenderer::renderReactModule('NewPostMenu', $props);
+            ob_start();
+            // Fire off the old event.
+            // See https://github.com/vanilla/support/issues/4896
+            $controller = \Gdn::controller();
+            if ($controller instanceof Gdn_Controller) {
+                Gdn::controller()->fireEvent('AfterNewDiscussionButton');
+                $extraHtml = ob_get_clean();
+                if ($extraHtml) {
+                    $html .= $extraHtml;
+                }
+            }
+            return $html;
+        } else {
+            return parent::toString();
+        }
     }
 
     /**

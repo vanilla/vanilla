@@ -13,7 +13,7 @@ import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import SelectOne from "@library/forms/select/SelectOne";
 import { useReduxActions } from "@library/redux/ReduxActions";
-import { ICategory } from "@vanilla/addon-vanilla/@types/api/categories";
+import { ICategory } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import { LazyTokens } from "@library/forms/select/LazyTokens";
 
 interface IProps {

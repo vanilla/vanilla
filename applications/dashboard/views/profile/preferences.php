@@ -1,4 +1,5 @@
 <?php use Vanilla\Theme\BoxThemeShim;
+use Vanilla\Web\TwigStaticRenderer;
 
 if (!defined('APPLICATION')) exit(); ?>
 <style>
@@ -139,8 +140,10 @@ if (!defined('APPLICATION')) exit(); ?>
             </table>
         <?php
         }
-        $this->fireEvent('CustomNotificationPreferences');
-        echo $this->Form->close('Save Preferences', '', ['class' => 'Button Primary']);
+        echo $this->Form->close('Save General Preferences', '', ['class' => 'Button Primary']);
+        if (c(\CategoryModel::CONF_CATEGORY_FOLLOWING)) {
+            echo TwigStaticRenderer::renderReactModule('CategoryNotificationPreferences', ["userID" => $this->User->UserID, "isEmailDisabled" => c('Garden.Email.Disabled')]);
+        }
         $this->fireEvent("AfterPreferencesRender");
         ?>
     </div>

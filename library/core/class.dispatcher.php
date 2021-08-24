@@ -38,6 +38,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         '#^api/v\d+/applicants(/|$)#' => self::BLOCK_NEVER,
         '#^api/v\d+/locales.*#' => self::BLOCK_NEVER,
         '#^api/v2/#' => self::BLOCK_PERMISSION,
+        '#^dist(/|$)#' => self::BLOCK_NEVER,
         '#^asset(/|$)#' => self::BLOCK_NEVER,
         '#^authenticate(/|$)#' => self::BLOCK_NEVER,
         '#^discussions/getcommentcounts(/|$)#' => self::BLOCK_NEVER,

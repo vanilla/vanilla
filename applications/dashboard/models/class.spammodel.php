@@ -47,6 +47,7 @@ class SpamModel extends Gdn_Pluggable {
 
     /**
      * Check whether or not the record is spam.
+     *
      * @param string $recordType By default, this should be one of the following:
      *  - Comment: A comment.
      *  - Discussion: A discussion.
@@ -54,17 +55,24 @@ class SpamModel extends Gdn_Pluggable {
      * @param array $data The record data.
      * @param array $options Options for fine-tuning this method call.
      *  - Log: Log the record if it is found to be spam.
+     *  - Operation: The log operation to use.
+     * @return bool Returns **true** if the record is spam or **false** otherwise.
      */
     public static function isSpam($recordType, $data, $options = []) {
         if (self::$Disabled) {
             return false;
         }
 
+        $options += [
+            'Log' => true,
+            'Operation' => LogModel::TYPE_SPAM,
+        ];
+
         // Set some information about the user in the data.
         if ($recordType == 'Registration') {
             touchValue('Username', $data, $data['Name']);
         } else {
-            touchValue('InsertUserID', $data, Gdn::session()->UserID);
+            $data += ['InsertUserID' => Gdn::session()->UserID];
 
             // Check moderation permissions for the user in session.
             if (Gdn::session()->getPermissions()->hasRanked('Garden.Moderation.Manage')) {
@@ -72,7 +80,7 @@ class SpamModel extends Gdn_Pluggable {
                 return false;
             }
 
-            $user = Gdn::userModel()->getID(val('InsertUserID', $data), DATASET_TYPE_ARRAY);
+            $user = Gdn::userModel()->getID($data['InsertUserID'], DATASET_TYPE_ARRAY);
 
             if ($user) {
                 $verified = val('Verified', $user);
@@ -82,9 +90,11 @@ class SpamModel extends Gdn_Pluggable {
                     // The user has been verified or is an admin and isn't a spammer.
                     return false;
                 }
-                touchValue('Username', $data, $user['Name']);
-                touchValue('Email', $data, $user['Email']);
-                touchValue('IPAddress', $data, $user['LastIPAddress']);
+                $data += [
+                    'Username' => $user['Name'],
+                    'Email' => $user['Email'],
+                    'IPAddress' => $user['LastIPAddress'],
+                ];
             }
         }
 
@@ -108,7 +118,7 @@ class SpamModel extends Gdn_Pluggable {
         $spam = $sp->EventArguments['IsSpam'];
 
         // Log the spam entry.
-        if ($spam && val('Log', $options, true)) {
+        if ($spam && $options['Log']) {
             // Make sure all IP addresses are packed before insertion
             $data = ipEncodeRecursive($data);
 
@@ -138,10 +148,10 @@ class SpamModel extends Gdn_Pluggable {
                 if ($recordID) {
                     self::flagForReview($recordType, $recordID, $data);
                 } else {
-                    LogModel::insert('Spam', $recordType, $data, $logOptions);
+                    LogModel::insert($options['Operation'], $recordType, $data, $logOptions);
                 }
             } else {
-                LogModel::insert('Spam', $recordType, $data, $logOptions);
+                LogModel::insert($options['Operation'], $recordType, $data, $logOptions);
             }
         }
 

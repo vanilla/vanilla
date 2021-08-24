@@ -92,7 +92,9 @@ class ComposerHelper {
      * - VANILLA_BUILD_DISABLE_AUTO_BUILD - Prevent the build from running on composer install.
      */
     public static function postUpdate() {
-        $vanillaRoot = realpath(__DIR__ . "/../../");
+        require_once __DIR__ . "/../../environment.php";
+
+        $vanillaRoot = PATH_ROOT;
         $skipBuild = getenv(self::DISABLE_AUTO_BUILD) === 'true';
         if ($skipBuild) {
             printf("\nSkipping automatic JS build because " . self::DISABLE_AUTO_BUILD . " env variable is set to \"true\".\n");
@@ -138,7 +140,7 @@ class ComposerHelper {
         }
 
         // Generate our vendor license file.
-        $distDir = $vanillaRoot . '/dist';
+        $distDir = PATH_DIST;
         $licensePath = $distDir . '/VENDOR_LICENSES.txt';
         if (!file_exists($distDir)) {
             mkdir($distDir);

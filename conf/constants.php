@@ -17,7 +17,11 @@ if (!defined('PATH_UPLOADS')) {
 }
 
 // You should not change these paths.
-define('PATH_DIST', PATH_ROOT.'/dist');
+// The dist directory is no longer purely "/dist" because some way of invalidating all assets is required.
+// /dist assets rely on a content hash to invalidate, but there are situations where an item is cached incorrectly
+// And the we need to bulk invalidate without
+define('PATH_DIST_NAME', 'dist/v1');
+define('PATH_DIST', PATH_ROOT.'/'.PATH_DIST_NAME);
 define('PATH_ADDONS_THEMES', PATH_ROOT.'/addons/themes');
 define('PATH_ADDONS_ADDONS', PATH_ROOT.'/addons/addons');
 define('PATH_APPLICATIONS', PATH_ROOT.'/applications');

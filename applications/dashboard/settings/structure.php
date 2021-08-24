@@ -874,7 +874,7 @@ $Construct->table('Regarding')
 
 $Construct->table('Ban')
     ->primaryKey('BanID')
-    ->column('BanType', ['IPAddress', 'Name', 'Email'], false, 'unique')
+    ->column('BanType', ['IPAddress', 'Name', 'Email', 'Fingerprint'], false, 'unique')
     ->column('BanValue', 'varchar(50)', false, 'unique')
     ->column('Notes', 'varchar(255)', null)
     ->column('CountUsers', 'uint', 0)
@@ -1009,6 +1009,29 @@ $Construct
     ->column("dateInserted", "datetime")
     ->column("dateUpdated", "datetime", false, ["index"])
     ->set($Explicit, $Drop);
+
+$recordStatusExists = $Construct->tableExists("recordStatus");
+
+$Construct->table("recordStatus")
+    ->primaryKey("statusID")
+    ->column("name", "varchar(100)", false, ["unique.recordTypeName"])
+    ->column("state", ["open", "closed"], "open")
+    ->column("recordType", "varchar(100)", false, ["index.recordType", "index.recordTypeSubType", "unique.recordTypeName"])
+    ->column("recordSubtype", "varchar(100)", null, ["index.recordTypeSubType"])
+    ->column("isDefault", "tinyint", 0)
+    ->column("insertUserID", "int")
+    ->column("insertIPAddress", "ipaddress")
+    ->column("dateInserted", "datetime")
+    ->column("updateUserID", "int", null)
+    ->column("updateIPAddress", "ipaddress", null)
+    ->column("dateUpdated", "datetime", null)
+    ->set($Explicit, $Drop);
+
+if ($recordStatusExists === false) {
+    // Add a protected space for core/addon status IDs and ensure user-created statuses will have IDs outside it.
+    $recordStatusIDQuery = "alter table " . Gdn::sql()->prefixTable("recordStatus") . " AUTO_INCREMENT=10000";
+    Gdn::sql()->query($recordStatusIDQuery, "update");
+}
 
 // If the AllIPAddresses column exists, attempt to migrate legacy IP data to the UserIP table.
 if (!$captureOnly && $AllIPAddressesExists) {

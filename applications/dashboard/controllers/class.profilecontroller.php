@@ -1294,6 +1294,7 @@ class ProfileController extends Gdn_Controller {
         $this->setData('PreferenceList', $this->Preferences);
 
         if ($this->Form->authenticatedPostBack()) {
+            $formValues = $this->Form->formValues();
             // Get, assign, and save the preferences.
             $newMetaPrefs = [];
             foreach ($this->Preferences as $prefGroup => $prefs) {
@@ -1328,7 +1329,7 @@ class ProfileController extends Gdn_Controller {
 
             $this->setData('Preferences', array_merge($this->data('Preferences', []), $userPrefs, $newMetaPrefs));
 
-            if (count($this->Form->errors() == 0)) {
+            if (empty($this->Form->errors())) {
                 $this->informMessage(sprite('Check', 'InformSprite').t('Your preferences have been saved.'), 'Dismissable AutoDismiss HasSprite');
             }
         } else {

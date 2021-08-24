@@ -1054,7 +1054,6 @@ class UsersApiController extends AbstractApiController {
                 'email:s?',
                 'photoUrl:s?',
                 'url:s?',
-                'roles:a?',
                 'dateInserted?',
                 'dateLastActive:dt?',
                 'countDiscussions?',

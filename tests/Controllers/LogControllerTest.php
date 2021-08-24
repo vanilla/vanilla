@@ -8,8 +8,11 @@
 namespace VanillaTests\Controllers;
 
 use Garden\Events\ResourceEvent;
+use Vanilla\Utility\ArrayUtils;
 use VanillaTests\EventSpyTestTrait;
 use VanillaTests\SiteTestCase;
+use VanillaTests\UsersAndRolesApiTestTrait;
+use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 
 /**
  * Tests for the `LogController` class.
@@ -17,6 +20,8 @@ use VanillaTests\SiteTestCase;
  */
 class LogControllerTest extends SiteTestCase {
     use EventSpyTestTrait;
+    use CommunityApiTestTrait;
+    use UsersAndRolesApiTestTrait;
 
     /** @var \LogController */
     private $controller;
@@ -88,13 +93,13 @@ class LogControllerTest extends SiteTestCase {
      */
     public function testSpamDiscussionRestore(): void {
         $userData = [
-            "Name" =>  __FUNCTION__."testrestoreuser",
+            "Name" => __FUNCTION__ . "testrestoreuser",
             "Email" => "testrestoreuser@example.com",
             "Password" => "vanilla"
         ];
         $this->userModel->save($userData);
         $logData = [
-            "Name" => __FUNCTION__."test discusionSpamRestore",
+            "Name" => __FUNCTION__ . "test discusionSpamRestore",
             "Body" => "test discusionSpamRestore",
             "CategoryID" => 1,
             "InsertUserID" => 1,
@@ -138,7 +143,7 @@ class LogControllerTest extends SiteTestCase {
      */
     public function testSpamCommentRestore(): void {
         $userData = [
-            "Name" =>  __FUNCTION__."testrestoreuser",
+            "Name" => __FUNCTION__ . "testrestoreuser",
             "Email" => "testrestoreuser@example.com",
             "Password" => "vanilla"
         ];
@@ -186,7 +191,7 @@ class LogControllerTest extends SiteTestCase {
      */
     public function testNotSpamNoDuplicationUserRestore(): void {
         $data = [
-            "Name" =>  "testrestoreuser",
+            "Name" => "testrestoreuser",
             "Email" => "testrestoreuser@example.com",
             "Password" => "vanilla"
         ];
@@ -208,4 +213,29 @@ class LogControllerTest extends SiteTestCase {
         $countUsers = $this->userModel->getCountWhere(['Email' => $data['Email']]);
         $this->assertEquals(1, $countUsers);
     }
+
+    /**
+     * Test LogController::record().
+     */
+    public function testLogRecord(): void {
+        $discussion = $this->createDiscussion();
+        $discussion = ArrayUtils::pascalCase($discussion);
+        unset($discussion['DateInserted']);
+        $discussion['Log_InsertIPAddress'] = $discussion['InsertIPAddress'] = '127.0.0.1';
+        $logID = $this->logModel->Insert('Delete', 'Discussion', $discussion);
+        // get a log as an admin.
+        $result = $this->bessy()->get("/log/record?recordType=discussion&recordID={$discussion['DiscussionID']}")->data('Log');
+        $this->assertEquals($logID, $result[0]['LogID']);
+        // get a recordType configuration as an admin.
+        $this->expectExceptionMessage("You do not have permission to access the requested resource.");
+        $this->expectExceptionCode(403);
+        $this->bessy()->get("/log/record?recordType=configuration")->data('Log');
+        $this->resetTable('Log');
+        $this->logModel->Insert('Edit', 'Configuration', []);
+        // get a recordType configuration as system user.
+        $this->runWithUser(function () {
+            return $this->bessy()->get("/log/record?recordType=configuration")->data('Log');
+        }, 1);
+    }
 }
+

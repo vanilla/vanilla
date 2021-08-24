@@ -32,7 +32,7 @@ class RenderFunctionsTest extends TestCase {
         // set config for disucussion filters test
         /** @var \Gdn_Configuration $config */
         $config = static::container()->get('Config');
-        $config->set('Vanilla.EnableCategoryFollowing', true, true, false);
+        $config->set(\CategoryModel::CONF_CATEGORY_FOLLOWING, true, true, false);
     }
 
     /**

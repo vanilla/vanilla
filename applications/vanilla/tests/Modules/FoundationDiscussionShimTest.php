@@ -66,6 +66,7 @@ class FoundationDiscussionShimTest extends SiteTestCase {
                 'url' => 'http://vanilla.test/foundationdiscussionshimtest/discussion/5/hello-name',
                 'canonicalUrl' => 'http://vanilla.test/foundationdiscussionshimtest/discussion/5/hello-name',
                 'format' => 'text',
+                'statusID' => 0,
                 'bookmarked' => false,
                 'unread' => false,
                 'category' => [

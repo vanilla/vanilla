@@ -136,4 +136,13 @@ export const pageBoxCompatStyles = useThemeCache(() => {
             }),
         },
     });
+
+    injectGlobal({
+        ".headerBoxLayout": {
+            position: "relative",
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "space-between",
+        },
+    });
 });

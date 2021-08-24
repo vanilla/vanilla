@@ -484,6 +484,11 @@ body.Section-EditProfile {
         * {
             line-height: $formElement_height;
         }
+
+        input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+        }
     }
 
     .Preferences .Buttons .Button {

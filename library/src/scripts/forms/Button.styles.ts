@@ -86,8 +86,6 @@ export const buttonUtilityClasses = useThemeCache(() => {
         "buttonIcon",
         iconMixin(formElementVars.sizing.height),
         mediaQueries.oneColumnDown({
-            height: vars.sizing.compactHeight,
-            width: vars.sizing.compactHeight,
             minWidth: vars.sizing.compactHeight,
         }),
     );
@@ -118,16 +116,14 @@ export const buttonUtilityClasses = useThemeCache(() => {
     });
 
     const buttonAsTextPrimary = css(asTextStyles, {
-        ...{
-            "&&": {
-                color: ColorsUtils.colorOut(globalVars.links.colors.default),
-            },
-            "&&:not(.focus-visible)": {
-                outline: 0,
-            },
-            "&&:hover, &&:focus, &&:active": {
-                color: ColorsUtils.colorOut(globalVars.links.colors.active),
-            },
+        "&&": {
+            color: ColorsUtils.colorOut(globalVars.links.colors.default),
+        },
+        "&&:not(.focus-visible)": {
+            outline: 0,
+        },
+        "&&:hover, &&:focus, &&:active": {
+            color: ColorsUtils.colorOut(globalVars.links.colors.active),
         },
     });
 

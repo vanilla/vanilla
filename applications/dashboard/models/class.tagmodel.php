@@ -1195,7 +1195,8 @@ class TagModel extends Gdn_Model {
                         'id' => $id,
                         'name' => $tag->Name,
                         'fullName' => $tag->FullName,
-                        'type' => $type
+                        'type' => $type,
+                        'parentTagID' => $tag->ParentTagID ?? null,
                     ];
                 } else {
                     $data[] = [

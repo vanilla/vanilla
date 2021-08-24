@@ -23,3 +23,4 @@ export * from "./useRouteChangePrompt";
 export * from "./useTabKeyboardHandler";
 export * from "./useThrowError";
 export * from "./deconstructAttributesFromElement";
+export * from "./useSessionStorage";

@@ -43,7 +43,8 @@ abstract class AbstractSearchIndexTemplate {
         'siteSections',
         'allowedDiscussionTypes',
         'title',
-        'private'
+        'private',
+        'punished',
     ];
 
     /**

@@ -137,6 +137,30 @@ class WidgetFactory implements \JsonSerializable {
                     'name' => $label,
                     'value' => $this->getWidgetPropertiesInternal($property, $parameters[$fieldName] ?? []),
                 ];
+            } elseif ($type === "array") {
+                $actualValue = $parameters[$fieldName] ?? $control['default'] ?? [];
+
+                $formattedValue = "";
+                if (!is_array($actualValue)) {
+                    $formattedValue = "(Can't Format)";
+                } elseif (empty($actualValue)) {
+                    $formattedValue = "(Default)";
+                } else {
+                    $firstItem = $actualValue[0];
+                    $key = array_keys($firstItem[0]);
+                    if (array_key_exists("label", $firstItem)) {
+                        $key = "label";
+                    } elseif (array_key_exists("value", $firstItem)) {
+                        $key = "value";
+                    }
+
+                    $formattedValue = implode(", ", array_column($actualValue, $key));
+                }
+
+                $widgetParameters[] = [
+                    'name' => $label,
+                    'value' => $formattedValue,
+                ];
             } else {
                 $actualValue = $parameters[$fieldName] ?? $control['default'] ?? '(Default)';
                 $staticChoices = $control['choices']['staticOptions'] ?? null;

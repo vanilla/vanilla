@@ -6,6 +6,8 @@
 
 namespace Vanilla\Forms;
 
+use Garden\Schema\Schema;
+
 /**
  * Form element schemas.
  */
@@ -15,6 +17,7 @@ class SchemaForm {
     const RADIO_TYPE = 'radio';
     const TEXT_TYPE = 'textBox';
     const TOGGLE_TYPE = 'toggle';
+    const DRAG_AND_DROP_TYPE = 'dragAndDrop';
     const CODE_EDITOR_TYPE = 'codeBox';
 
     /**
@@ -145,5 +148,23 @@ class SchemaForm {
         }
 
         return $result;
+    }
+
+    /**
+     * Used for rendering custom react form controls.
+     *
+     * @param FormOptions $options
+     * @param Schema $itemSchema Schema representing a single item in the drag and drop.
+     *
+     * @return array
+     */
+    public static function dragAndDrop(FormOptions $options, Schema $itemSchema): array {
+        return [
+            'inputType' => self::DRAG_AND_DROP_TYPE,
+            'description' => $options->getDescription(),
+            'label' => $options->getLabel(),
+            'itemSchema' => $itemSchema,
+            'fullSize' => true,
+        ];
     }
 }

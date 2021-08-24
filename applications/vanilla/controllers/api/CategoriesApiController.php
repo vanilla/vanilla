@@ -402,19 +402,8 @@ class CategoriesApiController extends AbstractApiController {
             $where['Featured'] = true;
             // Filter by parent.
             if ($parent['CategoryID'] !== -1) {
-                $filterCategories = $this->categoryModel->getTree(
-                    $parent['CategoryID'],
-                    [
-                        'maxdepth' => $query['maxDepth'],
-                    ]
-                );
-
-                $filterCategoryIDs = array_column($filterCategories, 'CategoryID');
-                $filterCategoryIDs = array_filter($filterCategoryIDs, function (int $id) {
-                    return $id !== -1;
-                });
-
-                $where['categoryID'] = $filterCategoryIDs;
+                $filterCategoriesIDs = $this->categoryModel->getCategoriesDescendantIDs([$parent['CategoryID']]);
+                $where['categoryID'] = $filterCategoriesIDs;
             }
             [$categories, $totalCountCallBack] = $this->getCategoriesWhere($where, $limit, $offset, 'SortFeatured');
         } elseif ($parent['DisplayAs'] === 'Flat') {
@@ -577,7 +566,8 @@ class CategoriesApiController extends AbstractApiController {
         $this->permission($permission);
 
         $in = $this->schema([
-            CategoryModel::PREFERENCE_KEY_NOTIFICATION
+            CategoryModel::PREFERENCE_KEY_NOTIFICATION,
+            CategoryModel::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS,
         ])->add($this->categoryModel->preferencesSchema());
         $out = $this->categoryModel->preferencesSchema();
 

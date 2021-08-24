@@ -6,11 +6,11 @@ include_once $this->fetchViewLocation('helper_functions', 'discussions', 'vanill
 include_once $this->fetchViewLocation('helper_functions', 'categories', 'vanilla');
 
 $checkMark = !$isDataDrivenTheme ? adminCheck(NULL, ['', ' ']) : '';
+echo '<section class="headerBoxLayout">';
 BoxThemeShim::startHeading();
 echo '<h1 class="H HomepageTitle">'.
     $checkMark.
     $this->data('Title').
-    followButton($this->data('Category.CategoryID')).
     '</h1>';
 /** @var $htmlSanitizer */
 $htmlSanitizer = Gdn::getContainer()->get(\Vanilla\Formatting\Html\HtmlSanitizer::class);
@@ -18,6 +18,8 @@ $Description = $htmlSanitizer->filter($this->data('Category.Description', $this-
 echo wrapIf($Description, 'div', ['class' => 'P PageDescription']);
 $this->fireEvent('AfterPageTitle');
 BoxThemeShim::endHeading();
+echo followButton($this->data('Category.CategoryID')).'</section>';
+
 
 
 $subtreeView = $this->fetchViewLocation('subtree', 'categories', 'vanilla', false);

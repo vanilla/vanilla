@@ -13,6 +13,7 @@ use Garden\Web\Data;
 use Garden\Web\Exception\ServerException;
 use Vanilla\InjectableInterface;
 use Vanilla\Models\SiteMeta;
+use Vanilla\Permissions;
 use Vanilla\Web\JsInterpop\ReduxActionPreloadTrait;
 use Vanilla\Web\JsInterpop\ReduxErrorAction;
 
@@ -21,7 +22,7 @@ use Vanilla\Web\JsInterpop\ReduxErrorAction;
  */
 abstract class Page implements InjectableInterface, CustomExceptionHandler, PageHeadInterface {
 
-    use TwigRenderTrait, ReduxActionPreloadTrait, PageHeadProxyTrait;
+    use TwigRenderTrait, ReduxActionPreloadTrait, PageHeadProxyTrait, PermissionCheckTrait;
 
     /** @var bool */
     private $requiresSeo = true;
@@ -246,5 +247,15 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler, Page
         } else {
             return $this;
         }
+    }
+
+    /**
+     * @inheridoc
+     */
+    protected function getPermissions(): ?Permissions {
+        if ($this->session === null) {
+            return null;
+        }
+        return $this->session->getPermissions();
     }
 }

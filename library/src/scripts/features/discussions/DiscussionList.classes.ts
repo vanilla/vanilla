@@ -12,6 +12,7 @@ import { Mixins } from "@library/styles/Mixins";
 import { useThemeCache } from "@library/styles/themeCache";
 import { styleUnit } from "../../styles/styleUnit";
 import voteCounterVariables from "@library/voteCounter/VoteCounter.variables";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
 
 export const discussionListClasses = useThemeCache(() => {
     const vars = discussionListVariables();
@@ -46,6 +47,10 @@ export const discussionListClasses = useThemeCache(() => {
         ...voteCounterPosition,
     });
 
+    const checkedboxRowStyle = css({
+        backgroundColor: ColorsUtils.colorOut(globalVars.states.hover.highlight),
+    });
+
     const options = {
         move: css({
             minHeight: styleUnit(200),
@@ -78,6 +83,7 @@ export const discussionListClasses = useThemeCache(() => {
         title,
         iconAndVoteCounterWrapper,
         voteCounterContainer,
+        checkedboxRowStyle,
         options,
         resolved,
     };

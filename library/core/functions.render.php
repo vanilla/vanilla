@@ -811,7 +811,7 @@ if (!function_exists('filtersDropDown')) {
             $default = t('All');
         }
         $output = '';
-        if (c('Vanilla.EnableCategoryFollowing')) {
+        if (c(\CategoryModel::CONF_CATEGORY_FOLLOWING)) {
             $links = [];
             $active = null;
 

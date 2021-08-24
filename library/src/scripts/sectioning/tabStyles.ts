@@ -14,7 +14,7 @@ import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent, viewHeight, calc, quote, color } from "csx";
 import { TabsTypes } from "@library/sectioning/TabsTypes";
-import { CSSObject } from "@emotion/css";
+import { css, CSSObject } from "@emotion/css";
 import { buttonResetMixin } from "@library/forms/buttonMixins";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { Mixins } from "@library/styles/Mixins";
@@ -261,6 +261,7 @@ export const tabBrowseClasses = useThemeCache(() => {
         style("tabList", {
             display: "flex",
             flexWrap: "wrap",
+            alignItems: "center",
             borderBottom: options?.includeBorder
                 ? singleBorder({ color: globalVars.separator.color, width: globalVars.separator.size })
                 : undefined,

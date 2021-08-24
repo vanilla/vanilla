@@ -10,6 +10,7 @@ import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
 import { NewQuickLinksLabItem } from "@dashboard/labs/NewQuickLinksLabItem";
 import { NewSearchPageLabItem } from "@dashboard/labs/NewSearchPageLabItem";
 import { UserCardsLabItem } from "@dashboard/labs/UserCardsLabItem";
+import { NewPostMenuLabItem } from "@dashboard/labs/NewPostMenuLabItem";
 import AddonList from "@library/addons/AddonList";
 import SmartLink from "@library/routing/links/SmartLink";
 import { t } from "@vanilla/i18n";
@@ -26,6 +27,7 @@ export function VanillaLabsPage() {
                     <UserCardsLabItem />
                     <NewSearchPageLabItem />
                     <NewQuickLinksLabItem />
+                    <NewPostMenuLabItem />
                 </AddonList>
             </div>
             <DashboardHelpAsset>

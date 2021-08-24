@@ -32,7 +32,7 @@ export function MetaLink(props: React.ComponentProps<typeof SmartLink>) {
 
     return (
         <MetaItem>
-            <SmartLink {...props} className={cx(classes.metaLink, props.className)} />
+            <SmartLink {...props} className={classNames(classes.metaLink, props.className)} />
         </MetaItem>
     );
 }

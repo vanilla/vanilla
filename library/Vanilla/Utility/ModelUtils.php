@@ -9,6 +9,7 @@ namespace Vanilla\Utility;
 
 use Garden\Schema\Validation;
 use Garden\Schema\ValidationException;
+use Garden\Web\Exception\ClientException;
 use Gdn_Locale as LocaleInterface;
 use Gdn_Validation;
 use Iterator;
@@ -141,6 +142,23 @@ class ModelUtils {
         }
 
         return $validation;
+    }
+
+    /**
+     * Look at the result of a save and see if it gave some premoderation result.
+     *
+     * @param string|int|bool $saveResult The result of calling Gdn_Model::save().
+     * @param string $recordType The record being validated.
+     *
+     * @throws ClientException For spam or unapproved content.
+     */
+    public static function validateSaveResultPremoderation($saveResult, string $recordType) {
+        if ($saveResult === SPAM || $saveResult === UNAPPROVED) {
+            // "Your discussion will appear after it is approved."
+            // "Your comment will appear after it is approved."
+            $message = t(sprintf("Your %s will appear after it is approved.", strtolower($recordType)));
+            throw new ClientException($message, 202);
+        }
     }
 
     /**

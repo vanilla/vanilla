@@ -11,11 +11,17 @@ import { LoadStatus } from "@library/@types/api/core";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { GUEST_USER_ID } from "@library/features/users/userModel";
-import { IUser } from "@library/@types/api/users";
+import { IMe, IUser } from "@library/@types/api/users";
 
 export function useCurrentUserID(): IUser["userID"] | undefined {
     return useSelector((state: ICoreStoreState) => {
         return state.users.current.data?.userID;
+    });
+}
+
+export function useCurrentUser(): IMe | undefined {
+    return useSelector((state: ICoreStoreState) => {
+        return state.users.current.data;
     });
 }
 

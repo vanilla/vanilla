@@ -29,13 +29,7 @@ echo heading($this->data('Title'));
       $State = $ReactionType['Active'] ? 'Active' : 'InActive';
 
       $reactionBlock = new MediaItemModule(t($ReactionType['Name']), '', $ReactionType['Description']);
-      switch (strtolower($ReactionType['UrlCode'])) {
-          case 'wtf':
-              $urlImgReaction = ReactionModel::ICON_BASE_URL.strtolower($UrlCode).'.png';
-              break;
-          default:
-              $urlImgReaction = ReactionModel::ICON_BASE_URL.strtolower($UrlCode).'.svg';
-      }
+      $urlImgReaction = isset($ReactionType['Photo']) ? Gdn_Upload::url($ReactionType['Photo']) : ReactionModel::ICON_BASE_URL.strtolower($UrlCode).'.svg';
       $reactionBlock->setView('media-sm')
          ->addCssClass('image-wrap', 'media-image-wrap-no-border')
          ->setImage($urlImgReaction);

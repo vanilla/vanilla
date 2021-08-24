@@ -823,51 +823,6 @@ class VanillaHooks extends Gdn_Plugin {
         $sender->Preferences['Notifications']['Popup.BookmarkComment'] = t('Notify me when people comment on my bookmarked discussions.');
         $sender->Preferences['Notifications']['Popup.Mention'] = t('Notify me when people mention me.');
         $sender->Preferences['Notifications']['Popup.ParticipateComment'] = t('Notify me when people comment on discussions I\'ve participated in.');
-
-        if (Gdn::session()->checkPermission('Garden.AdvancedNotifications.Allow')) {
-            $postBack = $sender->Form->authenticatedPostBack();
-            $set = [];
-
-            // Add the category definitions to for the view to pick up.
-            $doHeadings = c('Vanilla.Categories.DoHeadings');
-            // Grab all of the categories.
-            $categories = [];
-            $prefixes = ['Email.NewDiscussion', 'Popup.NewDiscussion', 'Email.NewComment', 'Popup.NewComment'];
-            foreach (CategoryModel::categories() as $category) {
-                if (!$category['PermsDiscussionsView'] || $category['Depth'] <= 0 || $category['Depth'] > 2 || $category['Archived']) {
-                    continue;
-                }
-
-                $category['Heading'] = ($doHeadings && $category['Depth'] <= 1);
-                $categories[] = $category;
-
-                if ($postBack) {
-                    foreach ($prefixes as $prefix) {
-                        $fieldName = "$prefix.{$category['CategoryID']}";
-                        $value = $sender->Form->getFormValue($fieldName, null);
-                        if (!$value) {
-                            $value = null;
-                        }
-                        $set[$fieldName] = $value;
-                    }
-                }
-            }
-            $sender->setData('CategoryNotifications', $categories);
-            if ($postBack) {
-                UserModel::setMeta($sender->User->UserID, $set, 'Preferences.');
-            }
-        }
-    }
-
-    /**
-     * Add the advanced notifications view to profiles.
-     *
-     * @param ProfileController $Sender
-     */
-    public function profileController_customNotificationPreferences_handler($Sender) {
-        if (Gdn::session()->checkPermission('Garden.AdvancedNotifications.Allow')) {
-            include $Sender->fetchViewLocation('notificationpreferences', 'vanillasettings', 'vanilla');
-        }
     }
 
     /**

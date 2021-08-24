@@ -65,6 +65,12 @@ class ThemeFeatures implements \JsonSerializable {
 
         // NewReactionsModule (icons and count) to replace writeProfileCounts()
         'NewReactionsModule',
+
+        // NewGuestModule to replace the view with react component
+        'NewGuestModule',
+
+        // NewPostMenu for NewDiscussionModule
+        'NewPostMenu',
     ];
 
     /**

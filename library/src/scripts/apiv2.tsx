@@ -5,6 +5,7 @@
  * @license GPL-2.0-only
  */
 
+import React from "react";
 import { t, getMeta, siteUrl } from "@library/utility/appUtils";
 import { indexArrayByKey, notEmpty } from "@vanilla/utils";
 import axios, { AxiosResponse, AxiosRequestConfig, AxiosError } from "axios";
@@ -13,6 +14,7 @@ import { sprintf } from "sprintf-js";
 import { humanFileSize } from "@library/utility/fileUtils";
 import { IApiError, IFieldError } from "@library/@types/api/core";
 import { IError } from "@library/errorPages/CoreErrorMessages";
+import { ApiContext } from "@vanilla/ui";
 
 function fieldErrorTransformer(responseData, headers: any) {
     if (responseData && responseData.status >= 400 && responseData.errors && responseData.errors.length > 0) {
@@ -188,4 +190,8 @@ export function getGlobalErrorMessage(apiError: IApiError | undefined, validFiel
     }
 
     return t("Something went wrong while contacting the server.");
+}
+
+export function ApiV2Context(props: { children: React.ReactNode }) {
+    return <ApiContext.Provider value={apiv2}>{props.children}</ApiContext.Provider>;
 }

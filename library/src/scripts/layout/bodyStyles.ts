@@ -146,11 +146,11 @@ export const globalCSS = useThemeCache(() => {
     });
 
     injectGlobal({
-        [`input::-webkit-search-decoration,
-        input::-webkit-search-cancel-button,
-        input::-webkit-search-results-button,
-        input::-webkit-search-results-decoration,
-        input::-ms-clear`]: {
+        [`input:-webkit-search-decoration,
+        input:-webkit-search-cancel-button,
+        input:-webkit-search-results-button,
+        input:-webkit-search-results-decoration,
+        input:-ms-clear`]: {
             display: "none",
         },
     });

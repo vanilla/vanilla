@@ -338,9 +338,108 @@ paths:
       responses:
         '204':
           description: Success
+        '408':
+          description: Discussion deletion failed or timed out.
+          content:
+            'application/json':
+              schema:
+                properties:
+                  failedIDs:
+                    description: DiscussionsIDs that failed.
+                    type: array
+                  successIDs:
+                    description: DiscussionIDs that were successfuly deleted.
+                    type: array
+                  notTriedIDs:
+                    description: DiscussionIDs that were not tried due to a request timeout.
+                    type: array
       tags:
         - Discussions
       summary: Delete a list of discussions.
+  '/discussions/move':
+    patch:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: An array of discussion IDs.
+              properties:
+                discussionIDs:
+                  type: array
+                  items:
+                    type: integer
+                categoryID:
+                  description: The category ID to move discussions into.
+                  type: integer
+                isRedirect:
+                  description: If a redirect discussion needs to be created.
+                  type: boolean
+      responses:
+        '200':
+          description: Success
+        '403':
+          description: User does not have permission to move discussions to the specifed category.
+        '408':
+          description: Discussion move failed or timed out.
+          content:
+            'application/json':
+              schema:
+                properties:
+                  failedIDs:
+                    description: DiscussionsIDs that failed.
+                    type: array
+                  successIDs:
+                    description: DiscussionIDs that were successfuly moved.
+                    type: array
+                  notTriedIDs:
+                    description: DiscussionIDs that were not tried due to a request timeout.
+                    type: array
+      tags:
+        - Discussions
+      summary: Move a list of discussions.
+  '/discussions/merge':
+    patch:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: An array of discussion IDs.
+              properties:
+                discussionsIDs:
+                  type: array
+                  items:
+                    type: integer
+                destinationDiscussionID:
+                  description: The ID of the discussion to merge into.
+                  type: integer
+                isRedirect:
+                  description: If a redirect discussion needs to be created.
+                  type: boolean
+      responses:
+        '200':
+          description: Success
+        '404':
+          description: Destination discussion is not found.
+        '408':
+          description: Discussion merge failed or timed out.
+          content:
+            'application/json':
+              schema:
+                properties:
+                  failedIDs:
+                    description: DiscussionsIDs that failed.
+                    type: array
+                  successIDs:
+                    description: DiscussionIDs that successfuly merged.
+                    type: array
+                  notTriedIDs:
+                    description: DiscussionIDs that were not tried due to a request timeout.
+                    type: array
+      tags:
+        - Discussions
+      summary: Merge discussions.
   '/discussions/{id}/bookmark':
     put:
       parameters:

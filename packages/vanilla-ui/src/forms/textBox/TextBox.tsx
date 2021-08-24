@@ -9,7 +9,7 @@ import React from "react";
 import { InputSize } from "../../types";
 import { inputClasses } from "../shared/input.styles";
 
-export interface ITextBoxProps extends Omit<React.HTMLProps<HTMLInputElement>, "type" | "ref" | "size"> {
+export interface ITextBoxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "type" | "ref" | "size"> {
     size?: InputSize;
 }
 

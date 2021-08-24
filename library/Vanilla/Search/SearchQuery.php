@@ -12,6 +12,7 @@ use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
 use Vanilla\DateFilterSchema;
+use Vanilla\Schema\LegacyDateRangeExpression;
 use Vanilla\Utility\ArrayUtils;
 use Webmozart\Assert\Assert;
 
@@ -303,11 +304,16 @@ abstract class SearchQuery {
      * Set int range filter
      *
      * @param string $attribute The attribute to filter.
-     * @param array $schemaFilter The output of some dates parsed with DateFilterSchema.
+     * @param array|LegacyDateRangeExpression $schemaFilter The output of some dates parsed with DateFilterSchema.
      *
      * @return $this
      */
-    public function setDateFilterSchema(string $attribute, array $schemaFilter) {
+    final public function setDateFilterSchema(string $attribute, $schemaFilter) {
+        if ($schemaFilter instanceof LegacyDateRangeExpression) {
+            $schemaFilter = $schemaFilter->toLegacyArray();
+        }
+        Assert::isArray($schemaFilter, 'Argument 2 passed to __METHOD__ must be of type array.');
+
         $schema = new DateFilterSchema();
         $schemaFilter = $schema->validate($schemaFilter);
         /**

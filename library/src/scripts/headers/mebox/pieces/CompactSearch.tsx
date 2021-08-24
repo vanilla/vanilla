@@ -29,6 +29,8 @@ import {
 import { AsyncCreatable } from "react-select";
 import { cx } from "@emotion/css";
 import { Icon } from "@vanilla/icons";
+import { meBoxClasses } from "@library/headers/mebox/pieces/meBoxStyles";
+import { isUserGuest, useUsersState } from "@library/features/users/userModel";
 
 export interface ICompactSearchProps {
     className?: string;
@@ -49,6 +51,7 @@ export interface ICompactSearchProps {
     scope?: ISearchScopeNoCompact;
     searchCloseOverwrites?: IStateColors;
     overwriteSearchBar?: ISearchBarOverwrites;
+    withLabel: boolean;
 }
 
 /**
@@ -61,8 +64,10 @@ export function CompactSearch(props: ICompactSearchProps) {
     const searchInputRef = useRef<AsyncCreatable<any> | null>(null);
     const resultsRef = useRef<HTMLDivElement | null>(null);
     const openSearchButtonRef = useRef<HTMLButtonElement | null>(null);
+    const { currentUser } = useUsersState();
+    const isGuest = isUserGuest(currentUser.data);
 
-    const { focusOnMount, open = false } = props;
+    const { focusOnMount, open = false, withLabel } = props;
     const prevOpen = useLastValue(open);
 
     const contextScope = useSearchScope();
@@ -118,24 +123,30 @@ export function CompactSearch(props: ICompactSearchProps) {
     const classes = compactSearchClasses();
     const classesSearchBar = searchBarClasses(props.overwriteSearchBar);
     const classesDropDown = dropDownClasses();
+    const classesMebox = meBoxClasses();
+    const isCompactMebox = props.overwriteSearchBar?.compact;
+    const label = withLabel && !isGuest && !isCompactMebox && <div className={classesMebox.label}>{t("Search")}</div>;
 
     return (
         <div ref={selfRef} className={classNames(props.className, classes.root, { isOpen: props.open })}>
             {!props.open && (
-                <Button
-                    onClick={props.onSearchButtonClick}
-                    className={classNames(classesTitleBar.centeredButton, props.buttonClass)}
-                    title={t("Search")}
-                    aria-expanded={false}
-                    aria-haspopup="true"
-                    buttonType={ButtonTypes.CUSTOM}
-                    aria-controls={id}
-                    buttonRef={openSearchButtonRef}
-                >
-                    <div className={classNames(props.buttonContentClassName)}>
-                        <Icon icon="search-search" />
-                    </div>
-                </Button>
+                <div className={classes.compactSearchWrapper}>
+                    <Button
+                        onClick={props.onSearchButtonClick}
+                        className={classNames(classesTitleBar.centeredButton, props.buttonClass)}
+                        title={t("Search")}
+                        aria-expanded={false}
+                        aria-haspopup="true"
+                        buttonType={ButtonTypes.CUSTOM}
+                        aria-controls={id}
+                        buttonRef={openSearchButtonRef}
+                    >
+                        <div className={classNames(props.buttonContentClassName)}>
+                            <Icon icon="search-search" />
+                        </div>
+                    </Button>
+                    {label}
+                </div>
             )}
             {props.open && (
                 <div className={classes.contents}>

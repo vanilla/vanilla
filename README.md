@@ -44,8 +44,8 @@ Full-text index support has been disabled by default as of Vanilla 4. To enable 
 
 -   Local Development - [Environment](https://github.com/vanilla/vanilla-docker), [Configuration & Debugging](https://docs.vanillaforums.com/developer/tools/environment/) & [Build Tools](https://docs.vanillaforums.com/developer/tools/building-frontend/).
 -   [Running Unit tests](https://github.com/vanilla/vanilla/blob/master/tests/README.md).
--   Coding Standard - [PHP](https://docs.vanillaforums.com/developer/contributing/coding-standard-php/), [Typescript](https://docs.vanillaforums.com/developer/contributing/coding-standard-typescript/), [Database Naming](https://docs.vanillaforums.com/developer/contributing/database-naming-standards/)
--   [Writing Pull Requests](https://docs.vanillaforums.com/developer/contributing/pull-requests/)
+-   Coding Standard - [PHP](https://success.vanillaforums.com/kb/articles/225-coding-standard-php), [Typescript](https://success.vanillaforums.com/kb/articles/226-coding-standard-typescript), [Database Naming](https://success.vanillaforums.com/kb/articles/227-naming-standards-database)
+-   [Writing Pull Requests](https://success.vanillaforums.com/kb/articles/228-using-pull-requests-to-contribute)
 -   [Contributing Guidelines](https://github.com/vanilla/vanilla/blob/master/CONTRIBUTING.md)
 -   [Contributing to Translations](https://github.com/vanilla/locales/blob/master/README.md)
 

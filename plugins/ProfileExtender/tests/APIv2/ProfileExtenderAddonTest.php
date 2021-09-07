@@ -9,16 +9,17 @@ namespace Vanilla\ProfileExtender\Tests\APIv2;
 use Exception;
 use Gdn_Configuration;
 use Vanilla\Attributes;
+use VanillaTests\Addons\ProfileExtender\ProfileExtenderTestTrait;
 
 /**
  * Tests for the profile extender addon.
  */
 class ProfileExtenderAddonTest extends \VanillaTests\SiteTestCase {
-    /**
-     * @var \ProfileExtenderPlugin
-     */
-    protected $profileExtender;
 
+    use ProfileExtenderTestTrait;
+
+    /** @var \ProfileExtenderPlugin */
+    private $profileExtender;
 
     /**
      * {@inheritdoc}
@@ -36,31 +37,6 @@ class ProfileExtenderAddonTest extends \VanillaTests\SiteTestCase {
         $this->container()->call(function (\ProfileExtenderPlugin $profileExtender) {
             $this->profileExtender = $profileExtender;
         });
-
-        $this->bessy()->post('/settings/profile-field-add-edit', [
-            'Name' => 'text',
-            'Label' => 'Text',
-            'FormType' => 'TextBox'
-        ]);
-
-        $this->bessy()->post('/settings/profile-field-add-edit', [
-            'Name' => 'check',
-            'Label' => 'Check',
-            'FormType' => 'CheckBox'
-        ]);
-
-        $this->bessy()->post('/settings/profile-field-add-edit', [
-            'Name' => 'DateOfBirth',
-            'Label' => 'Birthday',
-            'FormType' => 'DateOfBirth'
-        ]);
-
-        $this->bessy()->post('/settings/profile-field-add-edit', [
-            'Name' => 'dropdown',
-            'Label' => 'Dropdown',
-            'FormType' => 'Dropdown',
-            'Options' => "Option1\nOption2"
-        ]);
 
         $this->createUserFixtures();
     }

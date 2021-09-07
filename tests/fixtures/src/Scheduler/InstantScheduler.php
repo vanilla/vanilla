@@ -12,6 +12,7 @@ use PHPUnit\Framework\TestCase;
 use Vanilla\Scheduler\Descriptor\JobDescriptorInterface;
 use Vanilla\Scheduler\DummyScheduler;
 use Vanilla\Scheduler\Job\JobPriority;
+use Vanilla\Scheduler\TrackingSlip;
 use Vanilla\Scheduler\TrackingSlipInterface;
 
 /**
@@ -26,29 +27,14 @@ class InstantScheduler extends DummyScheduler {
      */
     private $isDispatching = false;
 
+    /**
+     * @var bool Used to pause execution of jobs.
+     */
+    private $isPaused = false;
+
     protected $logErrorsAsWarnings = true;
 
     private $scheduledJobs = [];
-
-    /**
-     * Add a new Job to the queue and immediately execute it.
-     *
-     * @param string $jobType
-     * @param array $message
-     * @param JobPriority|null $jobPriority
-     * @param int|null $delay
-     * @return TrackingSlipInterface
-     * @throws Exception On error.
-     */
-    public function addJob(
-        string $jobType,
-        $message = [],
-        JobPriority $jobPriority = null,
-        int $delay = null
-    ): TrackingSlipInterface {
-        $result = parent::addJob($jobType, $message, $jobPriority, $delay);
-        return $result;
-    }
 
     /**
      * Assert a job type was scheduled with a specific message.
@@ -88,17 +74,12 @@ class InstantScheduler extends DummyScheduler {
         $result = parent::addJobDescriptor($jobDescriptor);
 
         $type = $jobDescriptor->getJobType();
-        if (array_key_exists($type, $this->scheduledJobs)) {
-            $this->scheduledJobs[$type][] = $jobDescriptor->getMessage();
-        } else {
-            $this->scheduledJobs[$type] = [$jobDescriptor->getMessage()];
-        }
+        $this->scheduledJobs[$type][] = $jobDescriptor->getMessage();
 
         if (!$this->isDispatching) {
             // We are already executing a job. The newly queued job is pushed onto the end of the driver slips.
             // This way the jobs fully execute in the order they are queued.
             $this->dispatchAll();
-            $this->trackingSlips = [];
         }
 
         return $result;
@@ -109,8 +90,43 @@ class InstantScheduler extends DummyScheduler {
      * @inheritdoc
      */
     protected function dispatchAll() {
+        if ($this->isPaused) {
+            return;
+        }
         $this->isDispatching = true;
         parent::dispatchAll();
+        $this->isDispatching = false;
+        $this->trackingSlips = [];
+    }
+
+    /**
+     * Pause execution of jobs.
+     */
+    public function pause() {
+        $this->isPaused = true;
+    }
+
+    /**
+     * Resume execution of jobs. Any scheduled jobs will be executed immediately after resume.
+     */
+    public function resume() {
+        $this->isPaused = false;
+        $this->dispatchAll();
+    }
+
+    /**
+     * @return TrackingSlip[]
+     */
+    public function getTrackingSlips(): array {
+        return $this->trackingSlips;
+    }
+
+    /**
+     * Reset the scheduler.
+     */
+    public function reset() {
+        $this->trackingSlips = [];
+        $this->isPaused = false;
         $this->isDispatching = false;
     }
 }

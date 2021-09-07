@@ -11,10 +11,13 @@ use CategoryModel;
 use DiscussionModel;
 use Garden\EventManager;
 use Garden\Events\BulkUpdateEvent;
+use Garden\Web\Exception\PartialCompletionException;
 use Gdn;
+use RoleModel;
 use Vanilla\Community\Events\DiscussionEvent;
 use Vanilla\Formatting\Formats\RichFormat;
 use Vanilla\Scheduler\Job\LocalApiBulkDeleteJob;
+use Vanilla\Utility\ArrayUtils;
 use VanillaTests\APIv2\TestSortingTrait;
 use VanillaTests\Bootstrap;
 use VanillaTests\EventSpyTestTrait;
@@ -53,6 +56,11 @@ class DiscussionModelTest extends SiteTestCase {
      * @var array
      */
     private $privateCategory;
+
+    /**
+     * @var array
+     */
+    private static $data = [];
 
     /**
      * A test listener that increments the counter.
@@ -899,7 +907,8 @@ class DiscussionModelTest extends SiteTestCase {
             'Singular' => 'Discussion',
             'Plural' => 'Discussions',
             'AddUrl' => '/post/discussion',
-            'AddText' => 'New Discussion'
+            'AddText' => 'New Discussion',
+            'AddIcon' => 'new-discussion'
         ]], $discussionTypes);
     }
 
@@ -1055,48 +1064,20 @@ class DiscussionModelTest extends SiteTestCase {
     }
 
     /**
-     * Assert that discussion is deleted when we go through discussion + comments bulk deletion.
-     */
-    public function testDeleteDiscussionWithCommentBulkDeletion() {
-        $discussionRow = $this->createDiscussion(['name' => 'My discussion with 30 comments']);
-        $discussionID = $discussionRow['discussionID'];
-        $this->insertComments(
-            60,
-            [
-                'DiscussionID' => $discussionID,
-                'Body' => "[{\"insert\":\"Hello World\"}]",
-                'Format' => RichFormat::FORMAT_KEY]
-        );
-        $discussion = $this->api()->get('/discussions/'.$discussionID)->getBody();
-        $this->assertEquals(60, $discussion['countComments']);
-        $jobToDelete = new LocalApiBulkDeleteJob();
-        $request = \Gdn::request();
-        $jobToDelete->setMessage([
-            'iteratorUrl' => $request->getSimpleUrl("/api/v2/comments?discussionID=${discussionID}"),
-            'recordIDField' => 'commentID',
-            'deleteUrlPattern' => $request->getSimpleUrl("/api/v2/comments/:recordID"),
-            'finalDeleteUrl' => $request->getSimpleUrl("/api/v2/discussions/${discussionID}"),
-        ]);
-        $clientHttp = clone $this->api();
-        $jobToDelete->setDependencies($clientHttp);
-        Gdn::config()->saveToConfig('Vanilla.Comments.PerPage', 10, false);
-        $jobStatus = $jobToDelete->run();
-        $this->assertEquals('complete', $jobStatus->getStatus());
-        $response = $this->api()->setThrowExceptions(false)->get('/discussions/'.$discussionID);
-        $this->assertEquals(404, $response->getStatusCode());
-    }
-
-    /**
      * Test DiscussionModel::DeleteDiscussions().
      */
-    public function testDeleteDiscussions(): void {
+    public function testDeleteNonExistentDiscussions(): void {
         $discussion1 = $this->createDiscussion();
         $discussion2 = $this->createDiscussion();
-        $result = $this->discussionModel->deleteDiscussions([$discussion1['discussionID'], $discussion2['discussionID']]);
+        $this->discussionModel->deleteDiscussions([$discussion1['discussionID'], $discussion2['discussionID']]);
+        $result = $this->discussionModel->getIn([$discussion1['discussionID'], $discussion2['discussionID']])->resultArray();
         $this->assertEmpty($result);
         $rd = rand(6000, 8000);
-        $result = $this->discussionModel->deleteDiscussions([$rd]);
-        $this->assertEquals($rd, $result[0]);
+        try {
+            $this->discussionModel->deleteDiscussions([$rd]);
+        } catch (\Exception $e) {
+            $this->assertEquals(408, $e->getCode());
+        }
     }
 
     /**
@@ -1116,5 +1097,156 @@ class DiscussionModelTest extends SiteTestCase {
             return $this->discussionModel->filterCategoryPermissions($discussionIDs, 'Vanilla.Discussions.Delete');
         }, $userGuest);
         $this->assertEmpty($result);
+    }
+
+    /**
+     * Test DiscussionModel::CheckPermission().
+     */
+    public function testCheckPermission(): void {
+        $category = $this->createCategory();
+        $discussion =  $this->createDiscussion(['categoryID' => $category['categoryID']]);
+        $discussion = ArrayUtils::pascalCase($discussion);
+        $result = $this->discussionModel->checkPermission($discussion, 'Vanilla.Discussions.View');
+        $this->assertTrue($result);
+        $result = $this->discussionModel->checkPermission($discussion, 'View');
+        $this->assertTrue($result);
+        unset($discussion['CategoryID']);
+        $result = $this->discussionModel->checkPermission($discussion, 'Vanilla.Discussions.View');
+        $this->assertFalse($result);
+    }
+
+    /**
+     * Test Successful DiscussionModel::MoveDiscussions().
+     *
+     * @depends testPrepareMoveDiscussionsData
+     */
+    public function testSuccessDiscussionsMove(): void {
+        // Move valid discussions.
+        $this->discussionModel->moveDiscussions(self::$data['validDiscussionIDs'], ArrayUtils::pascalCase(self::$data['validCategory2'])['CategoryID'], true);
+        $discussions = $this->discussionModel->getIn(self::$data['validDiscussionIDs'])->resultArray();
+        foreach ($discussions as $discussion) {
+            $this->assertEquals(self::$data['validCategory2']['categoryID'], $discussion['CategoryID']);
+        }
+    }
+
+    /**
+     * Prepare move discussions test data.
+     */
+    public function testPrepareMoveDiscussionsData(): void {
+        $rd1 = rand(5000, 6000);
+        $rd2 = rand(3000, 4000);
+        $rd3 = rand(1000, 2000);
+        $categoryInvalid = [
+            'categoryID' => 123456,
+            'name' => 'invalid category',
+            'urlCode' => 'invalid category'.$rd1.$rd2,
+            'parentCategoryID' => $rd1
+        ];
+        $category_1Name = 'category_1'.$rd1;
+        $category_2Name = 'category_2'.$rd2;
+        $category_3Name = 'category_3'.$rd3;
+        $categoryData_1 = [
+            'name' => $category_1Name
+        ];
+
+        $categoryData_2 = [
+            'name' => $category_2Name
+        ];
+        $categoryData_3 = [
+            'name' => $category_3Name
+        ];
+
+        $category_1 = $this->createCategory($categoryData_1);
+        $category_2 = $this->createCategory($categoryData_2);
+        $category_3 = $this->createCategory($categoryData_3);
+        $category_permission = $this->createPermissionedCategory([], [RoleModel::ADMIN_ID]);
+        $discussionData_1 = [
+            'name' => 'Test Discussion_1',
+            'categoryID' => $category_1['categoryID']
+        ];
+        $discussionData_2 = [
+            'name' => 'Test Discussion_2',
+            'categoryID' => $category_1['categoryID']
+        ];
+        $discussionData_3 = [
+            'name' => 'Test Discussion_3',
+            'categoryID' => $category_1['categoryID']
+        ];
+        $discussionData_4 = [
+            'name' => 'Test Discussion_4',
+            'categoryID' => $category_1['categoryID']
+        ];
+        $discussionData_Permission = [
+            'name' => 'Test Discussion_Permission',
+            'categoryID' => $category_permission['categoryID']
+        ];
+        $discussion_1 = $this->createDiscussion($discussionData_1);
+        $discussion_2 = $this->createDiscussion($discussionData_2);
+        $discussion_3 = $this->createDiscussion($discussionData_3);
+        $discussion_4 = $this->createDiscussion($discussionData_Permission);
+        $discussion_Permission = $this->createDiscussion($discussionData_4);
+        $discussionIDs = [$discussion_1['discussionID'], $discussion_2['discussionID'], $discussion_3['discussionID'], $discussion_4['discussionID']];
+        self::$data['invalidDiscussionIDs'] = [$rd1, $rd2];
+        self::$data['invalidCategory'] = $categoryInvalid;
+        self::$data['validCategory1'] = $category_1;
+        self::$data['validCategory2'] = $category_2;
+        self::$data['validCategory3'] = $category_3;
+        self::$data['category_permission'] = $category_permission;
+        self::$data['discussion_1'] = $discussionData_1;
+        self::$data['discussion_2'] = $discussionData_2;
+        self::$data['discussion_Permission'] = $discussion_Permission;
+        self::$data['validDiscussionIDs'] = $discussionIDs;
+        self::$data['mixedIDs'] = array_merge(self::$data['validDiscussionIDs'], [1234]);
+
+        $this->assertTrue(!empty(self::$data));
+    }
+
+    /**
+     * Test failed DiscussionModel::DiscussionMove.
+     *
+     * @param string $discussionIDs
+     * @param string $category
+     * @param int $expectedCode
+     * @param int|null $batchTime
+     * @depends testPrepareMoveDiscussionsData
+     * @dataProvider provideDiscussionsMoveData
+     */
+    public function testFailedDiscussionsMove(
+        string $discussionIDs,
+        string $category,
+        int $expectedCode,
+        ?int $batchTime
+    ): void {
+        if (!$batchTime) {
+            $batchTime = 10;
+        }
+
+        $this->runWithConfig([
+            'Vanilla.MaxBatchTime' => $batchTime
+        ], function () use ($discussionIDs, $category, $expectedCode) {
+            try {
+                $user = $category === 'category_permission' ? $this->createUser() : self::$siteInfo['adminUserID'];
+                $this->runWithUser(function () use ($discussionIDs, $category) {
+                    $this->discussionModel->moveDiscussions(self::$data[$discussionIDs], ArrayUtils::pascalCase(self::$data[$category])['CategoryID'], true, false);
+                }, $user);
+            } catch (\Exception $e) {
+                $this->assertEquals($expectedCode, $e->getCode());
+            }
+        });
+    }
+
+    /**
+     * Provide discussions move data.
+     *
+     * @return array
+     */
+    public function provideDiscussionsMoveData(): array {
+        return [
+            'invalid-discussion' => ['invalidDiscussionIDs', 'validCategory1', 408, null],
+            'invalid-category' => ['validDiscussionIDs', 'invalidCategory', 404, null],
+            'valid-invalidIDs' => ['mixedIDs', 'validCategory2', 408, null],
+            'timeout' => ['validDiscussionIDs', 'validCategory3', 408, -1],
+            'permission-invalid' => ['validDiscussionIDs', 'category_permission', 403, null]
+        ];
     }
 }

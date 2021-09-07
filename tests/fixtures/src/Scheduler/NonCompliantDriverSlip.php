@@ -10,11 +10,14 @@ namespace VanillaTests\Fixtures\Scheduler;
 use Vanilla\HostedJob\Driver\HostedDriverSlip;
 use Vanilla\Scheduler\Driver\DriverSlipInterface;
 use Vanilla\Scheduler\Job\JobExecutionStatus;
+use Vanilla\Scheduler\Job\TrackableJobAwareTrait;
 
 /**
  * Class NonCompliantDriverSlip.
  */
 class NonCompliantDriverSlip implements DriverSlipInterface {
+
+    use TrackableJobAwareTrait;
 
     /**
      * Execute.
@@ -30,7 +33,7 @@ class NonCompliantDriverSlip implements DriverSlipInterface {
      *
      * @return string
      */
-    public function getId(): string {
+    public function getID(): string {
         return "null";
     }
 
@@ -85,7 +88,7 @@ class NonCompliantDriverSlip implements DriverSlipInterface {
      *
      * @return string|null
      */
-    public function getTrackingId(): ?string {
+    public function getTrackingID(): ?string {
         return "unknown";
     }
 
@@ -94,7 +97,7 @@ class NonCompliantDriverSlip implements DriverSlipInterface {
      *
      * @param string $trackingId
      */
-    public function setTrackingId(string $trackingId): void {
+    public function setTrackingID(string $trackingId): void {
         // void
     }
 

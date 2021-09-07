@@ -7,7 +7,7 @@
 import Button, { IButtonProps } from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import classNames from "classnames";
-import React, { PropsWithChildren, KeyboardEvent, useLayoutEffect, useState, useRef } from "react";
+import React, { PropsWithChildren, useState } from "react";
 import { embedButtonClasses } from "./embedButtonStyles";
 
 interface IProps extends IButtonProps {
@@ -28,7 +28,7 @@ export function EmbedButton(props: PropsWithChildren<IProps>) {
                 setIsFirst(button.previousSibling === null);
             }}
             tabIndex={isFirst ? 0 : -1}
-            onKeyDown={(e: React.KeyboardEvent<HTMLElement>) => {
+            onKeyDown={(e: React.KeyboardEvent<HTMLButtonElement>) => {
                 const key = e.key;
                 let target = e.target as HTMLElement & EventTarget;
                 const firstSibling = () => target.parentElement?.firstChild as HTMLElement | undefined;

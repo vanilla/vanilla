@@ -137,9 +137,7 @@ class Gdn_Model extends Gdn_Pluggable {
      * @return \Gdn_SQLDriver
      */
     protected function createSql(): \Gdn_SQLDriver {
-        $sql = clone $this->Database->sql();
-        $sql->reset();
-        return $sql;
+        return $this->Database->createSql();
     }
 
     /**

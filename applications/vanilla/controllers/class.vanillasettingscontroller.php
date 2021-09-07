@@ -864,7 +864,7 @@ class VanillaSettingsController extends Gdn_Controller {
         $cf = new ConfigurationModule($this);
 
         $cf->initialize([
-            'Vanilla.EnableCategoryFollowing' => [
+            \CategoryModel::CONF_CATEGORY_FOLLOWING => [
                 'LabelCode' => 'Category Following',
                 'Control' => 'toggle',
                 'Description' => t(

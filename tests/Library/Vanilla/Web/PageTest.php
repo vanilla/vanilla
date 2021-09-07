@@ -7,16 +7,19 @@
 
 namespace VanillaTests\Library\Vanilla\Web;
 
-use PHPUnit\Framework\TestCase;
+use Vanilla\Exception\PermissionException;
+use VanillaTests\Fixtures\Html\TestHtmlDocument;
+use VanillaTests\Fixtures\MockSiteMetaExtra;
 use VanillaTests\Fixtures\PageFixture;
-use VanillaTests\SiteTestTrait;
+use VanillaTests\SiteTestCase;
+use VanillaTests\UsersAndRolesApiTestTrait;
 
 /**
  * Tests of Vanilla's base page class.
  */
-class PageTest extends TestCase {
+class PageTest extends SiteTestCase {
 
-    use SiteTestTrait;
+    use UsersAndRolesApiTestTrait;
 
     /**
      * Test that links get added properly.
@@ -47,5 +50,88 @@ class PageTest extends TestCase {
 
         $meta = $xpath->query("//meta[@property='og:isOg']", $head);
         $this->assertEquals(1, $meta->count());
+    }
+
+    /**
+     * Test that extra metas can be applied.
+     */
+    public function testExtraMeta() {
+        /** @var PageFixture $fixture */
+        $fixture = self::container()->get(PageFixture::class);
+        $fixture->addSiteMetaExtra(new MockSiteMetaExtra(["hello" => ["world" => "foo"]]));
+        $result = $fixture->render()->getData();
+
+        $doc = new TestHtmlDocument($result);
+        $scriptTags = $doc->queryXPath("//script[contains(text(),\"gdn\")]");
+        $lastInlineScript = $scriptTags->item($scriptTags->count() - 1)->textContent;
+
+        $helloWorldJs = '"hello":{"world":"foo"}';
+        $this->assertStringContainsString($helloWorldJs, $lastInlineScript);
+    }
+
+    /**
+     * Test the permission calls on the page.
+     *
+     * @param array $permissions
+     * @param array $args
+     * @param string|null $exception
+     *
+     * @dataProvider providePermissions
+     */
+    public function testPermissionCheck(array $permissions, array $args, string $exception = null) {
+        /** @var PageFixture $fixture */
+        $fixture = self::container()->get(PageFixture::class);
+        $this->runWithPermissions(function () use ($fixture, $exception, $args) {
+            if ($exception) {
+                $this->expectException($exception);
+            }
+            $fixture->permission(...$args);
+
+            // We expected  "no exception'. Pass the test.
+            $this->assertTrue(true);
+        }, $permissions);
+    }
+
+    /**
+     * @return array[]
+     */
+    public function providePermissions(): array {
+        return [
+            "has one" => [
+                [
+                    "site.manage" => true,
+                ],
+                ["Garden.Settings.Manage"],
+            ],
+            "missing one" => [
+                [
+                    "site.manage" => false,
+                ],
+                ["Garden.Settings.Manage"],
+                PermissionException::class,
+            ],
+            "has two" => [
+                [
+                    "site.manage" => true,
+                    "community.manage" => true,
+                ],
+                [["Garden.Settings.Manage", "Garden.Community.Manage"]],
+            ],
+            "has one of two" => [
+                [
+                    "site.manage" => true,
+                    "community.manage" => false,
+                ],
+                [["Garden.Settings.Manage", "Garden.Community.Manage"]],
+            ],
+            "has none of two" => [
+                [
+                    "site.manage" => false,
+                    "community.manage" => false,
+                ],
+                [["Garden.Settings.Manage", "Garden.Community.Manage"]],
+                PermissionException::class,
+            ],
+        ];
     }
 }

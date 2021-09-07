@@ -747,7 +747,6 @@ class UsersTest extends AbstractResourceTest {
         $this->assertArrayHasKey('name', $response);
         $this->assertArrayHasKey('email', $response);
         $this->assertArrayHasKey('photoUrl', $response);
-        $this->assertArrayHasKey('roles', $response);
         $this->assertArrayHasKey('dateInserted', $response);
         $this->assertArrayHasKey('dateLastActive', $response);
         $this->assertArrayHasKey('countDiscussions', $response);
@@ -773,5 +772,34 @@ class UsersTest extends AbstractResourceTest {
             "resourceType" => "user",
             "primaryKey" => "userID"
         ];
+    }
+
+    /**
+     * Test GET /:ID user with personal info role.
+     */
+    public function testGetPersonalInfoProfile(): void {
+        $role = $this->createRole([
+            'name' => 'New Role',
+            'personalInfo' => true,
+            'permissions' => [
+                [
+                    'type' => 'global',
+                    'permissions' => [
+                        'signIn.allow' => true
+                    ]
+                ]
+            ]
+        ]);
+        // Create a user with personalInfo set to true.
+        $userA = $this->createUser(['name' => 'userA', 'roleID' => [$role['roleID']]]);
+        // a user without personalInfo.View permission should not be able to view role info.
+        $userB = $this->createUser(['name' => 'userB']);
+        $this->runWithUser(function () use ($userA) {
+            $result = $this->api()->get("/users/{$userA['userID']}")->getBody();
+            $this->assertArrayNotHasKey('roles', $result);
+        }, $userB);
+        // As an admin, role info should be visible.
+        $result =  $this->api()->get("/users/{$userA['userID']}")->getBody();
+        $this->assertArrayHasKey('roles', $result);
     }
 }

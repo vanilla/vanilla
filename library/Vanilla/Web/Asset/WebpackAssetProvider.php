@@ -164,7 +164,7 @@ class WebpackAssetProvider {
      */
     private function getCollectionForSection(string $section): WebpackAssetDefinitionCollection {
         if (!isset($this->collectionForSection[$section])) {
-            $distPath = Path::join($this->fsRoot, 'dist');
+            $distPath = Path::join($this->fsRoot, PATH_DIST_NAME);
             if (WebpackAssetDefinitionCollection::sectionExists($section, $distPath)) {
                 $this->collectionForSection[$section] = WebpackAssetDefinitionCollection::loadFromDist($section, $distPath);
             } else {

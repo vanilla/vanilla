@@ -17,6 +17,7 @@ class DiscussionModelCountsTest extends AbstractCountsTest {
      *
      * @param array $row
      * @return int
+     * @throws \Exception If a categoryID could not be determined.
      */
     private function alternateCategoryID(array $row): int {
         foreach ($this->categories as $category) {
@@ -106,7 +107,7 @@ class DiscussionModelCountsTest extends AbstractCountsTest {
         $parentSourceCategory = $this->categories[$parentSourceCategoryID];
         $parentDestCategory = $this->categories[$parentDestCategoryID];
 
-        $this->discussionModel->merge($sourceDiscussion['DiscussionID'], $destDiscussion['DiscussionID'], false);
+        $this->discussionModel->mergeDiscussions([$sourceDiscussion['DiscussionID']], $destDiscussion['DiscussionID'], false);
 
         $this->reloadCategoriesDiscussionsComments();
 
@@ -180,7 +181,7 @@ class DiscussionModelCountsTest extends AbstractCountsTest {
         }
         $this->assertNotNull($sourceDiscussion);
 
-        $this->discussionModel->merge($sourceDiscussion['DiscussionID'], $destDiscussion['DiscussionID'], false);
+        $this->discussionModel->mergeDiscussions([$sourceDiscussion['DiscussionID']], $destDiscussion['DiscussionID'], false);
 
         $this->reloadCategoriesDiscussionsComments();
 
@@ -222,7 +223,7 @@ class DiscussionModelCountsTest extends AbstractCountsTest {
         $destCategoryID = $destDiscussion['CategoryID'] ?? false;
         $destCategory = $this->categories[$destCategoryID];
 
-        $this->discussionModel->merge($sourceDiscussion['DiscussionID'], $destDiscussion['DiscussionID'], false);
+        $this->discussionModel->mergeDiscussions([$sourceDiscussion['DiscussionID']], $destDiscussion['DiscussionID'], false);
 
         $this->reloadCategoriesDiscussionsComments();
 

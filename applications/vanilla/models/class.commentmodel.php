@@ -1490,30 +1490,29 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
      *
      * Updates unread comment totals, bookmarks, and activity. Sends notifications.
      *
+     * @param int $commentID Unique ID for this comment.
+     * @param int $insert Used as a boolean for whether this is a new comment.
+     * @param bool $checkExisting Not used.
+     * @param bool $incUser Whether or not to just increment the user's comment count rather than recalculate it.
      * @since 2.0.0
      * @access public
-     *
-     * @param array $CommentID Unique ID for this comment.
-     * @param int $Insert Used as a boolean for whether this is a new comment.
-     * @param bool $CheckExisting Not used.
-     * @param bool $IncUser Whether or not to just increment the user's comment count rather than recalculate it.
      */
-    public function save2($CommentID, $Insert, $CheckExisting = true, $IncUser = false) {
-        $Session = Gdn::session();
+    public function save2($commentID, $insert, $checkExisting = true, $incUser = false) {
+        $session = Gdn::session();
 
         // Load comment data
-        $Fields = $this->getID($CommentID, DATASET_TYPE_ARRAY);
+        $fields = $this->getID($commentID, DATASET_TYPE_ARRAY);
 
         // Clear any session stashes related to this discussion
-        $DiscussionModel = $this->discussionModel;
-        $DiscussionID = val('DiscussionID', $Fields);
-        $Discussion = $DiscussionModel->getID($DiscussionID);
-        $Session->setPublicStash('CommentForForeignID_'.getValue('ForeignID', $Discussion), null);
+        $discussionModel = $this->discussionModel;
+        $discussionID = $fields['DiscussionID'] ?? null;
+        $discussion = $discussionModel->getID($discussionID);
+        $session->setPublicStash('CommentForForeignID_'.getValue('ForeignID', $discussion), null);
 
         // Make a quick check so that only the user making the comment can make the notification.
         // This check may be used in the future so should not be depended on later in the method.
         $validController = Gdn::controller() instanceof Gdn_Controller;
-        if ($validController && Gdn::controller()->deliveryType() === DELIVERY_TYPE_ALL && $Fields['InsertUserID'] != $Session->UserID) {
+        if ($validController && Gdn::controller()->deliveryType() === DELIVERY_TYPE_ALL && $fields['InsertUserID'] != $session->UserID) {
             return;
         }
 
@@ -1521,28 +1520,28 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
         // the number of discussions created by the user that s/he has
         // unread messages in) if this comment was not added by the
         // discussion author.
-        $this->updateUser($Fields['InsertUserID'], $IncUser && $Insert);
+        $this->updateUser($fields['InsertUserID'], $incUser && $insert);
 
         // Mark the user as participated and update DateLastViewed.
         $this->SQL->replace(
             'UserDiscussion',
-            ['Participated' => 1, 'DateLastViewed' => $Fields['DateInserted']],
-            ['DiscussionID' => $DiscussionID, 'UserID' => val('InsertUserID', $Fields)]
+            ['Participated' => 1, 'DateLastViewed' => $fields['DateInserted']],
+            ['DiscussionID' => $discussionID, 'UserID' => val('InsertUserID', $fields)]
         );
 
         $updateCounts = true;
         // We shouldn't update the category counts if the discussion counts haven't been updated.
-        if ($Fields['InsertUserID'] !== $Discussion->LastCommentUserID) {
+        if ($fields['InsertUserID'] !== $discussion->LastCommentUserID) {
             $updateCounts = false;
         }
-        if ($Insert && $updateCounts) {
-            // UPDATE COUNT AND LAST COMMENT ON CATEGORY TABLE
-            if ($Discussion->CategoryID > 0) {
-                CategoryModel::instance()->incrementLastComment($Fields);
+        if ($insert) {
+            if ($updateCounts && $discussion->CategoryID > 0) {
+                // UPDATE COUNT AND LAST COMMENT ON CATEGORY TABLE
+                CategoryModel::instance()->incrementLastComment($fields);
             }
             $this->notifyNewComment(
-                $Fields ? (array)$Fields : null,
-                $Discussion ? (array)$Discussion : null
+                $fields ? (array)$fields : null,
+                $discussion ? (array)$discussion : null
             );
         }
     }
@@ -1562,19 +1561,10 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
 
         $categoryID = val('CategoryID', $discussion);
 
-        // Figure out the category that governs this notification preference.
-        $i = 0;
+        // Make sure the category actually exists.
         $category = CategoryModel::categories($categoryID);
         if (!$category) {
             return;
-        }
-
-        while ($category['Depth'] > 2 && $i < 20) {
-            if (!$category || $category['Archived']) {
-                return;
-            }
-            $i++;
-            $category = CategoryModel::categories($category['ParentCategoryID']);
         }
 
         // Grab all of the users that need to be notified.
@@ -1596,9 +1586,9 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
             }
 
             $name = $row['Name'];
-            if (strpos($name, '.Email.') !== false) {
+            if (str_contains($name, '.Email.')) {
                 $notifyUsers[$userID]['Emailed'] = ActivityModel::SENT_PENDING;
-            } elseif (strpos($name, '.Popup.') !== false) {
+            } elseif (str_contains($name, '.Popup.')) {
                 $notifyUsers[$userID]['Notified'] = ActivityModel::SENT_PENDING;
             }
         }

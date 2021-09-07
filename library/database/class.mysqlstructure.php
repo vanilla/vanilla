@@ -722,6 +722,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             'mediumtext',
             'longtext',
             'text',
+            'tinytext',
             'decimal',
             'numeric',
             'float',

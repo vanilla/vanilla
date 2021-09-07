@@ -25,8 +25,15 @@ export interface IFormGroupProps {
     inputID?: string;
 }
 
+function noop() {}
+
 /** @internal */
-export const FormGroupContext = React.createContext<IFormGroupContext>({} as never);
+export const FormGroupContext = React.createContext<IFormGroupContext>({
+    inputID: "",
+    labelID: "",
+    setLabel: noop,
+    setLabelID: noop,
+});
 
 /**
  * A FormGroup renders a section of a form with a label and any input.

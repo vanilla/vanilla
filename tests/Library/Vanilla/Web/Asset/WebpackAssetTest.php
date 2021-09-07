@@ -31,7 +31,7 @@ class WebpackAssetTest extends TestCase {
      */
     public function testExists() {
         $fs =  vfsStream::create([
-            "dist" => [
+            PATH_DIST_NAME => [
                 "test" => [
                     'bootstrap.min.js' => "helloWorld",
                 ],

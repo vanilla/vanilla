@@ -301,4 +301,40 @@ class VanillaTestCase extends TestCase {
 
         return $result;
     }
+
+    /**
+     * Assert that rows in some arrays are like rows in another array.
+     *
+     * @param array $expectedFields The expected fields and their values.
+     * Example:
+     * [
+     *     'recordID' => [4, 652, 2],
+     *     'shouldNotExist' => null,
+     *     'otherField' => ['test', 'test2', 'test3'],
+     * ]
+     * @param array $actualRows The actual rows to check.
+     * @param bool $strictOrder Should the items be strictly ordered.
+     * @param int|null $count The expected count of rows.
+     */
+    protected function assertRowsLike(array $expectedFields, array $actualRows, bool $strictOrder = true, ?int $count = null) {
+        if (is_int($count)) {
+            $this->assertEquals($count, count($actualRows));
+        }
+
+        foreach ($expectedFields as $expectedField => $expectedValues) {
+            if ($expectedValues === null) {
+                foreach ($actualRows as $result) {
+                    $this->assertArrayNotHasKey($expectedField, $result);
+                }
+            } else {
+                $actualValues = array_column($actualRows, $expectedField);
+                if (!$strictOrder) {
+                    sort($actualValues);
+                    sort($expectedValues);
+                }
+
+                $this->assertEquals($expectedValues, $actualValues);
+            }
+        }
+    }
 }

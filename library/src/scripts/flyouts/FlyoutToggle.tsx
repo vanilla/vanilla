@@ -44,6 +44,7 @@ interface IProps {
     toggleButtonClassName?: string;
     buttonRef?: React.RefObject<HTMLButtonElement>;
     openAsModal: boolean;
+    modalSize?: ModalSizes;
     initialFocusElement?: HTMLElement | null;
     tag?: string;
 }
@@ -203,7 +204,7 @@ export default function FlyoutToggle(props: IProps) {
                     <LazyModal
                         id={contentID}
                         label={t("title")}
-                        size={ModalSizes.SMALL}
+                        size={props.modalSize ?? ModalSizes.SMALL}
                         exitHandler={closeMenuHandler}
                         elementToFocusOnExit={buttonRef.current!}
                         isVisible={isContentVisible}

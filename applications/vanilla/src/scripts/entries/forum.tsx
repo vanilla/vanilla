@@ -17,6 +17,9 @@ import { DiscussionListModule } from "@library/features/discussions/DiscussionLi
 import { UserSpotlight } from "@library/userSpotlight/UserSpotlight";
 import { SearchWidget } from "@library/searchWidget/SearchWidget";
 import { CategoryPicker } from "@library/forms/select/CategoryPicker";
+import { CategoryFollowDropDown } from "@vanilla/addon-vanilla/categories/CategoryFollowDropdown";
+import TabWidget from "@library/tabWidget/TabWidget";
+import NewPostMenu from "@library/flyouts/NewPostMenu";
 
 registerReducer("forum", forumReducer);
 registerCommunitySearchDomain();
@@ -28,6 +31,9 @@ addComponent("CallToAction", CallToAction, { overwrite: true });
 addComponent("UserSpotlight", UserSpotlight, { overwrite: true });
 addComponent("SearchWidget", SearchWidget, { overwrite: true });
 addComponent("CategoryPicker", CategoryPicker, { overwrite: true });
+addComponent("CategoryFollowDropDown", CategoryFollowDropDown, { overwrite: true });
+addComponent("TabWidget", TabWidget, { overwrite: true });
+addComponent("NewPostMenu", NewPostMenu, { overwrite: true });
 
 SearchContextProvider.setOptionProvider(new CommunitySearchProvider());
 accessibleRoleButton();

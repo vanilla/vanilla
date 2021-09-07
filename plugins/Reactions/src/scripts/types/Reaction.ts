@@ -3,9 +3,9 @@
  * @license GPL-2.0-only
  */
 
-import { IBadge } from "@library/badge/Badge";
+import { IContributionItem } from "@library/contributionItems/ContributionItem";
 
-export interface IReaction extends IBadge {
+export interface IReaction extends IContributionItem {
     tagID: number;
     urlcode: string;
     class: string;

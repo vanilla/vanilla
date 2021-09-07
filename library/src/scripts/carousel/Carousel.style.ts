@@ -10,6 +10,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
 import { percent } from "csx";
+import { userSelect } from "@library/styles/styleHelpersFeedback";
 
 export const carouselClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -89,6 +90,9 @@ export const carouselClasses = useThemeCache(() => {
         zIndex: 0,
         overflow: "hidden",
         width: percent(100),
+        "& *": {
+            ...userSelect("none"),
+        },
     });
 
     const slider = style("slider", {

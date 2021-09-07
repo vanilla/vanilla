@@ -56,6 +56,21 @@ class CallToActionModule extends AbstractReactModule {
     private $otherCTAs;
 
     /**
+     * @var string|null Explicitly pass alignment.
+     */
+    private $alignment = null;
+
+    /**
+     * @var bool If we want CTA buttons to be compact (mainly for legacy themes, as the panel width is smaller there).
+     */
+    private $compactButtons = false;
+
+    /**
+     * @var bool If true, the widget won't be rendered on smaller views.
+     */
+    private $desktopOnly = false;
+
+    /**
      * @return string
      */
     public function getTextCTA(): string {
@@ -182,6 +197,48 @@ class CallToActionModule extends AbstractReactModule {
     }
 
     /**
+     * @param string $alignment
+     */
+    public function setAlignment(string $alignment): void {
+        $this->alignment = $alignment;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAlignment(): ?string {
+        return $this->alignment;
+    }
+
+    /**
+     * @param bool $compactButtons
+     */
+    public function setCompactButtons(bool $compactButtons): void {
+        $this->compactButtons = $compactButtons;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getCompactButtons(): ?bool {
+        return $this->compactButtons;
+    }
+
+    /**
+     * @param bool $desktopOnly
+     */
+    public function setDesktopOnly(bool $desktopOnly): void {
+        $this->desktopOnly = $desktopOnly;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getDesktopOnly(): bool {
+        return $this->desktopOnly;
+    }
+
+    /**
      * @return string
      */
     public function assetTarget() {
@@ -283,7 +340,10 @@ class CallToActionModule extends AbstractReactModule {
                     'enum' => ['top', 'left'],
                 ],
                 'linkButtonType:s?',
+                'alignment:s?',
+                'compactButtons:b?',
             ]),
+            'desktopOnly:b?',
         ]);
     }
 
@@ -299,6 +359,7 @@ class CallToActionModule extends AbstractReactModule {
             'description' => $this->getDescription() ?? '',
             'options' => $this->getOptions(),
             'otherCTAs' => $this->getOtherCTAs(),
+            'desktopOnly' => $this->getdesktopOnly(),
         ];
         $props = $this->getSchema()->validate($props);
 
@@ -321,6 +382,12 @@ class CallToActionModule extends AbstractReactModule {
         }
         if ($this->getLinkButtonType()) {
             $options['linkButtonType'] = $this->getLinkButtonType();
+        }
+        if ($this->getAlignment()) {
+            $options['alignment'] = $this->getAlignment();
+        }
+        if ($this->getCompactButtons()) {
+            $options['compactButtons'] = $this->getCompactButtons();
         }
 
         return $options;

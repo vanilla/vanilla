@@ -1,5 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 
+/** @var ProfileController $Sender */
 if (is_array($this->ProfileFields)) {
     foreach ($this->ProfileFields as $k => $Field) {
         $Name = isset($Field['Name']) ? $Field['Name'] : $k;
@@ -19,13 +20,18 @@ if (is_array($this->ProfileFields)) {
             }
         } elseif ($Field['FormType'] == 'CheckBox') {
             $Options = "";
+        } else {
+            $Options = $Field['Options'] ?? [];
         }
 
-        if ($Field['FormType'] == 'TextBox' && !empty($Field['Options'])) {
-            $Options = $Field['Options'];
+        $formInput = "";
+        if ($Field['FormType'] === 'CheckBox') {
+            $formInput = $Sender->Form->checkBox($Name, $Field['Label']);
         } else {
-            echo wrap('<div class="label-wrap">'.$Sender->Form->label($Field['Label'], $Name).'</div>'.
-                '<div class="input-wrap">'.$Sender->Form->{$Field['FormType']}($Name, $Options).'</div>', 'li', ['class' => 'form-group']);
+            $formInput = '<div class="label-wrap">'.$Sender->Form->label($Field['Label'], $Name).'</div>'.
+                '<div class="input-wrap input-wrap-multiple">'.$Sender->Form->{$Field['FormType']}($Name, $Options).'</div>';
         }
+
+        echo wrap($formInput, 'li', ['class' => 'form-group']);
     }
 }

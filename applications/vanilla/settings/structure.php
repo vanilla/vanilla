@@ -173,6 +173,7 @@ $Construct
     ->column('Attributes', 'text', true)
     ->column('RegardingID', 'int(11)', true, 'index')
     ->column('hot', 'int(11)', 0, 'index')
+    ->column("statusID", "int(11)", 0, ["index"])
 ;
 //->column('Source', 'varchar(20)', true)
 
@@ -419,7 +420,7 @@ $DateInsertedExists = $Construct->columnExists('DateInserted');
 
 $Construct
     ->column('TagID', 'int', false, 'primary')
-    ->column('DiscussionID', 'int', false, 'primary')
+    ->column('DiscussionID', 'int', false, ['primary', 'index.DiscussionID'])
     ->column('CategoryID', 'int', false, 'index')
     ->column('DateInserted', 'datetime', !$DateInsertedExists)
     ->engine('InnoDB')

@@ -24,7 +24,7 @@ import { CSSObject } from "@emotion/css";
 import { buttonResetMixin } from "@library/forms/buttonMixins";
 import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 
-export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
+export const richEditorClasses = useThemeCache((legacyMode: boolean = true) => {
     const globalVars = globalVariables();
     const style = styleFactory("richEditor");
     const vars = richEditorVariables();
@@ -176,17 +176,15 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
             outline: 0,
             paddingBottom: 24, // So the user has room to click.
 
-            ...{
-                // When the editor is empty we should be displaying a placeholder.
-                "&.ql-blank::before": {
-                    content: `attr(placeholder)`,
-                    display: "block",
-                    color: ColorsUtils.colorOut(vars.text.placeholder.color),
-                    position: "absolute",
-                    top: 9,
-                    left: 12,
-                    cursor: "text",
-                },
+            // When the editor is empty we should be displaying a placeholder.
+            "&.ql-blank::before": {
+                content: `attr(placeholder)`,
+                display: "block",
+                color: ColorsUtils.colorOut(vars.text.placeholder.color),
+                position: "absolute",
+                top: legacyMode ? 9 : 0,
+                left: legacyMode ? 12 : 0,
+                cursor: "text",
             },
         },
         mediaQueries.oneColumnDown({

@@ -13,9 +13,9 @@ use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\DiscussionTypeConverter;
-use Vanilla\Exception\PermissionException;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\Models\TestDiscussionModelTrait;
+use VanillaTests\UsersAndRolesApiTestTrait;
 
 /**
  * Test the /api/v2/discussions endpoints.
@@ -28,9 +28,15 @@ class DiscussionsTest extends AbstractResourceTest {
     use TestSortingTrait;
     use TestDiscussionModelTrait;
     use TestFilterDirtyRecordsTrait;
+    use UsersAndRolesApiTestTrait;
 
     /** @var array */
     private static $categoryIDs = [];
+
+    /**
+     * @var array
+     */
+    private static $data = [];
 
     /**
      * {@inheritdoc}
@@ -209,8 +215,8 @@ class DiscussionsTest extends AbstractResourceTest {
         $this->assertArrayHasKey('canonicalUrl', $discussion);
         $this->assertEquals($url, $discussion['canonicalUrl']);
 
-        $this->expectException(\Garden\Web\Exception\ClientException::class);
-        $this->api()->put($this->baseUrl.'/'.$row['discussionID'].'/canonical-url', ['canonicalUrl' => $url.'overwrite']);
+        $r = $this->api()->put($this->baseUrl.'/'.$row['discussionID'].'/canonical-url', ['canonicalUrl' => $url.'overwrite']);
+        $this->assertSame($url.'overwrite', $r['canonicalUrl']);
     }
 
     /**
@@ -414,6 +420,7 @@ class DiscussionsTest extends AbstractResourceTest {
      * Ensure that there are dirtyRecords for a specific resource.
      */
     protected function triggerDirtyRecords() {
+        $this->resetTable('dirtyRecord');
         $discussion = $this->insertDiscussions(2);
         $ids = array_column($discussion, 'DiscussionID');
         /** @var DiscussionModel $discussionModel */
@@ -465,7 +472,6 @@ class DiscussionsTest extends AbstractResourceTest {
      * Test DELETE /discussions/list
      */
     public function testDeleteDiscussionsList(): void {
-
         $discussionData = [
             'name' => 'Test Discussion',
             'format' => 'text',
@@ -484,9 +490,9 @@ class DiscussionsTest extends AbstractResourceTest {
         // Delete an invalid discussion.
         try {
             $this->api()->deleteWithBody("/discussions/list", ["discussionIDs" => [$discussion3['discussionID'], $rd]])->getBody();
-        } catch (ClientException $e) {
+        } catch (\Exception $e) {
             $this->assertEquals($countBefore, $countAfter);
-            $this->assertEquals(400, $e->getCode());
+            $this->assertEquals(408, $e->getCode());
         }
         $this->api()->setUserID(\UserModel::GUEST_USER_ID);
         try {
@@ -494,6 +500,322 @@ class DiscussionsTest extends AbstractResourceTest {
         } catch (\Exception $e) {
             $this->assertEquals(403, $e->getCode());
         }
+    }
+
+    /**
+     * Test Success PATCH /discussions/move
+     *
+     * @depends testPrepareMoveDiscussionsData
+     */
+    public function testSuccessMoveDiscussionsList(): void {
+        $this->api()->patch("/discussions/move", [
+            'discussionIDs' => self::$data['validDiscussionIDs'],
+            'categoryID' => self::$data['validCategory2']['categoryID']]);
+        $discussions = $this->discussionModel->getIn(self::$data['validDiscussionIDs'])->resultArray();
+        foreach ($discussions as $discussion) {
+            $this->assertEquals(self::$data['validCategory2']['categoryID'], $discussion['CategoryID']);
+        }
+    }
+
+    /**
+     * Test success PATCH /discussions/merge
+     *
+     * @depends testPrepareMoveDiscussionsData
+     */
+    public function testSuccessMergeDiscussions(): void {
+        $discussionIDMerge_1 = self::$data['discussion_Merge_1']['discussionID'];
+        $discussionIDMerge_2 = self::$data['discussion_Merge_2']['discussionID'];
+        $commentsMerge1 = array_column($this->api()->get("/comments?discussionID={$discussionIDMerge_1}")->getBody(), 'commentID');
+        $commentsMerge2 = array_column($this->api()->get("/comments?discussionID={$discussionIDMerge_2}")->getBody(), 'commentID');
+        $commentIDs = array_merge($commentsMerge1, $commentsMerge2);
+        $this->api()->patch(
+            "/discussions/merge",
+            [
+                'discussionsIDs' => [self::$data['discussion_Merge_1']['discussionID'], self::$data['discussion_Merge_2']['discussionID']],
+                'destinationDiscussionID' => self::$data['discussion_Merge_3']['discussionID'],
+                'isRedirect' => true
+            ]
+        );
+        $discussionMergeID = self::$data['discussion_Merge_3']['discussionID'];
+        $commentsMerge = $this->api()->get("/comments?discussionID={$discussionMergeID}")->getBody();
+        $commentMergeIDs = array_column($commentsMerge, 'commentID');
+        $mergedIDs = array_combine($commentMergeIDs, $commentMergeIDs);
+        foreach ($commentIDs as $commentID) {
+            $this->assertArrayHasKey($commentID, $mergedIDs);
+        }
+    }
+
+    /**
+     * Test fail PATCH /discussions/merge
+     */
+    public function testFailMergeDiscussions(): void {
+        $rd1 = rand(7000, 8000);
+        $rd2 = rand(9000, 10000);
+        $rd3 = $rd1.$rd2;
+        try {
+            $this->api()->patch(
+                "/discussions/merge",
+                [
+                    'discussionsIDs' => [$rd1, $rd2],
+                    'destinationDiscussionID' => $rd3,
+                    'isRedirect' => true
+                ]
+            );
+        } catch (\Exception $e) {
+            $this->assertEquals(400, $e->getCode());
+        }
+    }
+
+    /**
+     * Prepare move discussions test data.
+     */
+    public function testPrepareMoveDiscussionsData(): void {
+        $rd1 = rand(6000, 7000);
+        $rd2 = rand(4000, 5000);
+        $rd3 = rand(2000, 3000);
+        $rd4 = rand(1000, 2000);
+        $categoryInvalid = [
+            'categoryID' => 123456,
+            'name' => 'invalid category',
+            'urlCode' => 'invalid category'.$rd1.$rd2
+        ];
+        $category_1Name = 'category_1'.$rd1;
+        $category_2Name = 'category_2'.$rd2;
+        $category_3Name = 'category_3'.$rd3;
+        $category_PermissionName = 'category_Permission'.$rd4;
+        $category_MergeName_1 = 'category_Merge_1'.$rd1;
+        $category_MergeName_2 = 'category_Merge_2'.$rd2;
+        $categoryData_1 = [
+            'customPermissions' => true,
+            'displayAs' => 'discussions',
+            'parentCategoryID' => 1,
+            'name' => $category_1Name,
+            'urlCode' => slugify($category_1Name)
+        ];
+
+        $categoryData_2 = [
+            'customPermissions' => true,
+            'displayAs' => 'discussions',
+            'parentCategoryID' => 1,
+            'name' => $category_2Name,
+            'urlCode' => slugify($category_2Name)
+        ];
+        $categoryData_3 = [
+            'customPermissions' => true,
+            'displayAs' => 'discussions',
+            'parentCategoryID' => 1,
+            'name' => $category_3Name,
+            'urlCode' => slugify($category_3Name)
+        ];
+        $categoryData_Merge_1 = [
+            'customPermissions' => true,
+            'displayAs' => 'discussions',
+            'parentCategoryID' => 1,
+            'name' => $category_MergeName_1,
+            'urlCode' => slugify($category_MergeName_1)
+        ];
+        $categoryData_Merge_2 = [
+            'customPermissions' => true,
+            'displayAs' => 'discussions',
+            'parentCategoryID' => 1,
+            'name' => $category_MergeName_2,
+            'urlCode' => slugify($category_MergeName_2)
+        ];
+        $categoryData_Permission = [
+            'customPermissions' => true,
+            'displayAs' => 'discussions',
+            'parentCategoryID' => 1,
+            'name' => $category_PermissionName,
+            'urlCode' => slugify($category_PermissionName)
+        ];
+        $category_1 = $this->api()->post("/categories", $categoryData_1)->getBody();
+        $category_2 =  $this->api()->post("/categories", $categoryData_2)->getBody();
+        $category_3 =  $this->api()->post("/categories", $categoryData_3)->getBody();
+        $category_permission = $this->api()->post("/categories", $categoryData_Permission)->getBody();
+        $category_Merge_1 = $this->api()->post("/categories", $categoryData_Merge_1)->getBody();
+        $category_Merge_2 = $this->api()->post("/categories", $categoryData_Merge_2)->getBody();
+
+        $this->api()->patch("/roles/".\RoleModel::ADMIN_ID, [
+            'permissions' => [[
+                "id" => $category_permission['categoryID'],
+                'type' => "category",
+                "permissions" =>  [
+                    "discussions.view" => true
+                ],
+            ]],
+        ]);
+        $discussionData_1 = [
+            'name' => 'Test Discussion_1',
+            'format' => 'text',
+            'body' => 'Hello Discussion_1',
+            'categoryID' => $category_1['categoryID'],
+        ];
+        $discussionData_2 = [
+            'name' => 'Test Discussion_2',
+            'format' => 'text',
+            'body' => 'Hello Discussion_2',
+            'categoryID' => $category_1['categoryID'],
+        ];
+        $discussionData_3 = [
+            'name' => 'Test Discussion_3',
+            'format' => 'text',
+            'body' => 'Hello Discussion_3',
+            'categoryID' => $category_1['categoryID'],
+        ];
+        $discussionData_4 = [
+            'name' => 'Test Discussion_4',
+            'format' => 'text',
+            'body' => 'Hello Discussion_4',
+            'categoryID' => $category_1['categoryID'],
+        ];
+        $discussionData_Merge_1 = [
+            'name' => 'Test Discussion_Merge_1',
+            'format' => 'text',
+            'body' => 'Hello Discussion_Merge_1',
+            'categoryID' => $category_Merge_1['categoryID'],
+        ];
+        $discussionData_Merge_2 = [
+            'name' => 'Test Discussion_Merge_2',
+            'format' => 'text',
+            'body' => 'Hello Discussion_Merge_2',
+            'categoryID' => $category_Merge_1['categoryID'],
+        ];
+        $discussionData_Merge_3 = [
+            'name' => 'Test Discussion_Merge_3',
+            'format' => 'text',
+            'body' => 'Hello Discussion_Merge_3',
+            'categoryID' => $category_Merge_2['categoryID'],
+        ];
+
+        $discussion_1 = $this->api()->post('/discussions', $discussionData_1)->getBody();
+        $discussion_2 = $this->api()->post('/discussions', $discussionData_2)->getBody();
+        $discussion_3 = $this->api()->post('/discussions', $discussionData_3)->getBody();
+        $discussion_4 = $this->api()->post('/discussions', $discussionData_4)->getBody();
+        $discussion_Merge_1 = $this->api()->post('/discussions', $discussionData_Merge_1)->getBody();
+        $discussion_Merge_2 = $this->api()->post('/discussions', $discussionData_Merge_2)->getBody();
+        $discussion_Merge_3 = $this->api()->post('/discussions', $discussionData_Merge_3)->getBody();
+        $this->api()->post("/comments", [
+            "body" => "Test Comment_Merge_1",
+            "format" => "text",
+            "discussionID" => $discussion_Merge_1['discussionID']
+        ])->getBody();
+        $this->api()->post("/comments", [
+            "body" => "Test Comment_Merge_2",
+            "format" => "text",
+            "discussionID" => $discussion_Merge_2['discussionID']
+        ])->getBody();
+
+        $discussionIDs = [$discussion_1['discussionID'], $discussion_2['discussionID'], $discussion_3['discussionID'], $discussion_4['discussionID']];
+        self::$data['invalidDiscussionIDs'] = [$rd1, $rd2];
+        self::$data['invalidCategory'] = $categoryInvalid;
+        self::$data['validCategory1'] = $category_1;
+        self::$data['validCategory2'] = $category_2;
+        self::$data['validCategory3'] = $category_3;
+        self::$data['category_Merge_1'] = $category_Merge_1;
+        self::$data['category_Merge_2'] = $category_Merge_2;
+        self::$data['category_permission'] = $category_permission;
+        self::$data['discussion_1'] = $discussionData_1;
+        self::$data['discussion_2'] = $discussionData_2;
+        self::$data['discussion_Merge_1'] = $discussion_Merge_1;
+        self::$data['discussion_Merge_2'] = $discussion_Merge_2;
+        self::$data['discussion_Merge_3'] = $discussion_Merge_3;
+        self::$data['validDiscussionIDs'] = $discussionIDs;
+        self::$data['mixedIDs'] = array_merge(self::$data['validDiscussionIDs'], [1234]);
+        $this->assertNotEmpty(self::$data);
+    }
+
+    /**
+     * Test Failed PATCH /discussions/move
+     *
+     * @param string $discussionIDs
+     * @param string $category
+     * @param int $expectedCode
+     * @param int|null $batchTime
+     * @dataProvider provideDiscussionsMoveData
+     * @depends testPrepareMoveDiscussionsData
+     */
+    public function testFailMoveDiscussionsList(
+        string $discussionIDs,
+        string $category,
+        int $expectedCode,
+        $batchTime
+    ) {
+        if (!$batchTime) {
+            $batchTime = 10;
+        }
+        $this->runWithConfig([
+            'Vanilla.MaxBatchTime' => $batchTime
+        ], function () use ($discussionIDs, $category, $expectedCode) {
+            try {
+                $user = $category === 'category_permission' ? $this->createUser() : self::$siteInfo['adminUserID'];
+                $this->runWithUser(function () use ($discussionIDs, $category) {
+                    $this->api()->patch("/discussions/move", [
+                        'discussionIDs' => self::$data[$discussionIDs],
+                        'categoryID' => self::$data[$category]['categoryID'],
+                        'isRedirect' => true
+                    ]);
+                }, $user);
+            } catch (\Exception $e) {
+                $this->assertEquals($expectedCode, $e->getCode());
+            }
+        });
+    }
+
+    /**
+     * Provide discussions move data.
+     *
+     * @return array
+     */
+    public function provideDiscussionsMoveData(): array {
+        return [
+            'invalid-discussion' => ['invalidDiscussionIDs', 'validCategory1', 408, null],
+            'invalid-category' => ['validDiscussionIDs', 'invalidCategory', 404, null],
+            'valid-invalidIDs' => ['mixedIDs', 'validCategory2', 408, null],
+            'timeout' => ['validDiscussionIDs', 'validCategory3', 408, -1],
+            'permission-invalid' => ['validDiscussionIDs', 'category_permission', 403, null]
+        ];
+    }
+
+    /**
+     * Test posting a discussion with a non-existing categoryID.
+     */
+    public function testPostInvalidCategory(): void {
+        $this->expectException(NotFoundException::class);
+        $discussionData = [
+            'name' => __FUNCTION__,
+            'categoryID' => rand(5000, 6000),
+            'format' => 'text',
+            'body' => __FUNCTION__
+        ];
+        $this->api()->post('/discussions', $discussionData);
+    }
+
+    /**
+     * Test editing a discussion.
+     */
+    public function testDiscussionCanEdit(): void {
+        $user = $this->createUser();
+        $discussion = $this->runWithUser(function () {
+            $data = [
+                "name" => "test discussion",
+                "body" => "Test discussion body",
+                "format" => "text",
+                "categoryID" => -1
+            ];
+            $discussion = $this->api()->post("/discussions", $data)->getBody();
+            $this->api()->post("/discussions/{$discussion['discussionID']}", ["body" => 'edited discussion']);
+            $result = $this->api()->get("/discussions/{$discussion['discussionID']}")->getBody();
+            $this->assertEquals("edited discussion", $result['body']);
+            return $discussion;
+        }, $user);
+        $this->runWithConfig([
+            'Garden.EditContentTimeout' => '0'
+        ], function () use ($user, $discussion) {
+            \Gdn::session()->start($user['userID']);
+            $this->expectExceptionMessage('Editing discussions is not allowed.');
+            $this->expectExceptionCode(400);
+            $this->api()->post("/discussions/{$discussion['discussionID']}", ["body" => 'edited discussion2']);
+        });
     }
 
     /**

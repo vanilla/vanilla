@@ -53,11 +53,17 @@ class SqlUtilsTest extends BootstrapTestCase {
      * The `SqlUtils::keepTextFields()` helper should work as an event handler.
      */
     public function testKeepTextFieldsEvent(): void {
+        /** @var EventManager $events */
+        $events = $this->container()->get(EventManager::class);
+        $handler = function (\Gdn_DatabaseStructure $structure) {
+            SqlUtils::keepTextFieldLengths($structure);
+        };
+        $events->bind(\Gdn_MySQLStructure::class.'_beforeSet', $handler);
+
         $this->doKeepTextFieldsTest(__FUNCTION__, function () {
-            $this->container()->call(function (EventManager $events) {
-                $events->bind(\Gdn_MySQLStructure::class.'_beforeSet', [SqlUtils::class, 'keepTextFieldLengths']);
-            });
         });
+
+        $events->unbind(\Gdn_MySQLStructure::class.'_beforeSet', $handler);
     }
 
     /**
@@ -68,16 +74,28 @@ class SqlUtilsTest extends BootstrapTestCase {
      */
     protected function doKeepTextFieldsTest(string $tableName, callable $keep): void {
         $this->structure->table($tableName);
+        $this->structure->drop();
 
         // Create a basic table first.
         $this->structure->table($tableName)
             ->primaryKey('id')
-            ->column('Body', 'mediumtext')
+            ->column('body', 'mediumtext')
+            ->column('name', 'varchar(50)')
+            ->column('toText', 'varchar(30)')
+            ->column('makeBigger', 'varchar(30)')
+            ->column('textToVarchar', 'text')
             ->set();
 
         // Now do an alter and make sure it works.
         $this->structure->table($tableName)
-            ->column('body', 'text');
+            ->column('body', 'text')
+            ->column('name', 'varchar(20)')
+            ->column('toText', 'text')
+            ->column('makeBigger', 'varchar(31)')
+            ->column('textToVarchar', 'varchar(5)')
+            ->column('newText', 'text')
+            ->column('newVarchar', 'varchar(20)')
+        ;
 
         $keep();
 
@@ -86,5 +104,12 @@ class SqlUtilsTest extends BootstrapTestCase {
         // Now see if the table was altered.
         $columns = $this->structure->table($tableName)->existingColumns();
         $this->assertSame('mediumtext', $columns['body']->Type);
+        $this->assertSame('varchar', $columns['name']->Type);
+        $this->assertSame(50, (int)$columns['name']->Length);
+        $this->assertSame('text', $columns['toText']->Type);
+        $this->assertSame(31, (int)$columns['makeBigger']->Length);
+        $this->assertSame('text', $columns['textToVarchar']->Type, 'textToVarchar');
+        $this->assertSame('text', $columns['newText']->Type);
+        $this->assertSame('varchar', $columns['newVarchar']->Type);
     }
 }

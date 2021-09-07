@@ -2517,6 +2517,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
             }
         }
 
+        $this->EventArguments['ExistingUser'] = $user;
         $this->EventArguments['FormPostValues'] = $formPostValues;
         $this->fireEvent('BeforeSaveValidation');
 
@@ -5455,7 +5456,11 @@ SQL;
      * @return bool
      */
     public static function rateLimit($user) {
+        // Garden.User.RateLimit = 0 disables rate limit.
         $loginRate = (int)Gdn::config('Garden.User.RateLimit', self::LOGIN_RATE);
+        if ($loginRate === 0) {
+            return true;
+        }
         // Make sure $user is an object
         $user = (object) $user;
         if (Gdn::cache()->activeEnabled()) {
@@ -5759,6 +5764,9 @@ SQL;
             if ($cachedPermissions !== Gdn_Cache::CACHEOP_FAILURE) {
                 $permissions->setPermissions($cachedPermissions);
                 $permissions->setAdmin($isAdmin);
+
+                // Fire an event after permissions are cached so that addons can augment them without overwriting the cache.
+                $this->eventManager->fire('userModel_filterPermissions', $this, $userID, $permissions);
                 return $permissions;
             }
         }
@@ -5783,6 +5791,8 @@ SQL;
                 );
             }
         }
+        // Fire an event after permissions are cached so that addons can augment them without overwriting the cache.
+        $this->eventManager->fire('userModel_filterPermissions', $this, $userID, $permissions);
 
         return $permissions;
     }

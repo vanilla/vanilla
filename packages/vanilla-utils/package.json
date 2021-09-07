@@ -7,6 +7,9 @@
     "devDependencies": {
         "@vanilla/tsconfig": "^3.0.1"
     },
+    "dependencies": {
+        "immer": "^2.0.0"
+    },
     "peerDependencies": {
         "lodash": "*"
     },

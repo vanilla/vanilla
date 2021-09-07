@@ -1375,6 +1375,8 @@ class Gdn_Controller extends Gdn_Pluggable {
 
             if (!$session->isValid() && $this->isRenderingMasterView()) {
                 redirectTo('/entry/signin?Target='.urlencode($this->Request->pathAndQuery()));
+            } elseif (defined('TESTMODE_ENABLED') && TESTMODE_ENABLED) {
+                throw permissionException();
             } else {
                 Gdn::dispatcher()->dispatch('DefaultPermission');
                 exit();

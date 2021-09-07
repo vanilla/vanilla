@@ -191,6 +191,15 @@ abstract class AbstractSearchType {
     }
 
     /**
+     * If this is returns true, the query from the type be optimized and shared with others of the same searchgroup.
+     *
+     * @return bool
+     */
+    public function canBeOptimizedIntoGroup(): bool {
+        return false;
+    }
+
+    /**
      * Check if the user has permission to search with this type.
      *
      * @return bool

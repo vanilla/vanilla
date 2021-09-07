@@ -21,20 +21,19 @@ class DateFilterSchemaTest extends TestCase {
      */
     public function provideInvalidDateFilters() {
         return [
-            'empty string' => ['', 'myDate is not formatted as a valid date filter.'],
-            'bad operator' => ['<>2015-07-30', 'myDate is not a valid datetime.'],
-            'bad date' => ['2015-01-50', 'myDate is not a valid datetime.'],
-            'null' => [null, 'myDate is not a valid date filter.'],
-            'true' => [true, 'myDate is not a valid date filter.'],
-            'false' => [false, 'myDate is not a valid date filter.'],
-            'Range: one date' => ['[2010-01-01]', 'myDate date filter range must contain 2 datetime values.'],
-            'Range: year-only' => ['[2010,2011]', 'Both values in myDate must be datetime.'],
-            'Range: three elements' => ['[2010-01-01,2010-01-15,2010-01-31]', 'myDate date filter range must contain 2 datetime values.'],
+            'empty string' => ['', 'myDate cannot be empty.'],
+            'bad operator' => ['<>2015-07-30', 'is not a valid operator'],
+            'bad date' => ['2015-01-50', 'myDate is not a valid datetime'],
+            'null' => [null, 'cannot be empty'],
+            'true' => [true, 'myDate is not a valid datetime'],
+            'false' => [false, 'myDate is not a valid datetime'],
+            'Range: one date' => ['[2010-01-01]', 'range must contain two values'],
+            'Range: year-only' => ['[2010,2011]', 'myDate.from is not a valid datetime. myDate.to is not a valid datetime.'],
+            'Range: three elements' => ['[2010-01-01,2010-01-15,2010-01-31]', 'range must contain two values'],
             'Range: later opening' => ['[2012-01-01,2011-12-31]', 'End of myDate range must come after beginning.'],
-            'Range: incorrect delimiter 1' => ['[2017-12-04,2017-12-06$', 'myDate is not formatted as a valid date filter.'],
-            'Range: incorrect delimiter 2' => ['[2017-12-04,2017-12-06[', 'myDate is not formatted as a valid date filter.'],
-            'Range: incorrect delimiter 3' => ['[2017-12-04,2017-12-06', 'myDate is not formatted as a valid date filter.'],
-            'Range: incorrect delimiter 4' => ['(2017-12-04,2017-12-06}', 'myDate is not formatted as a valid date filter.'],
+            'Range: incorrect delimiter 1' => ['[2017-12-04,2017-12-06$', 'is not a valid datetime'],
+            'Range: incorrect delimiter 2' => ['[2017-12-04,2017-12-06[', 'is not a valid datetime'],
+            'Range: incorrect delimiter 4' => ['(2017-12-04,2017-12-06}', 'is not a valid datetime'],
         ];
     }
 
@@ -54,7 +53,15 @@ class DateFilterSchemaTest extends TestCase {
             ],
             '2012-10-31' => [
                 '2012-10-31',
-                '=',
+                '[]',
+                [
+                    new DateTimeImmutable('2012-10-31 00:00:00'),
+                    new DateTimeImmutable('2012-10-31 23:59:59'),
+                ],
+            ],
+            '=2012-10-31' => [
+                '=2012-10-31',
+                '[]',
                 [
                     new DateTimeImmutable('2012-10-31 00:00:00'),
                     new DateTimeImmutable('2012-10-31 23:59:59'),
@@ -141,29 +148,30 @@ class DateFilterSchemaTest extends TestCase {
      * Tests for date fields.
      *
      * @param string $fieldName The name of a field.
-     * @param array $data A representation of request data (e.g. query string or request body).
-     * @param array $expectedResult
+     * @param string $expr A representation of request data (e.g. query string or request body).
+     * @param array $expectedFilter
      * @param DateTimeImmutable[] $expectedRange
      *
      * @dataProvider provideDateFilterFields
      */
-    public function testDateFilterField(string $fieldName, array $data, array $expectedResult, array $expectedRange) {
-        $result = DateFilterSchema::dateFilterField($fieldName, $data);
-        $this->assertEquals($expectedResult, $result);
-        $this->assertRangesEquals($expectedRange, $data['inclusiveRange']);
+    public function testDateFilterField(string $fieldName, string $expr, array $expectedFilter, array $expectedRange) {
+        $schema = new DateFilterSchema();
+        $range = $schema->validate($expr);
+        $filter = DateFilterSchema::dateFilterField($fieldName, $range);
+        $this->assertEquals($expectedFilter, $filter, "Invalid filter for $expr");
+        $this->assertRangesEquals($expectedRange, $range['inclusiveRange'], "Invalid range for $expr");
     }
 
     /**
      * Provider data for testDateFilterField.
      */
     public function provideDateFilterFields() {
-        $schema = new DateFilterSchema();
         $farPast = DateFilterSchema::farPastDate();
         $farFuture = DateFilterSchema::farFutureDate();
         return [
             'Equal (Date)' => [
                 'dateInserted',
-                $schema->validate('2017-01-01'),
+                '2017-01-01',
                 [
                     'dateInserted >=' => new DateTimeImmutable('2017-01-01 00:00:00'),
                     'dateInserted <=' => new DateTimeImmutable('2017-01-01 23:59:59'),
@@ -175,7 +183,7 @@ class DateFilterSchemaTest extends TestCase {
             ],
             'Equal (DateTime)' => [
                 'dateInserted',
-                $schema->validate('2017-01-01 00:00:00'),
+                '2017-01-01 00:00:00',
                 [
                     'dateInserted' => new DateTimeImmutable('2017-01-01 00:00:00'),
                 ],
@@ -186,8 +194,8 @@ class DateFilterSchemaTest extends TestCase {
             ],
             'Greater-Than (Date)' => [
                 'dateInserted',
-                $schema->validate('>2017-01-01'),
-                ['dateInserted >' => new DateTimeImmutable('2017-01-01 00:00:00')],
+                '>2017-01-01',
+                ['dateInserted >' => new DateTimeImmutable('2017-01-01 23:59:59')],
                 [
                     new DateTimeImmutable('2017-01-02 00:00:00'),
                     $farFuture,
@@ -195,7 +203,7 @@ class DateFilterSchemaTest extends TestCase {
             ],
             'Greater-Than (DateTime)' => [
                 'dateInserted',
-                $schema->validate('>2017-01-01 00:00:10'),
+                '>2017-01-01 00:00:10',
                 ['dateInserted >' => new DateTimeImmutable('2017-01-01 00:00:10')],
                 [
                     new DateTimeImmutable('2017-01-01 00:00:11'),
@@ -204,7 +212,7 @@ class DateFilterSchemaTest extends TestCase {
             ],
             'Greater-Than or Equal (Date)' => [
                 'dateInserted',
-                $schema->validate('>=2017-01-01'),
+                '>=2017-01-01',
                 ['dateInserted >=' => new DateTimeImmutable('2017-01-01 00:00:00')],
                 [
                     new DateTimeImmutable('2017-01-01 00:00:00'),
@@ -213,7 +221,7 @@ class DateFilterSchemaTest extends TestCase {
             ],
             'Greater-Than or Equal (DateTime)' => [
                 'dateInserted',
-                $schema->validate('>=2017-01-01 00:00:10'),
+                '>=2017-01-01 00:00:10',
                 ['dateInserted >=' => new DateTimeImmutable('2017-01-01 00:00:10')],
                 [
                     new DateTimeImmutable('2017-01-01 00:00:10'),
@@ -222,7 +230,7 @@ class DateFilterSchemaTest extends TestCase {
             ],
             'Less-Than (Date)' => [
                 'dateInserted',
-                $schema->validate('<2017-01-01'),
+                '<2017-01-01',
                 ['dateInserted <' => new DateTimeImmutable('2017-01-01 00:00:00')],
                 [
                     $farPast,
@@ -231,7 +239,7 @@ class DateFilterSchemaTest extends TestCase {
             ],
             'Less-Than (DateTime)' => [
                 'dateInserted',
-                $schema->validate('<2017-01-01 00:00:10'),
+                '<2017-01-01 00:00:10',
                 ['dateInserted <' => new DateTimeImmutable('2017-01-01 00:00:10')],
                 [
                     $farPast,
@@ -240,7 +248,7 @@ class DateFilterSchemaTest extends TestCase {
             ],
             'Less-Than or Equal (Date)' => [
                 'dateInserted',
-                $schema->validate('<=2017-01-01'),
+                '<=2017-01-01',
                 ['dateInserted <=' => new DateTimeImmutable('2017-01-01 23:59:59')],
                 [
                     $farPast,
@@ -249,7 +257,7 @@ class DateFilterSchemaTest extends TestCase {
             ],
             'Less-Than or Equal (DateTime)' => [
                 'dateInserted',
-                $schema->validate('<=2017-01-01 00:00:10'),
+                '<=2017-01-01 00:00:10',
                 ['dateInserted <=' => new DateTimeImmutable('2017-01-01 00:00:10')],
                 [
                     $farPast,
@@ -258,7 +266,7 @@ class DateFilterSchemaTest extends TestCase {
             ],
             'Range Inclusive (Date,Date)' => [
                 'dateInserted',
-                $schema->validate('[2017-01-01,2017-01-31]'),
+                '[2017-01-01,2017-01-31]',
                 [
                     'dateInserted >=' => new DateTimeImmutable('2017-01-01 00:00:00'),
                     'dateInserted <=' => new DateTimeImmutable('2017-01-31 23:59:59'),
@@ -270,7 +278,7 @@ class DateFilterSchemaTest extends TestCase {
             ],
             'Range Inclusive (DateTime,DateTime)' => [
                 'dateInserted',
-                $schema->validate('[2017-01-01 00:00:00,2017-01-31 00:00:10]'),
+                '[2017-01-01 00:00:00,2017-01-31 00:00:10]',
                 [
                     'dateInserted >=' => new DateTimeImmutable('2017-01-01 00:00:00'),
                     'dateInserted <=' => new DateTimeImmutable('2017-01-31 00:00:10'),
@@ -282,7 +290,7 @@ class DateFilterSchemaTest extends TestCase {
             ],
             'Range Inclusive (Date,DateTime)' => [
                 'dateInserted',
-                $schema->validate('[2017-01-01,2017-01-31 00:00:10]'),
+                '[2017-01-01,2017-01-31 00:00:10]',
                 [
                     'dateInserted >=' => new DateTimeImmutable('2017-01-01 00:00:00'),
                     'dateInserted <=' => new DateTimeImmutable('2017-01-31 00:00:10'),
@@ -294,7 +302,7 @@ class DateFilterSchemaTest extends TestCase {
             ],
             'Range Exclusive (Date,Date)' => [
                 'dateInserted',
-                $schema->validate('(2017-01-01,2017-01-31)'),
+                '(2017-01-01,2017-01-31)',
                 [
                     'dateInserted >=' => new DateTimeImmutable('2017-01-02 00:00:00'),
                     'dateInserted <=' => new DateTimeImmutable('2017-01-30 23:59:59'),
@@ -306,7 +314,7 @@ class DateFilterSchemaTest extends TestCase {
             ],
             'Range Exclusive (DateTime,DateTime)' => [
                 'dateInserted',
-                $schema->validate('(2017-01-01 00:00:10,2017-01-31 00:00:50)'),
+                '(2017-01-01 00:00:10,2017-01-31 00:00:50)',
                 [
                     'dateInserted >=' => new DateTimeImmutable('2017-01-01 00:00:11'),
                     'dateInserted <=' => new DateTimeImmutable('2017-01-31 00:00:49'),
@@ -318,7 +326,7 @@ class DateFilterSchemaTest extends TestCase {
             ],
             'Range Inclusive, Exclusive (Date,Date)' => [
                 'dateInserted',
-                $schema->validate('[2017-01-01,2017-01-31)'),
+                '[2017-01-01,2017-01-31)',
                 [
                     'dateInserted >=' => new DateTimeImmutable('2017-01-01 00:00:00'),
                     'dateInserted <=' => new DateTimeImmutable('2017-01-30 23:59:59'),
@@ -330,7 +338,7 @@ class DateFilterSchemaTest extends TestCase {
             ],
             'Range Inclusive, Exclusive (DateTime,DateTime)' => [
                 'dateInserted',
-                $schema->validate('[2017-01-01 00:00:10,2017-01-31 00:10:00)'),
+                '[2017-01-01 00:00:10,2017-01-31 00:10:00)',
                 [
                     'dateInserted >=' => new DateTimeImmutable('2017-01-01 00:00:10'),
                     'dateInserted <=' => new DateTimeImmutable('2017-01-31 00:09:59'),
@@ -342,7 +350,7 @@ class DateFilterSchemaTest extends TestCase {
             ],
             'Range Inclusive, Exclusive (DateTime,Date)' => [
                 'dateInserted',
-                $schema->validate('[2017-01-01 00:00:10,2017-01-31)'),
+                '[2017-01-01 00:00:10,2017-01-31)',
                 [
                     'dateInserted >=' => new DateTimeImmutable('2017-01-01 00:00:10'),
                     'dateInserted <=' => new DateTimeImmutable('2017-01-30 23:59:59'),
@@ -354,7 +362,7 @@ class DateFilterSchemaTest extends TestCase {
             ],
             'Range Exclusive, Inclusive (Date,Date)' => [
                 'dateInserted',
-                $schema->validate('(2017-01-01,2017-01-31]'),
+                '(2017-01-01,2017-01-31]',
                 [
                     'dateInserted >=' => new DateTimeImmutable('2017-01-02 00:00:00'),
                     'dateInserted <=' => new DateTimeImmutable('2017-01-31 23:59:59'),
@@ -366,7 +374,7 @@ class DateFilterSchemaTest extends TestCase {
             ],
             'Range Exclusive, Inclusive (DateTime,DateTime)' => [
                 'dateInserted',
-                $schema->validate('(2017-01-01 00:00:10,2017-01-31 00:10:00]'),
+                '(2017-01-01 00:00:10,2017-01-31 00:10:00]',
                 [
                     'dateInserted >=' => new DateTimeImmutable('2017-01-01 00:00:11'),
                     'dateInserted <=' => new DateTimeImmutable('2017-01-31 00:10:00'),
@@ -398,11 +406,12 @@ class DateFilterSchemaTest extends TestCase {
      *
      * @param DateTimeImmutable[] $expectedRange
      * @param DateTimeImmutable[] $actualRange
+     * @param string $message
      */
-    public function assertRangesEquals(array $expectedRange, array $actualRange) {
+    public function assertRangesEquals(array $expectedRange, array $actualRange, string $message = '') {
         $expectedRange = [$expectedRange[0]->format(DATE_RFC3339), $expectedRange[1]->format(DATE_RFC3339)];
         $actualRange = [$actualRange[0]->format(DATE_RFC3339), $actualRange[1]->format(DATE_RFC3339)];
 
-        $this->assertEquals($expectedRange, $actualRange);
+        $this->assertEquals($expectedRange, $actualRange, $message);
     }
 }

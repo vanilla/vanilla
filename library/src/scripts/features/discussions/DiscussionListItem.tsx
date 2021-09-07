@@ -20,10 +20,13 @@ import React from "react";
 import DiscussionOptionsMenu from "@library/features/discussions/DiscussionOptionsMenu";
 import DiscussionVoteCounter from "@library/features/discussions/DiscussionVoteCounter";
 import qs from "qs";
-import { hasPermission, PermissionMode } from "@library/features/users/Permission";
+import Permission, { hasPermission, PermissionMode } from "@library/features/users/Permission";
 import { ReactionUrlCode } from "@dashboard/@types/api/reaction";
 import DateTime from "@library/content/DateTime";
 import { metasClasses } from "@library/metas/Metas.styles";
+import { getMeta } from "@library/utility/appUtils";
+import CheckBox from "@library/forms/Checkbox";
+import { useDiscussionCheckBoxContext } from "@library/features/discussions/DiscussionCheckboxContext";
 
 interface IProps {
     discussion: IDiscussion;
@@ -35,6 +38,7 @@ export default function DiscussionListItem(props: IProps) {
     const classes = discussionListClasses();
     const variables = discussionListVariables();
     const currentUserSignedIn = useCurrentUserSignedIn();
+    const checkBoxContext = useDiscussionCheckBoxContext();
     const hasUnread = discussion.unread || (discussion.countUnread !== undefined && discussion.countUnread > 0);
 
     let iconView = <UserPhoto userInfo={discussion.insertUser} size={variables.profilePhoto.size} />;
@@ -80,10 +84,23 @@ export default function DiscussionListItem(props: IProps) {
     );
 
     const discussionUrl = currentUserSignedIn ? `${discussion.url}#latest` : discussion.url;
+
+    //check if the user has permission to see checkbox
+    const canUseCheckboxes =
+        hasPermission("community.moderate", {
+            resourceType: "category",
+            resourceID: discussion.categoryID,
+            mode: PermissionMode.RESOURCE_IF_JUNCTION,
+        }) && getMeta("ui.useAdminCheckboxes", false);
+
+    const { discussionID } = discussion;
+    const isRowChecked = checkBoxContext.checkedDiscussionIDs.includes(discussionID);
+
     return (
         <ListItem
             url={discussionUrl}
             name={discussion.name}
+            className={isRowChecked ? classes.checkedboxRowStyle : undefined}
             nameClassName={cx(classes.title, { isRead: !hasUnread && currentUserSignedIn })}
             description={discussion.excerpt}
             metas={<DiscussionListItemMeta {...discussion} />}
@@ -91,6 +108,23 @@ export default function DiscussionListItem(props: IProps) {
             icon={icon}
             iconWrapperClass={iconWrapperClass}
             options={variables.item.options}
+            // Disabled until the feature is finished.
+            // checkbox={
+            //     canUseCheckboxes ? (
+            //         <CheckBox
+            //             checked={isRowChecked}
+            //             label={`Select ${discussion.name}`}
+            //             hideLabel={true}
+            //             onChange={(e) => {
+            //                 if (e.target.checked) {
+            //                     checkBoxContext.addCheckedDiscussionID(discussionID);
+            //                 } else {
+            //                     checkBoxContext.removeCheckedDisscussionID(discussionID);
+            //                 }
+            //             }}
+            //         />
+            //     ) : undefined
+            // }
         ></ListItem>
     );
 }

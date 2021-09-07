@@ -39,6 +39,7 @@ export const toastClasses = useThemeCache(() => {
             background: ColorsUtils.colorOut(globalVars.mainColors.bg),
             p: {
                 margin: 0,
+                textAlign: "right",
             },
         });
     };

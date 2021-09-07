@@ -3,7 +3,9 @@
  * @license GPL-2.0-only
  */
 
+import { ILoadable } from "@library/@types/api/core";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
+import { RecordID } from "@vanilla/utils";
 
 export interface ICategoryFragment {
     categoryID: number;
@@ -37,3 +39,17 @@ enum CategoryDisplayAs {
     FLAT = "flat",
     HEADING = "heading",
 }
+
+export type CategoryPostNotificationType = "follow" | "discussions" | "all" | null;
+
+export interface ICategoryPreferences {
+    useEmailNotifications: boolean;
+    postNotifications: CategoryPostNotificationType;
+}
+
+export const DEFAULT_NOTIFICATION_PREFERENCES: ICategoryPreferences = {
+    useEmailNotifications: false,
+    postNotifications: null,
+};
+
+export const CATEGORIES_STORE_KEY = "categories";

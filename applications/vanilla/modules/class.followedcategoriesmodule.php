@@ -85,7 +85,7 @@ class FollowedCategoriesModule extends Gdn_Module {
         if (!$this->Data) {
             $this->getData();
         }
-        $this->Visible = Gdn::config('Vanilla.EnableCategoryFollowing') && Gdn::session()->isValid();
+        $this->Visible = Gdn::config(\CategoryModel::CONF_CATEGORY_FOLLOWING) && Gdn::session()->isValid();
 
         return parent::toString();
     }

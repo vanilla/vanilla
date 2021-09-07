@@ -10,6 +10,7 @@ namespace Vanilla\Models;
 use Garden\Schema\Schema;
 use Vanilla\ApiUtils;
 use Vanilla\SchemaFactory;
+use Vanilla\Search\AbstractSearchIndexTemplate;
 
 /**
  * Schema to validate shape of some media upload metadata.
@@ -27,8 +28,9 @@ class UserFragmentSchema extends Schema {
             'url:s?', // Full URL to the user profile page.
             'photoUrl:s', // The URL of the user's avatar picture.
             'dateLastActive:dt|n?', // Time the user was last active.
-            'banned:i?', // The banned status of the user
-            'private:b?', // The private profile status of the user
+            'banned:i?', // The banned status of the user.
+            'punished:i?' => [AbstractSearchIndexTemplate::OPT_NO_INDEX => true], // The jailed status of the user.
+            'private:b?', // The private profile status of the user.
             'label:s?'
         ]));
     }
@@ -67,6 +69,7 @@ class UserFragmentSchema extends Schema {
         $privateProfile = \UserModel::getRecordAttribute($dbRecord, 'Private', "0");
         $dbRecord['Private'] = (bool)$privateProfile;
         $dbRecord['Banned'] = $dbRecord['Banned'] ?? 0;
+        $dbRecord['Punished'] = $dbRecord['Punished'] ?? 0;
 
         $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
         $schemaRecord = self::instance()->validate($schemaRecord);

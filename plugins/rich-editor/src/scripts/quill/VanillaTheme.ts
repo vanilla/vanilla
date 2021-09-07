@@ -24,7 +24,6 @@ export default class VanillaTheme extends ThemeBase {
      * @param options - The current options for the instance.
      */
     constructor(quill: Quill, options: QuillOptionsStatic) {
-        const classesRichEditor = richEditorClasses(false);
         const themeOptions = {
             ...options,
             placeholder: "Create a new post...",
@@ -35,7 +34,6 @@ export default class VanillaTheme extends ThemeBase {
         this.applyLastSelectionHack();
         this.applyFocusFixHack();
 
-        this.quill.root.classList.add(classesRichEditor.text);
         this.quill.root.classList.add("richEditor-text");
         this.quill.root.classList.add("userContent");
 

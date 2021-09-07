@@ -11,9 +11,11 @@ use Garden\Web\Exception\NotFoundException;
 use Vanilla\ApiUtils;
 use Garden\Container\Container;
 use Vanilla\Formatting\DateTimeFormatter;
+use Vanilla\Formatting\FormatService;
 use Vanilla\Forum\Modules\QnAWidgetModule;
 use Vanilla\Models\LegacyModelUtils;
 use Vanilla\QnA\Models\AnswerSearchType;
+use Vanilla\QnA\Models\QnAJsonLD;
 use Vanilla\QnA\Models\QuestionSearchType;
 use Vanilla\QnA\Models\AnswerModel;
 use Psr\Log\LoggerAwareInterface;
@@ -91,6 +93,9 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
     /** @var int */
     private $unansweredCountLimit = self::UNANSWERED_COUNT_LIMIT_DEFAULT;
 
+    /** @var FormatService  */
+    private $formatService;
+
     /**
      * QnAPlugin constructor.
      *
@@ -100,6 +105,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
      * @param CategoryModel $categoryModel
      * @param AnswerModel $questionModel
      * @param Gdn_Session $session
+     * @param FormatService $formatService
      */
     public function __construct(
         CommentModel $commentModel,
@@ -107,7 +113,8 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
         UserModel $userModel,
         CategoryModel $categoryModel,
         AnswerModel $questionModel,
-        SessionInterface $session
+        SessionInterface $session,
+        FormatService $formatService
     ) {
         parent::__construct();
 
@@ -117,6 +124,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
         $this->categoryModel = $categoryModel;
         $this->answerModel = $questionModel;
         $this->session = $session;
+        $this->formatService = $formatService;
         $this->setLogger(Logger::getLogger());
         if (Gdn::addonManager()->isEnabled('Reactions', \Vanilla\Addon::TYPE_ADDON) && c('Plugins.QnA.Reactions', true)) {
             $this->Reactions = true;
@@ -310,12 +318,16 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
     public function base_discussionTypes_handler($sender, $args) {
         $category = val('Category', $args);
         if (empty($category) || !c('Plugins.QnA.UseBigButtons')) {
+            //for NewPostMenu, we change 'Ask a Question' to  'New Question'
+            $newPostMenu = Gdn::themeFeatures()->get("NewPostMenu");
+            $text = $newPostMenu ? 'New Question' : 'Ask a Question';
             $args['Types']['Question'] = [
                 'apiType' => 'question',
                 'Singular' => 'Question',
                 'Plural' => 'Questions',
                 'AddUrl' => '/post/question',
-                'AddText' => 'Ask a Question'
+                'AddText' => $text,
+                'AddIcon' => 'new-question'
             ];
         }
     }
@@ -1158,6 +1170,17 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
 
         if ($sender->data('Discussion.QnA')) {
             $sender->CssClass .= ' Question';
+            $discussion = (array)$sender->data('Discussion');
+            // Limit up to 3 answers
+            /** @var int $limit */
+            $limit = Gdn::config('QnA.JsonLD.AnswersLimit', 3);
+            /** @var  array $answers */
+            $answers = array_slice($sender->data('Answers', []), 0, $limit, true);
+            // This data structure works only if we have accepted answer or rules that bring best answer(vote, score,...)
+            if ($answers) {
+                $QnAJsonLDItem = new QnAJsonLD($discussion, $answers, $this->formatService, $this->userModel);
+                $sender->Head->addJsonLDItem($QnAJsonLDItem);
+            }
         }
     }
 
@@ -1913,6 +1936,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
                     'QnA',
                     $qna ? $qna : 'Unanswered'
                 );
+                $this->recalculateDiscussionQnA($discussion);
                 break;
             default:
                 $this->discussionModel->setField($discussionID, 'QnA', null);

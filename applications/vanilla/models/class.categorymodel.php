@@ -8,6 +8,7 @@
  * @since 2.0
  */
 
+use Garden\Web\Exception\ClientException;
 use Garden\EventManager;
 use Garden\Schema\Schema;
 use Vanilla\Dashboard\Models\PermissionJunctionModelInterface;
@@ -43,6 +44,7 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
 
     use LegacyDirtyRecordTrait;
 
+    public const CONF_CATEGORY_FOLLOWING = "Vanilla.EnableCategoryFollowing";
     public const PERM_DISCUSSION_VIEW = "Vanilla.Discussions.View";
     public const PERM_JUNCTION_TABLE = "Category";
 
@@ -52,6 +54,9 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
 
     /** Category preference key for communicating a user's post notification preferences. */
     public const PREFERENCE_KEY_NOTIFICATION = "postNotifications";
+
+    /** Category preference key for whether a user's notifications should also be emailed. */
+    public const PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS = "useEmailNotifications";
 
     /** UserMeta key for determining whether a user should receive in-app discussion notifications for a category. */
     private const PREFERENCE_DISCUSSION_APP = "Preferences.Popup.NewDiscussion.%d";
@@ -623,6 +628,13 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
             throw new InvalidArgumentException('Category not configured to display as discussions.');
         }
 
+        if ($followed == 1) {
+            $followedCategories = $this->getFollowed($userID);
+            if (count($followedCategories) >= $this->getMaxFollowedCategories()) {
+                throw new ClientException(t('Already following the maximum number of categories.'));
+            }
+        }
+
         $this->SQL->replace(
             'UserCategory',
             ['Followed' => $followed],
@@ -641,7 +653,7 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
      * @return bool
      */
     public function followingEnabled() {
-        $result = boolval(c('Vanilla.EnableCategoryFollowing'));
+        $result = boolval(c(\CategoryModel::CONF_CATEGORY_FOLLOWING));
         return $result;
     }
 
@@ -4136,35 +4148,43 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
     }
 
     /**
-     * Compile legacy notification settings from UserMeta and UserCategory into a standard notification flag.
+     * Compile legacy notification settings from UserMeta and UserCategory into newer notification flags.
      *
      * @param int $categoryID
      * @param array $userMeta
      * @param array $userCategory
-     * @return string|null
+     * @return array{postNotifications: string, useEmailNotifications: bool}
      */
-    private function notificationFromLegacy(int $categoryID, array $userMeta, array $userCategory): ?string {
+    private function notificationFromLegacy(int $categoryID, array $userMeta, array $userCategory): array {
         $following = $userCategory[$categoryID]["Followed"] ?? false;
 
-        $discussionApp = sprintf(self::PREFERENCE_DISCUSSION_APP, $categoryID);
-        $discussionEmail = sprintf(self::PREFERENCE_DISCUSSION_EMAIL, $categoryID);
-        $discussions = $userMeta[$discussionEmail] ?? $userMeta[$discussionApp] ?? false;
+        $discussionAppKey = sprintf(self::PREFERENCE_DISCUSSION_APP, $categoryID);
+        $discussionApp = $userMeta[$discussionAppKey]["Value"] ?? false;
+        $discussionEmailKey = sprintf(self::PREFERENCE_DISCUSSION_EMAIL, $categoryID);
+        $discussionEmail = $userMeta[$discussionEmailKey]["Value"] ?? false;
+        $discussions = $discussionEmail || $discussionApp;
 
-        $commentApp = sprintf(self::PREFERENCE_COMMENT_APP, $categoryID);
-        $commentEmail = sprintf(self::PREFERENCE_COMMENT_EMAIL, $categoryID);
-        $comments = $userMeta[$commentEmail] ?? $userMeta[$commentApp] ?? false;
+        $commentAppKey = sprintf(self::PREFERENCE_COMMENT_APP, $categoryID);
+        $commentApp = $userMeta[$commentAppKey]["Value"] ?? false;
+        $commentEmailKey = sprintf(self::PREFERENCE_COMMENT_EMAIL, $categoryID);
+        $commentEmail = $userMeta[$commentEmailKey]["Value"] ?? false;
+        $comments = $commentEmail || $commentApp;
 
         if ($comments) {
-            $result = self::NOTIFICATION_ALL;
+            $postNotifications = self::NOTIFICATION_ALL;
         } elseif ($discussions) {
-            $result = self::NOTIFICATION_DISCUSSIONS;
+            $postNotifications = self::NOTIFICATION_DISCUSSIONS;
         } elseif ($following) {
-            $result = self::NOTIFICATION_FOLLOW;
+            $postNotifications = self::NOTIFICATION_FOLLOW;
         } else {
-            $result = null;
+            $postNotifications = null;
         }
 
-        return $result;
+        $useEmailNotifications = $discussionEmail || $commentEmail;
+        return [
+            self::PREFERENCE_KEY_NOTIFICATION => $postNotifications,
+            self::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS => $useEmailNotifications,
+        ];
     }
 
     /**
@@ -4197,7 +4217,7 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
             $preferences = $this->generatePreferences($id, $userMeta, $userCategory);
 
             // Currently only tracking notification preferences. If there's nothing to add, skip the row.
-            $postNotifications = $preferences["postNotifications"] ?? null;
+            $postNotifications = $preferences[self::PREFERENCE_KEY_NOTIFICATION] ?? null;
             if ($postNotifications === null) {
                 continue;
             }
@@ -4236,7 +4256,21 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
      */
     public function setPreferences(int $userID, int $categoryID, array $preferences): void {
         if (array_key_exists(self::PREFERENCE_KEY_NOTIFICATION, $preferences)) {
-            $this->setNotificationPreference($userID, $categoryID, $preferences[self::PREFERENCE_KEY_NOTIFICATION]);
+            $useEmailNotifications = $preferences[self::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS] ?? false;
+            $this->setNotificationPreference(
+                $userID,
+                $categoryID,
+                $preferences[self::PREFERENCE_KEY_NOTIFICATION],
+                $useEmailNotifications
+            );
+        } elseif (array_key_exists(self::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS, $preferences)) {
+            $userPreferences = $this->getPreferencesByCategoryID($userID, $categoryID);
+            $this->setNotificationPreference(
+                $userID,
+                $categoryID,
+                $userPreferences[self::PREFERENCE_KEY_NOTIFICATION] ?? null,
+                $preferences[self::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS]
+            );
         }
     }
 
@@ -4246,20 +4280,26 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
      * @param int $userID
      * @param int $categoryID
      * @param string|null $notificationPreference One of the NOTIFICATION_* constants or `null` to disable notifications.
+     * @param bool $useEmailNotifications
      */
-    private function setNotificationPreference(int $userID, int $categoryID, ?string $notificationPreference): void {
+    private function setNotificationPreference(
+        int $userID,
+        int $categoryID,
+        ?string $notificationPreference,
+        bool $useEmailNotifications = false
+    ): void {
         switch ($notificationPreference) {
             case self::NOTIFICATION_ALL:
                 $following = true;
                 $discussionApp = true;
-                $discussionEmail = true;
+                $discussionEmail = $useEmailNotifications ?: null;
                 $commentApp = true;
-                $commentEmail = true;
+                $commentEmail = $useEmailNotifications ?: null;
                 break;
             case self::NOTIFICATION_DISCUSSIONS:
                 $following = true;
                 $discussionApp = true;
-                $discussionEmail = true;
+                $discussionEmail = $useEmailNotifications ?: null;
                 $commentApp = null;
                 $commentEmail = null;
                 break;
@@ -4301,10 +4341,11 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
      * @return array
      */
     private function generatePreferences(int $categoryID, array $userMeta, array $userCategory): array {
-        $postNotifications = $this->notificationFromLegacy($categoryID, $userMeta, $userCategory);
+        $notificationPreferences = $this->notificationFromLegacy($categoryID, $userMeta, $userCategory);
 
         return [
-            "postNotifications" => $postNotifications,
+            self::PREFERENCE_KEY_NOTIFICATION => $notificationPreferences[self::PREFERENCE_KEY_NOTIFICATION],
+            self::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS => $notificationPreferences[self::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS],
         ];
     }
 
@@ -4315,7 +4356,7 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
      */
     public function preferencesSchema(): Schema {
         $result = SchemaFactory::parse([
-            "postNotifications" => [
+            self::PREFERENCE_KEY_NOTIFICATION => [
                 "allowNull" => true,
                 "type" => "string",
                 "enum" => [
@@ -4323,7 +4364,10 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
                     CategoryModel::NOTIFICATION_DISCUSSIONS,
                     CategoryModel::NOTIFICATION_FOLLOW,
                 ],
-            ]
+            ],
+            self::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS => [
+                "type" => "boolean",
+            ],
         ], "CategoryPreferences");
         return $result;
     }

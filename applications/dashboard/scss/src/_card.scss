@@ -191,7 +191,7 @@
         padding-bottom: 4px;
         padding-top: 4px;
         display: flex;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         align-items: center;
 
         &:last-child {

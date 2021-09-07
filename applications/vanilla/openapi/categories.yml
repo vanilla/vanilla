@@ -42,7 +42,7 @@ paths:
         schema:
           default: false
           type: boolean
-      - description: Only list featured categories.
+      - description: Only list featured categories. When applied the maxDepth filter will be ignored.
         in: query
         name: featured
         required: false
@@ -878,6 +878,9 @@ components:
     CategoryPreferences:
       type: object
       properties:
+        useEmailNotifications:
+          nullable: true
+          type: boolean
         postNotifications:
           nullable: true
           type: string

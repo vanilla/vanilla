@@ -252,6 +252,11 @@ export default function Tree<D = {}>(props: Props<D>) {
      * @param event
      */
     function onKeyDown(e: React.KeyboardEvent) {
+        // Check if the tree does not contain target element and allow standard keydown events to the target
+        if (!e.currentTarget.contains(e.target as Element)) {
+            return;
+        }
+
         const container = containerRef.current;
         if (!isDragEnabled || dragState.current || !container) {
             return;

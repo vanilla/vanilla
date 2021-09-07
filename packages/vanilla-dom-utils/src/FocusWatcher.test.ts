@@ -18,6 +18,8 @@ describe("FocusWatcher", () => {
                 <span id="notfocusable"></span>
             </div>
             <button id="item3"></button>
+            <div id="modals"><button id="modalbutton"></button</div>
+            <div data-reach-popover tabindex="-1" id="popover"><button id="inpopover" /></div>
         </div>`;
     });
 
@@ -63,7 +65,9 @@ describe("FocusWatcher", () => {
         const spy = sinon.spy();
         const root1 = document.getElementById("root1")!;
         const item1 = document.getElementById("item1")!;
-        const item2 = document.getElementById("item2")!;
+        const modalButton = document.getElementById("modalbutton")!;
+        const popover = document.getElementById("popover")!;
+        const inPopover = document.getElementById("inpopover")!;
 
         const watcher = new FocusWatcher(root1, spy);
         watcher.start();
@@ -71,12 +75,17 @@ describe("FocusWatcher", () => {
         root1.focus();
         spy.resetHistory();
         item1.focus();
-        expect(spy.calledOnceWith(false));
+        expect(spy.calledOnceWith(true));
 
-        item1.focus();
         spy.resetHistory();
-        item2.focus();
-        expect(spy.calledOnceWith(false));
+        modalButton.focus();
+        expect(spy.notCalled);
+
+        popover.focus();
+        expect(spy.notCalled);
+
+        inPopover.focus();
+        expect(spy.notCalled);
     });
 
     it("does not notify about focus going to the 'body'", () => {
@@ -97,6 +106,25 @@ describe("FocusWatcher", () => {
         const root1 = document.getElementById("root1")!;
         const item1 = document.getElementById("item1")!;
         const item2 = document.getElementById("item2")!;
+        const notfocusable = document.getElementById("notfocusable")!;
+
+        const watcher = new FocusWatcher(root1, spy);
+        watcher.start();
+
+        root1.focus();
+        spy.resetHistory();
+        item2.click();
+        expect(spy.notCalled).eq(true);
+
+        item1.focus();
+        spy.resetHistory();
+        notfocusable.click();
+        expect(spy.notCalled).eq(true);
+    });
+
+    it("does not notify when an item in popover of modal is clicked", () => {
+        const spy = sinon.spy();
+        const root1 = document.getElementById("root1")!;
         const notfocusable = document.getElementById("notfocusable")!;
 
         const watcher = new FocusWatcher(root1, spy);

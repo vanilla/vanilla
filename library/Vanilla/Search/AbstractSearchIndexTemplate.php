@@ -18,7 +18,9 @@ abstract class AbstractSearchIndexTemplate {
     const OPT_NO_INDEX = "x-no-index-field";
 
     const SIMPLE_FIELD_TYPE_MAPPING = [
-        "integer"  => ["type" => "long"],
+        "integer"  => ["type" => "integer"],
+        "keyword"  => ["type" => "keyword"],
+        "constant_keyword"  => ["type" => "constant_keyword"],
         "string"   => ["type" => "text", "fields" => ["keyword" => ["type" => "keyword", "ignore_above" => 256]]],
         "boolean"  => ["type" =>  "boolean"],
         "datetime" => ["type" => "date"],
@@ -43,7 +45,8 @@ abstract class AbstractSearchIndexTemplate {
         'siteSections',
         'allowedDiscussionTypes',
         'title',
-        'private'
+        'private',
+        'punished',
     ];
 
     /**
@@ -89,6 +92,21 @@ abstract class AbstractSearchIndexTemplate {
             // ignore nullables fields for now.
             if (is_array($type)) {
                 $type = $type[0];
+            }
+
+            // Case specific. Do not apply onto to lowercase ID
+            // Lowercase IDs could be `bodyPlainText_id` (locale is "id").
+            if (str_ends_with($fieldName, "ID")) {
+                // ID fields don't need to support range queries.
+                // As a result elastic will query them more efficiently as a keyword type.
+                // See https://www.elastic.co/guide/en/elasticsearch/reference/current/keyword.html#keyword-field-type
+                $type = "keyword";
+            }
+
+            if ($fieldName === "siteID") {
+                // Every index shares content from the same site
+                // constant keyword allows better optimization of queries using this field.
+                $type = "constant_keyword";
             }
 
             if (array_key_exists($type, self::SIMPLE_FIELD_TYPE_MAPPING)) {

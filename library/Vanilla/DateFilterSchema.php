@@ -13,6 +13,9 @@ use Garden\Schema\Validation;
 use Garden\Schema\ValidationField;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ServerException;
+use Vanilla\Schema\DateRangeExpression;
+use Vanilla\Schema\LegacyDateRangeExpression;
+use Vanilla\Schema\RangeExpression;
 
 /**
  * Validate and parse a date filter string into an easy-to-use array representation.
@@ -35,6 +38,11 @@ class DateFilterSchema extends Schema {
     private $simpleOperators = ['=', '>', '<', '>=', '<='];
 
     /**
+     * @var Schema
+     */
+    private $adapter;
+
+    /**
      * Initialize an instance of a new DateFilterSchema class.
      *
      * @param array $extra Additional fields to set on the schema.
@@ -46,6 +54,8 @@ class DateFilterSchema extends Schema {
         } else {
             $extra['description'] = self::DEFAULT_DESCRIPTION;
         }
+
+        $this->adapter = LegacyDateRangeExpression::createSchema();
 
         parent::__construct([
             'type' => 'object',
@@ -245,6 +255,13 @@ class DateFilterSchema extends Schema {
      * {@inheritdoc}
      */
     public function validate($data, $sparse = false) {
+        if ($data instanceof DateRangeExpression) {
+            return $data;
+        } elseif (is_scalar($data) || is_null($data)) {
+            $valid = $this->adapter->validate($data, $sparse);
+            return $valid;
+        }
+
         $validation = $this->createValidation();
         $field = new ValidationField($validation, $this->getSchemaArray(), '', $sparse);
 
@@ -268,8 +285,9 @@ class DateFilterSchema extends Schema {
         if (!$validation->isValid()) {
             throw new ValidationException($field->getValidation());
         }
-
-        return $clean;
+        // Convert the old-school range array into a RangeExpression
+        $r = LegacyDateRangeExpression::createFromLegacyArray($clean);
+        return $r;
     }
 
     /**
@@ -315,12 +333,13 @@ class DateFilterSchema extends Schema {
      * @param mixed $dateData The decoded date data.
      * @return array
      * @throws \InvalidArgumentException Throws an exception when the operator is invalid.
+     * @deprecated Use the `DateRangeExpression` class. It can be passed directly to queries.
      */
-    public static function dateFilterField($field, array $dateData) {
+    public static function dateFilterField($field, $dateData) {
         $validOperators = ['=', '>', '<', '>=', '<=', '[]', '()', '[)', '(]'];
         $result = [];
 
-        if (array_key_exists('operator', $dateData) && array_key_exists('date', $dateData) && is_array($dateData['date'])) {
+        if (!empty($dateData['operator']) && !empty($dateData['date']) && is_array($dateData['date'])) {
             $op = $dateData['operator'];
             $dates = $dateData['date'];
 

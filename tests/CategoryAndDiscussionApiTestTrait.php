@@ -83,7 +83,7 @@ trait CategoryAndDiscussionApiTestTrait {
 
             ]);
 
-        $discussion = $discussionAPIController->post($body);
+        $discussion = $discussionAPIController->post($body)->getData();
         $this->lastInsertedDiscussionID = $discussion['discussionID'];
 
         return $discussion;

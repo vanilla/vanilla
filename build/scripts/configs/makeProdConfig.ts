@@ -6,7 +6,7 @@
 
 import path from "path";
 import { Configuration } from "webpack";
-import { DIST_DIRECTORY } from "../env";
+import { DIST_DIRECTORY, DIST_NAME } from "../env";
 import { getOptions, BuildMode } from "../buildOptions";
 import { makeBaseConfig } from "./makeBaseConfig";
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
@@ -39,12 +39,12 @@ export async function makeProdConfig(entryModel: EntryModel, section: string, is
     baseConfig.output = {
         filename: "[name].[contenthash].min.js",
         chunkFilename: "async/[name].[contenthash].min.js",
-        publicPath: `/dist/${section}/`,
+        publicPath: `/${DIST_NAME}/${section}/`,
         path: path.join(DIST_DIRECTORY, section),
         library: `vanilla${section}`,
     };
     if (options.modern) {
-        baseConfig.output.publicPath = isLegacy ? `/dist/${section}/` : `/dist/${section}-modern/`;
+        baseConfig.output.publicPath = isLegacy ? `/${DIST_NAME}/${section}/` : `/${DIST_NAME}/${section}-modern/`;
         baseConfig.output.path = path.join(DIST_DIRECTORY, isLegacy ? section : `${section}-modern`);
     }
     baseConfig.optimization = {

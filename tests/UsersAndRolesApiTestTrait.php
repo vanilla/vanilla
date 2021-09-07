@@ -188,7 +188,7 @@ trait UsersAndRolesApiTestTrait {
      * @param array $overrides
      * @return array
      */
-    public function createRole(array $overrides = []): array {
+    public function createRole(array $overrides = [], array $globalPermissions = []): array {
         $salt = '-' . round(microtime(true) * 1000) . rand(1, 1000);
 
         $body = $overrides + [
@@ -199,7 +199,7 @@ trait UsersAndRolesApiTestTrait {
             "permissions" => [
                 [
                     "id" => 0,
-                    "permissions" => [],
+                    "permissions" => $globalPermissions,
                     "type" => "global"
                 ]
             ],

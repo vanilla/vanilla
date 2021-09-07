@@ -9,18 +9,15 @@ import { IUser } from "@library/@types/api/users";
 import { configureStore, createSlice } from "@reduxjs/toolkit";
 import { getUserReactions } from "@Reactions/state/ReactionsActions";
 import { IReaction } from "@Reactions/types/Reaction";
+import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 
-export interface IReactionsStoreState {
-    reactions: IReactionState;
-}
-
-interface IReactionState {
+export interface IReactionsState {
     reactionsByID: Record<IReaction["tagID"], IReaction>;
     reactionIDsByUserID: Record<IUser["userID"], Array<IReaction["tagID"]>>;
     reactionIDsByParamHash: Record<string, Loadable<Array<IReaction["tagID"]>>>;
 }
 
-export const INITIAL_REACTIONS_STATE: IReactionState = {
+export const INITIAL_REACTIONS_STATE: IReactionsState = {
     reactionsByID: {},
     reactionIDsByUserID: {},
     reactionIDsByParamHash: {},
@@ -68,5 +65,18 @@ export const reactionsSlice = createSlice({
     },
 });
 
-const store = configureStore(reactionsSlice);
-export type ReactionsDispatch = typeof store.dispatch;
+export function getLoadStatusByParamHash(reationsState: IReactionsState, paramHash: number): LoadStatus | undefined {
+    return reationsState.reactionIDsByParamHash[paramHash]?.status;
+}
+
+export function getReactionsByUserID(reationsState: IReactionsState, userID: IUser["userID"]): IReaction[] | undefined {
+    return reationsState.reactionIDsByUserID[userID]?.map((reactionID) => reationsState.reactionsByID[reactionID]);
+}
+
+export function getReactionByID(reationsState: IReactionsState, reactionID: IReaction["tagID"]): IReaction | undefined {
+    return reationsState.reactionsByID[reactionID];
+}
+
+const dispatch = configureStore(reactionsSlice).dispatch;
+export const useReactionsDispatch = () => useDispatch<typeof dispatch>();
+export const useReactionsSelector: TypedUseSelectorHook<{ reactions: IReactionsState }> = useSelector;

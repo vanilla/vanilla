@@ -137,9 +137,7 @@ class Gdn_Model extends Gdn_Pluggable {
      * @return \Gdn_SQLDriver
      */
     protected function createSql(): \Gdn_SQLDriver {
-        $sql = clone $this->Database->sql();
-        $sql->reset();
-        return $sql;
+        return $this->Database->createSql();
     }
 
     /**
@@ -656,6 +654,40 @@ class Gdn_Model extends Gdn_Pluggable {
     public function getWhere($where = false, $orderFields = '', $orderDirection = 'asc', $limit = false, $offset = false) {
         $this->_beforeGet();
         return $this->SQL->getWhere($this->Name, $where, $orderFields, $orderDirection, $limit, $offset);
+    }
+
+    /**
+     * Iterator version of Gdn_Model::getWhere() where results are fetched in batches.
+     *
+     * @param array $where
+     * @param string $orderFields
+     * @param string $orderDirection
+     * @param bool $expand
+     * @param int $batchSize
+     * @return Generator<int, array>
+     */
+    public function getWhereIterator(
+        array $where = [],
+        string $orderFields = '',
+        string $orderDirection = '',
+        bool $expand = true,
+        int $batchSize = 100
+    ): Generator {
+        $offset = 0;
+        while (true) {
+            $results = $this->getWhere($where, $orderFields, $orderDirection, $batchSize, $offset, $expand)->resultArray();
+            foreach ($results as $result) {
+                $primaryKey = $result[$this->PrimaryKey];
+                yield $primaryKey => $result;
+            }
+
+            $offset += $batchSize;
+
+            if (count($results) < $batchSize) {
+                // We made it to the end.
+                return;
+            }
+        }
     }
 
     /**

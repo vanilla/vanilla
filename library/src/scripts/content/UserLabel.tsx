@@ -6,7 +6,7 @@ import { userLabelClasses } from "@library/content/userLabelStyles";
 import { Roles } from "@library/content/Roles";
 import classNames from "classnames";
 import { metasClasses } from "@library/metas/Metas.styles";
-import { ICategoryFragment } from "@vanilla/addon-vanilla/@types/api/categories";
+import { ICategoryFragment } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import DateTime from "@library/content/DateTime";
 import { MetaItem, MetaLink } from "@library/metas/Metas";
 

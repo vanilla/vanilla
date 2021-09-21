@@ -44,6 +44,8 @@ use Vanilla\Web\SafeCurlHttpHandler;
 use Vanilla\Web\TwigEnhancer;
 use Vanilla\Web\TwigRenderer;
 use Vanilla\Web\UASniffer;
+use Vanilla\Widgets\TabWidgetModule;
+use Vanilla\Widgets\TabWidgetTabService;
 use Vanilla\Widgets\WidgetService;
 
 if (!defined('APPLICATION')) exit();
@@ -405,6 +407,10 @@ $dic->setInstance(Container::class, $dic)
     ->setInherit(true)
 
     ->rule(WidgetService::class)
+    ->addCall('registerWidget', [TabWidgetModule::class])
+    ->setShared(true)
+
+    ->rule(TabWidgetTabService::class)
     ->setShared(true)
 
     ->rule('Gdn_IPlugin')

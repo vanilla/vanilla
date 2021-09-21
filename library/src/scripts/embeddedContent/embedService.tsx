@@ -10,6 +10,7 @@ import { FileEmbed } from "@library/embeddedContent/FileEmbed";
 import { GettyImagesEmbed } from "@library/embeddedContent/GettyImagesEmbed";
 import { GiphyEmbed } from "@library/embeddedContent/GiphyEmbed";
 import { IFrameEmbed, supportsFrames } from "@library/embeddedContent/IFrameEmbed";
+import { MuralEmbed } from "@library/embeddedContent/MuralEmbed";
 import { ImageEmbed } from "@library/embeddedContent/ImageEmbed";
 import { ImgurEmbed } from "@library/embeddedContent/ImgurEmbed";
 import { InstagramEmbed } from "@library/embeddedContent/InstagramEmbed";
@@ -166,6 +167,7 @@ function ensureBuiltinEmbeds() {
     registerEmbed("panopto", PanoptoEmbed);
     registerEmbed("image", ImageEmbed);
     registerEmbed("brightcove", BrightcoveEmbed);
+    registerEmbed("mural", MuralEmbed);
 
     if (supportsFrames()) {
         registerEmbed("iframe", IFrameEmbed);

@@ -111,6 +111,13 @@ class DiscussionSearchType extends AbstractSearchType {
     }
 
     /**
+     * @return bool
+     */
+    public function canBeOptimizedIntoGroup(): bool {
+        return true;
+    }
+
+    /**
      * @inheritdoc
      */
     public function getResultItems(array $recordIDs, SearchQuery $query): array {

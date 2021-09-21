@@ -18,8 +18,10 @@ use Vanilla\EmbeddedContent\Embeds\IFrameEmbed;
 use Vanilla\EmbeddedContent\Embeds\ImageEmbed;
 use Vanilla\EmbeddedContent\Embeds\ImgurEmbed;
 use Vanilla\EmbeddedContent\Embeds\LinkEmbed;
+use Vanilla\EmbeddedContent\Embeds\MuralEmbed;
 use Vanilla\EmbeddedContent\Embeds\TwitchEmbedFilter;
 use Vanilla\EmbeddedContent\Factories\BrightcoveEmbedFactory;
+use Vanilla\EmbeddedContent\Factories\MuralEmbedFactory;
 use Vanilla\EmbeddedContent\Factories\PanoptoEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\PanoptoEmbed;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
@@ -189,6 +191,9 @@ class EmbedService implements EmbedCreatorInterface {
             // Panopto
             ->registerFactory($dic->get(PanoptoEmbedFactory::class))
             ->registerEmbed(PanoptoEmbed::class, PanoptoEmbed::TYPE)
+            // Mural
+            ->registerFactory($dic->get(MuralEmbedFactory::class))
+            ->registerEmbed(MuralEmbed::class, MuralEmbed::TYPE)
             // Scrape-able Embeds
             ->setFallbackFactory($dic->get(ScrapeEmbedFactory::class))
             ->registerEmbed(ImageEmbed::class, ImageEmbed::TYPE)

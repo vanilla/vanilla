@@ -13,6 +13,7 @@ import { notEmpty } from "@vanilla/utils";
 import { AutoCompleteOption, IAutoCompleteOption, IAutoCompleteOptionProps } from "./AutoCompleteOption";
 import { IAutoCompleteProps } from "./AutoComplete";
 import { AutoCompleteContext } from "./AutoCompleteContext";
+import { useApiContext } from "../../ApiContext";
 
 export interface ILookupApi {
     searchUrl: string;
@@ -28,27 +29,31 @@ interface IAutoCompleteLookupRenderProps extends Pick<IAutoCompleteProps, "onSea
 
 interface IAutoCompleteLookupProps {
     lookup: ILookupApi;
-    api: AxiosInstance;
+    api?: AxiosInstance;
 }
 
 const apiCaches = new Map<string, any>();
 export function AutoCompleteLookupOptions(props: IAutoCompleteLookupProps) {
-    const { lookup, api } = props;
-    const { inputState, value, setOptions, setInputState } = useContext(AutoCompleteContext);
+    const { lookup } = props;
+    const contextApi = useApiContext();
+    const api = props.api ?? contextApi;
+    const { inputState, value, setOptions, setInputState, multiple } = useContext(AutoCompleteContext);
     const [ownQuery, setQuery] = useState<string | number>("");
     const [initialValue] = useState(value);
     const [options, currentOption] = useApiLookup(lookup, api, value, ownQuery, initialValue);
     const isLoading = (!!initialValue && !currentOption) || options === null;
 
+    const displayValue = multiple ? "" : currentOption?.label ?? currentOption?.value ?? "";
+
     useEffect(() => {
         if (inputState.status !== "suggesting") {
-            setInputState({ status: "selected", value: currentOption?.label ?? currentOption?.value ?? "" });
+            setInputState({ status: "selected", value: displayValue });
         }
-    }, [currentOption, inputState.status]);
+    }, [displayValue, inputState.status]);
 
     useEffect(() => {
         if (inputState.status === "suggesting") {
-            setQuery(inputState.value);
+            setQuery(inputState.value !== undefined ? inputState.value : "");
         }
     }, [inputState]);
 

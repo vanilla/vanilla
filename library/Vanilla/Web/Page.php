@@ -13,6 +13,7 @@ use Garden\Web\Data;
 use Garden\Web\Exception\ServerException;
 use Vanilla\InjectableInterface;
 use Vanilla\Models\SiteMeta;
+use Vanilla\Permissions;
 use Vanilla\Web\JsInterpop\ReduxActionPreloadTrait;
 use Vanilla\Web\JsInterpop\ReduxErrorAction;
 
@@ -21,7 +22,7 @@ use Vanilla\Web\JsInterpop\ReduxErrorAction;
  */
 abstract class Page implements InjectableInterface, CustomExceptionHandler, PageHeadInterface {
 
-    use TwigRenderTrait, ReduxActionPreloadTrait, PageHeadProxyTrait;
+    use TwigRenderTrait, ReduxActionPreloadTrait, PageHeadProxyTrait, PermissionCheckTrait;
 
     /** @var bool */
     private $requiresSeo = true;
@@ -231,11 +232,12 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler, Page
     /**
      * Redirect user to sign in page if they are not signed in.
      *
-     * @param string $redirectTarget URI user should be redirected back when log in.
+     * @param string|null $redirectTarget URI user should be redirected back when log in.
      *
      * @return $this
      */
-    public function requiresSession(string $redirectTarget): self {
+    public function requiresSession(string $redirectTarget = null): self {
+        $redirectTarget = $redirectTarget ?? \Gdn::request()->getUrl();
         if (!$this->session->isValid()) {
             header(
                 'Location: /entry/signin?Target=' . urlencode($redirectTarget),
@@ -246,5 +248,15 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler, Page
         } else {
             return $this;
         }
+    }
+
+    /**
+     * @inheridoc
+     */
+    protected function getPermissions(): ?Permissions {
+        if ($this->session === null) {
+            return null;
+        }
+        return $this->session->getPermissions();
     }
 }

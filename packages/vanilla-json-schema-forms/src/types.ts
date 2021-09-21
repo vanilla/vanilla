@@ -11,11 +11,12 @@ import React from "react";
 
 export type Path = Array<string | number>;
 
-interface ICommonControl {
+export interface ICommonControl {
     label?: string;
     description?: string;
     placeholder?: string;
     conditions?: Condition[];
+    fullSize?: boolean;
 }
 
 interface IChoices {
@@ -65,13 +66,19 @@ export interface ISchemaTab {
     isDefault?: boolean;
 }
 
+interface ICustomControl extends ICommonControl {
+    inputType: string;
+    [key: string]: any;
+}
+
 export type IFormControl =
     | IDropdownControl
     | IRadioControl
     | ITextBoxControl
     | ICheckBoxControl
     | ICodeBoxControl
-    | ITabsControl;
+    | ITabsControl
+    | ICustomControl;
 
 export type IFormControlType = IFormControl["inputType"];
 
@@ -131,11 +138,11 @@ export interface IValidationResult {
 }
 
 export interface ISchemaRenderProps {
-    FormControlGroup?(props: React.PropsWithChildren<IControlGroupProps>): JSX.Element | null;
-    Form?(props: React.PropsWithChildren<IFormProps>): JSX.Element | null;
-    FormSection?(props: React.PropsWithChildren<ISectionProps>): JSX.Element | null;
-    FormTabs?(props: React.PropsWithChildren<ITabsProps>): JSX.Element | null;
-    FormControl(props: React.PropsWithChildren<IControlProps>): JSX.Element | null;
+    FormControlGroup?: React.ComponentType<IControlGroupProps>;
+    Form?: React.ComponentType<IFormProps>;
+    FormSection?: React.ComponentType<ISectionProps>;
+    FormTabs?: React.ComponentType<ITabsProps>;
+    FormControl?: React.ComponentType<IControlProps>;
 }
 
 export interface IPtrReference {

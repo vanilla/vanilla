@@ -11,26 +11,16 @@ import { titleBarClasses } from "@library/headers/titleBarStyles";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { cx } from "@emotion/css";
 
-export interface IButtonProps extends IOptionalComponentID, React.HTMLAttributes<HTMLButtonElement> {
-    children: React.ReactNode;
-    className?: string;
-    disabled?: boolean;
+export interface IButtonProps extends IOptionalComponentID, React.ButtonHTMLAttributes<HTMLButtonElement> {
     prefix?: string;
     legacyMode?: boolean;
-    onClick?: (e) => void;
-    onKeyDown?: (e) => void;
-    title?: string;
-    submit?: boolean;
     ariaLabel?: string;
     buttonType?: ButtonTypes;
     ariaHidden?: boolean;
     tabIndex?: number;
-    lang?: string;
     buttonRef?: React.Ref<HTMLButtonElement>;
-    role?: string;
-    onKeyDownCapture?: (event: any) => void;
     controls?: string;
-    style?: {};
+    submit?: boolean;
 }
 
 interface IState {

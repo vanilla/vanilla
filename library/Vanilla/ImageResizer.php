@@ -38,6 +38,33 @@ class ImageResizer {
     ];
 
     /**
+     * This array has all image types that the various image functions can return.
+     *
+     * This constant is used to provide users with more sensible information. It is NOT an indication of all of the image
+     * types supported by this class.
+     */
+    public const ALL_TYPE_EXT = [
+        IMAGETYPE_GIF => 'gif', // 1
+        IMAGETYPE_JPEG => 'jpg', // 2
+        IMAGETYPE_PNG => 'png', // 3
+        IMAGETYPE_SWF => 'swf', // 4
+        IMAGETYPE_PSD => 'psd', // 5
+        IMAGETYPE_BMP => 'bmp', // 6
+        IMAGETYPE_TIFF_II => 'tiff', // 7
+        IMAGETYPE_TIFF_MM => 'tiff', // 8
+        IMAGETYPE_JPC => 'jpc', // 9
+        IMAGETYPE_JP2 => 'jp2', // 10
+        IMAGETYPE_JPX => 'jpx', // 11
+        IMAGETYPE_JB2 => 'jb2', // 12
+        IMAGETYPE_SWC => 'swc', // 13
+        IMAGETYPE_IFF => 'iff', // 14
+        IMAGETYPE_WBMP => 'wbmp', // 15
+        IMAGETYPE_XBM => 'xbm', // 16
+        IMAGETYPE_ICO => 'ico', // 17
+        IMAGETYPE_WEBP => 'webp', // 18
+    ];
+
+    /**
      * Resize an image.
      *
      * @param string $source The path of the source image.
@@ -57,7 +84,7 @@ class ImageResizer {
         list($width, $height, $srcType) = getimagesize($source);
         if (!in_array($srcType, [IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG])) {
             $ext = $this->extFromImageType($srcType);
-            throw new \InvalidArgumentException("Cannot resize images of this type ($ext).");
+            throw new \InvalidArgumentException("Cannot resize images of this type ($ext).", 400);
         }
 
         if ($destination === null) {
@@ -297,7 +324,11 @@ class ImageResizer {
      */
     public function imageTypeFromExt($path) {
         $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
-        $extType = static::getExtType();
+        if ($ext === 'jpeg') {
+            return IMAGETYPE_JPEG;
+        }
+
+        $extType = array_flip(self::ALL_TYPE_EXT);
         if (array_key_exists($ext, $extType)) {
             return $extType[$ext];
         }
@@ -366,7 +397,7 @@ class ImageResizer {
      * @return string Returns the file extension or **$type** if it was not found.
      */
     public function extFromImageType($type) {
-        $ext = isset(self::$typeExt[$type]) ? self::$typeExt[$type] : (string)$type;
+        $ext = self::ALL_TYPE_EXT[$type] ?? (string)$type;
         return $ext;
     }
 
@@ -484,9 +515,9 @@ class ImageResizer {
      * Should GIFs always be rewritten? GIFs will be rewritten if they exceed limits, regardless of this setting.
      * Rewriting animated GIFs will result in loss of animation.
      *
-     * @deprecated This is essentially a noop. The target property isn't used.
-     * @param boolean $alwaysRewriteGif
+     * @param bool $alwaysRewriteGif
      * @return self
+     * @deprecated This is essentially a noop. The target property isn't used.
      */
     public function setAlwaysRewriteGif(bool $alwaysRewriteGif): self {
         $this->alwaysRewriteGif = $alwaysRewriteGif;

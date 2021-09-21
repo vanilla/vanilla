@@ -10,12 +10,9 @@
 namespace Vanilla\Dashboard\Tests\Controllers;
 
 use EntryController;
-use Garden\EventManager;
-use VanillaTests\APIv0\TestDispatcher;
 use VanillaTests\Bootstrap;
-use VanillaTests\SetupTraitsTrait;
-use VanillaTests\SiteTestTrait;
-use VanillaTests\VanillaTestCase;
+use VanillaTests\Dashboard\EntryControllerConnectTestTrait;
+use VanillaTests\SiteTestCase;
 
 /**
  * Tests for the infamous `entry/connect` endpoint.
@@ -47,251 +44,10 @@ use VanillaTests\VanillaTestCase;
  *
  * Learn how `entry/connect` works from reading its code, but don't learn how to code there.
  */
-class EntryControllerConnectTest extends VanillaTestCase {
-    use SiteTestTrait, SetupTraitsTrait;
+class EntryControllerConnectTest extends SiteTestCase {
+    use EntryControllerConnectTestTrait;
 
     protected const PROVIDER_KEY = 'ec-test';
-
-    /**
-     * @var \Gdn_AuthenticationProviderModel
-     */
-    private $authModel;
-
-    /**
-     * @var \Gdn_Configuration
-     */
-    private $config;
-
-    /**
-     * @var \Gdn_Session
-     */
-    private $session;
-
-    /**
-     * @var array
-     */
-    private $existingUsers;
-
-    //region Set up and tear down.
-    /**
-     * {@inheritDoc}
-     *
-     * Hey! Look near the bottom of this method for a list of config settings that SSO uses. It's a serendipitous list.
-     */
-    public function setUp(): void {
-        parent::setUp();
-        $this->setupTestTraits();
-        $this->createUserFixtures();
-        debug(true);
-
-        $this->container()->call(function (
-            \Gdn_AuthenticationProviderModel $authModel,
-            \Gdn_Configuration $config,
-            \Gdn_Session $session
-        ) {
-            $this->authModel = $authModel;
-            $this->config = $config;
-            $this->session = $session;
-        });
-
-        $this->authModel->delete([\Gdn_AuthenticationProviderModel::COLUMN_KEY => self::PROVIDER_KEY]);
-        $this->authModel->save(
-            [
-                \Gdn_AuthenticationProviderModel::COLUMN_KEY => self::PROVIDER_KEY,
-                \Gdn_AuthenticationProviderModel::COLUMN_ALIAS => self::PROVIDER_KEY,
-                'AssociationSecret' => self::PROVIDER_KEY,
-                'Name' => self::PROVIDER_KEY,
-                'Trusted' => true,
-            ],
-            ['checkExisting' => true]
-        );
-
-        // Save some default SSO config settings to make testing easier and document the settings!
-        $this->config->set([
-            // Relax username validation so we don't have to worry during SSO testing.
-            'Garden.User.ValidationRegexPattern' => '`.+`',
-            // If you don't know what this is then you haven't been at Vanilla long.
-            'Garden.Registration.AutoConnect' => true,
-            // Allow SSO to connect with existing account via username/password.
-            'Garden.Registration.AllowConnect' => true,
-            // DEPRECATED. Whether or not roles are synchronized during SSO.
-            'Garden.SSO.SyncRoles' => false,
-            // Set to "register" to only sync roles during user registration.
-            'Garden.SSO.SyncRolesBehavior' => '',
-            // Whether to synchronize user info on subsequent user SSO's.
-            'Garden.Registration.ConnectSynchronize' => true,
-            // Whether SSO acts like the "remember me" checkbox was selected.
-            'Garden.SSO.RememberMe' => true,
-            // Affects validation when SSOing. Also affects the users presented during SSO conflicts.
-            'Garden.Registration.NameUnique' => true,
-            'Garden.Registration.EmailUnique' => true,
-            // Whether or not to send a welcome email to SSO users. Almost always false.
-            'Garden.Registration.SendConnectEmail' => false,
-        ], null);
-
-        // Test SSO as someone that isn't signed in yet.
-        $this->session->end();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function tearDown(): void {
-        parent::tearDown();
-        $this->tearDownTestTraits();
-    }
-    //endregion
-
-    //region Test harnesses and helpers.
-    /**
-     * POST to `/entry/connect` and return the controller.
-     *
-     * This is the basic test harness for most tests. It uses Bessy to dispatch to `/entry/connect`. You give it one
-     * of two things:
-     *
-     * 1. A handler that acts like an addon's `entry_connectData_handler()` method.
-     * 2. An array representing an SSO user. Most tests can be done with this.
-     *
-     * Either of those things act like your SSO addon. In this way we are mocking an SSO addon.
-     *
-     * @param callable|array $handlerOrUser An event handler to handle the connect data event or an array representing the user.
-     * @param array $body The post body.
-     * @param string|null $subpath A custom sub path to place after `entry/connect`.
-     * @param bool $throw Whether or not to throw an exception if any form errors occur.
-     * @return \EntryController
-     */
-    protected function entryConnect($handlerOrUser, $body = [], string $subpath = self::PROVIDER_KEY, bool $throw = true): \EntryController {
-        if (!empty($body)) {
-            $body += [
-                'Connect' => 'Vous vous connectez?', // needed for postback detection
-            ];
-        }
-
-        if (is_callable($handlerOrUser)) {
-            $handler = $handlerOrUser;
-        } elseif (is_array($handlerOrUser)) {
-            $handler = $this->basicConnectCallback($handlerOrUser);
-        } else {
-            throw new \InvalidArgumentException(__METHOD__.' expects $handlerOrUser to be a callable or an array.');
-        }
-
-        /** @var EventManager $events */
-        $events = $this->container()->get(EventManager::class);
-        try {
-            $events->bind('base_connectData', $handler);
-
-            if ($subpath) {
-                $subpath = '/'.ltrim($subpath, '/');
-            }
-
-            $r = $this->bessy()->post('/entry/connect'.$subpath, $body, [TestDispatcher::OPT_THROW_FORM_ERRORS => $throw]);
-            if (!($r instanceof \EntryController)) {
-                throw new \InvalidArgumentException(__METHOD__.' did not return the EntryController: '.get_class($r));
-            }
-            return $r;
-        } finally {
-            $events->unbind('base_connectData', $handler);
-        }
-    }
-
-    /**
-     * Make a callback to pass to `entryConnect()`.
-     *
-     * This returns a callback that acts like an addon's `base_connectData` handler. All it does is pass the provided
-     * user back to `entry/connect` for processing while setting additional required SSO meta data.
-     *
-     * @param array $user The user to SSO.
-     * @return callable Returns the callback.
-     */
-    protected function basicConnectCallback(array $user): callable {
-        $user += [
-            'Provider' => self::PROVIDER_KEY,
-            'ProviderName' => self::PROVIDER_KEY,
-        ];
-
-        /**
-         * @param \EntryController $sender
-         * @param array $args
-         */
-        $handler = function ($sender) use ($user) {
-            foreach ($user as $key => $value) {
-                if ($value !== null) {
-                    $sender->Form->setFormValue($key, $value);
-                }
-            }
-            $sender->setData('Verified', true);
-        };
-
-        return $handler;
-    }
-
-    /**
-     * Assert that an SSO entry has a user in the database.
-     *
-     * @param string|array $uniqueID The unique SSO ID of the user or a user with a `UniqueID` key.
-     * @param string $provider The name of the provider.
-     * @return array Returns the user for further assertions.
-     */
-    protected function assertAuthentication($uniqueID, string $provider = self::PROVIDER_KEY): array {
-        if (is_array($uniqueID)) {
-            $uniqueID = $uniqueID['UniqueID'];
-        }
-        $auth = $this->userModel->getAuthentication($uniqueID, $provider);
-        $this->assertNotFalse($auth, "The user doesn't have an authentication entry: $uniqueID, $provider");
-        $user = $this->userModel->getID($auth['UserID'], DATASET_TYPE_ARRAY);
-        $this->assertNotFalse($user, "The user was not found with the specified authentication: $uniqueID, $provider");
-        return $user;
-    }
-
-    /**
-     * Assert that an SSO entry was NOT found.
-     *
-     * This assertion is useful when checking against security vulnerabilities.
-     *
-     * @param string|array $uniqueID The unique SSO ID of the user or a user with a `UniqueID` key.
-     * @param string $provider The name of the provider.
-     */
-    protected function assertNoAuthentication($uniqueID, string $provider = self::PROVIDER_KEY): void {
-        if (is_array($uniqueID)) {
-            $uniqueID = $uniqueID['UniqueID'];
-        }
-        $auth = $this->userModel->getAuthentication($uniqueID, $provider);
-        $this->assertFalse($auth, "A user authentication record was found: $uniqueID, $provider");
-    }
-
-    /**
-     * Assert that an SSO user array matches the database.
-     *
-     * @param array $ssoUser The SSO user to test. This is in the format passed to `entry/connect`.
-     * @return array Returns the user for further assertions.
-     */
-    protected function assertSSOUser(array $ssoUser): array {
-        $dbUser = $this->assertAuthentication($ssoUser['UniqueID']);
-        unset($ssoUser['UniqueID'], $ssoUser['Provider'], $ssoUser['ProviderName']);
-        $this->assertArraySubsetRecursive($ssoUser, $dbUser);
-        return $dbUser;
-    }
-
-    /**
-     * Create and SSO a dummy user and return them.
-     *
-     * The user's unique ID is their name when registered.
-     *
-     * @param array $overrides Overrides for the user record.
-     * @return array
-     */
-    protected function ssoDummyUser(array $overrides = []): array {
-        $user = $this->dummyUser($overrides);
-        $userID = $this->userModel->connect($user['Name'], self::PROVIDER_KEY, $user);
-        $this->assertNotEmpty($userID);
-
-        $dbUser = $this->userModel->getID($userID, DATASET_TYPE_ARRAY);
-
-        $r = array_intersect_key($dbUser, $user);
-        $r['UniqueID'] = $user['Name'];
-        return $r;
-    }
-    //endregion
 
     //region Basic happy path tests.
     /**
@@ -354,9 +110,9 @@ class EntryControllerConnectTest extends VanillaTestCase {
      * @depends testMinimalSSORegistration
      */
     public function testMinimalSSONoSync(array $existingUser): void {
+        $this->config->set('Garden.Registration.AutoConnect', false);
         $this->session->end();
         $r = $this->entryConnect(['UniqueID' => $existingUser['UniqueID']]);
-        $this->bessy()->assertNoFormErrors();
 
         $dbUser = $this->assertAuthentication($existingUser['UniqueID']);
         $this->assertEquals($dbUser['UserID'], $this->session->UserID);
@@ -464,6 +220,33 @@ class EntryControllerConnectTest extends VanillaTestCase {
         $r2 = $this->entryConnect($ssoUser, $body);
     }
 
+    /**
+     * This scenario tests the following:
+     *
+     * 1. SSO doesn't provide email or username.
+     * 2. User doesn't provide anything and posts.
+     * 3. User then provides a username and email and SSO's.
+     */
+    public function testNoEmailOrUsernameRoundTrip(): void {
+        $this->config->set('Garden.Registration.AutoConnect', false);
+        $ssoUser = ['UniqueID' => __FUNCTION__];
+
+        // The initial connect page should present the user with email and username inputs.
+        $r = $this->entryConnect($ssoUser);
+        $this->assertNotSignedIn();
+
+        // The user just hits submit. Boo.
+        $html = $this->bessy()->getLastHtml();
+        $body = $html->getFormValues();
+        $r = $this->entryConnectNoThrow($ssoUser, $body);
+        $this->bessy()->assertFormFieldError('Email');
+        $this->bessy()->assertFormFieldError('ConnectName');
+
+        // The user then submits a proper user now.
+        $this->entryConnect($ssoUser, ['Email' => __FUNCTION__.'@example.com', 'ConnectName' => __FUNCTION__]);
+        $this->assertSSOUser($ssoUser + ['Email' => __FUNCTION__.'@example.com', 'Name' => __FUNCTION__]);
+    }
+
     //endregion
 
     //region User conflict and resolution tests.
@@ -471,18 +254,25 @@ class EntryControllerConnectTest extends VanillaTestCase {
      * If a user tries to SSO, but their email or username are already taken then they are presented with a list of
      * options to choose from. They must then change their information or connect to an existing user with username/password.
      *
-     * @param bool $name Whether or not to generate a name conflict.
+     * @param bool|int $name Whether or not to generate a name conflict.
      * @param bool $email Whether or not to generate an email conflict.
      * @param callable|null $extraHandler An optional callback to call after the basic SSO handler takes place.
      * @return array Returns the dispatched controller to help other tests.
      */
-    protected function entryConnectConflict(bool $name = true, bool $email = false, ?callable $extraHandler = null): array {
+    protected function entryConnectConflict($name = true, bool $email = false, ?callable $extraHandler = null): array {
         // Insert an existing user for the conflict.
         $existingUser = $this->insertDummyUser();
         $this->assertTrue($name || $email, "You need to specify at least one conflict.");
         $ssoUser = $this->dummyUser(['UniqueID' => __FUNCTION__.'%s']);
         if ($name) {
             $ssoUser['Name'] = $existingUser['Name'];
+
+            if ((int)$name > 1) {
+                for ($i = 2; $i <= $name; $i++) {
+                    $user = $this->insertDummyUser();
+                    $this->userModel->setField($user['UserID'], $existingUser['Name']);
+                }
+            }
         }
         if ($email) {
             $this->config->set('Garden.Registration.AutoConnect', false);
@@ -498,7 +288,7 @@ class EntryControllerConnectTest extends VanillaTestCase {
             $handler = $ssoUser;
         }
 
-        // Clear out the connect button to simulate a first time postback.
+        // Do a first time call to entry/connect.
         $r = $this->entryConnect($handler, [], self::PROVIDER_KEY, false);
         $this->assertFalse($this->session->isValid());
         $this->assertNoAuthentication($ssoUser['UniqueID']);
@@ -520,6 +310,9 @@ class EntryControllerConnectTest extends VanillaTestCase {
         $existingUsers = array_column($r->data('ExistingUsers'), null, 'UserID');
         $this->assertArrayHasKey($existingUser['UserID'], $existingUsers, "Missing user with name match.");
 
+        $userID = $this->bessy()->getLastHtml()->assertFormInput('UserSelect')->getAttribute('value');
+        $this->assertEquals($existingUser['UserID'], $userID);
+
         return $r;
     }
 
@@ -532,6 +325,9 @@ class EntryControllerConnectTest extends VanillaTestCase {
 
         $existingUsers = array_column($r->data('ExistingUsers'), null, 'UserID');
         $this->assertArrayHasKey($existingUser['UserID'], $existingUsers, "Missing user with email match.");
+
+        $userID = $this->bessy()->getLastHtml()->assertFormInput('UserSelect')->getAttribute('value');
+        $this->assertEquals($existingUser['UserID'], $userID);
     }
 
     /**
@@ -561,14 +357,13 @@ class EntryControllerConnectTest extends VanillaTestCase {
     public function testExistingConnectGoodPassword(): void {
         [$existingUser, $ssoUser, $entry] = $this->entryConnectConflict();
 
-        $this->bessy()->getLastHtml()->assertCssSelectorExists('input[name="UserSelect"]');
-        $this->bessy()->getLastHtml()->assertCssSelectorExists('input[name="ConnectPassword"]');
+        $this->bessy()->getLastHtml()->assertFormInput('UserSelect');
+        $this->bessy()->getLastHtml()->assertFormInput('ConnectPassword');
         $r = $this->entryConnect($ssoUser, [
             'UserSelect' => $existingUser['UserID'],
             'ConnectPassword' => $existingUser['Email'], // dummy users use email for password
         ]);
-        $this->assertTrue($this->session->isValid());
-        $this->assertAuthentication($ssoUser);
+        $this->assertSSOUser($ssoUser, true);
     }
 
     /**
@@ -577,7 +372,7 @@ class EntryControllerConnectTest extends VanillaTestCase {
     public function testChangeUsernameOnConflict(): void {
         [$existingUser, $ssoUser, $entry] = $this->entryConnectConflict();
 
-        $this->bessy()->getLastHtml()->assertCssSelectorExists('input[name="ConnectName"]');
+        $this->bessy()->getLastHtml()->assertFormInput('ConnectName');
         $r = $this->entryConnect($ssoUser, [
             'ConnectName' => $ssoUser['Name'].'-1',
         ]);
@@ -611,7 +406,7 @@ class EntryControllerConnectTest extends VanillaTestCase {
         [$existingUser, $ssoUser, $entry] = $this->entryConnectConflict(false, true, function (EntryController $entry) {
             $entry->Form->setFormValue('EmailVisible', true);
         });
-        $this->bessy()->getLastHtml()->assertCssSelectorExists('input[name="Email"]');
+        $this->bessy()->getLastHtml()->assertFormInput('Email');
 
         $newEmail = $ssoUser['Email'].'.uk';
         unset($ssoUser['Email']); // kludge to simulate the SSO addon not overwriting the email address on the postback.
@@ -661,7 +456,6 @@ class EntryControllerConnectTest extends VanillaTestCase {
 
         // This SSO user does not have a provided email
         $ssoUser = [
-            'Name' => $existingUser['Name'],
             'UniqueID' => __FUNCTION__
         ];
 

@@ -8,11 +8,13 @@
 namespace VanillaTests\Controllers;
 
 use VanillaTests\SiteTestCase;
+use VanillaTests\UsersAndRolesApiTestTrait;
 
 /**
  * Tests for the `MessagesController`
  */
 class MessagesControllerTest extends SiteTestCase {
+    use UsersAndRolesApiTestTrait;
 
     /** @var object  ConversationModel */
     private $conversationModel;
@@ -48,6 +50,29 @@ class MessagesControllerTest extends SiteTestCase {
         }
         $countAfter = $this->conversationModel->getRecipients(['ConversationID' => self::$conversation['ConversationID']])->numRows();
         $this->assertEquals($countBefore, $countAfter);
+    }
+
+
+    /**
+     * Test MessagesController::Add() with a deleted user.
+     * @depends testProvideData
+     */
+    public function testPostConversationDeletedUser(): void {
+        $userA = $this->createUser();
+        $userB = $this->createUser();
+
+        /** @var \UserModel $userModel */
+        $userModel = self::container()->get(\UserModel::class);
+        $userModel->deleteID($userB['userID']);
+        $to = "{$userA['userID']},{$userB['userID']}";
+        // Add a deleted user to the conversation.
+        $this->bessy()->post("/messages/add", [
+                'To' => $to,
+                'Body' => 'test-conversation',
+                'Format' => 'text'
+            ], ['DeliveryMethod' => DELIVERY_METHOD_JSON]);
+        $userBConversations = $this->conversationModel->get2($userB['userID'])->resultArray();
+        $this->assertEquals(0, count($userBConversations));
     }
 
     /**

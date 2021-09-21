@@ -19,6 +19,7 @@ export interface ICallToActionOptions {
     linkButtonType: ButtonTypes;
     imagePlacement?: "top" | "left";
     alignment?: "center" | "left";
+    compactButtons?: boolean;
 }
 
 /**
@@ -37,12 +38,11 @@ export const callToActionVariables = useThemeCache(
                  * @varGroup callToAction.options.box
                  * @expand box
                  */
-                box: Variables.box({
-                    borderType: BorderType.BORDER,
-                }),
+                box: Variables.box({}),
                 linkButtonType: ButtonTypes.STANDARD,
                 alignment: "left" as "left" | "center",
                 imagePlacement: "top" as "top" | "left",
+                compactButtons: false,
             },
             optionOverrides,
         );

@@ -8,15 +8,19 @@ namespace VanillaTests\APIv2;
 
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\ForbiddenException;
+use Garden\Web\Exception\ServerException;
 use Iterator;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Permissions;
 use Vanilla\Web\SystemCallableInterface;
+use VanillaTests\ExpectExceptionTrait;
 
 /**
  * Verify behavior of the /api/v2/calls resource.
  */
 class CallsTest extends AbstractAPIv2Test {
+
+    use ExpectExceptionTrait;
 
     private $baseUrl = "calls";
 
@@ -51,11 +55,17 @@ class CallsTest extends AbstractAPIv2Test {
             }
 
             /**
+             * @inheritdoc
+             */
+            public static function getSystemCallableMethods(): array {
+                return ['run'];
+            }
+
+            /**
              * Big ole dummy.
              *
              * @param mixed $args
              * @return Iterator
-             * @system-callable
              */
             public function run(...$args): Iterator {
                 $this->argsSpy = $args;
@@ -66,16 +76,14 @@ class CallsTest extends AbstractAPIv2Test {
         $this->getSession()->getPermissions()->set(Permissions::PERMISSION_SYSTEM, true);
 
         $body = [
-            "method" => "{$rule}::run",
+            "class" => $rule,
+            "method" => "run",
             "args" => ["foo", "bar"],
         ];
         $response = $this->api()->post("{$this->baseUrl}/run", $body);
 
         $this->assertSame(200, $response->getStatusCode());
-        $this->assertSame([
-            "status" => 200,
-            "statusType" => "complete",
-        ], $response->getBody());
+        $this->assertNull($response->getBody()['callbackPayload']);
         $this->assertSame($body["args"], $argsSpy);
     }
 
@@ -87,10 +95,16 @@ class CallsTest extends AbstractAPIv2Test {
         $this->container()->setInstance($rule, new class() implements SystemCallableInterface {
 
             /**
+             * @inheritdoc
+             */
+            public static function getSystemCallableMethods(): array {
+                return ['run'];
+            }
+
+            /**
              * Big ole dummy.
              *
              * @return Iterator
-             * @system-callable
              */
             public function run(): Iterator {
                 CurrentTimeStamp::mockTime(CurrentTimeStamp::get() + 360);
@@ -101,15 +115,13 @@ class CallsTest extends AbstractAPIv2Test {
         $this->getSession()->getPermissions()->set(Permissions::PERMISSION_SYSTEM, true);
 
         $response = $this->api()->post("{$this->baseUrl}/run", [
-            "method" => "{$rule}::run",
+            "class" => $rule,
+            "method" => "run",
             "args" => [],
-        ]);
+        ], [], ['throw' => false]);
 
-        $this->assertSame(202, $response->getStatusCode());
-        $this->assertArraySubsetRecursive([
-            "status" => 202,
-            "statusType" => "incomplete",
-        ], $response->getBody());
+        $this->assertSame(408, $response->getStatusCode());
+        $this->assertNotNull($response->getBody()['callbackPayload']);
     }
 
     /**
@@ -122,10 +134,11 @@ class CallsTest extends AbstractAPIv2Test {
 
         $this->getSession()->getPermissions()->set(Permissions::PERMISSION_SYSTEM, true);
 
-        $this->expectException(ClientException::class);
+        $this->expectException(ServerException::class);
         $this->expectExceptionMessage("Class does not implement " . SystemCallableInterface::class);
         $this->api()->post("{$this->baseUrl}/run", [
-            "method" => "{$rule}::run",
+            "class" => $rule,
+            "method" => "run",
             "args" => [],
         ]);
     }
@@ -136,6 +149,13 @@ class CallsTest extends AbstractAPIv2Test {
     public function testRunInvalidMethodAnnotation(): void {
         $rule = "@@" . __FUNCTION__;
         $this->container()->setInstance($rule, new class() implements SystemCallableInterface {
+
+            /**
+             * @inheritdoc
+             */
+            public static function getSystemCallableMethods(): array {
+                return [];
+            }
 
             /**
              * Big ole dummy.
@@ -149,10 +169,11 @@ class CallsTest extends AbstractAPIv2Test {
 
         $this->getSession()->getPermissions()->set(Permissions::PERMISSION_SYSTEM, true);
 
-        $this->expectException(ClientException::class);
-        $this->expectExceptionMessage($rule . "::run is not accessible by this method.");
+        $this->expectException(ServerException::class);
+        $this->expectExceptionMessage("Method `run` was not marked as system callable.");
         $this->api()->post("{$this->baseUrl}/run", [
-            "method" => "{$rule}::run",
+            "class" => $rule,
+            "method" => "run",
             "args" => [],
         ]);
     }
@@ -163,6 +184,13 @@ class CallsTest extends AbstractAPIv2Test {
     public function testRunInvalidGenerator(): void {
         $rule = "@@" . __FUNCTION__;
         $this->container()->setInstance($rule, new class() implements SystemCallableInterface {
+
+            /**
+             * @inheritdoc
+             */
+            public static function getSystemCallableMethods(): array {
+                return ['run'];
+            }
 
             /**
              * Big ole dummy.
@@ -176,10 +204,11 @@ class CallsTest extends AbstractAPIv2Test {
 
         $this->getSession()->getPermissions()->set(Permissions::PERMISSION_SYSTEM, true);
 
-        $this->expectException(ClientException::class);
+        $this->expectException(ServerException::class);
         $this->expectExceptionMessage("Method is not a generator.");
         $this->api()->post("{$this->baseUrl}/run", [
-            "method" => "{$rule}::run",
+            "class" => $rule,
+            "method" => "run",
             "args" => [],
         ]);
     }

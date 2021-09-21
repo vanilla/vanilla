@@ -4,6 +4,7 @@
  * @license GPL-2.0-only
  */
 
+import { css } from "@emotion/css";
 import { Mixins } from "@library/styles/Mixins";
 import { styleFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
@@ -11,21 +12,18 @@ import { important } from "csx";
 export type areaHiddenType = "true" | "false" | boolean | undefined;
 
 export const visibility = useThemeCache(() => {
-    const style = styleFactory("visibility");
     const onEmpty = (nest?: object) => {
-        return style("onEmpty", {
-            ...{
-                "&:empty": {
-                    display: "none",
-                },
-                ...nest,
+        return css({
+            "&:empty": {
+                display: "none",
             },
+            ...nest,
         });
     };
 
-    const visuallyHidden = style("srOnly", Mixins.absolute.srOnly());
+    const visuallyHidden = css(Mixins.absolute.srOnly());
 
-    const displayNone = style("displayNone", {
+    const displayNone = css({
         display: important("none"),
     });
 

@@ -12,6 +12,7 @@ use Garden\Web\RequestInterface;
 use Twig\Markup;
 use Vanilla\Contracts\Web\AssetInterface;
 use Vanilla\Models\SiteMeta;
+use Vanilla\Models\SiteMetaExtra;
 use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Web\Asset\AssetPreloadModel;
 use Vanilla\Web\Asset\WebpackAssetProvider;
@@ -108,6 +109,9 @@ final class PageHead implements PageHeadInterface {
     /** @var AbstractJsonLDItem */
     private $jsonLDItems = [];
 
+    /** @var SiteMetaExtra */
+    private $siteMetaExtras = [];
+
     /**
      * @return Markup
      */
@@ -119,7 +123,7 @@ final class PageHead implements PageHeadInterface {
         $this->styles = array_merge($this->styles, $this->assetProvider->getStylesheets($this->assetSection));
 
         $this->inlineScripts[] = new PhpAsJsVariable('gdn', [
-            'meta' => $this->siteMeta,
+            'meta' => $this->siteMeta->value($this->siteMetaExtras),
         ]);
         $viewData = [
             'nonce' => $this->cspModel->getNonce(),
@@ -270,6 +274,14 @@ final class PageHead implements PageHeadInterface {
      */
     public function addOpenGraphTag(string $property, string $content) {
         return $this->addMetaTag(['property' => $property, 'content' => $content]);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function addSiteMetaExtra(SiteMetaExtra $extra) {
+        $this->siteMetaExtras[] = $extra;
+        return $this;
     }
 
     /**

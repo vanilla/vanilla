@@ -19,13 +19,14 @@ use Vanilla\Site\SiteSectionModel;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Web\JsInterpop\AbstractReactModule;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
+use Vanilla\Widgets\LimitableWidgetInterface;
 
 /**
  * Class AbstractRecordTypeModule
  *
  * @package Vanilla\Community
  */
-class BaseDiscussionWidgetModule extends AbstractReactModule {
+class BaseDiscussionWidgetModule extends AbstractReactModule implements LimitableWidgetInterface {
 
     use HomeWidgetContainerSchemaTrait;
 
@@ -82,6 +83,7 @@ class BaseDiscussionWidgetModule extends AbstractReactModule {
             'title' => $this->title,
             'subtitle' => $this->subtitle,
             'description' => $this->description,
+            'noCheckboxes' => true,
         ];
 
         return $props;
@@ -119,7 +121,12 @@ class BaseDiscussionWidgetModule extends AbstractReactModule {
      */
     protected function getRealApiParams(): array {
         $apiParams = $this->apiParams;
-        $apiParams = $this->getApiSchema()->validate($apiParams);
+        $validatedParams = $this->getApiSchema()->validate($apiParams);
+
+        // We want our defaults from the widget schema applied, but to still allow extraneous properties that weren't defined.
+        // The widget may be manually configured with API params that are available on the endpoint but not in
+        // the widget's form.
+        $apiParams = array_merge($apiParams, $validatedParams);
 
         // Handle the slotType.
         $slotType = $apiParams['slotType'] ?? '';
@@ -151,7 +158,7 @@ class BaseDiscussionWidgetModule extends AbstractReactModule {
         // Force some common expands
         // Default sort.
         $apiParams['sort'] = $apiParams['sort'] ?? '-dateLastComment';
-        $apiParams['expand'] = ['category', 'insertUser', 'lastUser', '-body', 'excerpt', 'tags'];
+        $apiParams['expand'] = ['all', '-body'];
 
         return $apiParams;
     }
@@ -422,5 +429,14 @@ class BaseDiscussionWidgetModule extends AbstractReactModule {
      */
     public function setDiscussions(array $discussions): void {
         $this->discussions = $discussions;
+    }
+
+    /**
+     * Apply a limit to the number of discussions.
+     *
+     * @param int $limit
+     */
+    public function setLimit(int $limit) {
+        $this->apiParams['limit'] = $limit;
     }
 }

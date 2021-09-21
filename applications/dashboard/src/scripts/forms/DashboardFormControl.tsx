@@ -6,28 +6,17 @@
 
 import { DashboardCodeEditor } from "@dashboard/forms/DashboardCodeEditor";
 import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
-import { FormGroupContext } from "@dashboard/forms/DashboardFormGroupContext";
-import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import { DashboardInput } from "@dashboard/forms/DashboardInput";
 import { DashboardRadioButton } from "@dashboard/forms/DashboardRadioButton";
 import { DashboardRadioGroup } from "@dashboard/forms/DashboardRadioGroups";
-import { DashboardSelect } from "@dashboard/forms/DashboardSelect";
-import { DashboardSelectLookup } from "@dashboard/forms/DashboardSelectLookup";
 import { DashboardToggle } from "@dashboard/forms/DashboardToggle";
 import apiv2 from "@library/apiv2";
+import { FormTreeControl } from "@library/tree/FormTreeControl";
 import { useUniqueID } from "@library/utility/idUtils";
-import { t } from "@vanilla/i18n";
 import { IControlGroupProps, IControlProps } from "@vanilla/json-schema-forms";
-import {
-    AutoComplete,
-    AutoCompleteOption,
-    FormGroup,
-    FormGroupInput,
-    FormGroupLabel,
-    IFormGroupProps,
-} from "@vanilla/ui";
+import { AutoComplete, AutoCompleteOption, IFormGroupProps } from "@vanilla/ui";
 import { AutoCompleteLookupOptions } from "@vanilla/ui/src/forms/autoComplete/AutoCompleteLookupOptions";
-import React from "react";
+import React, { useEffect } from "react";
 
 /**
  * This is intended for use in the JsonSchemaForm component
@@ -115,6 +104,8 @@ export function DashboardFormControl(props: IControlProps) {
         case "checkBox":
         case "toggle":
             return <DashboardToggle disabled={props.disabled} checked={value} onChange={onChange} />;
+        case "dragAndDrop":
+            return <FormTreeControl {...(props as any)} />;
         default:
             return <div>{(control as any).inputType} is not supported</div>;
     }
@@ -128,7 +119,10 @@ export function DashboardFormControl(props: IControlProps) {
 export function DashboardFormControlGroup(props: React.PropsWithChildren<IControlGroupProps> & IFormGroupProps) {
     const { children, controls } = props;
     const { sideBySide, inputID } = props;
-    const { label, description } = controls[0];
+    const { label, description, fullSize } = controls[0];
+    if (fullSize) {
+        return <>{children}</>;
+    }
 
     return (
         <DashboardFormGroup label={label ?? ""} description={description}>

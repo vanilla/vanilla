@@ -4,51 +4,60 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import { toastClasses } from "@library/features/toaster/toastStyles";
-import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonTypes";
-import classNames from "classnames";
-import ButtonLoader from "@library/loaders/ButtonLoader";
+import React, { useEffect, useState } from "react";
+import { toastClasses } from "@library/features/toaster/Toast.styles";
+import { cx } from "@library/styles/styleShim";
+import { EntranceAnimation, FromDirection } from "@library/animation/EntranceAnimation";
 
-interface ILink {
-    name: string;
-    type: ButtonTypes;
-    onClick?: () => void;
-    isLoading?: boolean;
-}
-
-interface IProps {
+interface IProps extends React.HTMLAttributes<HTMLDivElement> {
+    children: React.ReactNode;
+    /** Duration in seconds that the toast should self dismiss */
+    autoCloseDuration?: number;
+    /** The current toast visibility */
+    visibility?: boolean;
+    /** Function to set the toasts visibility */
+    onVisibilityChange?(visibility: boolean): void;
+    /** The role of the toast */
+    role?: "alert" | "progressbar" | "status";
+    /** ClassName added to the toast element */
     className?: string;
-    links: ILink[];
-    message: React.ReactNode;
 }
 
 /**
- * Renders toast message with links
+ * Render a toast component
  */
-export default class Toast extends React.Component<IProps> {
-    public render() {
-        const { className, links, message } = this.props;
-        const classes = toastClasses();
+export function Toast(props: IProps) {
+    const { children, role, className, visibility, autoCloseDuration, onVisibilityChange } = props;
 
-        return (
-            <div className={classNames(classes.root())}>
-                <p>{message}</p>
-                <div className={classes.buttons}>
-                    {links.map((link, i) => (
-                        <Button
-                            key={i}
-                            buttonType={link.type}
-                            title={link.name}
-                            className={classNames(classes.button)}
-                            onClick={link.onClick}
-                        >
-                            {link.isLoading ? <ButtonLoader buttonType={link.type} /> : link.name}
-                        </Button>
-                    ))}
-                </div>
+    const classes = toastClasses();
+
+    /** Internal visibility state */
+    const [display, setDisplay] = useState(visibility ?? true);
+
+    useEffect(() => {
+        if (autoCloseDuration && display) {
+            setTimeout(() => setDisplay(false), autoCloseDuration);
+        }
+    }, [display, autoCloseDuration]);
+
+    useEffect(() => {
+        onVisibilityChange && onVisibilityChange(display);
+    }, [display, onVisibilityChange]);
+
+    useEffect(() => {
+        setDisplay(!!visibility);
+    }, [visibility]);
+
+    return (
+        <EntranceAnimation isEntered={display} fromDirection={FromDirection.LEFT}>
+            <div
+                className={cx(classes.root, className)}
+                role={role ?? "status"}
+                aria-live={"assertive"}
+                aria-atomic={true}
+            >
+                {children}
             </div>
-        );
-    }
+        </EntranceAnimation>
+    );
 }

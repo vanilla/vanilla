@@ -199,6 +199,46 @@ class ProfileControllerTest extends SiteTestCase {
     }
 
     /**
+     * Test that preferences can be set in bulk.
+     */
+    public function testBulkPreferences() {
+        // Needed so preferences don't get stripped off.
+        \Gdn::config()->saveToConfig('Api.Clean', false);
+        $user = $this->createUser([
+            'name' => 'preference_user',
+        ]);
+        $this->api()->setUserID($user['userID']);
+
+        $url = '/profile/preferences/preference_user.json';
+
+        $initialPrefs = $this->bessy()->getJsonData($url)['Preferences'];
+        $this->assertEquals(1, $initialPrefs['Popup.ActivityComment']);
+        $this->assertEquals(1, $initialPrefs['Popup.WallComment']);
+
+        // Pref defaults can be configured.
+        $this->runWithConfig(['Preferences.Popup.ActivityComment' => 0], function () use ($url) {
+            $withConfigDefaults = $this->bessy()->getJsonData($url)['Preferences'];
+            $this->assertEquals(0, $withConfigDefaults['Popup.ActivityComment']);
+        });
+
+        // Modify a couple at the same time.
+        $this->bessy()->postJsonData($url, [
+            'Popup-dot-ActivityComment' => 0,
+        ]);
+
+        $this->bessy()->postJsonData($url, [
+            'Popup-dot-WallComment' => 0,
+            // Won't save.
+            'Popup-dot-NotDefined' => 1,
+        ]);
+        $result = $this->bessy()->getJsonData($url)['Preferences'];
+
+        $this->assertEquals(0, $result['Popup.ActivityComment']);
+        $this->assertEquals(0, $result['Popup.WallComment']);
+        $this->assertArrayNotHasKey('Popup.NotDefined', $result);
+    }
+
+    /**
      * Provide test preference data.
      *
      * @return array
@@ -228,5 +268,72 @@ class ProfileControllerTest extends SiteTestCase {
         $session->start($this->memberID);
         $uploadForm = $this->bessy()->getHtml("/profile/picture?userid={$this->memberID}")->getInnerHtml();
         $this->assertStringContainsString("Upload New Picture", $uploadForm);
+    }
+
+    /**
+     * Test user email preferences with no email permission.
+     */
+    public function testEmailNotificationPreferences(): void {
+        // This is for preferences don't get stripped off.
+        \Gdn::config()->saveToConfig('Api.Clean', false);
+
+        //first the role has email permissions
+        $role = $this->createRole([
+            'name' => 'test_member_no_email_preference',
+            'permissions' => [
+                [
+                    'type' => 'global',
+                    'permissions' => [
+                        'email.view' => true,
+                        'signIn.allow' => true,
+                    ],
+                ],
+            ],
+        ]);
+        $roleID = $role['roleID'];
+        $user = $this->createUser([
+            'name' => 'test_user_no_email_preference',
+            'roleID' => [$roleID],
+        ]);
+        $url = '/profile/preferences/test_user_no_email_preference.json';
+
+        $this->runWithUser(function () use ($url, $roleID) {
+            // Set some preferences for our user
+            $this->bessy()->postJsonData($url, [
+                'Email.WallComment' => 1,
+                'Email.DiscussionComment' => 1,
+                'Popup.WallComment' => 1,
+            ]);
+            $userPreferences = $this->bessy()->getJsonData($url)['Preferences'];
+            $preferenceTypes = $this->bessy()->getJsonData($url)["PreferenceTypes"]["Notifications"];
+            $preferenceGroups = $this->bessy()->getJsonData($url)['PreferenceGroups']["Notifications"]["WallComment"];
+
+            //user has email permissions, so we have email preferences for user and we have them in groups and types
+            $this->assertEquals(1, $userPreferences['Email.WallComment']);
+            $this->assertEquals(true, in_array('Email.WallComment', $preferenceGroups));
+            $this->assertEquals(true, in_array('Email', $preferenceTypes));
+        }, $user);
+
+        //disable role email permissions
+        $this->api()->patch(
+            "/roles/{$roleID}/permissions",
+            [
+                ["permissions" => ["email.view" => false], "type" => "global"]
+            ]
+        );
+
+        $this->runWithUser(function () use ($url, $roleID) {
+            $userNewPreferences = $this->bessy()->getJsonData($url)['Preferences'];
+            $newPreferenceTypes = $this->bessy()->getJsonData($url)["PreferenceTypes"]["Notifications"];
+            $newPreferenceGroups = $this->bessy()->getJsonData($url)['PreferenceGroups']["Notifications"]["WallComment"];
+
+            //popup preference is still the same
+            $this->assertEquals(1, $userNewPreferences['Popup.WallComment']);
+
+            //no email permissions, email preferences should be reset to false for user and it does not exist in preference groups and types
+            $this->assertEquals(0, $userNewPreferences['Email.WallComment']);
+            $this->assertEquals(false, in_array('Email.WallComment', $newPreferenceGroups));
+            $this->assertEquals(false, in_array('Email', $newPreferenceTypes));
+        }, $user);
     }
 }

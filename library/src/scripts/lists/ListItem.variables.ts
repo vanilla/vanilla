@@ -27,6 +27,7 @@ export enum ListItemIconPosition {
      */
     HIDDEN = "hidden",
 }
+
 export interface IListItemOptions {
     layout: ListItemLayout;
 }

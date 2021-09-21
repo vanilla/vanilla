@@ -165,6 +165,12 @@ export const compactSearchClasses = useThemeCache(() => {
 
     const valueContainer = css({});
 
+    const compactSearchWrapper = css({
+        display: "flex",
+        alignItems: "center",
+        flexDirection: "column",
+    });
+
     return {
         root,
         contents,
@@ -172,5 +178,6 @@ export const compactSearchClasses = useThemeCache(() => {
         cancelContents,
         searchAndResults,
         valueContainer,
+        compactSearchWrapper,
     };
 });

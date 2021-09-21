@@ -75,7 +75,14 @@ export function HomeWidgetItem(props: IHomeWidgetItemProps) {
     );
 
     return (
-        <SmartLink to={props.to} className={cx(classes.root, props.className)} tabIndex={props.tabIndex}>
+        <SmartLink
+            to={props.to}
+            className={cx(classes.root, props.className)}
+            tabIndex={props.tabIndex}
+            // Prevent dragging these guys as links.
+            draggable={"false"}
+            onDragStart={(e) => e.preventDefault()}
+        >
             <div className={classes.backgroundContainer}>
                 {[
                     HomeWidgetItemContentType.TITLE_BACKGROUND_DESCRIPTION,

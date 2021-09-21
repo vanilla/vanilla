@@ -8,11 +8,12 @@ use Garden\Schema\Schema;
 use Garden\Web\Exception\ForbiddenException;
 use Vanilla\Dashboard\Models\BannerImageModel;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
-use Vanilla\LongRunner;
+use Vanilla\Scheduler\LongRunner;
 use Vanilla\Models\CrawlableRecordSchema;
 use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Permissions;
+use Vanilla\Scheduler\LongRunnerAction;
 use Vanilla\Utility\InstanceValidatorSchema;
 use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
@@ -138,7 +139,7 @@ class CategoriesApiController extends AbstractApiController {
 
         $options = [];
         if ($query["batch"]) {
-            $options[LongRunner::OPT_LOCAL_JOB] = false;
+            $this->runner->setMode(LongRunner::MODE_ASYNC);
         }
 
         $deleteOptions = [];
@@ -147,7 +148,10 @@ class CategoriesApiController extends AbstractApiController {
         }
         $args = [$id, $deleteOptions];
 
-        $response = $this->runner->runApi(CategoryModel::class, 'deleteIDIterable', $args, $options);
+        $response = $this->runner->runApi(new LongRunnerAction(CategoryModel::class, 'deleteIDIterable', $args, $options));
+        if ($response->getStatus() === 200) {
+            $response->setStatus(204);
+        }
         return $response;
     }
 
@@ -402,19 +406,8 @@ class CategoriesApiController extends AbstractApiController {
             $where['Featured'] = true;
             // Filter by parent.
             if ($parent['CategoryID'] !== -1) {
-                $filterCategories = $this->categoryModel->getTree(
-                    $parent['CategoryID'],
-                    [
-                        'maxdepth' => $query['maxDepth'],
-                    ]
-                );
-
-                $filterCategoryIDs = array_column($filterCategories, 'CategoryID');
-                $filterCategoryIDs = array_filter($filterCategoryIDs, function (int $id) {
-                    return $id !== -1;
-                });
-
-                $where['categoryID'] = $filterCategoryIDs;
+                $filterCategoriesIDs = $this->categoryModel->getCategoriesDescendantIDs([$parent['CategoryID']]);
+                $where['categoryID'] = $filterCategoriesIDs;
             }
             [$categories, $totalCountCallBack] = $this->getCategoriesWhere($where, $limit, $offset, 'SortFeatured');
         } elseif ($parent['DisplayAs'] === 'Flat') {
@@ -567,23 +560,42 @@ class CategoriesApiController extends AbstractApiController {
      * @param int $userID
      * @param array $body
      * @return Data
+     * @throws \Vanilla\Exception\PermissionException Throws a permission exception in the following cases:
+     * 1. the editing user is editing their own preferences, but does not have the SignIn.Allow permission.
+     * 2. the editing user is trying to set another user's preferences, but does not have either the
+     *      Garden.Users.Edit or the Moderation.Profiles.Edit permission.
+     * 3. if opting for email notifications when the user in question doesn't have the Garden.Email.View permission.
      */
     public function patch_preferences(int $id, int $userID, array $body): Data {
         if ($this->getSession()->UserID === $userID) {
             $permission = "Garden.SignIn.Allow";
+            $isSelfService = true;
         } else {
             $permission = ["Garden.Users.Edit", "Moderation.Profiles.Edit"];
+            $isSelfService = false;
         }
         $this->permission($permission);
 
         $in = $this->schema([
-            CategoryModel::PREFERENCE_KEY_NOTIFICATION
+            CategoryModel::PREFERENCE_KEY_NOTIFICATION,
+            CategoryModel::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS,
         ])->add($this->categoryModel->preferencesSchema());
         $out = $this->categoryModel->preferencesSchema();
 
         $this->category($id);
 
         $body = $in->validate($body, true);
+
+        // Make sure the user whose preferences are being changed has the Email.View permission if opting for email
+        // notifications. Throw an error if they don't.
+        if (isset($body[CategoryModel::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS]) && $body[CategoryModel::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS]) {
+            $hasEmailViewPerm = $isSelfService
+                ? $this->getPermissions()->has('Garden.Email.View')
+                : Gdn::getContainer()->get(UserModel::class)->getPermissions($userID)->has('Garden.Email.View');
+            if (!$hasEmailViewPerm) {
+                throw new \Vanilla\Exception\PermissionException('Garden.Email.View');
+            }
+        }
 
         $this->categoryModel->setPreferences($userID, $id, $body);
 
@@ -637,15 +649,8 @@ class CategoriesApiController extends AbstractApiController {
         $category = $this->category($id);
         $body = $in->validate($body);
         $userID = $this->getSession()->UserID;
-        $followed = $this->categoryModel->getFollowed($userID);
 
-        // Is this a new follow?
-        if ($body['followed'] && !array_key_exists($id, $followed)) {
-            $this->permission('Vanilla.Discussions.View', $category['PermissionCategoryID']);
-            if (count($followed) >= $this->categoryModel->getMaxFollowedCategories()) {
-                throw new ClientException('Already following the maximum number of categories.');
-            }
-        }
+        $this->permission('Vanilla.Discussions.View', $category['PermissionCategoryID']);
 
         $this->categoryModel->follow($userID, $id, $body['followed']);
 

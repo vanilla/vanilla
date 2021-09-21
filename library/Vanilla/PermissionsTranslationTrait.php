@@ -153,7 +153,7 @@ trait PermissionsTranslationTrait {
      * @return bool
      */
     private function isPermissionDeprecated($permission) {
-        $result = in_array($permission, $this->deprecatedPermissions);
+        $result = str_starts_with($permission, '_') || in_array($permission, $this->deprecatedPermissions);
         return $result;
     }
 

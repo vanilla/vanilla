@@ -477,7 +477,7 @@ class Bootstrap {
 
             ->rule(SystemTokenUtils::class)
             ->setConstructorArgs([
-                ContainerUtils::config("Context.Secret", "")
+                ContainerUtils::config("Context.Secret", "secret")
             ])
         ;
 

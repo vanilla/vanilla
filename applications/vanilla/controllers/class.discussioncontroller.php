@@ -10,6 +10,7 @@
 
 use Vanilla\Formatting\DateTimeFormatter;
 use Vanilla\Message;
+use Vanilla\Models\DiscussionJsonLD;
 
 /**
  * Handles accessing & displaying a single discussion via /discussion endpoint.
@@ -328,11 +329,7 @@ class DiscussionController extends VanillaController {
                 require_once $this->fetchViewLocation('attachment', 'attachments', 'dashboard');
             }
         }
-
-        $this->Head->setJsonLD(
-            'DiscussionForumPosting',
-            $this->DiscussionModel->structuredData((array)$this->Discussion)
-        );
+        $this->Head->addJsonLDItem(new DiscussionJsonLD((array)$this->Discussion, $this->DiscussionModel));
         $this->render();
     }
 

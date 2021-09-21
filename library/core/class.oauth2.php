@@ -178,7 +178,7 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
     public function structure() {
         // Make sure we have the OAuth2 provider.
         $provider = $this->provider();
-        if (!$provider['AuthenticationKey']) {
+        if (!$provider || !$provider['AuthenticationKey']) {
             $model = new Gdn_AuthenticationProviderModel();
             $provider = [
                 'AuthenticationKey' => $this->providerKey,
@@ -380,7 +380,7 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
     /**
      *  Return all the information saved in provider table.
      *
-     * @return array Stored provider data (secret, client_id, etc.).
+     * @return array|bool Stored provider data (secret, client_id, etc.).
      */
     public function provider() {
         if (!$this->provider) {

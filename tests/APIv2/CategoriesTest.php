@@ -13,11 +13,15 @@ use Garden\Web\Exception\NotFoundException;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Container\ContainerInterface;
 use UserModel;
-use Vanilla\LongRunner;
+use Vanilla\Scheduler\Job\LongRunnerJob;
+use Vanilla\Scheduler\LongRunner;
 use Vanilla\Models\DirtyRecordModel;
+use Vanilla\Scheduler\LongRunnerAction;
 use Vanilla\Scheduler\SchedulerInterface;
 use Vanilla\Web\SystemTokenUtils;
+use VanillaTests\DatabaseTestTrait;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
+use VanillaTests\SchedulerTestTrait;
 use VanillaTests\SetupTraitsTrait;
 use VanillaTests\UsersAndRolesApiTestTrait;
 
@@ -31,6 +35,8 @@ class CategoriesTest extends AbstractResourceTest {
     use TestFilterDirtyRecordsTrait;
     use CommunityApiTestTrait;
     use UsersAndRolesApiTestTrait;
+    use SchedulerTestTrait;
+    use DatabaseTestTrait;
 
     /** This category should never exist. */
     const BAD_CATEGORY_ID = 999;
@@ -61,25 +67,6 @@ class CategoriesTest extends AbstractResourceTest {
 
     /** {@inheritdoc} */
     protected $testPagingOnIndex = false;
-
-    /** @var MockObject&LongRunner */
-    private $longRunner;
-
-    /**
-     * @inheritDoc
-     */
-    public function setUp(): void {
-        parent::setUp();
-        $this->container()->call(function (ContainerInterface $container, SystemTokenUtils $tokenUtils, SchedulerInterface $scheduler) {
-            $this->longRunner = $this->getMockBuilder(LongRunner::class)
-                ->enableOriginalConstructor()
-                ->setConstructorArgs([$container, $tokenUtils, $scheduler])
-                ->enableProxyingToOriginalMethods()
-                ->onlyMethods(["runApi"])
-                ->getMock();
-        });
-        $this->container()->setInstance(LongRunner::class, $this->longRunner);
-    }
 
     /**
      * Fix some container setup issues of the breadcrumb model.
@@ -481,18 +468,6 @@ class CategoriesTest extends AbstractResourceTest {
         $origDiscussions = $this->api()->get("discussions", ["categoryID" => $origCategory["categoryID"]])->getBody();
         $this->assertCount(count($discussions), $origDiscussions);
 
-        $this->longRunner->expects($this->once())
-            ->method("runApi")
-            ->with(
-                CategoryModel::class,
-                "deleteIDIterable",
-                [
-                    $origCategory["categoryID"],
-                    ["newCategoryID" => $newCategory["categoryID"]],
-                ],
-                []
-            );
-
         $this->api()->delete(
             "{$this->baseUrl}/" . $origCategory["categoryID"],
             ["newCategoryID" => $newCategory["categoryID"]]
@@ -508,71 +483,51 @@ class CategoriesTest extends AbstractResourceTest {
     /**
      * Verify ability to delete category content in batches.
      */
-    public function testDeleteBatch(): void {
+    public function testDeleteBatches(): void {
         $category = $this->createCategory(["parentCategoryID" => CategoryModel::ROOT_ID]);
+        $disc1 = $this->createDiscussion();
+        $disc2 = $this->createDiscussion();
 
-        $this->longRunner->expects($this->once())
-            ->method("runApi")
-            ->with(
-                CategoryModel::class,
-                "deleteIDIterable",
-                [
-                    $category["categoryID"],
-                    [],
-                ],
-                [LongRunner::OPT_LOCAL_JOB => false]
-            );
+        // 2 Discussion records.
+        $whereCategoryID = [ 'CategoryID' => $category['categoryID'] ];
+        $this->assertRecordsFound('Discussion', $whereCategoryID, 2);
 
-        $this->api()->delete(
+        $this->getLongRunner()->setMaxIterations(1);
+        $response = $this->api()->delete(
             "{$this->baseUrl}/" . $category["categoryID"],
-            ["batch" => true]
+            [],
+            [],
+            ['throw' => false]
         );
+        $this->assertEquals(408, $response->getStatusCode());
 
-        $this->expectException(NotFoundException::class);
-        $this->api()->get("{$this->baseUrl}/" . $category["categoryID"]);
+        // 1 discussion is deleleted.
+        $this->assertRecordsFound('Discussion', $whereCategoryID, 1);
+        $this->assertRecordsFound('Category', $whereCategoryID, 1);
+
+        // Continue.
+        $response = $this->getLongRunner()
+            ->reset()
+            ->runApi(LongRunnerAction::fromCallbackPayload(
+                $response->getBody()['callbackPayload'],
+                self::container()->getArgs(SystemTokenUtils::class),
+                \Gdn::request()
+            ))
+        ;
+        $this->assertEquals(200, $response->getStatus());
+
+        $this->assertNoRecordsFound('Discussion', $whereCategoryID);
+        $this->assertNoRecordsFound('Category', $whereCategoryID);
     }
 
     /**
-     * Verify ability to delete a category while moving its content in batches.
+     * Test that the deprecated "batch" parameter results in an async long runner mode.
      */
-    public function testDeleteNewCategoryBatch(): void {
-        $origCategory = $this->createCategory(["parentCategoryID" => CategoryModel::ROOT_ID]);
-        $newCategory = $this->createCategory(["parentCategoryID" => CategoryModel::ROOT_ID]);
-
-        $discussions = [];
-        $discussions[] = $this->createDiscussion(["categoryID" => $origCategory["categoryID"]]);
-        $discussions[] = $this->createDiscussion(["categoryID" => $origCategory["categoryID"]]);
-        $discussions[] = $this->createDiscussion(["categoryID" => $origCategory["categoryID"]]);
-        $discussions[] = $this->createDiscussion(["categoryID" => $origCategory["categoryID"]]);
-        $discussions[] = $this->createDiscussion(["categoryID" => $origCategory["categoryID"]]);
-
-        $origDiscussions = $this->api()->get("discussions", ["categoryID" => $origCategory["categoryID"]])->getBody();
-        $this->assertCount(count($discussions), $origDiscussions);
-
-        $this->longRunner->expects($this->once())
-            ->method("runApi")
-            ->with(
-                CategoryModel::class,
-                "deleteIDIterable",
-                [
-                    $origCategory["categoryID"],
-                    ["newCategoryID" => $newCategory["categoryID"]],
-                ],
-                [LongRunner::OPT_LOCAL_JOB => false]
-            );
-
-        $this->api()->delete(
-            "{$this->baseUrl}/" . $origCategory["categoryID"],
-            [
-                "batch" => true,
-                "newCategoryID" => $newCategory["categoryID"]
-            ]
-        );
-        $newDiscussions = $this->api()->get("discussions", ["categoryID" => $newCategory["categoryID"]])->getBody();
-        $this->assertCount(count($discussions), $newDiscussions);
-
-        $this->expectException(NotFoundException::class);
-        $this->api()->get("{$this->baseUrl}/" . $origCategory["categoryID"]);
+    public function testDeleteBatchParam() {
+        $category = $this->createCategory();
+        $this->api()->delete("/categories/{$category['categoryID']}", ['batch' => true]);
+        $this->assertEquals(LongRunner::MODE_ASYNC, $this->getLongRunner()->getMode());
+        $this->getScheduler()->assertJobScheduled(LongRunnerJob::class);
     }
 
     /**
@@ -668,221 +623,22 @@ class CategoriesTest extends AbstractResourceTest {
     }
 
     /**
-     * Verify ability to successfully retrieve a user's preferences for a single category.
+     * Test that featured categories don't have any depth restrictions.
      *
-     * @param bool|null $following
-     * @param bool|null $discussionsApp
-     * @param bool|null $discussionsEmail
-     * @param bool|null $commentsApp
-     * @param bool|null $commentsEmail
-     * @param string|null $expected
-     * @dataProvider provideLegacyNotificationData
+     * @see https://github.com/vanilla/support/issues/4919
      */
-    public function testNotificationPreferencesGet(
-        ?bool $following,
-        ?bool $discussionsApp,
-        ?bool $discussionsEmail,
-        ?bool $commentsApp,
-        ?bool $commentsEmail,
-        ?string $expected
-    ): void {
-        $category = $this->createCategory();
-        $categoryID = $category["categoryID"];
-        $user = $this->createUser();
-        $userID = $user["userID"];
-        $this->api()->setUserID($userID);
+    public function testNestedFeaturedCategories() {
+        $rootCategory = $this->createCategory();
+        $this->createCategory(['featured' => true]);
+        $this->createCategory(['featured' => true]);
+        $this->createCategory(['featured' => true]);
+        $this->createCategory(['featured' => true]);
 
-        if (is_bool($following)) {
-            self::$categoryModel->follow($userID, $categoryID, $following);
-        }
+        $result = $this->api()
+            ->get('/categories', ['featured' => true, 'parentCategoryID' => $rootCategory['categoryID']])
+            ->getBody()
+        ;
 
-        /** @var \UserMetaModel $userMetaModel */
-        $userMetaModel = $this->container()->get(\UserMetaModel::class);
-        $userMetaModel->setUserMeta($userID, "Preferences.Popup.NewDiscussion.{$categoryID}", $discussionsApp);
-        $userMetaModel->setUserMeta($userID, "Preferences.Email.NewDiscussion.{$categoryID}", $discussionsEmail);
-        $userMetaModel->setUserMeta($userID, "Preferences.Popup.NewComment.{$categoryID}", $commentsApp);
-        $userMetaModel->setUserMeta($userID, "Preferences.Email.NewComment.{$categoryID}", $commentsEmail);
-
-        $preferences = $this->api()->get("{$this->baseUrl}/{$categoryID}/preferences/{$userID}")->getBody();
-        $this->assertSame($expected, $preferences[CategoryModel::PREFERENCE_KEY_NOTIFICATION]);
-    }
-
-    /**
-     * Provide data for verifying a user's legacy notification settings map to the proper notification value.
-     *
-     * @return array[]
-     */
-    public function provideLegacyNotificationData(): array {
-        return [
-            "Following, only" => [true, null, null, null, null, CategoryModel::NOTIFICATION_FOLLOW],
-            "Email on comments, only" => [null, null, null, null, true, CategoryModel::NOTIFICATION_ALL],
-            "Email on comments, following" => [true, null, null, null, true, CategoryModel::NOTIFICATION_ALL],
-            "Email on discussions, only" => [null, null, true, null, null, CategoryModel::NOTIFICATION_DISCUSSIONS],
-            "Email on discussions, following" => [true, null, true, null, null, CategoryModel::NOTIFICATION_DISCUSSIONS],
-            "In-app on comments, only" => [null, null, null, true, null, CategoryModel::NOTIFICATION_ALL],
-            "In-app on comments, following" => [true, null, null, true, null, CategoryModel::NOTIFICATION_ALL],
-            "In-app on discussions, only" => [null, true, null, null, null, CategoryModel::NOTIFICATION_DISCUSSIONS],
-            "In-app on discussions, following" => [true, true, null, null, null, CategoryModel::NOTIFICATION_DISCUSSIONS],
-            "Email on comments and discussions" => [null, null, true, null, true, CategoryModel::NOTIFICATION_ALL],
-            "Email on comments and discussions, following" => [true, null, true, null, true, CategoryModel::NOTIFICATION_ALL],
-            "In-app on comments and discussions" => [null, true, null, true, null, CategoryModel::NOTIFICATION_ALL],
-            "In-app on comments and discussions, following" => [true, true, null, true, null, CategoryModel::NOTIFICATION_ALL],
-            "Email and in-app on comments and discussions" => [null, true, true, true, true, CategoryModel::NOTIFICATION_ALL],
-            "Email and in-app on comments and discussions, following" => [true, true, true, true, true, CategoryModel::NOTIFICATION_ALL],
-        ];
-    }
-
-    /**
-     * Verify ability to update a user's legacy notification settings via the postNotifications preference.
-     *
-     * @param ?string $postNotifications
-     * @param bool|null $expectedFollowing
-     * @param bool|null $expectedDiscussionsApp
-     * @param bool|null $expectedDiscussionsEmail
-     * @param bool|null $expectedCommentsApp
-     * @param bool|null $expectedCommentsEmail
-     * @dataProvider providePostNotificationsData
-     */
-    public function testNotificationPreferencesSet(
-        ?string $postNotifications,
-        ?bool $expectedFollowing,
-        ?bool $expectedDiscussionsApp,
-        ?bool $expectedDiscussionsEmail,
-        ?bool $expectedCommentsApp,
-        ?bool $expectedCommentsEmail
-    ): void {
-        $category = $this->createCategory();
-        $categoryID = $category["categoryID"];
-        $user = $this->createUser();
-        $userID = $user["userID"];
-        $this->api()->setUserID($userID);
-
-        $this->api()->patch(
-            "{$this->baseUrl}/{$categoryID}/preferences/{$userID}",
-            [CategoryModel::PREFERENCE_KEY_NOTIFICATION => $postNotifications]
-        );
-
-        $actualFollowing = self::$categoryModel->isFollowed($userID, $categoryID);
-        $this->assertSame($expectedFollowing, $actualFollowing);
-
-        /** @var \UserMetaModel $userMetaModel */
-        $userMetaModel = $this->container()->get(\UserMetaModel::class);
-        $preferences = [
-            2 => "Preferences.Popup.NewDiscussion.%d",
-            3 => "Preferences.Email.NewDiscussion.%d",
-            4 => "Preferences.Popup.NewComment.%d",
-            5 => "Preferences.Email.NewComment.%d",
-        ];
-        foreach ($preferences as $arg => $preference) {
-            $expected = func_get_arg($arg);
-
-            $key = sprintf($preference, $categoryID);
-            $meta = $userMetaModel->getUserMeta($userID, $key);
-            $actual = $meta[$key];
-            $this->assertSame(
-                $expected,
-                $actual === null ? $actual : (bool)$actual
-            );
-        }
-    }
-
-    /**
-     * Provide data for verifying a notification preference properly maps to legacy notification settings.
-     *
-     * @return array[]
-     */
-    public function providePostNotificationsData(): array {
-        return [
-            CategoryModel::NOTIFICATION_ALL => [CategoryModel::NOTIFICATION_ALL, true, true, true, true, true],
-            CategoryModel::NOTIFICATION_DISCUSSIONS => [CategoryModel::NOTIFICATION_DISCUSSIONS, true, true, true, null, null],
-            CategoryModel::NOTIFICATION_FOLLOW => [CategoryModel::NOTIFICATION_FOLLOW, true, null, null, null, null],
-            "null" => [null, false, null, null, null, null],
-        ];
-    }
-
-    /**
-     * Verify listing out all of a user's category preferences.
-     */
-    public function testNotificationPreferencesIndex(): void {
-        $category = $this->createCategory();
-        $categoryID = $category["categoryID"];
-        $user = $this->createUser();
-        $userID = $user["userID"];
-        $this->api()->setUserID($userID);
-
-        self::$categoryModel->follow($userID, $categoryID, true);
-
-        $response = $this->api()->get("{$this->baseUrl}/preferences/{$userID}")->getBody();
-        $this->assertCount(1, $response);
-
-        $actual = array_shift($response);
-        $this->assertSame([
-            "preferences" => [CategoryModel::PREFERENCE_KEY_NOTIFICATION => CategoryModel::NOTIFICATION_FOLLOW],
-            "categoryID" => $categoryID,
-            "name" => $category["name"],
-            "url" => $category["url"],
-        ], $actual);
-    }
-
-    /**
-     * Verify disabling a user's notifications for a particular category.
-     */
-    public function testNotificationPreferencesNone(): void {
-        $category = $this->createCategory();
-        $categoryID = $category["categoryID"];
-        $user = $this->createUser();
-        $userID = $user["userID"];
-        $this->api()->setUserID($userID);
-
-        $preferences = $this->api()->get("{$this->baseUrl}/{$categoryID}/preferences/{$userID}")->getBody();
-        $this->assertSame(null, $preferences[CategoryModel::PREFERENCE_KEY_NOTIFICATION]);
-    }
-
-    /**
-     * Verify users with inadequate permissions cannot see other user's preferences.
-     */
-    public function testNotificationPreferencesNoPermission(): void {
-        $category = $this->createCategory();
-        $categoryID = $category["categoryID"];
-        $user = $this->createUser();
-        $userID = $user["userID"];
-        $targetUser = $this->createUser();
-        $targetUserID = $targetUser["userID"];
-        $this->api()->setUserID($userID);
-
-        $this->expectException(ForbiddenException::class);
-        $this->api()->get("{$this->baseUrl}/{$categoryID}/preferences/{$targetUserID}")->getBody();
-    }
-
-    /**
-     * Verify users with inadequate permissions cannot see other user's preferences.
-     */
-    public function testNotificationPreferencesNoPermissionIndex(): void {
-        $user = $this->createUser();
-        $userID = $user["userID"];
-        $targetUser = $this->createUser();
-        $targetUserID = $targetUser["userID"];
-        $this->api()->setUserID($userID);
-
-        $this->expectException(ForbiddenException::class);
-        $this->api()->get("{$this->baseUrl}/preferences/{$targetUserID}")->getBody();
-    }
-
-    /**
-     * Verify users with inadequate permissions cannot set other user's preferences.
-     */
-    public function testNotificationPreferencesNoPermissionPatch(): void {
-        $category = $this->createCategory();
-        $categoryID = $category["categoryID"];
-        $user = $this->createUser();
-        $userID = $user["userID"];
-        $targetUser = $this->createUser();
-        $targetUserID = $targetUser["userID"];
-        $this->api()->setUserID($userID);
-
-        $this->expectException(ForbiddenException::class);
-        $this->api()->patch("{$this->baseUrl}/{$categoryID}/preferences/{$targetUserID}", [
-            CategoryModel::PREFERENCE_KEY_NOTIFICATION => CategoryModel::NOTIFICATION_FOLLOW,
-        ]);
+        $this->assertCount(4, $result);
     }
 }

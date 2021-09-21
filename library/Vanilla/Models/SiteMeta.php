@@ -16,6 +16,7 @@ use Vanilla\Contracts;
 use Vanilla\Dashboard\Models\BannerImageModel;
 use Vanilla\Formatting\Formats\HtmlFormat;
 use Vanilla\Search\SearchService;
+use Vanilla\Site\OwnSite;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Theme\ThemeFeatures;
 use Vanilla\Theme\ThemeService;
@@ -51,6 +52,9 @@ class SiteMeta implements \JsonSerializable {
 
     /** @var UserModel $userModel */
     private $userModel;
+
+    /** @var Contracts\ConfigurationInterface */
+    private $config;
 
     /** @var string[] */
     private $allowedExtensions;
@@ -150,10 +154,15 @@ class SiteMeta implements \JsonSerializable {
     private $extraMetas = [];
 
     /**
+     * @var int
+     */
+    private $siteID;
+
+    /**
      * SiteMeta constructor.
      *
      * @param RequestInterface $request The request to gather data from.
-     * @param Contracts\ConfigurationInterface $config The configuration object.
+     * @param Contracts\ConfigurationInterface $config The config object.
      * @param SiteSectionModel $siteSectionModel
      * @param DeploymentCacheBuster $deploymentCacheBuster
      * @param ThemeFeatures $themeFeatures
@@ -163,6 +172,7 @@ class SiteMeta implements \JsonSerializable {
      * @param UserModel $userModel
      * @param AddonManager $addonManager
      * @param SearchService $searchService
+     * @param OwnSite $site
      */
     public function __construct(
         RequestInterface $request,
@@ -175,10 +185,11 @@ class SiteMeta implements \JsonSerializable {
         FormatService $formatService,
         UserModel $userModel,
         AddonManager $addonManager,
-        SearchService $searchService
+        SearchService $searchService,
+        OwnSite $site
     ) {
         $this->host = $request->getHost();
-
+        $this->config = $config;
         $this->formatService = $formatService;
 
         // We the roots from the request in the form of "" or "/asd" or "/asdf/asdf"
@@ -254,9 +265,16 @@ class SiteMeta implements \JsonSerializable {
         $this->reCaptchaKey = $config->get("RecaptchaV3.PublicKey", '');
 
         $this->bannedPrivateProfiles = $config->get("Vanilla.BannedUsers.PrivateProfiles", false);
+
+        $this->siteID = $site->getSiteID();
     }
 
     /**
+     * Add an extra meta to the site meta.
+     *
+     * Notably `SiteMeta` is often used as a singleton, so extas given here will apply everywhere.
+     * if you want a localized instance use the `$localizedExtraMetas` param when fetching the value.
+     *
      * @param SiteMetaExtra $extra
      */
     public function addExtra(SiteMetaExtra $extra) {
@@ -288,12 +306,18 @@ class SiteMeta implements \JsonSerializable {
     }
 
     /**
+     * Get the value of the site meta.
+     *
+     * @param SiteMetaExtra[] $localizedExtraMetas Extra metas for this one specific fetch of the value.
+     * Since `SiteMeta` is often used as a singleton, `SiteMeta::addExtra` will apply globally.
+     * By passing extra metas here they can be used for one specific instance.
+     *
      * @return array
      */
-    public function value(): array {
+    public function value(array $localizedExtraMetas = []): array {
         $extras = array_map(function (SiteMetaExtra $extra) {
             return $extra->getValue();
-        }, $this->extraMetas);
+        }, array_merge($this->extraMetas, $localizedExtraMetas));
 
         return array_replace_recursive([
             'context' => [
@@ -306,6 +330,7 @@ class SiteMeta implements \JsonSerializable {
                 'cacheBuster' => $this->cacheBuster,
                 'staticPathFolder' => $this->staticPathFolder,
                 'dynamicPathFolder' => $this->dynamicPathFolder,
+                'siteID' => $this->siteID,
             ],
             'ui' => [
                 'siteName' => $this->siteTitle,
@@ -323,6 +348,7 @@ class SiteMeta implements \JsonSerializable {
                 'currentUser' => $this->userModel->currentFragment(),
                 'editContentTimeout' => $this->editContentTimeout,
                 'bannedPrivateProfile' => $this->bannedPrivateProfiles,
+                'useAdminCheckboxes' => boolval($this->config->get('Vanilla.AdminCheckboxes.Use', false)),
             ],
             'search' => [
                 'defaultScope' => $this->defaultSearchScope,

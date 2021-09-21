@@ -11,6 +11,7 @@ use CategoryModel;
 use Garden\Web\Exception\NotFoundException;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Utility\ArrayUtils;
+use Vanilla\Utility\ModelUtils;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\SetupTraitsTrait;
 use VanillaTests\SiteTestCase;
@@ -1063,9 +1064,7 @@ class CategoryModelTest extends SiteTestCase {
         ];
 
         $iterator = $this->categoryModel->deleteIDIterable($categoryID);
-        foreach ($iterator as $iteration) {
-            $this->assertIsBool($iteration);
-        }
+        ModelUtils::consumeGenerator($iterator);
         foreach ($discussions as $discussion) {
             try {
                 $discussionID = $discussion["discussionID"];
@@ -1098,9 +1097,8 @@ class CategoryModelTest extends SiteTestCase {
         ];
 
         $iterator = $this->categoryModel->deleteIDIterable($categoryID, ["newCategoryID" => $newCategoryID]);
-        foreach ($iterator as $iteration) {
-            $this->assertIsBool($iteration);
-        }
+        ModelUtils::consumeGenerator($iterator);
+
         foreach ($discussions as $discussion) {
             $discussionID = $discussion["discussionID"];
             $updatedDiscussion = $this->api()->get("discussions/{$discussionID}");

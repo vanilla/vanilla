@@ -13,7 +13,8 @@ import { editor as Monaco } from "monaco-editor/esm/vs/editor/editor.api";
 
 monaco.config({
     paths: {
-        vs: assetUrl("/dist/monaco-editor-21-2/min/vs"),
+        // @ts-ignore: DIST_NAME comes from webpack.
+        vs: assetUrl(`/${__DIST__NAME__}/monaco-editor-21-2/min/vs`),
     },
 });
 export interface ITextEditorProps {

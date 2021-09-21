@@ -73,6 +73,7 @@ export class CommunitySearchProvider implements ISearchOptionProvider {
 
     public makeSearchUrl = (query: string) => {
         const queryParamName = NEW_SEARCH_PAGE_ENABLED ? "query" : "search";
-        return formatUrl(`/search?${queryParamName}=${query}`, true);
+        const url = formatUrl(`/search?${queryParamName}=${encodeURIComponent(query)}`, true);
+        return url;
     };
 }

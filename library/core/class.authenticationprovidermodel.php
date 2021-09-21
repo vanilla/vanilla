@@ -248,7 +248,7 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
      *
      * @param $authenticationSchemeAlias
      * @param null $userID
-     * @return array|bool|stdClass
+     * @return array|bool
      */
     public static function getProviderByScheme($authenticationSchemeAlias, $userID = null) {
         $providerQuery = Gdn::sql()

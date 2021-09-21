@@ -16,7 +16,7 @@ import { stableObjectHash } from "@vanilla/utils";
  * To be used internally by PartialSchemaForm.
  * This takes care of unreferencing pointers and evaluating conditions.
  */
-export function FormControlWrapper(props: Omit<IControlProps, "disabled"> & Pick<ISchemaRenderProps, "FormControl">) {
+export function FormControlWrapper(props: IControlProps & Pick<ISchemaRenderProps, "FormControl">) {
     const { FormControl, ...controlProps } = props;
     const { control, rootInstance, path } = controlProps;
     const { conditions } = control;
@@ -55,6 +55,9 @@ export function FormControlWrapper(props: Omit<IControlProps, "disabled"> & Pick
         [stableObjectHash(unrefValues), references],
     );
     const conditionsValidation = validateConditions(conditions ?? [], rootInstance);
-    const disabled = conditionsValidation.conditions.some((c) => c.disable);
+    const disabled = conditionsValidation.conditions.some((c) => c.disable) || props.disabled;
+    if (!FormControl) {
+        return <></>;
+    }
     return <FormControl {...controlProps} disabled={disabled} control={stableUnwrappedControl} />;
 }

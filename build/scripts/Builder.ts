@@ -12,7 +12,7 @@ import WebpackDevServer, { Configuration as DevServerConfiguration } from "webpa
 import { makeDevConfig } from "./configs/makeDevConfig";
 import { makePolyfillConfig } from "./configs/makePolyfillConfig";
 import { makeProdConfig } from "./configs/makeProdConfig";
-import { DIST_DIRECTORY, VANILLA_ROOT } from "./env";
+import { DIST_DIRECTORY, DIST_ROOT_DIRECTORY, VANILLA_ROOT } from "./env";
 import { BuildMode, getOptions, IBuildOptions } from "./buildOptions";
 import EntryModel from "./utility/EntryModel";
 import { copyMonacoEditorModule, installYarn } from "./utility/moduleUtils";
@@ -72,7 +72,7 @@ export default class Builder {
      */
     private async runProd() {
         // Cleanup
-        await fse.emptyDir(path.join(DIST_DIRECTORY));
+        await fse.emptyDir(path.join(DIST_ROOT_DIRECTORY));
         copyMonacoEditorModule();
         const sections = await this.entryModel.getSections();
         let configs: webpack.Configuration[];

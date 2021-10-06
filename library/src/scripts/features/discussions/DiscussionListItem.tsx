@@ -16,17 +16,24 @@ import { MetaIcon, MetaItem, MetaLink, MetaTag } from "@library/metas/Metas";
 import Notice from "@library/metas/Notice";
 import ProfileLink from "@library/navigation/ProfileLink";
 import { t } from "@vanilla/i18n";
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import DiscussionOptionsMenu from "@library/features/discussions/DiscussionOptionsMenu";
 import DiscussionVoteCounter from "@library/features/discussions/DiscussionVoteCounter";
 import qs from "qs";
-import { hasPermission, PermissionMode } from "@library/features/users/Permission";
+import Permission, { hasPermission, PermissionMode } from "@library/features/users/Permission";
 import { ReactionUrlCode } from "@dashboard/@types/api/reaction";
 import DateTime from "@library/content/DateTime";
 import { metasClasses } from "@library/metas/Metas.styles";
+import { getMeta } from "@library/utility/appUtils";
+import CheckBox from "@library/forms/Checkbox";
+import { useDiscussionCheckBoxContext } from "@library/features/discussions/DiscussionCheckboxContext";
+import { useToast } from "@library/features/toaster/ToastContext";
+import { ToolTip } from "@library/toolTip/ToolTip";
+import ConditionalWrap from "@library/layout/ConditionalWrap";
 
 interface IProps {
     discussion: IDiscussion;
+    noCheckboxes?: boolean;
 }
 
 export default function DiscussionListItem(props: IProps) {
@@ -35,6 +42,8 @@ export default function DiscussionListItem(props: IProps) {
     const classes = discussionListClasses();
     const variables = discussionListVariables();
     const currentUserSignedIn = useCurrentUserSignedIn();
+    const checkBoxContext = useDiscussionCheckBoxContext();
+    const toastContext = useToast();
     const hasUnread = discussion.unread || (discussion.countUnread !== undefined && discussion.countUnread > 0);
 
     let iconView = <UserPhoto userInfo={discussion.insertUser} size={variables.profilePhoto.size} />;
@@ -80,10 +89,45 @@ export default function DiscussionListItem(props: IProps) {
     );
 
     const discussionUrl = currentUserSignedIn ? `${discussion.url}#latest` : discussion.url;
+
+    //check if the user has permission to see checkbox
+    const canUseCheckboxes =
+        !props.noCheckboxes &&
+        hasPermission("discussions.manage", {
+            resourceType: "category",
+            resourceID: discussion.categoryID,
+            mode: PermissionMode.RESOURCE_IF_JUNCTION,
+        }) &&
+        getMeta("ui.useAdminCheckboxes", false);
+
+    const { discussionID } = discussion;
+    const isRowChecked = checkBoxContext.checkedDiscussionIDs.includes(discussionID);
+    const isPendingAction = checkBoxContext.pendingActionIDs.includes(discussionID);
+
+    const [disabledNote, setDisabledNote] = useState<string | null>(null);
+
+    const isCheckboxDisabled = useMemo(() => {
+        const BULK_ACTION_LIMIT = 50;
+        // Check for selection limit
+        const isLimitReached = !isRowChecked && checkBoxContext.checkedDiscussionIDs.length >= BULK_ACTION_LIMIT;
+        setDisabledNote((prevState) => {
+            if (isLimitReached) {
+                return t("You have reached the maximum selection amount.");
+            }
+            if (isPendingAction) {
+                return t("This discussion is still being processed.");
+            }
+            return prevState;
+        });
+
+        return isLimitReached || isPendingAction;
+    }, [checkBoxContext, isRowChecked, isPendingAction]);
+
     return (
         <ListItem
             url={discussionUrl}
             name={discussion.name}
+            className={isRowChecked || isPendingAction ? classes.checkedboxRowStyle : undefined}
             nameClassName={cx(classes.title, { isRead: !hasUnread && currentUserSignedIn })}
             description={discussion.excerpt}
             metas={<DiscussionListItemMeta {...discussion} />}
@@ -91,6 +135,33 @@ export default function DiscussionListItem(props: IProps) {
             icon={icon}
             iconWrapperClass={iconWrapperClass}
             options={variables.item.options}
+            // TODO: Disable this until the feature is finished.
+            checkbox={
+                canUseCheckboxes ? (
+                    <ConditionalWrap
+                        condition={isCheckboxDisabled && !!disabledNote}
+                        component={ToolTip}
+                        componentProps={{ label: disabledNote }}
+                    >
+                        {/* This span is required for the conditional tooltip */}
+                        <span>
+                            <CheckBox
+                                checked={isRowChecked || isPendingAction}
+                                label={`Select ${discussion.name}`}
+                                hideLabel={true}
+                                disabled={isCheckboxDisabled}
+                                onChange={(e) => {
+                                    if (e.target.checked) {
+                                        checkBoxContext.addCheckedDiscussionsByIDs(discussionID);
+                                    } else {
+                                        checkBoxContext.removeCheckedDiscussionsByIDs(discussionID);
+                                    }
+                                }}
+                            />
+                        </span>
+                    </ConditionalWrap>
+                ) : undefined
+            }
         ></ListItem>
     );
 }

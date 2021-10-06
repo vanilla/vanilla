@@ -17,7 +17,7 @@ interface IProps {
 export function DefaultBannerBg(props: IProps) {
     const { isContentBanner } = props;
     const { mediaQueries } = useLayout();
-    const classes = isContentBanner ? contentBannerClasses(mediaQueries) : bannerClasses(mediaQueries);
+    const classes = isContentBanner ? contentBannerClasses() : bannerClasses();
     const vars = isContentBanner ? contentBannerVariables() : bannerVariables();
 
     return (

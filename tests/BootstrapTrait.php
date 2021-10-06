@@ -475,4 +475,17 @@ trait BootstrapTrait {
         static::assertSame($expectedSubpath, $path);
         return $path;
     }
+
+    /**
+     * Make sure that an uploaded test file exists.
+     *
+     * @param string $url The URL to test.
+     * @return string Returns the file path of the file for further tests, if needed.
+     */
+    public static function assertUploadedFileUrlExists(string $url): string {
+        $path = str_replace(\Gdn::request()->urlDomain(true).\Gdn::request()->getAssetRoot().'/uploads', PATH_UPLOADS, $url);
+        TestCase::assertFileExists($path, "The file for $url does not exist.");
+
+        return $path;
+    }
 }

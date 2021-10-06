@@ -72,6 +72,17 @@ class MessagesController extends ConversationsController {
         // Sending a new conversation.
         if ($this->Form->authenticatedPostBack()) {
             $recipientUserIDs = explode(',', $this->Form->getFormValue('To', ''));
+            $recipients = [];
+            if (!empty($recipientUserIDs)) {
+                $recipients = Gdn::userModel()->getIDs($recipientUserIDs);
+                foreach ($recipients as $recipient) {
+                    if (isset($recipient['Attributes']['State']) && $recipient['Attributes']['State'] === 'Deleted') {
+                        unset($recipients[$recipient['UserID']]);
+                    }
+                }
+                $recipientUserIDs = array_keys($recipients);
+            }
+
             // Enforce MaxRecipients
             if (!$this->ConversationModel->addUserAllowed(0, count($recipientUserIDs))) {
                 // Reuse the Info message now as an error.
@@ -84,7 +95,6 @@ class MessagesController extends ConversationsController {
                     $maxRecipients
                 ));
             }
-
             $this->EventArguments['Recipients'] = $recipientUserIDs;
             $this->fireEvent('BeforeAddConversation');
             if (!empty($this->Form->getFormValue('To'))) {
@@ -140,7 +150,7 @@ class MessagesController extends ConversationsController {
         ]);
 
         $userData = [];
-        $recipients = Gdn::userModel()->getIDs($recipientUserIDs);
+        $recipients = empty($recipients) ? Gdn::userModel()->getIDs($recipientUserIDs) : $recipients;
         $recipient = $this->Form->getValue('Recipient');
         if ($recipient) {
             $recipient = (array)$recipient;

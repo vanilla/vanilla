@@ -146,7 +146,11 @@ class InternalClient extends HttpClient {
 
             $dataMeta = json_decode($response->getHeader('X-Data-Meta'), true);
             if (!empty($dataMeta['errorTrace'])) {
-                $message .= "\n".$dataMeta['errorTrace'];
+                if (isset($body['originalErrorTrace'])) {
+                    $body['originalErrorTrace'] .= "\n" . $dataMeta['errorTrace'];
+                } else {
+                    $message .= "\n" . $dataMeta['errorTrace'];
+                }
             }
 
             throw HttpException::createFromStatus($response->getStatusCode(), $message, $body);

@@ -4,14 +4,15 @@
  * @license GPL-2.0-only
  */
 
-namespace Vanilla\Dashboard\Controllers\API;
+namespace Vanilla\Dashboard\Controllers\Api;
 
 use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
 use Psr\Container\ContainerInterface;
 use ReflectionMethod;
-use Vanilla\LongRunner;
+use Vanilla\Scheduler\LongRunner;
 use Vanilla\Permissions;
+use Vanilla\Scheduler\LongRunnerAction;
 use Vanilla\Utility\ModelUtils;
 use Vanilla\Web\SystemCallableInterface;
 
@@ -22,24 +23,15 @@ use AbstractApiController;
  */
 class CallsApiController extends AbstractApiController {
 
-    private const CALLABLE_ANNOTATION = "@system-callable";
-
-    private const CALL_TIMEOUT = 30;
-
-    /** @var ContainerInterface */
-    private $container;
-
     /** @var LongRunner */
     private $runner;
 
     /**
      * CallsApiController constructor.
      *
-     * @param ContainerInterface $container
      * @param LongRunner $runner
      */
-    public function __construct(ContainerInterface $container, LongRunner $runner) {
-        $this->container = $container;
+    public function __construct(LongRunner $runner) {
         $this->runner = $runner;
     }
 
@@ -50,48 +42,21 @@ class CallsApiController extends AbstractApiController {
      * @return Data
      */
     public function post_run(array $body = []): Data {
+        // This is a special permission that can only be applied through `SystemTokenMiddleware`
+        // if the request has a signed system token as the body.
         $this->permission(Permissions::PERMISSION_SYSTEM);
 
         $in = $this->schema([
+            "class:s",
             "method:s",
             "args:a?",
         ], "in");
         $body = $in->validate($body);
 
-        [$class, $method] = explode("::", $body["method"]);
-
-        $object = $this->container->get($class);
-
-        if (!in_array(SystemCallableInterface::class, class_implements($object))) {
-            throw new ClientException("Class does not implement " . SystemCallableInterface::class . ": {$class}");
-        }
-
-        try {
-            $reflection = new ReflectionMethod($object, $method);
-        } catch (\ReflectionException $e) {
-            throw new ClientException($e->getMessage());
-        }
-
-        if (!$reflection->isGenerator()) {
-            throw new ClientException("Method is not a generator.");
-        }
-
-        $doc = $reflection->getDocComment() ?: "";
-        if (!preg_match("/^\s*\*\s" . preg_quote(self::CALLABLE_ANNOTATION) . "\s*$/m", $doc)) {
-            throw new ClientException("{$class}::{$method} is not accessible by this method.");
-        }
-
+        $class = $body['class'];
+        $method = $body['method'];
         $args = $body["args"] ?? [];
-        $iterator = call_user_func_array([$object, $method], $args);
-
-        $result = ModelUtils::iterateWithTimeout($iterator, self::CALL_TIMEOUT);
-
-        if ($result) {
-            $result = new Data(['status' => 200, 'statusType' => 'complete'], 200);
-        } else {
-            $result = $this->runner->makeJobRunResponse($class, $method, $args);
-        }
-
-        return $result;
+        $data = $this->runner->runApi(new LongRunnerAction($class, $method, $args));
+        return $data;
     }
 }

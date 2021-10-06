@@ -178,7 +178,7 @@ class WebpackAssetProviderTest extends MinimalContainerTestCase {
      * @param WebpackAsset[] $assets
      */
     private function assertAssetUrls(array $expected, array $assets) {
-        $webroot = 'http://example.com/dist/test/';
+        $webroot = 'http://example.com/dist/v1/test/';
         $actual = array_map(function (WebpackAsset $asset) {
             return $asset->getWebPath();
         }, $assets);
@@ -193,7 +193,7 @@ class WebpackAssetProviderTest extends MinimalContainerTestCase {
      */
     private function writeTestDist(): string {
         $someHash = 'a1e34123';
-        $root = '/dist/test/path/to';
+        $root = '/dist/v1/test/path/to';
 
         $manifest = [
             "vendor-$someHash.js" => $root."/vendor1.min.js",
@@ -205,7 +205,7 @@ class WebpackAssetProviderTest extends MinimalContainerTestCase {
             "addons/js-only-$someHash.js" => $root."/addons/js-only.min.js",
             "addons/css-only-$someHash.css" => $root."/css-only.min.css",
         ];
-        $path = Path::join(PATH_TEST_CACHE, 'dist/test/manifest.json');
+        $path = Path::join(PATH_TEST_CACHE, 'dist/v1/test/manifest.json');
         $dirname = dirname($path);
         mkdir($dirname, 0777, true);
         file_put_contents($path, json_encode($manifest));

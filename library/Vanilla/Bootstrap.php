@@ -8,6 +8,8 @@
 namespace Vanilla;
 
 use Garden\Container\Container;
+use Garden\Container\Reference;
+use Garden\Web\Dispatcher;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Container\ContainerInterface;
 use Psr\SimpleCache\CacheInterface;
@@ -15,6 +17,8 @@ use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\ChainAdapter;
 use Symfony\Component\Cache\Adapter\Psr16Adapter;
 use Vanilla\Cache\CacheCacheAdapter;
+use Vanilla\Scheduler\LongRunner;
+use Vanilla\Scheduler\LongRunnerMiddleware;
 
 /**
  * Contains static functions for bootstrapping Vanilla.
@@ -50,7 +54,7 @@ class Bootstrap {
             ->rule(\DateTimeInterface::class)
             ->setAliasOf(\DateTimeImmutable::class)
             ->setConstructorArgs([null, null])
-            ;
+        ;
 
         // Caches
         $container
@@ -66,6 +70,12 @@ class Bootstrap {
             ->rule(CacheItemPoolInterface::class)
             ->setShared(true)
             ->setClass(Psr16Adapter::class)
+
+            ->rule(Dispatcher::class)
+            ->addCall('addMiddleware', [new Reference(LongRunnerMiddleware::class)])
+
+            ->rule(LongRunner::class)
+            ->setShared(true)
 
             ->rule(self::CACHE_FAST)
             ->setShared(true)

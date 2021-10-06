@@ -532,6 +532,11 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: DeepPartia
             flex: "0 1 auto",
             display: "flex",
             flexDirection: "column",
+            /**
+             * TODO: Remove this kludge when IE 11 is deprecated
+             * This minimum height stops this container from collapsing on itself
+             */
+            minHeight: "80px",
         },
         isImageLeft && bgContainerLeftStyles,
         isImageLeftMobile && mobileQuery(bgContainerLeftStyles),

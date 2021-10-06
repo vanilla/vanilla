@@ -6,6 +6,8 @@
 
 use Garden\Schema\Schema;
 use Garden\Web\Data;
+use Garden\Web\Exception\ClientException;
+use Garden\Web\Exception\NotFoundException;
 
 /**
  * API Controller for the `/tags` resource.
@@ -40,6 +42,7 @@ class TagsApiController extends AbstractApiController {
                 'name:s',
                 'urlcode:s?',
                 'urlCode:s?',
+                'parentTagID:i|null?',
             ]);
         }
 
@@ -80,13 +83,13 @@ class TagsApiController extends AbstractApiController {
 
         $tags = [];
         $searchTerm = $query['query'] ?? '';
-            $tags = $this->tagModel->search(
-                $searchTerm,
-                true,
-                $query["parentID"] ?? [],
-                $query["type"],
-                $options
-            );
+        $tags = $this->tagModel->search(
+            $searchTerm,
+            true,
+            $query["parentID"] ?? [],
+            $query["type"],
+            $options
+        );
 
         $allowedTypes = $query["type"] === ["tag"] ? [] : $query["type"];
         $tags = $this->normalizeTags($tags, $allowedTypes);
@@ -108,7 +111,7 @@ class TagsApiController extends AbstractApiController {
      * @return Data
      * @throws \Garden\Schema\ValidationException Validation Exception.
      * @throws \Garden\Web\Exception\HttpException Http Exception.
-     * @throws \Garden\Web\Exception\NotFoundException Throws an exception if no tag is found.
+     * @throws NotFoundException Throws an exception if no tag is found.
      * @throws \Vanilla\Exception\PermissionException Throws an exception if the user doesn't have the Vanilla.Tagging.Add permission.
      */
     public function get(int $id): Data {
@@ -125,7 +128,7 @@ class TagsApiController extends AbstractApiController {
      * @return Data
      * @throws \Garden\Schema\ValidationException Validation Exception.
      * @throws \Garden\Web\Exception\HttpException HttpException.
-     * @throws \Garden\Web\Exception\NotFoundException Throws an exception if tag can't be found.
+     * @throws NotFoundException Throws an exception if tag can't be found.
      * @throws \Vanilla\Exception\PermissionException Throws an exception if user doesn't have Garden.Community.Manage permission.
      */
     public function post(array $body): Data {
@@ -152,7 +155,7 @@ class TagsApiController extends AbstractApiController {
         // Don't allow overwriting existing tags.
         $duplicateTags = $this->tagModel->getWhere(['Name' => $normalizedBody['Name']])->resultArray();
         if (!empty($duplicateTags)) {
-            throw new \Garden\Web\Exception\ClientException('A tag with this name already exists.', 409);
+            throw new ClientException('A tag with this name already exists.', 409);
         }
 
         $tagID = $this->tagModel->save($normalizedBody);
@@ -171,7 +174,7 @@ class TagsApiController extends AbstractApiController {
      * @return Data
      * @throws \Garden\Schema\ValidationException Validation Exception.
      * @throws \Garden\Web\Exception\HttpException Http Exception.
-     * @throws \Garden\Web\Exception\NotFoundException Throws exception if the tag to patch can't be found.
+     * @throws NotFoundException Throws exception if the tag to patch can't be found.
      * @throws \Vanilla\Exception\PermissionException Throws exception if the user doesn't have the Garden.Community.Manage permission.
      */
     public function patch(int $id, array $body): Data {
@@ -193,7 +196,7 @@ class TagsApiController extends AbstractApiController {
         // Get the tag and throw a Not Found error if nothing comes back.
         $tags = $this->tagModel->getWhere(['TagID' => $id])->resultArray();
         if (empty($tags)) {
-            throw new \Garden\Web\Exception\NotFoundException('Tag');
+            throw new NotFoundException('Tag');
         } else {
             $tag = $tags[0];
         }
@@ -216,26 +219,29 @@ class TagsApiController extends AbstractApiController {
      * Delete a tag via the API.
      *
      * @param int $id The tag ID.
-     * @throws \Garden\Web\Exception\ClientException Throws an exception if the tag is a parent.
+     * @throws ClientException Throws an exception if the tag is a parent.
      * @throws \Garden\Web\Exception\HttpException Http Exception.
-     * @throws \Garden\Web\Exception\NotFoundException Throws an exception if the tag to delete isn't found.
+     * @throws NotFoundException Throws an exception if the tag to delete isn't found.
      * @throws \Vanilla\Exception\PermissionException Throws exception if the user doesn't have the Garden.Community.Manage permission.
      */
     public function delete(int $id): void {
         $this->permission('Garden.Community.Manage');
-        $tags = $this->tagModel->getWhere(['TagID' => $id])->resultArray();
-        if (empty($tags)) {
-            throw new \Garden\Web\Exception\NotFoundException('Tag');
-        } else {
-            $tag = $tags[0];
+        $tag = $this->tagModel->getWhere(['TagID' => $id])->FirstRow(DATASET_TYPE_ARRAY);
 
+        if (empty($tag)) {
+            throw new NotFoundException('Tag');
+        } else {
             // Make sure the tag doesn't have any children or associated discussions.
             $isParent = $this->tagModel->getChildTags($id);
             if (!empty($isParent)) {
-                throw new \Garden\Web\Exception\ClientException('You cannot delete tags that have associated child tags.', 409);
+                throw new ClientException('You cannot delete tags that have associated child tags.', 409);
             } elseif ($tag['CountDiscussions'] > 0) {
-                throw new \Garden\Web\Exception\ClientException('You cannot delete tags that have associated discussions.', 409);
+                throw new ClientException('You cannot delete tags that have associated discussions.', 409);
             } else {
+                $allowedTypes = Gdn::config('Tagging.Discussions.AllowedTypes', ['']);
+                if (!in_array(($tag['Type'] ?? ''), $allowedTypes)) {
+                    throw new ClientException('You cannot delete a reserved tag.', 409);
+                }
                 $this->tagModel->deleteID($id);
             }
         }
@@ -272,7 +278,7 @@ class TagsApiController extends AbstractApiController {
      * @param int $tagID
      * @return array Returns the normalized and validated tag data.
      * @throws \Garden\Schema\ValidationException Throws a validation exception.
-     * @throws \Garden\Web\Exception\NotFoundException Throws an exception if the tag isn't found.
+     * @throws NotFoundException Throws an exception if the tag isn't found.
      */
     private function getTagFormattedForOutput(int $tagID): array {
         $out = $this->tagModel->getFullTagSchema();
@@ -288,7 +294,7 @@ class TagsApiController extends AbstractApiController {
      * Check to see if you can add a tag of this specified type and throw an error if you can't.
      *
      * @param string $type
-     * @throws \Garden\Web\Exception\ClientException Throws an error if you can't add tags of this type.
+     * @throws ClientException Throws an error if you can't add tags of this type.
      */
     private function checkTypeAddSetting(string $type): void {
         // Get all the tag types.
@@ -296,7 +302,7 @@ class TagsApiController extends AbstractApiController {
 
         // Check to see if the type is an existing one, and if it isn't make sure you're allowed to add tags to it.
         if (in_array(strtolower($type), array_keys($allTypes)) && !$this->tagModel->canAddTagForType($type)) {
-            throw new \Garden\Web\Exception\ClientException(sprintf("You cannot add tags with the type '%s'.", $type));
+            throw new ClientException(sprintf("You cannot add tags with the type '%s'.", $type));
         }
     }
 
@@ -304,12 +310,12 @@ class TagsApiController extends AbstractApiController {
      * Checks to make sure the parent tag exists and throws an error if it doesn't.
      *
      * @param int $parentTagID The ID of the tag to check.
-     * @throws \Garden\Web\Exception\NotFoundException Throws an exception if the parent tag isn't found.
+     * @throws NotFoundException Throws an exception if the parent tag isn't found.
      */
     private function parentExists(int $parentTagID): void {
         $parentExists = $this->tagModel->getID($parentTagID);
         if (!$parentExists) {
-            throw new \Garden\Web\Exception\ClientException('Parent tag not found.');
+            throw new ClientException('Parent tag not found.');
         }
     }
 }

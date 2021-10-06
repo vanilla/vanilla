@@ -21,12 +21,11 @@ const BookmarkToggle: FunctionComponent<IProps> = ({ bookmarked, onToggleBookmar
 
     return (
         <ActsAsCheckbox checked={bookmarked} onChange={onToggleBookmarked} title={t("Bookmark")}>
-            {({ disabled }) => (
+            {(props) => (
                 <Icon
                     icon={bookmarked ? "discussion-bookmark-solid" : "discussion-bookmark"}
                     className={cx(icon, {
-                        [iconDisabled]: disabled,
-                        [iconChecked]: bookmarked && !disabled,
+                        [iconChecked]: bookmarked,
                     })}
                 />
             )}

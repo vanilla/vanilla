@@ -2327,6 +2327,17 @@ abstract class Gdn_SQLDriver {
     }
 
     /**
+     * Convert an array into unnamed SQL parameters for a prepared statement for an IN or NOT IN statement.
+     *
+     * @param array $groupValue An array of values like ['asdfasdf', 4, 'asf]
+     * @return string A placeholder for a prepared statement. (?,?,?).
+     */
+    public function parameterizeGroupValue(array $groupValue): string {
+        $resultMarks = array_fill(0, count($groupValue), '?');
+        return '(' . implode(",", $resultMarks) . ")";
+    }
+
+    /**
      * Adds to the $this->_WhereIns collection. Used to generate a "where field
      * in (1,2,3)" query. Concatenated with AND.
      *

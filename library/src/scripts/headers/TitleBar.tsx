@@ -72,6 +72,7 @@ export default function TitleBar(_props: IProps) {
     };
 
     const containerOptions = titleBarVariables().titleBarContainer;
+    const meboxVars = titleBarVariables().meBox;
 
     const { bgProps, bg2Props, logoProps } = useScrollTransition();
     const { collisionSourceRef, hBoundary1Ref, hBoundary2Ref, hasCollision } = useCollisionDetector();
@@ -274,6 +275,7 @@ export default function TitleBar(_props: IProps) {
                                     overwriteSearchBar={{
                                         compact: isCompact,
                                     }}
+                                    withLabel={meboxVars.withLabel}
                                 />
                                 {meBox}
                             </ConditionalWrap>
@@ -438,6 +440,7 @@ function DesktopMeBox() {
     const registerLink = useRegisterLink();
     const signinLink = useSignInLink();
     const guestVars = titleBarVariables().guest;
+    const meboxVars = titleBarVariables().meBox;
 
     if (isGuest) {
         return (
@@ -467,6 +470,8 @@ function DesktopMeBox() {
                 className={classNames("titleBar-meBox", classes.meBox)}
                 buttonClassName={classes.button}
                 contentClassName={classNames("titleBar-dropDownContents", classes.dropDownContents)}
+                withSeparator={meboxVars.withSeparator}
+                withLabel={meboxVars.withLabel}
             />
         );
     }

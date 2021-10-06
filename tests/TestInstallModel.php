@@ -236,7 +236,7 @@ class TestInstallModel extends InstallModel {
         }
 
         if (class_exists(\CategoryModel::class)) {
-            \CategoryModel::$Categories = null;
+            \CategoryModel::reset();
         }
 
         if (class_exists(\SubcommunityModel::class)) {

@@ -46,7 +46,7 @@ const dummyUserFragment = {
 };
 
 story.add("Search Box", () => {
-    const classesSearch = bannerClasses(useLayout().mediaQueries);
+    const classesSearch = bannerClasses();
     return (
         <StoryContent>
             <StoryHeading depth={1}>Search Box</StoryHeading>

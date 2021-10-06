@@ -12,6 +12,7 @@ import { Mixins } from "@library/styles/Mixins";
 import { useThemeCache } from "@library/styles/themeCache";
 import { styleUnit } from "../../styles/styleUnit";
 import voteCounterVariables from "@library/voteCounter/VoteCounter.variables";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
 
 export const discussionListClasses = useThemeCache(() => {
     const vars = discussionListVariables();
@@ -46,6 +47,10 @@ export const discussionListClasses = useThemeCache(() => {
         ...voteCounterPosition,
     });
 
+    const checkedboxRowStyle = css({
+        backgroundColor: ColorsUtils.colorOut(globalVars.states.hover.highlight),
+    });
+
     const options = {
         move: css({
             minHeight: styleUnit(200),
@@ -74,11 +79,44 @@ export const discussionListClasses = useThemeCache(() => {
         }),
     });
 
+    const bulkActionsText = css({
+        display: "block",
+        marginBottom: 12,
+        fontSize: globalVars.fonts.size.medium,
+        color: "#838691",
+    });
+
+    const bulkActionsButtons = css({
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "start",
+
+        "& > *": {
+            ...Mixins.margin({
+                horizontal: 6,
+            }),
+            "&:first-child": {
+                marginLeft: 0,
+            },
+        },
+    });
+
+    // Used to make sure the legacy checkbox aligns properly.
+    const legacySelectAllCheckbox = css({
+        paddingTop: 0,
+        paddingBottom: 0,
+        transform: "translateY(2px)",
+    });
+
     return {
         title,
         iconAndVoteCounterWrapper,
         voteCounterContainer,
+        checkedboxRowStyle,
         options,
         resolved,
+        bulkActionsButtons,
+        bulkActionsText,
+        legacySelectAllCheckbox,
     };
 });

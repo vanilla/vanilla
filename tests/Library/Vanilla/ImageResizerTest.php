@@ -293,7 +293,7 @@ class ImageResizerTest extends TestCase {
      */
     public function provideExtFromImageType(): array {
         $result = [];
-        foreach (ImageResizer::getTypeExt() as $type => $ext) {
+        foreach (ImageResizer::ALL_TYPE_EXT as $type => $ext) {
             $result[$type] = [$type, $ext];
         }
         $result["Unsupported Type"] = [999, "999"];

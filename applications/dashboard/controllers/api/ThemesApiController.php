@@ -10,6 +10,7 @@ use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Garden\Web\RequestInterface;
 use Vanilla\ApiUtils;
+use Vanilla\Permissions;
 use Vanilla\Theme\Asset\ThemeAsset;
 use Vanilla\Theme\Theme;
 use Vanilla\Theme\ThemeAssetFactory;
@@ -54,7 +55,7 @@ class ThemesApiController extends AbstractApiController {
      * @return Data
      */
     public function get(string $themeKey, array $query = []): Data {
-        $this->permission();
+        $this->permission(Permissions::BAN_PRIVATE);
         if (isset($query['revisionID']) && empty($query['revisionID'])) {
             unset($query['revisionID']);
         }
@@ -220,7 +221,7 @@ class ThemesApiController extends AbstractApiController {
      * @return Data
      */
     public function get_current(): Data {
-        $this->permission();
+        $this->permission(Permissions::BAN_PRIVATE);
         $out = $this->themeResultSchema();
 
         $theme = $this->themeService->getCurrentTheme();
@@ -302,7 +303,7 @@ class ThemesApiController extends AbstractApiController {
      * @return Data
      */
     public function get_assets(string $id, string $assetKey): Data {
-        $this->permission();
+        $this->permission(Permissions::BAN_PRIVATE);
         $theme = $this->themeService->getTheme($id);
         /** @var ThemeAsset $asset */
         [$asset, $assetName, $ext] = $this->extractAssetForPath($theme, $assetKey);

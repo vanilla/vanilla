@@ -6,6 +6,8 @@
 
 namespace Vanilla;
 
+use Garden\Schema\Validation;
+use Garden\Web\RequestInterface;
 use Gdn;
 use Gdn_Upload;
 use Garden\Schema\Invalid;
@@ -13,6 +15,7 @@ use Garden\Schema\Schema;
 use Garden\Schema\ValidationField;
 use Garden\Schema\ValidationException;
 use Mimey\MimeTypes;
+use Vanilla\Utility\ArrayUtils;
 
 /**
  * Validation for uploaded files.
@@ -278,6 +281,7 @@ class UploadedFileSchema extends Schema {
     protected function validateUploadedFile($value, ValidationField $field) {
         if (!($value instanceof UploadedFile)) {
             $field->addError('invalid', ['messageCode' => '{field} is not a valid file upload.']);
+            return Invalid::value();
         }
         /* @var UploadedFile $value */
         if ($this->validateExists($value, $field)) {
@@ -427,5 +431,31 @@ class UploadedFileSchema extends Schema {
     public function setAllowNonStrictTypes(bool $allowNonStrictTypes): self {
         $this->allowNonStrictTypes = $allowNonStrictTypes;
         return $this;
+    }
+
+    /**
+     * Sanity check a request for an uploaded file.
+     *
+     * Uploaded files require a content type of multipart/form-data with a properly formatted request. It is very
+     * possible to have a malformed request where the body then comes in as empty or something like that. When this happens, the
+     * user often sees a generic "field is required" error when they know in their heart they posted the field.
+     *
+     * This convenience function is meant to give an error if the request looks bad so that developers can troubleshoot
+     * bad calls more easily.
+     *
+     * @param array|\ArrayAccess $body The body of the request.
+     * @param string $field The name of the field to check
+     * @param RequestInterface $request The request object used to look at headers.
+     */
+    final public static function validateUploadSanity($body, string $field, RequestInterface $request): void {
+        ArrayUtils::assertArray($body, "The request body isn't a valid array.");
+        if (empty($body[$field]) && stripos($request->getHeader('content-type'), 'multipart/form-data') === false) {
+            $validation = new Validation();
+            $validation->addError(
+                $field,
+                "The {field} field was not found. Make sure the content-type is multipart/form-data."
+            );
+            throw new ValidationException($validation);
+        }
     }
 }

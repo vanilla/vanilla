@@ -66,10 +66,12 @@ export function IndependentSearch(props: IIndependentSearchProps) {
 
     const scopeValue = scope.value?.value || "";
     const handleSubmit = useCallback(() => {
-        const searchQuery = [SEARCH_SCOPE_LOCAL, SEARCH_SCOPE_EVERYWHERE].includes(scopeValue)
-            ? `${query}&scope=${scopeValue}`
-            : query;
-        pushSmartLocation(props.searchOptionProvider.makeSearchUrl(searchQuery));
+        const queryParams: Record<string, any> = {};
+
+        if ([SEARCH_SCOPE_LOCAL, SEARCH_SCOPE_EVERYWHERE].includes(scopeValue)) {
+            queryParams.scope = scopeValue;
+        }
+        pushSmartLocation(props.searchOptionProvider.makeSearchUrl(query, queryParams));
     }, [props.searchOptionProvider, pushSmartLocation, query, scopeValue]);
 
     const handleSearchChange = useCallback(

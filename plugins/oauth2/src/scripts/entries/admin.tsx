@@ -7,12 +7,12 @@ import React from "react";
 import { Router } from "@library/Router";
 import { allAuthenticatorRoutes } from "@oauth2/AuthenticatorRoutes";
 import { addComponent } from "@library/utility/componentRegistry";
-import { AuthenticatorReducer } from "@oauth2/AuthenticatorReducer";
+import { authenticatorsSlice } from "@oauth2/AuthenticatorReducer";
 import { registerReducer } from "@library/redux/reducerRegistry";
 
 Router.addRoutes(allAuthenticatorRoutes);
 
-registerReducer("authenticators", AuthenticatorReducer);
+registerReducer(authenticatorsSlice.name, authenticatorsSlice.reducer);
 
 addComponent("oauth2App", () => {
     return <Router sectionRoots={["/oauth2-settings"]} />;

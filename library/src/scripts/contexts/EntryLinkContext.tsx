@@ -68,7 +68,7 @@ export function useSignInLink(): string {
  */
 export function useRegisterLink(): string | null {
     const contextQuery = useEntryLinkContext();
-    const metaUrl = getMeta("registerUrl", "/entry/register");
+    const metaUrl = getMeta("registrationUrl", "/entry/register");
 
     if (!metaUrl) {
         // We don't have a register URL.

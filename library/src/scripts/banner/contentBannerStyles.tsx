@@ -95,19 +95,17 @@ export const contentBannerVariables = useThemeCache(
     },
 );
 
-export const contentBannerClasses = useThemeCache(
-    (mediaQueries: IMediaQueryFunction, options?: { debug?: boolean | string }) => {
-        const vars = contentBannerVariables();
-        const classes = bannerClasses(mediaQueries, vars);
-        return {
-            ...classes,
-            textAndSearchContainer: cx(
-                classes.textAndSearchContainer,
-                css({
-                    flexBasis: styleUnit(vars.searchBar.sizing.maxWidth),
-                    flexGrow: 1,
-                }),
-            ),
-        };
-    },
-);
+export const contentBannerClasses = useThemeCache((options?: { debug?: boolean | string }) => {
+    const vars = contentBannerVariables();
+    const classes = bannerClasses(vars);
+    return {
+        ...classes,
+        textAndSearchContainer: cx(
+            classes.textAndSearchContainer,
+            css({
+                flexBasis: styleUnit(vars.searchBar.sizing.maxWidth),
+                flexGrow: 1,
+            }),
+        ),
+    };
+});

@@ -11,9 +11,11 @@ use Garden\Web\Exception\NotFoundException;
 use Vanilla\ApiUtils;
 use Garden\Container\Container;
 use Vanilla\Formatting\DateTimeFormatter;
+use Vanilla\Formatting\FormatService;
 use Vanilla\Forum\Modules\QnAWidgetModule;
 use Vanilla\Models\LegacyModelUtils;
 use Vanilla\QnA\Models\AnswerSearchType;
+use Vanilla\QnA\Models\QnAJsonLD;
 use Vanilla\QnA\Models\QuestionSearchType;
 use Vanilla\QnA\Models\AnswerModel;
 use Psr\Log\LoggerAwareInterface;
@@ -91,6 +93,9 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
     /** @var int */
     private $unansweredCountLimit = self::UNANSWERED_COUNT_LIMIT_DEFAULT;
 
+    /** @var FormatService  */
+    private $formatService;
+
     /**
      * QnAPlugin constructor.
      *
@@ -100,6 +105,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
      * @param CategoryModel $categoryModel
      * @param AnswerModel $questionModel
      * @param Gdn_Session $session
+     * @param FormatService $formatService
      */
     public function __construct(
         CommentModel $commentModel,
@@ -107,7 +113,8 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
         UserModel $userModel,
         CategoryModel $categoryModel,
         AnswerModel $questionModel,
-        SessionInterface $session
+        SessionInterface $session,
+        FormatService $formatService
     ) {
         parent::__construct();
 
@@ -117,6 +124,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
         $this->categoryModel = $categoryModel;
         $this->answerModel = $questionModel;
         $this->session = $session;
+        $this->formatService = $formatService;
         $this->setLogger(Logger::getLogger());
         if (Gdn::addonManager()->isEnabled('Reactions', \Vanilla\Addon::TYPE_ADDON) && c('Plugins.QnA.Reactions', true)) {
             $this->Reactions = true;
@@ -129,6 +137,12 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
 
         //set followup values
         $this->setFollowUpInterval(c('QnA.FollowUp.Interval'));
+
+        //set allowed query string values for modifying pager links using discussion list filters
+        $filterKeys = array_map('strtolower', [QnaModel::ACCEPTED,QnaModel::ANSWERED, QnaModel::UNANSWERED]);
+        foreach ($filterKeys as $filterKey) {
+            $this->discussionModel->addFilter($filterKey, 'qna', ['QnA' => $filterKey], '', 'qna');
+        }
     }
 
     /**
@@ -302,9 +316,9 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
     }
 
     /**
+     * Add the "Ask a Question" option to the new post menu.
      *
-     *
-     * @param $sender Sending controller instance.
+     * @param Gdn_Controller $sender Sending controller instance.
      * @param array $args Event arguments.
      */
     public function base_discussionTypes_handler($sender, $args) {
@@ -315,7 +329,8 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
                 'Singular' => 'Question',
                 'Plural' => 'Questions',
                 'AddUrl' => '/post/question',
-                'AddText' => 'Ask a Question'
+                'AddText' => 'Ask a Question',
+                'AddIcon' => 'new-question'
             ];
         }
     }
@@ -818,7 +833,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
     }
 
     /**
-     *
+     * Add where filter into discussion query
      *
      * @param DiscussionModel $sender Sending controller instance.
      * @param array $args Event arguments.
@@ -826,18 +841,40 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
     public function discussionModel_beforeGet_handler($sender, $args) {
         if (Gdn::controller()) {
             $unanswered = Gdn::controller()->ClassName == 'DiscussionsController' && Gdn::controller()->RequestMethod == 'unanswered';
+            $this->discussionModelQnaFilter($unanswered, $args);
+        }
+    }
 
-            if ($unanswered) {
-                $args['Wheres']['Type'] = 'Question';
-                $args['Wheres']['Announce'] ='All';
-                $this->discussionModel->SQL->beginWhereGroup()
-                    ->where('d.QnA', null)
-                    ->orWhereIn('d.QnA', ['Unanswered', 'Rejected'])
-                    ->endWhereGroup();
-                Gdn::controller()->title(t('Unanswered Questions'));
-            } elseif ($qnA = Gdn::request()->get('qna')) {
-                $args['Wheres']['QnA'] = $qnA;
-            }
+    /**
+     * Add where filter into count query
+     *
+     * @param DiscussionModel $sender Sending controller instance.
+     * @param array $args Event arguments.
+     */
+    public function discussionModel_beforeGetCount_handler($sender, $args) {
+        if (Gdn::controller()) {
+            $unanswered = Gdn::controller()->ClassName == 'DiscussionsController' && Gdn::controller()->RequestMethod == 'unanswered';
+            $this->discussionModelQnaFilter($unanswered, $args);
+        }
+    }
+
+    /**
+     * Qna filter where builder
+     *
+     * @param bool $unanswered Is this the unanswered filter page or a QnA filter args
+     * @param array $args query args
+     */
+    private function discussionModelQnaFilter(bool $unanswered = false, array $args = []) {
+        if ($unanswered) {
+            $args['Wheres']['Type'] = 'Question';
+            $args['Wheres']['Announce'] ='All';
+            $this->discussionModel->SQL->beginWhereGroup()
+                ->where('d.QnA', null)
+                ->orWhereIn('d.QnA', ['Unanswered', 'Rejected'])
+                ->endWhereGroup();
+            Gdn::controller()->title(t('Unanswered Questions'));
+        } elseif ($qnA = Gdn::request()->get('qna')) {
+            $args['Wheres']['QnA'] = $qnA;
         }
     }
 
@@ -966,40 +1003,9 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
      * @param array $args Event arguments.
      */
     public function discussionsController_beforeBuildPager_handler($sender, $args) {
-        if (Gdn::controller()->RequestMethod == 'unanswered') {
+        if (Gdn::controller()->RequestMethod == 'unanswered' || Gdn::request()->get('qna')) {
             $sender->setData('CountDiscussions', false);
         }
-    }
-
-    /**
-     * Return a limited count of unanswered questions.
-     *
-     * @return int
-     */
-    public function getUnansweredCount(): int {
-        // Me might have an alternate handler.
-        $eventManager = \Gdn::eventManager();
-        if ($eventManager->hasHandler('getAlternateUnansweredCount')) {
-            $questionCount = $eventManager->fireFilter(
-                'getAlternateUnansweredCount',
-                0,
-                $this->unansweredCountLimit
-            );
-            return $questionCount;
-        }
-
-        $cacheKey = 'QnA-UnansweredCount';
-        $questionCount = Gdn::cache()->get($cacheKey);
-
-        if ($questionCount === Gdn_Cache::CACHEOP_FAILURE) {
-            $questionCount = LegacyModelUtils::getLimitedCount($this->discussionModel, [
-                "Type" => "Question",
-                "QnA" => ["Unanswered", "Rejected"],
-            ], $this->unansweredCountLimit);
-            Gdn::cache()->store($cacheKey, $questionCount, [Gdn_Cache::FEATURE_EXPIRY => 15 * 60]);
-        }
-
-        return $questionCount;
     }
 
     /**
@@ -1041,7 +1047,10 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
      * @param array $args Event arguments.
      */
     public function discussionsController_unansweredCount_create($sender, $args) {
-        $count = $this->getUnansweredCount();
+        /** @var QnaModel $qnaModel */
+        $qnaModel = \Gdn::getContainer()->get(QnaModel::class);
+
+        $count = $qnaModel->getUnansweredCount($this->unansweredCountLimit);
         $count = $count < $this->unansweredCountLimit ? $count : $this->unansweredCountLimit . "+";
 
         $sender->setData('UnansweredCount', $count);
@@ -1158,6 +1167,17 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
 
         if ($sender->data('Discussion.QnA')) {
             $sender->CssClass .= ' Question';
+            $discussion = (array)$sender->data('Discussion');
+            // Limit up to 3 answers
+            /** @var int $limit */
+            $limit = Gdn::config('QnA.JsonLD.AnswersLimit', 3);
+            /** @var  array $answers */
+            $answers = array_slice($sender->data('Answers', []), 0, $limit, true);
+            // This data structure works only if we have accepted answer or rules that bring best answer(vote, score,...)
+            if ($answers) {
+                $QnAJsonLDItem = new QnAJsonLD($discussion, $answers, $this->formatService, $this->userModel);
+                $sender->Head->addJsonLDItem($QnAJsonLDItem);
+            }
         }
     }
 
@@ -1913,6 +1933,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
                     'QnA',
                     $qna ? $qna : 'Unanswered'
                 );
+                $this->recalculateDiscussionQnA($discussion);
                 break;
             default:
                 $this->discussionModel->setField($discussionID, 'QnA', null);

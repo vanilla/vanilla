@@ -13,6 +13,9 @@ export interface AutoCompleteClassesProps {
 
 export const autoCompleteClasses = ({ size = "default" }: AutoCompleteClassesProps) => ({
     arrowButton: css({}),
+    reachCombobox: css({
+        width: "100%",
+    }),
     inputContainer: css({
         position: "relative",
     }),
@@ -30,6 +33,34 @@ export const autoCompleteClasses = ({ size = "default" }: AutoCompleteClassesPro
             small: { padding: "0 8px" },
             default: { padding: "0 12px" },
         }[size],
+    }),
+    inputTokens: css({
+        display: "flex",
+        pointerEvents: "none",
+        flexDirection: "row",
+        position: "absolute",
+        top: 0,
+        left: 0,
+        bottom: 0,
+        flexWrap: "wrap",
+        ...{
+            small: {
+                height: 28,
+            },
+            default: {
+                height: 36,
+            },
+        }[size],
+    }),
+    inputTokenTag: css({
+        display: "flex",
+        ...{
+            small: { margin: 4, maxHeight: 20, paddingLeft: 6, fontSize: "13px" },
+            default: { margin: 5, maxHeight: 26, paddingLeft: 8, fontSize: "16px" },
+        }[size],
+        backgroundColor: "#eeefef",
+        borderRadius: 2,
+        alignItems: "center",
     }),
     popover: css({
         "&[data-reach-combobox-popover]": {
@@ -83,6 +114,13 @@ export const autoCompleteClasses = ({ size = "default" }: AutoCompleteClassesPro
         display: "flex",
         pointerEvents: "auto",
         cursor: "pointer",
+    }),
+    autoCompleteClose: css({
+        ...{
+            small: { height: 8, with: 8 },
+            default: { height: 10, width: 10 },
+        }[size],
+        alignSelf: "center",
     }),
     input: css({
         cursor: "default",

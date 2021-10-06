@@ -38,7 +38,7 @@ abstract class AbstractCommunitySearchTests extends AbstractSearchTest {
      * @param ConfigurationInterface $config
      */
     public static function applyConfigurationBeforeSetup(ConfigurationInterface $config) {
-        $config->saveToConfig('Vanilla.EnableCategoryFollowing', '1');
+        $config->saveToConfig(\CategoryModel::CONF_CATEGORY_FOLLOWING, '1');
     }
 
     /**

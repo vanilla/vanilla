@@ -24,7 +24,7 @@ class SystemTokenUtils {
 
     public const CLAIM_REQUEST_QUERY = "query";
 
-    public const TOKEN_TTL = 30;
+    public const TOKEN_TTL = 60 * 5;
 
     /** @var string */
     private $secret;

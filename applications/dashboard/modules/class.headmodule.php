@@ -8,6 +8,8 @@
  * @since 2.0
  */
 
+use Vanilla\Web\AbstractJsonLDItem;
+
 /**
  * Manages collections of items to be placed between the <HEAD> tags of the
  * page.
@@ -55,6 +57,9 @@ class HeadModule extends Gdn_Module {
 
     /** @var Garden\EventManager */
     protected $eventManager;
+
+    /** @var AbstractJsonLDItem */
+    private $jsonLDItems = [];
 
     /**
      * HeadModule constructor.
@@ -527,6 +532,10 @@ class HeadModule extends Gdn_Module {
             $this->addTag('script', ['type' => 'application/ld+json'], json_encode($this->jsonLD));
         }
 
+        if ($this->jsonLDItems) {
+            $this->addTag('script', ['type' => 'application/ld+json'], $this->getJsonLDScriptContent());
+        }
+
         $this->fireEvent('BeforeToString');
 
         // Make sure that css loads before js (for jquery)
@@ -638,10 +647,43 @@ class HeadModule extends Gdn_Module {
      * @param string $context Metadata schema context.
      * @return array
      * @link https://json-ld.org
+     * @deprecated Use addJsonLDItem instead.
      */
     public function setJsonLD(string $type, array $data, string $context = 'https://schema.org'): array {
         $data['@context'] = $context;
         $data['@type'] = $type;
         return $this->jsonLD = $data;
+    }
+
+    /**
+     * Add JSON LD item.
+     *
+     * @param AbstractJsonLDItem $item
+     * @link https://json-ld.org
+     */
+    public function addJsonLDItem(AbstractJsonLDItem $item): void {
+        $this->jsonLDItems[] = $item;
+    }
+
+    /**
+     * @return AbstractJsonLDItem
+     */
+    public function getJsonLDItems() {
+        return $this->jsonLDItems;
+    }
+
+    /**
+     * Get the content of the page's JSON-LD script.
+     *
+     * @see PageHead::getJsonLDScriptContent()
+     * @return string
+     */
+    private function getJsonLDScriptContent(): string {
+        $data = [
+            '@context' => "https://schema.org",
+            "@graph" => $this->jsonLDItems,
+        ];
+
+        return json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
 }

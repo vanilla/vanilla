@@ -162,6 +162,17 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
     }
 
     /**
+     * Get a fully serialized version of the data.
+     *
+     * Primarily useful for making assertions about the data as it would come out of the API.
+     *
+     * @return mixed
+     */
+    public function getSerializedData() {
+        return json_decode(json_encode($this), true);
+    }
+
+    /**
      * Get a header value.
      *
      * @param string $name The name of the header.

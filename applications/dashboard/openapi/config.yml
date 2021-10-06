@@ -144,6 +144,15 @@ components:
                     x-key: Feature.NewQuickLinks.Enabled
                     x-read: public
                     x-write: site.manage
+                "labs.newPostMenu":
+                    description: |
+                      Enable the new post menu UI on older themes.
+                    type: boolean
+                    default: false
+                    example: true
+                    x-key: Feature.NewPostMenu.Enabled
+                    x-read: public
+                    x-write: site.manage
                 "discussions.layout":
                     description: |
                         Choose the preferred layout for lists of discussions.
@@ -182,3 +191,10 @@ components:
                     x-key: Routes.DefaultController
                     x-read: public
                     x-write: site.manage
+                "vanilla.siteID":
+                  description: |
+                    The community siteID.
+                  type: number
+                  default: 0
+                  x-key: Vanilla.SiteID
+                  x-read: public

@@ -19,70 +19,63 @@ import ButtonLoader from "@library/loaders/ButtonLoader";
 import { Tabs } from "@library/sectioning/Tabs";
 import { siteUrl } from "@library/utility/appUtils";
 import { useUniqueID } from "@library/utility/idUtils";
-import { useAuthenticatorForm } from "@oauth2/AuthenticatorHooks";
-import { IAuthenticationRequestPrompt, IAuthenticator, IAuthenticatorFormState } from "@oauth2/AuthenticatorTypes";
+import { useEditAuthenticator } from "@oauth2/AuthenticatorHooks";
+import { IAuthenticationRequestPrompt, IAuthenticator } from "@oauth2/AuthenticatorTypes";
 import { t } from "@vanilla/i18n";
 import * as React from "react";
 import { useParams } from "react-router";
 import { DashboardSelect } from "@dashboard/forms/DashboardSelect";
-import Loader from "@library/loaders/Loader";
-import { IFieldError, LoadStatus } from "@library/@types/api/core";
-import ErrorMessages from "@library/forms/ErrorMessages";
+import { IFieldError, IServerError } from "@library/@types/api/core";
 import get from "lodash/get";
 import set from "lodash/set";
-import flatten from "lodash/flatten";
-import { useAuthenticatorActions } from "@oauth2/AuthenticatorActions";
-import { useHistory } from "react-router-dom";
+
 import produce from "immer";
 import { authenticatorAddEditClasses } from "@oauth2/pages/AuthenticatorAddEdit.styles";
+import { useFormik } from "formik";
+import { unwrapResult } from "@reduxjs/toolkit";
+import { useState } from "react";
+import flatten from "lodash/flatten";
+import ErrorMessages from "@library/forms/ErrorMessages";
+import Message from "@library/messages/Message";
+import { ErrorIcon } from "@library/icons/common";
 
 interface IProps {
     authenticatorID: number | undefined;
     onClose: () => void;
 }
 
-interface ITabContentsProps {
-    form: IAuthenticatorFormState;
-    update: (data: Partial<IAuthenticator>) => void;
-    fieldsError?: {
-        [key: string]: IFieldError[];
-    };
-}
-
 export default function OAuth2AddEdit(props: IProps) {
     const classes = authenticatorAddEditClasses();
     const params = useParams<{ authenticatorID?: string }>();
+    const { onClose } = props;
     const authenticatorID =
         props.authenticatorID || (params.authenticatorID ? parseInt(params.authenticatorID) : undefined);
-    const { form, update, save, fieldsError } = useAuthenticatorForm(authenticatorID);
-    const isEditing = !!authenticatorID;
+
     const titleID = useUniqueID("Oauth2Connection");
-    const isLoading = false;
-    const { clearForm } = useAuthenticatorActions();
 
-    const onClose = () => {
-        clearForm();
-        props.onClose();
-    };
+    const { initialValues, submitForm } = useEditAuthenticator(authenticatorID);
+    const [formErrors, setFormErrors] = useState<IServerError | undefined>(undefined);
 
-    if (isLoading || (isEditing && form.status !== LoadStatus.SUCCESS)) {
-        return (
-            <div style={{ height: 400 }}>
-                <Loader />
-            </div>
-        );
+    const { handleSubmit, values, isSubmitting, setValues } = useFormik<IAuthenticator>({
+        initialValues,
+        enableReinitialize: true,
+        onSubmit: async function (values) {
+            try {
+                const response = await submitForm(values);
+                unwrapResult(response);
+                onClose();
+            } catch (error) {
+                setFormErrors(error);
+            }
+        },
+    });
+
+    function update(updatedValues: Partial<IAuthenticator>) {
+        setValues({ ...values, ...updatedValues });
     }
 
     return (
-        <form
-            onSubmit={async (event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                await save();
-                clearForm();
-                onClose();
-            }}
-        >
+        <form onSubmit={handleSubmit}>
             <Frame
                 header={
                     <FrameHeader
@@ -101,14 +94,24 @@ export default function OAuth2AddEdit(props: IProps) {
                                 label: "OAuth Settings",
                                 panelData: "",
                                 contents: (
-                                    <OAuth2AddEditSettings form={form} fieldsError={fieldsError} update={update} />
+                                    <OAuth2AddEditSettings
+                                        values={values}
+                                        formErrors={formErrors}
+                                        fieldErrors={formErrors?.errors}
+                                        update={update}
+                                    />
                                 ),
                             },
                             {
                                 label: "General SSO Settings",
                                 panelData: "",
                                 contents: (
-                                    <AuthenticatorUserMappings form={form} fieldsError={fieldsError} update={update} />
+                                    <AuthenticatorUserMappings
+                                        values={values}
+                                        formErrors={formErrors}
+                                        fieldErrors={formErrors?.errors}
+                                        update={update}
+                                    />
                                 ),
                             },
                         ]}
@@ -116,8 +119,8 @@ export default function OAuth2AddEdit(props: IProps) {
                 }
                 footer={
                     <div className="Buttons form-footer padded-right">
-                        <Button submit={true} buttonType={ButtonTypes.DASHBOARD_PRIMARY} disabled={isLoading}>
-                            {isLoading ? <ButtonLoader /> : t("Save")}
+                        <Button submit buttonType={ButtonTypes.DASHBOARD_PRIMARY} disabled={isSubmitting}>
+                            {isSubmitting ? <ButtonLoader /> : t("Save")}
                         </Button>
                     </div>
                 }
@@ -126,8 +129,17 @@ export default function OAuth2AddEdit(props: IProps) {
     );
 }
 
-export function OAuth2AddEditSettings(props: ITabContentsProps) {
-    const { form, update, fieldsError } = props;
+interface ITabContentsProps {
+    values: IAuthenticator;
+    update: (data: Partial<IAuthenticator>) => void;
+    formErrors?: IServerError;
+    fieldErrors?: {
+        [K in keyof IAuthenticator]?: IFieldError[];
+    };
+}
+
+function OAuth2AddEditSettings(props: ITabContentsProps) {
+    const { values, update, formErrors, fieldErrors } = props;
     const callbackUrl = siteUrl("/entry/oauth2");
     const descriptionString = (
         <Translate
@@ -141,10 +153,10 @@ export function OAuth2AddEditSettings(props: ITabContentsProps) {
     const promptOptions = Object.entries(IAuthenticationRequestPrompt).map(([value, label]) => ({ label, value }));
 
     const makeInputProps = (path: string, deleteWhenEmpty = false) => ({
-        value: get(form.data, path) || "",
+        value: get(values, path) || "",
         onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
             const { value } = event.target;
-            const data = produce(form.data, (state) => {
+            const data = produce(values, (state) => {
                 if (value !== "" || !deleteWhenEmpty) {
                     set(state, path, value);
                 } else {
@@ -158,28 +170,32 @@ export function OAuth2AddEditSettings(props: ITabContentsProps) {
     return (
         <div className="padded-left padded-right">
             <div className="padded-bottom padded-top">
-                {form.error && typeof fieldsError === undefined && <ErrorMessages errors={flatten([form.error])} />}
                 <Paragraph>{descriptionString}</Paragraph>
             </div>
+            {!!formErrors?.message && (
+                <div className="padded-bottom padded-top">
+                    <Message icon={<ErrorIcon />} stringContents={formErrors.message} />
+                </div>
+            )}
             <DashboardFormSubheading>{t("OAuth Configuration")}</DashboardFormSubheading>
             <DashboardFormGroup label={t("Client ID")} description={t("Unique ID of the authentication application.")}>
-                <DashboardInput errors={fieldsError?.["clientID"]} inputProps={makeInputProps("clientID")} />
+                <DashboardInput errors={fieldErrors?.["clientID"]} inputProps={makeInputProps("clientID")} />
             </DashboardFormGroup>
             <DashboardFormGroup
                 label={t("Name")}
                 description={t("The name of the connection. This is displayed on some pages.")}
             >
-                <DashboardInput errors={fieldsError?.["name"]} inputProps={makeInputProps("name")} />
+                <DashboardInput errors={fieldErrors?.["name"]} inputProps={makeInputProps("name")} />
             </DashboardFormGroup>
             <DashboardFormGroup label={t("Secret")} description={t("Secret provided by the authentication provider.")}>
-                <DashboardInput errors={fieldsError?.["secret"]} inputProps={makeInputProps("secret")} />
+                <DashboardInput errors={fieldErrors?.["secret"]} inputProps={makeInputProps("secret")} />
             </DashboardFormGroup>
             <DashboardFormGroup
                 label={t("Authorize URL")}
                 description={t("URL where users sign-in with the authentication provider.")}
             >
                 <DashboardInput
-                    errors={fieldsError?.["authorizeUrl"]}
+                    errors={fieldErrors?.["authorizeUrl"]}
                     inputProps={makeInputProps("urls.authorizeUrl", true)}
                 />
             </DashboardFormGroup>
@@ -187,11 +203,11 @@ export function OAuth2AddEditSettings(props: ITabContentsProps) {
                 label={t("Token URL")}
                 description={t("Endpoint to retrieve the access token for a user.")}
             >
-                <DashboardInput errors={fieldsError?.["tokenUrl"]} inputProps={makeInputProps("urls.tokenUrl", true)} />
+                <DashboardInput errors={fieldErrors?.["tokenUrl"]} inputProps={makeInputProps("urls.tokenUrl", true)} />
             </DashboardFormGroup>
             <DashboardFormGroup label={t("Profile URL")} description={t("Endpoint to retrieve a user's profile.")}>
                 <DashboardInput
-                    errors={fieldsError?.["profileUrl"]}
+                    errors={fieldErrors?.["profileUrl"]}
                     inputProps={makeInputProps("urls.profileUrl", true)}
                 />
             </DashboardFormGroup>
@@ -210,7 +226,7 @@ export function OAuth2AddEditSettings(props: ITabContentsProps) {
                 description={t("Enter the scope to be sent with token requests.")}
             >
                 <DashboardInput
-                    errors={fieldsError?.["scope"]}
+                    errors={fieldErrors?.["scope"]}
                     inputProps={makeInputProps("authenticationRequest.scope")}
                 />
             </DashboardFormGroup>
@@ -218,7 +234,7 @@ export function OAuth2AddEditSettings(props: ITabContentsProps) {
                 <DashboardSelect
                     options={promptOptions}
                     value={promptOptions.find((option: { label: string; value: string }) => {
-                        return option.label === form.data.authenticationRequest.prompt;
+                        return option.label === values.authenticationRequest.prompt;
                     })}
                     onChange={(option) => {
                         update({
@@ -245,7 +261,7 @@ export function OAuth2AddEditSettings(props: ITabContentsProps) {
                     onChange={(isToggled) => {
                         update({ useBearerToken: isToggled });
                     }}
-                    checked={form.data.useBearerToken || false}
+                    checked={values.useBearerToken || false}
                 ></DashboardToggle>
             </DashboardFormGroup>
             <DashboardFormGroup
@@ -257,21 +273,21 @@ export function OAuth2AddEditSettings(props: ITabContentsProps) {
                     onChange={(isToggled) => {
                         update({ allowAccessTokens: isToggled });
                     }}
-                    checked={form.data.allowAccessTokens || false}
+                    checked={values.allowAccessTokens || false}
                 ></DashboardToggle>
             </DashboardFormGroup>
         </div>
     );
 }
 
-export function AuthenticatorUserMappings(props: ITabContentsProps) {
-    const { form, update, fieldsError } = props;
+function AuthenticatorUserMappings(props: ITabContentsProps) {
+    const { values, update, fieldErrors } = props;
 
     const makeInputProps = (path: string) => ({
-        value: get(form.data, path) || "",
+        value: get(values, path) || "",
         onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
             const { value } = event.target;
-            const data = produce(form.data, (state) => {
+            const data = produce(values, (state) => {
                 set(state, path, value);
             });
             update(data);
@@ -283,12 +299,12 @@ export function AuthenticatorUserMappings(props: ITabContentsProps) {
             <DashboardFormSubheading>{t("User Mapping")}</DashboardFormSubheading>
             <DashboardFormGroup label={t("User ID")} description={t("The key in the JSON array to designate user ID.")}>
                 <DashboardInput
-                    errors={fieldsError?.["uniqueID"]}
+                    errors={fieldErrors?.["uniqueID"]}
                     inputProps={makeInputProps("userMappings.uniqueID")}
                 />
             </DashboardFormGroup>
             <DashboardFormGroup label={t("Email")} description={t("The key in the JSON array to designate emails.")}>
-                <DashboardInput errors={fieldsError?.["email"]} inputProps={makeInputProps("userMappings.email")} />
+                <DashboardInput errors={fieldErrors?.["email"]} inputProps={makeInputProps("userMappings.email")} />
             </DashboardFormGroup>
             <DashboardFormGroup
                 label={t("Display Name")}
@@ -318,7 +334,7 @@ export function AuthenticatorUserMappings(props: ITabContentsProps) {
                     onChange={(isToggled) => {
                         update({ visible: isToggled });
                     }}
-                    checked={form.data.visible || false}
+                    checked={values.visible || false}
                 ></DashboardToggle>
             </DashboardFormGroup>
             <DashboardFormGroup
@@ -330,7 +346,7 @@ export function AuthenticatorUserMappings(props: ITabContentsProps) {
                     onChange={(isToggled) => {
                         update({ default: isToggled });
                     }}
-                    checked={form.data.default || false}
+                    checked={values.default || false}
                 ></DashboardToggle>
             </DashboardFormGroup>
         </div>

@@ -72,7 +72,7 @@ class ExternalLinksProcessor extends HtmlProcessor {
                     $leavingHref = $this->request->url("/home/leaving?" . http_build_query([
                         "allowTrusted" => 1,
                         "target" => $rawHref,
-                    ]));
+                    ]), true);
                     $this->setAttribute($linkNode, 'href', $leavingHref);
                 }
             }

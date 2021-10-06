@@ -683,9 +683,13 @@ class PocketsPlugin extends Gdn_Plugin {
             $controller = Gdn::controller();
         }
 
-        if ($controller->deliveryMethod() != DELIVERY_METHOD_XHTML) {
+        //if we are in unauthorized page, homecontroller will render error page, so no pockets on error page
+        $isOnUnauthorizedPage = $controller instanceof HomeController && $controller->RequestMethod === "unauthorized";
+
+        if ($controller->deliveryMethod() != DELIVERY_METHOD_XHTML || $isOnUnauthorizedPage) {
             return;
         }
+
         if ($controller->data('_NoMessages') && $location != 'Head' && $location !== 'AfterBanner') {
             return;
         }

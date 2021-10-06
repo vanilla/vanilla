@@ -101,13 +101,9 @@ paths:
           in: query
           schema:
             type: string
+          x-addon: reactions
+      x-addon: vanilla
 components:
-  parameters:
-    UserExpand:
-      schema:
-        items:
-          enum:
-            - reactionsReceived
   schemas:
     ReactionType:
       properties:

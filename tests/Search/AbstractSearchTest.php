@@ -130,26 +130,7 @@ abstract class AbstractSearchTest extends AbstractAPIv2Test {
         $this->assertEquals(200, $response->getStatusCode());
 
         $results = $response->getBody();
-
-        foreach ($expectedFields as $expectedField => $expectedValues) {
-            if ($expectedValues === null) {
-                foreach ($results as $result) {
-                    $this->assertArrayNotHasKey($expectedField, $result);
-                }
-            } else {
-                $actualValues = array_column($results, $expectedField);
-                if (!$strictOrder) {
-                    sort($actualValues);
-                    sort($expectedValues);
-                }
-
-                $this->assertEquals($expectedValues, $actualValues);
-            }
-        }
-
-        if (is_int($count)) {
-            $this->assertEquals($count, count($results));
-        }
+        $this->assertRowsLike($expectedFields, $results, $strictOrder, $count);
     }
 
     /**

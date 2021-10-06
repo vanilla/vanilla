@@ -671,10 +671,10 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     public function userModel_beforeSaveValidation_handler(\UserModel $sender, array $args) {
         $allowedFields = $this->getProfileFields();
         foreach ($allowedFields as $key => $value) {
-            $checkField = isset($args['FormPostValues'][$key]) && isset($value['Required']);
-            $invalid = $checkField && $value['Required'] == 1 && trim($args['FormPostValues'][$key]) === "";
+            $checkField = array_key_exists($value['Name'], $args['FormPostValues']) && isset($value['Required']);
+            $invalid = $checkField && $value['Required'] == 1 && trim($args['FormPostValues'][$value['Name']]) === "";
             if ($invalid) {
-                $sender->Validation->addValidationResult($key, sprintf(t('%s is required.'), $key));
+                $sender->Validation->addValidationResult($key, sprintf(t('%s is required.'), $value['Label']));
             }
         }
     }
@@ -1053,10 +1053,24 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     public function filterOpenApi(array &$openApi): void {
         $schema = $this->getProfileSchema('out');
 
+        // Add the extended fields schema to openapi.
         \Vanilla\Utility\ArrayUtils::setByPath(
             'components.schemas.ExtendedUserFields.properties',
             $openApi,
             $schema->jsonSerialize()['properties']
+        );
+
+        // Add the 'extended' option to the user expand options enum.
+        $userExpandEnum = \Vanilla\Utility\ArrayUtils::getByPath(
+            'components.parameters.UserExpand.schema.items.enum',
+            $openApi,
+            []
+        );
+        $userExpandEnum[] = 'extended';
+        \Vanilla\Utility\ArrayUtils::setByPath(
+            'components.parameters.UserExpand.schema.items.enum',
+            $openApi,
+            $userExpandEnum
         );
     }
 }

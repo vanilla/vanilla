@@ -7,6 +7,7 @@
 import { css } from "@emotion/css";
 import { listItemVariables } from "@library/lists/ListItem.variables";
 import { metasVariables } from "@library/metas/Metas.variables";
+import { tabBrowseClasses } from "@library/sectioning/tabStyles";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { Mixins } from "@library/styles/Mixins";
@@ -17,6 +18,12 @@ import { useThemeCache } from "@library/styles/themeCache";
 export const listItemClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = listItemVariables();
+
+    const listInTab = css({
+        ".tabContent &": {
+            marginTop: 12,
+        },
+    });
 
     const item = css({
         display: "flex",
@@ -57,7 +64,19 @@ export const listItemClasses = useThemeCache(() => {
     });
 
     const iconContainer = css({
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
         marginRight: globalVars.spacer.componentInner,
+    });
+
+    const checkboxContainer = css({
+        marginRight: "8px",
+    });
+    const checkboxLabelAdjustment = css({
+        "& > label": {
+            paddingTop: "2px",
+        },
     });
 
     const metasContainer = css({});
@@ -115,9 +134,12 @@ export const listItemClasses = useThemeCache(() => {
     });
 
     return {
+        listInTab,
         item,
         contentContainer,
         iconContainer,
+        checkboxContainer,
+        checkboxLabelAdjustment,
         inlineIconAndMetasContainer,
         inlineIconContainer,
         metasContainer,

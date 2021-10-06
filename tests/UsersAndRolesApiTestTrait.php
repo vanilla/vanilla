@@ -9,6 +9,8 @@ namespace VanillaTests;
 
 use Garden\Http\HttpRequest;
 use Garden\Http\HttpResponse;
+use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\TestCase;
 use Vanilla\Http\InternalClient;
 
 /**
@@ -49,13 +51,15 @@ trait UsersAndRolesApiTestTrait {
         $user = $this->createUser([
             'roleID' => [$this->lastRoleID],
         ]) ?? [];
-        $result = $this->runWithUser($callback, $user);
-
-        $id = $user['userID'] ?? $this->lastUserID;
-        // Cleanup.
-        $this->api()->deleteWithBody("/users/{$id}");
-        $this->api()->delete("/roles/{$role['roleID']}");
-        return $result;
+        try {
+            $result = $this->runWithUser($callback, $user);
+            return $result;
+        } finally {
+            $id = $user['userID'] ?? $this->lastUserID;
+            // Cleanup.
+            $this->api()->deleteWithBody("/users/{$id}");
+            $this->api()->delete("/roles/{$role['roleID']}");
+        }
     }
 
     /**
@@ -186,9 +190,12 @@ trait UsersAndRolesApiTestTrait {
      * Create a role.
      *
      * @param array $overrides
+     * @param array $globalPermissions
+     * @param array[] $otherPermissions
+     *
      * @return array
      */
-    public function createRole(array $overrides = []): array {
+    public function createRole(array $overrides = [], array $globalPermissions = [], array ...$otherPermissions): array {
         $salt = '-' . round(microtime(true) * 1000) . rand(1, 1000);
 
         $body = $overrides + [
@@ -196,13 +203,13 @@ trait UsersAndRolesApiTestTrait {
             "deletable" => true,
             "description" => "A custom role.",
             "name" => "role$salt",
-            "permissions" => [
+            "permissions" => array_merge([
                 [
                     "id" => 0,
-                    "permissions" => [],
+                    "permissions" => $globalPermissions,
                     "type" => "global"
-                ]
-            ],
+                ],
+            ], $otherPermissions),
             "personalInfo" => true,
             "type" => "member",
         ];
@@ -210,5 +217,18 @@ trait UsersAndRolesApiTestTrait {
         $result = $this->api()->post('/roles', $body)->getBody();
         $this->lastRoleID = $result['roleID'];
         return $result;
+    }
+
+    /**
+     * Assert that a user record has a particular value.
+     *
+     * @param string $field The field name.
+     * @param mixed $expected the expected value.
+     * @param int|null $userID The userID. Defaults to sessioned user.
+     */
+    public function assertUserField(string $field, $expected, int $userID = null) {
+        $userID = $userID ?? \Gdn::session()->UserID;
+        $user = \Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
+        $this->assertEquals($expected, $user[$field]);
     }
 }

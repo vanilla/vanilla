@@ -1,3 +1,9 @@
+/**
+ * @author Adam Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2021 Vanilla Forums Inc.
+ * @license gpl-2.0-only
+ */
+
 import React, { useState } from "react";
 import { Tabs as ReachTabs, TabList, Tab, TabPanels, TabPanel } from "@reach/tabs";
 import { tabStandardClasses, tabBrowseClasses, tabGroupClasses } from "@library/sectioning/tabStyles";
@@ -8,6 +14,7 @@ import { iconClasses } from "@library/icons/iconStyles";
 import { TabsTypes } from "@library/sectioning/TabsTypes";
 import { DomNodeAttacher } from "@vanilla/react-utils";
 import { cx } from "@emotion/css";
+import { WidgetLayout } from "@library/layout/WidgetLayout";
 
 export interface ITabData {
     tabID?: string | number;
@@ -19,7 +26,7 @@ export interface ITabData {
     disabled?: boolean;
     [extra: string]: any;
 }
-interface IProps {
+export interface ITabsProps {
     data: ITabData[];
     tabType?: TabsTypes;
     largeTabs?: boolean;
@@ -34,7 +41,11 @@ interface IProps {
     tabPanelClasses?: string;
 }
 
-export function Tabs(props: IProps) {
+function PassThruKludge(props: any) {
+    return <>{props.children}</>;
+}
+
+export function Tabs(props: ITabsProps) {
     const {
         data,
         tabType,
@@ -51,6 +62,9 @@ export function Tabs(props: IProps) {
         [TabsTypes.GROUP, tabGroupClasses()],
     ]);
     const classes = tabType && classVariants.get(tabType) ? classVariants.get(tabType) : tabStandardClasses();
+
+    // Need "disabled" applied as a prop on the top level element so it isn't recognized as a tab.
+    const FragmentKludge = React.Fragment as any;
 
     return (
         <ReachTabs
@@ -94,14 +108,20 @@ export function Tabs(props: IProps) {
                         </Tab>
                     );
                 })}
-                {props.extraButtons && <div className={classes?.extraButtons}>{props.extraButtons}</div>}
+                {/* Need to have "disabled" given to make sure this isn't parsed as a tab. */}
+                <PassThruKludge disabled>
+                    {props.extraButtons ? <div className={classes?.extraButtons}>{props.extraButtons}</div> : null}
+                </PassThruKludge>
             </TabList>
-            <TabPanels className={cx(classes?.tabPanels, tabPanelClasses)}>
+            <TabPanels className={cx(classes?.tabPanels, tabPanelClasses, "tabContent")}>
                 {data.map((tab, index) => {
                     return (
                         <TabPanel className={classes?.panel({ includeVerticalPadding })} key={index}>
-                            {tab.contents && tab.contents}
-                            {tab.contentNodes && <DomNodeAttacher nodes={tab.contentNodes} />}
+                            {/* Make sure widgets don't have their vertical padding */}
+                            <WidgetLayout widgetClass="" widgetWithContainerClass="">
+                                {tab.contents && tab.contents}
+                                {tab.contentNodes && <DomNodeAttacher nodes={tab.contentNodes} />}
+                            </WidgetLayout>
                         </TabPanel>
                     );
                 })}

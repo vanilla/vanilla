@@ -26,7 +26,7 @@ export function EditorEmbedBar(props: IProps) {
     if (!quill) {
         return null;
     }
-    const mimeTypes = getMeta("upload.allowedExtensions");
+    const mimeTypes = getMeta("upload.allowedExtensions", []);
     const classesRichEditor = richEditorClasses(legacyMode);
     const uploadEnabled = props.uploadEnabled ?? true;
     return (

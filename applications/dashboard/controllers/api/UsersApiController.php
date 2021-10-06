@@ -704,16 +704,16 @@ class UsersApiController extends AbstractApiController {
     /**
      * Set a new photo on a user.
      *
-     * @param $id A valid user ID.
+     * @param ?int $id A valid user ID.
      * @param array $body The request body.
-     * @throws ClientException if the image provided is not supported.
+     * @param \Garden\Web\RequestInterface|null $request
      * @return array
      */
-    public function post_photo($id = null, array $body) {
+    public function post_photo($id = null, array $body = [], \Garden\Web\RequestInterface $request = null) {
         $this->permission('Garden.SignIn.Allow');
 
         $photoUploadSchema = new UploadedFileSchema([
-            'allowedExtensions' => array_values(ImageResizer::getTypeExt())
+            'allowedExtensions' => ImageResizer::getAllExtensions()
         ]);
 
         $in = $this->schema([
@@ -730,7 +730,9 @@ class UsersApiController extends AbstractApiController {
         if ($id !== $this->getSession()->UserID) {
             $this->permission('Garden.Users.Edit');
         }
-
+        if ($request !== null) {
+            UploadedFileSchema::validateUploadSanity($body, 'photo', $request);
+        }
         $body = $in->validate($body);
 
         $photo = $this->processPhoto($body['photo']);
@@ -928,7 +930,7 @@ class UsersApiController extends AbstractApiController {
      * Process a user photo upload.
      *
      * @param UploadedFile $photo
-     * @throws Exception if there was an error encountered when saving the upload.
+     * @throws Exception If there was an error encountered when saving the upload.
      * @return string
      */
     private function processPhoto(UploadedFile $photo) {
@@ -946,10 +948,10 @@ class UsersApiController extends AbstractApiController {
         $destination = $photo->generatePersistedUploadPath(ProfileController::AVATAR_FOLDER);
 
         // Resize/crop the photo, then save it. Save by copying so upload can be used again for the thumbnail.
-        $this->savePhoto($photo, $size, 'p', true);
+        $this->savePhoto($photo, $size, changeBasename($destination, 'p%s'), true);
 
         // Resize and save the thumbnail.
-        $this->savePhoto($photo, $thumbSize, 'n');
+        $this->savePhoto($photo, $thumbSize, changeBasename($destination, 'n%s'), false);
 
         return $destination;
     }
@@ -959,13 +961,12 @@ class UsersApiController extends AbstractApiController {
      *
      * @param UploadedFile $upload An instance of an uploaded file.
      * @param int $size Maximum size, in pixels, for the photo.
-     * @param string $prefix An optional prefix (e.g. p for full-size or n for thumbnail).
+     * @param string $destination
      * @param bool $copy Should the upload be saved by copying, instead of moving?
      */
-    private function savePhoto(UploadedFile $upload, $size, $prefix = '', $copy = false) {
-        $upload->setImageConstraints(
-            ['crop' => true, 'height' => $size, 'width' => $size]
-        )->persistUpload($copy, ProfileController::AVATAR_FOLDER, "{$prefix}%s");
+    private function savePhoto(UploadedFile $upload, int $size, string $destination = ProfileController::AVATAR_FOLDER, bool $copy = false) {
+        $upload->setImageConstraints(['crop' => true, 'height' => $size, 'width' => $size]);
+        $upload->persistUploadToPath($copy, $destination);
     }
 
     /**
@@ -1053,8 +1054,8 @@ class UsersApiController extends AbstractApiController {
                 'sortName?',
                 'email:s?',
                 'photoUrl:s?',
+                'profilePhotoUrl:s?',
                 'url:s?',
-                'roles:a?',
                 'dateInserted?',
                 'dateLastActive:dt?',
                 'countDiscussions?',

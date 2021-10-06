@@ -97,4 +97,13 @@ class DataSetTest extends BootstrapTestCase {
 
         $this->assertEquals([['testValue1' => 84, 'testValue2' => 26]], $result);
     }
+
+    /**
+     * Test fetching a column from a dataset.
+     */
+    public function testColumn() {
+        $ds = new Gdn_DataSet([['foo' => 123, 'bar' => 'baz'], ['foo' => 345, 'bar' => 'sme']]);
+        $this->assertEquals([123, 345], $ds->column('foo'));
+        $this->assertEquals(['baz', 'sme'], $ds->column('bar'));
+    }
 }

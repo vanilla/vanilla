@@ -22,6 +22,9 @@
  * @package Addons
  */
 
+use Twig\Cache\CacheInterface;
+use Vanilla\Cache\CacheCacheAdapter;
+use Vanilla\Formatting\Formats\HtmlFormat;
 use \Vanilla\Formatting\FormatService;
 
 class SignaturesPlugin extends Gdn_Plugin {
@@ -39,6 +42,9 @@ class SignaturesPlugin extends Gdn_Plugin {
     /** @var array List of config settings can be overridden by sessions in other plugins */
     private $overriddenConfigSettings = ['MaxNumberImages', 'MaxLength'];
 
+    /** @var CacheInterface */
+    private $dirtyCache;
+
     /**
      * SignaturesPlugin constructor.
      * @param FormatService $formatService
@@ -46,6 +52,9 @@ class SignaturesPlugin extends Gdn_Plugin {
     public function __construct(FormatService $formatService) {
         parent::__construct();
         $this->formatService = $formatService;
+
+        // Explicitly not dependency injected. This is used to replace some static state.
+        $this->dirtyCache = new CacheCacheAdapter(new Gdn_Dirtycache());
     }
 
     /**
@@ -129,7 +138,7 @@ class SignaturesPlugin extends Gdn_Plugin {
             $args = array_slice($args, 0, 2);
         }
 
-        list($userReference, $username) = $args;
+        [$userReference, $username] = $args;
 
         $canEditSignatures = checkPermission('Plugins.Signatures.Edit');
 
@@ -210,6 +219,7 @@ class SignaturesPlugin extends Gdn_Plugin {
 
                         $this->setUserMeta($sigUserID, $key, $userMetaValue);
                     }
+                    $this->dirtyCache->clear();
                     $sender->informMessage(t("Your changes have been saved."));
                 }
             }
@@ -452,10 +462,10 @@ class SignaturesPlugin extends Gdn_Plugin {
      * @return array|bool|mixed|null
      */
     protected function userPreferences($sigKey = null, $default = null) {
-        static $userSigData = null;
-        if (is_null($userSigData)) {
+        $userSigData = $this->dirtyCache->get('userSigData', null);
+        if ($userSigData === null) {
             $userSigData = $this->getUserMeta(Gdn::session()->UserID, '%');
-
+            $this->dirtyCache->set('userSigData', $userSigData);
         }
 
         if (!is_null($sigKey)) {
@@ -475,7 +485,7 @@ class SignaturesPlugin extends Gdn_Plugin {
      * @return array|bool|mixed|null
      */
     protected function signatures($sender, $requestUserID = null, $default = null) {
-        static $signatures = null;
+        $signatures = $this->dirtyCache->get('signatures', null);
 
         if (is_null($signatures)) {
             $signatures = [];
@@ -517,7 +527,7 @@ class SignaturesPlugin extends Gdn_Plugin {
                     }
                 }
             }
-
+            $this->dirtyCache->set('signatures', $signatures);
         }
 
         if (!is_null($requestUserID)) {
@@ -612,7 +622,7 @@ EOT;
         $signature = $this->signatures($sender, $sourceUserID);
 
         if (is_array($signature)) {
-            list($signature, $sigFormat) = $signature;
+            [$signature, $sigFormat] = $signature;
         } else {
             $sigFormat = c('Garden.InputFormatter');
         }
@@ -653,8 +663,8 @@ EOT;
                 ]);
             }
 
-            //$userSignature = Gdn_Format::to($signature, $sigFormat);
-            $userSignature = \Gdn::formatService()->renderHTML($signature, strtolower($sigFormat));
+            $format = strtolower($sigFormat);
+            $userSignature = $this->formatService->renderHTML($signature, $format);
 
             // Restore original config.
             if (!$allowEmbeds) {
@@ -672,7 +682,9 @@ EOT;
 
             $this->fireEvent('FilterContent');
 
-            if ($userSignature) {
+            $length = $this->formatService->getPlainTextLength($userSignature, HtmlFormat::FORMAT_KEY);
+
+            if ($length > 0 && $userSignature) {
                 echo "<div class=\"Signature UserSignature userContent {$sigClasses}\">{$userSignature}</div>";
             }
         }

@@ -7,16 +7,23 @@
 
 namespace VanillaTests\Models;
 
+use Vanilla\Models\Model;
+use Vanilla\Models\PipelineModel;
+use VanillaTests\UsersAndRolesApiTestTrait;
+
 /**
  * Verify discussion count routines.
  */
 class DiscussionModelCountsTest extends AbstractCountsTest {
+
+    use UsersAndRolesApiTestTrait;
 
     /**
      * Given a discussion row, return a valid category ID, different from the original.
      *
      * @param array $row
      * @return int
+     * @throws \Exception If a categoryID could not be determined.
      */
     private function alternateCategoryID(array $row): int {
         foreach ($this->categories as $category) {
@@ -48,7 +55,8 @@ class DiscussionModelCountsTest extends AbstractCountsTest {
             }
         }
 
-        $this->discussionModel->deleteID($toDelete);
+        $response = $this->api()->deleteWithBody("/discussions/list", ["discussionIDs" => $toDelete]);
+        $this->assertEquals(200, $response->getStatusCode());
 
         foreach ($cats as $catID) {
             $this->assertCategoryCounts($catID);
@@ -106,7 +114,7 @@ class DiscussionModelCountsTest extends AbstractCountsTest {
         $parentSourceCategory = $this->categories[$parentSourceCategoryID];
         $parentDestCategory = $this->categories[$parentDestCategoryID];
 
-        $this->discussionModel->merge($sourceDiscussion['DiscussionID'], $destDiscussion['DiscussionID'], false);
+        $this->discussionModel->mergeDiscussions([$sourceDiscussion['DiscussionID']], $destDiscussion['DiscussionID'], false);
 
         $this->reloadCategoriesDiscussionsComments();
 
@@ -180,7 +188,7 @@ class DiscussionModelCountsTest extends AbstractCountsTest {
         }
         $this->assertNotNull($sourceDiscussion);
 
-        $this->discussionModel->merge($sourceDiscussion['DiscussionID'], $destDiscussion['DiscussionID'], false);
+        $this->discussionModel->mergeDiscussions([$sourceDiscussion['DiscussionID']], $destDiscussion['DiscussionID'], false);
 
         $this->reloadCategoriesDiscussionsComments();
 
@@ -222,7 +230,7 @@ class DiscussionModelCountsTest extends AbstractCountsTest {
         $destCategoryID = $destDiscussion['CategoryID'] ?? false;
         $destCategory = $this->categories[$destCategoryID];
 
-        $this->discussionModel->merge($sourceDiscussion['DiscussionID'], $destDiscussion['DiscussionID'], false);
+        $this->discussionModel->mergeDiscussions([$sourceDiscussion['DiscussionID']], $destDiscussion['DiscussionID'], false);
 
         $this->reloadCategoriesDiscussionsComments();
 
@@ -286,5 +294,40 @@ class DiscussionModelCountsTest extends AbstractCountsTest {
     private function getRootCategoryID(int $categoryID): int {
         $newCategoryID = $this->categories[$categoryID]['ParentCategoryID'];
         return ($newCategoryID == -1) ? $categoryID : $this->getRootCategoryID($newCategoryID);
+    }
+
+    /**
+     * Test recalculation of bookmarks counts.
+     */
+    public function testBookmarkCounts() {
+        $this->enableCaching();
+        $user1 = $this->createUser();
+        $user2 = $this->createUser();
+        $user3 = $this->createUser();
+
+        /** @var Model $model */
+        $model = self::container()->getArgs(Model::class, ['UserDiscussion']);
+        $model->insert(['UserID' => $user1['userID'], 'DiscussionID' => 4, 'Bookmarked' => true]);
+        $model->insert(['UserID' => $user1['userID'], 'DiscussionID' => 3, 'Bookmarked' => true]);
+        $model->insert(['UserID' => $user2['userID'], 'DiscussionID' => 1, 'Bookmarked' => true]);
+        $model->insert(['UserID' => $user3['userID'], 'DiscussionID' => 3, 'Bookmarked' => true]);
+
+        $this->discussionModel->recalculateBookmarkCounts(3);
+        $this->discussionModel->recalculateBookmarkCounts(1);
+
+        $this->assertBoomarkCount(2, $user1['userID']);
+        $this->assertBoomarkCount(1, $user2['userID']);
+        $this->assertBoomarkCount(1, $user3['userID']);
+    }
+
+    /**
+     * Assert that a user has a certain bookmark count.
+     *
+     * @param int $expected The expected count.
+     * @param int $userID The userID to check.
+     */
+    private function assertBoomarkCount(int $expected, int $userID) {
+        $user = $this->userModel->getID($userID, DATASET_TYPE_ARRAY);
+        $this->assertEquals($expected, $user['CountBookmarks']);
     }
 }

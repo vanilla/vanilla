@@ -12,10 +12,16 @@ use DOMNodeList;
 use Exception;
 use Garden\Http\HttpClient;
 use Garden\Http\HttpResponse;
+use Garden\Web\Exception\ClientException;
+use Garden\Web\Exception\HttpException;
+use Garden\Web\Exception\ServerException;
 use InvalidArgumentException;
 use Vanilla\Metadata\Parser\Parser;
 use Vanilla\Web\RequestValidator;
 
+/**
+ * Class for scraping pages of external sites.
+ */
 class PageScraper {
 
     /** @var HttpClient */
@@ -41,6 +47,7 @@ class PageScraper {
         $this->requestValidator = $requestValidator;
 
         $this->httpClient->setDefaultHeader("User-Agent", $this->userAgent());
+        $this->httpClient->setDefaultOption("timeout", 10);
     }
 
     /**
@@ -48,7 +55,8 @@ class PageScraper {
      *
      * @param string $url Target URL.
      * @return array Structured page information.
-     * @throws Exception
+     *
+     * @throws ServerException If the page cannot be fetched.
      */
     public function pageInfo(string $url): array {
         // Ensure that this function is never called during a GET request.
@@ -59,10 +67,6 @@ class PageScraper {
         $this->requestValidator->blockRequestType('GET', __METHOD__ . ' may not be called during a GET request.');
 
         $response = $this->getUrl($url);
-
-        if (!$response->isResponseClass('2xx')) {
-            throw new Exception('Unable to get URL contents.');
-        }
 
         $rawBody = $response->getRawBody();
 
@@ -91,10 +95,19 @@ class PageScraper {
             }
         }
 
+        $isError = !$response->isResponseClass("2xx");
         $info['Url'] = $url;
         $info['Title'] = htmlEntityDecode($info['Title']);
         $info['Description'] = htmlEntityDecode($info['Description']);
         $info['isCacheable'] = empty($response->getHeader('x-no-cache'));
+        if ($isError) {
+            $domain = parse_url($url, PHP_URL_HOST);
+            $sourceString = "Site '%s' did not respond successfully.";
+            $errorMessage = sprintft($sourceString, $domain);
+            throw new ServerException($errorMessage, $response->getStatusCode(), [
+                HttpException::FIELD_DESCRIPTION => $info['Title'] . ": " . $info['Description'],
+            ]);
+        }
 
         return $info;
     }
@@ -113,8 +126,21 @@ class PageScraper {
             throw new InvalidArgumentException('Unsupported URL scheme.');
         }
 
-        $result = $this->httpClient->get($url);
-        return $result;
+        // Cheap workaround until we implement a robots.txt parser.
+        // Until we do, this request gets us through some systems automated blocking.
+        // We will NEED to implement proper checking here. See https://higherlogic.atlassian.net/browse/VNLA-429
+        $host = $urlParts['host'];
+        $robotsUrl = "https://$host/robots.txt";
+
+        // We don't currently do anything with the response. For now it just serves as a signal that
+        // we *might be* a good bot.
+        $this->httpClient->get($robotsUrl, [], [], ['throw' => false]);
+        usleep(200);
+
+
+        // Make the actual request.
+        $response = $this->httpClient->get($url);
+        return $response;
     }
 
     /**
@@ -197,8 +223,7 @@ class PageScraper {
      * @return string
      */
     private function userAgent() {
-        $version = defined('APPLICATION_VERSION') ? APPLICATION_VERSION : '0.0';
-        return "Vanilla/{$version}";
+        return "vanilla-forums-embed/1.0";
     }
 
     /**

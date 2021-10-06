@@ -58,7 +58,7 @@ export default function Banner(props: IBannerProps) {
     const { action, className, isContentBanner } = props;
     const varsTitleBar = titleBarVariables();
     const classesTitleBar = titleBarClasses();
-    const classes = isContentBanner ? contentBannerClasses(mediaQueries) : bannerClasses(mediaQueries);
+    const classes = isContentBanner ? contentBannerClasses() : bannerClasses();
     const vars = isContentBanner ? contentBannerVariables(props.options) : bannerVariables(props.options);
     const { options } = vars;
     const device = useDevice();

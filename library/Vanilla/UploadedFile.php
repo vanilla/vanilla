@@ -214,22 +214,32 @@ class UploadedFile {
     }
 
     /**
-     * Save the uploaded file to a persistent location.
+     * Save the uploaded file to a persistent location with a random path to prevent filename clashes.
      *
      * @param bool $copy Whether or not to copy the file instead of moving it.
      * @param string $persistSubDirectory
      * @param string $nameFormat
      *
-     * @return $this For method chaining.
+     * @return $this
      */
     public function persistUpload(bool $copy = false, string $persistSubDirectory = '', string $nameFormat = '%s'): UploadedFile {
-        $this->tryApplyImageProcessing();
-
         $persistedPath = $this->generatePersistedUploadPath($persistSubDirectory, $nameFormat);
 
+        return $this->persistUploadToPath($copy, $persistedPath);
+    }
+
+    /**
+     * Save the uploaded file to a specific subpath.
+     *
+     * @param bool $copy Whether or not to copy the file instead of moving it.
+     * @param string $path The subpath to save to.
+     * @return $this
+     */
+    public function persistUploadToPath(bool $copy, string $path): UploadedFile {
+        $this->tryApplyImageProcessing();
         $result = $this->uploadModel->saveAs(
             $this->getFile(),
-            $persistedPath,
+            $path,
             ["OriginalFilename" => $this->getClientFilename()],
             $copy
         );

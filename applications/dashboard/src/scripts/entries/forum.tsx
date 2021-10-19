@@ -35,6 +35,8 @@ import { applyCompatibilityUserCards } from "@library/features/userCard/UserCard
 import { DashboardImageUploadGroup } from "@dashboard/forms/DashboardImageUploadGroup";
 import { LayoutProvider } from "@library/layout/LayoutContext";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
+// This is a misleading place for the component to live. Its used in the /profile/preferences/[USER_ID]
+import { CategoryNotificationPreferences } from "@dashboard/components/CategoryNotificationPreferences";
 
 onReady(initAllUserContent);
 onContent(convertAllUserContent);
@@ -118,3 +120,5 @@ applyReactElementsInForum({
         );
     },
 });
+
+addComponent("CategoryNotificationPreferences", CategoryNotificationPreferences, { overwrite: true });

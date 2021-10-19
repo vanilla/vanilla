@@ -646,7 +646,13 @@ class SettingsController extends DashboardController {
         $items = [
             'Garden.Profile.RedirectUrl' => [
                 'Control' => 'textbox',
-                'Description' => t("Custom URL to redirect the user instead of rendering Vanilla's profile page.")
+                'LabelCode' => t('"Profile" redirection URL'),
+                'Description' => t('Custom URL to redirect the user instead of rendering Vanilla\'s "Profile" page.')
+            ],
+            'Garden.Messages.Add.RedirectUrl' => [
+                'Control' => 'textbox',
+                'LabelCode' => t('"New Message" redirection URL'),
+                'Description' => t('Custom URL to redirect the user instead of rendering Vanilla\'s "New Message" page.')
             ]
         ];
 

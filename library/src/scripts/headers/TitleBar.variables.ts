@@ -33,13 +33,54 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
     const formElementVars = formElementsVariables(forcedVars);
     const makeThemeVars = variableFactory("titleBar", forcedVars);
 
+    const meBox = makeThemeVars("meBox", {
+        /**
+         * @var titleBar.mebox.sizing
+         * @description Height for mebox buttons
+         * @type number|string
+         */
+        sizing: {
+            buttonContents: formElementVars.sizing.height,
+        },
+        /**
+         * @var titleBar.mebox.withSeparator
+         * @description Wether mebox items are separated with separators.
+         * @type boolean
+         */
+        withSeparator: false,
+        /**
+         * @var titleBar.mebox.withLabel
+         * @description Wether to show mebox item labels below
+         * @type boolean
+         */
+        withLabel: false,
+        /**
+         * @var titleBar.mebox.label
+         * @description If the mebox is with label, those will be label styling options
+         */
+        label: {
+            /**
+             * @varGroup titleBar.mebox.label.font
+             * @title Label font
+             * @expand font
+             */
+            font: Variables.font({ size: 10 }),
+            /**
+             * @varGroup titleBar.mebox.label.spacing
+             * @title Spacing for label
+             * @expand spacing
+             */
+            spacing: Variables.spacing({ horizontal: 8, top: -4, bottom: 4 }),
+        },
+    });
+
     const sizing = makeThemeVars("sizing", {
         /**
          * @var titleBar.sizing.height
          * @description Pixel height of the Title Bar. Recommended between 48 and 90
          * @type number|string
          */
-        height: 48,
+        height: meBox.withLabel ? 64 : 48,
         spacer: 12,
         mobile: {
             /**
@@ -417,12 +458,6 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
         height: px(sizing.mobile.height),
     });
 
-    const meBox = makeThemeVars("meBox", {
-        sizing: {
-            buttonContents: formElementVars.sizing.height,
-        },
-    });
-
     // Note that the logo defined here is the last fallback. If set through the dashboard, it will overwrite these values.
     /**
      * @varGroup titleBar.logo
@@ -531,9 +566,19 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
             );
         };
 
+        const customBreakPoint = (styles: CSSObject, breakpoint: number) => {
+            return media(
+                {
+                    maxWidth: breakpoint,
+                },
+                styles,
+            );
+        };
+
         return {
             full,
             compact,
+            customBreakPoint,
         };
     };
 

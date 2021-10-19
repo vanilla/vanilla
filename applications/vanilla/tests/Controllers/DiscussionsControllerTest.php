@@ -68,7 +68,7 @@ class DiscussionsControllerTest extends TestCase {
     public function testFollowedRecentDiscussions(): array {
         /** @var \Gdn_Configuration $config */
         $config = static::container()->get('Config');
-        $config->set('Vanilla.EnableCategoryFollowing', true, true, false);
+        $config->set(\CategoryModel::CONF_CATEGORY_FOLLOWING, true, true, false);
         // follow a category
         self::$categoryModel->follow(\Gdn::session()->UserID, 1, true);
         $data = $this->bessy()->get('/discussions?followed=1')->Data;

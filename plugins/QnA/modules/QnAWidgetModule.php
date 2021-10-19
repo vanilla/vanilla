@@ -40,6 +40,7 @@ class QnAWidgetModule extends BaseDiscussionWidgetModule {
                 self::qnaFilterSchema(),
                 self::categorySchema(),
                 self::siteSectionIDSchema(),
+                self::sortSchema(),
                 self::limitSchema()
             )
         );

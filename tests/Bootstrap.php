@@ -33,6 +33,7 @@ use Vanilla\Contracts\Web\UASnifferInterface;
 use Vanilla\Dashboard\Controllers\API\ConfigApiController;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Forum\Navigation\ForumBreadcrumbProvider;
+use Vanilla\HttpCacheMiddleware;
 use Vanilla\InjectableInterface;
 use Vanilla\Models\AuthenticatorModel;
 use Vanilla\Models\SSOModel;
@@ -228,6 +229,9 @@ class Bootstrap {
 
             ->rule(LoggerAwareInterface::class)
             ->addCall('setLogger')
+
+            ->rule(HttpCacheMiddleware::class)
+            ->setShared(true)
 
             // EventManager
             ->rule(\Garden\EventManager::class)
@@ -477,7 +481,7 @@ class Bootstrap {
 
             ->rule(SystemTokenUtils::class)
             ->setConstructorArgs([
-                ContainerUtils::config("Context.Secret", "")
+                ContainerUtils::config("Context.Secret", "secret")
             ])
         ;
 

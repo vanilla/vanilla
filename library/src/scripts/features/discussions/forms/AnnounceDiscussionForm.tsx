@@ -81,7 +81,7 @@ export default function AnnounceDiscussionForm({ onCancel, onSuccess, discussion
                                         />
                                     }
                                 />
-                                <Permission permission="discussions.announce" mode={PermissionMode.GLOBAL}>
+                                <Permission permission="discussions.announce">
                                     <RadioButton
                                         defaultChecked={formik.values.pinLocation === "recent"}
                                         onChange={handleChange}

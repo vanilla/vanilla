@@ -708,6 +708,17 @@ class Gdn_Database implements InjectableInterface {
     }
 
     /**
+     * Get a clean SQL driver instance.
+     *
+     * @return Gdn_SQLDriver
+     */
+    public function createSql(): Gdn_SQLDriver {
+        $sql = clone $this->sql();
+        $sql->reset();
+        return $sql;
+    }
+
+    /**
      * Get the database structure class for this database.
      *
      * @return Gdn_DatabaseStructure The database structure class for this database.

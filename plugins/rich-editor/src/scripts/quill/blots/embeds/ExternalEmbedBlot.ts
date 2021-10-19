@@ -14,6 +14,7 @@ import LoadingBlot from "@rich-editor/quill/blots/embeds/LoadingBlot";
 import { forceSelectionUpdate } from "@rich-editor/quill/utility";
 import { logError } from "@vanilla/utils";
 import { SelectableEmbedBlot } from "@rich-editor/quill/blots/abstract/SelectableEmbedBlot";
+import { extractServerError } from "@library/apiv2";
 
 const DATA_KEY = "__embed-data__";
 
@@ -209,7 +210,7 @@ export default class ExternalEmbedBlot extends SelectableEmbedBlot {
                     return;
                 }
                 const errorData: IErrorData = {
-                    error: e,
+                    error: extractServerError(e),
                     type: value.loaderData.type === "file" ? ErrorBlotType.FILE : ErrorBlotType.STANDARD,
                     file: value.loaderData.file,
                 };

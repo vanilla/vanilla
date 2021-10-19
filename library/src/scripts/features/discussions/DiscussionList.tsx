@@ -9,12 +9,15 @@ import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { CoreErrorMessages } from "@library/errorPages/CoreErrorMessages";
 import { useDiscussionList } from "@library/features/discussions/discussionHooks";
 import { DiscussionListView } from "@library/features/discussions/DiscussionList.views";
+import { LegacyDiscussionListSelectAll } from "@library/features/discussions/DiscussionListSelectAll";
 import Loader from "@library/loaders/Loader";
 import React from "react";
 
 interface IProps {
     apiParams: IGetDiscussionListParams;
+    noCheckboxes?: boolean;
     discussions?: IDiscussion[];
+    isMainContent?: boolean;
 }
 
 export function DiscussionList(props: IProps) {
@@ -29,5 +32,14 @@ export function DiscussionList(props: IProps) {
         return <CoreErrorMessages apiError={discussions.error} />;
     }
 
-    return <DiscussionListView discussions={discussions.data} />;
+    return (
+        <>
+            <DiscussionListView noCheckboxes={props.noCheckboxes} discussions={discussions.data} />
+            {props.isMainContent && !props.noCheckboxes && (
+                <LegacyDiscussionListSelectAll
+                    discussionIDs={discussions.data?.map((discussion) => discussion.discussionID)}
+                />
+            )}
+        </>
+    );
 }

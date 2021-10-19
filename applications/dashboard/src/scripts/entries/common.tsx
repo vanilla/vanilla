@@ -6,7 +6,7 @@
 import React from "react";
 import { onReady, t } from "@library/utility/appUtils";
 import { addComponent } from "@library/utility/componentRegistry";
-import Toast from "@library/features/toaster/Toast";
+import { Toast } from "@library/features/toaster/Toast";
 import { ThemePreviewToast } from "@library/features/toaster/themePreview/ThemePreviewToast";
 import { themePreviewToastReducer } from "@library/features/toaster/themePreview/ThemePreviewToastReducer";
 import { registerReducer } from "@library/redux/reducerRegistry";

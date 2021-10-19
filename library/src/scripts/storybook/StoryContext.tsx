@@ -12,7 +12,9 @@ import { tilesVariables } from "@library/features/tiles/Tiles.variables";
 import { inputClasses } from "@library/forms/inputStyles";
 import { HomeWidget } from "@library/homeWidget/HomeWidget";
 import { Backgrounds } from "@library/layout/Backgrounds";
+import { DeviceProvider } from "@library/layout/DeviceContext";
 import { ScrollOffsetProvider } from "@library/layout/ScrollOffsetContext";
+import { TitleBarDeviceProvider } from "@library/layout/TitleBarContext";
 import { WidgetLayout } from "@library/layout/WidgetLayout";
 import { listVariables } from "@library/lists/List.variables";
 import { listItemVariables } from "@library/lists/ListItem.variables";
@@ -28,6 +30,7 @@ import { blotCSS } from "@rich-editor/quill/components/blotStyles";
 import merge from "lodash/merge";
 import React, { useCallback, useContext, useLayoutEffect, useState } from "react";
 import { Provider } from "react-redux";
+import { MemoryRouter } from "react-router";
 import { DeepPartial } from "redux";
 import "../../scss/_base.scss";
 
@@ -177,9 +180,15 @@ export function StoryContextProvider(props: {
     return (
         <StoryContext.Provider value={{ ...contextState, updateContext, refreshKey: themeKey }}>
             <Provider store={store}>
-                <ThemeProvider variablesOnly errorComponent={<ErrorComponent />} themeKey={themeKey}>
-                    <ScrollOffsetProvider>{content}</ScrollOffsetProvider>
-                </ThemeProvider>
+                <MemoryRouter>
+                    <ThemeProvider variablesOnly errorComponent={<ErrorComponent />} themeKey={themeKey}>
+                        <ScrollOffsetProvider>
+                            <DeviceProvider>
+                                <TitleBarDeviceProvider>{content}</TitleBarDeviceProvider>
+                            </DeviceProvider>
+                        </ScrollOffsetProvider>
+                    </ThemeProvider>
+                </MemoryRouter>
             </Provider>
         </StoryContext.Provider>
     );

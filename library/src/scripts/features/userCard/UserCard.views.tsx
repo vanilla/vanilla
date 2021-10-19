@@ -1,8 +1,9 @@
 /**
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
+import React, { ComponentProps } from "react";
 import { IUser, IUserFragment } from "@library/@types/api/users";
 import NumberFormatted from "@library/content/NumberFormatted";
 import Permission, { PermissionMode } from "@library/features/users/Permission";
@@ -15,14 +16,20 @@ import { Devices, useDevice } from "@library/layout/DeviceContext";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { MetaItem, Metas } from "@library/metas/Metas";
 import LinkAsButton from "@library/routing/LinkAsButton";
-import { getMeta, makeProfileUrl, t } from "@library/utility/appUtils";
+import {
+    getMeta,
+    makeProfileCommentsUrl,
+    makeProfileDiscussionsUrl,
+    makeProfileUrl,
+    t,
+} from "@library/utility/appUtils";
 import classNames from "classnames";
-import React from "react";
 import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
 import DateTime from "@library/content/DateTime";
 import { hasPermission } from "@library/features/users/Permission";
 import { formatUrl } from "@library/utility/appUtils";
 import { useCurrentUserID } from "@library/features/users/userHooks";
+import SmartLink from "@library/routing/links/SmartLink";
 
 interface IProps {
     user: IUser;
@@ -121,8 +128,18 @@ export function UserCardView(props: IProps) {
             </div>
 
             <Container borderTop={true}>
-                <Stat count={user.countDiscussions} text={t("Discussions")} position={"left"} />
-                <Stat count={user.countComments} text={t("Comments")} position={"right"} />
+                <StatLink
+                    to={makeProfileDiscussionsUrl(user.name)}
+                    count={user.countDiscussions}
+                    text={t("Discussions")}
+                    position={"left"}
+                />
+                <StatLink
+                    to={makeProfileCommentsUrl(user.name)}
+                    count={user.countComments}
+                    text={t("Comments")}
+                    position={"right"}
+                />
             </Container>
 
             <Container borderTop={true}>
@@ -318,26 +335,32 @@ function StatSkeleton(props: { text: string; position: "left" | "right" }) {
     const { text, position } = props;
     return (
         <div
-            className={classNames(classes.stat, {
+            className={classNames(classes.statLink, {
                 [classes.statLeft]: position === "left",
                 [classes.statRight]: position === "right",
             })}
         >
             <div className={classes.count}>
-                <LoadingRectangle height={27} width={48} />
+                <LoadingRectangle height={28} width={48} />
             </div>
             <div className={classes.statLabel}>{text}</div>
         </div>
     );
 }
 
-function Stat(props: { count?: number; text: string; position: "left" | "right" }) {
+function StatLink(props: {
+    to: ComponentProps<typeof SmartLink>["to"];
+    text: string;
+    position: "left" | "right";
+    count?: number;
+}) {
     const classes = userCardClasses();
 
-    const { count, text, position } = props;
+    const { to, count, text, position } = props;
     return (
-        <div
-            className={classNames(classes.stat, {
+        <SmartLink
+            to={to}
+            className={classNames(classes.statLink, {
                 [classes.statLeft]: position === "left",
                 [classes.statRight]: position === "right",
             })}
@@ -346,7 +369,7 @@ function Stat(props: { count?: number; text: string; position: "left" | "right" 
                 <NumberFormatted fallbackTag={"div"} value={count || 0} />
             </div>
             <div className={classes.statLabel}>{text}</div>
-        </div>
+        </SmartLink>
     );
 }
 

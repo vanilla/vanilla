@@ -133,6 +133,15 @@ export const navLinksClasses = useThemeCache(() => {
             flexDirection: "column",
             maxWidth: percent(100),
             width: percent(100 / vars.columns.desktop),
+            /**
+             * TODO: Remove this kludge when IE 11 is deprecated
+             * When this component is the only child within a `space-between`
+             * flex container, it is placed at the flex-end. This margin take up space
+             * to left align it
+             */
+            "&:only-of-type": {
+                marginRight: "auto",
+            },
         },
         mediaQueries.oneColumn({
             width: percent(100),

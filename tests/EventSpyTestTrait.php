@@ -355,4 +355,26 @@ trait EventSpyTestTrait {
         $this->assertEquals($recordID, $record[0]["recordID"]);
         $this->resetTable('dirtyRecord');
     }
+
+    /**
+     * Run a callback with some bound event handlers.
+     *
+     * @param callable $callable The callback to run.
+     * @param callable[] $eventHandlers Event handlers indexed by their event names.
+     *
+     * @return mixed
+     */
+    public function runWithBoundEvents(callable $callable, array $eventHandlers) {
+        $eventManager = $this->getEventManager();
+        foreach ($eventHandlers as $eventName => $eventHandler) {
+            $eventManager->bind($eventName, $eventHandler);
+        }
+
+        $result = call_user_func($callable);
+
+        foreach ($eventHandlers as $eventName => $eventHandler) {
+            $eventManager->unbind($eventName, $eventHandler);
+        }
+        return $result;
+    }
 }

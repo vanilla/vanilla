@@ -581,7 +581,12 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface {
                 $tagID = val(1, $sender->RequestArgs);
                 $tagModel = new TagModel();
                 $tag = $tagModel->getID($tagID, DATASET_TYPE_ARRAY);
-
+                $allowedTypes = Gdn::config('Tagging.Discussions.AllowedTypes', ['']);
+                if (!in_array(($tag['Type'] ?? ''), $allowedTypes)) {
+                    $sender->informMessage(formatString(t('You cannot delete a reserved tag.')));
+                    $sender->render('blank', 'utility', 'dashboard');
+                    break;
+                }
                 if ($sender->Form->authenticatedPostBack()) {
                     // Delete tag & tag relations.
                     $sQL = Gdn::sql();

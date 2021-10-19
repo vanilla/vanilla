@@ -101,7 +101,7 @@ abstract class BaseFormat implements FormatInterface {
      * @inheritdoc
      */
     public function getPlainTextLength(string $content): int {
-        return mb_strlen($this->renderPlainText($content), 'UTF-8');
+        return mb_strlen(trim($this->renderPlainText($content), 'UTF-8'));
     }
 
     /**

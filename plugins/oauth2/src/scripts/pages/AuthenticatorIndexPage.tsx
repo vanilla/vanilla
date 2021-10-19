@@ -1,11 +1,10 @@
 /**
  * @author Dominic Lacaille <dominic.lacaille@vanillaforums.com>
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 import React, { useState } from "react";
-import { RouteComponentProps } from "react-router";
 import { DashboardHeaderBlock } from "@dashboard/components/DashboardHeaderBlock";
 import { t } from "@vanilla/i18n";
 import { ButtonTypes } from "@library/forms/buttonTypes";
@@ -23,15 +22,11 @@ import OAuth2AddEdit from "@oauth2/pages/AuthenticatorAddEdit";
 import LazyModal from "@library/modal/LazyModal";
 import ModalSizes from "@library/modal/ModalSizes";
 import Button from "@library/forms/Button";
-import { modalClasses } from "@library/modal/modalStyles";
-import { useAuthenticators } from "@oauth2/AuthenticatorHooks";
-import { useAuthenticatorActions } from "@oauth2/AuthenticatorActions";
+import { useAuthenticators, useSetAuthenticatorActive } from "@oauth2/AuthenticatorHooks";
 
-interface IOwnProps extends RouteComponentProps<{}> {}
-
-export default function ConnectionsIndexPage(props: IOwnProps) {
+export default function ConnectionsIndexPage() {
     const { HeadItem } = DashboardTable;
-    const { setActive } = useAuthenticatorActions();
+    const setActive = useSetAuthenticatorActive();
     const [page, setPage] = useState<number>(1);
     const [isToggleDisabled, setIsToggleDisabled] = useState<boolean>(false);
     const [deleteID, setDeletingID] = useState<number | undefined>();

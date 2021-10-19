@@ -10,6 +10,7 @@ import React, { useState } from "react";
 import { labelize } from "@vanilla/utils";
 import { FormGroup, FormGroupLabel, FormGroupInput } from "../../index";
 import { AutoCompleteOption, AutoComplete as UIAutoComplete, AutoCompleteLookupOptions, ILookupApi } from "./";
+import * as Reach from "@reach/combobox";
 
 export default {
     title: "Vanilla UI/Forms",
@@ -18,7 +19,7 @@ export default {
 const storyStyle = css({
     display: "grid",
     gridTemplateColumns: "300px 200px",
-    gridTemplateRows: "30px repeat(5, auto)",
+    gridTemplateRows: "30px repeat(10, auto)",
     alignItems: "center",
     columnGap: 32,
     rowGap: 16,
@@ -34,14 +35,18 @@ interface StoryAutoCompleteProps extends React.ComponentProps<typeof UIAutoCompl
 
 function StoryAutoComplete(props: StoryAutoCompleteProps) {
     const { label, ...autoCompleteProps } = props;
-    const [value, setValue] = useState<any>(1);
+    const defaultValue = props.hasOwnProperty("value") ? props.value : 1;
+    const [value, setValue] = useState<any | any[] | undefined>(defaultValue);
+    const setDataValue = (values) => {
+        setValue(Array.isArray(values) ? [...values] : values);
+    };
     return (
         <>
             <FormGroup>
                 <FormGroupLabel>{label}</FormGroupLabel>
                 <FormGroupInput>
                     {(props) => (
-                        <UIAutoComplete {...autoCompleteProps} {...props} value={value} onChange={setValue}>
+                        <UIAutoComplete {...autoCompleteProps} {...props} value={value} onChange={setDataValue}>
                             <AutoCompleteOption value={1} label="Apple" />
                             <AutoCompleteOption value={2} label="Banana" />
                             <AutoCompleteOption value={3} label="Cherry" />
@@ -59,7 +64,7 @@ const api = Axios.create({
 });
 
 const lookup: ILookupApi = {
-    searchUrl: "pokemon?limit=100",
+    searchUrl: "pokemon?limit=50", // This is not a searchable endpoint (only for illustration purposes)
     singleUrl: "pokemon/%s",
     resultsKey: "results",
     processOptions: (options) =>
@@ -68,14 +73,17 @@ const lookup: ILookupApi = {
 
 function StoryAutoCompleteLookup(props: StoryAutoCompleteProps) {
     const { label, ...autoCompleteProps } = props;
-    const [value, setValue] = useState<any>("pikachu");
+    const [value, setValue] = useState<any | any[]>("bulbasaur");
+    const setDataValue = (values) => {
+        setValue(Array.isArray(values) ? [...values] : values);
+    };
     return (
         <>
             <FormGroup>
                 <FormGroupLabel>{label}</FormGroupLabel>
                 <FormGroupInput>
                     {(inputProps) => (
-                        <UIAutoComplete {...inputProps} {...autoCompleteProps} value={value} onChange={setValue}>
+                        <UIAutoComplete {...inputProps} {...autoCompleteProps} value={value} onChange={setDataValue}>
                             <AutoCompleteLookupOptions api={api} lookup={lookup} />
                         </UIAutoComplete>
                     )}
@@ -105,6 +113,31 @@ export function AutoComplete() {
             <div>
                 <StoryAutoCompleteLookup label="Lookup" clear />
             </div>
+            <div>
+                <StoryAutoComplete label="Multiple - No Default Value" multiple value={undefined} />
+            </div>
+            <div>
+                <StoryAutoComplete
+                    label="Multiple"
+                    multiple
+                    placeholder={"Here is some long place holder that should be visible from behind the input values"}
+                />
+            </div>
+            <div>
+                <StoryAutoComplete label="Default multiple clearable" multiple clear />
+            </div>
+            <div>
+                <StoryAutoCompleteLookup label="Lookup Multiple" multiple />
+            </div>
+            <div>
+                <StoryAutoComplete
+                    label="Allow Arbitrary Input Multiple"
+                    placeholder={"Here is some long place holder that should be visible from behind the input values"}
+                    multiple
+                    value={undefined}
+                    allowArbitraryInput
+                />
+            </div>
             {/* ------------------- */}
             <h3>Small</h3>
             <div>
@@ -119,6 +152,27 @@ export function AutoComplete() {
             </div>
             <div>
                 <StoryAutoCompleteLookup label="Lookup" size="small" clear />
+            </div>
+            <div>
+                <StoryAutoComplete label="Multiple - No Default Value" multiple size="small" value={undefined} />
+            </div>
+            <div>
+                <StoryAutoComplete label="Multiple" multiple size="small" />
+            </div>
+            <div>
+                <StoryAutoComplete label="Default multiple clearable" size="small" multiple clear />
+            </div>
+            <div>
+                <StoryAutoCompleteLookup label="Lookup Multiple" size="small" multiple />
+            </div>
+            <div>
+                <StoryAutoComplete
+                    label="Allow Arbitrary Input Multiple"
+                    size="small"
+                    multiple
+                    value={undefined}
+                    allowArbitraryInput
+                />
             </div>
         </div>
     );

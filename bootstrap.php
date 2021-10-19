@@ -15,6 +15,7 @@ use Vanilla\Formatting\Html\HtmlEnhancer;
 use Vanilla\Formatting\Html\HtmlPlainTextConverter;
 use Vanilla\Formatting\Html\HtmlSanitizer;
 use Vanilla\Formatting\Html\Processor\ExternalLinksProcessor;
+use Vanilla\HttpCacheMiddleware;
 use Vanilla\InjectableInterface;
 use Vanilla\Contracts;
 use Vanilla\Models\CurrentUserPreloadProvider;
@@ -44,6 +45,8 @@ use Vanilla\Web\SafeCurlHttpHandler;
 use Vanilla\Web\TwigEnhancer;
 use Vanilla\Web\TwigRenderer;
 use Vanilla\Web\UASniffer;
+use Vanilla\Widgets\TabWidgetModule;
+use Vanilla\Widgets\TabWidgetTabService;
 use Vanilla\Widgets\WidgetService;
 
 if (!defined('APPLICATION')) exit();
@@ -170,6 +173,9 @@ $dic->setInstance(Container::class, $dic)
 
     ->rule(\Psr\Log\LoggerAwareInterface::class)
     ->addCall('setLogger')
+
+    ->rule(HttpCacheMiddleware::class)
+    ->setShared(true)
 
     // EventManager
     ->rule(\Garden\EventManager::class)
@@ -343,6 +349,9 @@ $dic->setInstance(Container::class, $dic)
     ])
     ->setShared(true)
 
+    ->rule(\Vanilla\Web\RoleTokenFactory::class)
+    ->setShared(true)
+
     ->rule(\Vanilla\OpenAPIBuilder::class)
     ->addCall('addFilter', ['filter' => new Reference('@apiexpand-filter')])
 
@@ -405,6 +414,10 @@ $dic->setInstance(Container::class, $dic)
     ->setInherit(true)
 
     ->rule(WidgetService::class)
+    ->addCall('registerWidget', [TabWidgetModule::class])
+    ->setShared(true)
+
+    ->rule(TabWidgetTabService::class)
     ->setShared(true)
 
     ->rule('Gdn_IPlugin')
@@ -475,7 +488,7 @@ $dic->setInstance(Container::class, $dic)
     ->setShared(true)
 
     ->rule(\Vanilla\EmbeddedContent\Factories\ScrapeEmbedFactory::class)
-    ->setConstructorArgs(['httpClient' => new Reference('@scrape-http-client'), 'pageScraper' => new Reference('@scrape-page-scraper')])
+    ->setConstructorArgs(['httpClient' => new Reference('@scrape-http-client')])
     ->rule('@scrape-http-client')
     ->setClass(\Garden\Http\HttpClient::class)
     ->setConstructorArgs(["handler" => new Reference(Vanilla\Web\SafeCurlHttpHandler::class)])
@@ -486,8 +499,7 @@ $dic->setInstance(Container::class, $dic)
     ->addCall('registerMetadataParser', [new Reference(Vanilla\Metadata\Parser\JsonLDParser::class)])
     ->setShared(true)
 
-    ->rule('@scrape-page-scraper')
-    ->setClass(\Vanilla\PageScraper::class)
+    ->rule(\Vanilla\PageScraper::class)
     ->setConstructorArgs(['httpClient' => new Reference('@scrape-http-client')])
     ->addCall('registerMetadataParser', [new Reference(Vanilla\Metadata\Parser\OpenGraphParser::class)])
     ->addCall('registerMetadataParser', [new Reference(Vanilla\Metadata\Parser\JsonLDParser::class)])

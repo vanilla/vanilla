@@ -1,6 +1,7 @@
 /addons/themes/*
 /addons/addons/*
 !/addons/themes/theme-foundation/
+!/addons/themes/theme-dashboard/
 !/addons/themes/theme-boilerplate/
 !/addons/themes/keystone/
 /applications/*

@@ -5,8 +5,9 @@
  */
 
 import React from "react";
-import { logError } from "@vanilla/utils";
+import { logError, notEmpty } from "@vanilla/utils";
 import { t } from "@library/utility/appUtils";
+import { sprintf } from "sprintf-js";
 
 type TranslateCallback = (contents: string) => React.ReactNode;
 
@@ -21,6 +22,9 @@ interface IProps {
     c3?: TranslateCallback | React.ReactNode;
     c4?: TranslateCallback | React.ReactNode;
 }
+
+const TAG_REGEX = /<([\d ]+)>(.*?)<\/\1>|<([\d ]+)\/>|([^<]+|<)/g;
+const SPRINTF_PLACEHOLDER_REGEX = /%(?:\d+\$)?[dfsu]/g;
 
 /**
  * Component for translating text with interpolated components.
@@ -58,11 +62,52 @@ export default class Translate extends React.Component<IProps> {
      * @inheritDoc
      */
     public render(): React.ReactNode {
+        if (this.translatedSource.match(/<([\d ]+)\/?>/)) {
+            return this.renderHtmlStubs();
+        } else {
+            return this.renderSprintf();
+        }
+    }
+
+    /**
+     * Render a translation string with sprintf.
+     */
+    public renderSprintf() {
+        // Warn people if they us it incorrectly.
+        const allArgs = [this.props.c0, this.props.c1, this.props.c2, this.props.c3, this.props.c4];
+        allArgs.filter(notEmpty).forEach((arg) => {
+            if (typeof arg === "function") {
+                this.props.errorHandler!(
+                    `Cannot use a functional translation interpolation value with a sprintf source string: ${this.props.source}. \nThe translated value of source is ${this.translatedSource}.`,
+                );
+            }
+        });
+
+        const translatedSource = this.translatedSource;
+        const splitSource = translatedSource.split(SPRINTF_PLACEHOLDER_REGEX);
+        const result: React.ReactNode[] = [];
+
+        splitSource.forEach((textPiece, i) => {
+            // Push in the text piece.
+            result.push(<React.Fragment key={`text-${i}`}>{textPiece}</React.Fragment>);
+            // Push in a value for the placeholder.
+            const isLast = i === splitSource.length - 1;
+            if (!isLast) {
+                result.push(this.getInterpolatedComponent(i.toString(), `replaced-${i}`));
+            }
+        });
+
+        return result;
+    }
+
+    /**
+     * Render out an HTML placeholder translation string, like "<0>Login</0> or <1>Register</1>"
+     */
+    private renderHtmlStubs() {
         // First parse out the self closing elements.
-        const tagRegex = /<([\d ]+)>(.*?)<\/\1>|<([\d ]+)\/>|([^<]+|<)/g;
 
         const result: React.ReactNode[] = [];
-        this.translatedSource.replace(tagRegex, (match, childrenID, childrenMatch, standaloneID, textMatch, index) => {
+        this.translatedSource.replace(TAG_REGEX, (match, childrenID, childrenMatch, standaloneID, textMatch, index) => {
             if (textMatch != null) {
                 result.push(<React.Fragment key={index}>{textMatch}</React.Fragment>);
             }
@@ -87,7 +132,7 @@ export default class Translate extends React.Component<IProps> {
      * @param key The key of the fragment (index).
      * @param value The content to pass along to the prop callback.
      */
-    private getInterpolatedComponent(id: string, key: number, value?: string): React.ReactNode {
+    private getInterpolatedComponent(id: string, key: number | string, value?: string): React.ReactNode {
         id = id.trim();
 
         if (!(`c${id}` in this.props)) {

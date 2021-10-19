@@ -13,6 +13,7 @@ use JsonSerializable;
  * Job Status
  */
 class JobExecutionStatus implements JsonSerializable {
+
     /**
      * @var string
      */
@@ -133,6 +134,19 @@ class JobExecutionStatus implements JsonSerializable {
      */
     public static function unknown() {
         return new JobExecutionStatus('unknown');
+    }
+
+    /**
+     * Get a list of incomplete statuses.
+     *
+     * @return string[]
+     */
+    public static function incompleteStatuses(): array {
+        return [
+            self::received()->getStatus(),
+            self::progress()->getStatus(),
+            self::intended()->getStatus(),
+        ];
     }
 
     /**

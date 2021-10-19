@@ -169,9 +169,14 @@ components:
               description: The url-code of the tag.
               type: string
               deprecated: true
+            parentTagID:
+              type: integer
+              description: The parent ID of the tag.
+              nullable: true
           required:
             - id
             - urlCode
+            - parentTagID
     TagReference:
       description: A reference to a tag for assignment to other items.
       type: object

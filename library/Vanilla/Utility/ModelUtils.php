@@ -9,10 +9,12 @@ namespace Vanilla\Utility;
 
 use Garden\Schema\Validation;
 use Garden\Schema\ValidationException;
+use Garden\Web\Exception\ClientException;
 use Gdn_Locale as LocaleInterface;
 use Gdn_Validation;
 use Iterator;
 use Vanilla\CurrentTimeStamp;
+use Vanilla\Scheduler\LongRunner;
 
 /**
  * Class ModelUtils.
@@ -144,6 +146,23 @@ class ModelUtils {
     }
 
     /**
+     * Look at the result of a save and see if it gave some premoderation result.
+     *
+     * @param string|int|bool $saveResult The result of calling Gdn_Model::save().
+     * @param string $recordType The record being validated.
+     *
+     * @throws ClientException For spam or unapproved content.
+     */
+    public static function validateSaveResultPremoderation($saveResult, string $recordType) {
+        if ($saveResult === SPAM || $saveResult === UNAPPROVED) {
+            // "Your discussion will appear after it is approved."
+            // "Your comment will appear after it is approved."
+            $message = t(sprintf("Your %s will appear after it is approved.", strtolower($recordType)));
+            throw new ClientException($message, 202);
+        }
+    }
+
+    /**
      * Join fragments to a dataset.
      *
      * This method is essentially an in code left join. It is a fairly straightforward helper that defers most of the
@@ -239,21 +258,39 @@ class ModelUtils {
      *
      * @param Iterator $iterable
      * @param int $timeout
-     * @return bool
+     * @return \Generator<mixed, mixed, bool> A generator yield values of the underlying iterator.
+     * The generator will return true if it has completed or false if it has not.
      */
-    public static function iterateWithTimeout(Iterator $iterable, int $timeout): bool {
+    public static function iterateWithTimeout(Iterator $iterable, int $timeout): \Generator {
         $horizon = CurrentTimeStamp::get() + $timeout;
 
         $memoryLimit = ini_get("memory_limit");
         $memoryLimit = $memoryLimit == -1 ? null : StringUtils::unformatSize($memoryLimit);
 
-        foreach ($iterable as $r) {
+        foreach ($iterable as $key => $value) {
+            yield $key => $value;
             $memoryExceeded = $memoryLimit ? (memory_get_usage() / $memoryLimit) > 0.8 : false;
-            if (CurrentTimeStamp::get() >= $horizon || $memoryExceeded) {
+            $newTimestamp = CurrentTimeStamp::get();
+            if ($newTimestamp >= $horizon || $memoryExceeded) {
                 return false;
             }
         }
 
         return true;
+    }
+
+    /**
+     * Consume a generator entirely.
+     *
+     * @param \Generator $generator
+     *
+     * @return mixed|null
+     */
+    public static function consumeGenerator(\Generator $generator) {
+        while ($generator->valid()) {
+            $generator->next();
+        }
+        $return = $generator->getReturn();
+        return $return;
     }
 }

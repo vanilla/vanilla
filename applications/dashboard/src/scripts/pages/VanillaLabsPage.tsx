@@ -10,6 +10,7 @@ import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
 import { NewQuickLinksLabItem } from "@dashboard/labs/NewQuickLinksLabItem";
 import { NewSearchPageLabItem } from "@dashboard/labs/NewSearchPageLabItem";
 import { UserCardsLabItem } from "@dashboard/labs/UserCardsLabItem";
+import { NewPostMenuLabItem } from "@dashboard/labs/NewPostMenuLabItem";
 import AddonList from "@library/addons/AddonList";
 import SmartLink from "@library/routing/links/SmartLink";
 import { t } from "@vanilla/i18n";
@@ -23,9 +24,13 @@ export function VanillaLabsPage() {
             <div className="padded">{t("Enable and test out the latest Vanilla features.")}</div>
             <div className={dashboardClasses().extendRow}>
                 <AddonList>
+                    {VanillaLabsPage.extraLabComponents.map((ComponentName, index) => {
+                        return <ComponentName key={index} />;
+                    })}
                     <UserCardsLabItem />
                     <NewSearchPageLabItem />
                     <NewQuickLinksLabItem />
+                    <NewPostMenuLabItem />
                 </AddonList>
             </div>
             <DashboardHelpAsset>
@@ -41,3 +46,16 @@ export function VanillaLabsPage() {
         </MemoryRouter>
     );
 }
+
+/** Hold the extra lab components before rendering. */
+VanillaLabsPage.extraLabComponents = [] as React.ComponentType[];
+
+/**
+ * Register an extra lab component to be rendered before lab items.
+ * Mainly for items coming from plugins/addons e.g. new analytics.
+ *
+ * @param component The component class to be render.
+ */
+VanillaLabsPage.registerBeforeLabItems = (component: React.ComponentType) => {
+    VanillaLabsPage.extraLabComponents.push(component);
+};

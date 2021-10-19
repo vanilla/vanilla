@@ -31,6 +31,8 @@ $quickSearch-hover_bg:                   $button-primary-hover_bg !default;
 $quickSearch-hover_fg:                   $button-primary-hover_fg !default;
 $quickSearch-hover_borderColor:          $button-primary-hover_border !default;
 
+$xs_breakpoint:                          320px;
+
 /* -------------------------------------------------------------- *\
     Styles
 \* -------------------------------------------------------------- */
@@ -86,6 +88,12 @@ $quickSearch-hover_borderColor:          $button-primary-hover_border !default;
 .PagerWrap {
     margin: 0;
     float: right;
+
+        @media (max-width: #{$xs_breakpoint}) {
+           float: none;
+        }
+
+
 }
 
 .PagerNub {
@@ -104,6 +112,9 @@ $quickSearch-hover_borderColor:          $button-primary-hover_border !default;
 
 .BeforeCommentHeading {
     margin-bottom: $global-block_margin;
+    @media (max-width: #{$xs_breakpoint}) {
+        float: none;
+     }
 }
 
 .PageControls {

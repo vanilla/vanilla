@@ -5,7 +5,7 @@
  * @license GPLv2
  */
 
-namespace QnA\Tests;
+namespace VanillaTests\QnA;
 
 use Vanilla\QnA\Models\AnswerModel;
 use VanillaTests\APIv2\QnaApiTestTrait;
@@ -50,6 +50,7 @@ class QnAEventsTest extends VanillaTestCase {
     public function setUp(): void {
         parent::setUp();
         $this->setUpTestTraits();
+        $this->enableCaching();
 
         $this->categoryID = $this->createCategory()["categoryID"];
 

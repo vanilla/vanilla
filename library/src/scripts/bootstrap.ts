@@ -12,7 +12,7 @@ import apiv2 from "@library/apiv2";
 import { mountInputs } from "@library/forms/mountInputs";
 import { onPageView } from "@library/pageViews/pageViewTracking";
 import { History } from "history";
-import { _mountComponents } from "@library/utility/componentRegistry";
+import { addComponent, _mountComponents } from "@library/utility/componentRegistry";
 import { blotCSS } from "@rich-editor/quill/components/blotStyles";
 import { bootstrapLocales } from "@library/locales/localeBootstrap";
 import { isLegacyAnalyticsTickEnabled } from "@library/analytics/AnalyticsData";
@@ -23,10 +23,13 @@ import { hasPermission } from "@library/features/users/Permission";
 import "@library/gdn";
 import { loadedCSS } from "@rich-editor/quill/components/loadedStyles";
 import { loadThemeShadowDom } from "@library/theming/loadThemeShadowDom";
+import TabWidget from "@library/tabWidget/TabWidget";
 
 if (!getMeta("featureFlags.useFocusVisible.Enabled", true)) {
     document.body.classList.add("hasNativeFocus");
 }
+
+addComponent("TabWidget", TabWidget, { overwrite: true });
 
 // Inject the debug flag into the utility.
 const debugValue = getMeta("context.debug", getMeta("debug", false));

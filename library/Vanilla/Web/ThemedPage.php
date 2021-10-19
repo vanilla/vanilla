@@ -15,7 +15,10 @@ use Vanilla\Theme\ThemePreloadProvider;
 abstract class ThemedPage extends Page {
 
     /** @var ThemePreloadProvider */
-    private $themeProvider;
+    protected $themeProvider;
+
+    /** @var string|null */
+    protected $forcedThemeKey;
 
     /**
      * @inheritdoc
@@ -30,6 +33,9 @@ abstract class ThemedPage extends Page {
     ) {
         parent::setDependencies($siteMeta, $request, $session, $pageHead, $masterViewRenderer);
         $this->themeProvider = $themeProvider;
+        if ($this->forcedThemeKey !== null) {
+            $this->themeProvider->setForcedThemeKey($this->forcedThemeKey);
+        }
         $this->initAssets();
     }
 

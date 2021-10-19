@@ -4,7 +4,6 @@ import { createPortal } from "react-dom";
 
 import { animated } from "react-spring";
 import { newPostBackgroundClasses } from "./newPostBackgroundStyles";
-
 interface IProps {
     open: boolean;
     className?: string;
@@ -16,10 +15,11 @@ interface IProps {
 
 export default function NewPostBackground(props: IProps) {
     const classes = newPostBackgroundClasses();
+    const overlayClass = props.open ? classes.overlay : undefined;
 
     return createPortal(
         <animated.aside
-            className={classNames(classes.container)}
+            className={classNames(classes.container, overlayClass)}
             style={props.bgTransition}
             onClick={props.onClick}
             onKeyDown={props.onKeyDown}

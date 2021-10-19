@@ -116,6 +116,12 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
 
     public const RECORD_TYPE = "user";
 
+    public const PATH_DEFAULT_AVATAR = '/applications/dashboard/design/images/defaulticon.png';
+    public const PATH_BANNED_AVATAR = '/applications/dashboard/design/images/banned.png';
+
+    public const AVATAR_SIZE_THUMBNAIL = 'thumbnail';
+    public const AVATAR_SIZE_PROFILE = 'profile';
+
     /** @var EventManager */
     private $eventManager;
 
@@ -1340,7 +1346,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
                         $banned = $user['Banned'] ?? 0;
 
                         if ($banned) {
-                            $bannedPhoto = c('Garden.BannedPhoto', '/applications/dashboard/design/images/banned.png');
+                            $bannedPhoto = c('Garden.BannedPhoto', self::PATH_BANNED_AVATAR);
                             $photo = asset($bannedPhoto, true);
                         }
 
@@ -1373,27 +1379,54 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
     }
 
     /**
+     * Returns the URL to the avatar photo of the user based on their database record.
+     *
+     * @param array $user The user to get the URL for.
+     * @param string $size The size of the photo.
+     * @return string Returns a URL.
+     */
+    public static function getUserPhotoUrl(array $user, $size = self::AVATAR_SIZE_THUMBNAIL): string {
+        $photo = $user['Photo'];
+        if (!empty($user['Banned'])) {
+            $bannedPhoto = c('Garden.BannedPhoto', self::PATH_BANNED_AVATAR);
+            $photo = asset($bannedPhoto, true);
+            return $photo;
+        }
+
+        if ($photo) {
+            if (!isUrl($photo)) {
+                $sizeFormat = $size === self::AVATAR_SIZE_PROFILE ? 'p%s' : 'n%s';
+                $photoUrl = Gdn_Upload::url(changeBasename($photo, $sizeFormat));
+            } else {
+                $photoUrl = $photo;
+            }
+            return $photoUrl;
+        }
+        return static::getDefaultAvatarUrl($user, $size);
+    }
+
+    /**
      * Returns the url to the default avatar for a user.
      *
      * @param array $user The user to get the default avatar for.
      * @param string $size The size of avatar to return (only respected for dashboard-uploaded default avatars).
      * @return string The url to the default avatar image.
      */
-    public static function getDefaultAvatarUrl($user = [], $size = 'thumbnail') {
+    public static function getDefaultAvatarUrl($user = [], $size = self::AVATAR_SIZE_THUMBNAIL) {
         if (!empty($user) && function_exists('UserPhotoDefaultUrl')) {
             return userPhotoDefaultUrl($user);
         }
         if ($avatar = c('Garden.DefaultAvatar', false)) {
             if (strpos($avatar, 'defaultavatar/') !== false) {
-                if ($size == 'thumbnail') {
+                if ($size == self::AVATAR_SIZE_THUMBNAIL) {
                     return Gdn_UploadImage::url(changeBasename($avatar, 'n%s'));
-                } elseif ($size == 'profile') {
+                } elseif ($size == self::AVATAR_SIZE_PROFILE) {
                     return Gdn_UploadImage::url(changeBasename($avatar, 'p%s'));
                 }
             }
             return $avatar;
         }
-        return asset('applications/dashboard/design/images/defaulticon.png', true);
+        return asset(self::PATH_DEFAULT_AVATAR, true);
     }
 
     /**
@@ -2517,6 +2550,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
             }
         }
 
+        $this->EventArguments['ExistingUser'] = $user;
         $this->EventArguments['FormPostValues'] = $formPostValues;
         $this->fireEvent('BeforeSaveValidation');
 
@@ -2869,13 +2903,17 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
         }
         $row['email'] = !empty($row['Email']) ? $row['Email'] : null;
         if (array_key_exists('Photo', $row)) {
-            $photo = userPhotoUrl($row);
-            $row['Photo'] = $photo;
-            $row['photoUrl'] = $photo;
+            // It might be tempting to call out to `static::getUserPhotoUrl()` here, but there is a legacy behavior where
+            // themes can override `userPhotoUrl()`, which needs to be respected. This code makes sure of the following:
+            // 1. Our version of the banned photo will always be respected.
+            // 2. Otherwise, the `userPhotoUrl()` will flow through here.
             $banned = $row['Banned'] ?? 0;
             if ($banned) {
-                $bannedPhoto = c('Garden.BannedPhoto', '/applications/dashboard/design/images/banned.png');
-                $row['photoUrl'] = asset($bannedPhoto, true);
+                $bannedPhoto = c('Garden.BannedPhoto', self::PATH_BANNED_AVATAR);
+                $row['photoUrl'] = $row['profilePhotoUrl'] = asset($bannedPhoto, true);
+            } else {
+                $row['profilePhotoUrl'] = userPhotoUrl($row, static::AVATAR_SIZE_PROFILE);
+                $row['Photo'] = $row['photoUrl'] = userPhotoUrl($row, static::AVATAR_SIZE_THUMBNAIL);
             }
         }
         if (array_key_exists('Verified', $row)) {
@@ -2948,6 +2986,10 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
                 'minLength' => 0,
                 'description' => 'URL to the user photo.'
             ],
+            'profilePhotoUrl:s|n' => [
+                'minLength' => 0,
+                'x-no-index-field' => true,
+            ],
             'points:i',
             'emailConfirmed:b' => 'Has the email address for this user been confirmed?',
             'showEmail:b' => 'Is the email address visible to other users?',
@@ -2986,6 +3028,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
                 "name",
                 'sortName?',
                 "photoUrl",
+                "profilePhotoUrl?",
                 "url?",
                 "points",
                 "roles?",
@@ -5455,7 +5498,11 @@ SQL;
      * @return bool
      */
     public static function rateLimit($user) {
+        // Garden.User.RateLimit = 0 disables rate limit.
         $loginRate = (int)Gdn::config('Garden.User.RateLimit', self::LOGIN_RATE);
+        if ($loginRate === 0) {
+            return true;
+        }
         // Make sure $user is an object
         $user = (object) $user;
         if (Gdn::cache()->activeEnabled()) {
@@ -5759,6 +5806,9 @@ SQL;
             if ($cachedPermissions !== Gdn_Cache::CACHEOP_FAILURE) {
                 $permissions->setPermissions($cachedPermissions);
                 $permissions->setAdmin($isAdmin);
+
+                // Fire an event after permissions are cached so that addons can augment them without overwriting the cache.
+                $this->eventManager->fire('userModel_filterPermissions', $this, $userID, $permissions);
                 return $permissions;
             }
         }
@@ -5783,6 +5833,8 @@ SQL;
                 );
             }
         }
+        // Fire an event after permissions are cached so that addons can augment them without overwriting the cache.
+        $this->eventManager->fire('userModel_filterPermissions', $this, $userID, $permissions);
 
         return $permissions;
     }

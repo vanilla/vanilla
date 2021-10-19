@@ -27,9 +27,7 @@ storiesOf("User Content", module).add("Errors", () => {
             <StoryHeading>Attachment Error</StoryHeading>
             <AttachmentError message={"Sample message"} name={"Name of Error"} dateUploaded={now.toISOString()} />
             <StoryHeading>Embed Error</StoryHeading>
-            <StandardEmbedError id={"error123"} onDismissClick={doNothing}>
-                Standard Error
-            </StandardEmbedError>
+            <StandardEmbedError id={"error123"} onDismissClick={doNothing} error={{ message: "Standard Error" }} />
             <StoryHeading>Loading State</StoryHeading>
             <AttachmentLoading
                 type={AttachmentType.WORD}

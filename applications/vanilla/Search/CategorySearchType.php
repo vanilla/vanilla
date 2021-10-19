@@ -121,10 +121,14 @@ class CategorySearchType extends AbstractSearchType {
     private function mapCounts(array &$record) {
         $record['counts'] = [
             [
+                // %s sub-category
+                // %s sub-categories
                 'labelCode' => 'sub-categories',
                 'count' => $record['countCategories'],
             ],
             [
+                // %s discussion
+                // %s discussions
                 'labelCode' => 'discussions',
                 'count' => $record['countAllDiscussions'],
             ]

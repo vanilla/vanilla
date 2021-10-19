@@ -13,6 +13,7 @@ import { notEmpty } from "@vanilla/utils";
 import { AutoCompleteOption, IAutoCompleteOption, IAutoCompleteOptionProps } from "./AutoCompleteOption";
 import { IAutoCompleteProps } from "./AutoComplete";
 import { AutoCompleteContext } from "./AutoCompleteContext";
+import { useApiContext } from "../../ApiContext";
 
 export interface ILookupApi {
     searchUrl: string;
@@ -28,27 +29,46 @@ interface IAutoCompleteLookupRenderProps extends Pick<IAutoCompleteProps, "onSea
 
 interface IAutoCompleteLookupProps {
     lookup: ILookupApi;
-    api: AxiosInstance;
+    api?: AxiosInstance;
 }
 
+/**
+ * This is a local cache of query urls and the response results
+ */
 const apiCaches = new Map<string, any>();
+
+/**
+ * This component is used to declaratively configure an API lookup.
+ * It will read the input values from the Autocomplete Context and write the appropriate
+ * options to the context to be made available for selection.
+ *
+ * This component does not return any DOM elements.
+ */
 export function AutoCompleteLookupOptions(props: IAutoCompleteLookupProps) {
-    const { lookup, api } = props;
-    const { inputState, value, setOptions, setInputState } = useContext(AutoCompleteContext);
-    const [ownQuery, setQuery] = useState<string | number>("");
+    const { lookup } = props;
+    const contextApi = useApiContext();
+    const api = props.api ?? contextApi;
+    const { inputState, value, setOptions, setInputState, multiple } = useContext(AutoCompleteContext);
+    const [ownQuery, setQuery] = useState<string | number>(value ?? "");
     const [initialValue] = useState(value);
     const [options, currentOption] = useApiLookup(lookup, api, value, ownQuery, initialValue);
     const isLoading = (!!initialValue && !currentOption) || options === null;
 
+    const displayValue = multiple ? "" : currentOption?.label ?? currentOption?.value ?? "";
+
     useEffect(() => {
         if (inputState.status !== "suggesting") {
-            setInputState({ status: "selected", value: currentOption?.label ?? currentOption?.value ?? "" });
+            setInputState({ status: "selected", value: displayValue });
         }
-    }, [currentOption, inputState.status]);
+    }, [displayValue, inputState.status]);
 
     useEffect(() => {
         if (inputState.status === "suggesting") {
-            setQuery(inputState.value);
+            setQuery(inputState.value !== undefined ? inputState.value : "");
+        }
+        // This handles clearing an input to default the available options back to the initial
+        if (inputState.status === "selected" && inputState.value === "") {
+            setQuery("");
         }
     }, [inputState]);
 
@@ -61,6 +81,9 @@ export function AutoCompleteLookupOptions(props: IAutoCompleteLookupProps) {
     return null;
 }
 
+/**
+ * This hook is used to fetch and process search results
+ */
 function useApiLookup(
     lookup: ILookupApi,
     api: AxiosInstance,
@@ -109,6 +132,7 @@ function useApiLookup(
                     if (processOptions) {
                         options = processOptions(options);
                     }
+                    apiCaches.set(actualApiUrl, options);
                     setInitialOption(options[0]);
                 }
             });
@@ -140,6 +164,7 @@ function useApiLookup(
         [searchUrl, singleUrl, processOptions],
     );
 
+    // This hook will update the available options whenever the input has changed
     useEffect(() => {
         updateOptions(currentInputValue);
     }, [updateOptions, currentInputValue]);

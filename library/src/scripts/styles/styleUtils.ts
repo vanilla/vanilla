@@ -4,8 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { CSSObject } from "@emotion/css";
-import { style } from "@library/styles/styleShim";
+import { CSSObject, css } from "@emotion/css";
 import merge from "lodash/merge";
 import { color, rgba, rgb, hsla, hsl, ColorHelper } from "csx";
 import { logDebug, logWarning, logError, notEmpty } from "@vanilla/utils";
@@ -42,7 +41,7 @@ export function styleFactory(componentName: string) {
     function styleCreator(...objects: Array<CSSObjectOrFalsy | string | symbol>): string {
         objects = objects.filter((val) => !!val);
         if (objects.length === 0) {
-            return style();
+            return css();
         }
         let debugName = componentName;
         let shouldLogDebug = false;
@@ -64,13 +63,13 @@ export function styleFactory(componentName: string) {
             logDebug(styleObjs);
         }
 
-        return style(...styleObjs);
+        return css(...styleObjs);
     }
 
     return styleCreator;
 }
 
-type Mapping = GlobalVariableMapping | LocalVariableMapping;
+export type VariableMapping = GlobalVariableMapping | LocalVariableMapping;
 
 /**
  * A helper class for declaring variables while mixing server defined variables from context.
@@ -107,7 +106,7 @@ type Mapping = GlobalVariableMapping | LocalVariableMapping;
 export function variableFactory(
     componentNames: string | string[],
     themeVars?: IThemeVariables,
-    mappings?: Mapping | Mapping[],
+    mappings?: VariableMapping | VariableMapping[],
     mergeWithGlobals = false,
 ) {
     if (!themeVars) {

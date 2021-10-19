@@ -134,7 +134,39 @@ paths:
           description: The provided client ID did not match the client ID that was configured within Vanilla.
         '500':
           description: OAuth is either not enabled or is not configured on Vanilla.
+  /tokens/roles:
+    post:
+      summary: Issue a JWT that includes the current user's roles as its claims
+      description: |-
+        This is primarily intended for internal use on client-side code to authenticate to specific API endpoints where the response generated depends on the set of roles and associated permissions, but does not depend on the identity of the requesting user.
 
+        As many users may share a limited set of roles, this approach allows for caching responses to these endpoints for short periods, to improve overall page responsiveness while reducing server-side load.
+      tags:
+        - Tokens
+      responses:
+        '201':
+          description: Success
+          content:
+            'application/json':
+              schema:
+                type: object
+                properties:
+                  roleToken:
+                    type: string
+                    description: A signed JWT issued for the current user containing the set of roles assigned to this user in its claims.
+                  expires:
+                    type: string
+                    format: date-time
+                    description: The UTC date/time that the role token expires.
+                required:
+                  - roleToken
+                  - expires
+              example:
+                roleToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+                expires: '2024-11-19T19:17:45'
+        '403':
+          description: |
+            Forbidden. Role tokens cannot be issued to unauthenticated users.
 components:
   schemas:
     Token:

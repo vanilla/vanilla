@@ -49,12 +49,11 @@ export function useQueryStringSync(value: IStringMap, defaults?: IStringMap, syn
 
     // Handle continuous updates updates.
     useEffect(() => {
-        // Doesn't run on first mount.
-        if (!isMountedRef.current && filteredLast !== filteredCurrent) {
-            const query = qs.stringify(filteredCurrent);
+        // Only runs when mounted.
+        if (isMountedRef.current && filteredLast !== filteredCurrent) {
             debouncedQsUpdate({
                 ...location,
-                search: query,
+                search: filteredCurrent,
             });
         }
     }, [filteredLast, filteredCurrent, debouncedQsUpdate, location]);
@@ -63,10 +62,9 @@ export function useQueryStringSync(value: IStringMap, defaults?: IStringMap, syn
         // Handles first mount if needed.
         isMountedRef.current = true;
         if (syncOnFirstMount) {
-            const query = qs.stringify(filteredCurrent);
             debouncedQsUpdate({
                 ...location,
-                search: query,
+                search: filteredCurrent,
             });
         }
 

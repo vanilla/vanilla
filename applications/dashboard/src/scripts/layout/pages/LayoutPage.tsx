@@ -110,7 +110,9 @@ export function LayoutPage() {
             />
             <LayoutPreviewList
                 title={t("Discussions")}
-                description={t("Choose the preferred layout for lists of discussions.")}
+                description={t(
+                    "Choose the preferred layout for lists of discussions. You can edit the Foundation Layout.",
+                )}
                 options={[
                     {
                         label: t("Modern Layout"),

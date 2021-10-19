@@ -444,6 +444,7 @@ class ProfileController extends Gdn_Controller {
             $originalFormValues = (isset($originalSubmission))
                 ? json_decode($originalSubmission, true)
                 : null;
+            $emailChanged = false;
             if (isset($originalFormValues['Email'])) {
                 $emailChanged = $originalFormValues &&  $originalFormValues['Email'] !== $user['Email'];
             }
@@ -1280,10 +1281,23 @@ class ProfileController extends Gdn_Controller {
             }
         }
         $currentPrefs = array_merge($currentPrefs, $metaPrefs);
+
+        //if user does not have the permission, we set user email preferences to false
+        if (!$session->checkPermission('Garden.Email.View')) {
+            foreach ($currentPrefs as $pref => $val) {
+                if (is_string($pref) && str_contains($pref, 'Email')) {
+                    $currentPrefs[$pref] = $val === false || $val === "0" ? $val : false;
+                    if ($userPrefs && array_key_exists($pref, $userPrefs)) {
+                        $userPrefs[$pref] = false;
+                    }
+                }
+            }
+        }
+
         $currentPrefs = array_map('intval', $currentPrefs);
         $this->setData('Preferences', $currentPrefs);
 
-        if (UserModel::noEmail()) {
+        if (UserModel::noEmail() || !$session->checkPermission('Garden.Email.View')) {
             $this->PreferenceGroups = self::_removeEmailPreferences($this->PreferenceGroups);
             $this->PreferenceTypes = self::_removeEmailPreferences($this->PreferenceTypes);
             $this->setData('NoEmail', true);
@@ -1294,6 +1308,7 @@ class ProfileController extends Gdn_Controller {
         $this->setData('PreferenceList', $this->Preferences);
 
         if ($this->Form->authenticatedPostBack()) {
+            $formValues = $this->Form->formValues();
             // Get, assign, and save the preferences.
             $newMetaPrefs = [];
             foreach ($this->Preferences as $prefGroup => $prefs) {
@@ -1323,12 +1338,22 @@ class ProfileController extends Gdn_Controller {
                 }
             }
 
+            //we double check $userPrefs after we get form values,
+            //in case user has permission change, but the form is not re-submitted
+            if (!$session->checkPermission('Garden.Email.View')) {
+                foreach ($userPrefs as $pref => $val) {
+                    if (is_string($pref) && str_contains($pref, 'Email')) {
+                        $userPrefs[$pref] = false;
+                    }
+                }
+            }
+
             $this->UserModel->savePreference($this->User->UserID, $userPrefs);
             UserModel::setMeta($this->User->UserID, $newMetaPrefs, 'Preferences.');
 
             $this->setData('Preferences', array_merge($this->data('Preferences', []), $userPrefs, $newMetaPrefs));
 
-            if (count($this->Form->errors() == 0)) {
+            if (empty($this->Form->errors())) {
                 $this->informMessage(sprite('Check', 'InformSprite').t('Your preferences have been saved.'), 'Dismissable AutoDismiss HasSprite');
             }
         } else {

@@ -86,7 +86,8 @@
         "vanilla/vanilla-connect": "~0.0",
         "webmozart/assert": "^1.9",
         "webmozart/path-util": "^2.3",
-        "wikimedia/composer-merge-plugin": "^1.4.1"
+        "wikimedia/composer-merge-plugin": "^1.4.1",
+        "bopoda/robots-txt-parser": "^2.4"
     },
     "require-dev": {
         "cache/integration-tests": "dev-master",

@@ -45,6 +45,24 @@ class OAuth2Test extends AbstractAPIv2Test {
     }
 
     /**
+     * The database allows empty strings. The API should not die because of that.
+     */
+    public function testGetBadDB(): void {
+        $row = $this->testPost();
+        $rowID = $row["authenticatorID"];
+
+        \Gdn::sql()->put('UserAuthenticationProvider', [
+            'Name' => '',
+            'AuthenticateUrl' => '',
+            'RegisterUrl' => '',
+            'SignInUrl' => '',
+            'SignOutUrl' => '',
+        ]);
+
+        $response = $this->api()->get("authenticators/{$rowID}/oauth2")->getBody();
+    }
+
+    /**
      * Test getting an invalid authenticator.
      */
     public function testGetInvalid(): void {
@@ -131,6 +149,7 @@ class OAuth2Test extends AbstractAPIv2Test {
         $rowBefore = $this->api()->get("authenticators")->getBody();
         try {
             $this->api()->post("authenticators/oauth2", $body);
+            $this->fail('There is supposed to be an exception.');
         } catch (ClientException $e) {
             $this->assertEquals(422, $e->getCode());
             $rowAfter = $this->api()->get("authenticators")->getBody();

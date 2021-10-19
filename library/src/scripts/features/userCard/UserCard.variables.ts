@@ -62,6 +62,15 @@ export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) =>
         }),
     });
 
+    const statLink = makeVars("statLink", {
+        font: Variables.font({
+            color: ColorsUtils.colorOut(globalVars.mainColors.fg),
+        }),
+        fontState: Variables.font({
+            color: globalVars.mainColors.primary,
+        }),
+    });
+
     const count = makeVars("count", {
         size: 28,
     });
@@ -86,6 +95,7 @@ export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) =>
         name,
         label,
         containerWithBorder,
+        statLink,
         count,
         header,
         date,

@@ -14,7 +14,9 @@ use Traversable;
 use Vanilla\Utility\UrlUtils;
 
 /**
- * An iterator the fetches API results and iterates using it's pagination headers.
+ * An iterator the fetches API results and iterates using its pagination headers.
+ * Any error encountered when following a link to the next page of data yields a null value
+ * and discontinues the iteration.
  */
 class ApiPaginationIterator implements \IteratorAggregate {
 
@@ -51,8 +53,11 @@ class ApiPaginationIterator implements \IteratorAggregate {
 
         while ($this->currentUrl !== null) {
             $result = $this->httpClient->get($this->currentUrl);
-            $body = $result->getBody();
-            yield $body;
+            if (!$result->isSuccessful()) {
+                yield null;
+                break;
+            }
+            yield $result->getBody();
 
             $linkHeaders = WebLinking::parseLinkHeaders($result->getHeader(WebLinking::HEADER_NAME));
             $next = $linkHeaders['next'] ?? null;

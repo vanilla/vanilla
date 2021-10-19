@@ -7,24 +7,21 @@
 namespace VanillaTests\Library;
 
 use Garden\Web\Data;
-use Iterator;
-use Vanilla\LongRunner;
-use Vanilla\Scheduler\Job\ExecuteIteratorJob;
-use Vanilla\Scheduler\SchedulerInterface;
+use Vanilla\Scheduler\LongRunner;
+use Vanilla\Scheduler\LongRunnerAction;
 use Vanilla\Web\SystemTokenUtils;
 use VanillaTests\BootstrapTestCase;
-use VanillaTests\Fixtures\Scheduler\InstantScheduler;
+use VanillaTests\ExpectExceptionTrait;
+use VanillaTests\Fixtures\Scheduler\LongRunnerFixture;
+use VanillaTests\SchedulerTestTrait;
 
 /**
  * Verify basic behavior of LongRunner.
  */
 class LongRunnerTest extends BootstrapTestCase {
 
-    /** @var LongRunner */
-    private $longRunner;
-
-    /** @var InstantScheduler */
-    private $scheduler;
+    use ExpectExceptionTrait;
+    use SchedulerTestTrait;
 
     /**
      * @inheritDoc
@@ -32,147 +29,166 @@ class LongRunnerTest extends BootstrapTestCase {
     public function setUp(): void {
         parent::setUp();
 
-        $this->container()->call(function (LongRunner $longRunner, SchedulerInterface $scheduler) {
-            $this->longRunner = $longRunner;
-            $this->scheduler = $scheduler;
-        });
+        $this->container()->rule(LongRunnerFixture::class)->setShared(true);
+
+        // A little dirty but allow us to validate sessions without requiring a full site setup.
+        \Gdn::session()->UserID = 1;
     }
 
     /**
-     * Assert a job response matches the expected state.
+     * Test that we return a response to continue running when incomplete.
+     */
+    public function testIncomplete() {
+        $this->getLongRunner()->setTimeout(2);
+        $response = $this->getLongRunner()->runApi(new LongRunnerAction(
+            LongRunnerFixture::class,
+            'yieldIDs',
+            [1, 1, 2, 2]
+        ));
+        // There were errors with code 500
+        $this->assertEquals(500, $response->getStatus());
+        $data = $response->getSerializedData();
+        $this->assertCount(1, $data['progress']['successIDs']);
+        $this->assertCount(1, $data['progress']['failedIDs']);
+        $this->assertNotNull(1, $data['callbackPayload']);
+        return $data['callbackPayload'];
+    }
+
+    /**
+     * Test handling an incomplete callback payload and running it to completion.
      *
-     * @param string $class
-     * @param string $method
-     * @param array $args
-     * @param Data $actual
+     * @param string $callbackPayload The callback payload from the previous test.
+     *
+     * @depends testIncomplete
      */
-    private function assertJobRunResponse(string $class, string $method, array $args, Data $actual): void {
-        $tokenUtils = $this->container()->get(SystemTokenUtils::class);
-
-        $this->assertSame(202, $actual->getStatus());
-        $this->assertSame(202, $actual->getDataItem("status"));
-        $this->assertSame("incomplete", $actual->getDataItem("statusType"));
-
-        $expectedJwt = $tokenUtils->encode([
-            "method" => "{$class}::{$method}",
-            "args" => $args,
-        ]);
-        $this->assertSame($expectedJwt, $actual->getDataItem(SystemTokenUtils::CLAIM_REQUEST_BODY));
+    public function testHandlesCallbackPayload(string $callbackPayload) {
+        $response = $this
+            ->getLongRunner()
+            ->runApi(LongRunnerAction::fromCallbackPayload(
+                $callbackPayload,
+                self::container()->getArgs(SystemTokenUtils::class),
+                \Gdn::request()
+            ))
+        ;
+        // More errors occured with 500 even though we "finished".
+        $this->assertEquals(500, $response->getStatus());
+        $data = $response->getSerializedData();
+        $this->assertCount(2, $data['progress']['successIDs']);
+        $this->assertCount(2, $data['progress']['failedIDs']);
+        $this->assertNull($data['callbackPayload']);
     }
 
     /**
-     * Verify ability to successfully generate an "incomplete" job response using makeJobRunResponse.
+     * Test that we return an appropriate response when the job is run completely.
      */
-    public function testMakeJobRunResponse(): void {
-        $class = "foo";
-        $method = "bar";
-        $args = ["hello", "world"];
+    public function testComplete() {
+        $result = $this->getLongRunner()->runImmediately(new LongRunnerAction(
+            LongRunnerFixture::class,
+            'yieldIDs',
+            [3]
+        ));
 
-        $actual = $this->longRunner->makeJobRunResponse($class, $method, $args);
-        $this->assertJobRunResponse($class, $method, $args, $actual);
+        $this->assertEquals([1, 2, 3], $result->getSuccessIDs());
+        $this->assertEquals([], $result->getFailedIDs());
     }
 
     /**
-     * Verify executing an iterator via a scheduled job.
+     * Test how we handle failed ids coming back.
      */
-    public function testRunApiJob(): void {
-        $className = "@@" . __FUNCTION__;
-        $method = "getIterator";
-        $args = ["foo" => "bar"];
+    public function testCompleteWithFailed() {
+        $result = $this->getLongRunner()->runImmediately(new LongRunnerAction(
+            LongRunnerFixture::class,
+            'yieldIDs',
+            [3, 2]
+        ));
 
-        $this->container()->setInstance("@@" . __FUNCTION__, new class() {
+        $this->assertEquals([1, 2, 3], $result->getSuccessIDs());
+        $this->assertEquals([4, 5], $result->getFailedIDs());
+    }
 
-            /**
-             * Gimme an iterator.
-             *
-             * @return Iterator
-             */
-            public function getIterator(): Iterator {
-                yield true;
-            }
+    /**
+     * Test that we receive an error message if we try to run a long runner as guest.
+     */
+    public function testNotSignedIn() {
+        $session = \Gdn::session();
+        $session->UserID = \UserModel::GUEST_USER_ID;
+        $this->runWithExpectedExceptionCode(403, function () {
+            $this->getLongRunner()->runApi(new LongRunnerAction(LongRunnerFixture::class, 'yieldIDs', []));
+        });
+        $session->UserID = 1;
+    }
+
+    /**
+     * Test that we validate our long-running task is system callable.
+     */
+    public function testNotSystemCallable() {
+        $this->runWithExpectedExceptionCode(500, function () {
+            $this->getLongRunner()->runApi(new LongRunnerAction(LongRunnerFixture::class, 'notSystemCallable', []));
         });
 
-        $actual = $this->longRunner->runApi(
-            $className,
-            $method,
-            $args,
-            [LongRunner::OPT_LOCAL_JOB => true]
-        );
-
-        $this->assertSame(204, $actual->getStatus());
-
-        $this->scheduler->assertJobScheduled(ExecuteIteratorJob::class, [
-            ExecuteIteratorJob::OPT_CLASS => $className,
-            ExecuteIteratorJob::OPT_METHOD => $method,
-            ExecuteIteratorJob::OPT_ARGS => $args,
-        ]);
+        $this->runWithExpectedExceptionCode(500, function () {
+            $this->getLongRunner()->runApi(new LongRunnerAction(self::class, 'testNotSystemCallable', []));
+        });
     }
 
     /**
-     * Verify result when an iterator does not successfully complete.
+     * Test what happens if our long-running task doesn't return a generator.
      */
-    public function testRunApiTimeoutIncomplete(): void {
-        $className = "@@" . __FUNCTION__;
-        $method = "getIterator";
-        $args = ["foo" => "bar"];
-
-        $this->container()->setInstance("@@" . __FUNCTION__, new class() {
-
-            /**
-             * Gimme an iterator.
-             *
-             * @return Iterator
-             */
-            public function getIterator(): Iterator {
-                yield "foo";
-                yield "bar";
-            }
+    public function testNotGenerator() {
+        $this->runWithExpectedExceptionCode(500, function () {
+            $this->getLongRunner()->runApi(new LongRunnerAction(LongRunnerFixture::class, 'notGenerator', []));
         });
-
-        $actual = $this->longRunner->runApi(
-            $className,
-            $method,
-            $args,
-            [
-                LongRunner::OPT_LOCAL_JOB => false,
-                LongRunner::OPT_TIMEOUT => 0,
-            ]
-        );
-
-        $this->assertJobRunResponse($className, $method, $args, $actual);
     }
 
     /**
-     * Verify behavior when an iterator is fully executed.
+     * Test what happens when we return a bad return or yield after a return.
      */
-    public function testRunApiTimeoutComplete(): void {
-        $className = "@@" . __FUNCTION__;
-        $method = "getIterator";
-        $args = ["foo" => "bar"];
-
-        $this->container()->setInstance("@@" . __FUNCTION__, new class() {
-
-            /**
-             * Gimme an iterator.
-             *
-             * @return Iterator
-             */
-            public function getIterator(): Iterator {
-                yield "foo";
-            }
+    public function testBadGeneratorReturn() {
+        $this->getLongRunner()->setTimeout(0);
+        $this->runWithExpectedExceptionCode(500, function () {
+            $this->getLongRunner()->runApi(
+                new LongRunnerAction(LongRunnerFixture::class, 'catchAndReturn', [['not-args']])
+            );
         });
 
-        $actual = $this->longRunner->runApi(
-            $className,
-            $method,
-            $args,
-            [
-                LongRunner::OPT_LOCAL_JOB => false,
-                LongRunner::OPT_TIMEOUT => 30,
-            ]
-        );
+        $this->runWithExpectedExceptionCode(500, function () {
+            $this->getLongRunner()->runApi(
+                new LongRunnerAction(LongRunnerFixture::class, 'catchAndReturn', [['yield']])
+            );
+        });
+    }
 
-        $this->assertSame(204, $actual->getStatus());
-        $this->assertSame(null, $actual->getData());
+    /**
+     * Test when we timed out, but the generator was finished anyways.
+     */
+    public function testFinishedGeneratorReturn() {
+        $this->getLongRunner()->setTimeout(0);
+        $data = $this->getLongRunner()->runApi(
+            new LongRunnerAction(LongRunnerFixture::class, 'catchAndReturn', [LongRunner::FINISHED])
+        );
+        $this->assertEquals(200, $data->getStatus());
+    }
+
+    /**
+     * Test what happens if your long-running task finishes at the same time that we time-out.
+     */
+    public function testNoNextArgs() {
+        // Run once with some leftovers.
+        $data = $this
+            ->getLongRunner()
+            ->setTimeout(2)
+            ->runApi(new LongRunnerAction(LongRunnerFixture::class, 'canRunWithSameArgs', [[1, 2, 3, 4]]))
+            ->getSerializedData()
+        ;
+        // Run again with the same args, but it should finish.
+        $data = $this
+            ->getLongRunner()
+            ->runApi(LongRunnerAction::fromCallbackPayload(
+                $data['callbackPayload'],
+                self::container()->getArgs(SystemTokenUtils::class),
+                \Gdn::request()
+            ))
+            ->getSerializedData();
+        $this->assertNull($data['callbackPayload']);
     }
 }

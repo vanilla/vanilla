@@ -7,6 +7,7 @@
 
 namespace VanillaTests\Library\Core\Cache;
 
+use PHPUnit\Framework\SkippedTestSuiteError;
 use Vanilla\Cache\ValidatingCacheCacheAdapter;
 use Vanilla\Contracts\ConfigurationInterface;
 use VanillaTests\BootstrapTrait;
@@ -44,7 +45,7 @@ class MemcachedTest extends SimpleCacheTest {
             });
             self::$memcached = self::createMemcached();
         } else {
-            self::$memcached = null;
+            throw new SkippedTestSuiteError('Memcached is not set up for testing.');
         }
     }
 
@@ -65,11 +66,7 @@ class MemcachedTest extends SimpleCacheTest {
      * @inheritDoc
      */
     public function setUp(): void {
-        if (self::$memcached !== null) {
-            self::$memcached->flush();
-        } else {
-            $this->markTestSkipped("Memcached is not set up for testing.");
-        }
+        self::$memcached->flush();
         $this->setUpBootstrap();
         parent::setUp();
     }

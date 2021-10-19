@@ -141,12 +141,16 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         }),
     });
 
-    const stat = style("stat", {
+    const statLink = style("statLink", {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         flexGrow: 1,
         maxWidth: percent(50),
+        ...Mixins.font(vars.statLink.font),
+        "&:hover, &:focus, &:active, &.focus-visible": {
+            ...Mixins.font(vars.statLink.fontState),
+        },
     });
 
     const statLabel = style("statLabel", {
@@ -268,7 +272,7 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         buttonContainer,
         name,
         label,
-        stat,
+        statLink,
         count,
         avatar,
         header,

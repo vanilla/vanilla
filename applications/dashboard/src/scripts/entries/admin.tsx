@@ -30,6 +30,10 @@ import { VanillaLabsPage } from "@dashboard/pages/VanillaLabsPage";
 import { LayoutPage } from "@dashboard/layout/pages/LayoutPage";
 import { bindToggleChildrenEventListeners } from "@dashboard/settings";
 import { LanguageSettingsPage } from "@dashboard/pages/LanguageSettingsPage";
+import { escapeHTML } from "@vanilla/dom-utils";
+
+// Expose some new module functions to our old javascript system.
+window.escapeHTML = escapeHTML;
 
 addComponent("imageUploadGroup", DashboardImageUploadGroup, { overwrite: true });
 addComponent("VanillaLabsPage", VanillaLabsPage);

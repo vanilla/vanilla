@@ -273,6 +273,37 @@ class RolesTest extends AbstractResourceTest {
     }
 
     /**
+     * Assert that we can set global category permissions.
+     */
+    public function testRootCategoryPermissions() {
+        $role = $this->getPermissionsRole();
+
+        $this->api()->put(
+            "{$this->baseUrl}/{$role[$this->pk]}/permissions",
+            [
+                [
+                    'type' => 'global',
+                    'permissions' => [
+                        'email.view' => true
+                    ]
+                ],
+                [
+                    'type' => 'category',
+                    'id' => 0,
+                    'permissions' => [
+                        'discussions.add' => true,
+                    ]
+                ]
+            ]
+        );
+
+        $permissions = $this->getPermissions($role['roleID']);
+
+        $this->assertTrue($this->hasPermission('email.view', 'global', $permissions));
+        $this->assertTrue($this->hasPermission('discussions.add', 'category', $permissions, 0));
+    }
+
+    /**
      * Test GET /Roles with a user that doesn't have Garden.Settings.Manage'
      */
     public function testGetRolesWithMember() {
@@ -318,3 +349,5 @@ class RolesTest extends AbstractResourceTest {
         $this->assertNotContains($record['roleID'], $filteredRoleIDs);
     }
 }
+
+

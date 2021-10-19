@@ -1,21 +1,20 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import React from "react";
 import { defaultTransition, disabledInput, userSelect } from "@library/styles/styleHelpers";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
 import { Mixins } from "@library/styles/Mixins";
 import { Variables } from "@library/styles/Variables";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { calc, em, important, percent, px } from "csx";
-import { CSSObject } from "@emotion/css";
+import { calc, important, percent, px } from "csx";
+import { css, CSSObject } from "@emotion/css";
 
 export const checkRadioVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -76,7 +75,7 @@ export const checkRadioVariables = useThemeCache(() => {
     });
 
     const sizing = themeVars("sizing", {
-        width: 18,
+        width: 16,
     });
 
     const spacing = themeVars("spacing", {
@@ -98,13 +97,12 @@ export const checkRadioVariables = useThemeCache(() => {
 export const checkRadioClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = checkRadioVariables();
-    const style = styleFactory("checkRadio");
 
-    const isDashboard = style("isDashboard", {});
+    const isDashboard = css({});
 
     //.radioButton-label,
     // .checkbox-label
-    const label = style("label", {
+    const label = css({
         lineHeight: styleUnit(vars.sizing.width),
         paddingLeft: styleUnit(8),
         cursor: "pointer",
@@ -112,13 +110,13 @@ export const checkRadioClasses = useThemeCache(() => {
         width: calc(`100% - ${styleUnit(vars.sizing.width)}`),
     });
 
-    const labelBold = style("labelBold", {
+    const labelBold = css({
         ...Mixins.font({
             weight: globalVars.fonts.weights.semiBold,
         }),
     });
 
-    const labelNote = style("labelNote", {
+    const labelNote = css({
         display: "inline-block",
         fontSize: styleUnit(vars.labelNote.fontSize),
         marginLeft: styleUnit(24),
@@ -128,7 +126,7 @@ export const checkRadioClasses = useThemeCache(() => {
 
     // .radioButton-disk,
     // .checkbox-box
-    const iconContainer = style("iconContainer", {
+    const iconContainer = css({
         ...defaultTransition("border", "background", "opacity"),
         position: "relative",
         display: "inline-flex",
@@ -143,7 +141,7 @@ export const checkRadioClasses = useThemeCache(() => {
         ...Mixins.border(vars.border),
     });
 
-    const radioIcon = style("radioIcon", {
+    const radioIcon = css({
         ...Mixins.absolute.middleLeftOfParent(),
         display: "none",
         width: styleUnit(vars.radioButton.icon.width),
@@ -151,7 +149,7 @@ export const checkRadioClasses = useThemeCache(() => {
         margin: "auto",
     });
 
-    const checkIcon = style("checkBoxIcon", {
+    const checkIcon = css({
         ...Mixins.absolute.middleOfParent(),
         display: "none",
         width: styleUnit(vars.checkBox.check.width),
@@ -160,11 +158,11 @@ export const checkRadioClasses = useThemeCache(() => {
         margin: "auto",
     });
 
-    const disk = style("disk", {
+    const disk = css({
         borderRadius: percent(50),
     });
 
-    const diskIcon = style("diskIcon", {
+    const diskIcon = css({
         display: "none",
         width: vars.checkBox.disk.width,
         height: vars.checkBox.disk.height,
@@ -182,7 +180,7 @@ export const checkRadioClasses = useThemeCache(() => {
 
     // .radioButton-input,
     // .checkbox-input
-    const input = style("input", {
+    const input = css({
         ...Mixins.absolute.srOnly(),
         ...{
             [`&:hover:not(:disabled) + .${iconContainer}`]: uncheckedStateStyles,
@@ -206,7 +204,7 @@ export const checkRadioClasses = useThemeCache(() => {
 
     //.radioButton,
     //.checkbox
-    const root = style({
+    const root = css({
         display: important("flex"),
         flexWrap: "wrap",
         alignItems: "center",
@@ -229,7 +227,7 @@ export const checkRadioClasses = useThemeCache(() => {
         },
     });
 
-    const grid = style("grid", {
+    const grid = css({
         display: "flex",
         flexWrap: "wrap",
         alignItems: "strech",

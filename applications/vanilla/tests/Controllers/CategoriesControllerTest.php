@@ -61,7 +61,7 @@ class CategoriesControllerTest extends TestCase {
     public function testFollowedCategoriesIndex(): array {
         /** @var \Gdn_Configuration $config */
         $config = static::container()->get('Config');
-        $config->set('Vanilla.EnableCategoryFollowing', true, true, false);
+        $config->set(\CategoryModel::CONF_CATEGORY_FOLLOWING, true, true, false);
         // follow a category
         $this->followCategory(\Gdn::session()->UserID, 1, true);
 

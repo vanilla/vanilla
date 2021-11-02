@@ -12,6 +12,7 @@ import { ListItemIconPosition } from "@library/lists/ListItem.variables";
 import { BorderType } from "@library/styles/styleHelpersBorders";
 import { LoadStatus } from "@library/@types/api/core";
 import { ReactionUrlCode } from "@dashboard/@types/api/reaction";
+import { setMeta } from "@library/utility/appUtils";
 
 import keyBy from "lodash/keyBy";
 
@@ -22,6 +23,8 @@ export default {
 
 const dummyUserFragment = STORY_USER;
 const dummyTags = STORY_TAGS;
+
+setMeta("ui.useAdminCheckboxes", true);
 
 const commonFields = {
     dateInserted: "2021-02-11 17:51:15",

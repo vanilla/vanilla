@@ -28,23 +28,6 @@ Instead of creating controls for specific situations, make sure your control can
 </ListBox>
 ```
 
-**Components over lists and objects**
-
-Whenever possible, use the declarative form when specifying values or different parts of the control.
-
-This makes them easier to customize and readable.
-
-```tsx
-// ❌  Makes it hard to style subcomponents
-<AutoComplete items={[{ value: "apple" }], { value: "banana" }} className="myClass" itemClassName="myItemClass" />
-
-// ✅  Composition gives us more flexibility and readability.
-<AutoComplete className="myClass">
-    <AutoCompleteOption value="apple" className="myItemClass" />
-    <AutoCompleteOption value="banana" className="myItemClass" />
-</AutoComplete>
-```
-
 **Composability over adding properties**
 
 Whenever possible, it is always preferable to create a higher-order component or a hook to customize an existing component, as opposed to adding properties and unnecessary complexity.
@@ -56,11 +39,10 @@ Whenever possible, it is always preferable to create a higher-order component or
 // ✅  Gives the responsibility of fetching and searching fruits to another component.
 <ApiItemFetcher url="api/v2/fruits" searchUrl="api/v2/fruits?q=%s">
     {(items, onSearch) => (
-        <AutoComplete onSearch={onSearch}>
-            {items.map(({ value, label }) => (
-                <AutoCompleteOption value={value} label={label}/>
-            ))}
-        </AutoComplete>
+        <AutoComplete onSearch={onSearch} options={items.map(({ value, label }) => ({
+            value,
+            label
+        }))} />
     )}
 </ApiItemFetcher>
 ```

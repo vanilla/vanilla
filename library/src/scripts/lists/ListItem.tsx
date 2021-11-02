@@ -40,6 +40,7 @@ export interface IListItemProps {
     as?: keyof JSX.IntrinsicElements;
     headingDepth?: number;
     options?: Partial<IListItemComponentOptions>;
+    checkbox?: React.ReactNode;
 }
 
 export function ListItem(props: IListItemProps) {
@@ -83,12 +84,24 @@ export function ListItem(props: IListItemProps) {
         </Paragraph>
     ) : null;
 
+    //Class to add padding adjustment when checkbox is not beside avatar
+    const checkboxLabelAdjustment =
+        iconPosition === ListItemIconPosition.DEFAULT && props.icon ? null : classes.checkboxLabelAdjustment;
+    const checkboxWrapped = props.checkbox && (
+        <div className={cx(classes.checkboxContainer, checkboxLabelAdjustment)}>{props.checkbox}</div>
+    );
     return (
         <PageBox as={props.as ?? "li"} ref={selfRef} className={cx(props.className)}>
             <div className={classes.item}>
-                {iconPosition === ListItemIconPosition.DEFAULT && props.icon && (
-                    <div className={cx(classes.iconContainer, props.iconWrapperClass)}>{props.icon}</div>
+                {iconPosition === ListItemIconPosition.DEFAULT && props.icon ? (
+                    <div className={cx(classes.iconContainer, props.iconWrapperClass)}>
+                        {checkboxWrapped}
+                        {props.icon}
+                    </div>
+                ) : (
+                    checkboxWrapped
                 )}
+
                 <div className={classes.contentContainer}>
                     <div className={classes.titleContainer}>
                         <Heading custom className={classes.title} depth={headingDepth}>

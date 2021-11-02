@@ -19,7 +19,7 @@ interface IProps extends React.HTMLAttributes<HTMLDivElement> {}
 export function Metas(props: IProps) {
     const classes = metasClasses();
     // note: using cx to compose the class name breaks the sibling selectors required to ensure spacing between list item metas & description
-    return <div {...props} className={classNames(props.className, classes.root)} />;
+    return <div {...props} className={classNames(classes.root, props.className)} />;
 }
 
 export function MetaItem(props: IProps) {
@@ -32,7 +32,7 @@ export function MetaLink(props: React.ComponentProps<typeof SmartLink>) {
 
     return (
         <MetaItem>
-            <SmartLink {...props} className={cx(classes.metaLink, props.className)} />
+            <SmartLink {...props} className={classNames(classes.metaLink, props.className)} />
         </MetaItem>
     );
 }

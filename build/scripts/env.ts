@@ -17,7 +17,9 @@ export const VANILLA_THEMES = resolve(VANILLA_ROOT, "addons/themes");
 export const VANILLA_ADDONS = resolve(VANILLA_ROOT, "addons/addons");
 
 export const PACKAGES_DIRECTORY = resolve(VANILLA_ROOT, "packages");
-export const DIST_DIRECTORY = resolve(VANILLA_ROOT, "dist");
+export const DIST_NAME = "dist/v1";
+export const DIST_ROOT_DIRECTORY = resolve(VANILLA_ROOT, "dist");
+export const DIST_DIRECTORY = resolve(VANILLA_ROOT, DIST_NAME);
 export const LIBRARY_SRC_DIRECTORY = resolve(VANILLA_ROOT, "library/src/scripts");
 
 // Config files

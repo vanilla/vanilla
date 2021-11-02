@@ -1,25 +1,35 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import apiv2 from "@library/apiv2";
-import { AuthenticatorActions, useAuthenticatorActions } from "@oauth2/AuthenticatorActions";
+import { useCallback, useEffect, useMemo, useState } from "react";
+
 import {
+    IAuthenticationRequest,
+    IAuthenticationRequestPrompt,
     IAuthenticator,
-    IAuthenticatorFormHook,
     IAuthenticatorList,
-    IAuthenticatorStore,
+    IAuthenticatorUserMappings,
     IGetAllAuthenticatorsParams,
 } from "@oauth2/AuthenticatorTypes";
-import { useSelector, useDispatch } from "react-redux";
-import { ThunkDispatch } from "redux-thunk";
-import { AnyAction } from "redux";
+import { useAuthenticatorsDispatch, useAuthenticatorsSelector } from "@oauth2/AuthenticatorReducer";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { stableObjectHash } from "@vanilla/utils";
+import {
+    deleteAuthenticator,
+    getAllAuthenticators,
+    getAuthenticator,
+    patchAuthenticator,
+    postAuthenticator,
+    setAuthenticatorActive,
+} from "@oauth2/AuthenticatorActions";
 
 export function useAuthenticators(params?: IGetAllAuthenticatorsParams): ILoadable<IAuthenticatorList> {
+    const dispatch = useAuthenticatorsDispatch();
+
     const hash = params ? stableObjectHash(params) : "";
-    const authenticatorIDsByHash = useSelector(
-        (state: IAuthenticatorStore) => state.authenticators.authenticatorIDsByHash,
+    const authenticatorIDsByHash = useAuthenticatorsSelector(
+        ({ authenticators: { authenticatorIDsByHash } }) => authenticatorIDsByHash,
     );
-    const authenticatorsByID = useSelector((state: IAuthenticatorStore) => state.authenticators.authenticatorsByID);
+    const authenticatorsByID = useAuthenticatorsSelector(
+        ({ authenticators: { authenticatorsByID } }) => authenticatorsByID,
+    );
     const authenticatorIDs = authenticatorIDsByHash[hash];
     const authenticators = useMemo<IAuthenticatorList | undefined>(() => {
         if (!authenticatorIDs || authenticatorIDs.status !== LoadStatus.SUCCESS) {
@@ -30,13 +40,12 @@ export function useAuthenticators(params?: IGetAllAuthenticatorsParams): ILoadab
             pagination: authenticatorIDs.data!.pagination,
         };
     }, [authenticatorIDs, authenticatorsByID]);
-    const { getAll } = useAuthenticatorActions();
 
     useEffect(() => {
         if (params && !authenticatorIDs) {
-            void getAll(params!);
+            dispatch(getAllAuthenticators(params));
         }
-    }, [getAll, authenticatorIDs, params]);
+    }, [dispatch, authenticatorIDs, params]);
 
     return {
         ...authenticatorIDs,
@@ -44,54 +53,89 @@ export function useAuthenticators(params?: IGetAllAuthenticatorsParams): ILoadab
     };
 }
 
-export function useAuthenticatorForm(authenticatorID: number | undefined): IAuthenticatorFormHook {
-    const { initForm, updateForm, clearForm } = useAuthenticatorActions();
+export const INITIAL_AUTHENTICATOR_USER_MAPPINGS: IAuthenticatorUserMappings = {
+    uniqueID: "user_id",
+    email: "email",
+    name: "displayname",
+    fullName: "name",
+    photoUrl: "picture",
+    roles: "roles",
+};
 
-    const dispatch = useDispatch<ThunkDispatch<IAuthenticatorStore, any, AnyAction>>();
-    const form = useSelector((state: IAuthenticatorStore) => state.authenticators.form);
-    const fieldsError = form.error?.response.data?.errors;
+export const INITIAL_AUTHENTICATION_REQUEST: IAuthenticationRequest = {
+    scope: "",
+    prompt: IAuthenticationRequestPrompt.LOGIN,
+};
+
+export const INITIAL_AUTHENTICATOR_FORM_STATE: IAuthenticator = {
+    authenticatorID: undefined,
+    name: "",
+    clientID: "",
+    secret: "",
+    type: "oauth2",
+    urls: {},
+    userMappings: INITIAL_AUTHENTICATOR_USER_MAPPINGS,
+    authenticationRequest: INITIAL_AUTHENTICATION_REQUEST,
+    useBearerToken: false,
+    allowAccessTokens: false,
+    active: true,
+    default: false,
+    visible: true,
+};
+
+export function useEditAuthenticator(authenticatorID: IAuthenticator["authenticatorID"]) {
+    const dispatch = useAuthenticatorsDispatch();
+
+    const authenticator = useAuthenticatorsSelector(({ authenticators: { authenticatorsByID } }) =>
+        authenticatorID ? authenticatorsByID[authenticatorID] : undefined,
+    );
 
     useEffect(() => {
-        initForm(authenticatorID);
-    }, [authenticatorID, initForm]);
+        if (authenticatorID) {
+            dispatch(getAuthenticator(authenticatorID));
+        }
+    }, [dispatch, authenticatorID]);
 
-    const update = useCallback(
-        (data: Partial<IAuthenticator>) => {
-            updateForm(data);
-        },
-        [updateForm],
+    const submitForm = useCallback(
+        async (authenticator: IAuthenticator) =>
+            dispatch(authenticatorID ? patchAuthenticator(authenticator) : postAuthenticator(authenticator)),
+        [authenticatorID, dispatch],
     );
 
-    const save = useCallback(
-        () =>
-            dispatch((dispatch, getState) => {
-                const { data } = getState().authenticators.form;
-                return new AuthenticatorActions(dispatch, apiv2).saveForm(data);
-            }),
-        [dispatch],
-    );
+    const initialValues: IAuthenticator = {
+        ...INITIAL_AUTHENTICATOR_FORM_STATE,
+        ...authenticator,
+    };
 
     return {
-        form,
-        update,
-        save,
-        fieldsError,
+        initialValues,
+        submitForm,
     };
 }
 
-export function useDeleteAuthenticator() {
-    const deleteState = useSelector((state: IAuthenticatorStore) => state.authenticators.deleteState);
-    const actions = useAuthenticatorActions();
+export function useSetAuthenticatorActive() {
+    const dispatch = useAuthenticatorsDispatch();
 
-    const deleteAuthenticator = useCallback(
-        (authenticatorID: number) => {
-            actions.deleteAuthenticator(authenticatorID);
+    const setActive = useCallback(
+        async (authenticatorID: NonNullable<IAuthenticator["authenticatorID"]>, active: IAuthenticator["active"]) => {
+            await dispatch(setAuthenticatorActive({ authenticatorID, active }));
         },
-        [actions],
+        [dispatch],
     );
+
+    return setActive;
+}
+
+export function useDeleteAuthenticator(authenticatorID: NonNullable<IAuthenticator["authenticatorID"]>) {
+    const deleteState = useAuthenticatorsSelector(({ authenticators: { deleteState } }) => deleteState);
+    const dispatch = useAuthenticatorsDispatch();
+
+    const deleteAuthenticatorCallback = useCallback(async () => {
+        await dispatch(deleteAuthenticator(authenticatorID));
+    }, [dispatch, authenticatorID]);
 
     return {
         deleteState,
-        deleteAuthenticator,
+        deleteAuthenticator: deleteAuthenticatorCallback,
     };
 }

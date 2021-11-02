@@ -9,9 +9,11 @@ import { EMBED_FOCUS_CLASS } from "@library/embeddedContent/embedConstants";
 import CloseButton from "@library/navigation/CloseButton";
 import { t } from "@library/utility/appUtils";
 import { UserWarningIcon } from "@library/icons/titleBar";
+import { IError } from "@library/errorPages/CoreErrorMessages";
+import { EmbedTitle } from "@library/embeddedContent/components/EmbedTitle";
 
 interface IProps {
-    children: string;
+    error: IError;
     id: string;
     onDismissClick: () => void;
 }
@@ -19,6 +21,9 @@ interface IProps {
 export default class StandardEmbedError extends React.Component<IProps> {
     public render() {
         const descriptionId = this.props.id + "-description";
+
+        const title = this.props.error.description ? this.props.error.message : null;
+        const description = this.props.error.description ?? this.props.error.message;
 
         return (
             <div
@@ -30,8 +35,9 @@ export default class StandardEmbedError extends React.Component<IProps> {
                 tabIndex={-1}
             >
                 <UserWarningIcon className={"embedLoader-icon embedLoader-warningIcon"} />
+                {title && <EmbedTitle>{title}</EmbedTitle>}
                 <span id={descriptionId} className="embedLoader-errorMessage">
-                    {this.props.children}
+                    {description}
                 </span>
                 <CloseButton title={t("Remove")} onClick={this.handleDismissClick} />
             </div>

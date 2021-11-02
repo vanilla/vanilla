@@ -64,9 +64,9 @@ class PageDispatchController implements CustomExceptionHandler, InjectableInterf
     protected function useSimplePage(string $title): Page {
         /** @var Page $page */
         $page = $this->container->get($this->simplePageClass);
-        $page->initialize($title);
         $this->activePage = $page;
-        return $page;
+        $this->activePage->initialize($title);
+        return $this->activePage;
     }
 
     /**

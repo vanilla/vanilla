@@ -22,6 +22,11 @@
  */
 class Gdn_MySQLDriver extends Gdn_SQLDriver {
 
+    public const BYTE_LENGTH_TINY_TEXT = 255;
+    public const BYTE_LENGTH_TEXT = 65535;
+    public const BYTE_LENGTH_MEDIUMTEXT = 16777215;
+    public const BYTE_LENGTH_LONGTEXT = 4294967295;
+
     /**
      * Escape an identifier like a table or column name.
      *
@@ -167,6 +172,22 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
                 }
             }
 
+            // Pull out max lengths for different text fields.
+            switch ($type) {
+                case 'tinytext':
+                    $length = self::BYTE_LENGTH_TINY_TEXT;
+                    break;
+                case 'text':
+                    $length = self::BYTE_LENGTH_TEXT;
+                    break;
+                case 'mediumtext':
+                    $length = self::BYTE_LENGTH_MEDIUMTEXT;
+                    break;
+                case 'longtext':
+                    $length = self::BYTE_LENGTH_LONGTEXT;
+                    break;
+            }
+
             $object = new stdClass();
             $object->Name = $field->Field;
             $object->PrimaryKey = ($field->Key == 'PRI' ? true : false);
@@ -176,6 +197,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
             $object->AllowNull = ($field->Null == 'YES');
             $object->Default = $field->Default;
             $object->Length = $length;
+            $object->ByteLength = $length;
             $object->Precision = $precision;
             $object->Enum = $enum;
             $object->KeyType = null; // give placeholder so it can be defined again.

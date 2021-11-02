@@ -120,7 +120,8 @@ class DiscussionsApiIndexSchema extends Schema {
                     'field' => 'd.InsertUserID',
                 ],
             ],
-            'expand?' => \DiscussionExpandSchema::commonExpandDefinition()
+            'expand?' => \DiscussionExpandSchema::commonExpandDefinition(),
+            'statusID:i?',
         ]));
     }
 

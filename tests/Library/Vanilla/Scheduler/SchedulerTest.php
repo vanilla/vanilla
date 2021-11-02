@@ -221,7 +221,7 @@ final class SchedulerTest extends SchedulerTestCase {
         $eventManager->bind(self::DISPATCHED_EVENT, function ($trackingSlips) {
             /** @var $trackingSlips TrackingSlip[] */
             $this->assertTrue(count($trackingSlips) == 1);
-            $this->assertStringContainsString('localDriverId', $trackingSlips[0]->getId());
+            $this->assertStringContainsString('localDriverId', $trackingSlips[0]->getID());
             $complete = JobExecutionStatus::complete();
             $this->assertTrue($trackingSlips[0]->getStatus()->is($complete));
             $this->assertTrue($trackingSlips[0]->getExtendedStatus()['status']->is($complete));
@@ -309,7 +309,7 @@ final class SchedulerTest extends SchedulerTestCase {
         $eventManager->bind(self::DISPATCHED_EVENT, function ($trackingSlips) {
             /** @var $trackingSlips TrackingSlip[] */
             $this->assertTrue(count($trackingSlips) == 1);
-            $this->assertStringContainsString('localDriverId', $trackingSlips[0]->getId());
+            $this->assertStringContainsString('localDriverId', $trackingSlips[0]->getID());
             $stackExecutionError = JobExecutionStatus::stackExecutionError();
             $this->assertTrue($trackingSlips[0]->getStatus()->is($stackExecutionError));
             $this->assertTrue($trackingSlips[0]->getExtendedStatus()['status']->is($stackExecutionError));
@@ -369,7 +369,7 @@ final class SchedulerTest extends SchedulerTestCase {
         $eventManager->bind(self::DISPATCHED_EVENT, function ($trackingSlips) {
             /** @var $trackingSlips TrackingSlip[] */
             $this->assertTrue(count($trackingSlips) == 1);
-            $this->assertStringContainsString('localDriverId', $trackingSlips[0]->getId());
+            $this->assertStringContainsString('localDriverId', $trackingSlips[0]->getID());
             $stackExecutionError = JobExecutionStatus::stackExecutionError();
             $this->assertTrue($trackingSlips[0]->getStatus()->is($stackExecutionError));
             $this->assertTrue($trackingSlips[0]->getExtendedStatus()['status']->is($stackExecutionError));

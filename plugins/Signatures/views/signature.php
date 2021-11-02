@@ -2,14 +2,18 @@
 
 if (!defined('APPLICATION')) exit(); ?>
 <div class="FormTitleWrapper">
-<h1 class="H"><?php echo t('Signatures'); ?></h1>
-<?php BoxThemeShim::startBox(); ?>
+<?php BoxThemeShim::startHeading(); ?>
+    <h1 class="H"><?php echo t('Signatures'); ?></h1>
+<?php BoxThemeShim::endHeading(); ?>
+    <?php BoxThemeShim::startBox(); ?>
 <?php
 echo $this->Form->open();
 ?>
-<h2 class="H"><?php echo t('My Signature'); ?></h2>
-   <?php echo $this->Form->errors(); ?>
-   <ul class="pageBox">
+<?php BoxThemeShim::startHeading(); ?>
+    <h2 class="H"><?php echo t('My Signature'); ?></h2>
+<?php BoxThemeShim::endHeading(); ?>
+<?php echo $this->Form->errors(); ?>
+   <ul>
       <?php
       if (isset($this->Data['Plugin-Signatures-ForceEditing']) && $this->Data['Plugin-Signatures-ForceEditing'] != false) {
          ?>
@@ -47,8 +51,10 @@ echo $this->Form->open();
       $this->fireEvent('EditMySignatureAfter');
    ?>
 </ul>
+<?php BoxThemeShim::startHeading(); ?>
 <h2 class="H"><?php echo t('Forum Signature Settings'); ?></h2>
-<ul class="pageBox">
+<?php BoxThemeShim::endHeading(); ?>
+    <ul>
       <?php
       echo $this->Form->checkBox('Plugin.Signatures.HideAll','Hide signatures always');
       if (!c('Signatures.Hide.Mobile', true)) {

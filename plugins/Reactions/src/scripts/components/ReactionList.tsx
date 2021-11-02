@@ -4,32 +4,45 @@
  */
 
 import React from "react";
-import { BadgeListView } from "@library/badge/BadgeList.views";
 import { IReaction } from "@Reactions/types/Reaction";
-import { IGetUserReactionsParams } from "@Reactions/state/ReactionsActions";
-import { useUserReactions } from "@Reactions/hooks/ReactionsHooks";
-import { LoadStatus } from "@library/@types/api/core";
+import { ContributionItemList } from "@library/contributionItems/ContributionItemList.views";
+import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import Loader from "@library/loaders/Loader";
 import { t } from "@library/utility/appUtils";
 import { CoreErrorMessages } from "@library/errorPages/CoreErrorMessages";
-interface IProps {
-    apiParams: IGetUserReactionsParams;
-    apiData?: IReaction[];
+import { reactionsVariables } from "@Reactions/variables/Reactions.variables";
+interface IReactionListProps extends ILoadable<IReaction[]> {
+    maximumLength?: number;
+    openModal?(): void;
+    stacked?: boolean;
 }
 
-export function ReactionList(props: IProps) {
-    const apiData = useUserReactions(props.apiParams, props.apiData);
+export function ReactionList(props: IReactionListProps) {
+    const reactionVars = reactionsVariables();
 
-    if ([LoadStatus.LOADING, LoadStatus.PENDING].includes(apiData.status)) {
-        return <Loader />;
+    if ([LoadStatus.LOADING, LoadStatus.PENDING].includes(props.status)) {
+        return <Loader small minimumTime={100} />;
     }
-    if (apiData.error) {
-        return <CoreErrorMessages apiError={apiData.error} />;
+    if (!props.data || props.status === LoadStatus.ERROR || props.error) {
+        return <CoreErrorMessages apiError={props.error} />;
     }
 
-    if (!!apiData.data && apiData.data!.length === 0) {
-        return <span>{t("NoReactionEarned", "Any minute now…")}</span>;
+    if (!!props.data && props.data!.length === 0) {
+        return (
+            <span style={props.stacked ? { lineHeight: `${reactionVars.stackedList.sizing.width}px` } : {}}>
+                {t("No reactions yet.")}
+            </span>
+        );
     }
-    const reactions = apiData.data as IReaction[];
-    return <BadgeListView items={reactions} keyID="tagID" />;
+
+    return (
+        <ContributionItemList
+            keyID="tagID"
+            themingVariables={reactionVars}
+            items={props.data!}
+            maximumLength={props.maximumLength}
+            stacked={props.stacked}
+            openModal={props.openModal}
+        />
+    );
 }

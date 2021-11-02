@@ -20,7 +20,7 @@ use Vanilla\Web\JsInterpop\AbstractReactModule;
  */
 class UserSpotlightModule extends AbstractReactModule {
 
-    /** @var UserModel */
+    /** @var \UserModel */
     private $userModel;
 
     /** @var int $userID */
@@ -35,7 +35,7 @@ class UserSpotlightModule extends AbstractReactModule {
     /**
      * UserSpotlightModule Constructor
      *
-     * @param UserModel $userModel
+     * @param \UserModel $userModel
      */
     public function __construct(\UserModel $userModel) {
         parent::__construct();

@@ -8,13 +8,10 @@
 namespace Vanilla\Search;
 
 use Garden\Schema\Schema;
-use Vanilla\Adapters\SphinxClient;
-use Vanilla\Adapters\SphinxClient as SphinxAdapter;
 use Vanilla\ApiUtils;
 use Vanilla\Contracts\Site\AbstractSiteProvider;
 use Vanilla\DateFilterSchema;
 use Vanilla\Models\CrawlableRecordSchema;
-use Vanilla\Sphinx\Search\SphinxSearchQuery;
 
 /**
  * Search type for global parameters.

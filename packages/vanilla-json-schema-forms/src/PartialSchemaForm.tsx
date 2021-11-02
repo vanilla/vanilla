@@ -29,6 +29,7 @@ interface IPartialProps extends IBaseSchemaFormProps, ISchemaRenderProps {
     isRequired?: boolean;
     inheritSchema?: JsonSchema;
     onChange(instance: any): void;
+    disabled?: boolean;
 }
 
 export function PartialSchemaForm(props: IPartialProps) {
@@ -82,6 +83,7 @@ export function PartialSchemaForm(props: IPartialProps) {
                 {Object.entries(schema.properties).map(([key, value]: [string, JsonSchema]) => {
                     return (
                         <PartialSchemaForm
+                            disabled={props.disabled}
                             key={key}
                             path={[...path, key]}
                             schema={value}
@@ -149,6 +151,7 @@ export function PartialSchemaForm(props: IPartialProps) {
         >
             {visibleControls.map((singleControl, index) => (
                 <FormControlWrapper
+                    disabled={props.disabled}
                     key={`${path.join("/")}[${index}]`}
                     path={path}
                     control={singleControl}

@@ -8,6 +8,7 @@
  * @since 2.0
  */
 
+use Garden\Web\Exception\ClientException;
 use Garden\EventManager;
 use Garden\Schema\Schema;
 use Vanilla\Dashboard\Models\PermissionJunctionModelInterface;
@@ -21,6 +22,8 @@ use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Permissions;
 use Vanilla\Scheduler\Descriptor\NormalJobDescriptor;
 use Vanilla\Scheduler\Job\CallbackJob;
+use Vanilla\Scheduler\LongRunner;
+use Vanilla\Scheduler\LongRunnerQuantityTotal;
 use Vanilla\Scheduler\SchedulerInterface;
 use Vanilla\SchemaFactory;
 use Vanilla\Site\SiteSectionModel;
@@ -43,6 +46,7 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
 
     use LegacyDirtyRecordTrait;
 
+    public const CONF_CATEGORY_FOLLOWING = "Vanilla.EnableCategoryFollowing";
     public const PERM_DISCUSSION_VIEW = "Vanilla.Discussions.View";
     public const PERM_JUNCTION_TABLE = "Category";
 
@@ -52,6 +56,9 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
 
     /** Category preference key for communicating a user's post notification preferences. */
     public const PREFERENCE_KEY_NOTIFICATION = "postNotifications";
+
+    /** Category preference key for whether a user's notifications should also be emailed. */
+    public const PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS = "useEmailNotifications";
 
     /** UserMeta key for determining whether a user should receive in-app discussion notifications for a category. */
     private const PREFERENCE_DISCUSSION_APP = "Preferences.Popup.NewDiscussion.%d";
@@ -177,6 +184,15 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
         $this->collection = $this->createCollection();
         $this->eventManager = Gdn::getContainer()->get(EventManager::class);
         $this->modelCache = new ModelCache('CategoryModel', Gdn::cache());
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getSystemCallableMethods(): array {
+        return [
+            'deleteIDIterable',
+        ];
     }
 
     /**
@@ -441,7 +457,8 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
         ?bool $followedCategories = null,
         ?bool $includeChildCategories = null,
         ?bool $includeArchivedCategories = null,
-        ?array $categoryIDs = null
+        ?array $categoryIDs = null,
+        ?string $categorySearch = null
     ): array {
         $categoryFilter = [
             'forceArrayReturn' => true,
@@ -472,8 +489,10 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
             $resultIDs = array_intersect($categoryIDs, $resultIDs);
         }
 
-        // Make sure 0 (allowing other record types) makes it in.
-        $resultIDs[] = 0;
+        if ($categorySearch !== "Discussion" || $categoryID === null || empty($resultIDs)) {
+            // Make sure 0 (allowing other record types) makes it in.
+            $resultIDs[] = 0;
+        }
 
         return $resultIDs;
     }
@@ -623,6 +642,13 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
             throw new InvalidArgumentException('Category not configured to display as discussions.');
         }
 
+        if ($followed == 1) {
+            $followedCategories = $this->getFollowed($userID);
+            if (count($followedCategories) >= $this->getMaxFollowedCategories()) {
+                throw new ClientException(t('Already following the maximum number of categories.'));
+            }
+        }
+
         $this->SQL->replace(
             'UserCategory',
             ['Followed' => $followed],
@@ -641,7 +667,7 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
      * @return bool
      */
     public function followingEnabled() {
-        $result = boolval(c('Vanilla.EnableCategoryFollowing'));
+        $result = boolval(c(\CategoryModel::CONF_CATEGORY_FOLLOWING));
         return $result;
     }
 
@@ -1032,6 +1058,9 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
     public function counts($column) {
         $result = ['Complete' => true];
         switch ($column) {
+            case 'CountChildCategories':
+                $this->recalculateTree();
+                break;
             case 'CountDiscussions':
                 $this->Database->query(DBAModel::getCountSQL('count', 'Category', 'Discussion'));
                 break;
@@ -2303,27 +2332,28 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
      *
      * @param int $categoryID
      * @param array $options
-     * @return iterable
-     * @system-callable
+     * @return Generator
      */
-    public function deleteIDIterable(int $categoryID, array $options = []): iterable {
+    public function deleteIDIterable(int $categoryID, array $options = []): Generator {
         $options += [
             "newCategoryID" => null,
         ];
+        $category = self::categories($categoryID);
+        yield new LongRunnerQuantityTotal($category['CountDiscussions']);
         /** @var DiscussionModel $discussionModel */
         $discussionModel = Gdn::getContainer()->get(DiscussionModel::class);
         if ($options["newCategoryID"]) {
             foreach ($discussionModel->moveByCategory($categoryID, $options['newCategoryID']) as $d) {
-                yield false;
+                yield;
             }
         } else {
             foreach ($discussionModel->deleteByCategory($categoryID) as $d) {
-                yield false;
+                yield;
             }
         }
         $this->prepareForDelete($categoryID);
         $this->deleteInternal($categoryID, true);
-        yield true;
+        return LongRunner::FINISHED;
     }
 
     /**
@@ -3284,7 +3314,7 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
 
             return $collection;
         } catch (Throwable $t) {
-            throw new RuntimeException("Couldn't instantiate CategoryCollection");
+            throw new RuntimeException("Couldn't instantiate CategoryCollection", 500, $t);
         }
     }
 
@@ -3404,7 +3434,7 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
         $this->defineSchema();
 
         // Get data from form
-        $CategoryID = val('CategoryID', $formPostValues);
+        $CategoryID = val('CategoryID', $formPostValues, false);
         $NewName = val('Name', $formPostValues, '');
         $UrlCode = val('UrlCode', $formPostValues, '');
         $AllowDiscussions = val('AllowDiscussions', $formPostValues, 1);
@@ -3416,7 +3446,7 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
         }
 
         // Is this a new category?
-        $Insert = $CategoryID > 0 ? false : true;
+        $Insert = $CategoryID === false;
         if ($Insert) {
             $this->addInsertFields($formPostValues);
         }
@@ -4136,35 +4166,43 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
     }
 
     /**
-     * Compile legacy notification settings from UserMeta and UserCategory into a standard notification flag.
+     * Compile legacy notification settings from UserMeta and UserCategory into newer notification flags.
      *
      * @param int $categoryID
      * @param array $userMeta
      * @param array $userCategory
-     * @return string|null
+     * @return array{postNotifications: string, useEmailNotifications: bool}
      */
-    private function notificationFromLegacy(int $categoryID, array $userMeta, array $userCategory): ?string {
+    private function notificationFromLegacy(int $categoryID, array $userMeta, array $userCategory): array {
         $following = $userCategory[$categoryID]["Followed"] ?? false;
 
-        $discussionApp = sprintf(self::PREFERENCE_DISCUSSION_APP, $categoryID);
-        $discussionEmail = sprintf(self::PREFERENCE_DISCUSSION_EMAIL, $categoryID);
-        $discussions = $userMeta[$discussionEmail] ?? $userMeta[$discussionApp] ?? false;
+        $discussionAppKey = sprintf(self::PREFERENCE_DISCUSSION_APP, $categoryID);
+        $discussionApp = $userMeta[$discussionAppKey]["Value"] ?? false;
+        $discussionEmailKey = sprintf(self::PREFERENCE_DISCUSSION_EMAIL, $categoryID);
+        $discussionEmail = $userMeta[$discussionEmailKey]["Value"] ?? false;
+        $discussions = $discussionEmail || $discussionApp;
 
-        $commentApp = sprintf(self::PREFERENCE_COMMENT_APP, $categoryID);
-        $commentEmail = sprintf(self::PREFERENCE_COMMENT_EMAIL, $categoryID);
-        $comments = $userMeta[$commentEmail] ?? $userMeta[$commentApp] ?? false;
+        $commentAppKey = sprintf(self::PREFERENCE_COMMENT_APP, $categoryID);
+        $commentApp = $userMeta[$commentAppKey]["Value"] ?? false;
+        $commentEmailKey = sprintf(self::PREFERENCE_COMMENT_EMAIL, $categoryID);
+        $commentEmail = $userMeta[$commentEmailKey]["Value"] ?? false;
+        $comments = $commentEmail || $commentApp;
 
         if ($comments) {
-            $result = self::NOTIFICATION_ALL;
+            $postNotifications = self::NOTIFICATION_ALL;
         } elseif ($discussions) {
-            $result = self::NOTIFICATION_DISCUSSIONS;
+            $postNotifications = self::NOTIFICATION_DISCUSSIONS;
         } elseif ($following) {
-            $result = self::NOTIFICATION_FOLLOW;
+            $postNotifications = self::NOTIFICATION_FOLLOW;
         } else {
-            $result = null;
+            $postNotifications = null;
         }
 
-        return $result;
+        $useEmailNotifications = $discussionEmail || $commentEmail;
+        return [
+            self::PREFERENCE_KEY_NOTIFICATION => $postNotifications,
+            self::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS => $useEmailNotifications,
+        ];
     }
 
     /**
@@ -4180,7 +4218,7 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
         $categoryIDs = array_keys($userCategory);
         $categoryIDs = array_combine($categoryIDs, $categoryIDs);
         foreach ($userMeta as $name => $value) {
-            $id = substr(strrchr($name, "."), "-1");
+            $id = substr(strrchr($name, "."), 1);
             if (empty($id) || ($id = filter_var($id, FILTER_VALIDATE_INT)) === false) {
                 continue;
             }
@@ -4197,7 +4235,7 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
             $preferences = $this->generatePreferences($id, $userMeta, $userCategory);
 
             // Currently only tracking notification preferences. If there's nothing to add, skip the row.
-            $postNotifications = $preferences["postNotifications"] ?? null;
+            $postNotifications = $preferences[self::PREFERENCE_KEY_NOTIFICATION] ?? null;
             if ($postNotifications === null) {
                 continue;
             }
@@ -4236,7 +4274,21 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
      */
     public function setPreferences(int $userID, int $categoryID, array $preferences): void {
         if (array_key_exists(self::PREFERENCE_KEY_NOTIFICATION, $preferences)) {
-            $this->setNotificationPreference($userID, $categoryID, $preferences[self::PREFERENCE_KEY_NOTIFICATION]);
+            $useEmailNotifications = $preferences[self::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS] ?? false;
+            $this->setNotificationPreference(
+                $userID,
+                $categoryID,
+                $preferences[self::PREFERENCE_KEY_NOTIFICATION],
+                $useEmailNotifications
+            );
+        } elseif (array_key_exists(self::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS, $preferences)) {
+            $userPreferences = $this->getPreferencesByCategoryID($userID, $categoryID);
+            $this->setNotificationPreference(
+                $userID,
+                $categoryID,
+                $userPreferences[self::PREFERENCE_KEY_NOTIFICATION] ?? null,
+                $preferences[self::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS]
+            );
         }
     }
 
@@ -4246,20 +4298,26 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
      * @param int $userID
      * @param int $categoryID
      * @param string|null $notificationPreference One of the NOTIFICATION_* constants or `null` to disable notifications.
+     * @param bool $useEmailNotifications
      */
-    private function setNotificationPreference(int $userID, int $categoryID, ?string $notificationPreference): void {
+    private function setNotificationPreference(
+        int $userID,
+        int $categoryID,
+        ?string $notificationPreference,
+        bool $useEmailNotifications = false
+    ): void {
         switch ($notificationPreference) {
             case self::NOTIFICATION_ALL:
                 $following = true;
                 $discussionApp = true;
-                $discussionEmail = true;
+                $discussionEmail = $useEmailNotifications ?: null;
                 $commentApp = true;
-                $commentEmail = true;
+                $commentEmail = $useEmailNotifications ?: null;
                 break;
             case self::NOTIFICATION_DISCUSSIONS:
                 $following = true;
                 $discussionApp = true;
-                $discussionEmail = true;
+                $discussionEmail = $useEmailNotifications ?: null;
                 $commentApp = null;
                 $commentEmail = null;
                 break;
@@ -4301,10 +4359,11 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
      * @return array
      */
     private function generatePreferences(int $categoryID, array $userMeta, array $userCategory): array {
-        $postNotifications = $this->notificationFromLegacy($categoryID, $userMeta, $userCategory);
+        $notificationPreferences = $this->notificationFromLegacy($categoryID, $userMeta, $userCategory);
 
         return [
-            "postNotifications" => $postNotifications,
+            self::PREFERENCE_KEY_NOTIFICATION => $notificationPreferences[self::PREFERENCE_KEY_NOTIFICATION],
+            self::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS => $notificationPreferences[self::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS],
         ];
     }
 
@@ -4315,7 +4374,7 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
      */
     public function preferencesSchema(): Schema {
         $result = SchemaFactory::parse([
-            "postNotifications" => [
+            self::PREFERENCE_KEY_NOTIFICATION => [
                 "allowNull" => true,
                 "type" => "string",
                 "enum" => [
@@ -4323,7 +4382,10 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
                     CategoryModel::NOTIFICATION_DISCUSSIONS,
                     CategoryModel::NOTIFICATION_FOLLOW,
                 ],
-            ]
+            ],
+            self::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS => [
+                "type" => "boolean",
+            ],
         ], "CategoryPreferences");
         return $result;
     }
@@ -4589,13 +4651,13 @@ SQL;
      * Search for categories by name.
      *
      * @param string $name The whole or partial category name to search for.
+     * @param int|null $parentCategoryID Parent categoryID to filter by.
      * @param bool $expandParent Expand the parent category record.
      * @param int|null $limit Limit the total number of results.
      * @param int|null $offset Offset the results.
-     * @param array $expand List of data need to be expanded/joined.
      * @return array
      */
-    public function searchByName($name, $expandParent = false, $limit = null, $offset = null, array $expand = []) {
+    public function searchByName($name, ?int $parentCategoryID, bool $expandParent = false, ?int $limit = null, ?int $offset = null) {
         if ($limit !== null && filter_var($limit, FILTER_VALIDATE_INT) === false) {
             $limit = null;
         }
@@ -4603,10 +4665,17 @@ SQL;
             $offset = null;
         }
 
+        $searchableIDs = $this->getSearchCategoryIDs(
+            $parentCategoryID,
+            null,
+            true,
+            true
+        );
+
         $query = $this->SQL
             ->from('Category c')
             ->where('CategoryID >', 0)
-            ->where('DisplayAs <>', self::DISPLAY_HEADING)
+            ->where('CategoryID', $searchableIDs)
             ->like('Name', $name)
             ->orderBy('Name');
         if ($limit !== null) {
@@ -4631,10 +4700,6 @@ SQL;
                     self::calculate($category);
                     $category['Parent'] = $parent;
                 }
-            }
-            if (in_array('breadcrumbs', $expand)) {
-                $breadcrumbModel = Gdn::getContainer()->get(BreadcrumbModel::class);
-                $category['breadcrumbs'] = $breadcrumbModel->getForRecord(new ForumCategoryRecordType($category['CategoryID']));
             }
 
             $result[] = $category;
@@ -4912,6 +4977,7 @@ SQL;
 
         if ($rebuildTree) {
             $this->rebuildTree();
+            $this->recalculateTree();
         }
 
         // Let the world know we completed our mission.

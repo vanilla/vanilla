@@ -331,7 +331,7 @@ class RoleRequestModel extends PipelineModel implements FragmentFetcherInterface
     /**
      * @inheritDoc
      */
-    public function fetchFragments(array $roleIDs, array $options = []): array {
+    public function fetchFragments(array $ids, array $options = []): array {
         $options += [
             self::OPT_FRAGMENT_TYPE => null,
             self::OPT_FRAGMENT_USERID => null,
@@ -348,7 +348,7 @@ class RoleRequestModel extends PipelineModel implements FragmentFetcherInterface
             $userID = (int)$userID;
         }
 
-        $rows = $this->select(['roleID' => $roleIDs, 'type' => $type, 'userID' => $userID]);
+        $rows = $this->select(['roleID' => $ids, 'type' => $type, 'userID' => $userID]);
         $fragments = [];
 
         foreach ($rows as $row) {

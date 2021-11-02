@@ -14,15 +14,15 @@ use Vanilla\Database\Operation;
 use Vanilla\Database\Operation\CurrentIPAddressProcessor;
 use Vanilla\Database\Operation\StatusFieldProcessor;
 use Vanilla\Models\Model;
+use Vanilla\Models\PipelineModel;
+use VanillaTests\BootstrapTestCase;
 use VanillaTests\BootstrapTrait;
 use VanillaTests\SetupTraitsTrait;
 
 /**
  * Test the `StatusFieldProcessor` class.
  */
-class StatusFieldProcessorTest extends TestCase {
-    use BootstrapTrait, SetupTraitsTrait;
-
+class StatusFieldProcessorTest extends BootstrapTestCase {
     private const TEST_IP = '2001:db8:85a3::8a2e:370:7334';
 
     /**
@@ -147,6 +147,33 @@ class StatusFieldProcessorTest extends TestCase {
     }
 
     /**
+     * Test against an actual database table.
+     */
+    public function testDbIntegration(): void {
+        $table = __FUNCTION__;
+
+        $this->container()->call(function (\Gdn_DatabaseStructure $structure) use ($table) {
+            $structure
+                ->table($table)
+                ->primaryKey($table.'ID')
+                ->column('name', 'varchar(255)')
+                ->column($this->processor->getDateField(), 'datetime')
+                ->column($this->processor->getUserIDField(), 'int')
+                ->column($this->processor->getIpAddressField(), 'ipaddress')
+                ->set();
+        });
+
+        $model = $this->container()->getArgs(PipelineModel::class, [$table]);
+        $model->addPipelineProcessor($this->processor);
+
+        $id = $model->insert(['name' => __FUNCTION__]);
+        $this->assertNotFalse($id, 'The sample row did not insert.');
+        $row = $model->selectSingle($model->primaryWhere($id));
+        $this->assertSame($this->processor->getCurrentIPAddress(), $row[$this->processor->getIpAddressField()]);
+        $this->assertSame($this->processor->getCurrentUserID(), $row[$this->processor->getUserIDField()]);
+    }
+
+    /**
      * Data provider for processor field setters.
      *
      * @return array|\string[][]
@@ -175,7 +202,7 @@ class StatusFieldProcessorTest extends TestCase {
                 case Operation::TYPE_DELETE:
                     return true;
                 case Operation::TYPE_SELECT:
-                    return [['ip' => $this->processor->getCurrentIPAddress()], []];
+                    return [['ip' => ipEncode($this->processor->getCurrentIPAddress())], []];
                 default:
                     throw new \InvalidArgumentException("Invalid test operation: " . $op->getType());
             }
@@ -205,7 +232,7 @@ class StatusFieldProcessorTest extends TestCase {
         if (!empty($this->processor->getIpAddressField())) {
             $this->assertSame($exists, $op->hasSetItem($this->processor->getIpAddressField()), "Operation missing the IP Address field.");
             if ($exists) {
-                $this->assertSame($this->processor->getCurrentIPAddress(), $op->getSetItem($this->processor->getIpAddressField()));
+                $this->assertSame($this->processor->getCurrentIPAddress(), ipDecode($op->getSetItem($this->processor->getIpAddressField())));
             }
         }
     }

@@ -21,17 +21,12 @@ class ComposerHelper {
     const DISABLE_AUTO_BUILD = "VANILLA_BUILD_DISABLE_AUTO_BUILD";
 
     /**
-     * Clear the addon manager cache.
+     * Clear cached php files.
      */
-    public static function clearAddonManagerCache() {
+    public static function clearPhpCache() {
         $cacheDir = realpath(__DIR__.'/../../cache');
 
-        $paths = array_merge(
-            [$cacheDir.'/addon.php', $cacheDir.'/openapi.php', $cacheDir.'/config-schema.php'],
-            glob($cacheDir.'/locale/*.php'),
-            glob($cacheDir.'/theme/*.php'),
-            glob($cacheDir.'/*-index.php')
-        );
+        $paths = array_merge(glob($cacheDir.'/**/*.php'), glob($cacheDir.'/*.php'));
         foreach ($paths as $path) {
             if (file_exists($path)) {
                 unlink($path);
@@ -92,7 +87,9 @@ class ComposerHelper {
      * - VANILLA_BUILD_DISABLE_AUTO_BUILD - Prevent the build from running on composer install.
      */
     public static function postUpdate() {
-        $vanillaRoot = realpath(__DIR__ . "/../../");
+        require_once __DIR__ . "/../../environment.php";
+
+        $vanillaRoot = PATH_ROOT;
         $skipBuild = getenv(self::DISABLE_AUTO_BUILD) === 'true';
         if ($skipBuild) {
             printf("\nSkipping automatic JS build because " . self::DISABLE_AUTO_BUILD . " env variable is set to \"true\".\n");
@@ -138,7 +135,7 @@ class ComposerHelper {
         }
 
         // Generate our vendor license file.
-        $distDir = $vanillaRoot . '/dist';
+        $distDir = PATH_DIST;
         $licensePath = $distDir . '/VENDOR_LICENSES.txt';
         if (!file_exists($distDir)) {
             mkdir($distDir);
@@ -170,7 +167,7 @@ class ComposerHelper {
      * @param Event $event The event being fired.
      */
     public static function preUpdate(Event $event) {
-        self::clearAddonManagerCache();
+        self::clearPhpCache();
         self::clearTwigCache();
 
         // Check for a composer-local.json.

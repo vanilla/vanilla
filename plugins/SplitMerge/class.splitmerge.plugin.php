@@ -221,6 +221,7 @@ class SplitMergePlugin extends Gdn_Plugin {
                     if ($CommentID) {
                         $Comment['CommentID'] = $CommentID;
                         $this->EventArguments['SourceDiscussion'] = $Discussion;
+                        $this->EventArguments['DestinationDiscussion'] = $MergeDiscussion;
                         $this->EventArguments['TargetComment'] = $Comment;
                         $this->fireEvent('TransformDiscussionToComment');
 

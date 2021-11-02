@@ -9,7 +9,7 @@ import { storiesOf } from "@storybook/react";
 import React from "react";
 import { QuoteEmbed } from "@library/embeddedContent/QuoteEmbed";
 import { IUserFragment, IUserFragmentAndRoles } from "@library/@types/api/users";
-import { ICategory } from "@vanilla/addon-vanilla/@types/api/categories";
+import { ICategory } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import { StoryContent } from "@library/storybook/StoryContent";
 
 const story = storiesOf("Embeds", module);

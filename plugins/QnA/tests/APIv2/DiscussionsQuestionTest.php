@@ -10,7 +10,6 @@ namespace VanillaTests\APIv2;
 use CategoryModel;
 use Gdn;
 
-
 /**
  * Test managing questions with the /api/v2/discussions endpoint.
  */
@@ -60,6 +59,7 @@ class DiscussionsQuestionTest extends AbstractAPIv2Test {
 
         $body = $response->getBody();
         $this->assertIsQuestion($body, ['status' => 'unanswered']);
+        $this->assertSame($body['statusID'], \RecordStatusModel::DISCUSSION_STATUS_UNANSWERED);
 
         return $body;
     }
@@ -91,6 +91,7 @@ class DiscussionsQuestionTest extends AbstractAPIv2Test {
         $body = $response->getBody();
         $this->assertEquals('question', $body['type']);
         $this->assertIsQuestion($body, ['status' => 'unanswered']);
+        $this->assertSame($body['statusID'], \RecordStatusModel::DISCUSSION_STATUS_UNANSWERED);
 
         $this->assertTrue(is_int($body['discussionID']));
         $this->assertTrue($body['discussionID'] > 0);
@@ -149,6 +150,9 @@ class DiscussionsQuestionTest extends AbstractAPIv2Test {
         $this->api()->patch("comments/answer/".$answers[1]["commentID"], ["status" => "accepted"]);
 
         $discussion = $this->api()->get("discussions/".$question['discussionID'], ["expand" => ["acceptedAnswers"]])->getBody();
+
+        // Verify the question has a status of "Accepted".
+        $this->assertSame($discussion['statusID'], \RecordStatusModel::DISCUSSION_STATUS_ACCEPTED);
 
         // Verify we have accepted answers.
         $this->assertArrayHasKey("acceptedAnswers", $discussion["attributes"]["question"], "No accepted answers.");

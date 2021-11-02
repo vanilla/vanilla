@@ -21,6 +21,9 @@ final class FoundationShimOptions {
     /** @var string|null */
     private $viewAllUrl = null;
 
+    /** @var bool */
+    private $isMainContent = false;
+
     /**
      * @return FoundationShimOptions
      */
@@ -65,6 +68,20 @@ final class FoundationShimOptions {
     }
 
     /**
+     * Set this if we are shimming the primary content of the page.
+     *
+     * @param bool $isMainContent
+     *
+     * @return $this
+     */
+    public function setIsMainContent(bool $isMainContent): FoundationShimOptions {
+        $this->isMainContent = $isMainContent;
+        return $this;
+    }
+
+
+
+    /**
      * @return string|null
      */
     public function getTitle(): ?string {
@@ -83,5 +100,12 @@ final class FoundationShimOptions {
      */
     public function getViewAllUrl(): ?string {
         return $this->viewAllUrl;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isMainContent(): bool {
+        return $this->isMainContent;
     }
 }

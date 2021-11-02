@@ -11,6 +11,7 @@ use Garden\Web\Redirect;
 use Vanilla\Models\TrustedDomainModel;
 use Vanilla\Theme\ThemeService;
 use Vanilla\Web\Asset\DeploymentCacheBuster;
+use Vanilla\Web\CacheControlConstantsInterface;
 use Vanilla\Web\CacheControlMiddleware;
 
 if (!function_exists('asset')) {
@@ -1307,7 +1308,7 @@ if (!function_exists('redirectTo')) {
         @ob_end_clean();
 
         if ($statusCode === 302) {
-            CacheControlMiddleware::sendCacheControlHeaders(CacheControlMiddleware::NO_CACHE);
+            CacheControlMiddleware::sendCacheControlHeaders(CacheControlConstantsInterface::NO_CACHE);
         }
 
         if (Gdn::controller() !== null
@@ -1363,21 +1364,9 @@ if (!function_exists('safeURL')) {
      * @return string The destination if safe, /home/leaving?Target=$destination if not.
      */
     function safeURL($destination, $withDomain = false) {
-        $url = url($destination, true);
-
         /** @var TrustedDomainModel $trustedDomainModel */
-        $trustedDomainModel = \Gdn::getContainer()->get(TrustedDomainModel::class);
-        $trustedDomains = $trustedDomainModel->getAll();
-        $isTrustedDomain = false;
-
-        foreach ($trustedDomains as $trustedDomain) {
-            if (urlMatch($trustedDomain, $url)) {
-                $isTrustedDomain = true;
-                break;
-            }
-        }
-
-        return ($isTrustedDomain ? $url : url('/home/leaving?Target='.urlencode($destination), $withDomain));
+        $trustedDomainModel = Gdn::getContainer()->get(TrustedDomainModel::class);
+        return $trustedDomainModel->safeUrl($destination, $withDomain);
     }
 }
 

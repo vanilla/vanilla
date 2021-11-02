@@ -38,6 +38,9 @@ export const pageBoxCompatStyles = useThemeCache(() => {
             ...mediaQueries.oneColumnDown({
                 ...Mixins.margin({ bottom: globalVars.spacer.headingBoxCompact }),
             }),
+            ...mediaQueries.xs({
+                minWidth: 150,
+            }),
 
             "&:first-child": {
                 paddingTop: 0,
@@ -134,6 +137,15 @@ export const pageBoxCompatStyles = useThemeCache(() => {
                     }),
                 },
             }),
+        },
+    });
+
+    injectGlobal({
+        ".headerBoxLayout": {
+            position: "relative",
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "space-between",
         },
     });
 });

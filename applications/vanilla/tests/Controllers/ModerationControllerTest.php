@@ -105,6 +105,8 @@ class ModerationControllerTest extends SiteTestCase {
         $this->assertEquals(2, $response->Data['CountCheckedDiscussions']);
         $this->assertEquals(2, $response->Data['CountAllowed']);
         $this->assertEquals(0, $response->Data['CountNotAllowed']);
+
+        // Test with some random ids.
         $discussionIDs = [rand(3000, 4000), rand(3000, 4000)];
         $data = [
             'discussionIDs' => $discussionIDs

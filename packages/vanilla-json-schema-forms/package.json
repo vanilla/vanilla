@@ -5,7 +5,8 @@
     "version": "1.0.0",
     "license": "gpl-2.0-only",
     "dependencies": {
-        "ajv": "^8.0.1"
+        "ajv": "^8.0.1",
+        "@vanilla/ui": "*"
     },
     "devDependencies": {
         "@vanilla/tsconfig": "^3.0.1"

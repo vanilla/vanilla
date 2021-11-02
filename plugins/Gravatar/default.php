@@ -58,7 +58,7 @@ class GravatarPlugin extends Gdn_Plugin {
                 $defaultParsed = Gdn_Upload::parse($configuredDefaultAvatar);
                 $default = val('Url', $defaultParsed);
             } else {
-                $default = asset('applications/dashboard/design/images/defaulticon.png', true);
+                $default = \UserModel::getDefaultAvatarUrl();
             }
         }
 

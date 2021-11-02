@@ -75,7 +75,12 @@ class CategoryController extends VanillaController {
         if (!$hasPermission) {
             throw permissionException('Vanilla.Discussion.View');
         }
-        $result = $categoryModel->follow($userID, $categoryID, $followed);
+
+        try {
+            $result = $categoryModel->follow($userID, $categoryID, $followed);
+        } catch (Exception $e) {
+            throw new \Gdn_UserException($e->getMessage(), 403, $e);
+        }
 
         // Set the new value for api calls and json targets.
         $this->setData([

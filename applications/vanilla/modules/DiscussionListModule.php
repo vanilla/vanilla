@@ -23,6 +23,9 @@ use Vanilla\Forum\Controllers\Api\DiscussionsApiIndexSchema;
 class DiscussionListModule extends BaseDiscussionWidgetModule {
     use JsonFilterTrait;
 
+    /** @var bool */
+    private $isMainContent = false;
+
     /**
      * @inheritDoc
      */
@@ -64,6 +67,8 @@ class DiscussionListModule extends BaseDiscussionWidgetModule {
             'subtitle' => $this->subtitle,
             'description' => $this->description,
             'viewAllUrl' => $this->viewAllUrl,
+            'isMainContent' => $this->isMainContent,
+            'noCheckboxes' => !$this->isMainContent,
         ];
 
         return $props;
@@ -78,5 +83,12 @@ class DiscussionListModule extends BaseDiscussionWidgetModule {
         $this->title = $options->getTitle();
         $this->description = $options->getDescription();
         $this->viewAllUrl = $options->getViewAllUrl();
+    }
+
+    /**
+     * @param bool $isMainContent
+     */
+    public function setIsMainContent(bool $isMainContent): void {
+        $this->isMainContent = $isMainContent;
     }
 }

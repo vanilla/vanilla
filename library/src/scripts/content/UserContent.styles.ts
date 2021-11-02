@@ -59,9 +59,18 @@ export function userContentMixin(): CSSObject {
         },
         ["& ul"]: {
             listStyle: "disc",
+            /**
+             * This forces the unordered list to take up the remaining space when
+             * an embed is floated. Its important for this element to have the correct
+             * width because its child list items use an pseudo element to draw the
+             * list marker
+             */
+            display: "flex",
+            flexDirection: "column",
             ...{
                 [`& > li`]: {
-                    listStyle: "none",
+                    // There are unrelated !important styles in _style.scss which is overrides
+                    listStyle: "none!important",
                     position: "relative",
                 },
                 [`& > li::before`]: {
@@ -130,7 +139,7 @@ export function userContentMixin(): CSSObject {
             },
         },
 
-        "&& > *:not(:last-child):not(.embedResponsive)": {
+        "&& > *:not(:last-child):not(.embedResponsive):not(.emoji)": {
             marginBottom: vars.blocks.margin,
         },
 

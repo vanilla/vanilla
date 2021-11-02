@@ -10,7 +10,6 @@ import { IUser, IUserFragment } from "@library/@types/api/users";
 import { hasUserViewPermission } from "@library/features/users/modules/hasUserViewPermission";
 import { useUser, useCurrentUserID } from "@library/features/users/userHooks";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
-import ErrorMessages from "@library/forms/ErrorMessages";
 import { useDevice, Devices } from "@library/layout/DeviceContext";
 import LazyModal from "@library/modal/LazyModal";
 import ModalSizes from "@library/modal/ModalSizes";
@@ -37,6 +36,9 @@ interface IProps {
 
     /** Callback in the even the close button in the card is clicked. */
     onClose?: () => void;
+
+    /** Show a skeleton  */
+    forceSkeleton?: boolean;
 }
 
 /**
@@ -203,7 +205,7 @@ function positionPreferTopMiddle(targetRect?: DOMRect | null, popoverRect?: DOMR
 /**
  * The content of the user card, wrapped in a flyout.
  */
-function UserCardFlyout(props: React.ComponentProps<typeof UserCard>) {
+export function UserCardFlyout(props: React.ComponentProps<typeof UserCard>) {
     const context = useUserCardContext();
 
     const handleFocusChange = useCallback(
@@ -243,7 +245,7 @@ function UserCardFlyout(props: React.ComponentProps<typeof UserCard>) {
  * Wrapper around `UserCardView` that loads the data dynamically.
  */
 function UserCardDynamic(props: IProps) {
-    const { userFragment } = props;
+    const { userFragment, forceSkeleton = false } = props;
     const user = useUser({ userID: props.userID });
     const currentUseID = useCurrentUserID();
     const isOwnUser = userFragment?.userID === currentUseID;
@@ -258,7 +260,7 @@ function UserCardDynamic(props: IProps) {
         return <UserCardMinimal userFragment={userFragment} onClose={props.onClose} />;
     }
 
-    if (user.status === LoadStatus.PENDING || user.status === LoadStatus.LOADING) {
+    if (forceSkeleton || user.status === LoadStatus.PENDING || user.status === LoadStatus.LOADING) {
         return <UserCardSkeleton userFragment={userFragment} onClose={props.onClose} />;
     }
 

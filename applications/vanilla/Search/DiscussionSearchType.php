@@ -111,6 +111,13 @@ class DiscussionSearchType extends AbstractSearchType {
     }
 
     /**
+     * @return bool
+     */
+    public function canBeOptimizedIntoGroup(): bool {
+        return true;
+    }
+
+    /**
      * @inheritdoc
      */
     public function getResultItems(array $recordIDs, SearchQuery $query): array {
@@ -424,7 +431,8 @@ class DiscussionSearchType extends AbstractSearchType {
             $query->getQueryParameter('followedCategories'),
             $query->getQueryParameter('includeChildCategories'),
             $query->getQueryParameter('includeArchivedCategories'),
-            $query->getQueryParameter('categoryIDs')
+            $query->getQueryParameter('categoryIDs'),
+            "Discussion"
         );
         if ($query->supportsExtenders()) {
             /** @var SearchTypeQueryExtenderInterface $extender */

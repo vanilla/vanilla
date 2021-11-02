@@ -43,7 +43,7 @@ class UtilityController extends DashboardController {
      */
     public function __construct() {
         parent::__construct();
-        $this->setHeader('Cache-Control', \Vanilla\Web\CacheControlMiddleware::NO_CACHE);
+        $this->setHeader(self::HEADER_CACHE_CONTROL, self::NO_CACHE);
     }
 
     /**
@@ -84,7 +84,7 @@ class UtilityController extends DashboardController {
 
                     foreach ($rows as $sort => $iD) {
                         if (strpos($iD, '_') !== false) {
-                            list(, $iD) = explode('_', $iD, 2);
+                            [, $iD] = explode('_', $iD, 2);
                         }
                         if (!$iD) {
                             continue;

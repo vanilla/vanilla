@@ -10,11 +10,15 @@ namespace Vanilla\Scheduler\Descriptor;
 use Throwable;
 use Vanilla\Scheduler\Job\JobExecutionType;
 use Vanilla\Scheduler\Job\JobPriority;
+use Vanilla\Scheduler\Job\TrackableJobAwareInterface;
+use Vanilla\Scheduler\Job\TrackableJobAwareTrait;
 
 /**
  * Class NormalJobDescriptor
  */
-class NormalJobDescriptor implements JobDescriptorInterface {
+class NormalJobDescriptor implements JobDescriptorInterface, TrackableJobAwareInterface {
+
+    use TrackableJobAwareTrait;
 
     /** @var string */
     protected $jobType;

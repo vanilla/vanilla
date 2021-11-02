@@ -19,15 +19,37 @@ class GuestModule extends Gdn_Module {
     public $MessageCode = 'GuestModule.Message';
 
     /** @var string  */
-    public $MessageDefault = "It looks like you're new here. If you want to get involved, click one of these buttons!";
+    public $MessageDefault = "It looks like you're new here. Sign in or register to get started.";
 
     /**
      * @var bool
      */
     private $asWidget = false;
 
+    /**
+     * @var string
+     */
     private $registerLinkButtonType = 'standard';
+
+    /**
+     * @var string
+     */
     private $signInLinkButtonType = 'primary';
+
+    /**
+     * @var string
+     */
+    private $widgetAlignment = "left";
+
+    /**
+     * @var boolean
+     */
+    private $compactButtonsInWidget = false;
+
+    /**
+     * @var boolean
+     */
+    private $desktopOnlyWidget = false;
 
     /**
      *
@@ -96,6 +118,48 @@ class GuestModule extends Gdn_Module {
     }
 
     /**
+     * @return string
+     */
+    public function getWidgetAlignment(): string {
+        return $this->widgetAlignment;
+    }
+
+    /**
+     * @param string $widgetAlignment
+     */
+    public function setWidgetAlignment(string $widgetAlignment): void {
+        $this->widgetAlignment = $widgetAlignment;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getCompactButtonsInWidget(): bool {
+        return $this->compactButtonsInWidget;
+    }
+
+    /**
+     * @param bool $compactButtonsInWidget
+     */
+    public function setCompactButtonsInWidget(bool $compactButtonsInWidget): void {
+        $this->compactButtonsInWidget = $compactButtonsInWidget;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getDesktopOnlyWidget(): bool {
+        return $this->desktopOnlyWidget;
+    }
+
+    /**
+     * @param bool $desktopOnlyWidget
+     */
+    public function setDesktopOnlyWidget(bool $desktopOnlyWidget): void {
+        $this->desktopOnlyWidget = $desktopOnlyWidget;
+    }
+
+    /**
      * Get module data
      */
     public function getData() {
@@ -111,9 +175,12 @@ class GuestModule extends Gdn_Module {
      */
     private function getWidget(): CallToActionModule {
         $ctaModule = new CallToActionModule();
-        $ctaModule->setTitle(t('Howdy, Stranger!'));
+        $ctaModule->setAlignment($this->widgetAlignment);
+        $ctaModule->setCompactButtons($this->compactButtonsInWidget);
+        $ctaModule->setDesktopOnly($this->desktopOnlyWidget);
+        $ctaModule->setTitle(t('Welcome!', t('Howdy, Stranger!', 'Welcome!')));
         $ctaModule->setDescription(t($this->MessageCode, $this->MessageDefault));
-        $ctaModule->setTextCTA(t("Sign In Now"));
+        $ctaModule->setTextCTA(t("Sign In"));
         $ctaModule->setUrl($this->data('signInUrl'));
         $ctaModule->setLinkButtonType($this->getSignInLinkButtonType());
         if ($this->data('registerUrl')) {
@@ -136,8 +203,22 @@ class GuestModule extends Gdn_Module {
      */
     public function toString() {
         $isGuest = !Gdn::session()->isValid();
+        $newGuestModule = Gdn::themeFeatures()->get("NewGuestModule");
+        $isDataDrivenTheme = Gdn::themeFeatures()->get("DataDrivenTheme");
+
+        //other plugins (like Private Discussions) might have their own views, so we won't prevent its functionality
+        $isDefaultApplicationFolder = $this->_ApplicationFolder === "Dashboard";
+
         if ($isGuest) {
             $this->getData();
+        }
+        if ($newGuestModule && $isDefaultApplicationFolder) {
+            $this->setAsWidget(true);
+        }
+
+        //in legacy themes we render smaller buttons to fit in the panel
+        if (!$isDataDrivenTheme) {
+            $this->setCompactButtonsInWidget(true);
         }
         if ($isGuest && !$this->isAsWidget()) {
             return parent::toString();

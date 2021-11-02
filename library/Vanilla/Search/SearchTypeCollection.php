@@ -201,4 +201,46 @@ final class SearchTypeCollection implements \IteratorAggregate {
         }
         return $result;
     }
+
+    /**
+     * Extract an array of search string types.
+     *
+     * @param AbstractSearchType[] $searchTypes
+     * @return string[]
+     */
+    public static function extractTypeKeys(array $searchTypes): array {
+        $result = [];
+        foreach ($searchTypes as $searchType) {
+            $result[] = $searchType->getType();
+        }
+
+        return $result;
+    }
+
+    /**
+     * Group search types where possible.
+     *
+     * This will result in something like this:
+     * [
+     *      // These both share a searchGroup of "discussion" but can share the same query.
+     *      "discussion" => [DiscussionSearchType, QuestionsSearchType],
+     *      // These both a share searchGroup of "places" but can't share the same query.
+     *      "category" => [CategorySearchType],
+     *      "group" => [GroupSearchType],
+      * ]
+     *
+     * @return AbstractSearchType[][]
+     */
+    public function getAsOptimizedGroups(): array {
+        $typesByAllowedGroup = [];
+
+        foreach ($this->allTypes as $searchType) {
+            if ($searchType->canBeOptimizedIntoGroup()) {
+                $typesByAllowedGroup[$searchType->getSearchGroup()][] = $searchType;
+            } else {
+                $typesByAllowedGroup[$searchType->getType()][] = $searchType;
+            }
+        }
+        return array_values($typesByAllowedGroup);
+    }
 }

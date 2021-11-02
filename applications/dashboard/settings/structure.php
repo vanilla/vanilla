@@ -9,6 +9,7 @@
  */
 
 use Vanilla\Dashboard\UserPointsModel;
+use Vanilla\Scheduler\Job\JobStatusModel;
 use Vanilla\Theme\ThemeCache;
 use Vanilla\Theme\ThemeServiceHelper;
 
@@ -835,6 +836,9 @@ if ($Construct->columnExists('Plugins.Tagging.Add')) {
     $PermissionModel->define(['Vanilla.Tagging.Add' => 'Garden.Profiles.Edit']);
 }
 
+// Job status table.
+JobStatusModel::structure($Construct);
+
 $Construct->table('Log')
     ->primaryKey('LogID')
     ->column('Operation', ['Delete', 'Edit', 'Spam', 'Moderate', 'Pending', 'Ban', 'Error'], false, 'index')
@@ -874,7 +878,7 @@ $Construct->table('Regarding')
 
 $Construct->table('Ban')
     ->primaryKey('BanID')
-    ->column('BanType', ['IPAddress', 'Name', 'Email'], false, 'unique')
+    ->column('BanType', ['IPAddress', 'Name', 'Email', 'Fingerprint'], false, 'unique')
     ->column('BanValue', 'varchar(50)', false, 'unique')
     ->column('Notes', 'varchar(255)', null)
     ->column('CountUsers', 'uint', 0)
@@ -1009,6 +1013,115 @@ $Construct
     ->column("dateInserted", "datetime")
     ->column("dateUpdated", "datetime", false, ["index"])
     ->set($Explicit, $Drop);
+
+$Construct->table("recordStatus")
+    ->primaryKey("statusID")
+    ->column("name", "varchar(100)", false, ["unique.recordTypeName"])
+    ->column("state", ["open", "closed"], "open")
+    ->column("recordType", "varchar(100)", false, ["index.recordType", "index.recordTypeSubType", "unique.recordTypeName"])
+    ->column("recordSubtype", "varchar(100)", null, ["index.recordTypeSubType"])
+    ->column("isDefault", "tinyint", 0)
+    ->column("insertUserID", "int")
+    ->column("dateInserted", "datetime")
+    ->column("updateUserID", "int", null)
+    ->column("dateUpdated", "datetime", null)
+    ->set($Explicit, $Drop);
+
+// Create the default statuses to insert into the recordStatus table.
+$defaultStatusesData = [
+    [
+        'statusID' => RecordStatusModel::DISCUSSION_STATUS_UNANSWERED,
+        'name' => 'Unanswered',
+        'state' => 'open',
+        'recordType' => 'discussion',
+        'recordSubtype' => 'question',
+        'isDefault' => 1,
+    ],
+    [
+        'statusID' => RecordStatusModel::DISCUSSION_STATUS_ANSWERED,
+        'name' => 'Answered',
+        'state' => 'open',
+        'recordType' => 'discussion',
+        'recordSubtype' => 'question',
+        'isDefault' => 0,
+    ],
+    [
+        'statusID' => RecordStatusModel::DISCUSSION_STATUS_ACCEPTED,
+        'name' => 'Accepted',
+        'state' => 'closed',
+        'recordType' => 'discussion',
+        'recordSubtype' => 'question',
+        'isDefault' => 0,
+    ],
+    [
+        'statusID' => RecordStatusModel::DISCUSSION_STATUS_REJECTED,
+        'name' => 'Rejected',
+        'state' => 'open',
+        'recordType' => 'discussion',
+        'recordSubtype' => 'question',
+        'isDefault' => 0,
+    ],
+    [
+        'statusID' => RecordStatusModel::COMMENT_STATUS_ACCEPTED,
+        'name' => 'Accepted',
+        'state' => 'closed',
+        'recordType' => 'comment',
+        'recordSubtype' => 'answer',
+        'isDefault' => 0,
+    ],
+    [
+        'statusID' => RecordStatusModel::COMMENT_STATUS_REJECTED,
+        'name' => 'Rejected',
+        'state' => 'closed',
+        'recordType' => 'comment',
+        'recordSubtype' => 'answer',
+        'isDefault' => 0,
+    ],
+    [
+        'statusID' => RecordStatusModel::DISCUSSION_STATUS_UNRESOLVED,
+        'name' => 'Unresolved',
+        'state' => 'open',
+        'recordType' => 'discussion',
+        'recordSubtype' => 'discussion',
+        'isDefault' => 1,
+    ],
+    [
+        'statusID' => RecordStatusModel::DISCUSSION_STATUS_RESOLVED,
+        'name' => 'Resolved',
+        'state' => 'closed',
+        'recordType' => 'discussion',
+        'recordSubtype' => 'discussion',
+        'isDefault' => 0,
+    ],
+];
+
+$recordStatusExists = $Construct->tableExists("recordStatus");
+
+if ($recordStatusExists) {
+    $Construct->table("recordStatus");
+
+    $insertIPAddressExists = $Construct->columnExists('insertIPAddress');
+    if ($insertIPAddressExists) {
+        $Construct->dropColumn('insertIPAddress');
+    }
+
+    $updateIPAddressExists = $Construct->columnExists('updateIPAddress');
+    if ($updateIPAddressExists) {
+        $Construct->dropColumn('updateIPAddress');
+    }
+
+    // Add the default statuses if they're not already there.
+    foreach ($defaultStatusesData as $default) {
+        if ($SQL->getWhere('recordStatus', ['statusID' => $default['statusID']])->numRows() == 0) {
+            $default = array_merge($default, ['insertUserID' => 1, 'dateInserted' => date('Y-m-d H:i:s')]);
+            $SQL->insert('recordStatus', $default);
+        }
+    }
+} else {
+    // Add a protected space for core/addon status IDs and ensure user-created statuses will have IDs outside it.
+    $recordStatusIDQuery = "alter table " . Gdn::sql()->prefixTable("recordStatus") . " AUTO_INCREMENT=10000";
+    Gdn::sql()->query($recordStatusIDQuery, "update");
+}
 
 // If the AllIPAddresses column exists, attempt to migrate legacy IP data to the UserIP table.
 if (!$captureOnly && $AllIPAddressesExists) {

@@ -13,11 +13,13 @@ use Vanilla\AddonManager;
 use Vanilla\OpenAPIBuilder;
 use VanillaTests\Fixtures\MockAddonManager;
 use VanillaTests\Fixtures\Request;
+use VanillaTests\OpenAPIBuilderTrait;
 
 /**
  * Test Vanilla's OpenAPI build.
  */
 class OpenAPIBuilderTest extends TestCase {
+    use OpenAPIBuilderTrait;
 
     /**
      * Test that we generate a proper base path.
@@ -41,17 +43,7 @@ class OpenAPIBuilderTest extends TestCase {
      * The OpenAPI build should validate against the OpenAPI spec.
      */
     public function testValidOpenAPI() {
-        $am = new AddonManager(
-            [
-                Addon::TYPE_ADDON => ['/applications', '/plugins'],
-                Addon::TYPE_THEME => '/themes',
-                Addon::TYPE_LOCALE => '/locales'
-            ],
-            PATH_ROOT.'/tests/cache/open-api-builder/vanilla-manager'
-        );
-
-        $request = new Request();
-        $builder = new OpenAPIBuilder($am, $request, PATH_ROOT.'/tests/cache/'.__FUNCTION__.'.php');
+        $builder = $this->createOpenApiBuilder();
 
         $data = $builder->generateFullOpenAPI();
         $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);

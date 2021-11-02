@@ -5,19 +5,23 @@
  */
 import React from "react";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
-
+import { cx } from "@emotion/css";
 interface IProps {
     label: string;
     thumbnail: React.ReactNode;
     onClick?();
+    isCompact?: boolean;
 }
 
 export default function DropDownItemThumbnail(props: IProps) {
-    const { label, thumbnail, onClick } = props;
+    const { label, thumbnail, onClick, isCompact } = props;
     const classes = dropDownClasses();
 
     return (
-        <div className={classes.thumbnailItem} onClick={onClick}>
+        <div
+            className={cx(classes.thumbnailItem, isCompact ? classes.thumbnailItemSmall : undefined)}
+            onClick={onClick}
+        >
             <span className={classes.thumbnailItemThumbnail}>{thumbnail}</span>
             <span className={classes.thumbnailItemLabel}>{label}</span>
         </div>

@@ -12,7 +12,7 @@ import { Mixins } from "@library/styles/Mixins";
 import { Variables } from "@library/styles/Variables";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { css, CSSObject } from "@emotion/css";
-import { variableFactory } from "@library/styles/styleUtils";
+import { getPixelNumber, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { important, percent, rgba } from "csx";
 import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
@@ -54,7 +54,7 @@ export const dropDownVariables = useThemeCache(() => {
              * @title Medium
              * @type number
              */
-            medium: 350,
+            medium: 300,
         },
     });
 
@@ -172,8 +172,9 @@ export const dropDownClasses = useThemeCache(() => {
             ...contentMixin,
             "&.isParentWidth": {
                 minWidth: "initial",
-                left: 0,
-                right: 0,
+                left: vars.item.padding.horizontal * -1,
+                right: `${getPixelNumber(vars.item.padding.horizontal) * -1}px!important`,
+                width: `calc(100% + ${getPixelNumber(vars.item.padding.horizontal) * 2}px)`,
             },
             "&.isOwnWidth": {
                 width: "initial",
@@ -521,9 +522,26 @@ export const dropDownClasses = useThemeCache(() => {
         },
     });
 
+    const thumbnailItemSmall = css({
+        width: 154,
+        height: 166,
+
+        "& svg": {
+            width: 140,
+            height: 126,
+        },
+    });
+
     const gridItem = css({
         width: 680,
         padding: "0 10px",
+    });
+
+    const gridItemSmall = css({
+        display: "flex",
+        flexWrap: "wrap",
+        justifyContent: "center",
+        width: "100%",
     });
 
     return {
@@ -567,9 +585,11 @@ export const dropDownClasses = useThemeCache(() => {
         headingContentContainer,
         headingTitleContainer,
         thumbnailItem,
+        thumbnailItemSmall,
         thumbnailItemLabel,
         thumbnailItemThumbnail,
         gridItem,
+        gridItemSmall,
     };
 });
 

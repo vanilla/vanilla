@@ -70,4 +70,13 @@ export const dummyReactionsData: { [key: string]: IReaction } = {
         photoUrl: reactionBaseUrl + "abuse.svg",
         url: "",
     },
+    LongReaction: {
+        tagID: 10,
+        urlcode: "Abuse",
+        name: "Very Long Reaction Name Should Exceed Available Space",
+        class: "Flag",
+        count: 221520,
+        photoUrl: reactionBaseUrl + "abuse.svg",
+        url: "",
+    },
 };

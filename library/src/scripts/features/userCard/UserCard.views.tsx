@@ -1,8 +1,9 @@
 /**
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
+import React, { ComponentProps, ComponentType } from "react";
 import { IUser, IUserFragment } from "@library/@types/api/users";
 import NumberFormatted from "@library/content/NumberFormatted";
 import Permission, { PermissionMode } from "@library/features/users/Permission";
@@ -15,14 +16,20 @@ import { Devices, useDevice } from "@library/layout/DeviceContext";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { MetaItem, Metas } from "@library/metas/Metas";
 import LinkAsButton from "@library/routing/LinkAsButton";
-import { getMeta, makeProfileUrl, t } from "@library/utility/appUtils";
+import {
+    getMeta,
+    makeProfileCommentsUrl,
+    makeProfileDiscussionsUrl,
+    makeProfileUrl,
+    t,
+} from "@library/utility/appUtils";
 import classNames from "classnames";
-import React from "react";
 import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
 import DateTime from "@library/content/DateTime";
 import { hasPermission } from "@library/features/users/Permission";
 import { formatUrl } from "@library/utility/appUtils";
 import { useCurrentUserID } from "@library/features/users/userHooks";
+import SmartLink from "@library/routing/links/SmartLink";
 
 interface IProps {
     user: IUser;
@@ -36,6 +43,19 @@ const BANNED = "Banned";
 const PRIVATE = "Private";
 const ERROR = "ERROR";
 const DELETED = "DELETED";
+
+interface IExtraUserCardContent {
+    key: string;
+    component: ComponentType<{ userID: IUser["userID"] }>; //switch it to just a userID
+    skeleton?: ComponentType<{ userID: IUser["userID"] }>;
+}
+
+UserCardView.extraContent = [] as IExtraUserCardContent[];
+UserCardView.registerContent = function (registeredContent: IExtraUserCardContent) {
+    if (!UserCardView.extraContent.find((content) => content.key === registeredContent.key)) {
+        UserCardView.extraContent.push(registeredContent);
+    }
+};
 
 export function UserCardView(props: IProps) {
     const classes = userCardClasses();
@@ -75,10 +95,11 @@ export function UserCardView(props: IProps) {
                     </Button>
                 )}
             </div>
+            <Container>
+                <div className={classes.row}>
+                    <UserPhoto userInfo={user} size={photoSize} className={classes.userPhoto} />
+                </div>
 
-            <UserPhoto userInfo={user} size={photoSize} className={classes.userPhoto} />
-
-            <div className={classes.metaContainer}>
                 <div className={classes.row}>
                     <div className={classes.name}>{user.name}</div>
                 </div>
@@ -105,13 +126,15 @@ export function UserCardView(props: IProps) {
                         </div>
                     </Permission>
                 )}
-            </div>
-            {isBanned && (
-                <div className={classNames(classes.row, classes.msg)}>
-                    <div>{t(BANNED_USER_MSG)}</div>
-                </div>
-            )}
-            <div className={classNames(classes.container, classes.actionContainer)}>
+
+                {isBanned && (
+                    <div className={classNames(classes.row, classes.message)}>
+                        <div>{t(BANNED_USER_MSG)}</div>
+                    </div>
+                )}
+            </Container>
+
+            <div className={classNames(classes.row, classes.buttonsContainer)}>
                 <CardButton to={makeProfileUrl(user.name)}>{t("View Profile")}</CardButton>
                 <Permission permission={"conversations.add"}>
                     {isConversationsEnabled && !banned && (
@@ -120,18 +143,34 @@ export function UserCardView(props: IProps) {
                 </Permission>
             </div>
 
-            <Container borderTop={true}>
-                <Stat count={user.countDiscussions} text={t("Discussions")} position={"left"} />
-                <Stat count={user.countComments} text={t("Comments")} position={"right"} />
+            <Container borderTop>
+                <StatLink
+                    to={makeProfileDiscussionsUrl(user.name)}
+                    count={user.countDiscussions}
+                    text={t("Discussions")}
+                    position={"left"}
+                />
+                <StatLink
+                    to={makeProfileCommentsUrl(user.name)}
+                    count={user.countComments}
+                    text={t("Comments")}
+                    position={"right"}
+                />
             </Container>
 
-            <Container borderTop={true}>
+            {UserCardView.extraContent.map((content, index) => (
+                <Container key={index} borderTop>
+                    <content.component userID={user.userID} />
+                </Container>
+            ))}
+
+            <Container borderTop>
                 <Metas className={classes.metas}>
-                    <MetaItem>
+                    <MetaItem className={classes.metaItem}>
                         {t("Joined")}: <DateTime timestamp={user.dateInserted} />
                     </MetaItem>
                     {user.dateLastActive && (
-                        <MetaItem>
+                        <MetaItem className={classes.metaItem}>
                             {t("Last Active")}: <DateTime timestamp={user.dateLastActive} />
                         </MetaItem>
                     )}
@@ -165,13 +204,15 @@ export function UserCardSkeleton(props: ISkeletonProps) {
                     </Button>
                 )}
             </div>
-            {userFragment?.photoUrl ? (
-                <UserPhoto userInfo={userFragment} size={photoSize} className={classes.userPhoto} />
-            ) : (
-                <UserPhotoSkeleton size={photoSize} className={classes.userPhoto} />
-            )}
+            <Container>
+                <div className={classes.row}>
+                    {userFragment?.photoUrl ? (
+                        <UserPhoto userInfo={userFragment} size={photoSize} className={classes.userPhoto} />
+                    ) : (
+                        <UserPhotoSkeleton size={photoSize} className={classes.userPhoto} />
+                    )}
+                </div>
 
-            <div className={classes.metaContainer}>
                 <div className={classes.row}>
                     <div className={classes.name}>
                         {userFragment?.name ?? <LoadingRectangle inline height={12} width={60} />}
@@ -185,9 +226,9 @@ export function UserCardSkeleton(props: ISkeletonProps) {
                         </span>
                     </div>
                 </Permission>
-            </div>
+            </Container>
 
-            <div className={classNames(classes.container, classes.actionContainer)}>
+            <div className={classNames(classes.row, classes.buttonsContainer)}>
                 <CardButton
                     disabled={!userFragment?.name}
                     to={userFragment?.name ? makeProfileUrl(userFragment?.name) : ""}
@@ -203,17 +244,28 @@ export function UserCardSkeleton(props: ISkeletonProps) {
                 </Permission>
             </div>
 
-            <Container borderTop={true}>
+            <Container borderTop>
                 <StatSkeleton text={t("Discussions")} position={"left"} />
                 <StatSkeleton text={t("Comments")} position={"right"} />
             </Container>
 
-            <Container borderTop={true}>
+            {!!userFragment?.userID &&
+                UserCardView.extraContent.map((content, index) => (
+                    <Container key={index} borderTop>
+                        {content.skeleton ? (
+                            <content.skeleton userID={userFragment.userID!} />
+                        ) : (
+                            <LoadingRectangle inline height="2em" width={120} />
+                        )}
+                    </Container>
+                ))}
+
+            <Container borderTop>
                 <Metas className={classes.metas}>
-                    <MetaItem>
+                    <MetaItem className={classes.metaItem}>
                         {t("Joined")}: <LoadingRectangle inline height={8} width={60} />
                     </MetaItem>
-                    <MetaItem>
+                    <MetaItem className={classes.metaItem}>
                         {t("Last Active")}: <LoadingRectangle inline height={8} width={60} />
                     </MetaItem>
                 </Metas>
@@ -246,18 +298,21 @@ export function UserCardMinimal(props: IMinimalProps) {
     return (
         <>
             <div className={classes.header} />
-            <UserPhoto userInfo={userInfo} size={photoSize} className={classes.userPhoto} />
-            <div className={classes.metaContainer}>
+            <Container>
+                <div className={classes.row}>
+                    <UserPhoto userInfo={userInfo} size={photoSize} className={classes.userPhoto} />
+                </div>
+
                 <div className={classes.row}>
                     <div className={classes.name}>{name}</div>
                 </div>
                 <div className={classes.row}>
                     <div className={classes.label}>{labelText}</div>
                 </div>
-                <div className={classNames(classes.row, classes.msgMinimal)}>
+                <div className={classNames(classes.row, classes.message)}>
                     <div>{msg}</div>
                 </div>
-            </div>
+            </Container>
         </>
     );
 }
@@ -282,15 +337,18 @@ export function UserCardError(props: IUserCardErrorProps) {
     return (
         <>
             <div className={classes.header} />
-            <UserPhoto userInfo={user} size={photoSize} className={classes.userPhoto} />
-            <div className={classes.metaContainer}>
+            <Container>
+                <div className={classes.row}>
+                    <UserPhoto userInfo={user} size={photoSize} className={classes.userPhoto} />
+                </div>
+
                 <div className={classes.row}>
                     <div className={classes.label}>{label}</div>
                 </div>
-                <div className={classNames(classes.row, classes.msgMinimal)}>
+                <div className={classNames(classes.row, classes.message)}>
                     <div>{msg}</div>
                 </div>
-            </div>
+            </Container>
         </>
     );
 }
@@ -324,38 +382,41 @@ function StatSkeleton(props: { text: string; position: "left" | "right" }) {
             })}
         >
             <div className={classes.count}>
-                <LoadingRectangle height={27} width={48} />
+                <LoadingRectangle height={35} width={48} />
             </div>
             <div className={classes.statLabel}>{text}</div>
         </div>
     );
 }
 
-function Stat(props: { count?: number; text: string; position: "left" | "right" }) {
+function StatLink(props: {
+    to: ComponentProps<typeof SmartLink>["to"];
+    text: string;
+    position: "left" | "right";
+    count?: number;
+}) {
     const classes = userCardClasses();
 
-    const { count, text, position } = props;
+    const { to, count, text, position } = props;
     return (
-        <div
-            className={classNames(classes.stat, {
+        <SmartLink
+            title={text}
+            to={to}
+            className={classNames(classes.statLink, {
                 [classes.statLeft]: position === "left",
                 [classes.statRight]: position === "right",
             })}
         >
             <div className={classes.count}>
-                <NumberFormatted fallbackTag={"div"} value={count || 0} />
+                <NumberFormatted fallbackTag={"div"} value={count || 0} title={text} />
             </div>
             <div className={classes.statLabel}>{text}</div>
-        </div>
+        </SmartLink>
     );
 }
 
 function Container(props: { children: React.ReactNode; borderTop?: boolean }) {
     const { borderTop } = props;
     const classes = userCardClasses();
-    return (
-        <div className={classNames(classes.container, { [classes.containerWithBorder]: borderTop })}>
-            {props.children}
-        </div>
-    );
+    return <div className={borderTop ? classes.containerWithBorder : classes.container}>{props.children}</div>;
 }

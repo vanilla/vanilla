@@ -181,7 +181,7 @@ class ConversationsApiController extends AbstractApiController {
      * @return array
      */
     public function get($id) {
-        $this->permission();
+        $this->permission("Garden.SignIn.Allow");
 
         $this->idParamSchema()->setDescription('Get a conversation.');
         $out = $this->schema($this->fullSchema(), 'out');
@@ -215,7 +215,7 @@ class ConversationsApiController extends AbstractApiController {
      * @return Data
      */
     public function get_participants($id, array $query) {
-        $this->permission();
+        $this->permission("Garden.SignIn.Allow");
 
         $this->idParamSchema();
 
@@ -288,7 +288,7 @@ class ConversationsApiController extends AbstractApiController {
      * @return Data
      */
     public function index(array $query) {
-        $this->permission();
+        $this->permission("Garden.SignIn.Allow");
 
         $in = $this->schema([
             'insertUserID:i?' => 'Filter by author.',

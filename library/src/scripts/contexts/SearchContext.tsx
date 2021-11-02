@@ -36,8 +36,8 @@ SearchContextProvider.setOptionProvider = (provider: ISearchOptionProvider) => {
 
 export interface ISearchOptionProvider {
     supportsAutoComplete?: boolean;
-    autocomplete(query: string, options?: { [key: string]: any }): Promise<Array<IComboBoxOption<ISearchOptionData>>>;
-    makeSearchUrl(query: string): string;
+    autocomplete(query: string, options?: Record<string, any>): Promise<Array<IComboBoxOption<ISearchOptionData>>>;
+    makeSearchUrl(query: string, options?: Record<string, any>): string;
 }
 
 export interface IWithSearchProps {

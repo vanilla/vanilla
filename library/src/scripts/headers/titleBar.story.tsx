@@ -95,6 +95,36 @@ const initialState = testStoreState({
     },
 });
 
+const initialStateWithMeboxVars = testStoreState({
+    users: {
+        current: {
+            status: LoadStatus.SUCCESS,
+            data: makeMockRegisterUser,
+        },
+    },
+    theme: {
+        assets: {
+            data: {
+                logo: {
+                    type: "image",
+                    url: localLogoUrl as string,
+                },
+                variables: {
+                    type: "json",
+                    data: {
+                        titleBar: {
+                            meBox: {
+                                withLabel: true,
+                                withSeparator: true,
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    },
+});
+
 function StoryTitleBar(props: { title: string; openSearch?: boolean; scope?: boolean; forceMenuOpen?: boolean }) {
     let dummyData: React.ReactNode[] = [];
     for (let i = 0; i < 350; i++) {
@@ -388,6 +418,31 @@ export const TitleBarGuestUser = storyWithConfig(
         );
     },
 );
+
+export const TitleBarWithMeboxWithLabelsAndSeparators = storyWithConfig({}, () => {
+    TitleBarStatic.registerBeforeMeBox(() => {
+        return (
+            <Button buttonType={ButtonTypes.TITLEBAR_LINK}>
+                <>
+                    <Icon icon="navigation-languages" />
+                    <DownTriangleIcon />
+                </>
+            </Button>
+        );
+    });
+    return (
+        <MemoryRouter>
+            <Provider store={getStore(initialStateWithMeboxVars, true)}>
+                <TitleBarDeviceProvider>
+                    <StoryFullPage>
+                        <StoryHeading>Mebox with labels and separators</StoryHeading>
+                        <TitleBar />
+                    </StoryFullPage>
+                </TitleBarDeviceProvider>
+            </Provider>
+        </MemoryRouter>
+    );
+});
 
 const navigationItems: INavigationVariableItem[] = [
     {

@@ -15,7 +15,7 @@ import { DiscussionIcon, RightChevronIcon } from "@library/icons/common";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import SmartLink from "@library/routing/links/SmartLink";
 import { t } from "@library/utility/appUtils";
-import { ICategoryFragment } from "@vanilla/addon-vanilla/@types/api/categories";
+import { ICategoryFragment } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import classNames from "classnames";
 import React from "react";
 

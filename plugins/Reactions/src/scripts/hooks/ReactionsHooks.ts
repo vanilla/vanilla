@@ -3,25 +3,29 @@
  * @license GPL-2.0-only
  */
 
-import { IApiError, Loadable, LoadStatus } from "@library/@types/api/core";
-import { stableObjectHash } from "@vanilla/utils";
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { IReactionsStoreState, ReactionsDispatch } from "@Reactions/state/ReactionsReducer";
-import { IGetUserReactionsParams, getUserReactions } from "@Reactions/state/ReactionsActions";
 import { IReaction } from "@Reactions/types/Reaction";
+import { ILoadable, LoadStatus } from "@library/@types/api/core";
+import { stableObjectHash } from "@vanilla/utils";
+import {
+    useReactionsSelector,
+    useReactionsDispatch,
+    getLoadStatusByParamHash,
+    getReactionsByUserID,
+} from "@Reactions/state/ReactionsReducer";
+import { useEffect } from "react";
+import { IGetUserReactionsParams, getUserReactions } from "@Reactions/state/ReactionsActions";
 
 export function useUserReactions(
     apiParams: IGetUserReactionsParams,
     prehydratedItems?: IReaction[],
-): Loadable<IReaction[]> {
-    const dispatch = useDispatch<ReactionsDispatch>();
-
+    onLoad?: (data: IReaction[]) => void,
+): ILoadable<IReaction[]> {
     const paramHash = stableObjectHash(apiParams);
+    const dispatch = useReactionsDispatch();
 
-    const status = useSelector((state: IReactionsStoreState) => {
-        return state.reactions.reactionIDsByParamHash[paramHash]?.status ?? LoadStatus.PENDING;
-    });
+    const status = useReactionsSelector(
+        ({ reactions }) => getLoadStatusByParamHash(reactions, paramHash) ?? LoadStatus.PENDING,
+    );
 
     useEffect(() => {
         if (prehydratedItems) {
@@ -31,46 +35,20 @@ export function useUserReactions(
                 dispatch(getUserReactions(apiParams));
             }
         }
-    }, [prehydratedItems, apiParams, status, dispatch, paramHash]);
+    }, [prehydratedItems, dispatch, status, paramHash]);
 
-    const data = useSelector((state: IReactionsStoreState) => {
-        return status === LoadStatus.SUCCESS
-            ? state.reactions.reactionIDsByUserID[apiParams.userID]!.map(
-                  (tagID) => state.reactions.reactionsByID[tagID],
-              )
-            : [];
-    });
+    const data = useReactionsSelector(({ reactions }) =>
+        status === LoadStatus.SUCCESS ? getReactionsByUserID(reactions, apiParams.userID)! : [],
+    );
 
-    const error = useSelector((state: IReactionsStoreState) => {
-        const paramHash = stableObjectHash({ userID: apiParams.userID });
-        return status === LoadStatus.ERROR ? state.reactions.reactionIDsByParamHash[paramHash] : undefined;
-    });
+    useEffect(() => {
+        if (data) {
+            onLoad?.(data);
+        }
+    }, [data, paramHash, onLoad]);
 
-    const pendingData = {
+    return {
         status,
-    } as {
-        status: LoadStatus.PENDING | LoadStatus.LOADING;
-        error?: undefined;
-        data?: undefined;
+        data,
     };
-    const successData = {
-        status,
-        data: data,
-        error: undefined,
-    } as {
-        status: LoadStatus.SUCCESS;
-        error?: undefined;
-        data: IReaction[];
-    };
-    const errorData = {
-        status,
-        data: error?.data,
-        error: error?.error,
-    } as {
-        status: LoadStatus.ERROR;
-        error: IApiError;
-        data?: undefined;
-    };
-    const successRequest = status == LoadStatus.PENDING || status == LoadStatus.SUCCESS;
-    return status === LoadStatus.ERROR ? errorData : status === LoadStatus.SUCCESS ? successData : pendingData;
 }

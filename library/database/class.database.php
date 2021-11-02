@@ -9,6 +9,7 @@
  * @since 2.0
  */
 
+use Garden\Schema\Schema;
 use Vanilla\InjectableInterface;
 use Garden\EventManager;
 
@@ -336,7 +337,7 @@ class Gdn_Database implements InjectableInterface {
                 $port = $config['Port'];
                 if (empty($port) && strpos($host, ':') !== false) {
                     // Was the port explicitly defined with the host name? (ie. 127.0.0.1:3306)
-                    list($host, $port) = explode(':', $host);
+                    [$host, $port] = explode(':', $host);
                 }
 
                 if (empty($port)) {
@@ -486,7 +487,7 @@ class Gdn_Database implements InjectableInterface {
                     }
 
                     if ($pDOStatement === false) {
-                        list($state, $code, $message) = $pDO->errorInfo();
+                        [$state, $code, $message] = $pDO->errorInfo();
 
                         // Detect mysql "server has gone away" and try to reconnect.
                         if ($code == 2006 && $try < $tries) {
@@ -502,7 +503,7 @@ class Gdn_Database implements InjectableInterface {
                 } catch (Gdn_UserException $uex) {
                     trigger_error($uex->getMessage(), E_USER_ERROR);
                 } catch (Exception $ex) {
-                    list($state, $code, $message) = $pDO->errorInfo();
+                    [$state, $code, $message] = $pDO->errorInfo();
 
                     // If the error code is consistent with a disconnect, attempt to retry
                     if ($code == 2006 && $try < $tries) {
@@ -656,8 +657,11 @@ class Gdn_Database implements InjectableInterface {
                 'required' => $isRequired,
                 'type' => $type,
             ];
-            if ($type === 'string' && $databaseField->Length) {
-                $field['maxLength'] = $databaseField->Length;
+            if ($type === 'string') {
+                $maxLength = $databaseField->ByteLength ?? $databaseField->Length ?? null;
+                if ($maxLength !== null) {
+                    $field['maxLength'] = (int) $maxLength;
+                }
             }
             if (is_array($databaseField->Enum) && !empty($databaseField->Enum)) {
                 $field['enum'] = $databaseField->Enum;
@@ -668,8 +672,11 @@ class Gdn_Database implements InjectableInterface {
             $properties[$key] = $field;
         }
 
-        $result = \Garden\Schema\Schema::parse(['type' => 'object', 'properties' => $properties, 'required' => $required]);
-        return $result;
+        $schema = Schema::parse(['type' => 'object', 'properties' => $properties, 'required' => $required]);
+
+        // Database column size is in bytes, not unicode.
+        $schema->setFlag(Schema::VALIDATE_STRING_LENGTH_AS_UNICODE, false);
+        return $schema;
     }
 
     /**
@@ -705,6 +712,17 @@ class Gdn_Database implements InjectableInterface {
         }
 
         return $this->_SQL;
+    }
+
+    /**
+     * Get a clean SQL driver instance.
+     *
+     * @return Gdn_SQLDriver
+     */
+    public function createSql(): Gdn_SQLDriver {
+        $sql = clone $this->sql();
+        $sql->reset();
+        return $sql;
     }
 
     /**

@@ -1,0 +1,7 @@
+{
+    global: {
+        middleColumn: {
+            width: 1000
+        }
+    }
+}

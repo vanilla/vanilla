@@ -9,6 +9,7 @@ import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { ISearchOptionData } from "@library/features/search/SearchOption";
 import { AxiosResponse } from "axios";
 import apiv2 from "@library/apiv2";
+import qs from "qs";
 import pDebounce from "p-debounce";
 import { NEW_SEARCH_PAGE_ENABLED } from "@library/search/searchConstants";
 import { ISearchRequestQuery, ISearchResult } from "@library/search/searchTypes";
@@ -71,8 +72,13 @@ export class CommunitySearchProvider implements ISearchOptionProvider {
         return this.debounceFetchSearch(query, options);
     };
 
-    public makeSearchUrl = (query: string) => {
+    public makeSearchUrl = (query: string, options: Record<string, any>) => {
         const queryParamName = NEW_SEARCH_PAGE_ENABLED ? "query" : "search";
-        return formatUrl(`/search?${queryParamName}=${query}`, true);
+        const queryParams = {
+            ...options,
+            [queryParamName]: query,
+        };
+        const url = formatUrl(`/search?${qs.stringify(queryParams)}`, true);
+        return url;
     };
 }

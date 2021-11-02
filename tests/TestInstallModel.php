@@ -31,11 +31,6 @@ class TestInstallModel extends InstallModel {
     private $configDefaults = [];
 
     /**
-     * @var string $sphinxHost Sphinx host name.
-     */
-    private $sphinxHost;
-
-    /**
      * {@inheritdoc}
      */
     public function __construct(
@@ -106,8 +101,6 @@ class TestInstallModel extends InstallModel {
         // Some plugins being enabled directly at site install time breaks things in various tests.
         \PermissionModel::resetAllRoles();
 
-        $this->config->set('Plugins.Sphinx.Server', $this->getSphinxHost(), true, true);
-
         // Flush the config.
         $this->config->shutdown();
 
@@ -138,20 +131,6 @@ class TestInstallModel extends InstallModel {
             $this->dbHost = getenv('TEST_DB_HOST') ?: 'localhost';
         }
         return $this->dbHost;
-    }
-
-    /**
-     * Get the sphinx host.
-     *
-     * Enable server for test environment.
-     *
-     * @return string
-     */
-    public function getSphinxHost() {
-        if (empty($this->sphinxHost)) {
-            $this->sphinxHost = getenv('TEST_SPHINX_HOST') ?: 'sphinx';
-        }
-        return $this->sphinxHost;
     }
 
     /**
@@ -236,7 +215,7 @@ class TestInstallModel extends InstallModel {
         }
 
         if (class_exists(\CategoryModel::class)) {
-            \CategoryModel::$Categories = null;
+            \CategoryModel::reset();
         }
 
         if (class_exists(\SubcommunityModel::class)) {

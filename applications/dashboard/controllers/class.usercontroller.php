@@ -304,9 +304,7 @@ class UserController extends DashboardController {
     /**
      * Approve a user application.
      *
-     * @since 2.0.0
-     * @access public
-     * @param int $userID Unique ID.
+     * @param int|string $userID Unique ID.
      * @param string $TransientKey Security token.
      */
     public function approve($userID = '') {
@@ -486,9 +484,7 @@ class UserController extends DashboardController {
     /**
      * Decline a user application.
      *
-     * @since 2.0.0
-     * @access public
-     * @param int $userID Unique ID.
+     * @param int|string $userID Unique ID.
      * @param string $TransientKey Security token.
      */
     public function decline($userID = '') {
@@ -510,9 +506,7 @@ class UserController extends DashboardController {
     /**
      * Delete a user account.
      *
-     * @since 2.0.0
-     * @access public
-     * @param int $userID Unique ID.
+     * @param int|string $userID Unique ID.
      * @param string $method Type of deletion to do (delete, keep, or wipe).
      */
     public function delete($userID = '', $method = '') {

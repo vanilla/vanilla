@@ -54,7 +54,7 @@
         "michelf/php-markdown": "~1.9",
         "nette/neon": "^3.1",
         "pclzip/pclzip": "~2.0",
-        "phpmailer/phpmailer": "^6.1.6",
+        "phpmailer/phpmailer": "^6.5.0",
         "psr/cache": "^1.0",
         "psr/event-dispatcher": "^1.0",
         "psr/log": "~1.0",
@@ -76,7 +76,7 @@
         "vanilla/garden-http": "~2.4",
         "vanilla/garden-jsont": "^1.2",
         "vanilla/garden-password": "~1.0",
-        "vanilla/garden-schema": "~1.10.2",
+        "vanilla/garden-schema": "1.12.0",
         "vanilla/htmlawed": "~2.0",
         "vanilla/js-connect-php": "^3.2.1",
         "vanilla/legacy-oauth": "~1.0",
@@ -86,7 +86,8 @@
         "vanilla/vanilla-connect": "~0.0",
         "webmozart/assert": "^1.9",
         "webmozart/path-util": "^2.3",
-        "wikimedia/composer-merge-plugin": "^1.4.1"
+        "wikimedia/composer-merge-plugin": "^1.4.1",
+        "bopoda/robots-txt-parser": "^2.4"
     },
     "require-dev": {
         "cache/integration-tests": "dev-master",

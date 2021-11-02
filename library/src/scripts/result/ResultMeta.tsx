@@ -58,9 +58,13 @@ export function ResultMeta(props: IProps) {
                 const m = labelCode.match(p);
                 labelCode = labelCode.replace(p, m && m[0] === "ies" ? "y" : "");
             }
+
+            // Looking to end up with something like this
+            // %s discussions
+            // %s comments
             return (
                 <MetaItem key={i}>
-                    <Translate source={`<0/> ${labelCode}`} c0={<NumberFormatted value={count} />} />
+                    <Translate source={`%s ${labelCode}`} c0={<NumberFormatted value={count} />} />
                 </MetaItem>
             );
         });

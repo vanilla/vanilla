@@ -117,6 +117,15 @@ components:
                     x-key: Garden.Title
                     x-read: public
                     x-write: community.manage
+                "labs.newAnalytics":
+                    description: |
+                      Enable new analytics.
+                    type: boolean
+                    default: false
+                    example: true
+                    x-key: Feature.NewAnalytics.Enabled
+                    x-read: public
+                    x-write: site.manage
                 "labs.userCards":
                     description: |
                         Enable user cards on older themes.
@@ -142,6 +151,15 @@ components:
                     default: false
                     example: true
                     x-key: Feature.NewQuickLinks.Enabled
+                    x-read: public
+                    x-write: site.manage
+                "labs.newPostMenu":
+                    description: |
+                      Enable the new post menu UI on older themes.
+                    type: boolean
+                    default: false
+                    example: true
+                    x-key: Feature.NewPostMenu.Enabled
                     x-read: public
                     x-write: site.manage
                 "discussions.layout":
@@ -182,3 +200,10 @@ components:
                     x-key: Routes.DefaultController
                     x-read: public
                     x-write: site.manage
+                "vanilla.siteID":
+                  description: |
+                    The community siteID.
+                  type: number
+                  default: 0
+                  x-key: Vanilla.SiteID
+                  x-read: public

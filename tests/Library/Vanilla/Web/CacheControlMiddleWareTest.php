@@ -11,20 +11,24 @@ use Garden\Web\Data;
 use Garden\Web\RequestInterface;
 use Gdn_Session;
 use PHPUnit\Framework\TestCase;
+use Vanilla\Web\CacheControlConstantsInterface;
 use Vanilla\Web\CacheControlMiddleware;
+use Vanilla\Web\CacheControlTrait;
 use VanillaTests\Fixtures\Request;
 
 /**
  * Test for functions of CacheControlMiddleWare
  */
 
-class CacheControlMiddleWareTest extends TestCase {
+class CacheControlMiddleWareTest extends TestCase implements CacheControlConstantsInterface {
+
+    use CacheControlTrait;
 
     /**
      * Test getHttp10Headers() with max-time set to 0.
      */
     public function testGetHttp10HeadersWithMaxTimeZero() {
-        $actual = CacheControlMiddleware::getHttp10Headers('private, max-age=0, no-cache');
+        $actual = static::getHttp10Headers('private, max-age=0, no-cache');
         $expected = ['Expires' => 'Sat, 01 Jan 2000 00:00:00 GMT', 'Pragma' => 'no-cache'];
         $this->assertSame($expected, $actual);
     }
@@ -33,7 +37,7 @@ class CacheControlMiddleWareTest extends TestCase {
      * Test getHttp10Headers() with max-time not set to zero.
      */
     public function testGetHttpHeadersWithMaxTimeGreaterThanZero() {
-        $actual = CacheControlMiddleware::getHttp10Headers('private, max-age=120');
+        $actual = static::getHttp10Headers('private, max-age=120');
         $expected = ['Expires' => gmdate('D, d M Y H:i:s T', time() + 120)];
         $this->assertSame($expected, $actual);
     }
@@ -42,7 +46,7 @@ class CacheControlMiddleWareTest extends TestCase {
      * Test getHttpHeaders() with empty array.
      */
     public function testGetHttpHeadersWithEmptyArray() {
-        $actual = CacheControlMiddleware::getHttp10Headers('');
+        $actual = static::getHttp10Headers('');
         $expected = [];
         $this->assertSame($expected, $actual);
     }
@@ -92,7 +96,7 @@ class CacheControlMiddleWareTest extends TestCase {
         $r = [
             'userIDZeroAndPublicCache' => [
                 0,
-                ['Cache-Control' => CacheControlMiddleware::PUBLIC_CACHE],
+                ['Cache-Control' => self::PUBLIC_CACHE],
                 [],
                 [
                     'Cache-Control' => 'public, max-age=120',
@@ -101,7 +105,7 @@ class CacheControlMiddleWareTest extends TestCase {
             ],
             'userIDZeroAndNoCache' => [
                 0,
-                ['Cache-Control' => CacheControlMiddleware::NO_CACHE],
+                ['Cache-Control' => self::NO_CACHE],
                 [],
                 [
                     'Cache-Control' => 'private, no-cache, max-age=0, must-revalidate',
@@ -121,7 +125,7 @@ class CacheControlMiddleWareTest extends TestCase {
             ],
             'userID1AndPublicCache' => [
                 1,
-                ['Cache-Control' => CacheControlMiddleware::PUBLIC_CACHE],
+                ['Cache-Control' => self::PUBLIC_CACHE],
                 [],
                 [
                     'Cache-Control' => 'public, max-age=120',
@@ -130,15 +134,15 @@ class CacheControlMiddleWareTest extends TestCase {
             ],
             'userID1AndPublicCacheNoVary' => [
                 1,
-                ['Cache-Control' => CacheControlMiddleware::PUBLIC_CACHE],
-                [CacheControlMiddleware::META_NO_VARY => true],
+                ['Cache-Control' => self::PUBLIC_CACHE],
+                [self::META_NO_VARY => true],
                 [
                     'Cache-Control' => 'public, max-age=120',
                 ],
             ],
             'userID1AndNoCache' => [
                 1,
-                ['Cache-Control' => CacheControlMiddleware::NO_CACHE],
+                ['Cache-Control' => self::NO_CACHE],
                 [],
                 [
                     'Cache-Control' => 'private, no-cache, max-age=0, must-revalidate',

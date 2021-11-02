@@ -7,7 +7,8 @@ import { IReaction } from "@dashboard/@types/api/reaction";
 import { IUserFragment } from "@library/@types/api/users";
 import { ITag } from "@library/features/tags/TagsReducer";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
-import { ICategoryFragment } from "@vanilla/addon-vanilla/@types/api/categories";
+import { ICategoryFragment } from "@vanilla/addon-vanilla/categories/categoriesTypes";
+import { RecordID } from "@vanilla/utils";
 
 export interface IDiscussion {
     discussionID: number;
@@ -72,5 +73,8 @@ export interface IDiscussionEmbed {
 }
 
 export interface IGetDiscussionListParams {
-    expand: string | string[];
+    limit?: number;
+    page?: number;
+    discussionID: string | RecordID | RecordID[];
+    expand?: string | string[];
 }

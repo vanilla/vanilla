@@ -811,7 +811,7 @@ if (!function_exists('filtersDropDown')) {
             $default = t('All');
         }
         $output = '';
-        if (c('Vanilla.EnableCategoryFollowing')) {
+        if (c(\CategoryModel::CONF_CATEGORY_FOLLOWING)) {
             $links = [];
             $active = null;
 
@@ -1502,23 +1502,13 @@ if (!function_exists('userPhoto')) {
 
         $linkClass = $linkClass == '' ? '' : ' class="'.$linkClass.'"';
 
-        $photo = val('Photo', $fullUser, val('PhotoUrl', $user));
         $title = htmlspecialchars(val('Title', $options, $name));
 
         if ($fullUser && $fullUser['Banned']) {
-            $photo = c('Garden.BannedPhoto', 'https://images.v-cdn.net/banned_large.png');
             $title .= ' ('.t('Banned').')';
         }
 
-        if ($photo) {
-            if (!isUrl($photo)) {
-                $photoUrl = Gdn_Upload::url(changeBasename($photo, 'n%s'));
-            } else {
-                $photoUrl = $photo;
-            }
-        } else {
-            $photoUrl = UserModel::getDefaultAvatarUrl($fullUser, 'thumbnail');
-        }
+        $photoUrl = userPhotoUrl($fullUser);
 
         $accessibleLabel = HtmlUtils::accessibleLabel('User: "%s"', [$name]);
 
@@ -1533,13 +1523,19 @@ if (!function_exists('userPhotoUrl')) {
      * Take a user object an return the URL to their photo.
      *
      * @param object|array $user
+     * @param string $size
      * @return string
      */
-    function userPhotoUrl($user) {
+    function userPhotoUrl($user, $size = UserModel::AVATAR_SIZE_THUMBNAIL) {
         if (is_numeric($user)) {
             $user = Gdn::userModel()->getID($user, DATASET_TYPE_ARRAY);
         } else {
             $user = (array) $user;
+        }
+
+        // The $size parameter is recent. Protect against a call with an extraneous arg.
+        if (!is_string($size)) {
+            $size = UserModel::AVATAR_SIZE_THUMBNAIL;
         }
 
         if (!array_key_exists('Photo', $user) && array_key_exists('UserID', $user)) {
@@ -1547,26 +1543,12 @@ if (!function_exists('userPhotoUrl')) {
             $user = Gdn::userModel()->getID($user['UserID'], DATASET_TYPE_ARRAY);
         }
 
-        if (!$user) {
-            return UserModel::getDefaultAvatarUrl($user);
+        if (empty($user) || !is_array($user)) {
+            return UserModel::getDefaultAvatarUrl([], $size);
         }
 
-        $photo = $user['Photo'];
-        if ($user && $user['Banned']) {
-            $bannedPhoto = c('Garden.BannedPhoto', '/applications/dashboard/design/images/banned.png');
-            $photo = asset($bannedPhoto, true);
-            return $photo;
-        }
-
-        if ($photo) {
-            if (!isUrl($photo)) {
-                $photoUrl = Gdn_Upload::url(changeBasename($photo, 'n%s'));
-            } else {
-                $photoUrl = $photo;
-            }
-            return $photoUrl;
-        }
-        return UserModel::getDefaultAvatarUrl($user);
+        $url = UserModel::getUserPhotoUrl($user, $size);
+        return $url;
     }
 }
 
@@ -1663,7 +1645,7 @@ if (!function_exists('registerUrl')) {
     function registerUrl($target = '', $force = false) {
         $registrationMethod = strtolower(c('Garden.Registration.Method'));
 
-        if ($registrationMethod === 'closed') {
+        if ($registrationMethod === 'closed' || $registrationMethod === 'invitation') {
             return '';
         }
 

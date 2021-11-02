@@ -9,9 +9,11 @@ namespace VanillaTests\Library\Vanilla;
 use Garden\Schema\ValidationException;
 use PHPUnit\Framework\TestCase;
 use Gdn_Upload;
+use Vanilla\Http\InternalRequest;
 use Vanilla\UploadedFile;
 use Vanilla\UploadedFileSchema;
 use VanillaTests\BootstrapTrait;
+use VanillaTests\Fixtures\Request;
 
 /**
  * Tests for the **UploadedFileSchema** class.
@@ -258,5 +260,31 @@ class UploadedFileSchemaTest extends TestCase {
             $file,
             $mime
         );
+    }
+
+    /**
+     * The `UploadedFileSchema::validateUploadSanity()` method should have an exception if an expected file upload request
+     * looks malformed.
+     */
+    public function testValidateUploadSanityException(): void {
+        $request = new Request('/', 'POST', []);
+        $request->setHeader('content-type', 'application/json');
+
+        $this->expectExceptionMessage('Make sure the content-type is multipart/form-data.');
+        UploadedFileSchema::validateUploadSanity([], 'photo', $request);
+    }
+
+    /**
+     * Test upload sanity happy paths.
+     *
+     * The `UploadedFileSchema::validateUploadSanity()` should only validate against errors that might cause future
+     * validation to become confusing. The `UploadFileSchema` itself is used to further validate other issues.
+     */
+    public function testValidateUploadSanityHappy(): void {
+        $request = new Request('/', 'POST', []);
+        $request->setHeader('content-type', 'multipart/form-data');
+        $this->expectNotToPerformAssertions();
+        UploadedFileSchema::validateUploadSanity(['photo' => 'foo'], 'photo', $request);
+        UploadedFileSchema::validateUploadSanity([], 'photo', $request);
     }
 }

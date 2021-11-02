@@ -297,13 +297,13 @@ class ActivityModel extends Gdn_Model {
     /**
      * Delete a particular activity item.
      *
-     * @param int $activityID The unique ID of activity to be deleted.
+     * @param int $id The unique ID of activity to be deleted.
      * @param array $options Not used.
      * @return bool Returns **true** if the activity was deleted or **false** otherwise.
      */
-    public function deleteID($activityID, $options = []) {
+    public function deleteID($id, $options = []) {
         // Get the activity first.
-        $activity = $this->getID($activityID);
+        $activity = $this->getID($id);
         if ($activity) {
             // Log the deletion.
             $log = val('Log', $options);
@@ -312,10 +312,10 @@ class ActivityModel extends Gdn_Model {
             }
 
             // Delete comments on the activity item
-            $this->SQL->delete('ActivityComment', ['ActivityID' => $activityID]);
+            $this->SQL->delete('ActivityComment', ['ActivityID' => $id]);
 
             // Delete the activity item
-            return parent::deleteID($activityID);
+            return parent::deleteID($id);
         } else {
             return false;
         }
@@ -651,13 +651,13 @@ class ActivityModel extends Gdn_Model {
     /**
      * Get a particular activity record.
      *
-     * @param int $activityID Unique ID of activity item.
+     * @param int $id Unique ID of activity item.
      * @param bool|string $datasetType The format of the resulting data.
      * @param array $options Not used.
      * @return array|object A single SQL result.
      */
-    public function getID($activityID, $datasetType = false, $options = []) {
-        $activity = parent::getID($activityID, $datasetType);
+    public function getID($id, $datasetType = false, $options = []) {
+        $activity = parent::getID($id, $datasetType);
         if ($activity) {
             $this->calculateRow($activity);
             $activities = [$activity];
@@ -1128,7 +1128,7 @@ class ActivityModel extends Gdn_Model {
 
         if ($activityID) {
             // Save the emailed flag back to the activity.
-            $this->SQL->put('Activity', ['Emailed' => $emailed], ['ActivityID' => $activityID]);
+            $this->SQL->put('Activity', ['Emailed' => $activity['Emailed']], ['ActivityID' => $activityID]);
         }
         return true;
     }
@@ -1580,20 +1580,22 @@ class ActivityModel extends Gdn_Model {
     /**
      * Save an activity.
      *
-     * @param array $data
-     * @param bool $preference
+     * @param array $formPostValues
+     * @param string|false $settings The name of the activity type to save.
      * @param array $options
      * @return array|bool|string|null
      * @throws Exception
      */
-    public function save($data, $preference = false, $options = []) {
+    public function save($formPostValues, $settings = false, $options = []) {
+        $preference = $settings;
+
         trace('ActivityModel->save()');
-        $activity = $data;
+        $activity = $formPostValues;
         $this->_touch($activity);
         $queueEmail = $options["QueueEmail"] ?? false;
 
-        $extraFields = $data["Ext"] ?? [];
-        unset($data["Ext"]);
+        $extraFields = $formPostValues["Ext"] ?? [];
+        unset($formPostValues["Ext"]);
         $emailFields = $extraFields["Email"] ?? [];
 
         if ($activity['ActivityUserID'] == $activity['NotifyUserID'] && !val('Force', $options)) {

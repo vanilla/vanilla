@@ -10,6 +10,8 @@
     <projectFiles>
         <directory name="library" />
         <directory name="applications/conversations" />
+        <directory name="applications/dashboard" />
+        <directory name="applications/vanilla" />
         <directory name="tests" />
         <ignoreFiles>
             <directory name="library/deprecated" />

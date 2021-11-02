@@ -100,7 +100,7 @@ export class FocusWatcher {
                 (event as any).explicitOriginalTarget, // Firefox
             ];
 
-            let activeElement = null;
+            let activeElement: HTMLElement | null = null;
             for (const target of possibleTargets) {
                 if (target && target !== document.body) {
                     activeElement = target;
@@ -111,19 +111,30 @@ export class FocusWatcher {
             if (activeElement !== null) {
                 const isWatchedInBody = document.body.contains(this.watchedNode);
                 const isFocusedInBody = document.body.contains(activeElement);
-                const isInModal = this.isElementInModal(activeElement);
+                const isReachComboxBox =
+                    activeElement.matches("[data-reach-popover]") || activeElement.closest("[data-reach-popover]");
+                const isActiveInPortal = this.isElementInModal(activeElement) || isReachComboxBox;
+
                 const hasFocus = Boolean(
                     this.watchedNode &&
                         activeElement &&
                         (activeElement === this.watchedNode || this.watchedNode.contains(activeElement)),
                 );
 
+                if (!hasFocus && isActiveInPortal) {
+                    // If the thing that just took focus was in a modal or a reach popover
+                    // Don't report losing focus.
+                    // Someone moving focus to the body (trying to focus any non-focusable elemtent)
+                    // will still clear focus though, so thing like clicking the background of a modal will clear focus.
+                    return false;
+                }
+
                 // We will only invalidate based on something actually getting focus.
                 // Make sure we are still mounted before calling this.
                 // It could happen that our flyout is unmounted in between the setTimeout call.
                 // We might have focused on a modal which can't be in the watched tree.
                 if (isWatchedInBody && isFocusedInBody) {
-                    callback(hasFocus || isInModal, activeElement as Element);
+                    callback(hasFocus, activeElement as Element);
                 }
             }
         }, 0);

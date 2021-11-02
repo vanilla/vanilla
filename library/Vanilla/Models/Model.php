@@ -336,9 +336,7 @@ class Model implements InjectableInterface {
      * @return \Gdn_SQLDriver
      */
     protected function createSql(): \Gdn_SQLDriver {
-        $sql = clone $this->database->sql();
-        $sql->reset();
-        return $sql;
+        return $this->database->createSql();
     }
 
     /**

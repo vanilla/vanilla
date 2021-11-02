@@ -1,4 +1,5 @@
 <?php use Vanilla\Forum\Modules\FoundationDiscussionsShim;
+use Vanilla\Forum\Modules\FoundationShimOptions;
 use Vanilla\Theme\BoxThemeShim;
 
 if (!defined('APPLICATION')) return;
@@ -14,7 +15,7 @@ $title = $this->data('title');
 
 <?php if (count($discussions) > 0) {
     if (FoundationDiscussionsShim::isEnabled()) {
-        FoundationDiscussionsShim::printLegacyShim($discussions);
+        FoundationDiscussionsShim::printLegacyShim($discussions, FoundationShimOptions::create()->setIsMainContent(true));
     } else {
     ?>
     <ul class="DataList Discussions pageBox">

@@ -10,12 +10,14 @@ use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Garden\Web\RequestInterface;
 use Vanilla\ApiUtils;
+use Vanilla\Permissions;
 use Vanilla\Theme\Asset\ThemeAsset;
 use Vanilla\Theme\Theme;
 use Vanilla\Theme\ThemeAssetFactory;
 use Vanilla\Theme\ThemeService;
 use Vanilla\ThemingApi\Models\ThemeAssetModel;
 use Vanilla\Utility\InstanceValidatorSchema;
+use Vanilla\Web\CacheControlConstantsInterface;
 use Vanilla\Web\CacheControlMiddleware;
 use VanillaTests\Fixtures\Request;
 
@@ -54,7 +56,7 @@ class ThemesApiController extends AbstractApiController {
      * @return Data
      */
     public function get(string $themeKey, array $query = []): Data {
-        $this->permission();
+        $this->permission(Permissions::BAN_PRIVATE);
         if (isset($query['revisionID']) && empty($query['revisionID'])) {
             unset($query['revisionID']);
         }
@@ -220,7 +222,7 @@ class ThemesApiController extends AbstractApiController {
      * @return Data
      */
     public function get_current(): Data {
-        $this->permission();
+        $this->permission(Permissions::BAN_PRIVATE);
         $out = $this->themeResultSchema();
 
         $theme = $this->themeService->getCurrentTheme();
@@ -302,7 +304,7 @@ class ThemesApiController extends AbstractApiController {
      * @return Data
      */
     public function get_assets(string $id, string $assetKey): Data {
-        $this->permission();
+        $this->permission(Permissions::BAN_PRIVATE);
         $theme = $this->themeService->getTheme($id);
         /** @var ThemeAsset $asset */
         [$asset, $assetName, $ext] = $this->extractAssetForPath($theme, $assetKey);
@@ -321,8 +323,8 @@ class ThemesApiController extends AbstractApiController {
 
         // Set maximum cache durations for these static assets.
         // We apply a cache buster when generating these URLs.
-        $result->setHeader('Cache-Control', CacheControlMiddleware::MAX_CACHE);
-        $result->setMeta(CacheControlMiddleware::META_NO_VARY, true);
+        $result->setHeader(self::HEADER_CACHE_CONTROL, self::MAX_CACHE);
+        $result->setMeta(self::META_NO_VARY, true);
         $result->setMeta('X-App-Cache-Hit', $theme->isCacheHit() ? '1' : '0');
 
         return $result;

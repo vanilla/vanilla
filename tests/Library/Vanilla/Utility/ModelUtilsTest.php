@@ -46,7 +46,9 @@ class ModelUtilsTest extends TestCase {
                 yield true;
             } while (true);
         };
-        $result = ModelUtils::iterateWithTimeout($iterator(), 1);
+        $result = ModelUtils::consumeGenerator(
+            ModelUtils::iterateWithTimeout($iterator(), 1)
+        );
         $this->assertGreaterThan(0, $i);
         $this->assertSame(false, $result);
     }
@@ -60,7 +62,9 @@ class ModelUtilsTest extends TestCase {
             $i++;
             yield true;
         };
-        $result = ModelUtils::iterateWithTimeout($iterator(), 30);
+        $result = ModelUtils::consumeGenerator(
+            ModelUtils::iterateWithTimeout($iterator(), 50)
+        );
         $this->assertSame(1, $i);
         $this->assertSame(true, $result);
     }

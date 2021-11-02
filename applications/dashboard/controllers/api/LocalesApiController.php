@@ -7,6 +7,7 @@
 
 use Garden\Schema\Schema;
 use Garden\Web\Data;
+use Vanilla\Permissions;
 use Vanilla\Web\Controller;
 
 /**
@@ -39,7 +40,7 @@ class LocalesApiController extends Controller {
      * @return array
      */
     public function index(): array {
-        $this->permission();
+        $this->permission(Permissions::BAN_PRIVATE);
         $schema = $this->schema($this->localeSchema(), ['LocaleConfig', 'out']);
         $out = $this->schema([":a" => $schema], 'out');
         $enabled = $this->getEnabledLocales();
@@ -197,7 +198,9 @@ class LocalesApiController extends Controller {
      * @return Data Returns the translations.
      */
     public function index_translations(string $locale, array $query = []) {
-        $this->permission();
+        // Allowed even for geusts in a private community.
+        // The locale is required to show the login page.
+        $this->permission(Permissions::BAN_PRIVATE);
 
         $this->locale->set($locale);
 
@@ -220,6 +223,7 @@ class LocalesApiController extends Controller {
      * @return Data Returns the translations javascript.
      */
     public function index_translations_js(string $locale, array $query = []) {
+        $this->permission(Permissions::BAN_PRIVATE);
         $translations = $this->index_translations($locale, $query);
 
         $js = 'gdn.translations = '.json_encode($translations, JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR | JSON_UNESCAPED_UNICODE).';';

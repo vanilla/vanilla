@@ -96,6 +96,11 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface {
             ->addCall('registerWidget', [CommunityLeadersModule::class])
         ;
 
+        $eventManager = $dic->get(\Garden\EventManager::class);
+        $eventManager->addListenerMethod(
+            \Vanilla\Dashboard\Models\RecordStatusEventHandler::class,
+            "handleIdeaStatusEvent"
+        );
         $mf = \Vanilla\Models\ModelFactory::fromContainer($dic);
         $mf->addModel('user', UserModel::class, 'u');
 
@@ -581,7 +586,12 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface {
                 $tagID = val(1, $sender->RequestArgs);
                 $tagModel = new TagModel();
                 $tag = $tagModel->getID($tagID, DATASET_TYPE_ARRAY);
-
+                $allowedTypes = Gdn::config('Tagging.Discussions.AllowedTypes', ['']);
+                if (!in_array(($tag['Type'] ?? ''), $allowedTypes)) {
+                    $sender->informMessage(formatString(t('You cannot delete a reserved tag.')));
+                    $sender->render('blank', 'utility', 'dashboard');
+                    break;
+                }
                 if ($sender->Form->authenticatedPostBack()) {
                     // Delete tag & tag relations.
                     $sQL = Gdn::sql();
@@ -838,13 +848,14 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface {
             return;
         }
 
+        $m = [];
         $hasAuthHeader = (!empty($_SERVER['HTTP_AUTHORIZATION']) && preg_match('`^Bearer\s+(v[a-z]\.[^\s]+)`i', $_SERVER['HTTP_AUTHORIZATION'], $m));
         $hasTokenParam = !empty($_GET['access_token']);
         if (!$hasAuthHeader && !$hasTokenParam) {
             return;
         }
 
-        $token = empty($_GET['access_token']) ? $m[1] : $_GET['access_token'];
+        $token = empty($_GET['access_token']) ? $m[1] ?? '' : $_GET['access_token'];
         if ($token) {
             $model = new AccessTokenModel();
 

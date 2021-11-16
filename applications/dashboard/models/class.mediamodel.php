@@ -32,14 +32,14 @@ class MediaModel extends Gdn_Model implements FileUploadHandler {
     /**
      * Get a media row by ID.
      *
-     * @param int $mediaID The ID of the media entry.
+     * @param int $id The ID of the media entry.
      * @param string|false $datasetType The format of the result dataset.
      * @param array $options options to pass to the database.
      * @return array|object|false Returns the media row or **false** if it isn't found.
      */
-    public function getID($mediaID, $datasetType = false, $options = []) {
+    public function getID($id, $datasetType = false, $options = []) {
         $this->fireEvent('BeforeGetID');
-        return parent::getID($mediaID, $datasetType, $options);
+        return parent::getID($id, $datasetType, $options);
     }
 
     /**
@@ -112,14 +112,14 @@ class MediaModel extends Gdn_Model implements FileUploadHandler {
     /**
      * Delete record by ID.
      *
-     * @param int $mediaID ID of the record to delete
+     * @param int $id ID of the record to delete
      * @param array $options An array of options to control the delete.
      * - deleteFile: Delete the file from the disk. True by default
      *
      * @return Gdn_Dataset
      */
-    public function deleteID($mediaID, $options = []) {
-        return $this->delete(['MediaID' => $mediaID], $options);
+    public function deleteID($id, $options = []) {
+        return $this->delete(['MediaID' => $id], $options);
     }
 
     /**

@@ -102,6 +102,13 @@ class EventManager implements EventDispatcherInterface, ListenerProviderInterfac
     }
 
     /**
+     * Unbind all event handlers.
+     */
+    public function unbindAll() {
+        $this->handlers = [];
+    }
+
+    /**
      * Bind a class' declared event handlers.
      *
      * Plugin classes declare event handlers in the following way:

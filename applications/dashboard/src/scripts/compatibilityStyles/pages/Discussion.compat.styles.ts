@@ -32,6 +32,9 @@ export const discussionCompatCSS = () => {
             },
             marginRight: globalVars.gutter.half,
         },
+        ".BeforeCommentHeading:empty": {
+            display: "none",
+        },
     });
 
     // Polls

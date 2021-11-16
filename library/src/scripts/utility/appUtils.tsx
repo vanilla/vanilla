@@ -268,6 +268,22 @@ export function makeProfileUrl(username: string) {
     return formatUrl(userPath, true);
 }
 
+/**
+ * Make a URL to a user's discussions.
+ */
+export function makeProfileDiscussionsUrl(username: string) {
+    const discussionsPath = `/profile/discussions/${encodeURIComponent(username)}`;
+    return formatUrl(discussionsPath, true);
+}
+
+/**
+ * Make a URL to a user's comments.
+ */
+export function makeProfileCommentsUrl(username: string) {
+    const commentsPath = `/profile/comments/${encodeURIComponent(username)}`;
+    return formatUrl(commentsPath, true);
+}
+
 interface IRecaptcha {
     execute: (string) => string;
 }

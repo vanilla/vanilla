@@ -19,18 +19,32 @@ use Vanilla\Site\SiteSectionModel;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Web\JsInterpop\AbstractReactModule;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
+use Vanilla\Widgets\LimitableWidgetInterface;
+use Vanilla\Http\InternalClient;
 
 /**
  * Class AbstractRecordTypeModule
  *
  * @package Vanilla\Community
  */
-class BaseDiscussionWidgetModule extends AbstractReactModule {
+class BaseDiscussionWidgetModule extends AbstractReactModule implements LimitableWidgetInterface {
 
     use HomeWidgetContainerSchemaTrait;
 
     /** @var \DiscussionsApiController */
     protected $discussionsApi;
+
+    /** @var SiteSectionModel */
+    private $siteSectionModel;
+
+    /** @var \CategoryModel */
+    private $categoryModel;
+
+    /** @var \Gdn_Session */
+    private $session;
+
+    /** @var \DiscussionsApiController */
+    private $api;
 
     /** @var array Parameters to pass to the API */
     protected $apiParams = [];
@@ -50,16 +64,30 @@ class BaseDiscussionWidgetModule extends AbstractReactModule {
     /** @var null|array[] */
     protected $discussions = null;
 
-
     /**
      * DI.
      *
      * @param \DiscussionsApiController $discussionsApi
+     * @param SiteSectionModel $siteSectionModel
+     * @param \CategoryModel $categoryModel
+     * @param \Gdn_Session $session
+     * @param \DiscussionsApiController $api
      */
-    public function __construct(\DiscussionsApiController $discussionsApi) {
-        parent::__construct();
+    public function __construct(
+        \DiscussionsApiController $discussionsApi,
+        SiteSectionModel $siteSectionModel,
+        \CategoryModel $categoryModel,
+        \Gdn_Session $session,
+        \DiscussionsApiController $api
+    ) {
         $this->discussionsApi = $discussionsApi;
+        $this->siteSectionModel = $siteSectionModel;
+        $this->categoryModel = $categoryModel;
+        $this->session = $session;
+        $this->api = $api;
+        parent::__construct();
     }
+
 
     /**
      * @inheritdoc
@@ -67,11 +95,32 @@ class BaseDiscussionWidgetModule extends AbstractReactModule {
     public function getProps(): ?array {
         $apiParams = $this->getRealApiParams();
 
+        $isFollowed = $apiParams['followed'] ?? false;
+        if ($isFollowed) {
+            if (!$this->session->isValid()) {
+                // They couldn't have followed any categories.
+                return null;
+            }
+
+            $followedCategoryIDs = $this->categoryModel->getFollowed($this->session->UserID);
+            if (empty($followedCategoryIDs)) {
+                // They didn't follow any categories.
+                return null;
+            }
+        }
+
         if ($this->discussions === null) {
             try {
-                $this->discussions = $this->discussionsApi->index($apiParams);
+                $this->discussions = $this->api->index($apiParams)->getData();
             } catch (PermissionException $e) {
                 // A user might not have permission to see this.
+                return null;
+            }
+        }
+
+        if ($isFollowed) {
+            if (count($this->discussions) == 0) {
+                // They do not have any discussions for their followed categories
                 return null;
             }
         }
@@ -82,6 +131,7 @@ class BaseDiscussionWidgetModule extends AbstractReactModule {
             'title' => $this->title,
             'subtitle' => $this->subtitle,
             'description' => $this->description,
+            'noCheckboxes' => true,
         ];
 
         return $props;
@@ -119,7 +169,12 @@ class BaseDiscussionWidgetModule extends AbstractReactModule {
      */
     protected function getRealApiParams(): array {
         $apiParams = $this->apiParams;
-        $apiParams = $this->getApiSchema()->validate($apiParams);
+        $validatedParams = $this->getApiSchema()->validate($apiParams);
+
+        // We want our defaults from the widget schema applied, but to still allow extraneous properties that weren't defined.
+        // The widget may be manually configured with API params that are available on the endpoint but not in
+        // the widget's form.
+        $apiParams = array_merge($apiParams, $validatedParams);
 
         // Handle the slotType.
         $slotType = $apiParams['slotType'] ?? '';
@@ -151,7 +206,19 @@ class BaseDiscussionWidgetModule extends AbstractReactModule {
         // Force some common expands
         // Default sort.
         $apiParams['sort'] = $apiParams['sort'] ?? '-dateLastComment';
-        $apiParams['expand'] = ['category', 'insertUser', 'lastUser', '-body', 'excerpt', 'tags'];
+        $apiParams['expand'] = ['all', '-body'];
+
+        // Filter down to the current site section if we haven't set categoryID.
+        if (!isset($apiParams['categoryID'])) {
+            $currentSiteSection = $this->siteSectionModel->getCurrentSiteSection();
+            $apiParams['siteSectionID'] = $currentSiteSection->getSectionID();
+        }
+
+        // If we enabled to display only categories the user follows, we need to remove the category & subcommunity.
+        if ($apiParams['followed']) {
+            $apiParams['siteSectionID'] = null;
+            $apiParams['categoryID'] = null;
+        }
 
         return $apiParams;
     }
@@ -174,6 +241,26 @@ class BaseDiscussionWidgetModule extends AbstractReactModule {
     }
 
     /**
+     * Get only followed categories trigger schema.
+     *
+     * @return Schema
+     */
+    protected static function followedCategorySchema(): Schema {
+        return Schema::parse([
+            'followed?' => [
+                'type' => 'boolean',
+                'default' => false,
+                'x-control' => SchemaForm::toggle(
+                    new FormOptions(
+                        t('Display content from followed categories'),
+                        t('Enable to only show posts from categories a user follows.')
+                    )
+                )
+            ]
+        ]);
+    }
+
+    /**
      * Get categorySchema.
      *
      * @return Schema
@@ -189,6 +276,9 @@ class BaseDiscussionWidgetModule extends AbstractReactModule {
                         Schema::parse([
                             'siteSectionID' => [
                                 'type' => 'null'
+                            ],
+                            'followed' => [
+                                'const' => false
                             ]
                         ])
                     )
@@ -209,6 +299,9 @@ class BaseDiscussionWidgetModule extends AbstractReactModule {
                             ],
                             'siteSectionID' => [
                                 'type' => 'null'
+                            ],
+                            'followed' => [
+                                'const' => false
                             ]
                         ])
                     )
@@ -235,6 +328,9 @@ class BaseDiscussionWidgetModule extends AbstractReactModule {
                             'categoryID' => [
                                 'type' => 'null',
                             ],
+                            'followed' => [
+                                'const' => false
+                            ]
                         ])
                     )
                 )
@@ -251,7 +347,7 @@ class BaseDiscussionWidgetModule extends AbstractReactModule {
         return Schema::parse([
             'sort?' => [
                 'type' => 'string',
-                'default' => '-dateInserted',
+                'default' => '-dateLastComment',
                 'x-control' => DiscussionsApiIndexSchema::getSortFormOptions()
             ]
         ]);
@@ -422,5 +518,14 @@ class BaseDiscussionWidgetModule extends AbstractReactModule {
      */
     public function setDiscussions(array $discussions): void {
         $this->discussions = $discussions;
+    }
+
+    /**
+     * Apply a limit to the number of discussions.
+     *
+     * @param int $limit
+     */
+    public function setLimit(int $limit) {
+        $this->apiParams['limit'] = $limit;
     }
 }

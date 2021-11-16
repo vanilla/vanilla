@@ -67,6 +67,7 @@ class Permissions implements \JsonSerializable {
     const BAN_2FA = '!2fa';
     const BAN_CSRF = '!csrf';
     const BAN_UNINSTALLED = '!uninstalled';
+    const BAN_ROLE_TOKEN = '!roleToken';
 
     public const RANK_EVERYONE = "everyone";
     public const RANK_MEMBER = 'member';
@@ -187,7 +188,7 @@ class Permissions implements \JsonSerializable {
      * @param int|array $ids One or more IDs of foreign objects (e.g. category IDs).
      * @return $this
      */
-    public function add($permission, $ids) {
+    public function add($permission, $ids): self {
         if (!is_array($ids)) {
             $ids = [$ids];
         }
@@ -212,7 +213,7 @@ class Permissions implements \JsonSerializable {
      * 2. Bans can be added with the "except" key. This takes an array of permission names and will not apply to users
      * with any of those permissions.
      *
-     * @param string $name The name of the ban. Use one if the **BAN_*** constants. If you add a ban with the same name
+     * @param string $name The name of the ban. Use one of the **BAN_*** constants. If you add a ban with the same name
      * as an existing ban then the existing ban will be removed first.
      * @param array $ban The ban to add. This as an array with the following optional keys:
      *
@@ -222,7 +223,7 @@ class Permissions implements \JsonSerializable {
      * @param bool $prepend If **true**, the ban will be prepended to the ban list instead of appending it.
      * @return $this
      */
-    public function addBan($name, array $ban = [], $prepend = false) {
+    public function addBan(string $name, array $ban = [], bool $prepend = false): self {
         if (substr($name, 0, 1) !== '!') {
             throw new \InvalidArgumentException('Ban names must start with "!".', 500);
         }
@@ -246,7 +247,7 @@ class Permissions implements \JsonSerializable {
      * @param string $name The name of the ban to remove.
      * @return $this
      */
-    public function removeBan($name) {
+    public function removeBan(string $name): self {
         $name = strtolower($name);
         unset($this->bans[$name]);
         return $this;
@@ -258,7 +259,7 @@ class Permissions implements \JsonSerializable {
      * @param array $permissions Rows from the Permissions database table.
      * @return $this
      */
-    public function compileAndLoad(array $permissions) {
+    public function compileAndLoad(array $permissions): self {
         foreach ($permissions as $row) {
             // Store the junction ID, if we have one.
             $junctionID = $row['JunctionID'] ?? null;
@@ -308,7 +309,7 @@ class Permissions implements \JsonSerializable {
      *
      * @return array
      */
-    public function getPermissions() {
+    public function getPermissions(): array {
         return $this->permissions;
     }
 
@@ -320,7 +321,7 @@ class Permissions implements \JsonSerializable {
      * @return bool Returns **true** if the user is banned or **false** otherwise.
      * @see Permissions::addBan(), Permissions::getBan()
      */
-    public function isBanned(array $permissions = []) {
+    public function isBanned(array $permissions = []): bool {
         $ban = $this->getBan($permissions);
         return $ban !== null;
     }
@@ -362,10 +363,15 @@ class Permissions implements \JsonSerializable {
      * @param string $permission Permission slug to check the value for (e.g. Vanilla.Discussions.View).
      * @param int|null $id Foreign object ID to validate the permission against (e.g. a category ID).
      * @param string|null $checkMode One of {self::PERMISSION_CHECK_MODES}
-     * @param string|null $junctionTable Provide a junction table to check. Needed for some some checks.
+     * @param string|null $junctionTable Provide a junction table to check. Needed for some checks.
      * @return bool
      */
-    public function has($permission, $id = null, string $checkMode = self::CHECK_MODE_GLOBAL_OR_RESOURCE, ?string $junctionTable = null) {
+    public function has(
+        $permission,
+        $id = null,
+        string $checkMode = self::CHECK_MODE_GLOBAL_OR_RESOURCE,
+        ?string $junctionTable = null
+    ): bool {
         return $this->hasAll((array)$permission, $id, $checkMode, $junctionTable);
     }
 
@@ -375,11 +381,22 @@ class Permissions implements \JsonSerializable {
      * @param array $permissions Permission slugs to check the value for (e.g. Vanilla.Discussions.View).
      * @param int|null $id Foreign object ID to validate the permissions against (e.g. a category ID).
      * @param string|null $checkMode One of {self::PERMISSION_CHECK_MODES}
-     * @param string|null $junctionTable Provide a junction table to check. Needed for some some checks.
+     * @param string|null $junctionTable Provide a junction table to check. Needed for some checks.
      *
      * @return bool
      */
-    public function hasAll(array $permissions, $id = null, string $checkMode = self::CHECK_MODE_GLOBAL_OR_RESOURCE, ?string $junctionTable = null) {
+    public function hasAll(
+        array $permissions,
+        $id = null,
+        string $checkMode = self::CHECK_MODE_GLOBAL_OR_RESOURCE,
+        ?string $junctionTable = null
+    ): bool {
+        // Check if new permission is used, try to revert it back to old permission style
+        foreach ($permissions as &$permissionName) {
+            if ($this->isTwoPartPermission($permissionName)) {
+                $permissionName = $this->untranslatePermission($permissionName);
+            }
+        }
         // Look for the bans first.
         if ($this->isBanned($permissions)) {
             return false;
@@ -404,11 +421,22 @@ class Permissions implements \JsonSerializable {
      * @param array $permissions Permission slugs to check the value for (e.g. Vanilla.Discussions.View).
      * @param int|null $id Foreign object ID to validate the permissions against (e.g. a category ID).
      * @param string|null $checkMode One of {self::PERMISSION_CHECK_MODES}
-     * @param string|null $junctionTable Provide a junction table to check. Needed for some some checks.
+     * @param string|null $junctionTable Provide a junction table to check. Needed for some checks.
      *
      * @return bool
      */
-    public function hasAny(array $permissions, $id = null, string $checkMode = self::CHECK_MODE_GLOBAL_OR_RESOURCE, ?string $junctionTable = null) {
+    public function hasAny(
+        array $permissions,
+        $id = null,
+        string $checkMode = self::CHECK_MODE_GLOBAL_OR_RESOURCE,
+        ?string $junctionTable = null
+    ): bool {
+        // Check if new permission is used, try to revert it back to old permission style
+        foreach ($permissions as &$permissionName) {
+            if ($this->isTwoPartPermission($permissionName)) {
+                $permissionName = $this->untranslatePermission($permissionName);
+            }
+        }
         // Look for the bans first.
         if ($this->isBanned($permissions)) {
             return false;
@@ -436,7 +464,7 @@ class Permissions implements \JsonSerializable {
      *
      * @return bool
      */
-    public function isAdmin() {
+    public function isAdmin(): bool {
         return $this->isAdmin === true;
     }
 
@@ -446,7 +474,7 @@ class Permissions implements \JsonSerializable {
      * @param Permissions $source The source Permissions instance to import permissions from.
      * @return $this
      */
-    public function merge(Permissions $source) {
+    public function merge(Permissions $source): self {
         $this->setPermissions(array_merge_recursive(
             $this->permissions,
             $source->getPermissions()
@@ -466,7 +494,7 @@ class Permissions implements \JsonSerializable {
      * @param bool|array $value A single value for global permissions or an array of foreign object IDs for per-ID permissions.
      * @return $this
      */
-    public function overwrite($permission, $value) {
+    public function overwrite(string $permission, $value): self {
         if ($value === true || $value === false) {
             $this->set($permission, $value);
         } elseif (is_array($value)) {
@@ -490,7 +518,7 @@ class Permissions implements \JsonSerializable {
      * @param int|array $ids One or more IDs of foreign objects (e.g. category IDs).
      * @return $this;
      */
-    public function remove($permission, $ids) {
+    public function remove($permission, $ids): self {
         if (array_key_exists($permission, $this->permissions)) {
             if (!is_array($ids)) {
                 $ids = [$ids];
@@ -515,7 +543,7 @@ class Permissions implements \JsonSerializable {
      * @param bool $value Toggle value for the permission: true for granted, false for revoked.
      * @return $this
      */
-    public function set($permission, $value) {
+    public function set($permission, $value): self {
         $exists = array_search($permission, $this->permissions);
 
         if ($value) {
@@ -535,7 +563,7 @@ class Permissions implements \JsonSerializable {
      * @param bool $isAdmin Is the user an administrator?
      * @return $this
      */
-    public function setAdmin($isAdmin) {
+    public function setAdmin($isAdmin): self {
         $this->isAdmin = (bool)$isAdmin;
         return $this;
     }
@@ -546,7 +574,7 @@ class Permissions implements \JsonSerializable {
      * @param array $permissions A properly-formatted permissions array.
      * @return $this
      */
-    public function setPermissions(array $permissions) {
+    public function setPermissions(array $permissions): self {
         $this->permissions = $permissions;
         return $this;
     }
@@ -644,7 +672,7 @@ class Permissions implements \JsonSerializable {
      * @param string $permission The permission to check.
      * @param int|null $junctionID The database ID of a non-global permission or **null** if this is a global check.
      * @param string|null $checkMode One of {self::PERMISSION_CHECK_MODES}
-     * @param string|null $junctionTable Provide a junction table to check. Needed for some some checks.
+     * @param string|null $junctionTable Provide a junction table to check. Needed for some checks.
      *
      * @return bool|null Returns **true** if the user has the permission, **false** if they don't, or **null** if the permissions isn't applicable.
      */
@@ -709,7 +737,7 @@ class Permissions implements \JsonSerializable {
     }
 
     /**
-     * @return array[] An array of permission fragemnts. See PermissionFragmentSchema
+     * @return array[] An array of permission fragments. See PermissionFragmentSchema
      */
     public function asPermissionFragments(): array {
         $resultsByTypeAndID = [
@@ -813,7 +841,7 @@ class Permissions implements \JsonSerializable {
      *
      * @return array Returns an array with permissions, bans, and the isAdmin flag.
      */
-    public function jsonSerialize() {
+    public function jsonSerialize(): array {
         // Translate the internal permissions into a better one for json.
         $permissions = [];
         foreach ($this->permissions as $key => $value) {

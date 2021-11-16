@@ -55,7 +55,8 @@ export const countClasses = useThemeCache(() => {
         whiteSpace: "nowrap",
         padding: `0 3px`,
     });
-    const text = css("text", {
+
+    const text = css({
         display: "block",
         textAlign: "center",
         color: ColorsUtils.colorOut(fg),

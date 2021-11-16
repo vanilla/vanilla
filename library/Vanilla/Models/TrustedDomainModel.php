@@ -37,6 +37,9 @@ class TrustedDomainModel {
     /** @var bool */
     private $isInstalled;
 
+    /** @var bool */
+    private $linkWarnLeaving;
+
     /** @var string */
     private $siteDomain;
 
@@ -62,6 +65,9 @@ class TrustedDomainModel {
         }
         $this->configuredTrustedDomains = array_filter($configuredDomains);
         $this->isInstalled = $config->get('Garden.Installed', false);
+
+        $this->linkWarnLeaving = $config->get("Garden.Format.WarnLeaving", true);
+
         $this->siteDomain = $request->getHost();
     }
 
@@ -113,5 +119,45 @@ class TrustedDomainModel {
         );
 
         return $this->localDomainCache;
+    }
+
+    /**
+     * Transform a destination to make sure that the resulting URL is "Safe".
+     *
+     * "Safe" means that the domain of the URL is trusted.
+     *
+     * @param string $destination Destination URL or path.
+     * @param bool $withDomain
+     * @return string The destination if safe, /home/leaving?Target=$destination if not.
+     */
+    public function safeUrl($destination, $withDomain = false) {
+        $url = url($destination, true);
+        $trustedDomains = $this->getAll();
+        $isTrustedDomain = false;
+
+        foreach ($trustedDomains as $trustedDomain) {
+            if (urlMatch($trustedDomain, $url)) {
+                $isTrustedDomain = true;
+                break;
+            }
+        }
+
+        return ($isTrustedDomain ? $url : url('/home/leaving?Target='.urlencode($destination), $withDomain));
+    }
+
+    /**
+     * Performs optional url filtering if the Garden.Format.WarnLeaving config isn't explicitly set to false,
+     * otherwise it returns the url as is.
+     *
+     * @param string $destination Destination URL or path.
+     * @param bool $withDomain
+     * @return string The destination if safe, /home/leaving?Target=$destination if not.
+     */
+    public function safeContentUrl($destination, $withDomain = false) {
+        // If the Garden.Format.WarnLeaving Config is explicitly set to false we return the url as is
+        // otherwise we process the url through safeUrl();
+        return (!$this->linkWarnLeaving)
+            ? url($destination, $withDomain)
+            : $this->safeUrl($destination, $withDomain);
     }
 }

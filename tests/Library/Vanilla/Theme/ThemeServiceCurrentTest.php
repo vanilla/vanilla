@@ -193,4 +193,38 @@ class ThemeServiceCurrentTest extends MockThemeTestCase {
             ],
         ];
     }
+
+    /**
+     * Test that we fall back to the current theme when the mock addon fails.
+     */
+    public function testDeletePreviewedTheme() {
+        $currentAddon = new MockAddon('mock-current-addon');
+        $this->addonManager->pushAddon($currentAddon);
+
+        $currentTheme = $this->mockThemeProvider->addTheme([
+            'themeID' => 'mock-current-addon',
+        ], $currentAddon);
+        $this->setConfigs([
+            ThemeServiceHelper::CONFIG_DESKTOP_THEME => 'mock-current-addon',
+            ThemeServiceHelper::CONFIG_MOBILE_THEME => 'mock-current-addon',
+            ThemeServiceHelper::CONFIG_CURRENT_THEME => 'mock-current-addon',
+        ]);
+
+        $previewAddon = new MockAddon('mock-preview-addon');
+        $this->addonManager->pushAddon($previewAddon);
+
+        $previewTheme = $this->mockThemeProvider->addTheme([
+            'themeID' => 'mock-preview-addon',
+        ], $previewAddon);
+
+        // Theme is previewed.
+        $this->themeService()->setPreviewTheme('mock-preview-addon');
+        $theme = $this->themeService()->getCurrentTheme();
+        $this->assertEquals('mock-preview-addon', $theme->getThemeID());
+
+        // Delete the preview theme
+        $this->themeService()->deleteTheme('mock-preview-addon');
+        $theme = $this->themeService()->getCurrentTheme();
+        $this->assertEquals('mock-current-addon', $theme->getThemeID());
+    }
 }

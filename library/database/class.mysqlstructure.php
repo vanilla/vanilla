@@ -722,6 +722,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             'mediumtext',
             'longtext',
             'text',
+            'tinytext',
             'decimal',
             'numeric',
             'float',
@@ -758,7 +759,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
 
         $return .= "{$column->Type}";
 
-        $lengthTypes = $this->types('length');
+        $lengthTypes = $this->types('defineLength');
         if ($column->Length != '' && in_array($column->Type, $lengthTypes)) {
             if ($column->Precision != '') {
                 $return .= '('.$column->Length.', '.$column->Precision.')';

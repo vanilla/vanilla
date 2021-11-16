@@ -14,11 +14,12 @@ use Vanilla\Web\SimpleTitlePage;
 use VanillaTests\BootstrapTestCase;
 use VanillaTests\EventSpyTestTrait;
 use VanillaTests\Fixtures\Html\TestHtmlDocument;
+use VanillaTests\SiteTestCase;
 
 /**
  * Tests for the master view renderer.
  */
-class MasterViewRendererTest extends BootstrapTestCase {
+class MasterViewRendererTest extends SiteTestCase {
 
     use EventSpyTestTrait;
 

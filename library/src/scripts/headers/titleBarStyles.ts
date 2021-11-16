@@ -325,7 +325,6 @@ export const titleBarClasses = useThemeCache(() => {
             justifyContent: "center",
             marginLeft: "auto",
             minWidth: styleUnit(formElementVars.sizing.height),
-            flexBasis: px(formElementVars.sizing.height),
             maxWidth: percent(100),
             height: styleUnit(vars.sizing.height),
             ...{

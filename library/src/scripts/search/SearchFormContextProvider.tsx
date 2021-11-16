@@ -27,6 +27,7 @@ import { getCurrentLocale } from "@vanilla/i18n";
 import { SearchContext } from "./SearchContext";
 import { SearchService, ISearchDomain } from "./SearchService";
 import PlacesSearchListing from "@library/search/PlacesSearchListing";
+import { getSiteSection } from "@library/utility/appUtils";
 
 interface IProps {
     children?: React.ReactNode;
@@ -207,6 +208,17 @@ export function SearchFormContextProvider(props: IProps) {
                 recordTypes: currentDomain.getRecordTypes(),
                 expand: ["insertUser", "breadcrumbs", "image", "excerpt", "-body"],
             };
+        }
+
+        const siteSection = getSiteSection();
+        const siteSectionCategoryID = siteSection.attributes.categoryID;
+        /**
+         * finalQuery["categoryIDs"] could be a populated array, an empty array, or undefined
+         */
+        const hasCategoryIDs = !!(finalQuery["categoryIDs"] && finalQuery["categoryIDs"].length);
+        if (!("categoryID" in finalQuery) && !hasCategoryIDs && siteSectionCategoryID > 0) {
+            finalQuery.categoryID = siteSectionCategoryID;
+            finalQuery.includeChildCategories = true;
         }
 
         // Filter out empty fields.

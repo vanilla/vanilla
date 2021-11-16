@@ -734,6 +734,23 @@ class AddonManager implements LoggerAwareInterface {
     }
 
     /**
+     * Checks whether the addon in the x-addon field is enabled and handles cases where the field is an array.
+     *
+     * @param string|string[] $addons
+     * @return bool
+     */
+    public function checkAddonsEnabled($addons): bool {
+        $addons = is_array($addons) ? $addons : [$addons];
+        foreach ($addons as $addon) {
+            $enabled = $this->isEnabled($addon, Addon::TYPE_ADDON);
+            if (!$enabled) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Check the enabled dependents of an addon.
      *
      * Addons should always check their dependents before being disabled. This check does not consider dependents that

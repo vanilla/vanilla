@@ -44,22 +44,6 @@ export const profileCompatCSS = () => {
         width: "100%",
     });
 
-    cssOut(`body.Section-Profile .CountItemWrap, .Content .BadgeGrid a`, {
-        width: `${vars.badges.size.width} !important`,
-    });
-
-    cssOut(`body.Section-Profile .DataCounts, .Content .BadgeGrid .PhotoGrid`, {
-        width: `${percent(100)} !important`,
-        justifyContent:
-            vars.badges.alignment === ProfilePhotoAlignment.LEFT ? "flex-start !important" : "center !important",
-    });
-
-    injectGlobal({
-        ".pageBox.BadgeGrid .PhotoGrid": {
-            marginLeft: "0 !important",
-        },
-    });
-
     cssOut(`body.Section-Profile .Profile dd, dt`, {
         ...Mixins.font({
             ...globalVars.fontSizeAndWeightVars("large"),

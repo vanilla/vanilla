@@ -7,6 +7,7 @@
 
 namespace VanillaTests\Fixtures\Theme;
 
+use Garden\Web\Exception\NotFoundException;
 use Vanilla\Addon;
 use Vanilla\Theme\Asset\JsonThemeAsset;
 use Vanilla\Theme\Asset\ThemeAsset;
@@ -14,6 +15,7 @@ use Vanilla\Theme\Theme;
 use Vanilla\Theme\ThemeProviderInterface;
 use Vanilla\Theme\ThemeProviderWriteInterface;
 use Vanilla\Theme\ThemeService;
+use Vanilla\Theme\ThemeServiceHelper;
 use VanillaTests\Fixtures\MockAddon;
 
 /**
@@ -30,9 +32,20 @@ class MockThemeProvider implements ThemeProviderInterface, ThemeProviderWriteInt
     /** @var ThemeService */
     private $themeService;
 
+    /** @var ThemeServiceHelper */
+    private $serviceHelper;
+
     ///
     /// ThemeProviderInterface
     ///
+    /**
+     * DI.
+     *
+     * @param ThemeServiceHelper $serviceHelper
+     */
+    public function __construct(ThemeServiceHelper $serviceHelper) {
+        $this->serviceHelper = $serviceHelper;
+    }
 
     /**
      * @inheritdoc
@@ -52,7 +65,11 @@ class MockThemeProvider implements ThemeProviderInterface, ThemeProviderWriteInt
      * @inheritdoc
      */
     public function getTheme($themeKey, array $args = []): Theme {
-        return $this->themesByID[$themeKey];
+        if (!isset($this->themesByID[$themeKey])) {
+            throw new NotFoundException('Theme');
+        }
+        // Clone so things don't get dirty during tests.
+        return clone $this->themesByID[$themeKey];
     }
 
     /**
@@ -73,7 +90,9 @@ class MockThemeProvider implements ThemeProviderInterface, ThemeProviderWriteInt
      * @inheritdoc
      */
     public function setPreviewTheme($themeID, int $revisionID = null): Theme {
-        throw new \Exception('Not Implemented');
+        $theme = $this->getTheme($themeID);
+        $this->serviceHelper->setSessionPreviewTheme($theme);
+        return $theme;
     }
 
     /**

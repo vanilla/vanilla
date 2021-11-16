@@ -27,6 +27,8 @@ interface IProps {
     extraNavTop?: React.ReactNode;
     extraNavBottom?: React.ReactNode;
     showCloseIcon?: boolean;
+    navigationItems?: INavigationVariableItem[];
+    forceHamburgerOpen?: boolean;
 }
 
 const extraNavGroups: React.ComponentType[] = [];
@@ -39,7 +41,7 @@ export function addHamburgerNavGroup(node: React.ComponentType) {
  * Creates a hamburger menu.
  */
 export default function Hamburger(props: IProps) {
-    const [isOpen, setIsOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState(props.forceHamburgerOpen || false);
     const classes = hamburgerClasses();
 
     const closeDrawer = () => {
@@ -83,7 +85,7 @@ export default function Hamburger(props: IProps) {
                     </Button>
                 )}
                 <div className={classes.container}>
-                    <SiteNavigation onClose={() => setIsOpen(false)} />
+                    <SiteNavigation onClose={() => setIsOpen(false)} navigationItems={props.navigationItems} />
                     <MobileOnlyNavigation />
                     {props.extraNavTop}
                     {props.extraNavBottom}
@@ -98,6 +100,7 @@ export default function Hamburger(props: IProps) {
 
 interface ISiteNavigationProps {
     onClose: () => void;
+    navigationItems?: INavigationVariableItem[];
 }
 
 export function varItemToNavTreeItem(
@@ -140,7 +143,10 @@ export function getActiveRecord(navTreeItems: INavigationTreeItem[]): IPanelNavI
 }
 
 function SiteNavigation(props: ISiteNavigationProps) {
-    const { navigationItems } = navigationVariables();
+    const navigationItems =
+        props.navigationItems && props.navigationItems.length
+            ? props.navigationItems
+            : navigationVariables().navigationItems;
 
     const [treeItems, activeRecord] = useMemo(() => {
         const treeItems = navigationItems.map((item) => varItemToNavTreeItem(item)).filter(notEmpty);

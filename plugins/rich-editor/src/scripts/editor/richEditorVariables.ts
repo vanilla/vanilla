@@ -36,7 +36,7 @@ export const richEditorVariables = useThemeCache(() => {
     });
 
     const menuButton = makeThemeVars("menuButton", {
-        size: 42,
+        size: 36,
     });
 
     const paragraphMenuHandle = makeThemeVars("paragraphMenuHandle", {

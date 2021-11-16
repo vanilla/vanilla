@@ -28,9 +28,41 @@ class SafeCurlHttpHandler extends CurlHandler {
         $url = curl_getinfo($curlHandle, CURLINFO_EFFECTIVE_URL);
         $safeCurl = new SafeCurl($curlHandle);
         $safeCurl->setFollowLocation($this->followLocation);
-        $response = $safeCurl->execute($url);
+        try {
+            $response = $safeCurl->execute($url);
+        } catch (\Exception $e) {
+            // Safe curl tries to make some requests up front
+            // To make sure we aren't following redirects into an internal service.
+            // This can throw it's own exception as it validates the security of the URL.
+            // However whether or not we throw an exception, depends on the configuration of the HttpClient instance.
+            //
+            // TL:DR; HttpHandlers should never throw. Only return responses (that could be an error response).
+            $responseBody = [
+                'error' => array_filter([
+                    'message' => $e->getMessage(),
+                    'code' => $e->getCode(),
+                    'trace' => debug() ? $e->getTraceAsString() : null,
+                ])
+            ];
+            $response = new HttpResponse(500, ['content-type' => 'application/json'], json_encode($responseBody));
+        }
 
         return $response;
+    }
+
+    /**
+     * Decode a curl response and turn it into
+     *
+     * @param resource $ch The curl handle.
+     * @param string|HttpResponse $response Either a string or an http response.
+     * @return HttpResponse
+     */
+    protected function decodeCurlResponse($ch, $response): HttpResponse {
+        if ($response instanceof HttpResponse) {
+            return $response;
+        } else {
+            return parent::decodeCurlResponse($ch, $response);
+        }
     }
 
     /**

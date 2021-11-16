@@ -63,7 +63,7 @@ class SpoilerLineTerminatorBlot extends AbstractLineTerminatorBlot {
         $buttonClasses = "iconButton button-spoiler";
         $buttonDisabled = "disabled";
         $chevron = "";
-        if ($this->parseMode === Parser::PARSE_MODE_NORMAL) {
+        if ($this->parseMode !== Parser::PARSE_MODE_QUOTE) {
             $buttonClasses .= " js-toggleSpoiler";
             $buttonDisabled = "";
             $chevron = <<<HTML

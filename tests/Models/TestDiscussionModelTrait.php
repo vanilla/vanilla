@@ -9,6 +9,7 @@ namespace VanillaTests\Models;
 
 use DiscussionModel;
 use PHPUnit\Framework\TestCase;
+use Vanilla\Forum\Models\DiscussionMergeModel;
 use VanillaTests\VanillaTestCase;
 
 /**
@@ -20,11 +21,15 @@ trait TestDiscussionModelTrait {
      */
     protected $discussionModel;
 
+    /** @var DiscussionMergeModel */
+    protected $mergeModel;
+
     /**
      * Instantiate a fresh model for each
      */
     protected function setupTestDiscussionModel() {
         $this->discussionModel = $this->container()->get(DiscussionModel::class);
+        $this->mergeModel = $this->container()->get(DiscussionMergeModel::class);
         DiscussionModel::cleanForTests();
     }
 

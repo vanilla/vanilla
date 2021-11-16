@@ -71,7 +71,7 @@ class MySQLDriverTest extends TestCase {
      * Make sure the table is escaped in **fetchTableSchema()**.
      */
     public function testFetchTableSchemeInjection() {
-        $this->expectError();
+        $this->expectException(\Gdn_UserException::class);
         $schema = $this->sql->fetchTableSchema("User/**/where/**/1=(select/**/1/**/from(select/**/sleep(/**/1/**/))a)");
     }
 
@@ -459,5 +459,42 @@ SQL;
         $this->sql->Database = $mock;
         $this->sql->namedParameter('param1', false, 42);
         $this->sql->options($options)->query($sql);
+    }
+
+    /**
+     * Test the parameterizeGroup value method.
+     *
+     * @param string $expected
+     * @param array $in
+     *
+     * @dataProvider provideParameterizeGroupValue
+     */
+    public function testParameterizeGroupValue(string $expected, array $in) {
+        $result = $this->sql->parameterizeGroupValue($in);
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @return array[]
+     */
+    public function provideParameterizeGroupValue(): array {
+        return [
+            'empty' => [
+                '()',
+                [],
+            ],
+            'one' => [
+                '(?)',
+                [1],
+            ],
+            'many' => [
+                '(?,?,?,?)',
+                [true, 'other', 4, null],
+            ],
+            'assosc' => [
+                '(?,?,?)',
+                ['test' => 5, 'hello', 2 => 'other'],
+            ]
+        ];
     }
 }

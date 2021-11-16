@@ -1,12 +1,10 @@
-import createEmotion from "@emotion/css/create-instance";
-import { CSSObject } from "@emotion/css";
+import { keyframes, cx, injectGlobal, css, CSSObject } from "@emotion/css";
 
-const emotion = createEmotion({
-    key: "vanilla",
-    prepend: false,
-});
+export { keyframes, cx };
 
-export const { keyframes, cx, injectGlobal: cssRaw, css: style } = emotion;
+export const cssRaw = injectGlobal;
+
+export const style = css;
 
 export declare type TLength = number | string; // a few files are stil coupled to this type from typestyle
 
@@ -29,7 +27,7 @@ export function flattenNests(original?: NestCssObject) {
 
 export function cssRule(selector: string, ...objects: CSSObject[]): void {
     objects.forEach((object) => {
-        emotion.injectGlobal({
+        injectGlobal({
             [selector]: flattenNests(object),
         });
     });

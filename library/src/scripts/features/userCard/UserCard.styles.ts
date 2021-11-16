@@ -1,24 +1,20 @@
 /**
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import { buttonVariables } from "@library/forms/Button.variables";
-import { buttonResetMixin } from "@library/forms/buttonMixins";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { Mixins } from "@library/styles/Mixins";
-import { pointerEvents, singleBorder, unit } from "@library/styles/styleHelpers";
+import { singleBorder } from "@library/styles/styleHelpers";
 import { styleUnit } from "@library/styles/styleUnit";
-import { styleFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { userCardVariables } from "@library/features/userCard/UserCard.variables";
-import { important, percent } from "csx";
-import { css, injectGlobal } from "@emotion/css";
+import { percent } from "csx";
+import { css, injectGlobal, cx } from "@emotion/css";
 
 export const userCardClasses = useThemeCache((props: { compact?: boolean } = {}) => {
-    const style = styleFactory("popupUserCard");
     const vars = userCardVariables();
     const mediaQueries = panelLayoutVariables().mediaQueries();
     const globalVars = globalVariables();
@@ -31,7 +27,7 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         },
     });
 
-    const container = style("container", {
+    const container = css({
         display: "flex",
         flexDirection: "row",
         alignItems: "stretch",
@@ -42,54 +38,28 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         flexWrap: "wrap",
     });
 
-    const metaContainer = style("metaContainer", {
-        ...Mixins.padding({
-            all: vars.container.spacing,
+    const containerWithBorder = cx(
+        container,
+        css({
+            borderTop: `1px solid ${vars.containerWithBorder.color}`,
         }),
-    });
+    );
 
-    const row = style("row", {
+    const row = css({
         display: "flex",
+        width: "100%",
         justifyContent: "center",
     });
 
-    const actionContainer = style("actionContainer", {
+    const button = css({
+        maxWidth: percent(100),
         ...{
             "&&": {
-                ...Mixins.padding({
-                    horizontal: vars.actionContainer.spacing,
-                    top: vars.container.spacing,
-                    bottom: vars.actionContainer.spacing * 2 - vars.container.spacing,
-                }),
-                ...mediaQueries.oneColumnDown({
-                    ...Mixins.padding({
-                        vertical: vars.actionContainer.spacing * 2 - vars.container.spacing,
-                        horizontal: vars.actionContainer.spacing,
-                    }),
-                }),
+                minWidth: styleUnit(vars.button.minWidth),
             },
         },
-    });
 
-    const containerWithBorder = style("containerWithBorder", {
-        borderTop: `1px solid ${vars.containerWithBorder.color}`,
-    });
-
-    const avatar = style("avatar", {
-        ...buttonResetMixin(),
-    });
-
-    const button = style(
-        "button",
-        {
-            maxWidth: percent(100),
-            ...{
-                "&&": {
-                    minWidth: styleUnit(vars.button.minWidth),
-                },
-            },
-        },
-        mediaQueries.oneColumnDown({
+        ...mediaQueries.oneColumnDown({
             ...{
                 "&&": {
                     width: percent(100),
@@ -97,59 +67,68 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
                 },
             },
         }),
-    );
+    });
 
-    const buttonContainer = style(
-        "buttonContainer",
-        {
-            maxWidth: percent(100),
-            ...Mixins.padding({
-                all: vars.container.spacing,
-            }),
-        },
-        mediaQueries.oneColumnDown({
-            ...{
-                "&&": {
-                    flexGrow: 1,
-                    flexBasis: percent(50),
-                },
+    const buttonsContainer = css({
+        ...Mixins.padding({
+            horizontal: vars.container.spacing / 2,
+        }),
+    });
+
+    const buttonContainer = css({
+        maxWidth: percent(100),
+        ...Mixins.padding({
+            top: 0,
+            bottom: vars.container.spacing,
+            horizontal: vars.container.spacing / 2,
+        }),
+
+        ...mediaQueries.oneColumnDown({
+            "&&": {
+                flexGrow: 1,
+                flexBasis: percent(50),
             },
         }),
-    );
+    });
 
-    const name = style(
-        "name",
+    const name = css(
         {
-            margin: "auto",
-            fontSize: vars.name.size,
-            fontWeight: vars.name.weight,
+            ...Mixins.margin(vars.name.margin),
+            ...Mixins.font(vars.name.font),
             width: percent(100),
             textAlign: "center",
         },
         mediaQueries.oneColumnDown({
-            fontSize: (vars.name.size! as number) * 1.25,
+            fontSize: (vars.name.font.size! as number) * 1.25,
         }),
     );
 
-    const label = style("label", {
+    const label = css({
         ...Mixins.padding(vars.label.padding),
         ...Mixins.font(vars.label.font),
         ...Mixins.border(vars.label.border),
-        ...Mixins.margin({
-            top: vars.container.spacing,
-            horizontal: "auto",
-        }),
+        ...Mixins.margin(vars.label.margin),
     });
 
-    const stat = style("stat", {
+    const stat = css({
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         flexGrow: 1,
         maxWidth: percent(50),
+        ...Mixins.font(vars.stat.font),
     });
 
-    const statLabel = style("statLabel", {
+    const statLink = cx(
+        stat,
+        css({
+            "&:hover, &:focus, &:active, &.focus-visible": {
+                ...Mixins.font(vars.stat.fontState),
+            },
+        }),
+    );
+
+    const statLabel = css({
         marginTop: styleUnit(2),
         marginBottom: styleUnit(3),
         ...Mixins.font({
@@ -164,24 +143,22 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         }),
     });
 
-    const statLeft = style("statLeft", {
+    const statLeft = css({
         borderRight: singleBorder({}),
         ...Mixins.padding({
-            vertical: vars.container.spacing,
             right: globalVars.spacer.size / 2,
             left: globalVars.spacer.size,
         }),
     });
 
-    const statRight = style("statRight", {
+    const statRight = css({
         ...Mixins.padding({
-            vertical: vars.container.spacing,
             right: globalVars.spacer.size,
             left: globalVars.spacer.size / 2,
         }),
     });
 
-    const count = style("count", {
+    const count = css({
         marginTop: styleUnit(3),
         ...Mixins.font({
             size: vars.count.size,
@@ -189,34 +166,33 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         }),
     });
 
-    const header = style("header", {
+    const header = css({
         position: "relative",
-        height: styleUnit(vars.header.height),
     });
 
-    const section = style("section", {});
-
-    const linkColors = Mixins.clickable.itemState({ default: globalVars.mainColors.fg });
-    const email = style("email", {
+    const linkColors = Mixins.clickable.itemState({ default: vars.email.color });
+    const email = css({
         ...linkColors,
         "&&": {
-            ...Mixins.font({
-                ...globalVars.fontSizeAndWeightVars("small"),
-                align: "center",
-            }),
             display: "inline-flex",
-            margin: "auto",
-            marginTop: styleUnit(vars.container.spacing * 1.8),
+            ...Mixins.font(vars.email.font),
+            ...Mixins.margin(vars.email.margin),
         },
     });
 
     const metas = css({
-        textAlign: "center",
+        "&&": { textAlign: "center" },
+    });
+
+    const metaItem = css({
+        ...Mixins.margin({
+            vertical: 0,
+        }),
     });
 
     const formElementsVars = formElementsVariables();
 
-    const close = style("close", {
+    const close = css({
         ...{
             "&&&": {
                 ...Mixins.absolute.topRight(),
@@ -229,62 +205,39 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         },
     });
 
-    const userPhoto = style("userPhoto", {
-        margin: "auto",
+    const userPhoto = css({
+        ...Mixins.margin({
+            top: vars.container.spacing,
+        }),
         display: "block",
     });
 
-    const link = style("link", {
-        color: "inherit",
-        fontSize: "inherit",
-        ...{
-            "&.isLoading": {
-                cursor: important("wait"),
-                ...pointerEvents("auto"),
-            },
-        },
-    });
-
-    const msg = style("msg", {
-        fontSize: globalVars.fonts.size.small,
-        ...Mixins.margin({
-            top: unit(4),
-            bottom: unit(4),
-        }),
-    });
-
-    const msgMinimal = style("msgMinimal", {
-        fontSize: globalVars.fonts.size.small,
-        ...Mixins.margin({
-            top: unit(10),
-            bottom: unit(14),
-        }),
+    const message = css({
+        ...Mixins.font(vars.message.font),
+        ...Mixins.margin(vars.message.margin),
     });
 
     return {
         container,
         containerWithBorder,
+        buttonsContainer,
         button,
         buttonContainer,
         name,
         label,
         stat,
+        statLink,
         count,
-        avatar,
         header,
-        section,
         email,
         statLabel,
         statLeft,
         statRight,
         close,
         userPhoto,
-        actionContainer,
-        link,
-        metaContainer,
         row,
         metas,
-        msg,
-        msgMinimal,
+        metaItem,
+        message,
     };
 });

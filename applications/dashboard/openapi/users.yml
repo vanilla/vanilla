@@ -366,6 +366,12 @@ paths:
             type: string
           type: array
         style: form
+      - description: >
+          Authenticate using a JWT, [role/token](https://success.vanillaforums.com/kb/articles/436-api-role-tokens).
+        in: query
+        name: role-token
+        schema:
+          type: string
       responses:
         '200':
           content:
@@ -373,6 +379,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/User'
           description: Success
+        '403':
+          description: >
+            Forbidden, e.g. expired or invalid role token, role token used with another auth mechanism.
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/BasicError"
+        '404':
+          $ref: '#/components/responses/NotFound'
       tags:
       - Users
       summary: Get a user.
@@ -636,7 +651,7 @@ paths:
       - Users
       requestBody:
         content:
-          application/json:
+          multipart/form-data:
             schema:
               properties:
                 photo:

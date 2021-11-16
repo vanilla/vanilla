@@ -12,6 +12,7 @@ use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
 use Vanilla\DateFilterSchema;
+use Vanilla\Schema\LegacyDateRangeExpression;
 use Vanilla\Utility\ArrayUtils;
 use Webmozart\Assert\Assert;
 
@@ -46,8 +47,8 @@ abstract class SearchQuery {
     /** @var array $indexes */
     protected $indexes;
 
-    /** @var AbstractSearchType|null */
-    protected $currentType = null;
+    /** @var AbstractSearchType[]|null */
+    protected $currentTypes = null;
 
     /** @var array The boost values. */
     private $boosts;
@@ -96,16 +97,29 @@ abstract class SearchQuery {
         }
 
         $hasCollapsableType = false;
+
         // Give each of the search types a chance to validate the query object.
         /** @var AbstractSearchType $searchType */
-        foreach ($filteredTypes as $searchType) {
-            if ($searchType->supportsCollapsing()) {
-                $hasCollapsableType = true;
+        foreach ($filteredTypes->getAsOptimizedGroups() as $searchTypeGroup) {
+            $hasGlobal = false;
+            foreach ($searchTypeGroup as $searchType) {
+                if ($searchType instanceof GlobalSearchType) {
+                    $hasGlobal = true;
+                }
+
+                if ($searchType->supportsCollapsing()) {
+                    $hasCollapsableType = true;
+                }
             }
-            if ((!$searchType instanceof GlobalSearchType)) {
-                $this->startTypeQuery($searchType);
+
+            if (!$hasGlobal) {
+                $this->startTypeQuery($searchTypeGroup);
             }
-            $searchType->applyToQuery($this);
+
+            // This index has to exist, because getAsOptimizedGroups() won't create an empty group.
+            // Since these groups were optimized together, the first one should be able to generate the query for all of them.
+            $firstType = $searchTypeGroup[0];
+            $firstType->applyToQuery($this);
             $this->endTypeQuery();
         }
 
@@ -115,17 +129,17 @@ abstract class SearchQuery {
     }
 
     /**
-     * @param AbstractSearchType $currentType
+     * @param AbstractSearchType[] $currentTypes
      */
-    protected function startTypeQuery(AbstractSearchType $currentType): void {
-        $this->currentType = $currentType;
+    protected function startTypeQuery(array $currentTypes): void {
+        $this->currentTypes = $currentTypes;
     }
 
     /**
      * End the current type-specific query.
      */
     protected function endTypeQuery(): void {
-        $this->currentType = null;
+        $this->currentTypes = null;
     }
 
     /**
@@ -303,11 +317,16 @@ abstract class SearchQuery {
      * Set int range filter
      *
      * @param string $attribute The attribute to filter.
-     * @param array $schemaFilter The output of some dates parsed with DateFilterSchema.
+     * @param array|LegacyDateRangeExpression $schemaFilter The output of some dates parsed with DateFilterSchema.
      *
      * @return $this
      */
-    public function setDateFilterSchema(string $attribute, array $schemaFilter) {
+    final public function setDateFilterSchema(string $attribute, $schemaFilter) {
+        if ($schemaFilter instanceof LegacyDateRangeExpression) {
+            $schemaFilter = $schemaFilter->toLegacyArray();
+        }
+        Assert::isArray($schemaFilter, 'Argument 2 passed to __METHOD__ must be of type array.');
+
         $schema = new DateFilterSchema();
         $schemaFilter = $schema->validate($schemaFilter);
         /**

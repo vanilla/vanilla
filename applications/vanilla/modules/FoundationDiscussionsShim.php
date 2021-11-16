@@ -80,6 +80,7 @@ class FoundationDiscussionsShim {
         $module = $this->container->get(DiscussionListModule::class);
         $module->setDiscussions($newStyleDiscussions);
         $module->applyOptions($options ?? FoundationShimOptions::create());
+        $module->setIsMainContent($options->isMainContent());
 
         return $module->toString();
     }

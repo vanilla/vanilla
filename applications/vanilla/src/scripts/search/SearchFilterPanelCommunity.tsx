@@ -9,7 +9,7 @@ import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import InputTextBlock from "@library/forms/InputTextBlock";
 import { FilterFrame } from "@library/search/panels/FilterFrame";
 import { useSearchForm } from "@library/search/SearchContext";
-import { t } from "@library/utility/appUtils";
+import { getSiteSection, t } from "@library/utility/appUtils";
 import React from "react";
 import Checkbox from "@library/forms/Checkbox";
 import CommunityCategoryInput from "@vanilla/addon-vanilla/forms/CommunityCategoryInput";
@@ -65,6 +65,7 @@ export function SearchFilterPanelCommunity() {
                 onChange={(options) => {
                     updateForm({ categoryOptions: options });
                 }}
+                parentCategoryID={getSiteSection().attributes.categoryID ?? null}
                 value={form.categoryOptions ?? []}
             />
 

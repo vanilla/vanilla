@@ -1292,6 +1292,9 @@ class ImportModel extends Gdn_Model {
         $mysqli = new mysqli(c('Database.Host'), c('Database.User'), c('Database.Password'), c('Database.Name'), 128);
         $result = $mysqli->query($sql);
         if ($result === false) {
+            /**
+             * @psalm-suppress UndefinedClass
+             */
             $ex = new Exception($mysqli->error);
             $mysqli->close();
             throw $ex;

@@ -9,7 +9,7 @@ import React from "react";
 import { InputSize } from "../../types";
 import { inputClasses } from "../shared/input.styles";
 
-export interface ITextBoxProps extends Omit<React.HTMLProps<HTMLInputElement>, "type" | "ref" | "size"> {
+export interface ITextBoxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "type" | "ref" | "size"> {
     size?: InputSize;
 }
 
@@ -22,12 +22,13 @@ export const TextBox = React.forwardRef(function TextBoxImpl(
     props: ITextBoxProps,
     forwardedRef: React.Ref<HTMLInputElement>,
 ) {
-    const { size, ...otherProps } = props;
+    const { size, value, ...otherProps } = props;
     const classes = inputClasses({ size });
     return (
         <input
             tabIndex={0}
             {...otherProps}
+            value={value ?? ""}
             ref={forwardedRef}
             type="text"
             className={cx(classes.input, props.className)}

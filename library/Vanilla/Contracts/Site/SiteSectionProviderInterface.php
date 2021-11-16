@@ -6,7 +6,6 @@
  */
 
 namespace Vanilla\Contracts\Site;
-
 /**
  * Provider for site sections.
  *

@@ -68,7 +68,7 @@ class ForumBreadcrumbProvider implements BreadcrumbProviderInterface {
 
                 $newCrumb = new Breadcrumb(t('Categories'), url('/categories', true));
             } else {
-                $newCrumb = new Breadcrumb($ancestor['Name'], categoryUrl($ancestor, '', true));
+                $newCrumb = new Breadcrumb($ancestor['Name'] ?? t('Category'), categoryUrl($ancestor, '', true));
             }
             $this->crumbsByCategoryID[$categoryID] = $newCrumb;
             $crumbs[] = $newCrumb;

@@ -62,6 +62,13 @@ BoxThemeShim::startBox();
     echo '</div>'; // close discussion wrap
 
     if ($isFirstPage) {
+        //for dataDriven themes we render GuestModule after discussion as well, if there are at least some comments
+        if (!Gdn::session()->isValid() && Gdn::themeFeatures()->get("DataDrivenTheme") && $this->data('Comments')->numRows() > 2) {
+            /** @var GuestModule  $guestModule */
+            $guestModule = Gdn::getContainer()->get(GuestModule::class);
+            $guestModule->setWidgetAlignment("center");
+            echo $guestModule;
+        }
         // First page may have plugins to render after the discussion.
         $this->fireEvent('AfterDiscussion');
     }

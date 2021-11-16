@@ -22,7 +22,7 @@ final class ArrayUtils {
      * @param mixed $input The input to test.
      * @param string $message
      */
-    private static function assertArray($input, string $message): void {
+    public static function assertArray($input, string $message): void {
         if (!self::isArray($input)) {
             throw new \InvalidArgumentException($message, 400);
         }
@@ -521,7 +521,6 @@ final class ArrayUtils {
      *
      * @param array $arr
      * @return array
-     * @todo Add tests.
      */
     public static function camelCase(array $arr): array {
         $result = [];

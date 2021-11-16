@@ -7,6 +7,7 @@
 
 namespace Garden\Web;
 
+use Garden\Http\HttpResponse;
 use Garden\JsonFilterTrait;
 use Traversable;
 
@@ -159,6 +160,33 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
         $data = $this->getData();
         $data = $this->jsonFilter($data);
         return $data;
+    }
+
+    /**
+     * Get a fully serialized version of the data.
+     *
+     * Primarily useful for making assertions about the data as it would come out of the API.
+     *
+     * @return mixed
+     */
+    public function getSerializedData() {
+        return json_decode(json_encode($this), true);
+    }
+
+    /**
+     * Get this data as an HTTP response.
+     *
+     * @return HttpResponse
+     */
+    public function asHttpResponse(): HttpResponse {
+        $response = new HttpResponse(
+            $this->getStatus(),
+            array_merge($this->getHeaders(), ['X-Data-Meta' => json_encode($this->getMetaArray())])
+        );
+        // Simulate that the data was sent over HTTP and thus was serialized.
+        $body = $this->jsonSerialize();
+        $response->setBody($body);
+        return $response;
     }
 
     /**

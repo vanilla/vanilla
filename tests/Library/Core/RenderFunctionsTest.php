@@ -32,7 +32,7 @@ class RenderFunctionsTest extends TestCase {
         // set config for disucussion filters test
         /** @var \Gdn_Configuration $config */
         $config = static::container()->get('Config');
-        $config->set('Vanilla.EnableCategoryFollowing', true, true, false);
+        $config->set(\CategoryModel::CONF_CATEGORY_FOLLOWING, true, true, false);
     }
 
     /**
@@ -118,6 +118,8 @@ class RenderFunctionsTest extends TestCase {
      * @return array[]
      */
     public function provideUserPhotoValues(): array {
+        $defaultAvatar = \UserModel::PATH_DEFAULT_AVATAR;
+        
         $result = [
             "User array" => [
                 [
@@ -135,7 +137,7 @@ class RenderFunctionsTest extends TestCase {
                 ],
                 null,
                 '<a title="Unknown" href="/renderfunctionstest/profile/" class="PhotoWrap js-userCard" aria-label="User: &quot;Unknown&quot;"'.
-                ' data-userid=""><img src="http://vanilla.test/renderfunctionstest/applications/dashboard/design/images/defaulticon.png"'.
+                " data-userid=\"\"><img src=\"http://vanilla.test/renderfunctionstest{$defaultAvatar}\"".
                 ' alt="Unknown" class="ProfilePhoto ProfilePhotoMedium" data-fallback="avatar" loading="lazy" /></a>'
             ],
             "User object" => [
@@ -154,7 +156,7 @@ class RenderFunctionsTest extends TestCase {
                 ],
                 null,
                 '<a title="Unknown" href="/renderfunctionstest/profile/" class="PhotoWrap js-userCard" aria-label="User: &quot;Unknown&quot;"'.
-                ' data-userid=""><img src="http://vanilla.test/renderfunctionstest/applications/dashboard/design/images/defaulticon.png"'.
+                " data-userid=\"\"><img src=\"http://vanilla.test/renderfunctionstest{$defaultAvatar}\"".
                 ' alt="Unknown" class="ProfilePhoto ProfilePhotoMedium" data-fallback="avatar" loading="lazy" /></a>'
             ]
         ];

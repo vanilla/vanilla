@@ -131,14 +131,17 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
         } else {
             $Data = [];
         }
-        if ($viewHandler === null) {
-            include $viewPath;
-        } else {
-            // Use the view handler to parse the view.
-            $viewHandler->render($viewPath, $this);
+        try {
+            if ($viewHandler === null) {
+                include $viewPath;
+            } else {
+                // Use the view handler to parse the view.
+                $viewHandler->render($viewPath, $this);
+            }
+            $String = ob_get_contents();
+        } finally {
+            ob_end_clean();
         }
-        $String = ob_get_contents();
-        @ob_end_clean();
         return $String;
     }
 

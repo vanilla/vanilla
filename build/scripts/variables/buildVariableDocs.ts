@@ -25,6 +25,8 @@ import { spacingExpander } from "./spacingExpander";
 import { contentBoxesExpander } from "./contentBoxesExpander";
 import { buttonExpander } from "./buttonExpander";
 import { tagPresetExpander } from "./tagPresetExpander";
+import { contributionItemsExpander } from "./contributionItemsExpander";
+import { stackedListExpander } from "./stackedListExpander";
 
 const parser = VariableParser.create()
     .addTypeExpander(fontExpander)
@@ -35,7 +37,9 @@ const parser = VariableParser.create()
     .addTypeExpander(boxExpander)
     .addTypeExpander(contentBoxesExpander)
     .addTypeExpander(buttonExpander)
-    .addTypeExpander(tagPresetExpander);
+    .addTypeExpander(tagPresetExpander)
+    .addTypeExpander(contributionItemsExpander)
+    .addTypeExpander(stackedListExpander);
 
 const pattern = "**/*{Styles,styles,variables,Variables,Vars}.{ts,tsx}";
 

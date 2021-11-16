@@ -179,13 +179,6 @@ class CategoriesController extends VanillaController {
             throw new InvalidArgumentException('Filter IDs must be in an array.');
         }
 
-        $perPage = c('Vanilla.Categories.PerPage', 30);
-        $page = Gdn::request()->get(
-            'Page',
-            Gdn::request()->get('page', null)
-        );
-        list($offset, $limit) = offsetLimit($page, $perPage);
-
         $where = ['Followed' => true];
 
         if (!empty($filterIDs)) {
@@ -193,7 +186,7 @@ class CategoriesController extends VanillaController {
         }
 
         $result = $this->CategoryModel
-            ->getWhere($where, '', 'asc', $limit, $offset)
+            ->getWhere($where, '', 'asc')
             ->resultArray();
         $result = $this->CategoryModel->flattenCategories($result);
 
@@ -201,7 +194,7 @@ class CategoriesController extends VanillaController {
             $this->CategoryModel->joinRecent($result);
         }
 
-        $this->setData('_Limit', $perPage);
+        $this->setData('_Limit', count($result));
         $this->setData('_CurrentRecords', count($result));
 
         return $result;

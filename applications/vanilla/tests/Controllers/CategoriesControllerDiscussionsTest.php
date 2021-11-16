@@ -16,7 +16,7 @@ use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 class CategoriesControllerDiscussionsTest extends AbstractAPIv2Test {
     use CommunityApiTestTrait;
 
-    /** @var Gdn_Configuration */
+    /** @var \Gdn_Configuration */
     private $configuration;
 
     /**

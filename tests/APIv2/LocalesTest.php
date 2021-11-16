@@ -52,6 +52,32 @@ class LocalesTest extends AbstractAPIv2Test {
     }
 
     /**
+     * Test that the translations endpoint returns javascript.
+     */
+    public function testTranslations() {
+        // This should support running in a private community.
+        $this->runWithPrivateCommunity(function () {
+            $response = $this->api()->get("/locales/en/translations.js");
+            $this->assertEquals(200, $response->getStatusCode());
+            $this->assertEquals("application/javascript; charset=utf-8", $response->getHeader("content-type"));
+        });
+    }
+
+    /**
+     * Test that we fetch enabled locales from the index.
+     */
+    public function testIndex() {
+        // This should be accesible in a private community.
+        $this->runWithPrivateCommunity(function () {
+            $response = $this->api()->get("/locales");
+            $this->assertEquals(200, $response->getStatusCode());
+
+            // The 3 enabled locales.
+            $this->assertEquals(["en", "zh"], array_column($response->getBody(), "localeKey"));
+        });
+    }
+
+    /**
      * Provide locales test data.
      *
      * @return array Data provider.

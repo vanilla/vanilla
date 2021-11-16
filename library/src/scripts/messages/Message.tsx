@@ -26,7 +26,7 @@ export interface IMessageProps {
     cancelText?: React.ReactNode;
     isFixed?: boolean;
     isContained?: boolean;
-    title?: string;
+    title?: React.ReactNode;
     isActionLoading?: boolean;
     icon?: React.ReactNode | false;
 }

@@ -267,11 +267,11 @@ class AttachmentModel extends Gdn_Model {
 
     /**
      * {@inheritDoc}
-     * @param array $data
+     * @param array $formPostValues
      * @param bool $settings
      * @return bool|mixed Primary Key Value
      */
-    public function save($data, $settings = false) {
+    public function save($formPostValues, $settings = false) {
         $this->defineSchema();
         $schemaFields = $this->Schema->fields();
 
@@ -279,8 +279,8 @@ class AttachmentModel extends Gdn_Model {
         $attributes = [];
 
         // Grab the current attachment.
-        if (isset($data['AttachmentID'])) {
-            $primaryKeyVal = $data['AttachmentID'];
+        if (isset($formPostValues['AttachmentID'])) {
+            $primaryKeyVal = $formPostValues['AttachmentID'];
             $currentAttachment = $this->SQL->getWhere('Attachment', ['AttachmentID' => $primaryKeyVal])->firstRow(DATASET_TYPE_ARRAY);
             if ($currentAttachment) {
                 $attributes = dbdecode($currentAttachment['Attributes']);
@@ -298,7 +298,7 @@ class AttachmentModel extends Gdn_Model {
         }
 
         // Grab any values that aren't in the db schema and stick them in attributes.
-        foreach ($data as $name => $value) {
+        foreach ($formPostValues as $name => $value) {
             if ($name == 'Attributes') {
                 continue;
             }

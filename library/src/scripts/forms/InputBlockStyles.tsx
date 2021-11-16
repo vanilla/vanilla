@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -8,37 +8,35 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { negativeUnit } from "@library/styles/styleHelpers";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
-import { styleFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent } from "csx";
 import { Property } from "csstype";
 import { inputClasses, inputVariables } from "@library/forms/inputStyles";
 import { tokensClasses } from "@library/forms/select/tokensStyles";
-import { CSSObject } from "@emotion/css";
+import { css } from "@emotion/css";
 import { checkRadioClasses } from "@library/forms/checkRadioStyles";
 import { Mixins } from "@library/styles/Mixins";
 
 export const inputBlockClasses = useThemeCache(() => {
-    const style = styleFactory("inputBlock");
     const globalVars = globalVariables();
     const formElementVars = formElementsVariables();
 
-    const inputText = style("inputText", {
+    const inputText = css({
         display: "block",
     });
 
-    const inputWrap = style("inputWrap", {
+    const inputWrap = css({
         display: "block",
     });
 
-    const labelAndDescription = style("labelAndDescription", {
+    const labelAndDescription = css({
         display: "block",
         width: percent(100),
         color: ColorsUtils.colorOut(formElementVars.colors.fg),
     });
 
-    const root = style({
+    const root = css({
         display: "block",
         width: percent(100),
         ...{
@@ -79,16 +77,16 @@ export const inputBlockClasses = useThemeCache(() => {
         },
     });
 
-    const errors = style("errors", {
+    const errors = css({
         display: "block",
         ...Mixins.font({
             ...globalVars.fontSizeAndWeightVars("small"),
         }),
     });
 
-    const errorsPadding = style("errorsPadding", inputClasses().inputPaddingMixin);
+    const errorsPadding = css(inputClasses().inputPaddingMixin);
 
-    const error = style("error", {
+    const error = css({
         display: "block",
         color: ColorsUtils.colorOut(globalVars.messageColors.error.fg),
         ...{
@@ -97,7 +95,7 @@ export const inputBlockClasses = useThemeCache(() => {
             },
         },
     });
-    const labelNote = style("labelNote", {
+    const labelNote = css({
         display: "block",
         ...Mixins.font({
             ...globalVars.fontSizeAndWeightVars("small", "normal"),
@@ -105,7 +103,7 @@ export const inputBlockClasses = useThemeCache(() => {
         opacity: 0.6,
     });
 
-    const labelText = style("labelText", {
+    const labelText = css({
         display: "block",
         ...Mixins.font({
             ...globalVars.fontSizeAndWeightVars("medium", "semiBold"),
@@ -113,12 +111,12 @@ export const inputBlockClasses = useThemeCache(() => {
         marginBottom: styleUnit(formElementVars.spacing.margin),
     });
 
-    const sectionTitle = style("sectionTitle", {
+    const sectionTitle = css({
         fontWeight: globalVars.fonts.weights.semiBold,
         lineHeight: globalVars.lineHeights.base,
     });
 
-    const fieldsetGroup = style("fieldsetGroup", {
+    const fieldsetGroup = css({
         marginTop: styleUnit(formElementVars.spacing.margin),
         ...{
             "&.noMargin": {
@@ -128,18 +126,18 @@ export const inputBlockClasses = useThemeCache(() => {
     });
 
     const multiLine = (resize?: Property.Resize, overflow?: Property.Overflow) => {
-        return style("multiLine", {
+        return css({
             ...Mixins.padding({ vertical: 9 }),
             resize: (resize ? resize : "vertical") as Property.Resize,
             overflow: (overflow ? overflow : "auto") as Property.Overflow,
         });
     };
 
-    const related = style("related", {
+    const related = css({
         marginTop: styleUnit(globalVars.gutter.size),
     });
 
-    const grid = style("grid", {
+    const grid = css({
         display: "flex",
         flexWrap: "wrap",
         ...{
@@ -153,7 +151,7 @@ export const inputBlockClasses = useThemeCache(() => {
         },
     });
 
-    const tight = style("tight", {
+    const tight = css({
         ...{
             [`&&&`]: {
                 marginTop: negativeUnit(9),

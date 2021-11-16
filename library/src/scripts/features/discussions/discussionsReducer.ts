@@ -3,19 +3,20 @@
  * @license GPL-2.0-only
  */
 
-import { ILoadable, Loadable, LoadStatus } from "@library/@types/api/core";
+import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import DiscussionActions from "@library/features/discussions/DiscussionActions";
 import produce from "immer";
 import { reducerWithInitialState } from "typescript-fsa-reducers";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
-import { stableObjectHash } from "@vanilla/utils";
+import { RecordID, stableObjectHash } from "@vanilla/utils";
 import { IReaction } from "@dashboard/@types/api/reaction";
-import { ITag } from "@library/features/tags/TagsReducer";
+import { ICategoryFragment } from "@vanilla/addon-vanilla/categories/categoriesTypes";
+import difference from "lodash/difference";
 export interface IDiscussionsStoreState {
     discussions: IDiscussionState;
 }
 interface IDiscussionState {
-    discussionsByID: Record<number, IDiscussion>;
+    discussionsByID: Record<RecordID, IDiscussion>;
     discussionIDsByParamHash: Record<string, ILoadable<Array<IDiscussion["discussionID"]>>>;
 
     fullRecordStatusesByID: Record<number, ILoadable>;
@@ -26,6 +27,8 @@ interface IDiscussionState {
     postReactionStatusesByID: Record<number, ILoadable<{}>>;
     deleteReactionStatusesByID: Record<number, ILoadable<{}>>;
     putTagsByID: Record<number, ILoadable<{}>>;
+    categoriesStatusesByID: Record<number, ILoadable>;
+    categoriesByID: Record<RecordID, ICategoryFragment>;
 }
 
 export const INITIAL_DISCUSSIONS_STATE: IDiscussionState = {
@@ -40,6 +43,8 @@ export const INITIAL_DISCUSSIONS_STATE: IDiscussionState = {
     postReactionStatusesByID: {},
     deleteReactionStatusesByID: {},
     putTagsByID: {},
+    categoriesStatusesByID: {},
+    categoriesByID: {},
 };
 
 function setDiscussionReaction(
@@ -92,8 +97,22 @@ export const discussionsReducer = produce(
             return state;
         })
         .case(DiscussionActions.putDiscussionBookmarkedACs.started, (state, params) => {
-            const { discussionID } = params;
+            const { discussionID, bookmarked } = params;
             state.bookmarkStatusesByID[discussionID] = { status: LoadStatus.LOADING };
+            // Set bookmark optimistically
+            state.discussionsByID[discussionID] = {
+                ...state.discussionsByID[discussionID],
+                bookmarked: bookmarked,
+            };
+            return state;
+        })
+        .case(DiscussionActions.putDiscussionBookmarkedACs.failed, (state, payload) => {
+            const { discussionID } = payload.params;
+            state.bookmarkStatusesByID[discussionID] = { status: LoadStatus.ERROR, error: payload.error };
+            state.discussionsByID[discussionID] = {
+                ...state.discussionsByID[discussionID],
+                bookmarked: !state.discussionsByID[discussionID].bookmarked,
+            };
             return state;
         })
         .case(DiscussionActions.putDiscussionBookmarkedACs.done, (state, payload) => {
@@ -147,6 +166,13 @@ export const discussionsReducer = produce(
                     ...state.discussionsByID[discussion.discussionID],
                     ...discussion,
                 };
+                const categoryID = discussion.category?.categoryID;
+                if (categoryID && discussion.category) {
+                    state.categoriesByID = {
+                        ...state.categoriesByID,
+                        [categoryID]: discussion.category,
+                    };
+                }
             });
             return state;
         })
@@ -300,6 +326,183 @@ export const discussionsReducer = produce(
                 error: payload.error,
             };
 
+            return state;
+        })
+        .case(DiscussionActions.getDiscussionsByIDsAC.started, (state, params) => {
+            const { discussionIDs } = params;
+            const newState = Object.fromEntries(discussionIDs.map((ID) => [ID, { status: LoadStatus.LOADING }]));
+            state.fullRecordStatusesByID = {
+                ...state.fullRecordStatusesByID,
+                ...newState,
+            };
+            return state;
+        })
+        .case(DiscussionActions.getDiscussionsByIDsAC.failed, (state, payload) => {
+            const { discussionIDs } = payload.params;
+
+            const newState = Object.fromEntries(
+                discussionIDs.map((ID) => [
+                    ID,
+                    {
+                        status: LoadStatus.ERROR,
+                        error: payload.error,
+                    },
+                ]),
+            );
+            state.fullRecordStatusesByID = {
+                ...state.fullRecordStatusesByID,
+                ...newState,
+            };
+            return state;
+        })
+        .case(DiscussionActions.getDiscussionsByIDsAC.done, (state, payload) => {
+            const { limit, discussionIDs } = payload.params;
+
+            const newStatus = Object.fromEntries(discussionIDs.map((ID) => [ID, { status: LoadStatus.SUCCESS }]));
+            state.fullRecordStatusesByID = {
+                ...state.fullRecordStatusesByID,
+                ...newStatus,
+            };
+
+            // Merge the new records into the old ones.
+            payload.result.forEach((newDiscussion) => {
+                const existingDiscussion = state.discussionsByID[newDiscussion.discussionID] ?? {};
+                state.discussionsByID[newDiscussion.discussionID] = {
+                    ...existingDiscussion,
+                    ...newDiscussion,
+                };
+            });
+
+            // Remove discussions that were fetched but could not be found.
+            const resultIDs = payload.result.map((result) => result.discussionID);
+            if (limit && resultIDs.length < limit) {
+                // Some discussions were deleted.
+                const missingIDs = difference(discussionIDs, resultIDs);
+                missingIDs.forEach((missingID) => {
+                    delete state.discussionsByID[missingID];
+                });
+            }
+
+            return state;
+        })
+        .case(DiscussionActions.bulkDeleteDiscussionsACs.started, (state, params) => {
+            const { discussionIDs } = params;
+            discussionIDs.forEach((ID) => {
+                state.deleteStatusesByID[ID] = { status: LoadStatus.LOADING };
+            });
+            return state;
+        })
+        .case(DiscussionActions.bulkDeleteDiscussionsACs.failed, (state, payload) => {
+            const { discussionIDs } = payload.params;
+            discussionIDs.forEach((ID) => {
+                state.deleteStatusesByID[ID] = { status: LoadStatus.ERROR, error: payload.error };
+            });
+            return state;
+        })
+        .case(DiscussionActions.bulkDeleteDiscussionsACs.done, (state, payload) => {
+            const { failedIDs, exceptionsByID, successIDs } = payload.result.progress;
+
+            if (failedIDs && failedIDs.length > 0) {
+                failedIDs.forEach((ID) => {
+                    state.deleteStatusesByID[ID] = {
+                        status: LoadStatus.ERROR,
+                        error: exceptionsByID[ID],
+                    };
+                });
+            }
+
+            if (successIDs && successIDs.length > 0) {
+                successIDs.forEach((ID) => {
+                    state.deleteStatusesByID[ID] = {
+                        status: LoadStatus.SUCCESS,
+                    };
+                    delete state.discussionsByID[ID];
+                });
+
+                Object.keys(state.discussionIDsByParamHash).forEach((paramHash) => {
+                    if (state.discussionIDsByParamHash[paramHash].data !== undefined) {
+                        state.discussionIDsByParamHash[paramHash].data = state.discussionIDsByParamHash[
+                            paramHash
+                        ].data!.filter((key) => !successIDs.includes(key));
+                    }
+                });
+            }
+
+            return state;
+        })
+        .case(DiscussionActions.bulkMoveDiscussionsACs.started, (state, params) => {
+            const { discussionIDs } = params;
+
+            discussionIDs.forEach((ID) => {
+                state.patchStatusByPatchID[`${ID}-move`] = { status: LoadStatus.LOADING };
+            });
+            return state;
+        })
+        .case(DiscussionActions.bulkMoveDiscussionsACs.failed, (state, payload) => {
+            const { discussionIDs } = payload.params;
+
+            discussionIDs.forEach((ID) => {
+                state.patchStatusByPatchID[`${ID}-move`] = { status: LoadStatus.ERROR, error: payload.error };
+            });
+            return state;
+        })
+        .case(DiscussionActions.bulkMoveDiscussionsACs.done, (state, payload) => {
+            const { category } = payload.params;
+            const { failedIDs, exceptionsByID, successIDs } = payload.result.progress;
+
+            if (failedIDs && failedIDs.length > 0) {
+                failedIDs.forEach((ID) => {
+                    state.patchStatusByPatchID[`${ID}-move`] = {
+                        status: LoadStatus.ERROR,
+                        error: exceptionsByID[ID],
+                    };
+                });
+            }
+
+            if (successIDs && successIDs.length > 0) {
+                successIDs.forEach((ID) => {
+                    state.patchStatusByPatchID[`${ID}-move`] = {
+                        status: LoadStatus.SUCCESS,
+                    };
+                    state.discussionsByID[ID] = {
+                        ...state.discussionsByID[ID],
+                        categoryID: Number(payload.params.categoryID),
+                    };
+                    if (category) {
+                        state.discussionsByID[ID] = {
+                            ...state.discussionsByID[ID],
+                            category: {
+                                ...state.discussionsByID[ID].category,
+                                ...category,
+                            },
+                        };
+                    }
+                });
+            }
+
+            return state;
+        })
+        .case(DiscussionActions.getCategoryByIDACs.started, (state, params) => {
+            const { categoryID } = params;
+            state.categoriesStatusesByID[categoryID] = {
+                status: LoadStatus.LOADING,
+            };
+            return state;
+        })
+        .case(DiscussionActions.getCategoryByIDACs.failed, (state, payload) => {
+            const { categoryID } = payload.params;
+            state.categoriesStatusesByID[categoryID] = {
+                status: LoadStatus.ERROR,
+                error: payload.error,
+            };
+            return state;
+        })
+        .case(DiscussionActions.getCategoryByIDACs.done, (state, payload) => {
+            const { categoryID } = payload.params;
+            state.categoriesStatusesByID[categoryID] = {
+                status: LoadStatus.SUCCESS,
+            };
+            state.categoriesByID[categoryID] = payload.result;
             return state;
         }),
 );

@@ -166,8 +166,13 @@ class DiscussionsSortFilterModule extends Gdn_Module {
         }
 
         $filterDropdown = [];
+        $dropdowns = [];
 
         foreach($this->filters as $filter) {
+            // Check if this is hidden from UI
+            if (empty($filter['display'])) {
+                continue;
+            }
             // Check to see if there's a category restriction.
             if (!empty($filter['categories'])) {
                 if (!in_array($this->categoryID, $filter['categories'])) {

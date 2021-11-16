@@ -14,6 +14,7 @@ import React from "react";
 
 interface IProps {
     discussions: IDiscussion[];
+    noCheckboxes?: boolean;
 }
 
 export function DiscussionListView(props: IProps) {
@@ -33,7 +34,11 @@ export function DiscussionListView(props: IProps) {
             ) : (
                 discussions.map((discussion) => {
                     return (
-                        <DiscussionListItem discussion={discussion} key={discussion.discussionID}></DiscussionListItem>
+                        <DiscussionListItem
+                            noCheckboxes={props.noCheckboxes}
+                            discussion={discussion}
+                            key={discussion.discussionID}
+                        ></DiscussionListItem>
                     );
                 })
             )}

@@ -1,6 +1,6 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -9,6 +9,7 @@ import { t } from "@library/utility/appUtils";
 import { IOptionalComponentID, useUniqueID } from "@library/utility/idUtils";
 import { checkRadioClasses } from "@library/forms/checkRadioStyles";
 import classNames from "classnames";
+import { cx } from "@emotion/css";
 
 interface IProps extends IOptionalComponentID {
     id?: string;
@@ -16,6 +17,7 @@ interface IProps extends IOptionalComponentID {
     checked?: boolean;
     disabled?: boolean;
     onChange?: any;
+    onChecked?: () => void;
     label: string | ReactNode;
     name?: string;
     isHorizontal?: boolean;
@@ -41,10 +43,15 @@ export default function RadioButton(props: IProps) {
 
     return (
         <>
-            <label className={classNames(classes.root, props.className, { isHorizontal })}>
+            <label className={cx(classes.root, { isHorizontal }, props.className)}>
                 <input
-                    className={classNames(classes.input, "exclude-icheck", props.fakeFocus && "focus-visible")}
-                    onChange={props.onChange}
+                    className={cx(classes.input, "exclude-icheck", { "focus-visible": props.fakeFocus })}
+                    onChange={(e) => {
+                        props.onChange?.(e);
+                        if (e.target.checked) {
+                            props.onChecked?.();
+                        }
+                    }}
                     aria-disabled={props.disabled}
                     name={props.name}
                     disabled={props.disabled}

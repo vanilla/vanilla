@@ -72,4 +72,22 @@ class HomeControllerTest extends SiteTestCase {
         $this->expectException(\Gdn_UserException::class);
         $this->bessy()->getHtml('/home/leaving', ['target' => $destinationUrl]);
     }
+
+    /**
+     * Test leaving platform with trusted domain.
+     */
+    public function testLeavingWithoutWarnLeaving(): void {
+        $destinationUrl = 'http://example.com';
+
+        $this->runWithConfig(['Garden.Format.WarnLeaving' => false], function () use ($destinationUrl) {
+            // As example.com is trusted, reaching for /home/leaving should trigger a 302 redirection.
+            try {
+                $this->bessy()->get('/home/leaving', ['target' => url('http://example.com'), 'allowTrusted' => true]);
+            } catch (\Throwable $exception) {
+                $exResponse = $exception->getResponse();
+                $this->assertEquals(302, $exResponse->getStatus());
+                $this->assertEquals('http://example.com', $exResponse->getMeta('HTTP_LOCATION'));
+            }
+        });
+    }
 }

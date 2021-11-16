@@ -79,7 +79,10 @@ paths:
           - first
           - mixed
       - $ref: '#/components/parameters/Page'
-      - description: Desired number of items per page.
+      - description: >
+          Desired number of items per page. **Note that you may not get the exact number of records back as specified
+          with the limit unless you also specify pinOrder=mixed**. This is an optimization for pinned
+          (i.e. announcement) discussion handling.
         in: query
         name: limit
         schema:
@@ -273,8 +276,14 @@ paths:
           type: integer
       - $ref: '#/components/parameters/DiscussionExpand'
       responses:
+        '202':
+          $ref: "../../dashboard/openapi/responses.yml#/components/responses/TrackingSlipResponse"
         '204':
           description: Success
+        '403':
+          $ref: "../../dashboard/openapi/responses.yml#/components/responses/PermissionError"
+        '408':
+          $ref: "../../dashboard/openapi/responses.yml#/components/responses/LongRunnerResponse"
       tags:
       - Discussions
       summary: Delete a discussion.
@@ -335,12 +344,112 @@ paths:
                   type: array
                   items:
                     type: integer
+                  example: [2452, 14253, 14124]
       responses:
+        '202':
+          $ref: "../../dashboard/openapi/responses.yml#/components/responses/TrackingSlipResponse"
         '204':
           description: Success
+        '403':
+          $ref: "../../dashboard/openapi/responses.yml#/components/responses/PermissionError"
+        '408':
+          $ref: "../../dashboard/openapi/responses.yml#/components/responses/LongRunnerResponse"
       tags:
         - Discussions
       summary: Delete a list of discussions.
+  '/discussions/move':
+    patch:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: An array of discussion IDs.
+              properties:
+                discussionIDs:
+                  type: array
+                  items:
+                    type: integer
+                categoryID:
+                  description: The category ID to move discussions into.
+                  type: integer
+                addRedirects:
+                  description: If a redirect discussion needs to be created.
+                  type: boolean
+      responses:
+        '200':
+          description: Success
+        '202':
+          $ref: "../../dashboard/openapi/responses.yml#/components/responses/TrackingSlipResponse"
+        '403':
+          $ref: "../../dashboard/openapi/responses.yml#/components/responses/PermissionError"
+        '408':
+          $ref: "../../dashboard/openapi/responses.yml#/components/responses/LongRunnerResponse"
+      tags:
+        - Discussions
+      summary: Move a list of discussions.
+  '/discussions/close':
+    patch:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: An array of discussion IDs.
+              properties:
+                discussionIDs:
+                  type: array
+                  items:
+                    type: integer
+                closed:
+                  description: Whether to close (true) or open (false) this set of discussions.
+                  type: boolean
+      responses:
+        '200':
+          description: Success
+        '202':
+          $ref: "../../dashboard/openapi/responses.yml#/components/responses/TrackingSlipResponse"
+        '403':
+          $ref: "../../dashboard/openapi/responses.yml#/components/responses/PermissionError"
+        '408':
+          $ref: "../../dashboard/openapi/responses.yml#/components/responses/LongRunnerResponse"
+      tags:
+        - Discussions
+      summary: Close/open a list of discussions.
+  '/discussions/merge':
+    patch:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                discussionIDs:
+                  description: An array of discussion IDs to merge together.
+                  type: array
+                  items:
+                    type: integer
+                  example: [2052, 2053, 5602]
+                destinationDiscussionID:
+                  description: The discussionID that everything will be merged into.
+                  type: integer
+                  example: 2052
+                addRedirects:
+                  description: If a redirect discussion needs to be created.
+                  type: boolean
+                  example: true
+      responses:
+        '200':
+          description: Success
+        '202':
+          $ref: "../../dashboard/openapi/responses.yml#/components/responses/TrackingSlipResponse"
+        '403':
+          $ref: "../../dashboard/openapi/responses.yml#/components/responses/PermissionError"
+        '408':
+          $ref: "../../dashboard/openapi/responses.yml#/components/responses/LongRunnerResponse"
+      tags:
+        - Discussions
+      summary: Merge discussions.
   '/discussions/{id}/bookmark':
     put:
       parameters:

@@ -25,6 +25,13 @@ class BootstrapTestCase extends VanillaTestCase {
     public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
         static::setUpBeforeClassTestTraits();
+        // Clear all tables.
+        $dbConfig = Bootstrap::testDbConfig();
+        $dbname = $dbConfig['Dbname'];
+        $pdo = self::container()->get(\Gdn_Database::class)->connection();
+        $pdo->exec("drop database if exists `$dbname`");
+        $pdo->exec("create database if not exists `$dbname`");
+        $pdo->exec("use `$dbname`");
     }
 
     /**

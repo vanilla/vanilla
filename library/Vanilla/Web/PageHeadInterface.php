@@ -8,6 +8,7 @@
 namespace Vanilla\Web;
 
 use Vanilla\Contracts\Web\AssetInterface;
+use Vanilla\Models\SiteMetaExtra;
 use Vanilla\Navigation\Breadcrumb;
 
 /**
@@ -112,6 +113,14 @@ interface PageHeadInterface {
      * @return $this
      */
     public function addScript(AssetInterface $script);
+
+    /**
+     * Add an extra site meta item.
+     *
+     * @param SiteMetaExtra $extra
+     * @return $this
+     */
+    public function addSiteMetaExtra(SiteMetaExtra $extra);
 
     /**
      * @return string

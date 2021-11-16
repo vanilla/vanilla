@@ -15,6 +15,8 @@ use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Http\InternalClient;
 use Vanilla\Permissions;
 use Vanilla\Utility\ModelUtils;
+use Vanilla\Utility\UrlUtils;
+use Vanilla\Web\Pagination\WebLinking;
 
 /**
  * Allow a class to test against
@@ -324,7 +326,6 @@ TEMPLATE;
      *
      * @param ?string $sx The suffix to use for the usernames and email addresses.
      *
-     * @deprecated Use UsersAndRolesApiTest
      */
     protected function createUserFixtures(?string $sx = null): void {
         // Create some users to help.
@@ -332,9 +333,9 @@ TEMPLATE;
             $sx = round(microtime(true) * 1000) . mt_rand(1000, 9999);
         }
 
-        $this->adminID = $this->createUserFixture(Bootstrap::ROLE_ADMIN, $sx);
-        $this->moderatorID = $this->createUserFixture(Bootstrap::ROLE_MOD, $sx);
-        $this->memberID = $this->createUserFixture(Bootstrap::ROLE_MEMBER, $sx);
+        $this->adminID = $this->createUserFixture(VanillaTestCase::ROLE_ADMIN, $sx);
+        $this->moderatorID = $this->createUserFixture(VanillaTestCase::ROLE_MOD, $sx);
+        $this->memberID = $this->createUserFixture(VanillaTestCase::ROLE_MEMBER, $sx);
     }
 
     /**
@@ -343,8 +344,6 @@ TEMPLATE;
      * @param string $role
      * @param string|null $sx
      * @return int
-     *
-     * @deprecated Use UsersAndRolesApiTest
      */
     protected function createUserFixture(string $role, string $sx = null): int {
         static $count = 1;
@@ -460,7 +459,7 @@ TEMPLATE;
      * @param int $userID The user to check.
      * @param array $roles The expected roles.
      */
-    private function assertUserHasRoles(int $userID, array $roles) {
+    protected function assertUserHasRoles(int $userID, array $roles) {
         $userRoles = $this->userModel->getRoleIDs($userID);
         foreach ($roles as $role) {
             if (!is_numeric($role)) {
@@ -469,5 +468,45 @@ TEMPLATE;
 
             $this->assertContains($role, $userRoles);
         }
+    }
+
+    /**
+     * Make sure that there is no active session.
+     *
+     * @param string $message
+     */
+    public static function assertNotSignedIn($message = ''): void {
+        TestCase::assertFalse(\Gdn::session()->isValid(), $message ?: "There shouldn't be a user signed in right now.");
+    }
+
+    /**
+     * Assert that an API endpoint supports paging properly.
+     *
+     * @param string $url The URL to test.
+     * @param int $limit The limit to use when paging. The endpoint must return at least one page of data.
+     */
+    public function assertApiPaging(string $url, int $limit): void {
+        $url = UrlUtils::concatQuery($url, ['limit' => $limit]);
+        $page = 0;
+        do {
+            $page++;
+            $response = $this->api->get($url);
+
+            $header = $response->getHeader(WebLinking::HEADER_NAME);
+            TestCase::assertNotEmpty($header, 'The paging headers were not in the API response.');
+
+            $paging = WebLinking::parseLinkHeaders($header);
+            $url = $paging['next'] ?? '';
+
+            if (!empty($url)) {
+                TestCase::assertCount($limit, $response->getBody(), 'The API returned a row count different than the limit.');
+
+                parse_str(parse_url($url, PHP_URL_QUERY), $query);
+                TestCase::assertSame($limit, (int)$query['limit'], 'The limit in the next URL is not the same as the previous.');
+                TestCase::assertSame($page + 1, (int)$query['page'], 'The next page URL is not the current page + 1.');
+            }
+        } while (!empty($url));
+
+        TestCase::assertNotSame(1, $page, 'The paging test must go past page 1.');
     }
 }

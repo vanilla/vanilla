@@ -8,6 +8,7 @@ namespace Vanilla\EmbeddedContent\Factories;
 
 use Garden\Http\HttpClient;
 use Vanilla\EmbeddedContent\AbstractEmbed;
+use Vanilla\EmbeddedContent\Embeds\ErrorEmbed;
 use Vanilla\EmbeddedContent\Embeds\ImageEmbed;
 use Vanilla\EmbeddedContent\Embeds\LinkEmbed;
 use Vanilla\EmbeddedContent\FallbackEmbedFactory;

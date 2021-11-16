@@ -46,6 +46,7 @@ class IgnorePlugin extends Gdn_Plugin {
         $this->fireEvent('Init');
     }
 
+
     /**
      * Add mapper methods
      *
@@ -511,6 +512,31 @@ class IgnorePlugin extends Gdn_Plugin {
     }
 
     /**
+     * Filter out users that are ignored by the active user.
+     *
+     * @param ActivityModel $sender
+     */
+    public function activityModel_afterGet_handler($sender) {
+        $dataEventArgument = 'Data';
+        if (!array_key_exists($dataEventArgument, $sender->EventArguments)) {
+            return;
+        }
+
+        // Examine the data, and remove any rows that belong to the trolls
+        $data = &$sender->EventArguments[$dataEventArgument];
+        $result = &$data->result();
+        $result = array_filter($result, function ($row) {
+            return !$this->ignored($row['ActivityUserID']);
+        });
+
+        if (!empty($result)) {
+            // Be sure the array is properly indexed after unset. (important for json_encode)
+            $result = array_values($result);
+        }
+    }
+
+
+    /**
      * Add "Ignore" option to profile options.
      *
      * @param ProfileController $sender
@@ -769,6 +795,42 @@ class IgnorePlugin extends Gdn_Plugin {
             throw notFoundException();
         } else {
             return $user;
+        }
+    }
+
+    /**
+     * Filter ignored users from a conversation.
+     *
+     * @param array $recipientIDs Conversation userIDs.
+     */
+    public function filterIgnoredUsers(array &$recipientIDs) {
+        $userID = Gdn::session()->UserID;
+        foreach ($recipientIDs as $key => $value) {
+            if ($this->ignored($userID, $value)) {
+                unset($recipientIDs[$key]);
+            }
+        }
+    }
+
+    /**
+     * Check for ignored users before saving a conversation.
+     *
+     * @param ConversationModel $sender
+     * @param array $args
+     */
+    public function conversationModel_beforeSaveValidation_handler(ConversationModel $sender, array $args) {
+        $recipientIDs = $args['FormPostValues']['RecipientUserID'] ?? false;
+        if ($recipientIDs) {
+            $recipientsCopy = $recipientIDs;
+            $this->filterIgnoredUsers($recipientIDs);
+            $result = array_diff($recipientsCopy, $recipientIDs);
+            if (!empty($result)) {
+                $result = implode(',', $result);
+                $sender->Validation->addValidationResult(
+                    'recipientUsers',
+                    sprintf(t(' You cannot start a conversation with the following users because they ignored you. %s'), $result)
+                );
+            }
         }
     }
 

@@ -646,7 +646,13 @@ class SettingsController extends DashboardController {
         $items = [
             'Garden.Profile.RedirectUrl' => [
                 'Control' => 'textbox',
-                'Description' => t("Custom URL to redirect the user instead of rendering Vanilla's profile page.")
+                'LabelCode' => t('"Profile" redirection URL'),
+                'Description' => t('Custom URL to redirect the user instead of rendering Vanilla\'s "Profile" page.')
+            ],
+            'Garden.Messages.Add.RedirectUrl' => [
+                'Control' => 'textbox',
+                'LabelCode' => t('"New Message" redirection URL'),
+                'Description' => t('Custom URL to redirect the user instead of rendering Vanilla\'s "New Message" page.')
             ]
         ];
 
@@ -663,8 +669,8 @@ class SettingsController extends DashboardController {
      * @access public
      * @param string $action Add, edit, delete, or none.
      * @param string $search Term to filter ban list by.
-     * @param int $page Page number.
-     * @param int $iD Ban ID we're editing or deleting.
+     * @param int|string $page Page number.
+     * @param int|string $iD Ban ID we're editing or deleting.
      */
     public function bans($action = '', $search = '', $page = '', $iD = '') {
         $this->permission('Garden.Settings.Manage');

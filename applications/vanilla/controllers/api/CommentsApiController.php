@@ -17,6 +17,8 @@ use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Search\SearchOptions;
 use Vanilla\Search\SearchResultItem;
 use Vanilla\Search\SearchService;
+use Garden\Web\Exception\ClientException;
+use Vanilla\Utility\ModelUtils;
 
 /**
  * API Controller for the `/comments` resource.
@@ -427,6 +429,7 @@ class CommentsApiController extends AbstractApiController {
      * @param int $id The ID of the comment.
      * @param array $body The request body.
      * @return array
+     * @throws ClientException If comment editing is not allowed.
      */
     public function patch($id, array $body) {
         $this->permission('Garden.SignIn.Allow');
@@ -439,6 +442,10 @@ class CommentsApiController extends AbstractApiController {
         $commentData = ApiUtils::convertInputKeys($body);
         $commentData['CommentID'] = $id;
         $row = $this->commentByID($id);
+        $canEdit = CommentModel::canEdit($row);
+        if (!$canEdit) {
+            throw new ClientException('Editing comments is not allowed.');
+        }
         if ($row['InsertUserID'] !== $this->getSession()->UserID) {
             $discussion = $this->discussionByID($row['DiscussionID']);
             $this->discussionModel->categoryPermission('Vanilla.Comments.Edit', $discussion['CategoryID']);
@@ -451,8 +458,10 @@ class CommentsApiController extends AbstractApiController {
         if (!array_key_exists('Body', $commentData)) {
             $commentData['Body'] = $row['Body'];
         }
-        $this->commentModel->save($commentData);
+        $saveResult = $this->commentModel->save($commentData);
         $this->validateModel($this->commentModel);
+        ModelUtils::validateSaveResultPremoderation($saveResult, 'comment');
+
         $row = $this->commentByID($id);
         $this->userModel->expandUsers($row, ['InsertUserID']);
         $row = $this->normalizeOutput($row);
@@ -471,7 +480,6 @@ class CommentsApiController extends AbstractApiController {
      */
     public function post(array $body) {
         $this->permission('Garden.SignIn.Allow');
-
         $in = $this->commentPostSchema('in')->setDescription('Add a comment.');
         $out = $this->commentSchema('out');
 
@@ -492,6 +500,7 @@ class CommentsApiController extends AbstractApiController {
         }
         $id = $this->commentModel->save($commentData);
         $this->validateModel($this->commentModel);
+        ModelUtils::validateSaveResultPremoderation($id, 'comment');
         if (!$id) {
             throw new ServerException('Unable to insert comment.', 500);
         }

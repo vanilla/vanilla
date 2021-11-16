@@ -9,6 +9,8 @@ import { JsonSchema, ISchemaRenderProps, IValidationResult } from "./types";
 import { PartialSchemaForm } from "./PartialSchemaForm";
 import Ajv from "ajv";
 import produce from "immer";
+import { VanillaUIFormControl } from "./vanillaUIControl/VanillaUIFormControl";
+import { VanillaUIFormControlGroup } from "./vanillaUIControl/VanillaUIFormControlGroup";
 
 interface IProps extends ISchemaRenderProps {
     schema: JsonSchema | string;
@@ -16,6 +18,8 @@ interface IProps extends ISchemaRenderProps {
     /** true by default */
     autoValidate?: boolean;
     onChange(instance: any): void;
+    disabled?: boolean;
+    vanillaUI?: boolean;
 }
 
 export interface IJsonSchemaFormHandle {
@@ -32,7 +36,17 @@ export const JsonSchemaForm = forwardRef(function JsonSchemaFormImpl(
     props: IProps,
     ref: React.Ref<IJsonSchemaFormHandle>,
 ) {
-    const { autoValidate, instance, onChange, Form, FormSection, FormTabs, FormControl, FormControlGroup } = props;
+    const {
+        autoValidate,
+        instance,
+        onChange,
+        Form,
+        FormSection,
+        FormTabs,
+        FormControl,
+        FormControlGroup,
+        vanillaUI = false,
+    } = props;
     const [validation, setValidation] = useState<IValidationResult>();
 
     const schema = useMemo<JsonSchema>(
@@ -49,9 +63,9 @@ export const JsonSchemaForm = forwardRef(function JsonSchemaFormImpl(
         // eslint-disable-next-line react-hooks/exhaustive-deps
         FormTabs: useMemo(() => FormTabs, []),
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        FormControl: useMemo(() => FormControl, []),
+        FormControl: useMemo(() => FormControl ?? (vanillaUI ? VanillaUIFormControl : undefined), []),
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        FormControlGroup: useMemo(() => FormControlGroup, []),
+        FormControlGroup: useMemo(() => FormControlGroup ?? (vanillaUI ? VanillaUIFormControlGroup : undefined), []),
     };
 
     const schemaRef = useRef(schema);
@@ -121,6 +135,7 @@ export const JsonSchemaForm = forwardRef(function JsonSchemaFormImpl(
         <PartialSchemaForm
             {...props}
             {...Memoized}
+            disabled={props.disabled}
             path={[]}
             schema={schema}
             rootSchema={schema}

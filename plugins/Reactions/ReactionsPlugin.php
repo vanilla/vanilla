@@ -598,7 +598,7 @@ class ReactionsPlugin extends Gdn_Plugin {
             $discussionIDs = array_column($result, 'discussionID');
             $userReactions = $this->reactionModel->getUserDiscussionTags(Gdn::session()->UserID, $discussionIDs);
             array_walk($result, function (&$row) use ($attributes, $schema, $userReactions) {
-                $withAttributes = $this->addAttributes($row, $attributes[$row['discussionID']]);
+                $withAttributes = $this->addAttributes($row, $attributes[$row['discussionID']] ?? null);
                 $summary = $this->reactionModel->getRecordSummary($withAttributes);
                 // This is added so we don't get 422 errors when reaction name is empty.
                 foreach ($summary as &$reaction) {
@@ -1355,6 +1355,16 @@ class ReactionsPlugin extends Gdn_Plugin {
         $sender->addJsFile('global.js');
         $sender->addJsFile('jquery.form.js');
         $sender->addJsFile('jquery.popup.js');
+
+        // A little ugly bit will do the trick until this tiled layout has been rewritten.
+        // This janky jquery masonry plugin is not peformant and is very buggy.
+        // Until it is re-implemented, data-driven (new) themes will default to use the "list" layout
+        // unless they explicitly opt-in to using tiles (can be configured in the Reactions plugin settings).
+        //
+        // See https://github.com/vanilla/support/issues/4368#issuecomment-920959129
+        if (\Gdn::themeFeatures()->useDataDrivenTheme()) {
+            \Gdn::config()->touch('Plugins.Reactions.BestOfStyle', 'List', false);
+        }
 
         if (c('Plugins.Reactions.BestOfStyle', 'Tiles') == 'Tiles') {
             $sender->addJsFile('library/jQuery-Masonry/jquery.masonry.js', 'plugins/Reactions'); // I customized this to get proper callbacks.

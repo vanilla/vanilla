@@ -76,6 +76,9 @@ class CommunityLeadersModule extends AbstractHomeWidgetModule {
      * @return string|null
      */
     protected function getTitle(): ?string {
+        if ($this->title) {
+            return $this->title;
+        }
         $category = $this->userPointsModel->getPointsCategory($this->categoryID);
         return $this->userPointsModel->getTitleForSlotType($this->slotType, $category ? $category['Name'] : '');
     }
@@ -107,6 +110,8 @@ class CommunityLeadersModule extends AbstractHomeWidgetModule {
             'description' => $user['Label'] ?? null,
             'counts' => [
                 [
+                    // %s Point
+                    // %s Points
                     'labelCode' => 'Points',
                     'count' => $points,
                 ]

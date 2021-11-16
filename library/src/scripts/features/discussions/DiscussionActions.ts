@@ -7,14 +7,27 @@ import { IApiError } from "@library/@types/api/core";
 import ReduxActions, { bindThunkAction, useReduxActions } from "@library/redux/ReduxActions";
 import { actionCreatorFactory } from "typescript-fsa";
 import { IDiscussion, IGetDiscussionListParams } from "@dashboard/@types/api/discussion";
-import { IUser } from "@library/@types/api/users";
 import { IReaction } from "@dashboard/@types/api/reaction";
 import { ITag } from "@library/features/tags/TagsReducer";
+import { RecordID } from "@vanilla/utils";
+import { ICategoryFragment } from "@vanilla/addon-vanilla/categories/categoriesTypes";
+import intersection from "lodash/intersection";
+import { IForumStoreState } from "@vanilla/addon-vanilla/redux/state";
+import { ICoreStoreState } from "@library/redux/reducerRegistry";
+import { IDiscussionsStoreState } from "@library/features/discussions/discussionsReducer";
 
 const createAction = actionCreatorFactory("@@discussions");
 
 export interface IGetDiscussionByID {
     discussionID: number;
+}
+export interface IGetCategoryByID {
+    categoryID: RecordID;
+}
+export interface IGetDiscussionsByIDs {
+    discussionIDs: RecordID[];
+    limit?: number;
+    expand?: string | string[];
 }
 
 export type IPutDiscussionBookmarkedResult = Required<Pick<IDiscussion, "bookmarked">>;
@@ -74,6 +87,25 @@ export interface IDeleteDiscussionReaction {
 export interface IDeleteDiscussion {
     discussionID: IDiscussion["discussionID"];
 }
+export interface IBulkDeleteDiscussion {
+    discussionIDs: Array<IDiscussion["discussionID"]>;
+}
+
+export interface IBulkMoveDiscussions {
+    discussionIDs: RecordID[];
+    categoryID: RecordID;
+    addRedirects: boolean;
+    category?: ICategoryFragment;
+}
+export interface IBulkActionSyncResult {
+    callbackPayload: string | null;
+    progress: {
+        countTotalIDs: number;
+        exceptionsByID: Record<string | number, any>;
+        failedIDs: number[];
+        successIDs: number[];
+    };
+}
 
 export interface IPutDiscussionType {
     discussionID: IDiscussion["discussionID"];
@@ -84,7 +116,9 @@ export interface IPutDiscussionTags {
     tagIDs: number[];
 }
 
-export default class DiscussionActions extends ReduxActions {
+export default class DiscussionActions extends ReduxActions<
+    IForumStoreState & ICoreStoreState & IDiscussionsStoreState
+> {
     public static getDiscussionListACs = createAction.async<IGetDiscussionListParams, IDiscussion[], IApiError>(
         "GET_DISCUSSION_LIST",
     );
@@ -213,6 +247,30 @@ export default class DiscussionActions extends ReduxActions {
         return this.dispatch(thunk);
     };
 
+    public static bulkDeleteDiscussionsACs = createAction.async<
+        IBulkDeleteDiscussion,
+        IBulkActionSyncResult,
+        IApiError
+    >("BULK_DELETE_DISCUSSIONS");
+
+    public bulkDeleteDiscussion = (query: IBulkDeleteDiscussion) => {
+        const { discussionIDs } = query;
+
+        const deleteDiscussionListApi = async () => {
+            const reponse = await this.api.delete(`/discussions/list`, {
+                params: { longRunnerMode: "sync" },
+                data: { discussionIDs },
+            });
+            return reponse.data;
+        };
+
+        const thunk = bindThunkAction(
+            DiscussionActions.bulkDeleteDiscussionsACs,
+            deleteDiscussionListApi,
+        )({ discussionIDs });
+        return this.dispatch(thunk);
+    };
+
     public static putDiscussionTagsACs = createAction.async<IPutDiscussionTags, ITag[], IApiError>(
         "PUT_DISCUSSION_TAGS",
     );
@@ -225,6 +283,78 @@ export default class DiscussionActions extends ReduxActions {
             });
             return reponse.data;
         })({ discussionID, tagIDs });
+        return this.dispatch(thunk);
+    };
+
+    public static getDiscussionsByIDsAC = createAction.async<IGetDiscussionsByIDs, IDiscussion[], IApiError>(
+        "GET_DISCUSSIONS_BY_ID",
+    );
+
+    public getDiscussionByIDs = (query: IGetDiscussionsByIDs, onlyExisting: boolean = false) => {
+        let { discussionIDs } = query;
+        if (!query.limit) {
+            query.limit = query.discussionIDs.length;
+        }
+        if (onlyExisting) {
+            const existingIDs = Object.keys(this.getState().discussions.discussionsByID).map((key) => parseInt(key));
+            discussionIDs = intersection(discussionIDs, existingIDs);
+        }
+        // No discussions to fetch.
+        if (discussionIDs.length === 0) {
+            return Promise.resolve([]);
+        }
+        const thunk = bindThunkAction(DiscussionActions.getDiscussionsByIDsAC, async () => {
+            const response = await this.api.get(`/discussions`, {
+                params: {
+                    ...query,
+                    // Name improperly up until this point.
+                    discussionID: query.discussionIDs,
+                },
+            });
+            return response.data;
+        })(query);
+        return this.dispatch(thunk);
+    };
+
+    public static bulkMoveDiscussionsACs = createAction.async<IBulkMoveDiscussions, IBulkActionSyncResult, IApiError>(
+        "BULK_MOVE_DISCUSSIONS",
+    );
+
+    public bulkMoveDiscussions = (query: IBulkMoveDiscussions) => {
+        const { discussionIDs, categoryID, addRedirects, category } = query;
+
+        const moveDiscussionsApi = async () => {
+            const reponse = await this.api.patch(
+                `discussions/move`,
+                {
+                    discussionIDs,
+                    categoryID,
+                    addRedirects,
+                },
+                {
+                    params: { longRunnerMode: "sync" },
+                },
+            );
+            return reponse.data;
+        };
+
+        const thunk = bindThunkAction(
+            DiscussionActions.bulkMoveDiscussionsACs,
+            moveDiscussionsApi,
+        )({ discussionIDs, categoryID, addRedirects, category });
+        return this.dispatch(thunk);
+    };
+
+    public static getCategoryByIDACs = createAction.async<IGetCategoryByID, ICategoryFragment, IApiError>(
+        "GET_CATEGORY",
+    );
+
+    public getCategoryByID = (query: IGetCategoryByID) => {
+        const { categoryID } = query;
+        const thunk = bindThunkAction(DiscussionActions.getCategoryByIDACs, async () => {
+            const reponse = await this.api.get(`/categories/${categoryID}`);
+            return reponse.data;
+        })({ categoryID });
         return this.dispatch(thunk);
     };
 }

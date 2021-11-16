@@ -4,6 +4,7 @@
  * @license proprietary
  */
 
+use Vanilla\Models\TrustedDomainModel;
 
 /**
  * Class CategoryAsLinkPlugin
@@ -118,8 +119,10 @@ if (!function_exists("categoryUrl")) {
 
         // If there is a URL that links to a discussion it overrides the category or even a link to an alias category.
         if (val('RedirectUrl', $category)) {
+            /* @var TrustedDomainModel $trustedDomainModel */
+            $trustedDomainModel = Gdn::getContainer()->get(TrustedDomainModel::class);
             // SafeURL because you may be linking to another web property, another forum or knowledgebase.
-            return safeURL(val('RedirectUrl', $category));
+            return $trustedDomainModel->safeContentUrl(val('RedirectUrl', $category));
         }
 
         $categoryURL = '';

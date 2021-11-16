@@ -32,6 +32,7 @@ final class SqlUtils {
      */
     public static function keepTextFieldLengths(Gdn_DatabaseStructure $structure): void {
         $textTypes = ['tinytext' => 1, 'text' => 2, 'mediumtext' => 3, 'longtext' => 4];
+        $charTypes = ['varchar' => 1, 'char' => 1];
 
         if (!$structure->tableExists()) {
             return;
@@ -40,13 +41,20 @@ final class SqlUtils {
         $old = $structure->existingColumns();
 
         foreach ($old as $name => $oldDef) {
-            $oldType = strtolower($oldDef->Type ?? '');
-            if (!isset($textTypes[$oldType])) {
+            $newDef = $structure->columns($name);
+            if ($newDef === null) {
                 continue;
             }
+            $oldType = strtolower($oldDef->Type ?? '');
+            $newType = strtolower($newDef->Type ?? '');
 
-            if (null !== $newDef = $structure->columns($name)) {
+            if (isset($textTypes[$oldType])) {
+                // The existing type is a text type. Never allow it to be changed here.
                 $newDef->Type = $oldType;
+                $newDef->Length = '';
+            } elseif (isset($charTypes[$oldType]) && isset($charTypes[$newType])) {
+                // The existing type is a varchar. Only allow it to grow, never shrink.
+                $newDef->Length = max($oldDef->Length ?? 1, $newDef->Length ?? 1);
             }
         }
     }

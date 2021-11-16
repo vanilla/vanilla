@@ -35,6 +35,7 @@ class AnnouncementWidgetModule extends BaseDiscussionWidgetModule {
             SchemaUtils::composeSchemas(
                 self::categorySchema(),
                 self::siteSectionIDSchema(),
+                self::sortSchema(),
                 self::limitSchema()
             )
         );
@@ -48,7 +49,6 @@ class AnnouncementWidgetModule extends BaseDiscussionWidgetModule {
     protected function getRealApiParams(): array {
         $apiParams = parent::getRealApiParams();
         $apiParams['pinned'] = true;
-        $apiParams['sort'] = '-dateInserted';
 
         return $apiParams;
     }

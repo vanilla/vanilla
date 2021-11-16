@@ -32,6 +32,7 @@ class DiscussionWidgetModule extends BaseDiscussionWidgetModule {
 
         $apiSchema = $apiSchema->merge(
             SchemaUtils::composeSchemas(
+                self::followedCategorySchema(),
                 static::categorySchema(),
                 self::siteSectionIDSchema(),
                 self::sortSchema(),

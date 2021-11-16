@@ -18,6 +18,7 @@ import { Hoverable, useMeasure } from "@vanilla/react-utils";
 
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { cx } from "@emotion/css";
+import ModalSizes from "@library/modal/ModalSizes";
 
 export enum DropDownOpenDirection {
     ABOVE_LEFT = "aboveLeft",
@@ -52,7 +53,6 @@ export interface IDropDownProps extends IOpenDirectionProps {
     buttonClassName?: string;
     buttonType?: ButtonTypes;
     disabled?: boolean;
-    toggleButtonClassName?: string;
     initialFocusElement?: HTMLElement | null;
     buttonRef?: React.RefObject<HTMLButtonElement>;
     contentRef?: React.RefObject<HTMLDivElement>;
@@ -70,6 +70,7 @@ export interface IDropDownProps extends IOpenDirectionProps {
     tag?: string;
     accessibleLabel?: string;
     onHover?: () => void;
+    modalSize?: ModalSizes;
 }
 
 export enum FlyoutType {
@@ -144,11 +145,11 @@ export default function DropDown(props: IDropDownProps) {
             buttonClassName={props.buttonClassName}
             disabled={props.disabled}
             buttonRef={ownButtonRef}
-            toggleButtonClassName={props.toggleButtonClassName}
             isVisible={isVisible}
             forceVisible={isForcedOpen}
             onVisibilityChange={onVisibilityChange}
             openAsModal={openAsModal}
+            modalSize={props.modalSize}
             initialFocusElement={props.initialFocusElement}
             tag={props.tag}
             contentID={contentID}

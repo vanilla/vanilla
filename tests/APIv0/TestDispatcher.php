@@ -9,6 +9,7 @@ namespace VanillaTests\APIv0;
 
 use Garden\Container\Container;
 use Garden\EventManager;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Utility\ModelUtils;
 use Vanilla\Utility\StringUtils;
@@ -142,15 +143,21 @@ class TestDispatcher {
 
         $ex = null;
         try {
+            $this->lastOutput = null;
+
+            $obLevelStart = ob_get_level();
             // Capture output.
             ob_start();
             $dispatcher->dispatch($request, $options[self::OPT_PERMANENT]);
             $output = ob_get_contents();
             $this->lastOutput = $output;
         } finally {
-            ob_end_clean();
             \Gdn::request($oldRequest);
             $events->unbind('base_beforeControllerMethod', $fn);
+
+            ob_end_clean();
+            $obLevelEnd = ob_get_level();
+            Assert::assertSame($obLevelStart, $obLevelEnd, "Output buffer levels were different at the start and end of the request. Ending HTML:\n" . $this->lastOutput);
         }
 
         if ($this->lastController === null) {
@@ -191,6 +198,7 @@ class TestDispatcher {
         $controller = $this->get($path, $query, $options);
 
         TestCase::assertIsString($this->lastOutput, 'Control must output HTML');
+        TestCase::assertNotEmpty($this->lastOutput, 'Controller output must not be empty');
         $document = new TestHtmlDocument($this->lastOutput);
         return $document;
     }
@@ -206,6 +214,15 @@ class TestDispatcher {
         TestCase::assertIsString($this->lastOutput, 'Control must output HTML');
         $document = new TestHtmlDocument($this->lastOutput);
         return $document;
+    }
+
+    /**
+     * Test whether or not there is a last HTML output.
+     *
+     * @return bool
+     */
+    public function hasLastHtml(): bool {
+        return $this->lastOutput !== null;
     }
 
     /**
@@ -310,6 +327,20 @@ class TestDispatcher {
         $form = $controller->Form;
         $message = \Gdn_Validation::resultsAsText($form->validationResults());
         TestCase::assertStringContainsString($partialMessage, $message);
+    }
+
+    /**
+     * Assert that a particular form field has an error.
+     *
+     * @param string $name The name of the form field.
+     */
+    public function assertFormFieldError(string $name): void {
+        $controller = $this->lastController;
+        TestCase::assertNotNull($controller, "The controller was not properly set to assert.");
+
+        /** @var \Gdn_Form $form */
+        $results = $controller->Form->validationResults();
+        TestCase::assertArrayHasKey($name, $results, "The form should have an error on the $name field.");
     }
 
     /**

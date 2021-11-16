@@ -1,4 +1,5 @@
 <?php use Vanilla\Forum\Modules\FoundationDiscussionsShim;
+use Vanilla\Forum\Modules\FoundationShimOptions;
 
 if (!defined('APPLICATION')) exit();
 
@@ -7,7 +8,9 @@ if (FoundationDiscussionsShim::isEnabled()) {
     $announceData = $hasAnnounceData ? $this->AnnounceData->resultArray() : [];
     $regularData = $this->DiscussionData->resultArray();
     $legacyData = array_merge($announceData, $regularData);
-    FoundationDiscussionsShim::printLegacyShim($legacyData);
+    $options = new FoundationShimOptions();
+    $options->setIsMainContent($isMainContent ?? false);
+    FoundationDiscussionsShim::printLegacyShim($legacyData, $options);
 } else {
     $Session = Gdn::session();
     if (!function_exists('writeDiscussion'))

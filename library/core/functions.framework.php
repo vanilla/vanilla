@@ -8,9 +8,11 @@
 
 use Garden\Web\Exception\ResponseException;
 use Garden\Web\Redirect;
+use Vanilla\Logging\TraceCollector;
 use Vanilla\Models\TrustedDomainModel;
 use Vanilla\Theme\ThemeService;
 use Vanilla\Web\Asset\DeploymentCacheBuster;
+use Vanilla\Web\CacheControlConstantsInterface;
 use Vanilla\Web\CacheControlMiddleware;
 
 if (!function_exists('asset')) {
@@ -1307,7 +1309,7 @@ if (!function_exists('redirectTo')) {
         @ob_end_clean();
 
         if ($statusCode === 302) {
-            CacheControlMiddleware::sendCacheControlHeaders(CacheControlMiddleware::NO_CACHE);
+            CacheControlMiddleware::sendCacheControlHeaders(CacheControlConstantsInterface::NO_CACHE);
         }
 
         if (Gdn::controller() !== null
@@ -1363,21 +1365,9 @@ if (!function_exists('safeURL')) {
      * @return string The destination if safe, /home/leaving?Target=$destination if not.
      */
     function safeURL($destination, $withDomain = false) {
-        $url = url($destination, true);
-
         /** @var TrustedDomainModel $trustedDomainModel */
-        $trustedDomainModel = \Gdn::getContainer()->get(TrustedDomainModel::class);
-        $trustedDomains = $trustedDomainModel->getAll();
-        $isTrustedDomain = false;
-
-        foreach ($trustedDomains as $trustedDomain) {
-            if (urlMatch($trustedDomain, $url)) {
-                $isTrustedDomain = true;
-                break;
-            }
-        }
-
-        return ($isTrustedDomain ? $url : url('/home/leaving?Target='.urlencode($destination), $withDomain));
+        $trustedDomainModel = Gdn::getContainer()->get(TrustedDomainModel::class);
+        return $trustedDomainModel->safeUrl($destination, $withDomain);
     }
 }
 
@@ -1587,16 +1577,16 @@ if (!function_exists('trace')) {
      * - string: A trace message.
      * - other: A variable to output.
      * @param string $type One of the `TRACE_*` constants or a string label for the trace.
-     * @return array Returns the array of traces.
+     * @return array|void Returns the array of traces.
      */
     function trace($value = null, $type = TRACE_INFO) {
-        static $traces = [];
+        $traceCollector = \Gdn::getContainer()->get(TraceCollector::class);
 
         if ($value === null) {
-            return $traces;
+            return $traceCollector->getTraces();
+        } else {
+            $traceCollector->addTrace($value, $type);
         }
-
-        $traces[] = [$value, $type];
     }
 }
 

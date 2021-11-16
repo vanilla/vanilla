@@ -60,7 +60,7 @@ export function useConfigPatcher<T extends ConfigValues = ConfigValues>() {
     const actions = useConfigActions();
 
     const patchConfig = useCallback(
-        (values: T) => {
+        async (values: T) => {
             return actions.patchConfigThunk({ values, watchID });
         },
         [watchID],

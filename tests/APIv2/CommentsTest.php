@@ -13,6 +13,7 @@ use Gdn_Configuration;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Models\DirtyRecordModel;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
+use VanillaTests\UsersAndRolesApiTestTrait;
 
 /**
  * Test the /api/v2/discussions endpoints.
@@ -25,6 +26,7 @@ class CommentsTest extends AbstractResourceTest {
     use TestSortingTrait;
     use TestFilterDirtyRecordsTrait;
     use CommunityApiTestTrait;
+    use UsersAndRolesApiTestTrait;
 
     /**
      * {@inheritdoc}
@@ -185,6 +187,29 @@ class CommentsTest extends AbstractResourceTest {
             "discussionID" => $discussionID,
             "format" => "markdown",
         ]);
+    }
+
+    /**
+     * Test editing a comment.
+     */
+    public function testCommentCanEdit(): void {
+        $user = $this->createUser();
+        $comment = $this->runWithUser(function () {
+            $discussion = $this->createDiscussion();
+            $comment = $this->createComment(['discussionID' => $discussion['discussionID']]);
+            $this->api()->post("/comments/{$comment['commentID']}", ["body" => 'edited comment']);
+            $result = $this->api()->get("/comments/{$comment['commentID']}")->getBody();
+            $this->assertEquals("edited comment", $result['body']);
+            return $comment;
+        }, $user);
+        $this->runWithConfig([
+            'Garden.EditContentTimeout' => '0'
+        ], function () use ($user, $comment) {
+            \Gdn::session()->start($user['userID']);
+            $this->expectExceptionMessage('Editing comments is not allowed.');
+            $this->expectExceptionCode(400);
+            $this->api()->post("/comments/{$comment['commentID']}", ["body" => 'edited comment2']);
+        });
     }
 
     /**

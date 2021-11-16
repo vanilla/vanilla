@@ -259,4 +259,23 @@ EOT;
         $columns = array_column($columnsRaw, null, "Field");
         return $columns;
     }
+
+    /**
+     * Text types should not alter when being re-defined.
+     */
+    public function testNoAlterTextColumns(): void {
+        $this->st
+            ->table(__FUNCTION__)
+            ->column('foo', 'text')
+            ->set();
+
+        $this->st->CaptureOnly = true;
+        $this->st
+            ->table(__FUNCTION__)
+            ->column('foo', 'text');
+        $this->st->set();
+
+        $sql = $this->st->Database->CapturedSql ?? [];
+        $this->assertEmpty($sql, 'The table should not have altered.');
+    }
 }

@@ -250,7 +250,7 @@ class RedirectorPlugin extends Gdn_Plugin {
             $CommentModel = new CommentModel();
             // If a legacy slug is provided (assigned during a merge), attempt to lookup the comment using it
             if (isset($Get['legacy']) && Gdn::structure()->table('Comment')->columnExists('ForeignID')) {
-                $Comment = $CommentModel->getWhere(['ForeignID' => $Vars['CommentID']])->firstRow();
+                $Comment = $CommentModel->getWhere(['ForeignID' => $Get['legacy'] . '-' . $Vars['CommentID']])->firstRow();
 
             } else {
                 $Comment = $CommentModel->getID($Vars['CommentID']);
@@ -274,7 +274,7 @@ class RedirectorPlugin extends Gdn_Plugin {
             if (is_numeric($DiscussionID)) {
                 // If a legacy slug is provided (assigned during a merge), attempt to lookup the discussion using it
                 if (isset($Get['legacy']) && Gdn::structure()->table('Discussion')->columnExists('ForeignID') && $Filename !== 't5') {
-                    $Discussion = $DiscussionModel->getWhere(['ForeignID' => $DiscussionID])->firstRow();
+                    $Discussion = $DiscussionModel->getWhere(['ForeignID' => $Get['legacy'] . '-' . $DiscussionID])->firstRow();
                 } else {
                     $Discussion = $DiscussionModel->getID($Vars['DiscussionID']);
                 }

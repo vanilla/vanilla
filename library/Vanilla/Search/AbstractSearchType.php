@@ -39,7 +39,7 @@ abstract class AbstractSearchType {
      *
      * @return string
      */
-    abstract public function getSearchGroup(): string;
+    abstract public function getRecordType(): string;
 
     /**
      * Get the type of the record.
@@ -56,7 +56,7 @@ abstract class AbstractSearchType {
      * @return string
      */
     public function getIndex(): string {
-        return $this->getSearchGroup();
+        return $this->getRecordType();
     }
 
     /**
@@ -85,7 +85,7 @@ abstract class AbstractSearchType {
      * @return SearchResultItem
      */
     public function convertForeignSearchItem(array $record): SearchResultItem {
-        $record['recordType'] = $this->getSearchGroup();
+        $record['recordType'] = $this->getRecordType();
         $record['type'] = $this->getType();
         unset($record['breadcrumbs']);
 
@@ -165,7 +165,7 @@ abstract class AbstractSearchType {
             'recordTypes:a?' => [
                 'items' => [
                     'type' => 'string',
-                    'enum' => [$this->getSearchGroup()],
+                    'enum' => [$this->getRecordType()],
                 ],
                 'style' => 'form',
                 'description' => 'Restrict the search to the specified main type(s) of records.',
@@ -191,6 +191,15 @@ abstract class AbstractSearchType {
     }
 
     /**
+     * If this is returns true, the query from the type be optimized and shared with others of the same searchgroup.
+     *
+     * @return bool
+     */
+    public function canBeOptimizedIntoRecordType(): bool {
+        return false;
+    }
+
+    /**
      * Check if the user has permission to search with this type.
      *
      * @return bool
@@ -207,7 +216,7 @@ abstract class AbstractSearchType {
      * @return string
      */
     public function getLegacyCheckBoxID(): string {
-        return $this->getSearchGroup() . '_' . $this->getType();
+        return $this->getRecordType() . '_' . $this->getType();
     }
 
     /**

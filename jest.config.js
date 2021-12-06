@@ -113,8 +113,8 @@ module.exports = {
     // A map from regular expressions to module names that allow to stub out resources with a single module
     moduleNameMapper: {
         "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$":
-            "<rootDir>/__mocks__/fileMock.js",
-        "\\.(css|less)$": "<rootDir>/__mocks__/styleMock.js",
+            "<rootDir>/library/src/scripts/__tests__/fileMock.js",
+        "\\.(css|less)$": "<rootDir>/library/src/scripts/__tests__/styleMock.js",
         ...addonModuleMaps,
     },
 
@@ -149,7 +149,7 @@ module.exports = {
     // restoreMocks: false,
 
     // The root directory that Jest should scan for tests and modules within
-    // rootDir: null,
+    rootDir: VANILLA_ROOT,
 
     // A list of paths to directories that Jest should use to search for files in
     // roots: ["<rootDir>", ...addonRootDirs],
@@ -161,7 +161,9 @@ module.exports = {
     // setupFiles: [],
 
     // A list of paths to modules that run some code to configure or set up the testing framework before each test
-    // setupFilesAfterEnv: [],
+    setupFilesAfterEnv: [
+        "<rootDir>/jest.setup.js"
+    ],
 
     // A list of paths to snapshot serializer modules Jest should use for snapshot testing
     // snapshotSerializers: [],

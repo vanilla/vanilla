@@ -22,7 +22,7 @@ final class ArrayUtils {
      * @param mixed $input The input to test.
      * @param string $message
      */
-    private static function assertArray($input, string $message): void {
+    public static function assertArray($input, string $message): void {
         if (!self::isArray($input)) {
             throw new \InvalidArgumentException($message, 400);
         }
@@ -297,6 +297,7 @@ final class ArrayUtils {
     public static function filterRecursiveArray($array, callable $filter, bool $includeRoot = false) {
         $m = function (&$array, array $path) use ($filter, &$m) {
             $r = [];
+            $isSimpleArray = ArrayUtils::isArray($array) && !ArrayUtils::isAssociative($array);
             foreach ($array as $key => $value) {
                 if (static::isArray($value)) {
                     $subpath = array_merge($path, [$key]);
@@ -313,6 +314,11 @@ final class ArrayUtils {
                     $r[$key] = $value;
                 }
             }
+
+            if ($isSimpleArray) {
+                $r = array_values($r);
+            }
+
             return $r;
         };
 
@@ -521,7 +527,6 @@ final class ArrayUtils {
      *
      * @param array $arr
      * @return array
-     * @todo Add tests.
      */
     public static function camelCase(array $arr): array {
         $result = [];

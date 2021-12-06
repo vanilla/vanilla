@@ -1,0 +1,7 @@
+{
+    "key": "test",
+    "name": "An addon to dump test stuff.",
+    "type": "addon",
+    "version": "0.1",
+    "mobileFriendly": true
+}

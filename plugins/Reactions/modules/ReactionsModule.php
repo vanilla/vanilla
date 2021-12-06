@@ -71,6 +71,7 @@ class ReactionsModule extends AbstractReactModule {
         return $this->user ? [
             'apiParams' => ['userID' => $this->user->UserID],
             'apiData' => $reactions,
+            'homeWidget' => true,
         ] : null;
     }
 

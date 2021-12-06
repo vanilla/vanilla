@@ -17,7 +17,7 @@ use Vanilla\Exception\PermissionException;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Search\BoostableSearchQueryInterface;
-use Vanilla\Search\CollapsableSerachQueryInterface;
+use Vanilla\Search\CollapsableSearchQueryInterface;
 use Vanilla\Search\MysqlSearchQuery;
 use Vanilla\Search\SearchQuery;
 use Vanilla\Search\AbstractSearchType;
@@ -49,6 +49,8 @@ class DiscussionSearchType extends AbstractSearchType {
 
     /** @var array extenders */
     protected $extenders = [];
+
+    protected $queryFullTextFields = ['name', 'bodyPlainText'];
 
     /**
      * DI.
@@ -92,7 +94,7 @@ class DiscussionSearchType extends AbstractSearchType {
     /**
      * @inheritdoc
      */
-    public function getSearchGroup(): string {
+    public function getRecordType(): string {
         return 'discussion';
     }
 
@@ -107,6 +109,13 @@ class DiscussionSearchType extends AbstractSearchType {
      * @return bool
      */
     public function supportsCollapsing(): bool {
+        return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function canBeOptimizedIntoRecordType(): bool {
         return true;
     }
 
@@ -135,7 +144,7 @@ class DiscussionSearchType extends AbstractSearchType {
                 $mapped = ArrayUtils::remapProperties($result, [
                     'recordID' => 'discussionID',
                 ]);
-                $mapped['recordType'] = $this->getSearchGroup();
+                $mapped['recordType'] = $this->getRecordType();
                 $mapped['type'] = $this->getType();
                 $mapped['legacyType'] = $this->getSingularLabel();
                 $mapped['breadcrumbs'] = $this->breadcrumbModel->getForRecord(new ForumCategoryRecordType($mapped['categoryID']));
@@ -166,7 +175,7 @@ class DiscussionSearchType extends AbstractSearchType {
 
             $allTextQuery = $query->getQueryParameter('query');
             if ($allTextQuery) {
-                $fields = $query->setQueryMatchFields(['name', 'body']);
+                $fields = $query->setQueryMatchFields($this->queryFullTextFields);
                 $query->whereText($allTextQuery, $fields, $query::MATCH_FULLTEXT_EXTENDED, $locale);
             }
 
@@ -424,7 +433,8 @@ class DiscussionSearchType extends AbstractSearchType {
             $query->getQueryParameter('followedCategories'),
             $query->getQueryParameter('includeChildCategories'),
             $query->getQueryParameter('includeArchivedCategories'),
-            $query->getQueryParameter('categoryIDs')
+            $query->getQueryParameter('categoryIDs'),
+            "Discussion"
         );
         if ($query->supportsExtenders()) {
             /** @var SearchTypeQueryExtenderInterface $extender */

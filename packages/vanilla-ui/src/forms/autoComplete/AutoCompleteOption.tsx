@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import { cx } from "@emotion/css";
 import { ComboboxOption, ComboboxOptionText } from "@reach/combobox";
 import { autoCompleteClasses } from "./AutoComplete.styles";
@@ -25,14 +25,19 @@ export interface IAutoCompleteOptionProps
  * Renders a list element and provides a value for the searchable dropdown.
  * See ReachUI's ComboboxOption: https://reach.tech/combobox#comboboxoption
  */
-export const AutoCompleteOption = React.forwardRef(function AutoCompleteOptionImpl(props: IAutoCompleteOptionProps) {
+export const AutoCompleteOption = React.forwardRef(function AutoCompleteOptionImpl(
+    props: IAutoCompleteOptionProps,
+    ref: React.Ref<HTMLLIElement>,
+) {
     const { value, label = value, ...otherProps } = props;
-    const { size, value: autoCompleteValue } = useContext(AutoCompleteContext);
+    const { size, value: autoCompleteValue, multiple } = useContext(AutoCompleteContext);
     const classes = autoCompleteClasses({ size });
-    const selected = value == autoCompleteValue;
+    const values = multiple && Array.isArray(autoCompleteValue) ? autoCompleteValue : [autoCompleteValue];
+    const selected = values.indexOf(value) > -1;
 
     return (
         <ComboboxOption
+            ref={ref}
             {...otherProps}
             className={cx(classes.option, props.className)}
             data-autocomplete-selected={selected || undefined}
@@ -41,7 +46,11 @@ export const AutoCompleteOption = React.forwardRef(function AutoCompleteOptionIm
             <div className={classes.optionText}>
                 <ComboboxOptionText />
             </div>
-            {selected && <Checkmark />}
+            {selected && (
+                <span className={classes.checkmarkContainer}>
+                    <Checkmark />
+                </span>
+            )}
         </ComboboxOption>
     );
 });

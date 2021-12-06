@@ -10,6 +10,8 @@
 
 const fse = require("fs-extra");
 const path = require("path");
+const prettier = require("prettier");
+const vanillaPrettier = require("@vanilla/prettier-config");
 
 const fileNames = fse.readdirSync(path.resolve(__dirname, "./icons"));
 
@@ -29,7 +31,7 @@ function getPrefixTypeName(prefix) {
     return uppered + "IconType";
 }
 
-const resultJs = `
+let resultJs = `
 /**
  * @copyright 2009-2021 Vanilla Forums Inc.
  * @license gpl-2.0-only
@@ -53,4 +55,7 @@ export type IconType =${Object.keys(svgsByPrefix)
 ;
 `;
 
-fse.writeFileSync(path.resolve(__dirname, "./src/IconType.ts"), resultJs);
+const filePath = path.resolve(__dirname, "./src/IconType.ts");
+resultJs = prettier.format(resultJs, {...vanillaPrettier, filepath: filePath});
+
+fse.writeFileSync(filePath, resultJs);

@@ -73,6 +73,15 @@ abstract class ResourceEvent implements \JsonSerializable {
     }
 
     /**
+     * Set the event payload.
+     *
+     * @param array $payload The key => value pairs to set on the payload.
+     */
+    public function setPayload(array $payload): void {
+        $this->payload = $payload;
+    }
+
+    /**
      * Get the event resource api params.
      *
      * @return array|null

@@ -7,10 +7,12 @@
 
 namespace Vanilla;
 
+use Garden\Container\Container;
 use Garden\EventManager;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Vanilla\Contracts;
+use Vanilla\Utility\ArrayUtils;
 
 /**
  * A class to manage all of the addons in the application.
@@ -210,6 +212,20 @@ class AddonManager implements LoggerAwareInterface {
             }
         }
         return null;
+    }
+
+    /**
+     * Filter data by "x-addon" key
+     *
+     * @param array $data
+     * @return array|null
+     */
+    public function filterDataByAddon($data) {
+        $filter = function ($data) {
+            return (empty($data['x-addon']) || $this->checkAddonsEnabled($data['x-addon']));
+        };
+
+        return ArrayUtils::filterRecursiveArray($data, $filter);
     }
 
     /**
@@ -734,6 +750,23 @@ class AddonManager implements LoggerAwareInterface {
     }
 
     /**
+     * Checks whether the addon in the x-addon field is enabled and handles cases where the field is an array.
+     *
+     * @param string|string[] $addons
+     * @return bool
+     */
+    public function checkAddonsEnabled($addons): bool {
+        $addons = is_array($addons) ? $addons : [$addons];
+        foreach ($addons as $addon) {
+            $enabled = $this->isEnabled($addon, Addon::TYPE_ADDON);
+            if (!$enabled) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Check the enabled dependents of an addon.
      *
      * Addons should always check their dependents before being disabled. This check does not consider dependents that
@@ -814,7 +847,7 @@ class AddonManager implements LoggerAwareInterface {
     }
 
     /**
-     * @inheritdoc
+     * @return Addon[]
      */
     public function getEnabled(): array {
         if (!$this->enabledSorted) {
@@ -1207,13 +1240,7 @@ class AddonManager implements LoggerAwareInterface {
         $enabled = $this->getEnabled();
 
         foreach ($enabled as $addon) {
-            /* @var \Vanilla\Addon $addon */
-            if ($pluginClass = $addon->getPluginClass()) {
-                // Include the plugin here, rather than wait for it to hit the autoloader. This way is much faster.
-                include_once $addon->getClassPath($pluginClass);
-
-                $this->bindAddonEvents($addon, $eventManager);
-            }
+            $addon->bindEvents($eventManager);
         }
     }
 
@@ -1224,19 +1251,11 @@ class AddonManager implements LoggerAwareInterface {
      *
      * @param Addon $addon The addon to bind.
      * @param EventManager $eventManager The event manager to bind the plugin classes to.
+     *
+     * @deprecated Use the Addon::bindEvents()
      */
     public function bindAddonEvents(Addon $addon, EventManager $eventManager) {
-        // Check that the addon has a plugin.
-        if (!($pluginClass = $addon->getPluginClass())) {
-            return;
-        }
-
-        // Only register the plugin if it implements the Gdn_IPlugin interface.
-        if (is_a($pluginClass, 'Gdn_IPlugin', true)) {
-            $eventManager->bindClass($pluginClass, $addon->getPriority());
-        } else {
-            trigger_error("$pluginClass does not implement Gdn_IPlugin", E_USER_DEPRECATED);
-        }
+        $addon->bindEvents($eventManager);
     }
 
     /**
@@ -1248,16 +1267,57 @@ class AddonManager implements LoggerAwareInterface {
      * @param EventManager $eventManager The event manager to bind the plugin classes to.
      */
     public function unbindAddonEvents(Addon $addon, EventManager $eventManager) {
-        // Check that the addon has a plugin.
-        if (!($pluginClass = $addon->getPluginClass())) {
+        $specialClasses = $addon->getSpecialClasses();
+        if ($specialClasses === null) {
+            // Nothing to do here.
             return;
         }
+        foreach ($specialClasses->getEventHandlersClasses() as $eventHandlerClass) {
+            $eventManager->unbindClass($eventHandlerClass);
+        }
+    }
 
-        // Only register the plugin if it implements the Gdn_IPlugin interface.
-        if (is_a($pluginClass, 'Gdn_IPlugin', true)) {
-            $eventManager->unbindClass($pluginClass);
-        } else {
-            trigger_error("$pluginClass does not implement Gdn_IPlugin", E_USER_DEPRECATED);
+    /**
+     * Apply addon configuration defaults, then reapply site specific configuration.
+     *
+     * @param \Gdn_Configuration $config
+     */
+    public function applyConfigDefaults(\Gdn_Configuration $config) {
+        // Load the configurations for enabled addons.
+        foreach ($this->getEnabled() as $addon) {
+            if ($specialClasses = $addon->getSpecialClasses()) {
+                foreach ($specialClasses->getAddonConfigurationClasses() as $configurationClass) {
+                    /** @var AddonConfigurationDefaults $instance */
+                    $instance = new $configurationClass;
+                    $config->touch($instance->getDefaults(), null, false);
+                }
+            }
+
+
+            if ($configPath = $addon->getSpecial('config')) {
+                $config->load($addon->path($configPath));
+            }
+        }
+
+        // Re-apply loaded user settings.
+        $config->overlayDynamic();
+    }
+
+    /**
+     * Configure addon container rules.
+     *
+     * @param Container $container
+     */
+    public function configureContainer(Container $container) {
+        $enabled = $this->getEnabled();
+        // do new ones first.
+        foreach ($enabled as $addon) {
+            $addon->configureContainer($container, 'new');
+        }
+
+        // Then the old ones.
+        foreach ($enabled as $addon) {
+            $addon->configureContainer($container, 'old');
         }
     }
 

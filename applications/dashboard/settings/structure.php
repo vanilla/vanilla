@@ -8,8 +8,11 @@
  * @since 2.0
  */
 
+use Vanilla\Dashboard\Models\RecordStatusModel;
 use Vanilla\Dashboard\UserPointsModel;
+use Vanilla\Scheduler\Job\JobStatusModel;
 use Vanilla\Theme\ThemeCache;
+use Vanilla\Theme\ThemeService;
 use Vanilla\Theme\ThemeServiceHelper;
 
 if (!defined('APPLICATION')) {
@@ -835,6 +838,9 @@ if ($Construct->columnExists('Plugins.Tagging.Add')) {
     $PermissionModel->define(['Vanilla.Tagging.Add' => 'Garden.Profiles.Edit']);
 }
 
+// Job status table.
+JobStatusModel::structure($Construct);
+
 $Construct->table('Log')
     ->primaryKey('LogID')
     ->column('Operation', ['Delete', 'Edit', 'Spam', 'Moderate', 'Pending', 'Ban', 'Error'], false, 'index')
@@ -874,7 +880,7 @@ $Construct->table('Regarding')
 
 $Construct->table('Ban')
     ->primaryKey('BanID')
-    ->column('BanType', ['IPAddress', 'Name', 'Email'], false, 'unique')
+    ->column('BanType', ['IPAddress', 'Name', 'Email', 'Fingerprint'], false, 'unique')
     ->column('BanValue', 'varchar(50)', false, 'unique')
     ->column('Notes', 'varchar(255)', null)
     ->column('CountUsers', 'uint', 0)
@@ -1009,6 +1015,130 @@ $Construct
     ->column("dateInserted", "datetime")
     ->column("dateUpdated", "datetime", false, ["index"])
     ->set($Explicit, $Drop);
+
+$recordStatusExists = $Construct->tableExists("recordStatus");
+
+$Construct->table("recordStatus")
+    ->primaryKey("statusID")
+    ->column("name", "varchar(100)", false, ["unique.recordTypeName"])
+    ->column("state", ["open", "closed"], "open")
+    ->column("recordType", "varchar(100)", false, ["index.recordType", "index.recordTypeSubType", "unique.recordTypeName"])
+    ->column("recordSubtype", "varchar(100)", null, ["index.recordTypeSubType"])
+    ->column("isDefault", "tinyint", 0)
+    ->column("isSystem", "tinyint", 0)
+    ->column("insertUserID", "int")
+    ->column("dateInserted", "datetime")
+    ->column("updateUserID", "int", null)
+    ->column("dateUpdated", "datetime", null)
+    ->set($Explicit, $Drop);
+
+// Create the default statuses to insert into the recordStatus table.
+$defaultStatusesData = [
+    [
+        'statusID' => RecordStatusModel::DISCUSSION_STATUS_UNANSWERED,
+        'name' => 'Unanswered',
+        'state' => 'open',
+        'recordType' => 'discussion',
+        'recordSubtype' => 'question',
+        'isDefault' => 1,
+        'isSystem' => 1
+    ],
+    [
+        'statusID' => RecordStatusModel::DISCUSSION_STATUS_ANSWERED,
+        'name' => 'Answered',
+        'state' => 'open',
+        'recordType' => 'discussion',
+        'recordSubtype' => 'question',
+        'isDefault' => 0,
+        'isSystem' => 1
+    ],
+    [
+        'statusID' => RecordStatusModel::DISCUSSION_STATUS_ACCEPTED,
+        'name' => 'Accepted',
+        'state' => 'closed',
+        'recordType' => 'discussion',
+        'recordSubtype' => 'question',
+        'isDefault' => 0,
+        'isSystem' => 1
+    ],
+    [
+        'statusID' => RecordStatusModel::DISCUSSION_STATUS_REJECTED,
+        'name' => 'Rejected',
+        'state' => 'open',
+        'recordType' => 'discussion',
+        'recordSubtype' => 'question',
+        'isDefault' => 0,
+        'isSystem' => 1
+    ],
+    [
+        'statusID' => RecordStatusModel::COMMENT_STATUS_ACCEPTED,
+        'name' => 'Accepted',
+        'state' => 'closed',
+        'recordType' => 'comment',
+        'recordSubtype' => 'answer',
+        'isDefault' => 0,
+        'isSystem' => 1
+    ],
+    [
+        'statusID' => RecordStatusModel::COMMENT_STATUS_REJECTED,
+        'name' => 'Rejected',
+        'state' => 'closed',
+        'recordType' => 'comment',
+        'recordSubtype' => 'answer',
+        'isDefault' => 0,
+        'isSystem' => 1
+    ],
+    [
+        'statusID' => RecordStatusModel::DISCUSSION_STATUS_UNRESOLVED,
+        'name' => 'Unresolved',
+        'state' => 'open',
+        'recordType' => 'discussion',
+        'recordSubtype' => 'discussion',
+        'isDefault' => 1,
+        'isSystem' => 1
+    ],
+    [
+        'statusID' => RecordStatusModel::DISCUSSION_STATUS_RESOLVED,
+        'name' => 'Resolved',
+        'state' => 'closed',
+        'recordType' => 'discussion',
+        'recordSubtype' => 'discussion',
+        'isDefault' => 0,
+        'isSystem' => 1
+    ],
+];
+
+foreach ($defaultStatusesData as $default) {
+    /** @var Gdn_DataSet $dataSet */
+    $dataSet = $SQL->getWhere('recordStatus', ['statusID' => $default['statusID']]);
+    if ($dataSet->numRows() == 0) {
+        // Add the default statuses if they're not already there.
+        $default = array_merge($default, ['insertUserID' => 1, 'dateInserted' => date('Y-m-d H:i:s')]);
+        $SQL->insert('recordStatus', $default);
+    } else {
+        // Ensure the row matches this definition
+        $row = array_intersect_key($dataSet->firstRow(DATASET_TYPE_ARRAY), $default);
+        $defaultDiff = array_diff_assoc($default, $row);
+        if (!empty($defaultDiff)) {
+            $SQL->update('recordStatus', $defaultDiff, ['statusID' => $default['statusID']])->put();
+        }
+    }
+}
+
+// Add a protected space for core/addon status IDs and ensure user-created statuses will have IDs outside it.
+$databaseName = Gdn::sql()->databaseName();
+$tableName = Gdn::sql()->prefixTable('recordStatus');
+$recordStatusAutoIncrementQuery = "SELECT `AUTO_INCREMENT` FROM INFORMATION_SCHEMA.TABLES ".
+    "WHERE TABLE_SCHEMA = '{$databaseName}' AND TABLE_NAME = '{$tableName}'";
+$dataSet = Gdn::sql()->query($recordStatusAutoIncrementQuery, "select");
+$autoIncRow = array_values($dataSet->firstRow('array'));
+$autoIncVal = intval($autoIncRow[0]);
+if ($autoIncVal < 10000) {
+    $recordStatusIDQuery = "alter table {$tableName} AUTO_INCREMENT=10000";
+    Gdn::sql()->query($recordStatusIDQuery, "update");
+}
+
+\Vanilla\Layouts\LayoutModel::structure($Database, $Explicit, $Drop);
 
 // If the AllIPAddresses column exists, attempt to migrate legacy IP data to the UserIP table.
 if (!$captureOnly && $AllIPAddressesExists) {
@@ -1146,9 +1276,8 @@ $themeHelper->saveCurrentThemeToVisible();
 
 
 // Clear out the theme cache in case any file based themes were updated.
-/** @var ThemeCache $themeCache */
-$themeCache = Gdn::getContainer()->get(ThemeCache::class);
-$themeCache->clear();
+$themeService = Gdn::getContainer()->get(ThemeService::class);
+$themeService->invalidateCache();
 
 // Ensure we have a secret setup in the site context.
 Gdn::config()->touch("Context.Secret", betterRandomString(32, "Aa0"));

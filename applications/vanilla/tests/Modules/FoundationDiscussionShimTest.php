@@ -38,14 +38,16 @@ class FoundationDiscussionShimTest extends SiteTestCase {
             'userID' => 2,
             'name' => 'circleci',
             'url' => 'http://vanilla.test/foundationdiscussionshimtest/profile/circleci',
-            'photoUrl' => 'http://vanilla.test/foundationdiscussionshimtest/applications/dashboard/design/images/defaulticon.png',
+            'photoUrl' => 'http://vanilla.test/foundationdiscussionshimtest'.\UserModel::PATH_DEFAULT_AVATAR,
             'banned' => 0,
+            'punished' => 0,
             'private' => false,
         ];
 
+        $id = $legacyItems[0]['DiscussionID'];
         $expected = [
             [
-                'discussionID' => 5,
+                'discussionID' => $id,
                 'type' => 'discussion',
                 'name' => 'Hello name!',
                 'excerpt' => 'Hello Discussion',
@@ -63,9 +65,10 @@ class FoundationDiscussionShimTest extends SiteTestCase {
                 'countViews' => 1,
                 'score' => null,
                 'hot' => 0,
-                'url' => 'http://vanilla.test/foundationdiscussionshimtest/discussion/5/hello-name',
-                'canonicalUrl' => 'http://vanilla.test/foundationdiscussionshimtest/discussion/5/hello-name',
+                'url' => "http://vanilla.test/foundationdiscussionshimtest/discussion/$id/hello-name",
+                'canonicalUrl' => "http://vanilla.test/foundationdiscussionshimtest/discussion/$id/hello-name",
                 'format' => 'text',
+                'statusID' => 0,
                 'bookmarked' => false,
                 'unread' => false,
                 'category' => [
@@ -84,6 +87,7 @@ class FoundationDiscussionShimTest extends SiteTestCase {
         unset($actual[0]['dateLastComment']);
         unset($actual[0]['insertUser']['dateLastActive']);
         unset($actual[0]['lastUser']['dateLastActive']);
+        unset($actual[0]['attributes']);
 
         $this->assertSame($expected, $actual);
     }

@@ -607,6 +607,13 @@ if (!function_exists('writeCommentForm')) :
         <?php
         } elseif (!$userCanComment) {
             if (!Gdn::session()->isValid()) {
+                if (Gdn::themeFeatures()->get("NewGuestModule")) {
+                    /** @var GuestModule  $guestModule */
+                    $guestModule = Gdn::getContainer()->get(GuestModule::class);
+                    $guestModule->setWidgetAlignment("center");
+                    $guestModule->setDesktopOnlyWidget(true);
+                    echo $guestModule;
+                } else {
                 ?>
                 <div class="Foot Closed pageBox">
                     <div class="Note Closed SignInOrRegister"><?php
@@ -624,6 +631,7 @@ if (!function_exists('writeCommentForm')) :
                     <?php //echo anchor(t('All Discussions'), 'discussions', 'TabLink'); ?>
                 </div>
             <?php
+                }
             }
         }
 

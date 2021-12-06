@@ -29,21 +29,29 @@ abstract class MockThemeTestCase extends MinimalContainerTestCase {
     /** @var MockAddonManager */
     protected $addonManager;
 
+
+
     /**
      * Prepare the container.
      */
-    public function setUp(): void {
-        parent::setUp();
-        $this->addonManager = self::container()->get(MockAddonManager::class);
-        $this->mockThemeProvider = self::container()->get(MockThemeProvider::class);
-
+    public function configureContainer(): void {
         // Fresh container.
-        self::configureContainer();
+        parent::configureContainer();
+
+        self::container()
+            // Instances.
+            ->rule(AddonManager::class)
+            ->setShared(true)
+            ->setClass(MockAddonManager::class)
+            ->setInstance(\Gdn_Cache::class, new \Gdn_Dirtycache())
+        ;
+
+        $this->addonManager = self::container()->get(AddonManager::class);
+        $this->mockThemeProvider = self::container()->get(MockThemeProvider::class);
 
         self::container()
             ->rule(ThemeService::class)
             ->addCall('addThemeProvider', [$this->mockThemeProvider])
-            ->setInstance(AddonManager::class, $this->addonManager)
         ;
     }
 

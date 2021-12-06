@@ -81,7 +81,7 @@ export default function BackLink(props: IProps) {
     if (props.onClick) {
         content = (
             <Button
-                buttonType={ButtonTypes.ICON_COMPACT}
+                buttonType={ButtonTypes.TEXT}
                 className={className}
                 aria-label={title as string}
                 title={title as string}
@@ -94,7 +94,7 @@ export default function BackLink(props: IProps) {
         // We can go back.
         content = (
             <Button
-                buttonType={ButtonTypes.ICON_COMPACT}
+                buttonType={ButtonTypes.TEXT}
                 className={className}
                 aria-label={title as string}
                 title={title as string}
@@ -110,7 +110,7 @@ export default function BackLink(props: IProps) {
     } else {
         content = (
             <LinkAsButton
-                buttonType={ButtonTypes.ICON_COMPACT}
+                buttonType={ButtonTypes.TEXT}
                 to={props.fallbackUrl ?? backFallbackUrl} // Only here for showing the URL on hover.
                 className={className}
                 aria-label={title as string}

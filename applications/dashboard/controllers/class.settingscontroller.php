@@ -2,7 +2,7 @@
 /**
  * Managing core Dashboard settings.
  *
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Dashboard
  * @since 2.0
@@ -646,7 +646,13 @@ class SettingsController extends DashboardController {
         $items = [
             'Garden.Profile.RedirectUrl' => [
                 'Control' => 'textbox',
-                'Description' => t("Custom URL to redirect the user instead of rendering Vanilla's profile page.")
+                'LabelCode' => t('"Profile" redirection URL'),
+                'Description' => t('Custom URL to redirect the user instead of rendering Vanilla\'s "Profile" page.')
+            ],
+            'Garden.Messages.Add.RedirectUrl' => [
+                'Control' => 'textbox',
+                'LabelCode' => t('"New Message" redirection URL'),
+                'Description' => t('Custom URL to redirect the user instead of rendering Vanilla\'s "New Message" page.')
             ]
         ];
 
@@ -663,8 +669,8 @@ class SettingsController extends DashboardController {
      * @access public
      * @param string $action Add, edit, delete, or none.
      * @param string $search Term to filter ban list by.
-     * @param int $page Page number.
-     * @param int $iD Ban ID we're editing or deleting.
+     * @param int|string $page Page number.
+     * @param int|string $iD Ban ID we're editing or deleting.
      */
     public function bans($action = '', $search = '', $page = '', $iD = '') {
         $this->permission('Garden.Settings.Manage');
@@ -916,6 +922,10 @@ class SettingsController extends DashboardController {
      * @throws Gdn_UserException
      */
     public function emailStyles() {
+        // Set default value for fullpost inclusions in email digests to `false`.
+        if (!c('Vanilla.Email.FullPost')) {
+            saveToConfig('Vanilla.Email.FullPost', false, false);
+        }
         // Set default colors
         if (!c('Garden.EmailTemplate.TextColor')) {
             saveToConfig('Garden.EmailTemplate.TextColor', EmailTemplate::DEFAULT_TEXT_COLOR, false);
@@ -937,6 +947,7 @@ class SettingsController extends DashboardController {
         $this->addJsFile('email.js');
 
         $configurationModule = new ConfigurationModule($this);
+
         $configurationModule->initialize([
             'Garden.EmailTemplate.Image' => [
                 'Control' => 'imageupload',
@@ -1108,6 +1119,51 @@ class SettingsController extends DashboardController {
                 $this->jsonTarget("#plaintext-toggle", $newToggle);
             }
         }
+        $this->render('Blank', 'Utility');
+    }
+
+    /**
+     * Manages the Vanilla.Email.FullPost setting.
+     *
+     * @param int $value Whether to enable full posts in emails.
+     * @throws Exception If it's not PostBack.
+     * @throws Gdn_UserException When an error is encountered.
+     */
+    public function toggleEmailFullpost(int $value): void {
+        Gdn::request()->isAuthenticatedPostBack(true);
+
+        $value = (bool)$value;
+
+        $this->permission('Garden.Community.Manage');
+        // We save the new config value.
+        saveToConfig('Vanilla.Email.FullPost', $value);
+        if ($value) {
+            // The new toggle would be ON & allow to turn OFF.
+            $newToggle = wrap(
+                anchor(
+                    '<div class="toggle-well"></div><div class="toggle-slider"></div>',
+                    '/dashboard/settings/toggleemailfullpost/0',
+                    'Hijack'
+                ),
+                'span',
+                ['class' => "toggle-wrap toggle-wrap-on"]
+            );
+            $this->informMessage(sprintf(t('%s enabled.'), t('Full post in email notifications')));
+        } else {
+            // The new toggle would be OFF & allow to turn ON.
+            $newToggle = wrap(
+                anchor(
+                    '<div class="toggle-well"></div><div class="toggle-slider"></div>',
+                    '/dashboard/settings/toggleemailfullpost/1',
+                    'Hijack'
+                ),
+                'span',
+                ['class' => "toggle-wrap toggle-wrap-off"]
+            );
+            $this->informMessage(sprintf(t('%s disabled.'), t('Full post in email notifications')));
+        }
+        // We replace the current toggle with a new one.
+        $this->jsonTarget("#enable-email-full-post-toggle", $newToggle);
         $this->render('Blank', 'Utility');
     }
 

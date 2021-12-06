@@ -772,4 +772,20 @@ class UserModelTest extends SiteTestCase {
             }
         });
     }
+
+    /**
+     * Test UserModel::RateLimit()
+     */
+    public function testRateLimitDisabled(): void {
+        $this->runWithConfig([
+            'Cache.Enabled' => false,
+        ], function () {
+            $newUserId = $this->createUser("newUserRateLimitDisabled".rand(1, 100000));
+            $user = $this->userModel->getID($newUserId, DATASET_TYPE_ARRAY);
+            $this->config->set('Garden.User.RateLimit', 0);
+            $this->userModel->saveAttribute($newUserId, ['LoginRate' => 2]);
+            $result = UserModel::rateLimit($user);
+            $this->assertTrue($result);
+        });
+    }
 }

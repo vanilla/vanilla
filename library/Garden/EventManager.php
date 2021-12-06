@@ -102,6 +102,13 @@ class EventManager implements EventDispatcherInterface, ListenerProviderInterfac
     }
 
     /**
+     * Unbind all event handlers.
+     */
+    public function unbindAll() {
+        $this->handlers = [];
+    }
+
+    /**
      * Bind a class' declared event handlers.
      *
      * Plugin classes declare event handlers in the following way:
@@ -124,9 +131,23 @@ class EventManager implements EventDispatcherInterface, ListenerProviderInterfac
      * @throws \InvalidArgumentException Throws an exception when binding to a class name with no `instance()` method.
      */
     public function bindClass($class, $priority = EventManager::PRIORITY_NORMAL) {
+        $psrEventMethods = [];
+        if (is_a($class, PsrEventHandlersInterface::class, true)) {
+            $psrEventMethods = $class::getPsrEventHandlerMethods();
+        }
+
+        $className = is_string($class) ? $class : get_class($class);
+        foreach ($psrEventMethods as $psrEventMethod) {
+            $this->addListenerMethod($className, $psrEventMethod);
+        }
+
         $methodNames = get_class_methods($class);
 
         foreach ($methodNames as $method) {
+            if (in_array($method, $psrEventMethods)) {
+                continue;
+            }
+
             if (strpos($method, '_') == false) { // == instead of === filters out methods starting with _
                 continue;
             }
@@ -464,8 +485,10 @@ class EventManager implements EventDispatcherInterface, ListenerProviderInterfac
      * {@inheritDoc}
      */
     public function dispatch(object $event) {
-        foreach ($this->getListenersForEvent($event) as $listener) {
+        $listeners = $this->getListenersForEvent($event);
+        foreach ($listeners as $listener) {
             $event = $listener($event);
+
             if ($event instanceof StoppableEventInterface && $event->isPropagationStopped()) {
                 return $event;
             }

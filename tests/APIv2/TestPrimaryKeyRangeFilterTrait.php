@@ -25,7 +25,6 @@ trait TestPrimaryKeyRangeFilterTrait {
 
         [$minID, $maxID] = $this->minMaxIDs($rows);
 
-        /** @var HttpResponse $r */
         $r = $this->api()->get(
             $this->baseUrl,
             [

@@ -10,13 +10,13 @@ namespace VanillaTests\Library\Vanilla\Models;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Models\Model;
+use VanillaTests\BootstrapTestCase;
 use VanillaTests\BootstrapTrait;
 
 /**
  * Tests for the `Model` class.
  */
-class ModelTest extends TestCase {
-    use BootstrapTrait;
+class ModelTest extends BootstrapTestCase {
 
     /**
      * @var Model
@@ -27,6 +27,7 @@ class ModelTest extends TestCase {
      * @inheritDoc
      */
     public function setUp(): void {
+        parent::setUp();
         $this->container()->call(function (
             \Gdn_DatabaseStructure $st,
             \Gdn_SQLDriver $sql

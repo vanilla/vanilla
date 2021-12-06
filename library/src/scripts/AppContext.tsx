@@ -2,6 +2,7 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
+import { DiscussionCheckboxProvider } from "@library/features/discussions/DiscussionCheckboxContext";
 import { DeviceProvider } from "@library/layout/DeviceContext";
 import { FontSizeCalculatorProvider } from "@library/layout/pageHeadingContext";
 import { ScrollOffsetProvider } from "@library/layout/ScrollOffsetContext";
@@ -23,6 +24,8 @@ import { BannerContextProviderNoHistory } from "@library/banner/BannerContext";
 import { SearchFormContextProvider } from "@library/search/SearchFormContextProvider";
 import { EntryLinkContextProvider } from "@library/contexts/EntryLinkContext";
 import { css } from "@emotion/css";
+import { ApiV2Context } from "@library/apiv2";
+import { ToastProvider } from "@library/features/toaster/ToastContext";
 
 interface IProps {
     children: React.ReactNode;
@@ -61,6 +64,7 @@ export function AppContext(props: IProps) {
     const content = composeProviders(
         [
             [Provider, { store }],
+            ApiV2Context,
             LocaleProvider,
             SearchContextProvider,
             ContentTranslationProvider,
@@ -82,6 +86,8 @@ export function AppContext(props: IProps) {
             BannerContextProviderNoHistory,
             EntryLinkContextProvider,
             DeviceProvider,
+            ToastProvider,
+            DiscussionCheckboxProvider,
         ],
         props.children,
     );

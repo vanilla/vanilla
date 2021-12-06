@@ -63,7 +63,7 @@ class UserSearchType extends AbstractSearchType {
     /**
      * @inheritdoc
      */
-    public function getSearchGroup(): string {
+    public function getRecordType(): string {
         return 'user';
     }
 
@@ -92,7 +92,7 @@ class UserSearchType extends AbstractSearchType {
                 $mapped = ArrayUtils::remapProperties($result, [
                     'recordID' => 'userID',
                 ]);
-                $mapped['recordType'] = $this->getSearchGroup();
+                $mapped['recordType'] = $this->getRecordType();
                 $mapped['type'] = $this->getType();
                 $mapped['userInfo'] = $result;
 
@@ -239,7 +239,7 @@ class UserSearchType extends AbstractSearchType {
         $hasSiteScope = $query->getQueryParameter('scope', 'site') === 'site';
         $types = $query->getQueryParameter('types', []);
         $recordTypes = $query->getQueryParameter('recordTypes', []);
-        if (!$hasSiteScope && (in_array($this->getType(), $types) || in_array($this->getSearchGroup(), $recordTypes))) {
+        if (!$hasSiteScope && (in_array($this->getType(), $types) || in_array($this->getRecordType(), $recordTypes))) {
             throw new ClientException('Cannot search users with any scope other than `site`.', 422);
         }
 

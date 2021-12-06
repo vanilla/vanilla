@@ -227,15 +227,19 @@ class FlaggingPlugin extends Gdn_Plugin {
         list($context, $elementID, $elementAuthorID, $elementAuthor) = $arguments;
 
         // Verify user has permission on that discussion
-        if ($elementID && !$this->discussionModel->canView($elementID, $userID)) {
+        if (strtolower($context) === "discussion") {
+            $discussionID = $elementID;
+        } elseif (strtolower($context) === "comment") {
+            $comment = $this->commentModel->getID($elementID);
+            $discussionID = $comment->DiscussionID;
+        }
+
+        if ($discussionID && !$this->discussionModel->canView($discussionID, $userID)) {
             throw permissionException('Vanilla.Discussions.View');
         }
 
-        if ($context === "comment") {
-            $row = $this->commentModel->getID($elementID);
-            if ($row) {
-                $url = commentUrl($row, false);
-            }
+        if (isset($comment)) {
+            $url = commentUrl($comment, false);
         } else {
             $row = $this->discussionModel->getID($elementID);
             if ($row) {

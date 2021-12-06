@@ -11,6 +11,7 @@ use Vanilla\CurrentTimeStamp;
 use Vanilla\FeatureFlagHelper;
 use VanillaTests\EventSpyTestTrait;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
+use VanillaTests\UsersAndRolesApiTestTrait;
 
 /**
  * HTML generation for the community in foundation.
@@ -19,6 +20,7 @@ class CommunityStorybookTest extends StorybookGenerationTestCase {
 
     use CommunityApiTestTrait;
     use EventSpyTestTrait;
+    use UsersAndRolesApiTestTrait;
 
     /** @var string[] */
     public static $addons = ["IndexPhotos"];
@@ -233,6 +235,34 @@ class CommunityStorybookTest extends StorybookGenerationTestCase {
                 ['Vanilla.AdminCheckboxes.Use' => true],
                 'Discussion Comment List (Checkboxes)',
             ],
+        ];
+    }
+
+    /**
+     * Test NewGuestModule on discussion page.
+     *
+     * @param array $config
+     * @param string $name
+     *
+     * @dataProvider provideCommentListForGuest
+     * @depends testSetup
+     */
+    public function testNewGuestModule(array $config, string $name) {
+        $this->runWithUser(function () use ($name) {
+            $id = self::$commentedDiscussionID;
+            $this->generateStoryHtml("/discussion/{$id}", $name);
+        }, \UserModel::GUEST_USER_ID);
+    }
+
+    /**
+     * @return array[]
+     */
+    public function provideCommentListForGuest(): array {
+        return [
+            'Normal' => [
+                [],
+                'NewGuestModule In discussion and panel',
+            ]
         ];
     }
 

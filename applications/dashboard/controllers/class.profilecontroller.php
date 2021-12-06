@@ -128,12 +128,10 @@ class ProfileController extends Gdn_Controller {
     /**
      * Show activity feed for this user.
      *
-     * @since 2.0.0
-     * @access public
-     * @param mixed $userReference Unique identifier, possible ID or username.
+     * @param int|string $userReference Unique identifier, possible ID or username.
      * @param string $username Username.
-     * @param int $userID Unique ID.
-     * @param int $offset How many to skip (for paging).
+     * @param int|string $userID Unique ID.
+     * @param int|string $page How many to skip (for paging).
      */
     public function activity($userReference = '', $username = '', $userID = '', $page = '') {
         $this->permission('Garden.Profiles.View');
@@ -259,10 +257,8 @@ class ProfileController extends Gdn_Controller {
     /**
      * Generic way to get count via UserModel->profileCount().
      *
-     * @since 2.0.?
-     * @access public
      * @param string $column Name of column to count for this user.
-     * @param int $userID Defaults to current session.
+     * @param int|false $userID Defaults to current session.
      */
     public function count($column, $userID = false) {
         $column = 'Count'.ucfirst($column);
@@ -444,6 +440,7 @@ class ProfileController extends Gdn_Controller {
             $originalFormValues = (isset($originalSubmission))
                 ? json_decode($originalSubmission, true)
                 : null;
+            $emailChanged = false;
             if (isset($originalFormValues['Email'])) {
                 $emailChanged = $originalFormValues &&  $originalFormValues['Email'] !== $user['Email'];
             }
@@ -558,11 +555,9 @@ class ProfileController extends Gdn_Controller {
      *
      * If current user's profile, get notifications. Otherwise show their activity (if available) or discussions.
      *
-     * @since 2.0.0
-     * @access public
-     * @param mixed $user Unique identifier, possible ID or username.
+     * @param int|string $user Unique identifier, possible ID or username.
      * @param string $username .
-     * @param int $userID Unique ID.
+     * @param int|string $userID Unique ID.
      */
     public function index($user = '', $username = '', $userID = '', $page = false) {
         $this->editMode(false);
@@ -671,7 +666,7 @@ class ProfileController extends Gdn_Controller {
         // Allow page manipulation
         $this->EventArguments['Page'] = &$page;
         $this->EventArguments['Offset'] = &$offset;
-        $this->EventArguments['Limit'] = &$Limit;
+        $this->EventArguments['Limit'] = &$limit;
         /** @var \Garden\EventManager $eventManager */
         $eventManager = Gdn::getContainer()->get(\Garden\EventManager::class);
         $eventManager->fire('AfterPageCalculation');
@@ -784,9 +779,7 @@ class ProfileController extends Gdn_Controller {
     /**
      * Show notifications for current user.
      *
-     * @since 2.0.0
-     * @access public
-     * @param int $page Number to skip (paging).
+     * @param int|false $page Number to skip (paging).
      */
     public function notifications($page = false) {
         $this->permission('Garden.SignIn.Allow');
@@ -1184,11 +1177,9 @@ class ProfileController extends Gdn_Controller {
     /**
      * Edit user's preferences (mostly notification settings).
      *
-     * @since 2.0.0
-     * @access public
-     * @param mixed $userReference Unique identifier, possibly username or ID.
+     * @param int|string $userReference Unique identifier, possibly username or ID.
      * @param string $username .
-     * @param int $userID Unique identifier.
+     * @param int|string $userID Unique identifier.
      */
     public function preferences($userReference = '', $username = '', $userID = '') {
         $this->addJsFile('profile.js');
@@ -1280,10 +1271,23 @@ class ProfileController extends Gdn_Controller {
             }
         }
         $currentPrefs = array_merge($currentPrefs, $metaPrefs);
+
+        //if user does not have the permission, we set user email preferences to false
+        if (!$session->checkPermission('Garden.Email.View')) {
+            foreach ($currentPrefs as $pref => $val) {
+                if (is_string($pref) && str_contains($pref, 'Email')) {
+                    $currentPrefs[$pref] = $val === false || $val === "0" ? $val : false;
+                    if ($userPrefs && array_key_exists($pref, $userPrefs)) {
+                        $userPrefs[$pref] = false;
+                    }
+                }
+            }
+        }
+
         $currentPrefs = array_map('intval', $currentPrefs);
         $this->setData('Preferences', $currentPrefs);
 
-        if (UserModel::noEmail()) {
+        if (UserModel::noEmail() || !$session->checkPermission('Garden.Email.View')) {
             $this->PreferenceGroups = self::_removeEmailPreferences($this->PreferenceGroups);
             $this->PreferenceTypes = self::_removeEmailPreferences($this->PreferenceTypes);
             $this->setData('NoEmail', true);
@@ -1294,6 +1298,7 @@ class ProfileController extends Gdn_Controller {
         $this->setData('PreferenceList', $this->Preferences);
 
         if ($this->Form->authenticatedPostBack()) {
+            $formValues = $this->Form->formValues();
             // Get, assign, and save the preferences.
             $newMetaPrefs = [];
             foreach ($this->Preferences as $prefGroup => $prefs) {
@@ -1323,12 +1328,22 @@ class ProfileController extends Gdn_Controller {
                 }
             }
 
+            //we double check $userPrefs after we get form values,
+            //in case user has permission change, but the form is not re-submitted
+            if (!$session->checkPermission('Garden.Email.View')) {
+                foreach ($userPrefs as $pref => $val) {
+                    if (is_string($pref) && str_contains($pref, 'Email')) {
+                        $userPrefs[$pref] = false;
+                    }
+                }
+            }
+
             $this->UserModel->savePreference($this->User->UserID, $userPrefs);
             UserModel::setMeta($this->User->UserID, $newMetaPrefs, 'Preferences.');
 
             $this->setData('Preferences', array_merge($this->data('Preferences', []), $userPrefs, $newMetaPrefs));
 
-            if (count($this->Form->errors() == 0)) {
+            if (empty($this->Form->errors())) {
                 $this->informMessage(sprite('Check', 'InformSprite').t('Your preferences have been saved.'), 'Dismissable AutoDismiss HasSprite');
             }
         } else {
@@ -1451,9 +1466,7 @@ class ProfileController extends Gdn_Controller {
     /**
      * Let user send an invitation.
      *
-     * @since 2.0.0
-     * @access public
-     * @param int $invitationID Unique identifier.
+     * @param int|string $invitationID Unique identifier.
      */
     public function sendInvite($invitationID = '') {
         if (!$this->Form->authenticatedPostBack()) {
@@ -1513,9 +1526,9 @@ class ProfileController extends Gdn_Controller {
     /**
      * Edit user's preferences (mostly notification settings).
      *
-     * @param mixed $userReference Unique identifier, possibly username or ID.
+     * @param int|string $userReference Unique identifier, possibly username or ID.
      * @param string $username .
-     * @param int $userID Unique identifier.
+     * @param int|string $userID Unique identifier.
      */
     public function tokens($userReference = '', $username = '', $userID = '') {
         $this->addJsFile('profile.js');
@@ -1905,11 +1918,9 @@ EOT;
     /**
      * Retrieve the user to be manipulated. Defaults to current user.
      *
-     * @since 2.0.0
-     * @access public
-     * @param mixed $User Unique identifier, possibly username or ID.
-     * @param string $username .
-     * @param int $userID Unique ID.
+     * @param int|string $userReference Unique identifier, possibly username or ID.
+     * @param string $username The username slug.
+     * @param int|string $userID Unique ID.
      * @param bool $checkPermissions Whether or not to check user permissions.
      * @return bool Always true.
      */
@@ -1919,7 +1930,7 @@ EOT;
         }
 
         if (!c('Garden.Profile.Public') && !Gdn::session()->isValid()) {
-            throw permissionException();
+            throw permissionException('@'.t(self::PRIVATE_PROFILE));
         }
 
         // If a UserID was provided as a querystring parameter, use it over anything else:

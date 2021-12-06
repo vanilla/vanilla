@@ -27,14 +27,16 @@ use Vanilla\Scheduler\Job\JobExecutionType;
 use Vanilla\Scheduler\Job\JobInterface;
 use Vanilla\Scheduler\Job\JobPriority;
 use Vanilla\Scheduler\Job\JobPriorityAwareInterface;
+use Vanilla\Scheduler\Job\JobStatusModel;
 use Vanilla\Scheduler\Job\JobTrackingIdAwareInterface;
 use Vanilla\Scheduler\Job\JobTypeAwareInterface;
+use Vanilla\Scheduler\Job\TrackableJobAwareInterface;
 use Vanilla\Scheduler\Meta\SchedulerControlMeta;
 use Vanilla\Scheduler\Meta\SchedulerMetaDao;
 use Vanilla\Utility\Timers;
 
 /**
- * DummyScheduler
+ * DeferredScheduler.
  *
  * a.k.a first-in-first-out after-response event-fired scheduler
  *
@@ -61,6 +63,9 @@ class DummyScheduler implements SchedulerInterface {
 
     /** @var EventManager */
     protected $eventManager = null;
+
+    /** @var JobStatusModel */
+    protected $jobStatusModel;
 
     /** @var string */
     protected $dispatchEventName = null;
@@ -96,6 +101,7 @@ class DummyScheduler implements SchedulerInterface {
      * @param Gdn_Cache $cache
      * @param ConfigurationInterface $config
      * @param Timers $timers
+     * @param JobStatusModel $jobStatusModel
      */
     public function __construct(
         ContainerInterface $container,
@@ -104,7 +110,8 @@ class DummyScheduler implements SchedulerInterface {
         SchedulerMetaDao $schedulerMetaDao,
         Gdn_Cache $cache,
         ConfigurationInterface $config,
-        Timers $timers
+        Timers $timers,
+        JobStatusModel $jobStatusModel
     ) {
         $this->logger = $logger;
         $this->container = $container;
@@ -114,6 +121,7 @@ class DummyScheduler implements SchedulerInterface {
         $this->config = $config;
         $this->timers = $timers;
         $this->executionType = JobExecutionType::normal();
+        $this->jobStatusModel = $jobStatusModel;
     }
 
     /**
@@ -284,6 +292,10 @@ class DummyScheduler implements SchedulerInterface {
             $job->setDelay($jobDescriptor->getDelay());
         }
 
+        if ($jobDescriptor instanceof TrackableJobAwareInterface && $job instanceof TrackableJobAwareInterface) {
+            $job->setTrackingUserID($jobDescriptor->getTrackingUserID());
+        }
+
         // Type, Priority & Delay are set before the message, so the message could overwrite those values if needed
         $job->setMessage($jobDescriptor->getMessage());
 
@@ -293,8 +305,12 @@ class DummyScheduler implements SchedulerInterface {
 
                 $trackingSlip = new TrackingSlip($jobInterface, $driverSlip, $jobDescriptor, $this->logger, $this->config);
 
-                if ($job instanceof JobTrackingIdAwareInterface) {
-                    $job->setTrackingId($trackingSlip->getTrackingId());
+                if ($job instanceof TrackableJobAwareInterface) {
+                    $job->setTrackingID($trackingSlip->getTrackingID());
+
+                    if ($trackingUserID = $job->getTrackingUserID()) {
+                        $this->jobStatusModel->insertDriverSlip($driverSlip, $trackingUserID);
+                    }
                 }
 
                 $trackingSlip->log();
@@ -458,6 +474,9 @@ class DummyScheduler implements SchedulerInterface {
                 $trackingSlip->stop();
                 $trackingSlip->log();
                 $this->timers->stop(lcfirst($this->dispatchEventName));
+                if (isset($driverSlip)) {
+                    $this->jobStatusModel->updateDriverSlip($driverSlip);
+                }
             }
         }
 
@@ -481,6 +500,13 @@ class DummyScheduler implements SchedulerInterface {
         }
         // Reset the internal pointer to hopefully avoid unexpected behavior.
         reset($this->trackingSlips);
+    }
+
+    /**
+     * Reset the scheduler.
+     */
+    public function reset() {
+        $this->trackingSlips = [];
     }
 
     /**

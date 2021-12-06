@@ -153,9 +153,12 @@ class TwigEnhancer {
      */
     public function fireEchoEvent(string $eventName, array &$args = []): \Twig\Markup {
         ob_start();
-        $this->eventManager->fire($eventName, $args);
-        $echoedOutput = ob_get_contents();
-        ob_end_clean();
+        try {
+            $this->eventManager->fire($eventName, $args);
+            $echoedOutput = ob_get_contents();
+        } finally {
+            ob_end_clean();
+        }
         return new \Twig\Markup($echoedOutput, 'utf-8');
     }
 
@@ -172,12 +175,15 @@ class TwigEnhancer {
      */
     public function firePluggableEchoEvent(\Gdn_Pluggable $pluggable, string $eventName, array &$args = [], string $fireAs = ''): \Twig\Markup {
         ob_start();
-        if ($fireAs  !== '') {
-            $pluggable->fireAs($fireAs);
+        try {
+            if ($fireAs  !== '') {
+                $pluggable->fireAs($fireAs);
+            }
+            $pluggable->fireEvent($eventName, $args);
+            $echoedOutput = ob_get_contents();
+        } finally {
+            ob_end_clean();
         }
-        $pluggable->fireEvent($eventName, $args);
-        $echoedOutput = ob_get_contents();
-        ob_end_clean();
         return new \Twig\Markup($echoedOutput, 'utf-8');
     }
 
@@ -205,7 +211,8 @@ class TwigEnhancer {
         if (!$controller) {
             return new \Twig\Markup("Could not render an asset without a Gdn_Controller instance", "utf-8");
         }
-        return $controller->renderAssetForTwig($assetName);
+        $result = $controller->renderAssetForTwig($assetName);
+        return $result;
     }
 
     /**

@@ -4,8 +4,10 @@
  * @license GPL-2.0-only
  */
 
+import { containerVariables } from "@library/layout/components/containerStyles";
 import { bindActionCreators, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { useReducer, useMemo, useEffect } from "react";
+import clamp from "lodash/clamp";
+import { useReducer, useMemo, useEffect, useDebugValue } from "react";
 import { useSwipeable } from "react-swipeable";
 interface CarouselState {
     desiredIndex: number;
@@ -72,10 +74,11 @@ const carouselSlice = createSlice({
     },
 });
 
-export function useCarousel(slidesLength: number, sliderWidth: number, options: CarouselOptions = {}) {
+export function useCarousel(countSlides: number, sliderWidth: number, options: CarouselOptions = {}) {
     const { toShow = 1, childWidth = 0, sliderWrapper } = options;
     const [state, dispatch] = useReducer(carouselSlice.reducer, initCarouselState);
     let sliderPosition: number = toShow === 1 ? -20 : 0;
+    const totalMobileGutter = containerVariables().spacing.mobile.padding * 4;
 
     const actions = useMemo(
         () =>
@@ -99,7 +102,7 @@ export function useCarousel(slidesLength: number, sliderWidth: number, options: 
 
             if (horizontalSwipe) {
                 if (dir === "Left") {
-                    distanceSwipe = state.desiredIndex + toShow >= slidesLength ? 0 : halfSwiped;
+                    distanceSwipe = state.desiredIndex + toShow >= countSlides ? 0 : halfSwiped;
                 } else if (dir === "Right") {
                     distanceSwipe = state.desiredIndex === 0 ? 0 : halfSwiped;
                 }
@@ -121,7 +124,7 @@ export function useCarousel(slidesLength: number, sliderWidth: number, options: 
             //Stop sliding beyond limits
             if (
                 (e.dir === "Right" && state.desiredIndex === 0) ||
-                (e.dir === "Left" && state.desiredIndex + toShow >= slidesLength) ||
+                (e.dir === "Left" && state.desiredIndex + toShow >= countSlides) ||
                 e.dir === "Down" ||
                 e.dir === "Up"
             ) {
@@ -139,7 +142,7 @@ export function useCarousel(slidesLength: number, sliderWidth: number, options: 
                 actions.prev({ toShow, desiredIndex });
             }
         },
-        trackMouse: false,
+        trackMouse: true,
         trackTouch: true,
         preventDefaultTouchmoveEvent: true,
     });
@@ -152,8 +155,8 @@ export function useCarousel(slidesLength: number, sliderWidth: number, options: 
         //next
         let currentIndex: number = state.activeIndex + toShow;
         //adjust currentIndex to avoid gap at the end of the slider
-        if (currentIndex + toShow > slidesLength) {
-            currentIndex = slidesLength - toShow;
+        if (currentIndex + toShow > countSlides) {
+            currentIndex = countSlides - toShow;
         }
 
         if (toShow === 1 && currentIndex >= 1) {
@@ -175,11 +178,48 @@ export function useCarousel(slidesLength: number, sliderWidth: number, options: 
         }
     }
 
-    return {
+    // The logic here is pretty ugly but we have a case special when we can only display one item,
+    // To prevent us from offsetting past these edges we have clamp the edges.
+    //
+    //   Display first item with only 1 space to display.
+    //   -----------------------------------------|
+    //  |   ------------------------   -----------|
+    //  |   |                      |   |          |
+    //  |   |        Item 1        |   |    Item 2|
+    //  |   |                      |   |          |
+    //  |   |______________________|   |__________|
+    //  |_________________________________________|
+    //
+    //
+    //   Display last item with only 1 space to display.
+    //   -----------------------------------------|
+    //  |--------    --------------------------   |
+    //  |       |   |                          |  |
+    //  |Item 8 |   |       Item 9             |  |
+    //  |       |   |                          |  |
+    //  |_______|   |__________________________|  |
+    //  |_________________________________________|
+
+    const minimumOffset = totalMobileGutter;
+    const maximumOffset = childWidth * (countSlides - 1) - totalMobileGutter;
+
+    const result = {
         activeIndex: state.activeIndex,
         desiredIndex: state.desiredIndex,
         actions,
         handlers,
-        sliderPosition,
+        sliderPosition: clamp(sliderPosition, -maximumOffset, minimumOffset),
     };
+    useDebugValue({
+        result,
+        params: {
+            minimumOffset,
+            maximumOffset,
+            childWidth,
+            countSlides,
+            toShow,
+        },
+    });
+
+    return result;
 }

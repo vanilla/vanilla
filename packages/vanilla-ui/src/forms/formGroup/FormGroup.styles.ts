@@ -19,7 +19,7 @@ export const formGroupClasses = ({ sideBySide, compact }: FormGroupClassesProps)
             ? {
                   display: "flex",
                   flexDirection: "row",
-                  alignItems: "center",
+                  alignItems: "baseline",
                   justifyContent: "space-between",
 
                   ...(compact
@@ -39,7 +39,7 @@ export const formGroupClasses = ({ sideBySide, compact }: FormGroupClassesProps)
         ...(sideBySide ? { flex: 12 } : {}),
     }),
     labelContainer: css({
-        ...(sideBySide ? { flex: 10 } : { marginBottom: 8 }),
+        ...(sideBySide ? { flex: 6 } : { marginBottom: 8 }),
     }),
     label: css({
         fontSize: "14px",

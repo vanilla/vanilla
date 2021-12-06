@@ -11,14 +11,14 @@ use CivilTongueEx\Library\ContentFilter;
 use Garden\Container\Container;
 use PHPUnit\Framework\TestCase;
 use VanillaTests\SetupTraitsTrait;
+use VanillaTests\SiteTestCase;
 use VanillaTests\SiteTestTrait;
 
 /**
  * Class ContentFilterTest
  */
-class ContentFilterTest extends TestCase {
+class ContentFilterTest extends SiteTestCase {
 
-    use SiteTestTrait;
     use SetupTraitsTrait;
 
     /** @var ContentFilter */
@@ -34,15 +34,6 @@ class ContentFilterTest extends TestCase {
     }
 
     /**
-     * Bootstrap ContentFilter
-     */
-    public static function setUpBeforeClass(): void {
-        parent::setUpBeforeClass();
-        require PATH_ROOT.'/plugins/CivilTongueEx/Library/ContentFilter.php';
-        self::setUpBeforeClassTestTraits();
-    }
-
-    /**
      * Configure the container before addons are started.
      *
      * @param Container $container
@@ -50,14 +41,6 @@ class ContentFilterTest extends TestCase {
     public static function configureContainerBeforeStartup(Container $container) {
         self::$contentFilter = new ContentFilter();
         $container->setInstance(ContentFilter::class, self::$contentFilter);
-    }
-
-    /**
-     * Create a new ContentFilter instance for testing.
-     */
-    public function setUp(): void {
-        parent::setUp();
-        $this->setUpTestTraits();
     }
 
     /**

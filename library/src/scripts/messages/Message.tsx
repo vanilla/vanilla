@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { RefObject } from "react";
 import classNames from "classnames";
 import { t } from "@library/utility/appUtils";
 import { LiveMessage } from "react-aria-live";
@@ -14,6 +14,7 @@ import Container from "@library/layout/components/Container";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
+import { cx } from "@emotion/css";
 
 export interface IMessageProps {
     className?: string;
@@ -26,12 +27,12 @@ export interface IMessageProps {
     cancelText?: React.ReactNode;
     isFixed?: boolean;
     isContained?: boolean;
-    title?: string;
+    title?: React.ReactNode;
     isActionLoading?: boolean;
     icon?: React.ReactNode | false;
 }
 
-export default function Message(props: IMessageProps) {
+export const Message = React.forwardRef(function Message(props: IMessageProps, ref: RefObject<HTMLDivElement>) {
     const classes = messagesClasses();
 
     // When fixed we need to apply an extra layer for padding.
@@ -54,15 +55,16 @@ export default function Message(props: IMessageProps) {
     return (
         <>
             <div
-                className={classNames(classes.root, props.className, {
+                ref={ref}
+                className={cx(classes.root, props.className, {
                     [classes.fixed]: props.isFixed,
                 })}
             >
                 <OuterWrapper>
                     <div
-                        className={classNames(classes.wrap, props.className, {
+                        className={cx(classes.wrap, {
                             [classes.fixed]: props.isContained,
-                            [classes.hasIcon]: !!props.icon,
+                            [classes.wrapWithIcon]: !!props.icon,
                         })}
                     >
                         <InnerWrapper>
@@ -101,7 +103,7 @@ export default function Message(props: IMessageProps) {
                                 <Button
                                     buttonType={ButtonTypes.TEXT}
                                     onClick={props.onConfirm}
-                                    className={classNames(classes.actionButton, classes.actionButtonPrimary)}
+                                    className={cx(classes.actionButton, classes.actionButtonPrimary)}
                                     disabled={!!props.isActionLoading}
                                 >
                                     {props.isActionLoading ? <ButtonLoader /> : props.confirmText || t("OK")}
@@ -115,4 +117,6 @@ export default function Message(props: IMessageProps) {
             <LiveMessage clearOnUnmount={!!props.clearOnUnmount} message={props.stringContents} aria-live="assertive" />
         </>
     );
-}
+});
+
+export default Message;

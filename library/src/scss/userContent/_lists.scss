@@ -43,9 +43,6 @@ $nestedList-margin: 0 0 0 1em;
         }
     }
     ul {
-        > li {
-            list-style: disc !important;
-        }
         ol,
         ul {
             margin: $nestedList-margin;

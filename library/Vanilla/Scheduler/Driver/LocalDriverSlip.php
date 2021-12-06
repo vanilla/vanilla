@@ -9,11 +9,14 @@ namespace Vanilla\Scheduler\Driver;
 
 use Vanilla\Scheduler\Job\JobExecutionStatus;
 use Vanilla\Scheduler\Job\LocalJobInterface;
+use Vanilla\Scheduler\Job\TrackableJobAwareTrait;
 
 /**
  * LocalDriverSlip
  */
 class LocalDriverSlip implements DriverSlipInterface {
+
+    use TrackableJobAwareTrait;
 
     /** @var string */
     protected $id;
@@ -42,11 +45,18 @@ class LocalDriverSlip implements DriverSlipInterface {
     }
 
     /**
-     * Get id
+     * Get the underlying job.
+     */
+    public function getJob(): LocalJobInterface {
+        return $this->job;
+    }
+
+    /**
+     * Get ID.
      *
      * @return string
      */
-    public function getId(): string {
+    public function getID(): string {
         return $this->id;
     }
 
@@ -126,23 +136,5 @@ class LocalDriverSlip implements DriverSlipInterface {
      */
     public function getType(): string {
         return preg_replace('/\\\\/', '_', get_class($this->job));
-    }
-
-    /**
-     * GetTrackingId
-     *
-     * @return string|null
-     */
-    public function getTrackingId(): ?string {
-        return $this->trackingId;
-    }
-
-    /**
-     * SetTrackingId
-     *
-     * @param string $trackingId
-     */
-    public function setTrackingId(string $trackingId): void {
-        $this->trackingId = $trackingId;
     }
 }

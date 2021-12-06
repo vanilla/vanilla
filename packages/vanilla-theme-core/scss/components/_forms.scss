@@ -227,6 +227,12 @@ li.token-input-token {
     @include Tag;
 }
 
+.input-wrap-multiple {
+    & > * {
+        margin-right: 6px;
+    }
+}
+
 div.token-input-dropdown {
     border: none;
     border-top: $component_border;
@@ -263,6 +269,7 @@ div.token-input-dropdown {
     select {
         appearance: none;
         width: 100%;
+        padding-right: 24px;
     }
 
     &::after {

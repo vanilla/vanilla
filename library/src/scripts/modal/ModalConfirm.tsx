@@ -21,13 +21,14 @@ import React from "react";
 import { frameBodyClasses } from "@library/layout/frame/frameBodyStyles";
 import { frameFooterClasses } from "@library/layout/frame/frameFooterStyles";
 import LinkAsButton from "@library/routing/LinkAsButton";
+import { cx } from "@emotion/css";
 
 interface IProps {
     title: React.ReactNode; // required for accessibility
     srOnlyTitle?: boolean;
     className?: string;
-    onCancel?: (e: Event) => void;
-    onConfirm?: (e: Event) => void;
+    onCancel?: (e: React.SyntheticEvent) => void;
+    onConfirm?: (e: React.SyntheticEvent) => void;
     confirmLinkTo?: string;
     confirmTitle?: string;
     children: React.ReactNode;
@@ -36,6 +37,8 @@ interface IProps {
     elementToFocusOnExit?: HTMLElement;
     size?: ModalSizes;
     isVisible: boolean;
+    fullWidthContent?: boolean;
+    bodyClassName?: string;
 }
 
 /**
@@ -55,6 +58,7 @@ export default class ModalConfirm extends React.Component<IProps> {
             title,
             children,
             size,
+            fullWidthContent,
         } = this.props;
         const onCancel = this.handleCancel;
         const classesFrameBody = frameBodyClasses();
@@ -79,9 +83,27 @@ export default class ModalConfirm extends React.Component<IProps> {
                     }
                     body={
                         <FrameBody>
-                            <SmartAlign className={classNames("frameBody-contents", classesFrameBody.contents)}>
-                                {children}
-                            </SmartAlign>
+                            {fullWidthContent ? (
+                                <div
+                                    className={cx(
+                                        "frameBody-contents",
+                                        classesFrameBody.contents,
+                                        this.props.bodyClassName,
+                                    )}
+                                >
+                                    {children}
+                                </div>
+                            ) : (
+                                <SmartAlign
+                                    className={cx(
+                                        "frameBody-contents",
+                                        classesFrameBody.contents,
+                                        this.props.bodyClassName,
+                                    )}
+                                >
+                                    {children}
+                                </SmartAlign>
+                            )}
                         </FrameBody>
                     }
                     footer={

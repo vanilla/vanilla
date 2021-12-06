@@ -319,6 +319,7 @@ jQuery(document).ready(function($) {
                 success: function(json) {
                     $(msg).afterTrigger(json.Data);
                     $(msg).hide();
+                    $(msg).addClass("Hidden");
                     $(document).trigger('EditCommentFormLoaded', [container]);
 
                     // Dispatch a native event for things that don't use jquery
@@ -337,6 +338,7 @@ jQuery(document).ready(function($) {
             $(parent).find('div.EditCommentForm').remove();
             $(parent).find('span.TinyProgress').remove();
             $(msg).show();
+            $(msg).removeClass("Hidden");
         }
 
         $(document).trigger('CommentEditingComplete', [msg]);
@@ -347,7 +349,9 @@ jQuery(document).ready(function($) {
         var btn = this;
         var $container = $(btn).closest('.ItemComment');
 
-        $(btn).closest('.Comment').find('div.Message').show();
+        $msg = $($(btn).closest('.Comment').find('div.Message'));
+        $msg.show();
+        $msg.removeClass("Hidden");
         $(btn).closest('.CommentForm, .EditCommentForm').remove();
         $container.removeClass('Editing');
         $container.find(".ToggleFlyout.OptionsMenu").removeClass("Open");

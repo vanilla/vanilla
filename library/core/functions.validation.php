@@ -526,16 +526,21 @@ if (!function_exists('validateLength')) {
      * @return bool|string
      */
     function validateLength($value, $field) {
-        if (function_exists('mb_strlen')) {
+        $useByteLength = isset($field->ByteLength);
+
+        if (function_exists('mb_strlen') && !$useByteLength) {
             $diff = mb_strlen($value, 'UTF-8') - $field->Length;
         } else {
-            $diff = strlen($value) - $field->Length;
+            $diff = strlen($value) - $field->ByteLength;
         }
 
         if ($diff <= 0) {
             return true;
         } else {
-            return sprintf(t('ValidateLength'), t($field->Name), $diff);
+            $translationCode = $useByteLength
+                ? t('ValidateByteLength', '%1$s is %2$s bytes too long.')
+                : t('ValidateLength', '%1$s is %2$s characters too long.');
+            return sprintf($translationCode, t($field->Name), $diff);
         }
     }
 }

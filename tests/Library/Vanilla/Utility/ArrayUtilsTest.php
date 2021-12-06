@@ -523,6 +523,18 @@ class ArrayUtilsTest extends TestCase {
                 ['sID' => 'b', 'foo' => ['bar' => 'a']],
                 ['SID' => 'b', 'Foo' => ['Bar' => 'a']],
             ],
+            'includes both numeric and string keys' => [
+                ['blahBlah', 'sID' => 'b', 'MooCow', 'foo' => ['bar' => 'a', 'b', 'c']],
+                ['blahBlah', 'SID' => 'b', 'MooCow', 'Foo' => ['Bar' => 'a', 'b', 'c']],
+            ],
+            'values in camelCase are not converted' => [
+                ['sID' => 'fooBarBaz', 'fooBarBaz' => ['fizzBuzz' => 'flipFlop']],
+                ['SID' => 'fooBarBaz', 'FooBarBaz' => ['FizzBuzz' => 'flipFlop']],
+            ],
+            'values in PascalCase are not converted' => [
+                ['sID' => 'FooBarBaz', 'fooBarBaz' => ['fizzBuzz' => 'FlipFlop']],
+                ['SID' => 'FooBarBaz', 'FooBarBaz' => ['FizzBuzz' => 'FlipFlop']],
+            ]
         ];
     }
 
@@ -663,6 +675,19 @@ class ArrayUtilsTest extends TestCase {
                     ],
                 ],
             ],
+            'handlesHoles' => [
+                // Input
+                [
+                    0 => ['foo' => 'foo1'],
+                    1 => ['foo' => 'foo2', 'hidden' => true],
+                    2 => ['foo' => 'foo3'],
+                ],
+                // Expected
+                [
+                    0 => ['foo' => 'foo1', 'hidden' => false],
+                    1 => ['foo' => 'foo3', 'hidden' => false],
+                ],
+            ]
         ];
         return $r;
     }

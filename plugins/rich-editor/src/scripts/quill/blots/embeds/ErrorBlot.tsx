@@ -11,6 +11,7 @@ import { EMBED_FOCUS_CLASS } from "@library/embeddedContent/embedConstants";
 import StandardEmbedError from "@rich-editor/quill/blots/embeds/StandardEmbedError";
 import AttachmentError from "@library/content/attachments/AttachmentError";
 import { SelectableEmbedBlot } from "@rich-editor/quill/blots/abstract/SelectableEmbedBlot";
+import { IError } from "@library/errorPages/CoreErrorMessages";
 
 export enum ErrorBlotType {
     FILE = "file",
@@ -18,7 +19,7 @@ export enum ErrorBlotType {
 }
 
 export interface IErrorData {
-    error: Error;
+    error: IError;
     type: ErrorBlotType;
     file?: File;
 }
@@ -75,9 +76,7 @@ export default class ErrorBlot extends SelectableEmbedBlot {
             );
         } else {
             ReactDOM.render(
-                <StandardEmbedError onDismissClick={this.handleRemoveClick} id={id}>
-                    {data.error.message}
-                </StandardEmbedError>,
+                <StandardEmbedError onDismissClick={this.handleRemoveClick} id={id} error={this.data.error} />,
                 domNode,
             );
         }

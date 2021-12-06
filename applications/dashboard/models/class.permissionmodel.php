@@ -74,6 +74,25 @@ class PermissionModel extends Gdn_Model {
     }
 
     /**
+     * Returns a list of all permissions.
+     *
+     * @return array
+     */
+    public function getAllPermissions(): array {
+
+        $this->defineSchema();
+        $schema = $this->Schema;
+        $fields = $schema->fields();
+        $fieldName = [];
+        foreach ($fields as $field => $name) {
+            if (str_contains($field, ".")) {
+                $fieldName[] = $field;
+            }
+        }
+        return $fieldName;
+    }
+
+    /**
      * Get a mapping of all junction tables + JunctionIDs.
      *
      * @return array
@@ -402,14 +421,27 @@ class PermissionModel extends Gdn_Model {
     }
 
     /**
+     * For compatibility with `Gdn_Model` only.
      *
-     *
-     * @param null $roleID
-     * @param null $junctionTable
-     * @param null $junctionColumn
+     * @param int|null $where
+     * @param string|null $options
+     * @param string|null $junctionColumn
      * @param null $junctionID
+     * @return false|int|void
      */
-    public function delete($roleID = null, $junctionTable = null, $junctionColumn = null, $junctionID = null) {
+    public function delete($where = null, $options = null, $junctionColumn = null, $junctionID = null) {
+        $this->deletePermissions($where, $options, $junctionColumn, $junctionID);
+    }
+
+    /**
+     * Delete specific permission items.
+     *
+     * @param int|null $roleID
+     * @param string|null $junctionTable
+     * @param string|null $junctionColumn
+     * @param int|null $junctionID
+     */
+    public function deletePermissions($roleID = null, $junctionTable = null, $junctionColumn = null, $junctionID = null) {
         // Build the where clause.
         $where = [];
         if (!is_null($roleID)) {
@@ -1270,58 +1302,60 @@ class PermissionModel extends Gdn_Model {
     /**
      * Save a permission row.
      *
-     * @param array $values The values you want to save. See the Permission table for possible columns.
-     * @param bool $saveGlobal Also save a junction permission to the global permissions.
+     * @param array $formPostValues The values you want to save. See the Permission table for possible columns.
+     * @param bool $settings Also save a junction permission to the global permissions.
      */
-    public function save($values, $saveGlobal = false) {
+    public function save($formPostValues, $settings = false) {
+        $saveGlobal = $settings;
+
         // Get the list of columns that are available for permissions.
         $permissionColumns = Gdn::permissionModel()->defineSchema()->fields();
-        if (isset($values['Role'])) {
+        if (isset($formPostValues['Role'])) {
             $permissionColumns['Role'] = true;
         }
-        $values = array_intersect_key($values, $permissionColumns);
+        $formPostValues = array_intersect_key($formPostValues, $permissionColumns);
 
         // Figure out how to find the existing permission.
-        if (array_key_exists('PermissionID', $values)) {
-            $where = ['PermissionID' => $values['PermissionID']];
-            unset($values['PermissionID']);
+        if (array_key_exists('PermissionID', $formPostValues)) {
+            $where = ['PermissionID' => $formPostValues['PermissionID']];
+            unset($formPostValues['PermissionID']);
 
-            $this->SQL->update('Permission', $this->_Backtick($values), $where)->put();
+            $this->SQL->update('Permission', $this->_Backtick($formPostValues), $where)->put();
         } else {
             $where = [];
 
-            if (array_key_exists('RoleID', $values)) {
-                $where['RoleID'] = $values['RoleID'];
-                unset($values['RoleID']);
-            } elseif (array_key_exists('Role', $values)) {
+            if (array_key_exists('RoleID', $formPostValues)) {
+                $where['RoleID'] = $formPostValues['RoleID'];
+                unset($formPostValues['RoleID']);
+            } elseif (array_key_exists('Role', $formPostValues)) {
                 // Get the RoleID.
-                $roleID = $this->SQL->getWhere('Role', ['Name' => $values['Role']])->value('RoleID');
+                $roleID = $this->SQL->getWhere('Role', ['Name' => $formPostValues['Role']])->value('RoleID');
                 if (!$roleID) {
                     return;
                 }
                 $where['RoleID'] = $roleID;
-                unset($values['Role']);
+                unset($formPostValues['Role']);
             } else {
                 $where['RoleID'] = 0; // default role.
             }
 
-            if (array_key_exists('JunctionTable', $values)) {
-                $where['JunctionTable'] = $values['JunctionTable'];
+            if (array_key_exists('JunctionTable', $formPostValues)) {
+                $where['JunctionTable'] = $formPostValues['JunctionTable'];
 
                 // If the junction table was given then so must the other values.
-                if (array_key_exists('JunctionColumn', $values)) {
-                    $where['JunctionColumn'] = $values['JunctionColumn'];
+                if (array_key_exists('JunctionColumn', $formPostValues)) {
+                    $where['JunctionColumn'] = $formPostValues['JunctionColumn'];
                 }
-                $where['JunctionID'] = $values['JunctionID'];
+                $where['JunctionID'] = $formPostValues['JunctionID'];
             } else {
                 $where['JunctionTable'] = null; // no junction table.
                 $where['JunctionColumn'] = null;
                 $where['JunctionID'] = null;
             }
 
-            unset($values['JunctionTable'], $values['JunctionColumn'], $values['JunctionID']);
+            unset($formPostValues['JunctionTable'], $formPostValues['JunctionColumn'], $formPostValues['JunctionID']);
 
-            $this->SQL->replace('Permission', $this->_Backtick($values), $where, true);
+            $this->SQL->replace('Permission', $this->_Backtick($formPostValues), $where, true);
 
             if ($saveGlobal && !is_null($where['JunctionTable'])) {
                 // Save these permissions with the global permissions.
@@ -1329,7 +1363,7 @@ class PermissionModel extends Gdn_Model {
                 $where['JunctionColumn'] = null;
                 $where['JunctionID'] = null;
 
-                $this->SQL->replace('Permission', $this->_Backtick($values), $where, true);
+                $this->SQL->replace('Permission', $this->_Backtick($formPostValues), $where, true);
             }
         }
 

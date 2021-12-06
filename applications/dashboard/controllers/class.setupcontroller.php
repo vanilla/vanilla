@@ -220,7 +220,8 @@ class SetupController extends DashboardController {
                 // Apply the validation results to the form(s)
                 $this->Form->setValidationResults($ConfigurationModel->validationResults());
             } else {
-                $Host = array_shift(explode(':', Gdn::request()->requestHost()));
+                $arr = explode(':', Gdn::request()->requestHost());
+                $Host = array_shift($arr);
                 $Domain = Gdn::request()->domain();
 
                 // Set up cookies now so that the user can be signed in.

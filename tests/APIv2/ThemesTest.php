@@ -67,10 +67,12 @@ class ThemesTest extends AbstractAPIv2Test {
      * @dataProvider provideAssetTypes
      */
     public function testGetAsset(string $theme, string $assetKey, string $rawBody, string $contentType) {
-        $response = $this->api()->get("themes/{$theme}/assets/{$assetKey}");
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals($contentType, $response->getHeader("Content-Type"));
-        $this->assertEquals($rawBody, $response->getRawBody());
+        $this->runWithPrivateCommunity(function () use ($theme, $assetKey, $rawBody, $contentType) {
+            $response = $this->api()->get("themes/{$theme}/assets/{$assetKey}");
+            $this->assertEquals(200, $response->getStatusCode());
+            $this->assertEquals($contentType, $response->getHeader("Content-Type"));
+            $this->assertEquals($rawBody, $response->getRawBody());
+        });
     }
 
     /**
@@ -172,20 +174,22 @@ class ThemesTest extends AbstractAPIv2Test {
      * Test getting a theme by its name.
      */
     public function testGetByName() {
-        $response = $this->api()->get("themes/asset-test-no-parent");
+        $this->runWithPrivateCommunity(function () {
+            $response = $this->api()->get("themes/asset-test-no-parent");
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertStringStartsWith("application/json", $response->getHeader("Content-Type"));
+            $this->assertEquals(200, $response->getStatusCode());
+            $this->assertStringStartsWith("application/json", $response->getHeader("Content-Type"));
 
-        $body = json_decode($response->getRawBody(), true);
-        $this->assertEquals("asset-test-no-parent", $body["themeID"]);
-        $this->assertEquals("themeFile", $body["type"]);
-        $this->assertNotEmpty($body["assets"]);
+            $body = json_decode($response->getRawBody(), true);
+            $this->assertEquals("asset-test-no-parent", $body["themeID"]);
+            $this->assertEquals("themeFile", $body["type"]);
+            $this->assertNotEmpty($body["assets"]);
 
-        $expectedAssets = ["fonts", "footer", "header", "javascript", "scripts", "styles", "variables"];
-        foreach ($expectedAssets as $asset) {
-            $this->assertArrayHasKey($asset, $body["assets"], "Theme does not have expected asset: {$asset}");
-        }
+            $expectedAssets = ["fonts", "footer", "header", "javascript", "scripts", "styles", "variables"];
+            foreach ($expectedAssets as $asset) {
+                $this->assertArrayHasKey($asset, $body["assets"], "Theme does not have expected asset: {$asset}");
+            }
+        });
     }
 
     /**
@@ -253,9 +257,11 @@ class ThemesTest extends AbstractAPIv2Test {
      * Test /themes/current endpoint returns active theme (keystone).
      */
     public function testGetCurrent() {
-        $response = $this->api()->get("themes/current");
-        $body = $response->getBody();
-        $this->assertEquals('theme-foundation', $body['themeID']);
+        $this->runWithPrivateCommunity(function () {
+            $response = $this->api()->get("themes/current");
+            $body = $response->getBody();
+            $this->assertEquals('theme-foundation', $body['themeID']);
+        });
     }
 
     /**

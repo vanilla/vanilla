@@ -10,9 +10,7 @@ use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\ForbiddenException;
 use UserModel;
 use UsersApiController;
-use Vanilla\Events\DirtyRecordTrait;
 use Vanilla\Events\EventAction;
-use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Models\PermissionFragmentSchema;
 use Vanilla\Web\PrivateCommunityMiddleware;
 use VanillaTests\Fixtures\TestUploader;
@@ -161,7 +159,7 @@ class UsersTest extends AbstractResourceTest {
         $this->assertEquals(204, $response->getStatusCode());
 
         $user = $this->api()->get("{$this->baseUrl}/{$userID}")->getBody();
-        $this->assertStringEndsWith('/applications/dashboard/design/images/defaulticon.png', $user['photoUrl']);
+        $this->assertStringEndsWith(UserModel::PATH_DEFAULT_AVATAR, $user['photoUrl']);
     }
 
     /**
@@ -469,6 +467,7 @@ class UsersTest extends AbstractResourceTest {
         unset($newRow['photo']);
 
         $this->assertRowsEqual($newRow, $r->getBody());
+        $this->assertSame($r['photoUrl'], $r['profilePhotoUrl']);
         $this->assertLog(['event' => EventAction::eventName($this->resourceName, EventAction::UPDATE)]);
 
         return $r->getBody();
@@ -531,8 +530,15 @@ class UsersTest extends AbstractResourceTest {
         $this->assertArrayHasKey('photoUrl', $responseBody);
         $this->assertNotEmpty($responseBody['photoUrl']);
         $this->assertNotFalse(filter_var($responseBody['photoUrl'], FILTER_VALIDATE_URL), 'Photo is not a valid URL.');
-        $this->assertStringEndsNotWith('/applications/dashboard/design/images/defaulticon.png', $responseBody['photoUrl']);
+        $this->assertStringEndsNotWith(UserModel::PATH_DEFAULT_AVATAR, $responseBody['photoUrl'], 'The response returned the default avatar URL.');
         $this->assertNotEquals($user['photoUrl'], $responseBody['photoUrl']);
+
+        $this->assertUploadedFileUrlExists($responseBody['photoUrl']);
+
+        $user = $this->api()->get("{$this->baseUrl}/{$user['userID']}")->getBody();
+        $this->assertUploadedFileUrlExists($user['photoUrl']);
+        $this->assertUploadedFileUrlExists($user['profilePhotoUrl']);
+        $this->assertNotEquals($user['photoUrl'], $user['profilePhotoUrl']);
 
         return $user['userID'];
     }
@@ -612,6 +618,9 @@ class UsersTest extends AbstractResourceTest {
         $this->runWithPrivateCommunity([$this, 'testRegisterInvitation']);
     }
 
+    /**
+     * Test the full request of a lost password workflow.
+     */
     public function testRequestPassword() {
         static $i = 1;
 
@@ -667,8 +676,13 @@ class UsersTest extends AbstractResourceTest {
     public function testBanWithPermission() {
         $this->createUserFixtures('testBanWithPermission');
         $this->api()->setUserID($this->moderatorID);
-        $r = $this->api()->put("/users/{$this->memberID}/ban", ['banned' => true]);
+        $r = $this->api()->put("{$this->baseUrl}/{$this->memberID}/ban", ['banned' => true]);
         $this->assertTrue($r['banned']);
+
+        // Make sure the user has the banned photo.
+        $user = $this->api()->get("{$this->baseUrl}/{$this->memberID}")->getBody();
+        $this->assertStringEndsWith(UserModel::PATH_BANNED_AVATAR, $user['photoUrl']);
+        $this->assertSame($user['photoUrl'], $user['profilePhotoUrl']);
     }
 
     /**
@@ -747,7 +761,6 @@ class UsersTest extends AbstractResourceTest {
         $this->assertArrayHasKey('name', $response);
         $this->assertArrayHasKey('email', $response);
         $this->assertArrayHasKey('photoUrl', $response);
-        $this->assertArrayHasKey('roles', $response);
         $this->assertArrayHasKey('dateInserted', $response);
         $this->assertArrayHasKey('dateLastActive', $response);
         $this->assertArrayHasKey('countDiscussions', $response);
@@ -774,4 +787,71 @@ class UsersTest extends AbstractResourceTest {
             "primaryKey" => "userID"
         ];
     }
+
+    /**
+     * Test GET /:ID user with personal info role.
+     */
+    public function testGetPersonalInfoProfile(): void {
+        $role = $this->createRole([
+            'name' => 'New Role',
+            'personalInfo' => true,
+            'permissions' => [
+                [
+                    'type' => 'global',
+                    'permissions' => [
+                        'signIn.allow' => true
+                    ]
+                ]
+            ]
+        ]);
+        // Create a user with personalInfo set to true.
+        $userA = $this->createUser(['name' => 'userA', 'roleID' => [$role['roleID']]]);
+        // a user without personalInfo.View permission should not be able to view role info.
+        $userB = $this->createUser(['name' => 'userB']);
+        $this->runWithUser(function () use ($userA) {
+            $result = $this->api()->get("/users/{$userA['userID']}")->getBody();
+            $this->assertArrayNotHasKey('roles', $result);
+        }, $userB);
+        // As an admin, role info should be visible.
+        $result =  $this->api()->get("/users/{$userA['userID']}")->getBody();
+        $this->assertArrayHasKey('roles', $result);
+    }
+    /**
+     * Primarily used for obtaining a role token for tests that utilize a role token via the **depends** annotation
+     *
+     * @return array
+     */
+    public function testGetRoleTokenQueryParam() {
+        $tokenResponseBody = $this->getRoleTokenResponseBody();
+        $this->assertArrayHasKey('roleToken', $tokenResponseBody);
+        return [static::getRoleTokenParamName() => $tokenResponseBody["roleToken"]];
+    }
+
+    /**
+     * Test that the get users/{id} endpoint accepts role token auth
+     *
+     * @param array $roleTokenQueryParam
+     * @depends testGetRoleTokenQueryParam
+     */
+    public function testIndexWithRoleTokenAuth(array $roleTokenQueryParam) {
+        $user = $this->testPost();
+
+        $response = $this->api()->get("/users/{$user['userID']}", $roleTokenQueryParam)->getBody();
+
+        /** @var UsersApiController $userApiController */
+        $userApiController = static::container()->get(UsersApiController::class);
+        $viewProfileSchema = $userApiController->viewProfileSchema();
+
+        $this->assertArrayHasKey('name', $response);
+        $this->assertArrayHasKey('email', $response);
+        $this->assertArrayHasKey('photoUrl', $response);
+        $this->assertArrayHasKey('dateInserted', $response);
+        $this->assertArrayHasKey('dateLastActive', $response);
+        $this->assertArrayHasKey('countDiscussions', $response);
+        $this->assertArrayHasKey('countComments', $response);
+
+        $this->assertSame($user['name'], $response['name']);
+        $this->assertSame($user['email'], $response['email']);
+    }
+
 }

@@ -248,7 +248,7 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
      *
      * @param $authenticationSchemeAlias
      * @param null $userID
-     * @return array|bool|stdClass
+     * @return array|bool
      */
     public static function getProviderByScheme($authenticationSchemeAlias, $userID = null) {
         $providerQuery = Gdn::sql()
@@ -340,7 +340,14 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
         $transformer = new Transformer($spec);
 
         $result = $transformer->transform($row);
+
+        $result['name'] = $result['name'] ?: '(No Name)';
+
+        $result["urls"] = array_map(function ($url) {
+            return $url ?: null;
+        }, $result["urls"]);
         $result["urls"] = new Attributes($result["urls"] ?? []);
+
         return $result;
     }
 

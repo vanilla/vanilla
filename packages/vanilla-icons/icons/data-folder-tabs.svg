@@ -1,0 +1,37 @@
+<svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+>
+    <defs>
+        <filter id="prefix__a">
+            <feColorMatrix
+                in="SourceGraphic"
+                values="0 0 0 0 0.333333 0 0 0 0 0.352941 0 0 0 0 0.384314 0 0 0 1.000000 0"
+            />
+        </filter>
+        <filter id="prefix__b">
+            <feColorMatrix
+                in="SourceGraphic"
+                values="0 0 0 0 0.333333 0 0 0 0 0.352941 0 0 0 0 0.384314 0 0 0 1.000000 0"
+            />
+        </filter>
+    </defs>
+    <g
+        filter="url(#prefix__a)"
+        transform="translate(-12 -136)"
+        fill="none"
+        fillRule="evenodd"
+        opacity="0.5"
+    >
+        <g filter="url(#prefix__b)" transform="translate(12 136)">
+            <path
+                fill="currentColor"
+                d="M5.5 19h13a1.5 1.5 0 001.5-1.5V9a1.5 1.5 0 00-1.5-1.5H12L10.222 5H5.5A1.5 1.5 0 004 6.5v11A1.5 1.5 0 005.5 19z"
+            />
+        </g>
+        <path stroke="currentColor" d="M22.5 142h4l1 2v1h-5z" />
+        <path stroke="currentColor" d="M26.5 142h4l1 2v1h-3.75z" />
+    </g>
+</svg>

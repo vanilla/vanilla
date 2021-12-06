@@ -22,54 +22,13 @@ echo $form->errors();
         echo $form->toggle('Vanilla.AdminCheckboxes.Use', 'Enable checkboxes on discussions and comments', [], $checkboxDesc);
         ?>
     </div>
-    <div class="form-group">
-        <?php
-        $embedsLabel = 'Enable link embeds in discussions and comments';
-        $embedsDesc = '@'.t('Allow links to be transformed');
-        echo $form->toggle('Garden.Format.DisableUrlEmbeds', $embedsLabel, [], $embedsDesc, true);
-        ?>
-    </div>
 
-    <div class="form-group">
-        <?php
-            $imageUploadLimitLabel = t('ImageUploadLimits.Notes1', 'Enable Image Upload Limit');
-            $ImageUploadDesc = t('ImageUploadLimits.Notes2', 'Add limits to image upload dimensions.');
-            echo $form->toggle('ImageUpload.Limits.Enabled', $imageUploadLimitLabel, [], $ImageUploadDesc, false);
-        ?>
-    </div>
-
-    <div class="form-group ImageUploadLimitsDimensions dimensionsDisabled">
-        <div class="label-wrap-wide">
-            <?php
-            echo $form->label(t('ImageUploadLimits.Width1', 'Max Image Width'), 'ImageUpload.Limits.Width');
-            echo wrap(t('ImageUploadLimits.Width2', 'Images will be scaled down if they exceed this width.'), 'div', ['class' => 'info']);
-            ?>
-        </div>
-        <div class="input-wrap-right">
-            <div class="textbox-suffix" data-suffix="px">
-                <?php echo $form->textBox('ImageUpload.Limits.Width', ["class" => "form-control", "value" => c("ImageUpload.Limits.Width", 1400)]); ?>
-            </div>
-        </div>
-    </div>
-    <div class="form-group ImageUploadLimitsDimensions dimensionsDisabled">
-        <div class="label-wrap-wide">
-            <?php
-                echo $form->label(t('ImageUploadLimits.Height1', 'Max Image Height'), 'ImageUpload.Limits.Height');
-                echo wrap(t('ImageUploadLimits.Height2', 'Images will be scaled down if they exceed this height.'), 'div', ['class' => 'info']);
-            ?>
-        </div>
-        <div class="input-wrap-right">
-            <div class="textbox-suffix" data-suffix="px">
-                <?php echo $form->textBox('ImageUpload.Limits.Height', ["class" => "form-control", "value" => c("ImageUpload.Limits.Height", 1000)]); ?>
-            </div>
-        </div>
-    </div>
-
+    <h2 class="subheading"><?php echo t('Formats'); ?></h2>
     <div class="form-group">
         <?php
         $formatNotes1 = t('InputFormatter.Notes1', 'Select the default format of the editor for posts in the community.');
-        $formatNotes2 = t('InputFormatter.Notes2', 'The editor will auto-detect the format of old posts when editing them and load their 
-        original formatting rules. Aside from this exception, the selected post format below will take precedence.');
+        $formatNotes2 = t('InputFormatter.Notes2', 'The editor will auto-detect the format of old posts when editing them and load their
+            original formatting rules. Aside from this exception, the selected post format below will take precedence.');
         $label = '<p class="info">'.$formatNotes1.'</p><p class="info"><strong>'.t('Note:').' </strong>'.$formatNotes2.'</p>';
         ?>
         <div class="label-wrap">
@@ -89,7 +48,7 @@ echo $form->errors();
         <?php
         $mobileFormatterNote1 = t('MobileInputFormatter.Notes1', 'Specify an editing format for mobile devices.');
         $mobileFormatterNote2 =t('MobileInputFormatter.Notes2', 'If mobile devices should have the same experience,
-specify the same one as above. If users report issues with mobile editing, this is a good option to change.');
+    specify the same one as above. If users report issues with mobile editing, this is a good option to change.');
         $label = '<p class="info">'.$mobileFormatterNote1.'</p><p class="info"><strong>'.t('Note:').' </strong>'.$mobileFormatterNote2.'</p>';
         ?>
         <div class="label-wrap">
@@ -103,7 +62,85 @@ specify the same one as above. If users report issues with mobile editing, this 
         </div>
     </div>
 
+    <h2 class="subheading"><?php echo t('Embeds'); ?></h2>
 
+    <div class="form-group">
+        <?php
+        $embedsLabel = 'Enable link embeds in discussions and comments';
+        $embedsDesc = '@'.t('Allow links to be transformed');
+        echo $form->toggle('Garden.Format.DisableUrlEmbeds', $embedsLabel, [], $embedsDesc, true);
+        ?>
+    </div>
+
+    <div class="form-group">
+        <?php
+            $imageUploadLimitLabel = t('ImageUploadLimits.Notes1', 'Enable Image Upload Limit');
+            $ImageUploadDesc = t('ImageUploadLimits.Notes2', 'Add limits to image upload dimensions.');
+            echo $form->toggle('ImageUpload.Limits.Enabled', $imageUploadLimitLabel, [], $ImageUploadDesc, false);
+        ?>
+    </div>
+
+    <div class="form-group ImageUploadLimitsDimensions dimensionsDisabled">
+        <div class="label-wrap-wide">
+            <?php
+            echo $form->label(t('Max Image Width'), 'ImageUpload.Limits.Width');
+            echo wrap(t('ImageUploadLimits.Width2', 'Images will be scaled down if they exceed this width.'), 'div', ['class' => 'info']);
+            ?>
+        </div>
+        <div class="input-wrap-right">
+            <div class="textbox-suffix" data-suffix="px">
+                <?php echo $form->textBox('ImageUpload.Limits.Width', ["class" => "form-control", "value" => c("ImageUpload.Limits.Width", 1400)]); ?>
+            </div>
+        </div>
+    </div>
+    <div class="form-group ImageUploadLimitsDimensions dimensionsDisabled">
+        <div class="label-wrap-wide">
+            <?php
+                echo $form->label(t('Max Image Height'), 'ImageUpload.Limits.Height');
+                echo wrap(t('ImageUploadLimits.Height2', 'Images will be scaled down if they exceed this height.'), 'div', ['class' => 'info']);
+            ?>
+        </div>
+        <div class="input-wrap-right">
+            <div class="textbox-suffix" data-suffix="px">
+                <?php echo $form->textBox('ImageUpload.Limits.Height', ["class" => "form-control", "value" => c("ImageUpload.Limits.Height", 1000)]); ?>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="label-wrap">
+            <?php
+            echo $form->label(
+                t('Configure custom Kaltura domains'),
+                \VanillaSettingsController::CONFIG_KALTURA_DOMAINS
+            );
+            echo wrap(
+                wrap(
+                    t('Add your custom Kaltura domain(s) to transform links into embedded videos in discussions, comments or articles.'),
+                    'p'
+                ) .
+                wrap(
+                    t('Specify one domain per line. Use * for wildcard matches.'),
+                    'p'
+                ),
+                'div',
+                ['class' => 'info']
+            );
+            ?>
+        </div>
+        <div class="input-wrap">
+            <?php
+                echo $form->textBox(
+                    \VanillaSettingsController::CONFIG_KALTURA_DOMAINS,
+                    [
+                        'implode' => "\n",
+                        'MultiLine' => true,
+                        'class' => 'InputBox SmallInput'
+                    ]
+                );
+            ?>
+        </div>
+    </div>
+    <h2 class="subheading"><?php echo t('Appearance'); ?></h2>
     <div class="form-group">
         <?php
         $Options = ['1' => '1', '2' => '2', '3' => '3', '4' => '4', '5' => '5', '0' => 'No limit'];
@@ -113,7 +150,7 @@ specify the same one as above. If users report issues with mobile editing, this 
         <?php
         echo $form->label('Maximum Category Display Depth', 'Vanilla.Categories.MaxDisplayDepth');
         echo wrap(
-            t('CategoryMaxDisplayDepth.Notes', 'Nested categories deeper than this depth will be placed in a comma-delimited list.'),
+            t('Nested categories deeper than this depth will be placed in a comma-delimited list.'),
             'div',
             ['class' => 'info']
         );
@@ -129,7 +166,14 @@ specify the same one as above. If users report issues with mobile editing, this 
         $Fields = ['TextField' => 'Code', 'ValueField' => 'Code'];
         ?>
         <div class="label-wrap">
-        <?php echo $form->label('Discussions per Page', 'Vanilla.Discussions.PerPage'); ?>
+        <?php
+            echo $form->label('Discussions per Page', 'Vanilla.Discussions.PerPage');
+            echo wrap(
+                sprintft('Number of %s listed per page.', t('Discussions')),
+                'div',
+                ['class' => 'info']
+            );
+        ?>
         </div>
         <div class="input-wrap">
         <?php echo $form->dropDown('Vanilla.Discussions.PerPage', $Options, $Fields); ?>
@@ -137,12 +181,21 @@ specify the same one as above. If users report issues with mobile editing, this 
     </div>
     <div class="form-group">
         <div class="label-wrap">
-        <?php echo $form->label('Comments per Page', 'Vanilla.Comments.PerPage'); ?>
+        <?php
+            echo $form->label('Comments per Page', 'Vanilla.Comments.PerPage');
+            echo wrap(
+                sprintft('Number of %s listed per page.', t('Comments')),
+                'div',
+                ['class' => 'info']
+            );
+        ?>
         </div>
         <div class="input-wrap">
         <?php echo $form->dropDown('Vanilla.Comments.PerPage', $Options, $Fields); ?>
         </div>
     </div>
+
+    <h2 class="subheading"><?php echo t('Rules'); ?></h2>
     <div class="form-group">
         <?php
         $Options = ['0' => t('Authors may never edit'),
@@ -182,15 +235,5 @@ specify the same one as above. If users report issues with mobile editing, this 
         <div class="input-wrap">
         <?php echo $form->textBox('Vanilla.Comment.MinLength', ['class' => 'InputBox SmallInput']); ?>
         </div>
-    </div>
-    <div class="form-group">
-        <?php
-        echo $form->toggle(
-            "Vanilla.Email.FullPost",
-            "Include full post in email notifications",
-            [],
-            "If enabled, the full content of posts will be sent in email notifications to users."
-        );
-        ?>
     </div>
 <?php echo $form->close('Save'); ?>

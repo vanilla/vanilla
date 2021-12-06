@@ -4,6 +4,7 @@ if (!defined('APPLICATION')) exit();
 use Vanilla\Forum\Modules\FoundationCategoriesShim;
 use Vanilla\Theme\BoxThemeShim;
 use Vanilla\Utility\HtmlUtils;
+use Vanilla\Web\TwigStaticRenderer;
 
 if (!function_exists('CategoryHeading')):
 
@@ -80,7 +81,7 @@ if (!function_exists('getOptions')):
 
         $dropdown->addLink(t('Mark Read'), "/category/markread?categoryid={$categoryID}&tkey={$tk}", 'mark-read');
 
-        if (c('Vanilla.EnableCategoryFollowing') && val('DisplayAs', $category) == 'Discussions') {
+        if (c(\CategoryModel::CONF_CATEGORY_FOLLOWING) && val('DisplayAs', $category) == 'Discussions') {
             $dropdown->addLink(
                 t($followed ? 'Unfollow' : 'Follow'),
                 "/category/followed?tkey={$tk}&categoryid={$categoryID}&value=" . ($followed ? 0 : 1),
@@ -504,26 +505,22 @@ if (!function_exists('followButton')) :
         $userID = Gdn::session()->UserID;
         $category = CategoryModel::categories($categoryID);
 
-        if (c('Vanilla.EnableCategoryFollowing') && $userID && $category && $category['DisplayAs'] == 'Discussions') {
+        if (c(\CategoryModel::CONF_CATEGORY_FOLLOWING) && $userID && $category && $category['DisplayAs'] == 'Discussions') {
             $categoryModel = new CategoryModel();
             $following = $categoryModel->isFollowed($userID, $categoryID);
+            $isEmailDisabled = Gdn::config('Garden.Email.Disabled') || !Gdn::session()->checkPermission('Garden.Email.View');
+            $emailNotificationsByDefault = Gdn::config('Vanilla.CategoryFollowing.EmailNotificationsByDefault');
 
-            $iconTitle = t('Follow');
+            //we determine email notifications state through various permission/config check
+            $emailNotificationsMode = $isEmailDisabled ? "disabled" : ($emailNotificationsByDefault ? "defaultOn" : "defaultOff");
 
-            $icon = <<<EOT
-                <svg xmlns="http://www.w3.org/2000/svg" class="followButton-icon" viewBox="0 0 16 16" aria-hidden="true">
-                    <title>{$iconTitle}</title>
-                    <path d="M7.568,14.317a.842.842,0,0,1-1.684,0,4.21,4.21,0,0,0-4.21-4.21h0a.843.843,0,0,1,0-1.685A5.9,5.9,0,0,1,7.568,14.317Zm4.21,0a.842.842,0,0,1-1.684,0A8.421,8.421,0,0,0,1.673,5.9h0a.842.842,0,0,1,0-1.684,10.1,10.1,0,0,1,10.105,10.1Zm4.211,0a.842.842,0,0,1-1.684,0A12.633,12.633,0,0,0,1.673,1.683.842.842,0,0,1,1.673,0,14.315,14.315,0,0,1,15.989,14.315ZM1.673,16a1.684,1.684,0,1,1,1.684-1.684h0A1.684,1.684,0,0,1,1.673,16Z" transform="translate(0.011 0.001)" style="fill: currentColor;"/>
-                </svg>
-EOT;
-
-            $text = $following ? t('Following') : t('Follow');
-            $output .= anchor(
-                $icon.$text,
-                "/category/followed/{$categoryID}/".Gdn::session()->transientKey(),
-                'Hijack followButton'.($following ? ' TextColor isFollowing' : ''),
-                ['title' => $text, 'aria-pressed' => $following ? 'true' : 'false', 'role' => 'button', 'tabindex' => '0']
-            );
+            $output = TwigStaticRenderer::renderReactModule('CategoryFollowDropDown', [
+                "userID" => $userID,
+                "categoryID" => $categoryID,
+                "isFollowed" => $following,
+                'notificationPreferences' => $categoryModel->getPreferences($userID)[$categoryID]['preferences'] ?? null,
+                'emailNotificationsMode' => $emailNotificationsMode,
+            ]);
         }
         return $output;
     }

@@ -13,7 +13,10 @@ use Garden\Schema\ValidationException;
 use Garden\Web\Exception\HttpException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\Pass;
+use Logger;
 use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Vanilla\Contracts\LocaleInterface;
 use Vanilla\Permissions;
 use Garden\CustomExceptionHandler;
@@ -21,7 +24,9 @@ use Garden\CustomExceptionHandler;
 /**
  * Dispatches requests and receives responses.
  */
-class Dispatcher {
+class Dispatcher implements LoggerAwareInterface {
+
+    use LoggerAwareTrait;
     use MiddlewareAwareTrait;
 
     /** @var LocaleInterface */
@@ -179,7 +184,14 @@ class Dispatcher {
                 // Pass to the next route.
                 continue;
             } catch (\Throwable $dispatchEx) {
-                logException($dispatchEx);
+                if ($dispatchEx->getCode() >= 400 && $dispatchEx->getCode() < 500) {
+                    $this->logger->error($dispatchEx->getMessage(), [
+                        "event" => "api_error",
+                        "exception" => $dispatchEx,
+                    ]);
+                } else {
+                    logException($dispatchEx);
+                }
                 $response = null;
                 if (is_object($action ?? null) && $action instanceof Action) {
                     $obj = $action->getCallback()[0] ?? false;

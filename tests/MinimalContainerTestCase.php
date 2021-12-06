@@ -65,6 +65,8 @@ class MinimalContainerTestCase extends TestCase {
          $container = new Container();
 
         $container
+            ->rule(\Gdn_Session::class)
+            ->setShared(true)
             ->rule(Container::class)
             ->addAlias(ContainerInterface::class)
             ->setInstance(Container::class, $container)
@@ -177,7 +179,7 @@ class MinimalContainerTestCase extends TestCase {
      * @param array $info The user information to set.
      */
     public function setUserInfo(array $info) {
-        $session = new \Gdn_Session();
+        $session = $this->container()->get(\Gdn_Session::class);
 
         foreach ($info as $key => $value) {
             if ($key === 'UserID') {
@@ -191,7 +193,6 @@ class MinimalContainerTestCase extends TestCase {
             $session->User = new \stdClass();
             $session->User->{$key} = $value;
         }
-        self::container()->setInstance(\Gdn_Session::class, $session);
     }
 
     /**

@@ -768,14 +768,14 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
     /**
      * Delete a role.
      *
-     * @param int $roleID The ID of the role to delete.
+     * @param int $id The ID of the role to delete.
      * @param array $options An array of options to affect the behavior of the delete.
      *
      * - **newRoleID**: The new role to point users to.
      * @return bool Returns **true** on success or **false** otherwise.
      */
-    public function deleteID($roleID, $options = []) {
-        $result = $this->deleteAndReplace($roleID, val('newRoleID', $options));
+    public function deleteID($id, $options = []) {
+        $result = $this->deleteAndReplace($id, val('newRoleID', $options));
         return $result;
     }
 
@@ -876,15 +876,15 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
     /**
      * @inheritdoc
      */
-    public function validate($values, $insert = false) {
+    public function validate($formPostValues, $insert = false) {
         $result = true;
-        $roleID = val('RoleID', $values);
+        $roleID = val('RoleID', $formPostValues);
 
         if ($roleID && !$insert) {
             $role = $this->getID($roleID, DATASET_TYPE_ARRAY);
             if ($role) {
                 $roleType = val('Type', $role);
-                $newType = val('Type', $values);
+                $newType = val('Type', $formPostValues);
                 if (c('Garden.Registration.ConfirmEmail') && $roleType === self::TYPE_UNCONFIRMED && $newType !== self::TYPE_UNCONFIRMED) {
                     $totalUnconfirmedRoles = $this->getByType(self::TYPE_UNCONFIRMED)->count();
                     if ($totalUnconfirmedRoles === 1) {
@@ -894,7 +894,7 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
             }
         }
 
-        $result = $result && parent::validate($values, $insert);
+        $result = $result && parent::validate($formPostValues, $insert);
         return $result;
     }
 

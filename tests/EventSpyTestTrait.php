@@ -11,6 +11,7 @@ use Garden\EventManager;
 use Garden\Events\BulkUpdateEvent;
 use Garden\Events\GenericResourceEvent;
 use Garden\Events\ResourceEvent;
+use Garden\Events\TrackingEventInterface;
 use OpenStack\Metric\v1\Gnocchi\Models\Resource;
 use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\Constraint\IsEqual;
@@ -43,7 +44,7 @@ trait EventSpyTestTrait {
      */
     public function setUpEventSpyTestTrait() {
         if (!$this->isBound) {
-            $this->getEventManager()->bindClass($this);
+            $this->getEventManager()->bindClass($this, EventManager::PRIORITY_LOW);
             $this->isBound = true;
         }
         $this->cleanupEventSpyTestTrait();
@@ -183,6 +184,23 @@ trait EventSpyTestTrait {
     }
 
     /**
+     * Get the set of events fired that match the event name provided
+     *
+     * @param string $event Event name to match
+     * @return array Set of fired events that match provided event name
+     */
+    public function getMatchingEventsFired(string $event) : array {
+        $firedEvents = $this->getEventManager()->getFiredEvents();
+        $matchingEventsFired = array_filter(
+            $firedEvents,
+            function (array $fired) use ($event) {
+                return strcasecmp($fired[0], $event) === 0;
+            }
+        );
+        return empty($matchingEventsFired) ? [] : array_column($matchingEventsFired, 1);
+    }
+
+    /**
      * Assert an event was fired.
      *
      * @param string $event
@@ -272,8 +290,9 @@ trait EventSpyTestTrait {
      *
      * @param ResourceEvent $event
      * @param array|string[] $matchPayloadFields
+     * @return ResourceEvent|null ResourceEvent that matches provided payload fields, if any, else null
      */
-    public function assertEventDispatched(ResourceEvent $event, array $matchPayloadFields = ["*"]) {
+    public function assertEventDispatched(ResourceEvent $event, array $matchPayloadFields = ["*"]): ?ResourceEvent {
         $matchAll = in_array("*", $matchPayloadFields);
         $hasEvent = false;
         $dispatchedEvents = $this->getEventManager()->getDispatchedEvents();
@@ -298,6 +317,45 @@ trait EventSpyTestTrait {
                     continue 2;
                 }
             }
+            return $dispatchedEvent;
+        }
+
+        $this->assertTrue(
+            $hasEvent,
+            "Could not find a matching event for $event in dispatched events:\n" .
+                json_encode($dispatchedEvents, JSON_PRETTY_PRINT)
+        );
+        return null;
+    }
+
+    /**
+     * Assert that an event with a trackable payload was dispatched. Takes an optional array of trackable payload fields to match.
+     *
+     * @param TrackingEventInterface $event
+     * @param array $matchTrackablePayloadFields
+     */
+    public function assertTrackablePayload(TrackingEventInterface $event, $matchTrackablePayloadFields = []) {
+        $hasEvent = false;
+        $dispatchedEvents = $this->getEventManager()->getDispatchedEvents();
+        /** @var TrackingEventInterface $dispatchedEvent */
+        foreach ($dispatchedEvents as $dispatchedEvent) {
+            if (!($event instanceof TrackingEventInterface)
+                || !($dispatchedEvent instanceof TrackingEventInterface)
+                || !method_exists($event, 'getTrackablePayload')) {
+                continue;
+            }
+
+            if ($dispatchedEvent->getFullEventName() !== $event->getFullEventName()) {
+                continue;
+            }
+
+            foreach ($matchTrackablePayloadFields as $matchPayloadField) {
+                $dispatchedField = $dispatchedEvent->getTrackablePayload()[$dispatchedEvent->getType()][$matchPayloadField] ?? null;
+                $expectedField = $event->getTrackablePayload()[$event->getType()][$matchPayloadField] ?? null;
+                if ($dispatchedField !== $expectedField) {
+                    continue 2;
+                }
+            }
 
             $hasEvent = true;
         }
@@ -311,13 +369,15 @@ trait EventSpyTestTrait {
     /**
      * Generate an expected event.
      *
-     * @param string $type
-     * @param string $action
-     * @param array $payload
+     * @param string $type Either the fully namespaced class name of the type of resource event or the value to use
+     * in the resource event's `type` property
+     * @param string $action Action associated with resource event as defined in EventAction
+     * @param array $payload Payload to include in the event, assigned to an array key
+     * that matches the value returned by the event's `getType()` method.
      * @return ResourceEvent
      */
     private function expectedResourceEvent(string $type, string $action, array $payload): ResourceEvent {
-        if (is_a($type, ResourceEvent::class)) {
+        if (is_a($type, ResourceEvent::class, true)) {
             $recordType = $type::typeFromClass();
             return new $type(
                 $action,
@@ -354,5 +414,27 @@ trait EventSpyTestTrait {
         $record = $dirtyRecordModel->select(["recordType" => $recordType, "recordID" => $recordID]);
         $this->assertEquals($recordID, $record[0]["recordID"]);
         $this->resetTable('dirtyRecord');
+    }
+
+    /**
+     * Run a callback with some bound event handlers.
+     *
+     * @param callable $callable The callback to run.
+     * @param callable[] $eventHandlers Event handlers indexed by their event names.
+     *
+     * @return mixed
+     */
+    public function runWithBoundEvents(callable $callable, array $eventHandlers) {
+        $eventManager = $this->getEventManager();
+        foreach ($eventHandlers as $eventName => $eventHandler) {
+            $eventManager->bind($eventName, $eventHandler);
+        }
+
+        $result = call_user_func($callable);
+
+        foreach ($eventHandlers as $eventName => $eventHandler) {
+            $eventManager->unbind($eventName, $eventHandler);
+        }
+        return $result;
     }
 }

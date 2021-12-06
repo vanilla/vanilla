@@ -107,7 +107,7 @@ final class SearchTypeCollection implements \IteratorAggregate {
                 if (!$foundType->userHasPermission()) {
                     $validation->addError(
                         'recordTypes',
-                        sprintf("You don't have permission to search the %s recordType", $foundType->getSearchGroup()),
+                        sprintf("You don't have permission to search the %s recordType", $foundType->getRecordType()),
                         ['status' => 403]
                     );
                     continue;
@@ -195,10 +195,37 @@ final class SearchTypeCollection implements \IteratorAggregate {
     public function getByRecordType(string $recordType): array {
         $result = [];
         foreach ($this->allTypes as $searchType) {
-            if ($recordType === $searchType->getSearchGroup()) {
+            if ($recordType === $searchType->getRecordType()) {
                 $result[] = $searchType;
             }
         }
         return $result;
+    }
+
+    /**
+     * Group search types where possible.
+     *
+     * This will result in something like this:
+     * [
+     *      // These both share a searchGroup of "discussion" but can share the same query.
+     *      "discussion" => [DiscussionSearchType, QuestionsSearchType],
+     *      // These both a share searchGroup of "places" but can't share the same query.
+     *      "category" => [CategorySearchType],
+     *      "group" => [GroupSearchType],
+      * ]
+     *
+     * @return AbstractSearchType[][]
+     */
+    public function getAsOptimizedRecordTypes(): array {
+        $typesByAllowedGroup = [];
+
+        foreach ($this->allTypes as $searchType) {
+            if ($searchType->canBeOptimizedIntoRecordType()) {
+                $typesByAllowedGroup[$searchType->getRecordType()][] = $searchType;
+            } else {
+                $typesByAllowedGroup[$searchType->getType()][] = $searchType;
+            }
+        }
+        return array_values($typesByAllowedGroup);
     }
 }

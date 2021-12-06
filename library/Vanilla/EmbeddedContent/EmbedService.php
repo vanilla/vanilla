@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -18,8 +18,10 @@ use Vanilla\EmbeddedContent\Embeds\IFrameEmbed;
 use Vanilla\EmbeddedContent\Embeds\ImageEmbed;
 use Vanilla\EmbeddedContent\Embeds\ImgurEmbed;
 use Vanilla\EmbeddedContent\Embeds\LinkEmbed;
+use Vanilla\EmbeddedContent\Embeds\MuralEmbed;
 use Vanilla\EmbeddedContent\Embeds\TwitchEmbedFilter;
 use Vanilla\EmbeddedContent\Factories\BrightcoveEmbedFactory;
+use Vanilla\EmbeddedContent\Factories\MuralEmbedFactory;
 use Vanilla\EmbeddedContent\Factories\PanoptoEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\PanoptoEmbed;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
@@ -32,6 +34,8 @@ use Vanilla\EmbeddedContent\Factories\TwitchEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\TwitchEmbed;
 use Vanilla\EmbeddedContent\Factories\YouTubeEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\YouTubeEmbed;
+use Vanilla\EmbeddedContent\Factories\KalturaEmbedFactory;
+use Vanilla\EmbeddedContent\Embeds\KalturaEmbed;
 use Vanilla\EmbeddedContent\Factories\WistiaEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\WistiaEmbed;
 use Vanilla\EmbeddedContent\Factories\VimeoEmbedFactory;
@@ -186,9 +190,15 @@ class EmbedService implements EmbedCreatorInterface {
             // YouTube
             ->registerFactory($dic->get(YouTubeEmbedFactory::class))
             ->registerEmbed(YouTubeEmbed::class, YouTubeEmbed::TYPE)
+            // Kaltura
+            ->registerFactory($dic->get(KalturaEmbedFactory::class))
+            ->registerEmbed(KalturaEmbed::class, KalturaEmbed::TYPE)
             // Panopto
             ->registerFactory($dic->get(PanoptoEmbedFactory::class))
             ->registerEmbed(PanoptoEmbed::class, PanoptoEmbed::TYPE)
+            // Mural
+            ->registerFactory($dic->get(MuralEmbedFactory::class))
+            ->registerEmbed(MuralEmbed::class, MuralEmbed::TYPE)
             // Scrape-able Embeds
             ->setFallbackFactory($dic->get(ScrapeEmbedFactory::class))
             ->registerEmbed(ImageEmbed::class, ImageEmbed::TYPE)

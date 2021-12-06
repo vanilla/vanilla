@@ -6,13 +6,14 @@
 
 namespace VanillaTests\Library\Vanilla;
 
-use VanillaTests\BootstrapTestCase;
 use Vanilla\Permissions;
+use VanillaTests\SiteTestCase;
 
 /**
  * Tests for the `Permissions` class.
  */
-class PermissionsTest extends BootstrapTestCase {
+class PermissionsTest extends SiteTestCase {
+
     private const RANKED_PERMISSIONS = [
         'Garden.Admin.Allow', // virtual permission for isAdmin
         'Garden.Settings.Manage',
@@ -21,6 +22,28 @@ class PermissionsTest extends BootstrapTestCase {
         'Garden.Curation.Manage',
         'Garden.SignIn.Allow',
     ];
+
+    /**
+     * This method is called before the first test of this test class is run.
+     */
+    public static function setupBeforeClass(): void {
+        self::$addons = ['vanilla','knowledge'];
+        parent::setupBeforeClass();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function teardownAfterClass(): void {
+        self::$addons = ['vanilla', 'conversations', 'stubcontent'];
+    }
+    /**
+     *  Test setup.
+     */
+    public function setUp(): void {
+        $this->enableCaching();
+        parent::setUp();
+    }
 
     public function testAdd() {
         $permissions = new Permissions();
@@ -59,23 +82,57 @@ class PermissionsTest extends BootstrapTestCase {
         $this->assertTrue($permissions->has('Vanilla.Discussions.Add', 10));
     }
 
-    public function testHasAny() {
+    /**
+     * Test HasAny functionality
+     *
+     * @param array $permissionsCheck permissions to check
+     * @param boolean $expectedResult expected success or fail
+     *
+     * @dataProvider provideTestHasAnyArray
+     */
+    public function testHasAny($permissionsCheck, $expectedResult = false) {
         $permissions = new Permissions([
             'Vanilla.Comments.Add',
         ]);
-
-        $this->assertTrue($permissions->hasAny([
-            'Vanilla.Discussions.Add',
-            'Vanilla.Discussions.Edit',
-            'Vanilla.Comments.Add',
-            'Vanilla.Comments.Edit',
-        ]));
-        $this->assertFalse($permissions->hasAny([
-            'Garden.Settings.Manage',
-            'Garden.Community.Manage',
-            'Garden.Moderation.Manage',
-        ]));
+        if ($expectedResult) {
+            $this->assertTrue($permissions->hasAny($permissionsCheck));
+        } else {
+            $this->assertFalse($permissions->hasAny($permissionsCheck));
+        }
     }
+
+    /**
+     * Provide test data for {@link testHasAny()}.
+     *
+     * @return array Returns an array of test data.
+     */
+    public function provideTestHasAnyArray() {
+        return [
+            "Has Vanilla.Comments.Add and others" => [[
+                'Vanilla.Discussions.Add',
+                'Vanilla.Discussions.Edit',
+                'Vanilla.Comments.Add',
+                'Vanilla.Comments.Edit',
+            ], true],
+            "Has comments.add and others" => [[
+                'discussions.add',
+                'discussions.edit',
+                'comments.add',
+                'comments.edit',
+            ], true],
+            "Doesn't have any full name " => [[
+                'Garden.Settings.Manage',
+                'Garden.Community.Manage',
+                'Garden.Moderation.Manage',
+            ], false],
+            "Doesn't have any new name " => [[
+                'settings.manage',
+                'community.manage',
+                'moderation.manage',
+            ], false],
+        ];
+    }
+
 
     /**
      * Test that our -1 ID is handled.
@@ -158,27 +215,63 @@ class PermissionsTest extends BootstrapTestCase {
         ));
     }
 
-    public function testHasAll() {
+    /**
+     * Test HasAny functionality
+     *
+     * @param array $permissionsCheck permissions to check
+     * @param boolean $expectedResult expected success or fail
+     *
+     * @dataProvider provideTestHasAllArray
+     */
+    public function testHasAll($permissionsCheck, $expectedResult) {
         $permissions = new Permissions([
             'Vanilla.Discussions.Add',
             'Vanilla.Discussions.Edit',
             'Vanilla.Comments.Add',
             'Vanilla.Comments.Edit',
         ]);
+        if ($expectedResult) {
+            $this->assertTrue($permissions->hasAll($permissionsCheck));
+        } else {
+            $this->assertFalse($permissions->hasAll($permissionsCheck));
+        }
+    }
 
-        $this->assertTrue($permissions->hasAll([
-            'Vanilla.Discussions.Add',
-            'Vanilla.Discussions.Edit',
-            'Vanilla.Comments.Add',
-            'Vanilla.Comments.Edit',
-        ]));
-        $this->assertFalse($permissions->hasAll([
-            'Vanilla.Discussions.Announce',
-            'Vanilla.Discussions.Add',
-            'Vanilla.Discussions.Edit',
-            'Vanilla.Comments.Add',
-            'Vanilla.Comments.Edit',
-        ]));
+    /**
+     * Provide test data for {@link testHasAll()}.
+     *
+     * @return array Returns an array of test data.
+     */
+    public function provideTestHasAllArray() {
+        return [
+            "Has all Full/Old names" => [[
+                'Vanilla.Discussions.Add',
+                'Vanilla.Discussions.Edit',
+                'Vanilla.Comments.Add',
+                'Vanilla.Comments.Edit',
+                'comments.edit'
+            ], true],
+            "Has all new names" => [[
+                'discussions.add',
+                'discussions.edit',
+                'comments.add',
+                'comments.edit'
+            ], true],
+            "Doesn't have all full name " => [[
+                'Vanilla.Discussions.Announce',
+                'Vanilla.Discussions.Add',
+                'Vanilla.Discussions.Edit',
+                'Vanilla.Comments.Add',
+                'Vanilla.Comments.Edit',
+            ], false],
+            "Doesn't have all new name " => [[
+                'discussions.announce',
+                'discussions.add',
+                'discussions.edit',
+                'comments.add',
+                'comments.edit',
+            ], false],
+        ];
     }
 
     /**
@@ -191,26 +284,92 @@ class PermissionsTest extends BootstrapTestCase {
         $this->assertTrue($perm->hasAny([]));
     }
 
-    public function testHas() {
+    /**
+     * Test Untranslate API permission name
+     *
+     * @param string $permission API permission name
+     * @param string $expectedResult Old style permission name
+     *
+     * @dataProvider provideTestUnTranslateArray
+     */
+    public function testUnTranslatePermission($permission, $expectedResult) {
+        $permissions = new Permissions();
+        $oldName = $permissions->untranslatePermission($permission);
+
+        $this->assertSame(@$expectedResult, $oldName);
+    }
+
+    /**
+     * Provide test data for {@link testUnTranslatePermission()}.
+     *
+     * @return array Returns an array of test data.
+     */
+    public function provideTestUnTranslateArray() {
+        return [
+            'Permission articles.add permission' => ['articles.add', 'knowledge.articles.add'],
+            'Permission conversations.moderate' => ['conversations.moderate', 'Conversations.Moderation.Manage'],
+            'Permission comments.email' => ['comments.email', 'Email.Comments.Add'],
+            'Permission conversations.email' => ['conversations.email', 'Email.Conversations.Add'],
+            'Permission discussions.email' => ['discussions.email', 'Email.Discussions.Add'],
+            'Permission Reactions.Negative.Add' => ['Reactions.Negative.Add','Reactions.Negative.Add'],
+            'Permission Reactions.Positive.Add ' => ['Reactions.Positive.Add', 'Reactions.Positive.Add'],
+            'Permission discussions.edit' => ['discussions.edit', 'Vanilla.Discussions.Edit'],
+            'Permission comments.edit' => ['comments.edit', 'Vanilla.Comments.Edit'],
+            'Permission discussions.add' => ['discussions.add', 'Vanilla.Discussions.Add']
+        ];
+    }
+
+    /**
+     * Test Has permission function
+     *
+     * @param string $permission Permission name
+     * @param integer|null $permissionId Permission ID
+     * @param string|null $checkMode method of checking
+     * @param boolean $expectedHas should be error or not.
+     *
+     * @dataProvider provideTestHasArray
+     */
+    public function testHas($permission, $permissionId = null, $checkMode = null, $expectedHas = false) {
         $permissions = new Permissions([
             'Vanilla.Discussions.View',
             'Vanilla.Discussions.Add' => [10],
         ]);
 
-        $this->assertTrue($permissions->has('Vanilla.Discussions.View'));
-        $this->assertFalse($permissions->has('Garden.Settings.Manage'));
-        $this->assertTrue($permissions->has('Vanilla.Discussions.Add'));
+        if ($expectedHas) {
+            if ($checkMode === null) {
+                $this->assertTrue($permissions->has($permission, $permissionId));
+            } else {
+                $this->assertTrue($permissions->has($permission, $permissionId, $checkMode));
+            }
+        } else {
+            if ($checkMode === null) {
+                $this->assertFalse($permissions->has($permission, $permissionId));
+            } else {
+                $this->assertFalse($permissions->has($permission, $permissionId, $checkMode));
+            }
+        }
+    }
 
-        $this->assertTrue($permissions->has('Vanilla.Discussions.Add', 10));
-        $this->assertTrue($permissions->has('Vanilla.Discussions.Add', 10, Permissions::CHECK_MODE_RESOURCE_ONLY));
-        $this->assertFalse($permissions->has('Vanilla.Discussions.Add', 100));
-
-        $this->assertTrue($permissions->has('Vanilla.Discussions.Add', null));
-        $this->assertTrue($permissions->has('Vanilla.Discussions.View', null));
-        $this->assertFalse($permissions->has('Vanilla.Discussions.Add', null, Permissions::CHECK_MODE_GLOBAL_ONLY));
-        $this->assertFalse($permissions->has('Vanilla.Discussions.Edit'));
-
-        $this->assertFalse($permissions->has(""));
+    /**
+     * Provide test data for {@link testHas()}.
+     *
+     * @return array Returns an array of test data.
+     */
+    public function provideTestHasArray() {
+        return [
+            'Has Vanilla.Discussions.View permission' => ['Vanilla.Discussions.View', null, null, true ],
+            'Has Vanilla.Discussions.Add permission'  => ['Vanilla.Discussions.Add', null, null, true ],
+            'Has Vanilla.Discussions.Add 10 permission' => ['Vanilla.Discussions.Add', 10, null, true ],
+            'Has Vanilla.Discussions.Add 10 Check Mode permission' => ['Vanilla.Discussions.Add', 10, Permissions::CHECK_MODE_RESOURCE_ONLY, true ],
+            'Has discussions.add permission' => ['discussions.add', null, null, true ],
+            'Has discussions.add 10 permission' => ['discussions.add', 10, null, true ],
+            'Does not have Garden.Settings.Manage permission' => ['Garden.Settings.Manage', null, null, false ],
+            'Does not have Vanilla.Discussions.Add 100 permission' => ['Vanilla.Discussions.Add', 100, null, false ],
+            'Does not have Vanilla.Discussions.Add Global Mode permission' => ['Vanilla.Discussions.Add', null, Permissions::CHECK_MODE_GLOBAL_ONLY, false ],
+            'Does not have Vanilla.Discussions.Edit permission' => ['Vanilla.Discussions.Edit', null, null, false ],
+            'Does not have discussions.edit permission' => ['discussions.edit', null, null, false ],
+            'Does not have "" permission' => ['', null, null, false ],
+        ];
     }
 
     public function testMerge() {
@@ -234,10 +393,13 @@ class PermissionsTest extends BootstrapTestCase {
     public function testOverwrite() {
         $permissions = new Permissions([
             'Garden.Settings.Manage',
+            'Email.Discussions.Add',
             'Garden.Discussions.Add' => [1, 2, 3],
         ]);
 
         $this->assertTrue($permissions->has('Garden.Settings.Manage'));
+        $this->assertTrue($permissions->has('discussions.email'));
+
         $this->assertTrue($permissions->has('Garden.Discussions.Add', 1));
         $this->assertTrue($permissions->has('Garden.Discussions.Add', 2));
         $this->assertTrue($permissions->has('Garden.Discussions.Add', 3));

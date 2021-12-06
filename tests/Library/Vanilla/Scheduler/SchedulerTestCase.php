@@ -17,24 +17,55 @@ use Gdn_Configuration;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use Vanilla\Bootstrap;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Logger;
 use Vanilla\Scheduler\Driver\LocalDriver;
 use Vanilla\Scheduler\DummyScheduler;
 use Vanilla\Scheduler\SchedulerInterface;
+use VanillaTests\EventSpyTestTrait;
 use VanillaTests\Fixtures\NullCache;
 use VanillaTests\SetsGeneratorTrait;
+use VanillaTests\SiteTestCase;
 use VanillaTests\SiteTestTrait;
 
 /**
  * Class SchedulerTestCase
  */
-class SchedulerTestCase extends TestCase {
-    use SiteTestTrait;
+class SchedulerTestCase extends SiteTestCase {
     use SetsGeneratorTrait;
+    use EventSpyTestTrait;
 
     const DISPATCH_EVENT = 'SchedulerDispatch';
     const DISPATCHED_EVENT = 'SchedulerDispatched';
+
+    /**
+     * Use the dummy/deferred scheduler instead of the usual instant scheduler in tests.
+     *
+     * @param Container $container
+     */
+    public static function configureContainerBeforeStartup(Container $container) {
+        $container
+            ->rule(SchedulerInterface::class)
+            ->setClass(DummyScheduler::class)
+            ->addCall('setFinalizeRequest', [false])
+            ->setShared(true)
+        ;
+    }
+
+    /**
+     * Cleanup some singletons between tests.
+     */
+    public function setUp(): void {
+        parent::setUp();
+
+        // Clear the scheduler between tests.
+        /** @var DummyScheduler $scheduler */
+        $scheduler = self::container()->get(SchedulerInterface::class);
+        $scheduler->reset();
+        $this->getEventManager()->unbindAll();
+    }
+
 
     /**
      * Get a new, cleanly-configured container.
@@ -44,41 +75,10 @@ class SchedulerTestCase extends TestCase {
      * @throws NotFoundException On error.
      */
     protected function getConfiguredContainer(): Container {
-        $container = new Container();
-
-        $container
-            ->setInstance(ContainerInterface::class, $container)
-            //
-            ->rule(LoggerInterface::class)
-            ->setClass(Logger::class)
-            ->setShared(true)
-            //
-            ->rule(EventManager::class)
-            ->setShared(true)
-            //
-            ->rule(SchedulerInterface::class)
-            ->setClass(DummyScheduler::class)
-            ->addCall('setFinalizeRequest', [false])
-            ->setShared(true)
-            // Configuration
-            ->rule(Gdn_Configuration::class)
-            ->setShared(true)
-            ->addAlias('Config')
-            ->addAlias(ConfigurationInterface::class)
-            //
-            ->rule('Gdn_Database')
-            ->setShared(true)
-            ->setConstructorArgs([new Reference(['Gdn_Configuration', 'Database'])])
-            ->addAlias('Database')
-            //
-            ->rule(Gdn_Cache::class)
-            ->setClass(NullCache::class)
-        ;
+        $container = self::container();
 
         /** @var Gdn_Configuration $config */
         $config = $container->get(Gdn_Configuration::class);
-        $config->loadArray([], 'voidConfig');
-        $config->autoSave(false);
         $config->set('Garden.Scheduler.CronMinimumTimeSpan', 0);
 
         /** @var SchedulerInterface $dummyScheduler */
@@ -86,9 +86,6 @@ class SchedulerTestCase extends TestCase {
 
         $bool = $dummyScheduler->addDriver(LocalDriver::class);
         $this->assertTrue($bool);
-
-        $dummyScheduler->setDispatchEventName(self::DISPATCH_EVENT);
-        $dummyScheduler->setDispatchedEventName(self::DISPATCHED_EVENT);
 
         return $container;
     }

@@ -433,7 +433,7 @@ class AddonManagerTest extends SharedBootstrapTestCase {
         $manager = $this->createVanillaManager();
         $result = [];
         foreach ($types as $type) {
-            $addons = $manager->lookupAllByType($type);
+            $addons = @$manager->lookupAllByType($type);
             foreach ($addons as $addon) {
                 /* @var Addon $addon */
                 $result[$addon->getSubdir()] = [$addon];

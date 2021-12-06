@@ -466,7 +466,8 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface {
     /**
      * Adds to the "To" recipient collection.
      *
-     * @param mixed $recipientEmail An email (or array of emails) to add to the "To" recipient collection.
+     * @param mixed $recipientEmail An email, an array of emails, or a user object to add to the "To" recipient collection.
+     *   Note: Passing a user object adds Garden.Email.View permission checks.
      * @param string $recipientName The recipient name associated with $recipientEmail. If $recipientEmail is
      *   an array of email addresses, this value will be ignored.
      * @return Gdn_Email
@@ -494,8 +495,7 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface {
             return $this;
 
         } elseif ((is_object($recipientEmail) && property_exists($recipientEmail, 'Email'))
-            || (is_array($recipientEmail) && isset($recipientEmail['Email']))
-        ) {
+            || (is_array($recipientEmail) && isset($recipientEmail['Email']))) {
             $user = $recipientEmail;
             $recipientName = val('Name', $user);
             $recipientEmail = val('Email', $user);

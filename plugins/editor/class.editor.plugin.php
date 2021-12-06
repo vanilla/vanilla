@@ -1015,7 +1015,7 @@ class EditorPlugin extends Gdn_Plugin {
                 throw new Exception(t('You are not allowed to upload files in this category.'));
             }
         }
-        
+
         if (count($mediaIds)) {
             foreach ($mediaIds as $mediaID) {
                 $this->attachEditorUploads($mediaID, $id, $type);
@@ -1457,16 +1457,12 @@ class EditorPlugin extends Gdn_Plugin {
         Gdn_Form $form,
         Gdn_ConfigurationModel $configModel
     ): string {
-        //WYSIWYG form items
-        $forceWysiwygLabel = 'Reinterpret All Posts As Wysiwyg';
-        $forceWysiwygNote1 =  t('ForceWysiwyg.Notes1', 'Check the below option to tell the editor to reinterpret all old posts as Wysiwyg.');
-        $forceWysiwygNote2 = t('ForceWysiwyg.Notes2', 'This setting will only take effect if Wysiwyg was chosen as the Post Format above. The purpose of this option is to normalize the editor format. If older posts edited with another format, such as markdown or BBCode, are loaded, this option will force Wysiwyg.');
-        $label = '<p class="info">'.$forceWysiwygNote1.'</p><p class="info"><strong>'.t('Note:').' </strong>'.$forceWysiwygNote2.'</p>';
         $configModel->setField('Plugins.editor.ForceWysiwyg');
         $form->setValue('Plugins.editor.ForceWysiwyg', c('Plugins.editor.ForceWysiwyg'));
-        $formToggle = $form->toggle('Plugins.editor.ForceWysiwyg', $forceWysiwygLabel, [], $label);
-
-        $additionalFormItemHTML .= "<div class='form-group forceWysiwyg'>$formToggle</div>";
+        $additionalFormItemHTML .= "<div class='form-group forceWysiwyg'>"
+            .VanillaSettingsController::postFormatReintrerpretToggle($form, 'Plugins.editor.ForceWysiwyg', 'Wysiwyg')
+            ."</div>"
+        ;
 
         return $additionalFormItemHTML;
     }

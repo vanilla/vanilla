@@ -114,6 +114,7 @@ class AccessTokenModel extends Gdn_Model {
         $id = false;
         if (filter_var($token, FILTER_VALIDATE_INT)) {
             $id = $token;
+            $row = $this->getID($id, DATASET_TYPE_ARRAY);
         } else {
             $token = $this->trim($token);
             $row = $this->getToken($token);
@@ -121,11 +122,13 @@ class AccessTokenModel extends Gdn_Model {
                 $id = $row['AccessTokenID'];
             }
         }
+        $attributes = array_key_exists('Attributes', $row) ? $row['Attributes'] : [];
+        $attributes['revoked'] = true;
 
         $this->setField($id, [
-            'DateExpires' => Gdn_Format::toDateTime(strtotime('-1 hour'))
+            'DateExpires' => Gdn_Format::toDateTime(strtotime('-1 hour')),
+            'Attributes' => $attributes,
         ]);
-        $this->setAttribute($id, 'revoked', true);
         return $this->Database->LastInfo['RowCount'] > 0;
     }
 

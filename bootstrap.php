@@ -3,6 +3,7 @@
 use Garden\ClassLocator;
 use Garden\Container\Container;
 use Garden\Container\Reference;
+use Garden\EventManager;
 use Vanilla\Addon;
 use Vanilla\BodyFormatValidator;
 use Vanilla\Contracts\Web\UASnifferInterface;
@@ -15,6 +16,7 @@ use Vanilla\Formatting\Html\HtmlEnhancer;
 use Vanilla\Formatting\Html\HtmlPlainTextConverter;
 use Vanilla\Formatting\Html\HtmlSanitizer;
 use Vanilla\Formatting\Html\Processor\ExternalLinksProcessor;
+use Vanilla\HttpCacheMiddleware;
 use Vanilla\InjectableInterface;
 use Vanilla\Contracts;
 use Vanilla\Models\CurrentUserPreloadProvider;
@@ -35,6 +37,7 @@ use Vanilla\Site\SingleSiteSectionProvider;
 use Vanilla\Theme\FsThemeProvider;
 use Vanilla\Theme\ThemeAssetFactory;
 use Vanilla\Theme\ThemeFeatures;
+use Vanilla\Theme\ThemeService;
 use Vanilla\Theme\ThemeServiceHelper;
 use Vanilla\Theme\VariableProviders\QuickLinksVariableProvider;
 use Vanilla\Utility\ContainerUtils;
@@ -44,6 +47,8 @@ use Vanilla\Web\SafeCurlHttpHandler;
 use Vanilla\Web\TwigEnhancer;
 use Vanilla\Web\TwigRenderer;
 use Vanilla\Web\UASniffer;
+use Vanilla\Widgets\TabWidgetModule;
+use Vanilla\Widgets\TabWidgetTabService;
 use Vanilla\Widgets\WidgetService;
 
 if (!defined('APPLICATION')) exit();
@@ -171,6 +176,9 @@ $dic->setInstance(Container::class, $dic)
     ->rule(\Psr\Log\LoggerAwareInterface::class)
     ->addCall('setLogger')
 
+    ->rule(HttpCacheMiddleware::class)
+    ->setShared(true)
+
     // EventManager
     ->rule(\Garden\EventManager::class)
     ->addAlias(\Vanilla\Contracts\Addons\EventListenerConfigInterface::class)
@@ -262,7 +270,7 @@ $dic->setInstance(Container::class, $dic)
     ->addCall('setLocaleKey', [ContainerUtils::currentLocale()])
     ->addCall('setCacheBusterKey', [ContainerUtils::cacheBuster()])
     // Explicitly cannot be set as shared.
-    // If instaniated too early, then the request/site sections will not be processed yet.
+    // If instantiated too early, then the request/site sections will not be processed yet.
     ->setShared(false)
 
     ->rule(\Vanilla\Web\HttpStrictTransportSecurityModel::class)
@@ -293,7 +301,6 @@ $dic->setInstance(Container::class, $dic)
     ->addCall('addMiddleware', [new Reference(\Vanilla\Web\ContentSecurityPolicyMiddleware::class)])
     ->addCall('addMiddleware', [new Reference(\Vanilla\Web\HttpStrictTransportSecurityMiddleware::class)])
     ->addCall('addMiddleware', [new Reference(\Vanilla\Web\Middleware\LogTransactionMiddleware::class)])
-    ->addCall('addMiddleware', [new Reference(\Vanilla\Web\Middleware\SystemTokenMiddleware::class)])
 
     ->rule(\Vanilla\Web\Middleware\LogTransactionMiddleware::class)
     ->setShared(true)
@@ -331,16 +338,13 @@ $dic->setInstance(Container::class, $dic)
     ])
     ->setShared(true)
 
-    ->rule(\Vanilla\Web\Middleware\SystemTokenMiddleware::class)
-    ->setConstructorArgs([
-        "/api/v2/",
-    ])
-    ->setShared(true)
-
     ->rule(\Vanilla\Web\SystemTokenUtils::class)
     ->setConstructorArgs([
         ContainerUtils::config("Context.Secret", "")
     ])
+    ->setShared(true)
+
+    ->rule(\Vanilla\Web\RoleTokenFactory::class)
     ->setShared(true)
 
     ->rule(\Vanilla\OpenAPIBuilder::class)
@@ -362,6 +366,7 @@ $dic->setInstance(Container::class, $dic)
     ->addCall('setMeta', ['CONTENT_TYPE', 'application/json; charset=utf-8'])
     ->addCall('addMiddleware', [new Reference(\Vanilla\Web\PrivateCommunityMiddleware::class)])
     ->addCall('addMiddleware', [new Reference(\Vanilla\Web\ApiFilterMiddleware::class)])
+    ->addCall('addMiddleware', [new Reference(\Vanilla\Web\Middleware\RoleTokenAuthMiddleware::class)])
 
     ->rule('@view-application/json')
     ->setClass(\Vanilla\Web\JsonView::class)
@@ -385,12 +390,6 @@ $dic->setInstance(Container::class, $dic)
     ->rule(BreadcrumbModel::class)
     ->setShared(true)
 
-    ->rule(Gdn_Validation::class)
-    ->addCall('addRule', ['BodyFormat', new Reference(\Vanilla\BodyFormatValidator::class)])
-
-    ->rule(Gdn_Validation::class)
-    ->addCall('addRule', ['plainTextLength', new Reference(\Vanilla\PlainTextLengthValidator::class)])
-
     ->rule(\Vanilla\Models\AuthenticatorModel::class)
     ->setShared(true)
     ->addCall('registerAuthenticatorClass', [\Vanilla\Authenticator\PasswordAuthenticator::class])
@@ -405,6 +404,10 @@ $dic->setInstance(Container::class, $dic)
     ->setInherit(true)
 
     ->rule(WidgetService::class)
+    ->addCall('registerWidget', [TabWidgetModule::class])
+    ->setShared(true)
+
+    ->rule(TabWidgetTabService::class)
     ->setShared(true)
 
     ->rule('Gdn_IPlugin')
@@ -475,7 +478,7 @@ $dic->setInstance(Container::class, $dic)
     ->setShared(true)
 
     ->rule(\Vanilla\EmbeddedContent\Factories\ScrapeEmbedFactory::class)
-    ->setConstructorArgs(['httpClient' => new Reference('@scrape-http-client'), 'pageScraper' => new Reference('@scrape-page-scraper')])
+    ->setConstructorArgs(['httpClient' => new Reference('@scrape-http-client')])
     ->rule('@scrape-http-client')
     ->setClass(\Garden\Http\HttpClient::class)
     ->setConstructorArgs(["handler" => new Reference(Vanilla\Web\SafeCurlHttpHandler::class)])
@@ -486,8 +489,7 @@ $dic->setInstance(Container::class, $dic)
     ->addCall('registerMetadataParser', [new Reference(Vanilla\Metadata\Parser\JsonLDParser::class)])
     ->setShared(true)
 
-    ->rule('@scrape-page-scraper')
-    ->setClass(\Vanilla\PageScraper::class)
+    ->rule(\Vanilla\PageScraper::class)
     ->setConstructorArgs(['httpClient' => new Reference('@scrape-http-client')])
     ->addCall('registerMetadataParser', [new Reference(Vanilla\Metadata\Parser\OpenGraphParser::class)])
     ->addCall('registerMetadataParser', [new Reference(Vanilla\Metadata\Parser\JsonLDParser::class)])
@@ -573,7 +575,6 @@ $dic->call(function (
     Container $dic,
     Gdn_Configuration $config,
     \Vanilla\AddonManager $addonManager,
-    \Garden\EventManager $eventManager,
     Gdn_Request $request // remove later
 ) {
 
@@ -618,26 +619,18 @@ $dic->call(function (
      */
 
     // Start the addons, plugins, and applications.
-    $addonManager->startAddonsByKey(c('EnabledPlugins'), Addon::TYPE_ADDON);
-    $addonManager->startAddonsByKey(c('EnabledApplications'), Addon::TYPE_ADDON);
-    $addonManager->startAddonsByKey(array_keys(c('EnabledLocales', [])), Addon::TYPE_LOCALE);
+    $addonManager->startAddonsByKey($config->get('EnabledPlugins'), Addon::TYPE_ADDON);
+    $addonManager->startAddonsByKey($config->get('EnabledApplications'), Addon::TYPE_ADDON);
+    $addonManager->startAddonsByKey(array_keys($config->get('EnabledLocales', [])), Addon::TYPE_LOCALE);
 
-    $currentTheme = c('Garden.Theme', Gdn_ThemeManager::DEFAULT_DESKTOP_THEME);
-    if (isMobile()) {
-        $currentTheme = c('Garden.MobileTheme', Gdn_ThemeManager::DEFAULT_MOBILE_THEME);
-    }
+    $currentTheme = $config->get(
+        // Despite our default theme being responsive, older sites could be configured with a different mobile/desktop theme.
+        isMobile() ? 'Garden.MobileTheme' : 'Garden.Theme',
+        ThemeService::FALLBACK_THEME_KEY
+    );
     $addonManager->startAddonsByKey([$currentTheme], Addon::TYPE_THEME);
 
-    // Load the configurations for enabled addons.
-    foreach ($addonManager->getEnabled() as $addon) {
-        /* @var Addon $addon */
-        if ($configPath = $addon->getSpecial('config')) {
-            $config->load($addon->path($configPath));
-        }
-    }
-
-    // Re-apply loaded user settings.
-    $config->overlayDynamic();
+    $addonManager->applyConfigDefaults($config);
 
     /**
      * Bootstrap Late
@@ -659,18 +652,22 @@ $dic->call(function (
      * Allow installed addons to execute startup and bootstrap procedures that they may have, here.
      */
 
-    // Bootstrapping.
-    foreach ($addonManager->getEnabled() as $addon) {
-        /* @var Addon $addon */
-        if ($bootstrapPath = $addon->getSpecial('bootstrap')) {
-            $bootstrapPath = $addon->path($bootstrapPath);
-            include_once $bootstrapPath;
-        }
-    }
+    $addonManager->configureContainer($dic);
+
+    // Delay instantiation in case an addon has configured it.
+    $eventManager = $dic->get(EventManager::class);
 
     // Plugins startup
     $addonManager->bindAllEvents($eventManager);
 
+    // Prepare our locale.
+    $locale = $dic->get(Gdn_Locale::class);
+    $locale->loadExtraLocaleDefinitions();
+
+    ///
+    /// Both of these should be considered "soft" deprecated.
+    /// New addons should use AddonContainerRules to configure the application.
+    ///
     if ($eventManager->hasHandler('gdn_pluginManager_afterStart')) {
         $eventManager->fire('gdn_pluginManager_afterStart', $dic->get(Gdn_PluginManager::class));
     }

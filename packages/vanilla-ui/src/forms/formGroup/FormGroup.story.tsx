@@ -41,11 +41,11 @@ export function FormGroup() {
                     <UI.FormGroupLabel>City</UI.FormGroupLabel>
                     <UI.FormGroupInput>
                         {(props) => (
-                            <UI.AutoComplete {...props} clear>
-                                <UI.AutoCompleteOption value="Montreal" />
-                                <UI.AutoCompleteOption value="Detroit" />
-                                <UI.AutoCompleteOption value="Toronto" />
-                            </UI.AutoComplete>
+                            <UI.AutoComplete
+                                {...props}
+                                options={[{ value: "Montreal" }, { value: "Detroit" }, { value: "Toronto" }]}
+                                clear
+                            />
                         )}
                     </UI.FormGroupInput>
                 </UI.FormGroup>
@@ -64,11 +64,11 @@ export function FormGroup() {
                     <UI.FormGroupLabel>City</UI.FormGroupLabel>
                     <UI.FormGroupInput>
                         {(props) => (
-                            <UI.AutoComplete {...props} clear>
-                                <UI.AutoCompleteOption value="Montreal" />
-                                <UI.AutoCompleteOption value="Detroit" />
-                                <UI.AutoCompleteOption value="Toronto" />
-                            </UI.AutoComplete>
+                            <UI.AutoComplete
+                                {...props}
+                                clear
+                                options={[{ value: "Montreal" }, { value: "Detroit" }, { value: "Toronto" }]}
+                            />
                         )}
                     </UI.FormGroupInput>
                 </UI.FormGroup>

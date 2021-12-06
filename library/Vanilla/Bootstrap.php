@@ -8,13 +8,19 @@
 namespace Vanilla;
 
 use Garden\Container\Container;
+use Garden\Container\Reference;
+use Garden\Web\Dispatcher;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Container\ContainerInterface;
 use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\ChainAdapter;
 use Symfony\Component\Cache\Adapter\Psr16Adapter;
+use Vanilla\Analytics\TrackableDecoratorInterface;
 use Vanilla\Cache\CacheCacheAdapter;
+use Vanilla\Logging\TraceCollector;
+use Vanilla\Scheduler\LongRunner;
+use Vanilla\Scheduler\LongRunnerMiddleware;
 
 /**
  * Contains static functions for bootstrapping Vanilla.
@@ -50,7 +56,19 @@ class Bootstrap {
             ->rule(\DateTimeInterface::class)
             ->setAliasOf(\DateTimeImmutable::class)
             ->setConstructorArgs([null, null])
-            ;
+        ;
+
+        // Tracking
+        $container
+            ->rule(TrackableDecoratorInterface::class)
+            ->setShared(true)
+        ;
+
+        // Logging
+        $container
+            ->rule(TraceCollector::class)
+            ->setShared(true)
+        ;
 
         // Caches
         $container
@@ -66,6 +84,27 @@ class Bootstrap {
             ->rule(CacheItemPoolInterface::class)
             ->setShared(true)
             ->setClass(Psr16Adapter::class)
+
+            ->rule(Dispatcher::class)
+            ->addCall('addMiddleware', [new Reference(LongRunnerMiddleware::class)])
+
+            ->rule(LongRunner::class)
+            ->setShared(true)
+
+            ->rule(\Vanilla\Web\Middleware\SystemTokenMiddleware::class)
+            ->setConstructorArgs([
+                "/api/v2/",
+            ])
+            ->setShared(true)
+
+            ->rule(Dispatcher::class)
+            ->addCall('addMiddleware', [new Reference(\Vanilla\Web\Middleware\SystemTokenMiddleware::class)])
+            // Validation
+            ->rule(\Gdn_Validation::class)
+            ->addCall('addRule', ['BodyFormat', new Reference(BodyFormatValidator::class)])
+
+            ->rule(\Gdn_Validation::class)
+            ->addCall('addRule', ['plainTextLength', new Reference(PlainTextLengthValidator::class)])
 
             ->rule(self::CACHE_FAST)
             ->setShared(true)
@@ -85,7 +124,7 @@ class Bootstrap {
                     // @codeCoverageIgnoreEnd
                 }
                 return $mainCachePsr16;
-            });
+            })
         ;
     }
 }

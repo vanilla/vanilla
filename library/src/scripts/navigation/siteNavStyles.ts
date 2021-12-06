@@ -336,9 +336,6 @@ export const siteNavNodeDashboardClasses = useThemeCache(() => {
             "&:not(.focus-visible):active": {
                 outline: 0,
             },
-            "&:focus": {
-                outline: 0,
-            },
             "&.hasChildren": {
                 ...{
                     [`.${label}`]: {
@@ -369,7 +366,6 @@ export const siteNavNodeDashboardClasses = useThemeCache(() => {
             flexGrow: 1,
             lineHeight: vars.node.lineHeight,
             minHeight: px(30),
-            outline: 0,
             padding: 0,
             width: percent(100),
         };

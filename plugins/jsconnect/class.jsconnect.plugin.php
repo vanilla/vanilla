@@ -9,11 +9,12 @@ use Vanilla\JsConnect\JsConnect;
 use Vanilla\JsConnect\JsConnectJSONP;
 use Vanilla\JsConnect\JsConnectServer;
 use Vanilla\Utility\CamelCaseScheme;
+use Vanilla\Web\CacheControlConstantsInterface;
 
 /**
  * Class JsConnectPlugin
  */
-class JsConnectPlugin extends SSOAddon {
+class JsConnectPlugin extends SSOAddon implements CacheControlConstantsInterface {
 
     const DEFAULT_SECRET_LENGTH = 64;
 
@@ -328,7 +329,7 @@ class JsConnectPlugin extends SSOAddon {
     }
 
     /**
-     * Ge the provider array for a client ID.
+     * Get the provider array for a client ID.
      *
      * @param ?string $client_id
      * @return array|mixed
@@ -358,6 +359,9 @@ class JsConnectPlugin extends SSOAddon {
         }
 
         if ($client_id) {
+            $result = array_filter($result, function ($row) {
+                return val('AuthenticationSchemeAlias', $row) === self::AUTHENTICATION_SCHEME;
+            });
             return val(0, $result, false);
         } else {
             return $result;
@@ -566,7 +570,7 @@ class JsConnectPlugin extends SSOAddon {
      * @throws /Exception Throws an exception when the jsConnect provider is not found.
      */
     public function entryController_jsconnect_create($sender, $action = '', $target = '') {
-        $sender->setHeader('Cache-Control', \Vanilla\Web\CacheControlMiddleware::NO_CACHE);
+        $sender->setHeader(self::HEADER_CACHE_CONTROL, self::NO_CACHE);
 
 
         $clientID = $sender->setData('client_id', $sender->Request->get('client_id', 0));
@@ -613,7 +617,7 @@ class JsConnectPlugin extends SSOAddon {
             throw notFoundException("Provider");
         }
 
-        $sender->setHeader('Cache-Control', \Vanilla\Web\CacheControlMiddleware::NO_CACHE);
+        $sender->setHeader(self::HEADER_CACHE_CONTROL, self::NO_CACHE);
         switch ($provider['Protocol'] ?? self::PROTOCOL_V2) {
             case self::PROTOCOL_V3:
                 $state = [
@@ -1426,7 +1430,7 @@ class JsConnectPlugin extends SSOAddon {
             $target = url('/entry/jsconnect-redirect', true).'?'.
                 http_build_query(['client_id' => $clientID, 'target' => $state[JsConnect::FIELD_TARGET] ?? '/']);
             $url = $this->replaceUrlTarget($url, $target);
-            $sender->setHeader('Cache-Control', \Vanilla\Web\CacheControlMiddleware::NO_CACHE);
+            $sender->setHeader(self::HEADER_CACHE_CONTROL, self::NO_CACHE);
             redirectTo($url, 302, false);
         } else {
             Logger::event('jsconnect_success', Logger::INFO, 'JSData Passed Validation', ['user' => $user, 'protocol' => self::PROTOCOL_V3]);

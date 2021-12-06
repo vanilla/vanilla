@@ -20,11 +20,11 @@ import { useThemeCache } from "@library/styles/themeCache";
 import { calc, important, percent, quote, translateY } from "csx";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { CSSObject } from "@emotion/css";
+import { css, CSSObject } from "@emotion/css";
 import { buttonResetMixin } from "@library/forms/buttonMixins";
 import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 
-export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
+export const richEditorClasses = useThemeCache((legacyMode: boolean = true) => {
     const globalVars = globalVariables();
     const style = styleFactory("richEditor");
     const vars = richEditorVariables();
@@ -84,6 +84,12 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
             radius: 3,
             color: globalVars.elementaryColors.transparent,
         }),
+    });
+
+    const conversionNotice = css({
+        marginTop: 16,
+        marginBottom: 16,
+        width: "auto",
     });
 
     const paragraphMenu = style("paragraphMenu", {
@@ -176,17 +182,15 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
             outline: 0,
             paddingBottom: 24, // So the user has room to click.
 
-            ...{
-                // When the editor is empty we should be displaying a placeholder.
-                "&.ql-blank::before": {
-                    content: `attr(placeholder)`,
-                    display: "block",
-                    color: ColorsUtils.colorOut(vars.text.placeholder.color),
-                    position: "absolute",
-                    top: 9,
-                    left: 12,
-                    cursor: "text",
-                },
+            // When the editor is empty we should be displaying a placeholder.
+            "&.ql-blank::before": {
+                content: `attr(placeholder)`,
+                display: "block",
+                color: ColorsUtils.colorOut(vars.text.placeholder.color),
+                position: "absolute",
+                top: legacyMode ? 9 : 0,
+                left: legacyMode ? 12 : 0,
+                cursor: "text",
             },
         },
         mediaQueries.oneColumnDown({
@@ -205,6 +209,10 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
         margin: 0,
         zIndex: 1,
         overflow: "visible",
+        "&&&&": {
+            // Work around deeply nested edit profile style.
+            width: "auto",
+        },
         ".richEditor-menuItem": {
             ".richEditor-button": {
                 display: "block",
@@ -448,5 +456,6 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
         flyoutOffset,
         emojiGroup,
         placeholder,
+        conversionNotice,
     };
 });

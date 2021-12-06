@@ -759,7 +759,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
         }
 
         if (Gdn::session()->checkPermission('Garden.Settings.Manage')) {
-            if (Gdn::get('Garden.Analytics.Notify', false) !== false) {
+            if (Gdn::get('Garden.Analytics.Notify', false) !== false && Gdn::controller() !== null) {
                 $callMessage = sprite('Bandaid', 'InformSprite');
                 $callMessage .= sprintf(t("There's a problem with Vanilla Analytics that needs your attention.<br/> Handle it <a href=\"%s\">here &raquo;</a>"), url('dashboard/statistics'));
                 Gdn::controller()->informMessage($callMessage, ['CssClass' => 'HasSprite']);
@@ -775,7 +775,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
             $confFile = PATH_CONF.'/config.php';
             if (!is_writable($confFile)) {
                 // Admins see a helpful notice
-                if (Gdn::session()->checkPermission('Garden.Settings.Manage')) {
+                if (Gdn::session()->checkPermission('Garden.Settings.Manage') && Gdn::controller() !== null) {
                     $warning = sprite('Sliders', 'InformSprite');
                     $warning .= t('Your config.php file is not writable.');
                     Gdn::controller()->informMessage($warning, ['CssClass' => 'HasSprite']);
@@ -815,8 +815,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
 
         try {
             if (c('Garden.Analytics.Views.Denormalize', false) &&
-                Gdn::cache()->activeEnabled() &&
-                Gdn::cache()->type() != Gdn_Cache::CACHE_TYPE_NULL
+                Gdn::cache()->activeEnabled()
             ) {
                 $cacheKey = "QueryCache.Analytics.CountViews";
 
@@ -839,8 +838,10 @@ class Gdn_Statistics extends Gdn_Pluggable {
                 // Every X views, writeback to AnalyticsLocal
                 $denormalizeWriteback = c('Garden.Analytics.Views.DenormalizeWriteback', 10);
                 if (($views % $denormalizeWriteback) == 0) {
-                    Gdn::controller()->setData('WritebackViews', $views);
-                    Gdn::controller()->setData('WritebackEmbed', $embedViews);
+                    if (Gdn::controller() !== null) {
+                        Gdn::controller()->setData('WritebackViews', $views);
+                        Gdn::controller()->setData('WritebackEmbed', $embedViews);
+                    }
 
                     Gdn::database()->query(
                         "insert into {$px}AnalyticsLocal (TimeSlot, Views, EmbedViews) values (:TimeSlot, {$views}, {$embedViews})

@@ -14,16 +14,18 @@ import {
 } from "@library/tree/path";
 import {
     FlattenedTree,
-    IFlattenedItem,
-    ITreeItem,
-    ITreeData,
-    Path,
     IDragState,
-    ITreeDestinationPosition,
-    ITreeSourcePosition,
+    IFlattenedItem,
     ItemID,
+    ITreeData,
+    ITreeDestinationPosition,
+    ITreeItem,
     ITreeItemMutation,
+    ITreeSourcePosition,
+    Path,
 } from "@library/tree/types";
+import { castDraft, notEmpty, uuidv4 } from "@vanilla/utils";
+import produce from "immer";
 
 const between = (min: number, max: number, number: number) => Math.min(max, Math.max(min, number));
 
@@ -247,25 +249,16 @@ export function calculateFinalDropPositions<D>(
  * Changes the tree data structure with minimal reference changes.
  */
 export function mutateTreeItem<D>(tree: ITreeData<D>, itemId: ItemID, mutation: ITreeItemMutation<D>): ITreeData<D> {
-    const itemToChange = tree.items[itemId];
-    if (!itemToChange) {
-        // Item not found
-        return tree;
-    }
-    // Returning a clone of the tree structure and overwriting the field coming in mutation
-    return {
-        // rootId should not change
-        rootId: tree.rootId,
-        items: {
-            // copy all old items
-            ...tree.items,
-            // overwriting only the item being changed
-            [itemId]: {
+    const newTree = produce(tree, (treeDraft) => {
+        const itemToChange = treeDraft.items[itemId];
+        if (itemToChange) {
+            treeDraft.items[itemId] = {
                 ...itemToChange,
-                ...mutation,
-            },
-        },
-    };
+                ...castDraft(mutation),
+            };
+        }
+    });
+    return newTree;
 }
 
 /**
@@ -296,36 +289,82 @@ const isLeafItem = <D>(item: ITreeItem<D>): boolean => !item.hasChildren;
 export function removeItemFromTree<D>(
     tree: ITreeData<D>,
     position: ITreeSourcePosition,
-): { tree: ITreeData<D>; itemRemoved: ItemID } {
+    removeChildren: boolean = false,
+): { tree: ITreeData<D>; itemRemoved: ItemID | null } {
+    // Remove the item from it's parents.
+
+    // const newTree = produce(tree, (treeDraft) => {
     const sourceParent = tree.items[position.parentId];
-    const newSourceChildren = [...sourceParent.children];
-    const itemRemoved = newSourceChildren.splice(position.index, 1)[0];
-    const newTree = mutateTreeItem(tree, position.parentId, {
+    let newSourceChildren = [...sourceParent.children];
+    let itemRemoved = newSourceChildren.splice(position.index, 1)[0];
+
+    const item = tree.items[itemRemoved];
+    if (item == null || itemRemoved == null) {
+        return {
+            itemRemoved: null,
+            tree,
+        };
+    }
+
+    if (removeChildren) {
+        // Remove the children first.
+        item.children.forEach((childID, i) => {
+            tree = removeItemFromTree(tree, { parentId: item.id, index: i }, true).tree;
+        });
+    } else {
+        newSourceChildren = [...newSourceChildren, ...item.children];
+    }
+
+    tree = mutateTreeItem(tree, position.parentId, {
         children: newSourceChildren,
         hasChildren: newSourceChildren.length > 0,
         isExpanded: newSourceChildren.length > 0 && sourceParent.isExpanded,
     });
 
+    tree = produce(tree, (treeDraft) => {
+        delete treeDraft.items[itemRemoved];
+    });
+
     return {
-        tree: newTree,
-        itemRemoved,
+        tree,
+        itemRemoved: itemRemoved,
     };
 }
 
-function addItemToTree<D>(tree: ITreeData<D>, position: ITreeDestinationPosition, item: ItemID): ITreeData<D> {
-    const destinationParent = tree.items[position.parentId];
-    const newDestinationChildren = [...destinationParent.children];
-    if (typeof position.index === "undefined") {
-        if (hasLoadedChildren(destinationParent) || isLeafItem(destinationParent)) {
-            newDestinationChildren.push(item);
+/**
+ * Find the parent ite
+ */
+export function findItemPosition<D>(tree: ITreeData<D>, itemID: ItemID): ITreeSourcePosition | null {
+    for (const [loopItemID, loopItem] of Object.entries(tree.items)) {
+        const index = loopItem.children.indexOf(itemID);
+        if (index >= 0) {
+            return {
+                parentId: loopItemID,
+                index,
+            };
         }
-    } else {
-        newDestinationChildren.splice(position.index, 0, item);
     }
-    return mutateTreeItem(tree, position.parentId, {
-        children: newDestinationChildren,
-        hasChildren: true,
-    });
+
+    return null;
+}
+
+/**
+ * Return a new tree excluding the item at "position"
+ */
+export function removeItemFromTreeByID<D>(
+    tree: ITreeData<D>,
+    itemID: ItemID,
+    removeChildren: boolean = false,
+): { tree: ITreeData<D>; itemRemoved: ItemID | null } {
+    const position = findItemPosition(tree, itemID);
+    if (position === null) {
+        return {
+            tree,
+            itemRemoved: null,
+        };
+    }
+
+    return removeItemFromTree(tree, position, removeChildren);
 }
 
 /**
@@ -336,8 +375,23 @@ export function moveItemOnTree<D>(
     from: ITreeSourcePosition,
     to: ITreeDestinationPosition,
 ): ITreeData<D> {
-    const { tree: treeWithoutSource, itemRemoved } = removeItemFromTree(tree, from);
-    return addItemToTree(treeWithoutSource, to, itemRemoved);
+    return produce(tree, (treeDraft) => {
+        const currentParent = treeDraft.items[from.parentId];
+        const newParent = treeDraft.items[to.parentId];
+        if (currentParent == null || newParent == null) {
+            return;
+        }
+        const itemID = currentParent.children[from.index];
+        if (itemID == null) {
+            return;
+        }
+
+        // Remove from the old parent;
+        currentParent.children.splice(from.index, 1);
+        // Add into the new parent
+        // Placing at the end if no index is specified.
+        newParent.children.splice(to.index ?? newParent.children.length - 1, 0, itemID);
+    });
 }
 
 /**
@@ -351,3 +405,73 @@ export const getItemById = <D>(flattenedTree: FlattenedTree<D>, id: ItemID): IFl
  */
 export const getIndexById = <D>(flattenedTree: FlattenedTree<D>, id: ItemID): number =>
     flattenedTree.findIndex((item) => item.item.id === id);
+
+const TREE_ROOT_ID = "tree";
+
+export type PartialTreeItem<T> = object | { id?: ItemID; children?: T[] };
+export function itemsToTree<T extends PartialTreeItem<T>>(items: T[]): ITreeData<T> {
+    const acc: Record<ItemID, ITreeItem<T>> = {};
+
+    function itemAndChildrenToTree(item: PartialTreeItem<T>): ItemID {
+        const children = ("children" in item && item.children ? item.children : []) ?? [];
+
+        const childClearedData: T = { ...item, children: undefined } as T;
+        delete childClearedData["children"];
+        const treeItem: ITreeItem<T> = {
+            id: ("id" in item ? item.id : undefined) ?? uuidv4(),
+            children: [],
+            hasChildren: children.length > 0,
+            data: childClearedData,
+        };
+
+        acc[treeItem.id] = treeItem;
+
+        children.forEach((item) => {
+            const itemID = itemAndChildrenToTree(item);
+            treeItem.children.push(itemID);
+        });
+        return treeItem.id;
+    }
+
+    itemAndChildrenToTree({
+        id: TREE_ROOT_ID,
+        children: items,
+    });
+
+    acc[TREE_ROOT_ID].data = undefined as any;
+
+    return {
+        rootId: TREE_ROOT_ID,
+        items: acc,
+    };
+}
+
+export type WithRecursiveChildren<D> = D & { children?: Array<WithRecursiveChildren<D>> };
+
+export function treeToItems<D>(treeData: ITreeData<D>): Array<WithRecursiveChildren<D>> {
+    function getWithChildren(item: ITreeItem<D>): WithRecursiveChildren<D> {
+        const result: WithRecursiveChildren<D> = {
+            ...item.data,
+        };
+        const children = item.children
+            .map((childID) => {
+                const item = treeData.items[childID];
+                if (!item) {
+                    console.warn(`Tree child with id ${childID} could not be found in tree data: `, treeData);
+                    return null;
+                }
+                return getWithChildren(item);
+            })
+            .filter(notEmpty);
+        if (children.length > 0) {
+            result.children = children;
+        }
+        return result;
+    }
+
+    return getWithChildren(treeData.items[treeData.rootId]!).children ?? [];
+}
+
+export function getFirstItemID(treeData: ITreeData): ItemID | null {
+    return treeData.items[TREE_ROOT_ID]?.children?.[0] ?? null;
+}

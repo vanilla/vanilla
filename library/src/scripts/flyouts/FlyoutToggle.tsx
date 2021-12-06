@@ -41,9 +41,9 @@ interface IProps {
     onVisibilityChange?: (isVisible: boolean) => void;
     renderAbove?: boolean;
     renderLeft?: boolean;
-    toggleButtonClassName?: string;
     buttonRef?: React.RefObject<HTMLButtonElement>;
     openAsModal: boolean;
+    modalSize?: ModalSizes;
     initialFocusElement?: HTMLElement | null;
     tag?: string;
 }
@@ -157,7 +157,7 @@ export default function FlyoutToggle(props: IProps) {
     });
 
     const classes = dropDownClasses();
-    const buttonClasses = cx(props.buttonClassName, props.toggleButtonClassName, {
+    const buttonClasses = cx(props.buttonClassName, {
         isOpen: isVisible,
     });
 
@@ -203,7 +203,7 @@ export default function FlyoutToggle(props: IProps) {
                     <LazyModal
                         id={contentID}
                         label={t("title")}
-                        size={ModalSizes.SMALL}
+                        size={props.modalSize ?? ModalSizes.SMALL}
                         exitHandler={closeMenuHandler}
                         elementToFocusOnExit={buttonRef.current!}
                         isVisible={isContentVisible}

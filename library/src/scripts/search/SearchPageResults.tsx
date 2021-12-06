@@ -151,7 +151,7 @@ function MetaFactory(props: { searchResult: ISearchResult }) {
                 status={searchResult.status}
                 type={searchResult.recordType}
                 updateUser={searchResult.insertUser!}
-                dateUpdated={searchResult.dateInserted}
+                dateUpdated={searchResult.dateUpdated ?? searchResult.dateInserted}
                 labels={searchResult.labelCodes}
                 crumbs={crumbs}
                 isForeign={searchResult.isForeign}

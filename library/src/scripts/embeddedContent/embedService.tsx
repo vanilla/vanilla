@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -10,6 +10,7 @@ import { FileEmbed } from "@library/embeddedContent/FileEmbed";
 import { GettyImagesEmbed } from "@library/embeddedContent/GettyImagesEmbed";
 import { GiphyEmbed } from "@library/embeddedContent/GiphyEmbed";
 import { IFrameEmbed, supportsFrames } from "@library/embeddedContent/IFrameEmbed";
+import { MuralEmbed } from "@library/embeddedContent/MuralEmbed";
 import { ImageEmbed } from "@library/embeddedContent/ImageEmbed";
 import { ImgurEmbed } from "@library/embeddedContent/ImgurEmbed";
 import { InstagramEmbed } from "@library/embeddedContent/InstagramEmbed";
@@ -163,9 +164,11 @@ function ensureBuiltinEmbeds() {
     registerEmbed("vimeo", VideoEmbed);
     registerEmbed("wistia", VideoEmbed);
     registerEmbed("youtube", VideoEmbed);
+    registerEmbed("kaltura", VideoEmbed);
     registerEmbed("panopto", PanoptoEmbed);
     registerEmbed("image", ImageEmbed);
     registerEmbed("brightcove", BrightcoveEmbed);
+    registerEmbed("mural", MuralEmbed);
 
     if (supportsFrames()) {
         registerEmbed("iframe", IFrameEmbed);

@@ -150,4 +150,11 @@ class ApplicantsTest extends AbstractResourceTest {
         $result = parent::testPost($record, $fields);
         return $result;
     }
+
+    /**
+     * Make sure a user can apply as guest in a private community.
+     */
+    public function testPostPrivateCommunity() {
+        $this->runWithPrivateCommunity([$this, 'testPost']);
+    }
 }

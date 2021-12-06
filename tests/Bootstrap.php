@@ -9,6 +9,7 @@ namespace VanillaTests;
 
 use Garden\Container\Container;
 use Garden\Container\Reference;
+use Garden\EventManager;
 use Garden\Web\RequestInterface;
 use Gdn;
 use Nette\Loaders\RobotLoader;
@@ -33,6 +34,7 @@ use Vanilla\Contracts\Web\UASnifferInterface;
 use Vanilla\Dashboard\Controllers\API\ConfigApiController;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Forum\Navigation\ForumBreadcrumbProvider;
+use Vanilla\HttpCacheMiddleware;
 use Vanilla\InjectableInterface;
 use Vanilla\Models\AuthenticatorModel;
 use Vanilla\Models\SSOModel;
@@ -228,6 +230,9 @@ class Bootstrap {
 
             ->rule(LoggerAwareInterface::class)
             ->addCall('setLogger')
+
+            ->rule(HttpCacheMiddleware::class)
+            ->setShared(true)
 
             // EventManager
             ->rule(\Garden\EventManager::class)
@@ -477,7 +482,7 @@ class Bootstrap {
 
             ->rule(SystemTokenUtils::class)
             ->setConstructorArgs([
-                ContainerUtils::config("Context.Secret", "")
+                ContainerUtils::config("Context.Secret", "secret")
             ])
         ;
 
@@ -509,8 +514,7 @@ class Bootstrap {
         $dic->call(function (
             Container $dic,
             \Gdn_Configuration $config,
-            AddonManager $addonManager,
-            \Garden\EventManager $eventManager
+            AddonManager $addonManager
         ) {
 
             // Load installation-specific configuration so that we know what apps are enabled.
@@ -529,22 +533,8 @@ class Bootstrap {
             $addonManager->startAddonsByKey($config->get('EnabledApplications'), Addon::TYPE_ADDON);
             $addonManager->startAddonsByKey(array_keys($config->get('EnabledLocales', [])), Addon::TYPE_LOCALE);
 
-//            $currentTheme = c('Garden.Theme', Gdn_ThemeManager::DEFAULT_DESKTOP_THEME);
-//            if (isMobile()) {
-//                $currentTheme = c('Garden.MobileTheme', Gdn_ThemeManager::DEFAULT_MOBILE_THEME);
-//            }
-//            $addonManager->startAddonsByKey([$currentTheme], Addon::TYPE_THEME);
-
             // Load the configurations for enabled addons.
-            foreach ($addonManager->getEnabled() as $addon) {
-                /* @var Addon $addon */
-                if ($configPath = $addon->getSpecial('config')) {
-                    $config->load($addon->path($configPath));
-                }
-            }
-
-            // Re-apply loaded user settings.
-            $config->overlayDynamic();
+            $addonManager->applyConfigDefaults($config);
 
             /**
              * Extension Startup
@@ -553,13 +543,10 @@ class Bootstrap {
              */
 
             // Bootstrapping.
-            foreach ($addonManager->getEnabled() as $addon) {
-                /* @var Addon $addon */
-                if ($bootstrapPath = $addon->getSpecial('bootstrap')) {
-                    $bootstrapPath = $addon->path($bootstrapPath);
-                    include $bootstrapPath;
-                }
-            }
+            $addonManager->configureContainer($dic);
+
+            // Delay instantiation in case an addon has configured it.
+            $eventManager = $dic->get(EventManager::class);
 
             // Plugins startup
             $addonManager->bindAllEvents($eventManager);

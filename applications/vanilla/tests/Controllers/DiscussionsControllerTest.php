@@ -9,6 +9,7 @@ namespace Vanilla\Forum\Tests\Controllers;
 
 use CategoryModel;
 use PHPUnit\Framework\TestCase;
+use Vanilla\CurrentTimeStamp;
 use Vanilla\Formatting\Formats\MarkdownFormat;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\Models\TestDiscussionModelTrait;
@@ -46,6 +47,7 @@ class DiscussionsControllerTest extends TestCase {
     public function tearDown(): void {
         parent::tearDown();
         $this->tearDownTestTraits();
+        $this->container()->setInstance(CategoryModel::class, null);
     }
 
     /**
@@ -68,7 +70,7 @@ class DiscussionsControllerTest extends TestCase {
     public function testFollowedRecentDiscussions(): array {
         /** @var \Gdn_Configuration $config */
         $config = static::container()->get('Config');
-        $config->set('Vanilla.EnableCategoryFollowing', true, true, false);
+        $config->set(\CategoryModel::CONF_CATEGORY_FOLLOWING, true, true, false);
         // follow a category
         self::$categoryModel->follow(\Gdn::session()->UserID, 1, true);
         $data = $this->bessy()->get('/discussions?followed=1')->Data;
@@ -207,5 +209,44 @@ class DiscussionsControllerTest extends TestCase {
 
         $doc->assertCssSelectorText("title", "Hello Discussion — DiscussionsControllerTest");
         $doc->assertCssSelectorText(".ItemComment .userContent", "Hello Comment");
+    }
+
+    /**
+     * There is a bug where marking a category read then never allows discussions to be marked read.
+     *
+     * @see https://higherlogic.atlassian.net/browse/VNLA-652
+     */
+    public function testCategoryMarkReadBug(): void {
+        // Move the time back in case there is other code still not using `CurrentTimeStamp`.
+        CurrentTimeStamp::mockTime(CurrentTimeStamp::get() - 1);
+
+        $category = $this->createCategory(['name' => 'foop']);
+        $discussion = $this->createDiscussion(['name' => 'foop', 'categoryID' => $category['categoryID']]);
+        $comment = $this->createComment();
+
+        self::$categoryModel->saveUserTree($category['categoryID'], ['DateMarkedRead' => CurrentTimeStamp::getMySQL()]);
+
+        // Move the time forward so that new comments won't conflict with the category date marked read.
+        CurrentTimeStamp::mockTime(CurrentTimeStamp::get() + 1);
+
+        // Delete the user discussion entry to simulate the bug.
+        $this->discussionModel->SQL->delete(
+            'UserDiscussion',
+            ['UserID' => $this->getSession()->UserID, 'DiscussionID' => $discussion['discussionID']]
+        );
+        $userID = $this->getSession()->UserID;
+
+        // There is currently a bug where user data is not joined when loading just one category at a time.
+        // We need to peg the category model in the container because it is not normally shared during tests, but is in production.
+        $categoryModel = $this->container()->get(CategoryModel::class);
+        $this->container()->setInstance(CategoryModel::class, $categoryModel);
+        $categoryModel->setJoinUserCategory(true);
+
+        // Now let's read the discussion with bessy and see if there is a latest marker.
+        $controller = $this->bessy()->get("/discussion/{$discussion['discussionID']}/xxx");
+
+        // The discussion should be marked read at this point. Let's look for an entry in user discussion.
+        $discussionDb = $this->discussionModel->getID($discussion['discussionID']);
+        $this->assertSame(1, (int)$discussionDb->CountCommentWatch);
     }
 }

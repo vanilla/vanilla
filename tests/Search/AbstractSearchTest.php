@@ -12,13 +12,6 @@ use Garden\Container\Reference;
 use Garden\Http\HttpResponse;
 use Vanilla\Community\Events\DirtyRecordEvent;
 use Vanilla\Community\Events\DirtyRecordRunner;
-use Vanilla\Forum\Search\ArticleSearchIndexTemplate;
-use Vanilla\Forum\Search\CategorySearchIndexTemplate;
-use Vanilla\Forum\Search\CommentSearchIndexTemplate;
-use Vanilla\Forum\Search\DiscussionSearchIndexTemplate;
-use Vanilla\Forum\Search\GroupSearchIndexTemplate;
-use Vanilla\Forum\Search\KnowledgeBaseSearchIndexTemplate;
-use Vanilla\Forum\Search\UserSearchIndexTemplate;
 use Vanilla\Http\InternalClient;
 use Vanilla\Search\GlobalSearchType;
 use Vanilla\Search\MysqlSearchDriver;
@@ -98,11 +91,6 @@ abstract class AbstractSearchTest extends AbstractAPIv2Test {
             $container->addCall('registerSearchType', [new Reference($typeClass)]);
         }
 
-        $container->addCall('registerSearchIndexTemplate', [new Reference(CategorySearchIndexTemplate::class)]);
-        $container->addCall('registerSearchIndexTemplate', [new Reference(CommentSearchIndexTemplate::class)]);
-        $container->addCall('registerSearchIndexTemplate', [new Reference(DiscussionSearchIndexTemplate::class)]);
-        $container->addCall('registerSearchIndexTemplate', [new Reference(UserSearchIndexTemplate::class)]);
-
         static::configureSearchContainer($container);
     }
 
@@ -130,26 +118,7 @@ abstract class AbstractSearchTest extends AbstractAPIv2Test {
         $this->assertEquals(200, $response->getStatusCode());
 
         $results = $response->getBody();
-
-        foreach ($expectedFields as $expectedField => $expectedValues) {
-            if ($expectedValues === null) {
-                foreach ($results as $result) {
-                    $this->assertArrayNotHasKey($expectedField, $result);
-                }
-            } else {
-                $actualValues = array_column($results, $expectedField);
-                if (!$strictOrder) {
-                    sort($actualValues);
-                    sort($expectedValues);
-                }
-
-                $this->assertEquals($expectedValues, $actualValues);
-            }
-        }
-
-        if (is_int($count)) {
-            $this->assertEquals($count, count($results));
-        }
+        $this->assertRowsLike($expectedFields, $results, $strictOrder, $count);
     }
 
     /**

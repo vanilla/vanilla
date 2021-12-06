@@ -32,6 +32,8 @@ class CommentSearchType extends DiscussionSearchType {
     /** @var \CommentModel */
     private $commentModel;
 
+    protected $queryFullTextFields = ['bodyPlainText'];
+
     /**
      * @inheritdoc
      */
@@ -60,7 +62,7 @@ class CommentSearchType extends DiscussionSearchType {
     /**
      * @inheritdoc
      */
-    public function getSearchGroup(): string {
+    public function getRecordType(): string {
         return 'comment';
     }
 
@@ -87,7 +89,7 @@ class CommentSearchType extends DiscussionSearchType {
                 $mapped = ArrayUtils::remapProperties($result, [
                     'recordID' => 'commentID',
                 ]);
-                $mapped['recordType'] = $this->getSearchGroup();
+                $mapped['recordType'] = $this->getRecordType();
                 $mapped['type'] = $this->getType();
                 $mapped['legacyType'] = $this->getSingularLabel();
                 $mapped['breadcrumbs'] = $this->breadcrumbModel->getForRecord(
@@ -118,7 +120,7 @@ class CommentSearchType extends DiscussionSearchType {
     public function generateSql(MysqlSearchQuery $query): string {
         $types = $query->get('types');
 
-        if ($types !== null && ((count($types) > 0) && !in_array($this->getSearchGroup(), $types))) {
+        if ($types !== null && ((count($types) > 0) && !in_array($this->getRecordType(), $types))) {
             // discussions are not the part of this search query request
             // we don't need to do anything
             return '';

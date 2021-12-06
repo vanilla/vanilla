@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -9,6 +9,7 @@ namespace VanillaTests\Controllers;
 use CategoryModel;
 use PermissionModel;
 use RoleModel;
+use TagModel;
 use VanillaTests\SiteTestCase;
 
 /**
@@ -24,6 +25,9 @@ class VanillaSettingsControllerTest extends SiteTestCase {
 
     /** @var PermissionModel */
     private $permissionModel;
+
+    /** TagModel */
+    private $tagModel;
 
     /**
      * Grab an array of category permissions, indexed by role ID.
@@ -48,9 +52,10 @@ class VanillaSettingsControllerTest extends SiteTestCase {
      */
     public function setUp(): void {
         parent::setUp();
-        $this->container()->call(function (CategoryModel $categoryModel, PermissionModel $permissionModel) {
+        $this->container()->call(function (CategoryModel $categoryModel, PermissionModel $permissionModel, TagModel $tagModel) {
             $this->categoryModel = $categoryModel;
             $this->permissionModel = $permissionModel;
+            $this->tagModel = $tagModel;
         });
     }
 
@@ -168,5 +173,80 @@ class VanillaSettingsControllerTest extends SiteTestCase {
             $discussionsView,
             (bool)$resultPermissions[RoleModel::MEMBER_ID]["Vanilla.Discussions.View"]
         );
+    }
+
+    /**
+     * Test deleting a reserved tag.
+     */
+    public function testDeleteTags(): void {
+        $tagIDReserved = $this->tagModel->save([
+            'Name' => 'test tag1',
+            'FullName' => 'test tag1',
+            'Type' => 'reaction'
+        ]);
+        $tagID = $this->tagModel->save([
+            'Name' => 'test tag2',
+            'FullName' => 'test tag2',
+        ]);
+        $this->bessy()->post("/settings/tags/delete/{$tagID}");
+        $this->bessy()->post("/settings/tags/delete/{$tagIDReserved}");
+        $resultReserved = $this->tagModel->getID($tagIDReserved, DATASET_TYPE_ARRAY);
+        $resultNotReserved = $this->tagModel->getID($tagID, DATASET_TYPE_ARRAY);
+        $this->assertNotEmpty($resultReserved);
+        $this->assertFalse($resultNotReserved);
+    }
+
+    /**
+     * Test "enabling/disabling including full posts within email digests" option.
+     */
+    public function testEnableDisableEmailFullPost(): void {
+        $config = \Gdn::config();
+
+        // This config defaults to false.
+        $this->assertFalse($config->get('Vanilla.Email.FullPost'));
+
+        // Setting the config to true.
+        $this->bessy()->post('/dashboard/settings/toggleemailfullpost/1');
+        $this->assertTrue($config->get('Vanilla.Email.FullPost'));
+        $html = $this->bessy()->getHtml('/dashboard/settings/emailstyles');
+        // Verify that the interface has a turned on toggle.
+        $html->assertCssSelectorExists('span.toggle-wrap-on a[href$="/dashboard/settings/toggleemailfullpost/0"]');
+
+        // Setting the config back to false again.
+        $this->bessy()->post('/dashboard/settings/toggleemailfullpost/0');
+        $this->assertFalse($config->get('Vanilla.Email.FullPost'));
+        $html = $this->bessy()->getHtml('/dashboard/settings/emailstyles');
+        // Verify that the interface has a turned off toggle.
+        $html->assertCssSelectorExists('span.toggle-wrap-off a[href$="/dashboard/settings/toggleemailfullpost/1"]');
+    }
+
+    /**
+     * Test saving/loading custom domains for Kaltura embeds.
+     */
+    public function testSaveLoadKalturaCustomDomains(): void {
+        $customDomains = ["mycustomdomain.ca", "yourcustomdomain.com"];
+        $this->runWithConfig([\VanillaSettingsController::CONFIG_KALTURA_DOMAINS => $customDomains], function () use ($customDomains) {
+            $postingUrl = '/vanilla/settings/posting';
+
+            $PostingSettingsHtml = $this->bessy()->getHtml($postingUrl);
+            foreach ($customDomains as $customDomain) {
+                $PostingSettingsHtml->assertContainsString($customDomain);
+            }
+
+            $newCustomDomains = ["hiscustomdomain.org", "hercustomdomain.co.uk"];
+            $postingFormValues = [
+                'Vanilla.Comment.MaxLength' => 100,
+                'Garden.InputFormatter' => 'rich',
+                'Garden.MobileInputFormatter' => 'rich',
+                'Vanilla.Discussions.PerPage' => 10,
+                'Vanilla.Comments.PerPage' => 10,
+                \VanillaSettingsController::CONFIG_KALTURA_DOMAINS => implode("\n", $newCustomDomains)
+            ];
+
+            $this->bessy()->post($postingUrl, $postingFormValues);
+
+            \Gdn::config()->get(\VanillaSettingsController::CONFIG_KALTURA_DOMAINS);
+            $this->assertEquals($newCustomDomains, \Gdn::config()->get(\VanillaSettingsController::CONFIG_KALTURA_DOMAINS));
+        });
     }
 }

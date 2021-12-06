@@ -6,10 +6,12 @@
 
 namespace Vanilla\Theme;
 
+use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Models\ModelCache;
 use Vanilla\Site\SiteSectionModel;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Theme\Asset\ThemeAsset;
@@ -69,8 +71,8 @@ class ThemeService {
     /** @var FsThemeProvider */
     private $fallbackThemeProvider;
 
-    /** @var ThemeCache */
-    private $cache;
+    /** @var ModelCache */
+    private $modelCache;
 
     /**
      * ThemeService constructor.
@@ -82,7 +84,7 @@ class ThemeService {
      * @param ThemeSectionModel $themeSections
      * @param SiteSectionModel $siteSectionModel
      * @param FsThemeProvider $fallbackThemeProvider
-     * @param ThemeCache $cache
+     * @param \Gdn_Cache $cache
      */
     public function __construct(
         ConfigurationInterface $config,
@@ -92,7 +94,7 @@ class ThemeService {
         ThemeSectionModel $themeSections,
         SiteSectionModel $siteSectionModel,
         FsThemeProvider $fallbackThemeProvider,
-        ThemeCache $cache
+        \Gdn_Cache $cache
     ) {
         $this->config = $config;
         $this->session = $session;
@@ -101,7 +103,23 @@ class ThemeService {
         $this->themeSections = $themeSections;
         $this->siteSectionModel = $siteSectionModel;
         $this->fallbackThemeProvider = $fallbackThemeProvider;
-        $this->cache = $cache;
+
+        // When developers are working locally, this config key is enabled.
+        // In that situation always use an in-memory cache instead of allowing memcached.
+        // Otherwise developers working on fs-based theme will be looking at stale cached assets.
+        $isHotReloadEnabled = $config->get('HotReload.Enabled', true);
+        if ($isHotReloadEnabled) {
+            $cache = new \Gdn_Dirtycache();
+        }
+
+        $this->modelCache = new ModelCache('themeService', $cache);
+    }
+
+    /**
+     * Invalidate all cache entries.
+     */
+    public function invalidateCache() {
+        $this->modelCache->invalidateAll();
     }
 
     /**
@@ -150,21 +168,27 @@ class ThemeService {
      * @return Theme
      */
     public function getTheme($themeKey, array $query = []): Theme {
-        $cacheKey = $this->cache->cacheKey($themeKey, $query);
-        $result = $this->cache->get($cacheKey);
-        if ($result instanceof Theme) {
-            return $this->normalizeTheme($result);
-        }
+        $didFetch = false;
+        /** @var Theme $theme */
+        $theme = $this->modelCache->getCachedOrHydrate([
+            'getTheme' => true,
+            'themeKey' => $themeKey,
+            'query' => $query,
+        ], function () use ($themeKey, $query, &$didFetch) {
+            $theme = $this->lookupTheme($themeKey, $query);
+            $parentThemes = $this->lookupParentThemes($theme);
 
-        $theme = $this->lookupTheme($themeKey, $query);
-        $parentThemes = $this->lookupParentThemes($theme);
-
-        if (!empty($parentThemes)) {
-            $theme->mergeParentAssets(...$parentThemes);
+            if (!empty($parentThemes)) {
+                $theme->mergeParentAssets(...$parentThemes);
+            }
+            $didFetch = true;
+            return $theme;
+        });
+        if (!$didFetch) {
+            $theme->setIsCacheHit(true);
         }
 
         $theme = $this->normalizeTheme($theme);
-        $this->cache->set($cacheKey, $theme);
         return $theme;
     }
 
@@ -235,7 +259,7 @@ class ThemeService {
         $theme = $provider->postTheme($body);
 
         // Clear the cache.
-        $this->cache->clear();
+        $this->invalidateCache();
 
         $theme = $this->getTheme($theme->getThemeID());
         return $theme;
@@ -254,7 +278,7 @@ class ThemeService {
         $theme = $provider->patchTheme($themeID, $body);
 
         // Clear the cache.
-        $this->cache->clear();
+        $this->invalidateCache();
 
         $theme = $this->normalizeTheme($theme);
         return $theme;
@@ -269,7 +293,7 @@ class ThemeService {
         $provider = $this->getWritableThemeProvider($themeID);
         $provider->deleteTheme($themeID);
         // Clear the cache.
-        $this->cache->clear();
+        $this->invalidateCache();
     }
 
     /**
@@ -288,7 +312,7 @@ class ThemeService {
             $previousProvider->afterCurrentProviderChange();
         }
         // Clear the cache.
-        $this->cache->clear();
+        $this->invalidateCache();
 
         $newTheme = $this->normalizeTheme($newTheme);
         return $newTheme;
@@ -448,12 +472,12 @@ class ThemeService {
                     $args['revisionID'] = $previewThemeRevisionID;
                 }
 
-                $previewTheme = $this->getTheme($previewThemeKey, $args);
-                if ($previewTheme === null) {
-                    // if we stored wrong preview key store in session, lets reset it.
-                    $this->themeHelper->cancelSessionPreviewTheme();
-                } else {
+                try {
+                    $previewTheme = $this->getTheme($previewThemeKey, $args);
                     $current = $previewTheme;
+                } catch (NotFoundException $e) {
+                    // Theme might have been deleted.
+                    $this->themeHelper->cancelSessionPreviewTheme();
                 }
             }
 
@@ -462,10 +486,11 @@ class ThemeService {
                 $this->getTheme(self::FALLBACK_THEME_KEY);
             }
         } catch (\Exception $e) {
-            throw $e;
             trigger_error($e->getMessage(), E_USER_WARNING);
+            // if we stored wrong preview key store in session, lets reset it.
+            $this->themeHelper->cancelSessionPreviewTheme();
             // If we had some exception during this, fallback to the default.
-            $this->getTheme(self::FALLBACK_THEME_KEY);
+            $current = $this->getTheme(self::FALLBACK_THEME_KEY);
         }
 
         $current = $this->normalizeTheme($current);
@@ -484,7 +509,7 @@ class ThemeService {
     public function setAsset($themeID, string $assetKey, string $data): ThemeAsset {
         $provider = $this->getWritableThemeProvider($themeID);
         $asset = $provider->setAsset($themeID, $assetKey, $data);
-        $this->cache->clear();
+        $this->invalidateCache();
         return $asset;
     }
 
@@ -502,7 +527,7 @@ class ThemeService {
         $provider = $this->getWritableThemeProvider($themeID);
         $asset = $provider->sparseUpdateAsset($themeID, $assetKey, $data);
         // Clear the cache.
-        $this->cache->clear();
+        $this->invalidateCache();
         return $asset;
     }
 
@@ -553,7 +578,7 @@ class ThemeService {
         $provider = $this->getThemeProvider($themeID);
         $theme = $provider->getTheme($themeID);
         // Clear the cache.
-        $this->cache->clear();
+        $this->invalidateCache();
         return $theme->getAssets()[$assetKey] ?? null;
     }
 
@@ -567,7 +592,7 @@ class ThemeService {
         $provider = $this->getWritableThemeProvider($themeKey);
         $provider->deleteAsset($themeKey, $assetKey);
         // Clear the cache.
-        $this->cache->clear();
+        $this->invalidateCache();
     }
 
     /**
@@ -603,7 +628,7 @@ class ThemeService {
         // Fix current theme.
         $currentThemeID =
             $this->config->get(ThemeServiceHelper::CONFIG_CURRENT_THEME)
-            ?: $this->config->get(ThemeServiceHelper::CONFIG_DESKTOP_THEME);
+                ?: $this->config->get(ThemeServiceHelper::CONFIG_DESKTOP_THEME);
         $isCurrent = $currentThemeID == $theme->getThemeID();
         $theme->setCurrent($isCurrent);
 
@@ -626,7 +651,12 @@ class ThemeService {
             if ($features->disableKludgedVars() && $variableProvider instanceof KludgedVariablesProviderInterface) {
                 continue;
             }
-            $additionalVariables = array_replace_recursive($additionalVariables, $variableProvider->getVariables());
+            try {
+                $variables = $variableProvider->getVariables();
+                $additionalVariables = array_replace_recursive($additionalVariables, $variables);
+            } catch (\Exception $ex) {
+                trigger_error($ex->getMessage(), E_USER_WARNING);
+            }
         }
 
         $defaults = [];

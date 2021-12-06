@@ -4,8 +4,8 @@
  */
 
 import React from "react";
-import classNames from "classnames";
 import { smartAlignClasses } from "@library/layout/smartAlignStyles";
+import { cx } from "@emotion/css";
 
 interface IProps {
     className?: string;
@@ -20,8 +20,8 @@ export default class SmartAlign extends React.Component<IProps> {
         const Inner = this.props.outerTag || "div";
         const classes = smartAlignClasses();
         return (
-            <Outer className={classNames("smartAlign-outer", this.props.className, classes.root)}>
-                <Inner className={classNames("smartAlign-inner", classes.inner)}>{this.props.children}</Inner>
+            <Outer className={cx(classes.root, this.props.className)}>
+                <Inner className={cx(classes.inner)}>{this.props.children}</Inner>
             </Outer>
         );
     }

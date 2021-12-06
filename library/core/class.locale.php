@@ -9,6 +9,7 @@
  * @since 2.0
  */
 
+use Garden\EventManager;
 use Vanilla\AddonManager;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\LocaleInterface;
@@ -99,7 +100,11 @@ class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface {
      * @param AddonManager|null $addonManager
      * @param ConfigurationInterface $config
      */
-    public function __construct($localeName, AddonManager $addonManager = null, ConfigurationInterface $config) {
+    public function __construct(
+        $localeName,
+        AddonManager $addonManager = null,
+        ConfigurationInterface $config
+    ) {
         parent::__construct();
         $this->ClassName = __CLASS__;
 
@@ -108,6 +113,15 @@ class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface {
         }
         $this->config = $config;
         $this->set($localeName);
+    }
+
+    /**
+     * Fire an event to allow extra locale definitions to be loaded.
+     */
+    public function loadExtraLocaleDefinitions(): void {
+        // This used to be actually done in set, but we're doing it here since the locale could be constructed
+        // and set very early if the locale is constructed before event binding.
+        $this->fireEvent("afterSet");
     }
 
     /**
@@ -189,7 +203,7 @@ class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface {
             $currentLocale
         ];
 
-        list($language) = explode('_', $currentLocale, 2);
+        [$language] = explode('_', $currentLocale, 2);
         if (isset(self::$SetLocales[$language])) {
             $fullLocales = (array)self::$SetLocales[$language];
 
@@ -239,9 +253,6 @@ class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface {
         if ($this->DeveloperMode) {
             $this->DeveloperContainer->massImport($this->LocaleContainer->get('.'));
         }
-
-        // Allow hooking custom definitions
-        $this->fireEvent('AfterSet');
     }
 
     /**

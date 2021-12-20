@@ -5,7 +5,7 @@
  */
 
 import { Optionalize } from "@library/@types/utils";
-import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
+import { oneColumnVariables } from "@library/layout/Section.variables";
 import throttle from "lodash/throttle";
 import React, { useCallback, useContext, useEffect, useState } from "react";
 
@@ -47,7 +47,7 @@ interface IProps {
  */
 export function DeviceProvider(props: IProps) {
     const calculateDevice = useCallback(() => {
-        const breakpoints = panelLayoutVariables().panelLayoutBreakPoints;
+        const breakpoints = oneColumnVariables().breakPoints;
         const width = document.body.clientWidth;
         if (width <= breakpoints.xs) {
             return Devices.XS;

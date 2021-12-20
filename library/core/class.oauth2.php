@@ -171,16 +171,11 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface, Cache
     }
 
     /**
-     * Setup
-     */
-    public function setup() {
-        $this->structure();
-    }
-
-    /**
      * Create the structure in the database.
      */
     public function structure() {
+        // Clear any locally cached provider and make sure we fetch it fresh.
+        $this->provider = null;
         // Make sure we have the OAuth2 provider.
         $provider = $this->provider();
         if (empty($provider) || empty($provider['AuthenticationKey'])) {

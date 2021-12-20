@@ -390,6 +390,7 @@ class UsersApiController extends AbstractApiController {
         ]);
         $out = $this->schema([
             "isAdmin:b",
+            "isSysAdmin:b",
             'permissions:a' => new PermissionFragmentSchema(),
             'junctions?',
             'junctionAliases?',

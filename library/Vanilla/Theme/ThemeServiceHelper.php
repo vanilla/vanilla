@@ -29,6 +29,8 @@ class ThemeServiceHelper {
     // New theme API config.
     const CONFIG_CURRENT_THEME = 'Garden.CurrentTheme';
 
+    const CORE_THEME_KEYS = ['theme-foundation', 'keystone'];
+
     /** @var SessionInterface $session */
     private $session;
 
@@ -82,6 +84,7 @@ class ThemeServiceHelper {
 
         $themeKey = $theme->getKey();
         $alwaysVisibleThemes = array_map('trim', explode(",", $confVisible));
+        $alwaysVisibleThemes = array_unique(array_merge($alwaysVisibleThemes, self::CORE_THEME_KEYS));
 
         if (in_array($themeKey, $alwaysVisibleThemes, true)) {
             return true;
@@ -101,9 +104,7 @@ class ThemeServiceHelper {
             $sites[] = $site;
         }
 
-        if ($hidden === false) {
-            return true;
-        } elseif ($hidden === true) {
+        if ($hidden === true) {
             return false;
         } else {
             $hidden = false;

@@ -90,13 +90,6 @@ class AkismetPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Run once on enable.
-     */
-    public function setup() {
-        $this->structure();
-    }
-
-    /**
      * Database update.
      */
     public function structure() {
@@ -160,6 +153,7 @@ class AkismetPlugin extends Gdn_Plugin {
             case 'Activity':
             case 'ActivityComment':
                 $result = $this->checkAkismet($recordType, $data);
+//                $result = true;
                 if ($result) {
                     $data['Log_InsertUserID'] = $this->userID();
                 }
@@ -169,6 +163,7 @@ class AkismetPlugin extends Gdn_Plugin {
                 $result = false;
         }
         $sender->EventArguments['IsSpam'] = $result;
+        $sender->EventArguments['Source'] = 'akismet';
     }
 
     /**

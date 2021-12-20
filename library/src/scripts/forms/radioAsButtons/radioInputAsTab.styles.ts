@@ -6,7 +6,7 @@
 
 import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
-import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
+import { oneColumnVariables } from "@library/layout/Section.variables";
 import { userSelect } from "@library/styles/styleHelpersFeedback";
 import { borderRadii, negative } from "@library/styles/styleHelpers";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
@@ -95,7 +95,7 @@ export const radioInputAsTabVariables = useThemeCache(() => {
 
 export const radioInputAsTabClasses = useThemeCache(() => {
     const style = styleFactory("radioInputAsTab");
-    const mediaQueries = panelLayoutVariables().mediaQueries();
+    const mediaQueries = oneColumnVariables().mediaQueries();
     const vars = radioInputAsTabVariables();
     const formElementVariables = formElementsVariables();
 

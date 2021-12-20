@@ -7,7 +7,7 @@
 import React, { useState } from "react";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { t } from "@vanilla/i18n/src";
-import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
+import { oneColumnVariables } from "@library/layout/Section.variables";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import RadioInputAsButton, { IRadioInputAsButtonClasses } from "@library/forms/radioAsButtons/RadioInputAsButton";
 import { RadioGroup } from "@library/forms/radioAsButtons/RadioGroup";
@@ -19,7 +19,7 @@ export default {
     title: "Components/Radio Input",
     parameters: {
         chromatic: {
-            viewports: [1450, panelLayoutVariables().panelLayoutBreakPoints.xs],
+            viewports: [1450, oneColumnVariables().breakPoints.xs],
         },
     },
 };

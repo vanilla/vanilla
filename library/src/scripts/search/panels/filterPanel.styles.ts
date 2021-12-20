@@ -9,7 +9,7 @@ import { styleUnit } from "@library/styles/styleUnit";
 import { Mixins } from "@library/styles/Mixins";
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
+import { SectionTypes } from "@library/layout/types/interface.layoutTypes";
 
 export const filterPanelClasses = useThemeCache((mediaQueries) => {
     const globalVars = globalVariables();
@@ -30,7 +30,7 @@ export const filterPanelClasses = useThemeCache((mediaQueries) => {
             },
         },
         mediaQueries({
-            [LayoutTypes.TWO_COLUMNS]: {
+            [SectionTypes.TWO_COLUMNS]: {
                 oneColumnDown: {
                     ...Mixins.absolute.srOnly(),
                 },

@@ -7,7 +7,7 @@ import { CSSObject } from "@emotion/css";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { HomeWidgetItemContentType, homeWidgetItemVariables } from "@library/homeWidget/HomeWidgetItem.styles";
 import { pageHeadingBoxVariables, SubtitleType } from "@library/layout/PageHeadingBox.variables";
-import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
+import { oneColumnVariables } from "@library/layout/Section.variables";
 import { navLinksVariables } from "@library/navigation/navLinksStyles";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { IBackground } from "@library/styles/cssUtilsTypes";
@@ -172,7 +172,7 @@ export const homeWidgetContainerVariables = useThemeCache(
                 }),
             ) && options.borderType !== "navLinks";
 
-        const mobileMediaQuery = panelLayoutVariables().mediaQueries().oneColumnDown;
+        const mobileMediaQuery = oneColumnVariables().mediaQueries().oneColumnDown;
 
         return { options, itemSpacing, mobileMediaQuery, hasVisibleContainer };
     },

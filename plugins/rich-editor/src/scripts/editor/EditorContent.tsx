@@ -226,6 +226,7 @@ function useLegacyTextAreaSync(textArea?: HTMLInputElement | HTMLTextAreaElement
         const handleChange = throttle(() => {
             requestAnimationFrame(() => {
                 textArea.value = JSON.stringify(quill.getContents().ops);
+                textArea.dispatchEvent(new Event("input", { bubbles: true, cancelable: false }));
             });
         }, 1000 / 60); // 60FPS
         quill.on(Quill.events.TEXT_CHANGE, handleChange);

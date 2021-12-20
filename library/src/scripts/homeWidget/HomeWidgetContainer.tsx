@@ -13,7 +13,7 @@ import {
 } from "@library/homeWidget/HomeWidgetContainer.styles";
 import Container from "@library/layout/components/Container";
 import { PageHeadingBox } from "@library/layout/PageHeadingBox";
-import { useWidgetLayoutClasses } from "@library/layout/WidgetLayout.context";
+import { useWidgetSectionClasses } from "@library/layout/WidgetLayout.context";
 import { navLinksClasses } from "@library/navigation/navLinksStyles";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import { BorderType } from "@library/styles/styleHelpers";
@@ -36,7 +36,7 @@ export function HomeWidgetContainer(props: IHomeWidgetContainerProps) {
     const { options } = vars;
     const classes = homeWidgetContainerClasses(props.options);
     const { isGrid, isCarousel } = options;
-    const widgetClasses = useWidgetLayoutClasses();
+    const widgetClasses = useWidgetSectionClasses();
 
     let content = props.children;
     if (isGrid) {

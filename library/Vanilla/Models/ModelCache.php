@@ -12,7 +12,10 @@ use Symfony\Component\Cache\Adapter\Psr16Adapter;
 use Symfony\Contracts\Cache\ItemInterface;
 use Vanilla\Cache\CacheCacheAdapter;
 use Vanilla\FeatureFlagHelper;
-use Vanilla\InjectableInterface;
+use Vanilla\Scheduler\Descriptor\CronJobDescriptor;
+use Vanilla\Scheduler\Descriptor\NormalJobDescriptor;
+use Vanilla\Scheduler\Job\CallbackJob;
+use Vanilla\Scheduler\SchedulerInterface;
 
 /**
  * Cache for records out of various models.
@@ -23,7 +26,7 @@ use Vanilla\InjectableInterface;
  *   - A lock is aquired when calculating a cache value to prevent instances contending for resources to generate the same value.
  *   - Values may be recalculated early on random requests to prevent the value from expiring.
  */
-class ModelCache implements InjectableInterface {
+class ModelCache {
 
     /** @var int When we hit this size of incrementing key, we reset from 0. */
     const MAX_INCREMENTING_KEY = 1000000;
@@ -36,6 +39,10 @@ class ModelCache implements InjectableInterface {
     ];
 
     const DISABLE_FEATURE_FLAG = "DisableNewModelCaching";
+
+    public const OPT_TTL = \Gdn_Cache::FEATURE_EXPIRY;
+    public const OPT_DEFAULT = \Gdn_Cache::FEATURE_DEFAULT;
+    public const OPT_SCHEDULER = 'scheduler';
 
     /** @var string */
     private $cacheNameSpace;
@@ -72,11 +79,16 @@ class ModelCache implements InjectableInterface {
      * Create a cache key for some parameters.
      *
      * @param array $keyArgs Some arguments to generate the cache key from.
+     * @param bool $excludeNamespace Set this to true to remove the namespace from the generated key.
      *
      * @return string
      */
-    public function createCacheKey(array $keyArgs): string {
-        $key = $this->cacheNameSpace . '-' . $this->getIncrementingKey() . '-' . sha1(json_encode($keyArgs));
+    public function createCacheKey(array $keyArgs, bool $excludeNamespace = false): string {
+        $key = $this->getIncrementingKey() . '-' . sha1(json_encode($keyArgs));
+        if (!$excludeNamespace) {
+            // Make the key in the same why the symfony cache contract does.
+            $key = $this->cacheNameSpace . '_' . $key;
+        }
         return $key;
     }
 
@@ -99,20 +111,48 @@ class ModelCache implements InjectableInterface {
                 return call_user_func_array($hydrate, $args);
             }
         }
-        $ttl = $cacheOptions[\Gdn_Cache::FEATURE_EXPIRY] ?? $this->defaultCacheOptions[\Gdn_Cache::FEATURE_EXPIRY];
-        $key = $this->createCacheKey($args);
-        $result = $this->cacheContract->get($key, function (ItemInterface $item) use ($args, $hydrate, $ttl) {
-            if (empty($args)) {
-                $result = $hydrate();
-            } else {
-                $result = call_user_func_array($hydrate, $args);
-            }
-            $result = serialize($result);
+
+        $ttl = $cacheOptions[self::OPT_TTL] ?? $this->defaultCacheOptions[self::OPT_TTL];
+        $contractKey = $this->createCacheKey($args, true);
+        $result = $this->cacheContract->get($contractKey, function (ItemInterface $item) use ($args, $hydrate, $ttl, $cacheOptions) {
             $item->expiresAfter($ttl);
-            return $result;
+
+            $scheduler = $cacheOptions[self::OPT_SCHEDULER] ?? $this->defaultCacheOptions[self::OPT_SCHEDULER] ?? null;
+            $default = $cacheOptions[self::OPT_DEFAULT] ?? null;
+            if ($scheduler instanceof SchedulerInterface) {
+                // Defer hydration.
+                $fullKey = $this->createCacheKey($args);
+                $this->scheduleHydration($scheduler, $fullKey, $hydrate, $args);
+                // Return the default for now.
+                return serialize($default);
+            } else {
+                // Hydrate immediately.
+                $result = call_user_func_array($hydrate, $args);
+                $result = serialize($result);
+                return $result;
+            }
         });
         $result = unserialize($result);
         return $result;
+    }
+
+    /**
+     * Hydrate a cached value after the request completes.
+     *
+     * @param SchedulerInterface $scheduler
+     * @param string $cacheKey
+     * @param callable $hydrate
+     * @param array $args
+     * @return void
+     */
+    private function scheduleHydration(SchedulerInterface $scheduler, string $cacheKey, callable $hydrate, array $args) {
+        $scheduler->addJobDescriptor(new NormalJobDescriptor(CallbackJob::class, [
+            'callback' => function () use ($cacheKey, $hydrate, $args) {
+                $result = call_user_func_array($hydrate, $args);
+                $result = serialize($result);
+                $this->cache->set($cacheKey, $result);
+            },
+        ]));
     }
 
     /**

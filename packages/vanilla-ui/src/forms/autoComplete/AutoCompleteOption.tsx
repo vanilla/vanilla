@@ -45,6 +45,9 @@ export const AutoCompleteOption = React.forwardRef(function AutoCompleteOptionIm
         >
             <div className={classes.optionText}>
                 <ComboboxOptionText />
+                {props.data?.parentLabel && (
+                    <span className={classes.parentLabel}>{` - ${props.data.parentLabel}`}</span>
+                )}
             </div>
             {selected && (
                 <span className={classes.checkmarkContainer}>

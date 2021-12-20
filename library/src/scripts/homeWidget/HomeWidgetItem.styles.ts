@@ -15,7 +15,7 @@ import { activeSelector, styleFactory, variableFactory } from "@library/styles/s
 import { useThemeCache } from "@library/styles/themeCache";
 import { css, CSSObject } from "@emotion/css";
 import { percent, ColorHelper, calc, color, rgba } from "csx";
-import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
+import { oneColumnVariables } from "@library/layout/Section.variables";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { LocalVariableMapping } from "@library/styles/VariableMapping";
@@ -77,7 +77,7 @@ export const homeWidgetItemVariables = useThemeCache(
             }),
         ]);
         const globalVars = globalVariables(itemVars);
-        const layoutVars = panelLayoutVariables(itemVars);
+        const layoutVars = oneColumnVariables(itemVars);
 
         /**
          * @varGroup homeWidgetItem.options
@@ -458,7 +458,7 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: DeepPartia
     const vars = homeWidgetItemVariables(optionOverrides);
     const globalVars = globalVariables();
     const style = styleFactory("homeWidgetItem");
-    const mobileQuery = panelLayoutVariables().mediaQueries().oneColumnDown;
+    const mobileQuery = oneColumnVariables().mediaQueries().oneColumnDown;
     const isImageLeft = vars.options.imagePlacement === "left";
     const isImageLeftMobile = vars.options.imagePlacementMobile === "left";
     const boxHasBorder = Variables.boxHasOutline(vars.options.box);

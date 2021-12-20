@@ -28,8 +28,9 @@ class PermissionModelJunctionTest extends SiteTestCase {
      *  Test setup.
      */
     public function setUp(): void {
-        $this->enableCaching();
+        self::enableCaching();
         parent::setUp();
+        // Clear out the instance.
         $this->permissionModel = $this->container()->get(\PermissionModel::class);
     }
 
@@ -56,7 +57,7 @@ class PermissionModelJunctionTest extends SiteTestCase {
         ], $this->permissionModel->getAllJunctionTablesAndIDs());
 
         // Make sure we are actually using cache.
-        $this->resetTable('Permission');
+        \Gdn::sql()->truncate('Permission');
         $this->assertEquals([
             'Category' => [$permCat1['categoryID'], $permCat2['categoryID']],
         ], $this->permissionModel->getAllJunctionTablesAndIDs());

@@ -14,7 +14,7 @@ use Vanilla\Utility\SchemaUtils;
 
 /**
  * Class DiscussionWidgetModule
- *
+ * @deprecated Use DiscussionAnnouncementsWidget instead.
  * @package Vanilla\Forum\Modules
  */
 class AnnouncementWidgetModule extends BaseDiscussionWidgetModule {

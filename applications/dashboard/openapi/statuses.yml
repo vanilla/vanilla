@@ -1,193 +1,193 @@
 openapi: 3.0.2
 info:
 paths:
-  /discussions/statuses:
-    get:
-      summary: Get known discussion statuses.
-      tags:
-        - Statuses
-      parameters:
-        - name: subType
-          in: query
-          schema:
-            type: string
-        - name: state
-          in: query
-          schema:
-            type: string
-            enum:
-              - open
-              - closed
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
+    /discussions/statuses:
+        get:
+            summary: Get known discussion statuses.
+            tags:
+                - Statuses
+            parameters:
+                - name: subType
+                  in: query
+                  schema:
+                      type: string
+                - name: state
+                  in: query
+                  schema:
+                      type: string
+                      enum:
+                          - open
+                          - closed
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: "#/components/schemas/RecordStatus"
+                "400":
+                    description: Bad Request
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/BasicError"
+        post:
+            summary: Create a new discussion status.
+            tags:
+                - Statuses
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/RecordStatusPost"
+                required: true
+            responses:
+                "201":
+                    $ref: "#/components/responses/RecordStatusResponse"
+                "400":
+                    description: Bad Request
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/BasicError"
+                "403":
+                    $ref: "#/components/responses/PermissionError"
+                "404":
+                    $ref: "#/components/responses/NotFound"
+    /discussions/statuses/{id}:
+        parameters:
+            - name: id
+              in: path
+              required: true
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/RecordStatus'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/BasicError"
-    post:
-      summary: Create a new discussion status.
-      tags:
-        - Statuses
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RecordStatusPost'
-        required: true
-      responses:
-        '201':
-          $ref: '#/components/responses/RecordStatusResponse'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/BasicError"
-        '403':
-          $ref: '#/components/responses/PermissionError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-  /discussions/statuses/{id}:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: integer
-    get:
-      summary: Get a discussion status by its ID.
-      tags:
-        - Statuses
-      responses:
-        '200':
-          $ref: '#/components/responses/RecordStatusResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
-    patch:
-      summary: Update a discussion status.
-      tags:
-        - Statuses
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RecordStatusPatch'
-      responses:
-        '200':
-          $ref: '#/components/responses/RecordStatusResponse'
-        '400':
-          description: Bad Request, e.g. attempting to update a system-defined status
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/BasicError"
-        '403':
-          $ref: '#/components/responses/PermissionError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-    delete:
-      summary: Delete a discussion status.
-      tags:
-        - Statuses
-      responses:
-        '204':
-          description: OK
-        '400':
-          description: Bad Request, e.g. attempting to delete a system-defined status
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/BasicError"
-        '403':
-          $ref: '#/components/responses/PermissionError'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                  type: integer
+        get:
+            summary: Get a discussion status by its ID.
+            tags:
+                - Statuses
+            responses:
+                "200":
+                    $ref: "#/components/responses/RecordStatusResponse"
+                "404":
+                    $ref: "#/components/responses/NotFound"
+        patch:
+            summary: Update a discussion status.
+            tags:
+                - Statuses
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/RecordStatusPatch"
+            responses:
+                "200":
+                    $ref: "#/components/responses/RecordStatusResponse"
+                "400":
+                    description: Bad Request, e.g. attempting to update a system-defined status
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/BasicError"
+                "403":
+                    $ref: "#/components/responses/PermissionError"
+                "404":
+                    $ref: "#/components/responses/NotFound"
+        delete:
+            summary: Delete a discussion status.
+            tags:
+                - Statuses
+            responses:
+                "204":
+                    description: OK
+                "400":
+                    description: Bad Request, e.g. attempting to delete a system-defined status
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/BasicError"
+                "403":
+                    $ref: "#/components/responses/PermissionError"
+                "404":
+                    $ref: "#/components/responses/NotFound"
 components:
-  responses:
-    RecordStatusResponse:
-      description: OK
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/RecordStatus'
-  schemas:
-    RecordStatus:
-      type: object
-      properties:
-        statusID:
-          description: Unique numeric ID of a status.
-          type: string
-        name:
-          description: Name of status
-          type: string
-        state:
-          description: State of the item associated with this status
-          type: string
-          enum:
-            - open
-            - closed
-        recordType:
-          description: Type of resource to which this status applies
-          type: string
-          minLength: 1
-        recordSubtype:
-          description: Subtype of resource to which this status applies
-          type: string
-          nullable: true
-        isDefault:
-          description: True if this status is to be assigned to the resource upon its creation, false otherwise
-          type: boolean
-          default: false
-        isSystem:
-          description: True if this status is defined by the application and is not accessible for modification or deletion.
-          type: boolean
-          default: false
-    RecordStatusPatch:
-      type: object
-      properties:
-        name:
-          description: Name of status
-          type: string
-        isDefault:
-          description: True if this status is to be assigned to the resource upon its creation, false otherwise
-          type: boolean
-        state:
-          description: State of the item associated with this status
-          type: string
-          enum:
-            - open
-            - closed
-        recordSubtype:
-          description: Subtype of resource to which this status applies
-          type: string
-          nullable: true
-    RecordStatusPost:
-      type: object
-      properties:
-        name:
-          description: Name of status
-          type: string
-        isDefault:
-          description: True if this status is to be assigned to the resource upon its creation, false otherwise
-          type: boolean
-        state:
-          description: State of the item associated with this status
-          type: string
-          enum:
-            - open
-            - closed
-        recordSubtype:
-          description: Subtype of resource to which this status applies
-          type: string
-          nullable: true
-      required:
-        - name
+    responses:
+        RecordStatusResponse:
+            description: OK
+            content:
+                application/json:
+                    schema:
+                        $ref: "#/components/schemas/RecordStatus"
+    schemas:
+        RecordStatus:
+            type: object
+            properties:
+                statusID:
+                    description: Unique numeric ID of a status.
+                    type: string
+                name:
+                    description: Name of status
+                    type: string
+                state:
+                    description: State of the item associated with this status
+                    type: string
+                    enum:
+                        - open
+                        - closed
+                recordType:
+                    description: Type of resource to which this status applies
+                    type: string
+                    minLength: 1
+                recordSubtype:
+                    description: Subtype of resource to which this status applies
+                    type: string
+                    nullable: true
+                isDefault:
+                    description: True if this status is to be assigned to the resource upon its creation, false otherwise
+                    type: boolean
+                    default: false
+                isSystem:
+                    description: True if this status is defined by the application and is not accessible for modification or deletion.
+                    type: boolean
+                    default: false
+        RecordStatusPatch:
+            type: object
+            properties:
+                name:
+                    description: Name of status
+                    type: string
+                isDefault:
+                    description: True if this status is to be assigned to the resource upon its creation, false otherwise
+                    type: boolean
+                state:
+                    description: State of the item associated with this status
+                    type: string
+                    enum:
+                        - open
+                        - closed
+                recordSubtype:
+                    description: Subtype of resource to which this status applies
+                    type: string
+                    nullable: true
+        RecordStatusPost:
+            type: object
+            properties:
+                name:
+                    description: Name of status
+                    type: string
+                isDefault:
+                    description: True if this status is to be assigned to the resource upon its creation, false otherwise
+                    type: boolean
+                state:
+                    description: State of the item associated with this status
+                    type: string
+                    enum:
+                        - open
+                        - closed
+                recordSubtype:
+                    description: Subtype of resource to which this status applies
+                    type: string
+                    nullable: true
+            required:
+                - name

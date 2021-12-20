@@ -5,11 +5,9 @@
 
 import React from "react";
 import { useFormGroup } from "@dashboard/forms/DashboardFormGroupContext";
-import { IFieldError } from "@library/@types/api/core";
-import ErrorMessages from "@library/forms/ErrorMessages";
 
 interface IProps {
-    label: string;
+    label: React.ReactNode;
     description?: React.ReactNode;
     afterDescription?: React.ReactNode;
     labelType?: DashboardLabelType;

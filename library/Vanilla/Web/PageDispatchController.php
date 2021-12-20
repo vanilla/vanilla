@@ -10,12 +10,16 @@ namespace Vanilla\Web;
 use Garden\Container\Container;
 use Garden\Container\ContainerException;
 use Garden\Container\NotFoundException;
+use Garden\Container\Reference;
 use Garden\CustomExceptionHandler;
 use Garden\Web\Data;
+use Garden\Web\PageControllerRoute;
+use Garden\Web\ResourceRoute;
 use Vanilla\InjectableInterface;
+use Vanilla\Utility\StringUtils;
 
 /**
- * A controller used for mapping from the the dispatcher to individual page components.
+ * A controller used for mapping from the dispatcher to individual page components.
  *
  * @see \Garden\Web\Dispatcher
  * @see \Vanilla\Web\Page
@@ -27,6 +31,9 @@ class PageDispatchController implements CustomExceptionHandler, InjectableInterf
 
     /** @var Container */
     private $container;
+
+    /** @var string|null */
+    protected $assetSection = null;
 
     /**
      * Dependency Injection.
@@ -64,6 +71,11 @@ class PageDispatchController implements CustomExceptionHandler, InjectableInterf
     protected function useSimplePage(string $title): Page {
         /** @var Page $page */
         $page = $this->container->get($this->simplePageClass);
+
+        if ($this->assetSection && $page instanceof Page) {
+            $page->setAssetSection($this->assetSection);
+        }
+
         $this->activePage = $page;
         $this->activePage->initialize($title);
         return $this->activePage;
@@ -74,10 +86,7 @@ class PageDispatchController implements CustomExceptionHandler, InjectableInterf
      * @inheritdoc
      */
     public function hasExceptionHandler(\Throwable $e): bool {
-        if ($this->activePage) {
-            return $this->activePage->hasExceptionHandler($e);
-        }
-        return false;
+        return true;
     }
 
     /**
@@ -85,6 +94,7 @@ class PageDispatchController implements CustomExceptionHandler, InjectableInterf
      * @inheritdoc
      */
     public function handleException(\Throwable $e): Data {
-        return $this->activePage->handleException($e);
+        $activePage = $this->activePage ?? $this->container->get(SimpleTitlePage::class);
+        return $activePage->handleException($e);
     }
 }

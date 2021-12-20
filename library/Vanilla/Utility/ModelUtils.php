@@ -115,8 +115,10 @@ class ModelUtils {
 
         if (property_exists($model, 'Validation') && $model->Validation instanceof Gdn_Validation) {
             $results = $model->Validation->results();
+            $model->Validation->reset();
         } elseif ($model instanceof \Gdn_Validation) {
             $results = $model->results();
+            $model->reset();
         } elseif ($model instanceof \Gdn_Form) {
             $results = $model->validationResults();
         }

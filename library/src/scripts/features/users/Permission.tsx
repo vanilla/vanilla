@@ -160,5 +160,9 @@ export function hasPermission(permission: string | string[], options?: IPermissi
 }
 
 export function isUserAdmin(): boolean {
-    return getStore().getState().users.current.data?.isAdmin ?? false;
+    return getStore().getState().users.permissions.data?.isAdmin ?? false;
+}
+
+export function isUserSysAdmin(): boolean {
+    return getStore().getState().users.permissions.data?.isSysAdmin ?? false;
 }

@@ -13,7 +13,7 @@ import { tilesVariables } from "@library/features/tiles/Tiles.variables";
 import Container from "@library/layout/components/Container";
 import Heading from "@library/layout/Heading";
 import { visibility } from "@library/styles/styleHelpers";
-import { useLayout } from "@library/layout/LayoutContext";
+import { useSection } from "@library/layout/LayoutContext";
 import { TileAlignment } from "./TileAlignment";
 
 interface ITile {
@@ -42,7 +42,7 @@ export default function Tiles(props: IProps) {
     const optionOverrides = {
         columns: props.columns,
         alignment: props.alignment,
-        mediaQueries: useLayout().mediaQueries,
+        mediaQueries: useSection().mediaQueries,
     };
     const options = tilesVariables(optionOverrides).options;
     const { className, items, titleLevel = 2 } = props;

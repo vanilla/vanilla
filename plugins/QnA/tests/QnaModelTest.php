@@ -31,9 +31,6 @@ class QnaModelTest extends SiteTestCase {
      * Test unanswered count fetching, caching, and permissions.
      */
     public function testUnansweredCounts() {
-        // Make sure we have caching enabled.
-        $this->enableCaching();
-
         // Create an accepted answer question.
         $question = $this->createQuestion();
         $answer = $this->createAnswer();
@@ -79,7 +76,7 @@ class QnaModelTest extends SiteTestCase {
 
         // Other use with same category access as guest will get the same cache.
         $memberUser = $this->createUser();
-        $this->resetTable('Discussion');
+        $this->resetTable('Discussion', false);
         $this->runWithUser(function () {
             // CategoryModel doesn't recognize the session changing mid-request.
             \CategoryModel::clearCache();

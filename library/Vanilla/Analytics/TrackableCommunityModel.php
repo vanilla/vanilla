@@ -10,10 +10,7 @@ namespace Vanilla\Analytics;
 use CategoryModel;
 use CommentModel;
 use DiscussionModel;
-use Gdn;
-use PHPUnit\Exception;
-use UserModel;
-use Vanilla\Utility\ArrayUtils;
+use \Vanilla\Utility\ArrayUtils;
 
 /**
  * Utility functions for Trackable Events.
@@ -60,6 +57,7 @@ class TrackableCommunityModel {
         } else {
             // Fallback category data
             $category = ['categoryID' => 0];
+            trigger_error("Tried to fetch trackable category but it didn't exist. CategoryID: $categoryID", E_USER_WARNING);
         }
 
         return $category;
@@ -114,7 +112,7 @@ class TrackableCommunityModel {
         $discussion = $schema->validate($discussion);
 
         $discussion['firstCommentID'] = $firstCommentID;
-        $discussion['category'] = $this->getTrackableCategory($discussion['discussionID']);
+        $discussion['category'] = $this->getTrackableCategory($discussion['categoryID']);
         $discussion['categoryAncestors'] = self::getCategoryAncestors($discussion['categoryID']);
         $discussion['groupID'] = $discussion['groupID'] ?? null;
         $discussion['commentMetric'] = [
@@ -131,6 +129,33 @@ class TrackableCommunityModel {
     }
 
     /**
+     * Add special fields for tracking to data for a discussion that has no ID (as happens, e.g., when a posted
+     * discussion is immediately flagged as spam before being posted).
+     *
+     * @param array $discussionData
+     * @return array
+     */
+    public function getTrackableLogDiscussion(array $discussionData): array {
+        $discussionData["discussionID"] = 0;
+        $discussionData = ArrayUtils::camelCase($discussionData);
+        $schema = $this->discussionModel->schema();
+        $discussionData = $schema->validate($discussionData, true);
+        $discussionData["firstCommentID"] = null;
+        $discussionData["category"] = $this->getTrackableCategory($discussionData["categoryID"]);
+        $discussionData["categoryAncestors"] = self::getCategoryAncestors($discussionData["categoryID"]);
+        $discussionData['groupID'] = $discussionData['groupID'] ?? null;
+        $discussionData['commentMetric'] = [
+            'firstComment' => false,
+            'time' => null
+        ];
+        $discussionData['dateInserted'] = TrackableDateUtils::getDateTime($discussionData['dateInserted']);
+        $discussionData['discussionUser'] = $this->userUtils->getTrackableUser($discussionData['insertUserID']);
+        // Tracking events don't need the body. It takes up a lot of space unnecessarily.
+        $discussionData['body'] = null;
+        return $discussionData;
+    }
+
+    /**
      * Grab standard data for a comment.
      *
      * @param int|array $commentOrCommentID A comment's unique ID, used to query data.
@@ -139,7 +164,7 @@ class TrackableCommunityModel {
      */
     public function getTrackableComment($commentOrCommentID, string $type = 'comment_add'): array {
         if (is_int($commentOrCommentID)) {
-            $comment = $this->commentModel->getID($commentOrCommentID);
+            $comment = $this->commentModel->getID($commentOrCommentID, DATASET_TYPE_ARRAY);
             if (empty($comment)) {
                 return [
                     'commentID' => 0,
@@ -210,5 +235,46 @@ class TrackableCommunityModel {
         }
 
         return $data;
+    }
+
+    /**
+     * Add special fields for tracking to data for a comment that has no ID (as happens, e.g., when a posted
+     * discussion is immediately flagged as spam before being posted).
+     *
+     * @param array $commentData
+     * @return array
+     */
+    public function getTrackableLogComment(array $commentData): array {
+        $commentData["commentID"] = 0;
+        $commentData = ArrayUtils::camelCase($commentData);
+        $schema = $this->commentModel->schema();
+        $commentData = $schema->validate($commentData, true);
+        $commentData['dateInserted'] = TrackableDateUtils::getDateTime($commentData['dateInserted']);
+        $commentData['discussionID'] = (int) $commentData['discussionID'];
+        $commentData['insertUser'] = $this->userUtils->getTrackableUser($commentData['insertUserID']);
+        try {
+            $discussion = $this->getTrackableDiscussion($commentData['discussionID']);
+        } catch (\Exception $ex) {
+            $discussion = false;
+        }
+        if ($discussion) {
+            $commentData['category'] = $discussion["category"];
+            $commentData['categoryAncestors'] = $discussion['categoryAncestors'];
+            $commentData['discussionUser'] = $discussion['discussionUser'];
+
+            // Removing those redundancies...
+            unset(
+                $discussion['category'],
+                $discussion['categoryAncestors'],
+                $discussion['commentMetric'],
+                $discussion['discussionUser'],
+                $discussion['record']
+            );
+        }
+
+        // The body is large and unnecessary.
+        $commentData['body'] = null;
+
+        return $commentData;
     }
 }

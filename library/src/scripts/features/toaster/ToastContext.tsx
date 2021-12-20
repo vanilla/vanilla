@@ -69,6 +69,9 @@ export function ToastProvider(props: { children: ReactNode }) {
         return toastID;
     };
 
+    // Expose new toasts so regular js and legacy views can use them
+    window.__LEGACY_ADD_TOAST__ = addToast;
+
     const updateToast = (toastID: string, updatedToast: IToast) => {
         if (toasts && updatedToast) {
             setToast((prevState) =>

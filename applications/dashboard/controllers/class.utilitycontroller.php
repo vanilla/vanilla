@@ -8,6 +8,7 @@
  * @since 2.0
  */
 
+use Garden\Web\Exception\ServerException;
 use Vanilla\Formatting\DateTimeFormatter;
 
 /**
@@ -296,7 +297,7 @@ class UtilityController extends DashboardController {
             $this->setData('Success', false);
             $this->setData('Error', $ex->getMessage());
             if (debug()) {
-                throw $ex;
+                throw \Garden\Web\Exception\HttpException::createFromThrowable($ex);
             }
         }
         if (Gdn::session()->checkPermission('Garden.Settings.Manage')) {
@@ -699,7 +700,7 @@ class UtilityController extends DashboardController {
             $this->setData('Error', $ex->getMessage());
 
             if (debug()) {
-                throw $ex;
+                throw \Garden\Web\Exception\HttpException::createFromThrowable($ex);
             }
             return false;
         }

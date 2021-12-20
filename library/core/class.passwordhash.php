@@ -195,6 +195,22 @@ class Gdn_PasswordHash {
     }
 
     /**
+     * Test whether or not an algorithm exists.
+     *
+     * @param string $algorithm
+     * @return bool
+     */
+    public function hasAlgorithm(string $algorithm): bool {
+        if (!str_ends_with($algorithm, 'Password')) {
+            $algorithm .= 'Password';
+        }
+        $algorithm = ucfirst($algorithm);
+        $class = "\\Garden\\Password\\{$algorithm}";
+
+        return class_exists($class);
+    }
+
+    /**
      * Create a password hash.
      *
      * This method tries to use PHP's built in {@link password_hash()} function and falls back to the default

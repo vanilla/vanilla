@@ -106,6 +106,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     /** @var LoggerInterface */
     private $logger;
 
+    /** @var array */
+    private $sentHeaders = [];
+
     /**
      * @var array An associative collection of variables that will get passed into the
      * controller as properties once it has been instantiated.
@@ -877,6 +880,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      * @return mixed Returns the result of a dispatch not found if the controller wasn't found or is disabled.
      */
     private function dispatchController($request, $routeArgs) {
+        // Clean this out between dispatches.
+        $this->sentHeaders = [];
+
         // Create the controller first.
         $controllerName = $routeArgs['controller'];
         $controller = $this->createController($controllerName, $request, $routeArgs);
@@ -931,6 +937,11 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             Gdn::pluginManager()->callEventHandlers($controller, $controllerName, $controllerMethod, 'before');
             call_user_func_array($callback, $args);
             $this->applyTimeHeaders();
+        } catch (\Vanilla\Exception\ExitException $ex) {
+            // The controller wanted to exit.
+            if (!defined('TESTMODE_ENABLED') || !TESTMODE_ENABLED) {
+                exit();
+            }
         } catch (\Throwable $ex) {
             if ($this->rethrowExceptions) {
                 throw $ex;
@@ -987,6 +998,24 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             "x-app-$key-max" => Timers::formatDuration($timer['max']),
         ];
         return $result;
+    }
+
+    /**
+     * Keep track of the headers from the last response.
+     *
+     * @param array $headers The headers that were sent.
+     *
+     * @return void
+     */
+    public function setSentHeaders(array $headers): void {
+        $this->sentHeaders = $headers;
+    }
+
+    /**
+     * @return array
+     */
+    public function getSentHeaders(): array {
+        return $this->sentHeaders;
     }
 
     /**

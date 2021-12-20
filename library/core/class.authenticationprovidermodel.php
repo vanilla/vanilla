@@ -42,7 +42,7 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
     /**
      * Cache invalidation.
      */
-    protected function onUpdate() {
+    public function onUpdate() {
         parent::onUpdate();
         $cache = Gdn::cache();
         $cache->remove(self::ALL_CACHE_KEY);
@@ -394,18 +394,32 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
         if ($this->validate($formPostValues, $insert) === true) {
             // Clear the default from other authentication providers.
             $default = val('IsDefault', $formPostValues);
+            $postedAuthKey = val('AuthenticationKey', $formPostValues);
             if ($default) {
-                $this->SQL->put(
-                    $this->Name,
-                    ['IsDefault' => 0],
-                    ['AuthenticationKey <>' => val('AuthenticationKey', $formPostValues)]
-                );
+                $existingDefault = self::getDefault();
+                $isAlreadyDefault = $existingDefault && $existingDefault['AuthenticationKey'] !== $postedAuthKey;
+                if (!$isAlreadyDefault) {
+                    $this->SQL->put(
+                        $this->Name,
+                        ['IsDefault' => 0],
+                        ['AuthenticationKey <>' => $postedAuthKey]
+                    );
+                }
             }
 
             $fields = $this->Validation->validationFields();
             if ($insert === false) {
                 if ($settings['checkExisting'] ?? false) {
-                    $fields = array_diff_assoc($fields, $row);
+                    $updatedFields = [];
+                    foreach ($fields as $fieldKey => $fieldValue) {
+                        // Intentionally loose equality check.
+                        if (!isset($row[$fieldKey]) || $fieldValue != $row[$fieldKey]) {
+                            $updatedFields[$fieldKey] = $fieldValue;
+                        }
+                    }
+                    // Can't use `array_diff_assoc` because it does strict equality checks.
+                    // MySQL may have 0/1 but we will have false/true.
+                    $fields = $updatedFields;
                 }
 
                 if (!empty($fields)) {

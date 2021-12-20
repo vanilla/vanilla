@@ -7,13 +7,13 @@ import { panelAreaClasses } from "@library/layout/panelAreaStyles";
 import classNames from "classnames";
 import React from "react";
 import { panelBackgroundVariables } from "@library/layout/PanelBackground.variables";
-import { useLayout, withLayout } from "@library/layout/LayoutContext";
+import { useSection, withSection } from "@library/layout/LayoutContext";
 import { ILayoutContainer } from "@library/layout/components/interface.layoutContainer";
 
 export function PanelOverflow(
     props: ILayoutContainer & { offset: number; isLeft?: boolean; renderLeftPanelBackground?: boolean },
 ) {
-    const classes = panelAreaClasses(useLayout().mediaQueries);
+    const classes = panelAreaClasses(useSection().mediaQueries);
     const panelVars = panelBackgroundVariables();
     const color =
         panelVars.config.render && !!props.isLeft && props.renderLeftPanelBackground
@@ -30,4 +30,4 @@ export function PanelOverflow(
     );
 }
 
-export default withLayout(PanelOverflow);
+export default withSection(PanelOverflow);

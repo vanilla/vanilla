@@ -9,13 +9,14 @@ namespace VanillaTests\Library\EmbeddedContent\Factories;
 use Garden\Http\HttpResponse;
 use Vanilla\EmbeddedContent\Embeds\KalturaEmbed;
 use Vanilla\EmbeddedContent\Factories\KalturaEmbedFactory;
-use VanillaTests\MinimalContainerTestCase;
+use VanillaSettingsController;
+use VanillaTests\BootstrapTestCase;
 use VanillaTests\Fixtures\MockHttpClient;
 
 /**
  * Tests for the embed and factory.
  */
-class KalturaEmbedFactoryTest extends MinimalContainerTestCase {
+class KalturaEmbedFactoryTest extends BootstrapTestCase {
 
     /** @var KalturaEmbedFactory */
     private $factory;
@@ -169,5 +170,48 @@ class KalturaEmbedFactoryTest extends MinimalContainerTestCase {
 
         $this->expectExceptionMessage($expectedExceptionMessage);
         $this->factory->createEmbedForUrl($url);
+    }
+
+    /**
+     * Test supported array & string config values for `embeds.kaltura.customDomains`.
+     */
+    public function testKalturaDomainConfigArrayStringCompatibility() : void {
+        // Test supported domains with the `embeds.kaltura.customDomains` config as a new line split string.
+        $this->runWithConfig(
+            [VanillaSettingsController::CONFIG_KALTURA_DOMAINS => "mydomain.com\nyourdomain.ca"],
+            function () {
+                $kalturaEmbedFactory = new KalturaEmbedFactory(new MockHttpClient());
+                $customDomains = $kalturaEmbedFactory->getSupportedDomains();
+
+                $this->assertEquals(
+                    [
+                        'mediaspace.kaltura.com',
+                        'videos.kaltura.com',
+                        'mydomain.com',
+                        'yourdomain.ca'
+                    ],
+                    $customDomains
+                );
+            }
+        );
+
+        // Test supported domains with the `embeds.kaltura.customDomains` config as an array.
+        $this->runWithConfig(
+            [VanillaSettingsController::CONFIG_KALTURA_DOMAINS => ['mydomain.com', 'yourdomain.ca']],
+            function () {
+                $kalturaEmbedFactory = new KalturaEmbedFactory(new MockHttpClient());
+                $customDomains = $kalturaEmbedFactory->getSupportedDomains();
+
+                $this->assertEquals(
+                    [
+                        'mediaspace.kaltura.com',
+                        'videos.kaltura.com',
+                        'mydomain.com',
+                        'yourdomain.ca'
+                    ],
+                    $customDomains
+                );
+            }
+        );
     }
 }

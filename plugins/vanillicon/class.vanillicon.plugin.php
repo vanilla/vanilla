@@ -93,7 +93,7 @@ class VanilliconPlugin extends Gdn_Plugin {
     }
 }
 
-if (!function_exists('userPhotoDefaultUrl')) {
+if (!function_exists('userPhotoDefaultUrl') && !isTestMode()) {
     /**
      * Calculate the user's default photo url.
      *

@@ -40,7 +40,7 @@ export default function TitleBarNav(props: ITitleBarNavProps) {
     const [expanded, setExpanded] = useState<INavigationVariableItem>();
 
     const megaMenuRef = useRef<IMegaMenuHandle>(null);
-    const firstItemRef = useRef<HTMLAnchorElement>();
+    const firstItemRef = useRef<HTMLAnchorElement | HTMLButtonElement>();
 
     const active = expanded && expanded.children?.length && expanded;
 
@@ -48,6 +48,7 @@ export default function TitleBarNav(props: ITitleBarNavProps) {
 
     const classes = titleBarNavClasses();
     const dataLength = Object.keys(navigationItems).length;
+    let haveActiveNavItem = false;
     const content = navigationItems.map((item, key) => {
         if (item.isHidden) {
             return <React.Fragment key={key}></React.Fragment>;
@@ -102,13 +103,19 @@ export default function TitleBarNav(props: ITitleBarNavProps) {
             }
         };
 
+        //if we already have active navItem, avoid duplicates (cases when same url for multiple items etc)
+        const navItemIsActive = (active ? active === item : isCurrentPage()) && !haveActiveNavItem;
+        if (navItemIsActive) {
+            haveActiveNavItem = true;
+        }
+
         const component = (
             <TitleBarNavItem
                 to={item.url}
                 ref={(ref) => {
                     if (key === 0) firstItemRef.current = ref!;
                 }}
-                isActive={active ? active === item : isCurrentPage()}
+                isActive={navItemIsActive}
                 className={classNames({
                     [classes.lastItem]: dataLength === key,
                     [classes.firstItem]: key === 0,
@@ -118,6 +125,7 @@ export default function TitleBarNav(props: ITitleBarNavProps) {
                 onKeyDown={onKeyDown}
                 linkClassName={props.linkClassName}
                 key={key}
+                hasPopupMenu={item.children && !!item.children.length}
             >
                 {t(item.name)}
             </TitleBarNavItem>

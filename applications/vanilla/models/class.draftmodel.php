@@ -147,6 +147,9 @@ class DraftModel extends Gdn_Model {
                 $this->Validation->setSchemaProperty('Body', 'Length', $maxCommentLength);
                 $this->Validation->applyRule('Body', 'Length');
             }
+        } else {
+            $this->Validation->unapplyRule('Body', 'Required');
+            $this->Validation->unapplyRule('Body', 'Length');
         }
 
         // Get the DraftID from the form so we know if we are inserting or updating.

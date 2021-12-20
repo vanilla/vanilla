@@ -7,6 +7,9 @@
 
 namespace VanillaTests\APIv2;
 
+use Vanilla\Community\Events\DiscussionEvent;
+use VanillaTests\Analytics\SpyingAnalyticsTestTrait;
+use VanillaTests\EventSpyTestTrait;
 use VanillaTests\ExpectExceptionTrait;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\SchedulerTestTrait;
@@ -18,11 +21,14 @@ use VanillaTests\VanillaTestCase;
  * Test discussion merging.
  */
 class DiscussionsMergeTest extends SiteTestCase {
-
+    use EventSpyTestTrait;
     use CommunityApiTestTrait;
+    use SpyingAnalyticsTestTrait;
     use ExpectExceptionTrait;
     use SchedulerTestTrait;
     use UsersAndRolesApiTestTrait;
+
+    public static $addons = ['vanillaanalytics'];
 
     /**
      * Test success PATCH /discussions/merge
@@ -207,5 +213,40 @@ class DiscussionsMergeTest extends SiteTestCase {
         $allDiscussions = $this->api()->get('/discussions')->getBody();
         $this->assertCount(1, $allDiscussions);
         $this->assertEquals(2, $allDiscussions[0]['countComments']);
+    }
+
+    /**
+     * Test dispatched discussion resource events upon merge.
+     */
+    public function testMergeDiscussionsEvent(): void {
+        $category = $this->createCategory();
+
+        $discussions[] = $this->createDiscussion(['CategoryID' => $category['categoryID']]);
+        $discussions[] = $this->createDiscussion(['CategoryID' => $category['categoryID']]);
+        $discussions[] = $this->createDiscussion(['CategoryID' => $category['categoryID']]);
+
+        // Merge discussions to another discussion using `merge` API endpoint.
+        $result = $this->api()->patch(
+            "/discussions/merge",
+            [
+                'discussionIDs' => [
+                    $discussions[0]['discussionID'],
+                    $discussions[1]['discussionID'],
+                    $discussions[2]['discussionID'],
+                ],
+                'destinationDiscussionID' => $discussions[2]['discussionID']
+            ]
+        );
+
+        // Assert that everything went well & the resource event was fired.
+        $this->assertEquals(200, $result->getStatusCode());
+
+        $this->assertEventsDispatched(
+            [
+                $this->expectedResourceEvent('discussion', DiscussionEvent::ACTION_MERGE, $discussions[0]),
+                $this->expectedResourceEvent('discussion', DiscussionEvent::ACTION_MERGE, $discussions[1]),
+            ],
+            ['discussionID']
+        );
     }
 }

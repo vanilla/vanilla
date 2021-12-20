@@ -22,10 +22,10 @@ export function Metas(props: IProps) {
     return <div {...props} className={classNames(classes.root, props.className)} />;
 }
 
-export function MetaItem(props: IProps) {
+export const MetaItem = React.forwardRef(function MetaItem(props: IProps, ref: React.RefObject<HTMLDivElement>) {
     const classes = metasClasses();
-    return <div {...props} className={cx(classes.meta, props.className)} />;
-}
+    return <div {...props} ref={ref} className={cx(classes.meta, props.className)} />;
+});
 
 export function MetaLink(props: React.ComponentProps<typeof SmartLink>) {
     const classes = metasClasses();
@@ -37,17 +37,18 @@ export function MetaLink(props: React.ComponentProps<typeof SmartLink>) {
     );
 }
 
-export function MetaTag(
+export const MetaTag = React.forwardRef(function MetaTag(
     props: {
         tagPreset?: TagPreset;
     } & React.ComponentProps<typeof Tag>,
+    ref: React.RefObject<HTMLDivElement>,
 ) {
     const { tagPreset, ...rest } = props;
     const { height } = tagsVariables();
     const classes = metasClasses();
 
     return (
-        <MetaItem>
+        <MetaItem ref={ref}>
             <Tag
                 {...rest}
                 preset={props.tagPreset}
@@ -55,7 +56,7 @@ export function MetaTag(
             />
         </MetaItem>
     );
-}
+});
 
 export function MetaIcon(props: React.ComponentProps<typeof Icon>) {
     const { className, children, ...rest } = props;

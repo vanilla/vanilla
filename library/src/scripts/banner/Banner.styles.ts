@@ -6,7 +6,7 @@
 
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { containerVariables } from "@library/layout/components/containerStyles";
-import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
+import { oneColumnVariables } from "@library/layout/Section.variables";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { unitIfDefined } from "@library/styles/styleHelpers";
 import { styleUnit } from "@library/styles/styleUnit";
@@ -295,7 +295,7 @@ export const bannerClasses = useThemeCache((alternativeVariables?: ReturnType<ty
         {
             alignSelf: "stretch",
             maxWidth: makeImageMinWidth(
-                panelLayoutVariables().contentWidth,
+                oneColumnVariables().contentWidth,
                 containerVariables().spacing.padding * 2 * 2,
             ),
             flexGrow: 1,
@@ -303,7 +303,7 @@ export const bannerClasses = useThemeCache((alternativeVariables?: ReturnType<ty
             overflow: "hidden",
         },
         media(
-            { maxWidth: panelLayoutVariables().contentWidth },
+            { maxWidth: oneColumnVariables().contentWidth },
             {
                 minWidth: makeImageMinWidth("100vw", containerVariables().spacing.padding * 2),
             },

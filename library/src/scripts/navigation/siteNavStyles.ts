@@ -7,7 +7,7 @@
 import { variableFactory, styleFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
+import { oneColumnVariables } from "@library/layout/Section.variables";
 import { negative, allLinkStates } from "@library/styles/styleHelpers";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
@@ -54,7 +54,7 @@ export const siteNavVariables = useThemeCache(() => {
 export const siteNavClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = siteNavVariables();
-    const mediaQueries = panelLayoutVariables().mediaQueries();
+    const mediaQueries = oneColumnVariables().mediaQueries();
 
     const style = styleFactory("siteNav");
 
@@ -86,7 +86,7 @@ export const siteNavClasses = useThemeCache(() => {
 export const siteNavNodeClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = siteNavVariables();
-    const mediaQueries = panelLayoutVariables().mediaQueries();
+    const mediaQueries = oneColumnVariables().mediaQueries();
 
     const style = styleFactory("siteNavNode");
 

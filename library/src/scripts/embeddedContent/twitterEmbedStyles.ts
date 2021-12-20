@@ -6,11 +6,11 @@ import { styleFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { percent } from "csx";
 import { styleUnit } from "@library/styles/styleUnit";
-import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
+import { oneColumnVariables } from "@library/layout/Section.variables";
 
 export const twitterEmbedClasses = useThemeCache(() => {
     const style = styleFactory("twitter");
-    const mediaQueries = panelLayoutVariables().mediaQueries();
+    const mediaQueries = oneColumnVariables().mediaQueries();
 
     const card = style(
         "card",

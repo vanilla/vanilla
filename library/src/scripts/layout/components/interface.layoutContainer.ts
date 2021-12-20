@@ -3,16 +3,15 @@
  * @license GPL-2.0-only
  */
 
-import { ILayoutProps } from "@library/layout/LayoutContext";
+import { ISectionProps } from "@library/layout/LayoutContext";
 import React from "react";
-import { IPanelLayoutClasses } from "@library/layout/PanelLayout.styles";
-import { IPanelLayoutProps } from "@library/layout/PanelLayout";
+import { ISectionClasses } from "@library/layout/Section.styles";
 
-export interface ILayoutContainer extends ILayoutProps {
+export interface ILayoutContainer extends ISectionProps {
     className?: string;
     children?: React.ReactNode;
     tag?: keyof JSX.IntrinsicElements;
     ariaHidden?: boolean;
     innerRef?: React.RefObject<HTMLDivElement>;
-    panelClasses?: IPanelLayoutClasses;
+    panelClasses?: ISectionClasses;
 }

@@ -309,88 +309,6 @@ class UsersTest extends AbstractResourceTest {
     }
 
     /**
-     * To catch this regression.
-     * @see https://github.com/vanilla/support/issues/4039
-     */
-    public function testNoJunctionsPermissions() {
-        // There should not be an error.
-        $userID = $this->api()->getUserID();
-        $this->api()->get("/users/$userID/permissions", ['expand' => 'junctions']);
-        $this->assertTrue(true);
-    }
-
-    /**
-     * Test the users me endpoint with some custom roles.
-     */
-    public function testPermissions() {
-        $customCategory = $this->api()->post('/categories', [
-            'name' => 'Custom Perms',
-            'urlCode' => 'test-permissions-api',
-        ])->getBody();
-
-        $customRole = $this->api()->post('/roles', [
-            'name' => 'Custom Role',
-            'type' => 'member',
-            'permissions' => [
-                [
-                    'type' => PermissionFragmentSchema::TYPE_GLOBAL,
-                    'permissions' => [
-                        'community.manage' => true,
-                    ],
-                ],
-                // I would add some root category permissions here, but it's not possible to insert them through the API.
-                // https://github.com/vanilla/vanilla/issues/10184
-                [
-                    'type' => 'category',
-                    'id' => $customCategory['categoryID'],
-                    'permissions' => [
-                        "comments.add" => true,
-                        "comments.delete" => true,
-                        "comments.edit" => true,
-                        "discussions.add" => true,
-                        "discussions.manage" => false,
-                        "discussions.moderate" => false,
-                    ],
-                ],
-            ],
-        ])->getBody();
-
-        $user = $this->api()->post('/users', [
-            "email" => "testy@test.com",
-            "emailConfirmed" => true,
-            "name" => "TestTest",
-            "password" => "password",
-            "roleID" => [
-                $customRole['roleID'],
-            ],
-        ])->getBody();
-
-        $permissions = $this->api()->get('/users/' . $user['userID'] . '/permissions')->getBody();
-
-        $this->assertEquals([
-            'isAdmin' => false,
-            'permissions' => [
-                [
-                    'type' => PermissionFragmentSchema::TYPE_GLOBAL,
-                    'permissions' => [
-                        'community.manage' => true,
-                    ],
-                ],
-                [
-                    'type' => 'category',
-                    'id' => $customCategory['categoryID'],
-                    'permissions' => [
-                        "comments.add" => true,
-                        "comments.delete" => true,
-                        "comments.edit" => true,
-                        "discussions.add" => true,
-                    ],
-                ],
-            ]
-        ], $permissions);
-    }
-
-    /**
      * Test full-name filtering with GET /users/by-names.
      */
     public function testNamesFull() {
@@ -836,6 +754,7 @@ class UsersTest extends AbstractResourceTest {
     public function testIndexWithRoleTokenAuth(array $roleTokenQueryParam) {
         $user = $this->testPost();
 
+        $this->api()->setUserID(0);
         $response = $this->api()->get("/users/{$user['userID']}", $roleTokenQueryParam)->getBody();
 
         /** @var UsersApiController $userApiController */
@@ -853,5 +772,4 @@ class UsersTest extends AbstractResourceTest {
         $this->assertSame($user['name'], $response['name']);
         $this->assertSame($user['email'], $response['email']);
     }
-
 }

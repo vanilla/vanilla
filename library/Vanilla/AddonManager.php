@@ -126,6 +126,19 @@ class AddonManager implements LoggerAwareInterface {
     }
 
     /**
+     * Get the default directories to scan.
+     *
+     * @return array
+     */
+    public static function getDefaultScanDirectories(): array {
+        return [
+            Addon::TYPE_ADDON => ['/addons/addons', '/applications', '/plugins'],
+            Addon::TYPE_THEME => ['/addons/themes', '/themes'],
+            Addon::TYPE_LOCALE => '/locales'
+        ];
+    }
+
+    /**
      * Test whether an addon type uses multi-caching.
      *
      * @param string $type One of the **Addon::TYPE_*** constatns.

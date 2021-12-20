@@ -6,13 +6,13 @@
 import { panelAreaClasses } from "@library/layout/panelAreaStyles";
 import classNames from "classnames";
 import React from "react";
-import { useLayout, withLayout } from "@library/layout/LayoutContext";
+import { useSection, withSection } from "@library/layout/LayoutContext";
 import { ILayoutContainer } from "@library/layout/components/interface.layoutContainer";
 
 export function PanelAreaHorizontalPadding(props: ILayoutContainer) {
     const Tag = props.tag || "div";
-    const classes = panelAreaClasses(useLayout().mediaQueries);
+    const classes = panelAreaClasses(useSection().mediaQueries);
     return <Tag className={classNames(classes.root, props.className, "hasNoVerticalPadding")}>{props.children}</Tag>;
 }
 
-export default withLayout(PanelAreaHorizontalPadding);
+export default withSection(PanelAreaHorizontalPadding);

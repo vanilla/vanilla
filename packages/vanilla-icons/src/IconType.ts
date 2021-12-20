@@ -3,9 +3,9 @@
  * @license gpl-2.0-only
  */
 
-type DashboardIconType = "dashboard-edit";
+type DashboardIconType = "dashboard-edit" | "vanilla-logo";
 
-type DataIconType = "data-folder-tabs" | "data-pencil" | "data-trash";
+type DataIconType = "data-folder-tabs" | "data-pencil" | "data-refresh" | "data-trash";
 
 type DiscussionIconType = "discussion-bookmark-solid" | "discussion-bookmark";
 
@@ -28,20 +28,22 @@ type NavigationIconType = "navigation-ellipsis" | "navigation-languages";
 type SearchIconType = "search-events" | "search-search";
 
 type AnalyticsIconType = "analytics-add" | "analytics-remove";
+type StatusIconTypes = "status-warning";
 
 type NewPostIconType = "new-question" | "new-poll" | "new-idea" | "new-discussion" | "new-event";
 
 type ExternalIconType = "external-link";
 
 export type IconType =
+    | AnalyticsIconType
     | DashboardIconType
     | DataIconType
     | DiscussionIconType
     | EditorIconType
+    | ExternalIconType
     | MeIconType
     | MetaIconType
     | NavigationIconType
-    | SearchIconType
-    | AnalyticsIconType
     | NewPostIconType
-    | ExternalIconType;
+    | SearchIconType
+    | StatusIconTypes;

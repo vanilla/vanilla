@@ -69,11 +69,6 @@ class Dispatcher implements LoggerAwareInterface {
      * @return $this
      */
     public function addRoute(Route $route, $key = '') {
-        if (!$route->isEnabled()) {
-            // Return early. Route may have been disabled by some configuration.
-            return $this;
-        }
-
         if ($key !== '') {
             $this->routes[$key] = $route;
         } else {
@@ -310,6 +305,9 @@ class Dispatcher implements LoggerAwareInterface {
             }
 
             $data = $raw instanceof \JsonSerializable ? $raw->jsonSerialize() : ['message' => $raw->getMessage()];
+            if (debug() && is_array($data)) {
+                $data['trace'] = $raw->getTrace();
+            }
             $result = new Data($data, $errorCode);
             // Provide stack trace as meta information.
             $result->setMeta('exception', $raw);

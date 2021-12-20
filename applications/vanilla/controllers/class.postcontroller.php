@@ -48,7 +48,6 @@ class PostController extends VanillaController {
      */
     public function index($currentFormName = 'discussion') {
         $this->addJsFile('jquery.autosize.min.js');
-        $this->addJsFile('autosave.js');
         $this->addJsFile('post.js');
 
         $this->setData('CurrentFormName', $currentFormName);
@@ -116,7 +115,6 @@ class PostController extends VanillaController {
 
         // Setup head
         $this->addJsFile('jquery.autosize.min.js');
-        $this->addJsFile('autosave.js');
         $this->addJsFile('post.js');
 
         $session = Gdn::session();
@@ -614,7 +612,6 @@ class PostController extends VanillaController {
 
         // Setup head
         $this->addJsFile('jquery.autosize.min.js');
-        $this->addJsFile('autosave.js');
         $this->addJsFile('post.js');
 
         // Setup comment model, $CommentID, $DraftID

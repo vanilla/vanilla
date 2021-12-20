@@ -35,6 +35,7 @@ class UserPointsModelTest extends SiteTestCase {
         $this->userPointsModel = $this->container()->get(UserPointsModel::class);
         $this->categoryModel = $this->container()->get(\CategoryModel::class);
         $this->resetTable('UserPoints');
+        \Gdn::cache()->flush();
     }
 
     /**
@@ -156,6 +157,7 @@ class UserPointsModelTest extends SiteTestCase {
         $this->givePoints($userBanned, 100000);
         $this->assertCount(1, $this->userPointsModel->getLeaders(UserPointsModel::SLOT_TYPE_ALL));
         $this->userModel->ban($userBanned['userID'], ['Reason' => 'testBan']);
+        \Gdn::cache()->flush();
         $this->assertCount(0, $this->userPointsModel->getLeaders(UserPointsModel::SLOT_TYPE_ALL));
     }
 
@@ -167,6 +169,7 @@ class UserPointsModelTest extends SiteTestCase {
         $this->givePoints($userDeleted, 100000);
         $this->assertCount(1, $this->userPointsModel->getLeaders(UserPointsModel::SLOT_TYPE_ALL));
         $this->userModel->deleteID($userDeleted['userID']);
+        \Gdn::cache()->flush();
         $this->assertCount(0, $this->userPointsModel->getLeaders(UserPointsModel::SLOT_TYPE_ALL));
     }
 }

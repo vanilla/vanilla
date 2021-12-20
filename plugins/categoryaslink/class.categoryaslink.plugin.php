@@ -14,14 +14,6 @@ use Vanilla\Models\TrustedDomainModel;
 class CategoryAsLinkPlugin extends Gdn_Plugin {
 
     /**
-     * Executes every time the plugin is turned on, makes changes to config.
-     */
-    public function setup() {
-        $this->structure();
-    }
-
-
-    /**
      * Add columns to the Category table to store CustomLinkURLs.
      */
     public function structure() {

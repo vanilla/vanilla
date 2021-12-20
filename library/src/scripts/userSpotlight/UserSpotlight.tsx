@@ -14,7 +14,7 @@ import { IUserFragment } from "@library/@types/api/users";
 import { UserPhoto } from "@library/headers/mebox/pieces/UserPhoto";
 import { useMeasure } from "@vanilla/react-utils/src";
 import { forumLayoutVariables } from "@dashboard/compatibilityStyles/forumLayoutStyles";
-import { useWidgetLayoutClasses } from "@library/layout/WidgetLayout.context";
+import { useWidgetSectionClasses } from "@library/layout/WidgetLayout.context";
 
 export interface IUserSpotlightProps {
     title?: string;
@@ -29,7 +29,7 @@ export function UserSpotlight(props: IUserSpotlightProps) {
     const shouldWrap = rootMeasure.width > 0 && rootMeasure.width < forumLayoutVariables().panel.paddedWidth;
     const variables = userSpotlightVariables();
     const classes = userSpotlightClasses({ options: props.options, shouldWrap });
-    const widgetClasses = useWidgetLayoutClasses();
+    const widgetClasses = useWidgetSectionClasses();
 
     return (
         <div className={widgetClasses.widgetClass}>

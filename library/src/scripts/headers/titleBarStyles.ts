@@ -37,7 +37,7 @@ import backLinkClasses from "@library/routing/links/backLinkStyles";
 import { css, CSSObject } from "@emotion/css";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { buttonResetMixin } from "@library/forms/buttonMixins";
-import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
+import { oneColumnVariables } from "@library/layout/Section.variables";
 import { titleBarVariables } from "./TitleBar.variables";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 
@@ -347,7 +347,7 @@ export const titleBarClasses = useThemeCache(() => {
                 },
             },
         },
-        panelLayoutVariables()
+        oneColumnVariables()
             .mediaQueries()
             .xs({
                 ...{

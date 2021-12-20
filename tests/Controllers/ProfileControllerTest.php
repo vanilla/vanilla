@@ -7,7 +7,12 @@
 
 namespace VanillaTests\Controllers;
 
+use Garden\Password\VbulletinPassword;
+use Garden\Password\XenforoPassword;
+use Garden\Schema\ValidationException;
+use Vanilla\CurrentTimeStamp;
 use Vanilla\Utility\ArrayUtils;
+use VanillaTests\APIv0\TestDispatcher;
 use VanillaTests\SiteTestCase;
 use VanillaTests\UsersAndRolesApiTestTrait;
 use VanillaTests\VanillaTestCase;
@@ -19,6 +24,9 @@ class ProfileControllerTest extends SiteTestCase {
     use UsersAndRolesApiTestTrait;
 
     const REDIRECT_URL = 'https://example.com/{name}?id={userID}';
+    const OPT_SHOULD_REAUTHENTICATE = 'shouldReauthenticate';
+    const OPT_FORCE_REAUTHENTICATE = 'forceReauthenticate';
+    const OPT_USER_ID = 'userID';
 
     /**
      * {@inheritDoc}
@@ -349,5 +357,157 @@ class ProfileControllerTest extends SiteTestCase {
             $this->expectExceptionMessage(\ProfileController::PRIVATE_PROFILE);
             $r = $this->bessy()->get(userUrl($user));
         });
+    }
+
+    /**
+     * Test a basic flow of `/profile/edit`.
+     */
+    public function testProfileEdit(): void {
+        $userID = $this->createUserFixture(self::ROLE_MEMBER);
+        $this->getSession()->start($userID);
+
+        $page = $this->bessy()->getHtml('/profile/edit');
+        $data = $page->getFormValues();
+
+        // By default, there is not much we are allowed to edit.
+        $r = $this->bessy()->postBack(['ShowEmail' => true]);
+
+        $user = $this->userModel->getID($userID, DATASET_TYPE_ARRAY);
+        $this->assertTrue((bool)$user['ShowEmail'], 'The user was not updated.');
+    }
+
+    /**
+     * Run through a profile/edit loop with and without re-authentication.
+     *
+     * @param array $fields
+     * @param array $options
+     */
+    protected function doProfileEditSteps(array $fields = [], $options = []) {
+        $options += [
+            self::OPT_SHOULD_REAUTHENTICATE => true, // should there be a re-authentication page during the steps?
+            self::OPT_FORCE_REAUTHENTICATE => true, // force authentication timeout
+            self::OPT_USER_ID => null, // edit a specific user ID
+        ];
+
+        $userID = $options[self::OPT_USER_ID] ?? $this->getSession()->UserID;
+        if (empty($options[self::OPT_USER_ID])) {
+            $path = '/profile/edit';
+        } else {
+            $path = "/profile/edit/$userID/x";
+        }
+
+        $page = $this->bessy()->getHtml($path);
+
+        if ($options[self::OPT_FORCE_REAUTHENTICATE]) {
+            \Gdn::authenticator()->identity()->setAuthTime(CurrentTimeStamp::get() - \Gdn_Controller::REAUTH_TIMEOUT - 100);
+        }
+        $page = $this->bessy()->postBackHtml($fields);
+
+        if ($options[self::OPT_SHOULD_REAUTHENTICATE]) {
+            $page->assertFormInput('AuthenticatePassword');
+
+            // Make some bad attempts first.
+            try {
+                $page = $this->bessy()->postBackHtml(['AuthenticatePassword' => '']);
+                $this->fail('There should have been an error.');
+            } catch (ValidationException $ex) {
+                $this->assertStringContainsString('Password is required', $ex->getMessage());
+            }
+
+            try {
+                $page = $this->bessy()->postBackHtml(['AuthenticatePassword' => 'xyz']);
+                $this->fail('There should have been an error.');
+            } catch (ValidationException $ex) {
+                $this->assertStringContainsString('The password you entered was incorrect', $ex->getMessage());
+            }
+
+            $this->bessy()->postBack(['AuthenticatePassword' => 'test']);
+        } else {
+            $page->assertNoFormInput('AuthenticatePassword');
+        }
+        // Assert all the fields.
+        $user = $this->userModel->getID($userID, DATASET_TYPE_ARRAY);
+        foreach ($fields as $name => $value) {
+            $this->assertEquals($user[$name], $value, "User.$name was not updated.");
+        }
+    }
+
+    /**
+     * Test a flow where a user must re-authenticate using their password.
+     */
+    public function testProfileEditReauthenticate(): void {
+        $userID = $this->createUserFixture(self::ROLE_MEMBER);
+        $this->getSession()->start($userID);
+
+        $this->doProfileEditSteps(['ShowEmail' => true]);
+    }
+
+    /**
+     * When changing email there should be a forced re-authentication.
+     *
+     * @see https://github.com/vanilla/vanilla-patches/issues/634
+     */
+    public function testProfileEditReauthenticateOnEmailChange(): void {
+        $userID = $this->createUserFixture(self::ROLE_MEMBER);
+        $this->getSession()->start($userID);
+
+        $this->doProfileEditSteps(['Email' => 'changed@example.com'], [self::OPT_FORCE_REAUTHENTICATE => false]);
+
+        $page = $this->bessy()->getHtml('/profile/edit');
+    }
+
+    /**
+     * There was a bug being caused by a mismatch in password hashes.
+     *
+     * @see https://higherlogic.atlassian.net/browse/VNLA-728
+     */
+    public function testReauthenticatePasswordBug(): void {
+        $this->runWithConfig(['Garden.Registration.Method' => 'Connect'], function () {
+            $userID = $this->createUserFixture(self::ROLE_MEMBER);
+            $pw = new VbulletinPassword();
+            $hash = $pw->hash('test');
+            $this->userModel->setField($userID, ['Password' => $hash, 'HashMethod' => 'vbulletin']);
+
+            $this->getSession()->start($userID);
+
+            $this->doProfileEditSteps(['ShowEmail' => true], [self::OPT_SHOULD_REAUTHENTICATE => false]);
+        });
+    }
+
+    /**
+     * Test the above bug, but with a generic config.
+     *
+     * @see https://higherlogic.atlassian.net/browse/VNLA-728
+     */
+    public function testReauthenticateDifferentPasswordHash(): void {
+        $userID = $this->createUserFixture(self::ROLE_MEMBER);
+        $pw = new VbulletinPassword();
+        $hash = $pw->hash('test');
+        $this->userModel->setField($userID, ['Password' => $hash, 'HashMethod' => 'vbulletin']);
+
+        $this->getSession()->start($userID);
+
+        $this->doProfileEditSteps(['ShowEmail' => true]);
+    }
+
+    /**
+     * Make sure the re-authorization steps work when an admin is editing another user's profile.
+     *
+     * Note: There is some indication in the code that we did not want to re-authenticate administrators at all.
+     * When reading the code though it seems as though a check to always re-authenticate was put in here:
+     * https://github.com/vanilla/vanilla-cloud/blob/master/applications/dashboard/controllers/class.profilecontroller.php#L454.
+     *
+     * If at some point we discover this shouldn't be the case then this test can be changed. However, it seems better
+     * to force re-authentication for users with such a high privilege.
+     */
+    public function testReauthenticateWithDifferentUser(): void {
+        $adminID = $this->createUserFixture(self::ROLE_ADMIN);
+        $memberID = $this->createUserFixture(self::ROLE_MEMBER);
+        // Change the member's password to make sure it's the admin's password we are checking.
+        $this->userModel->setField($memberID, ['Password' => 'foo']);
+
+        $this->getSession()->start($adminID);
+
+        $this->doProfileEditSteps(['ShowEmail' => true], [self::OPT_USER_ID => $memberID]);
     }
 }

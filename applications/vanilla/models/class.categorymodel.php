@@ -8,25 +8,25 @@
  * @since 2.0
  */
 
-use Garden\Web\Exception\ClientException;
 use Garden\EventManager;
 use Garden\Schema\Schema;
+use Garden\Web\Exception\ClientException;
+use Vanilla\Contracts\Models\SiteTotalProviderInterface;
+use Vanilla\Community\Schemas\CategoryFragmentSchema;
 use Vanilla\Dashboard\Models\PermissionJunctionModelInterface;
 use Vanilla\Events\LegacyDirtyRecordTrait;
-use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Models\CrawlableRecordSchema;
 use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Models\ModelCache;
 use Vanilla\Navigation\Breadcrumb;
-use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Permissions;
 use Vanilla\Scheduler\Descriptor\NormalJobDescriptor;
 use Vanilla\Scheduler\Job\CallbackJob;
 use Vanilla\Scheduler\LongRunner;
 use Vanilla\Scheduler\LongRunnerQuantityTotal;
-use Vanilla\Scheduler\SchedulerInterface;
 use Vanilla\SchemaFactory;
 use Vanilla\Site\SiteSectionModel;
+use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\InstanceValidatorSchema;
 use Vanilla\Utility\ModelUtils;
 use Vanilla\Web\SystemCallableInterface;
@@ -42,7 +42,11 @@ use Vanilla\Dashboard\Models\BannerImageModel;
 /**
  * Manages discussion categories' data.
  */
-class CategoryModel extends Gdn_Model implements EventFromRowInterface, CrawlableInterface, PermissionJunctionModelInterface, SystemCallableInterface {
+class CategoryModel extends Gdn_Model implements
+    EventFromRowInterface,
+    CrawlableInterface,
+    PermissionJunctionModelInterface,
+    SystemCallableInterface {
 
     use LegacyDirtyRecordTrait;
 
@@ -184,6 +188,14 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
         $this->collection = $this->createCollection();
         $this->eventManager = Gdn::getContainer()->get(EventManager::class);
         $this->modelCache = new ModelCache('CategoryModel', Gdn::cache());
+    }
+
+    /**
+     * Clear the cache on update.
+     */
+    public function onUpdate() {
+        parent::onUpdate();
+        $this->modelCache->invalidateAll();
     }
 
     /**
@@ -927,7 +939,9 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
         self::calculateDisplayAs($category);
 
         if (!($category['CssClass'] ?? false)) {
-            $category['CssClass'] = 'Category-'.$category['UrlCode'];
+            // Our validation rule is that the CssClass should be no longer than 50 chars, so if we're auto-generating one,
+            // make sure we respect the rule.
+            $category['CssClass'] = substr('Category-'.$category['CategoryID'].'-'.$category['UrlCode'], 0, 50);
         }
 
         if (isset($category['AllowedDiscussionTypes']) && is_string($category['AllowedDiscussionTypes'])) {
@@ -1020,6 +1034,8 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
      */
     public static function clearCache(bool $schedule = false) {
         $doClear = function () {
+            self::$deferredCache = [];
+            self::$deferredCacheScheduled = false;
             self::$Categories = null;
             $instance = self::instance();
             $instance->modelCache->invalidateAll();
@@ -1049,6 +1065,10 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
 
         $key = 'UserCategory_'.$userID;
         Gdn::cache()->remove($key);
+
+        // User category data may be cached here.
+        self::$Categories = null;
+        self::instance()->collection->flushLocalCache();
     }
 
     /**
@@ -2814,6 +2834,26 @@ class CategoryModel extends Gdn_Model implements EventFromRowInterface, Crawlabl
         }
 
         $result = parent::getWhere($where, $orderFields, $orderDirection, $limit, $offset);
+        return $result;
+    }
+
+    /**
+     * Get a set of categoryIDs for some where query.
+     *
+     * @param array{string, mixed} $where
+     *
+     * @return int[]
+     */
+    public function selectCachedIDs(array $where): array {
+        $result = $this->modelCache->getCachedOrHydrate([$where, 'ids'], function () use ($where) {
+            $ids = $this->createSql()
+                ->from($this->getTableName())
+                ->select('CategoryID')
+                ->where($where)
+                ->get()
+                ->column('CategoryID');
+            return $ids;
+        }, [\Gdn_Cache::FEATURE_EXPIRY => 60 * 60]);
         return $result;
     }
 
@@ -4728,12 +4768,27 @@ SQL;
      * @return Schema Returns a schema.
      */
     public function fragmentSchema(): Schema {
-        $result = SchemaFactory::parse([
-            'categoryID:i' => 'The ID of the category.',
-            'name:s' => 'The name of the category.',
-            'url:s' => 'Full URL to the category.',
-        ], 'CategoryFragment');
+        $result = SchemaFactory::get(CategoryFragmentSchema::class);
         return $result;
+    }
+
+    /**
+     * Get a category fragment by its ID.
+     *
+     * @param int|null $categoryID
+     *
+     * @return array|null
+     */
+    public function getFragmentByID(?int $categoryID): ?array {
+        if ($categoryID === null) {
+            return null;
+        }
+        $category = CategoryModel::categories($categoryID);
+        if (empty($category)) {
+            return null;
+        }
+        $normalized = $this->normalizeRow($category);
+        return ArrayUtils::pluck($normalized, CategoryFragmentSchema::fieldNames());
     }
 
     /**
@@ -4889,7 +4944,10 @@ SQL;
                 'countComments:i' => 'Total comments in the category.',
                 'countAllDiscussions:i' => 'Total of all discussions in a category and its children.',
                 'countAllComments:i' => 'Total of all comments in a category and its children.',
-                'followed:b?' => 'Is the category being followed by the current user?',
+                'followed:b?' => [
+                    'default' => false,
+                    'description' => 'Is the category being followed by the current user?',
+                ],
                 "breadcrumbs:a?" => new InstanceValidatorSchema(Breadcrumb::class),
                 'featured:b?' => 'Featured category.',
                 'allowedDiscussionTypes:a',

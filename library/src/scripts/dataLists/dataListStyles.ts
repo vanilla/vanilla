@@ -9,7 +9,7 @@ import { useThemeCache } from "@library/styles/themeCache";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { Property } from "csstype";
-import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
+import { oneColumnVariables } from "@library/layout/Section.variables";
 import { Mixins } from "@library/styles/Mixins";
 import { Variables } from "@library/styles/Variables";
 
@@ -53,7 +53,7 @@ export const dataListClasses = useThemeCache((layoutMediaQueries?: { xs: any }) 
     const style = styleFactory("dataList");
     const vars = dataListVariables();
     const globalVars = globalVariables();
-    const mediaQueries = layoutMediaQueries ?? panelLayoutVariables().mediaQueries();
+    const mediaQueries = layoutMediaQueries ?? oneColumnVariables().mediaQueries();
 
     const root = style({});
 

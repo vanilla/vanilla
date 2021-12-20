@@ -26,6 +26,7 @@ use Vanilla\Search\SearchTypeQueryExtenderInterface;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\ModelUtils;
 use Vanilla\Models\CrawlableRecordSchema;
+use Vanilla\Contracts\ConfigurationInterface;
 
 /**
  * Search record type for a discussion.
@@ -50,6 +51,9 @@ class DiscussionSearchType extends AbstractSearchType {
     /** @var array extenders */
     protected $extenders = [];
 
+    /** @var ConfigurationInterface */
+    private $config;
+
     protected $queryFullTextFields = ['name', 'bodyPlainText'];
 
     /**
@@ -60,19 +64,22 @@ class DiscussionSearchType extends AbstractSearchType {
      * @param \UserModel $userModel
      * @param \TagModel $tagModel
      * @param BreadcrumbModel $breadcrumbModel
+     * @param ConfigurationInterface $config
      */
     public function __construct(
         \DiscussionsApiController $discussionsApi,
         \CategoryModel $categoryModel,
         \UserModel $userModel,
         \TagModel $tagModel,
-        BreadcrumbModel $breadcrumbModel
+        BreadcrumbModel $breadcrumbModel,
+        ConfigurationInterface $config
     ) {
         $this->discussionsApi = $discussionsApi;
         $this->categoryModel = $categoryModel;
         $this->userModel = $userModel;
         $this->tagModel = $tagModel;
         $this->breadcrumbModel = $breadcrumbModel;
+        $this->config = $config;
     }
 
     /**
@@ -220,7 +227,7 @@ class DiscussionSearchType extends AbstractSearchType {
      * @return float|null
      */
     protected function getBoostValue(): ?float {
-        return 0.5;
+        return $this->config->get('Elastic.Boost.Discussion', 0.5);
     }
 
     /**

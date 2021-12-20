@@ -35,9 +35,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
     /** @var array List of exceptions not to block */
     private $blockExceptions = [
-        '#^api/v\d+/applicants(/|$)#' => self::BLOCK_NEVER,
-        '#^api/v\d+/locales.*#' => self::BLOCK_NEVER,
         '#^api/v2/#' => self::BLOCK_PERMISSION,
+        '#^dist(/|$)#' => self::BLOCK_NEVER,
         '#^asset(/|$)#' => self::BLOCK_NEVER,
         '#^authenticate(/|$)#' => self::BLOCK_NEVER,
         '#^discussions/getcommentcounts(/|$)#' => self::BLOCK_NEVER,
@@ -954,7 +953,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                 ]);
                 safeHeader("HTTP/1.0 500", true, 500);
             }
-            exit();
+            if (!defined('TESTMODE_ENABLED') || !TESTMODE_ENABLED) {
+                exit();
+            }
         }
     }
 

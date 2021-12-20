@@ -12,7 +12,7 @@ type PromiseType<P extends Promise<any>> = P extends Promise<infer T> ? T : neve
 type StateFromFnReturningPromise<T extends FnReturningPromise> = AsyncState<PromiseType<ReturnType<T>>>;
 type AsyncFnReturn<T extends FnReturningPromise = FnReturningPromise> = [StateFromFnReturningPromise<T>, T];
 
-type AsyncState<T> =
+export type AsyncState<T> =
     | {
           status: "pending" | "loading";
           error?: undefined;
@@ -44,7 +44,7 @@ export function useAsyncFn<T extends FnReturningPromise>(
 
     const callback = useCallback((...args: Parameters<T>): ReturnType<T> => {
         const callId = ++lastCallId.current;
-        set((prevState) => ({ ...prevState, loading: true }));
+        set((prevState) => ({ ...prevState, status: "loading", error: undefined, data: undefined }));
 
         return fn(...args).then(
             (data) => {

@@ -24,6 +24,9 @@ import Translate from "@library/content/Translate";
 import { DashboardFormListItem } from "@dashboard/forms/DashboardFormListItem";
 import { Icon } from "@vanilla/icons";
 import { DashboardMediaAddonListItem } from "@dashboard/forms/DashboardMediaAddonListItem";
+import { AutoWidthInput } from "@library/forms/AutoWidthInput";
+import { autoWidthInputClasses } from "@library/forms/AutoWidthInput.classes";
+import { cx } from "@emotion/css";
 
 export default {
     title: "Dashboard/Forms",
@@ -311,6 +314,21 @@ export function MediaAddonListItems() {
                     actionIcon={<Icon icon={"dashboard-edit"} />}
                 />
             </DashboardFormList>
+        </>
+    );
+}
+
+export function InputWithAutoWidth() {
+    return (
+        <>
+            <StoryHeading depth={1}>Auto with input component</StoryHeading>
+            <StoryHeading depth={2}>Input width should increase while typing but not exceed 300px</StoryHeading>
+            <form>
+                <AutoWidthInput
+                    placeholder={"Type your text here"}
+                    className={cx(autoWidthInputClasses().themeInput)}
+                />
+            </form>
         </>
     );
 }

@@ -42,14 +42,14 @@ class MessageModel extends Gdn_Model {
     /**
      * Returns a single message object for the specified id or FALSE if not found.
      *
-     * @param int $messageID The MessageID to filter to.
+     * @param int $id The MessageID to filter to.
      * @param string|false $datasetType The format of the message.
      * @param array $options Options to modify the behavior of the get.
      * @return array Requested message.
      */
-    public function getID($messageID, $datasetType = false, $options = []) {
+    public function getID($id, $datasetType = false, $options = []) {
         if (Gdn::cache()->activeEnabled()) {
-            $message = self::messages($messageID);
+            $message = self::messages($id);
             if (!$message) {
                 return $message;
             }
@@ -61,7 +61,7 @@ class MessageModel extends Gdn_Model {
                 return (array)$message;
             }
         } else {
-            return parent::getID($messageID, $datasetType, $options);
+            return parent::getID($id, $datasetType, $options);
         }
     }
 

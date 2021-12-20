@@ -8,11 +8,14 @@
 namespace VanillaTests\Library\Garden;
 
 use Garden\EventManager;
+use Garden\PsrEventHandlersInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
 use Vanilla\Contracts\Addons\EventListenerConfigInterface;
 use VanillaTests\BootstrapTrait;
+use VanillaTests\Fixtures\Events\TestPsrEventHandler;
+use VanillaTests\Fixtures\Events\TestResourceEvent;
 use VanillaTests\Fixtures\TestEvent;
 use VanillaTests\Fixtures\TestEventChild;
 
@@ -145,5 +148,21 @@ class EventManagerPsrTest extends TestCase {
         $e->incNum();
         $e->stopPropagation();
         return $e;
+    }
+
+    /**
+     * Test that we bind PsrEventHandlerInterface and unbind it.
+     */
+    public function testBindUnbindPsrEventHandler() {
+        $this->eventManager->bindClass(TestPsrEventHandler::class);
+        $event = new TestResourceEvent('test', []);
+        $this->eventManager->dispatch($event);
+        $this->assertTrue($event->wasHandled);
+
+        // Unbind
+        $this->eventManager->unbindClass(TestPsrEventHandler::class);
+        $event = new TestResourceEvent('test', []);
+        $this->eventManager->dispatch($event);
+        $this->assertFalse($event->wasHandled);
     }
 }

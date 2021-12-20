@@ -7,6 +7,8 @@
 
 namespace Vanilla;
 
+use Garden\Container\Container;
+use Garden\EventManager;
 use Vanilla\Contracts;
 use Vanilla\Utility\CamelCaseScheme;
 
@@ -58,6 +60,9 @@ class Addon {
      */
     private $special = [];
 
+    /** @var AddonSpecialClasses|null */
+    private $specialClasses = null;
+
     /**
      * Addon constructor.
      *
@@ -84,10 +89,10 @@ class Addon {
         // Scan for classes.
         if ($this->getType() !== static::TYPE_LOCALE) {
             $classes = $this->scanClasses();
-        } else {
-            $classes = [];
+            $this->setClasses($classes);
+
+            $this->specialClasses = AddonSpecialClasses::fromAddon($this);
         }
-        $this->setClasses($classes);
 
         // Scan for a structure file.
         if ($this->getType() === static::TYPE_ADDON || $this->getType() === static::TYPE_THEME) {
@@ -115,6 +120,80 @@ class Addon {
 
         // Fix issues with the plugin that can be fixed.
         $this->check(true);
+    }
+
+    /**
+     * Bind events from this addon.
+     *
+     * @param EventManager $eventManager
+     */
+    public function bindEvents(EventManager $eventManager) {
+        foreach ($this->getEventHandlerClasses() as $eventHandlerClass) {
+            // Include the plugin here, rather than wait for it to hit the autoloader. This way is much faster.
+            include_once $this->getClassPath($eventHandlerClass);
+
+            // bind the methods of the event handlers.
+            $eventManager->bindClass($eventHandlerClass, $this->getPriority());
+        }
+    }
+
+    /**
+     * Bind events from this addon.
+     *
+     * @param EventManager $eventManager
+     */
+    public function unbindEvents(EventManager $eventManager) {
+        foreach ($this->getEventHandlerClasses() as $eventHandlerClass) {
+            $eventManager->unbindClass($eventHandlerClass);
+        }
+    }
+
+    /**
+     * Get the event handler classes for the addon.
+     *
+     * @return class-string[]
+     */
+    private function getEventHandlerClasses(): array {
+        $specialClasses = $this->getSpecialClasses();
+        $eventHandlerClasses = [];
+        if ($specialClasses !== null) {
+            $eventHandlerClasses = $specialClasses->getEventHandlersClasses();
+        }
+        if ($pluginClass = $this->getPluginClass()) {
+            $eventHandlerClasses[] = $pluginClass;
+        }
+        return $eventHandlerClasses;
+    }
+
+    /**
+     * Configure the container.
+     *
+     * @param Container $container The container.
+     * @param 'new'|'old'|'both' $only
+     */
+    public function configureContainer(Container $container, string $only = 'both') {
+        if ($only === 'both' || $only === 'new') {
+            $specialClasses = $this->getSpecialClasses();
+            if ($specialClasses !== null) {
+                foreach ($specialClasses->getContainerRulesClasses() as $containerRulesClass) {
+                    /** @var AddonContainerRules $rules */
+                    $rules = new $containerRulesClass();
+                    if (defined('TESTMODE_ENABLED') && TESTMODE_ENABLED) {
+                        $rules->configureTestContainer($container);
+                    } else {
+                        $rules->configureProductionContainer($container);
+                    }
+                }
+            }
+        }
+
+        if ($only === 'both' || $only === 'old') {
+            // Legacy bootstraps.
+            if ($bootstrapPath = $this->getSpecial('bootstrap')) {
+                $bootstrapPath = $this->path($bootstrapPath);
+                include_once $bootstrapPath;
+            }
+        }
     }
 
     /**
@@ -150,7 +229,7 @@ class Addon {
             }
 
             // Kludge that sets oldType until we unify applications and plugins into addon.
-            list($addonParentFolder, $addonFolder) = explode('/', ltrim($subdir, '/'));
+            [$addonParentFolder, $addonFolder] = explode('/', ltrim($subdir, '/'));
             if (in_array($addonParentFolder, ['applications', 'plugins'])) {
                 $info['oldType'] = substr($addonParentFolder, 0, -1);
 
@@ -868,6 +947,8 @@ class Addon {
             ->setSpecialArray(empty($array['special']) ? [] : $array['special'])
             ->triggerIssues();
 
+        $addon->specialClasses = $array['specialClasses'] ?? AddonSpecialClasses::__set_state([]);
+
         return $addon;
     }
 
@@ -1160,10 +1241,17 @@ class Addon {
     /**
      * Get the classes.
      *
-     * @return array Returns the classes.
+     * @return array<array{namespace: string, className: string, path: string}> Returns the classes.
      */
     public function getClasses() {
         return $this->classes;
+    }
+
+    /**
+     * @return AddonSpecialClasses|null
+     */
+    public function getSpecialClasses(): ?AddonSpecialClasses {
+        return $this->specialClasses;
     }
 
     /**

@@ -7,7 +7,9 @@
 
 namespace Vanilla;
 
+use Gdn;
 use Vanilla\Utility\NameScheme;
+use PermissionModel;
 
 /**
  * Translates permission names between the old and new formats.
@@ -15,6 +17,7 @@ use Vanilla\Utility\NameScheme;
  * Vanilla is changing the naming convention of permissions so this class is necessary to aid in that.
  */
 trait PermissionsTranslationTrait {
+
     /** @var NameScheme */
     private $nameScheme;
 
@@ -97,10 +100,26 @@ trait PermissionsTranslationTrait {
         'Vanilla.Tagging.Add' => 'tags.add',
     ];
 
+    private $reverseRenamedPermissions = [
+        'conversations.moderate' => 'Conversations.Moderation.Manage',
+        'comments.email' => 'Email.Comments.Add',
+        'conversations.email' => 'Email.Conversations.Add',
+        'discussions.email' => 'Email.Discussions.Add',
+        'community.moderate' => 'Garden.Moderation.Manage',
+        'noAds.use' => 'Garden.NoAds.Allow',
+        'site.manage' => 'Garden.Settings.Manage',
+        'applicants.manage' => 'Garden.Users.Approve',
+        'groups.add' => 'Groups.Group.Add',
+        'groups.moderate' => 'Groups.Moderation.Manage',
+        'uploads.add' => 'Plugins.Attachments.Upload.Allow',
+        'badges.moderate' => 'Reputation.Badges.Give',
+        'tags.add' => 'Vanilla.Tagging.Add',
+    ];
+
     /** @var array These permissions should not be renamed. */
     private $fixedPermissions = [
         'Reactions.Negative.Add',
-        'Reactions.Positive.Add'
+        'Reactions.Positive.Add',
     ];
 
     /**
@@ -153,7 +172,7 @@ trait PermissionsTranslationTrait {
      * @return bool
      */
     private function isPermissionDeprecated($permission) {
-        $result = in_array($permission, $this->deprecatedPermissions);
+        $result = str_starts_with($permission, '_') || in_array($permission, $this->deprecatedPermissions);
         return $result;
     }
 
@@ -183,9 +202,21 @@ trait PermissionsTranslationTrait {
             // Cache the renamed permission for this request.
             $result = implode('.', $segments);
             $this->renamedPermissions[$permission] = $result;
+            $this->reverseRenamedPermissions[$result] = $permission;
         }
 
         return $result;
+    }
+
+    /**
+     * Check if permission is 2 part
+     *
+     * @param string $permission
+     * @return boolean
+     */
+    private function isTwoPartPermission($permission) {
+        $segments = explode('.', $permission);
+        return count($segments) == 2;
     }
 
     /**
@@ -195,16 +226,28 @@ trait PermissionsTranslationTrait {
      * @return string
      */
     public function untranslatePermission(string $newName): string {
-        if ($pos = array_search($newName, $this->renamedPermissions)) {
-            return $pos;
+        $newName = strtolower($newName);
+        if (array_key_exists($newName, $this->reverseRenamedPermissions)) {
+            return $this->reverseRenamedPermissions[$newName];
         }
 
-        if (in_array($newName, $this->junctionTableMappings['category'])) {
-            return 'Vanilla.'.implode('.', array_map('ucfirst', explode('.', $newName)));
-        } else {
-            return 'Garden.'.implode('.', array_map('ucfirst', explode('.', $newName)));
+        $segments = explode('.', $newName);
+        $updatedPermission = implode('.', array_map('ucfirst', $segments));
+        if (in_array($updatedPermission, $this->fixedPermissions) && count($segments) == 3) {
+            return $updatedPermission;
         }
 
-        return $newName;
+        $result = $newName;
+        $permissionModel = Gdn::getContainer()->get(PermissionModel::class);
+        $permissionList = $permissionModel->getAllPermissions();
+        foreach ($permissionList as $permission) {
+            if (str_ends_with(strtolower($permission), strtolower($updatedPermission))) {
+                $result = $permission;
+                $this->renamedPermissions[$result] = $newName;
+                $this->reverseRenamedPermissions[$newName] = $result;
+                break;
+            }
+        }
+        return $result;
     }
 }

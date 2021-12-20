@@ -7,15 +7,20 @@
 use Garden\EventManager;
 use Garden\Events\ResourceEvent;
 use Garden\Events\EventFromRowInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Vanilla\Addon;
 use Vanilla\Reactions\Events\ReactionEvent;
 use Vanilla\Utility\CamelCaseScheme;
 use Garden\Schema\Schema;
+use Vanilla\Logger;
 
 /**
  * Class ReactionModel
  */
-class ReactionModel extends Gdn_Model implements EventFromRowInterface {
+class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAwareInterface {
+
+    use LoggerAwareTrait;
 
     const USERID_SUM = 0;
 
@@ -54,6 +59,8 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface {
      */
     public function __construct() {
         $this->eventManager = Gdn::getContainer()->get(EventManager::class);
+        // Needed because many places do not instantiate this class from the container.
+        $this->logger = Gdn::getContainer()->get(\Psr\Log\LoggerInterface::class);
 
         parent::__construct('ReactionType');
         $this->filterFields = array_merge(
@@ -1089,15 +1096,24 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface {
             'UserID' => $userID,
             'Total' => $inc
         ];
+        $loggerContext = $data + [
+            'log' => $log,
+            'logOperation' => $logOperation,
+        ];
         // Allow addons to validate or modify data before save.
         $data = $this->eventManager->fireFilter('reactionModel_react_saveData', $data, $this, $reactionType);
 
         // Create unique key based on the RecordID and UserID to limit requests on a record.
         $lockKey = 'Reactions.' . $iD . '.' . $userID;
         $haveLock = self::buildCacheLock($lockKey, self::CACHE_GRACE);
-
+        if ($log) {
+            $this->logger->info('Loggable Reaction: Try acquire lock', $loggerContext + ['haveLock' => $haveLock]);
+        }
         if ($haveLock) {
             $inserted = $this->toggleUserTag($data, $row, $model, $force);
+            if ($log) {
+                $this->logger->info('Loggable Reaction: Toggled', $loggerContext);
+            }
             $this->releaseCacheLock($lockKey);
         } else {
             // Fail silently because we don't have a lock, so we shouldn't execute the trailing code.
@@ -1143,7 +1159,11 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface {
 
             if (!$noDelete && $score >= $removeThreshold) {
                 // Remove the record to the log.
+                $this->logger->info('Loggable Reaction: Requesting Model to Delete and Log', $loggerContext);
                 $model->deleteID($iD, ['Log' => $log, 'LogOptions' => $logOptions]);
+                if ($log) {
+                    $this->logger->info('Loggable Reaction: Requested Model to Delete and Log', $loggerContext);
+                }
                 $message = [
                     sprintf(t('The %s has been removed for moderation.'),
                     t($recordType)).' '.$undoButton,
@@ -1161,23 +1181,31 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface {
                 }
             } elseif ($score >= $logThreshold) {
                 LogModel::insert($log, $recordType, $row, $logOptions);
+
+                $this->logger->info('Loggable Reaction: Under log threshold', $loggerContext + [
+                    'score' => $score,
+                    'logThreshold' => $logThreshold,
+                ]);
                 $message = [
                     sprintf(t('The %s has been flagged for moderation.'),
                     t($recordType)).' '.$undoButton,
                     ['CssClass' => 'Dismissable', 'id' => 'mod']
                 ];
             }
-        } else {
-            if ($score >= min($logThreshold, $removeThreshold)) {
-                $restoreUser = Gdn::userModel()->getID(getValueR($attrColumn.'.RestoreUserID', $row));
-                $dateRestored = getValueR($attrColumn.'.DateRestored', $row);
+        } elseif ($score >= min($logThreshold, $removeThreshold)) {
+            $restoreUser = Gdn::userModel()->getID(getValueR($attrColumn.'.RestoreUserID', $row));
+            $dateRestored = getValueR($attrColumn.'.DateRestored', $row);
 
-                // The post would have been logged, but since it has been restored we won't do that again.
-                $message = [
-                    sprintf(t('The %s was already approved by %s on %s.'), t($recordType), userAnchor($restoreUser), Gdn_Format::dateFull($dateRestored)),
-                    ['CssClass' => 'Dismissable', 'id' => 'mod']
-                ];
-            }
+            $this->logger->info('Loggable Reaction: Over log threshold, but already approved.', $loggerContext + [
+                'score' => $score,
+                'logThreshold' => $logThreshold,
+            ]);
+
+            // The post would have been logged, but since it has been restored we won't do that again.
+            $message = [
+                sprintf(t('The %s was already approved by %s on %s.'), t($recordType), userAnchor($restoreUser), Gdn_Format::dateFull($dateRestored)),
+                ['CssClass' => 'Dismissable', 'id' => 'mod']
+            ];
         }
 
         // Check to see if we need to give the user a badge.
@@ -1657,6 +1685,10 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface {
      */
     public function save($formPostValues, $settings = false) {
         $primaryKeyValue = val($this->PrimaryKey, $formPostValues);
+        if (isset($formPostValues['Photo']) && $formPostValues['Photo'] === '') {
+            unset($formPostValues['Photo']);
+        }
+
         $isFormValid = $this->validate($formPostValues);
         if (!$primaryKeyValue || !$isFormValid) {
             return false;
@@ -1887,7 +1919,7 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface {
                     "urlcode" => $type["UrlCode"],
                 ];
                 $code =strtolower($type["UrlCode"]);
-                $photoUrl = self::ICON_BASE_URL . "$code.svg";
+                $photoUrl = isset($type['Photo']) ? Gdn_Upload::url($type['Photo']): self::ICON_BASE_URL . "$code.svg";
                 $result[$userID][$type["UrlCode"]]["PhotoUrl"] = $photoUrl;
             }
         }

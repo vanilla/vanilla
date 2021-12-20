@@ -9,9 +9,12 @@
  * @package Core
  * @since 2.0
  */
+
+use Garden\MetaTrait;
 use Garden\Web\RequestInterface;
 use League\Uri\Http;
 use Psr\Http\Message\UriInterface;
+use Vanilla\Contracts\Web\RequestModifierInterface;
 use Vanilla\UploadedFile;
 
 /**
@@ -27,6 +30,9 @@ use Vanilla\UploadedFile;
  *                HTTP_X_CLUSTER_CLIENT_IP, HTTP_CLIENT_IP, HTTP_X_FORWARDED_FOR, REMOTE_ADDR).
  */
 class Gdn_Request implements RequestInterface {
+
+    use MetaTrait;
+
     /** Superglobal source. */
     const INPUT_CUSTOM = "custom";
 
@@ -95,6 +101,15 @@ class Gdn_Request implements RequestInterface {
      */
     public function __construct() {
         $this->reset();
+    }
+
+    /**
+     * Modify a request using some predefined modifier.
+     *
+     * @param RequestModifierInterface $modifier
+     */
+    public function applyRequestModifier(RequestModifierInterface $modifier): void {
+        $modifier->modifyRequest($this);
     }
 
     /**
@@ -1157,6 +1172,7 @@ class Gdn_Request implements RequestInterface {
      * Reset properties to default values.
      */
     public function reset() {
+        $this->setMetaArray([]);
         $this->_Environment = [];
         $this->_RequestArguments = [];
         $this->_ParsedRequest = [

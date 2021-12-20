@@ -614,6 +614,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
      *  - <b>string</b>: String types.
      *  - <b>date</b>: Date types.
      *  - <b>length</b>: Types that have a length.
+     *  - <b>defineLength</b>: Types that MUST be defined with a length.
      *  - <b>precision</b>: Types that have a precision.
      *  - <b>other</b>: Types that don't fit into any other category on their own.
      *  - <b>all</b>: All recognized types.
@@ -623,7 +624,8 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
         $decimal = ['decimal', 'numeric'];
         $float = ['float', 'double'];
         $int = ['int', 'tinyint', 'smallint', 'mediumint', 'bigint'];
-        $string = ['varchar', 'char', 'mediumtext', 'text'];
+        $char = ['varchar', 'char'];
+        $text = ['tinytext', 'text', 'mediumtext', 'longtext'];
         $length = ['varbinary'];
         $other = ['enum', 'tinyblob', 'blob', 'mediumblob', 'longblob', 'ipaddress'];
 
@@ -631,22 +633,22 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
             case 'date':
                 return $date;
             case 'decimal':
+            case 'precision':
                 return $decimal;
             case 'float':
                 return $float;
             case 'int':
                 return $int;
             case 'string':
-                return $string;
+                return array_merge($char, $text);
             case 'other':
                 return array_merge($length, $other);
-
             case 'numeric':
                 return array_merge($float, $int, $decimal);
             case 'length':
-                return array_merge($string, $length, $decimal);
-            case 'precision':
-                return $decimal;
+                return array_merge($char, $text, $length, $decimal);
+            case 'definelength':
+                return array_merge($char, $length, $decimal);
             default:
                 return [];
         }

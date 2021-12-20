@@ -56,7 +56,7 @@ class UserEvent extends ResourceEvent implements LoggableEventInterface {
      * @param string|null $username
      * @return string
      */
-    private function makeLogMessage(string $action, string $targetName, ?string $username): string {
+    protected function makeLogMessage(string $action, string $targetName, ?string $username): string {
         switch ($action) {
             case ResourceEvent::ACTION_INSERT:
                 return $username ?

@@ -437,9 +437,10 @@ class ReflectionAction {
                 // Check for a null type.
                 if (count($sch['type']) === 2 && in_array('null', $sch['type'])) {
                     $sch['x-nullable'] = true;
-                    $sch['type'] = array_pop(array_filter($sch['type'], function ($v) {
+                    $arr = array_filter($sch['type'], function ($v) {
                         return $v !== 'null';
-                    }));
+                    });
+                    $sch['type'] = array_pop($arr);
                 }
 
                 // Remove the boolean type from expand.

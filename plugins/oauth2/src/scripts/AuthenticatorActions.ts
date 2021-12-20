@@ -4,137 +4,88 @@
  * @license Proprietary
  */
 
-import { IAuthenticatorState } from "@dashboard/@types/state";
-import { IApiError } from "@library/@types/api/core";
+import { IServerError } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
 import SimplePagerModel from "@library/navigation/SimplePagerModel";
-import ReduxActions, { bindThunkAction } from "@library/redux/ReduxActions";
-import {
-    IAuthenticator,
-    IAuthenticatorList,
-    IGetAllAuthenticatorsParams,
-    INITIAL_AUTHENTICATOR_FORM_STATE,
-} from "@oauth2/AuthenticatorTypes";
-import { useMemo } from "react";
-import { useDispatch } from "react-redux";
-import actionCreatorFactory from "typescript-fsa";
+import { IAuthenticator, IAuthenticatorList, IGetAllAuthenticatorsParams } from "@oauth2/AuthenticatorTypes";
+import { createAsyncThunk } from "@reduxjs/toolkit";
 
-const actionCreator = actionCreatorFactory("@@authenticators");
-
-export class AuthenticatorActions extends ReduxActions {
-    public static readonly getAllAuthenticatorACs = actionCreator.async<
-        IGetAllAuthenticatorsParams,
-        IAuthenticatorList,
-        IApiError
-    >("GET_ALL");
-
-    public static readonly getEditAuthenticatorAC = actionCreator.async<
-        { authenticatorID: number },
-        IAuthenticator,
-        IApiError
-    >("GET_EDIT");
-
-    public static updateFormAC = actionCreator<Partial<IAuthenticator>>("UPDATE_FORM");
-    public static postFormACs = actionCreator.async<IAuthenticator, IAuthenticator, IApiError>("POST");
-    public static patchFormACs = actionCreator.async<Partial<IAuthenticator>, IAuthenticator, IApiError>("PATCH");
-    public static deleteAuthenticatorACs = actionCreator.async<number, void, IApiError>("DELETE");
-    public static clearFormAC = actionCreator("CLEAR_FORM");
-    public clearForm = this.bindDispatch(AuthenticatorActions.clearFormAC);
-
-    public updateForm = this.bindDispatch(AuthenticatorActions.updateFormAC);
-
-    public getAll = (params: IGetAllAuthenticatorsParams) => {
-        const { page, limit = 10, type = "oauth2" } = params;
-
-        const thunk = bindThunkAction(AuthenticatorActions.getAllAuthenticatorACs, async () => {
-            const response = await this.api.get(`/authenticators?page=${page}&limit=${limit}&type=${type}`, {});
-            const pagination = SimplePagerModel.parseLinkHeader(response.headers["link"], "page");
-            const result: IAuthenticatorList = {
-                items: response.data,
-                pagination,
-            };
-            return result;
-        })(params);
-
-        return this.dispatch(thunk);
-    };
-
-    public getEdit = (authenticatorID: number): Promise<IAuthenticator> => {
-        const thunk = bindThunkAction(AuthenticatorActions.getEditAuthenticatorAC, async () => {
-            const response = await this.api.get(`/authenticators/${authenticatorID}/oauth2`, {});
-            return response.data;
-        })({ authenticatorID });
-        return this.dispatch(thunk);
-    };
-
-    public initForm = async (authenticatorID?: number) => {
-        this.updateForm(INITIAL_AUTHENTICATOR_FORM_STATE.data);
-        if (authenticatorID) {
-            const payload = await this.getEdit(authenticatorID);
-            this.updateForm(payload);
-        }
-    };
-
-    public saveForm = async (form: IAuthenticator): Promise<IAuthenticator> => {
-        if (form.authenticatorID) {
-            return await this.patchForm(form);
-        } else {
-            return await this.postForm(form);
-        }
-    };
-
-    public postForm(form: IAuthenticator): Promise<IAuthenticator> {
-        const thunk = bindThunkAction(AuthenticatorActions.postFormACs, async (state) => {
-            const response = await this.api.post(`/authenticators/oauth2`, form);
-            return response.data;
-        })(form);
-
-        return this.dispatch(thunk);
-    }
-
-    public deleteAuthenticator(authenticatorID: number): Promise<IAuthenticator> {
-        const thunk = bindThunkAction(AuthenticatorActions.deleteAuthenticatorACs, async (state) => {
-            const response = await this.api.delete(`/authenticators/${authenticatorID}`);
-            return response.data;
-        })(authenticatorID);
-
-        return this.dispatch(thunk);
-    }
-
-    public patchForm(form: Partial<IAuthenticator>): Promise<IAuthenticator> {
-        const { authenticatorID, ...params } = form;
-
-        const thunk = bindThunkAction(AuthenticatorActions.patchFormACs, async () => {
-            const response = await this.api.patch(`/authenticators/${authenticatorID}`, params);
-            switch (response.data.type) {
-                case "oauth2": {
-                    const oauth2Response = await this.api.patch(`/authenticators/${authenticatorID}/oauth2`, params);
-                    return oauth2Response.data;
-                }
-            }
-            return response.data;
-        })(form);
-
-        return this.dispatch(thunk);
-    }
-
-    public setActive = (authenticatorID: number, active: boolean): Promise<IAuthenticator> => {
-        const data = {
-            authenticatorID,
-            active,
+export const getAllAuthenticators = createAsyncThunk<IAuthenticatorList, IGetAllAuthenticatorsParams>(
+    "@@authenticators/getAll",
+    async ({ page, limit = 10, type = "oauth2" }) => {
+        const response = await apiv2.get(`/authenticators?page=${page}&limit=${limit}&type=${type}`, {});
+        const pagination = SimplePagerModel.parseLinkHeader(response.headers["link"], "page");
+        const result: IAuthenticatorList = {
+            items: response.data,
+            pagination,
         };
+        return result;
+    },
+);
 
-        const thunk = bindThunkAction(AuthenticatorActions.patchFormACs, async () => {
-            const response = await this.api.patch(`/authenticators/${authenticatorID}`, data);
-            return response.data;
-        })(data);
+export const getAuthenticator = createAsyncThunk<
+    IAuthenticator,
+    NonNullable<IAuthenticator["authenticatorID"]>,
+    { rejectValue: IServerError }
+>("@@authenticators/get", async (authenticatorID) => {
+    const { data } = await apiv2.get<IAuthenticator>(`/authenticators/${authenticatorID}/oauth2`);
+    return data;
+});
 
-        return this.dispatch(thunk);
-    };
-}
+export const postAuthenticator = createAsyncThunk<IAuthenticator, IAuthenticator, { rejectValue: IServerError }>(
+    "@@authenticators/post",
+    async (form, { rejectWithValue }) => {
+        try {
+            const { data } = await apiv2.post<IAuthenticator>(`/authenticators/oauth2`, form);
+            return data;
+        } catch (e) {
+            return rejectWithValue(e.response.data);
+        }
+    },
+);
 
-export function useAuthenticatorActions() {
-    const dispatch = useDispatch();
-    const actions = useMemo(() => new AuthenticatorActions(dispatch, apiv2), [dispatch]);
-    return actions;
-}
+export const patchAuthenticator = createAsyncThunk<
+    IAuthenticator,
+    Partial<IAuthenticator>,
+    { rejectValue: IServerError }
+>("@@authenticators/patch", async (form, { rejectWithValue }) => {
+    const { authenticatorID, ...params } = form;
+    try {
+        const response = await apiv2.patch<IAuthenticator>(`/authenticators/${authenticatorID}`, params);
+        switch (response.data.type) {
+            case "oauth2": {
+                const oauth2Response = await apiv2.patch<IAuthenticator>(
+                    `/authenticators/${authenticatorID}/oauth2`,
+                    params,
+                );
+                return oauth2Response.data;
+            }
+        }
+    } catch (e) {
+        return rejectWithValue(e.response.data);
+    }
+});
+
+export const setAuthenticatorActive = createAsyncThunk<
+    IAuthenticator,
+    Required<Pick<IAuthenticator, "authenticatorID" | "active">>
+>("@@authenticators/patch", async (authenticator) => {
+    const { data } = await apiv2.patch<IAuthenticator>(
+        `/authenticators/${authenticator.authenticatorID}`,
+        authenticator,
+    );
+    return data;
+});
+
+export const deleteAuthenticator = createAsyncThunk<
+    any,
+    NonNullable<IAuthenticator["authenticatorID"]>,
+    { rejectValue: IServerError }
+>("@@authenticators/delete", async (authenticatorID, { rejectWithValue }) => {
+    try {
+        const { data } = await apiv2.delete(`/authenticators/${authenticatorID}`);
+        return data;
+    } catch (e) {
+        return rejectWithValue(e.response.data);
+    }
+});

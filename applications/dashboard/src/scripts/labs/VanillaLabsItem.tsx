@@ -7,17 +7,23 @@
 import { LoadStatus } from "@library/@types/api/core";
 import Addon, { IAddon } from "@library/addons/Addon";
 import { useConfigPatcher, useConfigsByKeys } from "@library/config/configHooks";
+import { useToast } from "@library/features/toaster/ToastContext";
 import { getMeta, setMeta, t } from "@library/utility/appUtils";
-import React, { useDebugValue } from "react";
+import React, { useDebugValue, useState } from "react";
 
 interface IProps extends Omit<IAddon, "onEnabledChange" | "enabled" | "isLoading"> {
     labName: string;
     themeFeatureName?: string;
+    reloadPageAfterToggle?: boolean; //in some cases we need tu reload the page so the legacy links (or other code) update
 }
 
 export function VanillaLabsItem(props: IProps) {
-    const { labName, themeFeatureName, ...passthru } = props;
-    const { enabled, toggleEnabled, isLoading, isAddonFeatureEnabled } = useLab(labName, themeFeatureName);
+    const { labName, themeFeatureName, reloadPageAfterToggle, ...passthru } = props;
+    const { enabled, toggleEnabled, isLoading, isAddonFeatureEnabled } = useLab(
+        labName,
+        themeFeatureName,
+        reloadPageAfterToggle,
+    );
 
     return (
         <Addon
@@ -31,13 +37,15 @@ export function VanillaLabsItem(props: IProps) {
     );
 }
 
-function useLab(labName: string, themeFeatureName?: string) {
+function useLab(labName: string, themeFeatureName?: string, reloadPageAfterToggle?: boolean) {
     const configKey = `labs.${labName}`;
     const configs = useConfigsByKeys(["labs.*"]);
     const { isLoading: isPatchLoading, patchConfig } = useConfigPatcher();
     const isConfigLoading = configs.status === LoadStatus.LOADING;
     const isLoading = isPatchLoading || isConfigLoading;
     const metaKey = themeFeatureName ? `addonFeatures.${themeFeatureName}` : null;
+
+    const toast = useToast();
 
     // Has an addon/theme forced the feature to be enabled.
     const isAddonFeatureEnabled = metaKey ? getMeta(metaKey, false) : false;
@@ -52,14 +60,21 @@ function useLab(labName: string, themeFeatureName?: string) {
         enabled,
     });
 
-    function toggleEnabled() {
+    async function toggleEnabled() {
         if (isLoading) {
             return;
         }
         const newValue = !enabled;
-        patchConfig({
+        await patchConfig({
             [configKey]: newValue,
         });
+
+        if (reloadPageAfterToggle) {
+            toast.addToast({
+                dismissible: true,
+                body: <>{t("Reload the page to apply these changes.")}</>,
+            });
+        }
     }
 
     return {

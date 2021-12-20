@@ -6,10 +6,10 @@
 *.less  text eol=lf
 *.md    text eol=lf
 *.yml   text eol=lf
+composer.lock text eol=lf
 
 # Mark built files as binary
 *.map binary
-composer.lock binary
 *.min.js binary
 *.min.css binary
 

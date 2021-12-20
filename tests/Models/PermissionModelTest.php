@@ -57,12 +57,43 @@ class PermissionModelTest extends SiteTestCase {
         $roleData = [
             'RoleID' => 3
         ];
+
         $globalPermissions = $this->permissionModel->getGlobalPermissions($roleData);
         $junctionPermissions = $this->permissionModel->getJunctionPermissions($roleData);
         $rolePermission = $this->permissionModel->getPermissions($roleData);
         $resultMerge = array_merge($globalPermissions, $junctionPermissions);
 
         $this->assertSame($resultMerge, $rolePermission);
+    }
+
+    /**
+     * Test get All permissions.
+     */
+    public function testGetAllPermissions(): void {
+        $roleData = [
+            "Garden.Email.View",
+            "Garden.Settings.Manage",
+            "Garden.Settings.View",
+            "Garden.SignIn.Allow",
+            "Garden.Users.Add",
+            "Garden.Users.Edit",
+            "Garden.Users.Delete",
+            "Garden.Users.Approve",
+            "Garden.Activity.Delete",
+            "Garden.Activity.View",
+            "Garden.Profiles.View",
+            "Garden.Profiles.Edit",
+            "Garden.ProfilePicture.Edit",
+            "Garden.Curation.Manage",
+            "Garden.Moderation.Manage",
+            "Garden.PersonalInfo.View",
+            "Garden.AdvancedNotifications.Allow",
+            "Garden.Community.Manage"
+        ];
+
+        $allPermissions = $this->permissionModel->getAllPermissions();
+
+        $this->assertSame($roleData, array_slice($allPermissions, 0, 18));
     }
 
     /**
@@ -172,7 +203,7 @@ class PermissionModelTest extends SiteTestCase {
             28 => 'Conversations.Conversations.Add',
         ];
 
-        $this->assertSame($expected, $permissions);
+        $this->assertEqualsCanonicalizing($expected, $permissions);
     }
 
     /**

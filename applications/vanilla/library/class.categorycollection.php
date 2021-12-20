@@ -110,7 +110,7 @@ class CategoryCollection {
         $this->sql = $sql;
 
         $this->cache = $cache ?? Gdn::cache() ?? new Gdn_Dirtycache();
-        $this->modelCache = new ModelCache("/catcollection/", $this->cache);
+        $this->modelCache = new ModelCache("catcollection", $this->cache);
 
         $this->setStaticCalculator([$this, 'defaultCalculator']);
         $this->setUserCalculator(function (&$category) {

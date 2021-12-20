@@ -1,11 +1,10 @@
 /**
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { Mixins } from "@library/styles/Mixins";
 import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { Variables } from "@library/styles/Variables";
@@ -16,11 +15,7 @@ export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) =>
     const globalVars = globalVariables();
 
     const container = makeVars("container", {
-        spacing: globalVars.gutter.size / 2,
-    });
-
-    const actionContainer = makeVars("actionContainer", {
-        spacing: 12,
+        spacing: globalVars.gutter.size,
     });
 
     const button = makeVars("button", {
@@ -30,12 +25,13 @@ export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) =>
         },
     });
 
-    const buttonContainer = makeVars("buttonContainer", {
-        padding: globalVars.gutter.half,
-    });
-
     const name = makeVars("name", {
-        ...globalVars.fontSizeAndWeightVars("large", "bold"),
+        font: Variables.font({
+            ...globalVars.fontSizeAndWeightVars("large", "bold"),
+        }),
+        margin: Variables.spacing({
+            top: 9,
+        }),
     });
 
     const label = makeVars("label", {
@@ -44,21 +40,38 @@ export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) =>
             radius: 3,
         }),
         padding: Variables.spacing({
-            vertical: 2,
             horizontal: 10,
+        }),
+        margin: Variables.spacing({
+            top: 12,
         }),
         font: Variables.font({
             color: globalVars.mainColors.primary,
             size: 10,
+            lineHeight: 15 / 10,
             transform: "uppercase",
         }),
     });
 
     const containerWithBorder = makeVars("containerWithBorder", {
         color: ColorsUtils.colorOut(globalVars.border.color),
-        ...Mixins.padding({
-            horizontal: container.spacing * 2,
-            vertical: container.spacing * 4,
+    });
+
+    const stat = makeVars("stat", {
+        font: Variables.font({
+            color: ColorsUtils.colorOut(globalVars.mainColors.fg),
+        }),
+        fontState: Variables.font({
+            color: globalVars.mainColors.primary,
+        }),
+    });
+
+    const message = makeVars("message", {
+        font: Variables.font({
+            size: globalVars.fonts.size.small,
+        }),
+        margin: Variables.spacing({
+            top: 12,
         }),
     });
 
@@ -66,29 +79,23 @@ export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) =>
         size: 28,
     });
 
-    const header = makeVars("header", {
-        height: 32,
-    });
-
-    const date = makeVars("date", {
-        padding: globalVars.gutter.size,
-    });
-
-    const email = makeVars("email", {
+    const headerLink = makeVars("headerLink", {
         color: ColorsUtils.colorOut(globalVars.mainColors.fg),
+        font: Variables.font({ ...globalVars.fontSizeAndWeightVars("small"), align: "center" }),
+        margin: Variables.spacing({
+            top: 14,
+        }),
     });
 
     return {
         container,
         button,
-        buttonContainer,
-        actionContainer,
         name,
         label,
         containerWithBorder,
+        stat,
+        message,
         count,
-        header,
-        date,
-        email,
+        headerLink,
     };
 });

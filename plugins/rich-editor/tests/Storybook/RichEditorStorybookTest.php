@@ -8,11 +8,15 @@
 namespace VanillaTests\Storybook;
 
 use Vanilla\EmbeddedContent\EmbedService;
+use Vanilla\Formatting\Formats\MarkdownFormat;
+use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 
 /**
  * HTML generation for the community in foundation.
  */
 class RichEditorStorybookTest extends StorybookGenerationTestCase {
+
+    use CommunityApiTestTrait;
 
     /** @var string[] */
     public static $addons = ["rich-editor"];
@@ -52,5 +56,25 @@ class RichEditorStorybookTest extends StorybookGenerationTestCase {
             ['/richeditorstyles/formatting', 'RichEditor Formatting'],
             ['/richeditorstyles/images', 'RichEditor Images'],
         ];
+    }
+
+    /**
+     * Test post being reinterpetted as rich.
+     */
+    public function testEditPostReinterpetRich() {
+        $this->createDiscussion([
+            "name" => "Markdown Post",
+            "body" => "## Heading\n\n_italic_ **bold**\n\n- list 1\n- list 2",
+            "format" => MarkdownFormat::FORMAT_KEY,
+        ]);
+
+        $this->runWithConfig([
+            \RichEditorPlugin::CONFIG_REINTERPRET_ENABLE => true,
+        ], function () {
+            $this->generateStoryHtml(
+                "/post/editdiscussion/" . $this->lastInsertedDiscussionID,
+                "RichEditor Convert Post"
+            );
+        });
     }
 }

@@ -1,5 +1,14 @@
 <?php
 /**
+ * @author Adam Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2021 Vanilla Forums Inc.
+ * @license gpl-2.0-only
+ */
+
+use Vanilla\Models\LegacyModelUtils;
+use Vanilla\Models\ModelCache;
+
+/**
  * Class QnaModel
  */
 class QnaModel extends Gdn_Model {
@@ -27,6 +36,47 @@ class QnaModel extends Gdn_Model {
         }
 
         return $result;
+    }
+
+    /**
+     * Get the count of unanswered questions visible to the current user.
+     *
+     * - This count is cached based on what categories are visible to the current user.
+     * - The cache here is limited by default to make it faster to calculate.
+     * - The cache has a 15-minute expiry, with no manual invalidation. It's accepable for a count to be slightly delayed.
+     *
+     * @param int|null $limit
+     * @return int
+     */
+    public function getUnansweredCount(?int $limit = LegacyModelUtils::COUNT_LIMIT_DEFAULT): int {
+        $limit = $limit ?? LegacyModelUtils::COUNT_LIMIT_DEFAULT;
+        $categoryModel = CategoryModel::instance();
+        $discussionModel = DiscussionModel::instance();
+
+        $modelCache = new ModelCache("qna", Gdn::cache());
+
+        // Will be filtered by current subcommunity automatically if they are enabled.
+        $visibleCategoryIDs = $categoryModel->getVisibleCategoryIDs(['forceArrayReturn' => true]);
+
+        $count = $modelCache->getCachedOrHydrate([
+            'qna/unansweredCount',
+            'limit' => $limit,
+            'categoryIDs' => $visibleCategoryIDs,
+        ], function () use ($limit, $visibleCategoryIDs, $discussionModel) {
+            $where = [
+                "Type" => "Question",
+                "QnA" => ["Unanswered", "Rejected"],
+            ];
+            // Visible categoryIDs can be "true" if a user has access to every category.
+            if (is_array($visibleCategoryIDs)) {
+                $where['CategoryID'] = $visibleCategoryIDs;
+            }
+            $questionCount = LegacyModelUtils::getLimitedCount($discussionModel, $where, $limit);
+            return $questionCount;
+        }, [
+            Gdn_Cache::FEATURE_EXPIRY => 15 * 60, // 15 minutes.
+        ]);
+        return $count;
     }
 
     /**

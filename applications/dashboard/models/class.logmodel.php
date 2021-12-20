@@ -9,18 +9,29 @@
  */
 
 use Garden\EventManager;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Vanilla\Community\Events\CommentEvent;
 use Vanilla\Community\Events\DiscussionEvent;
 use Vanilla\PrunableTrait;
 use Vanilla\Web\Middleware\LogTransactionMiddleware;
-
+use Vanilla\Logger;
 
 /**
  * Handles additional logging.
  */
-class LogModel extends Gdn_Pluggable {
+class LogModel extends Gdn_Pluggable implements LoggerAwareInterface {
 
     use PrunableTrait;
+    use LoggerAwareTrait;
+
+    const TYPE_EDIT = 'Edit';
+    const TYPE_DELETE = 'Delete';
+    const TYPE_SPAM = 'Spam';
+    const TYPE_MODERATE = 'Moderate';
+    const TYPE_PENDING = 'Pending';
+    const TYPE_BAN = 'Ban';
+    const TYPE_ERROR = 'Error';
 
     /** @var int Timestamp of when to prune delete logs. */
     private $deletePruneAfter;
@@ -31,11 +42,16 @@ class LogModel extends Gdn_Pluggable {
     ];
     private static $transactionID = null;
 
+    /** @var array Keep track of table structures we've already fetched. */
+    private $columns = [];
+
     /**
      * Constructor.
      */
     public function __construct() {
         parent::__construct();
+        // Needed because many places do not instantiate this class from the container.
+        $this->logger = Gdn::getContainer()->get(\Psr\Log\LoggerInterface::class);
         try {
             $this->setPruneAfter(c('Logs.Common.PruneAfter', '3 months'));
         } catch (Exception $e) {
@@ -103,8 +119,8 @@ class LogModel extends Gdn_Pluggable {
      *
      * @return int The transactionID.
      */
-    public static function beginTransaction(): int {
-        self::$transactionID = self::generateTransactionID();
+    public static function beginTransaction(?int $transactionID = null): int {
+        self::$transactionID = $transactionID ?? self::generateTransactionID();
         return self::$transactionID;
     }
 
@@ -115,7 +131,7 @@ class LogModel extends Gdn_Pluggable {
      *
      * @return int|null
      */
-    private static function getTransactionID(): ?int {
+    public static function getTransactionID(): ?int {
         /** @var LogTransactionMiddleware $logTransactionMiddleware */
         $logTransactionMiddleware = \Gdn::getContainer()->get(LogTransactionMiddleware::class);
         $middlewareID = $logTransactionMiddleware->getTransactionID();
@@ -175,14 +191,14 @@ class LogModel extends Gdn_Pluggable {
         $this->delete(
             [
                 $this->getPruneField().' <' => $dateCommonPrune->format('Y-m-d H:i:s'),
-                'Operation' => ['Edit','Spam','Moderate','Error'],
+                'Operation' => [self::TYPE_EDIT, self::TYPE_SPAM, self::TYPE_MODERATE, self::TYPE_ERROR],
             ],
             $options
         );
         $this->delete(
             [
                 $this->getPruneField().' <' => $dateDeletePrune->format('Y-m-d H:i:s'),
-                'Operation' => 'Delete',
+                'Operation' => self::TYPE_DELETE,
             ],
             $options
         );
@@ -206,7 +222,7 @@ class LogModel extends Gdn_Pluggable {
 
         foreach ($logs as $log) {
             $recordType = $log['RecordType'];
-            if (in_array($log['Operation'], ['Spam', 'Moderate']) && array_key_exists($recordType, $models)) {
+            if (in_array($log['Operation'], [self::TYPE_SPAM, self::TYPE_MODERATE]) && array_key_exists($recordType, $models)) {
                 /** @var Gdn_Model $model */
                 $model = $models[$recordType];
                 $recordID = $log['RecordID'];
@@ -853,8 +869,13 @@ class LogModel extends Gdn_Pluggable {
      * @throws Exception Throws an exception if restoring the record causes a validation error.
      */
     private function restoreOne($log, $deleteLog = true) {
-        // Keep track of table structures we've already fetched.
-        static $columns = [];
+        $sqlColumnSchema = [];
+        $loggerContext = [
+            "recordType" => $log['RecordType'],
+            "recordID" => $log['RecordID'],
+            "logID" => $log['LogID'],
+        ];
+        $this->logger->info("Restore Log Record: Start", $loggerContext);
 
         // Throw an event to see if the restore is being overridden.
         $handled = false;
@@ -876,9 +897,9 @@ class LogModel extends Gdn_Pluggable {
 
         $data = ipEncodeRecursive($log['Data']);
 
-        if (isset($data['Attributes'])) {
+        if (array_key_exists('Attributes', $data)) {
             $attr = 'Attributes';
-        } elseif (isset($data['Data'])) {
+        } elseif (array_key_exists('Data', $data)) {
             $attr = 'Data';
         } else {
             $attr = '';
@@ -896,27 +917,34 @@ class LogModel extends Gdn_Pluggable {
             $data[$attr]['RestoreUserID'] = Gdn::session()->UserID;
             $data[$attr]['DateRestored'] = Gdn_Format::toDateTime();
         }
-
-        if (!isset($columns[$tableName])) {
-            $columns[$tableName] = Gdn::sql()->fetchColumns($tableName);
+        if (!isset($sqlColumnSchema[$tableName]) || empty($this->columns[$tableName])) {
+            $sqlTableSchema[$tableName] = Gdn::sql()->fetchTableSchema($tableName);
+            foreach ($sqlTableSchema[$tableName] as $key => $value) {
+                $this->columns[$tableName][] = $value->Name;
+            }
         }
 
-        $set = array_flip($columns[$tableName]);
+        $set = array_flip($this->columns[$tableName]);
         // Set the sets from the data.
         foreach ($set as $key => $value) {
             if (isset($data[$key])) {
-                $value = $data[$key];
+                $value = $this->validateColumnValue($sqlTableSchema[$tableName], $key, $data[$key]);
                 if (is_array($value)) {
                     $value = dbencode($value);
                 }
                 $set[$key] = $value;
             } else {
-                unset($set[$key]);
+                $value = $this->validateColumnNullValue($sqlTableSchema[$tableName], $key);
+                if ($value) {
+                    $set[$key] = '';
+                } else {
+                    unset($set[$key]);
+                }
             }
         }
 
         switch ($log['Operation']) {
-            case 'Edit':
+            case self::TYPE_EDIT:
                 // We are restoring an edit so just update the record.
                 $iDColumn = $log['RecordType'].'ID';
                 $where = [$iDColumn => $log['RecordID']];
@@ -928,11 +956,11 @@ class LogModel extends Gdn_Pluggable {
                 );
 
                 break;
-            case 'Delete':
-            case 'Spam':
-            case 'Moderate':
-            case 'Pending':
-            case 'Ban':
+            case self::TYPE_DELETE:
+            case self::TYPE_SPAM:
+            case self::TYPE_MODERATE:
+            case self::TYPE_PENDING:
+            case self::TYPE_BAN:
                 if (!$log['RecordID']) {
                     // This log entry was never in the table.
                     if (isset($set['DateInserted'])) {
@@ -941,7 +969,7 @@ class LogModel extends Gdn_Pluggable {
                 }
 
                 // Insert the record back into the db.
-                if ($log['Operation'] == 'Spam' && $log['RecordType'] == 'Registration') {
+                if ($log['Operation'] == self::TYPE_SPAM && $log['RecordType'] == 'Registration') {
                     saveToConfig(['Garden.Registration.NameUnique' => false, 'Garden.Registration.EmailUnique' => false], '', false);
                     if (isset($data['Username'])) {
                         $set['Name'] = $data['Username'];
@@ -984,7 +1012,7 @@ class LogModel extends Gdn_Pluggable {
                     }
 
                     // Unban a user.
-                    if ($log['RecordType'] == 'User' && $log['Operation'] == 'Ban') {
+                    if ($log['RecordType'] == 'User' && $log['Operation'] == self::TYPE_BAN) {
                         Gdn::userModel()->save(["UserID" => $iD, "Banned" => 0]);
                     }
 
@@ -999,7 +1027,7 @@ class LogModel extends Gdn_Pluggable {
                             break;
                     }
 
-                    if ($log['Operation'] == 'Pending') {
+                    if ($log['Operation'] == self::TYPE_PENDING) {
                         switch ($log['RecordType']) {
                             case 'Discussion':
                                 if (val('UserDiscussion', $this->recalcIDs) && val($log['RecordUserID'], $this->recalcIDs['UserDiscussion'])) {
@@ -1055,6 +1083,44 @@ class LogModel extends Gdn_Pluggable {
         if ($deleteLog) {
             Gdn::sql()->delete('Log', ['LogID' => $log['LogID']]);
         }
+        $this->logger->info("Restore Log Record: Complete", $loggerContext);
+    }
+    /**
+     * Compare a cupplied log value to schema before restoring. Apply a specific fix if necessary.
+     *
+     * @param array $sqlSchema The sql table schema for inserting into.
+     * @param string $key The column name and log data property name.
+     * @param string $dataKey The value to be inserted from log record.
+     * @returns mixed The value, corrected for schema where necessary.
+     */
+    private function validateColumnValue($sqlSchema, $key, $dataKey) {
+        //align supplied value from changelog record with sql schema requirements
+        $type = $sqlSchema[$key]->Type;
+        $allowNull = $sqlSchema[$key]->AllowNull;
+        $default = $sqlSchema[$key]->Default;
+        if ($type == 'enum' && !$allowNull && is_null($default) && !in_array($dataKey, $sqlSchema[$key]->Enum)) {
+            $dataKey = $sqlSchema[$key]->Enum[0];
+        } elseif ($type == 'enum' && is_null($default) && !in_array($dataKey, $sqlSchema[$key]->Enum)) {
+            $dataKey = null;
+        }
+        return $dataKey;
+    }
 
+    /**
+     * Compare a missing log value to schema before restoring. Apply a specific fix if necessary.
+     *
+     * @param array $sqlSchema The sql table schema for inserting into.
+     * @param string $key The column name and log data property name.
+     * @returns bool Does column require empty string or will it accept null.
+     */
+    private function validateColumnNullValue($sqlSchema, $key) {
+        $allowNull = $sqlSchema[$key]->AllowNull;
+        $default = $sqlSchema[$key]->Default;
+        $autoIncrement = $sqlSchema[$key]->AutoIncrement;
+        if (!$autoIncrement && !$allowNull && is_null($default)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

@@ -9,6 +9,7 @@ use Garden\Schema\Schema;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\ApiUtils;
+use Vanilla\Community\Events\DiscussionTagEvent;
 use Vanilla\Utility\ArrayUtils;
 
 /**
@@ -45,6 +46,27 @@ class TagModel extends Gdn_Model {
             self::$instance = new TagModel();
         }
         return self::$instance;
+    }
+
+    /**
+     * Create a DiscussionTagEvent from the event Tag data.
+     *
+     * @param array $discussion to which tags were added.
+     * @param array $tagIDs An array of tag IDs.
+     * @return DiscussionTagEvent
+     */
+    protected function createDiscussionTagEvent(array $discussion, array $tagIDs): DiscussionTagEvent {
+        $senderField = $discussion['UpdateUserID'] ?? $discussion['InsertUserID'];
+        $sender = $senderField ? Gdn::userModel()->getFragmentByID($senderField) : null;
+        $discussionEvent = DiscussionModel::instance()->eventFromRow(
+            $discussion,
+            DiscussionTagEvent::ACTION_DISCUSSION_TAGGED,
+            $sender
+        );
+        // Obtain tags data
+        $tagsData = $this->getWhere(['TagID' => $tagIDs])->resultArray();
+
+        return new DiscussionTagEvent($discussionEvent, $tagsData);
     }
 
     /**
@@ -622,6 +644,12 @@ class TagModel extends Gdn_Model {
                         ['DiscussionID' => $discussionID, 'TagID' => $tagID, 'DateInserted' => $now, 'CategoryID' => $categoryID]
                     );
             }
+            // Dispatch a DiscussionTag event
+            $discussion = DiscussionModel::instance()->getID($discussionID, DATASET_TYPE_ARRAY);
+            if ($discussion) {
+                $discussionTagEvent = $this->createDiscussionTagEvent($discussion, $tagsToAdd);
+                $this->getEventManager()->dispatch($discussionTagEvent);
+            }
 
             // Increment the tag counts.
             $this->SQL->update('Tag')
@@ -728,18 +756,27 @@ class TagModel extends Gdn_Model {
 
         $now = Gdn_Format::toDateTime();
 
-        // Insert the new tag mappings.
-        foreach ($insert_tag_ids as $tag_id => $bool) {
-            if (isset($all_tags[$tag_id])) {
-                $insert_category_id = $all_tags[$tag_id]['CategoryID'];
-            } else {
-                $insert_category_id = $category_id;
+        if (count($insert_tag_ids) > 0) {
+            // Insert the new tag mappings.
+            foreach ($insert_tag_ids as $tag_id => $bool) {
+                if (isset($all_tags[$tag_id])) {
+                    $insert_category_id = $all_tags[$tag_id]['CategoryID'];
+                } else {
+                    $insert_category_id = $category_id;
+                }
+
+                $this->SQL->options('Ignore', true)->insert(
+                    'TagDiscussion',
+                    ['DiscussionID' => $discussion_id, 'TagID' => $tag_id, 'DateInserted' => $now, 'CategoryID' => $insert_category_id]
+                );
             }
 
-            $this->SQL->options('Ignore', true)->insert(
-                'TagDiscussion',
-                ['DiscussionID' => $discussion_id, 'TagID' => $tag_id, 'DateInserted' => $now, 'CategoryID' => $insert_category_id]
-            );
+            $discussion = DiscussionModel::instance()->getID($discussion_id, DATASET_TYPE_ARRAY);
+            if ($discussion) {
+                // Dispatch a DiscussionTag event
+                $discussionTagEvent = $this->createDiscussionTagEvent($discussion, array_keys($insert_tag_ids));
+                $this->getEventManager()->dispatch($discussionTagEvent);
+            }
         }
 
         // Delete the old tag mappings.
@@ -1195,7 +1232,8 @@ class TagModel extends Gdn_Model {
                         'id' => $id,
                         'name' => $tag->Name,
                         'fullName' => $tag->FullName,
-                        'type' => $type
+                        'type' => $type,
+                        'parentTagID' => $tag->ParentTagID ?? null,
                     ];
                 } else {
                     $data[] = [

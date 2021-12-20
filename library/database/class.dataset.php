@@ -296,6 +296,18 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable, Inj
     }
 
     /**
+     * Get a column value from all rows in the result set.
+     *
+     * @param string $columnName The name of the column to fetch.
+     *
+     * @return array The result.
+     */
+    public function column(string $columnName): array {
+        $result = $this->resultArray();
+        return array_column($result, $columnName);
+    }
+
+    /**
      * Index a result array.
      *
      * @param array|Traversable $data The array to index. It is formatted similar to the array returned by Gdn_DataSet::result().
@@ -594,7 +606,7 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable, Inj
     /**
      * Returns an array of associative arrays containing the ResultSet data.
      *
-     * @return array& Returns an array reference.
+     * @return array Returns an array reference.
      */
     public function &resultArray() {
         return $this->result(DATASET_TYPE_ARRAY);

@@ -259,7 +259,7 @@ function useInitialQueryParamSync() {
         }
 
         const { search: browserQuery } = location;
-        const queryForm: any = qs.parse(browserQuery.replace(/^\?/, ""));
+        const queryForm: any = qs.parse(browserQuery, { ignoreQueryPrefix: true });
 
         for (const [key, value] of Object.entries(queryForm)) {
             if (value === "true") {
@@ -271,11 +271,14 @@ function useInitialQueryParamSync() {
             }
 
             if (
+                // turn pure integer values into numbers.
                 typeof value === "string" &&
-                !moment(value, "YYYY-MM-DD", true).isValid() && //don't replace dates in the query
-                Number.isInteger(parseInt(value, 10))
+                value.match(/^[\d]*$/)
             ) {
-                queryForm[key] = parseInt(value, 10);
+                let intVal = parseInt(value, 10);
+                if (!Number.isNaN(intVal)) {
+                    queryForm[key] = intVal;
+                }
             }
 
             if (key.toLocaleLowerCase() === "search") {

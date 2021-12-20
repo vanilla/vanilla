@@ -1,7 +1,9 @@
 /**
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
+
+import React from "react";
 
 import { css } from "@emotion/css";
 import { LoadStatus } from "@library/@types/api/core";
@@ -15,13 +17,40 @@ import { STORY_USER, STORY_USER_BANNED, STORY_USER_PRIVATE } from "@library/stor
 import { IPartialBoxOptions } from "@library/styles/cssUtilsTypes";
 import { BorderType } from "@library/styles/styleHelpers";
 import { UserCardPopup, useUserCardTrigger } from "@library/features/userCard/UserCard";
-import {
-    UserCardSkeleton,
-    UserCardView,
-    UserCardMinimal,
-    UserCardError,
-} from "@library/features/userCard/UserCard.views";
-import React from "react";
+import { UserCardSkeleton, UserCardMinimal, UserCardError } from "@library/features/userCard/UserCard.views";
+
+export const STORY_USER_ID = 1;
+
+const viewCardConfig = {
+    users: {
+        permissions: {
+            status: LoadStatus.SUCCESS,
+            data: {
+                permissions: [
+                    {
+                        type: "global",
+                        id: STORY_USER_ID,
+                        permissions: {
+                            "profiles.view": true,
+                        },
+                    },
+                ],
+            },
+        },
+    },
+};
+
+const adminConfig = {
+    users: {
+        permissions: {
+            status: LoadStatus.SUCCESS,
+            data: {
+                isAdmin: true,
+                permissions: [],
+            },
+        },
+    },
+};
 
 export default {
     title: "Components/User Card",
@@ -30,130 +59,89 @@ export default {
             viewports: [1450, 400],
         },
     },
+    excludeStories: ["STORY_USER_ID", "SkeletonStory"],
 };
 
 gdn.meta.context = { conversationsEnabled: true };
 
 const boxOptions: IPartialBoxOptions = {
     borderType: BorderType.SHADOW,
-    spacing: { vertical: 0, top: 16, horizontal: 8 },
+    spacing: { vertical: 0, horizontal: 0 },
 };
 
-const adminConfig = {
-    storeState: {
-        users: {
-            permissions: {
-                status: LoadStatus.SUCCESS,
-                data: {
-                    isAdmin: true,
-                    permissions: [],
-                },
-            },
-        },
-    },
-};
-
-const viewCardConfig = {
-    storeState: {
-        users: {
-            permissions: {
-                status: LoadStatus.SUCCESS,
-                data: {
-                    permissions: [
-                        {
-                            type: "global",
-                            id: 1,
-                            permissions: {
-                                "profiles.view": true,
-                            },
-                        },
-                    ],
-                },
-            },
-        },
-    },
-};
-
-const BasicStory = () => (
-    <DeviceProvider>
-        <StoryContent>
-            <div className={css({ display: "flex", "& > *": { flex: 1, margin: 24 } })}>
-                <PageBox className={css({ maxWidth: 400, margin: "0 auto" })} options={boxOptions}>
-                    <UserCardView user={STORY_USER} />
-                </PageBox>
-            </div>
-        </StoryContent>
-    </DeviceProvider>
-);
-
-const BannedWithPermissionStory = () => (
-    <DeviceProvider>
-        <StoryContent>
-            <div className={css({ display: "flex", "& > *": { flex: 1, margin: 24 } })}>
-                <PageBox className={css({ maxWidth: 400, margin: "0 auto" })} options={boxOptions}>
-                    <UserCardView user={STORY_USER_BANNED} />
-                </PageBox>
-            </div>
-        </StoryContent>
-    </DeviceProvider>
-);
-
-export const Basic = storyWithConfig(viewCardConfig, BasicStory);
-
-export const WithPermissions = storyWithConfig(adminConfig, BasicStory);
-
-export const BannedWithPermission = storyWithConfig(adminConfig, BannedWithPermissionStory);
-
-export const Skeletons = storyWithConfig(viewCardConfig, () => {
-    // @ts-ignore
-    return (
-        <DeviceProvider>
-            <div
-                className={css({
-                    display: "flex",
-                    flexWrap: "wrap",
-                    "& > *": { minWidth: 320, margin: "20px !important" },
-                    alignItems: "flex-start",
-                })}
-            >
-                <PageBox className={css({ maxWidth: 400, margin: "0 auto" })} options={boxOptions}>
-                    <UserCardSkeleton userFragment={STORY_USER} />
-                </PageBox>
-                <PageBox className={css({ maxWidth: 400, margin: "0 auto" })} options={boxOptions}>
-                    <UserCardSkeleton />
-                </PageBox>
-                <PageBox className={css({ maxWidth: 400, margin: "0 auto" })} options={boxOptions}>
-                    <UserCardView
-                        user={{
-                            ...STORY_USER,
-                            photoUrl: "",
-                            label: undefined,
-                        }}
-                    />
-                </PageBox>
-                <PageBox className={css({ maxWidth: 400, margin: "0 auto" })} options={boxOptions}>
-                    <UserCardMinimal user={STORY_USER_BANNED} />
-                </PageBox>
-                <PageBox className={css({ maxWidth: 400, margin: "0 auto" })} options={boxOptions}>
-                    <UserCardMinimal user={STORY_USER_PRIVATE} />
-                </PageBox>
-                <PageBox className={css({ maxWidth: 400, margin: "0 auto" })} options={boxOptions}>
-                    <UserCardError />
-                </PageBox>
-                <PageBox className={css({ maxWidth: 400, margin: "0 auto" })} options={boxOptions}>
-                    <UserCardError error={"Failed to load user"} />
-                </PageBox>
-            </div>
-        </DeviceProvider>
+export const Basic = ({ config }: { config?: any }) => {
+    return React.createElement(
+        storyWithConfig({ storeState: { ...viewCardConfig, ...config } }, () => (
+            // <StoryContent>
+            <UserCardPopup forceOpen userID={STORY_USER.userID} user={STORY_USER}>
+                <StoryLinkTrigger />
+            </UserCardPopup>
+            // </StoryContent>
+        )),
     );
-});
+};
+
+export const BannedWithPermission = ({ config }: { config?: any }) => {
+    return React.createElement(
+        storyWithConfig({ storeState: { ...adminConfig, ...config } }, () => (
+            // <StoryContent>
+            <UserCardPopup forceOpen userID={STORY_USER.userID} user={STORY_USER_BANNED}>
+                <StoryLinkTrigger />
+            </UserCardPopup>
+            // </StoryContent>
+        )),
+    );
+};
+
+export const WithPermissions = () => <Basic config={adminConfig} />;
+
+export const SkeletonStory = ({ config }: { config?: any }) =>
+    React.createElement(
+        storyWithConfig({ storeState: { ...viewCardConfig, ...(config ?? {}) } }, () => (
+            <UserCardPopup forceOpen forceSkeleton userFragment={STORY_USER} userID={STORY_USER.userID}>
+                <StoryLinkTrigger />
+            </UserCardPopup>
+        )),
+    );
+
+export const Skeletons = () => (
+    <DeviceProvider>
+        <div
+            className={css({
+                display: "flex",
+                flexWrap: "wrap",
+                "& > *": { minWidth: 320, margin: "20px !important" },
+                alignItems: "flex-start",
+            })}
+        >
+            <PageBox className={css({ maxWidth: 400, margin: "0 auto" })} options={boxOptions}>
+                <UserCardSkeleton userFragment={STORY_USER} />
+            </PageBox>
+            <PageBox className={css({ maxWidth: 400, margin: "0 auto" })} options={boxOptions}>
+                <UserCardSkeleton />
+            </PageBox>
+            <PageBox className={css({ maxWidth: 400, margin: "0 auto" })} options={boxOptions}>
+                <UserCardMinimal user={STORY_USER_BANNED} />
+            </PageBox>
+            <PageBox className={css({ maxWidth: 400, margin: "0 auto" })} options={boxOptions}>
+                <UserCardMinimal user={STORY_USER_PRIVATE} />
+            </PageBox>
+            <PageBox className={css({ maxWidth: 400, margin: "0 auto" })} options={boxOptions}>
+                <UserCardError />
+            </PageBox>
+            <PageBox className={css({ maxWidth: 400, margin: "0 auto" })} options={boxOptions}>
+                <UserCardError error={"Failed to load user"} />
+            </PageBox>
+        </div>
+    </DeviceProvider>
+);
 
 function StoryLinkTrigger() {
     const { props, triggerRef } = useUserCardTrigger();
 
     return (
         <a href="/profile" className={buttonClasses().text} {...props} ref={triggerRef as any}>
-            Some User
+            {STORY_USER.name}
         </a>
     );
 }
@@ -166,7 +154,7 @@ function StoryUserLink(props: { forceOpen?: boolean }) {
     );
 }
 
-export const Trigger = storyWithConfig(viewCardConfig, () => {
+export const Trigger = storyWithConfig({ storeState: viewCardConfig }, () => {
     return (
         <StoryContent>
             <button>Before</button>
@@ -179,7 +167,7 @@ export const Trigger = storyWithConfig(viewCardConfig, () => {
     );
 });
 
-export const Positioning = storyWithConfig(viewCardConfig, () => (
+export const Positioning = storyWithConfig({ storeState: viewCardConfig }, () => (
     <DeviceProvider>
         <div
             style={{

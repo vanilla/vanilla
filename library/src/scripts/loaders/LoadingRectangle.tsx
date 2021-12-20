@@ -13,6 +13,13 @@ interface IProps extends DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>,
     inline?: boolean;
 }
 
+const PERCENTAGES_BY_INDEX = [90, 80, 92, 86, 74];
+
+export function getLoadingPercentageForIndex(index: number) {
+    const offset = index % 4;
+    return PERCENTAGES_BY_INDEX[offset] + "%";
+}
+
 export function LoadingRectangle(_props: IProps) {
     const { inline, ...props } = _props;
     return (

@@ -6,26 +6,24 @@
 
 import { LoadStatus } from "@library/@types/api/core";
 import ModalConfirm from "@library/modal/ModalConfirm";
-import { useAuthenticatorActions } from "@oauth2/AuthenticatorActions";
 import { useDeleteAuthenticator } from "@oauth2/AuthenticatorHooks";
+import { IAuthenticator } from "@oauth2/AuthenticatorTypes";
 import { t } from "@vanilla/i18n";
 import * as React from "react";
 import { useEffect } from "react";
 
 interface IProps {
-    authenticatorID: number | undefined;
+    authenticatorID: NonNullable<IAuthenticator["authenticatorID"]>;
     onDismiss: () => void;
 }
 
 export function AuthenticatorDeleteModal(props: IProps) {
     const { authenticatorID, onDismiss } = props;
-    const { deleteState, deleteAuthenticator } = useDeleteAuthenticator();
+    const { deleteState, deleteAuthenticator } = useDeleteAuthenticator(authenticatorID);
 
     const handleConfirm = async () => {
-        if (authenticatorID !== null) {
-            deleteAuthenticator(authenticatorID!);
-            onDismiss();
-        }
+        await deleteAuthenticator();
+        onDismiss();
     };
 
     useEffect(() => {

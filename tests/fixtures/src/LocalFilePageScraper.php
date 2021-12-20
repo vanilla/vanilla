@@ -15,7 +15,8 @@ class LocalFilePageScraper extends \Vanilla\PageScraper {
 
     /** @var string */
     private $htmlDir;
-
+    /** @var array Valid URL schemes.  Overwrites parent class property, for unit tests. */
+    protected $validSchemes = [false, 'http', 'https'];
     /**
      * Get the configured HTML directory.
      */

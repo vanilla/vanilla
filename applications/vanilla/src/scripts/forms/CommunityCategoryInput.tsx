@@ -13,13 +13,15 @@ import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import SelectOne from "@library/forms/select/SelectOne";
 import { useReduxActions } from "@library/redux/ReduxActions";
-import { ICategory } from "@vanilla/addon-vanilla/@types/api/categories";
+import { CategoryDisplayAs, ICategory } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import { LazyTokens } from "@library/forms/select/LazyTokens";
 
 interface IProps {
     multiple?: boolean;
     onChange: (tokens: IComboBoxOption[]) => void;
     value: IComboBoxOption[];
+    parentCategoryID?: number | null;
+    displayAs?: CategoryDisplayAs;
     label: string | null;
     labelNote?: string;
     disabled?: boolean;
@@ -36,7 +38,7 @@ export function CommunityCategoryInput(props: IProps) {
     const [query, setQuery] = useState<string>("");
     const [hasBeenFocused, setHasBeenFocused] = useState(false);
 
-    const suggestions = useCategorySuggestions(query, hasBeenFocused);
+    const suggestions = useCategorySuggestions(query, props.parentCategoryID, hasBeenFocused);
 
     const setFocused = () => {
         setHasBeenFocused(true);
@@ -45,7 +47,11 @@ export function CommunityCategoryInput(props: IProps) {
     const { multiple } = props;
     let options: IComboBoxOption[] | undefined;
     if (suggestions.status === LoadStatus.SUCCESS && suggestions.data) {
-        options = suggestions.data.map((suggestion) => {
+        let data = suggestions.data;
+        if (props.displayAs) {
+            data = data.filter((suggestion) => suggestion.displayAs === props.displayAs);
+        }
+        options = data.map((suggestion) => {
             let parentLabel;
             const crumbLength = suggestion.breadcrumbs?.length ?? 0;
             if (crumbLength > 1) {
@@ -63,6 +69,9 @@ export function CommunityCategoryInput(props: IProps) {
     }
 
     const isLoading = suggestions.status === LoadStatus.LOADING;
+
+    // TODO: Fix the AutoCompleteLookUp and use it here
+    // https://higherlogic.atlassian.net/browse/VNLA-383
 
     if (multiple) {
         return (
@@ -97,7 +106,11 @@ export function CommunityCategoryInput(props: IProps) {
     );
 }
 
-export function useCategorySuggestions(query: string, forceSearch?: boolean): ILoadable<ICategory[]> {
+export function useCategorySuggestions(
+    query: string,
+    parentCategoryID?: number | null,
+    forceSearch?: boolean,
+): ILoadable<ICategory[]> {
     const actions = useReduxActions(CategorySuggestionActions);
     const suggestions = useSelector((state: IForumStoreState) => {
         return state.forum.categories.suggestionsByQuery[query] ?? { status: LoadStatus.PENDING };
@@ -109,8 +122,8 @@ export function useCategorySuggestions(query: string, forceSearch?: boolean): IL
             return;
         }
 
-        actions.loadCategories(query);
-    }, [query, forceSearch]);
+        actions.loadCategories(query, parentCategoryID);
+    }, [query, parentCategoryID, forceSearch]);
 
     return suggestions;
 }

@@ -117,6 +117,9 @@ final class CrawlableRecordSchema {
             'type:s' => [
                 'default' => $defaultType,
             ],
+            'recordType:s' => [
+                'default' => $defaultType,
+            ],
             'siteID:i' => [
                 'default' => $siteProvider->getOwnSite()->getSiteID(),
             ],

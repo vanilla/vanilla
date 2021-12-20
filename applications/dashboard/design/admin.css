@@ -5716,8 +5716,8 @@ fieldset[disabled] a.file-upload-browse {
   padding-top: 4px;
   display: -ms-flexbox;
   display: flex;
-  -ms-flex-wrap: wrap;
-      flex-wrap: wrap;
+  -ms-flex-wrap: nowrap;
+      flex-wrap: nowrap;
   -ms-flex-align: center;
       align-items: center;
 }

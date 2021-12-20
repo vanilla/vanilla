@@ -744,7 +744,7 @@ class Gdn_Form extends Gdn_Pluggable {
         }
 
         if ($reverse) {
-            if ($attributes['checked'] === 'checked') {
+            if (isset($attributes['checked']) && ($attributes['checked'] === 'checked')) {
                 unset($attributes['checked']);
             } else {
                 $attributes['checked'] = 'checked';

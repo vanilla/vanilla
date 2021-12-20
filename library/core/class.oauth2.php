@@ -15,6 +15,8 @@ use Psr\Container\ContainerExceptionInterface;
 use Vanilla\Models\UserAuthenticationProviderFragmentSchema;
 use Vanilla\Permissions;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Web\CacheControlConstantsInterface;
+use Vanilla\Web\CacheControlTrait;
 
 /**
  * Class Gdn_OAuth2
@@ -30,7 +32,10 @@ use Vanilla\Contracts\ConfigurationInterface;
  * any of its methods of constants.
  *
  */
-class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
+class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface, CacheControlConstantsInterface {
+
+    use CacheControlTrait;
+
     const COLUMN_ASSOCIATION_KEY = 'AssociationKey';
 
     /** @var string token provided by authenticator  */
@@ -178,7 +183,7 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
     public function structure() {
         // Make sure we have the OAuth2 provider.
         $provider = $this->provider();
-        if (!$provider['AuthenticationKey']) {
+        if (empty($provider) || empty($provider['AuthenticationKey'])) {
             $model = new Gdn_AuthenticationProviderModel();
             $provider = [
                 'AuthenticationKey' => $this->providerKey,
@@ -380,7 +385,7 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
     /**
      *  Return all the information saved in provider table.
      *
-     * @return array Stored provider data (secret, client_id, etc.).
+     * @return array|bool Stored provider data (secret, client_id, etc.).
      */
     public function provider() {
         if (!$this->provider) {
@@ -421,7 +426,7 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
      * @return array Form fields to appear in settings dashboard.
      */
     protected function getSettingsFormFields() {
-        $promptOptions =  ['login' => 'login', 'none' => 'none', 'consent' => 'consent', 'consent and login' =>  'consent and login'];
+        $promptOptions =  ['login' => 'login', 'none' => 'none', 'consent' => 'consent', 'consent and login' =>  'consent and login'];
         $formFields = [
             'RegisterUrl' => ['LabelCode' => 'Register Url', 'Description' => 'Enter the endpoint to direct a user to register.'],
             'SignOutUrl' => ['LabelCode' => 'Sign Out Url', 'Description' => 'Enter the endpoint to log a user out.'],
@@ -446,7 +451,7 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface {
     public function entryRedirectEndpoint(\EntryController $sender, $state = '') {
         $state = $this->decodeState($state);
         $url = $this->realAuthorizeUri($state);
-        \Vanilla\Web\CacheControlMiddleware::sendCacheControlHeaders(\Vanilla\Web\CacheControlMiddleware::NO_CACHE);
+        static::sendCacheControlHeaders(self::NO_CACHE);
         redirectTo($url, 302, false);
     }
 

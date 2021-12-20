@@ -11,9 +11,7 @@
 use Garden\Container\Container;
 use Garden\Container\Reference;
 use Vanilla\DiscussionTypeHandler;
-use Vanilla\Forum\Modules\DiscussionListModule;
 use Vanilla\Theme\ThemeSectionModel;
-use Vanilla\Widgets\WidgetService;
 
 /**
  * Vanilla's event handlers.
@@ -28,25 +26,30 @@ class VanillaHooks extends Gdn_Plugin {
     public function container_init(Container $dic) {
         $dic->rule(\Vanilla\Navigation\BreadcrumbModel::class)
             ->addCall('addProvider', [new Reference(\Vanilla\Forum\Navigation\ForumBreadcrumbProvider::class)])
-        ;
-        $dic->rule(\Vanilla\Menu\CounterModel::class)
+
+            ->rule(\Vanilla\Menu\CounterModel::class)
             ->addCall('addProvider', [new Reference(\Vanilla\Forum\Menu\UserCounterProvider::class)])
-        ;
 
-        $dic->rule(ThemeSectionModel::class)
-            ->addCall('registerLegacySection', [t('Forum')]);
+            ->rule(ThemeSectionModel::class)
+            ->addCall('registerLegacySection', [t('Forum')])
 
-        $dic
             ->rule(\Vanilla\DiscussionTypeConverter::class)
-            ->addCall('addTypeHandler', [new Reference(DiscussionTypeHandler::class)]);
+            ->addCall('addTypeHandler', [new Reference(DiscussionTypeHandler::class)])
+
+            ->rule(PermissionModel::class)
+            ->addCall('addJunctionModel', ['Category', new Reference(CategoryModel::class)])
+        ;
 
         $mf = \Vanilla\Models\ModelFactory::fromContainer($dic);
         $mf->addModel('category', CategoryModel::class, 'cat');
         $mf->addModel('discussion', DiscussionModel::class, 'd');
         $mf->addModel('comment', CommentModel::class, 'c');
 
-        $dic->rule(PermissionModel::class)
-            ->addCall('addJunctionModel', ['Category', new Reference(CategoryModel::class)]);
+        $eventManager = $dic->get(\Garden\EventManager::class);
+        $eventManager->addListenerMethod(
+            \Vanilla\Community\Events\DiscussionStatusEventHandler::class,
+            "handleDiscussionStatusEvent"
+        );
     }
 
     /**
@@ -96,7 +99,16 @@ class VanillaHooks extends Gdn_Plugin {
     public function dbaController_countJobs_handler($sender) {
         $counts = [
             'Discussion' => ['CountComments', 'FirstCommentID', 'LastCommentID', 'DateLastComment', 'LastCommentUserID'],
-            'Category' => ['CountDiscussions', 'CountAllDiscussions', 'CountComments', 'CountAllComments', 'LastDiscussionID', 'LastCommentID', 'LastDateInserted'],
+            'Category' => [
+                'CountChildCategories',
+                'CountDiscussions',
+                'CountAllDiscussions',
+                'CountComments',
+                'CountAllComments',
+                'LastDiscussionID',
+                'LastCommentID',
+                'LastDateInserted'
+            ],
             'Tag' => ['CountDiscussions'],
         ];
 
@@ -823,51 +835,6 @@ class VanillaHooks extends Gdn_Plugin {
         $sender->Preferences['Notifications']['Popup.BookmarkComment'] = t('Notify me when people comment on my bookmarked discussions.');
         $sender->Preferences['Notifications']['Popup.Mention'] = t('Notify me when people mention me.');
         $sender->Preferences['Notifications']['Popup.ParticipateComment'] = t('Notify me when people comment on discussions I\'ve participated in.');
-
-        if (Gdn::session()->checkPermission('Garden.AdvancedNotifications.Allow')) {
-            $postBack = $sender->Form->authenticatedPostBack();
-            $set = [];
-
-            // Add the category definitions to for the view to pick up.
-            $doHeadings = c('Vanilla.Categories.DoHeadings');
-            // Grab all of the categories.
-            $categories = [];
-            $prefixes = ['Email.NewDiscussion', 'Popup.NewDiscussion', 'Email.NewComment', 'Popup.NewComment'];
-            foreach (CategoryModel::categories() as $category) {
-                if (!$category['PermsDiscussionsView'] || $category['Depth'] <= 0 || $category['Depth'] > 2 || $category['Archived']) {
-                    continue;
-                }
-
-                $category['Heading'] = ($doHeadings && $category['Depth'] <= 1);
-                $categories[] = $category;
-
-                if ($postBack) {
-                    foreach ($prefixes as $prefix) {
-                        $fieldName = "$prefix.{$category['CategoryID']}";
-                        $value = $sender->Form->getFormValue($fieldName, null);
-                        if (!$value) {
-                            $value = null;
-                        }
-                        $set[$fieldName] = $value;
-                    }
-                }
-            }
-            $sender->setData('CategoryNotifications', $categories);
-            if ($postBack) {
-                UserModel::setMeta($sender->User->UserID, $set, 'Preferences.');
-            }
-        }
-    }
-
-    /**
-     * Add the advanced notifications view to profiles.
-     *
-     * @param ProfileController $Sender
-     */
-    public function profileController_customNotificationPreferences_handler($Sender) {
-        if (Gdn::session()->checkPermission('Garden.AdvancedNotifications.Allow')) {
-            include $Sender->fetchViewLocation('notificationpreferences', 'vanillasettings', 'vanilla');
-        }
     }
 
     /**

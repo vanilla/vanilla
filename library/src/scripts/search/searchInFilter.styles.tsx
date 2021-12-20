@@ -68,6 +68,10 @@ export const searchInFilterClasses = useThemeCache(() => {
 
     const label = style("label", {
         ...labelStateStyles,
+        "&.isDisabled": {
+            pointerEvents: "none",
+            opacity: 0.5,
+        },
     });
 
     // Style states on actual radio button

@@ -63,7 +63,7 @@ class CategorySearchType extends AbstractSearchType {
     /**
      * @inheritdoc
      */
-    public function getSearchGroup(): string {
+    public function getRecordType(): string {
         return 'category';
     }
 
@@ -101,7 +101,7 @@ class CategorySearchType extends AbstractSearchType {
             $mapped = ArrayUtils::remapProperties($result, [
                 'recordID' => 'categoryID',
             ]);
-            $mapped['recordType'] = $this->getSearchGroup();
+            $mapped['recordType'] = $this->getRecordType();
             $mapped['type'] = $this->getType();
             $this->mapCounts($mapped);
 
@@ -121,10 +121,14 @@ class CategorySearchType extends AbstractSearchType {
     private function mapCounts(array &$record) {
         $record['counts'] = [
             [
+                // %s sub-category
+                // %s sub-categories
                 'labelCode' => 'sub-categories',
                 'count' => $record['countCategories'],
             ],
             [
+                // %s discussion
+                // %s discussions
                 'labelCode' => 'discussions',
                 'count' => $record['countAllDiscussions'],
             ]

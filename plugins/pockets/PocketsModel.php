@@ -233,16 +233,18 @@ class PocketsModel extends \Gdn_Model {
         return $body;
     }
 
-
     /**
      * @inheritdoc
      */
     public function save($formPostValues, $settings = false) {
         $this->validateWidgetType($formPostValues);
-        $row = $this->collapseAttributes($formPostValues);
+        $hasAttributes = (count($this->getAttributes($formPostValues)) > 0);
+        if ($hasAttributes) {
+            $formPostValues = $this->collapseAttributes($formPostValues);
+        }
 
-        $row = parent::save($row, $settings);
-        return $row;
+        $savedRecordId = parent::save($formPostValues, $settings);
+        return $savedRecordId;
     }
 
     /**

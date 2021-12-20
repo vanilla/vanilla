@@ -19,7 +19,7 @@ import FrameBody from "@library/layout/frame/FrameBody";
 import CommunityCategoryInput from "@vanilla/addon-vanilla/forms/CommunityCategoryInput";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { discussionListClasses } from "@library/features/discussions/DiscussionList.classes";
-import { ICategoryFragment } from "@vanilla/addon-vanilla/@types/api/categories";
+import { CategoryDisplayAs, ICategoryFragment } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import { useDiscussionPatch } from "@library/features/discussions/discussionHooks";
 
 type FormValues = {
@@ -71,6 +71,7 @@ export default function MoveDiscussionForm({ onCancel, discussion, onSuccess }: 
                         <div className={classesFrameBody.contents}>
                             <div className={classes.options.move}>
                                 <CommunityCategoryInput
+                                    displayAs={CategoryDisplayAs.DISCUSSIONS}
                                     placeholder={t("Select...")}
                                     label={t("Category")}
                                     onChange={(option) => {

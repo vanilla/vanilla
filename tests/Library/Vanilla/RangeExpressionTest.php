@@ -10,7 +10,10 @@ namespace VanillaTests\Library\Vanilla;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use PHPUnit\Framework\TestCase;
+use Vanilla\Schema\DateRangeExpression;
+use Vanilla\Schema\LegacyDateRangeExpression;
 use Vanilla\Schema\RangeExpression;
+use VanillaTests\VanillaTestCase;
 
 /**
  * Test the `RangeExpression` class.
@@ -22,7 +25,7 @@ class RangeExpressionTest extends TestCase {
      *
      * @param string $expression
      * @param string $fromOp
-     * @param string $toOp
+     * @param ?string $toOp
      * @dataProvider provideRangeExpressions
      */
     public function testParseRange(string $expression, string $fromOp, string $toOp = null): void {
@@ -166,7 +169,8 @@ class RangeExpressionTest extends TestCase {
      * An invalid operator name should not be allowed.
      */
     public function testInvalidOperator(): void {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('not a valid operator');
         $range = new RangeExpression('bla', '');
     }
 
@@ -326,5 +330,65 @@ class RangeExpressionTest extends TestCase {
             'empty' => ['=', [4, 6], []],
         ];
         return $r;
+    }
+
+    /**
+     * Ensure that a legacy date rage can be reset with its output array.
+     */
+    public function testLegacyGetSet(): void {
+        $arr = ['operator' => '()', 'date' => [new \DateTimeImmutable('2021-08-01'), new \DateTimeImmutable('2021-08-21')]];
+        $range = LegacyDateRangeExpression::createFromLegacyArray($arr);
+
+        $actual1 = $range->toLegacyArray();
+        $this->assertLegacyDateRangeArrayEquals($arr, $actual1);
+
+        $range->fromLegacyArray($actual1);
+        $actual2 = $range->toLegacyArray();
+        $this->assertLegacyDateRangeArrayEquals($actual1, $actual2);
+    }
+
+    /**
+     * Assert that two legacy date range expressions are equal.
+     *
+     * @param array $expected
+     * @param array $actual
+     * @param string $message
+     */
+    protected static function assertLegacyDateRangeArrayEquals(array $expected, array $actual, $message = ''): void {
+        self::assertSame($expected['operator'], $actual['operator'], $message);
+        self::assertEquals($expected['date'], $actual['date'], $message);
+        if (isset($expected['inclusiveRange'])) {
+            self::assertEquals($expected['inclusiveRange'], $actual['inclusiveRange']);
+        }
+    }
+
+    /**
+     * Test parsing and stringifying date ranges.
+     *
+     * @param string $expr
+     * @param string $expected
+     * @dataProvider provideDateRanges
+     */
+    public function testDateRanges(string $expr, string $expected): void {
+        $range = DateRangeExpression::parse($expr);
+        $actual = (string)$range;
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * Provide test date for `testDateRanges`.
+     *
+     * @return array
+     */
+    public function provideDateRanges(): array {
+        $r = [
+            ['[2021-06-01T00:00:00Z,2021-06-02T23:59Z]', '2021-06-01T00:00:00+00:00..2021-06-02T23:59:00+00:00'],
+            ['[2021-06-01T00:00:00Z,2021-06-02T23:59:59Z]', '2021-06-01T00:00:00+00:00..2021-06-02T23:59:59+00:00'],
+            ['noon 2021-08-23', '2021-08-23T12:00:00+00:00'],
+            ['2021-08-23', '2021-08-23T00:00:00+00:00..2021-08-23T23:59:59+00:00'],
+            ['>2021-08-23', '>2021-08-23T23:59:59+00:00'],
+            ['<=2021-08-23', '<=2021-08-23T23:59:59+00:00'],
+        ];
+        return array_column($r, null, 0);
     }
 }

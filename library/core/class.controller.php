@@ -13,6 +13,8 @@ use Vanilla\Site\SiteSectionModel;
 use Vanilla\Theme\ThemePreloadProvider;
 use Vanilla\Utility\HtmlUtils;
 use \Vanilla\Web\Asset\LegacyAssetModel;
+use Vanilla\Web\CacheControlConstantsInterface;
+use Vanilla\Web\CacheControlTrait;
 use Vanilla\Web\HttpStrictTransportSecurityModel;
 use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
 use Vanilla\Web\ContentSecurityPolicy\Policy;
@@ -26,8 +28,8 @@ use Vanilla\Web\MasterViewRenderer;
  *
  * @method void render($view = '', $controllerName = false, $applicationFolder = false, $assetName = 'Content') Render the controller's view.
  */
-class Gdn_Controller extends Gdn_Pluggable {
-    use \Garden\MetaTrait, ReduxActionPreloadTrait;
+class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInterface {
+    use \Garden\MetaTrait, ReduxActionPreloadTrait, CacheControlTrait;
 
     /** Seconds before reauthentication is required for protected operations. */
     const REAUTH_TIMEOUT = 1200; // 20 minutes
@@ -273,12 +275,12 @@ class Gdn_Controller extends Gdn_Pluggable {
 
         if (Gdn::session()->isValid() || Gdn::request()->getMethod() !== 'GET') {
             $this->_Headers = array_merge($this->_Headers, [
-                'Cache-Control' => \Vanilla\Web\CacheControlMiddleware::NO_CACHE, // PREVENT PAGE CACHING: HTTP/1.1
+                self::HEADER_CACHE_CONTROL => self::NO_CACHE, // PREVENT PAGE CACHING: HTTP/1.1
             ]);
         } else {
             $this->_Headers = array_merge($this->_Headers, [
-                'Cache-Control' => \Vanilla\Web\CacheControlMiddleware::PUBLIC_CACHE,
-                'Vary' => \Vanilla\Web\CacheControlMiddleware::VARY_COOKIE,
+                self::HEADER_CACHE_CONTROL => self::PUBLIC_CACHE,
+                'Vary' => self::VARY_COOKIE,
             ]);
         }
 
@@ -1366,15 +1368,18 @@ class Gdn_Controller extends Gdn_Pluggable {
             Logger::logAccess(
                 'security_denied',
                 Logger::NOTICE,
-                '{username} was denied access to {path}.',
+                '{username} was denied access to {requestPath}.',
                 [
                     'permission' => $permission,
                     Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
+                    'trace' => \Vanilla\Utility\DebugUtils::stackTraceString(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3)),
                 ]
             );
 
             if (!$session->isValid() && $this->isRenderingMasterView()) {
                 redirectTo('/entry/signin?Target='.urlencode($this->Request->pathAndQuery()));
+            } elseif (defined('TESTMODE_ENABLED') && TESTMODE_ENABLED) {
+                throw permissionException();
             } else {
                 Gdn::dispatcher()->dispatch('DefaultPermission');
                 exit();
@@ -1385,7 +1390,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                 Logger::logAccess(
                     'security_access',
                     Logger::INFO,
-                    "{username} accessed {path}.",
+                    "{username} accessed {requestPath}.",
                     [Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
                 );
             }
@@ -1658,9 +1663,12 @@ class Gdn_Controller extends Gdn_Pluggable {
      */
     public function renderAssetForTwig(string $assetName): \Twig\Markup {
         ob_start();
-        $this->renderAsset($assetName);
-        $echoedOutput = ob_get_contents();
-        ob_end_clean();
+        try {
+            $this->renderAsset($assetName);
+            $echoedOutput = ob_get_contents();
+        } finally {
+            ob_end_clean();
+        }
         return new \Twig\Markup($echoedOutput, 'utf-8');
     }
 
@@ -1890,6 +1898,19 @@ class Gdn_Controller extends Gdn_Pluggable {
                         break;
                     default:
                         $route = '/home/error';
+                }
+
+                // Log forbidden exceptions as security events.
+                if (in_array($ex->getCode(), [401, 403])) {
+                    Logger::logAccess(
+                        'security_denied',
+                        Logger::NOTICE,
+                        $ex->getMessage(),
+                        [
+                            Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
+                            'trace' => \Vanilla\Utility\DebugUtils::stackTraceString($ex->getTrace(), 3),
+                        ]
+                    );
                 }
 
                 // Redispatch to our error handler.
@@ -2303,8 +2324,8 @@ class Gdn_Controller extends Gdn_Pluggable {
             }
         }
 
-        if (!empty($this->_Headers['Cache-Control'])) {
-            \Vanilla\Web\CacheControlMiddleware::sendCacheControlHeaders($this->_Headers['Cache-Control']);
+        if (!empty($this->_Headers[self::HEADER_CACHE_CONTROL])) {
+            static::sendCacheControlHeaders($this->_Headers[self::HEADER_CACHE_CONTROL]);
         }
 
         // Empty the collection after sending

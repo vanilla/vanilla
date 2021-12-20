@@ -9,16 +9,19 @@ namespace Vanilla\ProfileExtender\Tests\APIv2;
 use Exception;
 use Gdn_Configuration;
 use Vanilla\Attributes;
+use VanillaTests\Addons\ProfileExtender\ProfileExtenderTestTrait;
+use VanillaTests\UsersAndRolesApiTestTrait;
 
 /**
  * Tests for the profile extender addon.
  */
 class ProfileExtenderAddonTest extends \VanillaTests\SiteTestCase {
-    /**
-     * @var \ProfileExtenderPlugin
-     */
-    protected $profileExtender;
 
+    use ProfileExtenderTestTrait;
+    use UsersAndRolesApiTestTrait;
+
+    /** @var \ProfileExtenderPlugin */
+    private $profileExtender;
 
     /**
      * {@inheritdoc}
@@ -36,31 +39,6 @@ class ProfileExtenderAddonTest extends \VanillaTests\SiteTestCase {
         $this->container()->call(function (\ProfileExtenderPlugin $profileExtender) {
             $this->profileExtender = $profileExtender;
         });
-
-        $this->bessy()->post('/settings/profile-field-add-edit', [
-            'Name' => 'text',
-            'Label' => 'Text',
-            'FormType' => 'TextBox'
-        ]);
-
-        $this->bessy()->post('/settings/profile-field-add-edit', [
-            'Name' => 'check',
-            'Label' => 'Check',
-            'FormType' => 'CheckBox'
-        ]);
-
-        $this->bessy()->post('/settings/profile-field-add-edit', [
-            'Name' => 'DateOfBirth',
-            'Label' => 'Birthday',
-            'FormType' => 'DateOfBirth'
-        ]);
-
-        $this->bessy()->post('/settings/profile-field-add-edit', [
-            'Name' => 'dropdown',
-            'Label' => 'Dropdown',
-            'FormType' => 'Dropdown',
-            'Options' => "Option1\nOption2"
-        ]);
 
         $this->createUserFixtures();
     }
@@ -115,6 +93,37 @@ class ProfileExtenderAddonTest extends \VanillaTests\SiteTestCase {
 
         $result = $this->bessy()->getHtml("profile/edit");
         $result->assertFormInput("text", __FUNCTION__);
+    }
+
+    /**
+     * Verify field validation for required fields.
+     */
+    public function testRequiredFieldWarning(): void {
+        // We check if our Custom Required Field exists on the registration page.
+        $registerPage = $this->bessy()->getHtml('/entry/register');
+        $registerPage->assertCssSelectorExists('#Form_CustomRequiredField');
+
+        // Trying to register providing an empty CustomrequiredField should display an exception message.
+        $this->expectExceptionMessage('Custom Required Field');
+        $registrationResults = $this->bessy()->post(
+            '/entry/register',
+            [
+                'Email' => 'new@user.com',
+                'Name' => 'NewUserName',
+                'CustomRequiredField' => '',
+                'Password' => 'jXM>e!gL4#38cP3Z',
+                'PasswordMatch' => 'jXM>e!gL4#38cP3Z',
+                'TermsOfService' => '1',
+                'Save' => "Save"
+            ]
+        );
+
+        // Run the following with an authenticated user.
+        $this->runWithUser(function () {
+            // We also check if the field exists on profile edition page.
+            $profilePage = $this->bessy()->getHtml("/profile/edit/");
+            $profilePage->assertCssSelectorExists('#Form_CustomRequiredField');
+        }, $this->adminID);
     }
 
     /**

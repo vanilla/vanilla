@@ -43,7 +43,7 @@ class UtilityController extends DashboardController {
      */
     public function __construct() {
         parent::__construct();
-        $this->setHeader('Cache-Control', \Vanilla\Web\CacheControlMiddleware::NO_CACHE);
+        $this->setHeader(self::HEADER_CACHE_CONTROL, self::NO_CACHE);
     }
 
     /**
@@ -84,7 +84,7 @@ class UtilityController extends DashboardController {
 
                     foreach ($rows as $sort => $iD) {
                         if (strpos($iD, '_') !== false) {
-                            list(, $iD) = explode('_', $iD, 2);
+                            [, $iD] = explode('_', $iD, 2);
                         }
                         if (!$iD) {
                             continue;
@@ -235,7 +235,7 @@ class UtilityController extends DashboardController {
         // This permission is run again to be sure someone doesn't accidentally call this method incorrectly.
         $this->permission('Garden.Settings.Manage');
 
-        $updateModel = new UpdateModel();
+        $updateModel = \Gdn::getContainer()->get(UpdateModel::class);
         $capturedSql = $updateModel->runStructure($captureOnly);
         $this->setData('CapturedSql', $capturedSql);
 
@@ -288,7 +288,7 @@ class UtilityController extends DashboardController {
         }
         try {
             // Run the structure.
-            $updateModel = new UpdateModel();
+            $updateModel = \Gdn::getContainer()->get(UpdateModel::class);
             $updateModel->runStructure();
             $this->setData('Success', true);
         } catch (Exception $ex) {
@@ -685,7 +685,7 @@ class UtilityController extends DashboardController {
         }
 
         // Run the structure.
-        $updateModel = new UpdateModel();
+        $updateModel = \Gdn::getContainer()->get(UpdateModel::class);
         try {
             if (isset($isTokenUpdate)) {
                 $updateModel->setRunAsSystem(true);

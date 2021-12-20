@@ -15,16 +15,19 @@ use Vanilla\Theme\VariableProviders\QuickLinkProviderInterface;
  */
 class QnaQuickLinksProvider implements QuickLinkProviderInterface {
 
-    /** @var \QnAPlugin */
-    private $qnaPlugin;
+    /** @var \QnaModel */
+    private $qnaModel;
+
+    /** @var int */
+    private $countLimit = 99;
 
     /**
      * DI.
      *
-     * @param \QnAPlugin $qnaPlugin
+     * @param \QnaModel $qnaModel
      */
-    public function __construct(\QnAPlugin $qnaPlugin) {
-        $this->qnaPlugin = $qnaPlugin;
+    public function __construct(\QnaModel $qnaModel) {
+        $this->qnaModel = $qnaModel;
     }
 
     /**
@@ -36,9 +39,9 @@ class QnaQuickLinksProvider implements QuickLinkProviderInterface {
         $quickLink = new QuickLink(
             t('Unanswered'),
             '/discussions/unanswered',
-            $this->qnaPlugin->getUnansweredCount() ?? 0
+            $this->qnaModel->getUnansweredCount($this->countLimit)
         );
-        $quickLink->setCountLimit($this->qnaPlugin->getUnansweredCountLimit());
+        $quickLink->setCountLimit($this->countLimit);
         return [$quickLink];
     }
 }

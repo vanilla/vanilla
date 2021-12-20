@@ -123,6 +123,22 @@ describe("ListBlot", () => {
         expect(quill.getContents().ops).deep.eq(nestedDelta);
     });
 
+    it("improperly nested lists don't explode", () => {
+        const delta = [
+            OpUtils.op("Depth 2"),
+            OpUtils.list(ListType.BULLETED, 2),
+            OpUtils.op("Depth 1"),
+            OpUtils.list(ListType.BULLETED, 1),
+            OpUtils.op("Depth 2"),
+            OpUtils.list(ListType.BULLETED, 2),
+        ];
+
+        quill.setContents(delta);
+
+        // There were no errors.
+        expect(true).eq(true);
+    });
+
     it("always reports it's value in the new object style", () => {
         insertListBlot("ordered");
         insertListBlot("bullet");

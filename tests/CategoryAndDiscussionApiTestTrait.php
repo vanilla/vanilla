@@ -13,6 +13,8 @@ use TagModel;
  * Class CategoryAndDiscussionApiTestTrait
  *
  * @package VanillaTests
+ *
+ * @deprecated Use CommunityApiTestTrait instead.
  */
 trait CategoryAndDiscussionApiTestTrait {
 
@@ -83,7 +85,7 @@ trait CategoryAndDiscussionApiTestTrait {
 
             ]);
 
-        $discussion = $discussionAPIController->post($body);
+        $discussion = $discussionAPIController->post($body)->getData();
         $this->lastInsertedDiscussionID = $discussion['discussionID'];
 
         return $discussion;

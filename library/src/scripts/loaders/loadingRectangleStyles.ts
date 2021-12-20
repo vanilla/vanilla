@@ -70,6 +70,5 @@ export const loadingCircleClass = useThemeCache((_height?: string | number, inli
         width: height,
         borderRadius: height,
         background: ColorsUtils.colorOut(vars.colors.bg),
-        margin: 20,
     });
 });

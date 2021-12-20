@@ -11,7 +11,7 @@ import { styleUnit } from "@library/styles/styleUnit";
 import { Mixins } from "@library/styles/Mixins";
 import { calc, percent } from "csx";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
-import { CSSObject } from "@emotion/css";
+import { css, CSSObject } from "@emotion/css";
 
 export const userLabelVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("userLabel");
@@ -35,11 +35,10 @@ export const userLabelVariables = useThemeCache(() => {
 });
 
 export const userLabelClasses = useThemeCache(() => {
-    const style = styleFactory("userLabel");
     const globalVars = globalVariables();
     const vars = userLabelVariables();
 
-    const root = style({
+    const root = css({
         display: "flex",
         flexWrap: "nowrap",
         alignItems: "center",
@@ -48,15 +47,15 @@ export const userLabelClasses = useThemeCache(() => {
         minHeight: styleUnit(vars.avatar.size),
     });
 
-    const fixLineHeight = style("fixLineHeight", {});
+    const fixLineHeight = css({});
 
-    const compact = style("compact", {
+    const compact = css({
         ...{
             [`&.${fixLineHeight}`]: lineHeightAdjustment(),
         },
     });
 
-    const main = style("main", {
+    const main = css({
         display: "flex",
         flexDirection: "column",
         flexWrap: "nowrap",
@@ -67,7 +66,7 @@ export const userLabelClasses = useThemeCache(() => {
         minHeight: styleUnit(vars.avatar.size),
     });
 
-    const avatar = style("avatar", {
+    const avatar = css({
         ...objectFitWithFallback(),
         overflow: "hidden",
         ...Mixins.border({
@@ -76,18 +75,18 @@ export const userLabelClasses = useThemeCache(() => {
             radius: vars.avatar.borderRadius,
         }),
     });
-    const avatarLink = style("avatarLink", {
+    const avatarLink = css({
         display: "block",
         position: "relative",
         width: styleUnit(vars.avatar.size),
         height: styleUnit(vars.avatar.size),
         flexBasis: styleUnit(vars.avatar.size),
     });
-    const topRow = style("topRow", {});
-    const bottomRow = style("bottomRow", {});
-    const isCompact = style("isCompact", {});
+    const topRow = css({});
+    const bottomRow = css({});
+    const isCompact = css({});
 
-    const userName = style("userName", {
+    const userName = css({
         ...{
             "&&": {
                 ...Mixins.font({

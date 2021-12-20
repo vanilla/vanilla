@@ -99,6 +99,7 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess {
                     'format' => 'uri',
                 ],
                 'dateInserted:dt',
+                'dateUpdated:dt?',
                 'breadcrumbs:a?' => new InstanceValidatorSchema(Breadcrumb::class),
                 "insertUserID:i?",
                 "updateUserID:i?",

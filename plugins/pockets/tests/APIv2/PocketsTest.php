@@ -108,7 +108,6 @@ class PocketsTest extends AbstractResourceTest {
         $this->assertEquals(true, $expandedBodyExists);
     }
 
-
     /**
      * Provide pocket test data.
      *
@@ -151,9 +150,7 @@ class PocketsTest extends AbstractResourceTest {
             'location-fail' => [['location'=> 'wrongLocation'], 422],
             'pocket-roleIDs' => [['roleIDs'=> 'roleIDs'], null]
 
-
-           //TODO SiteHome avialable with subc
-
+           //TODO SiteHome available with subcommunity
         ];
         return $r;
     }
@@ -164,7 +161,7 @@ class PocketsTest extends AbstractResourceTest {
      * @return array
      */
     protected function getPocketTemplate(): array {
-        $rd = rand(10, 1000);
+        $rd = self::id('pocketTemplate');
         return  [
             'name' => $rd.'pocketApiTest',
             'body' => 'pocketApiTest',

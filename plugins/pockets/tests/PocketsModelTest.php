@@ -131,6 +131,8 @@ class PocketsModelTest extends SiteTestCase {
             'PocketID' => $pocketID,
             'Format' => PocketsModel::FORMAT_CUSTOM,
             'Body' => 'hello world',
+            'SomeFieldThatGoesIntoAttributes' => 'Foo!',
+            'AnotherFieldThatIsAnAttribute' => 'Bar!'
         ]);
         ModelUtils::validationResultToValidationException($pocketModel);
         $pocket = $pocketModel->getID($pocketID);
@@ -140,6 +142,8 @@ class PocketsModelTest extends SiteTestCase {
             'Format' => PocketsModel::FORMAT_CUSTOM,
             'WidgetID' => null,
             'WidgetParameters' => null,
+            'SomeFieldThatGoesIntoAttributes' => 'Foo!',
+            'AnotherFieldThatIsAnAttribute' => 'Bar!'
         ];
 
         $this->assertArraySubsetRecursive(
@@ -156,6 +160,9 @@ class PocketsModelTest extends SiteTestCase {
             'PocketID' => $pocketID,
             'Disabled' => \Pocket::ENABLED,
         ]);
+
+        // We have to reload the pocket to ensure the data in the database isn't broken.
+        $pocket = $pocketModel->getID($pocketID);
 
         $this->assertArraySubsetRecursive(
             $goodSubset,

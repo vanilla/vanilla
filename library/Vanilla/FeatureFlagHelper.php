@@ -20,10 +20,20 @@ class FeatureFlagHelper {
      */
     public static function featureEnabled(string $feature): bool {
         // We're going to enforce the root "Feature" namespace.
-        $configValue = self::c("Feature.{$feature}.Enabled");
+        $configValue = self::c(self::featureConfigKey($feature));
         // Force a true boolean.
         $result = filter_var($configValue, FILTER_VALIDATE_BOOLEAN);
         return $result;
+    }
+
+    /**
+     * Get the config key for a feature flag.
+     *
+     * @param string $feature
+     * @return string
+     */
+    public static function featureConfigKey(string $feature): string {
+        return "Feature.{$feature}.Enabled";
     }
 
     /**

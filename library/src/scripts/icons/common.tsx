@@ -548,6 +548,32 @@ export function ComposeIcon(props: { className?: string; "aria-hidden"?: areaHid
     );
 }
 
+export function AnalyticsIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
+    const classes = iconClasses();
+    return (
+        <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className={classNames(classes.standard, "icon-analytics", props.className)}
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
+        >
+            <title>{t("Analytics")}</title>
+            <path
+                d="M1 1.5V18.5C1 19.0523 1.44772 19.5 2 19.5H21"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+            />
+            <path d="M1 15L5.59459 9.76191L9.27027 15L14.7838 4L18 10.8095" stroke="currentColor" />
+            <circle cx="18" cy="10.5" r="1.5" fill="currentColor" />
+            <circle cx="14.7" cy="3.5" r="1.5" fill="currentColor" />
+            <circle cx="9.30005" cy="15.5" r="1.5" fill="currentColor" />
+            <circle cx="5.59998" cy="9.5" r="1.5" fill="currentColor" />
+        </svg>
+    );
+}
+
 export function PlusCircleIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
     const title = `+`;
     const classes = iconClasses();

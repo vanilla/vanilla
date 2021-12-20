@@ -25,6 +25,7 @@ export const callToActionClasses = useThemeCache((optionsOverrides?: DeepPartial
         flexDirection: "column",
         overflow: "hidden",
     });
+
     const isImageLeft = vars.options.imagePlacement === "left";
     const isImageTop = vars.options.imagePlacement === "top";
     const mediaQueries = vars.mediaQueries();
@@ -61,6 +62,12 @@ export const callToActionClasses = useThemeCache((optionsOverrides?: DeepPartial
     });
     const link = style("link", {
         ...Mixins.margin(vars.link.spacing),
+    });
+
+    const compactButton = style("compactButton", {
+        "&&": {
+            minWidth: 86,
+        },
     });
 
     const linksWrapper = style("linksWrapper", {
@@ -148,5 +155,6 @@ export const callToActionClasses = useThemeCache((optionsOverrides?: DeepPartial
         imageWidthConstraint,
         link,
         linksWrapper,
+        compactButton,
     };
 });

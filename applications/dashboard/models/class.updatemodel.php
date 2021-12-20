@@ -7,12 +7,20 @@
  * @package Dashboard
  * @since 2.0
  */
+
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Vanilla\Addon;
+use Vanilla\AddonManager;
+use Vanilla\AddonStructure;
 
 /**
  * Handles updating.
  */
-class UpdateModel extends Gdn_Model {
+class UpdateModel extends Gdn_Model implements LoggerAwareInterface {
+
+    use LoggerAwareTrait;
+
     const STATUS_RUNNING = 'running';
     const STATUS_SUCCESS = 'success';
     const STATUS_ERROR = 'error';
@@ -655,8 +663,9 @@ class UpdateModel extends Gdn_Model {
      */
     public function runStructure($captureOnly = false) {
         $this->saveStatus(self::STATUS_RUNNING);
+        $session = \Gdn::session();
 
-        $userID = Gdn::session()->UserID;
+        $originalUserID = $session->UserID;
         try {
             $r = $this->runStructureInternal($captureOnly);
             $this->saveStatus(self::STATUS_SUCCESS);
@@ -665,12 +674,12 @@ class UpdateModel extends Gdn_Model {
             $this->saveStatus(self::STATUS_ERROR, $ex->getMessage());
             throw $ex;
         } finally {
-            if ($userID && $userID !== Gdn::session()->UserID) {
-                Gdn::session()->start($userID, false, false);
-            } elseif (!$userID && null !== c('Garden.Installed', false)) {
+            if ($originalUserID && $originalUserID !== $session->UserID) {
+                $session->start($originalUserID, false, false);
+            } elseif (!$originalUserID && null !== c('Garden.Installed', false)) {
             // Vanilla has an alternate install method where this config value is set to null.
             // When this using this alternate install method we don't have authenticators configured and can't end the session.
-                Gdn::session()->end();
+                $session->end();
             }
         }
     }
@@ -680,7 +689,7 @@ class UpdateModel extends Gdn_Model {
      *
      * @param bool $captureOnly If **true** will just capture SQL.
      * @return array Returns an array of update SQL.
-     * @throws Exception Throws an exception if in debug mode.
+     * @throws Exception|Throwable Throws an exception if in debug mode.
      */
     private function runStructureInternal(bool $captureOnly): array {
         $addons = array_reverse(Gdn::addonManager()->getEnabled());
@@ -694,63 +703,71 @@ class UpdateModel extends Gdn_Model {
 
         /* @var Addon $addon */
         foreach ($addons as $addon) {
+            $logContext = [
+                'addonKey' => $addon->getKey(),
+                \Vanilla\Logger::FIELD_CHANNEL => \Vanilla\Logger::CHANNEL_SYSTEM,
+                \Vanilla\Logger::FIELD_EVENT => 'addon_structure',
+            ];
+
+            // Look for special structure classes
+            if ($specialClasses = $addon->getSpecialClasses()) {
+                foreach ($specialClasses->getStructureClasses() as $structureClass) {
+                    $this->logger->debug(
+                        "Executing structure for {addonKey}.",
+                        [ 'structureType' => 'class', 'structureClass' => $structureClass ] + $logContext
+                    );
+                    try {
+                        /** @var AddonStructure $structureInstance */
+                        $structureInstance = \Gdn::getContainer()->get($structureClass);
+                        // If this is the first setup using the alt-install, this is the initial setup of the addon.
+                        $isAddonEnabled = Gdn::config('Garden.Installed', false);
+                        $structureInstance->structure($isAddonEnabled);
+                    } catch (Throwable $e) {
+                        $this->handleThrowable($e);
+                    }
+                }
+            }
+
             // Look for a structure file.
             if ($structure = $addon->getSpecial('structure')) {
-                Logger::event(
-                    'addon_structure',
-                    Logger::DEBUG,
+                $structurePath = $addon->path($structure);
+                $this->logger->debug(
                     "Executing structure for {addonKey}.",
-                    [
-                        'addonKey' => $addon->getKey(),
-                        'structureType' => 'file',
-                        \Vanilla\Logger::FIELD_CHANNEL => \Vanilla\Logger::CHANNEL_SYSTEM,
-                    ]
+                    [ 'structureType' => 'file', 'structurePath' => $structurePath ] + $logContext
                 );
 
                 try {
-                    include $addon->path($structure);
+                    include $structurePath;
 
                     // Use the system user if specified.
                     $systemUserID = Gdn::userModel()->getSystemUserID();
                     if ($addon->getGlobalKey() === 'dashboard' && $systemUserID) {
                         Gdn::session()->start($systemUserID, false, false);
                     }
-                } catch (\Throwable $ex) {
-                    if (debug()) {
-                        throw $ex;
-                    } else {
-                        trigger_error("Error running structure: ".$ex->getMessage(), E_USER_WARNING);
-                    }
+                } catch (\Throwable $e) {
+                    $this->handleThrowable($e);
                 }
             }
 
             // Look for a structure method on the plugin.
-            if ($addon->getPluginClass()) {
+            if ($pluginClass = $addon->getPluginClass()) {
                 $plugin = Gdn::pluginManager()->getPluginInstance(
-                    $addon->getPluginClass(),
+                    $pluginClass,
                     Gdn_PluginManager::ACCESS_CLASSNAME
                 );
 
                 if (is_object($plugin) && method_exists($plugin, 'structure')) {
-                    Logger::event(
-                        'addon_structure',
-                        Logger::DEBUG,
+                    $this->logger->debug(
                         "Executing structure for {addonKey}.",
-                        [
-                            'addonKey' => $addon->getKey(),
-                            'structureType' => 'method',
-                            \Vanilla\Logger::FIELD_CHANNEL => \Vanilla\Logger::CHANNEL_SYSTEM
-                        ]
+                        ['structureType' => 'method', 'structureClass' => $pluginClass]
                     );
 
                     try {
                         call_user_func([$plugin, 'structure']);
                     } catch (BadMethodCallException $ex) {
                         // The structure method could not be called, probably because it wasn't public.
-                    } catch (\Exception $ex) {
-                        if (debug()) {
-                            throw $ex;
-                        }
+                    } catch (\Throwable $ex) {
+                        $this->handleThrowable($ex);
                     }
                 }
             }
@@ -758,15 +775,12 @@ class UpdateModel extends Gdn_Model {
             // Register permissions.
             $permissions = $addon->getInfoValue('registerPermissions');
             if (!empty($permissions)) {
-                Logger::event(
-                    'addon_permissions',
-                    Logger::INFO,
+                $this->logger->info(
                     "Defining permissions for {addonKey}.",
                     [
-                        'addonKey' => $addon->getKey(),
                         'permissions' => $permissions,
-                        Logger::FIELD_CHANNEL => Logger::CHANNEL_SYSTEM,
-                    ]
+                        \Vanilla\Logger::FIELD_EVENT => 'addon_permissions',
+                    ] + $logContext
                 );
                 Gdn::permissionModel()->define($permissions);
             }
@@ -777,6 +791,20 @@ class UpdateModel extends Gdn_Model {
             return $Structure->Database->CapturedSql;
         }
         return [];
+    }
+
+    /**
+     * Handle a throwable while structuring an addon.
+     *
+     * @param Throwable $ex
+     * @throws Throwable Throws Exception in debug mode.
+     */
+    private function handleThrowable(Throwable $ex) {
+        if (debug()) {
+            throw $ex;
+        } else {
+            trigger_error("Error running structure: ".$ex->getMessage(), E_USER_WARNING);
+        }
     }
 
     /**

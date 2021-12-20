@@ -10,12 +10,16 @@ namespace VanillaTests\APIv2;
 use Vanilla\Formatting\Formats\TextFormat;
 use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Web\PrivateCommunityMiddleware;
+use Vanilla\Web\RoleTokenAuthTrait;
 use VanillaTests\SiteTestCase;
 
 /**
  * Base API test case.
  */
 abstract class AbstractAPIv2Test extends SiteTestCase {
+
+    use RoleTokenAuthTrait;
+
     /**
      * @var bool Set to false before setUp() to skip the session->start();
      */
@@ -234,5 +238,24 @@ abstract class AbstractAPIv2Test extends SiteTestCase {
         if (is_int($count)) {
             $this->assertEquals($count, count($results));
         }
+    }
+
+    /**
+     * Get the response from the role token endpoint associated to the current user. Note that the role token issued
+     * is time-constrained so the tests that utilize this token must pass this token prior to its expiration,
+     * i.e. within two minutes or so, otherwise the test will fail due to token expiration.
+     *
+     * @return array Associative single element array containing the role token's query param name as the key
+     * and the encoded role token JWT as the value.
+     * @throws \Garden\Container\ContainerException Container Exception.
+     * @throws \Garden\Container\NotFoundException Not Found Exception.
+     */
+    public function getRoleTokenResponseBody(): array {
+        /* @var \Gdn_Session $session */
+        $session = static::container()->get(\Gdn_Session::class);
+        $this->assertTrue($session->isValid(), "Cannot obtain a role token without a user specified in the session");
+        $tokenResponse = $this->api()->post("/tokens/roles");
+        $this->assertTrue($tokenResponse->isSuccessful());
+        return $tokenResponse->getBody();
     }
 }

@@ -7,13 +7,21 @@
 
 namespace Vanilla\Models;
 
+use Psr\SimpleCache\CacheInterface;
+use Symfony\Component\Cache\Adapter\Psr16Adapter;
+use Symfony\Contracts\Cache\ItemInterface;
+use Vanilla\Cache\CacheCacheAdapter;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\InjectableInterface;
 
 /**
  * Cache for records out of various models.
  *
- * Particularly good support for PipelineModel.
+ * Features:
+ * - Can give an invalidation processor for the pipeline model.
+ * - Uses symfony cache contracts:
+ *   - A lock is aquired when calculating a cache value to prevent instances contending for resources to generate the same value.
+ *   - Values may be recalculated early on random requests to prevent the value from expiring.
  */
 class ModelCache implements InjectableInterface {
 
@@ -35,8 +43,11 @@ class ModelCache implements InjectableInterface {
     /** @var array */
     private $defaultCacheOptions;
 
-    /** @var \Gdn_Cache */
+    /** @var CacheInterface */
     private $cache;
+
+    /** @var \Symfony\Contracts\Cache\CacheInterface */
+    private $cacheContract;
 
     /** @var bool */
     private $isFeatureDisabled;
@@ -49,7 +60,9 @@ class ModelCache implements InjectableInterface {
      * @param array $defaultCacheOptions Default options to apply for storing cache values.
      */
     public function __construct(string $cacheNameSpace, \Gdn_Cache $cache, array $defaultCacheOptions = []) {
-        $this->setCache($cache);
+        $this->cache = new CacheCacheAdapter($cache);
+        $cacheContract = new Psr16Adapter($this->cache, $cacheNameSpace);
+        $this->setCacheContract($cacheContract);
         $this->cacheNameSpace = $cacheNameSpace;
         $this->defaultCacheOptions = array_merge(self::GLOBAL_DEFAULT_OPTIONS, $defaultCacheOptions ?? []);
         $this->isFeatureDisabled = FeatureFlagHelper::featureEnabled(self::DISABLE_FEATURE_FLAG);
@@ -72,7 +85,7 @@ class ModelCache implements InjectableInterface {
      *
      * If the record can't be found, we hydrate it with the $hydrate callable and return it.
      *
-     * @param array $keyArgs The arguments to build the cache key.
+     * @param array $args The arguments to build the cache key.
      * @param callable $hydrate A callable to hydrate the cache.
      * @param array $cacheOptions Options for the cache storage.
      *
@@ -86,22 +99,19 @@ class ModelCache implements InjectableInterface {
                 return call_user_func_array($hydrate, $args);
             }
         }
-
+        $ttl = $cacheOptions[\Gdn_Cache::FEATURE_EXPIRY] ?? $this->defaultCacheOptions[\Gdn_Cache::FEATURE_EXPIRY];
         $key = $this->createCacheKey($args);
-        $result = $this->cache->get($key);
-
-        if ($result === \Gdn_Cache::CACHEOP_FAILURE) {
+        $result = $this->cacheContract->get($key, function (ItemInterface $item) use ($args, $hydrate, $ttl) {
             if (empty($args)) {
                 $result = $hydrate();
             } else {
                 $result = call_user_func_array($hydrate, $args);
             }
-            $options = array_merge($this->defaultCacheOptions, $cacheOptions);
-            $this->cache->store($key, serialize($result), $options);
-        } else {
-            $result = unserialize($result);
-        }
-
+            $result = serialize($result);
+            $item->expiresAfter($ttl);
+            return $result;
+        });
+        $result = unserialize($result);
         return $result;
     }
 
@@ -122,10 +132,10 @@ class ModelCache implements InjectableInterface {
     }
 
     /**
-     * @param \Gdn_Cache $cache
+     * @param \Symfony\Contracts\Cache\CacheInterface $cacheContract
      */
-    public function setCache(\Gdn_Cache $cache): void {
-        $this->cache = $cache;
+    public function setCacheContract(\Symfony\Contracts\Cache\CacheInterface $cacheContract): void {
+        $this->cacheContract = $cacheContract;
     }
 
     /**
@@ -139,13 +149,7 @@ class ModelCache implements InjectableInterface {
         }
 
         $incrementKeyCacheKey = self::INCREMENTING_KEY_NAMESPACE . '-' . $this->cacheNameSpace;
-        $result = $this->cache->get($incrementKeyCacheKey);
-
-        if ($result === \Gdn_Cache::CACHEOP_FAILURE) {
-            $result = 0;
-        }
-
-        $this->cache->store($incrementKeyCacheKey, $result);
+        $result = $this->cache->get($incrementKeyCacheKey, 0);
         return $result;
     }
 
@@ -156,15 +160,14 @@ class ModelCache implements InjectableInterface {
         if ($this->isFeatureDisabled) {
             return;
         }
-        $key = $this->getIncrementingKey();
 
-        $newKey = $key + 1;
+        $incrementKeyCacheKey = self::INCREMENTING_KEY_NAMESPACE . '-' . $this->cacheNameSpace;
+        $existingKey = $this->getIncrementingKey();
+        $newKey = $existingKey + 1;
         if ($newKey > self::MAX_INCREMENTING_KEY) {
             // Restart from 0.
             $newKey = 0;
         }
-
-        $incrementKeyCacheKey = self::INCREMENTING_KEY_NAMESPACE . '-' . $this->cacheNameSpace;
-        $this->cache->store($incrementKeyCacheKey, $newKey);
+        $this->cache->set($incrementKeyCacheKey, $newKey);
     }
 }

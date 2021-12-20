@@ -10,4 +10,11 @@ namespace Vanilla\Web;
  * Signal that this class has opted into System job calls.
  */
 interface SystemCallableInterface {
+
+    /**
+     * Get the array of system callable method names.
+     *
+     * @return string[]
+     */
+    public static function getSystemCallableMethods(): array;
 }

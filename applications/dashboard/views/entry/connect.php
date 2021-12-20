@@ -24,7 +24,7 @@ if (!$hasUserID) {
     $NoConnectName = $this->data('NoConnectName');
 
     // You just landed on this page.
-    $firstTimeHere = !($this->Form->isPostBack() && $this->Form->getFormValue('Connect', null) !== null);
+    $firstTimeHere = !$this->isConnectPostBack();
     $connectNameProvided = (bool)$this->Form->getFormValue('ConnectName');
 
     $validationResults = $this->Form->validationResults();
@@ -136,8 +136,10 @@ if (!$hasUserID) {
                     // No Name was passed over SSO and...
                     // No Users were found in GDN_User
                     if (count($ExistingUsers) === 0 && !$NoConnectName) {
-                        echo \Gdn::translate('ConnectChooseName', 'Choose a name to identify yourself on the site.');
+                        echo $this->Form->label('Username', 'ConnectName');
+                        echo wrap(\Gdn::translate('ConnectChooseName', 'Choose a name to identify yourself on the site.'), 'div', ['class' => 'FinePrint']);
                         echo $this->Form->textbox('ConnectName', ["aria-label" => t("Username")]);
+
                     }
                     ?>
                 </li>

@@ -10,11 +10,14 @@ namespace VanillaTests\Storybook;
 use Nette\Utils\FileSystem;
 use Vanilla\Formatting\Html\HtmlDocument;
 use VanillaTests\APIv2\AbstractAPIv2Test;
+use VanillaTests\Library\Vanilla\Formatting\HtmlNormalizeTrait;
 
 /**
  * Base test case for generating storybook data.
  */
 abstract class StorybookGenerationTestCase extends AbstractAPIv2Test {
+
+    use HtmlNormalizeTrait;
 
     const STORYBOOK_BASE_PATH = PATH_ROOT . '/build/.storybookAppPages';
 
@@ -27,7 +30,6 @@ abstract class StorybookGenerationTestCase extends AbstractAPIv2Test {
     protected static function getBootstrapFolderName() {
         return "";
     }
-
 
     /**
      * Generate story HTML from an application URL.
@@ -53,7 +55,11 @@ abstract class StorybookGenerationTestCase extends AbstractAPIv2Test {
         $this->assertInstanceOf(\DOMElement::class, $bodyNode);
 
         $cssFiles = $this->extractLegacyCssFiles($htmlDocument);
-        $this->assertNotEmpty($cssFiles, "Something went wrong extracting the page's legacy CSS files.");
+        $this->assertNotEmpty(
+            $cssFiles,
+            "Something went wrong extracting the page's legacy CSS files.\nHTML document:\n"
+            . $htmlDocument->getRawHtml()
+        );
         $bodyClasses = $bodyNode->getAttribute("class") ?? "";
         $data = [
             'cssFiles' => $cssFiles,
@@ -66,6 +72,7 @@ abstract class StorybookGenerationTestCase extends AbstractAPIv2Test {
         $dataPath = $writeBase . '.json';
 
         $bodyContent = $htmlDocument->getOuterHtml($bodyNode);
+        $bodyContent = $this->minifyHTML($bodyContent);
         FileSystem::write($htmlPath, $bodyContent, 0777);
         FileSystem::write($dataPath, $dataJson, 0777);
 

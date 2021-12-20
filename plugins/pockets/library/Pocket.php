@@ -4,13 +4,17 @@
  * @license GPL-2.0-only
  */
 
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Vanilla\Addons\Pockets\PocketsModel;
 use Vanilla\Widgets\WidgetService;
 
 /**
  * Class Pocket
  */
-class Pocket {
+class Pocket implements LoggerAwareInterface {
+
+    use LoggerAwareTrait;
 
     const ENABLED = 0;
     const DISABLED = 1;
@@ -90,7 +94,7 @@ class Pocket {
      */
     public function __construct(WidgetService $widgetService) {
         $this->widgetService = $widgetService;
-
+        $this->setLogger(Logger::getLogger());
     }
 
     /**
@@ -338,7 +342,10 @@ class Pocket {
             case PocketsModel::FORMAT_WIDGET:
                 $factory = $this->widgetService->getFactoryByID($this->widgetID);
                 if (!$factory) {
-                    trigger_error("Could not find widget factory for pocket {$this->Name}", E_USER_WARNING);
+                    $this->logger->warning("Could not find widget factory for pocket", [
+                        'pocketName' => $this->Name,
+                        'widgetID' => $this->widgetID,
+                    ]);
                     return '';
                 }
                 $output = $factory->renderWidget($this->widgetParameters);

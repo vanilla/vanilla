@@ -37,11 +37,15 @@ class AccessTokenModelTest extends SharedBootstrapTestCase {
      * @depends testIssueAndVerify
      */
     public function testRevoke($token) {
+        $model = new AccessTokenModel('sss');
+        $row = $model->verify($token);
+        $this->assertTrue($model->revoke($token));
+
+        $tokenRow = $model->getID($row['AccessTokenID']);
+        $this->assertTrue($tokenRow['Attributes']['revoked'], "The access token should have been marked revoked.");
+
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Your access token was revoked.');
-
-        $model = new AccessTokenModel('sss');
-        $this->assertTrue($model->revoke($token));
         $model->verify($token, true);
     }
 

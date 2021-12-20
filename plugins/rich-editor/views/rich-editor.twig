@@ -1,0 +1,28 @@
+<div
+    class="richEditor isDisabled"
+    aria-label="{{ t('Type your message') }}"
+    data-id="{{ editorID }}"
+    data-uploadenabled="{{ uploadEnabled }}"
+    aria-describedby="{{ descriptionID }}"
+    aria-multiline="true"
+    data-needshtmlconversion="{{ needsHtmlConversion|default(false) }}"
+>
+    <p id="{{ descriptionID }}" class="sr-only">
+        {{ t("richEditor.description.title") }}
+        {{ t("richEditor.description.paragraphMenu") }}
+        {{ t("richEditor.description.inlineMenu") }}
+        {{ t("richEditor.description.embed") }}
+    </p>
+    <div class="richEditor-frame InputBox">
+        <div class="richEditor-textWrap">
+            <div
+                class="ql-editor richEditor-text userContent isDisabled"
+                data-gramm="false"
+                contenteditable="false"
+                disabled="disabled"
+                data-placeholder="Create a new post..."
+                tabindex="0">
+            </div>
+        </div>
+    </div>
+</div>

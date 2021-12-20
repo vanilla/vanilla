@@ -136,13 +136,14 @@ class MorePagerModule extends PagerModule {
      * Format a URL for the pager.
      *
      * @param string $url
-     * @param int $offset
+     * @param int $page
      * @param int $limit
      * @param int $count
      * @return string
      * @deprecated This method differs from its parent. Please consider it for use in this class only.
      */
-    public static function formatUrl($url, $offset, $limit = 0, $count = 0) {
+    public static function formatUrl($url, $page, $limit = 0, $count = 0) {
+        $offset = $page;
         $page = pageNumber($offset, $limit, true);
         $data = [
             'offset' => $offset,

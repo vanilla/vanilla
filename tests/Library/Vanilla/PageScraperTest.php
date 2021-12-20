@@ -7,13 +7,18 @@
 namespace VanillaTests\Library\Vanilla;
 
 use Exception;
-use Garden\Http\HttpRequest;
-use VanillaTests\SharedBootstrapTestCase;
+use Garden\Http\HttpResponse;
+use Garden\Http\Mocks\MockHttpClient;
+use Vanilla\PageScraper;
+use VanillaTests\BootstrapTestCase;
 use VanillaTests\Fixtures\LocalFilePageScraper;
 use Vanilla\Metadata\Parser\OpenGraphParser;
 use Vanilla\Metadata\Parser\JsonLDParser;
 
-class PageScraperTest extends SharedBootstrapTestCase {
+/**
+ * Tests for the PageScraper.
+ */
+class PageScraperTest extends BootstrapTestCase {
 
     /** @var string Directory of test HTML files. */
     const HTML_DIR = PATH_ROOT.'/tests/fixtures/html';
@@ -23,10 +28,11 @@ class PageScraperTest extends SharedBootstrapTestCase {
      *
      * @return LocalFilePageScraper
      */
-    private function pageScraper() {
+    private function pageScraper(): LocalFilePageScraper {
         // Create the test instance. Register the metadata handlers.
         $pageScraper = self::container()->get(LocalFilePageScraper::class);
         $pageScraper->setHtmlDir(self::HTML_DIR);
+
         $pageScraper->registerMetadataParser(new OpenGraphParser());
         $pageScraper->registerMetadataParser(new JsonLDParser());
         return $pageScraper;
@@ -65,7 +71,8 @@ class PageScraperTest extends SharedBootstrapTestCase {
                 'no-description.htm',
                 [
                     'Title' => 'I am a standard title.',
-                    'Description' => 'I am a description. Instead of being part of the document head, I am inside the page contents. This is not ideal and is only a fallback for pages without proper meta descriptors.',
+                    'Description' => 'I am a description. Instead of being part of the document head, I am inside the page contents.'
+                                    .' This is not ideal and is only a fallback for pages without proper meta descriptors.',
                     'Images' => [],
                     'isCacheable' => true
                 ]
@@ -74,7 +81,8 @@ class PageScraperTest extends SharedBootstrapTestCase {
                 'og.htm',
                 [
                     'Title' => 'Online Community Software and Customer Forum Software by Vanilla Forums',
-                    'Description' => 'Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.',
+                    'Description' => 'Engage your customers with a vibrant and modern online customer community forum.'
+                                    .' A customer community helps to increases loyalty, reduce support costs and deliver feedback.',
                     'Images' => ['https://vanillaforums.com/images/metaIcons/vanillaForums.png'],
                     'isCacheable' => true
                 ]
@@ -97,11 +105,11 @@ class PageScraperTest extends SharedBootstrapTestCase {
      *
      * @param string $file
      * @param array $expected
-     * @throws Exception if there was an error loading the file.
      * @dataProvider provideInfoData
      */
     public function testFetch(string $file, array $expected) {
         $pageScraper = $this->pageScraper();
+
         $result = $pageScraper->pageInfo($file);
         $expected["Url"] = $file;
         $this->assertEquals($expected, $result);
@@ -114,7 +122,7 @@ class PageScraperTest extends SharedBootstrapTestCase {
      * @return array Returns page info.
      * @throws Exception Throws an exception if there was a non-recoverable error scraping.
      */
-    protected function scrapeFile(string $file) {
+    protected function scrapeFile(string $file): array {
         $scraper = $this->pageScraper();
         $result = $scraper->pageInfo($file);
         return $result;
@@ -138,7 +146,7 @@ class PageScraperTest extends SharedBootstrapTestCase {
      *
      * @return array Returns a data provider.
      */
-    public function provideUnicodeFiles() {
+    public function provideUnicodeFiles(): array {
         $r = [['unicode.htm'], ['unicode-xml.htm'], ['unicode-no-hint.htm'], ['unicode-xml-comment.htm'], ['unicode-http-equiv.htm']];
 
         return array_column($r, null, 0);
@@ -161,8 +169,120 @@ class PageScraperTest extends SharedBootstrapTestCase {
      *
      * @return array Returns a data provider.
      */
-    public function provideKOI8RFiles() {
+    public function provideKOI8RFiles(): array {
         $r = [['koi8-1.htm'], ['koi8-2.htm'], ['koi8-3.htm']];
         return array_column($r, null, 0);
+    }
+
+    /**
+     * Populate mock HTML client with possible returns.
+     *
+     * @return PageScraper page scraper
+     * @throws \Garden\Container\ContainerException Container exception.
+     * @throws \Garden\Container\NotFoundException Not found exception.
+     */
+    public function populateMockHttpClientScraper(): PageScraper {
+        $mockHttpClient = new MockHttpClient();
+        /** @var PageScraper $pageScraper */
+        $pageScraper = \Gdn::getContainer()->getArgs(PageScraper::class, ['httpClient' => $mockHttpClient]);
+        $mockHttpClient->addMockResponse("https://test.com/fails", new HttpResponse(403, [], "
+            <html lang='en-us'>
+                <head>
+                    <title>No permission to access resource</title>
+                    <meta name='description' content='Try again later'>
+                </head>
+                <body></body>
+            </html>
+        "));
+
+        $mockHttpClient->addMockResponse("https://test.com/robots.txt", new HttpResponse(200, [], "
+            # If you would like to crawl GitHub contact us via https://support.github.com/contact/
+# We also provide an extensive API: https://docs.github.com
+User-agent: baidu
+crawl-delay: 1
+
+
+User-agent: *
+
+Allow: /fails
+Disallow: /disallow
+        "));
+        return $pageScraper;
+    }
+
+    /**
+     * Test error handling of the page scraper.
+     */
+    public function testErrorHandling() {
+        /** @var PageScraper $pageScraper */
+        $pageScraper = $this->populateMockHttpClientScraper();
+
+        try {
+            $pageScraper->pageInfo("https://test.com/fails");
+        } catch (Exception $e) {
+            $caught = $e;
+        }
+
+        if (!isset($caught) || !$caught instanceof \JsonSerializable) {
+            $this->fail('No serializable exception was thrown.');
+        } else {
+            $serialized = $caught->jsonSerialize();
+            $this->assertEquals([
+                'message' => 'Site \'test.com\' did not respond successfully.',
+                'status' => 403,
+                'description' => 'No permission to access resource: Try again later',
+            ], $serialized);
+        }
+    }
+
+
+    /**
+     * Test deny url from robots.txt on the page scraper.
+     */
+    public function testRobotsDenyHandling() {
+        /** @var PageScraper $pageScraper */
+        $pageScraper = $this->populateMockHttpClientScraper();
+
+        try {
+            $pageScraper->pageInfo("https://test.com/disallow");
+        } catch (Exception $e) {
+            $caught = $e;
+        }
+
+        if (!isset($caught) || !$caught instanceof \JsonSerializable) {
+            $this->fail('No serializable exception was thrown.');
+        } else {
+            $serialized = $caught->jsonSerialize();
+            $this->assertEquals([
+                'message' => "Site's 'test.com' robots.txt did not allow access to the url.",
+                'status' => 403,
+                'description' => "robots.txt"
+            ], $serialized);
+        }
+    }
+
+    /**
+     * Test allow of Url via robots.txt file of the page scraper.
+     */
+    public function testRobotsAllowHandling() {
+        /** @var PageScraper $pageScraper */
+        $pageScraper = $this->populateMockHttpClientScraper();
+
+        try {
+            $pageScraper->pageInfo("https://test.com/fails");
+        } catch (Exception $e) {
+            $caught = $e;
+        }
+
+        if (!isset($caught) || !$caught instanceof \JsonSerializable) {
+            $this->fail('No serializable exception was thrown.');
+        } else {
+                $serialized = $caught->jsonSerialize();
+                $this->assertEquals([
+                    'message' => 'Site \'test.com\' did not respond successfully.',
+                    'status' => 403,
+                    'description' => 'No permission to access resource: Try again later',
+                ], $serialized);
+        }
     }
 }

@@ -6,8 +6,12 @@
 
 use Garden\Schema\Schema;
 use Garden\Web\Exception\ClientException;
+use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
+use Garden\Web\RequestInterface;
 use Vanilla\ApiUtils;
+use Vanilla\CurrentTimeStamp;
+use Vanilla\Web\RoleTokenFactory;
 
 /**
  * API Controller for the `/tokens` resource.
@@ -26,6 +30,12 @@ class TokensApiController extends AbstractApiController {
     /** @var AccessTokenModel */
     private $accessTokenModel;
 
+    /** @var UserModel $userModel */
+    private $userModel;
+
+    /** @var RoleTokenFactory $roleTokenFactory */
+    private $roleTokenFactory;
+
     /** @var Schema */
     private $fullSchema;
 
@@ -36,9 +46,17 @@ class TokensApiController extends AbstractApiController {
      * TokensApiController constructor.
      *
      * @param AccessTokenModel $accessTokenModel
+     * @param UserModel $userModel
+     * @param RoleTokenFactory $roleTokenFactory
      */
-    public function __construct(AccessTokenModel $accessTokenModel) {
+    public function __construct(
+        AccessTokenModel $accessTokenModel,
+        UserModel $userModel,
+        RoleTokenFactory $roleTokenFactory
+    ) {
         $this->accessTokenModel = $accessTokenModel;
+        $this->userModel = $userModel;
+        $this->roleTokenFactory = $roleTokenFactory;
     }
 
     /**
@@ -239,6 +257,36 @@ class TokensApiController extends AbstractApiController {
         $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
         return $result;
+    }
+
+    /**
+     * Create a new time-scoped role token (JWT) based on the current user's roles
+     *
+     * @param RequestInterface $request Initiating request
+     * @return array
+     * @throws ForbiddenException Request initiated from guest user.
+     * @throws \Garden\Schema\ValidationException Validation Failed.
+     */
+    public function post_roles(RequestInterface $request) : array {
+        if (!$this->getSession()->isValid()) {
+            throw new ForbiddenException("Must be logged in to create a role token");
+        }
+
+        $in = $this->schema([], 'in')->setDescription("Issue a role token for the current user");
+        $out = $this->schema([
+            'roleToken:s' => "A signed JWT issued for the current user containing the set of roles assigned ".
+                "to this user in its claims",
+            'expires:dt' => 'DateTime when issued JWT expires'
+        ], 'out');
+
+        $roleIDs = $this->userModel->getRoleIDs($this->getSession()->UserID);
+        $roleToken = $this->roleTokenFactory->forEncoding($roleIDs, $request);
+        $response = [
+            'roleToken' => $roleToken->encode(),
+            'expires' => $roleToken->getExpires()
+        ];
+
+        return $out->validate($response);
     }
 
     /**

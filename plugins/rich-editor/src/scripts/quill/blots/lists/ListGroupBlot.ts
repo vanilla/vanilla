@@ -4,8 +4,10 @@
  * @license gpl-2.0-only
  */
 
+import { current } from "@reduxjs/toolkit";
 import WrapperBlot from "@rich-editor/quill/blots/abstract/WrapperBlot";
 import { ListItemWrapperBlot } from "@rich-editor/quill/blots/lists/ListItemWrapperBlot";
+import { ListLineBlot } from "@rich-editor/quill/blots/lists/ListLineBlot";
 import Container from "quill/blots/container";
 import { IListObjectValue, syncValueToElement, getValueFromElement, ListTag, ListBlotType } from "./ListUtils";
 
@@ -101,7 +103,33 @@ export abstract class ListGroupBlot extends WrapperBlot {
      * Utility for getting the value from the blot's domNode.
      */
     public getValue(): IListObjectValue {
-        return getValueFromElement(this.domNode);
+        const savedValue = getValueFromElement(this.domNode);
+        return savedValue;
+    }
+
+    /**
+     * Get the HTML list depth of our list.
+     *
+     * It's possible that our data comes in as an invalid list.
+     * For example like this
+     * - item 1 (depth 4)
+     * - item 2 (depth 3)
+     * - item 3 (depth 4)
+     * Particularly if the first list element isn't depth 0
+     * Our optimize() loop can go on infinitely.
+     * In optimize we can't actually change any data, just the HTML.
+     */
+    public getHtmlListDepth(): number {
+        let depth = 0;
+        let currentBlot = this.parent;
+        while (currentBlot && currentBlot !== this.scroll) {
+            if (currentBlot instanceof ListGroupBlot) {
+                depth++;
+            }
+            currentBlot = currentBlot.parent;
+        }
+
+        return depth;
     }
 }
 

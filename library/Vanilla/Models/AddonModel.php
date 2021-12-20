@@ -17,6 +17,7 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
+use Vanilla\AddonStructure;
 use Vanilla\Logger;
 
 /**
@@ -187,20 +188,20 @@ class AddonModel implements LoggerAwareInterface {
         $this->addonManager->startAddon($addon);
 
         // Load bootstrap file.
-        if ($bootstrap = $addon->getSpecial('bootstrap')) {
-            include_once $addon->path($bootstrap, Addon::PATH_FULL);
-        }
+        $force = !empty($options['force']);
+        $shouldSkipContainer = !empty($options['skipContainer']);
+        if (!$wasEnabled || ($force && !$shouldSkipContainer)) {
+            $addon->configureContainer($this->container);
 
-        $this->runSetup($addon);
-        $this->enableInConfig($addon, true, $options);
-        if ($pluginClass = $addon->getPluginClass()) {
-            $this->events->bindClass($pluginClass, $addon->getPriority());
-
-            // Fire some main events on the plugin.
-            if (!$wasEnabled) {
+            $addon->bindEvents($this->events);
+            if ($pluginClass = $addon->getPluginClass()) {
                 $this->callBootstrapEvents($pluginClass);
             }
         }
+
+
+        $this->runSetup($addon);
+        $this->enableInConfig($addon, true, $options);
 
         if (!$wasEnabled) {
             $this->logger->info(
@@ -238,6 +239,24 @@ class AddonModel implements LoggerAwareInterface {
     private function runSetup(Addon $addon) {
         // Look for a setup method.
         $called = $this->callPluginMethod($addon, 'setup');
+
+        $specialClasses = $addon->getSpecialClasses();
+        if ($specialClasses !== null) {
+            foreach ($specialClasses->getStructureClasses() as $structureClass) {
+                $this->logger->debug(
+                    "Executing structure for {addonKey}.",
+                    [
+                        'event' => 'addon_structure',
+                        'addonKey' => $addon->getKey(),
+                        'structureType' => 'class',
+                        Logger::FIELD_CHANNEL => Logger::CHANNEL_SYSTEM,
+                    ]
+                );
+                /** @var AddonStructure $structureInstance */
+                $structureInstance = $this->container->get($structureClass);
+                $structureInstance->structure(true);
+            }
+        }
 
         // @TODO This if is a kludge because Vanilla's core applications are inconsistent.
         // Once the InstallModel is in use this code can be cleaned up by manual structure inclusion in addons.
@@ -400,9 +419,7 @@ class AddonModel implements LoggerAwareInterface {
 
         // 3. Disable it.
         $this->enableInConfig($addon, false, $options);
-        if ($addon->getPluginClass()) {
-            $this->events->unbindClass($addon->getPluginClass());
-        }
+        $addon->unbindEvents($this->events);
         $this->addonManager->stopAddon($addon);
 
         // 4. Log the disable.
@@ -492,7 +509,7 @@ class AddonModel implements LoggerAwareInterface {
 
         // Do a bit of optimization depending on the filter.
         if ($where['addonID']) {
-            list($key, $type) = Addon::splitGlobalKey($where['addonID']);
+            [$key, $type] = Addon::splitGlobalKey($where['addonID']);
             $addons = [$am->lookupByType($key, $type)];
         } elseif ($where['enabled'] && $where['type'] === Addon::TYPE_THEME) {
             $addons = [$am->lookupTheme($this->getThemeKey($where['themeType']))];

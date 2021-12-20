@@ -60,6 +60,7 @@ class AltTest extends AbstractAPIv2Test {
         $config = $this->getBaseConfig($apiv0);
         $config['Feature']['updateTokens']['Enabled'] = $enabled;
         $config['Garden']['UpdateToken'] = $updateToken;
+        $config['Debug'] = true;
 
         $apiv0->saveToConfig($config);
         $r = $apiv0->post('/utility/update.json', ['updateToken' => $postUpdateToken])->getBody();

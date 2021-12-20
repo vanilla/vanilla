@@ -59,9 +59,18 @@ export function userContentMixin(): CSSObject {
         },
         ["& ul"]: {
             listStyle: "disc",
+            /**
+             * This forces the unordered list to take up the remaining space when
+             * an embed is floated. Its important for this element to have the correct
+             * width because its child list items use an pseudo element to draw the
+             * list marker
+             */
+            display: "flex",
+            flexDirection: "column",
             ...{
                 [`& > li`]: {
-                    listStyle: "none",
+                    // There are unrelated !important styles in _style.scss which is overrides
+                    listStyle: "none!important",
                     position: "relative",
                 },
                 [`& > li::before`]: {
@@ -130,7 +139,7 @@ export function userContentMixin(): CSSObject {
             },
         },
 
-        "&& > *:not(:last-child):not(.embedResponsive)": {
+        "&& > *:not(:last-child):not(.embedResponsive):not(.emoji)": {
             marginBottom: vars.blocks.margin,
         },
 
@@ -418,36 +427,36 @@ export function userContentMixin(): CSSObject {
     );
 
     const root: CSSObject = {
-        ...{
-            // These CAN'T be flexed. That breaks margin collapsing.
-            display: important("block"),
-            position: "relative",
+        position: "relative",
+        width: percent(100),
+        wordBreak: "break-word",
+        ...Mixins.font({
+            size: vars.fonts.size,
+            lineHeight: globalVars.lineHeights.base,
+            color: ColorsUtils.colorOut(globalVars.mainColors.fg),
+        }),
+        marginTop: lineHeightAdjustment()["::before"]?.marginTop,
+        // A placeholder might be put in a ::before element. Make sure we match the line-height adjustment.
+        "& iframe": {
             width: percent(100),
-            wordBreak: "break-word",
-            ...Mixins.font({
-                size: vars.fonts.size,
-                lineHeight: globalVars.lineHeights.base,
-                color: ColorsUtils.colorOut(globalVars.mainColors.fg),
-            }),
-            marginTop: lineHeightAdjustment()["::before"]?.marginTop,
-            ...{
-                // A placeholder might be put in a ::before element. Make sure we match the line-height adjustment.
-                "& iframe": {
-                    width: percent(100),
-                },
-                ...tables,
-                ...headings,
-                ...lists,
-                ...paragraphSpacing,
-                ...codeStyles,
-                ...spoilersAndQuotes,
-                ...embeds,
-                ...blockquotes,
-                ...linkStyle,
-            },
         },
+        ...tables,
+        ...headings,
+        ...lists,
+        ...paragraphSpacing,
+        ...codeStyles,
+        ...spoilersAndQuotes,
+        ...embeds,
+        ...blockquotes,
+        ...linkStyle,
         ...tableOuterRadiusQuery,
         ...tableMobileQuery,
+        // These CAN'T be flexed. That breaks margin collapsing.
+        display: "block !important",
+        "&.Hidden": {
+            // In case some legacy code tries to hide us.
+            display: "none !important",
+        },
     };
 
     return root;

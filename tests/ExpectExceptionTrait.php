@@ -28,7 +28,13 @@ trait ExpectExceptionTrait {
             $caught = $e;
         }
 
-        $this->assertInstanceOf($expectedClass, $caught, 'Expected an ' . $expectedClass . ' to occur.');
+        TestCase::assertNotNull($caught, 'Expected to catch an exception, but none was thrown.');
+
+        TestCase::assertInstanceOf(
+            $expectedClass,
+            $caught,
+            'Expected an ' . $expectedClass . " to occur. Instead caught:\n" . formatException($caught)
+        );
     }
 
     /**
@@ -46,6 +52,10 @@ trait ExpectExceptionTrait {
         }
 
         TestCase::assertInstanceOf(\Exception::class, $caught);
-        TestCase::assertEquals($expectedCode, $caught->getCode());
+        TestCase::assertEquals(
+            $expectedCode,
+            $caught->getCode(),
+            "Exception did not have the correct return code. Instead caught:\n" . formatException($caught)
+        );
     }
 }

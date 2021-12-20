@@ -7,6 +7,8 @@
 
 namespace VanillaTests;
 
+use Garden\Container\Container;
+
 /**
  * A base class for tests that require Vanilla to be installed.
  *

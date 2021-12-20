@@ -34,11 +34,12 @@ import { Variables } from "@library/styles/Variables";
 import { BorderType, singleBorder } from "@library/styles/styleHelpersBorders";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { notEmpty } from "@vanilla/utils";
-import { activeSelector } from "@library/styles/styleUtils";
+import { activeSelector, getPixelNumber } from "@library/styles/styleUtils";
 import { negativeUnit } from "@library/styles/styleUnit";
 import { internalAbsoluteMixins } from "@library/styles/MixinsAbsolute";
 import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
 import { IButton } from "@library/forms/styleHelperButtonInterface";
+import { extendItemContainer } from "@library/styles/styleHelpersSpacing";
 
 export class Mixins {
     constructor() {
@@ -94,10 +95,23 @@ export class Mixins {
             "--has-background": hasBackground ? "true" : "false",
             "--has-full-outline": hasFullOutline ? "true" : "false",
         };
+
+        let extraSpacingCSS: CSSObject = {};
+
+        if (borderType === BorderType.SEPARATOR) {
+            const extraSpacing = globalVars.spacer.componentInner / 2;
+            spacing = {
+                ...spacing,
+                left: getPixelNumber(spacing.all ?? spacing.horizontal ?? spacing.left ?? 0, 0) + extraSpacing,
+                right: getPixelNumber(spacing.all ?? spacing.horizontal ?? spacing.right ?? 0, 0) + extraSpacing,
+            };
+            extraSpacingCSS = extendItemContainer(extraSpacing);
+        }
         const paddingCss: CSSObject = {
             ...debuggingProperties,
             padding: 0,
             ...Mixins.padding(spacing),
+            ...extraSpacingCSS,
         };
         const otherCss: CSSObject = {
             ...debuggingProperties,
@@ -148,8 +162,8 @@ export class Mixins {
         }
 
         return {
-            ...paddingCss,
             ...otherCss,
+            ...paddingCss,
         };
     };
 
@@ -333,8 +347,9 @@ export class Mixins {
         }
     }
 
-    static fontFamilyWithDefaults(fontFamilies: string[], options: { isMonospaced?: boolean } = {}): string {
-        return fontFamilies
+    static fontFamilyWithDefaults(fontFamilies: string | string[], options: { isMonospaced?: boolean } = {}): string {
+        const fontFamiliesAsArray = Array.isArray(fontFamilies) ? fontFamilies : [fontFamilies];
+        return fontFamiliesAsArray
             .concat(options.isMonospaced ? monoFallbacks : fontFallbacks)
             .map((font) => (font.includes(" ") && !font.includes('"') ? `"${font}"` : font))
             .join(", ");

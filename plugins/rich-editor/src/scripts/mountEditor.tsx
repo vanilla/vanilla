@@ -19,7 +19,8 @@ export default function mountEditor(containerSelector: string | Element, descrip
     const bodybox = container.closest("form")!.querySelector(".BodyBox");
     const placeholder = bodybox?.getAttribute("placeholder") ?? undefined;
 
-    const uploadEnabled = container.dataset.uploadenabled as boolean | undefined;
+    const uploadEnabled = !!container.dataset.uploadenabled;
+    const needsHtmlConversion = !!container.dataset.needshtmlconversion;
 
     if (!bodybox) {
         throw new Error("Could not find the BodyBox to mount editor to.");
@@ -34,6 +35,7 @@ export default function mountEditor(containerSelector: string | Element, descrip
                 legacyTextArea={bodybox as HTMLInputElement}
                 descriptionID={descriptionID ?? undefined}
                 uploadEnabled={uploadEnabled}
+                needsHtmlConversion={needsHtmlConversion}
             />,
             container,
             () => {

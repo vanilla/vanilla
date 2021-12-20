@@ -230,10 +230,10 @@ export class ListItemWrapperBlot extends withWrapper(Container as any) {
             grandParentGroup instanceof ListGroupBlot
         ) {
             // We have higher level list group we can check against.
-            const parentGroupValue = grandParentGroup.getValue();
+            const parentGroupDepth = grandParentGroup.getHtmlListDepth();
             const ownValue = this.getValue();
 
-            if (ownValue.depth <= parentGroupValue.depth) {
+            if (ownValue.depth <= parentGroupDepth) {
                 this.insertInto(grandParentGroup, parentWrapper.next);
             }
         }

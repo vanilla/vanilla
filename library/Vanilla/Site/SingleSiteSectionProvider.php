@@ -9,7 +9,6 @@ namespace Vanilla\Site;
 
 use Vanilla\Contracts\Site\SiteSectionInterface;
 use Vanilla\Contracts\Site\SiteSectionProviderInterface;
-
 /**
  * Class for dealing with sections of a site.
  *

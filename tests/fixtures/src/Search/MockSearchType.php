@@ -66,7 +66,7 @@ class MockSearchType extends AbstractSearchType {
     /**
      * @return string
      */
-    public function getSearchGroup(): string {
+    public function getRecordType(): string {
         return $this->searchGroup;
     }
 

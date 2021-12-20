@@ -26,6 +26,7 @@ interface IProps {
     legacyTextArea?: HTMLInputElement | HTMLTextAreaElement;
     placeholder?: string;
     placeholderClassName?: string;
+    needsHtmlConversion?: boolean;
 }
 
 /**
@@ -154,7 +155,12 @@ function useInitialValue() {
         if (quill && initialValue && initialValue.length > 0) {
             const initializeChangedToTrue = !prevReinitialize && reinitialize;
             if (prevInitialValue !== initialValue && initializeChangedToTrue) {
-                quill.setContents(initialValue);
+                try {
+                    quill.setContents(initialValue);
+                } catch (err) {
+                    console.error(err);
+                }
+
                 quill.setSelection(0, 0);
                 quill.history.clear();
             }

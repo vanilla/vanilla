@@ -8,13 +8,10 @@
 namespace Vanilla\Search;
 
 use Garden\Schema\Schema;
-use Vanilla\Adapters\SphinxClient;
-use Vanilla\Adapters\SphinxClient as SphinxAdapter;
 use Vanilla\ApiUtils;
 use Vanilla\Contracts\Site\AbstractSiteProvider;
 use Vanilla\DateFilterSchema;
 use Vanilla\Models\CrawlableRecordSchema;
-use Vanilla\Sphinx\Search\SphinxSearchQuery;
 
 /**
  * Search type for global parameters.
@@ -43,7 +40,7 @@ class GlobalSearchType extends AbstractSearchType {
     /**
      * @inheritdoc
      */
-    public function getSearchGroup(): string {
+    public function getRecordType(): string {
         return 'global';
     }
 
@@ -128,6 +125,9 @@ class GlobalSearchType extends AbstractSearchType {
         return Schema::parse([
             'query:s?' => [
                 'x-search-scope' => true,
+            ],
+            'queryOperator:s?' => [
+                'x-search-filter' => true,
             ],
             'name:s?' => [
                 'x-search-scope' => true,

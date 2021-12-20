@@ -173,7 +173,7 @@ class StatusFieldProcessor implements Processor {
             $op->setSetItem($this->dateField, CurrentTimeStamp::getMySQL());
         }
         if (!empty($this->getIpAddressField()) && !$op->hasSetItem($this->ipAddressField)) {
-            $op->setSetItem($this->ipAddressField, $this->request->getIP());
+            $op->setSetItem($this->ipAddressField, ipEncode($this->request->getIP()));
         }
     }
 

@@ -41,28 +41,6 @@ export const profileVariables = useThemeCache(() => {
 
     const panelBoxes = makeVars("panelBoxes", Variables.contentBoxes(globalVariables().panelBoxes));
 
-    /**
-     * @varGroup profile.badges
-     * @commonTitle Profile Badges
-     */
-    const badges = makeVars("badges", {
-        size: {
-            /**
-             * @var profile.badges.size.width
-             * @title Controls the width of the badge items
-             * @type string | number
-             */
-            width: 100,
-        },
-        /**
-         * @var profile.badges.alignment
-         * @title Controls the alignment of the badge and count items
-         * @type string
-         * @enum left | center
-         */
-        alignment: ProfilePhotoAlignment.LEFT,
-    });
-
     const photo = makeVars("photo", {
         /**
          * @var profile.photo.border.radius
@@ -80,5 +58,5 @@ export const profileVariables = useThemeCache(() => {
         size: 220,
     });
 
-    return { contentBoxes, panelBoxes, badges, photo };
+    return { contentBoxes, panelBoxes, photo };
 });

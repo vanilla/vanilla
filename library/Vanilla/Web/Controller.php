@@ -18,6 +18,7 @@ use Gdn_Session as SessionInterface;
 use Gdn_Upload as Upload;
 use Vanilla\Exception\PermissionException;
 use Vanilla\InjectableInterface;
+use Vanilla\Permissions;
 use Vanilla\SchemaFactory;
 use Vanilla\UploadedFile;
 use Vanilla\Utility\ModelUtils;
@@ -25,7 +26,9 @@ use Vanilla\Utility\ModelUtils;
 /**
  * The controller base class.
  */
-abstract class Controller implements InjectableInterface {
+abstract class Controller implements InjectableInterface, CacheControlConstantsInterface {
+
+    use PermissionCheckTrait;
 
     /**
      * @var SessionInterface
@@ -69,36 +72,13 @@ abstract class Controller implements InjectableInterface {
     }
 
     /**
-     * Enforce the following permission(s) or throw an exception that the dispatcher can handle.
-     *
-     * When passing several permissions to check the user can have any of the permissions. If you want to force several
-     * permissions then make several calls to this method.
-     *
-     * @throws \Exception if no session is available.
-     * @throws HttpException if a ban has been applied on the permission(s) for this session.
-     * @throws PermissionException if the user does not have the specified permission(s).
-     *
-     * @param string|array $permission The permissions you are requiring.
-     * @param int|null $id The ID of the record we are checking the permission of.
+     * @inheridoc
      */
-    public function permission($permission = null, $id = null) {
-        if (!$this->session instanceof SessionInterface) {
-            throw new ServerException("Session not available.", 500);
+    protected function getPermissions(): ?Permissions {
+        if ($this->session === null) {
+            return null;
         }
-        $permissions = (array)$permission;
-
-        /**
-         * First check to see if the user is banned.
-         */
-        if ($ban = $this->session->getPermissions()->getBan($permissions)) {
-            $ban += ['code' => 401, 'msg' => 'Access denied.'];
-
-            throw HttpException::createFromStatus($ban['code'], $ban['msg'], $ban);
-        }
-
-        if (!$this->session->getPermissions()->hasAny($permissions, $id)) {
-            throw new PermissionException($permissions);
-        }
+        return $this->session->getPermissions();
     }
 
     /**
@@ -116,7 +96,7 @@ abstract class Controller implements InjectableInterface {
     public function schema($schema, $type = 'in') {
         if (is_array($type)) {
             $origType = $type;
-            list($id, $type) = $origType;
+            [$id, $type] = $origType;
         } elseif (!in_array($type, ['in', 'out'], true)) {
             $id = $type;
             $type = '';

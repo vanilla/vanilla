@@ -45,7 +45,7 @@ class NewDiscussionModuleTest extends TestCase {
      */
     public function testGetButtonGroups($testButtons, $expected) {
         foreach ($testButtons as $button) {
-            $this->testDiscussionModule->addButton($button['Text'], $button['Url'], $button['asOwnButton']);
+            $this->testDiscussionModule->addButton($button['Text'], $button['Url'], $button['Icon'], $button['asOwnButton']);
         }
         $actual = $this->testDiscussionModule->getButtonGroups();
         $this->assertEquals($expected, $actual);
@@ -60,49 +60,49 @@ class NewDiscussionModuleTest extends TestCase {
         $r = [
           'allOwnButtons' => [
               [
-                 ['Text' => 'New Discussion', 'Url' => '/post/discussion', 'asOwnButton' => true],
-                 ['Text' => 'Ask a Question', 'Url' => '/post/question', 'asOwnButton' => true],
-                 ['Text' => 'New Poll', 'Url' => '/post/question', 'asOwnButton' => true],
-                 ['Text' => 'New Idea', 'Url' => '/post/idea', 'asOwnButton' => true],
+                 ['Text' => 'New Discussion', 'Url' => '/post/discussion','Icon' => 'new-discussion', 'asOwnButton' => true],
+                 ['Text' => 'Ask a Question', 'Url' => '/post/question','Icon' => 'new-question', 'asOwnButton' => true],
+                 ['Text' => 'New Poll', 'Url' => '/post/question', 'Icon' => 'new-poll', 'asOwnButton' => true],
+                 ['Text' => 'New Idea', 'Url' => '/post/idea', 'Icon' => 'new-idea', 'asOwnButton' => true],
               ],
               [
-                      [['Text' => 'New Discussion', 'Url' => '/post/discussion', 'asOwnButton' => true]],
-                      [['Text' => 'Ask a Question', 'Url' => '/post/question', 'asOwnButton' => true]],
-                      [['Text' => 'New Poll', 'Url' => '/post/question', 'asOwnButton' => true]],
-                      [['Text' => 'New Idea', 'Url' => '/post/idea', 'asOwnButton' => true]],
+                      [['Text' => 'New Discussion', 'Url' => '/post/discussion', 'Icon' => 'new-discussion', 'asOwnButton' => true]],
+                      [['Text' => 'Ask a Question', 'Url' => '/post/question', 'Icon' => 'new-question', 'asOwnButton' => true]],
+                      [['Text' => 'New Poll', 'Url' => '/post/question', 'Icon' => 'new-poll', 'asOwnButton' => true]],
+                      [['Text' => 'New Idea', 'Url' => '/post/idea', 'Icon' => 'new-idea', 'asOwnButton' => true]],
               ],
           ],
           'allGroupButtons' => [
               [
-                  ['Text' => 'New Discussion', 'Url' => '/post/discussion', 'asOwnButton' => false],
-                  ['Text' => 'Ask a Question', 'Url' => '/post/question', 'asOwnButton' => false],
-                  ['Text' => 'New Poll', 'Url' => '/post/question', 'asOwnButton' => false],
-                  ['Text' => 'New Idea', 'Url' => '/post/idea', 'asOwnButton' => false],
+                  ['Text' => 'New Discussion', 'Url' => '/post/discussion', 'Icon' => 'new-discussion', 'asOwnButton' => false],
+                  ['Text' => 'Ask a Question', 'Url' => '/post/question', 'Icon' => 'new-question', 'asOwnButton' => false],
+                  ['Text' => 'New Poll', 'Url' => '/post/question', 'Icon' => 'new-poll', 'asOwnButton' => false],
+                  ['Text' => 'New Idea', 'Url' => '/post/idea', 'Icon' => 'new-idea', 'asOwnButton' => false],
               ],
               [
                   [
-                      ['Text' => 'New Discussion', 'Url' => '/post/discussion', 'asOwnButton' => false],
-                      ['Text' => 'Ask a Question', 'Url' => '/post/question', 'asOwnButton' => false],
-                      ['Text' => 'New Poll', 'Url' => '/post/question', 'asOwnButton' => false],
-                      ['Text' => 'New Idea', 'Url' => '/post/idea', 'asOwnButton' => false],
+                      ['Text' => 'New Discussion', 'Url' => '/post/discussion', 'Icon' => 'new-discussion', 'asOwnButton' => false],
+                      ['Text' => 'Ask a Question', 'Url' => '/post/question', 'Icon' => 'new-question', 'asOwnButton' => false],
+                      ['Text' => 'New Poll', 'Url' => '/post/question', 'Icon' => 'new-poll', 'asOwnButton' => false],
+                      ['Text' => 'New Idea', 'Url' => '/post/idea', 'Icon' => 'new-idea', 'asOwnButton' => false],
                   ]
               ],
           ],
           'twoGroupedTwoOwn' => [
               [
-                  ['Text' => 'New Discussion', 'Url' => '/post/discussion', 'asOwnButton' => true],
-                  ['Text' => 'Ask a Question', 'Url' => '/post/question', 'asOwnButton' => false],
-                  ['Text' => 'New Poll', 'Url' => '/post/question', 'asOwnButton' => true],
-                  ['Text' => 'New Idea', 'Url' => '/post/idea', 'asOwnButton' => false],
+                  ['Text' => 'New Discussion', 'Url' => '/post/discussion', 'Icon' => 'new-discussion', 'asOwnButton' => true],
+                  ['Text' => 'Ask a Question', 'Url' => '/post/question', 'Icon' => 'new-question', 'asOwnButton' => false],
+                  ['Text' => 'New Poll', 'Url' => '/post/question', 'Icon' => 'new-poll', 'asOwnButton' => true],
+                  ['Text' => 'New Idea', 'Url' => '/post/idea', 'Icon' => 'new-idea', 'asOwnButton' => false],
               ],
               [
                   [
-                      ['Text' => 'Ask a Question', 'Url' => '/post/question', 'asOwnButton' => false],
-                      ['Text' => 'New Idea', 'Url' => '/post/idea', 'asOwnButton' => false],
+                      ['Text' => 'Ask a Question', 'Url' => '/post/question', 'Icon' => 'new-question', 'asOwnButton' => false],
+                      ['Text' => 'New Idea', 'Url' => '/post/idea', 'Icon' => 'new-idea', 'asOwnButton' => false],
 
                   ],
-                  [['Text' => 'New Discussion', 'Url' => '/post/discussion', 'asOwnButton' => true]],
-                  [['Text' => 'New Poll', 'Url' => '/post/question', 'asOwnButton' => true]],
+                  [['Text' => 'New Discussion', 'Url' => '/post/discussion', 'Icon' => 'new-discussion', 'asOwnButton' => true]],
+                  [['Text' => 'New Poll', 'Url' => '/post/question', 'Icon' => 'new-poll', 'asOwnButton' => true]],
               ]
           ]
         ];

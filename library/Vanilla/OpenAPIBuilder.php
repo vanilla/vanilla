@@ -306,7 +306,7 @@ class OpenAPIBuilder {
      *
      * @param callable $filter
      */
-    public function addFilter(callable  $filter): void {
+    public function addFilter(callable $filter): void {
         $this->filters[] = $filter;
     }
 

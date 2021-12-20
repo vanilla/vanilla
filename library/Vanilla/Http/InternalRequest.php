@@ -117,25 +117,20 @@ class InternalRequest extends HttpRequest implements RequestInterface {
         $_COOKIE = $cookies;
         $data = $this->dispatcher->dispatch($this);
         // Render the view in case it updates the Data object.
-        ob_start();
-        $this->dispatcher->render($this->container->get(\Gdn_Request::class), $data);
-        ob_end_clean();
-        $_COOKIE = $cookieStash;
+        try {
+            ob_start();
+            $this->dispatcher->render($this->container->get(\Gdn_Request::class), $data);
+        } finally {
+            ob_end_clean();
+            $_COOKIE = $cookieStash;
+        }
 
         if ($ex = $data->getMeta('exception')) {
             /* @var \Throwable $ex */
             $data->setMeta('errorTrace', $ex->getTraceAsString());
         }
 
-        $response = new HttpResponse(
-            $data->getStatus(),
-            array_merge($data->getHeaders(), ['X-Data-Meta' => json_encode($data->getMetaArray())])
-        );
-        // Simulate that the data was sent over HTTP and thus was serialized.
-        $body = $data->jsonSerialize();
-        $response->setBody($body);
-
-        return $response;
+        return $data->asHttpResponse();
     }
 
     /**

@@ -14,18 +14,35 @@ import { dummyReactionsData } from "@Reactions/storybook/dummyReactions";
 const fakeReactions: IReaction[] = Object.entries(dummyReactionsData).map((reactionWithKey) => reactionWithKey[1]);
 
 export default {
-    title: "Components/Badges/Reaction",
+    title: "Components/Reactions",
     parameters: {},
 };
 
+export const ReactionsListWithNames = storyWithConfig(
+    {
+        themeVars: {
+            reactions: {
+                name: {
+                    display: true,
+                },
+            },
+        },
+    },
+    () => (
+        <StoryContent>
+            <ReactionListModuleView homeWidget title="Reactions" apiData={fakeReactions} apiParams={{ userID: 1 }} />
+        </StoryContent>
+    ),
+);
+
 export const ReactionsList = storyWithConfig({}, () => (
     <StoryContent>
-        <ReactionListModuleView title="Reactions" apiData={fakeReactions} apiParams={{ userID: 1 }} />
+        <ReactionListModuleView homeWidget title="Reactions" apiData={fakeReactions} apiParams={{ userID: 1 }} />
     </StoryContent>
 ));
 
 export const NoReactions = storyWithConfig({}, () => (
     <StoryContent>
-        <ReactionListModuleView title="Reactions" apiData={[]} apiParams={{ userID: 1 }} />
+        <ReactionListModuleView homeWidget title="Reactions" apiData={[]} apiParams={{ userID: 1 }} />
     </StoryContent>
 ));

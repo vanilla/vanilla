@@ -123,9 +123,6 @@ class InstallModel {
             $this->config->set('Garden.Installed', $oldConfigValue);
         }
 
-        // Kludge: If we are testing the dashboard hooks will not have had an opportunity to configure the container.
-        $this->addonModel->callBootstrapEvents(\DashboardHooks::class);
-
         // Run through the addons.
         $data += ['addons' => static::$DEFAULT_ADDONS];
 
@@ -137,7 +134,11 @@ class InstallModel {
             }
 
             // TODO: Once we are using this addon model we can remove the force and tweak the config defaults.
-            $this->addonModel->enable($addon, ['force' => true]);
+            $this->addonModel->enable($addon, [
+                'force' => true,
+                // We already enabled the dashboard. No need to run its container configuration twice.
+                'skipContainer' => $addon->getKey() === 'dashboard',
+            ]);
         }
 
         // Now that all of the addons are are enabled we should set the default roles.

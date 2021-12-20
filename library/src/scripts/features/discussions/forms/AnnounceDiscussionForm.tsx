@@ -81,7 +81,12 @@ export default function AnnounceDiscussionForm({ onCancel, onSuccess, discussion
                                         />
                                     }
                                 />
-                                <Permission permission="discussions.announce" mode={PermissionMode.GLOBAL}>
+                                {/*
+                                    Need to check "discussions.moderate" because the announce permissions
+                                    is consolidated to moderate here:
+                                    https://github.com/vanilla/vanilla-cloud/blob/master/library/Vanilla/PermissionsTranslationTrait.php#L72
+                                 */}
+                                <Permission permission={["discussions.announce", "discussions.moderate"]}>
                                     <RadioButton
                                         defaultChecked={formik.values.pinLocation === "recent"}
                                         onChange={handleChange}

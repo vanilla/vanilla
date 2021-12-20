@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { userSelect, allButtonStates, allLinkStates, negativeUnit } from "@library/styles/styleHelpers";
@@ -15,10 +15,10 @@ import { Variables } from "@library/styles/Variables";
 import { percent, translate, em } from "csx";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
-import { relative } from "path";
 import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
+import { css } from "@emotion/css";
 
 export const messagesVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -89,14 +89,11 @@ export const messagesVariables = useThemeCache(() => {
 export const messagesClasses = useThemeCache(() => {
     const vars = messagesVariables();
     const globalVars = globalVariables();
-    const style = styleFactory("messages");
     const titleBarVars = titleBarVariables();
     const mediaQueries = panelLayoutVariables().mediaQueries();
     const shadows = shadowHelper();
 
-    const hasIcon = style("hasIcon", {});
-
-    const wrap = style("wrap", {
+    const wrap = css({
         display: "flex",
         alignItems: "center",
         justifyContent: "flex-start",
@@ -110,14 +107,13 @@ export const messagesClasses = useThemeCache(() => {
             left: vars.spacing.padding.withoutIcon * 1.5,
             right: vars.spacing.padding.withoutIcon,
         }),
-        ...{
-            [`&.${hasIcon}`]: {
-                paddingLeft: vars.spacing.padding.withIcon,
-            },
-        },
     });
 
-    const message = style("message", {
+    const wrapWithIcon = css({
+        paddingLeft: vars.spacing.padding.withIcon,
+    });
+
+    const message = css({
         ...userSelect(),
         ...Mixins.font(vars.text.font),
         width: percent(100),
@@ -129,8 +125,7 @@ export const messagesClasses = useThemeCache(() => {
     });
 
     // Fixed wrapper
-    const fixed = style(
-        "fixed",
+    const fixed = css(
         {
             position: "fixed",
             left: 0,
@@ -138,24 +133,22 @@ export const messagesClasses = useThemeCache(() => {
             minHeight: styleUnit(vars.sizing.minHeight),
             maxWidth: percent(100),
             zIndex: 20,
-            ...{
-                [`.${wrap}`]: {
-                    maxWidth: percent(100),
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    width: "auto",
-                },
-                [`.${message}`]: {
-                    width: "auto",
-                },
+            [`& .${wrap}`]: {
+                maxWidth: percent(100),
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "auto",
+            },
+            [`& .${message}`]: {
+                width: "auto",
             },
         },
         mediaQueries.oneColumnDown({
             top: styleUnit(titleBarVars.sizing.mobile.height + 1),
         }),
     );
-    const messageWrapper = style("messageWrapper", {
+    const messageWrapper = css({
         position: "relative",
         display: "flex",
         paddingLeft: 30,
@@ -166,7 +159,7 @@ export const messagesClasses = useThemeCache(() => {
         paddingBottom: styleUnit(vars.spacing.padding.vertical),
     });
 
-    const root = style({
+    const root = css({
         width: percent(100),
         backgroundColor: ColorsUtils.colorOut(vars.colors.bg),
         ...shadowOrBorderBasedOnLightness(
@@ -184,41 +177,39 @@ export const messagesClasses = useThemeCache(() => {
         },
     });
 
-    const setWidth = style("setWidth", {
+    const setWidth = css({
         width: styleUnit(vars.sizing.width),
         maxWidth: percent(100),
     });
 
-    const actionButtonPrimary = style("actionButtonPrimary", {});
+    const actionButtonPrimary = css({});
 
-    const actionButton = style("actionButton", {
-        ...{
-            "&&": {
-                position: "relative",
-                ...Mixins.padding(vars.actionButton.padding),
-                marginLeft: vars.actionButton.padding.left,
-                minHeight: styleUnit(vars.actionButton.minHeight),
-                whiteSpace: "nowrap",
-                ...Mixins.font(vars.actionButton.font),
-                ...allButtonStates({
-                    noState: {
-                        color: ColorsUtils.colorOut(vars.colors.fg),
-                    },
-                    allStates: {
-                        color: ColorsUtils.colorOut(vars.colors.states.fg),
-                    },
-                    clickFocus: {
-                        outline: 0,
-                    },
-                }),
-                [`&.${actionButtonPrimary}`]: {
-                    fontWeight: globalVars.fonts.weights.bold,
+    const actionButton = css({
+        "&&": {
+            position: "relative",
+            ...Mixins.padding(vars.actionButton.padding),
+            marginLeft: vars.actionButton.padding.left,
+            minHeight: styleUnit(vars.actionButton.minHeight),
+            whiteSpace: "nowrap",
+            ...Mixins.font(vars.actionButton.font),
+            ...allButtonStates({
+                noState: {
+                    color: ColorsUtils.colorOut(vars.colors.fg),
                 },
+                allStates: {
+                    color: ColorsUtils.colorOut(vars.colors.states.fg),
+                },
+                clickFocus: {
+                    outline: 0,
+                },
+            }),
+            [`&.${actionButtonPrimary}`]: {
+                fontWeight: globalVars.fonts.weights.bold,
             },
         },
     });
 
-    const iconPosition = style("iconPosition", {
+    const iconPosition = css({
         position: "absolute",
         left: 0,
         top: 0,
@@ -231,56 +222,48 @@ export const messagesClasses = useThemeCache(() => {
         width: styleUnit(vars.spacing.padding.withIcon),
     });
 
-    const icon = style("icon", {
-        // top: unit(vars.spacing.padding.vertical),
-    });
+    const icon = css({});
 
-    const errorIcon = style("errorIcon", {
-        ...{
-            "&&": {
-                color: ColorsUtils.colorOut(globalVars.mainColors.fg),
-            },
+    const errorIcon = css({
+        "&&": {
+            color: ColorsUtils.colorOut(globalVars.mainColors.fg),
         },
     });
-    const content = style("content", {
+    const content = css({
         width: percent(100),
         position: "relative",
-        ...{
-            a: allLinkStates({
-                noState: {
-                    color: ColorsUtils.colorOut(vars.colors.fg),
-                    textDecoration: "underline",
-                },
-                allStates: {
-                    color: ColorsUtils.colorOut(vars.colors.states.fg),
-                    textDecoration: "underline",
-                },
-            }),
-        },
+        "& a": allLinkStates({
+            noState: {
+                color: ColorsUtils.colorOut(vars.colors.fg),
+                textDecoration: "underline",
+            },
+            allStates: {
+                color: ColorsUtils.colorOut(vars.colors.states.fg),
+                textDecoration: "underline",
+            },
+        }),
     });
 
-    const inlineBlock = style("inlineBlock", {
+    const inlineBlock = css({
         display: "inline-block",
     });
 
-    const confirm = style("confirm", {});
+    const confirm = css({});
 
-    const main = style("main", {});
+    const main = css({});
 
-    const text = style("text", {
+    const text = css({
         ...Mixins.font(vars.text.font),
     });
-    const titleContent = style("titleContent", {
+    const titleContent = css({
         display: "flex",
         justifyContent: "start",
         position: "relative",
-        ...{
-            [`& + .${text}`]: {
-                marginTop: styleUnit(vars.title.margin.top),
-            },
+        [`& + .${text}`]: {
+            marginTop: styleUnit(vars.title.margin.top),
         },
     });
-    const title = style("title", {
+    const title = css({
         ...Mixins.font(vars.text.font),
         fontWeight: globalVars.fonts.weights.bold,
         ...lineHeightAdjustment({
@@ -293,6 +276,7 @@ export const messagesClasses = useThemeCache(() => {
     return {
         root,
         wrap,
+        wrapWithIcon,
         actionButton,
         actionButtonPrimary,
         message,
@@ -307,7 +291,6 @@ export const messagesClasses = useThemeCache(() => {
         messageWrapper,
         main,
         text,
-        hasIcon,
         icon,
         title,
     };

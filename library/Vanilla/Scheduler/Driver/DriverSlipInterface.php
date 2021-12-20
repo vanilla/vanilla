@@ -8,32 +8,20 @@
 namespace Vanilla\Scheduler\Driver;
 
 use Vanilla\Scheduler\Job\JobExecutionStatus;
+use Vanilla\Scheduler\Job\TrackableJobAwareInterface;
+use Vanilla\Scheduler\Job\TrackableJobAwareTrait;
 
 /**
- * Interface DriverJobInterface
+ * Interface representing a job that has been received by a particular driver.
  */
-interface DriverSlipInterface {
+interface DriverSlipInterface extends TrackableJobAwareInterface {
 
     /**
-     * Get the job Id
+     * Get the jobID
      *
-     * @return string The job Id
+     * @return string The jobID
      */
-    public function getId(): string;
-
-    /**
-     * Get TrackingId
-     *
-     * @return string|null
-     */
-    public function getTrackingId(): ?string;
-
-    /**
-     * Set TrackingId
-     *
-     * @param string $trackingId
-     */
-    public function setTrackingId(string $trackingId): void;
+    public function getID(): string;
 
     /**
      * GetType

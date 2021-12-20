@@ -152,7 +152,7 @@ trait MockSiteTestTrait {
         // Make sure debug is on
         $previousDebug = debug();
         debug(true);
-        $updateModel = new \UpdateModel();
+        $updateModel = self::container()->get(\UpdateModel::class);
         $updateModel->runStructure();
         debug($previousDebug);
         \PermissionModel::resetAllRoles();

@@ -217,10 +217,7 @@ class ActivityController extends Gdn_Controller {
     /**
      * Delete an activity item.
      *
-     * @since 2.0.0
-     * @access public
-     *
-     * @param int $activityID Unique ID of item to delete.
+     * @param int|string $activityID Unique ID of item to delete.
      * @param string $transientKey Verify intent.
      */
     public function delete($activityID = '', $transientKey = '') {

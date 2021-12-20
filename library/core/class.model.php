@@ -20,6 +20,9 @@ class Gdn_Model extends Gdn_Pluggable {
 
     use LegacyDirtyRecordTrait;
 
+    /** @var string[] These are text fields that extra values are collapsed into as JSON. */
+    private const COLLAPSEABLE_FIELDS = ['Attributes', 'Data'];
+
     /**  @var Gdn_DataSet An object representation of the current working dataset. */
     public $Data;
 
@@ -137,9 +140,7 @@ class Gdn_Model extends Gdn_Pluggable {
      * @return \Gdn_SQLDriver
      */
     protected function createSql(): \Gdn_SQLDriver {
-        $sql = clone $this->Database->sql();
-        $sql->reset();
-        return $sql;
+        return $this->Database->createSql();
     }
 
     /**
@@ -193,7 +194,21 @@ class Gdn_Model extends Gdn_Pluggable {
     }
 
     /**
-     * Take all of the values that aren't in the schema and put them into the attributes column.
+     * Returns an array of fields that aren't part of the Schema & would be bundled up in the "Attributes" field.
+     *
+     * @param array $formPostValues
+     * @return array
+     */
+    protected function getAttributes(array $formPostValues): array {
+        $this->defineSchema();
+        $row = array_intersect_key($formPostValues, $this->Schema->fields());
+        return array_diff_key($formPostValues, $row);
+    }
+
+    /**
+     * Take every values that aren't in the schema and put them into the "Attributes" column.
+     * DISCLAIMER: This function is unaware of any pre-existing "Attributes" values at the record's level.
+     * If $data doesn't have any extra values from the schema, this function will return an empty array.
      *
      * @param array $data
      * @param string $name
@@ -251,6 +266,17 @@ class Gdn_Model extends Gdn_Pluggable {
             $this->PrimaryKey = $this->Schema->primaryKey($this->Name, $this->Database);
             if (is_array($this->PrimaryKey)) {
                 $this->PrimaryKey = $this->PrimaryKey[0];
+            }
+
+            // Since validation happens before collapsable fields are collapsed, remove the length validation on them.
+            foreach (self::COLLAPSEABLE_FIELDS as $collapsableField) {
+                $field = $this->Schema->getField($collapsableField);
+                if ($field) {
+                    // 10 years of code is expecting this be an "empty" string to represent a null/empty value.
+                    $field->Length = "";
+                    // This one is new and things are aware it can be null.
+                    unset($field->ByteLength);
+                }
             }
 
             $this->Validation->setSchema($this->Schema);
@@ -367,7 +393,7 @@ class Gdn_Model extends Gdn_Pluggable {
      */
     public static function serializeRow(&$row) {
         foreach ($row as $name => &$value) {
-            if (is_array($value) && in_array($name, ['Attributes', 'Data'])) {
+            if (is_array($value) && in_array($name, self::COLLAPSEABLE_FIELDS)) {
                 $value = empty($value) ? null : dbencode($value);
             }
         }
@@ -441,7 +467,7 @@ class Gdn_Model extends Gdn_Pluggable {
             // Quote all of the fields.
             $quotedFields = [];
             foreach ($fields as $name => $value) {
-                if (is_array($value) && in_array($name, ['Attributes', 'Data'])) {
+                if (is_array($value) && in_array($name, self::COLLAPSEABLE_FIELDS)) {
                     $value = empty($value) ? null : dbencode($value);
                 }
 
@@ -483,7 +509,7 @@ class Gdn_Model extends Gdn_Pluggable {
             // Quote all of the fields.
             $quotedFields = [];
             foreach ($fields as $name => $value) {
-                if (is_array($value) && in_array($name, ['Attributes', 'Data'])) {
+                if (is_array($value) && in_array($name, self::COLLAPSEABLE_FIELDS)) {
                     $value = empty($value) ? null : dbencode($value);
                 }
 
@@ -616,7 +642,7 @@ class Gdn_Model extends Gdn_Pluggable {
         $this->options($options);
         $result = $this->getWhere([$this->PrimaryKey => $id])->firstRow($datasetType);
 
-        $fields = ['Attributes', 'Data'];
+        $fields = self::COLLAPSEABLE_FIELDS;
 
         foreach ($fields as $field) {
             if (is_array($result)) {
@@ -656,6 +682,40 @@ class Gdn_Model extends Gdn_Pluggable {
     public function getWhere($where = false, $orderFields = '', $orderDirection = 'asc', $limit = false, $offset = false) {
         $this->_beforeGet();
         return $this->SQL->getWhere($this->Name, $where, $orderFields, $orderDirection, $limit, $offset);
+    }
+
+    /**
+     * Iterator version of Gdn_Model::getWhere() where results are fetched in batches.
+     *
+     * @param array $where
+     * @param string $orderFields
+     * @param string $orderDirection
+     * @param bool $expand
+     * @param int $batchSize
+     * @return Generator<int, array>
+     */
+    public function getWhereIterator(
+        array $where = [],
+        string $orderFields = '',
+        string $orderDirection = '',
+        bool $expand = true,
+        int $batchSize = 100
+    ): Generator {
+        $offset = 0;
+        while (true) {
+            $results = $this->getWhere($where, $orderFields, $orderDirection, $batchSize, $offset, $expand)->resultArray();
+            foreach ($results as $result) {
+                $primaryKey = $result[$this->PrimaryKey];
+                yield $primaryKey => $result;
+            }
+
+            $offset += $batchSize;
+
+            if (count($results) < $batchSize) {
+                // We made it to the end.
+                return;
+            }
+        }
     }
 
     /**

@@ -9,6 +9,7 @@ namespace Vanilla\Site;
 
 use Gdn_Router;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Contracts\Site\SiteSectionChildIDProviderInterface;
 use Vanilla\Contracts\Site\SiteSectionCounterInterface;
 use Vanilla\Contracts\Site\SiteSectionCountStasherInterface;
 use Vanilla\Contracts\Site\SiteSectionInterface;
@@ -19,13 +20,16 @@ use VanillaTests\Fixtures\MockSiteSectionProvider;
  * Class SiteSectionModel
  * @package Vanilla\Site
  */
-class SiteSectionModel {
+class SiteSectionModel implements SiteSectionChildIDProviderInterface {
 
     /** @var SiteSectionProviderInterface[] $providers */
     private $providers = [];
 
     /** @var SiteSectionCounterInterface[] */
     private $siteSectionCounters = [];
+
+    /** @var SiteSectionChildIDProviderInterface[] */
+    private $siteSectionChildIDProviders = [];
 
     /** @var SiteSectionInterface[] $siteSections */
     private $siteSections;
@@ -73,7 +77,7 @@ class SiteSectionModel {
     }
 
     /**
-     * Register site section
+     * Register a counter.
      *
      * @param SiteSectionCounterInterface $counter
      */
@@ -87,6 +91,20 @@ class SiteSectionModel {
         $this->siteSectionCounters[] = $counter;
     }
 
+    /**
+     * Register an ID provider.
+     *
+     * @param SiteSectionChildIDProviderInterface $idProvider
+     */
+    public function addChildIDProvider(SiteSectionChildIDProviderInterface $idProvider) {
+        foreach ($this->siteSectionChildIDProviders as $existingCounter) {
+            if (get_class($idProvider) === get_class($existingCounter)) {
+                return;
+            }
+        }
+
+        $this->siteSectionChildIDProviders[] = $idProvider;
+    }
 
     /**
      * Register optional default route
@@ -344,5 +362,20 @@ class SiteSectionModel {
     public function clearLocalCache() {
         $this->siteSections = [];
         $this->siteSectionsForAttributes = [];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getChildIDs(SiteSectionInterface $siteSection): array {
+        $result = [];
+        foreach ($this->siteSectionChildIDProviders as $siteSectionProvider) {
+            $childIDs = $siteSectionProvider->getChildIDs($siteSection);
+            if (!empty($childIDs)) {
+                $result = array_merge_recursive($childIDs, $result);
+            }
+        }
+
+        return $result;
     }
 }

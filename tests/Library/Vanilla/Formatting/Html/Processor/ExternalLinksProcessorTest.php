@@ -62,7 +62,7 @@ class ExternalLinksProcessorTest extends VanillaTestCase {
         $document = new HtmlDocument($this->formatService->renderHTML($content, RichFormat::FORMAT_KEY));
         $actual = $this->processor->processDocument($document)->getInnerHtml();
 
-        $expectedHref = htmlspecialchars($this->request->url("/home/leaving?" . http_build_query([
+        $expectedHref = "http://" . \Gdn::request()->getHost() . htmlspecialchars($this->request->url("/home/leaving?" . http_build_query([
             "allowTrusted" => 1,
             "target" => $url,
         ])));

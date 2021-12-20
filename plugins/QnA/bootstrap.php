@@ -5,9 +5,16 @@
  * @license Proprietary
  */
 
+use Vanilla\Forum\Modules\QnATabFactory;
 use Vanilla\QnA\Models\QnaQuickLinksProvider;
 use Vanilla\Theme\VariableProviders\QuickLinksVariableProvider;
+use Vanilla\Widgets\TabWidgetTabService;
 
 \Gdn::getContainer()
     ->rule(QuickLinksVariableProvider::class)
-    ->addCall('addQuickLinkProvider', [new \Garden\Container\Reference(QnaQuickLinksProvider::class)]);
+       ->addCall('addQuickLinkProvider', [new \Garden\Container\Reference(QnaQuickLinksProvider::class)])
+    ->rule(TabWidgetTabService::class)
+        ->addCall('registerTabFactory', [QnATabFactory::getNewQuestionReference()])
+        ->addCall('registerTabFactory', [QnATabFactory::getUnansweredQuestionReference()])
+        ->addCall('registerTabFactory', [QnATabFactory::getRecentlyAnsweredReference()])
+;

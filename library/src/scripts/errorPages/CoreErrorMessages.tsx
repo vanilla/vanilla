@@ -107,7 +107,7 @@ export function messageFromErrorCode(errorCode?: string | number) {
 }
 
 export function getErrorCode(errorMessageProps: IErrorMessageProps) {
-    if (errorMessageProps.apiError) {
+    if (errorMessageProps.apiError && errorMessageProps.apiError.response) {
         return errorMessageProps.apiError.response.status;
     } else if (errorMessageProps.error && errorMessageProps.error.status) {
         return errorMessageProps.error.status;

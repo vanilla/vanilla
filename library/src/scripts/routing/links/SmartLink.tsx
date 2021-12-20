@@ -15,6 +15,7 @@ export interface ISmartLinkProps extends NavLinkProps {
     tabIndex?: number;
     to: LocationDescriptor;
     disabled?: boolean;
+    className?: string;
 }
 
 /**
@@ -61,12 +62,13 @@ export default React.forwardRef(function SmartLink(props: ISmartLinkProps, ref: 
         const isForeign = !href.startsWith(siteUrl(""));
         return (
             <a
-                {...passthru}
                 ref={ref}
                 href={sanitizeUrl(href)}
                 tabIndex={props.tabIndex ? props.tabIndex : 0}
                 target={isForeign ? "_blank" : undefined}
                 rel={isForeign ? "noopener noreferrer" : props.rel}
+                className={props.className}
+                {...passthru}
             />
         );
     }

@@ -166,6 +166,16 @@ paths:
           enum:
           - and
           - or
+      - description: |
+          Set the default search type.
+        in: query
+        name: queryOperator
+        schema:
+          type: string
+          default: and
+          enum:
+          - and
+          - or
       - $ref: '#/components/parameters/Page'
       - description: |
           Desired number of items per page.

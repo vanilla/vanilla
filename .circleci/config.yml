@@ -267,67 +267,11 @@ jobs:
         steps:
             - core/checkout
             - run: yarn audit
-    chromatic_test:
-        executor: php74
-        working_directory: ~/workspace/repo
-        resource_class: large
-        steps:
-            - run:
-                  command: |
-                      if [ -z "$CHROMATIC_APP_CODE" ]; then
-                          echo "No Chromatic app code detected. Exiting."
-                          circleci-agent step halt
-                      else
-                          echo "Chromatic app code detected. Proceeding..."
-                      fi
-                  name: "Conditionally perform Chromatic test"
-            - checkout
-            - *prepare_mysql
-            - *prepare_hosts
-            - *run_composer
-            - *restore_yarn_cache
-            - *run_yarn
-            - *save_yarn_cache
-            - run:
-                  command: yarn chromatic --exit-zero-on-changes --exit-once-uploaded
-                  name: Chromatic - accept all changes
-    chromatic_run_accept_all:
-        executor: php74
-        working_directory: ~/workspace/repo
-        resource_class: large
-        steps:
-            - run:
-                  command: |
-                      if [ -z "$CHROMATIC_APP_CODE" ]; then
-                          echo "No Chromatic app code detected. Exiting."
-                          circleci-agent step halt
-                      else
-                          echo "Chromatic app code detected. Proceeding..."
-                      fi
-                  name: "Conditionally perform Chromatic test"
-            - checkout
-            - *prepare_mysql
-            - *prepare_hosts
-            - *run_composer
-            - *restore_yarn_cache
-            - *run_yarn
-            - *save_yarn_cache
-            - run:
-                  command: yarn chromatic --auto-accept-changes
-                  name: Chromatic - accept all changes
 
 workflows:
     version: 2
     commit:
         jobs:
-            - chromatic_test:
-                  filters:
-                      branches:
-                          ignore: master
-            - chromatic_run_accept_all:
-                  filters:
-                      branches:
-                          only: master
             # PHP 7.2 jobs are only nightly until we move upwards on infra.
             - php_setup
             - php_72_lint

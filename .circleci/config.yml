@@ -87,14 +87,14 @@ aliases:
 executors:
     php72:
         docker:
-            - image: adamcharron/php-mysql:7.2
+            - image: vanillaforums/php-mysql:7.2
             - image: mysql:5.7
-              environment: *db_env
-    php73:
+              environment: *db_sphinx_env
+    php74:
         docker:
-            - image: adamcharron/php-mysql:7.3
+            - image: vanillaforums/php-mysql:7.4
             - image: mysql:5.7
-              environment: *db_env
+              environment: *db_sphinx_env
 
 jobs:
     frontend_setup:
@@ -187,7 +187,7 @@ jobs:
             - *run_php_static
     php_72_tests:
         executor: php72
-        resource_class: large
+        resource_class: medium
         parallelism: 12
         steps: &php_unit_test_steps
             - *attach_workspace
@@ -204,17 +204,16 @@ jobs:
                       echo "--filter $filter";
                       echo ""
 
-                      # phpdbg to generate code coverage is about 5x faster than xdebug.
                       # Containers have 4gb a memory. Try to avoid coming too close to the limit.
-                      # Remember that sphinx and mysql also take memory.
-                      phpdbg -qrr \
-                        -d memory_limit=2048M \
-                        ./vendor/bin/phpunit \
-                        -c phpunit.xml.dist \
-                        --exclude-group=ignore \
-                        --log-junit ~/phpunit/php-tests-junit.xml \
-                        --coverage-clover=php-tests-coverage.xml \
-                        --filter $filter
+                      # Remember that mysql also take memory.
+                      php --define pcov.enabled=1 \
+                          --define memory_limit=3076M \
+                          ./vendor/bin/phpunit \
+                              -c phpunit.xml.dist \
+                              --exclude-group=ignore \
+                              --log-junit ~/phpunit/php-tests-junit.xml \
+                              --coverage-clover=php-tests-coverage.xml \
+                              --filter $filter
             - run:
                   name: Adjust JUnit Paths
                   command: $HOME/workspace/repo/.circleci/scripts/fixJUnitPaths.sh "$HOME/phpunit/php-tests-junit.xml"
@@ -242,25 +241,26 @@ jobs:
                   name: APIv0 Tests
                   command: |
                       cd ~/workspace/repo
-                      ./vendor/bin/phpunit \
-                          -c phpunit.xml.dist \
-                          --exclude-group=ignore \
-                          --testsuite="APIv0" \
-                          --coverage-clover=apiv0-coverage.xml
+                      php --define pcov.enabled=1 \
+                          ./vendor/bin/phpunit \
+                              -c phpunit.xml.dist \
+                              --exclude-group=ignore \
+                              --testsuite="APIv0" \
+                              --coverage-clover=apiv0-coverage.xml
             - *upload_coverage
             - store_test_results:
                   path: ~/phpunit
-    php_73_lint:
-        executor: php73
+    php_74_lint:
+        executor: php74
         steps: *php_lint_steps
-    php_73_static:
-        executor: core/php73
+    php_74_static:
+        executor: core/php74
         steps: *php_static_steps
-    php_73_tests:
-        executor: php73
+    php_74_tests:
+        executor: php74
         steps: *php_unit_test_steps
-    php_73_integration:
-        executor: php73
+    php_74_integration:
+        executor: php74
         steps: *php_integration_test_steps
     dependency_audit:
         executor: php72
@@ -312,18 +312,18 @@ workflows:
             - php_setup
             - php_72_lint
             - php_72_static
-            - php_73_lint
-            - php_73_static
+            - php_74_lint
+            - php_74_static
             - php_72_integration:
                   requires:
                       - php_setup
-            - php_73_integration:
+            - php_74_integration:
                   requires:
                       - php_setup
             - php_72_tests:
                   requires:
                       - php_setup
-            - php_73_tests:
+            - php_74_tests:
                   requires:
                       - php_setup
             ## JS & browsers

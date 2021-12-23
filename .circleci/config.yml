@@ -89,12 +89,12 @@ executors:
         docker:
             - image: vanillaforums/php-mysql:7.2
             - image: mysql:5.7
-              environment: *db_sphinx_env
+              environment: *db_env
     php74:
         docker:
             - image: vanillaforums/php-mysql:7.4
             - image: mysql:5.7
-              environment: *db_sphinx_env
+              environment: *db_env
 
 jobs:
     frontend_setup:

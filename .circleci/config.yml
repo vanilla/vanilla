@@ -306,7 +306,6 @@ jobs:
                       fi
                   name: "Conditionally perform Chromatic test"
             - checkout
-            - *symlink_addons
             - *prepare_mysql
             - *prepare_hosts
             - *run_composer

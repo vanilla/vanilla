@@ -5,11 +5,11 @@
  */
 
 import React from "react";
-import { Widget } from "@library/features/homepages/Widget";
 import { ITabData, ITabsProps, Tabs } from "@library/sectioning/Tabs";
 import { TabsTypes } from "@library/sectioning/TabsTypes";
 import Container from "@library/layout/components/Container";
-import { useWidgetLayoutClasses } from "@library/layout/WidgetLayout.context";
+import { useWidgetSectionClasses } from "@library/layout/WidgetLayout.context";
+import { Layout } from "@library/features/Layout/Layout";
 
 interface ITabWidgetProps extends Omit<ITabsProps, "data"> {
     tabs: Array<{
@@ -22,12 +22,12 @@ interface ITabWidgetProps extends Omit<ITabsProps, "data"> {
 export default function TabWidget(props: ITabWidgetProps) {
     const { tabs } = props;
 
-    const tabsData: ITabData[] = tabs.map(({ label, componentName, componentProps }, index) => ({
+    const tabsData: ITabData[] = tabs.map(({ label, componentName, componentProps }) => ({
         label,
-        contents: <Widget key={index} $type={componentName} {...componentProps} />,
+        contents: <Layout layout={[{ $reactComponent: componentName, $reactProps: componentProps }]} />,
     }));
 
-    const widgetClasses = useWidgetLayoutClasses();
+    const widgetClasses = useWidgetSectionClasses();
 
     return (
         <div className={widgetClasses.widgetClass}>

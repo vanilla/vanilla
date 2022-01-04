@@ -1142,6 +1142,10 @@ class VanillaHooks extends Gdn_Plugin {
         $Config = Gdn::factory(Gdn::AliasConfig);
         $Drop = false;
 
+        // NOTE: Currently some structure elements don't occur the first time around
+        // So the Vanilla addon actually slightly depends on this getting run twice.
+        // If you remove this go take a look at the failures in AddonEnableDisableTest.
+
         // Call structure.php to update database
         $Validation = new Gdn_Validation(); // Needed by structure.php to validate permission names
         include(PATH_APPLICATIONS.DS.'vanilla'.DS.'settings'.DS.'structure.php');

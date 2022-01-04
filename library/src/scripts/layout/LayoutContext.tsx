@@ -7,73 +7,73 @@
 import { Optionalize } from "@library/@types/utils";
 import throttle from "lodash/throttle";
 import React, { useContext, useEffect, useState } from "react";
-import { IPanelLayoutClasses } from "@library/layout/PanelLayout.styles";
-import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
+import { ISectionClasses } from "@library/layout/Section.styles";
+import { SectionTypes } from "@library/layout/types/interface.layoutTypes";
 import { mediaQueryFactory } from "@library/layout/types/mediaQueryFactory";
-import { IAllLayoutDevices, ILayoutMediaQueryFunction } from "@library/layout/types/interface.panelLayout";
-import { twoColumnLayoutClasses, twoColumnLayoutVariables } from "@library/layout/types/layout.twoColumns";
-import { threeColumnLayoutClasses, threeColumnLayoutVariables } from "@library/layout/types/layout.threeColumns";
+import { IAllSectionDevices, ISectionMediaQueryFunction } from "@library/layout/types/interface.panelLayout";
+import { twoColumnClasses, twoColumnVariables } from "@library/layout/types/layout.twoColumns";
+import { threeColumnClasses, threeColumnVariables } from "@library/layout/types/layout.threeColumns";
 
-export interface ILayoutProps {
-    type: LayoutTypes;
+export interface ISectionProps {
+    type: SectionTypes;
     currentDevice: string;
-    Devices: IAllLayoutDevices;
+    Devices: IAllSectionDevices;
     isCompact: boolean; // Usually mobile and/or xs, but named this way to be more generic and not be confused with the actual mobile media query
     isFullWidth: boolean; // Usually desktop and no bleed, but named this way to be more generic and just to mean it's the full size
-    classes: IPanelLayoutClasses;
-    currentLayoutVariables: any;
-    mediaQueries: ILayoutMediaQueryFunction;
+    classes: ISectionClasses;
+    currentSectionVariables: any;
+    mediaQueries: ISectionMediaQueryFunction;
     contentWidth: number;
     calculateDevice: () => any;
-    layoutSpecificStyles: (style) => any | undefined;
+    sectionSpecificStyles: (style) => any | undefined;
     rightPanelCondition: (currentDevice: string, shouldRenderRightPanel: boolean) => boolean;
 }
 
-const layoutDataByType = (type: LayoutTypes): ILayoutProps => {
-    const layout = {
-        variables: type === LayoutTypes.TWO_COLUMNS ? twoColumnLayoutVariables() : threeColumnLayoutVariables(),
-        classes: type === LayoutTypes.TWO_COLUMNS ? twoColumnLayoutClasses() : threeColumnLayoutClasses(),
+const sectionDataByType = (type: SectionTypes): ISectionProps => {
+    const section = {
+        variables: type === SectionTypes.TWO_COLUMNS ? twoColumnVariables() : threeColumnVariables(),
+        classes: type === SectionTypes.TWO_COLUMNS ? twoColumnClasses() : threeColumnClasses(),
     };
 
-    const currentDevice = layout.variables.calculateDevice().toString();
+    const currentDevice = section.variables.calculateDevice().toString();
 
     return {
         type,
         currentDevice,
-        Devices: layout.variables.Devices as any,
-        isCompact: layout.variables.isCompact(currentDevice),
-        isFullWidth: layout.variables.isFullWidth(currentDevice),
-        classes: layout.classes as IPanelLayoutClasses,
-        currentLayoutVariables: layout.variables,
-        mediaQueries: mediaQueryFactory(layout.variables.mediaQueries, type),
-        contentWidth: layout.variables.contentWidth,
-        calculateDevice: layout.variables.calculateDevice,
-        layoutSpecificStyles: layout.variables["layoutSpecificStyles"] ?? undefined,
+        Devices: section.variables.Devices as any,
+        isCompact: section.variables.isCompact(currentDevice),
+        isFullWidth: section.variables.isFullWidth(currentDevice),
+        classes: section.classes as ISectionClasses,
+        currentSectionVariables: section.variables,
+        mediaQueries: mediaQueryFactory(section.variables.mediaQueries, type),
+        contentWidth: section.variables.contentWidth,
+        calculateDevice: section.variables.calculateDevice,
+        sectionSpecificStyles: section.variables["sectionSpecificStyles"] ?? undefined,
         rightPanelCondition:
-            layout.variables["rightPanelCondition"] !== undefined
-                ? layout.variables["rightPanelCondition"]
+            section.variables["rightPanelCondition"] !== undefined
+                ? section.variables["rightPanelCondition"]
                 : () => {
                       return false;
                   },
     };
 };
 
-const LayoutContext = React.createContext<ILayoutProps>(layoutDataByType(LayoutTypes.THREE_COLUMNS));
+const SectionContext = React.createContext<ISectionProps>(sectionDataByType(SectionTypes.THREE_COLUMNS));
 
-export default LayoutContext;
+export default SectionContext;
 
-export function useLayout() {
-    return useContext(LayoutContext);
+export function useSection() {
+    return useContext(SectionContext);
 }
 
-export function LayoutProvider(props: { type?: LayoutTypes; children: React.ReactNode }) {
-    const { type = LayoutTypes.THREE_COLUMNS, children } = props;
+export function SectionProvider(props: { type?: SectionTypes; children: React.ReactNode }) {
+    const { type = SectionTypes.THREE_COLUMNS, children } = props;
 
-    const [deviceInfo, setDeviceInfo] = useState<ILayoutProps>(layoutDataByType(type));
+    const [deviceInfo, setDeviceInfo] = useState<ISectionProps>(sectionDataByType(type));
 
     useEffect(() => {
         const throttledUpdate = throttle(() => {
-            setDeviceInfo(layoutDataByType(type));
+            setDeviceInfo(sectionDataByType(type));
         }, 100);
         window.addEventListener("resize", throttledUpdate);
         return () => {
@@ -81,7 +81,7 @@ export function LayoutProvider(props: { type?: LayoutTypes; children: React.Reac
         };
     }, [type, setDeviceInfo]);
 
-    return <LayoutContext.Provider value={deviceInfo}>{children}</LayoutContext.Provider>;
+    return <SectionContext.Provider value={deviceInfo}>{children}</SectionContext.Provider>;
 }
 
 /**
@@ -89,16 +89,16 @@ export function LayoutProvider(props: { type?: LayoutTypes; children: React.Reac
  *
  * @param WrappedComponent - The component to wrap
  */
-export function withLayout<T extends ILayoutProps = ILayoutProps>(WrappedComponent: React.ComponentType<T>) {
+export function withSection<T extends ISectionProps = ISectionProps>(WrappedComponent: React.ComponentType<T>) {
     const displayName = WrappedComponent.displayName || WrappedComponent.name || "Component";
-    const ComponentWithDevice = (props: Optionalize<T, ILayoutProps>) => {
+    const ComponentWithDevice = (props: Optionalize<T, ISectionProps>) => {
         return (
-            <LayoutContext.Consumer>
+            <SectionContext.Consumer>
                 {(context) => {
                     // https://github.com/Microsoft/TypeScript/issues/28938
                     return <WrappedComponent device={context} {...(props as T)} />;
                 }}
-            </LayoutContext.Consumer>
+            </SectionContext.Consumer>
         );
     };
     ComponentWithDevice.displayName = `withLayout(${displayName})`;

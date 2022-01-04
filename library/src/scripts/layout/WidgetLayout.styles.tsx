@@ -5,14 +5,14 @@
  */
 
 import { css, CSSObject } from "@emotion/css";
-import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
+import { oneColumnVariables } from "@library/layout/Section.variables";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { Mixins } from "@library/styles/Mixins";
 import { useThemeCache } from "@library/styles/themeCache";
 
 export const widgetLayoutClasses = useThemeCache(() => {
     const globalVars = globalVariables();
-    const layoutVars = panelLayoutVariables();
+    const layoutVars = oneColumnVariables();
 
     const widgetMixin: CSSObject = {
         clear: "both", // Some old themes have weird floating elements.

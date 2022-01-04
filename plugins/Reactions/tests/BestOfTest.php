@@ -22,11 +22,6 @@ class BestOfTest extends SiteTestCase {
      * Test defaulting behaviour of the data driven themes on the bestof layout.
      */
     public function testBestOfDefaultView() {
-        self::container()
-            ->rule(ThemeFeatures::class)
-            ->setShared(true)
-        ;
-
         \Gdn::themeFeatures()->forceFeatures(['DataDrivenTheme' => true]);
         $this->assertBestOfIsList();
 

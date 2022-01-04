@@ -18,6 +18,7 @@ use Vanilla\FeatureFlagHelper;
 use Vanilla\Utility\StringUtils;
 use VanillaTests\APIv0\TestDispatcher;
 use VanillaTests\Fixtures\Html\TestHtmlDocument;
+use VanillaTests\Fixtures\NullCache;
 use VanillaTests\Fixtures\TestCache;
 use Webmozart\Assert\Assert;
 
@@ -40,6 +41,9 @@ trait BootstrapTrait {
 
     /** @var string */
     protected $controllerRawOutput;
+
+    /** @var TestCache|null */
+    protected static $testCache;
 
     /**
      * Bootstrap the site.
@@ -76,6 +80,7 @@ trait BootstrapTrait {
 
         self::$emails = [];
         \Gdn_Form::resetIDs();
+        \Gdn_Controller::setIsReauthenticated(false);
     }
 
     /**
@@ -264,9 +269,16 @@ trait BootstrapTrait {
      * Reset necessary tables.
      *
      * @param string $name
+     * @param bool $flushCache Set to false if we should not flush the cache.
      */
-    protected static function resetTable(string $name): void {
+    protected static function resetTable(string $name, bool $flushCache = true): void {
         \Gdn::database()->sql()->truncate($name);
+
+        // Reset our caching if we need to.
+        if (\Gdn::config('Cache.Enabled') && $flushCache) {
+            // Make a fresh cache.
+            static::container()->get(\Gdn_Cache::class)->flush();
+        }
     }
 
     /**
@@ -277,11 +289,11 @@ trait BootstrapTrait {
      * @return TestCache
      */
     protected static function enableCaching(): TestCache {
-        $cache = new TestCache();
-        static::container()->setInstance(\Gdn_Cache::class, $cache);
-        static::container()->setInstance(CacheInterface::class, new CacheCacheAdapter($cache));
+        self::$testCache = new TestCache();
+        static::container()->setInstance(\Gdn_Cache::class, self::$testCache);
+        static::container()->setInstance(CacheInterface::class, new CacheCacheAdapter(self::$testCache));
         static::container()->get(ConfigurationInterface::class)->set('Cache.Enabled', true);
-        return $cache;
+        return self::$testCache;
     }
 
     /**

@@ -10,7 +10,6 @@ namespace Vanilla\Models;
 use Garden\Schema\Schema;
 use Vanilla\ApiUtils;
 use Vanilla\SchemaFactory;
-use Vanilla\Search\AbstractSearchIndexTemplate;
 
 /**
  * Schema to validate shape of some media upload metadata.
@@ -29,7 +28,7 @@ class UserFragmentSchema extends Schema {
             'photoUrl:s', // The URL of the user's avatar picture.
             'dateLastActive:dt|n?', // Time the user was last active.
             'banned:i?', // The banned status of the user.
-            'punished:i?' => [AbstractSearchIndexTemplate::OPT_NO_INDEX => true], // The jailed status of the user.
+            'punished:i?', // The jailed status of the user.
             'private:b?', // The private profile status of the user.
             'label:s?'
         ]));
@@ -56,22 +55,29 @@ class UserFragmentSchema extends Schema {
      * @return array
      */
     public static function normalizeUserFragment(array $dbRecord) {
-        $photo = $dbRecord['Photo'] ?? '';
+        $photo = $dbRecord['Photo'] ?? $dbRecord['photo'] ?? '';
         if ($photo) {
             $photo = userPhotoUrl($dbRecord);
-            $dbRecord['PhotoUrl'] = $photo;
+            $photoUrl = $photo;
         } else {
             $url = \UserModel::getDefaultAvatarUrl($dbRecord);
-            $dbRecord['PhotoUrl'] = ($url) ? $url : \UserModel::getDefaultAvatarUrl();
+            $photoUrl = $url ?: \UserModel::getDefaultAvatarUrl();
         }
-        $dbRecord['url'] = url(userUrl($dbRecord), true);
-        $dbRecord['Name'] = empty($dbRecord['Name']) ? 'unknown' : $dbRecord['Name'];
         $privateProfile = \UserModel::getRecordAttribute($dbRecord, 'Private', "0");
-        $dbRecord['Private'] = (bool)$privateProfile;
-        $dbRecord['Banned'] = $dbRecord['Banned'] ?? 0;
-        $dbRecord['Punished'] = $dbRecord['Punished'] ?? 0;
 
-        $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
+        $schemaRecord = [
+            'userID' => $dbRecord['UserID'] ?? $dbRecord['userID'],
+            'photoUrl' => $photoUrl,
+            'url' => url(userUrl($dbRecord), true),
+            'name' => $dbRecord['Name'] ?? $dbRecord['name'] ?? 'Unknown',
+            'private' => (bool) $privateProfile,
+            'banned' => $dbRecord['Banned'] ?? 0,
+            'punished' => $dbRecord['Punished'] ?? 0,
+            'dateLastActive' => $dbRecord['DateLastActive'] ?? null,
+            'title' => $dbRecord['Title'] ?? null,
+            'label' => $dbRecord['Label'] ?? $dbRecord['label'] ?? null,
+        ];
+        $schemaRecord = ApiUtils::convertOutputKeys($schemaRecord);
         $schemaRecord = self::instance()->validate($schemaRecord);
         return $schemaRecord;
     }

@@ -6,7 +6,7 @@
 import React from "react";
 import Member from "@dashboard/components/Member";
 import { MemberTable } from "@dashboard/components/MemberTable";
-import TwoColumnLayout from "@library/layout/TwoColumnLayout";
+import TwoColumnSection from "@library/layout/TwoColumnSection";
 import { IUser } from "@library/@types/api/users";
 import { IResult } from "@library/result/Result";
 
@@ -68,7 +68,7 @@ const badUserName = {
 };
 
 export const MemberList = () => (
-    <TwoColumnLayout
+    <TwoColumnSection
         mainTop={
             <MemberTable>
                 <Member {...one} />
@@ -86,7 +86,7 @@ export const MemberList = () => (
 );
 
 export const MemberListShort = () => (
-    <TwoColumnLayout
+    <TwoColumnSection
         mainTop={
             <MemberTable>
                 <Member {...one} />

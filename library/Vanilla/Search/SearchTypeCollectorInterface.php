@@ -22,14 +22,6 @@ interface SearchTypeCollectorInterface {
     public function registerSearchType(AbstractSearchType $searchType);
 
     /**
-     * Register a new search index template.
-     *
-     * @param AbstractSearchIndexTemplate $searchIndexTemplate
-     * @return mixed
-     */
-    public function registerSearchIndexTemplate(AbstractSearchIndexTemplate $searchIndexTemplate);
-
-    /**
      * Get a search type by an assosciate dType.
      *
      * @param string $type

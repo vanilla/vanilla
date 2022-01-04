@@ -22,7 +22,7 @@ import { actionBarClasses } from "@library/headers/ActionBarStyles";
 import PanelArea from "@library/layout/components/PanelArea";
 import PanelWidgetHorizontalPadding from "@library/layout/components/PanelWidgetHorizontalPadding";
 
-interface IProps {
+type IProps = {
     callToActionTitle?: string;
     anotherCallToActionTitle?: string;
     isCallToActionDisabled?: boolean;
@@ -38,10 +38,18 @@ interface IProps {
     selfPadded?: boolean;
     title?: React.ReactNode;
     fullWidth?: boolean;
-    backTitle?: string;
     handleCancel?: (e: React.MouseEvent) => void;
     handleAnotherSubmit?: (e: React.MouseEvent) => void;
-}
+} & (
+    | {
+          backTitle?: string;
+          noBackLink?: boolean;
+      }
+    | {
+          backTitle?: never;
+          noBackLink: false;
+      }
+);
 
 /**
  * Implement editor header component
@@ -66,14 +74,16 @@ export function ActionBar(props: IProps) {
 
     const content = (
         <ul className={classNames(classes.items)}>
-            <li className={classNames(classes.item, "isPullLeft")} ref={backRef} style={minButtonSizeStyles}>
-                <BackLink
-                    title={props.backTitle || t("Cancel")}
-                    visibleLabel={true}
-                    className={classes.backLink}
-                    onClick={props.handleCancel}
-                />
-            </li>
+            {!props.noBackLink && (
+                <li className={classNames(classes.item, "isPullLeft")} ref={backRef} style={minButtonSizeStyles}>
+                    <BackLink
+                        title={props.backTitle || t("Cancel")}
+                        visibleLabel={true}
+                        className={classes.backLink}
+                        onClick={props.handleCancel}
+                    />
+                </li>
+            )}
             {props.statusItem}
             {showMobileDropDown ? (
                 <li className={classes.centreColumn}>

@@ -9,7 +9,6 @@ import { storiesOf } from "@storybook/react";
 import React, { useState } from "react";
 import Tiles from "./Tiles";
 import { TileAlignment } from "./TileAlignment";
-import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import Container from "@library/layout/components/Container";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 

@@ -12,6 +12,7 @@ import classNames from "classnames";
 import SmartLink from "@library/routing/links/SmartLink";
 
 interface IProps extends Omit<React.ComponentProps<typeof ToolTip>, "children"> {
+    icon?: React.ReactNode;
     small?: boolean;
     href?: string;
 }
@@ -19,7 +20,8 @@ interface IProps extends Omit<React.ComponentProps<typeof ToolTip>, "children"> 
 export function ThemeInfoTooltip(props: IProps) {
     const classes = themeBuilderClasses();
 
-    let icon = <InformationIcon informationMessage={t("Info")} />;
+    let icon = props.icon ?? <InformationIcon informationMessage={t("Info")} />;
+
     if (props.href) {
         icon = (
             <SmartLink className={classes.documentationIconLink} to={props.href}>

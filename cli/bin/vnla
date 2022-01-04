@@ -1,0 +1,51 @@
+#!/usr/bin/env php
+<?php
+/**
+ * @author Adam Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2020 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+use Vanilla\Cli\Cloud\VanillaCloudCli;
+use Vanilla\Cli\Utils\SimpleScriptLogger;
+use Vanilla\Cli\VanillaCli;
+
+// Throw errors as exceptions.
+set_error_handler(static function(
+    int $code,
+    string $message,
+    string $filename = 'unknown',
+    int $line = -1
+) {
+    throw new ErrorException($message, $code, 1, $filename, $line);
+}, E_ALL);
+
+$originalCwd = getcwd();
+$root = realpath(__DIR__ . "/../../");
+try {
+    define('PATH_ROOT', $root);
+    $paths = [
+        __DIR__ . '/../../environment.php',
+    ];
+    foreach ($paths as $path) {
+        if (file_exists($path)) {
+            require_once $path;
+            break;
+        }
+    }
+
+    $main = class_exists(VanillaCloudCli::class) ? new VanillaCloudCli() : new VanillaCli();
+    $result = $main->main($argv);
+} catch (\Throwable $t) {
+    /** Restore the original CWD. */
+    system("cd {$originalCwd}");
+    $exitCode = $t->getCode() === 0 ? 1 : $t->getCode();
+
+    // Make a logger.
+    $logger = new SimpleScriptLogger();
+
+    $logger->critical($t->getMessage());
+    exit($exitCode);
+}
+
+exit($result);

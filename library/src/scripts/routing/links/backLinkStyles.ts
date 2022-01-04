@@ -13,7 +13,7 @@ import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { important, percent, px, translateY } from "csx";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
-import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
+import { oneColumnVariables } from "@library/layout/Section.variables";
 
 const backLinkVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -38,7 +38,7 @@ const backLinkVariables = useThemeCache(() => {
 
 const backLinkClasses = useThemeCache(() => {
     const globalVars = globalVariables();
-    const mediaQueries = panelLayoutVariables().mediaQueries();
+    const mediaQueries = oneColumnVariables().mediaQueries();
     const style = styleFactory("backLink");
     const titleBarVars = titleBarVariables();
     const vars = backLinkVariables();

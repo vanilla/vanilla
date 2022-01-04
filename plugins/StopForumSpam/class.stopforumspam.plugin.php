@@ -98,13 +98,6 @@ class StopForumSpamPlugin extends Gdn_Plugin {
     /**
      *
      */
-    public function setup() {
-        $this->structure();
-    }
-
-    /**
-     *
-     */
     public function structure() {
         // Get a user for operations.
         $userID = Gdn::sql()->getWhere('User', ['Name' => 'StopForumSpam', 'Admin' => 2])->value('UserID');

@@ -8,7 +8,7 @@ import { bannerClasses } from "@library/banner/Banner.styles";
 import { ensureColorHelper } from "@library/styles/styleHelpers";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { contentBannerClasses, contentBannerVariables } from "@library/banner/contentBannerStyles";
-import { useLayout } from "@library/layout/LayoutContext";
+import { useSection } from "@library/layout/LayoutContext";
 
 interface IProps {
     isContentBanner?: boolean;
@@ -16,7 +16,7 @@ interface IProps {
 
 export function DefaultBannerBg(props: IProps) {
     const { isContentBanner } = props;
-    const { mediaQueries } = useLayout();
+    const { mediaQueries } = useSection();
     const classes = isContentBanner ? contentBannerClasses() : bannerClasses();
     const vars = isContentBanner ? contentBannerVariables() : bannerVariables();
 

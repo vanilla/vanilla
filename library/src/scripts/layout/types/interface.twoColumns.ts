@@ -5,14 +5,14 @@
 
 import { CSSObject } from "@emotion/css";
 
-export enum twoColumnLayoutDevices {
+export enum twoColumnDevices {
     XS = "xs",
     MOBILE = "mobile",
     DESKTOP = "desktop",
     NO_BLEED = "no_bleed", // Not enough space for back link which goes outside the margin.
 }
 
-export interface ITwoColumnLayoutMediaQueryStyles {
+export interface ITwoColumnMediaQueryStyles {
     noBleed?: CSSObject;
     noBleedDown?: CSSObject;
     oneColumn?: CSSObject;
@@ -21,7 +21,7 @@ export interface ITwoColumnLayoutMediaQueryStyles {
     xs?: CSSObject;
 }
 
-export interface ITwoColumnLayoutMediaQueries {
+export interface ITwoColumnMediaQueries {
     noBleed: (styles: CSSObject) => CSSObject;
     oneColumn: (styles: CSSObject) => CSSObject;
     oneColumnDown: (styles: CSSObject) => CSSObject;

@@ -5,8 +5,8 @@
 
 import React from "react";
 import { NO_WRAPPER_CONFIG, storyWithConfig } from "@library/storybook/StoryContext";
-import { twoColumnLayoutVariables } from "@library/layout/types/layout.twoColumns";
-import TwoColumnLayout from "./TwoColumnLayout";
+import { twoColumnVariables } from "@library/layout/types/layout.twoColumns";
+import TwoColumnSection from "./TwoColumnSection";
 import PanelWidget from "./components/PanelWidget";
 import { Container } from "./components/Container";
 
@@ -28,7 +28,7 @@ const DummyPanel = (props: { bg?: string; children?: React.ReactNode }) => {
 export const SimplePanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
     return (
         <Container>
-            <TwoColumnLayout
+            <TwoColumnSection
                 mainTop={<DummyPanel>Middle Top</DummyPanel>}
                 mainBottom={<DummyPanel>Middle Bottom{largeIpsum}</DummyPanel>}
                 rightTop={<DummyPanel>Right Top{largeIpsum}</DummyPanel>}
@@ -40,7 +40,7 @@ export const SimplePanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
 export const LargeRightTopPanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
     return (
         <Container>
-            <TwoColumnLayout
+            <TwoColumnSection
                 mainTop={<DummyPanel>Middle Top</DummyPanel>}
                 mainBottom={<DummyPanel>Middle Bottom</DummyPanel>}
                 rightTop={<DummyPanel>Right Top {largeIpsum}</DummyPanel>}
@@ -53,7 +53,7 @@ export const LargeRightTopPanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
 export const LargeRightBottomPanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
     return (
         <Container>
-            <TwoColumnLayout
+            <TwoColumnSection
                 mainTop={<DummyPanel>Middle Top</DummyPanel>}
                 mainBottom={
                     <DummyPanel>
@@ -71,7 +71,7 @@ export const LargeRightBottomPanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
 export const LargeEverything = storyWithConfig(NO_WRAPPER_CONFIG, () => {
     return (
         <Container>
-            <TwoColumnLayout
+            <TwoColumnSection
                 mainTop={<DummyPanel>Middle Top{largeIpsum}</DummyPanel>}
                 mainBottom={<DummyPanel>Middle Bottom{largeIpsum}</DummyPanel>}
                 rightTop={<DummyPanel>Right Top{largeIpsum}</DummyPanel>}
@@ -96,7 +96,7 @@ export const DarkMode = storyWithConfig(
     () => {
         return (
             <Container>
-                <TwoColumnLayout
+                <TwoColumnSection
                     mainTop={<DummyPanel>Middle Top{largeIpsum}</DummyPanel>}
                     mainBottom={<DummyPanel>Middle Bottom{largeIpsum}</DummyPanel>}
                     rightTop={<DummyPanel>Right Top{largeIpsum}</DummyPanel>}

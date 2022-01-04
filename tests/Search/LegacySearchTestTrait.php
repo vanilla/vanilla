@@ -8,6 +8,7 @@
 namespace VanillaTests\Search;
 
 use Garden\Http\HttpResponse;
+use Vanilla\Controllers\SearchRootController;
 
 /**
  * @method dispatchData(mixed $request = null, bool $permanent = true);
@@ -20,8 +21,10 @@ trait LegacySearchTestTrait {
      * @return HttpResponse
      */
     protected function performSearch(array $searchParams): HttpResponse {
-        $query = http_build_query($searchParams);
-        $data = $this->dispatchData("/search?$query")['SearchResults'] ?? null;
+        \Gdn::themeFeatures()->forceFeatures([
+            SearchRootController::ENABLE_FLAG => false,
+        ]);
+        $data = $this->bessy()->getJsonData("/search", $searchParams)['SearchResults'] ?? null;
         $response = new HttpResponse(
             $data === null ? 500 : 200,
             ['content-type' => 'application/json'],

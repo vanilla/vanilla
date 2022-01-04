@@ -4,12 +4,13 @@
  * @license GPL-2.0-only
  */
 
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import qs from "qs";
 import { useHistory, useLocation } from "react-router";
 import debounce from "lodash/debounce";
 import History from "history";
 import { useLastValue } from "@vanilla/react-utils";
+import { Uri } from "monaco-editor";
 
 interface IStringMap {
     [key: string]: any;
@@ -25,6 +26,14 @@ export default function QueryString(props: IProps) {
     useQueryStringSync(props.value, props.defaults, props.syncOnFirstMount);
 
     return <React.Fragment />;
+}
+
+export function useUrlSearchParams(): URLSearchParams {
+    const location = useLocation();
+    const params = useMemo(() => {
+        return new URLSearchParams(location.search);
+    }, [location]);
+    return params;
 }
 
 export function useQueryStringSync(value: IStringMap, defaults?: IStringMap, syncOnFirstMount?: boolean) {

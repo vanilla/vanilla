@@ -40,7 +40,7 @@ class WidgetFactory implements \JsonSerializable {
         return [
             'widgetID' => $class::getWidgetID(),
             'name' => $class::getWidgetName(),
-            'widgetClass' => $class::getWidgetClass(),
+            'widgetClass' => $class,
             'schema' => $class::getWidgetSchema(),
         ];
     }

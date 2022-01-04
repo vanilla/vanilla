@@ -85,6 +85,8 @@ class Permissions implements \JsonSerializable {
     /** @var bool */
     private $isAdmin = false;
 
+    private $isSysAdmin = false;
+
     /**
      * @var array An array of bans that override all permissions a user may have.
      */
@@ -469,6 +471,15 @@ class Permissions implements \JsonSerializable {
     }
 
     /**
+     * Determine if the sysAdmin flag is set.
+     *
+     * @return bool
+     */
+    public function isSysAdmin(): bool {
+        return $this->isSysAdmin === true;
+    }
+
+    /**
      * Merge in data from another Permissions instance.
      *
      * @param Permissions $source The source Permissions instance to import permissions from.
@@ -483,6 +494,7 @@ class Permissions implements \JsonSerializable {
         $this->addJunctions($source->getJunctions());
         $this->addJunctionAliases($source->getJunctionAliases());
         $this->setAdmin($this->isAdmin() || $source->isAdmin());
+        $this->setSysAdmin($this->isSysAdmin() || $source->isSysAdmin());
 
         return $this;
     }
@@ -565,6 +577,17 @@ class Permissions implements \JsonSerializable {
      */
     public function setAdmin($isAdmin): self {
         $this->isAdmin = (bool)$isAdmin;
+        return $this;
+    }
+
+    /**
+     * Set the sysAdmin flag.
+     *
+     * @param bool $isSysAdmin Is the user an system administrator?
+     * @return $this
+     */
+    public function setSysAdmin($isSysAdmin): self {
+        $this->isSysAdmin = (bool)$isSysAdmin;
         return $this;
     }
 
@@ -826,7 +849,8 @@ class Permissions implements \JsonSerializable {
     public function asApiOutput(bool $withJunctions): array {
         $result = [
             'permissions' => $this->asPermissionFragments(),
-            'isAdmin' => $this->isAdmin,
+            'isAdmin' => $this->isAdmin(),
+            'isSysAdmin' => $this->isSysAdmin(),
         ];
 
         if ($withJunctions) {

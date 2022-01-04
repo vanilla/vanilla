@@ -13,7 +13,7 @@ import { StoryContent } from "@library/storybook/StoryContent";
 import SearchContext from "@library/contexts/SearchContext";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
 import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
-import { WarningIcon } from "@library/icons/common";
+import { Icon } from "@vanilla/icons";
 
 const story = storiesOf("Components", module);
 
@@ -56,7 +56,7 @@ story.add("Tool Tips", () => {
                         <ToolTip label={"This one's an icon"}>
                             <ToolTipIcon>
                                 <span style={{ backgroundColor: "#CACACA", width: "20px", height: "20px" }}>
-                                    <WarningIcon />
+                                    <Icon icon={"status-warning"} size={"compact"} />
                                 </span>
                             </ToolTipIcon>
                         </ToolTip>

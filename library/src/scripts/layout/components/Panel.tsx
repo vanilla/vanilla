@@ -5,14 +5,14 @@
 
 import classNames from "classnames";
 import React from "react";
-import { useLayout, withLayout } from "@library/layout/LayoutContext";
+import { useSection, withSection } from "@library/layout/LayoutContext";
 import { ILayoutContainer } from "@library/layout/components/interface.layoutContainer";
 
 export function Panel(props: ILayoutContainer) {
     const Tag = (props.tag as "div") || "div";
     return (
         <Tag
-            className={classNames(useLayout().classes.panel, props.className)}
+            className={classNames(useSection().classes.panel, props.className)}
             aria-hidden={props.ariaHidden}
             ref={props.innerRef}
         >
@@ -21,4 +21,4 @@ export function Panel(props: ILayoutContainer) {
     );
 }
 
-export default withLayout(Panel);
+export default withSection(Panel);

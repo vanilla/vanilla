@@ -87,8 +87,10 @@ trait UsersAndRolesApiTestTrait {
         $userID = is_array($userOrUserID) ? $userOrUserID['userID'] : $userOrUserID;
         $apiUserBefore = $this->api()->getUserID();
         $this->api()->setUserID($userID);
+        \CategoryModel::clearUserCache($userID);
         $result = call_user_func($callback);
         $this->api()->setUserID($apiUserBefore);
+        \CategoryModel::clearUserCache($apiUserBefore);
         return $result;
     }
 
@@ -127,10 +129,11 @@ trait UsersAndRolesApiTestTrait {
      * Create an user through the API.
      *
      * @param array $overrides
+     * @param array $extras Extra fields to set directly through the model.
      *
      * @return array
      */
-    protected function createUser(array $overrides = []): array {
+    protected function createUser(array $overrides = [], array $extras = []): array {
         $salt = '-' . round(microtime(true) * 1000) . rand(1, 1000);
 
         $body = $overrides + [
@@ -147,6 +150,11 @@ trait UsersAndRolesApiTestTrait {
 
         $result = $this->api()->post('/users', $body)->getBody();
         $this->lastUserID = $result['userID'];
+
+        if (!empty($extras)) {
+            \Gdn::userModel()->setField($this->lastUserID, $extras);
+        }
+
         return $result;
     }
 

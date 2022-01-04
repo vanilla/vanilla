@@ -13,7 +13,7 @@ namespace Garden\Web\Exception;
 abstract class HttpException extends \Exception implements \JsonSerializable {
     public const FIELD_DESCRIPTION = 'description';
 
-    private $context;
+    protected $context;
 
     /**
      * @var array HTTP response codes and messages.
@@ -126,6 +126,19 @@ abstract class HttpException extends \Exception implements \JsonSerializable {
         } else {
             return new ServerException($message, 500, $context + ['HTTP_X_ERROR_CODE' => $code]);
         }
+    }
+
+    /**
+     * Make sure an existing throwable is an HttpException.
+     *
+     * @param \Throwable $e
+     */
+    public static function createFromThrowable(\Throwable $e): HttpException {
+        if ($e instanceof HttpException) {
+            return $e;
+        }
+
+        return self::createFromStatus($e->getCode(), $e->getMessage());
     }
 
     /**

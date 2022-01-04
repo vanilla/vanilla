@@ -13,13 +13,17 @@ use Vanilla\Models\FullRecordCacheModel;
 use Vanilla\Models\Model;
 use Vanilla\Models\ModelCache;
 use Vanilla\Models\PipelineModel;
+use VanillaTests\Fixtures\TestCache;
+use VanillaTests\SchedulerTestTrait;
+use VanillaTests\SiteTestCase;
 use VanillaTests\SiteTestTrait;
 
 /**
  * Tests for the `Model` class.
  */
-class ModelCacheTest extends TestCase {
-    use SiteTestTrait;
+class ModelCacheTest extends SiteTestCase {
+
+    use SchedulerTestTrait;
 
     /**
      * @var PipelineModel
@@ -32,34 +36,24 @@ class ModelCacheTest extends TestCase {
     private $modelCache;
 
     /**
-     * Install the site and set up a test table.
+     * @inheritDoc
      */
-    public static function setupBeforeClass(): void {
-        static::setupBeforeClassSiteTestTrait();
-
-        static::container()->call(function (
-            \Gdn_DatabaseStructure $st
+    public function setUp(): void {
+        parent::setUp();
+        $this->container()->call(function (
+            \Gdn_DatabaseStructure $st,
+            \Gdn_SQLDriver $sql
         ) {
             $st->table('model')
                 ->primaryKey('modelID')
                 ->column('name', 'varchar(50)')
                 ->set()
             ;
-        });
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function setUp(): void {
-        $this->container()->call(function (
-            \Gdn_SQLDriver $sql
-        ) {
             $sql->truncate('model');
         });
 
         $this->model = $this->container()->getArgs(PipelineModel::class, ['model']);
-        $this->modelCache = new ModelCache($this->model->getTable(), new \Gdn_Dirtycache());
+        $this->modelCache = new ModelCache($this->model->getTable(), new TestCache());
     }
 
     /**
@@ -126,7 +120,7 @@ class ModelCacheTest extends TestCase {
      */
     public function testFullRecordCacheModelInvalidation() {
         /** @var FullRecordCacheModel $model */
-        $model = $this->container()->getArgs(FullRecordCacheModel::class, ['model', new \Gdn_Dirtycache()]);
+        $model = $this->container()->getArgs(FullRecordCacheModel::class, ['model', new TestCache()]);
         $this->model = $model;
 
         $fooID = $this->insertOne('foo');
@@ -166,7 +160,7 @@ class ModelCacheTest extends TestCase {
         $this->runWithConfig([
             'Feature.'.ModelCache::DISABLE_FEATURE_FLAG.'.Enabled' => true,
         ], function () {
-            $mockCache = $this->createMock(\Gdn_Dirtycache::class);
+            $mockCache = $this->createMock(TestCache::class);
             $mockCache
                 ->expects($this->never())
                 ->method($this->anything());
@@ -185,5 +179,37 @@ class ModelCacheTest extends TestCase {
     private function insertOne(string $name = 'foo'): int {
         $id = $this->model->insert(['name' => $name]);
         return $id;
+    }
+
+    /**
+     * Test that our cache hydration can be deferred into the scheduler.
+     */
+    public function testDeferredCacheHydration() {
+        $this->getScheduler()->pause();
+        $hydrateCount = 0;
+
+        $getDeferred = function () use (&$hydrateCount) {
+            return $this->modelCache->getCachedOrHydrate(['myKey'], function () use (&$hydrateCount) {
+                $hydrateCount++;
+                return 'hydrated';
+            }, [
+                ModelCache::OPT_DEFAULT => 'default',
+                ModelCache::OPT_SCHEDULER => $this->getScheduler(),
+            ]);
+        };
+
+        $result = $getDeferred();
+        $this->assertEquals('default', $result, "The default value is set.");
+        $getDeferred();
+        $getDeferred();
+        $getDeferred();
+        $this->assertEquals(0, $hydrateCount, "Hydrate should not have been called yet.");
+
+        // Execute the generation of the cache value.
+        $this->getScheduler()->resume();
+        $result = $getDeferred();
+        $this->assertEquals('hydrated', $result);
+        $getDeferred();
+        $this->assertEquals(1, $hydrateCount);
     }
 }

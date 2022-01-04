@@ -8,6 +8,7 @@
 namespace VanillaTests\Controllers;
 
 use Garden\Events\ResourceEvent;
+use Gdn;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Utility\ArrayUtils;
 use VanillaTests\EventSpyTestTrait;
@@ -262,22 +263,18 @@ class LogControllerTest extends SiteTestCase {
      * Test marking comments as not spam
      */
     public function testSpamCommentRestore(): void {
-        $userData = [
-            "Name" => __FUNCTION__ . "testrestoreuser",
-            "Email" => "testrestoreuser@example.com",
-            "Password" => "vanilla"
-        ];
-        $userID = $this->userModel->save($userData);
+        $user = $this->createUser();
+        $discussion = $this->createDiscussion();
         $preCommentCount = $this->commentModel->getCount();
         $logData = [
             "Body" => __FUNCTION__,
-            "DiscussionID" => 1,
-            "InsertUserID" => $userID,
+            "DiscussionID" => $discussion["discussionID"],
+            "InsertUserID" => $user["userID"],
             "Format" => "Markdown",
             "DateInserted" => "2020-01-01 00:00:00",
             "InsertIPAddress" => "127.0.0.1",
-            "Username" => $userData['Name'],
-            "Email" => $userData['Email'],
+            "Username" => $user['name'],
+            "Email" => $user['email'],
             "IPAddress" => "127.0.0.1",
         ];
 
@@ -319,8 +316,8 @@ class LogControllerTest extends SiteTestCase {
 
         $this->userModel->save($data);
         $logID = $this->logModel->insert('Spam', 'Registration', $data);
-        $this->controller->Request->setMethod('Post');
-        $this->controller->Request->setRequestArguments(
+        Gdn::request()->setMethod("Post");
+        Gdn::request()->setRequestArguments(
             \Gdn_Request::INPUT_POST,
             [
                 'LogIDs' => $logID

@@ -65,7 +65,10 @@ class AddonsApiController extends Controller {
                     'description' => 'The addon\'s icon.',
                     'format' => 'uri',
                 ],
-                'version:s' => 'The addon\'s version.',
+                'version:s' => [
+                    'description' => 'The addon\'s version.',
+                    'default' => 'unknown',
+                ],
                 'require:a?' => [
                     'type' => 'array',
                     'description' => 'An array of addons that are required to enable the addon.',

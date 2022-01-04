@@ -12,10 +12,10 @@ import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
 import { Mixins } from "@library/styles/Mixins";
 import { Variables } from "@library/styles/Variables";
-import { percent, translate, em } from "csx";
+import { percent, translate, em, color } from "csx";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
-import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
+import { oneColumnVariables } from "@library/layout/Section.variables";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { css } from "@emotion/css";
@@ -43,6 +43,9 @@ export const messagesVariables = useThemeCache(() => {
         bg: globalVars.messageColors.warning.bg,
         states: {
             fg: globalVars.messageColors.warning.state,
+        },
+        error: {
+            bg: color("#FBE8E8"),
         },
     });
     const title = themeVars("title", {
@@ -90,7 +93,7 @@ export const messagesClasses = useThemeCache(() => {
     const vars = messagesVariables();
     const globalVars = globalVariables();
     const titleBarVars = titleBarVariables();
-    const mediaQueries = panelLayoutVariables().mediaQueries();
+    const mediaQueries = oneColumnVariables().mediaQueries();
     const shadows = shadowHelper();
 
     const wrap = css({
@@ -171,10 +174,14 @@ export const messagesClasses = useThemeCache(() => {
         ),
         ...Mixins.margin({ horizontal: "auto" }),
         ...{
-            "& + &": {
+            "* + &": {
                 marginTop: styleUnit(globalVars.spacer.size / 2),
             },
         },
+    });
+
+    const error = css({
+        backgroundColor: ColorsUtils.colorOut(vars.colors.error.bg),
     });
 
     const setWidth = css({
@@ -275,6 +282,7 @@ export const messagesClasses = useThemeCache(() => {
 
     return {
         root,
+        error,
         wrap,
         wrapWithIcon,
         actionButton,

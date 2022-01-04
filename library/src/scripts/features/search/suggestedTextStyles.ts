@@ -10,14 +10,14 @@ import { useThemeCache } from "@library/styles/themeCache";
 import { percent } from "csx";
 import { buttonResetMixin } from "@library/forms/buttonMixins";
 import { CSSObject } from "@emotion/css";
-import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
+import { oneColumnVariables } from "@library/layout/Section.variables";
 import { Mixins } from "@library/styles/Mixins";
 
 export const suggestedTextStyleHelper = useThemeCache((overwrite?: { forDashboard?: boolean }) => {
     const globalVars = globalVariables();
     const metasVars = metasVariables();
     const { forDashboard = false } = overwrite || {};
-    const mediaQueries = panelLayoutVariables().mediaQueries();
+    const mediaQueries = oneColumnVariables().mediaQueries();
 
     // The styles have been split here so they can be exported to the compatibility styles.
     const option: CSSObject = {

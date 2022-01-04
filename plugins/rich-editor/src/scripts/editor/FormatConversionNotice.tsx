@@ -4,9 +4,9 @@
  * @license gpl-2.0-only
  */
 
-import { WarningIcon } from "@library/icons/common";
 import Message from "@library/messages/Message";
 import { t } from "@vanilla/i18n";
+import { Icon } from "@vanilla/icons";
 import React from "react";
 
 interface IProps extends Omit<React.ComponentProps<typeof Message>, "icon" | "title" | "contents" | "stringContents"> {}
@@ -25,7 +25,7 @@ export const FormatConversionNotice = React.forwardRef(function FormatConversion
             {...props}
             ref={ref}
             title={conversionTitle}
-            icon={<WarningIcon />}
+            icon={<Icon icon={"status-warning"} size={"compact"} />}
             contents={conversionMessage}
             stringContents={conversionMessage}
         />

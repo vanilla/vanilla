@@ -8,11 +8,11 @@ import React from "react";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import titleBarNavClasses from "@library/headers/titleBarNavStyles";
 import SmartLink from "@library/routing/links/SmartLink";
-import { getClassForButtonType } from "@library/forms/Button";
+import Button, { getClassForButtonType } from "@library/forms/Button";
 import classNames from "classnames";
 import TitleBarListItem from "@library/headers/mebox/pieces/TitleBarListItem";
 
-export interface ITitleBarNav extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
+export interface ITitleBarNav extends React.AnchorHTMLAttributes<HTMLAnchorElement | HTMLButtonElement> {
     className?: string;
     to: string;
     isActive?: boolean;
@@ -23,14 +23,16 @@ export interface ITitleBarNav extends React.AnchorHTMLAttributes<HTMLAnchorEleme
     permission?: string;
 }
 
-interface IProps extends ITitleBarNav {}
+interface IProps extends ITitleBarNav {
+    hasPopupMenu?: boolean;
+}
 
 /**
  * Implements Navigation item component for header
  */
 export const TitleBarNavItem = React.forwardRef(function TitleBarNavItem(
     props: IProps,
-    ref: React.Ref<HTMLAnchorElement>,
+    ref: React.Ref<HTMLAnchorElement | HTMLButtonElement>,
 ) {
     const {
         isActive,
@@ -41,28 +43,61 @@ export const TitleBarNavItem = React.forwardRef(function TitleBarNavItem(
         linkContentClassName,
         children,
         permission,
+        hasPopupMenu,
         ...passthru
     } = props;
 
     const classes = titleBarNavClasses();
+    const content = (
+        <div
+            className={classNames({
+                linkContentClassName: true,
+                [classes.linkActive]: isActive,
+            })}
+        >
+            {children}
+        </div>
+    );
 
     return (
         <TitleBarListItem className={classNames(className, classes.root, { isActive })}>
-            <SmartLink
-                {...passthru}
-                ref={ref}
-                to={to}
-                className={classNames(linkClassName, classes.link, buttonType ? getClassForButtonType(buttonType) : "")}
-            >
-                <div
-                    className={classNames({
-                        linkContentClassName: true,
-                        [classes.linkActive]: isActive,
-                    })}
+            {to && (
+                <SmartLink
+                    {...passthru}
+                    ref={(ref as unknown) as React.Ref<HTMLAnchorElement>}
+                    to={to}
+                    className={classNames(
+                        linkClassName,
+                        classes.link,
+                        buttonType ? getClassForButtonType(buttonType) : "",
+                    )}
+                    role="menulink"
+                    aria-haspopup={hasPopupMenu}
+                    aria-expanded={(hasPopupMenu && isActive) ?? undefined}
                 >
-                    {children}
-                </div>
-            </SmartLink>
+                    {content}
+                </SmartLink>
+            )}
+            {!to && (
+                <Button
+                    buttonRef={(ref as unknown) as React.Ref<HTMLButtonElement>}
+                    onFocus={passthru.onFocus}
+                    onMouseEnter={passthru.onMouseEnter}
+                    onKeyDown={passthru.onKeyDown}
+                    buttonType={ButtonTypes.TEXT}
+                    role="menubutton"
+                    className={classNames(
+                        classes.navLinkAsButton,
+                        linkClassName,
+                        classes.link,
+                        buttonType ? getClassForButtonType(buttonType) : "",
+                    )}
+                    aria-haspopup={hasPopupMenu}
+                    aria-expanded={(hasPopupMenu && isActive) ?? undefined}
+                >
+                    {content}
+                </Button>
+            )}
         </TitleBarListItem>
     );
 });

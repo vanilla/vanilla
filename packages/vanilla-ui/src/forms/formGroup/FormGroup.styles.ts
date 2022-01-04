@@ -14,10 +14,10 @@ interface FormGroupClassesProps {
 export const formGroupClasses = ({ sideBySide, compact }: FormGroupClassesProps) => ({
     formGroup: css({
         margin: "8px 0",
+        display: "flex",
 
         ...(sideBySide
             ? {
-                  display: "flex",
                   flexDirection: "row",
                   alignItems: "baseline",
                   justifyContent: "space-between",
@@ -33,7 +33,9 @@ export const formGroupClasses = ({ sideBySide, compact }: FormGroupClassesProps)
                             },
                         }),
               }
-            : {}),
+            : {
+                  flexDirection: "column",
+              }),
     }),
     inputContainer: css({
         ...(sideBySide ? { flex: 12 } : {}),
@@ -43,6 +45,7 @@ export const formGroupClasses = ({ sideBySide, compact }: FormGroupClassesProps)
     }),
     label: css({
         fontSize: "14px",
+        lineHeight: "21px",
         fontWeight: 600,
         marginBottom: 2,
     }),

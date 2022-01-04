@@ -61,6 +61,15 @@ class Model implements InjectableInterface {
     }
 
     /**
+     * Get the name of the table.
+     *
+     * @return string
+     */
+    public function getTableName(): string {
+        return $this->table;
+    }
+
+    /**
      * Configure a Garden Schema instance for read operations by the model.
      *
      * @param Schema $schema Schema representing the resource's database table.
@@ -78,7 +87,7 @@ class Model implements InjectableInterface {
      */
     public function getReadSchema(): Schema {
         if ($this->readSchema === null) {
-            $schema = $this->getDatabaseSchema();
+            $schema = clone $this->getDatabaseSchema();
             $this->configureReadSchema($schema);
             $this->readSchema = $schema;
         }
@@ -92,7 +101,7 @@ class Model implements InjectableInterface {
      */
     public function getWriteSchema(): Schema {
         if ($this->writeSchema === null) {
-            $schema = $this->getDatabaseSchema();
+            $schema = clone $this->getDatabaseSchema();
             $this->configureWriteSchema($schema);
             $this->writeSchema = $schema;
         }

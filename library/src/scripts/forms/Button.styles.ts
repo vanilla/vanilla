@@ -13,7 +13,7 @@ import { useThemeCache } from "@library/styles/themeCache";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { important, percent } from "csx";
 import generateButtonClass from "./styleHelperButtonGenerator";
-import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
+import { oneColumnVariables } from "@library/layout/Section.variables";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { buttonResetMixin } from "./buttonMixins";
 import { buttonVariables, buttonGlobalVariables } from "./Button.variables";
@@ -41,7 +41,7 @@ export const buttonUtilityClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const formElementVars = formElementsVariables();
     const style = styleFactory("buttonUtils");
-    const mediaQueries = panelLayoutVariables().mediaQueries();
+    const mediaQueries = oneColumnVariables().mediaQueries();
 
     const pushLeft = style("pushLeft", {
         marginRight: important("auto"),

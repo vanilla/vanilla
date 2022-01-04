@@ -1,0 +1,25 @@
+{
+    "name": "vanilla/cli",
+    "description": "Setup & scripting utilities for Vanilla",
+    "type": "project",
+    "license": "GPL-2.0-only",
+    "authors": [
+        {
+            "name": "Adam Charron",
+            "email": "adam@charrondev.com"
+        }
+    ],
+    "config": {
+        "platform": {
+            "php": "7.2"
+        }
+    },
+    "require": {
+        "vanilla/garden-cli": "~3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Vanilla\\Cli\\": "src"
+        }
+    }
+}

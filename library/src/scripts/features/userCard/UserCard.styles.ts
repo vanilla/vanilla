@@ -4,7 +4,7 @@
  */
 
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
+import { oneColumnVariables } from "@library/layout/Section.variables";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { Mixins } from "@library/styles/Mixins";
 import { singleBorder } from "@library/styles/styleHelpers";
@@ -16,7 +16,7 @@ import { css, injectGlobal, cx } from "@emotion/css";
 
 export const userCardClasses = useThemeCache((props: { compact?: boolean } = {}) => {
     const vars = userCardVariables();
-    const mediaQueries = panelLayoutVariables().mediaQueries();
+    const mediaQueries = oneColumnVariables().mediaQueries();
     const globalVars = globalVariables();
 
     // Global for reach
@@ -175,6 +175,7 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
     const headerLink = css({
         ...linkColors,
         "&&": {
+            minHeight: vars.headerLink.minHeight,
             display: "inline-flex",
             alignItems: "center",
             ...Mixins.font(vars.headerLink.font),

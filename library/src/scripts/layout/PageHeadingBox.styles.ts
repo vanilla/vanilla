@@ -6,7 +6,7 @@
 
 import { css, CSSObject } from "@emotion/css";
 import { IPageHeadingBoxOptions, pageHeadingBoxVariables } from "@library/layout/PageHeadingBox.variables";
-import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
+import { oneColumnVariables } from "@library/layout/Section.variables";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { Mixins } from "@library/styles/Mixins";
 import { getPixelNumber } from "@library/styles/styleUtils";
@@ -14,7 +14,7 @@ import { useThemeCache } from "@library/styles/themeCache";
 
 export const pageHeadingBoxClasses = useThemeCache((optionOverrides?: Partial<IPageHeadingBoxOptions>) => {
     const globalVars = globalVariables();
-    const mediaQueries = panelLayoutVariables().mediaQueries();
+    const mediaQueries = oneColumnVariables().mediaQueries();
     const vars = pageHeadingBoxVariables(optionOverrides);
 
     const excludeHeadingMargins: CSSObject = {

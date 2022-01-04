@@ -785,6 +785,7 @@ class PermissionsTest extends SiteTestCase {
                 ]
             ],
             'isAdmin' => false,
+            'isSysAdmin' => false,
             'junctions' => [
                 'category' => [62, 50, 100, 101],
             ],
@@ -807,6 +808,7 @@ class PermissionsTest extends SiteTestCase {
                 ],
             ],
             'isAdmin' => false,
+            'isSysAdmin' => false,
         ], $permissions->asApiOutput(false));
         $this->assertEquals([
             'permissions' => [
@@ -817,6 +819,7 @@ class PermissionsTest extends SiteTestCase {
                 ],
             ],
             'isAdmin' => false,
+            'isSysAdmin' => false,
             'junctions' => new \stdClass(),
             'junctionAliases' => new \stdClass(),
         ], $permissions->asApiOutput(true));

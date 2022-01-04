@@ -145,7 +145,8 @@ class GravatarPlugin extends Gdn_Plugin {
     }
 }
 
-if (!function_exists('UserPhotoDefaultUrl')) {
+// Don't run this in tests our pollutes use photo generation.
+if (!function_exists('UserPhotoDefaultUrl') && !isTestMode()) {
     /**
      * Calculate the user's default photo url.
      *

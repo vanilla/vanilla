@@ -39,11 +39,15 @@ class KalturaEmbedFactory extends AbstractEmbedFactory {
     /**
      * @inheritdoc
      */
-    protected function getSupportedDomains(): array {
+    public function getSupportedDomains(): array {
         $domains = self::DOMAINS;
 
         // Fetch custom domains & add them to the list of supported domains.
-        $customDomains = ArrayUtils::explodeTrim("\n", Gdn::config(\VanillaSettingsController::CONFIG_KALTURA_DOMAINS, ''));
+        $customDomains = Gdn::config(\VanillaSettingsController::CONFIG_KALTURA_DOMAINS, '');
+        // If the custom domains config is a string, we split it to an array.
+        if (is_string($customDomains)) {
+            $customDomains = ArrayUtils::explodeTrim("\n", $customDomains);
+        }
         $domains = array_merge($domains, $customDomains);
 
         return $domains;

@@ -72,5 +72,8 @@ class TestOAuthPlugin extends \Gdn_OAuth2 {
         if ($user) {
             $this->userModel->deleteID($user['UserID']);
         }
+
+        // Make sure our caches aren't messing with us.
+        \Gdn::cache()->flush();
     }
 }

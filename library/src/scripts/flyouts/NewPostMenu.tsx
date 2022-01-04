@@ -1,5 +1,5 @@
 import React from "react";
-import { useLayout } from "@library/layout/LayoutContext";
+import { useSection } from "@library/layout/LayoutContext";
 import { WidgetLayoutWidget } from "@library/layout/WidgetLayoutWidget";
 import NewPostMenuFAB from "@library/flyouts/NewPostMenuFAB";
 import NewPostMenuDropDown from "@library/flyouts/NewPostMenuDropdown";
@@ -22,7 +22,7 @@ interface NewPostMenuProps {
 
 export default function NewPostMenu(props: NewPostMenuProps) {
     const { items } = props;
-    const isCompact = !useLayout().isFullWidth;
+    const isCompact = !useSection().isFullWidth;
     const content = isCompact ? <NewPostMenuFAB items={items} /> : <NewPostMenuDropDown items={items} />;
 
     return <WidgetLayoutWidget>{content}</WidgetLayoutWidget>;

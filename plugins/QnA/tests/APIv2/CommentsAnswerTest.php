@@ -7,6 +7,7 @@
 
 namespace VanillaTests\APIv2;
 
+use Garden\Web\Exception\ForbiddenException;
 use Vanilla\CurrentTimeStamp;
 
 /**
@@ -317,5 +318,101 @@ class CommentsAnswerTest extends AbstractAPIv2Test {
         foreach ($unansweredQuestions as $question) {
             $this->assertContains(strtolower($question['QnA']), ["unanswered", "rejected"]);
         }
+    }
+
+    /**
+     * Test that a ForbiddenException is thrown when a member-level user tries to change the status of an answer on
+     * a closed discussion
+     */
+    public function testAcceptAnswerOnClosedDiscussionAsMember(): void {
+        $category = $this->createCategory();
+
+        // Post a question as a member-level user.
+        $memberUserID = $this->createUserFixture("Member");
+        $this->api()->setUserID($memberUserID);
+        $question = $this->createQuestion(["categoryID" => $category["categoryID"]]);
+
+        // Add an answer and close the discussion.
+        $this->api()->setUserID(self::$siteInfo["adminUserID"]);
+        $answer = $this->api()->post("comments", [
+            "discussionID" => $question["discussionID"],
+            "body" => "An exception will be thrown if a member-level user tried to change the status of this once the
+                discussion has been closed.",
+            "format" => "markdown",
+        ])->getBody();
+        $this->api()->patch("discussions/{$question["discussionID"]}", ["closed" => true]);
+
+        // Try to change the answer's status, but get an exception.
+        $this->api()->setUserID($memberUserID);
+        $this->expectExceptionObject(new ForbiddenException("Permission Problem"));
+        $this->api()->patch('comments/answer/'.$answer['commentID'], [
+            'status' => 'accepted',
+        ]);
+    }
+
+    /**
+     * Test that an admin can still change the status on an answer when a discussion is closed.
+     */
+    public function testAcceptAnswerOnClosedDiscussionAsAdmin(): void {
+        $category = $this->createCategory();
+        $memberUserID = $this->createUserFixture("Member");
+
+        // Post a QnA discussion and an answer.
+        $this->api()->setUserID($memberUserID);
+        $question = $this->createQuestion(["categoryID" => $category["categoryID"]]);
+        $answer = $this->api()->post("comments", [
+            "discussionID" => $question["discussionID"],
+            "body" => "An admin can change the status of this even when it's closed",
+            "format" => "markdown",
+        ])->getBody();
+
+        // Close the discussion.
+        $this->api()->setUserID(self::$siteInfo["adminUserID"]);
+        $this->api()->patch("discussions/{$question["discussionID"]}", ["closed" => true]);
+
+        // Verify that the admin can still change an answer's status.
+        $response = $this->api()->patch('comments/answer/'.$answer['commentID'], [
+            'status' => 'accepted',
+        ]);
+        $this->assertEquals(200, $response->getStatusCode());
+        $updatedDiscussion = $this->getQuestion($question["discussionID"]);
+        $status = $updatedDiscussion["attributes"]["question"]["status"];
+        $this->assertSame("accepted", $status);
+    }
+
+    /**
+     * Test that when a QnA discussion is closed, the option to accept or reject an answer is present for admins, but
+     * not for a member-level user.
+     */
+    public function testQnACommentOptionsOnClosedDiscussionRoleDependent() {
+        $category = $this->createCategory();
+        $memberUserID = $this->createUserFixture("Member");
+
+        // Post a question and an answer as a member-level user.
+        $this->api()->setUserID($memberUserID);
+        $question = $this->createQuestion(["categoryID" => $category["categoryID"]]);
+        $answer = $this->api()->post("comments", [
+            "discussionID" => $question["discussionID"],
+            "body" => "QnA options on this shouldn't be present when the discussion is closed.",
+            "format" => "markdown",
+        ])->getBody();
+
+        // Go to the discussion page and verify that the option to accept or reject an answer is added to the comment.
+        $discussionData = $this->bessy()->getHtml("discussion/{$question["discussionID"]}")->getInnerHtml();
+        $this->assertStringContainsString('class="DidThisAnswer"', $discussionData);
+
+        // Close the discussion.
+        $this->api()->setUserID(self::$siteInfo["adminUserID"]);
+        $this->api()->patch("discussions/{$question["discussionID"]}", ["closed" => true]);
+
+        // Now go back to the page and verify that the accept/reject option is no longer there for the member user.
+        $this->api()->setUserID($memberUserID);
+        $updatedDiscussionAccessedByMember = $this->bessy()->getHtml("discussion/{$question["discussionID"]}")->getInnerHtml();
+        $this->assertStringNotContainsString('class="DidThisAnswer"', $updatedDiscussionAccessedByMember);
+
+        // But the option is still there for the admin user.
+        $this->api()->setUserID(self::$siteInfo["adminUserID"]);
+        $updatedDiscussionAccessedByAdmin = $this->bessy()->getHtml("discussion/{$question["discussionID"]}")->getInnerHtml();
+        $this->assertStringContainsString('class="DidThisAnswer"', $updatedDiscussionAccessedByAdmin);
     }
 }

@@ -126,6 +126,19 @@ class AddonManager implements LoggerAwareInterface {
     }
 
     /**
+     * Get the default directories to scan.
+     *
+     * @return array
+     */
+    public static function getDefaultScanDirectories(): array {
+        return [
+            Addon::TYPE_ADDON => ['/addons/addons', '/applications', '/plugins'],
+            Addon::TYPE_THEME => ['/addons/themes', '/themes'],
+            Addon::TYPE_LOCALE => '/locales'
+        ];
+    }
+
+    /**
      * Test whether an addon type uses multi-caching.
      *
      * @param string $type One of the **Addon::TYPE_*** constatns.
@@ -1054,8 +1067,9 @@ class AddonManager implements LoggerAwareInterface {
      * Stop an addon and make it unavailable.
      *
      * @param Addon $addon The addon to stop.
+     * @param bool $removeClasses If set to false, we won't remove classes from the autoloader.
      */
-    public function stopAddon(Addon $addon) {
+    public function stopAddon(Addon $addon, bool $removeClasses = true) {
         if (empty($addon)) {
             trigger_error("Null addon supplied to AddonManager->stopAddon().", E_USER_NOTICE);
             return;
@@ -1064,11 +1078,13 @@ class AddonManager implements LoggerAwareInterface {
         unset($this->enabled[$addon->getType().'/'.$addon->getKey()]);
 
         // Remove all of the addon's classes from the autoloader.
-        foreach ($addon->getClasses() as $classKey => $classInfo) {
-            if (isset($this->autoloadClasses[$classKey])) {
-                foreach ($this->autoloadClasses[$classKey] as $namespaceKey => $classData) {
-                    if (strtolower($classData['namespace']) === $namespaceKey) {
-                        unset($this->autoloadClasses[$classKey][$namespaceKey]);
+        if ($removeClasses) {
+            foreach ($addon->getClasses() as $classKey => $classInfo) {
+                if (isset($this->autoloadClasses[$classKey])) {
+                    foreach ($this->autoloadClasses[$classKey] as $namespaceKey => $classData) {
+                        if (strtolower($classData['namespace']) === $namespaceKey) {
+                            unset($this->autoloadClasses[$classKey][$namespaceKey]);
+                        }
                     }
                 }
             }

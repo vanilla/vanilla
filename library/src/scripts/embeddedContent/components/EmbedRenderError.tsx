@@ -4,13 +4,13 @@
  */
 
 import React from "react";
-import { WarningIcon } from "@library/icons/common";
 import { t } from "@library/utility/appUtils";
 import { embedErrorClasses } from "@library/embeddedContent/components/embedErrorStyles";
 import SmartLink from "@library/routing/links/SmartLink";
 import { EMBED_FOCUS_CLASS } from "@library/embeddedContent/embedConstants";
 import classNames from "classnames";
 import { iconClasses } from "@library/icons/iconStyles";
+import { Icon } from "@vanilla/icons";
 
 interface IProps {
     url: string;
@@ -23,12 +23,16 @@ export function EmbedRenderError(props: IProps) {
         "https://success.vanillaforums.com/kb/articles/13-rich-editor#what-causes-the-warning-icon-while-inserting-a-rich-embed";
 
     return (
-        <div className={classNames(EMBED_FOCUS_CLASS, classes.renderErrorRoot, "embedLinkLoader-link")} tabIndex={-1}>
+        <div
+            className={classNames(EMBED_FOCUS_CLASS, classes.renderErrorRoot, "embedLinkLoader-link")}
+            tabIndex={-1}
+            title={warningTitle}
+        >
             <SmartLink to={props.url} rel="nofollow">
                 {props.url}
             </SmartLink>
             <SmartLink className={classes.renderErrorIconLink} to={helpUrl}>
-                <WarningIcon className={iconClasses().errorFgColor} warningMessage={warningTitle} />
+                <Icon className={iconClasses().errorFgColor} icon={"status-warning"} size={"compact"} />
             </SmartLink>
         </div>
     );

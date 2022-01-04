@@ -12,7 +12,7 @@ import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { panelWidgetClasses } from "@library/layout/panelWidgetStyles";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
-import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
+import { SectionTypes } from "@library/layout/types/interface.layoutTypes";
 import { Mixins } from "@library/styles/Mixins";
 
 export const panelAreaClasses = useThemeCache((mediaQueries) => {
@@ -39,14 +39,14 @@ export const panelAreaClasses = useThemeCache((mediaQueries) => {
             ...Mixins.padding({ horizontal: 0 }),
         },
         ...mediaQueries({
-            [LayoutTypes.TWO_COLUMNS]: {
+            [SectionTypes.TWO_COLUMNS]: {
                 oneColumnDown: {
                     ...Mixins.padding({
                         horizontal: 0,
                     }),
                 },
             },
-            [LayoutTypes.THREE_COLUMNS]: {
+            [SectionTypes.THREE_COLUMNS]: {
                 oneColumnDown: {
                     ...Mixins.padding({
                         horizontal: 0,

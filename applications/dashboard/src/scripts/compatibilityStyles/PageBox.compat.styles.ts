@@ -8,7 +8,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { MixinsFoundation } from "@library/styles/MixinsFoundation";
 import { useThemeCache } from "@library/styles/themeCache";
 import { Mixins } from "@library/styles/Mixins";
-import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
+import { oneColumnVariables } from "@library/layout/Section.variables";
 import { percent } from "csx/lib/units";
 import { extendItemContainer } from "@library/styles/styleHelpers";
 import { injectGlobal } from "@emotion/css";
@@ -16,7 +16,7 @@ import { ColorsUtils } from "@library/styles/ColorsUtils";
 
 export const pageBoxCompatStyles = useThemeCache(() => {
     const globalVars = globalVariables();
-    const mediaQueries = panelLayoutVariables().mediaQueries();
+    const mediaQueries = oneColumnVariables().mediaQueries();
 
     MixinsFoundation.contentBoxes(globalVars.contentBoxes);
     MixinsFoundation.contentBoxes(globalVars.panelBoxes, undefined, ".Panel");

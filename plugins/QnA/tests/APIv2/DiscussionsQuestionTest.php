@@ -21,11 +21,12 @@ class DiscussionsQuestionTest extends AbstractAPIv2Test {
     /** @var int Category containing questions. */
     private static $category;
 
+    public static $addons = ['qna'];
+
     /**
      * {@inheritdoc}
      */
     public static function setupBeforeClass(): void {
-        self::$addons = ['vanilla', 'qna'];
         parent::setupBeforeClass();
 
         /**

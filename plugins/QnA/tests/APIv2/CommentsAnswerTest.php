@@ -19,11 +19,12 @@ class CommentsAnswerTest extends AbstractAPIv2Test {
 
     private static $category;
 
+    public static $addons = ['qna'];
+
     /**
      * {@inheritdoc}
      */
     public static function setupBeforeClass(): void {
-        self::$addons = ['vanilla', 'qna'];
         parent::setupBeforeClass();
 
         /**

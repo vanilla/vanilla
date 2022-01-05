@@ -14,6 +14,8 @@ use ReactionModel;
  */
 class ReactionsReactTest extends AbstractAPIv2Test {
 
+    public static $addons = ['reactions', 'stubcontent'];
+
     /** @var \LogModel */
     private $logModel;
 
@@ -24,14 +26,6 @@ class ReactionsReactTest extends AbstractAPIv2Test {
         parent::setUp();
         ReactionModel::$ReactionTypes = null;
         $this->logModel = self::container()->get(\LogModel::class);
-    }
-
-    /**
-     * Setup routine, run before the test class is instantiated.
-     */
-    public static function setupBeforeClass(): void {
-        self::$addons = ['reactions', 'stubcontent', 'vanilla'];
-        parent::setUpBeforeClass();
     }
 
     /**

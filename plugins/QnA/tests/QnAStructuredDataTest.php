@@ -12,6 +12,7 @@ use Vanilla\QnA\Models\AnswerModel;
 use Vanilla\Web\AbstractJsonLDItem;
 use VanillaTests\APIv2\QnaApiTestTrait;
 use VanillaTests\SetupTraitsTrait;
+use VanillaTests\SiteTestCase;
 use VanillaTests\SiteTestTrait;
 use VanillaTests\EventSpyTestTrait;
 
@@ -21,8 +22,11 @@ use VanillaTests\VanillaTestCase;
 /**
  * Test QnA page structured data.
  */
-class QnAStructuredDataTest extends VanillaTestCase {
-    use SiteTestTrait, SetupTraitsTrait, EventSpyTestTrait, QnaApiTestTrait;
+class QnAStructuredDataTest extends SiteTestCase {
+    use SetupTraitsTrait, EventSpyTestTrait, QnaApiTestTrait;
+
+    public static $addons = ['qna'];
+
 
     /** @var AnswerModel */
     private $answerModel;
@@ -40,7 +44,6 @@ class QnAStructuredDataTest extends VanillaTestCase {
      */
     public function setUp(): void {
         parent::setUp();
-        $this->setUpTestTraits();
 
         $this->categoryID = $this->createCategory()["categoryID"];
 
@@ -48,17 +51,6 @@ class QnAStructuredDataTest extends VanillaTestCase {
             $this->answerModel = $answerModel;
             $this->commentModel = $commentModel;
         });
-    }
-
-    /**
-     * This method is called before the first test of this test class is run.
-     */
-    public static function setUpBeforeClass(): void {
-        // It seems like class exist even if module is not enabled.
-        // We don't really need 'replies'.
-        self::$addons = ['vanilla', 'qna'];
-        parent::setUpBeforeClass();
-        self::setUpBeforeClassTestTraits();
     }
 
     /**

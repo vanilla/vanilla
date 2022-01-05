@@ -27,18 +27,11 @@ class PermissionsTest extends SiteTestCase {
      * This method is called before the first test of this test class is run.
      */
     public static function setupBeforeClass(): void {
-        self::$addons = ['vanilla'];
         parent::setupBeforeClass();
 
         \Gdn::permissionModel()->define(['namespace.resource.lowercase' => 0]);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public static function teardownAfterClass(): void {
-        self::$addons = ['vanilla', 'conversations', 'stubcontent'];
-    }
     /**
      *  Test setup.
      */

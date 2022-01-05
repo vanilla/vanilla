@@ -787,8 +787,10 @@ class DiscussionController extends VanillaController {
                 if ($comment->InsertUserID != $session->UserID || !c('Vanilla.Comments.AllowSelfDelete')) {
                     // KLUDGE: Shouldn't be referencing group model.
                     // https://higherlogic.atlassian.net/browse/VNLA-901
+                    /**
+                     * @psalm-suppress UndefinedClass
+                     */
                     if (!is_null($discussion->GroupID) && class_exists(GroupModel::class)) {
-                        // @psalm-suppress UndefinedClass
                         $groupModel = new GroupModel;
                         $groupDelete = $groupModel->canModerate($discussion->GroupID, $session->UserID);
                     }

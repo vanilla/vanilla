@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { useContext } from "react";
+import React, { useContext, useMemo } from "react";
 import { cx } from "@emotion/css";
 import { ComboboxOption, ComboboxOptionText } from "@reach/combobox";
 import { autoCompleteClasses } from "./AutoComplete.styles";
@@ -31,7 +31,7 @@ export const AutoCompleteOption = React.forwardRef(function AutoCompleteOptionIm
 ) {
     const { value, label = value, ...otherProps } = props;
     const { size, value: autoCompleteValue, multiple } = useContext(AutoCompleteContext);
-    const classes = autoCompleteClasses({ size });
+    const classes = useMemo(() => autoCompleteClasses({ size }), [size]);
     const values = multiple && Array.isArray(autoCompleteValue) ? autoCompleteValue : [autoCompleteValue];
     const selected = values.indexOf(value) > -1;
 

@@ -1222,4 +1222,30 @@ class CategoryModelTest extends SiteTestCase {
 
         $this->assertNotEquals($categoryOneFromTree["CssClass"], $categoryTwoFromTree["CssClass"]);
     }
+
+    /**
+     * Test that when a child category is deleted, the CountCategories field of its parent is updated.
+     */
+    public function testCountCategoriesUpdated(): void {
+        // Create a category.
+        $parentCategory = $this->createCategory();
+        $parentID = $parentCategory["categoryID"];
+
+        // Add some children
+        $childCatOne = $this->createCategory(['parentCategoryID' => $parentID]);
+        $childCatTwo = $this->createCategory(['parentCategoryID' => $parentID]);
+
+        // Test that CountCategories reflects the added children.
+        $updatedParentCategory = $this->categoryModel->getID($parentID, DATASET_TYPE_ARRAY);
+        $this->assertSame($updatedParentCategory["CountCategories"], 2);
+
+        // Test that CountCategories reflects change when children are deleted.
+        $this->categoryModel->deleteID($childCatOne['categoryID']);
+        $parentCategoryOneChildDeleted = $this->categoryModel->getID($parentID, DATASET_TYPE_ARRAY);
+        $this->assertSame($parentCategoryOneChildDeleted["CountCategories"], 1);
+
+        $this->categoryModel->deleteID($childCatTwo['categoryID']);
+        $parentCategoryTwoChildrenDeleted = $this->categoryModel->getID($parentID, DATASET_TYPE_ARRAY);
+        $this->assertSame($parentCategoryTwoChildrenDeleted["CountCategories"], 0);
+    }
 }

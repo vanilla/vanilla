@@ -46,7 +46,7 @@ export const FormGroup = React.forwardRef(function FormGroupImpl(props, forwarde
     const inputID = useMemo(() => propsInputID || uuidv4(), [propsInputID]);
     const [label, setLabel] = useState<string | undefined>();
     const [labelID, setLabelID] = useState(`${inputID}_label`);
-    const classes = formGroupClasses({ sideBySide, compact });
+    const classes = useMemo(() => formGroupClasses({ sideBySide, compact }), [sideBySide, compact]);
 
     return (
         <Comp {...otherProps} className={cx(classes.formGroup, props.className)} ref={forwardedRef}>

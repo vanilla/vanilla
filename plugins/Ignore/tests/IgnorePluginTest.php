@@ -13,8 +13,6 @@ class IgnorePluginTest extends \VanillaTests\SiteTestCase {
     use \VanillaTests\Forum\Utils\CommunityApiTestTrait;
     use \VanillaTests\EventSpyTestTrait;
 
-    public static $addons = ['vanilla', 'ignore'];
-
     /** @var IgnorePlugin */
     private $ignorePlugin;
 
@@ -24,6 +22,14 @@ class IgnorePluginTest extends \VanillaTests\SiteTestCase {
     public function setUp(): void {
         $this->ignorePlugin = Gdn::getContainer()->get(IgnorePlugin::class);
         parent::setUp();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function setUpBeforeClass(): void {
+        self::$addons = ['vanilla', 'ignore'];
+        parent::setUpBeforeClass();
     }
 
     /**

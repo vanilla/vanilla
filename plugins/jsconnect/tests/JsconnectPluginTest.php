@@ -20,12 +20,18 @@ class JsconnectPLuginTest extends SiteTestCase {
 
     protected const CLIENT_ID_SINGLE = 'single';
 
-    public static $addons = ['jsconnect'];
-
     /**
      * @var \Gdn_AuthenticationProviderModel
      */
     private $providerModel;
+
+    /**
+     * Setup.
+     */
+    public static function setUpBeforeClass(): void {
+        self::$addons = ['vanilla', 'jsconnect'];
+        parent::setUpBeforeClass();
+    }
 
     /**
      * Setup.

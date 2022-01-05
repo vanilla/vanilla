@@ -25,8 +25,6 @@ class LogControllerTest extends SiteTestCase {
     use CommunityApiTestTrait;
     use UsersAndRolesApiTestTrait;
 
-    public static $addons = ['qna']; //QnA plugin required for testDeletedDiscussionRestoreBadValue()
-
     /** @var \LogController */
     private $controller;
 
@@ -59,6 +57,7 @@ class LogControllerTest extends SiteTestCase {
      * @inheritDoc
      */
     public static function setupBeforeClass(): void {
+        self::$addons = ['vanilla', 'qna']; //QnA plugin required for testDeletedDiscussionRestoreBadValue()
         parent::setUpBeforeClass();
         $session = self::container()->get('Session');
         $session->validateTransientKey(true);

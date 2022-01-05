@@ -5,8 +5,7 @@
  */
 
 import { cx } from "@emotion/css";
-import React, { useContext, useEffect } from "react";
-import * as Polymorphic from "../../polymorphic";
+import React, { useContext, useEffect, useMemo } from "react";
 import { FormGroupContext } from "./FormGroup";
 import { formGroupClasses } from "./FormGroup.styles";
 
@@ -28,7 +27,7 @@ export const FormGroupLabel = React.forwardRef(function FormGroupLabelImpl(
 ) {
     const { children, description, id, ...otherProps } = props;
     const { inputID, labelID, setLabelID, setLabel, sideBySide } = useContext(FormGroupContext);
-    const classes = formGroupClasses({ sideBySide });
+    const classes = useMemo(() => formGroupClasses({ sideBySide }), [sideBySide]);
 
     useEffect(() => {
         if (id && id !== labelID) {

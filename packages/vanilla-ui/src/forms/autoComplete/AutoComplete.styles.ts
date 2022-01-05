@@ -9,9 +9,15 @@ import { InputSize } from "../../types";
 
 export interface AutoCompleteClassesProps {
     size?: InputSize;
+    isDisabled?: boolean;
+    isClearable?: boolean;
 }
 
-export const autoCompleteClasses = ({ size = "default" }: AutoCompleteClassesProps) => ({
+export const autoCompleteClasses = ({
+    size = "default",
+    isDisabled = false,
+    isClearable = false,
+}: AutoCompleteClassesProps) => ({
     arrowButton: css({}),
     reachCombobox: css({
         width: "100%",
@@ -25,6 +31,10 @@ export const autoCompleteClasses = ({ size = "default" }: AutoCompleteClassesPro
         border: "solid 1px #bfcbd8",
         borderRadius: 6,
         flexWrap: "wrap",
+        ...{
+            small: { paddingRight: !isDisabled && isClearable ? 40 : !isDisabled ? 16 : 0 },
+            default: { paddingRight: !isDisabled && isClearable ? 44 : !isDisabled ? 20 : 0 },
+        }[size],
     }),
     inputActions: css({
         display: "flex",
@@ -35,7 +45,6 @@ export const autoCompleteClasses = ({ size = "default" }: AutoCompleteClassesPro
         top: 0,
         right: 0,
         bottom: 0,
-
         ...{
             small: { padding: "0 8px" },
             default: { padding: "0 12px" },
@@ -44,8 +53,8 @@ export const autoCompleteClasses = ({ size = "default" }: AutoCompleteClassesPro
     inputTokenTag: css({
         display: "flex",
         ...{
-            small: { margin: 4, padding: "3px 6px", fontSize: "13px" },
-            default: { margin: 5, padding: "4xp 8px", fontSize: "16px" },
+            small: { margin: "4px 0px 4px 8px", fontSize: "13px" },
+            default: { margin: "5px 0px 5px 8px", fontSize: "16px" },
         }[size],
         backgroundColor: "#eeefef",
         borderRadius: 2,
@@ -53,6 +62,13 @@ export const autoCompleteClasses = ({ size = "default" }: AutoCompleteClassesPro
         maxWidth: "85%",
         "& > label": {
             margin: 0,
+            ...{
+                small: { padding: "3px 6px", paddingRight: 0 },
+                default: { padding: "4px 8px", paddingRight: 0 },
+            }[size],
+            "& + div": {
+                paddingRight: 2,
+            },
         },
     }),
     popover: css({

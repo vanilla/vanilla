@@ -14,7 +14,7 @@ import { editor as Monaco } from "monaco-editor/esm/vs/editor/editor.api";
 monaco.config({
     paths: {
         // @ts-ignore: DIST_NAME comes from webpack.
-        vs: assetUrl(`/${__DIST__NAME__}/monaco-editor-21-2/min/vs`),
+        vs: assetUrl(`/${__DIST__NAME__}/monaco-editor-30-1/min/vs`),
     },
 });
 export interface ITextEditorProps {
@@ -141,7 +141,9 @@ function useJsonSchema(schemaUri: string | null) {
         if (!schemaUri) {
             return;
         }
-        const busterUrl = schemaUri + `?h=${getMeta("context.cacheBuster")}`;
+        const url = new URL(schemaUri);
+        url.searchParams.append("h", getMeta("context.cacheBuster"));
+        const busterUrl = url.toString();
         monaco.init().then((monaco) => {
             monaco.languages.json.jsonDefaults.setModeConfiguration({
                 colors: true,

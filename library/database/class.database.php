@@ -680,6 +680,24 @@ class Gdn_Database implements InjectableInterface {
     }
 
     /**
+     * Get the estimated row count for a table.
+     * Notably InnoDB doesn't keep very accurate counts here so this is just a rough estimate can vary by up to 50%.
+     *
+     * @param string $tableName
+     *
+     * @return int
+     */
+    public function getEstimatedRowCount(string $tableName): int {
+        $data = $this->query(
+            'show table status like '.$this->connection()->quote($this->DatabasePrefix.$tableName),
+            [],
+            ['ReturnType' => 'DataSet']
+        );
+
+        return $data->value('Rows', 0);
+    }
+
+    /**
      * The slave connection to the database.
      *
      * @return PDO

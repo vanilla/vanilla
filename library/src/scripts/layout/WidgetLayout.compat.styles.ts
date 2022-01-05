@@ -5,18 +5,18 @@
  */
 
 import { injectGlobal } from "@emotion/css";
-import { twoColumnLayoutClasses } from "@library/layout/types/layout.twoColumns";
-import { EMPTY_WIDGET_LAYOUT } from "@library/layout/WidgetLayout.context";
+import { twoColumnClasses } from "@library/layout/types/layout.twoColumns";
+import { EMPTY_WIDGET_SECTION } from "@library/layout/WidgetLayout.context";
 import { widgetLayoutClasses } from "@library/layout/WidgetLayout.styles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { Mixins } from "@library/styles/Mixins";
 
 export function widgetLayoutCompactCSS() {
     const classes = widgetLayoutClasses();
-    const panelLayoutClasses = twoColumnLayoutClasses();
+    const panelLayoutClasses = twoColumnClasses();
 
     const mainBodySelectors = `
-        .Content .${EMPTY_WIDGET_LAYOUT.widgetClass},
+        .Content .${EMPTY_WIDGET_SECTION.widgetClass},
         .Content .DataList,
         .Content .Empty,
         .Content .DataTable,
@@ -25,15 +25,15 @@ export function widgetLayoutCompactCSS() {
         .Content .MessageList`;
 
     injectGlobal({
-        [`.Frame-body .${EMPTY_WIDGET_LAYOUT.widgetClass}`]: classes.widgetMixin,
-        [`.Frame-body .${EMPTY_WIDGET_LAYOUT.widgetWithContainerClass}`]: classes.widgetWithContainerMixin,
+        [`.Frame-body .${EMPTY_WIDGET_SECTION.widgetClass}`]: classes.widgetMixin,
+        [`.Frame-body .${EMPTY_WIDGET_SECTION.widgetWithContainerClass}`]: classes.widgetWithContainerMixin,
 
         [mainBodySelectors]: panelLayoutClasses.mainPanelWidgetMixin,
 
         [`.pageHeadingBox + .DataList,
           .pageHeadingBox + .Empty,
           .pageHeadingBox + .DataTable,
-          .Content h2 + .${EMPTY_WIDGET_LAYOUT.widgetClass},
+          .Content h2 + .${EMPTY_WIDGET_SECTION.widgetClass},
           .Content h2 + .DataList,
           .Content h2 + .DataListWrap,
           .Content h2 + .Empty,
@@ -41,13 +41,13 @@ export function widgetLayoutCompactCSS() {
             marginTop: 0,
         },
 
-        [`.Panel .${EMPTY_WIDGET_LAYOUT.widgetClass}, .Panel .Box`]: panelLayoutClasses.secondaryPanelWidgetMixin,
+        [`.Panel .${EMPTY_WIDGET_SECTION.widgetClass}, .Panel .Box`]: panelLayoutClasses.secondaryPanelWidgetMixin,
         [`.Panel .BoxButtons`]: {
             ...Mixins.margin({
                 bottom: globalVariables().spacer.panelComponent * 1.5,
             }),
         },
-        [`.Frame-row .${EMPTY_WIDGET_LAYOUT.widgetClass}:first-child`]: {
+        [`.Frame-row .${EMPTY_WIDGET_SECTION.widgetClass}:first-child`]: {
             marginTop: 0,
         },
     });

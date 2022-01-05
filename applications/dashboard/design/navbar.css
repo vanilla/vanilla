@@ -1263,6 +1263,11 @@ body {
 .userContent.Message {
   margin-top: 14px;
 }
+.userContent.Message > *:last-child::after {
+  content: "";
+  display: table;
+  clear: both;
+}
 .userContent h1,
 .userContent h2,
 .userContent h3,
@@ -2434,9 +2439,6 @@ body.isMobile .Popup.hasRichEditor .Border {
 .userContent ol ol,
 .userContent ol ul {
   margin: 0 0 0 1em;
-}
-.userContent ul > li {
-  list-style: disc !important;
 }
 .userContent ul ol,
 .userContent ul ul {

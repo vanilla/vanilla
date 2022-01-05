@@ -55,7 +55,8 @@ abstract class Route {
 
     private $defaults = [];
 
-    private $themeFeatureEnabled = true;
+    /** @var string|null */
+    private $themeFeatureFlag = null;
 
     /**
      * Whether or not the route is enabled.
@@ -63,16 +64,22 @@ abstract class Route {
      * @return bool
      */
     public function isEnabled(): bool {
-        return $this->themeFeatureEnabled;
+        if ($this->themeFeatureFlag === null) {
+            return true;
+        }
+
+        // Fetch as late as possible.
+        $themeFeatures = \Gdn::themeFeatures();
+        return $themeFeatures->get($this->themeFeatureFlag);
     }
 
     /**
      * Apply a theme feature flag to a route. If the feature flag isn't enabled, the route will not activate.
      *
-     * @param bool $themeFeatureEnabled
+     * @param string $themeFeatureFlag
      */
-    public function setThemeFeatureEnabled(bool $themeFeatureEnabled) {
-        $this->themeFeatureEnabled = $themeFeatureEnabled;
+    public function setThemeFeatureFlag(string $themeFeatureFlag) {
+        $this->themeFeatureFlag = $themeFeatureFlag;
     }
 
     /**

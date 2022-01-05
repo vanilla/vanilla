@@ -6,7 +6,7 @@
 import { INITIAL_VIEWPORTS } from "@storybook/addon-viewport";
 import { makeStorybookDecorator } from "@library/makeStorybookDecorator";
 import { styleUnit } from "@library/styles/styleUnit";
-import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
+import { oneColumnVariables } from "@library/layout/Section.variables";
 import { _mountComponents, addComponent } from "@library/utility/componentRegistry";
 import { HomeWidget } from "@library/homeWidget/HomeWidget";
 import { loadThemeFonts } from "@library/theming/loadThemeFonts";
@@ -14,7 +14,7 @@ import { loadThemeFonts } from "@library/theming/loadThemeFonts";
 // Make sure our fonts load
 loadThemeFonts();
 
-const panelLayoutBreakPoints = panelLayoutVariables().panelLayoutBreakPoints;
+const panelLayoutBreakPoints = oneColumnVariables().breakPoints;
 
 const customViewports = {
     panelLayout_withBleed: {

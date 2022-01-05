@@ -9,7 +9,7 @@
          processIsolation="false"
          stopOnFailure="false"
          bootstrap="tests/phpunit.php"
->
+        >
     <php>
         <ini name="intl.default_locale" value="en"/>
         <ini name="intl.error_level" value="0"/>
@@ -22,7 +22,6 @@
         <env name="TEST_DB_USER" value="circleci" />
         <env name="TEST_DB_PASSWORD" value="" />
         <env name="TEST_DB_HOST" value="127.0.0.1" />
-        <env name="TEST_SPHINX_HOST" value="127.0.0.1" />
 
         <env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled=1"/>
     </php>
@@ -58,6 +57,9 @@
             <directory suffix="Test.php">./applications/*/tests/APIv2</directory>
             <directory suffix="Test.php">./plugins/*/tests/APIv2</directory>
         </testsuite>
+        <testsuite name="ElasticSearch">
+            <directory suffix="Test.php">./plugins/ElasticSearch</directory>
+        </testsuite>
         <testsuite name="Storybook">
             <directory suffix="StorybookTest.php">./tests/</directory>
             <directory suffix="StorybookTest.php">./applications/*/tests</directory>
@@ -73,17 +75,25 @@
             <directory suffix=".php">applications/dashboard</directory>
             <directory suffix=".php">applications/vanilla</directory>
             <directory suffix=".php">applications/conversations</directory>
+            <directory suffix=".php">applications/groups</directory>
 
-            <directory suffix=".php">plugins/QnA</directory>
-            <directory suffix=".php">plugins/Spoof</directory>
             <directory suffix=".php">library</directory>
+
+            <directory suffix=".php">plugins/ProfileExtender</directory>
+            <directory suffix=".php">plugins/QnA</directory>
+            <directory suffix=".php">plugins/Reactions</directory>
+            <directory suffix=".php">plugins/rich-editor</directory>
             <exclude>
+                <directory suffix=".php">applications/dashboard/tests</directory>
                 <directory suffix=".php">applications/dashboard/views</directory>
+                <directory suffix=".php">applications/vanilla/tests</directory>
                 <directory suffix=".php">applications/vanilla/views</directory>
+                <directory suffix=".php">applications/conversations/tests</directory>
                 <directory suffix=".php">applications/conversations/views</directory>
 
                 <directory suffix=".php">plugins/QnA/views</directory>
-                <directory suffix=".php">plugins/Spoof/views</directory>
+                <directory suffix=".php">plugins/ProfileExtender/views</directory>
+                <directory suffix=".php">plugins/Reactions/views</directory>
                 <directory suffix=".php">library/deprecated</directory>
             </exclude>
         </whitelist>

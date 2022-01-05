@@ -22,14 +22,14 @@ import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { css, CSSObject } from "@emotion/css";
 import { buttonResetMixin } from "@library/forms/buttonMixins";
-import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
+import { oneColumnVariables } from "@library/layout/Section.variables";
 
 export const richEditorClasses = useThemeCache((legacyMode: boolean = true) => {
     const globalVars = globalVariables();
     const style = styleFactory("richEditor");
     const vars = richEditorVariables();
     const formVars = formElementsVariables();
-    const mediaQueries = panelLayoutVariables().mediaQueries();
+    const mediaQueries = oneColumnVariables().mediaQueries();
 
     const root = style({
         position: "relative",

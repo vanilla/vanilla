@@ -156,15 +156,6 @@ class SitemapsPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Run once on enable.
-     *
-     * @return void
-     */
-    public function setup() {
-        $this->structure();
-    }
-
-    /**
      * Run on utility/update.
      *
      * @return void

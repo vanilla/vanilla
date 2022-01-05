@@ -34,6 +34,9 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
     /** Seconds before reauthentication is required for protected operations. */
     const REAUTH_TIMEOUT = 1200; // 20 minutes
 
+    /** @var bool Check if user is already re-authenticated. */
+    protected static $isAuthenticated = false;
+
     /** @var string The name of the application that this controller can be found in. */
     public $Application;
 
@@ -284,7 +287,7 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
             ]);
         }
 
-        $hsts = Gdn::getContainer()->get('HstsModel');
+        $hsts = Gdn::getContainer()->get(HttpStrictTransportSecurityModel::class);
         $this->_Headers[HttpStrictTransportSecurityModel::HSTS_HEADER] = $hsts->getHsts();
 
         $cspModel = Gdn::getContainer()->get(ContentSecurityPolicyModel::class);
@@ -305,6 +308,20 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
         if ($currentTheme instanceof \Vanilla\Addon) {
             $this->addDefinition('currentThemePath', $currentTheme->getSubdir());
         }
+    }
+
+    /**
+     * @return bool
+     */
+    public static function isReauthenticated(): bool {
+        return self::$isAuthenticated;
+    }
+
+    /**
+     * @param bool $isAuthenticated
+     */
+    public static function setIsReauthenticated(bool $isAuthenticated): void {
+        self::$isAuthenticated = $isAuthenticated;
     }
 
     /**
@@ -1403,26 +1420,37 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
      * @param array $options Setting key 'ForceTimeout' to `true` will ignore the cooldown window between prompts.
      */
     public function reauth($options = []) {
-        // Make sure we're logged in...
+        // If we've already gone through this then we are good.
+        if (self::isReauthenticated()) {
+            return;
+        }
+
+        // Make sure we're logged in.
         if (Gdn::session()->UserID == 0) {
             return;
         }
 
-        // ...aren't in an API v1 call...
+        // Make sure we aren't in an API v1 call.
         if ($this->isLegacyAPI()) {
             return;
         }
 
-        // ...and have a proper password.
-        $user = Gdn::userModel()->getID(Gdn::session()->UserID);
-        if (val('HashMethod', $user) === 'Random') {
+        // Don't ask for re-authentication on connect-only sites.
+        if (Gdn::config('Garden.Registration.Method') === 'Connect') {
+            return;
+        }
+
+        // Random passwords created by SSO cannot be re-authenticated.
+        $user = Gdn::userModel()->getID(Gdn::session()->UserID, DATASET_TYPE_ARRAY);
+        if (($user['HashMethod'] ?? '') === 'Random') {
             return;
         }
 
         // If the user has logged in recently enough, don't make them login again.
         $lastAuthenticated = Gdn::authenticator()->identity()->getAuthTime();
         $forceTimeout = $options['ForceTimeout'] ?? false;
-        if ($lastAuthenticated > 0 && !$forceTimeout) {
+        $inReauth = $this->Request->post('DoReauthenticate');
+        if ($lastAuthenticated > 0 && !$forceTimeout && !$inReauth) {
             $sinceAuth = time() - $lastAuthenticated;
             if ($sinceAuth < self::REAUTH_TIMEOUT) {
                 return;
@@ -1430,7 +1458,7 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
         }
 
         Gdn::dispatcher()->dispatch('/profile/authenticate', false);
-        exit();
+        throw new \Vanilla\Exception\ExitException();
     }
 
     /**
@@ -1502,9 +1530,6 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
             $this->contentType('text/plain');
         }
 
-        // Send headers to the browser
-        $this->sendHeaders();
-
         // Make sure to clear out the content asset collection if this is a syndication request
         if ($this->SyndicationMethod !== SYNDICATION_NONE) {
             $this->Assets['Content'] = [];
@@ -1539,6 +1564,9 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
             if ($exitRender) {
                 return;
             }
+        } else {
+            // Headers are ready now.
+            $this->sendHeaders();
         }
 
         if ($this->_DeliveryMethod == DELIVERY_METHOD_JSON) {
@@ -2310,6 +2338,15 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
     }
 
     /**
+     * Get the headers from the controller.
+     *
+     * @return array
+     */
+    public function getHeaders(): array {
+        return $this->_Headers ?? [];
+    }
+
+    /**
      * Sends all headers in $this->_Headers (defined with $this->setHeader()) to the browser.
      */
     public function sendHeaders() {
@@ -2327,6 +2364,10 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
         if (!empty($this->_Headers[self::HEADER_CACHE_CONTROL])) {
             static::sendCacheControlHeaders($this->_Headers[self::HEADER_CACHE_CONTROL]);
         }
+
+        // Keep track of the last rendered headers.
+        // This is primarily for tests.
+        \Gdn::dispatcher()->setSentHeaders($this->getHeaders());
 
         // Empty the collection after sending
         $this->_Headers = [];

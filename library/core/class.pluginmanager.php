@@ -1160,7 +1160,7 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
         // 3. Disable it.
         saveToConfig("EnabledPlugins.{$pluginName}", false);
 
-        $this->addonManager->stopAddon($addon);
+        $this->addonManager->stopAddon($addon, false);
 
         // 4. Unregister the plugin properly.
         $this->unregisterPlugin($pluginClassName);

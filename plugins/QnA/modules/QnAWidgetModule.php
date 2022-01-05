@@ -17,6 +17,7 @@ use Vanilla\Utility\SchemaUtils;
 /**
  * Class QnAnWidgetModule
  *
+ * @deprecated Use DiscussionQuestionsWidget instead.
  * @package Vanilla\Forum\Modules
  */
 class QnAWidgetModule extends BaseDiscussionWidgetModule {

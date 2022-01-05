@@ -11,25 +11,13 @@ use Gdn_Module;
 use Vanilla\Web\TwigRenderTrait;
 use Vanilla\Web\TwigStaticRenderer;
 use Vanilla\Widgets\AbstractWidgetModule;
+use Vanilla\Widgets\React\ReactWidgetInterface;
 
 /**
  * Module using the new events UI.
  */
-abstract class AbstractReactModule extends AbstractWidgetModule {
+abstract class AbstractReactModule extends AbstractWidgetModule implements ReactWidgetInterface {
     use TwigRenderTrait;
-
-    /**
-     * Get props for react component
-     *
-     * @return array|null If null is returned the component will not be rendered.
-     */
-    abstract public function getProps(): ?array;
-
-    /**
-     * Get react component name
-     * @return string
-     */
-    abstract public function getComponentName(): string;
 
     /**
      * Optional class for div

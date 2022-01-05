@@ -39,8 +39,11 @@ class FloodControlHelper {
         if (!Gdn::session()->isValid()) {
             $instance->setFloodControlEnabled(false);
 
-        // Let's deactivate flood control if the user is an admin :)
+            // Let's deactivate flood control if the user is an admin :)
         } elseif ($skipAdmins && ($session->User->Admin || $session->checkPermission('Garden.Moderation.Manage'))) {
+            $instance->setFloodControlEnabled(false);
+        } elseif (isTestMode()) {
+            // Here too
             $instance->setFloodControlEnabled(false);
         }
 

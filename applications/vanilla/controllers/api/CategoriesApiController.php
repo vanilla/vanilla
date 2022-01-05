@@ -649,6 +649,7 @@ class CategoriesApiController extends AbstractApiController {
         $this->permission('Vanilla.Discussions.View', $category['PermissionCategoryID']);
 
         $this->categoryModel->follow($userID, $id, $body['followed']);
+        ModelUtils::validationResultToValidationException($this->categoryModel);
 
         $result = $out->validate([
             'followed' => $this->categoryModel->isFollowed($userID, $id)
@@ -741,11 +742,12 @@ class CategoriesApiController extends AbstractApiController {
      * @return Schema
      */
     public function schemaWithChildren() {
-        $schema = $this->fullSchema();
+        $schema = clone $this->fullSchema();
+        $childSchema = clone $schema;
 
         $schema->merge(Schema::parse([
             'depth:i',
-            'children:a?' => $this->fullSchema()->merge(Schema::parse([
+            'children:a?' => $childSchema->merge(Schema::parse([
                 'depth:i',
                 'children:a'
             ]))

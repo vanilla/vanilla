@@ -10,7 +10,7 @@ import { styleUnit } from "@library/styles/styleUnit";
 import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { percent, viewHeight } from "csx";
-import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
+import { oneColumnVariables } from "@library/layout/Section.variables";
 import { css } from "@emotion/css";
 
 export const frameVariables = useThemeCache(() => {
@@ -70,7 +70,7 @@ export const frameVariables = useThemeCache(() => {
 
 export const frameClasses = useThemeCache(() => {
     const vars = frameVariables();
-    const mediaQueries = panelLayoutVariables().mediaQueries();
+    const mediaQueries = oneColumnVariables().mediaQueries();
 
     const headerWrap = css({
         background: ColorsUtils.colorOut(vars.colors.bg),

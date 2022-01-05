@@ -30,11 +30,11 @@ import debounce from "lodash/debounce";
 import qs from "qs";
 import React, { useCallback, useEffect } from "react";
 import { useLocation, useHistory } from "react-router";
-import TwoColumnLayout from "@library/layout/TwoColumnLayout";
-import { LayoutProvider, useLayout } from "@library/layout/LayoutContext";
+import TwoColumnSection from "@library/layout/TwoColumnSection";
+import { SectionProvider, useSection } from "@library/layout/LayoutContext";
 import PanelWidget from "@library/layout/components/PanelWidget";
 import PanelWidgetHorizontalPadding from "@library/layout/components/PanelWidgetHorizontalPadding";
-import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
+import { SectionTypes } from "@library/layout/types/interface.layoutTypes";
 import {
     EmptySearchScopeProvider,
     SEARCH_SCOPE_LOCAL,
@@ -62,7 +62,7 @@ function SearchPage(props: IProps) {
         getCurrentDomain,
         getDefaultFormValues,
     } = useSearchForm<{}>();
-    const { isCompact } = useLayout();
+    const { isCompact } = useSection();
     const classes = pageTitleClasses();
     useInitialQueryParamSync();
 
@@ -138,7 +138,7 @@ function SearchPage(props: IProps) {
                         value={{ ...form, initialized: undefined, scope, needsResearch: undefined }}
                         defaults={getDefaultFormValues()}
                     />
-                    <TwoColumnLayout
+                    <TwoColumnSection
                         className="hasLargePadding"
                         mainTop={
                             <>
@@ -311,9 +311,9 @@ function useInitialQueryParamSync() {
 
 export default function ExportedSearchPage(props: IProps) {
     return (
-        <LayoutProvider type={LayoutTypes.TWO_COLUMNS}>
+        <SectionProvider type={SectionTypes.TWO_COLUMNS}>
             <Backgrounds />
             <SearchPage {...props} />
-        </LayoutProvider>
+        </SectionProvider>
     );
 }

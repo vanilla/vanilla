@@ -12,6 +12,7 @@ use Garden\Container\Tests\Fixtures\PdoDb;
 use Vanilla\Contracts\Site\AbstractSiteProvider;
 use Vanilla\Contracts\Site\Site;
 use Vanilla\Http\InternalClient;
+use Vanilla\Models\Model;
 use Vanilla\Site\OwnSite;
 use VanillaTests\TestInstallModel;
 
@@ -37,11 +38,26 @@ trait MockSiteTestTrait {
     private $previousDatabaseName;
 
     /**
+     * @return bool
+     */
+    public static function shouldUseCaching(): bool {
+        return false;
+    }
+
+    /**
      * @param Container $container
      */
     public static function configureContainerBeforeStartup(Container $container) {
         parent::configureContainerBeforeStartup($container);
         self::configureMockSiteContainer($container);
+
+        // No caching of models.
+        $container->rule(\Gdn_Model::class)
+            ->setShared(false)
+        ;
+        $container->rule(Model::class)
+            ->setShared(false)
+        ;
     }
 
     /**
@@ -213,5 +229,6 @@ trait MockSiteTestTrait {
         $config->saveToConfig('Database.Name', $dbName);
         $db->init();
         TestInstallModel::clearMemoryCaches();
+        \Gdn::cache()->flush();
     }
 }

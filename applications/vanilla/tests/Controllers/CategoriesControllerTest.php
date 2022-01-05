@@ -1,12 +1,13 @@
 <?php
 /**
  * @author Isis Graziatto <isis.g@vanillaforums.com>
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace VanillaTests\Forum\Controllers;
 
+use Gdn;
 use PHPUnit\Framework\TestCase;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\Models\TestCategoryModelTrait;
@@ -112,6 +113,48 @@ class CategoriesControllerTest extends TestCase {
         $category = $data[0];
         $this->assertEquals($expected['title'], $category["LastTitle"]);
         $this->assertEquals($user, $category["LastUserID"]);
+    }
+
+    /**
+     * Test user redirections upon marking a category as `read`.
+     * A first level category would redirect to the list of categories, while nested categories would return to their
+     * parent's category url (There is no category nesting within the URL).
+     */
+    public function testMarkReadRedirections(): void {
+        /** @var \CategoryController $categoryController*/
+        $categoryController = Gdn::getContainer()->get(\CategoryController::class);
+        $transientKey = Gdn::session()->transientKey();
+
+        $lvl1Category = $this->createCategory();
+        $lvl2Category = $this->createCategory(["parentCategoryID" => $lvl1Category['categoryID']]);
+        $lvl3Category = $this->createCategory(["parentCategoryID" => $lvl2Category['categoryID']]);
+
+        // Testing redirection upon markRead() on $lvl1Category.
+        try {
+            $categoryController->markRead($lvl1Category['categoryID'], $transientKey);
+        } catch (\Throwable $exception) {
+            $exResponse = $exception->getResponse();
+            $this->assertEquals(302, $exResponse->getStatus());
+            $this->assertStringEndsWith('/categories', $exResponse->getMeta('HTTP_LOCATION'));
+        }
+
+        // Testing redirection upon markRead() on $lvl2Category.
+        try {
+            $categoryController->markRead($lvl2Category['categoryID'], $transientKey);
+        } catch (\Throwable $exception) {
+            $exResponse = $exception->getResponse();
+            $this->assertEquals(302, $exResponse->getStatus());
+            $this->assertEquals($lvl1Category['url'], $exResponse->getMeta('HTTP_LOCATION'));
+        }
+
+        // Testing redirection upon markRead() on $lvl3Category.
+        try {
+            $categoryController->markRead($lvl3Category['categoryID'], $transientKey);
+        } catch (\Throwable $exception) {
+            $exResponse = $exception->getResponse();
+            $this->assertEquals(302, $exResponse->getStatus());
+            $this->assertEquals($lvl2Category['url'], $exResponse->getMeta('HTTP_LOCATION'));
+        }
     }
 
     /**

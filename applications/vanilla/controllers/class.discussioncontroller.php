@@ -8,6 +8,7 @@
  * @since 2.0
  */
 
+use Vanilla\Community\Events\DiscussionEvent;
 use Vanilla\Formatting\DateTimeFormatter;
 use Vanilla\Message;
 use Vanilla\Models\DiscussionJsonLD;
@@ -88,7 +89,6 @@ class DiscussionController extends VanillaController {
         // Setup head
         $Session = Gdn::session();
         $this->addJsFile('jquery.autosize.min.js');
-        $this->addJsFile('autosave.js');
         $this->addJsFile('discussion.js');
 
         Gdn_Theme::section('Discussion');
@@ -109,7 +109,7 @@ class DiscussionController extends VanillaController {
         $Limit = c('Vanilla.Comments.PerPage', 30);
 
         $OffsetProvided = $Page != '';
-        list($Offset, $Limit) = offsetLimit($Page, $Limit);
+        [$Offset, $Limit] = offsetLimit($Page, $Limit);
 
         // Check permissions.
         $Category = CategoryModel::categories($this->Discussion->CategoryID);
@@ -685,23 +685,15 @@ class DiscussionController extends VanillaController {
             $this->permission('Vanilla.Discussions.Close', true, 'Category', $Discussion->CategoryID);
         }
 
-        // Close the discussion.
-        $this->DiscussionModel->setField($discussionID, 'Closed', $close);
-
-        $attributes = $Discussion->Attributes;
-        unset($Discussion->Attributes[DiscussionModel::CLOSED_BY_USER_ID]);
-
-        // Check if the discussion is getting closed and check if the author is closing it.
         if ($close) {
-            $Discussion->Attributes[DiscussionModel::CLOSED_BY_USER_ID] = Gdn::session()->UserID;
+            // Close the discussion.
+            $this->DiscussionModel->closeDiscussion($discussionID);
+        } else {
+            // Open the discussion.
+            $this->DiscussionModel->openDiscussion($discussionID);
         }
 
-        // Update the attributes if they changed.
-        if ($attributes !== $Discussion->Attributes) {
-            $this->DiscussionModel->setProperty($discussionID, 'Attributes', dbencode($Discussion->Attributes));
-        }
-
-        $Discussion->Closed = $close;
+        $Discussion = $this->DiscussionModel->getID($discussionID);
 
         // Redirect to the front page
         if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
@@ -793,7 +785,12 @@ class DiscussionController extends VanillaController {
                 // Make sure comment is this user's or they have Delete permission.
                 $groupDelete = false;
                 if ($comment->InsertUserID != $session->UserID || !c('Vanilla.Comments.AllowSelfDelete')) {
-                    if (!is_null($discussion->GroupID)) {
+                    /**
+                     * KLUDGE: Shouldn't be referencing group model.
+                     * https://higherlogic.atlassian.net/browse/VNLA-901
+                     * @psalm-suppress UndefinedClass
+                     */
+                    if (!is_null($discussion->GroupID) && class_exists(GroupModel::class)) {
                         $groupModel = new GroupModel;
                         $groupDelete = $groupModel->canModerate($discussion->GroupID, $session->UserID);
                     }
@@ -864,7 +861,6 @@ body { background: transparent !important; }
         $this->addJsFile('jquery.gardenmorepager.js');
         $this->addJsFile('jquery.autosize.min.js');
         $this->addJsFile('discussion.js');
-        $this->removeJsFile('autosave.js');
         $this->addDefinition('DoInform', '0'); // Suppress inform messages on embedded page.
         $this->addDefinition('SelfUrl', Gdn::request()->pathAndQuery());
         $this->addDefinition('Embedded', true);
@@ -922,7 +918,7 @@ body { background: transparent !important; }
             }
 
             $offsetProvided = $offset != '';
-            list($offset, $limit) = offsetLimit($offset, $limit);
+            [$offset, $limit] = offsetLimit($offset, $limit);
             $this->Offset = $offset;
             if (c('Vanilla.Comments.AutoOffset')) {
                 if ($actualResponses <= $limit) {

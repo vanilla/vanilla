@@ -11,7 +11,7 @@ import { BorderType } from "@library/styles/styleHelpersBorders";
 import { IBoxOptions } from "@library/styles/cssUtilsTypes";
 import { DeepPartial } from "redux";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
+import { oneColumnVariables } from "@library/layout/Section.variables";
 import { media } from "@library/styles/styleShim";
 
 export interface ICallToActionOptions {
@@ -99,7 +99,7 @@ export const callToActionVariables = useThemeCache(
         };
 
         const isImageLeft = options.imagePlacement === "left";
-        const layoutVars = panelLayoutVariables(forcedVars);
+        const layoutVars = oneColumnVariables(forcedVars);
         const minWidth = layoutVars.contentSizes.full / 4 - layoutVars.gutter.size * 5; // Min width allows 4 items to fit.
         const image = makeVars("image", {
             /**

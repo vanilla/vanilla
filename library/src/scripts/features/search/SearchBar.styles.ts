@@ -24,7 +24,7 @@ import { calc, important, percent, px, translateX } from "csx";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { buttonGlobalVariables } from "@library/forms/Button.variables";
 import { buttonResetMixin } from "@library/forms/buttonMixins";
-import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
+import { oneColumnVariables } from "@library/layout/Section.variables";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import { css, CSSObject } from "@emotion/css";
@@ -52,7 +52,7 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
         overwrites || {};
     const globalVars = globalVariables();
     const metasVars = metasVariables();
-    const layoutVars = panelLayoutVariables();
+    const layoutVars = oneColumnVariables();
     const inputVars = inputVariables();
     const titleBarVars = titleBarVariables();
     const formElementVars = formElementsVariables();

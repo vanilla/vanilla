@@ -79,7 +79,7 @@ components:
                     x-write: community.manage
                 "garden.locale":
                     description: |
-                      The default locale for your site. This will be the source language for your community.
+                        The default locale for your site. This will be the source language for your community.
                     type: string
                     default: "en"
                     maxLength: 100
@@ -119,7 +119,7 @@ components:
                     x-write: community.manage
                 "labs.newAnalytics":
                     description: |
-                      Enable new analytics.
+                        Enable new analytics.
                     type: boolean
                     default: false
                     example: true
@@ -155,7 +155,7 @@ components:
                     x-write: site.manage
                 "labs.newPostMenu":
                     description: |
-                      Enable the new post menu UI on older themes.
+                        Enable the new post menu UI on older themes.
                     type: boolean
                     default: false
                     example: true
@@ -201,9 +201,9 @@ components:
                     x-read: public
                     x-write: site.manage
                 "vanilla.siteID":
-                  description: |
-                    The community siteID.
-                  type: number
-                  default: 0
-                  x-key: Vanilla.SiteID
-                  x-read: public
+                    description: |
+                        The community siteID.
+                    type: number
+                    default: 0
+                    x-key: Vanilla.SiteID
+                    x-read: public

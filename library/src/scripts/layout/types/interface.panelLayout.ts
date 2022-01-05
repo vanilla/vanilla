@@ -1,16 +1,13 @@
 import { CSSObject } from "@emotion/css";
+import { IThreeColumnMediaQueries, IThreeColumnMediaQueryStyles } from "@library/layout/types/interface.threeColumns";
 import {
-    IThreeColumnLayoutMediaQueries,
-    IThreeColumnLayoutMediaQueryStyles,
-} from "@library/layout/types/interface.threeColumns";
-import {
-    ITwoColumnLayoutMediaQueries,
-    ITwoColumnLayoutMediaQueryStyles,
-    twoColumnLayoutDevices,
+    ITwoColumnMediaQueries,
+    ITwoColumnMediaQueryStyles,
+    twoColumnDevices,
 } from "@library/layout/types/interface.twoColumns";
-import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
+import { SectionTypes } from "@library/layout/types/interface.layoutTypes";
 
-export enum fallbackLayoutVariables {
+export enum fallbackSectionVariables {
     XS = "xs",
     MOBILE = "mobile",
     TABLET = "tablet",
@@ -18,7 +15,7 @@ export enum fallbackLayoutVariables {
     NO_BLEED = "no_bleed", // Not enough space for back link which goes outside the margin.
 }
 
-export interface IPanelLayoutMediaQueryStyles {
+export interface IOneColumnMediaQueryStyles {
     noBleed?: CSSObject;
     noBleedDown?: CSSObject;
     oneColumn?: CSSObject;
@@ -29,7 +26,7 @@ export interface IPanelLayoutMediaQueryStyles {
     xs?: CSSObject;
 }
 
-export interface IPanelLayoutMediaQueries {
+export interface IOneColumnMediaQueries {
     noBleed: (styles: CSSObject) => CSSObject;
     oneColumn: (styles: CSSObject) => CSSObject;
     oneColumnDown: (styles: CSSObject) => CSSObject;
@@ -40,9 +37,9 @@ export interface IPanelLayoutMediaQueries {
     xs: (styles: CSSObject) => CSSObject;
 }
 
-export type IAllMediaQueries = IThreeColumnLayoutMediaQueries | ITwoColumnLayoutMediaQueries | IPanelLayoutMediaQueries;
+export type IAllMediaQueries = IThreeColumnMediaQueries | ITwoColumnMediaQueries | IOneColumnMediaQueries;
 
-export interface IPanelLayoutVariables {
+export interface IOneColumnVariables {
     type: string;
     Devices: any;
     colors?: any;
@@ -60,15 +57,15 @@ export interface IPanelLayoutVariables {
     rightPanelCondition?: (currentDevice, shouldRenderLeftPanel) => boolean;
 }
 
-export interface IAllLayoutMediaQueries {
-    [LayoutTypes.TWO_COLUMNS]?: ITwoColumnLayoutMediaQueryStyles;
-    [LayoutTypes.THREE_COLUMNS]?: IThreeColumnLayoutMediaQueryStyles;
+export interface IAllSectionMediaQueries {
+    [SectionTypes.TWO_COLUMNS]?: ITwoColumnMediaQueryStyles;
+    [SectionTypes.THREE_COLUMNS]?: IThreeColumnMediaQueryStyles;
 }
 
-export type ILayoutMediaQueryFunction = (styles: IAllLayoutMediaQueries) => CSSObject;
+export type ISectionMediaQueryFunction = (styles: IAllSectionMediaQueries) => CSSObject;
 
-export type IAllLayoutDevices = twoColumnLayoutDevices | fallbackLayoutVariables;
+export type IAllSectionDevices = twoColumnDevices | fallbackSectionVariables;
 
-export type IAllMediaQueriesForLayouts = ITwoColumnLayoutMediaQueries | IThreeColumnLayoutMediaQueries | {};
+export type IAllMediaQueriesForSections = ITwoColumnMediaQueries | IThreeColumnMediaQueries | {};
 
-export type IMediaQueryFunction = (mediaQueriesForAllLayouts: IAllLayoutMediaQueries) => CSSObject;
+export type IMediaQueryFunction = (mediaQueriesForAllLayouts: IAllSectionMediaQueries) => CSSObject;

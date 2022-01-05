@@ -713,7 +713,7 @@ class DiscussionsApiController extends AbstractApiController {
                 $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $where['d.CategoryID']);
             }
         } elseif ($siteSectionID) {
-            $siteSection = $this->siteSectionModel->getForSectionID($query['siteSectionID']);
+            $siteSection = $this->siteSectionModel->getByID($query['siteSectionID']);
             $categoryID = ($siteSection) ? $siteSection->getCategoryID() : null;
             if ($categoryID) {
                 $where['d.CategoryID'] = $this->getNestedCategoriesIDs($categoryID, $followed);

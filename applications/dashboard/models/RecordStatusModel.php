@@ -20,6 +20,7 @@ use Vanilla\Utility\ArrayUtils;
  */
 class RecordStatusModel extends PipelineModel {
 
+    //region Properties
     private const TABLE_NAME = "recordStatus";
 
     public const DISCUSSION_STATUS_UNANSWERED = 1;
@@ -43,6 +44,101 @@ class RecordStatusModel extends PipelineModel {
         RecordStatusModel::DISCUSSION_STATUS_RESOLVED,
     ];
 
+    /** @var array */
+    private const DEFAULT_QUESTION_UNANSWERED_STATUS = [
+        'statusID' => RecordStatusModel::DISCUSSION_STATUS_UNANSWERED,
+        'name' => 'Unanswered',
+        'state' => 'open',
+        'recordType' => 'discussion',
+        'recordSubtype' => 'question',
+        'isDefault' => 1,
+        'isSystem' => 1
+    ];
+    /** @var array */
+    private const DEFAULT_QUESTION_ANSWERED_STATUS = [
+        'statusID' => RecordStatusModel::DISCUSSION_STATUS_ANSWERED,
+        'name' => 'Answered',
+        'state' => 'open',
+        'recordType' => 'discussion',
+        'recordSubtype' => 'question',
+        'isDefault' => 0,
+        'isSystem' => 1
+    ];
+    /** @var array */
+    private const DEFAULT_QUESTION_ACCEPTED_STATUS = [
+        'statusID' => RecordStatusModel::DISCUSSION_STATUS_ACCEPTED,
+        'name' => 'Accepted',
+        'state' => 'closed',
+        'recordType' => 'discussion',
+        'recordSubtype' => 'question',
+        'isDefault' => 0,
+        'isSystem' => 1
+    ];
+    /** @var array */
+    protected const DEFAULT_QUESTION_REJECTED_STATUS = [
+        'statusID' => RecordStatusModel::DISCUSSION_STATUS_REJECTED,
+        'name' => 'Rejected',
+        'state' => 'open',
+        'recordType' => 'discussion',
+        'recordSubtype' => 'question',
+        'isDefault' => 0,
+        'isSystem' => 1
+    ];
+    /** @var array */
+    protected const DEFAULT_COMMENT_ACCEPTED_STATUS = [
+        'statusID' => RecordStatusModel::COMMENT_STATUS_ACCEPTED,
+        'name' => 'Accepted',
+        'state' => 'closed',
+        'recordType' => 'comment',
+        'recordSubtype' => 'answer',
+        'isDefault' => 0,
+        'isSystem' => 1
+    ];
+    /** @var array */
+    protected const DEFAULT_COMMENT_REJECTED_STATUS = [
+        'statusID' => RecordStatusModel::COMMENT_STATUS_REJECTED,
+        'name' => 'Rejected',
+        'state' => 'closed',
+        'recordType' => 'comment',
+        'recordSubtype' => 'answer',
+        'isDefault' => 0,
+        'isSystem' => 1
+    ];
+    /** @var array */
+    protected const DEFAULT_DISCUSSION_UNRESOLVED_STATUS = [
+        'statusID' => RecordStatusModel::DISCUSSION_STATUS_UNRESOLVED,
+        'name' => 'Unresolved',
+        'state' => 'open',
+        'recordType' => 'discussion',
+        'recordSubtype' => 'discussion',
+        'isDefault' => 1,
+        'isSystem' => 1
+    ];
+    /** @var array */
+    protected const DEFAULT_DISCUSSION_RESOLVED_STATUS = [
+        'statusID' => self::DISCUSSION_STATUS_RESOLVED,
+        'name' => 'Resolved',
+        'state' => 'closed',
+        'recordType' => 'discussion',
+        'recordSubtype' => 'discussion',
+        'isDefault' => 0,
+        'isSystem' => 1
+    ];
+
+    /** @var array[] DEFAULT_STATUSES */
+    protected const DEFAULT_STATUSES = [
+        self::DEFAULT_QUESTION_UNANSWERED_STATUS,
+        self::DEFAULT_QUESTION_ANSWERED_STATUS,
+        self::DEFAULT_QUESTION_ACCEPTED_STATUS,
+        self::DEFAULT_QUESTION_REJECTED_STATUS,
+        self::DEFAULT_COMMENT_ACCEPTED_STATUS,
+        self::DEFAULT_COMMENT_REJECTED_STATUS,
+        self::DEFAULT_DISCUSSION_UNRESOLVED_STATUS,
+        self::DEFAULT_DISCUSSION_RESOLVED_STATUS,
+    ];
+    //endregion
+
+    //region Constructor
     /**
      * Setup the model.
      *
@@ -64,6 +160,45 @@ class RecordStatusModel extends PipelineModel {
 
         $booleanFields = new BooleanFieldProcessor(["isDefault", "isSystem"]);
         $this->addPipelineProcessor($booleanFields);
+    }
+    //endregion
+
+    //region Public Methods
+    /**
+     * Structure the table schema.
+     *
+     * @param \Gdn_Database $database Database handle
+     * @throws \Exception Query error.
+     */
+    public static function structure(\Gdn_Database $database): void {
+        $tableExists = $database->structure()->tableExists('recordStatus');
+        // TODO: remove block and method below once unique index has been propagated to all sites, post sprint 2022.01
+        if ($tableExists) {
+            self::dropObsoleteUniqueIndex($database);
+        }
+
+        $database
+            ->structure()
+            ->table("recordStatus")
+            ->primaryKey("statusID")
+            ->column("name", "varchar(100)", false, ["unique.recordTypeName"])
+            ->column("state", ["open", "closed"], "open")
+            ->column("recordType", "varchar(100)", false, ["index.recordType", "index.recordTypeSubType", "unique.recordTypeName"])
+            ->column("recordSubtype", "varchar(100)", null, ["index.recordTypeSubType", "unique.recordTypeName"])
+            ->column("isDefault", "tinyint", 0)
+            ->column("isSystem", "tinyint", 0)
+            ->column("insertUserID", "int")
+            ->column("dateInserted", "datetime")
+            ->column("updateUserID", "int", null)
+            ->column("dateUpdated", "datetime", null)
+            ->set();
+
+        // Create the default statuses to insert into the recordStatus table.
+        foreach (self::DEFAULT_STATUSES as $default) {
+            self::processDefaultStatuses($database, $default, $tableExists);
+        }
+
+        self::adjustAutoIncrement($database);
     }
 
     /**
@@ -228,6 +363,78 @@ class RecordStatusModel extends PipelineModel {
 
         return $convertedStatus;
     }
+    //endregion
+
+    //region Non-Public methods
+    /**
+     * Drop any unique index defined for the table that doesn't include recordSubtype.
+     * Initial unique index was over only name and recordType, need to establish unique index
+     * over all three of name, recordType and recordSubType.
+     *
+     * Remove this method once it is no longer necessary.
+     *
+     * @param \Gdn_Database $database Database handle
+     * @return void
+     * @throws \Exception Query error.
+     */
+    private static function dropObsoleteUniqueIndex(\Gdn_Database $database): void {
+        $indicies = $database->structure()->table('recordStatus')->indexSqlDb();
+        $candidates = array_filter($indicies, function ($value, $key) {
+            return str_starts_with($key, 'UX') && !str_contains($value, 'recordSubtype');
+        }, ARRAY_FILTER_USE_BOTH);
+        foreach ($candidates as $indexName => $_) {
+            $dropIndexStatement = "drop index {$indexName} on {$database->DatabasePrefix}recordStatus";
+            $database->sql()->query($dropIndexStatement);
+        }
+    }
+
+    /**
+     * Process a default status as part of database structure logic for this table.
+     *
+     * @param \Gdn_Database $database Database handle
+     * @param array $default Default record status to process
+     * @param bool $tableExists True if the table already exists, false if the table does not yet exist
+     * @throws \Exception Query error.
+     */
+    private static function processDefaultStatuses(\Gdn_Database $database, array $default, bool $tableExists): void {
+        $defaultInsertProps = ['insertUserID' => 1, 'dateInserted' => date('Y-m-d H:i:s')];
+        /** @var \Gdn_DataSet $dataSet */
+        $dataSet = $tableExists
+            ? $database->sql()->getWhere('recordStatus', ['statusID' => $default['statusID']])
+            : new \Gdn_DataSet([], DATASET_TYPE_ARRAY);
+        if ($dataSet->numRows() == 0) {
+            // Add the default statuses if they're not already there.
+            $default = array_merge($default, $defaultInsertProps);
+            $database->sql()->insert('recordStatus', $default);
+        } else {
+            // Ensure the row matches this definition
+            $row = array_intersect_key($dataSet->firstRow(DATASET_TYPE_ARRAY), $default);
+            $defaultDiff = array_diff_assoc($default, $row);
+            if (!empty($defaultDiff)) {
+                $database->sql()->update('recordStatus', $defaultDiff, ['statusID' => $default['statusID']])->put();
+            }
+        }
+    }
+
+    /**
+     * Add a protected space for core/addon status IDs and ensure user-created statuses will have IDs outside it.
+     *
+     * @param \Gdn_Database $database Database handle.
+     * @return void
+     * @throws \Exception Query error.
+     */
+    private static function adjustAutoIncrement(\Gdn_Database $database): void {
+        $databaseName = $database->sql()->databaseName();
+        $tableName = $database->sql()->prefixTable('recordStatus');
+        $recordStatusAutoIncrementQuery = "SELECT `AUTO_INCREMENT` FROM INFORMATION_SCHEMA.TABLES ".
+            "WHERE TABLE_SCHEMA = '{$databaseName}' AND TABLE_NAME = '{$tableName}'";
+        $dataSet = $database->sql()->query($recordStatusAutoIncrementQuery, "select")->firstRow('array');
+        $autoIncVal = $dataSet === false ? 0 : intval(array_values($dataSet)[0]);
+        if ($autoIncVal < 10000) {
+            $recordStatusIDQuery = "alter table {$tableName} AUTO_INCREMENT=10000";
+            $database->sql()->query($recordStatusIDQuery, "update");
+        }
+    }
 
     /**
      * Update the isDefault flag of a record type's statuses, based on updates to that type's statuses.
@@ -269,4 +476,5 @@ class RecordStatusModel extends PipelineModel {
             ]
         );
     }
+    //endregion
 }

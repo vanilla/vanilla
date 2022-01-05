@@ -1728,8 +1728,10 @@ class ActivityModel extends Gdn_Model {
                 }
 
                 if ($handled) {
+                    $skip = $activity["Skip"] ?? false;
                     // A plugin handled this activity so don't save it.
-                    return $activity;
+                    // If the plugin left a flag to skip sending notifications, return null.
+                    return $skip ? null : $activity;
                 }
 
                 if (val('CheckSpam', $options)) {

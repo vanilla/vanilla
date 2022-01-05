@@ -9,12 +9,13 @@ import { Tabs as ReachTabs, TabList, Tab, TabPanels, TabPanel } from "@reach/tab
 import { tabStandardClasses, tabBrowseClasses, tabGroupClasses } from "@library/sectioning/tabStyles";
 import classNames from "classnames";
 import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
-import { InformationIcon, WarningIcon } from "@library/icons/common";
+import { InformationIcon } from "@library/icons/common";
 import { iconClasses } from "@library/icons/iconStyles";
 import { TabsTypes } from "@library/sectioning/TabsTypes";
 import { DomNodeAttacher } from "@vanilla/react-utils";
 import { cx } from "@emotion/css";
 import { WidgetLayout } from "@library/layout/WidgetLayout";
+import { Icon } from "@vanilla/icons";
 
 export interface ITabData {
     tabID?: string | number;
@@ -90,10 +91,12 @@ export function Tabs(props: ITabsProps) {
                             {(tab.error || tab.warning) && (
                                 <ToolTip label={tab.error || tab.warning}>
                                     <ToolTipIcon>
-                                        <WarningIcon
+                                        <Icon
                                             className={
                                                 tab.error ? iconClasses().errorFgColor : iconClasses().warningFgColor
                                             }
+                                            icon={"status-warning"}
+                                            size={"compact"}
                                         />
                                     </ToolTipIcon>
                                 </ToolTip>

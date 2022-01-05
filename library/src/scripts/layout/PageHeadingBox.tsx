@@ -14,7 +14,7 @@ import {
     pageHeadingBoxVariables,
     SubtitleType,
 } from "@library/layout/PageHeadingBox.variables";
-import { useWidgetLayoutClasses } from "@library/layout/WidgetLayout.context";
+import { useWidgetSectionClasses } from "@library/layout/WidgetLayout.context";
 import React, { useRef } from "react";
 
 interface IProps {
@@ -31,7 +31,7 @@ export function PageHeadingBox(props: IProps) {
     const options = pageHeadingBoxVariables(props.options).options;
     const classes = pageHeadingBoxClasses(props.options);
     const { subtitleType } = options;
-    const contextClasses = useWidgetLayoutClasses();
+    const contextClasses = useWidgetSectionClasses();
 
     const wrapperRef = useRef<HTMLDivElement | null>(null);
     const depth = useCalculatedDepth(wrapperRef);

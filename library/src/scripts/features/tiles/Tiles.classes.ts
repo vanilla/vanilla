@@ -9,7 +9,7 @@ import { styleUnit } from "@library/styles/styleUnit";
 import { styleFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { percent } from "csx";
-import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
+import { oneColumnVariables } from "@library/layout/Section.variables";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { CSSPercentage } from "csx/lib/types";
 import { CSSObject } from "@emotion/css";
@@ -21,7 +21,7 @@ export const tilesClasses = useThemeCache((optionOverrides?: ITilesOptions) => {
     const globalVars = globalVariables();
     const vars = tilesVariables(optionOverrides);
     const style = styleFactory("tiles");
-    const mediaQueries = panelLayoutVariables().mediaQueries();
+    const mediaQueries = oneColumnVariables().mediaQueries();
 
     const root = style(
         {

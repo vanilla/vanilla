@@ -8,6 +8,7 @@
  * @since 2.0
  */
 
+use Garden\Web\Exception\ServerException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Vanilla\Addon;
@@ -695,116 +696,150 @@ class UpdateModel extends Gdn_Model implements LoggerAwareInterface {
         $addons = array_reverse(Gdn::addonManager()->getEnabled());
 
         // These variables are required for included structure files.
-        $Database = Gdn::database();
         $SQL = $this->SQL;
         $SQL->CaptureModifications = $captureOnly;
         $Structure = Gdn::structure();
         $Structure->CaptureOnly = $captureOnly;
 
-        /* @var Addon $addon */
-        foreach ($addons as $addon) {
-            $logContext = [
-                'addonKey' => $addon->getKey(),
-                \Vanilla\Logger::FIELD_CHANNEL => \Vanilla\Logger::CHANNEL_SYSTEM,
-                \Vanilla\Logger::FIELD_EVENT => 'addon_structure',
-            ];
-
-            // Look for special structure classes
-            if ($specialClasses = $addon->getSpecialClasses()) {
-                foreach ($specialClasses->getStructureClasses() as $structureClass) {
-                    $this->logger->debug(
-                        "Executing structure for {addonKey}.",
-                        [ 'structureType' => 'class', 'structureClass' => $structureClass ] + $logContext
-                    );
-                    try {
-                        /** @var AddonStructure $structureInstance */
-                        $structureInstance = \Gdn::getContainer()->get($structureClass);
-                        // If this is the first setup using the alt-install, this is the initial setup of the addon.
-                        $isAddonEnabled = Gdn::config('Garden.Installed', false);
-                        $structureInstance->structure($isAddonEnabled);
-                    } catch (Throwable $e) {
-                        $this->handleThrowable($e);
-                    }
+        $capturedSql = [];
+        $addonsWithErrors = [];
+        try {
+            /* @var Addon $addon */
+            foreach ($addons as $addon) {
+                $isSuccessful = $this->runStructureForAddon($addon);
+                if (!$isSuccessful) {
+                    $addonsWithErrors[] = $addon->getKey();
                 }
             }
-
-            // Look for a structure file.
-            if ($structure = $addon->getSpecial('structure')) {
-                $structurePath = $addon->path($structure);
-                $this->logger->debug(
-                    "Executing structure for {addonKey}.",
-                    [ 'structureType' => 'file', 'structurePath' => $structurePath ] + $logContext
-                );
-
-                try {
-                    include $structurePath;
-
-                    // Use the system user if specified.
-                    $systemUserID = Gdn::userModel()->getSystemUserID();
-                    if ($addon->getGlobalKey() === 'dashboard' && $systemUserID) {
-                        Gdn::session()->start($systemUserID, false, false);
-                    }
-                } catch (\Throwable $e) {
-                    $this->handleThrowable($e);
-                }
+            $this->fireEvent('AfterStructure');
+            if ($captureOnly && property_exists($Structure->Database, 'CapturedSql')) {
+                $capturedSql = $Structure->Database->CapturedSql;
             }
-
-            // Look for a structure method on the plugin.
-            if ($pluginClass = $addon->getPluginClass()) {
-                $plugin = Gdn::pluginManager()->getPluginInstance(
-                    $pluginClass,
-                    Gdn_PluginManager::ACCESS_CLASSNAME
-                );
-
-                if (is_object($plugin) && method_exists($plugin, 'structure')) {
-                    $this->logger->debug(
-                        "Executing structure for {addonKey}.",
-                        ['structureType' => 'method', 'structureClass' => $pluginClass]
-                    );
-
-                    try {
-                        call_user_func([$plugin, 'structure']);
-                    } catch (BadMethodCallException $ex) {
-                        // The structure method could not be called, probably because it wasn't public.
-                    } catch (\Throwable $ex) {
-                        $this->handleThrowable($ex);
-                    }
-                }
-            }
-
-            // Register permissions.
-            $permissions = $addon->getInfoValue('registerPermissions');
-            if (!empty($permissions)) {
-                $this->logger->info(
-                    "Defining permissions for {addonKey}.",
-                    [
-                        'permissions' => $permissions,
-                        \Vanilla\Logger::FIELD_EVENT => 'addon_permissions',
-                    ] + $logContext
-                );
-                Gdn::permissionModel()->define($permissions);
-            }
+        } finally {
+            // Cleanup.
+            $SQL->CaptureModifications = false;
+            $Structure->CaptureOnly = false;
+            $Structure->Database->CapturedSql = [];
         }
-        $this->fireEvent('AfterStructure');
 
-        if ($captureOnly && property_exists($Structure->Database, 'CapturedSql')) {
-            return $Structure->Database->CapturedSql;
+        if (!empty($addonsWithErrors)) {
+            throw new ServerException('Structure failed.', 500, [
+                'failedAddons' => $addonsWithErrors,
+            ]);
         }
-        return [];
+
+        return $capturedSql;
     }
 
     /**
-     * Handle a throwable while structuring an addon.
+     * Run a structure for a particular addon.
      *
-     * @param Throwable $ex
-     * @throws Throwable Throws Exception in debug mode.
+     * @param Addon $addon
+     *
+     * @return bool False if the structure failed.
      */
-    private function handleThrowable(Throwable $ex) {
-        if (debug()) {
-            throw $ex;
-        } else {
-            trigger_error("Error running structure: ".$ex->getMessage(), E_USER_WARNING);
+    public function runStructureForAddon(Addon $addon): bool {
+        $logContext = [
+            'addonKey' => $addon->getKey(),
+            \Vanilla\Logger::FIELD_CHANNEL => \Vanilla\Logger::CHANNEL_SYSTEM,
+            \Vanilla\Logger::FIELD_EVENT => 'addon_structure_'.$addon->getKey(),
+        ];
+
+        $hasError = false;
+        $handleThrowable = function (Throwable $ex) use ($logContext, &$hasError) {
+            $hasError = true;
+            if (debug()) {
+                throw $ex;
+            } else {
+                $this->logger->error("Structure failed for addon {addonKey}", [
+                    \Vanilla\Logger::FIELD_EVENT => $logContext[\Vanilla\Logger::FIELD_EVENT] . '_failed',
+                ] + $logContext);
+            }
+        };
+
+        // Look for special structure classes
+        if ($specialClasses = $addon->getSpecialClasses()) {
+            foreach ($specialClasses->getStructureClasses() as $structureClass) {
+                $this->logger->debug(
+                    "Executing structure for {addonKey}.",
+                    [ 'structureType' => 'class', 'structureClass' => $structureClass ] + $logContext
+                );
+                try {
+                    /** @var AddonStructure $structureInstance */
+                    $structureInstance = \Gdn::getContainer()->get($structureClass);
+                    // If this is the first setup using the alt-install, this is the initial setup of the addon.
+                    $isFirstEnable = !Gdn::config('Garden.Installed');
+                    $structureInstance->structure($isFirstEnable);
+                } catch (Throwable $e) {
+                    $handleThrowable($e);
+                }
+            }
         }
+
+        // Look for a structure file.
+        if ($structure = $addon->getSpecial('structure')) {
+            $structurePath = $addon->path($structure);
+            $this->logger->debug(
+                "Executing structure for {addonKey}.",
+                [ 'structureType' => 'file', 'structurePath' => $structurePath ] + $logContext
+            );
+
+            try {
+                // Legacy structure files require global variables.
+
+                /* @var \Gdn_Database $Database */
+                $Database = Gdn::database();
+                $SQL = $Database->sql();
+                $Structure = $Database->structure();
+                include $structurePath;
+
+                // Use the system user if specified.
+                $systemUserID = Gdn::userModel()->getSystemUserID();
+                if ($addon->getGlobalKey() === 'dashboard' && $systemUserID) {
+                    Gdn::session()->start($systemUserID, false, false);
+                }
+            } catch (\Throwable $e) {
+                $handleThrowable($e);
+            }
+        }
+
+        // Look for a structure method on the plugin.
+        if ($pluginClass = $addon->getPluginClass()) {
+            $plugin = Gdn::pluginManager()->getPluginInstance(
+                $pluginClass,
+                Gdn_PluginManager::ACCESS_CLASSNAME
+            );
+
+            if (is_object($plugin) && method_exists($plugin, 'structure')) {
+                $this->logger->debug(
+                    "Executing structure for {addonKey}.",
+                    ['structureType' => 'method', 'structureClass' => $pluginClass] + $logContext
+                );
+
+                try {
+                    call_user_func([$plugin, 'structure']);
+                } catch (BadMethodCallException $ex) {
+                    // The structure method could not be called, probably because it wasn't public.
+                } catch (\Throwable $ex) {
+                    $handleThrowable($ex);
+                }
+            }
+        }
+
+        // Register permissions.
+        $permissions = $addon->getInfoValue('registerPermissions');
+        if (!empty($permissions)) {
+            $this->logger->info(
+                "Defining permissions for {addonKey}.",
+                [
+                    'permissions' => $permissions,
+                    \Vanilla\Logger::FIELD_EVENT => 'addon_permissions',
+                ] + $logContext
+            );
+            Gdn::permissionModel()->define($permissions);
+        }
+
+        return !$hasError;
     }
 
     /**

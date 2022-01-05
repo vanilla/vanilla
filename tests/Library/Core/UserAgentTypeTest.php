@@ -7,13 +7,13 @@
 
 namespace VanillaTests\Library\Core;
 
-use PHPUnit\Framework\TestCase;
+use VanillaTests\BootstrapTestCase;
 
 /**
  * Tests for the user agent type.
  * @backupGlobals enabled
  */
-class UserAgentTypeTest extends TestCase {
+class UserAgentTypeTest extends BootstrapTestCase {
     const HEADER_NAME = 'HTTP_X_UA_DEVICE';
     const COOKIE_NAME = 'X-UA-Device-Force';
 

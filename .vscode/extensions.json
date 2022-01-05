@@ -6,7 +6,6 @@
     "recommendations": [
         "dbaeumer.vscode-eslint",
         "calebporzio.better-phpunit",
-        "msjsdiag.debugger-for-chrome",
         "eamodio.gitlens",
         "firsttris.vscode-jest-runner",
         "ziyasal.vscode-open-in-github",

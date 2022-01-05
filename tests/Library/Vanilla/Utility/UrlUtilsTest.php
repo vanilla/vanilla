@@ -44,42 +44,109 @@ class UrlUtilsTest extends TestCase {
     /**
      * Provide data for testing the testDomainAsAscii function.
      *
-     * @return array of valid domains to test.
+     * @return iterable valid URLs to test.
+     * @link http://homoglyphs.net Homoglyph generator
+     * @link https://www.charset.org/punycode Punycode converter
      */
-    public function provideUnicodeDomains(): array {
-        $result = [
-            'Valid ASCII domain' => ['www.vanillaforums.com', 'http://www.vanillaforums.com'],
-            'Valid Unicode domain' => ['http://www.goοgle.com/test', 'http://www.xn--gogle-sce.com/test'],
-            'Valid ASCII domain with fragment' => ['https://www.google.com/path/to/page?query=string#fragment', 'https://www.google.com/path/to/page?query=string#fragment'],
-            'Valid Unicode domain with fragment' => [
-                'https://www.goοgle.com/path/to/page?query=string#fragment', 'https://www.xn--gogle-sce.com/path/to/page?query=string#fragment'
-            ],
-            'Valid url' => ['http://www.vanillaforums.com', 'http://www.vanillaforums.com'],
-            'Valid punycoded url' => ['xn--gogle-sce.com', 'http://xn--gogle-sce.com'],
+    public function provideUnicodeDomains(): iterable {
+        yield 'Valid ASCII domain without scheme' => [
+            'url' => 'www.vanillaforums.com',
+            'punyEncoded' => 'http://www.vanillaforums.com'
         ];
-        return $result;
+        yield 'Valid Unicode domain' => [
+            'url' => 'http://www.goοgle.com/test',
+            'punyEncoded' => 'http://www.xn--gogle-sce.com/test'
+        ];
+        yield 'Valid ASCII host with ASCII username, no password' => [
+            'url' => 'https://guest:@www.vanillaforums.com',
+            'punyEncoded' => 'https://guest:@www.vanillaforums.com'
+        ];
+        yield 'Valid ASCII host with ASCII username and password' => [
+            'url' => 'https://guest:guest@www.vanillaforums.com',
+            'punyEncoded' => 'https://guest:guest@www.vanillaforums.com'
+        ];
+        yield 'Valid ASCII host with Unicode userinfo' => [
+            'url' => 'http://уｏｕ:ѡоｎ@android-winners-central.com/free/phone',
+            'punyEncoded' => 'http://xn--ou-tmc:xn--n-0tb8h@android-winners-central.com/free/phone',
+        ];
+        yield 'Valid Unicode host with Unicode userinfo' => [
+            'url' => 'http://ｆｒｅе:ⅰｐｈοｎｅ@аррӏе.com/you/won',
+            'punyEncoded' => 'http://xn--fre-tdd:xn--iphne-tce@xn--80ak6aa92e.com/you/won'
+        ];
+        yield 'Valid punycoded host with punycoded userinfo' => [
+            'url' => 'http://xn--fre-tdd:xn--iphne-tce@xn--80ak6aa92e.com/you/won',
+            'punyEncoded' => 'http://xn--fre-tdd:xn--iphne-tce@xn--80ak6aa92e.com/you/won'
+        ];
+        yield 'Valid ASCII-only URL with fragment' => [
+            'url' => 'https://www.google.com/path/to/page?query=string#fragment',
+            'punyEncoded' => 'https://www.google.com/path/to/page?query=string#fragment'
+        ];
+        yield 'Valid Unicode domain with fragment' => [
+            'url' => 'https://www.goοgle.com/path/to/page?query=string#fragment',
+            'punyEncoded' => 'https://www.xn--gogle-sce.com/path/to/page?query=string#fragment'
+        ];
+        yield 'Valid ASCII-only url' => [
+            'url' => 'http://www.vanillaforums.com',
+            'punyEncoded' => 'http://www.vanillaforums.com'
+        ];
+        yield 'Valid punycoded url without scheme' => [
+            'url' => 'xn--gogle-sce.com',
+            'punyEncoded' => 'http://xn--gogle-sce.com'
+        ];
     }
 
     /**
      * Test the domainAsAscii() function.
      *
-     * @param string $domain Test domain.
+     * @param string $url Test domain.
      * @param string $punyEncoded Domain converted to IDNA ASCII.
      * @dataProvider provideUnicodeDomains
      */
-    public function testDomainAsAscii($domain, $punyEncoded) {
-        $result = UrlUtils::domainAsAscii($domain);
+    public function testDomainAsAscii($url, $punyEncoded) {
+        $result = UrlUtils::domainAsAscii($url);
         $this->assertEquals($result, $punyEncoded);
     }
 
     /**
-     * Test the domainAsAscii() function using a domain with invalid character.
+     * Provide invalid URLs to domainAsAscii
+     *
+     * @return iterable
      */
-    public function testInvalidDomainAsAscii() {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Domain Invalid.');
+    public function provideInvalidUrls(): iterable {
+        yield 'parse_url returns false' => [
+            'url' => "http://user@:80",
+            'msg' => 'Url Invalid'
+        ];
+        yield 'Whitespace in host position' => [
+            'url' => "http://www.ɡооɡⅼе.ϲоⅿ\:@%20",
+            'msg' => 'Url Invalid'
+        ];
+        yield 'Invalid character in host' => [
+            'url' => '//goo�gle.com/',
+            'msg' => 'Domain Invalid.'
+        ];
+        yield 'Invalid character in username' => [
+            'url' => 'http://ｆｒ�ｅе:ⅰｐｈοｎｅ@аррӏе.com/you/won',
+            'msg' => 'Username Invalid.'
+        ];
+        yield 'Invalid character in password' => [
+            'url' => 'http://ｆｒｅе:ⅰｐｈοｎ�ｅ@аррӏе.com/you/won',
+            'msg' => 'Password Invalid.'
+        ];
+    }
 
-        UrlUtils::domainAsAscii('//goo�gle.com/');
+    /**
+     * Test that domainAsAscii returns an InvalidArgumentException when provided invalid characters within URL
+     *
+     * @param string $url
+     * @param string $msg
+     * @return void
+     * @dataProvider provideInvalidUrls
+     */
+    public function testDomainAsAsciiThrowsInvalidArgumentException(string $url, string $msg) : void {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage($msg);
+        $_ = UrlUtils::domainAsAscii($url);
     }
 
     /**

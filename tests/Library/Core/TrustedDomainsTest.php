@@ -28,7 +28,9 @@ class TrustedDomainsTest extends TestCase {
      */
     public function setUp(): void {
         $this->authProviderModel = self::container()->get(\Gdn_AuthenticationProviderModel::class);
-        \Gdn::sql()->truncate('UserAuthenticationProvider');
+        $this->resetTable('UserAuthenticationProvider');
+        // Clear out the cache.
+        $this->authProviderModel->onUpdate();
     }
 
     /**

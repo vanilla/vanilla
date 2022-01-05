@@ -18,6 +18,13 @@ export const autoCompleteClasses = ({ size = "default" }: AutoCompleteClassesPro
     }),
     inputContainer: css({
         position: "relative",
+        display: "flex",
+        width: "100%",
+        alignItems: "baseline",
+        justifyContent: "flex-start",
+        border: "solid 1px #bfcbd8",
+        borderRadius: 6,
+        flexWrap: "wrap",
     }),
     inputActions: css({
         display: "flex",
@@ -34,33 +41,19 @@ export const autoCompleteClasses = ({ size = "default" }: AutoCompleteClassesPro
             default: { padding: "0 12px" },
         }[size],
     }),
-    inputTokens: css({
-        display: "flex",
-        pointerEvents: "none",
-        flexDirection: "row",
-        position: "absolute",
-        top: 0,
-        left: 0,
-        bottom: 0,
-        flexWrap: "wrap",
-        ...{
-            small: {
-                height: 28,
-            },
-            default: {
-                height: 36,
-            },
-        }[size],
-    }),
     inputTokenTag: css({
         display: "flex",
         ...{
-            small: { margin: 4, maxHeight: 20, paddingLeft: 6, fontSize: "13px" },
-            default: { margin: 5, maxHeight: 26, paddingLeft: 8, fontSize: "16px" },
+            small: { margin: 4, padding: "3px 6px", fontSize: "13px" },
+            default: { margin: 5, padding: "4xp 8px", fontSize: "16px" },
         }[size],
         backgroundColor: "#eeefef",
         borderRadius: 2,
         alignItems: "center",
+        maxWidth: "85%",
+        "& > label": {
+            margin: 0,
+        },
     }),
     popover: css({
         "&[data-reach-combobox-popover]": {
@@ -79,6 +72,10 @@ export const autoCompleteClasses = ({ size = "default" }: AutoCompleteClassesPro
     checkmarkContainer: css({
         display: "flex",
         height: "1em",
+    }),
+    parentLabel: css({
+        color: "#767676",
+        fontSize: "12px",
     }),
     option: css({
         display: "flex",
@@ -107,6 +104,9 @@ export const autoCompleteClasses = ({ size = "default" }: AutoCompleteClassesPro
                 default: { width: 24, height: 24, right: -4, transform: "translateY(calc(0.5em - 50%))" },
             }[size],
         },
+        "&:first-of-type": {
+            background: "rgba(3,125,188,0.08)",
+        },
     }),
     optionText: css({
         flex: 1,
@@ -128,5 +128,16 @@ export const autoCompleteClasses = ({ size = "default" }: AutoCompleteClassesPro
     }),
     input: css({
         cursor: "default",
+        border: "none",
+        flex: 1,
+        minWidth: 100,
+        "* + &": {
+            height: 0,
+            fontSize: 0,
+        },
+        "* + &:focus, * + &[data-state='interacting'], * + &[data-state='suggesting']": {
+            height: "auto",
+            fontSize: "inherit",
+        },
     }),
 });

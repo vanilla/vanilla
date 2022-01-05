@@ -274,6 +274,8 @@ class DiscussionsTest extends AbstractResourceTest {
      * Test comment body expansion.
      */
     public function testExpandLastPostBody() {
+        $this->resetTable('Discussion');
+        $this->resetTable('Comment');
         $this->testPost();
 
         // Test that the field is there.

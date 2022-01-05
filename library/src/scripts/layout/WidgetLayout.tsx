@@ -4,11 +4,11 @@
  * @license gpl-2.0-only
  */
 
-import { IWidgetLayoutContext, WidgetLayoutContext } from "@library/layout/WidgetLayout.context";
+import { IWidgetSectionContext, WidgetSectionContext } from "@library/layout/WidgetLayout.context";
 import { widgetLayoutClasses } from "@library/layout/WidgetLayout.styles";
 import React from "react";
 
-interface IProps extends Partial<IWidgetLayoutContext> {
+interface IProps extends Partial<IWidgetSectionContext> {
     children: React.ReactNode;
 }
 
@@ -16,7 +16,7 @@ export function WidgetLayout(props: IProps) {
     const { children, ...contextValues } = props;
     const classes = widgetLayoutClasses();
     return (
-        <WidgetLayoutContext.Provider
+        <WidgetSectionContext.Provider
             value={{
                 widgetClass: classes.widget,
                 widgetWithContainerClass: classes.widgetWithContainer,
@@ -25,6 +25,6 @@ export function WidgetLayout(props: IProps) {
             }}
         >
             {props.children}
-        </WidgetLayoutContext.Provider>
+        </WidgetSectionContext.Provider>
     );
 }

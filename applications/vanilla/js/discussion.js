@@ -289,14 +289,6 @@ jQuery(document).ready(function($) {
             }
         });
 
-    // Autosave comments
-    if ($.fn.autosave) {
-        $('div.CommentForm textarea').autosave({
-            button: $('a.DraftButton')
-        });
-    }
-
-
     /* Options */
 
     // Edit comment

@@ -10,10 +10,11 @@ import { StoryContent } from "@library/storybook/StoryContent";
 import Message from "@library/messages/Message";
 import { messagesClasses } from "@library/messages/messageStyles";
 import Translate from "@library/content/Translate";
-import { ErrorIcon, InformationIcon, WarningIcon } from "@library/icons/common";
+import { ErrorIcon, InformationIcon } from "@library/icons/common";
 import classNames from "classnames";
 import { t } from "@library/utility/appUtils";
 import SmartLink from "@library/routing/links/SmartLink";
+import { Icon } from "@vanilla/icons";
 
 const story = storiesOf("Alerts", module);
 
@@ -92,7 +93,9 @@ story.add("Message", () => {
                     stringContents={t("Lorem ipsum dolor sit amet, consectetur adipiscing elit, visit site.")}
                 />
                 <Message
-                    icon={<WarningIcon className={classNames(classesMessages.icon)} />}
+                    icon={
+                        <Icon className={classNames(classesMessages.icon)} icon={"status-warning"} size={"compact"} />
+                    }
                     contents={
                         <div className={classesMessages.content}>
                             <Translate source={"Lorem ipsum dolor sit amet, consectetur"} />
@@ -105,7 +108,9 @@ story.add("Message", () => {
                 />
 
                 <Message
-                    icon={<WarningIcon className={classNames(classesMessages.icon)} />}
+                    icon={
+                        <Icon className={classNames(classesMessages.icon)} icon={"status-warning"} size={"compact"} />
+                    }
                     contents={
                         <div className={classesMessages.content}>
                             <Translate source={message} />
@@ -118,7 +123,9 @@ story.add("Message", () => {
                 />
 
                 <Message
-                    icon={<WarningIcon className={classNames(classesMessages.icon)} />}
+                    icon={
+                        <Icon className={classNames(classesMessages.icon)} icon={"status-warning"} size={"compact"} />
+                    }
                     contents={
                         <div className={classesMessages.content}>
                             <Translate source={message} />
@@ -159,7 +166,9 @@ story.add("Message", () => {
                 />
 
                 <Message
-                    icon={<WarningIcon className={classNames(classesMessages.icon)} />}
+                    icon={
+                        <Icon className={classNames(classesMessages.icon)} icon={"status-warning"} size={"compact"} />
+                    }
                     title="How do posts get sent to the Spam & Moderation queues How do posts get sent to the Spam & Moderation queues??"
                     contents={
                         <div className={classesMessages.content}>
@@ -184,6 +193,21 @@ story.add("Message", () => {
                         return;
                     }}
                     stringContents={t(message)}
+                />
+
+                <Message
+                    title="Vanilla Forums"
+                    icon={<ErrorIcon className={classNames(classesMessages.icon)} />}
+                    contents={
+                        <div className={classesMessages.content}>
+                            <Translate source={message} />
+                        </div>
+                    }
+                    onConfirm={() => {
+                        return;
+                    }}
+                    stringContents={t(message)}
+                    type={"error"}
                 />
 
                 <Message

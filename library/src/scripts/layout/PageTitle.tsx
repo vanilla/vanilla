@@ -12,7 +12,7 @@ import { pageTitleClasses } from "@library/layout/pageTitleStyles";
 import { useFontSizeCalculator } from "@library/layout/pageHeadingContext";
 import { typographyClasses } from "@library/styles/typographyStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { useLayout } from "@library/layout/LayoutContext";
+import { useSection } from "@library/layout/LayoutContext";
 
 export interface IPageTitle {
     title: React.ReactNode;
@@ -50,7 +50,7 @@ export function PageTitle(props: IPageTitle) {
         }
     }, [isLarge]);
 
-    const isCompact = useLayout().isCompact;
+    const isCompact = useSection().isCompact;
     const classes = pageTitleClasses();
     const classesMetas = metasClasses();
 

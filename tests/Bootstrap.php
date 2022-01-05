@@ -32,15 +32,14 @@ use Vanilla\Contracts\Site\AbstractSiteProvider;
 use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Vanilla\Contracts\Web\UASnifferInterface;
 use Vanilla\Dashboard\Controllers\API\ConfigApiController;
+use Vanilla\Dashboard\Models\RemoteResourceModel;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Forum\Navigation\ForumBreadcrumbProvider;
 use Vanilla\HttpCacheMiddleware;
-use Vanilla\InjectableInterface;
 use Vanilla\Models\AuthenticatorModel;
 use Vanilla\Models\SSOModel;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\OpenAPIBuilder;
-use Vanilla\Permissions;
 use Vanilla\SchemaFactory;
 use Vanilla\Search\GlobalSearchType;
 use Vanilla\Search\SearchService;
@@ -48,12 +47,10 @@ use Vanilla\Search\SearchTypeCollectorInterface;
 use Vanilla\Site\OwnSiteProvider;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Theme\FsThemeProvider;
-use Vanilla\Web\Middleware\LogTransactionMiddleware;
 use Vanilla\Web\SystemTokenUtils;
 use Vanilla\Web\TwigEnhancer;
 use Vanilla\Web\TwigRenderer;
 use Vanilla\Web\UASniffer;
-use Vanilla\Theme\ThemeFeatures;
 use Vanilla\Widgets\WidgetService;
 use VanillaTests\APIv0\TestDispatcher;
 use VanillaTests\Fixtures\Authenticator\MockAuthenticator;
@@ -66,6 +63,7 @@ use VanillaTests\Fixtures\NullCache;
 use Vanilla\Utility\ContainerUtils;
 use VanillaTests\Fixtures\MockSiteSectionProvider;
 use VanillaTests\Fixtures\SpyingEventManager;
+use VanillaTests\Fixtures\TestAddonManager;
 
 /**
  * Run bootstrap code for Vanilla tests.
@@ -189,20 +187,13 @@ class Bootstrap {
 
             // AddonManager
             ->rule(AddonManager::class)
-            ->setShared(true)
             ->setConstructorArgs([
-                [
-                    Addon::TYPE_ADDON => ['/addons/addons', '/applications', '/plugins'],
-                    Addon::TYPE_THEME => ['/addons/themes', '/themes'],
-                    Addon::TYPE_LOCALE => '/locales'
-                ],
-                PATH_ROOT.'/tests/cache/bootstrap'
+                array_merge_recursive(
+                    AddonManager::getDefaultScanDirectories(),
+                    TestAddonManager::getDefaultScanDirectories()
+                ),
+                'cacheDir' => PATH_ROOT.'/tests/cache/bootstrap'
             ])
-            ->addAlias('AddonManager')
-            ->addCall('registerAutoloader')
-
-            ->rule(ThemeFeatures::class)
-            ->setConstructorArgs(['theme' => ContainerUtils::currentTheme()])
 
             // ApplicationManager
             ->rule(\Gdn_ApplicationManager::class)
@@ -230,9 +221,6 @@ class Bootstrap {
 
             ->rule(LoggerAwareInterface::class)
             ->addCall('setLogger')
-
-            ->rule(HttpCacheMiddleware::class)
-            ->setShared(true)
 
             // EventManager
             ->rule(\Garden\EventManager::class)
@@ -335,55 +323,20 @@ class Bootstrap {
             ->rule(SSOModel::class)
             ->setShared(true)
 
-            ->rule(\Garden\Web\Dispatcher::class)
-            ->setShared(true)
-            ->addCall('addRoute', ['route' => new \Garden\Container\Reference('@api-v2-route'), 'api-v2'])
-            ->addCall('addMiddleware', [new Reference(\Vanilla\Web\PrivateCommunityMiddleware::class)])
-            ->addCall('addMiddleware', [new Reference(LogTransactionMiddleware::class)])
-            ->addCall('addMiddleware', [new Reference('@smart-id-middleware')])
-            ->addCall('addMiddleware', [new Reference(\Vanilla\Web\APIExpandMiddleware::class)])
+            // These models in particular doesn't do well with being shared.
+            // It holds onto local caches of permissions from enabled addons
+            // and is enabled very early on.
+            ->rule(\PermissionModel::class)
+            ->setShared(false)
+            ->rule(\UsersApiController::class)
+            ->setShared(false)
+            ->rule(\UserModel::class)
+            ->setShared(false)
+            ->rule(RemoteResourceModel::class)
+            ->setShared(false)
 
-            ->rule(LogTransactionMiddleware::class)
-            ->setShared(true)
-
-            ->rule('@smart-id-middleware')
-            ->setClass(\Vanilla\Web\SmartIDMiddleware::class)
-            ->setShared(true)
-            ->setConstructorArgs(['/api/v2/'])
-            ->addCall('addSmartID', ['CategoryID', 'categories', ['name', 'urlcode'], 'Category'])
-            ->addCall('addSmartID', ['RoleID', 'roles', ['name'], 'Role'])
-            ->addCall('addSmartID', ['UserID', 'users', '*', new Reference('@user-smart-id-resolver')])
-
-            ->rule('@user-smart-id-resolver')
-            ->setFactory(function (Container $dic) {
-                /* @var \Vanilla\Web\UserSmartIDResolver $uid */
-                $uid = $dic->get(\Vanilla\Web\UserSmartIDResolver::class);
-                $uid->setEmailEnabled(!$dic->get(\Gdn_Configuration::class)->get('Garden.Registration.NoEmail'))
-                    ->setViewEmail($dic->get(\Gdn_Session::class)->checkPermission('Garden.PersonalInfo.View'));
-
-                return $uid;
-            })
-
-            ->rule(\Vanilla\Web\HttpStrictTransportSecurityModel::class)
-            ->addAlias('HstsModel')
-
-            ->rule('@api-v2-route')
-            ->setClass(\Garden\Web\ResourceRoute::class)
-            ->setConstructorArgs(['/api/v2/', '*\\%sApiController'])
-            ->addCall('setConstraint', ['locale', ['position' => 0]])
-            ->addCall('setMeta', ['CONTENT_TYPE', 'application/json; charset=utf-8'])
-            ->addCall('addMiddleware', [new Reference(\Vanilla\Web\ApiFilterMiddleware::class)])
-
-            ->rule(\Vanilla\Web\PrivateCommunityMiddleware::class)
-            ->setShared(true)
-            ->setConstructorArgs([ContainerUtils::config('Garden.PrivateCommunity')])
-
-            ->rule(\Vanilla\Web\APIExpandMiddleware::class)
-            ->setConstructorArgs([
-                "/api/v2/",
-                ContainerUtils::config("Garden.api.ssoIDPermission", Permissions::RANK_COMMUNITY_MANAGER)
-            ])
-            ->setShared(true)
+            ->rule(\ActivityModel::class)
+            ->addCall('setFloodControlEnabled', [false])
 
             ->rule('@view-application/json')
             ->setClass(\Vanilla\Web\JsonView::class)
@@ -462,12 +415,6 @@ class Bootstrap {
             ->addCall('setDispatchEventName', ['SchedulerDispatch'])
             ->addCall('setDispatchedEventName', ['SchedulerDispatched'])
             ->setShared(true)
-
-            ->rule(\Vanilla\Web\APIExpandMiddleware::class)
-            ->setConstructorArgs([
-                "/api/v2/",
-                ContainerUtils::config("Garden.api.ssoIDPermission", Permissions::RANK_COMMUNITY_MANAGER)
-            ])
 
             ->rule(\Gdn_Form::class)
             ->addAlias('Form')

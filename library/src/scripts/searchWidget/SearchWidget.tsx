@@ -13,7 +13,7 @@ import LinkAsButton from "@library/routing/LinkAsButton";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { IControlProps, IForm, JsonSchema, JsonSchemaForm } from "@vanilla/json-schema-forms";
 import { SelectLookup } from "@library/forms/select/SelectLookup";
-import { useWidgetLayoutClasses } from "@library/layout/WidgetLayout.context";
+import { useWidgetSectionClasses } from "@library/layout/WidgetLayout.context";
 import { PageHeadingBox } from "@library/layout/PageHeadingBox";
 import { ISearchWidgetOptions, searchWidgetVariables } from "@library/searchWidget/SearchWidget.variables";
 import { t } from "@vanilla/i18n";
@@ -82,7 +82,7 @@ export function SearchWidget(props: ISearchWidgetProps) {
     const { options } = vars;
     const { formSchema } = props;
     const classes = searchWidgetClasses();
-    const widgetClasses = useWidgetLayoutClasses();
+    const widgetClasses = useWidgetSectionClasses();
     const [value, setValue] = useState({});
 
     return (

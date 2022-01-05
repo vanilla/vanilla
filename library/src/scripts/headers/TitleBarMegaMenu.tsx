@@ -36,7 +36,7 @@ function TitleBarMegaMenuChildImpl(props: IChildProps, ref: React.Ref<IMegaMenuC
     const { className, url, text, onKeyDown } = props;
 
     return (
-        <li className={className}>
+        <li className={className} role="menuitem">
             <SmartLink tabIndex={0} onKeyDown={onKeyDown} to={url}>
                 {text}
             </SmartLink>
@@ -209,7 +209,7 @@ function TitleBarMegaMenuImpl(props: IProps, ref: React.Ref<IMegaMenuHandle>) {
 
     function generateMegaMenuList(items: INavigationVariableItem[]) {
         return (
-            <ul className={classes.menuItemChildren}>
+            <ul className={classes.menuItemChildren} role="menu">
                 {items.map((item, key) => (
                     <TitleBarMegaMenuChild
                         className={classes.menuItemChild}

@@ -1305,16 +1305,6 @@ class DiscussionModelTest extends SiteTestCase {
                     'format' => MarkdownFormat::FORMAT_KEY,
                 ],
                 'Body is 7 characters too long.'
-            ],
-            'too long bytelength' => [
-                [
-                    'Vanilla.Comment.MaxLength' => 50000,
-                ],
-                [
-                    'body' => str_repeat("😱", 20000),
-                    'format' => TextFormat::FORMAT_KEY,
-                ],
-                'Body is 14465 bytes too long.'
             ]
         ];
     }

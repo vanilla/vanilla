@@ -61,12 +61,13 @@ dashboardHeading({
     </li>
     {{ form.imageUploadReact(
         'Photo',
-        t('Photo')
+        t('Icon'),
+        t('This image will be used in category lists and widgets when using the "Icon" style option. ')
     ) }}
     {{ form.imageUploadReact(
         "BannerImage",
         t('Banner Image'),
-        t('The banner image to use for this category. Recommended dimensions are about 1000px by 400px or a similar ratio.')
+        t('This image will appear in this category\'s banner and in category widgets when using the "Image" and/or "Background" style options. Recommended dimensions are about 1000px by 400px or a similar ratio.')
     ) }}
 
     <li class="form-group">

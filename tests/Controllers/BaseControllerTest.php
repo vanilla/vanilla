@@ -13,13 +13,8 @@ use VanillaTests\SiteTestCase;
  * Some tests for base Gdn_Controller functionality.
  */
 class BaseControllerTest extends SiteTestCase {
-    /**
-     * {@inheritDoc}
-     */
-    public static function setUpBeforeClass(): void {
-        self::$addons = ['vanilla', 'test'];
-        parent::setUpBeforeClass();
-    }
+
+    public static $addons = ['test'];
 
     /**
      * {@inheritDoc}

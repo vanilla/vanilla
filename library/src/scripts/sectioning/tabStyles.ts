@@ -9,7 +9,7 @@ import { useThemeCache } from "@library/styles/themeCache";
 import { negative, sticky, extendItemContainer, flexHelper, singleBorder } from "@library/styles/styleHelpers";
 import { styleUnit } from "@library/styles/styleUnit";
 import { userSelect } from "@library/styles/styleHelpers";
-import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
+import { oneColumnVariables } from "@library/layout/Section.variables";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent, viewHeight, calc, quote, color } from "csx";
@@ -75,7 +75,7 @@ export const tabsVariables = useThemeCache(() => {
 export const tabStandardClasses = useThemeCache(() => {
     const vars = tabsVariables();
     const style = styleFactory(TabsTypes.STANDARD);
-    const mediaQueries = panelLayoutVariables().mediaQueries();
+    const mediaQueries = oneColumnVariables().mediaQueries();
     const formElementVariables = formElementsVariables();
     const globalVars = globalVariables();
     const titleBarVars = titleBarVariables();
@@ -230,7 +230,7 @@ export const tabBrowseClasses = useThemeCache(() => {
     const vars = tabsVariables();
     const globalVars = globalVariables();
     const style = styleFactory(TabsTypes.BROWSE);
-    const mediaQueries = panelLayoutVariables().mediaQueries();
+    const mediaQueries = oneColumnVariables().mediaQueries();
 
     const horizontalPadding = 12;
     const verticalPadding = globalVars.gutter.size / 2;
@@ -336,7 +336,7 @@ export const tabBrowseClasses = useThemeCache(() => {
 export const tabGroupClasses = useThemeCache(() => {
     const vars = tabsVariables();
     const style = styleFactory(TabsTypes.GROUP);
-    const mediaQueries = panelLayoutVariables().mediaQueries();
+    const mediaQueries = oneColumnVariables().mediaQueries();
     const formElementVariables = formElementsVariables();
     const globalVars = globalVariables();
     const titleBarVars = titleBarVariables();

@@ -7,7 +7,7 @@ import { cx } from "@emotion/css";
 import { INavigationVariableItem } from "@library/headers/navigationVariables";
 import { PageBox } from "@library/layout/PageBox";
 import { PageHeadingBox } from "@library/layout/PageHeadingBox";
-import { useWidgetLayoutClasses } from "@library/layout/WidgetLayout.context";
+import { useWidgetSectionClasses } from "@library/layout/WidgetLayout.context";
 import { quickLinksClasses } from "@library/navigation/QuickLinks.classes";
 import { quickLinksVariables } from "@library/navigation/QuickLinks.variables";
 import SmartLink from "@library/routing/links/SmartLink";
@@ -33,7 +33,7 @@ export function QuickLinksView(props: IProps) {
         return !isSetHidden;
     });
 
-    const widgetClasses = useWidgetLayoutClasses();
+    const widgetClasses = useWidgetSectionClasses();
 
     return (
         <div className={cx(classes.root, widgetClasses.widgetClass)}>

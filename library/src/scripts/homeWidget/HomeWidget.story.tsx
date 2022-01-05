@@ -18,7 +18,7 @@ import { HomeWidgetItem } from "@library/homeWidget/HomeWidgetItem";
 import { HomeWidgetItemContentType, IHomeWidgetItemOptions } from "@library/homeWidget/HomeWidgetItem.styles";
 import Container from "@library/layout/components/Container";
 import { SubtitleType } from "@library/layout/PageHeadingBox.variables";
-import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
+import { oneColumnVariables } from "@library/layout/Section.variables";
 import { StoryNavLinks } from "@library/navigation/navLinksWithHeadings.story";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import { STORY_IMAGE, STORY_IPSUM_MEDIUM, STORY_IPSUM_SHORT } from "@library/storybook/storyData";
@@ -730,7 +730,7 @@ export const NestedContainers = storyWithConfig({ useWrappers: false }, () => {
 
 NestedContainers.parameters = {
     chromatic: {
-        viewports: Object.values(panelLayoutVariables().panelLayoutBreakPoints),
+        viewports: Object.values(oneColumnVariables().breakPoints),
     },
 };
 export function NotEnoughItems() {
@@ -789,7 +789,7 @@ export function NotEnoughItems() {
 
 NotEnoughItems.parameters = {
     chromatic: {
-        viewports: Object.values(panelLayoutVariables().panelLayoutBreakPoints),
+        viewports: Object.values(oneColumnVariables().breakPoints),
     },
 };
 
@@ -859,7 +859,7 @@ export const ContainerBackgroundVariants = storyWithConfig({ useWrappers: false 
 
 ContainerBackgroundVariants.parameters = {
     chromatic: {
-        viewports: Object.values(panelLayoutVariables().panelLayoutBreakPoints),
+        viewports: Object.values(oneColumnVariables().breakPoints),
     },
 };
 

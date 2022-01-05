@@ -15,12 +15,14 @@ use Vanilla\Formatting\DateTimeFormatter;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Forum\Modules\QnAWidgetModule;
 use Vanilla\Models\LegacyModelUtils;
+use Vanilla\QnA\Job\QnaFollowupJob;
 use Vanilla\QnA\Models\AnswerSearchType;
 use Vanilla\QnA\Models\QnAJsonLD;
 use Vanilla\QnA\Models\QuestionSearchType;
 use Vanilla\QnA\Models\AnswerModel;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use Vanilla\Scheduler\Descriptor\CronJobDescriptor;
 use Vanilla\Search\SearchTypeCollectorInterface;
 use Vanilla\Utility\ModelUtils;
 use Gdn_Session as SessionInterface;
@@ -151,8 +153,6 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
      * Run once on enable.
      */
     public function setup() {
-        $this->structure();
-
         \Gdn::config()->touch('QnA.Points.Enabled', false);
         \Gdn::config()->touch('QnA.Points.Answer', 1);
         \Gdn::config()->touch('QnA.Points.AcceptedAnswer', 1);
@@ -530,8 +530,9 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
         }
 
         // Check permissions.
-        $canAccept = Gdn::session()->checkRankedPermission('Garden.Curation.Manage');
-        $canAccept |= Gdn::session()->UserID == val('InsertUserID', $discussion);
+        $canAccept = Gdn::session()->UserID == val('InsertUserID', $discussion) && !$discussion->Closed;
+        $canAccept |= Gdn::session()->checkRankedPermission('Garden.Moderation.Manage');
+
 
         if (!$canAccept) {
             return;
@@ -1591,6 +1592,10 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
 
         if ($discussion['InsertUserID'] !== $sender->getSession()->UserID) {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.Edit', $discussion['CategoryID']);
+        }
+
+        if ($discussion["Closed"]) {
+            $sender->permission("Garden.Moderation.Manage");
         }
 
         // Body is a required field in CommentModel::save.

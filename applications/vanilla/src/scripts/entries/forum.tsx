@@ -20,6 +20,8 @@ import { CategoryPicker } from "@library/forms/select/CategoryPicker";
 import { CategoryFollowDropDown } from "@vanilla/addon-vanilla/categories/CategoryFollowDropdown";
 import TabWidget from "@library/tabWidget/TabWidget";
 import NewPostMenu from "@library/flyouts/NewPostMenu";
+import { triggerLegacyHashScrolling } from "@vanilla/addon-vanilla/legacy/legacyHashScrolling";
+import "@vanilla/addon-vanilla/forms/autosave";
 
 registerReducer("forum", forumReducer);
 registerCommunitySearchDomain();
@@ -37,3 +39,4 @@ addComponent("NewPostMenu", NewPostMenu, { overwrite: true });
 
 SearchContextProvider.setOptionProvider(new CommunitySearchProvider());
 accessibleRoleButton();
+triggerLegacyHashScrolling();

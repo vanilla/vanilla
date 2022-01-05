@@ -106,6 +106,17 @@ if (!function_exists('debug')) {
     }
 }
 
+if (!function_exists('isTestMode')) {
+    /**
+     * Determine if we are executing inside a test.
+     *
+     * @return bool
+     */
+    function isTestMode(): bool {
+        return defined('TESTMODE_ENABLED') && TESTMODE_ENABLED;
+    }
+}
+
 if (!function_exists('increaseMaxExecutionTime')) {
     /**
      * Used to increase php max_execution_time value.

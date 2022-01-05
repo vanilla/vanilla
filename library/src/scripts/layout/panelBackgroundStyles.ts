@@ -8,7 +8,7 @@ import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
 import { styleFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
-import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
+import { oneColumnVariables } from "@library/layout/Section.variables";
 import { calc, percent } from "csx";
 import { panelBackgroundVariables } from "./PanelBackground.variables";
 
@@ -16,7 +16,7 @@ export const panelBackgroundClasses = useThemeCache(() => {
     const style = styleFactory("panelBackground");
 
     const vars = panelBackgroundVariables();
-    const layoutVars = panelLayoutVariables();
+    const layoutVars = oneColumnVariables();
     const globalVars = globalVariables();
 
     const root = style({

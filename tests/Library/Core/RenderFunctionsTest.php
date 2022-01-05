@@ -25,7 +25,6 @@ class RenderFunctionsTest extends TestCase {
      * Make sure the render functions are included.
      */
     public static function setUpBeforeClass(): void {
-        self::$addons = ['dashboard']; // Needed for render paths.
         self::siteTestBeforeClass();
         require_once PATH_ROOT.'/library/core/functions.render.php';
 

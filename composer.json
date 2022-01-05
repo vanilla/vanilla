@@ -87,7 +87,8 @@
         "webmozart/assert": "^1.9",
         "webmozart/path-util": "^2.3",
         "wikimedia/composer-merge-plugin": "^1.4.1",
-        "bopoda/robots-txt-parser": "^2.4"
+        "bopoda/robots-txt-parser": "^2.4",
+        "vanilla/garden-hydrate": "^2.1"
     },
     "require-dev": {
         "cache/integration-tests": "dev-master",
@@ -161,7 +162,7 @@
             "include": [
                 "addons/*/composer.json",
                 "plugins/*/composer.json",
-                "cloud/scripts/composer.json"
+                "cli/composer.json"
             ],
             "recurse": false,
             "replace": false,

@@ -58,7 +58,6 @@ class WebpackAssetProviderTest extends MinimalContainerTestCase {
         $request = new Request();
         $fsThemeProvider = new FsThemeProvider(
             $addonManager,
-            $request,
             $config,
             $themeHelper
         );

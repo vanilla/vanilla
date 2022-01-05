@@ -8,19 +8,22 @@
 namespace VanillaTests\Library\Database;
 
 use PHPUnit\Framework\TestCase;
+use VanillaTests\BootstrapTestCase;
 use VanillaTests\Fixtures\TestMySQLStructure;
 use VanillaTests\SiteTestTrait;
 
 /**
  * Tests for the `Gdn_MySQLStructure` class.
  */
-class MySQLStructureTest extends TestCase {
-    use SiteTestTrait;
+class MySQLStructureTest extends BootstrapTestCase {
 
     /**
      * @var TestMySQLStructure
      */
     private $st;
+
+    /** @var \Gdn_Database */
+    private $db;
 
     /**
      * Set up a fixture for use in tests.
@@ -28,9 +31,13 @@ class MySQLStructureTest extends TestCase {
     public function setUp(): void {
         parent::setUp();
 
-        $st = new TestMySQLStructure($this->container()->get(\Gdn_Database::class));
+        $this->db = $this->container()->get(\Gdn_Database::class);
+        $st = new TestMySQLStructure($this->db);
         $this->st = $st;
         $this->st->reset();
+        $this->st->CaptureOnly = false;
+        $this->st->Database->CapturedSql = [];
+        \Gdn::sql()->CaptureModifications = false;
     }
 
     /**
@@ -277,5 +284,55 @@ EOT;
 
         $sql = $this->st->Database->CapturedSql ?? [];
         $this->assertEmpty($sql, 'The table should not have altered.');
+    }
+
+    /**
+     * Test the creation of multi-column unique indexes works correctly.
+     *
+     * We had a bug previously where the initial indexes on update were incorrect, but were correct on update.
+     */
+    public function testCreateUniqueIndexes() {
+        $createStructure = function () {
+            $this->st
+                ->table('uniqueIndexes')
+                ->column('part1', 'int', false, ['index', 'unique.combined'])
+                ->column('part2', 'int', false, 'unique.combined')
+                ->set()
+            ;
+        };
+
+        // run twice to make sure indexes are stable.
+        $createStructure();
+        $createStructure();
+
+        $this->assertIndexes([
+            'UX_uniqueIndexes_combined[part1]',
+            'UX_uniqueIndexes_combined[part2]',
+            'IX_uniqueIndexes_part1[part1]',
+        ], "uniqueIndexes");
+    }
+
+    /**
+     * Assert that we have indexes in the following format.
+     *
+     * INDEX_NAME[columnName]
+     *
+     * @param string[] $expected
+     * @param string $table
+     */
+    private function assertIndexes(array $expected, string $table) {
+        $actualIndexRows = $this->db->sql()
+            ->query("SHOW INDEXES FROM GDN_$table")
+            ->resultArray()
+        ;
+
+        $actual = "";
+        foreach ($actualIndexRows as $actualIndexRow) {
+            $actual .= $actualIndexRow['Key_name'] . '[' . $actualIndexRow['Column_name'] . ']' . "\n";
+        }
+        $actual = trim($actual);
+
+        $expected = implode("\n", $expected);
+        $this->assertEquals($expected, $actual, "Incorrect indexes were created for table '$table'");
     }
 }

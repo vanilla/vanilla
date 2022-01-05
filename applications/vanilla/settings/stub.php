@@ -14,7 +14,7 @@ $SQL = Gdn::database()->sql();
 
 // Only do this once, ever.
 $Row = $SQL->get('Discussion', '', 'asc', 1)->firstRow(DATASET_TYPE_ARRAY);
-if ($Row) {
+if ($Row || isTestMode()) {
     return;
 }
 

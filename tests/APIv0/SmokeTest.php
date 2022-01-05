@@ -285,7 +285,7 @@ class SmokeTest extends SiteTestCase {
         $this->getSession()->start($this->memberID);
 
         $discussions = $this->bessy()->getJsonData('/discussions.json');
-        $discussions = val('Discussions', $discussions);
+        $discussions = $discussions['Discussions'];
         if (empty($discussions)) {
             throw new \Exception("There are no discussions to post to.");
         }

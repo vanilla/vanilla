@@ -28,9 +28,6 @@ class RolesApiController extends AbstractApiController {
     /** @var PermissionModel */
     private $permissionModel;
 
-    /** @var bool Have all permissions been loaded into $renamedPermissions? */
-    private $permissionsLoaded = false;
-
     /** @var RoleModel */
     private $roleModel;
 
@@ -297,18 +294,14 @@ class RolesApiController extends AbstractApiController {
      * Fill the $renamedPermissions property with all known permissions.
      */
     private function loadAllPermissions() {
-        if ($this->permissionsLoaded !== true) {
-            $permissions = array_keys($this->permissionModel->permissionColumns());
-            unset($permissions[array_search('PermissionID', $permissions)]);
+        $permissions = array_keys($this->permissionModel->permissionColumns());
+        unset($permissions[array_search('PermissionID', $permissions)]);
 
-            foreach ($permissions as $permission) {
-                if (!in_array($permissions, $this->deprecatedPermissions)) {
-                    // This function will cache a copy of the renamed permission in the property.
-                    $this->renamePermission($permission);
-                }
+        foreach ($permissions as $permission) {
+            if (!in_array($permissions, $this->deprecatedPermissions)) {
+                // This function will cache a copy of the renamed permission in the property.
+                $this->renamePermission($permission);
             }
-
-            $this->permissionsLoaded = true;
         }
     }
 

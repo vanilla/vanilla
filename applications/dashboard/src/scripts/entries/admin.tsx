@@ -20,8 +20,6 @@ import { themeSettingsReducer } from "@library/theming/themeSettingsReducer";
 import { globalCSS, useBodyCSS } from "@library/layout/bodyStyles";
 import { applyCompatibilityIcons } from "@dashboard/compatibilityStyles/compatibilityIcons";
 import { forumReducer } from "@vanilla/addon-vanilla/redux/reducer";
-import { Route } from "react-router-dom";
-import RoleApplicationsPage from "@dashboard/roleRequests/pages/RoleApplicationsPage";
 import { RoleRequestReducer } from "@dashboard/roleRequests/state/roleRequestReducer";
 import { mountDashboardTabs } from "@dashboard/forms/mountDashboardTabs";
 import { mountDashboardCodeEditors } from "@dashboard/forms/DashboardCodeEditor";
@@ -31,6 +29,7 @@ import { LayoutPage } from "@dashboard/layout/pages/LayoutPage";
 import { bindToggleChildrenEventListeners } from "@dashboard/settings";
 import { LanguageSettingsPage } from "@dashboard/pages/LanguageSettingsPage";
 import { escapeHTML } from "@vanilla/dom-utils";
+import { getDashboardRoutes } from "@dashboard/dashboardRoutes";
 
 // Expose some new module functions to our old javascript system.
 window.escapeHTML = escapeHTML;
@@ -67,9 +66,7 @@ applySharedPortalContext((props) => {
     );
 });
 
-Router.addRoutes([
-    <Route exact path="/manage/requests/role-applications" component={RoleApplicationsPage} key="roleApplications" />,
-]);
+Router.addRoutes(getDashboardRoutes());
 
 // Routing
 addComponent("App", () => {

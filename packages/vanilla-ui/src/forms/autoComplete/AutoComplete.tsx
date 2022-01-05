@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import React, { RefObject, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import * as Reach from "@reach/combobox";
 import * as Polymorphic from "../../polymorphic";
 import "@reach/combobox/styles.css";
@@ -17,8 +17,6 @@ import { ClearIcon } from "../shared/ClearIcon";
 import { CloseIcon } from "../shared/CloseIcon";
 import { AutoCompleteOption, IAutoCompleteOption, IAutoCompleteOptionProps } from "./AutoCompleteOption";
 import { AutoCompleteContext, IAutoCompleteContext, IAutoCompleteInputState } from "./AutoCompleteContext";
-import { AutoCompleteLookupOptions } from "./AutoCompleteLookupOptions";
-import { useMeasure } from "@vanilla/react-utils/src";
 
 function AutoCompleteArrow() {
     const { size } = useContext(AutoCompleteContext);
@@ -153,9 +151,13 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
         ...otherProps
     } = props;
     const classes = autoCompleteClasses({ size });
-    const classesInput = inputClasses({ size, useInputRowSize: true });
+    const classesInput = inputClasses({ size });
     const [controlledOptions, setControlledOptions] = useState<IAutoCompleteOptionProps[]>();
     const [arbitraryValues, setArbitraryValues] = useState<string[]>([]);
+    // This ref records the HTML input so that we can focus it when clicking on the parent container
+    const inputRef = useRef() as RefObject<HTMLInputElement>;
+    // This state tracks if a user is using the direction keys tp navigate the combo box
+    const [isUsingDirectionKeys, setUsingDirectionKeys] = useState(false);
 
     const { options, optionByValue, optionByLabel } = useMemo(
         () => makeOptionState(controlledOptions ? controlledOptions : props.options ?? [], optionProvider),
@@ -234,24 +236,6 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
         }
         onChange && onChange(undefined);
     }, [onChange, isMultiple, allowArbitraryInput]);
-
-    // Verify if we need to add/remove extra height based on default height.
-    const tokenList = useRef<HTMLDivElement>(null);
-    const tokenListMeasure = useMeasure(tokenList, false, true);
-    const tokenScrollHeight = tokenList.current?.scrollHeight;
-    const [inputRowSize, setInputRowSize] = useState<number>(1);
-    const [initialHeight, setInitalHeight] = useState<number>(tokenListMeasure.height);
-    useEffect(() => {
-        if (initialHeight == 0 && tokenListMeasure.height > 0) {
-            setInitalHeight(tokenListMeasure.height);
-        }
-        if (initialHeight && tokenScrollHeight) {
-            const rowSize = Math.round(tokenScrollHeight / initialHeight);
-            if (inputRowSize !== rowSize && rowSize !== Infinity) {
-                setInputRowSize(rowSize);
-            }
-        }
-    }, [initialHeight, tokenListMeasure, tokenScrollHeight, inputRowSize]);
 
     /**
      * Syncs the arbitrary values with those selected by the user
@@ -378,61 +362,88 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
         return undefined;
     }, [placeholder, selectedTokens, arbitraryValues, state]);
 
+    const handleKeyDown = (event) => {
+        /**
+         * When not using the arrow keys, the return key should select the
+         * first filtered option
+         */
+        setUsingDirectionKeys([38, 40].includes(event.keyCode));
+        if (!isUsingDirectionKeys && inputRef?.current?.value.length !== 0 && event.keyCode === 13) {
+            filteredOptions.length && onSelect(filteredOptions[0].label ?? filteredOptions[0].value);
+            setUsingDirectionKeys(false);
+        }
+        /**
+         * When the user hits delete and the text input is empty, the last token should be delete
+         */
+        if (event.keyCode === 8 && inputRef?.current?.value.length === 0) {
+            // Get the last token value
+            const lastValue = [values].flat().pop();
+            // If there is a defined options list, remove its selection by label
+            if (isMultiple) {
+                if (lastValue) {
+                    const { label } = optionByValue[lastValue] || {};
+                    label && onSelect(label);
+                }
+            }
+            // If its arbitrary, remove it by value
+            if (allowArbitraryInput) {
+                lastValue && removeArbitraryInput(lastValue);
+            }
+        }
+        // Keys are used for combobox navigation.
+        // Don't allow these to propagate up the tree.
+        // For example when using this inside of a drag and drop tree
+        // we dont the tree to change the focused element
+        // when trying to select an item
+        event.stopPropagation();
+    };
+
     return (
         <AutoCompleteContext.Provider value={context}>
             <Reach.Combobox className={classes.reachCombobox} onSelect={onSelect} ref={forwardedRef} openOnFocus>
-                <div className={cx(classes.inputContainer, props.className)}>
+                <div
+                    className={cx(classes.inputContainer, props.className)}
+                    onClick={() => inputRef?.current && inputRef?.current?.focus()}
+                >
+                    {isMultiple && (
+                        <>
+                            {selectedTokens.map((labelItem, index) => {
+                                return (
+                                    <AutoCompleteToken
+                                        key={index}
+                                        label={labelItem}
+                                        onUnSelect={() => onSelect(labelItem)}
+                                    />
+                                );
+                            })}
+                        </>
+                    )}
+                    {allowArbitraryInput && (
+                        <>
+                            {arbitraryValues.map((item, index) => {
+                                return (
+                                    <AutoCompleteToken
+                                        key={`${index}${item}`}
+                                        label={item}
+                                        onUnSelect={() => removeArbitraryInput(item)}
+                                    />
+                                );
+                            })}
+                        </>
+                    )}
                     <Reach.ComboboxInput
                         {...otherProps}
+                        ref={inputRef}
                         selectOnClick
                         disabled={disabled}
                         autoFocus={autoFocus}
                         onChange={onInputChange}
                         placeholder={placeholderValue}
                         value={String(state.value)}
-                        className={cx(
-                            classesInput.input,
-                            classes.input,
-                            inputClassName,
-                            classesInput.inputHeightConstrainst(inputRowSize),
-                        )}
-                        onKeyDown={(e) => {
-                            // Keys are used for combobox navigaiton.
-                            // Don't allow these to propogate up the tree.
-                            // For example when using this inside of a drag and drop tree
-                            // we dont the tree to change the focused element
-                            // when trying to select an item
-                            e.stopPropagation();
-                        }}
+                        className={cx(classesInput.input, classes.input, inputClassName)}
+                        onKeyDown={handleKeyDown}
                     />
-                    <div ref={tokenList} className={classes.inputTokens}>
-                        {isMultiple && (
-                            <>
-                                {selectedTokens.map((labelItem, index) => {
-                                    return (
-                                        <AutoCompleteToken
-                                            key={index}
-                                            label={labelItem}
-                                            onUnSelect={() => onSelect(labelItem)}
-                                        />
-                                    );
-                                })}
-                            </>
-                        )}
-                        {allowArbitraryInput && (
-                            <>
-                                {arbitraryValues.map((item, index) => {
-                                    return (
-                                        <AutoCompleteToken
-                                            key={`${index}${item}`}
-                                            label={item}
-                                            onUnSelect={() => removeArbitraryInput(item)}
-                                        />
-                                    );
-                                })}
-                            </>
-                        )}
-                    </div>
+
                     {!disabled && (
                         <div className={classes.inputActions}>
                             <AutoCompleteArrow />

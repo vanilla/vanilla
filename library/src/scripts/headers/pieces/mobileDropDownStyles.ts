@@ -11,7 +11,7 @@ import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { calc, percent, px, translateX } from "csx";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
-import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
+import { oneColumnVariables } from "@library/layout/Section.variables";
 import { frameVariables } from "@library/layout/frame/frameStyles";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { Mixins } from "@library/styles/Mixins";
@@ -60,7 +60,7 @@ export const mobileDropDownClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const frameVars = frameVariables();
     const titleBarVars = titleBarVariables();
-    const mediaQueries = panelLayoutVariables().mediaQueries();
+    const mediaQueries = oneColumnVariables().mediaQueries();
     const flex = flexHelper();
 
     const root = css({

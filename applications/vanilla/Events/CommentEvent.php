@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -8,12 +8,10 @@ namespace Vanilla\Community\Events;
 
 use Garden\Events\ResourceEvent;
 use Garden\Events\TrackingEventInterface;
-use Gdn;
 use Psr\Log\LogLevel;
 use Vanilla\Analytics\TrackableCommunityModel;
 use Vanilla\Logging\LogEntry;
 use Vanilla\Logging\LoggableEventInterface;
-use Vanilla\Logging\LoggableEventTrait;
 use Vanilla\Logging\LoggerUtils;
 
 /**

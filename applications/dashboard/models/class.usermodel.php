@@ -36,7 +36,11 @@ use Vanilla\Utility\ModelUtils;
 /**
  * Handles user data.
  */
-class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRowInterface, CrawlableInterface, FragmentFetcherInterface {
+class UserModel extends Gdn_Model implements
+    UserProviderInterface,
+    EventFromRowInterface,
+    CrawlableInterface,
+    FragmentFetcherInterface {
 
     use LegacyDirtyRecordTrait;
     use StaticCacheConfigTrait;
@@ -330,6 +334,23 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
         $banned = val('Banned', $user, 0);
 
         $this->save(["UserID" => $userID, "Banned" => BanModel::setBanned($banned, true, BanModel::BAN_MANUAL)]);
+
+        if (!$banned) {
+            $sessionID = Gdn::session()->UserID;
+            $banningUserID = $sessionID === $userID ? $this->getSystemUserID() : $sessionID;
+            $source = "user";
+            $banEvent = $this->createUserDisciplineEvent(
+                $userID,
+                BanModel::ACTION_BAN,
+                \Vanilla\Dashboard\Events\UserDisciplineEvent::DISCIPLINE_TYPE_NEGATIVE,
+                $source,
+                $banningUserID
+            );
+            if (isset($options["Reason"])) {
+                $banEvent->setReason($options["Reason"]);
+            }
+            $this->eventManager->dispatch($banEvent);
+        }
 
         $logID = false;
         if (val('DeleteContent', $options)) {
@@ -678,6 +699,19 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
         $newBanned = BanModel::setBanned($banned, false, BanModel::BAN_AUTOMATIC | BanModel::BAN_MANUAL);
         $this->save(["UserID" => $userID, "Banned" => $newBanned]);
 
+        if (!$newBanned) {
+            $sessionID = Gdn::session()->UserID;
+            $banningUserID = $sessionID === $userID ? $this->getSystemUserID() : $sessionID;
+            $unbanEvent = $this->createUserDisciplineEvent(
+                $userID,
+                BanModel::ACTION_UNBAN,
+                \Vanilla\Dashboard\Events\UserDisciplineEvent::DISCIPLINE_TYPE_POSITIVE,
+                "user",
+                $banningUserID
+            );
+            $this->eventManager->dispatch($unbanEvent);
+        }
+
         // Restore the user's content.
         if (val('RestoreContent', $options)) {
             $banLogID = $this->getAttribute($userID, 'BanLogID');
@@ -725,6 +759,34 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
 
             $activityModel->saveQueue();
         }
+    }
+
+    /**
+     * Create a user discipline event.
+     *
+     * @param int $disciplinedUserID
+     * @param string $action
+     * @param string $disciplineType
+     * @param string|null $source
+     * @param int|null $discipliningUserID
+     * @return \Vanilla\Dashboard\Events\UserDisciplineEvent
+     */
+    public function createUserDisciplineEvent(
+        int $disciplinedUserID,
+        string $action,
+        string $disciplineType,
+        ?string $source,
+        ?int $discipliningUserID
+    ): \Vanilla\Dashboard\Events\UserDisciplineEvent {
+        $disciplinedUser = self::getFragmentByID($disciplinedUserID);
+        $discipliningUser = $discipliningUserID ? self::getFragmentByID($discipliningUserID) : null;
+        return new \Vanilla\Dashboard\Events\UserDisciplineEvent(
+            $disciplinedUser,
+            $action,
+            $disciplineType,
+            $source,
+            $discipliningUser
+        );
     }
 
     /**
@@ -5789,7 +5851,9 @@ SQL;
         $permissions = Gdn::permissionModel()->createPermissionInstance();
         $permissionsKey = '';
         $user = $this->getID($userID, DATASET_TYPE_ARRAY);
-        $isAdmin = $user && $user['Admin'] > 0;
+        $adminFlag = $user['Admin'] ?? 0;
+        $permissions->setAdmin($adminFlag > 0);
+        $permissions->setSysAdmin($adminFlag > 1);
         if (Gdn::cache()->activeEnabled()) {
             $permissionsIncrement = $this->getPermissionsIncrement();
             $permissionsKey = formatString(self::USERPERMISSIONS_KEY, [
@@ -5800,7 +5864,7 @@ SQL;
             $cachedPermissions = Gdn::cache()->get($permissionsKey);
             if ($cachedPermissions !== Gdn_Cache::CACHEOP_FAILURE) {
                 $permissions->setPermissions($cachedPermissions);
-                $permissions->setAdmin($isAdmin);
+
 
                 // Fire an event after permissions are cached so that addons can augment them without overwriting the cache.
                 $this->eventManager->fire('userModel_filterPermissions', $this, $userID, $permissions);
@@ -5810,7 +5874,6 @@ SQL;
 
         $data = Gdn::permissionModel()->getPermissionsByUser($userID);
         $permissions->setPermissions($data);
-        $permissions->setAdmin($isAdmin);
 
         $this->EventArguments['UserID'] = $userID;
         $this->EventArguments['Permissions'] = $permissions;

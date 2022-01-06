@@ -22,7 +22,7 @@
     <target name="build" depends="prepare">
         <!-- Trigger composer to do it's thing. -->
         <composer
-            composer="/usr/local/bin/composer">
+            composer="composer">
             <arg line="--working-dir=${project.dir} install --no-dev --optimize-autoloader" />
         </composer>
     </target>

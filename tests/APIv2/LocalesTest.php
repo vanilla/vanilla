@@ -193,4 +193,29 @@ class LocalesTest extends AbstractAPIv2Test {
             ]
         ];
     }
+
+    /**
+     * Test that event-based locale definitions are applied to the translations API.
+     */
+    public function testTranslationsWithExtras() {
+        $before = $this->api->get("/locales/en/translations")->getBody();
+        $this->assertArrayNotHasKey('foo', $before);
+        \Gdn::eventManager()->bindClass($this);
+
+        $after = $this->api->get("/locales/en/translations")->getBody();
+        $this->assertEquals('bar', $after['foo']);
+    }
+
+    /**
+     * Event handler mimicking vfcom's console locale loading.
+     *
+     * @param \Gdn_Locale $locale
+     */
+    public function gdn_locale_afterSet_handler(\Gdn_Locale $locale) {
+        $translations = [
+            'foo' => 'bar',
+        ];
+
+        $locale->LocaleContainer->loadArray($translations, 'ClientLocale', 'Definition', true);
+    }
 }

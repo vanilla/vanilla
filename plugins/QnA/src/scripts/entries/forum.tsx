@@ -13,6 +13,8 @@ import ModalSizes from "@library/modal/ModalSizes";
 import { mountModal } from "@library/modal/Modal";
 import { t } from "@vanilla/i18n";
 import gdn from "@library/gdn";
+import { addComponent } from "@library/utility/componentRegistry";
+import { DiscussionListModule } from "@library/features/discussions/DiscussionListModule";
 
 /**
  * Get discussionID from ItemDiscussion
@@ -63,3 +65,5 @@ export async function hijackFollowUpClick(e) {
 onReady(() => {
     document.addEventListener("click", hijackFollowUpClick);
 });
+
+addComponent("DiscussionQuestionsWidget", DiscussionListModule, { overwrite: true });

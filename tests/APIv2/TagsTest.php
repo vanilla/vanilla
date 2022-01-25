@@ -31,6 +31,12 @@ class TagsTest extends AbstractResourceTest {
     /** @var string[] */
     protected $patchFields = ["name", "type"];
 
+    /** @var bool */
+    protected $testPagingOnIndex = false;
+
+    /** @var string */
+    private const TYPE = "someType";
+
     /**
      * @inheritDoc
      */
@@ -62,16 +68,18 @@ class TagsTest extends AbstractResourceTest {
     /**
      * Create records for testing.
      *
+     * @param array $overrides
      * @return array
      */
-    public function record() {
+    public function record(array $overrides = []) {
         static $totalRecords = 0;
 
         $name = "API Test Tag " . ++$totalRecords;
-        $record = [
+        $record = array_replace([
             "name" => $name,
-            "type" => "someType",
-        ];
+            "type" => self::TYPE,
+        ], $overrides);
+
         return $record;
     }
 
@@ -155,7 +163,7 @@ class TagsTest extends AbstractResourceTest {
 
         // Set the config to allow the discussion type.
         $config = $this->container()->get(\Gdn_Configuration::class);
-        $config->saveToConfig('Tagging.Discussions.AllowedTypes', ['', 'someType']);
+        $config->saveToConfig('Tagging.Discussions.AllowedTypes', ['', self::TYPE]);
 
         // Tag it.
         $this->api()->post("discussions/{$discussion["discussionID"]}/tags", ["tagIDs" => [$tagToDelete["tagID"]]]);
@@ -177,32 +185,6 @@ class TagsTest extends AbstractResourceTest {
         $this->expectExceptionMessage('You cannot delete a reserved tag.');
         $tagReserved = $this->createTag(['type' => 'reaction']);
         $this->api()->delete("/tags/{$tagReserved['TagID']}");
-    }
-
-    /**
-     * Overrides the AbstractResourcesTest's testIndex() method, as our index call has a limit of 20, so the
-     * paging test doesn't pass.
-     */
-    public function testIndex() {
-        $indexUrl = $this->indexUrl();
-        $originalIndex = $this->api()->get($indexUrl, ['limit' => 100]);
-        $this->assertEquals(200, $originalIndex->getStatusCode());
-
-        $originalRows = $originalIndex->getBody();
-        $rows = $this->generateIndexRows();
-        $newIndex = $this->api()->get($indexUrl, ['limit' => count($originalRows) + count($rows) + 1]);
-
-        $newRows = $newIndex->getBody();
-        $this->assertEquals(count($originalRows) + count($rows), count($newRows));
-        // The index should be a proper indexed array.
-        $count = 0;
-        foreach ($newRows as $i => $row) {
-            $this->assertSame($count, $i);
-            $count++;
-        }
-
-        // There's not much we can really test here so just return and let subclasses do some more assertions.
-        return [$rows, $newRows];
     }
 
     /**
@@ -276,6 +258,29 @@ class TagsTest extends AbstractResourceTest {
             array_column($tags, "tagID"),
             array_column($result, "tagID")
         );
+    }
+
+    /**
+     * Verify ability to sort tags.
+     */
+    public function testIndexSort(): void {
+        $indexUrl = $this->indexUrl();
+        $rows = $this->api()->get($indexUrl)->getBody();
+
+        /** @var \TagModel $tagModel */
+        $tagModel = \Gdn::getContainer()->get(\TagModel::class);
+        for ($i = 0; $i < count($rows); $i++) {
+            $tagModel->setField($rows[$i]["tagID"], "CountDiscussions", rand(1, 5));
+        }
+
+        $updatedRows = $this->api()->get($indexUrl)->getBody();
+        $updatedRows = array_column($updatedRows, "countDiscussions");
+        rsort($updatedRows);
+
+        $result = $this->api()->get($indexUrl, ["sort" => "countDiscussions"]);
+        $resultRows = $result->getBody();
+
+        $this->assertSame(array_column($resultRows, "countDiscussions"), $updatedRows);
     }
 
     /**

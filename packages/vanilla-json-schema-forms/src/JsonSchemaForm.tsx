@@ -87,6 +87,8 @@ export const JsonSchemaForm = forwardRef(function JsonSchemaFormImpl(
             coerceTypes: true,
             // Lets us use discriminators to validate oneOf schemas properly (and remove additional properties)
             discriminator: true,
+            // AJV is out of date and it doesn't understand the new JSON schema specs.
+            strict: false,
         });
         // Add x-control as a suppported keyword of the schema.
         ajv.addKeyword("x-control");

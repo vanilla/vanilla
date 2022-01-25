@@ -11,14 +11,13 @@ use Garden\Schema\Schema;
 use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
-use Garden\Web\Exception\ServerException;
-use Vanilla\ApiUtils;
 use Vanilla\Layout\LayoutViewModel;
 use Vanilla\Layout\LayoutHydrator;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Layout\LayoutModel;
 use Vanilla\Layout\LayoutService;
 use Vanilla\Layout\Providers\MutableLayoutProviderInterface;
+use Vanilla\Utility\SchemaUtils;
 
 /**
  * API v2 endpoints for layouts and layout views
@@ -95,14 +94,19 @@ class LayoutsApiController extends \AbstractApiController {
      *
      * Get a set of layouts
      *
+     * @param array $query The query string.
+     *
      * @return Data
      * @throws \Garden\Schema\ValidationException Data does not validate against its schema.
      * @throws \Garden\Web\Exception\HttpException Ban applied to permission for this session.
      * @throws \Vanilla\Exception\PermissionException User does not have permission to access resource.
      * @throws \Exception Error during index processing.
      */
-    public function index(): Data {
+    public function index(array $query): Data {
         $this->permission("settings.manage");
+        $in = $this->schema($this->layoutModel->getQueryInputSchema(false));
+
+        $query = $in->validate($query);
 
         $out = $this->schema($this->layoutModel->getMetadataSchema(), "out");
 
@@ -110,10 +114,9 @@ class LayoutsApiController extends \AbstractApiController {
         foreach ($this->layoutProviderService->getProviders() as $layoutProvider) {
             $layouts = array_merge($layouts, $layoutProvider->getAll());
         }
+        $layouts = $this->layoutModel->normalizeRows($layouts, $query['expand']);
 
-        $layouts = array_map(function (array $row) use ($out) {
-            return $out->validate($this->layoutModel->normalizeRow($row));
-        }, $layouts);
+        SchemaUtils::validateArray($layouts, $out);
 
         $layouts = $this->sortLayouts($layouts);
 
@@ -126,6 +129,7 @@ class LayoutsApiController extends \AbstractApiController {
      * Get an individual layout by ID
      *
      * @param int|string $layoutID ID of the layout to retrieve
+     * @param array $query The query string.
      * @return Data
      * @throws \Garden\Schema\ValidationException Data does not validate against its schema.
      * @throws \Garden\Web\Exception\HttpException Ban applied to permission for this session.
@@ -133,10 +137,11 @@ class LayoutsApiController extends \AbstractApiController {
      * @throws \Garden\Web\Exception\ClientException Invalid layout ID specified.
      * @throws \Vanilla\Exception\PermissionException User does not have permission to access resource.
      */
-    public function get($layoutID): Data {
+    public function get($layoutID, array $query): Data {
+        $query['layoutID'] = $layoutID;
         $this->permission("settings.manage");
 
-        $this->schema($this->layoutModel->getIDSchema(), "in")->validate(['layoutID' => $layoutID]);
+        $query = $this->schema($this->layoutModel->getQueryInputSchema(true), "in")->validate($query);
 
         $out = $this->schema($this->layoutModel->getMetadataSchema(), "out");
 
@@ -149,7 +154,7 @@ class LayoutsApiController extends \AbstractApiController {
         } catch (NoResultsException $e) {
             throw new NotFoundException('Layout');
         }
-        $row = $this->layoutModel->normalizeRow($row);
+        $row = $this->layoutModel->normalizeRow($row, $query['expand']);
 
         $result = $out->validate($row);
         return new Data($result);
@@ -172,8 +177,10 @@ class LayoutsApiController extends \AbstractApiController {
 
         $this->schema($this->layoutModel->getIDSchema(), "in")->validate(['layoutID' => $layoutID]);
 
-        $layoutProvider = $this->tryGetMutableLayoutProvider($layoutID);
-
+        $layoutProvider = $this->layoutProviderService->getCompatibleProvider($layoutID);
+        if (!isset($layoutProvider)) {
+            throw new ClientException('Invalid layout ID format', 400, ['layoutID' => $layoutID]);
+        }
         try {
             $layout = $layoutProvider->getByID($layoutID);
         } catch (NoResultsException $e) {
@@ -295,15 +302,17 @@ class LayoutsApiController extends \AbstractApiController {
         $layoutProvider = $this->tryGetMutableLayoutProvider($layoutID);
 
         try {
-            $layout = $layoutProvider->getByID($layoutID);
+            $layoutProvider->getByID($layoutID);
         } catch (NoResultsException $e) {
             throw new NotFoundException('Layout');
         }
 
-        $layout = $this->layoutModel->normalizeRow($layout);
-        if (isset($layout['isActive']) && $layout['isActive']) {
-            throw new ClientException('Active layout cannot be deleted');
+        // If the layout has associated views, we prevent deletion & throw an exception.
+        $associatedViews = $this->get_views($layoutID, [])->getData();
+        if (count($associatedViews) > 0) {
+            throw new ClientException('Active layout cannot be deleted', 422);
         }
+
         $layoutProvider->deleteLayout($layoutID);
     }
 
@@ -382,24 +391,27 @@ class LayoutsApiController extends \AbstractApiController {
      * Get the set of layout views for the given layout
      *
      * @param int|string $layoutID ID of layout for which to retrieve its set of views
+     * @param array $query The query string.
      * @return Data
      * @throws \Garden\Schema\ValidationException Data does not validate against its schema.
      * @throws \Garden\Web\Exception\HttpException Ban applied to permission for this session.
      * @throws \Vanilla\Exception\Database\NoResultsException Layout not found.
      * @throws \Vanilla\Exception\PermissionException User does not have permission to access resource.
      */
-    public function get_views($layoutID): Data {
+    public function get_views($layoutID, array $query): Data {
+        $query['layoutID'] = $layoutID;
         $this->permission("settings.manage");
+
+        $query = $this->schema($this->layoutModel->getQueryInputSchema(true), "in")->validate($query);
 
         $this->schema($this->layoutModel->getIDSchema(), "in")->validate(['layoutID' => $layoutID]);
         $out = $this->schema(LayoutViewModel::getSchema());
         $rows = $this->layoutViewModel->getViewsByLayoutID($layoutID);
 
-        $result = array_map(function (array $row) use ($out) {
-            return $out->validate($this->layoutModel->normalizeRow($row));
-        }, $rows);
+        $rows = $this->layoutViewModel->normalizeRows($rows, $query['expand']);
+        SchemaUtils::validateArray($rows, $out);
 
-        return new Data($result);
+        return new Data($rows);
     }
 
     /**

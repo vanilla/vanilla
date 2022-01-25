@@ -11,6 +11,7 @@ use Garden\Web\Redirect;
 use Vanilla\Logging\TraceCollector;
 use Vanilla\Models\TrustedDomainModel;
 use Vanilla\Theme\ThemeService;
+use Vanilla\Utility\DebugUtils;
 use Vanilla\Web\Asset\DeploymentCacheBuster;
 use Vanilla\Web\CacheControlConstantsInterface;
 use Vanilla\Web\CacheControlMiddleware;
@@ -103,17 +104,6 @@ if (!function_exists('debug')) {
         }
         $debug = $value;
         return $debug;
-    }
-}
-
-if (!function_exists('isTestMode')) {
-    /**
-     * Determine if we are executing inside a test.
-     *
-     * @return bool
-     */
-    function isTestMode(): bool {
-        return defined('TESTMODE_ENABLED') && TESTMODE_ENABLED;
     }
 }
 
@@ -1001,7 +991,7 @@ if (!function_exists('isTrustedDomain')) {
     function isTrustedDomain($url) {
         static $trusted = null;
 
-        if (defined('TESTMODE_ENABLED') && constant('TESTMODE_ENABLED')) {
+        if (DebugUtils::isTestMode()) {
             $trusted = null;
         }
 
@@ -1312,7 +1302,7 @@ if (!function_exists('redirectTo')) {
         // This would cause http://evil.domain\@trusted.domain/ to be converted to http://evil.domain/@trusted.domain/
         $url = str_replace('\\', '%5c', $url);
 
-        if (defined('TESTMODE_ENABLED') && TESTMODE_ENABLED) {
+        if (DebugUtils::isTestMode()) {
             throw new ResponseException(new Redirect($url, $statusCode));
         }
 
@@ -1591,6 +1581,9 @@ if (!function_exists('trace')) {
      * @return array|void Returns the array of traces.
      */
     function trace($value = null, $type = TRACE_INFO) {
+        if (!debug()) {
+            return [];
+        }
         $traceCollector = \Gdn::getContainer()->get(TraceCollector::class);
 
         if ($value === null) {

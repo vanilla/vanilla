@@ -1620,7 +1620,7 @@ class EditorPlugin extends Gdn_Plugin {
             return $this->canUpload;
         } else {
             // Check config and user role upload permission
-            if (c('Garden.AllowFileUploads', true) && Gdn::session()->checkPermission('Plugins.Attachments.Upload.Allow', false)) {
+            if (c('Garden.AllowFileUploads', true) && Gdn::session()->checkPermission('Garden.Uploads.Add', false)) {
                 // Check category-specific permission
                 $permissionCategory = CategoryModel::permissionCategory(Gdn::controller()->data('Category'));
                 $this->canUpload = val('AllowFileUploads', $permissionCategory, true);

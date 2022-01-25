@@ -19,8 +19,8 @@ class DebugUtilsTest extends VanillaTestCase {
     /**
      * {@inheritDoc}
      */
-    public function setUp(): void {
-        parent::setUp();
+    public function tearDown(): void {
+        parent::tearDown();
         DebugUtils::setDebug(false);
     }
 
@@ -101,5 +101,12 @@ EOT;
             $b = DebugUtils::stackTraceString($ex->getTrace(), 2);
         }
         $this->assertSame($a, $b);
+    }
+
+    /**
+     * @return void
+     */
+    public function testIsTestMode(): void {
+        $this->assertTrue(DebugUtils::isTestMode());
     }
 }

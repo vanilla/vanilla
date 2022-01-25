@@ -40,6 +40,7 @@ type IProps = {
     fullWidth?: boolean;
     handleCancel?: (e: React.MouseEvent) => void;
     handleAnotherSubmit?: (e: React.MouseEvent) => void;
+    additionalActions?: React.ReactNode;
 } & (
     | {
           backTitle?: string;
@@ -93,6 +94,9 @@ export function ActionBar(props: IProps) {
                 </li>
             ) : null}
             {props.title}
+            {props.additionalActions && (
+                <li className={classNames(classes.item, "isPullRight")}>{props.additionalActions}</li>
+            )}
             {props.anotherCallToActionTitle && (
                 <li
                     ref={restoreRef}

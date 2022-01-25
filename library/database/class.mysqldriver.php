@@ -17,6 +17,8 @@
  * @since 2.0
  */
 
+use Vanilla\Contracts\ConfigurationInterface;
+
 /**
  * Class Gdn_MySQLDriver
  */
@@ -26,6 +28,20 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
     public const BYTE_LENGTH_TEXT = 65535;
     public const BYTE_LENGTH_MEDIUMTEXT = 16777215;
     public const BYTE_LENGTH_LONGTEXT = 4294967295;
+
+    /** @var ConfigurationInterface */
+    private $config;
+
+    /**
+     * DI.
+     *
+     * @param ConfigurationInterface $config
+     */
+    public function __construct(ConfigurationInterface $config) {
+        parent::__construct();
+        $this->config = $config;
+    }
+
 
     /**
      * Escape an identifier like a table or column name.
@@ -85,6 +101,23 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
             }
         }
         return $string;
+    }
+
+    /**
+     * Return the maximum number of bytes in a character for configured database's current character encoding.
+     *
+     * @return int
+     */
+    public function getCharacterEncodingBytes(): int {
+        $configValue = $this->config->get('Database.CharacterEncoding', 'utf8mb4');
+
+        if (str_contains($configValue, 'utf8mb4')) {
+            return 4;
+        } elseif (str_contains($configValue, "utf8")) {
+            return 3;
+        } else {
+            return 1;
+        }
     }
 
     /**
@@ -187,6 +220,11 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
                     $length = self::BYTE_LENGTH_LONGTEXT;
                     break;
             }
+            
+            // MySQL 8.0+ returns types without parenthesis like "int unsigned"
+            // whereas previously it would return "int(11) unsigned". If no parens,
+            // just split it at the space instead.
+            $type = explode(' ', $type)[0];
 
             $object = new stdClass();
             $object->Name = $field->Field;
@@ -197,7 +235,14 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
             $object->AllowNull = ($field->Null == 'YES');
             $object->Default = $field->Default;
             $object->Length = $length;
+
             $object->ByteLength = $length;
+            if ($type === "varchar" || $type === "char") {
+                // Char values count characters but characters can contain multiple bytes.
+                // For fields like text, we are measuring bytes and also charactes, but for chars and varchars, we check both differently.
+                // utf8-mb4 for example is 4 bytes maximum per character and utf8 is 3.
+                $object->ByteLength = $length * $this->getCharacterEncodingBytes();
+            }
             $object->Precision = $precision;
             $object->Enum = $enum;
             $object->KeyType = null; // give placeholder so it can be defined again.

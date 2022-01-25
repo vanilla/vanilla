@@ -10,7 +10,6 @@ namespace Garden\Web;
 use Garden\Container\ContainerConfigurationInterface;
 use Garden\Container\Reference;
 use Psr\Container\ContainerInterface;
-use Vanilla\Utility\ArrayUtils;
 use Vanilla\Web\PageDispatchController;
 
 /**
@@ -41,29 +40,24 @@ class PageControllerRoute extends ResourceRoute {
      *
      * @param ContainerConfigurationInterface $dic The container.
      * @param array{string, class-string<PageDispatchController>} $definitions A mapping of prefix => classname.
+     * @param string|null $featureFlag A theme feature flag or feature flag to lock the controller definition behind.
      *
      * @return void
      */
-    public static function configurePageRoutes(ContainerConfigurationInterface $dic, array $definitions): void {
-        $dic = $dic->rule(Dispatcher::class);
-
+    public static function configurePageRoutes(ContainerConfigurationInterface $dic, array $definitions, ?string $featureFlag = null): void {
         foreach ($definitions as $routePrefix => $controllerClass) {
-            $dic->addCall('addRoute', [self::containerDefinition($routePrefix, $controllerClass)]);
-        }
-    }
+            $ruleName = "@route/" . $routePrefix;
+            $dic->rule($ruleName)
+                ->setClass(self::class)
+                ->setConstructorArgs([$routePrefix, $controllerClass])
+            ;
 
-    /**
-     * Get a reference for this controllers route for the container.
-     *
-     * @param string $routePrefix A prefix for the route like '/my-prefix'
-     * @param class-string<PageDispatchController> $controllerClass The classname of the controller to create the route for.
-     *
-     * @return Reference
-     */
-    private static function containerDefinition(string $routePrefix, string $controllerClass): Reference {
-        return new Reference(
-            self::class,
-            [ $routePrefix, $controllerClass ]
-        );
+            if ($featureFlag) {
+                $dic->addCall("setFeatureFlag", [$featureFlag]);
+            }
+
+            $dic->rule(Dispatcher::class);
+            $dic->addCall('addRoute', [new Reference($ruleName)]);
+        }
     }
 }

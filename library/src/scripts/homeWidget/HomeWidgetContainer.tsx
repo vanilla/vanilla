@@ -10,13 +10,13 @@ import {
     homeWidgetContainerClasses,
     homeWidgetContainerVariables,
     IHomeWidgetContainerOptions,
+    WidgetContainerDisplayType,
 } from "@library/homeWidget/HomeWidgetContainer.styles";
 import Container from "@library/layout/components/Container";
 import { PageHeadingBox } from "@library/layout/PageHeadingBox";
 import { useWidgetSectionClasses } from "@library/layout/WidgetLayout.context";
 import { navLinksClasses } from "@library/navigation/navLinksStyles";
 import LinkAsButton from "@library/routing/LinkAsButton";
-import { BorderType } from "@library/styles/styleHelpers";
 import { Variables } from "@library/styles/Variables";
 import { t } from "@vanilla/i18n";
 import { useMeasure } from "@vanilla/react-utils";
@@ -29,13 +29,15 @@ export interface IHomeWidgetContainerProps {
     title?: string;
     subtitle?: string;
     description?: string;
+    titleCount?: string;
 }
 
 export function HomeWidgetContainer(props: IHomeWidgetContainerProps) {
     const vars = homeWidgetContainerVariables(props.options);
     const { options } = vars;
     const classes = homeWidgetContainerClasses(props.options);
-    const { isGrid, isCarousel } = options;
+    const isGrid = options.displayType === WidgetContainerDisplayType.GRID;
+    const isCarousel = options.displayType === WidgetContainerDisplayType.CAROUSEL;
     const widgetClasses = useWidgetSectionClasses();
 
     let content = props.children;
@@ -102,6 +104,7 @@ export function HomeWidgetContainer(props: IHomeWidgetContainerProps) {
                                 subtitleType: options.subtitle.type,
                                 alignment: options.headerAlignment,
                             }}
+                            titleCount={props.titleCount}
                         />
                         <div className={classes.content}>
                             <div className={classes.itemWrapper}>{content}</div>

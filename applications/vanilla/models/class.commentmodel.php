@@ -1589,6 +1589,13 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
             $userID = $row['UserID'];
             // Check user can still see the discussion.
             $discussionModel = $this->discussionModel;
+
+            if (!Gdn::config(CategoryModel::CONF_CATEGORY_FOLLOWING) &&
+                !$this->userModel->checkPermission($userID, 'Garden.AdvancedNotifications.Allow')
+            ) {
+                continue;
+            }
+
             if (!$discussionModel->canView($discussion, $userID)) {
                 continue;
             }

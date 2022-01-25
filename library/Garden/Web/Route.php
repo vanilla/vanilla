@@ -56,7 +56,7 @@ abstract class Route {
     private $defaults = [];
 
     /** @var string|null */
-    private $themeFeatureFlag = null;
+    private $featureFlag = null;
 
     /**
      * Whether or not the route is enabled.
@@ -64,13 +64,13 @@ abstract class Route {
      * @return bool
      */
     public function isEnabled(): bool {
-        if ($this->themeFeatureFlag === null) {
+        if ($this->featureFlag === null) {
             return true;
         }
 
         // Fetch as late as possible.
         $themeFeatures = \Gdn::themeFeatures();
-        return $themeFeatures->get($this->themeFeatureFlag);
+        return $themeFeatures->get($this->featureFlag) || FeatureFlagHelper::featureEnabled($this->featureFlag);
     }
 
     /**
@@ -78,8 +78,8 @@ abstract class Route {
      *
      * @param string $themeFeatureFlag
      */
-    public function setThemeFeatureFlag(string $themeFeatureFlag) {
-        $this->themeFeatureFlag = $themeFeatureFlag;
+    public function setFeatureFlag(string $themeFeatureFlag) {
+        $this->featureFlag = $themeFeatureFlag;
     }
 
     /**

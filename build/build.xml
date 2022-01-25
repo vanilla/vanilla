@@ -21,7 +21,8 @@
     <!-- Perform any steps to build the contents of the package. -->
     <target name="build" depends="prepare">
         <!-- Trigger composer to do it's thing. -->
-        <composer>
+        <composer
+            composer="/usr/local/bin/composer">
             <arg line="--working-dir=${project.dir} install --no-dev --optimize-autoloader" />
         </composer>
     </target>

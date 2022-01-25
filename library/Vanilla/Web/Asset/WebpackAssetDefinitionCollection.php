@@ -114,6 +114,9 @@ final class WebpackAssetDefinitionCollection {
         // Webpack assets are always lowercased.
         $enabledKeys = array_map('strtolower', $enabledKeys);
 
+        // Treat library as an addon.
+        $enabledKeys[] = 'library';
+
         $definitions = [];
         foreach ($enabledKeys as $enabledKey) {
             $found = $addonAssets[$enabledKey] ?? null;

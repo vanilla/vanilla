@@ -6,7 +6,9 @@ import debounce from "lodash/debounce";
 /** Attach auto save function after vanilla is loaded */
 window.onVanillaReady(function () {
     // Get the parent form
-    const formContainer = document.querySelector("#DiscussionForm, .CommentForm") as HTMLElement;
+    const formContainer = document.querySelector(
+        "body.Post #DiscussionForm, body.Discussion .CommentForm",
+    ) as HTMLElement;
 
     // Attach listeners to all inputs within
     if (formContainer) {
@@ -78,10 +80,11 @@ const saveDraft = debounce(
     async function (formContainer: HTMLElement) {
         // Find the form within the element passed in
         const form = formContainer.querySelector("form");
+        // Check if the form has DraftID field (indicating that it can accept drafts)
+        const draftID = form && (form.querySelector('input[id*="DraftID"]') as HTMLInputElement);
 
-        if (form) {
+        if (form && draftID) {
             // Get some info from the form
-            const draftID = form.querySelector('input[id*="DraftID"]') as HTMLInputElement;
             const discussionID = form.querySelector('input[id*="DiscussionID"]') as HTMLInputElement;
 
             // Generate the payload
@@ -116,16 +119,9 @@ const saveDraft = debounce(
                 const response = await apiv1.post(endpoint, getMergedRequestBody(), { params });
 
                 // Initial forms do not have a draft ID
-                if (draftID && draftID.value != response.data["DraftID"]) {
+                if (draftID.value != response.data["DraftID"]) {
                     draftID.value = response.data["DraftID"] ?? 0;
                 }
-
-                response.data["InformMessages"].forEach((serverToast: { Message: string; CssClasses: string }) => {
-                    window.__LEGACY_ADD_TOAST__({
-                        autoDismiss: true,
-                        body: serverToast["Message"],
-                    });
-                });
             }
         }
     },

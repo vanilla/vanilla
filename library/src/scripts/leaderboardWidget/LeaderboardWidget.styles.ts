@@ -3,19 +3,18 @@
  * @license GPL-2.0-only
  */
 
-import { leaderboardVariables } from "@dashboard/compatibilityStyles/Leaderboard.variables";
-import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { Mixins } from "@library/styles/Mixins";
-import { singleLineEllipsis } from "@library/styles/styleHelpers";
+import { singleLineEllipsis, styleUnit } from "@library/styles/styleHelpers";
 import { shadowHelper } from "@library/styles/shadowHelpers";
-import { px } from "csx";
-import { CSSObject } from "@emotion/css";
+import { percent, px } from "csx";
+import { css } from "@emotion/css";
 import { BorderType } from "@library/styles/styleHelpers";
+import { leaderboardVariables } from "@library/leaderboardWidget/LeaderboardWidget.variables";
 
-export const leaderboardCSS = () => {
+export const leaderboardWidgetClasses = () => {
     const vars = leaderboardVariables();
 
-    const rootStyles = {
+    const rootStyles = css({
         ...Mixins.background({
             color: vars.colors.bg,
         }),
@@ -27,51 +26,54 @@ export const leaderboardCSS = () => {
                   overflow: "hidden",
               }
             : {}),
-    };
+    });
 
-    const titleStyles = {
+    const titleStyles = css({
         display: "flex",
         justifyContent: vars.title.alignment,
         ...Mixins.background(vars.title.background),
         ...Mixins.font(vars.title.font),
         ...Mixins.padding(vars.title.spacing.padding),
-    };
+    });
 
-    const listStyles = {
+    const listStyles = css({
         ...Mixins.padding(vars.list.spacing),
         ...Mixins.border({ style: BorderType.NONE }),
-    };
+    });
 
-    const listItemStyles = {
+    const listItemStyles = css({
         ...Mixins.padding(vars.listItem.spacing),
-    };
+    });
 
-    const linkStyles = {
+    const linkStyles = css({
         display: "flex",
         alignItems: "center",
         ...Mixins.font({
             color: vars.username.font.color,
         }),
-    };
+    });
 
-    const asideStyles = {
+    const asideStyles = css({
         order: 2,
         ...Mixins.margin({
             all: 0,
             left: "auto",
         }),
-    };
+    });
 
-    const countStyles = {
+    const countStyles = css({
         ...Mixins.font(vars.count.font),
-    };
+    });
 
-    const userStyles: CSSObject = {
+    const userStyles = css({
         whiteSpace: "nowrap",
         display: "flex",
-    };
+        ...Mixins.padding({
+            vertical: 4,
+        }),
+    });
 
-    const usernameStyles = {
+    const usernameStyles = css({
         verticalAlign: "middle",
         display: "inline-block",
         ...singleLineEllipsis(),
@@ -81,32 +83,52 @@ export const leaderboardCSS = () => {
             ...vars.username.font,
             lineHeight: px(vars.profilePhoto.size),
         }),
-    };
+    });
 
-    const profilePhotoStyles = {
+    const profilePhotoStyles = css({
         verticalAlign: "middle",
         borderRadius: "50%",
         overflow: "hidden",
         width: vars.profilePhoto.size,
         height: vars.profilePhoto.size,
         flexShrink: 0,
-    };
+    });
 
-    cssOut(".Leaderboard", rootStyles, {
-        "h4.Leaderboard__title.Leaderboard__title.Leaderboard__title": titleStyles,
-        ".Leaderboard__user-list": {
-            "&.Leaderboard__user-list.Leaderboard__user-list": {
-                ...listStyles,
-            },
-            ".Leaderboard__user-list__item": listItemStyles,
-            ...{
-                a: linkStyles,
-                ".Aside": asideStyles,
-                ".Count": countStyles,
-                ".Leaderboard-User": userStyles,
-                ".Leaderboard-User .ProfilePhoto": profilePhotoStyles,
-                ".Leaderboard-User .Username": usernameStyles,
-            },
+    /**
+     * Table styles
+     */
+
+    const table = css({
+        width: percent(100),
+    });
+
+    const row = css({
+        boxSizing: "border-box",
+    });
+
+    const cell = css({
+        padding: 0,
+        minWidth: styleUnit(100),
+        verticalAlign: "middle",
+        textAlign: "right",
+        "&:first-of-type": {
+            textAlign: "left",
         },
     });
+
+    return {
+        rootStyles,
+        titleStyles,
+        listStyles,
+        listItemStyles,
+        linkStyles,
+        asideStyles,
+        countStyles,
+        userStyles,
+        profilePhotoStyles,
+        usernameStyles,
+        table,
+        row,
+        cell,
+    };
 };

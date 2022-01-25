@@ -4,6 +4,20 @@ paths:
     /layouts:
         x-hidden: true
         get:
+            parameters:
+                - description: >
+                      Expand associated records using one or more valid field names. A
+                      value of "all" will expand all expandable fields.
+                  in: query
+                  name: expand
+                  schema:
+                      items:
+                          enum:
+                              - layoutViews
+                              - all
+                          type: string
+                      type: array
+                  style: form
             summary: Get all defined layouts
             tags:
                 - Layout
@@ -48,6 +62,20 @@ paths:
                       - type: integer
                       - type: string
         get:
+            parameters:
+                - description: >
+                      Expand associated records using one or more valid field names. A
+                      value of "all" will expand all expandable fields.
+                  in: query
+                  name: expand
+                  schema:
+                      items:
+                          enum:
+                              - layoutViews
+                              - all
+                          type: string
+                      type: array
+                  style: form
             summary: Get a specific layout by ID
             tags:
                 - Layout
@@ -210,6 +238,21 @@ paths:
                       - type: string
                       - type: integer
         get:
+            parameters:
+                - description: >
+                      Expand associated records using one or more valid field names. A
+                      value of "all" will expand all expandable fields.
+                  in: query
+                  name: expand
+                  schema:
+                      items:
+                          enum:
+                              - record
+                              - all
+                          type: string
+                      type: array
+                  style: form
+
             summary: Get a list of layout views by layout ID
             tags:
                 - Layout
@@ -376,6 +419,10 @@ components:
                     description: The user that last updated the layout.
                     nullable: true
                     readOnly: true
+                layoutViews:
+                    items:
+                        $ref: "#/components/schemas/LayoutViewSchema"
+                    type: array
         LayoutMetadata:
             x-hidden: true
             type: object
@@ -473,6 +520,19 @@ components:
                     type: integer
                     description: The user that created the layout view.
                     readOnly: true
+                record:
+                    description: >-
+                        Location where layoutView is used
+                    properties:
+                        name:
+                            description: Name of the page
+                            minLength: 1
+                            type: string
+                        url:
+                            description: URL pof the page
+                            minLength: 1
+                            type: string
+                    type: object
         LayoutViewPostSchema:
             x-hidden: true
             type: object

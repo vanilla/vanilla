@@ -11,6 +11,7 @@
 // 1.2 Fixes - Make Gravatar work with the mobile theme
 // 1.3 Fixes - Changed UserBuilder override to also accept an array of user info
 // 1.4 Change - Lets you chain Vanillicon as the default by setting Plugins.Gravatar.UseVanillicon in config.
+use Vanilla\Utility\DebugUtils;
 
 /**
  * Class GravatarPlugin
@@ -146,7 +147,7 @@ class GravatarPlugin extends Gdn_Plugin {
 }
 
 // Don't run this in tests our pollutes use photo generation.
-if (!function_exists('UserPhotoDefaultUrl') && !isTestMode()) {
+if (!function_exists('UserPhotoDefaultUrl') && !DebugUtils::isTestMode()) {
     /**
      * Calculate the user's default photo url.
      *

@@ -53,5 +53,15 @@ export const pageHeadingBoxVariables = useThemeCache((overrideOptions?: Partial<
         ),
     });
 
-    return { options, subtitle };
+    const font = {
+        letterSpacing: "0.2em",
+    };
+
+    const count = {
+        weight: globalVars.fonts.weights.normal,
+        size: globalVars.fonts.size.small,
+        color: globalVars.mainColors.fg,
+    };
+
+    return { options, subtitle, font, count };
 });

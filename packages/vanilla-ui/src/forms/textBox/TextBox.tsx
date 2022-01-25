@@ -5,7 +5,7 @@
  */
 
 import { cx } from "@emotion/css";
-import React from "react";
+import React, { useMemo } from "react";
 import { InputSize } from "../../types";
 import { inputClasses } from "../shared/input.styles";
 
@@ -23,7 +23,7 @@ export const TextBox = React.forwardRef(function TextBoxImpl(
     forwardedRef: React.Ref<HTMLInputElement>,
 ) {
     const { size, value, ...otherProps } = props;
-    const classes = inputClasses({ size });
+    const classes = useMemo(() => inputClasses({ size }), [size]);
     return (
         <input
             tabIndex={0}

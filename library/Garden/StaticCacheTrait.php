@@ -7,6 +7,8 @@
 
 namespace Garden;
 
+use Vanilla\Utility\DebugUtils;
+
 /**
  * For classes that need to cache some static values and configs.
  *
@@ -31,7 +33,7 @@ trait StaticCacheTrait {
      * @return mixed
      */
     public static function sc(string $key, $default = false) {
-        if (defined('TESTMODE_ENABLED') && TESTMODE_ENABLED) {
+        if (DebugUtils::isTestMode()) {
             return self::f($key, $default);
         }
 

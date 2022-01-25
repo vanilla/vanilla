@@ -10,11 +10,13 @@ import { QuickLinksView } from "@library/navigation/QuickLinks.view";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import { BorderType } from "@library/styles/styleHelpers";
 import { ListSeparation } from "@library/styles/cssUtilsTypes";
+import TwoColumnSection from "@library/layout/TwoColumnSection";
+import PanelWidget from "@library/layout/components/PanelWidget";
 
 export default {
     title: "Components/QuickLinks",
     parameters: {},
-    includeStories: ["Standard", "ListSeparatorBorder", "ListItemColors", "Borders", "LineSeparator"],
+    includeStories: ["Standard", "ListSeparatorBorder", "ListItemColors", "Borders", "LineSeparator", "InPanel"],
 };
 
 const dummyData = [
@@ -74,7 +76,7 @@ const dummyData = [
 ];
 
 export function StoryQuickLinks(props: { title?: string }) {
-    return <QuickLinksView {...props} links={dummyData} />;
+    return <QuickLinksView {...props} links={dummyData} activePath={dummyData[0].url} />;
 }
 
 export const Standard = storyWithConfig({}, () => (
@@ -191,4 +193,63 @@ export const Borders = storyWithConfig(
             <StoryQuickLinks title="Quick Links With Borders" />
         </StoryContent>
     ),
+);
+
+export const InPanel = storyWithConfig(
+    {
+        useWrappers: false,
+    },
+    () => {
+        return (
+            <TwoColumnSection
+                mainTop={<PanelWidget />}
+                rightTop={
+                    <PanelWidget>
+                        <StoryQuickLinks title="Quick Links" />
+                        <QuickLinksView
+                            title="More Quick Links"
+                            links={[
+                                {
+                                    id: "home",
+                                    name: "Home",
+                                    url: "/",
+                                    isHidden: false,
+                                },
+                                {
+                                    id: "profile",
+                                    name: "My Profile",
+                                    url: "/profile",
+                                    isHidden: false,
+                                    children: [],
+                                },
+                                {
+                                    id: "events",
+                                    name: "Events",
+                                    url: "/events",
+                                    isHidden: false,
+                                },
+                            ]}
+                        />
+                        <QuickLinksView
+                            title="Even More Quick Links"
+                            links={[
+                                {
+                                    id: "developerDocs",
+                                    name: "Developer Documentation",
+                                    url: "/developer-docs",
+                                    isHidden: false,
+                                },
+                                {
+                                    id: "popular",
+                                    name: "Most Popular",
+                                    url: "/popular",
+                                    isHidden: false,
+                                },
+                            ]}
+                        />
+                    </PanelWidget>
+                }
+            ></TwoColumnSection>
+        );
+    },
 );

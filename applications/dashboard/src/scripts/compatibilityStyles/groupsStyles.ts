@@ -66,6 +66,10 @@ export const groupsCSS = () => {
                 marginBottom: styleUnit(vars.logo.height / 2 + 10),
             }),
         },
+        ".Group-GuestModule": {
+            borderTop: "1px solid #dddee0",
+            paddingTop: styleUnit(32),
+        },
         ".Group-Icon-Big-Wrap": {
             width: styleUnit(vars.logo.height),
             height: styleUnit(vars.logo.height),

@@ -162,6 +162,16 @@ components:
                     x-key: Feature.NewPostMenu.Enabled
                     x-read: public
                     x-write: site.manage
+                "labs.customLayoutHomePage":
+                    x-hidden: true
+                    description: |
+                        Use the layout playground page.
+                    type: boolean
+                    default: false
+                    example: true
+                    x-key: Feature.CustomLayoutHomePage.Enabled
+                    x-read: public
+                    x-write: site.manage
                 "discussions.layout":
                     description: |
                         Choose the preferred layout for lists of discussions.

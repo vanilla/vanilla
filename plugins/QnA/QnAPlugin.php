@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GNU GPLv2 http://www.opensource.org/licenses/gpl-2.0.php
  */
 
@@ -14,15 +14,12 @@ use Vanilla\Dashboard\Models\RecordStatusModel;
 use Vanilla\Formatting\DateTimeFormatter;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Forum\Modules\QnAWidgetModule;
-use Vanilla\Models\LegacyModelUtils;
-use Vanilla\QnA\Job\QnaFollowupJob;
 use Vanilla\QnA\Models\AnswerSearchType;
 use Vanilla\QnA\Models\QnAJsonLD;
 use Vanilla\QnA\Models\QuestionSearchType;
 use Vanilla\QnA\Models\AnswerModel;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
-use Vanilla\Scheduler\Descriptor\CronJobDescriptor;
 use Vanilla\Search\SearchTypeCollectorInterface;
 use Vanilla\Utility\ModelUtils;
 use Gdn_Session as SessionInterface;
@@ -991,7 +988,19 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
         $sender->setData('_PagerUrl', 'discussions/unanswered/{Page}');
 
         // Be sure to display every unanswered question (ie from groups)
-        $categories = CategoryModel::categories();
+        $categories = [];
+        $visibleCategoryIDs = $this->categoryModel->getVisibleCategoryIDs(
+            [
+                'forceArrayReturn' => true,
+                'filterHideDiscussions' => true,
+                'filterArchivedCategories' => true
+            ]
+        );
+        $unindexedCategories = $this->categoryModel->getWhere(['CategoryID' => $visibleCategoryIDs])->resultArray();
+        // CategoryIDs should be used as the records key index.
+        foreach ($unindexedCategories as $unindexedCategory) {
+            $categories[$unindexedCategory['CategoryID']] = $unindexedCategory;
+        }
 
         $this->EventArguments['Categories'] = &$categories;
         $this->fireEvent('UnansweredBeforeSetCategories');
@@ -1822,9 +1831,9 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
     private function sendNotificationEmails(array $discussion, string $userEmail) {
         $email = Gdn::getContainer()->get(Gdn_Email::class);
         $discussionUrl = $discussion['Url'];
-        $message = t('QnAFollowUp.Email.Message', "<p>We noticed you have at least one answer to your question.");
-        $message .= ' Can you visit the community and see if any of the answers resolve your question?</p>';
-        $message .= '<p>If you see an answer you find helpful, please accept one of the answers.</p>';
+        $message = t('QnAFollowUp.Email.Message', "<p>We noticed you have at least one answer to your question."
+            . " Can you visit the community and see if any of the answers resolve your question?</p>"
+            . "<p>If you see an answer you find helpful, please accept one of the answers.</p>");
         $url = externalUrl($discussionUrl);
         $emailTemplate = $email->getEmailTemplate()
             ->setButton($url, t('Check it out'));

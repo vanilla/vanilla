@@ -40,7 +40,7 @@ trait UsersAndRolesApiTestTrait {
         $globalPermissions = [
             'type' => 'global',
             'permissions' => array_merge([
-                'signIn.allow' => true,
+                'session.valid' => true,
             ], $globalPermissions),
         ];
 
@@ -88,9 +88,12 @@ trait UsersAndRolesApiTestTrait {
         $apiUserBefore = $this->api()->getUserID();
         $this->api()->setUserID($userID);
         \CategoryModel::clearUserCache($userID);
-        $result = call_user_func($callback);
-        $this->api()->setUserID($apiUserBefore);
-        \CategoryModel::clearUserCache($apiUserBefore);
+        try {
+            $result = call_user_func($callback);
+        } finally {
+            $this->api()->setUserID($apiUserBefore);
+            \CategoryModel::clearUserCache($apiUserBefore);
+        }
         return $result;
     }
 

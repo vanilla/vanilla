@@ -10,6 +10,7 @@ namespace Vanilla\Layout;
 use Garden\Container\Container;
 use Garden\Hydrate\DataHydrator;
 use Garden\Hydrate\Resolvers\AbstractDataResolver;
+use Garden\Hydrate\Middleware\AbstractMiddleware;
 use Garden\Hydrate\Resolvers\ParamResolver;
 use Garden\Hydrate\Schema\HydrateableSchema;
 use Garden\Schema\Schema;
@@ -28,11 +29,12 @@ use Vanilla\Layout\View\HomeLayoutView;
 use Vanilla\Web\JsInterpop\AbstractReactModule;
 use Vanilla\Widgets\React\BannerReactWidget;
 use Vanilla\Widgets\React\HtmlReactWidget;
+use Vanilla\Widgets\React\LeaderboardWidget;
 use Vanilla\Widgets\React\WidgetContainerReactWidget;
 use Vanilla\Widgets\Schema\ReactSingleChildSchema;
-use Garden\Hydrate\MiddlewareInterface;
 use Vanilla\Layout\Middleware\LayoutRoleFilterMiddleware;
 use Gdn_Session;
+use Vanilla\Widgets\React\QuickLinksWidget;
 
 /**
  * Class for hydrating layouts with the vanilla/garden-hydrate library.
@@ -83,6 +85,8 @@ final class LayoutHydrator {
             ->addReactResolver(SectionFullWidth::class)
             ->addReactResolver(BannerReactWidget::class)
             ->addReactResolver(WidgetContainerReactWidget::class)
+            ->addReactResolver(QuickLinksWidget::class)
+            ->addReactResolver(LeaderboardWidget::class)
         ;
 
         $this->addLayoutView($container->get(HomeLayoutView::class));
@@ -114,11 +118,11 @@ final class LayoutHydrator {
     /**
      * Add a data middleware to the service.
      *
-     * @param MiddlewareInterface $middleware
+     * @param AbstractMiddleware $middleware
      *
      * @return $this
      */
-    public function addMiddleware(MiddlewareInterface $middleware): LayoutHydrator {
+    public function addMiddleware(AbstractMiddleware $middleware): LayoutHydrator {
         $this->dataHydrator->addMiddleware($middleware);
         return $this;
     }
@@ -262,21 +266,20 @@ final class LayoutHydrator {
 
         $schemaGenerator = $dataHydrator->getSchemaGenerator();
         $schema = Schema::parse([
-            'type' => 'object',
-            'properties' => [
-                'layout' => [
-                    'type' => 'array',
-                    'items' => new HydrateableSchema(
-                        // Allow only sections in the top level.
-                        (new ReactSingleChildSchema(null, ReactResolver::HYDRATE_GROUP_SECTION))->getSchemaArray(),
-                        null
-                    ),
-                ],
-                'layoutViewType:s' => [
-                    'enum' => $this->getLayoutViewTypes(),
-                ],
+            'layoutID:s?',
+            'name:s?',
+            'layoutViewType:s' => [
+                'enum' => $this->getLayoutViewTypes(),
             ],
-            'required' => ['layout'],
+            'layout' => [
+                'type' => 'array',
+                'items' => new HydrateableSchema(
+                    // Allow only sections in the top level.
+                    (new ReactSingleChildSchema(null, ReactResolver::HYDRATE_GROUP_SECTION))->getSchemaArray(),
+                    null
+                ),
+            ],
+            'dateInserted:dt?',
         ]);
         $schema = $schemaGenerator->decorateSchema($schema);
 

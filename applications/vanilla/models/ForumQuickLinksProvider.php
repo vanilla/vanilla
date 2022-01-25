@@ -36,45 +36,49 @@ class ForumQuickLinksProvider implements QuickLinkProviderInterface {
             t('All Categories'),
             '/categories',
             null,
-            -4
+            -4,
+            "discussions.view"
         );
 
         $result[] = new QuickLink(
             'Recent Discussions',
             '/discussions',
             null,
-            -3
+            -3,
+            "discussions.view"
         );
 
         $result[] = new QuickLink(
             t('Activity'),
             '/activity',
             null,
-            -2
+            -2,
+            "discussions.view"
         );
 
-        if ($this->session->isValid()) {
-            $result[] = new QuickLink(
-                t('My Bookmarks'),
-                '/discussions/bookmarked',
-                $this->session->User->CountBookmarks ?? 0,
-                -1
-            );
+        $result[] = new QuickLink(
+            t('My Bookmarks'),
+            '/discussions/bookmarked',
+            $this->session->User->CountBookmarks ?? 0,
+            -1,
+            "session.valid"
+        );
 
-            $result[] = new QuickLink(
-                t('My Discussions'),
-                '/discussions/mine',
-                $this->session->User->CountDiscussions ?? 0,
-                -1
-            );
+        $result[] = new QuickLink(
+            t('My Discussions'),
+            '/discussions/mine',
+            $this->session->User->CountDiscussions ?? 0,
+            -1,
+            "session.valid"
+        );
 
-            $result[] = new QuickLink(
-                t('My Drafts'),
-                '/drafts',
-                $this->session->User->CountDrafts ?? 0,
-                -1
-            );
-        }
+        $result[] = new QuickLink(
+            t('My Drafts'),
+            '/drafts',
+            $this->session->User->CountDrafts ?? 0,
+            -1,
+            "session.valid"
+        );
 
         return $result;
     }

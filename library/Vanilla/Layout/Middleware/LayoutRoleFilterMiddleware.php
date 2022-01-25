@@ -8,13 +8,13 @@
 namespace Vanilla\Layout\Middleware;
 
 use Garden\Hydrate\DataResolverInterface;
-use Garden\Hydrate\MiddlewareInterface;
-use Garden\Web\Data;
+use Garden\Hydrate\Middleware\AbstractMiddleware;
+use Garden\Schema\Schema;
 
 /**
  * Middleware that filters based on roleID.
  */
-class LayoutRoleFilterMiddleware implements MiddlewareInterface {
+class LayoutRoleFilterMiddleware extends AbstractMiddleware {
 
     /** @var \Gdn_Session $session */
     private $session;
@@ -33,19 +33,41 @@ class LayoutRoleFilterMiddleware implements MiddlewareInterface {
         $this->userModel = $userModel;
     }
 
+    /**
+     * Process middleware params if found
+     *
+     * @param array $nodeData
+     * @param array $hydrateParams
+     * @param DataResolverInterface $next
+     * @return mixed|null
+     */
+    public function process(array $nodeData, array $hydrateParams, DataResolverInterface $next) {
+        $middlewareParams = $this->getMiddlewareParams($nodeData);
+        if ($middlewareParams !== null) {
+            return $this->processInternal($nodeData, $middlewareParams, $hydrateParams, $next);
+        }
+        return $next->resolve($nodeData, $hydrateParams);
+    }
 
     /**
-     * {@inheritDoc}
+     * Process middleware params
+     *
+     * @param array $nodeData
+     * @param array $middlewareParams
+     * @param array $hydrateParams
+     * @param DataResolverInterface $next
+     * @return mixed|null
      */
-    public function process(array $data, array $params, DataResolverInterface $next) {
-        if (!empty($data['$middleware'])) {
+    protected function processInternal(array $nodeData, array $middlewareParams, array $hydrateParams, DataResolverInterface $next) {
+        $middlewares = $nodeData['$middleware'] ?? null;
+        if (!empty($middlewares['role-filter'])) {
             $userRoleIDs = $this->userModel->getRoleIDs($this->session->UserID);
-            $response = $this->filterRoleIDs($data['$middleware'], $userRoleIDs, $data);
+            $response = $this->filterRoleIDs($middlewares, $userRoleIDs, $nodeData);
             if (is_null($response)) {
                 return null;
             }
         }
-        return $next->resolve($data, $params);
+        return $next->resolve($nodeData, $hydrateParams);
     }
 
     /**
@@ -63,5 +85,35 @@ class LayoutRoleFilterMiddleware implements MiddlewareInterface {
             return null;
         }
         return $data;
+    }
+
+    /**
+     * Get the middleware schema.
+     *
+     * @return Schema
+     */
+    public function getSchema(): Schema {
+        $schema = new Schema([
+            "x-no-hydrate" => true,
+            "description" => "Add role based fitlers for the current node. Only roles configured here will see the contents of the node.",
+            "type" => "object",
+                "properties" => [
+                    "roleIDs" => [
+                        "type" => "array",
+                        "description" => "A list of roleIDs that should see the node.",
+                        "items" => [
+                            "type" => "integer",
+                        ]
+                    ]
+            ]
+        ]);
+        return $schema;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getType(): string {
+        return "role-filter";
     }
 }

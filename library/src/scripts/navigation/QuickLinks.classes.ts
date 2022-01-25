@@ -4,6 +4,7 @@
  * @license GPL-2.0-only
  */
 
+import { css } from "@emotion/css";
 import { quickLinksVariables } from "@library/navigation/QuickLinks.variables";
 import { ListSeparation } from "@library/styles/cssUtilsTypes";
 import { Mixins } from "@library/styles/Mixins";
@@ -26,9 +27,6 @@ export const quickLinksClasses = useThemeCache(() => {
         "listItem",
         {
             width: "100%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
             ...Mixins.margin(vars.listItem.spacing),
         },
         listSeparation === ListSeparation.SEPARATOR && {
@@ -47,19 +45,24 @@ export const quickLinksClasses = useThemeCache(() => {
             }),
     );
 
-    const link = style("link", {
-        ...Mixins.padding(vars.listItem.padding),
-        ...Mixins.font(vars.listItem.font),
-        "&:hover, &:focus, &:active, &.focus-visible": {
-            ...Mixins.font(vars.listItem.fontState),
-        },
-    });
+    const link = (active = false) =>
+        css({
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            flex: 1,
+            ...Mixins.padding(vars.listItem.padding),
+            ...Mixins.font(vars.listItem.font),
+            ...(active ? Mixins.font(vars.listItem.fontState) : {}),
+            "&:hover, &:focus, &:active, &.focus-visible": {
+                ...Mixins.font(vars.listItem.fontState),
+            },
+        });
 
     const count = style("count", {
         whiteSpace: "nowrap", //Prevents count value from stacking.
         textAlign: "right",
         ...Mixins.font(vars.count.font),
-        ...Mixins.padding(vars.listItem.padding),
     });
 
     return {

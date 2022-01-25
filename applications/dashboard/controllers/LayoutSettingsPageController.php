@@ -8,6 +8,7 @@
 namespace Vanilla\Dashboard\Controllers;
 
 use Garden\Web\Data;
+use Vanilla\Web\ContentSecurityPolicyMiddleware;
 use Vanilla\Web\PageDispatchController;
 
 /**
@@ -23,11 +24,15 @@ class LayoutSettingsPageController extends PageDispatchController {
      * @return Data
      */
     public function get_playground(): Data {
-        return $this
+        $data = $this
             ->useSimplePage("Layout Editor")
             ->permission("settings.manage")
             ->blockRobots()
             ->render()
         ;
+
+        // To load monaco.
+        $data->setMeta(ContentSecurityPolicyMiddleware::SCRIPT_BYPASS, true);
+        return $data;
     }
 }

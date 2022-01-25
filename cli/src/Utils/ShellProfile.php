@@ -24,7 +24,7 @@ class ShellProfile {
     public const ZSH = "zsh";
 
     private const SHELL_PROFILE_MAP = [
-        'bash' => "~/.profile",
+        'bash' => "~/.bash_profile",
         'fish' => "~/.config/fish/config.fish",
         'sh' =>   "~/.profile",
         'zsh' =>  "~/.zshrc",

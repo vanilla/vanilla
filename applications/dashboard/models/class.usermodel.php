@@ -19,6 +19,7 @@ use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\Models\CrawlableInterface;
 use Vanilla\Contracts\Models\FragmentFetcherInterface;
 use Vanilla\Contracts\Models\UserProviderInterface;
+use Vanilla\Dashboard\Events\UserPointEvent;
 use Vanilla\Dashboard\Models\UserVisitUpdater;
 use Vanilla\Dashboard\UserPointsModel;
 use Vanilla\Events\LegacyDirtyRecordTrait;
@@ -2318,7 +2319,7 @@ class UserModel extends Gdn_Model implements
      * @param int|false $timestamp
      * @since 2.1.0
      */
-    public static function givePoints($userID, $points, $source = 'Other', $timestamp = false) {
+    public static function givePoints(int $userID, int $points, $source = 'Other', $timestamp = false) {
         if (!$timestamp) {
             $timestamp = CurrentTimeStamp::get();
         }
@@ -2359,15 +2360,15 @@ class UserModel extends Gdn_Model implements
 
         Gdn::userModel()->setField($userID, 'Points', $totalPoints);
 
-        // Fire a give points event.
-        Gdn::userModel()->EventArguments['UserID'] = $userID;
-        Gdn::userModel()->EventArguments['CategoryID'] = $categoryID;
-        Gdn::userModel()->EventArguments['TotalPoints'] = $totalPoints;
-        Gdn::userModel()->EventArguments['GivenPoints'] = $points;
-        Gdn::userModel()->EventArguments['Source'] = $source;
-        Gdn::userModel()->EventArguments['Timestamp'] = $timestamp;
-        Gdn::userModel()->EventArguments['Points'] = $totalPoints; // Deprecated in favor of TotalPoints
-        Gdn::userModel()->fireEvent('GivePoints');
+        $pointData = [
+            'userID' => $userID,
+            'source' => $source,
+            'categoryID' => $categoryID,
+            'givenPoints' => $points,
+            'timestamp' => $timestamp,
+        ];
+        $userPointEvent = Gdn::userModel()->createUserPointEvent($pointData);
+        Gdn::userModel()->getEventManager()->dispatch($userPointEvent);
     }
 
     /**
@@ -6219,5 +6220,29 @@ SQL;
         $roles = array_column($roles, null, 'RoleID');
 
         return $roles;
+    }
+
+    /**
+     * Create a UserPointEvent based on
+     * ['userID' => $userID,
+     *  'source' => $source,
+     *  'categoryID' => $categoryID,
+     *  'givenPoints' => $points]
+     *
+     * @param array $pointData
+     * @return UserPointEvent
+     * @throws Exception If givenPoints isn't set.
+     */
+    private function createUserPointEvent(array $pointData): UserPointEvent {
+        $user = $this->getID($pointData['userID'], DATASET_TYPE_ARRAY);
+        $fragment = $this->currentFragment();
+        $userEvent = $this->eventFromRow($user, UserEvent::ACTION_UPDATE, $fragment);
+
+        $pointReceived['value'] = $pointData['givenPoints'];
+        $pointReceived['source'] = $pointData['source'];
+        $pointReceived['categoryID'] = $pointData['categoryID'];
+        $pointReceived['dateUpdated'] = date(DATE_ATOM, $pointData['timestamp']);
+
+        return new UserPointEvent($userEvent, $pointReceived);
     }
 }

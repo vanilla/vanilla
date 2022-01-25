@@ -7,6 +7,7 @@
 
 namespace VanillaTests\Forum\Controllers;
 
+use Garden\Web\Exception\ResponseException;
 use Gdn;
 use PHPUnit\Framework\TestCase;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
@@ -166,5 +167,19 @@ class CategoriesControllerTest extends TestCase {
             ['member', 'mem', ['title' => '', 'userID' => null]],
             ['admin', 'admin', ['title' => 'privateDiscussion', 'userID' => 'apiUser']]
         ];
+    }
+
+    /**
+     * Test that users are sent to the category home when trying to reach the root category.
+     */
+    public function testRootCategoryAccessFail() {
+        $result = $this->api()->get('/categories/-1')->getBody();
+        try {
+            $this->bessy()->get($result['url'] . '/' . $result['urlcode'])->Data;
+        } catch (ResponseException $ex) {
+            $response = $ex->getResponse();
+            $this->assertSame(302, $response->getStatus());
+            $this->assertStringEndsWith('/categories', $response->getMeta('HTTP_LOCATION'));
+        }
     }
 }

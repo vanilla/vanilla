@@ -23,6 +23,7 @@ interface IPageHeading {
     actions?: React.ReactNode;
     includeBackLink?: boolean;
     isCompactHeading?: boolean;
+    titleCount?: React.ReactNode;
 }
 
 /**
@@ -30,7 +31,16 @@ interface IPageHeading {
  * Can be configured with an options menu and a backlink.
  */
 export function PageHeading(props: IPageHeading) {
-    const { includeBackLink = true, actions, children, headingClassName, title, className, isCompactHeading } = props;
+    const {
+        includeBackLink = true,
+        actions,
+        children,
+        headingClassName,
+        title,
+        className,
+        isCompactHeading,
+        titleCount,
+    } = props;
     const { fontSize } = useFontSizeCalculator();
 
     const classes = pageHeadingClasses();
@@ -55,7 +65,12 @@ export function PageHeading(props: IPageHeading) {
                     </Heading>
                 </ConditionalWrap>
             </div>
-            {actions && <div className={classes.actions}>{actions}</div>}
+            {(actions || titleCount) && (
+                <div className={classes.actions}>
+                    {titleCount}
+                    {actions}
+                </div>
+            )}
         </div>
     );
 }

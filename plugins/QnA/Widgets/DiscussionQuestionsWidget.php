@@ -35,7 +35,8 @@ class DiscussionQuestionsWidget extends QnAWidgetModule implements ReactWidgetIn
      * @inheridoc
      */
     public function getComponentName(): string {
-        return "DiscussionQuestionsWidget";
+        // Temporarily this until we make a version supported grids and carousels.
+        return "DiscussionListModule";
     }
 
     /**

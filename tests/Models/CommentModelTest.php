@@ -6,14 +6,15 @@
 
 namespace VanillaTests\Models;
 
-use PHPUnit\Framework\TestCase;
+use ActivityModel;
+use CategoryModel;
+use Gdn;
 use VanillaTests\EventSpyTestTrait;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
-use VanillaTests\SetupTraitsTrait;
 use VanillaTests\SiteTestCase;
-use VanillaTests\SiteTestTrait;
 use Garden\EventManager;
 use Vanilla\Community\Events\CommentEvent;
+use VanillaTests\UsersAndRolesApiTestTrait;
 
 /**
  * Test {@link CommentModel}.
@@ -23,10 +24,14 @@ class CommentModelTest extends SiteTestCase {
         TestDiscussionModelTrait,
         TestCommentModelTrait,
         CommunityApiTestTrait,
-        EventSpyTestTrait;
+        EventSpyTestTrait,
+        UsersAndRolesApiTestTrait;
 
     /** @var CommentEvent */
     private $lastEvent;
+
+    /** @var ActivityModel  */
+    private $activityModel;
 
     /**
      * {@inheritdoc}
@@ -51,6 +56,7 @@ class CommentModelTest extends SiteTestCase {
         $eventManager = $this->container()->get(EventManager::class);
         $eventManager->unbindClass(self::class);
         $eventManager->addListenerMethod(self::class, "handleCommentEvent");
+        $this->activityModel = Gdn::getContainer()->get(ActivityModel::class);
     }
 
     /**
@@ -251,5 +257,105 @@ class CommentModelTest extends SiteTestCase {
         $id = $comment['commentID'];
         $this->commentModel->setField($id, 'Score', 5);
         $this->assertDirtyRecordInserted('comment', $id);
+    }
+
+    /**
+     * Test a recordAdvancedNotications with Following disabled.
+     */
+    public function testRecordAdvancedNoticationsFollowingDisabled() {
+        $this->runWithConfig([CategoryModel::CONF_CATEGORY_FOLLOWING => false], function () {
+            $roles = $this->getRoles();
+
+            // Create a member user.
+            $memberUser = $this->createUser([
+                "Name" => "testNotications",
+                "Email" => __FUNCTION__ . "@example.com",
+                "Password" => "vanilla",
+                "RoleID" => $this->memberID,
+            ]);
+
+            $commentUser = $this->createUser([
+                "Name" => "testComment",
+                "Email" => __FUNCTION__ . "@example.com",
+                "Password" => "vanilla",
+                "RoleID" => $this->memberID,
+            ]);
+
+            $categoryAdmin = $this->createPermissionedCategory([], [$roles["Member"]]);
+
+            $userMeta = [
+                sprintf('Preferences.Email.NewComment.%d', $categoryAdmin['categoryID']) => $categoryAdmin['categoryID'],
+            ];
+            $this->userModel::setMeta($memberUser['userID'], $userMeta);
+
+            $discussionMember = [
+                'CategoryID' => $categoryAdmin['categoryID'],
+                'Name' => __FUNCTION__ . 'test discussion',
+                'Body' => 'foo foo foo',
+                'Format' => 'Text',
+                'InsertUserID' => $commentUser['userID']
+            ];
+
+            $discussionIDMember = $this->createDiscussion($discussionMember);
+            $this->createComment([
+                "DiscussionID" => $discussionIDMember,
+                "Body" => "Hello world.",
+                "Format" => "markdown",
+            ]);
+
+            $this->activityModel->clearNotificationQueue();
+            $this->commentModel->recordAdvancedNotications($this->activityModel, null, $discussionMember);
+            $this->assertSame(0, count(ActivityModel::$Queue));
+        });
+    }
+
+    /**
+     * Test a recordAdvancedNotications with Following enabled.
+     */
+    public function testRecordAdvancedNoticationsFollowingEnabled() {
+        $this->runWithConfig([CategoryModel::CONF_CATEGORY_FOLLOWING => true], function () {
+            $roles = $this->getRoles();
+
+            // Create a member user.
+            $memberUser = $this->createUser([
+                "Name" => "testNotications",
+                "Email" => __FUNCTION__ . "@example.com",
+                "Password" => "vanilla",
+                "RoleID" => $this->memberID,
+            ]);
+
+            $commentUser = $this->createUser([
+                "Name" => "testComment",
+                "Email" => __FUNCTION__ . "@example.com",
+                "Password" => "vanilla",
+                "RoleID" => $this->memberID,
+            ]);
+
+            $categoryAdmin = $this->createPermissionedCategory([], [$roles["Member"]]);
+
+            $userMeta = [
+                sprintf('Preferences.Email.NewComment.%d', $categoryAdmin['categoryID']) => $categoryAdmin['categoryID'],
+            ];
+            $this->userModel::setMeta($memberUser['userID'], $userMeta);
+
+            $discussionMember = [
+                'CategoryID' => $categoryAdmin['categoryID'],
+                'Name' => __FUNCTION__ . 'test discussion',
+                'Body' => 'foo foo foo',
+                'Format' => 'Text',
+                'InsertUserID' => $commentUser['userID']
+            ];
+
+            $discussionIDMember = $this->createDiscussion($discussionMember);
+            $this->createComment([
+                "DiscussionID" => $discussionIDMember,
+                "Body" => "Hello world.",
+                "Format" => "markdown",
+            ]);
+
+            $this->activityModel->clearNotificationQueue();
+            $this->commentModel->recordAdvancedNotications($this->activityModel, null, $discussionMember);
+            $this->assertSame(1, count(ActivityModel::$Queue));
+        });
     }
 }

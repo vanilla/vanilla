@@ -10,7 +10,9 @@ namespace Vanilla;
 use Garden\Container\Container;
 use Garden\EventManager;
 use Vanilla\Contracts;
+use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\CamelCaseScheme;
+use Vanilla\Utility\DebugUtils;
 
 /**
  * Contains the information for a single addon.
@@ -178,7 +180,7 @@ class Addon {
                 foreach ($specialClasses->getContainerRulesClasses() as $containerRulesClass) {
                     /** @var AddonContainerRules $rules */
                     $rules = new $containerRulesClass();
-                    if (defined('TESTMODE_ENABLED') && TESTMODE_ENABLED) {
+                    if (DebugUtils::isTestMode()) {
                         $rules->configureTestContainer($container);
                     } else {
                         $rules->configureProductionContainer($container);

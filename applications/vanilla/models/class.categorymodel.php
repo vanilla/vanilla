@@ -312,7 +312,6 @@ class CategoryModel extends Gdn_Model implements
         return Gdn::getContainer()->get(CategoryModel::class);
     }
 
-
     /**
      * Checks the allowed discussion types on a category.
      *
@@ -1072,10 +1071,12 @@ class CategoryModel extends Gdn_Model implements
     }
 
     /**
-     * @param $column
+     * Recalculate the counts for category data.
+     *
+     * @param string $column
      * @return array
      */
-    public function counts($column) {
+    public function counts(string $column): array {
         $result = ['Complete' => true];
         switch ($column) {
             case 'CountChildCategories':
@@ -1693,7 +1694,7 @@ class CategoryModel extends Gdn_Model implements
      * @param int $categoryID The category to give the points for.
      * @param int|false $timestamp The time the points were given.
      */
-    public static function givePoints($userID, $points, $source = 'Other', $categoryID = 0, $timestamp = false) {
+    public static function givePoints(int $userID, int $points, string $source = 'Other', int $categoryID = 0, $timestamp = false) {
         // Figure out whether or not the category tracks points seperately.
         if ($categoryID) {
             $category = self::categories($categoryID);
@@ -3071,7 +3072,23 @@ class CategoryModel extends Gdn_Model implements
 
         // Make sure the tree has a root.
         if (!isset($categories[-1])) {
-            $rootCat = ['CategoryID' => -1, 'TreeLeft' => 1, 'TreeRight' => 4, 'Depth' => 0, 'InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Gdn_Format::toDateTime(), 'DateUpdated' => Gdn_Format::toDateTime(), 'Name' => 'Root', 'UrlCode' => '', 'Description' => 'Root of category tree. Users should never see this.', 'PermissionCategoryID' => -1, 'Sort' => 0, 'ParentCategoryID' => null];
+            $rootCat = [
+                'CategoryID' => -1,
+                'TreeLeft' => 1,
+                'TreeRight' => 4,
+                'Depth' => 0,
+                'InsertUserID' => 1,
+                'UpdateUserID' => 1,
+                'DateInserted' => Gdn_Format::toDateTime(),
+                'DateUpdated' => Gdn_Format::toDateTime(),
+                'Name' => 'Root',
+                'UrlCode' => '',
+                'Description' => 'Root of category tree. Users should never see this.',
+                'PermissionCategoryID' => -1,
+                'Sort' => 0,
+                'ParentCategoryID' => null,
+                'CountCategories' => 0
+            ];
             $categories[-1] = $rootCat;
             $this->SQL->insert('Category', $rootCat);
         }
@@ -3120,10 +3137,29 @@ class CategoryModel extends Gdn_Model implements
             if (!isset($cat['CategoryID'])) {
                 continue;
             }
-            if ($cat['_TreeLeft'] != $cat['TreeLeft'] || $cat['_TreeRight'] != $cat['TreeRight'] || $cat['_Depth'] != $cat['Depth'] || $cat['PermissionCategoryID'] != $cat['PermissionCategoryID'] || $cat['_ParentCategoryID'] != $cat['ParentCategoryID'] || $cat['Sort'] != $cat['TreeLeft']) {
+
+            // Get the count of child categories. If this is the root category, the children have been unset by
+            // the call to _SetTree() above, so just use the "CountCategories" value.
+            $catCountChildren = $cat["ParentCategoryID"] ===  null ? $cat["CountCategories"] : count($cat["Children"] ?? []);
+
+            if ($cat['_TreeLeft'] != $cat['TreeLeft'] ||
+                $cat['_TreeRight'] != $cat['TreeRight'] ||
+                $cat['_Depth'] != $cat['Depth'] ||
+                $cat['PermissionCategoryID'] != $cat['PermissionCategoryID'] ||
+                $cat['_ParentCategoryID'] != $cat['ParentCategoryID'] ||
+                $cat['Sort'] != $cat['TreeLeft'] ||
+                $cat["CountCategories"] != $catCountChildren) {
                 $this->SQL->put(
                     'Category',
-                    ['TreeLeft' => $cat['TreeLeft'], 'TreeRight' => $cat['TreeRight'], 'Depth' => $cat['Depth'], 'PermissionCategoryID' => $cat['PermissionCategoryID'], 'ParentCategoryID' => $cat['ParentCategoryID'], 'Sort' => $cat['TreeLeft']],
+                    [
+                        'TreeLeft' => $cat['TreeLeft'],
+                        'TreeRight' => $cat['TreeRight'],
+                        'Depth' => $cat['Depth'],
+                        'PermissionCategoryID' => $cat['PermissionCategoryID'],
+                        'ParentCategoryID' => $cat['ParentCategoryID'],
+                        'Sort' => $cat['TreeLeft'],
+                        'CountCategories' => $catCountChildren,
+                    ],
                     ['CategoryID' => $cat['CategoryID']]
                 );
             }

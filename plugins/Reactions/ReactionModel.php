@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -14,7 +14,6 @@ use Vanilla\Reactions\Events\ReactionEvent;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\CamelCaseScheme;
 use Garden\Schema\Schema;
-use Vanilla\Logger;
 
 /**
  * Class ReactionModel
@@ -1188,8 +1187,8 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
                     $row,
                     "reactions",
                     $userID,
-                    $row["InsertUserID"],
                     "negative",
+                    $row["InsertUserID"],
                     ["reactionType" => ArrayUtils::camelCase($reactionType)]
                 );
                 $this->eventManager->dispatch($logPostEvent);

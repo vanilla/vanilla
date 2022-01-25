@@ -2,7 +2,7 @@
 /**
  * Spam model.
  *
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Dashboard
  * @since 2.0
@@ -158,8 +158,8 @@ class SpamModel extends Gdn_Pluggable {
                         $data,
                         $sp->EventArguments['Source'] ?? "unknown",
                         $data["Log_InsertUserID"] ?? Gdn::session()->UserID,
-                        $data["InsertUserID"],
                         "negative",
+                        $data["InsertUserID"],
                         ['recordID' => false]
                     );
                     Gdn::eventManager()->dispatch($logPostEvent);
@@ -243,8 +243,8 @@ class SpamModel extends Gdn_Pluggable {
             $row,
             $data['Source'] ?? "unknown",
             $data["Log_InsertUserID"] ?? Gdn::session()->UserID,
-            $data["InsertUserID"],
-            "negative"
+            "negative",
+            $data["InsertUserID"]
         );
         Gdn::eventManager()->dispatch($logPostEvent);
     }

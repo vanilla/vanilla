@@ -2915,7 +2915,7 @@ SQL;
      * @param array $activity
      * @param array $discussion
      */
-    private function recordAdvancedNotications(ActivityModel $activityModel, array $activity, array $discussion) {
+    public function recordAdvancedNotications(ActivityModel $activityModel, array $activity, array $discussion) {
         $categoryID = $discussion["CategoryID"] ?? null;
         $insertUserID = $discussion["InsertUserID"] ?? null;
 
@@ -2941,6 +2941,13 @@ SQL;
             }
 
             $userID = $row["UserID"];
+
+            if (!Gdn::config(\CategoryModel::CONF_CATEGORY_FOLLOWING) &&
+                !$this->userModel->checkPermission($userID, 'Garden.AdvancedNotifications.Allow')
+            ) {
+                continue;
+            }
+
             // Check user can still see the discussion.
             if (!$this->canView($discussion, $userID)) {
                 continue;

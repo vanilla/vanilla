@@ -11,6 +11,7 @@
 
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Theme\ThemePreloadProvider;
+use Vanilla\Utility\DebugUtils;
 use Vanilla\Utility\HtmlUtils;
 use \Vanilla\Web\Asset\LegacyAssetModel;
 use Vanilla\Web\CacheControlConstantsInterface;
@@ -1395,7 +1396,7 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
 
             if (!$session->isValid() && $this->isRenderingMasterView()) {
                 redirectTo('/entry/signin?Target='.urlencode($this->Request->pathAndQuery()));
-            } elseif (defined('TESTMODE_ENABLED') && TESTMODE_ENABLED) {
+            } elseif (DebugUtils::isTestMode()) {
                 throw permissionException();
             } else {
                 Gdn::dispatcher()->dispatch('DefaultPermission');

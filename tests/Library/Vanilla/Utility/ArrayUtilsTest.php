@@ -253,6 +253,12 @@ class ArrayUtilsTest extends TestCase {
                 "Hello world.",
                 ["foo" => ["bar" => ["A" => "one", "B" => "two", "C" => "three", "baz" => "Hello world."]]],
             ],
+            "create root" => [
+                "foo",
+                ["foo" => "not bar"],
+                "bar",
+                ["foo" => "bar"],
+            ]
         ];
         return $result;
     }

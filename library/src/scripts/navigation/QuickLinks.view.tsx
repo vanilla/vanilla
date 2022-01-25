@@ -4,6 +4,7 @@
  */
 
 import { cx } from "@emotion/css";
+import Permission from "@library/features/users/Permission";
 import { INavigationVariableItem } from "@library/headers/navigationVariables";
 import { PageBox } from "@library/layout/PageBox";
 import { PageHeadingBox } from "@library/layout/PageHeadingBox";
@@ -11,7 +12,6 @@ import { useWidgetSectionClasses } from "@library/layout/WidgetLayout.context";
 import { quickLinksClasses } from "@library/navigation/QuickLinks.classes";
 import { quickLinksVariables } from "@library/navigation/QuickLinks.variables";
 import SmartLink from "@library/routing/links/SmartLink";
-import { useUniqueID } from "@library/utility/idUtils";
 import { t } from "@vanilla/i18n";
 import classNames from "classnames";
 import React from "react";
@@ -19,6 +19,7 @@ import React from "react";
 interface IProps {
     title?: string;
     links: Array<INavigationVariableItem & { count?: number; countLimit?: number | null }>;
+    activePath?: string;
 }
 
 /**
@@ -27,7 +28,7 @@ interface IProps {
 export function QuickLinksView(props: IProps) {
     const classes = quickLinksClasses();
     const variables = quickLinksVariables();
-    const { title, links } = props;
+    const { title, links, activePath } = props;
     const visibleLinks = links.filter((link) => {
         const isSetHidden = "isHidden" in link && link.isHidden;
         return !isSetHidden;
@@ -42,14 +43,16 @@ export function QuickLinksView(props: IProps) {
                 <nav>
                     <ul className={classNames(classes.list, "no-css")}>
                         {visibleLinks ? (
-                            visibleLinks.map((link) => (
-                                <QuickLink
-                                    key={link.id}
-                                    path={link.url}
-                                    title={link.name}
-                                    count={link.count}
-                                    countLimit={link.countLimit}
-                                />
+                            visibleLinks.map((link, index) => (
+                                <Permission key={index} permission={link.permission}>
+                                    <QuickLink
+                                        active={link.url === activePath}
+                                        path={link.url}
+                                        title={link.name}
+                                        count={link.count}
+                                        countLimit={link.countLimit}
+                                    />
+                                </Permission>
                             ))
                         ) : (
                             <></>
@@ -66,11 +69,12 @@ interface IQuickLinkProps {
     count?: number;
     countLimit?: number | null;
     isHidden?: boolean;
+    active?: boolean;
 }
 
 function QuickLink(props: IQuickLinkProps) {
     const classes = quickLinksClasses();
-    const { path, title, count, countLimit, isHidden } = props;
+    const { path, title, count, countLimit, active } = props;
     const displayCount = React.useMemo(() => {
         if (count && countLimit && count >= countLimit) {
             return `${countLimit}+`;
@@ -80,10 +84,10 @@ function QuickLink(props: IQuickLinkProps) {
 
     return (
         <li className={classNames(classes.listItem)}>
-            <SmartLink className={classNames(classes.link)} to={path}>
+            <SmartLink to={path} active={active} className={classes.link(active)}>
                 {t(title)}
+                {displayCount != null && <span className={classNames(classes.count)}>{displayCount}</span>}
             </SmartLink>
-            {displayCount != null && <span className={classNames(classes.count)}>{displayCount}</span>}
         </li>
     );
 }

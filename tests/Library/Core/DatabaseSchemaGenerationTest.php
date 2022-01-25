@@ -30,7 +30,7 @@ class DatabaseSchemaGenerationTest extends BootstrapTestCase {
         ;
 
         $schema = new \Gdn_Schema('schemaTest', \Gdn::database());
-        $this->assertGdnSchemaFieldLength($schema, 'varchar', 80);
+        $this->assertGdnSchemaFieldLength($schema, 'varchar', 80, 320); // varchars are multiplied by 4 because of utf8-mb4.
         $this->assertGdnSchemaFieldLength($schema, 'tinytext', \Gdn_MySQLDriver::BYTE_LENGTH_TINY_TEXT);
         $this->assertGdnSchemaFieldLength($schema, 'text', \Gdn_MySQLDriver::BYTE_LENGTH_TEXT);
         $this->assertGdnSchemaFieldLength($schema, 'mediumtext', \Gdn_MySQLDriver::BYTE_LENGTH_MEDIUMTEXT);
@@ -44,7 +44,7 @@ class DatabaseSchemaGenerationTest extends BootstrapTestCase {
      */
     public function testTableSchemaLengths() {
         $schema = \Gdn::database()->simpleSchema('schemaTest');
-        $this->assertSchemaFieldLength($schema, 'varchar', 80);
+        $this->assertSchemaFieldLength($schema, 'varchar', 80, 320);
         $this->assertSchemaFieldLength($schema, 'tinytext', \Gdn_MySQLDriver::BYTE_LENGTH_TINY_TEXT);
         $this->assertSchemaFieldLength($schema, 'text', \Gdn_MySQLDriver::BYTE_LENGTH_TEXT);
         $this->assertSchemaFieldLength($schema, 'mediumtext', \Gdn_MySQLDriver::BYTE_LENGTH_MEDIUMTEXT);
@@ -57,11 +57,13 @@ class DatabaseSchemaGenerationTest extends BootstrapTestCase {
      * @param \Gdn_Schema $schema
      * @param string $fieldName
      * @param int $expectedLength
+     * @param int|null $expectedByteLength
      */
-    private function assertGdnSchemaFieldLength(\Gdn_Schema $schema, string $fieldName, int $expectedLength) {
+    private function assertGdnSchemaFieldLength(\Gdn_Schema $schema, string $fieldName, int $expectedLength, int $expectedByteLength = null) {
+        $expectedByteLength = $expectedByteLength ?? $expectedLength;
         $field = $schema->getField($fieldName);
         $this->assertEquals($expectedLength, $field->Length, "Expected field $fieldName to have length $expectedLength");
-        $this->assertEquals($expectedLength, $field->ByteLength, "Expected field $fieldName to have byte length $expectedLength");
+        $this->assertEquals($expectedByteLength, $field->ByteLength, "Expected field $fieldName to have byte length $expectedByteLength");
     }
 
     /**
@@ -70,10 +72,13 @@ class DatabaseSchemaGenerationTest extends BootstrapTestCase {
      * @param Schema $schema
      * @param string $fieldName
      * @param int $expectedLength
+     * @param int|null $expectedByteLength
      */
-    private function assertSchemaFieldLength(Schema $schema, string $fieldName, int $expectedLength) {
+    private function assertSchemaFieldLength(Schema $schema, string $fieldName, int $expectedLength, int $expectedByteLength = null) {
+        $expectedByteLength = $expectedByteLength ?? $expectedLength;
         $field = $schema->getSchemaArray()['properties'][$fieldName];
         $this->assertEquals($expectedLength, $field['maxLength'], "Expected field $fieldName to have length $expectedLength");
-        $this->assertFalse($schema->hasFlag(Schema::VALIDATE_STRING_LENGTH_AS_UNICODE), "Expected schema to measure byte length.");
+        $this->assertEquals($expectedByteLength, $field['maxByteLength'], "Expected field $fieldName to have bytelength $expectedByteLength");
+
     }
 }

@@ -8,6 +8,7 @@ use Garden\Schema\Schema;
 use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
+use Vanilla\ApiUtils;
 
 /**
  * API Controller for the `/tags` resource.
@@ -43,6 +44,7 @@ class TagsApiController extends AbstractApiController {
                 'urlcode:s?',
                 'urlCode:s?',
                 'parentTagID:i|null?',
+                'countDiscussions:i',
             ]);
         }
 
@@ -72,8 +74,25 @@ class TagsApiController extends AbstractApiController {
                     ],
                     'style' => 'form',
                 ],
+                "limit:i?" => [
+                    "description" => "Desired number of tags.",
+                    'default' => \TagModel::LIMIT,
+                    'minimum' => 1,
+                    'maximum' => ApiUtils::getMaxLimit(),
+                ],
+                "sort:s?" => [
+                    'enum' => ApiUtils::sortEnum('countDiscussions', 'tagID', 'name'),
+                ]
             ]
         );
+
+        if (key_exists('limit', $query)) {
+            $options['limit'] = $query['limit'];
+        }
+
+        if (key_exists('sort', $query)) {
+            $options['sort'] = $query['sort'];
+        }
 
         $query = $in->validate($query);
         $query["type"] = $query["type"] ?? ['all'];

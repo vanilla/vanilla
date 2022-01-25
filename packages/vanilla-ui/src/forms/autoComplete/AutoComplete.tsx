@@ -7,6 +7,8 @@
 import React, { RefObject, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import * as Reach from "@reach/combobox";
 import * as Polymorphic from "../../polymorphic";
+import { positionMatchWidth } from "@reach/popover";
+import { useRect } from "@reach/rect";
 import "@reach/combobox/styles.css";
 import { InputSize } from "../../types";
 import { cx } from "@emotion/css";
@@ -17,10 +19,11 @@ import { ClearIcon } from "../shared/ClearIcon";
 import { CloseIcon } from "../shared/CloseIcon";
 import { AutoCompleteOption, IAutoCompleteOption, IAutoCompleteOptionProps } from "./AutoCompleteOption";
 import { AutoCompleteContext, IAutoCompleteContext, IAutoCompleteInputState } from "./AutoCompleteContext";
+import { useComboboxContext } from "@reach/combobox";
 
 function AutoCompleteArrow() {
     const { size } = useContext(AutoCompleteContext);
-    const classes = autoCompleteClasses({ size });
+    const classes = useMemo(() => autoCompleteClasses({ size }), [size]);
     return (
         <div className={classes.autoCompleteArrow}>
             <DropDownArrow />
@@ -31,7 +34,7 @@ function AutoCompleteArrow() {
 function AutoCompleteClear(props: { onClear(): void }) {
     const { onClear } = props;
     const { size } = useContext(AutoCompleteContext);
-    const classes = autoCompleteClasses({ size });
+    const classes = useMemo(() => autoCompleteClasses({ size }), [size]);
     return (
         <div
             className={classes.autoCompleteClear}
@@ -55,7 +58,7 @@ function AutoCompleteClear(props: { onClear(): void }) {
 function AutoCompleteToken(props: { label: string; onUnSelect(): void }) {
     const { onUnSelect, label } = props;
     const { size } = useContext(AutoCompleteContext);
-    const classes = autoCompleteClasses({ size });
+    const classes = useMemo(() => autoCompleteClasses({ size }), [size]);
     return (
         <div className={cx("autocomplete-token", classes.inputTokenTag)} tabIndex={0}>
             <label>{label}</label>
@@ -111,6 +114,8 @@ function makeOptionState(
     };
 }
 
+type ComboboxStatus = "IDLE" | "SUGGESTING" | "NAVIGATING" | "INTERACTING";
+
 export interface IAutoCompleteProps {
     options?: IAutoCompleteOption[];
     optionProvider?: React.ReactNode;
@@ -150,10 +155,18 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
         optionProvider,
         ...otherProps
     } = props;
-    const classes = autoCompleteClasses({ size });
-    const classesInput = inputClasses({ size });
+    const classes = useMemo(() => autoCompleteClasses({ size, isDisabled: disabled, isClearable: !!clear }), [
+        size,
+        disabled,
+        clear,
+    ]);
+    const classesInput = useMemo(() => inputClasses({ size }), [size]);
     const [controlledOptions, setControlledOptions] = useState<IAutoCompleteOptionProps[]>();
     const [arbitraryValues, setArbitraryValues] = useState<string[]>([]);
+    const [comboboxState, setComboboxState] = useState<ComboboxStatus>();
+    // This ref records the outmost container so that the pop over can use its size and placement
+    const containerRef = useRef() as RefObject<HTMLDivElement>;
+    const containerRect = useRect(containerRef);
     // This ref records the HTML input so that we can focus it when clicking on the parent container
     const inputRef = useRef() as RefObject<HTMLInputElement>;
     // This state tracks if a user is using the direction keys tp navigate the combo box
@@ -368,7 +381,12 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
          * first filtered option
          */
         setUsingDirectionKeys([38, 40].includes(event.keyCode));
-        if (!isUsingDirectionKeys && inputRef?.current?.value.length !== 0 && event.keyCode === 13) {
+        if (
+            !isUsingDirectionKeys &&
+            inputRef?.current?.value.length !== 0 &&
+            comboboxState !== "IDLE" &&
+            event.keyCode === 13
+        ) {
             filteredOptions.length && onSelect(filteredOptions[0].label ?? filteredOptions[0].value);
             setUsingDirectionKeys(false);
         }
@@ -403,6 +421,7 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
             <Reach.Combobox className={classes.reachCombobox} onSelect={onSelect} ref={forwardedRef} openOnFocus>
                 <div
                     className={cx(classes.inputContainer, props.className)}
+                    ref={containerRef}
                     onClick={() => inputRef?.current && inputRef?.current?.focus()}
                 >
                     {isMultiple && (
@@ -454,6 +473,12 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
                 <Reach.ComboboxPopover
                     className={cx(classes.popover, props.popoverClassName)}
                     data-autocomplete-state={state.status}
+                    /**
+                     * This provides the popover the size and positioning of the parent wrapper
+                     * instead of the input itself, which changes size with token inputs
+                     * https://github.com/reach/reach-ui/pull/845#issuecomment-939074638
+                     */
+                    position={(_, popoverRect) => positionMatchWidth(containerRect, popoverRect)}
                 >
                     <Reach.ComboboxList>
                         {filteredOptions.map((props, index) => (
@@ -461,8 +486,24 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
                         ))}
                     </Reach.ComboboxList>
                 </Reach.ComboboxPopover>
+                <ComboboxState status={setComboboxState} />
             </Reach.Combobox>
             {optionProvider}
         </AutoCompleteContext.Provider>
     );
 }) as Polymorphic.ForwardRefComponent<"input", IAutoCompleteProps>;
+
+/**
+ * This kludge component is used to report the state of a ReachUI combo box to
+ * the AutoComplete, the hook herein needs to be a child of the combobox being observed
+ */
+interface IComboboxStateProps {
+    status(state: ComboboxStatus): void;
+}
+function ComboboxState(props: IComboboxStateProps) {
+    const { state } = useComboboxContext();
+    useEffect(() => {
+        props.status(state);
+    }, [state]);
+    return null;
+}

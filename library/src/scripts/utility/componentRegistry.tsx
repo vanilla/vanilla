@@ -59,6 +59,33 @@ export function addComponent(name: string, Component: React.ComponentType<any>, 
     };
 }
 
+type IWidget = React.ComponentType<any>;
+type ILoadableWidget = () => Promise<{ default: IWidget }>;
+
+export function registerWidgets(widgets: Record<string, IWidget>) {
+    for (const [widgetName, widget] of Object.entries(widgets)) {
+        addComponent(widgetName, widget);
+    }
+}
+
+const _widgetLoaders: Record<string, ILoadableWidget> = {};
+
+export function registerLoadableWidgets(widgets: Record<string, ILoadableWidget>) {
+    for (const [widgetName, widget] of Object.entries(widgets)) {
+        _widgetLoaders[widgetName] = widget;
+        addComponent(widgetName, React.lazy(widget));
+    }
+}
+
+export async function preloadWidgets(widgetNames: string[]): Promise<void> {
+    const loaderPromises = Object.entries(_widgetLoaders)
+        .filter(([widgetName, widgetLoader]) => {
+            return widgetNames.includes(widgetName);
+        })
+        .map(([widgetName, widgetLoader]) => widgetLoader());
+    await Promise.all(loaderPromises);
+}
+
 /**
  * Register a component in the Components registry.
  *

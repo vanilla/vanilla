@@ -35,7 +35,8 @@ class DiscussionAnnouncementsWidget extends AnnouncementWidgetModule implements 
      * @inheritDoc
      */
     public function getComponentName(): string {
-        return "DiscussionAnnouncementsWidget";
+        // Temporarily this until we make a version supported grids and carousels.
+        return "DiscussionListModule";
     }
 
     /**

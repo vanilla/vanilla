@@ -55,6 +55,11 @@ class SmartIDMiddleware {
     private $fullSuffixesRegex;
 
     /**
+     * @var array Header to set for the response.
+     */
+    private $responseHeaders = [];
+
+    /**
      * SmartIDMiddleware constructor.
      *
      * @param string $basePath The base path to match in order to apply the middleware.
@@ -135,8 +140,8 @@ class SmartIDMiddleware {
             $this->replaceBody($request);
             $this->replacePath($request);
         }
-
         $response = $next($request);
+        $response = $this->setResponseHeader(\Garden\Web\Data::box($response));
         return $response;
     }
 
@@ -273,6 +278,10 @@ class SmartIDMiddleware {
         list($column, $value) = explode(':', ltrim($smartID, static::SMART)) + ['', ''];
         list($pk, $columns, $resolver) = $this->pks[strtolower($pk)];
 
+        if ($smartID == '$me') {
+            $this->responseHeaders = [CacheControlConstantsInterface::HEADER_CACHE_CONTROL => CacheControlConstantsInterface::NO_CACHE];
+        }
+
         if ($columns !== '*' && !in_array(strtolower($column), $columns)) {
             throw new ClientException("Unknown column in smart ID expression: $column.", 400);
         }
@@ -328,5 +337,17 @@ class SmartIDMiddleware {
      */
     public static function valueIsSmartID(string $value): bool {
         return !empty($value) && $value[0] === self::SMART;
+    }
+
+    /**
+     * Overwrite the response header.
+     *
+     * @param mixed $response
+     */
+    private function setResponseHeader(\Garden\Web\Data $response) {
+        foreach ($this->responseHeaders as $headerName => $headerValue) {
+            $response->setHeader($headerName, $headerValue);
+        }
+        return $response;
     }
 }

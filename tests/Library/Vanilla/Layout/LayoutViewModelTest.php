@@ -69,12 +69,29 @@ class LayoutViewModelTest extends ClassLocatorTest {
     public function testGetLayoutView() {
         $layout = ['layoutID' => 1, 'layoutViewType' => 'home', 'name' => 'Home Test', 'layout' => 'test'];
         $layoutID = $this->layoutModel->insert($layout);
-        $layoutView = ['layoutID' => $layoutID, 'recordID' => 1, 'recordType' => 'home'];
+        $layoutView = ['layoutID' => $layoutID, 'recordID' => 1, 'recordType' => 'global'];
         $id = $this->layoutViewModel->insert($layoutView);
 
-        $result = $this->layoutViewModel->getLayoutViews('home', 'home', 1);
+        $result = $this->layoutViewModel->getLayoutViews('home', 'global', 1);
 
         $this->assertSame($id, $result['layoutViewID']);
         $this->assertSame($layoutView['layoutID'], $result['layoutID']);
+    }
+
+    /**
+     * Test model layout View model normalize Rows.
+     *
+     * @throws \Exception Throws exception when something goes wrong.
+     */
+    public function testNormalizeRows() {
+        $layout = ['layoutID' => 1, 'layoutViewType' => 'home', 'name' => 'Home Test', 'layout' => 'test'];
+        $layoutID = $this->layoutModel->insert($layout);
+        $layoutView = ['layoutID' => $layoutID, 'recordID' => 1, 'recordType' => 'global'];
+        $id = $this->layoutViewModel->insert($layoutView);
+        $rows = $this->layoutViewModel->getViewsByLayoutID($layoutID);
+        $result = $this->layoutViewModel->normalizeRows($rows, ['record']);
+
+        $this->assertSame(1, count($result));
+        $this->assertSame(2, count($result[0]['record']));
     }
 }

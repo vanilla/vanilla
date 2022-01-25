@@ -17,4 +17,12 @@ use Vanilla\Widgets\React\ReactWidgetInterface;
 abstract class AbstractLayoutSection implements ReactWidgetInterface, CombinedPropsWidgetInterface {
 
     use CombinedPropsWidgetTrait;
+
+    /**
+     * @inheritdoc
+     */
+    public function getProps(): ?array {
+        $this->props['autoWrap'] = true;
+        return $this->props;
+    }
 }

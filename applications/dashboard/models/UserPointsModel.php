@@ -7,7 +7,11 @@
 
 namespace Vanilla\Dashboard;
 
+use Garden\Schema\Schema;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Forms\FormOptions;
+use Vanilla\Forms\SchemaForm;
+use Vanilla\Forms\StaticFormChoices;
 use Vanilla\Models\Model;
 use Vanilla\Models\ModelCache;
 
@@ -177,7 +181,7 @@ class UserPointsModel extends Model {
             \Gdn_Cache::FEATURE_EXPIRY => $this->config->get(self::CONF_CACHE_TTL, self::DEFAULT_CACHE_TTL),
         ]);
 
-        $this->userModel->joinUsers($leaderData, ['UserID'], ['Join' => ['Name', 'Email', 'Photo', 'Label']]);
+        $this->userModel->joinUsers($leaderData, ['UserID']);
 
         return $leaderData;
     }
@@ -260,5 +264,54 @@ class UserPointsModel extends Model {
         } else {
             return t($str);
         }
+    }
+
+    /**
+     * The slot type schema for calculating leaders
+     *
+     * @return Schema
+     */
+    public static function slotTypeSchema(): Schema {
+        return Schema::parse([
+            "type" => "string",
+            "default" => UserPointsModel::SLOT_TYPE_ALL,
+            "description" => "The timeframe in which leaders should calculated",
+            "enum" => UserPointsModel::SLOT_TYPES,
+            "x-control" => SchemaForm::dropDown(
+                new FormOptions(
+                    "Timeframe",
+                    "Choose what duration to check for leaders in."
+                ),
+                new StaticFormChoices(
+                    [
+                        UserPointsModel::SLOT_TYPE_DAY => "Daily",
+                        UserPointsModel::SLOT_TYPE_WEEK => "Weekly",
+                        UserPointsModel::SLOT_TYPE_MONTH => "Monthly",
+                        UserPointsModel::SLOT_TYPE_YEAR => "Yearly",
+                        UserPointsModel::SLOT_TYPE_ALL => "All Time",
+                    ]
+                )
+            )
+        ]);
+    }
+
+    /**
+     * The user limit schema
+     *
+     * @return Schema
+     */
+    public static function limitSchema(): Schema {
+        return Schema::parse([
+            "type" => "integer",
+            "default" => 10,
+            "description" => "The maximum number of users to display",
+            "x-control" => SchemaForm::textBox(
+                new FormOptions(
+                    "Limit",
+                    "Maximum amount of users to display."
+                ),
+                "number"
+            )
+        ]);
     }
 }

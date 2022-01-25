@@ -3466,7 +3466,7 @@ PASSWORDMETER;
         if (is_array($attributes)) {
             foreach ($attributes as $attribute => $value) {
                 // Ignore reserved attributes
-                if (!in_array(strtolower($attribute), $reservedAttributes)) {
+                if (!in_array(strtolower($attribute), $reservedAttributes) && !is_array($value)) {
                     $return .= ' '.$attribute.($value === true ? '' : '="'.htmlspecialchars($value, ENT_COMPAT, 'UTF-8').'"');
                 }
             }

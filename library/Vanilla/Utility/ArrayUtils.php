@@ -227,7 +227,8 @@ final class ArrayUtils {
         $keys = explode(self::PATH_SEPARATOR, $path);
         $search = function ($array, array $keys) use ($value, &$search) {
             $currentKey = reset($keys);
-            if (self::arrayKeyExists($currentKey, $array) && !self::isArray($array[$currentKey])) {
+            $isLastKey = count($keys) === 1;
+            if (self::arrayKeyExists($currentKey, $array) && !self::isArray($array[$currentKey]) && !$isLastKey) {
                 throw new \InvalidArgumentException(
                     "Unexpected type in path. Expected an array or array-like object."
                 );

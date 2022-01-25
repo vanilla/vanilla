@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -36,7 +36,7 @@ class QnaModelTest extends SiteTestCase {
         $answer = $this->createAnswer();
         $this->acceptAnswer($question, $answer);
 
-        // Create the unanaswered records.
+        // Create the unanswered records.
         $this->createQuestion();
         $this->createQuestion();
         $permCat = $this->createPermissionedCategory([], [\RoleModel::ADMIN_ID]);

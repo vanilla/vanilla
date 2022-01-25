@@ -9,6 +9,9 @@ namespace Vanilla\Formatting\Formats;
 
 use Garden\Schema\ValidationException;
 use Garden\StaticCacheTranslationTrait;
+use Logger;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\EmbeddedContent\AbstractEmbed;
 use Vanilla\EmbeddedContent\Embeds\FileEmbed;
@@ -28,8 +31,8 @@ use Vanilla\Formatting\Quill;
 /**
  * Format service for the rich editor format. Rendered and parsed using Quill.
  */
-class RichFormat extends BaseFormat implements ParsableDOMInterface {
-
+class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAwareInterface {
+    use LoggerAwareTrait;
     use TwigRenderTrait;
     use StaticCacheTranslationTrait;
 
@@ -58,6 +61,7 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface {
         $this->parser = $parser;
         $this->renderer = $renderer;
         $this->filterer = $filterer;
+        $this->setLogger(Logger::getLogger());
     }
 
 
@@ -302,15 +306,7 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface {
      * @param string $input
      */
     private function logBadInput(string $input) {
-        trigger_error(
-            errorMessage(
-                "Bad input encountered",
-                self::class,
-                __METHOD__,
-                $input
-            ),
-            E_USER_WARNING
-        );
+        $this->logger->error("Bad input encountered", ['class' => self::class, 'method' =>  __METHOD__, 'input' => '$input'] + ($this->context ?? []));
     }
 
     /**

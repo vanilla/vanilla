@@ -76,40 +76,42 @@ trait HomeWidgetContainerSchemaTrait {
      * @param string $fieldName
      * @return Schema
      */
-    public static function containerOptionsSchema(string $fieldName = 'options'): Schema {
-        return Schema::parse([
-            "$fieldName?" => [
-                'description' => 'Configure various container options',
-                'type' => 'object',
-                'properties' => [
-                    'outerBackground?' => new WidgetBackgroundSchema('Set a full width background for the container.'),
-                    'innerBackground?' => new WidgetBackgroundSchema('Set an inner background (inside of the margins) for the container.'),
-                    'borderType:s?' => [
-                        'enum' => self::borderTypeOptions(),
-                        'description' => 'Describe what type of the border the widget should have.'
-                    ],
-                    'viewAll?' => self::viewAllSchema('Configure a view all link for the widget.'),
-                    'maxColumnCount:i?' => [
-                        'description' => 'Set the maximum number of columns for the widget.',
-                    ],
-                    'displayType:s?' => [
-                        'enum' => self::displayTypeOptions(),
-                        'description' => 'Describe the widget display format.'
-                    ],
-                    'isGrid:b?' => [
-                        'deprecationMessage' => 'This is deprecated. Use displayType instead.',
-                        'description' => 'Configure if the widget should display as a grid. Defaults to false.',
-                    ],
-                    'isCarousel:b?' => [
-                        'deprecationMessage' => 'This is deprecated. Use displayType instead.',
-                        'description' => 'Configure if the widget should display in a carousel. Defaults to false.',
-                    ],
-                    'headerAlignment:s?' => [
-                        'description' => 'Configure alignment of the title, subtitle, and description.',
-                        'enum' => ['left', 'center'],
-                    ],
-                ],
+    public static function containerOptionsSchema(string $fieldName = 'options', array $allowedProperties = null): Schema {
+        $propertiesSchema = Schema::parse([
+            'outerBackground?' => new WidgetBackgroundSchema('Set a full width background for the container.'),
+            'innerBackground?' => new WidgetBackgroundSchema('Set an inner background (inside of the margins) for the container.'),
+            'borderType:s?' => [
+                'enum' => self::borderTypeOptions(),
+                'description' => 'Describe what type of the border the widget should have.'
             ],
+            'viewAll?' => self::viewAllSchema('Configure a view all link for the widget.'),
+            'maxColumnCount:i?' => [
+                'description' => 'Set the maximum number of columns for the widget.',
+            ],
+            'displayType:s?' => [
+                'enum' => self::displayTypeOptions(),
+                'description' => 'Describe the widget display format.'
+            ],
+            'isGrid:b?' => [
+                'deprecationMessage' => 'This is deprecated. Use displayType instead.',
+                'description' => 'Configure if the widget should display as a grid. Defaults to false.',
+            ],
+            'isCarousel:b?' => [
+                'deprecationMessage' => 'This is deprecated. Use displayType instead.',
+                'description' => 'Configure if the widget should display in a carousel. Defaults to false.',
+            ],
+            'headerAlignment:s?' => [
+                'description' => 'Configure alignment of the title, subtitle, and description.',
+                'enum' => ['left', 'center'],
+            ],
+        ]);
+
+        if ($allowedProperties) {
+            $propertiesSchema = Schema::parse($allowedProperties)->add($propertiesSchema);
+        }
+
+        return Schema::parse([
+            "$fieldName?" => $propertiesSchema->setDescription('Configure various container options'),
         ]);
     }
 
@@ -161,7 +163,8 @@ trait HomeWidgetContainerSchemaTrait {
         return [
             'grid',
             'list',
-            'carousel'
+            'carousel',
+            'link'
         ];
     }
 }

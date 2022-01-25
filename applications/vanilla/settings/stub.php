@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 /**
  * Vanilla stub content for a new forum.
  *
@@ -10,11 +10,13 @@
  * @package Vanilla
  */
 
+use Vanilla\Utility\DebugUtils;
+
 $SQL = Gdn::database()->sql();
 
 // Only do this once, ever.
 $Row = $SQL->get('Discussion', '', 'asc', 1)->firstRow(DATASET_TYPE_ARRAY);
-if ($Row || isTestMode()) {
+if ($Row || DebugUtils::isTestMode()) {
     return;
 }
 

@@ -253,6 +253,8 @@ class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface {
         if ($this->DeveloperMode) {
             $this->DeveloperContainer->massImport($this->LocaleContainer->get('.'));
         }
+
+        $this->loadExtraLocaleDefinitions();
     }
 
     /**

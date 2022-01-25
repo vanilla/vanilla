@@ -271,6 +271,7 @@ export default class EntryModel {
      * Look up all of the entry directories. This is quite expensive in terms of IO so don't run it more than once.
      */
     private async initEntries() {
+        this.entryDirs.push(path.join(LIBRARY_SRC_DIRECTORY, "/entries"));
         for (const addon of Object.values(this.buildAddons)) {
             const entriesExists = await fileExists(addon.entriesDir);
             if (entriesExists) {

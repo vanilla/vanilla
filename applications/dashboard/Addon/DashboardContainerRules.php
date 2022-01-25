@@ -13,6 +13,7 @@ use Garden\Web\Dispatcher;
 use Garden\Web\PageControllerRoute;
 use Vanilla\AddonContainerRules;
 use Vanilla\Dashboard\Controllers\LayoutSettingsPageController;
+use Vanilla\Dashboard\Controllers\Pages\HomePageController;
 use Vanilla\Dashboard\Models\UserSiteTotalProvider;
 use Vanilla\Models\SiteTotalService;
 
@@ -28,6 +29,10 @@ class DashboardContainerRules extends AddonContainerRules {
         PageControllerRoute::configurePageRoutes($container, [
             '/settings/layout' => LayoutSettingsPageController::class,
         ]);
+
+        PageControllerRoute::configurePageRoutes($container, [
+            '/' => HomePageController::class,
+        ], 'CustomLayoutHomePage');
 
         $container->rule(SiteTotalService::class)
             ->addCall('registerProvider', [new Reference(UserSiteTotalProvider::class)])

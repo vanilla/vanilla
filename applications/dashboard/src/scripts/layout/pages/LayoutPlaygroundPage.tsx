@@ -4,9 +4,12 @@
  * @license gpl-2.0-only
  */
 
+import { usePlaygroundSetup, usePlaygroundSpec } from "@dashboard/layout/playground/playgroundHooks";
+import { css } from "@emotion/css";
 import { extractServerError } from "@library/apiv2";
 import { initCodeHighlighting } from "@library/content/code";
 import UserContent from "@library/content/UserContent";
+import { FormToggle } from "@library/forms/FormToggle";
 import { ActionBar } from "@library/headers/ActionBar";
 import { ErrorIcon } from "@library/icons/common";
 import Frame from "@library/layout/frame/Frame";
@@ -19,12 +22,13 @@ import { useUrlSearchParams } from "@library/routing/QueryString";
 import TextEditor from "@library/textEditor/TextEditor";
 import { getSiteSection, siteUrl } from "@library/utility/appUtils";
 import { escapeHTML } from "@vanilla/dom-utils";
-import { useAsyncFn, useLastValue, useSessionStorage } from "@vanilla/react-utils";
+import { useAsyncFn, useLastValue } from "@vanilla/react-utils";
 import { useApiContext } from "@vanilla/ui";
 import React, { useEffect, useMemo, useState } from "react";
 
 export default function LayoutPlaygroundPage() {
-    const [spec, setSpec] = useSessionStorage("hydrateSpec", "");
+    const { setLocalSpec: setSpec, localSpec: spec, updateDbSpec, isUpdating } = usePlaygroundSpec();
+    const { isSetup, isSetupLoading, setIsSetup } = usePlaygroundSetup();
     const [isResultOpen, setIsResultOpen] = useState(false);
     const api = useApiContext();
 
@@ -57,6 +61,11 @@ export default function LayoutPlaygroundPage() {
     useEffect(() => {
         if (prevStatus === "loading" && hydrateState.status !== "loading") {
             setIsResultOpen(true);
+
+            // If it was successful and we are setup save it.
+            if (isSetup && hydrateState.status === "success") {
+                updateDbSpec();
+            }
         }
     }, [prevStatus, hydrateState.status]);
 
@@ -79,6 +88,16 @@ export default function LayoutPlaygroundPage() {
                     callToActionTitle="Hydrate"
                     noBackLink
                     title={"Layout Editor"}
+                    additionalActions={
+                        <FormToggle
+                            slim
+                            enabled={isSetup ?? false}
+                            onChange={setIsSetup}
+                            visibleLabel={"Enable custom homepage"}
+                            indeterminate={isSetupLoading}
+                            disabled={isSetupLoading}
+                        />
+                    }
                 />
             </form>
             <TextEditor
@@ -97,9 +116,13 @@ export default function LayoutPlaygroundPage() {
                 isVisible={isResultOpen}
             >
                 <Frame
+                    canGrow
+                    className={css({
+                        maxHeight: "initial",
+                    })}
                     header={<FrameHeader closeFrame={() => setIsResultOpen(false)} title={"Result"} />}
                     body={
-                        <FrameBody>
+                        <FrameBody selfPadded>
                             {error && (
                                 <Message
                                     icon={<ErrorIcon />}

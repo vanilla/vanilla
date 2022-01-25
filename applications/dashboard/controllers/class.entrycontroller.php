@@ -8,6 +8,8 @@
  * @since 2.0
  */
 
+use Vanilla\Utility\DebugUtils;
+
 /**
  * Handles /entry endpoint.
  */
@@ -377,7 +379,7 @@ class EntryController extends Gdn_Controller {
             $url = str_ireplace('{target}', rawurlencode(url($target, true)), $url);
 
             if (($this->deliveryType() == DELIVERY_TYPE_ALL && strcasecmp($this->data('Method'), 'POST') != 0) ||
-                (defined('TESTMODE_ENABLED') && TESTMODE_ENABLED)
+                (DebugUtils::isTestMode())
             ) {
                 redirectTo(url($url, true), 302, false);
             } else {

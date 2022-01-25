@@ -480,16 +480,20 @@ class Gdn_Theme {
 
                 $module->Visible = true;
 
-                // Add properties passed in from the controller.
-                $controllerProperties = Gdn::controller()->data('_properties.'.strtolower($name), []);
-                $properties = array_merge($controllerProperties, $properties);
+                if ($module instanceof \Vanilla\Widgets\React\CombinedPropsWidgetInterface) {
+                    $module->setProps($properties);
+                } else {
+                    // Add properties passed in from the controller.
+                    $controllerProperties = Gdn::controller()->data('_properties.'.strtolower($name), []);
+                    $properties = array_merge($controllerProperties, $properties);
 
-                foreach ($properties as $name => $value) {
-                    // Check for a setter method
-                    if (method_exists($module, $method = 'set'.ucfirst($name))) {
-                        $module->$method($value);
-                    } else {
-                        $module->$name = $value;
+                    foreach ($properties as $name => $value) {
+                        // Check for a setter method
+                        if (method_exists($module, $method = 'set'.ucfirst($name))) {
+                            $module->$method($value);
+                        } else {
+                            $module->$name = $value;
+                        }
                     }
                 }
 

@@ -111,6 +111,7 @@ class TrackableCommunityModel {
         $firstCommentID = $discussion['firstCommentID'] ?? $discussion['FirstCommentID'] ?? null;
         $discussion = $schema->validate($discussion);
 
+        $discussion['discussionType'] = ucfirst($discussion['type']);
         $discussion['firstCommentID'] = $firstCommentID;
         $discussion['category'] = $this->getTrackableCategory($discussion['categoryID']);
         $discussion['categoryAncestors'] = self::getCategoryAncestors($discussion['categoryID']);
@@ -140,6 +141,7 @@ class TrackableCommunityModel {
         $discussionData = ArrayUtils::camelCase($discussionData);
         $schema = $this->discussionModel->schema();
         $discussionData = $schema->validate($discussionData, true);
+        $discussionData['discussionType'] = ucfirst($discussionData['type'] ?? 'Discussion');
         $discussionData["firstCommentID"] = null;
         $discussionData["category"] = $this->getTrackableCategory($discussionData["categoryID"]);
         $discussionData["categoryAncestors"] = self::getCategoryAncestors($discussionData["categoryID"]);

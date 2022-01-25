@@ -2,7 +2,7 @@
 /**
  * Contains useful functions for cleaning up the database.
  *
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Dashboard
  * @since 2.1
@@ -17,7 +17,6 @@ use Vanilla\Dashboard\Events\LogPostEvent;
 use Vanilla\PrunableTrait;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Web\Middleware\LogTransactionMiddleware;
-use Vanilla\Logger;
 
 /**
  * Handles additional logging.
@@ -149,7 +148,6 @@ class LogModel extends Gdn_Pluggable implements LoggerAwareInterface {
      *
      * @param array $where The where clause.
      * @param array $options Options for the delete.
-     * @return mixed
      */
     public function delete($where = [], $options = []) {
         $keysAreIDs = true;
@@ -241,8 +239,8 @@ class LogModel extends Gdn_Pluggable implements LoggerAwareInterface {
                     $record != false ? $record : $log["Data"],
                     "user",
                     Gdn::session()->UserID,
-                    $log["RecordUserID"],
-                    "negative"
+                    "negative",
+                    $log["RecordUserID"]
                 );
 
                 if ($record) {
@@ -265,8 +263,8 @@ class LogModel extends Gdn_Pluggable implements LoggerAwareInterface {
                     $log["Data"],
                     "user",
                     Gdn::session()->UserID,
-                    $log["RecordUserID"],
                     "negative",
+                    $log["RecordUserID"],
                     ["recordID" => false]
                 );
             }
@@ -1113,8 +1111,8 @@ class LogModel extends Gdn_Pluggable implements LoggerAwareInterface {
                 $log["Data"],
                 "user",
                 Gdn::session()->UserID,
-                $log["RecordUserID"],
                 "positive",
+                $log["RecordUserID"],
                 !empty($log["RecordID"]) ? [] : ["recordID" => false]
             );
 
@@ -1175,8 +1173,8 @@ class LogModel extends Gdn_Pluggable implements LoggerAwareInterface {
      * @param array $data The data to be dispatched in the event.
      * @param string $source The source responsible for logging the post (either "User" or a plugin).
      * @param int $discipliningUserID The id of the user inserting or editing the post.
-     * @param int $disciplinedUserID The id of the disciplining user.
      * @param string $disciplineType The discipline type (positive or negative).
+     * @param int $disciplinedUserID The id of the disciplining user.
      * @param array $options Array of options.
      * @return LogPostEvent
      */
@@ -1186,12 +1184,12 @@ class LogModel extends Gdn_Pluggable implements LoggerAwareInterface {
         array  $data,
         string $source,
         int $discipliningUserID,
-        int $disciplinedUserID,
         string $disciplineType,
+        int $disciplinedUserID = null,
         array  $options = []
     ): LogPostEvent {
         $discipliningUser = Gdn::userModel()->getFragmentByID($discipliningUserID);
-        $disciplinedUser = Gdn::userModel()->getFragmentByID($disciplinedUserID);
+        $disciplinedUser = Gdn::userModel()->getFragmentByID($disciplinedUserID ?? -1, true);
         $hasRecordID = (!isset($options["recordID"]) || $options["recordID"] !== false);
 
         switch (strtolower($recordType)) {

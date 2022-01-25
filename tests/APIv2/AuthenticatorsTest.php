@@ -8,6 +8,7 @@ namespace VanillaTests\APIv2;
 
 use Gdn_AuthenticationProviderModel;
 use Garden\Web\Exception\NotFoundException;
+use Vanilla\Web\CacheControlConstantsInterface;
 
 /**
  * Class AuthenticatorsTest
@@ -99,6 +100,9 @@ class AuthenticatorsTest extends AbstractAPIv2Test {
         $response = $this->api()->get("authenticators/{$rowID}");
         $this->assertSame(200, $response->getStatusCode());
         $this->assertCamelCase($response->getBody());
+
+        $header = $response->getHeaderLines('cache-control');
+        $this->assertSame(CacheControlConstantsInterface::NO_CACHE, $header[0]);
     }
 
     /**

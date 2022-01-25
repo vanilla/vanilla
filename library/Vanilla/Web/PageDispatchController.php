@@ -48,8 +48,10 @@ class PageDispatchController implements CustomExceptionHandler, InjectableInterf
     /**
      * Instantiate a page class and set it as the active instance.
      *
-     * @param string $pageClass
-     * @return Page The instance of the requested page.
+     * @template T of Page
+     *
+     * @param class-string<T> $pageClass
+     * @return T The instance of the requested page.
      * @throws NotFoundException If the page class couldn't be located.
      * @throws ContainerException Error while retrieving the entry.
      */

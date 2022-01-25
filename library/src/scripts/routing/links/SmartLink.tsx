@@ -5,17 +5,19 @@
  */
 
 import React from "react";
-import { NavLink, NavLinkProps } from "react-router-dom";
+import { NavLink, NavLinkProps, useLocation } from "react-router-dom";
 import { makeLocationDescriptorObject, LinkContext, useLinkContext } from "@library/routing/links/LinkContextProvider";
 import { sanitizeUrl } from "@vanilla/utils";
 import { LocationDescriptor } from "history";
 import { siteUrl } from "@library/utility/appUtils";
+import { cx } from "@emotion/css";
 
 export interface ISmartLinkProps extends NavLinkProps {
     tabIndex?: number;
     to: LocationDescriptor;
     disabled?: boolean;
     className?: string;
+    active?: boolean;
 }
 
 /**
@@ -35,7 +37,7 @@ export interface ISmartLinkProps extends NavLinkProps {
  * Result = https://test.com/root/someUrl/deeper/nested (full refresh)
  */
 export default React.forwardRef(function SmartLink(props: ISmartLinkProps, ref: React.Ref<HTMLAnchorElement>) {
-    const { replace, ...passthru } = props;
+    const { replace, active = false, ...passthru } = props;
     const context = useLinkContext();
 
     // Filter out undefined props
@@ -53,7 +55,6 @@ export default React.forwardRef(function SmartLink(props: ISmartLinkProps, ref: 
                 {...passthru}
                 innerRef={ref}
                 to={makeLocationDescriptorObject(props.to, href)}
-                activeClassName="isCurrent"
                 tabIndex={props.tabIndex ? props.tabIndex : 0}
                 replace={replace}
             />
@@ -62,12 +63,12 @@ export default React.forwardRef(function SmartLink(props: ISmartLinkProps, ref: 
         const isForeign = !href.startsWith(siteUrl(""));
         return (
             <a
+                aria-current={active ? "page" : false}
                 ref={ref}
                 href={sanitizeUrl(href)}
                 tabIndex={props.tabIndex ? props.tabIndex : 0}
                 target={isForeign ? "_blank" : undefined}
                 rel={isForeign ? "noopener noreferrer" : props.rel}
-                className={props.className}
                 {...passthru}
             />
         );

@@ -1222,4 +1222,58 @@ class CategoryModelTest extends SiteTestCase {
 
         $this->assertNotEquals($categoryOneFromTree["CssClass"], $categoryTwoFromTree["CssClass"]);
     }
+
+    /**
+     * Test `categoryModel->getVisibleCategoryIDs()`'s `filterHideDiscussions` option.
+     */
+    public function testGetVisibleCategoryIDsFilterHideDiscussions(): void {
+        // Create 2 Categories. The second one has `HideAllDiscussions` set to 1.
+        $category1 = $this->createCategory();
+        $category2 = $this->createCategory();
+        $this->categoryModel->setField($category2['categoryID'], 'HideAllDiscussions', 1);
+
+        // Obtain an unfiltered list of visible category IDs.
+        $unfilteredVisibleCategoryIDs = $this->categoryModel->getVisibleCategoryIDs(['forceArrayReturn' => true]);
+        // Assert that both categories exists within the list of IDs.
+        $this->assertTrue(in_array($category1['categoryID'], $unfilteredVisibleCategoryIDs));
+        $this->assertTrue(in_array($category2['categoryID'], $unfilteredVisibleCategoryIDs));
+
+        // Get a filtered list of visible category IDs where categories with `HideAllDiscussions`set to 1 are ignored.
+        $filteredVisibleCategoryIDs = $this->categoryModel->getVisibleCategoryIDs(
+            [
+                'forceArrayReturn' => true,
+                'filterHideDiscussions' => true
+            ]
+        );
+
+        // Assert that $category2 is left out of the list of IDs.
+        $this->assertTrue(in_array($category1['categoryID'], $filteredVisibleCategoryIDs));
+        $this->assertFalse(in_array($category2['categoryID'], $filteredVisibleCategoryIDs));
+    }
+
+    /**
+     * Test that when a child category is deleted, the CountCategories field of its parent is updated.
+     */
+    public function testCountCategoriesUpdated(): void {
+        // Create a category.
+        $parentCategory = $this->createCategory();
+        $parentID = $parentCategory["categoryID"];
+
+        // Add some children
+        $childCatOne = $this->createCategory(['parentCategoryID' => $parentID]);
+        $childCatTwo = $this->createCategory(['parentCategoryID' => $parentID]);
+
+        // Test that CountCategories reflects the added children.
+        $updatedParentCategory = $this->categoryModel->getID($parentID, DATASET_TYPE_ARRAY);
+        $this->assertSame($updatedParentCategory["CountCategories"], 2);
+
+        // Test that CountCategories reflects change when children are deleted.
+        $this->categoryModel->deleteID($childCatOne['categoryID']);
+        $parentCategoryOneChildDeleted = $this->categoryModel->getID($parentID, DATASET_TYPE_ARRAY);
+        $this->assertSame($parentCategoryOneChildDeleted["CountCategories"], 1);
+
+        $this->categoryModel->deleteID($childCatTwo['categoryID']);
+        $parentCategoryTwoChildrenDeleted = $this->categoryModel->getID($parentID, DATASET_TYPE_ARRAY);
+        $this->assertSame($parentCategoryTwoChildrenDeleted["CountCategories"], 0);
+    }
 }

@@ -5,10 +5,7 @@
  */
 
 import { cx } from "@emotion/css";
-import { forceInt } from "@vanilla/utils";
-import { isInteger } from "lodash";
-import React from "react";
-import { number } from "yargs";
+import React, { useMemo } from "react";
 import { InputSize } from "../../types";
 import { inputClasses } from "../shared/input.styles";
 
@@ -33,7 +30,7 @@ export const NumberBox = React.forwardRef(function NumberBoxImpl(
     forwardedRef: React.Ref<HTMLInputElement>,
 ) {
     const { size, value, onValueChange, min, max, ...otherProps } = props;
-    const classes = inputClasses({ size });
+    const classes = useMemo(() => inputClasses({ size }), [size]);
 
     const handleIncrement = () => {
         onValueChange && onValueChange(Math.min(value + 1, max ?? Number.MAX_SAFE_INTEGER));

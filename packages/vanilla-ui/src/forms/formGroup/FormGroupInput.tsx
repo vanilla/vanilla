@@ -5,7 +5,7 @@
  */
 
 import { cx } from "@emotion/css";
-import React, { useContext } from "react";
+import React, { useContext, useMemo } from "react";
 import { FormGroupContext } from "./FormGroup";
 import { formGroupClasses } from "./FormGroup.styles";
 
@@ -27,7 +27,7 @@ export const FormGroupInput = React.forwardRef(function FormGroupInputImpl(
 ) {
     const { children, className, ...otherProps } = props;
     const { inputID, labelID, sideBySide } = useContext(FormGroupContext);
-    const classes = formGroupClasses({ sideBySide });
+    const classes = useMemo(() => formGroupClasses({ sideBySide }), [sideBySide]);
 
     return (
         <div {...otherProps} className={cx(classes.inputContainer, className)} ref={forwardedRef}>

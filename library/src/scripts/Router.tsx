@@ -41,11 +41,7 @@ export function Router(props: IProps) {
         </Switch>
     );
 
-    routes = (
-        <BackRoutingProvider>
-            <BannerContextProvider>{routes}</BannerContextProvider>
-        </BackRoutingProvider>
-    );
+    routes = <BackRoutingProvider>{routes}</BackRoutingProvider>;
     if (!props.disableDynamicRouting) {
         routes = (
             <LinkContextProvider linkContexts={(props.sectionRoots ?? ["/"])?.map((root) => formatUrl(root, true))}>

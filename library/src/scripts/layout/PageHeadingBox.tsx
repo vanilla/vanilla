@@ -24,11 +24,10 @@ interface IProps {
     actions?: React.ReactNode;
     includeBackLink?: boolean;
     options?: Partial<IPageHeadingBoxOptions>;
-    titleCount?: string;
 }
 
 export function PageHeadingBox(props: IProps) {
-    const { title, description, subtitle, actions, includeBackLink, titleCount } = props;
+    const { title, description, subtitle, actions, includeBackLink } = props;
     const options = pageHeadingBoxVariables(props.options).options;
     const classes = pageHeadingBoxClasses(props.options);
     const { subtitleType } = options;
@@ -40,16 +39,6 @@ export function PageHeadingBox(props: IProps) {
     if (!title && !description && !subtitle && !actions) {
         return <></>;
     }
-
-    const titleCountView = titleCount ? (
-        <>
-            <span className={classes.titleCount}>
-                <span title={titleCount}>{titleCount}</span>
-            </span>
-        </>
-    ) : (
-        <></>
-    );
 
     const subtitleView = subtitle ? (
         <Heading className={cx(classes.subtitle, "subtitle")} depth={depth + 1}>
@@ -63,12 +52,7 @@ export function PageHeadingBox(props: IProps) {
         <div ref={wrapperRef} className={cx(classes.root, contextClasses.headingBlockClass, "pageHeadingBox")}>
             {subtitleType === SubtitleType.OVERLINE && subtitleView}
             <div className={classes.titleWrap}>
-                <PageHeading
-                    depth={depth}
-                    actions={actions}
-                    titleCount={titleCountView}
-                    includeBackLink={includeBackLink ?? false}
-                >
+                <PageHeading depth={depth} actions={actions} includeBackLink={includeBackLink ?? false}>
                     {title}
                 </PageHeading>
             </div>

@@ -15,8 +15,6 @@ import { ensureColorHelper } from "@library/styles/styleHelpersColors";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { LocalVariableMapping } from "@library/styles/VariableMapping";
 import { metasVariables } from "@library/metas/Metas.variables";
-import { IHomeWidgetContainerOptions } from "@library/homeWidget/HomeWidgetContainer.styles";
-import { BorderType } from "@library/styles/styleHelpersBorders";
 
 export const tagsVariables = useThemeCache(() => {
     /**
@@ -251,13 +249,12 @@ export enum TagListStyle {
     CLOUD = "cloud",
 }
 
-export const tagCloudVariables = useThemeCache((options?: IHomeWidgetContainerOptions) => {
-    const makeThemeVars = variableFactory("tags", options, [
+export const tagCloudVariables = useThemeCache(() => {
+    const makeThemeVars = variableFactory("tags", undefined, [
         new LocalVariableMapping({
             tagCloud: "tagItem",
         }),
     ]);
-    const globalVars = globalVariables();
 
     /**
      * @varGroup tags.tagCloud
@@ -271,17 +268,6 @@ export const tagCloudVariables = useThemeCache((options?: IHomeWidgetContainerOp
          * @enum cloud | list
          */
         type: TagListStyle.CLOUD,
-
-        /**
-         * @varGroup tags.tagCloud.box
-         * @commonTitle tagCloud - box
-         * @expand box
-         */
-        box: Variables.box({
-            background: options?.innerBackground,
-            borderType: options?.borderType as BorderType,
-            border: globalVars.border,
-        }),
 
         /**
          * @var tags.tagCloud.tagPreset

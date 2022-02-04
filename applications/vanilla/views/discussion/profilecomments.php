@@ -10,7 +10,7 @@ if (!function_exists('replaceCommentBlockQuotes')) :
      */
     function replaceCommentBlockQuotes($comment) {
         $reg = '/<blockquote(.*)<\/blockquote>/s';
-        $parsedBody = Gdn::formatService()->renderHTML($comment->Body, $comment->Format, ['recordID' => $comment->CommentIDm, 'recordType' => 'comment']);
+        $parsedBody = Gdn::formatService()->renderHTML($comment->Body, $comment->Format);
         return preg_replace($reg, "\n(Quote)\n", $parsedBody);
     }
 endif;

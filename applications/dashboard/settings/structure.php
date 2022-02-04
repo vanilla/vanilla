@@ -432,7 +432,6 @@ $Construct->table('AnalyticsLocal')
 
 $uploadPermission = 'Garden.Uploads.Add';
 $uploadPermissionExists = $Construct->table('Permission')->columnExists($uploadPermission);
-$oldUploadPermission = 'Plugins.Attachments.Upload.Allow';
 
 // Only Create the permission table if we are using Garden's permission model.
 $PermissionModel = Gdn::permissionModel();
@@ -503,22 +502,6 @@ if ($uploadPermissionExists === false) {
             }
         }
     }
-}
-
-if ($Construct->table('Permission')->columnExists($oldUploadPermission) &&
-    $Construct->table('Permission')->columnExists($uploadPermission)) {
-    // We aren't using the old upload permission anymore and should just rely on the new one.
-    // We'll migrate the old permission values to the new permission values to preserve the settings.
-    // That means if a role currently has one permission and not the other, the permission value may
-    // change.
-
-    $SQL->update("Permission")
-        ->set("`".$uploadPermission."`", 1)
-        ->where("`".$uploadPermission."`", 0)
-        ->where("`".$oldUploadPermission."`", 1)
-        ->put();
-
-    $Construct->table('Permission')->dropColumn($oldUploadPermission);
 }
 
 // Invitation Table

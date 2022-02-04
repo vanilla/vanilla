@@ -27,24 +27,22 @@ export const quickLinksVariables = useThemeCache((forcedVars?: IThemeVariables) 
 
     /**
      * @varGroup quickLinks.box
-     * @title Box
+     * @title Quick Links - Box
      * @expand box
      */
     const box = makeThemeVars("box", Variables.box(globalVars.panelBoxes.depth2));
 
     const links: INavigationVariableItem[] = makeThemeVars("links", []);
-
     const counts: Record<string, number | null> = makeThemeVars("counts", {});
 
     /**
      * @varGroup quickLinks.list
-     * @description Variables affecting the appearance of the list.
      */
     const list = makeThemeVars("list", {
         /**
          * @varGroup quickLinks.list.spacing
-         * @title Spacing
-         * @description Can be used to change the default space between the title and the list items.
+         * @title Margin
+         * @description Will be used in cases when we want to change the default space between title and list.
          * @expand spacing
          */
         spacing: Variables.spacing({}),
@@ -52,7 +50,6 @@ export const quickLinksVariables = useThemeCache((forcedVars?: IThemeVariables) 
 
     /**
      * @varGroup quickLinks.listItem
-     * @description Variables affecting the appearance of list items.
      */
     const listInit = makeThemeVars("listItem", {
         /**
@@ -82,7 +79,7 @@ export const quickLinksVariables = useThemeCache((forcedVars?: IThemeVariables) 
         /**
          * @varGroup quickLinks.listItem.font
          * @Title Font
-         * @description The font applied to the list items
+         * @commonDescription The font applied to the list items
          * @expand font
          */
         font: Variables.font({
@@ -100,21 +97,20 @@ export const quickLinksVariables = useThemeCache((forcedVars?: IThemeVariables) 
         /**
          * @varGroup quickLinks.listItem.fontState
          * @Title Font (state)
-         * @description The font applied to the links when hovered, focused, or active
+         * @commonDescription The font applied to the links when hovered, focused, or active
          * @expand font
          */
         fontState: Variables.font({
-            ...listInit.font,
             color:
                 listInit.font.color === globalVars.mainColors.fg
-                    ? globalVars.links.colors.active
+                    ? globalVars.mainColors.stateSecondary
                     : ColorsUtils.offsetLightness(listInit.font.color!, 0.05),
         }),
 
         /**
          * @varGroup quickLinks.listItem.padding
          * @title Padding
-         * @description The difference between padding and spacing
+         * @commonDescription The difference between padding and spacing
          * will only be apparent when there is a border or background color.
          * @expand spacing
          */
@@ -124,8 +120,8 @@ export const quickLinksVariables = useThemeCache((forcedVars?: IThemeVariables) 
         }),
         /**
          * @varGroup quickLinks.listItem.spacing
-         * @title Spacing
-         * @description The difference between padding and spacing
+         * @title Padding
+         * @commonDescription The difference between padding and spacing
          * will only be apparent when there is a border or background color.
          * @expand spacing
          */
@@ -135,16 +131,12 @@ export const quickLinksVariables = useThemeCache((forcedVars?: IThemeVariables) 
     });
 
     /**
-     * @varGroup quickLinks.count
-     * @title Count
-     * @description Use these variables to customize the appearance of the count that appears by some quick links.
+     * @varGroup quickLinks.count.font
+     * @title QuickLinks - Count Font
+     * @description Some quick links may have a count.
+     * @expand font
      */
     const count = makeThemeVars("count", {
-        /**
-         * @varGroup quickLinks.count.font
-         * @title Font
-         * @expand font
-         */
         font: {
             ...listItem.font,
             color: globalVars.mainColors.fg,

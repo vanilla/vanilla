@@ -48,7 +48,6 @@ export const AutoCompleteOption = React.forwardRef(function AutoCompleteOptionIm
                 {props.data?.parentLabel && (
                     <span className={classes.parentLabel}>{` - ${props.data.parentLabel}`}</span>
                 )}
-                {props.data?.labelSuffix}
             </div>
             {selected && (
                 <span className={classes.checkmarkContainer}>

@@ -9,6 +9,7 @@
  */
 
 use Garden\EventManager;
+use Garden\Events\GenericResourceEvent;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Vanilla\Community\Events\CommentEvent;
@@ -1192,35 +1193,46 @@ class LogModel extends Gdn_Pluggable implements LoggerAwareInterface {
         $disciplinedUser = Gdn::userModel()->getFragmentByID($disciplinedUserID ?? -1, true);
         $hasRecordID = (!isset($options["recordID"]) || $options["recordID"] !== false);
 
+        $resourceEvent = null;
+
         switch (strtolower($recordType)) {
             case "comment":
                 if ($hasRecordID) {
                     $commentModel = CommentModel::instance();
                     $payloadData = $commentModel->getID($data["CommentID"] ?? $data["RecordID"], DATASET_TYPE_ARRAY);
                     if ($payloadData !== false) {
-                        $commentEvent = $commentModel->eventFromRow($payloadData, "log{$operation}");
+                        $resourceEvent = $commentModel->eventFromRow($payloadData, "log{$operation}");
                     }
                 }
-                if (!isset($commentEvent)) {
+                if (!isset($resourceEvent)) {
                     $payloadData = self::normalizeLogPostDataWithNoRecordID($recordType, $data);
-                    $commentEvent = new CommentEvent("log{$operation}", $payloadData);
+                    $resourceEvent = new CommentEvent("log{$operation}", $payloadData);
                 }
-                return new LogPostEvent($commentEvent, $source, $discipliningUser, $disciplinedUser, $disciplineType, $options);
+                break;
             case "discussion":
                 if ($hasRecordID) {
                     $discussionModel = DiscussionModel::instance();
                     $payloadData = $discussionModel->getID($data["DiscussionID"] ?? $data["RecordID"], DATASET_TYPE_ARRAY);
                     if ($payloadData !== false) {
-                        $discussionEvent = $discussionModel->eventFromRow($payloadData, "log{$operation}");
+                        $resourceEvent = $discussionModel->eventFromRow($payloadData, "log{$operation}");
                     }
                 }
 
-                if (!isset($discussionEvent)) {
+                if (!isset($resourceEvent)) {
                     $payloadData = self::normalizeLogPostDataWithNoRecordID($recordType, $data);
-                    $discussionEvent = new DiscussionEvent("log{$operation}", $payloadData);
+                    $resourceEvent = new DiscussionEvent("log{$operation}", $payloadData);
                 }
-                return new LogPostEvent($discussionEvent, $source, $discipliningUser, $disciplinedUser, $disciplineType, $options);
+                break;
+            default:
+                $resourceEvent = new GenericResourceEvent(
+                    $operation,
+                    [$recordType => $data],
+                    $discipliningUser
+                );
+                $resourceEvent->setType($recordType);
+                break;
         }
+        return new LogPostEvent($resourceEvent, $source, $discipliningUser, $disciplinedUser, $disciplineType, $options);
     }
 
     /**

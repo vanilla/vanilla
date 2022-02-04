@@ -9,7 +9,6 @@ namespace VanillaTests\APIv2;
 use AccessTokenModel;
 use Garden\Web\Exception\ForbiddenException;
 use Vanilla\CurrentTimeStamp;
-use Vanilla\Web\CacheControlConstantsInterface;
 use VanillaTests\UsersAndRolesApiTestTrait;
 
 /**
@@ -77,7 +76,6 @@ class TokensTest extends AbstractAPIv2Test {
         );
 
         $this->assertEquals(200, $r->getStatusCode());
-        $this->assertEquals(CacheControlConstantsInterface::NO_CACHE, $r->getHeader('cache-control'));
 
         $body = $r->getBody();
         $this->assertCamelCase($body);
@@ -173,7 +171,7 @@ class TokensTest extends AbstractAPIv2Test {
                 [
                     'type' => 'global',
                     'permissions' => [
-                        'session.valid' => true
+                        'signIn.allow' => true
                     ]
                 ]
             ]
@@ -184,7 +182,7 @@ class TokensTest extends AbstractAPIv2Test {
                 [
                     'type' => 'global',
                     'permissions' => [
-                        'session.valid' => true
+                        'signIn.allow' => true
                     ]
                 ]
             ]
@@ -220,14 +218,6 @@ class TokensTest extends AbstractAPIv2Test {
 
         $this->assertEquals($user1TokenExpires, $user2TokenExpires);
         $this->assertEquals($user2TokenExpires, $user3TokenExpires);
-    }
-
-    /**
-     * Test that the `/tokens` header cache-control is set to no-cache.
-     */
-    public function testNoCache() {
-        $r = $this->api()->get($this->baseUrl);
-        $this->assertEquals(CacheControlConstantsInterface::NO_CACHE, $r->getHeader('cache-control'));
     }
 
 }

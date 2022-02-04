@@ -17,7 +17,6 @@ use Psr\Log\LoggerInterface;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\Contracts\ConfigurationInterface;
-use Vanilla\FeatureFlagHelper;
 use Vanilla\Utility\DebugUtils;
 use Vanilla\Utility\Timers;
 
@@ -806,21 +805,19 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                 case 'Test':
                     decho($matchRoute, 'Route');
                     decho([
-                        'Path' => $request->getPath(),
+                        'Path' => $request->path(),
                         'Get' => $request->get()
                     ], 'Request');
                     die();
             }
-        } elseif (in_array($request->getPath(), ['', '/'])) {
+        } elseif (in_array($request->path(), ['', '/'])) {
             $this->isHomepage = true;
-            if (FeatureFlagHelper::featureEnabled("CustomLayoutHomePage")) {
-                // With custom layout homepages, leave the request alone.
-                return $request;
+            $defaultController = Gdn::router()->getDefaultRoute();
+            $originalGet = $request->get();
+            $request->pathAndQuery($defaultController['Destination']);
+            if (is_array($originalGet) && count($originalGet) > 0) {
+                $request->setQuery(array_merge($request->get(), $originalGet));
             }
-
-            // Otherwise grab the home route destination from the router.
-            $homePath = Gdn::router()->getDefaultRoute()['Destination'];
-            $request->setPath($homePath);
         }
 
         return $request;

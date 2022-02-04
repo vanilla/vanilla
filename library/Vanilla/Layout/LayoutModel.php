@@ -1,21 +1,19 @@
 <?php
 /**
  * @author Dan Redman <dredman@higherlogic.com>
- * @copyright 2009-2022 Higher Logic LLC.
+ * @copyright 2009-2021 Higher Logic LLC.
  * @license GPL-2.0-only
  */
 
 namespace Vanilla\Layout;
 
 use Garden\Schema\Schema;
-use Vanilla\ApiUtils;
 use Vanilla\Database\Operation\CurrentDateFieldProcessor;
 use Vanilla\Database\Operation\CurrentUserFieldProcessor;
 use Vanilla\Database\Operation\JsonFieldProcessor;
 use Vanilla\Layout\Providers\MutableLayoutProviderInterface;
 use Vanilla\Models\Model;
 use Vanilla\Models\PipelineModel;
-use Vanilla\Utility\ModelUtils;
 
 /**
  * Model for managing persisted layout data
@@ -24,9 +22,6 @@ class LayoutModel extends PipelineModel implements MutableLayoutProviderInterfac
 
     //region Properties
     private const TABLE_NAME = 'layout';
-
-    /** @var LayoutModel $layoutViewModel */
-    private $layoutViewModel;
 
     //endregion
 
@@ -37,13 +32,11 @@ class LayoutModel extends PipelineModel implements MutableLayoutProviderInterfac
      * @param CurrentUserFieldProcessor $userFieldProcessor
      * @param CurrentDateFieldProcessor $dateFieldProcessor
      * @param JsonFieldProcessor $jsonFieldProcessor
-     * @param LayoutViewModel $layoutViewModel
      */
     public function __construct(
         CurrentUserFieldProcessor $userFieldProcessor,
         CurrentDateFieldProcessor $dateFieldProcessor,
-        JsonFieldProcessor        $jsonFieldProcessor,
-        LayoutViewModel           $layoutViewModel
+        JsonFieldProcessor        $jsonFieldProcessor
     ) {
         parent::__construct(self::TABLE_NAME);
 
@@ -55,7 +48,6 @@ class LayoutModel extends PipelineModel implements MutableLayoutProviderInterfac
 
         $jsonFieldProcessor->setFields(['layout']);
         $this->addPipelineProcessor($jsonFieldProcessor);
-        $this->layoutViewModel = $layoutViewModel;
     }
     //endregion
 
@@ -88,53 +80,14 @@ class LayoutModel extends PipelineModel implements MutableLayoutProviderInterfac
      * Normalize a layout record from the database into API output.
      *
      * @param array $row Layout record from database row
-     * @param array|string|bool $expand Additional parameters used to expand output based on row property values
+     * @param array $expand Additional parameters used to expand output based on row property values
      * @return array Normalized row
      */
-    public function normalizeRow(array $row, $expand = false): array {
-
+    public function normalizeRow(array $row, array $expand = []): array {
         // File-based layouts are set as defaults, which have string IDs
         $row['isDefault'] = !is_numeric($row['layoutID']);
-        if (ModelUtils::isExpandOption('layoutViews', $expand)) {
-            $row['layoutViews'] = $this->layoutViewModel->normalizeRows($this->layoutViewModel->getViewsByLayoutID($row['layoutID']), $expand);
-        }
+        $row['isActive'] = false; //TODO: derive the value based on whether any layout views reference this layout ID
         return $row;
-    }
-
-    /**
-     * Normalize a layout records from the database into API output.
-     *
-     * @param array $rows Layout record from database rows
-     * @param array|string|bool $expand Additional parameters used to expand output based on row property values
-     * @return array Normalized row
-     */
-    public function normalizeRows(array $rows, $expand): array {
-        $layoutViews = [];
-        if (ModelUtils::isExpandOption('layoutViews', $expand)) {
-            // Get all of the IDs from the result row
-            $ids = array_map(function (array $row) {
-                return $row['layoutID'];
-            }, $rows);
-            //expand layout Views based on layoutIDs .
-            $layoutViews = $this->layoutViewModel->normalizeRows($this->layoutViewModel->getViewsByLayoutIDs($ids), $expand);
-        }
-
-        $rows = array_map(function (array $row) use ($layoutViews, $expand) {
-            $row = $this->normalizeRow($row);
-            //If expand parameter present add layoutViews to the request.
-            if (!$row['isDefault'] && ModelUtils::isExpandOption('layoutViews', $expand)) {
-                $currentLayoutModel = array_filter($layoutViews, function ($layoutView) use ($row) {
-                    if ($layoutView['layoutID'] == $row['layoutID']) {
-                        $layoutView['layoutViewType'] = $row['layoutViewType'];
-                    }
-                    return $layoutView;
-                });
-                $row['layoutViews'] = $currentLayoutModel;
-            }
-            return $row;
-        }, $rows);
-
-        return $rows;
     }
 
     //region Schema retrieval methods
@@ -148,23 +101,6 @@ class LayoutModel extends PipelineModel implements MutableLayoutProviderInterfac
     }
 
     /**
-     * Get the schema to use when inputting a layout's metadata.
-     *
-     * @param bool $includesLayoutID include Layout ID in the schema or not.
-     *
-     * @return Schema
-     */
-    public function getQueryInputSchema($includesLayoutID = false): Schema {
-        $schema = [
-            'expand?' => ApiUtils::getExpandDefinition(['layoutViews'])
-        ];
-        if ($includesLayoutID) {
-            $schema += ["layoutID:i|s"];
-        }
-        return Schema::parse($schema);
-    }
-
-    /**
      * Get the schema to use when outputting a layout's metadata.
      *
      * @return Schema
@@ -175,11 +111,11 @@ class LayoutModel extends PipelineModel implements MutableLayoutProviderInterfac
             "name:s",
             "layoutViewType:s",
             "isDefault:b",
+            "isActive:b",
             "insertUserID:i",
             "dateInserted:dt",
             "updateUserID:i?",
-            "dateUpdated:dt?",
-            'layoutViews:a?'
+            "dateUpdated:dt?"
         ]);
     }
 
@@ -194,6 +130,7 @@ class LayoutModel extends PipelineModel implements MutableLayoutProviderInterfac
             "name:s",
             "layoutViewType:s",
             "isDefault:b",
+            "isActive:b",
             "layout:a",
         ]);
     }
@@ -214,7 +151,7 @@ class LayoutModel extends PipelineModel implements MutableLayoutProviderInterfac
      */
     public function getEditSchema(): Schema {
         return Schema::parse([
-            "layoutID:i|s",
+            "layoutID:i",
             "name:s" => ['maxLength' => 100],
             "layout:a"
         ]);

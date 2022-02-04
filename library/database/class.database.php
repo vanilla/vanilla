@@ -658,14 +658,9 @@ class Gdn_Database implements InjectableInterface {
                 'type' => $type,
             ];
             if ($type === 'string') {
-                $maxLength = $databaseField->Length ?? null;
+                $maxLength = $databaseField->ByteLength ?? $databaseField->Length ?? null;
                 if ($maxLength !== null) {
                     $field['maxLength'] = (int) $maxLength;
-                }
-
-                $maxByteLength = $databaseField->ByteLength ?? null;
-                if ($maxByteLength !== null) {
-                    $field['maxByteLength'] = (int) $maxByteLength;
                 }
             }
             if (is_array($databaseField->Enum) && !empty($databaseField->Enum)) {
@@ -678,6 +673,9 @@ class Gdn_Database implements InjectableInterface {
         }
 
         $schema = Schema::parse(['type' => 'object', 'properties' => $properties, 'required' => $required]);
+
+        // Database column size is in bytes, not unicode.
+        $schema->setFlag(Schema::VALIDATE_STRING_LENGTH_AS_UNICODE, false);
         return $schema;
     }
 

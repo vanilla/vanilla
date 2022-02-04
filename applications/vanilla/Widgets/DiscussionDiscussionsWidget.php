@@ -35,8 +35,7 @@ class DiscussionDiscussionsWidget extends DiscussionWidgetModule implements Reac
      * @inheridoc
      */
     public function getComponentName(): string {
-        // Temporarily this until we make a version supported grids and carousels.
-        return "DiscussionListModule";
+        return "DiscussionDiscussionsWidget";
     }
 
     /**

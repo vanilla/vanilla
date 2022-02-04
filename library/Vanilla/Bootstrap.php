@@ -206,7 +206,7 @@ class Bootstrap {
             ->rule("@new-search-route")
             ->setClass(\Garden\Web\ResourceRoute::class)
             ->setConstructorArgs(['/search', '*\\%sSearchPageController'])
-            ->addCall('setFeatureFlag', [SearchRootController::ENABLE_FLAG])
+            ->addCall('setThemeFeatureFlag', [SearchRootController::ENABLE_FLAG])
             ->addCall('setMeta', ['CONTENT_TYPE', 'text/html; charset=utf-8'])
             ->addCall('setRootController', [SearchRootController::class])
 
@@ -264,7 +264,7 @@ class Bootstrap {
             ->setConstructorArgs([PATH_CACHE.'/static-layouts'])
             ->addCall(
                 'registerStaticLayout',
-                ["home", PATH_ROOT."/library/Vanilla/Layout/Definitions/home.json"]
+                ["home", PATH_ROOT."/library/Vanilla/Layout/Definitions/home.yml"]
             )
 
             ->rule(Layout\LayoutService::class)

@@ -29,18 +29,16 @@ class FormatService {
      *
      * @param string $content The content to render.
      * @param string $format The format of the content.
-     * @param array $context context for logging.
      *
      * @return string
      */
-    public function renderHTML(string $content, ?string $format = null, ?array $context = null): string {
+    public function renderHTML(string $content, ?string $format): string {
         if (empty($content) && empty($format)) {
             return '';
         }
 
         return $this
             ->getFormatter($format)
-            ->setContext($context)
             ->renderHTML($content);
     }
 

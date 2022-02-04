@@ -479,8 +479,6 @@ class UsersApiController extends AbstractApiController {
 
         $response = $this->expandMiddleware->updateResponseByKey($result, 'userID', true);
         $response->setMeta(\Vanilla\Web\ApiFilterMiddleware::FIELD_ALLOW, ['email']);
-        $response->setHeader(self::HEADER_CACHE_CONTROL, self::NO_CACHE);
-
         return $response;
     }
 

@@ -3,6 +3,9 @@
     "description": "Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.",
     "version": "1.8.2",
     "mobileFriendly": true,
+    "registerPermissions": {
+        "Plugins.Attachments.Upload.Allow": "Garden.Profiles.Edit"
+    },
     "icon": "advanced-editor.png",
     "key": "editor",
     "type": "addon",

@@ -4,7 +4,11 @@
  * @license Proprietary
  */
 
-import LayoutErrorBoundary, { LayoutError } from "@library/features/Layout/LayoutErrorBoundary";
+import Translate from "@library/content/Translate";
+import LayoutErrorBoundary from "@library/features/Layout/LayoutErrorBoundary";
+import { ErrorIcon } from "@library/icons/common";
+import Message from "@library/messages/Message";
+import { t } from "@library/utility/appUtils";
 import { getComponent, IRegisteredComponent } from "@library/utility/componentRegistry";
 import { logDebug, RecordID } from "@vanilla/utils";
 import React from "react";
@@ -110,4 +114,24 @@ function resolveNestedComponents(componentProps: IDynamicComponent["$reactProps"
  */
 function isComponentConfig(object: { [key: string]: any }): object is IDynamicComponent {
     return object && object.hasOwnProperty("$reactComponent") && object.hasOwnProperty("$reactProps");
+}
+
+interface ILayoutErrorProps {
+    componentName: string;
+}
+
+function LayoutError(props: ILayoutErrorProps) {
+    return (
+        <>
+            <div style={{ width: "100%", height: "100%", padding: "16px" }}>
+                <Message
+                    type={"error"}
+                    icon={<ErrorIcon />}
+                    stringContents={`There was a problem loading "${
+                        props.componentName ?? t("Invalid component name")
+                    }"."`}
+                />
+            </div>
+        </>
+    );
 }

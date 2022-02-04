@@ -19,7 +19,6 @@ import { ClearIcon } from "../shared/ClearIcon";
 import { CloseIcon } from "../shared/CloseIcon";
 import { AutoCompleteOption, IAutoCompleteOption, IAutoCompleteOptionProps } from "./AutoCompleteOption";
 import { AutoCompleteContext, IAutoCompleteContext, IAutoCompleteInputState } from "./AutoCompleteContext";
-import { useComboboxContext } from "@reach/combobox";
 
 function AutoCompleteArrow() {
     const { size } = useContext(AutoCompleteContext);
@@ -114,8 +113,6 @@ function makeOptionState(
     };
 }
 
-type ComboboxStatus = "IDLE" | "SUGGESTING" | "NAVIGATING" | "INTERACTING";
-
 export interface IAutoCompleteProps {
     options?: IAutoCompleteOption[];
     optionProvider?: React.ReactNode;
@@ -163,7 +160,6 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
     const classesInput = useMemo(() => inputClasses({ size }), [size]);
     const [controlledOptions, setControlledOptions] = useState<IAutoCompleteOptionProps[]>();
     const [arbitraryValues, setArbitraryValues] = useState<string[]>([]);
-    const [comboboxState, setComboboxState] = useState<ComboboxStatus>();
     // This ref records the outmost container so that the pop over can use its size and placement
     const containerRef = useRef() as RefObject<HTMLDivElement>;
     const containerRect = useRect(containerRef);
@@ -381,12 +377,7 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
          * first filtered option
          */
         setUsingDirectionKeys([38, 40].includes(event.keyCode));
-        if (
-            !isUsingDirectionKeys &&
-            inputRef?.current?.value.length !== 0 &&
-            comboboxState !== "IDLE" &&
-            event.keyCode === 13
-        ) {
+        if (!isUsingDirectionKeys && inputRef?.current?.value.length !== 0 && event.keyCode === 13) {
             filteredOptions.length && onSelect(filteredOptions[0].label ?? filteredOptions[0].value);
             setUsingDirectionKeys(false);
         }
@@ -486,24 +477,8 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
                         ))}
                     </Reach.ComboboxList>
                 </Reach.ComboboxPopover>
-                <ComboboxState status={setComboboxState} />
             </Reach.Combobox>
             {optionProvider}
         </AutoCompleteContext.Provider>
     );
 }) as Polymorphic.ForwardRefComponent<"input", IAutoCompleteProps>;
-
-/**
- * This kludge component is used to report the state of a ReachUI combo box to
- * the AutoComplete, the hook herein needs to be a child of the combobox being observed
- */
-interface IComboboxStateProps {
-    status(state: ComboboxStatus): void;
-}
-function ComboboxState(props: IComboboxStateProps) {
-    const { state } = useComboboxContext();
-    useEffect(() => {
-        props.status(state);
-    }, [state]);
-    return null;
-}

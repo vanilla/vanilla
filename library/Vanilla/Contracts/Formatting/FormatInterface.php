@@ -25,15 +25,6 @@ interface FormatInterface {
     public function renderHTML(string $content): string;
 
     /**
-     * Render a safe, sanitized, HTML version of some content.
-     *
-     * @param ?array $context The context related to rendered content.
-     *
-     * @return FormatInterface
-     */
-    public function setContext(?array $context): FormatInterface;
-
-    /**
      * Render a safe, sanitized, short version of some content.
      *
      * @param string $content The content to render.

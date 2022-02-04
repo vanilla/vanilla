@@ -152,8 +152,36 @@ class CommunityLeadersModule extends AbstractHomeWidgetModule {
      */
     public static function getWidgetSchema(): Schema {
         $ownSchema = Schema::parse([
-            'slotType?' => UserPointsModel::slotTypeSchema(),
-            'limit?' => UserPointsModel::limitSchema(),
+            'slotType?' => [
+                'type' => 'string',
+                'default' => 'w',
+                'enum' => ['d', 'w', 'm', 'a'],
+                'x-control' => SchemaForm::radio(
+                    new FormOptions(
+                        'Timeframe',
+                        'Choose what duration to check for leaders in.'
+                    ),
+                    new StaticFormChoices(
+                        [
+                            'd' => 'Daily',
+                            'w' => 'Weekly',
+                            'm' => 'Monthly',
+                            'a' => 'All Time',
+                        ]
+                    )
+                )
+            ],
+            'limit?' => [
+                'type' => 'integer',
+                'default' => 10,
+                'x-control' => SchemaForm::textBox(
+                    new FormOptions(
+                        'Limit',
+                        'Maximum amount of users to display.'
+                    ),
+                    'number'
+                )
+            ],
         ]);
 
 

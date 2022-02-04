@@ -16,8 +16,6 @@ use Vanilla\Formatting\Html\HtmlSanitizer;
 use Vanilla\Formatting\Html\Processor\ExternalLinksProcessor;
 use Vanilla\HttpCacheMiddleware;
 use Vanilla\Contracts;
-use Vanilla\Layout\GlobalRecordProvider;
-use Vanilla\Layout\LayoutViewModel;
 use Vanilla\Models\CurrentUserPreloadProvider;
 use Vanilla\Models\LocalePreloadProvider;
 use Vanilla\Models\Model;
@@ -299,10 +297,6 @@ $dic->setInstance(Container::class, $dic)
     ->setClass(UserModel::class)
 
     ->rule(BreadcrumbModel::class)
-    ->setShared(true)
-
-    ->rule(LayoutViewModel::class)
-    ->addCall('addProvider', [new Reference(GlobalRecordProvider::class)])
     ->setShared(true)
 
     ->rule(\Vanilla\Models\AuthenticatorModel::class)

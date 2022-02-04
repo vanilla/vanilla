@@ -42,15 +42,13 @@ class QuickLink implements \JsonSerializable {
         string $name,
         string $url,
         ?int $count = null,
-        ?int $sort = null,
-        ?string $permission = null
+        ?int $sort = null
     ) {
         $this->name = $name;
         $this->url = $url;
         $this->count = $count;
         $this->id = slugify($name);
         $this->sort = $sort;
-        $this->permission = $permission;
     }
 
     /**
@@ -62,7 +60,6 @@ class QuickLink implements \JsonSerializable {
             'url' => $this->url,
             'id' => $this->id,
             'countLimit' => $this->countLimit,
-            'permission' => $this->permission,
         ];
     }
 

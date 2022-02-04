@@ -53,7 +53,7 @@ class TestPrivateProfile extends SiteTestCase {
                     'type' => 'global',
                     'permissions' => [
                         'profiles.view' => true,
-                        'session.valid' => true,
+                        'signIn.allow' => true,
                         'personalInfo.view' => false
                     ],
                 ],

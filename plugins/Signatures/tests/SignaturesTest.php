@@ -8,7 +8,6 @@
 namespace VanillaTests\Signatures;
 
 use Vanilla\Formatting\Formats\HtmlFormat;
-use Vanilla\Formatting\Formats\RichFormat;
 use Vanilla\Formatting\Formats\TextFormat;
 use VanillaTests\APIv0\TestDispatcher;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
@@ -79,47 +78,13 @@ class SignaturesTest extends SiteTestCase {
     }
 
     /**
-     * Test that signature can be set and are rendered on comments and discussions.
-     *
-     * @param string $signature signature string.
-     * @param string $format signature format, Rich/Text.
-     * @param bool $expectedSuccess is the test expected to pass or fail.
-     * @param string $expectValue resulting string.
-     *
-     * @dataProvider provideTestData
-     */
-    public function testSaveSignature(string $signature, string $format, bool $expectedSuccess, string $expectValue) {
-
-        if (!$expectedSuccess) {
-            $this->expectException(\Exception::class);
-            $this->expectExceptionMessage($expectValue);
-        }
-        $result = $this->setCurrentUserSignature($signature, $format);
-        $this->assertGreaterThan(0, $result->count());
-    }
-
-    /**
-     * Provide groups test cases.
-     *
-     * @return array
-     */
-    public function provideTestData(): array {
-        $r = [
-            'Invalid Rich Format' => ['Hello Signature', RichFormat::FORMAT_KEY, false, "Signature invalid."],
-            'Valid Text Format' => ['Hello Signature', TextFormat::FORMAT_KEY, true, "Your changes have been saved."],
-            'Valid Rich Format' => ['[{"insert":"test 123\n"}]', RichFormat::FORMAT_KEY, true, "Your changes have been saved."],
-        ];
-        return $r;
-    }
-
-    /**
      * Set the current user's signature.
      *
      * @param string $signature
      * @param string $format
      */
     private function setCurrentUserSignature(string $signature, string $format = TextFormat::FORMAT_KEY) {
-        return $this->bessy()->postJsonData('/profile/signature', [
+        $this->bessy()->postJsonData('/profile/signature', [
             'Body' => $signature,
             'Format' => $format,
         ]);

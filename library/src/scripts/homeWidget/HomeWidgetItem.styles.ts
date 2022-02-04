@@ -462,7 +462,6 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: DeepPartia
     const isImageLeft = vars.options.imagePlacement === "left";
     const isImageLeftMobile = vars.options.imagePlacementMobile === "left";
     const boxHasBorder = Variables.boxHasOutline(vars.options.box);
-    const borderTypeIsSeparator = vars.options.box.borderType === BorderType.SEPARATOR;
 
     const hasChatBubble = vars.options.contentType === HomeWidgetItemContentType.TITLE_CHAT_BUBBLE;
     // const hasBubbleShadow = hasChatBubble && vars.options.box.borderType === BorderType.SHADOW;
@@ -501,11 +500,6 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: DeepPartia
             flexDirection: "column",
         },
         !hasChatBubble && Mixins.box(vars.options.box, { noPaddings: true, interactiveOutline: true }),
-        borderTypeIsSeparator && {
-            "& + :before": {
-                borderTop: "none",
-            },
-        },
     );
 
     const name = style(

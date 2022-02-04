@@ -52,6 +52,7 @@ export interface IHomeWidgetContainerOptions {
     // @deprecated
     isCarousel?: boolean;
     titleChildren?: React.ReactNode;
+    contentIsListWithSeparators?: boolean;
 }
 
 interface IViewAll {
@@ -111,6 +112,7 @@ export const homeWidgetContainerVariables = useThemeCache(
                 displayType: undefined as WidgetContainerDisplayType | undefined,
                 isGrid: false,
                 isCarousel: false,
+                contentIsListWithSeparators: undefined as boolean | undefined,
             },
             optionOverrides,
         );
@@ -183,7 +185,7 @@ export const homeWidgetContainerVariables = useThemeCache(
                         options.borderType === "navLinks" ? mobileNavPaddings.horizontal : globalVars.gutter.size,
                 },
             },
-            options.displayType !== WidgetContainerDisplayType.GRID
+            !options.displayType || options.displayType === WidgetContainerDisplayType.CAROUSEL
                 ? { horizontal: 0, vertical: globalVars.gutter.size / 2, mobile: { horizontal: 0 } }
                 : {},
         );
@@ -293,9 +295,10 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
         vars.hasVisibleContainer
             ? {
                   paddingBottom: vars.itemSpacing.vertical,
+                  paddingTop: vars.options.contentIsListWithSeparators ? vars.itemSpacing.vertical : 0,
               }
             : {
-                  marginTop: negativeUnit(vars.itemSpacing.vertical),
+                  marginTop: vars.options.contentIsListWithSeparators ? 0 : negativeUnit(vars.itemSpacing.vertical),
               },
         borderStyling,
         vars.mobileMediaQuery(
@@ -310,7 +313,15 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
         flexBasis: percent(100 / vars.options.maxColumnCount),
     };
 
-    const gridItem = style("gridItem", itemMixin);
+    const gridItem = style(
+        "gridItem",
+        itemMixin,
+        vars.options.contentIsListWithSeparators && {
+            "&:not(:first-child) a:before": {
+                borderTop: "none",
+            },
+        },
+    );
 
     const gridItemSpacer = style("gridItemSpacer", {
         ...itemMixin,
@@ -322,7 +333,7 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
         {
             ...Mixins.padding({
                 horizontal: halfHorizontalSpacing,
-                top: vars.itemSpacing.vertical,
+                top: vars.options.contentIsListWithSeparators ? 0 : vars.itemSpacing.vertical,
             }),
             height: percent(100),
         },

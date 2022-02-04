@@ -1,8 +1,8 @@
 <?php
 /**
- * Discussion controller
+ * Category controller
  *
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Vanilla
  * @since 2.0.17.9

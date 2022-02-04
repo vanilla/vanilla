@@ -11,6 +11,7 @@ use Garden\Schema\Schema;
 use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
+use Vanilla\Layout\CategoryRecordProvider;
 use Vanilla\Layout\LayoutViewModel;
 use Vanilla\Layout\LayoutHydrator;
 use Vanilla\Exception\Database\NoResultsException;
@@ -18,6 +19,7 @@ use Vanilla\Layout\LayoutModel;
 use Vanilla\Layout\LayoutService;
 use Vanilla\Layout\Providers\MutableLayoutProviderInterface;
 use Vanilla\Utility\SchemaUtils;
+use Vanilla\Web\PageHead;
 
 /**
  * API v2 endpoints for layouts and layout views
@@ -31,7 +33,7 @@ class LayoutsApiController extends \AbstractApiController {
     /** @var LayoutModel $layoutModel */
     private $layoutModel;
 
-    /** @var LayoutModel $layoutViewModel */
+    /** @var LayoutViewModel $layoutViewModel */
     private $layoutViewModel;
 
     /** @var LayoutService $layoutProviderService */
@@ -217,19 +219,45 @@ class LayoutsApiController extends \AbstractApiController {
             'params:o',
         ]);
         $body = $in->validate($body);
-
-        // Validate the params.
-        $layoutViewType = $body['layoutViewType'];
-        $params = $this->layoutHydrator->resolveParams($layoutViewType, $body['params']);
-
-        $hydrator = $this->layoutHydrator->getHydrator($layoutViewType);
-
-        $result = $hydrator->resolve([
-            'layoutViewType' => $layoutViewType,
+        $rowData = [
+            'layoutViewType' => $body['layoutViewType'],
             'layout' => $body['layout'],
-        ], $params);
+        ];
+        $result = $this->layoutHydrator->hydrateLayout($body['layoutViewType'], $body['params'], $rowData);
 
         return new Data($result, ['status' => 200]);
+    }
+
+    /**
+     * GET /api/v2/layouts/lookup-hydrate
+     *
+     * Lookup a layout to Hydrate.
+     *
+     * @param array $query Parameters used to hydrate the child elements of the layout
+     *
+     * @return Data
+     * @throws \Garden\Web\Exception\NotFoundException Layout not found.
+     * @throws \Garden\Web\Exception\ClientException No layout provider found for ID format/value.
+     * @throws \Garden\Schema\ValidationException Data does not validate against its schema.
+     * @throws \Garden\Web\Exception\HttpException Ban applied to permission for this session.
+     */
+    public function get_lookupHydrate(array $query = []): Data {
+        $this->permission();
+
+        $in = $this->schema([
+            'layoutViewType:s',
+            'recordID:i',
+            'recordType:s',
+            'params:o?',
+        ], 'in');
+        $parsedQuery = $in->validate($query);
+        $layoutID = $this->layoutViewModel->getLayoutIdLookup($parsedQuery['layoutViewType'], $parsedQuery['recordType'], $parsedQuery['recordID']);
+        if ($layoutID === '') {
+            $fileLayoutView = $this->layoutHydrator->getLayoutViewType($parsedQuery['layoutViewType']);
+            $layoutID = $fileLayoutView->getLayoutID();
+        }
+
+        return $this->get_hydrate($layoutID, $query);
     }
 
     /**
@@ -270,9 +298,7 @@ class LayoutsApiController extends \AbstractApiController {
         }
         $layoutViewType = $row['layoutViewType'];
 
-        $layoutParams = $this->layoutHydrator->resolveParams($layoutViewType, $params);
-        $hydrator = $this->layoutHydrator->getHydrator($layoutViewType);
-        $hydrated = $hydrator->resolve($row, $layoutParams);
+        $hydrated = $this->layoutHydrator->hydrateLayout($layoutViewType, $params, $row);
 
         $result = $this->layoutModel->normalizeRow($hydrated);
         $result = $out->validate($result);
@@ -388,6 +414,8 @@ class LayoutsApiController extends \AbstractApiController {
     //region Layout Views API endpoints
 
     /**
+     * GET /api/v2/layouts/:layoutID/views
+     *
      * Get the set of layout views for the given layout
      *
      * @param int|string $layoutID ID of layout for which to retrieve its set of views
@@ -402,7 +430,7 @@ class LayoutsApiController extends \AbstractApiController {
         $query['layoutID'] = $layoutID;
         $this->permission("settings.manage");
 
-        $query = $this->schema($this->layoutModel->getQueryInputSchema(true), "in")->validate($query);
+        $query = $this->schema($this->layoutViewModel->getInputSchema(), "in")->validate($query);
 
         $this->schema($this->layoutModel->getIDSchema(), "in")->validate(['layoutID' => $layoutID]);
         $out = $this->schema(LayoutViewModel::getSchema());
@@ -415,7 +443,9 @@ class LayoutsApiController extends \AbstractApiController {
     }
 
     /**
-     * Post the set of layout views for the given layout
+     * PUT /api/v2/layouts/:layoutID/views
+     *
+     * Put the set of layout views for the given layout
      *
      * @param int|string $layoutID ID of layout for which to insert layout views
      * @param array $body layout view to insert
@@ -427,29 +457,42 @@ class LayoutsApiController extends \AbstractApiController {
      * @throws \Garden\Web\Exception\ClientException User attempted to insert a duplicate layout view.
      * @throws \Exception Error during record insertion.
      */
-    public function post_views($layoutID, array $body = []): Data {
+    public function put_views($layoutID, array $body = []): Data {
         $this->permission("settings.manage");
 
         $in = $this->schema(['recordID:i', 'recordType:s']);
         $out = $this->schema(LayoutViewModel::getSchema());
         $this->schema($this->layoutModel->getIDSchema(), "in")->validate(['layoutID' => $layoutID]);
         $body = $in->validate($body);
-        $body['layoutID'] = $layoutID;
-        $existing = $this->layoutViewModel->select($body);
-        if (!empty($existing)) {
-            throw new ClientException("Cannot create a duplicate layout view", 422, $body);
+        //Get layoutViewType from Layout.
+        $provider = $this->layoutProviderService->getCompatibleProvider($layoutID);
+        if (!isset($provider)) {
+            throw new ClientException('Invalid layout ID format', 400, ['layoutID' => $layoutID]);
         }
-        $layoutViewID = $this->layoutViewModel->insert($body);
-        $layout = $this->layoutModel->selectSingle(['layoutID' => $layoutID]);
+        try {
+            $row = $provider->getByID($layoutID);
+        } catch (NoResultsException $e) {
+            throw new NotFoundException('Layout');
+        }
+        $body['layoutViewType'] = $row['layoutViewType'];
+        $body['layoutID'] = $layoutID;
+
+        // If we want to assign a layoutView to a category, we verify if that category exists.
+        if (!$this->layoutViewModel->validateRecordExists($body['recordType'], [$body['recordID']])) {
+            throw new NotFoundException($body['recordType']);
+        }
+
+        $layoutViewID = $this->layoutViewModel->saveLayoutView($body);
 
         $layoutView = $this->layoutViewModel->selectSingle(['layoutViewID' => $layoutViewID]);
-        $layoutView['layoutViewType'] = $layout['layoutViewType'];
         $result = $out->validate($layoutView);
 
         return new Data($result, 201);
     }
 
     /**
+     * DELETE /api/v2/layouts/:layoutID/views
+     *
      * Delete the set of layout views for the given layout
      *
      * @param int $layoutID ID of layout for which to delete select views

@@ -8,6 +8,8 @@
 namespace Vanilla\Layout;
 
 use Vanilla\Layout\Providers\LayoutProviderInterface;
+use Vanilla\Layout\View\LayoutViewInterface;
+use Vanilla\Layout\View\LegacyLayoutViewInterface;
 
 /**
  * Used to mediate access to objects that can provide layouts
@@ -17,6 +19,10 @@ class LayoutService {
     //region Properties
     /** @var LayoutProviderInterface[] $layoutProviders  */
     private $layoutProviders;
+
+    /** @var LayoutViewInterface[] */
+    private $layoutViews;
+
     //endregion
 
     //region Constructor
@@ -25,6 +31,7 @@ class LayoutService {
      */
     public function __construct() {
         $this->layoutProviders = [];
+        $this->layoutViews = [];
     }
     //endregion
 
@@ -36,6 +43,15 @@ class LayoutService {
      */
     public function addProvider(LayoutProviderInterface $provider): void {
         $this->layoutProviders[] = $provider;
+    }
+
+    /**
+     * Add/register a layout view.
+     *
+     * @param LayoutViewInterface $view
+     */
+    public function addLayoutView(LayoutViewInterface $view): void {
+        $this->layoutViews[] = $view;
     }
 
     /**
@@ -61,5 +77,31 @@ class LayoutService {
         }
         return null;
     }
+
+    /**
+     * Get all layout views.
+     *
+     * @return LayoutViewInterface[]
+     */
+    public function getLayoutViews(): array {
+        return $this->layoutViews;
+    }
+
+    /**
+     * Get all registered legacy layout views.
+     *
+     * @return LegacyLayoutViewInterface[]
+     */
+    public function getLegacyLayoutViews(): array {
+        $legacyViews = [];
+        foreach ($this->getLayoutViews() as $view) {
+            if ($view instanceof LegacyLayoutViewInterface) {
+                $legacyViews[] = $view;
+            }
+        }
+
+        return $legacyViews;
+    }
+
     //endregion
 }

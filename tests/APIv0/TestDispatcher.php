@@ -78,6 +78,47 @@ class TestDispatcher {
     }
 
     /**
+     * Create a request with a given set of parameters.
+     *
+     * @param string $method
+     * @param string $path
+     * @param array|string $queryOrBody
+     * @param \Gdn_Request|null $onRequest Mutate this request instead of creating a new.
+     *
+     * @return \Gdn_Request
+     */
+    public function createRequest(string $method, string $path, $queryOrBody = [], ?\Gdn_Request $onRequest = null):
+    \Gdn_Request {
+        $request = $onRequest ?? \Gdn_Request::create();
+        $request->fromEnvironment();
+        $request->setMethod($method);
+        $request->setUrl($path);
+        // Kludge due to a bug in the dispatcher not understanding extensions properly.
+        if ($request->getExt()) {
+            $request->setPath($request->getPathExt());
+            $request->setExt('');
+        }
+        // Kludge due to the request not understanding roots.
+        if ($request->getRoot() &&  (str_starts_with($request->getPath(), $request->getRoot().'/'))) {
+            $path = StringUtils::substringLeftTrim($request->getPath(), $request->getRoot());
+            $request->setPath($path);
+        }
+
+        if ($method === 'POST') {
+            $request->setRequestArguments(\Gdn_Request::INPUT_POST, $queryOrBody);
+        } elseif (!empty($queryOrBody)) {
+            $get = $request->getRequestArguments(\Gdn_Request::INPUT_GET);
+            $get = array_replace($get, $queryOrBody);
+            $request->setRequestArguments(\Gdn_Request::INPUT_GET, $get);
+        }
+
+        // Kludge to ensure the path can be reloaded from the environment args.
+        $request->setURI($request->getPath());
+
+        return $request;
+    }
+
+    /**
      * Make a request to a controller and return it.
      *
      * @param string $method The request method, either GET or POST.
@@ -120,29 +161,10 @@ class TestDispatcher {
 
         // Back up the old request so that it doesn't pollute future tests.
         $oldRequest = clone \Gdn::request();
-
-        $request = \Gdn_Request::create()->fromEnvironment()->setMethod($method)->setUrl($path);
-        // Kludge due to a bug in the dispatcher not understanding extensions properly.
-        if ($request->getExt()) {
-            $request->setPath($request->getPathExt());
-            $request->setExt('');
-        }
-        // Kludge due to the request not understanding roots.
-        if ($request->getRoot() &&  (str_starts_with($request->getPath(), $request->getRoot().'/'))) {
-            $path = StringUtils::substringLeftTrim($request->getPath(), $request->getRoot());
-            $request->setPath($path);
-        }
-
-        // Kludge to ensure the path can be reloaded from the environment args.
-        $request->setURI($request->getPath());
+        $request = self::createRequest($method, $path, $queryOrBody);
 
         if ($method === 'POST') {
             $session->validateTransientKey(true);
-            $request->setRequestArguments(\Gdn_Request::INPUT_POST, $queryOrBody);
-        } elseif (!empty($queryOrBody)) {
-            $get = $request->getRequestArguments(\Gdn_Request::INPUT_GET);
-            $get = array_replace($get, $queryOrBody);
-            $request->setRequestArguments(\Gdn_Request::INPUT_GET, $get);
         }
 
         $fn = function ($sender, $args) {

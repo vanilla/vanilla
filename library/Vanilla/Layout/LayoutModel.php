@@ -122,12 +122,9 @@ class LayoutModel extends PipelineModel implements MutableLayoutProviderInterfac
         $rows = array_map(function (array $row) use ($layoutViews, $expand) {
             $row = $this->normalizeRow($row);
             //If expand parameter present add layoutViews to the request.
-            if (!$row['isDefault'] && ModelUtils::isExpandOption('layoutViews', $expand)) {
+            if (ModelUtils::isExpandOption('layoutViews', $expand)) {
                 $currentLayoutModel = array_filter($layoutViews, function ($layoutView) use ($row) {
-                    if ($layoutView['layoutID'] == $row['layoutID']) {
-                        $layoutView['layoutViewType'] = $row['layoutViewType'];
-                    }
-                    return $layoutView;
+                    return $layoutView['layoutID'] == $row['layoutID'];
                 });
                 $row['layoutViews'] = $currentLayoutModel;
             }
@@ -195,6 +192,7 @@ class LayoutModel extends PipelineModel implements MutableLayoutProviderInterfac
             "layoutViewType:s",
             "isDefault:b",
             "layout:a",
+            'seo:o',
         ]);
     }
 

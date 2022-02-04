@@ -801,4 +801,41 @@ class RequestTest extends SharedBootstrapTestCase {
         ];
         return $r;
     }
+
+    /**
+     * Run a repeatable test for our issues with request corruption when reparsing request variables.
+     *
+     * @param callable $test
+     */
+    public function runParseRequestTest(callable $test): void {
+        $request = self::createRequest();
+        $request->setURI('/wrong/uri');
+        $request->setRoot('/root');
+        $request->setPath('/path');
+
+        $test($request);
+
+        $this->assertSame('/path', $request->getPath());
+        $this->assertSame('/root', $request->getRoot());
+    }
+
+    /**
+     * Setting the IP address should not wreck the path.
+     */
+    public function testSetIPCorruption(): void {
+        $this->runParseRequestTest(function (Gdn_Request $request) {
+            $request->setIP('1.2.3.4');
+            $this->assertSame('1.2.3.4', $request->getIP());
+        });
+    }
+
+    /**
+     * Setting the method should not wreck the path.
+     */
+    public function testSetMethodCorruption(): void {
+        $this->runParseRequestTest(function (Gdn_Request $request) {
+            $request->setMethod('PATCH');
+            $this->assertSame('PATCH', $request->getMethod());
+        });
+    }
 }

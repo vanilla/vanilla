@@ -11,8 +11,8 @@ use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\Adapter\Psr16Adapter;
 use Symfony\Contracts\Cache\ItemInterface;
 use Vanilla\Cache\CacheCacheAdapter;
+use Vanilla\CurrentTimeStamp;
 use Vanilla\FeatureFlagHelper;
-use Vanilla\Scheduler\Descriptor\CronJobDescriptor;
 use Vanilla\Scheduler\Descriptor\NormalJobDescriptor;
 use Vanilla\Scheduler\Job\CallbackJob;
 use Vanilla\Scheduler\SchedulerInterface;
@@ -37,6 +37,9 @@ class ModelCache {
     const GLOBAL_DEFAULT_OPTIONS = [
         \Gdn_Cache::FEATURE_EXPIRY => 600,
     ];
+
+    /** @var int Amount of time to allow a scheduled hydration to wait before deleting the cache key. */
+    const RESCHEDULE_THRESHOLD = 30;
 
     const DISABLE_FEATURE_FLAG = "DisableNewModelCaching";
 
@@ -146,8 +149,18 @@ class ModelCache {
      * @return void
      */
     private function scheduleHydration(SchedulerInterface $scheduler, string $cacheKey, callable $hydrate, array $args) {
+        $time = CurrentTimeStamp::get();
+
         $scheduler->addJobDescriptor(new NormalJobDescriptor(CallbackJob::class, [
-            'callback' => function () use ($cacheKey, $hydrate, $args) {
+            'callback' => function () use ($cacheKey, $hydrate, $args, $time) {
+                // If the threshold has been reached, we delete the cache key and the hydration
+                // will run on the next request.
+                $newTime = CurrentTimeStamp::get();
+                if ($newTime - $time > self::RESCHEDULE_THRESHOLD) {
+                    $this->cache->delete($cacheKey);
+                    return;
+                }
+
                 $result = call_user_func_array($hydrate, $args);
                 $result = serialize($result);
                 $this->cache->set($cacheKey, $result);

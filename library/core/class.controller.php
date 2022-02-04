@@ -1967,10 +1967,10 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
                         ->dispatch($route);
                 } else {
                     // I dunno! Barf.
-                    gdn_ExceptionHandler($ex);
+                    gdnExceptionHandler($ex);
                 }
             } catch (Exception $ex2) {
-                gdn_ExceptionHandler($ex);
+                gdnExceptionHandler($ex);
             }
             return;
         }
@@ -2025,7 +2025,7 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
                 }
                 break;
 //         case DELIVERY_METHOD_XHTML:
-//            gdn_ExceptionHandler($Ex);
+//            gdnExceptionHandler($Ex);
 //            break;
             case DELIVERY_METHOD_XML:
                 safeHeader('Content-Type: text/xml; charset=utf-8', true);

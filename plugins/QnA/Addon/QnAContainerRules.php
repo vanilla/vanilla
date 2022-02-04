@@ -8,7 +8,13 @@
 namespace Vanilla\QnA\Addon;
 
 use Garden\Container\ContainerConfigurationInterface;
+use Garden\Container\Reference;
 use Vanilla\AddonContainerRules;
+use Vanilla\Models\SiteTotalService;
+use Vanilla\QnA\Models\Totals\AcceptedSiteTotalProvider;
+use Vanilla\QnA\Models\Totals\QuestionSiteTotalProvider;
+use Vanilla\Layout\LayoutService;
+use Vanilla\QnA\Layout\View\LegacyNewQuestionLayoutView;
 use Vanilla\QnA\Widgets\DiscussionQuestionsWidget;
 use Vanilla\Layout\LayoutHydrator;
 
@@ -24,5 +30,13 @@ class QnAContainerRules extends AddonContainerRules {
         $container
             ->rule(LayoutHydrator::class)
             ->addCall("addReactResolver", [DiscussionQuestionsWidget::class]);
+        $container
+            ->rule(SiteTotalService::class)
+            ->addCall("registerProvider", [new Reference(QuestionSiteTotalProvider::class)])
+            ->addCall("registerProvider", [new Reference(AcceptedSiteTotalProvider::class)])
+        ;
+        $container
+            ->rule(LayoutService::class)
+            ->addCall("addLayoutView", [new Reference(LegacyNewQuestionLayoutView::class)]);
     }
 }

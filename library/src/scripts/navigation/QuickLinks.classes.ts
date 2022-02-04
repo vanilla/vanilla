@@ -5,18 +5,20 @@
  */
 
 import { css } from "@emotion/css";
+import { IHomeWidgetContainerOptions } from "@library/homeWidget/HomeWidgetContainer.styles";
 import { quickLinksVariables } from "@library/navigation/QuickLinks.variables";
 import { ListSeparation } from "@library/styles/cssUtilsTypes";
 import { Mixins } from "@library/styles/Mixins";
 import { singleBorder } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 
-export const quickLinksClasses = useThemeCache(() => {
+export const quickLinksClasses = useThemeCache((containerOptions?: IHomeWidgetContainerOptions) => {
     const vars = quickLinksVariables();
     const style = styleFactory("quickLinks");
 
     const root = style({
         border: "none",
+        ...Mixins.background(containerOptions?.outerBackground ?? {}),
     });
 
     const list = style("list", { ...Mixins.margin(vars.list.spacing) });

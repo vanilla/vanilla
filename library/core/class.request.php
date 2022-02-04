@@ -23,7 +23,6 @@ use Vanilla\UploadedFile;
  *
  * @method string requestURI($uri = null) Get/Set the Request URI (REQUEST_URI).
  * @method string requestScript($scriptName = null) Get/Set the Request ScriptName (SCRIPT_NAME).
- * @method string requestMethod($method = null) Get/Set the Request Method (REQUEST_METHOD).
  * @method string requestHost($uri = null) Get/Set the Request Host (HTTP_HOST).
  * @method string requestFolder($folder = null) Get/Set the Request script's Folder.
  * @method string requestAddress($ip = null) Get/Set the Request IP address (first existing of HTTP_X_ORIGINALLY_FORWARDED_FOR,
@@ -150,7 +149,6 @@ class Gdn_Request implements RequestInterface {
         return $this;
     }
 
-
     /**
      * Generic chainable object creation method.
      *
@@ -196,16 +194,19 @@ class Gdn_Request implements RequestInterface {
      *
      * @param string $key Key to retrieve or set.
      * @param string $value Value of $Key key to set.
+     * @param bool $reparse Whether or not to mark the request for reparsing.
      * @return string|null
      */
-    protected function _environmentElement($key, $value = null) {
+    protected function _environmentElement($key, $value = null, $reparse = true) {
         if ($value === null && array_key_exists($key, $this->envElementCache)) {
             return $this->envElementCache[$key];
         }
         $rawKey = $key;
         $key = strtoupper($key);
         if ($value !== null) {
-            $this->_HaveParsedRequest = false;
+            if ($reparse) {
+                $this->_HaveParsedRequest = false;
+            }
 
             switch ($key) {
                 case 'URI':
@@ -495,9 +496,19 @@ class Gdn_Request implements RequestInterface {
      * @return string;
      */
     public function getIP() {
-        return (string)$this->_environmentElement('ADDRESS');
+        return (string)$this->_environmentElement('ADDRESS', null, false);
     }
 
+    /**
+     * Legacy get/set request method.
+     *
+     * @param string|null $method
+     * @return string|null
+     * @deprecated Use `getMethod()` and `setMethod()`.
+     */
+    public function requestMethod(string $method = null) {
+        return $this->_environmentElement('METHOD', $method, false);
+    }
 
     /**
      * Get the HTTP method.
@@ -1437,7 +1448,7 @@ class Gdn_Request implements RequestInterface {
      * @return self
      */
     public function setIP($ip) {
-        $this->_environmentElement('ADDRESS', $ip);
+        $this->_environmentElement('ADDRESS', $ip, false);
         return $this;
     }
 

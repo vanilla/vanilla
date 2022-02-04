@@ -13,6 +13,7 @@ use Garden\Schema\ValidationException;
 use Psr\Log\LoggerInterface;
 use Vanilla\Dashboard\Models\RecordStatusModel;
 use Vanilla\Exception\Database\NoResultsException;
+use Vanilla\Logging\ErrorLogger;
 
 /**
  * Handle events dispatched when a discussion status is updated
@@ -59,7 +60,7 @@ class DiscussionStatusEventHandler {
     public function handleDiscussionStatusEvent(DiscussionStatusEvent $discussionStatusEvent): void {
         $discussion = $this->discussionModel->getID($discussionStatusEvent->getDiscussionID(), DATASET_TYPE_ARRAY);
         if (empty($discussion)) {
-            $this->logger->error("Discussion Not Found", ['event' => $discussionStatusEvent]);
+            ErrorLogger::error("Discussion Not Found", ['recordStatus'], ['event' => $discussionStatusEvent]);
             return;
         }
         $event = $this->discussionModel->eventFromRow(
@@ -79,11 +80,11 @@ class DiscussionStatusEventHandler {
             $statusEvent = new DiscussionEvent($event->getAction(), $updatedPayload, $event->getSender());
             $this->eventManager->dispatch($statusEvent);
         } catch (NoResultsException $nre) {
-            $this->logger->error("Discussion Status Not Found", ['event' => $discussionStatusEvent]);
+            ErrorLogger::error("Discussion Status Not Found", ['recordStatus'], ['event' => $discussionStatusEvent]);
             return;
         } catch (ValidationException $e) {
             $context = ['event' => $discussionStatusEvent, 'status' => $status];
-            $this->logger->error("Discussion Status Validation Failure", $context);
+            ErrorLogger::error("Discussion Status Validation Failure", ['recordStatus'], $context);
         }
     }
 }

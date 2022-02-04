@@ -9,13 +9,16 @@ namespace Vanilla\Layout\View;
 
 use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
+use Gdn;
+use Vanilla\Formatting\Formats\HtmlFormat;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Site\SiteSectionSchema;
+use Vanilla\Web\PageHeadInterface;
 
 /**
  * Definition for assets and params common to every layoutViewType.
  */
-class CommonLayoutView extends AbstractLayoutView {
+class CommonLayoutView extends AbstractCustomLayoutView {
 
     /** @var SiteSectionModel */
     private $siteSectionModel;
@@ -34,7 +37,6 @@ class CommonLayoutView extends AbstractLayoutView {
         $this->categoryModel = $categoryModel;
     }
 
-
     /**
      * @inheritdoc
      */
@@ -46,6 +48,13 @@ class CommonLayoutView extends AbstractLayoutView {
      * @inheritdoc
      */
     public function getType(): string {
+        return "common";
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getLayoutID(): string {
         return "common";
     }
 
@@ -73,7 +82,7 @@ class CommonLayoutView extends AbstractLayoutView {
     /**
      * @inheritdoc
      */
-    public function resolveParams(array $paramInput): array {
+    public function resolveParams(array $paramInput, ?PageHeadInterface $pageHead = null): array {
         $result = [];
         $siteSectionID = $paramInput['siteSectionID'] ?? null;
         $siteSection = $siteSectionID === null
@@ -92,7 +101,10 @@ class CommonLayoutView extends AbstractLayoutView {
         } else {
             throw new NotFoundException('Category', ['categoryID' => $category]);
         }
-
+        $pageHead->setSeoTitle(Gdn::formatService()->renderPlainText(Gdn::config('Garden.HomepageTitle'), HtmlFormat::FORMAT_KEY));
+        $pageHead->setSeoDescription(Gdn::formatService()->renderPlainText(Gdn::config('Garden.Description'), HtmlFormat::FORMAT_KEY));
+        $pageHead->setCanonicalUrl(\Gdn::request()->getSimpleUrl());
+        $pageHead->applyMetaTags();
         return $result;
     }
 }

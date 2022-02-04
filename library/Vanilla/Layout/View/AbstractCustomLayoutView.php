@@ -12,6 +12,7 @@ use Garden\Hydrate\DataHydrator;
 use Garden\Schema\Schema;
 use Vanilla\Layout\Asset\AbstractLayoutAsset;
 use Vanilla\Layout\Resolvers\ReactResolver;
+use Vanilla\Web\PageHeadInterface;
 
 /**
  * A layout view contains:
@@ -19,7 +20,7 @@ use Vanilla\Layout\Resolvers\ReactResolver;
  * - Param validation and expansion for that type.
  * - The assets provided for that view type.
  */
-abstract class AbstractLayoutView {
+abstract class AbstractCustomLayoutView implements LayoutViewInterface {
 
     /** @var array<class-string<AbstractLayoutAsset>> */
     private $assetClasses = [];
@@ -30,9 +31,16 @@ abstract class AbstractLayoutView {
     abstract public function getName(): string;
 
     /**
+     * Get LayoutView Type.
+     *
      * @return string
      */
     abstract public function getType(): string;
+
+    /**
+     * @return string
+     */
+    abstract public function getLayoutID(): string;
 
     /**
      * Get a schema for the input parameters when resolving this viewType.
@@ -57,7 +65,7 @@ abstract class AbstractLayoutView {
      *
      * @return array
      */
-    public function resolveParams(array $paramInput): array {
+    public function resolveParams(array $paramInput, ?PageHeadInterface $pageHead = null): array {
         return $paramInput;
     }
 

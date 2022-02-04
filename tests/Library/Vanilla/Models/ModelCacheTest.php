@@ -8,6 +8,7 @@
 namespace VanillaTests\Library\Vanilla\Models;
 
 use PHPUnit\Framework\TestCase;
+use Vanilla\CurrentTimeStamp;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\Models\FullRecordCacheModel;
 use Vanilla\Models\Model;
@@ -211,5 +212,50 @@ class ModelCacheTest extends SiteTestCase {
         $this->assertEquals('hydrated', $result);
         $getDeferred();
         $this->assertEquals(1, $hydrateCount);
+    }
+
+    /**
+     * Test that a cache key is deleted if scheduled hydration is run after reschedule threshold time limit is exceeded.
+     */
+    public function testDeleteCacheKeyAfterThreshold() {
+        $cache = new TestCache();
+        $modelCache = new ModelCache('test-timeout', $cache);
+        $scheduler = $this->getScheduler();
+
+        $countHydrated = 0;
+
+        $getDeferred = function () use ($modelCache, $scheduler, &$countHydrated) {
+            return $modelCache->getCachedOrHydrate(['myKey'], function () use (&$countHydrated) {
+                $countHydrated++;
+                return 'hydrated';
+            }, [
+                ModelCache::OPT_DEFAULT => 'default',
+                ModelCache::OPT_SCHEDULER => $scheduler,
+            ]);
+        };
+
+        $this->getScheduler()->pause();
+        $time = CurrentTimeStamp::mockTime("1980-06-17");
+        $result = $getDeferred();
+        $this->assertEquals('default', $result);
+        $this->assertEquals(0, $countHydrated);
+
+        // More than 30 seconds pass and we do not hydrate and clear that cache key.
+        $time = CurrentTimeStamp::mockTime($time->modify('+31 seconds'));
+        $this->getScheduler()->resume();
+        $this->assertEquals(0, $countHydrated);
+
+        // Right at the threshold, it will hydrate this time.
+        $this->getScheduler()->pause();
+        $result = $getDeferred();
+        $this->assertEquals('default', $result);
+        $this->assertEquals(0, $countHydrated);
+
+        // Move the time past the threshold.
+        CurrentTimeStamp::mockTime($time->modify('+30 seconds'));
+        $this->getScheduler()->resume();
+        $result = $getDeferred();
+        $this->assertEquals('hydrated', $result);
+        $this->assertEquals(1, $countHydrated);
     }
 }

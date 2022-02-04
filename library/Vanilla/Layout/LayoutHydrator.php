@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -9,13 +9,15 @@ namespace Vanilla\Layout;
 
 use Garden\Container\Container;
 use Garden\Hydrate\DataHydrator;
-use Garden\Hydrate\Resolvers\AbstractDataResolver;
 use Garden\Hydrate\Middleware\AbstractMiddleware;
+use Garden\Hydrate\Resolvers\AbstractDataResolver;
 use Garden\Hydrate\Resolvers\ParamResolver;
 use Garden\Hydrate\Schema\HydrateableSchema;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\NotFoundException;
+use Vanilla\Layout\Middleware\LayoutRoleFilterMiddleware;
+use Vanilla\Layout\Middleware\VisibilityMiddleware;
 use Vanilla\Layout\Resolvers\ReactLayoutExceptionHandler;
 use Vanilla\Layout\Resolvers\ApiResolver;
 use Vanilla\Layout\Resolvers\ReactResolver;
@@ -23,18 +25,18 @@ use Vanilla\Layout\Section\SectionFullWidth;
 use Vanilla\Layout\Section\SectionOneColumn;
 use Vanilla\Layout\Section\SectionThreeColumns;
 use Vanilla\Layout\Section\SectionTwoColumns;
-use Vanilla\Layout\View\AbstractLayoutView;
+use Vanilla\Layout\View\AbstractCustomLayoutView;
 use Vanilla\Layout\View\CommonLayoutView;
 use Vanilla\Layout\View\HomeLayoutView;
 use Vanilla\Web\JsInterpop\AbstractReactModule;
+use Vanilla\Web\PageHead;
+use Vanilla\Web\PageHeadInterface;
 use Vanilla\Widgets\React\BannerReactWidget;
 use Vanilla\Widgets\React\HtmlReactWidget;
 use Vanilla\Widgets\React\LeaderboardWidget;
+use Vanilla\Widgets\React\QuickLinksWidget;
 use Vanilla\Widgets\React\WidgetContainerReactWidget;
 use Vanilla\Widgets\Schema\ReactSingleChildSchema;
-use Vanilla\Layout\Middleware\LayoutRoleFilterMiddleware;
-use Gdn_Session;
-use Vanilla\Widgets\React\QuickLinksWidget;
 
 /**
  * Class for hydrating layouts with the vanilla/garden-hydrate library.
@@ -44,17 +46,23 @@ use Vanilla\Widgets\React\QuickLinksWidget;
  */
 final class LayoutHydrator {
 
+    /** @var string */
+    public const PARAM_PAGE_HEAD = '_pageHead';
+
     /** @var Container */
     private $container;
 
     /** @var CommonLayoutView */
     private $commonLayout;
 
-    /** @var array{string, AbstractLayoutView} */
+    /** @var array{string, AbstractCustomLayoutView} */
     private $layoutViews = [];
 
     /** @var DataHydrator */
     private $dataHydrator;
+
+    /** @var PageHead */
+    private $pageHead;
 
     /**
      * DI.
@@ -72,6 +80,7 @@ final class LayoutHydrator {
         $this->commonLayout = $commonLayout;
         $this->dataHydrator = new DataHydrator();
         $this->dataHydrator->setExceptionHandler($reactExceptionHandler);
+        $this->pageHead = $container->get(PageHead::class);
 
         // Register core resolvers.
         $this->addResolver($container->get(ApiResolver::class));
@@ -91,16 +100,17 @@ final class LayoutHydrator {
 
         $this->addLayoutView($container->get(HomeLayoutView::class));
         $this->addMiddleware($container->get(LayoutRoleFilterMiddleware::class));
+        $this->addMiddleware($container->get(VisibilityMiddleware::class));
     }
 
     /**
      * Add a layout view type.
      *
-     * @param AbstractLayoutView $layoutView
+     * @param AbstractCustomLayoutView $layoutView
      *
      * @return LayoutHydrator
      */
-    public function addLayoutView(AbstractLayoutView $layoutView): LayoutHydrator {
+    public function addLayoutView(AbstractCustomLayoutView $layoutView): LayoutHydrator {
         $this->layoutViews[$layoutView->getType()] = $layoutView;
         return $this;
     }
@@ -153,12 +163,12 @@ final class LayoutHydrator {
     /**
      * Get the schema for the layout view parameters.
      *
-     * @param AbstractLayoutView|null $layoutView
+     * @param AbstractCustomLayoutView|null $layoutView
      * @param bool $includeResolvedSchema Include the resolved parameter values in the schema.
      *
      * @return Schema
      */
-    private function getViewParamSchema(?AbstractLayoutView $layoutView, bool $includeResolvedSchema = false): Schema {
+    private function getViewParamSchema(?AbstractCustomLayoutView $layoutView, bool $includeResolvedSchema = false): Schema {
         $schema = $this->commonLayout->getParamInputSchema();
 
         if ($includeResolvedSchema) {
@@ -177,12 +187,12 @@ final class LayoutHydrator {
     /**
      * Get all parameter names for a view type.
      *
-     * @param AbstractLayoutView|null $layoutView
+     * @param AbstractCustomLayoutView|null $layoutView
      * @param ParamResolver $paramResolver
      *
      * @return ParamResolver
      */
-    private function applyParamsNamesToResolver(?AbstractLayoutView $layoutView, ParamResolver $paramResolver): ParamResolver {
+    private function applyParamsNamesToResolver(?AbstractCustomLayoutView $layoutView, ParamResolver $paramResolver): ParamResolver {
         $paramSchema = $this->getViewParamSchema($layoutView, true);
         $enumValues = [];
         $enumDescriptions = [];
@@ -207,15 +217,46 @@ final class LayoutHydrator {
     }
 
     /**
+     * Validate and hydrate provided layout.
+     *
+     * @param string $layoutViewType Layout Type.
+     * @param array $params parameters to hydrate the layout.
+     * @param array $layout layout data
+     * @param bool $includeMeta should metadata be included?
+     *
+     * @return array returns hydrated content.
+     */
+    public function hydrateLayout(string $layoutViewType, array $params, array $layout, ?bool $includeMeta = true): array {
+        $cleanPageHead = clone $this->pageHead;
+
+        // Validate the params.
+        $params = $this->resolveParams($layoutViewType, $params, $cleanPageHead);
+
+        $hydrator = $this->getHydrator($layoutViewType);
+
+        $result = $hydrator->resolve($layout, $params);
+        if ($includeMeta) {
+            // Apply pageHead meta
+            $result['seo'] = [
+                'title' => $cleanPageHead->getSeoTitle(),
+                'description' => $cleanPageHead->getSeoDescription(),
+                'meta' => $cleanPageHead->getMetaTags(),
+                'links' => $cleanPageHead->getLinkTags()];
+        }
+        return $result;
+    }
+    /**
      * Get the full set of resolved params based on the input params.
      *
      * @param string|null $layoutViewType
      * @param array $inputParams
+     * @param PageHeadInterface|null $pageHead page header for metadata.
+     *
      * @return array
      *
      * @throws ValidationException If the params are invalid.
      */
-    public function resolveParams(?string $layoutViewType, array $inputParams): array {
+    public function resolveParams(?string $layoutViewType, array $inputParams, ?PageHeadInterface $pageHead = null): array {
         $layoutView = $this->getLayoutViewType($layoutViewType);
         $inputSchema = $this->getViewParamSchema($layoutView);
         $inputParams = $inputSchema->validate($inputParams);
@@ -224,7 +265,7 @@ final class LayoutHydrator {
         $resolvers = array_filter([$this->commonLayout, $layoutView]);
         $resolvedParams = $inputParams;
         foreach ($resolvers as $resolver) {
-            $resolvedParams = $resolver->resolveParams($resolvedParams);
+            $resolvedParams = $resolver->resolveParams($resolvedParams, $pageHead);
         }
         $resolvedParams = $resolvedParamSchema->validate($resolvedParams);
 
@@ -291,9 +332,9 @@ final class LayoutHydrator {
      *
      * @param string|null $layoutViewType
      *
-     * @return AbstractLayoutView|null
+     * @return AbstractCustomLayoutView|null
      */
-    public function getLayoutViewType(?string $layoutViewType): ?AbstractLayoutView {
+    public function getLayoutViewType(?string $layoutViewType): ?AbstractCustomLayoutView {
         $layoutView = $this->layoutViews[$layoutViewType] ?? null;
         if ($layoutViewType !== null && $layoutView === null) {
             throw new NotFoundException('LayoutViewType', ['layoutViewType' => $layoutViewType]);

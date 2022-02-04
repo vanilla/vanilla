@@ -1290,13 +1290,6 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
     }
 
     /**
-     * Add 'New Question Form' location to Messages.
-     */
-    public function messageController_afterGetLocationData_handler($sender, $args) {
-        $args['ControllerData']['Vanilla/Post/Question'] = t('New Question Form');
-    }
-
-    /**
      * Give point(s) to users for their first answer on an unanswered question!
      *
      * @param CommentModel $sender Sending controller instance.

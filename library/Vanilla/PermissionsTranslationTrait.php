@@ -112,6 +112,7 @@ trait PermissionsTranslationTrait {
         'groups.moderate' => 'Groups.Moderation.Manage',
         'badges.moderate' => 'Reputation.Badges.Give',
         'tags.add' => 'Vanilla.Tagging.Add',
+        'session.valid' => "Garden.SignIn.Allow",
     ];
 
     /** @var array These permissions should not be renamed. */

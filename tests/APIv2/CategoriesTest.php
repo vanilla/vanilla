@@ -7,6 +7,7 @@
 
 namespace VanillaTests\APIv2;
 
+use CategoriesApiController;
 use CategoryModel;
 use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
@@ -447,8 +448,8 @@ class CategoriesTest extends AbstractResourceTest {
      * Make sure `GET /categories` doesn't allow invalid querystring parameters.
      */
     public function testOnlyOneOfIndexQuery(): void {
-        $this->expectExceptionMessage('Only one of categoryID, archived, followed, featured are allowed.');
-        $r = $this->api()->get($this->baseUrl, ['categoryID' => 123, 'followed' => true]);
+        $this->expectErrorMessage(CategoriesApiController::ERRORINDEXMSG);
+        $r = $this->api()->get($this->baseUrl, ['outputFormat' => 'flat', 'maxDepth' => 2]);
     }
 
     /**
@@ -667,5 +668,19 @@ class CategoriesTest extends AbstractResourceTest {
         ;
 
         $this->assertCount(4, $result);
+    }
+
+    /**
+     * Test that the outputFormat is properly enforced on /categories
+     */
+    public function testGetWithOutputFormat() {
+        $parentCategoryID = $this->createCategory()['categoryID'];
+        $this->createCategory(['parentCategoryID' => $parentCategoryID]);
+
+        $result = $this->api()->get("/categories", ['outputFormat' => 'tree'])->getBody();
+        $this->assertArrayHasKey('children', $result[0]);
+
+        $result = $this->api()->get("/categories", ['outputFormat' => 'flat', 'parentCategoryID' => $parentCategoryID])->getBody();
+        $this->assertEquals(2, count($result));
     }
 }

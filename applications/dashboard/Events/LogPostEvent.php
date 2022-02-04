@@ -109,23 +109,23 @@ class LogPostEvent implements \Garden\Events\TrackingEventInterface {
      * @return array
      */
     public function getTrackablePayload(TrackableCommunityModel $trackableCommunityModel, TrackableUserModel $trackableUserModel): array {
-        $trackingData = $this->getPayload();
-        $commentID = $trackingData['comment']['commentID'] ?? null;
+        $postEvent = $this->getPayload();
+        $commentID = $postEvent['comment']['commentID'] ?? null;
         if ($commentID !== null) {
-            $trackingData["comment"] = $trackableCommunityModel->getTrackableComment($trackingData["comment"]["commentID"]);
-        } elseif (isset($trackingData['comment'])) {
-            $trackingData["comment"] = $trackableCommunityModel->getTrackableLogComment($trackingData["comment"]);
+            $trackingData = $trackableCommunityModel->getTrackableComment($postEvent["comment"]["commentID"]);
+        } elseif (isset($postEvent['comment'])) {
+            $trackingData = $trackableCommunityModel->getTrackableLogComment($postEvent["comment"]);
         }
 
-        $discussionID = $trackingData['discussion']['discussionID'] ?? null;
+        $discussionID = $postEvent['discussion']['discussionID'] ?? null;
         if ($discussionID !== null) {
-            $trackingData["discussion"] = $trackableCommunityModel->getTrackableDiscussion($trackingData["discussion"]["discussionID"]);
-        } elseif (isset($trackingData['discussion'])) {
-            $trackingData["discussion"] = $trackableCommunityModel->getTrackableLogDiscussion($trackingData["discussion"]);
+            $trackingData = $trackableCommunityModel->getTrackableDiscussion($postEvent["discussion"]["discussionID"]);
+        } elseif (isset($postEvent['discussion'])) {
+            $trackingData["discussion"] = $trackableCommunityModel->getTrackableLogDiscussion($postEvent["discussion"]);
         }
 
-        $trackingData["discipliningUser"] = $trackableUserModel->getTrackableUser($trackingData["discipliningUser"]["userID"]);
-        $trackingData["disciplinedUser"] = $trackableUserModel->getTrackableUser($trackingData["disciplinedUser"]["userID"]);
+        $trackingData["discipliningUser"] = $trackableUserModel->getTrackableUser($postEvent["discipliningUser"]["userID"]);
+        $trackingData["disciplinedUser"] = $trackableUserModel->getTrackableUser($postEvent["disciplinedUser"]["userID"]);
 
         return $trackingData;
     }

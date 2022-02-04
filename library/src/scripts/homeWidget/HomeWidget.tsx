@@ -18,6 +18,7 @@ import {
 import { IHomeWidgetItemProps, HomeWidgetItem } from "@library/homeWidget/HomeWidgetItem";
 import { HomeWidgetContainer } from "@library/homeWidget/HomeWidgetContainer";
 import { DeepPartial } from "redux";
+import { BorderType } from "@library/styles/styleHelpersBorders";
 
 export interface IWidgetCommonProps {
     /** The title of the widget */
@@ -48,6 +49,9 @@ export function HomeWidget(props: IProps) {
     };
     const containerOptions = homeWidgetContainerVariables(containerOptionsWithDefaults).options;
     const containerClasses = homeWidgetContainerClasses(props.containerOptions);
+    const contentIsListWithSeparators =
+        containerOptions.displayType === WidgetContainerDisplayType.LIST &&
+        itemOptions.box.borderType === BorderType.SEPARATOR;
 
     let items = props.itemData;
 
@@ -76,6 +80,7 @@ export function HomeWidget(props: IProps) {
             description={props.description}
             options={containerOptionsWithDefaults}
             title={props.title}
+            contentIsListWithSeparators={contentIsListWithSeparators}
         >
             {items.map((item, i) => {
                 return <HomeWidgetItem key={i} {...item} options={props.itemOptions} />;

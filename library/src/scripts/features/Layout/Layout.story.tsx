@@ -1,10 +1,11 @@
 import React from "react";
 import { addComponent } from "@library/utility/componentRegistry";
-import { IDynamicComponent, ILayout, Layout } from "@library/features/Layout/Layout";
+import { IDynamicComponent, ILayout, Layout, LayoutDevice } from "@library/features/Layout/Layout";
 import { fakeDiscussions } from "@library/features/discussions/DiscussionList.story";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
+import DeviceContext, { DeviceProvider } from "@library/layout/DeviceContext";
 
 export default {
     title: "Widgets/Layout",
@@ -357,3 +358,57 @@ export function ExamplePageLayout() {
         </>
     );
 }
+
+export function DeviceVisibility() {
+    return (
+        <>
+            <StoryContent>
+                <StoryHeading depth={1}>Device Specific Visibility</StoryHeading>
+                <StoryParagraph>This story tests configuring a device with the visiblity middleware.</StoryParagraph>
+            </StoryContent>
+            <LayoutStory
+                layout={[
+                    {
+                        $middleware: {
+                            visibility: {
+                                device: LayoutDevice.ALL,
+                            },
+                        },
+                        $reactComponent: "panel",
+                        $reactProps: {
+                            title: "This Panel always renders",
+                        },
+                    },
+                    {
+                        $middleware: {
+                            visibility: {
+                                device: LayoutDevice.DESKTOP,
+                            },
+                        },
+                        $reactComponent: "panel",
+                        $reactProps: {
+                            title: "This Panel renders on desktop only.",
+                        },
+                    },
+                    {
+                        $middleware: {
+                            visibility: {
+                                device: LayoutDevice.MOBILE,
+                            },
+                        },
+                        $reactComponent: "panel",
+                        $reactProps: {
+                            title: "This Panel renders on mobile only.",
+                        },
+                    },
+                ]}
+            />
+        </>
+    );
+}
+
+DeviceVisibility.parameters = {
+    chromatic: {
+        viewports: [400, 1000],
+    },
+};

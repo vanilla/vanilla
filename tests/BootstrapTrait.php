@@ -24,6 +24,7 @@ use Webmozart\Assert\Assert;
 
 trait BootstrapTrait {
     use PrivateAccessTrait;
+    use TestLoggerTrait;
 
     /** @var Bootstrap */
     private static $bootstrap;
@@ -75,9 +76,7 @@ trait BootstrapTrait {
         \Gdn::setController(null);
         StaticCache::clear();
 
-        $logger = $this->getTestLogger();
-        $logger->clear();
-
+        $this->setUpLoggerTrait();
         self::$emails = [];
         \Gdn_Form::resetIDs();
         \Gdn_Controller::setIsReauthenticated(false);
@@ -179,40 +178,6 @@ trait BootstrapTrait {
     }
 
     /**
-     * Assert that something was logged.
-     *
-     * @param array $filter The log filter.
-     * @return array Return the first log entry found.
-     */
-    public function assertLog($filter = []): array {
-        $logger = $this->getTestLogger();
-        $item = $logger->search($filter);
-        $this->assertNotNull($item, "Could not find expected log: ".json_encode($filter));
-        return $item;
-    }
-
-    /**
-     * Assert that something was NOT logged.
-     *
-     * @param array $filter The log filter.
-     */
-    public function assertNoLog($filter = []) {
-        $logger = $this->getTestLogger();
-        $item = $logger->search($filter);
-        $this->assertNull($item, "Unexpected log found: ".json_encode($filter));
-    }
-
-    /**
-     * Assert that the log has a message.
-     *
-     * @param string $message
-     */
-    public function assertLogMessage(string $message) {
-        $logger = $this->getTestLogger();
-        $this->assertTrue($logger->hasMessage($message), "The log doesn't have the message: ".$message);
-    }
-
-    /**
      * Run a callback with the following config and restore the config after.
      *
      * @param array $config The config to set.
@@ -246,15 +211,6 @@ trait BootstrapTrait {
                 }
             }
         }
-    }
-
-    /**
-     * @return TestLogger
-     */
-    protected static function getTestLogger(): TestLogger {
-        /** @var TestLogger $logger */
-        $logger = static::container()->get(TestLogger::class);
-        return $logger;
     }
 
     /**

@@ -25,7 +25,9 @@ paths:
                   required: false
                   schema:
                       type: boolean
-                - description: The maximum tree depth to return when getting a tree structure.
+                - description: >-
+                      The maximum tree depth to return when getting a tree structure.
+                      This parameter is incompatible with a flat structure.
                   in: query
                   name: maxDepth
                   schema:
@@ -34,28 +36,52 @@ paths:
                 - name: archived
                   description: >
                       Filter by archived status of a category. True for archived only.
-                      False for no archived categories. Not compatible with followed
-                      filter.
+                      False for no archived categories.
                   in: query
                   required: false
                   schema:
                       type: boolean
-                - description: Only list featured categories. When applied the maxDepth filter will be ignored.
+                - description: Only list featured categories.
                   in: query
                   name: featured
                   required: false
                   schema:
                       type: boolean
-                - $ref: "#/components/parameters/Page"
-                - description: |
+                - description: >-
+                      Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).
+                      This parameter is incompatible with a tree structure.
+                  in: query
+                  name: page
+                  schema:
+                      type: integer
+                      minimum: 1
+                - description: >-
                       Desired number of items per page.
+                      This parameter is incompatible with a tree structure.
                   in: query
                   name: limit
                   schema:
                       type: integer
-                      default: 30
                       maximum: 100
                       minimum: 1
+                - description: >-
+                      Filter categories by site-section-id (subcommunity).
+                      The subcommunityID or folder can be used.
+                      The query looks like
+                      siteSectionID=$SubcommunityID:{id} ie. 1
+                      siteSectionID=$SubcommunityID:{folder} ie. en
+                  in: query
+                  name: siteSectionID
+                  schema:
+                      type: string
+                - description: Format of the output as flat or tree.
+                  in: query
+                  name: outputFormat
+                  schema:
+                      type: string
+                      enum:
+                          - flat
+                          - tree
             responses:
                 "200":
                     content:
@@ -141,6 +167,8 @@ paths:
                                                         type: string
                                                     allowedDiscussionTypes:
                                                         description: Allowed category discussion types.
+                                                        items:
+                                                            type: string
                                                         type: array
                                                 required:
                                                     - categoryID

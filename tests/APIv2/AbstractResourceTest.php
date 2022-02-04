@@ -328,7 +328,7 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Test PATCH /resource/<id> with a a single field update.
+     * Test PATCH /resource/<id> with a single field update.
      *
      * Patch endpoints should be able to update every field on its own.
      *

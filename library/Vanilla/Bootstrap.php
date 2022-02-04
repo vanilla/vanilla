@@ -12,6 +12,7 @@ use Garden\Container\Reference;
 use Garden\Web\Dispatcher;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\ChainAdapter;
@@ -31,6 +32,7 @@ use Vanilla\Utility\ContainerUtils;
 use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
 use Vanilla\Web\Middleware\LogTransactionMiddleware;
 use Vanilla\Web\Page;
+use Vanilla\Web\PageHead;
 
 /**
  * Contains static functions for bootstrapping Vanilla.
@@ -78,6 +80,18 @@ class Bootstrap {
         ;
 
         // Logging
+        $container
+            ->rule(\Vanilla\Logger::class)
+            ->setShared(true)
+            ->addAlias(\Psr\Log\LoggerInterface::class)
+
+            ->rule(Vanilla\Logging\LogDecorator::class)
+            ->setShared(true)
+
+            ->rule(\Psr\Log\LoggerAwareInterface::class)
+            ->addCall('setLogger')
+        ;
+
         $container
             ->rule(TraceCollector::class)
             ->setShared(true)

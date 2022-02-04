@@ -5,7 +5,9 @@
  */
 
 import { DashboardCodeEditor } from "@dashboard/forms/DashboardCodeEditor";
+import { DashboardColorPicker } from "@dashboard/forms/DashboardFormColorPicker";
 import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
+import { DashboardImageUploadGroup } from "@dashboard/forms/DashboardImageUploadGroup";
 import { DashboardInput } from "@dashboard/forms/DashboardInput";
 import { DashboardRadioButton } from "@dashboard/forms/DashboardRadioButton";
 import { DashboardRadioGroup } from "@dashboard/forms/DashboardRadioGroups";
@@ -13,6 +15,7 @@ import { DashboardToggle } from "@dashboard/forms/DashboardToggle";
 import apiv2 from "@library/apiv2";
 import { FormTreeControl } from "@library/tree/FormTreeControl";
 import { useUniqueID } from "@library/utility/idUtils";
+import { t } from "@vanilla/i18n";
 import { IControlGroupProps, IControlProps } from "@vanilla/json-schema-forms";
 import { AutoComplete, IFormGroupProps } from "@vanilla/ui";
 import { AutoCompleteLookupOptions } from "@vanilla/ui/src/forms/autoComplete/AutoCompleteLookupOptions";
@@ -109,6 +112,17 @@ export function DashboardFormControl(props: IControlProps) {
             return <DashboardToggle disabled={props.disabled} checked={value} onChange={onChange} />;
         case "dragAndDrop":
             return <FormTreeControl {...(props as any)} />;
+        case "upload":
+            return (
+                <DashboardImageUploadGroup
+                    value={value}
+                    onChange={onChange}
+                    label={control.label ?? t("Image Upload")}
+                    description={control.description}
+                />
+            );
+        case "color":
+            return <DashboardColorPicker value={value} onChange={onChange} disabled={props.disabled} />;
         default:
             return <div>{(control as any).inputType} is not supported</div>;
     }
@@ -122,8 +136,8 @@ export function DashboardFormControl(props: IControlProps) {
 export function DashboardFormControlGroup(props: React.PropsWithChildren<IControlGroupProps> & IFormGroupProps) {
     const { children, controls } = props;
     const { sideBySide, inputID } = props;
-    const { label, description, fullSize } = controls[0];
-    if (fullSize) {
+    const { label, description, fullSize, inputType } = controls[0];
+    if (fullSize || inputType === "upload") {
         return <>{children}</>;
     }
 

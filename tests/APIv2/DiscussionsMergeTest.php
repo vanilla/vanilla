@@ -79,14 +79,15 @@ class DiscussionsMergeTest extends SiteTestCase {
         // Make sure counts were adjusted properly.
         $categoryIDs = [
             $rootCategory['categoryID'],
-            $category1['categoryID'],
             $category2['categoryID'],
+            $category1['categoryID'],
+
         ];
         $categories = $this->api()->get('/categories', ['categoryID' => $categoryIDs])->getBody();
         $this->assertRowsLike([
             'categoryID' => $categoryIDs,
-            'countComments' => [0, 6, 0],
-            'countDiscussions' => [0, 1, 2],
+            'countComments' => [0, 0, 6],
+            'countDiscussions' => [0, 2, 1],
         ], $categories, true, 3);
     }
 

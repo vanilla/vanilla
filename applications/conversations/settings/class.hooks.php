@@ -10,6 +10,9 @@
 
 use Garden\Container\Container;
 use Garden\Container\Reference;
+use Vanilla\Conversations\Layout\LegacyMessageInboxLayoutView;
+use Vanilla\Dashboard\Layout\View\LegacyProfileLayoutView;
+use Vanilla\Layout\LayoutService;
 
 /**
  * Handles hooks into Dashboard and Vanilla.
@@ -24,6 +27,8 @@ class ConversationsHooks implements Gdn_IPlugin {
         $dic->rule(\Vanilla\Menu\CounterModel::class)
             ->addCall('addProvider', [new Reference(ConversationCounterProvider::class)])
         ;
+        $dic->rule(LayoutService::class)
+            ->addCall('addLayoutView', [new Reference(LegacyMessageInboxLayoutView::class)]);
     }
 
     /**
@@ -167,13 +172,6 @@ class ConversationsHooks implements Gdn_IPlugin {
 
             $sender->Menu->addLink('Conversations', $inbox, '/messages/all', false, ['Standard' => true]);
         }
-    }
-
-    /**
-     * Let us add Messages to the Inbox page.
-     */
-    public function base_afterGetLocationData_handler($sender, $args) {
-        $args['ControllerData']['Conversations/messages/inbox'] = t('Inbox Page');
     }
 
     /**

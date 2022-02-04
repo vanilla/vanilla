@@ -16,7 +16,7 @@ export interface ILayoutErrorBoundaryProps {
 }
 
 export interface ILayoutErrorBoundaryState {
-    hasError: boolean;
+    error: Error | null;
 }
 
 interface ILayoutErrorProps {
@@ -42,11 +42,11 @@ export function LayoutError(props: ILayoutErrorProps) {
 export default class LayoutErrorBoundary extends Component<ILayoutErrorBoundaryProps, ILayoutErrorBoundaryState> {
     constructor(props: ILayoutErrorBoundaryProps) {
         super(props);
-        this.state = { hasError: false };
+        this.state = { error: null };
     }
 
     static getDerivedStateFromError(error: Error) {
-        return { hasError: true };
+        return { error: error.message };
     }
 
     componentDidCatch(error, errorInfo) {
@@ -54,7 +54,7 @@ export default class LayoutErrorBoundary extends Component<ILayoutErrorBoundaryP
     }
 
     render() {
-        if (this.state.hasError) {
+        if (this.state.error !== null) {
             return <LayoutError componentName="this content" />;
         }
 

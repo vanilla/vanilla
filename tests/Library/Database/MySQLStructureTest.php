@@ -127,6 +127,39 @@ class MySQLStructureTest extends BootstrapTestCase {
     }
 
     /**
+     * Database indexes should be case-insensitive.
+     */
+    public function testIndexCaseInsensitive(): void {
+        $px = $this->st->Database->DatabasePrefix;
+        $tbl = __FUNCTION__;
+
+        $this->st->table($tbl)->drop();
+
+        $this->st
+            ->table($tbl)
+            ->primaryKey('id')
+            ->column('status', 'int')
+            ->set();
+
+        $this->st->Database->query("alter table `$px{$tbl}` add index IX_{$tbl}_Status (`status`)");
+        $this->assertColumnHasIndex($tbl, 'status');
+
+        try {
+            $this->st->CaptureOnly = true;
+            $this->assertEmpty($this->db->CapturedSql, 'Something went wrong with the test.');
+
+            $this->st
+                ->table($tbl)
+                ->column('status', 'int', false, 'index.status')
+                ->set();
+
+            $this->assertEmpty($this->db->CapturedSql, $this->db->CapturedSql[0] ?? '');
+        } finally {
+            $this->st->CaptureOnly = false;
+        }
+    }
+
+    /**
      * Test adding an index requring a lock on a table under the modify row threshold.
      *
      * @return void

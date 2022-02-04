@@ -7,6 +7,7 @@
 
 namespace Vanilla\Widgets\Schema;
 
+use Garden\Hydrate\DataHydrator;
 use Garden\Hydrate\Schema\HydrateableSchema;
 use Garden\Schema\Schema;
 use Vanilla\Layout\Resolvers\ReactResolver;
@@ -28,6 +29,12 @@ class ReactSingleChildSchema extends Schema {
             'description' => $description ?? 'Render a specific react component with a set of props.',
             HydrateableSchema::X_HYDRATE_GROUP => $hydrateGroup,
             'properties' => [
+                // Optional middleware that can get passed through the client.
+                // If you want this to get through, your middleware has to explicitly set the middleware property.
+                DataHydrator::KEY_MIDDLEWARE => [
+                    'type' => 'object',
+                    'additionalProperties' => true,
+                ],
                 '$reactComponent' => [
                     HydrateableSchema::X_NO_HYDRATE => true,
                     'type' => 'string',

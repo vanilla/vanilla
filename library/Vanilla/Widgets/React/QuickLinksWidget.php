@@ -11,7 +11,9 @@ use Garden\Schema\Schema;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
 use Vanilla\Navigation\NavLinkSchema;
+use Vanilla\Utility\SchemaUtils;
 use Vanilla\Web\JsInterpop\AbstractReactModule;
+use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
 
 /**
  * Class QuickLinksWidget
@@ -19,6 +21,7 @@ use Vanilla\Web\JsInterpop\AbstractReactModule;
 class QuickLinksWidget extends AbstractReactModule implements CombinedPropsWidgetInterface {
 
     use CombinedPropsWidgetTrait;
+    use HomeWidgetContainerSchemaTrait;
 
     /**
      * @inheritDoc
@@ -40,13 +43,15 @@ class QuickLinksWidget extends AbstractReactModule implements CombinedPropsWidge
     public static function getWidgetID(): string {
         return "quick-links";
     }
+
     /**
      * @inheritDoc
      */
     public static function getWidgetSchema(): Schema {
         $linkSchema = new NavLinkSchema();
-
-        return Schema::parse([
+        return SchemaUtils::composeSchemas(
+            self::containerOptionsSchema('containerOptions'),
+            Schema::parse([
                 "title:s?" => [
                     'default' => t('Quick Links'),
                     'x-control' => SchemaForm::textBox(new FormOptions('Title', 'Title for the widget.', 'Quick Links')),
@@ -60,6 +65,7 @@ class QuickLinksWidget extends AbstractReactModule implements CombinedPropsWidge
                         $linkSchema
                     ),
                 ],
-        ]);
+            ])
+        );
     }
 }

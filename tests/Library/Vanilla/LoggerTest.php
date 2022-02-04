@@ -31,25 +31,34 @@ class LoggerTest extends LoggerInterfaceTest {
         $this->logger = new TestLogger();
     }
 
+    /**
+     * @return void
+     */
     public function testBasicLogging() {
         $logger = new TestLogger();
 
-        $this->assertLog($logger, Logger::DEBUG, 'Hello world', ['foo']);
+        $this->assertLogExists($logger, Logger::DEBUG, 'Hello world', ['foo']);
     }
 
+    /**
+     * @return void
+     */
     public function testLowPriority() {
         $logger = new TestLogger(null, Logger::INFO);
 
         $this->assertNotLog($logger, Logger::DEBUG, 'Hello world', ['bar']);
     }
 
+    /**
+     * @return void
+     */
     public function testTwoLoggers() {
         $logger1 = new TestLogger();
         $logger2 = new TestLogger($logger1->parent);
         $loggers = [$logger1, $logger2];
 
         foreach ($loggers as $logger) {
-            $this->assertLog($logger, Logger::DEBUG, 'Hello world', ['foo']);
+            $this->assertLogExists($logger, Logger::DEBUG, 'Hello world', ['foo']);
         }
     }
 
@@ -61,9 +70,17 @@ class LoggerTest extends LoggerInterfaceTest {
         parent::testThrowsOnInvalidLevel();
     }
 
-    protected function assertLog(TestLogger $logger, $level, $message, $context) {
+    /**
+     * Utility for asserting a log message exists.
+     *
+     * @param TestLogger $logger
+     * @param int $level
+     * @param string $message
+     * @param array $context
+     */
+    protected function assertLogExists(TestLogger $logger, $level, $message, $context) {
         $logger->parent->log($level, $message, $context);
-        list($lastLevel, $lastMessage, $lastContext) = $logger->last;
+        [$lastLevel, $lastMessage, $lastContext] = $logger->last;
         $this->assertSame($level, $lastLevel);
         $this->assertSame($message, $lastMessage);
 
@@ -73,7 +90,7 @@ class LoggerTest extends LoggerInterfaceTest {
 
     protected function assertNotLog(TestLogger $logger, $level, $message, $context) {
         $logger->parent->log($level, $message, $context);
-        list($lastLevel, $lastMessage, $lastContext) = $logger->last;
+        [$lastLevel, $lastMessage, $lastContext] = $logger->last;
         $this->assertNotSame($level, $lastLevel);
         $this->assertNotSame($message, $lastMessage);
         $this->assertNotSame($context, $lastContext);

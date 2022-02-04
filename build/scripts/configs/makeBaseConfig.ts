@@ -11,7 +11,7 @@ import { svgLoader } from "./svgLoader";
 import webpack from "webpack";
 import WebpackBar from "webpackbar";
 import { BuildMode, getOptions } from "../buildOptions";
-import { DIST_DIRECTORY, DIST_NAME, VANILLA_ROOT } from "../env";
+import { DIST_DIRECTORY, DIST_NAME, VANILLA_APPS, VANILLA_ROOT } from "../env";
 import EntryModel from "../utility/EntryModel";
 import { printVerbose } from "../utility/utils";
 const CircularDependencyPlugin = require("circular-dependency-plugin");
@@ -183,6 +183,14 @@ ${chalk.green(aliases)}`;
             modules: modulePaths,
             mainFields: ["browser", "module", "main"],
             alias: {
+                "@dashboard/compatibilityStyles/Leaderboard.variables": path.resolve(
+                    VANILLA_ROOT,
+                    "library/src/scripts/leaderboardWidget/LeaderboardWidget.variables.ts",
+                ),
+                "@dashboard/compatibilityStyles/Leaderboard.styles": path.resolve(
+                    VANILLA_ROOT,
+                    "library/src/scripts/leaderboardWidget/LeaderboardWidget.styles.ts",
+                ),
                 ...hotAliases,
                 ...entryModel.aliases,
                 "library-scss": path.resolve(VANILLA_ROOT, "library/src/scss"),

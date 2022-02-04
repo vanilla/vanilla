@@ -253,69 +253,8 @@ class ArrayUtilsTest extends TestCase {
                 "Hello world.",
                 ["foo" => ["bar" => ["A" => "one", "B" => "two", "C" => "three", "baz" => "Hello world."]]],
             ],
-            "create root" => [
-                "foo",
-                ["foo" => "not bar"],
-                "bar",
-                ["foo" => "bar"],
-            ]
         ];
         return $result;
-    }
-
-    /**
-     * Tests for unsetByPath().
-     *
-     * @param string $path
-     * @param array $initial
-     * @param array|string $expected
-     *
-     * @dataProvider provideUnsetByPath
-     */
-    public function testUnsetByPath(string $path, array $initial, $expected) {
-        $actual = $initial;
-
-        if (is_string($expected)) {
-            $this->expectExceptionMessage($expected);
-        }
-
-        ArrayUtils::unsetByPath($path, $actual);
-        $this->assertSame($expected, $actual);
-    }
-
-    /**
-     * @return iterable
-     */
-    public function provideUnsetByPath(): iterable {
-        yield "unset leaf" => [
-            'parent.leaf',
-            ['parent' => ['leaf' => true], 'other' => false],
-            ['parent' => [], 'other' => false],
-        ];
-
-        yield "unset parent" => [
-            'parent',
-            ['parent' => ['leaf' => true], 'other' => false],
-            ['other' => false],
-        ];
-
-        yield "unset null" => [
-            'key',
-            ['key' => null],
-            [],
-        ];
-
-        yield "unset not isset" => [
-            'notthere',
-            ['key' => 'value'],
-            ['key' => 'value'],
-        ];
-
-        yield "bad-path" => [
-            'not-a-parent.leaf',
-            ['not-a-parent' => true],
-            'Expected an array or array-like object'
-        ];
     }
 
     /**

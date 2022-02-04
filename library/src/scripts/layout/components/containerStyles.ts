@@ -6,7 +6,7 @@
 
 import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
-import { oneColumnVariables } from "@library/layout/Section.variables";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { percent } from "csx";
 import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
@@ -15,7 +15,7 @@ import { Mixins } from "@library/styles/Mixins";
 import { ISpacing } from "@library/styles/cssUtilsTypes";
 
 export const containerVariables = useThemeCache(() => {
-    const vars = oneColumnVariables();
+    const vars = panelLayoutVariables();
     const globalVars = globalVariables();
     const makeThemeVars = variableFactory("containerVariables");
 
@@ -63,7 +63,7 @@ export const containerMainStyles = (): CSSObject => {
 };
 
 export function containerMainMediaQueries() {
-    const mediaQueries = oneColumnVariables().mediaQueries();
+    const mediaQueries = panelLayoutVariables().mediaQueries();
     const vars = containerVariables();
     return mediaQueries.oneColumnDown({
         ...Mixins.padding({
@@ -74,7 +74,7 @@ export function containerMainMediaQueries() {
 
 export const containerClasses = useThemeCache((options?: { desktopSpacing?: ISpacing; maxWidth?: number | string }) => {
     const style = styleFactory("container");
-    const mediaQueries = oneColumnVariables().mediaQueries();
+    const mediaQueries = panelLayoutVariables().mediaQueries();
     const vars = containerVariables();
     const root = style(containerMainStyles(), containerMainMediaQueries());
 

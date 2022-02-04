@@ -8,7 +8,7 @@ import { percent } from "csx";
 import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { SectionTypes } from "@library/layout/types/interface.layoutTypes";
+import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
 import { Mixins } from "@library/styles/Mixins";
 import { css } from "@emotion/css";
 
@@ -38,14 +38,14 @@ export const panelWidgetClasses = useThemeCache((mediaQueries) => {
             ...Mixins.padding({ all: 0 }),
         },
         ...mediaQueries({
-            [SectionTypes.TWO_COLUMNS]: {
+            [LayoutTypes.TWO_COLUMNS]: {
                 oneColumnDown: {
                     ...Mixins.padding({
                         all: globalVars.widget.padding,
                     }),
                 },
             },
-            [SectionTypes.THREE_COLUMNS]: {
+            [LayoutTypes.THREE_COLUMNS]: {
                 oneColumnDown: {
                     ...Mixins.padding({
                         all: globalVars.widget.padding,

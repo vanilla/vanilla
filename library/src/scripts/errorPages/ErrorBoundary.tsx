@@ -10,7 +10,7 @@ import { ErrorIcon } from "@library/icons/common";
 import { t } from "@vanilla/i18n";
 
 interface IProps {
-    children?: React.ReactNode;
+    children: React.ReactNode;
     errorComponent?: React.ComponentType<any>;
 }
 

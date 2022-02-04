@@ -9,14 +9,14 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
-import { oneColumnVariables } from "@library/layout/Section.variables";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { percent, px } from "csx";
 import { Mixins } from "@library/styles/Mixins";
 import { css } from "@emotion/css";
 
 export const actionBarClasses = useThemeCache(() => {
     const titleBarVars = titleBarVariables();
-    const mediaQueries = oneColumnVariables().mediaQueries();
+    const mediaQueries = panelLayoutVariables().mediaQueries();
     const globalVars = globalVariables();
 
     const items = css(

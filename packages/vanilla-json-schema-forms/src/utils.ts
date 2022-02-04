@@ -48,7 +48,7 @@ export function findAllReferences(anyObj: any, path: Array<string | number> = []
                 return { path: [...path, key], ref };
             });
         }
-        if (typeof value === "object" && value !== null) return findAllReferences(value, [...path, key]);
+        if (typeof value === "object") return findAllReferences(value, [...path, key]);
         return [];
     });
 }

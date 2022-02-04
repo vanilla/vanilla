@@ -31,17 +31,7 @@ Follow-up notifications can be triggered in two ways:
 - Automatically: Once the feature flag is enabled, a service starts to run triggering notifications in a defined period of time.
 - Manually: Users with `Garden.Community.Manage` permission or higher can trigger this feature manually by clicking the discussion option "Send Q&A follow-up notification" on the discussion thread page.
 
-### Setup
 
-This feature depends on a **cronjob** being executed twice daily on the cluster's data server, POSTing to the site's `/api/v2/discussions/question-notifications` endpoint and passing a valid system access token.
-
-**On vanilla-cloud with hosted-queue enabled, this cron is automatically configured with `Vanilla\QnA\Job\QnAFollowupJob`**. 
-
-```
-30 1,13 * * * curl -XPOST -H "Authorization: Bearer SYSTEM_USER_ACCESS_TOKEN" https://CUSTOMER.vanillacommunities.com/api/v2/discussions/question-notifications
-```
-
-This token should be generated with `POST /api/v2/tokens`.
 
 ### Troubleshooting:
 

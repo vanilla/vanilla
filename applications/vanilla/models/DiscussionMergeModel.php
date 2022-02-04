@@ -9,8 +9,6 @@ namespace Vanilla\Forum\Models;
 
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
-use Gdn;
-use Vanilla\Community\Events\DiscussionEvent;
 use Vanilla\Scheduler\LongRunnerFailedID;
 use Vanilla\Scheduler\LongRunnerNextArgs;
 use Vanilla\Scheduler\LongRunnerQuantityTotal;
@@ -136,13 +134,6 @@ class DiscussionMergeModel implements SystemCallableInterface {
 
         // Convert the discussion into a comment.
         $this->convertDiscussionToComment($sourceDiscussion, $destinationDiscussion, $addRedirects);
-
-        // Dispatch a Discussion event (merge)
-        $senderUserID = Gdn::session()->UserID;
-        $sender = $senderUserID ? Gdn::userModel()->getFragmentByID($senderUserID) : null;
-        $discussionEvent = $this->discussionModel->eventFromRow($sourceDiscussion, DiscussionEvent::ACTION_MERGE, $sender);
-        $discussionEvent->setDestinationDiscussionID($destinationDiscussionID);
-        $this->discussionModel->getEventManager()->dispatch($discussionEvent);
     }
 
     /**

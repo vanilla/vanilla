@@ -8,7 +8,6 @@
 namespace Vanilla\Forum\Search;
 
 use Garden\Schema\Schema;
-use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Search\BoostableSearchQueryInterface;
 use Vanilla\Search\MysqlSearchQuery;
 use Vanilla\Search\SearchQuery;
@@ -29,11 +28,7 @@ class CategorySearchType extends AbstractSearchType {
     /** @var \CategoriesApiController $categoriesApi */
     protected $categoriesApi;
 
-    /** @var CategorySearchExclusionInterface[] */
-    private $searchExcluders = [];
-
-    /** @var ConfigurationInterface */
-    private $config;
+    private $excludedCategoryIDs = [];
 
     /**
      * CategorySearchType constructor.
@@ -43,19 +38,19 @@ class CategorySearchType extends AbstractSearchType {
      */
     public function __construct(
         \CategoryModel $categoryModel,
-        \CategoriesApiController $categoriesApi,
-        ConfigurationInterface $config
+        \CategoriesApiController $categoriesApi
     ) {
         $this->categoryModel = $categoryModel;
         $this->categoriesApi = $categoriesApi;
-        $this->config = $config;
     }
 
     /**
-     * @param CategorySearchExclusionInterface $searchExclusion
+     * Apply some categoryIDs that should be excluded from category searches.
+     *
+     * @param array $ids
      */
-    public function addSearchExcluder(CategorySearchExclusionInterface $searchExclusion): void {
-        $this->searchExcluders[] = $searchExclusion;
+    public function addExcludedCategoryIDs(array $ids) {
+        $this->excludedCategoryIDs = array_unique(array_merge($ids, $this->excludedCategoryIDs));
     }
 
     /**
@@ -83,9 +78,19 @@ class CategorySearchType extends AbstractSearchType {
      * @inheritdoc
      */
     public function getResultItems(array $recordIDs, SearchQuery $query): array {
+        $filteredRecordIDs = [];
+        foreach ($recordIDs as $categoryID) {
+            if (!in_array($categoryID, $this->excludedCategoryIDs)) {
+                $filteredRecordIDs[] = $categoryID;
+            }
+        }
+        if (count($filteredRecordIDs) === 0) {
+            return [];
+        }
+
         $results = $this->categoriesApi->index(
             [
-                'categoryID' => implode(',', $recordIDs),
+                'categoryID' => implode(',', $filteredRecordIDs),
                 'expand' => [ModelUtils::EXPAND_CRAWL],
             ],
             false
@@ -155,13 +160,6 @@ class CategorySearchType extends AbstractSearchType {
         if (empty($categoryIDs)) {
             $categoryIDs[] = 0;
         }
-
-        $excludedIDs = [];
-        foreach ($this->searchExcluders as $searchExclusion) {
-            $excludedIDs = array_merge($searchExclusion->getExcludedCategorySearchIDs(), $excludedIDs);
-        }
-
-        $categoryIDs = array_diff($categoryIDs, $excludedIDs);
 
         return $categoryIDs;
     }
@@ -246,7 +244,7 @@ class CategorySearchType extends AbstractSearchType {
      * @return float|null
      */
     protected function getBoostValue(): ?float {
-        return $this->config->get('Elastic.Boost.Category', 15);
+        return 10;
     }
 
 

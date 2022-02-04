@@ -8,8 +8,6 @@
  * @since 2.0
  */
 
-use Vanilla\Formatting\FormatService;
-
 /**
  * Handles posting and editing comments, discussions, and drafts via /post endpoint.
  */
@@ -41,19 +39,6 @@ class PostController extends VanillaController {
     /** @var null|array */
     public $Context = null;
 
-    /** @var FormatService */
-    private $formatService;
-
-    /**
-     * DI.
-     *
-     * @param FormatService $formatService
-     */
-    public function __construct(FormatService $formatService) {
-        parent::__construct();
-        $this->formatService = $formatService;
-    }
-
     /**
      * General "post" form, allows posting of any kind of form. Attach to PostController_AfterFormCollection_Handler.
      *
@@ -63,6 +48,7 @@ class PostController extends VanillaController {
      */
     public function index($currentFormName = 'discussion') {
         $this->addJsFile('jquery.autosize.min.js');
+        $this->addJsFile('autosave.js');
         $this->addJsFile('post.js');
 
         $this->setData('CurrentFormName', $currentFormName);
@@ -130,6 +116,7 @@ class PostController extends VanillaController {
 
         // Setup head
         $this->addJsFile('jquery.autosize.min.js');
+        $this->addJsFile('autosave.js');
         $this->addJsFile('post.js');
 
         $session = Gdn::session();
@@ -290,9 +277,10 @@ class PostController extends VanillaController {
                     }
                 }
 
-                if (!empty($this->Category)) {
+                if (is_object($this->Category)) {
                     // Check category permissions.
                     if ($this->Form->getFormValue('Announce') && !CategoryModel::checkPermission($this->Category, 'Vanilla.Discussions.Announce')) {
+
                         $this->Form->addError('You do not have permission to announce in this category', 'Announce');
                     }
 
@@ -306,20 +294,6 @@ class PostController extends VanillaController {
 
                     if (!isset($this->Discussion) && !CategoryModel::checkPermission($this->Category, 'Vanilla.Discussions.Add')) {
                         $this->Form->addError('You do not have permission to start discussions in this category', 'CategoryID');
-                    }
-
-                    // Check for uploads against category->AllowFileUploads. (admins bypass this condition)
-                    if (!boolval($session->User->Admin)) {
-                        $objCategory = (object)$this->Category;
-                        $AllowFileUploads = (bool) $objCategory->AllowFileUploads ?? true;
-
-                        if (!$AllowFileUploads) {
-                            $hasUpload = $this->hasFormUploads($this->Form->getFormValue('Format'), $this->Form->getFormValue('Body'));
-
-                            if ($hasUpload) {
-                                $this->Form->addError('You are not allowed to post attachments in this category. Please remove any attachments to proceed.');
-                            }
-                        }
                     }
                 }
 
@@ -442,20 +416,6 @@ class PostController extends VanillaController {
 
         // Render view (posts/discussion.php or post/preview.php)
         $this->render();
-    }
-
-    /**
-     * Check for uploads on the post body
-     *
-     * @param string $format
-     * @param string $body
-     * @return bool
-     */
-    public function hasFormUploads($format, $body) {
-        $attachments = $this->formatService->parseAttachments($body, $format);
-        $embeddedImages = $this->formatService->parseImages($body, $format);
-
-        return !!count(array_merge($attachments, $embeddedImages));
     }
 
     /**
@@ -654,6 +614,7 @@ class PostController extends VanillaController {
 
         // Setup head
         $this->addJsFile('jquery.autosize.min.js');
+        $this->addJsFile('autosave.js');
         $this->addJsFile('post.js');
 
         // Setup comment model, $CommentID, $DraftID

@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { RefObject, useState, useLayoutEffect, MutableRefObject } from "react";
+import { RefObject, useState, useLayoutEffect } from "react";
 import ResizeObserver from "resize-observer-polyfill";
 import debounce from "lodash/debounce";
 import { stableObjectHash } from "@vanilla/utils";
@@ -30,7 +30,7 @@ const EMPTY_RECT: DOMRect = {
  * @param watchRef Used to trigger a remeasure if the ref changes.
  */
 export function useMeasure(
-    ref: RefObject<HTMLElement | null> | MutableRefObject<HTMLElement | null | undefined>,
+    ref: RefObject<HTMLElement | null>,
     adjustForScrollOffset: boolean = false,
     watchRef: boolean = false,
 ) {

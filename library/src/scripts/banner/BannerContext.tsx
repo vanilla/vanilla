@@ -6,7 +6,6 @@
 import React, { useContext, useState, useEffect, useRef, useDebugValue } from "react";
 import { useMeasure } from "@vanilla/react-utils";
 import { usePageChangeListener } from "@library/pageViews/pageViewTracking";
-import { bannerVariables } from "@library/banner/Banner.variables";
 
 interface IContextValue {
     bannerExists: boolean;
@@ -30,15 +29,6 @@ export function useBannerContext() {
     const value = useContext(context);
     useDebugValue(value);
     return value;
-}
-
-/**
- * Used in some components (e.g. EventsHomePage) to determine if the main title will be rendered or no.
- */
-export function useShouldRenderMainTitle() {
-    const bannerContext = useBannerContext();
-    const deduplicateTitles = bannerVariables().options.deduplicateTitles;
-    return !bannerContext.bannerExists || !deduplicateTitles;
 }
 
 /**

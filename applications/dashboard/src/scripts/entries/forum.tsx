@@ -33,8 +33,8 @@ import { SearchPageRoute } from "@library/search/SearchPageRoute";
 import { notEmpty } from "@vanilla/utils";
 import { applyCompatibilityUserCards } from "@library/features/userCard/UserCard.compat";
 import { DashboardImageUploadGroup } from "@dashboard/forms/DashboardImageUploadGroup";
-import { SectionProvider } from "@library/layout/LayoutContext";
-import { SectionTypes } from "@library/layout/types/interface.layoutTypes";
+import { LayoutProvider } from "@library/layout/LayoutContext";
+import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
 // This is a misleading place for the component to live. Its used in the /profile/preferences/[USER_ID]
 import { CategoryNotificationPreferences } from "@dashboard/components/CategoryNotificationPreferences";
 
@@ -59,7 +59,7 @@ Router.addRoutes(
 applySharedPortalContext((props) => {
     return (
         <AppContext variablesOnly noWrap errorComponent={ErrorPage}>
-            <SectionProvider type={SectionTypes.THREE_COLUMNS}>{props.children}</SectionProvider>
+            <LayoutProvider type={LayoutTypes.THREE_COLUMNS}>{props.children}</LayoutProvider>
         </AppContext>
     );
 });

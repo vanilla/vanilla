@@ -1,8 +1,8 @@
 <?php
 /**
- * Category controller
+ * Discussion controller
  *
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Vanilla
  * @since 2.0.17.9
@@ -129,14 +129,6 @@ class CategoryController extends VanillaController {
             $this->CategoryModel->saveUserTree($categoryID, ['DateMarkedRead' => Gdn_Format::toDateTime()]);
         }
         if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
-            $category = $this->CategoryModel->getID($categoryID, DATASET_TYPE_ARRAY);
-
-            if ($category['ParentCategoryID'] > 0) {
-                $parentCategory = $this->CategoryModel->getID($category['ParentCategoryID'], DATASET_TYPE_ARRAY);
-                // If this is a subcategory, redirect to parent category.
-                redirectTo('/categories/' . $parentCategory['UrlCode']);
-            }
-            // Otherwise, redirect to categories page.
             redirectTo('/categories');
         }
 

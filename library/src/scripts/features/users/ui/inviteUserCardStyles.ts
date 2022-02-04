@@ -9,7 +9,7 @@ import { IThemeVariables } from "@library/theming/themeReducer";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { percent } from "csx";
 import { styleUnit } from "@library/styles/styleUnit";
-import { oneColumnVariables } from "@library/layout/Section.variables";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { css } from "@emotion/css";
 
 export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) => {
@@ -45,7 +45,7 @@ export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) =>
 });
 
 export const userCardClasses = useThemeCache((props: { compact?: boolean } = {}) => {
-    const mediaQueries = oneColumnVariables().mediaQueries();
+    const mediaQueries = panelLayoutVariables().mediaQueries();
     const vars = userCardVariables();
 
     const body = css({

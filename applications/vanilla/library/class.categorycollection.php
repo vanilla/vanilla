@@ -150,18 +150,11 @@ class CategoryCollection {
     }
 
     /**
-     * Flush our local in memory caches.
-     */
-    public function flushLocalCache() {
-        $this->categories = [];
-        $this->categorySlugs = [];
-    }
-
-    /**
      * Flush the entire category cache.
      */
     public function flushCache() {
-        $this->flushLocalCache();
+        $this->categories = [];
+        $this->categorySlugs = [];
         $this->modelCache->invalidateAll();
         $this->cache->increment(self::CACHE_CATEGORY.'inc', 1, [Gdn_Cache::FEATURE_INITIAL => 1]);
         $this->cacheInc = null;
@@ -206,13 +199,13 @@ class CategoryCollection {
      * @param int|string $categoryID The category ID to get.
      * @return array|null Returns a category or **null** if one isn't found.
      */
-    public function get($categoryID): ?array {
+    public function get($categoryID) {
         // Figure out the ID.
         if (empty($categoryID)) {
             return null;
         } elseif (is_int($categoryID)) {
             $id = $categoryID;
-        } elseif (!empty($this->categorySlugs[strtolower($categoryID)])) {
+        } elseif (isset($this->categorySlugs[strtolower($categoryID)])) {
             $id = $this->categorySlugs[strtolower($categoryID)];
         } else {
             // The ID still might not be found here.
@@ -223,7 +216,7 @@ class CategoryCollection {
             $id = (int)$id;
 
             if (isset($this->categories[$id])) {
-                return $this->categories[$id] ?: null;
+                return $this->categories[$id];
             } else {
                 $cacheKey = $this->cacheKey(self::CACHE_CATEGORY, $id);
                 $category = $this->cache->get($cacheKey);

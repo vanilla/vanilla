@@ -32,7 +32,7 @@ import {
 } from "@library/icons/searchIcons";
 import { t } from "@vanilla/i18n/src";
 import { StoryContent } from "@library/storybook/StoryContent";
-import { useSection } from "@library/layout/LayoutContext";
+import { useLayout } from "@library/layout/LayoutContext";
 import classNames from "classnames";
 import { PlacesResultMeta } from "@dashboard/components/panels/registerPlaceSearchDomain";
 

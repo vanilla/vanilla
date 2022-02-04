@@ -26,7 +26,6 @@ use Vanilla\Search\SearchTypeQueryExtenderInterface;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\ModelUtils;
 use Vanilla\Models\CrawlableRecordSchema;
-use Vanilla\Contracts\ConfigurationInterface;
 
 /**
  * Search record type for a discussion.
@@ -51,9 +50,6 @@ class DiscussionSearchType extends AbstractSearchType {
     /** @var array extenders */
     protected $extenders = [];
 
-    /** @var ConfigurationInterface */
-    private $config;
-
     protected $queryFullTextFields = ['name', 'bodyPlainText'];
 
     /**
@@ -64,22 +60,19 @@ class DiscussionSearchType extends AbstractSearchType {
      * @param \UserModel $userModel
      * @param \TagModel $tagModel
      * @param BreadcrumbModel $breadcrumbModel
-     * @param ConfigurationInterface $config
      */
     public function __construct(
         \DiscussionsApiController $discussionsApi,
         \CategoryModel $categoryModel,
         \UserModel $userModel,
         \TagModel $tagModel,
-        BreadcrumbModel $breadcrumbModel,
-        ConfigurationInterface $config
+        BreadcrumbModel $breadcrumbModel
     ) {
         $this->discussionsApi = $discussionsApi;
         $this->categoryModel = $categoryModel;
         $this->userModel = $userModel;
         $this->tagModel = $tagModel;
         $this->breadcrumbModel = $breadcrumbModel;
-        $this->config = $config;
     }
 
     /**
@@ -214,7 +207,11 @@ class DiscussionSearchType extends AbstractSearchType {
             $tagIDs = $this->tagModel->getTagIDsByName($tagNames);
             $tagOp = $query->getQueryParameter('tagOperator', 'or');
             if (!empty($tagIDs)) {
-                $query->setFilter('tagIDs', $tagIDs, false, $tagOp);
+                if ($query instanceof ElasticSearchQuery) {
+                    $query->setFilter('tagIDs', $tagIDs, false, $tagOp);
+                } else {
+                    $query->setFilter('Tags', $tagIDs, false, $tagOp);
+                }
             }
         }
     }
@@ -223,7 +220,7 @@ class DiscussionSearchType extends AbstractSearchType {
      * @return float|null
      */
     protected function getBoostValue(): ?float {
-        return $this->config->get('Elastic.Boost.Discussion', 0.5);
+        return 0.5;
     }
 
     /**

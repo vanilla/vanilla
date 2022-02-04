@@ -45,15 +45,6 @@ trait CommunityApiTestTrait {
     }
 
     /**
-     * Reset the categories table, leaving the root category alone.
-     */
-    public function resetCategoryTable() {
-        $model = new \Gdn_Model('Category');
-        $model->delete(['CategoryID >' => 0]);
-        \CategoryModel::clearCache();
-    }
-
-    /**
      * Create a category.
      *
      * @param array $overrides Fields to override on the insert.

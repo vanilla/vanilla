@@ -15,7 +15,7 @@ import { activeSelector, styleFactory, variableFactory } from "@library/styles/s
 import { useThemeCache } from "@library/styles/themeCache";
 import { css, CSSObject } from "@emotion/css";
 import { percent, ColorHelper, calc, color, rgba } from "csx";
-import { oneColumnVariables } from "@library/layout/Section.variables";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { LocalVariableMapping } from "@library/styles/VariableMapping";
@@ -77,7 +77,7 @@ export const homeWidgetItemVariables = useThemeCache(
             }),
         ]);
         const globalVars = globalVariables(itemVars);
-        const layoutVars = oneColumnVariables(itemVars);
+        const layoutVars = panelLayoutVariables(itemVars);
 
         /**
          * @varGroup homeWidgetItem.options
@@ -458,11 +458,10 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: DeepPartia
     const vars = homeWidgetItemVariables(optionOverrides);
     const globalVars = globalVariables();
     const style = styleFactory("homeWidgetItem");
-    const mobileQuery = oneColumnVariables().mediaQueries().oneColumnDown;
+    const mobileQuery = panelLayoutVariables().mediaQueries().oneColumnDown;
     const isImageLeft = vars.options.imagePlacement === "left";
     const isImageLeftMobile = vars.options.imagePlacementMobile === "left";
     const boxHasBorder = Variables.boxHasOutline(vars.options.box);
-    const borderTypeIsSeparator = vars.options.box.borderType === BorderType.SEPARATOR;
 
     const hasChatBubble = vars.options.contentType === HomeWidgetItemContentType.TITLE_CHAT_BUBBLE;
     // const hasBubbleShadow = hasChatBubble && vars.options.box.borderType === BorderType.SHADOW;
@@ -501,11 +500,6 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: DeepPartia
             flexDirection: "column",
         },
         !hasChatBubble && Mixins.box(vars.options.box, { noPaddings: true, interactiveOutline: true }),
-        borderTypeIsSeparator && {
-            "& + :before": {
-                borderTop: "none",
-            },
-        },
     );
 
     const name = style(

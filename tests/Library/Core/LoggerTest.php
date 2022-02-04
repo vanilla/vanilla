@@ -68,7 +68,6 @@ class LoggerTest extends BootstrapTestCase {
      *
      * @param string $level
      * @param int $priority
-     *
      * @dataProvider provideLogLevels
      */
     public function testPriorityLabels(string $level, int $priority): void {

@@ -97,7 +97,8 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
                     pre.removeClass('prettyprint');
                 });
             }
-            window.onVanillaReady(init);";
+
+            $(document).on('contentLoad', init);";
         return $result;
     }
 

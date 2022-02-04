@@ -13,7 +13,7 @@ import getStore from "@library/redux/getStore";
 import { testStoreState } from "@library/__tests__/testStoreState";
 import { LoadStatus } from "@library/@types/api/core";
 import { IMe } from "@library/@types/api/users";
-import { oneColumnVariables } from "@library/layout/Section.variables";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import Button from "@library/forms/Button";
 import { DownTriangleIcon } from "@library/icons/common";
@@ -140,7 +140,10 @@ story.add(
     },
     {
         chromatic: {
-            viewports: [oneColumnVariables().breakPoints.noBleed, oneColumnVariables().breakPoints.xs],
+            viewports: [
+                panelLayoutVariables().panelLayoutBreakPoints.noBleed,
+                panelLayoutVariables().panelLayoutBreakPoints.xs,
+            ],
         },
     },
 );
@@ -152,7 +155,10 @@ story.add(
     },
     {
         chromatic: {
-            viewports: [oneColumnVariables().breakPoints.noBleed, oneColumnVariables().breakPoints.xs],
+            viewports: [
+                panelLayoutVariables().panelLayoutBreakPoints.noBleed,
+                panelLayoutVariables().panelLayoutBreakPoints.xs,
+            ],
         },
     },
 );

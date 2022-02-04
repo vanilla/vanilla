@@ -13,6 +13,7 @@
         "dist": true,
         "**/node_modules": true,
         "**/bower_components": true,
+        "vendor": true,
         "**/.phpunit.result.cache": true,
         ".htaccess.dist": true
     },
@@ -42,7 +43,7 @@
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
     "[yaml]": {
-        "editor.formatOnSave": false,
+        "editor.formatOnSave": true,
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
     "[html]": {

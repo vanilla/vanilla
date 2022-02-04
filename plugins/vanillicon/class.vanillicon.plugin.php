@@ -8,8 +8,6 @@
  * @package vanillicon
  */
 
-use Vanilla\Utility\DebugUtils;
-
 /**
  * Class VanilliconPlugin
  */
@@ -95,7 +93,7 @@ class VanilliconPlugin extends Gdn_Plugin {
     }
 }
 
-if (!function_exists('userPhotoDefaultUrl') && !DebugUtils::isTestMode()) {
+if (!function_exists('userPhotoDefaultUrl')) {
     /**
      * Calculate the user's default photo url.
      *

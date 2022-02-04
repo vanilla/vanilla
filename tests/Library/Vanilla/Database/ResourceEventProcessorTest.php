@@ -58,8 +58,6 @@ class ResourceEventProcessorTest extends SiteTestCase {
             $sql->truncate('model');
         });
 
-        self::container()->rule(PipelineModel::class)->setShared(false);
-
         $this->model = $this->container()->getArgs(PipelineModel::class, ['model']);
         $this->eventProcessor = $this->container()->get(Operation\ResourceEventProcessor::class);
         $this->model->addPipelineProcessor($this->eventProcessor);

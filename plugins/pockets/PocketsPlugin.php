@@ -832,7 +832,7 @@ class PocketsPlugin extends Gdn_Plugin {
             ->column('Location', 'varchar(50)')
             ->column('Sort', 'smallint')
             ->column('Repeat', 'varchar(25)')
-            ->column('Body', 'mediumtext')
+            ->column('Body', 'text')
             ->column('Format', 'varchar(20)', 'index.Format')
             ->column('Condition', 'varchar(500)', null)
             ->column('Disabled', 'smallint', '0', 'index') // set to a constant in class Pocket

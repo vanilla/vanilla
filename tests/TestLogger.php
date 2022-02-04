@@ -9,15 +9,12 @@ namespace VanillaTests;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
-use Vanilla\Utility\ArrayUtils;
 
 /**
  * A test logger that collects all messages in an array.
  */
 class TestLogger implements LoggerInterface {
     use LoggerTrait;
-
-    private const SEARCH_FALLBACK = '_FALLBACK_DONT_USE';
 
     /**
      * @var array
@@ -61,17 +58,9 @@ class TestLogger implements LoggerInterface {
         foreach ($this->log as $item) {
             $found = true;
             foreach ($filter as $key => $value) {
-                if (str_contains($key, ".")) {
-                    $actual = ArrayUtils::getByPath($key, $item, self::SEARCH_FALLBACK);
-                    if ($actual != $value) {
-                        $found = false;
-                        break;
-                    }
-                } else {
-                    if (!array_key_exists($key, $item) || $item[$key] != $value) {
-                        $found = false;
-                        break;
-                    }
+                if (!array_key_exists($key, $item) || $item[$key] != $value) {
+                    $found = false;
+                    break;
                 }
             }
             if ($found) {

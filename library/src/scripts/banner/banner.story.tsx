@@ -12,11 +12,11 @@ import { color, linearGradient } from "csx";
 import Banner, { IBannerProps } from "@library/banner/Banner";
 import { BannerAlignment, SearchPlacement } from "@library/banner/Banner.variables";
 import { SearchBarPresets } from "@library/banner/SearchBarPresets";
-import { oneColumnVariables } from "@library/layout/Section.variables";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { ButtonPreset } from "@library/forms/ButtonPreset";
 import { STORY_LOGO_BLACK, STORY_LOGO_WHITE } from "@library/storybook/storyData";
-import { SectionProvider } from "@library/layout/LayoutContext";
-import { SectionTypes } from "@library/layout/types/interface.layoutTypes";
+import { LayoutProvider } from "@library/layout/LayoutContext";
+import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryHeading } from "@library/storybook/StoryHeading";
@@ -65,9 +65,9 @@ function StoryBanner(props: IStoryBannerProps) {
     return (
         <MemoryRouter>
             <SearchContext.Provider value={{ searchOptionProvider: new MockSearchData() }}>
-                <SectionProvider type={SectionTypes.THREE_COLUMNS}>
+                <LayoutProvider type={LayoutTypes.THREE_COLUMNS}>
                     <Banner {...mergedProps} />
-                </SectionProvider>
+                </LayoutProvider>
             </SearchContext.Provider>
             <StoryContent>
                 {message && (
@@ -496,7 +496,12 @@ export const LogoAndRightImage = storyWithConfig(
 
 ImageAsElement.parameters = {
     chromatic: {
-        viewports: [1400, oneColumnVariables().contentWidth, oneColumnVariables().breakPoints.oneColumn, 400],
+        viewports: [
+            1400,
+            panelLayoutVariables().contentWidth,
+            panelLayoutVariables().panelLayoutBreakPoints.oneColumn,
+            400,
+        ],
     },
 };
 
@@ -772,7 +777,7 @@ export const bannerImageOnly = storyWithConfig(
 
 ImageAsElementWide.parameters = {
     chromatic: {
-        viewports: [1450, 1350, oneColumnVariables().breakPoints.oneColumn, 400],
+        viewports: [1450, 1350, panelLayoutVariables().panelLayoutBreakPoints.oneColumn, 400],
     },
 };
 

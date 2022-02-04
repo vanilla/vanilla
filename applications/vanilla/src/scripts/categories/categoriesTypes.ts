@@ -15,7 +15,7 @@ export interface ICategoryFragment {
 }
 
 export interface ICategory extends ICategoryFragment {
-    description: RecordID;
+    description: string;
     parentCategoryID: number | null;
     customPermissions: false;
     isArchived: false;

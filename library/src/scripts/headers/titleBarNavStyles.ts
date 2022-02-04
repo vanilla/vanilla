@@ -199,10 +199,6 @@ const titleBarNavClasses = useThemeCache(() => {
 
     const navLinks = css({});
 
-    const navLinkAsButton = css({
-        ...Mixins.font({ weight: 400 }),
-    });
-
     return {
         root,
         navigation,
@@ -214,7 +210,6 @@ const titleBarNavClasses = useThemeCache(() => {
         firstItem,
         navLinks,
         navContiner,
-        navLinkAsButton,
     };
 });
 

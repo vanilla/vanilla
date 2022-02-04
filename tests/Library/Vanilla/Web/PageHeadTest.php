@@ -13,18 +13,25 @@ use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
 use Vanilla\Web\PageHead;
 use Vanilla\Web\PageHeadInterface;
 use VanillaTests\Fixtures\PageFixture;
-use VanillaTests\SiteTestCase;
 use VanillaTests\SiteTestTrait;
 
 /**
  * Tests for the page head.
  */
-class PageHeadTest extends SiteTestCase {
+class PageHeadTest extends TestCase {
+
+    use SiteTestTrait;
 
     /**
      * Test that our proxy works the same as actual head.
      */
     public function testProxy() {
+
+        // Make sure we use the same CSP model between tests (same nonce).
+        self::container()
+            ->rule(ContentSecurityPolicyModel::class)
+            ->setShared(true)
+        ;
 
         /** @var PageFixture $page */
         $page = self::container()->get(PageFixture::class);

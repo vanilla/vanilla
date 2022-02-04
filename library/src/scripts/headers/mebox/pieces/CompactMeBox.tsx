@@ -105,9 +105,7 @@ export default class CompactMeBox extends React.Component<IProps, IState> {
                                 ),
                                 panelContent: (
                                     <TouchScrollable>
-                                        <div className={classes.scrollContainer}>
-                                            <UserDropDownContents />
-                                        </div>
+                                        <UserDropDownContents className={classes.scrollContainer} />
                                     </TouchScrollable>
                                 ),
                             },

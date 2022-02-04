@@ -15,7 +15,7 @@ import { SearchService } from "@library/search/SearchService";
 import { useSearchForm } from "@library/search/SearchContext";
 import { useLastValue } from "@vanilla/react-utils";
 import { hashString } from "@vanilla/utils";
-import React, { useEffect, useLayoutEffect, useRef } from "react";
+import React, { useLayoutEffect } from "react";
 import { CoreErrorMessages } from "@library/errorPages/CoreErrorMessages";
 import { ALL_CONTENT_DOMAIN_NAME } from "@library/search/searchConstants";
 import { makeSearchUrl } from "@library/search/SearchPageRoute";
@@ -38,14 +38,6 @@ export function SearchPageResults(props: IProps) {
             window.scrollTo({ top: 0 });
         }
     }, [status, lastStatus]);
-
-    //this way, search page_view event won't be triggered multiple times with component rerendering, but only once when we visit the page
-    const isInitial = useRef(true);
-    useEffect(() => {
-        if (isInitial.current && status === LoadStatus.SUCCESS) {
-            isInitial.current = false;
-        }
-    });
 
     let content = <></>;
     switch (results.status) {
@@ -74,9 +66,7 @@ export function SearchPageResults(props: IProps) {
             }
             content = (
                 <>
-                    {isInitial.current && (
-                        <AnalyticsData uniqueKey={hashString(form.query + JSON.stringify(results.data!.pagination))} />
-                    )}
+                    <AnalyticsData uniqueKey={hashString(form.query + JSON.stringify(results.data!.pagination))} />
                     <ResultList
                         resultComponent={currentDomain.ResultComponent}
                         results={results.data!.results.map(mapResult)}

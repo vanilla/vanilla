@@ -23,11 +23,4 @@ interface CrawlableInterface {
      * @return array
      */
     public function getCrawlInfo(): array;
-
-    /**
-     * Get the name of the table.
-     *
-     * @return string
-     */
-    public function getTableName(): string;
 }

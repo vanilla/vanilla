@@ -860,11 +860,8 @@ if (!function_exists('filtersDropDown')) {
 
         if (Gdn::themeFeatures()->useDataDrivenTheme()) {
             if (Gdn_Theme::inSection('DiscussionList')) {
-                $controller = \Gdn::controller();
-                if ($controller !== null) {
-                    include_once Gdn::controller()->fetchViewLocation('helper_functions', 'discussions', 'vanilla');
-                    $output .= adminCheck();
-                }
+                include_once Gdn::controller()->fetchViewLocation('helper_functions', 'discussions', 'vanilla');
+                $output .= adminCheck();
             }
             $output = "<div class='PageControls-filters'>$output</div>";
         }

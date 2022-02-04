@@ -77,10 +77,10 @@ class MultilingualPlugin extends Gdn_Plugin {
      *
      * Moved event from AppStart to AfterAnalyzeRequest to allow Embed to set P3P header first.
      */
-    public function gdn_dispatcher_afterAnalyzeRequest_handler() {
+    public function gdn_dispatcher_afterAnalyzeRequest_handler($sender) {
         // Set user preference
         if ($tempLocale = $this->getAlternateLocale()) {
-            Gdn::locale()->set($tempLocale);
+            Gdn::locale()->set($tempLocale, Gdn::applicationManager()->enabledApplicationFolders(), Gdn::pluginManager()->enabledPluginFolders());
         }
     }
 

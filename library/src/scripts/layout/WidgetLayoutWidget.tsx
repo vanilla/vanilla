@@ -5,7 +5,7 @@
  */
 
 import { cx } from "@emotion/css";
-import { useWidgetSectionClasses } from "@library/layout/WidgetLayout.context";
+import { useWidgetLayoutClasses } from "@library/layout/WidgetLayout.context";
 import React from "react";
 
 interface IProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -18,7 +18,7 @@ export const WidgetLayoutWidget = React.forwardRef(function WidgetLayoutWidget(
     ref: React.RefObject<HTMLDivElement>,
 ) {
     const { withContainer, ...props } = _props;
-    const classes = useWidgetSectionClasses();
+    const classes = useWidgetLayoutClasses();
     return (
         <div
             {...props}

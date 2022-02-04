@@ -47,8 +47,7 @@ export const navigationVariables = useThemeCache((forcedVars?: IThemeVariables) 
 });
 
 function filterBadNavLinks(link: DeepPartial<INavigationVariableItem>): boolean {
-    const emptyUrlNoChildren = !link.url && (!link.children || (link.children && !link.children.length));
-    if (!link.name || emptyUrlNoChildren) {
+    if (!link.name || !link.url) {
         return false;
     }
 

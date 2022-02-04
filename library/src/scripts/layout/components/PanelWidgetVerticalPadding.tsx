@@ -5,13 +5,13 @@
 
 import classNames from "classnames";
 import React from "react";
-import { useSection, withSection } from "@library/layout/LayoutContext";
+import { useLayout, withLayout } from "@library/layout/LayoutContext";
 import { ILayoutContainer } from "@library/layout/components/interface.layoutContainer";
 import { panelWidgetClasses } from "@library/layout/panelWidgetStyles";
 
 function PanelWidgetVerticalPadding(props: ILayoutContainer) {
-    const classes = panelWidgetClasses(useSection().mediaQueries);
+    const classes = panelWidgetClasses(useLayout().mediaQueries);
     return <div className={classNames(classes.root, "hasNoHorizontalPadding", props.className)}>{props.children}</div>;
 }
 
-export default withSection(PanelWidgetVerticalPadding);
+export default withLayout(PanelWidgetVerticalPadding);

@@ -77,6 +77,7 @@ trait PermissionsTranslationTrait {
     private $deprecatedPermissions = [
         'Garden.Activity.Delete',
         'Garden.Activity.View',
+        'Garden.SignIn.Allow',
         'Garden.Curation.Manage',
         'Vanilla.Approval.Require',
         'Vanilla.Comments.Me'
@@ -94,9 +95,9 @@ trait PermissionsTranslationTrait {
         'Garden.Users.Approve' => 'applicants.manage',
         'Groups.Group.Add' => 'groups.add',
         'Groups.Moderation.Manage' => 'groups.moderate',
+        'Plugins.Attachments.Upload.Allow' => 'uploads.add',
         'Reputation.Badges.Give' => 'badges.moderate',
         'Vanilla.Tagging.Add' => 'tags.add',
-        'Garden.SignIn.Allow' => 'session.valid',
     ];
 
     private $reverseRenamedPermissions = [
@@ -110,9 +111,9 @@ trait PermissionsTranslationTrait {
         'applicants.manage' => 'Garden.Users.Approve',
         'groups.add' => 'Groups.Group.Add',
         'groups.moderate' => 'Groups.Moderation.Manage',
+        'uploads.add' => 'Plugins.Attachments.Upload.Allow',
         'badges.moderate' => 'Reputation.Badges.Give',
         'tags.add' => 'Vanilla.Tagging.Add',
-        'session.valid' => "Garden.SignIn.Allow",
     ];
 
     /** @var array These permissions should not be renamed. */

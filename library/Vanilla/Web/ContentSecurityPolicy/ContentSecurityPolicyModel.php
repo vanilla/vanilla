@@ -6,8 +6,6 @@
 
 namespace Vanilla\Web\ContentSecurityPolicy;
 
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\Web\UASnifferInterface;
@@ -15,9 +13,7 @@ use Vanilla\Contracts\Web\UASnifferInterface;
 /**
  * Content security policies model.
  */
-class ContentSecurityPolicyModel implements LoggerAwareInterface {
-
-    use LoggerAwareTrait;
+class ContentSecurityPolicyModel {
     const CONTENT_SECURITY_POLICY = 'Content-Security-Policy';
 
     const X_FRAME_OPTIONS = 'X-Frame-Options';
@@ -30,6 +26,9 @@ class ContentSecurityPolicyModel implements LoggerAwareInterface {
 
     /** @var UASnifferInterface */
     private $isIE11;
+
+    /** @var LoggerInterface */
+    private $logger;
 
     /** @var ConfigurationInterface */
     private $config;

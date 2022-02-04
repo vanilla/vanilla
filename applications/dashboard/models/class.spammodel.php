@@ -2,7 +2,7 @@
 /**
  * Spam model.
  *
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Dashboard
  * @since 2.0
@@ -146,23 +146,9 @@ class SpamModel extends Gdn_Pluggable {
                  * just treat it with regular SPAM logging.
                  */
                 if (!empty($recordID) && $options['Operation'] === LogModel::TYPE_SPAM) {
-                    // Pass the source as a $data field, so we can propogate it to the LogPostEvent created in flagForReview()..
-                    $data['Source'] = $sp->EventArguments['Source'] ?? "unknown";
                     self::flagForReview($recordType, $recordID, $data);
                 } else {
                     LogModel::insert($options['Operation'], $recordType, $data, $logOptions);
-
-                    $logPostEvent = LogModel::createLogPostEvent(
-                        $options['Operation'],
-                        $recordType,
-                        $data,
-                        $sp->EventArguments['Source'] ?? "unknown",
-                        $data["Log_InsertUserID"] ?? Gdn::session()->UserID,
-                        "negative",
-                        $data["InsertUserID"],
-                        ['recordID' => false]
-                    );
-                    Gdn::eventManager()->dispatch($logPostEvent);
                 }
             } else {
                 LogModel::insert($options['Operation'], $recordType, $data, $logOptions);
@@ -236,16 +222,5 @@ class SpamModel extends Gdn_Pluggable {
         }
 
         LogModel::insert(LogModel::TYPE_SPAM, $recordType, $row, $logOptions);
-
-        $logPostEvent = LogModel::createLogPostEvent(
-            LogModel::TYPE_SPAM,
-            $recordType,
-            $row,
-            $data['Source'] ?? "unknown",
-            $data["Log_InsertUserID"] ?? Gdn::session()->UserID,
-            "negative",
-            $data["InsertUserID"]
-        );
-        Gdn::eventManager()->dispatch($logPostEvent);
     }
 }

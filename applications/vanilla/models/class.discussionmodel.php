@@ -2915,7 +2915,7 @@ SQL;
      * @param array $activity
      * @param array $discussion
      */
-    public function recordAdvancedNotications(ActivityModel $activityModel, array $activity, array $discussion) {
+    private function recordAdvancedNotications(ActivityModel $activityModel, array $activity, array $discussion) {
         $categoryID = $discussion["CategoryID"] ?? null;
         $insertUserID = $discussion["InsertUserID"] ?? null;
 
@@ -2941,13 +2941,6 @@ SQL;
             }
 
             $userID = $row["UserID"];
-
-            if (!Gdn::config(\CategoryModel::CONF_CATEGORY_FOLLOWING) &&
-                !$this->userModel->checkPermission($userID, 'Garden.AdvancedNotifications.Allow')
-            ) {
-                continue;
-            }
-
             // Check user can still see the discussion.
             if (!$this->canView($discussion, $userID)) {
                 continue;
@@ -4573,21 +4566,14 @@ SQL;
      * @param int $discussionID
      * @return int Unique ID of the saved discussion.
      */
-    public function openDiscussion(int $discussionID) : bool {
+    protected function openDiscussion(int $discussionID) : bool {
         $save = [
             "DiscussionID" => $discussionID,
-            "Closed" => 0,
+            "Closed" => 0
         ];
         // Fire event in case some addon needs to change other data during the opening.
         $this->EventArguments = ['save' => &$save];
         $this->fireEvent("beforeOpenDiscussion");
-
-        // Remove the `ClosedByUserID` attribute, if it exists.
-        $discussion = $this->getID($discussionID);
-        if (isset($discussion->Attributes[self::CLOSED_BY_USER_ID])) {
-            unset($discussion->Attributes[self::CLOSED_BY_USER_ID]);
-            $this->setProperty($discussionID, 'Attributes', dbencode($discussion->Attributes));
-        }
 
         // Save the discussion
         return $this->save($this->EventArguments['save']);
@@ -4599,32 +4585,17 @@ SQL;
      * @param int $discussionID
      * @return int Unique ID of the saved discussion.
      */
-    public function closeDiscussion(int $discussionID) : bool {
+    protected function closeDiscussion(int $discussionID) : bool {
         $save = [
             "DiscussionID" => $discussionID,
-            "Closed" => 1,
+            "Closed" => 1
         ];
         // Fire event in case some addon needs to change other data during the close.
         $this->EventArguments = ['save' => &$save];
         $this->fireEvent("beforeCloseDiscussion");
 
-        // Set the `ClosedByUserID` attribute.
-        $discussion = $this->getID($discussionID);
-        $discussion->Attributes[DiscussionModel::CLOSED_BY_USER_ID] = Gdn::session()->UserID;
-        $this->setProperty($discussionID, 'Attributes', dbencode($discussion->Attributes));
-
         // Save the discussion
-        $saveSuccess = $this->save($this->EventArguments['save']);
-
-        // Dispatch a Discussion event (close)
-        $senderUserID = Gdn::session()->UserID;
-        $sender = $senderUserID ? Gdn::userModel()->getFragmentByID($senderUserID) : null;
-
-        $discussion = $this->getID($discussionID, DATASET_TYPE_ARRAY);
-        $discussionEvent = $this->eventFromRow($discussion, DiscussionEvent::ACTION_CLOSE, $sender);
-        $this->getEventManager()->dispatch($discussionEvent);
-
-        return $saveSuccess;
+        return $this->save($this->EventArguments['save']);
     }
 
     /**

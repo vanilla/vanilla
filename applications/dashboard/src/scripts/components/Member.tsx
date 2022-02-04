@@ -9,7 +9,7 @@ import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhot
 import classNames from "classnames";
 import { t } from "@vanilla/i18n";
 import NumberFormatted from "@library/content/NumberFormatted";
-import { useSection } from "@library/layout/LayoutContext";
+import { useLayout } from "@library/layout/LayoutContext";
 import ProfileLink from "@library/navigation/ProfileLink";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { memberListClasses } from "@dashboard/components/MemberList.styles";
@@ -23,7 +23,7 @@ interface IProps extends IResult {
 
 export default function Member(props: IProps) {
     const user = props.userInfo;
-    const { isCompact } = useSection();
+    const { isCompact } = useLayout();
 
     if (user == null) {
         return <></>;

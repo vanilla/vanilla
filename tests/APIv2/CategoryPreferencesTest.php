@@ -231,41 +231,41 @@ class CategoryPreferencesTest extends SiteTestCase {
      * Test that notifications get sent for items in categories more than 2 deep.
      */
     public function testNotificationPreferencesDepth4() {
-        $this->runWithConfig([
-            \CategoryModel::CONF_CATEGORY_FOLLOWING => true,
-        ], function () {
-            // Create categories.
-            $this->createCategory();
-            $this->createCategory();
-            $this->createCategory();
-            $depth4Category = $this->createCategory();
-            $this->assertNotEquals(CategoryModel::ROOT_ID, $depth4Category['parentCategoryID']);
+        // Create categories.
+        $this->createCategory();
+        $this->createCategory();
+        $this->createCategory();
+        $depth4Category = $this->createCategory();
+        $this->assertNotEquals(CategoryModel::ROOT_ID, $depth4Category['parentCategoryID']);
 
-            // Create Users
-            $postUser = $this->createUser();
-            $followUser = $this->createUser();
+        // Create Users
+        $postUser = $this->createUser();
+        $followUser = $this->createUser();
 
-            // Follow the category.
-            $this->runWithUser(function () use ($depth4Category, $followUser) {
-                $url = "/categories/{$depth4Category['categoryID']}/preferences/{$followUser['userID']}";
-                $this->api()->patch($url, [
-                    CategoryModel::PREFERENCE_KEY_NOTIFICATION => CategoryModel::NOTIFICATION_ALL,
-                    CategoryModel::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS => true,
-                ]);
-            }, $followUser);
-            // Create the posts
-            $this->runWithUser(function () use ($depth4Category) {
-                $discussion = $this->createDiscussion(['name' => 'Hello Discussion']);
-                $this->assertEquals($depth4Category['categoryID'], $discussion['categoryID']);
-                $this->createComment();
-            }, $postUser);
-            // Follow user should have 2 app notifications and 2 email notifications.
-            $this->runWithUser(function () use ($followUser) {
-                /** @var \ActivityModel $activityModel */
-                $activityModel = self::container()->get(\ActivityModel::class);
-                $this->assertEquals(2, $activityModel->getUserTotalUnread($followUser['userID']));
-            }, $followUser);
-        });
+        // Follow the category.
+        $this->runWithUser(function () use ($depth4Category, $followUser) {
+            $url = "/categories/{$depth4Category['categoryID']}/preferences/{$followUser['userID']}";
+            $this->api()->patch($url, [
+                CategoryModel::PREFERENCE_KEY_NOTIFICATION => CategoryModel::NOTIFICATION_ALL,
+                CategoryModel::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS => true,
+            ]);
+        }, $followUser);
+
+
+        // Create the posts
+        $this->runWithUser(function () use ($depth4Category) {
+            $discussion = $this->createDiscussion(['name' => 'Hello Discussion']);
+            $this->assertEquals($depth4Category['categoryID'], $discussion['categoryID']);
+            $this->createComment();
+        }, $postUser);
+
+
+        // Follow user should have 2 app notifications and 2 email notifications.
+        $this->runWithUser(function () use ($followUser) {
+            /** @var \ActivityModel $activityModel */
+            $activityModel = self::container()->get(\ActivityModel::class);
+            $this->assertEquals(2, $activityModel->getUserTotalUnread($followUser['userID']));
+        }, $followUser);
     }
 
     /**

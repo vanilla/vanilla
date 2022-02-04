@@ -20,7 +20,7 @@ export interface InputClassesProps {
  * @returns
  * @internal
  */
-export const inputClasses = ({ size = "default" }: InputClassesProps) => ({
+export const inputClasses = ({ size = "default", useInputRowSize = false }: InputClassesProps) => ({
     input: css({
         borderRadius: 6,
         color: "#3c4146",
@@ -29,13 +29,13 @@ export const inputClasses = ({ size = "default" }: InputClassesProps) => ({
 
         ...{
             small: {
-                height: 28,
+                height: !useInputRowSize ? 28 : undefined,
                 lineHeight: "28px",
                 padding: "0 8px",
                 fontSize: "13px",
             },
             default: {
-                height: 36,
+                height: !useInputRowSize ? 36 : undefined,
                 lineHeight: "36px",
                 padding: "0 12px",
                 fontSize: "16px",
@@ -47,6 +47,13 @@ export const inputClasses = ({ size = "default" }: InputClassesProps) => ({
             outline: "none",
         },
     }),
+    inputHeightConstrainst: (inputRowSize: number) =>
+        css({
+            ...{
+                small: { height: 28 * inputRowSize },
+                default: { height: 36 * inputRowSize },
+            }[size],
+        }),
     numberContainer: css({
         display: "inline-block",
         position: "relative",

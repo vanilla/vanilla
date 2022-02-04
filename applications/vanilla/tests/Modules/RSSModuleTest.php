@@ -9,10 +9,8 @@ namespace VanillaTests\Forum\Modules;
 
 use Vanilla\Community\RSSModule;
 use Vanilla\Dashboard\Models\RemoteResourceModel;
-use Vanilla\Widgets\AbstractHomeWidgetModule;
 use VanillaTests\EventSpyTestTrait;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
-use VanillaTests\Layout\LayoutTestTrait;
 use VanillaTests\Storybook\StorybookGenerationTestCase;
 
 /**
@@ -22,7 +20,6 @@ class RSSModuleTest extends StorybookGenerationTestCase {
 
     use EventSpyTestTrait;
     use CommunityApiTestTrait;
-    use LayoutTestTrait;
 
     /**
      * Configure the container.
@@ -67,61 +64,12 @@ class RSSModuleTest extends StorybookGenerationTestCase {
     }
 
     /**
-     * Test that we can hydrate an RSS widget.
-     */
-    public function testHydrateRssWidget() {
-        $fallbackImageUrl = 'https://images.com/fallback.png';
-        $apiParams = [
-            'feedUrl' => '/discussions/feed.rss',
-            'fallbackImageUrl' => $fallbackImageUrl,
-            'limit' => 3
-        ];
-        $containerOptions = [
-            'borderType' => 'shadow',
-            'viewAll' => [
-                'to' => 'https://someplace.com',
-            ],
-        ];
-        $spec = [
-            '$hydrate' => 'react.rss',
-            'apiParams' => $apiParams,
-            'title' => 'My RSS Feed',
-            'containerOptions' => $containerOptions,
-        ];
-
-        $hydrateParams = [];
-
-        $expected = [
-            '$reactComponent' => 'RSSWidget',
-            '$reactProps' => [
-                'apiParams' => $apiParams,
-                'title' => 'My RSS Feed',
-                'itemData' => [
-                    [
-                        'to' => 'https://vanillaforums.com/title-1',
-                        'name' => 'Title 1',
-                        'imageUrl' => 'https://us.v-cdn.net/5022541/uploads/091/7G8KTIZCJU5S.jpeg',
-                        'description' => 'Description.',
-                    ],
-                    [
-                        'to' => 'https://vanillaforums.com/title-2',
-                        'name' => 'Title 2',
-                        'imageUrl' => $fallbackImageUrl,
-                        'description' => 'Description 3',
-                    ],
-                ],
-                'containerOptions' => $containerOptions,
-            ],
-        ];
-        $this->assertHydratesTo($spec, $hydrateParams, $expected);
-    }
-
-    /**
      * Event handler to mount RSS module.
      *
      * @param \Gdn_Controller $sender
      */
     public function base_render_before(\Gdn_Controller $sender) {
+
         /** @var RSSModule $rssModuleDefault */
         $rssModuleDefault = self::container()->get(RSSModule::class);
         $rssModuleDefault->setUrl(url('discussions/feed.rss'));

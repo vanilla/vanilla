@@ -8,7 +8,6 @@
 namespace VanillaTests\Forum\Controllers;
 
 use Garden\Web\Exception\ClientException;
-use Garden\Web\Exception\ServerException;
 use VanillaTests\APIv2\AbstractAPIv2Test;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 
@@ -58,45 +57,37 @@ class CategoryValidationConflictsTest extends AbstractAPIv2Test {
                 [],
                 null
             ],
-            'tree & limit' => [
+            'categoryID & featured' => [
                 [
-                    'limit' => 10,
-                    'outputFormat' => 'tree'
+                    'categoryID' => 100,
+                    'featured' => true
                 ],
                 null,
-                ServerException::class
+                ClientException::class
             ],
-            'tree & page' => [
+            'categoryID & followed' => [
                 [
-                    'page' => 1,
-                    'outputFormat' => 'tree'
+                    'categoryID' => 100,
+                    'followed' => true
                 ],
                 null,
-                ServerException::class
+                ClientException::class
             ],
-            'flat & depth' => [
+            'categoryID & archived' => [
                 [
-                    'outputFormat' => 'flat',
-                    'maxDepth' => 2
+                    'categoryID' => 100,
+                    'archived' => false
                 ],
                 null,
-                ServerException::class
+                ClientException::class
             ],
-            'depth & limit' => [
+            'featured & followed' => [
                 [
-                    'depth' => 1,
-                    'limit' => 1
+                    'followed' => true,
+                    'featured' => true
                 ],
                 null,
-                ServerException::class
-            ],
-            'depth & page' => [
-                [
-                    'depth' => 1,
-                    'page' => 1
-                ],
-                null,
-                ServerException::class
+                ClientException::class
             ],
         ];
 

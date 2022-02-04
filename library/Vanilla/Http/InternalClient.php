@@ -155,7 +155,7 @@ class InternalClient extends HttpClient {
                 $message .= "\n" . json_encode($body, JSON_PRETTY_PRINT);
             }
 
-            throw HttpException::createFromStatus($response->getStatusCode(), $message, $body ?? []);
+            throw HttpException::createFromStatus($response->getStatusCode(), $message, $body);
         }
     }
 

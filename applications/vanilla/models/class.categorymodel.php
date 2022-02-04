@@ -2,31 +2,31 @@
 /**
  * Category model
  *
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Vanilla
  * @since 2.0
  */
 
+use Garden\Web\Exception\ClientException;
 use Garden\EventManager;
 use Garden\Schema\Schema;
-use Garden\Web\Exception\ClientException;
-use Vanilla\Community\Schemas\CategoryFragmentSchema;
 use Vanilla\Dashboard\Models\PermissionJunctionModelInterface;
 use Vanilla\Events\LegacyDirtyRecordTrait;
-use Vanilla\Layout\LayoutViewModel;
+use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Models\CrawlableRecordSchema;
 use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Models\ModelCache;
 use Vanilla\Navigation\Breadcrumb;
+use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Permissions;
 use Vanilla\Scheduler\Descriptor\NormalJobDescriptor;
 use Vanilla\Scheduler\Job\CallbackJob;
 use Vanilla\Scheduler\LongRunner;
 use Vanilla\Scheduler\LongRunnerQuantityTotal;
+use Vanilla\Scheduler\SchedulerInterface;
 use Vanilla\SchemaFactory;
 use Vanilla\Site\SiteSectionModel;
-use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\InstanceValidatorSchema;
 use Vanilla\Utility\ModelUtils;
 use Vanilla\Web\SystemCallableInterface;
@@ -34,7 +34,7 @@ use Webmozart\Assert\Assert;
 use Garden\Events\EventFromRowInterface;
 use Vanilla\Contracts\Models\CrawlableInterface;
 use Garden\Events\ResourceEvent;
-use Vanilla\Community\Events\CategoryEvent;
+use \Vanilla\Community\Events\CategoryEvent;
 use Vanilla\Models\UserFragmentSchema;
 use Vanilla\ApiUtils;
 use Vanilla\Dashboard\Models\BannerImageModel;
@@ -42,11 +42,7 @@ use Vanilla\Dashboard\Models\BannerImageModel;
 /**
  * Manages discussion categories' data.
  */
-class CategoryModel extends Gdn_Model implements
-    EventFromRowInterface,
-    CrawlableInterface,
-    PermissionJunctionModelInterface,
-    SystemCallableInterface {
+class CategoryModel extends Gdn_Model implements EventFromRowInterface, CrawlableInterface, PermissionJunctionModelInterface, SystemCallableInterface {
 
     use LegacyDirtyRecordTrait;
 
@@ -191,14 +187,6 @@ class CategoryModel extends Gdn_Model implements
     }
 
     /**
-     * Clear the cache on update.
-     */
-    public function onUpdate() {
-        parent::onUpdate();
-        $this->modelCache->invalidateAll();
-    }
-
-    /**
      * @inheritdoc
      */
     public static function getSystemCallableMethods(): array {
@@ -311,6 +299,7 @@ class CategoryModel extends Gdn_Model implements
     public static function instance() {
         return Gdn::getContainer()->get(CategoryModel::class);
     }
+
 
     /**
      * Checks the allowed discussion types on a category.
@@ -938,9 +927,7 @@ class CategoryModel extends Gdn_Model implements
         self::calculateDisplayAs($category);
 
         if (!($category['CssClass'] ?? false)) {
-            // Our validation rule is that the CssClass should be no longer than 50 chars, so if we're auto-generating one,
-            // make sure we respect the rule.
-            $category['CssClass'] = substr('Category-'.$category['CategoryID'].'-'.$category['UrlCode'], 0, 50);
+            $category['CssClass'] = 'Category-'.$category['UrlCode'];
         }
 
         if (isset($category['AllowedDiscussionTypes']) && is_string($category['AllowedDiscussionTypes'])) {
@@ -999,7 +986,7 @@ class CategoryModel extends Gdn_Model implements
      * @access public
      * @param array $data Dataset.
      */
-    public static function calculateData(&$data) {
+    private static function calculateData(&$data) {
         foreach ($data as &$category) {
             self::calculate($category);
         }
@@ -1033,8 +1020,6 @@ class CategoryModel extends Gdn_Model implements
      */
     public static function clearCache(bool $schedule = false) {
         $doClear = function () {
-            self::$deferredCache = [];
-            self::$deferredCacheScheduled = false;
             self::$Categories = null;
             $instance = self::instance();
             $instance->modelCache->invalidateAll();
@@ -1064,19 +1049,13 @@ class CategoryModel extends Gdn_Model implements
 
         $key = 'UserCategory_'.$userID;
         Gdn::cache()->remove($key);
-
-        // User category data may be cached here.
-        self::$Categories = null;
-        self::instance()->collection->flushLocalCache();
     }
 
     /**
-     * Recalculate the counts for category data.
-     *
-     * @param string $column
+     * @param $column
      * @return array
      */
-    public function counts(string $column): array {
+    public function counts($column) {
         $result = ['Complete' => true];
         switch ($column) {
             case 'CountChildCategories':
@@ -1694,7 +1673,7 @@ class CategoryModel extends Gdn_Model implements
      * @param int $categoryID The category to give the points for.
      * @param int|false $timestamp The time the points were given.
      */
-    public static function givePoints(int $userID, int $points, string $source = 'Other', int $categoryID = 0, $timestamp = false) {
+    public static function givePoints($userID, $points, $source = 'Other', $categoryID = 0, $timestamp = false) {
         // Figure out whether or not the category tracks points seperately.
         if ($categoryID) {
             $category = self::categories($categoryID);
@@ -2298,10 +2277,8 @@ class CategoryModel extends Gdn_Model implements
             $dbRecord = (array) $dbRecord;
         }
         if ($dbRecord['CategoryID'] === -1) {
-            $dbRecord['Url'] = url('/categories', true);
+            $dbRecord['Url'] = url('/categories');
             $dbRecord['DisplayAs'] = 'Discussions';
-        } else {
-            $dbRecord['Url'] = self::categoryUrl($dbRecord, '', true);
         }
 
         if ($dbRecord['ParentCategoryID'] <= 0) {
@@ -2841,26 +2818,6 @@ class CategoryModel extends Gdn_Model implements
     }
 
     /**
-     * Get a set of categoryIDs for some where query.
-     *
-     * @param array{string, mixed} $where
-     *
-     * @return int[]
-     */
-    public function selectCachedIDs(array $where): array {
-        $result = $this->modelCache->getCachedOrHydrate([$where, 'ids'], function () use ($where) {
-            $ids = $this->createSql()
-                ->from($this->getTableName())
-                ->select('CategoryID')
-                ->where($where)
-                ->get()
-                ->column('CategoryID');
-            return $ids;
-        }, [\Gdn_Cache::FEATURE_EXPIRY => 60 * 60]);
-        return $result;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getCount($wheres = '') {
@@ -2974,7 +2931,6 @@ class CategoryModel extends Gdn_Model implements
         $result = [];
 
         $categories = (array)$categories;
-        $categories = self::_setTreeCategoryKeys($categories);
 
         if ($root) {
             $result = self::instance()->collection->getTree(
@@ -3022,24 +2978,6 @@ class CategoryModel extends Gdn_Model implements
             }
         }
         return $result;
-    }
-
-    /**
-     * Sort the Categories array so that the key match the CategoryID.
-     *
-     * [CategoryID => Category]
-     *
-     * @param array $categories
-     * @return array
-     */
-    protected static function _setTreeCategoryKeys(array $categories) : array {
-        $sortedCategories = [];
-
-        foreach ($categories as $category) {
-            $sortedCategories[$category['CategoryID']] = $category;
-        }
-
-        return $sortedCategories;
     }
 
     /**
@@ -3093,23 +3031,7 @@ class CategoryModel extends Gdn_Model implements
 
         // Make sure the tree has a root.
         if (!isset($categories[-1])) {
-            $rootCat = [
-                'CategoryID' => -1,
-                'TreeLeft' => 1,
-                'TreeRight' => 4,
-                'Depth' => 0,
-                'InsertUserID' => 1,
-                'UpdateUserID' => 1,
-                'DateInserted' => Gdn_Format::toDateTime(),
-                'DateUpdated' => Gdn_Format::toDateTime(),
-                'Name' => 'Root',
-                'UrlCode' => '',
-                'Description' => 'Root of category tree. Users should never see this.',
-                'PermissionCategoryID' => -1,
-                'Sort' => 0,
-                'ParentCategoryID' => null,
-                'CountCategories' => 0
-            ];
+            $rootCat = ['CategoryID' => -1, 'TreeLeft' => 1, 'TreeRight' => 4, 'Depth' => 0, 'InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Gdn_Format::toDateTime(), 'DateUpdated' => Gdn_Format::toDateTime(), 'Name' => 'Root', 'UrlCode' => '', 'Description' => 'Root of category tree. Users should never see this.', 'PermissionCategoryID' => -1, 'Sort' => 0, 'ParentCategoryID' => null];
             $categories[-1] = $rootCat;
             $this->SQL->insert('Category', $rootCat);
         }
@@ -3128,7 +3050,6 @@ class CategoryModel extends Gdn_Model implements
                 $cat['_Depth'] = $cat['Depth'];
                 $cat['_PermissionCategoryID'] = $cat['PermissionCategoryID'];
                 $cat['_ParentCategoryID'] = $cat['ParentCategoryID'];
-                $cat['_CountCategories'] = $cat['CountCategories'];
             } catch (Exception $ex) {
                 // Suppress exceptions from bubbling up.
             }
@@ -3150,13 +3071,6 @@ class CategoryModel extends Gdn_Model implements
         }
         unset($cat);
 
-        // Reset CountCategories based on children.
-        foreach ($categories as $cat) {
-            if (isset($cat["CategoryID"])) {
-                $categories[$cat["CategoryID"]]["CountCategories"] = count($cat["Children"] ?? []);
-            }
-        }
-
         // Set the tree attributes of the tree.
         $this->_SetTree($root);
         unset($root);
@@ -3166,25 +3080,10 @@ class CategoryModel extends Gdn_Model implements
             if (!isset($cat['CategoryID'])) {
                 continue;
             }
-
-            if ($cat['_TreeLeft'] != $cat['TreeLeft'] ||
-                $cat['_TreeRight'] != $cat['TreeRight'] ||
-                $cat['_Depth'] != $cat['Depth'] ||
-                $cat['PermissionCategoryID'] != $cat['PermissionCategoryID'] ||
-                $cat['_ParentCategoryID'] != $cat['ParentCategoryID'] ||
-                $cat['Sort'] != $cat['TreeLeft'] ||
-                $cat["_CountCategories"] != $cat["CountCategories"]) {
+            if ($cat['_TreeLeft'] != $cat['TreeLeft'] || $cat['_TreeRight'] != $cat['TreeRight'] || $cat['_Depth'] != $cat['Depth'] || $cat['PermissionCategoryID'] != $cat['PermissionCategoryID'] || $cat['_ParentCategoryID'] != $cat['ParentCategoryID'] || $cat['Sort'] != $cat['TreeLeft']) {
                 $this->SQL->put(
                     'Category',
-                    [
-                        'TreeLeft' => $cat['TreeLeft'],
-                        'TreeRight' => $cat['TreeRight'],
-                        'Depth' => $cat['Depth'],
-                        'PermissionCategoryID' => $cat['PermissionCategoryID'],
-                        'ParentCategoryID' => $cat['ParentCategoryID'],
-                        'Sort' => $cat['TreeLeft'],
-                        'CountCategories' => $cat["CountCategories"],
-                    ],
+                    ['TreeLeft' => $cat['TreeLeft'], 'TreeRight' => $cat['TreeRight'], 'Depth' => $cat['Depth'], 'PermissionCategoryID' => $cat['PermissionCategoryID'], 'ParentCategoryID' => $cat['ParentCategoryID'], 'Sort' => $cat['TreeLeft']],
                     ['CategoryID' => $cat['CategoryID']]
                 );
             }
@@ -4829,27 +4728,12 @@ SQL;
      * @return Schema Returns a schema.
      */
     public function fragmentSchema(): Schema {
-        $result = SchemaFactory::get(CategoryFragmentSchema::class);
+        $result = SchemaFactory::parse([
+            'categoryID:i' => 'The ID of the category.',
+            'name:s' => 'The name of the category.',
+            'url:s' => 'Full URL to the category.',
+        ], 'CategoryFragment');
         return $result;
-    }
-
-    /**
-     * Get a category fragment by its ID.
-     *
-     * @param int|null $categoryID
-     *
-     * @return array|null
-     */
-    public function getFragmentByID(?int $categoryID): ?array {
-        if ($categoryID === null) {
-            return null;
-        }
-        $category = CategoryModel::categories($categoryID);
-        if (empty($category)) {
-            return null;
-        }
-        $normalized = $this->normalizeRow($category);
-        return ArrayUtils::pluck($normalized, CategoryFragmentSchema::fieldNames());
     }
 
     /**
@@ -5005,10 +4889,7 @@ SQL;
                 'countComments:i' => 'Total comments in the category.',
                 'countAllDiscussions:i' => 'Total of all discussions in a category and its children.',
                 'countAllComments:i' => 'Total of all comments in a category and its children.',
-                'followed:b?' => [
-                    'default' => false,
-                    'description' => 'Is the category being followed by the current user?',
-                ],
+                'followed:b?' => 'Is the category being followed by the current user?',
                 "breadcrumbs:a?" => new InstanceValidatorSchema(Breadcrumb::class),
                 'featured:b?' => 'Featured category.',
                 'allowedDiscussionTypes:a',
@@ -5083,9 +4964,6 @@ SQL;
      * @param bool $rebuildTree
      */
     private function deleteInternal(int $categoryID, bool $rebuildTree): void {
-        /** @var LayoutViewModel $layoutViewModel */
-        $layoutViewModel = Gdn::getContainer()->get(LayoutViewModel::class);
-
         $eventCategory = self::categories($categoryID);
         $deleteEvent = $this->eventFromRow(
             $eventCategory,
@@ -5101,9 +4979,6 @@ SQL;
             $this->rebuildTree();
             $this->recalculateTree();
         }
-
-        // We delete layoutViews associated with the deleted category.
-        $layoutViewModel->delete(['recordType' => 'category', 'recordID' => $categoryID]);
 
         // Let the world know we completed our mission.
         $this->EventArguments['CategoryID'] = $categoryID;

@@ -15,7 +15,6 @@ use Vanilla\Search\SearchQuery;
 use Vanilla\Search\SearchResultItem;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\ModelUtils;
-use Vanilla\Contracts\ConfigurationInterface;
 
 /**
  * Search record type for a discussion.
@@ -33,9 +32,6 @@ class CommentSearchType extends DiscussionSearchType {
     /** @var \CommentModel */
     private $commentModel;
 
-    /** @var ConfigurationInterface */
-    private $config;
-
     protected $queryFullTextFields = ['bodyPlainText'];
 
     /**
@@ -48,13 +44,11 @@ class CommentSearchType extends DiscussionSearchType {
         \CategoryModel $categoryModel,
         \UserModel $userModel,
         \TagModel $tagModel,
-        BreadcrumbModel $breadcrumbModel,
-        ConfigurationInterface $config
+        BreadcrumbModel $breadcrumbModel
     ) {
-        parent::__construct($discussionsApi, $categoryModel, $userModel, $tagModel, $breadcrumbModel, $config);
+        parent::__construct($discussionsApi, $categoryModel, $userModel, $tagModel, $breadcrumbModel);
         $this->commentsApi = $commentsApi;
         $this->commentModel = $commentModel;
-        $this->config = $config;
     }
 
 
@@ -114,7 +108,7 @@ class CommentSearchType extends DiscussionSearchType {
      * @return float|null
      */
     protected function getBoostValue(): ?float {
-        return $this->config->get('Elastic.Boost.Comments', null);
+        return null;
     }
 
     /**

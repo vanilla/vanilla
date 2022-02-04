@@ -1,4 +1,0 @@
-{
-    "x-version-scheme": "{Release version}-{? SNAPSHOT if it's a dev build}",
-    "version": "2022.003-SNAPSHOT"
-}

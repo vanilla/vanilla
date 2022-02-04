@@ -9,32 +9,15 @@ import { InputSize } from "../../types";
 
 export interface AutoCompleteClassesProps {
     size?: InputSize;
-    isDisabled?: boolean;
-    isClearable?: boolean;
 }
 
-export const autoCompleteClasses = ({
-    size = "default",
-    isDisabled = false,
-    isClearable = false,
-}: AutoCompleteClassesProps) => ({
+export const autoCompleteClasses = ({ size = "default" }: AutoCompleteClassesProps) => ({
     arrowButton: css({}),
     reachCombobox: css({
         width: "100%",
     }),
     inputContainer: css({
         position: "relative",
-        display: "flex",
-        width: "100%",
-        alignItems: "baseline",
-        justifyContent: "flex-start",
-        border: "solid 1px #bfcbd8",
-        borderRadius: 6,
-        flexWrap: "wrap",
-        ...{
-            small: { paddingRight: !isDisabled && isClearable ? 40 : !isDisabled ? 16 : 0 },
-            default: { paddingRight: !isDisabled && isClearable ? 44 : !isDisabled ? 20 : 0 },
-        }[size],
     }),
     inputActions: css({
         display: "flex",
@@ -45,31 +28,39 @@ export const autoCompleteClasses = ({
         top: 0,
         right: 0,
         bottom: 0,
+
         ...{
             small: { padding: "0 8px" },
             default: { padding: "0 12px" },
         }[size],
     }),
+    inputTokens: css({
+        display: "flex",
+        pointerEvents: "none",
+        flexDirection: "row",
+        position: "absolute",
+        top: 0,
+        left: 0,
+        bottom: 0,
+        flexWrap: "wrap",
+        ...{
+            small: {
+                height: 28,
+            },
+            default: {
+                height: 36,
+            },
+        }[size],
+    }),
     inputTokenTag: css({
         display: "flex",
         ...{
-            small: { margin: "4px 0px 4px 8px", fontSize: "13px" },
-            default: { margin: "5px 0px 5px 8px", fontSize: "16px" },
+            small: { margin: 4, maxHeight: 20, paddingLeft: 6, fontSize: "13px" },
+            default: { margin: 5, maxHeight: 26, paddingLeft: 8, fontSize: "16px" },
         }[size],
         backgroundColor: "#eeefef",
         borderRadius: 2,
         alignItems: "center",
-        maxWidth: "85%",
-        "& > label": {
-            margin: 0,
-            ...{
-                small: { padding: "3px 6px", paddingRight: 0 },
-                default: { padding: "4px 8px", paddingRight: 0 },
-            }[size],
-            "& + div": {
-                paddingRight: 2,
-            },
-        },
     }),
     popover: css({
         "&[data-reach-combobox-popover]": {
@@ -88,10 +79,6 @@ export const autoCompleteClasses = ({
     checkmarkContainer: css({
         display: "flex",
         height: "1em",
-    }),
-    parentLabel: css({
-        color: "#767676",
-        fontSize: "12px",
     }),
     option: css({
         display: "flex",
@@ -120,12 +107,6 @@ export const autoCompleteClasses = ({
                 default: { width: 24, height: 24, right: -4, transform: "translateY(calc(0.5em - 50%))" },
             }[size],
         },
-        "&:first-of-type&:last-of-type": {
-            background: "rgba(3,125,188,0.08)",
-        },
-        "&[data-autocomplete-selected=true]": {
-            background: "rgba(3,125,188,0.08)",
-        },
     }),
     optionText: css({
         flex: 1,
@@ -147,16 +128,5 @@ export const autoCompleteClasses = ({
     }),
     input: css({
         cursor: "default",
-        border: "none",
-        flex: 1,
-        minWidth: 100,
-        "* + &": {
-            height: 0,
-            fontSize: 0,
-        },
-        "* + &:focus, * + &[data-state='interacting'], * + &[data-state='suggesting']": {
-            height: "auto",
-            fontSize: "inherit",
-        },
     }),
 });

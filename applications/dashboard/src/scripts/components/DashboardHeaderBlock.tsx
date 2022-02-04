@@ -3,13 +3,15 @@
  * @license GPL-2.0-only
  */
 import React from "react";
-import { useHistory } from "react-router";
+import { LeftChevronCompactIcon } from "@library/icons/common";
+import { RouteComponentProps, useHistory } from "react-router";
+import Button from "@library/forms/Button";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { t } from "@library/utility/appUtils";
 import BackLink from "@library/routing/links/BackLink";
 import { cx } from "@emotion/css";
 
 interface IProps {
-    headingTag?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
     showBackLink?: boolean;
     title: string;
     actionButtons?: React.ReactNode;
@@ -19,13 +21,12 @@ interface IProps {
 }
 
 export function DashboardHeaderBlock(props: IProps) {
-    const HeadingTag = props.headingTag ?? "h1";
     const history = useHistory();
     return (
         <header className={cx("header-block", props.className)}>
             <div className="title-block">
                 {props.showBackLink && history && <BackLink aria-label={t("Return")} onClick={props.onBackClick} />}
-                <HeadingTag>{props.title}</HeadingTag>
+                <h1>{props.title}</h1>
             </div>
             {props.actionButtons}
         </header>

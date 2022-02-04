@@ -337,11 +337,6 @@ class CategoriesController extends VanillaController {
             }
             $category = (object)$category;
 
-            // Check for Root Category.
-            if ($category->CategoryID === -1) {
-                redirectTo('/categories');
-            }
-
             // Check permission
             $this->permission('Vanilla.Discussions.View', true, 'Category', val('PermissionCategoryID', $category));
 

@@ -22,13 +22,19 @@ class PocketsModelTest extends SiteTestCase {
 
     use ExpectExceptionTrait;
 
-    public static $addons = ['pockets'];
-
     /** @var TestCache */
     private $cache;
 
     /** @var PocketsModel */
     private $pocketModel;
+
+    /**
+     * Setup.
+     */
+    public static function setUpBeforeClass(): void {
+        self::$addons = ['vanilla', 'pockets'];
+        parent::setUpBeforeClass();
+    }
 
     /**
      * Setup.

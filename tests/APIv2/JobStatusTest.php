@@ -7,11 +7,9 @@
 
 namespace VanillaTests\APIv2;
 
-use Garden\Container\Container;
 use Vanilla\Dashboard\Controllers\Api\JobStatusesApiController;
 use Vanilla\Scheduler\Descriptor\NormalJobDescriptor;
 use Vanilla\Scheduler\Job\JobExecutionStatus;
-use Vanilla\Scheduler\Job\JobStatusModel;
 use Vanilla\Scheduler\TrackingSlipInterface;
 use VanillaTests\ExpectExceptionTrait;
 use VanillaTests\Fixtures\Scheduler\InstantScheduler;
@@ -30,20 +28,12 @@ class JobStatusTest extends SiteTestCase {
     use ExpectExceptionTrait;
 
     /**
-     * @param Container $container
-     */
-    public static function configureContainerBeforeStartup(Container $container) {
-        $container->rule(JobStatusModel::class)
-            ->setShared(false)
-        ;
-    }
-
-    /**
      * Cleanup before test.
      */
     public function setUp(): void {
         parent::setUp();
         $this->resetTable('jobStatus');
+        $this->enableCaching();
     }
 
     /**

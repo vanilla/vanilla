@@ -15,7 +15,7 @@ import { css, CSSObject } from "@emotion/css";
 import { getPixelNumber, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { important, percent, rgba } from "csx";
-import { oneColumnVariables } from "@library/layout/Section.variables";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { buttonResetMixin } from "@library/forms/buttonMixins";
 import { metasVariables } from "@library/metas/Metas.variables";
 
@@ -142,7 +142,7 @@ export const dropDownClasses = useThemeCache(() => {
     const metasVars = metasVariables();
     const globalVars = globalVariables();
     const shadows = shadowHelper();
-    const mediaQueries = oneColumnVariables().mediaQueries();
+    const mediaQueries = panelLayoutVariables().mediaQueries();
 
     const root = css({
         position: "relative",
@@ -597,7 +597,7 @@ export const dropDownClasses = useThemeCache(() => {
 export const actionMixin = (classBasedStates?: IStateSelectors): CSSObject => {
     const vars = dropDownVariables();
     const globalVars = globalVariables();
-    const mediaQueries = oneColumnVariables().mediaQueries();
+    const mediaQueries = panelLayoutVariables().mediaQueries();
 
     return {
         ...buttonResetMixin(),

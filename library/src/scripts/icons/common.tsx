@@ -291,6 +291,29 @@ export function NewFolderIcon(props: { className?: string; "aria-hidden"?: areaH
     );
 }
 
+export function WarningIcon(props: { className?: string; warningMessage?: string; "aria-hidden"?: areaHiddenType }) {
+    const classes = iconClasses();
+    const { className, warningMessage = t("Warning") } = props;
+
+    return (
+        <svg
+            className={classNames(classes.warning, className)}
+            aria-label={warningMessage}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 16 16"
+            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
+        >
+            <title>{warningMessage}</title>
+            <path
+                d="M12.709,13.405H11.314l-.291-5.9H13ZM11,15.472a1.048,1.048,0,0,1,.257-.767,1.01,1.01,0,0,1,.749-.26.982.982,0,0,1,.734.266,1.226,1.226,0,0,1,0,1.514.964.964,0,0,1-.731.275.993.993,0,0,1-.743-.269A1.042,1.042,0,0,1,11,15.472Z"
+                transform="translate(-4 -4)"
+                style={{ fill: "currentColor" }}
+            />
+            <circle cx="8" cy="8" r="7.5" style={{ fill: "none", stroke: "currentColor" }} />
+        </svg>
+    );
+}
+
 export function ErrorIcon(props: { className?: string; errorMessage?: string; "aria-hidden"?: areaHiddenType }) {
     const classes = iconClasses();
     const { className, errorMessage = t("Error") } = props;

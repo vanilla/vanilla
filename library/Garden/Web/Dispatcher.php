@@ -18,7 +18,6 @@ use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Vanilla\Contracts\LocaleInterface;
-use Vanilla\Logging\ErrorLogger;
 use Vanilla\Permissions;
 use Garden\CustomExceptionHandler;
 
@@ -70,6 +69,11 @@ class Dispatcher implements LoggerAwareInterface {
      * @return $this
      */
     public function addRoute(Route $route, $key = '') {
+        if (!$route->isEnabled()) {
+            // Return early. Route may have been disabled by some configuration.
+            return $this;
+        }
+
         if ($key !== '') {
             $this->routes[$key] = $route;
         } else {
@@ -186,9 +190,7 @@ class Dispatcher implements LoggerAwareInterface {
                         "exception" => $dispatchEx,
                     ]);
                 } else {
-                    ErrorLogger::error($dispatchEx, ['api_error', 'dispatcher-caught'], [
-                        'responseCode' => $dispatchEx->getCode(),
-                    ]);
+                    logException($dispatchEx);
                 }
                 $response = null;
                 if (is_object($action ?? null) && $action instanceof Action) {
@@ -308,9 +310,6 @@ class Dispatcher implements LoggerAwareInterface {
             }
 
             $data = $raw instanceof \JsonSerializable ? $raw->jsonSerialize() : ['message' => $raw->getMessage()];
-            if (debug() && is_array($data)) {
-                $data['trace'] = $raw->getTrace();
-            }
             $result = new Data($data, $errorCode);
             // Provide stack trace as meta information.
             $result->setMeta('exception', $raw);

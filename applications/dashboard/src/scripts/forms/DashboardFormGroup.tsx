@@ -3,14 +3,16 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { useMemo } from "react";
 import { useUniqueID } from "@library/utility/idUtils";
 import { DashboardFormLabel, DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import classNames from "classnames";
+import { IFieldError } from "@library/@types/api/core";
+import ErrorMessages from "@library/forms/ErrorMessages";
 import { FormGroupContext } from "./DashboardFormGroupContext";
 
 interface IProps {
-    label: React.ReactNode;
+    label: string;
     description?: React.ReactNode;
     afterDescription?: React.ReactNode;
     labelType?: DashboardLabelType;

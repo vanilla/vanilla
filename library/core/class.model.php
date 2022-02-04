@@ -135,15 +135,6 @@ class Gdn_Model extends Gdn_Pluggable {
     }
 
     /**
-     * Get the table name.
-     *
-     * @return string
-     */
-    public function getTableName(): string {
-        return $this->Name;
-    }
-
-    /**
      * Get a clean SQL driver instance.
      *
      * @return \Gdn_SQLDriver
@@ -531,6 +522,7 @@ class Gdn_Model extends Gdn_Pluggable {
         return $result;
     }
 
+
     /**
      * Delete records from a table.
      *
@@ -849,6 +841,7 @@ class Gdn_Model extends Gdn_Pluggable {
         }
     }
 
+
     /**
      * Adds $this->UpdateUserID and $this->DateUpdated fields to an associative
      * array of fieldname/values if those fields exist on the table being updated.
@@ -1100,7 +1093,13 @@ class Gdn_Model extends Gdn_Pluggable {
      * @return int
      */
     public function getTotalRowCount(): int {
-        return $this->Database->getEstimatedRowCount($this->Name);
+        $data = $this->Database->query(
+            'show table status like '.$this->Database->connection()->quote($this->Database->DatabasePrefix.$this->Name),
+            [],
+            ['ReturnType' => 'DataSet']
+        );
+
+        return $data->value('Rows', 0);
     }
 
     /**

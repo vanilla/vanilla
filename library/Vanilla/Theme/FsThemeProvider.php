@@ -23,23 +23,36 @@ class FsThemeProvider implements ThemeProviderInterface {
     /** @var ThemeServiceHelper */
     private $themeHelper;
 
+    /** @var RequestInterface $request */
+    private $request;
+
     /** @var ConfigurationInterface */
     private $config;
+
+    /** @var string|null A theme option value if set in the form of '%s_optionName' */
+    private $themeOptionValue;
+
+    /** @var ThemeService */
+    private $themeService;
 
     /**
      * FsThemeProvider constructor.
      *
      * @param AddonManager $addonManager
+     * @param RequestInterface $request
      * @param ConfigurationInterface $config
      * @param ThemeServiceHelper $themeHelper
      */
     public function __construct(
         AddonManager $addonManager,
+        RequestInterface $request,
         ConfigurationInterface $config,
         ThemeServiceHelper $themeHelper
     ) {
         $this->addonManager = $addonManager;
+        $this->request = $request;
         $this->config = $config;
+        $this->themeOptionValue = $this->config->get('Garden.ThemeOptions.Styles.Value', '');
         $this->themeHelper = $themeHelper;
     }
 
@@ -47,7 +60,7 @@ class FsThemeProvider implements ThemeProviderInterface {
      * @param ThemeService $themeService
      */
     public function setThemeService(ThemeService $themeService): void {
-        // Don't actually need it.
+        $this->themeService = $themeService;
     }
 
     /**

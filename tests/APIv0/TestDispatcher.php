@@ -9,15 +9,12 @@ namespace VanillaTests\APIv0;
 
 use Garden\Container\Container;
 use Garden\EventManager;
-use Garden\Web\Data;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
-use Vanilla\Analytics\TrackableLegacyControllerInterface;
 use Vanilla\Utility\ModelUtils;
 use Vanilla\Utility\StringUtils;
 use VanillaTests\Fixtures\Html\TestHtmlDocument;
 use VanillaTests\PrivateAccessTrait;
-use VanillaTests\VanillaTestCase;
 
 /**
  * A test dispatcher that dispatches to `Gdn_Controller` endpoints.
@@ -62,9 +59,6 @@ class TestDispatcher {
     /** @var \Gdn_Controller|null */
     private $lastController;
 
-    /** @var array */
-    private $lastHeaders = [];
-
     /** @var bool */
     private $rethrowExceptions = true;
 
@@ -75,47 +69,6 @@ class TestDispatcher {
      */
     public function __construct(Container $container) {
         $this->container = $container;
-    }
-
-    /**
-     * Create a request with a given set of parameters.
-     *
-     * @param string $method
-     * @param string $path
-     * @param array|string $queryOrBody
-     * @param \Gdn_Request|null $onRequest Mutate this request instead of creating a new.
-     *
-     * @return \Gdn_Request
-     */
-    public function createRequest(string $method, string $path, $queryOrBody = [], ?\Gdn_Request $onRequest = null):
-    \Gdn_Request {
-        $request = $onRequest ?? \Gdn_Request::create();
-        $request->fromEnvironment();
-        $request->setMethod($method);
-        $request->setUrl($path);
-        // Kludge due to a bug in the dispatcher not understanding extensions properly.
-        if ($request->getExt()) {
-            $request->setPath($request->getPathExt());
-            $request->setExt('');
-        }
-        // Kludge due to the request not understanding roots.
-        if ($request->getRoot() &&  (str_starts_with($request->getPath(), $request->getRoot().'/'))) {
-            $path = StringUtils::substringLeftTrim($request->getPath(), $request->getRoot());
-            $request->setPath($path);
-        }
-
-        if ($method === 'POST') {
-            $request->setRequestArguments(\Gdn_Request::INPUT_POST, $queryOrBody);
-        } elseif (!empty($queryOrBody)) {
-            $get = $request->getRequestArguments(\Gdn_Request::INPUT_GET);
-            $get = array_replace($get, $queryOrBody);
-            $request->setRequestArguments(\Gdn_Request::INPUT_GET, $get);
-        }
-
-        // Kludge to ensure the path can be reloaded from the environment args.
-        $request->setURI($request->getPath());
-
-        return $request;
     }
 
     /**
@@ -161,10 +114,29 @@ class TestDispatcher {
 
         // Back up the old request so that it doesn't pollute future tests.
         $oldRequest = clone \Gdn::request();
-        $request = self::createRequest($method, $path, $queryOrBody);
+
+        $request = \Gdn_Request::create()->fromEnvironment()->setMethod($method)->setUrl($path);
+        // Kludge due to a bug in the dispatcher not understanding extensions properly.
+        if ($request->getExt()) {
+            $request->setPath($request->getPathExt());
+            $request->setExt('');
+        }
+        // Kludge due to the request not understanding roots.
+        if ($request->getRoot() &&  (str_starts_with($request->getPath(), $request->getRoot().'/'))) {
+            $path = StringUtils::substringLeftTrim($request->getPath(), $request->getRoot());
+            $request->setPath($path);
+        }
+
+        // Kludge to ensure the path can be reloaded from the environment args.
+        $request->setURI($request->getPath());
 
         if ($method === 'POST') {
             $session->validateTransientKey(true);
+            $request->setRequestArguments(\Gdn_Request::INPUT_POST, $queryOrBody);
+        } elseif (!empty($queryOrBody)) {
+            $get = $request->getRequestArguments(\Gdn_Request::INPUT_GET);
+            $get = array_replace($get, $queryOrBody);
+            $request->setRequestArguments(\Gdn_Request::INPUT_GET, $get);
         }
 
         $fn = function ($sender, $args) {
@@ -182,7 +154,6 @@ class TestDispatcher {
             $dispatcher->dispatch($request, $options[self::OPT_PERMANENT]);
             $output = ob_get_contents();
             $this->lastOutput = $output;
-            $this->lastHeaders = $dispatcher->getSentHeaders();
         } finally {
             \Gdn::request($oldRequest);
             $events->unbind('base_beforeControllerMethod', $fn);
@@ -204,23 +175,6 @@ class TestDispatcher {
         }
 
         return $this->lastController;
-    }
-
-    /**
-     * Get a controller instance for an url and make assertions about its trackable pageview data.
-     *
-     * @param string $path
-     * @param array $query
-     * @param array $expected
-     *
-     * @return \Gdn_Controller
-     */
-    public function getAndAssertTrackableData(string $path, array $query, array $expected): \Gdn_Controller {
-        $controller = $this->get($path, $query);
-        TestCase::assertInstanceOf(TrackableLegacyControllerInterface::class, $controller);
-        $trackableData = $controller->getTrackableData();
-        VanillaTestCase::assertDataLike($expected, $trackableData);
-        return $controller;
     }
 
     /**
@@ -280,9 +234,9 @@ class TestDispatcher {
      * @param string $path
      * @param array $query
      * @param array $options
-     * @return Data
+     * @return false|mixed|string
      */
-    public function getJsonData(string $path, array $query = [], $options = []): Data {
+    public function getJsonData(string $path, array $query = [], $options = []) {
         $options += [
             self::OPT_DELIVERY_TYPE => DELIVERY_TYPE_DATA,
             self::OPT_DELIVERY_METHOD => DELIVERY_METHOD_JSON,
@@ -298,9 +252,7 @@ class TestDispatcher {
             $response = $this->lastOutput;
         }
 
-        $data = $this->createData($response);
-
-        return $data;
+        return $response;
     }
 
     /**
@@ -330,38 +282,6 @@ class TestDispatcher {
     }
 
     /**
-     * Do a post using the contents of the last request as a basis for the form values.
-     *
-     * @param array $bodyOverride
-     * @param array $options
-     * @return \Gdn_Controller
-     */
-    public function postBack($bodyOverride = [], array $options = []): \Gdn_Controller {
-        TestCase::assertNotNull($this->getLastHtml(), 'You must call get before you can postback.');
-        $form = $this->getLastHtml()->assertCssSelectorExists('form', 'There is no form on the page to post back to.');
-        $action = (string)$form->getAttribute('action');
-        $action = StringUtils::substringLeftTrim($action, \Gdn::request()->getRoot(), true);
-
-        $post = $this->getLastHtml()->getFormValues();
-        $post = array_replace($post, $bodyOverride);
-        $r = $this->post($action, $post, $options);
-        return $r;
-    }
-
-    /**
-     * Do a post using the contents of the last request as a basis for the form values.
-     *
-     * @param array $bodyOverride
-     * @param array $options
-     * @return TestHtmlDocument
-     */
-    public function postBackHtml($bodyOverride = [], array $options = []): TestHtmlDocument {
-        $controller = $this->postBack($bodyOverride, $options);
-
-        return $this->getLastHtml();
-    }
-
-        /**
      * Make a POST request and return its decoded data array.
      *
      * @param string $path
@@ -379,30 +299,6 @@ class TestDispatcher {
         TestCase::assertIsString($this->lastOutput, 'Controller must output HTML');
         $data = json_decode($this->lastOutput, true);
         TestCase::assertNotNull($data, "The controller did not return valid JSON.");
-
-        $data = $this->createData($data);
-
-        return $data;
-    }
-
-    /**
-     * Create http response data from controller output.
-     *
-     * @param mixed $responseBody
-     *
-     * @return Data
-     */
-    private function createData($responseBody): Data {
-        $data = new Data($responseBody, [], $this->lastHeaders);
-
-        // Try to extract a status code.
-        $status = $this->lastHeaders['Status'] ?? $this->lastHeaders['status'] ?? null;
-        if ($status !== null) {
-            // Status will be a string status. Extract out the actual status.
-            $statusCode = explode(" ", $status)[0];
-            TestCase::assertIsNumeric($statusCode, "Controller returned an invalid HTTP status code: " . $statusCode);
-            $data->setMeta('status', (int) $statusCode);
-        }
 
         return $data;
     }

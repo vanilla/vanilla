@@ -9,7 +9,6 @@ namespace VanillaTests\APIv2;
 
 use Garden\Web\Exception\HttpException;
 use PHPUnit\Framework\AssertionFailedError;
-use Vanilla\Utility\ModelUtils;
 use VanillaTests\TestOAuth\TestOAuthPlugin;
 
 /**
@@ -177,6 +176,8 @@ final class OAuth2TokenTest extends AbstractAPIv2Test {
 
         $provider = array_replace($provider, $set);
         $r = $model->save($provider);
-        ModelUtils::validationResultToValidationException($model);
+        if (!$r) {
+            throw new AssertionFailedError("Could not save the provider!!!");
+        }
     }
 }

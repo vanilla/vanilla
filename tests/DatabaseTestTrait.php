@@ -41,20 +41,16 @@ trait DatabaseTestTrait {
      * @param string $table
      * @param array $where
      * @param int|null $expectedCount The expected record count to be found or null.
-     *
-     * @return array The found records.
      */
-    protected function assertRecordsFound(string $table, array $where, ?int $expectedCount = null): array {
-        $records = $this->getDb()
+    protected function assertRecordsFound(string $table, array $where, ?int $expectedCount = null) {
+        $count = $this->getDb()
             ->createSql()
-            ->getWhere($table, $where)
-            ->resultArray()
+            ->getCount($table, $where)
         ;
         if ($expectedCount !== null) {
-            TestCase::assertCount($expectedCount, $records);
+            TestCase::assertEquals($expectedCount, $count);
         } else {
-            TestCase::assertTrue(count($records) > 0, 'No records were found.');
+            TestCase::assertGreaterThan(0, $count);
         }
-        return $records;
     }
 }

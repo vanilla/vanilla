@@ -20,19 +20,12 @@ import { CategoryPicker } from "@library/forms/select/CategoryPicker";
 import { CategoryFollowDropDown } from "@vanilla/addon-vanilla/categories/CategoryFollowDropdown";
 import TabWidget from "@library/tabWidget/TabWidget";
 import NewPostMenu from "@library/flyouts/NewPostMenu";
-import { triggerLegacyHashScrolling } from "@vanilla/addon-vanilla/legacy/legacyHashScrolling";
-import "@vanilla/addon-vanilla/forms/autosave";
-import { LeaderboardWidget } from "@library/leaderboardWidget/LeaderboardWidget";
-import { CategoriesWidget } from "@library/widgets/CategoriesWidget";
-import { RSSWidget } from "@library/rssWidget/RSSWidget";
 
 registerReducer("forum", forumReducer);
 registerCommunitySearchDomain();
 
 addComponent("HomeWidget", HomeWidget, { overwrite: true });
 addComponent("DiscussionListModule", DiscussionListModule, { overwrite: true });
-addComponent("DiscussionDiscussionsWidget", DiscussionListModule, { overwrite: true });
-addComponent("DiscussionAnnouncementsWidget", DiscussionListModule, { overwrite: true });
 addComponent("QuickLinks", QuickLinks, { overwrite: true });
 addComponent("CallToAction", CallToAction, { overwrite: true });
 addComponent("UserSpotlight", UserSpotlight, { overwrite: true });
@@ -41,10 +34,6 @@ addComponent("CategoryPicker", CategoryPicker, { overwrite: true });
 addComponent("CategoryFollowDropDown", CategoryFollowDropDown, { overwrite: true });
 addComponent("TabWidget", TabWidget, { overwrite: true });
 addComponent("NewPostMenu", NewPostMenu, { overwrite: true });
-addComponent("LeaderboardWidget", LeaderboardWidget, { overwrite: true });
-addComponent("CategoriesWidget", CategoriesWidget, { overwrite: true });
-addComponent("RSSWidget", RSSWidget, { overwrite: true });
 
 SearchContextProvider.setOptionProvider(new CommunitySearchProvider());
 accessibleRoleButton();
-triggerLegacyHashScrolling();

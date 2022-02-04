@@ -349,8 +349,8 @@ class UserModelTest extends SiteTestCase {
         $newRoleIDs = $this->userModel->getRoleIDs($userID);
         $this->assertSame($setRoleIDs, $newRoleIDs);
 
-        $this->assertLog(['event' => 'role_add', 'data.role' => Bootstrap::ROLE_ADMIN]);
-        $this->assertLog(['event' => 'role_remove', 'data.role' => Bootstrap::ROLE_MEMBER]);
+        $this->assertLog(['event' => 'role_add', 'role' => Bootstrap::ROLE_ADMIN]);
+        $this->assertLog(['event' => 'role_remove', 'role' => Bootstrap::ROLE_MEMBER]);
     }
 
     /**
@@ -366,7 +366,7 @@ class UserModelTest extends SiteTestCase {
             $newRoleIDs
         );
 
-        $this->assertLog(['event' => 'role_add', 'data.role' => Bootstrap::ROLE_ADMIN]);
+        $this->assertLog(['event' => 'role_add', 'role' => Bootstrap::ROLE_ADMIN]);
 
         return $userID;
     }
@@ -385,7 +385,7 @@ class UserModelTest extends SiteTestCase {
             [$this->roleID(Bootstrap::ROLE_ADMIN)],
             $newRoleIDs
         );
-        $this->assertLog(['event' => 'role_remove', 'data.role' => Bootstrap::ROLE_MEMBER]);
+        $this->assertLog(['event' => 'role_remove', 'role' => Bootstrap::ROLE_MEMBER]);
     }
 
     /**

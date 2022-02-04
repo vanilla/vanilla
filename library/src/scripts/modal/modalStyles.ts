@@ -5,7 +5,7 @@
  */
 
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
-import { oneColumnVariables } from "@library/layout/Section.variables";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { sticky } from "@library/styles/styleHelpers";
@@ -88,7 +88,7 @@ export const modalClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = modalVariables();
     const style = styleFactory("modal");
-    const mediaQueries = oneColumnVariables().mediaQueries();
+    const mediaQueries = panelLayoutVariables().mediaQueries();
     const shadows = shadowHelper();
     const titleBarVars = titleBarVariables();
 

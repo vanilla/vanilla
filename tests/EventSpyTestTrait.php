@@ -294,9 +294,8 @@ trait EventSpyTestTrait {
      */
     public function assertEventDispatched(ResourceEvent $event, array $matchPayloadFields = ["*"]): ?ResourceEvent {
         $matchAll = in_array("*", $matchPayloadFields);
+        $hasEvent = false;
         $dispatchedEvents = $this->getEventManager()->getDispatchedEvents();
-
-        $foundEvent = null;
         /** @var ResourceEvent $dispatchedEvent */
         foreach ($dispatchedEvents as $dispatchedEvent) {
             if (!($event instanceof ResourceEvent) || !($dispatchedEvent instanceof ResourceEvent)) {
@@ -318,15 +317,15 @@ trait EventSpyTestTrait {
                     continue 2;
                 }
             }
-            $foundEvent = $dispatchedEvent;
+            return $dispatchedEvent;
         }
 
         $this->assertTrue(
-            $foundEvent !== null,
+            $hasEvent,
             "Could not find a matching event for $event in dispatched events:\n" .
                 json_encode($dispatchedEvents, JSON_PRETTY_PRINT)
         );
-        return $foundEvent;
+        return null;
     }
 
     /**

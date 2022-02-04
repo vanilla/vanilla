@@ -9,7 +9,6 @@ namespace Vanilla;
 
 use DateTimeImmutable;
 use Vanilla\Formatting\DateTimeFormatter;
-use Vanilla\Utility\DebugUtils;
 
 /**
  * Simple class for getting the current time. Easily configurable for tests.
@@ -103,7 +102,7 @@ final class CurrentTimeStamp {
      * @codeCoverageIgnore
      */
     private static function assertTestMode() {
-        assert(DebugUtils::isTestMode());
+        assert(defined('TESTMODE_ENABLED') && TESTMODE_ENABLED);
     }
 
     /**

@@ -16,9 +16,6 @@
  */
 class BanModel extends Gdn_Model {
 
-    const ACTION_BAN = 'ban';
-    const ACTION_UNBAN = 'unban';
-
     const CACHE_KEY = "allBans";
     const CACHE_TTL = 60 * 30; // 30 minutes.
 
@@ -416,19 +413,6 @@ class BanModel extends Gdn_Model {
         if ($user['UserID'] == $banningUserID) {
             $banningUserID = val('InsertUserID', $ban, Gdn::userModel()->getSystemUserID());
         }
-
-        // Create and dispatch a UserDisciplineEvent
-        $action = $bannedValue ? self::ACTION_BAN : self::ACTION_UNBAN;
-        $disciplineType = $bannedValue ?
-            \Vanilla\Dashboard\Events\UserDisciplineEvent::DISCIPLINE_TYPE_NEGATIVE :
-            \Vanilla\Dashboard\Events\UserDisciplineEvent::DISCIPLINE_TYPE_POSITIVE;
-        $source  = $ban ? "ban_rules" : null;
-        $banEvent = Gdn::userModel()->createUserDisciplineEvent($user["UserID"], $action, $disciplineType, $source, $banningUserID);
-        if ($ban) {
-            $banEvent->setReason("{$ban["BanType"]} matches {$ban["BanValue"]}");
-        }
-        $eventManager = $this->getEventManager();
-        $eventManager->dispatch($banEvent);
 
         // Log the ban.
         $bannedString = $bannedValue ? 'banned' : 'unbanned';

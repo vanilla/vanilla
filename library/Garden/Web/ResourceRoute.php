@@ -80,9 +80,6 @@ class ResourceRoute extends Route {
      * {@inheritdoc}
      */
     public function match(RequestInterface $request) {
-        if (!$this->isEnabled()) {
-            return null;
-        }
         $path = $request->getPath();
 
         // First check and strip the base path.

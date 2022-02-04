@@ -31,11 +31,15 @@ class RemoteResourceModelTest extends SiteTestCase {
     /** @var MockObject */
     private $mockScheduler;
 
+    /** @var \Gdn_Cache */
+    private $cache;
+
     /**
      * @inheritDoc
      */
     public function setUp(): void {
         parent::setUp();
+        $this->cache = $this->enableCaching();
         $this->remoteResourceModel = \Gdn::getContainer()->get(RemoteResourceModel::class);
     }
 
@@ -64,7 +68,7 @@ class RemoteResourceModelTest extends SiteTestCase {
         $this->remoteResourceModel->insert(["url" => $url, "content" => $content]);
         $this->remoteResourceModel->getByUrl($url);
 
-        $this->resetTable("remoteResource", false);
+        $this->resetTable("remoteResource");
 
         $result = $this->remoteResourceModel->getByUrl($url);
         $this->assertEquals($content, $result);
@@ -104,7 +108,7 @@ class RemoteResourceModelTest extends SiteTestCase {
      * Test remote resource job gets add.
      */
     public function testRemoteResourceJobExecutedFirstTime() {
-        $this->resetTable('remoteResource', false);
+        $this->resetTable('remoteResource');
         $this->assertIfJobIsRun($this->once(), "addJobDescriptor", "http://test.com");
     }
 
@@ -112,14 +116,14 @@ class RemoteResourceModelTest extends SiteTestCase {
      * Test getByUrl Content already in DB
      */
     public function testRemoteResourceJobNotExecutedContentExisting() {
-        $this->resetTable('remoteResource', false);
+        $this->resetTable('remoteResource');
         $url = "http://amazing.com";
 
         $this->remoteResourceModel->insert(["url" => $url, "content" => "amazing content"]);
         $this->assertIfJobIsRun($this->never(), "addJobDescriptor", $url);
 
         // Check cache
-        $this->resetTable('remoteResource', false);
+        $this->resetTable('remoteResource');
         $this->assertIfJobIsRun($this->never(), "addJobDescriptor", $url);
     }
 
@@ -127,7 +131,7 @@ class RemoteResourceModelTest extends SiteTestCase {
      * Test getByUrl Content already in DB
      */
     public function testRemoteResourceJobExecuteStaleContent() {
-        $this->resetTable('remoteResource', false);
+        $this->resetTable('remoteResource');
         $url = "http://amazing.com";
         CurrentTimeStamp::mockTime('Jan 01 2020 01:01:01');
         $this->remoteResourceModel->insert(["url" => $url, "content" => "amazing content"]);

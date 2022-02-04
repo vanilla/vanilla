@@ -7,7 +7,6 @@
 
 namespace VanillaTests\TestOAuth;
 
-use Garden\Web\Exception\ServerException;
 use UserModel;
 
 /**
@@ -61,7 +60,7 @@ class TestOAuthPlugin extends \Gdn_OAuth2 {
         if (isset($this->profiles[$this->accessToken()])) {
             return $this->profiles[$this->accessToken()];
         }
-        throw new ServerException("Invalid access token.");
+        throw new \Gdn_ErrorException("Invalid access token.");
     }
 
     /**
@@ -73,8 +72,5 @@ class TestOAuthPlugin extends \Gdn_OAuth2 {
         if ($user) {
             $this->userModel->deleteID($user['UserID']);
         }
-
-        // Make sure our caches aren't messing with us.
-        \Gdn::cache()->flush();
     }
 }

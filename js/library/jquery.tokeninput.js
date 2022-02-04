@@ -341,28 +341,26 @@ $.TokenList = function (input, url_or_data, settings) {
                 case KEY.ENTER:
                 case KEY.NUMPAD_ENTER:
                 case KEY.COMMA:
-                    if (event.currentTarget.value.length > 0){
-                        if(selected_dropdown_item) {
-                            add_token($(selected_dropdown_item).data("tokeninput"));
-                            hidden_input.change();
-                        } else {
-                            if ($(input).data("settings").allowFreeTagging) {
-                            if($(input).data("settings").allowTabOut && $(this).val() === "") {
-                                return true;
-                            } else {
-                                add_freetagging_tokens();
-                            }
-                            } else {
-                            $(this).val("");
-                            if($(input).data("settings").allowTabOut) {
-                                return true;
-                            }
-                            }
-                            event.stopPropagation();
-                            event.preventDefault();
-                        }
-                        return false;
+                  if(selected_dropdown_item) {
+                    add_token($(selected_dropdown_item).data("tokeninput"));
+                    hidden_input.change();
+                  } else {
+                    if ($(input).data("settings").allowFreeTagging) {
+                      if($(input).data("settings").allowTabOut && $(this).val() === "") {
+                        return true;
+                      } else {
+                        add_freetagging_tokens();
+                      }
+                    } else {
+                      $(this).val("");
+                      if($(input).data("settings").allowTabOut) {
+                        return true;
+                      }
                     }
+                    event.stopPropagation();
+                    event.preventDefault();
+                  }
+                  return false;
 
                 case KEY.ESCAPE:
                   hide_dropdown();
@@ -606,7 +604,7 @@ $.TokenList = function (input, url_or_data, settings) {
 
         // The 'delete token' button
         if(!readonly) {
-          $("<span role='button' tabindex='0'>" + $(input).data("settings").deleteText + "</span>")
+          $("<span tabindex='0'>" + $(input).data("settings").deleteText + "</span>")
               .addClass($(input).data("settings").classes.tokenDelete)
               .appendTo($this_token)
               .click(function () {

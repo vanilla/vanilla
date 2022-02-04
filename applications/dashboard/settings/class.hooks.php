@@ -199,10 +199,9 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface {
         }
 
         // Add Message Modules (if necessary)
-        $messages = MessageModel::messages();
-        $layoutViewTypes = array_column($messages, "LayoutViewType");
+        $messageCache = Gdn::config('Garden.Messages.Cache', []);
         $location = $sender->Application.'/'.substr($sender->ControllerName, 0, -10).'/'.$sender->RequestMethod;
-        $exceptions = ["all"];
+        $exceptions = ['[Base]'];
 
         if (in_array($sender->MasterView, ['', 'default'])) {
             $exceptions[] = '[NonAdmin]';
@@ -216,21 +215,11 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface {
 
         // All registration pages should display "Register" messages.
         $location = strpos(strtolower($location), 'dashboard/entry/register') === 0 ? 'dashboard/entry/register' : $location;
-        $messageModel = new MessageModel();
-        $locationMap = array_change_key_case($messageModel->getLocationMap(), CASE_LOWER);
-        $location = $locationMap[strtolower($location)] ?? $location;
 
-        if ($sender->MasterView != 'admin' && !$sender->data('_NoMessages') &&
-            (
-                val('MessagesLoaded', $sender) != '1' &&
-                $sender->MasterView != 'empty' &&
-                arrayInArray($exceptions, $layoutViewTypes, false) ||
-                inArrayI($location, $layoutViewTypes)
-            )
-        ) {
+        if ($sender->MasterView != 'admin' && !$sender->data('_NoMessages') && (val('MessagesLoaded', $sender) != '1' && $sender->MasterView != 'empty' && arrayInArray($exceptions, $messageCache, false) || inArrayI($location, $messageCache))) {
+            $messageModel = new MessageModel();
             $messageData = $messageModel->getMessagesForLocation($location, $exceptions, $sender->data('Category.CategoryID'));
             foreach ($messageData as $message) {
-                $message["CssClass"] = ucfirst($message['Type'])."Message";
                 $messageModule = new MessageModule($sender, $message);
                 if ($signInOnly) { // Insert special messages even in SignIn popup
                     echo $messageModule;

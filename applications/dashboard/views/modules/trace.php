@@ -26,22 +26,22 @@
             width: 100px;
         }
 
-        .Trace .Tag-info {
+        .Trace .Tag-Info {
             background: #00A6FF;
             color: #fff;
         }
 
-        .Trace .Tag-warning {
+        .Trace .Tag-Warning {
             background: #FF9000;
             color: #fff;
         }
 
-        .Trace .Tag-notice {
+        .Trace .Tag-Notice {
             background: #FF9000;
             color: #fff;
         }
 
-        .Trace .Tag-error {
+        .Trace .Tag-Error {
             background: #f00;
             color: #fff;
         }

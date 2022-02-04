@@ -44,6 +44,7 @@ abstract class AbstractAPIv2Test extends SiteTestCase {
      */
     public function setUp(): void {
         parent::setUp();
+
         if ($this->startSessionOnSetup) {
             $this->setAdminApiUser();
             $this->api->setTransientKey(md5(now()));

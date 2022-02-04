@@ -58,13 +58,13 @@ class MessagesTest extends AbstractResourceTest {
         ]);
         self::$userID = $user['userID'];
 
-        /** @var \ConversationsApiController $conversationsApiController */
-        $conversationsApiController = static::container()->get('ConversationsApiController');
+        /** @var \ConversationsApiController $conversationsAPiController */
+        $conversationsAPiController = static::container()->get('ConversationsAPiController');
 
         // Create the conversation as the newly created user.
         $session->start(self::$userID, false, false);
 
-        $conversation = $conversationsApiController->post([
+        $conversation = $conversationsAPiController->post([
             'participantUserIDs' => [self::$userID]
         ]);
         self::$conversationID = $conversation['conversationID'];
@@ -183,75 +183,6 @@ class MessagesTest extends AbstractResourceTest {
      */
     public function testPatchFull() {
         $this->fail(__METHOD__.' needs to be implemented');
-    }
-
-    /**
-     * Test that output is sanitized when user posts a XSS vector.
-     *
-     * @param array $xssVectorFormat
-     * @param string $xssVector
-     * @param string $sanitizedOutput
-     * @return void
-     * @dataProvider provideXssVectorSanitized
-     */
-    public function testPostXssVectorOutputSanitized(
-        array $xssVectorFormat,
-        string $xssVector,
-        string $sanitizedOutput
-    ): void {
-        $postBody = $this->testPost(array_merge($this->record(), $xssVectorFormat));
-        $this->assertStringNotContainsString($xssVector, $postBody['body']);
-        $this->assertStringContainsString($sanitizedOutput, $postBody['body']);
-        $messageID = $postBody['messageID'];
-
-        // Need to switch back to user posting the message when getting the message
-        $currentUserID = $this->api()->getUserID();
-        $this->api()->setUserID(self::$userID);
-        $response = $this->api()->get("/messages/{$messageID}");
-        $this->api()->setUserID($currentUserID);
-
-        $this->assertTrue($response->isSuccessful());
-        $getBody = $response->getBody();
-        $this->assertStringContainsString($sanitizedOutput, $getBody['body']);
-    }
-
-    /**
-     * XSS vector / sanitized output data provider.
-     *
-     * @return iterable
-     */
-    public function provideXssVectorSanitized(): iterable {
-        $xssVector = '"><<iframe/><iframe src=javascript:alert(document.domain)></iframe>';
-        yield 'iframe with src javascript, markdown format' => [
-            'xssVectorFormat' => [
-                'body' => $xssVector,
-                'format' => 'markdown'
-            ],
-            'xssVector' => $xssVector,
-            'sanitizedOutput' => "\"&gt;&lt;" //stripped tags
-        ];
-        yield 'iframe with src javascript, rich format' => [
-            'xssVectorFormat' => [
-                'body' => json_encode([["insert" => "{$xssVector}"]]),
-                'format' => 'rich'
-            ],
-            'xssVector' => $xssVector,
-            'sanitizedOutput' => htmlspecialchars($xssVector, ENT_NOQUOTES)
-        ];
-        yield 'iframe with src javascript in code block, rich format' => [
-            'xssVectorFormat' => [
-                'body' => json_encode([
-                    [
-                        'attributes' => ['code' => true],
-                        'insert' => "{$xssVector}"
-                    ],
-                    ['insert' => '\n']
-                ]),
-                'format' => 'rich'
-            ],
-            'xssVector' => $xssVector,
-            'sanitizedOutput' => htmlspecialchars($xssVector, ENT_NOQUOTES)
-        ];
     }
 
     /**

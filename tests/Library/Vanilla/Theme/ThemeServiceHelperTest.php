@@ -55,13 +55,7 @@ class ThemeServiceHelperTest extends MinimalContainerTestCase {
     public function testThemeHidden() {
         $this->assertFalse($this->getHelper()->isThemeVisible(new MockAddon('theme-no-hidden-field')));
         $this->assertFalse($this->getHelper()->isThemeVisible(new MockAddon('theme-hidden-true', ['hidden' => true])));
-
-        // Doesn't actually do anything,
-        $this->assertFalse($this->getHelper()->isThemeVisible(new MockAddon('theme-hidden-false', ['hidden' => false])));
-
-        // These are on be default
-        $this->assertTrue($this->getHelper()->isThemeVisible(new MockAddon('theme-foundation')));
-        $this->assertTrue($this->getHelper()->isThemeVisible(new MockAddon('keystone')));
+        $this->assertTrue($this->getHelper()->isThemeVisible(new MockAddon('theme-hidden-false', ['hidden' => false])));
     }
 
 

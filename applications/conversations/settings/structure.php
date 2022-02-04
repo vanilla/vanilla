@@ -91,7 +91,7 @@ if (!$CountParticipantsExists && $UserConversationExists) {
 $Construct->table('ConversationMessage')
     ->primaryKey('MessageID')
     ->column('ConversationID', 'int', false, 'key')
-    ->column('Body', 'mediumtext')
+    ->column('Body', 'text')
     ->column('Format', 'varchar(20)', null)
     ->column('InsertUserID', 'int', null, 'key')
     ->column('DateInserted', 'datetime', false)

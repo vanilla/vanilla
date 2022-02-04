@@ -64,9 +64,6 @@ class BaseDiscussionWidgetModule extends AbstractReactModule implements Limitabl
     /** @var null|array[] */
     protected $discussions = null;
 
-    /** @var array */
-    protected $containerOptions = [];
-
     /**
      * DI.
      *
@@ -135,7 +132,6 @@ class BaseDiscussionWidgetModule extends AbstractReactModule implements Limitabl
             'subtitle' => $this->subtitle,
             'description' => $this->description,
             'noCheckboxes' => true,
-            'containerOptions' => $this->getContainerOptions(),
         ];
 
         return $props;
@@ -156,7 +152,7 @@ class BaseDiscussionWidgetModule extends AbstractReactModule implements Limitabl
     public static function getWidgetSchema(): Schema {
         $schema = SchemaUtils::composeSchemas(
             self::widgetTitleSchema(),
-            self::widgetSubtitleSchema('subtitle'),
+            self::widgetSubtitleSchema(),
             self::widgetDescriptionSchema(),
             Schema::parse([
                 'apiParams' => static::getApiSchema()
@@ -531,19 +527,5 @@ class BaseDiscussionWidgetModule extends AbstractReactModule implements Limitabl
      */
     public function setLimit(int $limit) {
         $this->apiParams['limit'] = $limit;
-    }
-
-    /**
-     * @return array
-     */
-    public function getContainerOptions(): array {
-        return $this->containerOptions;
-    }
-
-    /**
-     * @param array $containerOptions
-     */
-    public function setContainerOptions(array $containerOptions): void {
-        $this->containerOptions = $containerOptions;
     }
 }

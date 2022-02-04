@@ -104,7 +104,7 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
         );
 
         $this->assertEquals(200, $r->getStatusCode());
-        $this->assertRowsEqual($this->modifyGetExpected($row), $r->getBody());
+        $this->assertRowsEqual($row, $r->getBody());
         $this->assertCamelCase($r->getBody());
 
         return $r->getBody();
@@ -258,19 +258,6 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Allows subclasses to modify the contents of the POST /api/v2/<resource> body output that is expected
-     * when testing for the presence of properties returned by the GET /api/v2/<resource>/:id.
-     * Useful when the output of non-idempotent endpoints, i.e. POST and/or PATCH differs
-     * from the output of idempotent methods, i.e. GET
-     *
-     * @param array $row
-     * @return array
-     */
-    protected function modifyGetExpected(array $row): array {
-        return $row; // by default not modified
-    }
-
-    /**
      * Modify the row for update requests.
      *
      * @param array $row The row to modify.
@@ -328,7 +315,7 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Test PATCH /resource/<id> with a single field update.
+     * Test PATCH /resource/<id> with a a single field update.
      *
      * Patch endpoints should be able to update every field on its own.
      *

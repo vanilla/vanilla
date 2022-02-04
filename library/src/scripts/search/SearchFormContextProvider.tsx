@@ -28,7 +28,6 @@ import { SearchContext } from "./SearchContext";
 import { SearchService, ISearchDomain } from "./SearchService";
 import PlacesSearchListing from "@library/search/PlacesSearchListing";
 import { getSiteSection } from "@library/utility/appUtils";
-import { getSearchAnalyticsData } from "@library/search/searchAnalyticsData";
 
 interface IProps {
     children?: React.ReactNode;
@@ -253,15 +252,6 @@ export function SearchFormContextProvider(props: IProps) {
                         }),
                         pagination: SimplePagerModel.parseHeaders(response.headers),
                     },
-                }),
-            );
-            //analytics event to keen
-            document.dispatchEvent(
-                new CustomEvent("pageViewWithContext", {
-                    detail: getSearchAnalyticsData(form, {
-                        data: response.data,
-                        pagination: SimplePagerModel.parseHeaders(response.headers),
-                    }),
                 }),
             );
         } catch (error) {

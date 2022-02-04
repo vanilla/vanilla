@@ -178,7 +178,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler, Page
      *
      * @return $this Own instance for chaining.
      */
-    public function setSeoRequired(bool $required = true): self {
+    protected function setSeoRequired(bool $required = true): self {
         $this->requiresSeo = $required;
 
         return $this;

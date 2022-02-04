@@ -17,12 +17,12 @@ import DropDown, { DropDownOpenDirection, FlyoutType } from "@library/flyouts/Dr
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
 import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
+import { WarningIcon } from "@library/icons/common";
 import { iconClasses } from "@library/icons/iconStyles";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { color, ColorHelper } from "csx";
 import { IThemePreview } from "@library/theming/themeReducer";
 import PreviewCard, { ClickHandlerOrUrl, LinkOrButton } from "@library/theming/PreviewCard";
-import { Icon } from "@vanilla/icons";
 
 interface IProps {
     name?: string;
@@ -212,11 +212,7 @@ export default function ThemePreviewCard(props: IProps) {
                         <ToolTip label={t("This theme cannot be deleted because it is the currently applied theme.")}>
                             <ToolTipIcon>
                                 <span>
-                                    <Icon
-                                        className={classNames(iconClasses().errorFgColor)}
-                                        icon={"status-warning"}
-                                        size={"compact"}
-                                    />
+                                    <WarningIcon className={classNames(iconClasses().errorFgColor)} />
                                 </span>
                             </ToolTipIcon>
                         </ToolTip>

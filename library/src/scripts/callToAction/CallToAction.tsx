@@ -14,7 +14,7 @@ import { useMeasure } from "@vanilla/react-utils/src";
 import classNames from "classnames";
 import { ButtonTypes } from "../forms/buttonTypes";
 import { WidgetLayoutWidget } from "@library/layout/WidgetLayoutWidget";
-import { useSection } from "@library/layout/LayoutContext";
+import { useLayout } from "@library/layout/LayoutContext";
 
 interface ICTALink {
     to: string;
@@ -61,7 +61,7 @@ export function CallToAction(props: IProps) {
         });
     }
 
-    const isFullWidth = useSection().isFullWidth;
+    const isFullWidth = useLayout().isFullWidth;
     const showContent = props.desktopOnly && !isFullWidth ? false : true;
 
     return (

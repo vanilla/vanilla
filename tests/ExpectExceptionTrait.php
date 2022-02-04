@@ -38,29 +38,6 @@ trait ExpectExceptionTrait {
     }
 
     /**
-     * Run code the expects and exception with a message and continue.
-     *
-     * @param string $expectedMessage
-     * @param callable $callable
-     */
-    protected function runWithExpectedExceptionMessage(string $expectedMessage, callable $callable) {
-        $caught = null;
-        try {
-            call_user_func($callable);
-        } catch (\Exception $e) {
-            $caught = $e;
-        }
-
-        TestCase::assertNotNull($caught, 'Expected to catch an exception, but none was thrown.');
-
-        TestCase::assertStringContainsString(
-            $expectedMessage,
-            $caught->getMessage(),
-            'Expected an exception message containing \'' . $expectedMessage . "' to occur. Instead caught:\n" . formatException($caught)
-        );
-    }
-
-    /**
      * Run code the expects and exception and continue.
      *
      * @param int $expectedCode

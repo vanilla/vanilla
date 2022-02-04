@@ -12,7 +12,7 @@ import { t } from "@library/utility/appUtils";
 import { useUniqueID } from "@library/utility/idUtils";
 import React from "react";
 import { filterPanelClasses } from "@library/search/panels/filterPanel.styles";
-import { useSection } from "@library/layout/LayoutContext";
+import { useLayout } from "@library/layout/LayoutContext";
 
 export interface ISearchFilterPanel {
     title?: string;
@@ -33,7 +33,7 @@ export function FilterFrame(props: ISearchFilterPanel) {
     };
 
     const titleID = useUniqueID("searchFilter");
-    const classes = filterPanelClasses(useSection().mediaQueries);
+    const classes = filterPanelClasses(useLayout().mediaQueries);
 
     return (
         <form onSubmit={onSubmit} aria-describedby={titleID}>

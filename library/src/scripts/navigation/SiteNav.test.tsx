@@ -14,7 +14,7 @@ function renderSiteNav(activeRecord: IActiveRecord) {
     document.body.innerHTML = "<div id='sitenav'></div>";
     return mount(
         <SiteNav activeRecord={activeRecord} collapsible={true}>
-            {navigationItems}
+            {naviationItems}
         </SiteNav>,
         { attachTo: document.getElementById("siteNav") },
     );
@@ -28,11 +28,9 @@ describe("<SiteNav />", () => {
         };
 
         const siteNav = renderSiteNav(activeRecord);
+        expect(siteNav.find(".isCurrent")).to.have.lengthOf(1);
 
-        const activeLinks = siteNav.find('a[aria-current="page"]');
-        expect(activeLinks).to.have.lengthOf(1);
-
-        const siteNavNode = activeLinks.first().parents(SiteNavNode).first();
+        const siteNavNode = siteNav.find(".isCurrent").first().parents(SiteNavNode).first();
         expect(siteNavNode.props()).to.have.property("recordID", activeRecord.recordID);
         expect(siteNavNode.props()).to.have.property("recordType", activeRecord.recordType);
     });
@@ -44,8 +42,7 @@ describe("<SiteNav />", () => {
         };
 
         const siteNav = renderSiteNav(activeRecord);
-        const activeLinks = siteNav.find('a[aria-current="page"]');
-        expect(activeLinks).to.have.lengthOf(0);
+        expect(siteNav.find(".isCurrent")).to.have.lengthOf(0);
     });
 
     it("changes the active record.", () => {
@@ -59,25 +56,23 @@ describe("<SiteNav />", () => {
         };
 
         const siteNav = renderSiteNav(firstActiveRecord);
-        let activeLinks = siteNav.find('a[aria-current="page"]');
-        expect(activeLinks).to.have.lengthOf(1);
+        expect(siteNav.find(".isCurrent")).to.have.lengthOf(1);
 
-        const firstSiteNavNode = activeLinks.first().parents(SiteNavNode).first();
+        const firstSiteNavNode = siteNav.find(".isCurrent").first().parents(SiteNavNode).first();
         expect(firstSiteNavNode.props()).to.have.property("recordID", firstActiveRecord.recordID);
         expect(firstSiteNavNode.props()).to.have.property("recordType", firstActiveRecord.recordType);
 
         siteNav.setProps({ activeRecord: secondActiveRecord });
-        activeLinks = siteNav.find('a[aria-current="page"]');
-        expect(activeLinks).to.have.lengthOf(1);
+        expect(siteNav.find(".isCurrent")).to.have.lengthOf(1);
 
-        const secondSiteNavNode = activeLinks.first().parents(SiteNavNode).first();
+        const secondSiteNavNode = siteNav.find(".isCurrent").first().parents(SiteNavNode).first();
         expect(secondSiteNavNode.props()).to.have.property("recordID", secondActiveRecord.recordID);
         expect(secondSiteNavNode.props()).to.have.property("recordType", secondActiveRecord.recordType);
     });
 });
 
 // Mock navigation data.
-const navigationItems: INavigationTreeItem[] = [
+const naviationItems: INavigationTreeItem[] = [
     {
         name: "Parent A",
         url: "https://mysite.com/items/parent-a",

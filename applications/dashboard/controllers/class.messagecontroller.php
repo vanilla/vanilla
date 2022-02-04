@@ -13,21 +13,8 @@
  */
 class MessageController extends DashboardController {
 
-    /** @var MessageModel */
-    public $MessageModel;
-
-    /** @var Gdn_Form */
-    public $Form;
-
-    /**
-     * {@inheritDoc}
-     */
-    public function __construct() {
-        parent::__construct();
-        $this->MessageModel = \Gdn::getContainer()->get(MessageModel::class);
-        $this->Form = \Gdn::getContainer()->get(Gdn_Form::class);
-    }
-
+    /** @var array Objects to prep. */
+    public $Uses = ['Form', 'MessageModel'];
 
     /**
      * Form to create a new message.
@@ -57,6 +44,9 @@ class MessageController extends DashboardController {
             throw new Exception('Requires POST', 405);
         }
         $this->MessageModel->delete(['MessageID' => $messageID]);
+
+        // Reset the message cache
+        $this->MessageModel->setMessageCache();
 
         $this->informMessage(sprintf(t('%s deleted'), t('Message')));
         $this->jsonTarget('', '', 'Refresh');
@@ -111,7 +101,7 @@ class MessageController extends DashboardController {
 
         // Set the model on the form.
         $this->Form->setModel($this->MessageModel);
-        $this->Message = empty($messageID) ? false : MessageModel::messages(intval($messageID));
+        $this->Message = $this->MessageModel->getID($messageID);
         $this->Message = $this->MessageModel->defineLocation($this->Message);
 
         // Make sure the form knows which item we are editing.
@@ -119,7 +109,7 @@ class MessageController extends DashboardController {
             $this->Form->addHidden('MessageID', $messageID);
         } else {
             // Enable newly created messages by default.
-            $this->Form->setValue('IsEnabled', true);
+            $this->Form->setValue('Enabled', true);
         }
 
         $categoriesData = CategoryModel::categories();
@@ -138,6 +128,8 @@ class MessageController extends DashboardController {
             $this->Form->setData($this->Message);
         } else {
             if ($messageID = $this->Form->save()) {
+                // Reset the message cache
+                $this->MessageModel->setMessageCache();
 
                 // Redirect
                 $this->informMessage(t('Your changes have been saved.'));
@@ -222,6 +214,7 @@ class MessageController extends DashboardController {
         $messageModel = new MessageModel();
         $enabled = forceBool($enabled, '0', '1', '0');
         $messageModel->setProperty($messageID, 'Enabled', $enabled);
+        $this->MessageModel->setMessageCache();
         if ($enabled === '1') {
             $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/message/disable/'.$messageID, 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-on"]);
         } else {
@@ -265,16 +258,22 @@ class MessageController extends DashboardController {
      *
      * @return array
      */
-    protected function _getLocationData(): array {
-        $legacyLayoutViews = $this->MessageModel->getLegacyLayoutViews();
-        $controllerLocationsData = ["all" => t("All Pages")];
-        foreach ($legacyLayoutViews as $legacyView) {
-            $controllerLocationsData[$legacyView->getType()] = t($legacyView->getName(), $legacyView->getName());
-        }
+    protected function _getLocationData() {
+        $controllerData = [
+            '[Base]' => t('All Pages'),
+            '[NonAdmin]' => t('All Forum Pages'),
+            'Dashboard/Profile/Index' => t('Profile Page'),
+            'Vanilla/Discussions/Index' => t('Discussions Page'),
+            'Vanilla/Categories/Index' => t('Categories Page'),
+            'Vanilla/Discussion/Index' => t('Comments Page'),
+            'Vanilla/Post/Discussion' => t('New Discussion Form'),
+            'Dashboard/Entry/SignIn' => t('Sign In'),
+            'Dashboard/Entry/Register' => t('Registration')
+        ];
 
-        $this->EventArguments['ControllerData'] = &$controllerLocationsData;
+        $this->EventArguments['ControllerData'] = &$controllerData;
         $this->fireEvent('AfterGetLocationData');
 
-        return $controllerLocationsData;
+        return $controllerData;
     }
 }

@@ -895,6 +895,8 @@ class TwitterPlugin extends SSOAddon {
         if (!function_exists('curl_exec')) {
             throw new Gdn_UserException('This plugin requires cURL for PHP.');
         }
+
+        $this->structure();
     }
 
     /**

@@ -713,7 +713,7 @@ class DiscussionsApiController extends AbstractApiController {
                 $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $where['d.CategoryID']);
             }
         } elseif ($siteSectionID) {
-            $siteSection = $this->siteSectionModel->getByID($query['siteSectionID']);
+            $siteSection = $this->siteSectionModel->getForSectionID($query['siteSectionID']);
             $categoryID = ($siteSection) ? $siteSection->getCategoryID() : null;
             if ($categoryID) {
                 $where['d.CategoryID'] = $this->getNestedCategoriesIDs($categoryID, $followed);
@@ -1266,7 +1266,7 @@ class DiscussionsApiController extends AbstractApiController {
         foreach ($rows as &$row) {
             $id = $row['lastPost']['commentID'] ?? null;
             if (isset($comments[$id])) {
-                $row['lastPost']['body'] = \Gdn::formatService()->renderHTML($comments[$id]['Body'], $comments[$id]['Format'], ['recordID' => $id, 'recordType' => 'comment']);
+                $row['lastPost']['body'] = \Gdn::formatService()->renderHTML($comments[$id]['Body'], $comments[$id]['Format']);
             } elseif (isset($row['body'])) {
                 $row['lastPost']['body'] = $row['body'];
             }

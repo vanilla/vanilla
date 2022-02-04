@@ -29,7 +29,7 @@ class Model implements InjectableInterface {
     public const OPT_JOINS = 'joins';
 
     /** @var \Gdn_Database */
-    protected $database;
+    private $database;
 
     /** @var Schema */
     protected $readSchema;
@@ -61,15 +61,6 @@ class Model implements InjectableInterface {
     }
 
     /**
-     * Get the name of the table.
-     *
-     * @return string
-     */
-    public function getTableName(): string {
-        return $this->table;
-    }
-
-    /**
      * Configure a Garden Schema instance for read operations by the model.
      *
      * @param Schema $schema Schema representing the resource's database table.
@@ -87,7 +78,7 @@ class Model implements InjectableInterface {
      */
     public function getReadSchema(): Schema {
         if ($this->readSchema === null) {
-            $schema = clone $this->getDatabaseSchema();
+            $schema = $this->getDatabaseSchema();
             $this->configureReadSchema($schema);
             $this->readSchema = $schema;
         }
@@ -101,7 +92,7 @@ class Model implements InjectableInterface {
      */
     public function getWriteSchema(): Schema {
         if ($this->writeSchema === null) {
-            $schema = clone $this->getDatabaseSchema();
+            $schema = $this->getDatabaseSchema();
             $this->configureWriteSchema($schema);
             $this->writeSchema = $schema;
         }

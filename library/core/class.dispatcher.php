@@ -17,8 +17,6 @@ use Psr\Log\LoggerInterface;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\Contracts\ConfigurationInterface;
-use Vanilla\FeatureFlagHelper;
-use Vanilla\Utility\DebugUtils;
 use Vanilla\Utility\Timers;
 
 /**
@@ -107,9 +105,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
     /** @var LoggerInterface */
     private $logger;
-
-    /** @var array */
-    private $sentHeaders = [];
 
     /**
      * @var array An associative collection of variables that will get passed into the
@@ -806,21 +801,19 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                 case 'Test':
                     decho($matchRoute, 'Route');
                     decho([
-                        'Path' => $request->getPath(),
+                        'Path' => $request->path(),
                         'Get' => $request->get()
                     ], 'Request');
                     die();
             }
-        } elseif (in_array($request->getPath(), ['', '/'])) {
+        } elseif (in_array($request->path(), ['', '/'])) {
             $this->isHomepage = true;
-            if (FeatureFlagHelper::featureEnabled("CustomLayoutHomePage")) {
-                // With custom layout homepages, leave the request alone.
-                return $request;
+            $defaultController = Gdn::router()->getDefaultRoute();
+            $originalGet = $request->get();
+            $request->pathAndQuery($defaultController['Destination']);
+            if (is_array($originalGet) && count($originalGet) > 0) {
+                $request->setQuery(array_merge($request->get(), $originalGet));
             }
-
-            // Otherwise grab the home route destination from the router.
-            $homePath = Gdn::router()->getDefaultRoute()['Destination'];
-            $request->setPath($homePath);
         }
 
         return $request;
@@ -884,9 +877,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      * @return mixed Returns the result of a dispatch not found if the controller wasn't found or is disabled.
      */
     private function dispatchController($request, $routeArgs) {
-        // Clean this out between dispatches.
-        $this->sentHeaders = [];
-
         // Create the controller first.
         $controllerName = $routeArgs['controller'];
         $controller = $this->createController($controllerName, $request, $routeArgs);
@@ -941,11 +931,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             Gdn::pluginManager()->callEventHandlers($controller, $controllerName, $controllerMethod, 'before');
             call_user_func_array($callback, $args);
             $this->applyTimeHeaders();
-        } catch (\Vanilla\Exception\ExitException $ex) {
-            // The controller wanted to exit.
-            if (!DebugUtils::isTestMode()) {
-                exit();
-            }
         } catch (\Throwable $ex) {
             if ($this->rethrowExceptions) {
                 throw $ex;
@@ -968,7 +953,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                 ]);
                 safeHeader("HTTP/1.0 500", true, 500);
             }
-            if (!DebugUtils::isTestMode()) {
+            if (!defined('TESTMODE_ENABLED') || !TESTMODE_ENABLED) {
                 exit();
             }
         }
@@ -1002,24 +987,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             "x-app-$key-max" => Timers::formatDuration($timer['max']),
         ];
         return $result;
-    }
-
-    /**
-     * Keep track of the headers from the last response.
-     *
-     * @param array $headers The headers that were sent.
-     *
-     * @return void
-     */
-    public function setSentHeaders(array $headers): void {
-        $this->sentHeaders = $headers;
-    }
-
-    /**
-     * @return array
-     */
-    public function getSentHeaders(): array {
-        return $this->sentHeaders;
     }
 
     /**

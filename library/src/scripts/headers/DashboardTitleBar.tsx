@@ -6,17 +6,18 @@
 import * as React from "react";
 import classNames from "classnames";
 import { DashboardTitleBarClasses } from "@library/headers/DashboardTitleBar.classes";
+import { VanillaWhiteIcon } from "@vanillaanalytics/components/VanillaWhiteIcon";
 import SmartLink from "@library/routing/links/SmartLink";
 import { useUsersState } from "@library/features/users/userModel";
 import DashboardMeBox from "@library/headers/mebox/pieces/DashboardMeBox";
 import { Icon } from "@vanilla/icons";
 import { TitleBarDevices, useTitleBarDevice } from "@library/layout/TitleBarContext";
+import { useCollisionDetector } from "@vanilla/react-utils";
 import Hamburger from "@library/flyouts/Hamburger";
 import { titleBarClasses } from "@library/headers/titleBarStyles";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import { t } from "@vanilla/i18n";
 import Container from "@library/layout/components/Container";
-import { hasPermission, PermissionMode } from "@library/features/users/Permission";
 
 //Some props are for storybook, to force opening dropdowns, sidenavs and modals
 interface IProps {
@@ -27,13 +28,6 @@ interface IProps {
     hamburgerContent?: React.ReactNode;
 }
 
-interface IDefaultDashboardSections {
-    children: [];
-    id: string;
-    name: string;
-    url: string;
-}
-
 export default function DashboardTitleBar(props: IProps) {
     const classes = DashboardTitleBarClasses();
     const dropdownClasses = dropDownClasses();
@@ -42,12 +36,25 @@ export default function DashboardTitleBar(props: IProps) {
 
     const isCompact = props.isCompact || device === TitleBarDevices.COMPACT;
 
-    //permissions
-    const canModerate = hasPermission("community.moderate", { mode: PermissionMode.GLOBAL_OR_RESOURCE });
-    const canManage = hasPermission("site.manage", { mode: PermissionMode.GLOBAL_OR_RESOURCE });
-    const canViewSettings = hasPermission("settings.view", { mode: PermissionMode.GLOBAL_OR_RESOURCE });
-
-    let defaultDashboardSections: IDefaultDashboardSections[] = [
+    const defaultDashboardSections = [
+        {
+            children: [],
+            id: "builtin-dashboard-home",
+            name: "Dashboard",
+            url: "/dashboard/settings/home",
+        },
+        {
+            children: [],
+            id: "builtin-dashboard-moderation",
+            name: "Moderation",
+            url: "/dashboard/user",
+        },
+        {
+            children: [],
+            id: "builtin-dashboard-settings",
+            name: "Settings",
+            url: "/dashboard/settings/branding",
+        },
         {
             children: [],
             id: "builtin-dashboard-analytics",
@@ -55,31 +62,6 @@ export default function DashboardTitleBar(props: IProps) {
             url: "/analytics/v2/dashboards",
         },
     ];
-
-    if (canModerate) {
-        defaultDashboardSections.push({
-            children: [],
-            id: "builtin-dashboard-moderation",
-            name: "Moderation",
-            url: "/dashboard/user",
-        });
-    }
-    if (canManage) {
-        defaultDashboardSections.push({
-            children: [],
-            id: "builtin-dashboard-settings",
-            name: "Settings",
-            url: "/dashboard/settings/branding",
-        });
-    }
-    if (canViewSettings) {
-        defaultDashboardSections.push({
-            children: [],
-            id: "builtin-dashboard-home",
-            name: "Dashboard",
-            url: "/dashboard/settings/home",
-        });
-    }
 
     return (
         <header className={classes.container}>
@@ -108,7 +90,7 @@ export default function DashboardTitleBar(props: IProps) {
                     <>
                         <div className={classes.brand}>
                             <div className={classes.logo}>
-                                <Icon icon={"vanilla-logo"} />
+                                <VanillaWhiteIcon />
                             </div>
                             <a href="/" className={classes.backBtn}>
                                 Visit Site
@@ -116,22 +98,16 @@ export default function DashboardTitleBar(props: IProps) {
                             </a>
                         </div>
                         <nav className={classes.nav}>
-                            {canViewSettings && (
-                                <SmartLink className={classes.link} to="/dashboard/settings/home">
-                                    <div className={classes.linkLabel}>Dashboard</div>
-                                </SmartLink>
-                            )}
-                            {canModerate && (
-                                <SmartLink className={classes.link} to="/dashboard/user">
-                                    <div className={classes.linkLabel}>Moderation</div>
-                                </SmartLink>
-                            )}
+                            <SmartLink className={classes.link} to="/dashboard/settings/home">
+                                <div className={classes.linkLabel}>Dashboard</div>
+                            </SmartLink>
+                            <SmartLink className={classes.link} to="/dashboard/user">
+                                <div className={classes.linkLabel}>Moderation</div>
+                            </SmartLink>
                             {/** TODO: This needs to be a dynamic link to the last visited settings page. */}
-                            {canManage && (
-                                <SmartLink className={classes.link} to="/dashboard/settings/branding">
-                                    <div className={classes.linkLabel}>Settings</div>
-                                </SmartLink>
-                            )}
+                            <SmartLink className={classes.link} to="/dashboard/settings/branding">
+                                <div className={classes.linkLabel}>Settings</div>
+                            </SmartLink>
                             <SmartLink className={classNames(classes.link, "active")} to="/analytics/v2/dashboards">
                                 <div className={classes.linkLabel}>Analytics</div>
                             </SmartLink>

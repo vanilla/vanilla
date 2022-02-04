@@ -8,19 +8,27 @@ namespace VanillaTests\Models;
 
 use ActivityModel;
 use Garden\EventManager;
+use PHPUnit\Framework\TestCase;
 use Vanilla\Dashboard\Events\NotificationEvent;
-use VanillaTests\SiteTestCase;
+use Vanilla\Http\InternalClient;
+use VanillaTests\Fixtures\TestCache;
+use VanillaTests\SiteTestTrait;
 
 /**
  * Some basic tests for the `ActivityModel`.
  */
-class ActivityModelTest extends SiteTestCase {
+class ActivityModelTest extends TestCase {
+
+    use SiteTestTrait;
 
     /** @var NotificationEvent */
     private $lastEvent;
 
     /** @var ActivityModel */
     private $model;
+
+    /** @var TestCache */
+    private $cache;
 
     /**
      * A test listener that increments the counter.
@@ -39,6 +47,7 @@ class ActivityModelTest extends SiteTestCase {
     public function setUp(): void {
         parent::setUp();
 
+        $this->cache = self::enableCaching();
         $this->model = $this->container()->get(ActivityModel::class);
 
         // Make event testing a little easier.
@@ -118,6 +127,10 @@ class ActivityModelTest extends SiteTestCase {
         $this->model->getUserTotalUnread(3);
         $this->model->getUserTotalUnread(3);
         $this->model->getUserTotalUnread(3);
+
+        $cacheKey = "notificationCount/users/3";
+        $this->cache->assertGetCount($cacheKey, 3);
+        $this->cache->assertSetCount($cacheKey, 1);
     }
 
     /**

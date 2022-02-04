@@ -10,7 +10,10 @@ namespace Vanilla\Analytics;
 use CategoryModel;
 use CommentModel;
 use DiscussionModel;
-use \Vanilla\Utility\ArrayUtils;
+use Gdn;
+use PHPUnit\Exception;
+use UserModel;
+use Vanilla\Utility\ArrayUtils;
 
 /**
  * Utility functions for Trackable Events.
@@ -237,46 +240,5 @@ class TrackableCommunityModel {
         }
 
         return $data;
-    }
-
-    /**
-     * Add special fields for tracking to data for a comment that has no ID (as happens, e.g., when a posted
-     * discussion is immediately flagged as spam before being posted).
-     *
-     * @param array $commentData
-     * @return array
-     */
-    public function getTrackableLogComment(array $commentData): array {
-        $commentData["commentID"] = 0;
-        $commentData = ArrayUtils::camelCase($commentData);
-        $schema = $this->commentModel->schema();
-        $commentData = $schema->validate($commentData, true);
-        $commentData['dateInserted'] = TrackableDateUtils::getDateTime($commentData['dateInserted']);
-        $commentData['discussionID'] = (int) $commentData['discussionID'];
-        $commentData['insertUser'] = $this->userUtils->getTrackableUser($commentData['insertUserID']);
-        try {
-            $discussion = $this->getTrackableDiscussion($commentData['discussionID']);
-        } catch (\Exception $ex) {
-            $discussion = false;
-        }
-        if ($discussion) {
-            $commentData['category'] = $discussion["category"];
-            $commentData['categoryAncestors'] = $discussion['categoryAncestors'];
-            $commentData['discussionUser'] = $discussion['discussionUser'];
-
-            // Removing those redundancies...
-            unset(
-                $discussion['category'],
-                $discussion['categoryAncestors'],
-                $discussion['commentMetric'],
-                $discussion['discussionUser'],
-                $discussion['record']
-            );
-        }
-
-        // The body is large and unnecessary.
-        $commentData['body'] = null;
-
-        return $commentData;
     }
 }

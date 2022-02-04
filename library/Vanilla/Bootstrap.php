@@ -12,27 +12,15 @@ use Garden\Container\Reference;
 use Garden\Web\Dispatcher;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Container\ContainerInterface;
-use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\ChainAdapter;
 use Symfony\Component\Cache\Adapter\Psr16Adapter;
-use Vanilla\Analytics\AnalyticsActionsProvider;
 use Vanilla\Analytics\TrackableDecoratorInterface;
 use Vanilla\Cache\CacheCacheAdapter;
-use Vanilla\Layout\LayoutHydrator;
-use Vanilla\Controllers\SearchRootController;
 use Vanilla\Logging\TraceCollector;
-use Vanilla\Models\Model;
 use Vanilla\Scheduler\LongRunner;
 use Vanilla\Scheduler\LongRunnerMiddleware;
-use Vanilla;
-use Vanilla\Theme\ThemeFeatures;
-use Vanilla\Utility\ContainerUtils;
-use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
-use Vanilla\Web\Middleware\LogTransactionMiddleware;
-use Vanilla\Web\Page;
-use Vanilla\Web\PageHead;
 
 /**
  * Contains static functions for bootstrapping Vanilla.
@@ -68,9 +56,6 @@ class Bootstrap {
             ->rule(\DateTimeInterface::class)
             ->setAliasOf(\DateTimeImmutable::class)
             ->setConstructorArgs([null, null])
-
-            ->rule(LayoutHydrator::class)
-            ->setShared(true)
         ;
 
         // Tracking
@@ -81,55 +66,7 @@ class Bootstrap {
 
         // Logging
         $container
-            ->rule(\Vanilla\Logger::class)
-            ->setShared(true)
-
-            ->rule(LoggerInterface::class)
-            ->setShared(true)
-            ->setAliasOf(\Vanilla\Logger::class)
-            ->setClass(\Vanilla\Logger::class)
-
-            ->rule(Vanilla\Logging\LogDecorator::class)
-            ->setShared(true)
-
-            ->rule(\Psr\Log\LoggerAwareInterface::class)
-            ->addCall('setLogger')
-        ;
-
-        $container
             ->rule(TraceCollector::class)
-            ->setShared(true)
-        ;
-
-        // Addons
-        // Addon Manager
-        $container
-            ->rule(Vanilla\AddonManager::class)
-            ->setShared(true)
-            ->setConstructorArgs([
-                AddonManager::getDefaultScanDirectories(),
-                PATH_CACHE
-            ])
-            ->addAlias('AddonManager')
-            ->addCall('registerAutoloader')
-        ;
-
-        // Analytics
-        $container
-            ->rule(\Vanilla\Analytics\Client::class)
-            ->setShared(true)
-            ->addAlias(\Vanilla\Contracts\Analytics\ClientInterface::class)
-
-            ->rule(Page::class)
-            ->addCall('registerReduxActionProvider', ['provider' => new Reference(AnalyticsActionsProvider::class)])
-        ;
-
-        // Models
-        $container
-            ->rule(\Gdn_Model::class)
-            ->setShared(true)
-
-            ->rule(Model::class)
             ->setShared(true)
         ;
 
@@ -154,6 +91,14 @@ class Bootstrap {
             ->rule(LongRunner::class)
             ->setShared(true)
 
+            ->rule(\Vanilla\Web\Middleware\SystemTokenMiddleware::class)
+            ->setConstructorArgs([
+                "/api/v2/",
+            ])
+            ->setShared(true)
+
+            ->rule(Dispatcher::class)
+            ->addCall('addMiddleware', [new Reference(\Vanilla\Web\Middleware\SystemTokenMiddleware::class)])
             // Validation
             ->rule(\Gdn_Validation::class)
             ->addCall('addRule', ['BodyFormat', new Reference(BodyFormatValidator::class)])
@@ -180,114 +125,6 @@ class Bootstrap {
                 }
                 return $mainCachePsr16;
             })
-
-            ->rule(HttpCacheMiddleware::class)
-            ->setShared(true)
-
-            ->rule(ContentSecurityPolicyModel::class)
-            ->setShared(true)
-
-            ->rule(ThemeFeatures::class)
-            ->setShared(true)
-            ->setConstructorArgs(['theme' => ContainerUtils::currentTheme()])
-        ;
-
-        // Core dispatcher and middlewares
-        $container
-            ->rule(\Gdn_Dispatcher::class)
-            ->setShared(true)
-            ->addAlias(\Gdn::AliasDispatcher)
-
-            ->rule(Vanilla\Web\Controller::class)
-            ->setShared(true)
-
-            ->rule(\Garden\Web\Dispatcher::class)
-            ->setShared(true)
-            ->addCall('addRoute', ['route' => new Reference('@api-v2-route'), 'api-v2'])
-            ->addCall('addRoute', ['route' => new Reference('@new-search-route'), 'new-search'])
-            ->addCall('addRoute', ['route' => new \Garden\Container\Callback(function () {
-                return new \Garden\Web\PreflightRoute('/api/v2', true);
-            })])
-            ->addCall('setAllowedOrigins', ['isTrustedDomain'])
-            ->addCall('addMiddleware', [new Reference(\Vanilla\Web\Middleware\SystemTokenMiddleware::class)])
-            ->addCall('addMiddleware', [new Reference(\Vanilla\Web\Middleware\RoleTokenAuthMiddleware::class)])
-            ->addCall('addMiddleware', [new Reference(\Vanilla\Web\PrivateCommunityMiddleware::class)])
-            ->addCall('addMiddleware', [new Reference(\Vanilla\Web\CacheControlMiddleware::class)])
-            ->addCall('addMiddleware', [new Reference(LogTransactionMiddleware::class)])
-            ->addCall('addMiddleware', [new Reference('@smart-id-middleware')])
-            ->addCall('addMiddleware', [new Reference(\Vanilla\Web\DeploymentHeaderMiddleware::class)])
-            ->addCall('addMiddleware', [new Reference(\Vanilla\Web\ContentSecurityPolicyMiddleware::class)])
-            ->addCall('addMiddleware', [new Reference(\Vanilla\Web\HttpStrictTransportSecurityMiddleware::class)])
-            ->addCall('addMiddleware', [new Reference(\Vanilla\Web\APIExpandMiddleware::class)])
-
-            // Specific route definitions and middlewares
-            ->rule("@new-search-route")
-            ->setClass(\Garden\Web\ResourceRoute::class)
-            ->setConstructorArgs(['/search', '*\\%sSearchPageController'])
-            ->addCall('setFeatureFlag', [SearchRootController::ENABLE_FLAG])
-            ->addCall('setMeta', ['CONTENT_TYPE', 'text/html; charset=utf-8'])
-            ->addCall('setRootController', [SearchRootController::class])
-
-            ->rule('@api-v2-route')
-            ->setClass(\Garden\Web\ResourceRoute::class)
-            ->setConstructorArgs(['/api/v2/', '*\\%sApiController'])
-            ->addCall('setMeta', ['CONTENT_TYPE', 'application/json; charset=utf-8'])
-            ->addCall('addMiddleware', [new Reference(\Vanilla\Web\ApiFilterMiddleware::class)])
-
-            // Middleware configuration
-            ->rule(\Vanilla\Web\Middleware\SystemTokenMiddleware::class)
-            ->setConstructorArgs([
-                "/api/v2/",
-            ])
-            ->setShared(true)
-
-            ->rule(\Vanilla\Web\APIExpandMiddleware::class)
-            ->setConstructorArgs([
-                "/api/v2/",
-                ContainerUtils::config("Garden.api.ssoIDPermission", Permissions::RANK_COMMUNITY_MANAGER)
-            ])
-            ->setShared(true)
-
-            ->rule(\Vanilla\Web\HttpStrictTransportSecurityModel::class)
-            ->setShared(true)
-
-            ->rule(\Vanilla\Web\Middleware\LogTransactionMiddleware::class)
-            ->setShared(true)
-
-            ->rule('@smart-id-middleware')
-            ->setClass(\Vanilla\Web\SmartIDMiddleware::class)
-            ->setShared(true)
-            ->setConstructorArgs(['/api/v2/'])
-            ->addCall('addSmartID', ['CategoryID', 'categories', ['name', 'urlcode'], 'Category'])
-            ->addCall('addSmartID', ['RoleID', 'roles', ['name'], 'Role'])
-            ->addCall('addSmartID', ['UserID', 'users', '*', new Reference('@user-smart-id-resolver')])
-
-            ->rule('@user-smart-id-resolver')
-            ->setFactory(function (Container $dic) {
-                /* @var \Vanilla\Web\UserSmartIDResolver $uid */
-                $uid = $dic->get(\Vanilla\Web\UserSmartIDResolver::class);
-                $uid->setEmailEnabled(!$dic->get(\Gdn_Configuration::class)->get('Garden.Registration.NoEmail'))
-                    ->setViewEmail($dic->get(\Gdn_Session::class)->checkPermission('Garden.PersonalInfo.View'));
-
-                return $uid;
-            })
-
-            ->rule(\Vanilla\Web\PrivateCommunityMiddleware::class)
-            ->setShared(true)
-            ->setConstructorArgs([ContainerUtils::config('Garden.PrivateCommunity')])
-
-            // Layouts
-            ->rule(\Vanilla\Layout\Providers\FileBasedLayoutProvider::class)
-            ->setShared(true)
-            ->setConstructorArgs([PATH_CACHE.'/static-layouts'])
-            ->addCall(
-                'registerStaticLayout',
-                ["home", PATH_ROOT."/library/Vanilla/Layout/Definitions/home.json"]
-            )
-
-            ->rule(Layout\LayoutService::class)
-            ->addCall('addProvider', [new Reference(\Vanilla\Layout\LayoutModel::class)])
-            ->addCall('addProvider', [new Reference(\Vanilla\Layout\Providers\FileBasedLayoutProvider::class)])
         ;
     }
 }

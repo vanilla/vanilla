@@ -521,12 +521,11 @@ class ConversationsApiController extends AbstractApiController {
             $dbRecord['name'] = ConversationModel::participantTitle($dbRecord, false);
         }
 
-        if (!empty($dbRecord['LastBody'])) {
-            $dbRecord['body'] = $dbRecord['LastBody'];
-            $this->formatField($dbRecord, 'body', $dbRecord['LastFormat']);
-        } else {
-            $dbRecord['body'] = t('No messages.');
-        }
+        $defaultMsg = t('No messages.');
+        $lastBody = $dbRecord['LastBody'] ?? '';
+        $dbRecord['body'] = $lastBody
+            ?  (Gdn::formatService()->renderPlainText($dbRecord['LastBody'], $dbRecord['LastFormat']) ?: $defaultMsg)
+            : $defaultMsg;
 
         $dbRecord['url'] = url("/messages/{$dbRecord['ConversationID']}", true);
 

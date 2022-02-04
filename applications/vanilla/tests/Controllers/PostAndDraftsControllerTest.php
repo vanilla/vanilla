@@ -7,12 +7,7 @@
 
 namespace Vanilla\Forum\Tests\Controllers;
 
-use Garden\Schema\ValidationException;
 use PHPUnit\Framework\TestCase;
-use Vanilla\EmbeddedContent\Embeds\ImageEmbed;
-use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
-use Vanilla\EmbeddedContent\EmbedService;
-use VanillaTests\Models\TestCategoryModelTrait;
 use VanillaTests\Models\TestCommentModelTrait;
 use VanillaTests\Models\TestDiscussionModelTrait;
 use VanillaTests\SetupTraitsTrait;
@@ -22,12 +17,7 @@ use VanillaTests\SiteTestTrait;
  * Tests for the `DraftsController` class.
  */
 class PostAndDraftsControllerTest extends TestCase {
-    use SiteTestTrait, SetupTraitsTrait, TestDiscussionModelTrait, TestCommentModelTrait, TestCategoryModelTrait;
-
-    /**
-     * @var array
-     */
-    private $categoryWithoutAllowFileUploads;
+    use SiteTestTrait, SetupTraitsTrait, TestDiscussionModelTrait, TestCommentModelTrait;
 
     /**
      * @var array
@@ -60,14 +50,6 @@ class PostAndDraftsControllerTest extends TestCase {
     private $config;
 
     /**
-     * @inheritDoc
-     */
-    public static function setupBeforeClass(): void {
-        self::$addons = ['vanilla', 'editor'];
-        self::setupBeforeClassSiteTestTrait();
-    }
-
-    /**
      * Instantiate fixtures.
      */
     public function setUp(): void {
@@ -89,6 +71,7 @@ class PostAndDraftsControllerTest extends TestCase {
 
         // Save a sample draft comment for the discussion.
         $this->commentDraft = $this->postCommentDraft();
+        debug(true);
     }
 
     /**
@@ -459,85 +442,5 @@ HTML
         );
 
         $this->assertEquals($cat['CategoryID'], $r->Form->getValue('CategoryID'));
-    }
-
-    /**
-     * @dataProvider provideDiscussionWithAttachment
-     */
-
-    /**
-     * Test posting into a category with AllowFileUploads set to false
-     *
-     * @param bool $expected
-     * @param array $discussion
-     * @dataProvider provideDiscussionWithAttachment
-     */
-    public function testPostCategoryWithoutAllowFileUploads($expected, $discussion): void {
-        // Add category with AllowFileUploads.
-        $this->categoryWithoutAllowFileUploads = $this->insertCategories(1, ['name' => 'Category Without AllowFileUploads', 'AllowFileUploads' => false])[0];
-
-        // Make sure the image embed is registered.
-        /** @var EmbedService $embedService */
-        $embedService = \Gdn::getContainer()->get(EmbedService::class);
-        $embedService->registerEmbed(ImageEmbed::class, ImageEmbed::TYPE);
-
-        $body = json_encode($discussion['Body']);
-        $discussion['Body'] = $body;
-
-        $this->expectException(ValidationException::class);
-
-        /** @var \PostController $r */
-        $r = $this->bessy()->post(
-            "/post/discussion",
-            array_merge($discussion, ['CategoryID' => $this->categoryWithoutAllowFileUploads['CategoryID']])
-        );
-    }
-
-    /**
-     * Provides data for testPostCategoryWithoutAllowFileUploads
-     *
-     * @return array[]
-     */
-    public function provideDiscussionWithAttachment(): array {
-        $r = [
-            'rich discussion with attachment' => [
-                true, [
-                    'Format' => 'Rich',
-                    'Name' => 'Discussion with attachments',
-                    'Body' => [
-                        [
-                            "insert" => [
-                                "embed-external" => [
-                                    "data" => [
-                                        "url" => "https://example.com/foo.png",
-                                        "name" => "foo text here",
-                                        "type" => "image/png",
-                                        "size" => 26734,
-                                        "width" => 290,
-                                        "height" => 290,
-                                        "displaySize" => "medium",
-                                        "float" => "none",
-                                        "mediaID" => 136016,
-                                        "dateInserted" => "2021-04-08T18:24:13+00:00",
-                                        "insertUserID" => 1,
-                                        "foreignType" => "embed",
-                                        "foreignID" => 1,
-                                        "embedType" => "image"
-                                    ],
-                                    "loaderData" => [
-                                        "type" => "image"
-                                    ]
-                                ]
-                            ]
-                        ],
-                        [
-                            "insert" => "\n"
-                        ]
-                    ]
-                ],
-            ],
-        ];
-
-        return $r;
     }
 }

@@ -8,7 +8,9 @@
     "settingsPermission": "Garden.Moderation.Manage",
     "hasLocale": true,
     "mobileFriendly": true,
-    "registerPermissions": ["Plugins.Flagging.Notify"],
+    "registerPermissions": [
+        "Plugins.Flagging.Notify"
+    ],
     "icon": "flagging.png",
     "key": "flagging",
     "type": "addon",

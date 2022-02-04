@@ -68,10 +68,10 @@ define('SYNDICATION_RSS', 'RSS');
 define('SYNDICATION_ATOM', 'ATOM');
 
 // Debug error types.
-define('TRACE_INFO', 'info');
-define('TRACE_ERROR', 'error');
-define('TRACE_WARNING', 'warning');
-define('TRACE_NOTICE', 'notice');
+define('TRACE_INFO', 'Info');
+define('TRACE_ERROR', 'Error');
+define('TRACE_WARNING', 'Warning');
+define('TRACE_NOTICE', 'Notice');
 
 if (!defined('E_USER_DEPRECATED')) {
     define('E_USER_DEPRECATED', E_USER_WARNING);

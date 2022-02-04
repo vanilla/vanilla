@@ -173,4 +173,16 @@ jQuery(document).ready(function($) {
         $(frm).triggerHandler('submit');
         return false;
     });
+
+    // Autosave
+    if ($.fn.autosave) {
+        var btn = $('#Form_SaveDraft');
+
+        $('#CommentForm textarea').autosave({
+            button: btn
+        });
+        $('#DiscussionForm textarea').autosave({
+            button: btn
+        });
+    }
 });

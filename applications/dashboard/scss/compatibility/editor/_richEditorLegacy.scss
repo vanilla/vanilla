@@ -48,9 +48,6 @@ body {
 
     &.Message {
         margin-top: $global-medium_fontSize;
-        & > *:last-child {
-            @include clearfix();
-        }
     }
 
     @if ($staticVariables) {

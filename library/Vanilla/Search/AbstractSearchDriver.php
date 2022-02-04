@@ -21,6 +21,9 @@ abstract class AbstractSearchDriver implements SearchTypeCollectorInterface, Inj
     /** @var AbstractSearchType[] */
     protected $searchTypesByDtype = [];
 
+    /** @var AbstractSearchIndexTemplate[] */
+    protected $searchIndexTemplates = [];
+
     /** @var AbstractSiteProvider */
     private $siteProvider;
 
@@ -258,5 +261,26 @@ abstract class AbstractSearchDriver implements SearchTypeCollectorInterface, Inj
                 $this->searchTypesByDtype[$dtype] = $searchType;
             }
         }
+    }
+
+    /**
+     * @return AbstractSearchIndexTemplate[]
+     */
+    public function getSearchIndexTemplates(): array {
+        return $this->searchIndexTemplates;
+    }
+
+    /**
+     * Register a search index template.
+     *
+     * @param AbstractSearchIndexTemplate $searchIndexTemplate
+     */
+    public function registerSearchIndexTemplate(AbstractSearchIndexTemplate $searchIndexTemplate) {
+        foreach ($this->searchIndexTemplates as $existingSearchIndexTemplate) {
+            if (get_class($searchIndexTemplate) === get_class($existingSearchIndexTemplate)) {
+                return;
+            }
+        }
+        $this->searchIndexTemplates[] = $searchIndexTemplate;
     }
 }

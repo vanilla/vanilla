@@ -13,7 +13,6 @@ use Vanilla\Utility\SchemaUtils;
 /**
  * Class DiscussionWidgetModule
  *
- * @deprecated Use DiscussionDiscussionsWidget instead.
  * @package Vanilla\Forum\Modules
  */
 class DiscussionWidgetModule extends BaseDiscussionWidgetModule {

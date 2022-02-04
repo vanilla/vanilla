@@ -27,7 +27,6 @@ import { DashboardMediaAddonListItem } from "@dashboard/forms/DashboardMediaAddo
 import { AutoWidthInput } from "@library/forms/AutoWidthInput";
 import { autoWidthInputClasses } from "@library/forms/AutoWidthInput.classes";
 import { cx } from "@emotion/css";
-import { DashboardColorPicker } from "@dashboard/forms/DashboardFormColorPicker";
 
 export default {
     title: "Dashboard/Forms",
@@ -71,9 +70,6 @@ export function SimpleInputItems() {
                 labelType={DashboardLabelType.WIDE}
             >
                 <DashboardInput inputProps={{ placeholder: "Placeholder Here" }} />
-            </DashboardFormGroup>
-            <DashboardFormGroup label="label for color picker" description="This will allow user to pick a color">
-                <DashboardColorPicker value={""} onChange={(color) => null} />
             </DashboardFormGroup>
         </>
     );

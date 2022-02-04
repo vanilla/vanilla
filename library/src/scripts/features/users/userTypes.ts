@@ -19,7 +19,6 @@ type JunctionAliasID = string; // Generally a stringified number.
 
 export interface IPermissions {
     isAdmin?: boolean;
-    isSysAdmin?: boolean;
     permissions: IPermission[];
     junctions?: Record<JunctionType, JunctionID[]>;
     junctionAliases?: Record<JunctionType, Record<JunctionAliasID, JunctionID>>;

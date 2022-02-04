@@ -6,7 +6,7 @@
 import React from "react";
 import { t } from "@vanilla/i18n";
 import classNames from "classnames";
-import { useSection } from "@library/layout/LayoutContext";
+import { useLayout } from "@library/layout/LayoutContext";
 import { memberListClasses } from "@dashboard/components/MemberList.styles";
 
 interface IProps {
@@ -19,7 +19,7 @@ interface IProps {
  */
 export function MemberTable(props: IProps) {
     const { children } = props;
-    const { isCompact } = useSection();
+    const { isCompact } = useLayout();
     const classes = memberListClasses();
 
     return (

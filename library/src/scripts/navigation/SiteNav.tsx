@@ -14,7 +14,7 @@ import { useUniqueID } from "@library/utility/idUtils";
 import { INavigationTreeItem } from "@library/@types/api/core";
 import { TabHandler } from "@vanilla/dom-utils";
 import { panelListClasses } from "@library/layout/panelListStyles";
-import { useSection } from "@library/layout/LayoutContext";
+import { useLayout } from "@library/layout/LayoutContext";
 import { SiteNavNodeTypes } from "@library/navigation/SiteNavNodeTypes";
 
 interface IProps {
@@ -44,7 +44,7 @@ export function SiteNav(props: IProps) {
     const { activeRecord, collapsible, onItemHover, onSelectItem, children, siteNavNodeTypes } = props;
     const hasChildren = children && children.length > 0;
     const classes = siteNavClasses();
-    const classesPanelList = panelListClasses(useSection().mediaQueries);
+    const classesPanelList = panelListClasses(useLayout().mediaQueries);
 
     const handleKeyDown = useKeyboardHandler();
     const content = hasChildren

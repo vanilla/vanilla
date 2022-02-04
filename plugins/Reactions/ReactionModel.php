@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -11,9 +11,9 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Vanilla\Addon;
 use Vanilla\Reactions\Events\ReactionEvent;
-use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\CamelCaseScheme;
 use Garden\Schema\Schema;
+use Vanilla\Logger;
 
 /**
  * Class ReactionModel
@@ -1181,17 +1181,6 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
                 }
             } elseif ($score >= $logThreshold) {
                 LogModel::insert($log, $recordType, $row, $logOptions);
-                $logPostEvent = LogModel::createLogPostEvent(
-                    $log,
-                    $recordType,
-                    $row,
-                    "reactions",
-                    $userID,
-                    "negative",
-                    $row["InsertUserID"],
-                    ["reactionType" => ArrayUtils::camelCase($reactionType)]
-                );
-                $this->eventManager->dispatch($logPostEvent);
 
                 $this->logger->info('Loggable Reaction: Under log threshold', $loggerContext + [
                     'score' => $score,

@@ -8622,8 +8622,6 @@ wysihtml5.views.View = Base.extend(
         // --------- neword event ---------
         dom.observe(element, "keyup", function(event) {
             var keyCode = event.keyCode;
-            // This event is used by autosave
-            that.parent.textarea.element.dispatchEvent(new Event("input", { bubbles: true, cancelable: false }));
             if (keyCode === wysihtml5.SPACE_KEY || keyCode === wysihtml5.ENTER_KEY) {
                 that.parent.fire("newword:composer");
             }

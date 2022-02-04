@@ -719,6 +719,13 @@ class ReactionsPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Run once on enable.
+     */
+    public function setup() {
+        $this->structure();
+    }
+
+    /**
      * Database updates.
      */
     public function structure() {
@@ -1334,7 +1341,7 @@ class ReactionsPlugin extends Gdn_Plugin {
             );
         }
 
-        $sender->setData('_CurrentRecords', $reactionModel->LastCount);
+        $sender->setData('_CurrentRecords', count($data));
         if (count($data) > $limit) {
             array_pop($data);
         }

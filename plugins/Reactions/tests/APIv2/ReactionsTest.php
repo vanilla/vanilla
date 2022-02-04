@@ -13,8 +13,6 @@ use ReactionModel;
  */
 class ReactionsTest extends AbstractResourceTest {
 
-    public static $addons = ['reactions'];
-
     /**
      * {@inheritdoc}
      */
@@ -86,6 +84,14 @@ class ReactionsTest extends AbstractResourceTest {
     public function setup(): void {
         ReactionModel::$ReactionTypes = null;
         parent::setUp();
+    }
+
+    /**
+     * Setup routine, run before the test class is instantiated.
+     */
+    public static function setupBeforeClass(): void {
+        self::$addons = ['reactions', 'vanilla'];
+        parent::setUpBeforeClass();
     }
 
     /**

@@ -27,11 +27,16 @@ class PermissionsTest extends SiteTestCase {
      * This method is called before the first test of this test class is run.
      */
     public static function setupBeforeClass(): void {
+        self::$addons = ['vanilla','knowledge'];
         parent::setupBeforeClass();
-
-        \Gdn::permissionModel()->define(['namespace.resource.lowercase' => 0]);
     }
 
+    /**
+     * @inheritDoc
+     */
+    public static function teardownAfterClass(): void {
+        self::$addons = ['vanilla', 'conversations', 'stubcontent'];
+    }
     /**
      *  Test setup.
      */
@@ -301,7 +306,7 @@ class PermissionsTest extends SiteTestCase {
      */
     public function provideTestUnTranslateArray() {
         return [
-            'Permission resource.lowercase' => ['resource.lowercase', 'namespace.resource.lowercase'],
+            'Permission articles.add permission' => ['articles.add', 'knowledge.articles.add'],
             'Permission conversations.moderate' => ['conversations.moderate', 'Conversations.Moderation.Manage'],
             'Permission comments.email' => ['comments.email', 'Email.Comments.Add'],
             'Permission conversations.email' => ['conversations.email', 'Email.Conversations.Add'],
@@ -780,7 +785,6 @@ class PermissionsTest extends SiteTestCase {
                 ]
             ],
             'isAdmin' => false,
-            'isSysAdmin' => false,
             'junctions' => [
                 'category' => [62, 50, 100, 101],
             ],
@@ -803,7 +807,6 @@ class PermissionsTest extends SiteTestCase {
                 ],
             ],
             'isAdmin' => false,
-            'isSysAdmin' => false,
         ], $permissions->asApiOutput(false));
         $this->assertEquals([
             'permissions' => [
@@ -814,7 +817,6 @@ class PermissionsTest extends SiteTestCase {
                 ],
             ],
             'isAdmin' => false,
-            'isSysAdmin' => false,
             'junctions' => new \stdClass(),
             'junctionAliases' => new \stdClass(),
         ], $permissions->asApiOutput(true));

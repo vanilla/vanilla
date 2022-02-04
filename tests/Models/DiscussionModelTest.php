@@ -7,20 +7,23 @@
 
 namespace VanillaTests\Models;
 
-use ActivityModel;
 use CategoryModel;
 use DiscussionModel;
 use Garden\EventManager;
 use Garden\Events\BulkUpdateEvent;
+use Garden\Web\Exception\PartialCompletionException;
 use Gdn;
 use RoleModel;
 use Vanilla\Community\Events\DiscussionEvent;
 use Vanilla\Formatting\Formats\MarkdownFormat;
+use Vanilla\Formatting\Formats\RichFormat;
 use Vanilla\Formatting\Formats\TextFormat;
+use Vanilla\Scheduler\Job\LocalApiBulkDeleteJob;
 use Vanilla\Scheduler\LongRunnerAction;
 use Vanilla\Scheduler\LongRunnerResult;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\ModelUtils;
+use VanillaTests\APIv2\TestSortingTrait;
 use VanillaTests\Bootstrap;
 use VanillaTests\EventSpyTestTrait;
 use VanillaTests\ExpectExceptionTrait;
@@ -67,11 +70,6 @@ class DiscussionModelTest extends SiteTestCase {
     private static $data = [];
 
     /**
-     * @var ActivityModel
-     */
-
-    private $activityModel;
-    /**
      * A test listener that increments the counter.
      *
      * @param DiscussionEvent $e
@@ -108,7 +106,6 @@ class DiscussionModelTest extends SiteTestCase {
         ], ['UrlCode' => 'private-%s']);
         $this->insertDiscussions(3, ['CategoryID' => $this->privateCategory['CategoryID']]);
         DiscussionModel::cleanForTests();
-        $this->activityModel = Gdn::getContainer()->get(ActivityModel::class);
     }
 
     /**
@@ -1308,97 +1305,17 @@ class DiscussionModelTest extends SiteTestCase {
                     'format' => MarkdownFormat::FORMAT_KEY,
                 ],
                 'Body is 7 characters too long.'
+            ],
+            'too long bytelength' => [
+                [
+                    'Vanilla.Comment.MaxLength' => 50000,
+                ],
+                [
+                    'body' => str_repeat("😱", 20000),
+                    'format' => TextFormat::FORMAT_KEY,
+                ],
+                'Body is 14465 bytes too long.'
             ]
         ];
-    }
-
-    /**
-     * Test a recordAdvancedNotications with CONF_CATEGORY_FOLLOWING disabled.
-     */
-    public function testRecordAdvancedNotications() {
-        $this->runWithConfig([CategoryModel::CONF_CATEGORY_FOLLOWING => false], function () {
-            $roles = $this->getRoles();
-
-            // Create a member user.
-            $discussionUser = $this->createUser([
-                "Name" => "testDiscussion",
-                "Email" => __FUNCTION__ . "@example1.com",
-                "Password" => "vanilla",
-                "RoleID" => $this->memberID,
-            ]);
-
-            $memberUser = $this->createUser([
-                "Name" => "testNotications2",
-                "Email" => __FUNCTION__ . "@example1.com",
-                "Password" => "vanilla",
-                "RoleID" => $this->memberID,
-            ]);
-
-            $categoryAdmin = $this->createPermissionedCategory([], [$roles["Member"]]);
-
-            $userMeta = [
-                sprintf('Preferences.Email.NewDiscussion.%d', $categoryAdmin['categoryID']) => $categoryAdmin['categoryID'],
-            ];
-            $this->userModel::setMeta($memberUser['userID'], $userMeta);
-
-            $discussionMember = [
-                'CategoryID' => $categoryAdmin['categoryID'],
-                'Name' => __FUNCTION__ .'test discussion',
-                'Body' => 'foo foo foo',
-                'Format' => 'Text',
-                'InsertUserID' => $discussionUser['userID']
-            ];
-
-            $this->createDiscussion($discussionMember);
-
-            $this->activityModel->clearNotificationQueue();
-            $this->discussionModel->recordAdvancedNotications($this->activityModel, [], $discussionMember);
-            $this->assertSame(0, count(ActivityModel::$Queue));
-        });
-    }
-
-    /**
-     * Test a recordAdvancedNotications with CONF_CATEGORY_FOLLOWING enabled.
-     */
-    public function testRecordAdvancedNoticationsSuccess() {
-        $this->runWithConfig([CategoryModel::CONF_CATEGORY_FOLLOWING => true], function () {
-            $roles = $this->getRoles();
-
-            // Create a member user.
-            $discussionUser = $this->createUser([
-                "Name" => "testDiscussion",
-                "Email" => __FUNCTION__ . "@example1.com",
-                "Password" => "vanilla",
-                "RoleID" => $this->memberID,
-            ]);
-
-            $memberUser = $this->createUser([
-                "Name" => "testNotications2",
-                "Email" => __FUNCTION__ . "@example1.com",
-                "Password" => "vanilla",
-                "RoleID" => $this->memberID,
-            ]);
-
-            $categoryAdmin = $this->createPermissionedCategory([], [$roles["Member"]]);
-
-            $userMeta = [
-                sprintf('Preferences.Email.NewDiscussion.%d', $categoryAdmin['categoryID']) => $categoryAdmin['categoryID'],
-            ];
-            $this->userModel::setMeta($memberUser['userID'], $userMeta);
-
-            $discussionMember = [
-                'CategoryID' => $categoryAdmin['categoryID'],
-                'Name' => __FUNCTION__ .'test discussion',
-                'Body' => 'foo foo foo',
-                'Format' => 'Text',
-                'InsertUserID' => $discussionUser['userID']
-            ];
-
-            $this->createDiscussion($discussionMember);
-
-            $this->activityModel->clearNotificationQueue();
-            $this->discussionModel->recordAdvancedNotications($this->activityModel, [], $discussionMember);
-            $this->assertSame(1, count(ActivityModel::$Queue));
-        });
     }
 }

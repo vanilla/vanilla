@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 import React from "react";
-import { oneColumnVariables } from "@library/layout/Section.variables";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { DeviceProvider } from "@library/layout/DeviceContext";
 import { StoryContent } from "@library/storybook/StoryContent";
 import InviteUserCard from "@library/features/users/ui/InviteUserCard";
@@ -14,7 +14,7 @@ export default {
     title: "Groups",
     parameters: {
         chromatic: {
-            viewports: [1450, oneColumnVariables().breakPoints.xs],
+            viewports: [1450, panelLayoutVariables().panelLayoutBreakPoints.xs],
         },
     },
 };

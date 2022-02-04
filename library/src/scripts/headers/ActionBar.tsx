@@ -22,7 +22,7 @@ import { actionBarClasses } from "@library/headers/ActionBarStyles";
 import PanelArea from "@library/layout/components/PanelArea";
 import PanelWidgetHorizontalPadding from "@library/layout/components/PanelWidgetHorizontalPadding";
 
-type IProps = {
+interface IProps {
     callToActionTitle?: string;
     anotherCallToActionTitle?: string;
     isCallToActionDisabled?: boolean;
@@ -38,19 +38,10 @@ type IProps = {
     selfPadded?: boolean;
     title?: React.ReactNode;
     fullWidth?: boolean;
+    backTitle?: string;
     handleCancel?: (e: React.MouseEvent) => void;
     handleAnotherSubmit?: (e: React.MouseEvent) => void;
-    additionalActions?: React.ReactNode;
-} & (
-    | {
-          backTitle?: string;
-          noBackLink?: boolean;
-      }
-    | {
-          backTitle?: never;
-          noBackLink: false;
-      }
-);
+}
 
 /**
  * Implement editor header component
@@ -75,16 +66,14 @@ export function ActionBar(props: IProps) {
 
     const content = (
         <ul className={classNames(classes.items)}>
-            {!props.noBackLink && (
-                <li className={classNames(classes.item, "isPullLeft")} ref={backRef} style={minButtonSizeStyles}>
-                    <BackLink
-                        title={props.backTitle || t("Cancel")}
-                        visibleLabel={true}
-                        className={classes.backLink}
-                        onClick={props.handleCancel}
-                    />
-                </li>
-            )}
+            <li className={classNames(classes.item, "isPullLeft")} ref={backRef} style={minButtonSizeStyles}>
+                <BackLink
+                    title={props.backTitle || t("Cancel")}
+                    visibleLabel={true}
+                    className={classes.backLink}
+                    onClick={props.handleCancel}
+                />
+            </li>
             {props.statusItem}
             {showMobileDropDown ? (
                 <li className={classes.centreColumn}>
@@ -94,9 +83,6 @@ export function ActionBar(props: IProps) {
                 </li>
             ) : null}
             {props.title}
-            {props.additionalActions && (
-                <li className={classNames(classes.item, "isPullRight")}>{props.additionalActions}</li>
-            )}
             {props.anotherCallToActionTitle && (
                 <li
                     ref={restoreRef}

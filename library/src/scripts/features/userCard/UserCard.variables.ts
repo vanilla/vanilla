@@ -5,7 +5,6 @@
 
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { styleUnit } from "@library/styles/styleUnit";
 import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { Variables } from "@library/styles/Variables";
@@ -84,9 +83,8 @@ export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) =>
         color: ColorsUtils.colorOut(globalVars.mainColors.fg),
         font: Variables.font({ ...globalVars.fontSizeAndWeightVars("small"), align: "center" }),
         margin: Variables.spacing({
-            top: 8,
+            top: 14,
         }),
-        minHeight: styleUnit(24),
     });
 
     return {

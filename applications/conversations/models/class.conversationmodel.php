@@ -588,8 +588,6 @@ SQL;
             // Add & apply any extra validation rules:
             $this->Validation->applyRule('Body', 'Required');
             $messageModel->Validation->applyRule('Body', 'Required');
-        } else {
-            $this->Validation->unapplyRule('Body', 'Required');
         }
 
         // Make sure that there is at least one recipient
@@ -770,7 +768,7 @@ SQL;
      * @param int $readingUserID Unique ID of current user.
      */
     public function markRead($conversationID, $readingUserID) {
-        // Update the read conversation count for the user.
+        // Update the the read conversation count for the user.
         $this->SQL->update('UserConversation uc')
             ->join('Conversation c', 'c.ConversationID = uc.ConversationID')
             ->set('uc.CountReadMessages', 'c.CountMessages', false)

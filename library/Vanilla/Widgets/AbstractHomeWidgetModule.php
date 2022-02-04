@@ -90,7 +90,7 @@ abstract class AbstractHomeWidgetModule extends AbstractReactModule {
     public $containerOptions = [];
 
     /**
-     * @var array The item options for the widget.
+     * @var array The container options for the widget.
      */
     public $itemOptions = [];
 

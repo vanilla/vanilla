@@ -4,18 +4,13 @@
  * @license GPL-2.0-only
  */
 
-namespace VanillaTests\Models;
-
-use Vanilla\Utility\ModelUtils;
-use VanillaTests\BootstrapTestCase;
+use VanillaTests\SharedBootstrapTestCase;
 use VanillaTests\SiteTestTrait;
-use ConversationModel;
-use ConversationMessageModel;
 
 /**
  * Test {@link ConversationMessageModel}.
  */
-class ConversationMessageModelTest extends BootstrapTestCase {
+class ConversationMessageModelTest extends SharedBootstrapTestCase {
     use SiteTestTrait, \VanillaTests\SetupTraitsTrait;
 
     /**
@@ -50,7 +45,6 @@ class ConversationMessageModelTest extends BootstrapTestCase {
         $id = $this->conversationModel->save([
             'RecipientUserID' => [$this->memberID, $this->moderatorID],
         ], [ConversationModel::OPT_CONVERSATION_ONLY => true]);
-        ModelUtils::validationResultToValidationException($this->conversationModel);
         $this->conversation = $this->conversationModel->getID($id, DATASET_TYPE_ARRAY);
     }
 

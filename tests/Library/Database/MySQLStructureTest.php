@@ -8,22 +8,19 @@
 namespace VanillaTests\Library\Database;
 
 use PHPUnit\Framework\TestCase;
-use VanillaTests\BootstrapTestCase;
 use VanillaTests\Fixtures\TestMySQLStructure;
 use VanillaTests\SiteTestTrait;
 
 /**
  * Tests for the `Gdn_MySQLStructure` class.
  */
-class MySQLStructureTest extends BootstrapTestCase {
+class MySQLStructureTest extends TestCase {
+    use SiteTestTrait;
 
     /**
      * @var TestMySQLStructure
      */
     private $st;
-
-    /** @var \Gdn_Database */
-    private $db;
 
     /**
      * Set up a fixture for use in tests.
@@ -31,13 +28,9 @@ class MySQLStructureTest extends BootstrapTestCase {
     public function setUp(): void {
         parent::setUp();
 
-        $this->db = $this->container()->get(\Gdn_Database::class);
-        $st = new TestMySQLStructure($this->db);
+        $st = new TestMySQLStructure($this->container()->get(\Gdn_Database::class));
         $this->st = $st;
         $this->st->reset();
-        $this->st->CaptureOnly = false;
-        $this->st->Database->CapturedSql = [];
-        \Gdn::sql()->CaptureModifications = false;
     }
 
     /**
@@ -124,39 +117,6 @@ class MySQLStructureTest extends BootstrapTestCase {
             ->set();
 
         $this->assertColumnHasIndex(__FUNCTION__, "value");
-    }
-
-    /**
-     * Database indexes should be case-insensitive.
-     */
-    public function testIndexCaseInsensitive(): void {
-        $px = $this->st->Database->DatabasePrefix;
-        $tbl = __FUNCTION__;
-
-        $this->st->table($tbl)->drop();
-
-        $this->st
-            ->table($tbl)
-            ->primaryKey('id')
-            ->column('status', 'int')
-            ->set();
-
-        $this->st->Database->query("alter table `$px{$tbl}` add index IX_{$tbl}_Status (`status`)");
-        $this->assertColumnHasIndex($tbl, 'status');
-
-        try {
-            $this->st->CaptureOnly = true;
-            $this->assertEmpty($this->db->CapturedSql, 'Something went wrong with the test.');
-
-            $this->st
-                ->table($tbl)
-                ->column('status', 'int', false, 'index.status')
-                ->set();
-
-            $this->assertEmpty($this->db->CapturedSql, $this->db->CapturedSql[0] ?? '');
-        } finally {
-            $this->st->CaptureOnly = false;
-        }
     }
 
     /**
@@ -317,55 +277,5 @@ EOT;
 
         $sql = $this->st->Database->CapturedSql ?? [];
         $this->assertEmpty($sql, 'The table should not have altered.');
-    }
-
-    /**
-     * Test the creation of multi-column unique indexes works correctly.
-     *
-     * We had a bug previously where the initial indexes on update were incorrect, but were correct on update.
-     */
-    public function testCreateUniqueIndexes() {
-        $createStructure = function () {
-            $this->st
-                ->table('uniqueIndexes')
-                ->column('part1', 'int', false, ['index', 'unique.combined'])
-                ->column('part2', 'int', false, 'unique.combined')
-                ->set()
-            ;
-        };
-
-        // run twice to make sure indexes are stable.
-        $createStructure();
-        $createStructure();
-
-        $this->assertIndexes([
-            'UX_uniqueIndexes_combined[part1]',
-            'UX_uniqueIndexes_combined[part2]',
-            'IX_uniqueIndexes_part1[part1]',
-        ], "uniqueIndexes");
-    }
-
-    /**
-     * Assert that we have indexes in the following format.
-     *
-     * INDEX_NAME[columnName]
-     *
-     * @param string[] $expected
-     * @param string $table
-     */
-    private function assertIndexes(array $expected, string $table) {
-        $actualIndexRows = $this->db->sql()
-            ->query("SHOW INDEXES FROM GDN_$table")
-            ->resultArray()
-        ;
-
-        $actual = "";
-        foreach ($actualIndexRows as $actualIndexRow) {
-            $actual .= $actualIndexRow['Key_name'] . '[' . $actualIndexRow['Column_name'] . ']' . "\n";
-        }
-        $actual = trim($actual);
-
-        $expected = implode("\n", $expected);
-        $this->assertEquals($expected, $actual, "Incorrect indexes were created for table '$table'");
     }
 }

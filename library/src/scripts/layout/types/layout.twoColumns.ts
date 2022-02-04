@@ -7,17 +7,17 @@ import { CSSObject } from "@emotion/css";
 import { media } from "@library/styles/styleShim";
 import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
-import { generateSectionClasses } from "../Section.styles";
-import { oneColumnVariables } from "../Section.variables";
-import { SectionTypes } from "@library/layout/types/interface.layoutTypes";
-import { ITwoColumnMediaQueries, twoColumnDevices } from "@library/layout/types/interface.twoColumns";
-import { IOneColumnVariables } from "@library/layout/types/interface.panelLayout";
+import { generatePanelLayoutClasses } from "../PanelLayout.styles";
+import { panelLayoutVariables } from "../PanelLayout.variables";
+import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
+import { ITwoColumnLayoutMediaQueries, twoColumnLayoutDevices } from "@library/layout/types/interface.twoColumns";
+import { IPanelLayoutVariables } from "@library/layout/types/interface.panelLayout";
 import { mediaQueryFactory } from "@library/layout/types/mediaQueryFactory";
 
-export const twoColumnVariables = useThemeCache(
-    (): IOneColumnVariables => {
-        const layoutVars = oneColumnVariables();
-        const Devices = twoColumnDevices;
+export const twoColumnLayoutVariables = useThemeCache(
+    (): IPanelLayoutVariables => {
+        const layoutVars = panelLayoutVariables();
+        const Devices = twoColumnLayoutDevices;
         const { fullGutter } = layoutVars.foundationalWidths;
 
         const makeThemeVars = variableFactory("twoColumnLayout");
@@ -65,7 +65,7 @@ export const twoColumnVariables = useThemeCache(
 
         const contentWidth = middleColumn.paddedWidth + panel.paddedWidth * 2;
 
-        const mediaQueries = (): ITwoColumnMediaQueries => {
+        const mediaQueries = (): ITwoColumnLayoutMediaQueries => {
             const noBleed = (styles: CSSObject, useMinWidth: boolean = true) => {
                 return media(
                     {
@@ -156,7 +156,7 @@ export const twoColumnVariables = useThemeCache(
         const panelLayoutSpacing = makeThemeVars("panelLayoutSpacing", layoutVars.panelLayoutSpacing);
 
         return {
-            type: SectionTypes.TWO_COLUMNS.toString(),
+            type: LayoutTypes.TWO_COLUMNS.toString(),
             Devices,
             foundationalWidths,
             panel,
@@ -173,10 +173,10 @@ export const twoColumnVariables = useThemeCache(
     },
 );
 
-export const twoColumnClasses = () => {
-    return generateSectionClasses({
-        vars: twoColumnVariables(),
+export const twoColumnLayoutClasses = () => {
+    return generatePanelLayoutClasses({
+        vars: twoColumnLayoutVariables(),
         name: "twoColumnLayout",
-        mediaQueries: mediaQueryFactory(twoColumnVariables().mediaQueries, SectionTypes.TWO_COLUMNS),
+        mediaQueries: mediaQueryFactory(twoColumnLayoutVariables().mediaQueries, LayoutTypes.TWO_COLUMNS),
     });
 };

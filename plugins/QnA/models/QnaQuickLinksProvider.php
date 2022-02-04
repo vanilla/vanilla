@@ -39,9 +39,7 @@ class QnaQuickLinksProvider implements QuickLinkProviderInterface {
         $quickLink = new QuickLink(
             t('Unanswered'),
             '/discussions/unanswered',
-            $this->qnaModel->getUnansweredCount($this->countLimit),
-            null,
-            "discussions.view"
+            $this->qnaModel->getUnansweredCount($this->countLimit)
         );
         $quickLink->setCountLimit($this->countLimit);
         return [$quickLink];

@@ -287,7 +287,7 @@ final class PageHead implements PageHeadInterface {
     /**
      * Use existing site data to create open graph meta tags.
      */
-    public function applyMetaTags() {
+    private function applyMetaTags() {
 
         // Standard meta tags
         if ($this->seoDescription) {
@@ -334,23 +334,5 @@ final class PageHead implements PageHeadInterface {
         ];
 
         return json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-    }
-
-    /**
-     * Return MetaTags.
-     *
-     * @return array
-     */
-    public function getMetaTags(): array {
-        return $this->metaTags;
-    }
-
-    /**
-     * Return MetaTags.
-     *
-     * @return array
-     */
-    public function getLinkTags(): array {
-        return $this->linkTags;
     }
 }

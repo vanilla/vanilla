@@ -9,7 +9,6 @@
  */
 
 use Garden\Web\Exception\PartialCompletionException;
-use Garden\Web\Exception\ServerException;
 use Vanilla\Scheduler\LongRunner;
 use Vanilla\Scheduler\LongRunnerAction;
 use Webmozart\Assert\Assert;
@@ -409,7 +408,7 @@ class ModerationController extends VanillaController {
 
             // Handle errors
             if ($error = $result->getCombinedErrorMessage()) {
-                throw new ServerException($error, $result->asData()->getStatus(), $result->getExceptionsByID());
+                throw new Gdn_ErrorException($error);
             }
         }
         $this->render();
@@ -523,7 +522,7 @@ class ModerationController extends VanillaController {
 
                     // Handle errors
                     if ($error = $result->getCombinedErrorMessage()) {
-                        throw new ServerException($error, $result->asData()->getStatus(), $result->getExceptionsByID());
+                        throw new Gdn_ErrorException($error);
                     }
                 } else {
                     ModerationController::informCheckedDiscussions($this);

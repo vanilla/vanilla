@@ -5,13 +5,13 @@
 
 import React from "react";
 import { StoryHeading } from "@library/storybook/StoryHeading";
-import { oneColumnVariables } from "@library/layout/Section.variables";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryListItem } from "@library/storybook/StoryListItem";
 import { StoryBookImageTypeSearchResult } from "@library/embeddedContent/storybook/attachments/StorybookImageTypeSearchResult";
 import { sampleImages } from "./storybook/attachments/sampleAttachmentImages";
-import { SectionProvider } from "@library/layout/LayoutContext";
-import { SectionTypes } from "@library/layout/types/interface.layoutTypes";
+import { LayoutProvider } from "@library/layout/LayoutContext";
+import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
 
 export default {
     title: "Search",
@@ -19,9 +19,9 @@ export default {
         chromatic: {
             viewports: [
                 1450,
-                oneColumnVariables().breakPoints.twoColumns,
-                oneColumnVariables().breakPoints.oneColumn,
-                oneColumnVariables().breakPoints.xs,
+                panelLayoutVariables().panelLayoutBreakPoints.twoColumns,
+                panelLayoutVariables().panelLayoutBreakPoints.oneColumn,
+                panelLayoutVariables().panelLayoutBreakPoints.xs,
             ],
         },
     },
@@ -30,7 +30,7 @@ export default {
 export function SearchResultImages(props: { title?: string }) {
     const { title = "Search Result Images" } = props;
     return (
-        <SectionProvider type={SectionTypes.TWO_COLUMNS}>
+        <LayoutProvider type={LayoutTypes.TWO_COLUMNS}>
             <StoryContent>
                 <StoryHeading depth={1}>{title}</StoryHeading>
                 <StoryHeading depth={2}>We have possible ratios to handle:</StoryHeading>
@@ -51,6 +51,6 @@ export function SearchResultImages(props: { title?: string }) {
                 <StoryBookImageTypeSearchResult type={"tall"} imageSet={sampleImages.tall} />
                 <StoryBookImageTypeSearchResult type={"wide"} imageSet={sampleImages.wide} />
             </StoryContent>
-        </SectionProvider>
+        </LayoutProvider>
     );
 }

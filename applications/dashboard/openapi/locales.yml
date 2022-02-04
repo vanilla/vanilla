@@ -1,120 +1,120 @@
 openapi: 3.0.2
 info:
 paths:
-    /locales:
-        get:
-            summary: Get all enabled locales on the site.
-            tags:
-                - Locales
-            responses:
-                "200":
-                    description: A list of enabled locales
-                    content:
-                        "application/json":
-                            schema:
-                                type: array
-                                items:
-                                    $ref: "#/components/schemas/Locale"
-    /locales/{locale}:
-        get:
-            summary: Get single locale
-            tags:
-                - Locales
-            parameters:
-                - $ref: "#/components/parameters/LocaleCodeParameter"
-            responses:
-                "200":
-                    description: The specified locale information
-                    content:
-                        "application/json":
-                            schema:
-                                $ref: "#/components/schemas/LocaleConfig"
-        patch:
-            tags:
-                - Locales
-            parameters:
-                - $ref: "#/components/parameters/LocaleCodeParameter"
-            responses:
-                "200":
-                    description: The specified locale information
-                    content:
-                        "application/json":
-                            schema:
-                                $ref: "#/components/schemas/LocaleConfig"
-    /locales/translations/{locale}:
-        get:
-            summary: Get all of the application's translation strings.
-            tags:
-                - Translations
-            parameters:
-                - $ref: "#/components/parameters/LocaleCodeParameter"
-                - $ref: "#/components/parameters/CacheBusterParameter"
-            responses:
-                "200":
-                    content:
-                        "application/json":
-                            schema:
-                                description: A map of string keys to translation strings.
-                                type: object
-                                additionalProperties:
-                                    type: string
-                    description: Success
-    /locales/translations/{locale}.js:
-        get:
-            summary: Get the application's translations strings as a javascrpt file.
-            description: |
-                This endpoint is intended for application optimization where translations are requested within a `<script>` tag
-                rather than as an external API call.
-            tags:
-                - Translations
-            parameters:
-                - $ref: "#/components/parameters/LocaleCodeParameter"
-                - $ref: "#/components/parameters/CacheBusterParameter"
-            responses:
-                "200":
-                    description: Success
-                    content:
-                        "application/javascript":
-                            schema:
-                                type: string
+  /locales:
+    get:
+      summary: Get all enabled locales on the site.
+      tags:
+        - Locales
+      responses:
+        '200':
+          description: A list of enabled locales
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Locale'
+  /locales/{locale}:
+    get:
+      summary: Get single locale
+      tags:
+        - Locales
+      parameters:
+        - $ref: '#/components/parameters/LocaleCodeParameter'
+      responses:
+        '200':
+          description: The specified locale information
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/LocaleConfig'
+    patch:
+      tags:
+        - Locales
+      parameters:
+        - $ref: '#/components/parameters/LocaleCodeParameter'
+      responses:
+        '200':
+          description: The specified locale information
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/LocaleConfig'
+  /locales/translations/{locale}:
+    get:
+      summary: Get all of the application's translation strings.
+      tags:
+      - Translations
+      parameters:
+      - $ref: '#/components/parameters/LocaleCodeParameter'
+      - $ref: '#/components/parameters/CacheBusterParameter'
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                description: A map of string keys to translation strings.
+                type: object
+                additionalProperties:
+                  type: string
+          description: Success
+  /locales/translations/{locale}.js:
+    get:
+      summary: Get the application's translations strings as a javascrpt file.
+      description: |
+        This endpoint is intended for application optimization where translations are requested within a `<script>` tag
+        rather than as an external API call.
+      tags:
+      - Translations
+      parameters:
+      - $ref: '#/components/parameters/LocaleCodeParameter'
+      - $ref: '#/components/parameters/CacheBusterParameter'
+      responses:
+        '200':
+          description: Success
+          content:
+            'application/javascript':
+              schema:
+                type: string
 components:
-    parameters:
-        LocaleCodeParameter:
-            name: locale
-            in: path
-            description: The locale code requested.
-            required: true
-            schema:
-                type: string
-                pattern: "[a-zA-Z0-9-]+"
-        CacheBusterParameter:
-            name: etag
-            in: query
-            description: |
-                Whether or not output is cached.
-            schema:
-                type: string
-    schemas:
-        Locale:
-            properties:
-                localeID:
-                    description: The key of the locale addon.
-                    minLength: 1
-                    type: string
-                    example: vf_fr_CA,
-                localeKey:
-                    description: The normalized key of the locale without any regional modifier.
-                    type: string
-                    example: fr
-                regionalKey:
-                    description: The normalized key of the locale with a regional modifier if it exists.
-                    type: string
-                    example: fr_CA
-                displayNames:
-                    type: object
-                    description: Translatable names of the
-                    example: { "en": "French", "fr": "Français", "de": "Französisch" }
-            type: object
-        LocaleConfig:
-            allOf:
-                - $ref: "#/components/schemas/Locale"
+  parameters:
+    LocaleCodeParameter:
+      name: locale
+      in: path
+      description: The locale code requested.
+      required: true
+      schema:
+        type: string
+        pattern: '[a-zA-Z0-9-]+'
+    CacheBusterParameter:
+      name: etag
+      in: query
+      description: |
+        Whether or not output is cached.
+      schema:
+        type: string
+  schemas:
+    Locale:
+      properties:
+        localeID:
+          description: The key of the locale addon.
+          minLength: 1
+          type: string
+          example: vf_fr_CA,
+        localeKey:
+          description: The normalized key of the locale without any regional modifier.
+          type: string
+          example: fr
+        regionalKey:
+          description: The normalized key of the locale with a regional modifier if it exists.
+          type: string
+          example: fr_CA
+        displayNames:
+          type: object
+          description: Translatable names of the
+          example: { "en": "French", "fr": "Français", "de": "Französisch" }
+      type: object
+    LocaleConfig:
+      allOf:
+        - $ref: '#/components/schemas/Locale'

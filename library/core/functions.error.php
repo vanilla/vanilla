@@ -8,17 +8,97 @@
  * @since 2.0
  */
 
-use Vanilla\Logging\ErrorLogger;
+/**
+ * This class is for internal use within the global error handler only. Don't use this class elsewhere.
+ *
+ * An extension of the **ErrorException** that includes context variables.
+ */
+class Gdn_ErrorException extends ErrorException {
+
+    /** @var array */
+    protected $_Context;
+
+    /**
+     * Constructs the exception.
+     *
+     * @param string $message The Exception message to throw.
+     * @param int $code The Exception code.
+     * @param string $filename The filename where the exception is thrown.
+     * @param int $line The line number where the exception is thrown.
+     * @param array $context The currently defined variables.
+     */
+    public function __construct($message = "", $code = 0, $filename = __FILE__, $line = __LINE__, $context = []) {
+        parent::__construct($message, $code, 0, $filename, $line);
+        $this->_Context = $context;
+    }
+
+    /**
+     * Get the variables that were in context at the time of the error.
+     *
+     * @return array
+     */
+    public function getContext() {
+        return $this->_Context;
+    }
+}
+
+/**
+ * An error handler that can be registered in PHP.
+ *
+ * @param int $errorNumber
+ * @param string $message
+ * @param string $file
+ * @param int $line
+ * @param array $arguments
+ * @return bool|null
+ * @throws Gdn_ErrorException Throws the exception that represents the error.
+ */
+function gdn_ErrorHandler($errorNumber, $message, $file, $line, $arguments) {
+    $errorReporting = error_reporting();
+
+    // Don't do anything for @supressed errors.
+    if ($errorReporting === 0) {
+        return null;
+    }
+
+    if (($errorReporting & $errorNumber) !== $errorNumber) {
+        if (function_exists('trace') && debug()) {
+            trace(new \ErrorException($message, $errorNumber, $errorNumber, $file, $line), TRACE_NOTICE);
+        }
+
+        // Ignore errors that are below the current error reporting level.
+        return false;
+    }
+
+    $fatalErrorBitmask = E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR;
+    if ($errorNumber & $fatalErrorBitmask) {
+        // Convert all fatal errors to an exception
+        throw new Gdn_ErrorException($message, $errorNumber, $file, $line, $arguments);
+    }
+
+    // All other unprocessed non-fatal PHP errors are possibly Traced and logged to the PHP error log file
+    $nonFatalErrorException = new \ErrorException($message, $errorNumber, $errorNumber, $file, $line);
+    if (function_exists('trace')) {
+        trace($nonFatalErrorException, TRACE_NOTICE);
+    }
+
+    errorLog(formatErrorException($nonFatalErrorException));
+}
 
 /**
  * A custom error handler that displays much more, very useful information when
  * errors are encountered in Garden.
  *
- * @param Throwable $Exception The exception that was thrown.
+ * @param Exception $Exception The exception that was thrown.
  */
-function gdnExceptionHandler(Throwable $Exception) {
+function gdn_ExceptionHandler($Exception) {
     try {
-        ErrorLogger::handleException($Exception);
+        // Attempt to log the exception as early as possible
+        if ($Exception instanceof \ErrorException) {
+            errorLog(formatErrorException($Exception));
+        } else {
+            errorLog(formatException($Exception, true));
+        }
 
         $ErrorNumber = $Exception->getCode();
         $Message = $Exception->getMessage();
@@ -59,9 +139,9 @@ function gdnExceptionHandler(Throwable $Exception) {
         $MessageInfo = explode('|', $Message);
         $MessageCount = count($MessageInfo);
         if ($MessageCount == 4) {
-            [$SenderMessage, $SenderObject, $SenderMethod, $SenderCode] = $MessageInfo;
+            list($SenderMessage, $SenderObject, $SenderMethod, $SenderCode) = $MessageInfo;
         } elseif ($MessageCount == 3) {
-            [$SenderMessage, $SenderObject, $SenderMethod] = $MessageInfo;
+            list($SenderMessage, $SenderObject, $SenderMethod) = $MessageInfo;
         } elseif (function_exists('GetValueR')) {
             $IsError = (getValueR('0.function', $SenderTrace) == 'Gdn_ErrorHandler'); // not exception
             $N = ($IsError) ? '1' : '0';
@@ -320,9 +400,17 @@ if (!function_exists('errorLog')) {
      * Attempt to log an error message to the PHP error log.
      *
      * @param string|\Exception $message
-     * @deprecated ErrorLogger::writeErrorLog
+     * @access private
      */
     function errorLog($message) {
+        $errorLogFile = class_exists('Gdn', false) ? Gdn::config('Garden.Errors.LogFile', '') : '';
+
+        // Log only if the PHP setting "log_errors" is enabled
+        // OR if the Garden config "Garden.Errors.LogFile" is provided
+        if (!$errorLogFile && !ini_get('log_errors')) {
+            return;
+        }
+
         // Make sure the message can be converted to a string otherwise bail out
         if (!is_string($message) && !method_exists($message, '__toString')) {
             return;
@@ -333,7 +421,22 @@ if (!function_exists('errorLog')) {
             $message = (string) $message;
         }
 
-        ErrorLogger::writeErrorLog($message);
+        $destination = null;
+        if (!$errorLogFile) {
+            // sends to PHP's system logger
+            $messageType = 0;
+        } else {
+            // appends to a file
+            $messageType = 3;
+            $destination = $errorLogFile;
+
+            // Need to prepend the date when appending to an error log file
+            // and also add a newline manually
+            $date = date('d-M-Y H:i:s e');
+            $message = sprintf('[%s] %s', $date, $message) . PHP_EOL;
+        }
+
+        @error_log($message, $messageType, $destination);
     }
 }
 
@@ -608,6 +711,16 @@ if (!function_exists('__cleanErrorArguments')) {
         $result = $fn($var);
         return $result;
     }
+}
+
+/**
+ * Set up Garden to handle php errors.
+ *
+ * You can remove the "& ~E_STRICT" from time to time to clean up some easy strict errors.
+ */
+function setHandlers() {
+    set_error_handler('Gdn_ErrorHandler', E_ALL & ~E_STRICT);
+    set_exception_handler('Gdn_ExceptionHandler');
 }
 
 /**

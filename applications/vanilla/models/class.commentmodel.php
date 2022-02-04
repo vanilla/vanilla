@@ -1454,7 +1454,7 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
         $this->formatField($row, "Body", $row["Format"]);
         $row['Name'] = sprintf(t('Re: %s'), $row['DiscussionName'] ?? t('Untitled'));
         $row['Url'] = commentUrl($row);
-        $row['Attributes'] = new Attributes($row['Attributes'] ?? null);
+        $row['Attributes'] = new Attributes($row['Attributes']);
         $row['InsertUserID'] = $row['InsertUserID'] ?? 0;
         $row['DateInserted'] = $row['DateInserted'] ?? $row['DateUpdated'] ?? new DateTime();
         $scheme = new CamelCaseScheme();
@@ -1589,13 +1589,6 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
             $userID = $row['UserID'];
             // Check user can still see the discussion.
             $discussionModel = $this->discussionModel;
-
-            if (!Gdn::config(CategoryModel::CONF_CATEGORY_FOLLOWING) &&
-                !$this->userModel->checkPermission($userID, 'Garden.AdvancedNotifications.Allow')
-            ) {
-                continue;
-            }
-
             if (!$discussionModel->canView($discussion, $userID)) {
                 continue;
             }

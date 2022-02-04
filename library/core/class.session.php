@@ -435,8 +435,7 @@ class Gdn_Session {
                 $this->permissions->setPermissions($this->User->Permissions);
 
                 // Set permission overrides.
-                $this->permissions->setAdmin($this->User->Admin > 0);
-                $this->permissions->setSysAdmin($this->User->Admin > 1);
+                $this->permissions->setAdmin($this->User->Admin);
                 if (!empty($this->User->Deleted)) {
                     $this->permissions->addBan(Permissions::BAN_DELETED, ['msg' => t('Your account has been deleted.')]);
                 }

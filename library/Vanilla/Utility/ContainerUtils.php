@@ -9,7 +9,7 @@ namespace Vanilla\Utility;
 
 use Garden\Container\Callback;
 use Garden\Container\Container;
-use Garden\Container\ContainerConfigurationInterface;
+use Garden\Container\Reference;
 use Garden\Container\ReferenceInterface;
 use Psr\Container\ContainerInterface;
 use Vanilla\Contracts\ConfigurationInterface;
@@ -102,18 +102,16 @@ class ContainerUtils {
      * Sometimes you want to add a call to a container rule, but the container may have already instantiated a shared instance.
      * This method will let you add the rule, but also make sure the call is replicated if there is already an instance.
      *
-     * @param ContainerConfigurationInterface $container The container to configure.
+     * @param Container $container The container to configure.
      * @param string $rule The name of the rule to configure.
      * @param string $method The name of the method to call.
      * @param array $args The method's arguments.
      */
-    public static function addCall(ContainerConfigurationInterface $container, string $rule, string $method, array $args) {
+    public static function addCall(Container $container, string $rule, string $method, array $args) {
         $container->rule($rule)->addCall($method, $args);
-        if ($container instanceof Container) {
-            if ($container->hasInstance($rule)) {
-                $obj = $container->get($rule);
-                $container->call([$obj, $method], $args);
-            }
+        if ($container->hasInstance($rule)) {
+            $obj = $container->get($rule);
+            $container->call([$obj, $method], $args);
         }
     }
 }

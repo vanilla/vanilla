@@ -45,6 +45,9 @@ class ProfileController extends Gdn_Controller {
     /** @var string View for current tab. */
     protected $_TabView;
 
+    /** @var bool Check if user is already authenticated. */
+    private static $isAuthenticated = false;
+
     /** @var string Controller for current tab. */
     protected $_TabController;
 
@@ -360,9 +363,9 @@ class ProfileController extends Gdn_Controller {
     /**
      * Edit user account.
      *
+     * @since 2.0.0
+     * @access public
      * @param mixed $userReference Username or User ID.
-     * @param string $username
-     * @param string|int $userID
      */
     public function edit($userReference = '', $username = '', $userID = '') {
         $this->permission(['Garden.SignIn.Allow', 'Garden.Profiles.Edit'], true);
@@ -421,13 +424,41 @@ class ProfileController extends Gdn_Controller {
             // If we're changing the email address, militarize our reauth with no cooldown allowed.
             $authOptions = [];
             $submittedEmail = $this->Form->getFormValue('Email', null);
+            // If User has to re authenticate get the original form values
+            $originalSubmission = (array_key_exists('OriginalSubmission', $_POST))
+                ? $_POST['OriginalSubmission']
+                : '';
 
             if ($submittedEmail !== null && $canEditEmail && $user['Email'] !== $submittedEmail) {
                 $authOptions['ForceTimeout'] = true;
             }
+            // Do not reauthenticate if we are editing a user.
+            if ($user['UserID'] === $sessionUserID && self::$isAuthenticated !== true) {
+                $this->reauth($authOptions);
+            }
+            // If the Form was reloaded because of reauth, reset the the form values to the original submission values.
+            $originalFormValues = (isset($originalSubmission))
+                ? json_decode($originalSubmission, true)
+                : null;
+            $emailChanged = false;
+            if (isset($originalFormValues['Email'])) {
+                $emailChanged = $originalFormValues &&  $originalFormValues['Email'] !== $user['Email'];
+            }
+            $forceTimeout = $submittedEmail !== null && $canEditEmail && $user['Email'] !== $submittedEmail;
+            if ($emailChanged || $forceTimeout) {
+                $authOptions['ForceTimeout'] = true;
+            }
 
             // Authenticate user once.
-            $this->reauth($authOptions);
+            if (!self::$isAuthenticated) {
+                $this->reauth($authOptions);
+            }
+
+            if (is_array($originalFormValues)) {
+                foreach ($originalFormValues as $key => $value) {
+                    $this->Form->setFormValue($key, $value);
+                }
+            }
 
             $this->Form->setFormValue('UserID', $userID);
 
@@ -840,7 +871,8 @@ class ProfileController extends Gdn_Controller {
         // Vanilla's login form regardless of the state of their membership in the
         // external app.
         if (c('Garden.Registration.Method') == 'Connect') {
-            throw forbiddenException('@'.t('You cannot change your password when using SSO authentication only.'));
+            Gdn::dispatcher()->dispatch('DefaultPermission');
+            exit();
         }
 
         Gdn::userModel()->addPasswordStrength($this);
@@ -1351,15 +1383,10 @@ class ProfileController extends Gdn_Controller {
     public function authenticate() {
         $this->permission('Garden.SignIn.Allow');
 
-        if (empty(Gdn::session()->User)) {
-            throw permissionException('@'.t('You must be signed in.'));
-        }
-
-        // Make sure the user has a password that can even be checked.
-        $pw = Gdn::getContainer()->get(Gdn_PasswordHash::class);
-        $user = Gdn::userModel()->getID(Gdn::session()->UserID, DATASET_TYPE_ARRAY);
-        if (!$pw->hasAlgorithm($user['HashMethod'] ?? '')) {
-            throw permissionException('@'.t('You must reset your password before proceeding.'));
+        // If users are registering with SSO, don't bother with this form.
+        if (!is_object(Gdn::session()->User) || (c('Garden.Registration.Method') === 'Connect' && (Gdn::session()->User->HashMethod ?? '') !== 'Vanilla')) {
+            Gdn::dispatcher()->dispatch('DefaultPermission');
+            exit();
         }
 
         if ($this->Form->getFormValue('DoReauthenticate')) {
@@ -1381,10 +1408,8 @@ class ProfileController extends Gdn_Controller {
                             Gdn::request()->setRequestArguments(Gdn_Request::INPUT_POST, $formData);
                             self::$isAuthenticated = true;
                         }
-                        // Make sure there is no re-authentication flag or else we are headed for a loop.
-                        Gdn::request()->setValueOn(Gdn_Request::INPUT_POST, 'DoReauthenticate', false);
                         Gdn::dispatcher()->dispatch();
-                        throw new \Vanilla\Exception\ExitException();
+                        exit();
                     } else {
                         $this->Form->addError(t('Invalid password.'), 'AuthenticatePassword');
                     }

@@ -13,7 +13,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { iconVariables } from "@library/icons/iconStyles";
-import { oneColumnVariables } from "@library/layout/Section.variables";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 
 export const storyBookVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -212,7 +212,7 @@ export const storyBookClasses = useThemeCache(() => {
         flexWrap: "wrap",
         width: calc(`100% + ${styleUnit(vars.gaps.tile * 8)}`),
         transform: translateX(`-${styleUnit(vars.gaps.tile * 3.5)}`),
-        ...oneColumnVariables()
+        ...panelLayoutVariables()
             .mediaQueries()
             .oneColumnDown({
                 display: "block",

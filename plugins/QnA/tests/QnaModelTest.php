@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -31,12 +31,15 @@ class QnaModelTest extends SiteTestCase {
      * Test unanswered count fetching, caching, and permissions.
      */
     public function testUnansweredCounts() {
+        // Make sure we have caching enabled.
+        $this->enableCaching();
+
         // Create an accepted answer question.
         $question = $this->createQuestion();
         $answer = $this->createAnswer();
         $this->acceptAnswer($question, $answer);
 
-        // Create the unanswered records.
+        // Create the unanaswered records.
         $this->createQuestion();
         $this->createQuestion();
         $permCat = $this->createPermissionedCategory([], [\RoleModel::ADMIN_ID]);
@@ -76,7 +79,7 @@ class QnaModelTest extends SiteTestCase {
 
         // Other use with same category access as guest will get the same cache.
         $memberUser = $this->createUser();
-        $this->resetTable('Discussion', false);
+        $this->resetTable('Discussion');
         $this->runWithUser(function () {
             // CategoryModel doesn't recognize the session changing mid-request.
             \CategoryModel::clearCache();

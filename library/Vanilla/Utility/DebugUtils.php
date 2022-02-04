@@ -39,15 +39,6 @@ class DebugUtils {
     }
 
     /**
-     * Return if we are running in the context of a test.
-     *
-     * @return bool
-     */
-    public static function isTestMode(): bool {
-        return defined('TESTMODE_ENABLED') && TESTMODE_ENABLED;
-    }
-
-    /**
      * Return a string from an exception with different output depending on debug mode.
      *
      * @param \Throwable $ex The exception to render.

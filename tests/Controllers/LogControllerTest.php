@@ -8,7 +8,6 @@
 namespace VanillaTests\Controllers;
 
 use Garden\Events\ResourceEvent;
-use Gdn;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Utility\ArrayUtils;
 use VanillaTests\EventSpyTestTrait;
@@ -24,8 +23,6 @@ class LogControllerTest extends SiteTestCase {
     use EventSpyTestTrait;
     use CommunityApiTestTrait;
     use UsersAndRolesApiTestTrait;
-
-    public static $addons = ['qna']; //QnA plugin required for testDeletedDiscussionRestoreBadValue()
 
     /** @var \LogController */
     private $controller;
@@ -59,6 +56,7 @@ class LogControllerTest extends SiteTestCase {
      * @inheritDoc
      */
     public static function setupBeforeClass(): void {
+        self::$addons = ['vanilla', 'qna']; //QnA plugin required for testDeletedDiscussionRestoreBadValue()
         parent::setUpBeforeClass();
         $session = self::container()->get('Session');
         $session->validateTransientKey(true);
@@ -264,18 +262,22 @@ class LogControllerTest extends SiteTestCase {
      * Test marking comments as not spam
      */
     public function testSpamCommentRestore(): void {
-        $user = $this->createUser();
-        $discussion = $this->createDiscussion();
+        $userData = [
+            "Name" => __FUNCTION__ . "testrestoreuser",
+            "Email" => "testrestoreuser@example.com",
+            "Password" => "vanilla"
+        ];
+        $userID = $this->userModel->save($userData);
         $preCommentCount = $this->commentModel->getCount();
         $logData = [
             "Body" => __FUNCTION__,
-            "DiscussionID" => $discussion["discussionID"],
-            "InsertUserID" => $user["userID"],
+            "DiscussionID" => 1,
+            "InsertUserID" => $userID,
             "Format" => "Markdown",
             "DateInserted" => "2020-01-01 00:00:00",
             "InsertIPAddress" => "127.0.0.1",
-            "Username" => $user['name'],
-            "Email" => $user['email'],
+            "Username" => $userData['Name'],
+            "Email" => $userData['Email'],
             "IPAddress" => "127.0.0.1",
         ];
 
@@ -317,8 +319,8 @@ class LogControllerTest extends SiteTestCase {
 
         $this->userModel->save($data);
         $logID = $this->logModel->insert('Spam', 'Registration', $data);
-        Gdn::request()->setMethod("Post");
-        Gdn::request()->setRequestArguments(
+        $this->controller->Request->setMethod('Post');
+        $this->controller->Request->setRequestArguments(
             \Gdn_Request::INPUT_POST,
             [
                 'LogIDs' => $logID

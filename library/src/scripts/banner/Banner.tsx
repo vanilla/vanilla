@@ -23,7 +23,7 @@ import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { visibility } from "@library/styles/styleHelpersVisibility";
 import { contentBannerClasses, contentBannerVariables } from "@library/banner/contentBannerStyles";
 import { useComponentDebug } from "@vanilla/react-utils";
-import { useSection } from "@library/layout/LayoutContext";
+import { useLayout } from "@library/layout/LayoutContext";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
 import { styleUnit } from "@library/styles/styleUnit";
 import { ISearchScopeNoCompact } from "@library/features/search/SearchScopeContext";
@@ -52,7 +52,7 @@ export interface IBannerProps {
  * A component representing a single crumb in a breadcrumb component.
  */
 export default function Banner(props: IBannerProps) {
-    const { isCompact, mediaQueries } = useSection();
+    const { isCompact, mediaQueries } = useLayout();
     const bannerContextRef = useBannerContainerDivRef();
     const { setOverlayTitleBar } = useBannerContext();
     const { action, className, isContentBanner } = props;

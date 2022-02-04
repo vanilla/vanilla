@@ -83,9 +83,6 @@ trait SiteTestTrait {
      */
     protected $roleModel;
 
-    /** @var bool */
-    private $userFixturesCreated = false;
-
     /**
      * Get the names of addons to install.
      *
@@ -122,11 +119,6 @@ trait SiteTestTrait {
             $this->roleModel = $roleModel;
         });
         $this->api = static::container()->getArgs(InternalClient::class, [static::container()->get('@baseUrl').'/api/v2']);
-
-        // Save some configs.
-        \Gdn::config()->saveToConfig([
-            'Garden.User.RateLimit' => 0
-        ]);
     }
 
     /**
@@ -175,16 +167,6 @@ trait SiteTestTrait {
         $dic->get(\Gdn_Dispatcher::class)->start();
 
         self::$siteInfo = $result;
-        if (static::shouldUseCaching()) {
-            self::enableCaching();
-        }
-    }
-
-    /**
-     * @return bool
-     */
-    public static function shouldUseCaching(): bool {
-        return true;
     }
 
     /**
@@ -348,11 +330,6 @@ TEMPLATE;
     protected function createUserFixtures(?string $sx = null): void {
         // Create some users to help.
         if ($sx === null) {
-            if ($this->userFixturesCreated) {
-                return;
-            } else {
-                $this->userFixturesCreated = true;
-            }
             $sx = round(microtime(true) * 1000) . mt_rand(1000, 9999);
         }
 

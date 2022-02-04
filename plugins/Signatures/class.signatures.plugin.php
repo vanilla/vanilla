@@ -25,9 +25,7 @@
 use Twig\Cache\CacheInterface;
 use Vanilla\Cache\CacheCacheAdapter;
 use Vanilla\Formatting\Formats\HtmlFormat;
-use Vanilla\Formatting\Formats\RichFormat;
 use \Vanilla\Formatting\FormatService;
-use Vanilla\Formatting\Quill\Parser;
 
 class SignaturesPlugin extends Gdn_Plugin {
 
@@ -206,7 +204,7 @@ class SignaturesPlugin extends Gdn_Plugin {
                 }
 
                 $this->crossCheckSignature($values, $sender);
-                $this->validateSignatureFormat($values, $sender);
+
                 if ($sender->Form->errorCount() == 0) {
                     foreach ($frmValues as $userMetaKey => $userMetaValue) {
                         $key = $this->trimMetaKey($userMetaKey);
@@ -238,41 +236,11 @@ class SignaturesPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Check if format is Rich Format, and body is formatted correctly
-     *
-     * @param array $frmValues settings form values
-     * @param Controller $sender sender controller
-     */
-    public function validateSignatureFormat(array $frmValues, &$sender) {
-        $format = null;
-        $body = null;
-        foreach ($frmValues as $userMetaKey => $userMetaValue) {
-            $key = $this->trimMetaKey($userMetaKey);
-
-            switch ($key) {
-                case 'Format':
-                    $format = $userMetaValue;
-                    break;
-                case 'Sig':
-                    $body = $userMetaValue;
-                    break;
-            }
-        }
-        if (strcasecmp($format, RichFormat::FORMAT_KEY) == 0) {
-            try {
-                Parser::jsonToOperations($body);
-            } catch (Exception $e) {
-                $sender->Form->addError('Signature invalid.');
-            }
-        }
-    }
-
-    /**
      * Checks signature against constraints set in config settings,
      * and executes the external ValidateSignature function, if it exists.
      *
-     * @param array $values Signature settings form values
-     * @param Controller $sender
+     * @param $values Signature settings form values
+     * @param $sender Controller
      */
     public function crossCheckSignature($values, &$sender) {
         $this->checkSignatureLength($values, $sender);
@@ -696,7 +664,7 @@ EOT;
             }
 
             $format = strtolower($sigFormat);
-            $userSignature = $this->formatService->renderHTML($signature, $format, ['userID' => $sourceUserID, 'recordType' => 'signature']);
+            $userSignature = $this->formatService->renderHTML($signature, $format);
 
             // Restore original config.
             if (!$allowEmbeds) {

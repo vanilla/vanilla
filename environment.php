@@ -19,6 +19,11 @@ if (version_compare(phpversion(), ENVIRONMENT_PHP_VERSION) < 0) {
 if (!defined('APPLICATION')) {
     define('APPLICATION', 'Vanilla');
 }
+if (!defined('APPLICATION_VERSION')) {
+    // Rules for the versioning
+    // {Release version}-{? SNAPSHOT if it's a dev build}
+    define('APPLICATION_VERSION', '2021.024');
+}
 if (!defined('DS')) {
     define('DS', DIRECTORY_SEPARATOR);
 }
@@ -72,22 +77,3 @@ if (!include_once PATH_ROOT.'/vendor/autoload.php') {
     die("Could not find the autoloader. Did you forget to run 'composer install' in '".PATH_ROOT."' ?\n");
 }
 spl_autoload_register([Vanilla\AliasLoader::class, 'autoload']);
-
-// Classes are autoloaded
-// Let's load up the application version.
-if (!defined('APPLICATION_VERSION')) {
-    $version = "unknown";
-    try {
-        $version = \Vanilla\FileUtils::getCached(PATH_CACHE . '/version.php', function () {
-            $versionJsonContents = \Vanilla\FileUtils::getArray(PATH_ROOT . '/version.json');
-            return $versionJsonContents['version'] ?? 'unknown';
-        });
-    } catch (Throwable $e) {
-        // Don't completely blow up if we can't load this file.
-        trigger_error($e->getMessage(), E_USER_WARNING);
-    }
-
-    // Rules for the versioning
-    // {Release version}-{? SNAPSHOT if it's a dev build}
-    define('APPLICATION_VERSION', $version);
-}

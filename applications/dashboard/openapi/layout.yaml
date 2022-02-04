@@ -1,0 +1,187 @@
+openapi: 3.0.3
+info:
+paths:
+  /layouts:
+    x-hidden: true
+    get:
+      summary: Get a set of layouts
+      tags:
+        - Layout
+      parameters:
+        - description: Desired number of items per page.
+          in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+            maximum: 100
+            minimum: 1
+        - $ref: '#/components/parameters/Page'
+        - description: Sort the results
+          in: query
+          name: sort
+          required: false
+          schema:
+            type: string
+            enum:
+              - layoutID
+              - name
+              - dateInserted
+              - -layoutID
+              - -name
+              - -dateInserted
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/LayoutSchema'
+                type: array
+          description: Success
+        '403':
+            $ref: '#/components/responses/PermissionError'
+    post:
+      summary: Create a layout
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LayoutPostSchema'
+      tags:
+        - Layout
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LayoutSchema'
+          description: Success
+  /layouts/{id}:
+    x-hidden: true
+    parameters:
+      - description: The layout ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+    get:
+      summary: Get a specific layout by ID
+      tags:
+        - Layout
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LayoutSchema'
+          description: Success
+        '403':
+            $ref: '#/components/responses/PermissionError'
+        '404':
+            $ref: '#/components/responses/NotFound'
+    patch:
+      summary: Update a layout
+      tags:
+        - Layout
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LayoutPatchSchema'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LayoutSchema'
+          description: Success
+        '403':
+            $ref: '#/components/responses/PermissionError'
+        '404':
+            $ref: '#/components/responses/NotFound'
+    delete:
+      summary: Delete a layout
+      tags:
+        - Layout
+      responses:
+        '204':
+          description: Success
+        '403':
+          $ref: '#/components/responses/PermissionError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+components:
+  schemas:
+    LayoutType:
+      x-hidden: true
+      description: Type of resource to which this layout applies
+      type: string
+      enum:
+        - homepage
+    LayoutSchema:
+      x-hidden: true
+      type: object
+      properties:
+        layoutID:
+          type: integer
+          description: The layout's identifier.
+          readOnly: true
+        name:
+          type: string
+          description: User-friendly name.
+        layout:
+          type: string
+          description: Layout definition
+        layoutType:
+          $ref: '#/components/schemas/LayoutType'
+        isDefault:
+          type: boolean
+          description: Indicates whether this is the default layout for the resource type specified in layoutType
+        dateInserted:
+          type: string
+          description: The date/time that the layout was created.
+          format: date-time
+          readOnly: true
+        insertUserID:
+          type: integer
+          description: The user that created the layout.
+          readOnly: true
+        dateUpdated:
+          type: string
+          description: The date/time that the layout was last updated.
+          format: date-time
+          nullable: true
+          readOnly: true
+        updateUserID:
+          type: integer
+          description: The user that last updated the layout.
+          nullable: true
+          readOnly: true
+    LayoutPatchSchema:
+      x-hidden: true
+      type: object
+      description: Set of properties available to update after layout has been created
+      properties:
+        name:
+          type: string
+          maxLength: 100
+          description: User-friendly name.
+        layout:
+          type: string
+          description: Layout definition
+    LayoutPostSchema:
+      x-hidden: true
+      type: object
+      description: Set of properties used to define a new layout
+      properties:
+        name:
+          type: string
+          maxLength: 100
+          description: User-friendly name.
+        layout:
+          type: string
+          description: Layout definition
+        layoutType:
+          $ref: '#/components/schemas/LayoutType'

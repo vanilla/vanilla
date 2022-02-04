@@ -35,4 +35,11 @@ interface WidgetInterface {
      * @return string
      */
     public static function getWidgetID(): string;
+
+    /**
+     * Get a widgetsClass
+     *
+     * @return string
+     */
+    public static function getWidgetClass(): string;
 }

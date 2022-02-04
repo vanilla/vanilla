@@ -5,20 +5,20 @@
 
 import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
-import { generateSectionClasses } from "../Section.styles";
-import { oneColumnVariables } from "../Section.variables";
-import { SectionTypes } from "@library/layout/types/interface.layoutTypes";
-import { fallbackSectionVariables, IOneColumnVariables } from "@library/layout/types/interface.panelLayout";
+import { generatePanelLayoutClasses } from "../PanelLayout.styles";
+import { panelLayoutVariables } from "../PanelLayout.variables";
+import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
+import { fallbackLayoutVariables, IPanelLayoutVariables } from "@library/layout/types/interface.panelLayout";
 import { mediaQueryFactory } from "@library/layout/types/mediaQueryFactory";
 
-interface IProps extends IOneColumnVariables {
+interface IProps extends IPanelLayoutVariables {
     contentSizes: object;
 }
 
-export const threeColumnVariables = useThemeCache(
+export const threeColumnLayoutVariables = useThemeCache(
     (): IProps => {
-        const layoutVars = oneColumnVariables();
-        const Devices = fallbackSectionVariables;
+        const layoutVars = panelLayoutVariables();
+        const Devices = fallbackLayoutVariables;
 
         const makeThemeVars = variableFactory("threeColumnLayout");
 
@@ -101,7 +101,7 @@ export const threeColumnVariables = useThemeCache(
             contentSizes,
             gutter,
             panelLayoutSpacing,
-            type: SectionTypes.THREE_COLUMNS,
+            type: LayoutTypes.THREE_COLUMNS,
             Devices,
             foundationalWidths,
             panel,
@@ -117,10 +117,10 @@ export const threeColumnVariables = useThemeCache(
     },
 );
 
-export const threeColumnClasses = () => {
-    return generateSectionClasses({
-        vars: threeColumnVariables(),
+export const threeColumnLayoutClasses = () => {
+    return generatePanelLayoutClasses({
+        vars: threeColumnLayoutVariables(),
         name: "threeColumnLayout",
-        mediaQueries: mediaQueryFactory(threeColumnVariables().mediaQueries, SectionTypes.THREE_COLUMNS),
+        mediaQueries: mediaQueryFactory(threeColumnLayoutVariables().mediaQueries, LayoutTypes.THREE_COLUMNS),
     });
 };

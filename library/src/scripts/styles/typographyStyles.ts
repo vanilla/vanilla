@@ -8,7 +8,7 @@ import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { em } from "csx";
 import { styleUnit } from "@library/styles/styleUnit";
-import { oneColumnVariables } from "@library/layout/Section.variables";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { css, CSSObject } from "@emotion/css";
@@ -16,7 +16,7 @@ import { Mixins } from "@library/styles/Mixins";
 
 export const typographyClasses = useThemeCache(() => {
     const globalVars = globalVariables();
-    const mediaQueries = oneColumnVariables().mediaQueries();
+    const mediaQueries = panelLayoutVariables().mediaQueries();
 
     const sharedTitleStyle: CSSObject = {
         color: ColorsUtils.colorOut(globalVars.mainColors.fgHeading),

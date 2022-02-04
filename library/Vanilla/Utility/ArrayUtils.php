@@ -227,8 +227,7 @@ final class ArrayUtils {
         $keys = explode(self::PATH_SEPARATOR, $path);
         $search = function ($array, array $keys) use ($value, &$search) {
             $currentKey = reset($keys);
-            $isLastKey = count($keys) === 1;
-            if (self::arrayKeyExists($currentKey, $array) && !self::isArray($array[$currentKey]) && !$isLastKey) {
+            if (self::arrayKeyExists($currentKey, $array) && !self::isArray($array[$currentKey])) {
                 throw new \InvalidArgumentException(
                     "Unexpected type in path. Expected an array or array-like object."
                 );
@@ -253,36 +252,6 @@ final class ArrayUtils {
         $array = $search($array, $keys);
 
         return $array;
-    }
-
-    /**
-     * Remove a value by a dot notation string path.
-     *
-     * @param string $path
-     * @param array|ArrayAccess $array
-     */
-    public static function unsetByPath(string $path, &$array): void {
-        self::assertArray($array, __METHOD__ . "() expects argument 2 to be an array or array-like object.");
-        $arr = &$array;
-        $pieces = explode(self::PATH_SEPARATOR, $path);
-        foreach ($pieces as $i => $piece) {
-            if (!self::arrayKeyExists($piece, $arr)) {
-                // Nothing to unset.
-                return;
-            }
-
-            $isLastKey = $i === (count($pieces) - 1);
-
-            if ($isLastKey) {
-                unset($arr[$piece]);
-            } elseif (!self::isArray($arr[$piece])) {
-                throw new \InvalidArgumentException(
-                    "Unexpected type in path. Expected an array or array-like object."
-                );
-            } else {
-                $arr = &$arr[$piece];
-            }
-        }
     }
 
     /**

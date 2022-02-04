@@ -94,23 +94,6 @@ class UserModelExpandUserFragmentTest extends TestCase {
     }
 
     /**
-     * Test that empty username are replaced by 'Unknown' by UserModel::expandUsers.
-     */
-    public function testExpandUserNoUserName() {
-        $user = [
-            'name' => '',
-            'email' => 'noUserName@mail.com',
-            'Password' => 'test',
-            'HashMethod' => 'text',
-            'DateInserted' => date("Y-m-d H:i:s")
-        ];
-        $userID = (int)$this->model->SQL->insert($this->model->Name, $user);
-        $row = ['insertUser' => $userID];
-        $this->model->expandUsers($row, ['insertUser']);
-        $this->assertEquals('Unknown', $row['insertUser']['name']);
-    }
-
-    /**
      * Test UserModel->getFragmnetById method
      */
     public function testGetFragmentById() {

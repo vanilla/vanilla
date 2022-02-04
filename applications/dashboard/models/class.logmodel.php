@@ -2,22 +2,20 @@
 /**
  * Contains useful functions for cleaning up the database.
  *
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Dashboard
  * @since 2.1
  */
 
 use Garden\EventManager;
-use Garden\Events\GenericResourceEvent;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Vanilla\Community\Events\CommentEvent;
 use Vanilla\Community\Events\DiscussionEvent;
-use Vanilla\Dashboard\Events\LogPostEvent;
 use Vanilla\PrunableTrait;
-use Vanilla\Utility\ArrayUtils;
 use Vanilla\Web\Middleware\LogTransactionMiddleware;
+use Vanilla\Logger;
 
 /**
  * Handles additional logging.
@@ -149,6 +147,7 @@ class LogModel extends Gdn_Pluggable implements LoggerAwareInterface {
      *
      * @param array $where The where clause.
      * @param array $options Options for the delete.
+     * @return mixed
      */
     public function delete($where = [], $options = []) {
         $keysAreIDs = true;
@@ -223,7 +222,6 @@ class LogModel extends Gdn_Pluggable implements LoggerAwareInterface {
 
         foreach ($logs as $log) {
             $recordType = $log['RecordType'];
-            $record = false;
             if (in_array($log['Operation'], [self::TYPE_SPAM, self::TYPE_MODERATE]) && array_key_exists($recordType, $models)) {
                 /** @var Gdn_Model $model */
                 $model = $models[$recordType];
@@ -232,18 +230,6 @@ class LogModel extends Gdn_Pluggable implements LoggerAwareInterface {
 
                 // Determine if the original record, if still available, should be deleted too.
                 $record = $model->getID($recordID, DATASET_TYPE_ARRAY);
-
-                // Create a log post event here, so we can grab the record (if there is one) before it's deleted.
-                $logPostEvent = self::createLogPostEvent(
-                    $log["Operation"]."_".\Garden\Events\ResourceEvent::ACTION_DELETE,
-                    $recordType,
-                    $record != false ? $record : $log["Data"],
-                    "user",
-                    Gdn::session()->UserID,
-                    "negative",
-                    $log["RecordUserID"]
-                );
-
                 if ($record) {
                     switch ($recordType) {
                         case 'Discussion':
@@ -252,25 +238,12 @@ class LogModel extends Gdn_Pluggable implements LoggerAwareInterface {
                             }
                             break;
                     }
-
                     if ($deleteRecord) {
                         $model->deleteID($recordID, ['Log' => false]);
                     }
                 }
-            } else {
-                $logPostEvent = self::createLogPostEvent(
-                    $log["Operation"]."_".\Garden\Events\ResourceEvent::ACTION_DELETE,
-                    $recordType,
-                    $log["Data"],
-                    "user",
-                    Gdn::session()->UserID,
-                    "negative",
-                    $log["RecordUserID"],
-                    ["recordID" => false]
-                );
-            }
 
-            Gdn::eventManager()->dispatch($logPostEvent);
+            }
         }
 
         Gdn::sql()->whereIn('LogID', $logIDs)->delete('Log');
@@ -1105,21 +1078,6 @@ class LogModel extends Gdn_Pluggable implements LoggerAwareInterface {
             }
         }
 
-        if (in_array(strtolower($log["RecordType"]), ["comment", "discussion"])) {
-            $logPostEvent = LogModel::createLogPostEvent(
-                $log["Operation"]."_approve",
-                $log["RecordType"],
-                $log["Data"],
-                "user",
-                Gdn::session()->UserID,
-                "positive",
-                $log["RecordUserID"],
-                !empty($log["RecordID"]) ? [] : ["recordID" => false]
-            );
-
-            Gdn::eventManager()->dispatch($logPostEvent);
-        }
-
         $this->fireEvent('AfterRestore');
 
         if ($deleteLog) {
@@ -1164,97 +1122,5 @@ class LogModel extends Gdn_Pluggable implements LoggerAwareInterface {
         } else {
             return false;
         }
-    }
-
-    /**
-     * Create an event for logged posts.
-     *
-     * @param string $operation The log operation being carried out.
-     * @param string $recordType The type of record being logged (we currently only support comments and discussions).
-     * @param array $data The data to be dispatched in the event.
-     * @param string $source The source responsible for logging the post (either "User" or a plugin).
-     * @param int $discipliningUserID The id of the user inserting or editing the post.
-     * @param string $disciplineType The discipline type (positive or negative).
-     * @param int $disciplinedUserID The id of the disciplining user.
-     * @param array $options Array of options.
-     * @return LogPostEvent
-     */
-    public static function createLogPostEvent(
-        string $operation,
-        string $recordType,
-        array  $data,
-        string $source,
-        int $discipliningUserID,
-        string $disciplineType,
-        int $disciplinedUserID = null,
-        array  $options = []
-    ): LogPostEvent {
-        $discipliningUser = Gdn::userModel()->getFragmentByID($discipliningUserID);
-        $disciplinedUser = Gdn::userModel()->getFragmentByID($disciplinedUserID ?? -1, true);
-        $hasRecordID = (!isset($options["recordID"]) || $options["recordID"] !== false);
-
-        $resourceEvent = null;
-
-        switch (strtolower($recordType)) {
-            case "comment":
-                if ($hasRecordID) {
-                    $commentModel = CommentModel::instance();
-                    $payloadData = $commentModel->getID($data["CommentID"] ?? $data["RecordID"], DATASET_TYPE_ARRAY);
-                    if ($payloadData !== false) {
-                        $resourceEvent = $commentModel->eventFromRow($payloadData, "log{$operation}");
-                    }
-                }
-                if (!isset($resourceEvent)) {
-                    $payloadData = self::normalizeLogPostDataWithNoRecordID($recordType, $data);
-                    $resourceEvent = new CommentEvent("log{$operation}", $payloadData);
-                }
-                break;
-            case "discussion":
-                if ($hasRecordID) {
-                    $discussionModel = DiscussionModel::instance();
-                    $payloadData = $discussionModel->getID($data["DiscussionID"] ?? $data["RecordID"], DATASET_TYPE_ARRAY);
-                    if ($payloadData !== false) {
-                        $resourceEvent = $discussionModel->eventFromRow($payloadData, "log{$operation}");
-                    }
-                }
-
-                if (!isset($resourceEvent)) {
-                    $payloadData = self::normalizeLogPostDataWithNoRecordID($recordType, $data);
-                    $resourceEvent = new DiscussionEvent("log{$operation}", $payloadData);
-                }
-                break;
-            default:
-                $resourceEvent = new GenericResourceEvent(
-                    $operation,
-                    [$recordType => $data],
-                    $discipliningUser
-                );
-                $resourceEvent->setType($recordType);
-                break;
-        }
-        return new LogPostEvent($resourceEvent, $source, $discipliningUser, $disciplinedUser, $disciplineType, $options);
-    }
-
-    /**
-     * Normalize data for LogPostEvents.
-     *
-     * @param string $recordType
-     * @param array $data
-     * @return array
-     */
-    public static function normalizeLogPostDataWithNoRecordID(string $recordType, array $data): array {
-        $data = ArrayUtils::camelCase($data);
-
-        $data["recordType"] = strtolower($recordType);
-
-        if (isset($data["categoryID"])) {
-            $data["categoryID"] = (int) $data["categoryID"];
-        }
-
-        if (isset($data["discussionID"])) {
-            $data["discussionID"] = (int) $data["discussionID"];
-        }
-
-        return [strtolower($recordType) => $data];
     }
 }

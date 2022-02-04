@@ -410,4 +410,11 @@ class FlaggingPlugin extends Gdn_Plugin {
             removeFromConfig('EnabledPlugins.Flagging');
         }
     }
+
+    /**
+     * Runs the structure function when the plugin is turned on.
+     */
+    public function setup() {
+        $this->structure();
+    }
 }

@@ -10,13 +10,13 @@ import {
     homeWidgetContainerClasses,
     homeWidgetContainerVariables,
     IHomeWidgetContainerOptions,
-    WidgetContainerDisplayType,
 } from "@library/homeWidget/HomeWidgetContainer.styles";
 import Container from "@library/layout/components/Container";
 import { PageHeadingBox } from "@library/layout/PageHeadingBox";
-import { useWidgetSectionClasses } from "@library/layout/WidgetLayout.context";
+import { useWidgetLayoutClasses } from "@library/layout/WidgetLayout.context";
 import { navLinksClasses } from "@library/navigation/navLinksStyles";
 import LinkAsButton from "@library/routing/LinkAsButton";
+import { BorderType } from "@library/styles/styleHelpers";
 import { Variables } from "@library/styles/Variables";
 import { t } from "@vanilla/i18n";
 import { useMeasure } from "@vanilla/react-utils";
@@ -29,25 +29,24 @@ export interface IHomeWidgetContainerProps {
     title?: string;
     subtitle?: string;
     description?: string;
-    titleCount?: string;
-    contentIsListWithSeparators?: boolean;
 }
 
 export function HomeWidgetContainer(props: IHomeWidgetContainerProps) {
     const vars = homeWidgetContainerVariables(props.options);
     const { options } = vars;
     const classes = homeWidgetContainerClasses(props.options);
-    const widgetClasses = useWidgetSectionClasses();
+    const { isGrid, isCarousel } = options;
+    const widgetClasses = useWidgetLayoutClasses();
 
     let content = props.children;
-    if (options.displayType === WidgetContainerDisplayType.CAROUSEL) {
+    if (isGrid) {
+        content = <HomeWidgetGridContainer {...props}>{props.children}</HomeWidgetGridContainer>;
+    } else if (isCarousel) {
         content = (
             <Carousel maxSlidesToShow={options.maxColumnCount} carouselTitle={props.title}>
                 {props.children}
             </Carousel>
         );
-    } else if (options.displayType) {
-        content = <HomeWidgetGridContainer {...props}>{props.children}</HomeWidgetGridContainer>;
     }
 
     let viewAllLinkOrButton: ReactNode;
@@ -103,7 +102,6 @@ export function HomeWidgetContainer(props: IHomeWidgetContainerProps) {
                                 subtitleType: options.subtitle.type,
                                 alignment: options.headerAlignment,
                             }}
-                            titleCount={props.titleCount}
                         />
                         <div className={classes.content}>
                             <div className={classes.itemWrapper}>{content}</div>
@@ -119,10 +117,8 @@ export function HomeWidgetContainer(props: IHomeWidgetContainerProps) {
 }
 
 export function HomeWidgetGridContainer(props: IHomeWidgetContainerProps) {
-    const classes = homeWidgetContainerClasses({
-        ...props.options,
-        contentIsListWithSeparators: props.contentIsListWithSeparators,
-    });
+    const classes = homeWidgetContainerClasses(props.options);
+
     const firstItemRef = useRef<HTMLDivElement | null>(null);
     const firstItemMeasure = useMeasure(firstItemRef);
 

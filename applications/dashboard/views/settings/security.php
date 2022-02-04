@@ -21,8 +21,8 @@ echo $form->errors();
                     <p>
                     <?php
                     echo t(
-                        'You can specify a allow list of trusted domains.',
-                        'You can specify a allow list of trusted domains (ex. yourdomain.com) that are safe for redirects and embedding.'
+                        'You can specify a whitelist of trusted domains.',
+                        'You can specify a whitelist of trusted domains (ex. yourdomain.com) that are safe for redirects and embedding.'
                     );
                     ?>
                     </p>
@@ -40,8 +40,8 @@ echo $form->errors();
                     <p>
                         <?php
                         echo t(
-                            'You can specify an allow list of trusted domains. (CSP)',
-                            'You can specify an allow list of trusted domains (ex. yourdomain.com) that are safe to load javascript from.'
+                            'You can specify a whitelist of trusted domains. (CSP)',
+                            'You can specify a whitelist of trusted domains (ex. yourdomain.com) that are safe to load javascript from.'
                         );
                         ?>
                     </p>

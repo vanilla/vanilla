@@ -512,21 +512,6 @@ class IgnorePlugin extends Gdn_Plugin {
     }
 
     /**
-     * Check whether the activity user is on the notify user's ignore list and indicate that the notification
-     * should be skipped.
-     *
-     * @param ActivityModel $sender
-     * @param array $args
-     */
-    public function activityModel_beforeSave_handler($sender, $args) {
-        $activity = $args["Activity"];
-        if ($this->ignored($activity["ActivityUserID"], $activity["NotifyUserID"])) {
-            $args["Activity"]["Skip"] = true;
-            $args["Handled"] = true;
-        }
-    }
-
-    /**
      * Filter out users that are ignored by the active user.
      *
      * @param ActivityModel $sender
@@ -575,31 +560,33 @@ class IgnorePlugin extends Gdn_Plugin {
     }
 
     /**
-     * Determine whether a user has been ignored.
+     * Whether or not a user has been ignored.
      *
-     * @param int|null $userID ID of potential ignored user.
-     * When omitted/null, applies to all users ignored by the user identified by $sessionUserID
-     * @param int|null $sessionUserID ID of user for whom to check whether that user is ignoring other users.
-     * When omitted/null, uses the current sessioned user's ID.
-     * @return array|bool|null If both userID and sessionUserID are specified,
-     * returns true if userID ignored by sessionUserID, false otherwise.
-     * If userID set null, returns an array of blocked users if any users are currently ignored by sessioned user
+     * @param int|null $userID
+     * @param int|null $sessionUserID
+     * @return array|bool|null
      */
     public function ignored($userID = null, $sessionUserID = null) {
+        static $blockedUsers = null;
 
         if (is_null($sessionUserID)) {
             $sessionUserID = Gdn::session()->UserID;
         }
 
-        $blockedUsers = $this->getUserMeta($sessionUserID, 'Blocked.User.%');
+        if (is_null($blockedUsers)) {
+            $blockedUsers = $this->getUserMeta($sessionUserID, 'Blocked.User.%');
+        }
 
         if (is_null($userID)) {
             return $blockedUsers;
         }
 
         $blockKey = $this->makeMetaKey("Blocked.User.{$userID}");
+        if (array_key_exists($blockKey, $blockedUsers)) {
+            return true;
+        }
 
-        return array_key_exists($blockKey, $blockedUsers);
+        return false;
     }
 
     /**

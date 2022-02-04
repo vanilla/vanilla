@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GNU GPLv2 http://www.opensource.org/licenses/gpl-2.0.php
  */
 
@@ -14,6 +14,7 @@ use Vanilla\Dashboard\Models\RecordStatusModel;
 use Vanilla\Formatting\DateTimeFormatter;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Forum\Modules\QnAWidgetModule;
+use Vanilla\Models\LegacyModelUtils;
 use Vanilla\QnA\Models\AnswerSearchType;
 use Vanilla\QnA\Models\QnAJsonLD;
 use Vanilla\QnA\Models\QuestionSearchType;
@@ -150,6 +151,8 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
      * Run once on enable.
      */
     public function setup() {
+        $this->structure();
+
         \Gdn::config()->touch('QnA.Points.Enabled', false);
         \Gdn::config()->touch('QnA.Points.Answer', 1);
         \Gdn::config()->touch('QnA.Points.AcceptedAnswer', 1);
@@ -527,9 +530,8 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
         }
 
         // Check permissions.
-        $canAccept = Gdn::session()->UserID == val('InsertUserID', $discussion) && !$discussion->Closed;
-        $canAccept |= Gdn::session()->checkRankedPermission('Garden.Moderation.Manage');
-
+        $canAccept = Gdn::session()->checkRankedPermission('Garden.Curation.Manage');
+        $canAccept |= Gdn::session()->UserID == val('InsertUserID', $discussion);
 
         if (!$canAccept) {
             return;
@@ -988,19 +990,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
         $sender->setData('_PagerUrl', 'discussions/unanswered/{Page}');
 
         // Be sure to display every unanswered question (ie from groups)
-        $categories = [];
-        $visibleCategoryIDs = $this->categoryModel->getVisibleCategoryIDs(
-            [
-                'forceArrayReturn' => true,
-                'filterHideDiscussions' => true,
-                'filterArchivedCategories' => true
-            ]
-        );
-        $unindexedCategories = $this->categoryModel->getWhere(['CategoryID' => $visibleCategoryIDs])->resultArray();
-        // CategoryIDs should be used as the records key index.
-        foreach ($unindexedCategories as $unindexedCategory) {
-            $categories[$unindexedCategory['CategoryID']] = $unindexedCategory;
-        }
+        $categories = CategoryModel::categories();
 
         $this->EventArguments['Categories'] = &$categories;
         $this->fireEvent('UnansweredBeforeSetCategories');
@@ -1287,6 +1277,13 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
             $sender->title(t('Ask a Question'));
             $sender->setData('Breadcrumbs', [['Name' => $sender->data('Title'), 'Url' => '/post/question']]);
         }
+    }
+
+    /**
+     * Add 'New Question Form' location to Messages.
+     */
+    public function messageController_afterGetLocationData_handler($sender, $args) {
+        $args['ControllerData']['Vanilla/Post/Question'] = t('New Question Form');
     }
 
     /**
@@ -1596,10 +1593,6 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.Edit', $discussion['CategoryID']);
         }
 
-        if ($discussion["Closed"]) {
-            $sender->permission("Garden.Moderation.Manage");
-        }
-
         // Body is a required field in CommentModel::save.
         if (!array_key_exists('Body', $data)) {
             $data['Body'] = $comment['Body'];
@@ -1824,9 +1817,9 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
     private function sendNotificationEmails(array $discussion, string $userEmail) {
         $email = Gdn::getContainer()->get(Gdn_Email::class);
         $discussionUrl = $discussion['Url'];
-        $message = t('QnAFollowUp.Email.Message', "<p>We noticed you have at least one answer to your question."
-            . " Can you visit the community and see if any of the answers resolve your question?</p>"
-            . "<p>If you see an answer you find helpful, please accept one of the answers.</p>");
+        $message = t('QnAFollowUp.Email.Message', "<p>We noticed you have at least one answer to your question.");
+        $message .= ' Can you visit the community and see if any of the answers resolve your question?</p>';
+        $message .= '<p>If you see an answer you find helpful, please accept one of the answers.</p>';
         $url = externalUrl($discussionUrl);
         $emailTemplate = $email->getEmailTemplate()
             ->setButton($url, t('Check it out'));

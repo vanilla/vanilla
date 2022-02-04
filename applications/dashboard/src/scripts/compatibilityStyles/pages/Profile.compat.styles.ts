@@ -14,7 +14,7 @@ import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { important, percent } from "csx";
 import { MixinsFoundation } from "@library/styles/MixinsFoundation";
 import { profileVariables, ProfilePhotoAlignment } from "@dashboard/compatibilityStyles/pages/Profile.variables";
-import { oneColumnVariables } from "@library/layout/Section.variables";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { metasVariables } from "@library/metas/Metas.variables";
 import { injectGlobal } from "@emotion/css";
 
@@ -57,7 +57,7 @@ export const profileCompatCSS = () => {
         {
             width: percent(20),
         },
-        oneColumnVariables().mediaQueries().xs({
+        panelLayoutVariables().mediaQueries().xs({
             width: "100%",
             display: "block",
             paddingLeft: 0,
@@ -70,7 +70,7 @@ export const profileCompatCSS = () => {
             width: "calc(80% - 16px)",
             paddingLeft: 16,
         },
-        oneColumnVariables().mediaQueries().oneColumnDown({
+        panelLayoutVariables().mediaQueries().oneColumnDown({
             width: "100%",
             display: "block",
             paddingLeft: 0,

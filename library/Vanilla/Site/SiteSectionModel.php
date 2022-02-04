@@ -158,12 +158,12 @@ class SiteSectionModel implements SiteSectionChildIDProviderInterface {
     }
 
     /**
-     * Get a site section by from its ID.
+     * Get a site section by from it's ID.
      *
      * @param string $siteSectionID
-     * @return SiteSectionInterface|null
+     * @return mixed|SiteSectionInterface|null
      */
-    public function getByID(string $siteSectionID): ?SiteSectionInterface {
+    public function getForSectionID(string $siteSectionID) {
         foreach ($this->getAll() as $siteSection) {
             if ($siteSection->getSectionID() === $siteSectionID) {
                 return $siteSection;

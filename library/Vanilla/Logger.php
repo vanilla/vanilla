@@ -10,8 +10,6 @@ namespace Vanilla;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 use Psr\Log\LogLevel;
-use Vanilla\Logging\ErrorLogger;
-use Vanilla\Logging\LogDecorator;
 
 /**
  * A logger that can contain many loggers.
@@ -23,25 +21,15 @@ use Vanilla\Logging\LogDecorator;
 class Logger implements LoggerInterface {
     use LoggerTrait;
 
-    public const FIELD_TAGS = 'tags';
     public const FIELD_EVENT = 'event';
     public const FIELD_CHANNEL = 'channel';
     public const FIELD_TARGET_USERID = 'targetUserID';
     public const FIELD_TARGET_USERNAME = 'targetName';
-    public const FIELD_USERID = 'userID';
+    public const FIELD_USERID = 'userid';
     public const FIELD_USERNAME = 'username';
+
     public const FIELD_TARGET_EVENTID = 'targetEventId';
     public const FIELD_ATTENDING = 'attending';
-
-    public const FIELDS = [
-        self::FIELD_TAGS,
-        self::FIELD_EVENT,
-        self::FIELD_CHANNEL,
-        self::FIELD_TARGET_USERID,
-        self::FIELD_TARGET_USERNAME,
-        self::FIELD_USERID,
-        self::FIELD_USERNAME,
-    ];
 
     public const CHANNEL_ADMIN = 'admin';
     public const CHANNEL_APPLICATION = 'application';
@@ -86,36 +74,6 @@ class Logger implements LoggerInterface {
      * @var array An array of loggers and levels.
      */
     private $loggers = [];
-
-    /**
-     * Extract core logger fields to the top level of a context and stick the rest in data.
-     *
-     * @param array $context The context.
-     *
-     * @return array The hoisted data.
-     */
-    public static function hoistLoggerFields(array $context): array {
-        $extracted = [];
-        foreach (self::FIELDS as $FIELD) {
-            $extracted[$FIELD] = $context[$FIELD] ?? null;
-            unset($context[$FIELD]);
-        }
-
-        if ($extracted[self::FIELD_TAGS] === null) {
-            $extracted[self::FIELD_TAGS] = [];
-        }
-
-        $event = $extracted[Logger::FIELD_EVENT] ?? null;
-        if ($event !== null) {
-            $eventTokens = explode('_', $extracted[Logger::FIELD_EVENT]);
-            if ($eventTokens !== false) {
-                $extracted[self::FIELD_TAGS] = array_merge($eventTokens, $extracted[self::FIELD_TAGS]);
-            }
-        }
-        $extracted['data'] = $context;
-
-        return $extracted;
-    }
 
     /**
      * Get the numeric priority for a log level.
@@ -221,12 +179,10 @@ class Logger implements LoggerInterface {
         }
         $inCall = true;
 
-        // Try to decorate the context.
-        $context = LogDecorator::applyLogDecorator($context);
-
         foreach ($this->loggers as $row) {
             /* @var LoggerInterface $logger */
             [$logger, $loggerPriority, $filter] = $row;
+
             if ($loggerPriority >= $levelPriority) {
                 try {
                     if ($filter === null || call_user_func($filter, $level, $message, $context)) {
@@ -237,11 +193,6 @@ class Logger implements LoggerInterface {
                     throw $ex;
                 }
             }
-        }
-
-        // Go the error logger as well if this is an error.
-        if (LOG_WARNING >= $levelPriority) {
-            ErrorLogger::log($level, $message, [], $context);
         }
 
         $inCall = false;

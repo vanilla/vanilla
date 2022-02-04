@@ -285,32 +285,6 @@ class ConversationsTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Test that output of "body" field is sanitized when user posts a conversation message containing an XSS vector.
-     */
-    public function testXssBodySanitized(): void {
-        $xssVector = '"><<iframe/><iframe src=javascript:alert(document.domain)></iframe>';
-
-        // Create a conversation.
-        $conversation = $this->testPost();
-        $this->api()->setUserID($conversation["participants"][0]["userID"]);
-
-        // Post a message with XSS in the body.
-        $this->api()->post("/messages", [
-            "body" => '"><<iframe/><iframe src=javascript:alert(document.domain)></iframe>',
-            "conversationID" => $conversation["conversationID"],
-            "format" => "markdown",
-        ]);
-
-        // Retrieve the conversation.
-        $this->api()->setUserID($conversation["participants"][1]["userID"]);
-        $updatedConversation = $this->api()->get($this->baseUrl)->getBody()[0];
-
-        // Make sure the body has been formatted to remove the XSS.
-        $this->assertStringContainsString("\"&gt;&lt;", $updatedConversation["body"]);
-        $this->assertStringNotContainsString($updatedConversation["body"], $xssVector);
-    }
-
-    /**
      * Expect exceptions if conversation moderation isn't allowed.
      */
     private function expectModerationException(): void {

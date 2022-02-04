@@ -10,7 +10,7 @@ import { styleUnit } from "@library/styles/styleUnit";
 import { useThemeCache } from "@library/styles/themeCache";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
-import { oneColumnVariables } from "@library/layout/Section.variables";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { css } from "@emotion/css";
 import { Mixins } from "@library/styles/Mixins";
 
@@ -19,7 +19,7 @@ export const meBoxClasses = useThemeCache(() => {
     const formVars = formElementsVariables();
     const titleBarVars = titleBarVariables();
     const debug = debugHelper("meBox");
-    const mediaQueries = oneColumnVariables().mediaQueries();
+    const mediaQueries = panelLayoutVariables().mediaQueries();
     const flex = flexHelper();
 
     const root = css(

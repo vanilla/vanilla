@@ -8,23 +8,18 @@
 namespace VanillaTests\Library\Vanilla\Models;
 
 use PHPUnit\Framework\TestCase;
-use Vanilla\CurrentTimeStamp;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\Models\FullRecordCacheModel;
 use Vanilla\Models\Model;
 use Vanilla\Models\ModelCache;
 use Vanilla\Models\PipelineModel;
-use VanillaTests\Fixtures\TestCache;
-use VanillaTests\SchedulerTestTrait;
-use VanillaTests\SiteTestCase;
 use VanillaTests\SiteTestTrait;
 
 /**
  * Tests for the `Model` class.
  */
-class ModelCacheTest extends SiteTestCase {
-
-    use SchedulerTestTrait;
+class ModelCacheTest extends TestCase {
+    use SiteTestTrait;
 
     /**
      * @var PipelineModel
@@ -37,24 +32,34 @@ class ModelCacheTest extends SiteTestCase {
     private $modelCache;
 
     /**
-     * @inheritDoc
+     * Install the site and set up a test table.
      */
-    public function setUp(): void {
-        parent::setUp();
-        $this->container()->call(function (
-            \Gdn_DatabaseStructure $st,
-            \Gdn_SQLDriver $sql
+    public static function setupBeforeClass(): void {
+        static::setupBeforeClassSiteTestTrait();
+
+        static::container()->call(function (
+            \Gdn_DatabaseStructure $st
         ) {
             $st->table('model')
                 ->primaryKey('modelID')
                 ->column('name', 'varchar(50)')
                 ->set()
             ;
+        });
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setUp(): void {
+        $this->container()->call(function (
+            \Gdn_SQLDriver $sql
+        ) {
             $sql->truncate('model');
         });
 
         $this->model = $this->container()->getArgs(PipelineModel::class, ['model']);
-        $this->modelCache = new ModelCache($this->model->getTable(), new TestCache());
+        $this->modelCache = new ModelCache($this->model->getTable(), new \Gdn_Dirtycache());
     }
 
     /**
@@ -121,7 +126,7 @@ class ModelCacheTest extends SiteTestCase {
      */
     public function testFullRecordCacheModelInvalidation() {
         /** @var FullRecordCacheModel $model */
-        $model = $this->container()->getArgs(FullRecordCacheModel::class, ['model', new TestCache()]);
+        $model = $this->container()->getArgs(FullRecordCacheModel::class, ['model', new \Gdn_Dirtycache()]);
         $this->model = $model;
 
         $fooID = $this->insertOne('foo');
@@ -161,7 +166,7 @@ class ModelCacheTest extends SiteTestCase {
         $this->runWithConfig([
             'Feature.'.ModelCache::DISABLE_FEATURE_FLAG.'.Enabled' => true,
         ], function () {
-            $mockCache = $this->createMock(TestCache::class);
+            $mockCache = $this->createMock(\Gdn_Dirtycache::class);
             $mockCache
                 ->expects($this->never())
                 ->method($this->anything());
@@ -180,82 +185,5 @@ class ModelCacheTest extends SiteTestCase {
     private function insertOne(string $name = 'foo'): int {
         $id = $this->model->insert(['name' => $name]);
         return $id;
-    }
-
-    /**
-     * Test that our cache hydration can be deferred into the scheduler.
-     */
-    public function testDeferredCacheHydration() {
-        $this->getScheduler()->pause();
-        $hydrateCount = 0;
-
-        $getDeferred = function () use (&$hydrateCount) {
-            return $this->modelCache->getCachedOrHydrate(['myKey'], function () use (&$hydrateCount) {
-                $hydrateCount++;
-                return 'hydrated';
-            }, [
-                ModelCache::OPT_DEFAULT => 'default',
-                ModelCache::OPT_SCHEDULER => $this->getScheduler(),
-            ]);
-        };
-
-        $result = $getDeferred();
-        $this->assertEquals('default', $result, "The default value is set.");
-        $getDeferred();
-        $getDeferred();
-        $getDeferred();
-        $this->assertEquals(0, $hydrateCount, "Hydrate should not have been called yet.");
-
-        // Execute the generation of the cache value.
-        $this->getScheduler()->resume();
-        $result = $getDeferred();
-        $this->assertEquals('hydrated', $result);
-        $getDeferred();
-        $this->assertEquals(1, $hydrateCount);
-    }
-
-    /**
-     * Test that a cache key is deleted if scheduled hydration is run after reschedule threshold time limit is exceeded.
-     */
-    public function testDeleteCacheKeyAfterThreshold() {
-        $cache = new TestCache();
-        $modelCache = new ModelCache('test-timeout', $cache);
-        $scheduler = $this->getScheduler();
-
-        $countHydrated = 0;
-
-        $getDeferred = function () use ($modelCache, $scheduler, &$countHydrated) {
-            return $modelCache->getCachedOrHydrate(['myKey'], function () use (&$countHydrated) {
-                $countHydrated++;
-                return 'hydrated';
-            }, [
-                ModelCache::OPT_DEFAULT => 'default',
-                ModelCache::OPT_SCHEDULER => $scheduler,
-            ]);
-        };
-
-        $this->getScheduler()->pause();
-        $time = CurrentTimeStamp::mockTime("1980-06-17");
-        $result = $getDeferred();
-        $this->assertEquals('default', $result);
-        $this->assertEquals(0, $countHydrated);
-
-        // More than 30 seconds pass and we do not hydrate and clear that cache key.
-        $time = CurrentTimeStamp::mockTime($time->modify('+31 seconds'));
-        $this->getScheduler()->resume();
-        $this->assertEquals(0, $countHydrated);
-
-        // Right at the threshold, it will hydrate this time.
-        $this->getScheduler()->pause();
-        $result = $getDeferred();
-        $this->assertEquals('default', $result);
-        $this->assertEquals(0, $countHydrated);
-
-        // Move the time past the threshold.
-        CurrentTimeStamp::mockTime($time->modify('+30 seconds'));
-        $this->getScheduler()->resume();
-        $result = $getDeferred();
-        $this->assertEquals('hydrated', $result);
-        $this->assertEquals(1, $countHydrated);
     }
 }

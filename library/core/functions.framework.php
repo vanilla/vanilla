@@ -11,7 +11,6 @@ use Garden\Web\Redirect;
 use Vanilla\Logging\TraceCollector;
 use Vanilla\Models\TrustedDomainModel;
 use Vanilla\Theme\ThemeService;
-use Vanilla\Utility\DebugUtils;
 use Vanilla\Web\Asset\DeploymentCacheBuster;
 use Vanilla\Web\CacheControlConstantsInterface;
 use Vanilla\Web\CacheControlMiddleware;
@@ -991,7 +990,7 @@ if (!function_exists('isTrustedDomain')) {
     function isTrustedDomain($url) {
         static $trusted = null;
 
-        if (DebugUtils::isTestMode()) {
+        if (defined('TESTMODE_ENABLED') && constant('TESTMODE_ENABLED')) {
             $trusted = null;
         }
 
@@ -1302,7 +1301,7 @@ if (!function_exists('redirectTo')) {
         // This would cause http://evil.domain\@trusted.domain/ to be converted to http://evil.domain/@trusted.domain/
         $url = str_replace('\\', '%5c', $url);
 
-        if (DebugUtils::isTestMode()) {
+        if (defined('TESTMODE_ENABLED') && TESTMODE_ENABLED) {
             throw new ResponseException(new Redirect($url, $statusCode));
         }
 
@@ -1581,9 +1580,6 @@ if (!function_exists('trace')) {
      * @return array|void Returns the array of traces.
      */
     function trace($value = null, $type = TRACE_INFO) {
-        if (!debug()) {
-            return [];
-        }
         $traceCollector = \Gdn::getContainer()->get(TraceCollector::class);
 
         if ($value === null) {

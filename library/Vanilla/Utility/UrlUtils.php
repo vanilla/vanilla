@@ -15,54 +15,26 @@ use Psr\Http\Message\UriInterface;
 class UrlUtils {
     /**
      * Transform any unicode characters in the domain of a well-formed URL per IDNA encoding.
-     * Note that the terminology used here for "domain" is more accurately represented as the URL's authority,
-     * i.e. <code>userinfo[at]host:port</code>
      *
-     * @link https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#Syntax URI syntax
-     * @link https://en.wikipedia.org/wiki/IDN_homograph_attack IDN homograph attack
-     * @link http://homoglyphs.net Homoglyph generator
-     * @link https://www.charset.org/punycode Punycode converter
-     *
-     * @param string $url The URL to convert.
+     * @param string $url The domain name to convert.
      * @throws InvalidArgumentException If the host cannot be retrieved from the URL.
-     * @throws InvalidArgumentException Error performing IDN translation of any component within authority.
-     * @return string Returns an absolute, well-formed URL with IDN translation on the authority.
+     * @throws InvalidargumentException If there was an error performing IDN translation of the domain.
+     * @return string Returns an absolute, well-formed URL with IDN translation on the domain.
      */
     public static function domainAsAscii(string $url): ?string {
         $parsedLink = parse_url($url);
-        if ($parsedLink === false) {
-            throw new InvalidArgumentException('Url Invalid.');
-        }
         if (!array_key_exists('host', $parsedLink)) {
             $parsedLink = parse_url('http://'.$url);
             if (!array_key_exists('host', $parsedLink)) {
+                // @codeCoverageIgnoreStart
                 throw new InvalidArgumentException('Url Invalid.');
+                // @codeCoverageIgnoreEnd
             }
         }
-        if (empty(trim(urldecode($parsedLink['host'])))) {
-            throw new InvalidArgumentException('Url Invalid.');
+        $parsedLink['host'] = idn_to_ascii($parsedLink['host'], IDNA_NONTRANSITIONAL_TO_ASCII, INTL_IDNA_VARIANT_UTS46, $idnaInfo);
+        if ($idnaInfo['errors'] !== 0) {
+            throw new InvalidArgumentException('Domain Invalid.');
         }
-
-        // Include the userinfo portion of the authority in the IDN to ASCII translation
-        // to avoid obscuring content in the URL intended potentially to mislead observers
-        // as to what the URL's host actually is based on the position of the userinfo
-        // before the host within the URL.
-        // See: https://datatracker.ietf.org/doc/html/rfc3986#section-3.2
-        foreach (['host' => 'Domain', 'user' => 'Username', 'pass' => 'Password'] as $index => $name) {
-            if (!empty($parsedLink[$index])) {
-                $idnaInfo = [];
-                $parsedLink[$index] = idn_to_ascii(
-                    $parsedLink[$index],
-                    IDNA_NONTRANSITIONAL_TO_ASCII,
-                    INTL_IDNA_VARIANT_UTS46,
-                    $idnaInfo
-                );
-                if ($idnaInfo['errors'] !== 0) {
-                    throw new InvalidArgumentException("{$name} Invalid.");
-                }
-            }
-        }
-
         $buildUrl = http_build_url($parsedLink);
         return $buildUrl;
     }

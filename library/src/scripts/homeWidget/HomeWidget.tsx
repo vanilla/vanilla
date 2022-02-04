@@ -13,49 +13,29 @@ import {
     IHomeWidgetContainerOptions,
     homeWidgetContainerVariables,
     homeWidgetContainerClasses,
-    WidgetContainerDisplayType,
 } from "@library/homeWidget/HomeWidgetContainer.styles";
 import { IHomeWidgetItemProps, HomeWidgetItem } from "@library/homeWidget/HomeWidgetItem";
 import { HomeWidgetContainer } from "@library/homeWidget/HomeWidgetContainer";
 import { DeepPartial } from "redux";
-import { BorderType } from "@library/styles/styleHelpersBorders";
 
-export interface IWidgetCommonProps {
-    /** The title of the widget */
-    title?: string;
-    /** The subtitle of the widget */
-    subtitle?: string;
-    /** Text describing the widget */
-    description?: string;
-}
-interface IProps extends IWidgetCommonProps {
+interface IProps {
     // Options
     containerOptions?: IHomeWidgetContainerOptions;
     itemOptions?: DeepPartial<IHomeWidgetItemOptions>;
     maxItemCount?: number;
 
     // Content
+    title?: string;
+    subtitle?: string;
+    description?: string;
     itemData: IHomeWidgetItemProps[];
 }
 
 export function HomeWidget(props: IProps) {
     const itemOptions = homeWidgetItemVariables(props.itemOptions).options;
-    const containerOptionsWithDefaults = {
-        ...props.containerOptions,
-        isGrid:
-            !props.containerOptions?.isCarousel &&
-            (!props.containerOptions?.displayType ||
-                props.containerOptions?.displayType === WidgetContainerDisplayType.GRID),
-        maxColumnCount:
-            props.containerOptions?.displayType === WidgetContainerDisplayType.LIST
-                ? 1
-                : props.containerOptions?.maxColumnCount,
-    };
+    const containerOptionsWithDefaults = { ...props.containerOptions, isGrid: !props.containerOptions?.isCarousel };
     const containerOptions = homeWidgetContainerVariables(containerOptionsWithDefaults).options;
     const containerClasses = homeWidgetContainerClasses(props.containerOptions);
-    const contentIsListWithSeparators =
-        containerOptions.displayType === WidgetContainerDisplayType.LIST &&
-        itemOptions.box.borderType === BorderType.SEPARATOR;
 
     let items = props.itemData;
 
@@ -72,8 +52,7 @@ export function HomeWidget(props: IProps) {
             HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
         ].includes(itemOptions.contentType) &&
         props.itemData.length < containerOptions.maxColumnCount &&
-        !containerOptions.isCarousel &&
-        containerOptions.displayType !== WidgetContainerDisplayType.CAROUSEL
+        !containerOptions.isCarousel
     ) {
         extraSpacerItemCount = containerOptions.maxColumnCount - props.itemData.length;
     }
@@ -84,7 +63,6 @@ export function HomeWidget(props: IProps) {
             description={props.description}
             options={containerOptionsWithDefaults}
             title={props.title}
-            contentIsListWithSeparators={contentIsListWithSeparators}
         >
             {items.map((item, i) => {
                 return <HomeWidgetItem key={i} {...item} options={props.itemOptions} />;

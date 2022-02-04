@@ -5,13 +5,13 @@
 
 import classNames from "classnames";
 import React from "react";
-import { useSection, withSection } from "@library/layout/LayoutContext";
+import { useLayout, withLayout } from "@library/layout/LayoutContext";
 import { ILayoutContainer } from "@library/layout/components/interface.layoutContainer";
 import { panelAreaClasses } from "@library/layout/panelAreaStyles";
 
 export function PanelArea(props: ILayoutContainer) {
     const Tag = (props.tag as "div") || "div";
-    const classes = panelAreaClasses(useSection().mediaQueries);
+    const classes = panelAreaClasses(useLayout().mediaQueries);
     return (
         <Tag ref={props.innerRef} className={classNames(classes.root, props.className)}>
             {props.children}
@@ -19,4 +19,4 @@ export function PanelArea(props: ILayoutContainer) {
     );
 }
 
-export default withSection(PanelArea);
+export default withLayout(PanelArea);

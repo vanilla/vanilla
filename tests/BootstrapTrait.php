@@ -18,13 +18,11 @@ use Vanilla\FeatureFlagHelper;
 use Vanilla\Utility\StringUtils;
 use VanillaTests\APIv0\TestDispatcher;
 use VanillaTests\Fixtures\Html\TestHtmlDocument;
-use VanillaTests\Fixtures\NullCache;
 use VanillaTests\Fixtures\TestCache;
 use Webmozart\Assert\Assert;
 
 trait BootstrapTrait {
     use PrivateAccessTrait;
-    use TestLoggerTrait;
 
     /** @var Bootstrap */
     private static $bootstrap;
@@ -42,9 +40,6 @@ trait BootstrapTrait {
 
     /** @var string */
     protected $controllerRawOutput;
-
-    /** @var TestCache|null */
-    protected static $testCache;
 
     /**
      * Bootstrap the site.
@@ -76,10 +71,11 @@ trait BootstrapTrait {
         \Gdn::setController(null);
         StaticCache::clear();
 
-        $this->setUpLoggerTrait();
+        $logger = $this->getTestLogger();
+        $logger->clear();
+
         self::$emails = [];
         \Gdn_Form::resetIDs();
-        \Gdn_Controller::setIsReauthenticated(false);
     }
 
     /**
@@ -178,6 +174,40 @@ trait BootstrapTrait {
     }
 
     /**
+     * Assert that something was logged.
+     *
+     * @param array $filter The log filter.
+     * @return array Return the first log entry found.
+     */
+    public function assertLog($filter = []): array {
+        $logger = $this->getTestLogger();
+        $item = $logger->search($filter);
+        $this->assertNotNull($item, "Could not find expected log: ".json_encode($filter));
+        return $item;
+    }
+
+    /**
+     * Assert that something was NOT logged.
+     *
+     * @param array $filter The log filter.
+     */
+    public function assertNoLog($filter = []) {
+        $logger = $this->getTestLogger();
+        $item = $logger->search($filter);
+        $this->assertNull($item, "Unexpected log found: ".json_encode($filter));
+    }
+
+    /**
+     * Assert that the log has a message.
+     *
+     * @param string $message
+     */
+    public function assertLogMessage(string $message) {
+        $logger = $this->getTestLogger();
+        $this->assertTrue($logger->hasMessage($message), "The log doesn't have the message: ".$message);
+    }
+
+    /**
      * Run a callback with the following config and restore the config after.
      *
      * @param array $config The config to set.
@@ -214,6 +244,15 @@ trait BootstrapTrait {
     }
 
     /**
+     * @return TestLogger
+     */
+    protected static function getTestLogger(): TestLogger {
+        /** @var TestLogger $logger */
+        $logger = static::container()->get(TestLogger::class);
+        return $logger;
+    }
+
+    /**
      * Configure the container for connecting to the database.
      *
      * @deprecated This logic has been moved into the container config.
@@ -225,16 +264,9 @@ trait BootstrapTrait {
      * Reset necessary tables.
      *
      * @param string $name
-     * @param bool $flushCache Set to false if we should not flush the cache.
      */
-    protected static function resetTable(string $name, bool $flushCache = true): void {
+    protected static function resetTable(string $name): void {
         \Gdn::database()->sql()->truncate($name);
-
-        // Reset our caching if we need to.
-        if (\Gdn::config('Cache.Enabled') && $flushCache) {
-            // Make a fresh cache.
-            static::container()->get(\Gdn_Cache::class)->flush();
-        }
     }
 
     /**
@@ -245,11 +277,11 @@ trait BootstrapTrait {
      * @return TestCache
      */
     protected static function enableCaching(): TestCache {
-        self::$testCache = new TestCache();
-        static::container()->setInstance(\Gdn_Cache::class, self::$testCache);
-        static::container()->setInstance(CacheInterface::class, new CacheCacheAdapter(self::$testCache));
+        $cache = new TestCache();
+        static::container()->setInstance(\Gdn_Cache::class, $cache);
+        static::container()->setInstance(CacheInterface::class, new CacheCacheAdapter($cache));
         static::container()->get(ConfigurationInterface::class)->set('Cache.Enabled', true);
-        return self::$testCache;
+        return $cache;
     }
 
     /**

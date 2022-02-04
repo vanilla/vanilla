@@ -7,7 +7,6 @@
 
 namespace VanillaTests;
 
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Utility\ArrayUtils;
@@ -336,26 +335,6 @@ class VanillaTestCase extends TestCase {
 
                 self::assertEquals($expectedValues, $actualValues);
             }
-        }
-    }
-
-    /**
-     * Assert that one set of data is like another.
-     *
-     * @param array $expected Map of 'path.to.data' => 'expected value'
-     * @param array{string, mixed} $data A mapping of dot notation keys to expected values.
-     */
-    public static function assertDataLike(array $expected, array $data): void {
-        foreach ($expected as $key => $expectedValue) {
-            $actualValue = ArrayUtils::getByPath($key, $data);
-            Assert::assertEquals(
-                $expectedValue,
-                $actualValue,
-                "Expect key '$key' to be equal to:\n"
-                . json_encode($expectedValue, JSON_PRETTY_PRINT)
-                . "\n Instead got:\n"
-                . json_encode($actualValue, JSON_PRETTY_PRINT)
-            );
         }
     }
 }

@@ -7,7 +7,7 @@ import { CSSObject } from "@emotion/css";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { HomeWidgetItemContentType, homeWidgetItemVariables } from "@library/homeWidget/HomeWidgetItem.styles";
 import { pageHeadingBoxVariables, SubtitleType } from "@library/layout/PageHeadingBox.variables";
-import { oneColumnVariables } from "@library/layout/Section.variables";
+import { panelLayoutVariables } from "@library/layout/PanelLayout.variables";
 import { navLinksVariables } from "@library/navigation/navLinksStyles";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { IBackground } from "@library/styles/cssUtilsTypes";
@@ -21,13 +21,6 @@ import { useThemeCache } from "@library/styles/themeCache";
 import { Variables } from "@library/styles/Variables";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { percent } from "csx";
-
-export enum WidgetContainerDisplayType {
-    GRID = "grid",
-    CAROUSEL = "carousel",
-    LIST = "list",
-    LINK = "link",
-}
 export interface IHomeWidgetContainerOptions {
     outerBackground?: IBackground;
     innerBackground?: IBackground;
@@ -42,17 +35,10 @@ export interface IHomeWidgetContainerOptions {
     };
     // @deprecated
     description?: string;
-
     headerAlignment?: "left" | "center";
     contentAlignment?: "flex-start" | "center";
-    displayType?: WidgetContainerDisplayType;
-
-    // @deprecated
     isGrid?: boolean;
-    // @deprecated
     isCarousel?: boolean;
-    titleChildren?: React.ReactNode;
-    contentIsListWithSeparators?: boolean;
 }
 
 interface IViewAll {
@@ -109,10 +95,8 @@ export const homeWidgetContainerVariables = useThemeCache(
                 description: undefined as string | undefined,
                 headerAlignment: pageHeadingVars.options.alignment as "left" | "center",
                 contentAlignment: "flex-start" as "flex-start" | "center",
-                displayType: undefined as WidgetContainerDisplayType | undefined,
                 isGrid: false,
                 isCarousel: false,
-                contentIsListWithSeparators: undefined as boolean | undefined,
             },
             optionOverrides,
         );
@@ -125,15 +109,7 @@ export const homeWidgetContainerVariables = useThemeCache(
                     options.innerBackground.color || options.innerBackground.image
                         ? BorderType.SHADOW
                         : BorderType.NONE,
-                maxColumnCount:
-                    options.displayType === (WidgetContainerDisplayType.LIST || WidgetContainerDisplayType.LINK)
-                        ? 1
-                        : options.maxColumnCount,
-                displayType: options.isCarousel
-                    ? WidgetContainerDisplayType.CAROUSEL
-                    : options.isGrid
-                    ? WidgetContainerDisplayType.GRID
-                    : options.displayType,
+                isGrid: options.isCarousel ? false : options.isGrid,
             },
             optionOverrides,
         );
@@ -185,9 +161,7 @@ export const homeWidgetContainerVariables = useThemeCache(
                         options.borderType === "navLinks" ? mobileNavPaddings.horizontal : globalVars.gutter.size,
                 },
             },
-            !options.displayType || options.displayType === WidgetContainerDisplayType.CAROUSEL
-                ? { horizontal: 0, vertical: globalVars.gutter.size / 2, mobile: { horizontal: 0 } }
-                : {},
+            !options.isGrid ? { horizontal: 0, vertical: globalVars.gutter.size / 2, mobile: { horizontal: 0 } } : {},
         );
 
         const hasVisibleContainer =
@@ -198,7 +172,7 @@ export const homeWidgetContainerVariables = useThemeCache(
                 }),
             ) && options.borderType !== "navLinks";
 
-        const mobileMediaQuery = oneColumnVariables().mediaQueries().oneColumnDown;
+        const mobileMediaQuery = panelLayoutVariables().mediaQueries().oneColumnDown;
 
         return { options, itemSpacing, mobileMediaQuery, hasVisibleContainer };
     },
@@ -295,10 +269,9 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
         vars.hasVisibleContainer
             ? {
                   paddingBottom: vars.itemSpacing.vertical,
-                  paddingTop: vars.options.contentIsListWithSeparators ? vars.itemSpacing.vertical : 0,
               }
             : {
-                  marginTop: vars.options.contentIsListWithSeparators ? 0 : negativeUnit(vars.itemSpacing.vertical),
+                  marginTop: negativeUnit(vars.itemSpacing.vertical),
               },
         borderStyling,
         vars.mobileMediaQuery(
@@ -313,15 +286,7 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
         flexBasis: percent(100 / vars.options.maxColumnCount),
     };
 
-    const gridItem = style(
-        "gridItem",
-        itemMixin,
-        vars.options.contentIsListWithSeparators && {
-            "&:not(:first-child) a:before": {
-                borderTop: "none",
-            },
-        },
-    );
+    const gridItem = style("gridItem", itemMixin);
 
     const gridItemSpacer = style("gridItemSpacer", {
         ...itemMixin,
@@ -333,7 +298,7 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
         {
             ...Mixins.padding({
                 horizontal: halfHorizontalSpacing,
-                top: vars.options.contentIsListWithSeparators ? 0 : vars.itemSpacing.vertical,
+                top: vars.itemSpacing.vertical,
             }),
             height: percent(100),
         },

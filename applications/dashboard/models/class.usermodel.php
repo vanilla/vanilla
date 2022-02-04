@@ -19,7 +19,6 @@ use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\Models\CrawlableInterface;
 use Vanilla\Contracts\Models\FragmentFetcherInterface;
 use Vanilla\Contracts\Models\UserProviderInterface;
-use Vanilla\Dashboard\Events\UserPointEvent;
 use Vanilla\Dashboard\Models\UserVisitUpdater;
 use Vanilla\Dashboard\UserPointsModel;
 use Vanilla\Events\LegacyDirtyRecordTrait;
@@ -37,11 +36,7 @@ use Vanilla\Utility\ModelUtils;
 /**
  * Handles user data.
  */
-class UserModel extends Gdn_Model implements
-    UserProviderInterface,
-    EventFromRowInterface,
-    CrawlableInterface,
-    FragmentFetcherInterface {
+class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRowInterface, CrawlableInterface, FragmentFetcherInterface {
 
     use LegacyDirtyRecordTrait;
     use StaticCacheConfigTrait;
@@ -335,23 +330,6 @@ class UserModel extends Gdn_Model implements
         $banned = val('Banned', $user, 0);
 
         $this->save(["UserID" => $userID, "Banned" => BanModel::setBanned($banned, true, BanModel::BAN_MANUAL)]);
-
-        if (!$banned) {
-            $sessionID = Gdn::session()->UserID;
-            $banningUserID = $sessionID === $userID ? $this->getSystemUserID() : $sessionID;
-            $source = "user";
-            $banEvent = $this->createUserDisciplineEvent(
-                $userID,
-                BanModel::ACTION_BAN,
-                \Vanilla\Dashboard\Events\UserDisciplineEvent::DISCIPLINE_TYPE_NEGATIVE,
-                $source,
-                $banningUserID
-            );
-            if (isset($options["Reason"])) {
-                $banEvent->setReason($options["Reason"]);
-            }
-            $this->eventManager->dispatch($banEvent);
-        }
 
         $logID = false;
         if (val('DeleteContent', $options)) {
@@ -700,19 +678,6 @@ class UserModel extends Gdn_Model implements
         $newBanned = BanModel::setBanned($banned, false, BanModel::BAN_AUTOMATIC | BanModel::BAN_MANUAL);
         $this->save(["UserID" => $userID, "Banned" => $newBanned]);
 
-        if (!$newBanned) {
-            $sessionID = Gdn::session()->UserID;
-            $banningUserID = $sessionID === $userID ? $this->getSystemUserID() : $sessionID;
-            $unbanEvent = $this->createUserDisciplineEvent(
-                $userID,
-                BanModel::ACTION_UNBAN,
-                \Vanilla\Dashboard\Events\UserDisciplineEvent::DISCIPLINE_TYPE_POSITIVE,
-                "user",
-                $banningUserID
-            );
-            $this->eventManager->dispatch($unbanEvent);
-        }
-
         // Restore the user's content.
         if (val('RestoreContent', $options)) {
             $banLogID = $this->getAttribute($userID, 'BanLogID');
@@ -760,34 +725,6 @@ class UserModel extends Gdn_Model implements
 
             $activityModel->saveQueue();
         }
-    }
-
-    /**
-     * Create a user discipline event.
-     *
-     * @param int $disciplinedUserID
-     * @param string $action
-     * @param string $disciplineType
-     * @param string|null $source
-     * @param int|null $discipliningUserID
-     * @return \Vanilla\Dashboard\Events\UserDisciplineEvent
-     */
-    public function createUserDisciplineEvent(
-        int $disciplinedUserID,
-        string $action,
-        string $disciplineType,
-        ?string $source,
-        ?int $discipliningUserID
-    ): \Vanilla\Dashboard\Events\UserDisciplineEvent {
-        $disciplinedUser = self::getFragmentByID($disciplinedUserID);
-        $discipliningUser = $discipliningUserID ? self::getFragmentByID($discipliningUserID) : null;
-        return new \Vanilla\Dashboard\Events\UserDisciplineEvent(
-            $disciplinedUser,
-            $action,
-            $disciplineType,
-            $source,
-            $discipliningUser
-        );
     }
 
     /**
@@ -1429,10 +1366,6 @@ class UserModel extends Gdn_Model implements
                         setValue('Photo', $user, $photo);
                         // Add an alias to Photo. Currently only used in API calls.
                         setValue('PhotoUrl', $user, $photo);
-
-                        if (val('Name', $user) === '') {
-                            setValue('Name', $user, 'Unknown');
-                        }
                     }
                 }
                 $user = !empty($user) ? $user : $this->getGeneratedFragment(self::GENERATED_FRAGMENT_KEY_UNKNOWN);
@@ -2323,7 +2256,7 @@ class UserModel extends Gdn_Model implements
      * @param int|false $timestamp
      * @since 2.1.0
      */
-    public static function givePoints(int $userID, int $points, $source = 'Other', $timestamp = false) {
+    public static function givePoints($userID, $points, $source = 'Other', $timestamp = false) {
         if (!$timestamp) {
             $timestamp = CurrentTimeStamp::get();
         }
@@ -2364,15 +2297,15 @@ class UserModel extends Gdn_Model implements
 
         Gdn::userModel()->setField($userID, 'Points', $totalPoints);
 
-        $pointData = [
-            'userID' => $userID,
-            'source' => $source,
-            'categoryID' => $categoryID,
-            'givenPoints' => $points,
-            'timestamp' => $timestamp,
-        ];
-        $userPointEvent = Gdn::userModel()->createUserPointEvent($pointData);
-        Gdn::userModel()->getEventManager()->dispatch($userPointEvent);
+        // Fire a give points event.
+        Gdn::userModel()->EventArguments['UserID'] = $userID;
+        Gdn::userModel()->EventArguments['CategoryID'] = $categoryID;
+        Gdn::userModel()->EventArguments['TotalPoints'] = $totalPoints;
+        Gdn::userModel()->EventArguments['GivenPoints'] = $points;
+        Gdn::userModel()->EventArguments['Source'] = $source;
+        Gdn::userModel()->EventArguments['Timestamp'] = $timestamp;
+        Gdn::userModel()->EventArguments['Points'] = $totalPoints; // Deprecated in favor of TotalPoints
+        Gdn::userModel()->fireEvent('GivePoints');
     }
 
     /**
@@ -5856,9 +5789,7 @@ SQL;
         $permissions = Gdn::permissionModel()->createPermissionInstance();
         $permissionsKey = '';
         $user = $this->getID($userID, DATASET_TYPE_ARRAY);
-        $adminFlag = $user['Admin'] ?? 0;
-        $permissions->setAdmin($adminFlag > 0);
-        $permissions->setSysAdmin($adminFlag > 1);
+        $isAdmin = $user && $user['Admin'] > 0;
         if (Gdn::cache()->activeEnabled()) {
             $permissionsIncrement = $this->getPermissionsIncrement();
             $permissionsKey = formatString(self::USERPERMISSIONS_KEY, [
@@ -5869,7 +5800,7 @@ SQL;
             $cachedPermissions = Gdn::cache()->get($permissionsKey);
             if ($cachedPermissions !== Gdn_Cache::CACHEOP_FAILURE) {
                 $permissions->setPermissions($cachedPermissions);
-
+                $permissions->setAdmin($isAdmin);
 
                 // Fire an event after permissions are cached so that addons can augment them without overwriting the cache.
                 $this->eventManager->fire('userModel_filterPermissions', $this, $userID, $permissions);
@@ -5879,6 +5810,7 @@ SQL;
 
         $data = Gdn::permissionModel()->getPermissionsByUser($userID);
         $permissions->setPermissions($data);
+        $permissions->setAdmin($isAdmin);
 
         $this->EventArguments['UserID'] = $userID;
         $this->EventArguments['Permissions'] = $permissions;
@@ -6224,29 +6156,5 @@ SQL;
         $roles = array_column($roles, null, 'RoleID');
 
         return $roles;
-    }
-
-    /**
-     * Create a UserPointEvent based on
-     * ['userID' => $userID,
-     *  'source' => $source,
-     *  'categoryID' => $categoryID,
-     *  'givenPoints' => $points]
-     *
-     * @param array $pointData
-     * @return UserPointEvent
-     * @throws Exception If givenPoints isn't set.
-     */
-    private function createUserPointEvent(array $pointData): UserPointEvent {
-        $user = $this->getID($pointData['userID'], DATASET_TYPE_ARRAY);
-        $fragment = $this->currentFragment();
-        $userEvent = $this->eventFromRow($user, UserEvent::ACTION_UPDATE, $fragment);
-
-        $pointReceived['value'] = $pointData['givenPoints'];
-        $pointReceived['source'] = $pointData['source'];
-        $pointReceived['categoryID'] = $pointData['categoryID'];
-        $pointReceived['dateUpdated'] = date(DATE_ATOM, $pointData['timestamp']);
-
-        return new UserPointEvent($userEvent, $pointReceived);
     }
 }

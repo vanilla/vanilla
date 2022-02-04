@@ -4,7 +4,7 @@
  */
 
 // Main highlightJS
-import hljs from "highlight.js/lib/core.js";
+import hljs from "highlight.js/lib/highlight.js";
 
 // Supported languages
 // Serving all languages is pretty huge, so ideally we should only serve common languages.

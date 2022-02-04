@@ -1,7 +1,7 @@
 /**
  * Compatibility styles, using the color variables.
  *
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -14,7 +14,7 @@ import { styleUnit } from "@library/styles/styleUnit";
 import { Mixins } from "@library/styles/Mixins";
 import { calc, important } from "csx";
 import { inputVariables } from "@library/forms/inputStyles";
-import { linkMixin } from "@library/navigation/siteNavStyles";
+import { siteNavNodeClasses } from "@library/navigation/siteNavStyles";
 import { socialConnectCSS } from "@dashboard/compatibilityStyles/socialConnectStyles";
 import { reactionsCSS } from "@dashboard/compatibilityStyles/reactionsStyles";
 import { buttonCSS } from "@dashboard/compatibilityStyles/buttonStylesCompat";
@@ -40,7 +40,7 @@ import { signInMethodsCSS } from "@dashboard/compatibilityStyles/signInMethodSty
 import { suggestedTextStyleHelper } from "@library/features/search/suggestedTextStyles";
 import { dropDownVariables } from "@library/flyouts/dropDownStyles";
 import { userPhotoVariables } from "@library/headers/mebox/pieces/userPhotoStyles";
-import { leaderboardCSS } from "@library/leaderboardWidget/LeaderboardCompat.styles";
+import { leaderboardCSS } from "@dashboard/compatibilityStyles/Leaderboard.styles";
 import { cssOut } from "./cssOut";
 import { pageBoxCompatStyles } from "@dashboard/compatibilityStyles/PageBox.compat.styles";
 import { profileCompatCSS } from "@dashboard/compatibilityStyles/pages/Profile.compat.styles";
@@ -115,7 +115,7 @@ compatibilityStyles = useThemeCache(() => {
 
     // Panel
     cssOut(panelSelectors, {
-        ...linkMixin(undefined, true, panelSelectors),
+        ...siteNavNodeClasses().linkMixin(true, panelSelectors),
         minHeight: 0,
         display: "flex",
         opacity: 1,

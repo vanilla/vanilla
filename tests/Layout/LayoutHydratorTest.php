@@ -1,19 +1,22 @@
 <?php
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace VanillaTests\Layout;
 
-use Vanilla\Layout\LayoutHydrator;
 use VanillaTests\BootstrapTestCase;
+use VanillaTests\SiteTestTrait;
 
 /**
  * Tests for our layout exception handler.
  */
 class LayoutHydratorTest extends BootstrapTestCase {
+
+    use LayoutTestTrait;
+    use SiteTestTrait;
 
     /**
      * Test that varius layout inputs hydrate into specific outputs.
@@ -29,6 +32,26 @@ class LayoutHydratorTest extends BootstrapTestCase {
         $actual = $hydrator->resolve($input, $params);
         // Make sure we see it as the API output would.
         $actual = json_decode(json_encode($actual), true);
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * Test that hydrateLayout layout inputs hydrate into specific outputs.
+     *
+     * @param array $input The input.
+     * @param array $expected The expected result.
+     * @param array $params The parameters for rendering.
+     *
+     * @dataProvider provideLayoutHydratesTo
+     */
+    public function testHydrateLayout(array $input, array $expected, array $params = []) {
+        $actual = self::getLayoutService()->hydrateLayout('home', $params, $input);
+        // Make sure we see it as the API output would.
+        $this->assertArrayHasKey('seo', $actual);
+        $seo = json_decode(json_encode($actual['seo']), true);
+        unset($actual['seo']);
+        $actual = json_decode(json_encode($actual), true);
+        $this->assertEquals(4, count($seo));
         $this->assertSame($expected, $actual);
     }
 
@@ -118,12 +141,5 @@ class LayoutHydratorTest extends BootstrapTestCase {
                 ],
             ],
         ];
-    }
-
-    /**
-     * @return LayoutHydrator
-     */
-    private function getLayoutService(): LayoutHydrator {
-        return self::container()->get(LayoutHydrator::class);
     }
 }

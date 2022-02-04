@@ -180,6 +180,44 @@ paths:
                     $ref: "#/components/responses/HydratedLayout"
                 "404":
                     $ref: "#/components/responses/NotFound"
+    /layouts/lookup-hydrate:
+        x-hidden: true
+        get:
+            summary: Retrieve layoutID based on layout type, recordID and record type, and hydrate with parameters.
+            tags:
+                - Layout
+            parameters:
+                - name: layoutViewType
+                  in: query
+                  required: true
+                  description: Type of layout.
+                  schema:
+                      type: string
+
+                - name: recordID
+                  in: query
+                  required: true
+                  description: ID of the resource associated with this layout.
+                  schema:
+                      type: integer
+
+                - name: recordType
+                  in: query
+                  required: true
+                  description: Type of resource to which this layout applies.
+                  schema:
+                      type: string
+                - name: params
+                  in: query
+                  required: true
+                  description: Parameters defined for the layout's layoutViewType.
+                  schema:
+                      type: object
+            responses:
+                "200":
+                    $ref: "#/components/responses/HydratedLayout"
+                "404":
+                    $ref: "#/components/responses/NotFound"
     /layouts/hydrate:
         x-hidden: true
         post:
@@ -267,7 +305,7 @@ paths:
                     $ref: "#/components/responses/PermissionError"
                 "404":
                     $ref: "#/components/responses/NotFound"
-        post:
+        put:
             summary: Add a view to a layout
             tags:
                 - Layout

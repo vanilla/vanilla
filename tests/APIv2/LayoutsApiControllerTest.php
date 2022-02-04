@@ -7,9 +7,11 @@
 
 namespace VanillaTests\APIv2;
 
+use CategoryModel;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Gdn;
+use Vanilla\Layout\LayoutViewModel;
 use Vanilla\Layout\Providers\FileBasedLayoutProvider;
 use VanillaTests\ExpectExceptionTrait;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
@@ -21,6 +23,9 @@ class LayoutsApiControllerTest extends AbstractResourceTest {
 
     use CommunityApiTestTrait;
     use ExpectExceptionTrait;
+
+    /* @var LayoutViewModel */
+    private $layoutViewModel;
 
     //region Properties
     protected $testPagingOnIndex = false;
@@ -47,6 +52,9 @@ class LayoutsApiControllerTest extends AbstractResourceTest {
         'layoutViewType' => 'home'
     ];
 
+    /** @var CategoryModel */
+    protected $categoryModel;
+
     //endregion
 
     //region Setup / Teardown
@@ -60,6 +68,9 @@ class LayoutsApiControllerTest extends AbstractResourceTest {
 
         $fileBasedLayoutProvider = $this->container()->get(FileBasedLayoutProvider::class);
         $fileBasedLayoutProvider->setCacheBasePath(PATH_TEST_CACHE);
+
+        $this->categoryModel = $this->container()->get(CategoryModel::class);
+        $this->layoutViewModel = $this->container()->get(LayoutViewModel::class);
     }
     //endregion
 
@@ -311,6 +322,89 @@ class LayoutsApiControllerTest extends AbstractResourceTest {
     }
 
     /**
+     * Test that we can use dynamic hydrate lookup.
+     *
+     * @return void
+     */
+    public function testLookupHydrate() {
+        $category = $this->createCategory(['name' => 'My Category']);
+
+        $layoutDefinition = [
+            [
+                '$hydrate' => 'react.section.1-column',
+                'contents' => [
+                    [
+                        // Assets should be available.
+                        '$hydrate' => 'react.asset.breadcrumbs',
+                        'recordType' => 'category',
+                        'recordID' => [
+                            // Param definitions should be available.
+                            '$hydrate' => 'param',
+                            'ref' => 'category/categoryID',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $expected = [
+            [
+                '$reactComponent' => 'SectionOneColumn',
+                '$reactProps' => [
+                    'contents' => [
+                        [
+                            '$reactComponent' => 'Breadcrumbs',
+                            '$reactProps' => [
+                                'crumbs' => [
+                                    ['name' => 'Home', 'url' => url('', true)],
+                                    ['name' => 'My Category', 'url' => $category['url']],
+                                ],
+                            ],
+                        ],
+                    ],
+                    'isNarrow' => false,
+                    'autoWrap' => true,
+                ],
+            ],
+        ];
+
+        $params = [
+            'categoryID' => $category['categoryID'],
+        ];
+
+        // Posting to the main hydrate endpoints will have the correct result.
+        $response = $this->api()->post('/layouts/hydrate', [
+            'layout' => $layoutDefinition,
+            'params' => $params,
+            'layoutViewType' => 'home',
+        ]);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame($expected, $response->getBody()['layout']);
+
+        // We can save it as a layout and render it by the ID.
+
+        $layout = $this->api()->post('/layouts', [
+            'name' => 'My Layout',
+            'layout' => $layoutDefinition,
+            'layoutViewType' => 'home',
+        ]);
+
+        $response = $this->api()->put("/layouts/{$layout['layoutID']}/views", [
+            'recordID' => $category['categoryID'],
+            'recordType' => 'category'
+        ]);
+
+        $response = $this->api()->get("/layouts/lookup-hydrate", [
+            'layoutViewType' => 'home',
+            'recordID' => $category['categoryID'],
+            'recordType' => 'category',
+            'params' => $params,
+        ]);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame($expected, $response->getBody()['layout']);
+    }
+
+    /**
      * Test that we can generate a hydrateable schema.
      */
     public function testGetSchema() {
@@ -331,36 +425,27 @@ class LayoutsApiControllerTest extends AbstractResourceTest {
         $layout = $this->testPost();
         $layoutID = $layout['layoutID'];
 
-        $expected1 = ['recordID' => 1, 'recordType' => 'widget'];
-        $expected2 = ['recordID' => 2, 'recordType' => 'widget2'];
+        $expected1 = ['recordID' => -1, 'recordType' => 'global', 'layoutViewType' => 'home'];
 
         // Posting to the layout view post endpoints will have the correct result.
-        $response = $this->api()->post('/layouts/'.$layoutID.'/views', $expected1);
+        $response = $this->api()->put('/layouts/'.$layoutID.'/views', $expected1);
         $this->assertEquals(201, $response->getStatusCode());
-        $this->assertSame($layoutID, $response->getBody()['layoutID']);
+        $this->assertEquals($layoutID, $response->getBody()['layoutID']);
         $this->assertRowsEqual($expected1, $response->getBody());
 
         $layoutViewIDs = [$response->getBody()['layoutViewID']];
 
-        $response = $this->api()->post('/layouts/'.$layoutID.'/views', $expected2);
-        $this->assertEquals(201, $response->getStatusCode());
-        $this->assertSame($layoutID, $response->getBody()['layoutID']);
-        $this->assertRowsEqual($expected2, $response->getBody());
-
-        $layoutViewIDs[] = $response->getBody()['layoutViewID'];
-
         // Getting to the main layout view endpoints will have the correct result.
         $response = $this->api()->get('/layouts/'.$layoutID.'/views');
         $this->assertEquals(200, $response->getStatusCode());
-        $numLayoutViews = count($response->getBody());
-        $this->assertGreaterThanOrEqual(2, $numLayoutViews); // account for global default views
+        $this->assertGreaterThanOrEqual(1, count($response->getBody())); // account for global default views
 
         $response = $this->api()->delete('/layouts/'.$layoutID.'/views', ['layoutViewIDs' => $layoutViewIDs]);
         $this->assertEquals(204, $response->getStatusCode());
 
         $response = $this->api()->get('/layouts/'.$layoutID.'/views');
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertSame($numLayoutViews - 2, count($response->getBody()));
+        $this->assertSame(0, count($response->getBody()));
     }
 
     /**
@@ -372,8 +457,8 @@ class LayoutsApiControllerTest extends AbstractResourceTest {
         $layoutID = $layout['layoutID'];
 
         // Create a view associated to the new layout.
-        $expected = ['recordID' => 1, 'recordType' => 'widget'];
-        $createViewResponse = $this->api()->post('/layouts/'.$layoutID.'/views', $expected);
+        $expected = ['recordID' => -1, 'recordType' => 'global'];
+        $createViewResponse = $this->api()->put('/layouts/'.$layoutID.'/views', $expected);
         $layoutViewID = [$createViewResponse->getBody()['layoutViewID']];
 
         // Try to delete a layout associate to the view (This should fail).
@@ -388,21 +473,73 @@ class LayoutsApiControllerTest extends AbstractResourceTest {
     }
 
     /**
+     * Test assigning a LayoutView to a Nonexistent Category.
+     */
+    public function testAssignLayoutViewToNonexistentCategory() {
+        $fileBasedLayoutProvider = $this->container()->get(FileBasedLayoutProvider::class);
+        $fileBasedLayoutProvider->setCacheBasePath(PATH_TEST_CACHE);
+        // Create a layout
+        $layout = $this->testPost();
+        $layoutID = $layout['layoutID'];
+
+        $nonExistentCategoryID = 100;
+        $categoryExists = $this->categoryModel->getID($nonExistentCategoryID);
+        $this->assertFalse($categoryExists);
+
+        // Create a view associated to a nonexistent category. We are expecting a NotFoundException to be thrown.
+        $expected = ['recordType' => 'category', 'recordID' => $nonExistentCategoryID];
+        $this->expectException(NotFoundException::class);
+        $this->expectExceptionMessage("category not found");
+
+        $this->api()->put('/layouts/'.$layoutID.'/views', $expected);
+    }
+
+    /**
+     * Test assigning a LayoutView to an existing Category.
+     * Test deletion of layoutView when the associated category is deleted.
+     */
+    public function testLayoutViewDeletionUponCategoryDeletion() {
+        // Create a layout
+        $layout = $this->testPost();
+        $layoutID = $layout['layoutID'];
+        // We create a new category.
+        $newCategoryID = $this->createCategory()['categoryID'];
+        // We create a new layoutView assigned to the new category.
+        $expected = ['recordType' => 'category', 'recordID' => $newCategoryID];
+        $this->api()->put('/layouts/'.$layoutID.'/views', $expected);
+        // Verify that the associated layoutView exists.
+        $responseBody = $this->api()->get('/layouts/'.$layoutID.'/views')->getBody();
+        $this->assertEquals(1, count($responseBody));
+
+        // We test that the CategoryRecordProvider getRecords() function returns properly formatted data.
+        $providedRecords = $this->layoutViewModel->getRecords('category', [$responseBody[0]['layoutViewID']]);
+        $providedRecord = reset($providedRecords);
+        $this->assertArrayHasKey('name', $providedRecord);
+        $this->assertArrayHasKey('url', $providedRecord);
+
+        // We delete the category.
+        $this->categoryModel->deleteID($newCategoryID);
+        // Verify that the associated layoutView has also been deleted.
+        $response = $this->api()->get('/layouts/'.$layoutID.'/views');
+        $this->assertEquals(0, count($response->getBody()));
+    }
+
+    /**
      * Test that attempting to create a duplicate layout view throws a ClientException
      */
     public function testPostDuplicateLayoutViewReturnsClientException(): void {
         $layout = $this->testPost();
         $layoutID = $layout['layoutID'];
 
-        $discussionView = ['recordID' => 1, 'recordType' => 'discussion'];
+        $discussionView = ['recordID' => 1, 'recordType' => 'category'];
 
         // First post will succeed
-        $response = $this->api()->post('/layouts/'.$layoutID.'/views', $discussionView);
+        $response = $this->api()->put('/layouts/'.$layoutID.'/views', $discussionView);
         $this->assertEquals(201, $response->getStatusCode());
 
         // Second post, not so much
         $this->expectException(ClientException::class);
-        $_ = $this->api()->post('/layouts/'.$layoutID.'/views', $discussionView);
+        $_ = $this->api()->put('/layouts/'.$layoutID.'/views', $discussionView);
     }
 
     /**

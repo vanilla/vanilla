@@ -8,6 +8,7 @@
 namespace VanillaTests\Forum\Controllers;
 
 use Garden\Web\Exception\ClientException;
+use Garden\Web\Exception\ServerException;
 use VanillaTests\APIv2\AbstractAPIv2Test;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 
@@ -57,37 +58,45 @@ class CategoryValidationConflictsTest extends AbstractAPIv2Test {
                 [],
                 null
             ],
-            'categoryID & featured' => [
+            'tree & limit' => [
                 [
-                    'categoryID' => 100,
-                    'featured' => true
+                    'limit' => 10,
+                    'outputFormat' => 'tree'
                 ],
                 null,
-                ClientException::class
+                ServerException::class
             ],
-            'categoryID & followed' => [
+            'tree & page' => [
                 [
-                    'categoryID' => 100,
-                    'followed' => true
+                    'page' => 1,
+                    'outputFormat' => 'tree'
                 ],
                 null,
-                ClientException::class
+                ServerException::class
             ],
-            'categoryID & archived' => [
+            'flat & depth' => [
                 [
-                    'categoryID' => 100,
-                    'archived' => false
+                    'outputFormat' => 'flat',
+                    'maxDepth' => 2
                 ],
                 null,
-                ClientException::class
+                ServerException::class
             ],
-            'featured & followed' => [
+            'depth & limit' => [
                 [
-                    'followed' => true,
-                    'featured' => true
+                    'depth' => 1,
+                    'limit' => 1
                 ],
                 null,
-                ClientException::class
+                ServerException::class
+            ],
+            'depth & page' => [
+                [
+                    'depth' => 1,
+                    'page' => 1
+                ],
+                null,
+                ServerException::class
             ],
         ];
 

@@ -96,11 +96,11 @@ export function withSection<T extends ISectionProps = ISectionProps>(WrappedComp
             <SectionContext.Consumer>
                 {(context) => {
                     // https://github.com/Microsoft/TypeScript/issues/28938
-                    return <WrappedComponent device={context} {...(props as T)} />;
+                    return <WrappedComponent {...(context as T)} {...(props as T)} />;
                 }}
             </SectionContext.Consumer>
         );
     };
-    ComponentWithDevice.displayName = `withLayout(${displayName})`;
+    ComponentWithDevice.displayName = `withSection(${displayName})`;
     return ComponentWithDevice;
 }

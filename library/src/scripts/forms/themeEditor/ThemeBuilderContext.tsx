@@ -206,7 +206,7 @@ function variableGenerator(variables: IThemeVariables) {
         navigation: navigationVariables(variables),
         homeWidgetItem: homeWidgetItemVariables({}, variables),
         homeWidgetContainer: homeWidgetContainerVariables({}, variables),
-        quickLinks: quickLinksVariables(variables),
+        quickLinks: quickLinksVariables({}, variables),
         discussionList: discussionListVariables(variables),
         listItem: listItemVariables(undefined, variables),
     };

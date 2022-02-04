@@ -7,6 +7,7 @@
 
 namespace VanillaTests\TestOAuth;
 
+use Garden\Web\Exception\ServerException;
 use UserModel;
 
 /**
@@ -60,7 +61,7 @@ class TestOAuthPlugin extends \Gdn_OAuth2 {
         if (isset($this->profiles[$this->accessToken()])) {
             return $this->profiles[$this->accessToken()];
         }
-        throw new \Gdn_ErrorException("Invalid access token.");
+        throw new ServerException("Invalid access token.");
     }
 
     /**

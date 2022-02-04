@@ -37,6 +37,7 @@ use Vanilla\Formatting\FormatService;
 use Vanilla\Forum\Navigation\ForumBreadcrumbProvider;
 use Vanilla\HttpCacheMiddleware;
 use Vanilla\Layout\GlobalRecordProvider;
+use Vanilla\Layout\CategoryRecordProvider;
 use Vanilla\Layout\LayoutViewModel;
 use Vanilla\Models\AuthenticatorModel;
 use Vanilla\Models\SSOModel;
@@ -213,16 +214,11 @@ class Bootstrap {
             ->addAlias('ThemeManager')
 
             // Logger
-            ->rule(\Vanilla\Logger::class)
-            ->setShared(true)
-            ->addAlias(LoggerInterface::class)
-            ->addCall('addLogger', [new Reference(TestLogger::class)])
-
             ->rule(TestLogger::class)
             ->setShared(true)
 
-            ->rule(LoggerAwareInterface::class)
-            ->addCall('setLogger')
+            ->rule(\Vanilla\Logger::class)
+            ->addCall('addLogger', [new Reference(TestLogger::class)])
 
             // EventManager
             ->rule(\Garden\EventManager::class)
@@ -390,6 +386,9 @@ class Bootstrap {
 
             ->rule(LayoutViewModel::class)
             ->addCall('addProvider', [new Reference(GlobalRecordProvider::class)])
+
+            ->rule(LayoutViewModel::class)
+            ->addCall('addProvider', [new Reference(CategoryRecordProvider::class)])
 
             ->rule(\Vanilla\Formatting\Quill\Parser::class)
             ->addCall('addCoreBlotsAndFormats')

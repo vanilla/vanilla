@@ -33,7 +33,8 @@ class UserSiteTotalProvider implements SiteTotalProviderInterface {
      * {@inheritdoc}
      */
     public function calculateSiteTotalCount(): int {
-        return $this->userModel->getCount(['Deleted' => false]);
+        $result = $this->userModel->getCount(['Deleted' => 0]);
+        return $result;
     }
 
     /**

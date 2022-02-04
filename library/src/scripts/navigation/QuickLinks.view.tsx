@@ -6,6 +6,7 @@
 import { cx } from "@emotion/css";
 import Permission from "@library/features/users/Permission";
 import { INavigationVariableItem } from "@library/headers/navigationVariables";
+import { IHomeWidgetContainerOptions } from "@library/homeWidget/HomeWidgetContainer.styles";
 import { PageBox } from "@library/layout/PageBox";
 import { PageHeadingBox } from "@library/layout/PageHeadingBox";
 import { useWidgetSectionClasses } from "@library/layout/WidgetLayout.context";
@@ -20,14 +21,15 @@ interface IProps {
     title?: string;
     links: Array<INavigationVariableItem & { count?: number; countLimit?: number | null }>;
     activePath?: string;
+    containerOptions?: IHomeWidgetContainerOptions;
 }
 
 /**
  * Component for displaying data lists
  */
 export function QuickLinksView(props: IProps) {
-    const classes = quickLinksClasses();
-    const variables = quickLinksVariables();
+    const classes = quickLinksClasses(props.containerOptions);
+    const variables = quickLinksVariables(props.containerOptions);
     const { title, links, activePath } = props;
     const visibleLinks = links.filter((link) => {
         const isSetHidden = "isHidden" in link && link.isHidden;
@@ -38,7 +40,12 @@ export function QuickLinksView(props: IProps) {
 
     return (
         <div className={cx(classes.root, widgetClasses.widgetClass)}>
-            <PageHeadingBox title={title} />
+            <PageHeadingBox
+                title={title}
+                options={{
+                    alignment: props.containerOptions?.headerAlignment,
+                }}
+            />
             <PageBox options={variables.box}>
                 <nav>
                     <ul className={classNames(classes.list, "no-css")}>

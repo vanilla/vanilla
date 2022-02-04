@@ -29,7 +29,7 @@ class Model implements InjectableInterface {
     public const OPT_JOINS = 'joins';
 
     /** @var \Gdn_Database */
-    private $database;
+    protected $database;
 
     /** @var Schema */
     protected $readSchema;

@@ -34,22 +34,6 @@ class LayoutRoleFilterMiddleware extends AbstractMiddleware {
     }
 
     /**
-     * Process middleware params if found
-     *
-     * @param array $nodeData
-     * @param array $hydrateParams
-     * @param DataResolverInterface $next
-     * @return mixed|null
-     */
-    public function process(array $nodeData, array $hydrateParams, DataResolverInterface $next) {
-        $middlewareParams = $this->getMiddlewareParams($nodeData);
-        if ($middlewareParams !== null) {
-            return $this->processInternal($nodeData, $middlewareParams, $hydrateParams, $next);
-        }
-        return $next->resolve($nodeData, $hydrateParams);
-    }
-
-    /**
      * Process middleware params
      *
      * @param array $nodeData

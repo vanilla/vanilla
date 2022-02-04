@@ -25,6 +25,7 @@ use Vanilla\Formatting\ParsableDOMInterface;
 use Vanilla\Formatting\Quill\Blots\Embeds\ExternalBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\HeadingTerminatorBlot;
 use Vanilla\Formatting\TextDOMInterface;
+use Vanilla\Logging\ErrorLogger;
 use Vanilla\Web\TwigRenderTrait;
 use Vanilla\Formatting\Quill;
 
@@ -306,7 +307,11 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
      * @param string $input
      */
     private function logBadInput(string $input) {
-        $this->logger->error("Bad input encountered", ['class' => self::class, 'method' =>  __METHOD__, 'input' => '$input'] + ($this->context ?? []));
+        ErrorLogger::notice(
+            "Malformed rich text encounted.",
+            ['formatService'],
+            ['input' => $input] + ($this->context ?? [])
+        );
     }
 
     /**

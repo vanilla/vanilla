@@ -345,7 +345,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             $createType = val($columnKeyType, ['index' => 'index', 'key' => 'key', 'unique' => 'unique index', 'fulltext' => 'fulltext index', 'primary' => 'primary key']);
 
             if ($columnKeyType == 'primary') {
-                $result['PRIMARY'] = 'primary key (`'.implode('`, `', $indexGroups['']).'`)';
+                $result['primary'] = 'primary key (`'.implode('`, `', $indexGroups['']).'`)';
             } else {
                 foreach ($indexGroups as $indexGroup => $columnNames) {
                     $multi = (strlen($indexGroup) > 0 || in_array($columnKeyType, ['unique', 'fulltext']));
@@ -353,12 +353,12 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
                     if ($multi) {
                         $indexName = "{$prefixes[$columnKeyType]}{$this->_TableName}".($indexGroup ? '_'.$indexGroup : '');
 
-                        $result[$indexName] = "$createType $indexName (`".implode('`, `', $columnNames).'`)';
+                        $result[strtolower($indexName)] = "$createType $indexName (`".implode('`, `', $columnNames).'`)';
                     } else {
                         foreach ($columnNames as $columnName) {
                             $indexName = "{$prefixes[$columnKeyType]}{$this->_TableName}_$columnName";
 
-                            $result[$indexName] = "$createType $indexName (`$columnName`)";
+                            $result[strtolower($indexName)] = "$createType $indexName (`$columnName`)";
                         }
                     }
                 }
@@ -388,8 +388,10 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
 
         $result = [];
         foreach ($data as $row) {
-            if (array_key_exists($row->Key_name, $result)) {
-                $result[$row->Key_name] .= ', `'.$row->Column_name.'`';
+            $keyName = strtolower($row->Key_name);
+
+            if (array_key_exists($keyName, $result)) {
+                $result[$keyName] .= ', `'.$row->Column_name.'`';
             } else {
                 switch (strtoupper(substr($row->Key_name, 0, 2))) {
                     case 'PR':
@@ -419,7 +421,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
 
                         break;
                 }
-                $result[$row->Key_name] = $type.' (`'.$row->Column_name.'`';
+                $result[$keyName] = $type.' (`'.$row->Column_name.'`';
             }
         }
 
@@ -596,9 +598,9 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         // Go through the indexes to add or modify.
         foreach ($indexes as $name => $sql) {
             if (array_key_exists($name, $indexesDb)) {
-                if ($indexes[$name] != $indexesDb[$name]) {
+                if (strcasecmp($indexes[$name], $indexesDb[$name]) !== 0) {
 //               $IndexSql[$Name][] = "/* '{$IndexesDb[$Name]}' => '{$Indexes[$Name]}' */\n";
-                    if ($name == 'PRIMARY') {
+                    if ($name == 'primary') {
                         $indexSql[$name][] = $alterSqlPrefix."drop primary key;\n";
                     } else {
                         $indexSql[$name][] = $alterSqlPrefix.'drop index '.$name.";\n";
@@ -613,7 +615,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         // Go through the indexes to drop.
         if ($explicit) {
             foreach ($indexesDb as $name => $sql) {
-                if ($name == 'PRIMARY') {
+                if ($name == 'primary') {
                     $indexSql[$name][] = $alterSqlPrefix."drop primary key;\n";
                 } else {
                     $indexSql[$name][] = $alterSqlPrefix.'drop index '.$name.";\n";

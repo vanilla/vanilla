@@ -4,6 +4,7 @@
  */
 
 import { INavigationVariableItem } from "@library/headers/navigationVariables";
+import { IHomeWidgetContainerOptions } from "@library/homeWidget/HomeWidgetContainer.styles";
 import { quickLinksVariables } from "@library/navigation/QuickLinks.variables";
 import { QuickLinksView } from "@library/navigation/QuickLinks.view";
 import { findMatchingPath } from "@library/routing/routingUtils";
@@ -15,6 +16,7 @@ interface IProps {
     links?: INavigationVariableItem[];
     forcedCounts?: Record<string, number>;
     currentPath?: string;
+    containerOptions?: IHomeWidgetContainerOptions;
 }
 
 export function QuickLinks(props: IProps) {
@@ -42,5 +44,12 @@ export function QuickLinks(props: IProps) {
         return links;
     }, [links, props.forcedCounts]);
 
-    return <QuickLinksView title={props.title} links={linksWithCounts} activePath={activePath} />;
+    return (
+        <QuickLinksView
+            title={props.title}
+            links={linksWithCounts}
+            activePath={activePath}
+            containerOptions={props.containerOptions}
+        />
+    );
 }

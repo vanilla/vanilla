@@ -7,6 +7,8 @@
 
 namespace Vanilla\Layout;
 
+use Garden\Web\Exception\NotFoundException;
+use Vanilla\Web\PageHeadInterface;
 use Vanilla\Web\ThemedPage;
 
 /**
@@ -20,7 +22,7 @@ class LayoutPage extends ThemedPage {
      * @inheritdoc
      */
     public function initialize() {
-        // TODO: prehydrate layout.
+        // Do nothing.
     }
 
     /**

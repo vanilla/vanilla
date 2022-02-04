@@ -9,9 +9,14 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { css } from "@emotion/css";
 import { extendItemContainer } from "@library/styles/styleHelpersSpacing";
 import { singleBorder } from "@library/styles/styleHelpersBorders";
+import { inputMixinVars } from "@library/forms/inputStyles";
+import { Mixins } from "@library/styles/Mixins";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
 
 export const dashboardClasses = useThemeCache(() => {
     const globalVars = globalVariables();
+    const _inputMixinVars = inputMixinVars();
+
     const style = styleFactory("dashboard");
 
     const formList = style({
@@ -130,10 +135,27 @@ export const dashboardClasses = useThemeCache(() => {
     });
 
     const disabled = css({
+        pointerEvents: "none",
         opacity: 0.5,
         cursor: "not-allowed",
         '& div[class^="toggle"]': {
             cursor: "not-allowed",
+        },
+    });
+
+    const colorInput = css({
+        "&&": {
+            marginTop: 0,
+            borderRadius: "6px 0 0 6px",
+        },
+    });
+
+    const swatch = css({
+        "&&": {
+            border: "1px solid",
+            borderColor: ColorsUtils.colorOut(globalVars.borderType.formElements.default.color),
+            borderRadius: "0 6px 6px 0",
+            borderLeft: 0,
         },
     });
 
@@ -150,5 +172,7 @@ export const dashboardClasses = useThemeCache(() => {
         extendBottomBorder,
         mediaAddonListItem,
         disabled,
+        colorInput,
+        swatch,
     };
 });

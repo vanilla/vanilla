@@ -8,9 +8,12 @@
 namespace Vanilla\Layout\Resolvers;
 
 use Garden\Container\Container;
+use Garden\Hydrate\DataHydrator;
+use Garden\Hydrate\Middleware\AbstractMiddleware;
 use Garden\Hydrate\Resolvers\AbstractDataResolver;
 use Garden\Schema\Schema;
 use Vanilla\Layout\Section\AbstractLayoutSection;
+use Vanilla\Utility\ArrayUtils;
 use Vanilla\Widgets\React\CombinedPropsWidgetInterface;
 use Vanilla\Widgets\React\ReactWidgetInterface;
 
@@ -46,7 +49,6 @@ class ReactResolver extends AbstractDataResolver {
      * @inheritdoc
      */
     protected function resolveInternal(array $data, array $params) {
-
         /** @var ReactWidgetInterface $module */
         $module = $this->container->get($this->reactWidgetClass);
 
@@ -74,6 +76,17 @@ class ReactResolver extends AbstractDataResolver {
             '$reactComponent' => $module->getComponentName(),
             '$reactProps' => $module->getProps(),
         ];
+    }
+
+    /**
+     * Check if a node is a react node definition.
+     *
+     * @param mixed $node A hydrated node.
+     *
+     * @return bool
+     */
+    public static function isReactNode($node): bool {
+        return ArrayUtils::isArray($node) && isset($node['$reactComponent']) && isset($node['$reactProps']);
     }
 
     /**

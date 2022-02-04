@@ -2,7 +2,7 @@
 /**
  * Category model
  *
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Vanilla
  * @since 2.0
@@ -11,10 +11,10 @@
 use Garden\EventManager;
 use Garden\Schema\Schema;
 use Garden\Web\Exception\ClientException;
-use Vanilla\Contracts\Models\SiteTotalProviderInterface;
 use Vanilla\Community\Schemas\CategoryFragmentSchema;
 use Vanilla\Dashboard\Models\PermissionJunctionModelInterface;
 use Vanilla\Events\LegacyDirtyRecordTrait;
+use Vanilla\Layout\LayoutViewModel;
 use Vanilla\Models\CrawlableRecordSchema;
 use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Models\ModelCache;
@@ -34,7 +34,7 @@ use Webmozart\Assert\Assert;
 use Garden\Events\EventFromRowInterface;
 use Vanilla\Contracts\Models\CrawlableInterface;
 use Garden\Events\ResourceEvent;
-use \Vanilla\Community\Events\CategoryEvent;
+use Vanilla\Community\Events\CategoryEvent;
 use Vanilla\Models\UserFragmentSchema;
 use Vanilla\ApiUtils;
 use Vanilla\Dashboard\Models\BannerImageModel;
@@ -999,7 +999,7 @@ class CategoryModel extends Gdn_Model implements
      * @access public
      * @param array $data Dataset.
      */
-    private static function calculateData(&$data) {
+    public static function calculateData(&$data) {
         foreach ($data as &$category) {
             self::calculate($category);
         }
@@ -2298,8 +2298,10 @@ class CategoryModel extends Gdn_Model implements
             $dbRecord = (array) $dbRecord;
         }
         if ($dbRecord['CategoryID'] === -1) {
-            $dbRecord['Url'] = url('/categories');
+            $dbRecord['Url'] = url('/categories', true);
             $dbRecord['DisplayAs'] = 'Discussions';
+        } else {
+            $dbRecord['Url'] = self::categoryUrl($dbRecord, '', true);
         }
 
         if ($dbRecord['ParentCategoryID'] <= 0) {
@@ -2972,6 +2974,7 @@ class CategoryModel extends Gdn_Model implements
         $result = [];
 
         $categories = (array)$categories;
+        $categories = self::_setTreeCategoryKeys($categories);
 
         if ($root) {
             $result = self::instance()->collection->getTree(
@@ -3019,6 +3022,24 @@ class CategoryModel extends Gdn_Model implements
             }
         }
         return $result;
+    }
+
+    /**
+     * Sort the Categories array so that the key match the CategoryID.
+     *
+     * [CategoryID => Category]
+     *
+     * @param array $categories
+     * @return array
+     */
+    protected static function _setTreeCategoryKeys(array $categories) : array {
+        $sortedCategories = [];
+
+        foreach ($categories as $category) {
+            $sortedCategories[$category['CategoryID']] = $category;
+        }
+
+        return $sortedCategories;
     }
 
     /**
@@ -3107,6 +3128,7 @@ class CategoryModel extends Gdn_Model implements
                 $cat['_Depth'] = $cat['Depth'];
                 $cat['_PermissionCategoryID'] = $cat['PermissionCategoryID'];
                 $cat['_ParentCategoryID'] = $cat['ParentCategoryID'];
+                $cat['_CountCategories'] = $cat['CountCategories'];
             } catch (Exception $ex) {
                 // Suppress exceptions from bubbling up.
             }
@@ -3128,6 +3150,13 @@ class CategoryModel extends Gdn_Model implements
         }
         unset($cat);
 
+        // Reset CountCategories based on children.
+        foreach ($categories as $cat) {
+            if (isset($cat["CategoryID"])) {
+                $categories[$cat["CategoryID"]]["CountCategories"] = count($cat["Children"] ?? []);
+            }
+        }
+
         // Set the tree attributes of the tree.
         $this->_SetTree($root);
         unset($root);
@@ -3138,17 +3167,13 @@ class CategoryModel extends Gdn_Model implements
                 continue;
             }
 
-            // Get the count of child categories. If this is the root category, the children have been unset by
-            // the call to _SetTree() above, so just use the "CountCategories" value.
-            $catCountChildren = $cat["ParentCategoryID"] ===  null ? $cat["CountCategories"] : count($cat["Children"] ?? []);
-
             if ($cat['_TreeLeft'] != $cat['TreeLeft'] ||
                 $cat['_TreeRight'] != $cat['TreeRight'] ||
                 $cat['_Depth'] != $cat['Depth'] ||
                 $cat['PermissionCategoryID'] != $cat['PermissionCategoryID'] ||
                 $cat['_ParentCategoryID'] != $cat['ParentCategoryID'] ||
                 $cat['Sort'] != $cat['TreeLeft'] ||
-                $cat["CountCategories"] != $catCountChildren) {
+                $cat["_CountCategories"] != $cat["CountCategories"]) {
                 $this->SQL->put(
                     'Category',
                     [
@@ -3158,7 +3183,7 @@ class CategoryModel extends Gdn_Model implements
                         'PermissionCategoryID' => $cat['PermissionCategoryID'],
                         'ParentCategoryID' => $cat['ParentCategoryID'],
                         'Sort' => $cat['TreeLeft'],
-                        'CountCategories' => $catCountChildren,
+                        'CountCategories' => $cat["CountCategories"],
                     ],
                     ['CategoryID' => $cat['CategoryID']]
                 );
@@ -5058,6 +5083,9 @@ SQL;
      * @param bool $rebuildTree
      */
     private function deleteInternal(int $categoryID, bool $rebuildTree): void {
+        /** @var LayoutViewModel $layoutViewModel */
+        $layoutViewModel = Gdn::getContainer()->get(LayoutViewModel::class);
+
         $eventCategory = self::categories($categoryID);
         $deleteEvent = $this->eventFromRow(
             $eventCategory,
@@ -5073,6 +5101,9 @@ SQL;
             $this->rebuildTree();
             $this->recalculateTree();
         }
+
+        // We delete layoutViews associated with the deleted category.
+        $layoutViewModel->delete(['recordType' => 'category', 'recordID' => $categoryID]);
 
         // Let the world know we completed our mission.
         $this->EventArguments['CategoryID'] = $categoryID;

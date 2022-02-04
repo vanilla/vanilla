@@ -30,25 +30,24 @@ export interface IHomeWidgetContainerProps {
     subtitle?: string;
     description?: string;
     titleCount?: string;
+    contentIsListWithSeparators?: boolean;
 }
 
 export function HomeWidgetContainer(props: IHomeWidgetContainerProps) {
     const vars = homeWidgetContainerVariables(props.options);
     const { options } = vars;
     const classes = homeWidgetContainerClasses(props.options);
-    const isGrid = options.displayType === WidgetContainerDisplayType.GRID;
-    const isCarousel = options.displayType === WidgetContainerDisplayType.CAROUSEL;
     const widgetClasses = useWidgetSectionClasses();
 
     let content = props.children;
-    if (isGrid) {
-        content = <HomeWidgetGridContainer {...props}>{props.children}</HomeWidgetGridContainer>;
-    } else if (isCarousel) {
+    if (options.displayType === WidgetContainerDisplayType.CAROUSEL) {
         content = (
             <Carousel maxSlidesToShow={options.maxColumnCount} carouselTitle={props.title}>
                 {props.children}
             </Carousel>
         );
+    } else if (options.displayType) {
+        content = <HomeWidgetGridContainer {...props}>{props.children}</HomeWidgetGridContainer>;
     }
 
     let viewAllLinkOrButton: ReactNode;
@@ -120,8 +119,10 @@ export function HomeWidgetContainer(props: IHomeWidgetContainerProps) {
 }
 
 export function HomeWidgetGridContainer(props: IHomeWidgetContainerProps) {
-    const classes = homeWidgetContainerClasses(props.options);
-
+    const classes = homeWidgetContainerClasses({
+        ...props.options,
+        contentIsListWithSeparators: props.contentIsListWithSeparators,
+    });
     const firstItemRef = useRef<HTMLDivElement | null>(null);
     const firstItemMeasure = useMeasure(firstItemRef);
 

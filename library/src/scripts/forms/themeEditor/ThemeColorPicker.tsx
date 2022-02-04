@@ -28,6 +28,10 @@ interface IProps extends Omit<React.HTMLAttributes<HTMLInputElement>, "type" | "
     disabled?: boolean;
 }
 
+/**
+ * FIXME: [VNLA-1019] Refactor this component to consume @library/components/ColorPicker instead
+ */
+
 export function ThemeColorPicker(_props: IProps) {
     const { variableKey, inputClass, disabled, ...inputProps } = _props;
     const { inputID, labelID } = useThemeBlock();

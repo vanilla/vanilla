@@ -9,23 +9,21 @@ namespace VanillaTests\Library\Core;
 
 use PHPUnit\Framework\TestCase;
 use VanillaTests\Library\Vanilla\Formatting\HtmlNormalizeTrait;
+use VanillaTests\SiteTestCase;
 use VanillaTests\SiteTestTrait;
 
 /**
  * Test some of the functions in functions.render.php.
  */
-class RenderFunctionsTest extends TestCase {
+class RenderFunctionsTest extends SiteTestCase {
 
     use HtmlNormalizeTrait;
-    use SiteTestTrait {
-        setupBeforeClass as siteTestBeforeClass;
-    }
 
     /**
      * Make sure the render functions are included.
      */
     public static function setUpBeforeClass(): void {
-        self::siteTestBeforeClass();
+        parent::setUpBeforeClass();
         require_once PATH_ROOT.'/library/core/functions.render.php';
 
         // set config for disucussion filters test

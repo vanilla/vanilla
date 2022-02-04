@@ -1,11 +1,13 @@
 <?php
 
+use Firebase\JWT\JWT;
 use Garden\ClassLocator;
 use Garden\Container\Container;
 use Garden\Container\Reference;
 use Garden\EventManager;
 use Vanilla\Addon;
 use Vanilla\BodyFormatValidator;
+use Vanilla\Contracts;
 use Vanilla\Contracts\Web\UASnifferInterface;
 use Vanilla\EmbeddedContent\LegacyEmbedReplacer;
 use Vanilla\Formatting\BaseFormat;
@@ -15,9 +17,11 @@ use Vanilla\Formatting\Html\HtmlPlainTextConverter;
 use Vanilla\Formatting\Html\HtmlSanitizer;
 use Vanilla\Formatting\Html\Processor\ExternalLinksProcessor;
 use Vanilla\HttpCacheMiddleware;
-use Vanilla\Contracts;
 use Vanilla\Layout\GlobalRecordProvider;
+use Vanilla\Layout\CategoryRecordProvider;
 use Vanilla\Layout\LayoutViewModel;
+use Vanilla\Logging\ErrorLogger;
+use Vanilla\Logging\LogDecorator;
 use Vanilla\Models\CurrentUserPreloadProvider;
 use Vanilla\Models\LocalePreloadProvider;
 use Vanilla\Models\Model;
@@ -34,12 +38,10 @@ use Vanilla\Site\OwnSiteProvider;
 use Vanilla\Site\SingleSiteSectionProvider;
 use Vanilla\Theme\FsThemeProvider;
 use Vanilla\Theme\ThemeAssetFactory;
-use Vanilla\Theme\ThemeFeatures;
 use Vanilla\Theme\ThemeService;
 use Vanilla\Theme\ThemeServiceHelper;
 use Vanilla\Theme\VariableProviders\QuickLinksVariableProvider;
 use Vanilla\Utility\ContainerUtils;
-use Firebase\JWT\JWT;
 use Vanilla\Web\Page;
 use Vanilla\Web\SafeCurlHttpHandler;
 use Vanilla\Web\TwigEnhancer;
@@ -143,18 +145,6 @@ $dic->setInstance(Container::class, $dic)
 
     ->rule(\Vanilla\Theme\ThemeSectionModel::class)
     ->setShared(true)
-
-    // Logger
-    ->rule(\Vanilla\Logging\LogDecorator::class)
-    ->setShared(true)
-    ->setConstructorArgs(['logger' => new Reference(\Vanilla\Logger::class)])
-
-    ->rule(\Vanilla\Logger::class)
-    ->setShared(true)
-    ->addAlias(\Psr\Log\LoggerInterface::class)
-
-    ->rule(\Psr\Log\LoggerAwareInterface::class)
-    ->addCall('setLogger')
 
     ->rule(HttpCacheMiddleware::class)
     ->setShared(true)
@@ -303,6 +293,10 @@ $dic->setInstance(Container::class, $dic)
 
     ->rule(LayoutViewModel::class)
     ->addCall('addProvider', [new Reference(GlobalRecordProvider::class)])
+    ->setShared(true)
+
+    ->rule(LayoutViewModel::class)
+    ->addCall('addProvider', [new Reference(CategoryRecordProvider::class)])
     ->setShared(true)
 
     ->rule(\Vanilla\Models\AuthenticatorModel::class)
@@ -488,7 +482,6 @@ $dic->call(function (
     \Vanilla\AddonManager $addonManager,
     Gdn_Request $request // remove later
 ) {
-
     // Load default baseline Garden configurations.
     $config->load(PATH_CONF.'/config-defaults.php');
 
@@ -509,7 +502,8 @@ $dic->call(function (
     $config->caching(true);
     debug($config->get('Debug', false));
 
-    setHandlers();
+    set_error_handler([ErrorLogger::class, 'handleError'], E_ALL);
+    set_exception_handler('gdnExceptionHandler');
 
     /**
      * Installer Redirect
@@ -551,10 +545,6 @@ $dic->call(function (
      */
     if (file_exists(PATH_CONF.'/bootstrap.late.php')) {
         require_once PATH_CONF.'/bootstrap.late.php';
-    }
-
-    if ($config->get('Debug')) {
-        debug(true);
     }
 
     /**
@@ -656,10 +646,5 @@ register_shutdown_function(function () use ($dic) {
     });
 });
 
-// Add the log decorator.
-ContainerUtils::replace(
-    $dic,
-    \Psr\Log\LoggerInterface::class,
-    \Vanilla\Logging\LogDecorator::class
-);
-Logger::setLogger(null);
+// Apply better information to our logs.
+LogDecorator::applyAsLogger($dic);

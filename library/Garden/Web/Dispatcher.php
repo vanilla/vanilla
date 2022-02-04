@@ -18,6 +18,7 @@ use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Vanilla\Contracts\LocaleInterface;
+use Vanilla\Logging\ErrorLogger;
 use Vanilla\Permissions;
 use Garden\CustomExceptionHandler;
 
@@ -185,7 +186,9 @@ class Dispatcher implements LoggerAwareInterface {
                         "exception" => $dispatchEx,
                     ]);
                 } else {
-                    logException($dispatchEx);
+                    ErrorLogger::error($dispatchEx, ['api-error', 'dispatcher-caught'], [
+                        'responseCode' => $dispatchEx->getCode(),
+                    ]);
                 }
                 $response = null;
                 if (is_object($action ?? null) && $action instanceof Action) {

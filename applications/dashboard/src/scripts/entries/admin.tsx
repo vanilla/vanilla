@@ -30,6 +30,7 @@ import { bindToggleChildrenEventListeners } from "@dashboard/settings";
 import { LanguageSettingsPage } from "@dashboard/pages/LanguageSettingsPage";
 import { escapeHTML } from "@vanilla/dom-utils";
 import { getDashboardRoutes } from "@dashboard/dashboardRoutes";
+import { BrandingAndSEOPage } from "@dashboard/pages/BrandingAndSEOPage";
 
 // Expose some new module functions to our old javascript system.
 window.escapeHTML = escapeHTML;
@@ -38,6 +39,7 @@ addComponent("imageUploadGroup", DashboardImageUploadGroup, { overwrite: true })
 addComponent("VanillaLabsPage", VanillaLabsPage);
 addComponent("LayoutPage", LayoutPage);
 addComponent("LanguageSettingsPage", LanguageSettingsPage);
+addComponent("BrandSettingsPage", BrandingAndSEOPage);
 
 disableComponentTheming();
 onContent(() => initAllUserContent());

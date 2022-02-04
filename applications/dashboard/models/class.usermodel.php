@@ -1429,6 +1429,10 @@ class UserModel extends Gdn_Model implements
                         setValue('Photo', $user, $photo);
                         // Add an alias to Photo. Currently only used in API calls.
                         setValue('PhotoUrl', $user, $photo);
+
+                        if (val('Name', $user) === '') {
+                            setValue('Name', $user, 'Unknown');
+                        }
                     }
                 }
                 $user = !empty($user) ? $user : $this->getGeneratedFragment(self::GENERATED_FRAGMENT_KEY_UNKNOWN);

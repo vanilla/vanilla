@@ -33,6 +33,7 @@ import { forumReducer } from "@vanilla/addon-vanilla/redux/reducer";
 import { themePreviewToastReducer } from "@library/features/toaster/themePreview/ThemePreviewToastReducer";
 import NotificationsModel from "@library/features/notifications/NotificationsModel";
 import TagWidget from "@vanilla/addon-vanilla/tag/TagWidget";
+import { RSSWidget } from "@library/rssWidget/RSSWidget";
 
 // App Setup
 applySharedPortalContext((props) => {
@@ -69,6 +70,7 @@ registerWidgets({
     LeaderboardWidget,
     DiscussionListModule,
     TagWidget,
+    RSSWidget,
 });
 
 // Reducers

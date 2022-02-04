@@ -57,7 +57,7 @@ class LayoutModelTest extends ClassLocatorTest {
     public function testNormalizeRows() {
         $layout = ['layoutID' => 1, 'layoutViewType' => 'home', 'name' => 'Home Test', 'layout' => 'test'];
         $layoutID = $this->layoutModel->insert($layout);
-        $layoutView = ['layoutID' => $layoutID, 'recordID' => 1, 'recordType' => 'global'];
+        $layoutView = ['layoutID' => $layoutID, 'recordID' => 1, 'recordType' => 'global', 'layoutViewType' => 'home'];
         $this->layoutViewModel->insert($layoutView);
         $rows = $this->layoutModel->getAll();
         $result = $this->layoutModel->normalizeRows($rows, ['layoutViews']);
@@ -72,7 +72,7 @@ class LayoutModelTest extends ClassLocatorTest {
     public function testGetLayout() {
         $layout = ['layoutID' => 1, 'layoutViewType' => 'home', 'name' => 'Home Test', 'layout' => 'test'];
         $layoutID = $this->layoutModel->insert($layout);
-        $layoutView = ['layoutID' => $layoutID, 'recordID' => 1, 'recordType' => 'home'];
+        $layoutView = ['layoutID' => $layoutID, 'recordID' => 1, 'recordType' => 'home', 'layoutViewType' => 'home'];
         $this->layoutViewModel->insert($layoutView);
 
         $result = $this->layoutModel->getByID($layoutID);

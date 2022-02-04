@@ -9,9 +9,6 @@ import { oneColumnVariables } from "@library/layout/Section.variables";
 import throttle from "lodash/throttle";
 import React, { useCallback, useContext, useEffect, useState } from "react";
 
-/**
- * @deprecated get Devices from LayoutContext
- */
 export enum Devices {
     XS = "xs",
     MOBILE = "mobile",
@@ -24,15 +21,9 @@ export interface IDeviceProps {
     device: Devices;
 }
 
-/**
- * @deprecated get Devices from LayoutContext
- */
 const DeviceContext = React.createContext<Devices>(Devices.DESKTOP);
 export default DeviceContext;
 
-/**
- * @deprecated use LayoutContext
- */
 export function useDevice() {
     const device = useContext(DeviceContext);
     return device;
@@ -42,9 +33,6 @@ interface IProps {
     children: React.ReactNode;
 }
 
-/**
- * @deprecated get Devices from LayoutContext
- */
 export function DeviceProvider(props: IProps) {
     const calculateDevice = useCallback(() => {
         const breakpoints = oneColumnVariables().breakPoints;

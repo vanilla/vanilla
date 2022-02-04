@@ -24,6 +24,7 @@ import { triggerLegacyHashScrolling } from "@vanilla/addon-vanilla/legacy/legacy
 import "@vanilla/addon-vanilla/forms/autosave";
 import { LeaderboardWidget } from "@library/leaderboardWidget/LeaderboardWidget";
 import { CategoriesWidget } from "@library/widgets/CategoriesWidget";
+import { RSSWidget } from "@library/rssWidget/RSSWidget";
 
 registerReducer("forum", forumReducer);
 registerCommunitySearchDomain();
@@ -42,6 +43,7 @@ addComponent("TabWidget", TabWidget, { overwrite: true });
 addComponent("NewPostMenu", NewPostMenu, { overwrite: true });
 addComponent("LeaderboardWidget", LeaderboardWidget, { overwrite: true });
 addComponent("CategoriesWidget", CategoriesWidget, { overwrite: true });
+addComponent("RSSWidget", RSSWidget, { overwrite: true });
 
 SearchContextProvider.setOptionProvider(new CommunitySearchProvider());
 accessibleRoleButton();

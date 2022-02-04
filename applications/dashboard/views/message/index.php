@@ -27,10 +27,10 @@ echo heading(t('Manage Messages'), t('Add Message'), 'dashboard/message/add', 'j
                     printf(
                         t('%1$s on %2$s'),
                         val($Message->AssetTarget, $this->_GetAssetData(), 'Custom Location'),
-                        val($Message->Location, $this->_GetLocationData(), 'Custom Page')
+                        $Message->LayoutViewType ?? 'Custom Page'
                     );
 
-                    if (val('CategoryID', $Message) && $Category = CategoryModel::categories($Message->CategoryID)) {
+                    if (val('RecordID', $Message) && $Category = CategoryModel::categories($Message->RecordID)) {
                         echo '<div>'.
                             anchor($Category['Name'], categoryUrl($Category));
 
@@ -51,18 +51,19 @@ echo heading(t('Manage Messages'), t('Add Message'), 'dashboard/message/add', 'j
                 </td>
                 <td class="message-type">
                     <?php
-                    $cssClass = val('CssClass', $Message);
-                    switch ($cssClass) {
-                        case 'CasualMessage':
+                    $messageType = val('Type', $Message) ?? 'casual';
+                    $Message->CssClass = ucfirst($messageType)."Message";
+                    switch ($messageType) {
+                        case 'casual':
                             $type =  t('Casual');
                             break;
-                        case 'InfoMessage':
+                        case 'info':
                             $type = t('Information');
                             break;
-                        case 'AlertMessage':
+                        case 'alert':
                             $type = t('Alert');
                             break;
-                        case 'WarningMessage':
+                        case 'warning':
                             $type = t('Warning');
                             break;
                         default:

@@ -97,6 +97,25 @@ abstract class HttpException extends \Exception implements \JsonSerializable {
     }
 
     /**
+     * @return array
+     */
+    public function getContext(): array {
+        return $this->context;
+    }
+
+    /**
+     * Apply a context to the message.
+     *
+     * @param array $context
+     *
+     * @return $this
+     */
+    public function withContext(array $context): self {
+        $this->context = array_merge_recursive($this->context, $context);
+        return $this;
+    }
+
+    /**
      * Create the appropriate exception for an HTTP status code.
      *
      * @param int $code An HTTP status code.

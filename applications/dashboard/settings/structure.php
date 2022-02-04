@@ -738,22 +738,9 @@ $ActivityModel->defineType('Registration');
 $ActivityModel->defineType('Status');
 $ActivityModel->defineType('Ban');
 
-// Message Table
-$Construct->table('Message')
-    ->primaryKey('MessageID')
-    ->column('Content', 'text')
-    ->column('Format', 'varchar(20)', true)
-    ->column('AllowDismiss', 'tinyint(1)', '1')
-    ->column('Enabled', 'tinyint(1)', '1')
-    ->column('Application', 'varchar(255)', true)
-    ->column('Controller', 'varchar(255)', true)
-    ->column('Method', 'varchar(255)', true)
-    ->column('CategoryID', 'int', true)
-    ->column('IncludeSubcategories', 'tinyint', '0')
-    ->column('AssetTarget', 'varchar(20)', true)
-    ->column('CssClass', 'varchar(20)', true)
-    ->column('Sort', 'int', true)
-    ->set($Explicit, $Drop);
+
+$modMessageStructure = new \Vanilla\Dashboard\Models\ModerationMessageStructure($Database);
+$modMessageStructure->structure();
 
 $Prefix = $SQL->Database->DatabasePrefix;
 

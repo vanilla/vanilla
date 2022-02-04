@@ -3107,6 +3107,7 @@ class CategoryModel extends Gdn_Model implements
                 $cat['_Depth'] = $cat['Depth'];
                 $cat['_PermissionCategoryID'] = $cat['PermissionCategoryID'];
                 $cat['_ParentCategoryID'] = $cat['ParentCategoryID'];
+                $cat['_CountCategories'] = $cat['CountCategories'];
             } catch (Exception $ex) {
                 // Suppress exceptions from bubbling up.
             }
@@ -3128,6 +3129,13 @@ class CategoryModel extends Gdn_Model implements
         }
         unset($cat);
 
+        // Reset CountCategories based on children.
+        foreach ($categories as $cat) {
+            if (isset($cat["CategoryID"])) {
+                $categories[$cat["CategoryID"]]["CountCategories"] = count($cat["Children"] ?? []);
+            }
+        }
+
         // Set the tree attributes of the tree.
         $this->_SetTree($root);
         unset($root);
@@ -3138,17 +3146,13 @@ class CategoryModel extends Gdn_Model implements
                 continue;
             }
 
-            // Get the count of child categories. If this is the root category, the children have been unset by
-            // the call to _SetTree() above, so just use the "CountCategories" value.
-            $catCountChildren = $cat["ParentCategoryID"] ===  null ? $cat["CountCategories"] : count($cat["Children"] ?? []);
-
             if ($cat['_TreeLeft'] != $cat['TreeLeft'] ||
                 $cat['_TreeRight'] != $cat['TreeRight'] ||
                 $cat['_Depth'] != $cat['Depth'] ||
                 $cat['PermissionCategoryID'] != $cat['PermissionCategoryID'] ||
                 $cat['_ParentCategoryID'] != $cat['ParentCategoryID'] ||
                 $cat['Sort'] != $cat['TreeLeft'] ||
-                $cat["CountCategories"] != $catCountChildren) {
+                $cat["_CountCategories"] != $cat["CountCategories"]) {
                 $this->SQL->put(
                     'Category',
                     [
@@ -3158,7 +3162,7 @@ class CategoryModel extends Gdn_Model implements
                         'PermissionCategoryID' => $cat['PermissionCategoryID'],
                         'ParentCategoryID' => $cat['ParentCategoryID'],
                         'Sort' => $cat['TreeLeft'],
-                        'CountCategories' => $catCountChildren,
+                        'CountCategories' => $cat["CountCategories"],
                     ],
                     ['CategoryID' => $cat['CategoryID']]
                 );

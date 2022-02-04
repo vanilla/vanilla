@@ -119,9 +119,7 @@ class DiscussionEvent extends ResourceEvent implements LoggableEventInterface, T
      * @return array
      */
     public function getTrackablePayload(TrackableCommunityModel $trackableCommunity): array {
-        $trackingData = [
-            'discussion' => $trackableCommunity->getTrackableDiscussion($this->getPayload()['discussion'])
-        ];
+        $trackingData = $trackableCommunity->getTrackableDiscussion($this->getPayload()['discussion']);
 
         // If we have a source category ID, we add a trackable category data structure to the payload.
         if (isset($this->sourceCategoryID)) {

@@ -306,7 +306,7 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
      * @param string $input
      */
     private function logBadInput(string $input) {
-        $this->logger->error("Bad input encountered", ['class' => self::class, 'method' =>  __METHOD__, 'input' => '$input'] + ($this->context ?? []));
+        $this->logger->error("Bad input encountered", ['input' => $input] + ($this->context ?? []));
     }
 
     /**

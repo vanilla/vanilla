@@ -13,10 +13,7 @@ import {
     STORY_WIDGET_ITEMS,
 } from "@library/homeWidget/HomeWidget.storyItems";
 import { HomeWidgetContainer } from "@library/homeWidget/HomeWidgetContainer";
-import {
-    IHomeWidgetContainerOptions,
-    WidgetContainerDisplayType,
-} from "@library/homeWidget/HomeWidgetContainer.styles";
+import { IHomeWidgetContainerOptions } from "@library/homeWidget/HomeWidgetContainer.styles";
 import { HomeWidgetItem } from "@library/homeWidget/HomeWidgetItem";
 import { HomeWidgetItemContentType, IHomeWidgetItemOptions } from "@library/homeWidget/HomeWidgetItem.styles";
 import Container from "@library/layout/components/Container";
@@ -362,38 +359,6 @@ export const Carousel = storyWithConfig({ useWrappers: false }, () => {
                     ...itemOptions,
                     contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
                 }}
-            />
-        </div>
-    );
-});
-
-export const List = storyWithConfig({ useWrappers: false }, () => {
-    const itemOptions: DeepPartial<IHomeWidgetItemOptions> = {
-        imagePlacement: "left",
-    };
-    const containerOptions: DeepPartial<IHomeWidgetContainerOptions> = {
-        displayType: WidgetContainerDisplayType.LIST,
-    };
-
-    return (
-        <div>
-            <HomeWidget
-                title="List with Text and Separator"
-                itemData={STORY_WIDGET_ITEMS}
-                containerOptions={containerOptions}
-                itemOptions={{
-                    ...itemOptions,
-                    contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION,
-                    box: {
-                        borderType: BorderType.SEPARATOR,
-                    },
-                }}
-            />
-            <HomeWidget
-                title="List with Icon"
-                itemData={STORY_WIDGET_ITEMS}
-                containerOptions={containerOptions}
-                itemOptions={{ ...itemOptions, contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION_ICON }}
             />
         </div>
     );

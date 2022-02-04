@@ -28,9 +28,10 @@ class SectionOneColumn extends AbstractLayoutSection {
     public static function getWidgetSchema(): Schema {
         return Schema::parse([
             'contents' => new ReactChildrenSchema('The contents of the schema.'),
-            'isNarrow:b?' => [
+            'isNarrow:b' => [
                 'default' => false,
             ],
+            'breadcrumbs?' => new ReactChildrenSchema(),
         ]);
     }
 

@@ -71,12 +71,10 @@ class CommentEvent extends ResourceEvent implements LoggableEventInterface, Trac
      * @return array
      */
     public function getTrackablePayload(TrackableCommunityModel $trackableCommunity): array {
-        $trackingData = [
-            'comment' => $trackableCommunity->getTrackableComment(
-                $this->getPayload()["comment"],
-                $this->getTrackableAction()
-            )
-        ];
+        $trackingData = $trackableCommunity->getTrackableComment(
+            $this->getPayload()["comment"],
+            $this->getTrackableAction()
+        );
         return $trackingData;
     }
 

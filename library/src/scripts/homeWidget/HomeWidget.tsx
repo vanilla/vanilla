@@ -13,39 +13,27 @@ import {
     IHomeWidgetContainerOptions,
     homeWidgetContainerVariables,
     homeWidgetContainerClasses,
-    WidgetContainerDisplayType,
 } from "@library/homeWidget/HomeWidgetContainer.styles";
 import { IHomeWidgetItemProps, HomeWidgetItem } from "@library/homeWidget/HomeWidgetItem";
 import { HomeWidgetContainer } from "@library/homeWidget/HomeWidgetContainer";
 import { DeepPartial } from "redux";
 
-export interface IWidgetCommonProps {
-    /** The title of the widget */
-    title?: string;
-    /** The subtitle of the widget */
-    subtitle?: string;
-    /** Text describing the widget */
-    description?: string;
-}
-interface IProps extends IWidgetCommonProps {
+interface IProps {
     // Options
     containerOptions?: IHomeWidgetContainerOptions;
     itemOptions?: DeepPartial<IHomeWidgetItemOptions>;
     maxItemCount?: number;
 
     // Content
+    title?: string;
+    subtitle?: string;
+    description?: string;
     itemData: IHomeWidgetItemProps[];
 }
 
 export function HomeWidget(props: IProps) {
     const itemOptions = homeWidgetItemVariables(props.itemOptions).options;
-    const containerOptionsWithDefaults = {
-        ...props.containerOptions,
-        isGrid:
-            !props.containerOptions?.isCarousel &&
-            (!props.containerOptions?.displayType ||
-                props.containerOptions?.displayType === WidgetContainerDisplayType.GRID),
-    };
+    const containerOptionsWithDefaults = { ...props.containerOptions, isGrid: !props.containerOptions?.isCarousel };
     const containerOptions = homeWidgetContainerVariables(containerOptionsWithDefaults).options;
     const containerClasses = homeWidgetContainerClasses(props.containerOptions);
 
@@ -64,8 +52,7 @@ export function HomeWidget(props: IProps) {
             HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
         ].includes(itemOptions.contentType) &&
         props.itemData.length < containerOptions.maxColumnCount &&
-        !containerOptions.isCarousel &&
-        containerOptions.displayType !== WidgetContainerDisplayType.CAROUSEL
+        !containerOptions.isCarousel
     ) {
         extraSpacerItemCount = containerOptions.maxColumnCount - props.itemData.length;
     }

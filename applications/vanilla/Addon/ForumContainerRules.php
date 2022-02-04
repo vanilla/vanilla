@@ -15,11 +15,8 @@ use Vanilla\Forum\Models\Totals\CommentSiteTotalProvider;
 use Vanilla\Forum\Models\Totals\DiscussionSiteTotalProvider;
 use Vanilla\Forum\Widgets\DiscussionAnnouncementsWidget;
 use Vanilla\Forum\Widgets\DiscussionDiscussionsWidget;
-use Vanilla\Forum\Widgets\TagWidget;
-use Vanilla\Forum\Widgets\CategoriesWidget;
 use Vanilla\Layout\LayoutHydrator;
 use Vanilla\Models\SiteTotalService;
-
 
 /**
  * Class ForumContainerRules
@@ -33,9 +30,7 @@ class ForumContainerRules extends AddonContainerRules {
         $container
             ->rule(LayoutHydrator::class)
             ->addCall("addReactResolver", [DiscussionAnnouncementsWidget::class])
-            ->addCall("addReactResolver", [DiscussionDiscussionsWidget::class])
-            ->addCall("addReactResolver", [TagWidget::class])
-            ->addCall("addReactResolver", [CategoriesWidget::class]);
+            ->addCall("addReactResolver", [DiscussionDiscussionsWidget::class]);
 
         $container->rule(SiteTotalService::class)
             ->addCall('registerProvider', [new Reference(CategorySiteTotalProvider::class)])

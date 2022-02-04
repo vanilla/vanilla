@@ -1266,7 +1266,7 @@ class DiscussionsApiController extends AbstractApiController {
         foreach ($rows as &$row) {
             $id = $row['lastPost']['commentID'] ?? null;
             if (isset($comments[$id])) {
-                $row['lastPost']['body'] = \Gdn::formatService()->renderHTML($comments[$id]['Body'], $comments[$id]['Format'], ['recordID' => $id, 'recordType' => 'comment']);
+                $row['lastPost']['body'] = \Gdn::formatService()->renderHTML($comments[$id]['Body'], $comments[$id]['Format']);
             } elseif (isset($row['body'])) {
                 $row['lastPost']['body'] = $row['body'];
             }

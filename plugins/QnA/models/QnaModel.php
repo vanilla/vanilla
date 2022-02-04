@@ -56,6 +56,7 @@ class QnaModel extends Gdn_Model {
         $modelCache = new ModelCache("qna", Gdn::cache());
 
         // Will be filtered by current subcommunity automatically if they are enabled.
+        // Categories with `HideAllDiscussions` set to 1 are excluded.
         $visibleCategoryIDs = $categoryModel->getVisibleCategoryIDs(
             [
                 'forceArrayReturn' => true,

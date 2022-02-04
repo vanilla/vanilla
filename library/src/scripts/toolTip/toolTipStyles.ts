@@ -76,7 +76,7 @@ export const toolTipClasses = useThemeCache(() => {
             all: globalVars.fonts.size.medium,
         }),
         ...shadow.dropDown(),
-        zIndex: Math.max(modalVariables().sizing.zIndex + 1, 99999),
+        zIndex: modalVariables().sizing.zIndex + 1,
     });
 
     const nubPosition = style("nubPosition", {
@@ -90,7 +90,7 @@ export const toolTipClasses = useThemeCache(() => {
         transform: translateX("-50%"),
         marginLeft: styleUnit(vars.nub.width),
         pointerEvents: "none",
-        zIndex: Math.max(modalVariables().sizing.zIndex + 2, 99999),
+        zIndex: modalVariables().sizing.zIndex + 2,
         ...userSelect(),
     });
 

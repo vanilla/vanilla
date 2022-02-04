@@ -26,9 +26,6 @@ class FileBasedLayoutProvider implements LayoutProviderInterface {
     /** @var ?string $requestedLayoutPath */
     private $requestedLayoutPath;
 
-    /** @var \UserModel */
-    private $userModel;
-
     //endregion
 
     //region Constructor
@@ -38,9 +35,8 @@ class FileBasedLayoutProvider implements LayoutProviderInterface {
      *
      * @param string $cacheBasePath Base path used to cache parsed static layout definitions
      */
-    public function __construct(string $cacheBasePath, \UserModel $userModel) {
+    public function __construct(string $cacheBasePath) {
         $this->cacheBasePath = $cacheBasePath;
-        $this->userModel = $userModel;
         $this->layoutPaths = [];
     }
 
@@ -84,12 +80,12 @@ class FileBasedLayoutProvider implements LayoutProviderInterface {
     /**
      * Register a static layout with the provider and is typically invoked as part of container initialization.
      *
-     * @param string $layoutID Layout view type for the static layout
+     * @param string $layoutViewType Layout view type for the static layout
      * @param string $layoutFilePath Path to the file where the static layout is defined.
      */
-    public function registerStaticLayout(string $layoutID, string $layoutFilePath): void {
+    public function registerStaticLayout(string $layoutViewType, string $layoutFilePath): void {
         if (file_exists($layoutFilePath)) {
-            $this->layoutPaths[$layoutID] = $layoutFilePath;
+            $this->layoutPaths[$layoutViewType] = $layoutFilePath;
         }
     }
 
@@ -122,9 +118,7 @@ class FileBasedLayoutProvider implements LayoutProviderInterface {
             if (!isset($this->requestedLayoutPath)) {
                 throw new NotFoundException('Layout');
             }
-            $contents = FileUtils::getArray($this->requestedLayoutPath);
-            $contents['insertUserID'] = $this->userModel->getSystemUserID();
-            return $contents;
+            return FileUtils::getArray($this->requestedLayoutPath);
         } catch (\Exception $e) {
             throw new NotFoundException('Layout');
         }

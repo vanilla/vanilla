@@ -195,7 +195,7 @@ class LocalesTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Test that event-based locale definitions are applied to the translations API.
+     * Test that event based locale definitions are applied the translations API.
      */
     public function testTranslationsWithExtras() {
         $before = $this->api->get("/locales/en/translations")->getBody();

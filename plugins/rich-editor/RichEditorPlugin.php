@@ -141,16 +141,6 @@ class RichEditorPlugin extends Gdn_Plugin {
                 'uploadEnabled' => $args['Attributes']['UploadEnabled'] ?? true,
             ];
 
-            if (!Gdn::session()->User->Admin) {
-                // If a category is set check for AllowFileUploads. (admins bypass this condition)
-                $categoryID = $controller->data('Category.CategoryID', $controller->data('ContextualCategoryID'));
-                // Check the category exists.
-                $category = CategoryModel::categories($categoryID);
-                $viewData['uploadEnabled'] = is_array($category) && key_exists('AllowFileUploads', $category) ?
-                    (bool)$category['AllowFileUploads'] :
-                    true;
-            }
-
             if ($isForcedRich) {
                 $viewData['needsHtmlConversion'] = true;
 

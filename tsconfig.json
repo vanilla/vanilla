@@ -17,7 +17,6 @@
             "@Ranks/*": ["./plugins/Ranks/src/scripts/*"],
             "@Reactions/*": ["./plugins/Reactions/src/scripts/*"],
             "@badges/*": ["./plugins/badges/src/scripts/*"],
-            "@Online/*": ["./plugins/Online/src/scripts/*"],
             "@ElasticSearch/*": ["./plugins/ElasticSearch/src/scripts/*"],
             "typestyle": ["./library/src/scripts/styles/styleShim.ts"],
             "@vanilla/babel-preset": ["./packages/vanilla-babel-preset/*"],

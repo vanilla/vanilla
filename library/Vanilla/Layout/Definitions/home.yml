@@ -1,0 +1,21 @@
+layoutID: "home"
+name: "homepage"
+layoutViewType: "home"
+layout: >
+    [
+      {
+        "$hydrate": "react.section.1-column",
+        "contents": [
+          {
+            "$hydrate":"react.asset.breadcrumbs",
+            "recordType":"category",
+            "recordID":{
+              "$hydrate":"param",
+              "$ref":"category/categoryID"
+            },
+          }
+        ]
+      }
+    ]
+insertUserID: 1
+dateInserted: "2022-01-01 00:00:00"

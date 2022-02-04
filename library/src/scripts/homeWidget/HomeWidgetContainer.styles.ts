@@ -21,13 +21,6 @@ import { useThemeCache } from "@library/styles/themeCache";
 import { Variables } from "@library/styles/Variables";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { percent } from "csx";
-
-export enum WidgetContainerDisplayType {
-    GRID = "grid",
-    CAROUSEL = "carousel",
-    LIST = "list",
-    LINK = "link",
-}
 export interface IHomeWidgetContainerOptions {
     outerBackground?: IBackground;
     innerBackground?: IBackground;
@@ -42,16 +35,10 @@ export interface IHomeWidgetContainerOptions {
     };
     // @deprecated
     description?: string;
-
     headerAlignment?: "left" | "center";
     contentAlignment?: "flex-start" | "center";
-    displayType?: WidgetContainerDisplayType;
-
-    // @deprecated
     isGrid?: boolean;
-    // @deprecated
     isCarousel?: boolean;
-    titleChildren?: React.ReactNode;
 }
 
 interface IViewAll {
@@ -108,7 +95,6 @@ export const homeWidgetContainerVariables = useThemeCache(
                 description: undefined as string | undefined,
                 headerAlignment: pageHeadingVars.options.alignment as "left" | "center",
                 contentAlignment: "flex-start" as "flex-start" | "center",
-                displayType: undefined as WidgetContainerDisplayType | undefined,
                 isGrid: false,
                 isCarousel: false,
             },
@@ -123,15 +109,7 @@ export const homeWidgetContainerVariables = useThemeCache(
                     options.innerBackground.color || options.innerBackground.image
                         ? BorderType.SHADOW
                         : BorderType.NONE,
-                maxColumnCount:
-                    options.displayType === (WidgetContainerDisplayType.LIST || WidgetContainerDisplayType.LINK)
-                        ? 1
-                        : options.maxColumnCount,
-                displayType: options.isCarousel
-                    ? WidgetContainerDisplayType.CAROUSEL
-                    : options.isGrid
-                    ? WidgetContainerDisplayType.GRID
-                    : options.displayType,
+                isGrid: options.isCarousel ? false : options.isGrid,
             },
             optionOverrides,
         );
@@ -183,9 +161,7 @@ export const homeWidgetContainerVariables = useThemeCache(
                         options.borderType === "navLinks" ? mobileNavPaddings.horizontal : globalVars.gutter.size,
                 },
             },
-            options.displayType !== WidgetContainerDisplayType.GRID
-                ? { horizontal: 0, vertical: globalVars.gutter.size / 2, mobile: { horizontal: 0 } }
-                : {},
+            !options.isGrid ? { horizontal: 0, vertical: globalVars.gutter.size / 2, mobile: { horizontal: 0 } } : {},
         );
 
         const hasVisibleContainer =

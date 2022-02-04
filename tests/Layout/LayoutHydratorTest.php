@@ -48,8 +48,7 @@ class LayoutHydratorTest extends BootstrapTestCase {
                     '$hydrate' => "react.section.1-column",
                     "contents" => [
                         $breadcrumbDefinition,
-                    ],
-                    'autoWrap' => true,
+                    ]
                 ]]
             ],
             [
@@ -73,7 +72,6 @@ class LayoutHydratorTest extends BootstrapTestCase {
                             ],
                         ]],
                         'isNarrow' => false,
-                        'autoWrap' => true,
                     ],
                 ]]
             ]
@@ -114,7 +112,6 @@ class LayoutHydratorTest extends BootstrapTestCase {
                 '$reactProps' => [
                     "contents" => [],
                     'isNarrow' => false,
-                    'autoWrap' => true,
                 ],
             ],
         ];

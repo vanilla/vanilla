@@ -120,10 +120,7 @@ export const autoCompleteClasses = ({
                 default: { width: 24, height: 24, right: -4, transform: "translateY(calc(0.5em - 50%))" },
             }[size],
         },
-        "&:first-of-type&:last-of-type": {
-            background: "rgba(3,125,188,0.08)",
-        },
-        "&[data-autocomplete-selected=true]": {
+        "&:first-of-type": {
             background: "rgba(3,125,188,0.08)",
         },
     }),

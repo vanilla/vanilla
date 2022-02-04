@@ -12,7 +12,6 @@ use UserModel;
 use UsersApiController;
 use Vanilla\Events\EventAction;
 use Vanilla\Models\PermissionFragmentSchema;
-use Vanilla\Web\CacheControlConstantsInterface;
 use Vanilla\Web\PrivateCommunityMiddleware;
 use VanillaTests\Fixtures\TestUploader;
 use VanillaTests\UsersAndRolesApiTestTrait;
@@ -216,9 +215,6 @@ class UsersTest extends AbstractResourceTest {
         $response = $this->api()->get("{$this->baseUrl}/me");
         $this->assertSame(200, $response->getStatusCode());
 
-        $header = $response->getHeader('cache-control');
-        $this->assertSame(CacheControlConstantsInterface::NO_CACHE, $header);
-
         $expected = [
             "userID" => 0,
             "name" => "Guest",
@@ -298,8 +294,8 @@ class UsersTest extends AbstractResourceTest {
                 "personalInfo.view",
                 "profiles.edit",
                 "profiles.view",
-                "session.valid",
                 "settings.view",
+                "signIn.allow",
                 "site.manage",
                 "uploads.add",
                 "users.add",
@@ -721,7 +717,7 @@ class UsersTest extends AbstractResourceTest {
                 [
                     'type' => 'global',
                     'permissions' => [
-                        'session.valid' => true
+                        'signIn.allow' => true
                     ]
                 ]
             ]

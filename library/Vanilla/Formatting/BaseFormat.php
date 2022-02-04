@@ -28,9 +28,6 @@ abstract class BaseFormat implements FormatInterface {
     /** @var HtmlProcessor[] */
     protected $dynamicProcessors = [];
 
-    /** @var array context */
-    protected $context;
-
     /**
      * Apply an HTML processor to the stack of processors.
      *
@@ -45,14 +42,6 @@ abstract class BaseFormat implements FormatInterface {
             $this->staticProcessors[] = $processor;
         }
 
-        return $this;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setContext(?array $context = []): FormatInterface {
-        $this->context = $context;
         return $this;
     }
 

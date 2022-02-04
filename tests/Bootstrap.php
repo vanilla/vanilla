@@ -36,8 +36,6 @@ use Vanilla\Dashboard\Models\RemoteResourceModel;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Forum\Navigation\ForumBreadcrumbProvider;
 use Vanilla\HttpCacheMiddleware;
-use Vanilla\Layout\GlobalRecordProvider;
-use Vanilla\Layout\LayoutViewModel;
 use Vanilla\Models\AuthenticatorModel;
 use Vanilla\Models\SSOModel;
 use Vanilla\Navigation\BreadcrumbModel;
@@ -387,9 +385,6 @@ class Bootstrap {
 
             ->rule(BreadcrumbModel::class)
             ->addCall('addProvider', [new Reference(ForumBreadcrumbProvider::class)])
-
-            ->rule(LayoutViewModel::class)
-            ->addCall('addProvider', [new Reference(GlobalRecordProvider::class)])
 
             ->rule(\Vanilla\Formatting\Quill\Parser::class)
             ->addCall('addCoreBlotsAndFormats')

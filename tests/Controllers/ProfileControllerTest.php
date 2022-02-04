@@ -293,7 +293,7 @@ class ProfileControllerTest extends SiteTestCase {
                     'type' => 'global',
                     'permissions' => [
                         'email.view' => true,
-                        'session.valid' => true,
+                        'signIn.allow' => true,
                     ],
                 ],
             ],

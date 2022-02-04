@@ -60,18 +60,10 @@ export const pageHeadingBoxClasses = useThemeCache((optionOverrides?: Partial<IP
         excludeHeadingMargins,
     );
 
-    const titleCount = css({
-        whiteSpace: "nowrap", // prevents count value from stacking.
-        textAlign: "right",
-        paddingLeft: vars.font.letterSpacing,
-        ...Mixins.font(vars.count),
-    });
-
     return {
         root,
         titleWrap,
         descriptionWrap,
         subtitle,
-        titleCount,
     };
 });

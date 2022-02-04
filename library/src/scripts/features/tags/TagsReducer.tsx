@@ -13,9 +13,6 @@ export interface ITag {
     tagID: number;
     name: string;
     urlcode: string;
-    parentTagID?: number | null;
-    urlCode?: string;
-    countDiscussions?: number;
 }
 
 export interface ITagState {

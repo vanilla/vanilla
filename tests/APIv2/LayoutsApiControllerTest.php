@@ -1,17 +1,16 @@
 <?php
 /**
  * @author Dan Redman <dredman@higherlogic.com>
- * @copyright 2009-2022 Higher Logic LLC.
+ * @copyright 2009-2021 Higher Logic LLC.
  * @license GPL-2.0-only
  */
 
 namespace VanillaTests\APIv2;
 
+use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
-use Gdn;
 use Vanilla\Layout\Providers\FileBasedLayoutProvider;
-use VanillaTests\ExpectExceptionTrait;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 
 /**
@@ -20,7 +19,6 @@ use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 class LayoutsApiControllerTest extends AbstractResourceTest {
 
     use CommunityApiTestTrait;
-    use ExpectExceptionTrait;
 
     //region Properties
     protected $testPagingOnIndex = false;
@@ -55,9 +53,6 @@ class LayoutsApiControllerTest extends AbstractResourceTest {
      */
     public function setUp(): void {
         parent::setUp();
-        Gdn::sql()->truncate("layout");
-        Gdn::sql()->truncate("layoutView");
-
         $fileBasedLayoutProvider = $this->container()->get(FileBasedLayoutProvider::class);
         $fileBasedLayoutProvider->setCacheBasePath(PATH_TEST_CACHE);
     }
@@ -233,6 +228,7 @@ class LayoutsApiControllerTest extends AbstractResourceTest {
     public function mutableEndpointThrowsClientExceptionOnInvalidIdFormatDataProvider(): iterable {
         yield "floating point number" => [pi()];
         yield "boolean" => [false];
+        yield "string" => ["home"];
     }
 
 
@@ -278,7 +274,6 @@ class LayoutsApiControllerTest extends AbstractResourceTest {
                         ],
                     ],
                     'isNarrow' => false,
-                    'autoWrap' => true,
                 ],
             ],
         ];
@@ -324,6 +319,7 @@ class LayoutsApiControllerTest extends AbstractResourceTest {
         $this->assertStringContainsString("react.asset.breadcrumbs", $response->getRawBody());
     }
 
+
     /**
      * Test posting new views, retrieving those views, deleting those views and verifying those views were deleted
      */
@@ -361,30 +357,6 @@ class LayoutsApiControllerTest extends AbstractResourceTest {
         $response = $this->api()->get('/layouts/'.$layoutID.'/views');
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertSame($numLayoutViews - 2, count($response->getBody()));
-    }
-
-    /**
-     * Test layout deletion for layouts associated to view.
-     */
-    public function testDeleteLayoutAssociatedToView() {
-        // Create a layout
-        $layout = $this->testPost();
-        $layoutID = $layout['layoutID'];
-
-        // Create a view associated to the new layout.
-        $expected = ['recordID' => 1, 'recordType' => 'widget'];
-        $createViewResponse = $this->api()->post('/layouts/'.$layoutID.'/views', $expected);
-        $layoutViewID = [$createViewResponse->getBody()['layoutViewID']];
-
-        // Try to delete a layout associate to the view (This should fail).
-        $this->runWithExpectedException(ClientException::class, function () use ($layoutID) {
-            $this->api()->delete('/layouts/'.$layoutID);
-        });
-
-        $deleteViewResponse = $this->api()->delete('/layouts/'.$layoutID.'/views', ['layoutViewIDs' => $layoutViewID]);
-        $this->assertEquals(204, $deleteViewResponse->getStatusCode());
-        $deleteLayoutResponse = $this->api()->delete('/layouts/'.$layoutID);
-        $this->assertEquals(204, $deleteLayoutResponse->getStatusCode());
     }
 
     /**

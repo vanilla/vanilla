@@ -1694,7 +1694,7 @@ class CategoryModel extends Gdn_Model implements
      * @param int $categoryID The category to give the points for.
      * @param int|false $timestamp The time the points were given.
      */
-    public static function givePoints(int $userID, int $points, string $source = 'Other', int $categoryID = 0, $timestamp = false) {
+    public static function givePoints($userID, $points, $source = 'Other', $categoryID = 0, $timestamp = false) {
         // Figure out whether or not the category tracks points seperately.
         if ($categoryID) {
             $category = self::categories($categoryID);

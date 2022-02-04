@@ -29,8 +29,6 @@ class TagModel extends Gdn_Model {
 
     const FIELD_MAPPINGS = ['urlcode' => 'Name', 'name' => 'FullName'];
 
-    const LIMIT = 20;
-
     /**
      * @param string $name
      */
@@ -432,7 +430,6 @@ class TagModel extends Gdn_Model {
             'type:s?',
             'insertUserID:i',
             'dateInserted:dt',
-            'countDiscussions:i',
         ]));
         return $fullSchema;
     }
@@ -1199,13 +1196,8 @@ class TagModel extends Gdn_Model {
         if ($query || !empty($parent) || !empty($type)) {
             $tagQuery = Gdn::sql()
                 ->select('*')
-                ->from('Tag');
-
-            if (key_exists('sort', $options)) {
-                $tagQuery->orderBy($options['sort'], 'desc');
-            }
-
-            $tagQuery->limit(key_exists('limit', $options) ? $options['limit'] : self::LIMIT);
+                ->from('Tag')
+                ->limit(20);
 
             if ($query) {
                 $tagQuery->like('FullName', str_replace(['%', '_'], ['\%', '_'], $query), strlen($query) > 2 ? 'both' : 'right');
@@ -1242,7 +1234,6 @@ class TagModel extends Gdn_Model {
                         'fullName' => $tag->FullName,
                         'type' => $type,
                         'parentTagID' => $tag->ParentTagID ?? null,
-                        'countDiscussions' => $tag->CountDiscussions,
                     ];
                 } else {
                     $data[] = [

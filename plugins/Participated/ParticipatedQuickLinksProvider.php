@@ -36,13 +36,17 @@ class ParticipatedQuickLinksProvider implements QuickLinkProviderInterface {
      * @inheritdoc
      */
     public function provideQuickLinks(): array {
+        $session = \Gdn::session();
+        if (!$session->isValid()) {
+            return [];
+        }
+
         return [
             new QuickLink(
                 'Participated',
                 '/discussions/participated',
                 null,
-                $this->session->isValid() ? $this->discussionModel->getCountParticipated() : null,
-                "session.valid"
+                $this->discussionModel->getCountParticipated()
             )
         ];
     }

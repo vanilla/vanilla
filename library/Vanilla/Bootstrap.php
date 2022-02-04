@@ -83,7 +83,11 @@ class Bootstrap {
         $container
             ->rule(\Vanilla\Logger::class)
             ->setShared(true)
-            ->addAlias(\Psr\Log\LoggerInterface::class)
+
+            ->rule(LoggerInterface::class)
+            ->setShared(true)
+            ->setAliasOf(\Vanilla\Logger::class)
+            ->setClass(\Vanilla\Logger::class)
 
             ->rule(Vanilla\Logging\LogDecorator::class)
             ->setShared(true)

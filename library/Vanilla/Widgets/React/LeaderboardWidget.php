@@ -8,16 +8,11 @@
 namespace Vanilla\Widgets\React;
 
 use Garden\Schema\Schema;
-use Garden\Schema\ValidationField;
 use Vanilla\Dashboard\UserPointsModel;
-use Vanilla\Forms\FormOptions;
-use Vanilla\Forms\SchemaForm;
-use Vanilla\Forms\StaticFormChoices;
 use Vanilla\Forum\Controllers\Api\DiscussionsApiIndexSchema;
 use Vanilla\Models\UserFragmentSchema;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Web\JsInterpop\AbstractReactModule;
-use Vanilla\Widgets\AbstractHomeWidgetModule;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
 
 /**
@@ -104,7 +99,7 @@ class LeaderboardWidget extends AbstractReactModule implements ReactWidgetInterf
 
         return SchemaUtils::composeSchemas(
             self::widgetTitleSchema("All Time Leaders"),
-            self::widgetSubtitleSchema("leaderboard"),
+            self::widgetSubtitleSchema("subtitle"),
             self::widgetDescriptionSchema(),
             self::containerOptionsSchema("containerOptions"),
             $widgetSpecificSchema

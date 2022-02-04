@@ -74,6 +74,7 @@ class RSSModuleTest extends StorybookGenerationTestCase {
         $apiParams = [
             'feedUrl' => '/discussions/feed.rss',
             'fallbackImageUrl' => $fallbackImageUrl,
+            'limit' => 3
         ];
         $containerOptions = [
             'borderType' => 'shadow',

@@ -40,8 +40,9 @@ class TestLogger implements LoggerInterface {
     public static function replaceContext($format, $context = []) {
         $msg = preg_replace_callback('`({[^\s{}]+})`', function($m) use ($context) {
             $field = trim($m[1], '{}');
-            if (array_key_exists($field, $context)) {
-                return $context[$field];
+            $fieldValue = $context[$field] ?? $context['data'][$field] ?? null;
+            if ($fieldValue !== null) {
+                return $fieldValue;
             } else {
                 return $m[1];
             }

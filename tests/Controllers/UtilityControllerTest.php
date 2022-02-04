@@ -35,7 +35,7 @@ class UtilityControllerTest extends SiteTestCase {
 
             $this->assertLog([
                 "message" => "Structure failed for addon {addonKey}",
-                "addonKey" => "bad-structure",
+                "data.addonKey" => "bad-structure",
             ]);
         });
     }

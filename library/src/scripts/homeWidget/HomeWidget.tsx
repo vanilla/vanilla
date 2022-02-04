@@ -46,6 +46,10 @@ export function HomeWidget(props: IProps) {
             !props.containerOptions?.isCarousel &&
             (!props.containerOptions?.displayType ||
                 props.containerOptions?.displayType === WidgetContainerDisplayType.GRID),
+        maxColumnCount:
+            props.containerOptions?.displayType === WidgetContainerDisplayType.LIST
+                ? 1
+                : props.containerOptions?.maxColumnCount,
     };
     const containerOptions = homeWidgetContainerVariables(containerOptionsWithDefaults).options;
     const containerClasses = homeWidgetContainerClasses(props.containerOptions);

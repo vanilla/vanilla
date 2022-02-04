@@ -560,7 +560,7 @@ class UsersTest extends AbstractResourceTest {
         });
         $r = $this->api()->post('/users/request-password', ['email' => $user['email']]);
 
-        $this->assertLog(['event' => 'password_reset_skipped', 'email' => $user['email']]);
+        $this->assertLog(['event' => 'password_reset_skipped', 'data.email' => $user['email']]);
 
         try {
             $this->runWithConfig([
@@ -581,7 +581,7 @@ class UsersTest extends AbstractResourceTest {
         ], function () use ($user) {
             $this->getTestLogger()->clear();
             $r = $this->api()->post('/users/request-password', ['email' => $user['name']]);
-            $this->assertLog(['event' => 'password_reset_skipped', 'email' => $user['email']]);
+            $this->assertLog(['event' => 'password_reset_skipped', 'data.email' => $user['email']]);
         });
     }
 

@@ -10,6 +10,8 @@ namespace Vanilla;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 use Psr\Log\LogLevel;
+use Vanilla\Logging\ErrorLogger;
+use Vanilla\Logging\LogDecorator;
 
 /**
  * A logger that can contain many loggers.
@@ -219,10 +221,12 @@ class Logger implements LoggerInterface {
         }
         $inCall = true;
 
+        // Try to decorate the context.
+        $context = LogDecorator::applyLogDecorator($context);
+
         foreach ($this->loggers as $row) {
             /* @var LoggerInterface $logger */
             [$logger, $loggerPriority, $filter] = $row;
-
             if ($loggerPriority >= $levelPriority) {
                 try {
                     if ($filter === null || call_user_func($filter, $level, $message, $context)) {
@@ -233,6 +237,11 @@ class Logger implements LoggerInterface {
                     throw $ex;
                 }
             }
+        }
+
+        // Go the error logger as well if this is an error.
+        if (LOG_WARNING >= $levelPriority) {
+            ErrorLogger::log($level, $message, [], $context);
         }
 
         $inCall = false;

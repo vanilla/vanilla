@@ -14,6 +14,8 @@ use Garden\Container\Container;
 use Garden\EventManager;
 use Gdn_Cache;
 use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Throwable;
 use Vanilla\Contracts\ConfigurationInterface;
@@ -42,7 +44,10 @@ use Vanilla\Utility\Timers;
  *
  * Accepts jobs and process them all by delegating to an underlying Job Driver.
  */
-class DummyScheduler implements SchedulerInterface {
+class DummyScheduler implements SchedulerInterface, LoggerAwareInterface {
+
+    use LoggerAwareTrait;
+
     protected const CRON_LOCK_KEY = 'CRON_LOCK';
     protected const CRON_MINIMUM_TIME_SPAN = 60;
 
@@ -54,9 +59,6 @@ class DummyScheduler implements SchedulerInterface {
 
     /** @var Container */
     protected $container;
-
-    /** @var LoggerInterface */
-    protected $logger;
 
     /** @var DriverInterface[] */
     protected $drivers = [];

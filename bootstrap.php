@@ -645,6 +645,3 @@ register_shutdown_function(function () use ($dic) {
         }
     });
 });
-
-// Apply better information to our logs.
-LogDecorator::applyAsLogger($dic);

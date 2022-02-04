@@ -7,6 +7,8 @@
 
 namespace Vanilla\Scheduler;
 
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Vanilla\Contracts\ConfigurationInterface;
@@ -19,8 +21,9 @@ use Vanilla\Scheduler\Job\TrackableJobAwareTrait;
 /**
  * Class TrackingSlip
  */
-class TrackingSlip implements TrackingSlipInterface {
+class TrackingSlip implements TrackingSlipInterface, LoggerAwareInterface {
 
+    use LoggerAwareTrait;
     use TrackableJobAwareTrait;
 
     /**

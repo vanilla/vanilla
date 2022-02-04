@@ -69,30 +69,21 @@ class CategoriesWidget extends AbstractReactModule implements CombinedPropsWidge
      * @return array
      */
     public function getProps(): ?array {
-        $apiParams = (array)$this->props['apiParams'] ?? [];
-        $validatedParams = $this->getApiSchema()->validate($apiParams);
-        $apiParams = array_merge($apiParams, $validatedParams);
+        $validatedParams = $this->getApiSchema()->validate((array)$this->props['apiParams']);
+        $this->props['apiParams'] = array_merge((array)$this->props['apiParams'], $validatedParams);
 
         //if there is manual siteSection filter or we are in siteSection currently, we include it
-        //this might be in the api itself ? cause currently we can't send categoryID and parentCategoryID together, api throws an error ...
         $contextualCategoryID = $this->currentSiteSection->getAttributes()['categoryID'] ?? -1;
-        if (!$apiParams['parentCategoryID'] && !$apiParams['categoryID']) {
-            $apiParams['parentCategoryID'] = $contextualCategoryID;
+        $parentCategoryID = $this->props['apiParams']['parentCategoryID'] ?? null;
+        $categoryID = $this->props['apiParams']['categoryID'] ?? null;
+        if (!$parentCategoryID && !$categoryID) {
+            $this->props['apiParams']['parentCategoryID'] = $contextualCategoryID;
         }
 
         //get the categories
-        $categories = $this->api->index($apiParams)->getData();
+        $categories = $this->api->index($this->props['apiParams'])->getData();
 
-        $props = [
-            'title' => $this->props['title'],
-            'subtitle' => $this->props['subtitle'],
-            'description' => $this->props['description'],
-            'containerOptions' => $this->props['containerOptions'],
-            'itemOptions' => $this->props['itemOptions'],
-            'maxItemCount' => $this->props['maxItemCount'], //this will probably go away with categories API "limit" full support
-        ];
-
-        $props['itemData'] = array_map(function ($category) {
+        $this->props['itemData'] = array_map(function ($category) {
             return [
                 'to' => $category['url'],
                 'iconUrl' => $category['iconUrl'] ?? null,
@@ -108,7 +99,7 @@ class CategoriesWidget extends AbstractReactModule implements CombinedPropsWidge
             ];
         }, $categories);
 
-        return $props;
+        return $this->props;
     }
 
     /**
@@ -120,7 +111,7 @@ class CategoriesWidget extends AbstractReactModule implements CombinedPropsWidge
         $apiSchema = new Schema([
             'type' => 'object',
             'default' => new \stdClass(),
-            'description' => 'Api parameters for categories endpoint.'
+            'description' => 'Api parameters for categories endpoint.',
         ]);
         $apiSchema = $apiSchema->merge(SchemaUtils::composeSchemas(
             Schema::parse([
@@ -143,7 +134,7 @@ class CategoriesWidget extends AbstractReactModule implements CombinedPropsWidge
                 ],
                 'parentCategoryID?' => [
                     'type' => ['string', 'integer', 'null'],
-                    'description' => 'Filter by subcommunity'
+                    'description' => 'Filter by subcommunity',
                 ],
                 //TODO  sort options ? looks like some changes/adjustments should be done in the api itself, cause right now there is no such parameter to send
             ])

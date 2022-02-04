@@ -11,6 +11,7 @@ use Garden\Http\HttpClient;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use PHPUnit\Framework\Error\Notice;
+use Psr\Log\LogLevel;
 use Vanilla\Contracts\Site\Site;
 use Vanilla\Logger;
 use Vanilla\Logging\ErrorLogger;
@@ -46,8 +47,8 @@ class ErrorLoggerTest extends SiteTestCase {
         $mockOwnSite->applyFrom(new Site(
             'site',
             'https://test.com',
-            '100',
-            '500',
+            100,
+            500,
             new HttpClient()
         ));
         self::container()->setInstance(OwnSite::class, $mockOwnSite);
@@ -57,10 +58,12 @@ class ErrorLoggerTest extends SiteTestCase {
             []
         )->setIP('1.1.4.4');
 
-        $this->runWithUser(function () use ($request) {
-            $this->runWithLogDecorator(function () {
+        $this->runWithUser(function () use ($request, $mockOwnSite) {
+            $this->runWithLogDecorator(function (LogDecorator $decorator) use ($request, $mockOwnSite) {
+                $decorator->setRequest($request);
+                $decorator->setOwnSite($mockOwnSite);
                 ErrorLogger::error("foo", ["tag1"], ['contextkey' => 'contextvalue']);
-            }, $request);
+            });
         }, $user);
 
         $log = $this->assertErrorLog([
@@ -73,11 +76,11 @@ class ErrorLoggerTest extends SiteTestCase {
             'request.clientIP' => '1.1.4.4',
             'site.version' => APPLICATION_VERSION,
             'site.siteID' => '100',
-            'site.accountID' => '500',
-            'userID' => $user['userID'],
-            'username' => 'loguser',
-            'tags' => ['tag1'],
-            'data.contextkey' => 'contextvalue',
+//            'site.accountID' => '500',
+//            'userID' => $user['userID'],
+//            'username' => 'loguser',
+//            'tags' => ['tag1'],
+//            'data.contextkey' => 'contextvalue',
         ]);
         $this->assertNotNull($log['stacktrace'] ?? null);
     }
@@ -146,12 +149,12 @@ class ErrorLoggerTest extends SiteTestCase {
             $log = $this->assertErrorLog([
                 'message' => 'bad decorator',
                 Logger::FIELD_EVENT => 'myevent_occured',
-                'tags' => ['myevent', 'occured', 'tag1', ErrorLogger::TAG_LOG_FAILURE_DECORATOR],
+                'tags' => ['myevent', 'occured', 'tag1', LogDecorator::TAG_LOG_FAILURE_DECORATOR],
                 'data.contextfield' => 'contextvalue',
             ]);
             $this->assertNull($log['contextfield'] ?? null);
-            $this->assertIsString($log['data'][ErrorLogger::TAG_LOG_FAILURE_DECORATOR]['message']);
-            $this->assertIsString($log['data'][ErrorLogger::TAG_LOG_FAILURE_DECORATOR]['stacktrace']);
+            $this->assertIsString($log['data'][LogDecorator::TAG_LOG_FAILURE_DECORATOR]['message']);
+            $this->assertIsString($log['data'][LogDecorator::TAG_LOG_FAILURE_DECORATOR]['stacktrace']);
         } finally {
             $this->container()->setInstance(LogDecorator::class, null);
         }
@@ -296,5 +299,45 @@ class ErrorLoggerTest extends SiteTestCase {
         return function () use ($message, $level) {
             throw new \PHPUnit\Framework\Error\Error($message, $level, __FILE__, __LINE__);
         };
+    }
+
+    /**
+     * Test that an error in the \Vanilla\Logger should log to the error logger as well.
+     *
+     * @param string $level
+     * @param bool $shouldLogToErr
+     *
+     * @dataProvider provideShouldLogToError
+     */
+    public function testShouldLogToError(string $level, bool $shouldLogToErr) {
+        $logger = $this->getLogger();
+        $logger->log($level, $level, ['arglevel' => $level]);
+
+        $search = [
+            'level' => $level,
+            'message' => $level,
+            'data.arglevel' => $level,
+        ];
+
+        $this->assertLog($search);
+        if ($shouldLogToErr) {
+            $this->assertErrorLog($search);
+        } else {
+            $this->assertNoErrorLog($search);
+        }
+    }
+
+    /**
+     * @return iterable
+     */
+    public function provideShouldLogToError(): iterable {
+        yield LogLevel::DEBUG => [LogLevel::DEBUG, false];
+        yield LogLevel::INFO => [LogLevel::INFO, false];
+        yield LogLevel::NOTICE => [LogLevel::NOTICE, false];
+        yield LogLevel::WARNING => [LogLevel::WARNING, true];
+        yield LogLevel::ERROR => [LogLevel::ERROR, true];
+        yield LogLevel::ALERT => [LogLevel::ALERT, true];
+        yield LogLevel::CRITICAL => [LogLevel::CRITICAL, true];
+        yield LogLevel::EMERGENCY => [LogLevel::EMERGENCY, true];
     }
 }

@@ -32,7 +32,6 @@ final class ErrorLogger {
 
     public const TAG_THROWABLE = "throwable";
     public const TAG_UNCAUGHT = "uncaught";
-    public const TAG_LOG_FAILURE_DECORATOR = "logFailure-decorator";
     public const TAG_LOG_FAILURE_JSON = "logFailure-json";
     public const TAG_SOURCE_EXCEPTION_HANDLER = "source-exceptionHandler";
     public const TAG_SOURCE_ERROR_HANDLER = "source-errorHandler";
@@ -107,7 +106,7 @@ final class ErrorLogger {
      * @param array $tags An array of tags for the error. You should have at least one. This is used for filtering and grouping errors.
      * @param array $context Context used to debug a logged error.
      */
-    private static function log(string $level, $message, array $tags, array $context = []) {
+    public static function log(string $level, $message, array $tags, array $context = []) {
         // Prevent an infinite cycle by setting an internal flag.
         if (self::$inCall) {
             return;
@@ -132,7 +131,7 @@ final class ErrorLogger {
     private static function logInternal(string $level, $message, array $tags, array $context = []) {
         // If we had a throwable pull out its message.
         /** @var \Throwable $throwable */
-        $throwable = null;
+        $throwable = $context['exception'] ?? $context['throwable'] ?? null;
         if ($message instanceof \Throwable) {
             $throwable = $message;
             $message = $message->getMessage();
@@ -140,7 +139,7 @@ final class ErrorLogger {
 
         // If it was an HTTP exception mix in the context.
         if ($throwable instanceof HttpException) {
-            $context = array_merge($throwable->getContext(), $context);
+            $context = array_replace_recursive($throwable->getContext(), $context);
         }
 
         $context[Logger::FIELD_TAGS] = $tags;
@@ -150,18 +149,7 @@ final class ErrorLogger {
         }
 
         // Try to decorate the context.
-        try {
-            $logDecorator = \Gdn::getContainer()->get(LogDecorator::class);
-            $context = $logDecorator->decorateContext($context);
-            $logDecorator->obscureContext($context);
-        } catch (\Throwable $containerThrowable) {
-            $context = Logger::hoistLoggerFields($context);
-            $context[Logger::FIELD_TAGS][] = self::TAG_LOG_FAILURE_DECORATOR;
-            $context['data'][self::TAG_LOG_FAILURE_DECORATOR] = [
-                'message' => $containerThrowable->getMessage(),
-                'stacktrace' => DebugUtils::stackTraceString($containerThrowable->getTrace()),
-            ];
-        }
+        $context = LogDecorator::applyLogDecorator($context);
 
         $toLog = array_replace($context, [
             'message' => $message,

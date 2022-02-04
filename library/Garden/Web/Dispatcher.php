@@ -186,7 +186,7 @@ class Dispatcher implements LoggerAwareInterface {
                         "exception" => $dispatchEx,
                     ]);
                 } else {
-                    ErrorLogger::error($dispatchEx, ['api-error', 'dispatcher-caught'], [
+                    ErrorLogger::error($dispatchEx, ['api_error', 'dispatcher-caught'], [
                         'responseCode' => $dispatchEx->getCode(),
                     ]);
                 }

@@ -9,6 +9,7 @@ namespace Vanilla\Forum\Widgets;
 use Garden\Schema\Schema;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
+use Vanilla\Forms\StaticFormChoices;
 use Vanilla\InjectableInterface;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
@@ -58,7 +59,8 @@ class RSSWidget implements ReactWidgetInterface, CombinedPropsWidgetInterface, I
             $this->props['apiParams']['feedUrl'],
             $this->props['apiParams']['fallbackImageUrl'] ?? null
         );
-        $this->props['itemData'] = $itemData;
+        $limit = $this->props['apiParams']['limit'] ?? null;
+        $this->props['itemData'] = count($itemData) > $limit ? array_slice($itemData, 0, $limit) : $itemData;
         return $this->props;
     }
 
@@ -85,6 +87,13 @@ class RSSWidget implements ReactWidgetInterface, CombinedPropsWidgetInterface, I
                                 'Render this image instead if feed entry does not have one.'
                             ),
                             "url"
+                        ),
+                    ],
+                    'limit:i?' => [
+                        'default' => 10,
+                        'x-control' => SchemaForm::dropDown(
+                            new FormOptions('Limit', 'Maximum amount of items to display.'),
+                            new StaticFormChoices(array_combine(range(1, 10), range(1, 10)))
                         ),
                     ],
                 ])

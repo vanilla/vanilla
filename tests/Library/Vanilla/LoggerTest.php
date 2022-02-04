@@ -35,31 +35,22 @@ class LoggerTest extends LoggerInterfaceTest {
      * @return void
      */
     public function testBasicLogging() {
-        $logger = new TestLogger();
-
-        $this->assertLogExists($logger, Logger::DEBUG, 'Hello world', ['foo']);
+        $this->getTestLogger()->debug("Hello world");
+        $this->assertLog([
+            'level' => Logger::DEBUG,
+            'message' => 'Hello world',
+        ]);
     }
 
     /**
      * @return void
      */
     public function testLowPriority() {
-        $logger = new TestLogger(null, Logger::INFO);
-
-        $this->assertNotLog($logger, Logger::DEBUG, 'Hello world', ['bar']);
-    }
-
-    /**
-     * @return void
-     */
-    public function testTwoLoggers() {
-        $logger1 = new TestLogger();
-        $logger2 = new TestLogger($logger1->parent);
-        $loggers = [$logger1, $logger2];
-
-        foreach ($loggers as $logger) {
-            $this->assertLogExists($logger, Logger::DEBUG, 'Hello world', ['foo']);
-        }
+        $this->getTestLogger()->info("Hello world");
+        $this->assertLog([
+            'level' => Logger::DEBUG,
+            'message' => 'Hello world',
+        ]);
     }
 
     /**

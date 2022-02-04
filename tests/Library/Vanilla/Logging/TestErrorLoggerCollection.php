@@ -39,10 +39,11 @@ final class TestErrorLoggerCollection {
      */
     public function __construct(string $filepath) {
         $this->testLogger = new TestLogger();
-        if (!file_exists($filepath)) {
-            TestCase::fail("Log file did not exists: " . $filepath);
+        if (file_exists($filepath)) {
+            $data = file_get_contents($filepath);
+        } else {
+            $data = '';
         }
-        $data = file_get_contents($filepath);
         $pieces = explode("\n", $data);
         foreach ($pieces as $piece) {
             if (empty($piece)) {

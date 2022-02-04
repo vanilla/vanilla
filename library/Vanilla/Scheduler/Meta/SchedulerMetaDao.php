@@ -8,6 +8,8 @@
 namespace Vanilla\Scheduler\Meta;
 
 use Garden\EventManager;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Throwable;
 use Vanilla\Contracts\ConfigurationInterface;
@@ -15,7 +17,9 @@ use Vanilla\Contracts\ConfigurationInterface;
 /**
  * Class CronMetaDao
  */
-class SchedulerMetaDao {
+class SchedulerMetaDao implements LoggerAwareInterface {
+
+    use LoggerAwareTrait;
 
     protected const SCHEDULER_CONTROL_META_NAME = "Garden.Scheduler.ControlMeta";
 
@@ -24,9 +28,6 @@ class SchedulerMetaDao {
 
     /** @var EventManager */
     protected $eventManager;
-
-    /** @var LoggerInterface */
-    protected $logger;
 
     /**
      * CronMetaDao constructor.

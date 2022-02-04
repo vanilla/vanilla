@@ -10,6 +10,7 @@ namespace VanillaTests;
 use Psr\Log\LoggerInterface;
 use Vanilla\Logging\ErrorLogger;
 use Vanilla\Logging\LogDecorator;
+use Vanilla\Site\OwnSite;
 use VanillaTests\Library\Vanilla\Logging\TestErrorLoggerCollection;
 
 /**
@@ -55,28 +56,19 @@ trait TestLoggerTrait {
     }
 
     /**
-     * @return LogDecorator
-     */
-    protected static function applyLogDecorator(): LogDecorator {
-        self::container()->setInstance(LogDecorator::class, null);
-        LogDecorator::applyAsLogger(self::container());
-        return self::container()->get(LogDecorator::class);
-    }
-
-    /**
-     * Run a callback with a log decorator. A specific request may be applied to the log decorator.
+     * Run a callback that will receive a log decorator and allow mutations.
+     * Any changes will be reset afterwards.
      *
      * @param callable $callable
-     * @param \Gdn_Request|null $request
      */
-    protected static function runWithLogDecorator(callable $callable, \Gdn_Request $request = null) {
-        $existingLogger = self::container()->get(LoggerInterface::class);
+    protected static function runWithLogDecorator(callable $callable) {
+        $origDecorator = self::container()->get(LogDecorator::class);
         try {
-            $logDecorator = self::applyLogDecorator();
-            $logDecorator->setRequest($request);
-            call_user_func($callable);
+            $clonedDecorator = clone $origDecorator;
+            self::container()->setInstance(LogDecorator::class, $clonedDecorator);
+            call_user_func($callable, $clonedDecorator);
         } finally {
-            self::container()->setInstance(LoggerInterface::class, $existingLogger);
+            self::container()->setInstance(LogDecorator::class, $origDecorator);
         }
     }
 

@@ -15,14 +15,10 @@ use Gdn;
 use Nette\Loaders\RobotLoader;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerInterface;
-use Psr\SimpleCache\CacheInterface;
 use TagModule;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\Authenticator\PasswordAuthenticator;
-use Vanilla\Cache\CacheCacheAdapter;
 use Vanilla\Community\CallToActionModule;
 use Vanilla\Community\CategoriesModule;
 use Vanilla\Contracts\Addons\EventListenerConfigInterface;
@@ -218,6 +214,7 @@ class Bootstrap {
             ->setShared(true)
 
             ->rule(\Vanilla\Logger::class)
+            ->setShared(true)
             ->addCall('addLogger', [new Reference(TestLogger::class)])
 
             // EventManager

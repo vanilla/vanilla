@@ -8,6 +8,8 @@
 namespace Vanilla\Scheduler\Driver;
 
 use Exception;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Throwable;
 use Vanilla\Scheduler\Job\JobExecutionStatus;
@@ -19,12 +21,9 @@ use Vanilla\Scheduler\Job\LocalJobInterface;
  *
  * A driver that accepts jobs and process them locally on the current environment.
  */
-class LocalDriver implements DriverInterface {
+class LocalDriver implements DriverInterface, LoggerAwareInterface {
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    use LoggerAwareTrait;
 
     /**
      * LocalDriver constructor

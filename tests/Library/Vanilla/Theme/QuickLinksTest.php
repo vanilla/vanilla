@@ -8,14 +8,16 @@ namespace VanillaTests\Library\Vanilla\Theme;
 
 use Vanilla\Theme\VariableProviders\QuickLink;
 use VanillaTests\SiteTestCase;
-use VanillaTests\VanillaTestCase;
+use VanillaTests\Layout\LayoutTestTrait;
 
 /**
  * Class QuickLinksTest
  *
  * @package VanillaTests\Library\Vanilla\Theme
  */
-class QuickLinksTest extends VanillaTestCase {
+class QuickLinksTest extends SiteTestCase {
+
+    use LayoutTestTrait;
 
     /**
      * Make a simple Quick Link
@@ -83,5 +85,37 @@ class QuickLinksTest extends VanillaTestCase {
 
         $this->assertSame(null, $quickLink->getCountLimit());
         $this->assertSame(null, $serialized["countLimit"]);
+    }
+
+    /**
+     * Test that we can hydrate Quick Links Widget.
+     */
+    public function testHydrateQuickLinksWidget() {
+        $spec = [
+            '$hydrate' => 'react.quick-links',
+            'title' => 'Quick Links',
+            'containerOptions' => [
+                'borderType' => 'border',
+            ],
+            'links' => [
+                [
+                    'name' => "Item1",
+                    'url' => "http://something",
+                ],
+                [
+                    'name' => "Item2",
+                    'url' => "http://something2",
+                ],
+            ],
+        ];
+        $expected = [
+            '$reactComponent' => 'QuickLinks',
+            '$reactProps' => [
+                'containerOptions' => $spec['containerOptions'],
+                'title' => $spec['title'],
+                'links' => $spec['links'],
+            ],
+        ];
+        $this->assertHydratesTo($spec, [], $expected);
     }
 }

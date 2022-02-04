@@ -9,12 +9,14 @@ namespace Vanilla\Logging;
 
 use Garden\Container\Container;
 use GPBMetadata\Google\Api\Log;
+use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 use Ramsey\Uuid\Uuid;
 use Vanilla\Logger;
 use Vanilla\Site\OwnSite;
 use Vanilla\Utility\ContainerUtils;
+use Vanilla\Utility\DebugUtils;
 
 /**
  * A decorator for the log that adds default context attributes based on the current request.
@@ -22,7 +24,10 @@ use Vanilla\Utility\ContainerUtils;
 class LogDecorator implements LoggerInterface {
     use LoggerTrait;
 
+    public const SCHEMA_VERSION = 'v2';
+    public const FIELD_SCHEMA = '_schema';
     public const FIELD_DATA = "data";
+    public const TAG_LOG_FAILURE_DECORATOR = "logFailure-decorator";
 
     /**
      * @var \Gdn_Session
@@ -58,18 +63,42 @@ class LogDecorator implements LoggerInterface {
     ];
 
     /**
-     * Apply the log decorator as the current logger, wrapping the current one.
+     * Decorate a log context and transform it into the standard structure.
      *
-     * @param Container $container
+     * This will transform the context significantly, even if the decorator fails to load.
+     * If it does fail to decorate a tag will be added with information about the error.
+     *
+     * @param array $context
+     * @return array
      */
-    public static function applyAsLogger(Container $container) {
-        $existingLogger = $container->get(LoggerInterface::class);
-        $decorator = $container->getArgs(LogDecorator::class, ['logger' => $existingLogger]);
-        $container->setInstance(LoggerInterface::class, $decorator);
+    public static function applyLogDecorator(array $context): array {
+        $schema = $context[self::FIELD_SCHEMA] ?? null;
+        if ($schema === self::SCHEMA_VERSION) {
+            // We are already decorated.
+            return $context;
+        }
+
+        try {
+            $logDecorator = \Gdn::getContainer()->get(LogDecorator::class);
+            $context = $logDecorator->decorateContext($context);
+            $logDecorator->obscureContext($context);
+        } catch (\Throwable $throwable) {
+            $context = Logger::hoistLoggerFields($context);
+            $context[Logger::FIELD_TAGS][] = self::TAG_LOG_FAILURE_DECORATOR;
+            $context['data'][self::TAG_LOG_FAILURE_DECORATOR] = [
+                'message' => $throwable->getMessage(),
+                'stacktrace' => DebugUtils::stackTraceString($throwable->getTrace()),
+            ];
+        }
+
+        return $context;
     }
 
     /**
      * LogDecorator constructor.
+     *
+     * NOTE: This gets instantiated very early in the request.
+     * Do not add any other direct dependencies in here if possible.
      *
      * @param LoggerInterface $logger
      * @param \Gdn_Request $request
@@ -96,6 +125,13 @@ class LogDecorator implements LoggerInterface {
     }
 
     /**
+     * @param OwnSite $ownSite
+     */
+    public function setOwnSite(OwnSite $ownSite): void {
+        $this->ownSite = $ownSite;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function log($level, $message, array $context = []) {
@@ -115,7 +151,7 @@ class LogDecorator implements LoggerInterface {
         $coreFields = Logger::hoistLoggerFields($context);
 
         $coreContext = [
-            '_schema' => 'v2',
+            self::FIELD_SCHEMA => self::SCHEMA_VERSION,
 
             // Vanilla App Info
             'site' => [

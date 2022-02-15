@@ -35,6 +35,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     /** Free to be blocked. */
     const BLOCK_ANY = 2;
 
+    private $wasBlockExceptionEventTriggered = false;
+
     /** @var array List of exceptions not to block */
     private $blockExceptions = [
         '#^api/v2/#' => self::BLOCK_PERMISSION,
@@ -724,12 +726,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      * @return array
      */
     public function getBlockExceptions() {
-        static $eventTriggered = false;
-
-        if (!$eventTriggered) {
+        if (!$this->wasBlockExceptionEventTriggered) {
             $this->EventArguments['BlockExceptions'] = &$this->blockExceptions;
             $this->fireEvent('BeforeBlockDetect');
-            $eventTriggered = true;
+            $this->wasBlockExceptionEventTriggered = true;
         }
 
         return $this->blockExceptions;

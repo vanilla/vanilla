@@ -196,6 +196,14 @@ components:
                     x-key: Garden.Title
                     x-read: public
                     x-write: community.manage
+                "labs.customLayouts":
+                    description: Create and manage layouts for your community through the layout editor.
+                    type: boolean
+                    default: false
+                    example: false
+                    x-key: Feature.CustomLayoutHomePage.Enabled
+                    x-read: public
+                    x-write: community.manage
                 "labs.deferredLegacyScripts":
                     description: >-
                         This setting loads the page before executing Javascript which can improve your SEO.

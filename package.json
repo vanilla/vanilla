@@ -201,6 +201,11 @@
         "webpackbar": "^5.0.0-3",
         "yargs": "^13.2.2"
     },
+    "dependenciesMeta": {
+        "@react-spring/core": {
+            "built": false
+        }
+    },
     "resolutions": {
         "webpack@>=5.0.0": "^5.36.0",
         "@types/react": "^16.9.46",
@@ -235,5 +240,6 @@
         "storybook": "NODE_OPTIONS=--max_old_space_size=2500 NODE_ENV=test node ./node_modules/.bin/start-storybook -p 9001 -c build/.storybook",
         "storybook:modern": "STORYBOOK_SECTION=modern yarn storybook",
         "build-storybook": "yarn prepare-storybook-legacy && node --max-old-space-size=2048 ./node_modules/.bin/build-storybook -c build/.storybook -o build/.out"
-    }
+    },
+    "packageManager": "yarn@3.1.1"
 }

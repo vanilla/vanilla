@@ -58,11 +58,13 @@ export default function SiteNavProvider(props: IProps) {
      * Open an item in the nav.
      */
     const openItem = (recordType: string, recordID: number) => {
-        const records = openRecords[recordType] || new Set();
-        records.add(recordID);
-        setOpenRecords({
-            ...openRecords,
-            [recordType]: records,
+        setOpenRecords((existingState) => {
+            const records = existingState[recordType] || new Set();
+            records.add(recordID);
+            return {
+                ...existingState,
+                [recordType]: records,
+            };
         });
     };
 

@@ -24,6 +24,7 @@ use Vanilla\Forum\Widgets\DiscussionDiscussionsWidget;
 use Vanilla\Forum\Widgets\TagWidget;
 use Vanilla\Forum\Widgets\CategoriesWidget;
 use Vanilla\Forum\Widgets\RSSWidget;
+use Vanilla\Forum\Widgets\UserSpotlightWidget;
 use Vanilla\Layout\LayoutHydrator;
 use Vanilla\Layout\LayoutService;
 use Vanilla\Models\SiteTotalService;
@@ -45,6 +46,7 @@ class ForumContainerRules extends AddonContainerRules {
             ->addCall("addReactResolver", [TagWidget::class])
             ->addCall("addReactResolver", [CategoriesWidget::class])
             ->addCall("addReactResolver", [RSSWidget::class])
+            ->addCall("addReactResolver", [UserSpotlightWidget::class])
             ->addCall('addMiddleware', [new Reference(CategoryFilterMiddleware::class)]);
 
         $container->rule(SiteTotalService::class)

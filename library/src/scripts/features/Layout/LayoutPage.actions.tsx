@@ -8,17 +8,17 @@ import apiv2 from "@library/apiv2";
 import { ILayoutQuery, ILayoutSpec } from "@library/features/Layout/LayoutPage.types";
 import { getSiteSection } from "@library/utility/appUtils";
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { getCurrentLocale } from "@vanilla/i18n";
 
-/**
- * Lookup a layout. In the future this will use a lookup API.
- * Right now for testing purposes it uses the hardcoded layoutID 1 which is a home layout.
- * That can be edited at /settings/layout/playground
- */
 export const lookupLayout = createAsyncThunk("@@layouts/lookup", async (query?: ILayoutQuery) => {
-    const layoutSpec = await apiv2.get("/layouts/1/hydrate", {
+    const layoutSpec = await apiv2.get("/layouts/lookup-hydrate", {
         params: {
+            layoutViewType: query?.layoutViewType,
+            recordID: query?.recordID,
+            recordType: query?.recordType,
             params: {
                 siteSectionID: getSiteSection().sectionID,
+                locale: getCurrentLocale(),
             },
         },
     });

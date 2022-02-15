@@ -66,6 +66,7 @@ export const autoCompleteClasses = ({
                 small: { padding: "3px 6px", paddingRight: 0 },
                 default: { padding: "4px 8px", paddingRight: 0 },
             }[size],
+            fontWeight: "initial",
             "& + div": {
                 paddingRight: 2,
             },

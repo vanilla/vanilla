@@ -73,8 +73,6 @@ export const currentThemeClasses = useThemeCache(() => {
             horizontal: globalVars.gutter.size,
             vertical: globalVars.gutter.size + globalVars.gutter.half,
         }),
-        marginLeft: -18,
-        marginRight: -18,
     });
 
     const cardContainer = css({

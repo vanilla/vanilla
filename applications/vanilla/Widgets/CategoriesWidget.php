@@ -7,6 +7,7 @@
 namespace Vanilla\Forum\Widgets;
 
 use Garden\Schema\Schema;
+use Vanilla\Models\DiscussionJsonLD;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Web\JsInterpop\AbstractReactModule;

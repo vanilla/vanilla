@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6ba782cf011ea2df49dbdad314e4c2b8",
+    "content-hash": "6d5fd0487f7a98c159002ac6dfaeaf75",
     "packages": [
         {
             "name": "bopoda/robots-txt-parser",
@@ -893,12 +893,12 @@
                 }
             },
             "autoload": {
-                "psr-4": {
-                    "GuzzleHttp\\Psr7\\": "src/"
-                },
                 "files": [
                     "src/functions_include.php"
-                ]
+                ],
+                "psr-4": {
+                    "GuzzleHttp\\Psr7\\": "src/"
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -2003,6 +2003,16 @@
                 "identifier",
                 "uuid"
             ],
+            "funding": [
+                {
+                    "url": "https://github.com/ramsey",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/ramsey/uuid",
+                    "type": "tidelift"
+                }
+            ],
             "time": "2020-02-21T04:36:14+00:00"
         },
         {
@@ -2055,12 +2065,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/smarty-php/smarty.git",
-                "reference": "2dc5d8da8541cda90e67e0c1fccf47b0a04839fc"
+                "reference": "273f7e00fec034f6d61112552e9caf08d19565b7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smarty-php/smarty/zipball/2dc5d8da8541cda90e67e0c1fccf47b0a04839fc",
-                "reference": "2dc5d8da8541cda90e67e0c1fccf47b0a04839fc",
+                "url": "https://api.github.com/repos/smarty-php/smarty/zipball/273f7e00fec034f6d61112552e9caf08d19565b7",
+                "reference": "273f7e00fec034f6d61112552e9caf08d19565b7",
                 "shasum": ""
             },
             "require": {
@@ -2450,12 +2460,12 @@
                 }
             },
             "autoload": {
-                "psr-4": {
-                    "Symfony\\Polyfill\\Intl\\Idn\\": ""
-                },
                 "files": [
                     "bootstrap.php"
-                ]
+                ],
+                "psr-4": {
+                    "Symfony\\Polyfill\\Intl\\Idn\\": ""
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -2532,12 +2542,12 @@
                 }
             },
             "autoload": {
-                "psr-4": {
-                    "Symfony\\Polyfill\\Intl\\Normalizer\\": ""
-                },
                 "files": [
                     "bootstrap.php"
                 ],
+                "psr-4": {
+                    "Symfony\\Polyfill\\Intl\\Normalizer\\": ""
+                },
                 "classmap": [
                     "Resources/stubs"
                 ]
@@ -2687,12 +2697,12 @@
                 }
             },
             "autoload": {
-                "psr-4": {
-                    "Symfony\\Polyfill\\Php72\\": ""
-                },
                 "files": [
                     "bootstrap.php"
-                ]
+                ],
+                "psr-4": {
+                    "Symfony\\Polyfill\\Php72\\": ""
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -2760,12 +2770,12 @@
                 }
             },
             "autoload": {
-                "psr-4": {
-                    "Symfony\\Polyfill\\Php73\\": ""
-                },
                 "files": [
                     "bootstrap.php"
                 ],
+                "psr-4": {
+                    "Symfony\\Polyfill\\Php73\\": ""
+                },
                 "classmap": [
                     "Resources/stubs"
                 ]
@@ -2836,12 +2846,12 @@
                 }
             },
             "autoload": {
-                "psr-4": {
-                    "Symfony\\Polyfill\\Php74\\": ""
-                },
                 "files": [
                     "bootstrap.php"
-                ]
+                ],
+                "psr-4": {
+                    "Symfony\\Polyfill\\Php74\\": ""
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -2913,12 +2923,12 @@
                 }
             },
             "autoload": {
-                "psr-4": {
-                    "Symfony\\Polyfill\\Php80\\": ""
-                },
                 "files": [
                     "bootstrap.php"
                 ],
+                "psr-4": {
+                    "Symfony\\Polyfill\\Php80\\": ""
+                },
                 "classmap": [
                     "Resources/stubs"
                 ]
@@ -3471,16 +3481,16 @@
         },
         {
             "name": "vanilla/garden-hydrate",
-            "version": "v2.2.0",
+            "version": "v2.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/garden-hydrate.git",
-                "reference": "13fe9cda2e997fda41305b53a114b5f7d05152bc"
+                "reference": "76344e51300c762dacd909083543b0571006caa4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/garden-hydrate/zipball/13fe9cda2e997fda41305b53a114b5f7d05152bc",
-                "reference": "13fe9cda2e997fda41305b53a114b5f7d05152bc",
+                "url": "https://api.github.com/repos/vanilla/garden-hydrate/zipball/76344e51300c762dacd909083543b0571006caa4",
+                "reference": "76344e51300c762dacd909083543b0571006caa4",
                 "shasum": ""
             },
             "require": {
@@ -3512,7 +3522,7 @@
                 }
             ],
             "description": "A JSON based templating language for data.",
-            "time": "2022-01-18T19:00:26+00:00"
+            "time": "2022-02-10T15:43:52+00:00"
         },
         {
             "name": "vanilla/garden-jsont",
@@ -3870,7 +3880,7 @@
                 }
             ],
             "description": "A composer-compatible fork of the NBBC BBCode parsing library.",
-            "time": "2019-03-15T04:17:08+00:00"
+            "time": "2021-04-26T14:15:26+00:00"
         },
         {
             "name": "vanilla/safecurl",
@@ -4232,12 +4242,12 @@
                 }
             },
             "autoload": {
-                "psr-4": {
-                    "Amp\\ByteStream\\": "lib"
-                },
                 "files": [
                     "lib/functions.php"
-                ]
+                ],
+                "psr-4": {
+                    "Amp\\ByteStream\\": "lib"
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [

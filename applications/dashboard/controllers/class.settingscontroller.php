@@ -80,10 +80,10 @@ class SettingsController extends DashboardController {
      */
     public function initialize() {
         parent::initialize();
-        Gdn_Theme::section('Dashboard');
         if ($this->Menu) {
             $this->Menu->highlightRoute('/dashboard/settings');
         }
+        Gdn_Theme::section('Settings');
 
         // Many dashboard pages display a pretty style flash when deferring all scripts.
         // Disable deferred scripts on these pages until this is resolved.
@@ -512,127 +512,7 @@ class SettingsController extends DashboardController {
      */
     public function branding() {
         $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
-        $this->setHighlightRoute('dashboard/settings/branding');
-        $this->title(t('Branding & SEO'));
-        $items = [
-            'Garden.HomepageTitle' => [
-                'LabelCode' => t('Homepage Title'),
-                'Control' => 'textbox',
-                'Description' => t('The homepage title is displayed on your home page.', 'The homepage title is displayed on your home page. Pick a title that you would want to see appear in search engines.')
-            ],
-            'Garden.Description' => [
-                'LabelCode' => t('Site Description'),
-                'Control' => 'textbox',
-                'Description' => t("The site description usually appears in search engines.", 'The site description usually appears in search engines. You should try having a description that is 100–150 characters long.'),
-                'Options' => [
-                    'Multiline' => true,
-                ]
-            ],
-            'Garden.Title' => [
-                'LabelCode' => t('Banner Title'),
-                'Control' => 'textbox',
-                'Description' => t("The banner title appears on your site's banner and in your browser's title bar.",
-                    "The banner title appears on your site's banner and in your browser's title bar. It should be less than 20 characters. If a banner logo is uploaded, it will replace the banner title on user-facing forum pages. Also, keep in mind some themes may hide this title.")
-            ],
-            'Garden.OrgName' => [
-                'LabelCode' => t('Organization'),
-                'Control' => 'textbox',
-                'Description' => t("OrgDescription", "Your organization name is used for SEO microdata and JSON+LD"),
-            ],
-            'Garden.Logo' => [
-                'Label' => t('Banner Logo'),
-                'Control' => 'imageUploadReact',
-                'Description' => t(
-                    'LogoDescription',
-                    'The banner logo appears at the top of your site.'
-                ).' '.t('LogoDisclaimer'),
-            ],
-            'Garden.MobileLogo' => [
-                'Label' => t('Mobile Banner Logo'),
-                'Control' => 'imageUploadReact',
-                'Description' => t(
-                    'MobileLogoDescription',
-                    'The mobile banner logo appears at the top of your site.'
-                ).' '.t('LogoDisclaimer'),
-            ],
-            'Garden.BannerImage' => [
-                'Label' => t('Banner Image'),
-                'Control' => 'imageUploadReact',
-                'Description' => t('The default banner image across the site. This can be overridden on a per category basis.'),
-            ],
-            'Garden.FavIcon' => [
-                'LabelCode' => t('Favicon'),
-                'Control' => 'imageupload',
-                'Size' => '48x48',
-                'OutputType' => 'ico',
-                'Prefix' => 'favicon_',
-                'Crop' => true,
-                'Description' => t(
-                    'FaviconDescription',
-                    "Your site's favicon appears in your browser's title bar. It will be scaled down appropriately."
-                ),
-                'Options' => [
-                    'RemoveConfirmText' => sprintf(t('Are you sure you want to delete your %s?'), t('favicon'))
-                ]
-            ],
-            'Garden.TouchIcon' => [
-                'LabelCode' => t('Touch Icon'),
-                'Control' => 'imageupload',
-                'Size' => '152x152',
-                'OutputType' => 'png',
-                'Prefix' => 'favicon-152-',
-                'Crop' => true,
-                'Description' => t('TouchIconDescription', "The touch icon appears when you bookmark a website on the homescreen of an Apple device. These are usually 152 pixels. Apple adds rounded corners and lighting effect automatically."),
-                'Options' => [
-                    'RemoveConfirmText' => sprintf(t('Are you sure you want to delete your %s?'), t('Touch Icon'))
-                ]
-            ],
-            'Garden.ShareImage' => [
-                'Label' => t('Share Image'),
-                'Control' => 'imageUploadReact',
-                'Description' => t(
-                    'ShareImageDescription',
-                    "When someone shares a link from your site we try and grab an image from the page. "
-                    . "If there isn't an image on the page then we'll use this image instead. "
-                    . "The image should be at least 50×50, but we recommend 200×200."
-                ),
-            ],
-            'Garden.MobileAddressBarColor' => [
-                'LabelCode' => t('Mobile Address Bar Color'),
-                'Control' => 'color',
-                'Description' => t('AddressBarColorDescription', 'Some browsers support a color for the address bar. Mobile only.'),
-                'Options' => [
-                    'AllowEmpty' => true,
-                ]
-            ],
-            'Feature.DeferredLegacyScripts.Enabled' => [
-                'LabelCode' => t('Defer Javascript Loading'),
-                'Control' => 'toggle',
-                'Default' => true,
-                'Description' => t('This setting loads the page before executing Javascript.') . " " .
-                    anchor(t('More information'), 'https://success.vanillaforums.com/kb/articles/140-defer-javascript-loading-feature'),
-                'Options' => [
-                    'UseRealBoolean' => true
-                ]
-            ]
-        ];
-        /** @var \Vanilla\Site\SiteSectionModel $siteSectionModel */
-        $siteSectionModel = Gdn::getContainer()->get(\Vanilla\Site\SiteSectionModel::class);
-        $options = $siteSectionModel->getDefaultRoutes();
-        if (count($options) > 0) {
-            $items['Vanilla.Forum.Disabled'] = [
-                'LabelCode' => t('Disable forum pages'),
-                'Control' => 'toggle',
-                'Description' => t("Remove discussion and categories links from menus.<br /> Set discussion and category related pages to return not found page 404."),
-                'Options' => [
-                    'ForumDisabled' => true,
-                ]
-            ];
-        }
-        $configurationModule = new ConfigurationModule($this);
-        $configurationModule->initialize($items);
-        $this->setData('ConfigurationModule', $configurationModule);
-        $this->render();
+        redirectTo('appearance/branding', 302);
     }
 
     /**
@@ -677,6 +557,7 @@ class SettingsController extends DashboardController {
 
         // Page setup
         $this->title(t('Ban Rules'));
+        Gdn_Theme::section('Moderation');
 
         [$offset, $limit] = offsetLimit($page, 20);
 
@@ -744,8 +625,6 @@ class SettingsController extends DashboardController {
                 $this->setData('Bans', $bans);
                 break;
         }
-
-        Gdn_Theme::section('Moderation');
         $this->render();
     }
 
@@ -757,7 +636,7 @@ class SettingsController extends DashboardController {
      */
     public function layout() {
         $this->permission('Garden.Settings.Manage');
-        $this->render('layout');
+        redirectTo('/appearance/layouts', 302);
     }
 
     /**
@@ -853,7 +732,7 @@ class SettingsController extends DashboardController {
      * @deprecated 2.4 Legacy redirect. Use SettingsController::branding instead.
      */
     public function banner() {
-        redirectTo('/settings/branding');
+        redirectTo('/appearance/branding');
     }
 
 
@@ -1289,7 +1168,22 @@ class SettingsController extends DashboardController {
         }
 
         // Still here?
-        redirectTo('dashboard/settings/home');
+        redirectTo($this->getHomeUrl());
+    }
+
+    /**
+     * Get new home url
+     */
+    private function getHomeUrl() {
+        $url = 'dashboard/settings/home';
+
+        if (Gdn::addonManager()->isEnabled('vanillaanalytics', Vanilla\Addon::TYPE_ADDON) && !(bool)Gdn::config('VanillaAnalytics.DisableDashboard', false)) {
+            $url = (bool)Gdn::config('Feature.NewAnalytics.Enabled', false) ?
+                '/analytics/v2/dashboards' :
+                '/analytics';
+        }
+
+        return $url;
     }
 
     public function home() {
@@ -2270,7 +2164,6 @@ class SettingsController extends DashboardController {
         }
 
         $name = val('Name', $user);
-        Gdn_Theme::section('Moderation');
         $this->setHighlightRoute('dashboard/settings/bans');
         $this->setData('Title', sprintf(t('Ban rules matching %s'), htmlspecialchars($name)));
         $this->setData('Bans', $matchingBans);

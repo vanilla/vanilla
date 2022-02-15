@@ -399,21 +399,38 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface {
             ;
 
         $nav
-            ->addGroupToSection('Moderation', t('Content'), 'moderation')
-            ->addLinkToSectionIf($session->checkPermission(['Garden.Moderation.Manage', 'Moderation.Spam.Manage'], false), 'Moderation', t('Spam Queue'), '/dashboard/log/spam', 'moderation.spam-queue', '', $sort)
-            ->addLinkToSectionIf($session->checkPermission(['Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'], false), 'Moderation', t('Moderation Queue'), '/dashboard/log/moderation', 'moderation.moderation-queue', '', $sort, ['popinRel' => '/dashboard/log/count/moderate'], false)
-            ->addLinkToSectionIf($session->checkPermission(['Garden.Settings.Manage', 'Garden.Moderation.Manage'], false), 'Moderation', t('Change Log'), '/dashboard/log/edits', 'moderation.change-log', '', $sort)
-
-            ->addGroup(t('Appearance'), 'appearance', '', -1)
-            ->addLinkIf(
-                $session->checkPermission(['Garden.Settings.Manage', 'Garden.Community.Manage'], false),
-                t('Branding & SEO'),
-                '/dashboard/settings/branding',
-                'appearance.banner',
+            ->addGroupToSection('Moderation', t('Content'), 'content')
+            ->addLinkToSectionIf(
+                $session->checkPermission(['Garden.Moderation.Manage', 'Moderation.Spam.Manage'], false),
+                'Moderation',
+                t('Spam Queue'),
+                '/dashboard/log/spam',
+                'content.spam-queue',
                 '',
                 $sort
             )
-            ->addLinkIf('Garden.Settings.Manage', t('Layout'), '/dashboard/settings/layout', 'appearance.layout', '', $sort)
+            ->addLinkToSectionIf(
+                $session->checkPermission(['Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'], false),
+                'Moderation',
+                t('Moderation Queue'),
+                '/dashboard/log/moderation',
+                'content.moderation-queue',
+                '',
+                $sort,
+                ['popinRel' => '/dashboard/log/count/moderate'],
+                false
+            )
+            ->addLinkToSectionIf(
+                $session->checkPermission(['Garden.Settings.Manage', 'Garden.Moderation.Manage'], false),
+                'Moderation',
+                t('Change Log'),
+                '/dashboard/log/edits',
+                'content.change-log',
+                '',
+                $sort
+            )
+
+            ->addGroup(t('Appearance'), 'appearance', '', -1)
             ->addLinkIf('Garden.Settings.Manage', t('Themes'), '/dashboard/settings/themes', 'appearance.themes', '', $sort)
             ->addLinkIf($hasThemeOptions && $session->checkPermission('Garden.Settings.Manage'), t('Theme Options'), '/dashboard/settings/themeoptions', 'appearance.theme-options', '', $sort)
             ->addLinkIf($hasMobileThemeOptions && $session->checkPermission('Garden.Settings.Manage'), t('Mobile Theme Options'), '/dashboard/settings/mobilethemeoptions', 'appearance.mobile-theme-options', '', $sort)

@@ -109,9 +109,18 @@ npm-debug.log
 /tests/cache/
 /cgi-bin/
 phpunit.xml
-yarn-error.log
 lerna-debug.log
 git-diff.txt
 phpcs-diff.json
 .phpunit.result.cache
 *.cookiejar
+
+# Yarn
+yarn-error.log
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions

@@ -751,10 +751,8 @@ class Gdn_Database implements InjectableInterface {
      * @return Gdn_DatabaseStructure The database structure class for this database.
      */
     public function structure() {
-        if (is_null($this->_Structure)) {
-            $name = $this->Engine.'Structure';
-            $this->_Structure = Gdn::factory($name, $this);
-        }
+        $name = $this->Engine.'Structure';
+        $this->_Structure = Gdn::getContainer()->get($name);
 
         return $this->_Structure;
     }

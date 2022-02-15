@@ -20,7 +20,13 @@ interface IProps {
 }
 
 export function LayoutPage(props: IProps) {
-    const layout = useLayoutSpec();
+    //right now some of params are hardcoded, but should come through props
+    const layout = useLayoutSpec({
+        layoutViewType: props.layoutQuery.layoutViewType,
+        recordID: -1,
+        recordType: "global",
+        params: {},
+    });
 
     if (layout.error) {
         // Temporary error page.

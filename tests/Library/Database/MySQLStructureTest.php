@@ -32,7 +32,8 @@ class MySQLStructureTest extends BootstrapTestCase {
         parent::setUp();
 
         $this->db = $this->container()->get(\Gdn_Database::class);
-        $st = new TestMySQLStructure($this->db);
+        $sql = $this->db->createSql();
+        $st = new TestMySQLStructure($sql, $this->db);
         $this->st = $st;
         $this->st->reset();
         $this->st->CaptureOnly = false;

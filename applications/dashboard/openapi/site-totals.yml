@@ -42,6 +42,10 @@ components:
                     type: integer
                 isCalculating:
                     type: boolean
+                    description: Whether the value is currently being calculated.
+                isFiltered:
+                    type: boolean
+                    description: Indicates whether the count value has been filtered by siteSection
         SiteTotalsCountsResponseFields:
             type: object
             properties:

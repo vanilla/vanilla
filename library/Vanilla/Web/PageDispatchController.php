@@ -68,6 +68,7 @@ class PageDispatchController implements CustomExceptionHandler, InjectableInterf
      * Instantiate a SimpleTitlePage with a title and set it as the active instance.
      *
      * @param string $title The title to use.
+     *
      * @return Page
      */
     protected function useSimplePage(string $title): Page {

@@ -119,6 +119,7 @@ export function DashboardFormControl(props: IControlProps) {
                     onChange={onChange}
                     label={control.label ?? t("Image Upload")}
                     description={control.description}
+                    disabled={props.disabled}
                 />
             );
         case "color":

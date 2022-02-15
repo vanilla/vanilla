@@ -8,6 +8,8 @@
 namespace Vanilla\Widgets\React;
 
 use Garden\Schema\Schema;
+use Vanilla\Knowledge\Models\ArticleJsonLD;
+use Vanilla\Knowledge\Models\SearchJsonLD;
 
 /**
  * Widget for rendering raw HTML in react.

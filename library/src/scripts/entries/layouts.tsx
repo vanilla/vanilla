@@ -34,6 +34,10 @@ import { themePreviewToastReducer } from "@library/features/toaster/themePreview
 import NotificationsModel from "@library/features/notifications/NotificationsModel";
 import TagWidget from "@vanilla/addon-vanilla/tag/TagWidget";
 import { RSSWidget } from "@library/rssWidget/RSSWidget";
+import { UserSpotlightWidget } from "@library/userSpotlight/UserSpotlightWidget";
+import ArticleArticlesWidget from "@knowledge/components/ArticleArticlesWidget";
+import Banner from "@library/banner/Banner";
+import { SectionFullWidth } from "@library/layout/SectionFullWidth";
 
 // App Setup
 applySharedPortalContext((props) => {
@@ -59,6 +63,7 @@ addPageComponent(LayoutApp);
 
 // Widgets
 registerWidgets({
+    SectionFullWidth,
     SectionOneColumn,
     // Todo fix these names.
     SectionTwoColumns: TwoColumnSection,
@@ -71,6 +76,9 @@ registerWidgets({
     DiscussionListModule,
     TagWidget,
     RSSWidget,
+    UserSpotlightWidget,
+    ArticleArticlesWidget,
+    Banner,
 });
 
 // Reducers

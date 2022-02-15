@@ -7,6 +7,7 @@ import React from "react";
 import { IMe, IUser, IUserFragment } from "@library/@types/api/users";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
 import { ITag } from "@library/features/tags/TagsReducer";
+import random from "lodash/random";
 
 export const STORY_IMAGE = require("./storyDataImage.png");
 export const STORY_ICON = require("./storyDataImage.png");
@@ -16,6 +17,12 @@ export const STORY_LOGO_BLACK = "https://us.v-cdn.net/5022541/uploads/067/Z28XXG
 
 export const STORY_IPSUM_LONG =
     "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+
+export const STORY_IPSUM_LONG2 =
+    "Vivamus vitae purus euismod, porta nulla sed, dapibus tellus. Phasellus orci magna, lobortis a rhoncus ac, aliquet non arcu. Aliquam consectetur sodales nibh, vitae ultrices lectus accumsan id. Morbi ut metus mauris. Quisque posuere lectus vel est efficitur facilisis. Suspendisse vel tristique erat, a lacinia enim. Fusce placerat suscipit tellus ac luctus.";
+
+export const STORY_IPSUM_LONG3 =
+    "Proin neque est, mollis eu eleifend vel, viverra vel augue. Nulla euismod quam nec purus vestibulum, in pretium enim lacinia. Sed risus turpis, viverra in congue non, tincidunt a neque. Nulla tincidunt feugiat augue, eget finibus odio fermentum in. Pellentesque tincidunt lectus lorem, eget tincidunt risus congue ac. Sed luctus quam a interdum placerat. Ut ex sem, feugiat eu risus sed, sodales molestie tellus.";
 
 export const STORY_IPSUM_MEDIUM = STORY_IPSUM_LONG.slice(0, 160) + "…";
 
@@ -107,3 +114,13 @@ export const STORY_TAGS: ITag[] = [
         urlcode: "usertag4",
     },
 ];
+
+export const getRandomIpsum = function () {
+    const ipsums = [STORY_IPSUM_LONG, STORY_IPSUM_LONG2, STORY_IPSUM_LONG3];
+    return ipsums[random(0, 2)];
+};
+
+export const storyTitleGenerator = function (length = 100) {
+    const phrases = STORY_IPSUM_LONG.replace(/,/g, "").split(".");
+    return phrases[random(0, 3)].slice(0, length).trim();
+};

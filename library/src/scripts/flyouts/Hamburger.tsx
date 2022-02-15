@@ -107,7 +107,7 @@ export function varItemToNavTreeItem(
     variableItem: INavigationVariableItem,
     parentID: string = "root",
 ): INavigationTreeItem | null {
-    const { permission, name, url, id, children, isHidden } = variableItem;
+    const { permission, name, url, id, children, isHidden, badge } = variableItem;
 
     if (permission && !hasPermission(permission)) {
         return null;
@@ -117,7 +117,7 @@ export function varItemToNavTreeItem(
         return null;
     }
 
-    return {
+    const navTreeItem = {
         name,
         url,
         recordID: id,
@@ -126,6 +126,12 @@ export function varItemToNavTreeItem(
         children: children?.map((child) => varItemToNavTreeItem(child, id)).filter(notEmpty) ?? [],
         sort: 0,
     };
+
+    if (badge) {
+        navTreeItem["badge"] = badge;
+    }
+
+    return navTreeItem;
 }
 
 export function getActiveRecord(navTreeItems: INavigationTreeItem[]): IPanelNavItemsProps["activeRecord"] {

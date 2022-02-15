@@ -12,12 +12,6 @@ const RoleApplicationsRoute = new RouteHandler(
     () => "/manage/requests/role-applications",
 );
 
-const LayoutEditorRoute = new RouteHandler(
-    () => import("@dashboard/layout/pages/LayoutPlaygroundPage"),
-    "/settings/layout/playground",
-    () => "/settings/layout/playground",
-);
-
 export function getDashboardRoutes() {
-    return [RoleApplicationsRoute.route, LayoutEditorRoute.route];
+    return [RoleApplicationsRoute.route];
 }

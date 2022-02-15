@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -101,6 +101,7 @@ class CommonLayoutView extends AbstractCustomLayoutView {
         } else {
             throw new NotFoundException('Category', ['categoryID' => $category]);
         }
+
         $pageHead->setSeoTitle(Gdn::formatService()->renderPlainText(Gdn::config('Garden.HomepageTitle'), HtmlFormat::FORMAT_KEY));
         $pageHead->setSeoDescription(Gdn::formatService()->renderPlainText(Gdn::config('Garden.Description'), HtmlFormat::FORMAT_KEY));
         $pageHead->setCanonicalUrl(\Gdn::request()->getSimpleUrl());

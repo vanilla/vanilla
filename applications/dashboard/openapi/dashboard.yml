@@ -8,7 +8,7 @@ paths:
                 This endpoint returns the entire navigation structure of the dashboard. It has three levels:
 
                 1. The first level represents main menu sections.
-                2. Each section can be seperated into groups.
+                2. Each section can have children, seperated into groups.
                 3. Groups contain the actual menu links.
             tags:
                 - Dashboard
@@ -25,14 +25,14 @@ paths:
                                             description: The menu description.
                                             minLength: 1
                                             type: string
-                                        groups:
+                                        children:
                                             items:
                                                 properties:
-                                                    key:
-                                                        description: The key of the group.
+                                                    id:
+                                                        description: The id of the group.
                                                         minLength: 1
                                                         type: string
-                                                    links:
+                                                    children:
                                                         items:
                                                             properties:
                                                                 badge:
@@ -55,8 +55,12 @@ paths:
                                                                             description: The URL of a view.
                                                                             type: string
                                                                     type: object
-                                                                key:
-                                                                    description: The key of the link.
+                                                                id:
+                                                                    description: The id of the link.
+                                                                    minLength: 1
+                                                                    type: string
+                                                                parentID:
+                                                                    description: The id of the parent.
                                                                     minLength: 1
                                                                     type: string
                                                                 name:
@@ -74,7 +78,8 @@ paths:
                                                                     type: string
                                                             required:
                                                                 - name
-                                                                - key
+                                                                - id
+                                                                - parentID
                                                                 - url
                                                                 - react
                                                             type: object
@@ -85,11 +90,11 @@ paths:
                                                         type: string
                                                 required:
                                                     - name
-                                                    - key
-                                                    - links
+                                                    - id
+                                                    - children
                                                 type: object
                                             type: array
-                                        key:
+                                        id:
                                             description: The ID of the menu.
                                             minLength: 1
                                             type: string
@@ -102,8 +107,8 @@ paths:
                                             type: string
                                     required:
                                         - name
-                                        - key
+                                        - id
                                         - description
-                                        - groups
+                                        - children
                                 type: array
                     description: Success

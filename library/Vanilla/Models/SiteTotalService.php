@@ -10,6 +10,7 @@ namespace Vanilla\Models;
 use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Contracts\Models\AlreadyCachedSiteSectionTotalProviderInterface;
 use Vanilla\Contracts\Models\SiteSectionTotalProviderInterface;
 use Vanilla\Contracts\Models\SiteTotalProviderInterface;
 use Vanilla\Contracts\Site\SiteSectionInterface;
@@ -90,7 +91,7 @@ class SiteTotalService {
         if ($this->isProviderExpensive($provider)) {
             // Defer the calculation of the cached value until after the request.
             // In the meantime we will have a -1.
-            // User interfaces may intepret this to either not show the count or to display some indicator that it is
+            // User interfaces may interpret this to either not show the count or to display some indicator that it is
             // Calculating.
             $cacheOpts[ModelCache::OPT_SCHEDULER] = $this->scheduler;
             $cacheOpts[ModelCache::OPT_DEFAULT] = -1;
@@ -107,6 +108,11 @@ class SiteTotalService {
             // If a site section is specified, but the provider doesn't support filtering by
             // site section, just get the site total.
             $siteSection = null;
+        }
+
+        // If the result provider has its own caching we skip the caching & hydrating.
+        if ($provider instanceof AlreadyCachedSiteSectionTotalProviderInterface) {
+            return $provider->calculateSiteTotalCount($siteSection);
         }
 
         $result = $this->modelCache->getCachedOrHydrate($cacheKey, function () use ($provider, $siteSection) {
@@ -160,8 +166,9 @@ class SiteTotalService {
     public function getCountsOutputSchema(): Schema {
         $availableCounts = $this->getCountRecordTypes();
         $recordSchema = Schema::parse([
-                "count:i",
-                "isCalculating:b",
+            "count:i",
+            "isCalculating:b",
+            "isFiltered:b",
         ]);
         $properties = array_map(function ($recordType) use ($recordSchema) {
             return [$recordType => $recordSchema];

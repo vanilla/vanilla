@@ -4,16 +4,14 @@
  * @license gpl-2.0-only
  */
 
-import { useAuthActions } from "@dashboard/auth/AuthActions";
-import { useAsync } from "@vanilla/react-utils";
-import { useApiContext } from "@vanilla/ui";
 import { useDispatch, useSelector } from "react-redux";
 import * as layoutPageActions from "@library/features/Layout/LayoutPage.actions";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { bindActionCreators } from "redux";
 import { ILayoutPageStoreState } from "@library/features/Layout/LayoutPage.slice";
 import { stableObjectHash } from "@vanilla/utils";
 import { LoadStatus } from "@library/@types/api/core";
+import { ILayoutQuery } from "@library/features/Layout/LayoutPage.types";
 
 export function useLayoutPageActions() {
     const dispatch = useDispatch();
@@ -24,9 +22,9 @@ export function useLayoutPageActions() {
 }
 
 // Currently hardcoded.
-export function useLayoutSpec() {
+export function useLayoutSpec(query: ILayoutQuery) {
     const actions = useLayoutPageActions();
-    const paramHash = stableObjectHash({});
+    const paramHash = stableObjectHash(query ?? {});
 
     const existingLayout = useSelector((state: ILayoutPageStoreState) => {
         return (
@@ -36,9 +34,11 @@ export function useLayoutSpec() {
         );
     });
 
-    if (existingLayout.status === LoadStatus.PENDING) {
-        actions.lookupLayout();
-    }
+    useEffect(() => {
+        if (existingLayout.status === LoadStatus.PENDING) {
+            actions.lookupLayout(query);
+        }
+    }, [actions, existingLayout, query]);
 
     return existingLayout;
 }

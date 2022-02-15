@@ -242,6 +242,67 @@ paths:
                     $ref: "#/components/responses/HydratedLayout"
                 "403":
                     $ref: "#/components/responses/PermissionError"
+    /layouts/catalogue:
+        x-hidden: true
+        get:
+            summary: Get a catalogue of the items available in a layout.
+            tags:
+                - Layout
+            parameters:
+                - in: query
+                  name: layoutViewType
+                  schema:
+                      $ref: "#/components/schemas/LayoutViewType"
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    layoutViewType:
+                                        $ref: "#/components/schemas/LayoutViewType"
+                                    layoutParams:
+                                        description: A mapping of all available layout hydration params to their schemas.
+                                        type: object
+                                        example:
+                                            locale:
+                                                type: string
+                                                description: "The locale used to render the layout"
+                                            category/categoryID:
+                                                type: integer
+                                    widgets:
+                                        description: A mapping of widgetType to widget schema for all available widgets.
+                                        type: object
+                                        additionalProperties: true
+                                        example:
+                                            "react.discussions.list":
+                                                type: "object"
+                                                properties: {}
+                                    assets:
+                                        description: A mapping of widgetType to widget schema for all available assets.
+                                        type: object
+                                        additionalProperties: true
+                                        example:
+                                            "react.assets.breadcrumbs":
+                                                type: "object"
+                                                properties: {}
+                                    sections:
+                                        description: A mapping of widgetType to widget schema for all available sections.
+                                        type: object
+                                        additionalProperties: true
+                                        example:
+                                            "react.sections.2-columns":
+                                                type: "object"
+                                                properties: {}
+                                    middleware:
+                                        description: A mapping of middlewareType to middleware scheam for all available middlewares.
+                                        type: object
+                                        example:
+                                            "role-filter":
+                                                type: "object"
+                                                properties: {}
     /layouts/schema:
         x-hidden: true
         get:
@@ -259,11 +320,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                type: object
-                                properties:
-                                    "$schema":
-                                        type: string
-                                        example: "http://json-schema.org/draft-07/schema#"
+                                $ref: "#/components/schemas/JsonSchema"
     /layouts/{id}/views:
         x-hidden: true
         parameters:
@@ -372,6 +429,13 @@ components:
                             layout:
                                 $ref: "#/components/schemas/LayoutDefinitionHydrated"
     schemas:
+        JsonSchema:
+            type: object
+            example:
+                $schema: "https://json-schema.org/draft-07/schema#"
+                type: "object"
+                properties: {}
+
         LayoutViewType:
             x-hidden: true
             description: Type of resource to which this layout applies

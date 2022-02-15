@@ -15,5 +15,8 @@
     },
     "publishConfig": {
         "access": "public"
+    },
+    "peerDependencies": {
+        "lodash": "*"
     }
 }

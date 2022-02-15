@@ -64,7 +64,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler, Page
     private $pageHead;
 
     /** @var MasterViewRenderer */
-    private $masterViewRenderer;
+    protected $masterViewRenderer;
 
     /**
      * Dependendency Injection.
@@ -165,7 +165,8 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler, Page
      * @return $this Own instance for chaining.
      */
     public function blockRobots($content = 'noindex'): self {
-        header('X-Robots-Tag: noindex', true);
+        $this->setSeoRequired(false);
+        safeHeader('X-Robots-Tag: noindex', true);
         $this->addMetaTag(['name' => 'robots', 'content' => $content]);
 
         return $this;

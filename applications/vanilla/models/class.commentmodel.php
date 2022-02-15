@@ -1537,16 +1537,8 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
             ['DiscussionID' => $discussionID, 'UserID' => val('InsertUserID', $fields)]
         );
 
-        $updateCounts = true;
-        // We shouldn't update the category counts if the discussion counts haven't been updated.
-        if ($fields['InsertUserID'] !== $discussion->LastCommentUserID) {
-            $updateCounts = false;
-        }
         if ($insert) {
-            if ($updateCounts && $discussion->CategoryID > 0) {
-                // UPDATE COUNT AND LAST COMMENT ON CATEGORY TABLE
-                CategoryModel::instance()->incrementLastComment($fields);
-            }
+            CategoryModel::instance()->incrementLastComment($fields);
             $this->notifyNewComment(
                 $fields ? (array)$fields : null,
                 $discussion ? (array)$discussion : null

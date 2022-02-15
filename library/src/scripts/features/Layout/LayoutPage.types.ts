@@ -8,6 +8,8 @@ import { ILayout } from "@library/features/Layout/Layout";
 import { RecordID } from "@vanilla/utils";
 
 export interface ILayoutQuery {
+    recordID?: number;
+    recordType?: string;
     layoutViewType: string;
     params: {
         siteSectionID?: string;

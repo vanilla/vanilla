@@ -13,13 +13,13 @@ use Vanilla\CurrentTimeStamp;
 use Vanilla\Database\SetLiterals\Increment;
 use Vanilla\Database\SetLiterals\MinMax;
 use Vanilla\Schema\RangeExpression;
+use VanillaTests\SiteTestCase;
 use VanillaTests\SiteTestTrait;
 
 /**
  * Tests for the **Gdn_MySQLDriver** class.
  */
-class MySQLDriverTest extends TestCase {
-    use SiteTestTrait;
+class MySQLDriverTest extends SiteTestCase {
 
     /**
      * @var \Gdn_MySQLDriver
@@ -36,9 +36,10 @@ class MySQLDriverTest extends TestCase {
      */
     public function setUp(): void {
         parent::setUp();
-        $sql = static::container()->get(\Gdn_MySQLDriver::class);
-        $sql->reset();
-        $this->sql = $sql;
+        $db = static::container()->get(Gdn_Database::class);
+        $this->sql = $db->createSql();
+        static::container()->setInstance(\Gdn_MySQLDriver::class, $this->sql);
+        static::container()->setInstance(\Gdn_DatabaseStructure::class, null);
 
         $dump = function () {
             $r =  [
@@ -496,5 +497,51 @@ SQL;
                 ['test' => 5, 'hello', 2 => 'other'],
             ]
         ];
+    }
+
+    /**
+     * Test that our schema cache is working.
+     */
+    public function testSchemaCache() {
+        $cache = self::enableCaching();
+        $this->sql->setCache($cache);
+        $tableName = __FUNCTION__;
+        $runStructure = function (bool $withChange = false) use ($tableName) {
+            $st = $this->sql->Database->structure();
+            $st
+                ->table($tableName)
+                ->primaryKey('schemaCacheID')
+                ->column('name', 'varchar(50)');
+
+            if ($withChange) {
+                $st->column('new', 'varchar(10)');
+            }
+
+            $st
+                ->set();
+        };
+
+        $runStructure();
+        $cache->flush();
+        $this->sql->fetchTableSchema($tableName);
+        $cache->assertSetCount('*mysql*', 1);
+        $this->sql->fetchTableSchema($tableName);
+        $cache->assertSetCount('*mysql*', 1);
+        $cache->assertNotEmpty();
+
+        $runStructure(true);
+        $cache->assertSetCount('*mysql*', 2);
+        $this->assertTableSchemaHasColumn($tableName, 'new');
+    }
+
+    /**
+     * Assert that a table schema has a column.
+     *
+     * @param string $tableName
+     * @param string $columnName
+     */
+    private function assertTableSchemaHasColumn(string $tableName, string $columnName) {
+        $schema = $this->sql->fetchTableSchema($tableName);
+        $this->assertArrayHasKey($columnName, $schema);
     }
 }

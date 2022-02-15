@@ -70,6 +70,17 @@ interface IMultiType<T> {
 export type MultiTypeRecord<T, Subtract extends keyof T, TypeName extends string> = Omit<T, Subtract> &
     IMultiType<TypeName>;
 
+export interface INavigationItemBadge {
+    type: navigationItemBadgeType;
+    text: string;
+    url?: string;
+}
+
+export enum navigationItemBadgeType {
+    TEXT = "text",
+    VIEW = "view",
+}
+
 export interface INavigationItem {
     name: string;
     url?: string;
@@ -78,6 +89,7 @@ export interface INavigationItem {
     sort: number | null;
     recordType: string;
     isLink?: boolean;
+    badge?: INavigationItemBadge;
 }
 
 export interface IApiDateInfo {

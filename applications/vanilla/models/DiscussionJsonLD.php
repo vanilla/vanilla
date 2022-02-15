@@ -30,6 +30,7 @@ final class DiscussionJsonLD extends AbstractJsonLDItem {
      *
      * @param array $discussion
      * @param \DiscussionModel $discussionModel
+     *
      */
     public function __construct(
         array $discussion,

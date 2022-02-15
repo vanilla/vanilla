@@ -74,12 +74,17 @@ class TagsApiController extends AbstractApiController {
                     ],
                     'style' => 'form',
                 ],
+                'page:i?' => [
+                    'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
+                    'default' => 1,
+                    'minimum' => 1,
+                ],
                 "limit:i?" => [
                     "description" => "Desired number of tags.",
-                    'default' => \TagModel::LIMIT,
                     'minimum' => 1,
-                    'maximum' => ApiUtils::getMaxLimit(),
+                    'default' => \TagModel:: LIMIT_DEFAULT,
                 ],
+
                 "sort:s?" => [
                     'enum' => ApiUtils::sortEnum('countDiscussions', 'tagID', 'name'),
                 ]
@@ -87,7 +92,8 @@ class TagsApiController extends AbstractApiController {
         );
 
         if (key_exists('limit', $query)) {
-            $options['limit'] = $query['limit'];
+            $page = $query['page'] ?? 1;
+            [$options['offset'], $options['limit']] = offsetLimit("p{$page}", $query['limit']);
         }
 
         if (key_exists('sort', $query)) {

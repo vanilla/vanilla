@@ -210,8 +210,11 @@ const previewCardClasses = useThemeCache(() => {
 
     const title = css({
         "&&": {
+            marginTop: 12,
+            marginBottom: 0, //fighting admin.css
             ...Mixins.font({
                 ...globalVars.fontSizeAndWeightVars("medium", "semiBold"),
+                lineHeight: 20 / 14,
             }),
         },
         ...flexHelper().middleLeft(),

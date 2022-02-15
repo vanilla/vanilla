@@ -5,8 +5,8 @@
     "license": "gpl-2.0-only",
     "version": "3.0.1",
     "peerDependencies": {
-        "react": "*",
-        "@emotion/css": "*"
+        "@emotion/css": "*",
+        "react": "*"
     },
     "publishConfig": {
         "access": "public"

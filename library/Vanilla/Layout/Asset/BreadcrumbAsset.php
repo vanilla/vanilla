@@ -9,8 +9,10 @@ namespace Vanilla\Layout\Asset;
 
 use Garden\Schema\Schema;
 use Vanilla\Contracts\RecordInterface;
+use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Models\GenericRecord;
 use Vanilla\Navigation\BreadcrumbModel;
+use Vanilla\Web\BreadcrumbJsonLD;
 
 /**
  * Asset representing breadcrumbs for the page.
@@ -77,7 +79,9 @@ class BreadcrumbAsset extends AbstractLayoutAsset {
         if (!$includeHomeCrumb) {
             array_shift($crumbs);
         }
-
+        if ($this->pageHead !== null) {
+            $this->pageHead->setSeoBreadcrumbs($crumbs);
+        }
         return [
             'crumbs' => $crumbs
         ];

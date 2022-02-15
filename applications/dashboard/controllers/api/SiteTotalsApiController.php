@@ -10,6 +10,7 @@ namespace Vanilla\Dashboard\Controllers\Api;
 use AbstractApiController;
 use Garden\Web\Data;
 use Garden\Web\Exception\NotFoundException;
+use Vanilla\Contracts\Models\SiteSectionTotalProviderInterface;
 use Vanilla\Models\SiteTotalService;
 use Vanilla\Site\SiteSectionModel;
 
@@ -33,7 +34,6 @@ class SiteTotalsApiController extends AbstractApiController {
         $this->siteTotalService = $siteTotalService;
         $this->siteSectionModel = $siteSectionModel;
     }
-
 
     /**
      * Get the total counts for a site (or, optionally, a site section).
@@ -62,6 +62,8 @@ class SiteTotalsApiController extends AbstractApiController {
             $count = $this->siteTotalService->getTotalForType($countItem, $siteSection ?? null);
             $result["counts"][$countItem]["count"] = $count;
             $result["counts"][$countItem]["isCalculating"] = $count === -1;
+            $result["counts"][$countItem]["isFiltered"] = $siteSection !== null &&
+                $this->siteTotalService->getSiteTotalProviders()[$countItem] instanceof SiteSectionTotalProviderInterface;
         }
 
         $out = $this->siteTotalService->getCountsOutputSchema();

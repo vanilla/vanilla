@@ -62,14 +62,14 @@ class MasterViewRenderer {
     }
 
     /**
-     * Render the master template using a `Page` instance.
+     * Render a master template using a `Page` instance.
      *
      * @param Page $page
      * @param array $viewData
      *
      * @return string
      */
-    public function renderPage(Page $page, array $viewData): string {
+    public function renderPage(Page $page, array $viewData, $masterViewPath = self::MASTER_VIEW_PATH): string {
         $head = $page->getHead();
         $this->eventManager->fire('pageRenderBefore', new PageRenderBeforeEvent($head, $page));
 
@@ -81,7 +81,7 @@ class MasterViewRenderer {
         ];
         $data = array_merge($viewData, $extraData, $this->getSharedData());
 
-        return $this->renderTwig(self::MASTER_VIEW_PATH, $data);
+        return $this->renderTwig($masterViewPath, $data);
     }
 
     /**

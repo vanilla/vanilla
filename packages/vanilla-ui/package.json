@@ -9,6 +9,10 @@
         "@reach/combobox": "^0.15.0",
         "@vanilla/react-utils": "*"
     },
+    "peerDependencies": {
+        "react": "*",
+        "react-dom": "*"
+    },
     "devDependencies": {
         "@vanilla/tsconfig": "^3.0.1"
     },

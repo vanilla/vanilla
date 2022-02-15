@@ -8,27 +8,21 @@ import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import { BorderType } from "@library/styles/styleHelpers";
-import { UserSpotlight } from "@library/userSpotlight/UserSpotlight";
+import { UserSpotlightWidget } from "@library/userSpotlight/UserSpotlightWidget";
 import { DeepPartial } from "redux";
 import { IUserSpotlightOptions } from "@library/userSpotlight/UserSpotlight.variables";
-import {
-    STORY_USER,
-    STORY_IMAGE,
-    STORY_IPSUM_LONG,
-    STORY_IPSUM_MEDIUM,
-    STORY_IPSUM_SHORT,
-} from "@library/storybook/storyData";
-import { css } from "@emotion/css";
+import { STORY_USER, STORY_IPSUM_MEDIUM } from "@library/storybook/storyData";
 
 export default {
     title: "Widgets/UserSpotlight",
     parameters: {},
 };
 
-function UserSpotlightInit(props: Partial<React.ComponentProps<typeof UserSpotlight>>) {
+function UserSpotlightInit(props: Partial<React.ComponentProps<typeof UserSpotlightWidget>>) {
     const content = {
         title: props.title,
         description: props?.description,
+        userTextAlignment: props?.userTextAlignment as "left" | "right",
         userInfo: {
             userID: STORY_USER.userID,
             dateLastActive: STORY_USER.dateLastActive,
@@ -40,17 +34,15 @@ function UserSpotlightInit(props: Partial<React.ComponentProps<typeof UserSpotli
     };
 
     const options: DeepPartial<IUserSpotlightOptions> = {
-        box: {
-            borderType: BorderType.SHADOW,
-        },
-        ...props?.options,
+        borderType: BorderType.SHADOW,
+        ...props?.containerOptions,
     };
-    return <UserSpotlight {...content} options={options} />;
+    return <UserSpotlightWidget {...content} containerOptions={options} />;
 }
 
 export const TitleDescriptionBorderAlignmentPanelVariants = storyWithConfig({}, () => (
     <>
-        <StoryHeading>With Title, Description, User Title and Shadow </StoryHeading>
+        <StoryHeading>With Title, Description, User Title and Shadow</StoryHeading>
         <StoryContent>
             <UserSpotlightInit
                 title={"My Title"}
@@ -62,14 +54,12 @@ export const TitleDescriptionBorderAlignmentPanelVariants = storyWithConfig({}, 
                     name: STORY_USER.name,
                     photoUrl: STORY_USER.photoUrl,
                 }}
-                options={{
-                    box: {
-                        borderType: BorderType.SHADOW,
-                    },
+                containerOptions={{
+                    borderType: BorderType.SHADOW,
                 }}
             />
         </StoryContent>
-        <StoryHeading>User Name and User Title aligned to right </StoryHeading>
+        <StoryHeading>User Name and User Title aligned to right</StoryHeading>
         <StoryContent>
             <UserSpotlightInit
                 title={"My Title"}
@@ -81,11 +71,9 @@ export const TitleDescriptionBorderAlignmentPanelVariants = storyWithConfig({}, 
                     name: STORY_USER.name,
                     photoUrl: STORY_USER.photoUrl,
                 }}
-                options={{
-                    box: {
-                        borderType: BorderType.SHADOW,
-                    },
-                    userTextAlignment: "right",
+                userTextAlignment={"right"}
+                containerOptions={{
+                    borderType: BorderType.SHADOW,
                 }}
             />
         </StoryContent>
@@ -100,10 +88,8 @@ export const TitleDescriptionBorderAlignmentPanelVariants = storyWithConfig({}, 
                     name: STORY_USER.name,
                     photoUrl: STORY_USER.photoUrl,
                 }}
-                options={{
-                    box: {
-                        borderType: BorderType.BORDER,
-                    },
+                containerOptions={{
+                    borderType: BorderType.BORDER,
                 }}
             />
         </StoryContent>
@@ -111,10 +97,8 @@ export const TitleDescriptionBorderAlignmentPanelVariants = storyWithConfig({}, 
         <StoryContent>
             <UserSpotlightInit
                 description={STORY_IPSUM_MEDIUM}
-                options={{
-                    box: {
-                        borderType: BorderType.NONE,
-                    },
+                containerOptions={{
+                    borderType: BorderType.NONE,
                 }}
             />
         </StoryContent>
@@ -131,10 +115,8 @@ export const TitleDescriptionBorderAlignmentPanelVariants = storyWithConfig({}, 
                         name: STORY_USER.name,
                         photoUrl: STORY_USER.photoUrl,
                     }}
-                    options={{
-                        box: {
-                            borderType: BorderType.SHADOW,
-                        },
+                    containerOptions={{
+                        borderType: BorderType.SHADOW,
                     }}
                 />
             </div>

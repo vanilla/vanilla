@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -32,7 +32,6 @@ use Vanilla\Utility\ContainerUtils;
 use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
 use Vanilla\Web\Middleware\LogTransactionMiddleware;
 use Vanilla\Web\Page;
-use Vanilla\Web\PageHead;
 
 /**
  * Contains static functions for bootstrapping Vanilla.
@@ -83,7 +82,6 @@ class Bootstrap {
         $container
             ->rule(\Vanilla\Logger::class)
             ->setShared(true)
-
             ->rule(LoggerInterface::class)
             ->setShared(true)
             ->setAliasOf(\Vanilla\Logger::class)
@@ -210,8 +208,6 @@ class Bootstrap {
             })])
             ->addCall('setAllowedOrigins', ['isTrustedDomain'])
             ->addCall('addMiddleware', [new Reference(\Vanilla\Web\Middleware\SystemTokenMiddleware::class)])
-            ->addCall('addMiddleware', [new Reference(\Vanilla\Web\Middleware\RoleTokenAuthMiddleware::class)])
-            ->addCall('addMiddleware', [new Reference(\Vanilla\Web\PrivateCommunityMiddleware::class)])
             ->addCall('addMiddleware', [new Reference(\Vanilla\Web\CacheControlMiddleware::class)])
             ->addCall('addMiddleware', [new Reference(LogTransactionMiddleware::class)])
             ->addCall('addMiddleware', [new Reference('@smart-id-middleware')])
@@ -232,6 +228,8 @@ class Bootstrap {
             ->setClass(\Garden\Web\ResourceRoute::class)
             ->setConstructorArgs(['/api/v2/', '*\\%sApiController'])
             ->addCall('setMeta', ['CONTENT_TYPE', 'application/json; charset=utf-8'])
+            ->addCall('addMiddleware', [new Reference(\Vanilla\Web\PrivateCommunityMiddleware::class)])
+            ->addCall('addMiddleware', [new Reference(\Vanilla\Web\Middleware\RoleTokenAuthMiddleware::class)])
             ->addCall('addMiddleware', [new Reference(\Vanilla\Web\ApiFilterMiddleware::class)])
 
             // Middleware configuration

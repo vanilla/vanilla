@@ -19,6 +19,9 @@
         "@types/json-schema": "^7.0.6",
         "@vanilla/tsconfig": "^3.0.1"
     },
+    "peerDependencies": {
+        "lodash": "*"
+    },
     "scripts": {
         "test:unit": "jest"
     }

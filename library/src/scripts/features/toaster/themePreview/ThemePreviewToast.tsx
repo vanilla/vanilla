@@ -89,7 +89,7 @@ export function ThemePreviewToast() {
             revisionRestored
         ) {
             window.location.href = isRevisionPreview
-                ? `/theme/theme-settings/${themePreview.themeID}/revisions`
+                ? `/appearance/style-guides/${themePreview.themeID}/revisions`
                 : themePreview.redirect;
         }
     });

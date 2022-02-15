@@ -7,12 +7,13 @@
 
 namespace Vanilla\Forum\Models\Totals;
 
-use Vanilla\Contracts\Models\SiteTotalProviderInterface;
+use Vanilla\Contracts\Models\SiteSectionTotalProviderInterface;
+use Vanilla\Contracts\Site\SiteSectionInterface;
 
 /**
  * Provide site totals for discussions.
  */
-class DiscussionSiteTotalProvider implements SiteTotalProviderInterface {
+class DiscussionSiteTotalProvider implements SiteSectionTotalProviderInterface {
 
     /** @var \Gdn_Database */
     private $database;
@@ -27,15 +28,25 @@ class DiscussionSiteTotalProvider implements SiteTotalProviderInterface {
     }
 
     /**
-     * Our total counts are -1 because we don't include the root category.
+     * Get the total number of discussions on a site (or site section).
      *
+     * @param SiteSectionInterface|null $siteSection
      * @return int
      */
-    public function calculateSiteTotalCount(): int {
-        return $this->database
+    public function calculateSiteTotalCount(SiteSectionInterface $siteSection = null): int {
+        $rootCategoryID = $siteSection === null ? \CategoryModel::ROOT_ID : $siteSection->getCategoryID();
+
+        $countDiscussions = $this->database
             ->createSql()
-            ->from("Discussion")
-            ->getCount();
+            ->select("CountAllDiscussions")
+            ->from($this->getTableName())
+            ->where("CategoryID", $rootCategoryID)
+            ->get()
+            ->resultArray();
+
+        $countDiscussions = $countDiscussions[0]["CountAllDiscussions"];
+
+        return $countDiscussions;
     }
 
     /**
@@ -49,6 +60,6 @@ class DiscussionSiteTotalProvider implements SiteTotalProviderInterface {
      * @inheritdoc
      */
     public function getTableName(): string {
-        return 'Discussion';
+        return 'Category';
     }
 }

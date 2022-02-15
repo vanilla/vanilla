@@ -16,22 +16,41 @@
  * Class Gdn_MySQLStructure
  */
 class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
-    /**
-     * @var array[int] An array of table names to row count estimates.
-     */
-    private $rowCountEstimates;
 
     /** Default options when creating MySQL table indexes. */
     private const INDEX_OPTIONS = "algorithm=inplace, lock=none";
 
     /**
+     * @var array[int] An array of table names to row count estimates.
+     */
+    private $rowCountEstimates;
+
+    /** @var Gdn_MySQLDriver */
+    private $sqlDriver;
+
+    /**
      * Gdn_MySQLStructure constructor.
      *
+     * @param Gdn_MySQLDriver $sqlDriver
      * @param Gdn_Database|null $database
      */
-    public function __construct($database = null) {
+    public function __construct(Gdn_MySQLDriver $sqlDriver, $database = null) {
+        $this->sqlDriver = $sqlDriver;
         parent::__construct($database);
     }
+
+    /**
+     * Execute a query. Clears the mysql driver cache afterwards.
+     * @inheritdoc
+     */
+    public function executeQuery($sql, $checkThreshold = false) {
+        try {
+            return parent::executeQuery($sql, $checkThreshold);
+        } finally {
+            $this->sqlDriver->clearSchemaCache();
+        }
+    }
+
 
     /**
      * Drops $this->table() from the database.

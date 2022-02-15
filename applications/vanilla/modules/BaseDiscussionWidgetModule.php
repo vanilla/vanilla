@@ -20,7 +20,7 @@ use Vanilla\Utility\SchemaUtils;
 use Vanilla\Web\JsInterpop\AbstractReactModule;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
 use Vanilla\Widgets\LimitableWidgetInterface;
-use Vanilla\Http\InternalClient;
+use Vanilla\Widgets\WidgetSchemaTrait;
 
 /**
  * Class AbstractRecordTypeModule
@@ -29,7 +29,7 @@ use Vanilla\Http\InternalClient;
  */
 class BaseDiscussionWidgetModule extends AbstractReactModule implements LimitableWidgetInterface {
 
-    use HomeWidgetContainerSchemaTrait;
+    use HomeWidgetContainerSchemaTrait, WidgetSchemaTrait;
 
     /** @var \DiscussionsApiController */
     protected $discussionsApi;
@@ -338,36 +338,6 @@ class BaseDiscussionWidgetModule extends AbstractReactModule implements Limitabl
                         ])
                     )
                 )
-            ]
-        ]);
-    }
-
-    /**
-     * Get sort schema.
-     *
-     * @return Schema
-     */
-    protected static function sortSchema(): Schema {
-        return Schema::parse([
-            'sort?' => [
-                'type' => 'string',
-                'default' => '-dateLastComment',
-                'x-control' => DiscussionsApiIndexSchema::getSortFormOptions()
-            ]
-        ]);
-    }
-
-    /**
-     * Get limit Schema
-     *
-     * @return Schema
-     */
-    protected static function limitSchema(): Schema {
-        return Schema::parse([
-            'limit?' => [
-                'type' => 'integer',
-                'default' => 10,
-                'x-control' => DiscussionsApiIndexSchema::getLimitFormOptions()
             ]
         ]);
     }

@@ -7,12 +7,13 @@
 
 namespace Vanilla\Forum\Models\Totals;
 
-use Vanilla\Contracts\Models\SiteTotalProviderInterface;
+use Vanilla\Contracts\Models\SiteSectionTotalProviderInterface;
+use Vanilla\Contracts\Site\SiteSectionInterface;
 
 /**
  * Provide site totals for comments.
  */
-class CommentSiteTotalProvider implements SiteTotalProviderInterface {
+class CommentSiteTotalProvider implements SiteSectionTotalProviderInterface {
 
     /** @var \Gdn_Database */
     private $database;
@@ -27,14 +28,25 @@ class CommentSiteTotalProvider implements SiteTotalProviderInterface {
     }
 
     /**
-     * @inheritdoc
+     * Get the total number of comments on a site (or site section).
+     *
+     * @param SiteSectionInterface|null $siteSection
+     * @return int
      */
-    public function calculateSiteTotalCount(): int {
-        return $this->database
+    public function calculateSiteTotalCount(?SiteSectionInterface $siteSection = null): int {
+        $rootCategoryID = $siteSection === null ? \CategoryModel::ROOT_ID : $siteSection->getCategoryID();
+
+        $countDiscussions = $this->database
             ->createSql()
-            ->from("Comment")
-            ->getCount()
-        ;
+            ->select("CountAllComments")
+            ->from($this->getTableName())
+            ->where("CategoryID", $rootCategoryID)
+            ->get()
+            ->resultArray();
+
+        $countDiscussions = $countDiscussions[0]["CountAllComments"];
+
+        return $countDiscussions;
     }
 
     /**
@@ -48,6 +60,6 @@ class CommentSiteTotalProvider implements SiteTotalProviderInterface {
      * @inheritdoc
      */
     public function getTableName(): string {
-        return 'Comment';
+        return 'Category';
     }
 }

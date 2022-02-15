@@ -4,7 +4,7 @@
  */
 
 import { css } from "@emotion/css";
-import { userSpotlightVariables } from "./UserSpotlight.variables";
+import { IUserSpotlightOptions, userSpotlightVariables } from "./UserSpotlight.variables";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { Mixins } from "@library/styles/Mixins";
 import { useThemeCache } from "@library/styles/styleUtils";
@@ -12,11 +12,9 @@ import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
 import { url } from "csx";
 import { DeepPartial } from "redux";
-import { IUserSpotlightOptions } from "@library/userSpotlight/UserSpotlight.variables";
 
 export const userSpotlightClasses = useThemeCache(
-    (params?: { options?: DeepPartial<IUserSpotlightOptions>; shouldWrap?: boolean }) => {
-        const { options, shouldWrap = false } = params ?? {};
+    (shouldWrap: boolean, options?: DeepPartial<IUserSpotlightOptions>) => {
         const vars = userSpotlightVariables(options);
         const globalVars = globalVariables();
         const mediaQueries = vars.mediaQueries();
@@ -27,7 +25,7 @@ export const userSpotlightClasses = useThemeCache(
                 justifyContent: "space-around",
                 alignItems: "center",
                 minWidth: styleUnit(globalVars.foundationalWidths.panelWidth),
-                ...Mixins.box(vars.options.box, { noPaddings: true }),
+                ...Mixins.box(vars.options.box),
             },
             shouldWrap && {
                 flexWrap: "wrap",
@@ -36,13 +34,11 @@ export const userSpotlightClasses = useThemeCache(
 
         const avatarContainer = css(
             {
-                flex: "0 0 auto",
                 backgroundImage: vars.avatarContainer.bgImage ? url(vars.avatarContainer.bgImage) : undefined,
                 backgroundPosition: vars.avatarContainer.bgPosition,
                 backgroundColor: ColorsUtils.colorOut(vars.avatarContainer.bg),
                 width: vars.avatarContainer.sizing.width,
                 height: vars.avatarContainer.sizing.height,
-                ...Mixins.box(vars.options.box, { onlyPaddings: true }),
             },
             shouldWrap
                 ? {
@@ -82,10 +78,8 @@ export const userSpotlightClasses = useThemeCache(
             {
                 display: "flex",
                 flexDirection: "column",
-                flexBasis: 130,
                 flexGrow: 1,
                 ...Mixins.font(vars.textContainer.font),
-                ...Mixins.box(vars.options.box, { onlyPaddings: true }),
             },
             shouldWrap
                 ? {

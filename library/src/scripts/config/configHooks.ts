@@ -57,6 +57,8 @@ export function useConfigPatcher<T extends ConfigValues = ConfigValues>() {
         );
     });
 
+    const errorByID = useSelector((state: ICoreStoreState) => state.config.configPatchesByID[watchID]);
+
     const actions = useConfigActions();
 
     const patchConfig = useCallback(
@@ -69,6 +71,7 @@ export function useConfigPatcher<T extends ConfigValues = ConfigValues>() {
     return {
         patchConfig,
         isLoading: existing.status === LoadStatus.LOADING,
+        error: existing.status === LoadStatus.ERROR ? errorByID.error : null,
     };
 }
 

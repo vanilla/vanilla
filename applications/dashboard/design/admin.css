@@ -8159,8 +8159,8 @@ button.close {
 .file-upload .panel-nav input:hover ~ .nav-link.file-upload-choose,
 .panel-nav .file-upload input:hover ~ .nav-link.file-upload-browse,
 .file-upload .panel-nav input:hover ~ .nav-link.file-upload-browse, .panel-nav select.nav-link:focus, .panel-nav .nav-link.active:hover {
-  color: #fff;
-  background-color: #0291db;
+  color: #555a62;
+  background-color: #e8ecf2;
 }
 .panel-nav .nav-link.active .nav-pill, .panel-nav .nav-link.drop-enabled .nav-pill, .panel-nav .file-upload input:focus ~ .nav-link.file-upload-choose .nav-pill, .file-upload .panel-nav input:focus ~ .nav-link.file-upload-choose .nav-pill,
 .panel-nav .file-upload input:focus ~ .nav-link.file-upload-browse .nav-pill,
@@ -8169,12 +8169,11 @@ button.close {
 .file-upload .panel-nav input:hover ~ .nav-link.file-upload-choose .nav-pill,
 .panel-nav .file-upload input:hover ~ .nav-link.file-upload-browse .nav-pill,
 .file-upload .panel-nav input:hover ~ .nav-link.file-upload-browse .nav-pill, .panel-nav select.nav-link:focus .nav-pill, .panel-nav .nav-link.active:hover .nav-pill {
-  color: #0291db;
+  color: #e8ecf2;
   background-color: rgba(255, 255, 255, 0.7);
 }
 .panel-nav .nav-link:hover, .panel-nav .nav-link.hover {
-  color: #949aa2;
-  background-color: #e8ecf2;
+  color: #025c8a;
 }
 .panel-nav .nav-stacked .nav-item + .nav-item {
   margin-top: 0;
@@ -8187,18 +8186,6 @@ button.close {
   cursor: pointer;
 }
 
-.navbar {
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-align: center;
-      align-items: center;
-  -ms-flex-pack: distribute;
-      justify-content: space-around;
-  padding: 0;
-  color: #fff;
-  background-color: #0291db;
-  border: 1px solid rgba(0, 0, 0, 0.125);
-}
 .navbar .vanilla-logo {
   width: 65px;
 }
@@ -8626,6 +8613,7 @@ button.close {
   width: 100%;
   height: 48px;
   z-index: 1010;
+  background-color: #037DBC;
 }
 
 .main-row {

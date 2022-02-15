@@ -7,10 +7,12 @@
 
 namespace Vanilla\Dashboard\Controllers\API;
 
+use Garden\Hydrate\Resolvers\AbstractDataResolver;
 use Garden\Schema\Schema;
 use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
+use Vanilla\Layout\Asset\AbstractLayoutAsset;
 use Vanilla\Layout\CategoryRecordProvider;
 use Vanilla\Layout\LayoutViewModel;
 use Vanilla\Layout\LayoutHydrator;
@@ -18,6 +20,8 @@ use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Layout\LayoutModel;
 use Vanilla\Layout\LayoutService;
 use Vanilla\Layout\Providers\MutableLayoutProviderInterface;
+use Vanilla\Layout\Resolvers\ReactResolver;
+use Vanilla\Layout\Section\AbstractLayoutSection;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Web\PageHead;
 
@@ -89,6 +93,74 @@ class LayoutsApiController extends \AbstractApiController {
 
         $response = new Data($this->layoutHydrator->getSchema($query['layoutViewType'] ?? null));
         return $response;
+    }
+
+    /**
+     * /api/v2/layouts/catalogue
+     *
+     * Get a list of all layouts.
+     *
+     * @param array $query Query parameters for the request.
+     *
+     * @return Data
+     */
+    public function get_catalogue(array $query = []) {
+        $this->permission();
+        $in = Schema::parse([
+            'layoutViewType:s?' => [
+                'enum' => $this->layoutHydrator->getLayoutViewTypes(),
+            ]
+        ]);
+        $out = Schema::parse([
+            'layoutViewType:s?' => [
+                'default' => null,
+            ],
+            'layoutParams:o',
+            'middlewares:o',
+            'widgets:o',
+            'assets:o',
+            'sections:o'
+        ]);
+
+        $query = $in->validate($query);
+
+        $layoutView = $this->layoutHydrator->getLayoutViewType($query['layoutViewType']);
+        $hydrator = $this->layoutHydrator->getHydrator($query['layoutViewType'] ?? null);
+        $paramSchema = $this->layoutHydrator->getViewParamSchema($layoutView, true);
+        $flattenedParamSchema = SchemaUtils::flattenSchema($paramSchema, '/');
+
+        $widgetSchemas = [];
+        $assetSchemas = [];
+        $sectionSchemas = [];
+        foreach ($hydrator->getResolvers() as $resolver) {
+            if (!$resolver instanceof ReactResolver) {
+                continue;
+            }
+
+            $widgetClass = $resolver->getReactWidgetClass();
+            if (is_a($widgetClass, AbstractLayoutSection::class, true)) {
+                $sectionSchemas[$resolver->getType()] = $resolver->getSchema();
+            } elseif (is_a($widgetClass, AbstractLayoutAsset::class, true)) {
+                $assetSchemas[$resolver->getType()] = $resolver->getSchema();
+            } else {
+                $widgetSchemas[$resolver->getType()] = $resolver->getSchema();
+            }
+        }
+
+        $result = [
+            'layoutViewType' => $query['layoutViewType'],
+            'layoutParams' => $flattenedParamSchema->getSchemaArray()['properties'],
+            'widgets' => $widgetSchemas,
+            'assets' => $assetSchemas,
+            'sections' => $sectionSchemas,
+        ];
+
+        foreach ($hydrator->getMiddlewares() as $middleware) {
+            $result['middlewares'][$middleware->getType()] = $middleware->getSchema();
+        }
+
+        $result = $out->validate($result);
+        return new Data($result);
     }
 
     /**
@@ -485,7 +557,8 @@ class LayoutsApiController extends \AbstractApiController {
         $layoutViewID = $this->layoutViewModel->saveLayoutView($body);
 
         $layoutView = $this->layoutViewModel->selectSingle(['layoutViewID' => $layoutViewID]);
-        $result = $out->validate($layoutView);
+        $layoutView = $this->layoutViewModel->normalizeRows([$layoutView], ['record']);
+        $result = $out->validate($layoutView[0]);
 
         return new Data($result, 201);
     }

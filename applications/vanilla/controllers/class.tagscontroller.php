@@ -35,6 +35,7 @@ class TagsController extends VanillaController {
     public function search($q = '', $id = false, $parent = false, $type = 'tag') {
         $categoryID = getIncomingValue('CategoryID');
         $options["categoryID"] = $categoryID;
+        $options['limit'] = $this->tagModel::LIMIT_DEFAULT;
         $data = $this->tagModel->search($q, $id, $parent, $type, $options);
         header("Content-type: application/json");
         echo json_encode($data);

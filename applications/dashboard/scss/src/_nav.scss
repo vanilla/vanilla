@@ -253,11 +253,11 @@
 
       &,
       &:hover {
-        color: $white;
-        background-color: $nav-pills-active-link-hover-bg;
+        color: $grey-dark;
+        background-color: $nav-pills-link-hover-bg;
 
         .nav-pill {
-          color: $nav-pills-active-link-hover-bg;
+          color: $nav-pills-link-hover-bg;
           background-color: transparentize($white, .3);
         }
       }
@@ -265,8 +265,7 @@
 
     &:hover,
     &.hover {
-      color: $grey;
-      background-color: $nav-pills-link-hover-bg;
+      color: $brand-new-primary-active;
     }
   }
 

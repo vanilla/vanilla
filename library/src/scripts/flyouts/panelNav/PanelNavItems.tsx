@@ -4,7 +4,7 @@
  */
 
 import React, { useRef, useEffect } from "react";
-import { INavigationTreeItem } from "@library/@types/api/core";
+import { INavigationTreeItem, navigationItemBadgeType } from "@library/@types/api/core";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
@@ -123,6 +123,9 @@ export function PanelNavItems(props: IPanelNavItemsProps) {
                                         to={navItem.url || ""}
                                     >
                                         {navItem.name}
+                                        {navItem.badge && navItem.badge.type === navigationItemBadgeType.TEXT && (
+                                            <span className={classes.badge}>{navItem.badge.text}</span>
+                                        )}
                                     </DropDownItemLink>
                                 );
                             }

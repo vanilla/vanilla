@@ -131,6 +131,7 @@ class VanillaSettingsController extends Gdn_Controller {
             }
         }
 
+        Gdn_Theme::section('Settings');
         $this->setHighlightRoute('vanilla/settings/posting');
         $this->addJsFile('settings.js');
         $this->title(t('Posting'));
@@ -894,6 +895,7 @@ class VanillaSettingsController extends Gdn_Controller {
         $this->addJsFile('jquery.nestable.js');
         require_once $this->fetchViewLocation('category-settings-functions');
         $this->addAsset('Content', $this->fetchView('symbols'));
+        Gdn_Theme::section('Settings');
         $this->render();
     }
 

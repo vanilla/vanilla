@@ -306,7 +306,7 @@ class LogController extends DashboardController {
      */
     public function initialize() {
         parent::initialize();
-        Gdn_Theme::section('Dashboard');
+        Gdn_Theme::section('Moderation');
         $this->addJsFile('log.js');
         $this->addJsFile('jquery.expander.js');
         $this->addJsFile('jquery-ui.min.js');

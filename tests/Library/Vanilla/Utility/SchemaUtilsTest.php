@@ -121,4 +121,73 @@ class SchemaUtilsTest extends TestCase {
         $arr = [1, 'a'];
         SchemaUtils::validateArray($arr, $schema);
     }
+
+    /**
+     * Test the flattenSchema() method.
+     *
+     * @param Schema $input
+     * @param Schema $expected
+     * @dataProvider provideFlatten
+     */
+    public function testFlatten(Schema $input, Schema $expected) {
+        $actual = SchemaUtils::flattenSchema($input, '/');
+        $this->assertEquals($expected->getSchemaArray(), $actual->getSchemaArray());
+    }
+
+    /**
+     * @return iterable
+     */
+    public function provideFlatten(): iterable {
+        $alreadyFlatSchema = Schema::parse(['key1:s']);
+        yield "already flat" => [$alreadyFlatSchema, $alreadyFlatSchema];
+
+        yield "flatten nested objects" => [
+            Schema::parse([
+                'flat:s',
+                'nested' => Schema::parse([
+                    'level2:s'
+                ])
+            ]),
+            Schema::parse([
+                'flat:s',
+                'nested/level2:s'
+            ])
+        ];
+
+        yield "optional items" => [
+            Schema::parse([
+                'flat:s?',
+                'nestedOuterInnerOptional?' => Schema::parse([
+                    'level2:s?'
+                ]),
+                'nestedOuterRequiredInnerOptional' => Schema::parse([
+                    'level2:s?'
+                ]),
+                'nestedOuterOptionalInnerRequired?' => Schema::parse([
+                    'level2:s'
+                ])
+            ]),
+            Schema::parse([
+                'flat:s?',
+                'nestedOuterInnerOptional/level2:s?',
+                'nestedOuterRequiredInnerOptional/level2:s?',
+                'nestedOuterOptionalInnerRequired/level2:s?' => [
+                    'minLength' => 1,
+                ],
+            ])->setField('required', [])
+        ];
+
+        yield "arrays" => [
+            Schema::parse([
+                'flat:s',
+                'nested' => Schema::parse([
+                    'arr:a' => Schema::parse(['arrItem:s'])
+                ]),
+            ]),
+            Schema::parse([
+                'flat:s',
+                'nested/arr:a' => Schema::parse(['arrItem:s']),
+            ]),
+        ];
+    }
 }

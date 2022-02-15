@@ -104,4 +104,63 @@ final class SchemaUtils {
         }
         return $accumulator;
     }
+
+    /**
+     * Flatten a schema using a particular join character between properties.
+     *
+     * Please note this is slightly lossy.
+     * Something will only be marked as required if it is required at every level to the leaf node.
+     *
+     * @param Schema $schema
+     * @param string $joinCharacter
+     * @return Schema
+     */
+    public static function flattenSchema(Schema $schema, string $joinCharacter): Schema {
+        $newProperties = [];
+        $newRequired = [];
+
+        /**
+         * Internal recursive utility.
+         *
+         * @param string $schemaPath
+         * @param Schema|array $schemaArray
+         * @param bool $isRequired
+         * @return void
+         */
+        $flattenInternal = function (
+            string $schemaPath,
+            $schemaArray,
+            bool $isRequired = false
+        ) use (
+            &$newProperties,
+            &$newRequired,
+            $joinCharacter,
+            &$flattenInternal
+        ) {
+            $type = $schemaArray['type'] ?? null;
+            $properties = $schemaArray['properties'] ?? null;
+            $requiredProperties = $schemaArray['required'] ?? [];
+
+            if ($type === 'object' && $properties !== null) {
+                foreach ($properties as $propertyName => $propertySchema) {
+                    $isPropertyRequired = $isRequired && in_array($propertyName, $requiredProperties);
+                    $fullPropertyPath = empty($schemaPath) ? $propertyName : "{$schemaPath}{$joinCharacter}{$propertyName}";
+                    $flattenInternal($fullPropertyPath, $propertySchema, $isPropertyRequired);
+                }
+            } else {
+                $newProperties[$schemaPath] = $schemaArray;
+                if ($isRequired) {
+                    $newRequired[] = $schemaPath;
+                }
+            }
+        };
+
+        $flattenInternal('', $schema, true);
+        $newSchema = new Schema([
+            'type' => 'object',
+            'properties' => $newProperties,
+            'required' => $newRequired,
+        ]);
+        return $newSchema;
+    }
 }

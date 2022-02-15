@@ -339,6 +339,8 @@ export const siteNavNodeDashboardClasses = useThemeCache(
             outline: 0,
             height: styleUnit(vars.nodeToggle.height),
             width: styleUnit(vars.nodeToggle.width),
+            font: "initial",
+            lineHeight: 0,
         });
 
         const buttonOffset = style("buttonOffset", {

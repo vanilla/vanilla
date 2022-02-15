@@ -38,6 +38,7 @@ export interface IBannerOptions {
     hideDescription: boolean;
     hideTitle: boolean;
     hideSearch: boolean;
+    hideSearchOnMobile: boolean;
     hideIcon: boolean;
     searchPlacement: SearchPlacement;
     overlayTitleBar: boolean;
@@ -201,7 +202,7 @@ export const bannerVariables = useThemeCache(
 
                 // Not publicly documented yet. Currently just an escape hatch in case we have issues on deployment.
                 deduplicateTitles: true,
-            },
+            } as IBannerOptions,
             optionOverrides,
         );
 

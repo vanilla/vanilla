@@ -81,8 +81,10 @@ class SqlUtilsTest extends BootstrapTestCase {
             ->primaryKey('id')
             ->column('body', 'mediumtext')
             ->column('name', 'varchar(50)')
+            ->column('password', 'varbinary(20)')
             ->column('toText', 'varchar(30)')
             ->column('makeBigger', 'varchar(30)')
+            ->column('makeBinBigger', 'varbinary(30)')
             ->column('textToVarchar', 'text')
             ->set();
 
@@ -90,8 +92,10 @@ class SqlUtilsTest extends BootstrapTestCase {
         $this->structure->table($tableName)
             ->column('body', 'text')
             ->column('name', 'varchar(20)')
+            ->column('password', 'varbinary(10)')
             ->column('toText', 'text')
             ->column('makeBigger', 'varchar(31)')
+            ->column('makeBinBigger', 'varbinary(31)')
             ->column('textToVarchar', 'varchar(5)')
             ->column('newText', 'text')
             ->column('newVarchar', 'varchar(20)')
@@ -106,10 +110,13 @@ class SqlUtilsTest extends BootstrapTestCase {
         $this->assertSame('mediumtext', $columns['body']->Type);
         $this->assertSame('varchar', $columns['name']->Type);
         $this->assertSame(50, (int)$columns['name']->Length);
+        $this->assertSame(20, (int)$columns['password']->Length);
         $this->assertSame('text', $columns['toText']->Type);
         $this->assertSame(31, (int)$columns['makeBigger']->Length);
+        $this->assertSame(31, (int)$columns['makeBinBigger']->Length);
         $this->assertSame('text', $columns['textToVarchar']->Type, 'textToVarchar');
         $this->assertSame('text', $columns['newText']->Type);
         $this->assertSame('varchar', $columns['newVarchar']->Type);
+        ;
     }
 }

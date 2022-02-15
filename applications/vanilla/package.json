@@ -4,5 +4,8 @@
     "private": true,
     "dependencies": {
         "@vanilla/utils": "^3.0.1"
+    },
+    "peerDependencies": {
+        "lodash": "*"
     }
 }

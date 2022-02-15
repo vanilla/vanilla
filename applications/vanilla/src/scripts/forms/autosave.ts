@@ -10,8 +10,11 @@ window.onVanillaReady(function () {
         "body.Post #DiscussionForm, body.Discussion .CommentForm",
     ) as HTMLElement;
 
+    // Only save drafts when the "save draft" button is present on the form
+    const shouldSaveDrafts = !!formContainer.querySelectorAll("#Form_SaveDraft, .DraftButton");
+
     // Attach listeners to all inputs within
-    if (formContainer) {
+    if (formContainer && shouldSaveDrafts) {
         const userInputs = formContainer?.querySelectorAll("input, textarea");
         [].slice.call(userInputs).forEach((input: HTMLInputElement) => {
             input.addEventListener("input", function () {

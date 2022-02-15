@@ -32,7 +32,7 @@ final class SqlUtils {
      */
     public static function keepTextFieldLengths(Gdn_DatabaseStructure $structure): void {
         $textTypes = ['tinytext' => 1, 'text' => 2, 'mediumtext' => 3, 'longtext' => 4];
-        $charTypes = ['varchar' => 1, 'char' => 1];
+        $charTypes = ['varchar' => 1, 'char' => 1, 'varbinary' => 1, 'binary' => 1];
 
         if (!$structure->tableExists()) {
             return;

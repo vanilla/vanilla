@@ -1,27 +1,21 @@
 /**
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/styleUtils";
 import { media } from "@library/styles/styleShim";
+import { css } from "@emotion/css";
 
 const thumbnailGridClasses = useThemeCache(() => {
-    const style = styleFactory("thumbnailGrid");
-
-    const grid = style(
-        "grid",
+    const grid = css(
         {
-            display: ["flex", "grid"],
-            flexWrap: "wrap",
-            justifyContent: "flex-start",
-            marginTop: -18,
-            paddingRight: 18,
-            paddingLeft: 18,
-            marginLeft: -36,
-            marginRight: -36,
+            display: "grid",
+            justifyItems: "stretch",
+            alignItems: "stretch",
             gridTemplateColumns: "repeat(3, 1fr)",
             gridAutoRows: "minmax(240px, auto)",
+            gridGap: 20,
         },
         media(
             { maxWidth: 1300 },
@@ -37,11 +31,8 @@ const thumbnailGridClasses = useThemeCache(() => {
         ),
     );
 
-    const gridItem = style("gridItem", {
+    const gridItem = css({
         flex: 1,
-        paddingLeft: 18,
-        paddingRight: 18,
-        paddingTop: 36,
         display: "flex",
         flexDirection: "column",
     });

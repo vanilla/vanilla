@@ -11,7 +11,6 @@ use Garden\Schema\Schema;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
 use Vanilla\Widgets\Schema\ReactChildrenSchema;
-use Vanilla\Widgets\Schema\ReactSingleChildSchema;
 
 /**
  * Widget representing a layout container.

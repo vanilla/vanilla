@@ -11,7 +11,7 @@ import { IThemeVariables } from "@library/theming/themeReducer";
 import { getThemeVariables } from "@library/theming/getThemeVariables";
 import { uuidv4 } from "@vanilla/utils";
 import { DeepPartial } from "redux";
-
+import { INavigationItemBadge } from "@library/@types/api/core";
 export interface INavigationVariableItem {
     id: string;
     name: string;
@@ -20,6 +20,8 @@ export interface INavigationVariableItem {
     permission?: string;
     isCustom?: boolean;
     isHidden?: boolean;
+    react?: boolean;
+    badge?: INavigationItemBadge;
 }
 
 type INavItemGenerator = () => INavigationVariableItem;

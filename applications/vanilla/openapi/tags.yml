@@ -25,6 +25,15 @@ paths:
                       items:
                           type: integer
                   style: form
+                - $ref: "#/components/parameters/Page"
+                - description: Desired number of tags per page.
+                  in: query
+                  name: limit
+                  schema:
+                      type: integer
+                      default: 20
+                      minimum: 1
+
             responses:
                 "200":
                     content:

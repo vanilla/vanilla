@@ -2,14 +2,12 @@
 /**
  * Discussion controller
  *
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Vanilla
  * @since 2.0
  */
 
-use Vanilla\Community\Events\DiscussionEvent;
-use Vanilla\Formatting\DateTimeFormatter;
 use Vanilla\Message;
 use Vanilla\Models\DiscussionJsonLD;
 

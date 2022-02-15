@@ -15,22 +15,55 @@ use PHPUnit\Framework\TestCase;
 class TestCache extends \Gdn_Dirtycache {
 
     /**
+     * Assert that our cache is empty.
+     */
+    public function assertEmpty(): void {
+        TestCase::assertEmpty($this->cache, 'Expected cache to be empty.');
+    }
+
+    /**
+     * Assert that our cache is not empty.
+     */
+    public function assertNotEmpty(): void {
+        TestCase::assertNotEmpty($this->cache, 'Expected cache not to be empty.');
+    }
+
+    /**
      * Assert count of successful cache gets.
      *
-     * @param string $key
+     * @param string $keyPattern
      * @param int $expected
      */
-    public function assertGetCount(string $key, int $expected) {
-        TestCase::assertEquals($expected, $this->countGets[$key] ?? 0);
+    public function assertGetCount(string $keyPattern, int $expected) {
+        TestCase::assertEquals($expected, $this->getCount($keyPattern, $this->countGets));
     }
 
     /**
      * Assert count of successful cache sets.
      *
-     * @param string $key
+     * @param string $keyPattern
      * @param int $expected
      */
-    public function assertSetCount(string $key, int $expected) {
-        TestCase::assertEquals($expected, $this->countSets[$key] ?? 0);
+    public function assertSetCount(string $keyPattern, int $expected) {
+        TestCase::assertEquals($expected, $this->getCount($keyPattern, $this->countSets));
+    }
+
+    /**
+     * Fetch a count of gets or sets.
+     *
+     * @param string $keyPattern The key too lookup. Null for all keys.
+     * @param array $from The collection to pull from.
+     *
+     * @return int
+     */
+    private function getCount(string $keyPattern, array $from): int {
+        $actual = 0;
+        foreach ($from as $actualKey => $item) {
+            if (!fnmatch($keyPattern, $actualKey)) {
+                continue;
+            }
+            $actual += $item;
+        }
+        return $actual;
     }
 }

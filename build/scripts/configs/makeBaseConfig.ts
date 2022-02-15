@@ -87,6 +87,7 @@ ${chalk.green(aliases)}`;
                             "react-markdown",
                             "@simonwep.*",
                             "swagger-ui-react",
+                            "is-plain-obj",
                         ];
                         const exclusionRegex = new RegExp(`node_modules/(${modulesRequiringTranspilation.join("|")})/`);
 

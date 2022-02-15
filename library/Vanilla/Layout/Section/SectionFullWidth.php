@@ -19,7 +19,7 @@ class SectionFullWidth extends AbstractLayoutSection {
      * @inheritdoc
      */
     public function getComponentName(): string {
-        return 'PanelLayout';
+        return 'SectionFullWidth';
     }
 
     /**

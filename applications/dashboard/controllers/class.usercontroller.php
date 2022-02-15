@@ -48,7 +48,7 @@ class UserController extends DashboardController {
      */
     public function initialize() {
         parent::initialize();
-        Gdn_Theme::section('Dashboard');
+        Gdn_Theme::section('Moderation');
         if ($this->Menu) {
             $this->Menu->highlightRoute('/dashboard/settings');
         }

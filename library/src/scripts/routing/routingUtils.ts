@@ -21,3 +21,13 @@ export function findMatchingPath(paths: string[], currentPath: string): string |
 
     return sorted[0] ?? undefined;
 }
+
+export function flattenItems<T>(items: T[], key: string): T[] {
+    return items.reduce<T[]>((flattenedItems, item) => {
+        flattenedItems.push(item);
+        if (Array.isArray(item[key])) {
+            flattenedItems = flattenedItems.concat(flattenItems(item[key], key));
+        }
+        return flattenedItems;
+    }, []);
+}

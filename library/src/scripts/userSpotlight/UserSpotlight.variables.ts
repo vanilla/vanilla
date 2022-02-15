@@ -9,18 +9,13 @@ import { useThemeCache } from "@library/styles/themeCache";
 import { DeepPartial } from "redux";
 import { Variables } from "@library/styles/Variables";
 import { CSSObject } from "@emotion/css";
-import { IBoxOptions, ISpacing } from "@library/styles/cssUtilsTypes";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { BorderType } from "@library/styles/styleHelpers";
 import { UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
 import { media } from "@library/styles/styleShim";
+import { IHomeWidgetContainerOptions } from "@library/homeWidget/HomeWidgetContainer.styles";
 
-export interface IUserSpotlightOptions {
-    box: IBoxOptions;
-    container: {
-        spacing: ISpacing;
-        spacingMobile: ISpacing;
-    };
+export interface IUserSpotlightOptions extends IHomeWidgetContainerOptions {
     userTextAlignment: "left" | "right";
 }
 
@@ -36,7 +31,7 @@ export const userSpotlightVariables = useThemeCache(
         /**
          * @varGroup userSpotlight.options
          */
-        const options: IUserSpotlightOptions = makeThemeVars(
+        const options = makeThemeVars(
             "options",
             {
                 /**
@@ -45,10 +40,9 @@ export const userSpotlightVariables = useThemeCache(
                  * @expand box
                  */
                 box: Variables.box({
-                    borderType: BorderType.SHADOW,
-                    border: {
-                        radius: globalVars.border.radius,
-                    },
+                    background: optionOverrides?.innerBackground,
+                    borderType: optionOverrides?.borderType as BorderType,
+                    border: globalVars.border,
                 }),
 
                 /**
@@ -75,7 +69,9 @@ export const userSpotlightVariables = useThemeCache(
                  * @var userSpotlight.options.userTextAlignment
                  * @description Whether user name and user title aligned left or right.
                  */
-                userTextAlignment: "left" as "left" | "right",
+                userTextAlignment: optionOverrides?.userTextAlignment
+                    ? optionOverrides.userTextAlignment
+                    : ("left" as "left" | "right"),
             },
             optionOverrides,
         );

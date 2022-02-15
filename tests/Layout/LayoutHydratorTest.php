@@ -19,15 +19,16 @@ class LayoutHydratorTest extends BootstrapTestCase {
     use SiteTestTrait;
 
     /**
-     * Test that varius layout inputs hydrate into specific outputs.
+     * Test that various layout inputs hydrate into specific outputs.
      *
      * @param array $input The input.
      * @param array $expected The expected result.
+     * @param array $jsonLDExpected The JsonLD expected result.
      * @param array $params The parameters for rendering.
      *
      * @dataProvider provideLayoutHydratesTo
      */
-    public function testLayoutHydratesTo(array $input, array $expected, array $params = []) {
+    public function testLayoutHydratesTo(array $input, array $expected, array $jsonLDExpected, array $params = []) {
         $hydrator = self::getLayoutService()->getHydrator('home');
         $actual = $hydrator->resolve($input, $params);
         // Make sure we see it as the API output would.
@@ -40,19 +41,21 @@ class LayoutHydratorTest extends BootstrapTestCase {
      *
      * @param array $input The input.
      * @param array $expected The expected result.
+     * @param array $jsonLDExpected The JsonLD expected result.
      * @param array $params The parameters for rendering.
      *
      * @dataProvider provideLayoutHydratesTo
      */
-    public function testHydrateLayout(array $input, array $expected, array $params = []) {
+    public function testHydrateLayout(array $input, array $expected, array $jsonLDExpected, array $params = []) {
         $actual = self::getLayoutService()->hydrateLayout('home', $params, $input);
         // Make sure we see it as the API output would.
         $this->assertArrayHasKey('seo', $actual);
         $seo = json_decode(json_encode($actual['seo']), true);
         unset($actual['seo']);
         $actual = json_decode(json_encode($actual), true);
-        $this->assertEquals(4, count($seo));
+        $this->assertEquals(5, count($seo));
         $this->assertSame($expected, $actual);
+        $this->assertSame(json_encode($jsonLDExpected, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), $seo['json-ld']);
     }
 
     /**
@@ -65,6 +68,25 @@ class LayoutHydratorTest extends BootstrapTestCase {
             /// Invalid value here.
             "recordType" => []
         ];
+        $jsonLD = [
+            "@context" => "https://schema.org",
+            "@graph" => [[
+                "@context" => "http://schema.org",
+                "@type" => "BreadcrumbList",
+                "itemListElement" => [[
+                    "@type" => "ListItem",
+                    "position" => 0,
+                    "name" => "Home",
+                    "item" => "http://vanilla.test/layouthydratortest/"
+                ],
+                    [
+                        "@type" => "ListItem",
+                        "position" => 1,
+                        "name" => "General",
+                        "item" => "http://vanilla.test/layouthydratortest/categories/general"
+                    ]]
+            ]]
+        ];
         yield "Exceptions propagate up to the nearest react node" => [
             [
                 "layout" => [[
@@ -75,8 +97,7 @@ class LayoutHydratorTest extends BootstrapTestCase {
                     'autoWrap' => true,
                 ]]
             ],
-            [
-                'layout' => [[
+            [   'layout' => [[
                     '$reactComponent' => 'SectionOneColumn',
                     '$reactProps' => [
                         'contents' => [[
@@ -99,6 +120,10 @@ class LayoutHydratorTest extends BootstrapTestCase {
                         'autoWrap' => true,
                     ],
                 ]]
+            ],
+            [
+                "@context" => "https://schema.org",
+                "@graph" => []
             ]
         ];
 
@@ -119,6 +144,10 @@ class LayoutHydratorTest extends BootstrapTestCase {
                         'code' => 404,
                     ],
                 ],
+            ],
+            [
+                "@context" => "https://schema.org",
+                "@graph" => []
             ]
         ];
 
@@ -140,6 +169,50 @@ class LayoutHydratorTest extends BootstrapTestCase {
                     'autoWrap' => true,
                 ],
             ],
+            [
+                "@context" => "https://schema.org",
+                "@graph" => []
+            ]
+        ];
+
+        yield "Success hydration" => [
+            [   "layout" => [
+                    '$hydrate' => 'react.section.1-column',
+                    'contents' => [
+                        [
+                            // Assets should be available.
+                            '$hydrate' => 'react.asset.breadcrumbs',
+                            'recordType' => 'category',
+                            'recordID' => 1,
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'layout' => [
+                    '$reactComponent' => 'SectionOneColumn',
+                    '$reactProps' => [
+                        'contents' => [[
+                            '$reactComponent' => 'Breadcrumbs',
+                            '$reactProps' => [
+                                'crumbs' => [
+                                    0 => [
+                                        'name' => 'Home',
+                                        'url' => 'http://vanilla.test/layouthydratortest/',
+                                    ],
+                                    1 => [
+                                        'name' => 'General',
+                                        'url' => 'http://vanilla.test/layouthydratortest/categories/general',
+                                    ]
+                                ],
+                            ],
+                        ]],
+                        'isNarrow' => false,
+                        'autoWrap' => true,
+                    ]
+                ]
+            ],
+            $jsonLD
         ];
     }
 }

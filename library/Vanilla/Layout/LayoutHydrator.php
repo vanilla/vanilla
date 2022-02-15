@@ -16,10 +16,11 @@ use Garden\Hydrate\Schema\HydrateableSchema;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\NotFoundException;
+use Vanilla\Layout\Resolvers\TranslateResolver;
+use Vanilla\Layout\Resolvers\ApiResolver;
 use Vanilla\Layout\Middleware\LayoutRoleFilterMiddleware;
 use Vanilla\Layout\Middleware\VisibilityMiddleware;
 use Vanilla\Layout\Resolvers\ReactLayoutExceptionHandler;
-use Vanilla\Layout\Resolvers\ApiResolver;
 use Vanilla\Layout\Resolvers\ReactResolver;
 use Vanilla\Layout\Section\SectionFullWidth;
 use Vanilla\Layout\Section\SectionOneColumn;
@@ -30,8 +31,10 @@ use Vanilla\Layout\View\CommonLayoutView;
 use Vanilla\Layout\View\HomeLayoutView;
 use Vanilla\Web\JsInterpop\AbstractReactModule;
 use Vanilla\Web\PageHead;
+use Vanilla\Web\PageHeadAwareInterface;
 use Vanilla\Web\PageHeadInterface;
-use Vanilla\Widgets\React\BannerReactWidget;
+use Vanilla\Widgets\React\BannerFullWidget;
+use Vanilla\Widgets\React\BannerContentWidget;
 use Vanilla\Widgets\React\HtmlReactWidget;
 use Vanilla\Widgets\React\LeaderboardWidget;
 use Vanilla\Widgets\React\QuickLinksWidget;
@@ -84,6 +87,7 @@ final class LayoutHydrator {
 
         // Register core resolvers.
         $this->addResolver($container->get(ApiResolver::class));
+        $this->addResolver($container->get(TranslateResolver::class));
 
         // Register core react widget resolvers.
         $this
@@ -92,10 +96,11 @@ final class LayoutHydrator {
             ->addReactResolver(SectionTwoColumns::class)
             ->addReactResolver(SectionOneColumn::class)
             ->addReactResolver(SectionFullWidth::class)
-            ->addReactResolver(BannerReactWidget::class)
             ->addReactResolver(WidgetContainerReactWidget::class)
             ->addReactResolver(QuickLinksWidget::class)
             ->addReactResolver(LeaderboardWidget::class)
+            ->addReactResolver(BannerFullWidget::class)
+            ->addReactResolver(BannerContentWidget::class)
         ;
 
         $this->addLayoutView($container->get(HomeLayoutView::class));
@@ -168,7 +173,7 @@ final class LayoutHydrator {
      *
      * @return Schema
      */
-    private function getViewParamSchema(?AbstractCustomLayoutView $layoutView, bool $includeResolvedSchema = false): Schema {
+    public function getViewParamSchema(?AbstractCustomLayoutView $layoutView, bool $includeResolvedSchema = false): Schema {
         $schema = $this->commonLayout->getParamInputSchema();
 
         if ($includeResolvedSchema) {
@@ -182,6 +187,20 @@ final class LayoutHydrator {
             }
         }
         return $schema;
+    }
+
+    /**
+     * @return AbstractMiddleware[]
+     */
+    public function getMiddlewares(): array {
+        return $this->dataHydrator->getMiddlewares();
+    }
+
+    /**
+     * @return AbstractDataResolver[]
+     */
+    public function getResolvers(): array {
+        return $this->dataHydrator->getResolvers();
     }
 
     /**
@@ -232,8 +251,7 @@ final class LayoutHydrator {
         // Validate the params.
         $params = $this->resolveParams($layoutViewType, $params, $cleanPageHead);
 
-        $hydrator = $this->getHydrator($layoutViewType);
-
+        $hydrator = $this->getHydrator($layoutViewType, $cleanPageHead);
         $result = $hydrator->resolve($layout, $params);
         if ($includeMeta) {
             // Apply pageHead meta
@@ -241,7 +259,9 @@ final class LayoutHydrator {
                 'title' => $cleanPageHead->getSeoTitle(),
                 'description' => $cleanPageHead->getSeoDescription(),
                 'meta' => $cleanPageHead->getMetaTags(),
-                'links' => $cleanPageHead->getLinkTags()];
+                'links' => $cleanPageHead->getLinkTags(),
+                'json-ld' => $cleanPageHead->getJsonLDScriptContent(),
+            ];
         }
         return $result;
     }
@@ -276,13 +296,13 @@ final class LayoutHydrator {
      * Get a data hydrator instance for a layout view type.
      *
      * @param string|null $layoutViewType
+     * @param ?PageHeadInterface $pageHead
      *
      * @return DataHydrator
      */
-    public function getHydrator(?string $layoutViewType): DataHydrator {
+    public function getHydrator(?string $layoutViewType, ?PageHeadInterface $pageHead = null): DataHydrator {
         $dataHydrator = $this->dataHydrator;
         $layoutView = $this->getLayoutViewType($layoutViewType);
-
         if ($layoutView) {
             $dataHydrator = $layoutView->createHydrator($dataHydrator, $this->container);
         }
@@ -291,6 +311,13 @@ final class LayoutHydrator {
         $paramResolver = clone $dataHydrator->getParamResolver();
         $paramResolver = $this->applyParamsNamesToResolver($layoutView, $paramResolver);
         $dataHydrator->addResolver($paramResolver);
+
+        foreach ($dataHydrator->getResolvers() as $resolver) {
+            if ($resolver instanceof PageHeadAwareInterface && $pageHead !== null) {
+                $resolver->setPageHead($pageHead);
+            }
+        }
+
         return $dataHydrator;
     }
 

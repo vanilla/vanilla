@@ -8,57 +8,24 @@
 namespace Vanilla\Community;
 
 use Garden\Schema\Schema;
-use Vanilla\Forms\ApiFormChoices;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
-use Vanilla\Forms\StaticFormChoices;
+use Vanilla\Forum\Widgets\UserSpotlightWidgetTrait;
+use Vanilla\InjectableInterface;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Web\JsInterpop\AbstractReactModule;
 
 /**
  * Widget to spotlight a user.
  */
-class UserSpotlightModule extends AbstractReactModule {
-
-    /** @var \UserModel */
-    private $userModel;
-
-    /** @var int $userID */
-    private $userID;
+class UserSpotlightModule extends AbstractReactModule implements InjectableInterface {
+    use UserSpotlightWidgetTrait;
 
     /** @var string|null */
-    public $title = null;
+    private $title = null;
 
     /** @var string|null */
-    public $description = null;
-
-    /**
-     * UserSpotlightModule Constructor
-     *
-     * @param \UserModel $userModel
-     */
-    public function __construct(\UserModel $userModel) {
-        parent::__construct();
-        $this->userModel = $userModel;
-    }
-
-    /**
-     * Set userID.
-     *
-     * @param int $userID
-     */
-    public function setUserID(int $userID) {
-        $this->userID = $userID;
-    }
-
-    /**
-     * Get userID.
-     *
-     * @return int
-     */
-    public function getUserID(): int {
-        return $this->userID;
-    }
+    private $description = null;
 
     /**
      * Get props for component
@@ -67,18 +34,19 @@ class UserSpotlightModule extends AbstractReactModule {
      */
     public function getProps(): ?array {
         $data = $this->getData();
-        if ($data === null) {
+
+        if (is_null($data) || count($data) === 0) {
             return null;
         }
-        if (count($data) === 0) {
-            return null;
-        }
+
         $props = [];
         $props['title'] = $this->getTitle();
-        $props['description'] = $this->description;
+        $props['description'] = $this->getDescription();
         $props['userInfo'] = $data;
-
         $props = $this->getSchema()->validate($props);
+
+        // kludge containerOptions for the module
+        $props['containerOptions'] = ['borderType' => 'shadow'];
 
         return $props;
     }
@@ -87,7 +55,7 @@ class UserSpotlightModule extends AbstractReactModule {
      * @inheritdoc
      */
     public function getComponentName(): string {
-        return 'UserSpotlight';
+        return 'UserSpotlightWidget';
     }
 
     /**
@@ -111,30 +79,20 @@ class UserSpotlightModule extends AbstractReactModule {
         ]);
     }
 
-
-    /**
-     * @return array|null
-     */
-    protected function getData(): ?array {
-        if (!$this->userID) {
-            return null;
-        }
-
-        $user = $this->userModel->getFragmentByID($this->userID);
-
-        if (count($user) === 0) {
-            return null;
-        }
-        return $user;
-    }
-
     /**
      * Return the module's title
      *
      * @return string|null
      */
-    protected function getTitle(): ?string {
+    public function getTitle(): ?string {
         return $this->title;
+    }
+
+    /**
+     * @param string $title
+     */
+    public function setTitle($title): void {
+        $this->title = $title;
     }
 
     /**
@@ -142,8 +100,15 @@ class UserSpotlightModule extends AbstractReactModule {
      *
      * @return string|null
      */
-    protected function getDescription(): ?string {
+    public function getDescription(): ?string {
         return $this->description;
+    }
+
+    /**
+     * @param string $description
+     */
+    public function setDescription($description): void {
+        $this->description = $description;
     }
 
     /**
@@ -157,34 +122,19 @@ class UserSpotlightModule extends AbstractReactModule {
      * @return Schema
      */
     public static function getWidgetSchema(): Schema {
-        $widgetSchema = Schema::parse([
-            'userID?' => [
-                'type' => 'integer',
-                'x-control' => SchemaForm::dropDown(
-                    new FormOptions(
-                        'User',
-                        'Choose a user.',
-                        'Search...'
-                    ),
-                    new ApiFormChoices(
-                        '/api/v2/users/by-names?name=%s*',
-                        '/api/v2/users/%s',
-                        'userID',
-                        'name'
+        return SchemaUtils::composeSchemas(
+            self::getApiSchema(),
+            Schema::parse([
+                'title:s?' => [
+                    'x-control' => SchemaForm::textBox(new FormOptions('Title', 'Set a custom title.'))
+                ],
+                'description:s?' => [
+                    'x-control' => SchemaForm::textBox(
+                        new FormOptions('Description', 'Set a custom description.'),
+                        'textarea'
                     )
-                )
-            ],
-            'title:s?' => [
-                'x-control' => SchemaForm::textBox(new FormOptions('Title', 'Set a custom title.'))
-            ],
-            'description:s?' => [
-                'x-control' => SchemaForm::textBox(
-                    new FormOptions('Description', 'Set a custom description.'),
-                    'textarea'
-                )
-            ],
-        ]);
-
-        return SchemaUtils::composeSchemas($widgetSchema);
+                ]
+            ])
+        );
     }
 }

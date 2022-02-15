@@ -23,7 +23,6 @@ use Vanilla\Web\JsInterpop\PhpAsJsVariable;
  * Class for holding information for rendering and HMTL page head.
  */
 final class PageHead implements PageHeadInterface {
-
     use TwigRenderTrait;
 
     /** @var ContentSecurityPolicyModel */
@@ -327,7 +326,7 @@ final class PageHead implements PageHeadInterface {
      * Get the content of the page's JSON-LD script.
      * @return string
      */
-    private function getJsonLDScriptContent(): string {
+    public function getJsonLDScriptContent(): string {
         $data = [
             '@context' => "https://schema.org",
             "@graph" => $this->jsonLDItems,

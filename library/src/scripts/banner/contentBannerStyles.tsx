@@ -25,7 +25,7 @@ export const contentBannerVariables = useThemeCache(
 
         const normalBannerVars = bannerVariables(optionOverrides, forcedVars, "contentBanner");
 
-        const options = makeVars("options", {
+        const options: IBannerOptions = makeVars("options", {
             ...normalBannerVars.options,
             enabled: false,
             alignment: BannerAlignment.CENTER,

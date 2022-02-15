@@ -251,6 +251,17 @@ export const dropDownClasses = useThemeCache(() => {
         ...Mixins.font(vars.metas.font),
     });
 
+    const badge = css({
+        marginLeft: globalVars.gutter.size,
+        ...Mixins.padding({
+            vertical: globalVars.gutter.quarter,
+            horizontal: globalVars.gutter.half,
+        }),
+        backgroundColor: ColorsUtils.colorOut(vars.contents.fg.fade(0.4)),
+        color: ColorsUtils.colorOut(globalVars.elementaryColors.white),
+        borderRadius: globalVars.border.radius,
+    });
+
     // wrapping element
     const item = css({
         ...userSelect("none"),
@@ -589,6 +600,7 @@ export const dropDownClasses = useThemeCache(() => {
         thumbnailItemThumbnail,
         gridItem,
         gridItemSmall,
+        badge,
     };
 });
 

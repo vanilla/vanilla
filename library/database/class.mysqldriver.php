@@ -18,6 +18,7 @@
  */
 
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Models\ModelCache;
 
 /**
  * Class Gdn_MySQLDriver
@@ -32,16 +33,29 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
     /** @var ConfigurationInterface */
     private $config;
 
+    /** @var ModelCache */
+    private $modelCache;
+
     /**
      * DI.
      *
      * @param ConfigurationInterface $config
+     * @param Gdn_Cache $cache
      */
-    public function __construct(ConfigurationInterface $config) {
+    public function __construct(ConfigurationInterface $config, Gdn_Cache $cache) {
         parent::__construct();
         $this->config = $config;
+        $this->setCache($cache);
     }
 
+    /**
+     * Apply a cache for the table structures.
+     *
+     * @param Gdn_Cache $cache
+     */
+    public function setCache(Gdn_Cache $cache): void {
+        $this->modelCache = new ModelCache('mysql', $cache);
+    }
 
     /**
      * Escape an identifier like a table or column name.
@@ -171,10 +185,37 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
      * table. The returned array of objects contains the following properties:
      * Name, PrimaryKey, Type, AllowNull, Default, Length, Enum.
      *
+     * Schemas are cached until a structure is run.
+     *
      * @param string $table The name of the table to get schema data for.
      * @return array
      */
-    public function fetchTableSchema($table) {
+    public function fetchTableSchema($table): array {
+        $result = $this->modelCache->getCachedOrHydrate([__FUNCTION__, $table], function () use ($table) {
+            $schemaData = $this->fetchTableSchemaInternal($table);
+            return $schemaData;
+        }, [
+            ModelCache::OPT_TTL => 60,
+        ]);
+        return $result;
+    }
+
+    /**
+     * Clear the table schema caches.
+     */
+    public function clearSchemaCache() {
+        $this->modelCache->invalidateAll();
+    }
+
+    /**
+     * Returns an array of schema data objects for each field in the specified
+     * table. The returned array of objects contains the following properties:
+     * Name, PrimaryKey, Type, AllowNull, Default, Length, Enum.
+     *
+     * @param string $table The name of the table to get schema data for.
+     * @return array
+     */
+    private function fetchTableSchemaInternal($table) {
         // Format the table name.
         $table = $this->escapeIdentifier($this->Database->DatabasePrefix.$table);
         $dataSet = $this->query($this->fetchColumnSql($table));

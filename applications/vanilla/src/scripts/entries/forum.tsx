@@ -25,6 +25,8 @@ import "@vanilla/addon-vanilla/forms/autosave";
 import { LeaderboardWidget } from "@library/leaderboardWidget/LeaderboardWidget";
 import { CategoriesWidget } from "@library/widgets/CategoriesWidget";
 import { RSSWidget } from "@library/rssWidget/RSSWidget";
+import { UserSpotlightWidget } from "@library/userSpotlight/UserSpotlightWidget";
+import ArticleArticlesWidget from "@knowledge/components/ArticleArticlesWidget";
 
 registerReducer("forum", forumReducer);
 registerCommunitySearchDomain();
@@ -44,6 +46,8 @@ addComponent("NewPostMenu", NewPostMenu, { overwrite: true });
 addComponent("LeaderboardWidget", LeaderboardWidget, { overwrite: true });
 addComponent("CategoriesWidget", CategoriesWidget, { overwrite: true });
 addComponent("RSSWidget", RSSWidget, { overwrite: true });
+addComponent("UserSpotlightWidget", UserSpotlightWidget, { overwrite: true });
+addComponent("ArticleArticlesWidget", ArticleArticlesWidget, { overwrite: true });
 
 SearchContextProvider.setOptionProvider(new CommunitySearchProvider());
 accessibleRoleButton();

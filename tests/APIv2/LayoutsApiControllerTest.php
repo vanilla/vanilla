@@ -8,6 +8,8 @@
 namespace VanillaTests\APIv2;
 
 use CategoryModel;
+use Garden\Http\HttpResponse;
+use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Gdn;
@@ -416,6 +418,39 @@ class LayoutsApiControllerTest extends AbstractResourceTest {
 
         // Home asset was applied.
         $this->assertStringContainsString("react.asset.breadcrumbs", $response->getRawBody());
+    }
+
+    /**
+     * Test our out when fetching a catalogue.
+     */
+    public function testGetCatalogue() {
+        $response = $this->api()->get('/layouts/catalogue', ['layoutViewType' => 'home']);
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $this->assertSame('home', $response['layoutViewType']);
+        $this->assertSchemaExists($response, 'assets', 'react.asset.breadcrumbs');
+        $this->assertSchemaExists($response, 'sections', 'react.section.2-columns');
+        $this->assertSchemaExists($response, 'widgets', 'react.html');
+        $this->assertSchemaExists($response, 'layoutParams', 'category/categoryID');
+        $this->assertSchemaExists($response, 'middlewares', 'role-filter');
+    }
+
+    /**
+     * Assert that some value exists in a catalogue response and it is a schema.
+     *
+     * @param HttpResponse $catalogueResponse
+     * @param string $collectionName
+     * @param string $propertyName
+     */
+    private function assertSchemaExists(HttpResponse $catalogueResponse, string $collectionName, string $propertyName) {
+        $collection = $catalogueResponse[$collectionName] ?? null;
+        $value = $collection[$propertyName] ?? null;
+        $this->assertArrayHasKey(
+            "type",
+            $value ?? [],
+            "Could not find expected schema in catalogue collection '{$collectionName}': {$propertyName}\n"
+            . json_encode($collection, JSON_PRETTY_PRINT)
+        );
     }
 
     /**

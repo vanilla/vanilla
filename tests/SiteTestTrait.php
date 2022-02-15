@@ -11,8 +11,11 @@ use Garden\Container\Container;
 use Garden\EventManager;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
+use Vanilla\Addon;
+use Vanilla\AddonManager;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Http\InternalClient;
+use Vanilla\Models\AddonModel;
 use Vanilla\Permissions;
 use Vanilla\Utility\ModelUtils;
 use Vanilla\Utility\UrlUtils;
@@ -531,5 +534,20 @@ TEMPLATE;
         } while (!empty($url));
 
         TestCase::assertNotSame(1, $page, 'The paging test must go past page 1.');
+    }
+
+    /**
+     * Enable our locale fixtures.
+     */
+    public static function enableLocaleFixtures(): void {
+        $addonManager = self::container()->get(AddonManager::class);
+        $addonModel = self::container()->get(AddonModel::class);
+        $testLocaleAddon = new Addon("/tests/fixtures/locales/test");
+        $addonManager->add($testLocaleAddon);
+        $addonModel->enable($testLocaleAddon);
+
+        $testLocaleAddon = new Addon("/tests/fixtures/locales/test-fr");
+        $addonManager->add($testLocaleAddon);
+        $addonModel->enable($testLocaleAddon);
     }
 }

@@ -35,6 +35,7 @@ class ReactionsController extends DashboardController {
         $ReactionTypes = ReactionModel::getReactionTypes();
         $this->setData('ReactionTypes', $ReactionTypes);
 
+        Gdn_Theme::section('Settings');
         include_once $this->fetchViewLocation('settings_functions', '', 'plugins/Reactions');
         $this->render('reactiontypes', '', 'plugins/Reactions');
     }

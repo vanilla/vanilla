@@ -1,0 +1,50 @@
+/**
+ * @copyright 2009-2022 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+import React, { ReactNode } from "react";
+import adminTitleBarClasses from "@dashboard/components/AdminTitleBar.classes";
+import { cx } from "@emotion/css";
+import TruncatedText from "@library/content/TruncatedText";
+import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
+import { userContentClasses } from "@library/content/UserContent.styles";
+
+export interface IProps {
+    title: string;
+    containerClassName?: string;
+    titleAndActionsContainerClassName?: string;
+    actions?: React.ReactNode;
+    actionsWrapperClassName?: string;
+    description?: ReactNode;
+}
+
+export default function AdminTitleBar(props: IProps) {
+    const classes = adminTitleBarClasses();
+
+    return (
+        <div className={classes.root}>
+            <div className={cx(classes.container, props.containerClassName)}>
+                <div className={cx(classes.titleAndActionsContainer, props.titleAndActionsContainerClassName)}>
+                    <div className={classes.titleAndDescriptionContainer}>
+                        <h2 className={classes.title} title={props.title}>
+                            <TruncatedText lines={1}>
+                                {props.title ?? <LoadingRectangle height={32} width={300} />}
+                            </TruncatedText>
+                        </h2>
+                        {props.description && (
+                            <div className={cx(classes.descriptionWrapper)}>
+                                <div className={userContentClasses().root}>
+                                    <div className={cx(classes.description)}>{props.description}</div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                    {props.actions && (
+                        <div className={cx(classes.actionsWrapper, props.actionsWrapperClassName)}>{props.actions}</div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+}

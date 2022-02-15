@@ -14,13 +14,17 @@ use Garden\Hydrate\Resolvers\AbstractDataResolver;
 use Garden\Schema\Schema;
 use Vanilla\Layout\Section\AbstractLayoutSection;
 use Vanilla\Utility\ArrayUtils;
+use Vanilla\Web\PageHeadAwareInterface;
+use Vanilla\Web\PageHeadAwareTrait;
+use Vanilla\Web\PageHeadInterface;
 use Vanilla\Widgets\React\CombinedPropsWidgetInterface;
 use Vanilla\Widgets\React\ReactWidgetInterface;
 
 /**
  * Data resolver for hydrating a react widget.
  */
-class ReactResolver extends AbstractDataResolver {
+class ReactResolver extends AbstractDataResolver implements PageHeadAwareInterface {
+    use PageHeadAwareTrait;
 
     public const HYDRATE_GROUP_SECTION = "section";
     public const HYDRATE_GROUP_REACT = "react";
@@ -46,11 +50,22 @@ class ReactResolver extends AbstractDataResolver {
     }
 
     /**
+     * @return string
+     */
+    public function getReactWidgetClass(): string {
+        return $this->reactWidgetClass;
+    }
+
+    /**
      * @inheritdoc
      */
     protected function resolveInternal(array $data, array $params) {
         /** @var ReactWidgetInterface $module */
         $module = $this->container->get($this->reactWidgetClass);
+
+        if ($module instanceof PageHeadAwareInterface && $this->pageHead !== null) {
+            $module->setPageHead($this->pageHead);
+        }
 
         // Apply properties
         if ($module instanceof CombinedPropsWidgetInterface) {
@@ -66,7 +81,7 @@ class ReactResolver extends AbstractDataResolver {
             }
         }
 
-        $props = $module->getProps();
+        $props = $module->getProps($params);
         if ($props === null) {
             return null;
         }
@@ -74,7 +89,7 @@ class ReactResolver extends AbstractDataResolver {
         // Returns something matching ReactChildrenSchema.
         return [
             '$reactComponent' => $module->getComponentName(),
-            '$reactProps' => $module->getProps(),
+            '$reactProps' => $props,
         ];
     }
 

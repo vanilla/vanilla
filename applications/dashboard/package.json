@@ -25,6 +25,9 @@
         "sass": "1.20.1",
         "time-grunt": "2.0.0"
     },
+    "peerDependencies": {
+        "lodash": "*"
+    },
     "scripts": {
         "build": "grunt",
         "watch": "grunt watch"

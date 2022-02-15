@@ -46,6 +46,14 @@ trait PageHeadProxyTrait { // implements PageHeadInterface
     /**
      * @inheritdoc
      */
+    public function addJsonLDItems(array $item) {
+        $this->proxy->addJsonLDItems($item);
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function setSeoTitle(string $title, bool $withSiteTitle = true) {
         $this->proxy->setSeoTitle($title, $withSiteTitle);
         return $this;

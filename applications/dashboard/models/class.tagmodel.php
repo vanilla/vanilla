@@ -29,7 +29,7 @@ class TagModel extends Gdn_Model {
 
     const FIELD_MAPPINGS = ['urlcode' => 'Name', 'name' => 'FullName'];
 
-    const LIMIT = 20;
+    const LIMIT_DEFAULT = 20;
 
     /**
      * @param string $name
@@ -1205,7 +1205,10 @@ class TagModel extends Gdn_Model {
                 $tagQuery->orderBy($options['sort'], 'desc');
             }
 
-            $tagQuery->limit(key_exists('limit', $options) ? $options['limit'] : self::LIMIT);
+            if (key_exists('limit', $options)) {
+                $offset = $options['offset'] ?? 0;
+                $tagQuery->limit($options['limit'], $offset);
+            }
 
             if ($query) {
                 $tagQuery->like('FullName', str_replace(['%', '_'], ['\%', '_'], $query), strlen($query) > 2 ? 'both' : 'right');

@@ -83,7 +83,7 @@ export function PartialSchemaForm(props: IPartialProps) {
                 {Object.entries(schema.properties).map(([key, value]: [string, JsonSchema]) => {
                     return (
                         <PartialSchemaForm
-                            disabled={props.disabled}
+                            disabled={props.disabled || value?.disabled}
                             key={key}
                             path={[...path, key]}
                             schema={value}

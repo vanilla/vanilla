@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -25,21 +25,19 @@ import { mountDashboardTabs } from "@dashboard/forms/mountDashboardTabs";
 import { mountDashboardCodeEditors } from "@dashboard/forms/DashboardCodeEditor";
 import { TextEditorContextProvider } from "@library/textEditor/TextEditor";
 import { VanillaLabsPage } from "@dashboard/pages/VanillaLabsPage";
-import { LayoutPage } from "@dashboard/layout/pages/LayoutPage";
 import { bindToggleChildrenEventListeners } from "@dashboard/settings";
 import { LanguageSettingsPage } from "@dashboard/pages/LanguageSettingsPage";
 import { escapeHTML } from "@vanilla/dom-utils";
 import { getDashboardRoutes } from "@dashboard/dashboardRoutes";
-import { BrandingAndSEOPage } from "@dashboard/pages/BrandingAndSEOPage";
+import { dashboardSectionSlice } from "@dashboard/DashboardSectionSlice";
+import AdminHeader from "@dashboard/components/AdminHeader";
 
 // Expose some new module functions to our old javascript system.
 window.escapeHTML = escapeHTML;
 
 addComponent("imageUploadGroup", DashboardImageUploadGroup, { overwrite: true });
 addComponent("VanillaLabsPage", VanillaLabsPage);
-addComponent("LayoutPage", LayoutPage);
 addComponent("LanguageSettingsPage", LanguageSettingsPage);
-addComponent("BrandSettingsPage", BrandingAndSEOPage);
 
 disableComponentTheming();
 onContent(() => initAllUserContent());
@@ -68,12 +66,16 @@ applySharedPortalContext((props) => {
     );
 });
 
+registerReducer(dashboardSectionSlice.name, dashboardSectionSlice.reducer);
+
 Router.addRoutes(getDashboardRoutes());
 
 // Routing
 addComponent("App", () => {
     return <Router disableDynamicRouting />;
 });
+
+addComponent("title-bar-hamburger", AdminHeader);
 
 const render = () => {
     const app = document.querySelector("#app") as HTMLElement;

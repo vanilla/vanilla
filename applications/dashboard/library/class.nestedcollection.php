@@ -559,7 +559,7 @@ trait NestedCollection {
         $url = $item['url'] ?? false;
         if ($url) {
             $actual = trim(url($url, true), '/');
-            $result = $actual === $this->highlightRouteCache;
+            $result = $actual === url($this->highlightRouteCache, true);
         } else {
             $result = false;
         }

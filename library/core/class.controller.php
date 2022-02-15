@@ -9,6 +9,7 @@
  * @license GPL-2.0-only
  */
 
+use Vanilla\Models\DashboardPreloadProvider;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Theme\ThemePreloadProvider;
 use Vanilla\Utility\DebugUtils;
@@ -21,6 +22,7 @@ use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
 use Vanilla\Web\ContentSecurityPolicy\Policy;
 use Vanilla\Web\JsInterpop\ReduxActionPreloadTrait;
 use Vanilla\Web\MasterViewRenderer;
+use Vanilla\Dashboard\Pages\LegacyDashboardPage;
 
 /**
  * Controller base class.
@@ -2157,6 +2159,7 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
 
                 $this->addWebpackAssets();
                 $this->addThemeAssets();
+                $this->registerDashboardReduxActions();
 
                 // Add preloaded redux actions.
                 $this->Head->addScript(
@@ -2229,13 +2232,6 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
         $this->EventArguments['MasterViewPath'] = &$masterViewPath;
         $this->fireEvent('BeforeFetchMaster');
 
-        if ($masterViewPath === false) {
-            trigger_error(
-                errorMessage("Could not find master view: {$this->MasterView}.master*", $this->ClassName, '_FetchController'),
-                E_USER_ERROR
-            );
-        }
-
         /// A unique identifier that can be used in the body tag of the master view if needed.
         $controllerName = $this->ClassName;
         // Strip "Controller" from the body identifier.
@@ -2262,6 +2258,14 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
             ...$sectionClasses
         );
         $this->setData('CssClass', $cssClass, true);
+
+        if ($this->MasterView === 'admin') {
+            /** @var LegacyDashboardPage $page */
+            $page = Gdn::getContainer()->get(LegacyDashboardPage::class);
+            $page->initialize($this);
+            echo $page->renderPage();
+            return;
+        }
 
         if ($this->MasterView === 'default' && ($this->isReactView || Gdn::themeFeatures()->useSharedMasterView())) {
             /** @var MasterViewRenderer $viewRenderer */
@@ -2335,6 +2339,16 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
         $styleAssets = $webpackAssetProvider->getStylesheets($section);
         foreach ($styleAssets as $asset) {
             $this->Head->addCss($asset->getWebPath(), null, false);
+        }
+    }
+
+    /**
+     * Register actions for DashboardApiController
+     */
+    private function registerDashboardReduxActions() {
+        if ($this->MasterView === 'admin') {
+            $dashboardProvider = \Gdn::getContainer()->get(DashboardPreloadProvider::class);
+            $this->registerReduxActionProvider($dashboardProvider);
         }
     }
 

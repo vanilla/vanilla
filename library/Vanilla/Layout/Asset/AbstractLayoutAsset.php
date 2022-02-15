@@ -7,6 +7,8 @@
 
 namespace Vanilla\Layout\Asset;
 
+use Vanilla\Web\PageHeadAwareInterface;
+use Vanilla\Web\PageHeadAwareTrait;
 use Vanilla\Widgets\React\CombinedPropsWidgetInterface;
 use Vanilla\Widgets\React\CombinedPropsWidgetTrait;
 use Vanilla\Widgets\React\ReactWidgetInterface;
@@ -16,7 +18,8 @@ use Vanilla\Widgets\React\ReactWidgetInterface;
  *
  * Assets may have restrictions on where they can be placed and in what views.
  */
-abstract class AbstractLayoutAsset implements ReactWidgetInterface, CombinedPropsWidgetInterface {
+abstract class AbstractLayoutAsset implements ReactWidgetInterface, CombinedPropsWidgetInterface, PageHeadAwareInterface {
 
     use CombinedPropsWidgetTrait;
+    use PageHeadAwareTrait;
 }

@@ -54,6 +54,13 @@ class SiteTotalsApiControllerTest extends AbstractAPIv2Test {
         $this->createComment();
         $this->createComment();
         $this->createComment();
+
+        // Make sure all counts are up-to-date.
+        $categoryModel = Gdn::getContainer()->get(\CategoryModel::class);
+
+        $categoryModel->counts("CountComments");
+        $categoryModel->counts("CountAllComments");
+
         $commentAndDiscussionCounts = $this->api()->get($this->baseUrl . "?counts[]=discussion&counts[]=comment");
         $this->assertSame($commentAndDiscussionCounts["counts"]["discussion"]["count"], 4);
         $this->assertSame($commentAndDiscussionCounts["counts"]["comment"]["count"], 3);
@@ -65,14 +72,19 @@ class SiteTotalsApiControllerTest extends AbstractAPIv2Test {
      * @depends testGettingMultipleCounts
      */
     public function testPostCounts() {
-        // Make sure the category table's counts are up-to-date.
-        $categoryModel = Gdn::getContainer()->get(\CategoryModel::class);
+        $postCounts = $this->api()->get($this->baseUrl . "?counts[]=post");
 
-        $categoryModel->counts("CountComments");
-        $categoryModel->counts("CountAllComments");
-
-        $postCounts = $this->api()->get($this->baseUrl. "?counts[]=post");
         $this->assertSame($postCounts["counts"]["post"]["count"], 7);
+    }
+
+    /**
+     * Test site total category count.
+     */
+    public function testCategoryCounts() {
+        $this->createCategory();
+        $this->createCategory();
+        $catCount = $this->api()->get($this->baseUrl . "?counts[]=category");
+        $this->assertSame(3, $catCount["counts"]["category"]["count"]);
     }
 
     /**
@@ -85,6 +97,15 @@ class SiteTotalsApiControllerTest extends AbstractAPIv2Test {
         $countFields = array_keys($allCountsResponse["counts"]);
         foreach ($allRecordTypes as $recordType) {
             $this->assertTrue(in_array($recordType, $countFields));
+        }
+
+        foreach ($allCountsResponse["counts"] as $count) {
+            // Each count should have three fields.
+            $this->assertArrayHasKey("count", $count);
+            $this->assertArrayHasKey("isCalculating", $count);
+            $this->assertArrayHasKey("isFiltered", $count);
+            // Is filtered should be false for everything.
+            $this->assertFalse($count["isFiltered"]);
         }
     }
 }

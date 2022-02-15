@@ -5,13 +5,6 @@
 // No styleguide reference.
 
 .navbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  padding: 0;
-  color: $white;
-  background-color: $brand-primary;
-  border: 1px solid $navbar-border-color;
 
   .vanilla-logo {
     width: 65px;

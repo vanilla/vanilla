@@ -41,7 +41,7 @@ export async function makeProdConfig(entryModel: EntryModel, section: string, is
         chunkFilename: "async/[name].[contenthash].min.js",
         publicPath: `/${DIST_NAME}/${section}/`,
         path: path.join(DIST_DIRECTORY, section),
-        library: `vanilla${section}`,
+        library: `vanilla${section.replace("-", "_")}`,
     };
     if (options.modern) {
         baseConfig.output.publicPath = isLegacy ? `/${DIST_NAME}/${section}/` : `/${DIST_NAME}/${section}-modern/`;

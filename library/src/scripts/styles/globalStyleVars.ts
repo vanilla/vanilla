@@ -76,6 +76,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         white: color("#fff"),
         almostWhite: color("#f5f6f7"),
         transparent: rgba(0, 0, 0, 0),
+        primary: colorPrimary,
     };
 
     /**

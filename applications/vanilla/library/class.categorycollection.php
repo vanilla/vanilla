@@ -9,6 +9,7 @@ use Garden\EventManager;
 use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Models\ModelCache;
 use Vanilla\Utility\ArrayUtils;
+use Vanilla\Utility\TreeBuilder;
 
 /**
  * Manages categories as a whole.
@@ -536,8 +537,7 @@ class CategoryCollection {
         $resultIDs = [];
         $seenParentIDs = [];
 
-        $sql = clone $this->sql;
-        $sql->reset();
+        $sql = $this->createSql();
         $allIDs = $sql->select("CategoryID, ParentCategoryID")->get("Category")->resultArray();
         $categoryIDByParentID = ArrayUtils::arrayColumnArrays($allIDs, "CategoryID", "ParentCategoryID");
 
@@ -635,12 +635,25 @@ class CategoryCollection {
      * @return array Returns an array of categories.
      */
     public function flattenTree(array $categories) {
-        $result = [];
-
-        foreach ($categories as $category) {
-            $this->flattenTreeInternal($category, $result);
-        }
+        $result = self::treeBuilder()->flattenTree($categories);
         return $result;
+    }
+
+    /**
+     * Get a tree builder instance for categories.
+     *
+     * @return TreeBuilder
+     */
+    public static function treeBuilder(): TreeBuilder {
+        $builder = TreeBuilder::create('CategoryID', 'ParentCategoryID')
+            ->setAllowUnreachableNodes(true)
+            ->setRootID(-1)
+            ->setChildrenFieldName('Children')
+            ->setSorter(function (array $catA, array $catB) {
+                return ($catA['Sort'] ?? 0) <=> ($catB['Sort'] ?? 0);
+            })
+        ;
+        return $builder;
     }
 
     /**
@@ -831,22 +844,6 @@ class CategoryCollection {
             return $this->config->get($key, $default);
         } else {
             return $default;
-        }
-    }
-
-    /**
-     * Internal implementation support for {@link CategoryCollection::flattenTree()}.
-     *
-     * @param array $category The current category being examined.
-     * @param array &$result The working result.
-     */
-    private function flattenTreeInternal(array $category, array &$result) {
-        $children = $category['Children'] ?? [];
-        $category['Children'] = [];
-        $result[] = $category;
-
-        foreach ($children as $child) {
-            $this->flattenTreeInternal($child, $result);
         }
     }
 

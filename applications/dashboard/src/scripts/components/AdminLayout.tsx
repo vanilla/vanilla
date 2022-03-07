@@ -73,7 +73,6 @@ export default function AdminLayout(props: IProps) {
                 <AdminTitleBar
                     title={title ?? ""}
                     description={description}
-                    containerClassName={classes.adminTitleBarClasses}
                     titleAndActionsContainerClassName={titleAndActionsContainerClassName}
                     actions={titleBarActions}
                 />

@@ -7,13 +7,12 @@
 
 namespace Vanilla\Dashboard\Controllers\API;
 
-use Garden\Hydrate\Resolvers\AbstractDataResolver;
 use Garden\Schema\Schema;
 use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Layout\Asset\AbstractLayoutAsset;
-use Vanilla\Layout\CategoryRecordProvider;
+use Psr\SimpleCache\CacheInterface;
 use Vanilla\Layout\LayoutViewModel;
 use Vanilla\Layout\LayoutHydrator;
 use Vanilla\Exception\Database\NoResultsException;
@@ -23,7 +22,7 @@ use Vanilla\Layout\Providers\MutableLayoutProviderInterface;
 use Vanilla\Layout\Resolvers\ReactResolver;
 use Vanilla\Layout\Section\AbstractLayoutSection;
 use Vanilla\Utility\SchemaUtils;
-use Vanilla\Web\PageHead;
+use Vanilla\Web\CacheControlConstantsInterface;
 
 /**
  * API v2 endpoints for layouts and layout views
@@ -31,6 +30,12 @@ use Vanilla\Web\PageHead;
 class LayoutsApiController extends \AbstractApiController {
 
     //region Properties
+    /** @var string Cache key for layout assets. */
+    private const LAYOUT_ASSET_CACHE_KEY = "layoutAsset/%s";
+
+    /** @var int Cache time for user notification count. */
+    private const LAYOUT_ASSET_TTL = 120; // 120 seconds.
+
     /** @var LayoutHydrator */
     private $layoutHydrator;
 
@@ -43,6 +48,9 @@ class LayoutsApiController extends \AbstractApiController {
     /** @var LayoutService $layoutProviderService */
     private $layoutProviderService;
 
+    /** @var CacheInterface */
+    private $cache;
+
     //endregion
 
     //region Constructor
@@ -54,17 +62,20 @@ class LayoutsApiController extends \AbstractApiController {
      * @param LayoutViewModel $layoutViewModel
      * @param LayoutHydrator $layoutHydrator
      * @param LayoutService $layoutProviderService
+     * @param CacheInterface $cache
      */
     public function __construct(
         LayoutModel $layoutModel,
         LayoutViewModel $layoutViewModel,
         LayoutHydrator $layoutHydrator,
-        LayoutService $layoutProviderService
+        LayoutService $layoutProviderService,
+        CacheInterface $cache
     ) {
         $this->layoutModel = $layoutModel;
         $this->layoutViewModel = $layoutViewModel;
         $this->layoutProviderService = $layoutProviderService;
         $this->layoutHydrator = $layoutHydrator;
+        $this->cache = $cache;
     }
     //endregion
 
@@ -267,7 +278,6 @@ class LayoutsApiController extends \AbstractApiController {
         return new Data($result);
     }
 
-
     /**
      * POST /api/v2/layouts/hydrate
      *
@@ -376,6 +386,87 @@ class LayoutsApiController extends \AbstractApiController {
         $result = $out->validate($result);
 
         return new Data($result);
+    }
+
+    /**
+     * GET /api/v2/layouts/lookup-hydrate-assets
+     *
+     * Lookup a layout to Hydrate.
+     *
+     * @param array $query Parameters used to hydrate the child elements of the layout
+     *
+     * @return Data
+     * @throws \Garden\Web\Exception\NotFoundException Layout not found.
+     * @throws \Garden\Web\Exception\ClientException No layout provider found for ID format/value.
+     * @throws \Garden\Schema\ValidationException Data does not validate against its schema.
+     * @throws \Garden\Web\Exception\HttpException Ban applied to permission for this session.
+     */
+    public function get_lookupHydrateAssets(array $query = []): Data {
+        $this->permission();
+
+        $in = $this->schema([
+            'layoutViewType:s',
+            'recordID:i',
+            'recordType:s',
+            'params:o?',
+        ], 'in');
+        $parsedQuery = $in->validate($query);
+        $layoutID = $this->layoutViewModel->getLayoutIdLookup($parsedQuery['layoutViewType'], $parsedQuery['recordType'], $parsedQuery['recordID']);
+        if ($layoutID === '') {
+            $fileLayoutView = $this->layoutHydrator->getLayoutViewType($parsedQuery['layoutViewType']);
+            $layoutID = $fileLayoutView->getLayoutID();
+        }
+
+        return $this->get_hydrateAssets($layoutID, $query);
+    }
+
+    /**
+     * GET /api/v2/layouts/:layoutID/hydrate-assets
+     *
+     * Get static assets for the layout, without hydrating data.
+     *
+     * @param int|string $layoutID ID of layout to hydrate
+     * @param array $query Parameters used to hydrate the child elements of the layout
+     *
+     * @return Data
+     * @throws \Garden\Web\Exception\NotFoundException Layout not found.
+     * @throws \Garden\Web\Exception\ClientException No layout provider found for ID format/value.
+     * @throws \Garden\Schema\ValidationException Data does not validate against its schema.
+     * @throws \Garden\Web\Exception\HttpException Ban applied to permission for this session.
+     */
+    public function get_hydrateAssets($layoutID, array $query = []): Data {
+        $this->permission();
+
+        $this->schema($this->layoutModel->getIDSchema(), "in")->validate(['layoutID' => $layoutID]);
+
+        $in = $this->schema([
+            'params:o?',
+        ], 'in');
+        $out =  Schema::parse([
+            "js:a",
+            "css:a"
+        ]);
+        $query = $in->validate($query);
+        $params = $query['params'] ?? [];
+
+        // Grab the record from the database if it exists.
+        $provider = $this->layoutProviderService->getCompatibleProvider($layoutID);
+        if (!isset($provider)) {
+            throw new ClientException('Invalid layout ID format', 400, ['layoutID' => $layoutID]);
+        }
+        try {
+            $row = $provider->getByID($layoutID);
+        } catch (NoResultsException $e) {
+            throw new NotFoundException('Layout');
+        }
+        $layoutViewType = $row['layoutViewType'];
+
+        $assets = $this->layoutHydrator->getAssetLayout($layoutViewType, $params, $row);
+
+        $result = $out->validate($assets);
+        $response = new Data($result);
+        $response->setHeader('Cache-Control', self::PUBLIC_CACHE);
+        return $response;
     }
 
     /**

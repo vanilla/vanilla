@@ -39,7 +39,7 @@ use Vanilla\Utility\ArrayUtils;
  * - a,b,c
  * - An array of values.
  */
-class RangeExpression {
+class RangeExpression implements \JsonSerializable {
     public const SCHEMA_DATE = [
         'type' => 'datetime',
     ];
@@ -227,7 +227,7 @@ EOT;
         $class = static::class;
 
         $schema = new class ([
-            'type' => 'string',
+            'type' => ['string', "integer", "array"],
             'format' => 'range-filter'
         ], $class, $valueSchema) extends Schema {
             /**
@@ -354,6 +354,13 @@ EOT;
     }
 
     /**
+     * @return string
+     */
+    public function jsonSerialize() {
+        return $this->__toString();
+    }
+
+    /**
      * Convert this object to a string.
      *
      * @return string
@@ -376,19 +383,24 @@ EOT;
             } else {
                 return key($values).current($values);
             }
-        } elseif (count($values) >= 2) {
+        } elseif (count($values) === 2 && !isset($values['='])) {
             if (isset($values['>=']) && isset($values['<='])) {
                 return $values['>='].'..'.$values['<='];
             } else {
                 $left = isset($values['>']) ? '>' : '>=';
                 $right = isset($values['<']) ? '<' : '<=';
-
                 return self::BRACKETS[$left].$values[$left].','.$values[$right].self::BRACKETS[$right];
             }
         } else {
-            // @codeCoverageIgnoreStart
-            return '';
-            // @codeCoverageIgnoreStop
+            $pairs = [];
+            foreach ($values as $key => $val) {
+                if (is_array($val)) {
+                    $val = implode(",", $val);
+                }
+                $pairs[] = $key . $val;
+            }
+            $result = implode(";", $pairs);
+            return $result;
         }
     }
 

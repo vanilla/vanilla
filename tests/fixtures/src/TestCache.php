@@ -49,6 +49,28 @@ class TestCache extends \Gdn_Dirtycache {
     }
 
     /**
+     * Fetch a count of gets.
+     *
+     * @param string $keyPattern The key too lookup. Null for all keys.
+     *
+     * @return int
+     */
+    public function getGetCount(string $keyPattern): int {
+        return $this->getCount($keyPattern, $this->countGets);
+    }
+
+    /**
+     * Fetch a count of sets.
+     *
+     * @param string $keyPattern The key too lookup. Null for all keys.
+     *
+     * @return int
+     */
+    public function getSetCount(string $keyPattern): int {
+        return $this->getCount($keyPattern, $this->countSets);
+    }
+
+    /**
      * Fetch a count of gets or sets.
      *
      * @param string $keyPattern The key too lookup. Null for all keys.

@@ -37,7 +37,7 @@ export default function Page() {
             content={<ThemeList />}
             contentClassNames={styleGuideListPageClass.content}
             rightPanel={
-                <div>
+                <>
                     <h3>{t("Heads Up!")}</h3>
                     <p>
                         {t(
@@ -67,7 +67,7 @@ export default function Page() {
                     <p>
                         <SmartLink to={"/settings/themes"}>{t("Old Theming UI")}</SmartLink>
                     </p>
-                </div>
+                </>
             }
         />
     );

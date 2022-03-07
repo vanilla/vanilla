@@ -7,6 +7,11 @@
 
 namespace VanillaTests\Layout;
 
+use Garden\Web\RequestInterface;
+use Vanilla\AddonManager;
+use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Theme\ThemeService;
+use Vanilla\Web\Asset\WebpackAssetProvider;
 use VanillaTests\BootstrapTestCase;
 use VanillaTests\SiteTestTrait;
 
@@ -56,6 +61,32 @@ class LayoutHydratorTest extends BootstrapTestCase {
         $this->assertEquals(5, count($seo));
         $this->assertSame($expected, $actual);
         $this->assertSame(json_encode($jsonLDExpected, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), $seo['json-ld']);
+    }
+
+    /**
+     * Test that getAssetLayout returns a list of assets.
+     *
+     */
+    public function testGetAssetLayout() {
+        $leaderboard = ["layout" => [
+                        [  "rightBottom" => [
+                            [
+                                '$hydrate'=> "react.leaderboard",
+                                "title"=> "Community Leaders",
+                                "apiParams" => [
+                                    "slotType" => "a"
+                                ]
+                            ]]
+                        ]
+                    ]];
+        $this->mockWebPackAsset();
+        $expected = "LeaderboardWidget";
+        $actual = self::getLayoutService()->getAssetLayout('home', [], $leaderboard);
+        // Make sure we see it as the API output would.
+        $this->assertArrayHasKey('js', $actual);
+        $this->assertArrayHasKey('css', $actual);
+        $this->assertGreaterThan(0, count($actual['js']));
+        $this->assertStringContainsString($expected, $actual['js'][0]);
     }
 
     /**
@@ -214,5 +245,23 @@ class LayoutHydratorTest extends BootstrapTestCase {
             ],
             $jsonLD
         ];
+    }
+
+    /**
+     * Create and register MockWebpackAssetProvider
+     *
+     * @throws \Garden\Container\ContainerException Exception.
+     * @throws \Garden\Container\NotFoundException Exception.
+     */
+    public function mockWebPackAsset() {
+        $mock = new MockWebpackAssetProvider(
+            self::container()->get(RequestInterface::class),
+            self::container()->get(AddonManager::class),
+            self::container()->get(\Gdn_Session::class),
+            self::container()->get(ConfigurationInterface::class),
+            self::container()->get(ThemeService::class)
+        );
+
+        self::container()->setInstance(WebpackAssetProvider::class, $mock);
     }
 }

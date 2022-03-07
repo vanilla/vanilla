@@ -5,9 +5,25 @@
 
 import { LoadStatus } from "@library/@types/api/core";
 import { configureStore, createSlice } from "@reduxjs/toolkit";
-import { fetchAllLayouts, fetchLayout, putLayoutView } from "./LayoutSettings.actions";
+import {
+    createNewLayoutJsonDraft,
+    fetchAllLayouts,
+    fetchLayout,
+    putLayoutView,
+    fetchLayoutJson,
+    copyLayoutJsonToNewDraft,
+    postOrPatchLayoutJsonDraft,
+    updateLayoutJsonDraft,
+} from "./LayoutSettings.actions";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
-import { ILayout, ILayoutsState, INITIAL_LAYOUTS_STATE } from "./LayoutSettings.types";
+import { createLayoutJsonDraft } from "@dashboard/layout/layoutSettings/utils";
+import {
+    ILayout,
+    ILayoutsState,
+    INITIAL_LAYOUTS_STATE,
+    LayoutViewType,
+    LAYOUT_VIEW_TYPES,
+} from "./LayoutSettings.types";
 
 export const layoutSettingsSlice = createSlice({
     name: "layoutSettings",
@@ -27,19 +43,15 @@ export const layoutSettingsSlice = createSlice({
                 };
             })
             .addCase(fetchAllLayouts.fulfilled, (state, action) => {
+                action.payload.forEach((layout) => {
+                    state.layoutsByID[layout.layoutID] = {
+                        status: LoadStatus.SUCCESS,
+                        data: layout,
+                    };
+                });
                 state.layoutsListStatus = {
                     status: LoadStatus.SUCCESS,
                 };
-                // Get unique viewTypes from payload
-                const viewTypes = [...new Set(action.payload.map(({ layoutViewType }: ILayout) => layoutViewType))];
-                state.layoutsByViewType = Object.fromEntries(
-                    viewTypes.map((viewType: ILayout["layoutViewType"]) => {
-                        return [
-                            viewType,
-                            action.payload.filter((layout: ILayout) => layout.layoutViewType === viewType),
-                        ];
-                    }),
-                );
             })
             .addCase(fetchLayout.pending, (state, action) => {
                 state.layoutsByID[action.meta.arg] = {
@@ -58,6 +70,63 @@ export const layoutSettingsSlice = createSlice({
                     data: action.payload,
                 };
             })
+            .addCase(fetchLayoutJson.pending, (state, action) => {
+                state.layoutJsonsByLayoutID[action.meta.arg] = {
+                    status: LoadStatus.LOADING,
+                };
+            })
+            .addCase(fetchLayoutJson.rejected, (state, action) => {
+                state.layoutJsonsByLayoutID[action.meta.arg] = {
+                    status: LoadStatus.ERROR,
+                    error: action.error,
+                };
+            })
+            .addCase(fetchLayoutJson.fulfilled, (state, action) => {
+                state.layoutJsonsByLayoutID[action.meta.arg] = {
+                    status: LoadStatus.SUCCESS,
+                    data: action.payload,
+                };
+            })
+            .addCase(postOrPatchLayoutJsonDraft.fulfilled, (state, action) => {
+                const layout = action.payload;
+
+                const layoutJson = action.payload.layout!;
+
+                state.layoutJsonsByLayoutID[layout.layoutID] = {
+                    status: LoadStatus.SUCCESS,
+                    data: {
+                        layoutID: layout.layoutID,
+                        name: layout.name,
+                        layoutViewType: layout.layoutViewType,
+                        layout: layoutJson,
+                    },
+                };
+
+                state.layoutsByID[layout.layoutID] = {
+                    status: LoadStatus.SUCCESS,
+                    data: {
+                        ...(state.layoutsByID[layout.layoutID]?.data ?? {}),
+                        ...layout,
+                    },
+                };
+            })
+            .addCase(copyLayoutJsonToNewDraft, (state, action) => {
+                const { sourceLayoutJsonID, draftID } = action.payload;
+                const sourceLayoutJson = state.layoutJsonsByLayoutID[sourceLayoutJsonID];
+                const newDraftID = draftID ?? sourceLayoutJsonID;
+                if (sourceLayoutJson?.data) {
+                    state.layoutJsonDraftsByID[newDraftID] = createLayoutJsonDraft({
+                        ...sourceLayoutJson?.data,
+                    });
+                }
+            })
+            .addCase(createNewLayoutJsonDraft, (state, action) => {
+                const { draftID, layoutViewType } = action.payload;
+                state.layoutJsonDraftsByID[draftID] = createLayoutJsonDraft({ layoutViewType });
+            })
+            .addCase(updateLayoutJsonDraft, (state, action) => {
+                state.layoutJsonDraftsByID[action.payload.draftID] = action.payload.modifiedDraft;
+            })
             .addCase(putLayoutView.pending, (state, action) => {
                 state.layoutsByID[action.meta.arg.layoutID]!.status = LoadStatus.LOADING;
             })
@@ -73,7 +142,7 @@ export const layoutSettingsSlice = createSlice({
                     status: LoadStatus.SUCCESS,
                     data: {
                         ...existingLayout,
-                        layoutViews: [...existingLayout.layoutViews, action.payload],
+                        layoutViews: [...(existingLayout.layoutViews ?? []), action.payload],
                     },
                 };
             });
@@ -84,3 +153,29 @@ const store = configureStore({ reducer: { [layoutSettingsSlice.name]: layoutSett
 export type layoutDispatch = typeof store.dispatch;
 export const useLayoutDispatch = () => useDispatch<typeof store.dispatch>();
 export const useLayoutSelector: TypedUseSelectorHook<{ [layoutSettingsSlice.name]: ILayoutsState }> = useSelector;
+
+export function getLayoutJsonDraftByID(state: ILayoutsState, draftID: keyof ILayoutsState["layoutJsonDraftsByID"]) {
+    return state.layoutJsonDraftsByID[draftID];
+}
+
+export function getLayoutJsonByLayoutID(state: ILayoutsState, layoutID: keyof ILayoutsState["layoutJsonsByLayoutID"]) {
+    return state.layoutJsonsByLayoutID[layoutID];
+}
+
+export function getLayoutsByViewType(state: ILayoutsState): { [key in LayoutViewType]: ILayout[] } {
+    const obj = Object.fromEntries(
+        LAYOUT_VIEW_TYPES.map((viewType: ILayout["layoutViewType"]) => {
+            return [
+                viewType,
+                Object.values(state.layoutsByID)
+                    .filter(
+                        (val) =>
+                            val?.status === LoadStatus.SUCCESS && !!val.data && val.data.layoutViewType === viewType,
+                    )
+                    .map((loadableLayout) => loadableLayout!.data!),
+            ];
+        }),
+    );
+
+    return obj as { [key in LayoutViewType]: ILayout[] };
+}

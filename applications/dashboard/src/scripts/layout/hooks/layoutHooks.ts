@@ -4,6 +4,7 @@
  * @license gpl-2.0-only
  */
 
+import { ILayout } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
 import { useConfigPatcher, useConfigsByKeys } from "@library/config/configHooks";

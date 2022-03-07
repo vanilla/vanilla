@@ -519,9 +519,9 @@ class Gdn_Memcached extends Gdn_Cache {
     }
 
     /**
+     * Get values from the cache.
      *
-     *
-     * @param string $key
+     * @param string|array $key
      * @param array $options
      * @return array|bool|mixed
      */
@@ -558,6 +558,15 @@ class Gdn_Memcached extends Gdn_Cache {
                     }
                 }
                 $realKeys[] = $realKey;
+            }
+            if (count($localData) === count($key)) {
+                // Completely short circuit if we already have everything
+                // We also need to unmake our keys.
+                $localResult = [];
+                foreach ($key as $multiKey) {
+                    $localResult[$multiKey] = $localData[$this->makeKey($multiKey, $finalOptions)];
+                }
+                return $localResult;
             }
         } else {
             $multi = false;

@@ -237,6 +237,33 @@ class RangeExpressionTest extends TestCase {
     }
 
     /**
+     * Test that constructed range expressions turn into strings.
+     *
+     * @param RangeExpression $expression
+     * @param string $expected
+     *
+     * @dataProvider provideConstructedToString
+     */
+    public function testConstructedtoString(RangeExpression $expression, string $expected) {
+        $this->assertEquals($expected, (string) $expression);
+    }
+
+    /**
+     * @return iterable
+     */
+    public function provideConstructedToString(): iterable {
+        $expression = new RangeExpression(">", 0);
+        $expression = $expression->withFilteredValue("=", [5, 6]);
+        yield [$expression, ">0;=5,6"];
+
+        $expression = $expression->withFilteredValue("=", [5]);
+        yield [$expression, ">0;=5"];
+
+        $expression = $expression->withFilteredValue("<=", [30]);
+        yield [$expression, ">0;=5;<=30"];
+    }
+
+    /**
      * Test an empty from part of the range.
      */
     public function testEmptyFrom(): void {

@@ -15,7 +15,7 @@ use VanillaTests\UsersAndRolesApiTestTrait;
 /**
  * Test rendering of the QnA module.
  */
-class QnaModuleTest extends StorybookGenerationTestCase {
+class QnaModuleStorybookTest extends StorybookGenerationTestCase {
 
     use UsersAndRolesApiTestTrait;
     use QnaApiTestTrait;

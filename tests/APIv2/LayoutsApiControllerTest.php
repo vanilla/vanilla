@@ -406,6 +406,145 @@ class LayoutsApiControllerTest extends AbstractResourceTest {
         $this->assertSame($expected, $response->getBody()['layout']);
     }
 
+
+    /**
+     * Test that we can hydrate arbitrary and saved layouts asset.
+     *
+     * @return void
+     */
+    public function testHydrateAsset() {
+        $category = $this->createCategory(['name' => 'My Category']);
+
+        $layoutDefinition = [
+            [
+                '$hydrate' => 'react.section.1-column',
+                'contents' => [
+                    [
+                        // Assets should be available.
+                        '$hydrate' => 'react.asset.breadcrumbs',
+                        'recordType' => 'category',
+                        'recordID' => [
+                            // Param definitions should be available.
+                            '$hydrate' => 'param',
+                            'ref' => 'category/categoryID',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $expected = [
+            [
+                '$reactComponent' => 'SectionOneColumn',
+                '$reactProps' => [
+                    'contents' => [
+                        [
+                            '$reactComponent' => 'Breadcrumbs',
+                            '$reactProps' => [
+                                'crumbs' => [
+                                    ['name' => 'Home', 'url' => url('', true)],
+                                    ['name' => 'My Category', 'url' => $category['url']],
+                                ],
+                            ],
+                        ],
+                    ],
+                    'isNarrow' => false,
+                    'autoWrap' => true,
+                ],
+            ],
+        ];
+
+        $params = [
+            'categoryID' => $category['categoryID'],
+        ];
+
+        // Posting to the main hydrate endpoints will have the correct result.
+        $response = $this->api()->post('/layouts/hydrate', [
+            'layout' => $layoutDefinition,
+            'params' => $params,
+            'layoutViewType' => 'home',
+        ]);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame($expected, $response->getBody()['layout']);
+
+        // We can save it as a layout and render it by the ID.
+
+        $layout = $this->api()->post('/layouts', [
+            'name' => 'My Layout',
+            'layout' => $layoutDefinition,
+            'layoutViewType' => 'home',
+        ]);
+        $response = $this->api()->get("/layouts/{$layout['layoutID']}/hydrate-assets", [
+            'params' => $params,
+        ]);
+        $this->assertEquals(200, $response->getStatusCode());
+        $body = $response->getBody();
+        $this->assertArrayHasKey("js", $body);
+        $this->assertArrayHasKey("css", $body);
+    }
+
+    /**
+     * Test that we can use dynamic hydrate lookup assets.
+     *
+     * @return void
+     */
+    public function testLookupHydrateAsset() {
+        $category = $this->createCategory(['name' => 'My Category']);
+
+        $layoutDefinition = [
+            [
+                '$hydrate' => 'react.section.1-column',
+                'contents' => [
+                    [
+                        // Assets should be available.
+                        '$hydrate' => 'react.asset.breadcrumbs',
+                        'recordType' => 'category',
+                        'recordID' => [
+                            // Param definitions should be available.
+                            '$hydrate' => 'param',
+                            'ref' => 'category/categoryID',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $params = [
+            'categoryID' => $category['categoryID'],
+        ];
+
+        // Posting to the main hydrate endpoints will have the correct result.
+        $response = $this->api()->post('/layouts/hydrate', [
+            'layout' => $layoutDefinition,
+            'params' => $params,
+            'layoutViewType' => 'home',
+        ]);
+        $this->assertEquals(200, $response->getStatusCode());
+
+        // We can save it as a layout and render it by the ID.
+
+        $layout = $this->api()->post('/layouts', ['name' => 'My Layout',
+            'layout' => $layoutDefinition,
+            'layoutViewType' => 'home',
+        ]);
+
+        $response = $this->api()->put("/layouts/{$layout['layoutID']}/views", [
+            'recordID' => $category['categoryID'],
+            'recordType' => 'category'
+        ]);
+
+        $response = $this->api()->get("/layouts/lookup-hydrate-assets", [
+            'layoutViewType' => 'home',
+            'recordID' => $category['categoryID'],
+            'recordType' => 'category',
+            'params' => $params,
+        ]);
+        $this->assertEquals(200, $response->getStatusCode());
+        $body = $response->getBody();
+        $this->assertArrayHasKey("js", $body);
+        $this->assertArrayHasKey("css", $body);
+    }
+
     /**
      * Test that we can generate a hydrateable schema.
      */

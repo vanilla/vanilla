@@ -13,7 +13,7 @@ use VanillaTests\Storybook\StorybookGenerationTestCase;
 /**
  * Test rendering of the Guest Module module.
  */
-class GuestModuleTest extends StorybookGenerationTestCase {
+class GuestModuleStorybookTest extends StorybookGenerationTestCase {
 
     use EventSpyTestTrait;
 
@@ -32,17 +32,5 @@ class GuestModuleTest extends StorybookGenerationTestCase {
      */
     public function testRender() {
         $this->generateStoryHtml('/', 'Guest Module');
-    }
-
-    /**
-     * Event handler to add Guest module.
-     *
-     * @param \Gdn_Controller $sender
-     */
-    public function base_render_before(\Gdn_Controller $sender) {
-        /** @var \GuestModule $module */
-        $module = self::container()->get(\GuestModule::class);
-        $module->setAsWidget(true);
-        $sender->addModule($module);
     }
 }

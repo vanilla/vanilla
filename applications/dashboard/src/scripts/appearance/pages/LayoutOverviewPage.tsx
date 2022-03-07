@@ -26,16 +26,19 @@ import layoutOverviewPageClasses from "./LayoutOverviewPage.classes";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
 import { ErrorWrapper } from "@dashboard/appearance/pages/ErrorWrapper";
+import { EditLayoutJsonRoute } from "@dashboard/appearance/routes/pageRoutes";
 
 interface IDescriptionProps {
     layout: ILayout;
 }
 
 function LayoutOverviewPageDescriptionImpl(props: IDescriptionProps) {
-    const insertUser = useUser({ userID: props.layout.insertUserID });
-    const layoutViewNames =
-        props.layout?.layoutViews && props.layout?.layoutViews.map((layoutView) => layoutView.record.name);
-    const appliedGloballyOnly = layoutViewNames.length && !layoutViewNames.some((value) => value !== "global");
+    const insertUser = useUser({ userID: props.layout.insertUserID! });
+    const layoutViewNames = props.layout?.layoutViews
+        ? props.layout?.layoutViews.map((layoutView) => layoutView.record.name)
+        : [];
+
+    const appliedGloballyOnly = layoutViewNames.length && !(layoutViewNames || []).some((value) => value !== "global");
 
     if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(insertUser.status)) {
         return <LoadingRectangle width={320} height={18} />;
@@ -83,7 +86,7 @@ export default function LayoutOverviewPage(
     };
     const viewIsAlreadyApplied =
         layoutLoadable.status === LoadStatus.SUCCESS &&
-        layout?.layoutViews.some(
+        (layout?.layoutViews || []).some(
             (layoutView) =>
                 layoutView.recordType === globalLayoutView.recordType &&
                 layoutView.recordID === globalLayoutView.recordID,
@@ -111,34 +114,34 @@ export default function LayoutOverviewPage(
         <LayoutOverviewPageDescriptionImpl layout={layout as ILayout} />
     );
 
+    const titleBarActionsContent = !layoutStatusIsError ? (
+        <>
+            <DropDown name={t("Layout Options")} flyoutType={FlyoutType.LIST} className={classes.layoutOptionsDropdown}>
+                <DropDownItemButton
+                    onClick={() => {
+                        !viewIsAlreadyApplied && putLayoutView(globalLayoutView);
+                    }}
+                >
+                    {t("Apply")}
+                </DropDownItemButton>
+
+                {/* <DropDownItemButton onClick={() => {}}>{t("Preview")}</DropDownItemButton>
+                <DropDownItemButton onClick={() => {}}>{t("Delete")}</DropDownItemButton> */}
+            </DropDown>
+            <LinkAsButton buttonType={ButtonTypes.OUTLINE} to={EditLayoutJsonRoute.url(layout!)}>
+                {t("Edit")}
+            </LinkAsButton>
+        </>
+    ) : (
+        <></>
+    );
+
     return (
         <AdminLayout
             activeSectionID={"appearance"}
             title={layout?.name || ""}
             description={descriptionContent}
-            titleBarActions={
-                <>
-                    <DropDown
-                        name={t("Layout Options")}
-                        flyoutType={FlyoutType.LIST}
-                        className={classes.layoutOptionsDropdown}
-                    >
-                        <DropDownItemButton
-                            onClick={() => {
-                                !viewIsAlreadyApplied && putLayoutView(globalLayoutView);
-                            }}
-                        >
-                            {t("Apply")}
-                        </DropDownItemButton>
-
-                        <DropDownItemButton onClick={() => {}}>{t("Preview")}</DropDownItemButton>
-                        <DropDownItemButton onClick={() => {}}>{t("Delete")}</DropDownItemButton>
-                    </DropDown>
-                    <LinkAsButton buttonType={ButtonTypes.OUTLINE} to="http://editPath">
-                        {t("Edit")}
-                    </LinkAsButton>
-                </>
-            }
+            titleBarActions={titleBarActionsContent}
             adminBarHamburgerContent={<AppearanceNav asHamburger />}
             leftPanel={!isCompact && <AppearanceNav />}
             content={content}

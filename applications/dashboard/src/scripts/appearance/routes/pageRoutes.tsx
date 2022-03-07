@@ -5,15 +5,16 @@
 
 import RouteHandler from "@library/routing/RouteHandler";
 import PageLoader from "@library/routing/PageLoader";
-import { ILayout } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
+import { ILayout, LayoutViewType } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { slugify } from "@vanilla/utils";
-import {
-    getThemeRoutes,
-    ThemeEditorRoute,
-    ThemePreviewRoute,
-    ThemeRevisionsRoute,
-} from "@themingapi/routes/themeEditorRoutes";
+import { ThemeEditorRoute, ThemePreviewRoute, ThemeRevisionsRoute } from "@themingapi/routes/themeEditorRoutes";
 import { RecordID } from "@vanilla/utils";
+
+type LayoutFragment = {
+    layoutID: ILayout["layoutID"];
+    name: ILayout["name"];
+    layoutViewType: ILayout["layoutViewType"];
+};
 
 export const AppearanceRoute = new RouteHandler(
     () => import("@dashboard/appearance/pages/AppearancePage"),
@@ -22,38 +23,25 @@ export const AppearanceRoute = new RouteHandler(
     PageLoader,
 );
 
-export const AppearanceLayoutsRoute = new RouteHandler(
-    () => import("@dashboard/appearance/pages/AppearanceLayoutsPage"),
-    "/appearance/layouts",
-    () => "/appearance/layouts",
-    PageLoader,
-);
-
-export const HomepageLegacyLayoutsRoute = new RouteHandler(
-    () => import("@dashboard/appearance/pages/HomepageLegacyLayoutsPage"),
-    "/appearance/layouts/homepage/legacy",
-    () => "/appearance/layouts/homepage/legacy",
-    PageLoader,
-);
-
-export const DiscussionsLegacyLayoutsRoute = new RouteHandler(
-    () => import("@dashboard/appearance/pages/DiscussionsLegacyLayoutsPage"),
-    "/appearance/layouts/discussions/legacy",
-    () => "/appearance/layouts/discussions/legacy",
-    PageLoader,
-);
-
-export const CategoriesLegacyLayoutsRoute = new RouteHandler(
-    () => import("@dashboard/appearance/pages/CategoriesLegacyLayoutsPage"),
-    "/appearance/layouts/categories/legacy",
-    () => "/appearance/layouts/categories/legacy",
-    PageLoader,
-);
-
-export const LayoutEditorRoute = new RouteHandler(
+export const LayoutPlaygroundPage = new RouteHandler(
     () => import("@dashboard/layout/pages/LayoutPlaygroundPage"),
     "/appearance/layouts/playground",
-    () => "/appearance/layouts/playground",
+    () => `/appearance/layouts/playground`,
+    PageLoader,
+);
+
+export const NewLayoutJsonRoute = new RouteHandler(
+    () => import("@dashboard/layout/pages/NewLayoutJsonPage"),
+    "/appearance/layouts/:layoutViewType/add",
+    (layoutViewType: LayoutViewType) => `/appearance/layouts/${layoutViewType}/add`,
+    PageLoader,
+);
+
+export const LegacyLayoutsRoute = new RouteHandler(
+    () => import("@dashboard/appearance/pages/LegacyLayoutsPage"),
+    "/appearance/layouts/:layoutViewType/legacy",
+    (layoutViewType: LayoutViewType) => `/appearance/layouts/${layoutViewType}/legacy`,
+    PageLoader,
 );
 
 export const BrandingPageRoute = new RouteHandler(
@@ -63,10 +51,26 @@ export const BrandingPageRoute = new RouteHandler(
     PageLoader,
 );
 
+export const EditLayoutJsonRoute = new RouteHandler(
+    () => import("@dashboard/layout/pages/EditLayoutJsonPage"),
+    `/appearance/layouts/:layoutViewType/:layoutID(\\w+)(-[^/]+)?/edit`,
+    (layout: LayoutFragment) =>
+        `/appearance/layouts/${layout.layoutViewType}/${layout.layoutID}-${slugify(layout.name)}/edit`,
+    PageLoader,
+);
+
 export const LayoutOverviewRoute = new RouteHandler(
     () => import("@dashboard/appearance/pages/LayoutOverviewPage"),
+    `/appearance/layouts/:layoutViewType/:layoutID(\\w+)(-[^/]+)?`,
+    (layout: LayoutFragment) =>
+        `/appearance/layouts/${layout.layoutViewType}/${layout.layoutID}-${slugify(layout.name)}`,
+    PageLoader,
+);
+
+export const LayoutOverviewRedirectRoute = new RouteHandler(
+    () => import("@dashboard/appearance/pages/LayoutOverviewRedirectPage"),
     `/appearance/layouts/:layoutID(\\w+)(-[^/]+)?`,
-    (layout: ILayout) => `/appearance/layouts/${layout.layoutID}-${slugify(layout.name)}`,
+    (layout: LayoutFragment) => `/appearance/layouts/${layout.layoutID}-${slugify(layout.name)}`,
     PageLoader,
 );
 
@@ -76,19 +80,27 @@ export const StyleGuidesListRoute = new RouteHandler(
     (data?: { themeID: RecordID }) => `/appearance/style-guides`,
 );
 
+export const AppearanceLayoutsRoute = new RouteHandler(
+    () => import("@dashboard/appearance/pages/AppearanceLayoutsPage"),
+    "/appearance/layouts",
+    () => "/appearance/layouts",
+    PageLoader,
+);
+
 export function getAppearanceRoutes() {
     return [
         AppearanceRoute.route,
-        AppearanceLayoutsRoute.route,
-        HomepageLegacyLayoutsRoute.route,
-        DiscussionsLegacyLayoutsRoute.route,
-        CategoriesLegacyLayoutsRoute.route,
-        LayoutEditorRoute.route,
+        LegacyLayoutsRoute.route,
+        LayoutPlaygroundPage.route,
+        NewLayoutJsonRoute.route,
         BrandingPageRoute.route,
+        EditLayoutJsonRoute.route,
         LayoutOverviewRoute.route,
+        LayoutOverviewRedirectRoute.route,
         StyleGuidesListRoute.route,
         ThemePreviewRoute.route,
         ThemeEditorRoute.route,
         ThemeRevisionsRoute.route,
+        AppearanceLayoutsRoute.route,
     ];
 }

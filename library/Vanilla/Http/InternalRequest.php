@@ -11,6 +11,7 @@ use Garden\Container\Container;
 use Garden\Http\HttpHandlerInterface;
 use Garden\Http\HttpRequest;
 use Garden\Http\HttpResponse;
+use Garden\Web\Data;
 use Garden\Web\Dispatcher;
 use Garden\Web\RequestInterface;
 use League\Uri\Http;
@@ -101,6 +102,27 @@ class InternalRequest extends HttpRequest implements RequestInterface {
         $this->container->setInstance(\Gdn_Request::class, $this->convertToLegacyRequest());
 
         $cookieStash = $_COOKIE;
+        try {
+            $_COOKIE = $this->extractHeaderCookies();
+            $data = $this->dispatcher->dispatch($this);
+        } finally {
+            $_COOKIE = $cookieStash;
+        }
+
+        if ($ex = $data->getMeta('exception')) {
+            /* @var \Throwable $ex */
+            $data->setMeta('errorTrace', $ex->getTraceAsString());
+        }
+
+        return $data->asHttpResponse();
+    }
+
+    /**
+     * Extract a cookies object from our cookies header.
+     *
+     * @return array
+     */
+    private function extractHeaderCookies(): array {
         $cookies = [];
         if ($rawCookies = $this->getHeader('Cookie')) {
             $rawCookies = explode(';', $rawCookies);
@@ -113,24 +135,7 @@ class InternalRequest extends HttpRequest implements RequestInterface {
                 $cookies[$key] = rawurldecode($val);
             }
         }
-
-        $_COOKIE = $cookies;
-        $data = $this->dispatcher->dispatch($this);
-        // Render the view in case it updates the Data object.
-        try {
-            ob_start();
-            $this->dispatcher->render($this->container->get(\Gdn_Request::class), $data);
-        } finally {
-            ob_end_clean();
-            $_COOKIE = $cookieStash;
-        }
-
-        if ($ex = $data->getMeta('exception')) {
-            /* @var \Throwable $ex */
-            $data->setMeta('errorTrace', $ex->getTraceAsString());
-        }
-
-        return $data->asHttpResponse();
+        return $cookies;
     }
 
     /**

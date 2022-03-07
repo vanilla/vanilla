@@ -12,6 +12,8 @@ use Garden\JsonFilterTrait;
 use Traversable;
 
 use Garden\MetaTrait;
+use Vanilla\Web\JsonView;
+use Vanilla\Web\Pagination\WebLinking;
 
 /**
  * Represents the data in a web response.
@@ -179,6 +181,7 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
      * @return HttpResponse
      */
     public function asHttpResponse(): HttpResponse {
+        $this->applyMetaHeaders();
         $response = new HttpResponse(
             $this->getStatus(),
             array_merge($this->getHeaders(), ['X-Data-Meta' => json_encode($this->getMetaArray())])
@@ -286,6 +289,7 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
      * @codeCoverageIgnore
      */
     public function render() {
+        $this->applyMetaHeaders();
         http_response_code($this->getStatus());
 
         if (!headers_sent()) {
@@ -302,6 +306,45 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
             echo $this->data;
         } else {
             echo json_encode($this, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR);
+        }
+    }
+
+    /**
+     * Apply headers that come from meta items.
+     */
+    public function applyMetaHeaders() {
+        $paging = $this->getMeta('paging');
+
+        // Handle pagination.
+        if ($paging) {
+            $links = new WebLinking();
+            $hasPageCount = isset($paging['pageCount']);
+
+            $firstPageUrl = str_replace('%s', 1, $paging['urlFormat']);
+            $links->addLink('first', $firstPageUrl);
+            if ($paging['page'] > 1) {
+                $prevPageUrl = $paging['page'] > 2 ? str_replace('%s', $paging['page'] - 1, $paging['urlFormat']) : $firstPageUrl;
+                $links->addLink('prev', $prevPageUrl);
+            }
+            if (($paging['more'] ?? false) || ($hasPageCount && $paging['page'] < $paging['pageCount'])) {
+                $links->addLink('next', str_replace('%s', $paging['page'] + 1, $paging['urlFormat']));
+            }
+            if ($hasPageCount) {
+                $links->addLink('last', str_replace('%s', $paging['pageCount'], $paging['urlFormat']));
+            }
+            $links->setHeader($this);
+
+            $this->setHeader(JsonView::CURRENT_PAGE_HEADER, $paging['page']);
+
+            $totalCount = $paging['totalCount'] ?? null;
+            if ($totalCount !== null) {
+                $this->setHeader(JsonView::TOTAL_COUNT_HEADER, $totalCount);
+            }
+
+            $limit = $paging['limit'] ?? null;
+            if ($limit !== null) {
+                $this->setHeader(JsonView::LIMIT_HEADER, $limit);
+            }
         }
     }
 

@@ -14,7 +14,7 @@ use VanillaTests\Storybook\StorybookGenerationTestCase;
  *
  * @package VanillaTests\Addons\ProfileExtender
  */
-class ProfileExtendStorybookTests extends StorybookGenerationTestCase {
+class ProfileExtendStorybookTest extends StorybookGenerationTestCase {
 
     use ProfileExtenderTestTrait;
 

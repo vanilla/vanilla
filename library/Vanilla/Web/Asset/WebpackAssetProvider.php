@@ -23,6 +23,8 @@ class WebpackAssetProvider {
 
     use TwigRenderTrait;
 
+    const COLLECTION_SECTION = "async";
+
     /** @var RequestInterface */
     private $request;
 
@@ -134,7 +136,7 @@ class WebpackAssetProvider {
      * @param string $section - The section of the site to lookup.
      * @return WebpackAsset[] The assets files for all webpack scripts.
      */
-    public function getScripts(string $section): array {
+    public function getScripts(string $section, bool $includeAsync = false): array {
         $scripts = [];
 
         // Locale asset is always included if we have a locale set.
@@ -149,7 +151,7 @@ class WebpackAssetProvider {
             return $scripts;
         }
 
-        $collection = $this->getCollectionForSection($section);
+        $collection = $this->getCollectionForSection($section, $includeAsync);
         $scripts =
             array_merge($scripts, $collection->createAssets($this->request, $this->getEnabledAddonKeys(), 'js'));
         return $scripts;
@@ -159,19 +161,21 @@ class WebpackAssetProvider {
      * Get a colleciton for the current section.
      *
      * @param string $section
+     * @param bool $includeAsync Include async assets.
      *
      * @return WebpackAssetDefinitionCollection
      */
-    private function getCollectionForSection(string $section): WebpackAssetDefinitionCollection {
-        if (!isset($this->collectionForSection[$section])) {
+    private function getCollectionForSection(string $section, bool $includeAsync = false): WebpackAssetDefinitionCollection {
+        $key = $section . ($includeAsync ? self::COLLECTION_SECTION : "");
+        if (!isset($this->collectionForSection[$key])) {
             $distPath = Path::join($this->fsRoot, PATH_DIST_NAME);
             if (WebpackAssetDefinitionCollection::sectionExists($section, $distPath)) {
-                $this->collectionForSection[$section] = WebpackAssetDefinitionCollection::loadFromDist($section, $distPath);
+                $this->collectionForSection[$key] = WebpackAssetDefinitionCollection::loadFromDist($section, $distPath, $includeAsync);
             } else {
-                $this->collectionForSection[$section] = new WebpackAssetDefinitionCollection($section);
+                $this->collectionForSection[$key] = new WebpackAssetDefinitionCollection($section);
             }
         }
-        return $this->collectionForSection[$section];
+        return $this->collectionForSection[$key];
     }
 
     /**
@@ -213,16 +217,17 @@ class WebpackAssetProvider {
      * Get all stylesheets for a particular site section.
      *
      * @param string $section
+     * @param bool $includeAsync Include async assets.
      *
      * @return WebpackAsset[]
      */
-    public function getStylesheets(string $section): array {
+    public function getStylesheets(string $section, bool $includeAsync = false): array {
         if ($this->hotReloadEnabled) {
             // All style sheets are managed by the hot javascript bundle.
             return [];
         }
 
-        $collection = $this->getCollectionForSection($section);
+        $collection = $this->getCollectionForSection($section, $includeAsync);
         $styles = $collection->createAssets($this->request, $this->getEnabledAddonKeys(), 'css');
         return $styles;
     }

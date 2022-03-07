@@ -4,7 +4,7 @@
  */
 
 import React, { ReactNode } from "react";
-import adminTitleBarClasses from "@dashboard/components/AdminTitleBar.classes";
+import { adminTitleBarClasses } from "@dashboard/components/AdminTitleBar.classes";
 import { cx } from "@emotion/css";
 import TruncatedText from "@library/content/TruncatedText";
 import { LoadingRectangle } from "@library/loaders/LoadingRectangle";

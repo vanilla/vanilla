@@ -126,8 +126,8 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler, Page
         $this->addInlineScript($this->getReduxActionsAsJsVariable());
 
         $viewData = [
-            'header' => $this->headerHtml,
-            'footer' => $this->footerHtml,
+            'themeHeader' => new \Twig\Markup($this->headerHtml, 'utf-8'),
+            'themeFooter' => new \Twig\Markup($this->footerHtml, 'utf-8'),
             'cssClasses' => ['isLoading'],
             'seoContent' => $this->seoContent,
         ];

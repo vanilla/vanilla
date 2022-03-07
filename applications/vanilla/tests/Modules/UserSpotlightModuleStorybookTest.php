@@ -8,6 +8,7 @@
 namespace VanillaTests\Forum\Modules;
 
 use Vanilla\Community\UserSpotlightModule;
+use VanillaTests\EventSpyTestTrait;
 use VanillaTests\Layout\LayoutTestTrait;
 use VanillaTests\Storybook\StorybookGenerationTestCase;
 use VanillaTests\UsersAndRolesApiTestTrait;
@@ -15,30 +16,20 @@ use VanillaTests\UsersAndRolesApiTestTrait;
 /**
  * Tests covering the UserSpotlightModule and the UserSpotlightWidget.
  */
-class UserSpotlightModuleTest extends StorybookGenerationTestCase {
-    use LayoutTestTrait, UsersAndRolesApiTestTrait;
+class UserSpotlightModuleStorybookTest extends StorybookGenerationTestCase {
+    use LayoutTestTrait;
+    use UsersAndRolesApiTestTrait;
+    use EventSpyTestTrait;
 
     public static $addons = ['vanilla'];
 
     /** @var string */
     private $descriptionStub = 'Mauris eu volutpat nibh. Nam non nulla vel massa congue rutrum. Nullam arcu mi, aliquet sed malesuada condimentum, bibendum at urna.';
 
-    /** @var array */
-    private $users = [];
-
-    /**
-     * Setup data for tests.
-     */
-    public function setUp(): void {
-        parent::setUp();
-        $this->users[] = $this->createUser();
-    }
-
     /**
      * Test rendering of the UserSpotlightModule.
      */
     public function testRender() {
-        $this->users[] = $this->createUser();
         $this->generateStoryHtml('/', 'User Spotlight Module');
     }
 
@@ -48,11 +39,12 @@ class UserSpotlightModuleTest extends StorybookGenerationTestCase {
      * @param \Gdn_Controller $sender
      */
     public function base_render_before(\Gdn_Controller $sender) {
+        $user = $this->createUser();
         /** @var UserSpotlightModule $module */
         $module = self::container()->get(UserSpotlightModule::class);
         $module->setTitle('User Spotlight Module');
         $module->setDescription($this->descriptionStub);
-        $module->setUserID($this->users[0]['userID']);
+        $module->setUserID($user['userID']);
         $sender->addModule($module);
     }
 
@@ -60,8 +52,9 @@ class UserSpotlightModuleTest extends StorybookGenerationTestCase {
      * Test hydrating the UserSpotlightWidget.
      */
     public function testHydrateUserSpotlightWidget() {
+        $user = $this->createUser();
         $apiParams = [
-            'userID' => $this->users[0]['userID']
+            'userID' => $user['userID'],
         ];
         $containerOptions = [
             'borderType' => 'shadow'
@@ -83,10 +76,10 @@ class UserSpotlightModuleTest extends StorybookGenerationTestCase {
                 'userTextAlignment' => 'left',
                 'userInfo' => [
                     'banned' => 0,
-                    'name' => $this->users[0]['name'],
+                    'name' => $user['name'],
                     'photoUrl' => 'http://vanilla.test/applications/dashboard/design/images/defaulticon.png',
-                    'url' => 'http://vanilla.test/profile/' . $this->users[0]['name'],
-                    'userID' => $this->users[0]['userID'],
+                    'url' => 'http://vanilla.test/profile/' . $user['name'],
+                    'userID' => $user['userID'],
                     'private' => false,
                     'punished' => 0,
                 ]

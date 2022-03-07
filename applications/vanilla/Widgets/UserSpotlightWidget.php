@@ -79,16 +79,13 @@ class UserSpotlightWidget implements ReactWidgetInterface, CombinedPropsWidgetIn
      * @return array|null
      */
     public function getProps(?array $params = null): ?array {
-        $params = self::getApiSchema()->validate((array)$this->props['apiParams']);
-        $this->setUserID($params['userID']);
-        $data = $this->getData();
+        $user = $this->getUserFragment($this->props['apiParams']['userID']);
 
-        if (is_null($data) || count($data) === 0) {
+        if ($user === null) {
             return null;
         }
 
-        return array_merge($this->props, [
-            "userInfo" => $data
-        ]);
+        $this->props['userInfo'] = $user;
+        return $this->props;
     }
 }

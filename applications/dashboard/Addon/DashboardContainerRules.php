@@ -18,7 +18,7 @@ use Vanilla\Dashboard\Layout\View\LegacyRegistrationLayoutView;
 use Vanilla\Dashboard\Layout\View\LegacySigninLayoutView;
 use Vanilla\Dashboard\Controllers\Pages\AppearancePageController;
 use Vanilla\Dashboard\Controllers\Pages\HomePageController;
-use Vanilla\Dashboard\Models\ModerationMessageStructure;
+use Vanilla\Dashboard\Models\ModerationMessagesFilterOpenApi;
 use Vanilla\Dashboard\Models\UserSiteTotalProvider;
 use Vanilla\Layout\LayoutService;
 use Vanilla\Layout\Middleware\LayoutRoleFilterMiddleware;
@@ -38,7 +38,7 @@ class DashboardContainerRules extends AddonContainerRules {
         PageControllerRoute::configurePageRoutes($container, [
             '/settings/layout' => LayoutSettingsPageController::class,
             '/appearance' => AppearancePageController::class,
-        ]);
+        ], null, -1);
 
         PageControllerRoute::configurePageRoutes($container, [
             '/' => HomePageController::class,
@@ -58,5 +58,8 @@ class DashboardContainerRules extends AddonContainerRules {
 
         $container->rule(LayoutHydrator::class)
             ->addCall("addMiddleware", [new Reference(LayoutRoleFilterMiddleware::class)]);
+
+        $container->rule(OpenAPIBuilder::class)
+            ->addCall("addFilter", [new Reference(ModerationMessagesFilterOpenApi::class)]);
     }
 }

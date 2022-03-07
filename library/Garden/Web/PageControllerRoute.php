@@ -41,21 +41,26 @@ class PageControllerRoute extends ResourceRoute {
      * @param ContainerConfigurationInterface $dic The container.
      * @param array{string, class-string<PageDispatchController>} $definitions A mapping of prefix => classname.
      * @param string|null $featureFlag A theme feature flag or feature flag to lock the controller definition behind.
+     * @param int $priority Priority for the route. Defaults to 0. Higher priorities match first.
      *
      * @return void
      */
-    public static function configurePageRoutes(ContainerConfigurationInterface $dic, array $definitions, ?string $featureFlag = null): void {
+    public static function configurePageRoutes(
+        ContainerConfigurationInterface $dic,
+        array $definitions,
+        ?string $featureFlag = null,
+        int $priority = 0
+    ): void {
         foreach ($definitions as $routePrefix => $controllerClass) {
             $ruleName = "@route/" . $routePrefix;
             $dic->rule($ruleName)
                 ->setClass(self::class)
                 ->setConstructorArgs([$routePrefix, $controllerClass])
+                ->addCall('setPriority', [$priority])
             ;
-
             if ($featureFlag) {
                 $dic->addCall("setFeatureFlag", [$featureFlag]);
             }
-
             $dic->rule(Dispatcher::class);
             $dic->addCall('addRoute', [new Reference($ruleName)]);
         }

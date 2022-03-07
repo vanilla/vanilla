@@ -13,6 +13,7 @@ use Vanilla\Database\Operation\CurrentDateFieldProcessor;
 use Vanilla\Database\Operation\CurrentUserFieldProcessor;
 use Vanilla\Database\Operation\JsonFieldProcessor;
 use Vanilla\Layout\Providers\MutableLayoutProviderInterface;
+use Vanilla\Models\FullRecordCacheModel;
 use Vanilla\Models\Model;
 use Vanilla\Models\PipelineModel;
 use Vanilla\Utility\ModelUtils;
@@ -20,7 +21,7 @@ use Vanilla\Utility\ModelUtils;
 /**
  * Model for managing persisted layout data
  */
-class LayoutModel extends PipelineModel implements MutableLayoutProviderInterface {
+class LayoutModel extends FullRecordCacheModel implements MutableLayoutProviderInterface {
 
     //region Properties
     private const TABLE_NAME = 'layout';
@@ -38,14 +39,16 @@ class LayoutModel extends PipelineModel implements MutableLayoutProviderInterfac
      * @param CurrentDateFieldProcessor $dateFieldProcessor
      * @param JsonFieldProcessor $jsonFieldProcessor
      * @param LayoutViewModel $layoutViewModel
+     * @param \GDN_Cache $cache
      */
     public function __construct(
         CurrentUserFieldProcessor $userFieldProcessor,
         CurrentDateFieldProcessor $dateFieldProcessor,
         JsonFieldProcessor        $jsonFieldProcessor,
-        LayoutViewModel           $layoutViewModel
+        LayoutViewModel           $layoutViewModel,
+        \GDN_Cache $cache
     ) {
-        parent::__construct(self::TABLE_NAME);
+        parent::__construct(self::TABLE_NAME, $cache);
 
         $userFieldProcessor->camelCase();
         $this->addPipelineProcessor($userFieldProcessor);

@@ -118,14 +118,6 @@ export const adminLayoutClasses = useThemeCache(() => {
         },
     });
 
-    const adminTitleBarClasses = css({
-        marginLeft: 16,
-        marginRight: 16,
-        "& > div": {
-            justifyContent: "space-between",
-        },
-    });
-
     const helpText = css({
         fontSize: "inherit!important",
         flex: 1,
@@ -149,7 +141,6 @@ export const adminLayoutClasses = useThemeCache(() => {
         content,
         contentNoLeftPanel,
         threePanel,
-        adminTitleBarClasses,
         helpText,
     };
 });

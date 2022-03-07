@@ -12,6 +12,7 @@
  */
 
 use Garden\Web\Cookie;
+use Vanilla\Logging\ErrorLogger;
 
 if (!function_exists('apc_fetch') && function_exists('apcu_fetch')) {
     /**
@@ -412,6 +413,17 @@ if (!function_exists('safeHeader')) {
         }
         if (is_null($context)) {
             $context = requestContext();
+        }
+
+        //TODO: Remove this after cleaning up header newline error(s)
+        if (strpos($header, "\n") !== false) {
+            ErrorLogger::warning(
+                "Header contained newline"
+                ["headers"],
+                [
+                    "header" => $header,
+                ]
+            );
         }
 
         if ($context == 'http') {

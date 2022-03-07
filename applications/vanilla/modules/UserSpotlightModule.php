@@ -12,6 +12,7 @@ use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
 use Vanilla\Forum\Widgets\UserSpotlightWidgetTrait;
 use Vanilla\InjectableInterface;
+use Vanilla\Models\UserFragmentSchema;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Web\JsInterpop\AbstractReactModule;
 
@@ -27,13 +28,17 @@ class UserSpotlightModule extends AbstractReactModule implements InjectableInter
     /** @var string|null */
     private $description = null;
 
+    /** @var int */
+    private $userID;
+
+
     /**
      * Get props for component
      *
      * @return array
      */
     public function getProps(): ?array {
-        $data = $this->getData();
+        $data = $this->getUserFragment($this->getUserID());
 
         if (is_null($data) || count($data) === 0) {
             return null;
@@ -67,15 +72,7 @@ class UserSpotlightModule extends AbstractReactModule implements InjectableInter
         return Schema::parse([
             'title:s?',
             'description:s?',
-            'userInfo?' => Schema::parse([
-                'userID:i',
-                'url:s?',
-                'photoUrl:s?',
-                'name:s?',
-                'title:s?',
-                'label:s?',
-                'dateLastActive?'
-            ])
+            'userInfo?' => new UserFragmentSchema(),
         ]);
     }
 
@@ -116,6 +113,20 @@ class UserSpotlightModule extends AbstractReactModule implements InjectableInter
      */
     public static function getWidgetName(): string {
         return "User Spotlight";
+    }
+
+    /**
+     * @return int
+     */
+    public function getUserID(): int {
+        return $this->userID;
+    }
+
+    /**
+     * @param int $userID
+     */
+    public function setUserID(int $userID): void {
+        $this->userID = $userID;
     }
 
     /**

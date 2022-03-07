@@ -210,6 +210,7 @@ class TestInstallModel extends InstallModel {
      */
     public static function clearMemoryCaches() {
         FeatureFlagHelper::clearCache();
+        \Gdn_Theme::resetSection();
         if (class_exists(\DiscussionModel::class)) {
             \DiscussionModel::cleanForTests();
         }

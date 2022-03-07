@@ -12,6 +12,8 @@ use Garden\Hydrate\DataHydrator;
 use Garden\Hydrate\Middleware\AbstractMiddleware;
 use Garden\Hydrate\Resolvers\AbstractDataResolver;
 use Garden\Schema\Schema;
+use Vanilla\Layout\LayoutAssetAwareInterface;
+use Vanilla\Layout\LayoutAssetAwareTrait;
 use Vanilla\Layout\Section\AbstractLayoutSection;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Web\PageHeadAwareInterface;
@@ -23,8 +25,9 @@ use Vanilla\Widgets\React\ReactWidgetInterface;
 /**
  * Data resolver for hydrating a react widget.
  */
-class ReactResolver extends AbstractDataResolver implements PageHeadAwareInterface {
+class ReactResolver extends AbstractDataResolver implements LayoutAssetAwareInterface, PageHeadAwareInterface {
     use PageHeadAwareTrait;
+    use LayoutAssetAwareTrait;
 
     public const HYDRATE_GROUP_SECTION = "section";
     public const HYDRATE_GROUP_REACT = "react";
@@ -67,6 +70,10 @@ class ReactResolver extends AbstractDataResolver implements PageHeadAwareInterfa
             $module->setPageHead($this->pageHead);
         }
 
+        if ($this->getAsset) {
+            $this->addWidgetName($module->getComponentName());
+            return [];
+        }
         // Apply properties
         if ($module instanceof CombinedPropsWidgetInterface) {
             $module->setProps($data);

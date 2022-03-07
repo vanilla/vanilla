@@ -13,6 +13,7 @@ use Garden\Web\Exception\ServerException;
 use PHPUnit\Framework\Error\Notice;
 use Psr\Log\LogLevel;
 use Vanilla\Contracts\Site\Site;
+use Vanilla\Formatting\Html\HtmlDocument;
 use Vanilla\Logger;
 use Vanilla\Logging\ErrorLogger;
 use Vanilla\Logging\LogDecorator;
@@ -286,6 +287,37 @@ class ErrorLoggerTest extends SiteTestCase {
                 'channel' => ErrorLogger::CHANNEL_PHP,
             ],
         ];
+    }
+
+    /**
+     * Test that silenced/suppressed errors don't get logged.
+     */
+    public function testSuppressedErrorHandler() {
+        try {
+            // Will trigger an suppressed error.
+            $doc = new \DOMDocument('1.0', 'UTF-8');
+            // Bad HTML.
+            $doc->loadHTML("<asdfasdf");
+        } catch (\PHPUnit\Framework\Error\Error $err) {
+            $caught = $err;
+        }
+        $this->assertInstanceOf(\PHPUnit\Framework\Error\Error::class, $caught);
+
+        // Suppress
+        try {
+            $oldErrorLevel = error_reporting();
+            error_reporting(0);
+            ErrorLogger::handleError(
+                $caught->getCode(),
+                $caught->getMessage(),
+                $caught->getFile(),
+                $caught->getLine()
+            );
+        } finally {
+            error_reporting($oldErrorLevel);
+        }
+
+        $this->assertNoErrorLog();
     }
 
     /**

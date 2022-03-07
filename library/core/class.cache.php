@@ -774,6 +774,16 @@ abstract class Gdn_Cache {
         return Gdn_Cache::$trace;
     }
 
+    /**
+     * Reset our traces.
+     */
+    public static function resetTrace(): void {
+        self::$trackGet = [];
+        self::$trackGets = 0;
+        self::$trackSet = [];
+        self::$trackSets = 0;
+    }
+
     protected function localGet($key) {
         if (!$this->hasFeature(Gdn_Cache::FEATURE_LOCAL)) {
             return Gdn_Cache::CACHEOP_FAILURE;

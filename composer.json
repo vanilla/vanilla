@@ -82,7 +82,8 @@
         "webmozart/path-util": "^2.3",
         "wikimedia/composer-merge-plugin": "^1.4.1",
         "bopoda/robots-txt-parser": "^2.4",
-        "vanilla/garden-hydrate": "^2.2.1"
+        "vanilla/garden-hydrate": "^2.2.1",
+        "fakerphp/faker": "^1.19"
     },
     "require-dev": {
         "cache/integration-tests": "dev-master",

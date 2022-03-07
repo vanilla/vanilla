@@ -75,11 +75,12 @@ class MasterViewRenderer {
 
         $extraData = [
             'seoContent' => new \Twig\Markup($page->getSeoContent(), 'utf-8'),
-            'cssClasses' => 'isLoading',
+            'cssClasses' => ['isLoading'],
             'pageHead' => $page->getHead()->renderHtml(),
             'title' => $page->getSeoTitle(),
         ];
-        $data = array_merge($viewData, $extraData, $this->getSharedData());
+        $data = array_merge($this->getSharedData(), $extraData, $viewData);
+        $data['cssClasses'] = implode(" ", $data['cssClasses']);
 
         return $this->renderTwig($masterViewPath, $data);
     }

@@ -263,7 +263,7 @@ export default function BrandingAndSEOPage() {
                 </section>
             }
             rightPanel={
-                <div>
+                <>
                     <h3>{t("Heads up!")}</h3>
                     <p>
                         {t(
@@ -276,7 +276,7 @@ export default function BrandingAndSEOPage() {
                             {t("Video tutorial on managing appearance")}
                         </SmartLink>
                     </p>
-                </div>
+                </>
             }
         />
     );

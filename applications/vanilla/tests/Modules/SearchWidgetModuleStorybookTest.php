@@ -19,7 +19,7 @@ use VanillaTests\Storybook\StorybookGenerationTestCase;
 /**
  * Test rendering of the "Search Widget" module.
  */
-class SearchWidgetModuleTest extends StorybookGenerationTestCase {
+class SearchWidgetModuleStorybookTest extends StorybookGenerationTestCase {
 
     use EventSpyTestTrait;
 

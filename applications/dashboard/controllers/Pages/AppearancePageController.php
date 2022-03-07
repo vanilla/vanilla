@@ -9,19 +9,22 @@ namespace Vanilla\Dashboard\Controllers\Pages;
 
 use DashboardPage;
 use Garden\Web\Data;
+use Gdn;
+use Vanilla\Theme\ThemePreloadProvider;
 use Vanilla\Web\ContentSecurityPolicyMiddleware;
+use Vanilla\Web\JsInterpop\ReduxActionPreloadTrait;
 use Vanilla\Web\PageDispatchController;
 
 /**
  * Controller covering the `/appearance/*` pages.
  */
 class AppearancePageController extends PageDispatchController {
+    use ReduxActionPreloadTrait;
 
     /**
      * /appearance/*
      *
      * @param string $path Allow any path.
-     *
      * @return Data
      */
     public function index(string $path = ""): Data {

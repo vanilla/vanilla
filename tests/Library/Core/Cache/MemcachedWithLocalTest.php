@@ -32,6 +32,14 @@ class MemcachedWithLocalTest extends MemcachedTest {
     }
 
     /**
+     * @return void
+     */
+    public function setUp(): void {
+        parent::setUp();
+        \Gdn_Memcached::resetTrace();
+    }
+
+    /**
      * The container should fulfill the cache.
      *
      * This is as close as we can get to testing the actual container integration.
@@ -53,6 +61,21 @@ class MemcachedWithLocalTest extends MemcachedTest {
         $this->assertEquals('hello world', $val);
         $memcached->get('localKey');
         $memcached->get('localKey');
+        $this->assertEquals(1, \Gdn_Cache::$trackGets, "Only one actual memcached get should be done. Rest should come from local.");
+    }
+
+    /**
+     * Test that our local cache is primed when getting values.
+     */
+    public function testLocalMultiWorks() {
+        \Gdn_Cache::trace(true);
+        $memcached = self::$memcached;
+        $memcached->store('cache.item1', 'item1', [\Gdn_Cache::FEATURE_LOCAL => false]);
+        $memcached->store('cache.item2', 'item2', [\Gdn_Cache::FEATURE_LOCAL => false]);
+        $val = $memcached->get(['cache.item1', 'cache.item2']);
+        $this->assertEquals(['cache.item1' => 'item1', 'cache.item2' => 'item2'], $val);
+        $val = $memcached->get(['cache.item1', 'cache.item2']);
+        $val = $memcached->get(['cache.item1', 'cache.item2']);
         $this->assertEquals(1, \Gdn_Cache::$trackGets, "Only one actual memcached get should be done. Rest should come from local.");
     }
 }

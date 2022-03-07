@@ -17,7 +17,7 @@ use VanillaTests\UsersAndRolesApiTestTrait;
 /**
  * Test rendering of the "Discussions" module.
  */
-class DiscussionsModuleTest extends StorybookGenerationTestCase {
+class DiscussionsModuleStorybookTest extends StorybookGenerationTestCase {
 
     use EventSpyTestTrait;
     use CategoryAndDiscussionApiTestTrait;

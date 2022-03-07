@@ -9,9 +9,11 @@ namespace Vanilla\Forum\Widgets;
 
 use Garden\Schema\Schema;
 use UserModel;
+use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Forms\ApiFormChoices;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
+use Vanilla\Logging\ErrorLogger;
 
 /**
  * Sharable properties and methods between the UserSpotlightWidget and the module.
@@ -20,9 +22,6 @@ trait UserSpotlightWidgetTrait {
 
     /** @var UserModel */
     private $userModel;
-
-    /** @var int */
-    private $userID;
 
     /**
      * DI.
@@ -36,16 +35,18 @@ trait UserSpotlightWidgetTrait {
     /**
      * Get user data.
      *
+     * @param int $userID
+     *
      * @return array|null
      */
-    protected function getData(): ?array {
-        $userID = $this->getUserID();
-        if (!$userID) {
+    protected function getUserFragment(int $userID): ?array {
+        try {
+            $user = $this->userModel->getFragmentByID($userID);
+            return $user;
+        } catch (NoResultsException $e) {
+            ErrorLogger::warning($e, ['userspotlight']);
             return null;
         }
-
-        $user = $this->userModel->getFragmentByID($userID);
-        return $user;
     }
 
     /**
@@ -72,19 +73,5 @@ trait UserSpotlightWidgetTrait {
                 )
             ]
         ]);
-    }
-
-    /**
-     * @return int
-     */
-    public function getUserID(): int {
-        return $this->userID;
-    }
-
-    /**
-     * @param int $userID
-     */
-    public function setUserID(int $userID): void {
-        $this->userID = $userID;
     }
 }

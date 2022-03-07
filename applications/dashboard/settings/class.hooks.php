@@ -141,6 +141,10 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface {
      * @param Gdn_Controller $sender
      */
     public function base_render_before($sender) {
+        if (!\Gdn::config("Garden.Installed", false)) {
+            // Don't run any of this if we aren't installed.
+            return;
+        }
         $session = Gdn::session();
 
         if ($sender->MasterView == 'admin' && ($sender->isRenderingMasterView() || $sender->deliveryType() === DELIVERY_TYPE_VIEW)) {
@@ -431,7 +435,6 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface {
             )
 
             ->addGroup(t('Appearance'), 'appearance', '', -1)
-            ->addLinkIf('Garden.Settings.Manage', t('Themes'), '/dashboard/settings/themes', 'appearance.themes', '', $sort)
             ->addLinkIf($hasThemeOptions && $session->checkPermission('Garden.Settings.Manage'), t('Theme Options'), '/dashboard/settings/themeoptions', 'appearance.theme-options', '', $sort)
             ->addLinkIf($hasMobileThemeOptions && $session->checkPermission('Garden.Settings.Manage'), t('Mobile Theme Options'), '/dashboard/settings/mobilethemeoptions', 'appearance.mobile-theme-options', '', $sort)
             ->addLinkIf('Garden.Community.Manage', t('Avatars'), '/dashboard/settings/avatars', 'appearance.avatars', '', $sort)

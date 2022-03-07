@@ -10,6 +10,7 @@ namespace VanillaTests\Models;
 use CategoryModel;
 use Garden\Web\Exception\NotFoundException;
 use PHPUnit\Framework\TestCase;
+use Vanilla\Schema\RangeExpression;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\ModelUtils;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
@@ -1275,5 +1276,31 @@ class CategoryModelTest extends SiteTestCase {
         $this->categoryModel->deleteID($childCatTwo['categoryID']);
         $parentCategoryTwoChildrenDeleted = $this->categoryModel->getID($parentID, DATASET_TYPE_ARRAY);
         $this->assertSame($parentCategoryTwoChildrenDeleted["CountCategories"], 0);
+    }
+
+    /**
+     * Test that there is no cache pollution in category fetching with range expressions.
+     */
+    public function testCachePollutionRangeExpression() {
+        // Make sure we have an actual cache.
+        $this->enableCaching();
+        $this->container()->setInstance(CategoryModel::class, null);
+        $categoryModel = $this->container()->get(CategoryModel::class);
+        $cat1 = $this->createCategory();
+        $cat2 = $this->createCategory();
+
+        $rangeExpression = new RangeExpression(">", 0);
+        $rangeExpression = $rangeExpression->withFilteredValue("=", [$cat1['categoryID']]);
+        $result = $categoryModel->selectCachedIDs([
+            'CategoryID' => $rangeExpression,
+        ]);
+        $this->assertEquals([$cat1['categoryID']], $result);
+
+        $rangeExpression = new RangeExpression(">", 0);
+        $rangeExpression = $rangeExpression->withFilteredValue("=", [$cat2['categoryID']]);
+        $result = $categoryModel->selectCachedIDs([
+            'CategoryID' => $rangeExpression,
+        ]);
+        $this->assertEquals([$cat2['categoryID']], $result);
     }
 }

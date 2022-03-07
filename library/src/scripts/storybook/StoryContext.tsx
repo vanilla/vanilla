@@ -119,8 +119,8 @@ export function StoryContextProvider(props: {
     const [themeKey, setThemeKey] = useState("");
 
     useLayoutEffect(() => {
-        addComponent("HomeWidget", HomeWidget, { overwrite: true, bypassPortalManager: true });
-        addComponent("CallToAction", CallToAction, { overwrite: true, bypassPortalManager: true });
+        addComponent("HomeWidget", HomeWidget, { overwrite: true });
+        addComponent("CallToAction", CallToAction, { overwrite: true });
         _mountComponents(document.body);
     });
 

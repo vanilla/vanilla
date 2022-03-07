@@ -75,6 +75,10 @@ class Dispatcher implements LoggerAwareInterface {
         } else {
             $this->routes[] = $route;
         }
+        uasort($this->routes, function (Route $routeA, Route $routeB) {
+            // Inverted priority sort.
+            return -($routeA->getPriority() <=> $routeB->getPriority());
+        });
         return $this;
     }
 

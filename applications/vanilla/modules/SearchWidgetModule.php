@@ -42,7 +42,7 @@ class SearchWidgetModule extends AbstractReactModule {
     }
 
     /**
-     * @param string[] $tabFormSchemaClasses
+     * @param array<AbstractTabSearchFormSchema|string> $tabFormSchemaClasses
      */
     public function setTabFormSchemaClasses(array $tabFormSchemaClasses): void {
         /** @var AbstractTabSearchFormSchema[] $schemaInstances */

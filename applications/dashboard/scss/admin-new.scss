@@ -10,6 +10,7 @@
 @import "maps/vanillicon";
 @import "maps/vendorSubset";
 @import "new-components/imageUpload";
+
 $staticVariables: false;
 @import "../../../packages/vanilla-theme-core/scss/base/variables";
 
@@ -193,4 +194,8 @@ $global-button_radius: $global_borderRadius;
     ~ .file-upload-choose {
         background-color: $grey-lighter;
     }
+}
+
+ul {
+    margin-bottom: 0;
 }

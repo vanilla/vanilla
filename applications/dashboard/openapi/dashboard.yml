@@ -89,8 +89,6 @@ paths:
                                                         minLength: 1
                                                         type: string
                                                 required:
-                                                    - name
-                                                    - id
                                                     - children
                                                 type: object
                                             type: array

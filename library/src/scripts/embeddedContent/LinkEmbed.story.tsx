@@ -26,7 +26,7 @@ story.add("LinkEmbed", () => {
             <StoryHeading>w/ Image</StoryHeading>
             <LinkEmbed
                 url="https://vanillaforums.com/en/"
-                photoUrl="https://vanillaforums.com/images/metaIcons/vanillaForums.png"
+                photoUrl="https://us.v-cdn.net/6030677/uploads/ZQ4WYB5DOIVQ/microsoftteams-image-2818-29.png"
                 name="Online Community Software and Customer Forum Software by Vanilla Forums"
                 embedType="link"
                 body="Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback."
@@ -43,7 +43,7 @@ story.add("LinkEmbed", () => {
             <EmbedContext.Provider value={{ inEditor: true, isSelected: true }}>
                 <LinkEmbed
                     url="https://vanillaforums.com/en/"
-                    photoUrl="https://vanillaforums.com/images/metaIcons/vanillaForums.png"
+                    photoUrl="https://us.v-cdn.net/6030677/uploads/ZQ4WYB5DOIVQ/microsoftteams-image-2818-29.png"
                     name="Online Community Software and Customer Forum Software by Vanilla Forums"
                     embedType="link"
                     body="Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback."

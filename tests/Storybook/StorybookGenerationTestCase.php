@@ -72,7 +72,7 @@ abstract class StorybookGenerationTestCase extends AbstractAPIv2Test {
         $dataPath = $writeBase . '.json';
 
         $bodyContent = $htmlDocument->getOuterHtml($bodyNode);
-        $bodyContent = $this->minifyHTML($bodyContent);
+        // $bodyContent = $this->minifyHTML($bodyContent);
         FileSystem::write($htmlPath, $bodyContent, 0777);
         FileSystem::write($dataPath, $dataJson, 0777);
 

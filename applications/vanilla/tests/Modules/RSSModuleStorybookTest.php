@@ -18,7 +18,7 @@ use VanillaTests\Storybook\StorybookGenerationTestCase;
 /**
  * Test rendering of the RSS module.
  */
-class RSSModuleTest extends StorybookGenerationTestCase {
+class RSSModuleStorybookTest extends StorybookGenerationTestCase {
 
     use EventSpyTestTrait;
     use CommunityApiTestTrait;

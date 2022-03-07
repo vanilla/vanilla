@@ -14,7 +14,7 @@ use VanillaTests\Storybook\StorybookGenerationTestCase;
 /**
  * Test rendering of the "Call To Action" module.
  */
-class CallToActionModuleTest extends StorybookGenerationTestCase {
+class CallToActionStorybookTest extends StorybookGenerationTestCase {
 
     use EventSpyTestTrait;
 

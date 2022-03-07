@@ -168,7 +168,7 @@ function useApiLookup(
 
     const currentOption =
         [initialOption, ...(options ? options : [])].filter(notEmpty).find((option) => {
-            return option.value === currentValue;
+            return option.value == currentValue;
         }) ?? null;
 
     return [options, currentOption];

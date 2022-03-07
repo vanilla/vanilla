@@ -400,7 +400,7 @@ trait EventSpyTestTrait {
      * Get the current user.
      */
     private function getCurrentUser() {
-        return \Gdn::userModel()->currentFragment();
+        return \Gdn::userModel()->currentFragment()->jsonSerialize();
     }
 
     /**

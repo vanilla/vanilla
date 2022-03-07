@@ -29,6 +29,8 @@ use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Vanilla\Contracts\Web\UASnifferInterface;
 use Vanilla\Dashboard\Controllers\API\ConfigApiController;
 use Vanilla\Dashboard\Models\RemoteResourceModel;
+use Vanilla\Dashboard\UserLeaderService;
+use Vanilla\Dashboard\UserPointsModel;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Forum\Navigation\ForumBreadcrumbProvider;
 use Vanilla\HttpCacheMiddleware;
@@ -427,6 +429,9 @@ class Bootstrap {
             ->addCall('registerWidget', [CategoriesModule::class])
             ->addCall('registerWidget', [TagModule::class])
             ->addCall('registerWidget', [CallToActionModule::class])
+
+            ->rule(UserLeaderService::class)
+            ->addCall('addProvider', [new Reference(UserPointsModel::class)])
 
             ->rule(SystemTokenUtils::class)
             ->setConstructorArgs([

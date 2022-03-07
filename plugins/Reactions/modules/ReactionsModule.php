@@ -78,7 +78,7 @@ class ReactionsModule extends AbstractReactModule {
     /**
      * @inheritDoc
      */
-    public function getComponentName(): string {
+    public static function getComponentName(): string {
         return 'ReactionListModule';
     }
 

@@ -59,11 +59,13 @@ class LayoutModelTest extends ClassLocatorTest {
         $layoutID = $this->layoutModel->insert($layout);
         $layoutView = ['layoutID' => $layoutID, 'recordID' => 1, 'recordType' => 'global', 'layoutViewType' => 'home'];
         $this->layoutViewModel->insert($layoutView);
+        $layoutView = ['layoutID' => $layoutID, 'recordID' => 2, 'recordType' => 'global', 'layoutViewType' => 'home'];
+        $this->layoutViewModel->insert($layoutView);
         $rows = $this->layoutModel->getAll();
         $result = $this->layoutModel->normalizeRows($rows, ['layoutViews']);
 
         $this->assertSame(1, count($result));
-        $this->assertSame(1, count($result[0]['layoutViews']));
+        $this->assertSame(2, count($result[0]['layoutViews']));
     }
 
     /**

@@ -7,11 +7,10 @@
 
 namespace VanillaTests\Dashboard\Events;
 
-use Garden\Events\ResourceEvent;
 use ReactionModel;
-use Vanilla\Badges\Events\UserBadgeEvent;
 use Vanilla\Dashboard\Events\UserPointEvent;
-use VanillaTests\APIv2\AbstractBadgesSubResource;
+use VanillaTests\Analytics\SpyingAnalyticsTestTrait;
+use VanillaTests\APIv2\QnaApiTestTrait;
 use VanillaTests\EventSpyTestTrait;
 use VanillaTests\SiteTestCase;
 use VanillaTests\UsersAndRolesApiTestTrait;
@@ -20,17 +19,12 @@ use VanillaTests\UsersAndRolesApiTestTrait;
  * Tests for UserPointEvent.
  */
 class UserPointEventTest extends SiteTestCase {
+    use EventSpyTestTrait;
+    use SpyingAnalyticsTestTrait;
+    use QnaApiTestTrait;
+    use UsersAndRolesApiTestTrait;
 
-    use EventSpyTestTrait, \VanillaTests\APIv2\QnaApiTestTrait, UsersAndRolesApiTestTrait;
-
-    /**
-     * Get the names of addons to install.
-     *
-     * @return string[] Returns an array of addon names.
-     */
-    protected static function getAddons(): array {
-        return ["vanilla", "qna", "reactions"];
-    }
+    public static $addons = ["vanillaanalytics", "qna", "reactions"];
 
     /**
      * Setup routine, run before each test case.
@@ -64,6 +58,10 @@ class UserPointEventTest extends SiteTestCase {
             ),
             []
         );
+
+        // Assert that the tracked event data validates against its catalog.
+        $trackedEvent = $this->getTracker()->getTrackedEventLike("point", "user_point_add");
+        $trackedEvent->assertMatchesCatalog("point");
     }
 
     /**
@@ -76,7 +74,6 @@ class UserPointEventTest extends SiteTestCase {
         $this->api()->post("/discussions/$this->lastInsertedDiscussionID/reactions", [
             'reactionType' => 'Like'
         ]);
-
 
         $this->assertEventDispatched(
             $this->expectedResourceEvent(
@@ -97,5 +94,12 @@ class UserPointEventTest extends SiteTestCase {
             ),
             []
         );
+
+        $trackedEventAdd = $this->getTracker()->getTrackedEventLike('point', 'user_point_add');
+        $trackedEventDelete = $this->getTracker()->getTrackedEventLike('point', 'user_point_add');
+
+        // Assert that the tracked events data validates against their catalog.
+        $trackedEventAdd->assertMatchesCatalog("point");
+        $trackedEventDelete->assertMatchesCatalog("point");
     }
 }

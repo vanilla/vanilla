@@ -10,6 +10,7 @@
  */
 
 use Garden\Schema\Schema;
+use Garden\Web\Exception\ServerException;
 use Vanilla\InjectableInterface;
 use Garden\EventManager;
 
@@ -21,6 +22,8 @@ use Garden\EventManager;
  * @property string[] $CapturedSql
  */
 class Gdn_Database implements InjectableInterface {
+
+    const SQL_MODE_NO_AUTO_VALUE_ZERO = "NO_AUTO_VALUE_ON_ZERO";
 
     /** @var string The instance name of this class or the class that inherits from this class. */
     public $ClassName;
@@ -755,5 +758,48 @@ class Gdn_Database implements InjectableInterface {
         $this->_Structure = Gdn::getContainer()->get($name);
 
         return $this->_Structure;
+    }
+
+    /**
+     * Get an array of the current sql modes.
+     *
+     * @return array
+     */
+    public function getSqlModes(): array {
+        $currentModes = $this->query("SELECT @@sql_mode", [])->column("@@sql_mode");
+        $currentModes = reset($currentModes);
+        $currentModes = explode(",", $currentModes);
+        return $currentModes;
+    }
+
+    /**
+     * Get an array of the current sql modes.
+     *
+     * @param string[] $modes MySQL modes to set.
+     */
+    public function setSqlModes(array $modes): void {
+        $modes = implode(",", $modes);
+        $this->query("SET SESSION sql_mode=:mode", [':mode' => $modes], []);
+    }
+
+    /**
+     * Run a callback with particular sql modes.
+     *
+     * @param array $modes
+     * @param callable $callback
+     *
+     * @return mixed The result of the callback.
+     */
+    public function runWithSqlMode(array $modes, callable $callback) {
+        $originalModes = $this->getSqlModes();
+        $newModes = array_values(array_unique(array_merge($originalModes, $modes)));
+
+        try {
+            $this->setSqlModes($newModes);
+            $result = call_user_func($callback);
+            return $result;
+        } finally {
+            $this->setSqlModes($originalModes);
+        }
     }
 }

@@ -5,26 +5,24 @@
 
 import { css, cx } from "@emotion/css";
 import { Container } from "@library/layout/components/Container";
-import PanelWidget from "@library/layout/components/PanelWidget";
+import PanelArea from "@library/layout/components/PanelArea";
 import { useSection } from "@library/layout/LayoutContext";
 import { PageBoxDepthContextProvider } from "@library/layout/PageBox.context";
 import { useScrollOffset } from "@library/layout/ScrollOffsetContext";
 import { WidgetLayout } from "@library/layout/WidgetLayout";
-import { useWidgetSectionClasses, WidgetSectionContext } from "@library/layout/WidgetLayout.context";
-import { widgetLayoutClasses } from "@library/layout/WidgetLayout.styles";
+import { useWidgetSectionClasses } from "@library/layout/WidgetLayout.context";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
 import { useMeasure } from "@vanilla/react-utils";
 import { logError } from "@vanilla/utils";
 import classNames from "classnames";
-import React, { useCallback, useMemo, useRef } from "react";
+import React, { useMemo, useRef } from "react";
 import Panel from "./components/Panel";
-import PanelArea from "./components/PanelArea";
 import PanelAreaHorizontalPadding from "./components/PanelAreaHorizontalPadding";
 import PanelOverflow from "./components/PanelOverflow";
 import PanelWidgetHorizontalPadding from "./components/PanelWidgetHorizontalPadding";
 
-export interface ISectionProps {
+export interface ISectionProps extends React.HTMLAttributes<HTMLElement> {
     className?: string;
     toggleMobileMenu?: (isOpen: boolean) => void;
     contentTag?: keyof JSX.IntrinsicElements;
@@ -33,14 +31,17 @@ export interface ISectionProps {
     isFixed?: boolean;
     leftTop?: React.ReactNode;
     leftBottom?: React.ReactNode;
+    mainTop?: React.ReactNode;
+    mainBottom?: React.ReactNode;
+    children?: React.ReactNode;
     middleTop?: React.ReactNode;
     middleBottom?: React.ReactNode;
     rightTop?: React.ReactNode;
     rightBottom?: React.ReactNode;
     breadcrumbs?: React.ReactNode;
     renderLeftPanelBackground?: boolean;
-    // Automatically wrap all panels in component wrappers.
-    autoWrap?: boolean;
+    childrenAfter?: React.ReactNode;
+    contentRef?: React.RefObject<HTMLDivElement>;
 }
 
 /**
@@ -57,8 +58,8 @@ export interface ISectionProps {
  *
  * @layout Tablet
  * | Breadcrumbs |
- * | LeftTop     | RightTop
- * | LeftBottom  | MiddleTop
+ * | LeftTop     | MiddleTop
+ * | LeftBottom  | RightTop
  * |             | MiddleBottom
  * |             | RightBottom
  *
@@ -67,10 +68,11 @@ export interface ISectionProps {
  * HamburgerMenu / Panel - LeftBottom
  *
  * | Breadcrumbs  |
+ * | MiddleTop    |
  * | LeftTop      |
  * | RightTop     |
- * | MiddleTop    |
  * | MiddleBottom |
+ * | LeftBottom   |
  * | RightBottom  |
  */
 export default function Section(props: ISectionProps) {
@@ -80,7 +82,19 @@ export default function Section(props: ISectionProps) {
         growMiddleBottom = false,
         topPadding = true,
         isFixed = true,
-        ...childComponents
+        leftTop,
+        leftBottom,
+        middleTop,
+        middleBottom,
+        mainTop,
+        mainBottom,
+        rightTop,
+        rightBottom,
+        breadcrumbs,
+        contentRef,
+        children,
+        childrenAfter,
+        ...elementProps
     } = props;
 
     // Measure the panel itself.
@@ -99,6 +113,19 @@ export default function Section(props: ISectionProps) {
     if (!classes) {
         logError(`Classes not loaded for panel layout of type: ${type}, classes given: `, classes);
     }
+
+    const childComponents = {
+        leftTop: leftTop,
+        leftBottom: leftBottom,
+        mainBottom: mainBottom,
+        mainTop: mainTop,
+        middleTop: middleTop,
+        middleBottom: middleBottom,
+        rightTop: rightTop,
+        rightBottom: rightBottom,
+        breadcrumbs: breadcrumbs,
+        children: children,
+    };
 
     const panelRef = useRef<HTMLDivElement | null>(null);
     const panelMeasure = useMeasure(panelRef, true);
@@ -143,27 +170,10 @@ export default function Section(props: ISectionProps) {
         widgetClasses.widgetClass,
     );
 
-    const ChildWrapper = useCallback(
-        function ChildWrapper(innerProps: { children: React.ReactNode }) {
-            if (!props.autoWrap) {
-                return <>{innerProps.children}</>;
-            } else {
-                return (
-                    <>
-                        {React.Children.map(innerProps.children, (child) => {
-                            return <PanelWidget>{child}</PanelWidget>;
-                        })}
-                    </>
-                );
-            }
-        },
-        [props.autoWrap],
-    );
-
     // If applicable, set semantic tag, like "article"
     const ContentTag = contentTag;
     return (
-        <div className={panelClasses}>
+        <div className={panelClasses} ref={contentRef} {...elementProps}>
             <Container>
                 {shouldRenderBreadcrumbs && (
                     <div className={classNames(classes.container, classes.breadcrumbsContainer)}>
@@ -179,7 +189,6 @@ export default function Section(props: ISectionProps) {
                         </PanelAreaHorizontalPadding>
                     </div>
                 )}
-
                 <main className={classNames(classes.main, props.growMiddleBottom ? inheritHeightClass() : "")}>
                     <div
                         ref={panelRef}
@@ -202,14 +211,10 @@ export default function Section(props: ISectionProps) {
                                             renderLeftPanelBackground={props.renderLeftPanelBackground}
                                         >
                                             {childComponents.leftTop !== undefined && (
-                                                <PanelArea>
-                                                    <ChildWrapper>{childComponents.leftTop}</ChildWrapper>
-                                                </PanelArea>
+                                                <PanelArea>{childComponents.leftTop}</PanelArea>
                                             )}
                                             {childComponents.leftBottom !== undefined && (
-                                                <PanelArea>
-                                                    <ChildWrapper>{childComponents.leftBottom}</ChildWrapper>
-                                                </PanelArea>
+                                                <PanelArea>{childComponents.leftBottom}</PanelArea>
                                             )}
                                         </PanelOverflow>
                                     </Panel>
@@ -234,29 +239,19 @@ export default function Section(props: ISectionProps) {
                                     )}
                                 >
                                     {childComponents.middleTop !== undefined && (
-                                        <PanelArea>
-                                            <ChildWrapper>{childComponents.middleTop}</ChildWrapper>
-                                        </PanelArea>
+                                        <PanelArea>{childComponents.middleTop}</PanelArea>
                                     )}
                                     {!shouldRenderLeftPanel && childComponents.leftTop !== undefined && (
-                                        <PanelArea>
-                                            <ChildWrapper>{childComponents.leftTop}</ChildWrapper>
-                                        </PanelArea>
+                                        <PanelArea>{childComponents.leftTop}</PanelArea>
                                     )}
                                     {!shouldRenderRightPanel && childComponents.rightTop !== undefined && (
-                                        <PanelArea>
-                                            <ChildWrapper>{childComponents.rightTop}</ChildWrapper>
-                                        </PanelArea>
+                                        <PanelArea>{childComponents.rightTop}</PanelArea>
                                     )}
-                                    <PanelArea
-                                        className={classNames({ [inheritHeightClass()]: props.growMiddleBottom })}
-                                    >
-                                        <ChildWrapper>{childComponents.middleBottom}</ChildWrapper>
+                                    <PanelArea className={inheritHeightClass()}>
+                                        {childComponents.middleBottom}
                                     </PanelArea>
                                     {!shouldRenderRightPanel && childComponents.rightBottom !== undefined && (
-                                        <PanelArea>
-                                            <ChildWrapper>{childComponents.rightBottom}</ChildWrapper>
-                                        </PanelArea>
+                                        <PanelArea>{childComponents.rightBottom}</PanelArea>
                                     )}
                                 </Panel>
                             </ContentTag>
@@ -275,14 +270,10 @@ export default function Section(props: ISectionProps) {
                                     >
                                         <PanelOverflow offset={overflowOffset}>
                                             {childComponents.rightTop !== undefined && (
-                                                <PanelArea>
-                                                    <ChildWrapper>{childComponents.rightTop}</ChildWrapper>
-                                                </PanelArea>
+                                                <PanelArea>{childComponents.rightTop}</PanelArea>
                                             )}
                                             {childComponents.rightBottom !== undefined && (
-                                                <PanelArea>
-                                                    <ChildWrapper>{childComponents.rightBottom}</ChildWrapper>
-                                                </PanelArea>
+                                                <PanelArea>{childComponents.rightBottom}</PanelArea>
                                             )}
                                         </PanelOverflow>
                                     </Panel>
@@ -290,6 +281,7 @@ export default function Section(props: ISectionProps) {
                             </PageBoxDepthContextProvider>
                         )}
                     </div>
+                    {childrenAfter}
                 </main>
             </Container>
         </div>

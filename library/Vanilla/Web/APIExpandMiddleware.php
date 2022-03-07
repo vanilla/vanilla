@@ -110,9 +110,18 @@ class APIExpandMiddleware {
         }
 
         foreach ($expand as $expandField) {
+            $wholeMatchingExpandSpec = $this->supportedFields[$expandField] ?? null;
+            if ($wholeMatchingExpandSpec instanceof ExpandFieldConfig) {
+                $fields = $wholeMatchingExpandSpec->getFields();
+                // We need to flip these because our result is "sourcefield" => "destinationField"
+                // And our input is inverted.
+                $result[$expandField] = array_flip($fields);
+            }
+
             foreach ($this->supportedFields as $key => $spec) {
-                if ($spec->getFieldByDestination($expandField)) {
-                    $result[$key][$spec->getFieldByDestination($expandField)] = $expandField;
+                $sourceField = $spec->getFieldByDestination($expandField);
+                if ($sourceField !== null) {
+                    $result[$key][$sourceField] = $expandField;
                 }
             }
         }
@@ -186,8 +195,9 @@ class APIExpandMiddleware {
         }
 
         $scrubbedExpand = $expand;
-        foreach ($fields as $field) {
-            $scrubbedExpand = array_diff($scrubbedExpand, array_values($field));
+        foreach ($fields as $fieldTopLevel => $fieldValues) {
+            $fieldValues[] = $fieldTopLevel;
+            $scrubbedExpand = array_diff($scrubbedExpand, array_values($fieldValues));
         }
 
         if (empty($scrubbedExpand)) {
@@ -260,15 +270,21 @@ class APIExpandMiddleware {
     }
 
     /**
-     * Expand all of the fields possible based on a single primary key.
+     * Expand all the fields possible based on a single primary key.
      *
      * @param array|Data $response
      * @param string $pk
      * @param bool $firstLevel
-     * @returns Data
+     * @param string[] $excludedExpanders An array of expander names to exclude. Exaple: 'users', 'users.extended'
+     *
+     * @return Data
      */
-    public function updateResponseByKey($response, string $pk, bool $firstLevel = false): Data {
+    public function updateResponseByKey($response, string $pk, bool $firstLevel = false, array $excludedExpanders = []):
+    Data {
         $fields = $this->getExpandFieldsByKey($pk, $firstLevel);
+        foreach ($excludedExpanders as $excludedExpander) {
+            unset($fields[$excludedExpander]);
+        }
         $response = $this->updateResponse($response, $fields);
         return $response;
     }

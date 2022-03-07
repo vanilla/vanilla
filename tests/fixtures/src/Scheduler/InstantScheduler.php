@@ -100,10 +100,13 @@ class InstantScheduler extends DummyScheduler {
         if ($this->isPaused) {
             return;
         }
-        $this->isDispatching = true;
-        parent::dispatchAll();
-        $this->isDispatching = false;
-        $this->trackingSlips = [];
+        try {
+            $this->isDispatching = true;
+            parent::dispatchAll();
+        } finally {
+            $this->isDispatching = false;
+            $this->trackingSlips = [];
+        }
     }
 
     /**

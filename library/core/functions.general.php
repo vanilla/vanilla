@@ -8,6 +8,8 @@
  * @since 2.0
  */
 
+use Vanilla\Utility\ArrayUtils;
+
 if (!function_exists('absoluteSource')) {
     /**
      * Get the full url of a source path relative to a base url.
@@ -444,25 +446,10 @@ if (!function_exists('flattenArray')) {
      * @param string $sep The string used to separate keys.
      * @param array $array The array to flatten.
      * @return array Returns the flattened array.
+     * @deprecated Use ArrayUtils::flattenArray(); instead.
      */
     function flattenArray($sep, $array) {
-        $result = [];
-
-        $fn = function ($array, $previousLevel = null) use ($sep, &$fn, &$result) {
-            foreach ($array as $key => $value) {
-                $currentLevel = $previousLevel ? "{$previousLevel}{$sep}{$key}" : $key;
-
-                if (is_array($value)) {
-                    $fn($value, $currentLevel);
-                } else {
-                    $result[$currentLevel] = $value;
-                }
-            }
-        };
-
-        $fn($array);
-
-        return $result;
+        return ArrayUtils::flattenArray($sep, $array);
     }
 }
 
@@ -744,7 +731,7 @@ if (!function_exists('domGetImages')) {
                     $height = $imageInfo['Height'];
                     $width = $imageInfo['Width'];
                 } else {
-                    list($width, $height) = getimagesize($image);
+                    [$width, $height] = getimagesize($image);
                 }
 
                 $diag = (int)floor(sqrt(($width * $width) + ($height * $height)));
@@ -1665,7 +1652,7 @@ if (!function_exists('safeImage')) {
      */
     function safeImage($imageUrl, $minHeight = 0, $minWidth = 0) {
         try {
-            list($width, $height, $_, $_) = getimagesize($imageUrl);
+            [$width, $height, $_, $_] = getimagesize($imageUrl);
             if ($minHeight > 0 && $minHeight > $height) {
                 return false;
             }
@@ -1717,7 +1704,7 @@ if (!function_exists('sliceParagraph')) {
         if (is_int($limits)) {
             $limits = [$limits, 32];
         }
-        list($maxLength, $minLength) = $limits;
+        [$maxLength, $minLength] = $limits;
         if ($maxLength >= strlen($string)) {
             return $string;
         }

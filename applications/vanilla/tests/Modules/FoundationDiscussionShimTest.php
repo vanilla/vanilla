@@ -82,6 +82,10 @@ class FoundationDiscussionShimTest extends SiteTestCase {
         ];
         $actual = $shim->convertLegacyData($legacyItems);
 
+        // normalize userInfo data
+        $actual[0]['insertUser'] = $actual[0]['insertUser']->jsonSerialize();
+        $actual[0]['lastUser'] = $actual[0]['lastUser']->jsonSerialize();
+
         unset($actual[0]['dateInserted']);
         unset($actual[0]['dateUpdated']);
         unset($actual[0]['dateLastComment']);

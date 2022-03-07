@@ -110,9 +110,6 @@ class CategoriesTest extends AbstractResourceTest {
     /**
      * Assert all dirty records for a specific resource are returned.
      *
-     * INDEX /Categories by default returns a category tree (max 2 levels)
-     * we must check if the child-categories are dirty-records as well.
-     *
      * @param array $records
      */
     protected function assertAllDirtyRecordsReturned($records) {
@@ -120,13 +117,6 @@ class CategoriesTest extends AbstractResourceTest {
         $dirtyRecordModel = \Gdn::getContainer()->get(DirtyRecordModel::class);
         $recordType = $this->getResourceInformation();
         $dirtyRecords = $dirtyRecordModel->select(["recordType" => $recordType]);
-
-        // getCategoryTree will return a tree with dirtyRecords
-        foreach ($records as $record) {
-            if (count($record['children']) > 0) {
-                $records = array_merge($records, $record['children']);
-            }
-        }
 
         $dirtyRecordIDs = array_column($dirtyRecords, 'recordID');
         $categoryIDs = array_column($records, 'categoryID');
@@ -141,7 +131,6 @@ class CategoriesTest extends AbstractResourceTest {
      */
     protected function modifyRow(array $row) {
         $row = parent::modifyRow($row);
-        $dt = new \DateTimeImmutable();
         foreach ($this->patchFields as $key) {
             $value = $row[$key];
             switch ($key) {
@@ -246,7 +235,7 @@ class CategoriesTest extends AbstractResourceTest {
         $followBody = $follow->getBody();
         $this->assertTrue($followBody['followed']);
 
-        $index = $this->api()->get($this->baseUrl, ['parentCategoryID' => self::PARENT_CATEGORY_ID])->getBody();
+        $index = $this->api()->get($this->baseUrl, ['parentCategoryID' => self::PARENT_CATEGORY_ID, 'outputFormat' => 'flat'])->getBody();
         $categories = array_column($index, null, 'categoryID');
         $this->assertArrayHasKey($row['categoryID'], $categories);
         $this->assertTrue($categories[$row['categoryID']]['followed']);
@@ -256,13 +245,15 @@ class CategoriesTest extends AbstractResourceTest {
         $followBody = $follow->getBody();
         $this->assertFalse($followBody['followed']);
 
-        $index = $this->api()->get($this->baseUrl, ['parentCategoryID' => self::PARENT_CATEGORY_ID])->getBody();
+        $index = $this->api()->get($this->baseUrl, ['parentCategoryID' => self::PARENT_CATEGORY_ID, 'outputFormat' => 'flat'])->getBody();
         $categories = array_column($index, null, 'categoryID');
         $this->assertFalse($categories[$row['categoryID']]['followed']);
     }
 
     /**
      * Test getting a list of followed categories.
+     *
+     * @depends testFollow
      */
     public function testIndexFollowed() {
         // Make sure we're starting from scratch.
@@ -275,6 +266,7 @@ class CategoriesTest extends AbstractResourceTest {
         $postFollow = $this->api()->get($this->baseUrl, ['followed' => true])->getBody();
         $this->assertCount(1, $postFollow);
         $this->assertEquals($testCategoryID, $postFollow[0]['categoryID']);
+        $this->assertEquals(true, $postFollow[0]['followed']);
     }
 
     /**
@@ -396,7 +388,8 @@ class CategoriesTest extends AbstractResourceTest {
         // Get only non-archived categories.
         $categories = $this->api()->get($this->baseUrl, [
             'archived' => '',
-            'parentCategoryID' => self::PARENT_CATEGORY_ID
+            'parentCategoryID' => self::PARENT_CATEGORY_ID,
+            'outputFormat' => 'flat'
         ])->getBody();
 
         // Iterate through the results, making sure both archived and non-archived categories are included.
@@ -427,7 +420,7 @@ class CategoriesTest extends AbstractResourceTest {
         $followBody = $follow->getBody();
         $this->assertTrue($followBody['followed']);
 
-        $index = $this->api()->get($this->baseUrl, ['parentCategoryID' => self::PARENT_CATEGORY_ID])->getBody();
+        $index = $this->api()->get($this->baseUrl, ['parentCategoryID' => self::PARENT_CATEGORY_ID, 'outputFormat' => 'flat'])->getBody();
         $categories = array_column($index, null, 'categoryID');
         $this->assertArrayHasKey($row['categoryID'], $categories);
         $this->assertTrue($categories[$row['categoryID']]['followed']);
@@ -439,7 +432,7 @@ class CategoriesTest extends AbstractResourceTest {
         $followBody = $follow->getBody();
         $this->assertFalse($followBody['followed']);
 
-        $index = $this->api()->get($this->baseUrl, ['parentCategoryID' => self::PARENT_CATEGORY_ID])->getBody();
+        $index = $this->api()->get($this->baseUrl, ['parentCategoryID' => self::PARENT_CATEGORY_ID, 'outputFormat' => 'flat'])->getBody();
         $categories = array_column($index, null, 'categoryID');
         $this->assertFalse($categories[$row['categoryID']]['followed']);
     }
@@ -682,5 +675,72 @@ class CategoriesTest extends AbstractResourceTest {
 
         $result = $this->api()->get("/categories", ['outputFormat' => 'flat', 'parentCategoryID' => $parentCategoryID])->getBody();
         $this->assertEquals(2, count($result));
+    }
+
+    /**
+     * Test that max depth works.
+     */
+    public function testMaxDepth() {
+        $cat1 = $this->createCategory(['name' => 'depth1']);
+        $cat2 = $this->createCategory(['name' => 'depth2']);
+        $this->createCategory(['name' => 'depth3']);
+        $this->createCategory(['name' => 'depth4']);
+
+        // Default
+        $this->assertCategoriesInIndex([], ["depth1", "depth2"], ['depth3', 'depth4']);
+
+        // From a parent
+        $this->assertCategoriesInIndex([
+            'parentCategoryID' => $cat1['categoryID'],
+            'outputFormat' => 'tree',
+        ], ["depth1", "depth2", "depth3"], ['depth4']);
+
+        // From a parent
+        $this->assertCategoriesInIndex(
+            [
+                'parentCategoryID' => $cat2['categoryID'],
+                'maxDepth' => 1,
+            ],
+            ["depth2", 'depth3'],
+            ['depth1', 'depth4']
+        );
+    }
+
+    /**
+     * Test that the endpoint filters permissions.
+     */
+    public function testPermissionFilter() {
+        $cat1 = $this->createCategory(['name' => 'cat1']);
+        $permCat = $this->createPermissionedCategory(['name' => 'permcat'], [\RoleModel::ADMIN_ID]);
+
+        $query = [
+            'categoryID' => [$cat1['categoryID'], $permCat['categoryID']]
+        ];
+        $this->assertCategoriesInIndex($query, ['cat1', 'permcat']);
+        $this->runWithUser(function () use ($query) {
+            $this->assertCategoriesInIndex($query, ['cat1'], ['permcat']);
+        }, UserModel::GUEST_USER_ID);
+    }
+
+    /**
+     * Assert that certain category names come back in the index on a particular query.
+     *
+     * @param array $query
+     * @param array $includedNames
+     * @param array $excludedNames
+     */
+    private function assertCategoriesInIndex(array $query, array $includedNames, array $excludedNames = []) {
+        $results = $this->api()->get("/categories", $query)->getBody();
+        $results = \CategoryCollection::treeBuilder()->setChildrenFieldName('children')->flattenTree($results);
+
+        $names = array_column($results, 'name');
+        $flippedNames = array_flip($names);
+        foreach ($includedNames as $includedName) {
+            $this->assertArrayHasKey($includedName, $flippedNames);
+        }
+
+        foreach ($excludedNames as $excludedName) {
+            $this->assertArrayNotHasKey($excludedName, $flippedNames);
+        }
     }
 }

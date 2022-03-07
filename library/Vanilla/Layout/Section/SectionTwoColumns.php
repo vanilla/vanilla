@@ -18,7 +18,7 @@ class SectionTwoColumns extends AbstractLayoutSection {
     /**
      * @inheritdoc
      */
-    public function getComponentName(): string {
+    public static function getComponentName(): string {
         return 'SectionTwoColumns';
     }
 

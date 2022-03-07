@@ -177,11 +177,16 @@ class ModelUtils {
      * The function must take an array of IDs and then return an array that maps those IDs to the records to join.
      *
      * @param array[] $dataset The dataset to join the records to.
-     * @param array $idFields The names of the fields to lookup. See `parseJoinFragmentFields()` for more information.
+     * @param array $idFields The names of the fields to look up. See `parseJoinFragmentFields()` for more information.
      * @param callable $fetch The fetcher function to call that maps IDs to records.
      * @param mixed $default The default value to set when the the join record is not found.
      */
-    public static function leftJoin(array &$dataset, array $idFields, callable $fetch, $default = null): void {
+    public static function leftJoin(
+        array &$dataset,
+        array $idFields,
+        callable $fetch,
+        $default = null
+    ): void {
         $idFields = self::parseJoinFragmentFields($idFields);
 
         // Gather all of the IDs.
@@ -189,7 +194,9 @@ class ModelUtils {
         foreach ($dataset as $row) {
             foreach ($idFields as $idField => $aliasField) {
                 $currentID = ArrayUtils::getByPath($idField, $row);
-                $ids[$currentID] = $currentID;
+                if ($currentID !== null) {
+                    $ids[$currentID] = $currentID;
+                }
             }
         }
 
@@ -199,6 +206,10 @@ class ModelUtils {
         // Join them back into the data.
         foreach ($dataset as &$row) {
             foreach ($idFields as $idField => $aliasField) {
+                $fieldExists = arrayPathExists(explode(".", $idField), $row);
+                if (!$fieldExists) {
+                    continue;
+                }
                 ArrayUtils::setByPath($aliasField, $row, $fragments[ArrayUtils::getByPath($idField, $row)] ?? $default);
             }
         }

@@ -42,9 +42,9 @@ class DiscussionEvent extends ResourceEvent implements LoggableEventInterface, T
      *
      * @param string $action
      * @param array $payload
-     * @param array|null $sender
+     * @param array|object|null $sender
      */
-    public function __construct(string $action, array $payload, ?array $sender = null) {
+    public function __construct(string $action, array $payload, $sender = null) {
         parent::__construct($action, $payload, $sender);
         $this->addApiParams(['expand' => ['tagIDs', 'crawl']]);
     }
@@ -82,6 +82,13 @@ class DiscussionEvent extends ResourceEvent implements LoggableEventInterface, T
         );
 
         return $log;
+    }
+
+    /**
+     * @param array $statusFragment
+     */
+    public function setStatus(array $statusFragment) {
+        $this->payload['status'] = $statusFragment;
     }
 
     /**
@@ -201,5 +208,19 @@ class DiscussionEvent extends ResourceEvent implements LoggableEventInterface, T
     public function setCommentIDs(?array $commentIDs): void {
         $this->commentIDs = $commentIDs;
         $this->payload['commentIDs'] = $commentIDs;
+    }
+
+    /**
+     * @return int
+     */
+    public function getInsertUserID(): int {
+        return $this->payload['discussion']['insertUserID'];
+    }
+
+    /**
+     * @return int
+     */
+    public function getStatusID(): int {
+        return $this->payload['discussion']['statusID'] ?? 0;
     }
 }

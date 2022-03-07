@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPLv2
  */
 
@@ -144,7 +144,7 @@ class ReactionsTest extends AbstractResourceTest {
      * {@inheritdoc}
      * @requires function ReactionsApiController::post
      */
-    public function testEditFormatCompat($record = null, array $extra = []) {
+    public function testEditFormatCompat($editSuffix = '') {
         $this->fail(__METHOD__.' needs to be implemented.');
     }
 

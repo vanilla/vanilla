@@ -8,6 +8,8 @@
 use Garden\Container\Reference;
 use Vanilla\Community\RSSModule;
 use Vanilla\Community\SearchWidgetModule;
+use Vanilla\Dashboard\UserLeaderService;
+use Vanilla\Dashboard\UserPointsModel;
 use Vanilla\EmbeddedContent\EmbedService;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\Forum\EmbeddedContent\Factories\CommentEmbedFactory;
@@ -66,7 +68,7 @@ Gdn::getContainer()
     ->rule(QuickLinksVariableProvider::class)
     ->addCall('addQuickLinkProvider', [new Reference(ForumQuickLinksProvider::class)])
     ->rule(PermissionModel::class)
-    ->addCall('addJunctionModel', ['Category', new Reference(CategoryModel::class)]);
+    ->addCall('addJunctionModel', ['Category', new Reference(CategoryModel::class)])
 ;
 
 if (Gdn::config('Tagging.Discussions.Enabled', false)) {

@@ -4,7 +4,7 @@
  * @license gpl-2.0-only
  */
 
-import { usePlaygroundSetup, usePlaygroundSpec } from "@dashboard/layout/playground/playgroundHooks";
+import { usePlaygroundSetup, usePlaygroundSpec } from "@dashboard/layout/hooks/layoutHooks";
 import { css } from "@emotion/css";
 import { extractServerError } from "@library/apiv2";
 import { initCodeHighlighting } from "@library/content/code";

@@ -13,13 +13,18 @@ import { logError } from "@vanilla/utils";
  * required for accessibility.
  */
 export class TabHandler {
+    public static readonly NO_TABBING = "NO_TABBING";
+
     private tabbableElements: HTMLElement[];
 
     /**
      * Determine if an element is tabbable.
      */
     public static isTabbable(element: Node) {
-        const children = tabbable(element.parentNode);
+        if (!(element instanceof HTMLElement) || !element.parentElement) {
+            return false;
+        }
+        const children = TabHandler.getTabbableElements(element.parentElement);
         return children.includes(element);
     }
 
@@ -34,11 +39,30 @@ export class TabHandler {
      * @param excludedRoots - These element's children will be ignored.
      */
     public constructor(
-        root: Element = document.documentElement!,
+        private root: Element = document.documentElement!,
         private excludedElements: Element[] = [],
         private excludedRoots: Element[] = [],
     ) {
-        this.tabbableElements = tabbable(root);
+        this.tabbableElements = TabHandler.getTabbableElements(root);
+    }
+
+    /**
+     * Get tabbable elements within a parent element.
+     */
+    public static getTabbableElements(inElement: Element): HTMLElement[] {
+        const tabbables = tabbable(inElement).filter((element: HTMLElement) => {
+            if (element.tabIndex != null && element.tabIndex < 0) {
+                // Exclude things that explicitly opted out of tabindex -1
+                return false;
+            }
+
+            if (element.classList.contains(TabHandler.NO_TABBING) || element.closest(`.${TabHandler.NO_TABBING}`)) {
+                return false;
+            }
+
+            return true;
+        });
+        return tabbables;
     }
 
     /**
@@ -55,13 +79,23 @@ export class TabHandler {
         from: Element | null = document.activeElement,
         reverse: boolean = false,
         allowLooping: boolean = true,
+        withRefresh: boolean = false,
     ): HTMLElement | null {
         if (!(from instanceof HTMLElement)) {
             logError("Unable to tab to next element, `fromElement` given is not valid: ", from);
             return null;
         }
+
+        if (withRefresh) {
+            this.tabbableElements = TabHandler.getTabbableElements(this.root);
+        }
+
         const tabbables = this.tabbableElements.filter(this.createExcludeFilterWithExemption(from));
         const currentTabIndex = tabbables.indexOf(from);
+        if (currentTabIndex === -1 && !withRefresh) {
+            // We may need to refresh the tabbables.
+            return this.getNext(from, reverse, allowLooping, true);
+        }
 
         if (currentTabIndex < 0) {
             return null;

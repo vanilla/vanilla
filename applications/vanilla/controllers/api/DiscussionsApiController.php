@@ -526,7 +526,13 @@ class DiscussionsApiController extends AbstractApiController {
 
         $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $row['CategoryID']);
 
-        $this->userModel->expandUsers($row, ['insertUser' => 'InsertUserID', 'lastUser' => 'LastUserID']);
+        $this->userModel->expandUsers(
+            $row,
+            $this->resolveExpandFields(
+                $query,
+                ['insertUser' => 'InsertUserID', 'lastUser' => 'LastUserID']
+            )
+        );
         $this->discussionExpandSchema->commonExpand($row, $query['expand'] ?? []);
         $row = $this->normalizeOutput($row, $query["expand"]);
         $rows = [&$row];

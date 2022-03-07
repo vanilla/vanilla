@@ -146,7 +146,7 @@ class BaseDiscussionWidgetModule extends AbstractReactModule implements Limitabl
      *
      * @return string
      */
-    public function getComponentName(): string {
+    public static function getComponentName(): string {
         return "DiscussionListModule";
     }
 

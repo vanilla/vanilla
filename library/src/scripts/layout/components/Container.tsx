@@ -24,6 +24,18 @@ export interface IContainer {
 
 const containerContext = React.createContext({ hasParentContainer: false });
 
+export function ContainerContextReset(props: { children: React.ReactNode }) {
+    return (
+        <containerContext.Provider
+            value={{
+                hasParentContainer: false,
+            }}
+        >
+            {props.children}
+        </containerContext.Provider>
+    );
+}
+
 /*
  * Implements "Container" component used to set max width of content of page.
  */

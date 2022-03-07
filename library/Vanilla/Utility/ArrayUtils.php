@@ -417,6 +417,44 @@ final class ArrayUtils {
         return $arr;
     }
 
+
+    /**
+     * Recursively flatten a nested array into a single-dimension array.
+     *
+     * @param string $separator The string used to separate keys.
+     * @param array $array The array to flatten.
+     * @param bool $stopOnSequentialArrayValues Stop flattening when a sequential array value is met, or not.
+     * @return array Returns the flattened array.
+     */
+    public static function flattenArray(string $separator, array $array, bool $stopOnSequentialArrayValues = false): array {
+        $result = [];
+
+        $fn = function ($array, $previousLevel = null) use ($separator, &$fn, &$result, $stopOnSequentialArrayValues) {
+            foreach ($array as $key => $value) {
+                $currentLevel = $previousLevel ? "{$previousLevel}{$separator}{$key}" : $key;
+
+                if (is_object($value)) {
+                    $value = (array)$value;
+                }
+                if (is_array($value)) {
+                    if ($stopOnSequentialArrayValues && !self::isAssociative($value)) {
+                        $result[$currentLevel] = $value;
+                    } else {
+                        $fn($value, $currentLevel);
+                    }
+                } else {
+                    $result[$currentLevel] = $value;
+                }
+            }
+        };
+
+        $fn($array);
+
+        return $result;
+    }
+
+
+
     /**
      * Return a function that can be used to sort a dataset by one or more keys.
      *

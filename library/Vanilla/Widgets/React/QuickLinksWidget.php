@@ -10,6 +10,8 @@ namespace Vanilla\Widgets\React;
 use Garden\Schema\Schema;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
+use Vanilla\Layout\Section\SectionThreeColumns;
+use Vanilla\Layout\Section\SectionTwoColumns;
 use Vanilla\Navigation\NavLinkSchema;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Web\JsInterpop\AbstractReactModule;
@@ -18,7 +20,7 @@ use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
 /**
  * Class QuickLinksWidget
  */
-class QuickLinksWidget extends AbstractReactModule implements CombinedPropsWidgetInterface {
+class QuickLinksWidget extends AbstractReactModule implements CombinedPropsWidgetInterface, SectionAwareInterface {
 
     use CombinedPropsWidgetTrait;
     use HomeWidgetContainerSchemaTrait;
@@ -26,7 +28,7 @@ class QuickLinksWidget extends AbstractReactModule implements CombinedPropsWidge
     /**
      * @inheritDoc
      */
-    public function getComponentName(): string {
+    public static function getComponentName(): string {
         return "QuickLinks";
     }
 
@@ -42,6 +44,16 @@ class QuickLinksWidget extends AbstractReactModule implements CombinedPropsWidge
      */
     public static function getWidgetID(): string {
         return "quick-links";
+    }
+
+    /**
+     * @return array
+     */
+    public static function getRecommendedSectionIDs(): array {
+        return [
+            SectionTwoColumns::getWidgetID(),
+            SectionThreeColumns::getWidgetID(),
+        ];
     }
 
     /**

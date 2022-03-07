@@ -67,7 +67,7 @@ class MockWidget1 extends AbstractWidgetModule {
     /**
      * @return string
      */
-    public function getComponentName(): string {
+    public static function getComponentName(): string {
         return "mock-widget";
     }
 

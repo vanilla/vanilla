@@ -5,14 +5,16 @@
 
 import { panelAreaClasses } from "@library/layout/panelAreaStyles";
 import classNames from "classnames";
-import React from "react";
+import React, { useContext } from "react";
 import { panelBackgroundVariables } from "@library/layout/PanelBackground.variables";
 import { useSection, withSection } from "@library/layout/LayoutContext";
 import { ILayoutContainer } from "@library/layout/components/interface.layoutContainer";
+import { SectionBehaviourContext } from "@library/layout/SectionBehaviourContext";
 
 export function PanelOverflow(
     props: ILayoutContainer & { offset: number; isLeft?: boolean; renderLeftPanelBackground?: boolean },
 ) {
+    const { useMinHeight } = useContext(SectionBehaviourContext);
     const classes = panelAreaClasses(useSection().mediaQueries);
     const panelVars = panelBackgroundVariables();
     const color =
@@ -22,7 +24,10 @@ export function PanelOverflow(
     return (
         <div className={classes.areaOverlay}>
             <div className={classes.areaOverlayBefore(color, "left")} />
-            <div ref={props.innerRef} className={classNames(props.className, classes.overflowFull(props.offset))}>
+            <div
+                ref={props.innerRef}
+                className={classNames(props.className, classes.overflowFull(props.offset, useMinHeight))}
+            >
                 {props.children}
             </div>
             <div className={classes.areaOverlayAfter(color, "right")} />

@@ -48,6 +48,7 @@ export default React.forwardRef(function SmartLink(props: ISmartLinkProps, ref: 
     }
 
     const href = context.makeHref(props.to);
+    const tabIndex = context.areLinksDisabled ? -1 : props.tabIndex ?? 0;
     if (context.isDynamicNavigation(href)) {
         return (
             <NavLink
@@ -55,7 +56,7 @@ export default React.forwardRef(function SmartLink(props: ISmartLinkProps, ref: 
                 {...passthru}
                 innerRef={ref}
                 to={makeLocationDescriptorObject(props.to, href)}
-                tabIndex={props.tabIndex ? props.tabIndex : 0}
+                tabIndex={tabIndex}
                 replace={replace}
             />
         );
@@ -66,10 +67,10 @@ export default React.forwardRef(function SmartLink(props: ISmartLinkProps, ref: 
                 aria-current={active ? "page" : false}
                 ref={ref}
                 href={sanitizeUrl(href)}
-                tabIndex={props.tabIndex ? props.tabIndex : 0}
                 target={isForeign ? "_blank" : undefined}
                 rel={isForeign ? "noopener noreferrer" : props.rel}
                 {...passthru}
+                tabIndex={tabIndex}
             />
         );
     }

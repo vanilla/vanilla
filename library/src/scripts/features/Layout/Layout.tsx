@@ -4,12 +4,17 @@
  * @license Proprietary
  */
 
+import { layoutEditorContextProvider } from "@dashboard/appearance/components/LayoutEditorContextProvider";
 import LayoutErrorBoundary, { LayoutError } from "@library/features/Layout/LayoutErrorBoundary";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
-import { useSection } from "@library/layout/LayoutContext";
+import { SectionBehaviourContext } from "@library/layout/SectionBehaviourContext";
+import { WidgetLayout } from "@library/layout/WidgetLayout";
 import { getComponent, IRegisteredComponent } from "@library/utility/componentRegistry";
-import { logDebug, RecordID } from "@vanilla/utils";
-import React from "react";
+import { logDebug } from "@vanilla/utils";
+import React, { useContext } from "react";
+
+export type IComponentFetcher = (name: string) => IRegisteredComponent | null;
+export type FallbackLayoutWidget = React.ComponentType<IDynamicComponent>;
 
 export interface IDynamicComponent {
     $middleware?: {
@@ -28,25 +33,59 @@ export interface ILayout {
     layout: IDynamicComponent[];
 }
 
+interface IProps extends ILayout {
+    applyContexts?: boolean;
+    layoutRef?: React.Ref<HTMLDivElement>;
+    onKeyDown?: (e) => void;
+    fallbackWidget?: FallbackLayoutWidget;
+    componentFetcher?: IComponentFetcher;
+    editorDecorator?: (i) => JSX.Element;
+}
+
 /**
  * This component will render all registered components from the schema passed in the layout prop
  */
-export function Layout(props: ILayout): React.ReactElement {
-    return (
-        <LayoutErrorBoundary>
+export function Layout(props: IProps): React.ReactElement {
+    let content = (
+        <div ref={props.layoutRef}>
             <LayoutImpl {...props} />
-        </LayoutErrorBoundary>
+        </div>
     );
+    if (props.applyContexts ?? true) {
+        content = (
+            <SectionBehaviourContext.Provider value={{ autoWrap: true, useMinHeight: false }}>
+                <WidgetLayout>{content}</WidgetLayout>
+            </SectionBehaviourContext.Provider>
+        );
+    }
+    return <LayoutErrorBoundary>{content}</LayoutErrorBoundary>;
 }
 
-function LayoutImpl(props: ILayout) {
-    const { layout } = props;
+function LayoutImpl(props: IProps) {
+    const { layout, editorDecorator } = props;
     const device = useDevice();
     const layoutDevice = [Devices.XS, Devices.MOBILE].includes(device) ? LayoutDevice.MOBILE : LayoutDevice.DESKTOP;
+    const layoutRenderContext: ILayoutRenderContext = {
+        device: layoutDevice,
+        componentFetcher: props.componentFetcher,
+        fallbackWidget: props.fallbackWidget,
+    };
+    const { isEditMode } = useContext(layoutEditorContextProvider);
+
+    if (isEditMode && editorDecorator && layout.length === 0) {
+        return editorDecorator(0);
+    }
+
     return (
         <>
             {layout.map((componentConfig, index) => {
-                return resolveDynamicComponent(componentConfig, { device: layoutDevice }, index);
+                return (
+                    <React.Fragment key={index}>
+                        {isEditMode && editorDecorator && editorDecorator(index)}
+                        {resolveDynamicComponent(componentConfig, layoutRenderContext, index)}
+                        {isEditMode && index === layout.length - 1 && editorDecorator && editorDecorator(layout.length)}
+                    </React.Fragment>
+                );
             })}
         </>
     );
@@ -59,6 +98,8 @@ export enum LayoutDevice {
 }
 interface ILayoutRenderContext {
     device: LayoutDevice;
+    fallbackWidget?: React.ComponentType<any>;
+    componentFetcher?: (name: string) => IRegisteredComponent | null;
 }
 
 /**
@@ -67,11 +108,12 @@ interface ILayoutRenderContext {
 function resolveDynamicComponent(
     componentConfig: IDynamicComponent,
     context: ILayoutRenderContext,
-    key?: RecordID,
+    reactKey?: React.Key,
 ): React.ReactNode {
+    const componentFetcher = context.componentFetcher ?? getComponent;
     // Get the component from the registry
     const registeredComponent: IRegisteredComponent | null =
-        getComponent(componentConfig?.$reactComponent ?? "") ?? null;
+        componentFetcher(componentConfig?.$reactComponent ?? "") ?? null;
 
     // If the component is not found, warn the developer
     !registeredComponent &&
@@ -81,6 +123,8 @@ function resolveDynamicComponent(
             }" cannot be found in the component registry`,
         );
 
+    const key = (componentConfig?.$reactProps?.key || reactKey) ?? null;
+
     // Backend middleware allows specifying this device property on all nodes.
     const componentDevice = componentConfig?.$middleware?.visibility?.device;
     if (componentDevice && componentDevice !== LayoutDevice.ALL && componentDevice !== context.device) {
@@ -88,17 +132,25 @@ function resolveDynamicComponent(
         // It was not "all".
         // That device is different than the current device we determined during rendering.
         // Don't render the component.
-        return <React.Fragment key={key} />;
+        return <React.Fragment />;
     }
 
     // Return an error boundary wrapped component
     if (registeredComponent) {
-        return React.createElement(LayoutErrorBoundary, { key: (componentConfig.$reactProps?.key || key) ?? null }, [
+        return React.createElement(LayoutErrorBoundary, { key }, [
             React.createElement(registeredComponent.Component, {
                 ...resolveNestedComponents(componentConfig.$reactProps, context),
                 key: key,
             }),
         ]);
+    }
+
+    if (context.fallbackWidget) {
+        return React.createElement(
+            context.fallbackWidget,
+            { ...(componentConfig ?? {}), ...(componentConfig.$reactProps ?? {}), key },
+            [],
+        );
     }
 
     return React.createElement(LayoutError, { componentName: componentConfig?.$reactComponent, key });
@@ -111,7 +163,7 @@ function resolveDynamicComponent(
 function resolveNestedComponents(
     componentProps: IDynamicComponent["$reactProps"],
     context: ILayoutRenderContext,
-    key?: RecordID,
+    key?: React.Key,
 ) {
     if (componentProps !== null && typeof componentProps === "object") {
         // If props is not an object and we know its not a config

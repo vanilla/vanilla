@@ -38,16 +38,6 @@ class DashboardPage extends ThemedPage {
         /** @var DashboardPreloadProvider $dashboardProvider */
         $dashboardProvider = \Gdn::getContainer()->get(DashboardPreloadProvider::class);
         $this->registerReduxActionProvider($dashboardProvider);
-        $this->registerReduxActionProvider($this->themeProvider);
-
-        // HTML handling
-        $this->headerHtml = $this->themeProvider->getThemeHeaderHtml();
-        $this->footerHtml = $this->themeProvider->getThemeFooterHtml();
-
-        // Add the theme's script asset if it exists.
-        $script = $this->themeProvider->getThemeScript();
-        if ($script !== null) {
-            $this->addScript($script);
-        }
+        parent::initAssets();
     }
 }

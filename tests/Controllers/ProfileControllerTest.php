@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -421,7 +421,8 @@ class ProfileControllerTest extends SiteTestCase {
                 $this->assertStringContainsString('The password you entered was incorrect', $ex->getMessage());
             }
 
-            $this->bessy()->postBack(['AuthenticatePassword' => 'test']);
+            // See password value as set in SiteTestTrait's createUserFixture() function.
+            $this->bessy()->postBack(['AuthenticatePassword' => 'test15!AVeryS3cUR3pa55W0rd']);
         } else {
             $page->assertNoFormInput('AuthenticatePassword');
         }
@@ -482,7 +483,8 @@ class ProfileControllerTest extends SiteTestCase {
     public function testReauthenticateDifferentPasswordHash(): void {
         $userID = $this->createUserFixture(self::ROLE_MEMBER);
         $pw = new VbulletinPassword();
-        $hash = $pw->hash('test');
+        // See password value as set in SiteTestTrait's createUserFixture() function.
+        $hash = $pw->hash('test15!AVeryS3cUR3pa55W0rd');
         $this->userModel->setField($userID, ['Password' => $hash, 'HashMethod' => 'vbulletin']);
 
         $this->getSession()->start($userID);

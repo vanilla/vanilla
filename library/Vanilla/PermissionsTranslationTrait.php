@@ -105,7 +105,7 @@ trait PermissionsTranslationTrait {
         'conversations.email' => 'Email.Conversations.Add',
         'discussions.email' => 'Email.Discussions.Add',
         'community.moderate' => 'Garden.Moderation.Manage',
-        'noAds.use' => 'Garden.NoAds.Allow',
+        'noads.use' => 'Garden.NoAds.Allow',
         'site.manage' => 'Garden.Settings.Manage',
         'applicants.manage' => 'Garden.Users.Approve',
         'groups.add' => 'Groups.Group.Add',

@@ -18,13 +18,14 @@ use Vanilla\Dashboard\Layout\View\LegacyRegistrationLayoutView;
 use Vanilla\Dashboard\Layout\View\LegacySigninLayoutView;
 use Vanilla\Dashboard\Controllers\Pages\AppearancePageController;
 use Vanilla\Dashboard\Controllers\Pages\HomePageController;
-use Vanilla\Dashboard\Models\ModerationMessageStructure;
+use Vanilla\Dashboard\Models\ModerationMessagesFilterOpenApi;
 use Vanilla\Dashboard\Models\UserSiteTotalProvider;
 use Vanilla\Layout\LayoutService;
-use Vanilla\Layout\Middleware\LayoutRoleFilterMiddleware;
+use Vanilla\Layout\Middleware\LayoutPermissionFilterMiddleware;
 use Vanilla\Layout\LayoutHydrator;
 use Vanilla\Models\SiteTotalService;
 use Vanilla\OpenAPIBuilder;
+use Vanilla\Web\APIExpandMiddleware;
 
 /**
  * Container rules for the dashboard.
@@ -38,7 +39,7 @@ class DashboardContainerRules extends AddonContainerRules {
         PageControllerRoute::configurePageRoutes($container, [
             '/settings/layout' => LayoutSettingsPageController::class,
             '/appearance' => AppearancePageController::class,
-        ]);
+        ], null, -1);
 
         PageControllerRoute::configurePageRoutes($container, [
             '/' => HomePageController::class,
@@ -57,6 +58,27 @@ class DashboardContainerRules extends AddonContainerRules {
             ->addCall("addFilter", ["filter" => new Reference(SiteTotalsFilterOpenApi::class)]);
 
         $container->rule(LayoutHydrator::class)
-            ->addCall("addMiddleware", [new Reference(LayoutRoleFilterMiddleware::class)]);
+            ->addCall("addMiddleware", [new Reference(LayoutPermissionFilterMiddleware::class)]);
+
+        $container->rule(APIExpandMiddleware::class)
+            ->addCall(
+                "addExpandField",
+                [
+                    'users',
+                    [
+                        "firstInsertUser" => "firstInsertUserID",
+                        "insertUser" => "insertUserID",
+                        "lastInsertUser" => "lastInsertUserID",
+                        "lastPost.insertUser" => "lastPost.insertUserID",
+                        "lastUser" => "lastUserID",
+                        "updateUser" => "updateUserID",
+                        "user" => "userID",
+                    ],
+                    new Reference(UsersExpander::class)
+                ]
+            );
+
+        $container->rule(OpenAPIBuilder::class)
+            ->addCall("addFilter", [new Reference(ModerationMessagesFilterOpenApi::class)]);
     }
 }

@@ -87,7 +87,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             ->addCall(
                 "addExpandField",
                 [
-                    self::FIELD_EXTENDED,
+                    'users.extended',
                     [
                         "firstInsertUser.extended" => "firstInsertUserID",
                         "insertUser.extended" => "insertUserID",

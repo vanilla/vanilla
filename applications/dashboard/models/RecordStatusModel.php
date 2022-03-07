@@ -23,6 +23,7 @@ class RecordStatusModel extends PipelineModel {
     //region Properties
     private const TABLE_NAME = "recordStatus";
 
+    public const DISCUSSION_STATUS_NONE = 0;
     public const DISCUSSION_STATUS_UNANSWERED = 1;
     public const DISCUSSION_STATUS_ANSWERED = 2;
     public const DISCUSSION_STATUS_ACCEPTED = 3;
@@ -34,6 +35,7 @@ class RecordStatusModel extends PipelineModel {
 
     /** @var array $systemDefinedIDs */
     public static $systemDefinedIDs = [
+        RecordStatusModel::DISCUSSION_STATUS_NONE,
         RecordStatusModel::DISCUSSION_STATUS_UNANSWERED,
         RecordStatusModel::DISCUSSION_STATUS_ANSWERED,
         RecordStatusModel::DISCUSSION_STATUS_ACCEPTED,
@@ -42,6 +44,17 @@ class RecordStatusModel extends PipelineModel {
         RecordStatusModel::COMMENT_STATUS_REJECTED,
         RecordStatusModel::DISCUSSION_STATUS_UNRESOLVED,
         RecordStatusModel::DISCUSSION_STATUS_RESOLVED,
+    ];
+
+    /** @var array */
+    private const DEFAULT_DISCUSSION_STATUS = [
+        'statusID' => RecordStatusModel::DISCUSSION_STATUS_NONE,
+        'name' => 'None',
+        'state' => 'open',
+        'recordType' => 'discussion',
+        'recordSubtype' => 'discussion',
+        'isDefault' => 1,
+        'isSystem' => 1
     ];
 
     /** @var array */
@@ -127,6 +140,7 @@ class RecordStatusModel extends PipelineModel {
 
     /** @var array[] DEFAULT_STATUSES */
     protected const DEFAULT_STATUSES = [
+        self::DEFAULT_DISCUSSION_STATUS,
         self::DEFAULT_QUESTION_UNANSWERED_STATUS,
         self::DEFAULT_QUESTION_ANSWERED_STATUS,
         self::DEFAULT_QUESTION_ACCEPTED_STATUS,
@@ -405,7 +419,10 @@ class RecordStatusModel extends PipelineModel {
         if ($dataSet->numRows() == 0) {
             // Add the default statuses if they're not already there.
             $default = array_merge($default, $defaultInsertProps);
-            $database->sql()->insert('recordStatus', $default);
+            // Some default statuses have an ID of 0 and need this mode set.
+            $database->runWithSqlMode([\Gdn_Database::SQL_MODE_NO_AUTO_VALUE_ZERO], function () use ($default, $database) {
+                $database->sql()->insert('recordStatus', $default);
+            });
         } else {
             // Ensure the row matches this definition
             $row = array_intersect_key($dataSet->firstRow(DATASET_TYPE_ARRAY), $default);

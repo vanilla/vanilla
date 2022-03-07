@@ -7,6 +7,11 @@
 
 namespace VanillaTests\Layout;
 
+use Garden\Web\RequestInterface;
+use Vanilla\AddonManager;
+use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Theme\ThemeService;
+use Vanilla\Web\Asset\WebpackAssetProvider;
 use VanillaTests\BootstrapTestCase;
 use VanillaTests\SiteTestTrait;
 
@@ -59,6 +64,32 @@ class LayoutHydratorTest extends BootstrapTestCase {
     }
 
     /**
+     * Test that getAssetLayout returns a list of assets.
+     *
+     */
+    public function testGetAssetLayout() {
+        $leaderboard = ["layout" => [
+                        [  "rightBottom" => [
+                            [
+                                '$hydrate'=> "react.leaderboard",
+                                "title"=> "Community Leaders",
+                                "apiParams" => [
+                                    "slotType" => "a"
+                                ]
+                            ]]
+                        ]
+                    ]];
+        $this->mockWebPackAsset();
+        $expected = "LeaderboardWidget";
+        $actual = self::getLayoutService()->getAssetLayout('home', [], $leaderboard);
+        // Make sure we see it as the API output would.
+        $this->assertArrayHasKey('js', $actual);
+        $this->assertArrayHasKey('css', $actual);
+        $this->assertGreaterThan(0, count($actual['js']));
+        $this->assertStringContainsString($expected, $actual['js'][0]);
+    }
+
+    /**
      * @return iterable
      */
     public function provideLayoutHydratesTo(): iterable {
@@ -91,16 +122,15 @@ class LayoutHydratorTest extends BootstrapTestCase {
             [
                 "layout" => [[
                     '$hydrate' => "react.section.1-column",
-                    "contents" => [
+                    "children" => [
                         $breadcrumbDefinition,
                     ],
-                    'autoWrap' => true,
                 ]]
             ],
             [   'layout' => [[
                     '$reactComponent' => 'SectionOneColumn',
                     '$reactProps' => [
-                        'contents' => [[
+                        'children' => [[
                             '$reactComponent' => 'LayoutError',
                             '$reactProps' => [
                                 'layoutDefinition' => $breadcrumbDefinition,
@@ -117,7 +147,6 @@ class LayoutHydratorTest extends BootstrapTestCase {
                             ],
                         ]],
                         'isNarrow' => false,
-                        'autoWrap' => true,
                     ],
                 ]]
             ],
@@ -154,7 +183,7 @@ class LayoutHydratorTest extends BootstrapTestCase {
         yield "Component with null props is removed" => [
             [
                 '$hydrate' => "react.section.1-column",
-                "contents" => [[
+                "children" => [[
                     '$hydrate' => 'react.asset.breadcrumbs',
                     // When we don't have a recordID, breadcrumbs don't render.
                     'recordID' => null,
@@ -164,9 +193,8 @@ class LayoutHydratorTest extends BootstrapTestCase {
             [
                 '$reactComponent' => "SectionOneColumn",
                 '$reactProps' => [
-                    "contents" => [],
+                    "children" => [],
                     'isNarrow' => false,
-                    'autoWrap' => true,
                 ],
             ],
             [
@@ -178,7 +206,7 @@ class LayoutHydratorTest extends BootstrapTestCase {
         yield "Success hydration" => [
             [   "layout" => [
                     '$hydrate' => 'react.section.1-column',
-                    'contents' => [
+                    'children' => [
                         [
                             // Assets should be available.
                             '$hydrate' => 'react.asset.breadcrumbs',
@@ -192,7 +220,7 @@ class LayoutHydratorTest extends BootstrapTestCase {
                 'layout' => [
                     '$reactComponent' => 'SectionOneColumn',
                     '$reactProps' => [
-                        'contents' => [[
+                        'children' => [[
                             '$reactComponent' => 'Breadcrumbs',
                             '$reactProps' => [
                                 'crumbs' => [
@@ -208,11 +236,28 @@ class LayoutHydratorTest extends BootstrapTestCase {
                             ],
                         ]],
                         'isNarrow' => false,
-                        'autoWrap' => true,
                     ]
                 ]
             ],
             $jsonLD
         ];
+    }
+
+    /**
+     * Create and register MockWebpackAssetProvider
+     *
+     * @throws \Garden\Container\ContainerException Exception.
+     * @throws \Garden\Container\NotFoundException Exception.
+     */
+    public function mockWebPackAsset() {
+        $mock = new MockWebpackAssetProvider(
+            self::container()->get(RequestInterface::class),
+            self::container()->get(AddonManager::class),
+            self::container()->get(\Gdn_Session::class),
+            self::container()->get(ConfigurationInterface::class),
+            self::container()->get(ThemeService::class)
+        );
+
+        self::container()->setInstance(WebpackAssetProvider::class, $mock);
     }
 }

@@ -7,6 +7,7 @@
 import { CSSObject } from "@emotion/css";
 import { TLength } from "@library/styles/cssUtilsTypes";
 import { styleUnit } from "@library/styles/styleUnit";
+import { srOnlyMixin } from "@vanilla/ui";
 import { Property } from "csstype";
 import { important, percent, px } from "csx";
 
@@ -99,16 +100,6 @@ export const internalAbsoluteMixins = {
         };
     },
     srOnly: (): CSSObject => {
-        return {
-            position: important("absolute"),
-            display: important("block"),
-            width: important(px(1).toString()),
-            height: important(px(1).toString()),
-            padding: important(px(0).toString()),
-            margin: important(px(-1).toString()),
-            overflow: important("hidden"),
-            clip: important(`rect(0, 0, 0, 0)`),
-            border: important(px(0).toString()),
-        };
+        return srOnlyMixin();
     },
 };

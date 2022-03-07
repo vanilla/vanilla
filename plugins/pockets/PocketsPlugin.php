@@ -844,11 +844,6 @@ class PocketsPlugin extends Gdn_Plugin {
             ->column('TestMode', 'tinyint', '0')
             ->column('Type', [Pocket::TYPE_DEFAULT, Pocket::TYPE_AD], Pocket::TYPE_DEFAULT)
             ->set();
-
-        $PermissionModel = Gdn::permissionModel();
-        $PermissionModel->define([
-            'Garden.NoAds.Allow' => 0
-        ]);
     }
 
     /**

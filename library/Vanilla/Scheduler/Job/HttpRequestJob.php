@@ -151,6 +151,37 @@ class HttpRequestJob implements LocalJobInterface {
     }
 
     /**
+     * Add some default fields for Feedback Job schema
+     *
+     * @return Schema
+     */
+    public static function getFeedbackSchema(): Schema {
+        return Schema::parse([
+            "requestHeaders" => [
+                "type" => "string",
+            ],
+            "requestBody" => [
+                "type" => "string",
+            ],
+            "requestDuration" => [
+                "allowNull" => true,
+                "type" => "integer",
+            ],
+            "responseHeaders" => [
+                "type" => "string",
+            ],
+            "responseBody" => [
+                "allowNull" => true,
+                "type" => "string",
+            ],
+            "responseCode" => [
+                "allowNull" => true,
+                "type" => "integer",
+            ],
+        ]);
+    }
+
+    /**
      * Set the request body.
      *
      * @param string $body

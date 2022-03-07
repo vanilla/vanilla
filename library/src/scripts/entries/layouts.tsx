@@ -15,7 +15,7 @@ import ThreeColumnSection from "@library/layout/ThreeColumnSection";
 import TwoColumnSection from "@library/layout/TwoColumnSection";
 import Breadcrumbs from "@library/navigation/Breadcrumbs";
 import { Router } from "@library/Router";
-import { addPageComponent, registerWidgets } from "@library/utility/componentRegistry";
+import { addPageComponent, registerWidgets, registerLoadableWidgets } from "@library/utility/componentRegistry";
 import { applySharedPortalContext } from "@vanilla/react-utils";
 import { registerReducer } from "@library/redux/reducerRegistry";
 import { layoutSlice } from "@library/features/Layout/LayoutPage.slice";
@@ -24,7 +24,6 @@ import { Backgrounds } from "@library/layout/Backgrounds";
 // Theming Reset
 import "@library/theming/reset";
 import { QuickLinks } from "@library/navigation/QuickLinks";
-import { LeaderboardWidget } from "@library/leaderboardWidget/LeaderboardWidget";
 import { DiscussionListModule } from "@library/features/discussions/DiscussionListModule";
 import { CategoriesWidget } from "@library/widgets/CategoriesWidget";
 import { SectionOneColumn } from "@library/layout/SectionOneColumn";
@@ -72,13 +71,17 @@ registerWidgets({
     HtmlWidget,
     QuickLinks,
     CategoriesWidget,
-    LeaderboardWidget,
     DiscussionListModule,
     TagWidget,
     RSSWidget,
     UserSpotlightWidget,
     ArticleArticlesWidget,
     Banner,
+});
+
+registerLoadableWidgets({
+    LeaderboardWidget: () =>
+        import(/* webpackChunkName: "widgets/LeaderboardWidget" */ "@library/leaderboardWidget/LeaderboardWidget"),
 });
 
 // Reducers

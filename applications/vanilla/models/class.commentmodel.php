@@ -1417,10 +1417,10 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
      *
      * @param array $row
      * @param string $action
-     * @param array $sender
+     * @param array|object|null $sender
      * @return CommentEvent
      */
-    public function eventFromRow(array $row, string $action, ?array $sender = null): ResourceEvent {
+    public function eventFromRow(array $row, string $action, $sender = null): ResourceEvent {
         $this->userModel->expandUsers($row, ["InsertUserID"]);
         $row = $this->addDiscussionData($row);
         $comment = $this->normalizeRow($row);

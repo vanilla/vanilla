@@ -7,7 +7,8 @@
 namespace Vanilla\Forum\Widgets;
 
 use Garden\Schema\Schema;
-use Vanilla\Models\DiscussionJsonLD;
+use Vanilla\Layout\Section\SectionOneColumn;
+use Vanilla\Layout\Section\SectionTwoColumns;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Web\JsInterpop\AbstractReactModule;
@@ -15,11 +16,12 @@ use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
 use Vanilla\Widgets\WidgetSchemaTrait;
 use Vanilla\Widgets\React\CombinedPropsWidgetInterface;
 use Vanilla\Widgets\React\CombinedPropsWidgetTrait;
+use Vanilla\Widgets\React\SectionAwareInterface;
 
 /**
  * Class CategoriesWidget
  */
-class CategoriesWidget extends AbstractReactModule implements CombinedPropsWidgetInterface {
+class CategoriesWidget extends AbstractReactModule implements CombinedPropsWidgetInterface, SectionAwareInterface {
 
     use CombinedPropsWidgetTrait;
     use HomeWidgetContainerSchemaTrait;
@@ -44,24 +46,34 @@ class CategoriesWidget extends AbstractReactModule implements CombinedPropsWidge
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getWidgetID(): string {
         return "categories";
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getWidgetName(): string {
         return "Categories";
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
-    public function getComponentName(): string {
+    public static function getComponentName(): string {
         return "CategoriesWidget";
+    }
+
+    /**
+     * @return array
+     */
+    public static function getRecommendedSectionIDs(): array {
+        return [
+            SectionOneColumn::getWidgetID(),
+            SectionTwoColumns::getWidgetID(),
+        ];
     }
 
     /**
@@ -144,9 +156,8 @@ class CategoriesWidget extends AbstractReactModule implements CombinedPropsWidge
         return $apiSchema;
     }
 
-
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getWidgetSchema(): Schema {
         $schema = SchemaUtils::composeSchemas(

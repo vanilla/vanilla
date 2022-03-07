@@ -21,8 +21,12 @@ use VanillaTests\UsersAndRolesApiTestTrait;
  * Test the /api/v2/users endpoints.
  */
 class UsersTest extends AbstractResourceTest {
-    use TestPutFieldTrait, AssertLoggingTrait, TestPrimaryKeyRangeFilterTrait, TestSortingTrait,
-        TestFilterDirtyRecordsTrait, UsersAndRolesApiTestTrait;
+    use TestPutFieldTrait;
+    use AssertLoggingTrait;
+    use TestPrimaryKeyRangeFilterTrait;
+    use TestSortingTrait;
+    use TestFilterDirtyRecordsTrait;
+    use UsersAndRolesApiTestTrait;
 
     /** @var int A value to ensure new records are unique. */
     protected static $recordCounter = 1;

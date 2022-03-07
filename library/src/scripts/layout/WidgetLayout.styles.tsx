@@ -27,7 +27,7 @@ export const widgetLayoutClasses = useThemeCache(() => {
     };
     const widget = css(widgetMixin);
 
-    const widgetWithContainerMixin = css({
+    const widgetWithContainerMixin: CSSObject = {
         clear: "both", // Some old themes have weird floating elements.
         ...Mixins.padding({
             vertical: globalVars.spacer.pageComponent,
@@ -37,7 +37,7 @@ export const widgetLayoutClasses = useThemeCache(() => {
                 vertical: globalVars.spacer.pageComponentCompact,
             }),
         }),
-    });
+    };
     const widgetWithContainer = css(widgetWithContainerMixin);
 
     const headingBlock = css({

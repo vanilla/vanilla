@@ -219,6 +219,8 @@ trait WidgetSchemaTrait {
         return Schema::parse([
             'limit?' => [
                 'type' => 'integer',
+                'description' => t('Desired number of items.'),
+                'minimum' => 1,
                 'default' => 10,
                 'x-control' => DiscussionsApiIndexSchema::getLimitFormOptions(),
             ]

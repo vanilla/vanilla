@@ -10,7 +10,7 @@
  *  1.2.15  Add section 508 fixes.
  *  1.4.0   Add support for merging users' reactions.
  *
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -147,7 +147,7 @@ class ReactionsPlugin extends Gdn_Plugin {
     /**
      * Add mapper methods.
      *
-     * @param SimpleApiPlugin $sender
+     * @param SimpleAPIPlugin $sender
      */
     public function simpleApiPlugin_mapper_handler($sender) {
         switch ($sender->Mapper->Version) {
@@ -1019,7 +1019,7 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param string|int $userReference A username or userid.
      * @param string $username
      * @param string $reaction Which reaction is selected.
-     * @param int $page What page to show. Defaults to 1.
+     * @param int|string $page What page to show. Defaults to 1.
      */
     public function profileController_reactions_create($sender, $userReference, $username = '', $reaction = '', $page = '') {
         $sender->permission('Garden.Profiles.View');

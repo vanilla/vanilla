@@ -235,8 +235,6 @@ class ApplicantsApiController extends AbstractApiController {
 
         $body = $in->validate($body);
 
-        $this->userModel->validatePasswordStrength($body['password'], $body['name']);
-
         $userData = ApiUtils::convertInputKeys($body);
         $userID = $this->userModel->register($userData);
         $this->validateModel($this->userModel);

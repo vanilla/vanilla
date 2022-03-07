@@ -24,12 +24,15 @@ use Vanilla\Contracts\Formatting\FormatFieldInterface;
 use Vanilla\Contracts\Models\CrawlableInterface;
 use Vanilla\Contracts\Models\FragmentFetcherInterface;
 use Vanilla\CurrentTimeStamp as DiscussionTimeStamp;
+use Vanilla\Dashboard\Models\RecordStatusModel;
 use Vanilla\Events\LegacyDirtyRecordTrait;
+use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Formatting\DateTimeFormatter;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\FormatFieldTrait;
 use Vanilla\Formatting\UpdateMediaTrait;
+use Vanilla\Logging\ErrorLogger;
 use Vanilla\Scheduler\LongRunner;
 use Vanilla\Scheduler\LongRunnerFailedID;
 use Vanilla\Scheduler\LongRunnerItemResultInterface;
@@ -2380,8 +2383,10 @@ class DiscussionModel extends Gdn_Model implements
      * @param int $rowID
      * @param string|array $property
      * @param mixed $value
+     * @param bool $isPostInsert Set this if we are just doing some modification after the initial insert.
+     * In that case we don't want to fire any update events.
      */
-    public function setField($rowID, $property, $value = false) {
+    public function setField($rowID, $property, $value = false, bool $isPostInsert = false) {
         if (!is_array($property)) {
             $property = [$property => $value];
         }
@@ -2389,19 +2394,15 @@ class DiscussionModel extends Gdn_Model implements
         $this->EventArguments['DiscussionID'] = $rowID;
         $this->EventArguments['SetField'] = $property;
 
+        // Grab the existing row for comparison.
         if (isset($property['statusID'])) {
-            $row = $this->getID($rowID, DATASET_TYPE_ARRAY);
-            if (!empty($row) && $row['statusID'] != $property['statusID']) {
-                $statusEvent = new \Vanilla\Community\Events\DiscussionStatusEvent(
-                    $rowID,
-                    $property['statusID'],
-                    $row['statusID']
-                );
-            }
+            $existingRow = $this->getID($rowID, DATASET_TYPE_ARRAY);
         }
 
-        $this->addDirtyRecord('discussion', $rowID);
         parent::setField($rowID, $property, $value);
+        if (!$isPostInsert) {
+            $this->addDirtyRecord('discussion', $rowID);
+        }
 
         if (isset($property['Score']) || isset($property['CountComments'])) {
             $px = $this->Database->DatabasePrefix;
@@ -2412,10 +2413,63 @@ class DiscussionModel extends Gdn_Model implements
 SQL;
             $this->Database->query($sql, [":discussionID" => $rowID]);
         }
-        if (isset($statusEvent)) {
-            $this->getEventManager()->dispatch($statusEvent);
+
+        if (isset($property['statusID'])) {
+            if (!empty($existingRow) && $existingRow['statusID'] != $property['statusID']) {
+                $statusEvent = new \Vanilla\Community\Events\DiscussionStatusEvent(
+                    $rowID,
+                    $property['statusID'],
+                    $existingRow['statusID']
+                );
+                $this->getEventManager()->dispatch($statusEvent);
+                if (!$isPostInsert) {
+                    $this->dispatchStatusChangeUpdate($rowID);
+                }
+            }
         }
+
         $this->fireEvent('AfterSetField');
+    }
+
+    /**
+     * Dispatch an update event for a discussion whose status has changed.
+     *
+     * @param int $discussionID
+     */
+    private function dispatchStatusChangeUpdate(int $discussionID) {
+        // Fetch the row again.
+        $newRow = $this->getID($discussionID, DATASET_TYPE_ARRAY);
+
+        // KLUDGE: In the future this should just be an expand that gets expanded out on discussions by default.
+        $discussionEvent = $this->eventFromRow(
+            (array)$newRow,
+            DiscussionEvent::ACTION_UPDATE,
+            $this->userModel->currentFragment()
+        );
+        $this->getEventManager()->dispatch($discussionEvent);
+    }
+
+    /**
+     * Try to get a record status fragment.
+     *
+     * @param int $statusID
+     *
+     * @return array|null
+     */
+    private function tryGetStatusFragment(int $statusID): ?array {
+        try {
+            $recordStatusModel = \Gdn::getContainer()->get(RecordStatusModel::class);
+            $status = $recordStatusModel->selectSingle(['statusID' => $statusID]);
+            $statusFragment = RecordStatusModel::getSchemaFragment()->validate($status);
+            return $statusFragment;
+        } catch (NoResultsException $nre) {
+            ErrorLogger::error("Discussion Status Not Found", ['recordStatus'], ['statusID' => $statusID]);
+            return null;
+        } catch (ValidationException $e) {
+            $context = ['status' => $status];
+            ErrorLogger::error("Discussion Status Validation Failure", ['recordStatus'], $context);
+            return null;
+        }
     }
 
     /**
@@ -2746,6 +2800,9 @@ SQL;
                 $this->EventArguments['DiscussionID'] = $discussionID;
                 $this->fireEvent('AfterSaveDiscussion');
 
+                // Fetch the discussion again.
+                // It may have been modified in the event handler.
+                $discussion = $this->getID($discussionID, DATASET_TYPE_ARRAY);
                 $discussionEvent = $this->eventFromRow(
                     (array)$discussion,
                     $insert ? DiscussionEvent::ACTION_INSERT : DiscussionEvent::ACTION_UPDATE,
@@ -2763,10 +2820,10 @@ SQL;
      *
      * @param array $row
      * @param string $action
-     * @param array $sender
+     * @param array|object|null $sender
      * @return DiscussionEvent
      */
-    public function eventFromRow(array $row, string $action, ?array $sender = null): ResourceEvent {
+    public function eventFromRow(array $row, string $action, $sender = null): ResourceEvent {
         $this->userModel->expandUsers($row, ["InsertUserID", "LastUserID"]);
         $this->tagModel->expandTagIDs($row);
         $discussion = $this->normalizeRow($row, true);
@@ -2782,6 +2839,10 @@ SQL;
             ["discussion" => $discussion],
             $sender
         );
+        $statusFragment = $this->tryGetStatusFragment($result->getStatusID());
+        if ($statusFragment !== null) {
+            $result->setStatus($statusFragment);
+        }
 
         return $result;
     }

@@ -44,12 +44,6 @@ class VanillaHooks extends Gdn_Plugin {
         $mf->addModel('category', CategoryModel::class, 'cat');
         $mf->addModel('discussion', DiscussionModel::class, 'd');
         $mf->addModel('comment', CommentModel::class, 'c');
-
-        $eventManager = $dic->get(\Garden\EventManager::class);
-        $eventManager->addListenerMethod(
-            \Vanilla\Community\Events\DiscussionStatusEventHandler::class,
-            "handleDiscussionStatusEvent"
-        );
     }
 
     /**

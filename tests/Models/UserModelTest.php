@@ -478,6 +478,17 @@ class UserModelTest extends SiteTestCase {
     }
 
     /**
+     * Make sure the password strength is checked on inserts.
+     */
+    public function testPasswordStrengthCheckedOnInsert(): void {
+        // Create a user with a weak password.
+        $user = $this->dummyUser(['Password' => '123']);
+        $id = $this->userModel->save($user);
+        $this->expectExceptionMessage('The password is too weak.');
+        ModelUtils::validationResultToValidationException($this->userModel, \Gdn::locale());
+    }
+
+    /**
      * Test that a welcome email was properly sent.
      */
     public function testWelcomeEmailQuery(): void {

@@ -17,6 +17,7 @@ use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Permissions;
 use Vanilla\Scheduler\LongRunnerAction;
+use Vanilla\Schema\RangeExpression;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Utility\InstanceValidatorSchema;
 use Garden\Web\Data;
@@ -50,11 +51,9 @@ class CategoriesApiController extends AbstractApiController {
     /** @var LongRunner */
     private $runner;
 
-    /** Array */
-    const OUTPUTFORMAT = ['tree', 'flat'];
-
-    /** @var int */
-    const ROOTCATEGORYID = -1;
+    public const OUTPUT_FORMAT_TREE = "tree";
+    public const OUTPUT_FORMAT_FLAT = "flat";
+    public const OUTPUT_FORMATS = [self::OUTPUT_FORMAT_TREE, self::OUTPUT_FORMAT_FLAT];
 
     /** @var string */
     const ERRORINDEXMSG = 'The following fields: {page, limit, outputFormat=flat} is incompatible with {maxDepth, outputFormat=tree}';
@@ -358,7 +357,7 @@ class CategoriesApiController extends AbstractApiController {
             'featured:b?',
             'dirtyRecords:b?',
             'outputFormat:s?' => [
-                'enum' => self::OUTPUTFORMAT,
+                'enum' => self::OUTPUT_FORMATS,
             ],
             'siteSectionID:s?' => [
                 'description' => 'Filter categories by site-section-id (subcommunity).
@@ -376,7 +375,7 @@ class CategoriesApiController extends AbstractApiController {
      * Lookup the ParentCategory.
      *
      * @param array $query
-     * @return array|int[]
+     * @return array
      * @throws NotFoundException If unable to find the category.
      */
     public function getIndexParentCategoryID(array $query): array {
@@ -402,23 +401,31 @@ class CategoriesApiController extends AbstractApiController {
      * @return string
      */
     public function getIndexFormat(array $query, array $parentCategory): string {
-        $keysValidWithTree = ['maxDepth', 'archived', 'expand', 'page', 'limit', 'dirtyRecords'];
-
         if (array_key_exists('outputFormat', $query)) {
             return $query['outputFormat'];
         }
 
+        // Check the parent category.
         if (array_key_exists('DisplayAs', $parentCategory) && $parentCategory['DisplayAs'] == 'Flat') {
             return 'flat';
         }
 
-        $keys = array_keys($query);
-        $keys = array_diff($keys, $keysValidWithTree);
+        $defaultToFlatKeys = [
+            'categoryID',
+            'dirtyRecords',
+            'page',
+            'limit',
+            'followed',
+            'featured',
+        ];
 
-        if (count($keys) > 0) {
-            return 'flat';
+        $keys = array_keys($query);
+        $flatKeysFound = array_intersect($keys, $defaultToFlatKeys);
+
+        if (count($flatKeysFound) > 0) {
+            return self::OUTPUT_FORMAT_FLAT;
         } else {
-            return 'tree';
+            return self::OUTPUT_FORMAT_TREE;
         }
     }
 
@@ -433,7 +440,7 @@ class CategoriesApiController extends AbstractApiController {
         $this->permission();
         $in = $this->getIndexSchema();
         $query = $in->validate($query);
-        $this->validateIndexQuery($query);
+        $this->checkMixedQuery($query);
 
         $expand = $query['expand'];
         $out = $this->schema([
@@ -442,20 +449,18 @@ class CategoriesApiController extends AbstractApiController {
 
         $parentCategory = $this->getIndexParentCategoryID($query);
         $format = $this->getIndexFormat($query, $parentCategory);
-        $this->categoryModel->setJoinUserCategory(true);
+        $this->categoryModel->setJoinUserCategory(false);
 
         $page = isset($query['page']) ? $query['page'] : 1;
         $limit = isset($query['limit']) ? $query['limit'] : 30;
-        $depth = isset($query['maxDepth']) ? $query['maxDepth'] : 2;
-
         [$offset, $limit] = offsetLimit("p{$page}", $limit);
+        if ($format === self::OUTPUT_FORMAT_TREE) {
+            $limit = '';
+            $page = 1;
+        }
 
         $where = [];
         $sort = '';
-
-        if ($query['followed'] ?? false) {
-            $where['Followed'] = true;
-        }
 
         if ($query['featured'] ?? false) {
             $where['Featured'] = $query['featured'] ? 1 : 0;
@@ -467,42 +472,49 @@ class CategoriesApiController extends AbstractApiController {
         }
 
         if ($format === 'tree') {
-            $where['Depth <='] = $depth;
+            $maxDepth = $query['maxDepth'] ?? 2;
+            $parentCategoryDepth = $parentCategory['Depth'] ?? 0;
+            $maxDepth = $maxDepth + $parentCategoryDepth;
+            $where['Depth <='] = $maxDepth;
         }
 
-        if (!empty($query['categoryID'])) {
-            /** @var \Vanilla\Schema\RangeExpression $range */
-            $range = $query['categoryID'];
+        /** @var RangeExpression $categoryIDs */
+        $categoryIDs = $query['categoryID'] ?? new RangeExpression('>', 0);
 
-            $categoryIDs = $this->categoryModel->getVisibleCategoryIDs();
-            if ($categoryIDs === true) {
-                $range = $range->withFilteredValue('>', 0);
-            } else {
-                $range = $range->withFilteredValue('=', $categoryIDs);
-            }
-
-            $where['categoryID'] = $range;
-        } elseif (!empty($parentCategory)) {
-            $where['categoryID'] = $this->categoryModel->getCategoriesDescendantIDs([$parentCategory['CategoryID']]);
+        // Apply permission filtering.
+        $visibleIDs = $this->categoryModel->getVisibleCategoryIDs();
+        if ($visibleIDs === true) {
+            $categoryIDs = $categoryIDs->withFilteredValue('>', 0);
         } else {
-            $where['HideAllDiscussions'] = 0;
-            $parentCategory['CategoryID'] = self::ROOTCATEGORYID;
-            $where['categoryID'] = $this->categoryModel->getCategoriesDescendantIDs([$parentCategory['CategoryID']]);
+            $categoryIDs = $categoryIDs->withFilteredValue('=', $visibleIDs);
         }
+
+        // Apply "followed" filtering.
+        if ($query['followed'] ?? false) {
+            $followedRecords = $this->categoryModel->getFollowed($this->getSession()->UserID);
+            $followedIDs = array_column($followedRecords, 'CategoryID');
+            $categoryIDs = $categoryIDs->withFilteredValue("=", $followedIDs);
+        }
+
+        // Parent category filtering.
+        if (!empty($parentCategory)) {
+            $descendantIDs = $this->categoryModel->getCategoriesDescendantIDs([$parentCategory['CategoryID']]);
+            $categoryIDs = $categoryIDs->withFilteredValue("=", $descendantIDs);
+        }
+
+        $where['CategoryID'] = $categoryIDs;
 
         [$categories, $totalCountCallBack] = $this->getCategoriesWhere($where, $limit, $offset, $sort, $filter);
-
-        if ($sort === '') {
-            $categories = CategoryModel::sortCategoriesAsTree($categories);
-        }
-
-        if ($format === 'tree') {
-            $categories = $this->categoryModel->makeTree($categories);
-        }
 
         // Filter tree by the category "archived" fields.
         if (!isset($query['followed']) && $query['archived'] !== null) {
             $categories = $this->archiveFilter($categories, $query['archived'] ? 0 : 1);
+        }
+
+        if ($format === 'tree') {
+            $categories = CategoryCollection::treeBuilder()->buildTree($categories);
+        } elseif ($sort === '') {
+            $categories = CategoryModel::sortCategoriesAsTree($categories);
         }
 
         foreach ($categories as &$category) {
@@ -511,7 +523,7 @@ class CategoriesApiController extends AbstractApiController {
 
         $categories = $out->validate($categories);
 
-        if (isset($totalCountCallBack)) {
+        if (isset($totalCountCallBack) && $format === self::OUTPUT_FORMAT_FLAT) {
             $query['page'] = $page;
             $query['limit'] = $limit;
             $paging = ApiUtils::numberedPagerInfo($totalCountCallBack(), '/api/v2/categories', $query, $in);
@@ -858,9 +870,14 @@ class CategoriesApiController extends AbstractApiController {
             $categories = $this->categoryModel->getWhere($where, $order, '', $limit, $offset)
                 ->resultArray();
         } else {
-            $categories = $this->categoryModel
-                ->getWhere($where, $order, '', $limit, $offset)
-                ->resultArray();
+            $ids = $this->categoryModel->selectCachedIDs(
+                $where,
+                $order,
+                '',
+                $limit,
+                $offset
+            );
+            $categories = $this->categoryModel->getCollection()->getMulti($ids);
         }
 
         // Index by ID for category calculation functions.
@@ -890,13 +907,12 @@ class CategoriesApiController extends AbstractApiController {
      *
      * @param array $query
      */
-    private function validateIndexQuery($query): void {
-
+    private function checkMixedQuery($query): void {
         $formatIsFlat = isset($query['page']) || isset($query['limit']) || (isset($query['outputFormat']) && $query['outputFormat'] === 'flat');
         $formatIsTree = isset($query['maxDepth']) || (isset($query['outputFormat']) && $query['outputFormat'] === 'tree');
 
         if ($formatIsFlat && $formatIsTree) {
-            throw new \Exception(self::ERRORINDEXMSG, 422);
+            trigger_error(self::ERRORINDEXMSG, E_USER_WARNING);
         }
     }
 }

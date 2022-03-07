@@ -148,7 +148,12 @@ export async function _mountComponents(parent: Element) {
         const name = node.getAttribute("data-react") || "";
         let props = node.getAttribute("data-props") || {};
         if (typeof props === "string") {
-            props = JSON.parse(props);
+            try {
+                props = JSON.parse(props);
+            } catch (err) {
+                console.error(err, { node, name, props });
+                return;
+            }
         }
         const registeredComponent = getComponent(name);
 

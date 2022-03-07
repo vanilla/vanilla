@@ -260,7 +260,7 @@ class LayoutsApiControllerTest extends AbstractResourceTest {
         $layoutDefinition = [
             [
                 '$hydrate' => 'react.section.1-column',
-                'contents' => [
+                'children' => [
                     [
                         // Assets should be available.
                         '$hydrate' => 'react.asset.breadcrumbs',
@@ -279,7 +279,7 @@ class LayoutsApiControllerTest extends AbstractResourceTest {
             [
                 '$reactComponent' => 'SectionOneColumn',
                 '$reactProps' => [
-                    'contents' => [
+                    'children' => [
                         [
                             '$reactComponent' => 'Breadcrumbs',
                             '$reactProps' => [
@@ -291,7 +291,6 @@ class LayoutsApiControllerTest extends AbstractResourceTest {
                         ],
                     ],
                     'isNarrow' => false,
-                    'autoWrap' => true,
                 ],
             ],
         ];
@@ -334,7 +333,7 @@ class LayoutsApiControllerTest extends AbstractResourceTest {
         $layoutDefinition = [
             [
                 '$hydrate' => 'react.section.1-column',
-                'contents' => [
+                'children' => [
                     [
                         // Assets should be available.
                         '$hydrate' => 'react.asset.breadcrumbs',
@@ -353,7 +352,7 @@ class LayoutsApiControllerTest extends AbstractResourceTest {
             [
                 '$reactComponent' => 'SectionOneColumn',
                 '$reactProps' => [
-                    'contents' => [
+                    'children' => [
                         [
                             '$reactComponent' => 'Breadcrumbs',
                             '$reactProps' => [
@@ -365,7 +364,6 @@ class LayoutsApiControllerTest extends AbstractResourceTest {
                         ],
                     ],
                     'isNarrow' => false,
-                    'autoWrap' => true,
                 ],
             ],
         ];
@@ -406,6 +404,144 @@ class LayoutsApiControllerTest extends AbstractResourceTest {
         $this->assertSame($expected, $response->getBody()['layout']);
     }
 
+
+    /**
+     * Test that we can hydrate arbitrary and saved layouts asset.
+     *
+     * @return void
+     */
+    public function testHydrateAsset() {
+        $category = $this->createCategory(['name' => 'My Category']);
+
+        $layoutDefinition = [
+            [
+                '$hydrate' => 'react.section.1-column',
+                'children' => [
+                    [
+                        // Assets should be available.
+                        '$hydrate' => 'react.asset.breadcrumbs',
+                        'recordType' => 'category',
+                        'recordID' => [
+                            // Param definitions should be available.
+                            '$hydrate' => 'param',
+                            'ref' => 'category/categoryID',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $expected = [
+            [
+                '$reactComponent' => 'SectionOneColumn',
+                '$reactProps' => [
+                    'children' => [
+                        [
+                            '$reactComponent' => 'Breadcrumbs',
+                            '$reactProps' => [
+                                'crumbs' => [
+                                    ['name' => 'Home', 'url' => url('', true)],
+                                    ['name' => 'My Category', 'url' => $category['url']],
+                                ],
+                            ],
+                        ],
+                    ],
+                    'isNarrow' => false,
+                ],
+            ],
+        ];
+
+        $params = [
+            'categoryID' => $category['categoryID'],
+        ];
+
+        // Posting to the main hydrate endpoints will have the correct result.
+        $response = $this->api()->post('/layouts/hydrate', [
+            'layout' => $layoutDefinition,
+            'params' => $params,
+            'layoutViewType' => 'home',
+        ]);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame($expected, $response->getBody()['layout']);
+
+        // We can save it as a layout and render it by the ID.
+
+        $layout = $this->api()->post('/layouts', [
+            'name' => 'My Layout',
+            'layout' => $layoutDefinition,
+            'layoutViewType' => 'home',
+        ]);
+        $response = $this->api()->get("/layouts/{$layout['layoutID']}/hydrate-assets", [
+            'params' => $params,
+        ]);
+        $this->assertEquals(200, $response->getStatusCode());
+        $body = $response->getBody();
+        $this->assertArrayHasKey("js", $body);
+        $this->assertArrayHasKey("css", $body);
+    }
+
+    /**
+     * Test that we can use dynamic hydrate lookup assets.
+     *
+     * @return void
+     */
+    public function testLookupHydrateAsset() {
+        $category = $this->createCategory(['name' => 'My Category']);
+
+        $layoutDefinition = [
+            [
+                '$hydrate' => 'react.section.1-column',
+                'children' => [
+                    [
+                        // Assets should be available.
+                        '$hydrate' => 'react.asset.breadcrumbs',
+                        'recordType' => 'category',
+                        'recordID' => [
+                            // Param definitions should be available.
+                            '$hydrate' => 'param',
+                            'ref' => 'category/categoryID',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $params = [
+            'categoryID' => $category['categoryID'],
+        ];
+
+        // Posting to the main hydrate endpoints will have the correct result.
+        $response = $this->api()->post('/layouts/hydrate', [
+            'layout' => $layoutDefinition,
+            'params' => $params,
+            'layoutViewType' => 'home',
+        ]);
+        $this->assertEquals(200, $response->getStatusCode());
+
+        // We can save it as a layout and render it by the ID.
+
+        $layout = $this->api()->post('/layouts', ['name' => 'My Layout',
+            'layout' => $layoutDefinition,
+            'layoutViewType' => 'home',
+        ]);
+
+        $response = $this->api()->put("/layouts/{$layout['layoutID']}/views", [
+            'recordID' => $category['categoryID'],
+            'recordType' => 'category'
+        ]);
+
+        $response = $this->api()->get("/layouts/lookup-hydrate-assets", [
+            'layoutViewType' => 'home',
+            'recordID' => $category['categoryID'],
+            'recordType' => 'category',
+            'params' => $params,
+        ]);
+        $this->assertEquals(200, $response->getStatusCode());
+        $body = $response->getBody();
+        $this->assertArrayHasKey("js", $body);
+        $this->assertArrayHasKey("css", $body);
+    }
+
     /**
      * Test that we can generate a hydrateable schema.
      */
@@ -424,7 +560,7 @@ class LayoutsApiControllerTest extends AbstractResourceTest {
      * Test our out when fetching a catalogue.
      */
     public function testGetCatalogue() {
-        $response = $this->api()->get('/layouts/catalogue', ['layoutViewType' => 'home']);
+        $response = $this->api()->get('/layouts/catalog', ['layoutViewType' => 'home']);
         $this->assertEquals(200, $response->getStatusCode());
 
         $this->assertSame('home', $response['layoutViewType']);
@@ -433,6 +569,27 @@ class LayoutsApiControllerTest extends AbstractResourceTest {
         $this->assertSchemaExists($response, 'widgets', 'react.html');
         $this->assertSchemaExists($response, 'layoutParams', 'category/categoryID');
         $this->assertSchemaExists($response, 'middlewares', 'role-filter');
+        $this->assertValidRecommendations($response);
+    }
+
+    /**
+     * Assert that catalog recommendations all exist.
+     *
+     * @param array $catalogData
+     */
+    private function assertValidRecommendations(HttpResponse $catalogData) {
+        $recommendedIDs = [];
+        foreach ($catalogData['sections'] as $widgetDefinition) {
+            $recommendedWidgets = $widgetDefinition['recommendedWidgets'] ?? [];
+            foreach ($recommendedWidgets as $recommendedWidget) {
+                $recommendedIDs[] = $recommendedWidget['widgetID'];
+            }
+        }
+
+        $this->assertNotCount(0, $recommendedIDs, 'No widget recommendations appeared in the catalog.');
+        foreach ($recommendedIDs as $recommendedID) {
+            $this->assertArrayHasKey($recommendedID, $catalogData['widgets'], "Recommended widget was not present in the catalog: $recommendedID");
+        }
     }
 
     /**
@@ -444,7 +601,7 @@ class LayoutsApiControllerTest extends AbstractResourceTest {
      */
     private function assertSchemaExists(HttpResponse $catalogueResponse, string $collectionName, string $propertyName) {
         $collection = $catalogueResponse[$collectionName] ?? null;
-        $value = $collection[$propertyName] ?? null;
+        $value = $collection[$propertyName]['schema'] ?? null;
         $this->assertArrayHasKey(
             "type",
             $value ?? [],

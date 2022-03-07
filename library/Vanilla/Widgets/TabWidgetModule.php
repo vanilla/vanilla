@@ -139,7 +139,7 @@ class TabWidgetModule extends AbstractReactModule {
     /**
      * @inheritDoc
      */
-    public function getComponentName(): string {
+    public static function getComponentName(): string {
         return 'TabWidget';
     }
 

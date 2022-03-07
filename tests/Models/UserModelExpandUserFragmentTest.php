@@ -58,7 +58,8 @@ class UserModelExpandUserFragmentTest extends TestCase {
             'email' => $name.'@mail.com',
             'Password' => 'test',
             'HashMethod' => 'text',
-            'DateInserted' => date("Y-m-d H:i:s")
+            'DateInserted' => date("Y-m-d H:i:s"),
+            'DateLastActive' => date("Y-m-d H:i:s"),
         ];
         $userID = (int)$this->model->SQL->insert($this->model->Name, $user);
         $this->assertGreaterThan(0, $userID);
@@ -120,7 +121,8 @@ class UserModelExpandUserFragmentTest extends TestCase {
             'email' => $name.'@mail.com',
             'Password' => 'test',
             'HashMethod' => 'text',
-            'DateInserted' => date("Y-m-d H:i:s")
+            'DateInserted' => date("Y-m-d H:i:s"),
+            'DateLastActive' => date("Y-m-d H:i:s")
         ];
         $userID = (int)$this->model->SQL->insert($this->model->Name, $user);
         $this->assertGreaterThan(0, $userID);

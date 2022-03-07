@@ -20,6 +20,7 @@ use Vanilla\Contracts\Models\CrawlableInterface;
 use Vanilla\Contracts\Models\FragmentFetcherInterface;
 use Vanilla\Contracts\Models\UserProviderInterface;
 use Vanilla\Dashboard\Events\UserPointEvent;
+use Vanilla\Dashboard\Models\UserFragment;
 use Vanilla\Dashboard\Models\UserVisitUpdater;
 use Vanilla\Dashboard\UserPointsModel;
 use Vanilla\Events\LegacyDirtyRecordTrait;
@@ -779,8 +780,8 @@ class UserModel extends Gdn_Model implements
         ?string $source,
         ?int $discipliningUserID
     ): \Vanilla\Dashboard\Events\UserDisciplineEvent {
-        $disciplinedUser = self::getFragmentByID($disciplinedUserID);
-        $discipliningUser = $discipliningUserID ? self::getFragmentByID($discipliningUserID) : null;
+        $disciplinedUser = self::getFragmentByID($disciplinedUserID)->jsonSerialize();
+        $discipliningUser = $discipliningUserID ? self::getFragmentByID($discipliningUserID)->jsonSerialize() : null;
         return new \Vanilla\Dashboard\Events\UserDisciplineEvent(
             $disciplinedUser,
             $action,
@@ -1337,32 +1338,35 @@ class UserModel extends Gdn_Model implements
     /**
      * @inheritdoc
      */
-    public function getGeneratedFragment(string $key): array {
+    public function getGeneratedFragment(string $key): UserFragment {
         $unknownFragment = [
             'userID' => self::UNKNOWN_USER_ID,
             'name' => 'unknown',
             'email' => 'unknown@example.com',
             'photoUrl' => self::getDefaultAvatarUrl(),
-            'dateLastActive' => time(),
+            'DateLastActive' => date("Y-m-d H:i:s"),
         ];
         switch ($key) {
             case self::GENERATED_FRAGMENT_KEY_GUEST:
-                return [
+                $unknownFragment = [
                     'userID' => self::GUEST_USER_ID,
                     'name' => 'guest',
                     'email' => 'guest@example.com',
                     'photoUrl' => self::getDefaultAvatarUrl(),
-                    'dateLastActive' => null,
+                    'DateLastActive' => date("Y-m-d H:i:s"),
                 ];
+                break;
             case self::GENERATED_FRAGMENT_KEY_UNKNOWN:
-                return $unknownFragment;
+                break;
             default:
                 trigger_error(
                     'Called '.__CLASS__.'::'.__METHOD__.'($key) with an non-matching key. Supported values are: '
                     . "\n" . implode(", ", $this->getAllowedGeneratedRecordKeys())
                 );
-                return $unknownFragment;
+                break;
         }
+
+        return new UserFragment($unknownFragment);
     }
 
     /**
@@ -1386,7 +1390,7 @@ class UserModel extends Gdn_Model implements
             foreach ($columns as $key) {
                 if ($row[$key] ?? false) {
                     $id = $row[$key];
-                    $userIDs[$id] = true;
+                    $userIDs[] = $id;
                 }
             }
         };
@@ -1399,45 +1403,18 @@ class UserModel extends Gdn_Model implements
                 $extractUserIDs($row);
             }
         }
-        $users = !empty($userIDs) ? $this->getIDs(array_keys($userIDs)) : [];
+        $userFragments = $this->getUserFragments($userIDs);
+        $unknownFragment = $this->getGeneratedFragment(self::GENERATED_FRAGMENT_KEY_UNKNOWN);
 
-        $populate = function (&$row) use ($users, $columns) {
+        $populate = function (&$row) use ($userFragments, $columns, $unknownFragment) {
             foreach ($columns as $key) {
                 $destination = stringEndsWith($key, 'ID', true, true);
-                $id = $row[$key] ?? null;
-                $user = null;
-                if (is_numeric($id)) {
-                    // Massage the data, before injecting it into the results.
-                    $user = array_key_exists($id, $users) ? $users[$id] : false;
-                    if ($user) {
-                        // Make sure all user records have a valid photo.
-                        $photo = val('Photo', $user);
-                        $banned = $user['Banned'] ?? 0;
-
-                        if ($banned) {
-                            $bannedPhoto = c('Garden.BannedPhoto', self::PATH_BANNED_AVATAR);
-                            $photo = asset($bannedPhoto, true);
-                        }
-
-                        if ($photo && !isUrl($photo)) {
-                            $photoBase = changeBasename($photo, 'n%s');
-                            $photo = Gdn_Upload::url($photoBase);
-                        }
-                        if (empty($photo)) {
-                            $photo = UserModel::getDefaultAvatarUrl($user);
-                        }
-                        setValue('Photo', $user, $photo);
-                        // Add an alias to Photo. Currently only used in API calls.
-                        setValue('PhotoUrl', $user, $photo);
-
-                        if (val('Name', $user) === '') {
-                            setValue('Name', $user, 'Unknown');
-                        }
-                    }
+                $userID = $row[$key] ?? null;
+                if ($userID !== null) {
+                    $row[$destination] = $userFragments[$userID] ?? $unknownFragment;
+                } else {
+                    $row[$destination] = $unknownFragment;
                 }
-                $user = !empty($user) ? $user : $this->getGeneratedFragment(self::GENERATED_FRAGMENT_KEY_UNKNOWN);
-                $user =  UserFragmentSchema::normalizeUserFragment($user);
-                $row[$destination] = $user;
             }
         };
 
@@ -1449,6 +1426,53 @@ class UserModel extends Gdn_Model implements
                 $populate($row);
             }
         }
+    }
+
+    /**
+     * Get an array of user fragments.
+     *
+     * @param int[] $userIDs
+     *
+     * @return array[]
+     */
+    public function getUserFragments(array $userIDs): array {
+        $users = !empty($userIDs) ? $this->getIDs($userIDs) : [];
+
+        $userFragments = [];
+        foreach ($userIDs as $userID) {
+            $user = null;
+            // Massage the data, before injecting it into the results.
+            $user = $users[$userID] ?? null;
+            if ($user !== null) {
+                // Make sure all user records have a valid photo.
+                $photo = val('Photo', $user);
+                $banned = $user['Banned'] ?? 0;
+
+                if ($banned) {
+                    $bannedPhoto = c('Garden.BannedPhoto', self::PATH_BANNED_AVATAR);
+                    $photo = asset($bannedPhoto, true);
+                }
+
+                if ($photo && !isUrl($photo)) {
+                    $photoBase = changeBasename($photo, 'n%s');
+                    $photo = Gdn_Upload::url($photoBase);
+                }
+                if (empty($photo)) {
+                    $photo = UserModel::getDefaultAvatarUrl($user);
+                }
+                setValue('Photo', $user, $photo);
+                // Add an alias to Photo. Currently only used in API calls.
+                setValue('PhotoUrl', $user, $photo);
+
+                if (val('Name', $user) === '') {
+                    setValue('Name', $user, 'Unknown');
+                }
+            }
+
+            $user = !empty($user) ? new UserFragment($user) : $this->getGeneratedFragment(self::GENERATED_FRAGMENT_KEY_UNKNOWN);
+            $userFragments[$userID] = $user;
+        }
+        return $userFragments;
     }
 
     /**
@@ -1864,17 +1888,18 @@ class UserModel extends Gdn_Model implements
     /**
      * @inheritdoc
      */
-    public function getFragmentByID(int $id, bool $useUnknownFallback = false): array {
+    public function getFragmentByID(int $id, bool $useUnknownFallback = false) {
         $record = $this->getID($id, DATASET_TYPE_ARRAY);
         if ($record === false) {
             if ($useUnknownFallback) {
-                $record = $this->getGeneratedFragment(self::GENERATED_FRAGMENT_KEY_UNKNOWN);
+                $userFragment = $this->getGeneratedFragment(self::GENERATED_FRAGMENT_KEY_UNKNOWN);
             } else {
                 throw new NoResultsException("No user found for ID: " . $id);
             }
+        } else {
+            $userFragment =  new UserFragment($record);
         }
-
-        return UserFragmentSchema::normalizeUserFragment($record);
+        return $userFragment;
     }
 
     /**
@@ -2644,6 +2669,18 @@ class UserModel extends Gdn_Model implements
             $this->Validation->unapplyRule('Name', 'Username');
             $this->Validation->unapplyRule('Name', 'UsernameBlacklist');
         }
+        if ((array_key_exists('Name', $formPostValues)) &&
+            (array_key_exists('Password', $formPostValues))) {
+            $this->Validation->addRule('PasswordStrength', function () use ($formPostValues) {
+                try {
+                    $this->validatePasswordStrength($formPostValues['Password'], $formPostValues['Name']);
+                } catch (Gdn_UserException $exception) {
+                    return new \Vanilla\Invalid($exception->getMessage());
+                }
+                return $formPostValues['Password'];
+            });
+            $this->Validation->applyRule('Password', 'PasswordStrength');
+        }
 
         if ($this->validate($formPostValues, $insert) && $uniqueValid) {
             // All fields on the form that need to be validated (including non-schema field rules defined above)
@@ -2929,10 +2966,10 @@ class UserModel extends Gdn_Model implements
      *
      * @param array $row
      * @param string $action
-     * @param array|null $sender
+     * @param array|object|null $sender
      * @return UserEvent
      */
-    public function eventFromRow(array $row, string $action, ?array $sender = null): ResourceEvent {
+    public function eventFromRow(array $row, string $action, $sender = null): ResourceEvent {
         $user = $this->normalizeRow($row, false);
         $user = $this->readSchema()->validate($user);
 
@@ -6056,7 +6093,7 @@ SQL;
         $result = (bool)$strength['Pass'];
 
         if ($result === false) {
-            throw new Gdn_UserException('The password is too weak.');
+            throw new Gdn_UserException(t('The password is too weak.'));
         }
         return $result;
     }
@@ -6168,7 +6205,7 @@ SQL;
      *
      * @return array
      */
-    public function currentFragment(): array {
+    public function currentFragment() {
         if ($this->session->UserID) {
             $result = $this->getFragmentByID($this->session->UserID, true);
         } else {

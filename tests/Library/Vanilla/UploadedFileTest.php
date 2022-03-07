@@ -9,15 +9,16 @@ namespace VanillaTests\Library\Vanilla;
 
 use Garden\EventManager;
 use Garden\SafeCurl\Exception\InvalidURLException;
-use PHPUnit\Framework\TestCase;
 use Vanilla\UploadedFile;
 use VanillaTests\BootstrapTestCase;
-use VanillaTests\BootstrapTrait;
 
 /**
  * Tests for uploaded files.
  */
 class UploadedFileTest extends BootstrapTestCase {
+
+    public const TEST_REMOTE_FILE_URL = "https://via.placeholder.com/350x150.jpg";
+
     /**
      * Test that various internal IPs cannot be redirected too.
      *
@@ -48,7 +49,7 @@ class UploadedFileTest extends BootstrapTestCase {
     public function testSavesRemoteUrls() {
         $file = UploadedFile::fromRemoteResourceUrl('http://vanillaforums.com');
         $this->assertEquals('http://vanillaforums.com', $file->getForeignUrl());
-        $this->assertEquals('https://vanillaforums.com/en/', $file->getResolvedForeignUrl());
+        $this->assertEquals('https://vanillaforums.com/', $file->getResolvedForeignUrl());
 
         // Ensure we've temporarily stashed the file somewhere.
         $this->assertTrue(file_exists($file->getFile()));
@@ -59,7 +60,7 @@ class UploadedFileTest extends BootstrapTestCase {
      */
     public function testPersistFile() {
         // Perform some tests related to saving uploads.
-        $file = UploadedFile::fromRemoteResourceUrl('https://vanillaforums.com/svgs/logo.svg');
+        $file = UploadedFile::fromRemoteResourceUrl(self::TEST_REMOTE_FILE_URL);
 
         // Ensure we've temporarily stashed the file somewhere.
         $this->assertFileExists($file->getFile());
@@ -131,7 +132,7 @@ class UploadedFileTest extends BootstrapTestCase {
      */
     public function testCustomPersistedPath() {
         // Perform some tests related to saving uploads.
-        $file = UploadedFile::fromRemoteResourceUrl('https://vanillaforums.com/svgs/logo.svg');
+        $file = UploadedFile::fromRemoteResourceUrl(self::TEST_REMOTE_FILE_URL);
 
         // Ensure we've temporarily stashed the file somewhere.
         $this->assertFileExists($file->getFile());
@@ -139,7 +140,7 @@ class UploadedFileTest extends BootstrapTestCase {
         // Save the upload.
         $file->persistUpload(false, 'subdir', 'prefix-%s');
         $this->assertFileExists(PATH_UPLOADS.'/'.$file->getPersistedPath(), 'Final upload file is persisted');
-        $this->assertStringMatchesFormat('subdir/%s/prefix-logo.svg', $file->getPersistedPath());
+        $this->assertStringMatchesFormat('subdir/%s/prefix-350x150.jpg', $file->getPersistedPath());
     }
 
     /**
@@ -147,7 +148,7 @@ class UploadedFileTest extends BootstrapTestCase {
      */
     public function testCopying() {
         // Perform some tests related to saving uploads.
-        $file = UploadedFile::fromRemoteResourceUrl('https://vanillaforums.com/svgs/logo.svg');
+        $file = UploadedFile::fromRemoteResourceUrl(self::TEST_REMOTE_FILE_URL);
 
         // Ensure we've temporarily stashed the file somewhere.
         $this->assertFileExists($file->getFile());
@@ -171,7 +172,7 @@ class UploadedFileTest extends BootstrapTestCase {
             $args['Parsed']['SaveName'] = $expectedSaveName;
         });
 
-        $file = UploadedFile::fromRemoteResourceUrl('https://vanillaforums.com/svgs/logo.svg');
+        $file = UploadedFile::fromRemoteResourceUrl(self::TEST_REMOTE_FILE_URL);
         $file->persistUpload();
 
         // Standard cleanup/moving procedures did not occur.
@@ -207,7 +208,7 @@ class UploadedFileTest extends BootstrapTestCase {
         $this->expectExceptionMessage('height should be greater than or equal to 0.');
 
         // Perform some tests related to saving uploads.
-        $file = UploadedFile::fromRemoteResourceUrl('https://vanillaforums.com/svgs/logo.svg');
+        $file = UploadedFile::fromRemoteResourceUrl(self::TEST_REMOTE_FILE_URL);
         $file->setMaxImageHeight($actual);
     }
 
@@ -222,7 +223,7 @@ class UploadedFileTest extends BootstrapTestCase {
         $this->expectExceptionMessage('width should be greater than or equal to 0.');
 
         // Perform some tests related to saving uploads.
-        $file = UploadedFile::fromRemoteResourceUrl('https://vanillaforums.com/svgs/logo.svg');
+        $file = UploadedFile::fromRemoteResourceUrl(self::TEST_REMOTE_FILE_URL);
         $file->setMaxImageWidth($actual);
     }
 

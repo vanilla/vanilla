@@ -6,10 +6,13 @@
 
 namespace VanillaTests\APIv2;
 
+use VanillaTests\Forum\Utils\CommunityApiTestTrait;
+
 /**
  * Test the /api/v2/drafts endpoints.
  */
 class DraftsTest extends AbstractResourceTest {
+    use CommunityApiTestTrait;
 
     /**
      * {@inheritdoc}
@@ -107,5 +110,36 @@ class DraftsTest extends AbstractResourceTest {
         $this->expectExceptionCode(403);
         $this->expectExceptionMessage(t("ErrorPermission"));
         $this->bessy()->get("post/editcomment?CommentID=&DraftID={$draftComment['draftID']}");
+    }
+
+    /**
+     * Test that when a draft is saved with a category, the category picker defaults to that category.
+     */
+    public function testCategoryPickerDefaultsToCategory() {
+        \Gdn::themeFeatures()->forceFeatures([
+            'NewCategoryDropdown' => false,
+        ]);
+        $this->runWithConfig([
+            "Vanilla.Categories.Use" => true,
+        ], function () {
+            $newCat = $this->createCategory();
+            $data = [
+                'recordType' => 'discussion',
+                'parentRecordID' => $newCat["categoryID"],
+                'attributes' => [
+                    'announce' => 0,
+                    'body' => 'Check the category picker',
+                    'closed' => 1,
+                    'format' => 'Markdown',
+                    'name' => 'Discussion Draft',
+                    'sink' => 0,
+                    'tags' => 'interesting,helpful'
+                ]
+            ];
+            $draft = $this->testPost($data);
+            $content = $this->bessy()->getHtml("post/editdiscussion/0/{$draft["draftID"]}", ["deliveryType" => DELIVERY_TYPE_ALL]);
+
+            $content->assertCssSelectorText("option[selected]", $newCat['name']);
+        });
     }
 }

@@ -452,9 +452,14 @@ endif;
  * @since 2.1
  */
 if (!function_exists('writeDiscussionOptions')):
-    function writeDiscussionOptions($discussion = null) {
-        deprecated('writeDiscussionOptions', 'getDiscussionOptionsDropdown', 'March 2016');
 
+    /**
+     * Prints an options dropdown menu for a discussion.
+     *
+     * @param object|array|null $discussion The discussion to get the dropdown options for.
+     * @deprecated
+     */
+    function writeDiscussionOptions($discussion = null) {
         $options = getDiscussionOptions($discussion);
 
         if (empty($options)) {

@@ -12,6 +12,7 @@ import PanelWidget from "./components/PanelWidget";
 import TitleBar from "@library/headers/TitleBar";
 import { MemoryRouter } from "react-router";
 import Container from "@library/layout/components/Container";
+import { SectionBehaviourContext } from "@library/layout/SectionBehaviourContext";
 
 export default {
     title: "Layout/PanelLayout",
@@ -139,6 +140,27 @@ export const LargeRightBottomPanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
         />
     );
 });
+
+export const NoMinHeight = storyWithConfig(NO_WRAPPER_CONFIG, () => {
+    return (
+        <SectionBehaviourContext.Provider value={{ autoWrap: false, useMinHeight: false }}>
+            <ThreeColumnSection
+                leftTop={<DummyPanel>Left Top</DummyPanel>}
+                leftBottom={<DummyPanel>Left Bottom</DummyPanel>}
+                middleTop={<DummyPanel>Middle Top{smallIpsum}</DummyPanel>}
+                middleBottom={<DummyPanel>Middle Bottom{smallIpsum}</DummyPanel>}
+                rightTop={<DummyPanel>Right Top{smallIpsum}</DummyPanel>}
+                rightBottom={<DummyPanel>Right bottom {largeIpsum}</DummyPanel>}
+            />
+        </SectionBehaviourContext.Provider>
+    );
+});
+
+NoMinHeight.parameters = {
+    chromatic: {
+        viewports: Object.values(oneColumnVariables().breakPoints),
+    },
+};
 
 export const LargeEverything = storyWithConfig(NO_WRAPPER_CONFIG, () => {
     return (

@@ -211,6 +211,24 @@ describe("TabHandler", () => {
         expect(nextItem).eq(null);
     });
 
+    it.only("respects tabindex -1", () => {
+        document.body.innerHTML = `
+        <div>
+            <button id="item1"></button>
+            <button id="item2" tabindex="-1"></button>
+            <button id="item3"></button>
+        </div>`;
+
+        const item1 = document.getElementById("item1")!;
+        const item3 = document.getElementById("item3")!;
+
+        item1.focus();
+        const handler = new TabHandler();
+        const nextItem = handler.getNext(undefined, undefined, false);
+
+        expect(nextItem).eq(item3);
+    });
+
     it("can handle all options at once", () => {
         document.body.innerHTML = `
         <div>

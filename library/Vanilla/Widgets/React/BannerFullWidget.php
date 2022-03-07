@@ -87,7 +87,7 @@ class BannerFullWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
     /**
      * @inheritDoc
      */
-    public function getComponentName(): string {
+    public static function getComponentName(): string {
         return "Banner";
     }
 }

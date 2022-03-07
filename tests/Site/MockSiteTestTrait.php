@@ -17,7 +17,6 @@ use Vanilla\Site\OwnSite;
 use VanillaTests\TestInstallModel;
 
 /**
- * @method Container container()
  * @method InternalClient api()
  */
 trait MockSiteTestTrait {

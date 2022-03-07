@@ -397,7 +397,7 @@ class MessageModel extends Gdn_Model {
     }
 
     /**
-     * Get all available layout view names.
+     * Get all available layout view types.
      *
      * @return array
      */

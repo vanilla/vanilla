@@ -120,11 +120,8 @@ export function Tabs(props: ITabsProps) {
                 {data.map((tab, index) => {
                     return (
                         <TabPanel className={classes?.panel({ includeVerticalPadding })} key={index}>
-                            {/* Make sure widgets don't have their vertical padding */}
-                            <WidgetLayout widgetClass="" widgetWithContainerClass="">
-                                {tab.contents && tab.contents}
-                                {tab.contentNodes && <DomNodeAttacher nodes={tab.contentNodes} />}
-                            </WidgetLayout>
+                            {tab.contents && tab.contents}
+                            {tab.contentNodes && <DomNodeAttacher nodes={tab.contentNodes} />}
                         </TabPanel>
                     );
                 })}

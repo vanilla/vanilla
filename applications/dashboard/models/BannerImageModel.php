@@ -12,6 +12,7 @@ use Vanilla\AliasLoader;
 use Vanilla\Formatting\Formats\HtmlFormat;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Site\SiteSectionModel;
+use Vanilla\Web\TwigStaticRenderer;
 
 /**
  * Banner Image Model.
@@ -61,14 +62,14 @@ class BannerImageModel {
 
         $props = array_merge($defaultProps, $props);
         $html = "";
-        $propsJson = htmlspecialchars(json_encode($props, JSON_UNESCAPED_UNICODE), ENT_QUOTES);
         $isRendered = false;
+        $contents = "<div style=\"min-height:'500px'\"></div>";
         if (inSection(c("Theme.Banner.VisibleSections")) || $controller->data('isHomepage')) {
             $isRendered = true;
-            $html = "<div data-react='community-banner' data-props='$propsJson'><div style=\"min-height:'500px'\"></div></div>";
+            $html = TwigStaticRenderer::renderReactModule('community-banner', $props, '', $contents);
         } elseif (inSection(c('Theme.ContentBanner.VisibleSections'))) {
             $isRendered = true;
-            $html = "<div data-react='community-content-banner' data-props='$propsJson'><div style=\"min-height:'500px'\"></div></div>";
+            $html = TwigStaticRenderer::renderReactModule('community-content-banner', $props, '', $contents);
         }
 
         if ($isRendered) {

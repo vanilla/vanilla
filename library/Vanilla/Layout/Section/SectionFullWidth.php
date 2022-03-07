@@ -18,7 +18,7 @@ class SectionFullWidth extends AbstractLayoutSection {
     /**
      * @inheritdoc
      */
-    public function getComponentName(): string {
+    public static function getComponentName(): string {
         return 'SectionFullWidth';
     }
 
@@ -27,7 +27,7 @@ class SectionFullWidth extends AbstractLayoutSection {
      */
     public static function getWidgetSchema(): Schema {
         return Schema::parse([
-            'children' => new ReactChildrenSchema(),
+            'children' => new ReactChildrenSchema('The contents of the section.'),
         ]);
     }
 

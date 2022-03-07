@@ -9,6 +9,9 @@ use Vanilla\Addon;
 use Vanilla\BodyFormatValidator;
 use Vanilla\Contracts;
 use Vanilla\Contracts\Web\UASnifferInterface;
+use Vanilla\Dashboard\LeaderboardPostModel;
+use Vanilla\Dashboard\UserLeaderService;
+use Vanilla\Dashboard\UserPointsModel;
 use Vanilla\EmbeddedContent\LegacyEmbedReplacer;
 use Vanilla\Formatting\BaseFormat;
 use Vanilla\Formatting\FormatConfig;
@@ -396,6 +399,11 @@ $dic->setInstance(Container::class, $dic)
     ->rule(Vanilla\PageScraper::class)
     ->addCall('registerMetadataParser', [new Reference(Vanilla\Metadata\Parser\OpenGraphParser::class)])
     ->addCall('registerMetadataParser', [new Reference(Vanilla\Metadata\Parser\JsonLDParser::class)])
+    ->setShared(true)
+
+    ->rule(UserLeaderService::class)
+    ->addCall('addProvider', [new Reference(UserPointsModel::class)])
+    ->setInherit(true)
     ->setShared(true)
 
     ->rule(\Vanilla\PageScraper::class)

@@ -75,7 +75,7 @@ $Construct->primaryKey('CategoryID')
     ->column('CanDelete', 'tinyint', '1')
     ->column('Name', 'varchar(255)')
     ->column('UrlCode', 'varchar(255)', true)
-    ->column('Description', 'varchar(500)', true)
+    ->column('Description', 'varchar(1000)', true)
     ->column('Sort', 'int', true)
     ->column('CssClass', 'varchar(50)', true)
     ->column('Photo', 'varchar(255)', true)
@@ -350,6 +350,7 @@ $PermissionModel->define([
     'Vanilla.Approval.Require',
     'Vanilla.Comments.Me' => 1,
     'Vanilla.Discussions.CloseOwn' => 0,
+    'Garden.NoAds.Allow' => 0
 ]);
 $PermissionModel->undefine(['Vanilla.Settings.Manage', 'Vanilla.Categories.Manage']);
 

@@ -188,6 +188,78 @@ class APIExpandMiddlewareTest extends TestCase {
     }
 
     /**
+     * A whole expander can be expanded at once and can stack on each other.
+     */
+    public function testExpandWholeExpander(): void {
+        // Should already have one expander, added in setup. Add another.
+        $this->middleware->addExpandField("users", [
+            "insertUser" => "insertUserID",
+            "updateUser" => "updateUserID",
+        ], [$this, 'userExpander']);
+
+        $this->middleware->addExpandField("foo", [
+            "insertUser.foo" => "insertUserID",
+            "updateUser.foo" => "updateUserID",
+        ], [$this, 'barExpander']);
+
+        $otherExpand = "baz";
+        $expand = ["users", "foo", $otherExpand];
+        $request = new Request("/?expand=" . implode(",", $expand));
+
+        /** @var Data $actual */
+        $actual = call_user_func($this->middleware, $request, function () {
+            return [
+                "insertUserID" => 1,
+                "body" => "foo",
+                "updateUserID" => 2,
+            ];
+        });
+        $this->assertSame([
+            "insertUserID" => 1,
+            "body" => "foo",
+            "updateUserID" => 2,
+            "insertUser" => [
+                'name' => '1 Name',
+                'url' => 'https://site.com/users/1',
+                'foo' => 'bar-1',
+            ],
+            "updateUser" => [
+                'name' => '2 Name',
+                'url' => 'https://site.com/users/2',
+                'foo' => 'bar-2',
+            ],
+        ], $actual->getData());
+        $this->assertSame($otherExpand, $request->getQuery()["expand"]);
+    }
+
+    /**
+     * Test that if an input key isn't provided we won't try to expand it.
+     */
+    public function testNotProvidedNotExpanded() {
+        $this->middleware->addExpandField("foo", [
+            "insertUser.foo" => "insertUserID",
+            "updateUser.foo" => "updateUserID",
+        ], [$this, 'barExpander']);
+
+        $request = new Request("/?expand=foo");
+
+        /** @var Data $actual */
+        $actual = call_user_func($this->middleware, $request, function () {
+            return [
+                "insertUserID" => 1,
+                "body" => "foo",
+            ];
+        });
+        $this->assertSame([
+            "insertUserID" => 1,
+            "body" => "foo",
+            "insertUser" => [
+                'foo' => 'bar-1',
+            ],
+        ], $actual->getData());
+    }
+
+    /**
      * The expansion should work an an array of results.
      */
     public function testArrayExpandFields(): void {
@@ -476,5 +548,40 @@ EOT
                 ],
             ],
         ], $actual->getData());
+    }
+
+    ///
+    /// Utilities
+    ///
+
+    /**
+     * Expander that expands to foo: bar-$id.
+     *
+     * @param array $ids
+     * @return array
+     */
+    public function barExpander(array $ids): array {
+        $r = [];
+        foreach ($ids as $id) {
+            $r[$id] = "bar-{$id}";
+        }
+        return $r;
+    }
+
+    /**
+     * Expander that expands minimal user records.
+     *
+     * @param array $ids
+     * @return array
+     */
+    public function userExpander(array $ids): array {
+        $r = [];
+        foreach ($ids as $id) {
+            $r[$id] = [
+                'name' => "$id Name",
+                'url' => 'https://site.com/users/' . $id,
+            ];
+        }
+        return $r;
     }
 }

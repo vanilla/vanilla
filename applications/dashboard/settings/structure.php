@@ -8,10 +8,7 @@
  * @since 2.0
  */
 
-use Vanilla\Dashboard\Models\RecordStatusModel;
-use Vanilla\Dashboard\UserPointsModel;
 use Vanilla\Scheduler\Job\JobStatusModel;
-use Vanilla\Theme\ThemeCache;
 use Vanilla\Theme\ThemeService;
 use Vanilla\Theme\ThemeServiceHelper;
 

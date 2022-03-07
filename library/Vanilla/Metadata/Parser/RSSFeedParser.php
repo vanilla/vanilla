@@ -26,10 +26,10 @@ class RSSFeedParser extends AbstractXmlParser {
             'channel:o' => Schema::parse([
                 'title:s',
                 'link:s?',
-                'description:s',
+                'description:s?',
                 'image:o?' => Schema::parse([
-                    'url:s',
-                    'title:s',
+                    'url:s?',
+                    'title:s?',
                     'link:s',
                 ]),
             ]),

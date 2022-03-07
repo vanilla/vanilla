@@ -38,7 +38,7 @@ class BreadcrumbAsset extends AbstractLayoutAsset {
     /**
      * @inheritdoc
      */
-    public function getComponentName(): string {
+    public static function getComponentName(): string {
         return "Breadcrumbs";
     }
 

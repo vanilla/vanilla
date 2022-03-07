@@ -24,7 +24,9 @@ export default function TabWidget(props: ITabWidgetProps) {
 
     const tabsData: ITabData[] = tabs.map(({ label, componentName, componentProps }) => ({
         label,
-        contents: <Layout layout={[{ $reactComponent: componentName, $reactProps: componentProps }]} />,
+        contents: (
+            <Layout applyContexts={false} layout={[{ $reactComponent: componentName, $reactProps: componentProps }]} />
+        ),
     }));
 
     const widgetClasses = useWidgetSectionClasses();

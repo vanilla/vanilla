@@ -8,6 +8,8 @@
 namespace Vanilla\Models;
 
 use Garden\Schema\Schema;
+use Garden\Schema\ValidationException;
+use Vanilla\Dashboard\Models\UserFragment;
 use Vanilla\ApiUtils;
 use Vanilla\SchemaFactory;
 
@@ -73,12 +75,30 @@ class UserFragmentSchema extends Schema {
             'private' => (bool) $privateProfile,
             'banned' => $dbRecord['Banned'] ?? 0,
             'punished' => $dbRecord['Punished'] ?? 0,
-            'dateLastActive' => $dbRecord['DateLastActive'] ?? null,
+            'dateLastActive' => $dbRecord['DateLastActive'] ?? $dbRecord['dateLastActive'] ?? null,
             'title' => $dbRecord['Title'] ?? null,
             'label' => $dbRecord['Label'] ?? $dbRecord['label'] ?? null,
         ];
         $schemaRecord = ApiUtils::convertOutputKeys($schemaRecord);
         $schemaRecord = self::instance()->validate($schemaRecord);
         return $schemaRecord;
+    }
+
+    /**
+     * Validate data against the schema.
+     *
+     * @param mixed $data The data to validate.
+     * @param bool $sparse Whether or not this is a sparse validation.
+     * @return mixed Returns a cleaned version of the data.
+     * @throws ValidationException Throws an exception when the data does not validate against the schema.
+     */
+    public function validate($data, $sparse = false) {
+        if ($data instanceof UserFragment) {
+            $result = $data;
+        } else {
+            $result = parent::validate($data, $sparse);
+        }
+
+        return $result;
     }
 }

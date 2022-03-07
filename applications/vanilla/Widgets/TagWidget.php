@@ -8,17 +8,20 @@
 namespace Vanilla\Forum\Widgets;
 
 use Garden\Schema\Schema;
+use Vanilla\Layout\Section\SectionThreeColumns;
+use Vanilla\Layout\Section\SectionTwoColumns;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Web\JsInterpop\AbstractReactModule;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
 use Vanilla\Widgets\React\CombinedPropsWidgetInterface;
 use Vanilla\Widgets\React\CombinedPropsWidgetTrait;
 use Vanilla\Widgets\React\ReactWidgetInterface;
+use Vanilla\Widgets\React\SectionAwareInterface;
 
 /**
  * Class TagWidget
  */
-class TagWidget extends AbstractReactModule implements ReactWidgetInterface, CombinedPropsWidgetInterface {
+class TagWidget extends AbstractReactModule implements ReactWidgetInterface, CombinedPropsWidgetInterface, SectionAwareInterface {
 
     use CombinedPropsWidgetTrait, HomeWidgetContainerSchemaTrait;
 
@@ -52,8 +55,18 @@ class TagWidget extends AbstractReactModule implements ReactWidgetInterface, Com
     /**
      * @inheridoc
      */
-    public function getComponentName(): string {
+    public static function getComponentName(): string {
         return "TagWidget";
+    }
+
+    /**
+     * @return array
+     */
+    public static function getRecommendedSectionIDs(): array {
+        return [
+            SectionTwoColumns::getWidgetID(),
+            SectionThreeColumns::getWidgetID(),
+        ];
     }
 
     /**

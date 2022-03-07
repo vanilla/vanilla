@@ -111,6 +111,16 @@ trait TestLoggerTrait {
     }
 
     /**
+     * Assert that the log has a message.
+     *
+     * @param string $message
+     */
+    public function assertErrorLogMessage(string $message) {
+        $collection = self::getTestErrorLogCollection();
+        $this->assertLogMessage($message, $collection->getTestLogger());
+    }
+
+    /**
      * Assert that something was NOT logged.
      *
      * @param array $filter The log filter.
@@ -136,9 +146,10 @@ trait TestLoggerTrait {
      * Assert that the log has a message.
      *
      * @param string $message
+     * @param TestLogger|null $testLogger
      */
-    public function assertLogMessage(string $message) {
-        $logger = $this->getTestLogger();
+    public function assertLogMessage(string $message, TestLogger $testLogger = null) {
+        $logger = $testLogger ?? $this->getTestLogger();
         $this->assertTrue($logger->hasMessage($message), "The log doesn't have the message: ".$message);
     }
 }

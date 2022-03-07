@@ -45,7 +45,7 @@ class RSSWidget implements ReactWidgetInterface, CombinedPropsWidgetInterface, I
     /**
      * @inheridoc
      */
-    public function getComponentName(): string {
+    public static function getComponentName(): string {
         return "RSSWidget";
     }
 

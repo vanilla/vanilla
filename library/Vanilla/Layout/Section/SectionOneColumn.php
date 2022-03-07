@@ -18,7 +18,7 @@ class SectionOneColumn extends AbstractLayoutSection {
     /**
      * @inheritdoc
      */
-    public function getComponentName(): string {
+    public static function getComponentName(): string {
         return 'SectionOneColumn';
     }
 
@@ -27,7 +27,7 @@ class SectionOneColumn extends AbstractLayoutSection {
      */
     public static function getWidgetSchema(): Schema {
         return Schema::parse([
-            'contents' => new ReactChildrenSchema('The contents of the schema.'),
+            'children' => new ReactChildrenSchema('The contents of the section.'),
             'isNarrow:b?' => [
                 'default' => false,
             ],

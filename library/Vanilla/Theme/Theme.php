@@ -10,6 +10,7 @@ namespace Vanilla\Theme;
 use Garden\JsonFilterTrait;
 use Garden\Schema\Schema;
 use Vanilla\Addon;
+use Vanilla\Models\UserFragmentSchema;
 use Vanilla\Theme\ThemeService;
 use Vanilla\Theme\ThemeServiceHelper;
 use Vanilla\SchemaFactory;
@@ -98,7 +99,7 @@ class Theme implements \JsonSerializable {
             'version:s?',
             'revisionID:i?',
             'revisionName:s?',
-            'insertUser:o?',
+            'insertUser?' => SchemaFactory::get(UserFragmentSchema::class, "UserFragment"),
             'dateInserted:dt?',
             'current:b?',
             'active:b?',

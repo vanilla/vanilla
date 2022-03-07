@@ -19,6 +19,10 @@
         "footer": {
             "type": "html",
             "file": "footer.html"
+        },
+        "header": {
+            "type": "html",
+            "file": "header.html"
         }
     }
 }

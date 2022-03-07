@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -11,6 +11,9 @@ use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
+use Vanilla\Dashboard\Models\UserLeaderQuery;
+use Vanilla\Dashboard\UserLeaderService;
+use Vanilla\Dashboard\UserPointsModel;
 use Vanilla\DateFilterSchema;
 use Vanilla\ImageResizer;
 use Vanilla\Models\CrawlableRecordSchema;
@@ -37,7 +40,6 @@ class UsersApiController extends AbstractApiController {
 
     const ME_ACTION_CONSTANT = "@@users/GET_ME_DONE";
     const PERMISSIONS_ACTION_CONSTANT = "@@users/GET_PERMISSIONS_DONE";
-
 
     /** @var ActivityModel */
     private $activityModel;
@@ -477,7 +479,7 @@ class UsersApiController extends AbstractApiController {
         $user["countUnreadConversations"] = $user['countUnreadConversations'] ?? 0;
         $result = $out->validate($user);
 
-        $response = $this->expandMiddleware->updateResponseByKey($result, 'userID', true);
+        $response = $this->expandMiddleware->updateResponseByKey($result, 'userID', true, ['users']);
         $response->setMeta(\Vanilla\Web\ApiFilterMiddleware::FIELD_ALLOW, ['email']);
         $response->setHeader(self::HEADER_CACHE_CONTROL, self::NO_CACHE);
 
@@ -801,8 +803,6 @@ class UsersApiController extends AbstractApiController {
 
         $in->validate($body);
 
-        $this->userModel->validatePasswordStrength($userData['Password'], $userData['Name']);
-
         switch ($registrationMethod) {
             case 'invitation':
                 $userID = $this->userModel->insertForInvite($userData);
@@ -920,6 +920,69 @@ class UsersApiController extends AbstractApiController {
         $result = $out->validate($this->userByID($id));
         $result = new Data($result, ['api-allow' => ['email']]);
         return $result;
+    }
+
+    /**
+     * Get a list of point leaders by slotType/categoryID/limit criteria.
+     *
+     * @param array $query
+     * @return array
+     * @throws \Garden\Web\Exception\HttpException Exception.
+     * @throws \Vanilla\Exception\PermissionException Permission Exception.
+     */
+    public function get_leaders(array $query = []): array {
+        $this->permission();
+        // Throw If the vanillaanalytics plugin isn't enabled
+        if (!Gdn::addonManager()->isEnabled('vanillaanalytics', Vanilla\Addon::TYPE_ADDON)) {
+            throw new \Vanilla\Exception\FeatureNotEnabledException('VanillaAnalytics Plugin is not enabled.');
+        }
+        // Inbound data schema validation.
+        $query = $this->schema([
+            'leaderboardType:s' =>[
+                'description' => 'Type of data to use for a leaderboard.',
+                'enum' => [UserLeaderService::LEADERBOARD_TYPE_POSTS, UserLeaderService::LEADERBOARD_TYPE_REPUTATION],
+            ],
+            'slotType:s' => [
+                'description' => 'Slot type ("d" = day, "w" = week, "m" = month, "y" = year, "a" = all).',
+                'enum' => ['d', 'w', 'm', 'y', 'a'],
+            ],
+            'categoryID:i?' => [
+                'description' => 'The numeric ID of a category to limit search results to.',
+            ],
+            'limit:i?' => [
+                'description' => 'The maximum amount of records to be returned.',
+                "minimum" => 1,
+                'maximum' => ApiUtils::getMaxLimit(),
+            ]
+        ])->validate($query);
+
+        $query = new UserLeaderQuery(
+            $query['slotType'] ?? UserPointsModel::SLOT_TYPE_ALL,
+            $query['categoryID'] ?? null,
+            $query['limit'] ?? null,
+            $query['leaderboardType'] ?? UserLeaderService::LEADERBOARD_TYPE_REPUTATION
+        );
+        $userLeaderService = Gdn::getContainer()->get(UserLeaderService::class);
+        $leaders = $userLeaderService->getLeaders($query);
+
+        // Outbound data schema validation.
+        $leaders = $this->schema(
+            [
+                ':a' => [
+                    'slotType:s',
+                    'timeSlot:',
+                    'source:s',
+                    'categoryID:i',
+                    'userID:i',
+                    'points:i',
+                    'name:s',
+                    'photo:s'
+                ]
+            ],
+            'out'
+        )->validate($leaders);
+
+        return $leaders;
     }
 
     /**

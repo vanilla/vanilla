@@ -62,7 +62,7 @@ final class SchemaUtils {
      *
      * @param mixed $array The array to validate.
      * @param Schema $schema The schema to validate against.
-     * @param bool $sparse Whether or not to do a spase validation.
+     * @param bool $sparse Whether or not to do a sparse validation.
      */
     public static function validateArray(&$array, Schema $schema, bool $sparse = false) {
         if (!is_array($array)) {

@@ -98,8 +98,8 @@ class SmokeTest extends SiteTestCase {
         $user = [
             'Name' => 'frank',
             'Email' => 'frank@example.com',
-            'Password' => 'frankwantsin',
-            'PasswordMatch' => 'frankwantsin',
+            'Password' => '123fr@nkwantsin+NewPassword',
+            'PasswordMatch' => '123fr@nkwantsin+NewPassword',
             'Gender' => 'm',
             'TermsOfService' => '1',
         ];

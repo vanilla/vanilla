@@ -218,6 +218,71 @@ paths:
                     $ref: "#/components/responses/HydratedLayout"
                 "404":
                     $ref: "#/components/responses/NotFound"
+    /layouts/{id}/hydrate-assets:
+        x-hidden: true
+        parameters:
+            - name: id
+              description: The layout ID.
+              in: path
+              required: true
+              schema:
+                  oneOf:
+                      - type: integer
+                      - type: string
+        get:
+            summary: Getting assets of an existing layout without hydrating data.
+            tags:
+                - Layout
+            parameters:
+                - name: params
+                  in: query
+                  required: true
+                  description: Parameters defined for the layout's layoutViewType.
+                  schema:
+                      type: object
+            responses:
+                "200":
+                    $ref: "#/components/responses/HydratedLayout"
+                "404":
+                    $ref: "#/components/responses/NotFound"
+    /layouts/lookup-hydrate-assets:
+        x-hidden: true
+        get:
+            summary: Getting assets of an existing layout without hydrating data, based on layout type, recordID and record type.
+            tags:
+                - Layout
+            parameters:
+                - name: layoutViewType
+                  in: query
+                  required: true
+                  description: Type of layout.
+                  schema:
+                      type: string
+
+                - name: recordID
+                  in: query
+                  required: true
+                  description: ID of the resource associated with this layout.
+                  schema:
+                      type: integer
+
+                - name: recordType
+                  in: query
+                  required: true
+                  description: Type of resource to which this layout applies.
+                  schema:
+                      type: string
+                - name: params
+                  in: query
+                  required: true
+                  description: Parameters defined for the layout's layoutViewType.
+                  schema:
+                      type: object
+            responses:
+                "200":
+                    $ref: "#/components/responses/HydratedLayout"
+                "404":
+                    $ref: "#/components/responses/NotFound"
     /layouts/hydrate:
         x-hidden: true
         post:
@@ -242,10 +307,10 @@ paths:
                     $ref: "#/components/responses/HydratedLayout"
                 "403":
                     $ref: "#/components/responses/PermissionError"
-    /layouts/catalogue:
+    /layouts/catalog:
         x-hidden: true
         get:
-            summary: Get a catalogue of the items available in a layout.
+            summary: Get a catalog of the items available in a layout.
             tags:
                 - Layout
             parameters:
@@ -268,41 +333,50 @@ paths:
                                         type: object
                                         example:
                                             locale:
-                                                type: string
-                                                description: "The locale used to render the layout"
+                                                schema:
+                                                    type: string
+                                                    description: "The locale used to render the layout"
                                             category/categoryID:
-                                                type: integer
+                                                schema:
+                                                    type: integer
                                     widgets:
                                         description: A mapping of widgetType to widget schema for all available widgets.
                                         type: object
                                         additionalProperties: true
                                         example:
                                             "react.discussions.list":
-                                                type: "object"
-                                                properties: {}
+                                                $reactComponent: "DiscussionsList"
+                                                schema:
+                                                    type: "object"
+                                                    properties: {}
                                     assets:
                                         description: A mapping of widgetType to widget schema for all available assets.
                                         type: object
                                         additionalProperties: true
                                         example:
                                             "react.assets.breadcrumbs":
-                                                type: "object"
-                                                properties: {}
+                                                $reactComponent: "Breadcrumbs"
+                                                schema:
+                                                    type: "object"
+                                                    properties: {}
                                     sections:
                                         description: A mapping of widgetType to widget schema for all available sections.
                                         type: object
                                         additionalProperties: true
                                         example:
                                             "react.sections.2-columns":
-                                                type: "object"
-                                                properties: {}
+                                                $reactComponent: SectionTwoColumns
+                                                schema:
+                                                    type: "object"
+                                                    properties: {}
                                     middleware:
                                         description: A mapping of middlewareType to middleware scheam for all available middlewares.
                                         type: object
                                         example:
                                             "role-filter":
-                                                type: "object"
-                                                properties: {}
+                                                schema:
+                                                    type: "object"
+                                                    properties: {}
     /layouts/schema:
         x-hidden: true
         get:
@@ -428,6 +502,23 @@ components:
                                 $ref: "#/components/schemas/LayoutViewType"
                             layout:
                                 $ref: "#/components/schemas/LayoutDefinitionHydrated"
+        LayoutAssets:
+            description: Success
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            js:
+                                type: array
+                                description: List of JS files.
+                                default: false
+                                readOnly: true
+                            css:
+                                type: array
+                                description: List of CSS files.
+                                default: false
+                                readOnly: true
     schemas:
         JsonSchema:
             type: object
@@ -437,7 +528,6 @@ components:
                 properties: {}
 
         LayoutViewType:
-            x-hidden: true
             description: Type of resource to which this layout applies
             type: string
             enum:

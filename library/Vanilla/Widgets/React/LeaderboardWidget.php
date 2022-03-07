@@ -8,8 +8,12 @@
 namespace Vanilla\Widgets\React;
 
 use Garden\Schema\Schema;
+use Vanilla\Dashboard\Models\UserLeaderQuery;
+use Vanilla\Dashboard\UserLeaderService;
 use Vanilla\Dashboard\UserPointsModel;
 use Vanilla\Forum\Controllers\Api\DiscussionsApiIndexSchema;
+use Vanilla\Layout\Section\SectionThreeColumns;
+use Vanilla\Layout\Section\SectionTwoColumns;
 use Vanilla\Models\UserFragmentSchema;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Web\JsInterpop\AbstractReactModule;
@@ -18,13 +22,13 @@ use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
 /**
  * Widget with the users having the top points.
  */
-class LeaderboardWidget extends AbstractReactModule implements ReactWidgetInterface, CombinedPropsWidgetInterface {
+class LeaderboardWidget extends AbstractReactModule implements ReactWidgetInterface, CombinedPropsWidgetInterface, SectionAwareInterface {
 
     use CombinedPropsWidgetTrait;
     use HomeWidgetContainerSchemaTrait;
 
-    /** @var UserPointsModel */
-    private $userPointsModel;
+    /** @var UserLeaderService */
+    private $userLeaderService;
 
     /** @var \UserModel */
     private $userModel;
@@ -32,12 +36,12 @@ class LeaderboardWidget extends AbstractReactModule implements ReactWidgetInterf
     /**
      * DI.
      *
-     * @param UserPointsModel $userPointsModel
+     * @param UserLeaderService $userLeaderService
      * @param \UserModel $userModel
      */
-    public function __construct(UserPointsModel $userPointsModel, \UserModel $userModel) {
+    public function __construct(UserLeaderService $userLeaderService, \UserModel $userModel) {
         parent::__construct();
-        $this->userPointsModel = $userPointsModel;
+        $this->userLeaderService = $userLeaderService;
         $this->userModel = $userModel;
     }
 
@@ -62,11 +66,12 @@ class LeaderboardWidget extends AbstractReactModule implements ReactWidgetInterf
      * @inheritDoc
      */
     public function getProps(): ?array {
-        $users = $this->userPointsModel->getLeaders(
+        $query = new UserLeaderQuery(
             $this->props['apiParams']['slotType'],
             $this->props['apiParams']['categoryID'] ?? null,
             $this->props['apiParams']['limit']
         );
+        $users = $this->userLeaderService->getLeaders($query);
         if (count($users) === 0) {
             return null;
         }
@@ -92,6 +97,7 @@ class LeaderboardWidget extends AbstractReactModule implements ReactWidgetInterf
         $widgetSpecificSchema = Schema::parse([
             'apiParams?' => Schema::parse([
                 "slotType?" => UserPointsModel::slotTypeSchema(),
+                'LeaderboardType?' => UserPointsModel::leaderboardTypeSchema(),
                 "limit?" => UserPointsModel::limitSchema(),
                 'categoryID:i?' => $categoryIDSchema,
             ])
@@ -109,7 +115,7 @@ class LeaderboardWidget extends AbstractReactModule implements ReactWidgetInterf
     /**
      * @inheritDoc
      */
-    public function getComponentName(): string {
+    public static function getComponentName(): string {
         return "LeaderboardWidget";
     }
 
@@ -125,5 +131,15 @@ class LeaderboardWidget extends AbstractReactModule implements ReactWidgetInterf
      */
     public static function getWidgetName(): string {
         return "Leaderboard";
+    }
+
+    /**
+     * @return array
+     */
+    public static function getRecommendedSectionIDs(): array {
+        return [
+            SectionTwoColumns::getWidgetID(),
+            SectionThreeColumns::getWidgetID(),
+        ];
     }
 }

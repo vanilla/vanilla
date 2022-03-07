@@ -16,9 +16,10 @@ use Garden\Hydrate\Schema\HydrateableSchema;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\NotFoundException;
+use Gdn;
 use Vanilla\Layout\Resolvers\TranslateResolver;
 use Vanilla\Layout\Resolvers\ApiResolver;
-use Vanilla\Layout\Middleware\LayoutRoleFilterMiddleware;
+use Vanilla\Layout\Middleware\LayoutPermissionFilterMiddleware;
 use Vanilla\Layout\Middleware\VisibilityMiddleware;
 use Vanilla\Layout\Resolvers\ReactLayoutExceptionHandler;
 use Vanilla\Layout\Resolvers\ReactResolver;
@@ -29,6 +30,7 @@ use Vanilla\Layout\Section\SectionTwoColumns;
 use Vanilla\Layout\View\AbstractCustomLayoutView;
 use Vanilla\Layout\View\CommonLayoutView;
 use Vanilla\Layout\View\HomeLayoutView;
+use Vanilla\Web\Asset\WebpackAssetProvider;
 use Vanilla\Web\JsInterpop\AbstractReactModule;
 use Vanilla\Web\PageHead;
 use Vanilla\Web\PageHeadAwareInterface;
@@ -96,7 +98,6 @@ final class LayoutHydrator {
             ->addReactResolver(SectionTwoColumns::class)
             ->addReactResolver(SectionOneColumn::class)
             ->addReactResolver(SectionFullWidth::class)
-            ->addReactResolver(WidgetContainerReactWidget::class)
             ->addReactResolver(QuickLinksWidget::class)
             ->addReactResolver(LeaderboardWidget::class)
             ->addReactResolver(BannerFullWidget::class)
@@ -104,7 +105,7 @@ final class LayoutHydrator {
         ;
 
         $this->addLayoutView($container->get(HomeLayoutView::class));
-        $this->addMiddleware($container->get(LayoutRoleFilterMiddleware::class));
+        $this->addMiddleware($container->get(LayoutPermissionFilterMiddleware::class));
         $this->addMiddleware($container->get(VisibilityMiddleware::class));
     }
 
@@ -265,6 +266,56 @@ final class LayoutHydrator {
         }
         return $result;
     }
+
+    /**
+     * Validate and extract static assets.
+     *
+     * @param string $layoutViewType Layout Type.
+     * @param array $params parameters to hydrate the layout.
+     * @param array $layout layout data
+     *
+     * @return array returns hydrated content.
+     */
+    public function getAssetLayout(string $layoutViewType, array $params, array $layout): array {
+        $result = [];
+       // Validate the params.
+        $hydrator = $this->getHydrator($layoutViewType, null, true);
+        $hydrator->resolve($layout, $params);
+        $widgetNames = [];
+        foreach ($hydrator->getResolvers() as $resolver) {
+            if ($resolver instanceof LayoutAssetAwareInterface) {
+                $widget = $resolver->getWidgetNames();
+                $widgetNames = array_merge($widgetNames, $widget == null ? [] : $widget);
+            }
+        }
+
+        /** @var WebpackAssetProvider $webpackAssetProvider */
+        $webpackAssetProvider = Gdn::getContainer()->get(WebpackAssetProvider::class);
+        $webpackAssetProvider->setHotReloadEnabled(false);
+        $jsList = $webpackAssetProvider->getScripts('layouts', true);
+        $cssList = $webpackAssetProvider->getStylesheets('layouts', true);
+        $webpackAssetProvider->setHotReloadEnabled(true);
+        $result['js'] = [];
+        $result['css'] = [];
+
+        foreach ($widgetNames as $widget) {
+            foreach ($jsList as $jsAsset) {
+                if (str_contains($jsAsset->getWebPath(), $widget)) {
+                    $result['js'][] = $jsAsset->getWebPath();
+                }
+            }
+            foreach ($cssList as $cssAsset) {
+                if (str_contains($cssAsset->getWebPath(), $widget)) {
+                    $result['css'][] = $cssAsset->getWebPath();
+                }
+            }
+        }
+        // Apply pageHead meta
+
+
+        return $result;
+    }
+
     /**
      * Get the full set of resolved params based on the input params.
      *
@@ -297,10 +348,11 @@ final class LayoutHydrator {
      *
      * @param string|null $layoutViewType
      * @param ?PageHeadInterface $pageHead
+     * @param bool $onlyGetAsset
      *
      * @return DataHydrator
      */
-    public function getHydrator(?string $layoutViewType, ?PageHeadInterface $pageHead = null): DataHydrator {
+    public function getHydrator(?string $layoutViewType, ?PageHeadInterface $pageHead = null, ?bool $onlyGetAsset = null): DataHydrator {
         $dataHydrator = $this->dataHydrator;
         $layoutView = $this->getLayoutViewType($layoutViewType);
         if ($layoutView) {
@@ -315,6 +367,8 @@ final class LayoutHydrator {
         foreach ($dataHydrator->getResolvers() as $resolver) {
             if ($resolver instanceof PageHeadAwareInterface && $pageHead !== null) {
                 $resolver->setPageHead($pageHead);
+            } else if ($resolver instanceof LayoutAssetAwareInterface && $onlyGetAsset !== null) {
+                $resolver->setPartialHydrate($onlyGetAsset);
             }
         }
 

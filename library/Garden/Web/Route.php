@@ -30,11 +30,28 @@ abstract class Route {
      */
     private $middlewares = [];
 
+    /** @var int */
+    private $priority = 0;
+
     /**
      * Route constructor.
      */
     public function __construct() {
         // This is here so that subclasses can call parent::__construct() to be forwards compatible with any code added later.
+    }
+
+    /**
+     * @return int
+     */
+    public function getPriority(): int {
+        return $this->priority;
+    }
+
+    /**
+     * @param int $priority
+     */
+    public function setPriority(int $priority): void {
+        $this->priority = $priority;
     }
 
     /**

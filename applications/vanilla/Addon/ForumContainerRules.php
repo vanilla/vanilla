@@ -27,8 +27,8 @@ use Vanilla\Forum\Widgets\RSSWidget;
 use Vanilla\Forum\Widgets\UserSpotlightWidget;
 use Vanilla\Layout\LayoutHydrator;
 use Vanilla\Layout\LayoutService;
+use Vanilla\Layout\View\HomeLayoutView;
 use Vanilla\Models\SiteTotalService;
-
 
 /**
  * Class ForumContainerRules
@@ -60,6 +60,8 @@ class ForumContainerRules extends AddonContainerRules {
             ->addCall('addLayoutView', [new Reference(LegacyCategoryListLayoutView::class)])
             ->addCall('addLayoutView', [new Reference(LegacyDiscussionListLayoutView::class)])
             ->addCall('addLayoutView', [new Reference(LegacyDiscussionThreadLayoutView::class)])
-            ->addCall('addLayoutView', [new Reference(LegacyNewDiscussionLayoutView::class)]);
+            ->addCall('addLayoutView', [new Reference(LegacyNewDiscussionLayoutView::class)])
+            ->addCall('addLayoutView', [new Reference(HomeLayoutView::class)])
+        ;
     }
 }

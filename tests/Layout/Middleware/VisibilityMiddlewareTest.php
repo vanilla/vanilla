@@ -50,11 +50,12 @@ class VisibilityMiddlewareTest extends BootstrapTestCase {
             [
                 '$reactComponent' => 'SectionOneColumn',
                 '$reactProps' => [
-                    'contents' => [
+                    'children' => [
                         [
                             '$reactComponent' => 'HtmlWidget',
                             '$reactProps' => [
                                 'html' => 'Should appear',
+                                'isAdvertisement' => false
                             ],
                         ],
                         [
@@ -62,11 +63,11 @@ class VisibilityMiddlewareTest extends BootstrapTestCase {
                             '$reactComponent' => 'HtmlWidget',
                             '$reactProps' => [
                                 'html' => 'Should have middleware passed to frontend.',
+                                'isAdvertisement' => false
                             ],
                         ],
                     ],
                     'isNarrow' => false,
-                    'autoWrap' => true,
                 ],
             ],
             'notReact' => 'No middleware here',

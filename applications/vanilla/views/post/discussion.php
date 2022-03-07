@@ -24,7 +24,12 @@ if (!$CancelUrl) {
     $newCategoryDropdown = Gdn::themeFeatures()->get("NewCategoryDropdown");
 
     if ($this->ShowCategorySelector === true) {
-        $options = ['Value' => val('CategoryID', $this->Category), 'IncludeNull' => true, 'AdditionalPermissions' => ['PermsDiscussionsAdd']];
+        $includeNull = true;
+        if ($this->Category && $this->CategoryID > 0) {
+            $includeNull = [$this->Category->CategoryID, $this->Category->Name];
+        }
+        $options = ['Value' => val('CategoryID', $this->Category), "IncludeNull" => $includeNull, 'AdditionalPermissions' => ['PermsDiscussionsAdd']];
+
         if ($this->Context) {
             $options['Context'] = $this->Context;
         }

@@ -18,7 +18,9 @@ export const EmbedMenuContext = createContext<IEmbedMenuContext>({
     setSelected: () => {},
 });
 
-interface IProps {}
+interface IProps {
+    className?: string;
+}
 
 /**
  * Renders an embed menu and manages it's context.
@@ -34,7 +36,7 @@ export function EmbedMenu(props: PropsWithChildren<IProps>) {
                 <div
                     role="toolbar"
                     ref={menuRef}
-                    className={classNames({ [classes.root]: true, isOpened: selected != null })}
+                    className={classNames({ [classes.root]: true, isOpened: selected != null }, props.className)}
                 >
                     {children}
                 </div>

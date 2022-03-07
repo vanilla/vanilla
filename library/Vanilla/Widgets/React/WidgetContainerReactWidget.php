@@ -31,7 +31,7 @@ class WidgetContainerReactWidget implements ReactWidgetInterface, CombinedPropsW
     /**
      * @inheritdoc
      */
-    public function getComponentName(): string {
+    public static function getComponentName(): string {
         return 'WidgetContainer';
     }
 

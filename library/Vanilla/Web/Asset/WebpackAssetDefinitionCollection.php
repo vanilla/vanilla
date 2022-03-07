@@ -21,6 +21,7 @@ final class WebpackAssetDefinitionCollection {
 
     const MANIFEST_JSON = "manifest.json";
     const MANIFEST_PHP = "manifest.php";
+    const MANIFESTASYNC_PHP = "manifestAsync.php";
 
     /** @var string */
     private $section;
@@ -175,15 +176,16 @@ final class WebpackAssetDefinitionCollection {
      *
      * @param string $section
      * @param string $distPath The path to the dist directory.
+     * @param bool $includeAsync include async assets.
      *
      * @return WebpackAssetDefinitionCollection
      */
-    public static function loadFromDist(string $section, string $distPath = PATH_DIST): WebpackAssetDefinitionCollection {
+    public static function loadFromDist(string $section, string $distPath = PATH_DIST, bool $includeAsync = false): WebpackAssetDefinitionCollection {
         $sectionDir = Path::join([$distPath, $section]);
         $manifestPath = Path::join([$sectionDir, self::MANIFEST_JSON]);
-        $cachePath = Path::join([$sectionDir, self::MANIFEST_PHP]);
+        $cachePath = Path::join([$sectionDir, $includeAsync ? self::MANIFESTASYNC_PHP : self::MANIFEST_PHP]);
 
-        $definition = FileUtils::getCached($cachePath, function () use ($manifestPath, $section) {
+        $definition = FileUtils::getCached($cachePath, function () use ($manifestPath, $section, $includeAsync) {
             $collection = new WebpackAssetDefinitionCollection($section);
             if (!file_exists($manifestPath)) {
                 trigger_error("Failed to load webpack manifest for section '$section'. Could not locate them on disk.", E_USER_NOTICE);
@@ -193,7 +195,7 @@ final class WebpackAssetDefinitionCollection {
             // Load the manifest.
             try {
                 $manifest = FileUtils::getArray($manifestPath);
-                self::applyManifestToCollection($collection, $manifest);
+                self::applyManifestToCollection($collection, $manifest, $includeAsync);
             } catch (Exception $e) {
                 trigger_error("Could not decode webpack manifest for section '$section'." . $e->getMessage(), E_USER_NOTICE);
             } finally {
@@ -210,15 +212,16 @@ final class WebpackAssetDefinitionCollection {
      *
      * @param WebpackAssetDefinitionCollection $collection
      * @param array $manifest
+     * @param bool $includeAsync
      */
-    private static function applyManifestToCollection(WebpackAssetDefinitionCollection $collection, array $manifest) {
+    private static function applyManifestToCollection(WebpackAssetDefinitionCollection $collection, array $manifest, bool $includeAsync = false) {
         foreach ($manifest as $entryPath => $assetPath) {
             $isAddon = str_starts_with($entryPath, 'addons/');
             $extension = pathinfo($entryPath, PATHINFO_EXTENSION);
             $name = pathinfo($entryPath, PATHINFO_FILENAME);
             $addonKey = null;
 
-            if (str_contains($assetPath, '/async/')) {
+            if (str_contains($assetPath, '/async/') && !$includeAsync) {
                 // Async plugins are loaded by webpack, not by the frontend.
                 continue;
             }

@@ -27,7 +27,7 @@ class QuickLinksModule extends AbstractReactModule {
     /**
      * @inheritdoc
      */
-    public function getComponentName(): string {
+    public static function getComponentName(): string {
         return 'QuickLinks';
     }
 

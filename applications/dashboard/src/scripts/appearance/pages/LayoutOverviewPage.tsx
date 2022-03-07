@@ -14,7 +14,6 @@ import { ButtonTypes } from "@library/forms/buttonTypes";
 import { RouteComponentProps } from "react-router";
 import { useLayout, usePutLayoutView } from "@dashboard/layout/layoutSettings/LayoutSettings.hooks";
 import { LoadStatus } from "@library/@types/api/core";
-import Loader from "@library/loaders/Loader";
 import ErrorMessages from "@library/forms/ErrorMessages";
 import { notEmpty } from "@vanilla/utils";
 import Translate from "@library/content/Translate";
@@ -26,35 +25,55 @@ import layoutOverviewPageClasses from "./LayoutOverviewPage.classes";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
 import { ErrorWrapper } from "@dashboard/appearance/pages/ErrorWrapper";
+import { EditLayoutRoute } from "@dashboard/appearance/routes/pageRoutes";
+import { LayoutOverview } from "@dashboard/appearance/components/LayoutOverview";
+import { MetaItem, Metas } from "@library/metas/Metas";
+import ProfileLink from "@library/navigation/ProfileLink";
+import { metasClasses } from "@library/metas/Metas.styles";
 
 interface IDescriptionProps {
     layout: ILayout;
 }
 
-function LayoutOverviewPageDescriptionImpl(props: IDescriptionProps) {
-    const insertUser = useUser({ userID: props.layout.insertUserID });
-    const layoutViewNames =
-        props.layout?.layoutViews && props.layout?.layoutViews.map((layoutView) => layoutView.record.name);
-    const appliedGloballyOnly = layoutViewNames.length && !layoutViewNames.some((value) => value !== "global");
+function LayoutOverviewPageMetasImpl(props: IDescriptionProps) {
+    const classesMetas = metasClasses();
+    const layoutViewNames = props.layout?.layoutViews
+        ? props.layout?.layoutViews.map((layoutView) => layoutView.record.name)
+        : [];
 
-    if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(insertUser.status)) {
-        return <LoadingRectangle width={320} height={18} />;
-    }
-
-    if (!insertUser.data || insertUser.error) {
-        return <ErrorMessages errors={[insertUser.error].filter(notEmpty)} />;
-    }
+    const appliedGloballyOnly = layoutViewNames.length && !(layoutViewNames || []).some((value) => value !== "global");
 
     return (
-        <>
-            <Translate
-                source="Created <0/> by <1/>. "
-                c0={<DateTime timestamp={props.layout?.dateInserted} />}
-                c1={insertUser.data?.name}
-            />
-            {!!layoutViewNames.length &&
-                (appliedGloballyOnly ? t("Applied globally") : t("Applied on ") + layoutViewNames.join(", ")) + "."}
-        </>
+        <Metas>
+            <MetaItem>
+                <Translate
+                    source="Created <0/> by <1/>."
+                    c0={<DateTime timestamp={props.layout?.dateInserted} />}
+                    c1={
+                        <ProfileLink
+                            className={classesMetas.metaLink}
+                            userFragment={{
+                                userID: props.layout.insertUserID as number,
+                                name: props.layout.insertUser!.name,
+                            }}
+                        />
+                    }
+                />
+            </MetaItem>
+            {props.layout.updateUser && props.layout.dateUpdated && (
+                <MetaItem>
+                    <Translate
+                        source="Last updated <0/> by <1/>. "
+                        c0={<DateTime timestamp={props.layout?.dateUpdated} />}
+                        c1={<ProfileLink className={classesMetas.metaLink} userFragment={props.layout.updateUser} />}
+                    />
+                </MetaItem>
+            )}
+            <MetaItem>
+                {!!layoutViewNames.length &&
+                    t("Applied on ") + (appliedGloballyOnly ? "homepage" : layoutViewNames.join(", ")) + "."}
+            </MetaItem>
+        </Metas>
     );
 }
 
@@ -83,7 +102,7 @@ export default function LayoutOverviewPage(
     };
     const viewIsAlreadyApplied =
         layoutLoadable.status === LoadStatus.SUCCESS &&
-        layout?.layoutViews.some(
+        (layout?.layoutViews || []).some(
             (layoutView) =>
                 layoutView.recordType === globalLayoutView.recordType &&
                 layoutView.recordID === globalLayoutView.recordID,
@@ -95,53 +114,46 @@ export default function LayoutOverviewPage(
         </ErrorWrapper>
     );
 
-    const content = layoutStatusIsPending ? (
-        <Loader />
-    ) : layoutStatusIsError ? (
-        errorContent(layoutLoadable)
-    ) : (
-        <div>Preview content is here</div>
-    );
-
     const descriptionContent = layoutStatusIsPending ? (
         <LoadingRectangle width={320} height={18} />
     ) : layoutStatusIsError ? (
         errorContent(layoutLoadable)
     ) : (
-        <LayoutOverviewPageDescriptionImpl layout={layout as ILayout} />
+        <LayoutOverviewPageMetasImpl layout={layout as ILayout} />
+    );
+
+    const titleBarActionsContent = !layoutStatusIsError ? (
+        <>
+            <DropDown name={t("Layout Options")} flyoutType={FlyoutType.LIST} className={classes.layoutOptionsDropdown}>
+                <DropDownItemButton
+                    onClick={() => {
+                        !viewIsAlreadyApplied && putLayoutView(globalLayoutView);
+                    }}
+                >
+                    {t("Apply")}
+                </DropDownItemButton>
+
+                {/* <DropDownItemButton onClick={() => {}}>{t("Preview")}</DropDownItemButton>
+                 <DropDownItemButton onClick={() => {}}>{t("Delete")}</DropDownItemButton> */}
+            </DropDown>
+            <LinkAsButton buttonType={ButtonTypes.OUTLINE} to={EditLayoutRoute.url(layout!)}>
+                {t("Edit")}
+            </LinkAsButton>
+        </>
+    ) : (
+        <></>
     );
 
     return (
         <AdminLayout
+            contentClassNames={classes.overviewContent}
             activeSectionID={"appearance"}
             title={layout?.name || ""}
             description={descriptionContent}
-            titleBarActions={
-                <>
-                    <DropDown
-                        name={t("Layout Options")}
-                        flyoutType={FlyoutType.LIST}
-                        className={classes.layoutOptionsDropdown}
-                    >
-                        <DropDownItemButton
-                            onClick={() => {
-                                !viewIsAlreadyApplied && putLayoutView(globalLayoutView);
-                            }}
-                        >
-                            {t("Apply")}
-                        </DropDownItemButton>
-
-                        <DropDownItemButton onClick={() => {}}>{t("Preview")}</DropDownItemButton>
-                        <DropDownItemButton onClick={() => {}}>{t("Delete")}</DropDownItemButton>
-                    </DropDown>
-                    <LinkAsButton buttonType={ButtonTypes.OUTLINE} to="http://editPath">
-                        {t("Edit")}
-                    </LinkAsButton>
-                </>
-            }
+            titleBarActions={titleBarActionsContent}
             adminBarHamburgerContent={<AppearanceNav asHamburger />}
             leftPanel={!isCompact && <AppearanceNav />}
-            content={content}
+            content={<LayoutOverview layoutID={layoutID} />}
         />
     );
 }

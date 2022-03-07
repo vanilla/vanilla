@@ -114,6 +114,8 @@ git-diff.txt
 phpcs-diff.json
 .phpunit.result.cache
 *.cookiejar
+/cli/vendor/
+/cli/composer.lock
 
 # Yarn
 yarn-error.log

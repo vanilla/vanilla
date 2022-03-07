@@ -195,7 +195,7 @@ abstract class AbstractHomeWidgetModule extends AbstractReactModule {
      *
      * @return string
      */
-    public function getComponentName(): string {
+    public static function getComponentName(): string {
         return "HomeWidget";
     }
 

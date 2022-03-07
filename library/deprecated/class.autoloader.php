@@ -35,19 +35,19 @@ class Gdn_Autoloader {
     const PRIORITY_PERSIST = 'persist';
 
     /** @var array Array of registered maps to search during load requests */
-    protected static $maps;
+    protected static $maps = [];
 
     /** @var array Array of pathname prefixes used to namespace similar libraries */
-    protected static $prefixes;
+    protected static $prefixes = [];
 
     /** @var array Array of contexts used to establish search order */
-    protected static $contextOrder;
+    protected static $contextOrder = [];
 
     /** @var array Array of maps that pertain to the same CONTEXT+Extension */
-    protected static $mapGroups;
+    protected static $mapGroups = [];
 
     /** @var array List of priority/preferred CONTEXT+Extension[+MapType] groups for the next lookup */
-    protected static $priorities;
+    protected static $priorities = [];
 
     /**
      * Attach mappings for vanilla extension folders.
@@ -156,7 +156,7 @@ class Gdn_Autoloader {
         // We loop over the caches twice. First, hit only their cached data.
         // If all cache hits miss, search filesystem.
 
-        if (!is_array(self::$maps)) {
+        if (empty(self::$maps)) {
             return false;
         }
 

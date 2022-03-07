@@ -1,0 +1,21 @@
+/**
+ * @author Adam Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2021 Vanilla Forums Inc.
+ * @license gpl-2.0-only
+ */
+
+import { registerWidgetOverviews } from "@dashboard/appearance/components/LayoutOverview";
+import { SectionFullWidth } from "@library/layout/SectionFullWidth";
+import { SectionOneColumn } from "@library/layout/SectionOneColumn";
+import ThreeColumnSection from "@library/layout/ThreeColumnSection";
+import TwoColumnSection from "@library/layout/TwoColumnSection";
+import { QuickLinks } from "@library/navigation/QuickLinks";
+
+registerWidgetOverviews({
+    SectionFullWidth,
+    SectionOneColumn,
+    // Todo fix these names.
+    SectionTwoColumns: TwoColumnSection,
+    SectionThreeColumns: ThreeColumnSection,
+    QuickLinks, // Quicklinks doesn't need server data so the same widget renders here as on the server.
+});

@@ -14,6 +14,7 @@ export interface IWithLinkContext {
     pushSmartLocation(location: LocationDescriptor);
     isDynamicNavigation(location: LocationDescriptor): boolean;
     makeHref(location: LocationDescriptor): string;
+    areLinksDisabled: boolean;
 }
 
 const defaultMakeHref = (location: LocationDescriptor) => {
@@ -23,7 +24,8 @@ const defaultMakeHref = (location: LocationDescriptor) => {
     const stringUrl = typeof location === "string" ? location : createPath(location);
     return formatUrl(stringUrl, true);
 };
-export const LinkContext = React.createContext<IWithLinkContext>({
+
+export const LINK_CONTEXT_DEFAULTS: IWithLinkContext = {
     linkContexts: [formatUrl("/")],
     pushSmartLocation: (location) => {
         const href = defaultMakeHref(location);
@@ -33,7 +35,10 @@ export const LinkContext = React.createContext<IWithLinkContext>({
         return false;
     },
     makeHref: defaultMakeHref,
-});
+    areLinksDisabled: false,
+};
+
+export const LinkContext = React.createContext<IWithLinkContext>(LINK_CONTEXT_DEFAULTS);
 
 interface IProps {
     linkContexts: string[];
@@ -100,6 +105,7 @@ export const LinkContextProvider = (props: IProps) => {
                 pushSmartLocation,
                 isDynamicNavigation,
                 makeHref,
+                areLinksDisabled: false,
             }}
         >
             {props.children}

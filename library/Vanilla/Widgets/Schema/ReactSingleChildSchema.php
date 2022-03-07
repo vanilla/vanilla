@@ -45,6 +45,7 @@ class ReactSingleChildSchema extends Schema {
                     'description' => 'Props to render the component with.',
                 ],
             ],
+            "advertisement" => ['$reactComponent', '$reactProps'],
             "required" => ['$reactComponent', '$reactProps'],
         ]);
     }

@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -21,7 +21,7 @@ class HtmlReactWidget implements ReactWidgetInterface, CombinedPropsWidgetInterf
     /**
      * @inheritdoc
      */
-    public function getComponentName(): string {
+    public static function getComponentName(): string {
         return 'HtmlWidget';
     }
 
@@ -33,7 +33,21 @@ class HtmlReactWidget implements ReactWidgetInterface, CombinedPropsWidgetInterf
             'html:s' => [
                 'description' => 'Sanitized HTML to render.'
             ],
+            "isAdvertisement:b" => [
+                "description" => "Controls if element is advertisement, and display is controlled by permissions.",
+                "default" => false
+            ]
         ]);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getProps(): ?array {
+        if ($this->props['isAdvertisement'] && checkPermission('noAds.use')) {
+            return null;
+        }
+        return $this->props;
     }
 
     /**

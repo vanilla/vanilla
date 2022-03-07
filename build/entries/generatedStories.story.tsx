@@ -11,12 +11,13 @@ import { LoadStatus } from "@library/@types/api/core";
 import { initAllUserContent } from "@library/content";
 import { applyCompatibilityUserCards } from "@library/features/userCard/UserCard.compat";
 import { NO_WRAPPER_CONFIG, useStoryConfig } from "@library/storybook/StoryContext";
-import { setMeta, _executeReady } from "@library/utility/appUtils";
+import { onReady, setMeta, _executeReady } from "@library/utility/appUtils";
 import { loadedCSS } from "@rich-editor/quill/components/loadedStyles";
 import { storiesOf } from "@storybook/react";
 import { applySharedPortalContext } from "@vanilla/react-utils";
 import classNames from "classnames";
 import React, { useEffect, useRef } from "react";
+import "./windowGlobalsKludge";
 import "../../addons/themes/theme-foundation/src/scss/custom.scss";
 import "../../applications/vanilla/src/scripts/entries/forum";
 import "../../plugins/rich-editor/src/scripts/entries/forum";
@@ -69,9 +70,17 @@ Object.entries(allHtmls).forEach(([name, htmlModule]) => {
     }
     const storyName = otherWords.join(" ");
 
-    storyOf.add(storyName, () => {
-        return <HtmlRenderComponent html={html} data={data} />;
-    });
+    storyOf.add(
+        storyName,
+        () => {
+            return <HtmlRenderComponent html={html} data={data} />;
+        },
+        {
+            chromatic: {
+                viewports: [1300],
+            },
+        },
+    );
 });
 
 function HtmlRenderComponent(props: { html: string; data: IHtmlData }) {

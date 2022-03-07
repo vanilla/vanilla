@@ -1248,10 +1248,10 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
      *
      * @param array $row
      * @param string $action
-     * @param array|null $sender
+     * @param array|object|null $sender
      * @return ResourceEvent
      */
-    public function eventFromRow(array $row, string $action, ?array $sender = null): ResourceEvent {
+    public function eventFromRow(array $row, string $action, $sender = null): ResourceEvent {
         $reaction = $this->normalizeLogRow($row);
         $reaction = $this->logFragmentSchema()->validate($reaction);
 

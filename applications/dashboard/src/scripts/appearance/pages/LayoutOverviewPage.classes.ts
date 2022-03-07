@@ -6,7 +6,13 @@ export default useThemeCache(() => {
         marginRight: 8,
     });
 
+    const overviewContent = css({
+        padding: 0,
+        margin: 0,
+    });
+
     return {
         layoutOptionsDropdown,
+        overviewContent,
     };
 });

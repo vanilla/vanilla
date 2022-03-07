@@ -11,11 +11,15 @@ use VanillaTests\Bootstrap;
 use Gdn_Database;
 use Garden\EventManager;
 use Vanilla\Contracts\ConfigurationInterface;
+use VanillaTests\ExpectExceptionTrait;
 
 /**
  * Test the {@link Gdn_Database} class.
  */
 class DatabaseTest extends BootstrapTestCase {
+
+    use ExpectExceptionTrait;
+
     /**
      * Tests that a basic SQL query works and returns the intended result
      */
@@ -68,5 +72,25 @@ class DatabaseTest extends BootstrapTestCase {
         $result = $dataSet->resultArray();
 
         $this->assertEquals([['testValue' => 12]], $result);
+    }
+
+    /**
+     * Test that we can run a callback with certain SQL modes and they will be reset even if everything blows up.
+     */
+    public function testRunWithSqlMode() {
+        static::container()->get(EventManager::class)->unbindAll();
+        $db = static::container()->get(Gdn_Database::class);
+        $originalModes = $db->getSqlModes();
+        $modesInCallback = null;
+        $this->runWithExpectedExceptionMessage('Boom', function () use ($db, &$modesInCallback) {
+            $db->runWithSqlMode([Gdn_Database::SQL_MODE_NO_AUTO_VALUE_ZERO], function () use ($db, &$modesInCallback) {
+                $modesInCallback = $db->getSqlModes();
+                throw new \Exception('Boom');
+            });
+        });
+        $modesAfterCallback = $db->getSqlModes();
+        $this->assertTrue(in_array(Gdn_Database::SQL_MODE_NO_AUTO_VALUE_ZERO, $modesInCallback));
+        $this->assertFalse(in_array(Gdn_Database::SQL_MODE_NO_AUTO_VALUE_ZERO, $modesAfterCallback));
+        $this->assertSame($originalModes, $db->getSqlModes());
     }
 }

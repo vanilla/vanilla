@@ -21,6 +21,7 @@ class DiscussionStatusEvent {
 
     /** @var int $previousStatusID */
     private $previousStatusID;
+
     //endregion
 
     //region Constructor

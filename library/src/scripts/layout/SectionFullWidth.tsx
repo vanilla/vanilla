@@ -6,10 +6,18 @@
 
 import React from "react";
 
-interface IProps {
+interface IProps extends React.HTMLAttributes<HTMLDivElement> {
     children: React.ReactNode;
+    childrenAfter?: React.ReactNode;
+    contentRef?: React.RefObject<HTMLDivElement>;
 }
 
 export function SectionFullWidth(props: IProps) {
-    return <>{props.children}</>;
+    const { children, childrenAfter, contentRef, ...elementProps } = props;
+    return (
+        <div {...elementProps} ref={contentRef}>
+            {children}
+            {childrenAfter}
+        </div>
+    );
 }

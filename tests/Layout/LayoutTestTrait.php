@@ -24,13 +24,13 @@ trait LayoutTestTrait {
      *
      * @param array $hydrateSpec
      * @param array $params
-     * @param array $expected
+     * @param array|null $expected
      * @param string|null $layoutViewType
      */
     public function assertHydratesTo(
         array $hydrateSpec,
         array $params,
-        array $expected,
+        array $expected = null,
         ?string $layoutViewType = null
     ) {
         $hydrator = $this->getLayoutService()->getHydrator($layoutViewType);
@@ -49,7 +49,7 @@ trait LayoutTestTrait {
     protected function layoutSection(array $content, array $middleware = []): array {
         $node = [
             DataHydrator::KEY_HYDRATE => 'react.section.1-column',
-            'contents' => $content,
+            'children' => $content,
         ];
         if (!empty($middleware)) {
             $node[DataHydrator::KEY_MIDDLEWARE] = $middleware;

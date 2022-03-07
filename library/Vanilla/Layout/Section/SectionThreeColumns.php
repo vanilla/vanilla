@@ -18,7 +18,7 @@ class SectionThreeColumns extends AbstractLayoutSection {
     /**
      * @inheritdoc
      */
-    public function getComponentName(): string {
+    public static function getComponentName(): string {
         return 'SectionThreeColumns';
     }
 
@@ -29,8 +29,8 @@ class SectionThreeColumns extends AbstractLayoutSection {
         return Schema::parse([
             'leftTop?' => new ReactChildrenSchema(),
             'leftBottom?' => new ReactChildrenSchema(),
-            'mainTop?' => new ReactChildrenSchema(),
-            'mainBottom?' => new ReactChildrenSchema(),
+            'middleTop?' => new ReactChildrenSchema(),
+            'middleBottom?' => new ReactChildrenSchema(),
             'rightTop?' => new ReactChildrenSchema(),
             'rightBottom?' => new ReactChildrenSchema(),
             'breadcrumbs?' => new ReactChildrenSchema(),

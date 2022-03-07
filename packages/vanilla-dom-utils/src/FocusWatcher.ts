@@ -113,7 +113,6 @@ export class FocusWatcher {
                 const isFocusedInBody = document.body.contains(activeElement);
                 const isReachComboxBox =
                     activeElement.matches("[data-reach-popover]") || activeElement.closest("[data-reach-popover]");
-                const isActiveInPortal = this.isElementInModal(activeElement) || isReachComboxBox;
 
                 const hasFocus = Boolean(
                     this.watchedNode &&
@@ -121,8 +120,8 @@ export class FocusWatcher {
                         (activeElement === this.watchedNode || this.watchedNode.contains(activeElement)),
                 );
 
-                if (!hasFocus && isActiveInPortal) {
-                    // If the thing that just took focus was in a modal or a reach popover
+                if (!hasFocus && isReachComboxBox) {
+                    // If the thing that just took focus was a reach popover
                     // Don't report losing focus.
                     // Someone moving focus to the body (trying to focus any non-focusable elemtent)
                     // will still clear focus though, so thing like clicking the background of a modal will clear focus.

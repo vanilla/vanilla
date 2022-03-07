@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -48,6 +48,8 @@ require PATH_ROOT.'/environment.php';
 // Allow any addon class to be auto-loaded.
 \VanillaTests\Bootstrap::registerAutoloader();
 
+// Add some helper functions.
+require_once PATH_PLUGINS.'/Reactions/views/reaction_functions.php';
 
 // Allow a test before.
 $bootstrapTestFile = PATH_CONF . '/bootstrap.tests.php';

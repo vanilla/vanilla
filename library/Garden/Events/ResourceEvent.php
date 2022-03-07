@@ -43,9 +43,9 @@ abstract class ResourceEvent implements \JsonSerializable {
      *
      * @param string $action
      * @param array $payload
-     * @param array $sender
+     * @param array|object|null $sender
      */
-    public function __construct(string $action, array $payload, ?array $sender = null) {
+    public function __construct(string $action, array $payload, $sender = null) {
         $this->action = $action;
         $this->payload = $payload;
         $this->apiParams = [
@@ -102,9 +102,9 @@ abstract class ResourceEvent implements \JsonSerializable {
     /**
      * Get the entity responsible for triggering the event, if available.
      *
-     * @return array|null
+     * @return array|object|null
      */
-    public function getSender(): ?array {
+    public function getSender() {
         return $this->sender;
     }
 

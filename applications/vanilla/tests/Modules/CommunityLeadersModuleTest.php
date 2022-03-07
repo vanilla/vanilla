@@ -6,6 +6,7 @@
 
 namespace Vanilla\Dashboard\Modules;
 
+use Vanilla\Dashboard\UserLeaderService;
 use VanillaTests\SiteTestCase;
 use VanillaTests\UsersAndRolesApiTestTrait;
 use VanillaTests\Layout\LayoutTestTrait;
@@ -50,6 +51,7 @@ class CommunityLeadersModuleTest extends SiteTestCase {
             'apiParams' => [
                 'slotType' => 'w',
                 'limit' => 10,
+                'LeaderboardType' => UserLeaderService::LEADERBOARD_TYPE_REPUTATION
             ],
             'title' => 'Leaderboard Title',
             'subtitle' => 'Leaderboard Subtitle',

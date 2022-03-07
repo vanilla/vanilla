@@ -286,12 +286,11 @@ It seems auto-detection isn't working, so you'll need to specify the "elementToF
      * @param event The react event.
      */
     private handleShiftTab(event: React.KeyboardEvent) {
-        const nextElement = this.tabHandler?.getNext(undefined, true);
-        if (nextElement) {
+        const previousElement = this.tabHandler?.getNext(undefined, true);
+        if (previousElement) {
             event.preventDefault();
-
             event.stopPropagation();
-            nextElement.focus();
+            previousElement.focus();
         }
     }
 
@@ -304,11 +303,11 @@ It seems auto-detection isn't working, so you'll need to specify the "elementToF
      * @param event The react event.
      */
     private handleTab(event: React.KeyboardEvent) {
-        const previousElement = this.tabHandler?.getNext();
-        if (previousElement) {
+        const nextElement = this.tabHandler?.getNext();
+        if (nextElement) {
             event.preventDefault();
             event.stopPropagation();
-            previousElement.focus();
+            nextElement.focus();
         }
     }
 }

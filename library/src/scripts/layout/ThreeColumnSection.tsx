@@ -7,7 +7,7 @@ import { SectionProvider } from "@library/layout/LayoutContext";
 import { SectionTypes } from "@library/layout/types/interface.layoutTypes";
 import Section, { ISectionProps } from "@library/layout/Section";
 
-interface IProps extends Omit<ISectionProps, "ILayoutProps"> {}
+interface IProps extends ISectionProps {}
 
 function ThreeColumnSection(props: IProps) {
     return (

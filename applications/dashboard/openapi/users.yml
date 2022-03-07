@@ -661,6 +661,57 @@ paths:
                                 - photo
                             type: object
                 required: true
+    /users/leaders:
+        x-hidden: true
+        get:
+            summary: Get user's leaderboard.
+            tags:
+                - Users
+            parameters:
+                - description: Leaderboard type ("reputation" => "Reputation points", "posts" => "Discussion/comment posts").
+                  in: query
+                  name: leaderboardType
+                  required: true
+                  schema:
+                      type: string
+                      enum:
+                          - reputation
+                          - posts
+                      default: reputation
+                - description: Slot type ("d" = day, "w" = week, "m" = month, "y" = year, "a" = all).
+                  in: query
+                  name: slotType
+                  required: true
+                  schema:
+                      type: string
+                      enum:
+                          - d
+                          - w
+                          - m
+                          - y
+                          - a
+                      default: a
+                - description: The numeric ID of a category to limit search results to.
+                  in: query
+                  name: categoryID
+                  required: false
+                  schema:
+                      type: integer
+                - description: The maximum amount of records to be returned.
+                  in: query
+                  name: limit
+                  required: false
+                  schema:
+                      type: integer
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/User"
+                                type: array
+                    description: Success
     "/users/{id}/badges":
         x-addon: badges
         get:

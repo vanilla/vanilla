@@ -12,5 +12,6 @@ export * from "./src/logicUtils";
 export * from "./src/mathUtils";
 export * from "./src/promiseUtils";
 export * from "./src/stringUtils";
+export * from "./src/arrayUtils";
 export * from "./src/systemUtils";
 export * from "./src/typeUtils";

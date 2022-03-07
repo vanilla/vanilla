@@ -27,6 +27,7 @@ use Vanilla\Scheduler\LongRunnerQuantityTotal;
 use Vanilla\SchemaFactory;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Utility\ArrayUtils;
+use Vanilla\Utility\Deprecation;
 use Vanilla\Utility\InstanceValidatorSchema;
 use Vanilla\Utility\ModelUtils;
 use Vanilla\Web\SystemCallableInterface;
@@ -2847,12 +2848,27 @@ class CategoryModel extends Gdn_Model implements
      *
      * @return int[]
      */
-    public function selectCachedIDs(array $where): array {
-        $result = $this->modelCache->getCachedOrHydrate([$where, 'ids'], function () use ($where) {
+    public function selectCachedIDs(
+        array $where,
+        $orderFields = '',
+        $orderDirection = 'asc',
+        $limit = false,
+        $offset = false
+    ): array {
+        $result = $this->modelCache->getCachedOrHydrate([$where, 'ids'], function () use (
+            $where,
+            $orderFields,
+            $orderDirection,
+            $limit,
+            $offset
+        ) {
             $ids = $this->createSql()
                 ->from($this->getTableName())
                 ->select('CategoryID')
                 ->where($where)
+                ->orderBy($orderFields, $orderDirection)
+                ->limit($limit)
+                ->offset($offset)
                 ->get()
                 ->column('CategoryID');
             return $ids;
@@ -2964,17 +2980,17 @@ class CategoryModel extends Gdn_Model implements
     }
 
     /**
+     * Make tree or fetch one.
      *
-     *
-     * @param $categories
+     * @param array $categories
      * @param null $root
      * @return array
+     *
+     * @deprecated Use CategoryCollection::treeBuilder()->buildTree().
      */
     public static function makeTree($categories, $root = null) {
-        $result = [];
-
+        Deprecation::log();
         $categories = (array)$categories;
-        $categories = self::_setTreeCategoryKeys($categories);
 
         if ($root) {
             $result = self::instance()->collection->getTree(
@@ -2983,63 +2999,9 @@ class CategoryModel extends Gdn_Model implements
             );
             self::instance()->joinRecent($result);
         } else {
-            // Make a tree out of all categories.
-            foreach ($categories as $category) {
-                if (isset($category['Depth']) && $category['Depth'] == 1) {
-                    $row = $category;
-                    $row['Children'] = self::_MakeTreeChildren($row, $categories, 0);
-                    $result[] = $row;
-                }
-            }
+            $result = CategoryCollection::treeBuilder()->buildTree($categories);
         }
         return $result;
-    }
-
-    /**
-     *
-     *
-     * @param $category
-     * @param $categories
-     * @param null $depthAdj
-     * @return array
-     */
-    protected static function _MakeTreeChildren($category, $categories, $depthAdj = null) {
-        if (is_null($depthAdj)) {
-            $depthAdj = -val('Depth', $category);
-        }
-
-        $result = [];
-        $childIDs = val('ChildIDs', $category);
-        if (is_array($childIDs) && count($childIDs)) {
-            foreach ($childIDs as $iD) {
-                if (!isset($categories[$iD])) {
-                    continue;
-                }
-                $row = (array)$categories[$iD];
-                $row['Depth'] += $depthAdj;
-                $row['Children'] = self::_MakeTreeChildren($row, $categories);
-                $result[] = $row;
-            }
-        }
-        return $result;
-    }
-
-    /**
-     * Sort the Categories array so that the key match the CategoryID.
-     *
-     * [CategoryID => Category]
-     *
-     * @param array $categories
-     * @return array
-     */
-    protected static function _setTreeCategoryKeys(array $categories) : array {
-        $sortedCategories = [];
-
-        foreach ($categories as $category) {
-            $sortedCategories[$category['CategoryID']] = $category;
-        }
-
-        return $sortedCategories;
     }
 
     /**
@@ -3435,72 +3397,7 @@ class CategoryModel extends Gdn_Model implements
      * @return array The sorted categories.
      */
     public static function sortCategoriesAsTree(array $categories): array {
-        $categoriesByID = [];
-        $categoryIDsByParentID = [];
-        foreach ($categories as $category) {
-            $categoryID = $category['CategoryID'];
-            $parentCategoryID = $category['ParentCategoryID'];
-            $categoriesByID[$categoryID] = $category;
-            if ($parentCategoryID !== null) {
-                $categoryIDsByParentID[$parentCategoryID][] = $categoryID;
-            }
-        }
-
-        $result = [];
-        $seenRoots = [];
-        $pushChildren = function (int $rootID) use ($categoriesByID, $categoryIDsByParentID, &$seenRoots, &$pushChildren, &$result) {
-            if (in_array($rootID, $seenRoots)) {
-                // Protect against categories that recurse onto themselves.
-                return;
-            }
-            $seenRoots[] = $rootID;
-
-            // Push the category itself.
-            $rootCategory = $categoriesByID[$rootID] ?? null;
-            if ($rootCategory !== null) {
-                $result[] = $rootCategory;
-            }
-
-            // Get all of the child categories.
-            $childIDs = $categoryIDsByParentID[$rootID] ?? [];
-            $childCategories = [];
-            foreach ($childIDs as $childID) {
-                $child = $categoriesByID[$childID] ?? null;
-                if ($child !== null) {
-                    $childCategories[] = $child;
-                }
-            }
-
-            // Sort the children
-            usort($childCategories, function (array $catA, array $catB) {
-                return ($catA['Sort'] ?? 0) <=> ($catB['Sort'] ?? 0);
-            });
-
-            // Apply all of the children in order.
-            foreach ($childCategories as $childCategory) {
-                $pushChildren($childCategory['CategoryID']);
-            }
-        };
-
-        $pushChildren(-1);
-
-        // Check for any categories that weren't pushed and add them at the end.
-        $pushedIDs = array_column($result, 'CategoryID');
-        $allIDs = array_column($categories, 'CategoryID');
-        $notPushedIDs = array_diff($allIDs, $pushedIDs);
-        $notPushedCategories = [];
-        foreach ($notPushedIDs as $notPushedID) {
-            $notPushedCategories[] = $categoriesByID[$notPushedID];
-        }
-        // Sort the not pushed categories.
-        usort($notPushedCategories, function (array $catA, array $catB) {
-            return ($catA['Sort'] ?? 0) <=> ($catB['Sort'] ?? 0);
-        });
-
-        foreach ($notPushedCategories as $notPushedCategory) {
-            $result[] = $notPushedCategory;
-        }
-
+        $result = CategoryCollection::treeBuilder()->sort($categories);
         return $result;
     }
 
@@ -5042,11 +4939,11 @@ SQL;
      *
      * @param array $row
      * @param string $action
-     * @param array|null $sender
+     * @param array|object|null $sender
      *
      * @return ResourceEvent
      */
-    public function eventFromRow(array $row, string $action, ?array $sender = null): ResourceEvent {
+    public function eventFromRow(array $row, string $action, $sender = null): ResourceEvent {
         Gdn::userModel()->expandUsers($row, ["InsertUserID"]);
         $category = $this->normalizeRow($row);
         $category = $this->schema()->validate($category);

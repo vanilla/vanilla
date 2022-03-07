@@ -56,9 +56,9 @@ export const panelAreaClasses = useThemeCache((mediaQueries) => {
         }),
     });
 
-    const overflowFull = useThemeCache((offset: number) =>
+    const overflowFull = useThemeCache((offset: number, useMinHeight: boolean = true) =>
         style("overflowFull", {
-            height: calc(`100vh - ${styleUnit(offset)}`),
+            [useMinHeight ? "height" : "maxHeight"]: calc(`100vh - ${styleUnit(offset)}`),
             overflow: "auto",
             position: "relative",
             minHeight: 100,

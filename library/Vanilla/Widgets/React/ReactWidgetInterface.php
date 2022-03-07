@@ -25,5 +25,5 @@ interface ReactWidgetInterface extends WidgetInterface {
      *
      * @return string
      */
-    public function getComponentName(): string;
+    public static function getComponentName(): string;
 }

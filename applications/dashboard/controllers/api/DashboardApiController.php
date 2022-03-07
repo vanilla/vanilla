@@ -42,8 +42,8 @@ class DashboardApiController extends Controller {
                 'description:s' => 'The menu description.',
                 'url:s?' =>  'The URL to the menu if it doesn\'t have a submenu.',
                 'children:a' => [
-                    'name:s' => 'The title of the group.',
-                    'id:s' => 'The key of the group.',
+                    'name:s?' => 'The title of the group.',
+                    'id:s?' => 'The key of the group.',
                     'children:a' => [
                         'name:s' => 'The title of the link.',
                         'id:s' => 'The key of the link.',

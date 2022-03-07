@@ -1,18 +1,16 @@
 <?php
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 namespace Vanilla\Dashboard\Modules;
 
 use Garden\Schema\Schema;
+use Vanilla\Dashboard\Models\UserLeaderQuery;
+use Vanilla\Dashboard\UserLeaderService;
 use Vanilla\Dashboard\UserPointsModel;
-use Vanilla\Forms\ApiFormChoices;
-use Vanilla\Forms\FormOptions;
-use Vanilla\Forms\SchemaForm;
-use Vanilla\Forms\StaticFormChoices;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Widgets\AbstractHomeWidgetModule;
 
@@ -30,8 +28,8 @@ class CommunityLeadersModule extends AbstractHomeWidgetModule {
     /** @var int */
     private $limit = 10;
 
-    /** @var UserPointsModel */
-    private $userPointsModel;
+    /** @var UserLeaderService */
+    private $userLeaderService;
 
     public $contentType = self::CONTENT_TYPE_ICON;
     public $borderType = 'none';
@@ -46,11 +44,11 @@ class CommunityLeadersModule extends AbstractHomeWidgetModule {
     /**
      * DI.
      *
-     * @param UserPointsModel $userPointsModel
+     * @param UserLeaderService $userLeaderService
      */
-    public function __construct(UserPointsModel $userPointsModel) {
+    public function __construct(UserLeaderService $userLeaderService) {
         parent::__construct();
-        $this->userPointsModel = $userPointsModel;
+        $this->userLeaderService = $userLeaderService;
     }
 
     /**
@@ -79,15 +77,16 @@ class CommunityLeadersModule extends AbstractHomeWidgetModule {
         if ($this->title) {
             return $this->title;
         }
-        $category = $this->userPointsModel->getPointsCategory($this->categoryID);
-        return $this->userPointsModel->getTitleForSlotType($this->slotType, $category ? $category['Name'] : '');
+        $category = $this->userLeaderService->getPointsCategory($this->categoryID);
+        return $this->userLeaderService->getTitleForSlotType($this->slotType, $category ? $category['Name'] : '');
     }
 
     /**
      * @return array|null
      */
     protected function getData(): ?array {
-        $users = $this->userPointsModel->getLeaders($this->slotType, $this->categoryID, $this->limit);
+        $query = new UserLeaderQuery($this->slotType, $this->categoryID, $this->limit);
+        $users = $this->userLeaderService->getLeaders($query);
         if (count($users) === 0) {
             return null;
         }
@@ -153,6 +152,7 @@ class CommunityLeadersModule extends AbstractHomeWidgetModule {
     public static function getWidgetSchema(): Schema {
         $ownSchema = Schema::parse([
             'slotType?' => UserPointsModel::slotTypeSchema(),
+            'LeaderboardType?' => UserPointsModel::leaderboardTypeSchema(),
             'limit?' => UserPointsModel::limitSchema(),
         ]);
 

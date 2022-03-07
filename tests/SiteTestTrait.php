@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -380,7 +380,7 @@ TEMPLATE;
         $row = $this->api()->post('/users', [
             'name' => "$role$sx",
             'email' => "$role.$sx@example.com",
-            'password' => 'test',
+            'password' => 'test15!AVeryS3cUR3pa55W0rd',
             'roleID' => [
                 $this->roleID($role),
             ],
@@ -389,7 +389,7 @@ TEMPLATE;
     }
 
     /**
-     * Return all of the roles, keyed by name.
+     * Return every roles, keyed by name.
      *
      * @return array
      */

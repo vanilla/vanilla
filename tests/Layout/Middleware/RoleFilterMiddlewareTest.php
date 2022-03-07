@@ -31,16 +31,15 @@ class RoleFilterMiddlewareTest extends SiteTestCase {
      * @dataProvider provideMiddlewareFiltersTo
      */
     public function testLayoutHydratesTo(array $input, array $expected, array $params = []) {
-        $user = $this->createUser();
-        $this->runWithUser(function () use ($input, $params, $expected) {
-            $this->hydrator = self::getLayoutService()->getHydrator('home');
-            $actual = $this->hydrator->resolve($input, $params);
-            // Make sure we see it as the API output would.
-            $actual = json_decode(json_encode($actual), true);
-            $this->assertSame($expected, $actual);
-        }, $user['userID']);
+            $user = $this->createUser();
+            $this->runWithUser(function () use ($input, $params, $expected) {
+                $this->hydrator = self::getLayoutService()->getHydrator('home');
+                $actual = $this->hydrator->resolve($input, $params);
+                // Make sure we see it as the API output would.
+                $actual = json_decode(json_encode($actual), true);
+                $this->assertSame($expected, $actual);
+            }, $this->lastUserID);
     }
-
 
     /**
      * @return iterable
@@ -106,6 +105,45 @@ class RoleFilterMiddlewareTest extends SiteTestCase {
                     [
                         "data" => "is resolved args",
                         0 => [] //not null is successful node response
+                    ]
+                ]
+            ],
+            [
+                [16]
+            ]
+        ];
+
+        $permissions = ['noAds.use' => true];
+
+        yield "Success resolving node when user has doesn't have noAds.use permission " => [
+            [
+                "layoutViewType" => "home",
+                "layout" => [[
+                    "data" => [
+                        "mainTop"=> [
+                            [
+                                '$hydrate' => "react.html",
+                                "html" => "<h1 style='margin-top: 0'>Hello Layout Editor</h1>",
+                                'isAdvertisement' => true
+                            ]],
+                    ],
+                ]]
+            ],
+            [
+                "layoutViewType" => "home",
+                "layout" => [
+                    [
+                        'data' => [
+                            'mainTop' => [
+                                0 => [
+                                '$reactComponent' => 'HtmlWidget',
+                                '$reactProps' => [
+                                    'html' => "<h1 style='margin-top: 0'>Hello Layout Editor</h1>",
+                                    'isAdvertisement' => true
+                                 ]
+                                ]
+                            ]
+                        ]
                     ]
                 ]
             ],

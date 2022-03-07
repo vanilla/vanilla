@@ -19,7 +19,7 @@ trait JsonFilterTrait {
      */
     private function jsonFilter($value) {
         $fn = function (&$value, $key = '', $parentKey = '') use (&$fn) {
-            if (is_array($value)) {
+            if (is_array($value) || $value instanceof \ArrayAccess) {
                 array_walk($value, function (&$childValue, $childKey) use ($fn, $key) {
                     $fn($childValue, $childKey, $key);
                 });

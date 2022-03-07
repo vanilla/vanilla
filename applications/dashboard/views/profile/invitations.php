@@ -1,9 +1,9 @@
 <?php use Vanilla\Theme\BoxThemeShim;
 
 if (!defined('APPLICATION')) exit(); ?>
-    <?php BoxThemeShim::startHeading() ?>;
+    <?php BoxThemeShim::startHeading() ?>
     <h1 class="H"><?php echo t('Invitations'); ?></h1>
-    <?php BoxThemeShim::endHeading(); ?>;
+    <?php BoxThemeShim::endHeading(); ?>
 <?php
 //render form
 if ($this->InvitationsLeft !== 0 && $this->isOwnProfile) {

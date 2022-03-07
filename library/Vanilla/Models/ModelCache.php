@@ -87,7 +87,8 @@ class ModelCache {
      * @return string
      */
     public function createCacheKey(array $keyArgs, bool $excludeNamespace = false): string {
-        $key = $this->getIncrementingKey() . '-' . sha1(json_encode($keyArgs));
+        $jsonEncoded = json_encode($keyArgs);
+        $key = $this->getIncrementingKey() . '-' . sha1($jsonEncoded);
         if (!$excludeNamespace) {
             // Make the key in the same why the symfony cache contract does.
             $key = $this->cacheNameSpace . '_' . $key;

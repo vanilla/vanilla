@@ -9,13 +9,16 @@ namespace Vanilla\Forum\Widgets;
 
 use Garden\Schema\Schema;
 use Vanilla\Forum\Modules\DiscussionWidgetModule;
+use Vanilla\Layout\Section\SectionOneColumn;
+use Vanilla\Layout\Section\SectionTwoColumns;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Widgets\React\ReactWidgetInterface;
+use Vanilla\Widgets\React\SectionAwareInterface;
 
 /**
  * Class DiscussionDiscussionsWidget
  */
-class DiscussionDiscussionsWidget extends DiscussionWidgetModule implements ReactWidgetInterface {
+class DiscussionDiscussionsWidget extends DiscussionWidgetModule implements ReactWidgetInterface, SectionAwareInterface {
 
     /**
      * @inheridoc
@@ -34,9 +37,20 @@ class DiscussionDiscussionsWidget extends DiscussionWidgetModule implements Reac
     /**
      * @inheridoc
      */
-    public function getComponentName(): string {
+    public static function getComponentName(): string {
         // Temporarily this until we make a version supported grids and carousels.
         return "DiscussionListModule";
+    }
+
+
+    /**
+     * @return array
+     */
+    public static function getRecommendedSectionIDs(): array {
+        return [
+            SectionOneColumn::getWidgetID(),
+            SectionTwoColumns::getWidgetID(),
+        ];
     }
 
     /**

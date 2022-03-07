@@ -36,18 +36,18 @@ class LogPostEvent implements \Garden\Events\TrackingEventInterface {
      *
      * @param ResourceEvent $postEvent
      * @param string $source
-     * @param array $discipliningUser
-     * @param array $disciplinedUser
+     * @param array|object $discipliningUser
+     * @param array|object $disciplinedUser
      * @param string $disciplineType
      * @param array $additionalInfo
      */
     public function __construct(
         ResourceEvent $postEvent,
-        string        $source,
-        array         $discipliningUser,
-        array         $disciplinedUser,
-        string        $disciplineType,
-        array         $additionalInfo = []
+        string $source,
+        $discipliningUser,
+        $disciplinedUser,
+        string $disciplineType,
+        array $additionalInfo = []
     ) {
         $payload = [];
         $payload["source"] = $source;

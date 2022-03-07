@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -153,7 +153,6 @@ class ReactionsController extends DashboardController {
      *  Points
      *
      * @param string $urlCode
-     * @throws type
      */
     public function edit($urlCode) {
         $this->permission('Garden.Community.Manage');

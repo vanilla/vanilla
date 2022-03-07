@@ -381,6 +381,50 @@ class ArrayUtilsTest extends TestCase {
     }
 
     /**
+     * Test `ArrayUtils::flattenArray()`.
+     */
+    public function testFlattenArray(): void {
+        // The source array that we'll flatten in various ways.
+        $sourceArray = [
+            'firstElement' => [
+                1 => 'First Sub Element',
+                2 => 'Second Sub Element'
+            ],
+            'secondElement' => [
+                'one' => 'Third Sub Element',
+                'two' => 'Fourth Sub Element'
+            ]
+        ];
+
+        // First expected result.
+        $expectedFlattenedArray1 = [
+            'firstElement+1' => 'First Sub Element',
+            'firstElement+2' => 'Second Sub Element',
+            'secondElement+one' => 'Third Sub Element',
+            'secondElement+two' => 'Fourth Sub Element',
+        ];
+
+        // Second expected result.
+        $expectedFlattenedArray2 = [
+            'firstElement' => [
+                1 => 'First Sub Element',
+                2 => 'Second Sub Element',
+            ],
+            'secondElement.one' => 'Third Sub Element',
+            'secondElement.two' => 'Fourth Sub Element',
+        ];
+
+        // Flatten the array using a `+` separator.
+        $flattenedArray1 = ArrayUtils::flattenArray('+', $sourceArray);
+        $this->assertEquals($expectedFlattenedArray1, $flattenedArray1);
+
+        // Flatten the array using a `.` separator, minding(halting at) the sequential array values.
+        $flattenedArray2 = ArrayUtils::flattenArray('.', $sourceArray, true);
+        $this->assertEquals($expectedFlattenedArray2, $flattenedArray2);
+    }
+
+
+    /**
      * Test `ArrayUtils::ArrayMergeRecursiveFancy()`.
      *
      * @param array $arr1

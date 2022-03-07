@@ -69,6 +69,8 @@ export function LeaderboardWidget(props: IProps) {
     );
 }
 
+export default LeaderboardWidget;
+
 interface ILeaderboardTableProps {
     countKeys: string[];
     rows: ILeader[];

@@ -39,6 +39,9 @@ export interface IHomeWidgetItemProps {
     url?: string;
     className?: string;
     tabIndex?: number;
+    children?: React.ReactNode;
+    metaComponent?: React.ReactNode;
+    iconComponent?: React.ReactNode;
 
     // Layout options
     options?: DeepPartial<IHomeWidgetItemOptions>;
@@ -47,32 +50,63 @@ export interface IHomeWidgetItemProps {
 export function HomeWidgetItem(props: IHomeWidgetItemProps) {
     const options = homeWidgetItemVariables(props.options).options;
     const classes = homeWidgetItemClasses(props.options);
+
+    useDebugValue({ opts: options });
+
+    if (props.children) {
+        return (
+            <SmartLink
+                to={props.to}
+                className={cx(classes.root, props.className)}
+                tabIndex={props.tabIndex}
+                // Prevent dragging these guys as links.
+                draggable={"false"}
+                onDragStart={(e) => e.preventDefault()}
+            >
+                {props.children}
+            </SmartLink>
+        );
+    }
+
     const isAbsoluteContent = [
         HomeWidgetItemContentType.TITLE_BACKGROUND,
         HomeWidgetItemContentType.TITLE_BACKGROUND_DESCRIPTION,
     ].includes(options.contentType);
     const imageUrl = props.imageUrl ?? options.defaultImageUrl;
     const iconUrl = props.iconUrl ?? options.defaultIconUrl;
-    const hasMetas = props.counts && options.display.counts;
+    const hasMetas = (props.counts && options.display.counts) || props.metaComponent;
     const hasMetaDescription =
         [HomeWidgetItemContentType.TITLE_BACKGROUND_DESCRIPTION].includes(options.contentType) && props.description;
     const isChatBubble = [HomeWidgetItemContentType.TITLE_CHAT_BUBBLE].includes(options.contentType);
-    useDebugValue({ opts: options });
 
-    const metas = (hasMetas || hasMetaDescription) && !isChatBubble && (
-        <Metas className={classes.metas}>
-            {hasMetaDescription ? (
-                <MetaItem className={classes.longMetaItem}>
-                    <span className={cx(buttonClasses().textPrimary, classes.metaDescription)}>
-                        {props.description}
-                        {props.description && " ➔"}
-                    </span>
-                </MetaItem>
-            ) : (
-                <ResultMeta counts={props.counts} />
-            )}
-        </Metas>
-    );
+    const metas = props.metaComponent
+        ? props.metaComponent
+        : (hasMetas || hasMetaDescription) &&
+          !isChatBubble && (
+              <Metas className={classes.metas}>
+                  {hasMetaDescription ? (
+                      <MetaItem className={classes.longMetaItem}>
+                          <span className={cx(buttonClasses().textPrimary, classes.metaDescription)}>
+                              {props.description}
+                              {props.description && " ➔"}
+                          </span>
+                      </MetaItem>
+                  ) : (
+                      <ResultMeta counts={props.counts} />
+                  )}
+              </Metas>
+          );
+
+    const icon = props.iconComponent
+        ? props.iconComponent
+        : HomeWidgetItemContentType.TITLE_DESCRIPTION_ICON === options.contentType &&
+          iconUrl && (
+              <div className={classes.iconContainer}>
+                  <div className={classes.iconWrap}>
+                      <img className={classes.icon} src={iconUrl} alt={props.name} loading="lazy" />
+                  </div>
+              </div>
+          );
 
     return (
         <SmartLink
@@ -102,13 +136,7 @@ export function HomeWidgetItem(props: IHomeWidgetItemProps) {
                     HomeWidgetItemContentType.TITLE_BACKGROUND_DESCRIPTION,
                 ].includes(options.contentType) && <div className={classes.backgroundScrim}></div>}
 
-                {HomeWidgetItemContentType.TITLE_DESCRIPTION_ICON === options.contentType && iconUrl && (
-                    <div className={classes.iconContainer}>
-                        <div className={classes.iconWrap}>
-                            <img className={classes.icon} src={iconUrl} alt={props.name} loading="lazy" />
-                        </div>
-                    </div>
-                )}
+                {icon}
 
                 {isAbsoluteContent ? (
                     <HomeWidgetAbsoluteContent {...props} />

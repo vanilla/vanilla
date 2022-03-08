@@ -16,7 +16,7 @@ aliases:
               if [ -d ~/workspace/repo ]; then
                   cd ~/workspace/repo
               fi
-              yarn install --immutable
+              yarn install
     - &save_yarn_cache
       save_cache:
           paths:

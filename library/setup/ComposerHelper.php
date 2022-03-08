@@ -98,7 +98,7 @@ class ComposerHelper {
 
         printf("\nInstalling core node_modules\n");
 
-        passthru('yarn install --immutable', $installReturn);
+        passthru('yarn install', $installReturn);
         if ($installReturn !== 0) {
             printf("Installing core node_modules failed\n");
             exit($installReturn);

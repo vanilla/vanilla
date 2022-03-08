@@ -34,7 +34,6 @@ import NotificationsModel from "@library/features/notifications/NotificationsMod
 import TagWidget from "@vanilla/addon-vanilla/tag/TagWidget";
 import { RSSWidget } from "@library/rssWidget/RSSWidget";
 import { UserSpotlightWidget } from "@library/userSpotlight/UserSpotlightWidget";
-import ArticleArticlesWidget from "@knowledge/components/ArticleArticlesWidget";
 import Banner from "@library/banner/Banner";
 import { SectionFullWidth } from "@library/layout/SectionFullWidth";
 
@@ -75,7 +74,6 @@ registerWidgets({
     TagWidget,
     RSSWidget,
     UserSpotlightWidget,
-    ArticleArticlesWidget,
     Banner,
 });
 

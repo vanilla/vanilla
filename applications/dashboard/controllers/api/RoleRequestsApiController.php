@@ -141,6 +141,16 @@ class RoleRequestsApiController extends Controller {
     }
 
     /**
+     * Delete a single application request.
+     *
+     * @param int $roleRequestID
+     */
+    public function delete_applications(int $roleRequestID) {
+        $this->permission('site.manage');
+        $result = $this->requestModel->delete(['roleRequestID' => $roleRequestID]);
+    }
+
+    /**
      * Delete a single meta item.
      *
      * @param string $type

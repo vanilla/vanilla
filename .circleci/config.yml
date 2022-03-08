@@ -6,9 +6,9 @@ aliases:
       restore_cache:
           keys:
               # when lock file changes, use increasingly general patterns to restore cache
-              - yarn-packages-v1-{{ .Branch }}-{{ checksum "~/workspace/repo/yarn.lock" }}
-              - yarn-packages-v1-{{ .Branch }}-
-              - yarn-packages-v1-
+              - yarn-packages-v3-{{ .Branch }}-{{ checksum "~/workspace/repo/yarn.lock" }}
+              - yarn-packages-v3-{{ .Branch }}-
+              - yarn-packages-v3-
     - &run_yarn
       run:
           name: Install Yarn Packages
@@ -16,12 +16,12 @@ aliases:
               if [ -d ~/workspace/repo ]; then
                   cd ~/workspace/repo
               fi
-              yarn install --pure-lockfile
+              yarn install
     - &save_yarn_cache
       save_cache:
           paths:
               - ~/.cache/yarn
-          key: yarn-packages-v1-{{ .Branch }}-{{ checksum "~/workspace/repo/yarn.lock" }}
+          key: yarn-packages-v3-{{ .Branch }}-{{ checksum "~/workspace/repo/yarn.lock" }}
     - &attach_workspace
       attach_workspace:
           at: ~/workspace

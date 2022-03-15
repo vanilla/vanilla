@@ -64,12 +64,15 @@ paths:
                       type: integer
                       maximum: 100
                       minimum: 1
-                - description: >-
-                      Filter categories by site-section-id (subcommunity).
-                      The subcommunityID or folder can be used.
-                      The query looks like
-                      siteSectionID=$SubcommunityID:{id} ie. 1
-                      siteSectionID=$SubcommunityID:{folder} ie. en
+                - description: |-
+                      Filter categories by site section ID (ex. subcommunity).
+                      The subcommunity ID or folder can be used if you use [smart IDs](https://success.vanillaforums.com/kb/articles/46-smart-ids).
+                      The query looks like:
+
+                      ```
+                      siteSectionID=$subcommunityID:{id|folder}
+                      ```
+                  example: "$subcommunityID:en"
                   in: query
                   name: siteSectionID
                   schema:

@@ -22,12 +22,15 @@ paths:
                 - $ref: "#/components/parameters/DateInserted"
                 - $ref: "#/components/parameters/DateUpdated"
                 - $ref: "#/components/parameters/DateLastComment"
-                - description: >
-                      Filter discussions by site-section-id (subcommunity).
-                      The subcommunityID or folder can be used.
+                - description: |-
+                      Filter discussions by site section ID (ex. subcommunity).
+                      The subcommunity ID or folder can be used if you use [smart IDs](https://success.vanillaforums.com/kb/articles/46-smart-ids).
                       The query looks like:
-                      siteSectionID=$SubcommunityID:{id} ie. 1
-                      siteSectionID=$SubcommunityID:{folder} ie. en
+
+                      ```
+                      siteSectionID=$subcommunityID:{id|folder}
+                      ```
+                  example: "$subcommunityID:en"
                   in: query
                   name: siteSectionID
                   schema:

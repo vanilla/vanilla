@@ -27,6 +27,7 @@ use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
 use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Utility\ModelUtils;
+use Vanilla\Utility\TreeBuilder;
 
 /**
  * API Controller for the `/categories` resource.
@@ -511,17 +512,16 @@ class CategoriesApiController extends AbstractApiController {
             $categories = $this->archiveFilter($categories, $query['archived'] ? 0 : 1);
         }
 
-        if ($format === 'tree') {
-            $categories = CategoryCollection::treeBuilder()->buildTree($categories);
-        } elseif ($sort === '') {
-            $categories = CategoryModel::sortCategoriesAsTree($categories);
-        }
-
         foreach ($categories as &$category) {
             $category = $this->normalizeOutput($category, $expand);
         }
-
         $categories = $out->validate($categories);
+
+        if ($format === 'tree') {
+            $categories = $this->treeNormalizedBuilder()->buildTree($categories);
+        } elseif ($sort === '') {
+            $categories = $this->treeNormalizedBuilder()->sort($categories);
+        }
 
         if (isset($totalCountCallBack) && $format === self::OUTPUT_FORMAT_FLAT) {
             $query['page'] = $page;
@@ -829,8 +829,10 @@ class CategoriesApiController extends AbstractApiController {
             'depth:i',
             'children:a?' => $childSchema->merge(Schema::parse([
                 'depth:i',
-                'children:a'
-            ]))
+                'children:a',
+                'sort:i'
+            ])),
+            'sort:i',
         ]));
         return $schema;
     }
@@ -870,14 +872,9 @@ class CategoriesApiController extends AbstractApiController {
             $categories = $this->categoryModel->getWhere($where, $order, '', $limit, $offset)
                 ->resultArray();
         } else {
-            $ids = $this->categoryModel->selectCachedIDs(
-                $where,
-                $order,
-                '',
-                $limit,
-                $offset
-            );
-            $categories = $this->categoryModel->getCollection()->getMulti($ids);
+            $categories = $this->categoryModel
+                ->getWhere($where, $order, '', $limit, $offset)
+                ->resultArray();
         }
 
         // Index by ID for category calculation functions.
@@ -915,4 +912,23 @@ class CategoriesApiController extends AbstractApiController {
             trigger_error(self::ERRORINDEXMSG, E_USER_WARNING);
         }
     }
+
+    /**
+     * Return a normalized TreeBuilder for the /index api endpoint.
+     *
+     * @return TreeBuilder
+     */
+    private function treeNormalizedBuilder(): TreeBuilder {
+        $builder = TreeBuilder::create('categoryID', 'parentCategoryID')
+            ->setAllowUnreachableNodes(true)
+            ->setRootID(null)
+            ->setChildrenFieldName('children')
+            ->setSorter(function (array $catA, array $catB) {
+                return ($catA['sort'] ?? 0) <=> ($catB['sort'] ?? 0);
+            })
+        ;
+        return $builder;
+    }
+
+
 }

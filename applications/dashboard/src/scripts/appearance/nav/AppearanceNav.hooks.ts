@@ -10,21 +10,20 @@ import {
     BrandingPageRoute,
     LegacyLayoutsRoute,
     LayoutOverviewRoute,
-    NewLayoutRoute,
-    NewLayoutJsonRoute,
-} from "@dashboard/appearance/routes/pageRoutes";
+    LayoutEditorRoute,
+} from "@dashboard/appearance/routes/appearanceRoutes";
 import { useConfigsByKeys } from "@library/config/configHooks";
 import { useMemo } from "react";
 import { useLayouts } from "@dashboard/layout/layoutSettings/LayoutSettings.hooks";
 import { RecordID, uuidv4 } from "@vanilla/utils";
-import { ILayout } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
+import { ILayoutDetails } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import isEmpty from "lodash/isEmpty";
 import { LayoutViewType, LAYOUT_VIEW_TYPES } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { registeredAppearanceNavItems } from "@dashboard/appearance/navigationItems";
 
 const CUSTOM_LAYOUTS_CONFIG_KEY = "labs.customLayouts";
 
-function makeTreeChildren(layouts: ILayout[], recordID: RecordID) {
+function makeTreeChildren(layouts: ILayoutDetails[], recordID: RecordID) {
     return (
         layouts.map((layout, index) => ({
             sort: index,
@@ -85,7 +84,7 @@ function useLayoutEditorNavTree(ownID: RecordID, parentID: RecordID): INavigatio
                                         recordType: "addLayout",
                                         isLink: true,
                                         children: [],
-                                        url: getRelativeUrl(NewLayoutRoute.url(layoutViewType)),
+                                        url: getRelativeUrl(LayoutEditorRoute.url({ layoutViewType })),
                                     },
                                 ]
                               : []),

@@ -662,13 +662,12 @@ paths:
                             type: object
                 required: true
     /users/leaders:
-        x-hidden: true
         get:
             summary: Get user's leaderboard.
             tags:
                 - Users
             parameters:
-                - description: Leaderboard type ("reputation" => "Reputation points", "posts" => "Discussion/comment posts").
+                - description: Leaderboard type ("reputation" => "Reputation points", "posts" => "Discussion/comment posts", "acceptedAnswers" => "Accepted Answers count").
                   in: query
                   name: leaderboardType
                   required: true
@@ -677,6 +676,7 @@ paths:
                       enum:
                           - reputation
                           - posts
+                          - acceptedAnswers
                       default: reputation
                 - description: Slot type ("d" = day, "w" = week, "m" = month, "y" = year, "a" = all).
                   in: query
@@ -703,6 +703,18 @@ paths:
                   required: false
                   schema:
                       type: integer
+                - description: Specify a range or CSV of included role IDs.
+                  in: query
+                  name: includedRoleIDs
+                  required: false
+                  schema:
+                      $ref: "#/components/schemas/RangeExpression"
+                - description: Specify a range or CSV of excluded role IDs.
+                  in: query
+                  name: excludedRoleIDs
+                  required: false
+                  schema:
+                      $ref: "#/components/schemas/RangeExpression"
             responses:
                 "200":
                     content:

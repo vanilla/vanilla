@@ -33,20 +33,34 @@ class UserLeaderQuery {
     public $pointsCategoryID;
 
     /** @var array  */
-    public $moderatorIDs;
+    public $includedUserIDs;
+
+    /** @var array  */
+    public $excludedUserIDs;
 
     /**
      * Constructor of the User Leader.
      *
-     * @param string $slotType Time interval type.
-     * @param int|null $categoryID Category ID.
-     * @param int|null $limit Number of results to return.
-     * @param string|null $leaderboardType Leaderboard type.
+     * @param string $slotType
+     * @param int|null $categoryID
+     * @param int|null $limit
+     * @param int[] $includedUserIDs
+     * @param int[] $excludedUserIDs
+     * @param string|null $leaderboardType
      */
-    public function __construct(string $slotType, ?int $categoryID, ?int $limit, ?string $leaderboardType = UserLeaderService::LEADERBOARD_TYPE_REPUTATION) {
+    public function __construct(
+        string $slotType,
+        ?int $categoryID,
+        ?int $limit,
+        ?array $includedUserIDs = [],
+        ?array $excludedUserIDs = [],
+        ?string $leaderboardType = UserLeaderService::LEADERBOARD_TYPE_REPUTATION
+    ) {
         $this->slotType = $slotType;
         $this->categoryID = $categoryID;
         $this->limit = $limit;
+        $this->includedUserIDs = $includedUserIDs;
+        $this->excludedUserIDs = $excludedUserIDs;
         $this->leaderboardType = $leaderboardType;
     }
 }

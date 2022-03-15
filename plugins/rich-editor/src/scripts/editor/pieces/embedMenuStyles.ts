@@ -14,13 +14,14 @@ import { useThemeCache } from "@library/styles/themeCache";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { percent } from "csx";
 import { metasVariables } from "@library/metas/Metas.variables";
+import { css } from "@emotion/css";
 
 export const embedMenuClasses = useThemeCache(() => {
     const style = styleFactory("embedMenu");
     const metasVars = metasVariables();
     const globalVars = globalVariables();
 
-    const root = style({
+    const root = css({
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
@@ -31,20 +32,18 @@ export const embedMenuClasses = useThemeCache(() => {
         transform: "translate(-50%, -50%)",
         background: ColorsUtils.colorOut(globalVars.mainColors.bg),
         ...Mixins.border(),
-        ...shadowOrBorderBasedOnLightness(),
+        ...shadowOrBorderBasedOnLightness(undefined, undefined, shadowHelper().toolbar()),
         zIndex: 100,
         ...Mixins.padding({
             vertical: 4,
             horizontal: 2,
         }),
-        ...{
-            "&.isOpened": {
-                borderBottomLeftRadius: 0,
-                borderBottomRightRadius: 0,
-            },
-            "& > *": {
-                ...Mixins.margin({ horizontal: 4 }),
-            },
+        "&.isOpened": {
+            borderBottomLeftRadius: 0,
+            borderBottomRightRadius: 0,
+        },
+        "& > *": {
+            ...Mixins.margin({ horizontal: 4 }),
         },
     });
 

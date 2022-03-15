@@ -23,14 +23,14 @@ export function PanelOverflow(
             : undefined;
     return (
         <div className={classes.areaOverlay}>
-            <div className={classes.areaOverlayBefore(color, "left")} />
+            {useMinHeight && <div className={classes.areaOverlayBefore(color, "left")} />}
             <div
                 ref={props.innerRef}
                 className={classNames(props.className, classes.overflowFull(props.offset, useMinHeight))}
             >
                 {props.children}
             </div>
-            <div className={classes.areaOverlayAfter(color, "right")} />
+            {useMinHeight && <div className={classes.areaOverlayAfter(color, "right")} />}
         </div>
     );
 }

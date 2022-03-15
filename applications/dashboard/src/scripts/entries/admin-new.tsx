@@ -4,7 +4,7 @@
  * @license gpl-2.0-only
  */
 
-import { getAppearanceRoutes } from "@dashboard/appearance/routes/pageRoutes";
+import { getAppearanceRoutes } from "@dashboard/appearance/routes/appearanceRoutes";
 import { dashboardSectionSlice } from "@dashboard/DashboardSectionSlice";
 import { AppContext, registerContextProvider } from "@library/AppContext";
 import { supportsFrames } from "@library/embeddedContent/IFrameEmbed";

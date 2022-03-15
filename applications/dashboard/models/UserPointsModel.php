@@ -8,8 +8,8 @@
 namespace Vanilla\Dashboard;
 
 use Garden\Schema\Schema;
-use UserLeaderProviderInterface;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Dashboard\Models\UserLeaderProviderInterface;
 use Vanilla\Dashboard\Models\UserLeaderQuery;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
@@ -57,7 +57,7 @@ class UserPointsModel extends Model implements UserLeaderProviderInterface {
     }
 
     /**
-     * Get the leaders for a given slot type and time.
+     * Get the leaders by the queried criteria.
      *
      * @param UserLeaderQuery $query
      *
@@ -68,8 +68,9 @@ class UserPointsModel extends Model implements UserLeaderProviderInterface {
             $query->slotType,
             $query->timeSlot,
             $query->pointsCategoryID,
-            $query->moderatorIDs,
-            $query->limit
+            $query->limit,
+            $query->includedUserIDs,
+            $query->excludedUserIDs,
         ];
         $leaderData = $this->modelCache->getCachedOrHydrate($args, [$this, 'queryLeaders'], [
             \Gdn_Cache::FEATURE_EXPIRY => $this->config->get(UserLeaderService::CONF_CACHE_TTL, UserLeaderService::DEFAULT_CACHE_TTL),
@@ -84,8 +85,9 @@ class UserPointsModel extends Model implements UserLeaderProviderInterface {
      * @param string $slotType
      * @param string $timeSlot
      * @param int $categoryID
-     * @param int[] $excludedUserIDs
      * @param int $limit
+     * @param int[] $includedUserIDs
+     * @param int[] $excludedUserIDs
      *
      * @return int[]
      */
@@ -93,8 +95,9 @@ class UserPointsModel extends Model implements UserLeaderProviderInterface {
         string $slotType,
         string $timeSlot,
         int $categoryID,
-        array $excludedUserIDs,
-        int $limit
+        int $limit,
+        array $includedUserIDs = [],
+        array $excludedUserIDs = []
     ) {
         $sql = $this->createSql();
         $sql->select([
@@ -118,6 +121,9 @@ class UserPointsModel extends Model implements UserLeaderProviderInterface {
             ->orderBy('up.Points', 'desc')
             ->limit($limit);
 
+        if (!empty($includedUserIDs)) {
+            $sql->whereIn('up.UserID', $includedUserIDs);
+        }
         if (!empty($excludedUserIDs)) {
             $sql->whereNotIn('up.UserID', $excludedUserIDs);
         }

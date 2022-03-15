@@ -75,3 +75,19 @@ export function logWarning(...value: any[]) {
     // eslint-disable-next-line no-console
     console.warn(...value);
 }
+
+/**
+ * Log calls to a function with traces.
+ * @param fn The function wrap.
+ */
+export function logFunctionTraces<T extends Function>(fn: T, debugName: string): T {
+    const wrapped = (...args: any[]) => {
+        // eslint-disable-next-line no-console
+        console.trace("Function Trace", {
+            debugName,
+            args,
+        });
+        return fn(...args);
+    };
+    return wrapped as any;
+}

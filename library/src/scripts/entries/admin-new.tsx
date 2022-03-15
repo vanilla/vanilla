@@ -4,7 +4,7 @@
  * @license gpl-2.0-only
  */
 
-import { registerWidgetOverviews } from "@dashboard/appearance/components/LayoutOverview";
+import { registerWidgetOverviews } from "@dashboard/layout/overview/LayoutOverview";
 import { SectionFullWidth } from "@library/layout/SectionFullWidth";
 import { SectionOneColumn } from "@library/layout/SectionOneColumn";
 import ThreeColumnSection from "@library/layout/ThreeColumnSection";

@@ -113,7 +113,6 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
         $this->userModel = Gdn::getContainer()->get(UserModel::class);
         $this->categoryModel = Gdn::getContainer()->get(CategoryModel::class);
         $this->siteSectionModel = Gdn::getContainer()->get(SiteSectionModel::class);
-
         $this->setFormatterService(Gdn::getContainer()->get(FormatService::class));
         $this->setMediaForeignTable($this->Name);
         $this->setMediaModel(Gdn::getContainer()->get(MediaModel::class));
@@ -1452,7 +1451,7 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
         $rawBody = $row['Body'];
         $format = $row['Format'];
         $this->formatField($row, "Body", $row["Format"]);
-        $row['Name'] = sprintf(t('Re: %s'), $row['DiscussionName'] ?? t('Untitled'));
+        $row['Name'] = self::generateCommentName($row["DiscussionName"]);
         $row['Url'] = commentUrl($row);
         $row['Attributes'] = new Attributes($row['Attributes'] ?? null);
         $row['InsertUserID'] = $row['InsertUserID'] ?? 0;
@@ -1477,6 +1476,17 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
         }
         return $result;
     }
+
+    /**
+     * Generate a comment name from a discussion name. This will return 'Untitled' if passed a null value.
+     *
+     * @param string|null $discussionName
+     * @return string
+     */
+    public static function generateCommentName(?string $discussionName): string {
+        return sprintf(t('Re: %s'), $discussionName ?? t('Untitled'));
+    }
+
     /**
      * Update the attachment status of attachemnts in particular comment.
      *

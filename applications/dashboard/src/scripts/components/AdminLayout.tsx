@@ -95,7 +95,6 @@ export default function AdminLayout(props: IProps) {
                                 <aside className={cx(userContentClasses().root, classes.helpText)}>{rightPanel}</aside>
                             }
                             topPadding={false}
-                            isFixed
                         />
                     )}
                     {!rightPanel && (

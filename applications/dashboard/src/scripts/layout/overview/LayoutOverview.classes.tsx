@@ -1,6 +1,6 @@
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
@@ -17,18 +17,38 @@ export const layoutOverviewClasses = useThemeCache(() => {
     const fauxWidget = css({
         position: "relative",
         display: "flex",
-        alignItems: "center",
+        flexDirection: "column",
         ...Mixins.box(
             Variables.box({
                 borderType: BorderType.SHADOW,
             }),
         ),
         minHeight: styleUnit(80),
+    });
+
+    const fauxWidgetFullWidth = css({
+        position: "relative",
+        display: "flex",
+        flexDirection: "column",
+        minHeight: styleUnit(200),
+        background: "#f5f5f5",
+    });
+
+    const fauxWidgetContent = css({
+        display: "flex",
+        width: "100%",
+        height: "100%",
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "space-around",
+        userSelect: "none",
         "& p": {
-            fontSize: "bold",
+            fontWeight: "bold",
+            width: "100%",
+            textAlign: "center",
             fontFamily: globalVariables().fonts.families.monospace,
         },
     });
 
-    return { fauxWidget };
+    return { fauxWidget, fauxWidgetFullWidth, fauxWidgetContent };
 });

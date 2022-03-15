@@ -33,6 +33,7 @@ export const CustomRadioInput = React.forwardRef(function CustomRadioInput(
     const id = useMemo(() => {
         return "customRadio-" + uniqueId();
     }, []);
+    const descriptionID = id + "description";
     const radioContext = useContext(CustomRadioGroupContext);
     const classes = useMemo(() => customRadioGroupClasses(), []);
 
@@ -48,8 +49,11 @@ export const CustomRadioInput = React.forwardRef(function CustomRadioInput(
     return (
         <>
             <label {...htmlProps} htmlFor={id} ref={ref}>
+                <div id={descriptionID} className={classes.accessibleDescription}>
+                    {accessibleDescription}
+                </div>
                 <input
-                    aria-description={accessibleDescription}
+                    aria-describedby={descriptionID}
                     onFocus={() => {
                         setIsFocused(true);
                     }}

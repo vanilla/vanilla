@@ -19,20 +19,20 @@ import { notEmpty } from "@vanilla/utils";
 import Translate from "@library/content/Translate";
 import DateTime from "@library/content/DateTime";
 import { useUser } from "@library/features/users/userHooks";
-import { ILayout } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
+import { ILayoutDetails, LayoutViewType } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import layoutOverviewPageClasses from "./LayoutOverviewPage.classes";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
 import { ErrorWrapper } from "@dashboard/appearance/pages/ErrorWrapper";
-import { EditLayoutRoute } from "@dashboard/appearance/routes/pageRoutes";
-import { LayoutOverview } from "@dashboard/appearance/components/LayoutOverview";
+import { LayoutOverview } from "@dashboard/layout/overview/LayoutOverview";
 import { MetaItem, Metas } from "@library/metas/Metas";
 import ProfileLink from "@library/navigation/ProfileLink";
 import { metasClasses } from "@library/metas/Metas.styles";
+import { LayoutEditorRoute } from "@dashboard/appearance/routes/appearanceRoutes";
 
 interface IDescriptionProps {
-    layout: ILayout;
+    layout: ILayoutDetails;
 }
 
 function LayoutOverviewPageMetasImpl(props: IDescriptionProps) {
@@ -80,9 +80,11 @@ function LayoutOverviewPageMetasImpl(props: IDescriptionProps) {
 export default function LayoutOverviewPage(
     props: RouteComponentProps<{
         layoutID: string;
+        layoutViewType: LayoutViewType;
     }>,
 ) {
     const layoutID = props.match.params.layoutID;
+    const layoutViewType = props.match.params.layoutViewType;
     const layoutLoadable = useLayout(layoutID);
     const layout = layoutLoadable.data;
 
@@ -119,7 +121,7 @@ export default function LayoutOverviewPage(
     ) : layoutStatusIsError ? (
         errorContent(layoutLoadable)
     ) : (
-        <LayoutOverviewPageMetasImpl layout={layout as ILayout} />
+        <LayoutOverviewPageMetasImpl layout={layout as ILayoutDetails} />
     );
 
     const titleBarActionsContent = !layoutStatusIsError ? (
@@ -136,7 +138,13 @@ export default function LayoutOverviewPage(
                 {/* <DropDownItemButton onClick={() => {}}>{t("Preview")}</DropDownItemButton>
                  <DropDownItemButton onClick={() => {}}>{t("Delete")}</DropDownItemButton> */}
             </DropDown>
-            <LinkAsButton buttonType={ButtonTypes.OUTLINE} to={EditLayoutRoute.url(layout!)}>
+            <LinkAsButton
+                buttonType={ButtonTypes.OUTLINE}
+                to={LayoutEditorRoute.url({
+                    layoutID,
+                    layoutViewType,
+                })}
+            >
                 {t("Edit")}
             </LinkAsButton>
         </>

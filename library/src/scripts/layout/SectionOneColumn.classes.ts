@@ -12,6 +12,17 @@ import { useThemeCache } from "@library/styles/themeCache";
 
 export const sectionOneColumnClasses = useThemeCache(() => {
     const widgetClasses = widgetLayoutClasses();
+
+    const root = css({
+        position: "relative",
+    });
+
+    const container = css({
+        // the container is a flexbox by default.
+        // This is problematic as it disables margin collapsing.
+        display: "block",
+    });
+
     const widgetClass = css({
         ...widgetClasses.widgetMixin,
         "&:first-child": {
@@ -22,5 +33,5 @@ export const sectionOneColumnClasses = useThemeCache(() => {
         },
     });
 
-    return { widgetClass };
+    return { root, container, widgetClass };
 });

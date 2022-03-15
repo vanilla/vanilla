@@ -14,6 +14,7 @@ import { AutoWidthInput } from "@library/forms/AutoWidthInput";
 import { autoWidthInputClasses } from "@library/forms/AutoWidthInput.classes";
 import { adminEditTitleBarClasses } from "@dashboard/components/AdminTitleBar.classes";
 import { useDebouncedInput } from "@dashboard/hooks";
+import { TitleBarDevices, useTitleBarDevice } from "@library/layout/TitleBarContext";
 
 interface IProps {
     title: string;
@@ -23,15 +24,22 @@ interface IProps {
     autoFocusTitleInput?: boolean;
     isCompact?: boolean;
     leftPanel?: boolean;
+    isSaveLoading?: boolean;
     onSave?(): void;
+    noSaveButton?: boolean;
     actions?: React.ReactNode;
 }
 
 export default function AdminEditTitleBar(props: IProps) {
-    const { cancelPath, disableSave, onTitleChange, onSave, autoFocusTitleInput, isCompact, leftPanel } = props;
+    const { cancelPath, disableSave, onSave, autoFocusTitleInput, leftPanel } = props;
+
+    const device = useTitleBarDevice();
+    const isCompact = props.isCompact ?? device === TitleBarDevices.COMPACT;
 
     const editableRef = useRef<HTMLInputElement | null>();
-    const [title, setTitle] = useState(props.title);
+    const [ownTitle, ownSetTitle] = useState(props.title);
+    const title = props.title ?? ownTitle;
+    const setTitle = props.onTitleChange ?? ownSetTitle;
 
     const classes = adminEditTitleBarClasses();
 
@@ -55,8 +63,8 @@ export default function AdminEditTitleBar(props: IProps) {
     const debouncedTitle = useDebouncedInput(title, 500);
 
     useEffect(() => {
-        if (debouncedTitle !== props.title && debouncedTitle !== "" && onTitleChange) {
-            onTitleChange(debouncedTitle);
+        if (debouncedTitle !== props.title && debouncedTitle !== "" && setTitle) {
+            setTitle(debouncedTitle);
         }
     }, [debouncedTitle]);
 
@@ -104,14 +112,16 @@ export default function AdminEditTitleBar(props: IProps) {
                         )}
                         <div className={classes.editActions}>
                             {props.actions}
-                            <Button
-                                buttonType={ButtonTypes.TEXT_PRIMARY}
-                                className={classes.saveButton}
-                                onClick={onSaveHandler}
-                                disabled={disableSave}
-                            >
-                                {t("Save")}
-                            </Button>
+                            {!props.noSaveButton && (
+                                <Button
+                                    buttonType={ButtonTypes.TEXT_PRIMARY}
+                                    className={classes.saveButton}
+                                    onClick={onSaveHandler}
+                                    disabled={disableSave}
+                                >
+                                    {t("Save")}
+                                </Button>
+                            )}
                         </div>
                     </div>
                 </div>

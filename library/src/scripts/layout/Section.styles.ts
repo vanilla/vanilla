@@ -34,8 +34,7 @@ export const generateSectionClasses = (props: {
     const globalVars = globalVariables();
     const style = styleFactory(name);
 
-    const main = style("main", {
-        minHeight: viewHeight(20),
+    const main = css({
         width: percent(100),
     });
 
@@ -45,6 +44,7 @@ export const generateSectionClasses = (props: {
         },
     };
     const root = style({
+        position: "relative",
         width: percent(100),
         // Pull up by our panel widget spacing.
         "&&": {

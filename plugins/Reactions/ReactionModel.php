@@ -900,6 +900,16 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
                 }
             }
 
+            // Add the comment or discussion url and name to the row to pass to the reaction event.
+            if ($recordType === "Comment") {
+                $row["recordUrl"] = CommentModel::commentUrl($record);
+                $row["recordName"] = CommentModel::generateCommentName($record["DiscussionName"]);
+            } elseif ($recordType === "Discussion") {
+                $row["recordUrl"] = DiscussionModel::discussionUrl($record);
+                $row["recordName"] = $record["Name"];
+            }
+
+
             $reactionEvent = $this->eventFromRow(
                 $row,
                 $reactionAdded ? ReactionEvent::ACTION_INSERT : ReactionEvent::ACTION_DELETE
@@ -1760,6 +1770,8 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
             $logFragment = Schema::parse([
                 'recordType:s',
                 'recordID:i',
+                'recordName:s?',
+                'recordUrl:s?',
                 'tagID:i',
                 'userID:i',
                 'dateInserted:dt',

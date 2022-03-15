@@ -31,6 +31,7 @@ interface IProps {
     elementToFocus?: HTMLElement;
     size: ModalSizes;
     scrollable?: boolean;
+    noFocusOnExit?: boolean;
     elementToFocusOnExit?: HTMLElement; // Should either be a specific element or use document.activeElement
     isWholePage?: boolean;
     isVisible: boolean;
@@ -133,6 +134,14 @@ A modal was mounted, but the page container could not be found.
 Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it can be hidden to screenreaders.
             `);
         }
+        document.addEventListener("keydown", this.handleDocumentEscapePress);
+    }
+
+    /**
+     * Handle unmount.
+     */
+    public componentWillUnmount() {
+        document.removeEventListener("keydown", this.handleDocumentEscapePress);
     }
 
     public onMountIn = () => {
@@ -141,10 +150,6 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
         this.focusInitialElement();
         pageContainer && pageContainer.setAttribute("aria-hidden", true);
 
-        // Add the escape keyboard listener only on the first modal in the stack.
-        if (Modal.stack.length === 0) {
-            document.addEventListener("keydown", this.handleDocumentEscapePress);
-        }
         Modal.stack.push(this);
     };
 
@@ -160,16 +165,14 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
         Modal.stack.pop();
         if (Modal.stack.length === 0) {
             pageContainer && pageContainer.removeAttribute("aria-hidden");
-
-            // This event listener is only added once (on the top modal).
-            // So we only remove when clearing the last one.
-            document.removeEventListener("keydown", this.handleDocumentEscapePress);
         } else {
             pageContainer && pageContainer.setAttribute("aria-hidden", true);
         }
 
         // We were destroyed so we should focus back to the last element.
-        this.closeFocusElement?.focus();
+        if (!this.props.noFocusOnExit) {
+            this.closeFocusElement?.focus();
+        }
     };
 
     public componentDidUpdate(prevProps: IProps, prevState: IState) {
@@ -243,7 +246,6 @@ It seems auto-detection isn't working, so you'll need to specify the "elementToF
      * Because of this we have to be smarter and call only the top modal's escape handler.
      */
     private handleDocumentEscapePress = (event: React.SyntheticEvent | KeyboardEvent) => {
-        const topModal = Modal.stack[Modal.stack.length - 1];
         const escKey = 27;
 
         if ("keyCode" in event && event.keyCode === escKey) {
@@ -252,8 +254,8 @@ It seems auto-detection isn't working, so you'll need to specify the "elementToF
             if (Modal.stack.length === 1 && this.props.isWholePage) {
                 return;
             } else {
-                if (topModal.props.exitHandler) {
-                    topModal.props.exitHandler(event as any);
+                if (this.props.exitHandler && this.props.isVisible) {
+                    this.props.exitHandler(event as any);
                 }
             }
         }
@@ -265,6 +267,10 @@ It seems auto-detection isn't working, so you'll need to specify the "elementToF
      */
     private handleModalClick = (event: React.MouseEvent) => {
         event.stopPropagation();
+        if (event.target instanceof HTMLElement && !TabHandler.isTabbable(event.target)) {
+            // Move focus to the modal instead of the body.
+            this.selfRef.current?.focus();
+        }
     };
 
     /**

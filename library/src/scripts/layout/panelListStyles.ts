@@ -10,6 +10,7 @@ import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { allLinkStates } from "@library/styles/styleHelpers";
 import { styleUnit } from "@library/styles/styleUnit";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
 
 export const panelListVariables = useThemeCache(() => {
     const globalVals = globalVariables();
@@ -71,10 +72,10 @@ export const panelListClasses = useThemeCache((mediaQueries) => {
                 textDecoration: "none",
             },
             hover: {
-                color: globalVars.links.colors.hover,
+                color: ColorsUtils.colorOut(globalVars.links.colors.hover),
             },
             focus: {
-                color: globalVars.links.colors.focus,
+                color: ColorsUtils.colorOut(globalVars.links.colors.focus),
             },
         }),
     });

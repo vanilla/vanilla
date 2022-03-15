@@ -551,7 +551,7 @@ trait NestedCollection {
             if (empty($this->highlightRoute)) {
                 $this->highlightRouteCache = Gdn::request()->getUrl();
             } else {
-                $this->highlightRouteCache = url($this->highlightRoute);
+                $this->highlightRouteCache = url($this->highlightRoute, true);
             }
             $this->highlightRouteCache = trim($this->highlightRouteCache, "/");
         }
@@ -559,7 +559,7 @@ trait NestedCollection {
         $url = $item['url'] ?? false;
         if ($url) {
             $actual = trim(url($url, true), '/');
-            $result = $actual === url($this->highlightRouteCache, true);
+            $result = $actual === $this->highlightRouteCache;
         } else {
             $result = false;
         }

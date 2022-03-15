@@ -185,6 +185,10 @@ JSON;
                 $videoEmbed,
                 $videoOutput,
                 true
+            ],
+            [
+                "[[],{\"insert\":\"Just a normal post\"}, {\"insert\":\"nothing special here\"}]",
+                "[{\"insert\":\"Just a normal post\"},{\"insert\":\"nothing special here\"}]"
             ]
         ];
     }

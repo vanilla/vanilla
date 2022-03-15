@@ -249,7 +249,7 @@ trait EventSpyTestTrait {
         $eventDispatched = false;
         if ($eventProperties) {
             foreach ($events as $event) {
-                if (!($eventDispatched instanceof ResourceEvent)) {
+                if (!($event instanceof ResourceEvent)) {
                     continue;
                 }
 

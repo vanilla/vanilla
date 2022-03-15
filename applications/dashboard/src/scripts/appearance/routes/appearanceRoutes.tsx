@@ -5,40 +5,19 @@
 
 import RouteHandler from "@library/routing/RouteHandler";
 import PageLoader from "@library/routing/PageLoader";
-import { ILayout, LayoutViewType } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
+import { ILayoutDetails, LayoutViewType } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { slugify } from "@vanilla/utils";
 
 type LayoutFragment = {
-    layoutID: ILayout["layoutID"];
-    name: ILayout["name"];
-    layoutViewType: ILayout["layoutViewType"];
+    layoutID: ILayoutDetails["layoutID"];
+    name: ILayoutDetails["name"];
+    layoutViewType: ILayoutDetails["layoutViewType"];
 };
 
 export const AppearanceRoute = new RouteHandler(
     () => import("@dashboard/appearance/pages/AppearancePage"),
     "/appearance",
     () => "/appearance",
-    PageLoader,
-);
-
-export const LayoutPlaygroundPage = new RouteHandler(
-    () => import("@dashboard/layout/pages/LayoutPlaygroundPage"),
-    "/appearance/layouts/playground",
-    () => `/appearance/layouts/playground`,
-    PageLoader,
-);
-
-export const NewLayoutJsonRoute = new RouteHandler(
-    () => import("@dashboard/layout/pages/NewLayoutJsonPage"),
-    "/appearance/layouts/:layoutViewType/add/json",
-    (layoutViewType: LayoutViewType) => `/appearance/layouts/${layoutViewType}/add/json`,
-    PageLoader,
-);
-
-export const NewLayoutRoute = new RouteHandler(
-    () => import("@dashboard/layout/pages/NewLayoutPage"),
-    "/appearance/layouts/:layoutViewType/add",
-    (layoutViewType: LayoutViewType) => `/appearance/layouts/${layoutViewType}/add`,
     PageLoader,
 );
 
@@ -56,19 +35,20 @@ export const BrandingPageRoute = new RouteHandler(
     PageLoader,
 );
 
-export const EditLayoutRoute = new RouteHandler(
-    () => import("@dashboard/layout/pages/EditLayoutPage"),
-    `/appearance/layouts/:layoutViewType/:layoutID(\\w+)(-[^/]+)?/edit`,
-    (layout: LayoutFragment) =>
-        `/appearance/layouts/${layout.layoutViewType}/${layout.layoutID}-${slugify(layout.name)}/edit`,
-    PageLoader,
-);
-
-export const EditLayoutJsonRoute = new RouteHandler(
-    () => import("@dashboard/layout/pages/EditLayoutJsonPage"),
-    `/appearance/layouts/:layoutViewType/:layoutID(\\w+)(-[^/]+)?/edit/json`,
-    (layout: LayoutFragment) =>
-        `/appearance/layouts/${layout.layoutViewType}/${layout.layoutID}-${slugify(layout.name)}/edit/json`,
+export const LayoutEditorRoute = new RouteHandler(
+    () => import("@dashboard/layout/pages/LayoutEditorPage"),
+    [`/appearance/layouts/:layoutViewType/:layoutID(\\w+)(-[^/]+)?/edit`, "/appearance/layouts/:layoutViewType/add"],
+    (layout: Partial<LayoutFragment>) => {
+        if (layout.layoutID) {
+            let slug = layout.layoutID;
+            if (layout.name) {
+                slug += "-" + slugify(layout.name);
+            }
+            return `/appearance/layouts/${layout.layoutViewType}/${slug}/edit`;
+        } else {
+            return `/appearance/layouts/${layout.layoutViewType}/add`;
+        }
+    },
     PageLoader,
 );
 
@@ -98,12 +78,8 @@ export function getAppearanceRoutes() {
     return [
         AppearanceRoute.route,
         LegacyLayoutsRoute.route,
-        LayoutPlaygroundPage.route,
-        NewLayoutJsonRoute.route,
-        NewLayoutRoute.route,
         BrandingPageRoute.route,
-        EditLayoutRoute.route,
-        EditLayoutJsonRoute.route,
+        LayoutEditorRoute.route,
         LayoutOverviewRoute.route,
         LayoutOverviewRedirectRoute.route,
     ];

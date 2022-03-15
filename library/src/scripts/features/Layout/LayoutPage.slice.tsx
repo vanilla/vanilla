@@ -6,12 +6,12 @@
 
 import { IApiError, ILoadable, LoadStatus } from "@library/@types/api/core";
 import { lookupLayout } from "@library/features/Layout/LayoutPage.actions";
-import { ILayoutSpec } from "@library/features/Layout/LayoutPage.types";
+import { IHydratedLayoutSpec } from "@library/features/Layout/LayoutRenderer.types";
 import { createSlice } from "@reduxjs/toolkit";
 import { stableObjectHash } from "@vanilla/utils";
 
 interface ILayoutPageState {
-    layoutsByHash: Record<string, ILoadable<ILayoutSpec>>;
+    layoutsByHash: Record<string, ILoadable<IHydratedLayoutSpec>>;
 }
 
 export interface ILayoutPageStoreState {

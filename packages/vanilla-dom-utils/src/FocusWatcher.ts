@@ -27,6 +27,7 @@ export class FocusWatcher {
     public start = () => {
         this.watchedNode.addEventListener("focusout", this.handleFocusOut, true);
         this.watchedNode.addEventListener("focusin", this.handleFocusIn, true);
+
         document.addEventListener("click", this.handleClick);
     };
 
@@ -36,6 +37,7 @@ export class FocusWatcher {
     public stop = () => {
         this.watchedNode.removeEventListener("focusout", this.handleFocusOut, true);
         this.watchedNode.removeEventListener("focusin", this.handleFocusIn, true);
+
         document.removeEventListener("click", this.handleClick);
     };
 

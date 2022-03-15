@@ -3,6 +3,7 @@ import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { oneColumnVariables } from "@library/layout/Section.variables";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { Mixins } from "@library/styles/Mixins";
+import { sticky } from "@library/styles/styleHelpersPositioning";
 import { useThemeCache } from "@library/styles/styleUtils";
 import { Variables } from "@library/styles/Variables";
 import { calc } from "csx";
@@ -86,6 +87,9 @@ export const adminEditTitleBarClasses = useThemeCache(() => {
     const mediaQueries = titleBarVariables().mediaQueries();
 
     const editingContainerWrapper = css({
+        ...sticky(),
+        top: 0,
+        zIndex: 1,
         boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
         marginBottom: 1,
     });

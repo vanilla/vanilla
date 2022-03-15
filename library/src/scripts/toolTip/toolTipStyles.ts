@@ -14,6 +14,7 @@ import { Mixins } from "@library/styles/Mixins";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { translateX, percent, px, important } from "csx";
 import { modalVariables } from "@library/modal/modalStyles";
+import { injectGlobal } from "@emotion/css";
 
 export const tooltipVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("toolTips");

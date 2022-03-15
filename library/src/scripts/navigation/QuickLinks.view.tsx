@@ -9,6 +9,7 @@ import { INavigationVariableItem } from "@library/headers/navigationVariables";
 import { IHomeWidgetContainerOptions } from "@library/homeWidget/HomeWidgetContainer.styles";
 import { PageBox } from "@library/layout/PageBox";
 import { PageHeadingBox } from "@library/layout/PageHeadingBox";
+import { Widget } from "@library/layout/Widget";
 import { useWidgetSectionClasses } from "@library/layout/WidgetLayout.context";
 import { quickLinksClasses } from "@library/navigation/QuickLinks.classes";
 import { quickLinksVariables } from "@library/navigation/QuickLinks.variables";
@@ -36,10 +37,8 @@ export function QuickLinksView(props: IProps) {
         return !isSetHidden;
     });
 
-    const widgetClasses = useWidgetSectionClasses();
-
     return (
-        <div className={cx(classes.root, widgetClasses.widgetClass)}>
+        <Widget className={classes.root}>
             <PageHeadingBox
                 title={title}
                 options={{
@@ -67,7 +66,7 @@ export function QuickLinksView(props: IProps) {
                     </ul>
                 </nav>
             </PageBox>
-        </div>
+        </Widget>
     );
 }
 interface IQuickLinkProps {

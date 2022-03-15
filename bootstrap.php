@@ -9,7 +9,6 @@ use Vanilla\Addon;
 use Vanilla\BodyFormatValidator;
 use Vanilla\Contracts;
 use Vanilla\Contracts\Web\UASnifferInterface;
-use Vanilla\Dashboard\LeaderboardPostModel;
 use Vanilla\Dashboard\UserLeaderService;
 use Vanilla\Dashboard\UserPointsModel;
 use Vanilla\EmbeddedContent\LegacyEmbedReplacer;
@@ -403,7 +402,6 @@ $dic->setInstance(Container::class, $dic)
 
     ->rule(UserLeaderService::class)
     ->addCall('addProvider', [new Reference(UserPointsModel::class)])
-    ->setInherit(true)
     ->setShared(true)
 
     ->rule(\Vanilla\PageScraper::class)

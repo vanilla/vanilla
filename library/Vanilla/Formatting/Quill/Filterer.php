@@ -45,7 +45,7 @@ class Filterer {
     public function filter(string $content): string {
         $operations = Parser::jsonToOperations($content);
         // Re-encode the value to escape unicode values.
-        $operations = $this->cleanupEmbeds($operations);
+        $operations = $this->cleanup($operations);
         $operations = json_encode($operations, JSON_UNESCAPED_UNICODE);
         return $operations;
     }
@@ -57,11 +57,18 @@ class Filterer {
      * - Malformed partially formed operations (dataPromise).
      * - Nested embed data.
      *
+     * Added 2022-03-08:
+     * - strip out empty arrays that were getting inserted into the db
+     *
      * @param array[] $operations The quill operations to loop through.
      * @return array
      */
-    private function cleanupEmbeds(array &$operations): array {
+    private function cleanup(array &$operations): array {
         foreach ($operations as $key => &$op) {
+            if ($op === []) {
+                unset($operations[$key]);
+                continue;
+            }
             if (!is_array($op['insert']['embed-external'] ?? null)) {
                 continue;
             }

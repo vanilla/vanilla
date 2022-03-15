@@ -9,6 +9,7 @@ export default useThemeCache(() => {
     const overviewContent = css({
         padding: 0,
         margin: 0,
+        maxWidth: "initial",
     });
 
     return {

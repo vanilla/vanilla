@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import { LayoutOverviewRoute } from "@dashboard/appearance/routes/pageRoutes";
+import { LayoutOverviewRoute } from "@dashboard/appearance/routes/appearanceRoutes";
 import { useLayout } from "@dashboard/layout/layoutSettings/LayoutSettings.hooks";
 import { getRelativeUrl } from "@library/utility/appUtils";
 import { Redirect, RouteComponentProps } from "react-router-dom";

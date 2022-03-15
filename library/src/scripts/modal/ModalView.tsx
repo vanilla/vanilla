@@ -155,6 +155,7 @@ export function ModalView(props: IProps) {
                     <EntranceAnimation
                         id={props.id}
                         {...contentTransition}
+                        tabIndex={-1}
                         targetTransform={targetTransform}
                         isEntered={props.isVisible}
                         role="dialog"

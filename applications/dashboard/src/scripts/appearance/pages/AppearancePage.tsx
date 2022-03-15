@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { BrandingPageRoute } from "@dashboard/appearance/routes/pageRoutes";
+import { BrandingPageRoute } from "@dashboard/appearance/routes/appearanceRoutes";
 import { getRelativeUrl } from "@library/utility/appUtils";
 import React from "react";
 import { Redirect } from "react-router-dom";

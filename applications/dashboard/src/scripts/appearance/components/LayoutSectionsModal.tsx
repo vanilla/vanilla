@@ -36,7 +36,7 @@ export function LayoutSectionsModal(props: ILayoutSectionsModalProps) {
     const classFrameFooter = frameFooterClasses();
     const titleID = useUniqueID("layoutSectionTitle");
     return (
-        <LazyModal isVisible={isVisible} size={ModalSizes.LARGE} exitHandler={exitHandler}>
+        <LazyModal noFocusOnExit isVisible={isVisible} size={ModalSizes.LARGE} exitHandler={exitHandler}>
             <form
                 className={layoutSectionsModalClasses().form}
                 onSubmit={(e) => {

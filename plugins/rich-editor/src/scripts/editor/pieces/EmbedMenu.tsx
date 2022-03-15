@@ -7,6 +7,8 @@ import React, { createContext, PropsWithChildren, ReactNode, useRef, useState } 
 import { embedMenuClasses } from "@rich-editor/editor/pieces/embedMenuStyles";
 import { EditorEventWall } from "@rich-editor/editor/pieces/EditorEventWall";
 import classNames from "classnames";
+import { cx } from "@emotion/css";
+import { useFocusWatcher } from "@vanilla/react-utils";
 
 interface IEmbedMenuContext {
     selected: string | undefined;
@@ -18,29 +20,36 @@ export const EmbedMenuContext = createContext<IEmbedMenuContext>({
     setSelected: () => {},
 });
 
-interface IProps {
-    className?: string;
+interface IProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+/**
+ * Renders an embed menu and manages it's context.
+ */
+export function EditorEmbedMenu(props: PropsWithChildren<IProps>) {
+    const { children } = props;
+    const [selected, setSelected] = useState<string | undefined>();
+    return (
+        <EmbedMenuContext.Provider value={{ selected, setSelected }}>
+            <EditorEventWall>
+                <EmbedMenu {...props} isOpened={selected != null} />
+            </EditorEventWall>
+        </EmbedMenuContext.Provider>
+    );
 }
 
 /**
  * Renders an embed menu and manages it's context.
  */
-export function EmbedMenu(props: PropsWithChildren<IProps>) {
-    const { children } = props;
+export function EmbedMenu(props: PropsWithChildren<IProps> & { isOpened?: boolean }) {
+    const { children, ...restProps } = props;
     const classes = embedMenuClasses();
-    const [selected, setSelected] = useState<string | undefined>();
-    const menuRef = useRef<HTMLDivElement | null>(null);
     return (
-        <EmbedMenuContext.Provider value={{ selected, setSelected }}>
-            <EditorEventWall>
-                <div
-                    role="toolbar"
-                    ref={menuRef}
-                    className={classNames({ [classes.root]: true, isOpened: selected != null }, props.className)}
-                >
-                    {children}
-                </div>
-            </EditorEventWall>
-        </EmbedMenuContext.Provider>
+        <div
+            {...restProps}
+            role="toolbar"
+            className={cx({ [classes.root]: true, isOpened: props.isOpened }, props.className)}
+        >
+            {children}
+        </div>
     );
 }

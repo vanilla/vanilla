@@ -1,14 +1,12 @@
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
-import { ILayout } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
-import { LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
 import { useConfigPatcher, useConfigsByKeys } from "@library/config/configHooks";
-import { useAsync, useAsyncFn, useLastValue, useSessionStorage } from "@vanilla/react-utils";
+import { useAsyncFn, useLastValue, useSessionStorage } from "@vanilla/react-utils";
 import { useEffect, useRef } from "react";
 
 const CONFIG_KEY = "labs.customLayoutHomePage";

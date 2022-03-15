@@ -22,6 +22,20 @@ export interface IContainer {
     ignoreContext?: boolean;
 }
 
+const ContainerWidthContext = React.createContext({ maxWidth: undefined as number | string | undefined });
+
+export function ContainerWidthContextProvider(props: { maxWidth: number; children: React.ReactNode }) {
+    return (
+        <ContainerWidthContext.Provider
+            value={{
+                maxWidth: props.maxWidth,
+            }}
+        >
+            {props.children}
+        </ContainerWidthContext.Provider>
+    );
+}
+
 const containerContext = React.createContext({ hasParentContainer: false });
 
 export function ContainerContextReset(props: { children: React.ReactNode }) {
@@ -47,17 +61,18 @@ export const Container = React.forwardRef(function Container(props: IContainer, 
         fullGutter = false,
         narrow = false,
         style = {},
-        maxWidth,
         gutterSpacing,
         ignoreContext,
     } = props;
+    let { maxWidth } = useContext(ContainerWidthContext);
+    maxWidth = maxWidth ?? props.maxWidth;
     const classes = containerClasses({ maxWidth, desktopSpacing: gutterSpacing });
     const ownRef = useRef<HTMLElement>(null);
     ref = ref ?? ownRef;
     const { hasParentContainer } = useContext(containerContext);
 
-    if (props.maxWidth) {
-        style.maxWidth = props.maxWidth;
+    if (maxWidth) {
+        style.maxWidth = maxWidth;
     }
 
     const [hasLegacyParentContainer, setHasLegacyParentContainer] = useState(false);

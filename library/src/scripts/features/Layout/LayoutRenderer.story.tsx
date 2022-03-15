@@ -1,14 +1,18 @@
 import React from "react";
 import { addComponent } from "@library/utility/componentRegistry";
-import { IDynamicComponent, ILayout, Layout, LayoutDevice } from "@library/features/Layout/Layout";
 import { fakeDiscussions } from "@library/features/discussions/DiscussionList.story";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
-import DeviceContext, { DeviceProvider } from "@library/layout/DeviceContext";
+import {
+    IHydratedLayoutSpec,
+    IHydratedLayoutWidget,
+    LayoutDevice,
+} from "@library/features/Layout/LayoutRenderer.types";
+import { LayoutRenderer } from "@library/features/Layout/LayoutRenderer";
 
 export default {
-    title: "Widgets/Layout",
+    title: "Widgets/LayoutRenderer",
 };
 
 function Header(props) {
@@ -100,7 +104,7 @@ addComponent("TwoCol", TwoCol);
 addComponent("OneCol", OneCol);
 addComponent("panel", Panel);
 
-const sampleHomeLayout: IDynamicComponent[] = [
+const sampleHomeLayout: IHydratedLayoutWidget[] = [
     {
         $reactComponent: "header",
         $reactProps: {
@@ -133,7 +137,7 @@ const sampleHomeLayout: IDynamicComponent[] = [
     },
 ];
 
-function LayoutStory(props: ILayout) {
+function LayoutStory(props: IHydratedLayoutSpec) {
     const source = JSON.stringify(props.layout, null, 2);
 
     return (
@@ -153,7 +157,7 @@ function LayoutStory(props: ILayout) {
             </pre>
             <StoryHeading depth={3}>Result</StoryHeading>
             <div style={{ marginBottom: 16 }}>
-                <Layout {...props} />
+                <LayoutRenderer {...props} />
             </div>
         </>
     );
@@ -296,7 +300,7 @@ export function Misconfiguration() {
                                     ],
                                 },
                             },
-                        ] as unknown) as IDynamicComponent[]
+                        ] as unknown) as IHydratedLayoutWidget[]
                     }
                 />
             </StoryContent>

@@ -118,7 +118,12 @@ export default function TextEditor(props: ITextEditorProps) {
 
     const themeModeButton = theme === "vs-light" ? <LightThemeIcon /> : <DarkThemeIcon />;
     return (
-        <div className={classes.root(theme, props.minimal, props.noPadding)}>
+        <div
+            onClick={(e) => {
+                e.stopPropagation();
+            }}
+            className={classes.root(theme, props.minimal, props.noPadding)}
+        >
             <button type="button" onClick={toggleTheme} className={classes.themeToggleIcon} disabled={!isEditorReady}>
                 {themeModeButton}
             </button>

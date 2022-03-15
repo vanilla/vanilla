@@ -52,6 +52,7 @@ export function EmbedDropdown(props: PropsWithChildren<IEmbedDropdownProps>) {
                         case "":
                         case "ArrowDown": {
                             e.preventDefault();
+                            e.stopPropagation();
                             setSelected(name);
                             break;
                         }

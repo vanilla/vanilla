@@ -2,24 +2,26 @@
  * @copyright 2009-2022 Vanilla Forums Inc.
  * @license Proprietary
  */
-import * as React from "react";
-import { t } from "@vanilla/i18n";
-import { ILayoutCatalog, LayoutSectionID } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
-import { ToolTip } from "@library/toolTip/ToolTip";
-import { InformationIcon } from "@library/icons/common";
 import { layoutSectionThumbnailsClasses } from "@dashboard/appearance/thumbnails/LayoutSectionsThumbnails.classes";
-import Translate from "@library/content/Translate";
-import SmartLink from "@library/routing/links/SmartLink";
-import { useRef, useState } from "react";
+import { ILayoutCatalog, LayoutSectionID } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { cx } from "@emotion/css";
-import { CustomRadioGroup, CustomRadioInput } from "@vanilla/ui";
+import Translate from "@library/content/Translate";
 import { userContentClasses } from "@library/content/UserContent.styles";
+import { InformationIcon } from "@library/icons/common";
+import SmartLink from "@library/routing/links/SmartLink";
+import { ToolTip } from "@library/toolTip/ToolTip";
 import { useUniqueID } from "@library/utility/idUtils";
+import { t } from "@vanilla/i18n";
+import { CustomRadioGroup, CustomRadioInput } from "@vanilla/ui";
 import { RecordID } from "@vanilla/utils";
+import * as React from "react";
+import { useState } from "react";
 interface IProps {
-    labelID: string;
+    labelID?: string;
+    label?: string;
     value?: LayoutSectionID;
-    onChange?: (section: LayoutSectionID) => any;
+    onSectionClick?: (section: LayoutSectionID) => void;
+    onChange?: (section: LayoutSectionID) => void;
     sections: ILayoutCatalog["sections"];
 }
 
@@ -43,24 +45,32 @@ const LAYOUT_SECTIONS_THUMBNAILS = {
 };
 
 export default function LayoutSectionsThumbnails(props: IProps) {
-    const { sections, labelID } = props;
+    const { sections } = props;
     const classes = layoutSectionThumbnailsClasses();
     const [ownValue, ownOnChange] = useState(Object.keys(LAYOUT_SECTIONS_THUMBNAILS)[0] as RecordID);
     const value = props.value ?? ownValue;
     const onChange = props.onChange ?? ownOnChange;
 
-    const descriptionID = useUniqueID("layoutSectionDescription");
+    const descriptionID = useUniqueID("layoutSection");
+    const labelID = props.labelID ?? descriptionID + "-label";
 
     return (
         <div className={classes.container}>
             <div className={cx(userContentClasses().root, classes.description)} id={descriptionID}>
-                <Translate
-                    source="Select a section you want to add for your page. Find out more in the <1>documentation.</1>"
-                    c1={(text) => (
-                        //documentation link should be here when its ready
-                        <SmartLink to="">{text}</SmartLink>
-                    )}
-                />
+                {props.label && (
+                    <p id={labelID}>
+                        <strong>{props.label}</strong>
+                    </p>
+                )}
+                <p>
+                    <Translate
+                        source="Select a section you want to add for your page. Find out more in the <1>documentation.</1>"
+                        c1={(text) => (
+                            //documentation link should be here when its ready
+                            <SmartLink to="">{text}</SmartLink>
+                        )}
+                    />
+                </p>
             </div>
             <CustomRadioGroup
                 aria-labelledby={labelID}
@@ -77,12 +87,20 @@ export default function LayoutSectionsThumbnails(props: IProps) {
                         const accessibleDescription =
                             t("Widget Type: ") +
                             sections[sectionID].recommendedWidgets
-                                .map((recommendedWidget) => recommendedWidget.widgetName)
+                                ?.map((recommendedWidget) => recommendedWidget.widgetName)
                                 .join(", ") +
                             t(" etc");
 
                         return (
                             <CustomRadioInput
+                                onClick={(e) => {
+                                    // Browser fire a click event even if an item is selected with keyboard.
+                                    // https://github.com/facebook/react/issues/7407
+                                    if (e.type === "click" && e.clientX !== 0 && e.clientY !== 0) {
+                                        // This is a real click. Do something here
+                                        props.onSectionClick?.(sectionID);
+                                    }
+                                }}
                                 value={sectionID}
                                 accessibleDescription={accessibleDescription}
                                 key={sectionID}

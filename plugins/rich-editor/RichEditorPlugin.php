@@ -8,6 +8,7 @@
 use Vanilla\Formatting\Formats\RichFormat;
 use \Vanilla\Formatting\Formats;
 use Vanilla\Web\TwigStaticRenderer;
+use Vanilla\Formatting\Quill\Parser;
 
 /**
  * Plugin class for the Rich Editor.
@@ -72,7 +73,7 @@ class RichEditorPlugin extends Gdn_Plugin {
             return $this->isInputFormatterRich();
         }
 
-        return strcasecmp($format, RichFormat::FORMAT_KEY) === 0;
+        return $this->isFormatRich($format);
     }
 
     /**
@@ -94,10 +95,20 @@ class RichEditorPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Determine if the format string corresponds to rich format
+     *
+     * @param string $format - Format string to check
+     * @return bool
+     */
+    private function isFormatRich(string $format): bool {
+        return strcasecmp($format, RichFormat::FORMAT_KEY) === 0;
+    }
+
+    /**
      * @return bool
      */
     public function isInputFormatterRich(): bool {
-        return strcasecmp(Gdn_Format::defaultFormat(), RichFormat::FORMAT_KEY) === 0;
+        return $this->isFormatRich(Gdn_Format::defaultFormat());
     }
 
     /**
@@ -157,6 +168,15 @@ class RichEditorPlugin extends Gdn_Plugin {
                 $newBodyValue = $this->formatService->renderHTML($body, $originalFormat);
                 $sender->setValue("Body", $newBodyValue);
                 $sender->setValue("Format", RichFormat::FORMAT_KEY);
+            }
+            if ($this->isFormatRich($originalFormat)) {
+                // Filter out empty arrays from JSON. See https://higherlogic.atlassian.net/browse/VNLA-640
+                try {
+                    $newBodyValue = $this->formatService->filter($body, RichFormat::FORMAT_KEY);
+                    $sender->setValue("Body", $newBodyValue);
+                } catch (\Exception $e) {
+                    // Ignore
+                }
             }
 
             $rendered = TwigStaticRenderer::renderTwigStatic("@rich-editor/rich-editor.twig", $viewData);

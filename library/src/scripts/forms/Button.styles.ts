@@ -62,23 +62,17 @@ export const buttonUtilityClasses = useThemeCache(() => {
         border: "none",
         padding: 0,
         background: "transparent",
-        ...allButtonStates({
-            allStates: {
-                color: ColorsUtils.colorOut(globalVars.mainColors.secondary),
-            },
-            hover: {
-                color: ColorsUtils.colorOut(globalVars.mainColors.primary),
-            },
-            clickFocus: {
-                outline: 0,
-            },
-            keyboardFocus: {
-                outline: "initial",
-            },
-        }),
         color: "inherit",
-        "&&.focus-visible": {
-            outline: "-webkit-focus-ring-color auto 1px",
+        borderRadius: 3,
+        "&:hover, &:focus": {
+            color: ColorsUtils.colorOut(globalVars.mainColors.primary),
+        },
+        "&:focus": {
+            background: ColorsUtils.colorOut(globalVars.mainColors.primary.fade(0.1)),
+        },
+        "&&.focus-visible, &:focus-visible": {
+            outline: "none",
+            boxShadow: `0 0 0 1px ${globalVars.mainColors.primary}`,
         },
     });
 

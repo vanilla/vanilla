@@ -55,10 +55,12 @@ class CategoriesTest extends AbstractResourceTest {
     protected $baseUrl = '/categories';
 
     /** {@inheritdoc} */
-    protected $editFields = ['description', 'name', 'parentCategoryID', 'urlcode', 'displayAs'];
+    protected $editFields = ['description', 'name', 'parentCategoryID', 'urlcode', 'displayAs', 'iconUrl', 'bannerUrl'];
 
     /** {@inheritdoc} */
-    protected $patchFields = ['description', 'name', 'parentCategoryID', 'urlcode', 'displayAs'];
+    protected $patchFields = ['description', 'name', 'parentCategoryID', 'urlcode', 'displayAs', 'iconUrl', 'bannerUrl'];
+
+    protected $imageFields = ['bannerUrl', 'iconUrl'];
 
     /** {@inheritdoc} */
     protected $pk = 'categoryID';
@@ -165,7 +167,9 @@ class CategoriesTest extends AbstractResourceTest {
             'name' => $name,
             'urlcode' => $urlcode,
             'parentCategoryID' => self::PARENT_CATEGORY_ID,
-            'displayAs' => 'flat'
+            'displayAs' => 'flat',
+            'iconUrl' => null,
+            'bannerUrl' => null,
         ];
         static::$recordCounter++;
         return $record;

@@ -32,6 +32,9 @@ use Vanilla\Formatting\DateTimeFormatter;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\FormatFieldTrait;
 use Vanilla\Formatting\UpdateMediaTrait;
+use Vanilla\ImageSrcSet\ImageSrcSet;
+use Vanilla\ImageSrcSet\ImageSrcSetService;
+use Vanilla\ImageSrcSet\MainImageSchema;
 use Vanilla\Logging\ErrorLogger;
 use Vanilla\Scheduler\LongRunner;
 use Vanilla\Scheduler\LongRunnerFailedID;
@@ -133,7 +136,6 @@ class DiscussionModel extends Gdn_Model implements
     // Use to continue a long-running action to delete a discussion with the same transaction ID.
     private const OPT_DELETE_SINGLE_TRANSACTION_ID = "deleteSingleTransactionID";
 
-
     /**
      * @deprecated 2.6
      * @var bool
@@ -216,8 +218,11 @@ class DiscussionModel extends Gdn_Model implements
     /** @var array */
     private $options;
 
+    /** @var ImageSrcSetService */
+    private $imageSrcSetService;
+
     /**
-     * Clear out the staticly cached values for tests.
+     * Clear out the statically cached values for tests.
      */
     public static function cleanForTests() {
         self::$instance = null;
@@ -232,6 +237,7 @@ class DiscussionModel extends Gdn_Model implements
      */
     public function __construct(Gdn_Validation $validation = null) {
         parent::__construct('Discussion', $validation);
+        $this->imageSrcSetService = Gdn::getContainer()->get(ImageSrcSetService::class);
         $this->floodGate = FloodControlHelper::configure($this, 'Vanilla', 'Discussion');
 
         Gdn::getContainer()->call(function (
@@ -4440,9 +4446,11 @@ SQL;
         $result = $scheme->convertArrayKeys($row);
         $result['type'] = self::normalizeDiscussionType($result['type'] ?? null);
 
+        // Get the discussion's parsed body's first image & get the srcset for it.
+        $result['image'] = $this->formatterService->parseMainImage($rawBody, $format);
+
         return $result;
     }
-
 
     /**
      * Normalize a discussion type for output.
@@ -4562,6 +4570,7 @@ SQL;
             'statusID:i' => [
                 'default' => 0,
             ],
+            'image?' => new MainImageSchema(),
         ]);
         return $result;
     }

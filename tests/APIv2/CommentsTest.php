@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Ryan Perry <ryan.p@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -9,8 +9,6 @@ namespace VanillaTests\APIv2;
 
 use CommentModel;
 use DiscussionModel;
-use Gdn_Configuration;
-use Vanilla\Exception\PermissionException;
 use Vanilla\Models\DirtyRecordModel;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\UsersAndRolesApiTestTrait;

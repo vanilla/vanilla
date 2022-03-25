@@ -578,6 +578,15 @@ jQuery(document).ready(function($) {
         return string;
     };
 
+    // A simple, fast method of hashing a string. Similar to Java's hash function.
+    // import { hashString } from "@vanilla/utils";
+    gdn.hashString = function(str) {
+        function hashReduce(prevHash, currVal) {
+            return (prevHash << 5) - prevHash + currVal.charCodeAt(0);
+        }
+        return str.split("").reduce(hashReduce, 0);
+    }
+
     // Combine two paths and make sure that there is only a single directory concatenator
     gdn.combinePaths = function(path1, path2) {
         if (path1.substr(-1, 1) == '/')
@@ -1017,6 +1026,7 @@ jQuery(document).ready(function($) {
 
             try {
                 var message = response.InformMessages[i].Message;
+                var messageID = gdn.hashString(message);
                 var emptyMessage = message === '';
 
                 message = '<span aria-label="polite" class="InformMessageBody">' + message + '</span>';
@@ -1029,7 +1039,6 @@ jQuery(document).ready(function($) {
                 if (css.indexOf('Dismissable') > 0)
                     message = '<a href="#" onclick="return false;" tabindex="0" class="Close"><span>&times;</span></a>' + message;
 
-                var messageID = gdn.generateString(10);
                 message = '<div role="alert" class="InformMessage" id="'+messageID+'">' + message + '</div>';
 
                 // Insert any transient keys into the message (prevents csrf attacks in follow-on action urls).

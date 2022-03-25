@@ -1,14 +1,12 @@
 <?php
 /**
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace Vanilla\Forum\Search;
 
 use Garden\Schema\Schema;
-use Vanilla\Contracts\Site\AbstractSiteProvider;
-use Vanilla\Search\SearchQuery;
 use Vanilla\Search\SearchResultItem;
 
 /**

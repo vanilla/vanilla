@@ -4,11 +4,11 @@
  * @license gpl-2.0-only
  */
 
-import { LayoutSectionsModal } from "@dashboard/appearance/components/LayoutSectionsModal";
 import { useLayoutEditor } from "@dashboard/layout/editor/LayoutEditor";
 import { layoutEditorClasses } from "@dashboard/layout/editor/LayoutEditor.classes";
 import { LayoutEditorPath } from "@dashboard/layout/editor/LayoutEditorContents";
 import { LayoutEditorSelectionMode } from "@dashboard/layout/editor/LayoutEditorSelection";
+import { LayoutThumbnailsModal } from "@dashboard/layout/editor/thumbnails/LayoutThumbnailsModal";
 import { useLayoutCatalog } from "@dashboard/layout/layoutSettings/LayoutSettings.hooks";
 import { ILayoutEditorPath } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { cx } from "@emotion/css";
@@ -67,7 +67,7 @@ export const LayoutEditorAddSection = React.forwardRef(function LayoutEditorAddS
                     </div>
                 </Button>
             </Container>
-            <LayoutSectionsModal
+            <LayoutThumbnailsModal
                 title={t("Choose the Type of Section")}
                 exitHandler={() => {
                     setIsModalOpen(false);
@@ -82,6 +82,7 @@ export const LayoutEditorAddSection = React.forwardRef(function LayoutEditorAddS
                     editorSelection.moveSelectionTo(props.path, LayoutEditorSelectionMode.SECTION);
                 }}
                 isVisible={isModalOpen}
+                itemType="sections"
             />
         </>
     );

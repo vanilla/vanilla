@@ -168,7 +168,15 @@ export const searchResultClasses = useThemeCache(() => {
         cursor: "pointer",
     });
 
+    const highlight = css({
+        "b, strong, em": {
+            fontStyle: "normal",
+            fontWeight: 700,
+        },
+    });
+
     return {
         iconWrap,
+        highlight,
     };
 });

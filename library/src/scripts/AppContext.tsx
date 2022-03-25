@@ -26,6 +26,7 @@ import { EntryLinkContextProvider } from "@library/contexts/EntryLinkContext";
 import { css } from "@emotion/css";
 import { ApiV2Context } from "@library/apiv2";
 import { ToastProvider } from "@library/features/toaster/ToastContext";
+import { SearchSourcesContextProvider } from "@library/search/SearchSourcesContextProvider";
 
 interface IProps {
     children: React.ReactNode;
@@ -66,6 +67,7 @@ export function AppContext(props: IProps) {
             [Provider, { store }],
             ApiV2Context,
             LocaleProvider,
+            SearchSourcesContextProvider,
             SearchContextProvider,
             ContentTranslationProvider,
             LiveAnnouncer,

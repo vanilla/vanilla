@@ -1,9 +1,8 @@
 <?php
 /**
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
+ * @copyright 2009-2022 Vanilla Forums, Inc
  * @license GPL-2.0-only
- *
  *
  * This plugin allows users to maintain an ignore list that filters out other
  * users' comments.
@@ -25,6 +24,8 @@
 
 /**
  * Class IgnorePlugin.
+ *
+ * @psalm-suppress UndefinedDocblockClass
  */
 class IgnorePlugin extends Gdn_Plugin {
 
@@ -50,7 +51,7 @@ class IgnorePlugin extends Gdn_Plugin {
     /**
      * Add mapper methods
      *
-     * @param SimpleApiPlugin $sender
+     * @param object $sender
      */
     public function simpleApiPlugin_mapper_handler($sender) {
         switch ($sender->Mapper->Version) {
@@ -738,6 +739,7 @@ class IgnorePlugin extends Gdn_Plugin {
             $sender->setData('Conversations', $conversations);
 
             if ($sender->Form->authenticatedPostBack()) {
+                /** @psalm-suppress ParadoxicalCondition */
                 switch ($mode) {
                     case 'set':
                         if (!$ignoreRestricted) {
@@ -764,7 +766,6 @@ class IgnorePlugin extends Gdn_Plugin {
                         }
 
                         break;
-
                     default:
                         $sender->informMessage(t("Unsupported operation."));
                         $sender->setJson('Status', 400);

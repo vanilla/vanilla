@@ -113,6 +113,14 @@ export class FocusWatcher {
             if (activeElement !== null) {
                 const isWatchedInBody = document.body.contains(this.watchedNode);
                 const isFocusedInBody = document.body.contains(activeElement);
+                const closestModal = activeElement.closest("[data-modal-real-root-id]");
+                const closestModalRealRootID = closestModal?.getAttribute("data-modal-real-root-id");
+                const closestModalRealRoot = closestModalRealRootID
+                    ? document.getElementById(closestModalRealRootID)
+                    : null;
+                const isFocusInChildModal =
+                    (closestModalRealRoot != null && this.watchedNode === closestModalRealRoot) ||
+                    this.watchedNode.contains(closestModalRealRoot);
                 const isReachComboxBox =
                     activeElement.matches("[data-reach-popover]") || activeElement.closest("[data-reach-popover]");
 
@@ -122,7 +130,7 @@ export class FocusWatcher {
                         (activeElement === this.watchedNode || this.watchedNode.contains(activeElement)),
                 );
 
-                if (!hasFocus && isReachComboxBox) {
+                if (!hasFocus && (isReachComboxBox || isFocusInChildModal)) {
                     // If the thing that just took focus was a reach popover
                     // Don't report losing focus.
                     // Someone moving focus to the body (trying to focus any non-focusable elemtent)

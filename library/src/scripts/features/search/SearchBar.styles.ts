@@ -215,6 +215,10 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
                 ...flexHelper().middleLeft(),
                 justifyContent: "space-between",
             },
+            ".suggestedTextInput-groupHeading": {
+                ...suggestedTextStyleHelper().groupHeading,
+                margin: 0,
+            },
             ".suggestedTextInput-option": {
                 ...suggestedTextStyleHelper().option,
                 margin: 0,

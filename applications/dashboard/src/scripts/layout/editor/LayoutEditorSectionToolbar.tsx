@@ -25,68 +25,50 @@ export function LayoutEditorSectionToolbar(props: IProps) {
     const isFirstSection = props.path.sectionIndex === 0;
     const isLastSection = props.path.sectionIndex === editorContents.getSectionCount() - 1;
     const globalVars = globalVariables();
-    let leftOffset = (document.body.clientWidth - globalVars.contentWidth - globalVars.gutter.size * 2) / 2;
-    leftOffset = Math.max(globalVars.gutter.size, leftOffset);
+    let offsetLeft = (document.body.clientWidth - globalVars.contentWidth - globalVars.gutter.size * 2) / 2;
+    offsetLeft = Math.max(globalVars.gutter.size, offsetLeft);
     return (
-        <div
-            className={
-                // Uncomment in case we want the vertical toolbar.
-                // ""
-                classes.sectionToolbar
-            }
+        <EmbedMenu
+            className={classes.toolbarOffset(offsetLeft)}
+            onClick={(e) => {
+                // Prevent this click from bubbling up.
+                e.preventDefault();
+                e.stopPropagation();
+            }}
         >
-            <EmbedMenu
-                className={classes.toolbarOffset}
-                // Uncomment in case we want the vertical toolbar.
-                // style={{
-                //     position: "absolute",
-                //     flexDirection: "column",
-                //     left: leftOffset,
-                //     top: "50%",
-                //     transform: "translateY(-50%)",
-                //     right: "initial",
-                //     bottom: "initial",
-                // }}
-                onClick={(e) => {
-                    // Prevent this click from bubbling up.
-                    e.preventDefault();
-                    e.stopPropagation();
+            <EmbedButton
+                disabled={isFirstSection}
+                onClick={() => {
+                    const newPath: ILayoutEditorPath = {
+                        ...props.path,
+                        sectionIndex: props.path.sectionIndex - 1,
+                    };
+                    editorContents.moveSection(props.path, newPath);
+                    editorSelection.moveSelectionTo(newPath, LayoutEditorSelectionMode.SECTION);
                 }}
             >
-                <EmbedButton
-                    disabled={isFirstSection}
-                    onClick={() => {
-                        const newPath: ILayoutEditorPath = {
-                            ...props.path,
-                            sectionIndex: props.path.sectionIndex - 1,
-                        };
-                        editorContents.moveSection(props.path, newPath);
-                        editorSelection.moveSelectionTo(newPath, LayoutEditorSelectionMode.SECTION);
-                    }}
-                >
-                    <Icon icon={"data-up"} />
-                </EmbedButton>
-                <EmbedButton
-                    disabled={isLastSection}
-                    onClick={() => {
-                        const newPath: ILayoutEditorPath = {
-                            ...props.path,
-                            sectionIndex: props.path.sectionIndex + 1,
-                        };
-                        editorContents.moveSection(props.path, newPath);
-                        editorSelection.moveSelectionTo(newPath, LayoutEditorSelectionMode.SECTION);
-                    }}
-                >
-                    <Icon icon={"data-down"} />
-                </EmbedButton>
-                <EmbedButton
-                    onClick={() => {
-                        editorContents.deleteSection(props.path.sectionIndex);
-                    }}
-                >
-                    <Icon icon={"data-trash"} />
-                </EmbedButton>
-            </EmbedMenu>
-        </div>
+                <Icon icon={"data-up"} />
+            </EmbedButton>
+            <EmbedButton
+                disabled={isLastSection}
+                onClick={() => {
+                    const newPath: ILayoutEditorPath = {
+                        ...props.path,
+                        sectionIndex: props.path.sectionIndex + 1,
+                    };
+                    editorContents.moveSection(props.path, newPath);
+                    editorSelection.moveSelectionTo(newPath, LayoutEditorSelectionMode.SECTION);
+                }}
+            >
+                <Icon icon={"data-down"} />
+            </EmbedButton>
+            <EmbedButton
+                onClick={() => {
+                    editorContents.deleteSection(props.path.sectionIndex);
+                }}
+            >
+                <Icon icon={"data-trash"} />
+            </EmbedButton>
+        </EmbedMenu>
     );
 }

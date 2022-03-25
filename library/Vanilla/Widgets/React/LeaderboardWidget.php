@@ -134,6 +134,13 @@ class LeaderboardWidget extends AbstractReactModule implements ReactWidgetInterf
     }
 
     /**
+     * @return string
+     */
+    public static function getWidgetIconPath(): string {
+        return "/applications/dashboard/design/images/widgetIcons/leaderboard.svg";
+    }
+
+    /**
      * @return array
      */
     public static function getRecommendedSectionIDs(): array {

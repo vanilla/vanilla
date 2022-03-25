@@ -6,7 +6,7 @@
 
 import React, { useRef } from "react";
 import { useFocusOnActivate } from "./useFocusOnActivate";
-import { render } from "@testing-library/react";
+import { render, RenderResult } from "@testing-library/react";
 
 function Example(props: { isActive: boolean }) {
     const ref = useRef<HTMLDivElement | null>(null);
@@ -22,13 +22,14 @@ function Example(props: { isActive: boolean }) {
 }
 
 describe("useFocusOnActivate", () => {
-    let tree: ReturnType<typeof render>;
+    let tree: RenderResult;
     beforeEach(() => {
         tree = render(<></>);
     });
     afterEach(() => {
         tree.unmount();
     });
+
     it("gains focus on activate", () => {
         tree.rerender(<Example isActive={false} />);
         tree.rerender(<Example isActive={true} />);

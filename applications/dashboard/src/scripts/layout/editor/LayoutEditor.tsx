@@ -3,7 +3,6 @@
  * @license GPL-2.0-only
  */
 
-import LayoutSectionsThumbnails from "@dashboard/appearance/thumbnails/LayoutSectionsThumbnails";
 import { layoutEditorClasses } from "@dashboard/layout/editor/LayoutEditor.classes";
 import { fetchEditorOverviewComponent } from "@dashboard/layout/editor/LayoutEditor.overviews";
 import { LayoutEditorContents, LayoutEditorPath } from "@dashboard/layout/editor/LayoutEditorContents";
@@ -14,6 +13,7 @@ import {
     LayoutEditorSelectionState,
 } from "@dashboard/layout/editor/LayoutEditorSelection";
 import { LayoutEditorWidgetWrapper } from "@dashboard/layout/editor/LayoutEditorWidgetContext";
+import LayoutSectionsThumbnails from "@dashboard/layout/editor/thumbnails/LayoutSectionsThumbnails";
 import { useLayoutCatalog } from "@dashboard/layout/layoutSettings/LayoutSettings.hooks";
 import {
     IHydratedEditableWidgetProps,
@@ -65,7 +65,8 @@ function LayoutEditorImpl(props: IProps) {
     const [initialSectionID, setInitialSectionID] = useState<LayoutSectionID | null>(null);
 
     useFocusWatcher(ref, (hasFocus, elementFocused) => {
-        if (!hasFocus) {
+        const focusIsInLayoutEditorModal = elementFocused?.closest("[data-layout-editor-modal]");
+        if (!hasFocus && !focusIsInLayoutEditorModal) {
             editorSelection.stashState();
         } else if (hasFocus && elementFocused === ref.current) {
             editorSelection.restoreState();

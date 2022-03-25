@@ -80,6 +80,10 @@ export const userSpotlightVariables = useThemeCache(
          * @varGroup userSpotlight.breakPoints
          */
         const breakPoints = makeThemeVars("breakPoints", {
+            /**
+             * @var userSpotlight.breakPoints.mobile
+             * @type number
+             */
             mobile: globalVars.foundationalWidths.breakPoints.xs,
         });
 
@@ -93,25 +97,41 @@ export const userSpotlightVariables = useThemeCache(
 
         /**
          * @varGroup userSpotlight.avatarContainer
+         * @title Avatar Container
          */
         const avatarContainer = makeThemeVars("avatarContainer", {
             /**
-             * @varGroups userSpotlight.avatar.sizing
-             * @title Avatar Container Sizing
+             * @varGroup userSpotlight.avatarContainer.sizing
+             * @title Sizing
              * @description Width and height of avatar container, normally used when there is a background image for avatar.
              */
             sizing: {
+                /**
+                 * @var userSpotlight.avatarContainer.sizing.width
+                 * @type number | string
+                 */
                 width: undefined as number | string | undefined,
+                /**
+                 * @var userSpotlight.avatarContainer.sizing.height
+                 * @type number | string
+                 */
                 height: undefined as number | string | undefined,
             },
 
             /**
-             * @varGroups userSpotlight.avatarContainer.sizing
-             * @title Avatar Container Sizing Mobile
-             * @description Width and height of avatar container on mobile, normally used when there is a background image for avatar.
+             * @varGroup userSpotlight.avatarContainer.sizingMobile
+             * @title Sizing - Mobile
              */
             sizingMobile: {
+                /**
+                 * @var userSpotlight.avatarContainer.sizingMobile.width
+                 * @type number | string
+                 */
                 width: undefined as number | string | undefined,
+                /**
+                 * @var userSpotlight.avatarContainer.sizingMobile.height
+                 * @type number | string
+                 */
                 height: undefined as number | string | undefined,
             },
 
@@ -172,7 +192,7 @@ export const userSpotlightVariables = useThemeCache(
          */
         const avatar = makeThemeVars("avatar", {
             /**
-             * @varGroups userSpotlight.avatar.border
+             * @varGroup userSpotlight.avatar.border
              * @expand border
              */
             border: Variables.border({
@@ -180,16 +200,19 @@ export const userSpotlightVariables = useThemeCache(
             }),
 
             /**
-             * @varGroup userSpotlight.avatar.size
+             * @var userSpotlight.avatar.size
              * @title Avatar Size
+             * @type string
+             * @enum small | medium | large | xlarge
              */
 
             size: UserPhotoSize.LARGE,
 
             /**
-             * @varGroup userSpotlight.avatar.sizeMobile
+             * @var userSpotlight.avatar.sizeMobile
              * @title Avatar Size Mobile
              * @description In case we want to make it smaller on mobile views.
+             * @type number | string
              */
             sizeMobile: undefined as number | string | undefined,
         });

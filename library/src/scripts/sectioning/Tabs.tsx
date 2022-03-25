@@ -4,7 +4,7 @@
  * @license gpl-2.0-only
  */
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Tabs as ReachTabs, TabList, Tab, TabPanels, TabPanel } from "@reach/tabs";
 import { tabStandardClasses, tabBrowseClasses, tabGroupClasses } from "@library/sectioning/tabStyles";
 import classNames from "classnames";
@@ -57,6 +57,13 @@ export function Tabs(props: ITabsProps) {
         tabPanelClasses,
     } = props;
     const [activeTab, setActiveTab] = useState(defaultTabIndex ?? 0);
+
+    useEffect(() => {
+        if (props.defaultTabIndex !== undefined && activeTab !== props.defaultTabIndex) {
+            setActiveTab(props.defaultTabIndex);
+        }
+    }, [props.defaultTabIndex, activeTab]);
+
     const classVariants = new Map([
         [TabsTypes.STANDARD, tabStandardClasses()],
         [TabsTypes.BROWSE, tabBrowseClasses()],

@@ -55,7 +55,7 @@ export interface IBannerOptions {
 export const bannerVariables = useThemeCache(
     (optionOverrides?: Partial<IBannerOptions>, forcedVars?: IThemeVariables, altName?: string) => {
         const makeThemeVars = variableFactory(
-            altName ?? ["banner", "splash"],
+            altName ?? "banner",
             forcedVars,
             new LocalVariableMapping({
                 [`padding`]: "spacing.padding",
@@ -116,7 +116,7 @@ export const bannerVariables = useThemeCache(
 
         /**
          * @varGroup banner.options
-         * @commonTitle Banner - Options
+         * @commonTitle Options
          * @description Control different variants for the banner. These options can affect multiple parts of the banner at once.
          */
         const options = makeThemeVars(
@@ -208,7 +208,7 @@ export const bannerVariables = useThemeCache(
 
         /**
          * @varGroup banner.padding
-         * @commonTitle Banner Padding
+         * @commonTitle Padding
          * @expand spacing
          */
         const padding = makeThemeVars(
@@ -244,7 +244,7 @@ export const bannerVariables = useThemeCache(
         const border = makeThemeVars("border", {
             /**
              * @var banner.border.width
-             * @title Banner Input - Border Width
+             * @title Border Width
              * @description Choose the width of the banner border.
              * @type number|string
              */
@@ -252,7 +252,7 @@ export const bannerVariables = useThemeCache(
 
             /**
              * @var banner.border.width
-             * @title Banner Input - Border Radius
+             * @title Border Radius
              * @description Choose the radius of the banner border.
              * @type number|string
              */
@@ -262,7 +262,7 @@ export const bannerVariables = useThemeCache(
         const backgrounds = makeThemeVars("backgrounds", {
             /**
              * @var banner.backgrounds.useOverlay
-             * @title Banner - Background Overlay
+             * @title Background Overlay
              * @description Apply an overlay color of the background for improved contrast.
              * This color is detected automatically, but can be overridden with the
              * banner.backgrounds.overlayColor variable.
@@ -271,7 +271,7 @@ export const bannerVariables = useThemeCache(
 
             /**
              * @var banner.backgrounds.overlayColor
-             * @title Banner - Background Overlay Color
+             * @title Background Overlay Color
              * @description Choose a specific overlay color to go with banner.backgrounds.useOverlay.
              * @type string
              * @format hex-color
@@ -366,8 +366,44 @@ export const bannerVariables = useThemeCache(
         const icon = makeThemeVars("icon", {
             ...iconInit,
             /**
-             * * @varGroup banner.icon.mobile
-             * FIXME: document icon.mobile vargroup whose options are the same as those above
+             * @varGroup banner.icon.mobile
+             * @title Mobile
+             * @description Icon on mobile. By default, uses the same values in the banner.icon variable group.
+             */
+
+            /**
+             * @var banner.icon.mobile.width
+             * @title Width
+             * @description Choose the width of the icon
+             * @type number|string
+             */
+
+            /**
+             * @var banner.icon.mobile.height
+             * @title Height
+             * @description Choose the height of the icon
+             * @type number|string
+             */
+
+            /**
+             * @varGroup banner.icon.mobile.margins
+             * @title Margins
+             * @description Set the margins around the icon
+             * @expand spacing
+             */
+
+            /**
+             * @var banner.icon.mobile.image
+             * @title Image
+             * @description The URL where the icon image is hosted
+             * @type string
+             */
+
+            /**
+             * @var banner.icon.mobile.borderRadius
+             * @title Border Radius
+             * @description Choose the border radius of the icon
+             * @type number|string
              */
             mobile: {
                 ...iconInit,
@@ -378,7 +414,7 @@ export const bannerVariables = useThemeCache(
             "outerBackground",
             /**
              * @varGroup banner.outerBackground
-             * @commonTitle Banner - Background
+             * @commonTitle Background
              * @expand background
              */
             Variables.background({
@@ -398,7 +434,7 @@ export const bannerVariables = useThemeCache(
             ...breakpointVariables({
                 /**
                  * @varGroup banner.outerBackground.breakpoints.tablet
-                 * @title Banner - Background (Tablet)
+                 * @title Background (Tablet)
                  * @expand background
                  */
                 tablet: {
@@ -407,7 +443,7 @@ export const bannerVariables = useThemeCache(
                 },
                 /**
                  * @varGroup banner.outerBackground.breakpoints.mobile
-                 * @title Banner - Background (Mobile)
+                 * @title Background (Mobile)
                  * @expand background
                  */
                 mobile: {
@@ -435,7 +471,7 @@ export const bannerVariables = useThemeCache(
             "font",
             /**
              * @varGroup banner.font
-             * @title Banner Font
+             * @commonTitle Font
              * @expand font
              */
             Variables.font({
@@ -461,8 +497,8 @@ export const bannerVariables = useThemeCache(
 
         /**
          * @varGroup banner.textAndSearchContainer
-         * @title Banner textAndSearchContainer
-         * @description In cases when we want banner text width to be different from the searchbar.
+         * @title Text & Search Container
+         * @description In cases when we want banner text width to be different from that of the search bar.
          */
         const textAndSearchContainer = makeThemeVars("textAndSearchContainer", {
             /**
@@ -475,13 +511,13 @@ export const bannerVariables = useThemeCache(
 
         /**
          * @varGroup banner.title
-         * @title Banner Title
+         * @title Title
          */
         const title = makeThemeVars("title", {
             /**
              * @varGroup banner.title.font
              * @expand font
-             * @title Banner Title - Font
+             * @title Font
              */
             font: Variables.font({
                 ...font,
@@ -490,7 +526,7 @@ export const bannerVariables = useThemeCache(
             /**
              * @varGroup banner.title.fontMobile
              * @expand font
-             * @title Banner Title - Font (Mobile)
+             * @title Font (Mobile)
              */
             fontMobile: Variables.font({
                 ...font,
@@ -499,7 +535,7 @@ export const bannerVariables = useThemeCache(
             }),
             /**
              * @varGroup banner.title.margins
-             * @title Banner Title - Spacing
+             * @title Spacing
              * @expand spacing
              */
             margins: Variables.spacing({
@@ -510,13 +546,13 @@ export const bannerVariables = useThemeCache(
 
         /**
          * @varGroup banner.description
-         * @title Banner Description
+         * @title Description
          */
         const description = makeThemeVars("description", {
             text: undefined as string | undefined,
             /**
              * @varGroup banner.description.font
-             * @title Banner Description - Font
+             * @title Font
              * @expand font
              */
             font: Variables.font({
@@ -526,7 +562,7 @@ export const bannerVariables = useThemeCache(
             }),
             /**
              * @varGroup banner.description.margins
-             * @title Banner Description - Spacing
+             * @title Spacing
              * @expand spacing
              */
             margins: Variables.spacing({
@@ -536,7 +572,7 @@ export const bannerVariables = useThemeCache(
 
         /**
          * @varGroup banner.searchBar
-         * @title Banner - SearchBar
+         * @title SearchBar
          */
         const searchBarInit = makeThemeVars("searchBar", {
             preset: presets.button.preset,
@@ -697,7 +733,7 @@ export const bannerVariables = useThemeCache(
 
         /**
          * @varGroup banner.searchStrip
-         * @title Banner - Search Strip
+         * @title Search Strip
          */
         const searchStrip = makeThemeVars("searchStrip", {
             /**

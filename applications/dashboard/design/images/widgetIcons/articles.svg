@@ -1,0 +1,16 @@
+<svg width="120" height="100" viewBox="0 0 120 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="9" y="31" width="31" height="4" fill="#ADB2BB"/>
+<rect x="8.96289" y="14" width="25.037" height="3.85185" fill="#ADB2BB"/>
+<rect x="9" y="39" width="57" height="2" fill="#ADB2BB"/>
+<rect x="63" y="39" width="47" height="2" fill="#ADB2BB"/>
+<rect x="87.9258" y="63.1111" width="22.1481" height="1.92593" fill="#ADB2BB"/>
+<rect x="84.0742" y="87.1852" width="26" height="1.92593" fill="#ADB2BB"/>
+<path d="M8.27083 24.1111H111.729" stroke="#ADB2BB" stroke-width="0.5" stroke-linecap="square"/>
+<rect x="9" y="55" width="31" height="4" fill="#ADB2BB"/>
+<rect x="9" y="63" width="37" height="2" fill="#ADB2BB"/>
+<rect x="44" y="63" width="41" height="2" fill="#ADB2BB"/>
+<path d="M8.27083 48.1852H111.729" stroke="#ADB2BB" stroke-width="0.5" stroke-linecap="square"/>
+<rect x="9" y="79" width="31" height="4" fill="#ADB2BB"/>
+<rect x="9" y="87" width="72" height="2" fill="#ADB2BB"/>
+<path d="M8.27083 72.2593H111.729" stroke="#ADB2BB" stroke-width="0.5" stroke-linecap="square"/>
+</svg>

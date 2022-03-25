@@ -48,6 +48,35 @@ final class LongRunnerAction {
     }
 
     /**
+     * Encode a JWT with parameters for the next iteration of an action.
+     *
+     * @param SystemTokenUtils $tokenUtils
+     * @param string $className
+     * @param string $method
+     * @param array $args
+     * @param array $options
+     **
+     * @return string A JWT of the next job payload.
+     */
+    public static function makeCallbackPayload(
+        SystemTokenUtils $tokenUtils,
+        string $className,
+        string $method,
+        array $args,
+        array $options
+    ): string {
+        $payload = [
+            "class" => $className,
+            "method" => $method,
+            "args" => $args,
+            "options" => $options,
+        ];
+        $jwt = $tokenUtils->encode($payload);
+
+        return $jwt;
+    }
+
+    /**
      * Encode a JWT with parameters for the next iteration of the action.
      *
      * @param SystemTokenUtils $tokenUtils
@@ -55,15 +84,13 @@ final class LongRunnerAction {
      * @return string A JWT of the next job payload.
      */
     public function asCallbackPayload(SystemTokenUtils $tokenUtils): string {
-        $payload = [
-            "class" => $this->className,
-            "method" => $this->method,
-            "args" => $this->args,
-            "options" => $this->options,
-        ];
-        $jwt = $tokenUtils->encode($payload);
-
-        return $jwt;
+        return self::makeCallbackPayload(
+            $tokenUtils,
+            $this->className,
+            $this->method,
+            $this->args,
+            $this->options
+        );
     }
 
     /**

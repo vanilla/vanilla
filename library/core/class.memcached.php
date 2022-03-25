@@ -110,6 +110,15 @@ class Gdn_Memcached extends Gdn_Cache {
     }
 
     /**
+     * Return the memcached instance.
+     *
+     * @return object
+     */
+    public function getMemcached() {
+        return $this->memcache;
+    }
+
+    /**
      * Reads in known/config servers and adds them to the instance.
      *
      * This method is called when the cache object is invoked by the framework

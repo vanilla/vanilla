@@ -9,6 +9,8 @@ namespace VanillaTests;
 
 use Garden\Container\Container;
 use Garden\EventManager;
+use Garden\Web\Exception\ResponseException;
+use Garden\Web\Redirect;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Addon;
@@ -549,5 +551,27 @@ TEMPLATE;
         $testLocaleAddon = new Addon("/tests/fixtures/locales/test-fr");
         $addonManager->add($testLocaleAddon);
         $addonModel->enable($testLocaleAddon);
+    }
+
+    /**
+     * Assert that some callback creates a redirect.
+     *
+     * @param string $expectedPath The expected redirect path.
+     * @param int $expectedCode The expected redirect status code.
+     * @param callable $callback The callback to generate the redirect.
+     */
+    public function assertRedirectsTo(string $expectedPath, int $expectedCode, callable $callback) {
+        $expectedPath = url($expectedPath);
+        $caught = null;
+        try {
+            call_user_func($callback);
+        } catch (ResponseException $e) {
+            $caught = $e;
+        }
+        TestCase::assertInstanceOf(ResponseException::class, $caught, 'Callback did not redirect.');
+        $redirect = $caught->getResponse();
+        TestCase::assertInstanceOf(Redirect::class, $redirect, 'Callback did not redirect.');
+        TestCase::assertEquals($expectedCode, $redirect->getStatus());
+        TestCase::assertEquals($expectedPath, $redirect->getHeader("Location"));
     }
 }

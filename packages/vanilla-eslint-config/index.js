@@ -93,6 +93,7 @@ module.exports = {
 
         // Vanilla Custom
         "@vanilla/no-unconventional-imports": "error",
+        "@vanilla/no-cloud-imports-in-core": "error",
 
         // Lodash
         // Ensure we always do single package lodash imports.

@@ -134,7 +134,7 @@ export const homeWidgetItemVariables = useThemeCache(
                  * @title Foreground Color
                  * @description Choose the color of the foreground content in the widget. Defaults to have contrast with the box background.
                  * @type string
-                 * @format hex-string
+                 * @format hex-color
                  */
                 fg: globalVars.mainColors.fg,
                 verticalAlignment: "middle",

@@ -63,4 +63,11 @@ class WidgetContainerReactWidget implements ReactWidgetInterface, CombinedPropsW
     public static function getWidgetID(): string {
         return 'widget-container';
     }
+
+    /**
+     * @return string
+     */
+    public static function getWidgetIconPath(): string {
+        return "";
+    }
 }

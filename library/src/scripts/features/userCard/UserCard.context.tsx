@@ -11,6 +11,7 @@ interface IUserCardContext {
     setIsOpen: (val: boolean) => void;
     triggerRef: React.RefObject<HTMLElement>;
     contentRef: React.RefObject<HTMLElement>;
+    contents: React.ReactNode;
     contentID: string;
     triggerID: string;
 }
@@ -24,6 +25,7 @@ export const UserCardContext = React.createContext<IUserCardContext>({
     contentRef: {
         current: null,
     },
+    contents: null,
     contentID: "",
     triggerID: "",
 });

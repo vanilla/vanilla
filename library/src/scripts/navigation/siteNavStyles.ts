@@ -240,6 +240,11 @@ export const siteNavNodeClasses = useThemeCache((active = false, isFirstLevel = 
         color: ColorsUtils.colorOut(globalVars.links.colors.active),
     });
 
+    const checkMark = style("checkMark", {
+        color: ColorsUtils.colorOut(globalVars.mainColors.primary),
+        ...Mixins.margin({ left: 8, right: 4 }),
+    });
+
     return {
         root,
         children,
@@ -250,6 +255,7 @@ export const siteNavNodeClasses = useThemeCache((active = false, isFirstLevel = 
         toggle,
         buttonOffset,
         activeLink,
+        checkMark,
     };
 });
 

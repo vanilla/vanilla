@@ -56,6 +56,7 @@ function InnerLink(props: IProps) {
             className={classNames(props.className)}
         >
             {children}
+            {context.contents}
         </SmartLink>
     );
 }

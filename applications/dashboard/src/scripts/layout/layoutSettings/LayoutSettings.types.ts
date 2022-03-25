@@ -144,6 +144,8 @@ export type IWidgetCatalog = Record<
         schema: JsonSchema;
         $reactComponent: string;
         recommendedWidgets?: Array<{ widgetID: string; widgetName: string }>;
+        iconUrl?: string;
+        name: string;
     }
 >;
 

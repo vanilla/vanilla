@@ -50,13 +50,7 @@ export function EditorSectionFullWidth(props: EditorSectionProps<typeof SectionF
                 aria-label={`Full width section at position ${props.$editorPath.sectionIndex}`}
                 data-layout-editor-focusable
                 onClick={onClick}
-                className={cx(
-                    classes.section(1),
-                    "isFullWidth",
-                    activeClasses,
-                    TabHandler.NO_TABBING,
-                    classes.fullWidth,
-                )}
+                className={cx(classes.section(1), "isFullWidth", activeClasses, classes.fullWidth)}
                 tabIndex={isSelected ? 0 : -1}
                 contentRef={ref}
                 data-layout-selectable={true}

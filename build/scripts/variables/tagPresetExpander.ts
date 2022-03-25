@@ -5,7 +5,6 @@
  */
 
 import { ITypeExpander } from "@vanilla/variable-parser";
-import { string } from "yargs";
 
 export const tagPresetExpander: ITypeExpander = {
     type: "tagPreset",

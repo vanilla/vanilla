@@ -147,7 +147,7 @@ class ReactionsPlugin extends Gdn_Plugin {
     /**
      * Add mapper methods.
      *
-     * @param SimpleAPIPlugin $sender
+     * @param mixed $sender The simpleAPI plugin instance. Can't reference it here because of psalm.
      */
     public function simpleApiPlugin_mapper_handler($sender) {
         switch ($sender->Mapper->Version) {

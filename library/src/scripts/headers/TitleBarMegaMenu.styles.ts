@@ -16,7 +16,7 @@ import { css } from "@emotion/css";
 
 /**
  * @varGroup titleBarMegaMenu
- * @title MegaMenu (TitleBar)
+ * @title Mega Menu (Title Bar)
  * @description The mega menu is used when you have navigation items that are nested inside of the titlebar on desktop screen sizes.
  */
 export const titleBarMegaMenuVariables = useThemeCache((forcedVars?: IThemeVariables) => {
@@ -36,7 +36,7 @@ export const titleBarMegaMenuVariables = useThemeCache((forcedVars?: IThemeVaria
      */
     const item = makeThemeVars("item", {
         /**
-         * @varGroup titleBarMegaMenu.item.spacer
+         * @var titleBarMegaMenu.item.spacer
          * @description Spacing units for menu item
          * @title Content Spacing
          * @type number
@@ -74,7 +74,7 @@ export const titleBarMegaMenuVariables = useThemeCache((forcedVars?: IThemeVaria
      */
     const wrapper = makeThemeVars("wrapper", {
         /**
-         * @varGroup titleBarMegaMenu.wrapper.shadow
+         * @var titleBarMegaMenu.wrapper.shadow
          * @description Shadow detail at the bottom of the mega menu
          * @title Shadow
          * @type string

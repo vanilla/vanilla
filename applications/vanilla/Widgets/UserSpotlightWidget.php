@@ -28,7 +28,7 @@ class UserSpotlightWidget implements ReactWidgetInterface, CombinedPropsWidgetIn
      * @inheritDoc
      */
     public static function getWidgetName(): string {
-        return "UserSpotlight";
+        return "User Spotlight";
     }
 
     /**
@@ -45,6 +45,12 @@ class UserSpotlightWidget implements ReactWidgetInterface, CombinedPropsWidgetIn
         return "UserSpotlightWidget";
     }
 
+    /**
+     * @return string
+     */
+    public static function getWidgetIconPath(): string {
+        return "/applications/dashboard/design/images/widgetIcons/userspotlight.svg";
+    }
 
     /**
      * @return array

@@ -8,6 +8,26 @@ import { ICrumb } from "@library/navigation/Breadcrumbs";
 import { PublishStatus } from "@library/@types/api/core";
 import { IUserFragment, IUser } from "@library/@types/api/users";
 import { ILinkPages } from "@library/navigation/SimplePagerModel";
+import { ISelectBoxItem } from "@library/forms/select/SelectBox";
+
+export interface ISearchSource {
+    /** Key used to identify the search source */
+    key: string;
+    /** Translated label for the tab heading */
+    getLabel: () => string;
+    /** Function to make the request and return the mapped results */
+    performSearch: (query: ISearchRequestQuery) => Promise<ISearchResults>;
+    /** Sort options available to this search source */
+    sortOptions?: ISelectBoxItem[];
+    /** The additional search filters this source should make available */
+    queryFilterComponent?: React.ReactNode;
+}
+
+export interface ISearchSource {
+    key: string;
+    getLabel: () => string;
+    performSearch: (query: ISearchRequestQuery) => Promise<ISearchResults>;
+}
 
 export interface ISearchFormBase {
     domain: string;
@@ -56,9 +76,9 @@ export interface ISearchResult {
     };
     dateUpdated: string | null;
     dateInserted: string;
-    insertUserID: number;
-    insertUser: IUserFragment;
-    updateUserID: number;
+    insertUserID?: number;
+    insertUser?: IUserFragment;
+    updateUserID?: number;
     updateUser?: IUserFragment;
     userInfo?: IUser;
     counts?: ICountResult[];
@@ -70,6 +90,7 @@ export interface ISearchResult {
     siteID?: number;
     siteDomain?: string;
     highlight?: string;
+    source?: string;
 }
 
 export interface ISearchResults {

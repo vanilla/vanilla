@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -223,41 +223,41 @@ class SitemapsPlugin extends Gdn_Plugin {
         $sender->deliveryType(DELIVERY_TYPE_VIEW);
         $sender->setHeader('Content-Type', 'text/xml');
 
-        $SiteMaps = [];
+        $siteMaps = [];
 
         if (class_exists('CategoryModel')) {
-            $Categories = CategoryModel::categories();
+            $categories = CategoryModel::categories();
 
             $this->EventArguments['Categories'] = &$categories;
             $this->fireEvent('siteMapCategories');
 
             $limit = $this->getDiscussionLimit();
 
-            foreach ($Categories as $Category) {
-                if (!$Category['PermsDiscussionsView'] || $Category['CategoryID'] < 0 || $Category['CountDiscussions'] == 0) {
+            foreach ($categories as $category) {
+                if (!$category['PermsDiscussionsView'] || $category['CategoryID'] < 0 || $category['CountDiscussions'] == 0) {
                     continue;
                 }
 
-                $urlCode = rawurlencode($Category['UrlCode'] ? $Category['UrlCode'] : $Category['CategoryID']);
+                $urlCode = rawurlencode($category['UrlCode'] ? $category['UrlCode'] : $category['CategoryID']);
 
                 /**
                  * Add several site-maps for each page of discussions.
                  */
-                for ($i = 0; $i < $Category['CountDiscussions']; $i += $limit) {
-                    $SiteMap = [
+                for ($i = 0; $i < $category['CountDiscussions']; $i += $limit) {
+                    $siteMap = [
                         'Loc' => url('/sitemap-category-'.$urlCode.'-'.($i + 1).'-'.($i + $limit).'.xml', true),
                         'ChangeFreq' => '',
                         'Priority' => '',
                     ];
 
                     if ($i === 0) {
-                        $SiteMap['LastMod'] = $Category['DateLastComment'];
+                        $siteMap['LastMod'] = $category['DateLastComment'];
                     }
-                    $SiteMaps[] = $SiteMap;
+                    $siteMaps[] = $siteMap;
                 }
             }
         }
-        $sender->setData('SiteMaps', $SiteMaps);
+        $sender->setData('SiteMaps', $siteMaps);
         $sender->render('SiteMapIndex', '', 'plugins/Sitemaps');
     }
 
@@ -275,29 +275,32 @@ class SitemapsPlugin extends Gdn_Plugin {
         $sender->deliveryType(DELIVERY_TYPE_VIEW);
         $sender->setHeader('Content-Type', 'text/xml');
 
-        $SiteMaps = [];
+        $siteMaps = [];
 
         if (class_exists('CategoryModel')) {
-            $Categories = CategoryModel::categories();
+            $categories = CategoryModel::categories();
 
             $this->EventArguments['Categories'] = &$categories;
             $this->fireEvent('siteMapCategories');
 
-            foreach ($Categories as $Category) {
-                if (!$Category['PermsDiscussionsView'] || $Category['CategoryID'] < 0 || $Category['CountDiscussions'] == 0) {
+            foreach ($categories as $category) {
+                if (!$category['PermsDiscussionsView'] || $category['CategoryID'] < 0 || $category['CountDiscussions'] == 0) {
                     continue;
                 }
 
-                $SiteMap = [
-                    'Loc' => url('/sitemap-category-'.rawurlencode($Category['UrlCode'] ? $Category['UrlCode'] : $Category['CategoryID']).'.xml', true),
-                    'LastMod' => $Category['DateLastComment'],
+                $siteMap = [
+                    'Loc' => url(
+                        '/sitemap-category-'.rawurlencode($category['UrlCode'] ? $category['UrlCode'] : $category['CategoryID']).'.xml',
+                        true
+                    ),
+                    'LastMod' => $category['DateLastComment'],
                     'ChangeFreq' => '',
                     'Priority' => ''
                 ];
-                $SiteMaps[] = $SiteMap;
+                $siteMaps[] = $siteMap;
             }
         }
-        $sender->setData('SiteMaps', $SiteMaps);
+        $sender->setData('SiteMaps', $siteMaps);
         $sender->render('SiteMapIndex', '', 'plugins/Sitemaps');
     }
 

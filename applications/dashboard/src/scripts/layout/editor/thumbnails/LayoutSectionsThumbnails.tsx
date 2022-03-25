@@ -1,53 +1,34 @@
 /**
  * @copyright 2009-2022 Vanilla Forums Inc.
- * @license Proprietary
+ * @license gpl-2.0-only
  */
-import { layoutSectionThumbnailsClasses } from "@dashboard/appearance/thumbnails/LayoutSectionsThumbnails.classes";
-import { ILayoutCatalog, LayoutSectionID } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
-import { cx } from "@emotion/css";
-import Translate from "@library/content/Translate";
-import { userContentClasses } from "@library/content/UserContent.styles";
-import { InformationIcon } from "@library/icons/common";
-import SmartLink from "@library/routing/links/SmartLink";
-import { ToolTip } from "@library/toolTip/ToolTip";
-import { useUniqueID } from "@library/utility/idUtils";
+import * as React from "react";
 import { t } from "@vanilla/i18n";
+import { ILayoutCatalog, LayoutSectionID } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
+import { ToolTip } from "@library/toolTip/ToolTip";
+import { InformationIcon } from "@library/icons/common";
+import Translate from "@library/content/Translate";
+import SmartLink from "@library/routing/links/SmartLink";
+import { useState } from "react";
+import { cx } from "@emotion/css";
+import { userContentClasses } from "@library/content/UserContent.styles";
+import { useUniqueID } from "@library/utility/idUtils";
 import { CustomRadioGroup, CustomRadioInput } from "@vanilla/ui";
 import { RecordID } from "@vanilla/utils";
-import * as React from "react";
-import { useState } from "react";
+import { layoutThumbnailsClasses } from "@dashboard/layout/editor/thumbnails/LayoutThumbnails.classes";
 interface IProps {
     labelID?: string;
     label?: string;
-    value?: LayoutSectionID;
+    value?: string;
     onSectionClick?: (section: LayoutSectionID) => void;
     onChange?: (section: LayoutSectionID) => void;
     sections: ILayoutCatalog["sections"];
 }
 
-const LAYOUT_SECTIONS_THUMBNAILS = {
-    "react.section.full-width": {
-        label: "Full-Width",
-        iconUrl: require("!file-loader!./icons/fullwidth.svg").default,
-    },
-    "react.section.1-column": {
-        label: "1 column",
-        iconUrl: require("!file-loader!./icons/1column.svg").default,
-    },
-    "react.section.2-columns": {
-        label: "2 columns",
-        iconUrl: require("!file-loader!./icons/2column.svg").default,
-    },
-    "react.section.3-columns": {
-        label: "3 columns",
-        iconUrl: require("!file-loader!./icons/3column.svg").default,
-    },
-};
-
 export default function LayoutSectionsThumbnails(props: IProps) {
     const { sections } = props;
-    const classes = layoutSectionThumbnailsClasses();
-    const [ownValue, ownOnChange] = useState(Object.keys(LAYOUT_SECTIONS_THUMBNAILS)[0] as RecordID);
+    const classes = layoutThumbnailsClasses();
+    const [ownValue, ownOnChange] = useState(Object.keys(sections)[0] as RecordID);
     const value = props.value ?? ownValue;
     const onChange = props.onChange ?? ownOnChange;
 
@@ -83,7 +64,7 @@ export default function LayoutSectionsThumbnails(props: IProps) {
                 {Object.keys(sections)
                     .reverse()
                     .map((sectionID: LayoutSectionID) => {
-                        const label = t(LAYOUT_SECTIONS_THUMBNAILS[sectionID].label);
+                        const label = t(sections[sectionID].name);
                         const accessibleDescription =
                             t("Widget Type: ") +
                             sections[sectionID].recommendedWidgets
@@ -120,12 +101,12 @@ export default function LayoutSectionsThumbnails(props: IProps) {
                                                 height="138"
                                                 className={classes.thumbnailImage}
                                                 alt={label}
-                                                src={LAYOUT_SECTIONS_THUMBNAILS[sectionID].iconUrl}
+                                                src={sections[sectionID].iconUrl}
                                             />
                                         </span>
 
                                         <div className={classes.labelContainer}>
-                                            {label}
+                                            {t(label)}
                                             <ToolTip label={accessibleDescription}>
                                                 <div className={classes.informationIcon}>
                                                     <InformationIcon />

@@ -71,13 +71,17 @@ export const layoutEditorClasses = useThemeCache(() => {
         alignItems: "center",
     });
 
-    const toolbarOffset = css({
-        position: "relative",
-        zIndex: 1,
-        inset: "initial",
-        transform: "none",
-        margin: "0 auto",
-    });
+    const toolbarOffset = useThemeCache((offsetLeft) =>
+        css({
+            position: "absolute",
+            flexDirection: "column",
+            left: offsetLeft,
+            top: "50%",
+            transform: "translateY(-50%)",
+            right: "initial",
+            bottom: "initial",
+        }),
+    );
 
     const screen = css({
         position: "relative",

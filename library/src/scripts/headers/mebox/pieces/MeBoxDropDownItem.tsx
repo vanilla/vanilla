@@ -26,6 +26,7 @@ export enum MeBoxItemType {
 export interface IMeBoxItem {
     className?: string;
     message: string;
+    messageHtml?: string;
     photo: string | null;
     photoAlt: string;
     activityName?: string;
@@ -52,7 +53,7 @@ type IProps = IMeBoxMessageItem | IMeBoxNotificationItem;
  */
 export default class MeBoxDropDownItem extends React.Component<IProps> {
     public render() {
-        const { unread, message, timestamp, to, photoAlt, photo } = this.props;
+        const { unread, message, messageHtml, timestamp, to, photoAlt, photo } = this.props;
         const classesMeBoxMessage = meBoxMessageClasses();
         const classesMetas = metasClasses();
 
@@ -94,11 +95,17 @@ export default class MeBoxDropDownItem extends React.Component<IProps> {
                                 {authorList!}
                             </div>
                         )}
-                        {/* Current notifications API returns HTML-formatted messages. Should be updated to return something aside from raw HTML. */}
-                        <div
-                            className={classNames("meBoxMessage-message", classesMeBoxMessage.message)}
-                            dangerouslySetInnerHTML={{ __html: message }}
-                        />
+                        {messageHtml ? (
+                            <div
+                                className={classNames("meBoxMessage-message", classesMeBoxMessage.message)}
+                                dangerouslySetInnerHTML={{ __html: message }}
+                            />
+                        ) : (
+                            <div className={classNames("meBoxMessage-message", classesMeBoxMessage.message)}>
+                                {message}
+                            </div>
+                        )}
+
                         <div className={classNames("meBoxMessage-metas", classesMetas.root, "isFlexed")}>
                             {timestamp && <DateTime timestamp={timestamp} className={classesMetas.meta} />}
                             {this.props.type === MeBoxItemType.MESSAGE && (

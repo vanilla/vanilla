@@ -31,7 +31,7 @@ class DiscussionDiscussionsWidget extends DiscussionWidgetModule implements Reac
      * @inheridoc
      */
     public static function getWidgetName(): string {
-        return "Discussion - Discussions";
+        return "Discussions";
     }
 
     /**
@@ -42,6 +42,12 @@ class DiscussionDiscussionsWidget extends DiscussionWidgetModule implements Reac
         return "DiscussionListModule";
     }
 
+    /**
+     * @return string
+     */
+    public static function getWidgetIconPath(): string {
+        return "/applications/dashboard/design/images/widgetIcons/discussions.svg";
+    }
 
     /**
      * @return array

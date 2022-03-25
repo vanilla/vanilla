@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -10,6 +10,7 @@ namespace VanillaTests\APIv2;
 use Garden\Http\HttpResponse;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Formatting\FormatCompatibilityService;
+use Vanilla\Formatting\Formats\WysiwygFormat;
 
 /**
  * A base test class for testing any API v2 RESTful resource.
@@ -28,6 +29,9 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
 
     /** @var array Fields to be checked with get/<id>/edit */
     protected $editFields = ['name', 'body', 'format'];
+
+    /** @var array image fields that have a corresponding srcset. */
+    protected $imageFields = [];
 
     /** @var bool Whether to check if paging works or not in the index. */
     protected $testPagingOnIndex = true;
@@ -211,6 +215,55 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
         $this->assertCamelCase($r->getBody());
 
         return $r->getBody();
+    }
+
+    /**
+     * Test image fields srcset existence.
+     *
+     * @return void
+     */
+    public function testImageFields() {
+        if (empty($this->imageFields)) {
+            $this->markTestSkipped("No image fields defined");
+            return;
+        }
+        $record = $this->record();
+        foreach ($this->imageFields as $imageField) {
+            $record[$imageField] = 'https://my-image.com';
+        }
+
+        $result = $this->testPost($record);
+        // Fetch again because srcSets aren't editable fields.
+        $result = $this->api()->get(
+            "{$this->baseUrl}/{$result[$this->pk]}"
+        );
+
+        foreach ($this->imageFields as $imageField) {
+            $this->assertArrayHasKey($imageField . 'SrcSet', $result);
+        }
+    }
+
+    /**
+     * Test that items with a format extract their main image.
+     */
+    public function testMainImageField() {
+        if ((!in_array('format', $this->patchFields)) || in_array('image', $this->patchFields)) {
+            $this->markTestSkipped('Only occurs for endpoints with a format');
+        }
+
+        $record = $this->record();
+        $record['body'] = '<img alt="My Alt" src="https://site.com/myimg.png" />';
+        $record['format'] = WysiwygFormat::FORMAT_KEY;
+
+        $result = $this->testPost($record);
+        // Fetch again because srcSets aren't editable fields.
+        $result = $this->api()->get(
+            "{$this->baseUrl}/{$result[$this->pk]}"
+        );
+
+        $this->assertEquals("My Alt", $result['image']['alt']);
+        $this->assertEquals("https://site.com/myimg.png", $result['image']['url']);
+        $this->assertArrayHasKey("urlSrcSet", $result['image']);
     }
 
     /**

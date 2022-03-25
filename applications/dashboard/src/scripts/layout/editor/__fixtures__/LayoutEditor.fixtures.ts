@@ -24,6 +24,7 @@ export class LayoutEditorFixture {
                 "react.my-widget": {
                     $reactComponent: "MyWidget",
                     schema: {},
+                    name: "My Widget",
                 },
             },
             assets: {},
@@ -32,11 +33,13 @@ export class LayoutEditorFixture {
                     $reactComponent: "SectionOneColumn",
                     recommendedWidgets: [],
                     schema: {},
+                    name: "1 column",
                 },
                 "react.section.2-columns": {
                     $reactComponent: "SectionTwoColumns",
                     recommendedWidgets: [],
                     schema: {},
+                    name: "2 columns",
                 },
             },
             middleware: {},

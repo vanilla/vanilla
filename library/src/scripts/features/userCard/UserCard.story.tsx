@@ -137,11 +137,12 @@ export const Skeletons = () => (
 );
 
 function StoryLinkTrigger() {
-    const { props, triggerRef } = useUserCardTrigger();
+    const context = useUserCardTrigger();
 
     return (
-        <a href="/profile" className={buttonClasses().text} {...props} ref={triggerRef as any}>
+        <a href="/profile" className={buttonClasses().text} {...context.props} ref={context.triggerRef as any}>
             {STORY_USER.name}
+            {context.contents}
         </a>
     );
 }

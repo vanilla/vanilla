@@ -14,6 +14,8 @@ use Garden\Web\Exception\ClientException;
 use Vanilla\Community\Schemas\CategoryFragmentSchema;
 use Vanilla\Dashboard\Models\PermissionJunctionModelInterface;
 use Vanilla\Events\LegacyDirtyRecordTrait;
+use Vanilla\ImageSrcSet\ImageSrcSet;
+use Vanilla\ImageSrcSet\ImageSrcSetService;
 use Vanilla\Layout\LayoutViewModel;
 use Vanilla\Models\CrawlableRecordSchema;
 use Vanilla\Models\DirtyRecordModel;
@@ -178,6 +180,9 @@ class CategoryModel extends Gdn_Model implements
     /** @var ModelCache */
     private $modelCache;
 
+    /** @var ImageSrcSetService */
+    private $imageSrcSetService;
+
     /**
      * Class constructor. Defines the related database table name.
      *
@@ -186,6 +191,7 @@ class CategoryModel extends Gdn_Model implements
      */
     public function __construct() {
         parent::__construct('Category');
+        $this->imageSrcSetService = Gdn::getContainer()->get(ImageSrcSetService::class);
         $this->collection = $this->createCollection();
         $this->eventManager = Gdn::getContainer()->get(EventManager::class);
         $this->modelCache = new ModelCache('CategoryModel', Gdn::cache());
@@ -2345,6 +2351,11 @@ class CategoryModel extends Gdn_Model implements
             Gdn_UploadImage::url($dbRecord['Photo']) ?: null // In case false is returned.
         ) : null;
         $schemaRecord['bannerUrl'] = BannerImageModel::getBannerImageSlug($dbRecord['CategoryID']) ?: null;
+
+        // We add Images srcsets.
+        $schemaRecord['iconUrlSrcSet'] = $this->imageSrcSetService->getResizedSrcSet($schemaRecord['iconUrl']);
+        $schemaRecord['bannerUrlSrcSet'] = $this->imageSrcSetService->getResizedSrcSet($schemaRecord['bannerUrl']);
+
         return $schemaRecord;
     }
 
@@ -4895,8 +4906,10 @@ SQL;
                     'default' => 'discussions'
                 ],
                 'iconUrl:s|n?',
+                'iconUrlSrcSet?' => new InstanceValidatorSchema(ImageSrcSet::class),
                 'dateInserted:dt?',
                 'bannerUrl:s|n?',
+                'bannerUrlSrcSet?' => new InstanceValidatorSchema(ImageSrcSet::class),
                 'countCategories:i' => 'Total number of child categories.',
                 'countDiscussions:i' => 'Total discussions in the category.',
                 'countComments:i' => 'Total comments in the category.',
@@ -5145,5 +5158,19 @@ SQL;
                 }]
             ));
         }
+    }
+
+
+    /**
+     * Wraps the self::permissionCategory method to get the AllowFileUploads setting.
+     * It will either be from the passed in $category or from the root category if
+     * custom category permissions are turned off.
+     *
+     * @param mixed $category
+     * @return bool
+     */
+    public static function checkAllowFileUploads($category): bool {
+        $permissionCategory = self::permissionCategory($category);
+        return (bool) $permissionCategory['AllowFileUploads'] ?? true;
     }
 }

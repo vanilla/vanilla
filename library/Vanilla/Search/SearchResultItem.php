@@ -13,6 +13,8 @@ use Garden\Web\Data;
 use Vanilla\Formatting\DateTimeFormatter;
 use Vanilla\Formatting\Formats\HtmlFormat;
 use Vanilla\Formatting\Formats\WysiwygFormat;
+use Vanilla\ImageSrcSet\ImageSrcSet;
+use Vanilla\ImageSrcSet\ImageSrcSetService;
 use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Utility\InstanceValidatorSchema;
@@ -46,7 +48,7 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess {
      * @param array $data
      */
     public function __construct(array $data) {
-        $this->data = $this->fullSchema()->validate($data);
+        $this->data = $this->itemInputSchema()->validate($data);
     }
 
     /**
@@ -73,7 +75,7 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess {
     /**
      * @return Schema
      */
-    protected function fullSchema(): Schema {
+    protected function itemInputSchema(): Schema {
         if ($this->schema === null) {
             $countSchema = Schema::parse([
                 'count:i',
@@ -87,7 +89,7 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess {
                 'bodyRaw:s?',
                 'bodyPlainText:s?',
                 'excerpt:s?',
-                'image:s?',
+                'image:s|o?',
                 'recordID:i',
                 'categoryID:i?',
                 'altRecordID:i?',
@@ -253,21 +255,27 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess {
      * @return array|null
      */
     public function getImage(): ?array {
-        if (array_key_exists('image', $this->data)) {
-            $image = $this->data['image'];
-            if (is_array($image)) {
-                return $image;
-            } elseif (is_string($image)) {
-                return [
-                    'url' => $image,
+        $resultImage = null;
+        $imageField = $this->data['image'] ?? null;
+        if ($imageField !== null) {
+            if (is_array($imageField)) {
+                $resultImage = $imageField;
+            } elseif (is_string($imageField)) {
+                $resultImage = [
+                    'url' => $imageField,
                     'alt' => t('Untitled'),
                 ];
             }
+        } elseif ($this->getBody() !== null && $this->getFormat() !== null) {
+            $resultImage = \Gdn::formatService()->parseImages($this->getBody(), $this->getFormat())[0] ?? null;
         }
-        if ($this->getBody() !== null && $this->getFormat() !== null) {
-            return \Gdn::formatService()->parseImages($this->getBody(), $this->getFormat())[0] ?? null;
+
+        if ($resultImage !== null) {
+            $imageUrl = $resultImage['url'];
+            $srcSetService = \Gdn::getContainer()->get(ImageSrcSetService::class);
+            $resultImage['urlSrcSet'] = $srcSetService->getResizedSrcSet($imageUrl);
         }
-        return null;
+        return $resultImage;
     }
 
     /**
@@ -367,8 +375,11 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess {
             unset($data['excerpt']);
         }
 
+        // Only comes on input.
         if (ModelUtils::isExpandOption('image', $this->expandFields)) {
             $data['image'] = $this->getImage();
+        } else {
+            unset($data['image']);
         }
 
         if (!ModelUtils::isExpandOption('collapse', $this->expandFields)) {
@@ -423,7 +434,7 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess {
             $this->data[$offset] = $value;
         }
 
-        $this->fullSchema()->validate($this->data);
+        $this->itemInputSchema()->validate($this->data);
     }
 
     /**
@@ -431,7 +442,7 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess {
      */
     public function offsetUnset($offset) {
         unset($this->data[$offset]);
-        $this->fullSchema()->validate($this->data);
+        $this->itemInputSchema()->validate($this->data);
     }
 
     /**

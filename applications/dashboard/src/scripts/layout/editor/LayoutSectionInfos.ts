@@ -15,6 +15,6 @@ export const LayoutSectionInfos: Record<string, ILayoutSectionInfo> = {
         oneWidgetPerRegion: false,
     },
     "react.section.2-columns": { regionNames: ["mainBottom", "rightBottom"], oneWidgetPerRegion: false },
-    "react.section.1-column": { regionNames: ["children"], oneWidgetPerRegion: true },
+    "react.section.1-column": { regionNames: ["children"], oneWidgetPerRegion: false },
     "react.section.full-width": { regionNames: ["children"], oneWidgetPerRegion: true },
 };

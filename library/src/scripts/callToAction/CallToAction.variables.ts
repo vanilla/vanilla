@@ -47,14 +47,12 @@ export const callToActionVariables = useThemeCache(
             optionOverrides,
         );
 
-        const isAlignmentCenter = options.alignment === "center";
-
         /**
          * @varGroup callToAction.title
          */
         const title = makeVars("title", {
             /**
-             * @varGroups callToAction.title.font
+             * @varGroup callToAction.title.font
              * @expand font
              */
             font: Variables.font({
@@ -62,7 +60,7 @@ export const callToActionVariables = useThemeCache(
                 color: globalVars.mainColors.fg,
             }),
             /**
-             * @varGroups callToAction.title.spacing
+             * @varGroup callToAction.title.spacing
              * @expand spacing
              */
             spacing: Variables.spacing({
@@ -75,7 +73,7 @@ export const callToActionVariables = useThemeCache(
          */
         const description = makeVars("description", {
             /**
-             * @varGroups callToAction.description.font
+             * @varGroup callToAction.description.font
              * @expand font
              */
             font: Variables.font({
@@ -83,7 +81,7 @@ export const callToActionVariables = useThemeCache(
                 color: globalVars.mainColors.fg,
             }),
             /**
-             * @varGroups callToAction.description.spacing
+             * @varGroup callToAction.description.spacing
              * @expand spacing
              */
             spacing: Variables.spacing({
@@ -139,7 +137,7 @@ export const callToActionVariables = useThemeCache(
         });
 
         /**
-         * @varGroups callToAction.sizing
+         * @varGroup callToAction.sizing
          */
         const sizing = makeVars("sizing", {
             minWidth: minWidth, // Min width allows 4 items to fit.

@@ -78,6 +78,13 @@ class MessagesTest extends AbstractResourceTest {
     }
 
     /**
+     * We don't care about main images for this endpoint.
+     */
+    public function testMainImageField() {
+        $this->markTestSkipped();
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function record() {

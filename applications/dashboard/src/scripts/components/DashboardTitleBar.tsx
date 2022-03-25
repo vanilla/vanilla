@@ -56,24 +56,29 @@ export default function DashboardTitleBar(props: IProps) {
         <header className={classes.container}>
             <Container fullGutter className={classes.flexContainer}>
                 {isCompact && (
-                    <Hamburger
-                        className={titleBarClasses().hamburger}
-                        extraNavTop={props.hamburgerContent}
-                        extraNavBottom={
-                            <>
-                                <hr className={dropdownClasses.separator} />
-                                <SmartLink className={dropdownClasses.action} to={"/"}>
-                                    <div className={classes.iconWrapper}>
-                                        <Icon icon="meta-external" />
-                                    </div>
-                                    {t("Visit Site")}
-                                </SmartLink>
-                            </>
-                        }
-                        showCloseIcon={false}
-                        navigationItems={(sections as unknown) as INavigationVariableItem[]}
-                        forceHamburgerOpen={props.forceHamburgerOpen}
-                    />
+                    <>
+                        <Hamburger
+                            className={titleBarClasses().hamburger}
+                            extraNavTop={props.hamburgerContent}
+                            extraNavBottom={
+                                <>
+                                    <hr className={dropdownClasses.separator} />
+                                    <SmartLink className={dropdownClasses.action} to={"/"}>
+                                        <div className={classes.iconWrapper}>
+                                            <Icon icon="meta-external" />
+                                        </div>
+                                        {t("Visit Site")}
+                                    </SmartLink>
+                                </>
+                            }
+                            showCloseIcon={false}
+                            navigationItems={(sections as unknown) as INavigationVariableItem[]}
+                            forceHamburgerOpen={props.forceHamburgerOpen}
+                        />
+                        <div className={classes.logo}>
+                            <Icon icon={"vanilla-logo"} />
+                        </div>
+                    </>
                 )}
                 {!isCompact && (
                     <>
@@ -112,6 +117,7 @@ export default function DashboardTitleBar(props: IProps) {
                     currentUser={currentUser}
                     forceOpen={props.forceMeBoxOpen}
                     forceOpenAsModal={props.forceMeBoxOpenAsModal}
+                    isCompact={isCompact}
                 />
             </Container>
         </header>

@@ -148,9 +148,11 @@ describe("LayoutEditorSelection", () => {
         selection.moveSelectionInDirection(LayoutEditorDirection.DOWN);
         assertSelectedWidgetID("1Col2");
 
-        // We move into the 1col section.
-        // 1col sections don't have their own add button
-        // so we end up in the next sections add button.
+        // We move into the first 1col secitons add button.
+        selection.moveSelectionInDirection(LayoutEditorDirection.DOWN);
+        assertSelectAddButton(LayoutEditorPath.widget(2, "children", 2));
+
+        // We move into the next empty 1col section.
         selection.moveSelectionInDirection(LayoutEditorDirection.DOWN);
         assertSelectAddButton(LayoutEditorPath.widget(3, "children", 0));
 

@@ -23,6 +23,7 @@ import React, { useCallback, useRef, useState } from "react";
 import { UserCardError } from "@library/features/userCard/UserCard.views";
 import { hasPermission } from "@library/features/users/Permission";
 import { getMeta } from "@library/utility/appUtils";
+import { StackingContextProvider } from "@library/modal/StackingContext";
 
 interface IProps {
     /** UserID of the user being loaded. */
@@ -81,46 +82,52 @@ export function UserCardPopup(props: React.PropsWithChildren<IProps> & { forceOp
     }
 
     return (
-        <UserCardContext.Provider
-            value={{
-                isOpen,
-                setIsOpen,
-                triggerRef,
-                contentRef,
-                triggerID,
-                contentID,
-            }}
-        >
-            {props.children}
-            {!forceModal && isOpen && (
-                // If we aren't a modal, and we're open, show the flyout.
-                <Popover targetRef={triggerRef} position={positionPreferTopMiddle}>
-                    <UserCardFlyout
-                        {...props}
-                        onClose={() => {
-                            setIsOpen(false);
-                        }}
-                    />
-                </Popover>
-            )}
-            {forceModal && (
-                // On mobile we are forced into a modal, which is controlled by the `isVisible` param instead of conditional rendering.
-                <LazyModal
-                    isVisible={isOpen}
-                    size={ModalSizes.SMALL}
-                    exitHandler={() => {
-                        setIsOpen(false);
-                    }}
-                >
-                    <UserCard
-                        {...props}
-                        onClose={() => {
-                            setIsOpen(false);
-                        }}
-                    />
-                </LazyModal>
-            )}
-        </UserCardContext.Provider>
+        <StackingContextProvider>
+            <UserCardContext.Provider
+                value={{
+                    isOpen,
+                    setIsOpen,
+                    triggerRef,
+                    contentRef,
+                    triggerID,
+                    contentID,
+                    contents: (
+                        <>
+                            {!forceModal && isOpen && (
+                                // If we aren't a modal, and we're open, show the flyout.
+                                <Popover targetRef={triggerRef} position={positionPreferTopMiddle}>
+                                    <UserCardFlyout
+                                        {...props}
+                                        onClose={() => {
+                                            setIsOpen(false);
+                                        }}
+                                    />
+                                </Popover>
+                            )}
+                            {forceModal && (
+                                // On mobile we are forced into a modal, which is controlled by the `isVisible` param instead of conditional rendering.
+                                <LazyModal
+                                    isVisible={isOpen}
+                                    size={ModalSizes.SMALL}
+                                    exitHandler={() => {
+                                        setIsOpen(false);
+                                    }}
+                                >
+                                    <UserCard
+                                        {...props}
+                                        onClose={() => {
+                                            setIsOpen(false);
+                                        }}
+                                    />
+                                </LazyModal>
+                            )}
+                        </>
+                    ),
+                }}
+            >
+                {props.children}
+            </UserCardContext.Provider>
+        </StackingContextProvider>
     );
 }
 
@@ -131,6 +138,7 @@ export function UserCardPopup(props: React.PropsWithChildren<IProps> & { forceOp
 export function useUserCardTrigger(): {
     props: React.HTMLAttributes<HTMLElement>;
     triggerRef: React.RefObject<HTMLElement | null>;
+    contents: React.ReactNode;
     isOpen?: boolean;
 } {
     const context = useUserCardContext();
@@ -176,6 +184,7 @@ export function useUserCardTrigger(): {
             : {},
         triggerRef: context.triggerRef,
         isOpen: context.isOpen,
+        contents: context.contents,
     };
 }
 

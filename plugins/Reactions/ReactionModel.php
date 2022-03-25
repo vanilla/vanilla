@@ -73,7 +73,7 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
     /**
      * Clear the model static state between tests.
      */
-    public static function resetForTests() {
+    public static function resetStaticCache() {
         self::$ReactionTypes = null;
         self::$TagIDs = null;
     }
@@ -1229,9 +1229,6 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
             ];
         }
 
-        // Check to see if we need to give the user a badge.
-        $this->checkBadges($row['InsertUserID'], $reactionType);
-
         if (is_a($controller, 'Gdn_Controller')) {
             if ($message) {
                 Gdn::controller()->informMessage($message[0], $message[1]);
@@ -1246,9 +1243,11 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
             'RecordID' => $iD,
             'Record' => $row,
             'ReactionUrlCode' => $reactionUrlCode,
+            'ReactionType' => $reactionType,
             'ReactionData' => $data,
             'Insert' => $inserted,
-            'UserID' => $userID
+            'UserID' => $userID,
+            'TargetUserID' => $row['InsertUserID'],
         ];
         ReactionsPlugin::instance()->fireEvent('Reaction');
     }
@@ -1270,40 +1269,6 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
             ["reaction" => $reaction],
             $sender
         );
-    }
-
-    /**
-     *
-     *
-     * @param $userID
-     * @param $reactionType
-     */
-    public function checkBadges($userID, $reactionType) {
-        if (!Gdn::addonManager()->isEnabled('badges', Addon::TYPE_ADDON)) {
-            return;
-        }
-
-        // Get the score on the user.
-        $countRow = $this->SQL->getWhere('UserTag', [
-            'RecordType' => 'User',
-            'RecordID' => $userID,
-            'UserID' => self::USERID_OTHER,
-            'TagID' => $reactionType['TagID']
-        ])->firstRow(DATASET_TYPE_ARRAY);
-
-        $score = $countRow['Total'];
-
-        $badgeModel = new BadgeModel();
-        $userBadgeModel = new UserBadgeModel();
-
-        $badges = $badgeModel
-            ->getWhere(['Type' => 'Reaction', 'Class' => $reactionType['UrlCode']], 'Threshold', 'desc')
-            ->resultArray();
-        foreach ($badges as $badge) {
-            if ($score >= $badge['Threshold']) {
-                $userBadgeModel->give($userID, $badge);
-            }
-        }
     }
 
     /**

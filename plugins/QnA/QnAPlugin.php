@@ -163,9 +163,6 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface {
             ->addCall('registerSearchType', [new Reference(QuestionSearchType::class)])
             ->addCall('registerSearchType', [new Reference(AnswerSearchType::class)]);
 
-        $dic->rule(QuickLinksVariableProvider::class)
-            ->addCall('addQuickLinkProvider', [$this]);
-
         $dic->rule(WidgetService::class)
             ->addCall('registerWidget', [QnAWidgetModule::class]);
 

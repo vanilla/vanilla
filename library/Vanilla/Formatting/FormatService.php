@@ -12,6 +12,7 @@ use Vanilla\Contracts\Formatting\Heading;
 use Vanilla\Formatting\Exception\FormatterNotFoundException;
 use Vanilla\Formatting\Exception\FormattingException;
 use Vanilla\Formatting\Formats\NotFoundFormat;
+use Vanilla\ImageSrcSet\ImageSrcSetService;
 
 /**
  * Simple service for calling out to formatters registered in FormatFactory.
@@ -23,6 +24,18 @@ class FormatService {
 
     /** @var FormatInterface[] */
     private $formatInstances = [];
+
+    /** @var ImageSrcSetService */
+    private $imageSrcSetService;
+
+    /**
+     * DI.
+     *
+     * @param ImageSrcSetService $imageSrcSetService
+     */
+    public function __construct(ImageSrcSetService $imageSrcSetService) {
+        $this->imageSrcSetService = $imageSrcSetService;
+    }
 
     /**
      * Render a safe, sanitized, HTML version of some content.
@@ -133,6 +146,25 @@ class FormatService {
         return $this
             ->getFormatter($format)
             ->parseAttachments($content);
+    }
+
+    /**
+     * Parse out the main image from some content.
+     *
+     * @param string $content
+     * @param string|null $format
+     *
+     * @return array|null
+     */
+    public function parseMainImage(string $content, ?string $format): ?array {
+        $images = $this->parseImages($content, $format);
+        if (empty($images)) {
+            return null;
+        }
+
+        $result = $images[0];
+        $result['urlSrcSet'] = $this->imageSrcSetService->getResizedSrcSet($result['url']);
+        return $result;
     }
 
     /**

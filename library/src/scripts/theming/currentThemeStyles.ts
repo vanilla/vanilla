@@ -91,6 +91,7 @@ export const currentThemeClasses = useThemeCache(() => {
         }),
         maxWidth: percent(100),
         position: "relative",
+        flexWrap: "wrap",
     });
 
     const flag = css({

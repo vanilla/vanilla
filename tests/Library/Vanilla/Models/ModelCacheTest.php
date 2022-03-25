@@ -7,20 +7,17 @@
 
 namespace VanillaTests\Library\Vanilla\Models;
 
-use PHPUnit\Framework\TestCase;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\Models\FullRecordCacheModel;
-use Vanilla\Models\Model;
 use Vanilla\Models\ModelCache;
 use Vanilla\Models\PipelineModel;
 use VanillaTests\Fixtures\TestCache;
 use VanillaTests\SchedulerTestTrait;
 use VanillaTests\SiteTestCase;
-use VanillaTests\SiteTestTrait;
 
 /**
- * Tests for the `Model` class.
+ * Tests for the `ModelCache` class.
  */
 class ModelCacheTest extends SiteTestCase {
 

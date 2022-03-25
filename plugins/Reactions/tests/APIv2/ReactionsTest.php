@@ -20,6 +20,7 @@ class ReactionsTest extends AbstractResourceTest {
      */
     public function __construct($name = null, array $data = [], $dataName = '') {
         $this->baseUrl = '/reactions';
+        $this->editFields = ['active', 'name', 'description', 'class', 'points'];
         $this->patchFields = ['active', 'name', 'description', 'class', 'points'];
         $this->pk = 'urlCode';
 

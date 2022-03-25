@@ -5,9 +5,11 @@
  */
 
 const { noUnconventionalImports } = require("./rules/noUnconventionalImports");
+const { noCloudImportsInCore } = require("./rules/noCloudImportsInCore");
 
 module.exports = {
     rules: {
-       [noUnconventionalImports.name]: noUnconventionalImports
+        [noUnconventionalImports.name]: noUnconventionalImports,
+        [noCloudImportsInCore.name]: noCloudImportsInCore,
     },
 };

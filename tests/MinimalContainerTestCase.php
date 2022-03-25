@@ -59,10 +59,23 @@ class MinimalContainerTestCase extends TestCase {
     protected $baseUrl = 'http://vanilla.test/minimal-container-test/';
 
     /**
+     * Whether or not we should apply the common bootstrap.
+     *
+     * @return bool
+     */
+    protected static function useCommonBootstrap(): bool {
+        return true;
+    }
+
+    /**
      * Setup the container.
      */
     protected function configureContainer() {
-         $container = new Container();
+        $container = new Container();
+
+        if (static::useCommonBootstrap()) {
+            \Vanilla\Bootstrap::configureContainer($container);
+        }
 
         $container
             ->rule(\Gdn_Session::class)

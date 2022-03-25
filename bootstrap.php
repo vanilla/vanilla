@@ -19,6 +19,8 @@ use Vanilla\Formatting\Html\HtmlPlainTextConverter;
 use Vanilla\Formatting\Html\HtmlSanitizer;
 use Vanilla\Formatting\Html\Processor\ExternalLinksProcessor;
 use Vanilla\HttpCacheMiddleware;
+use Vanilla\ImageSrcSet\Providers\DefaultImageResizeProvider;
+use Vanilla\ImageSrcSet\ImageSrcSetService;
 use Vanilla\Layout\GlobalRecordProvider;
 use Vanilla\Layout\CategoryRecordProvider;
 use Vanilla\Layout\LayoutViewModel;
@@ -57,7 +59,7 @@ if (!defined('APPLICATION')) exit();
 /**
  * Bootstrap.
  *
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Core
  * @since 2.0

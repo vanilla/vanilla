@@ -38,6 +38,8 @@ type IProps = {
           actionsWrapperClassName?: string;
           /** Any nodes that should appear below the title */
           description?: ReactNode;
+          /** Any extra nodes appearing near title for highlight reasons(e.g. APPLIED etc) */
+          titleLabel?: ReactNode;
       }
     | {
           /** Replaces the default <AdminTitleBar /> */
@@ -48,6 +50,7 @@ type IProps = {
           titleBarActions?: never;
           actionsWrapperClassName?: never;
           description?: never;
+          titleLabel?: never;
       }
 );
 
@@ -63,6 +66,7 @@ export default function AdminLayout(props: IProps) {
         titleBarActions,
         contentClassNames,
         description,
+        titleLabel,
     } = props;
 
     const topTitleBar = useMemo(
@@ -75,6 +79,7 @@ export default function AdminLayout(props: IProps) {
                     description={description}
                     titleAndActionsContainerClassName={titleAndActionsContainerClassName}
                     actions={titleBarActions}
+                    titleLabel={titleLabel}
                 />
             ),
         [classes, customTitleBar, title, titleAndActionsContainerClassName, titleBarActions],
@@ -84,7 +89,7 @@ export default function AdminLayout(props: IProps) {
         <>
             <AdminHeader hamburgerContent={props.adminBarHamburgerContent} activeSectionID={props.activeSectionID} />
             <div className={classes.container}>
-                <Container fullGutter>
+                <Container fullGutter className={rightPanel ? classes.adjustedContainerPadding : undefined}>
                     {rightPanel && (
                         <ThreeColumnSection
                             className={classes.threePanel}

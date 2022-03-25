@@ -30,6 +30,13 @@ class QuoteEmbedFilterTest extends MinimalContainerTestCase {
     private $richFormatter;
 
     /**
+     * @return bool
+     */
+    protected static function useCommonBootstrap(): bool {
+        return false;
+    }
+
+    /**
      * Test that user's are properly replace with clean content.
      */
     public function testHtmlFieldFiltering() {

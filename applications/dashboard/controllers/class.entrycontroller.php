@@ -1170,7 +1170,7 @@ class EntryController extends Gdn_Controller {
                 }
 
                 if (!$user) {
-                    $this->addCredentialErrorToForm('@' . sprintf(t('User not found.'), strtolower(t(UserModel::signinLabelCode()))));
+                    $this->addCredentialErrorToForm('@' . sprintf(t('Invalid user/password provided.'), strtolower(t(UserModel::signinLabelCode()))));
                     Logger::event(
                         'signin_failure',
                         Logger::INFO,
@@ -1234,7 +1234,7 @@ class EntryController extends Gdn_Controller {
                                 $this->_setRedirect();
                             }
                         } else {
-                            $this->addCredentialErrorToForm('Invalid password.');
+                            $this->addCredentialErrorToForm('Invalid user/password provided.');
                             Logger::event(
                                 'signin_failure',
                                 Logger::WARNING,

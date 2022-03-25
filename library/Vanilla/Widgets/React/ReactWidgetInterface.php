@@ -26,4 +26,11 @@ interface ReactWidgetInterface extends WidgetInterface {
      * @return string
      */
     public static function getComponentName(): string;
+
+    /**
+     * Get widget icon url.
+     *
+     * @return string
+     */
+    public static function getWidgetIconPath(): ?string;
 }

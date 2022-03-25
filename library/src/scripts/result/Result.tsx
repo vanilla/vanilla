@@ -45,8 +45,8 @@ export default function Result(props: IResult) {
     ) : null;
 
     const highlightElement = highlight ? (
-        <TruncatedText maxCharCount={160} lines={2}>
-            <div dangerouslySetInnerHTML={{ __html: highlight }}></div>
+        <TruncatedText className={classes.highlight} maxCharCount={160} lines={2}>
+            <span dangerouslySetInnerHTML={{ __html: highlight }}></span>
         </TruncatedText>
     ) : null;
 

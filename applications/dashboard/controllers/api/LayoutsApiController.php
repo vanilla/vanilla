@@ -152,11 +152,16 @@ class LayoutsApiController extends \AbstractApiController {
             /** @var ReactWidgetInterface $widgetClass */
             $widgetClass = $resolver->getReactWidgetClass();
             $componentName = $widgetClass::getComponentName();
+            $widgetIconUrl = asset($widgetClass::getWidgetIconPath(), true);
+            $widgetName = $widgetClass::getWidgetName();
+
             if (is_a($widgetClass, AbstractLayoutSection::class, true)) {
                 $sectionSchemas[$resolver->getType()] = [
                     '$reactComponent' => $componentName,
                     'schema' => $resolver->getSchema(),
                     'recommendedWidgets' => $this->getRecommendedWidgets($widgetClass::getWidgetID()),
+                    'iconUrl' => $widgetIconUrl,
+                    'name' => $widgetName,
                 ];
             } elseif (is_a($widgetClass, AbstractLayoutAsset::class, true)) {
                 $assetSchemas[$resolver->getType()] = [
@@ -167,6 +172,8 @@ class LayoutsApiController extends \AbstractApiController {
                 $widgetSchemas[$resolver->getType()] = [
                     '$reactComponent' => $componentName,
                     'schema' => $resolver->getSchema(),
+                    'iconUrl' => $widgetIconUrl,
+                    'name' => $widgetName,
                 ];
             }
             $typeCollection[$resolver->getType()] = [

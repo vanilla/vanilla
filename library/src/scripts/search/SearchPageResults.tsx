@@ -29,6 +29,7 @@ interface IProps {}
 
 export function SearchPageResults(props: IProps) {
     const { updateForm, results, form, getCurrentDomain } = useSearchForm<{}>();
+
     const currentDomain = getCurrentDomain();
 
     const status = results.status;
@@ -55,6 +56,10 @@ export function SearchPageResults(props: IProps) {
             break;
         case LoadStatus.ERROR:
             content = <CoreErrorMessages error={results.error} />;
+            const { message } = results.error ?? { message: "" };
+            if (message === "canceled") {
+                content = <SearchPageResultsLoader count={3} />;
+            }
             break;
 
         case LoadStatus.SUCCESS:
@@ -88,7 +93,8 @@ export function SearchPageResults(props: IProps) {
             );
             break;
     }
-    return <PanelWidgetHorizontalPadding>{content}</PanelWidgetHorizontalPadding>;
+
+    return content;
 }
 
 /**

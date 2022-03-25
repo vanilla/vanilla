@@ -162,6 +162,7 @@ export default function LayoutOverviewPage(
             adminBarHamburgerContent={<AppearanceNav asHamburger />}
             leftPanel={!isCompact && <AppearanceNav />}
             content={<LayoutOverview layoutID={layoutID} />}
+            titleLabel={viewIsAlreadyApplied ? <span className={classes.titleLabel}>{t("Applied")}</span> : undefined}
         />
     );
 }

@@ -18,27 +18,32 @@ import { frameBodyClasses } from "@library/layout/frame/frameBodyStyles";
 import { frameFooterClasses } from "@library/layout/frame/frameFooterStyles";
 import Modal from "@library/modal/Modal";
 import { useUniqueID } from "@library/utility/idUtils";
-import LayoutSectionsThumbnails from "@dashboard/appearance/thumbnails/LayoutSectionsThumbnails";
-import { layoutSectionsModalClasses } from "@dashboard/appearance/components/LayoutSectionsModal.classes";
+import LayoutSectionsThumbnails from "@dashboard/layout/editor/thumbnails/LayoutSectionsThumbnails";
+import LayoutWidgetsThumbnails from "@dashboard/layout/editor/thumbnails/LayoutWidgetsThumbnails";
+import { layoutThumbnailsClasses } from "@dashboard/layout/editor/thumbnails/LayoutThumbnails.classes";
 
-interface ILayoutSectionsModalProps {
+interface ILayoutThumbnailsModalProps<T extends "sections" | "widgets"> {
     title?: string;
-    sections: ILayoutCatalog["sections"];
+    sections: ILayoutCatalog[T];
     isVisible: ComponentProps<typeof Modal>["isVisible"];
     exitHandler: ComponentProps<typeof Modal>["exitHandler"];
-    onAddSection: (sectionID: LayoutSectionID) => void;
+    onAddSection: (sectionID: string) => void;
+    itemType: "sections" | "widgets";
+    selectedSection?: string;
 }
 
-export function LayoutSectionsModal(props: ILayoutSectionsModalProps) {
-    const { title, sections, isVisible, exitHandler, onAddSection } = props;
-    const [selectedSectionID, setSelectedSectionID] = useState<LayoutSectionID>("react.section.full-width");
+export function LayoutThumbnailsModal<T extends "sections" | "widgets">(props: ILayoutThumbnailsModalProps<T>) {
+    const { title, sections, isVisible, exitHandler, onAddSection, itemType, selectedSection } = props;
+    const [selectedSectionID, setSelectedSectionID] = useState<string>(selectedSection ?? Object.keys(sections)[0]);
     const classesFrameBody = frameBodyClasses();
     const classFrameFooter = frameFooterClasses();
-    const titleID = useUniqueID("layoutSectionTitle");
+    const titleID = useUniqueID("layoutThumbnail");
+
     return (
         <LazyModal noFocusOnExit isVisible={isVisible} size={ModalSizes.LARGE} exitHandler={exitHandler}>
             <form
-                className={layoutSectionsModalClasses().form}
+                data-layout-editor-modal
+                className={layoutThumbnailsClasses().form}
                 onSubmit={(e) => {
                     e.preventDefault();
                     onAddSection(selectedSectionID);
@@ -49,12 +54,21 @@ export function LayoutSectionsModal(props: ILayoutSectionsModalProps) {
                     body={
                         <FrameBody>
                             <div className={classesFrameBody.contents}>
-                                <LayoutSectionsThumbnails
-                                    labelID={titleID}
-                                    sections={sections}
-                                    onChange={setSelectedSectionID}
-                                    value={selectedSectionID}
-                                />
+                                {itemType === "sections" ? (
+                                    <LayoutSectionsThumbnails
+                                        labelID={titleID}
+                                        sections={sections}
+                                        onChange={setSelectedSectionID}
+                                        value={selectedSectionID}
+                                    />
+                                ) : (
+                                    <LayoutWidgetsThumbnails
+                                        labelID={titleID}
+                                        widgets={sections}
+                                        onChange={setSelectedSectionID}
+                                        value={selectedSectionID}
+                                    />
+                                )}
                             </div>
                         </FrameBody>
                     }

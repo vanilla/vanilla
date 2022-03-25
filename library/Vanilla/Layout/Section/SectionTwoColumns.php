@@ -39,7 +39,7 @@ class SectionTwoColumns extends AbstractLayoutSection {
      * @inheritdoc
      */
     public static function getWidgetName(): string {
-        return '2 Column Layout';
+        return '2 Columns';
     }
 
     /**
@@ -47,5 +47,12 @@ class SectionTwoColumns extends AbstractLayoutSection {
      */
     public static function getWidgetID(): string {
         return 'section.2-columns';
+    }
+
+    /**
+     * @return string
+     */
+    public static function getWidgetIconPath(): string {
+        return "/applications/dashboard/design/images/sectionIcons/2columnu.svg";
     }
 }

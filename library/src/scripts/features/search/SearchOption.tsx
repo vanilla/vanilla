@@ -16,7 +16,7 @@ import { OptionProps } from "react-select/lib/components/Option";
 import { PlacesSearchListingItem } from "@library/search/PlacesSearchListingContainer";
 import { searchBarClasses } from "@library/features/search/SearchBar.styles";
 import DateTime from "@library/content/DateTime";
-import { MetaTag } from "@library/metas/Metas";
+import { MetaIcon, MetaTag } from "@library/metas/Metas";
 
 export interface ISearchOptionData {
     crumbs: ICrumb[];
@@ -26,6 +26,7 @@ export interface ISearchOptionData {
     url: string;
     type?: string;
     isFirst?: boolean;
+    isForeign?: boolean;
 }
 
 interface IProps extends OptionProps<ISearchOptionData> {
@@ -37,6 +38,7 @@ interface IProps extends OptionProps<ISearchOptionData> {
 export default function SearchOption(props: IProps) {
     const { innerProps, isSelected, isFocused } = props;
     const data = props.data.data;
+    const isForeign = data?.isForeign;
 
     if (data) {
         const label = props.label;
@@ -92,6 +94,7 @@ export default function SearchOption(props: IProps) {
                                 </span>
                             )}
                             {hasLocationData && <BreadCrumbString className={classesMetas.meta} crumbs={crumbs} />}
+                            {isForeign && <MetaIcon icon="meta-external" />}
                         </span>
                     </span>
                 </SmartLink>

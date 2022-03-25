@@ -25,15 +25,22 @@ const CUSTOM_LAYOUTS_CONFIG_KEY = "labs.customLayouts";
 
 function makeTreeChildren(layouts: ILayoutDetails[], recordID: RecordID) {
     return (
-        layouts.map((layout, index) => ({
-            sort: index,
-            name: layout.name,
-            url: getRelativeUrl(LayoutOverviewRoute.url(layout)),
-            recordType: "customLayout",
-            parentID: recordID,
-            recordID: layout.layoutID,
-            children: [],
-        })) ?? []
+        layouts.map((layout, index) => {
+            const isApplied =
+                layout.layoutViewType === recordID &&
+                !!layout.layoutViews.length &&
+                !!layout.layoutViews.find((layoutView) => layoutView.layoutViewType === recordID);
+            return {
+                sort: index,
+                name: layout.name,
+                url: getRelativeUrl(LayoutOverviewRoute.url(layout)),
+                recordType: "customLayout",
+                parentID: recordID,
+                recordID: layout.layoutID,
+                children: [],
+                withCheckMark: isApplied,
+            };
+        }) ?? []
     );
 }
 
@@ -102,26 +109,36 @@ export function useAppearanceNavItems(parentID: RecordID): INavigationTreeItem[]
         return registeredNavItems.map((itemPartial: Partial<INavigationTreeItem>) => ({
             ...itemPartial,
             name: t(itemPartial?.name ?? ""),
-            parentID,
+            parentID: 0,
             sort: 0,
-            recordID: 1,
+            recordID: "registeredNavItem",
             recordType: "customLink",
             children: [],
             url: getRelativeUrl(itemPartial?.url ?? ""),
         }));
-    }, [parentID, registeredNavItems]);
+    }, [registeredNavItems]);
 
     const brandingPageLink: INavigationTreeItem = {
         name: t("Branding & SEO"),
-        parentID,
+        parentID: 0,
         sort: 0,
-        recordID: 0,
+        recordID: "brandingAndSEO",
         recordType: "customLink",
         children: [],
         url: getRelativeUrl(BrandingPageRoute.url(undefined)),
     };
 
-    const layoutTreeItem = useLayoutEditorNavTree(2, parentID);
+    //Branding & SEO and Style Guides should be part of parent named Branding & Assets
+    const brandingAndAssetsTreeItem = {
+        name: t("Branding & Assets"),
+        parentID,
+        sort: 0,
+        recordID: 0,
+        recordType: "panelMenu",
+        children: [brandingPageLink, ...otherNavItems],
+    };
 
-    return [brandingPageLink, ...otherNavItems, layoutTreeItem];
+    const layoutTreeItem = useLayoutEditorNavTree(1, parentID);
+
+    return [brandingAndAssetsTreeItem, layoutTreeItem];
 }

@@ -20,6 +20,7 @@ import React from "react";
 import "../../../design/admin-new.css";
 import { layoutSettingsSlice } from "@dashboard/layout/layoutSettings/LayoutSettings.slice";
 import { hasPermission } from "@library/features/users/Permission";
+import { t } from "@vanilla/i18n";
 
 registerContextProvider(TextEditorContextProvider);
 registerReducer(dashboardSectionSlice.name, dashboardSectionSlice.reducer);
@@ -38,14 +39,17 @@ Router.addRoutes(getAppearanceRoutes());
 supportsFrames(true);
 addPageComponent(AdminApp);
 
+const SETTINGS_PERMISSIONS = ["settings.manage", "community.moderate"];
+const ANALYTICS_PERMISSIONS = ["data.view", "dashboards.manage"];
+
 function AdminApp() {
-    if (hasPermission(["settings.manage", "community.moderate"])) {
+    if (hasPermission([...SETTINGS_PERMISSIONS, ...ANALYTICS_PERMISSIONS])) {
         return (
             <SiteNavProvider categoryRecordType="panelMenu">
                 <Router sectionRoots={["/appearance", "/analytics/v2"]} />
             </SiteNavProvider>
         );
     } else {
-        return <ErrorPage />;
+        return <ErrorPage error={{ message: t("You don't have permission to view this page.") }} />;
     }
 }

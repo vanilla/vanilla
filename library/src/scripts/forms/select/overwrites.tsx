@@ -20,6 +20,7 @@ import { components } from "react-select";
 import { CloseTinyIcon, CheckCompactIcon, DownTriangleIcon } from "@library/icons/common";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { selectOneClasses } from "@library/forms/select/selectOneStyles";
+import { GroupProps } from "react-select/lib/components/Group";
 
 /**
  * Overwrite for the controlContainer component in React Select
@@ -161,6 +162,20 @@ export function SelectOption(props: ISelectOptionOverwrite) {
                 </span>
             </button>
         </li>
+    );
+}
+
+/**
+ * Overwrite for the Group component in React Select
+ */
+export function Group(props: GroupProps<ISelectOptionOverwrite>) {
+    return (
+        <>
+            <li className="suggestedTextInput-item">
+                <span className="suggestedTextInput-groupHeading">{props.label}</span>
+            </li>
+            {props.children}
+        </>
     );
 }
 

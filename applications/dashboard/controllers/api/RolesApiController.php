@@ -5,6 +5,7 @@
  */
 
 use Garden\Schema\Schema;
+use Garden\Schema\ValidationField;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
@@ -22,7 +23,9 @@ class RolesApiController extends AbstractApiController {
     /** Maximum number of permission rows that can be displayed before an error is reported. */
     const MAX_PERMISSIONS = 100;
 
-    /** @var CategoryModel */
+    const ERROR_PERMISSION_PATCH =  'Body must be formatted as follows : [{"type", "id", "permissions"}, {"type", "id", "permissions"}, ...]';
+
+/** @var CategoryModel */
     private $categoryModel;
 
     /** @var PermissionModel */
@@ -375,8 +378,14 @@ class RolesApiController extends AbstractApiController {
     public function patch_permissions($id, array $body) {
         $this->permission('Garden.Settings.Manage');
 
-        $in = $this->schema([':a', $this->getPermissionFragment()], 'in')->setDescription('Update permissions on a role');
-        $out = $this->schema([':a', $this->getPermissionFragment()], 'out');
+        $in = $this->schema([':a' => $this->getPermissionFragment()])
+            ->setDescription('Update permissions on a role')
+            ->addValidator('', function ($data, ValidationField $field) {
+                if (empty($data)) {
+                    $field->addError('Validation Failed', ['messageCode' => self::ERROR_PERMISSION_PATCH, 'code' => 403]);
+                }
+            });
+        $out = $this->schema([':a' => $this->getPermissionFragment()], 'out');
 
         $this->roleByID($id);
 
@@ -433,8 +442,14 @@ class RolesApiController extends AbstractApiController {
     public function put_permissions($id, array $body) {
         $this->permission('Garden.Settings.Manage');
 
-        $in = $this->schema([':a', $this->getPermissionFragment()], 'in')->setDescription('Overwrite all permissions for a role.');
-        $out = $this->schema([':a', $this->getPermissionFragment()], 'out');
+        $in = $this->schema([':a' => $this->getPermissionFragment()])
+            ->setDescription('Update permissions on a role')
+            ->addValidator('', function ($data, ValidationField $field) {
+                if (empty($data)) {
+                    $field->addError('Validation Failed', ['messageCode' => self::ERROR_PERMISSION_PATCH, 'code' => 403]);
+                }
+            });
+        $out = $this->schema([':a' => $this->getPermissionFragment()], 'out');
 
         $this->roleByID($id);
 

@@ -10,6 +10,7 @@ import { logWarning, debug } from "@vanilla/utils";
 import React, { ReactElement } from "react";
 import { TabHandler } from "@vanilla/dom-utils";
 import { mountPortal } from "@vanilla/react-utils";
+import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 
 React.memo(
     function MyComponent() {
@@ -43,6 +44,7 @@ interface IProps {
 
 interface IState {
     wasDestroyed: boolean;
+    realRootID: string;
 }
 
 export const MODAL_CONTAINER_ID = "modals";
@@ -74,6 +76,7 @@ export default class Modal extends React.Component<IProps, IState> {
 
     public state: IState = {
         wasDestroyed: !this.props.isVisible,
+        realRootID: uniqueIDFromPrefix("realModalRoot"),
     };
 
     /**
@@ -84,7 +87,7 @@ export default class Modal extends React.Component<IProps, IState> {
             return null;
         }
 
-        return mountPortal(
+        const portal = mountPortal(
             <>
                 <ModalView
                     id={this.props.id}
@@ -101,6 +104,7 @@ export default class Modal extends React.Component<IProps, IState> {
                     label={"label" in this.props ? this.props.label : undefined}
                     isVisible={this.props.isVisible}
                     onKeyPress={this.props.onKeyPress}
+                    realRootID={this.state.realRootID}
                 >
                     {this.props.children}
                 </ModalView>
@@ -108,6 +112,13 @@ export default class Modal extends React.Component<IProps, IState> {
             </>,
             MODAL_CONTAINER_ID,
             true,
+        );
+        return (
+            <>
+                {/* This is just here so we can find where a modal really came from in the dom. */}
+                <span id={this.state.realRootID} style={{ display: "none" }} />
+                {portal}
+            </>
         );
     }
 
@@ -267,10 +278,6 @@ It seems auto-detection isn't working, so you'll need to specify the "elementToF
      */
     private handleModalClick = (event: React.MouseEvent) => {
         event.stopPropagation();
-        if (event.target instanceof HTMLElement && !TabHandler.isTabbable(event.target)) {
-            // Move focus to the modal instead of the body.
-            this.selfRef.current?.focus();
-        }
     };
 
     /**

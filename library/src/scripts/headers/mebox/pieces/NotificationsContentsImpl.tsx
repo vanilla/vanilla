@@ -157,6 +157,7 @@ function mapStateToProps(state: INotificationsStoreState) {
                       const transientQuery = "?" + transientQueryParams.toString();
                       return {
                           message: notification.body,
+                          messageHtml: notification.body, // The server has already sanitized this for us.
                           photo: notification.photoUrl || null,
                           photoAlt: notification.activityName
                               ? accessibleLabel(t(`User: "%s"`), [notification.activityName])

@@ -83,7 +83,8 @@
         "wikimedia/composer-merge-plugin": "^1.4.1",
         "bopoda/robots-txt-parser": "^2.4",
         "vanilla/garden-hydrate": "^2.2.1",
-        "fakerphp/faker": "^1.19"
+        "fakerphp/faker": "^1.19",
+        "symfony/lock": "^5.2"
     },
     "require-dev": {
         "cache/integration-tests": "dev-master",

@@ -104,7 +104,13 @@ export const DashboardTitleBarClasses = useThemeCache(() => {
     });
 
     const iconWrapper = css({
-        ...Mixins.margin({ top: 4, left: -4, right: 4 }),
+        ...Mixins.margin({ left: -4, right: 4 }),
+        width: 28,
+        height: 28,
+        "& svg": {
+            width: "100%",
+            height: "100%",
+        },
     });
 
     return {

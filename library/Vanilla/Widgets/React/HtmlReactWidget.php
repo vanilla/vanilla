@@ -26,6 +26,13 @@ class HtmlReactWidget implements ReactWidgetInterface, CombinedPropsWidgetInterf
     }
 
     /**
+     * @return string
+     */
+    public static function getWidgetIconPath(): string {
+        return "/applications/dashboard/design/images/widgetIcons/customhtml.svg";
+    }
+
+    /**
      * @inheritdoc
      */
     public static function getWidgetSchema(): Schema {
@@ -54,7 +61,7 @@ class HtmlReactWidget implements ReactWidgetInterface, CombinedPropsWidgetInterf
      * @inheritdoc
      */
     public static function getWidgetName(): string {
-        return 'Html Widget';
+        return 'Custom HTML';
     }
 
     /**

@@ -21,7 +21,7 @@ export const borderExpander: ITypeExpander = {
             {
                 ...variable,
                 title: "width",
-                description: `Set the width of the border. Numerical units are interpretted as pixels.`,
+                description: `Set the width of the border. Numerical units are interpreted as pixels.`,
                 key: variable.key + ".width",
                 type: ["string", "number"],
             },
@@ -36,7 +36,7 @@ export const borderExpander: ITypeExpander = {
             {
                 ...variable,
                 title: "radius",
-                description: `Set the radius of the border. Numerical units are interpretted as pixels.`,
+                description: `Set the radius of the border. Numerical units are interpreted as pixels.`,
                 key: variable.key + ".radius",
                 type: ["string", "number"],
             },

@@ -3,7 +3,7 @@
  * ProfileExtender Plugin.
  *
  * @author Lincoln Russell <lincoln@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package ProfileExtender
  */
@@ -277,7 +277,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     /**
      * Set the label on the Title and Location fields if there is a ProfileExtender field for them.
      *
-     * @param ProfileExtender $sender
+     * @param ProfileController $sender
      */
     public function profileController_beforeEdit_handler($sender) {
         if (c('ProfileExtender.Fields.Title.Label')) {
@@ -467,7 +467,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
 
                 // Fallback in case the name is empty
                 if (empty($name)) {
-                    $name = $testSlug = md5($field);
+                    $name = $testSlug = md5(val('Label', $formPostValues));
                 }
                 $keys = $fields;
                 array_walk($keys, function (&$item) {

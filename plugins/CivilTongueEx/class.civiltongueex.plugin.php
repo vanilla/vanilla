@@ -1,8 +1,9 @@
 <?php
 /**
- * Based on the Civil Tongue plugin.
+ * @copyright 2008-2022 Vanilla Forums, Inc.
+ * @license GPLv2
  *
- * @package CivilTongueEx
+ * Based on the Civil Tongue plugin.
  */
 
 // 1.0 - Fix empty pattern when list ends in semi-colon, use non-custom permission (2012-03-12 Lincoln)
@@ -88,7 +89,7 @@ class CivilTonguePlugin extends Gdn_Plugin {
     /**
      * Clean up activities and activity comments.
      *
-     * @param Controller $sender
+     * @param Gdn_Controller $sender
      * @param array $args
      */
     public function activityController_render_before($sender, $args) {
@@ -445,6 +446,7 @@ class CivilTonguePlugin extends Gdn_Plugin {
      *
      * @param PollModule $sender Poll Module.
      * @param array $args Sending arguments.
+     * @psalm-suppress UndefinedDocblockClass
      */
     public function pollModule_afterLoadPoll_handler($sender, $args) {
         if ($options = val('PollOptions', $args)) {

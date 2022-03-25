@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -23,7 +23,7 @@ use Vanilla\Scheduler\SchedulerInterface;
  * Features:
  * - Can give an invalidation processor for the pipeline model.
  * - Uses symfony cache contracts:
- *   - A lock is aquired when calculating a cache value to prevent instances contending for resources to generate the same value.
+ *   - A lock is acquired when calculating a cache value to prevent instances contending for resources to generate the same value.
  *   - Values may be recalculated early on random requests to prevent the value from expiring.
  */
 class ModelCache {
@@ -71,11 +71,21 @@ class ModelCache {
      */
     public function __construct(string $cacheNameSpace, \Gdn_Cache $cache, array $defaultCacheOptions = []) {
         $this->cache = new CacheCacheAdapter($cache);
-        $cacheContract = new Psr16Adapter($this->cache, $cacheNameSpace);
-        $this->setCacheContract($cacheContract);
+        $this->cacheContract = new Psr16Adapter($this->cache, $cacheNameSpace);
+        // Apply our own callback lock mechanism.
+        // Unfortunately have to cheat a bit on this because this is often manually constructed.
+        $lockRegistry = \Gdn::getContainer()->get(ModelCacheLockRegistry::class);
+        $this->applyLockRegistry($lockRegistry);
         $this->cacheNameSpace = $cacheNameSpace;
         $this->defaultCacheOptions = array_merge(self::GLOBAL_DEFAULT_OPTIONS, $defaultCacheOptions ?? []);
         $this->isFeatureDisabled = FeatureFlagHelper::featureEnabled(self::DISABLE_FEATURE_FLAG);
+    }
+
+    /**
+     * @param ModelCacheLockRegistry $lockRegistry
+     */
+    public function applyLockRegistry(ModelCacheLockRegistry $lockRegistry) {
+        $this->cacheContract->setCallbackWrapper([$lockRegistry, 'compute']);
     }
 
     /**
@@ -183,13 +193,6 @@ class ModelCache {
      */
     public function createInvalidationProcessor(): ModelCacheInvalidationProcessor {
         return new ModelCacheInvalidationProcessor($this);
-    }
-
-    /**
-     * @param \Symfony\Contracts\Cache\CacheInterface $cacheContract
-     */
-    public function setCacheContract(\Symfony\Contracts\Cache\CacheInterface $cacheContract): void {
-        $this->cacheContract = $cacheContract;
     }
 
     /**

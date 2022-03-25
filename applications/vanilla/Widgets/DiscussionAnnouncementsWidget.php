@@ -28,7 +28,7 @@ class DiscussionAnnouncementsWidget extends AnnouncementWidgetModule implements 
      * @inheritDoc
      */
     public static function getWidgetName(): string {
-        return "Discussion - Announcements";
+        return "Announcements";
     }
 
     /**
@@ -37,6 +37,13 @@ class DiscussionAnnouncementsWidget extends AnnouncementWidgetModule implements 
     public static function getComponentName(): string {
         // Temporarily this until we make a version supported grids and carousels.
         return "DiscussionListModule";
+    }
+
+    /**
+     * @return string
+     */
+    public static function getWidgetIconPath(): string {
+        return "/applications/dashboard/design/images/widgetIcons/announcements.svg";
     }
 
     /**

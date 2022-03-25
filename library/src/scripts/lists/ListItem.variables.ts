@@ -72,6 +72,7 @@ export const listItemVariables = useThemeCache(
             /**
              * @varGroup listItem.title.font
              * @description Font variables for the default state of the title.
+             * @expand font
              */
             font: Variables.font({
                 ...globalVars.fontSizeAndWeightVars("large", "semiBold"),
@@ -84,8 +85,9 @@ export const listItemVariables = useThemeCache(
         const title = makeVars("title", {
             ...titleInit,
             /**
-             * @varGroup listItem.title.font
-             * @description Font variables title when it is being interacted with. (hover, active, focus).
+             * @varGroup listItem.title.fontState
+             * @description Font variables when the title is being interacted with. (hover, active, focus).
+             * @expand font
              */
             fontState: Variables.font({
                 color: isDefaultFontColor
@@ -98,6 +100,7 @@ export const listItemVariables = useThemeCache(
             /**
              * @varGroup listItem.description.font
              * @description Font variables for the default state of the title.
+             * @expand font
              */
             font: Variables.font({
                 size: globalVars.fonts.size.medium,

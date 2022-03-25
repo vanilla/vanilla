@@ -78,14 +78,7 @@ class ConversationModel extends ConversationsModel {
                 $this->Database->query(DBAModel::getCountSQL('count', 'Conversation', 'ConversationMessage', $column, 'MessageID'));
                 break;
             case 'CountParticipants':
-                $innerSQL = <<<SQL
-select count(uc.ConversationID)
-from GDN_UserConversation uc
-where uc.ConversationID = c.ConversationID and uc.Deleted = 0
-SQL;
-                $this->SQL->update('Conversation c')
-                    ->set('c.CountParticipants', $innerSQL, false, false)
-                    ->put();
+                $this->Database->query(DBAModel::getCountSQL('count', 'Conversation', 'UserConversation', 'CountParticipants', 'UserID'));
                 break;
             case 'FirstMessageID':
                 $this->Database->query(DBAModel::getCountSQL('min', 'Conversation', 'ConversationMessage', $column, 'MessageID'));

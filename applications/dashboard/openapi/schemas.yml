@@ -67,6 +67,34 @@ components:
                           type: string
                   required:
                       - ssoID
+        MainImage:
+            description: The main image, pulled from content.
+            type: object
+            properties:
+                url:
+                    description: The original image URL.
+                    type: string
+                urlSrcSet:
+                    $ref: "schemas.yml#/components/schemas/SrcSet"
+                alt:
+                    description: The image's alternative text.
+                    type: string
+        SrcSet:
+            description: An image's srcset for various sizes.
+            type: object
+            properties:
+                10:
+                    description: 10px large Image url.
+                    type: string
+                300:
+                    description: 300px large Image url.
+                    type: string
+                800:
+                    description: 800px large Image url.
+                    type: string
+                1200:
+                    description: 1200px large Image url.
+                    type: string
         RangeExpression:
             description: Specify a range or CSV of values.
             type: string

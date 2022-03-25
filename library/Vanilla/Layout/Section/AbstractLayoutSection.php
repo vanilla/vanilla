@@ -17,4 +17,11 @@ use Vanilla\Widgets\React\ReactWidgetInterface;
 abstract class AbstractLayoutSection implements ReactWidgetInterface, CombinedPropsWidgetInterface {
 
     use CombinedPropsWidgetTrait;
+
+    /**
+     * @return string
+     */
+    public static function getWidgetIconPath(): string {
+        return "";
+    }
 }

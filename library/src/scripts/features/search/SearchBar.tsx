@@ -27,10 +27,13 @@ import { AsyncCreatable, components } from "react-select";
 import { MenuProps } from "react-select/lib/components/Menu";
 import { ActionMeta, InputActionMeta } from "react-select/lib/types";
 import { useSearchScope } from "@library/features/search/SearchScopeContext";
+import { useSearchSources } from "@library/search/SearchSourcesContextProvider";
 import { PLACES_CATEGORY_TYPE, PLACES_KNOWLEDGE_BASE_TYPE, PLACES_GROUP_TYPE } from "@library/search/searchConstants";
 import { Icon } from "@vanilla/icons";
 import { cx } from "@emotion/css";
 import { sprintf } from "sprintf-js";
+import { ISearchSource } from "@library/search/searchTypes";
+import { DEFAULT_SEARCH_SOURCE } from "@library/search/SearchService";
 
 // Re-exported after being moved.
 export { IComboBoxOption };
@@ -50,7 +53,7 @@ export default React.forwardRef(function SearchBar(
         placeholder: "",
         ...props,
     };
-
+    const { sources } = useSearchSources();
     const [isFocused, setFocused] = useState(false);
     const prefix = "searchBar";
     const ownID = useUniqueID(prefix);
@@ -162,6 +165,7 @@ export default React.forwardRef(function SearchBar(
             ClearIndicator: selectOverrides.NullComponent,
             DropdownIndicator: selectOverrides.NullComponent,
             LoadingMessage: selectOverrides.OptionLoader,
+            Group: selectOverrides.Group,
         };
     }, [optionComponent, resultsRef]);
 
@@ -187,25 +191,36 @@ export default React.forwardRef(function SearchBar(
             isValidNewOption={() => true}
             cached={true}
             loadOptions={() => {
-                return props.loadOptions?.(props.value).then((results) => {
+                return props.loadOptions?.(props.value).then((loadedOptions) => {
                     // We want items belonging to group, category, and kb types to be on top
                     // of the list (inline elements), but we cannot simply copy over, since
                     // react-select use label to identify the items, and so there will be
                     // double hover, double listing etc. behavior.
-                    const placesListingResults = results
-                        .filter((result) =>
-                            [PLACES_GROUP_TYPE, PLACES_CATEGORY_TYPE, PLACES_KNOWLEDGE_BASE_TYPE].includes(result.type),
+                    const placesListingResults = loadedOptions
+                        .filter((option) =>
+                            [PLACES_GROUP_TYPE, PLACES_CATEGORY_TYPE, PLACES_KNOWLEDGE_BASE_TYPE].includes(option.type),
                         )
-                        .map((result) => ({ ...result, label: `places___${result.label}___` }));
+                        .map((option) => ({ ...option, label: `places___${option.label}___` }));
 
                     if (placesListingResults[0]) {
                         placesListingResults[0].data.isFirst = true;
                     }
 
-                    const result = [...placesListingResults, ...results];
+                    const results = [...placesListingResults, ...loadedOptions];
 
-                    setOptions(result);
-                    return result;
+                    setOptions(results);
+
+                    return [
+                        ...results.filter(({ source }) => source === DEFAULT_SEARCH_SOURCE.key),
+                        ...sources
+                            .filter((source) => source.key !== DEFAULT_SEARCH_SOURCE.key)
+                            .map((source) => ({
+                                label: source.getLabel(),
+                                options: results.filter(
+                                    ({ source: resultSourceKey }) => source.key === resultSourceKey,
+                                ),
+                            })),
+                    ];
                 });
             }}
             defaultOptions={props.forcedOptions}

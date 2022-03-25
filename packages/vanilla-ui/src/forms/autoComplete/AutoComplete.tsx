@@ -422,7 +422,11 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
                 <div
                     className={cx(classes.inputContainer, props.className)}
                     ref={containerRef}
-                    onClick={() => inputRef?.current && inputRef?.current?.focus()}
+                    onClick={(e: React.MouseEvent) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        inputRef?.current && inputRef?.current?.focus();
+                    }}
                 >
                     {isMultiple && (
                         <>

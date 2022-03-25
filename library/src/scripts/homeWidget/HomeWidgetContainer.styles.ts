@@ -65,7 +65,7 @@ interface IViewAll {
 
 /**
  * @varGroup homeWidgetContainer
- * @title HomeWidget Container
+ * @title Home Widget Container
  * @description The home widget container controls the grid of home widget items. It doesn't affect the individual items, instead focusing on the content around the items and their arrangement/placement together.
  */
 export const homeWidgetContainerVariables = useThemeCache(
@@ -75,11 +75,6 @@ export const homeWidgetContainerVariables = useThemeCache(
         const itemVars = homeWidgetItemVariables({}, forcedVars);
         const pageHeadingVars = pageHeadingBoxVariables();
 
-        /**
-         * @varGroup homeWidgetContainer.options
-         * @commonTitle HomeWidget - Options
-         * @description Control different variants for the HomeWidget. These options can affect multiple parts of the HomeWidget at once.
-         */
         let options = makeVars(
             "options",
             {
@@ -103,7 +98,7 @@ export const homeWidgetContainerVariables = useThemeCache(
                     : 3,
                 subtitle: {
                     type: pageHeadingVars.options.subtitleType,
-                    // FIXME take this out of varialbes entirely. Pretty weird.
+                    // FIXME take this out of variables entirely. Pretty weird.
                     content: undefined as string | undefined,
                 },
                 description: undefined as string | undefined,
@@ -155,8 +150,7 @@ export const homeWidgetContainerVariables = useThemeCache(
 
         /**
          * @varGroup homeWidgetContainer.itemSpacing
-         * @commonTitle HomeWidget Grid Spacing
-         * @expand spacing
+         * @commonTitle Grid Spacing
          */
         const itemSpacing = makeVars(
             "itemSpacing",
@@ -176,11 +170,16 @@ export const homeWidgetContainerVariables = useThemeCache(
                 vertical: globalVars.gutter.size,
 
                 /**
-                 * @var homeWidgetContainer.itemSpacing.mobile
-                 * @description Sets the amount of horizontal padding the container has on mobile devices.
-                 * @type string | number
+                 * @varGroup homeWidgetContainer.itemSpacing.mobile
+                 * @title Mobile
                  */
                 mobile: {
+                    /**
+                     * @var homeWidgetContainer.itemSpacing.mobile.horizontal
+                     * @title Horizontal
+                     * @description Sets the amount of horizontal padding the container has on mobile devices.
+                     * @type string | number
+                     */
                     horizontal:
                         options.borderType === "navLinks" ? mobileNavPaddings.horizontal : globalVars.gutter.size,
                 },

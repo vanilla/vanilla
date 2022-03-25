@@ -44,16 +44,18 @@ export const profileVariables = useThemeCache(() => {
     const photo = makeVars("photo", {
         /**
          * @var profile.photo.border.radius
-         * @title Controls the border radius of the photo
-         * @type number
+         * @title Border radius
+         * @description Controls the border radius of the photo
+         * @type number | string
          */
         border: {
             radius: "50%",
         },
         /**
          * @var profile.photo.size
-         * @title Controls the size of the photo wrapped inside a wrapper
-         * @type  number
+         * @title Size
+         * @description Controls the size of the photo wrapped inside a wrapper
+         * @type number
          */
         size: 220,
     });

@@ -23,10 +23,9 @@ export const EmbedMenuContext = createContext<IEmbedMenuContext>({
 interface IProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 /**
- * Renders an embed menu and manages it's context.
+ * Renders an embed menu and manages its context.
  */
 export function EditorEmbedMenu(props: PropsWithChildren<IProps>) {
-    const { children } = props;
     const [selected, setSelected] = useState<string | undefined>();
     return (
         <EmbedMenuContext.Provider value={{ selected, setSelected }}>
@@ -38,17 +37,13 @@ export function EditorEmbedMenu(props: PropsWithChildren<IProps>) {
 }
 
 /**
- * Renders an embed menu and manages it's context.
+ * Renders an embed menu and manages its context.
  */
 export function EmbedMenu(props: PropsWithChildren<IProps> & { isOpened?: boolean }) {
-    const { children, ...restProps } = props;
+    const { children, isOpened, ...restProps } = props;
     const classes = embedMenuClasses();
     return (
-        <div
-            {...restProps}
-            role="toolbar"
-            className={cx({ [classes.root]: true, isOpened: props.isOpened }, props.className)}
-        >
+        <div {...restProps} role="toolbar" className={cx({ [classes.root]: true, isOpened }, props.className)}>
             {children}
         </div>
     );

@@ -15,11 +15,13 @@ use PHPMailer\PHPMailer\PHPMailer;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
+use Vanilla\CurrentTimeStamp;
 use Vanilla\Dashboard\Models\ActivityEmail;
 use Vanilla\Formatting\Formats\TextFormat;
 use Vanilla\Formatting\Formats;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Dashboard\Events\NotificationEvent;
+use Vanilla\Formatting\Html\HtmlSanitizer;
 use Vanilla\Models\UserFragmentSchema;
 use Vanilla\Utility\CamelCaseScheme;
 
@@ -527,12 +529,12 @@ class ActivityModel extends Gdn_Model {
     }
 
     /**
+     * Get an activity type by its name or ID.
      *
-     *
-     * @param $activityType
-     * @return bool
+     * @param int|string $activityTypeIDOrName
+     * @return array|false
      */
-    public static function getActivityType($activityType) {
+    public static function getActivityType($activityTypeIDOrName) {
         if (self::$ActivityTypes === null) {
             $data = Gdn::sql()->get('ActivityType')->resultArray();
             foreach ($data as $row) {
@@ -540,8 +542,8 @@ class ActivityModel extends Gdn_Model {
                 self::$ActivityTypes[$row['ActivityTypeID']] = $row;
             }
         }
-        if (isset(self::$ActivityTypes[$activityType])) {
-            return self::$ActivityTypes[$activityType];
+        if (isset(self::$ActivityTypes[$activityTypeIDOrName])) {
+            return self::$ActivityTypes[$activityTypeIDOrName];
         }
         return false;
     }
@@ -1645,7 +1647,9 @@ class ActivityModel extends Gdn_Model {
         if (val('CheckRecord', $options)) {
             // Check to see if this record already notified so we don't notify multiple times.
             $where = arrayTranslate($activity, ['NotifyUserID', 'RecordType', 'RecordID']);
-            $where['DateUpdated >'] = Gdn_Format::toDateTime(strtotime('-2 days')); // index hint
+            $where['DateUpdated >'] = Gdn_Format::toDateTime(
+                CurrentTimeStamp::getDateTime()->modify("-2 days")->getTimestamp()
+            ); // index hint
 
             $checkActivity = $this->SQL->getWhere(
                 'Activity',
@@ -1671,7 +1675,9 @@ class ActivityModel extends Gdn_Model {
             }
             $where['NotifyUserID'] = $activity['NotifyUserID'];
             // Make sure to only group activities by day.
-            $where['DateInserted >'] = Gdn_Format::toDateTime(strtotime('-1 day'));
+            $where['DateInserted >'] = Gdn_Format::toDateTime(
+                CurrentTimeStamp::getDateTime()->modify("-1 day")->getTimestamp()
+            );
 
             // See if there is another activity to group these into.
             $groupActivity = $this->SQL->getWhere(
@@ -2065,7 +2071,7 @@ class ActivityModel extends Gdn_Model {
             return null;
         } else {
             $tz = new \DateTimeZone('UTC');
-            $now = new DateTime('now', $tz);
+            $now = new DateTime('@' . CurrentTimeStamp::get(), $tz);
             $test = new DateTime($this->pruneAfter, $tz);
 
             $interval = $test->diff($now);
@@ -2087,7 +2093,7 @@ class ActivityModel extends Gdn_Model {
     public function setPruneAfter($pruneAfter) {
         if ($pruneAfter) {
             // Make sure the string is negative.
-            $now = time();
+            $now = CurrentTimeStamp::get();
             $testTime = strtotime($pruneAfter, $now);
             if ($testTime === false) {
                 throw new InvalidArgumentException('Invalid timespan value for "prune after".', 400);
@@ -2363,6 +2369,9 @@ class ActivityModel extends Gdn_Model {
         $body = formatString($row["Headline"], $row);
         // Replace anchors with bold text until notifications can be spun off from activities.
         $row["body"] = preg_replace("#<a [^>]+>(.+)</a>#Ui", "<strong>$1</strong>", $body);
+
+        $htmlSanitizer = \Gdn::getContainer()->get(HtmlSanitizer::class);
+        $row['body'] = $htmlSanitizer->filter($row['body']);
 
         $scheme = new CamelCaseScheme();
         $result = $scheme->convertArrayKeys($row);

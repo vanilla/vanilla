@@ -17,7 +17,7 @@
  *  1.6.1   The spacening.
  *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
+ * @copyright 2009-2022 Vanilla Forums, Inc
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  * @package Addons
  */
@@ -62,7 +62,8 @@ class SignaturesPlugin extends Gdn_Plugin {
     /**
      * Add mapper methods
      *
-     * @param SimpleApiPlugin $sender
+     * @param SimpleAPIPlugin $sender
+     * @psalm-suppress UndefinedDocblockClass
      */
     public function simpleApiPlugin_mapper_handler($sender) {
         switch ($sender->Mapper->Version) {
@@ -124,9 +125,9 @@ class SignaturesPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Handle the preferences endpoints.
      *
-     *
-     * @param $sender
+     * @param Gdn_Controller $sender
      */
     public function controller_index($sender) {
         $sender->permission([
@@ -241,7 +242,7 @@ class SignaturesPlugin extends Gdn_Plugin {
      * Check if format is Rich Format, and body is formatted correctly
      *
      * @param array $frmValues settings form values
-     * @param Controller $sender sender controller
+     * @param Gdn_Controller $sender sender controller
      */
     public function validateSignatureFormat(array $frmValues, &$sender) {
         $format = null;
@@ -272,7 +273,7 @@ class SignaturesPlugin extends Gdn_Plugin {
      * and executes the external ValidateSignature function, if it exists.
      *
      * @param array $values Signature settings form values
-     * @param Controller $sender
+     * @param Gdn_Controller $sender
      */
     public function crossCheckSignature($values, &$sender) {
         $this->checkSignatureLength($values, $sender);
@@ -586,7 +587,7 @@ class SignaturesPlugin extends Gdn_Plugin {
     /**
      * Add a custom signature style tag to enforce image height.
      *
-     * @param Gdn_Control $sender
+     * @param Gdn_Controller $sender
      * @param array $args
      */
     public function base_render_before($sender, $args) {

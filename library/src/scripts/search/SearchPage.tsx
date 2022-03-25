@@ -28,7 +28,7 @@ import { useLastValue } from "@vanilla/react-utils";
 import classNames from "classnames";
 import debounce from "lodash/debounce";
 import qs from "qs";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { useLocation, useHistory } from "react-router";
 import TwoColumnSection from "@library/layout/TwoColumnSection";
 import { SectionProvider, useSection } from "@library/layout/LayoutContext";
@@ -47,6 +47,9 @@ import History from "history";
 import { Backgrounds } from "@library/layout/Backgrounds";
 import { PlacesSearchTypeFilter } from "@dashboard/components/panels/PlacesSearchTypeFilter";
 import moment from "moment";
+import { Tabs } from "@library/sectioning/Tabs";
+import { TabsTypes } from "@library/sectioning/TabsTypes";
+import { useSearchSources } from "@library/search/SearchSourcesContextProvider";
 
 interface IProps {
     placeholder?: string;
@@ -62,9 +65,15 @@ function SearchPage(props: IProps) {
         getCurrentDomain,
         getDefaultFormValues,
     } = useSearchForm<{}>();
+
     const { isCompact } = useSection();
     const classes = pageTitleClasses();
     useInitialQueryParamSync();
+
+    const { sources, currentSource, setCurrentSource } = useSearchSources();
+    const lastSourceKey = useLastValue(currentSource.key);
+
+    const currentSourceIsCommunity = currentSource.key === "community";
 
     const currentDomain = getCurrentDomain();
 
@@ -102,30 +111,76 @@ function SearchPage(props: IProps) {
         specificRecordID = currentDomain.getSpecificRecord?.(form);
     }
 
-    const resultsHeader = (
-        <PanelWidgetHorizontalPadding>
-            <SortAndPaginationInfo
-                pages={results.data?.pagination}
-                sortValue={form.sort}
-                onSortChange={(newSort) => updateForm({ sort: newSort })}
-                sortOptions={currentDomain?.getSortValues() ?? []}
-            />
-        </PanelWidgetHorizontalPadding>
-    );
+    const rightTopContent = useMemo<React.ReactNode>(() => {
+        if (hasSpecificRecord) {
+            return currentDomain.SpecificRecordPanel ?? null;
+        }
+        if (currentSource?.queryFilterComponent) {
+            return currentSource.queryFilterComponent ?? null;
+        }
+        return currentFilter;
+    }, [
+        currentDomain.SpecificRecordPanel,
+        currentFilter,
+        currentSource.queryFilterComponent,
+        hasSpecificRecord,
+        isCompact,
+    ]);
 
     const { needsResearch } = form;
     useEffect(() => {
         // Trigger new search
-        if (needsResearch || (lastScope && lastScope !== scope)) {
+        if (
+            needsResearch ||
+            (lastScope && lastScope !== scope) ||
+            (lastSourceKey && lastSourceKey !== currentSource.key)
+        ) {
             search();
             currentDomain.extraSearchAction?.();
         }
-    }, [search, needsResearch, lastScope, scope, currentDomain]);
+    }, [search, needsResearch, lastScope, scope, currentDomain, lastSourceKey, currentSource.key]);
 
     const domains = getDomains();
     const sortedNonIsolatedDomains = domains
         .filter((domain) => !domain.isIsolatedType())
         .sort((a, b) => a.sort - b.sort);
+
+    const sortAndPaginationContent = useMemo(() => {
+        return (
+            <SortAndPaginationInfo
+                pages={results.data?.pagination}
+                sortValue={form.sort}
+                onSortChange={(newSort) => updateForm({ sort: newSort })}
+                sortOptions={currentDomain?.getSortValues() ?? currentSource?.sortOptions ?? []}
+            />
+        );
+    }, [currentDomain, form.sort, results, updateForm, currentSource]);
+
+    let mainBottomContent = (
+        <>
+            {sortAndPaginationContent}
+            <SearchPageResults />
+        </>
+    );
+
+    if (sources.length > 1) {
+        mainBottomContent = (
+            <Tabs
+                defaultTabIndex={sources.map(({ key }) => key).indexOf(currentSource.key)}
+                includeVerticalPadding={false}
+                includeBorder={false}
+                largeTabs
+                tabType={TabsTypes.BROWSE}
+                data={sources.map((source) => ({
+                    tabID: source.key,
+                    label: source.getLabel(),
+                    contents: <SearchPageResults />,
+                }))}
+                onChange={({ tabID: newSourceKey }) => setCurrentSource(`${newSourceKey!}`)}
+                extraButtons={sortAndPaginationContent}
+            />
+        );
+    }
 
     return (
         // Add a context provider so that smartlinks within search use dynamic navigation.
@@ -135,7 +190,13 @@ function SearchPage(props: IProps) {
                 <Banner isContentBanner />
                 <Container>
                     <QueryString
-                        value={{ ...form, initialized: undefined, scope, needsResearch: undefined }}
+                        value={{
+                            ...form,
+                            initialized: undefined,
+                            scope,
+                            needsResearch: undefined,
+                            source: currentSource.key,
+                        }}
                         defaults={getDefaultFormValues()}
                     />
                     <TwoColumnSection
@@ -185,7 +246,7 @@ function SearchPage(props: IProps) {
                                             <SpecificRecordComponent discussionID={specificRecordID} />
                                         )}
                                     </ConditionalWrap>
-                                    {!hasSpecificRecord && (
+                                    {!hasSpecificRecord && currentSourceIsCommunity && (
                                         <SearchInFilter
                                             setData={(newDomain) => {
                                                 updateForm({ domain: newDomain });
@@ -209,24 +270,21 @@ function SearchPage(props: IProps) {
                                                 })}
                                         />
                                     )}
-                                    {PlacesSearchTypeFilter.searchTypes.length > 0 && currentDomain.heading}
+                                    {currentSourceIsCommunity &&
+                                        PlacesSearchTypeFilter.searchTypes.length > 0 &&
+                                        currentDomain.heading}
                                 </PanelWidget>
-                                {isCompact && (
+                                {isCompact && currentSourceIsCommunity && (
                                     <PanelWidgetHorizontalPadding>
-                                        <Drawer title={t("Filter Results")}>{currentFilter}</Drawer>
+                                        <Drawer title={t("Filter Results")}>
+                                            {currentSourceIsCommunity ? currentFilter : rightTopContent}
+                                        </Drawer>
                                     </PanelWidgetHorizontalPadding>
                                 )}
-                                {resultsHeader}
                             </>
                         }
-                        mainBottom={<SearchPageResults />}
-                        rightTop={
-                            !isCompact && (
-                                <PanelWidget>
-                                    {hasSpecificRecord ? <SpecificRecordFilter /> : currentFilter}
-                                </PanelWidget>
-                            )
-                        }
+                        mainBottom={<PanelWidgetHorizontalPadding>{mainBottomContent}</PanelWidgetHorizontalPadding>}
+                        rightTop={!isCompact && <PanelWidget>{rightTopContent}</PanelWidget>}
                     />
                 </Container>
             </DocumentTitle>
@@ -239,6 +297,8 @@ function useInitialQueryParamSync() {
     const history = useHistory();
     const location = useLocation();
     const searchScope = useSearchScope();
+
+    const { sources, setCurrentSource } = useSearchSources();
 
     const { initialized } = form;
 
@@ -288,6 +348,10 @@ function useInitialQueryParamSync() {
             if (key === "discussionID") {
                 queryForm.domain = "discussions";
             }
+
+            if (key === "source") {
+                queryForm.source = queryForm[key];
+            }
         }
 
         const blockedKeys = ["needsResearch", "initialized"];
@@ -299,6 +363,10 @@ function useInitialQueryParamSync() {
 
         if (typeof queryForm.scope === "string") {
             searchScope.setValue?.(queryForm.scope);
+        }
+
+        if (typeof queryForm.source === "string" && sources.find(({ key }) => key === queryForm.source)) {
+            setCurrentSource(queryForm.source);
         }
 
         queryForm.initialized = true;

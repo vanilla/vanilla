@@ -26,7 +26,6 @@ class ThemeFeaturesTest extends MinimalContainerTestCase {
         $this->assertTrue($features->useSharedMasterView());
         $this->assertTrue($features->useNewFlyouts());
         $this->assertTrue($features->useProfileHeader());
-        $this->assertTrue($features->disableKludgedVars());
     }
 
     /**
@@ -39,7 +38,6 @@ class ThemeFeaturesTest extends MinimalContainerTestCase {
         $this->assertTrue($features->useSharedMasterView());
         $this->assertTrue($features->useNewFlyouts());
         $this->assertFalse($features->useProfileHeader());
-        $this->assertFalse($features->disableKludgedVars());
     }
 
     /**
@@ -65,6 +63,5 @@ class ThemeFeaturesTest extends MinimalContainerTestCase {
         $this->assertTrue($features->useSharedMasterView());
         $this->assertFalse($features->useNewFlyouts());
         $this->assertFalse($features->useProfileHeader());
-        $this->assertFalse($features->disableKludgedVars());
     }
 }

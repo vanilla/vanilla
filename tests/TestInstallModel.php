@@ -224,7 +224,7 @@ class TestInstallModel extends InstallModel {
         }
 
         if (class_exists(\ReactionModel::class)) {
-            \ReactionModel::resetForTests();
+            \ReactionModel::resetStaticCache();
         }
     }
 

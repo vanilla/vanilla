@@ -41,7 +41,7 @@ class SectionThreeColumns extends AbstractLayoutSection {
      * @inheritdoc
      */
     public static function getWidgetName(): string {
-        return '3 Column Layout';
+        return '3 Columns';
     }
 
     /**
@@ -49,5 +49,12 @@ class SectionThreeColumns extends AbstractLayoutSection {
      */
     public static function getWidgetID(): string {
         return 'section.3-columns';
+    }
+
+    /**
+     * @return string
+     */
+    public static function getWidgetIconPath(): string {
+        return "/applications/dashboard/design/images/sectionIcons/3column.svg";
     }
 }

@@ -17,7 +17,6 @@ class ApplicantsTest extends AbstractResourceTest {
     public function __construct($name = null, array $data = [], $dataName = '') {
         $this->baseUrl = '/applicants';
         $this->patchFields = ['status'];
-        $this->editFields = ['status'];
         $this->pk = 'applicantID';
 
         parent::__construct($name, $data, $dataName);

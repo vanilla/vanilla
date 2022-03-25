@@ -1077,8 +1077,6 @@ components:
                     description: The group the discussion is in.
                     nullable: true
                     type: integer
-                image:
-                    $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/MainImage"
                 insertUser:
                     $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/UserFragment"
                 insertUserID:

@@ -1,14 +1,5 @@
-<?php
-/**
- * @copyright 2009-2019 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */
+<?php if (!defined('APPLICATION')) exit;
 
-if (!defined('APPLICATION')) {
-    exit;
-}
-
-/** @var QnAPlugin $this */
 Gdn::structure()->table('Discussion');
 
 $QnAExists = Gdn::structure()->columnExists('QnA');
@@ -32,7 +23,6 @@ Gdn::structure()
     ->column('CountAcceptedAnswers', 'int', '0')
     ->set();
 
-/** @psalm-suppress InvalidScope */
 if ($this->questionFollowupFeatureEnabled()) {
     Gdn::structure()
         ->table('Category')
@@ -71,14 +61,9 @@ if ($QnAExists && !$DateAcceptedExists) {
 // Define 'Answer' badges
 
 if (Gdn::addonManager()->isEnabled('badges', \Vanilla\Addon::TYPE_ADDON) && c('Plugins.QnA.Badges', true)) {
-    /** @psalm-suppress InaccessibleProperty  */
     $this->Badges = true;
 }
 
-/**
- * @psalm-suppress InaccessibleProperty
- * @psalm-suppress UndefinedClass
- */
 if ($this->Badges && class_exists('BadgeModel')) {
     $BadgeModel = new BadgeModel();
 
@@ -166,11 +151,9 @@ if ($this->Badges && class_exists('BadgeModel')) {
 // Define 'Accept' reaction
 
 if (Gdn::addonManager()->isEnabled('Reactions', \Vanilla\Addon::TYPE_ADDON) && c('Plugins.QnA.Reactions', true)) {
-    /** @psalm-suppress InaccessibleProperty  */
     $this->Reactions = true;
 }
 
-/** @psalm-suppress InaccessibleProperty  */
 if ($this->Reactions && class_exists('ReactionModel')) {
     $Rm = new ReactionModel();
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -92,7 +92,7 @@ class AnswerModel implements EventFromRowInterface {
      * @param array|object $discussion
      * @param array|object $comment
      * @param string|null $newQnA
-     * @param \Gdn_Form|null $form
+     * @param Gdn_Form|null $form
      *
      * @internal
      */

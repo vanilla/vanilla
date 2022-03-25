@@ -157,7 +157,9 @@ class RichEditorPlugin extends Gdn_Plugin {
                 $categoryID = $controller->data('Category.CategoryID', $controller->data('ContextualCategoryID'));
                 // Check the category exists.
                 $category = CategoryModel::categories($categoryID);
-                $viewData['uploadEnabled'] = CategoryModel::checkAllowFileUploads($category);
+                $viewData['uploadEnabled'] = is_array($category) && key_exists('AllowFileUploads', $category) ?
+                    (bool)$category['AllowFileUploads'] :
+                    true;
             }
 
             if ($isForcedRich) {

@@ -2,7 +2,7 @@
 /**
  * Comment model
  *
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Vanilla
  * @since 2.0
@@ -18,12 +18,11 @@ use Vanilla\Community\Schemas\PostFragmentSchema;
 use Vanilla\Events\LegacyDirtyRecordTrait;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Exception\PermissionException;
+use Vanilla\Formatting\Formats\RichFormat;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\FormatFieldTrait;
 use Vanilla\Formatting\UpdateMediaTrait;
-use Vanilla\ImageSrcSet\ImageSrcSet;
-use Vanilla\ImageSrcSet\ImageSrcSetService;
-use Vanilla\ImageSrcSet\MainImageSchema;
+use Vanilla\Models\CrawlableRecordSchema;
 use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Models\UserFragmentSchema;
 use Vanilla\SchemaFactory;
@@ -32,7 +31,6 @@ use Vanilla\Contracts\Formatting\FormatFieldInterface;
 use Vanilla\Site\OwnSite;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Utility\CamelCaseScheme;
-use Vanilla\Utility\InstanceValidatorSchema;
 use Vanilla\Utility\ModelUtils;
 use Webmozart\Assert\Assert;
 use Vanilla\Search\SearchService;
@@ -100,9 +98,6 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
     /** @var OwnSite */
     private $ownSite;
 
-    /** @var ImageSrcSetService */
-    private $imageSrcSetService;
-
     /**
      * Class constructor. Defines the related database table name.
      *
@@ -110,8 +105,6 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
      */
     public function __construct(Gdn_Validation $validation = null) {
         parent::__construct('Comment', $validation);
-
-        $this->imageSrcSetService = Gdn::getContainer()->get(ImageSrcSetService::class);
 
         $this->floodGate = FloodControlHelper::configure($this, 'Vanilla', 'Comment');
         $this->pageCache = Gdn::cache()->activeEnabled() && c('Properties.CommentModel.pageCache', false);
@@ -998,7 +991,6 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
             'groupID:i?' => [
                 'x-null-value' => -1,
             ],
-            'image?' => new MainImageSchema(),
         ]);
         return $result;
     }
@@ -1482,10 +1474,6 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
                 $extender->extendRecord($result, 'comment');
             }
         }
-
-        // Get the comment's parsed content's first image & get the srcset for it.
-        $result['image'] = $this->formatterService->parseMainImage($rawBody, $format);
-
         return $result;
     }
 

@@ -644,9 +644,13 @@ class ThemeService {
      * @param Theme $theme Variables json theme asset string.
      */
     private function overlayAddonVariables(Theme $theme) {
+        $features = new ThemeFeatures($this->config, $theme->getAddon());
         // Allow addons to add their own variable overrides. Should be moved into the model when the asset generation is refactored.
         $additionalVariables = [];
         foreach ($this->variableProviders as $variableProvider) {
+            if ($features->disableKludgedVars() && $variableProvider instanceof KludgedVariablesProviderInterface) {
+                continue;
+            }
             try {
                 $variables = $variableProvider->getVariables();
                 $additionalVariables = array_replace_recursive($additionalVariables, $variables);

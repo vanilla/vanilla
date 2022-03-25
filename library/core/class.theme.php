@@ -9,7 +9,6 @@
  * @since 2.0
  */
 
-use Vanilla\Logging\ErrorLogger;
 use Vanilla\Site\SiteSectionModel;
 
 /**
@@ -504,8 +503,7 @@ class Gdn_Theme {
             if (debug()) {
                 $result = '<pre class="Exception">'.htmlspecialchars($ex->getMessage()."\n".$ex->getTraceAsString()).'</pre>';
             } else {
-                $result = '';
-                ErrorLogger::error($ex, [$name]);
+                $result = $ex->getMessage();
             }
         }
 

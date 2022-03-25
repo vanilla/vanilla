@@ -22,13 +22,6 @@ class AssetPreloadModelTest extends MinimalContainerTestCase {
     use HtmlNormalizeTrait;
 
     /**
-     * @return bool
-     */
-    protected static function useCommonBootstrap(): bool {
-        return false;
-    }
-
-    /**
      * Test that unique keys work.
      */
     public function testDuplication() {

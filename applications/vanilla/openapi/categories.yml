@@ -230,12 +230,6 @@ paths:
                                         followed:
                                             description: Is the category being followed by the current user?
                                             type: boolean
-                                        iconUrl:
-                                            description: The URL of the category's icon.
-                                            nullable: true
-                                            type: string
-                                        iconUrlSrcSet:
-                                            $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/SrcSet"
                                         isArchived:
                                             description: The archived state of this category.
                                             type: boolean

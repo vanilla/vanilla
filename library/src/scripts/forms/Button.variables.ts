@@ -30,36 +30,36 @@ export const buttonGlobalVariables = useThemeCache((forcedVars?: IThemeVariables
     const makeThemeVars = variableFactory("buttonGlobals", forcedVars);
 
     /**
-     * @varGroup buttonGlobals.colors
-     * @commonTitle Colors
+     * @varGroup buttonGlobals.fonts
+     * @commonTitle  Fonts
      */
     let colors = makeThemeVars("colors", {
         /**
          * @var buttonGlobals.colors.fg
          * @title Foreground color
          * @type string
-         * @format hex-color
+         * @format hex-string
          */
         fg: globalVars.mainColors.fg,
         /**
          * @var buttonGlobals.colors.bg
          * @title Background color
          * @type string
-         * @format hex-color
+         * @format hex-string
          */
         bg: globalVars.mainColors.bg,
         /**
          * @var buttonGlobals.colors.primary
          * @title Primary color
          * @type string
-         * @format hex-color
+         * @format hex-string
          */
         primary: globalVars.mainColors.primary,
         /**
          * @var buttonGlobals.colors.primaryContrast
          * @title Primary contrast color
          * @type string
-         * @format hex-color
+         * @format hex-string
          */
         primaryContrast: globalVars.mainColors.primaryContrast,
     });
@@ -80,23 +80,8 @@ export const buttonGlobalVariables = useThemeCache((forcedVars?: IThemeVariables
      * @commonTitle Padding
      */
     const padding = makeThemeVars("padding", {
-        /**
-         * @var buttonGlobals.padding.top
-         * @title Top
-         * @type number
-         */
         top: 2,
-        /**
-         * @var buttonGlobals.padding.bottom
-         * @title Bottom
-         * @type number
-         */
         bottom: 3,
-        /**
-         * @var buttonGlobals.padding.horizontal
-         * @title Horizontal
-         * @type number
-         */
         horizontal: 12,
         fullBorderRadius: {
             extraHorizontalPadding: 8,
@@ -108,30 +93,14 @@ export const buttonGlobalVariables = useThemeCache((forcedVars?: IThemeVariables
      * @commonTitle Sizing
      */
     const sizing = makeThemeVars("sizing", {
-        /**
-         * @var buttonGlobals.sizing.minHeight
-         * @title Minimum height
-         * @type number
-         */
         minHeight: formElVars.sizing.height,
-        /**
-         * @var buttonGlobals.sizing.minWidth
-         * @title Minimum width
-         * @type number
-         */
         minWidth: 104,
-        /**
-         * @var buttonGlobals.sizing.compactHeight
-         * @title Compact height
-         * @type number
-         */
         compactHeight: 24,
     });
 
     /**
      * @varGroup buttonGlobals.border
      * @commonTitle Border
-     * @expand border
      */
     const border = makeThemeVars("border", globalVars.borderType.formElements.buttons);
 

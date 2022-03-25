@@ -45,9 +45,7 @@ const noCloudImportsInCore = {
                     return;
                 }
                 const potentialPluginName = libraryMatch[1];
-                let fileName = context.getFilename();
-
-                fileName = fs.realpathSync(fileName);
+                const fileName = context.getFilename();
 
                 if (!fileName.includes(cloudPluginsPath) && cloudPlugins.includes(potentialPluginName)) {
                     context.report({

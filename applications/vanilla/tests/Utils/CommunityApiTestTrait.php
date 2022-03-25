@@ -11,7 +11,6 @@ use Garden\Http\HttpResponse;
 use Vanilla\Formatting\Formats\TextFormat;
 use Vanilla\Http\InternalClient;
 use Vanilla\Utility\ModelUtils;
-use VanillaTests\Fixtures\TestUploader;
 use VanillaTests\VanillaTestCase;
 
 /**
@@ -274,35 +273,5 @@ trait CommunityApiTestTrait {
             ];
             $this->bessy()->post("/vanilla/settings/categoriestree.json", $query);
         }
-    }
-
-    /**
-     * Create a media item.
-     *
-     * @param array $overrides
-     * @param array $attachmentData
-     * @return mixed|string
-     * @throws \Exception If mediaID is null.
-     */
-    public function createMedia(array $overrides = [], array $attachmentData = []) {
-        TestUploader::resetUploads();
-        $photo = TestUploader::uploadFile('photo', PATH_ROOT.'/tests/fixtures/apple.jpg');
-
-        $params = $overrides + [
-            'file' => $photo,
-            'type' => 'image',
-        ];
-        $response = $this->api()->post('/media', $params);
-        $result = $response->getBody();
-
-        $mediaID = $result['mediaID'] ?? null;
-
-        if (is_null($mediaID)) {
-            throw new \Exception('Could not insert a test media because mediaID is null');
-        }
-
-        // Update media with $attachmentData
-        $response = $this->api()->patch("/media/{$mediaID}/attachment", $attachmentData);
-        return $response->getBody();
     }
 }

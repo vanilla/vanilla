@@ -21,7 +21,6 @@ use Vanilla\Formatting\Formats\TextFormat;
 use Vanilla\Formatting\Formats;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Dashboard\Events\NotificationEvent;
-use Vanilla\Formatting\Html\HtmlSanitizer;
 use Vanilla\Models\UserFragmentSchema;
 use Vanilla\Utility\CamelCaseScheme;
 
@@ -2369,9 +2368,6 @@ class ActivityModel extends Gdn_Model {
         $body = formatString($row["Headline"], $row);
         // Replace anchors with bold text until notifications can be spun off from activities.
         $row["body"] = preg_replace("#<a [^>]+>(.+)</a>#Ui", "<strong>$1</strong>", $body);
-
-        $htmlSanitizer = \Gdn::getContainer()->get(HtmlSanitizer::class);
-        $row['body'] = $htmlSanitizer->filter($row['body']);
 
         $scheme = new CamelCaseScheme();
         $result = $scheme->convertArrayKeys($row);

@@ -11,9 +11,6 @@ namespace VanillaTests\APIv2;
  */
 class InvitesTest extends AbstractResourceTest {
 
-    // You can't edit an invite.
-    protected $editFields = [];
-
     /**
      * {@inheritdoc}
      */

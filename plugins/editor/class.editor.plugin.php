@@ -1011,7 +1011,7 @@ class EditorPlugin extends Gdn_Plugin {
             $categoryID = $discussion->CategoryID;
             $category = CategoryModel::categories($categoryID);
 
-            if (!CategoryModel::checkAllowFileUploads($category) && Gdn::request()->getValue('MediaIDs') !== false) {
+            if ($category && $category['AllowFileUploads'] != 1  && Gdn::request()->getValue('MediaIDs') !== false) {
                 throw new Exception(t('You are not allowed to upload files in this category.'));
             }
         }
@@ -1125,14 +1125,6 @@ class EditorPlugin extends Gdn_Plugin {
      * @param array|object $row The row of data being attached to.
      */
     protected function attachUploadsToComment($sender, $type = 'comment', $row = null) {
-
-        // We need to do this because other addons needs to be able to control
-        // whether attachments should be rendered (for example, private discussions).
-        $shouldAttach = Gdn::eventManager()->fireFilter('shouldAttachUploads', true);
-        if (!$shouldAttach) {
-            return;
-        }
-
         $param = ucfirst($type).'ID';
         $foreignId = val($param, val(ucfirst($type), $sender->EventArguments));
 

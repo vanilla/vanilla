@@ -311,8 +311,9 @@ class PostController extends VanillaController {
                     // Check for uploads against category->AllowFileUploads. (admins bypass this condition)
                     if (!boolval($session->User->Admin)) {
                         $objCategory = (object)$this->Category;
+                        $AllowFileUploads = (bool) $objCategory->AllowFileUploads ?? true;
 
-                        if (!CategoryModel::checkAllowFileUploads($objCategory)) {
+                        if (!$AllowFileUploads) {
                             $hasUpload = $this->hasFormUploads($this->Form->getFormValue('Format'), $this->Form->getFormValue('Body'));
 
                             if ($hasUpload) {
@@ -452,8 +453,9 @@ class PostController extends VanillaController {
      */
     public function hasFormUploads($format, $body) {
         $attachments = $this->formatService->parseAttachments($body, $format);
+        $embeddedImages = $this->formatService->parseImages($body, $format);
 
-        return !!count($attachments);
+        return !!count(array_merge($attachments, $embeddedImages));
     }
 
     /**

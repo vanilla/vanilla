@@ -19,13 +19,6 @@ class TwigAssetTest extends MinimalContainerTestCase {
     const NOW = 1437955201;
 
     /**
-     * @return bool
-     */
-    protected static function useCommonBootstrap(): bool {
-        return false;
-    }
-
-    /**
      * Test our twig rendering.
      */
     public function testRender() {

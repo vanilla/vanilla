@@ -42,15 +42,15 @@ export const dropDownVariables = useThemeCache(() => {
          */
         widths: {
             /**
-             * @var dropDown.sizing.widths.default
-             * @description The default width is used on menus like discussion options.
+             * @varGroup dropDown.sizing.widths.default
+             * @description The default sizing is used on menus like discussion options.
              * @title Default
              * @type number
              */
             default: 250,
             /**
-             * @var dropDown.sizing.widths.medium
-             * @description The medium width is used on items like the MeBox.
+             * @varGroup dropDown.sizing.widths.medium
+             * @description The medium sizing is used on items like the MeBox.
              * @title Medium
              * @type number
              */
@@ -104,7 +104,7 @@ export const dropDownVariables = useThemeCache(() => {
      */
     const contents = makeThemeVars("contents", {
         /**
-         * @var dropDown.contents.bg
+         * @varGroup dropDown.contents.bg
          * @description Background color for user menu
          * @title User Menu Background Color
          * @type string
@@ -112,7 +112,7 @@ export const dropDownVariables = useThemeCache(() => {
          */
         bg: globalVars.mainColors.bg,
         /**
-         * @var dropDown.contents.fg
+         * @varGroup dropDown.contents.fg
          * @description Foreground color for user menu
          * @title User Menu Foreground Color
          * @type string

@@ -557,8 +557,6 @@ components:
                     description: The body of the comment.
                     minLength: 1
                     type: string
-                image:
-                    $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/MainImage"
                 commentID:
                     description: The ID of the comment.
                     type: integer

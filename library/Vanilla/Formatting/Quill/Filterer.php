@@ -7,9 +7,11 @@
 
 namespace Vanilla\Formatting\Quill;
 
+use exussum12\CoverageChecker\ArgParser;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
 use Vanilla\EmbeddedContent\EmbedService;
 use Vanilla\Formatting\Exception\FormattingException;
+use Vanilla\Formatting\Formats\RichFormat;
 
 /**
  * Class for filtering Rich content before it gets inserted into the database.

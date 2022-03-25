@@ -131,6 +131,7 @@ function mapStateToProps(state: IConversationsStoreState) {
         // Tally the total unread messages. Massage rows into something that will fit into IMeBoxMessageItem.
         for (const conversation of Object.values(conversationsByID.data) as IConversation[]) {
             const authors: IUserFragment[] = [];
+            const messageDoc = new DOMParser().parseFromString(conversation.body, "text/html");
             if (conversation.unread === true) {
                 countUnread++;
             }
@@ -141,7 +142,7 @@ function mapStateToProps(state: IConversationsStoreState) {
             data.push({
                 authors,
                 countMessages: conversation.countMessages,
-                message: conversation.excerpt,
+                message: messageDoc.body.textContent || "",
                 photo: conversation.lastMessage!.insertUser.photoUrl || null,
                 photoAlt: accessibleLabel(`User: "%s"`, [conversation.lastMessage!.insertUser.name])!,
                 to: conversation.url,

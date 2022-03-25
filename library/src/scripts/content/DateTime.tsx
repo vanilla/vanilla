@@ -104,8 +104,6 @@ export default class DateTime extends Component<IDateTimeProps> {
         const inputDateObject = new Date(this.props.timestamp);
         const nowDate = new Date();
 
-        const localeKey = getJSLocaleKey();
-
         if (this.props.mode === "relative") {
             const seconds = (nowDate.getTime() - inputDateObject.getTime()) / 1000;
             if (seconds >= 0 && seconds <= 5) {
@@ -117,27 +115,28 @@ export default class DateTime extends Component<IDateTimeProps> {
                 // If it's the same day, return the time.
                 if (isSameDate(inputDateObject, nowDate, DateElement.DAY)) {
                     return inputDateObject
-                        .toLocaleString(localeKey, {
+                        .toLocaleString("en-US", {
                             hour: "numeric",
                             minute: "numeric",
+                            hour12: true,
                             timeZone: this.props.timezone,
                         })
                         .toLowerCase();
                 }
                 // Otherwise return the date.
-                return inputDateObject.toLocaleString(localeKey, this.options);
+                return inputDateObject.toLocaleString(getJSLocaleKey(), this.options);
             } else {
                 const classes = dateTimeClasses();
                 return (
                     <span className={classes.compactRoot}>
                         <span className={classes.compactMonth} key={"month"}>
-                            {inputDateObject.toLocaleString(localeKey, {
+                            {inputDateObject.toLocaleString(getJSLocaleKey(), {
                                 month: "short",
                                 timeZone: this.props.timezone,
                             })}
                         </span>
                         <span className={classes.compactDay} key={"day"}>
-                            {inputDateObject.toLocaleString(localeKey, {
+                            {inputDateObject.toLocaleString(getJSLocaleKey(), {
                                 day: "numeric",
                                 timeZone: this.props.timezone,
                             })}

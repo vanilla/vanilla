@@ -118,9 +118,8 @@ class Pocket implements LoggerAwareInterface {
     public function canRender($data) {
         $testMode = self::inTestMode($this);
         $pocketAdmin = checkPermission('Plugins.Pockets.Manage');
-        $inSectionDashboard = inSection('Dashboard') || inSection('Moderation') || inSection('Settings') || inSection('Analytics') || inSection('DashboardHome');
 
-        if (!$this->ShowInDashboard && $inSectionDashboard) {
+        if (!$this->ShowInDashboard && inSection('Dashboard')) {
             return false;
         }
 

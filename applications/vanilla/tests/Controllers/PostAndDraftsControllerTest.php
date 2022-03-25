@@ -9,7 +9,6 @@ namespace Vanilla\Forum\Tests\Controllers;
 
 use Garden\Schema\ValidationException;
 use PHPUnit\Framework\TestCase;
-use Vanilla\EmbeddedContent\Embeds\FileEmbed;
 use Vanilla\EmbeddedContent\Embeds\ImageEmbed;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
 use Vanilla\EmbeddedContent\EmbedService;
@@ -467,32 +466,25 @@ HTML
      */
 
     /**
-     * Test posting into a category with AllowFileUploads set to false and CustomPermissions set to true
+     * Test posting into a category with AllowFileUploads set to false
      *
-     * @param bool $exceptionExpected
+     * @param bool $expected
      * @param array $discussion
      * @dataProvider provideDiscussionWithAttachment
      */
-    public function testPostCategoryWithoutAllowFileUploads(bool $exceptionExpected, array $discussion): void {
+    public function testPostCategoryWithoutAllowFileUploads($expected, $discussion): void {
         // Add category with AllowFileUploads.
-        $this->categoryWithoutAllowFileUploads = $this->insertCategories(1, [
-            'name' => 'Category Without AllowFileUploads',
-            'AllowFileUploads' => false,
-            'CustomPermissions' => true
-        ])[0];
+        $this->categoryWithoutAllowFileUploads = $this->insertCategories(1, ['name' => 'Category Without AllowFileUploads', 'AllowFileUploads' => false])[0];
 
         // Make sure the image embed is registered.
         /** @var EmbedService $embedService */
         $embedService = \Gdn::getContainer()->get(EmbedService::class);
         $embedService->registerEmbed(ImageEmbed::class, ImageEmbed::TYPE);
-        $embedService->registerEmbed(FileEmbed::class, FileEmbed::TYPE);
 
         $body = json_encode($discussion['Body']);
         $discussion['Body'] = $body;
 
-        if ($exceptionExpected) {
-            $this->expectException(ValidationException::class);
-        }
+        $this->expectException(ValidationException::class);
 
         /** @var \PostController $r */
         $r = $this->bessy()->post(
@@ -508,8 +500,8 @@ HTML
      */
     public function provideDiscussionWithAttachment(): array {
         $r = [
-            'rich discussion with image attachment' => [
-                false, [
+            'rich discussion with attachment' => [
+                true, [
                     'Format' => 'Rich',
                     'Name' => 'Discussion with attachments',
                     'Body' => [
@@ -534,46 +526,6 @@ HTML
                                     ],
                                     "loaderData" => [
                                         "type" => "image"
-                                    ]
-                                ]
-                            ]
-                        ],
-                        [
-                            "insert" => "\n"
-                        ]
-                    ]
-                ],
-            ],
-            'rich discussion with pdf attachment' => [
-                true, [
-                    'Format' => 'Rich',
-                    'Name' => 'Discussion with attachments',
-                    'Body' => [
-                        [
-                            'insert' => [
-                                'embed-external' => [
-                                    'data' => [
-                                        'url' => 'https://example.com/foo.pdf',
-                                        'name' => 'foo.pdf',
-                                        'type' => 'application/pdf',
-                                        'size' => 7945,
-                                        'displaySize' => 'large',
-                                        'float' => 'none',
-                                        'mediaID' => 55,
-                                        'dateInserted' => '2022-03-22T05:29:00+00:00',
-                                        'insertUserID' => 2,
-                                        'foreignType' => 'embed',
-                                        'foreignID' => 2,
-                                        'embedType' => 'file',
-                                    ],
-                                    'loaderData' => [
-                                        'type' => 'file',
-                                        'file' => [],
-                                        'progressEventEmitter' => [
-                                            'listeners' => [
-                                                0 => null
-                                            ]
-                                        ]
                                     ]
                                 ]
                             ]

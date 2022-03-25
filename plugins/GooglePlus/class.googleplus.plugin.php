@@ -2,7 +2,7 @@
 /**
  * GooglePlus Plugin.
  *
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package GooglePlus
  */
@@ -272,7 +272,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
     /**
      * Calculate the final sign in and register urls for google+.
      *
-     * @param Gdn_AuthenticationProviderModel $sender Not used.
+     * @param authenticationProviderModel $sender Not used.
      * @param array $args Contains the provider and data.
      */
     public function authenticationProviderModel_calculateGooglePlus_handler($sender, $args) {
@@ -454,7 +454,8 @@ class GooglePlusPlugin extends Gdn_Plugin {
         switch ($state['r']) {
             case 'profile':
                 // This is a connect request from the user's profile.
-                $accessToken = $this->accessToken($this->getAccessToken($code));
+
+                $this->accessToken($this->getAccessToken($code));
 
                 // Get the user's information.
                 $profile = $this->api('/userinfo');
@@ -530,11 +531,12 @@ class GooglePlusPlugin extends Gdn_Plugin {
      * I'm sure someone out there does this. Somewhere. Probably alone.
      *
      * @param PostController $sender
-     * @param string $recordType
-     * @param int $id
+     * @param type $recordType
+     * @param type $iD
+     * @throws type
      */
-    public function postController_googlePlus_create($sender, $recordType, $id) {
-        $row = getRecord($recordType, $id);
+    public function postController_googlePlus_create($sender, $recordType, $iD) {
+        $row = getRecord($recordType, $iD);
         if ($row) {
             $message = sliceParagraph(Gdn_Format::plainText($row['Body'], $row['Format']), 160);
 

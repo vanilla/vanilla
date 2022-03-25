@@ -11,7 +11,7 @@ window.onVanillaReady(function () {
     ) as HTMLElement;
 
     // Only save drafts when the "save draft" button is present on the form
-    const shouldSaveDrafts = formContainer && !!formContainer.querySelectorAll("#Form_SaveDraft, .DraftButton").length;
+    const shouldSaveDrafts = formContainer && !!formContainer.querySelectorAll("#Form_SaveDraft, .DraftButton");
 
     // Attach listeners to all inputs within
     if (formContainer && shouldSaveDrafts) {

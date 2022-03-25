@@ -13,7 +13,6 @@ import ScrollLock, { TouchScrollable } from "react-scrolllock";
 import { EntranceAnimation, ITargetTransform, FromDirection } from "@library/animation/EntranceAnimation";
 import { useLastValue } from "@vanilla/react-utils";
 import { useDropdownContext } from "../flyouts/DropDown";
-import { useStackingContext } from "@library/modal/StackingContext";
 
 interface IProps {
     id?: string;
@@ -31,8 +30,6 @@ interface IProps {
     isVisible: boolean;
     onDestroyed: () => void;
     onKeyPress?: (e) => void;
-    // The ID of the real place the modal is mounted.
-    realRootID: string;
 }
 
 /**
@@ -65,7 +62,7 @@ export function ModalView(props: IProps) {
 
     const ownRef = useRef<HTMLDivElement>(null);
     const modalRef = props.modalRef || ownRef;
-    const { zIndex } = useStackingContext();
+
     const classes = modalClasses();
 
     let contents = (
@@ -140,11 +137,7 @@ export function ModalView(props: IProps) {
     })();
 
     return (
-        <div
-            onKeyPress={props.onKeyPress}
-            data-modal-real-root-id={props.realRootID}
-            className={classes.stackingZindex(zIndex)}
-        >
+        <div onKeyPress={props.onKeyPress}>
             <EntranceAnimation
                 fade
                 isEntered={props.isVisible}
@@ -162,7 +155,6 @@ export function ModalView(props: IProps) {
                     <EntranceAnimation
                         id={props.id}
                         {...contentTransition}
-                        tabIndex={-1}
                         targetTransform={targetTransform}
                         isEntered={props.isVisible}
                         role="dialog"

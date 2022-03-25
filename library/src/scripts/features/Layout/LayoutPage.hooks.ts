@@ -11,7 +11,7 @@ import { bindActionCreators } from "redux";
 import { ILayoutPageStoreState } from "@library/features/Layout/LayoutPage.slice";
 import { stableObjectHash } from "@vanilla/utils";
 import { LoadStatus } from "@library/@types/api/core";
-import { ILayoutQuery } from "@library/features/Layout/LayoutRenderer.types";
+import { ILayoutQuery } from "@library/features/Layout/LayoutPage.types";
 
 export function useLayoutPageActions() {
     const dispatch = useDispatch();

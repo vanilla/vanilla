@@ -14,7 +14,7 @@ import { SiteNavContext } from "@library/navigation/SiteNavContext";
 import { INavigationTreeItem } from "@library/@types/api/core";
 import { Hoverable } from "@vanilla/react-utils";
 import { TabHandler } from "@vanilla/dom-utils";
-import { CheckCompactIcon, DownTriangleIcon, RightTriangleIcon } from "@library/icons/common";
+import { DownTriangleIcon, RightTriangleIcon } from "@library/icons/common";
 import { RecordID } from "@vanilla/utils";
 import { SiteNavNodeTypes } from "@library/navigation/SiteNavNodeTypes";
 import { cx } from "@emotion/css";
@@ -30,7 +30,6 @@ interface IProps extends INavigationTreeItem {
     clickableCategoryLabels?: boolean;
     collapsible: boolean;
     siteNavNodeTypes?: SiteNavNodeTypes;
-    withCheckMark?: boolean;
 }
 
 export interface IActiveRecord {
@@ -73,7 +72,6 @@ export default class SiteNavNode extends React.Component<IProps> {
             const linkOrButtonContents = (
                 <span className={cx(classes.label, { [`${classes.activeLink}`]: this.props.isLink })}>
                     {this.props.name}
-                    {this.props.withCheckMark && <CheckCompactIcon className={siteNavNodeClasses().checkMark} />}
                 </span>
             );
             linkContents = (

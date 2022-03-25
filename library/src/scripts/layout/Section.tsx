@@ -9,7 +9,6 @@ import PanelArea from "@library/layout/components/PanelArea";
 import { useSection } from "@library/layout/LayoutContext";
 import { PageBoxDepthContextProvider } from "@library/layout/PageBox.context";
 import { useScrollOffset } from "@library/layout/ScrollOffsetContext";
-import { SectionBehaviourContext } from "@library/layout/SectionBehaviourContext";
 import { WidgetLayout } from "@library/layout/WidgetLayout";
 import { useWidgetSectionClasses } from "@library/layout/WidgetLayout.context";
 import { globalVariables } from "@library/styles/globalStyleVars";
@@ -17,7 +16,7 @@ import { inheritHeightClass } from "@library/styles/styleHelpers";
 import { useMeasure } from "@vanilla/react-utils";
 import { logError } from "@vanilla/utils";
 import classNames from "classnames";
-import React, { useContext, useMemo, useRef } from "react";
+import React, { useMemo, useRef } from "react";
 import Panel from "./components/Panel";
 import PanelAreaHorizontalPadding from "./components/PanelAreaHorizontalPadding";
 import PanelOverflow from "./components/PanelOverflow";
@@ -29,6 +28,7 @@ export interface ISectionProps extends React.HTMLAttributes<HTMLElement> {
     contentTag?: keyof JSX.IntrinsicElements;
     growMiddleBottom?: boolean;
     topPadding?: boolean;
+    isFixed?: boolean;
     leftTop?: React.ReactNode;
     leftBottom?: React.ReactNode;
     mainTop?: React.ReactNode;
@@ -40,7 +40,6 @@ export interface ISectionProps extends React.HTMLAttributes<HTMLElement> {
     rightBottom?: React.ReactNode;
     breadcrumbs?: React.ReactNode;
     renderLeftPanelBackground?: boolean;
-    childrenBefore?: React.ReactNode;
     childrenAfter?: React.ReactNode;
     contentRef?: React.RefObject<HTMLDivElement>;
 }
@@ -82,6 +81,7 @@ export default function Section(props: ISectionProps) {
         contentTag = "div",
         growMiddleBottom = false,
         topPadding = true,
+        isFixed = true,
         leftTop,
         leftBottom,
         middleTop,
@@ -93,12 +93,9 @@ export default function Section(props: ISectionProps) {
         breadcrumbs,
         contentRef,
         children,
-        childrenBefore,
         childrenAfter,
         ...elementProps
     } = props;
-
-    const { isSticky } = useContext(SectionBehaviourContext);
 
     // Measure the panel itself.
     const { offsetClass, rawScrollOffset } = useScrollOffset();
@@ -177,7 +174,6 @@ export default function Section(props: ISectionProps) {
     const ContentTag = contentTag;
     return (
         <div className={panelClasses} ref={contentRef} {...elementProps}>
-            {childrenBefore}
             <Container>
                 {shouldRenderBreadcrumbs && (
                     <div className={classNames(classes.container, classes.breadcrumbsContainer)}>
@@ -205,10 +201,8 @@ export default function Section(props: ISectionProps) {
                                     headingBlockClass={classes.secondaryPanelHeadingBlock}
                                 >
                                     <Panel
-                                        className={classNames(classes.leftColumn, {
-                                            [classes.isSticky]: isSticky,
-                                            [panelOffsetClass]: isSticky,
-                                            [offsetClass]: isSticky,
+                                        className={classNames(classes.leftColumn, offsetClass, panelOffsetClass, {
+                                            [classes.isSticky]: isFixed,
                                         })}
                                     >
                                         <PanelOverflow
@@ -270,10 +264,8 @@ export default function Section(props: ISectionProps) {
                                     headingBlockClass={classes.secondaryPanelHeadingBlock}
                                 >
                                     <Panel
-                                        className={classNames(classes.rightColumn, {
-                                            [classes.isSticky]: isSticky,
-                                            [panelOffsetClass]: isSticky,
-                                            [offsetClass]: isSticky,
+                                        className={classNames(classes.rightColumn, offsetClass, panelOffsetClass, {
+                                            [classes.isSticky]: isFixed,
                                         })}
                                     >
                                         <PanelOverflow offset={overflowOffset}>
@@ -289,9 +281,9 @@ export default function Section(props: ISectionProps) {
                             </PageBoxDepthContextProvider>
                         )}
                     </div>
+                    {childrenAfter}
                 </main>
             </Container>
-            {childrenAfter}
         </div>
     );
 }

@@ -8,9 +8,10 @@
 namespace VanillaTests\Library\Vanilla;
 
 use PHPUnit\Framework\TestCase;
+use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\OpenAPIBuilder;
-use Vanilla\Utility\ArrayUtils;
+use VanillaTests\Fixtures\MockAddonManager;
 use VanillaTests\Fixtures\Request;
 use VanillaTests\OpenAPIBuilderTrait;
 
@@ -19,68 +20,6 @@ use VanillaTests\OpenAPIBuilderTrait;
  */
 class OpenAPIBuilderTest extends TestCase {
     use OpenAPIBuilderTrait;
-
-    /**
-     * @var array
-     */
-    private $openAPI = null;
-
-    /**
-     * Assert than an array schema has valid items.
-     *
-     * @param array|\ArrayAccess $schema
-     * @param string $pathStr
-     */
-    public static function assertArraySchemaItems($schema, string $pathStr): void {
-        if (empty($schema['type']) || $schema['type'] !== 'array') {
-            return;
-        }
-
-        TestCase::assertArrayHasKey('items', $schema, 'Schemas of type array must have an items property: ' . $pathStr);
-        self::assertIsSchema($schema['items'], $pathStr.'.items');
-    }
-
-    /**
-     * Assert that a variable represents a JSON schema.
-     *
-     * @param mixed $schema The schema to test.
-     * @param string $pathStr The path to the schema for error messages.
-     */
-    public static function assertIsSchema($schema, string $pathStr): void {
-        TestCase::assertIsArray($schema, "The schema must be an array: $pathStr");
-
-        if (!empty($schema['$ref'])) {
-            return;
-        }
-
-        if (!empty($schema['allOf'])) {
-            TestCase::assertIsArray($schema['allOf'], "The allOf schema must be an array: $pathStr");
-            foreach ($schema['allOf'] as $i => $item) {
-                self::assertIsSchema($item, "$pathStr.$i");
-            }
-        } elseif (!empty($schema['oneOf'])) {
-            TestCase::assertIsArray($schema['oneOf'], "The oneOf schema must be an array: $pathStr");
-            foreach ($schema['oneOf'] as $i => $item) {
-                self::assertIsSchema($item, "$pathStr.$i");
-            }
-        } else {
-            TestCase::assertArrayHasKey('type', $schema, 'The schema must have a type: ' . $pathStr);
-        }
-    }
-
-    /**
-     * Get the full OpenAPI array for various tests.
-     *
-     * @return array
-     */
-    public function getFullOpenAPI() {
-        if ($this->openAPI === null) {
-            $builder = $this->createOpenApiBuilder();
-
-            $this->openAPI = $builder->getFullOpenAPI();
-        }
-        return $this->openAPI;
-    }
 
     /**
      * Test that we generate a proper base path.
@@ -104,7 +43,9 @@ class OpenAPIBuilderTest extends TestCase {
      * The OpenAPI build should validate against the OpenAPI spec.
      */
     public function testValidOpenAPI() {
-        $data = $this->getFullOpenAPI();
+        $builder = $this->createOpenApiBuilder();
+
+        $data = $builder->generateFullOpenAPI();
         $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         $path = PATH_ROOT.'/tests/cache/open-api-builder/openapi.json';
         if (file_put_contents($path, $json) === false) {
@@ -130,21 +71,6 @@ class OpenAPIBuilderTest extends TestCase {
     public function testSchemaMergeBugs(array $schema1, array $schema2, array $expected) {
         $actual = OpenAPIBuilder::mergeSchemas($schema1, $schema2);
         $this->assertSame($expected, $actual);
-    }
-
-    /**
-     * The Swagger UI library has an issue where schemas of type array will fail if they have no `items` property.
-     *
-     * This isn't something caught by our general test and can only be seen when expanding an endpoint in the UI where
-     * it fails to render with an obscure looking error.
-     */
-    public function testArrayItemsSchema(): void {
-        $data = $this->getFullOpenAPI();
-
-        ArrayUtils::walkRecursiveArray($data, function ($schema, $path) {
-            $pathStr = implode('.', $path);
-            self::assertArraySchemaItems($schema, $pathStr);
-        });
     }
 
     /**

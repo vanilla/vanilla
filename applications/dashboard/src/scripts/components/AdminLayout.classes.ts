@@ -131,11 +131,6 @@ export const adminLayoutClasses = useThemeCache(() => {
         ),
     });
 
-    const adjustedContainerPadding = css(
-        mediaQueries.customBreakPoint({ paddingRight: 0 }, panelLayoutVars.contentWidth),
-        mediaQueries.compact({ paddingLeft: 0 }),
-    );
-
     return {
         container,
         layout,
@@ -147,6 +142,5 @@ export const adminLayoutClasses = useThemeCache(() => {
         contentNoLeftPanel,
         threePanel,
         helpText,
-        adjustedContainerPadding,
     };
 });

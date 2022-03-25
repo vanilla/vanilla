@@ -302,9 +302,7 @@ export const tabBrowseClasses = useThemeCache(() => {
     const extraButtons = style(
         "extraButtons",
         {
-            ...Mixins.padding({
-                horizontal: horizontalPadding / 2,
-            }),
+            ...Mixins.padding({ horizontal: horizontalPadding / 2, vertical: verticalPadding }),
             flex: 1,
             display: "flex",
             alignItems: "center",

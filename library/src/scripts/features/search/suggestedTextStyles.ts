@@ -12,7 +12,6 @@ import { buttonResetMixin } from "@library/forms/buttonMixins";
 import { CSSObject } from "@emotion/css";
 import { oneColumnVariables } from "@library/layout/Section.variables";
 import { Mixins } from "@library/styles/Mixins";
-import { userSelect } from "@library/styles/styleHelpers";
 
 export const suggestedTextStyleHelper = useThemeCache((overwrite?: { forDashboard?: boolean }) => {
     const globalVars = globalVariables();
@@ -20,7 +19,9 @@ export const suggestedTextStyleHelper = useThemeCache((overwrite?: { forDashboar
     const { forDashboard = false } = overwrite || {};
     const mediaQueries = oneColumnVariables().mediaQueries();
 
-    const baseStyle: CSSObject = {
+    // The styles have been split here so they can be exported to the compatibility styles.
+    const option: CSSObject = {
+        ...buttonResetMixin(),
         width: percent(100),
         ...Mixins.padding({
             vertical: 6,
@@ -33,24 +34,6 @@ export const suggestedTextStyleHelper = useThemeCache((overwrite?: { forDashboar
         textAlign: "left",
         display: "block",
         color: "inherit",
-    };
-
-    const groupHeading: CSSObject = {
-        ...baseStyle,
-        ...userSelect("none"),
-        ...Mixins.font({
-            size: 18,
-            lineHeight: 24 / 18,
-            weight: 700,
-        }),
-    };
-
-    // The styles have been split here so they can be exported to the compatibility styles.
-    const option: CSSObject = {
-        ...buttonResetMixin(),
-
-        ...baseStyle,
-
         ...{
             ".suggestedTextInput-parentTag": {
                 ...Mixins.font({
@@ -73,7 +56,6 @@ export const suggestedTextStyleHelper = useThemeCache((overwrite?: { forDashboar
     };
 
     return {
-        groupHeading,
         option,
     };
 });

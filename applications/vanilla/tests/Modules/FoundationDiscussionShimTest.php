@@ -93,7 +93,7 @@ class FoundationDiscussionShimTest extends SiteTestCase {
         unset($actual[0]['lastUser']['dateLastActive']);
         unset($actual[0]['attributes']);
 
-        $this->assertArraySubsetRecursive($expected, $actual);
+        $this->assertSame($expected, $actual);
     }
 
     /**

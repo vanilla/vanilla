@@ -3,22 +3,25 @@
  * @license Proprietary
  */
 
-import * as layoutActions from "@dashboard/layout/layoutSettings/LayoutSettings.actions";
 import {
-    getLayoutsByViewType,
-    useLayoutDispatch,
-    useLayoutSelector,
-} from "@dashboard/layout/layoutSettings/LayoutSettings.slice";
-import {
-    ILayoutDetails,
-    ILayoutEdit,
-    ILayoutViewQuery,
+    ILayout,
+    ILayoutsState,
+    LayoutEditSchema,
     LayoutViewType,
 } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
+import {
+    getLayoutJsonDraftByID,
+    getLayoutJsonByLayoutID,
+    useLayoutDispatch,
+    useLayoutSelector as useSelector,
+    getLayoutsByViewType,
+} from "@dashboard/layout/layoutSettings/LayoutSettings.slice";
 import { Loadable, LoadStatus } from "@library/@types/api/core";
-import { RecordID } from "@vanilla/utils";
 import { useCallback, useEffect, useMemo } from "react";
+import { ILayoutViewQuery } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { bindActionCreators } from "redux";
+import * as layoutActions from "@dashboard/layout/layoutSettings/LayoutSettings.actions";
+import { RecordID, uuidv4 } from "@vanilla/utils";
 
 export function useLayoutsActions() {
     const dispatch = useLayoutDispatch();
@@ -26,8 +29,8 @@ export function useLayoutsActions() {
 }
 export function useLayouts() {
     const { fetchAllLayouts } = useLayoutsActions();
-    const layoutsListStatus = useLayoutSelector(({ layoutSettings }) => layoutSettings.layoutsListStatus);
-    const layoutsByViewType = useLayoutSelector(({ layoutSettings }) => getLayoutsByViewType(layoutSettings));
+    const layoutsListStatus = useSelector(({ layoutSettings }) => layoutSettings.layoutsListStatus);
+    const layoutsByViewType = useSelector(({ layoutSettings }) => getLayoutsByViewType(layoutSettings));
 
     useEffect(() => {
         if (layoutsListStatus.status === LoadStatus.PENDING) {
@@ -42,9 +45,9 @@ export function useLayouts() {
     };
 }
 
-export function useLayout(layoutID: ILayoutDetails["layoutID"]) {
+export function useLayout(layoutID: ILayout["layoutID"]) {
     const { fetchLayout } = useLayoutsActions();
-    const layout = useLayoutSelector(({ layoutSettings }) => layoutSettings.layoutsByID[layoutID]);
+    const layout = useSelector(({ layoutSettings }) => layoutSettings.layoutsByID[layoutID]);
 
     useEffect(() => {
         if (!layout) {
@@ -55,25 +58,88 @@ export function useLayout(layoutID: ILayoutDetails["layoutID"]) {
     return layout ?? { status: LoadStatus.PENDING };
 }
 
-export function useLayoutJson(layoutID: ILayoutDetails["layoutID"]): Loadable<ILayoutEdit> {
+export function useLayoutJson(layoutID: ILayout["layoutID"]): Loadable<LayoutEditSchema> {
     const { fetchLayoutJson } = useLayoutsActions();
-    const loadable = useLayoutSelector(
-        ({ layoutSettings }) =>
-            layoutSettings.layoutJsonsByLayoutID[layoutID] ?? {
-                status: LoadStatus.PENDING,
-            },
+    const layoutJson = useSelector(({ layoutSettings }) => getLayoutJsonByLayoutID(layoutSettings, layoutID));
+
+    useEffect(() => {
+        if (!layoutJson) {
+            fetchLayoutJson(layoutID);
+        }
+    }, [fetchLayoutJson, layoutJson, layoutID]);
+
+    return layoutJson ?? { status: LoadStatus.PENDING };
+}
+
+export function useLayoutJsonDraft(
+    existingDraftID?: ILayout["layoutID"],
+    sourceLayoutJsonID?: ILayout["layoutID"],
+    layoutViewType = "home" as LayoutViewType,
+    copy = false,
+): Loadable<LayoutEditSchema> {
+    const { fetchLayoutJson, copyLayoutJsonToNewDraft, createNewLayoutJsonDraft } = useLayoutsActions();
+
+    const isCopy = copy || (existingDraftID !== undefined && existingDraftID === sourceLayoutJsonID);
+    const isNewDraft = !existingDraftID && !!(!sourceLayoutJsonID || (sourceLayoutJsonID && isCopy));
+
+    const draftID = useMemo(() => {
+        return isNewDraft ? uuidv4() : existingDraftID ?? sourceLayoutJsonID!;
+    }, [isNewDraft, existingDraftID, sourceLayoutJsonID]);
+
+    const draft = useSelector(({ layoutSettings }) => getLayoutJsonDraftByID(layoutSettings, draftID));
+
+    const sourceLayoutJson = useSelector(({ layoutSettings }) =>
+        sourceLayoutJsonID ? getLayoutJsonByLayoutID(layoutSettings, sourceLayoutJsonID) : undefined,
     );
 
     useEffect(() => {
-        if (loadable.status === LoadStatus.PENDING) {
-            fetchLayoutJson(layoutID);
+        if (sourceLayoutJsonID && !sourceLayoutJson) {
+            fetchLayoutJson(sourceLayoutJsonID);
         }
-    }, [fetchLayoutJson, loadable, layoutID]);
+    }, [draft, fetchLayoutJson, sourceLayoutJson, sourceLayoutJsonID]);
 
-    return loadable;
+    useEffect(() => {
+        if (!draft) {
+            if (!!sourceLayoutJsonID && sourceLayoutJson?.status === LoadStatus.SUCCESS) {
+                copyLayoutJsonToNewDraft({ sourceLayoutJsonID, draftID: isCopy ? draftID : sourceLayoutJsonID });
+            } else if (!sourceLayoutJsonID) {
+                createNewLayoutJsonDraft({ draftID, layoutViewType });
+            }
+        }
+    }, [draft, draftID, sourceLayoutJson, sourceLayoutJsonID, isCopy]);
+
+    return draft
+        ? {
+              status: LoadStatus.SUCCESS,
+              data: {
+                  ...draft,
+                  layoutID: draftID,
+              },
+          }
+        : {
+              status: LoadStatus.PENDING,
+          };
 }
 
-export function usePutLayoutView(layoutID: ILayoutDetails["layoutID"]) {
+export function useLayoutJsonDraftActions(draftID: keyof ILayoutsState["layoutJsonDraftsByID"]) {
+    const draft = useSelector(({ layoutSettings }) => getLayoutJsonDraftByID(layoutSettings, draftID))!;
+    const dispatch = useLayoutDispatch();
+    const save = useCallback(
+        async function () {
+            const resultAction = dispatch(layoutActions.postOrPatchLayoutJsonDraft(draft));
+            const unwrappedResult = await resultAction.unwrap();
+            return unwrappedResult;
+        },
+        [dispatch, draft],
+    );
+
+    function update(modifiedDraft: LayoutEditSchema) {
+        return dispatch(layoutActions.updateLayoutJsonDraft({ draftID, modifiedDraft }));
+    }
+    return { save, update };
+}
+
+export function usePutLayoutView(layoutID: ILayout["layoutID"]) {
     const { putLayoutView } = useLayoutsActions();
 
     return useCallback(
@@ -107,8 +173,8 @@ export function useCatalogForLayout(layoutID: RecordID) {
 export function useLayoutCatalog(layoutViewType: LayoutViewType | null) {
     const { fetchLayoutCatalogByViewType } = useLayoutsActions();
 
-    const catalogs = useLayoutSelector(({ layoutSettings }) => layoutSettings.catalogByViewType);
-    const catalogStatus = useLayoutSelector(({ layoutSettings }) => layoutSettings.catalogStatusByViewType);
+    const catalogs = useSelector(({ layoutSettings }) => layoutSettings.catalogByViewType);
+    const catalogStatus = useSelector(({ layoutSettings }) => layoutSettings.catalogStatusByViewType);
     const catalog = useMemo(() => (layoutViewType && catalogs[layoutViewType]) ?? null, [layoutViewType, catalogs]);
 
     useEffect(() => {

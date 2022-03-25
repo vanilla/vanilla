@@ -3,7 +3,9 @@
  * @license GPL-2.0-only
  */
 
+import apiv2 from "@library/apiv2";
 import { TypeAllIcon } from "@library/icons/searchIcons";
+import SimplePagerModel from "@library/navigation/SimplePagerModel";
 import { FilterPanelAll } from "@library/search/panels/FilterPanelAll";
 import { SearchActions } from "@library/search/SearchActions";
 import { DEFAULT_CORE_SEARCH_FORM, INITIAL_SEARCH_STATE, searchReducer } from "@library/search/searchReducer";
@@ -16,18 +18,17 @@ import {
     PLACES_DOMAIN_NAME,
 } from "@library/search/searchConstants";
 import { t } from "@vanilla/i18n";
-import React, { ReactNode, useCallback, useContext, useEffect, useReducer, useState } from "react";
+import React, { useCallback, useReducer } from "react";
 import merge from "lodash/merge";
 import Result from "@library/result/Result";
 import { ISelectBoxItem } from "@library/forms/select/SelectBox";
 import { useSearchScope } from "@library/features/search/SearchScopeContext";
 import { getCurrentLocale } from "@vanilla/i18n";
 import { SearchContext } from "./SearchContext";
-import { SearchService, ISearchDomain, DEFAULT_SEARCH_SOURCE } from "./SearchService";
+import { SearchService, ISearchDomain } from "./SearchService";
 import PlacesSearchListing from "@library/search/PlacesSearchListing";
 import { getSiteSection } from "@library/utility/appUtils";
 import { getSearchAnalyticsData } from "@library/search/searchAnalyticsData";
-import { useSearchSources } from "@library/search/SearchSourcesContextProvider";
 
 interface IProps {
     children?: React.ReactNode;
@@ -56,8 +57,6 @@ export function getGlobalSearchSorts(): ISelectBoxItem[] {
 export function SearchFormContextProvider(props: IProps) {
     const [state, dispatch] = useReducer(searchReducer, INITIAL_SEARCH_STATE);
 
-    const { currentSource: searchSource } = useSearchSources();
-
     const getFilterComponentsForDomain = (domain: string) => {
         return SearchService.extraFilters.map((extraFilter, i) => {
             if (extraFilter.searchDomain === domain) {
@@ -72,7 +71,7 @@ export function SearchFormContextProvider(props: IProps) {
 
     const ALL_CONTENT_DOMAIN: ISearchDomain = {
         key: ALL_CONTENT_DOMAIN_NAME,
-        name: "All",
+        name: t("All"),
         sort: 0,
         icon: <TypeAllIcon />,
         heading: hasPlacesDomain ? <PlacesSearchListing /> : null,
@@ -115,7 +114,7 @@ export function SearchFormContextProvider(props: IProps) {
     };
 
     const getDomains = () => {
-        return [{ ...ALL_CONTENT_DOMAIN, name: t(ALL_CONTENT_DOMAIN.name) }, ...SearchService.pluggableDomains];
+        return [ALL_CONTENT_DOMAIN, ...SearchService.pluggableDomains];
     };
 
     const getCurrentDomain = (): ISearchDomain => {
@@ -240,21 +239,28 @@ export function SearchFormContextProvider(props: IProps) {
 
         try {
             const query = buildQuery(form);
-
-            const result = await searchSource.performSearch(query);
+            const response = await apiv2.get("/search", {
+                params: query,
+            });
 
             dispatch(
                 SearchActions.performSearchACs.done({
                     params: form,
-                    result,
+                    result: {
+                        results: response.data.map((item) => {
+                            item.body = item.excerpt ?? item.body;
+                            return item;
+                        }),
+                        pagination: SimplePagerModel.parseHeaders(response.headers),
+                    },
                 }),
             );
             //analytics event to keen
             document.dispatchEvent(
                 new CustomEvent("pageViewWithContext", {
                     detail: getSearchAnalyticsData(form, {
-                        data: result,
-                        pagination: result.pagination,
+                        data: response.data,
+                        pagination: SimplePagerModel.parseHeaders(response.headers),
                     }),
                 }),
             );
@@ -264,36 +270,34 @@ export function SearchFormContextProvider(props: IProps) {
     };
 
     const searchInDomain = async (domain: string) => {
-        // We only do this for our own community search
-        if (searchSource.key === DEFAULT_SEARCH_SOURCE.key) {
-            const { form } = state;
-            const formWithDomain = { ...form, domain };
+        const { form } = state;
+        const formWithDomain = { ...form, domain };
 
-            dispatch(SearchActions.performDomainSearchACs.started(formWithDomain));
+        dispatch(SearchActions.performDomainSearchACs.started(formWithDomain));
 
-            const subTypes = SearchService.getSubTypes()
-                .filter((subType) => subType.domain === domain)
-                .map((subType) => subType.type);
+        const subTypes = SearchService.getSubTypes()
+            .filter((subType) => subType.domain === domain)
+            .map((subType) => subType.type);
 
-            try {
-                const query = {
-                    ...buildQuery(formWithDomain),
-                    limit: DOMAIN_SEARCH_LIMIT_DEFAULT,
-                    types: subTypes,
-                    recordTypes: [],
-                };
-
-                const result = await searchSource.performSearch(query);
-
-                dispatch(
-                    SearchActions.performDomainSearchACs.done({
-                        params: formWithDomain,
-                        result,
-                    }),
-                );
-            } catch (error) {
-                dispatch(SearchActions.performDomainSearchACs.failed({ params: formWithDomain, error }));
-            }
+        try {
+            const query = buildQuery(formWithDomain);
+            const response = await apiv2.get("/search", {
+                params: { ...query, limit: DOMAIN_SEARCH_LIMIT_DEFAULT, types: subTypes, recordTypes: [] },
+            });
+            dispatch(
+                SearchActions.performDomainSearchACs.done({
+                    params: formWithDomain,
+                    result: {
+                        results: response.data.map((item) => {
+                            item.body = item.excerpt ?? item.body;
+                            return item;
+                        }),
+                        pagination: SimplePagerModel.parseHeaders(response.headers),
+                    },
+                }),
+            );
+        } catch (error) {
+            dispatch(SearchActions.performDomainSearchACs.failed({ params: formWithDomain, error }));
         }
     };
 

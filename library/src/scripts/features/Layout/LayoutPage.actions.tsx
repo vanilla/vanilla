@@ -5,7 +5,7 @@
  */
 
 import apiv2 from "@library/apiv2";
-import { IHydratedLayoutSpec, ILayoutQuery } from "@library/features/Layout/LayoutRenderer.types";
+import { ILayoutQuery, ILayoutSpec } from "@library/features/Layout/LayoutPage.types";
 import { getSiteSection } from "@library/utility/appUtils";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { getCurrentLocale } from "@vanilla/i18n";
@@ -22,5 +22,5 @@ export const lookupLayout = createAsyncThunk("@@layouts/lookup", async (query?: 
             },
         },
     });
-    return layoutSpec.data as IHydratedLayoutSpec;
+    return layoutSpec.data as ILayoutSpec;
 });

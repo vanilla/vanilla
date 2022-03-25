@@ -3,15 +3,16 @@
  * @license GPL-2.0-only
  */
 
-import TitleBar from "@library/headers/TitleBar";
-import Container from "@library/layout/components/Container";
-import { oneColumnVariables } from "@library/layout/Section.variables";
-import { SectionBehaviourContext } from "@library/layout/SectionBehaviourContext";
-import { NO_WRAPPER_CONFIG, storyWithConfig } from "@library/storybook/StoryContext";
 import React from "react";
-import { MemoryRouter } from "react-router";
-import PanelWidget from "./components/PanelWidget";
+import Section from "@library/layout/Section";
+import { oneColumnVariables } from "@library/layout/Section.variables";
+import { NO_WRAPPER_CONFIG, storyWithConfig } from "@library/storybook/StoryContext";
 import ThreeColumnSection from "./ThreeColumnSection";
+import PanelWidget from "./components/PanelWidget";
+import TitleBar from "@library/headers/TitleBar";
+import { MemoryRouter } from "react-router";
+import Container from "@library/layout/components/Container";
+import { SectionBehaviourContext } from "@library/layout/SectionBehaviourContext";
 
 export default {
     title: "Layout/PanelLayout",
@@ -142,7 +143,7 @@ export const LargeRightBottomPanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
 
 export const NoMinHeight = storyWithConfig(NO_WRAPPER_CONFIG, () => {
     return (
-        <SectionBehaviourContext.Provider value={{ isSticky: false, autoWrap: false, useMinHeight: false }}>
+        <SectionBehaviourContext.Provider value={{ autoWrap: false, useMinHeight: false }}>
             <ThreeColumnSection
                 leftTop={<DummyPanel>Left Top</DummyPanel>}
                 leftBottom={<DummyPanel>Left Bottom</DummyPanel>}

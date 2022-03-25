@@ -14,15 +14,16 @@ import { userCardVariables } from "@library/features/userCard/UserCard.variables
 import { percent } from "csx";
 import { css, injectGlobal, cx } from "@emotion/css";
 
-export const userCardClasses = useThemeCache((props: { compact?: boolean; zIndex?: number } = {}) => {
+export const userCardClasses = useThemeCache((props: { compact?: boolean } = {}) => {
     const vars = userCardVariables();
     const mediaQueries = oneColumnVariables().mediaQueries();
     const globalVars = globalVariables();
 
     // Global for reach
+
     injectGlobal({
         "[data-reach-popover]": {
-            zIndex: props.zIndex ?? 1051, // Get above our modals.
+            zIndex: 1051, // Get above our modals.
         },
     });
 

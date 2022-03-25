@@ -20,8 +20,6 @@ use Symfony\Component\Cache\Adapter\Psr16Adapter;
 use Vanilla\Analytics\AnalyticsActionsProvider;
 use Vanilla\Analytics\TrackableDecoratorInterface;
 use Vanilla\Cache\CacheCacheAdapter;
-use Vanilla\ImageSrcSet\ImageSrcSetService;
-use Vanilla\ImageSrcSet\Providers\DefaultImageResizeProvider;
 use Vanilla\Layout\LayoutHydrator;
 use Vanilla\Controllers\SearchRootController;
 use Vanilla\Logging\TraceCollector;
@@ -98,15 +96,6 @@ class Bootstrap {
 
         $container
             ->rule(TraceCollector::class)
-            ->setShared(true)
-        ;
-
-        // Image Srcset
-        $container
-            ->rule(ImageSrcSetService::class)
-            ->setConstructorArgs([
-                'provider' => new Reference([DefaultImageResizeProvider::class])
-            ])
             ->setShared(true)
         ;
 

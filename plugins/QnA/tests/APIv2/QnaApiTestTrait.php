@@ -37,7 +37,6 @@ trait QnaApiTestTrait {
     public function setUpQnaApiTestTrait() {
         $this->lastInsertedQuestionID = null;
         $this->lastInsertedAnswerID = null;
-        \ActivityModel::$ActivityTypes = null;
     }
 
     /**

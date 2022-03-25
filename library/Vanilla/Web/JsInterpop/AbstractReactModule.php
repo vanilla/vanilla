@@ -28,13 +28,6 @@ abstract class AbstractReactModule extends AbstractWidgetModule implements React
     }
 
     /**
-     * @return string
-     */
-    public static function getWidgetIconPath(): string {
-        return "";
-    }
-
-    /**
      * Rendering function.
      *
      * @return string

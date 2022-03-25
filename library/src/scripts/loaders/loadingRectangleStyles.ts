@@ -17,15 +17,16 @@ export const loadingRectangleVariables = useThemeCache(() => {
     const colors = makeVars("colors", {
         bg: linearGradient(
             "to right",
-            `${ColorsUtils.colorOut(globalVariables().mixBgAndFg(0.08))} 6%`,
-            `${ColorsUtils.colorOut(globalVariables().mixBgAndFg(0.1))} 25%`,
-            `${ColorsUtils.colorOut(globalVariables().mixBgAndFg(0.08))} 34%`,
+            globalVariables().mixBgAndFg(0.15),
+            globalVariables().mixBgAndFg(0.2),
+            globalVariables().mixBgAndFg(0.25),
         ),
     });
 
     const loadingAnimation = keyframes({
-        "0%": { backgroundPosition: "-1000px 0" },
-        "100%": { backgroundPosition: "1000px 0" },
+        "0%": { opacity: 0.8 },
+        "50%": { opacity: 1 },
+        "100%": { opacity: 0.8 },
     });
 
     return {
@@ -42,11 +43,10 @@ export const loadingRectangleClass = useThemeCache(
             display: inline ? "inline-block" : "block",
             borderRadius: 2,
             background: ColorsUtils.colorOut(vars.colors.bg),
-            backgroundSize: "1000px 100%",
             height: height ? styleUnit(height) : "1em",
             width: styleUnit(width),
             animationName: vars.loadingAnimation,
-            animationDuration: "2s",
+            animationDuration: "4s",
             animationIterationCount: "infinite",
             maxWidth: percent(100),
         });

@@ -32,8 +32,6 @@ class DashboardApiController extends Controller {
             'Garden.Users.Edit',
             'Garden.Users.Delete',
             'Garden.Users.Approve',
-            'Analytics.Data.View',
-            'Analytics.Dashboards.Manage'
         ]);
 
         $in = $this->schema([], 'in')->setDescription('List the dashboard menus.');

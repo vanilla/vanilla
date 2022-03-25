@@ -99,11 +99,10 @@ class ContentSecurityPolicyModel implements LoggerAwareInterface {
         foreach ($policies as $policy) {
             $directive = $policy->getDirective();
             if ($filter === 'all' || $directive === $filter) {
-                $policyArgument = str_replace(["\r","\n"], "", $policy->getArgument());
                 if (array_key_exists($directive, $directives)) {
-                    $directives[$directive] .= ' ' . $policyArgument;
+                    $directives[$directive] .= ' ' . $policy->getArgument();
                 } else {
-                    $directives[$directive] = $directive . ' ' . $policyArgument;
+                    $directives[$directive] = $directive . ' ' . $policy->getArgument();
                 }
             }
         }

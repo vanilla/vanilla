@@ -113,7 +113,6 @@ function useQuillAttributeSync(placeholder?: string, placeholderClass?: string) 
         if (quill) {
             // Initialize some CSS classes onto the quill root.quillRootClasses
             // quill && quill.root.classList.value,
-            quill.root.tabIndex = 0;
             quill.root.classList.value += " " + quillRootClasses;
         }
     }, [quill, quillRootClasses]);

@@ -8,30 +8,25 @@ import { Container } from "@library/layout/components/Container";
 import { sectionOneColumnClasses } from "@library/layout/SectionOneColumn.classes";
 import { useWidgetSectionClasses, WidgetSectionContext } from "@library/layout/WidgetLayout.context";
 import React from "react";
-import { cx } from "@emotion/css";
+import classNames from "classnames";
+import { PanelArea } from "@library/layout/components/PanelArea";
 
 interface IProps extends React.HTMLAttributes<HTMLDivElement> {
     className?: string;
     children: React.ReactNode;
-    isNarrow?: boolean;
-    childrenBefore?: React.ReactNode;
+    isNarrow: boolean;
     childrenAfter?: React.ReactNode;
     contentRef?: React.RefObject<HTMLDivElement>;
 }
 
 export function SectionOneColumn(props: IProps) {
-    const { className, isNarrow, children, childrenBefore, childrenAfter, contentRef, ...elementProps } = props;
+    const { className, isNarrow, children, childrenAfter, contentRef, ...elementProps } = props;
     const widgetClasses = useWidgetSectionClasses();
     const oneColumnClasses = sectionOneColumnClasses();
 
     return (
-        <div
-            {...elementProps}
-            ref={contentRef}
-            className={cx(oneColumnClasses.root, widgetClasses.widgetClass, className)}
-        >
-            {childrenBefore}
-            <Container fullGutter narrow={isNarrow} className={oneColumnClasses.container}>
+        <div {...elementProps} ref={contentRef}>
+            <Container fullGutter narrow={isNarrow} className={classNames(widgetClasses.widgetClass, className)}>
                 <WidgetSectionContext.Provider
                     value={{
                         widgetClass: oneColumnClasses.widgetClass,
@@ -39,10 +34,12 @@ export function SectionOneColumn(props: IProps) {
                         headingBlockClass: widgetClasses.headingBlockClass,
                     }}
                 >
-                    <>{children}</>
+                    <>
+                        {children}
+                        {childrenAfter}
+                    </>
                 </WidgetSectionContext.Provider>
             </Container>
-            {childrenAfter}
         </div>
     );
 }

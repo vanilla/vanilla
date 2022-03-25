@@ -4570,7 +4570,7 @@ a {
 }
 a:focus, a:hover {
   color: #015f8f;
-  text-decoration: none;
+  text-decoration: underline;
 }
 a:focus {
   outline: thin dotted;

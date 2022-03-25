@@ -3,7 +3,7 @@
  * Quotes Plugin.
  *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Quotes
  */
@@ -179,9 +179,9 @@ class QuotesPlugin extends Gdn_Plugin {
      *
      * Old and busted method.
      *
-     * @param Gdn_Controller $sender
+     * @param $sender
      */
-    public function controller_getQuote($sender) {
+    public function controller_getquote($sender) {
         $this->discussionController_getQuote_create($sender);
     }
 
@@ -189,10 +189,10 @@ class QuotesPlugin extends Gdn_Plugin {
      * Retrieve text of a quote.
      *
      * @param discussionController $sender
-     * @param string $selector
+     * @param $selector
      * @param bool $format
      */
-    public function discussionController_getQuote_create($sender, $selector = '', $format = false) {
+    public function discussionController_getQuote_create($sender, $selector, $format = false) {
         $sender->permission('Garden.SignIn.Allow');
 
         $sender->deliveryMethod(DELIVERY_METHOD_JSON);

@@ -15,7 +15,7 @@ import { Mixins } from "@library/styles/Mixins";
 import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { calc, percent, translate, translateX, viewHeight } from "csx";
-import { css, CSSObject } from "@emotion/css";
+import { CSSObject } from "@emotion/css";
 import { cssRule } from "@library/styles/styleShim";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 
@@ -92,13 +92,11 @@ export const modalClasses = useThemeCache(() => {
     const shadows = shadowHelper();
     const titleBarVars = titleBarVariables();
 
-    //we'll give the zIndex to child elements to support the stacking behaviour
-    const stackingZindex = useThemeCache((zIndex: number = 1050) =>
-        css({
-            zIndex,
-            position: "absolute",
-        }),
-    );
+    cssRule("#modals", {
+        position: "relative",
+        zIndex: 1050, // Sorry it's so high. Our dashboard uses some bootstrap which specifies 1040 for the old modals.
+        // When nesting our modals on top we need to be higher.
+    });
 
     const overlayMixin: CSSObject = {
         position: "fixed",
@@ -297,6 +295,5 @@ export const modalClasses = useThemeCache(() => {
         overlayScrim,
         overlayContent,
         frameWrapper,
-        stackingZindex,
     };
 });

@@ -20,18 +20,11 @@ export const EmbedContainer = forwardRef(function EmbedContainer(props: IProps, 
     const { size, withPadding, ...htmlProps } = props;
     const classes = embedContainerClasses();
 
-    const { inEditor, selectSelf } = useEmbedContext();
+    const { inEditor } = useEmbedContext();
     return (
         <div
             ref={ref}
             {...htmlProps}
-            onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                e.nativeEvent.stopImmediatePropagation();
-                htmlProps.onClick?.(e);
-                selectSelf?.();
-            }}
             className={classNames(
                 "embedExternal",
                 classes.makeRootClass(props.size || EmbedContainerSize.MEDIUM, !!inEditor, !!withPadding),

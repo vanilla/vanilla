@@ -18,25 +18,23 @@ export default {
     title: "Components/Tabs",
 };
 
-// FIXME: [VNLA-1206] https://higherlogic.atlassian.net/browse/VNLA-1206
-//  this story can be restored when the monaco config issue in TextEditor is resolved (probably after updating to new monaco editor version)
-// export function TextEditors() {
-//     const tabData = [
-//         { label: "Header", contents: <TextEditor language={"html"} /> },
-//         { label: "Footer", contents: <TextEditor language={"html"} /> },
-//         { label: "CSS", contents: <TextEditor language={"css"} /> },
-//         { label: "JS", contents: <TextEditor language={"javascript"} /> },
-//     ];
+export function TextEditors() {
+    const tabData = [
+        { label: "Header", contents: <TextEditor language={"html"} /> },
+        { label: "Footer", contents: <TextEditor language={"html"} /> },
+        { label: "CSS", contents: <TextEditor language={"css"} /> },
+        { label: "JS", contents: <TextEditor language={"javascript"} /> },
+    ];
 
-//     return (
-//         <>
-//             <StoryContent>
-//                 <StoryHeading>Simple Tab List </StoryHeading>
-//             </StoryContent>
-//             <Tabs data={tabData} />
-//         </>
-//     );
-// }
+    return (
+        <>
+            <StoryContent>
+                <StoryHeading>Simple Tab List </StoryHeading>
+            </StoryContent>
+            <Tabs data={tabData} />
+        </>
+    );
+}
 
 export function TabWithErrors() {
     return (

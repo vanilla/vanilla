@@ -3,7 +3,6 @@ import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { oneColumnVariables } from "@library/layout/Section.variables";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { Mixins } from "@library/styles/Mixins";
-import { sticky } from "@library/styles/styleHelpersPositioning";
 import { useThemeCache } from "@library/styles/styleUtils";
 import { Variables } from "@library/styles/Variables";
 import { calc } from "csx";
@@ -47,18 +46,11 @@ export const adminTitleBarClasses = useThemeCache(() => {
 
     const titleAndDescriptionContainer = css({});
 
-    const titleWrap = css({
+    const title = css({
         fontSize: "20px",
         fontWeight: "bold",
         color: "#555a62",
         marginBottom: 0,
-        display: "flex",
-        alignItems: "center",
-        flexWrap: "wrap",
-    });
-
-    const title = css({
-        marginRight: 16,
     });
 
     const actionsWrapper = css({ display: "flex", flexDirection: "row", alignItems: "center" });
@@ -75,18 +67,11 @@ export const adminTitleBarClasses = useThemeCache(() => {
             ...globalVariables().fontSizeAndWeightVars("medium", "normal"),
             lineHeight: 24 / 14,
         }),
-
-        "&& a": {
-            [`&:hover, &:active, &:focus, &.focus-visible`]: {
-                textDecoration: "none",
-            },
-        },
     });
 
     return {
         root,
         container,
-        titleWrap,
         title,
         titleAndActionsContainer,
         titleAndDescriptionContainer,
@@ -101,9 +86,6 @@ export const adminEditTitleBarClasses = useThemeCache(() => {
     const mediaQueries = titleBarVariables().mediaQueries();
 
     const editingContainerWrapper = css({
-        ...sticky(),
-        top: 0,
-        zIndex: 3,
         boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
         marginBottom: 1,
     });

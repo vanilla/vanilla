@@ -15,6 +15,7 @@ import { TitleBarDevices, useTitleBarDevice } from "@library/layout/TitleBarCont
 import { useCollisionDetector } from "@vanilla/react-utils";
 import { useConfigPatcher, useConfigsByKeys } from "@library/config/configHooks";
 import AdminLayout from "@dashboard/components/AdminLayout";
+import AdminTitleBar from "@dashboard/components/AdminTitleBar";
 import Button from "@library/forms/Button";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import isEmpty from "lodash/isEmpty";
@@ -22,6 +23,7 @@ import isEqual from "lodash/isEqual";
 import React, { useEffect, useMemo, useState } from "react";
 import SmartLink from "@library/routing/links/SmartLink";
 import { BrandingAndSEOPageClasses } from "@dashboard/appearance/pages/BrandingAndSEOPage.classes";
+import { userContentClasses } from "@library/content/UserContent.styles";
 
 const BRANDING_SETTINGS: JsonSchema = {
     type: "object",
@@ -267,6 +269,12 @@ export default function BrandingAndSEOPage() {
                         {t(
                             "Spend a little time thinking about how you describe your site here. Giving your site a meaningful title and concise description could help your position in search engines.",
                         )}
+                    </p>
+                    <h3>{t("Need more help?")}</h3>
+                    <p>
+                        <SmartLink to="settings/tutorials/appearance">
+                            {t("Video tutorial on managing appearance")}
+                        </SmartLink>
                     </p>
                 </>
             }

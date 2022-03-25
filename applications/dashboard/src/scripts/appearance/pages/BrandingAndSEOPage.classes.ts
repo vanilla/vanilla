@@ -18,6 +18,7 @@ export const BrandingAndSEOPageClasses = {
 
         "& > section": {
             width: "100%",
+            minWidth: 536,
             maxWidth: 1024,
             ...Mixins.padding(
                 Variables.spacing({

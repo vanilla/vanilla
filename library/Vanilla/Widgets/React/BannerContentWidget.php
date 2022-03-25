@@ -21,7 +21,7 @@ class BannerContentWidget extends ReactBannerFullWidget {
      * @inheritDoc
      */
     public static function getWidgetName(): string {
-        return "Content Banner";
+        return "Banner - Content";
     }
 
     /**
@@ -29,13 +29,6 @@ class BannerContentWidget extends ReactBannerFullWidget {
      */
     public static function getWidgetID(): string {
         return "banner.content";
-    }
-
-    /**
-     * @return string
-     */
-    public static function getWidgetIconPath(): string {
-        return "/applications/dashboard/design/images/widgetIcons/contentbanner.svg";
     }
 
     /**

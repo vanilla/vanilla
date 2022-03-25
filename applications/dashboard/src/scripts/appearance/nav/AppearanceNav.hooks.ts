@@ -10,37 +10,31 @@ import {
     BrandingPageRoute,
     LegacyLayoutsRoute,
     LayoutOverviewRoute,
-    LayoutEditorRoute,
-} from "@dashboard/appearance/routes/appearanceRoutes";
+    NewLayoutRoute,
+    NewLayoutJsonRoute,
+} from "@dashboard/appearance/routes/pageRoutes";
 import { useConfigsByKeys } from "@library/config/configHooks";
 import { useMemo } from "react";
 import { useLayouts } from "@dashboard/layout/layoutSettings/LayoutSettings.hooks";
 import { RecordID, uuidv4 } from "@vanilla/utils";
-import { ILayoutDetails } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
+import { ILayout } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import isEmpty from "lodash/isEmpty";
 import { LayoutViewType, LAYOUT_VIEW_TYPES } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { registeredAppearanceNavItems } from "@dashboard/appearance/navigationItems";
 
 const CUSTOM_LAYOUTS_CONFIG_KEY = "labs.customLayouts";
 
-function makeTreeChildren(layouts: ILayoutDetails[], recordID: RecordID) {
+function makeTreeChildren(layouts: ILayout[], recordID: RecordID) {
     return (
-        layouts.map((layout, index) => {
-            const isApplied =
-                layout.layoutViewType === recordID &&
-                !!layout.layoutViews.length &&
-                !!layout.layoutViews.find((layoutView) => layoutView.layoutViewType === recordID);
-            return {
-                sort: index,
-                name: layout.name,
-                url: getRelativeUrl(LayoutOverviewRoute.url(layout)),
-                recordType: "customLayout",
-                parentID: recordID,
-                recordID: layout.layoutID,
-                children: [],
-                withCheckMark: isApplied,
-            };
-        }) ?? []
+        layouts.map((layout, index) => ({
+            sort: index,
+            name: layout.name,
+            url: getRelativeUrl(LayoutOverviewRoute.url(layout)),
+            recordType: "customLayout",
+            parentID: recordID,
+            recordID: layout.layoutID,
+            children: [],
+        })) ?? []
     );
 }
 
@@ -91,7 +85,7 @@ function useLayoutEditorNavTree(ownID: RecordID, parentID: RecordID): INavigatio
                                         recordType: "addLayout",
                                         isLink: true,
                                         children: [],
-                                        url: getRelativeUrl(LayoutEditorRoute.url({ layoutViewType })),
+                                        url: getRelativeUrl(NewLayoutRoute.url(layoutViewType)),
                                     },
                                 ]
                               : []),
@@ -109,36 +103,26 @@ export function useAppearanceNavItems(parentID: RecordID): INavigationTreeItem[]
         return registeredNavItems.map((itemPartial: Partial<INavigationTreeItem>) => ({
             ...itemPartial,
             name: t(itemPartial?.name ?? ""),
-            parentID: 0,
+            parentID,
             sort: 0,
-            recordID: "registeredNavItem",
+            recordID: 1,
             recordType: "customLink",
             children: [],
             url: getRelativeUrl(itemPartial?.url ?? ""),
         }));
-    }, [registeredNavItems]);
+    }, [parentID, registeredNavItems]);
 
     const brandingPageLink: INavigationTreeItem = {
         name: t("Branding & SEO"),
-        parentID: 0,
+        parentID,
         sort: 0,
-        recordID: "brandingAndSEO",
+        recordID: 0,
         recordType: "customLink",
         children: [],
         url: getRelativeUrl(BrandingPageRoute.url(undefined)),
     };
 
-    //Branding & SEO and Style Guides should be part of parent named Branding & Assets
-    const brandingAndAssetsTreeItem = {
-        name: t("Branding & Assets"),
-        parentID,
-        sort: 0,
-        recordID: 0,
-        recordType: "panelMenu",
-        children: [brandingPageLink, ...otherNavItems],
-    };
+    const layoutTreeItem = useLayoutEditorNavTree(2, parentID);
 
-    const layoutTreeItem = useLayoutEditorNavTree(1, parentID);
-
-    return [brandingAndAssetsTreeItem, layoutTreeItem];
+    return [brandingPageLink, ...otherNavItems, layoutTreeItem];
 }

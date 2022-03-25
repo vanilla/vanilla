@@ -50,13 +50,6 @@ class RSSWidget implements ReactWidgetInterface, CombinedPropsWidgetInterface, I
     }
 
     /**
-     * @return string
-     */
-    public static function getWidgetIconPath(): string {
-        return "/applications/dashboard/design/images/widgetIcons/rssfeed.svg";
-    }
-
-    /**
      * Get props for component
      *
      * @return array

@@ -38,7 +38,7 @@ class SectionOneColumn extends AbstractLayoutSection {
      * @inheritdoc
      */
     public static function getWidgetName(): string {
-        return '1 Column';
+        return '1 Column Layout';
     }
 
     /**
@@ -46,12 +46,5 @@ class SectionOneColumn extends AbstractLayoutSection {
      */
     public static function getWidgetID(): string {
         return 'section.1-column';
-    }
-
-    /**
-     * @return string
-     */
-    public static function getWidgetIconPath(): string {
-        return "/applications/dashboard/design/images/sectionIcons/1column.svg";
     }
 }

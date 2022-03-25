@@ -29,14 +29,7 @@ abstract class MockThemeTestCase extends MinimalContainerTestCase {
     /** @var MockAddonManager */
     protected $addonManager;
 
-    /**
-     * If someone wants to untangle this be my guest.
-     *
-     * @return bool
-     */
-    protected static function useCommonBootstrap(): bool {
-        return false;
-    }
+
 
     /**
      * Prepare the container.

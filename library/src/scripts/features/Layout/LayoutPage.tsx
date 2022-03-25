@@ -6,13 +6,14 @@
 
 import React from "react";
 import { ErrorPage } from "@library/errorPages/ErrorComponent";
-import { LayoutRenderer } from "@library/features/Layout/LayoutRenderer";
+import { Layout } from "@library/features/Layout/Layout";
 import { useLayoutSpec } from "@library/features/Layout/LayoutPage.hooks";
+import { ILayoutQuery } from "@library/features/Layout/LayoutPage.types";
+import TitleBar from "@library/headers/TitleBar";
 import Loader from "@library/loaders/Loader";
 import { Router } from "@library/Router";
 import { Route, RouteComponentProps } from "react-router";
 import { WidgetLayout } from "@library/layout/WidgetLayout";
-import { ILayoutQuery } from "@library/features/Layout/LayoutRenderer.types";
 
 interface IProps {
     layoutQuery: ILayoutQuery;
@@ -39,7 +40,7 @@ export function LayoutPage(props: IProps) {
 
     return (
         <WidgetLayout>
-            <LayoutRenderer layout={layout.data.layout} />;
+            <Layout layout={layout.data.layout} />;
         </WidgetLayout>
     );
 }

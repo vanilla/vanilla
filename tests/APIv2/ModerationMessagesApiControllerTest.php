@@ -213,11 +213,4 @@ class ModerationMessagesApiControllerTest extends AbstractResourceTest {
     public function testEditFormatCompat(string $editSuffix = "/edit") {
         TestCase::markTestSkipped("This resource doesn't have GET /:id/edit.");
     }
-
-    /**
-     * We don't need the image.
-     */
-    public function testMainImageField() {
-        $this->markTestSkipped();
-    }
 }

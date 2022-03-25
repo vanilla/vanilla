@@ -16,6 +16,7 @@ export const resultPaginationInfoClasses = useThemeCache(() => {
 
     const root = style({
         ...Mixins.font(metasVars.font),
+        marginTop: globalVars.gutter.half,
     });
 
     const alignRight = style("alignRight", {

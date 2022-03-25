@@ -17,7 +17,6 @@ export interface IProps {
     actions?: React.ReactNode;
     actionsWrapperClassName?: string;
     description?: ReactNode;
-    titleLabel?: ReactNode;
 }
 
 export default function AdminTitleBar(props: IProps) {
@@ -28,11 +27,10 @@ export default function AdminTitleBar(props: IProps) {
             <div className={cx(classes.container, props.containerClassName)}>
                 <div className={cx(classes.titleAndActionsContainer, props.titleAndActionsContainerClassName)}>
                     <div className={classes.titleAndDescriptionContainer}>
-                        <h2 className={classes.titleWrap} title={props.title}>
-                            <TruncatedText lines={1} className={classes.title}>
+                        <h2 className={classes.title} title={props.title}>
+                            <TruncatedText lines={1}>
                                 {props.title ?? <LoadingRectangle height={32} width={300} />}
                             </TruncatedText>
-                            {props.titleLabel ?? undefined}
                         </h2>
                         {props.description && (
                             <div className={cx(classes.descriptionWrapper)}>

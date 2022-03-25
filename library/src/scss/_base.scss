@@ -15,9 +15,3 @@
 
 @import "~library-scss/utility/scaffolding";
 @import "~library-scss/utility/utilities";
-
-// Clear reach warning
-// https://reach.tech/styling/
-:root {
-    --reach-tooltip: 1;
-}

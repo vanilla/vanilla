@@ -13,7 +13,6 @@ import qs from "qs";
 import pDebounce from "p-debounce";
 import { NEW_SEARCH_PAGE_ENABLED } from "@library/search/searchConstants";
 import { ISearchRequestQuery, ISearchResult } from "@library/search/searchTypes";
-import { SearchService } from "@library/search/SearchService";
 
 /**
  * Advanced Search implementation of autocomplete using sphinx.
@@ -28,45 +27,28 @@ export class CommunitySearchProvider implements ISearchOptionProvider {
         const queryObj: ISearchRequestQuery = {
             query: value,
             expand: ["breadcrumbs", "-body"],
-            limit: Math.floor(10 / SearchService.pluggableSources.length),
+            limit: 10,
             collapse: true,
             ...options,
         };
-
-        // TODO [VNLA-1313]: Fix this so that we don't need to wait for all calls to resolve before showing the results
-        const searchAllSources = SearchService.pluggableSources.map((source) =>
-            source.performSearch(queryObj).then((response) => ({
-                ...response,
-                source: source.key,
-            })),
-        );
-        const responses = await Promise.all(searchAllSources);
-
-        const formattedResponses = responses
-            .map(({ results, source }) => {
-                return results.map((result) => {
-                    const data: ISearchOptionData = {
-                        crumbs: result.breadcrumbs ?? [],
-                        name: result.name,
-                        dateUpdated: result.dateUpdated ?? result.dateInserted,
-                        labels: result.labelCodes,
-                        url: result.url,
-                        type: result.type,
-                        isForeign: result.isForeign,
-                    };
-                    return {
-                        label: result.name,
-                        value: result.name,
-                        type: result.type,
-                        url: result.url,
-                        source: source,
-                        data,
-                    };
-                });
-            })
-            .flat();
-
-        return formattedResponses;
+        const response: AxiosResponse<ISearchResult[]> = await apiv2.get(`/search`, { params: queryObj });
+        return response.data.map((result) => {
+            const data: ISearchOptionData = {
+                crumbs: result.breadcrumbs ?? [],
+                name: result.name,
+                dateUpdated: result.dateUpdated ?? result.dateInserted,
+                labels: result.labelCodes,
+                url: result.url,
+                type: result.type,
+            };
+            return {
+                label: result.name,
+                value: result.name,
+                data,
+                type: result.type,
+                url: result.url,
+            };
+        });
     };
 
     /**

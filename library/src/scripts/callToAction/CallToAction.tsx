@@ -13,7 +13,7 @@ import { DeepPartial } from "redux";
 import { useMeasure } from "@vanilla/react-utils/src";
 import classNames from "classnames";
 import { ButtonTypes } from "../forms/buttonTypes";
-import { Widget } from "@library/layout/Widget";
+import { WidgetLayoutWidget } from "@library/layout/WidgetLayoutWidget";
 import { useSection } from "@library/layout/LayoutContext";
 
 interface ICTALink {
@@ -65,7 +65,7 @@ export function CallToAction(props: IProps) {
     const showContent = props.desktopOnly && !isFullWidth ? false : true;
 
     return (
-        <Widget>
+        <WidgetLayoutWidget>
             {showContent && (
                 <div className={ctaClasses.root}>
                     <div className={ctaClasses.container}>
@@ -103,6 +103,6 @@ export function CallToAction(props: IProps) {
                     </div>
                 </div>
             )}
-        </Widget>
+        </WidgetLayoutWidget>
     );
 }

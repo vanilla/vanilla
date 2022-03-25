@@ -17,7 +17,7 @@ import DropDownUserCard from "@library/flyouts/items/DropDownUserCard";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { getMeta, getSiteSection, t } from "@library/utility/appUtils";
 import classNames from "classnames";
-import React, { ReactNode, useMemo } from "react";
+import React from "react";
 import { connect } from "react-redux";
 import { DropDownEditProfileLink } from "@library/flyouts/items/DropDownEditProfileLink";
 import { extraUserDropDownComponents } from "@library/headers/mebox/pieces/UserDropdownExtras";
@@ -30,17 +30,6 @@ function UserDropDownContentsImpl(props: IProps) {
     const { userInfo } = props;
     const signOutUrl = useSignOutLink();
     const siteSection = getSiteSection();
-
-    const dashboardMenuItem: ReactNode = useMemo(() => {
-        if (hasPermission(["site.manage", "settings.view"])) {
-            return <DropDownItemLink to={"/dashboard/settings"} name={t("Dashboard")} />;
-        }
-        if (!hasPermission(["site.manage", "settings.view"]) && hasPermission(["data.view", "dashboards.manage"])) {
-            return <DropDownItemLink to={"/analytics"} name={t("Analytics")} />;
-        }
-        return null;
-    }, []);
-
     if (!userInfo) {
         return null;
     }
@@ -99,7 +88,9 @@ function UserDropDownContentsImpl(props: IProps) {
                 </DropDownSection>
             </Permission>
             <DropDownItemSeparator />
-            {dashboardMenuItem}
+            <Permission permission={["site.manage", "settings.view"]}>
+                <DropDownItemLink to={"/dashboard/settings"} name={t("Dashboard")} />
+            </Permission>
             <DropDownItemLink to={signOutUrl} name={t("Sign Out")} />
         </ul>
     );

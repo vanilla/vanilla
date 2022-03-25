@@ -22,15 +22,12 @@ paths:
                 - $ref: "#/components/parameters/DateInserted"
                 - $ref: "#/components/parameters/DateUpdated"
                 - $ref: "#/components/parameters/DateLastComment"
-                - description: |-
-                      Filter discussions by site section ID (ex. subcommunity).
-                      The subcommunity ID or folder can be used if you use [smart IDs](https://success.vanillaforums.com/kb/articles/46-smart-ids).
+                - description: >
+                      Filter discussions by site-section-id (subcommunity).
+                      The subcommunityID or folder can be used.
                       The query looks like:
-
-                      ```
-                      siteSectionID=$subcommunityID:{id|folder}
-                      ```
-                  example: "$subcommunityID:en"
+                      siteSectionID=$SubcommunityID:{id} ie. 1
+                      siteSectionID=$SubcommunityID:{folder} ie. en
                   in: query
                   name: siteSectionID
                   schema:
@@ -1077,8 +1074,6 @@ components:
                     description: The group the discussion is in.
                     nullable: true
                     type: integer
-                image:
-                    $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/MainImage"
                 insertUser:
                     $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/UserFragment"
                 insertUserID:

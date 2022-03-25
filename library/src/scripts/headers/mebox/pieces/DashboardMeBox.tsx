@@ -25,12 +25,10 @@ import { Icon } from "@vanilla/icons";
 import { getMeta } from "@library/utility/appUtils";
 import ModalSizes from "@library/modal/ModalSizes";
 import { titleBarClasses } from "@library/headers/titleBarStyles";
-import { cx } from "@emotion/css";
 
 interface DashboardMeBoxProps extends IMeBoxProps {
     forceOpen?: boolean;
     forceOpenAsModal?: boolean;
-    isCompact?: boolean;
 }
 
 /**
@@ -61,7 +59,7 @@ export default function DashboardMeBox(props: DashboardMeBoxProps) {
     );
 
     return (
-        <div className={cx(classes.container, props.isCompact ? classes.mobileContainer : undefined)}>
+        <div className={classes.container}>
             <DropDown
                 buttonClassName={classesTitleBar.button}
                 renderLeft={true}

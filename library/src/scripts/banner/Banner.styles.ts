@@ -412,7 +412,7 @@ export const bannerClasses = useThemeCache((alternativeVariables?: ReturnType<ty
             transform: translateX("-50%"),
             borderTopRightRadius: 0,
             borderTopLeftRadius: 0,
-            ".suggestedTextInput-option, .suggestedTextInput-groupHeading": {
+            ".suggestedTextInput-option": {
                 ...Mixins.padding({
                     horizontal: 21,
                 }),

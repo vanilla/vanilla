@@ -15,7 +15,6 @@ use PHPMailer\PHPMailer\PHPMailer;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
-use Vanilla\CurrentTimeStamp;
 use Vanilla\Dashboard\Models\ActivityEmail;
 use Vanilla\Formatting\Formats\TextFormat;
 use Vanilla\Formatting\Formats;
@@ -529,12 +528,12 @@ class ActivityModel extends Gdn_Model {
     }
 
     /**
-     * Get an activity type by its name or ID.
      *
-     * @param int|string $activityTypeIDOrName
-     * @return array|false
+     *
+     * @param $activityType
+     * @return bool
      */
-    public static function getActivityType($activityTypeIDOrName) {
+    public static function getActivityType($activityType) {
         if (self::$ActivityTypes === null) {
             $data = Gdn::sql()->get('ActivityType')->resultArray();
             foreach ($data as $row) {
@@ -542,8 +541,8 @@ class ActivityModel extends Gdn_Model {
                 self::$ActivityTypes[$row['ActivityTypeID']] = $row;
             }
         }
-        if (isset(self::$ActivityTypes[$activityTypeIDOrName])) {
-            return self::$ActivityTypes[$activityTypeIDOrName];
+        if (isset(self::$ActivityTypes[$activityType])) {
+            return self::$ActivityTypes[$activityType];
         }
         return false;
     }
@@ -1647,9 +1646,7 @@ class ActivityModel extends Gdn_Model {
         if (val('CheckRecord', $options)) {
             // Check to see if this record already notified so we don't notify multiple times.
             $where = arrayTranslate($activity, ['NotifyUserID', 'RecordType', 'RecordID']);
-            $where['DateUpdated >'] = Gdn_Format::toDateTime(
-                CurrentTimeStamp::getDateTime()->modify("-2 days")->getTimestamp()
-            ); // index hint
+            $where['DateUpdated >'] = Gdn_Format::toDateTime(strtotime('-2 days')); // index hint
 
             $checkActivity = $this->SQL->getWhere(
                 'Activity',
@@ -1675,9 +1672,7 @@ class ActivityModel extends Gdn_Model {
             }
             $where['NotifyUserID'] = $activity['NotifyUserID'];
             // Make sure to only group activities by day.
-            $where['DateInserted >'] = Gdn_Format::toDateTime(
-                CurrentTimeStamp::getDateTime()->modify("-1 day")->getTimestamp()
-            );
+            $where['DateInserted >'] = Gdn_Format::toDateTime(strtotime('-1 day'));
 
             // See if there is another activity to group these into.
             $groupActivity = $this->SQL->getWhere(
@@ -2071,7 +2066,7 @@ class ActivityModel extends Gdn_Model {
             return null;
         } else {
             $tz = new \DateTimeZone('UTC');
-            $now = new DateTime('@' . CurrentTimeStamp::get(), $tz);
+            $now = new DateTime('now', $tz);
             $test = new DateTime($this->pruneAfter, $tz);
 
             $interval = $test->diff($now);
@@ -2093,7 +2088,7 @@ class ActivityModel extends Gdn_Model {
     public function setPruneAfter($pruneAfter) {
         if ($pruneAfter) {
             // Make sure the string is negative.
-            $now = CurrentTimeStamp::get();
+            $now = time();
             $testTime = strtotime($pruneAfter, $now);
             if ($testTime === false) {
                 throw new InvalidArgumentException('Invalid timespan value for "prune after".', 400);

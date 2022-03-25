@@ -3,12 +3,13 @@
  * @license Proprietary
  */
 
-import { ILoadable, Loadable, LoadStatus } from "@library/@types/api/core";
+import { Loadable, LoadStatus } from "@library/@types/api/core";
 import { IUserFragment } from "@library/@types/api/users";
-import { IHydratedLayoutWidget } from "@library/features/Layout/LayoutRenderer.types";
+import { InPanelLayout } from "@library/carousel/Carousel.story";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
-import { JsonSchema } from "@vanilla/json-schema-forms";
 import { RecordID } from "@vanilla/utils";
+import { ILayout as ILayoutSchema } from "@library/features/Layout/Layout";
+import { JsonSchema } from "@vanilla/json-schema-forms";
 
 // TODO: Fix these interface names
 export interface ILayoutsStoreState extends ICoreStoreState {
@@ -16,16 +17,22 @@ export interface ILayoutsStoreState extends ICoreStoreState {
 }
 
 export interface ILayoutsState {
-    layoutsByID: { [key in ILayoutDetails["layoutID"]]?: Loadable<ILayoutDetails> };
+    layoutsByID: { [key in ILayout["layoutID"]]?: Loadable<ILayout> };
     layoutsListStatus: {
         status: LoadStatus;
         error?: any;
     };
-    layoutDraft: ILayoutDraft | null;
-    layoutDraftPersistLoadable: ILoadable<ILayoutEdit>;
-    layoutJsonsByLayoutID: Record<RecordID, Loadable<ILayoutEdit>>;
-    catalogByViewType: Partial<Record<LayoutViewType, ILayoutCatalog>>;
-    catalogStatusByViewType: Partial<Record<LayoutViewType, Loadable<{}>>>;
+    layoutJsonDraftsByID: { [key in ILayout["layoutID"]]?: Omit<LayoutEditSchema, "layoutID"> };
+    layoutJsonsByLayoutID: { [key in ILayout["layoutID"]]?: Loadable<LayoutEditSchema> };
+    catalogByViewType: {
+        [key in ILayoutCatalog["layoutViewType"]]?: ILayoutCatalog;
+    };
+    catalogStatusByViewType: {
+        [key in ILayoutCatalog["layoutViewType"]]?: {
+            status: LoadStatus;
+            error?: any;
+        };
+    };
 }
 
 export const INITIAL_LAYOUTS_STATE: ILayoutsState = {
@@ -33,10 +40,7 @@ export const INITIAL_LAYOUTS_STATE: ILayoutsState = {
     layoutsListStatus: {
         status: LoadStatus.PENDING,
     },
-    layoutDraft: null,
-    layoutDraftPersistLoadable: {
-        status: LoadStatus.PENDING,
-    },
+    layoutJsonDraftsByID: {},
     layoutJsonsByLayoutID: {},
     catalogByViewType: {},
     catalogStatusByViewType: {},
@@ -44,7 +48,7 @@ export const INITIAL_LAYOUTS_STATE: ILayoutsState = {
 
 export type LayoutViewType = "home" | "discussions" | "categories";
 export const LAYOUT_VIEW_TYPES = ["home", "discussions", "categories"] as LayoutViewType[];
-export interface ILayoutDetails {
+export interface ILayout {
     layoutID: RecordID;
     name: string;
     isDefault?: boolean;
@@ -58,14 +62,19 @@ export interface ILayoutDetails {
     layoutViews: ILayoutView[];
 }
 
-export interface ILayoutEdit extends IEditableLayoutSpec {
-    name: string;
-    layoutID: ILayoutDetails["layoutID"];
+interface ILayoutDefinition {
+    $hydrate: string;
+    [key: string]: any; //react component props
 }
-export interface ILayoutDraft extends IEditableLayoutSpec {
-    name: string;
-    layoutID?: ILayoutDetails["layoutID"];
-}
+
+export type LayoutEditSchema = {
+    layoutID: ILayout["layoutID"];
+    name: ILayout["name"];
+    layoutViewType: ILayout["layoutViewType"]; //fixme: this property is not in the backend schema
+    layout: ILayoutDefinition[];
+};
+
+export interface LayoutFromPostOrPatchResponse extends ILayout, LayoutEditSchema {}
 
 export interface ILayoutView {
     layoutViewID: RecordID;
@@ -87,48 +96,9 @@ export interface ILayoutViewQuery {
     recordID: number;
     recordType: string;
 }
-
-/**
- * Interface representing a raw layout widget (like what comes back from the /api/v2/layouts/:id/edit)
- */
-export interface IEditableLayoutWidget {
-    $middleware?: Record<string, any>;
-    $hydrate: string;
-    // Any props for the widget.
-    [key: string]: any;
-}
-
-export interface IEditableLayoutSpec {
-    layoutViewType: LayoutViewType;
-    layout: IEditableLayoutWidget[];
-}
-
-export interface ILayoutEditorPath {
-    sectionIndex: number; // 0
-    sectionRegion?: string; // rightTop
-    sectionRegionIndex?: number; // 4
-}
-
-export interface ILayoutEditorSectionPath extends ILayoutEditorPath {}
-
-export interface ILayoutEditorDestinationPath extends ILayoutEditorPath {
-    sectionRegion: string; // rightTop
-}
-
-export interface ILayoutEditorWidgetPath extends ILayoutEditorDestinationPath {
-    sectionRegionIndex: number; // 4
-}
-
-export interface IHydratedEditableWidgetProps {
-    $hydrate: string;
-    $componentName: string;
-    $editorPath: ILayoutEditorPath;
-}
-
-export interface IHydratedEditableLayoutWidget extends IHydratedLayoutWidget<IHydratedEditableWidgetProps> {}
-
-export interface IHydratedEditableLayoutSpec {
-    layout: IHydratedEditableLayoutWidget[];
+export interface IEditableLayout extends ILayoutSchema {
+    layoutID: ILayout["layoutID"];
+    name: ILayout["name"];
 }
 
 type ISchemaCatalog = Record<
@@ -138,14 +108,12 @@ type ISchemaCatalog = Record<
     }
 >;
 
-export type IWidgetCatalog = Record<
+type IWidgetCatalog = Record<
     string,
     {
         schema: JsonSchema;
         $reactComponent: string;
-        recommendedWidgets?: Array<{ widgetID: string; widgetName: string }>;
-        iconUrl?: string;
-        name: string;
+        recommendedWidgets: Array<{ widgetID: string; widgetName: string }>;
     }
 >;
 

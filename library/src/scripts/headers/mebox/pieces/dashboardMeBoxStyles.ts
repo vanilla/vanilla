@@ -25,10 +25,6 @@ export const dashboardMeBoxClasses = useThemeCache(() => {
         justifyContent: "flex-end",
     });
 
-    const mobileContainer = css({
-        flexBasis: "initial",
-    });
-
     const userPhoto = css({
         "&&": {
             border: 0,
@@ -113,7 +109,6 @@ export const dashboardMeBoxClasses = useThemeCache(() => {
     return {
         root,
         container,
-        mobileContainer,
         userPhoto,
         dropdownBody,
         dropdownUserPhoto,

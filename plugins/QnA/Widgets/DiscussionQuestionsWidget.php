@@ -28,7 +28,7 @@ class DiscussionQuestionsWidget extends QnAWidgetModule implements ReactWidgetIn
      * @inheridoc
      */
     public static function getWidgetName(): string {
-        return "Questions";
+        return "Discussion - Questions";
     }
 
     /**
@@ -37,13 +37,6 @@ class DiscussionQuestionsWidget extends QnAWidgetModule implements ReactWidgetIn
     public static function getComponentName(): string {
         // Temporarily this until we make a version supported grids and carousels.
         return "DiscussionListModule";
-    }
-
-    /**
-     * @return string
-     */
-    public static function getWidgetIconPath(): string {
-        return "/applications/dashboard/design/images/widgetIcons/questions.svg";
     }
 
     /**

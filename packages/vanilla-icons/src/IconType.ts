@@ -5,18 +5,7 @@
 
 type DashboardIconType = "dashboard-edit" | "vanilla-logo";
 
-type DataIconType =
-    | "data-folder-tabs"
-    | "data-pencil"
-    | "data-refresh"
-    | "data-trash"
-    | "data-add"
-    | "data-up"
-    | "data-down"
-    | "data-right"
-    | "data-left"
-    | "data-swap"
-    | "data-replace";
+type DataIconType = "data-folder-tabs" | "data-pencil" | "data-refresh" | "data-trash" | "data-add" | "data-up" | "data-down" | "data-swap" | "data-replace";
 
 type DiscussionIconType = "discussion-bookmark-solid" | "discussion-bookmark";
 

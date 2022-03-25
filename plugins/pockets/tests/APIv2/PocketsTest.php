@@ -252,12 +252,4 @@ class PocketsTest extends AbstractResourceTest {
     public function testEditFormatCompat(string $editSuffix = "/edit") {
         $this->fail(__METHOD__.' needs to be implemented');
     }
-
-
-    /**
-     * We don't need the image.
-     */
-    public function testMainImageField() {
-        $this->markTestSkipped();
-    }
 }

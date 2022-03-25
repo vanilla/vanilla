@@ -30,7 +30,6 @@ import { hasPermission } from "@library/features/users/Permission";
 import { formatUrl } from "@library/utility/appUtils";
 import { useCurrentUserID } from "@library/features/users/userHooks";
 import SmartLink from "@library/routing/links/SmartLink";
-import { useStackingContext } from "@library/modal/StackingContext";
 
 interface IProps {
     user: IUser;
@@ -73,8 +72,7 @@ UserCardView.registerLinks = function (registeredLinks: IExtraUserCardContent) {
 };
 
 export function UserCardView(props: IProps) {
-    const { zIndex } = useStackingContext();
-    const classes = userCardClasses({ zIndex: zIndex });
+    const classes = userCardClasses();
     const { user } = props;
     const device = useDevice();
     const isCompact = device === Devices.MOBILE || device === Devices.XS;
@@ -397,8 +395,7 @@ export function UserCardError(props: IUserCardErrorProps) {
 }
 
 export function CardButton(props: { disabled?: boolean; to?: string; target?: string; children?: React.ReactNode }) {
-    const { zIndex } = useStackingContext();
-    const classes = userCardClasses({ zIndex: zIndex });
+    const classes = userCardClasses();
 
     return (
         <div className={classes.buttonContainer}>
@@ -416,8 +413,7 @@ export function CardButton(props: { disabled?: boolean; to?: string; target?: st
 }
 
 function StatSkeleton(props: { text: string; position: "left" | "right" }) {
-    const { zIndex } = useStackingContext();
-    const classes = userCardClasses({ zIndex: zIndex });
+    const classes = userCardClasses();
 
     const { text, position } = props;
     return (
@@ -441,8 +437,7 @@ function StatLink(props: {
     position: "left" | "right";
     count?: number;
 }) {
-    const { zIndex } = useStackingContext();
-    const classes = userCardClasses({ zIndex: zIndex });
+    const classes = userCardClasses();
 
     const { to, count, text, position } = props;
     return (
@@ -464,7 +459,6 @@ function StatLink(props: {
 
 function Container(props: { children: React.ReactNode; borderTop?: boolean }) {
     const { borderTop } = props;
-    const { zIndex } = useStackingContext();
-    const classes = userCardClasses({ zIndex: zIndex });
+    const classes = userCardClasses();
     return <div className={borderTop ? classes.containerWithBorder : classes.container}>{props.children}</div>;
 }

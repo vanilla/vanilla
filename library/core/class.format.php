@@ -13,7 +13,6 @@
 
 use Garden\EventManager;
 use Garden\StaticCacheConfigTrait;
-use Vanilla\CurrentTimeStamp;
 use \Vanilla\Formatting;
 use \Vanilla\Formatting\Formats;
 use \Vanilla\Formatting\FormatUtil;
@@ -386,7 +385,7 @@ class Gdn_Format {
             }
 
             if (!$timestamp) {
-                $timestamp = CurrentTimeStamp::get();
+                $timestamp = time();
             }
 
             return formatDateCustom($timestamp, $format);
@@ -1300,7 +1299,7 @@ class Gdn_Format {
      */
     public static function toDate($timestamp = '') {
         if ($timestamp == '') {
-            $timestamp = CurrentTimeStamp::get();
+            $timestamp = time();
         } elseif (!is_numeric($timestamp)) {
             $timestamp = DateTimeFormatter::dateTimeToTimeStamp($timestamp);
         }
@@ -1317,7 +1316,7 @@ class Gdn_Format {
      */
     public static function toDateTime($timestamp = '') {
         if ($timestamp == '') {
-            $timestamp = CurrentTimeStamp::get();
+            $timestamp = time();
         }
         return DateTimeFormatter::timeStampToDateTime((int) $timestamp);
     }

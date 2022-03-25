@@ -57,7 +57,7 @@ class UserPointsModel extends Model implements UserLeaderProviderInterface {
     }
 
     /**
-     * Get the leaders by the queried criteria.
+     * Get the leaders for a given slot type and time.
      *
      * @param UserLeaderQuery $query
      *
@@ -68,9 +68,8 @@ class UserPointsModel extends Model implements UserLeaderProviderInterface {
             $query->slotType,
             $query->timeSlot,
             $query->pointsCategoryID,
-            $query->limit,
-            $query->includedUserIDs,
-            $query->excludedUserIDs,
+            $query->moderatorIDs,
+            $query->limit
         ];
         $leaderData = $this->modelCache->getCachedOrHydrate($args, [$this, 'queryLeaders'], [
             \Gdn_Cache::FEATURE_EXPIRY => $this->config->get(UserLeaderService::CONF_CACHE_TTL, UserLeaderService::DEFAULT_CACHE_TTL),
@@ -85,9 +84,8 @@ class UserPointsModel extends Model implements UserLeaderProviderInterface {
      * @param string $slotType
      * @param string $timeSlot
      * @param int $categoryID
-     * @param int $limit
-     * @param int[] $includedUserIDs
      * @param int[] $excludedUserIDs
+     * @param int $limit
      *
      * @return int[]
      */
@@ -95,9 +93,8 @@ class UserPointsModel extends Model implements UserLeaderProviderInterface {
         string $slotType,
         string $timeSlot,
         int $categoryID,
-        int $limit,
-        array $includedUserIDs = [],
-        array $excludedUserIDs = []
+        array $excludedUserIDs,
+        int $limit
     ) {
         $sql = $this->createSql();
         $sql->select([
@@ -121,9 +118,6 @@ class UserPointsModel extends Model implements UserLeaderProviderInterface {
             ->orderBy('up.Points', 'desc')
             ->limit($limit);
 
-        if (!empty($includedUserIDs)) {
-            $sql->whereIn('up.UserID', $includedUserIDs);
-        }
         if (!empty($excludedUserIDs)) {
             $sql->whereNotIn('up.UserID', $excludedUserIDs);
         }

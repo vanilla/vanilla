@@ -6,8 +6,7 @@
 
 import React from "react";
 
-export const SectionBehaviourContext = React.createContext({
+export const SectionBehaviourContext = React.createContext<{ autoWrap: boolean; useMinHeight: boolean }>({
     autoWrap: false,
-    isSticky: true,
     useMinHeight: true,
 });

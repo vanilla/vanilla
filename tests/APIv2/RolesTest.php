@@ -191,7 +191,6 @@ class RolesTest extends AbstractResourceTest {
         $this->assertFalse($this->hasPermission('site.manage', 'global', $permissions));
         $this->assertFalse($this->hasPermission('comments.add', 'category', $permissions, 1));
     }
-
     /**
      * Test updating permissions with PATCH /roles/:id/permissions
      */
@@ -238,28 +237,6 @@ class RolesTest extends AbstractResourceTest {
 
         $this->assertTrue($this->hasPermission('discussions.add', 'category', $permissions2, 1));
         $this->assertTrue($this->hasPermission('comments.add', 'category', $permissions2, 1));
-    }
-
-    /**
-     * Test empty body for PATCH /roles/:id/permissions
-     */
-    public function testPatchPermissionFailBody() {
-        $role = $this->getPermissionsRole();
-        $this->expectExceptionMessage("Body must be formatted as follows : [null, null, ...]");
-        $this->api()->patch("{$this->baseUrl}/{$role[$this->pk]}/permissions", [])->getBody();
-    }
-
-    /**
-     * Test permission error for PATCH /roles/:id/permissions
-     */
-    public function testPatchPermissionFailPermission() {
-        $user = $this->createUser();
-
-        $this->expectExceptionMessage("Permission Problem");
-        $this->runWithUser(function () {
-            $role = $this->getPermissionsRole();
-            $this->api()->patch("{$this->baseUrl}/{$role[$this->pk]}/permissions", []);
-        }, $user);
     }
 
     public function testPutPermissionsEndpoint() {

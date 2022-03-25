@@ -48,8 +48,8 @@ body {
 
     &.Message {
         margin-top: $global-medium_fontSize;
-        & > .embedImage + p {
-                @include clearfix();
+        & > *:last-child {
+            @include clearfix();
         }
     }
 

@@ -59,12 +59,6 @@ export const shadowVariables = useThemeCache(() => {
     });
 
     const dropDown: IShadowSizing = makeVariables("dropDown", {
-        // horizontalOffset: 0,
-        // verticalOffset: 0,
-        // blur: 6,
-        // spread: 0,
-        // opacity: 0.16,
-
         horizontalOffset: 0,
         verticalOffset: 5,
         blur: 10,
@@ -80,14 +74,6 @@ export const shadowVariables = useThemeCache(() => {
         opacity: 0.5,
     });
 
-    const toolbar: IShadowSizing = makeVariables("toolbar", {
-        horizontalOffset: 0,
-        verticalOffset: 0,
-        blur: 6,
-        spread: 0,
-        opacity: 0.16,
-    });
-
     const floatingButton: IShadowSizing = makeVariables("floatingButton", {
         horizontalOffset: 0,
         verticalOffset: 5,
@@ -96,7 +82,7 @@ export const shadowVariables = useThemeCache(() => {
         opacity: 0.5,
     });
 
-    return { button, buttonHover, widget, widgetHover, dropDown, modal, toolbar, floatingButton };
+    return { button, buttonHover, widget, widgetHover, dropDown, modal, floatingButton };
 });
 
 export const shadowHelper = useThemeCache(() => {
@@ -156,15 +142,6 @@ export const shadowHelper = useThemeCache(() => {
         };
     };
 
-    const toolbar = (baseColor: ColorHelper = shadowBaseColor) => {
-        const { verticalOffset, horizontalOffset, blur, spread, opacity } = vars.toolbar;
-        return {
-            boxShadow: `${horizontalOffset} ${styleUnit(verticalOffset)} ${styleUnit(blur)} ${styleUnit(
-                spread,
-            )} ${baseColor.fade(opacity)}`,
-        };
-    };
-
     const floatingButton = (baseColor: ColorHelper = shadowBaseColor) => {
         const { verticalOffset, horizontalOffset, blur, spread, opacity } = vars.floatingButton;
         return {
@@ -214,7 +191,6 @@ export const shadowHelper = useThemeCache(() => {
         modal,
         contrast,
         makeShadow,
-        toolbar,
         floatingButton,
     };
 });

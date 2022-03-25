@@ -7,7 +7,7 @@ import { embedContentClasses } from "@library/embeddedContent/components/embedSt
 import { EMBED_FOCUS_CLASS } from "@library/embeddedContent/embedConstants";
 import { useEmbedContext } from "@library/embeddedContent/IEmbedContext";
 import { DeleteIcon } from "@library/icons/common";
-import { EditorEmbedMenu } from "@rich-editor/editor/pieces/EmbedMenu";
+import { EmbedMenu } from "@rich-editor/editor/pieces/EmbedMenu";
 import classNames from "classnames";
 import React from "react";
 
@@ -38,12 +38,12 @@ export const EmbedContent = React.forwardRef<HTMLDivElement, IProps>(function Em
         >
             {props.children}
             {inEditor && isSelected && (
-                <EditorEmbedMenu>
+                <EmbedMenu>
                     {props.embedActions}
                     <EmbedButton onClick={deleteSelf}>
                         <DeleteIcon />
                     </EmbedButton>
-                </EditorEmbedMenu>
+                </EmbedMenu>
             )}
         </div>
     );

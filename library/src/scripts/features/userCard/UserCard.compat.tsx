@@ -20,11 +20,7 @@ function LegacyUserCardTrigger(props: IProps) {
     const { Tag, tagProps, domNodesToAttach } = props;
     const context = useUserCardTrigger();
     useDomNodeAttachment(domNodesToAttach, context.triggerRef);
-    return (
-        <Tag {...tagProps} {...context.props} ref={context.triggerRef}>
-            {context.contents}
-        </Tag>
-    );
+    return <Tag {...tagProps} {...context.props} ref={context.triggerRef} />;
 }
 
 export function applyCompatibilityUserCards(scope: HTMLElement | Document | undefined = document) {

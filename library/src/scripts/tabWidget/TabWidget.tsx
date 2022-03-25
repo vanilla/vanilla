@@ -9,7 +9,7 @@ import { ITabData, ITabsProps, Tabs } from "@library/sectioning/Tabs";
 import { TabsTypes } from "@library/sectioning/TabsTypes";
 import Container from "@library/layout/components/Container";
 import { useWidgetSectionClasses } from "@library/layout/WidgetLayout.context";
-import { LayoutRenderer } from "@library/features/Layout/LayoutRenderer";
+import { Layout } from "@library/features/Layout/Layout";
 
 interface ITabWidgetProps extends Omit<ITabsProps, "data"> {
     tabs: Array<{
@@ -25,10 +25,7 @@ export default function TabWidget(props: ITabWidgetProps) {
     const tabsData: ITabData[] = tabs.map(({ label, componentName, componentProps }) => ({
         label,
         contents: (
-            <LayoutRenderer
-                applyContexts={false}
-                layout={[{ $reactComponent: componentName, $reactProps: componentProps }]}
-            />
+            <Layout applyContexts={false} layout={[{ $reactComponent: componentName, $reactProps: componentProps }]} />
         ),
     }));
 

@@ -8,7 +8,7 @@ import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import DropDownItem from "@library/flyouts/items/DropDownItem";
 import SmartLink from "@library/routing/links/SmartLink";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
-import { Widget } from "@library/layout/Widget";
+import { WidgetLayoutWidget } from "@library/layout/WidgetLayoutWidget";
 import { IAddPost } from "@library/flyouts/NewPostMenu";
 
 interface NewPostMenuDropDownProps {

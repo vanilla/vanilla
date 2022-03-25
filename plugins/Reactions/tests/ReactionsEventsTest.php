@@ -7,9 +7,6 @@
 
 namespace Reactions\Tests;
 
-use CommentModel;
-use DiscussionModel;
-use Vanilla\Utility\ArrayUtils;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\SetupTraitsTrait;
 use VanillaTests\SiteTestTrait;
@@ -31,9 +28,6 @@ class ReactionsEventsTest extends VanillaTestCase {
     /** @var \DiscussionModel */
     private $discussionModel;
 
-    /** @var \CommentModel */
-    private $commentModel;
-
     /**
      * Get the names of addons to install.
      *
@@ -50,10 +44,9 @@ class ReactionsEventsTest extends VanillaTestCase {
         parent::setUp();
         $this->setUpTestTraits();
 
-        $this->container()->call(function (\ReactionModel $reactionModel, \DiscussionModel $discussionModel, \CommentModel $commentModel) {
+        $this->container()->call(function (\ReactionModel $reactionModel, \DiscussionModel $discussionModel) {
             $this->reactionModel = $reactionModel;
             $this->discussionModel = $discussionModel;
-            $this->commentModel = $commentModel;
         });
     }
 
@@ -68,7 +61,7 @@ class ReactionsEventsTest extends VanillaTestCase {
     /**
      * Tests event upon a reaction to a discussion.
      */
-    public function testToggleUserTagDiscussionReactionEvent() {
+    public function testToggleUserTagReactionEvent() {
         $this->assertTrue(true);
 
         $this->createDiscussion();
@@ -95,44 +88,6 @@ class ReactionsEventsTest extends VanillaTestCase {
                 ResourceEvent::ACTION_INSERT,
                 [
                     'tagID' => $reaction['TagID'],
-                    'recordName' => $discussion["Name"],
-                    'recordUrl' => DiscussionModel::discussionUrl($discussion),
-
-                ]
-            )
-        );
-    }
-
-    /**
-     * Test that a reaction event is properly created and dispatched when a comment is reacted to.
-     */
-    public function testToggleUserTagCommentReactionEvent() {
-        $discussion = $this->createDiscussion();
-        $comment = $this->createComment();
-
-        $types = \ReactionModel::reactionTypes();
-        $reaction = reset($types);
-
-        $data = [
-            'RecordType' => 'Comment',
-            'RecordID' => $comment['commentID'],
-            'TagID' => $reaction['TagID'],
-            'UserID' => $this->api()->getUserID()
-        ];
-
-        [$record] = $this->reactionModel->getRow('Comment', $comment['commentID']);
-
-        $this->reactionModel->toggleUserTag($data, $record, $this->commentModel);
-
-        $this->assertEventDispatched(
-            $this->expectedResourceEvent(
-                'reaction',
-                ResourceEvent::ACTION_INSERT,
-                [
-                    'tagID' => $reaction['TagID'],
-                    'recordName' => CommentModel::generateCommentName($discussion["name"]),
-                    'recordUrl' => CommentModel::commentUrl(ArrayUtils::pascalCase($comment)),
-
                 ]
             )
         );

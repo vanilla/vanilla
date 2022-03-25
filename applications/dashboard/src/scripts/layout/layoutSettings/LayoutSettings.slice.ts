@@ -5,27 +5,27 @@
 
 import { LoadStatus } from "@library/@types/api/core";
 import { configureStore, createSlice } from "@reduxjs/toolkit";
-import { t } from "@vanilla/i18n";
-import { notEmpty } from "@vanilla/utils";
-import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import {
-    clearLayoutDraft,
+    createNewLayoutJsonDraft,
     fetchAllLayouts,
     fetchLayout,
-    fetchLayoutCatalogByViewType,
-    fetchLayoutJson,
-    initializeLayoutDraft,
-    persistLayoutDraft,
     putLayoutView,
-    updateLayoutDraft,
+    fetchLayoutJson,
+    copyLayoutJsonToNewDraft,
+    postOrPatchLayoutJsonDraft,
+    updateLayoutJsonDraft,
+    fetchLayoutCatalogByViewType,
 } from "./LayoutSettings.actions";
+import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
+import { createLayoutJsonDraft } from "@dashboard/layout/layoutSettings/utils";
 import {
-    ILayoutDetails,
+    ILayout,
     ILayoutsState,
     INITIAL_LAYOUTS_STATE,
     LayoutViewType,
     LAYOUT_VIEW_TYPES,
 } from "./LayoutSettings.types";
+import { notEmpty } from "@vanilla/utils";
 
 export const layoutSettingsSlice = createSlice({
     name: "layoutSettings",
@@ -89,46 +89,45 @@ export const layoutSettingsSlice = createSlice({
                     data: action.payload,
                 };
             })
-            .addCase(persistLayoutDraft.pending, (state, action) => {
-                state.layoutDraftPersistLoadable = {
-                    status: LoadStatus.LOADING,
-                };
-            })
-            .addCase(persistLayoutDraft.fulfilled, (state, action) => {
-                state.layoutDraftPersistLoadable = {
+            .addCase(postOrPatchLayoutJsonDraft.fulfilled, (state, action) => {
+                const layout = action.payload;
+
+                const layoutJson = action.payload.layout!;
+
+                state.layoutJsonsByLayoutID[layout.layoutID] = {
                     status: LoadStatus.SUCCESS,
-                    data: action.payload,
+                    data: {
+                        layoutID: layout.layoutID,
+                        name: layout.name,
+                        layoutViewType: layout.layoutViewType,
+                        layout: layoutJson,
+                    },
+                };
+
+                state.layoutsByID[layout.layoutID] = {
+                    status: LoadStatus.SUCCESS,
+                    data: {
+                        ...(state.layoutsByID[layout.layoutID]?.data ?? {}),
+                        ...layout,
+                    },
                 };
             })
-            .addCase(persistLayoutDraft.rejected, (state, action) => {
-                state.layoutDraftPersistLoadable = {
-                    status: LoadStatus.ERROR,
-                    error: action.error,
-                };
-            })
-            .addCase(initializeLayoutDraft, (state, action) => {
-                const { initialLayout = {} } = action.payload;
-                state.layoutDraftPersistLoadable = {
-                    status: LoadStatus.PENDING,
-                };
-                state.layoutDraft = {
-                    name: t("My Layout"),
-                    layoutViewType: "home" as LayoutViewType,
-                    layout: [],
-                    ...initialLayout,
-                };
-            })
-            .addCase(clearLayoutDraft, (state, action) => {
-                state.layoutDraft = INITIAL_LAYOUTS_STATE.layoutDraft;
-                state.layoutDraftPersistLoadable = INITIAL_LAYOUTS_STATE.layoutDraftPersistLoadable;
-            })
-            .addCase(updateLayoutDraft, (state, action) => {
-                if (state.layoutDraft) {
-                    state.layoutDraft = {
-                        ...state.layoutDraft,
-                        ...action.payload,
-                    };
+            .addCase(copyLayoutJsonToNewDraft, (state, action) => {
+                const { sourceLayoutJsonID, draftID } = action.payload;
+                const sourceLayoutJson = state.layoutJsonsByLayoutID[sourceLayoutJsonID];
+                const newDraftID = draftID ?? sourceLayoutJsonID;
+                if (sourceLayoutJson?.data) {
+                    state.layoutJsonDraftsByID[newDraftID] = createLayoutJsonDraft({
+                        ...sourceLayoutJson?.data,
+                    });
                 }
+            })
+            .addCase(createNewLayoutJsonDraft, (state, action) => {
+                const { draftID, layoutViewType } = action.payload;
+                state.layoutJsonDraftsByID[draftID] = createLayoutJsonDraft({ layoutViewType });
+            })
+            .addCase(updateLayoutJsonDraft, (state, action) => {
+                state.layoutJsonDraftsByID[action.payload.draftID] = action.payload.modifiedDraft;
             })
             .addCase(putLayoutView.pending, (state, action) => {
                 state.layoutsByID[action.meta.arg.layoutID]!.status = LoadStatus.LOADING;
@@ -140,7 +139,7 @@ export const layoutSettingsSlice = createSlice({
                 };
             })
             .addCase(putLayoutView.fulfilled, (state, action) => {
-                const existingLayout = state.layoutsByID[action.meta.arg.layoutID]?.data as ILayoutDetails;
+                const existingLayout = state.layoutsByID[action.meta.arg.layoutID]?.data as ILayout;
                 state.layoutsByID[action.meta.arg.layoutID] = {
                     status: LoadStatus.SUCCESS,
                     data: {
@@ -172,7 +171,7 @@ export const layoutSettingsSlice = createSlice({
                 state.catalogStatusByViewType[action.meta.arg] = { status: LoadStatus.LOADING };
             })
             .addCase(fetchLayoutCatalogByViewType.fulfilled, (state, action) => {
-                state.catalogStatusByViewType[action.meta.arg] = { status: LoadStatus.SUCCESS, data: {} };
+                state.catalogStatusByViewType[action.meta.arg] = { status: LoadStatus.SUCCESS };
                 state.catalogByViewType[action.meta.arg] = action.payload as any; // TODO: Fix once we upgrade immer.
             })
             .addCase(fetchLayoutCatalogByViewType.rejected, (state, action) => {
@@ -186,9 +185,17 @@ export type layoutDispatch = typeof store.dispatch;
 export const useLayoutDispatch = () => useDispatch<typeof store.dispatch>();
 export const useLayoutSelector: TypedUseSelectorHook<{ [layoutSettingsSlice.name]: ILayoutsState }> = useSelector;
 
-export function getLayoutsByViewType(state: ILayoutsState): { [key in LayoutViewType]: ILayoutDetails[] } {
+export function getLayoutJsonDraftByID(state: ILayoutsState, draftID: keyof ILayoutsState["layoutJsonDraftsByID"]) {
+    return state.layoutJsonDraftsByID[draftID];
+}
+
+export function getLayoutJsonByLayoutID(state: ILayoutsState, layoutID: keyof ILayoutsState["layoutJsonsByLayoutID"]) {
+    return state.layoutJsonsByLayoutID[layoutID];
+}
+
+export function getLayoutsByViewType(state: ILayoutsState): { [key in LayoutViewType]: ILayout[] } {
     const obj = Object.fromEntries(
-        LAYOUT_VIEW_TYPES.map((viewType: ILayoutDetails["layoutViewType"]) => {
+        LAYOUT_VIEW_TYPES.map((viewType: ILayout["layoutViewType"]) => {
             return [
                 viewType,
                 Object.values(state.layoutsByID)
@@ -202,5 +209,5 @@ export function getLayoutsByViewType(state: ILayoutsState): { [key in LayoutView
         }),
     );
 
-    return obj as { [key in LayoutViewType]: ILayoutDetails[] };
+    return obj as { [key in LayoutViewType]: ILayout[] };
 }

@@ -957,7 +957,7 @@ body {
 .userContent.Message {
   margin-top: 14px;
 }
-.userContent.Message > .embedImage + p::after {
+.userContent.Message > *:last-child::after {
   content: "";
   display: table;
   clear: both;

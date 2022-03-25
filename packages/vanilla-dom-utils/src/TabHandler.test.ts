@@ -211,7 +211,7 @@ describe("TabHandler", () => {
         expect(nextItem).eq(null);
     });
 
-    it("respects tabindex -1", () => {
+    it.only("respects tabindex -1", () => {
         document.body.innerHTML = `
         <div>
             <button id="item1"></button>

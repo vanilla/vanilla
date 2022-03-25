@@ -35,7 +35,7 @@ class SectionFullWidth extends AbstractLayoutSection {
      * @inheritdoc
      */
     public static function getWidgetName(): string {
-        return 'Full Width';
+        return 'Full Width Layout';
     }
 
     /**
@@ -43,12 +43,5 @@ class SectionFullWidth extends AbstractLayoutSection {
      */
     public static function getWidgetID(): string {
         return 'section.full-width';
-    }
-
-    /**
-     * @return string
-     */
-    public static function getWidgetIconPath(): string {
-        return "/applications/dashboard/design/images/sectionIcons/fullwidth.svg";
     }
 }

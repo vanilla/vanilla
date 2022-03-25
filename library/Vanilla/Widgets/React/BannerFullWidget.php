@@ -41,7 +41,7 @@ class BannerFullWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
      * @inheritDoc
      */
     public static function getWidgetName(): string {
-        return "Banner";
+        return "Banner - Full";
     }
 
     /**
@@ -49,13 +49,6 @@ class BannerFullWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
      */
     public static function getWidgetID(): string {
         return "banner.full";
-    }
-
-    /**
-     * @return string
-     */
-    public static function getWidgetIconPath(): string {
-        return "/applications/dashboard/design/images/widgetIcons/banner.svg";
     }
 
     /**

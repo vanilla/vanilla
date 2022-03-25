@@ -31,6 +31,7 @@ export const searchMiscellaneousComponentsClasses = useThemeCache(() => {
         display: "flex",
         alignItems: "center",
         justifyContent: "flex-start",
+        marginBottom: styleUnit(vars.spacing.margin),
     });
 
     const sort = style("sort", {

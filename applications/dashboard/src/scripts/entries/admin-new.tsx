@@ -4,7 +4,7 @@
  * @license gpl-2.0-only
  */
 
-import { getAppearanceRoutes } from "@dashboard/appearance/routes/appearanceRoutes";
+import { getAppearanceRoutes } from "@dashboard/appearance/routes/pageRoutes";
 import { dashboardSectionSlice } from "@dashboard/DashboardSectionSlice";
 import { AppContext, registerContextProvider } from "@library/AppContext";
 import { supportsFrames } from "@library/embeddedContent/IFrameEmbed";
@@ -20,7 +20,6 @@ import React from "react";
 import "../../../design/admin-new.css";
 import { layoutSettingsSlice } from "@dashboard/layout/layoutSettings/LayoutSettings.slice";
 import { hasPermission } from "@library/features/users/Permission";
-import { t } from "@vanilla/i18n";
 
 registerContextProvider(TextEditorContextProvider);
 registerReducer(dashboardSectionSlice.name, dashboardSectionSlice.reducer);
@@ -39,17 +38,14 @@ Router.addRoutes(getAppearanceRoutes());
 supportsFrames(true);
 addPageComponent(AdminApp);
 
-const SETTINGS_PERMISSIONS = ["settings.manage", "community.moderate"];
-const ANALYTICS_PERMISSIONS = ["data.view", "dashboards.manage"];
-
 function AdminApp() {
-    if (hasPermission([...SETTINGS_PERMISSIONS, ...ANALYTICS_PERMISSIONS])) {
+    if (hasPermission(["settings.manage", "community.moderate"])) {
         return (
             <SiteNavProvider categoryRecordType="panelMenu">
                 <Router sectionRoots={["/appearance", "/analytics/v2"]} />
             </SiteNavProvider>
         );
     } else {
-        return <ErrorPage error={{ message: t("You don't have permission to view this page.") }} />;
+        return <ErrorPage />;
     }
 }

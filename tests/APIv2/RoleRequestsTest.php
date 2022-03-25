@@ -18,14 +18,11 @@ use Vanilla\Dashboard\Models\RoleRequestModel;
 use Vanilla\Exception\Database\NoResultsException;
 use VanillaTests\Bootstrap;
 use Vanilla\Dashboard\Controllers\RequestsController;
-use VanillaTests\UsersAndRolesApiTestTrait;
 
 /**
  * Tests for the `/api/v2/role-requests` endpoints.
  */
 class RoleRequestsTest extends AbstractAPIv2Test {
-    use UsersAndRolesApiTestTrait;
-
     private static $count = 1;
 
     /**
@@ -536,32 +533,6 @@ class RoleRequestsTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Test that role-requests/applications/{roleRequestID} delete the given record.
-     */
-    public function testRoleApplicantDeleteSuccess(): void {
-        $initialCount = $this->getRoleRequestCount();
-        $this->api->delete("/role-requests/applications/1000");
-        $count = $this->getRoleRequestCount();
-        // Test that no record get deleted when using an invalid ID.
-        $this->assertEquals($initialCount, $count);
-
-        $r = $this->api->delete("/role-requests/applications/{$this->application['roleRequestID']}");
-        $count = $this->getRoleRequestCount();
-        $this->assertEquals($initialCount - 1, $count, 'Failed deleting the roleRequest record.');
-        $this->assertEquals(204, $r->getStatusCode());
-    }
-
-    /**
-     * Test that role-requests/applications/{roleRequestID} fail without the proper permission.
-     */
-    public function testRoleApplicantDeleteFail(): void {
-        $this->expectExceptionMessage('Permission Problem');
-        $this->runWithUser(function () {
-            $this->api->delete("/role-requests/applications/{$this->application['roleRequestID']}");
-        }, $this->memberID);
-    }
-
-    /**
      * Apply to a role as a member.
      *
      * @param int|array $override
@@ -597,21 +568,5 @@ class RoleRequestsTest extends AbstractAPIv2Test {
         if (isset($request['statusUserID'])) {
             $this->assertIsArray($request['statusUser']);
         }
-    }
-
-    /**
-     * Return the number of role-request for testing purposes.
-     *
-     * @return int
-     */
-    private function getRoleRequestCount(): int {
-        $r = $this->api()->get('/role-requests/applications')->getBody();
-
-        if ($r) {
-            $count = count($r);
-        } else {
-            $count =0;
-        }
-        return $count;
     }
 }

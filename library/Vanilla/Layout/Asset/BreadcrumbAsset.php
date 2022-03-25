@@ -56,13 +56,6 @@ class BreadcrumbAsset extends AbstractLayoutAsset {
         return "asset.breadcrumbs";
     }
 
-    /**
-     * @return string
-     */
-    public static function getWidgetIconPath(): string {
-        return "/applications/dashboard/design/images/widgetIcons/breadcrumbs.svg";
-    }
-
     ///
     /// endregion
     ///

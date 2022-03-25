@@ -77,13 +77,6 @@ class CategoriesWidget extends AbstractReactModule implements CombinedPropsWidge
     }
 
     /**
-     * @return string
-     */
-    public static function getWidgetIconPath(): string {
-        return "/applications/dashboard/design/images/widgetIcons/categories.svg";
-    }
-
-    /**
      * Get props for component
      *
      * @return array

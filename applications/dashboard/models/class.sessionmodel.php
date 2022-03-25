@@ -1,10 +1,8 @@
 <?php
 /**
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-
-use Vanilla\Utility\ModelUtils;
 
 /**
  * Class SessionModel
@@ -19,51 +17,6 @@ class SessionModel extends Gdn_Model {
         parent::__construct('Session');
         $this->setPruneField('DateExpires');
         $this->setPruneAfter('45 minutes');
-    }
-
-    /**
-     * Used by startSession to create & manage sessions for users & guests.     *
-     *
-     * @param int $userID user ID for creating session.
-     *
-     * @return bool|array Current session.
-     * @throws \Garden\Schema\ValidationException Exception when insert fails.
-     */
-    public function startNewSession(int $userID) {
-        $sessionName = 'sid';
-        // Grab the entire session record.
-        $sessionID = Gdn::authenticator()->identity()->getAttribute($sessionName);
-
-        $session = $this->getID($sessionID, DATASET_TYPE_ARRAY);
-
-        if (!$session) {
-            $session = [
-                'UserID' => $userID,
-                'DateInserted' => date(MYSQL_DATE_FORMAT),
-                'DateExpires' => date(MYSQL_DATE_FORMAT, time() + Gdn_Session::VISIT_LENGTH),
-                'Attributes' => [],
-            ];
-
-            // Save the session information to the database.
-            $sessionID = $this->insert($session);
-            ModelUtils::validationResultToValidationException($this);
-            $session['SessionID'] = $sessionID;
-            trace("Inserting session stash $sessionID");
-
-            // Save a session cookie.
-            $path = c('Garden.Cookie.Path', '/');
-            $domain = c('Garden.Cookie.Domain', '');
-            $expire = 0;
-
-            // If the domain being set is completely incompatible with the
-            // current domain then make the domain work.
-            $currentHost = Gdn::request()->host();
-            if (!stringEndsWith($currentHost, trim($domain, '.'))) {
-                $domain = '';
-            }
-        }
-
-        return $session;
     }
 
     /**
@@ -95,37 +48,6 @@ class SessionModel extends Gdn_Model {
         }
 
         parent::update($fields, $where, $limit);
-    }
-
-    /**
-     * Refresh expiration of the session.
-     *
-     * @param string $sessionID session ID of the current active session.
-     *
-     * @return bool status of refresh
-     */
-    public function refreshSession(string $sessionID): bool {
-        if ($this->isExpired($sessionID)) {
-            return false;
-        }
-
-        $fields = ['DateExpires' => date(MYSQL_DATE_FORMAT, time() + Gdn_Session::VISIT_LENGTH),
-                   'DateUpdated' => date(MYSQL_DATE_FORMAT)];
-
-        $where =  ['SessionID' => $sessionID];
-
-        parent::update($fields, $where);
-        return true;
-    }
-
-    /**
-     * Expire expiration of the session.
-     *
-     * @param string $sessionID session ID of the current active session.
-     */
-    public function expireSession(string $sessionID) {
-        $where =  ['SessionID' => $sessionID];
-        parent::delete($where);
     }
 
     /**

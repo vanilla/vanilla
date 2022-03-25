@@ -42,7 +42,7 @@ class TagWidget extends AbstractReactModule implements ReactWidgetInterface, Com
      * @inheridoc
      */
     public static function getWidgetName(): string {
-        return "Tag Cloud";
+        return "Tag";
     }
 
     /**
@@ -57,13 +57,6 @@ class TagWidget extends AbstractReactModule implements ReactWidgetInterface, Com
      */
     public static function getComponentName(): string {
         return "TagWidget";
-    }
-
-    /**
-     * @return string
-     */
-    public static function getWidgetIconPath(): string {
-        return"/applications/dashboard/design/images/widgetIcons/tagcloud.svg";
     }
 
     /**

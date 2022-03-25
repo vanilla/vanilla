@@ -7,9 +7,11 @@
 
 namespace Vanilla\Formatting\Quill;
 
+use exussum12\CoverageChecker\ArgParser;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
 use Vanilla\EmbeddedContent\EmbedService;
 use Vanilla\Formatting\Exception\FormattingException;
+use Vanilla\Formatting\Formats\RichFormat;
 
 /**
  * Class for filtering Rich content before it gets inserted into the database.
@@ -43,7 +45,7 @@ class Filterer {
     public function filter(string $content): string {
         $operations = Parser::jsonToOperations($content);
         // Re-encode the value to escape unicode values.
-        $operations = $this->cleanup($operations);
+        $operations = $this->cleanupEmbeds($operations);
         $operations = json_encode($operations, JSON_UNESCAPED_UNICODE);
         return $operations;
     }
@@ -55,18 +57,11 @@ class Filterer {
      * - Malformed partially formed operations (dataPromise).
      * - Nested embed data.
      *
-     * Added 2022-03-08:
-     * - strip out empty arrays that were getting inserted into the db
-     *
      * @param array[] $operations The quill operations to loop through.
      * @return array
      */
-    private function cleanup(array &$operations): array {
+    private function cleanupEmbeds(array &$operations): array {
         foreach ($operations as $key => &$op) {
-            if ($op === []) {
-                unset($operations[$key]);
-                continue;
-            }
             if (!is_array($op['insert']['embed-external'] ?? null)) {
                 continue;
             }

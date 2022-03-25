@@ -512,16 +512,12 @@ components:
                             js:
                                 type: array
                                 description: List of JS files.
-                                items:
-                                    type: string
-                                default: []
+                                default: false
                                 readOnly: true
                             css:
                                 type: array
                                 description: List of CSS files.
-                                items:
-                                    type: string
-                                default: []
+                                default: false
                                 readOnly: true
     schemas:
         JsonSchema:
@@ -540,8 +536,6 @@ components:
             x-hidden: true
             type: array
             description: Layout as defined by the /api/v2/layouts/schema.
-            items:
-                type: object
             example:
                 - "$hydrate": section.one-column
                   "children":
@@ -559,8 +553,6 @@ components:
             x-hidden: true
             type: array
             description: Layout as defined by the /api/v2/layouts/schema.
-            items:
-                type: object
             example:
                 - "$reactComponent": "SectionOneColumn"
                   "$reactProps":

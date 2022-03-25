@@ -1,26 +1,32 @@
 <?php
 /**
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 use Garden\Schema\Schema;
+use Garden\Schema\Validation;
+use Garden\Schema\ValidationException;
+use Garden\Schema\ValidationField;
 use Garden\Web\Exception\ForbiddenException;
+use Vanilla\Dashboard\Models\BannerImageModel;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Scheduler\LongRunner;
 use Vanilla\Models\CrawlableRecordSchema;
 use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Navigation\BreadcrumbModel;
+use Vanilla\Permissions;
 use Vanilla\Scheduler\LongRunnerAction;
 use Vanilla\Schema\RangeExpression;
 use Vanilla\Site\SiteSectionModel;
+use Vanilla\Utility\InstanceValidatorSchema;
 use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
+use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Utility\ModelUtils;
-use Vanilla\Utility\TreeBuilder;
 
 /**
  * API Controller for the `/categories` resource.
@@ -61,7 +67,6 @@ class CategoriesApiController extends AbstractApiController {
      * @param CategoryModel $categoryModel
      * @param BreadcrumbModel $breadcrumbModel
      * @param LongRunner $runner
-     * @param SiteSectionModel $siteSectionModel
      */
     public function __construct(
         CategoryModel $categoryModel,
@@ -84,17 +89,7 @@ class CategoriesApiController extends AbstractApiController {
      */
     public function categoryPostSchema($type = '', array $extra = []) {
         if ($this->categoryPostSchema === null) {
-            $fields = [
-                'name',
-                'parentCategoryID?',
-                'urlcode',
-                'displayAs?',
-                'customPermissions?',
-                'description?',
-                'featured?',
-                'iconUrl?',
-                'bannerUrl?'
-            ];
+            $fields = ['name', 'parentCategoryID?', 'urlcode', 'displayAs?', 'customPermissions?', 'description?', 'featured?'];
             $this->categoryPostSchema = $this->schema(
                 Schema::parse(array_merge($fields, $extra))->add($this->schemaWithParent()),
                 'CategoryPost'
@@ -226,7 +221,7 @@ class CategoriesApiController extends AbstractApiController {
 
         $in = $this->idParamSchema()->setDescription('Get a category for editing.');
         $out = $this->schema(Schema::parse([
-            'categoryID', 'name', 'parentCategoryID', 'urlcode', 'description', 'displayAs', 'iconUrl', 'bannerUrl'
+            'categoryID', 'name', 'parentCategoryID', 'urlcode', 'description', 'displayAs'
         ])->add($this->fullSchema()), 'out');
 
         $row = $this->category($id);
@@ -516,16 +511,17 @@ class CategoriesApiController extends AbstractApiController {
             $categories = $this->archiveFilter($categories, $query['archived'] ? 0 : 1);
         }
 
+        if ($format === 'tree') {
+            $categories = CategoryCollection::treeBuilder()->buildTree($categories);
+        } elseif ($sort === '') {
+            $categories = CategoryModel::sortCategoriesAsTree($categories);
+        }
+
         foreach ($categories as &$category) {
             $category = $this->normalizeOutput($category, $expand);
         }
-        $categories = $out->validate($categories);
 
-        if ($format === 'tree') {
-            $categories = $this->treeNormalizedBuilder()->buildTree($categories);
-        } elseif ($sort === '') {
-            $categories = $this->treeNormalizedBuilder()->sort($categories);
-        }
+        $categories = $out->validate($categories);
 
         if (isset($totalCountCallBack) && $format === self::OUTPUT_FORMAT_FLAT) {
             $query['page'] = $page;
@@ -748,17 +744,6 @@ class CategoriesApiController extends AbstractApiController {
      * @return array
      */
     public function normalizeInput(array $request) {
-        if (array_key_exists('bannerUrl', $request)) {
-            $request['BannerImage'] = $request['bannerUrl'];
-            unset($request['bannerUrl']);
-        }
-
-
-        if (array_key_exists('iconUrl', $request)) {
-            $request['Photo'] = $request['iconUrl'];
-            unset($request['iconUrl']);
-        }
-
         $request = ApiUtils::convertInputKeys($request);
 
         if (array_key_exists('Urlcode', $request)) {
@@ -844,10 +829,8 @@ class CategoriesApiController extends AbstractApiController {
             'depth:i',
             'children:a?' => $childSchema->merge(Schema::parse([
                 'depth:i',
-                'children:a',
-                'sort:i'
-            ])),
-            'sort:i',
+                'children:a'
+            ]))
         ]));
         return $schema;
     }
@@ -927,23 +910,4 @@ class CategoriesApiController extends AbstractApiController {
             trigger_error(self::ERRORINDEXMSG, E_USER_WARNING);
         }
     }
-
-    /**
-     * Return a normalized TreeBuilder for the /index api endpoint.
-     *
-     * @return TreeBuilder
-     */
-    private function treeNormalizedBuilder(): TreeBuilder {
-        $builder = TreeBuilder::create('categoryID', 'parentCategoryID')
-            ->setAllowUnreachableNodes(true)
-            ->setRootID(null)
-            ->setChildrenFieldName('children')
-            ->setSorter(function (array $catA, array $catB) {
-                return ($catA['sort'] ?? 0) <=> ($catB['sort'] ?? 0);
-            })
-        ;
-        return $builder;
-    }
-
-
 }

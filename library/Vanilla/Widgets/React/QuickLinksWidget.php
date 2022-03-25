@@ -47,13 +47,6 @@ class QuickLinksWidget extends AbstractReactModule implements CombinedPropsWidge
     }
 
     /**
-     * @return string
-     */
-    public static function getWidgetIconPath(): string {
-        return "/applications/dashboard/design/images/widgetIcons/quicklinks.svg";
-    }
-
-    /**
      * @return array
      */
     public static function getRecommendedSectionIDs(): array {

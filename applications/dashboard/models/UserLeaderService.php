@@ -7,7 +7,6 @@
 
 namespace Vanilla\Dashboard;
 
-use Garden\Web\Exception\NotFoundException;
 use RoleModel;
 use Vanilla\Dashboard\Models\UserLeaderProviderInterface;
 use UserModel;
@@ -21,7 +20,7 @@ class UserLeaderService {
 
     const LEADERBOARD_TYPE_REPUTATION = "reputation";
     const LEADERBOARD_TYPE_POSTS = "posts";
-    const LEADERBOARD_TYPE_ACCEPTED_ANSWERS = "acceptedAnswers";
+    const LEADERBOARD_TYPE_ACCEPTED_ANSWERS = "answers";
     const LEADERBOARD_TYPES = [
         self::LEADERBOARD_TYPE_REPUTATION,
         self::LEADERBOARD_TYPE_POSTS,
@@ -92,10 +91,7 @@ class UserLeaderService {
 
         $pointsCategory = $this->getPointsCategory($query->categoryID);
         $query->pointsCategoryID = $pointsCategory['CategoryID'] ?? 0;
-
-        // We add moderators' user IDs to the excluded user IDs.
-        $moderatorIDs = $this->getModeratorIDs();
-        $query->excludedUserIDs = array_merge($query->excludedUserIDs, $moderatorIDs);
+        $query->moderatorIDs = $this->getModeratorIDs();
 
         foreach ($this->providers as $provider) {
             if ($provider->canHandleQuery($query)) {
@@ -105,8 +101,7 @@ class UserLeaderService {
             }
         }
 
-        // Throw expection when no provider is found.
-        throw new NotFoundException($query->leaderboardType . " provider could not be found");
+        return [];
     }
 
     /**

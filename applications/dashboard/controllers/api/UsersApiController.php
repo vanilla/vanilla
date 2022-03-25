@@ -932,10 +932,6 @@ class UsersApiController extends AbstractApiController {
      */
     public function get_leaders(array $query = []): array {
         $this->permission();
-        // Throw If the vanillaanalytics plugin isn't enabled
-        if (!Gdn::addonManager()->isEnabled('vanillaanalytics', Vanilla\Addon::TYPE_ADDON)) {
-            throw new \Vanilla\Exception\FeatureNotEnabledException('VanillaAnalytics Plugin is not enabled.');
-        }
         // Inbound data schema validation.
         $query = $this->schema([
             'leaderboardType:s' =>[

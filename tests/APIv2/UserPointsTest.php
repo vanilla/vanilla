@@ -27,7 +27,6 @@ class UserPointsTest extends SiteTestCase {
     /** @var \CategoryModel */
     private $categoryModel;
 
-    public static $addons = ["vanillaanalytics"];
     /**
      * Disable email before running tests.
      */

@@ -14,7 +14,7 @@ import { Mixins } from "@library/styles/Mixins";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { translateX, percent, px, important } from "csx";
 import { modalVariables } from "@library/modal/modalStyles";
-import { injectGlobal } from "@emotion/css";
+import { css, injectGlobal } from "@emotion/css";
 
 export const tooltipVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("toolTips");
@@ -77,8 +77,12 @@ export const toolTipClasses = useThemeCache(() => {
             all: globalVars.fonts.size.medium,
         }),
         ...shadow.dropDown(),
-        zIndex: Math.max(modalVariables().sizing.zIndex + 1, 99999),
     });
+
+    const boxStackingLevel = (zIndex: number = 1) =>
+        css({
+            zIndex,
+        });
 
     const nubPosition = style("nubPosition", {
         position: "absolute",
@@ -91,9 +95,13 @@ export const toolTipClasses = useThemeCache(() => {
         transform: translateX("-50%"),
         marginLeft: styleUnit(vars.nub.width),
         pointerEvents: "none",
-        zIndex: Math.max(modalVariables().sizing.zIndex + 2, 99999),
         ...userSelect(),
     });
+
+    const nubStackingLevel = (zIndex: number = 1) =>
+        css({
+            zIndex: zIndex + 1, // Nubs always appear above the box
+        });
 
     const nub = style("nub", {
         position: "relative",
@@ -125,5 +133,7 @@ export const toolTipClasses = useThemeCache(() => {
         nubPosition,
         noPointerContent,
         noPointerTrigger,
+        nubStackingLevel,
+        boxStackingLevel,
     };
 });

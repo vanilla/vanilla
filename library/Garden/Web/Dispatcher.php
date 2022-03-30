@@ -34,7 +34,7 @@ class Dispatcher implements LoggerAwareInterface {
     private $locale;
 
     /**
-     * @var array
+     * @var Route[]
      */
     private $routes = [];
 
@@ -150,7 +150,7 @@ class Dispatcher implements LoggerAwareInterface {
                                 Permissions::BAN_CSRF,
                                 [
                                     'msg' => $this->locale->translate('Invalid CSRF token.', 'Invalid CSRF token. Please try again.'),
-                                    'code' => 403
+                                    'code' => 403,
                                 ]
                             );
                         }

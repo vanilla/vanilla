@@ -14,6 +14,7 @@ let addonModuleDirs = [path.join(VANILLA_ROOT, "node_modules"), path.join(VANILL
 let addonModuleMaps = {
     [`^@library/(.*)$`]: path.join(VANILLA_ROOT, "library/src/scripts/$1"),
 };
+let packageDirectoryMaps = {};
 
 function scanAddons(addonDir) {
     const keys = glob
@@ -31,8 +32,25 @@ function scanAddons(addonDir) {
     });
 }
 
+function scanPackages(packagesDir) {
+    const keys = glob
+    // Get the directory contents
+    .sync(path.join(VANILLA_ROOT, packagesDir + "/*"))
+    // Filter out any files
+    .filter((path) => fs.lstatSync(path).isDirectory())
+    // Rectify the paths
+    .map(dir => dir.replace(path.join(VANILLA_ROOT, packagesDir + "/"), ""));
+
+    keys.forEach((key) => {
+        // Split into groups of prefix and package name
+        const nameArray = key.split(new RegExp("(vanilla).(.*)")).filter((group) => group.length);
+        packageDirectoryMaps[`^@${nameArray[0]}/${nameArray[1]}/(.*)$`] = path.join(VANILLA_ROOT, packagesDir,key, "$1");
+    });
+}
+
 scanAddons("applications");
 scanAddons("plugins");
+scanPackages("packages");
 
 module.exports = {
     // All imported modules in your tests should be mocked automatically
@@ -51,26 +69,33 @@ module.exports = {
     clearMocks: true,
 
     // Indicates whether the coverage information should be collected while executing the test
-    // collectCoverage: false,
+    collectCoverage: true,
 
     // An array of glob patterns indicating a set of files for which coverage information should be collected
-    // collectCoverageFrom: null,
+    collectCoverageFrom: ['<rootDir>/**/*.tsx', '<rootDir>/**/*.ts'],
 
     // The directory where Jest should output its coverage files
-    coverageDirectory: "coverage",
+    coverageDirectory: "coverage/jest",
 
     // An array of regexp pattern strings used to skip coverage collection
-    // coveragePathIgnorePatterns: [
-    //   "/node_modules/"
-    // ],
+    coveragePathIgnorePatterns: [
+      ".circleci",
+      ".github",
+      ".vscode",
+      ".yarn",
+      "/build",
+      "/node_modules/",
+      "/cache/",
+      "/vendor/",
+    ],
 
     // A list of reporter names that Jest uses when writing coverage reports
-    // coverageReporters: [
+    coverageReporters: [
     //   "json",
     //   "text",
-    //   "lcov",
+      "lcov",
     //   "clover"
-    // ],
+    ],
 
     // An object that configures minimum threshold enforcement for coverage results
     // coverageThreshold: null,
@@ -114,7 +139,8 @@ module.exports = {
     moduleNameMapper: {
         "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$":
             "<rootDir>/library/src/scripts/__tests__/fileMock.js",
-        "\\.(css|less)$": "<rootDir>/library/src/scripts/__tests__/styleMock.js",
+        "\\.(css|less|scss)$": "<rootDir>/library/src/scripts/__tests__/styleMock.js",
+        ...packageDirectoryMaps,
         ...addonModuleMaps,
     },
 
@@ -169,7 +195,7 @@ module.exports = {
     // snapshotSerializers: [],
 
     // The test environment that will be used for testing
-    // testEnvironment: "jest-environment-jsdom",
+    testEnvironment: "jest-environment-jsdom",
 
     // Options that will be passed to the testEnvironment
     // testEnvironmentOptions: {},

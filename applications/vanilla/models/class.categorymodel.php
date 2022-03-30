@@ -1277,6 +1277,40 @@ class CategoryModel extends Gdn_Model implements
     }
 
     /**
+     * Whether a category allows posts. Returns true if the display type is discussions or it's the root category.
+     *
+     * @param int|array $categoryOrCategoryID
+     * @return bool
+     */
+    public static function doesCategoryAllowPosts($categoryOrCategoryID): bool {
+        $category = is_numeric($categoryOrCategoryID)
+            ? self::categories($categoryOrCategoryID)
+            : ArrayUtils::pascalCase($categoryOrCategoryID);
+        if (!$category) {
+            throw new \Garden\Web\Exception\NotFoundException("Category");
+        }
+        return strtolower($category["DisplayAs"]) === "discussions" || $category["CategoryID"] === -1;
+    }
+
+    /**
+     * Checks if a category allows posts and throws an error if not.
+     *
+     * @param int|array $categoryOrCategoryID
+     * @throws \Garden\Web\Exception\ForbiddenException Throws an exception if category does not allow posting.
+     */
+    public static function checkCategoryAllowsPosts($categoryOrCategoryID): void {
+        $category = is_numeric($categoryOrCategoryID)
+            ? self::categories($categoryOrCategoryID)
+            : ArrayUtils::pascalCase($categoryOrCategoryID);
+        $canPost = self::doesCategoryAllowPosts($category);
+        if (!$canPost) {
+            throw new \Garden\Web\Exception\ForbiddenException(
+                sprintft('You are not allowed to post in categories with a display type of %s.', t($category["DisplayAs"]))
+            );
+        }
+    }
+
+    /**
      * Remove categories that a user does not have permission to view.
      *
      * @param array $categoryIDs An array of categories to filter.

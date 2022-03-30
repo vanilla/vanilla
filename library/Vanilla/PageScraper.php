@@ -121,7 +121,7 @@ class PageScraper implements LoggerAwareInterface {
             $errorMessage = sprintft($sourceString, $domain);
             $this->logger->info($errorMessage);
             throw new ServerException($errorMessage, $isError ? $response->getStatusCode() : "403", [
-                HttpException::FIELD_DESCRIPTION => $isError ? $info['Title'] . ": " . $info['Description'] : "robots.txt",
+                HttpException::FIELD_DESCRIPTION => $isError ? $info['Title'] . ": " . $info['Description'] : null,
             ]);
         }
         return $info;

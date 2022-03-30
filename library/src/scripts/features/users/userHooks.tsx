@@ -7,7 +7,7 @@ import { useSelector } from "react-redux";
 import { IGetUserByIDQuery, IInviteUsersByGroupIDQuery, useUserActions } from "@library/features/users/UserActions";
 import { IUsersStoreState } from "@library/features/users/userTypes";
 import { useDebugValue, useEffect } from "react";
-import { LoadStatus } from "@library/@types/api/core";
+import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { GUEST_USER_ID } from "@library/features/users/userModel";
@@ -31,25 +31,31 @@ export function useCurrentUserSignedIn(): boolean {
     });
 }
 
-export function useUser(query: IGetUserByIDQuery) {
+export function useUser(query: Partial<IGetUserByIDQuery>): ILoadable<IUser> {
     const actions = useUserActions();
     const { userID } = query;
 
     const existingResult = useSelector((state: IUsersStoreState) => {
-        return (
-            state.users.usersByID[userID] ?? {
-                status: LoadStatus.PENDING,
-            }
-        );
+        const pending = {
+            status: LoadStatus.PENDING,
+        };
+        if (userID == null) {
+            return pending;
+        }
+        return state.users.usersByID[userID] ?? pending;
     });
 
     const { status } = existingResult;
 
     useEffect(() => {
-        if (LoadStatus.PENDING.includes(status)) {
-            actions.getUserByID(query);
+        if (userID == null) {
+            // Nothing to do. We weren't given a userID.
+            return;
         }
-    }, [status, actions, query]);
+        if (LoadStatus.PENDING.includes(status)) {
+            actions.getUserByID({ userID });
+        }
+    }, [status, actions, userID]);
 
     useDebugValue(existingResult);
 

@@ -62,7 +62,7 @@ export function Tabs(props: ITabsProps) {
         if (props.defaultTabIndex !== undefined && activeTab !== props.defaultTabIndex) {
             setActiveTab(props.defaultTabIndex);
         }
-    }, [props.defaultTabIndex, activeTab]);
+    }, [props.defaultTabIndex]);
 
     const classVariants = new Map([
         [TabsTypes.STANDARD, tabStandardClasses()],

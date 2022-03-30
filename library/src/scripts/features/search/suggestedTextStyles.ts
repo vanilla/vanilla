@@ -22,35 +22,43 @@ export const suggestedTextStyleHelper = useThemeCache((overwrite?: { forDashboar
 
     const baseStyle: CSSObject = {
         width: percent(100),
-        ...Mixins.padding({
-            vertical: 6,
-            horizontal: 12,
-        }),
+        display: "block",
+
         ...Mixins.font({
+            align: "left",
             ...(forDashboard ? globalVars.fontSizeAndWeightVars("medium") : globalVars.fontSizeAndWeightVars("large")),
             color: globalVars.mainColors.fg,
         }),
-        textAlign: "left",
-        display: "block",
-        color: "inherit",
+
+        ...Mixins.padding({
+            horizontal: 12,
+        }),
     };
 
     const groupHeading: CSSObject = {
-        ...baseStyle,
         ...userSelect("none"),
+        ...baseStyle,
         ...Mixins.font({
-            size: 18,
-            lineHeight: 24 / 18,
-            weight: 700,
+            size: globalVars.fonts.size.subTitle,
+            weight: globalVars.fonts.weights.bold,
+            lineHeight: globalVars.lineHeights.condensed,
+            color: globalVars.mainColors.fg,
+        }),
+
+        ...Mixins.padding({
+            top: 12,
+            bottom: 10,
         }),
     };
 
     // The styles have been split here so they can be exported to the compatibility styles.
     const option: CSSObject = {
         ...buttonResetMixin(),
-
         ...baseStyle,
 
+        ...Mixins.padding({
+            vertical: 6,
+        }),
         ...{
             ".suggestedTextInput-parentTag": {
                 ...Mixins.font({

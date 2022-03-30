@@ -212,7 +212,7 @@ class PostController extends VanillaController {
             $allowedCategories = CategoryModel::getByPermission(
                 'Discussions.Add',
                 $this->Form->getValue('CategoryID', $this->CategoryID),
-                ['Archived' => 0, 'AllowDiscussions' => 1],
+                ['Archived' => 0, 'AllowDiscussions' => 1, 'DisplayAs' => CategoryModel::DISPLAY_DISCUSSIONS],
                 ['AllowedDiscussionTypes' => $this->Data['Type']]
             );
             $allowedCategoriesCount = count($allowedCategories);

@@ -11,15 +11,14 @@ namespace Vanilla\ImageSrcSet;
  * Service that provides Image's srcset.
  */
 class ImageSrcSetService {
+
     /** @var ImageResizeProviderInterface|null */
     private $provider;
 
     /**
-     * DI.
-     *
-     * @param ImageResizeProviderInterface|null $provider
+     * @param ImageResizeProviderInterface $provider
      */
-    public function __construct(?ImageResizeProviderInterface $provider = null) {
+    public function setImageResizeProvider(ImageResizeProviderInterface $provider) {
         $this->provider = $provider;
     }
 

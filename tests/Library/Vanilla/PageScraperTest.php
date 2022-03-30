@@ -256,7 +256,7 @@ Disallow: /disallow
             $this->assertEquals([
                 'message' => "Site's 'test.com' robots.txt did not allow access to the url.",
                 'status' => 403,
-                'description' => "robots.txt"
+                'description' => null
             ], $serialized);
         }
     }

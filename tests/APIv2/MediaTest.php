@@ -1,21 +1,24 @@
 <?php
 /**
  * @author Alexandre (DaazKu) Chouinard <alexandre.c@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace VanillaTests\APIv2;
 
+use Garden\Web\Exception\ForbiddenException;
 use Gdn_Upload;
 use Garden\Http\HttpResponse;
 use Vanilla\UploadedFile;
 use VanillaTests\Fixtures\TestUploader;
+use VanillaTests\UsersAndRolesApiTestTrait;
 
 /**
  * Test the /api/v2/media endpoints.
  */
 class MediaTest extends AbstractAPIv2Test {
+    use UsersAndRolesApiTestTrait;
 
     /** @var string */
     private $baseUrl = '/media';
@@ -46,7 +49,7 @@ class MediaTest extends AbstractAPIv2Test {
      */
     public function testPost() {
         TestUploader::resetUploads();
-        $photo = TestUploader::uploadFile('photo', PATH_ROOT.'/tests/fixtures/apple.jpg');
+        $photo = TestUploader::uploadFile('photo', PATH_ROOT . '/tests/fixtures/apple.jpg');
 
         $row = [
             'file' => $photo,
@@ -65,6 +68,68 @@ class MediaTest extends AbstractAPIv2Test {
             'uploadedFile' => $photo,
             'responseBody' => $result->getBody(),
         ];
+    }
+
+    /**
+     * Test posting/uploading an SVG file through the /media API endpoint depending on the permissions.
+     */
+    public function testPostSVGPermissions() {
+        TestUploader::resetUploads();
+
+        // Perform an SVG file upload with both the `Garden.Uploads.Add` & `Garden.Community.Manage` permissions.
+        $permissions = [
+            'uploads.add' => true,
+            'community.manage' => true
+        ];
+        $this->runWithPermissions(
+            function () {
+                $photo = TestUploader::uploadFile('photo', PATH_ROOT . '/tests/fixtures/test.svg');
+
+                $row = ['file' => $photo, 'type' => 'image'];
+                $result = $this->api()->post($this->baseUrl, $row);
+                // We are expecting a valid response status code.
+                $this->assertEquals(201, $result->getStatusCode());
+                // We validate the uploaded media file.
+                $this->validateMedia($photo, $result);
+            },
+            $permissions
+        );
+
+        // Perform a JPG file upload with the `Garden.Community.Manage` permission missing.
+        $permissions = [
+            'uploads.add' => true,
+            'community.manage' => false
+        ];
+        $this->runWithPermissions(
+            function () {
+                $photo = TestUploader::uploadFile('photo', PATH_ROOT . '/tests/fixtures/apple.jpg');
+
+                $row = ['file' => $photo, 'type' => 'image'];
+                $result = $this->api()->post($this->baseUrl, $row);
+                // We are expecting a valid response status code.
+                $this->assertEquals(201, $result->getStatusCode());
+                // We validate the uploaded media file.
+                $this->validateMedia($photo, $result);
+            },
+            $permissions
+        );
+
+        // Try & fail an SVG file upload with the `Garden.Community.Manage` permission missing.
+        $permissions = [
+            'uploads.add' => true,
+            'community.manage' => false
+        ];
+        $this->runWithPermissions(
+            function () {
+                $photo = TestUploader::uploadFile('photo', PATH_ROOT . '/tests/fixtures/test.svg');
+
+                $row = ['file' => $photo, 'type' => 'image'];
+                // We are expecting the user will be denied the svg file format upload.
+                $this->expectExceptionMessage("file contains an invalid file extension: svg.");
+                $this->api()->post($this->baseUrl, $row);
+            },
+            $permissions
+        );
     }
 
     /**
@@ -143,6 +208,8 @@ class MediaTest extends AbstractAPIv2Test {
      * @param HttpResponse $result
      */
     private function validateMedia(UploadedFile $uploadedFile, HttpResponse $result) {
+        $sizelessMediaTypes = ['image/svg+xml'];
+
         $body = $result->getBody();
         $this->assertIsArray($body);
 
@@ -163,21 +230,23 @@ class MediaTest extends AbstractAPIv2Test {
         $this->assertArrayHasKey('size', $body);
         $this->assertEquals($uploadedFile->getSize(), $body['size']);
 
-        $this->assertArrayHasKey('width', $body);
-        $this->assertArrayHasKey('height', $body);
-        if (strpos($body['type'], 'image/') === 0) {
-            $imageInfo = getimagesize($filename);
-            $this->assertEquals($imageInfo[0], $body['width']);
-            $this->assertEquals($imageInfo[1], $body['height']);
-        } else {
-            $this->assertEquals(null, $body['width']);
-            $this->assertEquals(null, $body['height']);
+        if (!in_array($body['type'], $sizelessMediaTypes)) {
+            $this->assertArrayHasKey('width', $body);
+            $this->assertArrayHasKey('height', $body);
+            if (strpos($body['type'], 'image/') === 0) {
+                $imageInfo = getimagesize($filename);
+                $this->assertEquals($imageInfo[0], $body['width']);
+                $this->assertEquals($imageInfo[1], $body['height']);
+            } else {
+                $this->assertEquals(null, $body['width']);
+                $this->assertEquals(null, $body['height']);
+            }
         }
 
         $this->assertArrayHasKey('foreignType', $body);
         $this->assertEquals('embed', $body['foreignType']);
 
         $this->assertArrayHasKey('foreignID', $body);
-        $this->assertEquals(self::$siteInfo['adminUserID'], $body['foreignID']);
+        $this->assertEquals(\Gdn::session()->UserID, $body['foreignID']);
     }
 }

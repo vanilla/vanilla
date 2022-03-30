@@ -116,6 +116,7 @@ phpcs-diff.json
 *.cookiejar
 /cli/vendor/
 /cli/composer.lock
+/coverage
 
 # Yarn
 yarn-error.log

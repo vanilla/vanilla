@@ -14,6 +14,7 @@ use Gdn_Locale as LocaleInterface;
 use Gdn_Validation;
 use Iterator;
 use Vanilla\CurrentTimeStamp;
+use Vanilla\Dashboard\Models\UserFragment;
 use Vanilla\Scheduler\LongRunner;
 
 /**
@@ -210,7 +211,15 @@ class ModelUtils {
                 if (!$fieldExists) {
                     continue;
                 }
-                ArrayUtils::setByPath($aliasField, $row, $fragments[ArrayUtils::getByPath($idField, $row)] ?? $default);
+                $newValue = $fragments[ArrayUtils::getByPath($idField, $row)] ?? $default;
+                $existingValue = ArrayUtils::getByPath($aliasField, $row, []);
+                if ($newValue instanceof UserFragment) {
+                    if ($existingValue instanceof UserFragment) {
+                        $existingValue = $existingValue->jsonSerialize();
+                    }
+                    $newValue->addExtraData($existingValue);
+                }
+                ArrayUtils::setByPath($aliasField, $row, $newValue);
             }
         }
     }

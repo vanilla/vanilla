@@ -32,7 +32,6 @@ import { PLACES_CATEGORY_TYPE, PLACES_KNOWLEDGE_BASE_TYPE, PLACES_GROUP_TYPE } f
 import { Icon } from "@vanilla/icons";
 import { cx } from "@emotion/css";
 import { sprintf } from "sprintf-js";
-import { ISearchSource } from "@library/search/searchTypes";
 import { DEFAULT_SEARCH_SOURCE } from "@library/search/SearchService";
 
 // Re-exported after being moved.
@@ -481,7 +480,11 @@ function SearchBarControl(props: IControlProps) {
                         {props.value && (
                             <ClearButton
                                 onClick={clearInput}
-                                className={classNames(classes.clear, props.clearButtonClass)}
+                                className={classNames(
+                                    classes.clear,
+                                    { [classes.clearWithButtonWithoutScope]: searchButtonIsVisible && !hasScope },
+                                    props.clearButtonClass,
+                                )}
                             />
                         )}
                     </div>

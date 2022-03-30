@@ -312,10 +312,6 @@ class Bootstrap {
             ->rule(SearchTypeCollectorInterface::class)
             ->addCall('registerSearchType', [new Reference(GlobalSearchType::class)])
 
-            // File base theme api provider
-            ->rule(\Vanilla\Theme\ThemeService::class)
-            ->addCall("addThemeProvider", [new Reference(FsThemeProvider::class)])
-
             ->rule(SSOModel::class)
             ->setShared(true)
 

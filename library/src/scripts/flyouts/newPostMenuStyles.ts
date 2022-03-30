@@ -212,7 +212,7 @@ export const newPostMenuClasses = useThemeCache(() => {
     };
 
     const button = css({
-        minWidth: styleUnit(148),
+        minWidth: buttonVars.primary.sizing?.minWidth ?? styleUnit(148),
         height: styleUnit(48),
         ...newPostButtonBorderAndShadow,
         ...{

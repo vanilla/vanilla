@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -8,13 +8,10 @@ use Garden\SafeCurl\Exception\InvalidURLException;
 use Garden\Schema\Schema;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
-use Vanilla\ApiUtils;
 use Vanilla\Contracts\ConfigurationInterface;
 use \Vanilla\EmbeddedContent\EmbedService;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\ImageResizer;
-use Vanilla\Models\VanillaMediaSchema;
-use Vanilla\UploadedFile;
 use Vanilla\UploadedFileSchema;
 use \Vanilla\EmbeddedContent\AbstractEmbed;
 
@@ -23,14 +20,10 @@ use \Vanilla\EmbeddedContent\AbstractEmbed;
  */
 class MediaApiController extends AbstractApiController {
 
-    /**
-     * @deprecated
-     */
+    /** @deprecated */
     const TYPE_IMAGE = 'image';
 
-    /**
-     * @deprecated
-     */
+    /** @deprecated */
     const TYPE_FILE = 'file';
 
     /** @var Schema */
@@ -56,6 +49,9 @@ class MediaApiController extends AbstractApiController {
 
     /** @var ?int Max image upload width */
     private $maxImageWidth;
+
+    // Supplementary allowed file extensions for upload, given the user has the `Garden.Community.Manage` permission.
+    const UPLOAD_RESTRICTED_ALLOWED_FILE_EXTENSIONS = ['svg'];
 
     /**
      * DI.
@@ -250,6 +246,10 @@ class MediaApiController extends AbstractApiController {
         $this->permission('Garden.Uploads.Add');
 
         $allowedExtensions = $this->config->get('Garden.Upload.AllowedFileExtensions', []);
+        // Users with the `Garden.Community.Manage` permission have some extra allowed file extensions to upload.
+        if ($this->getSession()->getPermissions()->has('Garden.Community.Manage')) {
+            $allowedExtensions = array_merge($allowedExtensions, $this::UPLOAD_RESTRICTED_ALLOWED_FILE_EXTENSIONS);
+        }
         $uploadSchema = new UploadedFileSchema([
             UploadedFileSchema::OPTION_ALLOWED_EXTENSIONS => $allowedExtensions,
             UploadedFileSchema::OPTION_VALIDATE_CONTENT_TYPES => FeatureFlagHelper::featureEnabled('validateContentTypes'),
@@ -262,6 +262,7 @@ class MediaApiController extends AbstractApiController {
         ], 'in')->setDescription('Add a media item.');
 
         $body = $in->validate($body);
+
         $fileData = [
             'foreignType' => 'embed',
             'foreignID' => $this->getSession()->UserID

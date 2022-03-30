@@ -116,6 +116,7 @@ compatibilityStyles = useThemeCache(() => {
     // Panel
     cssOut(panelSelectors, {
         ...linkMixin(undefined, true, panelSelectors),
+        padding: 0,
         minHeight: 0,
         display: "flex",
         opacity: 1,

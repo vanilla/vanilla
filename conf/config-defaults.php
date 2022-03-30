@@ -108,7 +108,8 @@ $Configuration['Garden']['VanillaUrl'] = 'https://open.vanillaforums.com';
 $Configuration['Garden']['CanProcessImages'] = false;
 $Configuration['Garden']['Upload']['MaxFileSize'] = '50M';
 $Configuration['Garden']['Upload']['AllowedFileExtensions'] = [
-    'txt', 'jpg', 'jpeg', 'gif', 'png', 'bmp', 'tiff', 'ico', 'zip', 'gz', 'tar.gz', 'tgz', 'psd', 'ai', 'pdf', 'doc', 'xls', 'ppt', 'docx', 'xlsx', 'pptx', 'log', 'rar', '7z'
+    'txt', 'jpg', 'jpeg', 'gif', 'png', 'bmp', 'tiff', 'ico', 'zip', 'gz', 'tar.gz', 'tgz', 'psd', 'ai', 'pdf', 'doc',
+    'xls', 'ppt', 'docx', 'xlsx', 'pptx', 'log', 'rar', '7z',
 ];
 $Configuration['Garden']['Profile']['MaxHeight'] = 560;
 $Configuration['Garden']['Profile']['MaxWidth'] = 560;

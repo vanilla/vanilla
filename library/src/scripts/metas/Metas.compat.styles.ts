@@ -30,6 +30,10 @@ export const metasCSS = () => {
                 }),
             },
 
+            "&.BadgeDescription": {
+                whiteSpace: "initial",
+            },
+
             "&.Hidden, &.RSS, &.JustNew": {
                 display: "none",
             },

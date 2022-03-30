@@ -12,6 +12,7 @@ import { UserSpotlightWidget } from "@library/userSpotlight/UserSpotlightWidget"
 import { DeepPartial } from "redux";
 import { IUserSpotlightOptions } from "@library/userSpotlight/UserSpotlight.variables";
 import { STORY_USER, STORY_IPSUM_MEDIUM } from "@library/storybook/storyData";
+import { UserSpotlightWidgetPreview } from "@library/userSpotlight/UserSpotlightWidget.preview";
 
 export default {
     title: "Widgets/UserSpotlight",
@@ -120,6 +121,15 @@ export const TitleDescriptionBorderAlignmentPanelVariants = storyWithConfig({}, 
                     }}
                 />
             </div>
+        </StoryContent>
+    </>
+));
+
+export const UserSpotlightPreview = storyWithConfig({}, () => (
+    <>
+        <StoryHeading>User Spotlight Widget Preview (e.g. in Layout editr/overview pages) </StoryHeading>
+        <StoryContent>
+            <UserSpotlightWidgetPreview />
         </StoryContent>
     </>
 ));

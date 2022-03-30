@@ -276,6 +276,15 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
         },
     });
 
+    const clearWithButtonWithoutScope = css({
+        ...absolutePosition.topRight(),
+        bottom: 0,
+        ...Mixins.margin({
+            vertical: "auto",
+        }),
+        transform: translateX(styleUnit(vars.border.width * 2)),
+    });
+
     const mainConditionalStyles = isInsetBordered
         ? {
               padding: `0 ${styleUnit(borderVars.width)}`,
@@ -380,14 +389,6 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
                     left: borderRadius,
                     right: 0,
                 }),
-            },
-            [`&&.inputText.withButton.withoutScope .${clear}`]: {
-                ...absolutePosition.topRight(),
-                bottom: 0,
-                ...Mixins.margin({
-                    vertical: "auto",
-                }),
-                transform: translateX(styleUnit(vars.border.width * 2)),
             },
             // Both sides flat
             "&&.inputText.withButton.withScope": {
@@ -758,6 +759,7 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
         actionButton,
         label,
         clear,
+        clearWithButtonWithoutScope,
         form,
         content,
         heading,

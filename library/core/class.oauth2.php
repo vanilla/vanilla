@@ -14,7 +14,6 @@ use Garden\Web\Exception\ServerException;
 use Psr\Container\ContainerExceptionInterface;
 use Vanilla\Models\UserAuthenticationProviderFragmentSchema;
 use Vanilla\Permissions;
-use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Web\CacheControlConstantsInterface;
 use Vanilla\Web\CacheControlTrait;
 
@@ -510,7 +509,19 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface, Cache
             'AuthorizeUrl' =>  ['LabelCode' => 'Authorize Url', 'Description' => 'URL where users sign-in with the authentication provider.'],
             'TokenUrl' => ['LabelCode' => 'Token Url', 'Description' => 'Endpoint to retrieve the authorization token for a user.'],
             'ProfileUrl' => ['LabelCode' => 'Profile Url', 'Description' => 'Endpoint to retrieve a user\'s profile.'],
-            'BearerToken' => ['LabelCode' => 'Authorization Code in Header', 'Description' => 'When requesting the profile, pass the access token in the HTTP header. i.e Authorization: Bearer [accesstoken]', 'Control' => 'checkbox']
+            'BearerToken' => [
+                'LabelCode' => 'Authorization Code in Header',
+                'Description' => 'When requesting the profile, pass the access token in the HTTP header. i.e Authorization: Bearer [accesstoken]', 'Control' => 'checkbox'
+            ],
+            'BasicAuthToken' => [
+                'LabelCode' => 'Basic Authorization Code in Header',
+                'Description' => 'When requesting the Access Token, pass the basic Auth token in the HTTP header. i.e Authorization: ' .
+                    '[Authorization =\> Basic base64_encode($rawToken)]', 'Control' => 'checkbox'
+            ],
+            'PostProfileRequest' => [
+                'LabelCode' => 'Request Profile Using the POST Method',
+                'Description' => 'When requesting the profile, use the HTTP POST method (default method is GET).', 'Control' => 'checkbox'
+            ]
         ];
 
         $formFields = $formFields + $this->getSettingsFormFields();
@@ -845,10 +856,27 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface, Cache
         $post = array_filter(array_merge($defaultParams, $this->requestAccessTokenParams));
 
         $this->log('Before calling API to request access token', ['requestAccessToken' => ['targetURI' => $uri, 'post' => $post]]);
-
-        $this->accessTokenResponse = $this->api($uri, 'POST', $post, $this->getAccessTokenRequestOptions());
+        $token = [];
+        if (val('BasicAuthToken', $provider)) {
+            $token = $this->generateBasicAuthHeader($this->providerKey);
+        }
+        $this->accessTokenResponse = $this->api($uri, 'POST', $post, $this->getAccessTokenRequestOptions() + $token);
 
         return $this->accessTokenResponse;
+    }
+
+    /**
+     * Generate Basic Auth Header.
+     *
+     * @param string $providerKey
+     * @return string[]
+     */
+    public function generateBasicAuthHeader(string $providerKey): array {
+        $provider = Gdn_AuthenticationProviderModel::getProviderByScheme($providerKey);
+        $client_id = $provider[$this->clientIDField];
+        $secret = $provider['AssociationSecret'];
+        $rawToken = $client_id.':'.$secret;
+        return ['Authorization-Header-Message' => 'Basic '.base64_encode($rawToken)];
     }
 
     /**
@@ -907,8 +935,9 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface, Cache
         // Merge any inherited parameters and remove any empty parameters before sending them in the request.
         $requestParams = array_filter(array_merge($defaultParams, $this->requestProfileParams));
 
+        $requestMethod = (isset($provider['PostProfileRequest']) && $provider['PostProfileRequest'] === true) ? 'POST' : 'GET';
         // Request the profile from the Authentication Provider
-        $rawProfile = $this->api($uri, 'GET', $requestParams, $requestOptions);
+        $rawProfile = $this->api($uri, $requestMethod, $requestParams, $requestOptions);
 
         // Translate the keys of the profile sent to match the keys we are looking for.
         $profile = $this->translateProfileResults($rawProfile);
@@ -1114,6 +1143,15 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface, Cache
     }
 
     /**
+     * Return ssoUtils.
+     *
+     * @return SsoUtils ssoUtils Member
+     */
+    public function getSsoUtils(): SsoUtils {
+        return $this->ssoUtils;
+    }
+
+    /**
      * Log a debug message to the general event log.
      *
      * @param string $message
@@ -1189,6 +1227,8 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface, Cache
                 ],
             ],
             "useBearerToken:b?" => ["default" => null],
+            "useBasicAuthToken:b?" => ["default" => null],
+            "postProfileRequest:b?" => ["default" => null],
             "allowAccessTokens:b?" => ["default" => null],
             "userMappings:o?" => [
                 "uniqueID:s?" => ["default" => "user_id"],

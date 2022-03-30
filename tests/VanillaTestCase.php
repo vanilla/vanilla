@@ -328,13 +328,16 @@ class VanillaTestCase extends TestCase {
                     self::assertArrayNotHasKey($expectedField, $result);
                 }
             } else {
-                $actualValues = array_column($actualRows, $expectedField);
+                $actualValues = [];
+                foreach ($actualRows as $row) {
+                    $actualValues[] = ArrayUtils::getByPath($expectedField, $row, null);
+                }
                 if (!$strictOrder) {
                     sort($actualValues);
                     sort($expectedValues);
                 }
 
-                self::assertEquals($expectedValues, $actualValues);
+                self::assertEquals($expectedValues, $actualValues, "Found wrong values for expected field: $expectedField");
             }
         }
     }

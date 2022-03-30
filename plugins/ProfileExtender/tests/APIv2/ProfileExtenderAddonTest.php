@@ -59,7 +59,7 @@ class ProfileExtenderAddonTest extends \VanillaTests\SiteTestCase {
         $fields = ['text' => __FUNCTION__, 'check' => true];
 
         $this->profileExtender->updateUserFields($this->memberID, $fields);
-        $data = $this->api()->get("/users/{$this->memberID}", ['expand' => \ProfileExtenderPlugin::FIELD_EXTENDED])->getBody();
+        $data = $this->api()->get("/users/{$this->memberID}", ['expand' => 'extended'])->getBody();
         $this->assertArraySubsetRecursive($fields, $data['extended']);
     }
 

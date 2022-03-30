@@ -50,6 +50,32 @@ export class KarmaRunner {
         });
     };
 
+    private coverageKarmaConfig() {
+        if (this.options.mode === BuildMode.TEST_COVERAGE) {
+            return {
+                reporters: ["mocha", "coverage"],
+                plugins: [
+                    "karma-coverage",
+                    "karma-chai",
+                    "karma-viewport",
+                    "karma-chrome-launcher",
+                    "karma-webpack",
+                    "karma-sourcemap-loader",
+                    "karma-mocha",
+                    "karma-mocha-reporter",
+                    "karma-spec-reporter",
+                    "karma-expect",
+                    { "middleware:genericImageMiddleware": ["value", genericImageMiddleware] },
+                ],
+                coverageReporter: {
+                    dir: "coverage/karma/",
+                    reporters: [{ type: "lcov", subdir: "." }],
+                },
+            };
+        }
+        return {};
+    }
+
     private async makeKarmaConfig(): Promise<any> {
         return {
             preprocessors: this.preprocessors,
@@ -77,7 +103,7 @@ export class KarmaRunner {
                 stats: "errors-only",
             },
             webpack: await makeTestConfig(this.entryModel),
-            singleRun: this.options.mode === BuildMode.TEST, // All other tests modes are in "watch mode".
+            singleRun: [BuildMode.TEST, BuildMode.TEST_COVERAGE].includes(this.options.mode), // All other tests modes are in "watch mode".
             concurrency: Infinity,
             middleware: ["genericImageMiddleware"],
             plugins: [
@@ -103,6 +129,7 @@ export class KarmaRunner {
                     flags: ["--remote-debugging-port=9333"],
                 },
             },
+            ...this.coverageKarmaConfig(),
         };
     }
 }

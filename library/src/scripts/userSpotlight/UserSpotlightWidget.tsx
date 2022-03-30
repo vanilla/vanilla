@@ -11,13 +11,16 @@ import { HomeWidgetContainer } from "@library/homeWidget/HomeWidgetContainer";
 import { UserSpotlight } from "@library/userSpotlight/UserSpotlight";
 import { IUserSpotlightOptions } from "@library/userSpotlight/UserSpotlight.variables";
 import { DeepPartial } from "redux";
-
+import { Widget } from "@library/layout/Widget";
 interface IProps {
     title?: string;
     description?: string;
     userTextAlignment?: "left" | "right";
     containerOptions?: IHomeWidgetContainerOptions;
     userInfo: IUserFragment;
+    apiParams?: {
+        userID?: number;
+    };
 }
 
 export function UserSpotlightWidget(props: IProps) {
@@ -25,8 +28,10 @@ export function UserSpotlightWidget(props: IProps) {
     const options = { ...containerOptions, userTextAlignment } as DeepPartial<IUserSpotlightOptions>;
 
     return (
-        <HomeWidgetContainer options={containerOptions}>
-            <UserSpotlight title={title} description={description} options={options} userInfo={userInfo} />
-        </HomeWidgetContainer>
+        <Widget>
+            <HomeWidgetContainer options={containerOptions}>
+                <UserSpotlight title={title} description={description} options={options} userInfo={userInfo} />
+            </HomeWidgetContainer>
+        </Widget>
     );
 }

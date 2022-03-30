@@ -21,7 +21,8 @@ class ImageSrcSetServiceTest extends MinimalContainerTestCase {
     public function testCreatingResizedSrcSet() {
         $mockImageSrcSetProvider = new MockImageSrcSetProvider();
 
-        $imageSrcSetService = new ImageSrcSetService($mockImageSrcSetProvider);
+        $imageSrcSetService = new ImageSrcSetService();
+        $imageSrcSetService->setImageResizeProvider($mockImageSrcSetProvider);
 
         $srcImageUrl = 'https://test.net/files/1539622619/bacon.jpg';
         $desiredOutput = [

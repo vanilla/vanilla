@@ -5,44 +5,30 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { metasVariables } from "@library/metas/Metas.variables";
-import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { styleUnit } from "@library/styles/styleUnit";
 import { Mixins } from "@library/styles/Mixins";
-
-export const searchMiscellaneousComponentsVariables = useThemeCache(() => {
-    const makeThemeVars = variableFactory("searchComponents");
-    const spacing = makeThemeVars("spacing", {
-        margin: 4,
-    });
-    return {
-        spacing,
-    };
-});
+import { css } from "@emotion/css";
 
 export const searchMiscellaneousComponentsClasses = useThemeCache(() => {
-    const style = styleFactory("searchMiscellaneousComponents");
     const globalVars = globalVariables();
     const metasVars = metasVariables();
 
-    const vars = searchMiscellaneousComponentsVariables();
-
-    const root = style("root", {
+    const root = css({
         display: "flex",
-        alignItems: "center",
         justifyContent: "flex-start",
+        alignItems: "baseline",
     });
 
-    const sort = style("sort", {
+    const sort = css({
         display: "flex",
         ...Mixins.margin({
             all: 0,
             right: globalVars.gutter.size,
         }),
-        flexGrow: 1,
     });
 
-    const sortLabel = style("sortLabel", {
+    const sortLabel = css({
         alignSelf: "center",
         marginRight: styleUnit(6),
         ...Mixins.font({

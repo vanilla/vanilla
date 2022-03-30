@@ -256,7 +256,7 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
     useEffect(() => {
         if (allowArbitraryInput) {
             setControlledOptions((prevState) => {
-                if (prevState) {
+                if (prevState && values && Array.isArray(values)) {
                     return prevState.filter((controlled) => values.includes(controlled));
                 }
                 return prevState;

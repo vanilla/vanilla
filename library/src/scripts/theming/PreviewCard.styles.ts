@@ -81,7 +81,6 @@ const previewCardClasses = useThemeCache(() => {
         maxHeight: (vars.container.maxWidth * vars.container.ratioHeight) / vars.container.ratioWidth,
         ...shadowHelper().embed(),
         borderRadius: styleUnit(2),
-        overflow: "hidden",
     });
 
     const constraintContainerActive = css({

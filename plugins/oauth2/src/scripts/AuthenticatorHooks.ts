@@ -77,6 +77,8 @@ export const INITIAL_AUTHENTICATOR_FORM_STATE: IAuthenticator = {
     userMappings: INITIAL_AUTHENTICATOR_USER_MAPPINGS,
     authenticationRequest: INITIAL_AUTHENTICATION_REQUEST,
     useBearerToken: false,
+    useBasicAuthToken: false,
+    postProfileRequest: false,
     allowAccessTokens: false,
     active: true,
     default: false,

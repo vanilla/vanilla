@@ -265,6 +265,42 @@ function OAuth2AddEditSettings(props: ITabContentsProps) {
                 ></DashboardToggle>
             </DashboardFormGroup>
             <DashboardFormGroup
+                label={t("Basic Authorization Code in Header")}
+                description={
+                    <Translate
+                        source={
+                            "When requesting the Access Token, pass the basic Auth token in the HTTP header. i.e Authorization:  [Authorization =\\> Basic base64_encode($rawToken)]"
+                        }
+                        c0={() => <br />}
+                    ></Translate>
+                }
+                labelType={DashboardLabelType.WIDE}
+            >
+                <DashboardToggle
+                    onChange={(isToggled) => {
+                        update({ useBasicAuthToken: isToggled });
+                    }}
+                    checked={values.useBasicAuthToken || false}
+                ></DashboardToggle>
+            </DashboardFormGroup>
+            <DashboardFormGroup
+                label={t("Request Profile Using the POST Method")}
+                description={
+                    <Translate
+                        source={"When requesting the profile, use the HTTP POST method (default method is GET)."}
+                        c0={() => <br />}
+                    ></Translate>
+                }
+                labelType={DashboardLabelType.WIDE}
+            >
+                <DashboardToggle
+                    onChange={(isToggled) => {
+                        update({ postProfileRequest: isToggled });
+                    }}
+                    checked={values.postProfileRequest || false}
+                ></DashboardToggle>
+            </DashboardFormGroup>
+            <DashboardFormGroup
                 label={t("Allow Access Tokens")}
                 description={t("Allow this connection to issue API access tokens.")}
                 labelType={DashboardLabelType.WIDE}

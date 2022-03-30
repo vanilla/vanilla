@@ -18,14 +18,12 @@ use Vanilla\Formatting\Html\HtmlEnhancer;
 use Vanilla\Formatting\Html\HtmlPlainTextConverter;
 use Vanilla\Formatting\Html\HtmlSanitizer;
 use Vanilla\Formatting\Html\Processor\ExternalLinksProcessor;
+use Vanilla\Formatting\Html\Processor\ImageHtmlProcessor;
 use Vanilla\HttpCacheMiddleware;
-use Vanilla\ImageSrcSet\Providers\DefaultImageResizeProvider;
-use Vanilla\ImageSrcSet\ImageSrcSetService;
 use Vanilla\Layout\GlobalRecordProvider;
 use Vanilla\Layout\CategoryRecordProvider;
 use Vanilla\Layout\LayoutViewModel;
 use Vanilla\Logging\ErrorLogger;
-use Vanilla\Logging\LogDecorator;
 use Vanilla\Models\CurrentUserPreloadProvider;
 use Vanilla\Models\LocalePreloadProvider;
 use Vanilla\Models\Model;
@@ -143,12 +141,7 @@ $dic->setInstance(Container::class, $dic)
 
     // File base theme api provider
     ->rule(\Vanilla\Theme\ThemeService::class)
-        ->setShared(true)
-        ->addCall("addThemeProvider", [new Reference(FsThemeProvider::class)])
         ->addCall("addVariableProvider", [new Reference(QuickLinksVariableProvider::class)])
-
-    ->rule(\Vanilla\Theme\ThemeSectionModel::class)
-    ->setShared(true)
 
     ->rule(HttpCacheMiddleware::class)
     ->setShared(true)
@@ -421,6 +414,9 @@ $dic->setInstance(Container::class, $dic)
 
     ->rule(BaseFormat::class)
     ->addCall("addHtmlProcessor", [new Reference(ExternalLinksProcessor::class)])
+
+    ->rule(BaseFormat::class)
+    ->addCall("addHtmlProcessor", [new Reference(ImageHtmlProcessor::class)])
 
     ->rule(ExternalLinksProcessor::class)
     ->addCall("setWarnLeaving", [ContainerUtils::config("Garden.Format.WarnLeaving")])

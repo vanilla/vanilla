@@ -15,6 +15,7 @@ use Vanilla\Database\Operation\JsonFieldProcessor;
 use Vanilla\Layout\Providers\MutableLayoutProviderInterface;
 use Vanilla\Models\FullRecordCacheModel;
 use Vanilla\Models\Model;
+use Vanilla\Models\PipelineModel;
 use Vanilla\Utility\ModelUtils;
 
 /**

@@ -4395,9 +4395,8 @@ class UserModel extends Gdn_Model implements
         // Make sure the username & email aren't already being used
         if (c('Garden.Registration.NameUnique', true) && $username) {
             $where['Name'] = $username;
-            $sql = $this->Database->createSql();
-            $testData = $sql->getWhere('User', $where, '', '', 1)->resultArray();
-            if (!empty($testData)) {
+            $testData = $this->getWhere($where);
+            if ($testData->numRows() > 0) {
                 $result['Name'] = false;
                 $valid = false;
             }
@@ -4406,9 +4405,8 @@ class UserModel extends Gdn_Model implements
 
         if (c('Garden.Registration.EmailUnique', true) && $email) {
             $where['Email'] = $email;
-            $sql = $this->Database->createSql();
-            $testData = $sql->getWhere('User', $where, '', '', 1)->resultArray();
-            if (!empty($testData)) {
+            $testData = $this->getWhere($where);
+            if ($testData->numRows() > 0) {
                 $result['Email'] = false;
                 $valid = false;
             }

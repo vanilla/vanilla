@@ -11,7 +11,6 @@ import ThreeColumnSection from "@library/layout/ThreeColumnSection";
 import TwoColumnSection from "@library/layout/TwoColumnSection";
 import { QuickLinks } from "@library/navigation/QuickLinks";
 import { UserSpotlightWidgetPreview } from "@library/userSpotlight/UserSpotlightWidget.preview";
-import { CategoriesWidgetPreview } from "@library/categoriesWidget/CategoriesWidget.preview";
 
 registerWidgetOverviews({
     SectionFullWidth,
@@ -21,5 +20,4 @@ registerWidgetOverviews({
     SectionThreeColumns: ThreeColumnSection,
     QuickLinks, // Quicklinks doesn't need server data so the same widget renders here as on the server.
     UserSpotlightWidget: UserSpotlightWidgetPreview,
-    CategoriesWidget: CategoriesWidgetPreview,
 });

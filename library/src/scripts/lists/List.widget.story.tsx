@@ -133,7 +133,7 @@ export const InAPanel = storyWithConfig({ useWrappers: false }, () => {
                         </PanelWidget>
                     </>
                 }
-                secondaryBottom={
+                rightBottom={
                     <>
                         <PanelWidget>
                             <div className={userContentClasses().root}>

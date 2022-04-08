@@ -3,15 +3,11 @@
  * @license Proprietary
  */
 
-import { ISearchForm, ISearchResults, ISearchSource } from "@library/search/searchTypes";
+import { ISearchForm, ISearchResults } from "@library/search/searchTypes";
 import { getSiteSection } from "@library/utility/appUtils";
 import { RecordID } from "@vanilla/utils";
 
-interface ITrackedSearchSource {
-    key: ISearchSource["key"];
-    label: string;
-}
-export interface IResultAnalyticsData {
+interface IResultAnalyticsData {
     type: "search";
     domain: string;
     searchResults: number;
@@ -24,7 +20,6 @@ export interface IResultAnalyticsData {
     category: { categoryID: number[]; categoryName: string[] };
     kb: { kbID: number | null; kbName: string };
     siteSection: object;
-    source?: ITrackedSearchSource;
 }
 
 interface IPieces {
@@ -104,11 +99,7 @@ export const splitSearchTerms = (query: string): ISplitSearchTerms => {
 /**
  * Get structured data for search analytics
  */
-export const getSearchAnalyticsData = (
-    form: ISearchForm,
-    results: ISearchResults,
-    searchSource?: ITrackedSearchSource,
-): IResultAnalyticsData => {
+export const getSearchAnalyticsData = (form: ISearchForm, results: ISearchResults): IResultAnalyticsData => {
     const resultsWithAnalyticsData: IResultAnalyticsData = {
         type: "search",
         domain: form.domain,
@@ -142,16 +133,13 @@ export const getSearchAnalyticsData = (
         resultsWithAnalyticsData.tag.tagID = form.tagsOptions.map((tag) => tag.value);
         resultsWithAnalyticsData.tag.tagName = form.tagsOptions.map((tag) => tag.label);
     }
-    if (form.categoryOptions && form.categoryOptions.length) {
+    if (form.category && form.category.length) {
         resultsWithAnalyticsData.category.categoryID = form.categoryOptions.map((category) => category.value);
-        resultsWithAnalyticsData.category.categoryName = form.categoryOptions.map((category) => category.label);
+        resultsWithAnalyticsData.tag.tagName = form.categoryOptions.map((category) => category.label);
     }
     if (form.knowledgeBaseOption) {
         resultsWithAnalyticsData.kb.kbID = form.knowledgeBaseOption.value;
         resultsWithAnalyticsData.kb.kbName = form.knowledgeBaseOption.label;
-    }
-    if (searchSource) {
-        resultsWithAnalyticsData.source = searchSource;
     }
 
     return resultsWithAnalyticsData;

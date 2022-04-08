@@ -4,9 +4,8 @@
  */
 
 import { ISearchForm, ISearchResult, ISearchResults } from "@library/search/searchTypes";
-import { getSearchAnalyticsData, IResultAnalyticsData, splitSearchTerms } from "./searchAnalyticsData";
+import { getSearchAnalyticsData, splitSearchTerms } from "./searchAnalyticsData";
 import * as _appUtils from "@library/utility/appUtils";
-import { SearchFixture } from "@library/search/__fixtures__/Search.fixture";
 
 interface ITermsCase {
     name: string;
@@ -43,6 +42,58 @@ const testCases: ITermsCase[] = [
         expectedNegativeTerms: [],
     },
 ];
+
+const createTestSearchForm = (params?: Partial<ISearchForm>): ISearchForm => {
+    return {
+        domain: "test-domain",
+        query: "test-query",
+        page: 1,
+        sort: "relevance",
+        initialized: true,
+        ...params,
+    };
+};
+
+const createMockResults = (params?: Partial<ISearchResults>): ISearchResults => {
+    const makeResults = (numberOfResults: number = 10): ISearchResult[] => {
+        return Array(numberOfResults)
+            .fill(null)
+            .map((_, id) => ({
+                name: "test",
+                url: "/",
+                body: "test",
+                excerpt: "test",
+                recordID: id,
+                recordType: "test",
+                type: "article",
+                breadcrumbs: [],
+                dateUpdated: "",
+                dateInserted: "",
+                insertUserID: 0,
+                insertUser: {
+                    userID: 1,
+                    name: "Bob",
+                    photoUrl: "",
+                    dateLastActive: "2016-07-25 17:51:15",
+                },
+                updateUserID: 0,
+            }));
+    };
+
+    return {
+        results: {
+            ...makeResults(),
+            ...(params?.results ?? {}),
+        },
+        pagination: {
+            next: 2,
+            prev: 0,
+            total: 14,
+            currentPage: 1,
+            ...(params?.pagination ?? {}),
+        },
+    };
+};
 
 const mockSiteSection: _appUtils.ISiteSection = {
     basePath: "string",
@@ -84,13 +135,13 @@ describe("splitSearchTerms", () => {
 });
 
 describe("getSearchAnalyticsData", () => {
-    let form: ISearchForm;
-    let results: ISearchResults;
-    let actual: IResultAnalyticsData;
+    let form;
+    let results;
+    let actual;
 
-    beforeAll(() => {
-        form = SearchFixture.createMockSearchForm();
-        results = SearchFixture.createMockSearchResults();
+    beforeEach(() => {
+        form = createTestSearchForm();
+        results = createMockResults();
         actual = getSearchAnalyticsData(form, results);
     });
     it("The type field is correct", () => {
@@ -107,69 +158,5 @@ describe("getSearchAnalyticsData", () => {
     });
     it("The site section field is populated", () => {
         expect(actual.siteSection).toEqual(mockSiteSection);
-    });
-    it("The source object is not populated when source is not passed into it", () => {
-        expect(actual.source).toBeUndefined();
-    });
-    it("The source object is populated", () => {
-        const source = { key: "community", label: "Community" };
-        actual = getSearchAnalyticsData(form, results, source);
-        expect(actual).toHaveProperty("source");
-        expect(actual.source?.key).toBe(source.key);
-        expect(actual.source?.label).toBe(source.label);
-    });
-    it("The author field is populated", () => {
-        const formWithAuthor = SearchFixture.createMockSearchForm({
-            authors: [
-                {
-                    value: 1,
-                    label: "Bobby",
-                },
-            ],
-        });
-        actual = getSearchAnalyticsData(formWithAuthor, results);
-        expect(actual.author.authorID.length).toEqual(1);
-        expect(actual.author.authorID).toEqual(expect.arrayContaining([1]));
-        expect(actual.author.authorName).toEqual(expect.arrayContaining(["Bobby"]));
-    });
-    it("The tag field is populated", () => {
-        const formWithTags = SearchFixture.createMockSearchForm({
-            tagsOptions: [
-                {
-                    value: 1,
-                    label: "Tag 1",
-                },
-            ],
-        });
-        actual = getSearchAnalyticsData(formWithTags, results);
-        expect(actual.tag.tagID.length).toEqual(1);
-        expect(actual.tag.tagID).toEqual(expect.arrayContaining([1]));
-        expect(actual.tag.tagName).toEqual(expect.arrayContaining(["Tag 1"]));
-    });
-    it("The category field is populated", () => {
-        const formWithCategories = SearchFixture.createMockSearchForm({
-            categoryOptions: [
-                {
-                    value: 0,
-                    label: "General",
-                },
-            ],
-        });
-        actual = getSearchAnalyticsData(formWithCategories, results);
-        expect(actual.category.categoryID.length).toEqual(1);
-        expect(actual.category.categoryID).toEqual(expect.arrayContaining([0]));
-        expect(actual.category.categoryName).toEqual(expect.arrayContaining(["General"]));
-    });
-    it("The knowledge base field is populated", () => {
-        const formWithKnowledgeBase = SearchFixture.createMockSearchForm({
-            knowledgeBaseOption: {
-                value: 1,
-                label: "Guides",
-            },
-        });
-        actual = getSearchAnalyticsData(formWithKnowledgeBase, results);
-        expect(actual).toHaveProperty("kb");
-        expect(actual.kb.kbID).toEqual(1);
-        expect(actual.kb.kbName).toEqual("Guides");
     });
 });

@@ -14,7 +14,6 @@ export interface ISearchInButton {
     label: string;
     icon: React.ReactNode;
     data: string;
-    disabled?: boolean;
 }
 
 interface IProps {

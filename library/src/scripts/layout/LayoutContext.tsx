@@ -26,6 +26,7 @@ export interface ISectionProps {
     contentWidth: number;
     calculateDevice: () => any;
     sectionSpecificStyles: (style) => any | undefined;
+    rightPanelCondition: (currentDevice: string, shouldRenderRightPanel: boolean) => boolean;
 }
 
 const sectionDataByType = (type: SectionTypes): ISectionProps => {
@@ -48,6 +49,12 @@ const sectionDataByType = (type: SectionTypes): ISectionProps => {
         contentWidth: section.variables.contentWidth,
         calculateDevice: section.variables.calculateDevice,
         sectionSpecificStyles: section.variables["sectionSpecificStyles"] ?? undefined,
+        rightPanelCondition:
+            section.variables["rightPanelCondition"] !== undefined
+                ? section.variables["rightPanelCondition"]
+                : () => {
+                      return false;
+                  },
     };
 };
 

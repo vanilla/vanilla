@@ -68,9 +68,7 @@ function RandomSection() {
                 </SectionOneColumn>
             );
         case 2:
-            return (
-                <TwoColumnSection mainBottom={<RandomWidgets inPanel />} secondaryBottom={<RandomWidgets inPanel />} />
-            );
+            return <TwoColumnSection mainBottom={<RandomWidgets inPanel />} rightBottom={<RandomWidgets inPanel />} />;
         case 3:
             return (
                 <ThreeColumnSection

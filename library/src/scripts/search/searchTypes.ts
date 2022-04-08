@@ -21,10 +21,12 @@ export interface ISearchSource {
     sortOptions?: ISelectBoxItem[];
     /** The additional search filters this source should make available */
     queryFilterComponent?: React.ReactNode;
-    /** The domains that can be searched using this source */
-    searchableDomainKeys?: string[];
-    /** The default domain searched using this source */
-    defaultDomainKey?: string;
+}
+
+export interface ISearchSource {
+    key: string;
+    getLabel: () => string;
+    performSearch: (query: ISearchRequestQuery) => Promise<ISearchResults>;
 }
 
 export interface ISearchFormBase {

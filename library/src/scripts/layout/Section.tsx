@@ -102,7 +102,16 @@ export default function Section(props: ISectionProps) {
 
     // Measure the panel itself.
     const { offsetClass, rawScrollOffset } = useScrollOffset();
-    const { type, classes, currentDevice, isCompact, isFullWidth } = useSection();
+    const {
+        type,
+        classes,
+        currentDevice,
+        isCompact,
+        isFullWidth,
+        rightPanelCondition = () => {
+            return false;
+        },
+    } = useSection();
 
     if (!classes) {
         logError(`Classes not loaded for panel layout of type: ${type}, classes given: `, classes);
@@ -147,8 +156,7 @@ export default function Section(props: ISectionProps) {
     // Calculate some rendering variables.
 
     const shouldRenderLeftPanel: boolean = !isCompact && (!!childComponents.leftTop || !!childComponents.leftBottom);
-    const shouldRenderRightPanel: boolean =
-        isFullWidth && (!!childComponents.rightTop || !!childComponents.rightBottom);
+    const shouldRenderRightPanel: boolean = isFullWidth || rightPanelCondition(currentDevice, shouldRenderLeftPanel);
     const shouldRenderBreadcrumbs: boolean = !!childComponents.breadcrumbs;
 
     const widgetClasses = useWidgetSectionClasses();
@@ -190,7 +198,7 @@ export default function Section(props: ISectionProps) {
                         ref={panelRef}
                         className={classNames(classes.container, props.growMiddleBottom ? inheritHeightClass() : "")}
                     >
-                        {shouldRenderLeftPanel && (
+                        {!isCompact && shouldRenderLeftPanel && (
                             <PageBoxDepthContextProvider depth={4}>
                                 <WidgetLayout
                                     widgetClass={classes.secondaryPanelWidget}
@@ -248,9 +256,6 @@ export default function Section(props: ISectionProps) {
                                     <PanelArea className={inheritHeightClass()}>
                                         {childComponents.middleBottom}
                                     </PanelArea>
-                                    {!shouldRenderLeftPanel && childComponents.leftBottom !== undefined && (
-                                        <PanelArea>{childComponents.leftBottom}</PanelArea>
-                                    )}
                                     {!shouldRenderRightPanel && childComponents.rightBottom !== undefined && (
                                         <PanelArea>{childComponents.rightBottom}</PanelArea>
                                     )}

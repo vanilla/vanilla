@@ -54,6 +54,7 @@ export interface IOneColumnVariables {
     panelLayoutSpacing: any;
     breakPoints: any;
     calculateDevice: () => string;
+    rightPanelCondition?: (currentDevice, shouldRenderLeftPanel) => boolean;
 }
 
 export interface IAllSectionMediaQueries {

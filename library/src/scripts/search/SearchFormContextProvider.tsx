@@ -7,7 +7,7 @@ import { TypeAllIcon } from "@library/icons/searchIcons";
 import { FilterPanelAll } from "@library/search/panels/FilterPanelAll";
 import { SearchActions } from "@library/search/SearchActions";
 import { DEFAULT_CORE_SEARCH_FORM, INITIAL_SEARCH_STATE, searchReducer } from "@library/search/searchReducer";
-import { ISearchForm, ISearchRequestQuery, ISearchFormBase, ISearchSource } from "@library/search/searchTypes";
+import { ISearchForm, ISearchRequestQuery, ISearchFormBase } from "@library/search/searchTypes";
 import {
     ALLOWED_GLOBAL_SEARCH_FIELDS,
     ALL_CONTENT_DOMAIN_NAME,
@@ -28,7 +28,6 @@ import PlacesSearchListing from "@library/search/PlacesSearchListing";
 import { getSiteSection } from "@library/utility/appUtils";
 import { getSearchAnalyticsData } from "@library/search/searchAnalyticsData";
 import { useSearchSources } from "@library/search/SearchSourcesContextProvider";
-import { stableObjectHash } from "@vanilla/utils";
 
 interface IProps {
     children?: React.ReactNode;
@@ -234,32 +233,6 @@ export function SearchFormContextProvider(props: IProps) {
         return finalQuery;
     };
 
-    /**
-     * This state holds a stable hash of the form query and the source its been searched from
-     * to be used to prevent duplicate events from firing
-     */
-    const [hashedSearchEvents, setHashedSearchEvents] = useState<number[]>([]);
-
-    /**
-     * Generate and store a hash representing the form query and the search source
-     */
-    const updateHashedEventStore = (form: ISearchForm, source: ISearchSource): void => {
-        const hash = stableObjectHash({ query: form.query, key: source.key });
-        setHashedSearchEvents((prevValues) => {
-            return [...new Set([...prevValues, hash])];
-        });
-    };
-    /**
-     * Used to check if a search event has already been tracked
-     * Will prevent multiple events from firing should a user flip between
-     * source tabs without changing the search term, or if a user
-     * spams the search button
-     */
-    const shouldDispatchAnalyticsEvent = (form: ISearchForm, source: ISearchSource): boolean => {
-        const hash = stableObjectHash({ query: form.query, key: source.key });
-        return !hashedSearchEvents.includes(hash);
-    };
-
     const search = async () => {
         const { form } = state;
 
@@ -276,25 +249,12 @@ export function SearchFormContextProvider(props: IProps) {
                     result,
                 }),
             );
-
-            /**
-             * Search event tracking
-             */
-            // Check if we should dispatch an event, or if one has been dispatched already
-            const shouldTrack = shouldDispatchAnalyticsEvent(form, searchSource);
-
-            if (shouldTrack) {
-                // Make sure to update the store, to prevent subsequent event dispatch
-                updateHashedEventStore(form, searchSource);
-                document.dispatchEvent(
-                    new CustomEvent("pageViewWithContext", {
-                        detail: getSearchAnalyticsData(form, result, {
-                            key: searchSource.key,
-                            label: searchSource.getLabel(),
-                        }),
-                    }),
-                );
-            }
+            //analytics event to keen
+            document.dispatchEvent(
+                new CustomEvent("pageViewWithContext", {
+                    detail: getSearchAnalyticsData(form, result),
+                }),
+            );
         } catch (error) {
             dispatch(SearchActions.performSearchACs.failed({ params: form, error }));
         }

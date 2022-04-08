@@ -14,7 +14,6 @@ use Garden\Web\Exception\ServerException;
 use Psr\Container\ContainerExceptionInterface;
 use Vanilla\Models\UserAuthenticationProviderFragmentSchema;
 use Vanilla\Permissions;
-use Vanilla\Utility\StringUtils;
 use Vanilla\Web\CacheControlConstantsInterface;
 use Vanilla\Web\CacheControlTrait;
 
@@ -647,11 +646,6 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface, Cache
         // Optionally over-write the content type
         if ($contentType = val('Content-Type', $options, $this->defaultContentType)) {
             $headers['Content-Type'] = $contentType;
-        }
-
-        // JSON encode params if the Content-Type is application/json.
-        if ($headers['Content-Type'] === 'application/json') {
-            $params = StringUtils::jsonEncodeChecked($params);
         }
 
         // Obtionally add proprietary required Authorization headers

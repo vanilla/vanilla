@@ -31,20 +31,20 @@ export const SimplePanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
             <TwoColumnSection
                 mainTop={<DummyPanel>Middle Top</DummyPanel>}
                 mainBottom={<DummyPanel>Middle Bottom{largeIpsum}</DummyPanel>}
-                secondaryTop={<DummyPanel>Right Top{largeIpsum}</DummyPanel>}
+                rightTop={<DummyPanel>Right Top{largeIpsum}</DummyPanel>}
             />
         </Container>
     );
 });
 
-export const LargeSecondaryTopPanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
+export const LargeRightTopPanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
     return (
         <Container>
             <TwoColumnSection
                 mainTop={<DummyPanel>Middle Top</DummyPanel>}
                 mainBottom={<DummyPanel>Middle Bottom</DummyPanel>}
-                secondaryTop={<DummyPanel>Right Top {largeIpsum}</DummyPanel>}
-                secondaryBottom={<DummyPanel>Right bottom</DummyPanel>}
+                rightTop={<DummyPanel>Right Top {largeIpsum}</DummyPanel>}
+                rightBottom={<DummyPanel>Right bottom</DummyPanel>}
             />
         </Container>
     );
@@ -61,8 +61,8 @@ export const LargeRightBottomPanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
                         {smallIpsum}
                     </DummyPanel>
                 }
-                secondaryTop={<DummyPanel>Right Top</DummyPanel>}
-                secondaryBottom={<DummyPanel>Right bottom {largeIpsum}</DummyPanel>}
+                rightTop={<DummyPanel>Right Top</DummyPanel>}
+                rightBottom={<DummyPanel>Right bottom {largeIpsum}</DummyPanel>}
             />
         </Container>
     );
@@ -74,8 +74,8 @@ export const LargeEverything = storyWithConfig(NO_WRAPPER_CONFIG, () => {
             <TwoColumnSection
                 mainTop={<DummyPanel>Middle Top{largeIpsum}</DummyPanel>}
                 mainBottom={<DummyPanel>Middle Bottom{largeIpsum}</DummyPanel>}
-                secondaryTop={<DummyPanel>Secondary Top{largeIpsum}</DummyPanel>}
-                secondaryBottom={<DummyPanel>Secondary bottom {largeIpsum}</DummyPanel>}
+                rightTop={<DummyPanel>Right Top{largeIpsum}</DummyPanel>}
+                rightBottom={<DummyPanel>Right bottom {largeIpsum}</DummyPanel>}
             />
         </Container>
     );
@@ -99,8 +99,8 @@ export const DarkMode = storyWithConfig(
                 <TwoColumnSection
                     mainTop={<DummyPanel>Middle Top{largeIpsum}</DummyPanel>}
                     mainBottom={<DummyPanel>Middle Bottom{largeIpsum}</DummyPanel>}
-                    secondaryTop={<DummyPanel>Right Top{largeIpsum}</DummyPanel>}
-                    secondaryBottom={<DummyPanel>Right bottom {largeIpsum}</DummyPanel>}
+                    rightTop={<DummyPanel>Right Top{largeIpsum}</DummyPanel>}
+                    rightBottom={<DummyPanel>Right bottom {largeIpsum}</DummyPanel>}
                 />
             </Container>
         );

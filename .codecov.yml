@@ -10,9 +10,7 @@ coverage:
         project:
             default:
                 informational: true
-        patch:
-            front-end:
-              informational: true
+        patch: yes
         changes: no
 
 parsers:

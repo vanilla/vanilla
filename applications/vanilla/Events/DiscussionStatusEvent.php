@@ -7,20 +7,20 @@
 
 namespace Vanilla\Community\Events;
 
-use Garden\Events\ResourceEvent;
-use Psr\Log\LogLevel;
-use Vanilla\Logging\LogEntry;
-use Vanilla\Logging\LoggableEventInterface;
-use Vanilla\Logging\LoggerUtils;
-
 /**
  * Defines the event dispatched when a status is applied to a discussion
  */
-class DiscussionStatusEvent extends ResourceEvent implements LoggableEventInterface {
+class DiscussionStatusEvent {
 
     //region Properties
-    public const ACTION_DISCUSSION_STATUS = 'statusUpdate';
+    /** @var int $discussionID */
+    private $discussionID;
 
+    /** @var int $statusID */
+    private $statusID;
+
+    /** @var int $previousStatusID */
+    private $previousStatusID;
 
     //endregion
 
@@ -28,40 +28,43 @@ class DiscussionStatusEvent extends ResourceEvent implements LoggableEventInterf
     /**
      * Constructor
      *
-     * @param string $action
-     * @param array $payload
-     * @param array|object|null $sender
+     * @param int $discussionID ID of the discussion to which the status update applies
+     * @param int $statusID ID of the status assigned to the discussion
+     * @param int $previousStatusID ID of the discussion's status that was overwritten by the status update
      */
-    public function __construct(string $action, array $payload, $sender = null) {
-        parent::__construct($action, $payload, $sender);
-        $this->type = 'discussion';
+    public function __construct(int $discussionID, int $statusID, int $previousStatusID) {
+        $this->discussionID = $discussionID;
+        $this->statusID = $statusID;
+        $this->previousStatusID = $previousStatusID;
     }
     //endregion
 
     //region Methods
+    /**
+     * Get the ID of the discussion to which the status update applies.
+     *
+     * @return int
+     */
+    public function getDiscussionID(): int {
+        return $this->discussionID;
+    }
 
     /**
-     * @inheritDoc
+     * Get the ID of the status assigned to the discussion
+     *
+     * @return int
      */
-    public function getLogEntry(): LogEntry {
-        $context = LoggerUtils::resourceEventLogContext($this);
-        $context['discussion'] = array_intersect_key($this->payload["discussion"] ?? [], [
-            "discussionID" => true,
-            "dateInserted" => true,
-            "dateUpdated" => true,
-            "updateUserID" => true,
-            "insertUserID" => true,
-            "url" => true,
-            "name" => true,
-        ]);
+    public function getStatusID(): int {
+        return $this->statusID;
+    }
 
-        $log = new LogEntry(
-            LogLevel::INFO,
-            LoggerUtils::resourceEventLogMessage($this),
-            $context
-        );
-
-        return $log;
+    /**
+     * Get the ID of the discussion's status that was overwritten by the status update
+     *
+     * @return int
+     */
+    public function getPreviousStatusID(): int {
+        return $this->previousStatusID;
     }
 
     /**

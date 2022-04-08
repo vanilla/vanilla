@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Dan Redman <dredman@higherlogic.com>
- * @copyright 2009-2022 Higher Logic LLC.
+ * @copyright 2009-2021 Higher Logic LLC.
  * @license GPL-2.0-only
  */
 
@@ -21,9 +21,8 @@ use Vanilla\Layout\LayoutService;
 use Vanilla\Layout\Providers\MutableLayoutProviderInterface;
 use Vanilla\Layout\Resolvers\ReactResolver;
 use Vanilla\Layout\Section\AbstractLayoutSection;
-use Vanilla\Site\SiteSectionModel;
-use Vanilla\Subcommunities\Models\SubcommunitySiteSection;
 use Vanilla\Utility\SchemaUtils;
+use Vanilla\Web\CacheControlConstantsInterface;
 use Vanilla\Widgets\React\ReactWidgetInterface;
 
 /**
@@ -379,22 +378,14 @@ class LayoutsApiController extends \AbstractApiController {
 
         $in = $this->schema([
             'layoutViewType:s',
-            'recordID:s',
+            'recordID:i',
             'recordType:s',
             'params:o?',
         ], 'in');
-        $query = $in->validate($query);
-
-        [$layoutViewType, $recordType, $recordID] = $this->layoutViewModel->getProviderLayoutIdLookupParams(
-            $query['layoutViewType'],
-            $query['recordType'],
-            $query['recordID']
-        );
-
-        $layoutID = $this->layoutViewModel->getLayoutIdLookup($layoutViewType, $recordType, $recordID);
-
+        $parsedQuery = $in->validate($query);
+        $layoutID = $this->layoutViewModel->getLayoutIdLookup($parsedQuery['layoutViewType'], $parsedQuery['recordType'], $parsedQuery['recordID']);
         if ($layoutID === '') {
-            $fileLayoutView = $this->layoutHydrator->getLayoutViewType($query['layoutViewType']);
+            $fileLayoutView = $this->layoutHydrator->getLayoutViewType($parsedQuery['layoutViewType']);
             $layoutID = $fileLayoutView->getLayoutID();
         }
 

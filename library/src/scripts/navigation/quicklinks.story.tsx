@@ -203,7 +203,7 @@ export const InPanel = storyWithConfig(
         return (
             <TwoColumnSection
                 mainTop={<PanelWidget />}
-                secondaryTop={
+                rightTop={
                     <PanelWidget>
                         <StoryQuickLinks title="Quick Links" />
                         <QuickLinksView

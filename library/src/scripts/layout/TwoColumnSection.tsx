@@ -14,28 +14,12 @@ interface IProps
     > {
     mainTop?: React.ReactNode; // mapped to middleTop
     mainBottom?: React.ReactNode; // mapped to middleBottom
-    secondaryTop?: React.ReactNode; // mapped to rightTop
-    secondaryBottom?: React.ReactNode; // mapped to rightBottom
-    isInverted?: boolean;
 }
 
 function TwoColumnSection(props: IProps) {
-    const leftTopContent = props.isInverted ? props.secondaryTop : undefined;
-    const leftBottomContent = props.isInverted ? props.secondaryBottom : undefined;
-    const rightTopContent = props.isInverted ? undefined : props.secondaryTop;
-    const rightBottomContent = props.isInverted ? undefined : props.secondaryBottom;
-
     return (
         <SectionProvider type={SectionTypes.TWO_COLUMNS}>
-            <Section
-                {...props}
-                middleTop={props.mainTop}
-                middleBottom={props.mainBottom}
-                leftTop={leftTopContent}
-                leftBottom={leftBottomContent}
-                rightTop={rightTopContent}
-                rightBottom={rightBottomContent}
-            />
+            <Section {...props} middleTop={props.mainTop} middleBottom={props.mainBottom} />
         </SectionProvider>
     );
 }

@@ -25,7 +25,7 @@ import { Backgrounds } from "@library/layout/Backgrounds";
 import "@library/theming/reset";
 import { QuickLinks } from "@library/navigation/QuickLinks";
 import { DiscussionListModule } from "@library/features/discussions/DiscussionListModule";
-import { CategoriesWidget } from "@library/categoriesWidget/CategoriesWidget";
+import { CategoriesWidget } from "@library/widgets/CategoriesWidget";
 import { SectionOneColumn } from "@library/layout/SectionOneColumn";
 import { themeSettingsReducer } from "@library/theming/themeSettingsReducer";
 import { forumReducer } from "@vanilla/addon-vanilla/redux/reducer";

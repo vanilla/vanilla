@@ -1016,7 +1016,7 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface {
      */
     public function updateModel_afterStructure_handler($sender) {
         // Only setup default permissions if no role permissions are set.
-        $hasPermissions = Gdn::sql()->getWhere('Permission', ['RoleID >' => 0], '', '', 1)->firstRow(DATASET_TYPE_ARRAY);
+        $hasPermissions = Gdn::sql()->getWhere('Permission', ['RoleID >' => 0])->firstRow(DATASET_TYPE_ARRAY);
         if (!$hasPermissions) {
             PermissionModel::resetAllRoles();
         }

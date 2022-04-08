@@ -23,7 +23,7 @@ import NewPostMenu from "@library/flyouts/NewPostMenu";
 import { triggerLegacyHashScrolling } from "@vanilla/addon-vanilla/legacy/legacyHashScrolling";
 import "@vanilla/addon-vanilla/forms/autosave";
 import { LeaderboardWidget } from "@library/leaderboardWidget/LeaderboardWidget";
-import { CategoriesWidget } from "@library/categoriesWidget/CategoriesWidget";
+import { CategoriesWidget } from "@library/widgets/CategoriesWidget";
 import { RSSWidget } from "@library/rssWidget/RSSWidget";
 import { UserSpotlightWidget } from "@library/userSpotlight/UserSpotlightWidget";
 

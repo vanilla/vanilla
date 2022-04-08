@@ -36,6 +36,10 @@ export const threeColumnVariables = useThemeCache(
             ...layoutVars.panelLayoutSpacing,
         });
 
+        const rightPanelCondition = (currentDevice, shouldRenderLeftPanel: boolean) => {
+            return currentDevice === Devices.TABLET && !shouldRenderLeftPanel;
+        };
+
         const foundationalWidths = makeThemeVars("foundationalWidths", {
             ...layoutVars.foundationalWidths,
         });
@@ -108,6 +112,7 @@ export const threeColumnVariables = useThemeCache(
             calculateDevice,
             isFullWidth,
             isCompact,
+            rightPanelCondition,
         };
     },
 );

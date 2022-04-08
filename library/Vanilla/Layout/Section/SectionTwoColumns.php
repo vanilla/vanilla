@@ -27,15 +27,10 @@ class SectionTwoColumns extends AbstractLayoutSection {
      */
     public static function getWidgetSchema(): Schema {
         return Schema::parse([
-            'isInverted?' => [
-                'type' => 'boolean',
-                'default' => false,
-                'description' => 'If "true", places the secondary column to the left.'
-            ],
             'mainTop?' => new ReactChildrenSchema(),
             'mainBottom?' => new ReactChildrenSchema(),
-            'secondaryTop?' => new ReactChildrenSchema(),
-            'secondaryBottom?' => new ReactChildrenSchema(),
+            'rightTop?' => new ReactChildrenSchema(),
+            'rightBottom?' => new ReactChildrenSchema(),
             'breadcrumbs?' => new ReactChildrenSchema(),
         ]);
     }

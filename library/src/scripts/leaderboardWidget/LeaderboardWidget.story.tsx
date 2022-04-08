@@ -155,7 +155,7 @@ export const List = ({ config }: { config?: any }) => {
                 <WidgetLayout>
                     <TwoColumnSection
                         mainBottom={<LeaderboardWidget {...baseProps} />}
-                        secondaryBottom={<LeaderboardWidget {...baseProps} />}
+                        rightBottom={<LeaderboardWidget {...baseProps} />}
                     ></TwoColumnSection>
                 </WidgetLayout>
             </>
@@ -171,7 +171,7 @@ export const Grid = ({ config }: { config?: any }) => {
                         mainBottom={
                             <LeaderboardWidget containerOptions={{ isGrid: true, maxColumnCount: 3 }} {...baseProps} />
                         }
-                        secondaryBottom={
+                        rightBottom={
                             <LeaderboardWidget containerOptions={{ isGrid: true, maxColumnCount: 2 }} {...baseProps} />
                         }
                     ></TwoColumnSection>

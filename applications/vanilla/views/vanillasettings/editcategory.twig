@@ -106,13 +106,13 @@ dashboardHeading({
 </ul>
 <div class="CategoryPermissions">
 
-    {% if DiscussionTypes|length > 1 %}
+    {% if AllowedDiscussionTypes|length > 1 %}
         <div class="P DiscussionTypes form-group">
             <div class="label-wrap">
                 {{ form.label('Discussion Types') }}
             </div>
             <div class="checkbox-list input-wrap">
-                {% for type, row in DiscussionTypes %}
+                {% for type, row in AllowedDiscussionTypes %}
                     {{ form.checkBox('AllowedDiscussionTypes[]', row.Plural ?: type, {value: type}) }}
                 {% endfor %}
             </div>

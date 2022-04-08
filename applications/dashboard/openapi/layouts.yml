@@ -193,14 +193,12 @@ paths:
                   description: Type of layout.
                   schema:
                       type: string
-
                 - name: recordID
                   in: query
                   required: true
                   description: ID of the resource associated with this layout.
                   schema:
-                      type: integer
-
+                      type: string
                 - name: recordType
                   in: query
                   required: true

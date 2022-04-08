@@ -72,20 +72,22 @@ class ModelCache {
     public function __construct(string $cacheNameSpace, \Gdn_Cache $cache, array $defaultCacheOptions = []) {
         $this->cache = new CacheCacheAdapter($cache);
         $this->cacheContract = new Psr16Adapter($this->cache, $cacheNameSpace);
-        // Apply our own callback lock mechanism.
-        // Unfortunately have to cheat a bit on this because this is often manually constructed.
-        $lockRegistry = \Gdn::getContainer()->get(ModelCacheLockRegistry::class);
-        $this->applyLockRegistry($lockRegistry);
+
+        // By default symfony has a wrapped that takes locks to prevent concurrent calculation of a cache key.
+        // Unfortunately we've had extensive deadlocking issues on infrastrucutre and increased latency with this.
+        // As a result we've decided to disable this feature altogether. https://higher-logic-llc.slack.com/archives/G010E9CKJ1H/p1648759680021669
+        // We attempted multiple iterations with:
+        // - The built-in lockstore
+        // - A lock store using `symfony/lock` and the `FlockStore`
+        // - A lock store using `symfony/lock` and the `MemcachedStore`.
+        //
+        // We have other mechanisms for prevent concurrent computation.
+        // Things that need a lock (like siteTotal computation) can use deferred hydration and their own lock.
+        $this->cacheContract->setCallbackWrapper(null);
+
         $this->cacheNameSpace = $cacheNameSpace;
         $this->defaultCacheOptions = array_merge(self::GLOBAL_DEFAULT_OPTIONS, $defaultCacheOptions ?? []);
         $this->isFeatureDisabled = FeatureFlagHelper::featureEnabled(self::DISABLE_FEATURE_FLAG);
-    }
-
-    /**
-     * @param ModelCacheLockRegistry $lockRegistry
-     */
-    public function applyLockRegistry(ModelCacheLockRegistry $lockRegistry) {
-        $this->cacheContract->setCallbackWrapper([$lockRegistry, 'compute']);
     }
 
     /**

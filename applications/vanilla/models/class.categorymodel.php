@@ -327,7 +327,7 @@ class CategoryModel extends Gdn_Model implements
      * @param Gdn_Controller $sender
      * @return array The allowed discussion types on the category.
      */
-    public static function allowedDiscussionTypes($permissionCategory, $category = [], $sender = null) {
+    public static function getAllowedDiscussionData($permissionCategory, $category = [], $sender = null): array {
         $permissionCategory = self::permissionCategory($permissionCategory);
         $allowed = val('AllowedDiscussionTypes', $permissionCategory);
         $allTypes = DiscussionModel::discussionTypes();
@@ -342,6 +342,25 @@ class CategoryModel extends Gdn_Model implements
         Gdn::pluginManager()->EventArguments['sender'] = $sender;
         Gdn::pluginManager()->fireAs('CategoryModel')->fireEvent('AllowedDiscussionTypes');
 
+        return $allowedTypes;
+    }
+
+    /**
+     * Get the names of the allowed discussion types for a category. This is really just a conveniene method
+     * that returns the 'apiType' field from getAllowedDiscussionData().
+     *
+     * @param mixed $category
+     * @return array
+     */
+    public static function getAllowedDiscussionTypes($category): array {
+        if ($category instanceof stdClass) {
+            $category = (array)$category;
+        }
+        $category = ArrayUtils::pascalCase($category);
+        $permissionCategory = self::permissionCategory($category["CategoryID"]);
+        $allowedTypesData = self::getAllowedDiscussionData($permissionCategory, $category);
+
+        $allowedTypes = array_column($allowedTypesData, 'apiType');
         return $allowedTypes;
     }
 
@@ -1268,7 +1287,7 @@ class CategoryModel extends Gdn_Model implements
      */
     public function getCategoryAllowedDiscussionTypes(array &$row): array {
         $categoryAllowedDiscussionTypes = $row['AllowedDiscussionTypes'] ?? [];
-        $allowedDiscussionTypes = self::allowedDiscussionTypes($row);
+        $allowedDiscussionTypes = self::getAllowedDiscussionData($row);
         $allowedDiscussionTypes = array_keys($allowedDiscussionTypes);
 
         $discussionTypes = array_intersect($allowedDiscussionTypes, $categoryAllowedDiscussionTypes);
@@ -2354,12 +2373,17 @@ class CategoryModel extends Gdn_Model implements
         $dbRecord['CustomPermissions'] = ($dbRecord['PermissionCategoryID'] === $dbRecord['CategoryID']);
         $dbRecord['Description'] = $dbRecord['Description'] ?: '';
         $displayAs = $dbRecord['DisplayAs'] ?? '';
-        $dbRecord['DisplayAs'] =  $displayAs ? strtolower($displayAs) : 'discussions';
-        $dbRecord['AllowedDiscussionTypes'] = array_map(
+        $dbRecord['DisplayAs'] = $displayAs ? strtolower($displayAs) : 'discussions';
+        $discussionTypes = self::getAllowedDiscussionTypes($dbRecord);
+
+        $dbDiscussionTypes = array_map(
             'strtolower',
             is_array($dbRecord['AllowedDiscussionTypes']) ? $dbRecord['AllowedDiscussionTypes'] :
                 ['Discussion']
         );
+
+        $dbRecord['AllowedDiscussionTypes'] = array_intersect($discussionTypes, $dbDiscussionTypes);
+
         if (!empty($dbRecord['Children']) && is_array($dbRecord['Children'])) {
             $dbRecord['Children'] = array_map([$this, 'normalizeRow'], $dbRecord['Children']);
         }

@@ -16,15 +16,15 @@ export const searchMiscellaneousComponentsClasses = useThemeCache(() => {
 
     const root = css({
         display: "flex",
-        justifyContent: "flex-start",
         alignItems: "baseline",
+        justifyContent: "flex-end",
     });
 
     const sort = css({
         display: "flex",
+        flexWrap: "wrap",
         ...Mixins.margin({
             all: 0,
-            right: globalVars.gutter.size,
         }),
     });
 
@@ -37,9 +37,16 @@ export const searchMiscellaneousComponentsClasses = useThemeCache(() => {
         }),
     });
 
+    const pages = css({
+        ...Mixins.margin({
+            left: globalVars.gutter.size,
+        }),
+    });
+
     return {
         root,
         sort,
         sortLabel,
+        pages,
     };
 });

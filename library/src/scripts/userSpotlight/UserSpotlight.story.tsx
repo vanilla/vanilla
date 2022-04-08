@@ -127,7 +127,7 @@ export const TitleDescriptionBorderAlignmentPanelVariants = storyWithConfig({}, 
 
 export const UserSpotlightPreview = storyWithConfig({}, () => (
     <>
-        <StoryHeading>User Spotlight Widget Preview (e.g. in Layout editr/overview pages) </StoryHeading>
+        <StoryHeading>User Spotlight Widget Preview (e.g. in Layout editor/overview pages) </StoryHeading>
         <StoryContent>
             <UserSpotlightWidgetPreview />
         </StoryContent>

@@ -50,6 +50,8 @@ import moment from "moment";
 import { Tabs } from "@library/sectioning/Tabs";
 import { TabsTypes } from "@library/sectioning/TabsTypes";
 import { useSearchSources } from "@library/search/SearchSourcesContextProvider";
+import { DEFAULT_SEARCH_SOURCE } from "@library/search/SearchService";
+import { ALL_CONTENT_DOMAIN_NAME } from "@library/search/searchConstants";
 
 interface IProps {
     placeholder?: string;
@@ -73,7 +75,7 @@ function SearchPage(props: IProps) {
     const { sources, currentSource, setCurrentSource } = useSearchSources();
     const lastSourceKey = useLastValue(currentSource.key);
 
-    const currentSourceIsCommunity = currentSource.key === "community";
+    const currentSourceIsCommunity = currentSource.key === DEFAULT_SEARCH_SOURCE.key;
 
     const currentDomain = getCurrentDomain();
 
@@ -145,6 +147,30 @@ function SearchPage(props: IProps) {
         .filter((domain) => !domain.isIsolatedType())
         .sort((a, b) => a.sort - b.sort);
 
+    const availableDomainKeys = currentSource.searchableDomainKeys ?? domains.map(({ key }) => key);
+
+    const handleSourceChange = useCallback(
+        (newSourceKey: string) => {
+            const nextSource = sources.find((source) => source.key === newSourceKey)!;
+            const nextAvailableDomainKeys = nextSource.searchableDomainKeys ?? domains.map(({ key }) => key);
+
+            updateForm({
+                // reset page so pagination doesn't carry over from one source to another.
+                page: 1,
+                ...(nextAvailableDomainKeys.includes(currentDomain.key)
+                    ? //don't change the domain, if the new source supports the current domain.
+                      {}
+                    : // change to the new source's default domain, if it exists, or fall back to searching all domains.
+                      {
+                          domain: nextSource.defaultDomainKey ?? ALL_CONTENT_DOMAIN_NAME,
+                      }),
+            });
+
+            setCurrentSource(newSourceKey);
+        },
+        [currentDomain.key, setCurrentSource, sources, updateForm],
+    );
+
     const sortAndPaginationContent = useMemo(() => {
         return (
             <SortAndPaginationInfo
@@ -176,7 +202,9 @@ function SearchPage(props: IProps) {
                     label: source.getLabel(),
                     contents: <SearchPageResults />,
                 }))}
-                onChange={({ tabID: newSourceKey }) => setCurrentSource(`${newSourceKey!}`)}
+                onChange={({ tabID: newSourceKey }) => {
+                    handleSourceChange(`${newSourceKey!}`);
+                }}
                 extraButtons={sortAndPaginationContent}
             />
         );
@@ -246,7 +274,7 @@ function SearchPage(props: IProps) {
                                             <SpecificRecordComponent discussionID={specificRecordID} />
                                         )}
                                     </ConditionalWrap>
-                                    {!hasSpecificRecord && currentSourceIsCommunity && (
+                                    {!hasSpecificRecord && (
                                         <SearchInFilter
                                             setData={(newDomain) => {
                                                 updateForm({ domain: newDomain });
@@ -257,6 +285,7 @@ function SearchPage(props: IProps) {
                                                     label: domain.getName?.() || domain.name,
                                                     icon: domain.icon,
                                                     data: domain.key,
+                                                    disabled: !availableDomainKeys.includes(domain.key),
                                                 };
                                             })}
                                             endFilters={domains
@@ -266,6 +295,7 @@ function SearchPage(props: IProps) {
                                                         label: domain.name,
                                                         icon: domain.icon,
                                                         data: domain.key,
+                                                        disabled: !availableDomainKeys.includes(domain.key),
                                                     };
                                                 })}
                                         />
@@ -284,7 +314,7 @@ function SearchPage(props: IProps) {
                             </>
                         }
                         mainBottom={<PanelWidgetHorizontalPadding>{mainBottomContent}</PanelWidgetHorizontalPadding>}
-                        rightTop={!isCompact && <PanelWidget>{rightTopContent}</PanelWidget>}
+                        secondaryTop={!isCompact && <PanelWidget>{rightTopContent}</PanelWidget>}
                     />
                 </Container>
             </DocumentTitle>

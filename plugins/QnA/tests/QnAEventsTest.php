@@ -9,6 +9,7 @@ namespace VanillaTests\QnA;
 
 use Garden\Events\ResourceEvent;
 use Vanilla\Community\Events\DiscussionEvent;
+use Vanilla\Community\Events\DiscussionStatusEvent;
 use Vanilla\Dashboard\Models\RecordStatusModel;
 use Vanilla\QnA\Events\AnswerEvent;
 use Vanilla\QnA\Models\AnswerModel;
@@ -110,7 +111,7 @@ class QnAEventsTest extends VanillaTestCase {
         $matchingDispatchedEvent = $this->assertEventDispatched(
             $this->expectedResourceEvent(
                 DiscussionEvent::class,
-                ResourceEvent::ACTION_UPDATE,
+                DiscussionStatusEvent::ACTION_DISCUSSION_STATUS,
                 [
                     'discussionID' => $question['discussionID'],
                     'type' => 'question',
@@ -161,7 +162,7 @@ class QnAEventsTest extends VanillaTestCase {
         $matchingDispatchedEvent = $this->assertEventDispatched(
             $this->expectedResourceEvent(
                 DiscussionEvent::class,
-                ResourceEvent::ACTION_UPDATE,
+                DiscussionStatusEvent::ACTION_DISCUSSION_STATUS,
                 [
                     'discussionID' => $question['discussionID'],
                     'type' => 'question',
@@ -183,7 +184,7 @@ class QnAEventsTest extends VanillaTestCase {
         $matchingDispatchedEvent = $this->assertEventDispatched(
             $this->expectedResourceEvent(
                 DiscussionEvent::class,
-                ResourceEvent::ACTION_UPDATE,
+                DiscussionStatusEvent::ACTION_DISCUSSION_STATUS,
                 [
                     'discussionID' => $question['discussionID'],
                     'type' => 'question',
@@ -214,7 +215,7 @@ class QnAEventsTest extends VanillaTestCase {
         $matchingDispatchedEvent = $this->assertEventDispatched(
             $this->expectedResourceEvent(
                 DiscussionEvent::class,
-                ResourceEvent::ACTION_UPDATE,
+                DiscussionStatusEvent::ACTION_DISCUSSION_STATUS,
                 [
                     'discussionID' => $question['discussionID'],
                     'type' => 'question',

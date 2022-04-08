@@ -3,21 +3,28 @@
  * @license Proprietary
  */
 
+import { ISearchForm, ISearchResults, ISearchSource } from "@library/search/searchTypes";
 import { getSiteSection } from "@library/utility/appUtils";
+import { RecordID } from "@vanilla/utils";
 
-interface IResultAnalyticsData {
+interface ITrackedSearchSource {
+    key: ISearchSource["key"];
+    label: string;
+}
+export interface IResultAnalyticsData {
     type: "search";
     domain: string;
     searchResults: number;
     searchQuery: ISplitSearchTerms;
     page: number;
     title: string;
-    author: { authorID: number[]; authorName: string[] };
+    author: { authorID: RecordID[]; authorName: string[] };
     recordType: string[];
     tag: { tagID: number[]; tagName: string[] };
     category: { categoryID: number[]; categoryName: string[] };
     kb: { kbID: number | null; kbName: string };
     siteSection: object;
+    source?: ITrackedSearchSource;
 }
 
 interface IPieces {
@@ -97,13 +104,17 @@ export const splitSearchTerms = (query: string): ISplitSearchTerms => {
 /**
  * Get structured data for search analytics
  */
-export const getSearchAnalyticsData = (form, results): IResultAnalyticsData => {
+export const getSearchAnalyticsData = (
+    form: ISearchForm,
+    results: ISearchResults,
+    searchSource?: ITrackedSearchSource,
+): IResultAnalyticsData => {
     const resultsWithAnalyticsData: IResultAnalyticsData = {
         type: "search",
         domain: form.domain,
-        searchResults: results.data.length,
+        searchResults: results.pagination.total ?? -1,
         searchQuery: splitSearchTerms(form.query),
-        page: results.pagination.currentPage,
+        page: results.pagination?.currentPage ?? -1,
         title: form.name ?? "",
         author: {
             authorID: [],
@@ -131,13 +142,16 @@ export const getSearchAnalyticsData = (form, results): IResultAnalyticsData => {
         resultsWithAnalyticsData.tag.tagID = form.tagsOptions.map((tag) => tag.value);
         resultsWithAnalyticsData.tag.tagName = form.tagsOptions.map((tag) => tag.label);
     }
-    if (form.category && form.category.length) {
+    if (form.categoryOptions && form.categoryOptions.length) {
         resultsWithAnalyticsData.category.categoryID = form.categoryOptions.map((category) => category.value);
-        resultsWithAnalyticsData.tag.tagName = form.categoryOptions.map((category) => category.label);
+        resultsWithAnalyticsData.category.categoryName = form.categoryOptions.map((category) => category.label);
     }
     if (form.knowledgeBaseOption) {
         resultsWithAnalyticsData.kb.kbID = form.knowledgeBaseOption.value;
         resultsWithAnalyticsData.kb.kbName = form.knowledgeBaseOption.label;
+    }
+    if (searchSource) {
+        resultsWithAnalyticsData.source = searchSource;
     }
 
     return resultsWithAnalyticsData;

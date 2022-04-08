@@ -11,6 +11,7 @@ use Garden\Web\Exception\ServerException;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Logging\ErrorLogger;
 use Vanilla\Models\ModelCache;
 use Vanilla\Site\SiteSectionModel;
 use Garden\Web\Exception\ClientException;
@@ -486,7 +487,9 @@ class ThemeService {
                 $this->getTheme(self::FALLBACK_THEME_KEY);
             }
         } catch (\Exception $e) {
-            trigger_error($e->getMessage(), E_USER_WARNING);
+            ErrorLogger::error("Failed to load theme", ['themeService', 'currentTheme'], [
+                'exception' => $e,
+            ]);
             // if we stored wrong preview key store in session, lets reset it.
             $this->themeHelper->cancelSessionPreviewTheme();
             // If we had some exception during this, fallback to the default.

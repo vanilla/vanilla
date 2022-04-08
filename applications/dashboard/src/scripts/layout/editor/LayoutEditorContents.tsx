@@ -226,6 +226,20 @@ export class LayoutEditorContents {
     };
 
     /**
+     * Modify a section at the specified index.
+     *
+     * @param index The index to modify at.
+     *
+     * @returns A new editor contents instance.
+     */
+    public modifySection = (index: number, newSpec: IEditableLayoutWidget): LayoutEditorContents => {
+        return this.modifyLayout((draft) => {
+            draft[index] = newSpec;
+            return draft;
+        });
+    };
+
+    /**
      * Internal utility for immutably modifying the edit spec and creating a new instance.
      *
      * @param callback A callback to modify the edit spec.
@@ -350,21 +364,29 @@ export class LayoutEditorContents {
         }
 
         const sectionInfo = LayoutSectionInfos[section.$hydrate] ?? null;
+        // handles "isInverted" prop
+        if (sectionInfo && section.isInverted) {
+            return { ...sectionInfo, regionNames: sectionInfo.invertedRegionNames as string[] };
+        }
         return sectionInfo;
     };
 
     /**
-     * Make sure a path has a valid region.
+     * Return a valid path for the next section.
      */
-    public ensureValidRegion = (
+    public getValidPath = (
         path: ILayoutEditorWidgetPath,
         newSectionInfo: ILayoutSectionInfo,
+        fromPath: ILayoutEditorWidgetPath,
     ): ILayoutEditorWidgetPath => {
         const initialRegion = path.sectionRegion;
+
+        // if there's the same region exists on the next section, move into that
         if (newSectionInfo.regionNames.includes(initialRegion)) {
             return path;
         }
 
+        // if there's only one region to move to, move into that
         if (newSectionInfo.regionNames.length === 1) {
             return {
                 ...path,
@@ -372,7 +394,7 @@ export class LayoutEditorContents {
             };
         }
 
-        // We came from a main column.
+        // we came from a main region, so try moving into the same on the next section
         if (["children", "mainBottom", "middleBottom"].includes(initialRegion)) {
             if (newSectionInfo.regionNames.includes("mainBottom")) {
                 return {
@@ -388,6 +410,21 @@ export class LayoutEditorContents {
             }
         }
 
+        // we came from either a left or right region, so move using the region index
+        const fromSectionInfo = this.getSectionInfo(fromPath);
+        const fromRegionIndex = fromSectionInfo ? fromSectionInfo.regionNames.indexOf(initialRegion) : -1;
+        if (fromSectionInfo && fromRegionIndex > -1) {
+            // the index is at the last position but both sections have different regions length
+            // move into the last index of the next section
+            if (fromRegionIndex >= fromSectionInfo.regionNames.length - 1) {
+                return {
+                    ...path,
+                    sectionRegion: newSectionInfo.regionNames[newSectionInfo.regionNames.length - 1],
+                };
+            }
+        }
+
+        // fallback, just move into the first region on the next section
         return {
             ...path,
             sectionRegion: newSectionInfo.regionNames[0],

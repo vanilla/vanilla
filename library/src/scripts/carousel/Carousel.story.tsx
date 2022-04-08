@@ -99,7 +99,7 @@ export const InPanelLayout = storyWithConfig(
                         <StoryCarousel />
                     </PanelWidget>
                 }
-                rightBottom={
+                secondaryBottom={
                     <PanelWidget>
                         <StoryCarousel />
                     </PanelWidget>

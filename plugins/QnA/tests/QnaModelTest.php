@@ -89,6 +89,15 @@ class QnaModelTest extends SiteTestCase {
     }
 
     /**
+     * Test that questions are added to allowed discussion types.
+     */
+    public function testCategoryModelAllowedDiscussionTypes(): void {
+        $category = $this->createCategory();
+        $allowedTypes = \CategoryModel::getAllowedDiscussionTypes($category);
+        $this->assertEqualsCanonicalizing($allowedTypes, ["discussion", "question"]);
+    }
+
+    /**
      * Assert that there is a certain unsanswered count.
      *
      * @param int $expected

@@ -93,7 +93,7 @@ export function isAllowedUrl(input: string): boolean {
     return isURL(input);
 }
 
-interface ISiteSection {
+export interface ISiteSection {
     basePath: string;
     contentLocale: string;
     sectionGroup: string;

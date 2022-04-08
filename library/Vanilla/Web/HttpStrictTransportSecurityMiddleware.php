@@ -8,7 +8,6 @@ namespace Vanilla\Web;
 
 use Garden\Web\Data;
 use Garden\Web\RequestInterface;
-use Vanilla\Web\HttpStrictTransportSecurityModel;
 
 /**
  * Dispatcher middleware for handling HSTS header.
@@ -42,6 +41,11 @@ class HttpStrictTransportSecurityMiddleware {
             $this->hstsModel->getHsts()
         );
 
+        //get additional security headers added in HttpStrictTransportSecurityModel::class
+        foreach ($this->hstsModel->getAdditionalSecurityHeaders() as $header) {
+            [$name,$value] = $this->hstsModel->getSecurityHeaderEntry($header);
+            $response->setHeader($name, $value);
+        }
         return $response;
     }
 }

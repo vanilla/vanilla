@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -8,14 +8,13 @@ import { homeWidgetItemVariables, IHomeWidgetItemOptions } from "@library/homeWi
 import {
     WidgetContainerDisplayType,
     IHomeWidgetContainerOptions,
-    homeWidgetContainerVariables,
 } from "@library/homeWidget/HomeWidgetContainer.styles";
 import { DeepPartial } from "redux";
 import { IHomeWidgetItemProps } from "@library/homeWidget/HomeWidgetItem";
 import { HomeWidget } from "@library/homeWidget/HomeWidget";
 import { BorderType } from "@library/styles/styleHelpersBorders";
 import { QuickLinks } from "@library/navigation/QuickLinks";
-import { HomeWidgetContainer } from "@library/homeWidget/HomeWidgetContainer";
+import { Widget } from "@library/layout/Widget";
 interface IProps {
     title?: string;
     subtitle?: string;
@@ -54,6 +53,10 @@ export function CategoriesWidget(props: IProps) {
     if (props.containerOptions?.displayType === WidgetContainerDisplayType.LINK) {
         return <QuickLinks title={props.title} links={quickLinks} containerOptions={props.containerOptions} />;
     } else {
-        return <HomeWidget {...props} itemOptions={defaultItemOptions} />;
+        return (
+            <Widget>
+                <HomeWidget {...props} itemOptions={defaultItemOptions} />
+            </Widget>
+        );
     }
 }

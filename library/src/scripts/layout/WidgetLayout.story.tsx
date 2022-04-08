@@ -107,7 +107,7 @@ function DummyPanelWidget() {
                         <DummyWidget withDescription withSubtitle />
                     </PanelWidget>
                 }
-                rightBottom={
+                secondaryBottom={
                     <>
                         <PanelWidget>
                             <StoryQuickLinks title="Quick Links" />

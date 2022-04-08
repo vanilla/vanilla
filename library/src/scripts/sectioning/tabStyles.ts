@@ -18,7 +18,6 @@ import { css, CSSObject } from "@emotion/css";
 import { buttonResetMixin } from "@library/forms/buttonMixins";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { Mixins } from "@library/styles/Mixins";
-import { Variables } from "@library/styles/Variables";
 
 interface IListOptions {
     includeBorder?: boolean;
@@ -258,14 +257,21 @@ export const tabBrowseClasses = useThemeCache(() => {
     const tabPanels = style("tabPanels", {});
 
     const tabList = useThemeCache((options?: IListOptions) =>
-        style("tabList", {
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            borderBottom: options?.includeBorder
-                ? singleBorder({ color: globalVars.separator.color, width: globalVars.separator.size })
-                : undefined,
-        }),
+        style(
+            "tabList",
+            {
+                display: "flex",
+                flexWrap: "nowrap",
+                alignItems: "center",
+                borderBottom: options?.includeBorder
+                    ? singleBorder({ color: globalVars.separator.color, width: globalVars.separator.size })
+                    : undefined,
+            },
+
+            mediaQueries.oneColumnDown({
+                flexWrap: "wrap",
+            }),
+        ),
     );
 
     const tab = useThemeCache((largeTabs?: boolean, legacyButton?: boolean) =>
@@ -305,7 +311,7 @@ export const tabBrowseClasses = useThemeCache(() => {
             ...Mixins.padding({
                 horizontal: horizontalPadding / 2,
             }),
-            flex: 1,
+            flex: "1 0 auto",
             display: "flex",
             alignItems: "center",
             justifyContent: "flex-end",
@@ -316,7 +322,7 @@ export const tabBrowseClasses = useThemeCache(() => {
             flex: "1 0 auto",
             justifyContent: "flex-start",
             ...Mixins.padding({
-                top: globalVars.gutter.size * 2, // For extra spacing from the mockup.
+                vertical: verticalPadding,
                 horizontal: horizontalPadding, // For proper alignment.
             }),
         }),

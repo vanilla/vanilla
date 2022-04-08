@@ -7,7 +7,6 @@ import React from "react";
 import { UserSpotlightWidget } from "@library/userSpotlight/UserSpotlightWidget";
 import { LayoutEditorPreviewData } from "@dashboard/layout/editor/LayoutEditorPreviewData";
 import { BorderType } from "@library/styles/styleHelpersBorders";
-import { useUser } from "@library/features/users/userHooks";
 
 interface IProps extends Omit<React.ComponentProps<typeof UserSpotlightWidget>, "userInfo"> {}
 

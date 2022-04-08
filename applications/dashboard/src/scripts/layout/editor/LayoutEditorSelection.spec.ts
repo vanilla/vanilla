@@ -174,13 +174,13 @@ describe("LayoutEditorSelection", () => {
         selection.moveSelectionInDirection(LayoutEditorDirection.LEFT);
         assertSelectAddButton(LayoutEditorPath.widget(4, "mainBottom", 1));
 
-        // We can move right into the right column.
+        // We can move right into the secondary column.
         selection.moveSelectionInDirection(LayoutEditorDirection.RIGHT);
-        assertSelectAddButton(LayoutEditorPath.widget(4, "rightBottom", 0));
+        assertSelectAddButton(LayoutEditorPath.widget(4, "secondaryBottom", 0));
 
         // Going right doesn't do anything.
         selection.moveSelectionInDirection(LayoutEditorDirection.RIGHT);
-        assertSelectAddButton(LayoutEditorPath.widget(4, "rightBottom", 0));
+        assertSelectAddButton(LayoutEditorPath.widget(4, "secondaryBottom", 0));
 
         // We can move down into the 3 column section.
         selection.moveSelectionInDirection(LayoutEditorDirection.DOWN);

@@ -16,6 +16,7 @@ import { DomNodeAttacher } from "@vanilla/react-utils";
 import { cx } from "@emotion/css";
 import { WidgetLayout } from "@library/layout/WidgetLayout";
 import { Icon } from "@vanilla/icons";
+import TruncatedText from "@library/content/TruncatedText";
 
 export interface ITabData {
     tabID?: string | number;
@@ -94,7 +95,10 @@ export function Tabs(props: ITabsProps) {
                             })}
                             disabled={tab.disabled}
                         >
-                            <div>{tab.label}</div>
+                            <TruncatedText lines={1} maxCharCount={25}>
+                                {tab.label}
+                            </TruncatedText>
+
                             {(tab.error || tab.warning) && (
                                 <ToolTip label={tab.error || tab.warning}>
                                     <ToolTipIcon>

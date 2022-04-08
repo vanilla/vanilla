@@ -207,7 +207,7 @@ export class LayoutEditorSelection extends LayoutEditorSelectionState {
                         return null;
                     }
 
-                    newPath = contents.ensureValidRegion(newPath, nextSectionInfo);
+                    newPath = contents.getValidPath(newPath, nextSectionInfo, fromPath);
                     newPath.sectionRegionIndex = 0;
                 }
                 return newPath;
@@ -227,7 +227,7 @@ export class LayoutEditorSelection extends LayoutEditorSelectionState {
                         // There is no previous section.
                         return null;
                     }
-                    newPath = contents.ensureValidRegion(newPath, previousSectionInfo);
+                    newPath = contents.getValidPath(newPath, previousSectionInfo, fromPath);
 
                     let maxRegionIndex = treatAddAsWidget
                         ? contents.getMaxRegionIndex(newPath)

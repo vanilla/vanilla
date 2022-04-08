@@ -546,7 +546,7 @@ class Gdn_Form extends Gdn_Pluggable {
                 // Filter out categories that don't allow our discussion type, if specified
                 if ($discussionType) {
                     $permissionCategory = CategoryModel::permissionCategory($category);
-                    $allowedDiscussionTypes = CategoryModel::allowedDiscussionTypes($permissionCategory, $category);
+                    $allowedDiscussionTypes = CategoryModel::getAllowedDiscussionData($permissionCategory, $category);
                     if (!array_key_exists($discussionType, $allowedDiscussionTypes)) {
                         continue;
                     }

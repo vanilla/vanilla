@@ -293,6 +293,12 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
         $hsts = Gdn::getContainer()->get(HttpStrictTransportSecurityModel::class);
         $this->_Headers[HttpStrictTransportSecurityModel::HSTS_HEADER] = $hsts->getHsts();
 
+        //get additional security headers added in HttpStrictTransportSecurityModel::class
+        foreach ($hsts->getAdditionalSecurityHeaders() as $header) {
+            [$name,$value] = $hsts->getSecurityHeaderEntry($header);
+            $this->_Headers[$name] = $value;
+        }
+
         $cspModel = Gdn::getContainer()->get(ContentSecurityPolicyModel::class);
         $this->_Headers[ContentSecurityPolicyModel::CONTENT_SECURITY_POLICY] = $cspModel->getHeaderString(Policy::FRAME_ANCESTORS);
         $xFrameString = $cspModel->getXFrameString();
@@ -1523,7 +1529,6 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
                 ob_clean();
             }
             $this->contentType('application/json; charset=utf-8');
-            $this->setHeader('X-Content-Type-Options', 'nosniff');
 
             // Cross-Origin Resource Sharing (CORS)
             $this->setAccessControl();

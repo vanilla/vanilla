@@ -11,19 +11,19 @@ import { ResultMeta } from "@library/result/ResultMeta";
 import { SearchPageResultsLoader } from "@library/search/SearchPageResultsLoader";
 import { SearchPagination } from "@library/search/SearchPagination";
 import { ISearchResult } from "@library/search/searchTypes";
-import { SearchService } from "@library/search/SearchService";
+import { DEFAULT_SEARCH_SOURCE, SearchService } from "@library/search/SearchService";
 import { useSearchForm } from "@library/search/SearchContext";
 import { useLastValue } from "@vanilla/react-utils";
 import { hashString } from "@vanilla/utils";
 import React, { useEffect, useLayoutEffect, useRef } from "react";
 import { CoreErrorMessages } from "@library/errorPages/CoreErrorMessages";
-import { ALL_CONTENT_DOMAIN_NAME } from "@library/search/searchConstants";
+import { ALL_CONTENT_DOMAIN_NAME, DEFAULT_RESULT_COMPONENT } from "@library/search/searchConstants";
 import { makeSearchUrl } from "@library/search/SearchPageRoute";
 import { formatUrl, t } from "@library/utility/appUtils";
 import qs from "qs";
 import { sprintf } from "sprintf-js";
-import PanelWidgetHorizontalPadding from "@library/layout/components/PanelWidgetHorizontalPadding";
 import { MetaLink } from "@library/metas/Metas";
+import { useSearchSources } from "@library/search/SearchSourcesContextProvider";
 
 interface IProps {}
 
@@ -31,6 +31,8 @@ export function SearchPageResults(props: IProps) {
     const { updateForm, results, form, getCurrentDomain } = useSearchForm<{}>();
 
     const currentDomain = getCurrentDomain();
+    const { currentSource } = useSearchSources();
+    const isCommunity = currentSource.key === DEFAULT_SEARCH_SOURCE.key;
 
     const status = results.status;
     const lastStatus = useLastValue(status);
@@ -83,9 +85,9 @@ export function SearchPageResults(props: IProps) {
                         <AnalyticsData uniqueKey={hashString(form.query + JSON.stringify(results.data!.pagination))} />
                     )}
                     <ResultList
-                        resultComponent={currentDomain.ResultComponent}
+                        resultComponent={isCommunity ? currentDomain.ResultComponent : DEFAULT_RESULT_COMPONENT}
                         results={results.data!.results.map(mapResult)}
-                        ResultWrapper={currentDomain.ResultWrapper}
+                        ResultWrapper={isCommunity ? currentDomain.ResultWrapper : undefined}
                         rel={"noindex nofollow"}
                     />
                     <SearchPagination onNextClick={paginationNextClick} onPreviousClick={paginationPreviousClick} />
@@ -121,7 +123,7 @@ function mapResult(searchResult: ISearchResult): IResult | undefined {
 
 function MetaFactory(props: { searchResult: ISearchResult }) {
     const { searchResult } = props;
-    const { getDomains, getCurrentDomain, form, updateForm } = useSearchForm();
+    const { getDomains, getCurrentDomain, form } = useSearchForm();
     const currentDomain = getCurrentDomain();
 
     const crumbs =

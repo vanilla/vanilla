@@ -677,22 +677,18 @@ class VanillaSettingsController extends Gdn_Controller {
     }
 
     /**
+     * Set a Category's allowed discussion types.
      *
-     *
-     * @param $category
+     * @param mixed $category
+     * @return void
      */
-    protected function setupDiscussionTypes($category) {
+    protected function setupDiscussionTypes($category): void {
         $discussionTypes = DiscussionModel::discussionTypes($category);
         $this->setData('DiscussionTypes', $discussionTypes);
 
         if (!$this->Form->isPostBack()) {
             $pCatID = val('PermissionCategoryID', $category, -1);
-            if ($pCatID == val('CategoryID', $category)) {
-                $pCat = $category;
-            } else {
-                $pCat = CategoryModel::categories($pCatID);
-            }
-            $allowedTypes = val('AllowedDiscussionTypes', $pCat);
+            $allowedTypes = CategoryModel::getAllowedDiscussionData($pCatID, (array)$category);
             if (empty($allowedTypes)) {
                 $allowedTypes = array_keys($discussionTypes);
             }

@@ -11,13 +11,13 @@ import { LayoutEditorAddWidget } from "@dashboard/layout/editor/LayoutEditorAddW
 import { LayoutEditorPath } from "@dashboard/layout/editor/LayoutEditorContents";
 import { LayoutEditorSectionToolbar } from "@dashboard/layout/editor/LayoutEditorSectionToolbar";
 import { LayoutEditorSelectionMode } from "@dashboard/layout/editor/LayoutEditorSelection";
+import { LayoutSectionInfos } from "@dashboard/layout/editor/LayoutSectionInfos";
 import { IHydratedEditableWidgetProps, ILayoutEditorPath } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { cx } from "@emotion/css";
 import { SectionFullWidth } from "@library/layout/SectionFullWidth";
 import { SectionOneColumn } from "@library/layout/SectionOneColumn";
 import ThreeColumnSection from "@library/layout/ThreeColumnSection";
 import TwoColumnSection from "@library/layout/TwoColumnSection";
-import { TabHandler } from "@vanilla/dom-utils";
 import { useFocusOnActivate } from "@vanilla/react-utils";
 import React, { useDebugValue, useRef } from "react";
 
@@ -235,6 +235,9 @@ function SectionDecorationAbsolute(
         ...props.$editorPath,
         sectionIndex: props.$editorPath.sectionIndex - 1,
     });
+
+    const allowColumnInvert = LayoutSectionInfos[props.$hydrate].allowColumnInvert;
+
     let offset = -20;
     if (isFullWidth) {
         offset = 0;
@@ -255,7 +258,11 @@ function SectionDecorationAbsolute(
                 </div>
             )}
             {!props.skipAfter && isSelfSectionSelected && (
-                <LayoutEditorSectionToolbar path={props.$editorPath} offset={offset} />
+                <LayoutEditorSectionToolbar
+                    path={props.$editorPath}
+                    offset={offset}
+                    allowColumnInvert={allowColumnInvert}
+                />
             )}
         </>
     );

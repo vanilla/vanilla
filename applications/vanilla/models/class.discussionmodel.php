@@ -19,6 +19,7 @@ use Garden\Web\Exception\PartialCompletionException;
 use Vanilla\AdvancedRedirector\AdvancedRedirectorPlugin;
 use Vanilla\Attributes;
 use Vanilla\Community\Events\DiscussionEvent;
+use Vanilla\Community\Events\DiscussionStatusEvent;
 use Vanilla\Community\Schemas\PostFragmentSchema;
 use Vanilla\Contracts\Formatting\FormatFieldInterface;
 use Vanilla\Contracts\Models\CrawlableInterface;
@@ -2420,17 +2421,15 @@ SQL;
             $this->Database->query($sql, [":discussionID" => $rowID]);
         }
 
-        if (isset($property['statusID'])) {
-            if (!empty($existingRow) && $existingRow['statusID'] != $property['statusID']) {
-                $statusEvent = new \Vanilla\Community\Events\DiscussionStatusEvent(
-                    $rowID,
-                    $property['statusID'],
-                    $existingRow['statusID']
+        if (!$isPostInsert) {
+            if (!empty($existingRow) && isset($property['statusID']) && $existingRow['statusID'] != $property['statusID']) {
+                $event = $this->statusChangeUpdate($rowID);
+                $statusEvent = new DiscussionStatusEvent(
+                    DiscussionStatusEvent::ACTION_DISCUSSION_STATUS,
+                    $event->getPayload(),
+                    $event->getSender()
                 );
                 $this->getEventManager()->dispatch($statusEvent);
-                if (!$isPostInsert) {
-                    $this->dispatchStatusChangeUpdate($rowID);
-                }
             }
         }
 
@@ -2442,17 +2441,17 @@ SQL;
      *
      * @param int $discussionID
      */
-    private function dispatchStatusChangeUpdate(int $discussionID) {
+    private function statusChangeUpdate(int $discussionID): DiscussionEvent {
         // Fetch the row again.
         $newRow = $this->getID($discussionID, DATASET_TYPE_ARRAY);
 
         // KLUDGE: In the future this should just be an expand that gets expanded out on discussions by default.
         $discussionEvent = $this->eventFromRow(
             (array)$newRow,
-            DiscussionEvent::ACTION_UPDATE,
+            DiscussionStatusEvent::ACTION_DISCUSSION_STATUS,
             $this->userModel->currentFragment()
         );
-        $this->getEventManager()->dispatch($discussionEvent);
+        return $discussionEvent;
     }
 
     /**

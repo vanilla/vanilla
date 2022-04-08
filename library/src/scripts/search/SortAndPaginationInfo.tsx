@@ -53,10 +53,11 @@ export function SortAndPaginationInfo(props: ISearchSortAndPages) {
                         widthOfParent={false}
                         renderLeft={false}
                         className={classes.sort}
+                        verticalPadding={false}
                     />
                 </label>
             )}
-            {pages && content}
+            {pages && <div className={classes.pages}>{content}</div>}
         </div>
     );
 }

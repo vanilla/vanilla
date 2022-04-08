@@ -17,6 +17,7 @@ use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Layout\Providers\LayoutViewRecordProviderInterface;
 use Vanilla\Models\FullRecordCacheModel;
 use Vanilla\SchemaFactory;
+use Vanilla\Site\SiteSectionModel;
 use Vanilla\Utility\ModelUtils;
 use CategoryModel;
 
@@ -249,6 +250,29 @@ class LayoutViewModel extends FullRecordCacheModel {
         return $provider->getRecords($recordIDs);
     }
 
+    /**
+     * Adapt parameters prior to calling layoutViewModel::getLayoutIdLookup(), if needed.
+     *
+     * @param string $layoutViewType layoutViewType.
+     * @param string $recordType recordType.
+     * @param string $recordID recordID.
+     * @return array
+     * @throws \Garden\Container\ContainerException Container Exception.
+     * @throws \Garden\Container\NotFoundException Container not found exception.
+     */
+    public function getProviderLayoutIdLookupParams(string $layoutViewType, string $recordType, string $recordID): array {
+        // If the recordID is non-numeric(a slug), we see if we can rely on the SiteSectionModel to provide
+        // alternative parameters for getLayOutIdLookup().
+        if (!is_numeric($recordID)) {
+            $model = \Gdn::getContainer()->get(SiteSectionModel::class);
+            $section = $model->getByID($recordID);
+
+            if ($section && method_exists($section, 'getLayoutIdLookupParams')) {
+                return $section->getLayoutIdLookupParams($layoutViewType, $recordType, $recordID);
+            }
+        }
+        return [$layoutViewType, $recordType, $recordID];
+    }
 
     /**
      * We verify if that category exists.

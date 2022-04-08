@@ -19,6 +19,8 @@ use Vanilla\Dashboard\Layout\View\LegacySigninLayoutView;
 use Vanilla\Dashboard\Controllers\Pages\AppearancePageController;
 use Vanilla\Dashboard\Controllers\Pages\HomePageController;
 use Vanilla\Dashboard\Models\ModerationMessagesFilterOpenApi;
+use Vanilla\Dashboard\Models\SsoUsersExpander;
+use Vanilla\Dashboard\Models\UsersExpander;
 use Vanilla\Dashboard\Models\UserSiteTotalProvider;
 use Vanilla\Layout\LayoutService;
 use Vanilla\Layout\Middleware\LayoutPermissionFilterMiddleware;
@@ -62,21 +64,14 @@ class DashboardContainerRules extends AddonContainerRules {
 
         $container->rule(APIExpandMiddleware::class)
             ->addCall(
-                "addExpandField",
-                [
-                    'users',
-                    [
-                        "firstInsertUser" => "firstInsertUserID",
-                        "insertUser" => "insertUserID",
-                        "lastInsertUser" => "lastInsertUserID",
-                        "lastPost.insertUser" => "lastPost.insertUserID",
-                        "lastUser" => "lastUserID",
-                        "updateUser" => "updateUserID",
-                        "user" => "userID",
-                    ],
-                    new Reference(UsersExpander::class)
-                ]
-            );
+                "addExpander",
+                [new Reference(UsersExpander::class)]
+            )
+            ->addCall(
+                "addExpander",
+                [new Reference(SsoUsersExpander::class)]
+            )
+        ;
 
         $container->rule(OpenAPIBuilder::class)
             ->addCall("addFilter", [new Reference(ModerationMessagesFilterOpenApi::class)]);

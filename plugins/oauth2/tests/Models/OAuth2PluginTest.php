@@ -8,6 +8,7 @@
 namespace Vanilla\OAuth2\Tests\Models;
 
 use Garden\Web\Exception\ResponseException;
+use Gdn_OAuth2;
 use PHPUnit\Framework\TestCase;
 use VanillaTests\Fixtures\Request;
 use VanillaTests\SiteTestCase;
@@ -19,6 +20,11 @@ class OAuth2PluginTest extends SiteTestCase {
     protected const CLIENT_ID1 = 'p1';
     protected const CLIENT_ID2 = 'p2';
     protected const CLIENT_ID_SINGLE = 'single';
+
+    /**
+     * @var string
+     */
+    protected $clientIDField = \Gdn_AuthenticationProviderModel::COLUMN_KEY;
 
     /**
      * @var \OAuth2Plugin
@@ -85,7 +91,7 @@ class OAuth2PluginTest extends SiteTestCase {
             $this->providerModel = $authenticationProviderModel;
             $this->ssoUtils = $this->callOn($oauth2Plugin, function () {
                 /** @var \Gdn_OAuth2 $this */
-                return $this->ssoUtils;
+                return $this->getSsoUtils();
             });
         });
 
@@ -117,6 +123,7 @@ class OAuth2PluginTest extends SiteTestCase {
                 'ProfileUrl' => "https://example.com/$id/profile",
                 'RegisterUrl' => "https://example.com/$id/register",
                 'AllowAccessTokens' => true,
+                'PostProfileRequest' => false,
                 'AcceptedScope' => "openid"
             ];
             if ($defaultFirst && $id === self::CLIENT_ID1) {
@@ -139,6 +146,8 @@ class OAuth2PluginTest extends SiteTestCase {
         $provider = [
             \Gdn_AuthenticationProviderModel::COLUMN_KEY => $id,
             \Gdn_AuthenticationProviderModel::COLUMN_NAME => $this->oauth2Plugin->getProviderKey()." $id",
+            'BasicAuthToken' => true,
+            'PostProfileRequest' => true,
             'AssociationSecret' => "secret$id",
             'AuthorizeUrl' => "https://example.com/$id/authorize",
             'TokenUrl' => "https://example.com/$id/token",
@@ -339,9 +348,16 @@ class OAuth2PluginTest extends SiteTestCase {
                 $profile = new Request($provider['ProfileUrl']);
                 $mock->ResponseStatus = 200;
 
+                $profileRequestMethod = ($provider['PostProfileRequest']) ? 'POST' : 'GET';
                 switch ($request->getPath()) {
                     case $token->getPath():
-                        TestCase::assertSame('POST', $request->getMethod());
+                        if (empty($provider['BasicAuthToken'])) {
+                            TestCase::assertArrayNotHasKey('Authorization', $extraHeaders, 'No basic Auth Header.');
+                        } else {
+                            $rawToken = $provider[$this->clientIDField].':'.$provider['AssociationSecret'];
+                            TestCase::assertSame('Basic '.base64_encode($rawToken), $extraHeaders['Authorization']);
+                        }
+
                         TestCase::assertSame($provider[\Gdn_AuthenticationProviderModel::COLUMN_KEY], $params['client_id'], 'Invalid client_id.');
                         TestCase::assertSame($this->testAccessCode, $params['code'], 'Invalid access code.');
                         TestCase::assertSame($provider['AssociationSecret'], $params['client_secret'], 'Invalid secret.');
@@ -354,11 +370,16 @@ class OAuth2PluginTest extends SiteTestCase {
                         break;
                     case $profile->getPath():
                         if (empty($provider['Bearer'])) {
-                            TestCase::assertSame($this->testAccessToken, $request->getQuery()['access_token'], 'Invalid access token.');
+                            if ($request->getMethod() === 'GET') {
+                                TestCase::assertSame($this->testAccessToken, $request->getQuery()['access_token'], 'Invalid access token.');
+                            } else {
+                                TestCase::assertSame($this->testAccessToken, $request->getBody()['access_token'], 'Invalid access token.');
+                            }
                         } else {
                             TestCase::assertSame('Bearer '.$this->testAccessToken, $extraHeaders['Authorization']);
                         }
 
+                        TestCase::assertSame($profileRequestMethod, $request->getMethod());
                         $response = [
                             'UniqueID' => $this->testAccessToken,
                             'Name' => $this->testAccessToken,

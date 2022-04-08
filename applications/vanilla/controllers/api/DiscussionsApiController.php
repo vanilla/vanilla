@@ -33,6 +33,7 @@ use Vanilla\SchemaFactory;
 use Vanilla\Search\SearchOptions;
 use Vanilla\Search\SearchResultItem;
 use Vanilla\Site\SiteSectionModel;
+use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\ModelUtils;
 
 /**
@@ -981,6 +982,7 @@ class DiscussionsApiController extends AbstractApiController {
         }
         if (array_key_exists('CategoryID', $discussionData) && $categoryID !== $discussionData['CategoryID']) {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.Add', $discussionData['CategoryID']);
+            $this->checkCategoryAllowsPosting($discussionData['CategoryID']);
             $categoryID = $discussionData['CategoryID'];
         }
 
@@ -1036,6 +1038,8 @@ class DiscussionsApiController extends AbstractApiController {
         if (!$category) {
             throw new NotFoundException('Category');
         }
+        $this->checkCategoryAllowsPosting($category);
+
         $categoryPermissionID = self::getPermissionID($categoryID);
         $this->discussionModel->categoryPermission('Vanilla.Discussions.Add', $categoryID);
         $this->fieldPermission($body, 'closed', 'Vanilla.Discussions.Close', $categoryPermissionID);
@@ -1367,6 +1371,25 @@ class DiscussionsApiController extends AbstractApiController {
         $row = $this->discussionByID($id);
         if ($row['InsertUserID'] !== $this->getSession()->UserID) {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.Edit', $row['CategoryID']);
+        }
+    }
+
+
+    /**
+     * Check to make sure the category is a discussion-type category. Throw an error if not.
+     *
+     * @param int|array $categoryOrCategoryID
+     * @throws \Garden\Web\Exception\ForbiddenException Throws if the category is a non-discussion type.
+     */
+    public function checkCategoryAllowsPosting($categoryOrCategoryID): void {
+        $category = is_numeric($categoryOrCategoryID)
+            ? $this->categoryModel->getID($categoryOrCategoryID, DATASET_TYPE_ARRAY)
+            : ArrayUtils::PascalCase($categoryOrCategoryID);
+        $canPost = CategoryModel::doesCategoryAllowPosts($categoryOrCategoryID);
+        if (!$canPost) {
+            throw new \Garden\Web\Exception\ForbiddenException(
+                sprintft('You are not allowed to post in categories with a display type of %s.', t($category["DisplayAs"]))
+            );
         }
     }
 

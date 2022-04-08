@@ -133,6 +133,8 @@ class OAuth2Plugin extends Gdn_OAuth2 {
                 ],
             ],
             "useBearerToken:b?",
+            "useBasicAuthToken:b?",
+            "postProfileRequest:b?",
             "allowAccessTokens:b?",
             "userMappings:o?" => [
                 "uniqueID:s?",
@@ -284,6 +286,8 @@ class OAuth2Plugin extends Gdn_OAuth2 {
             "AssociationSecret" => "secret",
             "TokenUrl" => "/urls/tokenUrl",
             "BearerToken" => "useBearerToken",
+            "BasicAuthToken" => "useBasicAuthToken",
+            "PostProfileRequest" => "postProfileRequest",
         ]);
         $result = $transformer->transform($input);
         return $result;
@@ -316,6 +320,8 @@ class OAuth2Plugin extends Gdn_OAuth2 {
             ],
             "secret" => "AssociationSecret",
             "useBearerToken" => "BearerToken",
+            "useBasicAuthToken" => "BasicAuthToken",
+            "postProfileRequest" => "PostProfileRequest",
         ]);
 
         $result["authenticationRequest"] = new Attributes($result["authenticationRequest"] ?? []);

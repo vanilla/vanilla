@@ -31,7 +31,6 @@ use Vanilla\Web\APIExpandMiddleware;
  * @todo Dynamic validation rule
  */
 class ProfileExtenderPlugin extends Gdn_Plugin {
-    const FIELD_EXTENDED = "extended";
 
     const EXPORT_PROFILE_CHUNK = 50000;
 
@@ -83,25 +82,6 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
      * @param Container $dic
      */
     public function container_init(Container $dic): void {
-        $dic->rule(APIExpandMiddleware::class)
-            ->addCall(
-                "addExpandField",
-                [
-                    'users.extended',
-                    [
-                        "firstInsertUser.extended" => "firstInsertUserID",
-                        "insertUser.extended" => "insertUserID",
-                        "lastInsertUser.extended" => "lastInsertUserID",
-                        "lastPost.insertUser.extended" => "lastPost.insertUserID",
-                        "lastUser.extended" => "lastUserID",
-                        "updateUser.extended" => "updateUserID",
-                        "user.extended" => "userID",
-                        self::FIELD_EXTENDED => "userID",
-                    ],
-                    [$this, "getUserProfileValuesChecked"],
-                ]
-            );
-
         // Add the OpenAPI filter to set the field schema.
         $dic->rule(OpenAPIBuilder::class)
             ->addCall('addFilter', ['filter' => [$this, 'filterOpenApi']]);

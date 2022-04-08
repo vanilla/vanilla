@@ -1177,7 +1177,10 @@ class SettingsController extends DashboardController {
     private function getHomeUrl() {
         $url = 'dashboard/settings/home';
 
-        if (Gdn::addonManager()->isEnabled('vanillaanalytics', Vanilla\Addon::TYPE_ADDON) && !(bool)Gdn::config('VanillaAnalytics.DisableDashboard', false)) {
+        if (Gdn::session()->checkPermission('Analytics.Data.View') &&
+            Gdn::addonManager()->isEnabled('vanillaanalytics', Vanilla\Addon::TYPE_ADDON) &&
+            !(bool)Gdn::config('VanillaAnalytics.DisableDashboard', false)
+        ) {
             $url = (bool)Gdn::config('Feature.NewAnalytics.Enabled', false) ?
                 '/analytics/v2/dashboards' :
                 '/analytics';

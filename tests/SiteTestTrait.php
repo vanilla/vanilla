@@ -19,6 +19,8 @@ use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Http\InternalClient;
 use Vanilla\Models\AddonModel;
 use Vanilla\Permissions;
+use Vanilla\Theme\ThemeService;
+use Vanilla\Theme\VariablesProviderInterface;
 use Vanilla\Utility\ModelUtils;
 use Vanilla\Utility\UrlUtils;
 use Vanilla\Web\Pagination\WebLinking;
@@ -573,5 +575,46 @@ TEMPLATE;
         TestCase::assertInstanceOf(Redirect::class, $redirect, 'Callback did not redirect.');
         TestCase::assertEquals($expectedCode, $redirect->getStatus());
         TestCase::assertEquals($expectedPath, $redirect->getHeader("Location"));
+    }
+
+    /**
+     * Run a callback with certain theme variables.
+     *
+     * @param array $variables The variables to apply.
+     * @param callable $callback The callback to run.
+     *
+     * @return mixed The result of the callback.
+     */
+    public function runWithThemeVariables(array $variables, callable $callback) {
+        $provider = new class($variables) implements VariablesProviderInterface {
+
+            /** @var array */
+            private $variables;
+
+            /**
+             * Constructor.
+             *
+             * @param array $variables
+             */
+            public function __construct(array $variables) {
+                $this->variables = $variables;
+            }
+
+            /**
+             * @inheritDoc
+             */
+            public function getVariables(): array {
+                return $this->variables;
+            }
+        };
+        $themeService = $this->container()->get(ThemeService::class);
+        $themeService->clearVariableProviders();
+        try {
+            $themeService->addVariableProvider($provider);
+            $result = call_user_func($callback);
+            return $result;
+        } finally {
+            $themeService->clearVariableProviders();
+        }
     }
 }

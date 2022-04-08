@@ -93,6 +93,18 @@ components:
                         When requesting the profile, pass the access token in the HTTP header. i.e Authorization: Bearer [accesstoken]
                     default: true
                     x-column: BearerToken
+                useBasicAuthToken:
+                    type: boolean
+                    description: |
+                        When requesting the Access Token, pass the basic Auth token in the HTTP header. i.e Authorization:  [Authorization =\> Basic base64_encode($rawToken)]
+                    default: true
+                    x-column: BasicAuthToken
+                postProfileRequest:
+                    type: boolean
+                    description: |
+                        When requesting the profile, use the HTTP POST method.
+                    default: null
+                    x-column: PostProfileRequest
                 allowAccessTokens:
                     type: boolean
                     description: |

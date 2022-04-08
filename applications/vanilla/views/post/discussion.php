@@ -25,7 +25,7 @@ if (!$CancelUrl) {
 
     if ($this->ShowCategorySelector === true) {
         $includeNull = true;
-        if ($this->Category && $this->CategoryID > 0) {
+        if ($this->Category && $this->CategoryID > 0 && $this->Category->DisplayAs === CategoryModel::DISPLAY_DISCUSSIONS) {
             $includeNull = [$this->Category->CategoryID, $this->Category->Name];
         }
         $options = ['Value' => val('CategoryID', $this->Category), "IncludeNull" => $includeNull, 'AdditionalPermissions' => ['PermsDiscussionsAdd']];

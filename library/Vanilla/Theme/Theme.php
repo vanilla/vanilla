@@ -554,6 +554,13 @@ class Theme implements \JsonSerializable {
     }
 
     /**
+     * @return JsonThemeAsset
+     */
+    public function getVariables(): JsonThemeAsset {
+        return $this->assets['variables'];
+    }
+
+    /**
      * Set a single theme asset.
      *
      * @param string $assetName

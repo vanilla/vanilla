@@ -27,7 +27,9 @@ use Vanilla\Models\Model;
 use Vanilla\Scheduler\LongRunner;
 use Vanilla\Scheduler\LongRunnerMiddleware;
 use Vanilla;
+use Vanilla\Theme\FsThemeProvider;
 use Vanilla\Theme\ThemeFeatures;
+use Vanilla\Theme\VariableProviders\QuickLinksVariableProvider;
 use Vanilla\Utility\ContainerUtils;
 use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
 use Vanilla\Web\Middleware\LogTransactionMiddleware;
@@ -188,6 +190,15 @@ class Bootstrap {
             ->rule(ThemeFeatures::class)
             ->setShared(true)
             ->setConstructorArgs(['theme' => ContainerUtils::currentTheme()])
+
+            // File base theme api provider
+            ->rule(\Vanilla\Theme\ThemeService::class)
+            ->setShared(true)
+            ->addCall("addThemeProvider", [new Reference(FsThemeProvider::class)])
+
+            ->rule(\Vanilla\Theme\ThemeSectionModel::class)
+            ->setShared(true)
+
         ;
 
         // Core dispatcher and middlewares
@@ -240,10 +251,7 @@ class Bootstrap {
             ->setShared(true)
 
             ->rule(\Vanilla\Web\APIExpandMiddleware::class)
-            ->setConstructorArgs([
-                "/api/v2/",
-                ContainerUtils::config("Garden.api.ssoIDPermission", Permissions::RANK_COMMUNITY_MANAGER)
-            ])
+            ->setConstructorArgs(["/api/v2/"])
             ->setShared(true)
 
             ->rule(\Vanilla\Web\HttpStrictTransportSecurityModel::class)

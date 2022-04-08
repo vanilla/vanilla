@@ -26,11 +26,12 @@ export const EmbedContainer = forwardRef(function EmbedContainer(props: IProps, 
             ref={ref}
             {...htmlProps}
             onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                e.nativeEvent.stopImmediatePropagation();
                 htmlProps.onClick?.(e);
-                selectSelf?.();
+                if (inEditor) {
+                    e.stopPropagation();
+                    e.nativeEvent.stopImmediatePropagation();
+                    selectSelf?.();
+                }
             }}
             className={classNames(
                 "embedExternal",

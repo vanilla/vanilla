@@ -5073,6 +5073,14 @@ SQL;
         $discussionCategoryID = $discussion['CategoryID'] ?? null;
         if ($discussionCategoryID === $newCategory['CategoryID']) {
             return true;
+        } else {
+            $postingCategory = CategoryModel::doesCategoryAllowPosts($newCategoryID);
+            if (!$postingCategory) {
+                throw new ClientException("Destination category does not allow discussions.", 400, [
+                    'discussionID' => $discussionID,
+                    'destinationCategoryID' => $newCategoryID,
+                ]);
+            }
         }
 
         $allowedDiscussionTypes = $newCategory['AllowedDiscussionTypes'];

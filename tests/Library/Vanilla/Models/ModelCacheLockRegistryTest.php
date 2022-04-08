@@ -55,7 +55,7 @@ class ModelCacheLockRegistryTest extends BootstrapTestCase {
      */
     public function testOnAlreadyAquiredLock() {
         $key = $this->modelCache->createCacheKey(["arg1"], true);
-        $lock = $this->lockRegistry->createLock($key, 2);
+        [$lock, $lockKey] = $this->lockRegistry->createLockAndKey($key, 2);
         $aquired = $lock->acquire();
         $this->assertTrue(true, $aquired);
         $result = $this->modelCache->getCachedOrHydrate(['arg1'], function () {
@@ -78,7 +78,7 @@ class ModelCacheLockRegistryTest extends BootstrapTestCase {
 
         // This time an exception occurs in the second codepath after the lock is released.
         $key = $this->modelCache->createCacheKey([], true);
-        $lock = $this->lockRegistry->createLock($key, 2);
+        [$lock, $lockKey] = $this->lockRegistry->createLockAndKey($key, 2);
         $aquired = $lock->acquire();
         $this->assertTrue(true, $aquired);
         // Exception bubbles up.

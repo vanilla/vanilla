@@ -8,6 +8,7 @@
 namespace VanillaTests\Models;
 
 use CategoryModel;
+use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Schema\RangeExpression;
@@ -1302,5 +1303,48 @@ class CategoryModelTest extends SiteTestCase {
             'CategoryID' => $rangeExpression,
         ]);
         $this->assertEquals([$cat2['categoryID']], $result);
+    }
+
+    /**
+     * Test that canPostInCategory method returns true for the root category.
+     */
+    public function testCanPostInCategoryRoot() {
+        $canPost = CategoryModel::doesCategoryAllowPosts(-1);
+        $this->assertTrue($canPost);
+    }
+
+    /**
+     * Test that canPostInCategory returns true for discussion-type category.
+     */
+    public function testCanPostInCategoryTrue() {
+        $discussionCat = $this->createCategory(["displayAs" => "discussions"]);
+        $canPost = CategoryModel::doesCategoryAllowPosts($discussionCat["categoryID"]);
+        $this->assertTrue($canPost);
+    }
+
+    /**
+     * Test that canPostInCategory returns false for a non-discussion-type category.
+     */
+    public function testCanPostInCategoryFalse() {
+        $headingCat = $this->createCategory(["displayAs" => "heading"]);
+        $canPost = CategoryModel::doesCategoryAllowPosts($headingCat);
+        $this->assertFalse($canPost);
+    }
+
+    /**
+     * Test that an error if thrown when calling canPostInCategory on a non-existent category.
+     */
+    public function testCanPostInCategoryPhantomCategory() {
+        $this->expectException(NotFoundException::class);
+        CategoryModel::doesCategoryAllowPosts(11111);
+    }
+
+    /**
+     * Test that a ForbiddenException is thrown when calling checkCategoryAllowsPost on a non-discussion-type category.
+     */
+    public function testCheckCategoryAllowsPostError() {
+        $headingCat = $this->createCategory(["displayAs" => "heading"]);
+        $this->expectException(ForbiddenException::class);
+        CategoryModel::checkCategoryAllowsPosts($headingCat);
     }
 }

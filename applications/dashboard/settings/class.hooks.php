@@ -111,28 +111,6 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface {
             // This is a kludge, but given this is a privacy setting, let's ensure newed up IPs are used properly.
             $_SERVER['HTTP_CLIENT_IP'] = $_SERVER['HTTP_X_FORWARDED_FOR'] = $_SERVER['REMOTE_ADDR'] = \Gdn::request()->getIP();
         }
-
-        ContainerUtils::addCall(
-            $dic,
-            APIExpandMiddleware::class,
-            "addExpandField",
-            [
-                "ssoID",
-                [
-                    "firstInsertUser.ssoID" => "firstInsertUserID",
-                    "insertUser.ssoID" => "insertUserID",
-                    "lastInsertUser.ssoID" => "lastInsertUserID",
-                    "lastPost.insertUser.ssoID" => "lastPost.insertUserID",
-                    "lastUser.ssoID" => "lastUserID",
-                    "updateUser.ssoID" => "updateUserID",
-                    "user.ssoID" => "userID",
-                    "ssoID" => "userID",
-                ],
-                new Callback(function (Container $dic) {
-                    return [$dic->get(UserModel::class), "getDefaultSSOIDs"];
-                })
-            ]
-        );
     }
 
     /**
@@ -1038,7 +1016,7 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface {
      */
     public function updateModel_afterStructure_handler($sender) {
         // Only setup default permissions if no role permissions are set.
-        $hasPermissions = Gdn::sql()->getWhere('Permission', ['RoleID >' => 0])->firstRow(DATASET_TYPE_ARRAY);
+        $hasPermissions = Gdn::sql()->getWhere('Permission', ['RoleID >' => 0], '', '', 1)->firstRow(DATASET_TYPE_ARRAY);
         if (!$hasPermissions) {
             PermissionModel::resetAllRoles();
         }

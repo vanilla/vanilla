@@ -626,16 +626,23 @@ class DiscussionsTest extends AbstractResourceTest {
             'name' => $category_PermissionName,
             'urlCode' => slugify($category_PermissionName)
         ];
+        $categoryData_Heading = [
+            'displayAs' => 'heading',
+            'parentCategoryID' => 1,
+            'name' => 'headingCategory' . $rd1,
+            'urlCode' => slugify('headingCategory' . $rd1)
+        ];
         $category_1 = $this->api()->post("/categories", $categoryData_1)->getBody();
-        $category_2 =  $this->api()->post("/categories", $categoryData_2)->getBody();
-        $category_3 =  $this->api()->post("/categories", $categoryData_3)->getBody();
+        $category_2 = $this->api()->post("/categories", $categoryData_2)->getBody();
+        $category_3 = $this->api()->post("/categories", $categoryData_3)->getBody();
         $category_permission = $this->api()->post("/categories", $categoryData_Permission)->getBody();
+        $category_heading = $this->api()->post("/categories", $categoryData_Heading)->getBody();
 
-        $this->api()->patch("/roles/".\RoleModel::ADMIN_ID, [
+        $this->api()->patch("/roles/" . \RoleModel::ADMIN_ID, [
             'permissions' => [[
                 "id" => $category_permission['categoryID'],
                 'type' => "category",
-                "permissions" =>  [
+                "permissions" => [
                     "discussions.view" => true
                 ],
             ]],
@@ -743,6 +750,7 @@ class DiscussionsTest extends AbstractResourceTest {
         self::$data['validCategory2'] = $category_2;
         self::$data['validCategory3'] = $category_3;
         self::$data['category_permission'] = $category_permission;
+        self::$data['category_heading'] = $category_heading;
         self::$data['discussion_1'] = $discussionData_1;
         self::$data['discussion_2'] = $discussionData_2;
         self::$data['validDiscussionIDs'] = $discussionIDs;
@@ -794,7 +802,8 @@ class DiscussionsTest extends AbstractResourceTest {
             'invalid-category' => ['validDiscussionIDs', 'invalidCategory', 404, null],
             'valid-invalidIDs' => ['mixedIDs', 'validCategory2', 403, null],
             'timeout' => ['validDiscussionIDs', 'validCategory3', 408, 2],
-            'permission-invalid' => ['validDiscussionIDs', 'category_permission', 403, null]
+            'permission-invalid' => ['validDiscussionIDs', 'category_permission', 403, null],
+            'non-discussion-category-invalid' => ['validDiscussionIDs', 'category_heading', 400, null],
         ];
     }
 
@@ -838,6 +847,42 @@ class DiscussionsTest extends AbstractResourceTest {
             $this->expectExceptionCode(400);
             $this->api()->post("/discussions/{$discussion['discussionID']}", ["body" => 'edited discussion2']);
         });
+    }
+
+    /**
+     * Test that an exception is thrown when posting to a non-discussion-type category.
+     */
+    public function testPostToNonDiscussionCategory() {
+        $nestedCategory = $this->api()->post("/categories", [
+            "name" => "no discussions nested",
+            "urlcode" => "no-discussions-nested",
+            "displayAs" => "heading",
+        ])->getBody();
+
+        $data = [
+            "name" => "Can't post to a non-discussion category.",
+            "body" => "So don't even try it.",
+            "format" => "markdown",
+            "categoryID" => $nestedCategory["categoryID"],
+        ];
+
+        $this->expectExceptionMessage('You are not allowed to post in categories with a display type of Heading.');
+        $this->api()->post("/discussions", $data);
+    }
+
+    /**
+     * Test that an exception is thrown when moving a discussion to a non-discussion-type category.
+     */
+    public function testPatchToNonDiscussionCategory() {
+        $discussion = $this->insertDiscussions(1)[0];
+        $headingCategory = $this->api()->post("/categories", [
+            "name" => "no discussions heading",
+            "urlcode" => "no-discussions-heading",
+            "displayAs" => "heading",
+        ])->getBody();
+
+        $this->expectExceptionMessage('You are not allowed to post in categories with a display type of Heading.');
+        $this->api()->patch("/discussions/{$discussion["DiscussionID"]}", ["categoryID" => $headingCategory["categoryID"]]);
     }
 
     /**

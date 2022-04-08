@@ -28,6 +28,8 @@ export interface IAuthenticator {
     userMappings: IAuthenticatorUserMappings;
     authenticationRequest: IAuthenticationRequest;
     useBearerToken: boolean;
+    useBasicAuthToken: boolean;
+    postProfileRequest: boolean;
     allowAccessTokens: boolean;
     active: boolean;
     default: boolean;

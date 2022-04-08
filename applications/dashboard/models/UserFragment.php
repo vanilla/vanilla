@@ -52,7 +52,7 @@ class UserFragment implements \ArrayAccess, \JsonSerializable, \IteratorAggregat
     /**
      * @return array
      */
-    protected function getArrayAccessSource(): array {
+    protected function & getArrayAccessSource(): array {
         return $this->data;
     }
 
@@ -92,28 +92,18 @@ class UserFragment implements \ArrayAccess, \JsonSerializable, \IteratorAggregat
     }
 
     /**
-     * D.I.
+     * Apply some extra data into our fragment.
      *
-     * @return array|int
+     * @param array $data
      */
-    public function count() {
-        return $this->data;
+    public function addExtraData(array $data) {
+        $this->data = array_merge($this->data, $data);
     }
 
     /**
-     * Looks for UserFragment in an array and replace it with it's array value.
-     *
-     * @param array $rows
-     * @return array
+     * Implement the \Countable interface.
      */
-    public static function userFragmentToArray(array $rows): array {
-        foreach ($rows as $key => $value) {
-            if ($value instanceof UserFragment) {
-                $rows[$key] = $value->jsonSerialize();
-            } else if (is_array($value)) {
-                $rows[$key] = self::userFragmentToArray($value);
-            }
-        }
-        return $rows;
+    public function count() {
+        return count($this->data);
     }
 }

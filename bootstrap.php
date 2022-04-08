@@ -141,12 +141,7 @@ $dic->setInstance(Container::class, $dic)
 
     // File base theme api provider
     ->rule(\Vanilla\Theme\ThemeService::class)
-        ->setShared(true)
-        ->addCall("addThemeProvider", [new Reference(FsThemeProvider::class)])
         ->addCall("addVariableProvider", [new Reference(QuickLinksVariableProvider::class)])
-
-    ->rule(\Vanilla\Theme\ThemeSectionModel::class)
-    ->setShared(true)
 
     ->rule(HttpCacheMiddleware::class)
     ->setShared(true)

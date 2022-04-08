@@ -12,6 +12,7 @@ use PHPUnit\Framework\TestCase;
 use Vanilla\EmbeddedContent\Embeds\ImageEmbed;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
 use Vanilla\EmbeddedContent\EmbedService;
+use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\Models\TestCategoryModelTrait;
 use VanillaTests\Models\TestCommentModelTrait;
 use VanillaTests\Models\TestDiscussionModelTrait;
@@ -22,7 +23,12 @@ use VanillaTests\SiteTestTrait;
  * Tests for the `DraftsController` class.
  */
 class PostAndDraftsControllerTest extends TestCase {
-    use SiteTestTrait, SetupTraitsTrait, TestDiscussionModelTrait, TestCommentModelTrait, TestCategoryModelTrait;
+    use SiteTestTrait,
+        SetupTraitsTrait,
+        TestDiscussionModelTrait,
+        TestCommentModelTrait,
+        TestCategoryModelTrait,
+        CommunityApiTestTrait;
 
     /**
      * @var array
@@ -539,5 +545,26 @@ HTML
         ];
 
         return $r;
+    }
+
+    /**
+     * Test that a non-discussion type category is not an available option for posting a discussion.
+     */
+    public function testNonDiscussionCategoriesInDropdown(): void {
+        \Gdn::themeFeatures()->forceFeatures([
+            'NewCategoryDropdown' => false,
+        ]);
+        $this->runWithConfig([
+            "Vanilla.Categories.Use" => true,
+        ], function () {
+            $this->api()->setUserID(self::$siteInfo["adminUserID"]);
+            // Create a non-discussion type category.
+            $newCat = $this->createCategory(["displayAs" => "heading"]);
+            $content = $this->bessy()->getHtml("post/discussion/{$newCat["urlcode"]}", ["deliveryType" => DELIVERY_TYPE_ALL]);
+            // We should have the default text, meaning no category is pre-selected.
+            $content->assertContainsString("Select a category...");
+            // The heading category should not be an available option.
+            $content->assertCssSelectorText("option[disabled]", $newCat['name']);
+        });
     }
 }

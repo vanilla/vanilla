@@ -252,10 +252,7 @@ export function SearchFormContextProvider(props: IProps) {
             //analytics event to keen
             document.dispatchEvent(
                 new CustomEvent("pageViewWithContext", {
-                    detail: getSearchAnalyticsData(form, {
-                        data: result,
-                        pagination: result.pagination,
-                    }),
+                    detail: getSearchAnalyticsData(form, result),
                 }),
             );
         } catch (error) {

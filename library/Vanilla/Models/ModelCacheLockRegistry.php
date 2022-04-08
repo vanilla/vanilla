@@ -7,10 +7,14 @@
 
 namespace Vanilla\Models;
 
+use Garden\Web\Exception\ServerException;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\LockInterface;
+use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\SharedLockInterface;
+use Symfony\Component\Lock\SharedLockStoreInterface;
 use Symfony\Component\Lock\Store\FlockStore;
 use Symfony\Component\Lock\Store\MemcachedStore;
 use Symfony\Contracts\Cache\CacheInterface;
@@ -32,6 +36,18 @@ class ModelCacheLockRegistry {
     /** @var LockFactory|null */
     private $lockFactory;
 
+    /** @var PersistingStoreInterface */
+    private $lockStore;
+
+    /** @var object|null Could be a memcached instance. No type used because of psalm and no direct memcached dependency.. */
+    private $memcached;
+
+    /** @var ConfigurationInterface */
+    private $config;
+
+    /** @var string */
+    private $lockPrefix = '';
+
     /** @var LoggerInterface */
     private $logger;
 
@@ -48,17 +64,31 @@ class ModelCacheLockRegistry {
      * @param ConfigurationInterface $config
      */
     public function __construct(\Gdn_Cache $cache, ConfigurationInterface $config) {
+        $this->config = $config;
         // flock or memcached.
         $lockStore = $config->get('Cache.LockStore', 'memcached');
         if ($cache instanceof \Gdn_Memcached && $lockStore === 'memcached') {
-            $store = new MemcachedStore($cache->getMemcached());
+            $this->memcached = $cache->getMemcached();
+            $store = new MemcachedStore($this->memcached);
+
+            // Grab our own cache prefix.
+            $this->lockPrefix = $cache->getPrefix();
         } else {
             $store = new FlockStore(PATH_CACHE . '/locks');
         }
 
+        $this->lockStore = $store;
+
         // We may want to play with this in the future.
         $this->ttl = $config->get('Cache.LockTTL', 15);
         $this->lockFactory = new LockFactory($store);
+    }
+
+    /**
+     * @return bool
+     */
+    private function isDisabled() {
+        return $this->config->get("Cache.LockStore") === 'disabled';
     }
 
     /**
@@ -74,13 +104,15 @@ class ModelCacheLockRegistry {
      * @param string $key
      * @param int|null $ttl Use a specific TTL instead of the default one.
      *
-     * @return LockInterface
+     * @return array{LockInterface, Key}
      */
-    public function createLock(string $key, int $ttl = null): LockInterface {
+    public function createLockAndKey(string $key, int $ttl = null): array {
         $ttl = $ttl ?? $this->ttl;
-        $key = 'lock.'.$key;
-        $lock = $this->lockFactory->createLock($key, $ttl, true);
-        return $lock;
+        $key = implode(".", [$this->lockPrefix, 'lock', $key]);
+        $key = trim($key, ".");
+        $key = new Key($key);
+        $lock = $this->lockFactory->createLockFromKey($key, $ttl, true);
+        return [$lock, $key];
     }
 
     /**
@@ -89,7 +121,7 @@ class ModelCacheLockRegistry {
      *
      * @param callable $callback
      * @param ItemInterface $item
-     * @param bool $save
+     * @param bool $shouldCallerSaveCacheItem
      * @param CacheInterface $pool
      * @param \Closure|null $setMetadata
      *
@@ -98,10 +130,15 @@ class ModelCacheLockRegistry {
     public function compute(
         callable $callback,
         ItemInterface $item,
-        bool &$save,
+        bool &$shouldCallerSaveCacheItem,
         CacheInterface $pool,
         \Closure $setMetadata = null
     ) {
+        if ($this->isDisabled()) {
+            // Don't take any locks.
+            return $callback($item, $shouldCallerSaveCacheItem);
+        }
+
         if ($this->currentlyLockedKey === $item->getKey()) {
             /* @codeCoverageIgnoreStart */
             // Somehow the callback called itself again. Don't deadlock on ourselves.
@@ -109,10 +146,10 @@ class ModelCacheLockRegistry {
             ErrorLogger::warning("ModelCache tried to generate a lock recursively", ["modelCache", "lock"], [
                 'lockKey' => $item->getKey(),
             ]);
-            return $callback($item, $save);
+            return $callback($item, $shouldCallerSaveCacheItem);
             /* @codeCoverageIgnoreEnd */
         }
-        $lock = $this->createLock($item->getKey());
+        [$lock, $lockKey] = $this->createLockAndKey($item->getKey());
         $this->currentlyLockedKey = $item->getKey();
         try {
             while (true) {
@@ -124,25 +161,23 @@ class ModelCacheLockRegistry {
                         ['key' => $item->getKey()]
                     );
 
-                    $value = $callback($item, $save);
+                    $value = $callback($item, $shouldCallerSaveCacheItem);
 
-                    if ($save) {
+                    if ($shouldCallerSaveCacheItem) {
                         if ($setMetadata) {
                             $setMetadata($item);
                         }
 
                         $pool->save($item->set($value));
-                        $save = false;
+                        // We've already saved it ourselves.
+                        // No need to save it again.
+                        $shouldCallerSaveCacheItem = false;
                     }
 
                     return $value;
                 }
                 // if we failed the race, retry locking in blocking mode to wait for the winner
-                if ($lock instanceof SharedLockInterface) {
-                    $lock->acquireRead(true);
-                } else {
-                    $this->blockUntilLockReleased($lock);
-                }
+                $this->blockUntilLockReleased($lock, $lockKey);
 
                 // Because null is a perfectly valid value
                 // We need a mechanism to determine if no value was found.
@@ -156,7 +191,8 @@ class ModelCacheLockRegistry {
                 try {
                     $value = $pool->get($item->getKey(), $signalingCallback, 0);
                     $this->logger && $this->logger->info('Item "{key}" retrieved after lock was released', ['key' => $item->getKey()]);
-                    $save = false;
+                    // No changes to save. Another request hydrated the cache item for us.
+                    $shouldCallerSaveCacheItem = false;
 
                     // We found a value in the cache.
                     return $value;
@@ -182,14 +218,35 @@ class ModelCacheLockRegistry {
      * Wait until a lock is released.
      *
      * @param LockInterface $lock
+     * @param Key $key
+     *
+     * @psalm-suppress UndefinedClass
      */
-    public function blockUntilLockReleased(LockInterface $lock) {
-        while (true) {
-            if (!$lock->isAcquired()) {
-                return;
-            } else {
-                usleep((100 + random_int(-10, 10)) * 1000);
+    public function blockUntilLockReleased(LockInterface $lock, Key $key) {
+        if ($lock instanceof SharedLockInterface && $this->lockStore instanceof SharedLockStoreInterface) {
+            // We have native support for shared reader locks.
+            // Use that.
+            $lock->acquireRead(true);
+        } elseif ($this->memcached !== null) {
+            // The MemcachedLockStore doesn't implement SharedLockStoreInterface
+            // As a result the acquireRead() call on the lock will try to aquire its own full lock.
+            // This is no good here as it causes a cascade of requests aquiring a lock.
+            // Instead we will just check for the existence of the lock's cache key.
+            // Once the lock is released the cache key is removed.
+
+
+            // We want to wait until the lock is gone.
+            while (true) {
+                $this->memcached->get((string) $key);
+                $doesLockExist = $this->memcached->getResultCode() !== \Memcached::RES_NOTFOUND;
+                if (!$doesLockExist) {
+                    return;
+                } else {
+                    usleep((100 + random_int(-10, 10)) * 1000);
+                }
             }
+        } else {
+            throw new ServerException('LockStore must either be memcached or a SharedLockStoreInterface.');
         }
     }
 }

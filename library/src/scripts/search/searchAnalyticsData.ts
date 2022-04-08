@@ -3,7 +3,9 @@
  * @license Proprietary
  */
 
+import { ISearchForm, ISearchResults } from "@library/search/searchTypes";
 import { getSiteSection } from "@library/utility/appUtils";
+import { RecordID } from "@vanilla/utils";
 
 interface IResultAnalyticsData {
     type: "search";
@@ -12,7 +14,7 @@ interface IResultAnalyticsData {
     searchQuery: ISplitSearchTerms;
     page: number;
     title: string;
-    author: { authorID: number[]; authorName: string[] };
+    author: { authorID: RecordID[]; authorName: string[] };
     recordType: string[];
     tag: { tagID: number[]; tagName: string[] };
     category: { categoryID: number[]; categoryName: string[] };
@@ -97,13 +99,13 @@ export const splitSearchTerms = (query: string): ISplitSearchTerms => {
 /**
  * Get structured data for search analytics
  */
-export const getSearchAnalyticsData = (form, results): IResultAnalyticsData => {
+export const getSearchAnalyticsData = (form: ISearchForm, results: ISearchResults): IResultAnalyticsData => {
     const resultsWithAnalyticsData: IResultAnalyticsData = {
         type: "search",
         domain: form.domain,
-        searchResults: results.data.length,
+        searchResults: results.pagination.total ?? -1,
         searchQuery: splitSearchTerms(form.query),
-        page: results.pagination.currentPage,
+        page: results.pagination?.currentPage ?? -1,
         title: form.name ?? "",
         author: {
             authorID: [],

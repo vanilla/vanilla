@@ -1026,12 +1026,13 @@ if (!$captureOnly && $AllIPAddressesExists) {
     $limit = 10000;
     $resetBatch = 100;
 
-    // Grab the initial batch of users.
-    $legacyIPAddresses = $SQL->select(['UserID', 'AllIPAddresses', 'InsertIPAddress', 'LastIPAddress', 'DateLastActive'])
-        ->from('User')->where('AllIPAddresses is not null')->limit($limit)
-        ->get()->resultArray();
+    // Grab initial count.
+    $legacyIPAddressesCount = $Database->createSql()->getCount('User', 'AllIPAddresses is not null');
 
-    do {
+    while ($legacyIPAddressesCount > 0) {
+        $legacyIPAddresses = $SQL->select(['UserID', 'AllIPAddresses', 'InsertIPAddress', 'LastIPAddress', 'DateLastActive'])
+            ->from('User')->where('AllIPAddresses is not null')->limit($limit)
+            ->get()->resultArray();
         $processedUsers = [];
 
         // Iterate through the records of users with data needing to be migrated.
@@ -1075,11 +1076,9 @@ if (!$captureOnly && $AllIPAddressesExists) {
             $SQL->update('User')->set('AllIPAddresses', null)->where('UserID', $processedUsers)->limit(count($processedUsers))->put();
         }
 
-        // Query the next batch of users with IP data needing to be migrated.
-        $legacyIPAddresses = $SQL->select(['UserID', 'AllIPAddresses', 'InsertIPAddress', 'LastIPAddress', 'DateLastActive'])
-            ->from('User')->where('AllIPAddresses is not null')->limit($limit)
-            ->get()->resultArray();
-    } while (count($legacyIPAddresses) > 0);
+        // Look how many legacyIPs are left.
+        $legacyIPAddressesCount = $Database->createSql()->getCount('User', 'AllIPAddresses is not null');
+    }
 
     unset($allIPAddresses, $dateLastActive, $insertIPAddress, $lastIPAddress, $userID, $processedUsers);
 }

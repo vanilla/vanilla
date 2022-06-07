@@ -12,8 +12,10 @@ import { suggestedTextStyleHelper } from "@library/features/search/suggestedText
 import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { CategoryPicker } from "@library/forms/select/CategoryPicker";
 import { addComponent } from "@library/utility/componentRegistry";
+import { CommunityMemberInput } from "@vanilla/addon-vanilla/forms/CommunityMemberInput";
 cssOut(`.suggestedTextInput-option`, suggestedTextStyleHelper({ forDashboard: true }).option);
 addComponent("CategoryPicker", CategoryPicker, { overwrite: true });
+addComponent("CommunityMemberInput", CommunityMemberInput, { overwrite: true });
 onReady(handleImageUploadInputDisplay);
 onContent(handleImageUploadInputDisplay);
 

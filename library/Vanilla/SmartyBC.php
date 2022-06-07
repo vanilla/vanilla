@@ -8,7 +8,6 @@
 
 namespace Vanilla;
 
-
 use Smarty;
 
 /**
@@ -31,7 +30,7 @@ class SmartyBC extends Smarty
      * @var array
      * @deprecated
      */
-    public $trusted_dir = array();
+    public $trusted_dir = [];
 
     /**
      * Initialize new SmartyBC object
@@ -90,7 +89,7 @@ class SmartyBC extends Smarty
      */
     public function register_function($function, $function_impl, $cacheable = true, $cache_attrs = null)
     {
-        $this->registerPlugin('function', $function, $function_impl, $cacheable, $cache_attrs);
+        $this->registerPlugin("function", $function, $function_impl, $cacheable, $cache_attrs);
     }
 
     /**
@@ -101,7 +100,7 @@ class SmartyBC extends Smarty
      */
     public function unregister_function($function)
     {
-        $this->unregisterPlugin('function', $function);
+        $this->unregisterPlugin("function", $function);
     }
 
     /**
@@ -117,15 +116,10 @@ class SmartyBC extends Smarty
      * @internal param array $block_functs list of methods that are block format
      * @deprecated
      */
-    public function register_object(
-        $object,
-        $object_impl,
-        $allowed = array(),
-        $smarty_args = true,
-        $block_methods = array()
-    ) {
-        settype($allowed, 'array');
-        settype($smarty_args, 'boolean');
+    public function register_object($object, $object_impl, $allowed = [], $smarty_args = true, $block_methods = [])
+    {
+        settype($allowed, "array");
+        settype($smarty_args, "boolean");
         $this->registerObject($object, $object_impl, $allowed, $smarty_args, $block_methods);
     }
 
@@ -153,7 +147,7 @@ class SmartyBC extends Smarty
      */
     public function register_block($block, $block_impl, $cacheable = true, $cache_attrs = null)
     {
-        $this->registerPlugin('block', $block, $block_impl, $cacheable, $cache_attrs);
+        $this->registerPlugin("block", $block, $block_impl, $cacheable, $cache_attrs);
     }
 
     /**
@@ -164,7 +158,7 @@ class SmartyBC extends Smarty
      */
     public function unregister_block($block)
     {
-        $this->unregisterPlugin('block', $block);
+        $this->unregisterPlugin("block", $block);
     }
 
     /**
@@ -179,7 +173,7 @@ class SmartyBC extends Smarty
      */
     public function register_compiler_function($function, $function_impl, $cacheable = true)
     {
-        $this->registerPlugin('compiler', $function, $function_impl, $cacheable);
+        $this->registerPlugin("compiler", $function, $function_impl, $cacheable);
     }
 
     /**
@@ -190,7 +184,7 @@ class SmartyBC extends Smarty
      */
     public function unregister_compiler_function($function)
     {
-        $this->unregisterPlugin('compiler', $function);
+        $this->unregisterPlugin("compiler", $function);
     }
 
     /**
@@ -204,7 +198,7 @@ class SmartyBC extends Smarty
      */
     public function register_modifier($modifier, $modifier_impl)
     {
-        $this->registerPlugin('modifier', $modifier, $modifier_impl);
+        $this->registerPlugin("modifier", $modifier, $modifier_impl);
     }
 
     /**
@@ -215,7 +209,7 @@ class SmartyBC extends Smarty
      */
     public function unregister_modifier($modifier)
     {
-        $this->unregisterPlugin('modifier', $modifier);
+        $this->unregisterPlugin("modifier", $modifier);
     }
 
     /**
@@ -252,7 +246,7 @@ class SmartyBC extends Smarty
      */
     public function register_prefilter($function)
     {
-        $this->registerFilter('pre', $function);
+        $this->registerFilter("pre", $function);
     }
 
     /**
@@ -263,7 +257,7 @@ class SmartyBC extends Smarty
      */
     public function unregister_prefilter($function)
     {
-        $this->unregisterFilter('pre', $function);
+        $this->unregisterFilter("pre", $function);
     }
 
     /**
@@ -277,7 +271,7 @@ class SmartyBC extends Smarty
      */
     public function register_postfilter($function)
     {
-        $this->registerFilter('post', $function);
+        $this->registerFilter("post", $function);
     }
 
     /**
@@ -288,7 +282,7 @@ class SmartyBC extends Smarty
      */
     public function unregister_postfilter($function)
     {
-        $this->unregisterFilter('post', $function);
+        $this->unregisterFilter("post", $function);
     }
 
     /**
@@ -302,7 +296,7 @@ class SmartyBC extends Smarty
      */
     public function register_outputfilter($function)
     {
-        $this->registerFilter('output', $function);
+        $this->registerFilter("output", $function);
     }
 
     /**
@@ -313,7 +307,7 @@ class SmartyBC extends Smarty
      */
     public function unregister_outputfilter($function)
     {
-        $this->unregisterFilter('output', $function);
+        $this->unregisterFilter("output", $function);
     }
 
     /**
@@ -450,7 +444,7 @@ class SmartyBC extends Smarty
      * @param string $scope
      * @deprecated
      */
-    public function config_load($file, $section = null, $scope = 'global')
+    public function config_load($file, $section = null, $scope = "global")
     {
         $this->ConfigLoad($file, $section, $scope);
     }

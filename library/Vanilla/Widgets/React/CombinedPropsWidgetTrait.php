@@ -10,15 +10,16 @@ namespace Vanilla\Widgets\React;
 /**
  * Trait implementing CombinedPropsWidgetInterface.
  */
-trait CombinedPropsWidgetTrait {
-
+trait CombinedPropsWidgetTrait
+{
     /** @var array */
     protected $props = [];
 
     /**
      * @inheritdoc
      */
-    public function setProps(array $props, bool $merge = false) {
+    public function setProps(array $props, bool $merge = false)
+    {
         if ($merge) {
             $this->props = array_replace_recursive($this->props, $props);
         } else {
@@ -29,7 +30,8 @@ trait CombinedPropsWidgetTrait {
     /**
      * @inheritdoc
      */
-    public function getProps(): ?array {
+    public function getProps(): ?array
+    {
         return $this->props;
     }
 }

@@ -12,8 +12,8 @@ use Garden\Http\HttpClient;
 /**
  * Defines interface that consumes data when synchronizing from site sync source to site sync destination.
  */
-interface SiteSyncConsumerInterface {
-
+interface SiteSyncConsumerInterface
+{
     /**
      * Perform any necessary setup on the sync destination prior to consuming data from a sync source
      */
@@ -40,5 +40,5 @@ interface SiteSyncConsumerInterface {
         HttpClient $destinationClient,
         array $sourceResources,
         ?string $foreignIDPrefix = null
-    ) : void;
+    ): void;
 }

@@ -27,6 +27,7 @@ interface IProps extends Omit<React.HTMLAttributes<HTMLInputElement>, "type" | "
     inputID?: string;
     labelID?: string;
     isInvalid?: (invalid: boolean) => void;
+    placeholder?: string;
 }
 
 export function ColorPicker(_props: IProps) {
@@ -40,6 +41,7 @@ export function ColorPicker(_props: IProps) {
         inputID,
         labelID,
         isInvalid,
+        placeholder,
     } = _props;
 
     const classes = colorPickerClasses();
@@ -126,7 +128,7 @@ export function ColorPicker(_props: IProps) {
                     aria-describedby={labelID}
                     aria-hidden={true}
                     className={cx(inputClassName)}
-                    placeholder={defaultColorString}
+                    placeholder={placeholder ?? defaultColorString}
                     value={textInputValue ?? ""} // Null is not an allowed value for an input.
                     onChange={onTextChange}
                     auto-correct="false"

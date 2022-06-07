@@ -10,7 +10,8 @@ namespace Vanilla\Contracts\Site;
 /**
  * Class TranslationItem
  */
-class TranslationItem {
+class TranslationItem
+{
     /** @var string $resource */
     private $resource;
 
@@ -33,16 +34,13 @@ class TranslationItem {
      * @param string $locale
      * @param string $translation
      */
-    public function __construct(
-        string $combinedKey,
-        string $locale,
-        string $translation
-    ) {
+    public function __construct(string $combinedKey, string $locale, string $translation)
+    {
         // resource key pattern: {model}.{id}.{propertyKey}
-        $info = explode('.', $combinedKey);
+        $info = explode(".", $combinedKey);
 
         $this->resource = $info[0];
-        $this->recordID = (int)$info[1];
+        $this->recordID = (int) $info[1];
         $this->locale = $locale;
         $this->property = $info[2];
         $this->translation = $translation;
@@ -51,35 +49,40 @@ class TranslationItem {
     /**
      * @return string
      */
-    public function getResource(): string {
+    public function getResource(): string
+    {
         return $this->resource;
     }
 
     /**
      * @return int
      */
-    public function getRecordID(): int {
+    public function getRecordID(): int
+    {
         return $this->recordID;
     }
 
     /**
      * @return string
      */
-    public function getLocale(): string {
+    public function getLocale(): string
+    {
         return $this->locale;
     }
 
     /**
      * @return string
      */
-    public function getProperty(): string {
+    public function getProperty(): string
+    {
         return $this->property;
     }
 
     /**
      * @return string
      */
-    public function getTranslation(): string {
+    public function getTranslation(): string
+    {
         return $this->translation;
     }
 }

@@ -6,18 +6,18 @@
 
 use VanillaTests\NullContainer;
 
-require_once __DIR__.'/definitions.php';
+require_once __DIR__ . "/definitions.php";
 
 // Use consistent timezone for all tests.
 date_default_timezone_set("UTC");
 
 ini_set("default_charset", "UTF-8");
 error_reporting(E_ALL);
-ini_set('log_errors', '0');
+ini_set("log_errors", "0");
 
 // Alias classes for some limited PHPUnit v5 compatibility with v6.
 $classCompatibility = [
-    'PHPUnit\\Framework\\TestCase' => 'PHPUnit_Framework_TestCase', // See https://github.com/php-fig/log/pull/52
+    "PHPUnit\\Framework\\TestCase" => "PHPUnit_Framework_TestCase", // See https://github.com/php-fig/log/pull/52
 ];
 foreach ($classCompatibility as $class => $legacyClass) {
     if (!class_exists($legacyClass) && class_exists($class)) {
@@ -26,14 +26,14 @@ foreach ($classCompatibility as $class => $legacyClass) {
 }
 
 // Copy the cgi-bin files.
-$dir = PATH_ROOT.'/cgi-bin';
+$dir = PATH_ROOT . "/cgi-bin";
 if (!file_exists($dir)) {
     mkdir($dir);
 }
 
-$files = glob(PATH_ROOT."/.circleci/scripts/templates/vanilla/cgi-bin/*.php");
+$files = glob(PATH_ROOT . "/.circleci/scripts/templates/vanilla/cgi-bin/*.php");
 foreach ($files as $file) {
-    $dest = $dir.'/'.basename($file);
+    $dest = $dir . "/" . basename($file);
     $r = copy($file, $dest);
     if (!$r) {
         throw new \Exception("Could not copy $dest.", 500);
@@ -43,16 +43,16 @@ foreach ($files as $file) {
 // ===========================================================================
 // Adding the minimum dependencies to support unit testing for core libraries
 // ===========================================================================
-require PATH_ROOT.'/environment.php';
+require PATH_ROOT . "/environment.php";
 
 // Allow any addon class to be auto-loaded.
 \VanillaTests\Bootstrap::registerAutoloader();
 
 // Add some helper functions.
-require_once PATH_PLUGINS.'/Reactions/views/reaction_functions.php';
+require_once PATH_PLUGINS . "/Reactions/views/reaction_functions.php";
 
 // Allow a test before.
-$bootstrapTestFile = PATH_CONF . '/bootstrap.tests.php';
+$bootstrapTestFile = PATH_CONF . "/bootstrap.tests.php";
 if (file_exists($bootstrapTestFile)) {
     require_once $bootstrapTestFile;
 }
@@ -61,20 +61,20 @@ if (file_exists($bootstrapTestFile)) {
 Gdn::setContainer(new NullContainer());
 
 // Clear the test cache.
-\Gdn_FileSystem::removeFolder(PATH_ROOT.'/tests/cache');
+\Gdn_FileSystem::removeFolder(PATH_ROOT . "/tests/cache");
 
 // Ensure our uploads directory exists.
-mkdir(PATH_ROOT.'/tests/cache', 0777);
+mkdir(PATH_ROOT . "/tests/cache", 0777);
 mkdir(PATH_UPLOADS, 0777);
 
-require_once PATH_LIBRARY_CORE.'/functions.validation.php';
+require_once PATH_LIBRARY_CORE . "/functions.validation.php";
 
-require_once PATH_LIBRARY_CORE.'/functions.render.php';
+require_once PATH_LIBRARY_CORE . "/functions.render.php";
 
 // Include test utilities.
 $utilityFiles = array_merge(
-    glob(PATH_ROOT.'/plugins/*/tests/Utils/*.php'),
-    glob(PATH_ROOT.'/applications/*/tests/Utils/*.php')
+    glob(PATH_ROOT . "/plugins/*/tests/Utils/*.php"),
+    glob(PATH_ROOT . "/applications/*/tests/Utils/*.php")
 );
 foreach ($utilityFiles as $file) {
     require_once $file;

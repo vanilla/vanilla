@@ -13,7 +13,8 @@ namespace VanillaTests\Models;
  * Tests may want to simulate the "real world" a bit by inserting records sequentially, rather than all in the same
  * second. Certain logic depends on dates not being the same.
  */
-final class TestDate {
+final class TestDate
+{
     /**
      * @var int The
      */
@@ -24,7 +25,8 @@ final class TestDate {
      *
      * @return int
      */
-    public static function timestamp(): int {
+    public static function timestamp(): int
+    {
         return self::$date++;
     }
 
@@ -33,7 +35,8 @@ final class TestDate {
      *
      * @return string
      */
-    public static function mySqlDate(): string {
+    public static function mySqlDate(): string
+    {
         return gmdate(MYSQL_DATE_FORMAT, self::timestamp());
     }
 
@@ -42,7 +45,8 @@ final class TestDate {
      *
      * @return \DateTimeInterface
      */
-    public static function date(): \DateTimeInterface {
-        return new \DateTimeImmutable('@'.self::timestamp());
+    public static function date(): \DateTimeInterface
+    {
+        return new \DateTimeImmutable("@" . self::timestamp());
     }
 }

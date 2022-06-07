@@ -17,6 +17,7 @@ import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import Heading from "@library/layout/Heading";
 import { t } from "@vanilla/i18n";
 import { useLayout } from "@dashboard/layout/layoutSettings/LayoutSettings.hooks";
+import { ILayoutDetails } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 
 interface IProps {
     id?: string;
@@ -43,7 +44,7 @@ export function AppearanceNav(props: IProps) {
     const matchingPath = findMatchingPath(urls, location.pathname);
     const matchingNavItem = flatNavItems.find(({ url }) => url === matchingPath);
 
-    const [lastHovered, setLastHovered] = React.useState("");
+    const [lastHovered, setLastHovered] = React.useState<ILayoutDetails["layoutID"] | undefined>(undefined);
     useLayout(lastHovered);
 
     if (props.asHamburger) {

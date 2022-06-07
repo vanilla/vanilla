@@ -15,25 +15,27 @@ use VanillaTests\MinimalContainerTestCase;
  *
  * @package VanillaTests\Models
  */
-class MediaSchemaTest extends MinimalContainerTestCase {
+class MediaSchemaTest extends MinimalContainerTestCase
+{
     /**
      * Provides image widths and expected display size.
      * @return array[]
      */
-    public function provideMediaRows(): array {
+    public function provideMediaRows(): array
+    {
         return [
             "Small Image" => [
-                'imageWidth' => 100,
-                'expectedDisplaySize' => "small"
+                "imageWidth" => 100,
+                "expectedDisplaySize" => "small",
             ],
             "Medium Image" => [
-                'imageWidth' => 300,
-                'expectedDisplaySize' => "medium"
+                "imageWidth" => 300,
+                "expectedDisplaySize" => "medium",
             ],
             "Large Image" => [
-                'imageWidth' => 500,
-                'expectedDisplaySize' => "large"
-            ]
+                "imageWidth" => 500,
+                "expectedDisplaySize" => "large",
+            ],
         ];
     }
 
@@ -45,7 +47,8 @@ class MediaSchemaTest extends MinimalContainerTestCase {
      * @param string $expectedDisplaySize
      * @dataProvider provideMediaRows
      */
-    public function testDisplaySize(int $imageWidth, string $expectedDisplaySize) {
+    public function testDisplaySize(int $imageWidth, string $expectedDisplaySize)
+    {
         $displaySize = VanillaMediaSchema::getDefaultDisplaySize($imageWidth);
 
         $this->assertEquals($displaySize, $expectedDisplaySize);

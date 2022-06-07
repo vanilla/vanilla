@@ -82,8 +82,8 @@ export const iconVariables = useThemeCache(() => {
     });
 
     const vanillaLogo = themeVars("vanillaLogo", {
-        width: 80,
-        height: 32.3,
+        width: 79,
+        height: 33,
         mobile: {
             width: undefined,
             height: undefined,

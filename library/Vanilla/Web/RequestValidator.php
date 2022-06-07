@@ -13,8 +13,8 @@ use Garden\Web\RequestInterface;
 /**
  * Class for validating various things about a request.
  */
-class RequestValidator {
-
+class RequestValidator
+{
     /** @var RequestInterface */
     private $request;
 
@@ -23,7 +23,8 @@ class RequestValidator {
      *
      * @param RequestInterface $request
      */
-    public function __construct(RequestInterface $request) {
+    public function __construct(RequestInterface $request)
+    {
         $this->request = $request;
     }
 
@@ -36,7 +37,8 @@ class RequestValidator {
      * @throws ClientException If the request method doesn't match.
      *
      */
-    public function blockRequestType(string $requestMethod, string $extraMessage = "") {
+    public function blockRequestType(string $requestMethod, string $extraMessage = "")
+    {
         $message = "Request method $requestMethod is not allowed.";
         if ($extraMessage !== "") {
             $message .= '\n' . $extraMessage;

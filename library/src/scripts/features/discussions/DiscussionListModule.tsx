@@ -5,10 +5,8 @@
  */
 
 import { DiscussionList } from "@library/features/discussions/DiscussionList";
-import { DiscussionListView } from "@library/features/discussions/DiscussionList.views";
 import { HomeWidgetContainer } from "@library/homeWidget/HomeWidgetContainer";
-import React, { useEffect } from "react";
-import { useSelector } from "react-redux";
+import React from "react";
 
 interface IProps extends React.ComponentProps<typeof DiscussionList> {
     title?: string;

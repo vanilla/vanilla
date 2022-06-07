@@ -12,8 +12,8 @@
 /**
  * Manages defining and examining the schema of a database table.
  */
-class Gdn_Schema {
-
+class Gdn_Schema
+{
     /**
      * @var array An associative array of TableName => Fields associative arrays that
      * describe the table's field properties. Each field is represented by an
@@ -30,8 +30,9 @@ class Gdn_Schema {
      * @param string Explicitly define the name of the table that this model represents. You can also explicitly set this value with $this->TableName.
      * @param Gdn_Database
      */
-    public function __construct($table = '', $database = null) {
-        if ($table != '') {
+    public function __construct($table = "", $database = null)
+    {
+        if ($table != "") {
             $this->fetch($table, $database);
         }
     }
@@ -44,7 +45,8 @@ class Gdn_Schema {
      * @param Gdn_Database
      * @return array
      */
-    public function fetch($table = false, $database = null) {
+    public function fetch($table = false, $database = null)
+    {
         if ($table !== false) {
             $this->CurrentTable = $table;
         }
@@ -68,7 +70,8 @@ class Gdn_Schema {
      *
      * @return array
      */
-    public function fields($tablename = false) {
+    public function fields($tablename = false)
+    {
         if (!$tablename) {
             $tablename = $this->CurrentTable;
         }
@@ -82,8 +85,9 @@ class Gdn_Schema {
      * @param string The name of the field to look for in $this->CurrentTable (or $table if it is defined).
      * @param string If this value is specified, $this->CurrentTable will be switched to $table.
      */
-    public function getField($field, $table = '') {
-        if ($table != '') {
+    public function getField($field, $table = "")
+    {
+        if ($table != "") {
             $this->CurrentTable = $table;
         }
 
@@ -107,13 +111,14 @@ class Gdn_Schema {
      * @param string The default value to return if $property is not found in $field of $table.
      * @param string If this value is specified, $this->CurrentTable will be switched to $table.
      */
-    public function getProperty($field, $property, $default = false, $table = '') {
+    public function getProperty($field, $property, $default = false, $table = "")
+    {
         $return = $default;
-        if ($table != '') {
+        if ($table != "") {
             $this->CurrentTable = $table;
         }
 
-        $properties = ['Name', 'PrimaryKey', 'Type', 'AllowNull', 'Default', 'Length', 'Enum'];
+        $properties = ["Name", "PrimaryKey", "Type", "AllowNull", "Default", "Length", "Enum"];
         if (in_array($property, $properties)) {
             $field = $this->getField($field, $this->CurrentTable);
             if ($field !== false) {
@@ -131,11 +136,13 @@ class Gdn_Schema {
      * @param string The name of the table to look for $field in.
      * @param string The name of the field to look for in $table.
      */
-    public function fieldExists($table, $field) {
-        if (array_key_exists($table, $this->_Schema)
-            && is_array($this->_Schema[$table])
-            && array_key_exists($field, $this->_Schema[$table])
-            && is_object($this->_Schema[$table][$field])
+    public function fieldExists($table, $field)
+    {
+        if (
+            array_key_exists($table, $this->_Schema) &&
+            is_array($this->_Schema[$table]) &&
+            array_key_exists($field, $this->_Schema[$table]) &&
+            is_object($this->_Schema[$table][$field])
         ) {
             return true;
         } else {
@@ -149,7 +156,8 @@ class Gdn_Schema {
      *
      * @param string The name of the table for which to find the primary key(s).
      */
-    public function primaryKey($table, $database = null) {
+    public function primaryKey($table, $database = null)
+    {
         $schema = $this->fetch($table, $database);
         $primaryKeys = [];
         foreach ($schema as $fieldName => $properties) {
@@ -159,10 +167,10 @@ class Gdn_Schema {
         }
 
         if (count($primaryKeys) == 0) {
-            return '';
-        } elseif (count($primaryKeys) == 1)
+            return "";
+        } elseif (count($primaryKeys) == 1) {
             return $primaryKeys[0];
-        else {
+        } else {
             return $primaryKeys;
         }
     }

@@ -12,8 +12,8 @@ use Vanilla\Dashboard\UserLeaderService;
 /**
  * Interface for containing Leaderboard query details.
  */
-class UserLeaderQuery {
-
+class UserLeaderQuery
+{
     /** @var string */
     public $slotType;
 

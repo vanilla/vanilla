@@ -9,8 +9,8 @@ namespace Vanilla;
 /**
  * Represent a basic UI message.
  */
-class Message {
-
+class Message
+{
     const TYPE_ALERT = "Alert";
 
     const TYPE_CASUAL = "Casual";
@@ -34,7 +34,8 @@ class Message {
      * @param string $htmlBody
      * @param string $type
      */
-    public function __construct(string $htmlBody, string $type) {
+    public function __construct(string $htmlBody, string $type)
+    {
         $this->setHtmlBody($htmlBody);
         $this->setType($type);
     }
@@ -44,10 +45,11 @@ class Message {
      *
      * @return string
      */
-    public function __toString() {
+    public function __toString()
+    {
         $classes = $this->classes;
         $classes[] = "{$this->type}Message";
-        return '<div class="' . implode(" ", $classes) . '">' . $this->htmlBody . '</div>';
+        return '<div class="' . implode(" ", $classes) . '">' . $this->htmlBody . "</div>";
     }
 
     /**
@@ -55,7 +57,8 @@ class Message {
      *
      * @param string $htmlBody
      */
-    public function setHtmlBody(string $htmlBody) {
+    public function setHtmlBody(string $htmlBody)
+    {
         $this->htmlBody = $htmlBody;
     }
 
@@ -64,11 +67,14 @@ class Message {
      *
      * @param string $type
      */
-    public function setType(string $type) {
+    public function setType(string $type)
+    {
         $validTypes = [static::TYPE_ALERT, static::TYPE_CASUAL, static::TYPE_INFORMATION, static::TYPE_WARNING];
 
         if (!in_array($type, $validTypes)) {
-            throw new \InvalidArgumentException("Invalid type: {$type}. Type must be one of the following: " . implode(", ", $validTypes));
+            throw new \InvalidArgumentException(
+                "Invalid type: {$type}. Type must be one of the following: " . implode(", ", $validTypes)
+            );
         }
 
         $this->type = $type;

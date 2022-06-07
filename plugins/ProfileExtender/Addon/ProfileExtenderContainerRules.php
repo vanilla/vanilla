@@ -16,18 +16,15 @@ use Vanilla\Web\APIExpandMiddleware;
 /**
  * Container rules for the profile extender plugin.
  */
-class ProfileExtenderContainerRules extends AddonContainerRules {
-
+class ProfileExtenderContainerRules extends AddonContainerRules
+{
     /**
      * @inheritdoc
      */
-    public function configureContainer(ContainerConfigurationInterface $container): void {
+    public function configureContainer(ContainerConfigurationInterface $container): void
+    {
         $container
             ->rule(APIExpandMiddleware::class)
-            ->addCall(
-                "addExpander",
-                [new Reference(ExtendedUsersExpander::class)]
-            )
-        ;
+            ->addCall("addExpander", [new Reference(ExtendedUsersExpander::class)]);
     }
 }

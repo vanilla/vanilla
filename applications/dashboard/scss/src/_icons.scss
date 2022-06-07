@@ -29,27 +29,27 @@
 // Styleguide 3.1.
 
 .icon {
-  &,
-  svg {
-    vertical-align: middle;
-    display: inline-block;
-    fill: currentColor;
-  }
+    &,
+    svg {
+        vertical-align: middle;
+        display: inline-block;
+        fill: currentColor;
+    }
 }
 
 @each $icon-size in map-keys($icon-sizes) {
-  .icon-#{$icon-size} {
-    &,
-    svg {
-      height: #{$icon-size}px;
-      width: #{$icon-size}px;
+    .icon-#{$icon-size} {
+        &,
+        svg {
+            height: #{$icon-size}px;
+            width: #{$icon-size}px;
+        }
     }
-  }
 }
 
 .icon-text {
-  width: $font-size-base;
-  height: $font-size-base;
-  color: $grey-dark;
-  vertical-align: middle;
+    width: $font-size-base;
+    height: $font-size-base;
+    color: $grey-dark;
+    vertical-align: middle;
 }

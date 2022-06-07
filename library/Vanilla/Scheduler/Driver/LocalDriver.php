@@ -21,8 +21,8 @@ use Vanilla\Scheduler\Job\LocalJobInterface;
  *
  * A driver that accepts jobs and process them locally on the current environment.
  */
-class LocalDriver implements DriverInterface, LoggerAwareInterface {
-
+class LocalDriver implements DriverInterface, LoggerAwareInterface
+{
     use LoggerAwareTrait;
 
     /**
@@ -30,7 +30,8 @@ class LocalDriver implements DriverInterface, LoggerAwareInterface {
      *
      * @param LoggerInterface $logger
      */
-    public function __construct(LoggerInterface $logger) {
+    public function __construct(LoggerInterface $logger)
+    {
         $this->logger = $logger;
     }
 
@@ -41,8 +42,8 @@ class LocalDriver implements DriverInterface, LoggerAwareInterface {
      * @return DriverSlipInterface
      * @throws Exception The job class '%s' doesn't implement LocalJobInterface.
      */
-    public function receive(JobInterface $job): DriverSlipInterface {
-
+    public function receive(JobInterface $job): DriverSlipInterface
+    {
         if (!$job instanceof LocalJobInterface) {
             $missingInterfaceMsg = sprintf("The job class '%s' doesn't implement LocalJobInterface.", get_class($job));
             $this->logger->error($missingInterfaceMsg);
@@ -59,8 +60,8 @@ class LocalDriver implements DriverInterface, LoggerAwareInterface {
      * @return JobExecutionStatus
      * @throws Exception The class `%s` doesn't implement LocalDriverSlip.
      */
-    public function execute(DriverSlipInterface $driverSlip): JobExecutionStatus {
-
+    public function execute(DriverSlipInterface $driverSlip): JobExecutionStatus
+    {
         if (!$driverSlip instanceof LocalDriverSlip) {
             $missingInterfaceMsg = sprintf("The class `%s` doesn't implement LocalDriverSlip.", get_class($driverSlip));
             $this->logger->error($missingInterfaceMsg);
@@ -74,9 +75,9 @@ class LocalDriver implements DriverInterface, LoggerAwareInterface {
             $msg = $t->getMessage();
             if (strpos($msg, "File: ") !== false) {
                 $msg = "Scheduler failed to execute Job";
-                $msg .= ". Message: ".$t->getMessage();
-                $msg .= ". File: ".$t->getFile();
-                $msg .= ". Line: ".$t->getLine();
+                $msg .= ". Message: " . $t->getMessage();
+                $msg .= ". File: " . $t->getFile();
+                $msg .= ". Line: " . $t->getLine();
             }
 
             trigger_error($msg, E_USER_WARNING);
@@ -89,9 +90,8 @@ class LocalDriver implements DriverInterface, LoggerAwareInterface {
     /**
      * @return array
      */
-    public function getSupportedInterfaces(): array {
-        return [
-            LocalJobInterface::class,
-        ];
+    public function getSupportedInterfaces(): array
+    {
+        return [LocalJobInterface::class];
     }
 }

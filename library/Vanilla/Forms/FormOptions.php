@@ -11,8 +11,8 @@ namespace Vanilla\Forms;
  *
  * @package Vanilla\Forms
  */
-class FormOptions {
-
+class FormOptions
+{
     /** @var string */
     private $description;
 
@@ -29,11 +29,8 @@ class FormOptions {
      * @param string $label
      * @param string $placeholder
      */
-    public function __construct(
-        string $label = '',
-        string $description = '',
-        string $placeholder = ''
-    ) {
+    public function __construct(string $label = "", string $description = "", string $placeholder = "")
+    {
         $this->description = $description;
         $this->label = $label;
         $this->placeholder = $placeholder;
@@ -44,7 +41,8 @@ class FormOptions {
      *
      * @return string
      */
-    public function getDescription(): string {
+    public function getDescription(): string
+    {
         return $this->description;
     }
 
@@ -53,7 +51,8 @@ class FormOptions {
      *
      * @return string
      */
-    public function getLabel(): string {
+    public function getLabel(): string
+    {
         return $this->label;
     }
 
@@ -62,7 +61,8 @@ class FormOptions {
      *
      * @return string
      */
-    public function getPlaceHolder(): string {
+    public function getPlaceHolder(): string
+    {
         return $this->placeholder;
     }
 }

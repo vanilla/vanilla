@@ -21,8 +21,11 @@ use Vanilla\Widgets\React\SectionAwareInterface;
 /**
  * Class TagWidget
  */
-class TagWidget extends AbstractReactModule implements ReactWidgetInterface, CombinedPropsWidgetInterface, SectionAwareInterface {
-
+class TagWidget extends AbstractReactModule implements
+    ReactWidgetInterface,
+    CombinedPropsWidgetInterface,
+    SectionAwareInterface
+{
     use CombinedPropsWidgetTrait, HomeWidgetContainerSchemaTrait;
 
     /** @var \TagsApiController */
@@ -33,7 +36,8 @@ class TagWidget extends AbstractReactModule implements ReactWidgetInterface, Com
      *
      * @param \TagsApiController $apiClient
      */
-    public function __construct(\TagsApiController $apiClient) {
+    public function __construct(\TagsApiController $apiClient)
+    {
         $this->apiClient = $apiClient;
         parent::__construct();
     }
@@ -41,39 +45,41 @@ class TagWidget extends AbstractReactModule implements ReactWidgetInterface, Com
     /**
      * @inheridoc
      */
-    public static function getWidgetName(): string {
+    public static function getWidgetName(): string
+    {
         return "Tag Cloud";
     }
 
     /**
      * @inheridoc
      */
-    public static function getWidgetID(): string {
+    public static function getWidgetID(): string
+    {
         return "tag";
     }
 
     /**
      * @inheridoc
      */
-    public static function getComponentName(): string {
+    public static function getComponentName(): string
+    {
         return "TagWidget";
     }
 
     /**
      * @return string
      */
-    public static function getWidgetIconPath(): string {
-        return"/applications/dashboard/design/images/widgetIcons/tagcloud.svg";
+    public static function getWidgetIconPath(): string
+    {
+        return "/applications/dashboard/design/images/widgetIcons/tagcloud.svg";
     }
 
     /**
      * @return array
      */
-    public static function getRecommendedSectionIDs(): array {
-        return [
-            SectionTwoColumns::getWidgetID(),
-            SectionThreeColumns::getWidgetID(),
-        ];
+    public static function getRecommendedSectionIDs(): array
+    {
+        return [SectionTwoColumns::getWidgetID(), SectionThreeColumns::getWidgetID()];
     }
 
     /**
@@ -81,7 +87,8 @@ class TagWidget extends AbstractReactModule implements ReactWidgetInterface, Com
      *
      * @return Schema
      */
-    private static function getItemSchema(): Schema {
+    private static function getItemSchema(): Schema
+    {
         return Schema::parse([
             "itemOptions?" => [
                 "description" => "Configure various item options",
@@ -89,26 +96,30 @@ class TagWidget extends AbstractReactModule implements ReactWidgetInterface, Com
                 "properties" => [
                     "tagPreset:s" => [
                         "description" => "Collections of styles predefined for tags.",
-                        "enum" => ["STANDARD", "PRIMARY", "GREYSCALE", "COLORED"]
-                    ]
-                ]
-            ]
+                        "enum" => ["STANDARD", "PRIMARY", "GREYSCALE", "COLORED"],
+                    ],
+                ],
+            ],
         ]);
     }
 
     /**
      * @inheridoc
      */
-    public static function getWidgetSchema(): Schema {
+    public static function getWidgetSchema(): Schema
+    {
         $schema = SchemaUtils::composeSchemas(
             self::widgetTitleSchema(),
             self::widgetSubtitleSchema("subtitle"),
             self::widgetDescriptionSchema(),
+            \TagModule::getWidgetSchema(),
             self::containerOptionsSchema("containerOptions", [
-                'outerBackground?', 'innerBackground?', 'borderType?', 'headerAlignment?'
-                ]),
-            self::getItemSchema(),
-            \TagModule::getWidgetSchema()
+                "outerBackground?",
+                "innerBackground?",
+                "borderType?",
+                "headerAlignment?",
+            ]),
+            self::getItemSchema()
         );
         return $schema;
     }
@@ -116,7 +127,8 @@ class TagWidget extends AbstractReactModule implements ReactWidgetInterface, Com
     /**
      * @inheridoc
      */
-    public function getProps(): ?array {
+    public function getProps(): ?array
+    {
         $tags = $this->apiClient->index(["sort" => "countDiscussions"]);
 
         if (count($tags) === 0) {
@@ -124,7 +136,7 @@ class TagWidget extends AbstractReactModule implements ReactWidgetInterface, Com
         }
 
         return array_merge($this->props, [
-            "tags" => $tags
+            "tags" => $tags,
         ]);
     }
 }

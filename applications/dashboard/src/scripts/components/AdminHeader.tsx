@@ -159,5 +159,5 @@ function getNavItemsTree(items): INavigationTreeItem[] {
 }
 
 function getChildlessSections(sections: IDashboardSection[]): IDashboardSection[] {
-    return (sections.map((section) => ({ ...section, children: [] })) as unknown) as IDashboardSection[];
+    return sections.map((section) => ({ ...section, children: [] })) as unknown as IDashboardSection[];
 }

@@ -16,15 +16,16 @@ use Vanilla\Scheduler\Job\JobInterface;
  *
  * I look like a Driver, but not implementing the DriverInterface
  */
-class NonCompliantDriver {
-
+class NonCompliantDriver
+{
     /**
      * Receive a job.
      *
      * @param JobInterface $job
      * @return DriverSlipInterface
      */
-    public function receive(JobInterface $job): DriverSlipInterface {
+    public function receive(JobInterface $job): DriverSlipInterface
+    {
     }
 
     /**
@@ -33,6 +34,7 @@ class NonCompliantDriver {
      * @param DriverSlipInterface $driverSlip
      * @return JobExecutionStatus
      */
-    public function execute(DriverSlipInterface $driverSlip): JobExecutionStatus {
+    public function execute(DriverSlipInterface $driverSlip): JobExecutionStatus
+    {
     }
 }

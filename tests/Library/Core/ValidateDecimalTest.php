@@ -13,8 +13,8 @@ use PHPUnit\Framework\TestCase;
  * Tests for validateDecimal().
  */
 
-class ValidateDecimalTest extends TestCase {
-
+class ValidateDecimalTest extends TestCase
+{
     /**
      * Tests {@link validateDecimal()} against several scenarios.
      *
@@ -23,7 +23,8 @@ class ValidateDecimalTest extends TestCase {
      * @param bool $expected The expected result.
      * @dataProvider provideTestValidateDecimalArrays
      */
-    public function testValidateDecimal($testValue, $testField, $expected) {
+    public function testValidateDecimal($testValue, $testField, $expected)
+    {
         time();
         $actual = validateDecimal($testValue, $testField);
         $this->assertSame($expected, $actual);
@@ -34,28 +35,13 @@ class ValidateDecimalTest extends TestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideTestValidateDecimalArrays() {
+    public function provideTestValidateDecimalArrays()
+    {
         $r = [
-            'integerValue' => [
-                4,
-                ['number' => ''],
-                true,
-            ],
-            'stringNumber' => [
-                '4',
-                ['number'],
-                true,
-            ],
-            'stringText' => [
-                'NaN',
-                ['number'],
-                false,
-            ],
-            'bool' => [
-                true,
-                ['number'],
-                false,
-            ],
+            "integerValue" => [4, ["number" => ""], true],
+            "stringNumber" => ["4", ["number"], true],
+            "stringText" => ["NaN", ["number"], false],
+            "bool" => [true, ["number"], false],
         ];
 
         return $r;
@@ -64,7 +50,8 @@ class ValidateDecimalTest extends TestCase {
     /**
      * Test validateDecimal() with an object.
      */
-    public function testValidateDecimalWithObject() {
+    public function testValidateDecimalWithObject()
+    {
         $testObject = new \stdClass();
         $testObject->AllowNull = true;
         $actual = validateDecimal(null, $testObject);

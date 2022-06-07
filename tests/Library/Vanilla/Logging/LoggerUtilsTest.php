@@ -13,15 +13,16 @@ use Vanilla\Logging\LoggerUtils;
 /**
  * Tests for the `LoggerUtils` class.
  */
-class LoggerUtilsTest extends TestCase {
-
+class LoggerUtilsTest extends TestCase
+{
     /**
      * A basic nested toest for `LoggerUtils::stringinfyDates()`.
      */
-    public function testStringifyDates(): void {
-        $dt = new \DateTimeImmutable('2020-05-24');
+    public function testStringifyDates(): void
+    {
+        $dt = new \DateTimeImmutable("2020-05-24");
         $str = $dt->format(\DateTime::ATOM);
 
-        $this->assertSame(['a' => ['b' => $str]], LoggerUtils::stringifyDates(['a' => ['b' => $dt]]));
+        $this->assertSame(["a" => ["b" => $str]], LoggerUtils::stringifyDates(["a" => ["b" => $dt]]));
     }
 }

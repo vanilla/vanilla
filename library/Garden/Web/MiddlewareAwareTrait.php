@@ -10,7 +10,8 @@ namespace Garden\Web;
 /**
  * Allows classes to add and execute middleware when transforming requests into responses.
  */
-trait MiddlewareAwareTrait {
+trait MiddlewareAwareTrait
+{
     /**
      * @var callable The middleware stack. This property must be initialized to the inner function that performs the main operation.
      */
@@ -30,7 +31,8 @@ trait MiddlewareAwareTrait {
      * @param callable $middleware The middleware to add.
      * @return $this
      */
-    public function addMiddleware(callable $middleware) {
+    public function addMiddleware(callable $middleware)
+    {
         if ($this->middleware === null) {
             throw new \RuntimeException("Cannot add middleware before the inner middleware is initialized.", 500);
         }
@@ -39,7 +41,7 @@ trait MiddlewareAwareTrait {
         $this->middleware = function (RequestInterface $request) use ($middleware, $next): Data {
             $response = $middleware($request, $next);
             if (!$response instanceof Data) {
-                throw new \BadFunctionCallException('Middleware must return a '.Data::class.' object.', 500);
+                throw new \BadFunctionCallException("Middleware must return a " . Data::class . " object.", 500);
             }
             return $response;
         };
@@ -53,7 +55,8 @@ trait MiddlewareAwareTrait {
      * @param RequestInterface $request The request to process.
      * @return Data The response.
      */
-    public function callMiddleware(RequestInterface $request): Data {
+    public function callMiddleware(RequestInterface $request): Data
+    {
         if ($this->middleware === null) {
             throw new \RuntimeException("Cannot call middleware before the inner middleware is initialized.", 500);
         }

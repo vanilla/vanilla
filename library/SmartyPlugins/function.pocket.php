@@ -15,15 +15,16 @@
  * @param Smarty $smarty The smarty object rendering the template.
  * @return string The pocket string.
  */
-function smarty_function_pocket($params, $smarty) {
-    if (!class_exists('PocketsPlugin')) {
-        return '';
+function smarty_function_pocket($params, $smarty)
+{
+    if (!class_exists("PocketsPlugin")) {
+        return "";
     }
 
-    $name = val('name', $params);
-    unset($params['name']);
+    $name = val("name", $params);
+    unset($params["name"]);
 
     $result = PocketsPlugin::pocketString($name, $params);
 
-	return $result;
+    return $result;
 }

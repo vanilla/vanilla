@@ -12,8 +12,8 @@
 /**
  * Handles relating external actions to comments and discussions. Flagging, Praising, Reporting, etc.
  */
-class Gdn_RegardingEntity extends Gdn_Pluggable {
-
+class Gdn_RegardingEntity extends Gdn_Pluggable
+{
     private $Type = null;
 
     private $ForeignType = null;
@@ -46,7 +46,8 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
      * @param $foreignType
      * @param $foreignID
      */
-    public function __construct($foreignType, $foreignID) {
+    public function __construct($foreignType, $foreignID)
+    {
         $this->ForeignType = strtolower($foreignType);
         $this->ForeignID = $foreignID;
         parent::__construct();
@@ -58,7 +59,8 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
      * @param null $sourceElement
      * @return $this|null
      */
-    public function verifiedAs($sourceElement = null) {
+    public function verifiedAs($sourceElement = null)
+    {
         if (is_null($sourceElement)) {
             return $this->SourceElement;
         } else {
@@ -66,19 +68,19 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
         }
 
         switch ($this->ForeignType) {
-            case 'discussion':
+            case "discussion":
                 $oCField = "Body";
                 break;
 
-            case 'comment':
+            case "comment":
                 $oCField = "Body";
                 break;
 
-            case 'conversation':
+            case "conversation":
                 $oCField = null;
                 break;
 
-            case 'conversationmessage':
+            case "conversationmessage":
                 $oCField = "Body";
                 break;
 
@@ -102,10 +104,11 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
      * @return $this
      * @throws Exception
      */
-    public function autoParent($parentType, $parentIDKey = null) {
+    public function autoParent($parentType, $parentIDKey = null)
+    {
         if (!is_null($this->SourceElement)) {
             if (is_null($parentIDKey)) {
-                $parentIDKey = ucfirst($parentType).'ID';
+                $parentIDKey = ucfirst($parentType) . "ID";
             }
             $parentID = val($parentIDKey, $this->SourceElement, false);
             if ($parentID !== false) {
@@ -124,15 +127,22 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
      * @return $this
      * @throws Exception
      */
-    public function withParent($parentType, $parentID) {
-        $modelName = ucfirst($parentType).'Model';
+    public function withParent($parentType, $parentID)
+    {
+        $modelName = ucfirst($parentType) . "Model";
 
         if (!class_exists($modelName)) {
-            throw new Exception(sprintf(t("Could not find a model for %s objects (parent type for %s objects)."), ucfirst($parentType), ucfirst($this->ForeignType)));
+            throw new Exception(
+                sprintf(
+                    t("Could not find a model for %s objects (parent type for %s objects)."),
+                    ucfirst($parentType),
+                    ucfirst($this->ForeignType)
+                )
+            );
         }
 
         // If we can lookup this object, it is verified
-        $verifyModel = new $modelName;
+        $verifyModel = new $modelName();
         $parentElement = $verifyModel->getID($parentID);
 
         if ($parentElement !== false) {
@@ -152,7 +162,8 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
      * @param $actionType
      * @return $this
      */
-    public function actionIt($actionType) {
+    public function actionIt($actionType)
+    {
         $this->Type = strtolower($actionType);
         return $this;
     }
@@ -165,8 +176,9 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
      * @param $inCategory
      * @return Gdn_RegardingEntity
      */
-    public function forDiscussion($inCategory) {
-        return $this->forCollaboration('discussion', $inCategory);
+    public function forDiscussion($inCategory)
+    {
+        return $this->forCollaboration("discussion", $inCategory);
     }
 
     /**
@@ -175,8 +187,9 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
      * @param $withUsers
      * @return Gdn_RegardingEntity
      */
-    public function forConversation($withUsers) {
-        return $this->forCollaboration('conversation', $withUsers);
+    public function forConversation($withUsers)
+    {
+        return $this->forCollaboration("conversation", $withUsers);
     }
 
     /**
@@ -186,11 +199,12 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
      * @param null $collaborationParameters
      * @return $this
      */
-    public function forCollaboration($collaborationType, $collaborationParameters = null) {
+    public function forCollaboration($collaborationType, $collaborationParameters = null)
+    {
         if ($collaborationType !== false) {
             $this->CollaborativeActions[] = [
-                'Type' => $collaborationType,
-                'Parameters' => $collaborationParameters
+                "Type" => $collaborationType,
+                "Parameters" => $collaborationParameters,
             ];
         }
         return $this;
@@ -202,41 +216,42 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
      * @param $collaborativeTitle
      * @return $this
      */
-    public function entitled($collaborativeTitle) {
+    public function entitled($collaborativeTitle)
+    {
         $this->CollaborativeTitle = $collaborativeTitle;
 
         // Figure out how much space we have for the title
         $maxLength = 90;
         $stripped = formatString($collaborativeTitle, [
-            'RegardingTitle' => ''
+            "RegardingTitle" => "",
         ]);
         $usedLength = strlen($stripped);
         $availableLength = $maxLength - $usedLength;
 
         // Check if the SourceElement contains a 'Name'
-        $name = val('Name', $this->SourceElement, false);
+        $name = val("Name", $this->SourceElement, false);
 
         // If not...
         if ($name === false) {
             // ...and we have a parent element...
             if (!is_null($this->ParentElement)) {
                 // ...try to get a 'Name' from the parent
-                $name = val('Name', $this->ParentElement, false);
+                $name = val("Name", $this->ParentElement, false);
             }
         }
 
         // If all that failed, use the 'Body' of the source
         if ($name === false) {
-            $name = val('Body', $this->SourceElement, '');
+            $name = val("Body", $this->SourceElement, "");
         }
 
         // Trim it if it is too long
         if (strlen($name) > $availableLength) {
-            $name = substr($name, 0, $availableLength - 3).'...';
+            $name = substr($name, 0, $availableLength - 3) . "...";
         }
 
         $collaborativeTitle = formatString($collaborativeTitle, [
-            'RegardingTitle' => $name
+            "RegardingTitle" => $name,
         ]);
 
         $this->CollaborativeTitle = $collaborativeTitle;
@@ -251,24 +266,25 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
      * @param $uRL
      * @return $this
      */
-    public function located($uRL) {
+    public function located($uRL)
+    {
         // Try to auto generate URL from known information
         if ($uRL === true) {
             switch ($this->ForeignType) {
-                case 'discussion':
-                    $uRL = sprintf('discussion/%d', $this->ForeignID);
+                case "discussion":
+                    $uRL = sprintf("discussion/%d", $this->ForeignID);
                     break;
 
-                case 'comment':
-                    $uRL = sprintf('discussion/comment/%d', $this->ForeignID);
+                case "comment":
+                    $uRL = sprintf("discussion/comment/%d", $this->ForeignID);
                     break;
 
-                case 'conversation':
-                    $uRL = sprintf('messages/%d', $this->ForeignID);
+                case "conversation":
+                    $uRL = sprintf("messages/%d", $this->ForeignID);
                     break;
 
-                case 'conversationmessage':
-                    $uRL = sprintf('messages/%d', $this->ParentID);
+                case "conversationmessage":
+                    $uRL = sprintf("messages/%d", $this->ParentID);
                     break;
 
                 default:
@@ -288,7 +304,8 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
      * @param $userID
      * @return $this
      */
-    public function from($userID) {
+    public function from($userID)
+    {
         $this->UserID = $userID;
         return $this;
     }
@@ -299,7 +316,8 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
      * @param $reason
      * @return $this
      */
-    public function because($reason) {
+    public function because($reason)
+    {
         $this->Comment = $reason;
         return $this;
     }
@@ -313,7 +331,8 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
      * @throws Exception
      * @throws Gdn_UserException
      */
-    public function commit() {
+    public function commit()
+    {
         if (is_null($this->Type)) {
             throw new Exception(t("Adding a Regarding event requires a type."));
         }
@@ -336,31 +355,31 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
 
         $regardingModel = new RegardingModel();
 
-        $collapseMode = c('Garden.Regarding.AutoCollapse', true);
+        $collapseMode = c("Garden.Regarding.AutoCollapse", true);
         $collapse = false;
         if ($collapseMode) {
             // Check for an existing report of this type
             $existingRegardingEntity = $regardingModel->getRelated($this->Type, $this->ForeignType, $this->ForeignID);
             if ($existingRegardingEntity) {
                 $collapse = true;
-                $regardingID = val('RegardingID', $existingRegardingEntity);
+                $regardingID = val("RegardingID", $existingRegardingEntity);
             }
         }
 
         if (!$collapse) {
             // Create a new Regarding entry
             $regardingPreSend = [
-                'Type' => $this->Type,
-                'ForeignType' => $this->ForeignType,
-                'ForeignID' => $this->ForeignID,
-                'InsertUserID' => $this->UserID,
-                'DateInserted' => date('Y-m-d H:i:s'),
-                'ParentType' => $this->ParentType,
-                'ParentID' => $this->ParentID,
-                'ForeignURL' => $this->ForeignURL,
-                'Comment' => $this->Comment,
-                'OriginalContent' => $this->OriginalContent,
-                'Reports' => 1
+                "Type" => $this->Type,
+                "ForeignType" => $this->ForeignType,
+                "ForeignID" => $this->ForeignID,
+                "InsertUserID" => $this->UserID,
+                "DateInserted" => date("Y-m-d H:i:s"),
+                "ParentType" => $this->ParentType,
+                "ParentID" => $this->ParentID,
+                "ForeignURL" => $this->ForeignURL,
+                "Comment" => $this->Comment,
+                "OriginalContent" => $this->OriginalContent,
+                "Reports" => 1,
             ];
 
             $regardingID = $regardingModel->save($regardingPreSend);
@@ -378,30 +397,31 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
         }
 
         foreach ($this->CollaborativeActions as $action) {
-            $actionType = val('Type', $action);
+            $actionType = val("Type", $action);
             switch ($actionType) {
-                case 'discussion':
+                case "discussion":
                     $discussionModel = new DiscussionModel();
                     if ($collapse) {
                         $discussion = Gdn::sql()
-                            ->select('*')
-                            ->from('Discussion')
-                            ->where(['RegardingID' => $regardingID])
-                            ->get()->firstRow(DATASET_TYPE_ARRAY);
+                            ->select("*")
+                            ->from("Discussion")
+                            ->where(["RegardingID" => $regardingID])
+                            ->get()
+                            ->firstRow(DATASET_TYPE_ARRAY);
                     }
 
                     if (!$collapse || !$discussion) {
-                        $categoryID = val('Parameters', $action);
+                        $categoryID = val("Parameters", $action);
 
                         // Make a new discussion
                         $discussionID = $discussionModel->save([
-                            'Name' => $this->CollaborativeTitle,
-                            'CategoryID' => $categoryID,
-                            'Body' => $this->OriginalContent,
-                            'InsertUserID' => val('InsertUserID', $this->SourceElement),
-                            'Announce' => 0,
-                            'Close' => 0,
-                            'RegardingID' => $regardingID
+                            "Name" => $this->CollaborativeTitle,
+                            "CategoryID" => $categoryID,
+                            "Body" => $this->OriginalContent,
+                            "InsertUserID" => val("InsertUserID", $this->SourceElement),
+                            "Announce" => 0,
+                            "Close" => 0,
+                            "RegardingID" => $regardingID,
                         ]);
 
                         if (!$discussionID) {
@@ -413,9 +433,9 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
                         // Add a comment to the existing discussion.
                         $commentModel = new CommentModel();
                         $commentID = $commentModel->save([
-                            'DiscussionID' => val('DiscussionID', $discussion),
-                            'Body' => $this->Comment,
-                            'InsertUserID' => $this->UserID
+                            "DiscussionID" => val("DiscussionID", $discussion),
+                            "Body" => $this->Comment,
+                            "InsertUserID" => $this->UserID,
                         ]);
 
                         $commentModel->save2($commentID, true);
@@ -423,23 +443,33 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
 
                     break;
 
-                case 'conversation':
-
+                case "conversation":
                     $conversationModel = new ConversationModel();
                     $conversationMessageModel = new ConversationMessageModel();
 
-                    $users = val('Parameters', $action);
-                    $userList = explode(',', $users);
+                    $users = val("Parameters", $action);
+                    $userList = explode(",", $users);
                     if (!sizeof($userList)) {
-                        throw new Exception(sprintf(t("The userlist provided for collaboration on '%s:%s' is invalid.", $this->Type, $this->ForeignType)));
+                        throw new Exception(
+                            sprintf(
+                                t(
+                                    "The userlist provided for collaboration on '%s:%s' is invalid.",
+                                    $this->Type,
+                                    $this->ForeignType
+                                )
+                            )
+                        );
                     }
 
-                    $conversationID = $conversationModel->save([
-                        'To' => 'Admins',
-                        'Body' => $this->CollaborativeTitle,
-                        'RecipientUserID' => $userList,
-                        'RegardingID' => $regardingID
-                    ], $conversationMessageModel);
+                    $conversationID = $conversationModel->save(
+                        [
+                            "To" => "Admins",
+                            "Body" => $this->CollaborativeTitle,
+                            "RecipientUserID" => $userList,
+                            "RegardingID" => $regardingID,
+                        ],
+                        $conversationMessageModel
+                    );
 
                     break;
             }
@@ -451,6 +481,7 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
     /**
      * No setup.
      */
-    public function setup() {
+    public function setup()
+    {
     }
 }

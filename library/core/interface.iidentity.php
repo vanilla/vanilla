@@ -11,8 +11,8 @@
 /**
  * Interface Gdn_IIdentity
  */
-interface Gdn_IIdentity {
-
+interface Gdn_IIdentity
+{
     /**
      * Return the unique id assigned to a user in the database.
      *

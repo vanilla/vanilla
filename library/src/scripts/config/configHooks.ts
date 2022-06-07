@@ -14,11 +14,13 @@ import { bindActionCreators } from "@reduxjs/toolkit";
 import { useUniqueID } from "@library/utility/idUtils";
 import { IComboBoxOption } from "@library/features/search/ISearchBarProps";
 import { IAddon, ILocale } from "@dashboard/languages/LanguageSettingsTypes";
+import { useConfigDispatch } from "@library/config/configReducer";
+import { patchConfigThunk } from "@library/config/configActions";
 
 const LOCALE_KEY = "garden.locale";
 
 export function useConfigActions() {
-    const dispatch = useDispatch();
+    const dispatch = useConfigDispatch();
     return useMemo(() => {
         return bindActionCreators(ConfigActions, dispatch);
     }, [dispatch]);
@@ -59,11 +61,12 @@ export function useConfigPatcher<T extends ConfigValues = ConfigValues>() {
 
     const errorByID = useSelector((state: ICoreStoreState) => state.config.configPatchesByID[watchID]);
 
-    const actions = useConfigActions();
+    const dispatch = useConfigDispatch();
 
     const patchConfig = useCallback(
         async (values: T) => {
-            return actions.patchConfigThunk({ values, watchID });
+            const act = dispatch(patchConfigThunk({ values, watchID }));
+            return await act.unwrap();
         },
         [watchID],
     );

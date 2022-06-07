@@ -18,12 +18,11 @@ import { UserCardMinimal, UserCardSkeleton, UserCardView } from "@library/featur
 import { useUniqueID } from "@library/utility/idUtils";
 import Popover, { positionDefault } from "@reach/popover";
 import { t } from "@vanilla/i18n";
-import { useFocusWatcher } from "@vanilla/react-utils";
+import { StackingContextProvider, useFocusWatcher } from "@vanilla/react-utils";
 import React, { useCallback, useRef, useState } from "react";
 import { UserCardError } from "@library/features/userCard/UserCard.views";
 import { hasPermission } from "@library/features/users/Permission";
 import { getMeta } from "@library/utility/appUtils";
-import { StackingContextProvider } from "@library/modal/StackingContext";
 
 interface IProps {
     /** UserID of the user being loaded. */

@@ -10,6 +10,6 @@ namespace Vanilla\Dashboard\Events;
 /**
  * Event for defining a status related to a discussion
  */
-class DiscussionStatusDefinitionEvent extends RecordStatusDefinitionEvent {
-
+class DiscussionStatusDefinitionEvent extends RecordStatusDefinitionEvent
+{
 }

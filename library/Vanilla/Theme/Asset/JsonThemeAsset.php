@@ -11,10 +11,10 @@ use Vanilla\Theme\ThemeAssetFactory;
 use Vanilla\Utility\ArrayUtils;
 
 /**
-  * JSON theme asset.
-  */
-class JsonThemeAsset extends ThemeAsset {
-
+ * JSON theme asset.
+ */
+class JsonThemeAsset extends ThemeAsset
+{
     /** @var string JSON content of this asset. */
     protected $jsonString;
 
@@ -29,8 +29,9 @@ class JsonThemeAsset extends ThemeAsset {
      *
      * IF YOU HAVE TO CHANGE THIS DON'T FORGET NeonThemeAsset::__sleep().
      */
-    public function __sleep() {
-        return ['jsonString', 'data'];
+    public function __sleep()
+    {
+        return ["jsonString", "data"];
     }
 
     /**
@@ -39,11 +40,12 @@ class JsonThemeAsset extends ThemeAsset {
      * @param string $data
      * @param string $url
      */
-    public function __construct(string $data, string $url) {
+    public function __construct(string $data, string $url)
+    {
         $this->url = $url;
         $decoded = json_decode($data, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            $this->error = new ClientException('Error decoding JSON', 400, ['description' => json_last_error_msg()]);
+            $this->error = new ClientException("Error decoding JSON", 400, ["description" => json_last_error_msg()]);
             // It's a bad asset.
             // Replace the asset with some json containing the error message.
             $this->data = [
@@ -65,8 +67,9 @@ class JsonThemeAsset extends ThemeAsset {
      *
      * @return mixed
      */
-    protected function preservedOutputDecode(string $jsonIn) {
-        if (trim($jsonIn) === '[]') {
+    protected function preservedOutputDecode(string $jsonIn)
+    {
+        if (trim($jsonIn) === "[]") {
             return [];
         } else {
             $decoded = json_decode($jsonIn, true);
@@ -80,7 +83,8 @@ class JsonThemeAsset extends ThemeAsset {
      * @param mixed $input
      * @return mixed
      */
-    protected function fixEmptyArraysToObjects($input) {
+    protected function fixEmptyArraysToObjects($input)
+    {
         if (is_array($input) && empty($input)) {
             return new \stdClass();
         }
@@ -99,10 +103,11 @@ class JsonThemeAsset extends ThemeAsset {
     /**
      * The JSON asset must be an array.
      */
-    protected function ensureArray() {
+    protected function ensureArray()
+    {
         if (!is_array($this->data) && !is_object($this->data)) {
-            $this->data = [ 'value' => $this->data ];
-            $this->error = new ClientException('JSON asset must be an object or array.');
+            $this->data = ["value" => $this->data];
+            $this->error = new ClientException("JSON asset must be an object or array.");
             $this->jsonString = json_encode($this->data);
         }
     }
@@ -110,21 +115,24 @@ class JsonThemeAsset extends ThemeAsset {
     /**
      * @inheritdoc
      */
-    public function getDefaultType(): string {
+    public function getDefaultType(): string
+    {
         return ThemeAssetFactory::ASSET_TYPE_JSON;
     }
 
     /**
      * @inheritdoc
      */
-    public function getContentType(): string {
+    public function getContentType(): string
+    {
         return "application/json";
     }
 
     /**
      * @inheritdoc
      */
-    public function getValue() {
+    public function getValue()
+    {
         return json_decode($this->jsonString, true);
     }
 
@@ -133,15 +141,16 @@ class JsonThemeAsset extends ThemeAsset {
      *
      * @inheritdoc
      */
-    public function jsonSerialize() {
+    public function jsonSerialize()
+    {
         $result = [
-            'url' => $this->getUrl(),
-            'type' => $this->getDefaultType(),
-            'content-type' => $this->getContentType(),
+            "url" => $this->getUrl(),
+            "type" => $this->getDefaultType(),
+            "content-type" => $this->getContentType(),
         ];
 
         if ($this->includeValueInJson) {
-            $result['data'] = json_decode($this->jsonString);
+            $result["data"] = json_decode($this->jsonString);
         }
 
         return $result;
@@ -150,7 +159,8 @@ class JsonThemeAsset extends ThemeAsset {
     /**
      * @inheritdoc
      */
-    public function validate(): void {
+    public function validate(): void
+    {
         if ($this->error) {
             throw $this->error;
         }
@@ -159,7 +169,8 @@ class JsonThemeAsset extends ThemeAsset {
     /**
      * @inheritdoc
      */
-    public function __toString(): string {
+    public function __toString(): string
+    {
         return $this->jsonString;
     }
 
@@ -170,14 +181,16 @@ class JsonThemeAsset extends ThemeAsset {
      * @param mixed $default The default value.
      * @return mixed
      */
-    public function get(string $key, $default) {
+    public function get(string $key, $default)
+    {
         return valr($key, $this->data, $default);
     }
 
     /**
      * @return bool
      */
-    public function canMerge(): bool {
+    public function canMerge(): bool
+    {
         return true;
     }
 }

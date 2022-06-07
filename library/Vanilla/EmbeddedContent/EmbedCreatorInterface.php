@@ -9,7 +9,8 @@ namespace Vanilla\EmbeddedContent;
 /**
  * Interface for a class that generates embeds.
  */
-interface EmbedCreatorInterface {
+interface EmbedCreatorInterface
+{
     /**
      * Creates an embed from a given URL.
      * This is a potentially very slow/expensive operation.

@@ -48,8 +48,11 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
     const shadow = shadowHelper();
     const classesInputBlock = inputBlockClasses();
     const vars = searchBarVariables();
-    const { compact = vars.options.compact, borderRadius = vars.border.radius, preset = vars.options.preset } =
-        overwrites || {};
+    const {
+        compact = vars.options.compact,
+        borderRadius = vars.border.radius,
+        preset = vars.options.preset,
+    } = overwrites || {};
     const globalVars = globalVariables();
     const metasVars = metasVariables();
     const layoutVars = oneColumnVariables();

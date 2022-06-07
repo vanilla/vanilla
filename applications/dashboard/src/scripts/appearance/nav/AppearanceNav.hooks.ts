@@ -21,7 +21,7 @@ import isEmpty from "lodash/isEmpty";
 import { LayoutViewType, LAYOUT_VIEW_TYPES } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { registeredAppearanceNavItems } from "@dashboard/appearance/navigationItems";
 
-const CUSTOM_LAYOUTS_CONFIG_KEY = "labs.customLayouts";
+export const CUSTOM_LAYOUTS_CONFIG_KEY = "labs.layoutEditor";
 
 function makeTreeChildren(layouts: ILayoutDetails[], recordID: RecordID) {
     return (

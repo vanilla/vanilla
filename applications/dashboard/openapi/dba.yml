@@ -1,0 +1,42 @@
+openapi: 3.0.2
+info:
+    description: API to recalculate counts.
+    title: Vanilla API
+    version: "2.0"
+servers:
+    - url: /api/v2
+paths:
+    /dba/counts:
+        x-hidden: true
+        patch:
+            summary: Recalculate counts for specific tables.
+            tags:
+                - Recalculate Counts
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                tables:
+                                    description: The table that needs the counts or functional fields updated.
+                                    type: array
+                                    items:
+                                        type: string
+                                        required:
+                                            - tables
+            responses:
+                "200":
+                    description: Success
+                "202":
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/TrackingSlipResponse"
+                "403":
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/PermissionError"
+                "408":
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/LongRunnerResponse"
+                "400":
+                    description: Bad Request
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "../../dashboard/openapi/responses.yml#/components/schemas/BasicError"

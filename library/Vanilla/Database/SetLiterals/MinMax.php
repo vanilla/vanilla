@@ -10,9 +10,10 @@ namespace Vanilla\Database\SetLiterals;
 /**
  * Represents a set value that will perform an inline min/max expression.
  */
-class MinMax extends SetLiteral {
-    public const OP_MIN = 'min';
-    public const OP_MAX = 'max';
+class MinMax extends SetLiteral
+{
+    public const OP_MIN = "min";
+    public const OP_MAX = "max";
 
     /**
      * @var string
@@ -30,7 +31,8 @@ class MinMax extends SetLiteral {
      * @param string $op
      * @param mixed $value
      */
-    public function __construct(string $op, $value) {
+    public function __construct(string $op, $value)
+    {
         if (!in_array($op, [self::OP_MIN, self::OP_MAX], true)) {
             throw new \InvalidArgumentException("Operator must be one of: min, max.", 400);
         }
@@ -41,9 +43,10 @@ class MinMax extends SetLiteral {
     /**
      * {@inheritDoc}
      */
-    public function toSql(\Gdn_SQLDriver $sql, string $escapedFieldName): string {
+    public function toSql(\Gdn_SQLDriver $sql, string $escapedFieldName): string
+    {
         $quoted = $sql->quote($this->value);
-        $op = $this->op === self::OP_MIN ? '<' : '>';
+        $op = $this->op === self::OP_MIN ? "<" : ">";
 
         $sql = "case when $escapedFieldName is null or $quoted $op $escapedFieldName then $quoted else $escapedFieldName end";
         return $sql;
@@ -54,7 +57,8 @@ class MinMax extends SetLiteral {
      *
      * @return string
      */
-    public function getOp(): string {
+    public function getOp(): string
+    {
         return $this->op;
     }
 
@@ -63,7 +67,8 @@ class MinMax extends SetLiteral {
      *
      * @return mixed
      */
-    public function getValue() {
+    public function getValue()
+    {
         return $this->value;
     }
 }

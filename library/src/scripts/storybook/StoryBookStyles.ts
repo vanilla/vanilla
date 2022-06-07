@@ -12,7 +12,6 @@ import { calc, em, percent, scale, translateX } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
-import { iconVariables } from "@library/icons/iconStyles";
 import { oneColumnVariables } from "@library/layout/Section.variables";
 
 export const storyBookVariables = useThemeCache(() => {
@@ -314,12 +313,6 @@ export const storyBookClasses = useThemeCache(() => {
         },
     });
 
-    const iconVars = iconVariables();
-    const smallerLogo = style("smallerLogo", {
-        height: importantUnit(iconVars.vanillaLogo.height / 2),
-        width: importantUnit(iconVars.vanillaLogo.width / 2),
-    });
-
     const fullPage = style("fullPage", {
         ...Mixins.margin({
             vertical: negative(vars.outerContainer.paddings.vertical),
@@ -350,7 +343,6 @@ export const storyBookClasses = useThemeCache(() => {
         tileText,
         tileTextPaddingLeft,
         compactTilesAndText,
-        smallerLogo,
         fullPage,
     };
 });

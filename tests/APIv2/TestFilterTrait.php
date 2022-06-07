@@ -13,7 +13,8 @@ use VanillaTests\BootstrapTrait;
 /**
  * Allows an `AbstractResourceTest` to test API filtering.
  */
-trait TestFilterTrait {
+trait TestFilterTrait
+{
     /**
      * @var array The fields that are allowed for sorting.
      */
@@ -22,13 +23,16 @@ trait TestFilterTrait {
     /**
      * Test whether each of the filter fields works on a resources index endpoint.
      */
-    public function testFilter(): void {
+    public function testFilter(): void
+    {
         TestCase::assertNotEmpty($this->filterFields, "Specify some filter fields to test.");
         $row = $this->testPost();
 
         foreach ($this->filterFields as $key) {
             $query = [$key => $row[$key]];
-            $rows = $this->api()->get($this->baseUrl, $query)->getBody();
+            $rows = $this->api()
+                ->get($this->baseUrl, $query)
+                ->getBody();
             BootstrapTrait::assertArrayMatchesFilter($rows, $query);
         }
     }

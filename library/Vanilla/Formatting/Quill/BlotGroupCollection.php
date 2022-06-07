@@ -21,8 +21,8 @@ use Vanilla\Formatting\TextFragmentType;
 /**
  * Class for sorting operations into blots and groups.
  */
-class BlotGroupCollection implements \IteratorAggregate, TextDOMInterface {
-
+class BlotGroupCollection implements \IteratorAggregate, TextDOMInterface
+{
     /** @var array[] The operations to parse. */
     private $operations;
 
@@ -58,7 +58,8 @@ class BlotGroupCollection implements \IteratorAggregate, TextDOMInterface {
     /**
      * @inheritdoc
      */
-    public function getIterator() {
+    public function getIterator()
+    {
         return new \ArrayIterator($this->groups);
     }
 
@@ -69,7 +70,8 @@ class BlotGroupCollection implements \IteratorAggregate, TextDOMInterface {
      * @param string[] $allowedBlotClasses The class names of the blots we are allowed to create in the groups.
      * @param string $parseMode The parsing mode to create the blots with.
      */
-    public function __construct(array $operations, array $allowedBlotClasses, string $parseMode) {
+    public function __construct(array $operations, array $allowedBlotClasses, string $parseMode)
+    {
         $this->operations = $operations;
         $this->allowedBlotClasses = $allowedBlotClasses;
         $this->parseMode = $parseMode;
@@ -79,7 +81,8 @@ class BlotGroupCollection implements \IteratorAggregate, TextDOMInterface {
     /**
      * Push the current line into the group and reset the line.
      */
-    private function clearLine() {
+    private function clearLine()
+    {
         $this->inProgressGroup->pushBlots($this->inProgressLine);
         $this->inProgressLine = [];
     }
@@ -89,7 +92,8 @@ class BlotGroupCollection implements \IteratorAggregate, TextDOMInterface {
      *
      * @return BlotGroup|null
      */
-    private function getPreviousBlotGroup(): ?BlotGroup {
+    private function getPreviousBlotGroup(): ?BlotGroup
+    {
         return $this->groups[count($this->groups) - 1] ?? null;
     }
 
@@ -97,7 +101,8 @@ class BlotGroupCollection implements \IteratorAggregate, TextDOMInterface {
      * Push the group into our groups array and start a new one.
      * Do not push an empty group.
      */
-    private function clearBlotGroup() {
+    private function clearBlotGroup()
+    {
         if ($this->inProgressGroup->isEmpty()) {
             return;
         }
@@ -120,7 +125,8 @@ class BlotGroupCollection implements \IteratorAggregate, TextDOMInterface {
     /**
      * Create Blots and their groups.
      */
-    private function createBlotGroups() {
+    private function createBlotGroups()
+    {
         $this->inProgressGroup = new BlotGroup();
         $this->inProgressLine = [];
         $this->groups = [];
@@ -138,7 +144,7 @@ class BlotGroupCollection implements \IteratorAggregate, TextDOMInterface {
                 continue;
             }
 
-            if (($this->inProgressBlot->shouldClearCurrentGroup($this->inProgressGroup))) {
+            if ($this->inProgressBlot->shouldClearCurrentGroup($this->inProgressGroup)) {
                 // Ask the blot if it should close the current group.
                 $this->clearBlotGroup();
             }
@@ -176,7 +182,8 @@ class BlotGroupCollection implements \IteratorAggregate, TextDOMInterface {
 
      * @return AbstractBlot
      */
-    public function getCurrentBlot(): AbstractBlot {
+    public function getCurrentBlot(): AbstractBlot
+    {
         // Fallback to a TextBlot if possible. Otherwise we fallback to rendering nothing at all.
         $blotClass = Blots\TextBlot::matches($this->currentOp) ? Blots\TextBlot::class : Blots\NullBlot::class;
         foreach ($this->allowedBlotClasses as $blot) {
@@ -193,7 +200,8 @@ class BlotGroupCollection implements \IteratorAggregate, TextDOMInterface {
     /**
      * @inheritDoc
      */
-    public function getFragments(): array {
+    public function getFragments(): array
+    {
         $result = [];
         foreach ($this->groups as $i => $group) {
             $this->getFragmentsBlotGroup($group, $result);
@@ -208,7 +216,8 @@ class BlotGroupCollection implements \IteratorAggregate, TextDOMInterface {
      * @param BlotGroup $group
      * @param array $result Working result array.
      */
-    private function getFragmentsBlotGroup(BlotGroup $group, array &$result = []) {
+    private function getFragmentsBlotGroup(BlotGroup $group, array &$result = [])
+    {
         if ($group->getBlotsAndGroups() instanceof AbstractBlot) {
             $result[] = new BlotGroupTextFragment($group, $this);
         } else {
@@ -243,7 +252,8 @@ class BlotGroupCollection implements \IteratorAggregate, TextDOMInterface {
      *
      * @return string[]
      */
-    public function getAllowedBlotClasses(): array {
+    public function getAllowedBlotClasses(): array
+    {
         return $this->allowedBlotClasses;
     }
 
@@ -252,14 +262,16 @@ class BlotGroupCollection implements \IteratorAggregate, TextDOMInterface {
      *
      * @return string
      */
-    public function getParseMode(): string {
+    public function getParseMode(): string
+    {
         return $this->parseMode;
     }
 
     /**
      * @inheritDoc
      */
-    public function renderHTML(): string {
+    public function renderHTML(): string
+    {
         $renderer = new Renderer();
         $result = $renderer->render($this);
         return $result;
@@ -268,7 +280,8 @@ class BlotGroupCollection implements \IteratorAggregate, TextDOMInterface {
     /**
      * @inheritDoc
      */
-    public function stringify(): FormatText {
+    public function stringify(): FormatText
+    {
         $result = [];
         foreach ($this->groups as $group) {
             $result = array_merge($result, $group->getOperations());
@@ -281,7 +294,8 @@ class BlotGroupCollection implements \IteratorAggregate, TextDOMInterface {
      *
      * @return BlotGroup[]
      */
-    public function getGroups(): array {
+    public function getGroups(): array
+    {
         return $this->groups;
     }
 
@@ -290,7 +304,8 @@ class BlotGroupCollection implements \IteratorAggregate, TextDOMInterface {
      *
      * @param ExternalBlot $blot
      */
-    private function makeExternalBlotFragments(ExternalBlot $blot) {
+    private function makeExternalBlotFragments(ExternalBlot $blot)
+    {
         $result = new TextFragmentCollection();
 
         $validFragments = [

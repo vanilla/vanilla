@@ -8,7 +8,9 @@
 use Vanilla\Reactions\Models\ReactionsQuickLinksProvider;
 use Vanilla\Theme\VariableProviders\QuickLinksVariableProvider;
 
-\Gdn::getContainer()->rule(QuickLinksVariableProvider::class)
-    ->addCall('addQuickLinkProvider', [new \Garden\Container\Reference(ReactionsQuickLinksProvider::class)]);
-Gdn::getContainer()->rule(\Vanilla\OpenAPIBuilder::class)
-    ->addCall('addFilter', ['filter' => new \Garden\Container\Reference(ReactionsFilterOpenApi::class)]);
+\Gdn::getContainer()
+    ->rule(QuickLinksVariableProvider::class)
+    ->addCall("addQuickLinkProvider", [new \Garden\Container\Reference(ReactionsQuickLinksProvider::class)]);
+Gdn::getContainer()
+    ->rule(\Vanilla\OpenAPIBuilder::class)
+    ->addCall("addFilter", ["filter" => new \Garden\Container\Reference(ReactionsFilterOpenApi::class)]);

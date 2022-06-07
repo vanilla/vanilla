@@ -20,8 +20,8 @@ use Vanilla\Contracts\ConfigurationInterface;
 /**
  * Search record type for a discussion.
  */
-class CommentSearchType extends DiscussionSearchType {
-
+class CommentSearchType extends DiscussionSearchType
+{
     /**
      * @var string Class used to construct search result items.
      */
@@ -36,7 +36,7 @@ class CommentSearchType extends DiscussionSearchType {
     /** @var ConfigurationInterface */
     private $config;
 
-    protected $queryFullTextFields = ['bodyPlainText'];
+    protected $queryFullTextFields = ["bodyPlainText"];
 
     /**
      * @inheritdoc
@@ -57,49 +57,52 @@ class CommentSearchType extends DiscussionSearchType {
         $this->config = $config;
     }
 
-
     /**
      * @inheritdoc
      */
-    public function getKey(): string {
-        return 'comment';
+    public function getKey(): string
+    {
+        return "comment";
     }
 
     /**
      * @inheritdoc
      */
-    public function getRecordType(): string {
-        return 'comment';
+    public function getRecordType(): string
+    {
+        return "comment";
     }
 
     /**
      * @inheritdoc
      */
-    public function getType(): string {
-        return 'comment';
+    public function getType(): string
+    {
+        return "comment";
     }
 
     /**
      * @inheritdoc
      */
-    public function getResultItems(array $recordIDs, SearchQuery $query): array {
+    public function getResultItems(array $recordIDs, SearchQuery $query): array
+    {
         try {
             $results = $this->commentsApi->index([
-                'commentID' => implode(",", $recordIDs),
-                'limit' => 100,
-                'expand' => [ModelUtils::EXPAND_CRAWL],
+                "commentID" => implode(",", $recordIDs),
+                "limit" => 100,
+                "expand" => [ModelUtils::EXPAND_CRAWL],
             ]);
             $results = $results->getData();
 
             $resultItems = array_map(function ($result) {
                 $mapped = ArrayUtils::remapProperties($result, [
-                    'recordID' => 'commentID',
+                    "recordID" => "commentID",
                 ]);
-                $mapped['recordType'] = $this->getRecordType();
-                $mapped['type'] = $this->getType();
-                $mapped['legacyType'] = $this->getSingularLabel();
-                $mapped['breadcrumbs'] = $this->breadcrumbModel->getForRecord(
-                    new ForumCategoryRecordType($mapped['categoryID'])
+                $mapped["recordType"] = $this->getRecordType();
+                $mapped["type"] = $this->getType();
+                $mapped["legacyType"] = $this->getSingularLabel();
+                $mapped["breadcrumbs"] = $this->breadcrumbModel->getForRecord(
+                    new ForumCategoryRecordType($mapped["categoryID"])
                 );
                 return new CommentSearchResultItem($mapped);
             }, $results);
@@ -113,8 +116,9 @@ class CommentSearchType extends DiscussionSearchType {
     /**
      * @return float|null
      */
-    protected function getBoostValue(): ?float {
-        return $this->config->get('Elastic.Boost.Comments', null);
+    protected function getBoostValue(): ?float
+    {
+        return $this->config->get("Elastic.Boost.Comments", null);
     }
 
     /**
@@ -123,20 +127,21 @@ class CommentSearchType extends DiscussionSearchType {
      * @param MysqlSearchQuery $query
      * @return string
      */
-    public function generateSql(MysqlSearchQuery $query): string {
-        $types = $query->get('types');
+    public function generateSql(MysqlSearchQuery $query): string
+    {
+        $types = $query->get("types");
 
-        if ($types !== null && ((count($types) > 0) && !in_array($this->getRecordType(), $types))) {
+        if ($types !== null && (count($types) > 0 && !in_array($this->getRecordType(), $types))) {
             // discussions are not the part of this search query request
             // we don't need to do anything
-            return '';
+            return "";
         }
 
-        $types = $query->get('recordTypes');
-        if ($types !== null && ((count($types) > 0) && !in_array($this->getType(), $types))) {
+        $types = $query->get("recordTypes");
+        if ($types !== null && (count($types) > 0 && !in_array($this->getType(), $types))) {
             // discussions are not the part of this search query request
             // we don't need to do anything
-            return '';
+            return "";
         }
         /** @var \Gdn_SQLDriver $db */
         $db = $query->getDB();
@@ -144,48 +149,52 @@ class CommentSearchType extends DiscussionSearchType {
         $categoryIDs = $this->getCategoryIDs($query);
 
         if ($categoryIDs === []) {
-            return '';
+            return "";
         }
 
         // Build base query
-        $db->from('Comment c')
-            ->select('c.CommentID as recordID, d.Name as Title, c.Format, d.CategoryID, c.Score')
-            ->select("'/discussion/comment/', c.CommentID, '/#Comment_', c.CommentID", "concat", 'Url')
-            ->select('c.DateInserted')
-            ->select('null as `recordType`')
-            ->select('c.InsertUserID as UserID')
-            ->select("'comment'", '', 'type')
-            ->join('Discussion d', 'd.DiscussionID = c.DiscussionID')
-            ->orderBy('c.DateInserted', 'desc')
-        ;
+        $db->from("Comment c")
+            ->select("c.CommentID as recordID, d.Name as Title, c.Format, d.CategoryID, c.Score")
+            ->select("'/discussion/comment/', c.CommentID, '/#Comment_', c.CommentID", "concat", "Url")
+            ->select("c.DateInserted")
+            ->select("null as `recordType`")
+            ->select("c.InsertUserID as UserID")
+            ->select("'comment'", "", "type")
+            ->join("Discussion d", "d.DiscussionID = c.DiscussionID")
+            ->orderBy("c.DateInserted", "desc");
 
-        if (false !== $query->get('expandBody', null)) {
-            $db->select('c.Body as body');
+        if (false !== $query->get("expandBody", null)) {
+            $db->select("c.Body as body");
         }
 
-        $terms = $query->get('query', false);
+        $terms = $query->get("query", false);
         if ($terms) {
-            $terms = $db->quote('%'.str_replace(['%', '_'], ['\%', '\_'], $terms).'%');
+            $terms = $db->quote("%" . str_replace(["%", "_"], ["\%", "\_"], $terms) . "%");
             $db->where("c.Body like", $terms, false, false);
         }
 
-        if ($name = $query->get('name', false)) {
-            $db->where('d.Name like', $db->quote('%'.str_replace(['%', '_'], ['\%', '\_'], $name).'%'), true, false);
+        if ($name = $query->get("name", false)) {
+            $db->where(
+                "d.Name like",
+                $db->quote("%" . str_replace(["%", "_"], ["\%", "\_"], $name) . "%"),
+                true,
+                false
+            );
         }
 
-        $this->applyUserIDs($db, $query, 'c');
-        $this->applyDateInsertedSql($db, $query, 'c');
+        $this->applyUserIDs($db, $query, "c");
+        $this->applyDateInsertedSql($db, $query, "c");
 
-        if ($discussionID = $query->get('discussionID', false)) {
-            $db->where('d.DiscussionID', $discussionID);
+        if ($discussionID = $query->get("discussionID", false)) {
+            $db->where("d.DiscussionID", $discussionID);
         }
 
         if (!empty($categoryIDs)) {
-            $db->where('d.CategoryID', $categoryIDs);
+            $db->where("d.CategoryID", $categoryIDs);
         }
 
-        $limit = $query->get('limit', 100);
-        $offset = $query->get('offset', 0);
+        $limit = $query->get("limit", 100);
+        $offset = $query->get("offset", 0);
         $db->limit($limit + $offset);
 
         $sql = $db->getSelect(true);
@@ -197,35 +206,40 @@ class CommentSearchType extends DiscussionSearchType {
     /**
      * @inheritDoc
      */
-    public function getIndex(): string {
-        return 'comment';
+    public function getIndex(): string
+    {
+        return "comment";
     }
 
     /**
      * @return string
      */
-    public function getSingularLabel(): string {
-        return \Gdn::translate('Comment');
+    public function getSingularLabel(): string
+    {
+        return \Gdn::translate("Comment");
     }
 
     /**
      * @return string
      */
-    public function getPluralLabel(): string {
-        return \Gdn::translate('Comments');
+    public function getPluralLabel(): string
+    {
+        return \Gdn::translate("Comments");
     }
 
     /**
      * @inheritdoc
      */
-    public function getDTypes(): ?array {
+    public function getDTypes(): ?array
+    {
         return [100];
     }
 
     /**
      * @inheritdoc
      */
-    public function guidToRecordID(int $guid): ?int {
+    public function guidToRecordID(int $guid): ?int
+    {
         return ($guid - 2) / 10;
     }
 }

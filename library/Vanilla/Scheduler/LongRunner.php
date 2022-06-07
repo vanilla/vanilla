@@ -22,8 +22,8 @@ use Vanilla\Web\SystemTokenUtils;
 /**
  * This class provides utility methods for executing longer running tasks that use iterators to break up their work.
  */
-class LongRunner {
-
+class LongRunner
+{
     /** @var string A long-running generator can return this to indicate it is complete. */
     public const FINISHED = "finished";
 
@@ -71,11 +71,8 @@ class LongRunner {
      * @param SystemTokenUtils $tokenUtils
      * @param \Gdn_Session $session
      */
-    public function __construct(
-        ContainerInterface $container,
-        SystemTokenUtils $tokenUtils,
-        \Gdn_Session $session
-    ) {
+    public function __construct(ContainerInterface $container, SystemTokenUtils $tokenUtils, \Gdn_Session $session)
+    {
         $this->container = $container;
         $this->tokenUtils = $tokenUtils;
         $this->session = $session;
@@ -88,7 +85,8 @@ class LongRunner {
      *
      * @return Data API response data.
      */
-    public function runApi(LongRunnerAction $action): Data {
+    public function runApi(LongRunnerAction $action): Data
+    {
         if ($this->mode === self::MODE_SYNC) {
             $result = $this->runImmediately($action);
             return $result->asData();
@@ -105,7 +103,8 @@ class LongRunner {
      *
      * @return TrackingSlipInterface A tracking slip for the queued job.
      */
-    public function runDeferred(LongRunnerAction $action): TrackingSlipInterface {
+    public function runDeferred(LongRunnerAction $action): TrackingSlipInterface
+    {
         $this->validateLongRunnable($action);
         $job = new NormalJobDescriptor(LongRunnerJob::class);
         $job->setMessage([
@@ -132,7 +131,8 @@ class LongRunner {
      *
      * @return LongRunnerResult
      */
-    public function runImmediately(LongRunnerAction $action): LongRunnerResult {
+    public function runImmediately(LongRunnerAction $action): LongRunnerResult
+    {
         $generator = $this->runIterator($action);
         return ModelUtils::consumeGenerator($generator);
     }
@@ -146,7 +146,8 @@ class LongRunner {
      * @throws ServerException Thrown if the method is not allowed to be run or the long-runner doesn't behave properly.
      * @throws ForbiddenException Thrown if there is no session user.
      */
-    public function runIterator(LongRunnerAction $action): \Generator {
+    public function runIterator(LongRunnerAction $action): \Generator
+    {
         $className = $action->getClassName();
         $method = $action->getMethod();
         $args = $action->getArgs();
@@ -215,7 +216,9 @@ class LongRunner {
             }
 
             if ($generator->valid()) {
-                throw new ServerException("Long running method $callableName was told return it's next arguments, but did not return.");
+                throw new ServerException(
+                    "Long running method $callableName was told return it's next arguments, but did not return."
+                );
             }
 
             $nextArgs = $generator->getReturn();
@@ -225,14 +228,12 @@ class LongRunner {
             }
 
             if (!$nextArgs instanceof LongRunnerNextArgs) {
-                throw new ServerException("Long running method $callableName did not return a LongRunnerNextArgs when requested.");
+                throw new ServerException(
+                    "Long running method $callableName did not return a LongRunnerNextArgs when requested."
+                );
             }
 
-            $result->setCallbackPayload(
-                $newAction
-                    ->applyNextArgs($nextArgs)
-                    ->asCallbackPayload($this->tokenUtils)
-            );
+            $result->setCallbackPayload($newAction->applyNextArgs($nextArgs)->asCallbackPayload($this->tokenUtils));
         }
 
         return $result;
@@ -246,20 +247,23 @@ class LongRunner {
      * @throws ServerException Thrown if the method is not allowed to be run.
      * @throws ForbiddenException Thrown if there is no session user.
      */
-    private function validateLongRunnable(LongRunnerAction $action) {
+    private function validateLongRunnable(LongRunnerAction $action)
+    {
         if (!$this->session->isValid()) {
-            throw new ForbiddenException('You must be signed in to trigger a long-running action.');
+            throw new ForbiddenException("You must be signed in to trigger a long-running action.");
         }
 
         // Maybe this class only exists as a container rule?
         /** @var SystemCallableInterface $class */
         $class = $this->container->get($action->getClassName());
         if (!$class instanceof SystemCallableInterface) {
-            throw new ServerException("Class does not implement " . SystemCallableInterface::class . ": {$action->getClassName()}");
+            throw new ServerException(
+                "Class does not implement " . SystemCallableInterface::class . ": {$action->getClassName()}"
+            );
         }
 
         $allowedMethods = $class::getSystemCallableMethods();
-        $lowercased = array_map('strtolower', $allowedMethods);
+        $lowercased = array_map("strtolower", $allowedMethods);
         if (!in_array(strtolower($action->getMethod()), $lowercased, true)) {
             throw new ServerException("Method `{$action->getMethod()}` was not marked as system callable.");
         }
@@ -282,7 +286,8 @@ class LongRunner {
      *
      * @return $this
      */
-    public function setMode(string $mode): LongRunner {
+    public function setMode(string $mode): LongRunner
+    {
         $this->mode = $mode;
         return $this;
     }
@@ -290,7 +295,8 @@ class LongRunner {
     /**
      * @return string
      */
-    public function getMode(): string {
+    public function getMode(): string
+    {
         return $this->mode;
     }
 
@@ -301,7 +307,8 @@ class LongRunner {
      *
      * @return $this
      */
-    public function setTimeout(int $timeout): LongRunner {
+    public function setTimeout(int $timeout): LongRunner
+    {
         $this->timeout = $timeout;
         return $this;
     }
@@ -313,7 +320,8 @@ class LongRunner {
      *
      * @return $this
      */
-    public function setMaxIterations(int $maxIterations): LongRunner {
+    public function setMaxIterations(int $maxIterations): LongRunner
+    {
         $this->maxIterations = $maxIterations;
         return $this;
     }
@@ -323,7 +331,8 @@ class LongRunner {
      *
      * @return $this
      */
-    public function reset(): LongRunner {
+    public function reset(): LongRunner
+    {
         $this->mode = self::MODE_SYNC;
         $this->timeout = self::TIMEOUT_MAX;
         $this->maxIterations = null;

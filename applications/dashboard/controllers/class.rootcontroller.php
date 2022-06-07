@@ -16,8 +16,8 @@
 /**
  * Handle endpoints for virtual controllers.
  */
-class RootController extends Gdn_Controller {
-
+class RootController extends Gdn_Controller
+{
     /**
      * Get the file location of a view.
      *
@@ -29,9 +29,15 @@ class RootController extends Gdn_Controller {
      * @return bool|mixed
      * @throws Exception
      */
-    public function fetchViewLocation($view = '', $controllerName = false, $applicationFolder = false, $throwError = true, $useController = true) {
+    public function fetchViewLocation(
+        $view = "",
+        $controllerName = false,
+        $applicationFolder = false,
+        $throwError = true,
+        $useController = true
+    ) {
         if (!$controllerName) {
-            $controllerName = '';
+            $controllerName = "";
         }
 
         return parent::fetchViewLocation($view, $controllerName, $applicationFolder, $throwError, $useController);

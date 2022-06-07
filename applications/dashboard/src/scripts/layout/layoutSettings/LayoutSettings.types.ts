@@ -3,7 +3,7 @@
  * @license Proprietary
  */
 
-import { ILoadable, Loadable, LoadStatus } from "@library/@types/api/core";
+import { Loadable, LoadStatus } from "@library/@types/api/core";
 import { IUserFragment } from "@library/@types/api/users";
 import { IHydratedLayoutWidget } from "@library/features/Layout/LayoutRenderer.types";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
@@ -22,7 +22,7 @@ export interface ILayoutsState {
         error?: any;
     };
     layoutDraft: ILayoutDraft | null;
-    layoutDraftPersistLoadable: ILoadable<ILayoutEdit>;
+
     layoutJsonsByLayoutID: Record<RecordID, Loadable<ILayoutEdit>>;
     catalogByViewType: Partial<Record<LayoutViewType, ILayoutCatalog>>;
     catalogStatusByViewType: Partial<Record<LayoutViewType, Loadable<{}>>>;
@@ -34,9 +34,7 @@ export const INITIAL_LAYOUTS_STATE: ILayoutsState = {
         status: LoadStatus.PENDING,
     },
     layoutDraft: null,
-    layoutDraftPersistLoadable: {
-        status: LoadStatus.PENDING,
-    },
+
     layoutJsonsByLayoutID: {},
     catalogByViewType: {},
     catalogStatusByViewType: {},
@@ -82,11 +80,7 @@ export interface ILayoutView {
         url: string;
     };
 }
-export interface ILayoutViewQuery {
-    layoutID: RecordID;
-    recordID: number;
-    recordType: string;
-}
+export type LayoutViewFragment = Pick<ILayoutView, "recordID" | "recordType">;
 
 /**
  * Interface representing a raw layout widget (like what comes back from the /api/v2/layouts/:id/edit)
@@ -166,5 +160,5 @@ export interface ILayoutCatalog {
     /** A mapping of widgetType to widget schema for all available sections. */
     sections: IWidgetCatalog;
     /** A mapping of middlewareType to middleware schema for all available middleware. */
-    middleware: ISchemaCatalog;
+    middlewares: ISchemaCatalog;
 }

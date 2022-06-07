@@ -16,7 +16,8 @@ use VanillaTests\UsersAndRolesApiTestTrait;
 /**
  * Test {@link UserModel}.
  */
-class LogModelTest extends SiteTestCase {
+class LogModelTest extends SiteTestCase
+{
     use UsersAndRolesApiTestTrait;
 
     /**
@@ -27,7 +28,8 @@ class LogModelTest extends SiteTestCase {
     /**
      * Get a new model for each test.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         $this->session = Gdn::session();
     }
@@ -36,17 +38,18 @@ class LogModelTest extends SiteTestCase {
      * Test createLogPostEvent
      *
      */
-    public function testCreateLogPostEvent() {
+    public function testCreateLogPostEvent()
+    {
         $logPostEvent = LogModel::createLogPostEvent(
-            'save',
-            'registration',
-            ['test'=>'result'],
+            "save",
+            "registration",
+            ["test" => "result"],
             "reactions",
             $this->session->UserID,
             "negative",
             null
         );
 
-        $this->assertSame('save', $logPostEvent->getAction());
+        $this->assertSame("save", $logPostEvent->getAction());
     }
 }

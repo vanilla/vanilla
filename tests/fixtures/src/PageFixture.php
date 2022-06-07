@@ -12,19 +12,21 @@ use Vanilla\Web\Page;
 /**
  * Fixture for testing the page class.
  */
-class PageFixture extends Page {
-
+class PageFixture extends Page
+{
     /**
      * @inheritdoc
      */
-    public function getAssetSection(): string {
-        return 'tests';
+    public function getAssetSection(): string
+    {
+        return "tests";
     }
 
     /**
      * @inheritdoc
      */
-    public function initialize() {
+    public function initialize()
+    {
         return;
     }
 }

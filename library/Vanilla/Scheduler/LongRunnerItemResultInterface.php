@@ -10,8 +10,8 @@ namespace Vanilla\Scheduler;
 /**
  * Interface to represent a long runner item result.
  */
-interface LongRunnerItemResultInterface {
-
+interface LongRunnerItemResultInterface
+{
     /**
      * Get the record ID of this long runner result.
      *

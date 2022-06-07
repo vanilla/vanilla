@@ -14,7 +14,8 @@ use VanillaTests\VanillaTestCase;
 /**
  * Verify behavior of the abstract database structure class.
  */
-class DatabaseStructureTest extends BootstrapTestCase {
+class DatabaseStructureTest extends BootstrapTestCase
+{
     /** @var Gdn_Database */
     private $db;
 
@@ -24,20 +25,21 @@ class DatabaseStructureTest extends BootstrapTestCase {
     /**
      * @inheritDoc
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         $this->db = $this->createMock(Gdn_Database::class);
-        $this->structure = new class($this->db) extends Gdn_DatabaseStructure {
-        };
+        $this->structure = new class ($this->db) extends Gdn_DatabaseStructure {};
     }
 
     /**
      * Verify basic creation of a column.
      */
-    public function testColumnBasic(): void {
+    public function testColumnBasic(): void
+    {
         $this->structure->column(__FUNCTION__, "text");
-        $result = (array)$this->structure->columns(__FUNCTION__);
+        $result = (array) $this->structure->columns(__FUNCTION__);
         $this->assertNotEmpty($result);
 
         $expected = [
@@ -62,15 +64,11 @@ class DatabaseStructureTest extends BootstrapTestCase {
      * @param array $expectedKeyType
      * @dataProvider provideColumnFullTextData
      */
-    public function testColumnFullText(bool $fullTextIndexingEnabled, $expectedKeyType): void {
+    public function testColumnFullText(bool $fullTextIndexingEnabled, $expectedKeyType): void
+    {
         $this->structure->setFullTextIndexingEnabled($fullTextIndexingEnabled);
-        $this->structure->column(
-            __FUNCTION__,
-            "text",
-            false,
-            Gdn_DatabaseStructure::KEY_TYPE_FULLTEXT
-        );
-        $result = (array)$this->structure->columns(__FUNCTION__);
+        $this->structure->column(__FUNCTION__, "text", false, Gdn_DatabaseStructure::KEY_TYPE_FULLTEXT);
+        $result = (array) $this->structure->columns(__FUNCTION__);
         $this->assertNotEmpty($result);
 
         $this->assertSame($expectedKeyType, $result["KeyType"]);
@@ -81,7 +79,8 @@ class DatabaseStructureTest extends BootstrapTestCase {
      *
      * @return array
      */
-    public function provideColumnFullTextData(): array {
+    public function provideColumnFullTextData(): array
+    {
         return [
             "disabled" => [false, false],
             "enabled, no name" => [true, Gdn_DatabaseStructure::KEY_TYPE_FULLTEXT],
@@ -95,9 +94,10 @@ class DatabaseStructureTest extends BootstrapTestCase {
      * @param array $expected
      * @dataProvider provideColumnKeyTypes
      */
-    public function testColumnKeyType($keyType, array $expected): void {
+    public function testColumnKeyType($keyType, array $expected): void
+    {
         $this->structure->column(__FUNCTION__, "text", false, $keyType);
-        $result = (array)$this->structure->columns(__FUNCTION__);
+        $result = (array) $this->structure->columns(__FUNCTION__);
         $this->assertNotEmpty($result);
 
         VanillaTestCase::assertArraySubsetRecursive($expected, $result);
@@ -108,50 +108,27 @@ class DatabaseStructureTest extends BootstrapTestCase {
      *
      * @return array
      */
-    public function provideColumnKeyTypes(): array {
+    public function provideColumnKeyTypes(): array
+    {
         return [
-            "invalid key type" => [
-                "foobar",
-                ["KeyType" => false],
-            ],
-            "key" => [
-                "key",
-                ["KeyType" => "key"],
-            ],
+            "invalid key type" => ["foobar", ["KeyType" => false]],
+            "key" => ["key", ["KeyType" => "key"]],
             "multiple keys, valid" => [
                 ["index.foo", "key.bar"],
                 [
                     "KeyType" => ["index.foo", "key.bar"],
                 ],
             ],
-            "multiple keys, partially valid" => [
-                ["index.foo", "hello.world"],
-                ["KeyType" => "index.foo"],
-            ],
-            "multiple keys, invalid" => [
-                ["hello.world", "foo.bar"],
-                ["KeyType" => false],
-            ],
-            "none" => [
-                false,
-                ["KeyType" => false],
-            ],
-            "no name" => [
-                Gdn_DatabaseStructure::KEY_TYPE_INDEX,
-                ["KeyType" => Gdn_DatabaseStructure::KEY_TYPE_INDEX],
-            ],
-            "named" => [
-                "index.foo",
-                ["KeyType" => "index.foo"],
-            ],
+            "multiple keys, partially valid" => [["index.foo", "hello.world"], ["KeyType" => "index.foo"]],
+            "multiple keys, invalid" => [["hello.world", "foo.bar"], ["KeyType" => false]],
+            "none" => [false, ["KeyType" => false]],
+            "no name" => [Gdn_DatabaseStructure::KEY_TYPE_INDEX, ["KeyType" => Gdn_DatabaseStructure::KEY_TYPE_INDEX]],
+            "named" => ["index.foo", ["KeyType" => "index.foo"]],
             "primary" => [
                 Gdn_DatabaseStructure::KEY_TYPE_PRIMARY,
                 ["KeyType" => Gdn_DatabaseStructure::KEY_TYPE_PRIMARY],
             ],
-            "unique" => [
-                Gdn_DatabaseStructure::KEY_TYPE_UNIQUE,
-                ["KeyType" => Gdn_DatabaseStructure::KEY_TYPE_UNIQUE],
-            ],
+            "unique" => [Gdn_DatabaseStructure::KEY_TYPE_UNIQUE, ["KeyType" => Gdn_DatabaseStructure::KEY_TYPE_UNIQUE]],
         ];
     }
 
@@ -162,9 +139,10 @@ class DatabaseStructureTest extends BootstrapTestCase {
      * @param array $expected
      * @dataProvider provideColumnNullDefaults
      */
-    public function testColumnNullDefault($nullDefault, array $expected): void {
+    public function testColumnNullDefault($nullDefault, array $expected): void
+    {
         $this->structure->column(__FUNCTION__, "text", $nullDefault);
-        $result = (array)$this->structure->columns(__FUNCTION__);
+        $result = (array) $this->structure->columns(__FUNCTION__);
         $this->assertNotEmpty($result);
 
         VanillaTestCase::assertArraySubsetRecursive($expected, $result);
@@ -175,28 +153,29 @@ class DatabaseStructureTest extends BootstrapTestCase {
      *
      * @return array
      */
-    public function provideColumnNullDefaults(): array {
+    public function provideColumnNullDefaults(): array
+    {
         return [
             "nullable, no default" => [
                 null,
                 [
                     "AllowNull" => true,
                     "Default" => null,
-                ]
+                ],
             ],
             "nullable, alt, no default" => [
                 true,
                 [
                     "AllowNull" => true,
                     "Default" => null,
-                ]
+                ],
             ],
             "not nullable, no default" => [
                 false,
                 [
                     "AllowNull" => false,
                     "Default" => null,
-                ]
+                ],
             ],
             "array, explicit" => [
                 [
@@ -206,14 +185,14 @@ class DatabaseStructureTest extends BootstrapTestCase {
                 [
                     "AllowNull" => true,
                     "Default" => "xyz",
-                ]
+                ],
             ],
             "not nullable, default value" => [
                 "foobar",
                 [
                     "AllowNull" => false,
                     "Default" => "foobar",
-                ]
+                ],
             ],
         ];
     }
@@ -225,9 +204,10 @@ class DatabaseStructureTest extends BootstrapTestCase {
      * @param array $expected
      * @dataProvider provideColumnTypes
      */
-    public function testColumnType($type, array $expected): void {
+    public function testColumnType($type, array $expected): void
+    {
         $this->structure->column(__FUNCTION__, $type);
-        $result = (array)$this->structure->columns(__FUNCTION__);
+        $result = (array) $this->structure->columns(__FUNCTION__);
         $this->assertNotEmpty($result);
 
         VanillaTestCase::assertArraySubsetRecursive($expected, $result);
@@ -238,7 +218,8 @@ class DatabaseStructureTest extends BootstrapTestCase {
      *
      * @return array
      */
-    public function provideColumnTypes(): array {
+    public function provideColumnTypes(): array
+    {
         $params = [
             [
                 "float(10,2)",
@@ -268,7 +249,7 @@ class DatabaseStructureTest extends BootstrapTestCase {
                     "Precision" => "",
                     "Type" => "text",
                     "Unsigned" => false,
-                ]
+                ],
             ],
             [
                 "uint",
@@ -295,10 +276,7 @@ class DatabaseStructureTest extends BootstrapTestCase {
 
         $params += [
             "enum, typed" => [
-                [
-                    "string",
-                    ["foo", "bar"]
-                ],
+                ["string", ["foo", "bar"]],
                 [
                     "Enum" => ["foo", "bar"],
                     "Length" => "",
@@ -316,7 +294,7 @@ class DatabaseStructureTest extends BootstrapTestCase {
                     "Type" => "enum",
                     "Unsigned" => false,
                 ],
-            ]
+            ],
         ];
 
         return $params;
@@ -328,7 +306,8 @@ class DatabaseStructureTest extends BootstrapTestCase {
      * @param bool $value
      * @dataProvider providerFullTextIndexingProperties
      */
-    public function testSetFullTextIndexingProperty(bool $value): void {
+    public function testSetFullTextIndexingProperty(bool $value): void
+    {
         $this->structure->setFullTextIndexingEnabled($value);
         $this->assertSame($value, $this->structure->isFullTextIndexingEnabled());
     }
@@ -338,7 +317,8 @@ class DatabaseStructureTest extends BootstrapTestCase {
      *
      * @return array
      */
-    public function providerFullTextIndexingProperties(): array {
+    public function providerFullTextIndexingProperties(): array
+    {
         return [
             "disable" => [false],
             "enable" => [true],

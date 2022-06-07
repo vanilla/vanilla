@@ -13,13 +13,14 @@ use PHPUnit\Framework\TestCase;
  * Tests for validateEmail().
  */
 
-class ValidateEmailTest extends TestCase {
-
+class ValidateEmailTest extends TestCase
+{
     /**
      * Test with email address.
      */
-    public function testWithEmailAddress() {
-        $actual = validateEmail('dick@example.com');
+    public function testWithEmailAddress()
+    {
+        $actual = validateEmail("dick@example.com");
         $expected = true;
         $this->assertSame($expected, $actual);
     }
@@ -27,8 +28,9 @@ class ValidateEmailTest extends TestCase {
     /**
      * Test with no email address.
      */
-    public function testNoEmailAddress() {
-        $actual = validateEmail('no-address-here');
+    public function testNoEmailAddress()
+    {
+        $actual = validateEmail("no-address-here");
         $expected = false;
         $this->assertSame($expected, $actual);
     }
@@ -36,7 +38,8 @@ class ValidateEmailTest extends TestCase {
     /**
      * Test with array including email address
      */
-    public function testWithBool() {
+    public function testWithBool()
+    {
         $actual = validateEmail(false);
         $expected = true;
         $this->assertSame($expected, $actual);

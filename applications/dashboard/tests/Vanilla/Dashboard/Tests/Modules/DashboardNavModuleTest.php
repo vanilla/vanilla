@@ -12,15 +12,16 @@ use VanillaTests\APIv2\AbstractAPIv2Test;
 /**
  * Test converge for the DashboardNavModule.
  */
-class DashboardNavModuleTest extends AbstractAPIv2Test {
-
+class DashboardNavModuleTest extends AbstractAPIv2Test
+{
     /** @var \DashboardNavModule */
     private $nav;
 
     /**
      * @inheridoc
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         /** @var \DashboardNavModule dashboardNavModule */
         $this->nav = \DashboardNavModule::getDashboardNav();
@@ -30,27 +31,25 @@ class DashboardNavModuleTest extends AbstractAPIv2Test {
     /**
      * Asset retrieving sections with preferences set and without.
      */
-    public function testUserPreferencesLandingPage() {
-        $preference = ['Settings' => '/vanilla/settings/posting'];
-        $this->session->setPreference('DashboardNav.SectionLandingPages', $preference);
+    public function testUserPreferencesLandingPage()
+    {
+        $preference = ["Settings" => "/vanilla/settings/posting"];
+        $this->session->setPreference("DashboardNav.SectionLandingPages", $preference);
 
         $sectionInfo = $this->nav->getSectionsInfo();
-        $this->assertSame($preference['Settings'], $sectionInfo['Settings']['url']);
+        $this->assertSame($preference["Settings"], $sectionInfo["Settings"]["url"]);
 
         //reset section
         $section = [
-            'permission' => [
-                'Garden.Settings.Manage',
-                'Garden.Community.Manage',
-            ],
-            'section' => 'Settings',
-            'title' => 'Settings',
-            'description' => 'Configuration & Addons',
-            'url' => '/dashboard/role'
+            "permission" => ["Garden.Settings.Manage", "Garden.Community.Manage"],
+            "section" => "Settings",
+            "title" => "Settings",
+            "description" => "Configuration & Addons",
+            "url" => "/dashboard/role",
         ];
         $this->nav->registerSection($section);
 
         $sectionInfo = $this->nav->getSectionsInfo(false);
-        $this->assertSame($section['url'], $sectionInfo['Settings']['url']);
+        $this->assertSame($section["url"], $sectionInfo["Settings"]["url"]);
     }
 }

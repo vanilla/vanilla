@@ -66,7 +66,7 @@ function LayoutEditorImpl(props: IProps) {
 
     useFocusWatcher(ref, (hasFocus, elementFocused) => {
         const focusIsInLayoutEditorModal = elementFocused?.closest("[data-layout-editor-modal]");
-        if (!hasFocus && !focusIsInLayoutEditorModal) {
+        if (elementFocused && !hasFocus && !focusIsInLayoutEditorModal) {
             editorSelection.stashState();
         } else if (hasFocus && elementFocused === ref.current) {
             editorSelection.restoreState();

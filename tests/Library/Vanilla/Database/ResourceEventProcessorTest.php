@@ -18,7 +18,8 @@ use VanillaTests\SiteTestCase;
 /**
  * Tests for the `PruneProcessor` class.
  */
-class ResourceEventProcessorTest extends SiteTestCase {
+class ResourceEventProcessorTest extends SiteTestCase
+{
     use EventSpyTestTrait;
 
     /**
@@ -34,15 +35,14 @@ class ResourceEventProcessorTest extends SiteTestCase {
     /**
      * Install the site and set up a test table.
      */
-    public static function setupBeforeClass(): void {
+    public static function setupBeforeClass(): void
+    {
         parent::setUpBeforeClass();
 
-        static::container()->call(function (
-            \Gdn_DatabaseStructure $st
-        ) {
-            $st->table('model')
-                ->primaryKey('modelID')
-                ->column('name', 'varchar(50)')
+        static::container()->call(function (\Gdn_DatabaseStructure $st) {
+            $st->table("model")
+                ->primaryKey("modelID")
+                ->column("name", "varchar(50)")
                 ->set();
         });
     }
@@ -50,17 +50,18 @@ class ResourceEventProcessorTest extends SiteTestCase {
     /**
      * {@inheritDoc}
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
-        $this->container()->call(function (
-            \Gdn_SQLDriver $sql
-        ) {
-            $sql->truncate('model');
+        $this->container()->call(function (\Gdn_SQLDriver $sql) {
+            $sql->truncate("model");
         });
 
-        self::container()->rule(PipelineModel::class)->setShared(false);
+        self::container()
+            ->rule(PipelineModel::class)
+            ->setShared(false);
 
-        $this->model = $this->container()->getArgs(PipelineModel::class, ['model']);
+        $this->model = $this->container()->getArgs(PipelineModel::class, ["model"]);
         $this->eventProcessor = $this->container()->get(Operation\ResourceEventProcessor::class);
         $this->model->addPipelineProcessor($this->eventProcessor);
     }
@@ -68,71 +69,82 @@ class ResourceEventProcessorTest extends SiteTestCase {
     /**
      * Test that delets events are gathered and fired.
      */
-    public function testInsert() {
-        $this->model->insert(['name' => 'item1']);
+    public function testInsert()
+    {
+        $this->model->insert(["name" => "item1"]);
         $this->assertEventsDispatched([
-            $this->expectedResourceEvent('model', ResourceEvent::ACTION_INSERT, ['name' => 'item1', 'modelID' => 1]),
+            $this->expectedResourceEvent("model", ResourceEvent::ACTION_INSERT, ["name" => "item1", "modelID" => 1]),
         ]);
     }
 
     /**
      * Test that delets events are gathered and fired.
      */
-    public function testUpdateSingle() {
-        $this->model->insert(['name' => 'item1']);
-        $this->model->update(['name' => 'item2'], ['modelID' => 1]);
+    public function testUpdateSingle()
+    {
+        $this->model->insert(["name" => "item1"]);
+        $this->model->update(["name" => "item2"], ["modelID" => 1]);
         $this->assertEventsDispatched([
-            $this->expectedResourceEvent('model', ResourceEvent::ACTION_INSERT, ['name' => 'item1', 'modelID' => 1]),
-            $this->expectedResourceEvent('model', ResourceEvent::ACTION_UPDATE, ['name' => 'item2', 'modelID' => 1]),
+            $this->expectedResourceEvent("model", ResourceEvent::ACTION_INSERT, ["name" => "item1", "modelID" => 1]),
+            $this->expectedResourceEvent("model", ResourceEvent::ACTION_UPDATE, ["name" => "item2", "modelID" => 1]),
         ]);
     }
 
     /**
      * Test that delets events are gathered and fired.
      */
-    public function testUpdateMultiple() {
-        $this->model->insert(['name' => 'item1']);
-        $this->model->insert(['name' => 'item2']);
-        $this->model->update(['name' => 'name reset'], ['modelID <' => 3]);
+    public function testUpdateMultiple()
+    {
+        $this->model->insert(["name" => "item1"]);
+        $this->model->insert(["name" => "item2"]);
+        $this->model->update(["name" => "name reset"], ["modelID <" => 3]);
         $this->assertEventsDispatched([
-            $this->expectedResourceEvent('model', ResourceEvent::ACTION_INSERT, ['name' => 'item1', 'modelID' => 1]),
-            $this->expectedResourceEvent('model', ResourceEvent::ACTION_INSERT, ['name' => 'item2', 'modelID' => 2]),
-            $this->expectedResourceEvent('model', ResourceEvent::ACTION_UPDATE, ['name' => 'name reset', 'modelID' => 1]),
-            $this->expectedResourceEvent('model', ResourceEvent::ACTION_UPDATE, ['name' => 'name reset', 'modelID' => 2]),
+            $this->expectedResourceEvent("model", ResourceEvent::ACTION_INSERT, ["name" => "item1", "modelID" => 1]),
+            $this->expectedResourceEvent("model", ResourceEvent::ACTION_INSERT, ["name" => "item2", "modelID" => 2]),
+            $this->expectedResourceEvent("model", ResourceEvent::ACTION_UPDATE, [
+                "name" => "name reset",
+                "modelID" => 1,
+            ]),
+            $this->expectedResourceEvent("model", ResourceEvent::ACTION_UPDATE, [
+                "name" => "name reset",
+                "modelID" => 2,
+            ]),
         ]);
     }
 
     /**
      * Test that delets events are gathered and fired.
      */
-    public function testDeleteMultiple() {
-        $this->model->insert(['name' => 'item1']);
-        $this->model->insert(['name' => 'item2']);
-        $this->model->delete(['modelID <' => 3]);
+    public function testDeleteMultiple()
+    {
+        $this->model->insert(["name" => "item1"]);
+        $this->model->insert(["name" => "item2"]);
+        $this->model->delete(["modelID <" => 3]);
         $this->assertEventsDispatched([
-            $this->expectedResourceEvent('model', ResourceEvent::ACTION_INSERT, ['name' => 'item1', 'modelID' => 1]),
-            $this->expectedResourceEvent('model', ResourceEvent::ACTION_INSERT, ['name' => 'item2', 'modelID' => 2]),
-            $this->expectedResourceEvent('model', ResourceEvent::ACTION_DELETE, ['name' => 'item1', 'modelID' => 1]),
-            $this->expectedResourceEvent('model', ResourceEvent::ACTION_DELETE, ['name' => 'item2', 'modelID' => 2]),
+            $this->expectedResourceEvent("model", ResourceEvent::ACTION_INSERT, ["name" => "item1", "modelID" => 1]),
+            $this->expectedResourceEvent("model", ResourceEvent::ACTION_INSERT, ["name" => "item2", "modelID" => 2]),
+            $this->expectedResourceEvent("model", ResourceEvent::ACTION_DELETE, ["name" => "item1", "modelID" => 1]),
+            $this->expectedResourceEvent("model", ResourceEvent::ACTION_DELETE, ["name" => "item2", "modelID" => 2]),
         ]);
     }
 
     /**
      * Test that if an operation fails, no events will be dispatched from it.
      */
-    public function testFailureNoDispatch() {
-        $this->model->insert(['name' => 'item1']);
-        $this->model->insert(['name' => 'item2']);
+    public function testFailureNoDispatch()
+    {
+        $this->model->insert(["name" => "item1"]);
+        $this->model->insert(["name" => "item2"]);
 
         $processorFixtures = new ProcessorFixture(function () {
-            throw new \Exception('ERROR!');
+            throw new \Exception("ERROR!");
         });
 
         $this->model->addPipelineProcessor($processorFixtures);
 
         $exception = null;
         try {
-            $this->model->delete(['modelID <' => 3]);
+            $this->model->delete(["modelID <" => 3]);
         } catch (\Exception $e) {
             $exception = $e;
             // Do nothing.
@@ -142,24 +154,25 @@ class ResourceEventProcessorTest extends SiteTestCase {
 
         // An exception was thrown after the delete events were processed, but the events were not dispatched.
         $this->assertEventsDispatched([
-            $this->expectedResourceEvent('model', ResourceEvent::ACTION_INSERT, ['name' => 'item1', 'modelID' => 1]),
-            $this->expectedResourceEvent('model', ResourceEvent::ACTION_INSERT, ['name' => 'item2', 'modelID' => 2]),
+            $this->expectedResourceEvent("model", ResourceEvent::ACTION_INSERT, ["name" => "item1", "modelID" => 1]),
+            $this->expectedResourceEvent("model", ResourceEvent::ACTION_INSERT, ["name" => "item2", "modelID" => 2]),
         ]);
     }
 
     /**
      * Test the limit of resources that can be processed.
      */
-    public function testLimit() {
+    public function testLimit()
+    {
         $this->eventProcessor->setUpdateLimit(2);
-        $this->model->insert(['name' => 'item1']);
-        $this->model->insert(['name' => 'item2']);
-        $this->model->insert(['name' => 'item2']);
+        $this->model->insert(["name" => "item1"]);
+        $this->model->insert(["name" => "item2"]);
+        $this->model->insert(["name" => "item2"]);
 
         // Only affects 2 rows. No limit needed.
-        $this->model->update(['name' => 'name reset'], ['modelID <' => 3]);
+        $this->model->update(["name" => "name reset"], ["modelID <" => 3]);
 
         $this->expectException(ResourceEventLimitException::class);
-        $this->model->update(['name' => 'name reset'], ['modelID <' => 4]);
+        $this->model->update(["name" => "name reset"], ["modelID <" => 4]);
     }
 }

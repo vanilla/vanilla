@@ -14,12 +14,13 @@ use NewDiscussionModule;
 /**
  * A mock new discussion module to test NewDiscussionModule methods.
  */
-class MockNewDiscussionModule extends NewDiscussionModule {
-
+class MockNewDiscussionModule extends NewDiscussionModule
+{
     /**
      * Override parent constructor to avoid call to Vanilla Configuration.
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
         $this->DefaultButton = false;
     }
@@ -29,7 +30,8 @@ class MockNewDiscussionModule extends NewDiscussionModule {
      *
      * @param Gdn_Controller|null $sender
      */
-    public function setSender($sender) {
+    public function setSender($sender)
+    {
         $this->_Sender = $sender;
     }
 }

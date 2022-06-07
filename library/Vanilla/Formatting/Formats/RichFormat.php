@@ -25,6 +25,7 @@ use Vanilla\Formatting\ParsableDOMInterface;
 use Vanilla\Formatting\Quill\Blots\Embeds\ExternalBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\HeadingTerminatorBlot;
 use Vanilla\Formatting\TextDOMInterface;
+use Vanilla\Formatting\UserMentionInterface;
 use Vanilla\Logging\ErrorLogger;
 use Vanilla\Web\TwigRenderTrait;
 use Vanilla\Formatting\Quill;
@@ -32,7 +33,8 @@ use Vanilla\Formatting\Quill;
 /**
  * Format service for the rich editor format. Rendered and parsed using Quill.
  */
-class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAwareInterface {
+class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAwareInterface
+{
     use LoggerAwareTrait;
     use TwigRenderTrait;
     use StaticCacheTranslationTrait;
@@ -40,7 +42,7 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
     const FORMAT_KEY = "rich";
 
     /** @var string */
-    const RENDER_ERROR_MESSAGE = 'There was an error rendering this rich post.';
+    const RENDER_ERROR_MESSAGE = "There was an error rendering this rich post.";
 
     /** @var Quill\Parser */
     private $parser;
@@ -58,18 +60,19 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
      * @param Quill\Renderer $renderer
      * @param Quill\Filterer $filterer
      */
-    public function __construct(Quill\Parser $parser, Quill\Renderer $renderer, Quill\Filterer $filterer) {
+    public function __construct(Quill\Parser $parser, Quill\Renderer $renderer, Quill\Filterer $filterer)
+    {
         $this->parser = $parser;
         $this->renderer = $renderer;
         $this->filterer = $filterer;
         $this->setLogger(Logger::getLogger());
     }
 
-
     /**
      * @inheritdoc
      */
-    public function renderHTML(string $content, bool $throw = false): string {
+    public function renderHTML(string $content, bool $throw = false): string
+    {
         try {
             $content = $this->filterer->filter($content);
             $operations = Quill\Parser::jsonToOperations($content);
@@ -94,8 +97,9 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
     /**
      * @inheritdoc
      */
-    public function renderPlainText(string $content): string {
-        $text = '';
+    public function renderPlainText(string $content): string
+    {
+        $text = "";
         try {
             $content = $this->filterer->filter($content);
             $operations = Quill\Parser::jsonToOperations($content);
@@ -115,7 +119,8 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
     /**
      * @inheritdoc
      */
-    public function renderQuote(string $content): string {
+    public function renderQuote(string $content): string
+    {
         try {
             $content = $this->filterer->filter($content);
             $operations = Quill\Parser::jsonToOperations($content);
@@ -135,7 +140,8 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
     /**
      * @inheritdoc
      */
-    public function filter(string $content): string {
+    public function filter(string $content): string
+    {
         $filtered = $this->filterer->filter($content);
         $this->renderHTML($filtered, true);
         return $filtered;
@@ -149,10 +155,10 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
      *
      * @return AbstractEmbed[]
      */
-    private function parseEmbedsOfType(string $content, string $embedClass): array {
+    private function parseEmbedsOfType(string $content, string $embedClass): array
+    {
         $operations = Quill\Parser::jsonToOperations($content);
-        $parser = (new Quill\Parser())
-            ->addBlot(ExternalBlot::class);
+        $parser = (new Quill\Parser())->addBlot(ExternalBlot::class);
         $blotGroups = $parser->parse($operations);
 
         $embeds = [];
@@ -177,7 +183,8 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
     /**
      * @inheritdoc
      */
-    public function parseImageUrls(string $content): array {
+    public function parseImageUrls(string $content): array
+    {
         $urls = [];
 
         try {
@@ -196,7 +203,8 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
     /**
      * @inheritdoc
      */
-    public function parseImages(string $content): array {
+    public function parseImages(string $content): array
+    {
         $props = [];
         try {
             $embeds = $this->parseEmbedsOfType($content, ImageEmbed::class);
@@ -205,7 +213,7 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
             foreach ($embeds as $imageEmbed) {
                 $props[] = [
                     "url" => $imageEmbed->getUrl(),
-                    "alt" => $imageEmbed->getAlt()
+                    "alt" => $imageEmbed->getAlt(),
                 ];
             }
         } catch (\Throwable $e) {
@@ -217,7 +225,8 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
     /**
      * @inheritdoc
      */
-    public function parseAttachments(string $content): array {
+    public function parseAttachments(string $content): array
+    {
         $attachments = [];
 
         try {
@@ -233,11 +242,11 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
         return $attachments;
     }
 
-
     /**
      * @inheritdoc
      */
-    public function parseMentions(string $content): array {
+    public function parseMentions(string $content, bool $skipTaggedContent = true): array
+    {
         try {
             $operations = Quill\Parser::jsonToOperations($content);
             return $this->parser->parseMentionUsernames($operations);
@@ -250,14 +259,13 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
     /**
      * @inheritdoc
      */
-    public function parseHeadings(string $content): array {
+    public function parseHeadings(string $content): array
+    {
         $outline = [];
 
         try {
             $operations = Quill\Parser::jsonToOperations($content);
-            $parser = (new Quill\Parser())
-                ->addBlot(HeadingTerminatorBlot::class)
-                ->addBlot(ExternalBlot::class);
+            $parser = (new Quill\Parser())->addBlot(HeadingTerminatorBlot::class)->addBlot(ExternalBlot::class);
 
             $blotGroups = $parser->parse($operations);
 
@@ -292,13 +300,15 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
      *
      * @return string
      */
-    private function renderErrorMessage(): string {
+    private function renderErrorMessage(): string
+    {
         $data = [
-            'title' => self::t(self::RENDER_ERROR_MESSAGE),
-            'errorUrl' => 'https://docs.vanillaforums.com/help/addons/rich-editor/#why-is-my-published-post-replaced-with-there-was-an-error-rendering-this-rich-post',
+            "title" => self::t(self::RENDER_ERROR_MESSAGE),
+            "errorUrl" =>
+                "https://docs.vanillaforums.com/help/addons/rich-editor/#why-is-my-published-post-replaced-with-there-was-an-error-rendering-this-rich-post",
         ];
 
-        return $this->renderTwig('resources/views/userContentError.twig', $data);
+        return $this->renderTwig("resources/views/userContentError.twig", $data);
     }
 
     /**
@@ -306,11 +316,12 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
      *
      * @param string $input
      */
-    private function logBadInput(string $input) {
+    private function logBadInput(string $input)
+    {
         ErrorLogger::notice(
             "Malformed rich text encounted.",
-            ['formatService'],
-            ['input' => $input] + ($this->context ?? [])
+            ["formatService"],
+            ["input" => $input] + ($this->context ?? [])
         );
     }
 
@@ -320,12 +331,13 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
      * @param array $row The row to filter.
      * @return array Returns the filtered row.
      */
-    public static function editBodyFilter($row) {
-        if (!is_array($row) || strcasecmp($row['format'] ?? $row['Format'] ?? '', 'rich') !== 0) {
+    public static function editBodyFilter($row)
+    {
+        if (!is_array($row) || strcasecmp($row["format"] ?? ($row["Format"] ?? ""), "rich") !== 0) {
             return $row;
         }
 
-        $key = array_key_exists('Body', $row) ? 'Body' : 'body';
+        $key = array_key_exists("Body", $row) ? "Body" : "body";
         $row[$key] = self::stripSensitiveInfoRich($row[$key]);
 
         return $row;
@@ -337,7 +349,8 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
      * @param string $input The rich text input.
      * @return string The string.
      */
-    private static function stripSensitiveInfoRich(string $input): string {
+    private static function stripSensitiveInfoRich(string $input): string
+    {
         if (strpos($input, "password") === false) {
             return $input; // Bailout because it doesn't actually have user record.
         }
@@ -346,17 +359,17 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
             return $input;
         }
         foreach ($operations as &$op) {
-            $insertUser = $op['insert']['embed-external']['data']['insertUser'] ?? null;
+            $insertUser = $op["insert"]["embed-external"]["data"]["insertUser"] ?? null;
             if (!$insertUser) {
                 // No user.
                 continue;
             }
-            $op['insert']['embed-external']['data']['insertUser'] = [
-                'userID' => $insertUser['userID'],
-                'name' => $insertUser['name'],
-                'photoUrl' => $insertUser['photoUrl'],
-                'dateLastActive' => $insertUser['dateLastActive'],
-                'label' => $insertUser['label'],
+            $op["insert"]["embed-external"]["data"]["insertUser"] = [
+                "userID" => $insertUser["userID"],
+                "name" => $insertUser["name"],
+                "photoUrl" => $insertUser["photoUrl"],
+                "dateLastActive" => $insertUser["dateLastActive"],
+                "label" => $insertUser["label"],
             ];
         }
         $output = json_encode($operations, JSON_UNESCAPED_UNICODE);
@@ -366,7 +379,8 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
     /**
      * @inheritDoc
      */
-    public function parseDOM(string $content): TextDOMInterface {
+    public function parseDOM(string $content): TextDOMInterface
+    {
         $content = $this->filterer->filter($content);
         $operations = Quill\Parser::jsonToOperations($content);
 
@@ -376,5 +390,14 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
         );
 
         return $blotGroups;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function removeUserPII(string $username, string $body): string
+    {
+        // TODO: Implement removeMention() method.
+        return $body;
     }
 }

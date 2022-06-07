@@ -13,8 +13,8 @@ use PHPUnit\Framework\TestCase;
  * Tests for deprecated().
  */
 
-class DeprecatedTest extends TestCase {
-
+class DeprecatedTest extends TestCase
+{
     /**
      * Test {@link deprecated()} against two scenarios ($newName and !$newName).
      *
@@ -22,7 +22,8 @@ class DeprecatedTest extends TestCase {
      * @param string $testNewName The name of the new function that should be used instead.
      * @dataProvider provideDeprecatedArrays
      */
-    public function testDeprecated(string $testOldName, string $testNewName = '') {
+    public function testDeprecated(string $testOldName, string $testNewName = "")
+    {
         $this->expectDeprecation();
         $this->expectDeprecationMessage("$testOldName is deprecated.");
         deprecated($testOldName, $testNewName);
@@ -33,15 +34,11 @@ class DeprecatedTest extends TestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideDeprecatedArrays() {
+    public function provideDeprecatedArrays()
+    {
         $r = [
-            'normalCase' => [
-                'deprecatedFunction',
-                'newFunction',
-            ],
-            'noNewName' => [
-                'deprecatedFunction',
-            ]
+            "normalCase" => ["deprecatedFunction", "newFunction"],
+            "noNewName" => ["deprecatedFunction"],
         ];
 
         return $r;

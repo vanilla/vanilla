@@ -15,26 +15,29 @@ use Vanilla\Widgets\React\ReactWidgetInterface;
 /**
  * Class DiscussionQuestionsWidget
  */
-class DiscussionQuestionsWidget extends QnAWidgetModule implements ReactWidgetInterface {
-
+class DiscussionQuestionsWidget extends QnAWidgetModule implements ReactWidgetInterface
+{
     /**
      * @inheridoc
      */
-    public static function getWidgetID(): string {
+    public static function getWidgetID(): string
+    {
         return "discussion.questions";
     }
 
     /**
      * @inheridoc
      */
-    public static function getWidgetName(): string {
+    public static function getWidgetName(): string
+    {
         return "Questions";
     }
 
     /**
      * @inheridoc
      */
-    public static function getComponentName(): string {
+    public static function getComponentName(): string
+    {
         // Temporarily this until we make a version supported grids and carousels.
         return "DiscussionListModule";
     }
@@ -42,17 +45,20 @@ class DiscussionQuestionsWidget extends QnAWidgetModule implements ReactWidgetIn
     /**
      * @return string
      */
-    public static function getWidgetIconPath(): string {
+    public static function getWidgetIconPath(): string
+    {
         return "/applications/dashboard/design/images/widgetIcons/questions.svg";
     }
 
     /**
      * @inheridoc
      */
-    public static function getWidgetSchema(): Schema {
+    public static function getWidgetSchema(): Schema
+    {
         $schema = SchemaUtils::composeSchemas(
-            parent::getWidgetSchema(),
-            self::containerOptionsSchema('containerOptions')
+            parent::getWidgetSchema()
+            //we'll include containerOptions when we replace DiscussionListModule component with the one supporting grid/carousel
+            //self::containerOptionsSchema("containerOptions")
         );
         return $schema;
     }

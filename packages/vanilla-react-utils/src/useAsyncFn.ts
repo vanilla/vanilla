@@ -60,5 +60,5 @@ export function useAsyncFn<T extends FnReturningPromise>(
         ) as ReturnType<T>;
     }, deps);
 
-    return [state, (callback as unknown) as T];
+    return [state, callback as unknown as T];
 }

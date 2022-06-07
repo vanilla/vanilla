@@ -15,8 +15,8 @@ use Vanilla\Cli\Utils\SimpleScriptLogger;
 /**
  * Install command.
  */
-class InstallCommand implements LoggerAwareInterface {
-
+class InstallCommand implements LoggerAwareInterface
+{
     use LoggerAwareTrait;
 
     public const BIN_DIR = PATH_ROOT . "/cli/bin";
@@ -32,7 +32,8 @@ class InstallCommand implements LoggerAwareInterface {
      * Install the vnla utility onto your $PATH. Only installs to /usr/local/bin.
      * If you need to install somewhere else, symlink it yourself.
      */
-    public function install() {
+    public function install()
+    {
         if (self::isInstalled()) {
             $this->logger->success("vnla is already installed.");
             return;
@@ -44,7 +45,8 @@ class InstallCommand implements LoggerAwareInterface {
     /**
      * Lint changed PHP code.
      */
-    public static function isInstalled(): bool {
+    public static function isInstalled(): bool
+    {
         return ShellProfile::hasInPath(self::BIN_DIR);
     }
 }

@@ -10,12 +10,13 @@ namespace VanillaTests\Fixtures\EmbeddedContent;
 /**
  * Fixtures for the legacy embed system values.
  */
-class LegacyEmbedFixtures {
-
+class LegacyEmbedFixtures
+{
     /**
      * @return string
      */
-    public static function discussion(): string {
+    public static function discussion(): string
+    {
         return <<<JSON
 {
     "url": "https://dev.vanilla.localhost/discussion/8/test-file-upload",
@@ -47,7 +48,8 @@ JSON;
     /**
      * @return string
      */
-    public static function comment(): string {
+    public static function comment(): string
+    {
         return <<<JSON
 {
     "url": "https://dev.vanilla.localhost/discussion/comment/5#Comment_5",

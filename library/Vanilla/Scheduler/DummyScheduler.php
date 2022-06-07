@@ -44,11 +44,11 @@ use Vanilla\Utility\Timers;
  *
  * Accepts jobs and process them all by delegating to an underlying Job Driver.
  */
-class DummyScheduler implements SchedulerInterface, LoggerAwareInterface {
-
+class DummyScheduler implements SchedulerInterface, LoggerAwareInterface
+{
     use LoggerAwareTrait;
 
-    protected const CRON_LOCK_KEY = 'CRON_LOCK';
+    protected const CRON_LOCK_KEY = "CRON_LOCK";
     protected const CRON_MINIMUM_TIME_SPAN = 60;
 
     /** @var JobExecutionType */
@@ -135,8 +135,8 @@ class DummyScheduler implements SchedulerInterface, LoggerAwareInterface {
      * @throws Exception The class `%s` cannot be found.
      * @throws Exception The class `%s` doesn't implement DriverInterface.
      */
-    public function addDriver(string $driverType): bool {
-
+    public function addDriver(string $driverType): bool
+    {
         if (!$this->container->has($driverType)) {
             $missingDriverMsg = "The class `$driverType` cannot be found.";
             $this->logger->error($missingDriverMsg);
@@ -171,7 +171,8 @@ class DummyScheduler implements SchedulerInterface, LoggerAwareInterface {
      *
      * @return array
      */
-    public function getDrivers(): array {
+    public function getDrivers(): array
+    {
         return $this->drivers;
     }
 
@@ -182,7 +183,8 @@ class DummyScheduler implements SchedulerInterface, LoggerAwareInterface {
      *
      * @return bool
      */
-    public function setDispatchEventName(string $eventName): bool {
+    public function setDispatchEventName(string $eventName): bool
+    {
         $this->dispatchEventName = $eventName;
         $this->eventManager->bind($this->dispatchEventName, function () {
             $this->dispatchedEventHandler();
@@ -196,7 +198,8 @@ class DummyScheduler implements SchedulerInterface, LoggerAwareInterface {
      *
      * @return string
      */
-    public function getDispatchEventName(): string {
+    public function getDispatchEventName(): string
+    {
         return $this->dispatchEventName;
     }
 
@@ -206,7 +209,8 @@ class DummyScheduler implements SchedulerInterface, LoggerAwareInterface {
      * @param string $eventName
      * @return bool
      */
-    public function setDispatchedEventName(string $eventName): bool {
+    public function setDispatchedEventName(string $eventName): bool
+    {
         $this->dispatchedEventName = $eventName;
 
         return true;
@@ -217,7 +221,8 @@ class DummyScheduler implements SchedulerInterface, LoggerAwareInterface {
      *
      * @return string
      */
-    public function getDispatchedEventName(): string {
+    public function getDispatchedEventName(): string
+    {
         return $this->dispatchedEventName;
     }
 
@@ -257,7 +262,8 @@ class DummyScheduler implements SchedulerInterface, LoggerAwareInterface {
      * @throws Exception The job class `%s` doesn't implement JobInterface.
      * @throws Exception Missing driver to handle the job class `%s`.
      */
-    public function addJobDescriptor(JobDescriptorInterface $jobDescriptor): TrackingSlipInterface {
+    public function addJobDescriptor(JobDescriptorInterface $jobDescriptor): TrackingSlipInterface
+    {
         $hash = $jobDescriptor->getHash();
         for ($index = 0; $index < count($this->trackingSlips); $index++) {
             if ($this->trackingSlips[$index]->getDescriptor()->getHash() === $hash) {
@@ -305,7 +311,13 @@ class DummyScheduler implements SchedulerInterface, LoggerAwareInterface {
             if ($job instanceof $jobInterface) {
                 $driverSlip = $driver->receive($job);
 
-                $trackingSlip = new TrackingSlip($jobInterface, $driverSlip, $jobDescriptor, $this->logger, $this->config);
+                $trackingSlip = new TrackingSlip(
+                    $jobInterface,
+                    $driverSlip,
+                    $jobDescriptor,
+                    $this->logger,
+                    $this->config
+                );
 
                 if ($job instanceof TrackableJobAwareInterface) {
                     $job->setTrackingID($trackingSlip->getTrackingID());
@@ -332,7 +344,8 @@ class DummyScheduler implements SchedulerInterface, LoggerAwareInterface {
      *
      * @return bool
      */
-    public function getFinalizeRequest(): bool {
+    public function getFinalizeRequest(): bool
+    {
         return $this->finalizeRequest;
     }
 
@@ -341,14 +354,16 @@ class DummyScheduler implements SchedulerInterface, LoggerAwareInterface {
      *
      * @param bool $finalizeRequest
      */
-    public function setFinalizeRequest(bool $finalizeRequest): void {
+    public function setFinalizeRequest(bool $finalizeRequest): void
+    {
         $this->finalizeRequest = $finalizeRequest;
     }
 
     /**
      * @param JobExecutionType $executionType
      */
-    public function setExecutionType(JobExecutionType $executionType): void {
+    public function setExecutionType(JobExecutionType $executionType): void
+    {
         $this->executionType = $executionType;
     }
 
@@ -358,7 +373,8 @@ class DummyScheduler implements SchedulerInterface, LoggerAwareInterface {
      * @return bool
      * @throws Exception On error.
      */
-    protected function dispatchedEventHandler() {
+    protected function dispatchedEventHandler()
+    {
         if (count($this->trackingSlips) == 0) {
             // If there is nothing to do -> return false
             if ($this->dispatchedEventName != null) {
@@ -378,12 +394,13 @@ class DummyScheduler implements SchedulerInterface, LoggerAwareInterface {
          */
         if ($this->executionType->is(JobExecutionType::cron())) {
             $shouldAbort = false;
-            $minTime = $this->config->get('Garden.Scheduler.CronMinimumTimeSpan', self::CRON_MINIMUM_TIME_SPAN);
+            $minTime = $this->config->get("Garden.Scheduler.CronMinimumTimeSpan", self::CRON_MINIMUM_TIME_SPAN);
 
             if ($this->cache->activeEnabled()) {
                 // If we have cache, we rely on its atomic mechanism
-                if ($this->cache->add(self::CRON_LOCK_KEY, uniqid(), [Gdn_Cache::FEATURE_EXPIRY => $minTime])
-                    !== Gdn_Cache::CACHEOP_SUCCESS
+                if (
+                    $this->cache->add(self::CRON_LOCK_KEY, uniqid(), [Gdn_Cache::FEATURE_EXPIRY => $minTime]) !==
+                    Gdn_Cache::CACHEOP_SUCCESS
                 ) {
                     $shouldAbort = true;
                 }
@@ -417,10 +434,10 @@ class DummyScheduler implements SchedulerInterface, LoggerAwareInterface {
             session_write_close();
 
             // We assume fastCgi. If that fails, go old-school.
-            if (!function_exists('fastcgi_finish_request') || !fastcgi_finish_request()) {
+            if (!function_exists("fastcgi_finish_request") || !fastcgi_finish_request()) {
                 // need to calculate content length *after* URL rewrite!
                 if (headers_sent() === false) {
-                    header("Content-length: ".ob_get_length());
+                    header("Content-length: " . ob_get_length());
                 }
                 ob_end_flush();
             }
@@ -437,7 +454,8 @@ class DummyScheduler implements SchedulerInterface, LoggerAwareInterface {
      * @return void
      * @throws Exception In case of error executing job.
      */
-    protected function dispatchAll() {
+    protected function dispatchAll()
+    {
         /** @var TrackingSlip $trackingSlip */
         foreach ($this->generateTrackingSlips() as $trackingSlip) {
             $this->timers->start(lcfirst($this->dispatchEventName));
@@ -446,7 +464,8 @@ class DummyScheduler implements SchedulerInterface, LoggerAwareInterface {
                 $driverSlip = $trackingSlip->getDriverSlip();
                 $jobDescriptor = $trackingSlip->getDescriptor();
 
-                if (!$this->executionType->is($jobDescriptor->getExecutionType()) ||
+                if (
+                    !$this->executionType->is($jobDescriptor->getExecutionType()) ||
                     ($jobDescriptor instanceof CronJobDescriptorInterface && !$this->shouldRun($jobDescriptor))
                 ) {
                     $driverSlip->setStatus(JobExecutionStatus::abandoned());
@@ -458,9 +477,9 @@ class DummyScheduler implements SchedulerInterface, LoggerAwareInterface {
                 $msg = $t->getMessage();
                 if (strpos($msg, "File: ") !== false) {
                     $msg = "Scheduler failed to execute Job";
-                    $msg .= ". Message: ".$t->getMessage();
-                    $msg .= ". File: ".$t->getFile();
-                    $msg .= ". Line: ".$t->getLine();
+                    $msg .= ". Message: " . $t->getMessage();
+                    $msg .= ". File: " . $t->getFile();
+                    $msg .= ". Line: " . $t->getLine();
                 }
 
                 if (isset($driverSlip)) {
@@ -490,7 +509,8 @@ class DummyScheduler implements SchedulerInterface, LoggerAwareInterface {
     /**
      * Tracking slip generator.
      */
-    protected function generateTrackingSlips() {
+    protected function generateTrackingSlips()
+    {
         // Ensure we're starting at the start.
         reset($this->trackingSlips);
         while (($key = key($this->trackingSlips)) !== null) {
@@ -507,7 +527,8 @@ class DummyScheduler implements SchedulerInterface, LoggerAwareInterface {
     /**
      * Reset the scheduler.
      */
-    public function reset() {
+    public function reset()
+    {
         $this->trackingSlips = [];
     }
 
@@ -518,9 +539,10 @@ class DummyScheduler implements SchedulerInterface, LoggerAwareInterface {
      * @return bool
      * @throws Exception On DateTime conversion error.
      */
-    protected function shouldRun(CronJobDescriptorInterface $jobDescriptor): bool {
+    protected function shouldRun(CronJobDescriptorInterface $jobDescriptor): bool
+    {
         // A "commented" cron schedule will be skipped
-        if (strpos($jobDescriptor->getSchedule(), '#') === 0) {
+        if (strpos($jobDescriptor->getSchedule(), "#") === 0) {
             return false;
         }
 
@@ -536,6 +558,6 @@ class DummyScheduler implements SchedulerInterface, LoggerAwareInterface {
 
         $nextRun = $cron->getNextRunDate(new DateTime("@$lastTimestamp"), 0, true);
 
-        return (new DateTime('now') >= $nextRun);
+        return new DateTime("now") >= $nextRun;
     }
 }

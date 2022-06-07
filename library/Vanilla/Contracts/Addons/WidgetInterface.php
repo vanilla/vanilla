@@ -13,8 +13,8 @@ use Garden\Schema\Schema;
  *
  * @package Vanilla\Contracts\Addons
  */
-interface WidgetInterface {
-
+interface WidgetInterface
+{
     /**
      * Get a widgets schema.
      *

@@ -19,7 +19,8 @@ use VanillaTests\UsersAndRolesApiTestTrait;
  *
  * @package Vanilla\Dashboard\Tests\Controllers
  */
-class ActivityControllerTest extends AbstractAPIv2Test {
+class ActivityControllerTest extends AbstractAPIv2Test
+{
     use UsersAndRolesApiTestTrait;
 
     /** @var int Debug activity type. */
@@ -34,7 +35,8 @@ class ActivityControllerTest extends AbstractAPIv2Test {
      * @throws ContainerException If an error was encountered while retrieving an entry from the container.
      * @throws NotFoundException If unable to find an entry in the container.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         $this->activityModel = $this->container()->get(\ActivityModel::class);
     }
@@ -44,7 +46,8 @@ class ActivityControllerTest extends AbstractAPIv2Test {
      *
      * @return int Activity ID of the new notification.
      */
-    private function addNotification(): int {
+    private function addNotification(): int
+    {
         $result = $this->activityModel->insert([
             "ActivityTypeID" => self::ACTIVITY_TYPE_ID,
             "DateInserted" => date("Y-m-d H:i:s", now()),
@@ -52,18 +55,18 @@ class ActivityControllerTest extends AbstractAPIv2Test {
             "Emailed" => \ActivityModel::SENT_PENDING,
             "NotifyUserID" => $this->api()->getUserID(),
             "Notified" => \ActivityModel::SENT_PENDING,
-            "Route" => '/somewhere',
-            "HeadlineFormat" => 'Something happen',
+            "Route" => "/somewhere",
+            "HeadlineFormat" => "Something happen",
         ]);
 
         return $result;
     }
 
-
     /**
      * Test read and redirect to target notification.
      */
-    public function testReadAndRedirect() {
+    public function testReadAndRedirect()
+    {
         $id = $this->addNotification();
         $getResponse = $this->api()->get("/notifications/{$id}");
         $notification = $getResponse->getBody();
@@ -73,12 +76,12 @@ class ActivityControllerTest extends AbstractAPIv2Test {
         // We are using try/catch because bessy rethrow the exception.
         try {
             $url = \ActivityModel::getReadUrl($id);
-            $this->bessy()->get($url, ['transientKey' => \Gdn::session()->transientKey()]);
-            $this->fail('Expected a redirect.');
+            $this->bessy()->get($url, ["transientKey" => \Gdn::session()->transientKey()]);
+            $this->fail("Expected a redirect.");
         } catch (ResponseException $ex) {
             $response = $ex->getResponse();
             $this->assertSame(302, $response->getStatus());
-            $this->assertEquals(url('/somewhere', true), $response->getHeader('Location'));
+            $this->assertEquals(url("/somewhere", true), $response->getHeader("Location"));
             $getResponseRead = $this->api()->get("/notifications/{$id}");
             $notificationRead = $getResponseRead->getBody();
             $this->assertTrue($notificationRead["read"]);
@@ -88,7 +91,8 @@ class ActivityControllerTest extends AbstractAPIv2Test {
     /**
      * Test read and redirect to target notification failed.
      */
-    public function testReadAndRedirectFailed() {
+    public function testReadAndRedirectFailed()
+    {
         $user = $this->createUser();
         $id = $this->runWithUser(function () {
             return $this->addNotification();
@@ -99,7 +103,7 @@ class ActivityControllerTest extends AbstractAPIv2Test {
         // Test invalid transient Key.
         try {
             $url = \ActivityModel::getReadUrl($id);
-            $this->bessy()->get($url, ['transientKey' => 'transientKey']);
+            $this->bessy()->get($url, ["transientKey" => "transientKey"]);
         } catch (\Gdn_UserException $ex) {
             $this->assertSame(403, $ex->getCode());
             $this->assertSame('You don\'t have permission to do that.', $ex->getMessage());
@@ -108,16 +112,16 @@ class ActivityControllerTest extends AbstractAPIv2Test {
         // Test Activity not found.
         try {
             $url = \ActivityModel::getReadUrl($newID);
-            $this->bessy()->get($url, ['transientKey' => \Gdn::session()->transientKey()]);
+            $this->bessy()->get($url, ["transientKey" => \Gdn::session()->transientKey()]);
         } catch (\Gdn_UserException $ex) {
             $this->assertSame(404, $ex->getCode());
-            $this->assertSame('Activity Not Found', $ex->getMessage());
+            $this->assertSame("Activity Not Found", $ex->getMessage());
         }
 
         // Test has is not the activity owner.
         try {
             $url = \ActivityModel::getReadUrl($id);
-            $this->bessy()->get($url, ['transientKey' => \Gdn::session()->transientKey()]);
+            $this->bessy()->get($url, ["transientKey" => \Gdn::session()->transientKey()]);
         } catch (\Gdn_UserException $ex) {
             $this->assertSame(403, $ex->getCode());
             $this->assertSame('You don\'t have permission to do that.', $ex->getMessage());

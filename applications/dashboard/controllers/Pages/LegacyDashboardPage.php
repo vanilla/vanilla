@@ -15,10 +15,10 @@ use Vanilla\Web\Page;
 /**
  * Page that handles legacy dashboard pages (basically pages rendering from Gdn_Controllers)
  */
-class LegacyDashboardPage extends Page {
-
+class LegacyDashboardPage extends Page
+{
     /** @var string */
-    const MASTER_VIEW_PATH = 'addons/themes/theme-dashboard/views/admin.master.twig';
+    const MASTER_VIEW_PATH = "addons/themes/theme-dashboard/views/admin.master.twig";
 
     /** @var ConfigurationInterface */
     private $config;
@@ -29,12 +29,13 @@ class LegacyDashboardPage extends Page {
     /**
      * @inheritdoc
      */
-    public function initialize(\Gdn_Controller $controller = null) {
+    public function initialize(\Gdn_Controller $controller = null)
+    {
         if ($controller === null) {
-            throw new ServerException('Unable to initialize page.');
+            throw new ServerException("Unable to initialize page.");
         }
 
-        $this->setSeoTitle('Dashboard')
+        $this->setSeoTitle("Dashboard")
             ->setSeoRequired(false)
             ->blockRobots()
             ->setController($controller)
@@ -44,8 +45,9 @@ class LegacyDashboardPage extends Page {
     /**
      * Set Page config
      */
-    private function setConfig() {
-        $this->config = \Gdn::getContainer()->get('Config');
+    private function setConfig()
+    {
+        $this->config = \Gdn::getContainer()->get("Config");
         return $this;
     }
 
@@ -55,7 +57,8 @@ class LegacyDashboardPage extends Page {
      * @param \Gdn_Controller $controller
      * @return $this
      */
-    private function setController(\Gdn_Controller $controller) {
+    private function setController(\Gdn_Controller $controller)
+    {
         $this->controller = $controller;
         return $this;
     }
@@ -67,7 +70,8 @@ class LegacyDashboardPage extends Page {
      * @return DashboardNavModule
      * @throws \Exception Throws an exception if the module isn't configured properly.
      */
-    private function getDashboardNav($activeUrl): DashboardNavModule {
+    private function getDashboardNav($activeUrl): DashboardNavModule
+    {
         /** @var DashboardNavModule $dashboardNav */
         $dashboardNav = DashboardNavModule::getDashboardNav();
         $dashboardNav->getSectionsInfo(false);
@@ -80,16 +84,17 @@ class LegacyDashboardPage extends Page {
      * Render the page as a string.
      * This method needed to be overwritten because Gdn_Controller can't dispatch Data
      */
-    public function renderPage(): string {
+    public function renderPage(): string
+    {
         $viewData = [
-            'locale' => $this->siteMeta->getLocaleKey(),
-            'forumLinkLabel' => $this->config->get('Garden.Title'),
-            'cssClass' => $this->controller->Data['CssClass'],
-            'vanillaUrl' => $this->config->get('Garden.VanillaUrl'),
-            'showVanillaVersion' => !\Gdn::addonManager()->isEnabled("vfoptions", \Vanilla\Addon::TYPE_ADDON),
-            'applicationVersion' => APPLICATION_VERSION,
-            'dashboardNav' => $this->getDashboardNav($this->controller->SelfUrl),
-            'IsWidePage' => $this->controller->Data['IsWidePage'] ?? false,
+            "locale" => $this->siteMeta->getLocaleKey(),
+            "forumLinkLabel" => $this->config->get("Garden.Title"),
+            "cssClass" => $this->controller->Data["CssClass"],
+            "vanillaUrl" => $this->config->get("Garden.VanillaUrl"),
+            "showVanillaVersion" => !\Gdn::addonManager()->isEnabled("vfoptions", \Vanilla\Addon::TYPE_ADDON),
+            "applicationVersion" => APPLICATION_VERSION,
+            "dashboardNav" => $this->getDashboardNav($this->controller->SelfUrl),
+            "IsWidePage" => $this->controller->Data["IsWidePage"] ?? false,
         ];
 
         return $this->masterViewRenderer->renderPage($this, $viewData, self::MASTER_VIEW_PATH);
@@ -98,7 +103,8 @@ class LegacyDashboardPage extends Page {
     /**
      * @inheritdoc
      */
-    public function getAssetSection(): string {
+    public function getAssetSection(): string
+    {
         return "admin";
     }
 }

@@ -18,15 +18,16 @@ namespace VanillaTests\Fixtures\Formatting;
  * - parsed headings: output-headings.json
  * - quote output: output-quote.html
  */
-class FormatFixture {
-
+class FormatFixture
+{
     /** @var string */
     private $fixtureRoot;
 
     /**
      * @param string $fixtureRoot
      */
-    public function __construct(string $fixtureRoot) {
+    public function __construct(string $fixtureRoot)
+    {
         $this->fixtureRoot = $fixtureRoot;
     }
 
@@ -36,8 +37,9 @@ class FormatFixture {
      * @param string $fileName
      * @return string|null
      */
-    private function getFixtureContentsWithFileName(string $fileName): ?string {
-        $fullPath = $this->fixtureRoot . '/' . $fileName;
+    private function getFixtureContentsWithFileName(string $fileName): ?string
+    {
+        $fullPath = $this->fixtureRoot . "/" . $fileName;
         if (file_exists($fullPath)) {
             return file_get_contents($fullPath);
         }
@@ -48,51 +50,58 @@ class FormatFixture {
     /**
      * @return string
      */
-    public function getName(): string {
+    public function getName(): string
+    {
         return basename($this->fixtureRoot);
     }
 
     /**
      * @return string
      */
-    public function getInput(): string {
-        $inputs = glob($this->fixtureRoot . '/input.*');
+    public function getInput(): string
+    {
+        $inputs = glob($this->fixtureRoot . "/input.*");
         return $this->getFixtureContentsWithFileName(basename($inputs[0]));
     }
 
     /**
      * @return string
      */
-    public function getHtml(): ?string {
-        return $this->getFixtureContentsWithFileName('output.html');
+    public function getHtml(): ?string
+    {
+        return $this->getFixtureContentsWithFileName("output.html");
     }
 
     /**
      * @return string|null
      */
-    public function getText(): ?string {
-        return $this->getFixtureContentsWithFileName('output.txt');
+    public function getText(): ?string
+    {
+        return $this->getFixtureContentsWithFileName("output.txt");
     }
 
     /**
      * @return string|null
      */
-    public function getExcerpt(): ?string {
-        return $this->getFixtureContentsWithFileName('output-excerpt.txt');
+    public function getExcerpt(): ?string
+    {
+        return $this->getFixtureContentsWithFileName("output-excerpt.txt");
     }
 
     /**
      * @return string|null
      */
-    public function getQuote(): ?string {
-        return $this->getFixtureContentsWithFileName('output-quote.html');
+    public function getQuote(): ?string
+    {
+        return $this->getFixtureContentsWithFileName("output-quote.html");
     }
 
     /**
      * @return array|null
      */
-    public function getImages(): ?array {
-        $json = $this->getFixtureContentsWithFileName('output-images.json');
+    public function getImages(): ?array
+    {
+        $json = $this->getFixtureContentsWithFileName("output-images.json");
         if ($json) {
             return json_decode($json, true);
         }
@@ -103,8 +112,9 @@ class FormatFixture {
     /**
      * @return array|null
      */
-    public function getImageUrls(): ?array {
-        $json = $this->getFixtureContentsWithFileName('output-imageUrls.json');
+    public function getImageUrls(): ?array
+    {
+        $json = $this->getFixtureContentsWithFileName("output-imageUrls.json");
         if ($json) {
             return json_decode($json, true);
         }
@@ -115,8 +125,9 @@ class FormatFixture {
     /**
      * @return array|null
      */
-    public function getAttachments(): ?array {
-        $json = $this->getFixtureContentsWithFileName('output-attachments.json');
+    public function getAttachments(): ?array
+    {
+        $json = $this->getFixtureContentsWithFileName("output-attachments.json");
         if ($json) {
             return json_decode($json, true);
         }
@@ -127,8 +138,9 @@ class FormatFixture {
     /**
      * @return array|null
      */
-    public function getHeadings(): ?array {
-        $json = $this->getFixtureContentsWithFileName('output-headings.json');
+    public function getHeadings(): ?array
+    {
+        $json = $this->getFixtureContentsWithFileName("output-headings.json");
         if ($json) {
             return json_decode($json, true);
         }
@@ -139,8 +151,9 @@ class FormatFixture {
     /**
      * @return array|null
      */
-    public function getMentions(): ?array {
-        $json = $this->getFixtureContentsWithFileName('output-mentions.json');
+    public function getMentions(): ?array
+    {
+        $json = $this->getFixtureContentsWithFileName("output-mentions.json");
         if ($json) {
             return json_decode($json, true);
         }

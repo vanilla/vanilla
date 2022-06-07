@@ -12,40 +12,40 @@ use Vanilla\Widgets\WidgetService;
 /**
  * Class Pocket
  */
-class Pocket implements LoggerAwareInterface {
-
+class Pocket implements LoggerAwareInterface
+{
     use LoggerAwareTrait;
 
     const ENABLED = 0;
     const DISABLED = 1;
     const TESTING = 2;
 
-    const REPEAT_BEFORE = 'before';
-    const REPEAT_AFTER = 'after';
-    const REPEAT_ONCE = 'once';
-    const REPEAT_EVERY = 'every';
-    const REPEAT_INDEX = 'index';
+    const REPEAT_BEFORE = "before";
+    const REPEAT_AFTER = "after";
+    const REPEAT_ONCE = "once";
+    const REPEAT_EVERY = "every";
+    const REPEAT_INDEX = "index";
 
-    const TYPE_AD = 'ad';
-    const TYPE_DEFAULT = 'default';
+    const TYPE_AD = "ad";
+    const TYPE_DEFAULT = "default";
 
     /** $var string The text to display in the pocket. */
-    public $Body = '';
+    public $Body = "";
 
     /** @var int Whether or not the pocket is disabled. The pocket can also be in testing-mode. */
     public $Disabled = Pocket::ENABLED;
 
     /** @var string The format of the pocket. */
-    public $Format = 'Raw';
+    public $Format = "Raw";
 
     /** $var string The location on the page to display the pocket. */
     public $Location;
 
     /** $var string A descriptive name for the pocket to help keep it organized. */
-    public $Name = '';
+    public $Name = "";
 
     /** $var string The name of the page to put the pocket on. */
-    public $Page = '';
+    public $Page = "";
 
     /** $var string How the pocket repeats on the page. */
     public $RepeatType = Pocket::REPEAT_INDEX;
@@ -75,7 +75,7 @@ class Pocket implements LoggerAwareInterface {
     public $ShowInDashboard = false;
 
     /** @var array */
-    public static $NameTranslations = ['conversations' => 'inbox', 'messages' => 'inbox', 'discussion' => 'comments'];
+    public static $NameTranslations = ["conversations" => "inbox", "messages" => "inbox", "discussion" => "comments"];
 
     /** @var array */
     public $Attributes = [];
@@ -92,7 +92,8 @@ class Pocket implements LoggerAwareInterface {
     /**
      * Pocket constructor.
      */
-    public function __construct(WidgetService $widgetService) {
+    public function __construct(WidgetService $widgetService)
+    {
         $this->widgetService = $widgetService;
         $this->setLogger(Logger::getLogger());
     }
@@ -105,8 +106,9 @@ class Pocket implements LoggerAwareInterface {
      *
      * @return bool
      */
-    public static function inTestMode($pocket) {
-        return (val('Disabled', $pocket) === Pocket::TESTING) || (val('TestMode', $pocket) === 1);
+    public static function inTestMode($pocket)
+    {
+        return val("Disabled", $pocket) === Pocket::TESTING || val("TestMode", $pocket) === 1;
     }
 
     /**
@@ -115,10 +117,16 @@ class Pocket implements LoggerAwareInterface {
      * @param array $data Data specific to the request.
      * @return bool
      */
-    public function canRender($data) {
+    public function canRender($data)
+    {
         $testMode = self::inTestMode($this);
-        $pocketAdmin = checkPermission('Plugins.Pockets.Manage');
-        $inSectionDashboard = inSection('Dashboard') || inSection('Moderation') || inSection('Settings') || inSection('Analytics') || inSection('DashboardHome');
+        $pocketAdmin = checkPermission("Plugins.Pockets.Manage");
+        $inSectionDashboard =
+            inSection("Dashboard") ||
+            inSection("Moderation") ||
+            inSection("Settings") ||
+            inSection("Analytics") ||
+            inSection("DashboardHome");
 
         if (!$this->ShowInDashboard && $inSectionDashboard) {
             return false;
@@ -129,11 +137,11 @@ class Pocket implements LoggerAwareInterface {
             return false;
         }
 
-        if ($this->isAd() && checkPermission('Garden.NoAds.Allow')) {
+        if ($this->isAd() && checkPermission("Garden.NoAds.Allow")) {
             return false;
         }
 
-        if ($this->EmbeddedNever && strcasecmp(Gdn::controller()->RequestMethod, 'embed') == 0) {
+        if ($this->EmbeddedNever && strcasecmp(Gdn::controller()->RequestMethod, "embed") == 0) {
             return false;
         }
 
@@ -146,16 +154,16 @@ class Pocket implements LoggerAwareInterface {
         }
 
         // Check to see if the page matches.
-        $page = $this->Page ?? '';
-        $homepageMatches = (strtolower($page) === 'home' || strtolower($page) === 'sitehome') && $data['isHomepage'];
-        $pageMatches = $homepageMatches || strtolower($page) === strtolower($data['PageName']);
+        $page = $this->Page ?? "";
+        $homepageMatches = (strtolower($page) === "home" || strtolower($page) === "sitehome") && $data["isHomepage"];
+        $pageMatches = $homepageMatches || strtolower($page) === strtolower($data["PageName"]);
         if ($page && !$pageMatches) {
             // A page is set, but we don't match it.
             return false;
         }
 
         // Check to see if this is repeating.
-        $count = val('Count', $data);
+        $count = val("Count", $data);
         if ($count) {
             switch ($this->RepeatType) {
                 case Pocket::REPEAT_AFTER:
@@ -180,12 +188,12 @@ class Pocket implements LoggerAwareInterface {
                         $every = 1;
                     }
                     $begin = val(1, $frequency, 1);
-                    if (($count % $every) > 0 || ($count < $begin)) {
+                    if ($count % $every > 0 || $count < $begin) {
                         return false;
                     }
                     break;
                 case Pocket::REPEAT_INDEX:
-                    if (!in_array($count, (array)$this->RepeatFrequency)) {
+                    if (!in_array($count, (array) $this->RepeatFrequency)) {
                         return false;
                     }
                     break;
@@ -194,7 +202,7 @@ class Pocket implements LoggerAwareInterface {
 
         /** @var \Garden\EventManager $eventManager */
         $eventManager = Gdn::getContainer()->get(\Garden\EventManager::class);
-        $eventResult = $eventManager->fireFilter('pocket_canRender', true, $this, $data);
+        $eventResult = $eventManager->fireFilter("pocket_canRender", true, $this, $data);
 
         return $eventResult;
     }
@@ -204,25 +212,26 @@ class Pocket implements LoggerAwareInterface {
      *
      * @param array $data
      */
-    public function load($data) {
-        $this->Body = $data['Body'];
-        $this->Disabled = $data['Disabled'];
-        $this->Format = $data['Format'];
-        $this->Location = $data['Location'];
-        $this->Name = $data['Name'];
-        $this->Page = $data['Page'];
-        $this->MobileOnly = $data['MobileOnly'];
-        $this->MobileNever = $data['MobileNever'];
-        $this->Type = $data['Type'] ?? Pocket::TYPE_DEFAULT;
-        $this->EmbeddedNever = $data['EmbeddedNever'] ?? null;
-        $this->ShowInDashboard = $data['ShowInDashboard'] ?? $data;
-        $this->TestMode = $data['TestMode'] ?? null;
+    public function load($data)
+    {
+        $this->Body = $data["Body"];
+        $this->Disabled = $data["Disabled"];
+        $this->Format = $data["Format"];
+        $this->Location = $data["Location"];
+        $this->Name = $data["Name"];
+        $this->Page = $data["Page"];
+        $this->MobileOnly = $data["MobileOnly"];
+        $this->MobileNever = $data["MobileNever"];
+        $this->Type = $data["Type"] ?? Pocket::TYPE_DEFAULT;
+        $this->EmbeddedNever = $data["EmbeddedNever"] ?? null;
+        $this->ShowInDashboard = $data["ShowInDashboard"] ?? $data;
+        $this->TestMode = $data["TestMode"] ?? null;
         $this->Data = $data;
-        $this->widgetParameters = $data['WidgetParameters'] ?? [];
-        $this->widgetID = $data['WidgetID'] ?? null;
+        $this->widgetParameters = $data["WidgetParameters"] ?? [];
+        $this->widgetID = $data["WidgetID"] ?? null;
 
         // parse the frequency.
-        $repeat = $data['Repeat'];
+        $repeat = $data["Repeat"];
         [$this->RepeatType, $this->RepeatFrequency] = Pocket::parseRepeat($repeat);
     }
 
@@ -231,7 +240,8 @@ class Pocket implements LoggerAwareInterface {
      *
      * @return bool
      */
-    public function isAd() {
+    public function isAd()
+    {
         return $this->Type == Pocket::TYPE_AD;
     }
 
@@ -248,16 +258,17 @@ class Pocket implements LoggerAwareInterface {
      *
      * @return string A page name or empty string if null/no argument was passed.
      */
-    public static function pageName($nameOrObject = null): string {
+    public static function pageName($nameOrObject = null): string
+    {
         if (is_object($nameOrObject)) {
-            $name = val('PageName', $nameOrObject, val('ControllerName', $nameOrObject, get_class($nameOrObject)));
+            $name = val("PageName", $nameOrObject, val("ControllerName", $nameOrObject, get_class($nameOrObject)));
         } else {
             $name = $nameOrObject;
         }
 
         $name = strtolower($name);
-        if (stringEndsWith($name, 'controller', false)) {
-            $name = substr($name, 0, -strlen('controller'));
+        if (stringEndsWith($name, "controller", false)) {
+            $name = substr($name, 0, -strlen("controller"));
         }
 
         if (array_key_exists($name, self::$NameTranslations)) {
@@ -273,8 +284,9 @@ class Pocket implements LoggerAwareInterface {
      *
      * @return array A tuple of the repeat value and frequency in the form `[string, string[]]`.
      */
-    public static function parseRepeat($repeat) {
-        $repeatType = '';
+    public static function parseRepeat($repeat)
+    {
+        $repeatType = "";
         if (stringBeginsWith($repeat, Pocket::REPEAT_EVERY)) {
             $repeatType = Pocket::REPEAT_EVERY;
             $frequency = substr($repeat, strlen(Pocket::REPEAT_EVERY));
@@ -290,8 +302,8 @@ class Pocket implements LoggerAwareInterface {
         }
 
         if (isset($frequency)) {
-            $frequency = explode(',', $frequency);
-            $frequency = array_map('trim', $frequency);
+            $frequency = explode(",", $frequency);
+            $frequency = array_map("trim", $frequency);
         } else {
             $frequency = [];
         }
@@ -304,7 +316,8 @@ class Pocket implements LoggerAwareInterface {
      *
      *  @param array $data additional data for the pocket.
      */
-    public function render($data = null) {
+    public function render($data = null)
+    {
         echo $this->toString($data);
     }
 
@@ -316,7 +329,8 @@ class Pocket implements LoggerAwareInterface {
      * - indexes: Renders only at the given indexes, starting at 1.
      * @param int|array $frequency The frequency of the repeating, see the $type parameter for how this works.
      */
-    public function repeat($type, $frequency) {
+    public function repeat($type, $frequency)
+    {
         $this->RepeatType = $type;
         $this->RepeatFrequency = $frequency;
     }
@@ -326,14 +340,15 @@ class Pocket implements LoggerAwareInterface {
      *
      * @return mixed|string Either the raw body of the pocket or a formatted version, depending on the Format.
      */
-    public function toString() {
+    public function toString()
+    {
         static $plugin;
         if (!isset($plugin)) {
             $plugin = PocketsPlugin::instance();
         }
 
-        $plugin->EventArguments['Pocket'] = $this;
-        $plugin->fireEvent('ToString');
+        $plugin->EventArguments["Pocket"] = $this;
+        $plugin->fireEvent("ToString");
 
         $format = strtolower($this->Format);
 
@@ -344,10 +359,10 @@ class Pocket implements LoggerAwareInterface {
                 $factory = $this->widgetService->getFactoryByID($this->widgetID);
                 if (!$factory) {
                     $this->logger->warning("Could not find widget factory for pocket", [
-                        'pocketName' => $this->Name,
-                        'widgetID' => $this->widgetID,
+                        "pocketName" => $this->Name,
+                        "widgetID" => $this->widgetID,
                     ]);
-                    return '';
+                    return "";
                 }
                 $output = $factory->renderWidget($this->widgetParameters);
                 return $output;
@@ -366,11 +381,12 @@ class Pocket implements LoggerAwareInterface {
      *
      * @deprecated PocketsModel::touchPocket()
      */
-    public static function touch($name, $value) {
+    public static function touch($name, $value)
+    {
         /** @var PocketsModel $model */
         $model = \Gdn::getContainer()->get(PocketsModel::class);
         return $model->touchPocket($name, [
-            'Body' => $value,
+            "Body" => $value,
         ]);
     }
 }

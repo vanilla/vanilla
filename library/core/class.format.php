@@ -14,10 +14,10 @@
 use Garden\EventManager;
 use Garden\StaticCacheConfigTrait;
 use Vanilla\CurrentTimeStamp;
-use \Vanilla\Formatting;
-use \Vanilla\Formatting\Formats;
-use \Vanilla\Formatting\FormatUtil;
-use \Vanilla\Formatting\Html;
+use Vanilla\Formatting;
+use Vanilla\Formatting\Formats;
+use Vanilla\Formatting\FormatUtil;
+use Vanilla\Formatting\Html;
 use Vanilla\Formatting\DateTimeFormatter;
 
 /**
@@ -25,13 +25,10 @@ use Vanilla\Formatting\DateTimeFormatter;
  *
  * Utility class that helps to format strings, objects, and arrays.
  */
-class Gdn_Format {
-
+class Gdn_Format
+{
     use StaticCacheConfigTrait;
-    const INVALID_FIRST_MENTION_CHARS = [
-        "{",
-        "}",
-    ];
+    const INVALID_FIRST_MENTION_CHARS = ["{", "}"];
 
     /**
      * @var bool Flag which allows plugins to decide if the output should include rel="nofollow" on any <a> links.
@@ -46,12 +43,10 @@ class Gdn_Format {
     public static $FormatLinks = true;
 
     /** @var string  */
-    public static $MentionsUrlFormat = '/profile/{name}';
+    public static $MentionsUrlFormat = "/profile/{name}";
 
     /** @var array  */
-    protected static $SanitizedFormats = [
-        'html', 'bbcode', 'wysiwyg', 'text', 'textex', 'markdown', 'rich', 'display'
-    ];
+    protected static $SanitizedFormats = ["html", "bbcode", "wysiwyg", "text", "textex", "markdown", "rich", "display"];
 
     /**
      * The ActivityType table has some special sprintf search/replace values in the
@@ -76,62 +71,66 @@ class Gdn_Format {
      * @param int|string $viewingUserID The user viewing the headline.
      * @return string
      */
-    public static function activityHeadline($activity, $profileUserID = '', $viewingUserID = '') {
-        $activity = (object)$activity;
-        if ($viewingUserID == '') {
+    public static function activityHeadline($activity, $profileUserID = "", $viewingUserID = "")
+    {
+        $activity = (object) $activity;
+        if ($viewingUserID == "") {
             $session = Gdn::session();
             $viewingUserID = $session->isValid() ? $session->UserID : -1;
         }
 
-        $genderSuffixCode = 'First';
+        $genderSuffixCode = "First";
         $genderSuffixGender = $activity->ActivityGender;
 
         if ($viewingUserID == $activity->ActivityUserID) {
-            $activityName = $activityNameP = t('You');
+            $activityName = $activityNameP = t("You");
         } else {
             $activityName = $activity->ActivityName;
             $activityNameP = formatPossessive($activityName);
-            $genderSuffixCode = 'Third';
+            $genderSuffixCode = "Third";
         }
 
         if ($profileUserID != $activity->ActivityUserID) {
             // If we're not looking at the activity user's profile, link the name
             $activityNameD = urlencode($activity->ActivityName);
-            $activityName = anchor($activityName, userUrl($activity, 'Activity'));
-            $activityNameP = anchor($activityNameP, userUrl($activity, 'Activity'));
-            $genderSuffixCode = 'Third';
+            $activityName = anchor($activityName, userUrl($activity, "Activity"));
+            $activityNameP = anchor($activityNameP, userUrl($activity, "Activity"));
+            $genderSuffixCode = "Third";
         }
 
-        $gender = t('their'); //TODO: this isn't preferable but I don't know a better option
-        $gender2 = t('they'); //TODO: this isn't preferable either
-        if ($activity->ActivityGender == 'm') {
-            $gender = t('his');
-            $gender2 = t('he');
-        } elseif ($activity->ActivityGender == 'f') {
-            $gender = t('her');
-            $gender2 = t('she');
+        $gender = t("their"); //TODO: this isn't preferable but I don't know a better option
+        $gender2 = t("they"); //TODO: this isn't preferable either
+        if ($activity->ActivityGender == "m") {
+            $gender = t("his");
+            $gender2 = t("he");
+        } elseif ($activity->ActivityGender == "f") {
+            $gender = t("her");
+            $gender2 = t("she");
         }
 
-        if ($viewingUserID == $activity->RegardingUserID || ($activity->RegardingUserID == '' && $activity->ActivityUserID == $viewingUserID)) {
-            $gender = $gender2 = t('your');
+        if (
+            $viewingUserID == $activity->RegardingUserID ||
+            ($activity->RegardingUserID == "" && $activity->ActivityUserID == $viewingUserID)
+        ) {
+            $gender = $gender2 = t("your");
         }
 
         $isYou = false;
         if ($viewingUserID == $activity->RegardingUserID) {
             $isYou = true;
-            $regardingName = t('you');
-            $regardingNameP = t('your');
+            $regardingName = t("you");
+            $regardingNameP = t("your");
             $genderSuffixGender = $activity->RegardingGender;
         } else {
-            $regardingName = $activity->RegardingName == '' ? t('somebody') : $activity->RegardingName;
+            $regardingName = $activity->RegardingName == "" ? t("somebody") : $activity->RegardingName;
             $regardingNameP = formatPossessive($regardingName);
 
             if ($activity->ActivityUserID != $viewingUserID) {
-                $genderSuffixCode = 'Third';
+                $genderSuffixCode = "Third";
             }
         }
-        $regardingWall = '';
-        $regardingWallLink = '';
+        $regardingWall = "";
+        $regardingWallLink = "";
 
         if ($activity->ActivityUserID == $activity->RegardingUserID) {
             // If the activityuser and regardinguser are the same, use the $Gender Ref as the RegardingName
@@ -141,25 +140,25 @@ class Gdn_Format {
             // If there is a regarding user and we're not looking at his/her profile, link the name.
             $regardingNameD = urlencode($activity->RegardingName);
             if (!$isYou) {
-                $regardingName = anchor($regardingName, userUrl($activity, 'Regarding'));
-                $regardingNameP = anchor($regardingNameP, userUrl($activity, 'Regarding'));
-                $genderSuffixCode = 'Third';
+                $regardingName = anchor($regardingName, userUrl($activity, "Regarding"));
+                $regardingNameP = anchor($regardingNameP, userUrl($activity, "Regarding"));
+                $genderSuffixCode = "Third";
                 $genderSuffixGender = $activity->RegardingGender;
             }
-            $regardingWallActivityPath = userUrl($activity, 'Regarding');
+            $regardingWallActivityPath = userUrl($activity, "Regarding");
             $regardingWallLink = url($regardingWallActivityPath);
-            $regardingWall = anchor(t('wall'), $regardingWallActivityPath);
+            $regardingWall = anchor(t("wall"), $regardingWallActivityPath);
         }
-        if ($regardingWall == '') {
-            $regardingWall = t('wall');
+        if ($regardingWall == "") {
+            $regardingWall = t("wall");
         }
 
-        if ($activity->Route == '') {
-            $activityRouteLink = '';
+        if ($activity->Route == "") {
+            $activityRouteLink = "";
             if ($activity->RouteCode) {
                 $route = t($activity->RouteCode);
             } else {
-                $route = '';
+                $route = "";
             }
         } else {
             $activityRouteLink = url($activity->Route);
@@ -169,9 +168,9 @@ class Gdn_Format {
 
         // Translate the gender suffix.
         $genderSuffixCode = "GenderSuffix.$genderSuffixCode.$genderSuffixGender";
-        $genderSuffix = t($genderSuffixCode, '');
+        $genderSuffix = t($genderSuffixCode, "");
         if ($genderSuffix == $genderSuffixCode) {
-            $genderSuffix = ''; // in case translate doesn't support empty strings.
+            $genderSuffix = ""; // in case translate doesn't support empty strings.
         }
         /*
           Debug:
@@ -188,9 +187,25 @@ class Gdn_Format {
 
         $fullHeadline = t("Activity.{$activity->ActivityType}.FullHeadline", t($activity->FullHeadline));
         $profileHeadline = t("Activity.{$activity->ActivityType}.ProfileHeadline", t($activity->ProfileHeadline));
-        $messageFormat = ($profileUserID == $activity->ActivityUserID || $profileUserID == '' || !$profileHeadline ? $fullHeadline : $profileHeadline);
+        $messageFormat =
+            $profileUserID == $activity->ActivityUserID || $profileUserID == "" || !$profileHeadline
+                ? $fullHeadline
+                : $profileHeadline;
 
-        return sprintf($messageFormat, $activityName, $activityNameP, $regardingName, $regardingNameP, $regardingWall, $gender, $gender2, $route, $genderSuffix, $regardingWallLink, $activityRouteLink);
+        return sprintf(
+            $messageFormat,
+            $activityName,
+            $activityNameP,
+            $regardingName,
+            $regardingNameP,
+            $regardingWall,
+            $gender,
+            $gender2,
+            $route,
+            $genderSuffix,
+            $regardingWallLink,
+            $activityRouteLink
+        );
     }
 
     /**
@@ -199,11 +214,12 @@ class Gdn_Format {
      * @param string $mixed An object, array, or string to be formatted.
      * @return string
      */
-    public static function alphaNumeric($mixed) {
+    public static function alphaNumeric($mixed)
+    {
         if (!is_string($mixed)) {
-            return self::to($mixed, 'ForAlphaNumeric');
+            return self::to($mixed, "ForAlphaNumeric");
         } else {
-            return preg_replace('/([^\w-])/', '', $mixed);
+            return preg_replace("/([^\w-])/", "", $mixed);
         }
     }
 
@@ -214,7 +230,8 @@ class Gdn_Format {
      * @param array $array An array to be converted to object.
      * @return stdClass
      */
-    public static function arrayAsObject($array) {
+    public static function arrayAsObject($array)
+    {
         if (!is_array($array)) {
             return $array;
         }
@@ -235,8 +252,9 @@ class Gdn_Format {
      * @param string The string to be formatted.
      * @return string
      */
-    public static function arrayValueForPhp($string) {
-        return str_replace('\\', '\\', html_entity_decode($string, ENT_QUOTES));
+    public static function arrayValueForPhp($string)
+    {
+        return str_replace("\\", "\\", html_entity_decode($string, ENT_QUOTES));
     }
 
     /**
@@ -246,10 +264,11 @@ class Gdn_Format {
      * @return string
      * @deprecated 3.2 The formatting method should be saved in the DB.
      */
-    public static function auto($mixed) {
-        deprecated(__FUNCTION__, 'Any other formatting method.');
-        $formatter = c('Garden.InputFormatter');
-        if (!method_exists('Gdn_Format', $formatter)) {
+    public static function auto($mixed)
+    {
+        deprecated(__FUNCTION__, "Any other formatting method.");
+        $formatter = c("Garden.InputFormatter");
+        if (!method_exists("Gdn_Format", $formatter)) {
             return $mixed;
         }
 
@@ -263,9 +282,10 @@ class Gdn_Format {
      * @return string Sanitized HTML.
      * @deprecated 3.2 FormatService::renderHtml($str, Formats\BBCodeFormat::FORMAT_KEY);
      */
-    public static function bbCode($mixed) {
+    public static function bbCode($mixed)
+    {
         if (!is_string($mixed)) {
-            return self::to($mixed, 'BBCode');
+            return self::to($mixed, "BBCode");
         } else {
             return Gdn::formatService()->renderHtml($mixed, Formats\BBCodeFormat::FORMAT_KEY);
         }
@@ -279,7 +299,8 @@ class Gdn_Format {
      * @return string The formatted number.
      * @todo Make this locale aware.
      */
-    public static function bigNumber($number, $format = '') {
+    public static function bigNumber($number, $format = "")
+    {
         if (!is_numeric($number)) {
             return $number;
         }
@@ -288,7 +309,7 @@ class Gdn_Format {
         $workingNumber = $number;
         if ($number < 0) {
             $negative = true;
-            $workingNumber = $number - ($number * 2);
+            $workingNumber = $number - $number * 2;
         }
 
         if ($workingNumber >= 1000000000) {
@@ -305,12 +326,12 @@ class Gdn_Format {
         }
 
         if ($negative) {
-            $number2 = $number2 - ($number2 * 2);
+            $number2 = $number2 - $number2 * 2;
         }
 
         if (isset($suffix)) {
             $result = number_format($number2, 1);
-            if (substr($result, -2) == '.0') {
+            if (substr($result, -2) == ".0") {
                 $result = substr($result, 0, -2);
             }
 
@@ -319,8 +340,8 @@ class Gdn_Format {
             $result = $number;
         }
 
-        if ($format == 'html') {
-            $result = wrap($result, 'span', ['title' => number_format($number)]);
+        if ($format == "html") {
+            $result = wrap($result, "span", ["title" => number_format($number)]);
         }
 
         return $result;
@@ -333,13 +354,14 @@ class Gdn_Format {
      * @param int $precision The number of decimal places to return.
      * @return string The formatted bytes.
      */
-    public static function bytes($bytes, $precision = 2) {
-        $units = ['B', 'K', 'M', 'G', 'T'];
+    public static function bytes($bytes, $precision = 2)
+    {
+        $units = ["B", "K", "M", "G", "T"];
         $bytes = max($bytes, 0);
         $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
         $pow = min($pow, count($units) - 1);
         $bytes /= pow(1024, $pow);
-        return round($bytes, $precision).$units[$pow];
+        return round($bytes, $precision) . $units[$pow];
     }
 
     /**
@@ -349,18 +371,20 @@ class Gdn_Format {
      * @return string
      * @deprecated 3.2 FormatUtil::transliterate()
      */
-    public static function clean($mixed): string {
+    public static function clean($mixed): string
+    {
         if (!is_string($mixed)) {
-            return self::to($mixed, 'Clean');
+            return self::to($mixed, "Clean");
         }
-        deprecated(__FUNCTION__, 'FormatUtil::transliterate()');
+        deprecated(__FUNCTION__, "FormatUtil::transliterate()");
         return FormatUtil::transliterate($mixed);
     }
 
     /**
      * @return DateTimeFormatter
      */
-    private static function getDateTimeFormatter(): DateTimeFormatter {
+    private static function getDateTimeFormatter(): DateTimeFormatter
+    {
         return Gdn::getContainer()->get(DateTimeFormatter::class);
     }
 
@@ -374,11 +398,12 @@ class Gdn_Format {
      * @return string
      * @deprecated 3.2 DateTimeFormatter::formatDate($timestamp)
      */
-    public static function date($timestamp = '', $format = '') {
-        if (function_exists('formatDateCustom') && (!$format || strcasecmp($format, 'html') == 0)) {
+    public static function date($timestamp = "", $format = "")
+    {
+        if (function_exists("formatDateCustom") && (!$format || strcasecmp($format, "html") == 0)) {
             deprecated(
-                'FormatDateCustom',
-                'Extend ' . DateTimeFormatter::class . ' and replace it in Garden\Container'
+                "FormatDateCustom",
+                "Extend " . DateTimeFormatter::class . " and replace it in Garden\Container"
             );
             // Was a mysqldatetime passed?
             if ($timestamp !== null && !is_numeric($timestamp)) {
@@ -392,8 +417,8 @@ class Gdn_Format {
             return formatDateCustom($timestamp, $format);
         }
 
-        $isHtml = strtolower($format) === 'html';
-        $format = $isHtml ? '' : $format;
+        $isHtml = strtolower($format) === "html";
+        $format = $isHtml ? "" : $format;
 
         return self::getDateTimeFormatter()->formatDate($timestamp, $isHtml, $format);
     }
@@ -407,7 +432,8 @@ class Gdn_Format {
      * @since 2.1
      * @deprecated 3.2 DateTimeFormatter::formatDate($timestamp, true)
      */
-    public static function dateFull($timestamp, $format = DateTimeFormatter::FORCE_FULL_FORMAT) {
+    public static function dateFull($timestamp, $format = DateTimeFormatter::FORCE_FULL_FORMAT)
+    {
         return self::date($timestamp, $format);
     }
 
@@ -417,15 +443,16 @@ class Gdn_Format {
      * @param mixed $mixed An object, array, or string to be formatted.
      * @return string
      */
-    public static function deleted($mixed) {
+    public static function deleted($mixed)
+    {
         if (!is_string($mixed)) {
-            return self::to($mixed, 'Deleted');
+            return self::to($mixed, "Deleted");
         } else {
-            $formatter = Gdn::factory('HtmlFormatter');
+            $formatter = Gdn::factory("HtmlFormatter");
             if (is_null($formatter)) {
                 return Gdn_Format::display($mixed);
             } else {
-                return $formatter->format(wrap($mixed, 'div', ' class="Deleted"'));
+                return $formatter->format(wrap($mixed, "div", ' class="Deleted"'));
             }
         }
     }
@@ -437,7 +464,8 @@ class Gdn_Format {
      * @return string
      * @deprecated 3.2 FormatConfig::getDefaultFormat()
      */
-    public static function defaultFormat($forceMobile = false) {
+    public static function defaultFormat($forceMobile = false)
+    {
         /** @var Formatting\FormatConfig $formatConfig */
         $formatConfig = Gdn::getContainer()->get(Formatting\FormatConfig::class);
         if ($forceMobile) {
@@ -454,12 +482,13 @@ class Gdn_Format {
      * @return string
      * @deprecated 3.2 Use a specific formatting method.
      */
-    public static function display($mixed) {
+    public static function display($mixed)
+    {
         if (!is_string($mixed)) {
-            return self::to($mixed, 'Display');
+            return self::to($mixed, "Display");
         } else {
-            $mixed = htmlspecialchars($mixed, ENT_QUOTES, 'UTF-8');
-            $mixed = str_replace(["&quot;", "&amp;"], ['"', '&'], $mixed);
+            $mixed = htmlspecialchars($mixed, ENT_QUOTES, "UTF-8");
+            $mixed = str_replace(["&quot;", "&amp;"], ['"', "&"], $mixed);
 
             /** @var Html\HtmlEnhancer $htmlEnhancer */
             $htmlEnhancer = Gdn::getContainer()->get(Html\HtmlEnhancer::class);
@@ -474,24 +503,25 @@ class Gdn_Format {
      * @param string $email
      * @return string
      */
-    public static function email($email) {
+    public static function email($email)
+    {
         $max = max(3, floor(strlen($email) / 2));
         $chunks = str_split($email, mt_rand(3, $max));
-        $chunks = array_map('htmlentities', $chunks);
+        $chunks = array_map("htmlentities", $chunks);
 
         $st = mt_rand(0, 1);
         $end = count($chunks) - mt_rand(1, 4);
 
-        $result = '';
+        $result = "";
         foreach ($chunks as $i => $chunk) {
             if ($i >= $st && $i <= $end) {
-                $result .= '<span style="display:inline;display:none">'.str_rot13($chunk).'</span>';
+                $result .= '<span style="display:inline;display:none">' . str_rot13($chunk) . "</span>";
             }
 
-            $result .= '<span style="display:none;display:inline">'.$chunk.'</span>';
+            $result .= '<span style="display:none;display:inline">' . $chunk . "</span>";
         }
 
-        return '<span class="Email">'.$result.'</span>';
+        return '<span class="Email">' . $result . "</span>";
     }
 
     /**
@@ -500,14 +530,15 @@ class Gdn_Format {
      * @param mixed $mixed An object, array, or string to be formatted.
      * @return string
      */
-    public static function form($mixed) {
+    public static function form($mixed)
+    {
         if (!is_string($mixed)) {
-            return self::to($mixed, 'Form');
+            return self::to($mixed, "Form");
         } else {
-            if (c('Garden.Format.ReplaceNewlines', true)) {
-                return nl2br(htmlspecialchars($mixed, ENT_QUOTES, 'UTF-8'));
+            if (c("Garden.Format.ReplaceNewlines", true)) {
+                return nl2br(htmlspecialchars($mixed, ENT_QUOTES, "UTF-8"));
             } else {
-                return htmlspecialchars($mixed, ENT_QUOTES, 'UTF-8');
+                return htmlspecialchars($mixed, ENT_QUOTES, "UTF-8");
             }
         }
     }
@@ -522,7 +553,8 @@ class Gdn_Format {
      * @return string
      * @deprecated 3.2 DateTimeFormatter::formatRelativeTime
      */
-    public static function fuzzyTime($timestamp = null, $morePrecise = false): string {
+    public static function fuzzyTime($timestamp = null, $morePrecise = false): string
+    {
         if ($morePrecise) {
             deprecated(__FUNCTION__ . ' param $morePrecise');
         }
@@ -538,9 +570,10 @@ class Gdn_Format {
      * @return string Sanitized HTML.
      * @deprecated 3.2 FormatService::renderHtml($str, Formats\HtmlFormat::FORMAT_KEY);
      */
-    public static function html($mixed) {
+    public static function html($mixed)
+    {
         if (!is_string($mixed)) {
-            return self::to($mixed, 'Html');
+            return self::to($mixed, "Html");
         }
 
         return Gdn::formatService()->renderHTML($mixed, Formats\HtmlFormat::FORMAT_KEY);
@@ -557,9 +590,10 @@ class Gdn_Format {
      * @return string Sanitized HTML.
      * @deprecated 3.2 HtmlSanitizer
      */
-    public static function htmlFilter($mixed, $options = []) {
+    public static function htmlFilter($mixed, $options = [])
+    {
         if (!is_string($mixed)) {
-            return self::to($mixed, 'HtmlFilter');
+            return self::to($mixed, "HtmlFilter");
         } else {
             /** @var Html\HtmlSanitizer $htmlSanitizer */
             $htmlSanitizer = Gdn::getContainer()->get(Html\HtmlSanitizer::class);
@@ -573,7 +607,8 @@ class Gdn_Format {
      * @param string $body a encoded array of image properties (Image, Thumbnail, Caption)
      * @return string HTML
      */
-    public static function image($body) {
+    public static function image($body)
+    {
         if (is_string($body)) {
             $image = dbdecode($body);
 
@@ -582,14 +617,16 @@ class Gdn_Format {
             }
         }
 
-        $url = val('Image', $image);
-        $caption = Gdn_Format::plainText(val('Caption', $image));
-        return '<div class="ImageWrap">'
-            .'<div class="Image">'
-            .img($url, ['alt' => $caption, 'title' => $caption])
-            .'</div>'
-            .'<div class="Caption">'.$caption.'</div>'
-            .'</div>';
+        $url = val("Image", $image);
+        $caption = Gdn_Format::plainText(val("Caption", $image));
+        return '<div class="ImageWrap">' .
+            '<div class="Image">' .
+            img($url, ["alt" => $caption, "title" => $caption]) .
+            "</div>" .
+            '<div class="Caption">' .
+            $caption .
+            "</div>" .
+            "</div>";
     }
 
     /**
@@ -602,7 +639,8 @@ class Gdn_Format {
      * @param string $spoilerText The inner text of the spoiler.
      * @return string
      */
-    public static function spoilerHtml($spoilerText) {
+    public static function spoilerHtml($spoilerText)
+    {
         return "<div class=\"Spoiler\">{$spoilerText}</div>";
     }
 
@@ -616,7 +654,8 @@ class Gdn_Format {
      * @since 2.1
      * @deprecated 3.2 FormatService::renderPlainText
      */
-    public static function plainText($body, $format = 'Html') {
+    public static function plainText($body, $format = "Html")
+    {
         $format = $format ?? Formats\HtmlFormat::FORMAT_KEY;
         $plainText = Gdn::formatService()->renderPlainText((string) $body, (string) $format);
 
@@ -644,7 +683,8 @@ class Gdn_Format {
      * @since 2.1
      * @deprecated 3.2 FormatService::renderExcerpt
      */
-    public static function excerpt($body, $format = 'Html', $collapse = false) {
+    public static function excerpt($body, $format = "Html", $collapse = false)
+    {
         $format = $format ?? Formats\HtmlFormat::FORMAT_KEY;
         $plainText = Gdn::formatService()->renderExcerpt((string) $body, (string) $format);
 
@@ -664,18 +704,18 @@ class Gdn_Format {
      * @param string $format The current format of the text.
      * @return string
      */
-    public static function rssHtml($text, $format = 'Html') {
-        if (!in_array($format, ['Html', 'Raw'])) {
+    public static function rssHtml($text, $format = "Html")
+    {
+        if (!in_array($format, ["Html", "Raw"])) {
             $text = Gdn_Format::to($text, $format);
         }
 
-        if (function_exists('FormatRssHtmlCustom')) {
+        if (function_exists("FormatRssHtmlCustom")) {
             return formatRssHtmlCustom($text);
         } else {
             return Gdn_Format::html($text);
         }
     }
-
 
     /**
      * Executes the callback function on parts of the string excluding html tags.
@@ -688,7 +728,8 @@ class Gdn_Format {
      * @param bool $skipCode  Whether to call the callback function on code tag content.
      * @return string
      */
-    public static function tagContent($html, $callback, $skipAnchors = true, $skipCode = true) {
+    public static function tagContent($html, $callback, $skipAnchors = true, $skipCode = true)
+    {
         $regex = "`([<>])`i";
         $parts = preg_split($regex, $html, null, PREG_SPLIT_DELIM_CAPTURE);
 
@@ -698,34 +739,34 @@ class Gdn_Format {
 
         foreach ($parts as $i => $str) {
             switch ($str) {
-                case '<':
+                case "<":
                     $inTag = true;
                     break;
-                case '>':
+                case ">":
                     $inTag = false;
                     break;
-                case '':
+                case "":
                     break;
-                default;
+                default:
                     if ($inTag) {
-                        if ($str[0] == '/') {
-                            $tagName = preg_split('`\s`', substr($str, 1), 2);
+                        if ($str[0] == "/") {
+                            $tagName = preg_split("`\s`", substr($str, 1), 2);
                             $tagName = $tagName[0];
 
-                            if ($tagName == 'a') {
+                            if ($tagName == "a") {
                                 $inAnchor = false;
                             }
-                            if ($tagName == 'code') {
+                            if ($tagName == "code") {
                                 $inCode = false;
                             }
                         } else {
-                            $tagName = preg_split('`\s`', trim($str), 2);
+                            $tagName = preg_split("`\s`", trim($str), 2);
                             $tagName = $tagName[0];
 
-                            if ($tagName == 'a') {
+                            if ($tagName == "a") {
                                 $inAnchor = true;
                             }
-                            if ($tagName == 'code') {
+                            if ($tagName == "code") {
                                 $inCode = true;
                             }
                         }
@@ -751,16 +792,17 @@ class Gdn_Format {
      *
      * @return string
      */
-    public static function links($mixed, bool $isHtml = false, bool $doEmbeds = true) {
+    public static function links($mixed, bool $isHtml = false, bool $doEmbeds = true)
+    {
         if (!is_string($mixed)) {
-            return self::to($mixed, 'Links');
+            return self::to($mixed, "Links");
         }
 
-        if (!c('Garden.Format.Links', true)) {
+        if (!c("Garden.Format.Links", true)) {
             return $mixed;
         }
 
-        $warnLeaving = (bool)Gdn::config("Garden.Format.WarnLeaving", true);
+        $warnLeaving = (bool) Gdn::config("Garden.Format.WarnLeaving", true);
         $linksCallback = function ($matches) use ($isHtml, $doEmbeds, $warnLeaving) {
             static $inTag = 0;
             static $inAnchor = false;
@@ -768,12 +810,12 @@ class Gdn_Format {
             $inOut = $matches[1];
             $tag = strtolower($matches[2]);
 
-            if ($inOut == '<') {
+            if ($inOut == "<") {
                 $inTag++;
-                $inAnchor = $tag == 'a';
-            } elseif ($inOut == '</') {
+                $inAnchor = $tag == "a";
+            } elseif ($inOut == "</") {
                 $inTag++;
-                if ($tag == 'a') {
+                if ($tag == "a") {
                     $inAnchor = false;
                 }
             } elseif ($matches[3]) {
@@ -789,10 +831,13 @@ class Gdn_Format {
                     if ($isHtml) {
                         $url = htmlspecialchars_decode($url);
                     }
-                    return url("/home/leaving?" . http_build_query([
-                        "allowTrusted" => 1,
-                        "target" => $url,
-                    ]));
+                    return url(
+                        "/home/leaving?" .
+                            http_build_query([
+                                "allowTrusted" => 1,
+                                "target" => $url,
+                            ])
+                    );
                 }
             }
 
@@ -800,15 +845,15 @@ class Gdn_Format {
                 return $matches[0];
             }
             // We are not in a tag and what we matched starts with //
-            if (preg_match('#^//#', $matches[4])) {
+            if (preg_match("#^//#", $matches[4])) {
                 return $matches[0];
             }
 
             $url = $matches[4];
 
             if ($doEmbeds) {
-                $embeddedResult = self::getLegacyReplacer()->replaceUrl($url ?? '');
-                if ($embeddedResult !== '') {
+                $embeddedResult = self::getLegacyReplacer()->replaceUrl($url ?? "");
+                if ($embeddedResult !== "") {
                     return $embeddedResult;
                 }
             }
@@ -819,43 +864,45 @@ class Gdn_Format {
             }
 
             // Strip punctuation off of the end of the url.
-            $punc = '';
+            $punc = "";
 
             // Special case where &nbsp; is right after an url and is not part of it!
             // This can happen in WYSIWYG format if the url is the last text of the body.
-            while (stringEndsWith($url, '&nbsp;')) {
+            while (stringEndsWith($url, "&nbsp;")) {
                 $url = substr($url, 0, -6);
-                $punc .= '&nbsp;';
+                $punc .= "&nbsp;";
             }
 
             if (preg_match('`^(.+)([.?,;!:])$`', $url, $matches)) {
                 $url = $matches[1];
-                $punc = $matches[2].$punc;
+                $punc = $matches[2] . $punc;
             }
 
             // Get human-readable text from url.
             $text = $url;
-            if (strpos($text, '%') !== false) {
+            if (strpos($text, "%") !== false) {
                 $text = rawurldecode($text);
-                $text = htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
+                $text = htmlspecialchars($text, ENT_QUOTES, "UTF-8");
             }
 
-            $nofollow = (self::$DisplayNoFollow) ? ' rel="nofollow"' : '';
+            $nofollow = self::$DisplayNoFollow ? ' rel="nofollow"' : "";
 
             // If this is valid HTMl, the link text's HTML special characters should be encoded. Decode them to their raw state for URL encoding.
             $plainUrl = !$isHtml ? $url : htmlspecialchars_decode($url);
             if ($warnLeaving && isExternalUrl($plainUrl)) {
-                $href = "/home/leaving?" . http_build_query([
-                    "allowTrusted" => 1,
-                    "target" => $plainUrl,
-                ]);
+                $href =
+                    "/home/leaving?" .
+                    http_build_query([
+                        "allowTrusted" => 1,
+                        "target" => $plainUrl,
+                    ]);
                 return anchor($text, $href) . $punc;
             }
 
-            return '<a href="'.$url.'"'.$nofollow.'>'.$text.'</a>'.$punc;
+            return '<a href="' . $url . '"' . $nofollow . ">" . $text . "</a>" . $punc;
         };
         // Strip  Right-To-Left override.
-        $mixed = str_replace("\xE2\x80\xAE", '', $mixed);
+        $mixed = str_replace("\xE2\x80\xAE", "", $mixed);
         if (unicodeRegexSupport()) {
             $regex =
                 "`(?:(</?)([!a-z]+))|(>)|((?:(?:https?|ftp):)?//[\{\}\(\)@\p{L}\p{N}\x21\x23-\x27\x2a-\x2e\x3a\x3b\/\x3f-\x7a\x7e\x3d]+)`iu";
@@ -864,19 +911,14 @@ class Gdn_Format {
                 "`(?:(</?)([!a-z]+))|(>)|((?:(?:https?|ftp):)?//[\{\}\(\)@a-z0-9\x21\x23-\x27\x2a-\x2e\x3a\x3b\/\x3f-\x7a\x7e\x3d]+)`i";
         }
 
-        $mixed = FormatUtil::replaceButProtectCodeBlocks(
-            $regex,
-            $linksCallback,
-            $mixed,
-            true
-        );
+        $mixed = FormatUtil::replaceButProtectCodeBlocks($regex, $linksCallback, $mixed, true);
 
         Gdn::getContainer()
             ->get(EventManager::class)
             ->fire(
-                'Format_Links',
+                "Format_Links",
                 null, // To comply with the only handler type expecting (mixed $sender, array $args)
-                ['Mixed' => &$mixed]
+                ["Mixed" => &$mixed]
             );
 
         return $mixed;
@@ -895,20 +937,21 @@ class Gdn_Format {
      * @return string
      * @deprecated 3.2 \Vanilla\EmbeddedContent\LegacyEmbedReplacer::unembedContent()
      */
-    public static function unembedContent($mixed) {
-        deprecated(__FUNCTION__, '\Vanilla\EmbeddedContent\LegacyEmbedReplacer::unembedContent()');
+    public static function unembedContent($mixed)
+    {
+        deprecated(__FUNCTION__, "\Vanilla\EmbeddedContent\LegacyEmbedReplacer::unembedContent()");
         if (!is_string($mixed)) {
-            return self::to($mixed, 'UnembedContent');
+            return self::to($mixed, "UnembedContent");
         } else {
             return self::getLegacyReplacer()->unembedContent($mixed);
         }
     }
 
-
     /**
      * @return \Vanilla\EmbeddedContent\EmbedConfig
      */
-    private static function getEmbedConfig(): \Vanilla\EmbeddedContent\EmbedConfig {
+    private static function getEmbedConfig(): \Vanilla\EmbeddedContent\EmbedConfig
+    {
         $embedReplacer = Gdn::getContainer()->get(\Vanilla\EmbeddedContent\EmbedConfig::class);
         return $embedReplacer;
     }
@@ -918,7 +961,8 @@ class Gdn_Format {
      *
      * @return \Vanilla\EmbeddedContent\LegacyEmbedReplacer
      */
-    private static function getLegacyReplacer(): \Vanilla\EmbeddedContent\LegacyEmbedReplacer {
+    private static function getLegacyReplacer(): \Vanilla\EmbeddedContent\LegacyEmbedReplacer
+    {
         $embedReplacer = Gdn::getContainer()->get(\Vanilla\EmbeddedContent\LegacyEmbedReplacer::class);
         return $embedReplacer;
     }
@@ -929,8 +973,9 @@ class Gdn_Format {
      * @deprecated 3.2 \Vanilla\EmbeddedContent\EmbedConfig::getLegacyEmbedSize()
      * @return array array(Width, Height)
      */
-    public static function getEmbedSize() {
-        deprecated(__FUNCTION__, '\Vanilla\EmbeddedContent\EmbedConfig::getLegacyEmbedSize()');
+    public static function getEmbedSize()
+    {
+        deprecated(__FUNCTION__, "\Vanilla\EmbeddedContent\EmbedConfig::getLegacyEmbedSize()");
         return self::getEmbedConfig()->getLegacyEmbedSize();
     }
 
@@ -942,15 +987,13 @@ class Gdn_Format {
      * @return string Sanitized HTML.
      * @deprecated 3.2 FormatService::renderHtml($mixed, Formats\MarkdownFormat::FORMAT_KEY)
      */
-    public static function markdown($mixed, $flavor = null) {
+    public static function markdown($mixed, $flavor = null)
+    {
         if (!is_string($mixed)) {
-            return self::to($mixed, 'Markdown');
+            return self::to($mixed, "Markdown");
         } else {
             if ($flavor) {
-                deprecated(
-                    __FUNCTION__ . ' param $flavor',
-                    'config `Garden.Format.UseVanillaMarkdownFlavor`'
-                );
+                deprecated(__FUNCTION__ . ' param $flavor', "config `Garden.Format.UseVanillaMarkdownFlavor`");
             }
             return Gdn::formatService()->renderHTML($mixed, Formats\MarkdownFormat::FORMAT_KEY);
         }
@@ -968,8 +1011,9 @@ class Gdn_Format {
      * @param string $str The html-formatted string to format mentions in.
      * @return string The formatted string.
      */
-    protected static function formatMentionsCallback($str) {
-        $parts = preg_split('`\B@`', $str);
+    protected static function formatMentionsCallback($str)
+    {
+        $parts = preg_split("`\B@`", $str);
 
         $partCount = count($parts);
         // We have no mentions here.
@@ -977,7 +1021,7 @@ class Gdn_Format {
             return $str;
         }
 
-        if ($partCount > self::c('Garden.Format.MaxMentions', 50)) {
+        if ($partCount > self::c("Garden.Format.MaxMentions", 50)) {
             // This post has more mentions than we can efficiently format in the current system.
             return $str;
         }
@@ -998,7 +1042,7 @@ class Gdn_Format {
 
             // There was an escaped @@.
             if (empty($str)) {
-                $parts[$i - 1] = '';
+                $parts[$i - 1] = "";
                 continue;
             }
 
@@ -1009,7 +1053,7 @@ class Gdn_Format {
 
             // Grab the mention.
             $mention = false;
-            $suffix = '';
+            $suffix = "";
 
             // Quoted mention.
             $hasQuote = false;
@@ -1018,9 +1062,9 @@ class Gdn_Format {
 
             if (strpos($str, '"') === 0) {
                 $hasQuote = true;
-            } else if (strpos($str, '&quot;') === 0) {
+            } elseif (strpos($str, "&quot;") === 0) {
                 $hasQuote = true;
-                $quote = '&quot;';
+                $quote = "&quot;";
                 $quoteLength = strlen($quote);
             }
 
@@ -1039,27 +1083,27 @@ class Gdn_Format {
             if (!$mention && !empty($str)) {
                 $parts2 = preg_split('`&nbsp;|([\s.,;?!:\'])`', $str, 2, PREG_SPLIT_DELIM_CAPTURE);
                 $mention = $parts2[0];
-                $suffix = val(1, $parts2, '') . val(2, $parts2, '');
+                $suffix = val(1, $parts2, "") . val(2, $parts2, "");
             }
 
             if ($mention) {
                 $attributes = [];
                 if (self::$DisplayNoFollow) {
-                    $attributes['rel'] = 'nofollow';
+                    $attributes["rel"] = "nofollow";
                 }
                 $parts[$i] =
                     anchor(
-                        '@' . $mention,
-                        url(str_replace('{name}', rawurlencode($mention), self::$MentionsUrlFormat), true),
-                        '',
+                        "@" . $mention,
+                        url(str_replace("{name}", rawurlencode($mention), self::$MentionsUrlFormat), true),
+                        "",
                         $attributes
                     ) . $suffix;
             } else {
-                $parts[$i] = '@' . $parts[$i];
+                $parts[$i] = "@" . $parts[$i];
             }
         }
 
-        return implode('', $parts);
+        return implode("", $parts);
     }
 
     /**
@@ -1068,36 +1112,40 @@ class Gdn_Format {
      * @param $mixed
      * @return mixed|string
      */
-    public static function mentions($mixed) {
+    public static function mentions($mixed)
+    {
         if (!is_string($mixed)) {
-            return self::to($mixed, 'Mentions');
+            return self::to($mixed, "Mentions");
         } else {
             // Check for a custom formatter.
-            $formatter = Gdn::factory('MentionsFormatter');
+            $formatter = Gdn::factory("MentionsFormatter");
             if (is_object($formatter)) {
                 return $formatter->formatMentions($mixed);
             }
 
             // Handle @mentions.
-            if (c('Garden.Format.Mentions', true)) {
+            if (c("Garden.Format.Mentions", true)) {
                 // Only format mentions that are not already in anchor tags or code tags.
-                $mixed = self::tagContent($mixed, 'Gdn_Format::formatMentionsCallback');
+                $mixed = self::tagContent($mixed, "Gdn_Format::formatMentionsCallback");
             }
 
             // Handle #hashtag searches
-            if (c('Garden.Format.Hashtags', false)) {
+            if (c("Garden.Format.Hashtags", false)) {
                 $mixed = FormatUtil::replaceButProtectCodeBlocks(
                     '/(^|[\s,\.>])\#([\w\-]+)(?=[\s,\.!?<]|$)/i',
-                    '\1'.anchor('#\2', url('/search?Search=%23\2&Mode=like', true)).'\3',
+                    '\1' . anchor('#\2', url('/search?Search=%23\2&Mode=like', true)) . '\3',
                     $mixed
                 );
             }
 
             // Handle "/me does x" action statements
-            if (c('Garden.Format.MeActions', false)) {
+            if (c("Garden.Format.MeActions", false)) {
                 $mixed = FormatUtil::replaceButProtectCodeBlocks(
                     '/(^|[\n])(\/me)(\s[^(\n)]+)/i',
-                    '\1'.wrap(wrap('\2', 'span', ['class' => 'MeActionName']).'\3', 'span', ['class' => 'AuthorAction']),
+                    '\1' .
+                        wrap(wrap('\2', "span", ["class" => "MeActionName"]) . '\3', "span", [
+                            "class" => "AuthorAction",
+                        ]),
                     $mixed
                 );
             }
@@ -1111,15 +1159,17 @@ class Gdn_Format {
      *
      * @param string $string The string which should be optimized
      */
-    public static function reduceWhiteSpaces($string) {
-        return trim(preg_replace('/\s+/', ' ', $string));
+    public static function reduceWhiteSpaces($string)
+    {
+        return trim(preg_replace("/\s+/", " ", $string));
     }
 
     /**
      * @deprecated 2.9 Use Formatting\FormatUtil::replaceButProtectCodeBlocks
      */
-    public static function replaceButProtectCodeBlocks($search, $replace, $subject, $isCallback = false) {
-        deprecated(__FUNCTION__, 'FormatUtil::replaceButProtectCodeBlocks');
+    public static function replaceButProtectCodeBlocks($search, $replace, $subject, $isCallback = false)
+    {
+        deprecated(__FUNCTION__, "FormatUtil::replaceButProtectCodeBlocks");
         return Formatting\FormatUtil::replaceButProtectCodeBlocks(
             (string) $search,
             (string) $replace,
@@ -1137,10 +1187,11 @@ class Gdn_Format {
      * @param string|object|array $mixed The data to format.
      * @return string
      */
-    public static function raw($mixed) {
-        deprecated('raw', 'wysiwyg');
+    public static function raw($mixed)
+    {
+        deprecated("raw", "wysiwyg");
         if (!is_string($mixed)) {
-            return self::to($mixed, 'Raw');
+            return self::to($mixed, "Raw");
         } else {
             // Deprecate raw formatting. It's too dangeous.
             return self::wysiwyg($mixed);
@@ -1155,7 +1206,8 @@ class Gdn_Format {
      * @return array
      * @deprecated
      */
-    public static function objectAsArray($object) {
+    public static function objectAsArray($object)
+    {
         if (!is_object($object)) {
             return $object;
         }
@@ -1174,7 +1226,8 @@ class Gdn_Format {
      * @return string
      * @deprecated 3.2 DateTimeFormatter::formatSeconds()
      */
-    public static function seconds($seconds): string {
+    public static function seconds($seconds): string
+    {
         $formatter = self::getDateTimeFormatter();
         if (!is_numeric($seconds)) {
             $seconds = $formatter::dateTimeToSecondsAgo($seconds);
@@ -1188,10 +1241,16 @@ class Gdn_Format {
      * @param mixed $mixed An object, array, or string to be serialized.
      * @return string The serialized version of the string.
      */
-    public static function serialize($mixed) {
-        if (is_array($mixed) || is_object($mixed)
-            || (is_string($mixed) && (substr_compare('a:', $mixed, 0, 2) !== 0  && substr_compare('O:', $mixed, 0, 2) !== 0
-                    && substr_compare('arr:', $mixed, 0, 4) !== 0 && substr_compare('obj:', $mixed, 0, 4) !== 0))
+    public static function serialize($mixed)
+    {
+        if (
+            is_array($mixed) ||
+            is_object($mixed) ||
+            (is_string($mixed) &&
+                (substr_compare("a:", $mixed, 0, 2) !== 0 &&
+                    substr_compare("O:", $mixed, 0, 2) !== 0 &&
+                    substr_compare("arr:", $mixed, 0, 4) !== 0 &&
+                    substr_compare("obj:", $mixed, 0, 4) !== 0))
         ) {
             $result = serialize($mixed);
         } else {
@@ -1208,13 +1267,14 @@ class Gdn_Format {
      * @return string Sanitized HTML.
      * @deprecated Formats\TextFormat::renderHtml()
      */
-    public static function text($mixed, $addBreaks = null) {
+    public static function text($mixed, $addBreaks = null)
+    {
         if (!is_string($mixed)) {
-            return self::to($mixed, 'Text');
+            return self::to($mixed, "Text");
         }
 
         if ($addBreaks) {
-            deprecated(__FUNCTION__ . ' param $addBreaks', 'config `Garden.Format.ReplaceNewlines`');
+            deprecated(__FUNCTION__ . ' param $addBreaks', "config `Garden.Format.ReplaceNewlines`");
         }
 
         return Gdn::formatService()->renderHTML((string) $mixed, Formats\TextFormat::FORMAT_KEY);
@@ -1228,9 +1288,10 @@ class Gdn_Format {
      * @since 2.1
      * @deprecated 3.2 FormatService::renderHtml($str, Formats\TextExFormat::FORMAT_KEY)
      */
-    public static function textEx($str) {
+    public static function textEx($str)
+    {
         if (!is_string($str)) {
-            return self::to($str, 'TextEx');
+            return self::to($str, "TextEx");
         }
 
         return Gdn::formatService()->renderHTML($str, Formats\TextExFormat::FORMAT_KEY);
@@ -1244,7 +1305,8 @@ class Gdn_Format {
      * @return mixed
      * @deprecated 3.2 FormatService::renderHtml
      */
-    public static function to($mixed, $formatMethod) {
+    public static function to($mixed, $formatMethod)
+    {
         $r = $mixed;
         $r = self::formatToInternal($r, $formatMethod);
         return $r;
@@ -1258,18 +1320,22 @@ class Gdn_Format {
      * @param array $seen
      * @return array|string|object
      */
-    private static function formatToInternal(&$mixed, $formatMethod, $seen = []) {
+    private static function formatToInternal(&$mixed, $formatMethod, $seen = [])
+    {
         // Process $Mixed based on its type.
         $formatService = Gdn::formatService();
         if (is_string($mixed)) {
             if (is_string($formatMethod) && $formatService->hasFormat($formatMethod)) {
                 $mixed = $formatService->renderHTML($mixed, $formatMethod);
-            } elseif (in_array(strtolower($formatMethod), self::$SanitizedFormats) && method_exists('Gdn_Format', $formatMethod)) {
+            } elseif (
+                in_array(strtolower($formatMethod), self::$SanitizedFormats) &&
+                method_exists("Gdn_Format", $formatMethod)
+            ) {
                 $mixed = self::$formatMethod($mixed);
-            } elseif (function_exists('gdn_formatter_'.$formatMethod)) {
-                $formatMethod = 'gdn_formatter_'.$formatMethod;
+            } elseif (function_exists("gdn_formatter_" . $formatMethod)) {
+                $formatMethod = "gdn_formatter_" . $formatMethod;
                 $mixed = $formatMethod($mixed);
-            } elseif ($formatter = Gdn::factory($formatMethod.'Formatter')) {
+            } elseif ($formatter = Gdn::factory($formatMethod . "Formatter")) {
                 $mixed = $formatter->format($mixed);
             } else {
                 $mixed = Gdn_Format::text($mixed);
@@ -1298,8 +1364,9 @@ class Gdn_Format {
      * @return string The formatted date.
      * @deprecated 3.2 DateTimeFormatter::timeStampToDate()
      */
-    public static function toDate($timestamp = '') {
-        if ($timestamp == '') {
+    public static function toDate($timestamp = "")
+    {
+        if ($timestamp == "") {
             $timestamp = CurrentTimeStamp::get();
         } elseif (!is_numeric($timestamp)) {
             $timestamp = DateTimeFormatter::dateTimeToTimeStamp($timestamp);
@@ -1315,8 +1382,9 @@ class Gdn_Format {
      * @return string The formatted date and time.
      * @deprecated DateTimeFormatter::timeStampToDateTime()
      */
-    public static function toDateTime($timestamp = '') {
-        if ($timestamp == '') {
+    public static function toDateTime($timestamp = "")
+    {
+        if ($timestamp == "") {
             $timestamp = CurrentTimeStamp::get();
         }
         return DateTimeFormatter::timeStampToDateTime((int) $timestamp);
@@ -1330,7 +1398,8 @@ class Gdn_Format {
      * @return string|bool Returns FALSE upon failure.
      * @deprecated 3.2 DateTimeFormatter::dateTimeToTimeStamp()
      */
-    public static function toTimestamp($dateTime = '') {
+    public static function toTimestamp($dateTime = "")
+    {
         if (!is_string($dateTime)) {
             return false;
         }
@@ -1344,7 +1413,8 @@ class Gdn_Format {
      * @return int The timestamp according to the user's timezone.
      * @deprecated 3.2 DateTimeFormatter::adjustTimeStampForUser()
      */
-    public static function toTimezone($timestamp) {
+    public static function toTimezone($timestamp)
+    {
         return self::getDateTimeFormatter()->adjustTimeStampForUser((int) $timestamp);
     }
 
@@ -1355,43 +1425,273 @@ class Gdn_Format {
      * @return string
      * @deprecated 3.2 DateTimeFormatter::timeStampToTime()
      */
-    public static function timespan($timespan) {
-        deprecated(__FUNCTION__, 'DateTimeFormatter::timeStampToTime()');
+    public static function timespan($timespan)
+    {
+        deprecated(__FUNCTION__, "DateTimeFormatter::timeStampToTime()");
         return DateTimeFormatter::timeStampToTime((int) $timespan);
     }
 
     /** @var array  */
     protected static $_UrlTranslations = [
-        '–' => '-', '—' => '-', 'À' => 'A', 'Á' => 'A', 'Â' => 'A', 'Ã' => 'A', 'Ä' => 'Ae', 'Å' => 'A',
-        'Ā' => 'A', 'Ą' => 'A', 'Ă' => 'A', 'Æ' => 'Ae', 'Ç' => 'C', 'Ć' => 'C', 'Č' => 'C', 'Ĉ' => 'C', 'Ċ' => 'C',
-        'Ď' => 'D', 'Đ' => 'D', 'Ð' => 'D', 'È' => 'E', 'É' => 'E', 'Ê' => 'E', 'Ë' => 'E', 'Ē' => 'E', 'Ě' => 'E',
-        'Ĕ' => 'E', 'Ė' => 'E', 'Ĝ' => 'G', 'Ğ' => 'G', 'Ġ' => 'G', 'Ģ' => 'G', 'Ĥ' => 'H', 'Ħ' => 'H', 'Ì' => 'I',
-        'Í' => 'I', 'Î' => 'I', 'Ï' => 'I', 'Ī' => 'I', 'Ĩ' => 'I', 'Ĭ' => 'I', 'Į' => 'I', 'İ' => 'I', 'Ĳ' => 'IJ',
-        'Ĵ' => 'J', 'Ķ' => 'K', 'Ł' => 'K', 'Ľ' => 'K', 'Ĺ' => 'K', 'Ļ' => 'K', 'Ŀ' => 'K', 'Ñ' => 'N', 'Ń' => 'N',
-        'Ň' => 'N', 'Ņ' => 'N', 'Ŋ' => 'N', 'Ò' => 'O', 'Ó' => 'O', 'Ô' => 'O', 'Õ' => 'O', 'Ö' => 'Oe',
-        'Ō' => 'O', 'Ő' => 'O', 'Ŏ' => 'O', 'Œ' => 'OE', 'Ŕ' => 'R', 'Ŗ' => 'R', 'Ś' => 'S', 'Š' => 'S', 'Ş' => 'S',
-        'Ŝ' => 'S', 'Ť' => 'T', 'Ţ' => 'T', 'Ŧ' => 'T', 'Ț' => 'T', 'Ù' => 'U', 'Ú' => 'U', 'Û' => 'U', 'Ü' => 'Ue',
-        'Ū' => 'U', 'Ů' => 'U', 'Ű' => 'U', 'Ŭ' => 'U', 'Ũ' => 'U', 'Ų' => 'U', 'Ŵ' => 'W', 'Ý' => 'Y',
-        'Ŷ' => 'Y', 'Ÿ' => 'Y', 'Ź' => 'Z', 'Ž' => 'Z', 'Ż' => 'Z', 'Þ' => 'T', 'à' => 'a', 'á' => 'a', 'â' => 'a',
-        'ã' => 'a', 'ä' => 'ae', 'å' => 'a', 'ā' => 'a', 'ą' => 'a', 'ă' => 'a', 'æ' => 'ae', 'ç' => 'c',
-        'ć' => 'c', 'č' => 'c', 'ĉ' => 'c', 'ċ' => 'c', 'ď' => 'd', 'đ' => 'd', 'ð' => 'd', 'è' => 'e', 'é' => 'e',
-        'ê' => 'e', 'ë' => 'e', 'ē' => 'e', 'ę' => 'e', 'ě' => 'e', 'ĕ' => 'e', 'ė' => 'e', 'ƒ' => 'f', 'ĝ' => 'g',
-        'ğ' => 'g', 'ġ' => 'g', 'ģ' => 'g', 'ĥ' => 'h', 'ħ' => 'h', 'ì' => 'i', 'í' => 'i', 'î' => 'i', 'ï' => 'i',
-        'ī' => 'i', 'ĩ' => 'i', 'ĭ' => 'i', 'į' => 'i', 'ı' => 'i', 'ĳ' => 'ij', 'ĵ' => 'j', 'ķ' => 'k', 'ĸ' => 'k',
-        'ł' => 'l', 'ľ' => 'l', 'ĺ' => 'l', 'ļ' => 'l', 'ŀ' => 'l', 'ñ' => 'n', 'ń' => 'n', 'ň' => 'n', 'ņ' => 'n',
-        'ŉ' => 'n', 'ŋ' => 'n', 'ò' => 'o', 'ó' => 'o', 'ô' => 'o', 'õ' => 'o', 'ö' => 'oe', 'ø' => 'o',
-        'ō' => 'o', 'ő' => 'o', 'ŏ' => 'o', 'œ' => 'oe', 'ŕ' => 'r', 'ř' => 'r', 'ŗ' => 'r', 'š' => 's', 'ù' => 'u',
-        'ú' => 'u', 'û' => 'u', 'ü' => 'ue', 'ū' => 'u', 'ů' => 'u', 'ű' => 'u', 'ŭ' => 'u', 'ũ' => 'u',
-        'ų' => 'u', 'ŵ' => 'w', 'ý' => 'y', 'ÿ' => 'y', 'ŷ' => 'y', 'ž' => 'z', 'ż' => 'z', 'ź' => 'z', 'þ' => 't',
-        'ß' => 'ss', 'ſ' => 'ss', 'А' => 'A', 'Б' => 'B', 'В' => 'V', 'Г' => 'G', 'Д' => 'D', 'Е' => 'E', 'Ё' => 'YO',
-        'Ж' => 'ZH', 'З' => 'Z', 'И' => 'I', 'І' => 'I', 'Й' => 'Y', 'К' => 'K', 'Л' => 'L', 'М' => 'M', 'Н' => 'N',
-        'О' => 'O', 'П' => 'P', 'Р' => 'R', 'С' => 'S', 'ș' => 's', 'ț' => 't', 'Т' => 'T', 'У' => 'U', 'Ф' => 'F',
-        'Х' => 'H', 'Ц' => 'C', 'Ч' => 'CH', 'Ш' => 'SH', 'Щ' => 'SCH', 'Ъ' => '', 'Ы' => 'Y', 'Ь' => '', 'Э' => 'E',
-        'Ю' => 'YU', 'Я' => 'YA', 'Є' => 'YE', 'Ї' => 'YI', 'а' => 'a', 'б' => 'b', 'в' => 'v', 'г' => 'g', 'д' => 'd',
-        'е' => 'e', 'ё' => 'yo', 'ж' => 'zh', 'з' => 'z', 'и' => 'i', 'і' => 'i', 'й' => 'y', 'к' => 'k', 'л' => 'l',
-        'м' => 'm', 'н' => 'n', 'о' => 'o', 'п' => 'p', 'р' => 'r', 'с' => 's', 'т' => 't', 'у' => 'u', 'ф' => 'f',
-        'х' => 'h', 'ц' => 'c', 'ч' => 'ch', 'ш' => 'sh', 'щ' => 'sch', 'ъ' => '', 'ы' => 'y', 'ь' => '', 'э' => 'e',
-        'ю' => 'yu', 'я' => 'ya', 'є' => 'ye', 'ї' => 'yi'
+        "–" => "-",
+        "—" => "-",
+        "À" => "A",
+        "Á" => "A",
+        "Â" => "A",
+        "Ã" => "A",
+        "Ä" => "Ae",
+        "Å" => "A",
+        "Ā" => "A",
+        "Ą" => "A",
+        "Ă" => "A",
+        "Æ" => "Ae",
+        "Ç" => "C",
+        "Ć" => "C",
+        "Č" => "C",
+        "Ĉ" => "C",
+        "Ċ" => "C",
+        "Ď" => "D",
+        "Đ" => "D",
+        "Ð" => "D",
+        "È" => "E",
+        "É" => "E",
+        "Ê" => "E",
+        "Ë" => "E",
+        "Ē" => "E",
+        "Ě" => "E",
+        "Ĕ" => "E",
+        "Ė" => "E",
+        "Ĝ" => "G",
+        "Ğ" => "G",
+        "Ġ" => "G",
+        "Ģ" => "G",
+        "Ĥ" => "H",
+        "Ħ" => "H",
+        "Ì" => "I",
+        "Í" => "I",
+        "Î" => "I",
+        "Ï" => "I",
+        "Ī" => "I",
+        "Ĩ" => "I",
+        "Ĭ" => "I",
+        "Į" => "I",
+        "İ" => "I",
+        "Ĳ" => "IJ",
+        "Ĵ" => "J",
+        "Ķ" => "K",
+        "Ł" => "K",
+        "Ľ" => "K",
+        "Ĺ" => "K",
+        "Ļ" => "K",
+        "Ŀ" => "K",
+        "Ñ" => "N",
+        "Ń" => "N",
+        "Ň" => "N",
+        "Ņ" => "N",
+        "Ŋ" => "N",
+        "Ò" => "O",
+        "Ó" => "O",
+        "Ô" => "O",
+        "Õ" => "O",
+        "Ö" => "Oe",
+        "Ō" => "O",
+        "Ő" => "O",
+        "Ŏ" => "O",
+        "Œ" => "OE",
+        "Ŕ" => "R",
+        "Ŗ" => "R",
+        "Ś" => "S",
+        "Š" => "S",
+        "Ş" => "S",
+        "Ŝ" => "S",
+        "Ť" => "T",
+        "Ţ" => "T",
+        "Ŧ" => "T",
+        "Ț" => "T",
+        "Ù" => "U",
+        "Ú" => "U",
+        "Û" => "U",
+        "Ü" => "Ue",
+        "Ū" => "U",
+        "Ů" => "U",
+        "Ű" => "U",
+        "Ŭ" => "U",
+        "Ũ" => "U",
+        "Ų" => "U",
+        "Ŵ" => "W",
+        "Ý" => "Y",
+        "Ŷ" => "Y",
+        "Ÿ" => "Y",
+        "Ź" => "Z",
+        "Ž" => "Z",
+        "Ż" => "Z",
+        "Þ" => "T",
+        "à" => "a",
+        "á" => "a",
+        "â" => "a",
+        "ã" => "a",
+        "ä" => "ae",
+        "å" => "a",
+        "ā" => "a",
+        "ą" => "a",
+        "ă" => "a",
+        "æ" => "ae",
+        "ç" => "c",
+        "ć" => "c",
+        "č" => "c",
+        "ĉ" => "c",
+        "ċ" => "c",
+        "ď" => "d",
+        "đ" => "d",
+        "ð" => "d",
+        "è" => "e",
+        "é" => "e",
+        "ê" => "e",
+        "ë" => "e",
+        "ē" => "e",
+        "ę" => "e",
+        "ě" => "e",
+        "ĕ" => "e",
+        "ė" => "e",
+        "ƒ" => "f",
+        "ĝ" => "g",
+        "ğ" => "g",
+        "ġ" => "g",
+        "ģ" => "g",
+        "ĥ" => "h",
+        "ħ" => "h",
+        "ì" => "i",
+        "í" => "i",
+        "î" => "i",
+        "ï" => "i",
+        "ī" => "i",
+        "ĩ" => "i",
+        "ĭ" => "i",
+        "į" => "i",
+        "ı" => "i",
+        "ĳ" => "ij",
+        "ĵ" => "j",
+        "ķ" => "k",
+        "ĸ" => "k",
+        "ł" => "l",
+        "ľ" => "l",
+        "ĺ" => "l",
+        "ļ" => "l",
+        "ŀ" => "l",
+        "ñ" => "n",
+        "ń" => "n",
+        "ň" => "n",
+        "ņ" => "n",
+        "ŉ" => "n",
+        "ŋ" => "n",
+        "ò" => "o",
+        "ó" => "o",
+        "ô" => "o",
+        "õ" => "o",
+        "ö" => "oe",
+        "ø" => "o",
+        "ō" => "o",
+        "ő" => "o",
+        "ŏ" => "o",
+        "œ" => "oe",
+        "ŕ" => "r",
+        "ř" => "r",
+        "ŗ" => "r",
+        "š" => "s",
+        "ù" => "u",
+        "ú" => "u",
+        "û" => "u",
+        "ü" => "ue",
+        "ū" => "u",
+        "ů" => "u",
+        "ű" => "u",
+        "ŭ" => "u",
+        "ũ" => "u",
+        "ų" => "u",
+        "ŵ" => "w",
+        "ý" => "y",
+        "ÿ" => "y",
+        "ŷ" => "y",
+        "ž" => "z",
+        "ż" => "z",
+        "ź" => "z",
+        "þ" => "t",
+        "ß" => "ss",
+        "ſ" => "ss",
+        "А" => "A",
+        "Б" => "B",
+        "В" => "V",
+        "Г" => "G",
+        "Д" => "D",
+        "Е" => "E",
+        "Ё" => "YO",
+        "Ж" => "ZH",
+        "З" => "Z",
+        "И" => "I",
+        "І" => "I",
+        "Й" => "Y",
+        "К" => "K",
+        "Л" => "L",
+        "М" => "M",
+        "Н" => "N",
+        "О" => "O",
+        "П" => "P",
+        "Р" => "R",
+        "С" => "S",
+        "ș" => "s",
+        "ț" => "t",
+        "Т" => "T",
+        "У" => "U",
+        "Ф" => "F",
+        "Х" => "H",
+        "Ц" => "C",
+        "Ч" => "CH",
+        "Ш" => "SH",
+        "Щ" => "SCH",
+        "Ъ" => "",
+        "Ы" => "Y",
+        "Ь" => "",
+        "Э" => "E",
+        "Ю" => "YU",
+        "Я" => "YA",
+        "Є" => "YE",
+        "Ї" => "YI",
+        "а" => "a",
+        "б" => "b",
+        "в" => "v",
+        "г" => "g",
+        "д" => "d",
+        "е" => "e",
+        "ё" => "yo",
+        "ж" => "zh",
+        "з" => "z",
+        "и" => "i",
+        "і" => "i",
+        "й" => "y",
+        "к" => "k",
+        "л" => "l",
+        "м" => "m",
+        "н" => "n",
+        "о" => "o",
+        "п" => "p",
+        "р" => "r",
+        "с" => "s",
+        "т" => "t",
+        "у" => "u",
+        "ф" => "f",
+        "х" => "h",
+        "ц" => "c",
+        "ч" => "ch",
+        "ш" => "sh",
+        "щ" => "sch",
+        "ъ" => "",
+        "ы" => "y",
+        "ь" => "",
+        "э" => "e",
+        "ю" => "yu",
+        "я" => "ya",
+        "є" => "ye",
+        "ї" => "yi",
     ];
 
     /**
@@ -1400,26 +1700,27 @@ class Gdn_Format {
      * @param mixed $mixed An object, array, or string to be formatted.
      * @return string
      */
-    public static function url($mixed) {
+    public static function url($mixed)
+    {
         if (!is_string($mixed)) {
-            return self::to($mixed, 'Url');
+            return self::to($mixed, "Url");
         }
 
         // Preliminary decoding
-        $mixed = strip_tags(html_entity_decode($mixed, ENT_COMPAT, 'UTF-8'));
+        $mixed = strip_tags(html_entity_decode($mixed, ENT_COMPAT, "UTF-8"));
         $mixed = strtr($mixed, self::$_UrlTranslations);
-        $mixed = preg_replace('`[\']`', '', $mixed);
+        $mixed = preg_replace('`[\']`', "", $mixed);
 
         // Convert punctuation, symbols, and spaces to hyphens
         if (unicodeRegexSupport()) {
-            $mixed = preg_replace('`[\pP\pS\s]`u', '-', $mixed);
+            $mixed = preg_replace("`[\pP\pS\s]`u", "-", $mixed);
         } else {
-            $mixed = preg_replace('`[\W_]`', '-', $mixed);
+            $mixed = preg_replace("`[\W_]`", "-", $mixed);
         }
 
         // Lowercase, no trailing or repeat hyphens
-        $mixed = preg_replace('`-+`', '-', strtolower($mixed));
-        $mixed = trim($mixed, '-');
+        $mixed = preg_replace("`-+`", "-", strtolower($mixed));
+        $mixed = trim($mixed, "-");
 
         return rawurlencode($mixed);
     }
@@ -1431,15 +1732,19 @@ class Gdn_Format {
      * @return mixed
      * @deprecated
      */
-    public static function unserialize($serializedString) {
+    public static function unserialize($serializedString)
+    {
         $result = $serializedString;
 
         if (is_string($serializedString)) {
-            if (substr_compare('a:', $serializedString, 0, 2) === 0 || substr_compare('O:', $serializedString, 0, 2) === 0) {
-                $result = unserialize($serializedString, ['allowed_classes' => false]);
-            } elseif (substr_compare('obj:', $serializedString, 0, 4) === 0) {
+            if (
+                substr_compare("a:", $serializedString, 0, 2) === 0 ||
+                substr_compare("O:", $serializedString, 0, 2) === 0
+            ) {
+                $result = unserialize($serializedString, ["allowed_classes" => false]);
+            } elseif (substr_compare("obj:", $serializedString, 0, 4) === 0) {
                 $result = json_decode(substr($serializedString, 4), false);
-            } elseif (substr_compare('arr:', $serializedString, 0, 4) === 0) {
+            } elseif (substr_compare("arr:", $serializedString, 0, 4) === 0) {
                 $result = json_decode(substr($serializedString, 4), true);
             }
         }
@@ -1453,11 +1758,16 @@ class Gdn_Format {
      * @param $replaceWith
      * @return mixed
      */
-    public static function vanillaSprintf($placeholderString, $replaceWith) {
+    public static function vanillaSprintf($placeholderString, $replaceWith)
+    {
         // Set replacement array inside callback
         Gdn_Format::vanillaSprintfCallback(null, $replaceWith);
 
-        $finalString = preg_replace_callback('/({([a-z0-9_:]+)})/i', ['Gdn_Format', 'VanillaSprintfCallback'], $placeholderString);
+        $finalString = preg_replace_callback(
+            "/({([a-z0-9_:]+)})/i",
+            ["Gdn_Format", "VanillaSprintfCallback"],
+            $placeholderString
+        );
 
         // Cleanup replacement list
         Gdn_Format::vanillaSprintfCallback(null, []);
@@ -1472,14 +1782,15 @@ class Gdn_Format {
      * @param bool $internalReplacementList
      * @return mixed
      */
-    protected static function vanillaSprintfCallback($match, $internalReplacementList = false) {
+    protected static function vanillaSprintfCallback($match, $internalReplacementList = false)
+    {
         static $internalReplacement = [];
 
         if (is_array($internalReplacementList)) {
             $internalReplacement = $internalReplacementList;
         } else {
             $matchStr = $match[2];
-            $format = (count($splitMatch = explode(':', $matchStr)) > 1) ? $splitMatch[1] : false;
+            $format = count($splitMatch = explode(":", $matchStr)) > 1 ? $splitMatch[1] : false;
 
             if (array_key_exists($matchStr, $internalReplacement)) {
                 if ($format) {
@@ -1500,19 +1811,17 @@ class Gdn_Format {
      *
      * @deprecated 3.2 FormatService::renderHtml($string, Formats\WysiwygFormat::FORMAT_KEY)
      */
-    public static function wysiwyg($mixed) {
+    public static function wysiwyg($mixed)
+    {
         static $customFormatter;
         if (!isset($customFormatter)) {
-            $customFormatter = c('Garden.Format.WysiwygFunction', false);
+            $customFormatter = c("Garden.Format.WysiwygFunction", false);
         }
 
         if (!is_string($mixed)) {
-            return self::to($mixed, 'Wysiwyg');
+            return self::to($mixed, "Wysiwyg");
         } elseif (is_callable($customFormatter)) {
-            deprecated(
-                'Garden.Format.WysiwygFunction',
-                'Replace WysiwygFormat using Garden\Container'
-            );
+            deprecated("Garden.Format.WysiwygFunction", "Replace WysiwygFormat using Garden\Container");
             return $customFormatter($mixed);
         } else {
             return Gdn::formatService()->renderHTML($mixed, Formats\WysiwygFormat::FORMAT_KEY);
@@ -1527,7 +1836,8 @@ class Gdn_Format {
      * @return string - The rendered HTML output.
      * @deprecated 3.2 FormatService::renderHtml($content, Formats\RichFormat::FORMAT_KEY)
      */
-    public static function rich(string $deltas): string {
+    public static function rich(string $deltas): string
+    {
         deprecated(__FUNCTION__, 'FormatService::renderHtml($content, Formats\RichFormat::FORMAT_KEY)');
         return Gdn::formatService()->renderHTML($deltas, Formats\RichFormat::FORMAT_KEY);
     }
@@ -1541,7 +1851,8 @@ class Gdn_Format {
      * @return string
      * @deprecated 3.2 FormatService::renderQuote($body, $format)
      */
-    public static function quoteEmbed($body, string $format): string {
+    public static function quoteEmbed($body, string $format): string
+    {
         deprecated(__FUNCTION__, 'FormatService::renderQuote($body, $format)');
         $body = is_array($body) ? json_encode($body) : $body;
         return Gdn::formatService()->renderQuote($body, $format);
@@ -1555,17 +1866,13 @@ class Gdn_Format {
      * @return string[]
      * @deprecated 3.2 FormatService::parseMentions($body, Formats\RichFormat::FORMAT_KEY)
      */
-    public static function getRichMentionUsernames(string $body): array {
+    public static function getRichMentionUsernames(string $body): array
+    {
         deprecated(__FUNCTION__, 'RichFormat::parseMentions($body)');
         return Gdn::formatService()->parseMentions($body, Formats\RichFormat::FORMAT_KEY);
     }
 
-    const SAFE_PROTOCOLS = [
-        "http",
-        "https",
-        "tel",
-        "mailto",
-    ];
+    const SAFE_PROTOCOLS = ["http", "https", "tel", "mailto"];
 
     /**
      * Sanitize a URL to ensure that it matches a whitelist of approved url schemes.
@@ -1581,14 +1888,15 @@ class Gdn_Format {
      *
      * @return string
      */
-    public static function sanitizeUrl(string $url): string {
+    public static function sanitizeUrl(string $url): string
+    {
         $protocol = parse_url($url, PHP_URL_SCHEME) ?: "";
         $isSafe = in_array($protocol, self::SAFE_PROTOCOLS, true);
 
         if ($isSafe) {
             return $url;
         } else {
-            return "unsafe:".$url;
+            return "unsafe:" . $url;
         }
     }
 }

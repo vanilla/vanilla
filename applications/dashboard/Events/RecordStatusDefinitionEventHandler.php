@@ -18,8 +18,8 @@ use Vanilla\Http\InternalClient;
 /**
  * Handle events related to defining a record status, that is, a status assigned to a resource record.
  */
-class RecordStatusDefinitionEventHandler {
-
+class RecordStatusDefinitionEventHandler
+{
     //region Fields
     /** @var EventManager $eventManager */
     private $eventManager;
@@ -35,7 +35,8 @@ class RecordStatusDefinitionEventHandler {
      * @param EventManager $eventManager
      * @param InternalClient $apiClient
      */
-    public function __construct(EventManager $eventManager, InternalClient $apiClient) {
+    public function __construct(EventManager $eventManager, InternalClient $apiClient)
+    {
         $this->eventManager = $eventManager;
         $this->apiClient = $apiClient;
     }
@@ -47,7 +48,8 @@ class RecordStatusDefinitionEventHandler {
      *
      * @param IdeaStatusDefinitionEvent $event Event to handle
      */
-    public function handleIdeaStatusDefinitionEvent(IdeaStatusDefinitionEvent $event): void {
+    public function handleIdeaStatusDefinitionEvent(IdeaStatusDefinitionEvent $event): void
+    {
         switch ($event->getAction()) {
             case EventAction::ADD:
                 $this->handleIdeaStatusAddition($event);
@@ -71,13 +73,14 @@ class RecordStatusDefinitionEventHandler {
      *
      * @param IdeaStatusDefinitionEvent $event Idea Status Added Event to handle
      */
-    private function handleIdeaStatusAddition(IdeaStatusDefinitionEvent $event): void {
+    private function handleIdeaStatusAddition(IdeaStatusDefinitionEvent $event): void
+    {
         $ideaStatus = $event->getPayload();
-        if (empty($ideaStatus['recordStatusID'])) {
+        if (empty($ideaStatus["recordStatusID"])) {
             // Create the corresponding discussion-specific status that relates to ideation
-            $defaults = ['recordType' => 'discussion', 'recordSubtype' => 'ideation', 'isSystem' => 0];
+            $defaults = ["recordType" => "discussion", "recordSubtype" => "ideation", "isSystem" => 0];
             $recordStatus = array_merge($ideaStatus, $defaults);
-            $recordStatus['state'] = lcfirst($recordStatus['state']);
+            $recordStatus["state"] = lcfirst($recordStatus["state"]);
 
             $this->apiClient->setUserID($event->getUserID());
             $response = $this->apiClient->post("/api/v2/discussions/statuses", $recordStatus);
@@ -85,7 +88,7 @@ class RecordStatusDefinitionEventHandler {
             if ($response->isSuccessful()) {
                 //Fire a new discussion status inserted event that references the added idea status' ID
                 $discussionStatus = $response->getBody();
-                $discussionStatusID = intval($discussionStatus['statusID']);
+                $discussionStatusID = intval($discussionStatus["statusID"]);
                 $ideaStatusID = $event->getID();
                 $addEvent = new DiscussionStatusDefinitionEvent(
                     EventAction::ADD,
@@ -104,22 +107,23 @@ class RecordStatusDefinitionEventHandler {
      *
      * @param IdeaStatusDefinitionEvent $event Idea Status Update event to handle
      */
-    private function handleIdeaStatusUpdate(IdeaStatusDefinitionEvent $event): void {
+    private function handleIdeaStatusUpdate(IdeaStatusDefinitionEvent $event): void
+    {
         if (is_numeric($event->getForeignID())) {
             $payload = $event->getPayload();
-            if (!empty($payload['name']) || !empty($payload['state']) || array_key_exists('isDefault', $payload)) {
+            if (!empty($payload["name"]) || !empty($payload["state"]) || array_key_exists("isDefault", $payload)) {
                 // Ideation states have initial uppercase letter while discussion statuses have initial lowercase letter
-                if (!empty($payload['state'])) {
-                    $payload['state'] = lcfirst($payload['state']);
+                if (!empty($payload["state"])) {
+                    $payload["state"] = lcfirst($payload["state"]);
                 }
-                unset($payload['statusID']);
+                unset($payload["statusID"]);
 
                 $path = "/api/v2/discussions/statuses/{$event->getForeignID()}";
                 $this->apiClient->setUserID($event->getUserID());
                 $getResponse = $this->apiClient->get($path);
                 if ($getResponse->isSuccessful()) {
                     // Retain only those keys from the payload that are included in an API GET request
-                    $current = (array)$getResponse->getBody();
+                    $current = (array) $getResponse->getBody();
                     $payload = array_intersect_key($payload, $current);
                     // Retain only those keys from the current row that are included in the event payload
                     $current = array_intersect_key($current, $payload);
@@ -138,7 +142,8 @@ class RecordStatusDefinitionEventHandler {
      *
      * @param IdeaStatusDefinitionEvent $event Idea Status Delete event to handle
      */
-    private function handleIdeaStatusDelete(IdeaStatusDefinitionEvent $event): void {
+    private function handleIdeaStatusDelete(IdeaStatusDefinitionEvent $event): void
+    {
         if (is_numeric($event->getForeignID())) {
             $path = "/api/v2/discussions/statuses/{$event->getForeignID()}";
             try {

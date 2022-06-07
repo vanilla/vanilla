@@ -30,7 +30,7 @@ import { hasPermission } from "@library/features/users/Permission";
 import { formatUrl } from "@library/utility/appUtils";
 import { useCurrentUserID } from "@library/features/users/userHooks";
 import SmartLink from "@library/routing/links/SmartLink";
-import { useStackingContext } from "@library/modal/StackingContext";
+import { useStackingContext } from "@vanilla/react-utils";
 
 interface IProps {
     user: IUser;

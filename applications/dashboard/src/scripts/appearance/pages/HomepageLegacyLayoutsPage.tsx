@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { ComponentType } from "react";
+import React, { ComponentType, useMemo } from "react";
 import { AppearanceNav } from "@dashboard/appearance/nav/AppearanceNav";
 import AdminLayout from "@dashboard/components/AdminLayout";
 import { TitleBarDevices, useTitleBarDevice } from "@library/layout/TitleBarContext";
@@ -21,6 +21,7 @@ import { notEmpty } from "@vanilla/utils";
 import Categories from "@dashboard/appearance/previews/Categories";
 import ModernLayout from "@dashboard/appearance/previews/ModernLayout";
 import AdminTitleBar from "@dashboard/components/AdminTitleBar";
+import { useDeleteLayoutView, useLayouts } from "@dashboard/layout/layoutSettings/LayoutSettings.hooks";
 
 export interface IHomepageRouteOption {
     label: string;
@@ -46,14 +47,25 @@ export function addHomepageRouteOption(option: IHomepageRouteOption) {
 }
 
 function HomepageLegacyLayoutsPageImpl() {
-    const configs = useConfigsByKeys(["routes.defaultController"]);
+    const configs = useConfigsByKeys(["routes.defaultController", "labs.useCustomLayout"]);
 
     const { patchConfig } = useConfigPatcher();
+    const { layoutsByViewType } = useLayouts();
+    const deleteLayoutView = useDeleteLayoutView();
 
     function applyHomeRoute(route: string) {
         patchConfig({
             "routes.defaultController": [route, "internal"],
+            "labs.useCustomLayout": false,
         });
+
+        //delete custom layout views for "home"
+        const layoutsToDeleteViews = layoutsByViewType["home"].filter((layout) => {
+            return layout.layoutViews.length > 0;
+        });
+        for (const layout of layoutsToDeleteViews) {
+            deleteLayoutView(layout.layoutID);
+        }
     }
 
     if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(configs.status)) {
@@ -69,7 +81,9 @@ function HomepageLegacyLayoutsPageImpl() {
             options={homepageRouteOptions.map((option) => ({
                 label: t(option.label),
                 thumbnailComponent: option.thumbnailComponent,
-                active: configs.data["routes.defaultController"][0] == option.value,
+                active:
+                    configs.data["routes.defaultController"][0] == option.value &&
+                    !configs.data["labs.useCustomLayout"],
                 onApply: () => applyHomeRoute(option.value),
             }))}
         />

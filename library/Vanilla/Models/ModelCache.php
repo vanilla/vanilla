@@ -26,13 +26,13 @@ use Vanilla\Scheduler\SchedulerInterface;
  *   - A lock is acquired when calculating a cache value to prevent instances contending for resources to generate the same value.
  *   - Values may be recalculated early on random requests to prevent the value from expiring.
  */
-class ModelCache {
-
+class ModelCache
+{
     /** @var int When we hit this size of incrementing key, we reset from 0. */
     const MAX_INCREMENTING_KEY = 1000000;
 
     /** @var string */
-    const INCREMENTING_KEY_NAMESPACE = 'vanillaIncrementingKey';
+    const INCREMENTING_KEY_NAMESPACE = "vanillaIncrementingKey";
 
     const GLOBAL_DEFAULT_OPTIONS = [
         \Gdn_Cache::FEATURE_EXPIRY => 600,
@@ -45,7 +45,7 @@ class ModelCache {
 
     public const OPT_TTL = \Gdn_Cache::FEATURE_EXPIRY;
     public const OPT_DEFAULT = \Gdn_Cache::FEATURE_DEFAULT;
-    public const OPT_SCHEDULER = 'scheduler';
+    public const OPT_SCHEDULER = "scheduler";
 
     /** @var string */
     private $cacheNameSpace;
@@ -69,7 +69,8 @@ class ModelCache {
      * @param \Gdn_Cache $cache The cache instance.
      * @param array $defaultCacheOptions Default options to apply for storing cache values.
      */
-    public function __construct(string $cacheNameSpace, \Gdn_Cache $cache, array $defaultCacheOptions = []) {
+    public function __construct(string $cacheNameSpace, \Gdn_Cache $cache, array $defaultCacheOptions = [])
+    {
         $this->cache = new CacheCacheAdapter($cache);
         $this->cacheContract = new Psr16Adapter($this->cache, $cacheNameSpace);
 
@@ -98,12 +99,13 @@ class ModelCache {
      *
      * @return string
      */
-    public function createCacheKey(array $keyArgs, bool $excludeNamespace = false): string {
+    public function createCacheKey(array $keyArgs, bool $excludeNamespace = false): string
+    {
         $jsonEncoded = json_encode($keyArgs);
-        $key = $this->getIncrementingKey() . '-' . sha1($jsonEncoded);
+        $key = $this->getIncrementingKey() . "-" . sha1($jsonEncoded);
         if (!$excludeNamespace) {
             // Make the key in the same why the symfony cache contract does.
-            $key = $this->cacheNameSpace . '_' . $key;
+            $key = $this->cacheNameSpace . "_" . $key;
         }
         return $key;
     }
@@ -119,7 +121,8 @@ class ModelCache {
      *
      * @return mixed
      */
-    public function getCachedOrHydrate(array $args, callable $hydrate, array $cacheOptions = []) {
+    public function getCachedOrHydrate(array $args, callable $hydrate, array $cacheOptions = [])
+    {
         if ($this->isFeatureDisabled) {
             if (empty($args)) {
                 return $hydrate();
@@ -130,10 +133,16 @@ class ModelCache {
 
         $ttl = $cacheOptions[self::OPT_TTL] ?? $this->defaultCacheOptions[self::OPT_TTL];
         $contractKey = $this->createCacheKey($args, true);
-        $result = $this->cacheContract->get($contractKey, function (ItemInterface $item) use ($args, $hydrate, $ttl, $cacheOptions) {
+        $result = $this->cacheContract->get($contractKey, function (ItemInterface $item) use (
+            $args,
+            $hydrate,
+            $ttl,
+            $cacheOptions
+        ) {
             $item->expiresAfter($ttl);
 
-            $scheduler = $cacheOptions[self::OPT_SCHEDULER] ?? $this->defaultCacheOptions[self::OPT_SCHEDULER] ?? null;
+            $scheduler =
+                $cacheOptions[self::OPT_SCHEDULER] ?? ($this->defaultCacheOptions[self::OPT_SCHEDULER] ?? null);
             $default = $cacheOptions[self::OPT_DEFAULT] ?? null;
             if ($scheduler instanceof SchedulerInterface) {
                 // Defer hydration.
@@ -161,30 +170,34 @@ class ModelCache {
      * @param array $args
      * @return void
      */
-    private function scheduleHydration(SchedulerInterface $scheduler, string $cacheKey, callable $hydrate, array $args) {
+    private function scheduleHydration(SchedulerInterface $scheduler, string $cacheKey, callable $hydrate, array $args)
+    {
         $time = CurrentTimeStamp::get();
 
-        $scheduler->addJobDescriptor(new NormalJobDescriptor(CallbackJob::class, [
-            'callback' => function () use ($cacheKey, $hydrate, $args, $time) {
-                // If the threshold has been reached, we delete the cache key and the hydration
-                // will run on the next request.
-                $newTime = CurrentTimeStamp::get();
-                if ($newTime - $time > self::RESCHEDULE_THRESHOLD) {
-                    $this->cache->delete($cacheKey);
-                    return;
-                }
+        $scheduler->addJobDescriptor(
+            new NormalJobDescriptor(CallbackJob::class, [
+                "callback" => function () use ($cacheKey, $hydrate, $args, $time) {
+                    // If the threshold has been reached, we delete the cache key and the hydration
+                    // will run on the next request.
+                    $newTime = CurrentTimeStamp::get();
+                    if ($newTime - $time > self::RESCHEDULE_THRESHOLD) {
+                        $this->cache->delete($cacheKey);
+                        return;
+                    }
 
-                $result = call_user_func_array($hydrate, $args);
-                $result = serialize($result);
-                $this->cache->set($cacheKey, $result);
-            },
-        ]));
+                    $result = call_user_func_array($hydrate, $args);
+                    $result = serialize($result);
+                    $this->cache->set($cacheKey, $result);
+                },
+            ])
+        );
     }
 
     /**
      * Invalidate all cached results for this cache.
      */
-    public function invalidateAll() {
+    public function invalidateAll()
+    {
         $this->rolloverIncrementingKey();
     }
 
@@ -193,7 +206,8 @@ class ModelCache {
      *
      * @return ModelCacheInvalidationProcessor
      */
-    public function createInvalidationProcessor(): ModelCacheInvalidationProcessor {
+    public function createInvalidationProcessor(): ModelCacheInvalidationProcessor
+    {
         return new ModelCacheInvalidationProcessor($this);
     }
 
@@ -202,12 +216,13 @@ class ModelCache {
      *
      * @return int
      */
-    private function getIncrementingKey(): int {
+    private function getIncrementingKey(): int
+    {
         if ($this->isFeatureDisabled) {
             return 0;
         }
 
-        $incrementKeyCacheKey = self::INCREMENTING_KEY_NAMESPACE . '-' . $this->cacheNameSpace;
+        $incrementKeyCacheKey = self::INCREMENTING_KEY_NAMESPACE . "-" . $this->cacheNameSpace;
         $result = $this->cache->get($incrementKeyCacheKey, 0);
         return $result;
     }
@@ -215,12 +230,13 @@ class ModelCache {
     /**
      * Update the incrementing key.
      */
-    private function rolloverIncrementingKey(): void {
+    private function rolloverIncrementingKey(): void
+    {
         if ($this->isFeatureDisabled) {
             return;
         }
 
-        $incrementKeyCacheKey = self::INCREMENTING_KEY_NAMESPACE . '-' . $this->cacheNameSpace;
+        $incrementKeyCacheKey = self::INCREMENTING_KEY_NAMESPACE . "-" . $this->cacheNameSpace;
         $existingKey = $this->getIncrementingKey();
         $newKey = $existingKey + 1;
         if ($newKey > self::MAX_INCREMENTING_KEY) {

@@ -12,7 +12,8 @@ import {
 import {
     ILayoutDetails,
     ILayoutEdit,
-    ILayoutViewQuery,
+    ILayoutView,
+    LayoutViewFragment,
     LayoutViewType,
 } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { Loadable, LoadStatus } from "@library/@types/api/core";
@@ -42,12 +43,14 @@ export function useLayouts() {
     };
 }
 
-export function useLayout(layoutID: ILayoutDetails["layoutID"]) {
+export function useLayout(layoutID?: ILayoutDetails["layoutID"]) {
     const { fetchLayout } = useLayoutsActions();
-    const layout = useLayoutSelector(({ layoutSettings }) => layoutSettings.layoutsByID[layoutID]);
+    const layout = useLayoutSelector(({ layoutSettings }) =>
+        layoutID !== undefined ? layoutSettings.layoutsByID[layoutID] : undefined,
+    );
 
     useEffect(() => {
-        if (!layout) {
+        if (layoutID !== undefined && !layout) {
             fetchLayout(layoutID);
         }
     }, [fetchLayout, layout, layoutID]);
@@ -73,18 +76,38 @@ export function useLayoutJson(layoutID: ILayoutDetails["layoutID"]): Loadable<IL
     return loadable;
 }
 
-export function usePutLayoutView(layoutID: ILayoutDetails["layoutID"]) {
-    const { putLayoutView } = useLayoutsActions();
+export function usePutLayoutViews(layoutID: ILayoutDetails["layoutID"]) {
+    const dispatch = useLayoutDispatch();
+
+    return async (layoutViews: LayoutViewFragment[]) =>
+        dispatch(
+            layoutActions.putLayoutViews({
+                layoutID,
+                layoutViews,
+            }),
+        ).unwrap();
+}
+
+export function useDeleteLayout({
+    layoutID,
+    onSuccessBeforeDeletion,
+}: {
+    layoutID: ILayoutDetails["layoutID"];
+    onSuccessBeforeDeletion?: () => void;
+}) {
+    const dispatch = useLayoutDispatch();
+    return async () => dispatch(layoutActions.deleteLayout({ layoutID, onSuccessBeforeDeletion })).unwrap();
+}
+
+export function useDeleteLayoutView() {
+    const { deleteLayoutView } = useLayoutsActions();
 
     return useCallback(
-        (query: Omit<ILayoutViewQuery, "layoutID">) => {
-            putLayoutView({
-                layoutID,
-                ...query,
-            });
+        (layoutID: ILayoutView["layoutID"]) => {
+            deleteLayoutView({ layoutID: layoutID });
         },
 
-        [putLayoutView, layoutID],
+        [deleteLayoutView],
     );
 }
 

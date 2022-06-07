@@ -18,9 +18,9 @@ use Vanilla\Scheduler\Job\LocalApiJob;
  *
  * @package Vanilla\RemoteResource
  */
-class LocalRemoteResourceJob extends LocalApiJob {
-
-    const REMOTE_RESOURCE_LOCK = 'REMOTE_RESOURCE_LOCK.%s';
+class LocalRemoteResourceJob extends LocalApiJob
+{
+    const REMOTE_RESOURCE_LOCK = "REMOTE_RESOURCE_LOCK.%s";
 
     /** @var RemoteResourceModel */
     protected $remoteResourceModel;
@@ -32,7 +32,7 @@ class LocalRemoteResourceJob extends LocalApiJob {
     protected $remoteResourceHttpClient;
 
     /** @var string */
-    private $url = '';
+    private $url = "";
 
     /**
      * DI.
@@ -56,13 +56,12 @@ class LocalRemoteResourceJob extends LocalApiJob {
      *
      * @param array $message
      */
-    public function setMessage(array $message) {
-        $schema = Schema::parse([
-            'url:s',
-        ]);
+    public function setMessage(array $message)
+    {
+        $schema = Schema::parse(["url:s"]);
 
         $message = $schema->validate($message);
-        $this->url = $message['url'] ?? '';
+        $this->url = $message["url"] ?? "";
     }
 
     /**
@@ -70,16 +69,13 @@ class LocalRemoteResourceJob extends LocalApiJob {
      *
      * @return JobExecutionStatus
      */
-    public function run(): JobExecutionStatus {
+    public function run(): JobExecutionStatus
+    {
         $key = sprintf(self::REMOTE_RESOURCE_LOCK, $this->url);
         $locked = $this->cache->get($key);
         if (!$locked) {
             $expiry = RemoteResourceHttpClient::REQUEST_TIMEOUT * 2;
-            $this->cache->add(
-                $key,
-                $this->url,
-                [Gdn_Cache::FEATURE_EXPIRY => $expiry]
-            );
+            $this->cache->add($key, $this->url, [Gdn_Cache::FEATURE_EXPIRY => $expiry]);
             $response = $this->getRemoteResource();
             $contentBody = $response->getBody();
             $jobStatus = $this->saveContent($response, $contentBody);
@@ -95,7 +91,8 @@ class LocalRemoteResourceJob extends LocalApiJob {
      *
      * @return HttpResponse
      */
-    private function getRemoteResource(): HttpResponse {
+    private function getRemoteResource(): HttpResponse
+    {
         $response = $this->remoteResourceHttpClient->get($this->url);
         return $response;
     }
@@ -107,7 +104,8 @@ class LocalRemoteResourceJob extends LocalApiJob {
      * @param string|null $contentBody
      * @return JobExecutionStatus
      */
-    private function saveContent(HttpResponse $response, ?string $contentBody): JobExecutionStatus {
+    private function saveContent(HttpResponse $response, ?string $contentBody): JobExecutionStatus
+    {
         if ($response->isSuccessful() && $contentBody) {
             $this->remoteResourceModel->insert(["url" => $this->url, "content" => $contentBody]);
             $jobStatus = JobExecutionStatus::complete();

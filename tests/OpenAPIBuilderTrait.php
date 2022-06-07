@@ -12,24 +12,25 @@ use Vanilla\AddonManager;
 use Vanilla\OpenAPIBuilder;
 use VanillaTests\Fixtures\Request;
 
-trait OpenAPIBuilderTrait {
-
+trait OpenAPIBuilderTrait
+{
     /**
      * Create a configured openAPIBuilder
      *
      * @return OpenAPIBuilder
      */
-    public function createOpenApiBuilder(): OpenAPIBuilder {
+    public function createOpenApiBuilder(): OpenAPIBuilder
+    {
         $am = new AddonManager(
             [
-                Addon::TYPE_ADDON => ['/applications', '/plugins'],
-                Addon::TYPE_THEME => '/themes',
-                Addon::TYPE_LOCALE => '/locales'
+                Addon::TYPE_ADDON => ["/applications", "/plugins"],
+                Addon::TYPE_THEME => "/themes",
+                Addon::TYPE_LOCALE => "/locales",
             ],
-            PATH_ROOT.'/tests/cache/open-api-builder/vanilla-manager'
+            PATH_ROOT . "/tests/cache/open-api-builder/vanilla-manager"
         );
 
         $request = new Request();
-        return new OpenAPIBuilder($am, $request, PATH_ROOT.'/tests/cache/'.__FUNCTION__.'.php');
+        return new OpenAPIBuilder($am, $request, PATH_ROOT . "/tests/cache/" . __FUNCTION__ . ".php");
     }
 }

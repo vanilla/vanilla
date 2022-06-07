@@ -19,14 +19,14 @@ use Webmozart\Assert\Assert;
 /**
  * A search query object.
  */
-abstract class SearchQuery {
-
+abstract class SearchQuery
+{
     const LIMIT_DEFAULT = 10;
     const LIMIT_MAXIMUM = 100;
 
-    const FILTER_OP_OR = 'or';
-    const FILTER_OP_AND = 'and';
-    const FILTER_OP_WILDCARD = 'wildcard';
+    const FILTER_OP_OR = "or";
+    const FILTER_OP_AND = "and";
+    const FILTER_OP_WILDCARD = "wildcard";
 
     const MATCH_FULLTEXT = "fulltext";
     const MATCH_FULLTEXT_EXTENDED = "fulltext_extended";
@@ -34,9 +34,9 @@ abstract class SearchQuery {
     const MATCH_PHRASE = "match_phrase";
     const MATCH_PHRASE_PREFIX = "match_phrase_prefix";
 
-    const SORT_RELEVANCE = 'relevance';
-    const SORT_ASC = 'asc';
-    const SORT_DESC = 'desc';
+    const SORT_RELEVANCE = "relevance";
+    const SORT_ASC = "asc";
+    const SORT_DESC = "desc";
 
     /** @var Schema */
     protected $querySchema;
@@ -59,12 +59,13 @@ abstract class SearchQuery {
      * @param AbstractSearchType[] $searchTypes The registered search types contributing to the query.
      * @param array $queryData The data making up the query.
      */
-    public function __construct(array $searchTypes, array $queryData) {
+    public function __construct(array $searchTypes, array $queryData)
+    {
         $allTypeCollection = new SearchTypeCollection($searchTypes);
         $filteredTypes = $allTypeCollection->getFilteredCollection($queryData);
 
         if (!$filteredTypes->hasExclusiveType()) {
-            $globalType = $allTypeCollection->getByType('global')[0] ?? null;
+            $globalType = $allTypeCollection->getByType("global")[0] ?? null;
             if ($globalType) {
                 // Make sure the global type is added if possible.
                 $filteredTypes->addType($globalType);
@@ -74,7 +75,7 @@ abstract class SearchQuery {
         $this->querySchema = $this->buildSchema($searchTypes);
         $this->queryData = $this->querySchema->validate($queryData);
 
-        $boosts = $this->getQueryParameter('boosts', null);
+        $boosts = $this->getQueryParameter("boosts", null);
         if ($boosts === null) {
             // Apply default boosts.
             $boostSchema = self::buildBoostSchema($searchTypes);
@@ -82,7 +83,7 @@ abstract class SearchQuery {
         } else {
             // Some boosts are defined.
 
-            if ($boosts['enabled'] === false) {
+            if ($boosts["enabled"] === false) {
                 // Boosts were explicitly disabled from this query.
                 // As a result we will not apply any defaults or any other values.
                 $this->boosts = [];
@@ -123,22 +124,28 @@ abstract class SearchQuery {
             $this->endTypeQuery();
         }
 
-        if ($this instanceof CollapsableSearchQueryInterface && $this->getQueryParameter('collapse') && $hasCollapsableType) {
-            $this->collapseField('recordCollapseID');
+        if (
+            $this instanceof CollapsableSearchQueryInterface &&
+            $this->getQueryParameter("collapse") &&
+            $hasCollapsableType
+        ) {
+            $this->collapseField("recordCollapseID");
         }
     }
 
     /**
      * @param AbstractSearchType[] $currentTypes
      */
-    protected function startTypeQuery(array $currentTypes): void {
+    protected function startTypeQuery(array $currentTypes): void
+    {
         $this->currentTypes = $currentTypes;
     }
 
     /**
      * End the current type-specific query.
      */
-    protected function endTypeQuery(): void {
+    protected function endTypeQuery(): void
+    {
         $this->currentTypes = null;
     }
 
@@ -150,7 +157,8 @@ abstract class SearchQuery {
      *
      * @return mixed|null
      */
-    public function getQueryParameter(string $queryParam, $default = null) {
+    public function getQueryParameter(string $queryParam, $default = null)
+    {
         return $this->queryData[$queryParam] ?? $default;
     }
 
@@ -165,7 +173,8 @@ abstract class SearchQuery {
      *
      * @return mixed|null
      */
-    public function getBoostParameter(string $boostParam) {
+    public function getBoostParameter(string $boostParam)
+    {
         return ArrayUtils::getByPath($boostParam, $this->boosts, null);
     }
 
@@ -176,44 +185,53 @@ abstract class SearchQuery {
      *
      * @return Schema
      */
-    public static function buildSchema(array $searchTypes): Schema {
+    public static function buildSchema(array $searchTypes): Schema
+    {
         $querySchema = Schema::parse([
-            'page:i?' => [
-                'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
-                'default' => 1,
-                'minimum' => 1,
+            "page:i?" => [
+                "description" => "Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).",
+                "default" => 1,
+                "minimum" => 1,
             ],
-            'limit:i?' => [
-                'description' => 'Desired number of items per page.',
-                'default' => self::LIMIT_DEFAULT,
-                'minimum' => 1,
-                'maximum' => self::LIMIT_MAXIMUM,
+            "limit:i?" => [
+                "description" => "Desired number of items per page.",
+                "default" => self::LIMIT_DEFAULT,
+                "minimum" => 1,
+                "maximum" => self::LIMIT_MAXIMUM,
             ],
-            'expand?' => ApiUtils::getExpandDefinition(['insertUser', 'updateUser', 'breadcrumbs', 'image', 'excerpt', '-body', 'tagIDs']),
-            'recordTypes:a?' => [
-                'items' => [
-                    'type' => 'string',
-                    'enum' => array_map(function ($searchType) {
+            "expand?" => ApiUtils::getExpandDefinition([
+                "insertUser",
+                "updateUser",
+                "breadcrumbs",
+                "image",
+                "excerpt",
+                "-body",
+                "tagIDs",
+            ]),
+            "recordTypes:a?" => [
+                "items" => [
+                    "type" => "string",
+                    "enum" => array_map(function ($searchType) {
                         return $searchType->getRecordType();
                     }, $searchTypes),
                 ],
-                'style' => 'form',
-                'description' => 'Restrict the search to the specified main type(s) of records.',
+                "style" => "form",
+                "description" => "Restrict the search to the specified main type(s) of records.",
             ],
-            'types:a?' => [
-                'items' => [
-                    'type' => 'string',
-                    'enum' => array_map(function ($searchType) {
+            "types:a?" => [
+                "items" => [
+                    "type" => "string",
+                    "enum" => array_map(function ($searchType) {
                         return $searchType->getType();
                     }, $searchTypes),
                 ],
-                'style' => 'form',
-                'description' => 'Restrict the search to the specified type(s) of records.',
+                "style" => "form",
+                "description" => "Restrict the search to the specified type(s) of records.",
             ],
-            'collapse:b?' => [
-                'default' => false,
+            "collapse:b?" => [
+                "default" => false,
             ],
-            'boosts?' => self::buildBoostSchema($searchTypes),
+            "boosts?" => self::buildBoostSchema($searchTypes),
         ]);
 
         foreach ($searchTypes as $searchType) {
@@ -229,10 +247,11 @@ abstract class SearchQuery {
      *
      * @return Schema
      */
-    public static function buildBoostSchema(array $searchTypes): Schema {
+    public static function buildBoostSchema(array $searchTypes): Schema
+    {
         $boostSchema = Schema::parse([
-            'enabled:b?' => [
-                'default' => true,
+            "enabled:b?" => [
+                "default" => true,
             ],
         ]);
         foreach ($searchTypes as $searchType) {
@@ -260,7 +279,12 @@ abstract class SearchQuery {
      *
      * @return $this
      */
-    abstract public function whereText(string $text, array $fieldNames = [], string $matchMode = self::MATCH_FULLTEXT, ?string $locale = "");
+    abstract public function whereText(
+        string $text,
+        array $fieldNames = [],
+        string $matchMode = self::MATCH_FULLTEXT,
+        ?string $locale = ""
+    );
 
     /**
      * Add index to scan to the search query
@@ -268,7 +292,8 @@ abstract class SearchQuery {
      * @param string $index
      * @return void
      */
-    public function addIndex(string $index) {
+    public function addIndex(string $index)
+    {
         $this->indexes[$index] = true;
     }
 
@@ -277,10 +302,10 @@ abstract class SearchQuery {
      *
      * @return array|null
      */
-    public function getIndexes(): ?array {
+    public function getIndexes(): ?array
+    {
         return $this->indexes !== null ? array_keys($this->indexes) : null;
     }
-
 
     /**
      * Set filter values for some attribute.
@@ -309,7 +334,8 @@ abstract class SearchQuery {
      *
      * @return $this
      */
-    public function setFilterRange(string $attribute, int $min, int $max, bool $exclude = false) {
+    public function setFilterRange(string $attribute, int $min, int $max, bool $exclude = false)
+    {
         return $this;
     }
 
@@ -321,11 +347,12 @@ abstract class SearchQuery {
      *
      * @return $this
      */
-    final public function setDateFilterSchema(string $attribute, $schemaFilter) {
+    final public function setDateFilterSchema(string $attribute, $schemaFilter)
+    {
         if ($schemaFilter instanceof LegacyDateRangeExpression) {
             $schemaFilter = $schemaFilter->toLegacyArray();
         }
-        Assert::isArray($schemaFilter, 'Argument 2 passed to __METHOD__ must be of type array.');
+        Assert::isArray($schemaFilter, "Argument 2 passed to __METHOD__ must be of type array.");
 
         $schema = new DateFilterSchema();
         $schemaFilter = $schema->validate($schemaFilter);
@@ -333,7 +360,7 @@ abstract class SearchQuery {
          * @var \DateTimeImmutable $start
          * @var \DateTimeImmutable $end
          */
-        [$start, $end] = $schemaFilter['inclusiveRange'];
+        [$start, $end] = $schemaFilter["inclusiveRange"];
         $this->setFilterRange($attribute, $start->getTimestamp(), $end->getTimestamp());
         return $this;
     }
@@ -346,7 +373,8 @@ abstract class SearchQuery {
      *
      * @return $this
      */
-    public function setSort(string $sort, ?string $field = null) {
+    public function setSort(string $sort, ?string $field = null)
+    {
         return $this;
     }
 
@@ -355,8 +383,9 @@ abstract class SearchQuery {
      *
      * @return string
      */
-    public function driver(): string {
-        return '';
+    public function driver(): string
+    {
+        return "";
     }
 
     /**
@@ -364,7 +393,8 @@ abstract class SearchQuery {
      *
      * @return bool
      */
-    public function supportsExtenders(): bool {
+    public function supportsExtenders(): bool
+    {
         return false;
     }
 
@@ -374,7 +404,8 @@ abstract class SearchQuery {
      * @param array $fields
      * @return array
      */
-    public function setQueryMatchFields(array $fields = []): array {
+    public function setQueryMatchFields(array $fields = []): array
+    {
         return $fields;
     }
 }

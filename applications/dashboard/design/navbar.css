@@ -680,7 +680,9 @@ button.Close {
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-.Popup .Content > h1:first-child, .Popup .Content > h2:first-child, .Popup .Content > h3:first-child {
+.Popup .Content > h1:first-child,
+.Popup .Content > h2:first-child,
+.Popup .Content > h3:first-child {
   font-size: 20px;
   margin-top: 0;
   margin-bottom: 14px;
@@ -800,7 +802,8 @@ button.Close {
 }
 
 .button.Button.Primary.buttonCTA, .button.Button.button-sso {
-  user-select: none;
+  -webkit-user-select: none;
+          user-select: none;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -888,7 +891,8 @@ button.Close {
 .selectBox-label {
   position: relative;
   cursor: pointer;
-  user-select: none;
+  -webkit-user-select: none;
+          user-select: none;
   margin-right: 5px;
 }
 
@@ -898,7 +902,8 @@ button.Close {
   align-items: center;
   position: relative;
   cursor: pointer;
-  user-select: none;
+  -webkit-user-select: none;
+          user-select: none;
 }
 
 .selectBox-content {
@@ -913,7 +918,8 @@ button.Close {
   display: inline-block;
   vertical-align: inherit;
   cursor: pointer;
-  user-select: none;
+  -webkit-user-select: none;
+          user-select: none;
   outline: none;
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -1098,7 +1104,8 @@ body.Categories.isMobile .PageControls.Top {
   line-height: 36px;
   height: 36px;
   font-weight: 400;
-  user-select: none;
+  -webkit-user-select: none;
+          user-select: none;
   overflow: hidden;
   cursor: pointer;
   background-color: #fff;
@@ -1128,7 +1135,8 @@ label.checkbox input.checkbox-input {
 }
 
 .checkbox-label {
-  user-select: none;
+  -webkit-user-select: none;
+          user-select: none;
   margin-left: 6px;
   line-height: inherit;
 }
@@ -1253,7 +1261,7 @@ body {
 .userContent.Message {
   margin-top: 14px;
 }
-.userContent.Message > *:last-child::after {
+.userContent.Message > .embedImage + p::after {
   content: "";
   display: table;
   clear: both;
@@ -1276,12 +1284,14 @@ body {
 .userContent .embedResponsive {
   margin-bottom: 0 !important;
 }
-.userContent .float-left, .userContent .float-right {
+.userContent .float-left,
+.userContent .float-right {
   margin: 0 !important;
   border: 0 !important;
   box-shadow: none !important;
 }
-.userContent .float-left .embedExternal-content, .userContent .float-right .embedExternal-content {
+.userContent .float-left .embedExternal-content,
+.userContent .float-right .embedExternal-content {
   margin-bottom: 14px;
 }
 .userContent .embedExternal {
@@ -1350,7 +1360,8 @@ body {
 }
 
 .richEditor-button {
-  user-select: none;
+  -webkit-user-select: none;
+          user-select: none;
   cursor: pointer;
 }
 
@@ -1360,7 +1371,9 @@ body.hasRichEditor #Form_Preview {
   display: none !important;
 }
 body.hasRichEditor .richEditor .buttonClose {
-  appearance: none;
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
   border: 0;
 }
 body.hasRichEditor .richEditor .spoiler .iconButton {
@@ -1707,7 +1720,8 @@ body.isMobile .Popup.hasRichEditor .Border {
   width: 1em;
   margin: 0;
   vertical-align: -0.14em;
-  user-select: none;
+  -webkit-user-select: none;
+          user-select: none;
 }
 
 .embedLinkLoader-loader {
@@ -1745,7 +1759,8 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .richEditor .embedExternal {
-  user-select: none;
+  -webkit-user-select: none;
+          user-select: none;
 }
 .richEditor .embedExternal-content,
 .richEditor .embedLinkLoader-link {
@@ -2056,7 +2071,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedLink-excerpt {
-  color: #555A62;
+  color: #555a62;
   overflow: hidden;
   text-overflow: ellipsis;
   word-break: break-word;
@@ -2092,7 +2107,7 @@ body.isMobile .Popup.hasRichEditor .Border {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #FFFFFF;
+  background: #ffffff;
   box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.3);
   width: 135px;
   height: 135px;
@@ -2444,4 +2459,4 @@ body:not(.dashboard) svg {
   pointer-events: none !important;
 }
 
-/*# sourceMappingURL=navbar.css.map */
+/*# sourceMappingURL=navbar.css.map*/

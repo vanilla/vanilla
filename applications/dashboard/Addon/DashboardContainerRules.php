@@ -32,48 +32,56 @@ use Vanilla\Web\APIExpandMiddleware;
 /**
  * Container rules for the dashboard.
  */
-class DashboardContainerRules extends AddonContainerRules {
-
+class DashboardContainerRules extends AddonContainerRules
+{
     /**
      * @param ContainerConfigurationInterface $container
      */
-    public function configureContainer(ContainerConfigurationInterface $container): void {
-        PageControllerRoute::configurePageRoutes($container, [
-            '/settings/layout' => LayoutSettingsPageController::class,
-            '/appearance' => AppearancePageController::class,
-        ], null, -1);
+    public function configureContainer(ContainerConfigurationInterface $container): void
+    {
+        PageControllerRoute::configurePageRoutes(
+            $container,
+            [
+                "/settings/layout" => LayoutSettingsPageController::class,
+                "/appearance" => AppearancePageController::class,
+            ],
+            null,
+            -1
+        );
 
-        PageControllerRoute::configurePageRoutes($container, [
-            '/' => HomePageController::class,
-        ], 'CustomLayoutHomePage');
+        PageControllerRoute::configurePageRoutes(
+            $container,
+            [
+                "/" => HomePageController::class,
+            ],
+            "UseCustomLayout"
+        );
 
-        $container->rule(SiteTotalService::class)
-            ->addCall('registerProvider', [new Reference(UserSiteTotalProvider::class)])
-        ;
+        $container
+            ->rule(SiteTotalService::class)
+            ->addCall("registerProvider", [new Reference(UserSiteTotalProvider::class)]);
 
-        $container->rule(LayoutService::class)
-            ->addCall('addLayoutView', [new Reference(LegacyProfileLayoutView::class)])
-            ->addCall('addLayoutView', [new Reference(LegacyRegistrationLayoutView::class)])
-            ->addCall('addLayoutView', [new Reference(LegacySigninLayoutView::class)]);
+        $container
+            ->rule(LayoutService::class)
+            ->addCall("addLayoutView", [new Reference(LegacyProfileLayoutView::class)])
+            ->addCall("addLayoutView", [new Reference(LegacyRegistrationLayoutView::class)])
+            ->addCall("addLayoutView", [new Reference(LegacySigninLayoutView::class)]);
 
-        $container->rule(OpenAPIBuilder::class)
+        $container
+            ->rule(OpenAPIBuilder::class)
             ->addCall("addFilter", ["filter" => new Reference(SiteTotalsFilterOpenApi::class)]);
 
-        $container->rule(LayoutHydrator::class)
+        $container
+            ->rule(LayoutHydrator::class)
             ->addCall("addMiddleware", [new Reference(LayoutPermissionFilterMiddleware::class)]);
 
-        $container->rule(APIExpandMiddleware::class)
-            ->addCall(
-                "addExpander",
-                [new Reference(UsersExpander::class)]
-            )
-            ->addCall(
-                "addExpander",
-                [new Reference(SsoUsersExpander::class)]
-            )
-        ;
+        $container
+            ->rule(APIExpandMiddleware::class)
+            ->addCall("addExpander", [new Reference(UsersExpander::class)])
+            ->addCall("addExpander", [new Reference(SsoUsersExpander::class)]);
 
-        $container->rule(OpenAPIBuilder::class)
+        $container
+            ->rule(OpenAPIBuilder::class)
             ->addCall("addFilter", [new Reference(ModerationMessagesFilterOpenApi::class)]);
     }
 }

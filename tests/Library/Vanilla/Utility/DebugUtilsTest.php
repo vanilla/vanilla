@@ -7,19 +7,19 @@
 
 namespace VanillaTests\Library\Vanilla\Utility;
 
-use PHP_CodeSniffer\Standards\MySource\Tests\PHP\EvalObjectFactoryUnitTest;
 use Vanilla\Utility\DebugUtils;
 use VanillaTests\VanillaTestCase;
 
 /**
  * Tests for the `DebugUtils` class.
  */
-class DebugUtilsTest extends VanillaTestCase {
-
+class DebugUtilsTest extends VanillaTestCase
+{
     /**
      * {@inheritDoc}
      */
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
         DebugUtils::setDebug(false);
     }
@@ -27,10 +27,11 @@ class DebugUtilsTest extends VanillaTestCase {
     /**
      * Test a basic call to `DebugUtils::renderException()`.
      */
-    public function testRenderException(): void {
+    public function testRenderException(): void
+    {
         $ex = new \Exception("foo");
 
-        $actual = DebugUtils::renderException($ex, 'test', DebugUtils::WRAP_HTML_NONE);
+        $actual = DebugUtils::renderException($ex, "test", DebugUtils::WRAP_HTML_NONE);
         $expected = <<<EOT
 test
 
@@ -42,11 +43,12 @@ EOT;
     /**
      * Test a basic call to `DebugUtils::renderException()`.
      */
-    public function testRenderExceptionInDebug(): void {
+    public function testRenderExceptionInDebug(): void
+    {
         $ex = new \Exception("foo");
 
         DebugUtils::setDebug(true);
-        $actual = DebugUtils::renderException($ex, 'test', DebugUtils::WRAP_HTML_NONE);
+        $actual = DebugUtils::renderException($ex, "test", DebugUtils::WRAP_HTML_NONE);
         $expected = <<<EOT
 test
 
@@ -59,7 +61,8 @@ EOT;
     /**
      * A call to `DebugUtils::wrapHtmlComment()` should escape comment markers.
      */
-    public function testWrapHtmlCommentEscaped(): void {
+    public function testWrapHtmlCommentEscaped(): void
+    {
         $actual = DebugUtils::wrapMessage("foo --> <script>", DebugUtils::WRAP_HTML_COMMENT);
         $expected = <<<EOT
 
@@ -75,7 +78,8 @@ EOT;
     /**
      * A call to `DebugUtils::wrapDebug()` should escape HTML.
      */
-    public function testWrapDebugEscaped(): void {
+    public function testWrapDebugEscaped(): void
+    {
         $actual = DebugUtils::wrapMessage("foo </pre> hack", DebugUtils::WRAP_HTML);
         $expected = <<<EOT
 
@@ -89,8 +93,9 @@ EOT;
     /**
      * Smoke test `DebugUtils::stackTraceString()`.
      */
-    public function testStackTraceString(): void {
-        $this->assertSame('', DebugUtils::stackTraceString([], 2));
+    public function testStackTraceString(): void
+    {
+        $this->assertSame("", DebugUtils::stackTraceString([], 2));
 
         $a = DebugUtils::stackTraceString(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), 2);
         $this->assertCount(2, explode("\n", $a));
@@ -106,7 +111,8 @@ EOT;
     /**
      * @return void
      */
-    public function testIsTestMode(): void {
+    public function testIsTestMode(): void
+    {
         $this->assertTrue(DebugUtils::isTestMode());
     }
 }

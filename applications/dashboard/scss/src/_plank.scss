@@ -94,7 +94,6 @@
     }
 
     .badge {
-
     }
 }
 
@@ -120,7 +119,7 @@
     color: $grey;
 
     &:hover {
-        fill: transparentize($body-color, .4);
+        fill: transparentize($body-color, 0.4);
     }
 }
 
@@ -186,4 +185,3 @@
         padding-right: 3px;
     }
 }
-

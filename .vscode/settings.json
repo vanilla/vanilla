@@ -36,7 +36,8 @@
         "yarn.lock": true,
         "composer.lock": true,
         "**/node_modules": true,
-        "dist": true
+        "dist": true,
+        "coverage": true
     },
     "[json]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"

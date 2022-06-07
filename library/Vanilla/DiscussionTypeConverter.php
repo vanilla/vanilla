@@ -13,16 +13,13 @@ use Garden\Web\Exception\ClientException;
  *
  * @package Vanilla
  */
-class DiscussionTypeConverter {
-
+class DiscussionTypeConverter
+{
     /**
      * Types that can't be converted
      * by DiscussionTypeConverter
      */
-    const RESTRICTED_TYPES = [
-        'Report',
-        'Redirect'
-    ];
+    const RESTRICTED_TYPES = ["Report", "Redirect"];
 
     /** @var AbstractTypeHandler[] */
     private $typeHandlers = [];
@@ -32,7 +29,8 @@ class DiscussionTypeConverter {
      *
      * @param string $type
      */
-    public function addTypeHandler($type = '') {
+    public function addTypeHandler($type = "")
+    {
         $this->typeHandlers[] = $type;
     }
 
@@ -43,7 +41,8 @@ class DiscussionTypeConverter {
      *
      * @return AbstractTypeHandler|null
      */
-    public function getTypeHandlers(string $type): ?AbstractTypeHandler {
+    public function getTypeHandlers(string $type): ?AbstractTypeHandler
+    {
         foreach ($this->typeHandlers as $typeHandler) {
             if ($typeHandler->getTypeHandlerName() === $type) {
                 return $typeHandler;
@@ -59,7 +58,8 @@ class DiscussionTypeConverter {
      * @param string $to
      * @throws ClientException If record type is restricted or unavailable.
      */
-    public function convert(array $from, string $to) {
+    public function convert(array $from, string $to)
+    {
         if (in_array($to, self::RESTRICTED_TYPES)) {
             throw new ClientException("{$to} record type conversion are restricted.");
         }
@@ -73,7 +73,7 @@ class DiscussionTypeConverter {
 
         $toHandler->handleTypeConversion($from, $to);
 
-        $type = $from['Type'] ?? 'Discussion';
+        $type = $from["Type"] ?? "Discussion";
         $fromHandler = $this->getTypeHandlers($type);
         if ($fromHandler) {
             $fromHandler->cleanUpRelatedData($from, $to);

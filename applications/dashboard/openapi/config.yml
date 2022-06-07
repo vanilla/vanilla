@@ -196,12 +196,12 @@ components:
                     x-key: Garden.Title
                     x-read: public
                     x-write: community.manage
-                "labs.customLayouts":
+                "labs.layoutEditor":
                     description: Create and manage layouts for your community through the layout editor.
                     type: boolean
                     default: false
                     example: false
-                    x-key: Feature.CustomLayoutHomePage.Enabled
+                    x-key: Feature.LayoutEditor.Enabled
                     x-read: public
                     x-write: community.manage
                 "labs.deferredLegacyScripts":
@@ -260,14 +260,14 @@ components:
                     x-key: Feature.NewPostMenu.Enabled
                     x-read: public
                     x-write: site.manage
-                "labs.customLayoutHomePage":
+                "labs.useCustomLayout":
                     x-hidden: true
                     description: |
-                        Use the layout playground page.
+                        Possibility to apply custom layouts on homepage or other pages.
                     type: boolean
                     default: false
                     example: true
-                    x-key: Feature.CustomLayoutHomePage.Enabled
+                    x-key: Feature.UseCustomLayout.Enabled
                     x-read: public
                     x-write: site.manage
                 "discussions.layout":

@@ -20,8 +20,8 @@ use Vanilla\Web\TwigRenderTrait;
  *
  * Users can change or delete emoji sets for their forums.
  */
-class EmojiExtenderPlugin extends Gdn_Plugin {
-
+class EmojiExtenderPlugin extends Gdn_Plugin
+{
     use TwigRenderTrait;
 
     /**
@@ -32,7 +32,8 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
     /**
      * Setup some variables and change emoji set.
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
         $this->ClassName = "EmojiExtenderPlugin";
     }
@@ -43,7 +44,8 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
      * @param Emoji $emoji The emoji object to change.
      * @param string $emojiSetKey The name of the emoji set to enable.
      */
-    public function changeEmojiSet($emoji, $emojiSetKey) {
+    public function changeEmojiSet($emoji, $emojiSetKey)
+    {
         if (!array_key_exists($emojiSetKey, $this->getEmojiSets())) {
             trigger_error("Emoji set not found: $emojiSetKey.", E_USER_NOTICE);
 
@@ -55,7 +57,7 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
         $manifest = $this->getManifest($emojiSet);
 
         if ($manifest) {
-            $emoji->setFromManifest($manifest, $emojiSet['basePath']);
+            $emoji->setFromManifest($manifest, $emojiSet["basePath"]);
         }
     }
 
@@ -66,8 +68,9 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
      * @return array|null Returns the manifest on success,
      * `false` if the emoji should be disabled, or `null` otherwise.
      */
-    protected function getManifest($emojiSet) {
-        $manifest = val('manifest', $emojiSet);
+    protected function getManifest($emojiSet)
+    {
+        $manifest = val("manifest", $emojiSet);
 
         if (!$manifest) {
             return null; // this is the default emoji set.
@@ -103,10 +106,11 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
      * @param string|array $manifest The path to the manifest or the manifest itself.
      * @param string $basePath The url path to the emoji.
      */
-    public function addEmojiSet($key, $manifest, $basePath) {
+    public function addEmojiSet($key, $manifest, $basePath)
+    {
         $this->emojiSets[$key] = [
-            'manifest' => $manifest,
-            'basePath' => $basePath,
+            "manifest" => $manifest,
+            "basePath" => $basePath,
         ];
     }
 
@@ -115,30 +119,30 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
      *
      * @return array Returns an array of all of the emoji sets.
      */
-    public function getEmojiSets() {
+    public function getEmojiSets()
+    {
         if (!isset($this->emojiSets)) {
-            $root = '/plugins/emojiextender/emoji';
+            $root = "/plugins/emojiextender/emoji";
 
             $this->addEmojiSet(
-                '',
+                "",
                 [
-                    'name' => 'Apple Emoji',
-                    'author' => 'Apple Inc.',
-                    'description' => 'A modern set of emoji you might recognize from any of your ubiquitous iDevices.',
-                    'icon' => 'icon.png',
-
+                    "name" => "Apple Emoji",
+                    "author" => "Apple Inc.",
+                    "description" => "A modern set of emoji you might recognize from any of your ubiquitous iDevices.",
+                    "icon" => "icon.png",
                 ],
-                '/resources/emoji'
+                "/resources/emoji"
             );
 
-            $this->addEmojiSet('twitter', PATH_ROOT . "$root/twitter/manifest.php", "$root/twitter");
-            $this->addEmojiSet('little', PATH_ROOT . "$root/little/manifest.php", "$root/little");
-            $this->addEmojiSet('rice', PATH_ROOT . "$root/rice/manifest.php", "$root/rice");
-            $this->addEmojiSet('yahoo', PATH_ROOT . "$root/yahoo/manifest.php", "$root/yahoo");
+            $this->addEmojiSet("twitter", PATH_ROOT . "$root/twitter/manifest.php", "$root/twitter");
+            $this->addEmojiSet("little", PATH_ROOT . "$root/little/manifest.php", "$root/little");
+            $this->addEmojiSet("rice", PATH_ROOT . "$root/rice/manifest.php", "$root/rice");
+            $this->addEmojiSet("yahoo", PATH_ROOT . "$root/yahoo/manifest.php", "$root/yahoo");
 
-            $this->fireEvent('Init');
+            $this->fireEvent("Init");
 
-            $this->addEmojiSet('none', PATH_ROOT . "$root/none/manifest.php", "$root/none");
+            $this->addEmojiSet("none", PATH_ROOT . "$root/none/manifest.php", "$root/none");
         }
 
         return $this->emojiSets;
@@ -149,9 +153,10 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
      *
      * @param Emoji $sender
      */
-    public function emoji_init_handler($sender) {
+    public function emoji_init_handler($sender)
+    {
         // Get the currently selected emoji set & switch to it.
-        $emojiSetKey = c('Garden.EmojiSet');
+        $emojiSetKey = c("Garden.EmojiSet");
         if (!$emojiSetKey || !array_key_exists($emojiSetKey, $this->getEmojiSets())) {
             return;
         }
@@ -163,42 +168,42 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
      *
      * @param SettingsController $sender
      */
-    public function settingsController_emojiExtender_create($sender) {
-        $sender->permission('Garden.Settings.Manage');
+    public function settingsController_emojiExtender_create($sender)
+    {
+        $sender->permission("Garden.Settings.Manage");
 
         $items = [];
         foreach ($this->getEmojiSets() as $key => $emojiSet) {
             $manifest = $this->getManifest($emojiSet);
             $data = [
-                'iconUrl' => isset($manifest['icon'])
-                    ? asset($emojiSet['basePath'] . '/' . $manifest['icon'], true, true)
-                    : '',
-                'name' => $manifest['name'],
-                'author' => !empty($manifest['author']) ? sprintf(t('by %s'), $manifest['author']) : null,
-                'descriptionHtml' => Gdn_Format::text($manifest['description'])
+                "iconUrl" => isset($manifest["icon"])
+                    ? asset($emojiSet["basePath"] . "/" . $manifest["icon"], true, true)
+                    : "",
+                "name" => $manifest["name"],
+                "author" => !empty($manifest["author"]) ? sprintf(t("by %s"), $manifest["author"]) : null,
+                "descriptionHtml" => Gdn_Format::text($manifest["description"]),
             ];
 
-            $items[$key] = $this->renderTwig('/plugins/emojiextender/views/settings.twig', $data);
+            $items[$key] = $this->renderTwig("/plugins/emojiextender/views/settings.twig", $data);
         }
         $cf = new ConfigurationModule($sender);
         $cf->initialize([
-            'Garden.EmojiSet' => [
-                'LabelCode' => 'Emoji Set',
-                'Control' => 'radiolist',
-                'Items' => $items,
-                'Options' => [
-                    'list' => true,
-                    'list-item-class' => 'label-selector-item',
-                    'listclass' => 'emojiext-list label-selector',
-                    'display' => 'after',
-                    'class' => 'label-selector-input',
-                    'no-grid' => true
+            "Garden.EmojiSet" => [
+                "LabelCode" => "Emoji Set",
+                "Control" => "radiolist",
+                "Items" => $items,
+                "Options" => [
+                    "list" => true,
+                    "list-item-class" => "label-selector-item",
+                    "listclass" => "emojiext-list label-selector",
+                    "display" => "after",
+                    "class" => "label-selector-input",
+                    "no-grid" => true,
                 ],
             ],
         ]);
 
-
-        $sender->setData('Title', t('Choose Your Emoji Set'));
+        $sender->setData("Title", t("Choose Your Emoji Set"));
         $cf->renderAll();
     }
 }

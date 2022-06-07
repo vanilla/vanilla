@@ -13,36 +13,34 @@ use PHPUnit\Framework\TestCase;
  * Tests for safeGlob().
  */
 
-class SafeGlobTest extends TestCase {
-
+class SafeGlobTest extends TestCase
+{
     /**
      * Basic test for safeGlob().
      */
-    public function testBasicGlob() {
-        $actual = safeGlob(PATH_ROOT.'/tests/fixtures/glob/*');
-        $expected = array (
-            PATH_ROOT.'/tests/fixtures/glob/b.md',
-            PATH_ROOT.'/tests/fixtures/glob/a.txt',
-        );
+    public function testBasicGlob()
+    {
+        $actual = safeGlob(PATH_ROOT . "/tests/fixtures/glob/*");
+        $expected = [PATH_ROOT . "/tests/fixtures/glob/b.md", PATH_ROOT . "/tests/fixtures/glob/a.txt"];
         $this->assertEqualsCanonicalizing($expected, $actual);
     }
 
     /**
      * Test with only '.md' extension.
      */
-    public function testOnlyMdExtension() {
-        $actual = safeGlob(PATH_ROOT.'/tests/fixtures/glob/*', ['md']);
-        $expected = array (
-            PATH_ROOT.'/tests/fixtures/glob/b.md',
-        );
+    public function testOnlyMdExtension()
+    {
+        $actual = safeGlob(PATH_ROOT . "/tests/fixtures/glob/*", ["md"]);
+        $expected = [PATH_ROOT . "/tests/fixtures/glob/b.md"];
         $this->assertEqualsCanonicalizing($expected, $actual);
     }
 
     /**
      * Test with nonexistent extensions.
      */
-    public function testWithNonexistentExtensions() {
-        $actual = safeGlob(PATH_ROOT.'/tests/fixtures/glob/*', ['html', 'doc']);
+    public function testWithNonexistentExtensions()
+    {
+        $actual = safeGlob(PATH_ROOT . "/tests/fixtures/glob/*", ["html", "doc"]);
         $expected = [];
         $this->assertEqualsCanonicalizing($expected, $actual);
     }
@@ -50,8 +48,9 @@ class SafeGlobTest extends TestCase {
     /**
      * Test with empty glob string.
      */
-    public function testWithBadGlobString() {
-        $actual = safeGlob('/tests/fixtures/globe/*');
+    public function testWithBadGlobString()
+    {
+        $actual = safeGlob("/tests/fixtures/globe/*");
         $expected = [];
         $this->assertEqualsCanonicalizing($expected, $actual);
     }

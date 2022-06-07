@@ -15,15 +15,15 @@
  * @param bool $repeat
  * @return string The url.
  */
-function smarty_block_permission($params, $content, &$smarty, &$repeat) {
+function smarty_block_permission($params, $content, &$smarty, &$repeat)
+{
     // Only output on the closing tag.
-    if (!$repeat){
+    if (!$repeat) {
         if (isset($content)) {
-            $require = val('require', $params);
+            $require = val("require", $params);
             $hasPermission = Gdn::session()->checkPermission($require);
             if ($hasPermission) {
                 return $content;
-
             }
         }
     }

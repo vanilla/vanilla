@@ -16,14 +16,13 @@ use Vanilla\Utility\Deprecation;
  * retrieve settings from the arrays, assign new values to the arrays, and save
  * the arrays back to the files.
  */
-class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\ConfigurationInterface {
-
+class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\ConfigurationInterface
+{
     /** Cache key format. */
-    const CONFIG_FILE_CACHE_KEY = 'garden.config.%s';
-
+    const CONFIG_FILE_CACHE_KEY = "garden.config.%s";
 
     /** @var string  */
-    public $NotFound = 'NOT_FOUND';
+    public $NotFound = "NOT_FOUND";
 
     /**
      * @var array Holds the associative array of configuration data.
@@ -59,7 +58,7 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
     protected $autoSave = true;
 
     /** @var string The default top level group for new configs. */
-    protected $defaultGroup = 'Configuration';
+    protected $defaultGroup = "Configuration";
 
     /** @var null The sort flag to use with ksort. */
     private $sortFlag = null;
@@ -75,16 +74,17 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      *
      * @param string $defaultGroup
      */
-    public function __construct($defaultGroup = null) {
+    public function __construct($defaultGroup = null)
+    {
         parent::__construct();
         if (!is_null($defaultGroup)) {
             $this->defaultGroup = $defaultGroup;
         }
 
-        if (defined('PATH_CONF_DEFAULT')) {
+        if (defined("PATH_CONF_DEFAULT")) {
             $this->defaultPath = PATH_CONF_DEFAULT;
         } else {
-            $this->defaultPath = PATH_CONF.'/config.php';
+            $this->defaultPath = PATH_CONF . "/config.php";
         }
     }
 
@@ -94,11 +94,12 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      * @param string $str The string to format.
      * @param string[] $lines The output buffer.
      */
-    private static function formatComment(string $str, array &$lines) {
-        $commentLines = explode("\n", str_replace("\r", '', $str));
+    private static function formatComment(string $str, array &$lines)
+    {
+        $commentLines = explode("\n", str_replace("\r", "", $str));
 
         foreach ($commentLines as $line) {
-            $lines[] = '// '.$line;
+            $lines[] = "// " . $line;
         }
     }
 
@@ -108,8 +109,9 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      * @param string $formatOption The option in $allowedOptions that you want to update.
      * @param string|bool $value The value of the option you want to update.
      */
-    public function setFormatOption($formatOption, $value) {
-        $allowedOptions = ['VariableName', 'WrapPHP', 'SafePHP', 'Headings', 'FormatStyle'];
+    public function setFormatOption($formatOption, $value)
+    {
+        $allowedOptions = ["VariableName", "WrapPHP", "SafePHP", "Headings", "FormatStyle"];
 
         if (in_array($formatOption, $allowedOptions)) {
             $this->formatOptions[$formatOption] = $value;
@@ -119,7 +121,8 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
     /**
      * Getter for formatOptions.
      */
-    public function getFormatOptions() {
+    public function getFormatOptions()
+    {
         return $this->formatOptions;
     }
 
@@ -130,7 +133,8 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      * @param int $sortFlag As defined in php standard definitions
      * @return Gdn_Configuration $this
      */
-    public function setSortFlag($sortFlag) {
+    public function setSortFlag($sortFlag)
+    {
         $this->sortFlag = $sortFlag;
         return $this;
     }
@@ -138,7 +142,8 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
     /**
      * @return null|int The sort flag to be used with ksort.
      */
-    public function getSortFlag() {
+    public function getSortFlag()
+    {
         return $this->sortFlag;
     }
 
@@ -147,8 +152,9 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      *
      * @param bool $autoSave
      */
-    public function autoSave($autoSave = true) {
-        $this->autoSave = (boolean)$autoSave;
+    public function autoSave($autoSave = true)
+    {
+        $this->autoSave = (bool) $autoSave;
     }
 
     /**
@@ -156,8 +162,9 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      *
      * @param boolean $splitting
      */
-    public function splitting($splitting = true) {
-        $this->splitting = (boolean)$splitting;
+    public function splitting($splitting = true)
+    {
+        $this->splitting = (bool) $splitting;
     }
 
     /**
@@ -165,8 +172,9 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      *
      * @throws Exception
      */
-    public function clearSaveData() {
-        throw new Exception('DEPRECATED');
+    public function clearSaveData()
+    {
+        throw new Exception("DEPRECATED");
     }
 
     /**
@@ -175,9 +183,10 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      * @param boolean $caching Whether to use caching.
      * @return boolean
      */
-    public function caching($caching = null) {
+    public function caching($caching = null)
+    {
         if (!is_null($caching)) {
-            $this->useCaching = (bool)$caching;
+            $this->useCaching = (bool) $caching;
         }
         return $this->useCaching;
     }
@@ -188,11 +197,12 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      * @param string $configFile
      * @return void
      */
-    public function clearCache($configFile) {
+    public function clearCache($configFile)
+    {
         $fileKey = sprintf(Gdn_Configuration::CONFIG_FILE_CACHE_KEY, $configFile);
         if (Gdn::cache()->type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::cache()->activeEnabled()) {
             Gdn::cache()->remove($fileKey, [
-                Gdn_Cache::FEATURE_NOPREFIX => true
+                Gdn_Cache::FEATURE_NOPREFIX => true,
             ]);
         }
     }
@@ -204,7 +214,8 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      * @return string Returns the current default config path.
      * @since 2.3
      */
-    public function defaultPath($value = null) {
+    public function defaultPath($value = null)
+    {
         if ($value !== null) {
             $this->defaultPath = $value;
         }
@@ -218,19 +229,20 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      * @param boolean $create Whether or not to create the data if it isn't there already.
      * @return mixed A reference to the configuration data node.
      */
-    public function &find($name, $create = true) {
+    public function &find($name, $create = true)
+    {
         $array = &$this->Data;
 
-        if ($name == '') {
+        if ($name == "") {
             return $array;
         }
 
-        $keys = explode('.', $name);
+        $keys = explode(".", $name);
         // If splitting is off, HANDLE IT
         if (!$this->splitting) {
             $firstKey = val(0, $keys);
             if ($firstKey == $this->defaultGroup) {
-                $keys = [array_shift($keys), implode('.', $keys)];
+                $keys = [array_shift($keys), implode(".", $keys)];
             } else {
                 $keys = [$name];
             }
@@ -264,27 +276,28 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      * @param array $options
      * @return string
      */
-    public static function format($data, $options = []) {
+    public static function format($data, $options = [])
+    {
         if (is_string($options)) {
-            $options = ['VariableName' => $options];
+            $options = ["VariableName" => $options];
         }
 
         $defaults = [
-            'VariableName' => 'Configuration',
-            'WrapPHP' => true,
-            'SafePHP' => true,
-            'Headings' => true,
-            'FormatStyle' => 'Array'
+            "VariableName" => "Configuration",
+            "WrapPHP" => true,
+            "SafePHP" => true,
+            "Headings" => true,
+            "FormatStyle" => "Array",
         ];
         $options = array_merge($defaults, $options);
-        $variableName = val('VariableName', $options);
-        $wrapPHP = val('WrapPHP', $options, true);
-        $safePHP = val('SafePHP', $options, true);
-        $headings = val('Headings', $options, true);
-        $formatStyle = val('FormatStyle', $options);
+        $variableName = val("VariableName", $options);
+        $wrapPHP = val("WrapPHP", $options, true);
+        $safePHP = val("SafePHP", $options, true);
+        $headings = val("Headings", $options, true);
+        $formatStyle = val("FormatStyle", $options);
         $formatter = "Format{$formatStyle}Assignment";
 
-        $firstLine = '';
+        $firstLine = "";
         $lines = [];
         if ($wrapPHP) {
             $firstLine .= "<?php ";
@@ -304,16 +317,16 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
         $lastKey = false;
         foreach ($data as $key => $value) {
             if ($headings && $lastKey != $key && is_array($value)) {
-                $lines[] = '';
+                $lines[] = "";
                 self::formatComment($key, $lines);
                 $lastKey = $key;
             }
 
-            if ($formatStyle == 'Array') {
-                $prefix = '$'.$variableName."[".var_export($key, true)."]";
+            if ($formatStyle == "Array") {
+                $prefix = '$' . $variableName . "[" . var_export($key, true) . "]";
             }
-            if ($formatStyle == 'Dotted') {
-                $prefix = '$'.$variableName."['".trim(var_export($key, true), "'");
+            if ($formatStyle == "Dotted") {
+                $prefix = '$' . $variableName . "['" . trim(var_export($key, true), "'");
             }
 
             $formatter($lines, $prefix, $value);
@@ -329,12 +342,13 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      * @param string $key The key.
      * @return array The peices of the key.
      */
-    private function splitConfigKey(string $key): array {
-        $keys = explode('.', $key);
+    private function splitConfigKey(string $key): array
+    {
+        $keys = explode(".", $key);
         if (!$this->splitting) {
             $firstKey = $keys[0];
             if ($firstKey == $this->defaultGroup) {
-                $keys = [array_shift($keys), implode('.', $keys)];
+                $keys = [array_shift($keys), implode(".", $keys)];
             } else {
                 $keys = [$key];
             }
@@ -352,9 +366,10 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      * @param mixed $defaultValue If the parameter is not found in the group, this value will be returned.
      * @return mixed The configuration value.
      */
-    public function get($key, $defaultValue = false) {
+    public function get($key, $defaultValue = false)
+    {
         // Shortcut, get the whole config
-        if ($key == '.') {
+        if ($key == ".") {
             return $this->Data;
         }
 
@@ -371,7 +386,7 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
                 $value = $value[$keys[$i]];
             } else {
                 if ($this->fallBackDecorator ?? false) {
-                    $defaultValue =  $this->fallBackDecorator . $defaultValue . $this->fallBackDecorator;
+                    $defaultValue = $this->fallBackDecorator . $defaultValue . $this->fallBackDecorator;
                 }
                 return $defaultValue;
             }
@@ -389,9 +404,10 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      *
      * @return bool Whether or not the config key is defined.
      */
-    public function configKeyExists(string $name): bool {
+    public function configKeyExists(string $name): bool
+    {
         // Shortcut, get the whole config
-        if ($name == '.') {
+        if ($name == ".") {
             return true;
         }
 
@@ -417,7 +433,8 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      * @param string $identifier filename or string tag
      * @return Gdn_ConfigurationSource
      */
-    public function getSource($type, $identifier) {
+    public function getSource($type, $identifier)
+    {
         $sourceTag = "{$type}:{$identifier}";
         if (!array_key_exists($sourceTag, $this->sources)) {
             return false;
@@ -437,7 +454,8 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      * @param boolean $overwrite If the setting already exists, should it's value be overwritten? Defaults to true.
      * @param boolean $save Whether or not to queue the value up for the next call to Gdn_Config::save().
      */
-    public function set($name, $value, $overwrite = true, $save = true) {
+    public function set($name, $value, $overwrite = true, $save = true)
+    {
         // Make sure the config settings are in the right format
         if (!is_array($this->Data)) {
             $this->Data = [];
@@ -445,7 +463,7 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
 
         if (!is_array($name)) {
             $name = [
-                $name => $value
+                $name => $value,
             ];
         } else {
             $overwrite = $value;
@@ -453,12 +471,12 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
 
         $data = $name;
         foreach ($data as $name => $value) {
-            $keys = explode('.', $name);
+            $keys = explode(".", $name);
             // If splitting is off, HANDLE IT
             if (!$this->splitting) {
                 $firstKey = val(0, $keys);
                 if ($firstKey == $this->defaultGroup) {
-                    $keys = [array_shift($keys), implode('.', $keys)];
+                    $keys = [array_shift($keys), implode(".", $keys)];
                 } else {
                     $keys = [$name];
                 }
@@ -504,19 +522,20 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      * @param string $name The name of the configuration setting with dot notation.
      * @return boolean Wether or not the key was found.
      */
-    public function remove($name, $save = true) {
+    public function remove($name, $save = true)
+    {
         // Make sure the config settings are in the right format
         if (!is_array($this->Data)) {
             return false;
         }
 
         $found = false;
-        $keys = explode('.', $name);
+        $keys = explode(".", $name);
         // If splitting is off, HANDLE IT
         if (!$this->splitting) {
             $firstKey = getValue(0, $keys);
             if ($firstKey == $this->defaultGroup) {
-                $keys = [array_shift($keys), implode('.', $keys)];
+                $keys = [array_shift($keys), implode(".", $keys)];
             } else {
                 $keys = [$name];
             }
@@ -529,13 +548,13 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
 
             // Key will always be in here if it is anywhere at all
             if (array_key_exists($key, $settings)) {
-                if ($i == ($keyCount - 1)) {
+                if ($i == $keyCount - 1) {
                     // We are at the setting, so unset it.
                     $found = true;
                     unset($settings[$key]);
                 } else {
                     // Advance the pointer
-                    $settings =& $settings[$key];
+                    $settings = &$settings[$key];
                 }
             } else {
                 $found = false;
@@ -561,7 +580,8 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      *   is called after all defaults are loaded.
      * @return boolean
      */
-    public function load($file, $name = 'Configuration', $dynamic = false) {
+    public function load($file, $name = "Configuration", $dynamic = false)
+    {
         $configurationSource = Gdn_ConfigurationSource::fromFile($this, $file, $name);
         if (!$configurationSource) {
             return false;
@@ -603,7 +623,14 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      *   is called after all defaults are loaded.
      * @return boolean
      */
-    public function loadString($string, $tag, $name = 'Configuration', $dynamic = true, $saveCallback = null, $callbackOptions = null) {
+    public function loadString(
+        $string,
+        $tag,
+        $name = "Configuration",
+        $dynamic = true,
+        $saveCallback = null,
+        $callbackOptions = null
+    ) {
         $configurationSource = Gdn_ConfigurationSource::fromString($this, $string, $tag, $name);
         if (!$configurationSource) {
             return false;
@@ -631,7 +658,6 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
         }
     }
 
-
     /**
      * Loads settings from an array into the object with the specified name;
      *
@@ -646,7 +672,14 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      *   is called after all defaults are loaded.
      * @return boolean
      */
-    public function loadArray($configData, $tag, $name = 'Configuration', $dynamic = true, $saveCallback = null, $callbackOptions = null) {
+    public function loadArray(
+        $configData,
+        $tag,
+        $name = "Configuration",
+        $dynamic = true,
+        $saveCallback = null,
+        $callbackOptions = null
+    ) {
         $configurationSource = Gdn_ConfigurationSource::fromArray($this, $configData, $tag, $name);
         if (!$configurationSource) {
             return false;
@@ -679,7 +712,8 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      *
      * @deprecated
      */
-    public static function loadFile($path, $options = []) {
+    public static function loadFile($path, $options = [])
+    {
         throw new Exception("DEPRECATED");
     }
 
@@ -690,7 +724,8 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      *
      * @param array $data
      */
-    public function massImport($data) {
+    public function massImport($data)
+    {
         if ($this->splitting) {
             return;
         }
@@ -709,7 +744,8 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      * @param array $data Reference to the current active state
      * @param array $loaded Data to merge
      */
-    protected static function mergeConfig(&$data, $loaded) {
+    protected static function mergeConfig(&$data, $loaded)
+    {
         foreach ($loaded as $key => $value) {
             if (array_key_exists($key, $data) && is_array($data[$key]) && is_array($value) && !self::isList($value)) {
                 self::mergeConfig($data[$key], $value);
@@ -725,7 +761,8 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      * @param array $list
      * @return boolean
      */
-    protected static function isList(&$list) {
+    protected static function isList(&$list)
+    {
         $n = count($list);
         for ($i = 0; $i < $n; $i++) {
             if (!isset($list[$i]) && !array_key_exists($i, $list)) {
@@ -740,7 +777,8 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      *
      * @return Gdn_ConfigurationSource
      */
-    public function dynamic() {
+    public function dynamic()
+    {
         return $this->dynamic;
     }
 
@@ -753,7 +791,8 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      *
      * This method does that
      */
-    public function overlayDynamic() {
+    public function overlayDynamic()
+    {
         if ($this->dynamic instanceof Gdn_ConfigurationSource) {
             $loaded = $this->dynamic->export();
             self::mergeConfig($this->Data, $loaded);
@@ -767,8 +806,9 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      * @param bool|array $options Bool = whether to save or not. Assoc array =
      *   Save => Whether to save or not
      */
-    public function removeFromConfig($name, $options = []) {
-        $save = $options === false ? false : val('Save', $options, true);
+    public function removeFromConfig($name, $options = [])
+    {
+        $save = $options === false ? false : val("Save", $options, true);
 
         if (!is_array($name)) {
             $name = [$name];
@@ -787,16 +827,16 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      * @param string $group The name of the settings group to be saved to the $file.
      * @return boolean
      */
-    public function save($file = null, $group = null) {
-
+    public function save($file = null, $group = null)
+    {
         // Plain calls to Gdn::config()->save() simply save the dynamic config and return
         if (is_null($file)) {
             return $this->dynamic->save();
         }
 
         // ... otherwise we're trying to extract some of the config for some reason
-        if ($file == '') {
-            trigger_error(errorMessage('You must specify a file path to be saved.', $group, 'Save'), E_USER_ERROR);
+        if ($file == "") {
+            trigger_error(errorMessage("You must specify a file path to be saved.", $group, "Save"), E_USER_ERROR);
         }
 
         if (!is_writable($file)) {
@@ -817,11 +857,11 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
 
         // Do a sanity check on the config save.
         if ($file == $this->defaultPath()) {
-            if (!isset($data['Database'])) {
+            if (!isset($data["Database"])) {
                 if ($pm = Gdn::pluginManager()) {
-                    $pm->EventArguments['Data'] = $data;
-                    $pm->EventArguments['Backtrace'] = debug_backtrace();
-                    $pm->fireEvent('ConfigError');
+                    $pm->EventArguments["Data"] = $data;
+                    $pm->EventArguments["Backtrace"] = debug_backtrace();
+                    $pm->fireEvent("ConfigError");
                 }
                 return false;
             }
@@ -829,25 +869,25 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
 
         // Build string
         $fileContents = $this->format($data, [
-            'VariableName' => $group,
-            'Headers' => true,
-            'WrapPHP' => true
+            "VariableName" => $group,
+            "Headers" => true,
+            "WrapPHP" => true,
         ]);
 
         if ($fileContents === false) {
-            trigger_error(errorMessage('Failed to define configuration file contents.', $group, 'Save'), E_USER_ERROR);
+            trigger_error(errorMessage("Failed to define configuration file contents.", $group, "Save"), E_USER_ERROR);
         }
 
         $fileKey = sprintf(Gdn_Configuration::CONFIG_FILE_CACHE_KEY, $file);
         if ($this->caching() && Gdn::cache()->type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::cache()->activeEnabled()) {
             Gdn::cache()->store($fileKey, $data, [
                 Gdn_Cache::FEATURE_NOPREFIX => true,
-                Gdn_Cache::FEATURE_EXPIRY => 3600
+                Gdn_Cache::FEATURE_EXPIRY => 3600,
             ]);
         }
 
         // Infrastructure deployment. Use old method.
-        $tmpFile = tempnam(PATH_CONF, 'config');
+        $tmpFile = tempnam(PATH_CONF, "config");
         $result = false;
         if (file_put_contents($tmpFile, $fileContents) !== false) {
             chmod($tmpFile, 0664);
@@ -855,10 +895,10 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
         }
 
         if ($result) {
-            if (function_exists('apc_delete_file')) {
+            if (function_exists("apc_delete_file")) {
                 // This fixes a bug with some configurations of apc.
                 @apc_delete_file($file);
-            } elseif (function_exists('opcache_invalidate')) {
+            } elseif (function_exists("opcache_invalidate")) {
                 @opcache_invalidate($file);
             }
         }
@@ -874,16 +914,18 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      * @param array $options
      * @throws Exception
      */
-    public static function saveFile($path, $data, $options = []) {
+    public static function saveFile($path, $data, $options = [])
+    {
         throw new Exception("DEPRECATED");
     }
 
     /**
      * @inheritdoc
      */
-    public function saveToConfig($name, $value = '', $options = []) {
-        $save = $options === false ? false : val('Save', $options, true);
-        $removeEmpty = val('RemoveEmpty', $options);
+    public function saveToConfig($name, $value = "", $options = [])
+    {
+        $save = $options === false ? false : val("Save", $options, true);
+        $removeEmpty = val("RemoveEmpty", $options);
 
         if (!is_array($name)) {
             $name = [$name => $value];
@@ -912,7 +954,8 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      * @param mixed $default The default value to set in the config.
      * @param bool $persist Whether or not the configurations should be persisted.
      */
-    public function touch($name, $default = null, bool $persist = true) {
+    public function touch($name, $default = null, bool $persist = true)
+    {
         if (!is_array($name)) {
             $name = [$name => $default];
         }
@@ -934,14 +977,16 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      *
      * @param string $decorator
      */
-    public function setFallbackDecorator(string $decorator) {
+    public function setFallbackDecorator(string $decorator)
+    {
         $this->fallBackDecorator = $decorator;
     }
 
     /**
      * Shutdown.
      */
-    public function shutdown() {
+    public function shutdown()
+    {
         foreach ($this->sources as $source) {
             $source->shutdown();
         }
@@ -953,14 +998,16 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      * @internal
      * @return Gdn_ConfigurationSource
      */
-    public function getDynamic(): Gdn_ConfigurationSource {
+    public function getDynamic(): Gdn_ConfigurationSource
+    {
         return $this->dynamic;
     }
 
     /**
      * Destruct.
      */
-    public function __destruct() {
+    public function __destruct()
+    {
         if ($this->autoSave) {
             $this->shutdown();
         }

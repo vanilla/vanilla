@@ -7,22 +7,26 @@
 
 namespace Vanilla\Dashboard\Controllers\Pages;
 
+use Vanilla\Knowledge\Controllers\Api\ActionConstants;
+use Vanilla\Layout\Asset\LayoutFormAsset;
 use Vanilla\Layout\LayoutPage;
+use Vanilla\Web\JsInterpop\ReduxAction;
 use Vanilla\Web\PageDispatchController;
 
 /**
  * Controller for the custom layout homepage.
  */
-class HomePageController extends PageDispatchController {
-
+class HomePageController extends PageDispatchController
+{
     /**
      * Homepage index.
      */
-    public function index() {
+    public function index()
+    {
         return $this->usePage(LayoutPage::class)
             ->permission()
             ->setSeoRequired(false)
-            ->setSeoTitle("Home")
+            ->preloadLayout(new LayoutFormAsset("home"))
             ->render();
     }
 }

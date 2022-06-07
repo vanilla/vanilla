@@ -12,7 +12,8 @@ use Vanilla\Contracts\Addons\WidgetInterface;
 /**
  * Interface for a widget that will have its view rendered by the React JS framework.
  */
-interface ReactWidgetInterface extends WidgetInterface {
+interface ReactWidgetInterface extends WidgetInterface
+{
     /**
      * Get props for react component.
      *

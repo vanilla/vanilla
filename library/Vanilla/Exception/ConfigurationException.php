@@ -12,5 +12,6 @@ use Garden\Web\Exception\ForbiddenException;
 /**
  * An exception tha represents a configuration test failing.
  */
-class ConfigurationException extends ForbiddenException {
+class ConfigurationException extends ForbiddenException
+{
 }

@@ -8,6 +8,8 @@
 namespace Vanilla\Widgets\React;
 
 use Garden\Schema\Schema;
+use Vanilla\Forms\FormOptions;
+use Vanilla\Forms\SchemaForm;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Widgets\React\BannerFullWidget as ReactBannerFullWidget;
 use Gdn_Upload;
@@ -15,52 +17,64 @@ use Gdn_Upload;
 /**
  * Class BannerContentWidget
  */
-class BannerContentWidget extends ReactBannerFullWidget {
-
+class BannerContentWidget extends ReactBannerFullWidget
+{
     /**
      * @inheritDoc
      */
-    public static function getWidgetName(): string {
+    public static function getWidgetName(): string
+    {
         return "Content Banner";
     }
 
     /**
      * @inheritDoc
      */
-    public static function getWidgetID(): string {
+    public static function getWidgetID(): string
+    {
         return "banner.content";
     }
 
     /**
      * @return string
      */
-    public static function getWidgetIconPath(): string {
+    public static function getWidgetIconPath(): string
+    {
         return "/applications/dashboard/design/images/widgetIcons/contentbanner.svg";
     }
 
     /**
      * @inheritDoc
      */
-    public function getProps(): ?array {
+    public function getProps(): ?array
+    {
         $parentProps = parent::getProps();
-        $categoryID = $this->props['categoryID'] ?? null;
-        $iconUrl = $this->categoryModel->getCategoryFieldRecursive($categoryID, 'Photo', null);
+        $categoryID = $this->props["categoryID"] ?? null;
+        $iconUrl = $this->categoryModel->getCategoryFieldRecursive($categoryID, "Photo", null);
         $iconUrl = $iconUrl ? Gdn_Upload::url($iconUrl) : null;
-        $props = array_merge($parentProps, [
-            'isContentBanner' => true,
-            'iconImage' => $iconUrl,
-        ], $this->props);
+        $props = array_merge(
+            $parentProps,
+            [
+                "isContentBanner" => true,
+                "iconImage" => $iconUrl,
+            ],
+            $this->props
+        );
         return $props;
     }
 
     /**
      * @inheritDoc
      */
-    public static function getWidgetSchema(): Schema {
+    public static function getWidgetSchema(): Schema
+    {
         return SchemaUtils::composeSchemas(
             parent::getWidgetSchema(),
             Schema::parse([
-                'iconImage:s?' => 'URL for the icon image.'
+                "iconImage:s?" => [
+                    "description" => "URL for the icon image.",
+                    "x-control" => SchemaForm::textBox(new FormOptions("Icon Image", "URL for the icon image.")),
+                ],
             ])
         );
     }

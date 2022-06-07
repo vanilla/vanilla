@@ -16,8 +16,8 @@ use Vanilla\Models\SSOData;
 /**
  * Class MockSSOAuthenticator
  */
-class MockSSOAuthenticator extends SSOAuthenticator {
-
+class MockSSOAuthenticator extends SSOAuthenticator
+{
     /**
      * MockSSOAuthenticator constructor.
      *
@@ -26,30 +26,32 @@ class MockSSOAuthenticator extends SSOAuthenticator {
      * @throws \Garden\Schema\ValidationException
      * @throws \Garden\Web\Exception\NotFoundException
      */
-    public function __construct(AuthenticatorModel $authenticatorModel) {
-        parent::__construct('MockSSO', $authenticatorModel);
+    public function __construct(AuthenticatorModel $authenticatorModel)
+    {
+        parent::__construct("MockSSO", $authenticatorModel);
     }
 
     /**
      * @inheritdoc
      */
-    public static function getAuthenticatorSchema(): Schema {
+    public static function getAuthenticatorSchema(): Schema
+    {
         $schema = parent::getAuthenticatorSchema();
 
         $defaults = [
-            'properties.name' => 'MockSSO',
-            'properties.isActive' => true,
-            'properties.signInUrl' => 'http://example.com/MockSSOSignInPage',
-            'properties.sso.properties.canSignIn' => true,
-            'properties.sso.properties.isTrusted' => true,
-            'properties.sso.properties.canAutoLinkUser' => false,
-            'properties.sso.properties.canLinkSession' => false,
+            "properties.name" => "MockSSO",
+            "properties.isActive" => true,
+            "properties.signInUrl" => "http://example.com/MockSSOSignInPage",
+            "properties.sso.properties.canSignIn" => true,
+            "properties.sso.properties.isTrusted" => true,
+            "properties.sso.properties.canAutoLinkUser" => false,
+            "properties.sso.properties.canLinkSession" => false,
         ];
 
         foreach ($defaults as $fieldPath => $defaultValue) {
             $field = $schema->getField($fieldPath);
-            $field['default'] = $defaultValue;
-            unset($field['x-instance-required']);
+            $field["default"] = $defaultValue;
+            unset($field["x-instance-required"]);
             $schema->setField($fieldPath, $field);
         }
 
@@ -59,39 +61,44 @@ class MockSSOAuthenticator extends SSOAuthenticator {
     /**
      * @inheritdoc
      */
-    protected function setAuthenticatorInfo(array $data) {
-        $data['attributes'] = $data['attributes'] ?? [];
-        $data['attributes']['SSOData'] = $data['attributes']['SSOData'] ?? [];
-        $data['attributes']['SSOData']['uniqueID'] = $data['attributes']['SSOData']['uniqueID'] ?? uniqid('MockSSOUserID_');
+    protected function setAuthenticatorInfo(array $data)
+    {
+        $data["attributes"] = $data["attributes"] ?? [];
+        $data["attributes"]["SSOData"] = $data["attributes"]["SSOData"] ?? [];
+        $data["attributes"]["SSOData"]["uniqueID"] =
+            $data["attributes"]["SSOData"]["uniqueID"] ?? uniqid("MockSSOUserID_");
 
         parent::setAuthenticatorInfo($data);
 
-        $this->attributes['SSOData'] = SSOData::fromArray($this->attributes['SSOData'] ?? []);
+        $this->attributes["SSOData"] = SSOData::fromArray($this->attributes["SSOData"] ?? []);
     }
 
     /**
      * @inheritDoc
      */
-    protected function sso(RequestInterface $request): SSOData {
+    protected function sso(RequestInterface $request): SSOData
+    {
         return $this->getData();
     }
 
     /**
      * @return \Vanilla\Models\SSOData
      */
-    protected function getData() {
-        return $this->attributes['SSOData'];
+    protected function getData()
+    {
+        return $this->attributes["SSOData"];
     }
 
     /**
      * @inheritDoc
      */
-    protected static function getAuthenticatorTypeInfoImpl(): array {
+    protected static function getAuthenticatorTypeInfoImpl(): array
+    {
         return [
-            'ui' => [
-                'photoUrl' => 'http://www.example.com/image.jpg',
-                'backgroundColor' => '#ffffff',
-                'foregroundColor' => '#000000',
+            "ui" => [
+                "photoUrl" => "http://www.example.com/image.jpg",
+                "backgroundColor" => "#ffffff",
+                "foregroundColor" => "#000000",
             ],
         ];
     }
@@ -99,25 +106,28 @@ class MockSSOAuthenticator extends SSOAuthenticator {
     /**
      * @inheritDoc
      */
-    public static function isUnique(): bool {
+    public static function isUnique(): bool
+    {
         return true;
     }
 
     /**
      * @inheritDoc
      */
-    protected function getAuthenticatorInfoImpl(): array {
+    protected function getAuthenticatorInfoImpl(): array
+    {
         return [
-            'ui' => [
-                'buttonName' => 'Sign in with MockAuthenticator',
-            ]
+            "ui" => [
+                "buttonName" => "Sign in with MockAuthenticator",
+            ],
         ];
     }
 
     /**
      * @inheritdoc
      */
-    public function setTrusted(bool $trusted) {
+    public function setTrusted(bool $trusted)
+    {
         return parent::setTrusted($trusted);
     }
 }

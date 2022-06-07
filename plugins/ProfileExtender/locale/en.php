@@ -6,5 +6,5 @@
  */
 // phpcs:ignoreFile
 
-$Definition['Profile.No'] = 'No';
-$Definition['Profile.Yes'] = 'Yes';
+$Definition["Profile.No"] = "No";
+$Definition["Profile.Yes"] = "Yes";

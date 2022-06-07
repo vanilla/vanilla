@@ -13,7 +13,8 @@ use Garden\Web\Data;
  * This interface provide a way to bypass default Dispatcher exception handling.
  *
  */
-interface CustomExceptionHandler {
+interface CustomExceptionHandler
+{
     /**
      * Detect if class has custom exception handler for particular throwable exception.
      *

@@ -13,8 +13,8 @@ use Vanilla\Cli\Utils\SimpleScriptLogger;
 /**
  * Script to log in and view information on Vanilla Console..
  */
-class VanillaConsole {
-
+class VanillaConsole
+{
     /** @var SimpleScriptLogger */
     private $logger;
 
@@ -26,7 +26,8 @@ class VanillaConsole {
      *
      * @param SimpleScriptLogger $logger
      */
-    public function __construct(SimpleScriptLogger $logger) {
+    public function __construct(SimpleScriptLogger $logger)
+    {
         $this->logger = $logger;
         $this->http = new ShellHttp($logger);
     }
@@ -35,9 +36,10 @@ class VanillaConsole {
      * Returns true when the user is logged in.
      * @return bool
      */
-    public function checkLoggedIn(): bool {
+    public function checkLoggedIn(): bool
+    {
         $response = $this->http->get("https://console.vanilladev.com/");
-        return !str_contains($response['url'], "entry/signin");
+        return !str_contains($response["url"], "entry/signin");
     }
 
     /**
@@ -47,7 +49,8 @@ class VanillaConsole {
      * @param string $password
      * @return bool
      */
-    public function login(string $email, string $password): bool {
+    public function login(string $email, string $password): bool
+    {
         $response = $this->http->post("https://console.vanilladev.com/entry/signin", [
             "form" => [
                 "Email" => $email,
@@ -71,7 +74,8 @@ class VanillaConsole {
      * @param int $siteID
      * @return mixed
      */
-    public function getConfig(int $siteID) {
+    public function getConfig(int $siteID)
+    {
         $this->logger->info("Fetching config for site $siteID");
         $response = $this->http->get("https://console.vanilladev.com/sites/view.json/config/$siteID");
         $body = $response["body"];
@@ -81,7 +85,7 @@ class VanillaConsole {
         $contextPayload = $bodyJson["context"]["payload"];
         if (!$contextPayload) {
             $this->logger->error("Get config failed.");
-            exit;
+            exit();
         }
         $decoded = html_entity_decode($contextPayload);
         $config = json_decode($decoded, true);

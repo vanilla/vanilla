@@ -17,13 +17,15 @@ use VanillaTests\VanillaTestCase;
 /**
  * Some basic smoke tests for the `Vanilla\Bootstrap` class.
  */
-final class BootstrapTest extends VanillaTestCase {
+final class BootstrapTest extends VanillaTestCase
+{
     use BootstrapTrait;
 
     /**
      * Awknowledge we've called `Bootstrap::configureContainer` for code coverage.
      */
-    public function testConfigureContainer(): void {
+    public function testConfigureContainer(): void
+    {
         $container = new Container();
         Bootstrap::configureContainer($container);
 
@@ -37,7 +39,8 @@ final class BootstrapTest extends VanillaTestCase {
     /**
      * The fast cache should work as a cache.
      */
-    public function testFastCache(): void {
+    public function testFastCache(): void
+    {
         /** @var CacheItemPoolInterface $cache */
         $cache = $this->container()->get(Bootstrap::CACHE_FAST);
         $this->assertInstanceOf(CacheItemPoolInterface::class, $cache);

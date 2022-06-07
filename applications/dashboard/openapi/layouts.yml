@@ -367,7 +367,7 @@ paths:
                                                 schema:
                                                     type: "object"
                                                     properties: {}
-                                    middleware:
+                                    middlewares:
                                         description: A mapping of middlewareType to middleware scheam for all available middlewares.
                                         type: object
                                         example:
@@ -442,14 +442,16 @@ paths:
                 content:
                     application/json:
                         schema:
-                            type: object
-                            properties:
-                                recordID:
-                                    type: integer
-                                    description: Record Id to add.
-                                recordType:
-                                    type: string
-                                    description: Record type.
+                            type: array
+                            items:
+                                type: object
+                                properties:
+                                    recordID:
+                                        type: integer
+                                        description: Record Id to add.
+                                    recordType:
+                                        type: string
+                                        description: Record type.
             responses:
                 "200":
                     content:

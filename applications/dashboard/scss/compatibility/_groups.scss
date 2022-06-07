@@ -2,28 +2,27 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-$title-icon_height: .8em;
-$title-icon_opacity: .4;
+$title-icon_height: 0.8em;
+$title-icon_opacity: 0.4;
 
 .Title-Icon {
     display: inline-block;
     margin: {
-        left: .15em;
-        right: .15em;
+        left: 0.15em;
+        right: 0.15em;
     }
 }
 
 .Title-PrivateIcon {
     height: $title-icon_height;
-    width: .8em;
-    vertical-align: -.05;
+    width: 0.8em;
+    vertical-align: -0.05;
     opacity: $title-icon_opacity;
 }
-
 
 .Title-SecretIcon {
     height: $title-icon_height;
     width: 1.1em;
-    vertical-align: -.1em;
+    vertical-align: -0.1em;
     opacity: $title-icon_opacity;
 }

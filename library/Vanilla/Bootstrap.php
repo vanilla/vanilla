@@ -43,8 +43,9 @@ use Vanilla\Web\Page;
  *
  * This class is intended to be usable in the application and tests.
  */
-class Bootstrap {
-    public const CACHE_FAST = '@fast-cache';
+class Bootstrap
+{
+    public const CACHE_FAST = "@fast-cache";
 
     /**
      * Configure the application's dependency injection container.
@@ -57,7 +58,8 @@ class Bootstrap {
      *
      * @param Container $container
      */
-    public static function configureContainer(Container $container): void {
+    public static function configureContainer(Container $container): void
+    {
         $container
             ->rule(\Psr\Container\ContainerInterface::class)
             ->setAliasOf(\Garden\Container\Container::class)
@@ -67,21 +69,17 @@ class Bootstrap {
             ->setShared(true)
 
             ->rule(InjectableInterface::class)
-            ->addCall('setDependencies')
+            ->addCall("setDependencies")
 
             ->rule(\DateTimeInterface::class)
             ->setAliasOf(\DateTimeImmutable::class)
             ->setConstructorArgs([null, null])
 
             ->rule(LayoutHydrator::class)
-            ->setShared(true)
-        ;
+            ->setShared(true);
 
         // Tracking
-        $container
-            ->rule(TrackableDecoratorInterface::class)
-            ->setShared(true)
-        ;
+        $container->rule(TrackableDecoratorInterface::class)->setShared(true);
 
         // Logging
         $container
@@ -96,32 +94,23 @@ class Bootstrap {
             ->setShared(true)
 
             ->rule(\Psr\Log\LoggerAwareInterface::class)
-            ->addCall('setLogger')
-        ;
+            ->addCall("setLogger");
 
-        $container
-            ->rule(TraceCollector::class)
-            ->setShared(true)
-        ;
+        $container->rule(TraceCollector::class)->setShared(true);
 
         // Image Srcset
         $container
             ->rule(ImageSrcSetService::class)
-            ->addCall('setImageResizeProvider', [new Reference(DefaultImageResizeProvider::class)])
-        ;
+            ->addCall("setImageResizeProvider", [new Reference(DefaultImageResizeProvider::class)]);
 
         // Addons
         // Addon Manager
         $container
             ->rule(Vanilla\AddonManager::class)
             ->setShared(true)
-            ->setConstructorArgs([
-                AddonManager::getDefaultScanDirectories(),
-                PATH_CACHE
-            ])
-            ->addAlias('AddonManager')
-            ->addCall('registerAutoloader')
-        ;
+            ->setConstructorArgs([AddonManager::getDefaultScanDirectories(), PATH_CACHE])
+            ->addAlias("AddonManager")
+            ->addCall("registerAutoloader");
 
         // Analytics
         $container
@@ -130,8 +119,7 @@ class Bootstrap {
             ->addAlias(\Vanilla\Contracts\Analytics\ClientInterface::class)
 
             ->rule(Page::class)
-            ->addCall('registerReduxActionProvider', ['provider' => new Reference(AnalyticsActionsProvider::class)])
-        ;
+            ->addCall("registerReduxActionProvider", ["provider" => new Reference(AnalyticsActionsProvider::class)]);
 
         // Models
         $container
@@ -139,15 +127,14 @@ class Bootstrap {
             ->setShared(true)
 
             ->rule(Model::class)
-            ->setShared(true)
-        ;
+            ->setShared(true);
 
         // Caches
         $container
             ->rule(\Gdn_Cache::class)
             ->setShared(true)
-            ->setFactory([\Gdn_Cache::class, 'initialize'])
-            ->addAlias('Cache')
+            ->setFactory([\Gdn_Cache::class, "initialize"])
+            ->addAlias("Cache")
 
             ->rule(CacheInterface::class)
             ->setShared(true)
@@ -158,17 +145,17 @@ class Bootstrap {
             ->setClass(Psr16Adapter::class)
 
             ->rule(Dispatcher::class)
-            ->addCall('addMiddleware', [new Reference(LongRunnerMiddleware::class)])
+            ->addCall("addMiddleware", [new Reference(LongRunnerMiddleware::class)])
 
             ->rule(LongRunner::class)
             ->setShared(true)
 
             // Validation
             ->rule(\Gdn_Validation::class)
-            ->addCall('addRule', ['BodyFormat', new Reference(BodyFormatValidator::class)])
+            ->addCall("addRule", ["BodyFormat", new Reference(BodyFormatValidator::class)])
 
             ->rule(\Gdn_Validation::class)
-            ->addCall('addRule', ['plainTextLength', new Reference(PlainTextLengthValidator::class)])
+            ->addCall("addRule", ["plainTextLength", new Reference(PlainTextLengthValidator::class)])
 
             ->rule(self::CACHE_FAST)
             ->setShared(true)
@@ -177,12 +164,12 @@ class Bootstrap {
                 $mainCache = $container->get(CacheInterface::class);
                 $mainCachePsr16 = new Psr16Adapter($mainCache);
 
-                if (function_exists('apcu_fetch')) {
+                if (function_exists("apcu_fetch")) {
                     // @codeCoverageIgnoreStart
                     // This code doesn't usually get hit in unit tests, but was manually confirmed.
                     $cache = new ChainAdapter([
                         $mainCachePsr16,
-                        new ApcuAdapter((string)$mainCache->getCache()->getPrefix(), 5)
+                        new ApcuAdapter((string) $mainCache->getCache()->getPrefix(), 5),
                     ]);
                     return $cache;
                     // @codeCoverageIgnoreEnd
@@ -198,7 +185,7 @@ class Bootstrap {
 
             ->rule(ThemeFeatures::class)
             ->setShared(true)
-            ->setConstructorArgs(['theme' => ContainerUtils::currentTheme()])
+            ->setConstructorArgs(["theme" => ContainerUtils::currentTheme()])
 
             // File base theme api provider
             ->rule(\Vanilla\Theme\ThemeService::class)
@@ -206,9 +193,7 @@ class Bootstrap {
             ->addCall("addThemeProvider", [new Reference(FsThemeProvider::class)])
 
             ->rule(\Vanilla\Theme\ThemeSectionModel::class)
-            ->setShared(true)
-
-        ;
+            ->setShared(true);
 
         // Core dispatcher and middlewares
         $container
@@ -221,42 +206,42 @@ class Bootstrap {
 
             ->rule(\Garden\Web\Dispatcher::class)
             ->setShared(true)
-            ->addCall('addRoute', ['route' => new Reference('@api-v2-route'), 'api-v2'])
-            ->addCall('addRoute', ['route' => new Reference('@new-search-route'), 'new-search'])
-            ->addCall('addRoute', ['route' => new \Garden\Container\Callback(function () {
-                return new \Garden\Web\PreflightRoute('/api/v2', true);
-            })])
-            ->addCall('setAllowedOrigins', ['isTrustedDomain'])
-            ->addCall('addMiddleware', [new Reference(\Vanilla\Web\Middleware\SystemTokenMiddleware::class)])
-            ->addCall('addMiddleware', [new Reference(\Vanilla\Web\CacheControlMiddleware::class)])
-            ->addCall('addMiddleware', [new Reference(LogTransactionMiddleware::class)])
-            ->addCall('addMiddleware', [new Reference('@smart-id-middleware')])
-            ->addCall('addMiddleware', [new Reference(\Vanilla\Web\DeploymentHeaderMiddleware::class)])
-            ->addCall('addMiddleware', [new Reference(\Vanilla\Web\ContentSecurityPolicyMiddleware::class)])
-            ->addCall('addMiddleware', [new Reference(\Vanilla\Web\HttpStrictTransportSecurityMiddleware::class)])
-            ->addCall('addMiddleware', [new Reference(\Vanilla\Web\APIExpandMiddleware::class)])
+            ->addCall("addRoute", ["route" => new Reference("@api-v2-route"), "api-v2"])
+            ->addCall("addRoute", ["route" => new Reference("@new-search-route"), "new-search"])
+            ->addCall("addRoute", [
+                "route" => new \Garden\Container\Callback(function () {
+                    return new \Garden\Web\PreflightRoute("/api/v2", true);
+                }),
+            ])
+            ->addCall("setAllowedOrigins", ["isTrustedDomain"])
+            ->addCall("addMiddleware", [new Reference(\Vanilla\Web\Middleware\SystemTokenMiddleware::class)])
+            ->addCall("addMiddleware", [new Reference(\Vanilla\Web\CacheControlMiddleware::class)])
+            ->addCall("addMiddleware", [new Reference(LogTransactionMiddleware::class)])
+            ->addCall("addMiddleware", [new Reference("@smart-id-middleware")])
+            ->addCall("addMiddleware", [new Reference(\Vanilla\Web\DeploymentHeaderMiddleware::class)])
+            ->addCall("addMiddleware", [new Reference(\Vanilla\Web\ContentSecurityPolicyMiddleware::class)])
+            ->addCall("addMiddleware", [new Reference(\Vanilla\Web\HttpStrictTransportSecurityMiddleware::class)])
+            ->addCall("addMiddleware", [new Reference(\Vanilla\Web\APIExpandMiddleware::class)])
 
             // Specific route definitions and middlewares
             ->rule("@new-search-route")
             ->setClass(\Garden\Web\ResourceRoute::class)
-            ->setConstructorArgs(['/search', '*\\%sSearchPageController'])
-            ->addCall('setFeatureFlag', [SearchRootController::ENABLE_FLAG])
-            ->addCall('setMeta', ['CONTENT_TYPE', 'text/html; charset=utf-8'])
-            ->addCall('setRootController', [SearchRootController::class])
+            ->setConstructorArgs(["/search", "*\\%sSearchPageController"])
+            ->addCall("setFeatureFlag", [SearchRootController::ENABLE_FLAG])
+            ->addCall("setMeta", ["CONTENT_TYPE", "text/html; charset=utf-8"])
+            ->addCall("setRootController", [SearchRootController::class])
 
-            ->rule('@api-v2-route')
+            ->rule("@api-v2-route")
             ->setClass(\Garden\Web\ResourceRoute::class)
-            ->setConstructorArgs(['/api/v2/', '*\\%sApiController'])
-            ->addCall('setMeta', ['CONTENT_TYPE', 'application/json; charset=utf-8'])
-            ->addCall('addMiddleware', [new Reference(\Vanilla\Web\PrivateCommunityMiddleware::class)])
-            ->addCall('addMiddleware', [new Reference(\Vanilla\Web\Middleware\RoleTokenAuthMiddleware::class)])
-            ->addCall('addMiddleware', [new Reference(\Vanilla\Web\ApiFilterMiddleware::class)])
+            ->setConstructorArgs(["/api/v2/", "*\\%sApiController"])
+            ->addCall("setMeta", ["CONTENT_TYPE", "application/json; charset=utf-8"])
+            ->addCall("addMiddleware", [new Reference(\Vanilla\Web\PrivateCommunityMiddleware::class)])
+            ->addCall("addMiddleware", [new Reference(\Vanilla\Web\Middleware\RoleTokenAuthMiddleware::class)])
+            ->addCall("addMiddleware", [new Reference(\Vanilla\Web\ApiFilterMiddleware::class)])
 
             // Middleware configuration
             ->rule(\Vanilla\Web\Middleware\SystemTokenMiddleware::class)
-            ->setConstructorArgs([
-                "/api/v2/",
-            ])
+            ->setConstructorArgs(["/api/v2/"])
             ->setShared(true)
 
             ->rule(\Vanilla\Web\APIExpandMiddleware::class)
@@ -269,40 +254,38 @@ class Bootstrap {
             ->rule(\Vanilla\Web\Middleware\LogTransactionMiddleware::class)
             ->setShared(true)
 
-            ->rule('@smart-id-middleware')
+            ->rule("@smart-id-middleware")
             ->setClass(\Vanilla\Web\SmartIDMiddleware::class)
             ->setShared(true)
-            ->setConstructorArgs(['/api/v2/'])
-            ->addCall('addSmartID', ['CategoryID', 'categories', ['name', 'urlcode'], 'Category'])
-            ->addCall('addSmartID', ['RoleID', 'roles', ['name'], 'Role'])
-            ->addCall('addSmartID', ['UserID', 'users', '*', new Reference('@user-smart-id-resolver')])
+            ->setConstructorArgs(["/api/v2/"])
+            ->addCall("addSmartID", ["CategoryID", "categories", ["name", "urlcode"], "Category"])
+            ->addCall("addSmartID", ["RoleID", "roles", ["name"], "Role"])
+            ->addCall("addSmartID", ["UserID", "users", "*", new Reference("@user-smart-id-resolver")])
 
-            ->rule('@user-smart-id-resolver')
+            ->rule("@user-smart-id-resolver")
             ->setFactory(function (Container $dic) {
                 /* @var \Vanilla\Web\UserSmartIDResolver $uid */
                 $uid = $dic->get(\Vanilla\Web\UserSmartIDResolver::class);
-                $uid->setEmailEnabled(!$dic->get(\Gdn_Configuration::class)->get('Garden.Registration.NoEmail'))
-                    ->setViewEmail($dic->get(\Gdn_Session::class)->checkPermission('Garden.PersonalInfo.View'));
+                $uid->setEmailEnabled(
+                    !$dic->get(\Gdn_Configuration::class)->get("Garden.Registration.NoEmail")
+                )->setViewEmail($dic->get(\Gdn_Session::class)->checkPermission("Garden.PersonalInfo.View"));
 
                 return $uid;
             })
 
             ->rule(\Vanilla\Web\PrivateCommunityMiddleware::class)
             ->setShared(true)
-            ->setConstructorArgs([ContainerUtils::config('Garden.PrivateCommunity')])
+            ->setConstructorArgs([ContainerUtils::config("Garden.PrivateCommunity")])
 
             // Layouts
             ->rule(\Vanilla\Layout\Providers\FileBasedLayoutProvider::class)
             ->setShared(true)
-            ->setConstructorArgs([PATH_CACHE.'/static-layouts'])
-            ->addCall(
-                'registerStaticLayout',
-                ["home", PATH_ROOT."/library/Vanilla/Layout/Definitions/home.json"]
-            )
+            ->setConstructorArgs([PATH_CACHE . "/static-layouts"])
+            ->addCall("registerStaticLayout", ["home", PATH_ROOT . "/library/Vanilla/Layout/Definitions/home.json"])
 
             ->rule(Layout\LayoutService::class)
-            ->addCall('addProvider', [new Reference(\Vanilla\Layout\LayoutModel::class)])
-            ->addCall('addProvider', [new Reference(\Vanilla\Layout\Providers\FileBasedLayoutProvider::class)])
-        ;
+            ->setShared(true)
+            ->addCall("addProvider", [new Reference(\Vanilla\Layout\LayoutModel::class)])
+            ->addCall("addProvider", [new Reference(\Vanilla\Layout\Providers\FileBasedLayoutProvider::class)]);
     }
 }

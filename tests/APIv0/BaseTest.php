@@ -13,14 +13,16 @@ use VanillaTests\SharedBootstrapTestCase;
 /**
  * Best test for old-school cURL tests.
  */
-abstract class BaseTest extends SharedBootstrapTestCase {
+abstract class BaseTest extends SharedBootstrapTestCase
+{
     /** @var APIv0  $api */
     protected static $api;
 
     /**
      * Make sure there is a fresh copy of Vanilla for the class' tests.
      */
-    public static function setUpBeforeClass(): void {
+    public static function setUpBeforeClass(): void
+    {
         parent::setUpBeforeClass();
         $api = new APIv0();
 
@@ -29,13 +31,13 @@ abstract class BaseTest extends SharedBootstrapTestCase {
         self::$api = $api;
 
         self::$api->saveToConfig([
-            'Vanilla.Discussion.SpamCount' => 1000,
-            'Vanilla.Comment.SpamCount' => 1000,
+            "Vanilla.Discussion.SpamCount" => 1000,
+            "Vanilla.Comment.SpamCount" => 1000,
         ]);
 
-        $r = $api->get('/discussions.json');
+        $r = $api->get("/discussions.json");
         $data = $r->getBody();
-        if (empty($data['Discussions'])) {
+        if (empty($data["Discussions"])) {
             throw new \Exception("The discussion stub content is missing.", 500);
         }
     }
@@ -43,7 +45,8 @@ abstract class BaseTest extends SharedBootstrapTestCase {
     /**
      * @inheritDoc
      */
-    public static function tearDownAfterClass(): void {
+    public static function tearDownAfterClass(): void
+    {
         self::$api->uninstall();
         self::$api->terminate();
         parent::tearDownAfterClass();
@@ -54,7 +57,8 @@ abstract class BaseTest extends SharedBootstrapTestCase {
      *
      * @return APIv0 Returns the API.
      */
-    public function api() {
+    public function api()
+    {
         return self::$api;
     }
 
@@ -63,7 +67,8 @@ abstract class BaseTest extends SharedBootstrapTestCase {
      *
      * @param HttpResponse $response The response to test.
      */
-    public function assertResponseSuccess(HttpResponse $response) {
+    public function assertResponseSuccess(HttpResponse $response)
+    {
         $this->assertNotNull($response);
         $this->assertTrue($response->isSuccessful());
     }

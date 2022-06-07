@@ -12,8 +12,8 @@ use Vanilla\Utility\ModelUtils;
 /**
  * Class DiscussionExpandSchema
  */
-class DiscussionExpandSchema {
-
+class DiscussionExpandSchema
+{
     /**
      * @var CategoryModel
      */
@@ -29,8 +29,8 @@ class DiscussionExpandSchema {
      * @param CategoryModel $categoryModel
      * @param TagModel $tagModel
      */
-    public function __construct(CategoryModel $categoryModel, TagModel $tagModel) {
-
+    public function __construct(CategoryModel $categoryModel, TagModel $tagModel)
+    {
         $this->categoryModel = $categoryModel;
         $this->tagModel = $tagModel;
     }
@@ -39,9 +39,10 @@ class DiscussionExpandSchema {
      * Get common expand schema
      * @return Schema
      */
-    public static function commonExpandSchema(): Schema {
+    public static function commonExpandSchema(): Schema
+    {
         return Schema::parse([
-            'expand?' => self::commonExpandDefinition(),
+            "expand?" => self::commonExpandDefinition(),
         ]);
     }
 
@@ -50,22 +51,23 @@ class DiscussionExpandSchema {
      *
      * @return Schema
      */
-    public static function commonExpandDefinition(): Schema {
+    public static function commonExpandDefinition(): Schema
+    {
         return ApiUtils::getExpandDefinition([
-            'category',
-            'insertUser',
-            '-insertUser',
-            'lastUser',
-            'lastPost',
-            'lastPost.body',
-            '-lastUser',
-            'lastPost.insertUser',
-            'raw',
-            'tagIDs',
-            'tags',
-            'breadcrumbs',
-            '-body',
-            'excerpt',
+            "category",
+            "insertUser",
+            "-insertUser",
+            "lastUser",
+            "lastPost",
+            "lastPost.body",
+            "-lastUser",
+            "lastPost.insertUser",
+            "raw",
+            "tagIDs",
+            "tags",
+            "breadcrumbs",
+            "-body",
+            "excerpt",
         ]);
     }
 
@@ -75,11 +77,12 @@ class DiscussionExpandSchema {
      * @param array $rows
      * @param array|bool $expandOption
      */
-    public function commonExpand(array &$rows, $expandOption) {
-        if (ModelUtils::isExpandOption('category', $expandOption)) {
+    public function commonExpand(array &$rows, $expandOption)
+    {
+        if (ModelUtils::isExpandOption("category", $expandOption)) {
             $this->categoryModel->expandCategories($rows);
         }
-        if (ModelUtils::isExpandOption('tagIDs', $expandOption)) {
+        if (ModelUtils::isExpandOption("tagIDs", $expandOption)) {
             $this->tagModel->expandTagIDs($rows);
         }
     }

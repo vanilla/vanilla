@@ -47,6 +47,7 @@ export function DashboardImageUploadGroup(props: IProps) {
     return (
         <>
             <DashboardFormGroup
+                inputType="upload"
                 label={props.label}
                 description={props.description}
                 afterDescription={

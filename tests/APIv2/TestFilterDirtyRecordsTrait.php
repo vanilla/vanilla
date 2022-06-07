@@ -11,8 +11,8 @@ use Vanilla\Models\DirtyRecordModel;
 /**
  * Test resource index endpoints filtering on dirtyRecords
  */
-trait TestFilterDirtyRecordsTrait {
-
+trait TestFilterDirtyRecordsTrait
+{
     /**
      * Ensure that there are dirtyRecords for a specific resource.
      */
@@ -28,10 +28,13 @@ trait TestFilterDirtyRecordsTrait {
     /**
      * Test whether each of the filter fields works on a resources index endpoint.
      */
-    public function testFilterDirtyRecords(): void {
+    public function testFilterDirtyRecords(): void
+    {
         $this->triggerDirtyRecords();
         $query = $this->getQuery();
-        $rows = $this->api()->get($this->baseUrl, $query)->getBody();
+        $rows = $this->api()
+            ->get($this->baseUrl, $query)
+            ->getBody();
 
         $this->assertAllDirtyRecordsReturned($rows);
     }
@@ -41,7 +44,8 @@ trait TestFilterDirtyRecordsTrait {
      *
      * @return array
      */
-    protected function getQuery():array {
+    protected function getQuery(): array
+    {
         return [DirtyRecordModel::DIRTY_RECORD_OPT => true];
     }
 
@@ -50,15 +54,16 @@ trait TestFilterDirtyRecordsTrait {
      *
      * @param array $records
      */
-    protected function assertAllDirtyRecordsReturned(array $records) {
+    protected function assertAllDirtyRecordsReturned(array $records)
+    {
         /** @var DirtyRecordModel $dirtyRecordModel */
         $dirtyRecordModel = \Gdn::getContainer()->get(DirtyRecordModel::class);
         $resourceInformation = $this->getResourceInformation();
-        $recordType = $resourceInformation["resourceType"] ?? '';
-        $primaryKey = $resourceInformation["primaryKey"] ?? '';
+        $recordType = $resourceInformation["resourceType"] ?? "";
+        $primaryKey = $resourceInformation["primaryKey"] ?? "";
         $dirtyRecords = $dirtyRecordModel->select(["recordType" => $recordType]);
 
-        $dirtyRecordIDs = array_column($dirtyRecords, 'recordID');
+        $dirtyRecordIDs = array_column($dirtyRecords, "recordID");
         $ids = array_column($records, $primaryKey);
 
         foreach ($dirtyRecordIDs as $dirtyRecordID) {

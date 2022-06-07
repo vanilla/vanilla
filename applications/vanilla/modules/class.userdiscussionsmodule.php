@@ -11,8 +11,8 @@
 /**
  * Renders recent discussions started by a specified user.
  */
-class UserDiscussionsModule extends Gdn_Module {
-
+class UserDiscussionsModule extends Gdn_Module
+{
     /** @var int Display limit. */
     public $limit = 10;
 
@@ -26,13 +26,14 @@ class UserDiscussionsModule extends Gdn_Module {
      * @param GDN_Controller $sender
      * @throws Exception
      */
-    public function __construct($sender) {
+    public function __construct($sender)
+    {
         parent::__construct();
-        $this->_ApplicationFolder = 'vanilla';
-        $this->fireEvent('Init');
+        $this->_ApplicationFolder = "vanilla";
+        $this->fireEvent("Init");
         //If you are being executed from the profile controller, get the UserID.
-        if (strtolower(val('ControllerName', $sender)) === 'profilecontroller') {
-            $this->userID = valr('User.UserID', $sender);
+        if (strtolower(val("ControllerName", $sender)) === "profilecontroller") {
+            $this->userID = valr("User.UserID", $sender);
         }
     }
 
@@ -41,7 +42,8 @@ class UserDiscussionsModule extends Gdn_Module {
      *
      * @param int|bool $limit Override the number of comments to display.
      */
-    public function getData($limit = false) {
+    public function getData($limit = false)
+    {
         if (!$limit) {
             $limit = $this->limit;
         }
@@ -51,11 +53,11 @@ class UserDiscussionsModule extends Gdn_Module {
         }
 
         $userModel = new UserModel();
-        $this->setData('User', $userModel->getID($this->userID));
+        $this->setData("User", $userModel->getID($this->userID));
 
         $discussionModel = new DiscussionModel();
-        $discussions  = $discussionModel->getByUser($this->userID, $limit, 0, false);
-        $this->setData('Discussions', $discussions);
+        $discussions = $discussionModel->getByUser($this->userID, $limit, 0, false);
+        $this->setData("Discussions", $discussions);
     }
 
     /**
@@ -63,8 +65,9 @@ class UserDiscussionsModule extends Gdn_Module {
      *
      * @return string
      */
-    public function assetTarget() {
-        return 'Panel';
+    public function assetTarget()
+    {
+        return "Panel";
     }
 
     /**
@@ -72,13 +75,14 @@ class UserDiscussionsModule extends Gdn_Module {
      *
      * @return string|void
      */
-    public function toString() {
+    public function toString()
+    {
         // If there is no userID show nothing.
         if (!$this->userID) {
             return;
         }
 
-        if (!$this->data('Discussions')) {
+        if (!$this->data("Discussions")) {
             $this->getData();
         }
 

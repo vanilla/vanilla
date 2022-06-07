@@ -107,8 +107,8 @@ class LeaderboardWidget extends AbstractReactModule implements ReactWidgetInterf
             self::widgetTitleSchema("All Time Leaders"),
             self::widgetSubtitleSchema("subtitle"),
             self::widgetDescriptionSchema(),
-            self::containerOptionsSchema("containerOptions"),
-            $widgetSpecificSchema
+            $widgetSpecificSchema,
+            self::containerOptionsSchema("containerOptions")
         );
     }
 

@@ -11,6 +11,8 @@ use CategoryModel;
 use Garden\Schema\Schema;
 use Gdn_Upload;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Forms\FormOptions;
+use Vanilla\Forms\SchemaForm;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
 
 /**
@@ -63,10 +65,19 @@ class BannerFullWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
      */
     public static function getWidgetSchema(): Schema {
         return Schema::parse([
-            'backgroundImage:s?' => 'URL for the background image.',
+            'backgroundImage:s?' => [
+                'description' => 'URL for the background image.',
+                'x-control' => SchemaForm::textBox(new FormOptions('Background Image', 'URL for the background image.'))
+            ],
             'categoryID:s?' => 'Category ID.',
-            'title:s?' => 'Title.',
-            'description:s?' => 'Description.',
+            'title:s?' => [
+                'description' => 'Banner title.',
+                'x-control' => SchemaForm::textBox(new FormOptions('Title', 'Banner title.'))
+            ],
+            'description:s?' => [
+                'description' => 'Banner description.',
+                'x-control' => SchemaForm::textBox(new FormOptions('Description', 'Banner description.'))
+            ],
         ]);
     }
 

@@ -72,4 +72,19 @@ class MarkdownFormat extends HtmlFormat {
         $markdownParsed = $this->markdownParser->transform($value);
         return parent::renderQuote($markdownParsed);
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function removeUserPII(string $username, string $body): string {
+        $pattern = [];
+        $replacement = [];
+
+        [$pattern['atMention'], $replacement['atMention']] = $this->getNonRichAtMentionPattern($username, $this->anonymizeUsername);
+
+        [$pattern['url'], $replacement['url']] = $this->getUrlPattern($username, $this->anonymizeUrl);
+
+        $body = preg_replace($pattern, $replacement, $body);
+        return $body;
+    }
 }

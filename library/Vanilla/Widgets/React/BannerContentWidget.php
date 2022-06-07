@@ -8,6 +8,8 @@
 namespace Vanilla\Widgets\React;
 
 use Garden\Schema\Schema;
+use Vanilla\Forms\FormOptions;
+use Vanilla\Forms\SchemaForm;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Widgets\React\BannerFullWidget as ReactBannerFullWidget;
 use Gdn_Upload;
@@ -60,7 +62,10 @@ class BannerContentWidget extends ReactBannerFullWidget {
         return SchemaUtils::composeSchemas(
             parent::getWidgetSchema(),
             Schema::parse([
-                'iconImage:s?' => 'URL for the icon image.'
+                'iconImage:s?' =>   [
+                    'description' => 'URL for the icon image.',
+                    'x-control' => SchemaForm::textBox(new FormOptions('Icon Image', 'URL for the icon image.'))
+                ]
             ])
         );
     }

@@ -71,6 +71,9 @@ class UserSpotlightWidget implements ReactWidgetInterface, CombinedPropsWidgetIn
             self::widgetSubtitleSchema('subtitle'),
             self::widgetDescriptionSchema(),
             Schema::parse([
+                'apiParams' => self::getApiSchema()
+            ]),
+            Schema::parse([
                'userTextAlignment?' => [
                    'type' => 'string',
                    'description' => t('Whether user name and title is aligned to the left or right.'),
@@ -83,9 +86,6 @@ class UserSpotlightWidget implements ReactWidgetInterface, CombinedPropsWidgetIn
             ]),
             self::containerOptionsSchema("containerOptions", [
                 'outerBackground?', 'innerBackground?', 'borderType?'
-            ]),
-            Schema::parse([
-                'apiParams' => self::getApiSchema()
             ])
         );
 

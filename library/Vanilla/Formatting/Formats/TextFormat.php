@@ -9,22 +9,32 @@ namespace Vanilla\Formatting\Formats;
 
 use Vanilla\Formatting\BaseFormat;
 use Vanilla\Formatting\FormatConfig;
+use Vanilla\Formatting\UserPIIRemoveTrait;
 
 /**
  * Class for rendering content of the markdown format.
  */
 class TextFormat extends BaseFormat {
+    use UserPIIRemoveTrait;
 
     const FORMAT_KEY = "text";
 
     /** @var FormatConfig */
     private $formatConfig;
 
+    /** @var string */
+    protected $anonymizeUsername;
+
+    /** @var string */
+    protected $anonymizeUrl;
+
     /**
      * @param FormatConfig $formatConfig
      */
     public function __construct(FormatConfig $formatConfig) {
         $this->formatConfig = $formatConfig;
+        $this->anonymizeUsername = $this->getAnonymizeUserName();
+        $this->anonymizeUrl = $this->getAnonymizeUserUrl();
     }
 
     /**
@@ -94,5 +104,20 @@ class TextFormat extends BaseFormat {
         // Legacy Mention Fetcher.
         // This should get replaced in a future refactoring.
         return getMentions($content);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function removeUserPII(string $username, string $body): string {
+        $pattern = [];
+        $replacement = [];
+
+        [$pattern['atMention'], $replacement['atMention']] = $this->getNonRichAtMentionPattern($username, $this->anonymizeUsername);
+
+        [$pattern['url'], $replacement['url']] = $this->getUrlPattern($username, $this->anonymizeUrl);
+
+        $body = preg_replace($pattern, $replacement, $body);
+        return $body;
     }
 }

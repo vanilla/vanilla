@@ -518,3 +518,14 @@ if (!$hotExists) {
         ->set('hot', '0 + COALESCE(Score, 0) + COALESCE(CountComments, 0)', false)
         ->put();
 }
+
+$Construct->table('userMention')
+    ->column('userID', 'int', false, ['primary', 'index.userMention'])
+    ->column('recordType', 'varchar(20)', false, ['primary', 'index.userMention'])
+    ->column('recordID', 'int', false, ['primary', 'index.userMention'])
+    ->column('mentionedName', 'varchar(100)')
+    ->column('parentRecordType', 'varchar(20)', null)
+    ->column('parentRecordID', 'int', null)
+    ->column('dateInserted', 'datetime', null)
+    ->column('status', ['active', 'removed', 'toDelete'], 'active')
+    ->set();

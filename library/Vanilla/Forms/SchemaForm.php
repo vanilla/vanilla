@@ -19,6 +19,7 @@ class SchemaForm {
     const TOGGLE_TYPE = 'toggle';
     const DRAG_AND_DROP_TYPE = 'dragAndDrop';
     const CODE_EDITOR_TYPE = 'codeBox';
+    const COLOR_TYPE = 'color';
 
     /**
      * Create a "section" of the form on an object type.
@@ -165,6 +166,21 @@ class SchemaForm {
             'label' => $options->getLabel(),
             'itemSchema' => $itemSchema,
             'fullSize' => true,
+        ];
+    }
+
+    /**
+     * Used for rendering react color picker.
+     *
+     * @param FormOptions $options
+     *
+     * @return array
+     */
+    public static function color(FormOptions $options): array {
+        return [
+            'description' => $options->getDescription(),
+            'label' => $options->getLabel(),
+            'inputType' => self::COLOR_TYPE,
         ];
     }
 }

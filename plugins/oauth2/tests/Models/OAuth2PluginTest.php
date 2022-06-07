@@ -297,6 +297,18 @@ class OAuth2PluginTest extends SiteTestCase {
     }
 
     /**
+     * Test the OAuth return flow with multiple connections, and BasicAuthToken.
+     */
+    public function testReturnUrlFlowMultipleProvidersPart2(): void {
+        $this->setupMultipleProviders();
+        $this->setupSingleProvider();
+
+        \Gdn::session()->end();
+
+        $this->assertReturnUrlFlow(self::CLIENT_ID_SINGLE);
+    }
+
+    /**
      * Test the OAuth return flow with a single connection.
      */
     public function testReturnUrlFlowSingleProvider(): void {

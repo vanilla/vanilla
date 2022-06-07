@@ -8,6 +8,8 @@
 namespace Vanilla\Widgets\Schema;
 
 use Garden\Schema\Schema;
+use Vanilla\Forms\FormOptions;
+use Vanilla\Forms\SchemaForm;
 
 /**
  * Schema for a theme background.
@@ -27,6 +29,7 @@ class WidgetBackgroundSchema extends Schema {
                 'color' => [
                     'type' => 'string',
                     'description' => 'Set the background color of the component.',
+                    'x-control' => SchemaForm::color(new FormOptions('Background color', 'Pick a background color.'))
                 ],
                 'image' => [
                     'type' => 'string',
@@ -35,7 +38,8 @@ class WidgetBackgroundSchema extends Schema {
                         ."character will be relative to the current theme directory. For example if the current "
                         ."file-based them is in /addons/themes/my-theme, ~/design/my-image.png would be equivalent"
                         ." to /addons/themes/my-theme/design/my-image.png\n- "
-                        ."Please pass _URLs_ for this variable. __Do not__ pass urls wrapped in \"url()\"."
+                        ."Please pass _URLs_ for this variable. __Do not__ pass urls wrapped in \"url()\".",
+                    'x-control' => SchemaForm::textBox(new FormOptions('Image URL', 'Custom URL for the background image.'))
                 ],
                 'attachment' => [
                     'type' => 'string',

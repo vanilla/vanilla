@@ -69,7 +69,6 @@ class QuickLinksWidget extends AbstractReactModule implements CombinedPropsWidge
     public static function getWidgetSchema(): Schema {
         $linkSchema = new NavLinkSchema();
         return SchemaUtils::composeSchemas(
-            self::containerOptionsSchema('containerOptions'),
             Schema::parse([
                 "title:s?" => [
                     'default' => t('Quick Links'),
@@ -84,7 +83,8 @@ class QuickLinksWidget extends AbstractReactModule implements CombinedPropsWidge
                         $linkSchema
                     ),
                 ],
-            ])
+            ]),
+            self::containerOptionsSchema('containerOptions')
         );
     }
 }

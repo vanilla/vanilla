@@ -7,9 +7,12 @@
 
 namespace VanillaTests\APIv2;
 
+use Garden\Web\Exception\ForbiddenException;
+use Garden\Web\Exception\NotFoundException;
 use Gdn;
 use Gdn_Session;
 use SessionModel;
+use VanillaTests\UsersAndRolesApiTestTrait;
 
 /**
  * Tests for the Gdn_Session class.
@@ -17,6 +20,7 @@ use SessionModel;
  * @package VanillaTests\APIv2
  */
 class SessionTest extends AbstractAPIv2Test {
+    use UsersAndRolesApiTestTrait;
 
     /**
      * @inheritDoc
@@ -133,6 +137,60 @@ class SessionTest extends AbstractAPIv2Test {
         $session->start();
 
         $this->assertEquals("", $session->SessionID, "Session ID from authentication is invalid, and would cause guest usage.");
+    }
+
+    /**
+     * Test removing session from database using the DELETE `/sessions/{sessionID}` API endpoint.
+     */
+    public function testApiDeleteSession() {
+        $this->enableFeature(\Gdn_Session::FEATURE_SESSION_ID_COOKIE);
+        $sessionID = $this->runWithUser(function () {
+            $session = $this->getSession();
+            $session->start($this->memberID);
+
+            // Get the session ID from an API call to GET `/sessions/user`.
+            return $this->api()->get('/sessions/user')->getBody()[0]['sessionID'];
+        }, $this->memberID);
+
+        // Expire the session using DELETE `/sessions/{sessionID}`
+        $deletionStatusCode = $this->api()->delete(
+            '/sessions/' . $this->memberID,
+            ['sessionID' => $sessionID]
+        )->getStatusCode();
+        // Assert we got a success response code from the deletion process.
+        $this->assertEquals(204, $deletionStatusCode);
+
+        // Try to expire the session AGAIN using DELETE `/sessions/{sessionID}`.
+        // We are expecting this will throw a not found exception.
+        $this->expectException(NotFoundException::class);
+        $this->api()->delete(
+            '/sessions/' . $this->memberID,
+            ['sessionID' => $sessionID]
+        )->getStatusCode();
+    }
+
+    /**
+     * Test removing session from database using the DELETE `/sessions/{sessionID}` API endpoint.
+     */
+    public function testApiListSessions() {
+        $this->enableFeature(\Gdn_Session::FEATURE_SESSION_ID_COOKIE);
+        // We start a session
+        $session = $this->getSession();
+        $session->start($this->memberID);
+
+        // Check that the admin user has the `Garden.Moderation.Manage` permission.
+        $this->assertTrue($this->userModel->checkPermission($this->adminID, ['Garden.Moderation.Manage']));
+        // Poke the GET `/sessions` API with the `Garden.Moderation.Manage` permission & assert that we get results.
+        $sessions = $this->runWithUser(function () {
+            return $this->api()->get('/sessions')->getBody();
+        }, $this->adminID);
+        $this->assertTrue(count($sessions)>0);
+
+        // Poke the GET `/sessions` API with the member user & assert that we are met with a forbidden exception.
+        $this->runWithUser(function () {
+            $this->expectException(ForbiddenException::class);
+            $this->api()->get('/sessions')->getBody();
+        }, $this->memberID);
     }
 
     /**

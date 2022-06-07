@@ -13,6 +13,7 @@ use Vanilla\Formatting\ParsableDOMInterface;
 use Vanilla\Formatting\TextDOMInterface;
 use Vanilla\Formatting\TextFragmentInterface;
 use Vanilla\Formatting\TextFragmentType;
+use Vanilla\Formatting\UserPIIRemoveTrait;
 
 /**
  * Basic display format.
@@ -21,8 +22,11 @@ use Vanilla\Formatting\TextFragmentType;
  * quasi-implmentation of Gdn_Format::display.
  */
 final class DisplayFormat extends BaseFormat implements ParsableDOMInterface {
-
+    use UserPIIRemoveTrait;
     const FORMAT_KEY = "display";
+
+    /** @var string */
+    protected $anonymizeUrl;
 
     /**
      * @inheritdoc
@@ -148,5 +152,15 @@ final class DisplayFormat extends BaseFormat implements ParsableDOMInterface {
                 return TextFragmentType::TEXT;
             }
         };
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function removeUserPII(string $username, string $body): string {
+        [$pattern, $replacement] = $this->getUrlPattern($username, $this->getAnonymizeUserUrl());
+
+        $body = preg_replace($pattern, $replacement, $body);
+        return $body;
     }
 }

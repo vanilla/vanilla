@@ -1,0 +1,39 @@
+/**
+ * @copyright 2009-2022 Vanilla Forums Inc.
+ * @license gpl-2.0-only
+ */
+
+import { css } from "@emotion/css";
+import { Mixins } from "@library/styles/Mixins";
+import { useThemeCache } from "@library/styles/styleUtils";
+import { calc } from "csx";
+
+export const widgetSettingsAccordionClasses = useThemeCache(() => {
+    const header = css({
+        textAlign: "center",
+        width: "100%",
+        ...Mixins.font({
+            transform: "uppercase",
+            color: "#757e8c",
+            size: 12,
+            weight: 600,
+        }),
+    });
+    const panel = css({
+        ...Mixins.padding({
+            top: 8,
+            horizontal: 16,
+        }),
+    });
+    const item = css({
+        ...Mixins.margin({
+            horizontal: -16,
+        }),
+        borderBottom: "1px dotted #e7e8e9",
+        width: calc(`100% + 32px`),
+        "& .form-group": {
+            borderBottom: "none",
+        },
+    });
+    return { header, panel, item };
+});

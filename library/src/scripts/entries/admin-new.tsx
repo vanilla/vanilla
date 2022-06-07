@@ -12,6 +12,8 @@ import TwoColumnSection from "@library/layout/TwoColumnSection";
 import { QuickLinks } from "@library/navigation/QuickLinks";
 import { UserSpotlightWidgetPreview } from "@library/userSpotlight/UserSpotlightWidget.preview";
 import { CategoriesWidgetPreview } from "@library/categoriesWidget/CategoriesWidget.preview";
+import { LeaderboardWidgetPreview } from "@library/leaderboardWidget/LeaderboardWidget.preview";
+import { DiscussionListModulePreview } from "@library/discussions/DiscussionListModuleWidget.preview";
 
 registerWidgetOverviews({
     SectionFullWidth,
@@ -22,4 +24,6 @@ registerWidgetOverviews({
     QuickLinks, // Quicklinks doesn't need server data so the same widget renders here as on the server.
     UserSpotlightWidget: UserSpotlightWidgetPreview,
     CategoriesWidget: CategoriesWidgetPreview,
+    DiscussionListModule: DiscussionListModulePreview,
+    LeaderboardWidget: LeaderboardWidgetPreview,
 });

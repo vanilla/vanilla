@@ -97,7 +97,7 @@ class ApiUtils {
             ],
             'nullable' => true,
             'style' => 'form',
-            'type' => ['boolean', 'array'],
+            'type' => ['boolean', 'array', 'null'],
         ]);
 
         $schema->addFilter('', function ($value) use ($negativeKeys) {

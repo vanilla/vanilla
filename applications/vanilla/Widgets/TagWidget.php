@@ -104,11 +104,11 @@ class TagWidget extends AbstractReactModule implements ReactWidgetInterface, Com
             self::widgetTitleSchema(),
             self::widgetSubtitleSchema("subtitle"),
             self::widgetDescriptionSchema(),
+            \TagModule::getWidgetSchema(),
             self::containerOptionsSchema("containerOptions", [
                 'outerBackground?', 'innerBackground?', 'borderType?', 'headerAlignment?'
                 ]),
-            self::getItemSchema(),
-            \TagModule::getWidgetSchema()
+            self::getItemSchema()
         );
         return $schema;
     }

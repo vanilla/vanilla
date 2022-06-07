@@ -10,6 +10,7 @@ namespace Vanilla\Widgets;
 use Garden\Schema\Schema;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
+use Vanilla\Forms\StaticFormChoices;
 use Vanilla\Widgets\Schema\WidgetBackgroundSchema;
 
 /**
@@ -82,15 +83,42 @@ trait HomeWidgetContainerSchemaTrait {
             'innerBackground?' => new WidgetBackgroundSchema('Set an inner background (inside of the margins) for the container.'),
             'borderType:s?' => [
                 'enum' => self::borderTypeOptions(),
-                'description' => 'Describe what type of the border the widget should have.'
+                'description' => 'Describe what type of border the widget should have.',
+                'x-control' => SchemaForm::dropDown(
+                    new FormOptions(
+                        'Border Type',
+                        'Choose widget border type'
+                    ),
+                    new StaticFormChoices(
+                        [
+                            'border' => "Border",
+                            'separator' => "Separator",
+                            'none' => "None",
+                            'shadow' => "Shadow"
+                        ]
+                    )
+                ),
             ],
             'viewAll?' => self::viewAllSchema('Configure a view all link for the widget.'),
             'maxColumnCount:i?' => [
                 'description' => 'Set the maximum number of columns for the widget.',
+                'x-control' => SchemaForm::dropDown(
+                    new FormOptions('Max Columns', 'Set the maximum number of columns for the widget.'),
+                    new StaticFormChoices(['1' => 1, '2' => 2, '3' => 3, '4' => 4, '5' => 5])
+                )
             ],
             'displayType:s?' => [
-                'enum' => self::displayTypeOptions(),
-                'description' => 'Describe the widget display format.'
+                'enum' => ['grid', 'list', 'carousel', 'link'],
+                'description' => 'Describe the widget display format.',
+                'x-control' => SchemaForm::dropDown(
+                    new FormOptions('Display Type', 'Choose the widget display type.'),
+                    new StaticFormChoices([
+                        'grid' => 'Grid',
+                        'list' => 'List',
+                        'carousel' => 'Carousel',
+                        'link' => 'Link'
+                    ])
+                )
             ],
             'isGrid:b?' => [
                 'deprecationMessage' => 'This is deprecated. Use displayType instead.',
@@ -103,6 +131,10 @@ trait HomeWidgetContainerSchemaTrait {
             'headerAlignment:s?' => [
                 'description' => 'Configure alignment of the title, subtitle, and description.',
                 'enum' => ['left', 'center'],
+                'x-control' => SchemaForm::dropDown(
+                    new FormOptions('Header Alignment', 'Configure alignment of the title, subtitle, and description.'),
+                    new StaticFormChoices(['left' => 'Left', 'center' => 'Center'])
+                )
             ],
         ]);
 
@@ -125,13 +157,27 @@ trait HomeWidgetContainerSchemaTrait {
         $schema = Schema::parse([
             'position:s?' => [
                 'enum' => ['top', 'bottom'],
-                'description' => 'Where to render the viewAll link. Default is "bottom" or defined by the theme.'
+                'description' => 'Where to render the viewAll link. Default is "bottom" or defined by the theme.',
+                'x-control' => SchemaForm::dropDown(
+                    new FormOptions(
+                        'View All position',
+                        'Choose "View All" link position.'
+                    ),
+                    new StaticFormChoices(
+                        [
+                            'top' => 'Top',
+                            'bottom' => 'Bottom',
+                        ]
+                    )
+                ),
             ],
-            'to:s' => [
+            'to:s?' => [
                 'description' => 'The URL of the view all link.',
+                'x-control' => SchemaForm::textBox(new FormOptions('View All URL', 'Set a custom url for "View All" link.'))
             ],
             'name:s?' => [
                 'description' => 'A custom name for the view all link. Default is "View All" or defined by the theme.',
+                'x-control' => SchemaForm::textBox(new FormOptions('View All link name', 'Set a custom name for "View All" link.'))
             ],
         ]);
         if ($description) {

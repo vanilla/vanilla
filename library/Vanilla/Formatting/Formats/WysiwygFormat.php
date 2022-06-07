@@ -56,4 +56,19 @@ class WysiwygFormat extends HtmlFormat {
     protected function legacySpoilers(string $html): string {
         return $html;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function removeUserPII(string $username, string $body): string {
+        [$pattern['atMention'], $replacement['atMention']] = $this->getNonRichAtMentionPattern($username, $this->anonymizeUsername);
+
+        [$pattern['url'], $replacement['url']] = $this->getUrlPattern($username, $this->anonymizeUrl);
+
+        $pattern['quote'] = "~>$username<~";
+        $replacement['quote'] = ">$this->anonymizeUsername<";
+
+        $body = preg_replace($pattern, $replacement, $body);
+        return $body;
+    }
 }

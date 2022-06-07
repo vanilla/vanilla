@@ -123,4 +123,31 @@ abstract class BaseFormat implements FormatInterface {
     public function setAllowExtendedContent(bool $extendContent): void {
         $this->allowExtendedContent = $extendContent;
     }
+
+    /**
+     * Return the anonymize username.
+     *
+     * @return string
+     */
+    public function getAnonymizeUserName(): string {
+        return t('[Deleted User]');
+    }
+
+    /**
+     * Return the anonymize User url.
+     *
+     * @return string
+     */
+    public function getAnonymizeUserUrl(): string {
+        return \UserModel::getProfileUrl(['name' => t('[Deleted User]')]);
+    }
+
+    /**
+     * Anonymize the username from body by replacing the username with the replacement value.
+     *
+     * @param string $username
+     * @param string $body
+     * @return string
+     */
+    abstract public function removeUserPII(string $username, string $body): string;
 }

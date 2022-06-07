@@ -8,6 +8,7 @@
 namespace Vanilla\Formatting\Formats;
 
 use Exception;
+use UserModel;
 use Vanilla\Formatting\BaseFormat;
 use Vanilla\Formatting\Exception\FormattingException;
 use Vanilla\Formatting\Html\HtmlDocument;
@@ -20,12 +21,14 @@ use Vanilla\Formatting\Html\Processor\ImageHtmlProcessor;
 use Vanilla\Formatting\Html\Processor\UserContentCssProcessor;
 use Vanilla\Formatting\ParsableDOMInterface;
 use Vanilla\Formatting\TextDOMInterface;
+use Vanilla\Formatting\UserPIIRemoveTrait;
 use Vanilla\InjectableInterface;
 
 /**
  * Format definition for HTML based formats.
  */
 class HtmlFormat extends BaseFormat implements InjectableInterface, ParsableDOMInterface {
+    use UserPIIRemoveTrait;
 
     const FORMAT_KEY = "html";
 
@@ -53,6 +56,12 @@ class HtmlFormat extends BaseFormat implements InjectableInterface, ParsableDOMI
     /** @var bool allowExtendedContent */
     protected $allowExtendedContent;
 
+    /** @var string */
+    protected $anonymizeUsername;
+
+    /** @var string */
+    protected $anonymizeUrl;
+
     /**
      * Constructor for dependency injection.
      *
@@ -74,6 +83,8 @@ class HtmlFormat extends BaseFormat implements InjectableInterface, ParsableDOMI
         $this->plainTextConverter = $plainTextConverter;
         $this->shouldCleanupLineBreaks = $shouldCleanupLineBreaks;
         $this->allowExtendedContent = $allowExtendedContent;
+        $this->anonymizeUsername = $this->getAnonymizeUserName();
+        $this->anonymizeUrl = $this->getAnonymizeUserUrl();
     }
 
     /**
@@ -286,5 +297,20 @@ class HtmlFormat extends BaseFormat implements InjectableInterface, ParsableDOMI
         $html = $this->renderHtml($content, false);
         $dom = new HtmlDocument($html);
         return $dom;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function removeUserPII(string $username, string $body): string {
+        [$pattern['atMention'], $replacement['atMention']] = $this->getNonRichAtMentionPattern($username, $this->anonymizeUsername);
+
+        [$pattern['url'], $replacement['url']] = $this->getUrlPattern($username, $this->anonymizeUrl);
+
+        $pattern['quote'] = "~<blockquote class=\"Quote\" rel=\"$username\">~";
+        $replacement['quote'] = "<blockquote class=\"Quote\" rel=\"$this->anonymizeUsername\">";
+
+        $body = preg_replace($pattern, $replacement, $body);
+        return $body;
     }
 }

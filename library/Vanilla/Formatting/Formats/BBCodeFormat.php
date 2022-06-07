@@ -57,4 +57,19 @@ class BBCodeFormat extends HtmlFormat {
         $renderedBBCode = $this->bbcodeParser->format($value);
         return parent::renderQuote($renderedBBCode);
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function removeUserPII(string $username, string $body): string {
+        [$pattern['atMention'], $replacement['atMention']] = $this->getNonRichAtMentionPattern($username, $this->anonymizeUsername);
+
+        [$pattern['url'], $replacement['url']] = $this->getUrlPattern($username, $this->anonymizeUrl);
+
+        $pattern['quote'] = "~quote=\"$username;~";
+        $replacement['quote'] = "quote=\"$this->anonymizeUsername;";
+
+        $body = preg_replace($pattern, $replacement, $body);
+        return $body;
+    }
 }

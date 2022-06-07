@@ -864,7 +864,7 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface, Cache
         $this->log('Before calling API to request access token', ['requestAccessToken' => ['targetURI' => $uri, 'post' => $post]]);
         $token = [];
         if (val('BasicAuthToken', $provider)) {
-            $token = $this->generateBasicAuthHeader($this->providerKey);
+            $token = $this->generateBasicAuthHeader($provider[$this->clientIDField], $provider['AssociationSecret']);
         }
         $this->accessTokenResponse = $this->api($uri, 'POST', $post, $this->getAccessTokenRequestOptions() + $token);
 
@@ -874,13 +874,11 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface, Cache
     /**
      * Generate Basic Auth Header.
      *
-     * @param string $providerKey
+     * @param string $client_id
+     * @param string $secret
      * @return string[]
      */
-    public function generateBasicAuthHeader(string $providerKey): array {
-        $provider = Gdn_AuthenticationProviderModel::getProviderByScheme($providerKey);
-        $client_id = $provider[$this->clientIDField];
-        $secret = $provider['AssociationSecret'];
+    public function generateBasicAuthHeader(string $client_id, string $secret): array {
         $rawToken = $client_id.':'.$secret;
         return ['Authorization-Header-Message' => 'Basic '.base64_encode($rawToken)];
     }

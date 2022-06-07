@@ -4,6 +4,7 @@
  * @license GPL-2.0-only
  */
 
+use Vanilla\CurrentTimeStamp;
 use Vanilla\Utility\ModelUtils;
 
 /**
@@ -119,13 +120,29 @@ class SessionModel extends Gdn_Model {
     }
 
     /**
-     * Expire expiration of the session.
+     * Expire a user's sessions by userID and an optional sessionID.
+     *
+     * @param int $userID User ID.
+     * @param string $sessionID Session ID.
+     * @return int|false Returns the number of deleted records or **false** on failure.
+     */
+    public function expireUserSessions(int $userID, string $sessionID = null) {
+        $where['UserID'] = $userID;
+        if ($sessionID) {
+            $where['SessionID'] = $sessionID;
+        }
+        return parent::delete($where);
+    }
+
+    /**
+     * Expire a session by sessionID.
      *
      * @param string $sessionID session ID of the current active session.
+     * @return int|false Returns the number of deleted records or **false** on failure.
      */
     public function expireSession(string $sessionID) {
         $where =  ['SessionID' => $sessionID];
-        parent::delete($where);
+        return parent::delete($where);
     }
 
     /**
@@ -171,5 +188,52 @@ class SessionModel extends Gdn_Model {
             throw new Gdn_UserException('Session expired, please try again.', 401);
         }
         return $row;
+    }
+
+    /**
+     * Get a list of sessions, optionally filtered by `valid` or `invalid` sessions.
+     *
+     * @param string $filter
+     * @return array
+     */
+    public function getSessions(string $filter = ''): array {
+        $currentTimeStamp = CurrentTimeStamp::getDateTime()->format(\DateTime::ATOM);
+
+        $sessions = [];
+        switch ($filter) {
+            case 'invalid':
+                $sessions = $this->SQL
+                    ->select('*')
+                    ->from('Session')
+                    ->where('DateExpires <=', $currentTimeStamp)
+                    ->orWhere('DateExpires', null)
+                    ->get()
+                    ->resultArray();
+                break;
+            case 'valid':
+                $where['DateExpires >'] = $currentTimeStamp;
+                $sessions = $this->getWhere($where)->resultArray();
+                break;
+            default:
+                $sessions = $this->getWhere()->resultArray();
+                break;
+        }
+        return $sessions;
+    }
+
+    /**
+     * Check if a session exists.
+     *
+     * @param int $userID
+     * @param string $sessionID
+     * @return bool
+     */
+    public function sessionExists(int $userID, string $sessionID = null): bool {
+        $queryParams = ['UserID' => $userID];
+        if ($sessionID) {
+            $queryParams = ['SessionID' => $sessionID];
+        }
+        $sessionLookup = $this->getWhere($queryParams)->resultArray();
+        return (count($sessionLookup)==0) ? false : true;
     }
 }

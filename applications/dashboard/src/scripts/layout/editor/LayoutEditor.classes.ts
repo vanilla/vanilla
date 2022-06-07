@@ -279,6 +279,13 @@ export const layoutEditorClasses = useThemeCache(() => {
         paddingTop: 100,
     });
 
+    const toolbarMenu = css({
+        "&& button": {
+            marginLeft: 2,
+            marginRight: 2,
+        },
+    });
+
     return {
         root,
         screen,
@@ -297,5 +304,6 @@ export const layoutEditorClasses = useThemeCache(() => {
         widget,
         widgetBorder,
         initialSectionForm,
+        toolbarMenu,
     };
 });

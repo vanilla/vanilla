@@ -35,6 +35,8 @@ function TwoColumnSection(props: IProps) {
                 leftBottom={leftBottomContent}
                 rightTop={rightTopContent}
                 rightBottom={rightBottomContent}
+                displayLeftColumn={props.isInverted}
+                displayRightColumn={!props.isInverted}
             />
         </SectionProvider>
     );

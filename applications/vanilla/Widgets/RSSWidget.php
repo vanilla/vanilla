@@ -76,24 +76,25 @@ class RSSWidget implements ReactWidgetInterface, CombinedPropsWidgetInterface, I
      */
     public static function getWidgetSchema(): Schema {
         $schema = SchemaUtils::composeSchemas(
+            self::widgetTitleSchema(),
+            self::widgetSubtitleSchema("subtitle"),
+            self::widgetDescriptionSchema(),
             Schema::parse([
                 'apiParams' => Schema::parse([
                     'feedUrl:s' => [
                         'x-control' => SchemaForm::textBox(
                             new FormOptions(
-                                'URL',
+                                'RSS Feed URL',
                                 'RSS Feed URL.'
-                            ),
-                            "url"
+                            )
                         ),
                     ],
-                    'fallbackImageUrl:?' => [
+                    'fallbackImageUrl:s?' => [
                         'x-control' => SchemaForm::textBox(
                             new FormOptions(
-                                'URL',
+                                'Fallback Image URL',
                                 'Render this image instead if feed entry does not have one.'
-                            ),
-                            "url"
+                            )
                         ),
                     ],
                     'limit:i?' => [
@@ -105,9 +106,6 @@ class RSSWidget implements ReactWidgetInterface, CombinedPropsWidgetInterface, I
                     ],
                 ])
             ]),
-            self::widgetTitleSchema(),
-            self::widgetSubtitleSchema("subtitle"),
-            self::widgetDescriptionSchema(),
             self::containerOptionsSchema('containerOptions'),
             self::itemOptionsSchema()
         );

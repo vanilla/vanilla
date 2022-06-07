@@ -7,6 +7,9 @@
 namespace Vanilla\Forum\Widgets;
 
 use Garden\Schema\Schema;
+use Vanilla\Forms\ApiFormChoices;
+use Vanilla\Forms\FormOptions;
+use Vanilla\Forms\SchemaForm;
 use Vanilla\Layout\Section\SectionOneColumn;
 use Vanilla\Layout\Section\SectionTwoColumns;
 use Vanilla\Site\SiteSectionModel;
@@ -138,19 +141,38 @@ class CategoriesWidget extends AbstractReactModule implements CombinedPropsWidge
                 'categoryID?' => [
                     'type' => ['string', 'integer', 'null'],
                     'description' => 'One or range of categoryIDs',
+                    'x-control' => SchemaForm::dropDown(
+                        new FormOptions('Categories', 'Select the categories to use'),
+                        new ApiFormChoices(
+                            '/api/v2/categories?outputFormat=flat',
+                            '/api/v2/categories/%s',
+                            'categoryID',
+                            'name'
+                        )
+                    )
                 ],
                 'limit?' => [ //does not seem like currently its supported for categories without any other filter
                     'type' => 'integer',
                     'default' => 10,
                     'description' => 'Number of results to fetch.',
                 ],
-                'featured?' => [
-                    'type' => 'boolean',
-                    'description' => 'Featured categories filter',
-                ],
-                'followed?' => [
-                    'type' => 'boolean',
+                'featured:b?' => [
                     'description' => 'Followed categories filter',
+                    'x-control' => SchemaForm::toggle(
+                        new FormOptions(
+                            'Featured',
+                            'Only featured categories.'
+                        )
+                    ),
+                ],
+                'followed:b?' => [
+                    'description' => 'Followed categories filter',
+                    'x-control' => SchemaForm::toggle(
+                        new FormOptions(
+                            'Followed',
+                            'Only followed categories.'
+                        )
+                    ),
                 ],
                 'parentCategoryID?' => [
                     'type' => ['string', 'integer', 'null'],
@@ -167,17 +189,15 @@ class CategoriesWidget extends AbstractReactModule implements CombinedPropsWidge
      * @inheritdoc
      */
     public static function getWidgetSchema(): Schema {
-        $schema = SchemaUtils::composeSchemas(
+        return SchemaUtils::composeSchemas(
             self::widgetTitleSchema(),
             self::widgetDescriptionSchema(),
             self::widgetSubtitleSchema('subtitle'),
-            self::containerOptionsSchema('containerOptions'),
-            self::itemOptionsSchema('itemOptions'),
             Schema::parse([
                 'apiParams' => self::getApiSchema(),
-            ])
+            ]),
+            self::containerOptionsSchema('containerOptions'),
+            self::itemOptionsSchema('itemOptions')
         );
-
-        return $schema;
     }
 }

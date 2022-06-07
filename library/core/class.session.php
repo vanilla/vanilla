@@ -294,7 +294,7 @@ class Gdn_Session implements LoggerAwareInterface {
             $expires = time() + $expires;
         }
 
-        safeCookie($name, $value, $expires, $path, $domain);
+        safeCookie($name, $value == null ? "" : $value, $expires, $path, $domain);
         $_COOKIE[$name] = $value;
     }
 

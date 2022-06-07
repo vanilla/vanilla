@@ -11,12 +11,15 @@ import textEditorClasses from "./textEditorStyles";
 import { assetUrl, getMeta, siteUrl } from "@library/utility/appUtils";
 import { editor as Monaco } from "monaco-editor/esm/vs/editor/editor.api";
 
-monaco.config({
-    paths: {
-        // @ts-ignore: DIST_NAME comes from webpack.
-        vs: assetUrl(`/${__DIST__NAME__}/monaco-editor-30-1/min/vs`),
-    },
-});
+// FIXME: [VNLA-1206] https://higherlogic.atlassian.net/browse/VNLA-1206
+if (process.env.NODE_ENV !== "test") {
+    monaco.config({
+        paths: {
+            // @ts-ignore: DIST_NAME comes from webpack.
+            vs: assetUrl(`/${__DIST__NAME__}/monaco-editor-30-1/min/vs`),
+        },
+    });
+}
 export interface ITextEditorProps {
     language: string;
     // A URI pointing to a JSON schema to validate the document with.

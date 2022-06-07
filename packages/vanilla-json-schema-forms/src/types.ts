@@ -130,6 +130,7 @@ export interface IControlProps extends IBaseSchemaFormProps {
     required?: boolean;
     disabled?: boolean;
     onChange(instance: any): void;
+    onBlur?(): void;
 }
 
 export interface IValidationResult {

@@ -377,4 +377,12 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
 
         return $blotGroups;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function removeUserPII(string $username, string $body): string {
+        // TODO: Implement removeMention() method.
+        return $body;
+    }
 }

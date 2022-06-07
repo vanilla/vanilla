@@ -8,41 +8,41 @@
     Variables
 \* -------------------------------------------------------------- */
 
-$flyout_bg:                             $global-color_white !default;
-$flyout-hover_bg:                       $global-color_active_primaryBg !default;
-$flyout_fg:                             $global-color_grey !default;
-$flyout_borderColor:                    mix($flyout_fg, $flyout_bg, 24%) !default;
-$flyout_border:                         $global-border-width $global-border-style $flyout_borderColor !default;
-$flyoutOverlay-border_color:            mix($flyout_fg, $flyout_bg, 10%) !default;
-$flyout_borderRadius:                   $global_borderRadius !default;
+$flyout_bg: $global-color_white !default;
+$flyout-hover_bg: $global-color_active_primaryBg !default;
+$flyout_fg: $global-color_grey !default;
+$flyout_borderColor: mix($flyout_fg, $flyout_bg, 24%) !default;
+$flyout_border: $global-border-width $global-border-style $flyout_borderColor !default;
+$flyoutOverlay-border_color: mix($flyout_fg, $flyout_bg, 10%) !default;
+$flyout_borderRadius: $global_borderRadius !default;
 
-$flyout-link_color:                     $flyout_fg !default;
-$flyout-link-hover_color:               $link-default-hover_color !default;
+$flyout-link_color: $flyout_fg !default;
+$flyout-link-hover_color: $link-default-hover_color !default;
 
-$flyoutHeader_fontSize:                 $global-subTitle_fontSize !default;
-$flyoutHeader_minHeight:                44px !default;
-$flyoutHeader_spacing:                  12px !default;
+$flyoutHeader_fontSize: $global-subTitle_fontSize !default;
+$flyoutHeader_minHeight: 44px !default;
+$flyoutHeader_spacing: 12px !default;
 
-$flyoutMenuItems_padding:               8px !default;
-$flyoutMessage_padding:                 4px 18px !default;
-$flyoutMessage-unreadDot_width:         12px !default;
+$flyoutMenuItems_padding: 8px !default;
+$flyoutMessage_padding: 4px 18px !default;
+$flyoutMessage-unreadDot_width: 12px !default;
 
-$flyoutFooter_spacing:                  $flyoutHeader_spacing !default;
-$flyoutFooter_minHeight:                $flyoutHeader_minHeight !default;
+$flyoutFooter_spacing: $flyoutHeader_spacing !default;
+$flyoutFooter_minHeight: $flyoutHeader_minHeight !default;
 
-$flyout_meta_fg:                        mix($flyout_fg, $flyout_bg, 85%) !default;
+$flyout_meta_fg: mix($flyout_fg, $flyout_bg, 85%) !default;
 
-$flyoutModal-large_width:               375px;
+$flyoutModal-large_width: 375px;
 
-$dropDown_width:                        350px !default;
-$menuItems_width:                       250px !default;
+$dropDown_width: 350px !default;
+$menuItems_width: 250px !default;
 
-$dropDown-item_verticalPadding:         6px !default;
-$dropDown-item_horizontalPadding:       18px !default;
+$dropDown-item_verticalPadding: 6px !default;
+$dropDown-item_horizontalPadding: 18px !default;
 
-$dropDown-item_mobile_minHeight:        44px !default;
+$dropDown-item_mobile_minHeight: 44px !default;
 
-$flyout-progress_size:                  24px !default;
+$flyout-progress_size: 24px !default;
 
 /* -------------------------------------------------------------- *\
     Styles
@@ -60,7 +60,6 @@ $flyout-progress_size:                  24px !default;
 .ToggleFlyout.Open,
 .editor-dropdown-open,
 .richEditor-button.isOpen {
-
     @include maxWidth {
         min-width: auto;
     }
@@ -73,7 +72,6 @@ $flyout-progress_size:                  24px !default;
 
 .MenuItems,
 .Flyout.Flyout {
-
     @include shadow-dropDown;
     padding: $dropDown-item_verticalPadding 0;
     position: absolute;
@@ -107,7 +105,7 @@ $flyout-progress_size:                  24px !default;
 
         &::after {
             @include spinnerLoader($flyout-progress_size, 4px);
-            content: '';
+            content: "";
         }
     }
 
@@ -180,9 +178,7 @@ $flyout-progress_size:                  24px !default;
 
     .Item.Title,
     .Item.Center {
-
         a {
-
             &:active,
             &:focus,
             &:hover {
@@ -253,7 +249,6 @@ $flyout-progress_size:                  24px !default;
 
 .Flyout,
 .richEditorFlyout {
-
     .Item + .Item {
         border-top: $flyout_border;
     }
@@ -422,28 +417,24 @@ $flyout-progress_size:                  24px !default;
 }
 
 .PopList.Activities {
-
     .Item.Title a::before {
         content: $kbicon-settings;
     }
 }
 
 .PopList.Conversations {
-
     .Item.Title a::before {
         content: $kbicon-compose;
     }
 }
 
 .editor-action-emoji {
-
     .MenuItems {
         width: calc(44px * 6 + 2px);
     }
 }
 
 .editor-dd-link + .mobileFlyoutOverlay {
-
     input.InputBox {
         width: calc(100% - (#{$flyoutMenuItems_padding} * 2));
         margin: $flyoutMenuItems_padding;
@@ -537,7 +528,6 @@ $flyout-progress_size:                  24px !default;
 }
 
 .richEditorFlyout {
-
     .richEditorFlyout-header {
         border-bottom: solid $flyoutOverlay-border_color 1px;
     }
@@ -598,7 +588,6 @@ $flyout-progress_size:                  24px !default;
 
 // ---------- click event for iOS <=9.3 ---------- //
 @include maxWidth($theme-breakpoint_tablet) {
-
     .ToggleFlyout,
     .ButtonGroup,
     .editor-dropdown {
@@ -612,7 +601,6 @@ $flyout-progress_size:                  24px !default;
 
 // --------------  mobile styles  --------------- //
 @include maxWidth {
-
     .mobileFlyoutOverlay {
         opacity: 0;
         position: fixed;
@@ -634,7 +622,6 @@ $flyout-progress_size:                  24px !default;
     .ButtonGroup.Open,
     .editor-dropdown-open,
     .richEditor-button.isOpen {
-
         .mobileFlyoutOverlay {
             opacity: 1;
             z-index: 1;
@@ -669,9 +656,7 @@ $flyout-progress_size:                  24px !default;
         cursor: pointer;
         max-height: 80vh;
         overflow: auto;
-        transition:
-            visibility 0s linear $global-default_timing,
-            transform $global-default_easing $global-default_timing,
+        transition: visibility 0s linear $global-default_timing, transform $global-default_easing $global-default_timing,
             opacity $global-default_easing $global-default_timing;
         z-index: 100;
 

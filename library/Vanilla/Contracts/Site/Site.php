@@ -13,8 +13,8 @@ use Vanilla\Navigation\Breadcrumb;
 /**
  * Class representing a type.
  */
-class Site implements \JsonSerializable {
-
+class Site implements \JsonSerializable
+{
     /** @var string */
     protected $name;
 
@@ -39,13 +39,8 @@ class Site implements \JsonSerializable {
      * @param int $accountID
      * @param HttpClient $httpClient
      */
-    public function __construct(
-        string $name,
-        string $webUrl,
-        int $siteID,
-        int $accountID,
-        HttpClient $httpClient
-    ) {
+    public function __construct(string $name, string $webUrl, int $siteID, int $accountID, HttpClient $httpClient)
+    {
         $this->name = $name;
         $this->webUrl = $webUrl;
         $this->siteID = $siteID;
@@ -58,7 +53,8 @@ class Site implements \JsonSerializable {
      *
      * @return string
      */
-    public function getName(): string {
+    public function getName(): string
+    {
         return $this->name;
     }
 
@@ -67,7 +63,8 @@ class Site implements \JsonSerializable {
      *
      * @return string
      */
-    public function getWebUrl(): string {
+    public function getWebUrl(): string
+    {
         return $this->webUrl;
     }
 
@@ -76,14 +73,16 @@ class Site implements \JsonSerializable {
      *
      * @return int
      */
-    public function getSiteID(): int {
+    public function getSiteID(): int
+    {
         return $this->siteID;
     }
 
     /**
      * @param int $siteID
      */
-    public function setSiteID(int $siteID): void {
+    public function setSiteID(int $siteID): void
+    {
         $this->siteID = $siteID;
     }
 
@@ -92,7 +91,8 @@ class Site implements \JsonSerializable {
      *
      * @return int
      */
-    public function getAccountID(): int {
+    public function getAccountID(): int
+    {
         return $this->accountID;
     }
 
@@ -101,10 +101,9 @@ class Site implements \JsonSerializable {
      *
      * @return Breadcrumb[]
      */
-    public function toBreadcrumbs(): array {
-        return [
-            new Breadcrumb($this->getName(), $this->getWebUrl())
-        ];
+    public function toBreadcrumbs(): array
+    {
+        return [new Breadcrumb($this->getName(), $this->getWebUrl())];
     }
 
     /**
@@ -112,7 +111,8 @@ class Site implements \JsonSerializable {
      *
      * @return HttpClient
      */
-    public function getHttpClient(): HttpClient {
+    public function getHttpClient(): HttpClient
+    {
         $this->httpClient->setThrowExceptions(true);
         return $this->httpClient;
     }
@@ -120,12 +120,13 @@ class Site implements \JsonSerializable {
     /**
      * @return array
      */
-    public function jsonSerialize() {
+    public function jsonSerialize()
+    {
         return [
-            'name' => $this->getName(),
-            'webUrl' => $this->getWebUrl(),
-            'accountID' => $this->getAccountID(),
-            'siteID' => $this->getSiteID(),
+            "name" => $this->getName(),
+            "webUrl" => $this->getWebUrl(),
+            "accountID" => $this->getAccountID(),
+            "siteID" => $this->getSiteID(),
         ];
     }
 }

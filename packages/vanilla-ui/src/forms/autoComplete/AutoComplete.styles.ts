@@ -11,12 +11,14 @@ export interface AutoCompleteClassesProps {
     size?: InputSize;
     isDisabled?: boolean;
     isClearable?: boolean;
+    zIndex?: number;
 }
 
 export const autoCompleteClasses = ({
     size = "default",
     isDisabled = false,
     isClearable = false,
+    zIndex = 1,
 }: AutoCompleteClassesProps) => ({
     arrowButton: css({}),
     reachCombobox: css({
@@ -74,7 +76,7 @@ export const autoCompleteClasses = ({
     }),
     popover: css({
         "&[data-reach-combobox-popover]": {
-            zIndex: 9999,
+            zIndex: zIndex + 1, // Always one above the current stack height
             background: "#fff",
             border: 0,
             borderRadius: 6,

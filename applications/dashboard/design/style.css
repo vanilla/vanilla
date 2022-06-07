@@ -589,8 +589,7 @@ body:not(.dataDriven) .Button:active {
   border-width: 0 0 100px 200px;
   opacity: 0;
   filter: alpha(opacity=0);
-  -ms-transform: translate(-300px, 0) scale(4);
-      transform: translate(-300px, 0) scale(4);
+  transform: translate(-300px, 0) scale(4);
   direction: ltr;
   cursor: pointer;
 }
@@ -6223,12 +6222,9 @@ img.jcrop-preview {
 }
 
 .flex {
-  display: -ms-flexbox;
   display: flex;
-  -ms-flex-pack: justify;
-      justify-content: space-between;
-  -ms-flex-align: center;
-      align-items: center;
+  justify-content: space-between;
+  align-items: center;
 }
 .flex > * {
   margin-right: 4.5px;
@@ -6238,28 +6234,23 @@ img.jcrop-preview {
 }
 
 .flex-wrap {
-  -ms-flex-wrap: wrap;
-      flex-wrap: wrap;
+  flex-wrap: wrap;
 }
 
 .shrink {
-  -ms-flex-negative: 1;
-      flex-shrink: 1;
+  flex-shrink: 1;
 }
 
 .grow {
-  -ms-flex-positive: 1;
-      flex-grow: 1;
+  flex-grow: 1;
 }
 
 .no-shrink {
-  -ms-flex-negative: 0;
-      flex-shrink: 0;
+  flex-shrink: 0;
 }
 
 .no-grow {
-  -ms-flex-positive: 0;
-      flex-grow: 0;
+  flex-grow: 0;
 }
 
 .pull-left {
@@ -6299,4 +6290,4 @@ img.jcrop-preview {
   content: "";
 }
 
-/*# sourceMappingURL=style.css.map */
+/*# sourceMappingURL=style.css.map*/

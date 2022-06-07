@@ -30,17 +30,8 @@ interface IProps extends Omit<React.HTMLAttributes<HTMLInputElement>, "type" | "
 }
 
 export function ColorPicker(_props: IProps) {
-    const {
-        rootClassName,
-        inputClassName,
-        swatchClassName,
-        disabled,
-        value,
-        onChange,
-        inputID,
-        labelID,
-        isInvalid,
-    } = _props;
+    const { rootClassName, inputClassName, swatchClassName, disabled, value, onChange, inputID, labelID, isInvalid } =
+        _props;
 
     const classes = colorPickerClasses();
     const textInput = useRef<HTMLInputElement>(null);

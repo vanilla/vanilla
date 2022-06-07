@@ -13,8 +13,8 @@ use Vanilla\Formatting\Quill\Parser;
 /**
  * Trait for rendering Formats.
  */
-trait FormattableTextTrait {
-
+trait FormattableTextTrait
+{
     /** @var AbstractFormat[] */
     private $formats;
 
@@ -28,7 +28,8 @@ trait FormattableTextTrait {
      * @throws \Garden\Container\ContainerException If the container can't be found.
      * @throws \Garden\Container\NotFoundException If the container can't find the Parser.
      */
-    public function parseFormats(array $currentOp, array $previousOp = [], array $nextOp = []) {
+    public function parseFormats(array $currentOp, array $previousOp = [], array $nextOp = [])
+    {
         /** @var Parser $parser */
         $parser = \Gdn::getContainer()->get(Parser::class);
         $this->formats = $parser->getFormatsForOperations($currentOp, $previousOp, $nextOp);
@@ -39,7 +40,8 @@ trait FormattableTextTrait {
      *
      * @return string
      */
-    public function renderOpeningFormatTags(): string {
+    public function renderOpeningFormatTags(): string
+    {
         $result = "";
         foreach ($this->formats as $format) {
             $result .= $format->renderOpeningTag();
@@ -52,7 +54,8 @@ trait FormattableTextTrait {
      *
      * @return string
      */
-    public function renderClosingFormatTags(): string {
+    public function renderClosingFormatTags(): string
+    {
         $result = "";
         /** @var AbstractFormat $format */
         foreach (array_reverse($this->formats, true) as $format) {

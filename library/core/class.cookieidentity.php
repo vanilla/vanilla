@@ -12,17 +12,19 @@
  */
 
 use Firebase\JWT\JWT;
+use Garden\Web\Cookie;
+use Garden\Web\Exception\ForbiddenException;
 
 /**
  * Validating, Setting, and Retrieving session data in cookies.
  */
-class Gdn_CookieIdentity {
-
+class Gdn_CookieIdentity
+{
     /** Signing algorithm for JWT tokens. */
-    const JWT_ALGORITHM = 'HS256';
+    const JWT_ALGORITHM = "HS256";
 
     /** Current cookie identity version. */
-    const VERSION = '2';
+    const VERSION = "2";
 
     /** @var int|null */
     public $UserID = null;
@@ -49,17 +51,18 @@ class Gdn_CookieIdentity {
     public $CookieSalt;
 
     /** @var string */
-    public $PersistExpiry = '30 days';
+    public $PersistExpiry = "30 days";
 
     /** @var string */
-    public $SessionExpiry = '2 days';
+    public $SessionExpiry = "2 days";
 
     /**
      *
      *
      * @param null $config
      */
-    public function __construct($config = null) {
+    public function __construct($config = null)
+    {
         $this->init($config);
     }
 
@@ -68,42 +71,48 @@ class Gdn_CookieIdentity {
      *
      * @param null $config
      */
-    public function init($config = null) {
+    public function init($config = null)
+    {
         if (is_null($config)) {
-            $config = Gdn::config('Garden.Cookie');
+            $config = Gdn::config("Garden.Cookie");
         } elseif (is_string($config)) {
             $config = Gdn::config($config);
         }
 
         $defaultConfig = array_replace(
-            ['PersistExpiry' => '30 days', 'SessionExpiry' => '2 days'],
-            Gdn::config('Garden.Cookie')
+            ["PersistExpiry" => "30 days", "SessionExpiry" => "2 days"],
+            Gdn::config("Garden.Cookie")
         );
-        $this->CookieName = val('Name', $config, $defaultConfig['Name']);
-        $this->CookiePath = val('Path', $config, $defaultConfig['Path']);
-        $this->CookieDomain = val('Domain', $config, $defaultConfig['Domain']);
+        $this->CookieName = val("Name", $config, $defaultConfig["Name"]);
+        $this->CookiePath = val("Path", $config, $defaultConfig["Path"]);
+        $this->CookieDomain = val("Domain", $config, $defaultConfig["Domain"]);
 
         // If the domain being set is completely incompatible with the current domain then make the domain work.
         $currentHost = Gdn::request()->host();
-        if (!stringEndsWith($currentHost, trim($this->CookieDomain, '.'))) {
-            $this->CookieDomain = '';
+        if (!stringEndsWith($currentHost, trim($this->CookieDomain, "."))) {
+            $this->CookieDomain = "";
             trigger_error(
-                sprintf('Config "Garden.Cookie.Domain" is incompatible with the current host (%s vs %s).', $currentHost, $this->CookieDomain),
+                sprintf(
+                    'Config "Garden.Cookie.Domain" is incompatible with the current host (%s vs %s).',
+                    $currentHost,
+                    $this->CookieDomain
+                ),
                 E_USER_NOTICE
             );
         }
 
-        $this->CookieHashMethod = val('HashMethod', $config, $defaultConfig['HashMethod']);
-        $this->CookieSalt = val('Salt', $config, $defaultConfig['Salt']);
-        $this->VolatileMarker = $this->CookieName.'-Volatile';
-        $this->PersistExpiry = val('PersistExpiry', $config, $defaultConfig['PersistExpiry']);
-        $this->SessionExpiry = val('SessionExpiry', $config, $defaultConfig['SessionExpiry']);
+        $this->CookieHashMethod = val("HashMethod", $config, $defaultConfig["HashMethod"]);
+        $this->CookieSalt = val("Salt", $config, $defaultConfig["Salt"]);
+        $this->VolatileMarker = $this->CookieName . "-Volatile";
+        $this->PersistExpiry = val("PersistExpiry", $config, $defaultConfig["PersistExpiry"]);
+        $this->SessionExpiry = val("SessionExpiry", $config, $defaultConfig["SessionExpiry"]);
     }
 
     /**
      * Destroys the user's session cookie - essentially de-authenticating them.
      */
-    protected function _clearIdentity() {
+    protected function _clearIdentity()
+    {
         // Destroy the cookie.
         $this->UserID = 0;
         $this->SessionID = "";
@@ -119,7 +128,8 @@ class Gdn_CookieIdentity {
      * @throws \Garden\Schema\ValidationException Exception of the validation.
      * @throws Exception Exception from validation.
      */
-    public function getIdentity() {
+    public function getIdentity()
+    {
         if (!is_null($this->UserID) && $this->UserID > 0) {
             return $this->UserID;
         }
@@ -134,7 +144,7 @@ class Gdn_CookieIdentity {
             switch ($version) {
                 case 1:
                     if ($this->_checkCookie($name)) {
-                        list($userID) = self::getCookiePayload($name);
+                        [$userID] = self::getCookiePayload($name);
                         // Old cookie identity. Upgrade it.
                         $payload = $this->setIdentity($userID);
                     }
@@ -142,16 +152,27 @@ class Gdn_CookieIdentity {
                 case self::VERSION:
                 default:
                     $payload = $this->getJWTPayload($name);
-                    $userID = val('sub', $payload, 0);
+                    $userID = val("sub", $payload, 0);
                     if (\Vanilla\FeatureFlagHelper::featureEnabled(Gdn_Session::FEATURE_SESSION_ID_COOKIE)) {
-                        $sessionName = 'sid';
+                        $sessionName = "sid";
                         $this->SessionID = val($sessionName, $payload, "");
                         $sessionModel = new SessionModel();
                         // If session was created before this session, lets convert it.
                         if (stringIsNullOrEmpty($this->SessionID) && $userID != 0) {
+                            if (
+                                \Vanilla\FeatureFlagHelper::featureEnabled(
+                                    Gdn_Session::FEATURE_ENFORCE_SESSION_ID_COOKIE
+                                )
+                            ) {
+                                $this->_clearIdentity();
+                                $cookie = Gdn::getContainer()->get(Cookie::class);
+                                //Pushed removal of cookie, to allow user to login again.
+                                $cookie->flush();
+                                throw new ForbiddenException("Cookie must have session ID.");
+                            }
                             $sessionModel = new SessionModel();
                             $session = $sessionModel->startNewSession($userID);
-                            $this->SessionID = $session['SessionID'];
+                            $this->SessionID = $session["SessionID"];
                             // $this->_clearIdentity();
                             $this->setIdentity($userID, true, $this->SessionID);
                         } else {
@@ -160,7 +181,7 @@ class Gdn_CookieIdentity {
                                 $this->_clearIdentity();
                                 $userID = 0;
                             } else {
-                                $userID = val('UserID', $session, 0);
+                                $userID = val("UserID", $session, 0);
                             }
                         }
                     }
@@ -172,11 +193,12 @@ class Gdn_CookieIdentity {
             } elseif (is_array($payload)) {
                 Gdn::pluginManager()
                     ->fireAs(self::class)
-                    ->fireEvent('getIdentity', ['payload' => &$payload]);
+                    ->fireEvent("getIdentity", ["payload" => &$payload]);
             }
         }
 
-        if (filter_var($userID, FILTER_VALIDATE_INT) === false || $userID < -2) { // allow for handshake special id
+        if (filter_var($userID, FILTER_VALIDATE_INT) === false || $userID < -2) {
+            // allow for handshake special id
             $userID = 0;
         }
 
@@ -193,7 +215,8 @@ class Gdn_CookieIdentity {
      *
      * @return int
      */
-    public function getSession() {
+    public function getSession()
+    {
         if (stringIsNullOrEmpty($this->SessionID)) {
             $this->getIdentity();
         }
@@ -206,7 +229,8 @@ class Gdn_CookieIdentity {
      * @param $checkUserID
      * @return bool
      */
-    public function hasVolatileMarker($checkUserID) {
+    public function hasVolatileMarker($checkUserID)
+    {
         $hasMarker = $this->checkVolatileMarker($checkUserID);
         if (!$hasMarker) {
             $this->setVolatileMarker($checkUserID);
@@ -221,13 +245,14 @@ class Gdn_CookieIdentity {
      * @param string $name
      * @return int|null
      */
-    protected function getCookieVersion($name) {
+    protected function getCookieVersion($name)
+    {
         $result = null;
 
         if (array_key_exists($name, $_COOKIE)) {
             $cookie = $_COOKIE[$name];
 
-            $v1Parts = explode('|', $cookie);
+            $v1Parts = explode("|", $cookie);
             if (count($v1Parts) === 5) {
                 $result = 1;
             } elseif ($this->getJWTPayload($name) !== null) {
@@ -244,12 +269,13 @@ class Gdn_CookieIdentity {
      * @param $checkUserID
      * @return bool
      */
-    public function checkVolatileMarker($checkUserID) {
+    public function checkVolatileMarker($checkUserID)
+    {
         if (!$this->_CheckCookie($this->VolatileMarker)) {
             return false;
         }
 
-        list($userID) = self::getCookiePayload($this->CookieName);
+        [$userID] = self::getCookiePayload($this->CookieName);
 
         if ($userID != $checkUserID) {
             return false;
@@ -264,7 +290,8 @@ class Gdn_CookieIdentity {
      * @param string $name
      * @return mixed
      */
-    public function getAttribute($name) {
+    public function getAttribute($name)
+    {
         $payload = $this->getJWTPayload($this->CookieName);
         $result = val($name, $payload, null);
         return $result;
@@ -277,12 +304,13 @@ class Gdn_CookieIdentity {
      * @param mixed $value
      * @return bool
      */
-    public function setAttribute($name, $value) {
+    public function setAttribute($name, $value)
+    {
         $payload = $this->getJWTPayload($this->CookieName);
         $result = false;
 
         if (is_scalar($value) && (is_array($payload) || is_object($payload))) {
-            $expiry = val('exp', $payload, strtotime($this->PersistExpiry));
+            $expiry = val("exp", $payload, strtotime($this->PersistExpiry));
             setValue($name, $payload, $value);
             $this->setJWTPayload($this->CookieName, $payload, $expiry);
             $result = true;
@@ -301,9 +329,10 @@ class Gdn_CookieIdentity {
      * @throws Exception If the cookie salt is empty.
      * @return array|bool
      */
-    public function setIdentity(int $userID = null, bool $persist = false, string $sessionID = null) {
+    public function setIdentity(int $userID = null, bool $persist = false, string $sessionID = null)
+    {
         if (empty($this->CookieSalt)) {
-            throw new Exception('Cookie salt is empty.', 500);
+            throw new Exception("Cookie salt is empty.", 500);
         }
 
         if (is_null($userID)) {
@@ -323,19 +352,19 @@ class Gdn_CookieIdentity {
         }
         $timestamp = time();
         $payload = [
-            'exp' => strtotime($this->PersistExpiry), // Expiration
-            'iat' => $timestamp, // Issued at
+            "exp" => strtotime($this->PersistExpiry), // Expiration
+            "iat" => $timestamp, // Issued at
         ];
         if (\Vanilla\FeatureFlagHelper::featureEnabled(Gdn_Session::FEATURE_SESSION_ID_COOKIE)) {
-            $payload['sid'] = $sessionID; // Session ID
+            $payload["sid"] = $sessionID; // Session ID
         }
-        $payload['sub'] = $userID; // Subject
+        $payload["sub"] = $userID; // Subject
 
         // Generate the token.
 
         Gdn::pluginManager()
             ->fireAs(self::class)
-            ->fireEvent('setIdentity', ['payload' => &$payload]);
+            ->fireEvent("setIdentity", ["payload" => &$payload]);
 
         $this->setJWTPayload($this->CookieName, $payload, $expiry);
         return $payload;
@@ -347,7 +376,8 @@ class Gdn_CookieIdentity {
      * @param integer $userID
      * @return void
      */
-    public function setVolatileMarker($userID) {
+    public function setVolatileMarker($userID)
+    {
         if (is_null($userID)) {
             return;
         }
@@ -357,7 +387,7 @@ class Gdn_CookieIdentity {
         // Note: setting $Expire to 0 will cause the cookie to die when the browser closes.
         $cookieExpires = 0;
 
-        $keyData = $userID.'-'.$payloadExpires;
+        $keyData = $userID . "-" . $payloadExpires;
         $this->_setCookie($this->VolatileMarker, $keyData, [$userID, $payloadExpires], $cookieExpires);
     }
 
@@ -370,8 +400,18 @@ class Gdn_CookieIdentity {
      * @param integer $cookieExpires
      * @return void
      */
-    protected function _setCookie($cookieName, $keyData, $cookieContents, $cookieExpires) {
-        self::setCookie($cookieName, $keyData, $cookieContents, $cookieExpires, $this->CookiePath, $this->CookieDomain, $this->CookieHashMethod, $this->CookieSalt);
+    protected function _setCookie($cookieName, $keyData, $cookieContents, $cookieExpires)
+    {
+        self::setCookie(
+            $cookieName,
+            $keyData,
+            $cookieContents,
+            $cookieExpires,
+            $this->CookiePath,
+            $this->CookieDomain,
+            $this->CookieHashMethod,
+            $this->CookieSalt
+        );
     }
 
     /**
@@ -388,31 +428,40 @@ class Gdn_CookieIdentity {
      * @param string $cookieSalt Optional. Cookie salt (auto load from config)
      * @return void
      */
-    public static function setCookie($cookieName, $keyData, $cookieContents, $cookieExpires, $path = null, $domain = null, $cookieHashMethod = null, $cookieSalt = null) {
+    public static function setCookie(
+        $cookieName,
+        $keyData,
+        $cookieContents,
+        $cookieExpires,
+        $path = null,
+        $domain = null,
+        $cookieHashMethod = null,
+        $cookieSalt = null
+    ) {
         if (is_null($path)) {
-            $path = Gdn::config('Garden.Cookie.Path', '/');
+            $path = Gdn::config("Garden.Cookie.Path", "/");
         }
 
         if (is_null($domain)) {
-            $domain = Gdn::config('Garden.Cookie.Domain', '');
+            $domain = Gdn::config("Garden.Cookie.Domain", "");
         }
 
         // If the domain being set is completely incompatible with the current domain then make the domain work.
         $currentHost = Gdn::request()->host();
-        if (!stringEndsWith($currentHost, trim($domain, '.'))) {
-            $domain = '';
+        if (!stringEndsWith($currentHost, trim($domain, "."))) {
+            $domain = "";
         }
 
         if (!$cookieHashMethod) {
-            $cookieHashMethod = Gdn::config('Garden.Cookie.HashMethod');
+            $cookieHashMethod = Gdn::config("Garden.Cookie.HashMethod");
         }
 
         if (!$cookieSalt) {
-            $cookieSalt = Gdn::config('Garden.Cookie.Salt');
+            $cookieSalt = Gdn::config("Garden.Cookie.Salt");
         }
 
         if (empty($cookieSalt)) {
-            throw new Exception('Cookie salt is empty.', 500);
+            throw new Exception("Cookie salt is empty.", 500);
         }
 
         // Create the cookie signature
@@ -422,10 +471,10 @@ class Gdn_CookieIdentity {
 
         // Attach cookie payload
         if (!is_null($cookieContents)) {
-            $cookieContents = (array)$cookieContents;
+            $cookieContents = (array) $cookieContents;
             $cookie = array_merge($cookie, $cookieContents);
         }
-        $cookieContents = implode('|', $cookie);
+        $cookieContents = implode("|", $cookie);
 
         // Create the cookie.
         safeCookie($cookieName, $cookieContents, $cookieExpires, $path, $domain, null, true);
@@ -438,7 +487,8 @@ class Gdn_CookieIdentity {
      * @param $cookieName
      * @return bool
      */
-    protected function _checkCookie($cookieName) {
+    protected function _checkCookie($cookieName)
+    {
         $cookieStatus = self::checkCookie($cookieName, $this->CookieHashMethod, $this->CookieSalt);
         if ($cookieStatus === false) {
             $this->_deleteCookie($cookieName);
@@ -455,31 +505,32 @@ class Gdn_CookieIdentity {
      * @param null $cookieSalt
      * @return bool
      */
-    public static function checkCookie($cookieName, $cookieHashMethod = null, $cookieSalt = null) {
+    public static function checkCookie($cookieName, $cookieHashMethod = null, $cookieSalt = null)
+    {
         if (empty($_COOKIE[$cookieName])) {
             return false;
         }
 
         if (is_null($cookieHashMethod)) {
-            $cookieHashMethod = Gdn::config('Garden.Cookie.HashMethod');
+            $cookieHashMethod = Gdn::config("Garden.Cookie.HashMethod");
         }
 
         if (is_null($cookieSalt)) {
-            $cookieSalt = Gdn::config('Garden.Cookie.Salt');
+            $cookieSalt = Gdn::config("Garden.Cookie.Salt");
         }
 
         if (empty($cookieSalt)) {
-            throw new Exception('Cookie salt is empty.', 500);
+            throw new Exception("Cookie salt is empty.", 500);
         }
 
-        $cookieData = explode('|', $_COOKIE[$cookieName]);
+        $cookieData = explode("|", $_COOKIE[$cookieName]);
         if (count($cookieData) < 5) {
             self::deleteCookie($cookieName);
             return false;
         }
 
-        list($hashKey, $cookieHash) = $cookieData;
-        list($userID, $expiration) = self::getCookiePayload($cookieName);
+        [$hashKey, $cookieHash] = $cookieData;
+        [$userID, $expiration] = self::getCookiePayload($cookieName);
         if ($expiration < time()) {
             self::deleteCookie($cookieName);
             return false;
@@ -501,11 +552,12 @@ class Gdn_CookieIdentity {
      * @param string $cookieName
      * @return array
      */
-    public static function getCookiePayload($cookieName) {
-        $payload = explode('|', $_COOKIE[$cookieName]);
-        $key = explode('-', $payload[0]);
+    public static function getCookiePayload($cookieName)
+    {
+        $payload = explode("|", $_COOKIE[$cookieName]);
+        $key = explode("-", $payload[0]);
         $expiration = array_pop($key);
-        $userID = implode('-', $key);
+        $userID = implode("-", $key);
         $payload = array_slice($payload, 4);
         $payload = array_merge([$userID, $expiration], $payload);
 
@@ -517,8 +569,9 @@ class Gdn_CookieIdentity {
      *
      * @return int|null
      */
-    public function getAuthTime() {
-        $result = $this->getAttribute('iat');
+    public function getAuthTime()
+    {
+        $result = $this->getAttribute("iat");
         return $result;
     }
 
@@ -529,9 +582,10 @@ class Gdn_CookieIdentity {
      * @param string $name Name of the cookie holding a JWT token.
      * @return array|null
      */
-    public function getJWTPayload($name) {
+    public function getJWTPayload($name)
+    {
         if (empty($this->CookieSalt)) {
-            throw new Exception('Cookie salt is empty.', 500);
+            throw new Exception("Cookie salt is empty.", 500);
         }
 
         $result = null;
@@ -541,15 +595,13 @@ class Gdn_CookieIdentity {
             try {
                 $payload = JWT::decode($jwt, $this->CookieSalt, [self::JWT_ALGORITHM]);
                 if (is_object($payload)) {
-                    $result = (array)$payload;
+                    $result = (array) $payload;
                 }
             } catch (Exception $e) {
-                Logger::event(
-                    'cookie_jwt_error',
-                    Logger::ERROR,
-                    $e->getMessage(),
-                    ['jwt' => $jwt, Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
-                );
+                Logger::event("cookie_jwt_error", Logger::ERROR, $e->getMessage(), [
+                    "jwt" => $jwt,
+                    Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
+                ]);
             }
         }
 
@@ -561,8 +613,9 @@ class Gdn_CookieIdentity {
      *
      * @param int $timestamp
      */
-    public function setAuthTime($timestamp) {
-        $this->setAttribute('iat', $timestamp);
+    public function setAuthTime($timestamp)
+    {
+        $this->setAttribute("iat", $timestamp);
     }
 
     /**
@@ -573,10 +626,11 @@ class Gdn_CookieIdentity {
      * @param int $expiry
      * @return string
      */
-    public function setJWTPayload($name, $payload, $expiry) {
+    public function setJWTPayload($name, $payload, $expiry)
+    {
         $jwt = JWT::encode($payload, $this->CookieSalt, self::JWT_ALGORITHM);
 
-        setValue('exp', $payload, $expiry);
+        setValue("exp", $payload, $expiry);
 
         // Send the updated cookie to the browser.
         safeCookie($name, $jwt, $expiry, $this->CookiePath, $this->CookieDomain, null, true);
@@ -592,7 +646,8 @@ class Gdn_CookieIdentity {
      *
      * @param $cookieName
      */
-    protected function _deleteCookie($cookieName) {
+    protected function _deleteCookie($cookieName)
+    {
         if (!array_key_exists($cookieName, $_COOKIE)) {
             return;
         }
@@ -608,18 +663,19 @@ class Gdn_CookieIdentity {
      * @param null $path
      * @param null $domain
      */
-    public static function deleteCookie($cookieName, $path = null, $domain = null) {
+    public static function deleteCookie($cookieName, $path = null, $domain = null)
+    {
         if (is_null($path)) {
-            $path = Gdn::config('Garden.Cookie.Path');
+            $path = Gdn::config("Garden.Cookie.Path");
         }
 
         if (is_null($domain)) {
-            $domain = Gdn::config('Garden.Cookie.Domain');
+            $domain = Gdn::config("Garden.Cookie.Domain");
         }
 
         $currentHost = Gdn::request()->host();
-        if (!stringEndsWith($currentHost, trim($domain, '.'))) {
-            $domain = '';
+        if (!stringEndsWith($currentHost, trim($domain, "."))) {
+            $domain = "";
         }
 
         $expiry = time() - 60 * 60;

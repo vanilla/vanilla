@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { AppearanceNav } from "@dashboard/appearance/nav/AppearanceNav";
 import AdminLayout from "@dashboard/components/AdminLayout";
 import { TitleBarDevices, useTitleBarDevice } from "@library/layout/TitleBarContext";
@@ -11,14 +11,13 @@ import { useCollisionDetector } from "@vanilla/react-utils";
 import { t } from "@vanilla/i18n";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import { RouteComponentProps } from "react-router";
-import { useLayout, usePutLayoutView } from "@dashboard/layout/layoutSettings/LayoutSettings.hooks";
+import { RouteComponentProps } from "react-router-dom";
+import { useDeleteLayout, useLayout, usePutLayoutView } from "@dashboard/layout/layoutSettings/LayoutSettings.hooks";
 import { LoadStatus } from "@library/@types/api/core";
 import ErrorMessages from "@library/forms/ErrorMessages";
 import { notEmpty } from "@vanilla/utils";
 import Translate from "@library/content/Translate";
 import DateTime from "@library/content/DateTime";
-import { useUser } from "@library/features/users/userHooks";
 import { ILayoutDetails, LayoutViewType } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import layoutOverviewPageClasses from "./LayoutOverviewPage.classes";
@@ -29,7 +28,14 @@ import { LayoutOverview } from "@dashboard/layout/overview/LayoutOverview";
 import { MetaItem, Metas } from "@library/metas/Metas";
 import ProfileLink from "@library/navigation/ProfileLink";
 import { metasClasses } from "@library/metas/Metas.styles";
-import { LayoutEditorRoute } from "@dashboard/appearance/routes/appearanceRoutes";
+import { LayoutEditorRoute, LegacyLayoutsRoute } from "@dashboard/appearance/routes/appearanceRoutes";
+import { getRelativeUrl } from "@library/utility/appUtils";
+import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
+import { Icon } from "@vanilla/icons";
+import { iconClasses } from "@library/icons/iconStyles";
+import { useToast } from "@library/features/toaster/ToastContext";
+import { css } from "@emotion/css";
+import ModalConfirm from "@library/modal/ModalConfirm";
 
 interface IDescriptionProps {
     layout: ILayoutDetails;
@@ -83,16 +89,51 @@ export default function LayoutOverviewPage(
         layoutViewType: LayoutViewType;
     }>,
 ) {
+    const { history } = props;
     const layoutID = props.match.params.layoutID;
     const layoutViewType = props.match.params.layoutViewType;
-    const layoutLoadable = useLayout(layoutID);
-    const layout = layoutLoadable.data;
+
+    const toast = useToast();
 
     const classes = layoutOverviewPageClasses();
     const device = useTitleBarDevice();
     const { hasCollision } = useCollisionDetector();
     const isCompact = hasCollision || device === TitleBarDevices.COMPACT;
+
     const putLayoutView = usePutLayoutView(layoutID);
+
+    const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+
+    function openDeleteModal() {
+        setDeleteModalVisible(true);
+    }
+
+    function closeDeleteModal() {
+        setDeleteModalVisible(false);
+    }
+
+    const deleteLayout = useDeleteLayout({
+        layoutID,
+        onSuccessBeforeDeletion: () => history.replace(getRelativeUrl(LegacyLayoutsRoute.url(layoutViewType))),
+    });
+
+    async function handleDeleteLayout() {
+        try {
+            await deleteLayout();
+            toast.addToast({
+                autoDismiss: true,
+                body: <>{t("Layout successfully deleted.")}</>,
+            });
+        } catch (e) {
+            toast.addToast({
+                autoDismiss: true,
+                body: <>{e.description}</>,
+            });
+        }
+    }
+
+    const layoutLoadable = useLayout(layoutID);
+    const layout = layoutLoadable.data;
 
     const layoutStatusIsPending = [LoadStatus.PENDING, LoadStatus.LOADING].includes(layoutLoadable.status);
     const layoutStatusIsError = !layoutLoadable.data || layoutLoadable.error;
@@ -109,6 +150,9 @@ export default function LayoutOverviewPage(
                 layoutView.recordType === globalLayoutView.recordType &&
                 layoutView.recordID === globalLayoutView.recordID,
         );
+
+    const isDefault = layout?.isDefault ?? false;
+    const canDelete = !viewIsAlreadyApplied && !isDefault;
 
     const errorContent = (errorLoadable) => (
         <ErrorWrapper message={errorLoadable.error.message}>
@@ -135,8 +179,34 @@ export default function LayoutOverviewPage(
                     {t("Apply")}
                 </DropDownItemButton>
 
-                {/* <DropDownItemButton onClick={() => {}}>{t("Preview")}</DropDownItemButton>
-                 <DropDownItemButton onClick={() => {}}>{t("Delete")}</DropDownItemButton> */}
+                {/* <DropDownItemButton onClick={() => {}}>{t("Preview")}</DropDownItemButton> */}
+
+                <DropDownItemButton onClick={openDeleteModal} disabled={!canDelete}>
+                    <span className={classes.dropdownItemLabel}>{t("Delete")}</span>
+                    {!canDelete && (
+                        <ToolTip
+                            label={
+                                viewIsAlreadyApplied
+                                    ? t("This layout cannot be deleted because it is currently applied.")
+                                    : t("This is a default layout and cannot be deleted.") //fixme
+                            }
+                        >
+                            <ToolTipIcon>
+                                <Icon className={iconClasses().errorFgColor} icon={"status-warning"} size={"compact"} />
+                            </ToolTipIcon>
+                        </ToolTip>
+                    )}
+                    <ModalConfirm
+                        isVisible={deleteModalVisible}
+                        title={t("Delete Layout")}
+                        onCancel={closeDeleteModal}
+                        onConfirm={handleDeleteLayout}
+                        confirmTitle={t("Delete")}
+                        bodyClassName={css({ justifyContent: "start" })}
+                    >
+                        {t("Are you sure you want to delete?")}
+                    </ModalConfirm>
+                </DropDownItemButton>
             </DropDown>
             <LinkAsButton
                 buttonType={ButtonTypes.OUTLINE}

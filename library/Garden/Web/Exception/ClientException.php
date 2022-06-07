@@ -10,7 +10,8 @@ namespace Garden\Web\Exception;
 /**
  * Represents a 400 series exception.
  */
-class ClientException extends HttpException {
+class ClientException extends HttpException
+{
     /**
      * Initialize an instance of the {@link ClientException} class.
      *
@@ -25,7 +26,8 @@ class ClientException extends HttpException {
      * @param int $code The http error code.
      * @param array $context An array of context variables that can be used to render a more detailed response.
      */
-    public function __construct($message = '', $code = 400, array $context = []) {
+    public function __construct($message = "", $code = 400, array $context = [])
+    {
         parent::__construct($message, $code, $context);
     }
 }

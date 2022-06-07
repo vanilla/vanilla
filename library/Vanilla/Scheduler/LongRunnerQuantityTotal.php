@@ -10,8 +10,8 @@ namespace Vanilla\Scheduler;
 /**
  * Yield this to tell the long runner the total quantity of items that can be progressed.
  */
-final class LongRunnerQuantityTotal {
-
+final class LongRunnerQuantityTotal
+{
     /** @var int */
     private $value;
 
@@ -20,14 +20,16 @@ final class LongRunnerQuantityTotal {
      *
      * @param int $value The total quantity of items that can be progress.
      */
-    public function __construct(int $value) {
+    public function __construct(int $value)
+    {
         $this->value = $value;
     }
 
     /**
      * @return int
      */
-    public function getValue(): int {
+    public function getValue(): int
+    {
         return $this->value;
     }
 }

@@ -15,8 +15,8 @@ use Vanilla\Web\Pagination\WebLinking;
 /**
  * A local job for handling bulk deletes.
  */
-class LocalApiBulkDeleteJob extends LocalApiJob implements TrackableJobAwareInterface {
-
+class LocalApiBulkDeleteJob extends LocalApiJob implements TrackableJobAwareInterface
+{
     const PROGRESS_EVERY = 10;
 
     use TrackableJobAwareTrait;
@@ -47,15 +47,20 @@ class LocalApiBulkDeleteJob extends LocalApiJob implements TrackableJobAwareInte
      *
      * @param JobStatusModel $jobStatusModel
      */
-    public function __construct(JobStatusModel $jobStatusModel) {
+    public function __construct(JobStatusModel $jobStatusModel)
+    {
         $this->jobStatusModel = $jobStatusModel;
     }
 
     /**
      * @return JobExecutionStatus
      */
-    public function run(): JobExecutionStatus {
-        $this->vanillaClient->setDefaultHeader(LogTransactionMiddleware::HEADER_NAME, \LogModel::generateTransactionID());
+    public function run(): JobExecutionStatus
+    {
+        $this->vanillaClient->setDefaultHeader(
+            LogTransactionMiddleware::HEADER_NAME,
+            \LogModel::generateTransactionID()
+        );
 
         foreach ($this->runIterator() as $status) {
             if ($status instanceof JobExecutionProgress) {
@@ -76,7 +81,8 @@ class LocalApiBulkDeleteJob extends LocalApiJob implements TrackableJobAwareInte
      * @return \Generator<JobExecutionStatus>
      * @internal Only exposed publicly for usage in tests.
      */
-    public function runIterator(int $progressionFrequency = self::PROGRESS_EVERY): \Generator {
+    public function runIterator(int $progressionFrequency = self::PROGRESS_EVERY): \Generator
+    {
         $progressionFrequency = max($progressionFrequency, 1);
         $quantityComplete = 0;
         $nextPage = null;
@@ -90,7 +96,7 @@ class LocalApiBulkDeleteJob extends LocalApiJob implements TrackableJobAwareInte
             }
             $header = $response->getHeader(WebLinking::HEADER_NAME);
             $linkHeaders = WebLinking::parseLinkHeaders($header);
-            $nextPage = $linkHeaders['next'] ?? null;
+            $nextPage = $linkHeaders["next"] ?? null;
             $apiResults = $response->getBody();
             // Loop through each one and delete it.
             foreach ($apiResults as $apiResult) {
@@ -114,31 +120,30 @@ class LocalApiBulkDeleteJob extends LocalApiJob implements TrackableJobAwareInte
     /**
      * @inheritdoc
      */
-    public function setMessage(array $message) {
+    public function setMessage(array $message)
+    {
         $schema = Schema::parse([
-            'iteratorUrl:s',
-            'recordIDField:s',
-            'deleteUrlPattern:s', // Pattern "/some/path/:recordID/asdfasdf
-            'finalDeleteUrl:s?',
-            'countRecords:s?',
-            'notify:o?' => [
-                'userID:i',
-                'title:s',
-                'body:s',
-            ],
+            "iteratorUrl:s",
+            "recordIDField:s",
+            "deleteUrlPattern:s", // Pattern "/some/path/:recordID/asdfasdf
+            "finalDeleteUrl:s?",
+            "countRecords:s?",
+            "notify:o?" => ["userID:i", "title:s", "body:s"],
         ]);
 
         $message = $schema->validate($message);
-        $this->iteratorUrl = $message['iteratorUrl'];
-        $this->recordIDField = $message['recordIDField'];
-        $this->deleteUrlPattern = $message['deleteUrlPattern'];
-        $this->countRecords = $message['countRecords'] ?? null;
+        $this->iteratorUrl = $message["iteratorUrl"];
+        $this->recordIDField = $message["recordIDField"];
+        $this->deleteUrlPattern = $message["deleteUrlPattern"];
+        $this->countRecords = $message["countRecords"] ?? null;
 
         if (strpos($this->deleteUrlPattern, ":recordID") === false) {
-            throw new \Exception("Unable to queue a bulk delete job with an invalid deleteUrlPattern. It must contain a `:recordID` placeholder");
+            throw new \Exception(
+                "Unable to queue a bulk delete job with an invalid deleteUrlPattern. It must contain a `:recordID` placeholder"
+            );
         }
 
-        $this->finalDeleteUrl = $message['finalDeleteUrl'] ?? null;
-        $this->notify = $message['notify'] ?? null;
+        $this->finalDeleteUrl = $message["finalDeleteUrl"] ?? null;
+        $this->notify = $message["notify"] ?? null;
     }
 }

@@ -35,6 +35,11 @@ paths:
                   name: siteSectionID
                   schema:
                       type: string
+                - description: Filter discussion by a range of tag IDs.
+                  in: query
+                  name: tagID
+                  schema:
+                      $ref: "#/components/schemas/RangeExpression"
                 - description: Filter by discussion type.
                   in: query
                   name: type
@@ -127,6 +132,18 @@ paths:
                       type: boolean
                   x-filter:
                       field: d.Resolved
+                - description: Bookmarked by the UserID.
+                  in: query
+                  name: bookmarkUserID
+                  schema:
+                      type: integer
+                  allowEmptyValue: false
+                - description: Commented (participated) on by the UserID.
+                  in: query
+                  name: participatedUserID
+                  schema:
+                      type: integer
+                  allowEmptyValue: false
             responses:
                 "200":
                     content:

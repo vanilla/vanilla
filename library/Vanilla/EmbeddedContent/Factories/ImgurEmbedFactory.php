@@ -15,8 +15,8 @@ use Vanilla\Utility\HtmlParserTrait;
 /**
  * Factory for the ImgurEmbed.
  */
-class ImgurEmbedFactory extends AbstractEmbedFactory {
-
+class ImgurEmbedFactory extends AbstractEmbedFactory
+{
     use HtmlParserTrait;
 
     const DOMAINS = ["imgur.com"];
@@ -31,14 +31,16 @@ class ImgurEmbedFactory extends AbstractEmbedFactory {
      *
      * @param HttpClient $httpClient
      */
-    public function __construct(HttpClient $httpClient) {
+    public function __construct(HttpClient $httpClient)
+    {
         $this->httpClient = $httpClient;
     }
 
     /**
      * @inheritdoc
      */
-    protected function getSupportedDomains(): array {
+    protected function getSupportedDomains(): array
+    {
         return self::DOMAINS;
     }
 
@@ -46,7 +48,8 @@ class ImgurEmbedFactory extends AbstractEmbedFactory {
      * We pass along to the oembed service. If it can't parse the URL, then we definitely can't.
      * @inheritdoc
      */
-    protected function getSupportedPathRegex(string $domain): string {
+    protected function getSupportedPathRegex(string $domain): string
+    {
         // Imgur paths are incredibly complicated.
         // See https://www.reddit.com/r/redditdev/comments/35bb7i/imgur_link_format/ for examples.
         // We will pretty much always hit their API, so a pretty freeform slug should suffice.
@@ -58,11 +61,9 @@ class ImgurEmbedFactory extends AbstractEmbedFactory {
      *
      * @inheritdoc
      */
-    public function createEmbedForUrl(string $url): AbstractEmbed {
-        $response = $this->httpClient->get(
-            self::OEMBED_URL_BASE,
-            ["url" => $url]
-        );
+    public function createEmbedForUrl(string $url): AbstractEmbed
+    {
+        $response = $this->httpClient->get(self::OEMBED_URL_BASE, ["url" => $url]);
 
         // Example Response JSON
         // phpcs:disable Generic.Files.LineLength
@@ -82,11 +83,11 @@ class ImgurEmbedFactory extends AbstractEmbedFactory {
         $blockAttributes = $this->parseSimpleAttrs($response["html"], "blockquote");
 
         $data = [
-            'embedType' => ImgurEmbed::TYPE,
-            'url' => $url,
-            'name' => $response['title'] ?? '',
-            'height' => $response['height'] ?? null,
-            'width' => $response['width'] ?? null,
+            "embedType" => ImgurEmbed::TYPE,
+            "url" => $url,
+            "name" => $response["title"] ?? "",
+            "height" => $response["height"] ?? null,
+            "width" => $response["width"] ?? null,
             "imgurID" => $blockAttributes["data-id"] ?? null,
         ];
 

@@ -96,7 +96,6 @@
         "phpunit/phpunit": "~8.0",
         "roave/security-advisories": "dev-latest",
         "symfony/phpunit-bridge": "^5.1",
-        "vanilla/standards": "~1.3",
         "vimeo/psalm": "^3.13",
         "voku/html-min": "3.0.5",
         "voku/simple_html_dom": "4.1.7"

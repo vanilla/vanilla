@@ -16,13 +16,18 @@ use Vanilla\Layout\Resolvers\ReactResolver;
 /**
  * Middleware for controlling the visibility of a hydrated react node.
  */
-class VisibilityMiddleware extends AbstractMiddleware {
-
+class VisibilityMiddleware extends AbstractMiddleware
+{
     /**
      * We can't actually determine our device on the server (we don't know it's size) so pass it through to the frontend.
      * @inheritdoc
      */
-    protected function processInternal(array $nodeData, array $middlewareParams, array $hydrateParams, DataResolverInterface $next) {
+    protected function processInternal(
+        array $nodeData,
+        array $middlewareParams,
+        array $hydrateParams,
+        DataResolverInterface $next
+    ) {
         $hydrated = $next->resolve($nodeData, $hydrateParams);
 
         if (ReactResolver::isReactNode($hydrated)) {
@@ -36,27 +41,25 @@ class VisibilityMiddleware extends AbstractMiddleware {
     /**
      * @inheritdoc
      */
-    public function getType(): string {
+    public function getType(): string
+    {
         return "visibility";
     }
 
     /**
      * @inheritdoc
      */
-    public function getSchema(): ?Schema {
+    public function getSchema(): ?Schema
+    {
         return Schema::parse([
             "device:s?" => [
-                'description' => 'Choose which type of devices to render the widget on',
-                'default' => 'all',
-                'enum' => [
-                    "all",
-                    "desktop",
-                    "mobile",
-                ],
-                'enumDescriptions' => [
-                    'Render on all devices.',
-                    'Render only on desktop devices.',
-                    'Render only on mobile devices.',
+                "description" => "Choose which type of devices to render the widget on",
+                "default" => "all",
+                "enum" => ["all", "desktop", "mobile"],
+                "enumDescriptions" => [
+                    "Render on all devices.",
+                    "Render only on desktop devices.",
+                    "Render only on mobile devices.",
                 ],
             ],
         ]);

@@ -17,8 +17,8 @@ use function trace;
 /**
  * Class for logging errors in vanilla.
  */
-final class ErrorLogger {
-
+final class ErrorLogger
+{
     /** @var bool */
     private static $inCall = false;
 
@@ -27,7 +27,7 @@ final class ErrorLogger {
     public const CHANNEL_PHP = "channel-php";
     public const CHANNEL_VANILLA = "channel-vanilla";
 
-    public const CONF_LOG_FILE = 'errors.logFilePath';
+    public const CONF_LOG_FILE = "errors.logFilePath";
     public const CONF_LOG_NOTICES = "errors.logNotices";
 
     public const TAG_THROWABLE = "throwable";
@@ -42,12 +42,14 @@ final class ErrorLogger {
     public const LEVEL_CRITICAL = "critical";
 
     private const ERROR_SUPPRESSED = 0;
-    private const BITMASK_FATAL = E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR;
+    private const BITMASK_FATAL =
+        E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR;
     private const BITMASK_NOTICE = E_NOTICE | E_USER_NOTICE;
     private const BITMASK_DEPRECATED = E_DEPRECATED | E_USER_DEPRECATED;
     private const BITMASK_WARNING = E_WARNING | E_USER_WARNING | E_STRICT | self::BITMASK_DEPRECATED;
     private const BITMASK_TYPE_VANILLA = E_USER_NOTICE | E_USER_DEPRECATED | E_USER_WARNING;
-    private const BITMASK_TYPE_PHP = E_NOTICE | E_DEPRECATED | E_WARNING | E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR;
+    private const BITMASK_TYPE_PHP =
+        E_NOTICE | E_DEPRECATED | E_WARNING | E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR;
 
     /**
      * Log a notice level of an error.
@@ -56,7 +58,8 @@ final class ErrorLogger {
      * @param array $tags An array of tags for the error. You should have at least one. This is used for filtering and grouping errors.
      * @param array $context Context used to debug a logged error.
      */
-    public static function notice($message, array $tags, array $context = []) {
+    public static function notice($message, array $tags, array $context = [])
+    {
         $shouldLogNotices = DebugUtils::isDebug() || self::c(self::CONF_LOG_NOTICES, false);
         if (!$shouldLogNotices && !self::$inCall) {
             // We don't have noticing logging enabled.
@@ -73,7 +76,8 @@ final class ErrorLogger {
      * @param array $tags An array of tags for the error. You should have at least one. This is used for filtering and grouping errors.
      * @param array $context Context used to debug a logged error.
      */
-    public static function warning($message, array $tags, array $context = []) {
+    public static function warning($message, array $tags, array $context = [])
+    {
         self::log(self::LEVEL_WARNING, $message, $tags, $context);
     }
 
@@ -84,7 +88,8 @@ final class ErrorLogger {
      * @param array $tags An array of tags for the error. You should have at least one. This is used for filtering and grouping errors.
      * @param array $context Context used to debug a logged error.
      */
-    public static function error($message, array $tags, array $context = []) {
+    public static function error($message, array $tags, array $context = [])
+    {
         self::log(self::LEVEL_ERROR, $message, $tags, $context);
     }
 
@@ -95,7 +100,8 @@ final class ErrorLogger {
      * @param array $tags An array of tags for the error. You should have at least one. This is used for filtering and grouping errors.
      * @param array $context Context used to debug a logged error.
      */
-    public static function critical($message, array $tags, array $context = []) {
+    public static function critical($message, array $tags, array $context = [])
+    {
         self::log(self::LEVEL_CRITICAL, $message, $tags, $context);
     }
 
@@ -107,7 +113,8 @@ final class ErrorLogger {
      * @param array $tags An array of tags for the error. You should have at least one. This is used for filtering and grouping errors.
      * @param array $context Context used to debug a logged error.
      */
-    public static function log(string $level, $message, array $tags, array $context = []) {
+    public static function log(string $level, $message, array $tags, array $context = [])
+    {
         // Prevent an infinite cycle by setting an internal flag.
         if (self::$inCall) {
             return;
@@ -129,10 +136,11 @@ final class ErrorLogger {
      * @param array $tags An array of tags for the error. You should have at least one. This is used for filtering and grouping errors.
      * @param array $context Context used to debug a logged error.
      */
-    private static function logInternal(string $level, $message, array $tags, array $context = []) {
+    private static function logInternal(string $level, $message, array $tags, array $context = [])
+    {
         // If we had a throwable pull out its message.
         /** @var \Throwable $throwable */
-        $throwable = $context['exception'] ?? $context['throwable'] ?? null;
+        $throwable = $context["exception"] ?? ($context["throwable"] ?? null);
         if ($message instanceof \Throwable) {
             $throwable = $message;
             $message = $message->getMessage();
@@ -153,9 +161,9 @@ final class ErrorLogger {
         $context = LogDecorator::applyLogDecorator($context);
 
         $toLog = array_replace($context, [
-            'message' => $message,
-            'level' => $level,
-            'stacktrace' => DebugUtils::stackTraceString(
+            "message" => $message,
+            "level" => $level,
+            "stacktrace" => DebugUtils::stackTraceString(
                 isset($throwable) ? $throwable->getTrace() : debug_backtrace()
             ),
         ]);
@@ -169,10 +177,10 @@ final class ErrorLogger {
         try {
             $serialized = StringUtils::jsonEncodeChecked($toLog, $jsonParams);
         } catch (\Exception $e) {
-            $toLog['tags'][] = self::TAG_LOG_FAILURE_JSON;
+            $toLog["tags"][] = self::TAG_LOG_FAILURE_JSON;
 
             // Drop the extra context. It likely caused the problem.
-            $toLog['data'] = new \stdClass();
+            $toLog["data"] = new \stdClass();
             $serialized = StringUtils::jsonEncodeChecked($toLog, $jsonParams);
         }
 
@@ -189,12 +197,13 @@ final class ErrorLogger {
      *
      * @param string $message The error message.
      */
-    public static function writeErrorLog(string $message) {
+    public static function writeErrorLog(string $message)
+    {
         $errorLogFile = self::c(self::CONF_LOG_FILE);
 
         // Log only if the PHP setting "log_errors" is enabled
         // OR if the Garden config "Garden.Errors.LogFile" is provided
-        if (!$errorLogFile && !ini_get('log_errors')) {
+        if (!$errorLogFile && !ini_get("log_errors")) {
             return;
         }
 
@@ -204,8 +213,8 @@ final class ErrorLogger {
         } else {
             // Need to prepend the date when appending to an error log file
             // and also add a newline manually
-            $date = date('d-M-Y H:i:s e');
-            $message = sprintf('[%s] %s', $date, $message) . PHP_EOL;
+            $date = date("d-M-Y H:i:s e");
+            $message = sprintf("[%s] %s", $date, $message) . PHP_EOL;
             error_log($message, 3, $errorLogFile);
         }
     }
@@ -218,12 +227,8 @@ final class ErrorLogger {
      * @param string $file
      * @param int $line
      */
-    public static function handleError(
-        int $severity,
-        string $message,
-        string $file = '',
-        int $line = 0
-    ): void {
+    public static function handleError(int $severity, string $message, string $file = "", int $line = 0): void
+    {
         $isErrorSuppressed = error_reporting() === self::ERROR_SUPPRESSED;
         if ($isErrorSuppressed) {
             return;
@@ -266,12 +271,10 @@ final class ErrorLogger {
      *
      * @param \Throwable $exception
      */
-    public static function handleException(\Throwable $exception) {
+    public static function handleException(\Throwable $exception)
+    {
         $code = $exception->getCode();
-        $channel = $code & self::BITMASK_TYPE_PHP
-            ? ErrorLogger::CHANNEL_PHP
-            : ErrorLogger::CHANNEL_VANILLA
-        ;
+        $channel = $code & self::BITMASK_TYPE_PHP ? ErrorLogger::CHANNEL_PHP : ErrorLogger::CHANNEL_VANILLA;
         self::error(
             $exception,
             [ErrorLogger::TAG_UNCAUGHT, ErrorLogger::TAG_SOURCE_EXCEPTION_HANDLER],

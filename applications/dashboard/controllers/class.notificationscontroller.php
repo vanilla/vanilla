@@ -13,21 +13,22 @@ use Vanilla\Formatting\Formats\HtmlFormat;
 /**
  * Handle /notifications endpoint.
  */
-class NotificationsController extends Gdn_Controller {
-
+class NotificationsController extends Gdn_Controller
+{
     /**
      * CSS, JS and module includes.
      */
-    public function initialize() {
+    public function initialize()
+    {
         $this->Head = new HeadModule($this);
-        $this->addJsFile('jquery.js');
-        $this->addJsFile('jquery.form.js');
-        $this->addJsFile('jquery.popup.js');
-        $this->addJsFile('jquery.gardenhandleajaxform.js');
-        $this->addJsFile('global.js');
-        $this->addCssFile('style.css');
-        $this->addCssFile('vanillicon.css', 'static');
-        $this->addModule('GuestModule');
+        $this->addJsFile("jquery.js");
+        $this->addJsFile("jquery.form.js");
+        $this->addJsFile("jquery.popup.js");
+        $this->addJsFile("jquery.gardenhandleajaxform.js");
+        $this->addJsFile("global.js");
+        $this->addCssFile("style.css");
+        $this->addCssFile("vanillicon.css", "static");
+        $this->addModule("GuestModule");
         parent::initialize();
     }
 
@@ -37,13 +38,14 @@ class NotificationsController extends Gdn_Controller {
      * @since 2.0.18
      * @access public
      */
-    public function inform() {
+    public function inform()
+    {
         $this->deliveryType(DELIVERY_TYPE_BOOL);
         $this->deliveryMethod(DELIVERY_METHOD_JSON);
 
         // Retrieve all notifications and inform them.
         NotificationsController::informNotifications($this);
-        $this->fireEvent('BeforeInformNotifications');
+        $this->fireEvent("BeforeInformNotifications");
 
         $this->render();
     }
@@ -59,7 +61,8 @@ class NotificationsController extends Gdn_Controller {
      *
      * @param Gdn_Controller $sender The object calling this method.
      */
-    public static function informNotifications($sender) {
+    public static function informNotifications($sender)
+    {
         $session = Gdn::session();
         if (!$session->isValid()) {
             return;
@@ -68,44 +71,45 @@ class NotificationsController extends Gdn_Controller {
         $activityModel = new ActivityModel();
         // Get five pending notifications.
         $where = [
-            'NotifyUserID' => Gdn::session()->UserID,
-            'Notified' => ActivityModel::SENT_PENDING];
+            "NotifyUserID" => Gdn::session()->UserID,
+            "Notified" => ActivityModel::SENT_PENDING,
+        ];
 
         // If we're in the middle of a visit only get very recent notifications.
-        $where['DateUpdated >'] = Gdn_Format::toDateTime(strtotime('-5 minutes'));
+        $where["DateUpdated >"] = Gdn_Format::toDateTime(strtotime("-5 minutes"));
 
-        $activities = $activityModel->getWhere($where, '', '', 5, 0)->resultArray();
+        $activities = $activityModel->getWhere($where, "", "", 5, 0)->resultArray();
 
-        $activityIDs = array_column($activities, 'ActivityID');
+        $activityIDs = array_column($activities, "ActivityID");
         $activityModel->setNotified($activityIDs);
 
-        $sender->EventArguments['Activities'] = &$activities;
-        $sender->fireEvent('InformNotifications');
+        $sender->EventArguments["Activities"] = &$activities;
+        $sender->fireEvent("InformNotifications");
 
         foreach ($activities as $activity) {
-            if ($activity['Photo']) {
+            if ($activity["Photo"]) {
                 $userPhoto = anchor(
-                    img($activity['Photo'], ['class' => 'ProfilePhotoMedium']),
-                    $activity['Url'],
-                    'Icon'
+                    img($activity["Photo"], ["class" => "ProfilePhotoMedium"]),
+                    $activity["Url"],
+                    "Icon"
                 );
             } else {
-                $userPhoto = '';
+                $userPhoto = "";
             }
 
-            $excerpt = '';
-            $skipStory = $activity['Data']['skipStory'] ?? false;
-            $activityStory = $activity['Story'] ?? null;
-            $story = (!$skipStory) ? $activityStory : null;
-            $format = $activity['Format'] ?? HtmlFormat::FORMAT_KEY;
+            $excerpt = "";
+            $skipStory = $activity["Data"]["skipStory"] ?? false;
+            $activityStory = $activity["Story"] ?? null;
+            $story = !$skipStory ? $activityStory : null;
+            $format = $activity["Format"] ?? HtmlFormat::FORMAT_KEY;
             $excerpt = htmlspecialchars($story ? Gdn::formatService()->renderExcerpt($story, $format) : $excerpt);
-            $activityClass = ' Activity-'.$activity['ActivityType'];
+            $activityClass = " Activity-" . $activity["ActivityType"];
 
             $sender->informMessage(
-                $userPhoto
-                .wrap($activity['Headline'], 'div', ['class' => 'Title'])
-                .wrap($excerpt, 'div', ['class' => 'Excerpt']),
-                'Dismissable AutoDismiss'.$activityClass.($userPhoto == '' ? '' : ' HasIcon')
+                $userPhoto .
+                    wrap($activity["Headline"], "div", ["class" => "Title"]) .
+                    wrap($excerpt, "div", ["class" => "Excerpt"]),
+                "Dismissable AutoDismiss" . $activityClass . ($userPhoto == "" ? "" : " HasIcon")
             );
         }
     }

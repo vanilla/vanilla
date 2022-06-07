@@ -11,14 +11,15 @@ use Garden\Schema\Schema;
 /**
  * Form element schemas.
  */
-class SchemaForm {
-
-    const DROPDOWN_TYPE = 'dropDown';
-    const RADIO_TYPE = 'radio';
-    const TEXT_TYPE = 'textBox';
-    const TOGGLE_TYPE = 'toggle';
-    const DRAG_AND_DROP_TYPE = 'dragAndDrop';
-    const CODE_EDITOR_TYPE = 'codeBox';
+class SchemaForm
+{
+    const DROPDOWN_TYPE = "dropDown";
+    const RADIO_TYPE = "radio";
+    const TEXT_TYPE = "textBox";
+    const TOGGLE_TYPE = "toggle";
+    const DRAG_AND_DROP_TYPE = "dragAndDrop";
+    const CODE_EDITOR_TYPE = "codeBox";
+    const COLOR_TYPE = "color";
 
     /**
      * Create a "section" of the form on an object type.
@@ -27,10 +28,11 @@ class SchemaForm {
      *
      * @return array
      */
-    public static function section(FormOptions $options): array {
+    public static function section(FormOptions $options): array
+    {
         return [
-            'label' => $options->getLabel(),
-            'description' => $options->getDescription(),
+            "label" => $options->getLabel(),
+            "description" => $options->getDescription(),
         ];
     }
 
@@ -47,17 +49,16 @@ class SchemaForm {
         FormChoicesInterface $choices,
         FieldMatchConditional $conditions = null
     ): array {
-
         $result = [
-            'description' => $options->getDescription(),
-            'label' => $options->getLabel(),
-            'inputType' => self::DROPDOWN_TYPE,
-            'placeholder' => $options->getPlaceHolder(),
-            'choices' => $choices->getChoices(),
+            "description" => $options->getDescription(),
+            "label" => $options->getLabel(),
+            "inputType" => self::DROPDOWN_TYPE,
+            "placeholder" => $options->getPlaceHolder(),
+            "choices" => $choices->getChoices(),
         ];
 
         if ($conditions) {
-            $result['conditions'] = [$conditions->getCondition()];
+            $result["conditions"] = [$conditions->getCondition()];
         }
 
         return $result;
@@ -71,13 +72,14 @@ class SchemaForm {
      *
      * @return array
      */
-    public static function textBox(FormOptions $options, string $type = 'text'): array {
+    public static function textBox(FormOptions $options, string $type = "text"): array
+    {
         return [
-            'description' => $options->getDescription(),
-            'label' => $options->getLabel(),
-            'inputType' => self::TEXT_TYPE,
-            'placeholder' => $options->getPlaceHolder(),
-            'type' => $type,
+            "description" => $options->getDescription(),
+            "label" => $options->getLabel(),
+            "inputType" => self::TEXT_TYPE,
+            "placeholder" => $options->getPlaceHolder(),
+            "type" => $type,
         ];
     }
 
@@ -92,16 +94,16 @@ class SchemaForm {
      */
     public static function codeBox(
         FormOptions $options,
-        string $language = 'text/html',
+        string $language = "text/html",
         ?string $jsonSchemaUri = null
     ): array {
         return [
-            'description' => $options->getDescription(),
-            'label' => $options->getLabel(),
-            'inputType' => self::CODE_EDITOR_TYPE,
-            'placeholder' => $options->getPlaceHolder(),
-            'language' => $language,
-            'jsonSchemaUri' => $jsonSchemaUri,
+            "description" => $options->getDescription(),
+            "label" => $options->getLabel(),
+            "inputType" => self::CODE_EDITOR_TYPE,
+            "placeholder" => $options->getPlaceHolder(),
+            "language" => $language,
+            "jsonSchemaUri" => $jsonSchemaUri,
         ];
     }
 
@@ -112,15 +114,16 @@ class SchemaForm {
      * @param FieldMatchConditional|null $conditions
      * @return array
      */
-    public static function toggle(FormOptions $options, FieldMatchConditional $conditions = null) {
+    public static function toggle(FormOptions $options, FieldMatchConditional $conditions = null)
+    {
         $result = [
-            'description' => $options->getDescription(),
-            'label' => $options->getLabel(),
-            'inputType' => self::TOGGLE_TYPE,
+            "description" => $options->getDescription(),
+            "label" => $options->getLabel(),
+            "inputType" => self::TOGGLE_TYPE,
         ];
 
         if ($conditions) {
-            $result['conditions'] = [$conditions->getCondition()];
+            $result["conditions"] = [$conditions->getCondition()];
         }
 
         return $result;
@@ -135,16 +138,20 @@ class SchemaForm {
      *
      * @return array
      */
-    public static function radio(FormOptions $options, FormChoicesInterface $choices, FieldMatchConditional $conditions = null) {
+    public static function radio(
+        FormOptions $options,
+        FormChoicesInterface $choices,
+        FieldMatchConditional $conditions = null
+    ) {
         $result = [
-            'description' => $options->getDescription(),
-            'label' => $options->getLabel(),
-            'inputType' => self::RADIO_TYPE,
-            'choices' => $choices->getChoices(),
+            "description" => $options->getDescription(),
+            "label" => $options->getLabel(),
+            "inputType" => self::RADIO_TYPE,
+            "choices" => $choices->getChoices(),
         ];
 
         if ($conditions) {
-            $result['conditions'] = [$conditions->getCondition()];
+            $result["conditions"] = [$conditions->getCondition()];
         }
 
         return $result;
@@ -158,13 +165,30 @@ class SchemaForm {
      *
      * @return array
      */
-    public static function dragAndDrop(FormOptions $options, Schema $itemSchema): array {
+    public static function dragAndDrop(FormOptions $options, Schema $itemSchema): array
+    {
         return [
-            'inputType' => self::DRAG_AND_DROP_TYPE,
-            'description' => $options->getDescription(),
-            'label' => $options->getLabel(),
-            'itemSchema' => $itemSchema,
-            'fullSize' => true,
+            "inputType" => self::DRAG_AND_DROP_TYPE,
+            "description" => $options->getDescription(),
+            "label" => $options->getLabel(),
+            "itemSchema" => $itemSchema,
+            "fullSize" => true,
+        ];
+    }
+
+    /**
+     * Used for rendering react color picker.
+     *
+     * @param FormOptions $options
+     *
+     * @return array
+     */
+    public static function color(FormOptions $options): array
+    {
+        return [
+            "description" => $options->getDescription(),
+            "label" => $options->getLabel(),
+            "inputType" => self::COLOR_TYPE,
         ];
     }
 }

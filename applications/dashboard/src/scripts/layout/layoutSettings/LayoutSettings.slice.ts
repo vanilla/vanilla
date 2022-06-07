@@ -10,6 +10,7 @@ import { notEmpty } from "@vanilla/utils";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import {
     clearLayoutDraft,
+    deleteLayout,
     fetchAllLayouts,
     fetchLayout,
     fetchLayoutCatalogByViewType,
@@ -89,28 +90,31 @@ export const layoutSettingsSlice = createSlice({
                     data: action.payload,
                 };
             })
-            .addCase(persistLayoutDraft.pending, (state, action) => {
-                state.layoutDraftPersistLoadable = {
-                    status: LoadStatus.LOADING,
-                };
-            })
             .addCase(persistLayoutDraft.fulfilled, (state, action) => {
-                state.layoutDraftPersistLoadable = {
+                state.layoutJsonsByLayoutID[action.payload.layoutID] = {
                     status: LoadStatus.SUCCESS,
-                    data: action.payload,
+                    data: {
+                        ...(state.layoutJsonsByLayoutID[action.payload.layoutID]?.data ?? {}),
+                        ...action.payload,
+                    },
+                };
+
+                state.layoutJsonsByLayoutID[action.payload.layoutID] = {
+                    status: LoadStatus.SUCCESS,
+                    data: {
+                        ...(state.layoutJsonsByLayoutID[action.payload.layoutID]?.data ?? {}),
+                        ...action.payload,
+                    },
                 };
             })
-            .addCase(persistLayoutDraft.rejected, (state, action) => {
-                state.layoutDraftPersistLoadable = {
-                    status: LoadStatus.ERROR,
-                    error: action.error,
-                };
+            .addCase(deleteLayout.fulfilled, (state, action) => {
+                const { layoutID } = action.meta.arg;
+                delete state.layoutsByID[layoutID];
+                delete state.layoutJsonsByLayoutID[layoutID];
             })
             .addCase(initializeLayoutDraft, (state, action) => {
                 const { initialLayout = {} } = action.payload;
-                state.layoutDraftPersistLoadable = {
-                    status: LoadStatus.PENDING,
-                };
+
                 state.layoutDraft = {
                     name: t("My Layout"),
                     layoutViewType: "home" as LayoutViewType,
@@ -120,7 +124,6 @@ export const layoutSettingsSlice = createSlice({
             })
             .addCase(clearLayoutDraft, (state, action) => {
                 state.layoutDraft = INITIAL_LAYOUTS_STATE.layoutDraft;
-                state.layoutDraftPersistLoadable = INITIAL_LAYOUTS_STATE.layoutDraftPersistLoadable;
             })
             .addCase(updateLayoutDraft, (state, action) => {
                 if (state.layoutDraft) {

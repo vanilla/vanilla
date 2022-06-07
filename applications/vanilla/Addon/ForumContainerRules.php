@@ -9,9 +9,11 @@ namespace Vanilla\Forum\Addon;
 
 use Garden\Container\ContainerConfigurationInterface;
 use Garden\Container\Reference;
+use Garden\Web\PageControllerRoute;
 use Vanilla\AddonContainerRules;
+use Vanilla\Forum\Controllers\Pages\DiscussionListPageController;
 use Vanilla\Forum\Layout\View\LegacyCategoryListLayoutView;
-use Vanilla\Forum\Layout\View\LegacyDiscussionListLayoutView;
+use Vanilla\Forum\Layout\View\DiscussionListLayoutView;
 use Vanilla\Forum\Layout\View\LegacyDiscussionThreadLayoutView;
 use Vanilla\Forum\Layout\View\LegacyNewDiscussionLayoutView;
 use Vanilla\Forum\Layout\Middleware\CategoryFilterMiddleware;
@@ -33,12 +35,13 @@ use Vanilla\Models\SiteTotalService;
 /**
  * Class ForumContainerRules
  */
-class ForumContainerRules extends AddonContainerRules {
-
+class ForumContainerRules extends AddonContainerRules
+{
     /**
      * @inheritdoc
      */
-    public function configureContainer(ContainerConfigurationInterface $container): void {
+    public function configureContainer(ContainerConfigurationInterface $container): void
+    {
         $container
             ->rule(LayoutHydrator::class)
             ->addCall("addReactResolver", [DiscussionAnnouncementsWidget::class])
@@ -47,21 +50,40 @@ class ForumContainerRules extends AddonContainerRules {
             ->addCall("addReactResolver", [CategoriesWidget::class])
             ->addCall("addReactResolver", [RSSWidget::class])
             ->addCall("addReactResolver", [UserSpotlightWidget::class])
-            ->addCall('addMiddleware', [new Reference(CategoryFilterMiddleware::class)]);
+            ->addCall("addMiddleware", [new Reference(CategoryFilterMiddleware::class)])
 
-        $container->rule(SiteTotalService::class)
-            ->addCall('registerProvider', [new Reference(CategorySiteTotalProvider::class)])
-            ->addCall('registerProvider', [new Reference(DiscussionSiteTotalProvider::class)])
-            ->addCall('registerProvider', [new Reference(CommentSiteTotalProvider::class)])
-            ->addCall('registerProvider', [new Reference(PostSiteTotalProvider::class)])
-        ;
+            // Modern layout views.
+            ->addCall("addLayoutView", [new Reference(DiscussionListLayoutView::class)]);
 
-        $container->rule(LayoutService::class)
-            ->addCall('addLayoutView', [new Reference(LegacyCategoryListLayoutView::class)])
-            ->addCall('addLayoutView', [new Reference(LegacyDiscussionListLayoutView::class)])
-            ->addCall('addLayoutView', [new Reference(LegacyDiscussionThreadLayoutView::class)])
-            ->addCall('addLayoutView', [new Reference(LegacyNewDiscussionLayoutView::class)])
-            ->addCall('addLayoutView', [new Reference(HomeLayoutView::class)])
-        ;
+        $container
+            ->rule(\Vanilla\Layout\Providers\FileBasedLayoutProvider::class)
+            ->addCall("registerStaticLayout", [
+                "discussionList",
+                PATH_ROOT . "/applications/vanilla/Layout/Definitions/discussionList.json",
+            ]);
+
+        $container
+            ->rule(SiteTotalService::class)
+            ->addCall("registerProvider", [new Reference(CategorySiteTotalProvider::class)])
+            ->addCall("registerProvider", [new Reference(DiscussionSiteTotalProvider::class)])
+            ->addCall("registerProvider", [new Reference(CommentSiteTotalProvider::class)])
+            ->addCall("registerProvider", [new Reference(PostSiteTotalProvider::class)]);
+
+        // Legacy Layout views
+        $container
+            ->rule(LayoutService::class)
+            ->addCall("addLayoutView", [new Reference(LegacyCategoryListLayoutView::class)])
+            ->addCall("addLayoutView", [new Reference(DiscussionListLayoutView::class)])
+            ->addCall("addLayoutView", [new Reference(LegacyDiscussionThreadLayoutView::class)])
+            ->addCall("addLayoutView", [new Reference(LegacyNewDiscussionLayoutView::class)])
+            ->addCall("addLayoutView", [new Reference(HomeLayoutView::class)]);
+
+        PageControllerRoute::configurePageRoutes(
+            $container,
+            [
+                "/discussions" => DiscussionListPageController::class,
+            ],
+            "CustomLayoutDiscussionListPage"
+        );
     }
 }

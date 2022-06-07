@@ -14,8 +14,8 @@ use VanillaTests\Library\Garden\ClassLocatorTest;
 /**
  * Unit test for LayoutModel
  */
-class LayoutModelTest extends ClassLocatorTest {
-
+class LayoutModelTest extends ClassLocatorTest
+{
     /**
      * @var LayoutViewModel
      */
@@ -28,12 +28,10 @@ class LayoutModelTest extends ClassLocatorTest {
     /**
      * Get a new model for each test.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
-        $this->container()->call(function (
-            \Gdn_DatabaseStructure $st,
-            \Gdn_SQLDriver $sql
-        ) {
+        $this->container()->call(function (\Gdn_DatabaseStructure $st, \Gdn_SQLDriver $sql) {
             $Database = Gdn::database();
             if (!$st->tableExists("layout")) {
                 LayoutModel::structure($Database);
@@ -43,8 +41,8 @@ class LayoutModelTest extends ClassLocatorTest {
             }
         });
 
-        $this->resetTable('layout');
-        $this->resetTable('layoutView');
+        $this->resetTable("layout");
+        $this->resetTable("layoutView");
         $this->layoutViewModel = $this->container()->get(LayoutViewModel::class);
         $this->layoutModel = $this->container()->get(LayoutModel::class);
     }
@@ -54,31 +52,33 @@ class LayoutModelTest extends ClassLocatorTest {
      *
      * @throws \Exception Throws exception when something goes wrong.
      */
-    public function testNormalizeRows() {
-        $layout = ['layoutID' => 1, 'layoutViewType' => 'home', 'name' => 'Home Test', 'layout' => 'test'];
+    public function testNormalizeRows()
+    {
+        $layout = ["layoutID" => 1, "layoutViewType" => "home", "name" => "Home Test", "layout" => "test"];
         $layoutID = $this->layoutModel->insert($layout);
-        $layoutView = ['layoutID' => $layoutID, 'recordID' => 1, 'recordType' => 'global', 'layoutViewType' => 'home'];
+        $layoutView = ["layoutID" => $layoutID, "recordID" => 1, "recordType" => "global", "layoutViewType" => "home"];
         $this->layoutViewModel->insert($layoutView);
-        $layoutView = ['layoutID' => $layoutID, 'recordID' => 2, 'recordType' => 'global', 'layoutViewType' => 'home'];
+        $layoutView = ["layoutID" => $layoutID, "recordID" => 2, "recordType" => "global", "layoutViewType" => "home"];
         $this->layoutViewModel->insert($layoutView);
         $rows = $this->layoutModel->getAll();
-        $result = $this->layoutModel->normalizeRows($rows, ['layoutViews']);
+        $result = $this->layoutModel->normalizeRows($rows, ["layoutViews"]);
 
         $this->assertSame(1, count($result));
-        $this->assertSame(2, count($result[0]['layoutViews']));
+        $this->assertSame(2, count($result[0]["layoutViews"]));
     }
 
     /**
-    * Test Layout model getByID method
-    */
-    public function testGetLayout() {
-        $layout = ['layoutID' => 1, 'layoutViewType' => 'home', 'name' => 'Home Test', 'layout' => 'test'];
+     * Test Layout model getByID method
+     */
+    public function testGetLayout()
+    {
+        $layout = ["layoutID" => 1, "layoutViewType" => "home", "name" => "Home Test", "layout" => "test"];
         $layoutID = $this->layoutModel->insert($layout);
-        $layoutView = ['layoutID' => $layoutID, 'recordID' => 1, 'recordType' => 'home', 'layoutViewType' => 'home'];
+        $layoutView = ["layoutID" => $layoutID, "recordID" => 1, "recordType" => "home", "layoutViewType" => "home"];
         $this->layoutViewModel->insert($layoutView);
 
         $result = $this->layoutModel->getByID($layoutID);
 
-        $this->assertSame($layoutID, $result['layoutID']);
+        $this->assertSame($layoutID, $result["layoutID"]);
     }
 }

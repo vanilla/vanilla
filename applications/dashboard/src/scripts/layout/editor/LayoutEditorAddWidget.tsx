@@ -8,9 +8,10 @@ import { useLayoutEditor } from "@dashboard/layout/editor/LayoutEditor";
 import { layoutEditorClasses } from "@dashboard/layout/editor/LayoutEditor.classes";
 import { LayoutEditorPath } from "@dashboard/layout/editor/LayoutEditorContents";
 import { LayoutEditorSelectionMode } from "@dashboard/layout/editor/LayoutEditorSelection";
+import { WidgetSettingsModal } from "@dashboard/layout/editor/widgetSettings/WidgetSettingsModal";
 import { LayoutThumbnailsModal } from "@dashboard/layout/editor/thumbnails/LayoutThumbnailsModal";
 import { useLayoutCatalog } from "@dashboard/layout/layoutSettings/LayoutSettings.hooks";
-import { ILayoutEditorDestinationPath } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
+import { ILayoutEditorDestinationPath, IWidgetCatalog } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { cx } from "@library/styles/styleShim";
@@ -29,10 +30,16 @@ export function LayoutEditorAddWidget(props: IProps) {
     const catalog = useLayoutCatalog(layoutViewType);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
+    //widgetSettingsModal
+    const [isWidgetSettingsModalOpen, setWidgetSettingsModalOpen] = useState(false);
+    const [selectedWidgetID, setSelectedWidgetID] = useState("");
+    const [selectedWidget, setSelectedWidget] = useState<IWidgetCatalog | {}>({});
+
     const isSelected =
         LayoutEditorPath.areWidgetPathsEqual(props.path, editorSelection.getPath()) &&
         editorSelection.getMode() === LayoutEditorSelectionMode.WIDGET;
     useFocusOnActivate(buttonRef, isSelected);
+
     // Temp hack
     const isFullWidth = editorContents.isSectionFullWidth(props.path);
     return (
@@ -63,7 +70,18 @@ export function LayoutEditorAddWidget(props: IProps) {
                 }}
                 sections={catalog?.widgets ?? {}}
                 onAddSection={(widgetID) => {
-                    setIsModalOpen(false);
+                    setWidgetSettingsModalOpen(true);
+                    setSelectedWidgetID(widgetID);
+                    setSelectedWidget(catalog?.widgets[widgetID] ?? {});
+                }}
+                isVisible={isModalOpen}
+                itemType="widgets"
+            />
+            <WidgetSettingsModal
+                exitHandler={() => {
+                    setWidgetSettingsModalOpen(false);
+                }}
+                onSave={(settings) => {
                     editorContents.insertWidget(
                         props.path,
                         isFullWidth
@@ -72,14 +90,18 @@ export function LayoutEditorAddWidget(props: IProps) {
                                   isFullWidth: isFullWidth,
                               }
                             : {
-                                  $hydrate: widgetID,
+                                  $hydrate: selectedWidgetID,
+                                  ...settings,
                               },
                     );
                     editorSelection.moveSelectionTo(props.path, LayoutEditorSelectionMode.WIDGET);
+                    setWidgetSettingsModalOpen(false);
+                    setIsModalOpen(false);
                 }}
-                isVisible={isModalOpen}
-                itemType="widgets"
-                selectedSection="react.discussion.announcements"
+                isVisible={isWidgetSettingsModalOpen}
+                initialValue={{}}
+                widgetID={selectedWidgetID}
+                widgetCatalog={catalog?.widgets ?? {}}
             />
         </>
     );

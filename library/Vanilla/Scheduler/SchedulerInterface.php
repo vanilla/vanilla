@@ -14,8 +14,8 @@ use Vanilla\Scheduler\Job\JobPriority;
 /**
  * Scheduler Interface
  */
-interface SchedulerInterface {
-
+interface SchedulerInterface
+{
     /**
      * Add driver
      *

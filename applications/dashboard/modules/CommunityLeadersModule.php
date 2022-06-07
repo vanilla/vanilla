@@ -17,8 +17,8 @@ use Vanilla\Widgets\AbstractHomeWidgetModule;
 /**
  * Widget with the users having the top points.
  */
-class CommunityLeadersModule extends AbstractHomeWidgetModule {
-
+class CommunityLeadersModule extends AbstractHomeWidgetModule
+{
     /** @var string One of the SLOT_TYPE constants */
     private $slotType = UserPointsModel::SLOT_TYPE_WEEK;
 
@@ -32,13 +32,13 @@ class CommunityLeadersModule extends AbstractHomeWidgetModule {
     private $userLeaderService;
 
     public $contentType = self::CONTENT_TYPE_ICON;
-    public $borderType = 'none';
+    public $borderType = "none";
     public $name = null;
     public $maxColumnCount = 5;
     public $iconProps = [
-        'border' => [
-            'radius' => 100,
-        ]
+        "border" => [
+            "radius" => 100,
+        ],
     ];
 
     /**
@@ -46,7 +46,8 @@ class CommunityLeadersModule extends AbstractHomeWidgetModule {
      *
      * @param UserLeaderService $userLeaderService
      */
-    public function __construct(UserLeaderService $userLeaderService) {
+    public function __construct(UserLeaderService $userLeaderService)
+    {
         parent::__construct();
         $this->userLeaderService = $userLeaderService;
     }
@@ -54,18 +55,19 @@ class CommunityLeadersModule extends AbstractHomeWidgetModule {
     /**
      * @return array
      */
-    protected function getItemOptions(): array {
+    protected function getItemOptions(): array
+    {
         $options = [
-            'contentType' => $this->contentType,
-            'display' => $this->display,
-            'box' => [
-                'borderType' => $this->borderType,
+            "contentType" => $this->contentType,
+            "display" => $this->display,
+            "box" => [
+                "borderType" => $this->borderType,
             ],
-            'name' => $this->name,
-            'alignment' => 'center',
+            "name" => $this->name,
+            "alignment" => "center",
         ];
         if (!empty($this->iconProps)) {
-            $options['iconProps'] = $this->iconProps;
+            $options["iconProps"] = $this->iconProps;
         }
         return $options;
     }
@@ -73,24 +75,26 @@ class CommunityLeadersModule extends AbstractHomeWidgetModule {
     /**
      * @return string|null
      */
-    protected function getTitle(): ?string {
+    protected function getTitle(): ?string
+    {
         if ($this->title) {
             return $this->title;
         }
         $category = $this->userLeaderService->getPointsCategory($this->categoryID);
-        return $this->userLeaderService->getTitleForSlotType($this->slotType, $category ? $category['Name'] : '');
+        return $this->userLeaderService->getTitleForSlotType($this->slotType, $category ? $category["Name"] : "");
     }
 
     /**
      * @return array|null
      */
-    protected function getData(): ?array {
+    protected function getData(): ?array
+    {
         $query = new UserLeaderQuery($this->slotType, $this->categoryID, $this->limit);
         $users = $this->userLeaderService->getLeaders($query);
         if (count($users) === 0) {
             return null;
         }
-        return array_map([$this, 'mapUserToWidgetItem'], $users);
+        return array_map([$this, "mapUserToWidgetItem"], $users);
     }
 
     /**
@@ -100,62 +104,67 @@ class CommunityLeadersModule extends AbstractHomeWidgetModule {
      *
      * @return array
      */
-    private function mapUserToWidgetItem(array $user): array {
-        $points = $user['Points'] ?? 0;
+    private function mapUserToWidgetItem(array $user): array
+    {
+        $points = $user["Points"] ?? 0;
         return [
-            'to' => userUrl($user),
-            'iconUrl' => $user['Photo'],
-            'name' => $user['Name'],
-            'description' => $user['Label'] ?? null,
-            'counts' => [
+            "to" => userUrl($user),
+            "iconUrl" => $user["Photo"],
+            "name" => $user["Name"],
+            "description" => $user["Label"] ?? null,
+            "counts" => [
                 [
                     // %s Point
                     // %s Points
-                    'labelCode' => 'Points',
-                    'count' => $points,
-                ]
-            ]
+                    "labelCode" => "Points",
+                    "count" => $points,
+                ],
+            ],
         ];
     }
 
     /**
      * @param string $slotType
      */
-    public function setSlotType(string $slotType): void {
+    public function setSlotType(string $slotType): void
+    {
         $this->slotType = $slotType;
     }
 
     /**
      * @param int|null $categoryID
      */
-    public function setCategoryID(?int $categoryID): void {
+    public function setCategoryID(?int $categoryID): void
+    {
         $this->categoryID = $categoryID;
     }
 
     /**
      * @param int $limit
      */
-    public function setLimit(int $limit): void {
+    public function setLimit(int $limit): void
+    {
         $this->limit = $limit;
     }
 
     /**
      * @inheritdoc
      */
-    public static function getWidgetName(): string {
+    public static function getWidgetName(): string
+    {
         return "LeaderBoard (Grid)";
     }
 
     /**
      * @inheritdoc
      */
-    public static function getWidgetSchema(): Schema {
+    public static function getWidgetSchema(): Schema
+    {
         $ownSchema = Schema::parse([
-            'slotType?' => UserPointsModel::slotTypeSchema(),
-            'LeaderboardType?' => UserPointsModel::leaderboardTypeSchema(),
-            'limit?' => UserPointsModel::limitSchema(),
+            "slotType?" => UserPointsModel::slotTypeSchema(),
+            "LeaderboardType?" => UserPointsModel::leaderboardTypeSchema(),
+            "limit?" => UserPointsModel::limitSchema(),
         ]);
-
 
         return SchemaUtils::composeSchemas(
             self::widgetTitleSchema(),

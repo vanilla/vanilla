@@ -10,8 +10,8 @@ namespace Vanilla\Scheduler\Auth;
 /**
  * Class AdHocAuth401Exception
  */
-class AdHocAuth401Exception extends AdHocAuthException {
-
+class AdHocAuth401Exception extends AdHocAuthException
+{
     /**
      * AdHocAuth401Exception constructor
      *
@@ -20,9 +20,9 @@ class AdHocAuth401Exception extends AdHocAuthException {
      * @param array $context
      */
     public function __construct(
-        string $message = 'Invalid Token',
+        string $message = "Invalid Token",
         int $code = 401,
-        array $context = ['description' => 'AdHocAuth - Invalid Token']
+        array $context = ["description" => "AdHocAuth - Invalid Token"]
     ) {
         parent::__construct($message, $code, $context);
     }

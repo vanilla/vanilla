@@ -12,9 +12,13 @@ export const getConfigsByKeyThunk = createAsyncThunk("@@config/get", async (conf
 
 export const patchConfigThunk = createAsyncThunk(
     "@@config/patch",
-    async (params: { values: Record<string, any>; watchID: string }) => {
-        const response = await apiv2.patch("/config", params.values);
-        return response.data;
+    async (params: { values: Record<string, any>; watchID: string }, thunkAPI) => {
+        try {
+            const response = await apiv2.patch("/config", params.values);
+            return response.data;
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error);
+        }
     },
 );
 

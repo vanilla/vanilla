@@ -9,7 +9,6 @@
 \* -------------------------------------------------------------- */
 
 body.Section-Profile {
-
     .Profile h2,
     .BadgeGrid h4 {
         font-size: $global-subTitle_fontSize;
@@ -69,7 +68,6 @@ body.Section-Profile {
     }
 
     .MainContent {
-
         > .FormTitleWrapper {
             padding: 0;
         }
@@ -101,7 +99,6 @@ body.Section-Profile {
     }
 
     .Profile-name {
-
         @include maxWidth($theme-breakpoint_tablet) {
             width: 100%;
             text-align: center;
@@ -157,12 +154,12 @@ body.Section-Profile {
         @if ($staticVariables) {
             .Button-EditProfile {
                 @include Button(
-                        $button-primary_bg,
-                        $button-primary_fg,
-                        $button-primary_border,
-                        $button-primary-hover_bg,
-                        $button-primary-hover_fg,
-                        $button-primary-hover_border
+                    $button-primary_bg,
+                    $button-primary_fg,
+                    $button-primary_border,
+                    $button-primary-hover_bg,
+                    $button-primary-hover_fg,
+                    $button-primary-hover_border
                 );
             }
         }
@@ -213,7 +210,6 @@ body.Section-Profile {
     }
 
     .Panel-main {
-
         .PhotoWrapLarge {
             margin-bottom: $utility-baseUnitTriple;
         }
@@ -292,7 +288,6 @@ body.Section-Profile {
     }
 
     .CountItemWrap {
-
         .TextColor {
             width: 100%;
             display: flex;
@@ -333,7 +328,6 @@ body.Section-Profile {
     }
 
     .Profile {
-
         dl {
             @include clearfix;
             width: 100%;
@@ -378,7 +372,6 @@ body.Section-Profile {
     }
 
     @include maxWidth($theme-breakpoint_tablet) {
-
         .Button-EditProfile {
             .Hidden {
                 display: inline;
@@ -392,12 +385,10 @@ body.Section-Profile {
 }
 
 body.Section-EditProfile {
-
     // titles have different classes depending on the page
     @if $staticVariables {
         &.signature,
         &.preferences {
-
             h2 {
                 font-size: $global-large_fontSize;
                 font-weight: $global-heading_fontWeight;
@@ -417,7 +408,6 @@ body.Section-EditProfile {
     }
 
     .ProfileButtons-BackToProfile {
-
         @include maxWidth {
             width: 100%;
             text-align: center;
@@ -496,7 +486,6 @@ body.Section-EditProfile {
     }
 
     @include maxWidth {
-
         .Buttons {
             .Button {
                 width: 100%;
@@ -505,7 +494,6 @@ body.Section-EditProfile {
         }
 
         &.tokens {
-
             .Button.Action {
                 width: 100%;
                 text-align: center;

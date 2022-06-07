@@ -59,5 +59,5 @@ export function FormControlWrapper(props: IControlProps & Pick<ISchemaRenderProp
     if (!FormControl) {
         return <></>;
     }
-    return <FormControl {...controlProps} disabled={disabled} control={stableUnwrappedControl} />;
+    return <FormControl {...controlProps} disabled={disabled} control={stableUnwrappedControl} size={props.size} />;
 }

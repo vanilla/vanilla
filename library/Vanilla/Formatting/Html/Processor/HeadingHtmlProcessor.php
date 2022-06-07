@@ -13,12 +13,13 @@ use Vanilla\Formatting\Html\HtmlDocument;
 /**
  * Processor of HMTL headings.
  */
-class HeadingHtmlProcessor extends HtmlProcessor {
-
+class HeadingHtmlProcessor extends HtmlProcessor
+{
     /**
      * @inheritdoc
      */
-    public function processDocument(HtmlDocument $document): HtmlDocument {
+    public function processDocument(HtmlDocument $document): HtmlDocument
+    {
         $this->getHeadings($document, true);
         return $document;
     }
@@ -31,8 +32,11 @@ class HeadingHtmlProcessor extends HtmlProcessor {
      *
      * @return Heading[]
      */
-    public function getHeadings(HtmlDocument $document, bool $applyToDom = false): array {
-        $domHeadings = $document->queryXPath('.//*[self::h1 or self::h2 or self::h3 or self::h4 or self::h5 or self::h6]');
+    public function getHeadings(HtmlDocument $document, bool $applyToDom = false): array
+    {
+        $domHeadings = $document->queryXPath(
+            ".//*[self::h1 or self::h2 or self::h3 or self::h4 or self::h5 or self::h6]"
+        );
 
         /** @var Heading[] $headings */
         $headings = [];
@@ -42,7 +46,7 @@ class HeadingHtmlProcessor extends HtmlProcessor {
 
         /** @var \DOMElement $domHeading */
         foreach ($domHeadings as $domHeading) {
-            $level = (int) str_replace('h', '', $domHeading->tagName);
+            $level = (int) str_replace("h", "", $domHeading->tagName);
 
             $text = $domHeading->textContent;
             if ($text === "") {
@@ -54,18 +58,14 @@ class HeadingHtmlProcessor extends HtmlProcessor {
             $count = $slugKeyCache[$slug] ?? 0;
             $slugKeyCache[$slug] = $count + 1;
             if ($count > 0) {
-                $slug .= '-' . $count;
+                $slug .= "-" . $count;
             }
 
             if ($applyToDom) {
-                $domHeading->setAttribute('data-id', $slug);
+                $domHeading->setAttribute("data-id", $slug);
             }
 
-            $headings[] = new Heading(
-                $domHeading->textContent,
-                $level,
-                $slug
-            );
+            $headings[] = new Heading($domHeading->textContent, $level, $slug);
         }
 
         return $headings;

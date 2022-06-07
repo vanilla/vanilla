@@ -216,9 +216,10 @@ export const newPostMenuClasses = useThemeCache(() => {
         height: styleUnit(48),
         ...newPostButtonBorderAndShadow,
         ...{
-            [`&:not([disabled]):focus-visible, &:not([disabled]):focus, &:not([disabled]):hover, &:not([disabled]):active`]: {
-                ...newPostButtonBorderAndShadow,
-            },
+            [`&:not([disabled]):focus-visible, &:not([disabled]):focus, &:not([disabled]):hover, &:not([disabled]):active`]:
+                {
+                    ...newPostButtonBorderAndShadow,
+                },
         },
     });
 

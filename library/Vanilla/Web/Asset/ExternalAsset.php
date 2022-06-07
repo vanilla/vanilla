@@ -12,29 +12,32 @@ use Vanilla\Contracts\Web\AssetInterface;
 /**
  * Class representing an external asset of some type.
  */
-class ExternalAsset implements AssetInterface {
-
+class ExternalAsset implements AssetInterface
+{
     /** @var string */
     private $url;
 
     /**
      * @param string $url
      */
-    public function __construct(string $url) {
+    public function __construct(string $url)
+    {
         $this->url = $url;
     }
 
     /**
      * @return string
      */
-    public function getWebPath(): string {
+    public function getWebPath(): string
+    {
         return $this->url;
     }
 
     /**
      * @inheritdoc
      */
-    public function isStatic(): bool {
+    public function isStatic(): bool
+    {
         return false;
     }
 }

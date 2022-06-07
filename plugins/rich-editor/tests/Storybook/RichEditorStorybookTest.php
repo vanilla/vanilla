@@ -14,8 +14,8 @@ use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 /**
  * HTML generation for the community in foundation.
  */
-class RichEditorStorybookTest extends StorybookGenerationTestCase {
-
+class RichEditorStorybookTest extends StorybookGenerationTestCase
+{
     use CommunityApiTestTrait;
 
     /** @var string[] */
@@ -26,12 +26,13 @@ class RichEditorStorybookTest extends StorybookGenerationTestCase {
      *
      * @return void
      */
-    public static function setUpBeforeClass(): void {
+    public static function setUpBeforeClass(): void
+    {
         parent::setUpBeforeClass();
-        self::container()->rule(EmbedService::class)
-            ->addCall('addCoreEmbeds');
+        self::container()
+            ->rule(EmbedService::class)
+            ->addCall("addCoreEmbeds");
     }
-
 
     /**
      * Test the rendered rich editor.
@@ -43,38 +44,43 @@ class RichEditorStorybookTest extends StorybookGenerationTestCase {
      *
      * @return void
      */
-    public function testRenderedRichEditor(string $url, string $storyName) {
+    public function testRenderedRichEditor(string $url, string $storyName)
+    {
         $this->generateStoryHtml($url, $storyName);
     }
-
 
     /**
      * @return array[]
      */
-    public function provideRichEditorTests(): array {
+    public function provideRichEditorTests(): array
+    {
         return [
-            ['/richeditorstyles/formatting', 'RichEditor Formatting'],
-            ['/richeditorstyles/images', 'RichEditor Images'],
+            ["/richeditorstyles/formatting", "RichEditor Formatting"],
+            ["/richeditorstyles/images", "RichEditor Images"],
         ];
     }
 
     /**
      * Test post being reinterpetted as rich.
      */
-    public function testEditPostReinterpetRich() {
+    public function testEditPostReinterpetRich()
+    {
         $this->createDiscussion([
             "name" => "Markdown Post",
             "body" => "## Heading\n\n_italic_ **bold**\n\n- list 1\n- list 2",
             "format" => MarkdownFormat::FORMAT_KEY,
         ]);
 
-        $this->runWithConfig([
-            \RichEditorPlugin::CONFIG_REINTERPRET_ENABLE => true,
-        ], function () {
-            $this->generateStoryHtml(
-                "/post/editdiscussion/" . $this->lastInsertedDiscussionID,
-                "RichEditor Convert Post"
-            );
-        });
+        $this->runWithConfig(
+            [
+                \RichEditorPlugin::CONFIG_REINTERPRET_ENABLE => true,
+            ],
+            function () {
+                $this->generateStoryHtml(
+                    "/post/editdiscussion/" . $this->lastInsertedDiscussionID,
+                    "RichEditor Convert Post"
+                );
+            }
+        );
     }
 }

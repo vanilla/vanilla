@@ -1,25 +1,26 @@
 <?php
 
-
 /**
  * Renders links to select locale.
  */
-class LocaleChooserModule extends Gdn_Module {
-
+class LocaleChooserModule extends Gdn_Module
+{
     /** @var string HTML links to activate locales. */
-    public $Links = '';
+    public $Links = "";
 
-    public function assetTarget() {
-        return 'Foot';
+    public function assetTarget()
+    {
+        return "Foot";
     }
 
     /**
      * Build footer link to change locale.
      */
-    public function buildLocaleLink($name, $urlCode) {
-        $url = 'profile/setlocale/'.$urlCode;
+    public function buildLocaleLink($name, $urlCode)
+    {
+        $url = "profile/setlocale/" . $urlCode;
 
-        return wrap(anchor($name, $url, 'js-hijack'), 'span', ['class' => 'LocaleOption '.$name.'Locale']);
+        return wrap(anchor($name, $url, "js-hijack"), "span", ["class" => "LocaleOption " . $name . "Locale"]);
     }
 
     /**
@@ -27,10 +28,11 @@ class LocaleChooserModule extends Gdn_Module {
      *
      * @return string HTML.
      */
-    public function buildLocales() {
+    public function buildLocales()
+    {
         $locales = MultilingualPlugin::enabledLocales();
 
-        $links = '';
+        $links = "";
         foreach ($locales as $code => $name) {
             $links .= $this->buildLocaleLink($name, $code);
         }
@@ -43,10 +45,12 @@ class LocaleChooserModule extends Gdn_Module {
      *
      * @return string|void
      */
-    public function toString() {
-        if (!$this->Links)
+    public function toString()
+    {
+        if (!$this->Links) {
             $this->Links = $this->buildLocales();
+        }
 
-        echo wrap($this->Links, 'div', ['class' => 'LocaleOptions']);
+        echo wrap($this->Links, "div", ["class" => "LocaleOptions"]);
     }
 }

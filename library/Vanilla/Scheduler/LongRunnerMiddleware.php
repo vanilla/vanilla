@@ -17,8 +17,8 @@ use Garden\Web\RequestInterface;
  * Add 2 global API parameters for configuring the long runner.
  * /api/v2/runs/long?longRunnerMode=async&longRunneTimeout=10
  */
-final class LongRunnerMiddleware {
-
+final class LongRunnerMiddleware
+{
     public const PARAM_MODE = "longRunnerMode";
     public const PARAM_TIMEOUT = "longRunnerTimeout";
 
@@ -30,7 +30,8 @@ final class LongRunnerMiddleware {
      *
      * @param LongRunner $longRunner
      */
-    public function __construct(LongRunner $longRunner) {
+    public function __construct(LongRunner $longRunner)
+    {
         $this->longRunner = $longRunner;
     }
 
@@ -41,14 +42,15 @@ final class LongRunnerMiddleware {
      * @param callable $next
      * @return mixed
      */
-    public function __invoke(RequestInterface $request, callable $next) {
+    public function __invoke(RequestInterface $request, callable $next)
+    {
         $schema = Schema::parse([
-            'longRunnerMode:s?' => [
-                'enum' => [LongRunner::MODE_ASYNC, LongRunner::MODE_SYNC],
+            "longRunnerMode:s?" => [
+                "enum" => [LongRunner::MODE_ASYNC, LongRunner::MODE_SYNC],
             ],
-            'longRunnerTimeout:i?' => [
-                'max' => LongRunner::TIMEOUT_MAX,
-                'min' => 0,
+            "longRunnerTimeout:i?" => [
+                "max" => LongRunner::TIMEOUT_MAX,
+                "min" => 0,
             ],
         ]);
         $query = $request->getQuery();

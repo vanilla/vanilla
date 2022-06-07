@@ -6,23 +6,24 @@
 
 namespace VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize;
 
-class CodeBlockSanitizeTest extends SanitizeTest {
-
+class CodeBlockSanitizeTest extends SanitizeTest
+{
     /**
      * @inheritdoc
      */
-    protected function insertContentOperations(string $content): array {
+    protected function insertContentOperations(string $content): array
+    {
         $operations = [
             ["insert" => $content],
             [
                 "attributes" => ["codeBlock" => true],
-                "insert" => "\n"
+                "insert" => "\n",
             ],
             ["insert" => $content],
             [
                 "attributes" => ["codeBlock" => true],
-                "insert" => "$content"
-            ]
+                "insert" => "$content",
+            ],
         ];
         return $operations;
     }

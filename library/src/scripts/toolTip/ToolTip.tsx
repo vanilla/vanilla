@@ -11,7 +11,7 @@ import Portal from "@reach/portal";
 import { toolTipClasses, tooltipVariables } from "@library/toolTip/toolTipStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import throttle from "lodash/throttle";
-import { StackingContextProvider, useStackingContext } from "@library/modal/StackingContext";
+import { StackingContextProvider, useStackingContext } from "@vanilla/react-utils";
 import { cx } from "@emotion/css";
 
 const nubPosition = (triggerRect, hasOverflow) => {

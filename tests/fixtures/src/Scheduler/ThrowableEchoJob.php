@@ -14,8 +14,8 @@ use Vanilla\Scheduler\Job\LocalJobInterface;
 /**
  * Class ThrowableEchoJob
  */
-class ThrowableEchoJob implements LocalJobInterface {
-
+class ThrowableEchoJob implements LocalJobInterface
+{
     /** @var LoggerInterface */
     protected $logger;
 
@@ -27,7 +27,8 @@ class ThrowableEchoJob implements LocalJobInterface {
      *
      * @param LoggerInterface $logger
      */
-    public function __construct(LoggerInterface $logger) {
+    public function __construct(LoggerInterface $logger)
+    {
         $this->logger = $logger;
     }
 
@@ -36,7 +37,8 @@ class ThrowableEchoJob implements LocalJobInterface {
      *
      * @param array $message
      */
-    public function setMessage(array $message) {
+    public function setMessage(array $message)
+    {
         $this->message = $message;
     }
 
@@ -45,7 +47,8 @@ class ThrowableEchoJob implements LocalJobInterface {
      *
      * @return JobExecutionStatus
      */
-    public function run(): JobExecutionStatus {
+    public function run(): JobExecutionStatus
+    {
         /** @noinspection PhpUndefinedFunctionInspection */
         /** @psalm-suppress UndefinedFunction */
         return nonExistentFunction();

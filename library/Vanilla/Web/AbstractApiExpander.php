@@ -10,8 +10,8 @@ namespace Vanilla\Web;
 /**
  * Interface used to expand record fragments with the ApiExpandMiddleware.
  */
-abstract class AbstractApiExpander {
-
+abstract class AbstractApiExpander
+{
     /** @var array<string, string> */
     private $expandFields = [];
 
@@ -50,7 +50,8 @@ abstract class AbstractApiExpander {
      *
      * @return array|null
      */
-    public function getDefaultRecord(): ?array {
+    public function getDefaultRecord(): ?array
+    {
         return null;
     }
 
@@ -63,7 +64,8 @@ abstract class AbstractApiExpander {
      *     'insertUser' => 'insertUserID'
      * ]
      */
-    public function getExpandFields(): array {
+    public function getExpandFields(): array
+    {
         return $this->expandFields;
     }
 
@@ -75,7 +77,8 @@ abstract class AbstractApiExpander {
      *
      * @return $this The instance for fluent method chaining.
      */
-    public function addExpandField(string $destinationKey, string $idKey): AbstractApiExpander {
+    public function addExpandField(string $destinationKey, string $idKey): AbstractApiExpander
+    {
         $this->expandFields[$destinationKey] = $idKey;
         return $this;
     }
@@ -87,7 +90,8 @@ abstract class AbstractApiExpander {
      *
      * @return string|null
      */
-    public function getFieldByDestination(string $destinationKey): ?string {
+    public function getFieldByDestination(string $destinationKey): ?string
+    {
         return $this->expandFields[$destinationKey] ?? null;
     }
 }

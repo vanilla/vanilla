@@ -10,9 +10,9 @@ use Garden\Web\Exception\ClientException;
  * Class QnaTypeHandler
  */
 
-class QnaTypeHandler extends \Vanilla\AbstractTypeHandler {
-
-    const HANDLER_TYPE = 'Question';
+class QnaTypeHandler extends \Vanilla\AbstractTypeHandler
+{
+    const HANDLER_TYPE = "Question";
 
     /** @var DiscussionModel */
     private $discussionModel;
@@ -25,7 +25,6 @@ class QnaTypeHandler extends \Vanilla\AbstractTypeHandler {
 
     /** @var CategoryModel */
     private $categoryModel;
-
 
     /**
      * QnATypeHandler constructor.
@@ -55,22 +54,20 @@ class QnaTypeHandler extends \Vanilla\AbstractTypeHandler {
      * @param string $to
      * @throws ClientException If category doesn't allow record type.
      */
-    public function handleTypeConversion(array $from, $to) {
+    public function handleTypeConversion(array $from, $to)
+    {
         $categoryID = $from["CategoryID"] ?? null;
         $category = $this->categoryModel->getID($categoryID, DATASET_TYPE_ARRAY);
-        $allowedTypes = $category['AllowedDiscussionTypes'] ?? [];
+        $allowedTypes = $category["AllowedDiscussionTypes"] ?? [];
 
         if (in_array(self::HANDLER_TYPE, $allowedTypes) || empty($allowedTypes)) {
-            $permissionCategoryID = $from['PermissionCategoryID'] ?? null;
-            $this->session->checkPermission(
-                'Vanilla.Discussions.Edit',
-                true,
-                'Category',
-                $permissionCategoryID
-            );
+            $permissionCategoryID = $from["PermissionCategoryID"] ?? null;
+            $this->session->checkPermission("Vanilla.Discussions.Edit", true, "Category", $permissionCategoryID);
             $this->convertTo($from, $to);
         } else {
-            throw new ClientException("Category #{$categoryID} doesn't allow for " . self::HANDLER_TYPE . " type records");
+            throw new ClientException(
+                "Category #{$categoryID} doesn't allow for " . self::HANDLER_TYPE . " type records"
+            );
         }
     }
 
@@ -80,8 +77,9 @@ class QnaTypeHandler extends \Vanilla\AbstractTypeHandler {
      * @param array $record
      * @param string $to
      */
-    public function convertTo(array $record, string $to) {
-        $id = $record['DiscussionID'] ?? null;
+    public function convertTo(array $record, string $to)
+    {
+        $id = $record["DiscussionID"] ?? null;
         $this->qnaPlugin->updateRecordType($id, $record, $to);
     }
 
@@ -92,7 +90,8 @@ class QnaTypeHandler extends \Vanilla\AbstractTypeHandler {
      * @param string $to
      * @return bool
      */
-    public function cleanUpRelatedData(array $record, string $to) {
+    public function cleanUpRelatedData(array $record, string $to)
+    {
         // answer clean up not implemented.
         return true;
     }

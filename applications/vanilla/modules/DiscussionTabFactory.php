@@ -15,8 +15,8 @@ use Vanilla\Widgets\AbstractTabWidgetTabFactory;
 /**
  * Tab factories for discussions.
  */
-class DiscussionTabFactory extends AbstractTabWidgetTabFactory {
-
+class DiscussionTabFactory extends AbstractTabWidgetTabFactory
+{
     public const PRESET_RECENT_DISCUSSIONS = "recent-discussions";
     public const PRESET_TRENDING_DISCUSSIONS = "trending-discussions";
     public const PRESET_TOP_DISCUSSIONS = "top-discussions";
@@ -42,7 +42,8 @@ class DiscussionTabFactory extends AbstractTabWidgetTabFactory {
      * @param array $apiParams
      * @param bool $isDefault
      */
-    public function __construct(string $presetID, string $defaultLabel, array $apiParams, bool $isDefault = false) {
+    public function __construct(string $presetID, string $defaultLabel, array $apiParams, bool $isDefault = false)
+    {
         $this->presetID = $presetID;
         $this->defaultLabel = $defaultLabel;
         $this->apiParams = $apiParams;
@@ -52,21 +53,24 @@ class DiscussionTabFactory extends AbstractTabWidgetTabFactory {
     /**
      * @return string
      */
-    public function getTabPresetID(): string {
+    public function getTabPresetID(): string
+    {
         return $this->presetID;
     }
 
     /**
      * @return string
      */
-    public function getWidgetClass(): string {
+    public function getWidgetClass(): string
+    {
         return DiscussionWidgetModule::class;
     }
 
     /**
      * @return AbstractReactModule
      */
-    public function getTabModule(): AbstractReactModule {
+    public function getTabModule(): AbstractReactModule
+    {
         /** @var DiscussionWidgetModule $module */
         $module = parent::getTabModule();
         $module->setApiParams($this->apiParams);
@@ -76,14 +80,16 @@ class DiscussionTabFactory extends AbstractTabWidgetTabFactory {
     /**
      * @return string
      */
-    public function getDefaultTabLabelCode(): string {
+    public function getDefaultTabLabelCode(): string
+    {
         return $this->defaultLabel;
     }
 
     /**
      * @return bool
      */
-    public function isDefault(): bool {
+    public function isDefault(): bool
+    {
         return $this->isDefault;
     }
 
@@ -92,13 +98,14 @@ class DiscussionTabFactory extends AbstractTabWidgetTabFactory {
      *
      * @return Reference
      */
-    public static function getRecentReference(): Reference {
+    public static function getRecentReference(): Reference
+    {
         return new Reference(static::class, [
             self::PRESET_RECENT_DISCUSSIONS,
-            'Recent Discussions',
+            "Recent Discussions",
             [
-                'sort' => '-dateLastComment',
-                'pinOrder' => 'mixed',
+                "sort" => "-dateLastComment",
+                "pinOrder" => "mixed",
             ],
             true,
         ]);
@@ -109,14 +116,15 @@ class DiscussionTabFactory extends AbstractTabWidgetTabFactory {
      *
      * @return Reference
      */
-    public static function getTrendingReference(): Reference {
+    public static function getTrendingReference(): Reference
+    {
         return new Reference(static::class, [
             self::PRESET_TRENDING_DISCUSSIONS,
-            'Trending Discussions',
+            "Trending Discussions",
             [
-                'slotType' => 'w',
-                'sort' => '-hot',
-                'pinOrder' => 'mixed',
+                "slotType" => "w",
+                "sort" => "-hot",
+                "pinOrder" => "mixed",
             ],
             true,
         ]);
@@ -127,14 +135,15 @@ class DiscussionTabFactory extends AbstractTabWidgetTabFactory {
      *
      * @return Reference
      */
-    public static function getTopReference(): Reference {
+    public static function getTopReference(): Reference
+    {
         return new Reference(static::class, [
             self::PRESET_TOP_DISCUSSIONS,
-            'Top Discussions',
+            "Top Discussions",
             [
-                'slotType' => 'm',
-                'sort' => '-score',
-                'pinOrder' => 'mixed',
+                "slotType" => "m",
+                "sort" => "-score",
+                "pinOrder" => "mixed",
             ],
         ]);
     }
@@ -144,12 +153,13 @@ class DiscussionTabFactory extends AbstractTabWidgetTabFactory {
      *
      * @return Reference
      */
-    public static function getAnnouncedReference(): Reference {
+    public static function getAnnouncedReference(): Reference
+    {
         return new Reference(static::class, [
             self::PRESET_ANNOUNCEMENTS,
-            'Announced Discussions',
+            "Announced Discussions",
             [
-                'pinned' => true,
+                "pinned" => true,
             ],
             true,
         ]);

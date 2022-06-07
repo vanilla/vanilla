@@ -18,14 +18,14 @@ use Vanilla\AddonManager;
  *
  * @deprecated 3.0 Use Vanilla\AddonManager.
  */
-class Gdn_ThemeManager extends Gdn_Pluggable {
-
+class Gdn_ThemeManager extends Gdn_Pluggable
+{
     const ACTION_ENABLE = 1;
 
     const ACTION_DISABLE = 2;
 
-    const DEFAULT_DESKTOP_THEME = 'default';
-    const DEFAULT_MOBILE_THEME = 'mobile';
+    const DEFAULT_DESKTOP_THEME = "default";
+    const DEFAULT_MOBILE_THEME = "mobile";
 
     /** @var array An array of search paths for themes and their files. */
     private $themeSearchPaths = null;
@@ -45,10 +45,10 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
     private $hasRequest = true;
 
     /** @var array The layout options for a category list. */
-    private $allowedCategoriesLayouts = ['table', 'modern', 'mixed'];
+    private $allowedCategoriesLayouts = ["table", "modern", "mixed"];
 
     /** @var array The layout options for a discussions list. */
-    private $allowedDiscussionsLayouts = ['table', 'modern'];
+    private $allowedDiscussionsLayouts = ["table", "modern"];
 
     /**
      * @var AddonManager
@@ -58,7 +58,8 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
     /**
      *
      */
-    public function __construct(AddonManager $addonManager = null, $hasRequest = null) {
+    public function __construct(AddonManager $addonManager = null, $hasRequest = null)
+    {
         parent::__construct();
         $this->addonManager = $addonManager;
         $this->hasRequest = !($hasRequest === false);
@@ -72,7 +73,8 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      * Finally, it parses all plugin files and extracts their events and plugged
      * methods.
      */
-    public function start($force = false) {
+    public function start($force = false)
+    {
         // Do nothing. The plugin manager handles the theme hooks.
     }
 
@@ -84,7 +86,8 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      * @param bool $force Deprecated.
      * @return array Returns the available themes in an array.
      */
-    public function availableThemes($force = false) {
+    public function availableThemes($force = false)
+    {
         $addons = $this->addonManager->lookupAllByType(Addon::TYPE_THEME);
         $result = [];
         /* @var Addon $addon */
@@ -102,7 +105,8 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      * @param null $pathListing
      * @return bool|string
      */
-    public function indexSearchPath($searchPath, &$themeInfo, $pathListing = null) {
+    public function indexSearchPath($searchPath, &$themeInfo, $pathListing = null)
+    {
         if (is_null($pathListing) || !is_array($pathListing)) {
             $pathListing = scandir($searchPath, 0);
             sort($pathListing);
@@ -113,39 +117,39 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
         }
 
         foreach ($pathListing as $themeFolderName) {
-            if (substr($themeFolderName, 0, 1) == '.') {
+            if (substr($themeFolderName, 0, 1) == ".") {
                 continue;
             }
 
             $themePath = combinePaths([$searchPath, $themeFolderName]);
             $themeFiles = $this->findThemeFilesOld($themePath);
 
-            if (val('about', $themeFiles) === false) {
+            if (val("about", $themeFiles) === false) {
                 continue;
             }
 
-            $themeAboutFile = val('about', $themeFiles);
+            $themeAboutFile = val("about", $themeFiles);
             $searchThemeInfo = $this->scanThemeFileOld($themeAboutFile);
 
             // Don't index archived themes.
-//         if (val('Archived', $SearchThemeInfo, FALSE))
-//            continue;
+            //         if (val('Archived', $SearchThemeInfo, FALSE))
+            //            continue;
 
             // Add the screenshot.
-            if (array_key_exists('screenshot', $themeFiles)) {
-                $relativeScreenshot = ltrim(str_replace(PATH_ROOT, '', val('screenshot', $themeFiles)), '/');
-                $searchThemeInfo['ScreenshotUrl'] = $this->asset($relativeScreenshot, true);
+            if (array_key_exists("screenshot", $themeFiles)) {
+                $relativeScreenshot = ltrim(str_replace(PATH_ROOT, "", val("screenshot", $themeFiles)), "/");
+                $searchThemeInfo["ScreenshotUrl"] = $this->asset($relativeScreenshot, true);
             }
 
             // Add the mobile screenshot.
-            if (array_key_exists('mobilescreenshot', $themeFiles)) {
-                $relativeScreenshot = ltrim(str_replace(PATH_ROOT, '', val('mobilescreenshot', $themeFiles)), '/');
-                $searchThemeInfo['MobileScreenshotUrl'] = $this->asset($relativeScreenshot, true);
+            if (array_key_exists("mobilescreenshot", $themeFiles)) {
+                $relativeScreenshot = ltrim(str_replace(PATH_ROOT, "", val("mobilescreenshot", $themeFiles)), "/");
+                $searchThemeInfo["MobileScreenshotUrl"] = $this->asset($relativeScreenshot, true);
             }
 
-            if (array_key_exists('hooks', $themeFiles)) {
-                $searchThemeInfo['HooksFile'] = val('hooks', $themeFiles, false);
-                $searchThemeInfo['RealHooksFile'] = realpath($searchThemeInfo['HooksFile']);
+            if (array_key_exists("hooks", $themeFiles)) {
+                $searchThemeInfo["HooksFile"] = val("hooks", $themeFiles, false);
+                $searchThemeInfo["RealHooksFile"] = realpath($searchThemeInfo["HooksFile"]);
             }
 
             if ($searchThemeInfo === false) {
@@ -165,11 +169,12 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      * @param string $withDomain Whether or not to include the domain.
      * @return string Returns the asset URL.
      */
-    private function asset($path, $withDomain) {
+    private function asset($path, $withDomain)
+    {
         if ($this->hasRequest) {
             return asset($path, $withDomain);
         } else {
-            return '/'.ltrim($path);
+            return "/" . ltrim($path);
         }
     }
 
@@ -178,8 +183,9 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      *
      * @deprecated
      */
-    public function clearThemeCache() {
-        deprecated('Gdn_PluginManager->clearThemeCache()');
+    public function clearThemeCache()
+    {
+        deprecated("Gdn_PluginManager->clearThemeCache()");
     }
 
     /**
@@ -187,7 +193,8 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      *
      * @deprecated
      */
-    public function searchPaths() {
+    public function searchPaths()
+    {
         return [];
     }
 
@@ -196,8 +203,9 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      *
      * @return array Deprecated.
      */
-    public function findThemeFiles() {
-        deprecated('Gdn_ThemeManager->findThemeFiles');
+    public function findThemeFiles()
+    {
+        deprecated("Gdn_ThemeManager->findThemeFiles");
         return [];
     }
 
@@ -210,30 +218,31 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      * @return array|false Returns an array of paths or false if the {@link $themePath} is invalid.
      * @deprecated
      */
-    private function findThemeFilesOld($themePath) {
+    private function findThemeFilesOld($themePath)
+    {
         if (!is_dir($themePath)) {
             return false;
         }
 
         $themeFiles = scandir($themePath);
         $testPatterns = [
-            'about\.php' => 'about',
-            '.*\.theme\.php' => 'about',
-            'class\..*themehooks\.php' => 'hooks',
-            'screenshot\.(gif|jpg|jpeg|png)' => 'screenshot',
-            'mobile\.(gif|jpg|jpeg|png)' => 'mobilescreenshot'
+            "about\.php" => "about",
+            ".*\.theme\.php" => "about",
+            "class\..*themehooks\.php" => "hooks",
+            "screenshot\.(gif|jpg|jpeg|png)" => "screenshot",
+            "mobile\.(gif|jpg|jpeg|png)" => "mobilescreenshot",
         ];
 
         $matchedThemeFiles = [];
         foreach ($themeFiles as $themeFile) {
             foreach ($testPatterns as $testPattern => $fileType) {
-                if (preg_match('!'.$testPattern.'!', $themeFile)) {
+                if (preg_match("!" . $testPattern . "!", $themeFile)) {
                     $matchedThemeFiles[$fileType] = combinePaths([$themePath, $themeFile]);
                 }
             }
         }
 
-        return array_key_exists('about', $matchedThemeFiles) ? $matchedThemeFiles : false;
+        return array_key_exists("about", $matchedThemeFiles) ? $matchedThemeFiles : false;
     }
 
     /**
@@ -244,7 +253,8 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      * @return null|array Returns the theme info.
      * @deprecated
      */
-    private function scanThemeFileOld($ThemeFile, $VariableName = '') {
+    private function scanThemeFileOld($ThemeFile, $VariableName = "")
+    {
         // Find the $PluginInfo array
         if (!file_exists($ThemeFile)) {
             return null;
@@ -253,17 +263,17 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
 
         $InfoBuffer = false;
         $ClassBuffer = false;
-        $ClassName = '';
-        $ThemeInfoString = '';
+        $ClassName = "";
+        $ThemeInfoString = "";
         if (!$VariableName) {
-            $VariableName = 'ThemeInfo';
+            $VariableName = "ThemeInfo";
         }
 
-        $ParseVariableName = '$'.$VariableName;
+        $ParseVariableName = '$' . $VariableName;
         ${$VariableName} = [];
 
         foreach ($Lines as $Line) {
-            if ($InfoBuffer && substr(trim($Line), -2) == ');') {
+            if ($InfoBuffer && substr(trim($Line), -2) == ");") {
                 $ThemeInfoString .= $Line;
                 $ClassBuffer = true;
                 $InfoBuffer = false;
@@ -277,18 +287,17 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
                 $ThemeInfoString .= $Line;
             }
 
-            if ($ClassBuffer && strtolower(substr(trim($Line), 0, 6)) == 'class ') {
-                $Parts = explode(' ', $Line);
+            if ($ClassBuffer && strtolower(substr(trim($Line), 0, 6)) == "class ") {
+                $Parts = explode(" ", $Line);
                 if (count($Parts) > 2) {
                     $ClassName = $Parts[1];
                 }
 
                 break;
             }
-
         }
         unset($Lines);
-        if ($ThemeInfoString != '') {
+        if ($ThemeInfoString != "") {
             @eval($ThemeInfoString);
         }
 
@@ -299,12 +308,12 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
             $name = key($var);
             $var = current($var);
 
-            $var['Index'] = $name;
-            $var['AboutFile'] = $ThemeFile;
-            $var['RealAboutFile'] = realpath($ThemeFile);
-            $var['ThemeRoot'] = dirname($ThemeFile);
-            touchValue('Name', $var, $name);
-            touchValue('Folder', $var, basename(dirname($ThemeFile)));
+            $var["Index"] = $name;
+            $var["AboutFile"] = $ThemeFile;
+            $var["RealAboutFile"] = realpath($ThemeFile);
+            $var["ThemeRoot"] = dirname($ThemeFile);
+            touchValue("Name", $var, $name);
+            touchValue("Folder", $var, basename(dirname($ThemeFile)));
 
             return $var;
         } elseif ($VariableName !== null) {
@@ -322,7 +331,8 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      * @param $themeName
      * @return array|bool
      */
-    public function getThemeInfo($themeName) {
+    public function getThemeInfo($themeName)
+    {
         $theme = $this->addonManager->lookupTheme($themeName);
         if ($theme) {
             return Gdn_PluginManager::calcOldInfoArray($theme);
@@ -336,7 +346,8 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      *
      * @param string $themeName The name of the theme.
      */
-    private function preparePreview($themeName) {
+    private function preparePreview($themeName)
+    {
         $themeInfo = $this->getThemeInfo($themeName);
         $this->setLayout($themeInfo, false);
     }
@@ -346,7 +357,8 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      *
      * @return mixed
      */
-    public function currentTheme() {
+    public function currentTheme()
+    {
         if (isMobile()) {
             if ($this->hasMobilePreview()) {
                 return $this->getMobilePreview();
@@ -367,7 +379,8 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      *
      * @return mixed
      */
-    public function desktopTheme() {
+    public function desktopTheme()
+    {
         if ($this->hasPreview()) {
             $preview = $this->getPreview();
             $this->preparePreview($preview);
@@ -381,24 +394,25 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      *
      * @throws Gdn_UserException
      */
-    public function disableTheme() {
-        if ($this->currentTheme() == 'default') {
-            throw new Gdn_UserException(t('You cannot disable the default theme.'));
+    public function disableTheme()
+    {
+        if ($this->currentTheme() == "default") {
+            throw new Gdn_UserException(t("You cannot disable the default theme."));
         }
         $oldTheme = $this->getEnabledDesktopThemeKey();
-        removeFromConfig('Garden.Theme');
+        removeFromConfig("Garden.Theme");
         $newTheme = $this->getEnabledDesktopThemeKey();
 
         if ($oldTheme != $newTheme) {
             $this->themeHook($oldTheme, self::ACTION_DISABLE, true);
             Logger::event(
-                'theme_changed',
+                "theme_changed",
                 Logger::INFO,
-                'The {themeType} theme was changed from {oldTheme} to {newTheme}.',
+                "The {themeType} theme was changed from {oldTheme} to {newTheme}.",
                 [
-                    'themeType' => 'desktop',
-                    'oldTheme' => $oldTheme,
-                    'newTheme' => $newTheme,
+                    "themeType" => "desktop",
+                    "oldTheme" => $oldTheme,
+                    "newTheme" => $newTheme,
                     Logger::FIELD_CHANNEL => Logger::CHANNEL_ADMIN,
                 ]
             );
@@ -413,21 +427,22 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      * @param boolean $callback whether to perform the hook method.
      * @return void
      */
-    private function themeHook($themeName, $forAction, $callback = false) {
+    private function themeHook($themeName, $forAction, $callback = false)
+    {
         switch ($forAction) {
             case self::ACTION_ENABLE:
-                $methodName = 'setup';
+                $methodName = "setup";
                 break;
             case self::ACTION_DISABLE:
-                $methodName = 'onDisable';
+                $methodName = "onDisable";
                 break;
             default:
-                $methodName = '';
+                $methodName = "";
         }
 
         $info = $this->getThemeInfo($themeName);
-        $pluginClass = val('ClassName', $info, '');
-        $path = val('RealHooksFile', $info , '');
+        $pluginClass = val("ClassName", $info, "");
+        $path = val("RealHooksFile", $info, "");
         if (!empty($path)) {
             include_once $path;
         }
@@ -445,8 +460,9 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      *
      * @return string
      */
-    public function enabledTheme() {
-        deprecated('enabledTheme', 'getEnabledDesktopThemeKey', 'March 2017');
+    public function enabledTheme()
+    {
+        deprecated("enabledTheme", "getEnabledDesktopThemeKey", "March 2017");
         return $this->getEnabledDesktopThemeKey();
     }
 
@@ -455,25 +471,26 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      *
      * @return string
      */
-    public function getEnabledDesktopThemeKey() {
-        $themeName = Gdn::config('Garden.Theme');
+    public function getEnabledDesktopThemeKey()
+    {
+        $themeName = Gdn::config("Garden.Theme");
         // Does it actually exist?
-        if ($themeName && (Gdn::addonManager()->lookupTheme($themeName) === null)) {
+        if ($themeName && Gdn::addonManager()->lookupTheme($themeName) === null) {
             return self::DEFAULT_DESKTOP_THEME;
         }
         return $themeName;
     }
-
 
     /**
      * Retrieves the key for the current mobile theme.
      *
      * @return string
      */
-    public function getEnabledMobileThemeKey() {
-        $themeName = Gdn::config('Garden.MobileTheme');
+    public function getEnabledMobileThemeKey()
+    {
+        $themeName = Gdn::config("Garden.MobileTheme");
         // Does it actually exist?
-        if ($themeName && (Gdn::addonManager()->lookupTheme($themeName) === null)) {
+        if ($themeName && Gdn::addonManager()->lookupTheme($themeName) === null) {
             return self::DEFAULT_MOBILE_THEME;
         }
         return $themeName;
@@ -485,7 +502,8 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      * @param bool $returnInSourceFormat
      * @return array|mixed
      */
-    public function enabledThemeInfo($returnInSourceFormat = false) {
+    public function enabledThemeInfo($returnInSourceFormat = false)
+    {
         $enabledThemeName = $this->getEnabledDesktopThemeKey();
         $themeInfo = $this->getThemeInfo($enabledThemeName);
 
@@ -498,27 +516,27 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
         }
 
         // Update the theme info for a format consumable by views.
-        if (is_array($themeInfo) & isset($themeInfo['Options'])) {
-            $options =& $themeInfo['Options'];
-            if (isset($options['Styles'])) {
-                foreach ($options['Styles'] as $key => $params) {
+        if (is_array($themeInfo) & isset($themeInfo["Options"])) {
+            $options = &$themeInfo["Options"];
+            if (isset($options["Styles"])) {
+                foreach ($options["Styles"] as $key => $params) {
                     if (is_string($params)) {
-                        $options['Styles'][$key] = ['Basename' => $params];
+                        $options["Styles"][$key] = ["Basename" => $params];
                     } elseif (is_array($params) && isset($params[0])) {
-                        $params['Basename'] = $params[0];
+                        $params["Basename"] = $params[0];
                         unset($params[0]);
-                        $options['Styles'][$key] = $params;
+                        $options["Styles"][$key] = $params;
                     }
                 }
             }
-            if (isset($options['Text'])) {
-                foreach ($options['Text'] as $key => $params) {
+            if (isset($options["Text"])) {
+                foreach ($options["Text"] as $key => $params) {
                     if (is_string($params)) {
-                        $options['Text'][$key] = ['Type' => $params];
+                        $options["Text"][$key] = ["Type" => $params];
                     } elseif (is_array($params) && isset($params[0])) {
-                        $params['Type'] = $params[0];
+                        $params["Type"] = $params[0];
                         unset($params[0]);
-                        $options['Text'][$key] = $params;
+                        $options["Text"][$key] = $params;
                     }
                 }
             }
@@ -532,15 +550,16 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      * @param array $themeInfo A theme info array retrieved from `getThemeInfo()`.
      * @param bool $save Whether to save the layout to config.
      */
-    private function setLayout($themeInfo, $save = true) {
-        if ($layout = val('Layout', $themeInfo, false)) {
-            $discussionsLayout = strtolower(val('Discussions', $layout, ''));
-            $categoriesLayout = strtolower(val('Categories', $layout, ''));
+    private function setLayout($themeInfo, $save = true)
+    {
+        if ($layout = val("Layout", $themeInfo, false)) {
+            $discussionsLayout = strtolower(val("Discussions", $layout, ""));
+            $categoriesLayout = strtolower(val("Categories", $layout, ""));
             if ($discussionsLayout && in_array($discussionsLayout, $this->allowedDiscussionsLayouts)) {
-                saveToConfig('Vanilla.Discussions.Layout', $discussionsLayout, $save);
+                saveToConfig("Vanilla.Discussions.Layout", $discussionsLayout, $save);
             }
             if ($categoriesLayout && in_array($categoriesLayout, $this->allowedCategoriesLayouts)) {
-                saveToConfig('Vanilla.Categories.Layout', $categoriesLayout, $save);
+                saveToConfig("Vanilla.Categories.Layout", $categoriesLayout, $save);
             }
         }
     }
@@ -551,9 +570,10 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      * @param string $themeKey The key value of the theme we're checking.
      * @return bool Whether the given theme has theme options.
      */
-    public function hasThemeOptions($themeKey) {
+    public function hasThemeOptions($themeKey)
+    {
         $themeInfo = $this->getThemeInfo($themeKey);
-        $options = val('Options', $themeInfo, []);
+        $options = val("Options", $themeInfo, []);
         return !empty($options);
     }
 
@@ -565,25 +585,28 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      * @return bool
      * @throws Exception
      */
-    public function enableTheme($themeName, $isMobile = false) {
+    public function enableTheme($themeName, $isMobile = false)
+    {
         // Make sure to run the setup
         $this->testTheme($themeName);
 
         // Set the theme.
         $themeInfo = $this->getThemeInfo($themeName);
-        $themeFolder = val('Folder', $themeInfo, '');
+        $themeFolder = val("Folder", $themeInfo, "");
 
-        $oldTheme = $isMobile ? c('Garden.MobileTheme', self::DEFAULT_MOBILE_THEME) : c('Garden.Theme', self::DEFAULT_DESKTOP_THEME);
+        $oldTheme = $isMobile
+            ? c("Garden.MobileTheme", self::DEFAULT_MOBILE_THEME)
+            : c("Garden.Theme", self::DEFAULT_DESKTOP_THEME);
 
-        if ($themeFolder == '') {
-            throw new Exception(t('The theme folder was not properly defined.'));
+        if ($themeFolder == "") {
+            throw new Exception(t("The theme folder was not properly defined."));
         } else {
             if ($isMobile) {
-                saveToConfig('Garden.MobileTheme', $themeName);
+                saveToConfig("Garden.MobileTheme", $themeName);
             } else {
-                saveToConfig('Garden.Theme', $themeName);
+                saveToConfig("Garden.Theme", $themeName);
                 // Cleanup from the other theme page.
-                removeFromConfig('Garden.CurrentTheme');
+                removeFromConfig("Garden.CurrentTheme");
             }
 
             $this->setLayout($themeInfo);
@@ -593,13 +616,13 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
             $this->themeHook($themeName, self::ACTION_ENABLE, true);
             $this->themeHook($oldTheme, self::ACTION_DISABLE, true);
             Logger::event(
-                'theme_changed',
+                "theme_changed",
                 Logger::INFO,
-                'The {themeType} theme changed from {oldTheme} to {newTheme}.',
+                "The {themeType} theme changed from {oldTheme} to {newTheme}.",
                 [
-                    'themeType' => $isMobile ? 'mobile' : 'desktop',
-                    'oldTheme' => $oldTheme,
-                    'newTheme' => $themeName,
+                    "themeType" => $isMobile ? "mobile" : "desktop",
+                    "oldTheme" => $oldTheme,
+                    "newTheme" => $themeName,
                     Logger::FIELD_CHANNEL => Logger::CHANNEL_ADMIN,
                 ]
             );
@@ -617,10 +640,11 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      * @return bool Returns
      * @throws Gdn_UserException Throws an exception when there was an issue testing the theme.
      */
-    public function testTheme($themeName) {
+    public function testTheme($themeName)
+    {
         $addon = $this->addonManager->lookupTheme($themeName);
         if (!$addon) {
-            throw notFoundException('Plugin');
+            throw notFoundException("Plugin");
         }
 
         try {
@@ -637,7 +661,8 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      *
      * @return mixed
      */
-    public function mobileTheme() {
+    public function mobileTheme()
+    {
         if ($this->hasMobilePreview()) {
             return $this->getMobilePreview();
         }
@@ -649,8 +674,9 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      *
      * @return string The folder name of the previewed mobile theme or an empty string.
      */
-    public function getPreview() {
-        return htmlspecialchars(Gdn::session()->getPreference('PreviewThemeFolder', ''));
+    public function getPreview()
+    {
+        return htmlspecialchars(Gdn::session()->getPreference("PreviewThemeFolder", ""));
     }
 
     /**
@@ -658,8 +684,9 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      *
      * @return bool Whether there's a theme being previewed.
      */
-    public function hasPreview() {
-        return Gdn::session()->getPreference('PreviewThemeFolder', '') !== '';
+    public function hasPreview()
+    {
+        return Gdn::session()->getPreference("PreviewThemeFolder", "") !== "";
     }
 
     /**
@@ -667,8 +694,9 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      *
      * @return bool Whether there's a mobile theme being previewed.
      */
-    public function hasMobilePreview() {
-        return Gdn::session()->getPreference('PreviewMobileThemeFolder', '') !== '';
+    public function hasMobilePreview()
+    {
+        return Gdn::session()->getPreference("PreviewMobileThemeFolder", "") !== "";
     }
 
     /**
@@ -677,8 +705,9 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      *
      * @return string The folder name of the previewed mobile theme or an empty string.
      */
-    public function getMobilePreview() {
-        return htmlspecialchars(Gdn::session()->getPreference('PreviewMobileThemeFolder', ''));
+    public function getMobilePreview()
+    {
+        return htmlspecialchars(Gdn::session()->getPreference("PreviewMobileThemeFolder", ""));
     }
 
     /**
@@ -687,8 +716,9 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      * @param $type
      * @return mixed
      */
-    public function themeFromType($type) {
-        if ($type === 'mobile') {
+    public function themeFromType($type)
+    {
+        if ($type === "mobile") {
             return $this->mobileTheme();
         } else {
             return $this->desktopTheme();

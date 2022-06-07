@@ -5,14 +5,14 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-use \Vanilla\Authenticator\Authenticator;
-use \Vanilla\Authenticator\ShimAuthenticator;
+use Vanilla\Authenticator\Authenticator;
+use Vanilla\Authenticator\ShimAuthenticator;
 
 /**
  * Class OAuth2Authenticator.
  */
-class OAuth2Authenticator extends ShimAuthenticator {
-
+class OAuth2Authenticator extends ShimAuthenticator
+{
     /** @var OAuth2Plugin */
     private $oAuth2Plugin;
 
@@ -23,36 +23,40 @@ class OAuth2Authenticator extends ShimAuthenticator {
      *
      * @throws \Garden\Schema\ValidationException
      */
-    public function __construct(OAuth2Plugin $oAuth2Plugin) {
+    public function __construct(OAuth2Plugin $oAuth2Plugin)
+    {
         $this->oAuth2Plugin = $oAuth2Plugin;
 
-        parent::__construct('OAuth2');
+        parent::__construct("OAuth2");
     }
 
     /**
      * @inheritDoc
      */
-    protected static function getAuthenticatorTypeInfoImpl(): array {
+    protected static function getAuthenticatorTypeInfoImpl(): array
+    {
         return [
-            'ui' => [
-                'photoUrl' => null,
-                'backgroundColor' => null,
-                'foregroundColor' => null,
-            ]
+            "ui" => [
+                "photoUrl" => null,
+                "backgroundColor" => null,
+                "foregroundColor" => null,
+            ],
         ];
     }
 
     /**
      * @inheritdoc
      */
-    public function isActive(): bool {
+    public function isActive(): bool
+    {
         return $this->oAuth2Plugin->isConfigured();
     }
 
     /**
      * @inheritDoc
      */
-    public static function isUnique(): bool {
+    public static function isUnique(): bool
+    {
         return true;
     }
 }

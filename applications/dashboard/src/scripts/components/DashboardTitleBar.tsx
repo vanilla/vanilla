@@ -72,7 +72,7 @@ export default function DashboardTitleBar(props: IProps) {
                                 </>
                             }
                             showCloseIcon={false}
-                            navigationItems={(sections as unknown) as INavigationVariableItem[]}
+                            navigationItems={sections as unknown as INavigationVariableItem[]}
                             forceHamburgerOpen={props.forceHamburgerOpen}
                         />
                         <div className={classes.logo}>

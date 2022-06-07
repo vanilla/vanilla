@@ -10,7 +10,8 @@ namespace Vanilla\Contracts\Models;
 /**
  * Interface for record types with custom logic for crawlable counts.
  */
-interface SiteTotalProviderInterface {
+interface SiteTotalProviderInterface
+{
     /**
      * Calculate the actual count of crawlable records for the model.
      *

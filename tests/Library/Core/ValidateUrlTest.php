@@ -13,13 +13,14 @@ use PHPUnit\Framework\TestCase;
  * Tests for validateUrl().
  */
 
-class ValidateUrlTest extends TestCase {
-
+class ValidateUrlTest extends TestCase
+{
     /**
      * Test with empty string.
      */
-    public function testValidateUrlEmptyString() {
-        $actual = validateUrl('');
+    public function testValidateUrlEmptyString()
+    {
+        $actual = validateUrl("");
         $expected = true;
         $this->assertSame($expected, $actual);
     }
@@ -27,8 +28,9 @@ class ValidateUrlTest extends TestCase {
     /**
      * Test with valid string.
      */
-    public function testValidateUrlWithValidString() {
-        $actual = validateUrl('http://example.com');
+    public function testValidateUrlWithValidString()
+    {
+        $actual = validateUrl("http://example.com");
         $expected = true;
         $this->assertSame($expected, $actual);
     }
@@ -36,8 +38,9 @@ class ValidateUrlTest extends TestCase {
     /**
      * Test with invalid string.
      */
-    public function testValidateUrlWithInvalidString() {
-        $actual = validateUrl('http:///example.com');
+    public function testValidateUrlWithInvalidString()
+    {
+        $actual = validateUrl("http:///example.com");
         $expected = false;
         $this->assertSame($expected, $actual);
     }

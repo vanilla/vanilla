@@ -26,7 +26,8 @@ use Vanilla\Widgets\React\SectionAwareInterface;
 /**
  * Data resolver for hydrating a react widget.
  */
-class ReactResolver extends AbstractDataResolver implements LayoutAssetAwareInterface, PageHeadAwareInterface {
+class ReactResolver extends AbstractDataResolver implements LayoutAssetAwareInterface, PageHeadAwareInterface
+{
     use PageHeadAwareTrait;
     use LayoutAssetAwareTrait;
 
@@ -48,7 +49,8 @@ class ReactResolver extends AbstractDataResolver implements LayoutAssetAwareInte
      * @param class-string<ReactWidgetInterface> $reactWidgetClass
      * @param Container $container This is a module factory, so we need the container to instantiate modules.
      */
-    public function __construct(string $reactWidgetClass, Container $container) {
+    public function __construct(string $reactWidgetClass, Container $container)
+    {
         $this->reactWidgetClass = $reactWidgetClass;
         $this->container = $container;
     }
@@ -56,14 +58,16 @@ class ReactResolver extends AbstractDataResolver implements LayoutAssetAwareInte
     /**
      * @return class-string<ReactWidgetInterface>
      */
-    public function getReactWidgetClass(): string {
+    public function getReactWidgetClass(): string
+    {
         return $this->reactWidgetClass;
     }
 
     /**
      * @inheritdoc
      */
-    protected function resolveInternal(array $data, array $params) {
+    protected function resolveInternal(array $data, array $params)
+    {
         /** @var ReactWidgetInterface $module */
         $module = $this->container->get($this->reactWidgetClass);
 
@@ -81,7 +85,7 @@ class ReactResolver extends AbstractDataResolver implements LayoutAssetAwareInte
         } else {
             foreach ($data as $name => $value) {
                 // Check for a setter method
-                if (method_exists($module, $method = 'set'.ucfirst($name))) {
+                if (method_exists($module, $method = "set" . ucfirst($name))) {
                     $module->$method($value);
                 } else {
                     $module->$name = $value;
@@ -108,7 +112,8 @@ class ReactResolver extends AbstractDataResolver implements LayoutAssetAwareInte
      *
      * @return bool
      */
-    public static function isReactNode($node): bool {
+    public static function isReactNode($node): bool
+    {
         return ArrayUtils::isArray($node) && isset($node['$reactComponent']) && isset($node['$reactProps']);
     }
 
@@ -117,7 +122,8 @@ class ReactResolver extends AbstractDataResolver implements LayoutAssetAwareInte
      *
      * @return array
      */
-    public function getRecommendedSectionIDs(): array {
+    public function getRecommendedSectionIDs(): array
+    {
         $widgetClass = $this->getReactWidgetClass();
         if (is_a($widgetClass, SectionAwareInterface::class, true)) {
             return $widgetClass::getRecommendedSectionIDs();
@@ -129,12 +135,13 @@ class ReactResolver extends AbstractDataResolver implements LayoutAssetAwareInte
     /**
      * @inheritdoc
      */
-    public function getSchema(): ?Schema {
+    public function getSchema(): ?Schema
+    {
         /** @var ReactWidgetInterface $class */
         $class = $this->reactWidgetClass;
         $schema = $class::getWidgetSchema();
-        if ($schema->getField('description', null) === null) {
-            $schema->setField('description', $class::getWidgetName());
+        if ($schema->getField("description", null) === null) {
+            $schema->setField("description", $class::getWidgetName());
         }
         return $schema;
     }
@@ -142,7 +149,8 @@ class ReactResolver extends AbstractDataResolver implements LayoutAssetAwareInte
     /**
      * @return string
      */
-    private function getHydrateGroup(): string {
+    private function getHydrateGroup(): string
+    {
         if (is_a($this->reactWidgetClass, AbstractLayoutSection::class, true)) {
             return self::HYDRATE_GROUP_SECTION;
         } else {
@@ -153,16 +161,18 @@ class ReactResolver extends AbstractDataResolver implements LayoutAssetAwareInte
     /**
      * @inheritdoc
      */
-    public function getType(): string {
+    public function getType(): string
+    {
         /** @var ReactWidgetInterface $module */
         $module = $this->reactWidgetClass;
-        return self::HYDRATE_GROUP_REACT . '.' . $module::getWidgetID();
+        return self::HYDRATE_GROUP_REACT . "." . $module::getWidgetID();
     }
 
     /**
      * @inheritdoc
      */
-    public function getHydrateGroups(): array {
+    public function getHydrateGroups(): array
+    {
         return [$this->getHydrateGroup()];
     }
 }

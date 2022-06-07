@@ -10,8 +10,8 @@ namespace Vanilla\Search;
 /**
  * A collector of search types.
  */
-interface SearchTypeCollectorInterface {
-
+interface SearchTypeCollectorInterface
+{
     /**
      * Register a search type.
      *

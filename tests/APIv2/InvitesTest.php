@@ -9,16 +9,17 @@ namespace VanillaTests\APIv2;
 /**
  * Test the /api/v2/invites endpoints.
  */
-class InvitesTest extends AbstractResourceTest {
-
+class InvitesTest extends AbstractResourceTest
+{
     // You can't edit an invite.
     protected $editFields = [];
 
     /**
      * {@inheritdoc}
      */
-    public function __construct($name = null, array $data = [], $dataName = '') {
-        $this->baseUrl = '/invites';
+    public function __construct($name = null, array $data = [], $dataName = "")
+    {
+        $this->baseUrl = "/invites";
 
         parent::__construct($name, $data, $dataName);
     }
@@ -26,29 +27,31 @@ class InvitesTest extends AbstractResourceTest {
     /**
      * {@inheritdoc}
      */
-    public function record() {
+    public function record()
+    {
         static $inc = 0;
-        $record = ['email' => 'vanilla-'.($inc++).'@example.com'];
+        $record = ["email" => "vanilla-" . $inc++ . "@example.com"];
         return $record;
     }
 
     /**
      * {@inheritdoc}
      */
-    public static function setupBeforeClass(): void {
+    public static function setupBeforeClass(): void
+    {
         parent::setupBeforeClass();
 
         /** @var \Gdn_Configuration $config */
-        $config = static::container()->get('Config');
-        $config->set('Garden.Email.Disabled', true, true, false);
-        $config->set('Garden.Registration.Method', 'Invitation');
-
+        $config = static::container()->get("Config");
+        $config->set("Garden.Email.Disabled", true, true, false);
+        $config->set("Garden.Registration.Method", "Invitation");
     }
 
     /**
      * {@inheritdoc}
      */
-    public function testDelete() {
+    public function testDelete()
+    {
         parent::testDelete();
     }
 
@@ -57,8 +60,9 @@ class InvitesTest extends AbstractResourceTest {
      * @requires function InvitationsApiController::get_edit
      * @group ignore
      */
-    public function testGetEdit($record = null) {
-        $this->fail(__METHOD__.' needs to be implemented.');
+    public function testGetEdit($record = null)
+    {
+        $this->fail(__METHOD__ . " needs to be implemented.");
     }
 
     /**
@@ -66,14 +70,16 @@ class InvitesTest extends AbstractResourceTest {
      * @requires function InvitationsApiController::get_edit
      * @group ignore
      */
-    public function testGetEditFields() {
-        $this->fail(__METHOD__.' needs to be implemented.');
+    public function testGetEditFields()
+    {
+        $this->fail(__METHOD__ . " needs to be implemented.");
     }
 
     /**
      * {@inheritdoc}
      */
-    public function testIndex() {
+    public function testIndex()
+    {
         parent::testIndex();
     }
 
@@ -81,15 +87,17 @@ class InvitesTest extends AbstractResourceTest {
      * {@inheritdoc}
      * @requires function InvitationsApiController::patch
      */
-    public function testPatchFull() {
-        $this->fail(__METHOD__.' needs to be implemented.');
+    public function testPatchFull()
+    {
+        $this->fail(__METHOD__ . " needs to be implemented.");
     }
 
     /**
      * {@inheritdoc}
      * @requires function InvitationsApiController::patch
      */
-    public function testPatchSparse($field) {
-        $this->fail(__METHOD__.' needs to be implemented.');
+    public function testPatchSparse($field)
+    {
+        $this->fail(__METHOD__ . " needs to be implemented.");
     }
 }

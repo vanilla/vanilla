@@ -14,21 +14,23 @@ use Vanilla\Web\ThemedPage;
 /**
  * Base page for rendering custom layouts.
  */
-class LayoutPage extends ThemedPage {
-
+class LayoutPage extends ThemedPage
+{
     /**
      * In the future this will be responsible for pre-hydrating layout specs.
      *
      * @inheritdoc
      */
-    public function initialize() {
+    public function initialize()
+    {
         // Do nothing.
     }
 
     /**
      * @return string
      */
-    public function getAssetSection(): string {
+    public function getAssetSection(): string
+    {
         return "layouts";
     }
 }

@@ -13,8 +13,8 @@ use Vanilla\Web\SystemTokenUtils;
 /**
  * Parameters to run a long-runner action.
  */
-final class LongRunnerAction {
-
+final class LongRunnerAction
+{
     /**
      * Special arg that represents the previous total of a progressable action.
      */
@@ -40,7 +40,8 @@ final class LongRunnerAction {
      * @param array $args The arguments to pass to the method.
      * @param array $options See LongRunner::OPT_* options.
      */
-    public function __construct(string $className, string $method, array $args, array $options = []) {
+    public function __construct(string $className, string $method, array $args, array $options = [])
+    {
         $this->className = $className;
         $this->method = $method;
         $this->args = $args;
@@ -83,14 +84,9 @@ final class LongRunnerAction {
      *
      * @return string A JWT of the next job payload.
      */
-    public function asCallbackPayload(SystemTokenUtils $tokenUtils): string {
-        return self::makeCallbackPayload(
-            $tokenUtils,
-            $this->className,
-            $this->method,
-            $this->args,
-            $this->options
-        );
+    public function asCallbackPayload(SystemTokenUtils $tokenUtils): string
+    {
+        return self::makeCallbackPayload($tokenUtils, $this->className, $this->method, $this->args, $this->options);
     }
 
     /**
@@ -102,37 +98,43 @@ final class LongRunnerAction {
      *
      * @return LongRunnerAction
      */
-    public static function fromCallbackPayload(string $jwt, SystemTokenUtils $tokenUtils, RequestInterface $request): LongRunnerAction {
+    public static function fromCallbackPayload(
+        string $jwt,
+        SystemTokenUtils $tokenUtils,
+        RequestInterface $request
+    ): LongRunnerAction {
         $decoded = $tokenUtils->decode($jwt, $request)[SystemTokenUtils::CLAIM_REQUEST_BODY];
         return new LongRunnerAction(
-            $decoded['class'],
-            $decoded['method'],
-            $decoded['args'] ?? [],
-            $decoded['options'] ?? []
+            $decoded["class"],
+            $decoded["method"],
+            $decoded["args"] ?? [],
+            $decoded["options"] ?? []
         );
     }
 
     /**
      * @return string
      */
-    public function getClassName(): string {
+    public function getClassName(): string
+    {
         return $this->className;
     }
 
     /**
      * @return string
      */
-    public function getMethod(): string {
+    public function getMethod(): string
+    {
         return $this->method;
     }
 
     /**
      * @return array
      */
-    public function getArgs(): array {
+    public function getArgs(): array
+    {
         return $this->args;
     }
-
 
     /**
      * Apply next args to the action.
@@ -141,7 +143,8 @@ final class LongRunnerAction {
      *
      * @return $this
      */
-    public function applyNextArgs(LongRunnerNextArgs $args): LongRunnerAction {
+    public function applyNextArgs(LongRunnerNextArgs $args): LongRunnerAction
+    {
         $this->args = $args->getNextArgs();
         return $this;
     }
@@ -149,7 +152,8 @@ final class LongRunnerAction {
     /**
      * @return array
      */
-    public function getOptions(): array {
+    public function getOptions(): array
+    {
         return $this->options;
     }
 }

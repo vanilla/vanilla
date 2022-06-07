@@ -13,34 +13,37 @@
  *
  * @deprecated 2.2.113 Dropped in favor of muting categories
  */
-class CategoryFollowToggleModule extends Gdn_Module {
-
+class CategoryFollowToggleModule extends Gdn_Module
+{
     /**
      * Set the preference in the user's session.
      */
-    public function setToggle() {
+    public function setToggle()
+    {
         $session = Gdn::session();
         if (!$session->isValid()) {
             return;
         }
 
-        $showAllCategories = getIncomingValue('ShowAllCategories', '');
-        if ($showAllCategories != '') {
-            $showAllCategories = $showAllCategories == 'true' ? true : false;
-            $showAllCategoriesPref = $session->getPreference('ShowAllCategories');
+        $showAllCategories = getIncomingValue("ShowAllCategories", "");
+        if ($showAllCategories != "") {
+            $showAllCategories = $showAllCategories == "true" ? true : false;
+            $showAllCategoriesPref = $session->getPreference("ShowAllCategories");
             if ($showAllCategories != $showAllCategoriesPref) {
-                $session->setPreference('ShowAllCategories', $showAllCategories);
+                $session->setPreference("ShowAllCategories", $showAllCategories);
             }
 
-            redirectTo('/'.ltrim(Gdn::request()->path(), '/'));
+            redirectTo("/" . ltrim(Gdn::request()->path(), "/"));
         }
     }
 
-    public function assetTarget() {
-        return 'Panel';
+    public function assetTarget()
+    {
+        return "Panel";
     }
 
-    public function toString() {
-        return '';
+    public function toString()
+    {
+        return "";
     }
 }

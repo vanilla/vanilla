@@ -7,21 +7,28 @@
 
 namespace VanillaTests\APIv2;
 
+use Garden\Web\Exception\ForbiddenException;
+use Garden\Web\Exception\NotFoundException;
 use Gdn;
 use Gdn_Session;
+use Ramsey\Uuid\Uuid;
 use SessionModel;
+use VanillaTests\UsersAndRolesApiTestTrait;
 
 /**
  * Tests for the Gdn_Session class.
  *
  * @package VanillaTests\APIv2
  */
-class SessionTest extends AbstractAPIv2Test {
+class SessionTest extends AbstractAPIv2Test
+{
+    use UsersAndRolesApiTestTrait;
 
     /**
      * @inheritDoc
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         $this->createUserFixtures();
     }
@@ -29,7 +36,8 @@ class SessionTest extends AbstractAPIv2Test {
     /**
      * {@inheritDoc}
      */
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
         $session = $this->getSession();
         $session->end();
@@ -38,8 +46,9 @@ class SessionTest extends AbstractAPIv2Test {
     /**
      * Test that when you start a session with a stringified ID, the userID is set as an integer.
      */
-    public function testUserIDIsInteger() {
-        $stringifiedID = (string)$this->memberID;
+    public function testUserIDIsInteger()
+    {
+        $stringifiedID = (string) $this->memberID;
         $session = $this->getSession();
         $session->start($stringifiedID);
         $this->assertIsInt($session->UserID);
@@ -49,36 +58,66 @@ class SessionTest extends AbstractAPIv2Test {
     /**
      * Test that when you start a session with a UserID, using new session ID in the cookies.
      */
-    public function testSessionIDUsage() {
+    public function testSessionIDUsage()
+    {
         $this->enableFeature(\Gdn_Session::FEATURE_SESSION_ID_COOKIE);
         $session = $this->getSession();
         $session->start($this->memberID);
         $this->clearIdentity();
         $sessionModel = new SessionModel();
         $sessionID = Gdn::authenticator()->getSession();
-        $dbSession = $sessionModel->getID($sessionID);
+        $dbSession = $sessionModel->getID($sessionID, DATASET_TYPE_ARRAY);
 
-        $this->assertIsString($session->SessionID, 'Session is a string');
-        $this->assertEquals($sessionID, $session->SessionID, 'Session in DB is the same as session returned.');
-        $this->assertEquals($this->memberID, $dbSession->UserID, 'User ID used for session creation is the same as found in the DB session record.');
+        $this->assertIsString($session->SessionID, "Session is a string");
+        $this->assertEquals($sessionID, $session->SessionID, "Session in DB is the same as session returned.");
+        $this->assertEquals(
+            $this->memberID,
+            $dbSession["UserID"],
+            "User ID used for session creation is the same as found in the DB session record."
+        );
+    }
+
+    /**
+     * Test that when you start a session with a UserID and existing SessionID, using provided session ID in the cookies.
+     */
+    public function testUsingExistingSessionID()
+    {
+        $this->enableFeature(\Gdn_Session::FEATURE_SESSION_ID_COOKIE);
+        $session = $this->getSession();
+        $existingSessionID = str_replace("-", "", Uuid::uuid1()->toString());
+        $session->start($this->memberID, true, false, $existingSessionID);
+        $this->clearIdentity();
+        $sessionModel = new SessionModel();
+        $sessionID = Gdn::authenticator()->getSession();
+        $dbSession = $sessionModel->getID($sessionID, DATASET_TYPE_ARRAY);
+
+        $this->assertSame($existingSessionID, $session->SessionID, "Existing session is the same as returned form DB.");
+        $this->assertEquals($sessionID, $session->SessionID, "Session in DB is the same as getSession returned.");
+        $this->assertEquals(
+            $this->memberID,
+            $dbSession["UserID"],
+            "User ID used for session creation is the same as found in the DB session record."
+        );
     }
 
     /**
      * Test ending the session deletes it.
      */
-    public function testEndSession() {
+    public function testEndSession()
+    {
         $this->enableFeature(\Gdn_Session::FEATURE_SESSION_ID_COOKIE);
         $session = $this->getSession();
         $session->start($this->memberID);
         $session->end();
         $sessionID = Gdn::authenticator()->getSession();
-        $this->assertEquals('', $sessionID);
+        $this->assertEquals("", $sessionID);
     }
 
     /**
      * Test start session will use what's in the cookie, finding it automaticly.
      */
-    public function testSessionStart() {
+    public function testSessionStart()
+    {
         $session = $this->getSession();
         $session->start($this->memberID);
         $this->enableFeature(\Gdn_Session::FEATURE_SESSION_ID_COOKIE);
@@ -88,13 +127,18 @@ class SessionTest extends AbstractAPIv2Test {
         $newSession = $this->getSession();
         $newSession->start();
 
-        $this->assertEquals($sessionID, $newSession->SessionID, "Session ID from authentication same as from start new session.");
+        $this->assertEquals(
+            $sessionID,
+            $newSession->SessionID,
+            "Session ID from authentication same as from start new session."
+        );
     }
 
     /**
      * Test start session with old method, and change flag, that converts to new session cookie.
      */
-    public function testTransitionSessionToNewMethod() {
+    public function testTransitionSessionToNewMethod()
+    {
         $session = $this->getSession();
         $session->start($this->memberID);
         $this->assertEquals($session->UserID, $this->memberID);
@@ -105,11 +149,11 @@ class SessionTest extends AbstractAPIv2Test {
         $this->assertEquals($this->memberID, $session->UserID);
     }
 
-
     /**
      * Test failed session.
      */
-    public function testSessionStartWithoutUserID() {
+    public function testSessionStartWithoutUserID()
+    {
         $this->enableFeature(\Gdn_Session::FEATURE_SESSION_ID_COOKIE);
         $session = $this->getSession();
         $session->start();
@@ -117,11 +161,11 @@ class SessionTest extends AbstractAPIv2Test {
         $this->assertEquals("", $session->SessionID, "No Session ID.");
     }
 
-
     /**
      * Test load session failed when session is no longer in the database.
      */
-    public function testDeletedSession() {
+    public function testDeletedSession()
+    {
         $this->enableFeature(\Gdn_Session::FEATURE_SESSION_ID_COOKIE);
         $session = $this->getSession();
         $session->start($this->memberID);
@@ -132,13 +176,78 @@ class SessionTest extends AbstractAPIv2Test {
         $this->clearIdentity();
         $session->start();
 
-        $this->assertEquals("", $session->SessionID, "Session ID from authentication is invalid, and would cause guest usage.");
+        $this->assertEquals(
+            "",
+            $session->SessionID,
+            "Session ID from authentication is invalid, and would cause guest usage."
+        );
+    }
+
+    /**
+     * Test removing session from database using the DELETE `/sessions/{sessionID}` API endpoint.
+     */
+    public function testApiDeleteSession()
+    {
+        $this->enableFeature(\Gdn_Session::FEATURE_SESSION_ID_COOKIE);
+        $sessionID = $this->runWithUser(function () {
+            $session = $this->getSession();
+            $session->start($this->memberID);
+
+            // Get the session ID from an API call to GET `/sessions/user`.
+            return $this->api()
+                ->get("/sessions/user")
+                ->getBody()[0]["sessionID"];
+        }, $this->memberID);
+
+        // Expire the session using DELETE `/sessions/{sessionID}`
+        $deletionStatusCode = $this->api()
+            ->delete("/sessions/" . $this->memberID, ["sessionID" => $sessionID])
+            ->getStatusCode();
+        // Assert we got a success response code from the deletion process.
+        $this->assertEquals(204, $deletionStatusCode);
+
+        // Try to expire the session AGAIN using DELETE `/sessions/{sessionID}`.
+        // We are expecting this will throw a not found exception.
+        $this->expectException(NotFoundException::class);
+        $this->api()
+            ->delete("/sessions/" . $this->memberID, ["sessionID" => $sessionID])
+            ->getStatusCode();
+    }
+
+    /**
+     * Test removing session from database using the DELETE `/sessions/{sessionID}` API endpoint.
+     */
+    public function testApiListSessions()
+    {
+        $this->enableFeature(\Gdn_Session::FEATURE_SESSION_ID_COOKIE);
+        // We start a session
+        $session = $this->getSession();
+        $session->start($this->memberID);
+
+        // Check that the admin user has the `Garden.Moderation.Manage` permission.
+        $this->assertTrue($this->userModel->checkPermission($this->adminID, ["Garden.Moderation.Manage"]));
+        // Poke the GET `/sessions` API with the `Garden.Moderation.Manage` permission & assert that we get results.
+        $sessions = $this->runWithUser(function () {
+            return $this->api()
+                ->get("/sessions")
+                ->getBody();
+        }, $this->adminID);
+        $this->assertTrue(count($sessions) > 0);
+
+        // Poke the GET `/sessions` API with the member user & assert that we are met with a forbidden exception.
+        $this->runWithUser(function () {
+            $this->expectException(ForbiddenException::class);
+            $this->api()
+                ->get("/sessions")
+                ->getBody();
+        }, $this->memberID);
     }
 
     /**
      * Test load session failed when session Expiration data is in the past.
      */
-    public function testExpiredSession() {
+    public function testExpiredSession()
+    {
         $this->enableFeature(\Gdn_Session::FEATURE_SESSION_ID_COOKIE);
         $session = $this->getSession();
         $session->start($this->memberID);
@@ -146,22 +255,46 @@ class SessionTest extends AbstractAPIv2Test {
         $sessionModel = new SessionModel();
         $sessionModel->update(
             [
-                'DateExpires' => date(MYSQL_DATE_FORMAT, time() - Gdn_Session::VISIT_LENGTH)
+                "DateExpires" => date(MYSQL_DATE_FORMAT, time() - Gdn_Session::VISIT_LENGTH),
             ],
-            ['SessionID' => $sessionID]
+            ["SessionID" => $sessionID]
         );
         $this->clearIdentity();
         $session->start();
 
-        $this->assertEquals("", $session->SessionID, "Session ID from authentication is expired, causes guest permission.");
+        $this->assertEquals(
+            "",
+            $session->SessionID,
+            "Session ID from authentication is expired, causes guest permission."
+        );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function testFailedSessionCheck()
+    {
+        $this->disableFeature(\Gdn_Session::FEATURE_SESSION_ID_COOKIE);
+        $this->disableFeature(\Gdn_Session::FEATURE_ENFORCE_SESSION_ID_COOKIE);
+        $this->expectException(ForbiddenException::class);
+        $session = $this->getSession();
+        $session->start($this->memberID);
+        $this->assertEquals($session->UserID, $this->memberID);
+        $this->clearIdentity();
+        $this->enableFeature(\Gdn_Session::FEATURE_SESSION_ID_COOKIE);
+        $this->enableFeature(\Gdn_Session::FEATURE_ENFORCE_SESSION_ID_COOKIE);
+        $session->start();
+
+        $this->assertEquals(0, $session->UserID);
     }
 
     /**
      * Clear identity session and user IDs.
      */
-    public function clearIdentity() {
-        $_Identity = Gdn::factory('Identity');
+    public function clearIdentity()
+    {
+        $_Identity = Gdn::factory("Identity");
         $_Identity->UserID = null;
-        $_Identity->SessionID = '';
+        $_Identity->SessionID = "";
     }
 }

@@ -23,8 +23,8 @@ use Vanilla\Utility\ModelUtils;
 /**
  * Class to hold a search result.
  */
-class SearchResultItem implements \JsonSerializable, \ArrayAccess {
-
+class SearchResultItem implements \JsonSerializable, \ArrayAccess
+{
     const FIELD_SCORE = "searchScore";
     const FIELD_SUBQUERY_COUNT = "subqueryMatchCount";
 
@@ -47,7 +47,8 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess {
      *
      * @param array $data
      */
-    public function __construct(array $data) {
+    public function __construct(array $data)
+    {
         $this->data = $this->itemInputSchema()->validate($data);
     }
 
@@ -68,56 +69,55 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess {
      *
      * @return Schema
      */
-    protected function extraSchema(): ?Schema {
+    protected function extraSchema(): ?Schema
+    {
         return null;
     }
 
     /**
      * @return Schema
      */
-    protected function itemInputSchema(): Schema {
+    protected function itemInputSchema(): Schema
+    {
         if ($this->schema === null) {
-            $countSchema = Schema::parse([
-                'count:i',
-                'labelCode:s',
-            ]);
+            $countSchema = Schema::parse(["count:i", "labelCode:s"]);
             $schema = Schema::parse([
-                'recordType:s',
-                'type:s',
-                'legacyType:s?',
-                'body:s?',
-                'bodyRaw:s?',
-                'bodyPlainText:s?',
-                'excerpt:s?',
-                'image:s|o?',
-                'recordID:i',
-                'categoryID:i?',
-                'altRecordID:i?',
-                'siteID:i?',
-                'siteDomain:s?',
-                'name:s',
-                'url' => [
-                    'type' => 'string',
-                    'format' => 'uri',
+                "recordType:s",
+                "type:s",
+                "legacyType:s?",
+                "body:s?",
+                "bodyRaw:s?",
+                "bodyPlainText:s?",
+                "excerpt:s?",
+                "image:s|o?",
+                "recordID:i",
+                "categoryID:i?",
+                "altRecordID:i?",
+                "siteID:i?",
+                "siteDomain:s?",
+                "name:s",
+                "url" => [
+                    "type" => "string",
+                    "format" => "uri",
                 ],
-                'dateInserted:dt',
-                'dateUpdated:dt?',
-                'breadcrumbs:a?' => new InstanceValidatorSchema(Breadcrumb::class),
+                "dateInserted:dt",
+                "dateUpdated:dt?",
+                "breadcrumbs:a?" => new InstanceValidatorSchema(Breadcrumb::class),
                 "insertUserID:i?",
                 "updateUserID:i?",
                 "format:s?",
-                'status:s?',
-                'isForeign:b?' => [
-                    'default' => false,
+                "status:s?",
+                "isForeign:b?" => [
+                    "default" => false,
                 ],
                 "counts:a?" => $countSchema,
 
                 // Search result specific.
-                'searchScore:f?',
-                'subqueryMatchCount:i?' => [
-                    'default' => 1,
+                "searchScore:f?",
+                "subqueryMatchCount:i?" => [
+                    "default" => 1,
                 ],
-                'subqueryExtraParams:o?',
+                "subqueryExtraParams:o?",
             ]);
 
             $extra = $this->extraSchema();
@@ -134,114 +134,130 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess {
     /**
      * @return string
      */
-    public function getRecordType(): string {
-        return $this->data['recordType'];
+    public function getRecordType(): string
+    {
+        return $this->data["recordType"];
     }
 
     /**
      * @return string
      */
-    public function getType(): string {
-        return $this->data['type'];
+    public function getType(): string
+    {
+        return $this->data["type"];
     }
 
     /**
      * @return int
      */
-    public function getRecordID(): int {
-        return $this->data['recordID'];
+    public function getRecordID(): int
+    {
+        return $this->data["recordID"];
     }
 
     /**
      * @return int
      */
-    public function getCategoryID(): ?int {
-        return $this->data['categoryID'] ?? null;
+    public function getCategoryID(): ?int
+    {
+        return $this->data["categoryID"] ?? null;
     }
 
     /**
      * @return int|null
      */
-    public function getAltRecordID(): ?int {
-        return $this->data['altRecordID'] ?? null;
+    public function getAltRecordID(): ?int
+    {
+        return $this->data["altRecordID"] ?? null;
     }
 
     /**
      * @param string $domain
      */
-    public function setSiteDomain(string $domain): void {
-        $this->data['siteDomain'] = $domain;
+    public function setSiteDomain(string $domain): void
+    {
+        $this->data["siteDomain"] = $domain;
     }
 
     /**
      * @return ?int
      */
-    public function getSiteID(): ?int {
-        return $this->data['siteID'] ?? null;
+    public function getSiteID(): ?int
+    {
+        return $this->data["siteID"] ?? null;
     }
 
     /**
      * @return string
      */
-    public function getName(): string {
-        return $this->data['name'];
+    public function getName(): string
+    {
+        return $this->data["name"];
     }
 
     /**
      * @return bool
      */
-    public function isForeign(): bool {
-        return $this->data['isForeign'];
+    public function isForeign(): bool
+    {
+        return $this->data["isForeign"];
     }
 
     /**
      * @param bool $isForeign
      */
-    public function setIsForeign(bool $isForeign): void {
-        $this->data['isForeign'] = $isForeign;
+    public function setIsForeign(bool $isForeign): void
+    {
+        $this->data["isForeign"] = $isForeign;
     }
 
     /**
      * @return int|null
      */
-    public function getSubqueryMatchCount(): ?int {
+    public function getSubqueryMatchCount(): ?int
+    {
         return $this->data[self::FIELD_SUBQUERY_COUNT] ?? null;
     }
 
     /**
      * @param int|null $count
      */
-    public function setSubqueryMatchCount(?int $count): void {
+    public function setSubqueryMatchCount(?int $count): void
+    {
         $this->data[self::FIELD_SUBQUERY_COUNT] = $count;
     }
 
     /**
      * @return float|null
      */
-    public function getSearchScore(): ?float {
+    public function getSearchScore(): ?float
+    {
         return $this->data[self::FIELD_SCORE] ?? null;
     }
 
     /**
      * @param float|null $score
      */
-    public function setSearchScore(?float $score): void {
+    public function setSearchScore(?float $score): void
+    {
         $this->data[self::FIELD_SCORE] = $score;
     }
 
     /**
      * @return string
      */
-    public function getUrl(): string {
-        return $this->data['url'];
+    public function getUrl(): string
+    {
+        return $this->data["url"];
     }
 
     /**
      * @return string|null
      */
-    public function getExcerpt(): ?string {
-        if (array_key_exists('excerpt', $this->data)) {
-            return $this->data['excerpt'];
+    public function getExcerpt(): ?string
+    {
+        if (array_key_exists("excerpt", $this->data)) {
+            return $this->data["excerpt"];
         }
 
         if ($this->getBody() !== null && $this->getFormat() !== null) {
@@ -254,16 +270,17 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess {
     /**
      * @return array|null
      */
-    public function getImage(): ?array {
+    public function getImage(): ?array
+    {
         $resultImage = null;
-        $imageField = $this->data['image'] ?? null;
+        $imageField = $this->data["image"] ?? null;
         if ($imageField !== null) {
             if (is_array($imageField)) {
                 $resultImage = $imageField;
             } elseif (is_string($imageField)) {
                 $resultImage = [
-                    'url' => $imageField,
-                    'alt' => t('Untitled'),
+                    "url" => $imageField,
+                    "alt" => t("Untitled"),
                 ];
             }
         } elseif ($this->getBody() !== null && $this->getFormat() !== null) {
@@ -271,9 +288,9 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess {
         }
 
         if ($resultImage !== null) {
-            $imageUrl = $resultImage['url'];
+            $imageUrl = $resultImage["url"];
             $srcSetService = \Gdn::getContainer()->get(ImageSrcSetService::class);
-            $resultImage['urlSrcSet'] = $srcSetService->getResizedSrcSet($imageUrl);
+            $resultImage["urlSrcSet"] = $srcSetService->getResizedSrcSet($imageUrl);
         }
         return $resultImage;
     }
@@ -281,9 +298,10 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess {
     /**
      * @return array
      */
-    public function getImages(): array {
-        if (array_key_exists('images', $this->data)) {
-            return $this->data['images'];
+    public function getImages(): array
+    {
+        if (array_key_exists("images", $this->data)) {
+            return $this->data["images"];
         }
         if ($this->getBody() !== null && $this->getFormat() !== null) {
             return \Gdn::formatService()->parseImages($this->getBody(), $this->getFormat());
@@ -291,34 +309,36 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess {
         return [];
     }
 
-
     /**
      * @return string|null
      */
-    public function getBody(): ?string {
-        return $this->data['body'] ?? null;
+    public function getBody(): ?string
+    {
+        return $this->data["body"] ?? null;
     }
 
     /**
      * @return string|null
      */
-    public function getBodyPlainText(): ?string {
-        return $this->data['bodyPlainText'] ?? null;
+    public function getBodyPlainText(): ?string
+    {
+        return $this->data["bodyPlainText"] ?? null;
     }
-
 
     /**
      * @return string|null
      */
-    public function getBodyRaw(): ?string {
-        return $this->data['bodyRaw'] ?? null;
+    public function getBodyRaw(): ?string
+    {
+        return $this->data["bodyRaw"] ?? null;
     }
 
     /**
      * Get the highlighted string.
      */
-    public function getHighlight() {
-        return $this->data['highlight'] ?? null;
+    public function getHighlight()
+    {
+        return $this->data["highlight"] ?? null;
     }
 
     /**
@@ -326,21 +346,23 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess {
      *
      * @param string $highlight
      */
-    public function setHighlight(string $highlight = '') {
-        $this->data['highlight'] = $highlight;
+    public function setHighlight(string $highlight = "")
+    {
+        $this->data["highlight"] = $highlight;
     }
 
     /**
      * @return string|null
      */
-    public function getFormat(): string {
+    public function getFormat(): string
+    {
         // Workaround because sometimes we get an already formatted body.
-        $format = $this->data['format'] ?? '';
+        $format = $this->data["format"] ?? "";
         if (!$format) {
             $format = WysiwygFormat::FORMAT_KEY;
         }
 
-        if ($format === 'rich' || $format === 'Rich' && !stringBeginsWith('[{', $this->getBody())) {
+        if ($format === "rich" || ($format === "Rich" && !stringBeginsWith("[{", $this->getBody()))) {
             $format = WysiwygFormat::FORMAT_KEY;
         }
 
@@ -352,7 +374,8 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess {
      *
      * @param string[]|string|bool $expandFields
      */
-    public function setExpands($expandFields) {
+    public function setExpands($expandFields)
+    {
         $this->expandFields = $expandFields;
     }
 
@@ -361,39 +384,40 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess {
      *
      * @return array The filtered data.
      */
-    protected function getFilteredOutput(): array {
+    protected function getFilteredOutput(): array
+    {
         // Copy so we don't modify internally.
         $data = $this->data;
 
-        if (!ModelUtils::isExpandOption('body', $this->expandFields)) {
-            unset($data['body']);
+        if (!ModelUtils::isExpandOption("body", $this->expandFields)) {
+            unset($data["body"]);
         }
 
-        if (ModelUtils::isExpandOption('excerpt', $this->expandFields)) {
-            $data['excerpt'] = $this->getExcerpt();
+        if (ModelUtils::isExpandOption("excerpt", $this->expandFields)) {
+            $data["excerpt"] = $this->getExcerpt();
         } else {
-            unset($data['excerpt']);
+            unset($data["excerpt"]);
         }
 
         // Only comes on input.
-        if (ModelUtils::isExpandOption('image', $this->expandFields)) {
-            $data['image'] = $this->getImage();
+        if (ModelUtils::isExpandOption("image", $this->expandFields)) {
+            $data["image"] = $this->getImage();
         } else {
-            unset($data['image']);
+            unset($data["image"]);
         }
 
-        if (!ModelUtils::isExpandOption('collapse', $this->expandFields)) {
-            unset($data['subqueryMatchCount']);
-            unset($data['subqueryExtraParams']);
+        if (!ModelUtils::isExpandOption("collapse", $this->expandFields)) {
+            unset($data["subqueryMatchCount"]);
+            unset($data["subqueryExtraParams"]);
         }
 
         if ($this->isForeign()) {
-            unset($data['insertUser']);
-            unset($data['updateUser']);
+            unset($data["insertUser"]);
+            unset($data["updateUser"]);
         }
 
-        unset($data['format']);
-        unset($data['rawBody']);
+        unset($data["format"]);
+        unset($data["rawBody"]);
         return $data;
     }
 
@@ -404,7 +428,8 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess {
     /**
      * @inheritdoc
      */
-    public function jsonSerialize() {
+    public function jsonSerialize()
+    {
         $output = $this->getFilteredOutput();
 
         return $this->jsonFilter($output);
@@ -413,21 +438,24 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess {
     /**
      * @inheritdoc
      */
-    public function offsetExists($offset) {
+    public function offsetExists($offset)
+    {
         return isset($this->data[$offset]);
     }
 
     /**
      * @inheritdoc
      */
-    public function offsetGet($offset) {
+    public function offsetGet($offset)
+    {
         return $this->data[$offset] ?? null;
     }
 
     /**
      * @inheritdoc
      */
-    public function offsetSet($offset, $value) {
+    public function offsetSet($offset, $value)
+    {
         if (is_null($offset)) {
             $this->data[] = $value;
         } else {
@@ -440,7 +468,8 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess {
     /**
      * @inheritdoc
      */
-    public function offsetUnset($offset) {
+    public function offsetUnset($offset)
+    {
         unset($this->data[$offset]);
         $this->itemInputSchema()->validate($this->data);
     }
@@ -450,85 +479,85 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess {
      *
      * @return array
      */
-    public function asLegacyArray(): array {
-        $date = $this->data['dateInserted'] ?? null;
+    public function asLegacyArray(): array
+    {
+        $date = $this->data["dateInserted"] ?? null;
         $dateString = $date ? $date->format(\DateTime::ATOM) : null;
         $dateHtml = $dateString ? \Gdn::dateTimeFormatter()->formatDate($dateString) : null;
         $summary = $this->getExcerpt();
 
         $notes = null;
         if (debug()) {
-            $notes = 'Score: ' . $this->getSearchScore();
+            $notes = "Score: " . $this->getSearchScore();
         }
 
         return [
-            'PrimaryID' => $this->getRecordID(),
-            'CategoryID' => $this->getCategoryID() ?? 0, // 0 fallback needed for compatibility.'
-            'DiscussionID' => in_array($this->getRecordType(), ['discussion', 'comment']) ? $this->data['discussionID'] ?? null : null,
-            'RecordType' => $this->getRecordType(),
-            'Type' => $this->data['legacyType'] ?? $this->getType(),
-            'Format' => HtmlFormat::FORMAT_KEY, // Forced to HTML for compatibility.
-            'Summary' => $summary,
-            'Url' => $this->getUrl(),
-            'Title' => $this->getName(),
+            "PrimaryID" => $this->getRecordID(),
+            "CategoryID" => $this->getCategoryID() ?? 0, // 0 fallback needed for compatibility.'
+            "DiscussionID" => in_array($this->getRecordType(), ["discussion", "comment"])
+                ? $this->data["discussionID"] ?? null
+                : null,
+            "RecordType" => $this->getRecordType(),
+            "Type" => $this->data["legacyType"] ?? $this->getType(),
+            "Format" => HtmlFormat::FORMAT_KEY, // Forced to HTML for compatibility.
+            "Summary" => $summary,
+            "Url" => $this->getUrl(),
+            "Title" => $this->getName(),
 
-            'Notes' => $notes,
+            "Notes" => $notes,
 
             // Dates
-            'DateInserted' => $dateString,
-            'DateHtml' => $dateHtml,
-            'Breadcrumbs' => isset($this->data['breadcrumbs']) ? BreadcrumbModel::crumbsAsArray($this->data['breadcrumbs']) : [],
-            'Score' => 0,
-            'Count' => $this->getSubqueryMatchCount(),
+            "DateInserted" => $dateString,
+            "DateHtml" => $dateHtml,
+            "Breadcrumbs" => isset($this->data["breadcrumbs"])
+                ? BreadcrumbModel::crumbsAsArray($this->data["breadcrumbs"])
+                : [],
+            "Score" => 0,
+            "Count" => $this->getSubqueryMatchCount(),
 
-            'Media' => [],
-            'images' => $this->getImages(),
+            "Media" => [],
+            "images" => $this->getImages(),
 
             // User data.
-            'UserID' => $this->data['insertUserID'] ?? -1,
-            'Name' => $this->data['insertUser']['name'] ?? 'Unknown',
-            'Photo' => $this->data['insertUser']['photoUrl'],
+            "UserID" => $this->data["insertUserID"] ?? -1,
+            "Name" => $this->data["insertUser"]["name"] ?? "Unknown",
+            "Photo" => $this->data["insertUser"]["photoUrl"],
         ];
     }
 
     /**
      * @return Schema
      */
-    public static function legacySchema(): Schema {
+    public static function legacySchema(): Schema
+    {
         return Schema::parse([
-            'PrimaryID:i',
-            'CategoryID:i',
-            'DiscussionID:i?',
-            'RecordType:s',
-            'Type:s',
-            'Format:s',
-            'Summary:s',
-            'Url:s',
-            'Title:s',
-            'DateInserted:s?',
-            'DateHtml:s?',
-            'Breadcrumbs:a' => Schema::parse([
-                'Name:s',
-                'Url:s',
-            ]),
-            'Notes:s?', // Extra metadata, eg. relevance/scoring.
-            'Score:i',
-            'Count:i?', // Subquery matches.
+            "PrimaryID:i",
+            "CategoryID:i",
+            "DiscussionID:i?",
+            "RecordType:s",
+            "Type:s",
+            "Format:s",
+            "Summary:s",
+            "Url:s",
+            "Title:s",
+            "DateInserted:s?",
+            "DateHtml:s?",
+            "Breadcrumbs:a" => Schema::parse(["Name:s", "Url:s"]),
+            "Notes:s?", // Extra metadata, eg. relevance/scoring.
+            "Score:i",
+            "Count:i?", // Subquery matches.
 
             // Left behind for compatibility with existing view overrides.
             // They won't see the media previews unless they are updated, but at least they won't break.
-            'Media:a',
+            "Media:a",
 
             // This is where the actual images live.
-            'images:a' => Schema::parse([
-                'url:s',
-                'alt:s',
-            ]),
+            "images:a" => Schema::parse(["url:s", "alt:s"]),
 
             // User data
-            'UserID:s',
-            'Name:s',
-            'Photo:s',
+            "UserID:s",
+            "Name:s",
+            "Photo:s",
         ]);
     }
 }

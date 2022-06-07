@@ -20,10 +20,14 @@ import { CloseIcon } from "../shared/CloseIcon";
 import { AutoCompleteOption, IAutoCompleteOption, IAutoCompleteOptionProps } from "./AutoCompleteOption";
 import { AutoCompleteContext, IAutoCompleteContext, IAutoCompleteInputState } from "./AutoCompleteContext";
 import { useComboboxContext } from "@reach/combobox";
+import groupBy from "lodash/groupBy";
+import sortBy from "lodash/sortBy";
+import { useStackingContext } from "@vanilla/react-utils";
 
 function AutoCompleteArrow() {
     const { size } = useContext(AutoCompleteContext);
-    const classes = useMemo(() => autoCompleteClasses({ size }), [size]);
+    const { zIndex } = useStackingContext();
+    const classes = useMemo(() => autoCompleteClasses({ size, zIndex }), [size, zIndex]);
     return (
         <div className={classes.autoCompleteArrow}>
             <DropDownArrow />
@@ -34,7 +38,8 @@ function AutoCompleteArrow() {
 function AutoCompleteClear(props: { onClear(): void }) {
     const { onClear } = props;
     const { size } = useContext(AutoCompleteContext);
-    const classes = useMemo(() => autoCompleteClasses({ size }), [size]);
+    const { zIndex } = useStackingContext();
+    const classes = useMemo(() => autoCompleteClasses({ size, zIndex }), [size, zIndex]);
     return (
         <div
             className={classes.autoCompleteClear}
@@ -58,7 +63,8 @@ function AutoCompleteClear(props: { onClear(): void }) {
 function AutoCompleteToken(props: { label: string; onUnSelect(): void }) {
     const { onUnSelect, label } = props;
     const { size } = useContext(AutoCompleteContext);
-    const classes = useMemo(() => autoCompleteClasses({ size }), [size]);
+    const { zIndex } = useStackingContext();
+    const classes = useMemo(() => autoCompleteClasses({ size, zIndex }), [size, zIndex]);
     return (
         <div className={cx("autocomplete-token", classes.inputTokenTag)} tabIndex={0}>
             <label>{label}</label>
@@ -155,11 +161,11 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
         optionProvider,
         ...otherProps
     } = props;
-    const classes = useMemo(() => autoCompleteClasses({ size, isDisabled: disabled, isClearable: !!clear }), [
-        size,
-        disabled,
-        clear,
-    ]);
+    const { zIndex } = useStackingContext();
+    const classes = useMemo(
+        () => autoCompleteClasses({ size, isDisabled: disabled, isClearable: !!clear, zIndex }),
+        [size, disabled, clear, zIndex],
+    );
     const classesInput = useMemo(() => inputClasses({ size }), [size]);
     const [controlledOptions, setControlledOptions] = useState<IAutoCompleteOptionProps[]>();
     const [arbitraryValues, setArbitraryValues] = useState<string[]>([]);

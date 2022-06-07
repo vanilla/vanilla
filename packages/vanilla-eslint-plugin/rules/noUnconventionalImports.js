@@ -49,7 +49,6 @@ const noUnconventionalImports = {
                     return;
                 }
 
-
                 const srcScriptsMatch = value.match(SRC_SCRIPTS_IMPORT_REGEX);
                 if (srcScriptsMatch) {
                     context.report({

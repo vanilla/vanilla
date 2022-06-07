@@ -18,8 +18,8 @@ use Vanilla\Scheduler\TrackingSlipInterface;
 /**
  * Class InstantScheduler
  */
-class InstantScheduler extends DummyScheduler {
-
+class InstantScheduler extends DummyScheduler
+{
     /**
      * @var int Used to keep jobs executing in the order they are queued.
      *
@@ -43,7 +43,8 @@ class InstantScheduler extends DummyScheduler {
      * @param array|null $expectedMessage If null don't check the message.
      * @param string $message
      */
-    public function assertJobScheduled(string $expectedType, ?array $expectedMessage = null, string $message = ""): void {
+    public function assertJobScheduled(string $expectedType, ?array $expectedMessage = null, string $message = ""): void
+    {
         if ($expectedMessage !== null) {
             ksort($expectedMessage);
         }
@@ -77,7 +78,8 @@ class InstantScheduler extends DummyScheduler {
      * @param JobDescriptorInterface $jobDescriptor
      * @return TrackingSlipInterface
      */
-    public function addJobDescriptor(JobDescriptorInterface $jobDescriptor): TrackingSlipInterface {
+    public function addJobDescriptor(JobDescriptorInterface $jobDescriptor): TrackingSlipInterface
+    {
         $result = parent::addJobDescriptor($jobDescriptor);
 
         $type = $jobDescriptor->getJobType();
@@ -96,7 +98,8 @@ class InstantScheduler extends DummyScheduler {
      * Override to track execution.
      * @inheritdoc
      */
-    protected function dispatchAll() {
+    protected function dispatchAll()
+    {
         if ($this->isPaused) {
             return;
         }
@@ -112,14 +115,16 @@ class InstantScheduler extends DummyScheduler {
     /**
      * Pause execution of jobs.
      */
-    public function pause() {
+    public function pause()
+    {
         $this->isPaused = true;
     }
 
     /**
      * Resume execution of jobs. Any scheduled jobs will be executed immediately after resume.
      */
-    public function resume() {
+    public function resume()
+    {
         $this->isPaused = false;
         $this->dispatchAll();
     }
@@ -127,14 +132,16 @@ class InstantScheduler extends DummyScheduler {
     /**
      * @return TrackingSlip[]
      */
-    public function getTrackingSlips(): array {
+    public function getTrackingSlips(): array
+    {
         return $this->trackingSlips;
     }
 
     /**
      * Reset the scheduler.
      */
-    public function reset() {
+    public function reset()
+    {
         $this->trackingSlips = [];
         $this->isPaused = false;
         $this->isDispatching = false;

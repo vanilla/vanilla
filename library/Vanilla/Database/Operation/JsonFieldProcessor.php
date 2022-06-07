@@ -12,8 +12,8 @@ use Vanilla\Logging\LoggerUtils;
 /**
  * Database operation processor for packing and unpacking JSON fields.
  */
-class JsonFieldProcessor implements Processor {
-
+class JsonFieldProcessor implements Processor
+{
     /** @var array */
     private $fields = [];
 
@@ -22,7 +22,8 @@ class JsonFieldProcessor implements Processor {
      *
      * @param array $fields
      */
-    public function __construct(array $fields = []) {
+    public function __construct(array $fields = [])
+    {
         $this->setFields($fields);
     }
 
@@ -31,7 +32,8 @@ class JsonFieldProcessor implements Processor {
      *
      * @return array
      */
-    public function getFields(): array {
+    public function getFields(): array
+    {
         return $this->fields;
     }
 
@@ -42,7 +44,8 @@ class JsonFieldProcessor implements Processor {
      * @param callable $stack
      * @return mixed
      */
-    public function handle(Operation $operation, callable $stack) {
+    public function handle(Operation $operation, callable $stack)
+    {
         if (in_array($operation->getType(), [Operation::TYPE_INSERT, Operation::TYPE_UPDATE])) {
             $this->packFields($operation);
             return $stack($operation);
@@ -60,7 +63,8 @@ class JsonFieldProcessor implements Processor {
      * @param Operation $operation
      * @throws \Exception If JSON field data is not valid JSON.
      */
-    private function packFields(Operation $operation) {
+    private function packFields(Operation $operation)
+    {
         $set = $operation->getSet();
         foreach ($this->getFields() as $field) {
             if (array_key_exists($field, $set)) {
@@ -84,7 +88,8 @@ class JsonFieldProcessor implements Processor {
      * @param array $fields
      * @return self
      */
-    public function setFields(array $fields): self {
+    public function setFields(array $fields): self
+    {
         $this->fields = $fields;
         return $this;
     }
@@ -95,7 +100,8 @@ class JsonFieldProcessor implements Processor {
      * @param array $results
      * @return array
      */
-    private function unpackFields(array $results): array {
+    private function unpackFields(array $results): array
+    {
         $fields = $this->getFields();
         foreach ($results as &$row) {
             foreach ($fields as $field) {

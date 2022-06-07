@@ -12,8 +12,8 @@ use PHPUnit\Framework\TestCase;
 /**
  * Tests for combinePaths().
  */
-class CombinePathsTest extends TestCase {
-
+class CombinePathsTest extends TestCase
+{
     /**
      * Test {@link combinePaths()} against several scenarios.
      *
@@ -22,7 +22,8 @@ class CombinePathsTest extends TestCase {
      * @param string $expected The expected result.
      * @dataProvider provideCombinePathsArrays
      */
-    public function testCombinePaths($testPaths, string $testDelimiter, string $expected) {
+    public function testCombinePaths($testPaths, string $testDelimiter, string $expected)
+    {
         $actual = combinePaths($testPaths, $testDelimiter);
         $this->assertSame($expected, $actual);
     }
@@ -32,28 +33,13 @@ class CombinePathsTest extends TestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideCombinePathsArrays() {
+    public function provideCombinePathsArrays()
+    {
         $r = [
-            'combineTwoPaths' => [
-                ['path1/path2', 'path3/path4'],
-                '/',
-                'path1/path2/path3/path4',
-            ],
-            'combineWithHttp' => [
-                ['http:', 'path1/path2', 'path3'],
-                '/',
-                'http://path1/path2/path3',
-            ],
-            'combineWithHttps' => [
-                ['https:', 'path1/path2', 'path3'],
-                '/',
-                'https://path1/path2/path3',
-            ],
-            'combineWithString' => [
-                'path1/path2',
-                '/',
-                'path1/path2',
-            ]
+            "combineTwoPaths" => [["path1/path2", "path3/path4"], "/", "path1/path2/path3/path4"],
+            "combineWithHttp" => [["http:", "path1/path2", "path3"], "/", "http://path1/path2/path3"],
+            "combineWithHttps" => [["https:", "path1/path2", "path3"], "/", "https://path1/path2/path3"],
+            "combineWithString" => ["path1/path2", "/", "path1/path2"],
         ];
 
         return $r;

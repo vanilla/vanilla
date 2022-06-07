@@ -58,15 +58,8 @@ interface IProps {
 }
 
 function SearchPage(props: IProps) {
-    const {
-        form,
-        updateForm,
-        search,
-        results,
-        getDomains,
-        getCurrentDomain,
-        getDefaultFormValues,
-    } = useSearchForm<{}>();
+    const { form, updateForm, search, results, getDomains, getCurrentDomain, getDefaultFormValues } =
+        useSearchForm<{}>();
 
     const { isCompact } = useSection();
     const classes = pageTitleClasses();

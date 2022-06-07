@@ -23,25 +23,24 @@ use Vanilla\Theme\VariableProviders\QuickLinksVariableProvider;
 /**
  * Class ForumContainerRules
  */
-class QnAContainerRules extends AddonContainerRules {
-
+class QnAContainerRules extends AddonContainerRules
+{
     /**
      * @inheritdoc
      */
-    public function configureContainer(ContainerConfigurationInterface $container): void {
-        $container
-            ->rule(LayoutHydrator::class)
-            ->addCall("addReactResolver", [DiscussionQuestionsWidget::class]);
+    public function configureContainer(ContainerConfigurationInterface $container): void
+    {
+        $container->rule(LayoutHydrator::class)->addCall("addReactResolver", [DiscussionQuestionsWidget::class]);
         $container
             ->rule(SiteTotalService::class)
             ->addCall("registerProvider", [new Reference(QuestionSiteTotalProvider::class)])
-            ->addCall("registerProvider", [new Reference(AcceptedSiteTotalProvider::class)])
-        ;
+            ->addCall("registerProvider", [new Reference(AcceptedSiteTotalProvider::class)]);
         $container
             ->rule(LayoutService::class)
             ->addCall("addLayoutView", [new Reference(LegacyNewQuestionLayoutView::class)]);
 
-        $container->rule(QuickLinksVariableProvider::class)
-            ->addCall('addQuickLinkProvider', [new Reference(QnaQuickLinksProvider::class)]);
+        $container
+            ->rule(QuickLinksVariableProvider::class)
+            ->addCall("addQuickLinkProvider", [new Reference(QnaQuickLinksProvider::class)]);
     }
 }

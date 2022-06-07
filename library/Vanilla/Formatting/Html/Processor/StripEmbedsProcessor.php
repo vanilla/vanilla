@@ -14,15 +14,16 @@ use Vanilla\Formatting\Html\HtmlDocument;
 /**
  * Processor of DomUtils::stripEmbeds()
  */
-class StripEmbedsProcessor extends HtmlProcessor {
-
+class StripEmbedsProcessor extends HtmlProcessor
+{
     /**
      * Process the HTML document.
      *
      * @param HtmlDocument $document
      * @return HtmlDocument
      */
-    public function processDocument(HtmlDocument $document): HtmlDocument {
+    public function processDocument(HtmlDocument $document): HtmlDocument
+    {
         $this->applyStripEmbeds($document);
         return $document;
     }
@@ -32,7 +33,8 @@ class StripEmbedsProcessor extends HtmlProcessor {
      *
      * @param HtmlDocument $document
      */
-    public function applyStripEmbeds(HtmlDocument $document) {
+    public function applyStripEmbeds(HtmlDocument $document)
+    {
         DomUtils::stripEmbeds($document->getDom());
     }
 }

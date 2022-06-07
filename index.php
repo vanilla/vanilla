@@ -10,16 +10,16 @@
 
 // Report and track all errors.
 error_reporting(E_ALL);
-ini_set('display_errors', 0);
-ini_set('track_errors', 1);
+ini_set("display_errors", 0);
+ini_set("track_errors", 1);
 
 ob_start();
 
 // Minimal environment needed to use most of Vanilla's framework.
-require_once(__DIR__.'/environment.php');
+require_once __DIR__ . "/environment.php";
 
 // Require the bootstrap to configure the application.
-require_once(__DIR__.'/bootstrap.php');
+require_once __DIR__ . "/bootstrap.php";
 
 // Create and configure the dispatcher.
 $dispatcher = Gdn::dispatcher();

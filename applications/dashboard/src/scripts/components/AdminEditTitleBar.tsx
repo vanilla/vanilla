@@ -24,7 +24,6 @@ interface IProps {
     autoFocusTitleInput?: boolean;
     isCompact?: boolean;
     leftPanel?: boolean;
-    isSaveLoading?: boolean;
     onSave?(): void;
     noSaveButton?: boolean;
     actions?: React.ReactNode;

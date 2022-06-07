@@ -9,8 +9,8 @@ namespace Vanilla\Formatting;
 /**
  * A data class that holds a string and its format.
  */
-class FormatText {
-
+class FormatText
+{
     /** @var string The text content. */
     public $text;
 
@@ -23,7 +23,8 @@ class FormatText {
      * @param string $text The text content.
      * @param string $format The text's content.
      */
-    public function __construct(string $text, string $format) {
+    public function __construct(string $text, string $format)
+    {
         $this->text = $text;
         $this->format = $format;
     }

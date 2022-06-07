@@ -13,32 +13,33 @@ use Vanilla\CurrentTimeStamp;
 /**
  * Test managing answers with the /api/v2/comments endpoint.
  */
-class CommentsAnswerTest extends AbstractAPIv2Test {
-
+class CommentsAnswerTest extends AbstractAPIv2Test
+{
     use QnaApiTestTrait;
 
     private static $category;
 
-    public static $addons = ['qna'];
+    public static $addons = ["qna"];
 
     /**
      * {@inheritdoc}
      */
-    public static function setupBeforeClass(): void {
+    public static function setupBeforeClass(): void
+    {
         parent::setupBeforeClass();
 
         /**
          * @var \Gdn_Session $session
          */
         $session = self::container()->get(\Gdn_Session::class);
-        $session->start(self::$siteInfo['adminUserID'], false, false);
+        $session->start(self::$siteInfo["adminUserID"], false, false);
 
         /** @var \CategoriesApiController $categoryAPIController */
-        $categoryAPIController = static::container()->get('CategoriesApiController');
+        $categoryAPIController = static::container()->get("CategoriesApiController");
 
         self::$category = $categoryAPIController->post([
-            'name' => 'answerTest',
-            'urlcode' => 'answertest',
+            "name" => "answerTest",
+            "urlcode" => "answertest",
         ]);
 
         $session->end();
@@ -49,10 +50,11 @@ class CommentsAnswerTest extends AbstractAPIv2Test {
      *
      * @return array The set of questions
      */
-    public function createQuestionSet() {
+    public function createQuestionSet()
+    {
         $category = $this->createCategory();
         $questionSet = [
-            $this->createQuestion(['categoryID' => $category['categoryID']]),
+            $this->createQuestion(["categoryID" => $category["categoryID"]]),
             $this->testResetAnswer(),
             $this->testAcceptAnswer(),
             $this->testRejectAnswer(),
@@ -67,7 +69,8 @@ class CommentsAnswerTest extends AbstractAPIv2Test {
      * @param int $discussionID
      * @return array The question.
      */
-    protected function getQuestion($discussionID) {
+    protected function getQuestion($discussionID)
+    {
         $response = $this->api()->get("discussions/$discussionID");
         $this->assertEquals(200, $response->getStatusCode());
 
@@ -80,32 +83,33 @@ class CommentsAnswerTest extends AbstractAPIv2Test {
      * @param int $discussionID If omitted the answer will be created on a new Question.
      * @return mixed
      */
-    public function testPostAnswer($discussionID = null) {
+    public function testPostAnswer($discussionID = null)
+    {
         $category = $this->createCategory();
         if ($discussionID === null) {
-            $question = $this->createQuestion(['categoryID' => $category['categoryID']]);
-            $discussionID = $question['discussionID'];
+            $question = $this->createQuestion(["categoryID" => $category["categoryID"]]);
+            $discussionID = $question["discussionID"];
         }
 
         $record = [
-            'discussionID' => $discussionID,
-            'body' => 'Hello world!',
-            'format' => 'markdown',
+            "discussionID" => $discussionID,
+            "body" => "Hello world!",
+            "format" => "markdown",
         ];
-        $response = $this->api()->post('comments', $record);
+        $response = $this->api()->post("comments", $record);
         $this->assertEquals(201, $response->getStatusCode());
 
         $body = $response->getBody();
 
-        $this->assertTrue(is_int($body['commentID']));
-        $this->assertTrue($body['commentID'] > 0);
+        $this->assertTrue(is_int($body["commentID"]));
+        $this->assertTrue($body["commentID"] > 0);
 
         $this->assertRowsEqual($record, $body);
 
         $this->assertIsAnswer($body);
 
         $question = $this->getQuestion($discussionID);
-        $this->assertIsQuestion($question, ['status' => 'answered']);
+        $this->assertIsQuestion($question, ["status" => "answered"]);
 
         return $body;
     }
@@ -115,15 +119,16 @@ class CommentsAnswerTest extends AbstractAPIv2Test {
      *
      * @depends testPostAnswer
      */
-    public function testGetAnswer() {
+    public function testGetAnswer()
+    {
         $answer = $this->testPostAnswer();
-        $commentID = $answer['commentID'];
+        $commentID = $answer["commentID"];
 
         $response = $this->api()->get("comments/{$commentID}");
         $this->assertEquals(200, $response->getStatusCode());
 
         $body = $response->getBody();
-        $this->assertIsAnswer($body, ['status' => 'pending']);
+        $this->assertIsAnswer($body, ["status" => "pending"]);
     }
 
     /**
@@ -132,20 +137,21 @@ class CommentsAnswerTest extends AbstractAPIv2Test {
      * @return array Returns the updated question.
      * @depends testPostAnswer
      */
-    public function testAcceptAnswer() {
+    public function testAcceptAnswer()
+    {
         $category = $this->createCategory();
-        $question = $this->createQuestion(['categoryID' => $category['categoryID']]);
-        $answer = $this->testPostAnswer($question['discussionID']);
+        $question = $this->createQuestion(["categoryID" => $category["categoryID"]]);
+        $answer = $this->testPostAnswer($question["discussionID"]);
 
-        $response = $this->api()->patch('comments/answer/'.$answer['commentID'], [
-            'status' => 'accepted',
+        $response = $this->api()->patch("comments/answer/" . $answer["commentID"], [
+            "status" => "accepted",
         ]);
         $this->assertEquals(200, $response->getStatusCode());
 
-        $this->assertIsAnswer($response->getBody(), ['status' => 'accepted']);
+        $this->assertIsAnswer($response->getBody(), ["status" => "accepted"]);
 
-        $updatedQuestion = $this->getQuestion($question['discussionID']);
-        $this->assertIsQuestion($updatedQuestion, ['status' => 'accepted']);
+        $updatedQuestion = $this->getQuestion($question["discussionID"]);
+        $this->assertIsQuestion($updatedQuestion, ["status" => "accepted"]);
 
         return $updatedQuestion;
     }
@@ -156,20 +162,21 @@ class CommentsAnswerTest extends AbstractAPIv2Test {
      * @return array Returns the updated question.
      * @depends testPostAnswer
      */
-    public function testRejectAnswer() {
+    public function testRejectAnswer()
+    {
         $category = $this->createCategory();
-        $question = $this->createQuestion(['categoryID' => $category['categoryID']]);
-        $answer = $this->testPostAnswer($question['discussionID']);
+        $question = $this->createQuestion(["categoryID" => $category["categoryID"]]);
+        $answer = $this->testPostAnswer($question["discussionID"]);
 
-        $response = $this->api()->patch('comments/answer/'.$answer['commentID'], [
-            'status' => 'rejected',
+        $response = $this->api()->patch("comments/answer/" . $answer["commentID"], [
+            "status" => "rejected",
         ]);
         $this->assertEquals(200, $response->getStatusCode());
 
-        $this->assertIsAnswer($response->getBody(), ['status' => 'rejected']);
+        $this->assertIsAnswer($response->getBody(), ["status" => "rejected"]);
 
-        $updatedQuestion = $this->getQuestion($question['discussionID']);
-        $this->assertIsQuestion($updatedQuestion, ['status' => 'rejected']);
+        $updatedQuestion = $this->getQuestion($question["discussionID"]);
+        $this->assertIsQuestion($updatedQuestion, ["status" => "rejected"]);
 
         return $updatedQuestion;
     }
@@ -180,24 +187,25 @@ class CommentsAnswerTest extends AbstractAPIv2Test {
      * @return array Returns the updated question.
      * @depends testPostAnswer
      */
-    public function testResetAnswer() {
+    public function testResetAnswer()
+    {
         $category = $this->createCategory();
-        $question = $this->createQuestion(['categoryID' => $category['categoryID']]);
-        $answer = $this->testPostAnswer($question['discussionID']);
+        $question = $this->createQuestion(["categoryID" => $category["categoryID"]]);
+        $answer = $this->testPostAnswer($question["discussionID"]);
 
-        $response = $this->api()->patch('comments/answer/'.$answer['commentID'], [
-            'status' => 'accepted',
+        $response = $this->api()->patch("comments/answer/" . $answer["commentID"], [
+            "status" => "accepted",
         ]);
         $this->assertEquals(200, $response->getStatusCode());
-        $response = $this->api()->patch('comments/answer/'.$answer['commentID'], [
-            'status' => 'pending',
+        $response = $this->api()->patch("comments/answer/" . $answer["commentID"], [
+            "status" => "pending",
         ]);
         $this->assertEquals(200, $response->getStatusCode());
 
-        $this->assertIsAnswer($response->getBody(), ['status' => 'pending']);
+        $this->assertIsAnswer($response->getBody(), ["status" => "pending"]);
 
-        $updatedQuestion = $this->getQuestion($question['discussionID']);
-        $this->assertIsQuestion($updatedQuestion, ['status' => 'answered']);
+        $updatedQuestion = $this->getQuestion($question["discussionID"]);
+        $this->assertIsQuestion($updatedQuestion, ["status" => "answered"]);
 
         return $updatedQuestion;
     }
@@ -207,24 +215,25 @@ class CommentsAnswerTest extends AbstractAPIv2Test {
      *
      * @depends testPostAnswer
      */
-    public function testAcceptRejectAnswer() {
+    public function testAcceptRejectAnswer()
+    {
         $category = $this->createCategory();
-        $question = $this->createQuestion(['categoryID' => $category['categoryID']]);
-        $answer = $this->testPostAnswer($question['discussionID']);
+        $question = $this->createQuestion(["categoryID" => $category["categoryID"]]);
+        $answer = $this->testPostAnswer($question["discussionID"]);
 
-        $response = $this->api()->patch('comments/answer/'.$answer['commentID'], [
-            'status' => 'accepted',
+        $response = $this->api()->patch("comments/answer/" . $answer["commentID"], [
+            "status" => "accepted",
         ]);
         $this->assertEquals(200, $response->getStatusCode());
-        $response = $this->api()->patch('comments/answer/'.$answer['commentID'], [
-            'status' => 'rejected',
+        $response = $this->api()->patch("comments/answer/" . $answer["commentID"], [
+            "status" => "rejected",
         ]);
         $this->assertEquals(200, $response->getStatusCode());
 
-        $this->assertIsAnswer($response->getBody(), ['status' => 'rejected']);
+        $this->assertIsAnswer($response->getBody(), ["status" => "rejected"]);
 
-        $updatedQuestion = $this->getQuestion($question['discussionID']);
-        $this->assertIsQuestion($updatedQuestion, ['status' => 'rejected']);
+        $updatedQuestion = $this->getQuestion($question["discussionID"]);
+        $this->assertIsQuestion($updatedQuestion, ["status" => "rejected"]);
     }
 
     /**
@@ -232,29 +241,30 @@ class CommentsAnswerTest extends AbstractAPIv2Test {
      *
      * @depends testPostAnswer
      */
-    public function testResetRejectedQuestionStatus() {
+    public function testResetRejectedQuestionStatus()
+    {
         $category = $this->createCategory();
-        $question = $this->createQuestion(['categoryID' => $category['categoryID']]);
-        $answer = $this->testPostAnswer($question['discussionID']);
+        $question = $this->createQuestion(["categoryID" => $category["categoryID"]]);
+        $answer = $this->testPostAnswer($question["discussionID"]);
 
-        $response = $this->api()->patch('comments/answer/'.$answer['commentID'], [
-            'status' => 'rejected',
+        $response = $this->api()->patch("comments/answer/" . $answer["commentID"], [
+            "status" => "rejected",
         ]);
         $this->assertEquals(200, $response->getStatusCode());
 
-        $updatedQuestion = $this->getQuestion($question['discussionID']);
-        $this->assertIsQuestion($updatedQuestion, ['status' => 'rejected']);
+        $updatedQuestion = $this->getQuestion($question["discussionID"]);
+        $this->assertIsQuestion($updatedQuestion, ["status" => "rejected"]);
 
-        $answerAgain = $this->testPostAnswer($question['discussionID']);
-        $commentID = $answerAgain['commentID'];
+        $answerAgain = $this->testPostAnswer($question["discussionID"]);
+        $commentID = $answerAgain["commentID"];
 
         $response = $this->api()->get("comments/{$commentID}");
         $this->assertEquals(200, $response->getStatusCode());
         $body = $response->getBody();
-        $this->assertIsAnswer($body, ['status' => 'pending']);
+        $this->assertIsAnswer($body, ["status" => "pending"]);
 
-        $answeredQuestion = $this->getQuestion($question['discussionID']);
-        $this->assertIsQuestion($answeredQuestion, ['status' => 'answered']);
+        $answeredQuestion = $this->getQuestion($question["discussionID"]);
+        $this->assertIsQuestion($answeredQuestion, ["status" => "answered"]);
     }
 
     /**
@@ -262,62 +272,66 @@ class CommentsAnswerTest extends AbstractAPIv2Test {
      *
      * @depends testPostAnswer
      */
-    public function testAnsweredQuestionDates() {
-
+    public function testAnsweredQuestionDates()
+    {
         // Mock the current time.
-        CurrentTimeStamp::mockTime('Dec 1 2010');
+        CurrentTimeStamp::mockTime("Dec 1 2010");
         $category = $this->createCategory();
-        $question = $this->createQuestion(['categoryID' => $category['categoryID']]);
-        $this->assertIsQuestion($question, ['dateAccepted' => null]);
+        $question = $this->createQuestion(["categoryID" => $category["categoryID"]]);
+        $this->assertIsQuestion($question, ["dateAccepted" => null]);
 
-        $answer = $this->testPostAnswer($question['discussionID']);
+        $answer = $this->testPostAnswer($question["discussionID"]);
 
-        $response = $this->api()->patch('comments/answer/'.$answer['commentID'], [
-            'status' => 'accepted',
+        $response = $this->api()->patch("comments/answer/" . $answer["commentID"], [
+            "status" => "accepted",
         ]);
         $this->assertEquals(200, $response->getStatusCode());
 
         $body = $response->getBody();
 
-        $answeredQuestion = $this->getQuestion($question['discussionID']);
-        $dateAnswered = $answeredQuestion['attributes']['question']['dateAnswered'];
-        $this->assertEquals($answer['dateInserted'], $dateAnswered);
-        $this->assertIsQuestion($answeredQuestion, ['dateAccepted' => $body['dateInserted']]);
-        $this->assertIsQuestion($answeredQuestion, ['dateAnswered' => $body['dateInserted']]);
+        $answeredQuestion = $this->getQuestion($question["discussionID"]);
+        $dateAnswered = $answeredQuestion["attributes"]["question"]["dateAnswered"];
+        $this->assertEquals($answer["dateInserted"], $dateAnswered);
+        $this->assertIsQuestion($answeredQuestion, ["dateAccepted" => $body["dateInserted"]]);
+        $this->assertIsQuestion($answeredQuestion, ["dateAnswered" => $body["dateInserted"]]);
     }
 
     /**
      * Test dateAccepted and dateAnswered when answer is rejected.
      */
-    public function testUnAnsweredQuestionDates() {
-
+    public function testUnAnsweredQuestionDates()
+    {
         $category = $this->createCategory();
-        $question = $this->createQuestion(['categoryID' => $category['categoryID']]);
-        $this->assertIsQuestion($question, ['dateAccepted' => null]);
+        $question = $this->createQuestion(["categoryID" => $category["categoryID"]]);
+        $this->assertIsQuestion($question, ["dateAccepted" => null]);
 
-        $answerNumberOne = $this->testPostAnswer($question['discussionID']);
+        $answerNumberOne = $this->testPostAnswer($question["discussionID"]);
 
-        $response = $this->api()->patch('comments/answer/'.$answerNumberOne['commentID'], [
-            'status' => 'rejected',
+        $response = $this->api()->patch("comments/answer/" . $answerNumberOne["commentID"], [
+            "status" => "rejected",
         ]);
         $this->assertEquals(200, $response->getStatusCode());
 
-        $unansweredQuestion = $this->getQuestion($question['discussionID']);
+        $unansweredQuestion = $this->getQuestion($question["discussionID"]);
 
-        $this->assertIsQuestion($unansweredQuestion, ['dateAccepted' => null]);
-        $this->assertIsQuestion($unansweredQuestion, ['dateAnswered' => null]);
+        $this->assertIsQuestion($unansweredQuestion, ["dateAccepted" => null]);
+        $this->assertIsQuestion($unansweredQuestion, ["dateAnswered" => null]);
     }
 
     /**
      * Test getting all unanswered questions as we do for the 'discussions/unanswered' endpoint.
      * This should get all (and only) questions with a status of 'unanswered' and 'rejected'.
      */
-    public function testGetAllUnansweredQuestions() {
+    public function testGetAllUnansweredQuestions()
+    {
         $this->createQuestionSet();
-        $unansweredQuestions = $this->bessy()->get("discussions/unanswered")->data("Discussions")->resultArray();
+        $unansweredQuestions = $this->bessy()
+            ->get("discussions/unanswered")
+            ->data("Discussions")
+            ->resultArray();
 
         foreach ($unansweredQuestions as $question) {
-            $this->assertContains(strtolower($question['QnA']), ["unanswered", "rejected"]);
+            $this->assertContains(strtolower($question["QnA"]), ["unanswered", "rejected"]);
         }
     }
 
@@ -325,7 +339,8 @@ class CommentsAnswerTest extends AbstractAPIv2Test {
      * Test that a ForbiddenException is thrown when a member-level user tries to change the status of an answer on
      * a closed discussion
      */
-    public function testAcceptAnswerOnClosedDiscussionAsMember(): void {
+    public function testAcceptAnswerOnClosedDiscussionAsMember(): void
+    {
         $category = $this->createCategory();
 
         // Post a question as a member-level user.
@@ -335,45 +350,50 @@ class CommentsAnswerTest extends AbstractAPIv2Test {
 
         // Add an answer and close the discussion.
         $this->api()->setUserID(self::$siteInfo["adminUserID"]);
-        $answer = $this->api()->post("comments", [
-            "discussionID" => $question["discussionID"],
-            "body" => "An exception will be thrown if a member-level user tried to change the status of this once the
+        $answer = $this->api()
+            ->post("comments", [
+                "discussionID" => $question["discussionID"],
+                "body" => "An exception will be thrown if a member-level user tried to change the status of this once the
                 discussion has been closed.",
-            "format" => "markdown",
-        ])->getBody();
+                "format" => "markdown",
+            ])
+            ->getBody();
         $this->api()->patch("discussions/{$question["discussionID"]}", ["closed" => true]);
 
         // Try to change the answer's status, but get an exception.
         $this->api()->setUserID($memberUserID);
         $this->expectExceptionObject(new ForbiddenException("Permission Problem"));
-        $this->api()->patch('comments/answer/'.$answer['commentID'], [
-            'status' => 'accepted',
+        $this->api()->patch("comments/answer/" . $answer["commentID"], [
+            "status" => "accepted",
         ]);
     }
 
     /**
      * Test that an admin can still change the status on an answer when a discussion is closed.
      */
-    public function testAcceptAnswerOnClosedDiscussionAsAdmin(): void {
+    public function testAcceptAnswerOnClosedDiscussionAsAdmin(): void
+    {
         $category = $this->createCategory();
         $memberUserID = $this->createUserFixture("Member");
 
         // Post a QnA discussion and an answer.
         $this->api()->setUserID($memberUserID);
         $question = $this->createQuestion(["categoryID" => $category["categoryID"]]);
-        $answer = $this->api()->post("comments", [
-            "discussionID" => $question["discussionID"],
-            "body" => "An admin can change the status of this even when it's closed",
-            "format" => "markdown",
-        ])->getBody();
+        $answer = $this->api()
+            ->post("comments", [
+                "discussionID" => $question["discussionID"],
+                "body" => "An admin can change the status of this even when it's closed",
+                "format" => "markdown",
+            ])
+            ->getBody();
 
         // Close the discussion.
         $this->api()->setUserID(self::$siteInfo["adminUserID"]);
         $this->api()->patch("discussions/{$question["discussionID"]}", ["closed" => true]);
 
         // Verify that the admin can still change an answer's status.
-        $response = $this->api()->patch('comments/answer/'.$answer['commentID'], [
-            'status' => 'accepted',
+        $response = $this->api()->patch("comments/answer/" . $answer["commentID"], [
+            "status" => "accepted",
         ]);
         $this->assertEquals(200, $response->getStatusCode());
         $updatedDiscussion = $this->getQuestion($question["discussionID"]);
@@ -385,21 +405,26 @@ class CommentsAnswerTest extends AbstractAPIv2Test {
      * Test that when a QnA discussion is closed, the option to accept or reject an answer is present for admins, but
      * not for a member-level user.
      */
-    public function testQnACommentOptionsOnClosedDiscussionRoleDependent() {
+    public function testQnACommentOptionsOnClosedDiscussionRoleDependent()
+    {
         $category = $this->createCategory();
         $memberUserID = $this->createUserFixture("Member");
 
         // Post a question and an answer as a member-level user.
         $this->api()->setUserID($memberUserID);
         $question = $this->createQuestion(["categoryID" => $category["categoryID"]]);
-        $answer = $this->api()->post("comments", [
-            "discussionID" => $question["discussionID"],
-            "body" => "QnA options on this shouldn't be present when the discussion is closed.",
-            "format" => "markdown",
-        ])->getBody();
+        $answer = $this->api()
+            ->post("comments", [
+                "discussionID" => $question["discussionID"],
+                "body" => "QnA options on this shouldn't be present when the discussion is closed.",
+                "format" => "markdown",
+            ])
+            ->getBody();
 
         // Go to the discussion page and verify that the option to accept or reject an answer is added to the comment.
-        $discussionData = $this->bessy()->getHtml("discussion/{$question["discussionID"]}")->getInnerHtml();
+        $discussionData = $this->bessy()
+            ->getHtml("discussion/{$question["discussionID"]}")
+            ->getInnerHtml();
         $this->assertStringContainsString('class="DidThisAnswer"', $discussionData);
 
         // Close the discussion.
@@ -408,12 +433,16 @@ class CommentsAnswerTest extends AbstractAPIv2Test {
 
         // Now go back to the page and verify that the accept/reject option is no longer there for the member user.
         $this->api()->setUserID($memberUserID);
-        $updatedDiscussionAccessedByMember = $this->bessy()->getHtml("discussion/{$question["discussionID"]}")->getInnerHtml();
+        $updatedDiscussionAccessedByMember = $this->bessy()
+            ->getHtml("discussion/{$question["discussionID"]}")
+            ->getInnerHtml();
         $this->assertStringNotContainsString('class="DidThisAnswer"', $updatedDiscussionAccessedByMember);
 
         // But the option is still there for the admin user.
         $this->api()->setUserID(self::$siteInfo["adminUserID"]);
-        $updatedDiscussionAccessedByAdmin = $this->bessy()->getHtml("discussion/{$question["discussionID"]}")->getInnerHtml();
+        $updatedDiscussionAccessedByAdmin = $this->bessy()
+            ->getHtml("discussion/{$question["discussionID"]}")
+            ->getInnerHtml();
         $this->assertStringContainsString('class="DidThisAnswer"', $updatedDiscussionAccessedByAdmin);
     }
 }

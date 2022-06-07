@@ -13,8 +13,8 @@ use Vanilla\Formatting\Exception\FormattingException;
 /**
  * An interface for rendering, filtering, and parsing user content.
  */
-interface FormatInterface {
-
+interface FormatInterface
+{
     /**
      * Render a safe, sanitized, HTML version of some content.
      *
@@ -121,7 +121,7 @@ interface FormatInterface {
      *
      * @return string[] A list of usernames.
      */
-    public function parseMentions(string $content): array;
+    public function parseMentions(string $content, bool $skipTaggedContent = true): array;
 
     /**
      * @param bool $extendContent

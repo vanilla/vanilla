@@ -6,25 +6,26 @@
 
 namespace VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize;
 
-class OrderedListSanitizeTest extends SanitizeTest {
-
+class OrderedListSanitizeTest extends SanitizeTest
+{
     use TestAttributesTrait;
 
     /**
      * @inheritdoc
      */
-    protected function attributeOperations(): array {
+    protected function attributeOperations(): array
+    {
         $result = [
             [
                 ["insert" => "Hello world."],
                 [
                     "attributes" => [
                         "list" => "bullet",
-                        "indent" => "#VALUE#"
+                        "indent" => "#VALUE#",
                     ],
-                    "insert" => "\n"
-                ]
-            ]
+                    "insert" => "\n",
+                ],
+            ],
         ];
         return $result;
     }
@@ -32,13 +33,14 @@ class OrderedListSanitizeTest extends SanitizeTest {
     /**
      * @inheritdoc
      */
-    protected function insertContentOperations(string $content): array {
+    protected function insertContentOperations(string $content): array
+    {
         $operations = [
             ["insert" => $content],
             [
                 "attributes" => ["list" => "ordered"],
-                "insert" => "$content"
-            ]
+                "insert" => "$content",
+            ],
         ];
         return $operations;
     }

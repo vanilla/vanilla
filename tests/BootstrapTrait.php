@@ -22,7 +22,8 @@ use VanillaTests\Fixtures\NullCache;
 use VanillaTests\Fixtures\TestCache;
 use Webmozart\Assert\Assert;
 
-trait BootstrapTrait {
+trait BootstrapTrait
+{
     use PrivateAccessTrait;
     use TestLoggerTrait;
 
@@ -49,19 +50,21 @@ trait BootstrapTrait {
     /**
      * Bootstrap the site.
      */
-    public static function setUpBeforeClass(): void {
+    public static function setUpBeforeClass(): void
+    {
         self::setUpBeforeClassBootstrap();
     }
 
     /**
      * Set up everything we need to set up.
      */
-    protected static function setUpBeforeClassBootstrap(): void {
+    protected static function setUpBeforeClassBootstrap(): void
+    {
         $dic = self::createContainer();
 
         /** @var EventManager $events */
         $events = \Gdn::getContainer()->get(EventManager::class);
-        $events->bind('gdn_email_beforeSendMail', function (\Gdn_Email $email) {
+        $events->bind("gdn_email_beforeSendMail", function (\Gdn_Email $email) {
             $captured = CapturedEmail::fromEmail($email);
 
             // Put most recent first.
@@ -72,7 +75,8 @@ trait BootstrapTrait {
     /**
      * @inheritDoc
      */
-    public function setUpBootstrap() {
+    public function setUpBootstrap()
+    {
         \Gdn::setController(null);
         StaticCache::clear();
 
@@ -87,7 +91,8 @@ trait BootstrapTrait {
      *
      * @return Container Returns a container.
      */
-    protected static function createContainer() {
+    protected static function createContainer()
+    {
         $folder = static::getBootstrapFolderName();
         if ($folder !== "") {
             $folder = "/" . $folder;
@@ -105,14 +110,16 @@ trait BootstrapTrait {
      *
      * @return string
      */
-    protected static function getBootstrapFolderName() {
+    protected static function getBootstrapFolderName()
+    {
         return strtolower(EventManager::classBasename(get_called_class()));
     }
 
     /**
      * Cleanup the container after testing is done.
      */
-    public static function tearDownAfterClass(): void {
+    public static function tearDownAfterClass(): void
+    {
         Bootstrap::cleanup(self::$container);
     }
 
@@ -121,7 +128,8 @@ trait BootstrapTrait {
      *
      * @return \Gdn_Session
      */
-    protected function getSession(): \Gdn_Session {
+    protected function getSession(): \Gdn_Session
+    {
         return $this->container()->get(\Gdn_Session::class);
     }
 
@@ -133,7 +141,8 @@ trait BootstrapTrait {
      * @param string $message An error message if the test fails.
      * @return CapturedEmail
      */
-    public static function assertEmailSentTo(?string $email, ?string $name = null, string $message = ''): CapturedEmail {
+    public static function assertEmailSentTo(?string $email, ?string $name = null, string $message = ""): CapturedEmail
+    {
         foreach (self::$emails as $row) {
             $found = $row->findRecipient($email, $name);
             if ($found !== null) {
@@ -148,7 +157,8 @@ trait BootstrapTrait {
      *
      * @return Container Returns a container with site dependencies.
      */
-    protected static function container(): Container {
+    protected static function container(): Container
+    {
         return self::$container;
     }
 
@@ -164,7 +174,8 @@ trait BootstrapTrait {
      *
      * @return TestDispatcher Returns a dispatcher.
      */
-    protected static function bessy(): TestDispatcher {
+    protected static function bessy(): TestDispatcher
+    {
         return self::$bessy;
     }
 
@@ -173,7 +184,8 @@ trait BootstrapTrait {
      *
      * @return Bootstrap
      */
-    protected static function bootstrap() {
+    protected static function bootstrap()
+    {
         return self::$bootstrap;
     }
 
@@ -184,7 +196,8 @@ trait BootstrapTrait {
      * @param callable $callback The code to run.
      * @return mixed Returns the result of the callback.
      */
-    protected function runWithConfig(array $config, callable $callback) {
+    protected function runWithConfig(array $config, callable $callback)
+    {
         /* @var \Gdn_Configuration $c */
         $c = $this->container()->get(\Gdn_Configuration::class);
 
@@ -218,7 +231,8 @@ trait BootstrapTrait {
      *
      * @deprecated This logic has been moved into the container config.
      */
-    protected static function initializeDatabase() {
+    protected static function initializeDatabase()
+    {
     }
 
     /**
@@ -227,13 +241,18 @@ trait BootstrapTrait {
      * @param string $name
      * @param bool $flushCache Set to false if we should not flush the cache.
      */
-    protected static function resetTable(string $name, bool $flushCache = true): void {
-        \Gdn::database()->sql()->truncate($name);
+    protected static function resetTable(string $name, bool $flushCache = true): void
+    {
+        \Gdn::database()
+            ->sql()
+            ->truncate($name);
 
         // Reset our caching if we need to.
-        if (\Gdn::config('Cache.Enabled') && $flushCache) {
+        if (\Gdn::config("Cache.Enabled") && $flushCache) {
             // Make a fresh cache.
-            static::container()->get(\Gdn_Cache::class)->flush();
+            static::container()
+                ->get(\Gdn_Cache::class)
+                ->flush();
         }
     }
 
@@ -244,11 +263,14 @@ trait BootstrapTrait {
      *
      * @return TestCache
      */
-    protected static function enableCaching(): TestCache {
+    protected static function enableCaching(): TestCache
+    {
         self::$testCache = new TestCache();
         static::container()->setInstance(\Gdn_Cache::class, self::$testCache);
         static::container()->setInstance(CacheInterface::class, new CacheCacheAdapter(self::$testCache));
-        static::container()->get(ConfigurationInterface::class)->set('Cache.Enabled', true);
+        static::container()
+            ->get(ConfigurationInterface::class)
+            ->set("Cache.Enabled", true);
         return self::$testCache;
     }
 
@@ -257,8 +279,24 @@ trait BootstrapTrait {
      *
      * @param string $feature The config-friendly name of the feature.
      */
-    public static function enableFeature(string $feature) {
-        static::container()->get(ConfigurationInterface::class)->set("Feature.{$feature}.Enabled", true);
+    public static function enableFeature(string $feature)
+    {
+        static::container()
+            ->get(ConfigurationInterface::class)
+            ->set("Feature.{$feature}.Enabled", true);
+        FeatureFlagHelper::clearCache();
+    }
+
+    /**
+     * Disable a feature flag.
+     *
+     * @param string $feature The config-friendly name of the feature.
+     */
+    public static function disableFeature(string $feature)
+    {
+        static::container()
+            ->get(ConfigurationInterface::class)
+            ->set("Feature.{$feature}.Enabled", false);
         FeatureFlagHelper::clearCache();
     }
 
@@ -272,7 +310,11 @@ trait BootstrapTrait {
      * @return \Gdn_Controller Returns the dispatched controller.
      * @deprecated Use `$this->bessy()->get()`.
      */
-    protected function dispatchController($request = null, $permanent = true, string $deliveryType = DELIVERY_TYPE_VIEW): \Gdn_Controller {
+    protected function dispatchController(
+        $request = null,
+        $permanent = true,
+        string $deliveryType = DELIVERY_TYPE_VIEW
+    ): \Gdn_Controller {
         $dispatcher = \Gdn::dispatcher();
         $fn = function () use ($deliveryType) {
             $this->deliveryType = $deliveryType;
@@ -288,16 +330,19 @@ trait BootstrapTrait {
             $controller = $sender;
             $controller->deliveryType($deliveryType);
         };
-        $events->bind('base_render_before', $fn);
+        $events->bind("base_render_before", $fn);
 
         if (is_string($request)) {
-            $request = ['GET', $request, []];
+            $request = ["GET", $request, []];
         }
 
         if (is_array($request)) {
-            [$method, $path, $post] = $request + ['', '/', []];
-            $request = \Gdn_Request::create()->fromEnvironment()->setMethod($method)->setUrl($path);
-            if ($method === 'POST') {
+            [$method, $path, $post] = $request + ["", "/", []];
+            $request = \Gdn_Request::create()
+                ->fromEnvironment()
+                ->setMethod($method)
+                ->setUrl($path);
+            if ($method === "POST") {
                 \Gdn::session()->validateTransientKey(true);
                 $request->setRequestArguments(\Gdn_Request::INPUT_POST, $post);
             }
@@ -311,7 +356,7 @@ trait BootstrapTrait {
             $this->controllerRawOutput = $output;
         } finally {
             ob_end_clean();
-            $events->unbind('base_render_before', $fn);
+            $events->unbind("base_render_before", $fn);
         }
 
         if ($controller === null) {
@@ -329,7 +374,8 @@ trait BootstrapTrait {
      * @return mixed Returns the dispatched controller's data property.
      * @deprecated Use `$this->bessy()->get()->Data`.
      */
-    public function dispatchData($request = null, $permanent = true) {
+    public function dispatchData($request = null, $permanent = true)
+    {
         $controller = $this->dispatchController($request, $permanent, DELIVERY_TYPE_VIEW);
         return $controller->Data;
     }
@@ -343,15 +389,15 @@ trait BootstrapTrait {
      * @return TestHtmlDocument Returns the dispatched controller's data property.
      * @deprecated Use `$this->bessy()->getHtml()`.
      */
-    public function dispatchControllerHtml($request = null, $permanent = true, string $deliveryType = DELIVERY_TYPE_VIEW): TestHtmlDocument {
-        $allowedDeliveryTypes = [
-            DELIVERY_TYPE_VIEW,
-            DELIVERY_TYPE_ALL,
-            DELIVERY_METHOD_XHTML,
-        ];
+    public function dispatchControllerHtml(
+        $request = null,
+        $permanent = true,
+        string $deliveryType = DELIVERY_TYPE_VIEW
+    ): TestHtmlDocument {
+        $allowedDeliveryTypes = [DELIVERY_TYPE_VIEW, DELIVERY_TYPE_ALL, DELIVERY_METHOD_XHTML];
         Assert::inArray($deliveryType, $allowedDeliveryTypes);
         $this->dispatchController($request, $permanent, $deliveryType);
-        Assert::string($this->controllerRawOutput, 'Control must output HTML');
+        Assert::string($this->controllerRawOutput, "Control must output HTML");
         $document = new TestHtmlDocument($this->controllerRawOutput);
         return $document;
     }
@@ -365,7 +411,8 @@ trait BootstrapTrait {
      * @return mixed Returns the matching row.
      * @deprecated Use `VanillaTestCase::assertDatasetHasRow()`.
      */
-    public static function assertArrayHasRow(array $rows, array $filter, string $message = '') {
+    public static function assertArrayHasRow(array $rows, array $filter, string $message = "")
+    {
         VanillaTestCase::assertDatasetHasRow($rows, $filter, $message);
     }
 
@@ -378,7 +425,8 @@ trait BootstrapTrait {
      * @return mixed Returns the matching row.
      * @deprecated Use `VanillaTestCase::assertDatasetMatchesFilter()`.
      */
-    public static function assertArrayMatchesFilter(array $rows, array $filter, string $message = '') {
+    public static function assertArrayMatchesFilter(array $rows, array $filter, string $message = "")
+    {
         VanillaTestCase::assertDatasetMatchesFilter($rows, $filter, $message);
     }
 
@@ -393,7 +441,8 @@ trait BootstrapTrait {
      * @param array $overrides Override or add user fields.
      * @return array Returns a user array.
      */
-    protected function dummyUser(array $overrides = []): array {
+    protected function dummyUser(array $overrides = []): array
+    {
         static $i = 1;
 
         foreach ($overrides as &$value) {
@@ -402,10 +451,7 @@ trait BootstrapTrait {
             }
         }
 
-        $user = array_replace(
-            ['Name' => 'user'.$i, 'Email' => "user$i@example.com"],
-            $overrides
-        );
+        $user = array_replace(["Name" => "user" . $i, "Email" => "user$i@example.com"], $overrides);
         $i++;
         return $user;
     }
@@ -415,7 +461,8 @@ trait BootstrapTrait {
      *
      * @param \Gdn_Model $model
      */
-    protected function assertModelVal(\Gdn_Model $model): void {
+    protected function assertModelVal(\Gdn_Model $model): void
+    {
         if (!empty($model->Validation->results())) {
             TestCase::fail($model->Validation->resultsText());
         }
@@ -427,7 +474,8 @@ trait BootstrapTrait {
      * @param string $path
      * @return string
      */
-    public static function stripWebRoot(string $path): string {
+    public static function stripWebRoot(string $path): string
+    {
         $webroot = \Gdn::request()->getRoot();
         TestCase::assertStringStartsWith($webroot, $path);
         return StringUtils::substringLeftTrim($path, $webroot);
@@ -440,7 +488,8 @@ trait BootstrapTrait {
      * @param string $actualFullPath
      * @return string
      */
-    public static function assertSubpath(string $expectedSubpath, string $actualFullPath): string {
+    public static function assertSubpath(string $expectedSubpath, string $actualFullPath): string
+    {
         $path = static::stripWebRoot($actualFullPath);
         static::assertSame($expectedSubpath, $path);
         return $path;
@@ -452,8 +501,13 @@ trait BootstrapTrait {
      * @param string $url The URL to test.
      * @return string Returns the file path of the file for further tests, if needed.
      */
-    public static function assertUploadedFileUrlExists(string $url): string {
-        $path = str_replace(\Gdn::request()->urlDomain(true).\Gdn::request()->getAssetRoot().'/uploads', PATH_UPLOADS, $url);
+    public static function assertUploadedFileUrlExists(string $url): string
+    {
+        $path = str_replace(
+            \Gdn::request()->urlDomain(true) . \Gdn::request()->getAssetRoot() . "/uploads",
+            PATH_UPLOADS,
+            $url
+        );
         TestCase::assertFileExists($path, "The file for $url does not exist.");
 
         return $path;

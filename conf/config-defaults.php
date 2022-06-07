@@ -80,7 +80,7 @@ $Configuration['Garden']['Registration']['ConfirmEmail'] = false;
 $Configuration['Garden']['Registration']['MinPasswordLength'] = 6;
 $Configuration['Garden']['Registration']['NameUnique'] = true;
 $Configuration['Garden']['TermsOfService'] = '/home/termsofservice'; // The url to the terms of service.
-$Configuration['Garden']['Password']['MinLength'] = 6;
+$Configuration['Garden']['Password']['MinLength'] = 12;
 $Configuration['Garden']['Roles']['Manage'] = true; // @deprecated
 
 // Garden security features

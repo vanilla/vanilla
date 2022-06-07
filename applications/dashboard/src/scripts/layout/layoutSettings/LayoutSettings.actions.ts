@@ -34,6 +34,20 @@ export const fetchLayout = createAsyncThunk(
     },
 );
 
+export const deleteLayout = createAsyncThunk<
+    any,
+    { layoutID: ILayoutDetails["layoutID"]; onSuccessBeforeDeletion?: () => void },
+    { serializedErrorType: IApiError }
+>("@@layouts/deleteLayout", async ({ layoutID, onSuccessBeforeDeletion }, thunkAPI) => {
+    try {
+        const response = await apiv2.delete(`/layouts/${layoutID}`, {});
+        onSuccessBeforeDeletion?.(); //pass an onSuccessBeforeDeletion callback to do things like route changes before the reducer handles deletion
+        return response.data;
+    } catch (err) {
+        return thunkAPI.rejectWithValue(err);
+    }
+});
+
 export const fetchLayoutJson = createAsyncThunk(
     "@@layouts/fetchLayoutJson",
     async (layoutID: ILayoutDetails["layoutID"]) => {
@@ -55,14 +69,15 @@ export const persistLayoutDraft = createAsyncThunk<
     Omit<ILayoutEdit, "layoutID">,
     { serializedErrorType: IApiError; state: { layoutSettings: ILayoutsState }; dispatch: layoutDispatch }
 >("@@layouts/persistLayoutDraft", async (draft: ILayoutDraft, thunkAPI) => {
-    const existingLayout = draft.layoutID && thunkAPI.getState().layoutSettings.layoutsByID[draft.layoutID];
+    const existingLayoutJson =
+        draft.layoutID && thunkAPI.getState().layoutSettings.layoutJsonsByLayoutID[draft.layoutID];
 
     try {
-        const response = await (existingLayout
+        const response = await (existingLayoutJson
             ? apiv2.patch<ILayoutEdit>(`/layouts/${draft.layoutID}`, draft)
             : apiv2.post<ILayoutEdit>(`/layouts`, { ...draft, layoutID: undefined }));
 
-        if (draft.layoutID && existingLayout) {
+        if (draft.layoutID && existingLayoutJson) {
             await thunkAPI.dispatch(fetchLayout(draft.layoutID)).unwrap();
         }
 

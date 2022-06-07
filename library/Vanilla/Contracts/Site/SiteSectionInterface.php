@@ -12,9 +12,10 @@ namespace Vanilla\Contracts\Site;
  *
  * Through this mechanism content across the site may be separated and filtered.
  */
-interface SiteSectionInterface extends \JsonSerializable {
-    const APP_FORUM = 'forum';
-    const APP_KB = 'knowledgeBase';
+interface SiteSectionInterface extends \JsonSerializable
+{
+    const APP_FORUM = "forum";
+    const APP_KB = "knowledgeBase";
     /**
      * Get the base path for the section of the site.
      *

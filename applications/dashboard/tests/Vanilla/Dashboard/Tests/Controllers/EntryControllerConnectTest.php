@@ -13,6 +13,7 @@ use EntryController;
 use VanillaTests\Bootstrap;
 use VanillaTests\Dashboard\EntryControllerConnectTestTrait;
 use VanillaTests\SiteTestCase;
+use VanillaTests\VanillaTestCase;
 
 /**
  * Tests for the infamous `entry/connect` endpoint.
@@ -44,10 +45,11 @@ use VanillaTests\SiteTestCase;
  *
  * Learn how `entry/connect` works from reading its code, but don't learn how to code there.
  */
-class EntryControllerConnectTest extends SiteTestCase {
+class EntryControllerConnectTest extends SiteTestCase
+{
     use EntryControllerConnectTestTrait;
 
-    protected const PROVIDER_KEY = 'ec-test';
+    protected const PROVIDER_KEY = "ec-test";
 
     //region Basic happy path tests.
     /**
@@ -62,15 +64,16 @@ class EntryControllerConnectTest extends SiteTestCase {
      *
      * @return array Returns the user that registered so they can continue on their journey.
      */
-    public function testMinimalSSORegistration(): array {
-        $ssoUser = $this->dummyUser(['UniqueID' => __FUNCTION__]);
+    public function testMinimalSSORegistration(): array
+    {
+        $ssoUser = $this->dummyUser(["UniqueID" => __FUNCTION__]);
         $r = $this->entryConnect($ssoUser);
         $this->bessy()->assertNoFormErrors();
 
         $dbUser = $this->assertSSOUser($ssoUser);
-        $this->assertEquals($dbUser['UserID'], $this->session->UserID);
+        $this->assertEquals($dbUser["UserID"], $this->session->UserID);
 
-        $dbUser['UniqueID'] = $ssoUser['UniqueID'];
+        $dbUser["UniqueID"] = $ssoUser["UniqueID"];
         return $dbUser;
     }
 
@@ -87,15 +90,46 @@ class EntryControllerConnectTest extends SiteTestCase {
      * @param array $existingUser Pass a user that has already registered via SSO
      * @depends testMinimalSSORegistration
      */
-    public function testMinimalSSOSync(array $existingUser): void {
+    public function testMinimalSSOSync(array $existingUser): void
+    {
         $newSSOInfo = $this->dummyUser();
-        $newSSOInfo['UniqueID'] = $existingUser['UniqueID'];
+        $newSSOInfo["UniqueID"] = $existingUser["UniqueID"];
 
         $r = $this->entryConnect($newSSOInfo);
         $this->bessy()->assertNoFormErrors();
 
         $dbUser = $this->assertSSOUser($newSSOInfo);
-        $this->assertEquals($dbUser['UserID'], $this->session->UserID);
+        $this->assertEquals($dbUser["UserID"], $this->session->UserID);
+    }
+
+    /**
+     * A returning user should be able to connect again and have their user information synchronized,
+     * even if the name passed in is blank through configurations.
+     *
+     * Here is this scenario:
+     *
+     * 1. Someone has already SSO'd.
+     * 2. Configurations changed, resulting in 'Name' sent being blank.
+     * 3. They come back to the site and SSO again.
+     *
+     * They should be recognized by their `UniqueID` and their new user information should be updated, including roles should still be updated
+     *
+     * @param array $existingUser Pass a user that has already registered via SSO
+     * @depends testMinimalSSORegistration
+     */
+    public function testSSOSyncWithoutName(array $existingUser): void
+    {
+        $newSSOInfo = $this->dummyUser(["Name" => "", "Roles" => VanillaTestCase::ROLE_ADMIN]);
+        $newSSOInfo["UniqueID"] = $existingUser["UniqueID"];
+        $this->config->set("Garden.SSO.SyncRoles", true);
+        $this->assertCount(0, $this->userModel->getRoleIDs($this->session->UserID));
+        $r = $this->entryConnect($newSSOInfo);
+        $this->bessy()->assertNoFormErrors();
+        unset($newSSOInfo["Name"]);
+        unset($newSSOInfo["Roles"]);
+        $dbUser = $this->assertSSOUser($newSSOInfo);
+        $this->assertEquals($dbUser["UserID"], $this->session->UserID);
+        $this->assertUserHasRoles($this->session->UserID, [VanillaTestCase::ROLE_ADMIN]);
     }
 
     /**
@@ -109,13 +143,14 @@ class EntryControllerConnectTest extends SiteTestCase {
      * @param array $existingUser Pass a user that has already registered via SSO
      * @depends testMinimalSSORegistration
      */
-    public function testMinimalSSONoSync(array $existingUser): void {
-        $this->config->set('Garden.Registration.AutoConnect', false);
+    public function testMinimalSSONoSync(array $existingUser): void
+    {
+        $this->config->set("Garden.Registration.AutoConnect", false);
         $this->session->end();
-        $r = $this->entryConnect(['UniqueID' => $existingUser['UniqueID']]);
+        $r = $this->entryConnect(["UniqueID" => $existingUser["UniqueID"]]);
 
-        $dbUser = $this->assertAuthentication($existingUser['UniqueID']);
-        $this->assertEquals($dbUser['UserID'], $this->session->UserID);
+        $dbUser = $this->assertAuthentication($existingUser["UniqueID"]);
+        $this->assertEquals($dbUser["UserID"], $this->session->UserID);
     }
 
     /**
@@ -130,17 +165,18 @@ class EntryControllerConnectTest extends SiteTestCase {
      * PLEASE NOTE: When this config setting is on the email addresses must be secured in some way, usually through a
      * verification process. Please ask if you are setting up SSO for someone.
      */
-    public function testAutoConnect(): void {
-        $this->config->set('Garden.Registration.AutoConnect', true);
+    public function testAutoConnect(): void
+    {
+        $this->config->set("Garden.Registration.AutoConnect", true);
 
         $importedUser = $this->insertDummyUser();
-        $ssoUser = $this->dummyUser(['Email' => $importedUser['Email'], 'UniqueID' => __FUNCTION__]);
+        $ssoUser = $this->dummyUser(["Email" => $importedUser["Email"], "UniqueID" => __FUNCTION__]);
 
         $r = $this->entryConnect($ssoUser);
         $this->bessy()->assertNoFormErrors();
 
         $dbUser = $this->assertSSOUser($ssoUser);
-        $this->assertEquals($dbUser['UserID'], $this->session->UserID);
+        $this->assertEquals($dbUser["UserID"], $this->session->UserID);
     }
 
     /**
@@ -150,20 +186,21 @@ class EntryControllerConnectTest extends SiteTestCase {
      * 1. By having the provider mark itself as "Trusted" using `$sender->setData('Trusted', true)`.
      * 2. DEPRECATED. Using the `Garden.SSO.SyncRoles` configuration setting.
      */
-    public function testSSORoles(): void {
-        $ssoUser = $this->dummyUser(['UniqueID' => __FUNCTION__, 'Roles' => [Bootstrap::ROLE_MOD]]);
+    public function testSSORoles(): void
+    {
+        $ssoUser = $this->dummyUser(["UniqueID" => __FUNCTION__, "Roles" => [Bootstrap::ROLE_MOD]]);
 
         // First, connect the roles with a connection marked trusted.
         $this->entryConnect(function (\EntryController $sender) use ($ssoUser) {
             $this->basicConnectCallback($ssoUser)($sender);
-            $sender->setData('Trusted', true);
+            $sender->setData("Trusted", true);
         });
         $this->bessy()->assertNoFormErrors();
         $this->assertUserHasRoles($this->session->UserID, [Bootstrap::ROLE_MOD]);
 
         // Second, reconnect with the global config.
-        $this->config->set('Garden.SSO.SyncRoles', true);
-        $ssoUser['Roles'] = [Bootstrap::ROLE_ADMIN];
+        $this->config->set("Garden.SSO.SyncRoles", true);
+        $ssoUser["Roles"] = [Bootstrap::ROLE_ADMIN];
         $this->entryConnect($ssoUser);
         $this->bessy()->assertNoFormErrors();
         $this->assertUserHasRoles($this->session->UserID, [Bootstrap::ROLE_ADMIN]);
@@ -177,21 +214,22 @@ class EntryControllerConnectTest extends SiteTestCase {
      *
      * This is the case with Twitter's SSO and many other social style SSO providers.
      */
-    public function testMissingEmail(): void {
-        $ssoUser = $this->dummyUser(['UniqueID' => __FUNCTION__, 'Email' => null]);
+    public function testMissingEmail(): void
+    {
+        $ssoUser = $this->dummyUser(["UniqueID" => __FUNCTION__, "Email" => null]);
 
-        $this->config->set('Garden.Registration.AutoConnect', false);
+        $this->config->set("Garden.Registration.AutoConnect", false);
         // The first hit to entry connect should return with a form for the user to fill out.
         $r = $this->entryConnect($ssoUser);
         $this->assertFalse($this->session->isValid());
         $html = $this->bessy()->getLastHtml();
-        $html->assertContainsString('Add Info &amp; Create Account');
-        $html->assertFormInput('Email');
+        $html->assertContainsString("Add Info &amp; Create Account");
+        $html->assertFormInput("Email");
         // TODO: Would be nice if this were prefilled, but it's not.
-        $html->assertFormInput('ConnectName');
+        $html->assertFormInput("ConnectName");
 
         // The user can now fill the form out.
-        $body = ['Email' => __FUNCTION__.'@example.com'];
+        $body = ["Email" => __FUNCTION__ . "@example.com"];
         $r2 = $this->entryConnect($ssoUser, $body);
         $this->bessy()->assertNoFormErrors();
         $this->assertSSOUser($body + $ssoUser);
@@ -201,22 +239,23 @@ class EntryControllerConnectTest extends SiteTestCase {
      * An SSO provider that doesn't provide an email address will need to prompt the user.
      * This process shouldn't allow to takeover another user's account.
      */
-    public function testMissingEmailCantTakeoverAccount(): void {
+    public function testMissingEmailCantTakeoverAccount(): void
+    {
         $existingUser = $this->insertDummyUser();
-        $ssoUser = $this->dummyUser(['UniqueID' => __FUNCTION__, 'Email' => null]);
+        $ssoUser = $this->dummyUser(["UniqueID" => __FUNCTION__, "Email" => null]);
 
-        $this->config->set('Garden.Registration.AutoConnect', false);
+        $this->config->set("Garden.Registration.AutoConnect", false);
         // The first hit to entry connect should return with a form for the user to fill out.
         $r = $this->entryConnect($ssoUser);
         $this->assertFalse($this->session->isValid());
         $html = $this->bessy()->getLastHtml();
-        $html->assertContainsString('Add Info &amp; Create Account');
-        $html->assertFormInput('Email');
-        $html->assertFormInput('ConnectName');
+        $html->assertContainsString("Add Info &amp; Create Account");
+        $html->assertFormInput("Email");
+        $html->assertFormInput("ConnectName");
 
         // The user can now fill the form out.
-        $body = ['Email' => $existingUser['Email']];
-        $this->expectExceptionMessage('The email you entered is in use by another member.');
+        $body = ["Email" => $existingUser["Email"]];
+        $this->expectExceptionMessage("The email you entered is in use by another member.");
         $r2 = $this->entryConnect($ssoUser, $body);
     }
 
@@ -227,9 +266,10 @@ class EntryControllerConnectTest extends SiteTestCase {
      * 2. User doesn't provide anything and posts.
      * 3. User then provides a username and email and SSO's.
      */
-    public function testNoEmailOrUsernameRoundTrip(): void {
-        $this->config->set('Garden.Registration.AutoConnect', false);
-        $ssoUser = ['UniqueID' => __FUNCTION__];
+    public function testNoEmailOrUsernameRoundTrip(): void
+    {
+        $this->config->set("Garden.Registration.AutoConnect", false);
+        $ssoUser = ["UniqueID" => __FUNCTION__];
 
         // The initial connect page should present the user with email and username inputs.
         $r = $this->entryConnect($ssoUser);
@@ -239,12 +279,12 @@ class EntryControllerConnectTest extends SiteTestCase {
         $html = $this->bessy()->getLastHtml();
         $body = $html->getFormValues();
         $r = $this->entryConnectNoThrow($ssoUser, $body);
-        $this->bessy()->assertFormFieldError('Email');
-        $this->bessy()->assertFormFieldError('ConnectName');
+        $this->bessy()->assertFormFieldError("Email");
+        $this->bessy()->assertFormFieldError("ConnectName");
 
         // The user then submits a proper user now.
-        $this->entryConnect($ssoUser, ['Email' => __FUNCTION__.'@example.com', 'ConnectName' => __FUNCTION__]);
-        $this->assertSSOUser($ssoUser + ['Email' => __FUNCTION__.'@example.com', 'Name' => __FUNCTION__]);
+        $this->entryConnect($ssoUser, ["Email" => __FUNCTION__ . "@example.com", "ConnectName" => __FUNCTION__]);
+        $this->assertSSOUser($ssoUser + ["Email" => __FUNCTION__ . "@example.com", "Name" => __FUNCTION__]);
     }
 
     //endregion
@@ -259,24 +299,25 @@ class EntryControllerConnectTest extends SiteTestCase {
      * @param callable|null $extraHandler An optional callback to call after the basic SSO handler takes place.
      * @return array Returns the dispatched controller to help other tests.
      */
-    protected function entryConnectConflict($name = true, bool $email = false, ?callable $extraHandler = null): array {
+    protected function entryConnectConflict($name = true, bool $email = false, ?callable $extraHandler = null): array
+    {
         // Insert an existing user for the conflict.
         $existingUser = $this->insertDummyUser();
         $this->assertTrue($name || $email, "You need to specify at least one conflict.");
-        $ssoUser = $this->dummyUser(['UniqueID' => __FUNCTION__.'%s']);
+        $ssoUser = $this->dummyUser(["UniqueID" => __FUNCTION__ . "%s"]);
         if ($name) {
-            $ssoUser['Name'] = $existingUser['Name'];
+            $ssoUser["Name"] = $existingUser["Name"];
 
-            if ((int)$name > 1) {
+            if ((int) $name > 1) {
                 for ($i = 2; $i <= $name; $i++) {
                     $user = $this->insertDummyUser();
-                    $this->userModel->setField($user['UserID'], $existingUser['Name']);
+                    $this->userModel->setField($user["UserID"], $existingUser["Name"]);
                 }
             }
         }
         if ($email) {
-            $this->config->set('Garden.Registration.AutoConnect', false);
-            $ssoUser['Email'] = $existingUser['Email'];
+            $this->config->set("Garden.Registration.AutoConnect", false);
+            $ssoUser["Email"] = $existingUser["Email"];
         }
 
         if ($extraHandler !== null) {
@@ -291,10 +332,10 @@ class EntryControllerConnectTest extends SiteTestCase {
         // Do a first time call to entry/connect.
         $r = $this->entryConnect($handler, [], self::PROVIDER_KEY, false);
         $this->assertFalse($this->session->isValid());
-        $this->assertNoAuthentication($ssoUser['UniqueID']);
+        $this->assertNoAuthentication($ssoUser["UniqueID"]);
 
-        $r->setData('@existingUser', $existingUser); // kluge to help other tests.
-        $r->setData('@ssoUser', $ssoUser);
+        $r->setData("@existingUser", $existingUser); // kluge to help other tests.
+        $r->setData("@ssoUser", $ssoUser);
         return [$existingUser, $ssoUser, $r];
     }
 
@@ -304,14 +345,18 @@ class EntryControllerConnectTest extends SiteTestCase {
      *
      * @return \EntryController Returns the dispatched controller to help other tests.
      */
-    public function testBasicSSONameConflict(): \EntryController {
+    public function testBasicSSONameConflict(): \EntryController
+    {
         [$existingUser, $ssoUser, $r] = $this->entryConnectConflict();
 
-        $existingUsers = array_column($r->data('ExistingUsers'), null, 'UserID');
-        $this->assertArrayHasKey($existingUser['UserID'], $existingUsers, "Missing user with name match.");
+        $existingUsers = array_column($r->data("ExistingUsers"), null, "UserID");
+        $this->assertArrayHasKey($existingUser["UserID"], $existingUsers, "Missing user with name match.");
 
-        $userID = $this->bessy()->getLastHtml()->assertFormInput('UserSelect')->getAttribute('value');
-        $this->assertEquals($existingUser['UserID'], $userID);
+        $userID = $this->bessy()
+            ->getLastHtml()
+            ->assertFormInput("UserSelect")
+            ->getAttribute("value");
+        $this->assertEquals($existingUser["UserID"], $userID);
 
         return $r;
     }
@@ -319,15 +364,19 @@ class EntryControllerConnectTest extends SiteTestCase {
     /**
      * User's can also conflict on email addresses if auto connect is turned off.
      */
-    public function testBasicSSOEmailConflict(): void {
-        $this->config->set('Garden.Registration.AutoConnect', false);
+    public function testBasicSSOEmailConflict(): void
+    {
+        $this->config->set("Garden.Registration.AutoConnect", false);
         [$existingUser, $ssoUser, $r] = $this->entryConnectConflict(false, true);
 
-        $existingUsers = array_column($r->data('ExistingUsers'), null, 'UserID');
-        $this->assertArrayHasKey($existingUser['UserID'], $existingUsers, "Missing user with email match.");
+        $existingUsers = array_column($r->data("ExistingUsers"), null, "UserID");
+        $this->assertArrayHasKey($existingUser["UserID"], $existingUsers, "Missing user with email match.");
 
-        $userID = $this->bessy()->getLastHtml()->assertFormInput('UserSelect')->getAttribute('value');
-        $this->assertEquals($existingUser['UserID'], $userID);
+        $userID = $this->bessy()
+            ->getLastHtml()
+            ->assertFormInput("UserSelect")
+            ->getAttribute("value");
+        $this->assertEquals($existingUser["UserID"], $userID);
     }
 
     /**
@@ -336,32 +385,42 @@ class EntryControllerConnectTest extends SiteTestCase {
      * This test just makes sure the connection doesn't work if there is an invalid password. This is a very sensible
      * test to have since its failure would mean a critical security vulnerability.
      */
-    public function testExistingConnectBadPassword(): void {
+    public function testExistingConnectBadPassword(): void
+    {
         [$existingUser, $ssoUser, $entry] = $this->entryConnectConflict();
 
-        $this->bessy()->getLastHtml()->assertCssSelectorExists('input[name="UserSelect"]');
-        $this->bessy()->getLastHtml()->assertCssSelectorExists('input[name="ConnectPassword"]');
+        $this->bessy()
+            ->getLastHtml()
+            ->assertCssSelectorExists('input[name="UserSelect"]');
+        $this->bessy()
+            ->getLastHtml()
+            ->assertCssSelectorExists('input[name="ConnectPassword"]');
 
-        $this->expectExceptionMessage('The password you entered is incorrect.');
+        $this->expectExceptionMessage("The password you entered is incorrect.");
         $r = $this->entryConnect($ssoUser, [
-            'UserSelect' => $entry->data('ExistingUsers.0.UserID'),
-            'ConnectPassword' => 'Wrong Password',
+            "UserSelect" => $entry->data("ExistingUsers.0.UserID"),
+            "ConnectPassword" => "Wrong Password",
         ]);
         $this->assertFalse($this->session->isValid());
-        $this->assertNoAuthentication($ssoUser['UniqueID']);
+        $this->assertNoAuthentication($ssoUser["UniqueID"]);
     }
 
     /**
      * When a user enters the correct password for a user they are connecting with then they should connect.
      */
-    public function testExistingConnectGoodPassword(): void {
+    public function testExistingConnectGoodPassword(): void
+    {
         [$existingUser, $ssoUser, $entry] = $this->entryConnectConflict();
 
-        $this->bessy()->getLastHtml()->assertFormInput('UserSelect');
-        $this->bessy()->getLastHtml()->assertFormInput('ConnectPassword');
+        $this->bessy()
+            ->getLastHtml()
+            ->assertFormInput("UserSelect");
+        $this->bessy()
+            ->getLastHtml()
+            ->assertFormInput("ConnectPassword");
         $r = $this->entryConnect($ssoUser, [
-            'UserSelect' => $existingUser['UserID'],
-            'ConnectPassword' => $existingUser['Email'], // dummy users use email for password
+            "UserSelect" => $existingUser["UserID"],
+            "ConnectPassword" => $existingUser["Email"], // dummy users use email for password
         ]);
         $this->assertSSOUser($ssoUser, true);
     }
@@ -369,17 +428,20 @@ class EntryControllerConnectTest extends SiteTestCase {
     /**
      * The easiest way to resolve a conflict is to just have the user enter a new value for the conflicting field.
      */
-    public function testChangeUsernameOnConflict(): void {
+    public function testChangeUsernameOnConflict(): void
+    {
         [$existingUser, $ssoUser, $entry] = $this->entryConnectConflict();
 
-        $this->bessy()->getLastHtml()->assertFormInput('ConnectName');
+        $this->bessy()
+            ->getLastHtml()
+            ->assertFormInput("ConnectName");
         $r = $this->entryConnect($ssoUser, [
-            'ConnectName' => $ssoUser['Name'].'-1',
+            "ConnectName" => $ssoUser["Name"] . "-1",
         ]);
         $this->assertTrue($this->session->isValid());
         $dbUser = $this->assertAuthentication($ssoUser);
-        $this->assertNotEquals($dbUser['UserID'], $existingUser['UserID']);
-        $this->assertEquals($ssoUser['Name'].'-1', $dbUser['Name']);
+        $this->assertNotEquals($dbUser["UserID"], $existingUser["UserID"]);
+        $this->assertEquals($ssoUser["Name"] . "-1", $dbUser["Name"]);
     }
 
     /**
@@ -402,33 +464,44 @@ class EntryControllerConnectTest extends SiteTestCase {
      * @see EntryControllerConnectTest::testChangeUsernameOnConflict()
      * @see https://github.com/vanilla/vanilla-cloud/issues/1032
      */
-    public function testChangeEmailOnConflict(): void {
+    public function testChangeEmailOnConflict(): void
+    {
         [$existingUser, $ssoUser, $entry] = $this->entryConnectConflict(false, true, function (EntryController $entry) {
-            $entry->Form->setFormValue('EmailVisible', true);
+            $entry->Form->setFormValue("EmailVisible", true);
         });
-        $this->bessy()->getLastHtml()->assertFormInput('Email');
+        $this->bessy()
+            ->getLastHtml()
+            ->assertFormInput("Email");
 
-        $newEmail = $ssoUser['Email'].'.uk';
-        unset($ssoUser['Email']); // kludge to simulate the SSO addon not overwriting the email address on the postback.
+        $newEmail = $ssoUser["Email"] . ".uk";
+        unset($ssoUser["Email"]); // kludge to simulate the SSO addon not overwriting the email address on the postback.
         $r = $this->entryConnect($ssoUser, [
-            'Email' => $newEmail,
+            "Email" => $newEmail,
         ]);
         $this->assertTrue($this->session->isValid());
         $dbUser = $this->assertAuthentication($ssoUser);
-        $this->assertNotEquals($dbUser['UserID'], $existingUser['UserID']);
-        $this->assertEquals($newEmail, $dbUser['Email']);
+        $this->assertNotEquals($dbUser["UserID"], $existingUser["UserID"]);
+        $this->assertEquals($newEmail, $dbUser["Email"]);
     }
 
     /**
      * Make sure the user can't just submit another user's username or email on a conflict.
      */
-    public function testNoChangeUsernameOnConflict(): void {
+    public function testNoChangeUsernameOnConflict(): void
+    {
         [$existingUser, $ssoUser, $entry] = $this->entryConnectConflict();
 
-        $r = $this->entryConnect($ssoUser, [
-            'ConnectName' => $existingUser['Name'],
-        ], self::PROVIDER_KEY, false);
-        $this->bessy()->assertFormErrorMessage('You are trying to connect with a username that is already assigned to a user on this forum.');
+        $r = $this->entryConnect(
+            $ssoUser,
+            [
+                "ConnectName" => $existingUser["Name"],
+            ],
+            self::PROVIDER_KEY,
+            false
+        );
+        $this->bessy()->assertFormErrorMessage(
+            "You are trying to connect with a username that is already assigned to a user on this forum."
+        );
         $this->assertFalse($this->session->isValid());
         $this->assertNoAuthentication($ssoUser);
     }
@@ -436,13 +509,19 @@ class EntryControllerConnectTest extends SiteTestCase {
     /**
      * Make sure the user can't just submit another user's username or email on a conflict.
      */
-    public function testNoChangeEmailOnConflict(): void {
+    public function testNoChangeEmailOnConflict(): void
+    {
         [$existingUser, $ssoUser, $entry] = $this->entryConnectConflict(false, true);
 
-        $r = $this->entryConnect($ssoUser, [
-            'ConnectEmail' => $existingUser['Email'],
-        ], self::PROVIDER_KEY, false);
-        $this->bessy()->assertFormErrorMessage('The email you entered is in use by another member.');
+        $r = $this->entryConnect(
+            $ssoUser,
+            [
+                "ConnectEmail" => $existingUser["Email"],
+            ],
+            self::PROVIDER_KEY,
+            false
+        );
+        $this->bessy()->assertFormErrorMessage("The email you entered is in use by another member.");
         $this->assertFalse($this->session->isValid());
         $this->assertNoAuthentication($ssoUser);
     }
@@ -450,22 +529,18 @@ class EntryControllerConnectTest extends SiteTestCase {
     /**
      * Make sure an exception is triggered when the SSO provider does not supply an email & autoconnect is enabled.
      */
-    public function testPreventSSOAutoConnectOnAbsentEmail(): void {
-        $this->config->set('Garden.Registration.AutoConnect', true);
+    public function testPreventSSOAutoConnectOnAbsentEmail(): void
+    {
+        $this->config->set("Garden.Registration.AutoConnect", true);
         $existingUser = $this->insertDummyUser();
 
         // This SSO user does not have a provided email
         $ssoUser = [
-            'UniqueID' => __FUNCTION__
+            "UniqueID" => __FUNCTION__,
         ];
 
-        $this->expectExceptionMessage('Unable to auto-connect because SSO did not provide an email address.');
-        $r = $this->entryConnect(
-            $ssoUser,
-            [],
-            self::PROVIDER_KEY,
-            false
-        );
+        $this->expectExceptionMessage("Unable to auto-connect because SSO did not provide an email address.");
+        $r = $this->entryConnect($ssoUser, [], self::PROVIDER_KEY, false);
 
         $this->assertFalse($this->session->isValid());
         $this->assertNoAuthentication($ssoUser);
@@ -477,13 +552,14 @@ class EntryControllerConnectTest extends SiteTestCase {
      * If a user is already linked through SSO and they SSO again with conflicts then the conflicting fields should just
      * be ignored and not updated rather than stop the SSO.
      */
-    public function testAutoConflictResolution(): void {
+    public function testAutoConflictResolution(): void
+    {
         $ssoUser = $this->ssoDummyUser();
         $existingUser = $this->insertDummyUser();
         $conflictingSSOUser = $ssoUser;
-        $conflictingSSOUser['Name'] = $existingUser['Name'];
-        $conflictingSSOUser['Email'] = $existingUser['Email'];
-        $conflictingSSOUser['Photo'] = 'https://example.com/avatar.jpg';
+        $conflictingSSOUser["Name"] = $existingUser["Name"];
+        $conflictingSSOUser["Email"] = $existingUser["Email"];
+        $conflictingSSOUser["Photo"] = "https://example.com/avatar.jpg";
 
         $r = $this->entryConnect($conflictingSSOUser);
         $this->bessy()->assertNoFormErrors();
@@ -491,9 +567,9 @@ class EntryControllerConnectTest extends SiteTestCase {
 
         // The user's conflicting fields should not have updated.
         $dbUser = $this->assertAuthentication($conflictingSSOUser);
-        $this->assertSame($conflictingSSOUser['Photo'], $dbUser['Photo']);
-        $this->assertSame($ssoUser['Name'], $dbUser['Name']);
-        $this->assertSame($ssoUser['Email'], $dbUser['Email']);
+        $this->assertSame($conflictingSSOUser["Photo"], $dbUser["Photo"]);
+        $this->assertSame($ssoUser["Name"], $dbUser["Name"]);
+        $this->assertSame($ssoUser["Email"], $dbUser["Email"]);
     }
 
     //endregion
@@ -506,11 +582,12 @@ class EntryControllerConnectTest extends SiteTestCase {
      * We have this step to avoid security holes where no SSO addon applies, but the SSO is allowed anyway. That would
      * be very bad. So the idea is that SSO won't work until an addon tells it to work.
      */
-    public function testSSONotVerified(): void {
-        $this->expectExceptionMessage('The connection data has not been verified.');
+    public function testSSONotVerified(): void
+    {
+        $this->expectExceptionMessage("The connection data has not been verified.");
         $this->entryConnect(function (EntryController $entry) {
             // Simulate a setting that some plucky developer might allow without realizing its repercussions.
-            $entry->Form->setFormValue('Verified', true);
+            $entry->Form->setFormValue("Verified", true);
         });
     }
 
@@ -519,13 +596,19 @@ class EntryControllerConnectTest extends SiteTestCase {
      *
      * This test also passes a user that would otherwise be fine for SSO to ensure that the SSO doesn't actually happen.
      */
-    public function testSSOFormErrors(): void {
-        $ssoUser = $this->dummyUser(['UniqueID' => __FUNCTION__.'%s']);
-        $this->entryConnect(function (EntryController $entry) use ($ssoUser) {
-            $this->basicConnectCallback($ssoUser)($entry);
-            $entry->Form->addError('Some error.');
-        }, [], self::PROVIDER_KEY, false);
-        $this->bessy()->assertFormErrorMessage('Some error.');
+    public function testSSOFormErrors(): void
+    {
+        $ssoUser = $this->dummyUser(["UniqueID" => __FUNCTION__ . "%s"]);
+        $this->entryConnect(
+            function (EntryController $entry) use ($ssoUser) {
+                $this->basicConnectCallback($ssoUser)($entry);
+                $entry->Form->addError("Some error.");
+            },
+            [],
+            self::PROVIDER_KEY,
+            false
+        );
+        $this->bessy()->assertFormErrorMessage("Some error.");
         $this->assertFalse($this->session->isValid());
         $this->assertNoAuthentication($ssoUser);
     }
@@ -544,14 +627,22 @@ class EntryControllerConnectTest extends SiteTestCase {
      * This would be for errors like the other server doesn't return a response or returns an error response to you.
      * Throw the exception to surface to the client, but don't worry about dealing with it if it's not your responsibility.
      */
-    public function testSSOUserException(): void {
+    public function testSSOUserException(): void
+    {
         debug(false);
-        $ssoUser = $this->dummyUser(['UniqueID' => __FUNCTION__.'%s']);
-        $this->entryConnect(function (EntryController $entry) use ($ssoUser) {
-            $this->basicConnectCallback($ssoUser)($entry);
-            throw new \Gdn_UserException("Some exception.");
-        }, [], self::PROVIDER_KEY, false);
-        $this->bessy()->getLastHtml()->assertContainsString('Some exception.');
+        $ssoUser = $this->dummyUser(["UniqueID" => __FUNCTION__ . "%s"]);
+        $this->entryConnect(
+            function (EntryController $entry) use ($ssoUser) {
+                $this->basicConnectCallback($ssoUser)($entry);
+                throw new \Gdn_UserException("Some exception.");
+            },
+            [],
+            self::PROVIDER_KEY,
+            false
+        );
+        $this->bessy()
+            ->getLastHtml()
+            ->assertContainsString("Some exception.");
         $this->assertFalse($this->session->isValid());
         $this->assertNoAuthentication($ssoUser);
     }
@@ -561,15 +652,28 @@ class EntryControllerConnectTest extends SiteTestCase {
      *
      * This protects against some unknown exception in the process leaking potentially sensitive information.
      */
-    public function testSSOPanicException(): void {
+    public function testSSOPanicException(): void
+    {
         debug(false);
-        $ssoUser = $this->dummyUser(['UniqueID' => __FUNCTION__.'%s']);
-        $this->entryConnect(function (EntryController $entry) use ($ssoUser) {
-            $this->basicConnectCallback($ssoUser)($entry);
-            throw new \Exception("Some sensitive exception.");
-        }, [], self::PROVIDER_KEY, false);
-        $this->bessy()->getLastHtml()->assertContainsString('There was an error fetching the connection data.');
-        $this->assertStringNotContainsString('Some sensitive exception.', $this->bessy()->getLastHtml()->getRawHtml());
+        $ssoUser = $this->dummyUser(["UniqueID" => __FUNCTION__ . "%s"]);
+        $this->entryConnect(
+            function (EntryController $entry) use ($ssoUser) {
+                $this->basicConnectCallback($ssoUser)($entry);
+                throw new \Exception("Some sensitive exception.");
+            },
+            [],
+            self::PROVIDER_KEY,
+            false
+        );
+        $this->bessy()
+            ->getLastHtml()
+            ->assertContainsString("There was an error fetching the connection data.");
+        $this->assertStringNotContainsString(
+            "Some sensitive exception.",
+            $this->bessy()
+                ->getLastHtml()
+                ->getRawHtml()
+        );
         $this->assertFalse($this->session->isValid());
         $this->assertNoAuthentication($ssoUser);
     }
@@ -583,20 +687,26 @@ class EntryControllerConnectTest extends SiteTestCase {
      * In this case a user should not get a list of existing users nor be allowed to connect to an existing user with a
      * `UserSelect/ConnectPassword` combo.
      */
-    public function testExistingConnectNotAllowed(): void {
-        $this->config->set('Garden.Registration.AllowConnect', false);
-        $this->config->set('Garden.Registration.AutoConnect', false);
+    public function testExistingConnectNotAllowed(): void
+    {
+        $this->config->set("Garden.Registration.AllowConnect", false);
+        $this->config->set("Garden.Registration.AutoConnect", false);
         [$existingUser, $ssoUser, $entry] = $this->entryConnectConflict();
-        $this->assertFalse($entry->data('AllowConnect'));
-        $this->assertEmpty($entry->data('ExistingUsers'));
+        $this->assertFalse($entry->data("AllowConnect"));
+        $this->assertEmpty($entry->data("ExistingUsers"));
 
-        $r = $this->entryConnect($ssoUser, [
-            'UserSelect' => $existingUser['UserID'],
-            'ConnectPassword' => $existingUser['Email'], // dummy users use email for password
-        ], self::PROVIDER_KEY, false);
-        $this->bessy()->assertFormErrorMessage('The site does not allow you connect with an existing user.');
+        $r = $this->entryConnect(
+            $ssoUser,
+            [
+                "UserSelect" => $existingUser["UserID"],
+                "ConnectPassword" => $existingUser["Email"], // dummy users use email for password
+            ],
+            self::PROVIDER_KEY,
+            false
+        );
+        $this->bessy()->assertFormErrorMessage("The site does not allow you connect with an existing user.");
         $this->assertFalse($this->session->isValid());
-        $this->assertNoAuthentication($ssoUser['UniqueID']);
+        $this->assertNoAuthentication($ssoUser["UniqueID"]);
     }
     //endregion
 }

@@ -9,8 +9,8 @@ use Vanilla\Scheduler\Job\JobExecutionStatus;
 /**
  * Execute the activity queue.
  */
-class ExecuteActivityQueue implements Vanilla\Scheduler\Job\LocalJobInterface {
-
+class ExecuteActivityQueue implements Vanilla\Scheduler\Job\LocalJobInterface
+{
     /** @var ActivityModel */
     private $activityModel;
 
@@ -19,14 +19,16 @@ class ExecuteActivityQueue implements Vanilla\Scheduler\Job\LocalJobInterface {
      *
      * @param ActivityModel $activityModel
      */
-    public function __construct(ActivityModel $activityModel) {
+    public function __construct(ActivityModel $activityModel)
+    {
         $this->activityModel = $activityModel;
     }
 
     /**
      * Execute all queued up items in the ActivityModel queue.
      */
-    public function run(): JobExecutionStatus {
+    public function run(): JobExecutionStatus
+    {
         $this->activityModel->saveQueue(true);
 
         return JobExecutionStatus::complete();
@@ -37,7 +39,7 @@ class ExecuteActivityQueue implements Vanilla\Scheduler\Job\LocalJobInterface {
      *
      * @param array $message
      */
-    public function setMessage(array $message) {
+    public function setMessage(array $message)
+    {
     }
-
 }

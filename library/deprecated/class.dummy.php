@@ -16,21 +16,25 @@
  * but you don't want to have to check for them on every use.
  * @deprecated
  */
-class Gdn_Dummy {
-
-    public function __call($name, $arguments) {
+class Gdn_Dummy
+{
+    public function __call($name, $arguments)
+    {
         return $this;
     }
 
-    public static function __callStatic($name, $arguments) {
+    public static function __callStatic($name, $arguments)
+    {
         return self::getInstance();
     }
 
-    public function __get($name) {
+    public function __get($name)
+    {
         return $this;
     }
 
-    public function __set($name, $value) {
+    public function __set($name, $value)
+    {
         return $this;
     }
 
@@ -47,7 +51,8 @@ class Gdn_Dummy {
      * @static
      * @return Dummy The singleton instance of this class.
      */
-    public static function getInstance() {
+    public static function getInstance()
+    {
         if (!isset(self::$_Instance)) {
             self::$_Instance = new Gdn_Dummy();
         }

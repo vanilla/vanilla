@@ -10,4 +10,4 @@ use Vanilla\Theme\VariableProviders\QuickLinksVariableProvider;
 
 \Gdn::getContainer()
     ->rule(QuickLinksVariableProvider::class)
-    ->addCall('addQuickLinkProvider', [new \Garden\Container\Reference(ParticipatedQuickLinksProvider::class)]);
+    ->addCall("addQuickLinkProvider", [new \Garden\Container\Reference(ParticipatedQuickLinksProvider::class)]);

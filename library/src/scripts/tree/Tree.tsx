@@ -240,10 +240,10 @@ export default function Tree<D = {}>(props: Props<D>) {
         dragState.current = undefined;
     }
 
-    const renderedItems = useMemo(() => flattenedTree.map((fi, index) => renderItem(fi, index)), [
-        renderItem,
-        flattenedTree,
-    ]);
+    const renderedItems = useMemo(
+        () => flattenedTree.map((fi, index) => renderItem(fi, index)),
+        [renderItem, flattenedTree],
+    );
 
     /**
      * Keyboard handler for arrow up, arrow down, home, end and escape.

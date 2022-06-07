@@ -12,8 +12,8 @@ use Gdn_Upload;
 /**
  * Test utilities for uploads.
  */
-class TestUploader {
-
+class TestUploader
+{
     const TEST_UPLOAD_PATH = PATH_UPLOADS;
 
     /**
@@ -21,11 +21,12 @@ class TestUploader {
      *
      * @throws Exception If the directory can't be created.
      */
-    protected static function ensureDirectory() {
+    protected static function ensureDirectory()
+    {
         if (!file_exists(self::TEST_UPLOAD_PATH)) {
             $result = mkdir(self::TEST_UPLOAD_PATH, 0777, true);
             if (!$result) {
-                throw new Exception('Unable to create uploads directory: '.self::TEST_UPLOAD_PATH);
+                throw new Exception("Unable to create uploads directory: " . self::TEST_UPLOAD_PATH);
             }
         }
     }
@@ -35,10 +36,11 @@ class TestUploader {
      *
      * @return string
      */
-    protected static function generateFilename() {
+    protected static function generateFilename()
+    {
         do {
             $name = randomString(12);
-            $path = self::TEST_UPLOAD_PATH."/{$name}";
+            $path = self::TEST_UPLOAD_PATH . "/{$name}";
         } while (file_exists($path));
         return $path;
     }
@@ -46,9 +48,10 @@ class TestUploader {
     /**
      * Clear the uploads directory and reset the $_FILES global..
      */
-    public static function resetUploads() {
+    public static function resetUploads()
+    {
         if (file_exists(self::TEST_UPLOAD_PATH)) {
-            $files = glob(self::TEST_UPLOAD_PATH.'/*.*');
+            $files = glob(self::TEST_UPLOAD_PATH . "/*.*");
             foreach ($files as $file) {
                 if (is_resource($file)) {
                     unlink($file);
@@ -69,7 +72,8 @@ class TestUploader {
      * @throws Exception If the file is not readable.
      * @return UploadedFile
      */
-    public static function uploadFile($name, $file) {
+    public static function uploadFile($name, $file)
+    {
         if (!file_exists($file)) {
             throw new Exception("{$file} does not exist.");
         }
@@ -84,26 +88,26 @@ class TestUploader {
         $destination = static::generateFilename();
 
         if (!copy($file, $destination)) {
-            throw new Exception('Unable to copy file to destination: '.$destination);
+            throw new Exception("Unable to copy file to destination: " . $destination);
         }
 
         $info = [
-            'name' => basename($file),
-            'type' => mime_content_type($file),
-            'size' => filesize($file),
-            'tmp_name' => $destination,
-            'error' => UPLOAD_ERR_OK
+            "name" => basename($file),
+            "type" => mime_content_type($file),
+            "size" => filesize($file),
+            "tmp_name" => $destination,
+            "error" => UPLOAD_ERR_OK,
         ];
 
         $_FILES[$name] = $info;
 
         $result = new UploadedFile(
             new Gdn_Upload(),
-            $info['tmp_name'],
-            $info['size'],
-            $info['error'],
-            $info['name'],
-            $info['type']
+            $info["tmp_name"],
+            $info["size"],
+            $info["error"],
+            $info["name"],
+            $info["type"]
         );
         return $result;
     }

@@ -44,11 +44,8 @@ interface IProps {
 }
 
 export default function DiscussionMergeFormImpl(props: IProps) {
-    const {
-        checkedDiscussionIDs,
-        addPendingDiscussionByIDs,
-        removePendingDiscussionByIDs,
-    } = useDiscussionCheckBoxContext();
+    const { checkedDiscussionIDs, addPendingDiscussionByIDs, removePendingDiscussionByIDs } =
+        useDiscussionCheckBoxContext();
 
     const discussionActions = useDiscussionActions();
 

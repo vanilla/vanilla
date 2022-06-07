@@ -15,8 +15,8 @@ use VanillaTests\Fixtures\Search\MockSearchType;
 /**
  * Tests for the SearchQuery class.
  */
-class SearchTypeCollectionTest extends TestCase {
-
+class SearchTypeCollectionTest extends TestCase
+{
     /**
      * Test that types are filtered correctly by query parameters.
      *
@@ -26,7 +26,8 @@ class SearchTypeCollectionTest extends TestCase {
      *
      * @dataProvider provideFilterTypes
      */
-    public function testGetFilteredCollection(array $inputTypes, array $expectedTypes, array $queryData = []) {
+    public function testGetFilteredCollection(array $inputTypes, array $expectedTypes, array $queryData = [])
+    {
         $collection = new SearchTypeCollection($inputTypes);
         $filtered = $collection->getFilteredCollection($queryData);
         $this->assertEquals($expectedTypes, $filtered->getAllTypes());
@@ -35,11 +36,12 @@ class SearchTypeCollectionTest extends TestCase {
     /**
      * @return array
      */
-    public function provideFilterTypes(): array {
-        $type1 = new MockSearchType('type1');
-        $type2 = new MockSearchType('type2');
-        $type2SubType = new MockSearchType('type2.1');
-        $type2SubType->setSearchGroup('type2');
+    public function provideFilterTypes(): array
+    {
+        $type1 = new MockSearchType("type1");
+        $type2 = new MockSearchType("type2");
+        $type2SubType = new MockSearchType("type2.1");
+        $type2SubType->setSearchGroup("type2");
 
         $type1NoPermission = clone $type1;
         $type1NoPermission->setUserHasPermission(false);
@@ -48,68 +50,23 @@ class SearchTypeCollectionTest extends TestCase {
         $type1Exclusive->setIsExclusiveType(true);
 
         return [
-            'passthrough' => [
+            "passthrough" => [[$type1, $type2, $type2SubType], [$type1, $type2, $type2SubType]],
+            "types filtering" => [
+                [$type1, $type2, $type2SubType],
+                [$type1, $type2],
                 [
-                    $type1,
-                    $type2,
-                    $type2SubType,
+                    "types" => ["type1", "type2"],
                 ],
-                [
-                    $type1,
-                    $type2,
-                    $type2SubType,
-                ]
             ],
-            'types filtering' => [
+            "recordTypes filtering" => [
+                [$type1, $type2, $type2SubType],
+                [$type2, $type2SubType],
                 [
-                    $type1,
-                    $type2,
-                    $type2SubType,
+                    "recordTypes" => ["type2"],
                 ],
-                [
-                    $type1,
-                    $type2,
-                ],
-                [
-                    'types' => ['type1', 'type2']
-                ]
             ],
-            'recordTypes filtering' => [
-                [
-                    $type1,
-                    $type2,
-                    $type2SubType,
-                ],
-                [
-                    $type2,
-                    $type2SubType,
-                ],
-                [
-                    'recordTypes' => ['type2']
-                ]
-            ],
-            'exclusive default filtering' => [
-                [
-                    $type1Exclusive,
-                    $type2,
-                    $type2SubType,
-                ],
-                [
-                    $type2,
-                    $type2SubType,
-                ]
-            ],
-            'permission default filtering' => [
-                [
-                    $type1NoPermission,
-                    $type2,
-                    $type2SubType,
-                ],
-                [
-                    $type2,
-                    $type2SubType,
-                ]
-            ],
+            "exclusive default filtering" => [[$type1Exclusive, $type2, $type2SubType], [$type2, $type2SubType]],
+            "permission default filtering" => [[$type1NoPermission, $type2, $type2SubType], [$type2, $type2SubType]],
         ];
     }
 
@@ -121,7 +78,11 @@ class SearchTypeCollectionTest extends TestCase {
      * @param string $expectedException
      * @dataProvider provideExceptionTypes
      */
-    public function testFilterExceptions(array $inputTypes, array $queryData, string $expectedException = ValidationException::class) {
+    public function testFilterExceptions(
+        array $inputTypes,
+        array $queryData,
+        string $expectedException = ValidationException::class
+    ) {
         $this->expectException($expectedException);
         $collection = new SearchTypeCollection($inputTypes);
         $collection->getFilteredCollection($queryData);
@@ -130,9 +91,10 @@ class SearchTypeCollectionTest extends TestCase {
     /**
      * @return array
      */
-    public function provideExceptionTypes(): array {
-        $type1 = new MockSearchType('type1');
-        $type2 = new MockSearchType('type2');
+    public function provideExceptionTypes(): array
+    {
+        $type1 = new MockSearchType("type1");
+        $type2 = new MockSearchType("type2");
 
         $type1NoPermission = clone $type1;
         $type1NoPermission->setUserHasPermission(false);
@@ -144,50 +106,35 @@ class SearchTypeCollectionTest extends TestCase {
         $type2Exclusive->setIsExclusiveType(true);
 
         return [
-            '2 exclusive types' => [
+            "2 exclusive types" => [
+                [$type1Exclusive, $type2Exclusive],
                 [
-                    $type1Exclusive,
-                    $type2Exclusive,
-                ],
-                [
-                    'types' => ['type1', 'type2'],
-                ]
-            ],
-            '2 exclusive recordTypes' => [
-                [
-                    $type1Exclusive,
-                    $type2Exclusive,
-                ],
-                [
-                    'recordTypes' => ['type1', 'type2'],
-                ]
-            ],
-            'mixed exclusive types' => [
-                [
-                    $type1Exclusive,
-                    $type2Exclusive,
-                ],
-                [
-                    'recordTypes' => ['type1'],
-                    'types' => ['type2'],
+                    "types" => ["type1", "type2"],
                 ],
             ],
-            'no permission recordTypes' => [
+            "2 exclusive recordTypes" => [
+                [$type1Exclusive, $type2Exclusive],
                 [
-                    $type1NoPermission,
-                    $type2,
-                ],
-                [
-                    'recordTypes' => ['type1', 'type2'],
+                    "recordTypes" => ["type1", "type2"],
                 ],
             ],
-            'no permission types' => [
+            "mixed exclusive types" => [
+                [$type1Exclusive, $type2Exclusive],
                 [
-                    $type1NoPermission,
-                    $type2,
+                    "recordTypes" => ["type1"],
+                    "types" => ["type2"],
                 ],
+            ],
+            "no permission recordTypes" => [
+                [$type1NoPermission, $type2],
                 [
-                    'types' => ['type1', 'type2'],
+                    "recordTypes" => ["type1", "type2"],
+                ],
+            ],
+            "no permission types" => [
+                [$type1NoPermission, $type2],
+                [
+                    "types" => ["type1", "type2"],
                 ],
             ],
         ];

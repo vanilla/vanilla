@@ -12,22 +12,24 @@ use Vanilla\Contracts\Web\UASnifferInterface;
 /**
  * Simple mock implementation of UA sniffing.
  */
-class MockUASniffer implements UASnifferInterface {
-
+class MockUASniffer implements UASnifferInterface
+{
     private $isIE11 = false;
 
     /**
      * Constructor.
      * @param bool $isIE11
      */
-    public function __construct(bool $isIE11 = false) {
+    public function __construct(bool $isIE11 = false)
+    {
         $this->isIE11 = $isIE11;
     }
 
     /**
      * @return bool
      */
-    public function isIE11(): bool {
+    public function isIE11(): bool
+    {
         return $this->isIE11;
     }
 }

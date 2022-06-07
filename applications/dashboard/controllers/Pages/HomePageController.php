@@ -13,12 +13,13 @@ use Vanilla\Web\PageDispatchController;
 /**
  * Controller for the custom layout homepage.
  */
-class HomePageController extends PageDispatchController {
-
+class HomePageController extends PageDispatchController
+{
     /**
      * Homepage index.
      */
-    public function index() {
+    public function index()
+    {
         return $this->usePage(LayoutPage::class)
             ->permission()
             ->setSeoRequired(false)

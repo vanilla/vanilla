@@ -10,6 +10,6 @@ namespace VanillaTests\Fixtures;
 /**
  * Class TestEventChild
  */
-class TestEventChild extends TestEvent {
-
+class TestEventChild extends TestEvent
+{
 }

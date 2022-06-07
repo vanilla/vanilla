@@ -18,8 +18,8 @@ use Vanilla\Utility\UrlUtils;
  * Any error encountered when following a link to the next page of data yields a null value
  * and discontinues the iteration.
  */
-class ApiPaginationIterator implements \IteratorAggregate {
-
+class ApiPaginationIterator implements \IteratorAggregate
+{
     /** @var HttpClient */
     private $httpClient;
 
@@ -35,7 +35,8 @@ class ApiPaginationIterator implements \IteratorAggregate {
      * @param HttpClient $httpClient
      * @param string $initialUrl
      */
-    public function __construct(HttpClient $httpClient, string $initialUrl) {
+    public function __construct(HttpClient $httpClient, string $initialUrl)
+    {
         $this->httpClient = $httpClient;
         $this->initialUrl = $initialUrl;
         $this->currentUrl = $initialUrl;
@@ -46,7 +47,8 @@ class ApiPaginationIterator implements \IteratorAggregate {
      *
      * @return \Generator
      */
-    protected function internalGenerator(): \Generator {
+    protected function internalGenerator(): \Generator
+    {
         if ($this->currentUrl === null) {
             $this->currentUrl = $this->initialUrl;
         }
@@ -60,7 +62,7 @@ class ApiPaginationIterator implements \IteratorAggregate {
             yield $result->getBody();
 
             $linkHeaders = WebLinking::parseLinkHeaders($result->getHeader(WebLinking::HEADER_NAME));
-            $next = $linkHeaders['next'] ?? null;
+            $next = $linkHeaders["next"] ?? null;
 
             $this->currentUrl = $next;
         }
@@ -69,7 +71,8 @@ class ApiPaginationIterator implements \IteratorAggregate {
     /**
      * @inheritdoc
      */
-    public function getIterator() {
+    public function getIterator()
+    {
         return $this->internalGenerator();
     }
 }

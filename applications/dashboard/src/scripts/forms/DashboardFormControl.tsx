@@ -19,7 +19,7 @@ import { t } from "@vanilla/i18n";
 import { IControlGroupProps, IControlProps } from "@vanilla/json-schema-forms";
 import { AutoComplete, IFormGroupProps } from "@vanilla/ui";
 import { AutoCompleteLookupOptions } from "@vanilla/ui/src/forms/autoComplete/AutoCompleteLookupOptions";
-import React, { useEffect } from "react";
+import React from "react";
 
 /**
  * This is intended for use in the JsonSchemaForm component
@@ -29,7 +29,7 @@ import React, { useEffect } from "react";
  * @returns
  */
 export function DashboardFormControl(props: IControlProps) {
-    const { control, required, disabled, instance, schema, onChange } = props;
+    const { control, required, disabled, instance, schema, onChange, onBlur, validation, size } = props;
     const value = instance ?? schema.default;
     const inputName = useUniqueID("input");
 
@@ -39,11 +39,24 @@ export function DashboardFormControl(props: IControlProps) {
             const typeIsNumber = control.type === "number";
             const typeIsUrl = control.type === "url";
             const type = typeIsNumber ? "number" : typeIsUrl ? "url" : "text";
+
             return (
                 <DashboardInput
+                    errors={
+                        validation?.errors
+                            ?.filter((error) => error.instancePath === `/${props.path[0]!}`)
+                            .map((e) => {
+                                return {
+                                    message: e.message!,
+                                    field: `${props.path[0]!}`,
+                                };
+                            }) ?? []
+                    }
                     inputProps={{
                         value: value ?? "",
+                        required,
                         disabled,
+                        onBlur,
                         onChange: (event) => onChange(event.target.value),
                         maxLength: schema.type === "string" ? schema.maxLength : undefined,
                         type: !isMultiline ? type : undefined,
@@ -95,6 +108,7 @@ export function DashboardFormControl(props: IControlProps) {
                         onChange={(value) => {
                             onChange(value);
                         }}
+                        onBlur={onBlur}
                         optionProvider={api ? <AutoCompleteLookupOptions api={apiv2} lookup={api} /> : undefined}
                         options={
                             staticOptions
@@ -104,6 +118,7 @@ export function DashboardFormControl(props: IControlProps) {
                                   }))
                                 : undefined
                         }
+                        size={size}
                     />
                 </div>
             );

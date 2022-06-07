@@ -22,7 +22,8 @@ use Vanilla\Web\JsInterpop\PhpAsJsVariable;
 /**
  * Class for holding information for rendering and HMTL page head.
  */
-final class PageHead implements PageHeadInterface {
+final class PageHead implements PageHeadInterface
+{
     use TwigRenderTrait;
 
     /** @var ContentSecurityPolicyModel */
@@ -114,77 +115,84 @@ final class PageHead implements PageHeadInterface {
     /**
      * @return Markup
      */
-    public function renderHtml(): Markup {
+    public function renderHtml(): Markup
+    {
         $this->applyMetaTags();
 
         $this->inlineScripts[] = $this->assetProvider->getInlinePolyfillContents();
         $this->scripts = array_merge($this->scripts, $this->assetProvider->getScripts($this->assetSection));
         $this->styles = array_merge($this->styles, $this->assetProvider->getStylesheets($this->assetSection));
 
-        $this->inlineScripts[] = new PhpAsJsVariable('gdn', [
-            'meta' => $this->siteMeta->value($this->siteMetaExtras),
+        $this->inlineScripts[] = new PhpAsJsVariable("gdn", [
+            "meta" => $this->siteMeta->value($this->siteMetaExtras),
         ]);
         $viewData = [
-            'nonce' => $this->cspModel->getNonce(),
-            'title' => $this->seoTitle,
-            'description' => $this->seoDescription,
-            'canonicalUrl' => $this->canonicalUrl,
-            'locale' => $this->siteMeta->getLocaleKey(),
-            'debug' => $this->siteMeta->getDebugModeEnabled(),
-            'scripts' => $this->scripts,
-            'inlineScripts' => $this->inlineScripts,
-            'styles' => $this->styles,
-            'inlineStyles' => $this->inlineStyles,
-            'metaTags' => $this->metaTags,
-            'linkTags' => $this->linkTags,
-            'preloadModel' => $this->preloadModel,
-            'cssClasses' => ['isLoading'],
-            'favIcon' => $this->siteMeta->getFavIcon(),
-            'jsonLD' => $this->getJsonLDScriptContent(),
+            "nonce" => $this->cspModel->getNonce(),
+            "title" => $this->seoTitle,
+            "description" => $this->seoDescription,
+            "canonicalUrl" => $this->canonicalUrl,
+            "locale" => $this->siteMeta->getLocaleKey(),
+            "debug" => $this->siteMeta->getDebugModeEnabled(),
+            "scripts" => $this->scripts,
+            "inlineScripts" => $this->inlineScripts,
+            "styles" => $this->styles,
+            "inlineStyles" => $this->inlineStyles,
+            "metaTags" => $this->metaTags,
+            "linkTags" => $this->linkTags,
+            "preloadModel" => $this->preloadModel,
+            "cssClasses" => ["isLoading"],
+            "favIcon" => $this->siteMeta->getFavIcon(),
+            "jsonLD" => $this->getJsonLDScriptContent(),
         ];
-        $this->eventManager->fireArray('BeforeRenderMasterView', [&$viewData]);
-        return new Markup($this->renderTwig(__DIR__.'/PageHead.twig', $viewData), 'utf-8');
+        $this->eventManager->fireArray("BeforeRenderMasterView", [&$viewData]);
+        return new Markup($this->renderTwig(__DIR__ . "/PageHead.twig", $viewData), "utf-8");
     }
 
     /**
      * @inheritdoc
      */
-    public function setAssetSection(string $section) {
+    public function setAssetSection(string $section)
+    {
         $this->assetSection = $section;
     }
 
     /**
      * @inheritdoc
      */
-    public function getSeoTitle(): ?string {
+    public function getSeoTitle(): ?string
+    {
         return $this->seoTitle;
     }
 
     /**
      * @inheritdoc
      */
-    public function getSeoDescription(): ?string {
+    public function getSeoDescription(): ?string
+    {
         return $this->seoDescription;
     }
 
     /**
      * @inheritdoc
      */
-    public function getSeoBreadcrumbs(): ?array {
+    public function getSeoBreadcrumbs(): ?array
+    {
         return $this->seoBreadcrumbs;
     }
 
     /**
      * @inheritdoc
      */
-    public function getCanonicalUrl(): ?string {
+    public function getCanonicalUrl(): ?string
+    {
         return $this->canonicalUrl;
     }
 
     /**
      * @inheritdoc
      */
-    public function addJsonLDItem(AbstractJsonLDItem $item) {
+    public function addJsonLDItem(AbstractJsonLDItem $item)
+    {
         $this->jsonLDItems[] = $item;
         return $this;
     }
@@ -192,7 +200,8 @@ final class PageHead implements PageHeadInterface {
     /**
      * @inheritdoc
      */
-    public function setSeoTitle(string $title, bool $withSiteTitle = true) {
+    public function setSeoTitle(string $title, bool $withSiteTitle = true)
+    {
         if ($withSiteTitle) {
             if ($title === "") {
                 $title = $this->siteMeta->getSiteTitle();
@@ -208,7 +217,8 @@ final class PageHead implements PageHeadInterface {
     /**
      * @inheritdoc
      */
-    public function setSeoDescription(string $description) {
+    public function setSeoDescription(string $description)
+    {
         $this->seoDescription = $description;
 
         return $this;
@@ -217,7 +227,8 @@ final class PageHead implements PageHeadInterface {
     /**
      * @inheritdoc
      */
-    public function setCanonicalUrl(string $path) {
+    public function setCanonicalUrl(string $path)
+    {
         $this->canonicalUrl = $this->request->url($path, true);
 
         return $this;
@@ -226,7 +237,8 @@ final class PageHead implements PageHeadInterface {
     /**
      * @inheritdoc
      */
-    public function setSeoBreadcrumbs(array $crumbs) {
+    public function setSeoBreadcrumbs(array $crumbs)
+    {
         $this->seoBreadcrumbs = $crumbs;
         $this->addJsonLDItem(new BreadcrumbJsonLD($crumbs));
         return $this;
@@ -235,7 +247,8 @@ final class PageHead implements PageHeadInterface {
     /**
      * @inheritdoc
      */
-    public function addInlineScript(string $script) {
+    public function addInlineScript(string $script)
+    {
         $this->inlineScripts[] = $script;
 
         return $this;
@@ -244,7 +257,8 @@ final class PageHead implements PageHeadInterface {
     /**
      * @inheritdoc
      */
-    public function addScript(AssetInterface $script) {
+    public function addScript(AssetInterface $script)
+    {
         $this->scripts[] = $script;
 
         return $this;
@@ -253,7 +267,8 @@ final class PageHead implements PageHeadInterface {
     /**
      * @inheritdoc
      */
-    public function addLinkTag(array $attributes) {
+    public function addLinkTag(array $attributes)
+    {
         $this->linkTags[] = $attributes;
 
         return $this;
@@ -262,7 +277,8 @@ final class PageHead implements PageHeadInterface {
     /**
      * @inheritdoc
      */
-    public function addMetaTag(array $attributes) {
+    public function addMetaTag(array $attributes)
+    {
         $this->metaTags[] = $attributes;
 
         return $this;
@@ -271,14 +287,16 @@ final class PageHead implements PageHeadInterface {
     /**
      * @inheritdoc
      */
-    public function addOpenGraphTag(string $property, string $content) {
-        return $this->addMetaTag(['property' => $property, 'content' => $content]);
+    public function addOpenGraphTag(string $property, string $content)
+    {
+        return $this->addMetaTag(["property" => $property, "content" => $content]);
     }
 
     /**
      * @inheritdoc
      */
-    public function addSiteMetaExtra(SiteMetaExtra $extra) {
+    public function addSiteMetaExtra(SiteMetaExtra $extra)
+    {
         $this->siteMetaExtras[] = $extra;
         return $this;
     }
@@ -286,11 +304,11 @@ final class PageHead implements PageHeadInterface {
     /**
      * Use existing site data to create open graph meta tags.
      */
-    public function applyMetaTags() {
-
+    public function applyMetaTags()
+    {
         // Standard meta tags
         if ($this->seoDescription) {
-            $this->addMetaTag(['name' => 'description', 'content' => $this->seoDescription]);
+            $this->addMetaTag(["name" => "description", "content" => $this->seoDescription]);
         }
 
         if ($mobileAddressBarColor = $this->siteMeta->getMobileAddressBarColor()) {
@@ -298,23 +316,23 @@ final class PageHead implements PageHeadInterface {
         }
 
         // Site name
-        $this->addOpenGraphTag('og:site_name', $this->siteMeta->getSiteTitle());
+        $this->addOpenGraphTag("og:site_name", $this->siteMeta->getSiteTitle());
 
         if ($this->seoTitle) {
-            $this->addOpenGraphTag('og:title', $this->seoTitle);
+            $this->addOpenGraphTag("og:title", $this->seoTitle);
         }
 
         if ($this->seoDescription) {
-            $this->addOpenGraphTag('og:description', $this->seoDescription);
+            $this->addOpenGraphTag("og:description", $this->seoDescription);
         }
 
         if ($this->canonicalUrl) {
-            $this->addOpenGraphTag('og:url', $this->canonicalUrl);
-            $this->addLinkTag(['rel' => 'canonical', 'href' => $this->canonicalUrl]);
+            $this->addOpenGraphTag("og:url", $this->canonicalUrl);
+            $this->addLinkTag(["rel" => "canonical", "href" => $this->canonicalUrl]);
         }
 
         // Twitter specific tags
-        $this->addMetaTag(['name' => 'twitter:card', 'content' => 'summary']);
+        $this->addMetaTag(["name" => "twitter:card", "content" => "summary"]);
         // There is no need to duplicate twitter & OG tags.
         //
         // When the Twitter card processor looks for tags on a page, it first checks for the Twitter-specific property,
@@ -326,9 +344,10 @@ final class PageHead implements PageHeadInterface {
      * Get the content of the page's JSON-LD script.
      * @return string
      */
-    public function getJsonLDScriptContent(): string {
+    public function getJsonLDScriptContent(): string
+    {
         $data = [
-            '@context' => "https://schema.org",
+            "@context" => "https://schema.org",
             "@graph" => $this->jsonLDItems,
         ];
 
@@ -340,7 +359,8 @@ final class PageHead implements PageHeadInterface {
      *
      * @return array
      */
-    public function getMetaTags(): array {
+    public function getMetaTags(): array
+    {
         return $this->metaTags;
     }
 
@@ -349,7 +369,8 @@ final class PageHead implements PageHeadInterface {
      *
      * @return array
      */
-    public function getLinkTags(): array {
+    public function getLinkTags(): array
+    {
         return $this->linkTags;
     }
 }

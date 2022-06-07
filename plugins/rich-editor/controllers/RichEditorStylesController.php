@@ -5,32 +5,37 @@
  * @license GPL-2.0-only
  */
 
-class RichEditorStylesController extends VanillaController {
+class RichEditorStylesController extends VanillaController
+{
     /**
      * Renders the rich text editor.
      */
-    public function index() {
+    public function index()
+    {
         $this->render();
     }
 
     /**
      * Renders embeds.
      */
-    public function embeds() {
+    public function embeds()
+    {
         $this->render();
     }
 
     /**
      * Renders common rich text formatting.
      */
-    public function formatting() {
+    public function formatting()
+    {
         $this->render();
     }
 
     /**
      * Renders images with various size and placement options.
      */
-    public function images() {
+    public function images()
+    {
         $this->render();
     }
 }

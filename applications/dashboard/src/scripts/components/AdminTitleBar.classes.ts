@@ -8,13 +8,17 @@ import { useThemeCache } from "@library/styles/styleUtils";
 import { Variables } from "@library/styles/Variables";
 import { calc } from "csx";
 
-export const adminTitleBarClasses = useThemeCache(() => {
+export const adminTitleBarClasses = (props?) => {
+    const { zIndex } = props ?? {};
     const panelLayoutVars = oneColumnVariables();
     const mediaQueries = titleBarVariables().mediaQueries();
 
     const root = css({
         background: "#fbfcff",
         borderBottom: "1px solid #dddee0",
+        position: "sticky",
+        top: titleBarVariables().fullHeight + 1,
+        zIndex: zIndex ?? 1,
     });
 
     const container = css(
@@ -94,7 +98,7 @@ export const adminTitleBarClasses = useThemeCache(() => {
         descriptionWrapper,
         description,
     };
-});
+};
 
 export const adminEditTitleBarClasses = useThemeCache(() => {
     const panelLayoutVars = oneColumnVariables();

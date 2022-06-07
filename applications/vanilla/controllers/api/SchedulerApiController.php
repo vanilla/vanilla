@@ -15,8 +15,9 @@ use Vanilla\Scheduler\SchedulerInterface;
 /**
  * Class SchedulerApiController
  */
-class SchedulerApiController extends AbstractApiController {
-    public const CRON_TRIGGER_EVENT = 'CRON_TRIGGER_EVENT';
+class SchedulerApiController extends AbstractApiController
+{
+    public const CRON_TRIGGER_EVENT = "CRON_TRIGGER_EVENT";
 
     /** @var SchedulerInterface */
     protected $scheduler;
@@ -55,8 +56,9 @@ class SchedulerApiController extends AbstractApiController {
      *
      * @throws AdHocAuthException On bad authentication.
      */
-    public function post_cron() {
-        $this->permissionOrToken('Garden.Scheduler.Cron');
+    public function post_cron()
+    {
+        $this->permissionOrToken("Garden.Scheduler.Cron");
 
         $this->scheduler->setExecutionType(JobExecutionType::cron());
         $this->eventManager->fire(self::CRON_TRIGGER_EVENT);
@@ -70,7 +72,8 @@ class SchedulerApiController extends AbstractApiController {
      * @param string|array $permission The permissions you are requiring.
      * @throws AdHocAuthException On bad authentication.
      */
-    protected function permissionOrToken($permission) {
+    protected function permissionOrToken($permission)
+    {
         try {
             $this->permission($permission);
         } catch (Exception $standardAuthenticationFailed) {

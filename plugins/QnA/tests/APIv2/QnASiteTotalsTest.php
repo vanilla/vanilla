@@ -12,11 +12,12 @@ use Vanilla\Dashboard\Models\RecordStatusModel;
 /**
  * Test for site total counts that depend on QnA.
  */
-class QnASiteTotalsTest extends AbstractAPIv2Test {
+class QnASiteTotalsTest extends AbstractAPIv2Test
+{
     use QnaApiTestTrait;
 
     // Don't enable stub content.
-    public static $addons = ['vanilla', 'qna'];
+    public static $addons = ["vanilla", "qna"];
 
     protected $baseUrl = "/site-totals";
 
@@ -25,7 +26,8 @@ class QnASiteTotalsTest extends AbstractAPIv2Test {
     /**
      * @inheritDoc
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         // Make sure we have a fresh cache for each test.
         self::$testCache->flush();
@@ -34,7 +36,8 @@ class QnASiteTotalsTest extends AbstractAPIv2Test {
     /**
      * Create one question with each status.
      */
-    public function createQuestionsWithStatuses() {
+    public function createQuestionsWithStatuses()
+    {
         // Unanswered
         $this->createQuestion();
 
@@ -47,22 +50,25 @@ class QnASiteTotalsTest extends AbstractAPIv2Test {
         $answer = $this->createAnswer();
         $this->acceptAnswer($question, $answer);
 
-        $questions = $this->api()->get("discussions", ["type" => "question"])->getBody();
+        $questions = $this->api()
+            ->get("discussions", ["type" => "question"])
+            ->getBody();
         $returnedStatuses = array_column($questions, "statusID");
         $availableStatuses = [
             RecordStatusModel::DISCUSSION_STATUS_UNANSWERED,
             RecordStatusModel::DISCUSSION_STATUS_ANSWERED,
             RecordStatusModel::DISCUSSION_STATUS_ACCEPTED,
-            ];
+        ];
         $this->assertEqualsCanonicalizing($returnedStatuses, $availableStatuses);
     }
 
     /**
      * Test that the returned question count is accurate.
      */
-    public function testQuestionCount() {
+    public function testQuestionCount()
+    {
         $this->createQuestionsWithStatuses();
-        $siteTotalsQuestion = $this->api->get($this->baseUrl."?counts[]=question")->getBody();
+        $siteTotalsQuestion = $this->api->get($this->baseUrl . "?counts[]=question")->getBody();
         $this->assertSame($siteTotalsQuestion["counts"]["question"]["count"], 3);
     }
 
@@ -71,8 +77,9 @@ class QnASiteTotalsTest extends AbstractAPIv2Test {
      *
      * @depends testQuestionCount
      */
-    public function testAcceptedCount() {
-        $siteTotalsAccepted = $this->api->get($this->baseUrl."?counts[]=accepted")->getBody();
+    public function testAcceptedCount()
+    {
+        $siteTotalsAccepted = $this->api->get($this->baseUrl . "?counts[]=accepted")->getBody();
         $this->assertSame($siteTotalsAccepted["counts"]["accepted"]["count"], 1);
     }
 }

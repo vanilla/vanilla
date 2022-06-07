@@ -107,7 +107,7 @@ echo $form->errors();
                 <div class="form-group">
                     <div class="buttons input-wrap no-label">
                         <?php
-                        echo anchor(t('Generate Password'), '#', 'GeneratePassword btn btn-secondary');
+                        echo anchor(t('Generate Password'), '#', 'GeneratePassword btn btn-secondary', ['data-length' => Gdn::config('Garden.Password.MinLength')]);
                         echo anchor(t('Reveal Password'), '#', 'RevealPassword btn btn-secondary',
                             ['data-hide-text' => t('Hide Password'), 'data-show-text' => t('Reveal Password')]);
                         ?>
@@ -124,7 +124,7 @@ echo $form->errors();
         <div class="form-group">
             <div class="buttons input-wrap no-label">
                 <?php
-                echo anchor(t('Generate Password'), '#', 'GeneratePassword btn btn-secondary');
+                echo anchor(t('Generate Password'), '#', 'GeneratePassword btn btn-secondary',['data-length' => Gdn::config('Garden.Password.MinLength')]);
                 echo anchor(t('Reveal Password'), '#', 'RevealPassword btn btn-secondary',
                     ['data-hide-text' => t('Hide Password'), 'data-show-text' => t('Reveal Password')]);
                 ?>

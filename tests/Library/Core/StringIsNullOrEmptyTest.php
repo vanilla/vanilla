@@ -13,8 +13,8 @@ use PHPUnit\Framework\TestCase;
  * Tests for stringIsNullOrEmpty().
  */
 
-class StringIsNullOrEmptyTest extends TestCase {
-
+class StringIsNullOrEmptyTest extends TestCase
+{
     /**
      * Test {@link stringIsNullOrEmpty()} against several scenarios.
      *
@@ -22,7 +22,8 @@ class StringIsNullOrEmptyTest extends TestCase {
      * @param bool $expected The expected result.
      * @dataProvider provideTestStringIsNullOrEmptyArrays
      */
-    public function testStringIsNullOrEmpty($testString, $expected) {
+    public function testStringIsNullOrEmpty($testString, $expected)
+    {
         $actual = stringIsNullOrEmpty($testString);
         $this->assertSame($expected, $actual);
     }
@@ -32,20 +33,12 @@ class StringIsNullOrEmptyTest extends TestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideTestStringIsNullOrEmptyArrays() {
+    public function provideTestStringIsNullOrEmptyArrays()
+    {
         $r = [
-            'stringIsNull' => [
-                null,
-                true,
-            ],
-            'stringIsEmpty' => [
-                '',
-                true,
-            ],
-            'stringIsNotNullOrEmpty' => [
-                'sting',
-                false,
-            ],
+            "stringIsNull" => [null, true],
+            "stringIsEmpty" => ["", true],
+            "stringIsNotNullOrEmpty" => ["sting", false],
         ];
 
         return $r;

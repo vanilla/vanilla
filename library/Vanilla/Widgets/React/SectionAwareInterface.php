@@ -10,7 +10,8 @@ namespace Vanilla\Widgets\React;
 /**
  * Interface to get recommended section IDs for widgets.
  */
-interface SectionAwareInterface {
+interface SectionAwareInterface
+{
     /**
      * Get section IDs.
      *

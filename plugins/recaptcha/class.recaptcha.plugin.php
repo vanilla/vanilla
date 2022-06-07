@@ -16,8 +16,8 @@
  * @author Tim Gunter <tim@vanillaforums.com>
  * @package vanilla
  */
-class RecaptchaPlugin extends Gdn_Plugin {
-
+class RecaptchaPlugin extends Gdn_Plugin
+{
     /**
      * reCAPTCHA private key
      * @var string
@@ -34,12 +34,13 @@ class RecaptchaPlugin extends Gdn_Plugin {
      * Plugin initialization.
      *
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
 
         // Get keys from config
-        $this->privateKey = c('Recaptcha.PrivateKey');
-        $this->publicKey = c('Recaptcha.PublicKey');
+        $this->privateKey = c("Recaptcha.PrivateKey");
+        $this->publicKey = c("Recaptcha.PublicKey");
     }
 
     /**
@@ -47,7 +48,8 @@ class RecaptchaPlugin extends Gdn_Plugin {
      *
      * @param string $key
      */
-    public function setPrivateKey($key) {
+    public function setPrivateKey($key)
+    {
         $this->privateKey = $key;
     }
 
@@ -56,7 +58,8 @@ class RecaptchaPlugin extends Gdn_Plugin {
      *
      * @return string
      */
-    public function getPrivateKey() {
+    public function getPrivateKey()
+    {
         return $this->privateKey;
     }
 
@@ -65,7 +68,8 @@ class RecaptchaPlugin extends Gdn_Plugin {
      *
      * @param string $key
      */
-    public function setPublicKey($key) {
+    public function setPublicKey($key)
+    {
         $this->publicKey = $key;
     }
 
@@ -74,7 +78,8 @@ class RecaptchaPlugin extends Gdn_Plugin {
      *
      * @return string
      */
-    public function getPublicKey() {
+    public function getPublicKey()
+    {
         return $this->publicKey;
     }
 
@@ -85,24 +90,29 @@ class RecaptchaPlugin extends Gdn_Plugin {
      * @return boolean
      * @throws Exception
      */
-    public function validateCaptcha($captchaText) {
-        $api = new Garden\Http\HttpClient('https://www.google.com/recaptcha/api');
+    public function validateCaptcha($captchaText)
+    {
+        $api = new Garden\Http\HttpClient("https://www.google.com/recaptcha/api");
         $data = [
-            'secret' => $this->getPrivateKey(),
-            'response' => $captchaText
+            "secret" => $this->getPrivateKey(),
+            "response" => $captchaText,
         ];
-        $response = $api->get('/siteverify', $data);
+        $response = $api->get("/siteverify", $data);
 
         if ($response->isSuccessful()) {
             $result = $response->getBody();
-            $errorCodes = val('error_codes', $result);
-            if ($result && val('success', $result)) {
+            $errorCodes = val("error_codes", $result);
+            if ($result && val("success", $result)) {
                 return true;
-            } else if (!empty($errorCodes) && $errorCodes != ['invalid-input-response']) {
-                throw new Exception(formatString(t('No response from reCAPTCHA.').' {ErrorCodes}', ['ErrorCodes' => join(', ', $errorCodes)]));
+            } elseif (!empty($errorCodes) && $errorCodes != ["invalid-input-response"]) {
+                throw new Exception(
+                    formatString(t("No response from reCAPTCHA.") . " {ErrorCodes}", [
+                        "ErrorCodes" => join(", ", $errorCodes),
+                    ])
+                );
             }
         } else {
-            throw new Exception(t('No response from reCAPTCHA.'));
+            throw new Exception(t("No response from reCAPTCHA."));
         }
 
         return false;
@@ -113,17 +123,18 @@ class RecaptchaPlugin extends Gdn_Plugin {
      *
      * @param SettingsController $sender
      */
-    public function settingsController_registration_handler($sender) {
-        $configurationModel = $sender->EventArguments['Configuration'];
+    public function settingsController_registration_handler($sender)
+    {
+        $configurationModel = $sender->EventArguments["Configuration"];
 
-        $manageCaptcha = c('Garden.Registration.ManageCaptcha', true);
-        $sender->setData('_ManageCaptcha', $manageCaptcha);
+        $manageCaptcha = c("Garden.Registration.ManageCaptcha", true);
+        $sender->setData("_ManageCaptcha", $manageCaptcha);
 
         if ($manageCaptcha) {
-            $configurationModel->setField('Recaptcha.PrivateKey');
-            $configurationModel->setField('Recaptcha.PublicKey');
-            $configurationModel->setField('RecaptchaV3.PublicKey');
-            $configurationModel->setField('RecaptchaV3.PrivateKey');
+            $configurationModel->setField("Recaptcha.PrivateKey");
+            $configurationModel->setField("Recaptcha.PublicKey");
+            $configurationModel->setField("RecaptchaV3.PublicKey");
+            $configurationModel->setField("RecaptchaV3.PrivateKey");
         }
     }
 
@@ -133,8 +144,9 @@ class RecaptchaPlugin extends Gdn_Plugin {
      * @param Gdn_PluginManager $sender
      * @param array $args
      */
-    public function captcha_isEnabled_handler($sender, $args) {
-        $args['Enabled'] = true;
+    public function captcha_isEnabled_handler($sender, $args)
+    {
+        $args["Enabled"] = true;
     }
 
     /**
@@ -144,8 +156,9 @@ class RecaptchaPlugin extends Gdn_Plugin {
      *
      * @param SettingsController $sender
      */
-    public function captcha_settings_handler($sender) {
-        echo $sender->fetchView('registration', 'settings', 'plugins/recaptcha');
+    public function captcha_settings_handler($sender)
+    {
+        echo $sender->fetchView("registration", "settings", "plugins/recaptcha");
     }
 
     /**
@@ -155,8 +168,9 @@ class RecaptchaPlugin extends Gdn_Plugin {
      *
      * @param Gdn_Controller $sender
      */
-    public function captcha_render_handler($sender) {
-        echo $sender->fetchView('captcha', 'display', 'plugins/recaptcha');
+    public function captcha_render_handler($sender)
+    {
+        echo $sender->fetchView("captcha", "display", "plugins/recaptcha");
     }
 
     /**
@@ -166,10 +180,11 @@ class RecaptchaPlugin extends Gdn_Plugin {
      * @return boolean
      * @throws Exception
      */
-    public function captcha_validate_handler($sender) {
-        $valid = &$sender->EventArguments['captchavalid'];
+    public function captcha_validate_handler($sender)
+    {
+        $valid = &$sender->EventArguments["captchavalid"];
 
-        $recaptchaResponse = Gdn::request()->post('g-recaptcha-response');
+        $recaptchaResponse = Gdn::request()->post("g-recaptcha-response");
         if (!$recaptchaResponse) {
             return $valid = false;
         }
@@ -182,10 +197,11 @@ class RecaptchaPlugin extends Gdn_Plugin {
      *
      * @param Gdn_PluginManager $sender
      */
-    public function captcha_get_handler($sender) {
-        $recaptchaResponse = Gdn::request()->post('g-recaptcha-response');
+    public function captcha_get_handler($sender)
+    {
+        $recaptchaResponse = Gdn::request()->post("g-recaptcha-response");
         if ($recaptchaResponse) {
-            $sender->EventArguments['captchatext'] = $recaptchaResponse;
+            $sender->EventArguments["captchatext"] = $recaptchaResponse;
         }
     }
 
@@ -197,36 +213,93 @@ class RecaptchaPlugin extends Gdn_Plugin {
      * @param Gdn_Form $sender
      * @return string
      */
-    public function gdn_form_captcha_handler($sender) {
+    public function gdn_form_captcha_handler($sender)
+    {
         if (!$this->getPrivateKey() || !$this->getPublicKey()) {
-            echo '<div class="Warning">' . t('reCAPTCHA has not been set up by the site administrator in registration settings. This is required to register.') .  '</div>';
+            echo '<div class="Warning">' .
+                t(
+                    "reCAPTCHA has not been set up by the site administrator in registration settings. This is required to register."
+                ) .
+                "</div>";
         }
 
         // Google whitelist https://developers.google.com/recaptcha/docs/language
-        $whitelist = ['ar', 'bg', 'ca', 'zh-CN', 'zh-TW', 'hr', 'cs', 'da', 'nl', 'en-GB', 'en', 'fil', 'fi', 'fr', 'fr-CA', 'de', 'de-AT', 'de-CH', 'el', 'iw', 'hi', 'hu', 'id', 'it', 'ja', 'ko', 'lv', 'lt', 'no', 'fa', 'pl', 'pt', 'pt-BR', 'pt-PT', 'ro', 'ru', 'sr', 'sk', 'sl', 'es', 'es-419', 'sv', 'th', 'tr', 'uk', 'vi'];
+        $whitelist = [
+            "ar",
+            "bg",
+            "ca",
+            "zh-CN",
+            "zh-TW",
+            "hr",
+            "cs",
+            "da",
+            "nl",
+            "en-GB",
+            "en",
+            "fil",
+            "fi",
+            "fr",
+            "fr-CA",
+            "de",
+            "de-AT",
+            "de-CH",
+            "el",
+            "iw",
+            "hi",
+            "hu",
+            "id",
+            "it",
+            "ja",
+            "ko",
+            "lv",
+            "lt",
+            "no",
+            "fa",
+            "pl",
+            "pt",
+            "pt-BR",
+            "pt-PT",
+            "ro",
+            "ru",
+            "sr",
+            "sk",
+            "sl",
+            "es",
+            "es-419",
+            "sv",
+            "th",
+            "tr",
+            "uk",
+            "vi",
+        ];
 
         // Use our current locale against the whitelist.
         $language = Gdn::locale()->language();
         if (!in_array($language, $whitelist)) {
-            $language = (in_array(Gdn::locale()->Locale, $whitelist)) ? Gdn::locale()->Locale : false;
+            $language = in_array(Gdn::locale()->Locale, $whitelist) ? Gdn::locale()->Locale : false;
         }
 
-        $scriptSrc = 'https://www.google.com/recaptcha/api.js?hl='.$language;
+        $scriptSrc = "https://www.google.com/recaptcha/api.js?hl=" . $language;
 
-        $attributes = ['class' => 'g-recaptcha', 'data-sitekey' => $this->getPublicKey(), 'data-theme' => c('Recaptcha.Theme', 'light')];
+        $attributes = [
+            "class" => "g-recaptcha",
+            "data-sitekey" => $this->getPublicKey(),
+            "data-theme" => c("Recaptcha.Theme", "light"),
+        ];
 
         // see https://developers.google.com/recaptcha/docs/display for details
-        $this->EventArguments['Attributes'] = &$attributes;
-        $this->fireEvent('BeforeCaptcha');
+        $this->EventArguments["Attributes"] = &$attributes;
+        $this->fireEvent("BeforeCaptcha");
 
-        echo '<div '. attribute($attributes) . '></div>';
-        echo '<script src="'.$scriptSrc.'"></script>';
+        echo "<div " . attribute($attributes) . "></div>";
+        echo '<script src="' . $scriptSrc . '"></script>';
     }
 
     /**
      * On plugin enable.
      *
      */
-    public function setup() {}
-
+    public function setup()
+    {
+    }
 }

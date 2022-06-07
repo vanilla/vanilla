@@ -14,8 +14,8 @@ use VanillaTests\Fixtures\Tuple;
  * Tests for touchValue().
  */
 
-class TouchValueTest extends TestCase {
-
+class TouchValueTest extends TestCase
+{
     /**
      * Tests (@link touchValue()} against several scenarios.
      *
@@ -26,7 +26,8 @@ class TouchValueTest extends TestCase {
      * @dataProvider provideTestTouchValueArraysArray
      * @dataProvider provideTestTouchValueArraysObject
      */
-    public function testTouchValue($testKey, &$testCollection, $testDefault, $expected) {
+    public function testTouchValue($testKey, &$testCollection, $testDefault, $expected)
+    {
         $actual = touchValue($testKey, $testCollection, $testDefault);
         $this->assertSame($expected, $actual);
     }
@@ -38,20 +39,11 @@ class TouchValueTest extends TestCase {
     /**
      * Test data where collection is an array.
      */
-    public function provideTestTouchValueArraysArray() {
+    public function provideTestTouchValueArraysArray()
+    {
         $r = [
-            'keyAlreadyExists' => [
-                'a',
-                ['a' => 'a', 'b' => 'b'],
-                'b',
-                'a',
-            ],
-            'keyDoesNotExist' => [
-                'a',
-                ['b' => 'b'],
-                'a',
-                'a',
-            ],
+            "keyAlreadyExists" => ["a", ["a" => "a", "b" => "b"], "b", "a"],
+            "keyDoesNotExist" => ["a", ["b" => "b"], "a", "a"],
         ];
 
         return $r;
@@ -60,21 +52,12 @@ class TouchValueTest extends TestCase {
     /**
      * Test data where collection is an object.
      */
-    public function provideTestTouchValueArraysObject() {
-        $testObject = new Tuple('a', 'b');
+    public function provideTestTouchValueArraysObject()
+    {
+        $testObject = new Tuple("a", "b");
         $r = [
-            'propertyAlreadyExists' => [
-                'a',
-                $testObject,
-                'b',
-                'a',
-            ],
-            'propertyDoesNotExist' => [
-                'c',
-                $testObject,
-                'c',
-                'c',
-            ],
+            "propertyAlreadyExists" => ["a", $testObject, "b", "a"],
+            "propertyDoesNotExist" => ["c", $testObject, "c", "c"],
         ];
 
         return $r;

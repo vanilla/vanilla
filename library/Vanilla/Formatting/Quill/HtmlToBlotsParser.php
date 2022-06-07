@@ -14,7 +14,8 @@ use Vanilla\Formatting\Quill\Blots\TextBlot;
 /**
  * Utility functions for parsing HTML into bots.
  */
-class HtmlToBlotsParser {
+class HtmlToBlotsParser
+{
     /**
      * Parse an HTML fragment into blots.
      *
@@ -23,7 +24,11 @@ class HtmlToBlotsParser {
      * @param AbstractLineTerminatorBlot $terminator An optional terminator for the operations.
      * @return array<TextBlot>
      */
-    public static function parseInlineHtml(string $html, BlotGroupCollection $parent, AbstractLineTerminatorBlot $terminator = null): array {
+    public static function parseInlineHtml(
+        string $html,
+        BlotGroupCollection $parent,
+        AbstractLineTerminatorBlot $terminator = null
+    ): array {
         $dom = new HtmlDocument($html);
         $root = $dom->getRoot();
 
@@ -45,12 +50,13 @@ class HtmlToBlotsParser {
      * @param array $parentOp A parent operation with attributes already set.
      * @return array
      */
-    private static function parseDOMElementOperations(\DOMNode $parent, $parentOp = []): array {
+    private static function parseDOMElementOperations(\DOMNode $parent, $parentOp = []): array
+    {
         $result = [];
         foreach ($parent->childNodes as $node) {
             $op = $parentOp;
             if ($node instanceof \DOMText) {
-                $op['insert'] = $node->nodeValue;
+                $op["insert"] = $node->nodeValue;
                 $result[] = $op;
             } elseif ($node instanceof \DOMElement) {
                 $op = array_replace_recursive($op, static::attributesFromElement($node));
@@ -68,26 +74,27 @@ class HtmlToBlotsParser {
      * @param \DOMElement $node
      * @return array
      */
-    private static function attributesFromElement(\DOMElement $node): array {
+    private static function attributesFromElement(\DOMElement $node): array
+    {
         $op = [];
         switch (strtolower($node->tagName)) {
-            case 'b':
-            case 'strong':
-                $op['attributes']['bold'] = true;
+            case "b":
+            case "strong":
+                $op["attributes"]["bold"] = true;
                 break;
-            case 'i':
-            case 'em':
-                $op['attributes']['italic'] = true;
+            case "i":
+            case "em":
+                $op["attributes"]["italic"] = true;
                 break;
-            case 's':
-            case 'strike':
-                $op['attributes']['strike'] = true;
+            case "s":
+            case "strike":
+                $op["attributes"]["strike"] = true;
                 break;
-            case 'code':
-                $op['attributes']['code'] = true;
+            case "code":
+                $op["attributes"]["code"] = true;
                 break;
-            case 'a':
-                $op['attributes']['link'] = (string)$node->getAttribute('href');
+            case "a":
+                $op["attributes"]["link"] = (string) $node->getAttribute("href");
                 break;
         }
         return $op;

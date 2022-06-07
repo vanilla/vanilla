@@ -13,13 +13,14 @@ use PHPUnit\Framework\TestCase;
  * Tests for validateUrlString().
  */
 
-class ValidateUrlStringTest extends TestCase {
-
+class ValidateUrlStringTest extends TestCase
+{
     /**
      * Test with valid string.
      */
-    public function testWithValidString() {
-        $actual = validateUrlString('this-is-a-valid-string');
+    public function testWithValidString()
+    {
+        $actual = validateUrlString("this-is-a-valid-string");
         $expected = true;
         $this->assertSame($expected, $actual);
     }
@@ -27,9 +28,10 @@ class ValidateUrlStringTest extends TestCase {
     /**
      * Test with invalid string.
      */
-    public function testWithInvalidString() {
-         $actual = validateUrlString('i-think-thi]-i]-not-a-valid-[tring');
-         $expected = false;
-         $this->assertSame($expected, $actual);
+    public function testWithInvalidString()
+    {
+        $actual = validateUrlString("i-think-thi]-i]-not-a-valid-[tring");
+        $expected = false;
+        $this->assertSame($expected, $actual);
     }
 }

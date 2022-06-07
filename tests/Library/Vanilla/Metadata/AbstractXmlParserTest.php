@@ -15,45 +15,43 @@ use Vanilla\Metadata\Parser\AbstractXmlParser;
  *
  * @package VanillaTests\Library\Vanilla\Metadata
  */
-class AbstractXmlParserTest extends TestCase {
-
+class AbstractXmlParserTest extends TestCase
+{
     /**
      * @return string[]
      */
-    public function dataXML(): array {
-        return [
-                [''],
-        ];
+    public function dataXML(): array
+    {
+        return [[""]];
     }
-
 
     /**
      * Test XML parsing.
      *
      */
-    public function testParseDirectElement(): void {
+    public function testParseDirectElement(): void
+    {
         $xmlContent = '<Person>
                         <Name>Name1</Name>
                         <Something>Something1</Something>
                     </Person>';
         $xmlDOM = new \DOMDocument();
         $xmlDOM->loadXML($xmlContent);
-        $schema =  Schema::parse([
-            'Name:s'
-        ]);
+        $schema = Schema::parse(["Name:s"]);
         $xmlParserStub = $this->getMockForAbstractClass(AbstractXmlParser::class);
-        $xmlParserStub->method('getSchema')->willReturn($schema);
-        $xmlParserStub->method('addDataToField')->willReturn(null);
+        $xmlParserStub->method("getSchema")->willReturn($schema);
+        $xmlParserStub->method("addDataToField")->willReturn(null);
         $results = $xmlParserStub->parse($xmlDOM);
         $this->assertCount(1, $results);
-        $this->assertEquals('Name1', $results['Name']);
+        $this->assertEquals("Name1", $results["Name"]);
     }
 
     /**
      * Test XML parsing: List items.
      *
      */
-    public function testParseListOfData(): void {
+    public function testParseListOfData(): void
+    {
         $xmlContent = '<Persons>
                     <Person>
                         <Name>Name1</Name>
@@ -67,16 +65,13 @@ class AbstractXmlParserTest extends TestCase {
         $xmlDOM = new \DOMDocument();
         $xmlDOM->loadXML($xmlContent);
         $xmlParserStub = $this->getMockForAbstractClass(AbstractXmlParser::class);
-        $schema =  Schema::parse([
-            'Person:a' => Schema::parse([
-                'Name:s',
-                'FirstName:s?',
-            ])
+        $schema = Schema::parse([
+            "Person:a" => Schema::parse(["Name:s", "FirstName:s?"]),
         ]);
-        $xmlParserStub->method('getSchema')->willReturn($schema);
-        $xmlParserStub->method('addDataToField')->willReturn(null);
+        $xmlParserStub->method("getSchema")->willReturn($schema);
+        $xmlParserStub->method("addDataToField")->willReturn(null);
         $results = $xmlParserStub->parse($xmlDOM);
-        $this->assertCount(2, $results['Person']);
-        $this->assertNotContains('Something', array_keys($results['Person'][0]));
+        $this->assertCount(2, $results["Person"]);
+        $this->assertNotContains("Something", array_keys($results["Person"][0]));
     }
 }

@@ -19,7 +19,8 @@ namespace Vanilla\Database\SetLiterals;
  * $discussionModel->setFieldCount($id, ['CountComments' => new Increment(1)]);
  * ```
  */
-class Increment extends SetLiteral {
+class Increment extends SetLiteral
+{
     private $amount;
 
     /**
@@ -27,23 +28,26 @@ class Increment extends SetLiteral {
      *
      * @param int $amount
      */
-    public function __construct(int $amount) {
+    public function __construct(int $amount)
+    {
         $this->amount = $amount;
     }
 
     /**
      * @return int
      */
-    public function getAmount(): int {
+    public function getAmount(): int
+    {
         return $this->amount;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function toSql(\Gdn_SQLDriver $sql, string $escapedFieldName): string {
+    public function toSql(\Gdn_SQLDriver $sql, string $escapedFieldName): string
+    {
         if ($this->amount === 0) {
-            return '';
+            return "";
         } elseif ($this->amount > 0) {
             $expr = "+$this->amount";
         } else {

@@ -17,6 +17,7 @@ use Vanilla\Dashboard\Models\BannerImageModel;
  * @return string
  * @deprecated 4.0
  */
-function smarty_function_hero_image_link($params, &$smarty) {
+function smarty_function_hero_image_link($params, &$smarty)
+{
     return BannerImageModel::getCurrentBannerImageLink();
 }

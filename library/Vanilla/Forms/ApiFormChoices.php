@@ -11,8 +11,8 @@ namespace Vanilla\Forms;
  *
  * @package Vanilla\Forms
  */
-class ApiFormChoices implements FormChoicesInterface {
-
+class ApiFormChoices implements FormChoicesInterface
+{
     /**
      * @var string $indexUrl
      */
@@ -42,10 +42,10 @@ class ApiFormChoices implements FormChoicesInterface {
      * @param string $valueKey
      */
     public function __construct(
-        string $indexUrl = '',
-        string $singleUrl = '',
-        string $labelKey = '',
-        string $valueKey = ''
+        string $indexUrl = "",
+        string $singleUrl = "",
+        string $labelKey = "",
+        string $valueKey = ""
     ) {
         $this->indexUrl = $indexUrl;
         $this->singleUrl = $singleUrl;
@@ -58,14 +58,15 @@ class ApiFormChoices implements FormChoicesInterface {
      *
      * @return array
      */
-    public function getChoices(): array {
+    public function getChoices(): array
+    {
         return [
-            'api' => [
-                'searchUrl' => $this->indexUrl,
-                'singleUrl' => $this->singleUrl,
-                'valueKey' => $this->valueKey,
-                'labelKey' => $this->labelKey,
-            ]
+            "api" => [
+                "searchUrl" => $this->indexUrl,
+                "singleUrl" => $this->singleUrl,
+                "valueKey" => $this->valueKey,
+                "labelKey" => $this->labelKey,
+            ],
         ];
     }
 }

@@ -14,8 +14,8 @@ use Vanilla\Web\JsInterpop\ReduxActionProviderInterface;
 /**
  * Page preloader for locale information.
  */
-class LocalePreloadProvider implements ReduxActionProviderInterface {
-
+class LocalePreloadProvider implements ReduxActionProviderInterface
+{
     /** @var \LocalesApiController */
     private $localesApi;
 
@@ -24,23 +24,18 @@ class LocalePreloadProvider implements ReduxActionProviderInterface {
      *
      * @param \LocalesApiController $localesApi
      */
-    public function __construct(\LocalesApiController $localesApi) {
+    public function __construct(\LocalesApiController $localesApi)
+    {
         $this->localesApi = $localesApi;
     }
-
 
     /**
      * @inheritdoc
      */
-    public function createActions(): array {
+    public function createActions(): array
+    {
         $locales = $this->localesApi->index();
 
-        return [
-            new ReduxAction(
-                \LocalesApiController::GET_ALL_REDUX_KEY,
-                Data::box($locales),
-                []
-            ),
-        ];
+        return [new ReduxAction(\LocalesApiController::GET_ALL_REDUX_KEY, Data::box($locales), [])];
     }
 }

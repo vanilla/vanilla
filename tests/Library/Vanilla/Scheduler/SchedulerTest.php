@@ -29,15 +29,16 @@ use VanillaTests\Fixtures\Scheduler\VoidDriver;
 /**
  * Class SchedulerTest
  */
-final class SchedulerTest extends SchedulerTestCase {
-
+final class SchedulerTest extends SchedulerTestCase
+{
     /**
      * Test get fully-configured scheduler from container.
      *
      * @throws ContainerException On error.
      * @throws NotFoundException On error.
      */
-    public function testGetFullyConfiguredSchedulerFromContainer() {
+    public function testGetFullyConfiguredSchedulerFromContainer()
+    {
         /* @var $dummyScheduler SchedulerInterface */
         $dummyScheduler = $this->getConfiguredContainer()->get(SchedulerInterface::class);
 
@@ -54,9 +55,10 @@ final class SchedulerTest extends SchedulerTestCase {
      * @throws ContainerException On error.
      * @throws NotFoundException On error.
      */
-    public function testAddUnknownDriver() {
+    public function testAddUnknownDriver()
+    {
         $this->expectException(Exception::class);
-        $msg = 'The class `VanillaTests\Library\Vanilla\Scheduler\UnknownDriver` cannot be found.';
+        $msg = "The class `VanillaTests\Library\Vanilla\Scheduler\UnknownDriver` cannot be found.";
         $this->expectExceptionMessage($msg);
 
         /* @var $dummyScheduler SchedulerInterface */
@@ -73,7 +75,8 @@ final class SchedulerTest extends SchedulerTestCase {
      * @throws ContainerException On error.
      * @throws NotFoundException On error.
      */
-    public function testAddNonCompliantDriver() {
+    public function testAddNonCompliantDriver()
+    {
         $this->expectException(Exception::class);
         $msg = 'The class `VanillaTests\Fixtures\Scheduler\NonCompliantDriver` doesn\'t implement DriverInterface.';
         $this->expectExceptionMessage($msg);
@@ -89,7 +92,8 @@ final class SchedulerTest extends SchedulerTestCase {
      * @throws ContainerException On error.
      * @throws NotFoundException On error.
      */
-    public function testAddVoidDriver() {
+    public function testAddVoidDriver()
+    {
         $this->expectException(Exception::class);
         $msg = 'The class `VanillaTests\Fixtures\Scheduler\VoidDriver` doesn\'t support any Job implementation.';
         $this->expectExceptionMessage($msg);
@@ -105,10 +109,10 @@ final class SchedulerTest extends SchedulerTestCase {
      * @throws ContainerException On error.
      * @throws NotFoundException On error.
      */
-    public function testAddNormalEchoJob() {
+    public function testAddNormalEchoJob()
+    {
         /* @var $dummyScheduler SchedulerInterface */
         $dummyScheduler = $this->getConfiguredContainer()->get(SchedulerInterface::class);
-
 
         $trackingSlip = $dummyScheduler->addJobDescriptor(new NormalJobDescriptor(EchoJob::class));
 
@@ -122,7 +126,8 @@ final class SchedulerTest extends SchedulerTestCase {
      * @throws ContainerException On error.
      * @throws NotFoundException On error.
      */
-    public function testAddEchoAwareJob() {
+    public function testAddEchoAwareJob()
+    {
         /* @var $dummyScheduler SchedulerInterface */
         $dummyScheduler = $this->getConfiguredContainer()->get(SchedulerInterface::class);
 
@@ -138,9 +143,10 @@ final class SchedulerTest extends SchedulerTestCase {
      * @throws ContainerException On error.
      * @throws NotFoundException On error.
      */
-    public function testAddUnknownJob() {
+    public function testAddUnknownJob()
+    {
         $this->expectException(Exception::class);
-        $this->expectExceptionMessage('The class `VanillaTests\Library\Vanilla\Scheduler\UnknownJob` cannot be found.');
+        $this->expectExceptionMessage("The class `VanillaTests\Library\Vanilla\Scheduler\UnknownJob` cannot be found.");
 
         /* @var $dummyScheduler SchedulerInterface */
         $dummyScheduler = $this->getConfiguredContainer()->get(SchedulerInterface::class);
@@ -156,7 +162,8 @@ final class SchedulerTest extends SchedulerTestCase {
      * @throws ContainerException On error.
      * @throws NotFoundException On error.
      */
-    public function testAddNonCompliantJob() {
+    public function testAddNonCompliantJob()
+    {
         $this->expectException(Exception::class);
         $msg = 'The job class `VanillaTests\Fixtures\Scheduler\NonCompliantJob` doesn\'t implement JobInterface.';
         $this->expectExceptionMessage($msg);
@@ -172,7 +179,8 @@ final class SchedulerTest extends SchedulerTestCase {
      * @throws ContainerException On error.
      * @throws NotFoundException On error.
      */
-    public function testAddNonDroveJob() {
+    public function testAddNonDroveJob()
+    {
         $this->expectException(Exception::class);
         $msg = "Missing driver to handle the job class `VanillaTests\Fixtures\Scheduler\NonDroveJob`.";
         $this->expectExceptionMessage($msg);
@@ -188,7 +196,8 @@ final class SchedulerTest extends SchedulerTestCase {
      * @throws ContainerException On error.
      * @throws NotFoundException On error.
      */
-    public function testDispatchWithNoJob() {
+    public function testDispatchWithNoJob()
+    {
         /** @var $eventManager EventManager */
         $eventManager = $this->getConfiguredContainer()->get(EventManager::class);
 
@@ -205,7 +214,8 @@ final class SchedulerTest extends SchedulerTestCase {
      * @throws ContainerException On error.
      * @throws NotFoundException On error.
      */
-    public function testDispatchedWithOneJob() {
+    public function testDispatchedWithOneJob()
+    {
         $container = $this->getConfiguredContainer();
 
         /* @var $dummyScheduler SchedulerInterface */
@@ -221,10 +231,10 @@ final class SchedulerTest extends SchedulerTestCase {
         $eventManager->bind(self::DISPATCHED_EVENT, function ($trackingSlips) {
             /** @var $trackingSlips TrackingSlip[] */
             $this->assertTrue(count($trackingSlips) == 1);
-            $this->assertStringContainsString('localDriverId', $trackingSlips[0]->getID());
+            $this->assertStringContainsString("localDriverId", $trackingSlips[0]->getID());
             $complete = JobExecutionStatus::complete();
             $this->assertTrue($trackingSlips[0]->getStatus()->is($complete));
-            $this->assertTrue($trackingSlips[0]->getExtendedStatus()['status']->is($complete));
+            $this->assertTrue($trackingSlips[0]->getExtendedStatus()["status"]->is($complete));
         });
 
         $eventManager->fire(self::DISPATCH_EVENT);
@@ -236,7 +246,8 @@ final class SchedulerTest extends SchedulerTestCase {
      * @throws ContainerException On error.
      * @throws NotFoundException On error.
      */
-    public function testDispatchedWithOneJobOneChildren() {
+    public function testDispatchedWithOneJobOneChildren()
+    {
         $container = $this->getConfiguredContainer();
 
         /** @var $eventManager EventManager */
@@ -264,7 +275,8 @@ final class SchedulerTest extends SchedulerTestCase {
      * @throws ContainerException On error.
      * @throws NotFoundException On error.
      */
-    public function testDispatchedWithOneJobOneChildrenUsingDeprecatedMethod() {
+    public function testDispatchedWithOneJobOneChildrenUsingDeprecatedMethod()
+    {
         $container = $this->getConfiguredContainer();
 
         /** @var $eventManager EventManager */
@@ -293,7 +305,8 @@ final class SchedulerTest extends SchedulerTestCase {
      * @throws ContainerException On error.
      * @throws NotFoundException On error.
      */
-    public function testDispatchedWithOneFailedJob() {
+    public function testDispatchedWithOneFailedJob()
+    {
         $container = $this->getConfiguredContainer();
 
         /* @var $dummyScheduler SchedulerInterface */
@@ -309,11 +322,11 @@ final class SchedulerTest extends SchedulerTestCase {
         $eventManager->bind(self::DISPATCHED_EVENT, function ($trackingSlips) {
             /** @var $trackingSlips TrackingSlip[] */
             $this->assertTrue(count($trackingSlips) == 1);
-            $this->assertStringContainsString('localDriverId', $trackingSlips[0]->getID());
+            $this->assertStringContainsString("localDriverId", $trackingSlips[0]->getID());
             $stackExecutionError = JobExecutionStatus::stackExecutionError();
             $this->assertTrue($trackingSlips[0]->getStatus()->is($stackExecutionError));
-            $this->assertTrue($trackingSlips[0]->getExtendedStatus()['status']->is($stackExecutionError));
-            $this->assertNotNull($trackingSlips[0]->getExtendedStatus()['error']);
+            $this->assertTrue($trackingSlips[0]->getExtendedStatus()["status"]->is($stackExecutionError));
+            $this->assertNotNull($trackingSlips[0]->getExtendedStatus()["error"]);
         });
 
         $eventManager->fire(self::DISPATCH_EVENT);
@@ -325,7 +338,8 @@ final class SchedulerTest extends SchedulerTestCase {
      * @throws ContainerException On error.
      * @throws NotFoundException On error.
      */
-    public function testTrackingSlipIsReferenceOfTrackingSlips() {
+    public function testTrackingSlipIsReferenceOfTrackingSlips()
+    {
         $container = $this->getConfiguredContainer();
 
         /* @var $dummyScheduler SchedulerInterface */
@@ -350,7 +364,8 @@ final class SchedulerTest extends SchedulerTestCase {
      * @throws ContainerException On error.
      * @throws NotFoundException On error.
      */
-    public function testDriverNotHandlingError() {
+    public function testDriverNotHandlingError()
+    {
         $container = $this->getConfiguredContainer();
 
         /* @var $dummyScheduler SchedulerInterface */
@@ -369,11 +384,11 @@ final class SchedulerTest extends SchedulerTestCase {
         $eventManager->bind(self::DISPATCHED_EVENT, function ($trackingSlips) {
             /** @var $trackingSlips TrackingSlip[] */
             $this->assertTrue(count($trackingSlips) == 1);
-            $this->assertStringContainsString('localDriverId', $trackingSlips[0]->getID());
+            $this->assertStringContainsString("localDriverId", $trackingSlips[0]->getID());
             $stackExecutionError = JobExecutionStatus::stackExecutionError();
             $this->assertTrue($trackingSlips[0]->getStatus()->is($stackExecutionError));
-            $this->assertTrue($trackingSlips[0]->getExtendedStatus()['status']->is($stackExecutionError));
-            $this->assertNotNull($trackingSlips[0]->getExtendedStatus()['error']);
+            $this->assertTrue($trackingSlips[0]->getExtendedStatus()["status"]->is($stackExecutionError));
+            $this->assertNotNull($trackingSlips[0]->getExtendedStatus()["error"]);
         });
 
         $eventManager->fire(self::DISPATCH_EVENT);
@@ -385,7 +400,8 @@ final class SchedulerTest extends SchedulerTestCase {
      * @throws ContainerException On error.
      * @throws NotFoundException On error.
      */
-    public function testDuplicatedJob() {
+    public function testDuplicatedJob()
+    {
         $container = $this->getConfiguredContainer();
 
         /** @var $eventManager EventManager */
@@ -394,9 +410,9 @@ final class SchedulerTest extends SchedulerTestCase {
         /* @var $dummyScheduler SchedulerInterface */
         $dummyScheduler = $container->get(SchedulerInterface::class);
 
-        $dummyScheduler->addJobDescriptor((new NormalJobDescriptor(EchoJob::class))->setMessage(['a' => 'a']));
-        $dummyScheduler->addJobDescriptor((new NormalJobDescriptor(EchoJob::class))->setMessage(['b' => 'b']));
-        $dummyScheduler->addJobDescriptor((new NormalJobDescriptor(EchoJob::class))->setMessage(['a' => 'a']));
+        $dummyScheduler->addJobDescriptor((new NormalJobDescriptor(EchoJob::class))->setMessage(["a" => "a"]));
+        $dummyScheduler->addJobDescriptor((new NormalJobDescriptor(EchoJob::class))->setMessage(["b" => "b"]));
+        $dummyScheduler->addJobDescriptor((new NormalJobDescriptor(EchoJob::class))->setMessage(["a" => "a"]));
 
         $eventManager->bind(self::DISPATCHED_EVENT, function ($trackingSlips) {
             /** @var $trackingSlips TrackingSlip[] */

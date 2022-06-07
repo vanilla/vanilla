@@ -13,8 +13,8 @@ use PHPUnit\Framework\TestCase;
  * Tests for isTimestamp().
  */
 
-class IsTimestampTest extends TestCase {
-
+class IsTimestampTest extends TestCase
+{
     /**
      * Tests {@link isTimestamp()} against several scenarios.
      *
@@ -22,7 +22,8 @@ class IsTimestampTest extends TestCase {
      * @param bool $expected The expected result.
      * @dataProvider provideTestIsTimestamp
      */
-    public function testIsTimestamp($testStamp, $expected) {
+    public function testIsTimestamp($testStamp, $expected)
+    {
         $actual = isTimestamp($testStamp);
         $this->assertSame($expected, $actual);
     }
@@ -32,28 +33,14 @@ class IsTimestampTest extends TestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideTestIsTimestamp() {
+    public function provideTestIsTimestamp()
+    {
         $r = [
-            'monthDayYear' => [
-                10051998,
-                true,
-            ],
-            'dayMonthYear' => [
-                20112002,
-                true,
-            ],
-            'twoDigitYear' => [
-                060777,
-                true,
-            ],
-            'noInitialZeros' => [
-                6777,
-                true,
-            ],
-            'tooManyDigits' => [
-                12390617194092879,
-                false,
-            ],
+            "monthDayYear" => [10051998, true],
+            "dayMonthYear" => [20112002, true],
+            "twoDigitYear" => [060777, true],
+            "noInitialZeros" => [6777, true],
+            "tooManyDigits" => [12390617194092879, false],
         ];
 
         return $r;

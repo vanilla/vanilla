@@ -12,16 +12,16 @@ use Vanilla\Layout\Providers\LayoutViewRecordProviderInterface;
 /**
  * Provide capabilities for generating a category breadcrumb.
  */
-class GlobalRecordProvider implements LayoutViewRecordProviderInterface {
-
+class GlobalRecordProvider implements LayoutViewRecordProviderInterface
+{
     /**
      * @inheritdoc
      */
-    public function getRecords(array $recordIDs): array {
-
+    public function getRecords(array $recordIDs): array
+    {
         $result = [];
         foreach ($recordIDs as $id) {
-            $result[$id] = ['name' => 'global', 'url' => \Gdn::request()->getSimpleUrl()];
+            $result[$id] = ["name" => "global", "url" => \Gdn::request()->getSimpleUrl()];
         }
 
         return $result;
@@ -30,7 +30,8 @@ class GlobalRecordProvider implements LayoutViewRecordProviderInterface {
     /**
      * @inheritdoc
      */
-    public function validateRecords(array $recordIDs): bool {
+    public function validateRecords(array $recordIDs): bool
+    {
         $recordIDs = array_filter($recordIDs, function ($id) {
             return $id == -1;
         });
@@ -40,7 +41,8 @@ class GlobalRecordProvider implements LayoutViewRecordProviderInterface {
     /**
      * @inheritdoc
      */
-    public static function getValidRecordTypes(): array {
-        return ['global'];
+    public static function getValidRecordTypes(): array
+    {
+        return ["global"];
     }
 }

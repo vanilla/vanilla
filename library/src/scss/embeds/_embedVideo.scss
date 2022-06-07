@@ -24,7 +24,8 @@ $embedVideo_width: $embed_width;
     }
 }
 
-.richEditor { // No hover in edit mode
+.richEditor {
+    // No hover in edit mode
     .embedVideo {
         .embedExternal-content {
             &:focus,
@@ -47,7 +48,6 @@ $embedVideo_width: $embed_width;
     background-color: black;
 }
 
-
 .embedVideo-ratio {
     position: relative;
     display: block;
@@ -58,18 +58,18 @@ $embedVideo_width: $embed_width;
         left: 0;
         right: 0;
         bottom: 0;
-    };
+    }
 
     &.is21by9 {
-        padding-top: #{(9/21*100%)};
+        padding-top: #{(9/21 * 100%)};
     }
 
     &.is16by9 {
-        padding-top: #{(9/16*100%)};
+        padding-top: #{(9/16 * 100%)};
     }
 
     &.is4by3 {
-        padding-top: #{(3/4*100%)};
+        padding-top: #{(3/4 * 100%)};
     }
 
     &.is1by1 {
@@ -98,7 +98,6 @@ $embedVideo_width: $embed_width;
     background: linear-gradient(to bottom, $bg, $bg);
     border-radius: 50%;
 }
-
 
 .embedVideo-playIcon {
     color: white;

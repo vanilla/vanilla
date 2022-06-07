@@ -10,6 +10,7 @@ import { Variables } from "@library/styles/Variables";
 import { listItemVariables } from "@library/lists/ListItem.variables";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { TagPreset } from "@library/metas/Tags.variables";
+import { css } from "@emotion/css";
 
 export const discussionListVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     /**
@@ -184,6 +185,14 @@ export const discussionListVariables = useThemeCache((forcedVars?: IThemeVariabl
         },
     });
 
+    const widget = {
+        preview: {
+            offset: css({
+                padding: globalVars.widget.padding,
+            }),
+        },
+    };
+
     return {
         profilePhoto,
         panelBoxes,
@@ -191,5 +200,6 @@ export const discussionListVariables = useThemeCache((forcedVars?: IThemeVariabl
         item,
         labels,
         userTags,
+        widget,
     };
 });

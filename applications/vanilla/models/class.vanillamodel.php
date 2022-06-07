@@ -13,8 +13,8 @@
  *
  * @deprecated
  */
-abstract class VanillaModel extends Gdn_Model {
-
+abstract class VanillaModel extends Gdn_Model
+{
     use \Vanilla\FloodControlTrait;
 
     /**
@@ -25,7 +25,8 @@ abstract class VanillaModel extends Gdn_Model {
      *
      * @param string $name Database table name.
      */
-    public function __construct($name = '') {
+    public function __construct($name = "")
+    {
         parent::__construct($name);
     }
 
@@ -40,17 +41,21 @@ abstract class VanillaModel extends Gdn_Model {
      * @param string $type Valid values are 'Comment' or 'Discussion'.
      * @return bool Whether spam check is positive (TRUE = spammer).
      */
-    public function checkForSpam($type) {
-        deprecated(__CLASS__.' '.__METHOD__, 'FloodControlTrait::checkUserSpamming()');
+    public function checkForSpam($type)
+    {
+        deprecated(__CLASS__ . " " . __METHOD__, "FloodControlTrait::checkUserSpamming()");
 
         $session = Gdn::session();
 
         // Validate $Type
-        if (!in_array($type, ['Comment', 'Discussion'])) {
-            trigger_error(errorMessage(sprintf('Spam check type unknown: %s', $type), 'VanillaModel', 'CheckForSpam'), E_USER_ERROR);
+        if (!in_array($type, ["Comment", "Discussion"])) {
+            trigger_error(
+                errorMessage(sprintf("Spam check type unknown: %s", $type), "VanillaModel", "CheckForSpam"),
+                E_USER_ERROR
+            );
         }
 
-        $storageObject = FloodControlHelper::configure($this, 'Vanilla', $type);
+        $storageObject = FloodControlHelper::configure($this, "Vanilla", $type);
         $isUserSpamming = $this->checkUserSpamming($session->User->UserID, $storageObject);
 
         return $isUserSpamming;

@@ -19,12 +19,12 @@ use VanillaTests\UsersAndRolesApiTestTrait;
 /**
  * Tests for the `APIExpandMiddlewareTest` class.
  */
-class APIExpandMiddlewareTest extends SiteTestCase {
-
+class APIExpandMiddlewareTest extends SiteTestCase
+{
     use UsersAndRolesApiTestTrait;
     use ProfileExtenderTestTrait;
 
-    public static $addons = ['ProfileExtender'];
+    public static $addons = ["ProfileExtender"];
 
     /** @var int */
     private static $userID1;
@@ -43,7 +43,8 @@ class APIExpandMiddlewareTest extends SiteTestCase {
     /**
      * Create a configured test middleware for each test.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         $this->middleware = $this->container()->get(APIExpandMiddleware::class);
     }
@@ -51,38 +52,40 @@ class APIExpandMiddlewareTest extends SiteTestCase {
     /**
      * Setup users for other tests.
      */
-    public function testUserSetup() {
+    public function testUserSetup()
+    {
         $authProvider = self::container()->get(\Gdn_AuthenticationProviderModel::class);
         $provider = [
-            'AuthenticationKey' => 'testauth',
-            'AuthenticationSchemeAlias' => 'testauth',
-            'Name' => 'testauth',
-            'IsDefault' => true
+            "AuthenticationKey" => "testauth",
+            "AuthenticationSchemeAlias" => "testauth",
+            "Name" => "testauth",
+            "IsDefault" => true,
         ];
         $authProvider->save($provider);
-        $user1 = $this->createExtendedUser('user1', 'user1 text', 'testauth-user1');
-        self::$userID1 = $user1['userID'];
+        $user1 = $this->createExtendedUser("user1", "user1 text", "testauth-user1");
+        self::$userID1 = $user1["userID"];
         $this->assertIsInt(self::$userID1);
-        $user2 = $this->createExtendedUser('user2', 'user2 text', 'testauth-user2');
-        self::$userID2 = $user2['userID'];
+        $user2 = $this->createExtendedUser("user2", "user2 text", "testauth-user2");
+        self::$userID2 = $user2["userID"];
         $this->assertIsInt(self::$userID2);
 
-        $basicUser = $this->createUser(['name' => 'basic']);
-        self::$basicUserID = $basicUser['userID'];
+        $basicUser = $this->createUser(["name" => "basic"]);
+        self::$basicUserID = $basicUser["userID"];
         $this->assertIsInt(self::$basicUserID);
     }
 
     /**
      * Test that we don't do anything if the expand field is not preset.
      */
-    public function testPreservesEmptyExpand(): void {
-        $request = new Request('/');
-        $this->assertArrayNotHasKey('expand', $request->getQuery());
+    public function testPreservesEmptyExpand(): void
+    {
+        $request = new Request("/");
+        $this->assertArrayNotHasKey("expand", $request->getQuery());
 
         call_user_func($this->middleware, $request, function () {
             return [];
         });
-        $this->assertArrayNotHasKey('expand', $request->getQuery());
+        $this->assertArrayNotHasKey("expand", $request->getQuery());
     }
 
     /**
@@ -90,22 +93,25 @@ class APIExpandMiddlewareTest extends SiteTestCase {
      *
      * @depends testUserSetup
      */
-    public function testExpandAllUsers(): void {
+    public function testExpandAllUsers(): void
+    {
         $this->assertExpands(
-            'users,users.extended,users.ssoID',
-            [[
-                'insertUserID' => self::$userID1,
-                'updateUserID' => self::$userID2
-            ]],
+            "users,users.extended,users.ssoID",
             [
-                'insertUserID' => [self::$userID1],
-                'insertUser.name' => ['user1'],
-                'insertUser.ssoID' => ['testauth-user1'],
-                'insertUser.extended.text' => ['user1 text'],
-                'updateUserID' => [self::$userID2],
-                'updateUser.name' => ['user2'],
-                'updateUser.ssoID' => ['testauth-user2'],
-                'updateUser.extended.text' => ['user2 text'],
+                [
+                    "insertUserID" => self::$userID1,
+                    "updateUserID" => self::$userID2,
+                ],
+            ],
+            [
+                "insertUserID" => [self::$userID1],
+                "insertUser.name" => ["user1"],
+                "insertUser.ssoID" => ["testauth-user1"],
+                "insertUser.extended.text" => ["user1 text"],
+                "updateUserID" => [self::$userID2],
+                "updateUser.name" => ["user2"],
+                "updateUser.ssoID" => ["testauth-user2"],
+                "updateUser.extended.text" => ["user2 text"],
             ]
         );
     }
@@ -115,20 +121,23 @@ class APIExpandMiddlewareTest extends SiteTestCase {
      *
      * @depends testUserSetup
      */
-    public function testMultipleExpanders(): void {
+    public function testMultipleExpanders(): void
+    {
         $this->assertExpands(
-            'insertUser.ssoID,updateUser',
-            [[
-                'insertUserID' => self::$userID1,
-                'body' => 'foo',
-                'updateUserID' => self::$userID2,
-            ]],
+            "insertUser.ssoID,updateUser",
             [
-                'body' => ['foo'],
-                'insertUserID' => [self::$userID1],
-                'updateUserID' => [self::$userID2],
-                'insertUser.ssoID' => ['testauth-user1'],
-                'updateUser.name' => ['user2'],
+                [
+                    "insertUserID" => self::$userID1,
+                    "body" => "foo",
+                    "updateUserID" => self::$userID2,
+                ],
+            ],
+            [
+                "body" => ["foo"],
+                "insertUserID" => [self::$userID1],
+                "updateUserID" => [self::$userID2],
+                "insertUser.ssoID" => ["testauth-user1"],
+                "updateUser.name" => ["user2"],
             ]
         );
     }
@@ -137,17 +146,18 @@ class APIExpandMiddlewareTest extends SiteTestCase {
      * Test that we can expand on multiple records at once and handle an expand not existing.
      * @depends testUserSetup
      */
-    public function testExpandMultipleRecords(): void {
+    public function testExpandMultipleRecords(): void
+    {
         $this->assertExpands(
-            'insertUser.ssoID',
+            "insertUser.ssoID",
             [
-                ['insertUserID' => self::$userID1],
-                ['insertUserID' => self::$userID2],
-                ['insertUserID' => self::$basicUserID],
+                ["insertUserID" => self::$userID1],
+                ["insertUserID" => self::$userID2],
+                ["insertUserID" => self::$basicUserID],
             ],
             [
-                'insertUserID' => [self::$userID1, self::$userID2, self::$basicUserID],
-                'insertUser.ssoID' => ['testauth-user1', 'testauth-user2', null],
+                "insertUserID" => [self::$userID1, self::$userID2, self::$basicUserID],
+                "insertUser.ssoID" => ["testauth-user1", "testauth-user2", null],
             ]
         );
     }
@@ -157,18 +167,16 @@ class APIExpandMiddlewareTest extends SiteTestCase {
      *
      * @depends testUserSetup
      */
-    public function testNotProvidedNotExpanded() {
+    public function testNotProvidedNotExpanded()
+    {
         $this->assertExpands(
-            'insertUser.ssoID,updateUser.ssoID',
+            "insertUser.ssoID,updateUser.ssoID",
+            [["insertUserID" => self::$userID1], ["insertUserID" => self::$userID1, "updateUserID" => self::$userID2]],
             [
-                ['insertUserID' => self::$userID1],
-                ['insertUserID' => self::$userID1, 'updateUserID' => self::$userID2],
-            ],
-            [
-                'insertUserID' => [self::$userID1, self::$userID1],
-                'updateUserID' => [null, self::$userID2],
-                'insertUser.ssoID' => ['testauth-user1', 'testauth-user1'],
-                'updateUser.ssoID' => [null, 'testauth-user2']
+                "insertUserID" => [self::$userID1, self::$userID1],
+                "updateUserID" => [null, self::$userID2],
+                "insertUser.ssoID" => ["testauth-user1", "testauth-user1"],
+                "updateUser.ssoID" => [null, "testauth-user2"],
             ]
         );
     }
@@ -178,19 +186,22 @@ class APIExpandMiddlewareTest extends SiteTestCase {
      *
      * @depends testUserSetup
      */
-    public function testNonDestructiveExpansion(): void {
+    public function testNonDestructiveExpansion(): void
+    {
         $this->assertExpands(
-            'insertUser.ssoID',
-            [[
-                'insertUserID' => self::$userID1,
-                'insertUser' => [
-                    'name' => 'hello',
-                ],
-            ]],
+            "insertUser.ssoID",
             [
-                'insertUserID' => [self::$userID1],
-                'insertUser.name' => ['hello'],
-                'insertUser.ssoID' => ['testauth-user1'],
+                [
+                    "insertUserID" => self::$userID1,
+                    "insertUser" => [
+                        "name" => "hello",
+                    ],
+                ],
+            ],
+            [
+                "insertUserID" => [self::$userID1],
+                "insertUser.name" => ["hello"],
+                "insertUser.ssoID" => ["testauth-user1"],
             ]
         );
     }
@@ -198,27 +209,32 @@ class APIExpandMiddlewareTest extends SiteTestCase {
     /**
      * Field expansion should be driven by the querystring.
      */
-    public function testNoExpansion(): void {
-        $request = new Request('/api/v2/resource');
+    public function testNoExpansion(): void
+    {
+        $request = new Request("/api/v2/resource");
         $next = function ($r) {
             return [
-                'insertUserID' => 1
+                "insertUserID" => 1,
             ];
         };
 
         /** @var Data $actual */
         $actual = call_user_func($this->middleware, $request, $next);
-        $this->assertSame([
-            'insertUserID' => 1,
-        ], Data::box($actual)->getData());
+        $this->assertSame(
+            [
+                "insertUserID" => 1,
+            ],
+            Data::box($actual)->getData()
+        );
     }
 
     /**
      * Don't crash if there is a bad parameter.
      */
-    public function testBadExpandParameter() {
-        $request = new Request('/api/v2/resource');
-        $request->setQuery(['expand' => (object)['haha' => 'haha']]);
+    public function testBadExpandParameter()
+    {
+        $request = new Request("/api/v2/resource");
+        $request->setQuery(["expand" => (object) ["haha" => "haha"]]);
         $next = function ($r) {
             return [];
         };
@@ -230,9 +246,10 @@ class APIExpandMiddlewareTest extends SiteTestCase {
     /**
      * A more realistic version of a bad parameter.
      */
-    public function testBadExpandParameter2() {
-        $request = new Request('/api/v2/resource');
-        $request->setQuery(['expand' => [['nested' => true]]]);
+    public function testBadExpandParameter2()
+    {
+        $request = new Request("/api/v2/resource");
+        $request->setQuery(["expand" => [["nested" => true]]]);
         $next = function ($r) {
             return [];
         };
@@ -244,17 +261,18 @@ class APIExpandMiddlewareTest extends SiteTestCase {
     /**
      * @depends testUserSetup
      */
-    public function testBasePathVerification() {
-        $request = new Request('/not/api?expand=users');
+    public function testBasePathVerification()
+    {
+        $request = new Request("/not/api?expand=users");
         $next = function ($r) {
             return [
-                'insertUserID' => self::$userID1,
+                "insertUserID" => self::$userID1,
             ];
         };
 
         $actual = call_user_func($this->middleware, $request, $next);
         $this->assertEquals($actual, [
-            'insertUserID' => self::$userID1
+            "insertUserID" => self::$userID1,
         ]);
         $this->assertTrue(true);
     }
@@ -262,35 +280,40 @@ class APIExpandMiddlewareTest extends SiteTestCase {
     /**
      * Test that we can use fallback records for expansion.
      */
-    public function testDefaultRecord() {
-        $this->assertExpands('users', [
-            ['insertUserID' => 1342414124]
-        ], [
-            'insertUserID' => [1342414124],
-            'insertUser.name' => ['unknown'],
-        ]);
+    public function testDefaultRecord()
+    {
+        $this->assertExpands(
+            "users",
+            [["insertUserID" => 1342414124]],
+            [
+                "insertUserID" => [1342414124],
+                "insertUser.name" => ["unknown"],
+            ]
+        );
     }
 
     /**
      * Test that we enforce permissions for certain expanders.
      */
-    public function testExpansionPermissions() {
+    public function testExpansionPermissions()
+    {
         $user = $this->createUser();
 
         $this->runWithUser(function () {
             // This one works.
-            $this->assertExpands('users,users.extended', [], []);
+            $this->assertExpands("users,users.extended", [], []);
 
             // This one throws because we requested ssoID which has a required permission.
             $this->expectException(PermissionException::class);
-            $this->assertExpands('users,users.ssoID', [], []);
+            $this->assertExpands("users,users.ssoID", [], []);
         }, $user);
     }
 
     /**
      * A basic test for the OpenAPI factory.
      */
-    public function testOpenAPIFactory() {
+    public function testOpenAPIFactory()
+    {
         $actual = APIExpandMiddleware::filterOpenAPIFactory($this->middleware);
         $this->assertSame($actual[0], $this->middleware);
     }
@@ -298,8 +321,10 @@ class APIExpandMiddlewareTest extends SiteTestCase {
     /**
      * Open API parameters should be augmented with the `".ssoID"` parameters.
      */
-    public function testBasicOpenAPIAugmentation() {
-        $in = json_decode(<<<EOT
+    public function testBasicOpenAPIAugmentation()
+    {
+        $in = json_decode(
+            <<<EOT
 {
   "/articles/drafts": {
     "get": {
@@ -323,9 +348,12 @@ class APIExpandMiddlewareTest extends SiteTestCase {
   }
 }
 EOT
-            , true);
+            ,
+            true
+        );
 
-        $expected = json_decode(<<<EOT
+        $expected = json_decode(
+            <<<EOT
 {
   "/articles/drafts": {
     "get": {
@@ -353,7 +381,9 @@ EOT
   }
 }
 EOT
-            , true);
+            ,
+            true
+        );
 
         $this->middleware->filterOpenAPI($in);
         $this->assertSame($expected, $in);
@@ -362,8 +392,10 @@ EOT
     /**
      * Expand parameters should work in the components section of an OpenAPI schema too.
      */
-    public function testOpenAPIAugmentationComponents() {
-        $in = json_decode(<<<EOT
+    public function testOpenAPIAugmentationComponents()
+    {
+        $in = json_decode(
+            <<<EOT
 {
   "components": {
     "parameters": {
@@ -385,9 +417,12 @@ EOT
   }
 }
 EOT
-, true);
+            ,
+            true
+        );
 
-        $expected = json_decode(<<<EOT
+        $expected = json_decode(
+            <<<EOT
 {
   "components": {
     "parameters": {
@@ -413,7 +448,9 @@ EOT
   }
 }
 EOT
-            , true);
+            ,
+            true
+        );
 
         $this->middleware->filterOpenAPI($in);
         $this->assertSame($expected, $in);
@@ -424,30 +461,32 @@ EOT
      *
      * @depends testUserSetup
      */
-    public function testNoDoubleExpand(): void {
-        $request = new Request('/api/v2/resource?expand=insertUser.ssoID');
+    public function testNoDoubleExpand(): void
+    {
+        $request = new Request("/api/v2/resource?expand=insertUser.ssoID");
         $next = function ($r) {
             return [
-                'insertUserID' => self::$userID1,
-                'insertUser' => [
-                    'insertUserID' => self::$userID1,
-                    'name' => 'foo',
-                ]
+                "insertUserID" => self::$userID1,
+                "insertUser" => [
+                    "insertUserID" => self::$userID1,
+                    "name" => "foo",
+                ],
             ];
         };
 
         /** @var Data $actual */
         $actual = call_user_func($this->middleware, $request, $next);
-        $this->assertArrayHasKey('ssoID', $actual['insertUser']);
-        $this->assertArrayNotHasKey('insertUSer', $actual['insertUser']);
+        $this->assertArrayHasKey("ssoID", $actual["insertUser"]);
+        $this->assertArrayNotHasKey("insertUSer", $actual["insertUser"]);
     }
 
     /**
      * Getters and setters should work.
      */
-    public function testGettersSetters(): void {
-        $this->middleware->setBasePath('/foo');
-        $this->assertSame('/foo', $this->middleware->getBasePath());
+    public function testGettersSetters(): void
+    {
+        $this->middleware->setBasePath("/foo");
+        $this->assertSame("/foo", $this->middleware->getBasePath());
     }
 
     ///
@@ -463,21 +502,22 @@ EOT
      *
      * @return array
      */
-    private function createExtendedUser(string $name, ?string $extendedText, ?string $foreignKey): array {
+    private function createExtendedUser(string $name, ?string $extendedText, ?string $foreignKey): array
+    {
         $user = $this->createUser([
-            'name' => $name,
+            "name" => $name,
         ]);
         if ($extendedText !== null) {
-            $this->api()->patch("/users/{$user['userID']}/extended", [
-                'text' => $extendedText,
+            $this->api()->patch("/users/{$user["userID"]}/extended", [
+                "text" => $extendedText,
             ]);
         }
         if ($foreignKey !== null) {
             $userAuthModel = self::container()->get(UserAuthenticationModel::class);
             $userAuthModel->insert([
-                'ForeignUserKey' => $foreignKey,
-                'ProviderKey' => 'testauth',
-                'UserID' => $user['userID'],
+                "ForeignUserKey" => $foreignKey,
+                "ProviderKey" => "testauth",
+                "UserID" => $user["userID"],
             ]);
             \Gdn::cache()->flush();
         }
@@ -493,7 +533,8 @@ EOT
      *
      * @return array
      */
-    private function assertExpands(string $expandString, array $initialResponse, array $expectedResponseShape): array {
+    private function assertExpands(string $expandString, array $initialResponse, array $expectedResponseShape): array
+    {
         $request = new Request("/api/v2/endpoint?expand=$expandString");
         $next = function () use ($initialResponse) {
             return Data::box($initialResponse);

@@ -11,8 +11,8 @@ use Garden\Schema\ValidationField;
 /**
  * A collection of field filter functions, compatible with Garden Schema.
  */
-class SchemaFilters {
-
+class SchemaFilters
+{
     /**
      * Attempt to decode a encoded string value into a more complex type.
      *
@@ -20,8 +20,9 @@ class SchemaFilters {
      * @param ValidationField $field An object representing the Garden Schema field.
      * @return mixed Unpacked attributes field value.
      */
-    public static function encodeValue($value, ValidationField $field) {
-        if ($value === null || $value === '') {
+    public static function encodeValue($value, ValidationField $field)
+    {
+        if ($value === null || $value === "") {
             return null;
         }
         $result = StringUtils::jsonEncodeChecked($value, JSON_UNESCAPED_SLASHES);
@@ -35,8 +36,9 @@ class SchemaFilters {
      * @param ValidationField $field An object representing the Garden Schema field.
      * @return mixed Unpacked attributes field value.
      */
-    public static function decodeValue($value, ValidationField $field) {
-        if ($value === null || $value === '') {
+    public static function decodeValue($value, ValidationField $field)
+    {
+        if ($value === null || $value === "") {
             $value = null;
         } elseif (is_string($value)) {
             $value = json_decode($value, true);

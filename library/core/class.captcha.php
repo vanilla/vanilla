@@ -1,7 +1,6 @@
 <?php
-
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -15,28 +14,25 @@
  * @subpackage core
  * @since 2.2
  */
-class Captcha {
-
-    private static $enabled;
-
+class Captcha
+{
     /**
      * Should we expect captcha submissions?
      *
      * @return boolean
      */
-    public static function enabled() {
-        if (!isset(static::$enabled)) {
-            $enabled = !c('Garden.Registration.SkipCaptcha', false);
-            $handlersAvailable = false;
+    public static function enabled()
+    {
+        $enabled = !c("Garden.Registration.SkipCaptcha", false);
+        $handlersAvailable = false;
 
-            Gdn::pluginManager()->fireAs('captcha')->fireEvent('IsEnabled', [
-                'Enabled' => &$handlersAvailable
+        Gdn::pluginManager()
+            ->fireAs("captcha")
+            ->fireEvent("IsEnabled", [
+                "Enabled" => &$handlersAvailable,
             ]);
 
-            static::$enabled = $enabled && $handlersAvailable;
-        }
-
-        return static::$enabled;
+        return $enabled && $handlersAvailable;
     }
 
     /**
@@ -47,13 +43,14 @@ class Captcha {
      * @param Gdn_Controller $controller
      * @return null
      */
-    public static function settings($controller) {
-        if (!c('Garden.Registration.ManageCaptcha', true)) {
+    public static function settings($controller)
+    {
+        if (!c("Garden.Registration.ManageCaptcha", true)) {
             return null;
         }
 
         // Hook to allow rendering of captcha settings form
-        $controller->fireAs('captcha')->fireEvent('settings');
+        $controller->fireAs("captcha")->fireEvent("settings");
         return null;
     }
 
@@ -65,13 +62,14 @@ class Captcha {
      * @param Gdn_Controller $controller
      * @return null;
      */
-    public static function render($controller) {
+    public static function render($controller)
+    {
         if (!Captcha::enabled()) {
             return null;
         }
 
         // Hook to allow rendering of captcha form
-        $controller->fireAs('captcha')->fireEvent('render');
+        $controller->fireAs("captcha")->fireEvent("render");
         return null;
     }
 
@@ -81,14 +79,17 @@ class Captcha {
      * @param mixed $value
      * @return boolean validity of captcha submission
      */
-    public static function validate($value = null) {
+    public static function validate($value = null)
+    {
         if (is_null($value)) {
             // Get captcha text
             $captchaText = null;
-            Gdn::pluginManager()->EventArguments['captchatext'] = &$captchaText;
-            Gdn::pluginManager()->fireAs('captcha')->fireEvent('get', [
-                'captcha' => $value
-            ]);
+            Gdn::pluginManager()->EventArguments["captchatext"] = &$captchaText;
+            Gdn::pluginManager()
+                ->fireAs("captcha")
+                ->fireEvent("get", [
+                    "captcha" => $value,
+                ]);
             $value = $captchaText;
         }
 
@@ -101,13 +102,14 @@ class Captcha {
         // Assume invalid submission
         $valid = false;
 
-        Gdn::pluginManager()->EventArguments['captchavalid'] = &$valid;
-        Gdn::pluginManager()->fireAs('captcha')->fireEvent('validate', [
-            'captcha' => $value
-        ]);
+        Gdn::pluginManager()->EventArguments["captchavalid"] = &$valid;
+        Gdn::pluginManager()
+            ->fireAs("captcha")
+            ->fireEvent("validate", [
+                "captcha" => $value,
+            ]);
         $isValid = $valid ? true : false;
-        unset(Gdn::pluginManager()->EventArguments['captchavalid']);
+        unset(Gdn::pluginManager()->EventArguments["captchavalid"]);
         return $isValid;
     }
-
 }

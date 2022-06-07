@@ -14,17 +14,18 @@ use VanillaTests\Storybook\StorybookGenerationTestCase;
 /**
  * Test rendering of the "Call To Action" module.
  */
-class CallToActionStorybookTest extends StorybookGenerationTestCase {
-
+class CallToActionStorybookTest extends StorybookGenerationTestCase
+{
     use EventSpyTestTrait;
 
-    public static $addons = ['vanilla'];
+    public static $addons = ["vanilla"];
 
     /**
      * Test rendering of the Call To Action module.
      */
-    public function testRender() {
-        $this->generateStoryHtml('/', 'CTA Module');
+    public function testRender()
+    {
+        $this->generateStoryHtml("/", "CTA Module");
     }
 
     /**
@@ -32,13 +33,14 @@ class CallToActionStorybookTest extends StorybookGenerationTestCase {
      *
      * @param \Gdn_Controller $sender
      */
-    public function base_render_before(\Gdn_Controller $sender) {
+    public function base_render_before(\Gdn_Controller $sender)
+    {
         /** @var CallToActionModule $module */
         $module = self::container()->get(CallToActionModule::class);
-        $module->setTitle('Call To Action - No Image + Multiple CTAs');
-        $module->setTextCTA('Click');
-        $module->setUrl('https://www.vanillaforums.com');
-        $otherCTA = ['to' => 'https://www.vanillaforums.com/en/why-vanilla/community', 'textCTA' => 'Join'];
+        $module->setTitle("Call To Action - No Image + Multiple CTAs");
+        $module->setTextCTA("Click");
+        $module->setUrl("https://www.vanillaforums.com");
+        $otherCTA = ["to" => "https://www.vanillaforums.com/en/why-vanilla/community", "textCTA" => "Join"];
         $module->setOtherCTAs([$otherCTA]);
         $sender->addModule($module);
     }

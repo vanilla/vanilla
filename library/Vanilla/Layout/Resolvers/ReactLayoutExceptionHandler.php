@@ -14,30 +14,34 @@ use Garden\Hydrate\DataHydrator;
  *
  * Propagates errors up to the nearest React node and replaces them with a React error component.
  */
-class ReactLayoutExceptionHandler implements \Garden\Hydrate\ExceptionHandlerInterface {
-
+class ReactLayoutExceptionHandler implements \Garden\Hydrate\ExceptionHandlerInterface
+{
     /**
      * @inheritdoc
      */
-    public function handleException(\Throwable $ex, array $data, array $params) {
-        $hydrateKey = $data[DataHydrator::KEY_HYDRATE] ?? '';
-        $isReactNode = stringBeginsWith($hydrateKey, 'react') || stringBeginsWith($hydrateKey, 'section');
+    public function handleException(\Throwable $ex, array $data, array $params)
+    {
+        $hydrateKey = $data[DataHydrator::KEY_HYDRATE] ?? "";
+        $isReactNode = stringBeginsWith($hydrateKey, "react") || stringBeginsWith($hydrateKey, "section");
         if (!$isReactNode) {
             // Propagate the exception up until we hit a React node.
             throw $ex;
         }
 
-        $errorBody = $ex instanceof \JsonSerializable ? $ex : [
-            'message' => $ex->getMessage(),
-            'code' => $ex->getCode(),
-        ];
+        $errorBody =
+            $ex instanceof \JsonSerializable
+                ? $ex
+                : [
+                    "message" => $ex->getMessage(),
+                    "code" => $ex->getCode(),
+                ];
 
         return [
             '$reactComponent' => "LayoutError",
             '$reactProps' => [
-                'layoutDefinition' => $data,
-                'error' => $errorBody,
-            ]
+                "layoutDefinition" => $data,
+                "error" => $errorBody,
+            ],
         ];
     }
 }

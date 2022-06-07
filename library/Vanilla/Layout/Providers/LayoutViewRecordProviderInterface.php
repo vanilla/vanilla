@@ -10,7 +10,8 @@ namespace Vanilla\Layout\Providers;
 /**
  * Some class that can map record IDs to record name/url.
  */
-interface LayoutViewRecordProviderInterface {
+interface LayoutViewRecordProviderInterface
+{
     /**
      * Get a Name/URL array for a particular record.
      *

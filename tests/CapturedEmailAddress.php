@@ -10,7 +10,8 @@ namespace VanillaTests;
 /**
  * Class CapturedEmailTo
  */
-class CapturedEmailAddress {
+class CapturedEmailAddress
+{
     /**
      * @var string
      */
@@ -27,7 +28,8 @@ class CapturedEmailAddress {
      * @param string $email
      * @param ?string $name
      */
-    public function __construct(string $email, ?string $name) {
+    public function __construct(string $email, ?string $name)
+    {
         $this->email = $email;
         $this->name = $name;
     }

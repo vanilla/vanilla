@@ -42,12 +42,14 @@ export function useLayouts() {
     };
 }
 
-export function useLayout(layoutID: ILayoutDetails["layoutID"]) {
+export function useLayout(layoutID?: ILayoutDetails["layoutID"]) {
     const { fetchLayout } = useLayoutsActions();
-    const layout = useLayoutSelector(({ layoutSettings }) => layoutSettings.layoutsByID[layoutID]);
+    const layout = useLayoutSelector(({ layoutSettings }) =>
+        layoutID !== undefined ? layoutSettings.layoutsByID[layoutID] : undefined,
+    );
 
     useEffect(() => {
-        if (!layout) {
+        if (layoutID !== undefined && !layout) {
             fetchLayout(layoutID);
         }
     }, [fetchLayout, layout, layoutID]);
@@ -86,6 +88,17 @@ export function usePutLayoutView(layoutID: ILayoutDetails["layoutID"]) {
 
         [putLayoutView, layoutID],
     );
+}
+
+export function useDeleteLayout({
+    layoutID,
+    onSuccessBeforeDeletion,
+}: {
+    layoutID: ILayoutDetails["layoutID"];
+    onSuccessBeforeDeletion?: () => void;
+}) {
+    const dispatch = useLayoutDispatch();
+    return async () => dispatch(layoutActions.deleteLayout({ layoutID, onSuccessBeforeDeletion })).unwrap();
 }
 
 /**

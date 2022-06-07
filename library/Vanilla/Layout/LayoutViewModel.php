@@ -24,8 +24,8 @@ use CategoryModel;
 /**
  * Model for managing the layout view table.
  */
-class LayoutViewModel extends FullRecordCacheModel {
-
+class LayoutViewModel extends FullRecordCacheModel
+{
     //region Properties
     private const TABLE_NAME = "layoutView";
     //endregion
@@ -61,12 +61,12 @@ class LayoutViewModel extends FullRecordCacheModel {
 
     //endregion
 
-
     //region Public Methods
     /**
      * @param LayoutViewRecordProviderInterface $provider
      */
-    public function addProvider(LayoutViewRecordProviderInterface $provider) {
+    public function addProvider(LayoutViewRecordProviderInterface $provider)
+    {
         $types = $provider::getValidRecordTypes();
         foreach ($types as $type) {
             $this->providers[$type] = $provider;
@@ -79,8 +79,9 @@ class LayoutViewModel extends FullRecordCacheModel {
      * @param int|string $layoutID ID of the layout
      * @return array
      */
-    public function getViewsByLayoutID($layoutID): array {
-        $rows = $this->select(['layoutID' => $layoutID]);
+    public function getViewsByLayoutID($layoutID): array
+    {
+        $rows = $this->select(["layoutID" => $layoutID]);
         return $rows;
     }
 
@@ -90,8 +91,9 @@ class LayoutViewModel extends FullRecordCacheModel {
      * @param array $layoutIDs IDs of the layout
      * @return array
      */
-    public function getViewsByLayoutIDs(array $layoutIDs): array {
-        $rows = $this->select(['layoutID' => $layoutIDs]);
+    public function getViewsByLayoutIDs(array $layoutIDs): array
+    {
+        $rows = $this->select(["layoutID" => $layoutIDs]);
         return $rows;
     }
 
@@ -102,16 +104,20 @@ class LayoutViewModel extends FullRecordCacheModel {
      *
      * @return int
      */
-    public function saveLayoutView(array $body): int {
-        $existingRow = $this->getLayoutViews(false, $body['layoutViewType'], $body['recordType'], $body['recordID']);
+    public function saveLayoutView(array $body): int
+    {
+        $existingRow = $this->getLayoutViews(false, $body["layoutViewType"], $body["recordType"], $body["recordID"]);
 
         try {
             $this->database->beginTransaction();
             if (!empty($existingRow)) {
-                if ($existingRow['layoutID'] == $body['layoutID']) {
+                if ($existingRow["layoutID"] == $body["layoutID"]) {
                     throw new ClientException("Cannot create a duplicate layout view", 422, $body);
                 } else {
-                    $this->delete(['layoutID' => $existingRow['layoutID'], 'layoutViewID' => $existingRow['layoutViewID']]);
+                    $this->delete([
+                        "layoutID" => $existingRow["layoutID"],
+                        "layoutViewID" => $existingRow["layoutViewID"],
+                    ]);
                 }
             }
             $layoutViewID = $this->insert($body);
@@ -133,15 +139,16 @@ class LayoutViewModel extends FullRecordCacheModel {
      * @return string
      * @throws NotFoundException In case layout ID is not found based on provided parameters.
      */
-    public function getLayoutIdLookup(string $layoutViewType, string $recordType, int $recordID): string {
-        $where = ['layoutViewType'=> $layoutViewType, 'recordType' =>  $recordType, 'recordID' => $recordID];
+    public function getLayoutIdLookup(string $layoutViewType, string $recordType, int $recordID): string
+    {
+        $where = ["layoutViewType" => $layoutViewType, "recordType" => $recordType, "recordID" => $recordID];
         try {
             $row = $this->selectSingle($where);
         } catch (NoResultsException $e) {
-            return '';
+            return "";
         }
 
-        return $row['layoutID'];
+        return $row["layoutID"];
     }
 
     /**
@@ -154,15 +161,20 @@ class LayoutViewModel extends FullRecordCacheModel {
      *
      * @return array
      */
-    public function getLayoutViews(bool $allowNull, string $layoutViewType, string $recordType = null, int $recordID = null): array {
+    public function getLayoutViews(
+        bool $allowNull,
+        string $layoutViewType,
+        string $recordType = null,
+        int $recordID = null
+    ): array {
         if ($layoutViewType != null) {
-            $where['layoutViewType'] = $layoutViewType;
+            $where["layoutViewType"] = $layoutViewType;
         }
         if ($recordType != null) {
-            $where['recordType'] = $recordType;
+            $where["recordType"] = $recordType;
         }
         if ($recordID != null) {
-            $where['recordID'] = $recordID;
+            $where["recordID"] = $recordID;
         }
         try {
             $row = $this->selectSingle($where);
@@ -173,7 +185,7 @@ class LayoutViewModel extends FullRecordCacheModel {
         if (count($row) == 0 && $allowNull) {
             if ($recordID != null) {
                 $row = $this->getLayoutViews($allowNull, $layoutViewType, $recordType);
-            } else if ($recordType != null) {
+            } elseif ($recordType != null) {
                 $row = $this->getLayoutViews($allowNull, $layoutViewType);
             }
         }
@@ -187,9 +199,10 @@ class LayoutViewModel extends FullRecordCacheModel {
      * @param array|string|bool $expand Additional parameters used to expand output based on row property values
      * @return array Normalized row
      */
-    public function normalizeRow(array $row, $expand = false): array {
-        if (ModelUtils::isExpandOption('record', $expand)) {
-            $row['record'] = $this->getRecords($row['recordType'], [$row['recordID']]);
+    public function normalizeRow(array $row, $expand = false): array
+    {
+        if (ModelUtils::isExpandOption("record", $expand)) {
+            $row["record"] = $this->getRecords($row["recordType"], [$row["recordID"]]);
         }
         return $row;
     }
@@ -201,16 +214,17 @@ class LayoutViewModel extends FullRecordCacheModel {
      * @param array|string|bool $expand Additional parameters used to expand output based on row property values
      * @return array Normalized row
      */
-    public function normalizeRows(array $rows, $expand): array {
+    public function normalizeRows(array $rows, $expand): array
+    {
         $recordViews = [];
-        if (ModelUtils::isExpandOption('record', $expand)) {
+        if (ModelUtils::isExpandOption("record", $expand)) {
             $ids = [];
             //Extract record ID/type and combine them
             array_map(function (array $row) use (&$ids) {
-                if (!array_key_exists($row['recordType'], $ids)) {
-                    $ids[$row['recordType']] = [];
+                if (!array_key_exists($row["recordType"], $ids)) {
+                    $ids[$row["recordType"]] = [];
                 }
-                array_push($ids[$row['recordType']], $row['recordID']);
+                array_push($ids[$row["recordType"]], $row["recordID"]);
             }, $rows);
             // Query recordIDs for each record type.
             foreach ($ids as $recordType => $idList) {
@@ -219,12 +233,12 @@ class LayoutViewModel extends FullRecordCacheModel {
         }
 
         $rows = array_map(function (array $row) use ($recordViews, $expand) {
-            if (ModelUtils::isExpandOption('record', $expand)) {
+            if (ModelUtils::isExpandOption("record", $expand)) {
                 // Add expand record types to the request row.
-                if (array_key_exists($row['recordType'], $recordViews)) {
-                    $typeRecords = $recordViews[$row['recordType']];
-                    if (array_key_exists($row['recordID'], $typeRecords)) {
-                        $row['record'] = $typeRecords[$row['recordID']];
+                if (array_key_exists($row["recordType"], $recordViews)) {
+                    $typeRecords = $recordViews[$row["recordType"]];
+                    if (array_key_exists($row["recordID"], $typeRecords)) {
+                        $row["record"] = $typeRecords[$row["recordID"]];
                     }
                 }
             }
@@ -242,7 +256,8 @@ class LayoutViewModel extends FullRecordCacheModel {
      * @return array formatted [id => ['Name'=> , 'URL' => ]]
      * @throws NotFoundException Throws exception when provider not found.
      */
-    public function getRecords(string $recordType, array $recordIDs): array {
+    public function getRecords(string $recordType, array $recordIDs): array
+    {
         $provider = $this->providers[$recordType] ?? null;
         if (!$provider) {
             throw new NotFoundException($recordType . " provider could not be found");
@@ -260,14 +275,15 @@ class LayoutViewModel extends FullRecordCacheModel {
      * @throws \Garden\Container\ContainerException Container Exception.
      * @throws \Garden\Container\NotFoundException Container not found exception.
      */
-    public function getProviderLayoutIdLookupParams(string $layoutViewType, string $recordType, string $recordID): array {
+    public function getProviderLayoutIdLookupParams(string $layoutViewType, string $recordType, string $recordID): array
+    {
         // If the recordID is non-numeric(a slug), we see if we can rely on the SiteSectionModel to provide
         // alternative parameters for getLayOutIdLookup().
         if (!is_numeric($recordID)) {
             $model = \Gdn::getContainer()->get(SiteSectionModel::class);
             $section = $model->getByID($recordID);
 
-            if ($section && method_exists($section, 'getLayoutIdLookupParams')) {
+            if ($section && method_exists($section, "getLayoutIdLookupParams")) {
                 return $section->getLayoutIdLookupParams($layoutViewType, $recordType, $recordID);
             }
         }
@@ -281,7 +297,8 @@ class LayoutViewModel extends FullRecordCacheModel {
      * @param int|string $recordIDs Record IDs
      * @throws NotFoundException Throws exception if there is no provider for the requested recordType.
      */
-    public function validateRecordExists(string $recordType, $recordIDs): bool {
+    public function validateRecordExists(string $recordType, $recordIDs): bool
+    {
         $provider = $this->providers[$recordType] ?? null;
         if (!$provider) {
             throw new NotFoundException($recordType . " provider could not be found");
@@ -298,10 +315,12 @@ class LayoutViewModel extends FullRecordCacheModel {
      * @param bool $drop Optional, true to drop table if it already exists,
      * false to retain table if it already exists. Default false.
      */
-    public static function structure(\Gdn_Database $database, bool $explicit = false, bool $drop = false): void {
+    public static function structure(\Gdn_Database $database, bool $explicit = false, bool $drop = false): void
+    {
         $construct = $database->structure();
         $sql = $database->sql();
-        $construct->table(self::TABLE_NAME)
+        $construct
+            ->table(self::TABLE_NAME)
             ->primaryKey("layoutViewID")
             ->column("layoutID", "varchar(100)", false, ["index.layoutIDIndex"])
             ->column("recordID", "int", 0, ["unique.record"])
@@ -313,18 +332,20 @@ class LayoutViewModel extends FullRecordCacheModel {
             ->column("dateUpdated", "datetime", null)
             ->set($explicit, $drop);
         $default = [
-            'layoutViewID' => 1,
-            'layoutID' => 1,
-            'recordID' => 0,
-            'recordType' => 'global',
-            'layoutViewType' => 'global',
-            'insertUserID' => 2,
-            'dateInserted' => date('Y-m-d H:i:s'),
-            'updateUserID' => 2,
-            'dateUpdated' => date('Y-m-d H:i:s')];
+            "layoutViewID" => 1,
+            "layoutID" => 1,
+            "recordID" => 0,
+            "recordType" => "global",
+            "layoutViewType" => "global",
+            "insertUserID" => 2,
+            "dateInserted" => date("Y-m-d H:i:s"),
+            "updateUserID" => 2,
+            "dateUpdated" => date("Y-m-d H:i:s"),
+        ];
 
-        $insertDefault = !$database->structure()->tableExists(self::TABLE_NAME)
-            || $sql->getWhere(self::TABLE_NAME, ['layoutViewID' => 1])->numRows() == 0;
+        $insertDefault =
+            !$database->structure()->tableExists(self::TABLE_NAME) ||
+            $sql->getWhere(self::TABLE_NAME, ["layoutViewID" => 1])->numRows() == 0;
 
         if ($insertDefault) {
             $sql->insert(self::TABLE_NAME, $default);
@@ -333,27 +354,32 @@ class LayoutViewModel extends FullRecordCacheModel {
     /**
      * @return Schema
      */
-    public static function getInputSchema(): Schema {
-        return SchemaFactory::parse([
-            'layoutID:i|s',
-            'expand?' => ApiUtils::getExpandDefinition(['record'])
-        ], 'LayoutView');
+    public static function getInputSchema(): Schema
+    {
+        return SchemaFactory::parse(
+            ["layoutID:i|s", "expand?" => ApiUtils::getExpandDefinition(["record"])],
+            "LayoutView"
+        );
     }
 
     /**
      * @return Schema
      */
-    public static function getSchema(): Schema {
-        return SchemaFactory::parse([
-            'layoutViewID:i',
-            'layoutID:i|s',
-            'recordID:i',
-            'recordType:s',
-            'layoutViewType:s',
-            'insertUserID:i',
-            'dateInserted:dt',
-            'record:o?'
-        ], 'LayoutView');
+    public static function getSchema(): Schema
+    {
+        return SchemaFactory::parse(
+            [
+                "layoutViewID:i",
+                "layoutID:i|s",
+                "recordID:i",
+                "recordType:s",
+                "layoutViewType:s",
+                "insertUserID:i",
+                "dateInserted:dt",
+                "record:o?",
+            ],
+            "LayoutView"
+        );
     }
     //endregion
 }

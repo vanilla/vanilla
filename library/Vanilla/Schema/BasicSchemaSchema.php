@@ -17,7 +17,8 @@ use Garden\Schema\ValidationField;
  * Use this schema if you want an endpoint to handle schemas itself. This class will validate a stripped down schema
  * array.
  */
-class BasicSchemaSchema extends Schema {
+class BasicSchemaSchema extends Schema
+{
     /**
      * @var Schema
      */
@@ -26,81 +27,81 @@ class BasicSchemaSchema extends Schema {
     /**
      * BasicSchemaSchema constructor.
      */
-    public function __construct() {
+    public function __construct()
+    {
         $schema = [
-            'type' => 'object',
-            'properties' => [
-                'type' => [
-                    'type' => 'string',
-                    'enum' => ['object'],
+            "type" => "object",
+            "properties" => [
+                "type" => [
+                    "type" => "string",
+                    "enum" => ["object"],
                 ],
-                'properties' => [
-                    'type' => 'object',
+                "properties" => [
+                    "type" => "object",
                 ],
-                'required' => [
-                    'type' => 'array',
-                    'items' => [
-                        'type' => 'string',
+                "required" => [
+                    "type" => "array",
+                    "items" => [
+                        "type" => "string",
                     ],
                 ],
             ],
-            'required' => [
-                'type',
-                'properties',
-            ],
+            "required" => ["type", "properties"],
         ];
 
         parent::__construct($schema);
 
         $propertySchema = [
-            'type' => 'object',
-            'properties' => [
-                'type' => [
-                    'type' => ['string', 'array'],
-                    'enum' => [
-                        'string', ['string', 'null'],
-                        'number', ['number', 'null'],
-                        'integer', ['integer', 'null'],
-                        'boolean', ['boolean', 'null'],
+            "type" => "object",
+            "properties" => [
+                "type" => [
+                    "type" => ["string", "array"],
+                    "enum" => [
+                        "string",
+                        ["string", "null"],
+                        "number",
+                        ["number", "null"],
+                        "integer",
+                        ["integer", "null"],
+                        "boolean",
+                        ["boolean", "null"],
                     ],
                 ],
-                'description' => [
-                    'type' => 'string',
+                "description" => [
+                    "type" => "string",
                 ],
-                'x-label' => [
-                    'type' => 'string',
+                "x-label" => [
+                    "type" => "string",
                 ],
-                'x-control' => [
-                    'type' => 'string',
-                    'enum' => ['textbox', 'textarea', 'checkbox'],
+                "x-control" => [
+                    "type" => "string",
+                    "enum" => ["textbox", "textarea", "checkbox"],
                 ],
-                'default' => [
-                    'type' => ['string', 'number', 'integer', 'boolean', 'null'],
+                "default" => [
+                    "type" => ["string", "number", "integer", "boolean", "null"],
                 ],
-                'enum' => [
-                    'type' => 'array',
-                    'items' => [
-                        'type' => ['string', 'number', 'integer', 'boolean'],
+                "enum" => [
+                    "type" => "array",
+                    "items" => [
+                        "type" => ["string", "number", "integer", "boolean"],
                     ],
                 ],
-                'minLength' => [
-                    'type' => 'integer',
-                    'minimum' => 0,
+                "minLength" => [
+                    "type" => "integer",
+                    "minimum" => 0,
                 ],
-                'maxLength' => [
-                    'type' => 'integer',
-                    'minimum' => 1,
+                "maxLength" => [
+                    "type" => "integer",
+                    "minimum" => 1,
                 ],
-                'minimum' => [
-                    'type' => 'number',
+                "minimum" => [
+                    "type" => "number",
                 ],
-                'maximum' => [
-                    'type' => 'number',
+                "maximum" => [
+                    "type" => "number",
                 ],
             ],
-            'required' => [
-                'type',
-            ],
+            "required" => ["type"],
         ];
 
         $this->propertySchema = new Schema($propertySchema);
@@ -109,12 +110,13 @@ class BasicSchemaSchema extends Schema {
     /**
      * {@inheritDoc}
      */
-    public function validate($data, $sparse = false) {
+    public function validate($data, $sparse = false)
+    {
         $valid = parent::validate($data, $sparse);
 
         // Garden schema 1.x doesn't support the additionalProperties attribute so fake it here.
         $validation = $this->createValidation();
-        foreach ($valid['properties'] as $name => &$property) {
+        foreach ($valid["properties"] as $name => &$property) {
             try {
                 $property = $this->propertySchema->validate($property);
             } catch (ValidationException $ex) {

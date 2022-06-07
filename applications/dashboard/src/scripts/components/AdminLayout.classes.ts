@@ -6,6 +6,7 @@ import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { Mixins } from "@library/styles/Mixins";
 import { Variables } from "@library/styles/Variables";
 import { singleBorder } from "@library/styles/styleHelpersBorders";
+import { sticky } from "@library/styles/styleHelpersPositioning";
 
 export const adminLayoutClasses = useThemeCache(() => {
     const panelLayoutVars = oneColumnVariables();
@@ -33,6 +34,12 @@ export const adminLayoutClasses = useThemeCache(() => {
 
     const twoColLeftPanel = css({
         width: 240,
+        ...sticky(),
+        top: titleBarVariables().fullHeight + 1,
+        // Critical for the sticky to work.
+        alignSelf: "flex-start",
+        maxHeight: `calc(100vh - ${titleBarVariables().fullHeight}px)`,
+        overflow: "auto",
     });
 
     const noLeftPanel = css(

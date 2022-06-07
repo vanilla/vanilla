@@ -1997,6 +1997,10 @@ button.list-group-item-danger.active:hover {
   border-color: #66afe9;
   outline: none;
 }
+.form-control:-ms-input-placeholder {
+  color: #999;
+  opacity: 1;
+}
 .form-control::placeholder {
   color: #999;
   opacity: 1;
@@ -4489,9 +4493,6 @@ html {
 @-ms-viewport {
   width: device-width;
 }
-@-o-viewport {
-  width: device-width;
-}
 @-webkit-viewport {
   width: device-width;
 }
@@ -4545,7 +4546,7 @@ dl {
 }
 
 ol ol,
-ul,
+ul ul,
 ol ul,
 ul ol {
   margin-bottom: 0;
@@ -4570,7 +4571,7 @@ a {
 }
 a:focus, a:hover {
   color: #015f8f;
-  text-decoration: none;
+  text-decoration: underline;
 }
 a:focus {
   outline: thin dotted;
@@ -4837,7 +4838,9 @@ output {
   line-height: 36px;
   height: 36px;
   font-weight: normal;
-  user-select: none;
+  -webkit-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
   overflow: hidden;
   cursor: pointer;
   background-color: transparent;
@@ -5862,4 +5865,12 @@ label[id^=iCheck] {
   background-color: #f4f6fb;
 }
 
-/*# sourceMappingURL=admin-new.css.map */
+ul {
+  margin-bottom: 0;
+}
+
+a:focus, a:hover {
+  text-decoration: none;
+}
+
+/*# sourceMappingURL=admin-new.css.map*/

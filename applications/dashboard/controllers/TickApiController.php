@@ -11,8 +11,8 @@ use Garden\Schema\Schema;
 /**
  * API Controller for site analytics.
  */
-class TickApiController extends AbstractApiController {
-
+class TickApiController extends AbstractApiController
+{
     /** @var Statistics */
     private $statistics;
 
@@ -20,7 +20,8 @@ class TickApiController extends AbstractApiController {
      * TickApiController constructor.
      * @param Statistics $statistics
      */
-    public function __construct(Statistics $statistics) {
+    public function __construct(Statistics $statistics)
+    {
         $this->statistics = $statistics;
     }
 
@@ -29,9 +30,10 @@ class TickApiController extends AbstractApiController {
      *
      * @return Data
      */
-    public function post(): Data {
+    public function post(): Data
+    {
         $this->statistics->tick();
         $this->statistics->fireEvent("AnalyticsTick");
-        return new Data('');
+        return new Data("");
     }
 }

@@ -51,6 +51,7 @@ export function registerLayoutPage(path: string | string[], pathMapper: IPathLay
         <Route
             key={[path].flat().join("-")}
             path={path}
+            exact={true}
             render={(params) => {
                 const mappedQuery = pathMapper(params);
                 return <LayoutPage layoutQuery={mappedQuery} />;

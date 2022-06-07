@@ -14,8 +14,8 @@ use Vanilla\Navigation\Breadcrumb;
 /**
  * Interface for all public page head methods.
  */
-interface PageHeadInterface {
-
+interface PageHeadInterface
+{
     /**
      * Set the section of the site we are serving assets for.
      *

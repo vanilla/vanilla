@@ -14,8 +14,8 @@ use Garden\Schema\Schema;
 /**
  * Middleware that filters based on roleID.
  */
-class LayoutPermissionFilterMiddleware extends AbstractMiddleware {
-
+class LayoutPermissionFilterMiddleware extends AbstractMiddleware
+{
     /** @var \Gdn_Session $session */
     private $session;
 
@@ -28,7 +28,8 @@ class LayoutPermissionFilterMiddleware extends AbstractMiddleware {
      * @param \Gdn_Session $session
      * @param \UserModel $userModel
      */
-    public function __construct(\Gdn_Session $session, \UserModel $userModel) {
+    public function __construct(\Gdn_Session $session, \UserModel $userModel)
+    {
         $this->session = $session;
         $this->userModel = $userModel;
     }
@@ -42,9 +43,14 @@ class LayoutPermissionFilterMiddleware extends AbstractMiddleware {
      * @param DataResolverInterface $next
      * @return mixed|null
      */
-    protected function processInternal(array $nodeData, array $middlewareParams, array $hydrateParams, DataResolverInterface $next) {
+    protected function processInternal(
+        array $nodeData,
+        array $middlewareParams,
+        array $hydrateParams,
+        DataResolverInterface $next
+    ) {
         $userRoleIDs = $this->userModel->getRoleIDs($this->session->UserID);
-        if (isset($middlewareParams['roleIDs'])) {
+        if (isset($middlewareParams["roleIDs"])) {
             $response = $this->filterRoleIDs($middlewareParams, $userRoleIDs, $nodeData);
             if (is_null($response)) {
                 return null;
@@ -62,8 +68,9 @@ class LayoutPermissionFilterMiddleware extends AbstractMiddleware {
      *
      * @return int[]|null
      */
-    private function filterRoleIDs(array $roleFilter, array $roleIDs, array $data): ?array {
-        $objRoleIds = $roleFilter['roleIDs'];
+    private function filterRoleIDs(array $roleFilter, array $roleIDs, array $data): ?array
+    {
+        $objRoleIds = $roleFilter["roleIDs"];
         if (!array_intersect($objRoleIds, $roleIDs)) {
             return null;
         }
@@ -75,20 +82,22 @@ class LayoutPermissionFilterMiddleware extends AbstractMiddleware {
      *
      * @return Schema
      */
-    public function getSchema(): Schema {
+    public function getSchema(): Schema
+    {
         $schema = new Schema([
             "x-no-hydrate" => true,
-            "description" => "Add role based fitlers for the current node. Only roles configured here will see the contents of the node.",
+            "description" =>
+                "Add role based fitlers for the current node. Only roles configured here will see the contents of the node.",
             "type" => "object",
-                "properties" => [
-                    "roleIDs" => [
-                        "type" => "array",
-                        "description" => "A list of roleIDs that should see the node.",
-                        "items" => [
-                            "type" => "integer",
-                        ]
-                    ]
-                ]
+            "properties" => [
+                "roleIDs" => [
+                    "type" => "array",
+                    "description" => "A list of roleIDs that should see the node.",
+                    "items" => [
+                        "type" => "integer",
+                    ],
+                ],
+            ],
         ]);
         return $schema;
     }
@@ -96,7 +105,8 @@ class LayoutPermissionFilterMiddleware extends AbstractMiddleware {
     /**
      * @inheritdoc
      */
-    public function getType(): string {
+    public function getType(): string
+    {
         return "role-filter";
     }
 }

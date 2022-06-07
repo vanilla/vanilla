@@ -3,7 +3,7 @@
  * @license Proprietary
  */
 
-import { ILoadable, Loadable, LoadStatus } from "@library/@types/api/core";
+import { Loadable, LoadStatus } from "@library/@types/api/core";
 import { IUserFragment } from "@library/@types/api/users";
 import { IHydratedLayoutWidget } from "@library/features/Layout/LayoutRenderer.types";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
@@ -22,7 +22,7 @@ export interface ILayoutsState {
         error?: any;
     };
     layoutDraft: ILayoutDraft | null;
-    layoutDraftPersistLoadable: ILoadable<ILayoutEdit>;
+
     layoutJsonsByLayoutID: Record<RecordID, Loadable<ILayoutEdit>>;
     catalogByViewType: Partial<Record<LayoutViewType, ILayoutCatalog>>;
     catalogStatusByViewType: Partial<Record<LayoutViewType, Loadable<{}>>>;
@@ -34,9 +34,7 @@ export const INITIAL_LAYOUTS_STATE: ILayoutsState = {
         status: LoadStatus.PENDING,
     },
     layoutDraft: null,
-    layoutDraftPersistLoadable: {
-        status: LoadStatus.PENDING,
-    },
+
     layoutJsonsByLayoutID: {},
     catalogByViewType: {},
     catalogStatusByViewType: {},

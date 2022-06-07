@@ -669,7 +669,6 @@ export const actionMixin = (classBasedStates?: IStateSelectors): CSSObject => {
         ),
         ...mediaQueries.oneColumnDown({
             fontSize: styleUnit(vars.item.mobile.fontSize),
-            fontWeight: globalVars.fonts.weights.semiBold,
             minHeight: styleUnit(vars.item.mobile.minHeight),
         }),
     };

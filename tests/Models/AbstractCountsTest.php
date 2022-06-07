@@ -15,7 +15,8 @@ use VanillaTests\SiteTestTrait;
 /**
  * Test count updating around categories, discussions, and comments.
  */
-abstract class AbstractCountsTest extends SiteTestCase {
+abstract class AbstractCountsTest extends SiteTestCase
+{
     use TestCategoryModelTrait, TestDiscussionModelTrait, TestCommentModelTrait;
 
     /**
@@ -41,7 +42,8 @@ abstract class AbstractCountsTest extends SiteTestCase {
     /**
      * @inheritDoc
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         $this->sql = $this->discussionModel->SQL;
 
@@ -50,30 +52,30 @@ abstract class AbstractCountsTest extends SiteTestCase {
         $this->comments = [];
 
         // Insert some category containers.
-        $parentCategories = $this->insertCategories(2, ['Name' => 'Parent Count %s', 'DisplayAs' => \CategoryModel::DISPLAY_NESTED]);
-        $this->categories += array_column($parentCategories, null, 'CategoryID');
+        $parentCategories = $this->insertCategories(2, [
+            "Name" => "Parent Count %s",
+            "DisplayAs" => \CategoryModel::DISPLAY_NESTED,
+        ]);
+        $this->categories += array_column($parentCategories, null, "CategoryID");
 
         foreach ($parentCategories as $category) {
-            $childCategories = $this->insertCategories(
-                2,
-                [
-                'Name' => 'Test Count %s',
-                'DisplayAs' => \CategoryModel::DISPLAY_DISCUSSIONS,
-                'ParentCategoryID' => $category['CategoryID'],
-                ]
-            );
+            $childCategories = $this->insertCategories(2, [
+                "Name" => "Test Count %s",
+                "DisplayAs" => \CategoryModel::DISPLAY_DISCUSSIONS,
+                "ParentCategoryID" => $category["CategoryID"],
+            ]);
 
-            $this->categories += array_column($childCategories, null, 'CategoryID');
+            $this->categories += array_column($childCategories, null, "CategoryID");
 
             foreach ($childCategories as $childCategory) {
                 // Insert some test discussions.
-                $discussions = $this->insertDiscussions(2, ['CategoryID' => $childCategory['CategoryID']]);
-                $this->discussions += array_column($discussions, null, 'DiscussionID');
+                $discussions = $this->insertDiscussions(2, ["CategoryID" => $childCategory["CategoryID"]]);
+                $this->discussions += array_column($discussions, null, "DiscussionID");
 
                 // Insert some comments for each discussion.
                 foreach ($discussions as $discussion) {
-                    $comments = $this->insertComments(5, ['DiscussionID' => $discussion['DiscussionID']]);
-                    $this->comments += array_column($comments, null, 'CommentID');
+                    $comments = $this->insertComments(5, ["DiscussionID" => $discussion["DiscussionID"]]);
+                    $this->comments += array_column($comments, null, "CommentID");
                 }
             }
         }
@@ -84,35 +86,41 @@ abstract class AbstractCountsTest extends SiteTestCase {
     /**
      * Reloads Categories, Discussions & Comments to the classes members.
      */
-    public function reloadCategoriesDiscussionsComments():void {
+    public function reloadCategoriesDiscussionsComments(): void
+    {
         // Reload categories.
-        $categoriesRows = $this->categoryModel->getWhere(['CategoryID' => array_keys($this->categories)])->resultArray();
+        $categoriesRows = $this->categoryModel
+            ->getWhere(["CategoryID" => array_keys($this->categories)])
+            ->resultArray();
         $this->categories = [];
         foreach ($categoriesRows as $categoriesRow) {
-            $this->categories[$categoriesRow['CategoryID']] = $categoriesRow;
+            $this->categories[$categoriesRow["CategoryID"]] = $categoriesRow;
         }
 
         // Reload discussions
-        $discussionsRows = $this->discussionModel->getWhere(['DiscussionID' => array_keys($this->discussions)])->resultArray();
+        $discussionsRows = $this->discussionModel
+            ->getWhere(["DiscussionID" => array_keys($this->discussions)])
+            ->resultArray();
         $this->discussions = [];
         foreach ($discussionsRows as $discussionsRow) {
-            $this->discussions[$discussionsRow['DiscussionID']] = $discussionsRow;
+            $this->discussions[$discussionsRow["DiscussionID"]] = $discussionsRow;
         }
 
         // Reload comments
-        $commentsRows = $this->commentModel->getWhere(['CommentID' => array_keys($this->comments)])->resultArray();
+        $commentsRows = $this->commentModel->getWhere(["CommentID" => array_keys($this->comments)])->resultArray();
         $this->comments = [];
         foreach ($commentsRows as $commentsRow) {
-            $this->comments[$commentsRow['CommentID']] = $commentsRow;
+            $this->comments[$commentsRow["CommentID"]] = $commentsRow;
         }
     }
 
     /**
      * Test the counts on the records that were inserted during setup.
      */
-    public function assertAllCounts(): void {
+    public function assertAllCounts(): void
+    {
         foreach ($this->discussions as $row) {
-            $this->assertDiscussionCounts($row['DiscussionID']);
+            $this->assertDiscussionCounts($row["DiscussionID"]);
         }
 
         foreach ($this->categories as $categoryID => $_) {
@@ -125,45 +133,53 @@ abstract class AbstractCountsTest extends SiteTestCase {
      *
      * @param int $discussionID
      */
-    public function assertDiscussionCounts(int $discussionID): void {
+    public function assertDiscussionCounts(int $discussionID): void
+    {
         // Use database to ensure no model flim-flammery.
-        $discussion = $this->sql->getWhere('Discussion', ['DiscussionID' => $discussionID])->firstRow(DATASET_TYPE_ARRAY);
+        $discussion = $this->sql
+            ->getWhere("Discussion", ["DiscussionID" => $discussionID])
+            ->firstRow(DATASET_TYPE_ARRAY);
         $this->assertNotEmpty($discussion);
 
-        $counts = $this->query(<<<SQL
+        $counts = $this->query(
+            <<<SQL
 select
     count(c.CommentID) as CountComments,
     max(c.DateInserted) as DateLastComment
 from GDN_Comment c
 where c.DiscussionID = :id
 SQL
-            , ['id' => $discussionID])->firstRow(DATASET_TYPE_ARRAY);
+            ,
+            ["id" => $discussionID]
+        )->firstRow(DATASET_TYPE_ARRAY);
 
         if (empty($counts)) {
             $counts = [
-                'CountComments' => 0,
-                'DateLastComment' => $discussion['DateInserted'],
+                "CountComments" => 0,
+                "DateLastComment" => $discussion["DateInserted"],
             ];
         } else {
             // Get the last comment by date then ID.
             $firstComment = $this->sql
-                ->orderBy(['DateInserted', 'CommentID'])
+                ->orderBy(["DateInserted", "CommentID"])
                 ->limit(1)
-                ->getWhere('Comment', ['DiscussionID' => $discussionID])->firstRow(DATASET_TYPE_ARRAY);
+                ->getWhere("Comment", ["DiscussionID" => $discussionID])
+                ->firstRow(DATASET_TYPE_ARRAY);
 
             $lastComment = $this->sql
-                ->orderBy(['-DateInserted', '-CommentID'])
+                ->orderBy(["-DateInserted", "-CommentID"])
                 ->limit(1)
-                ->getWhere('Comment', ['DiscussionID' => $discussionID])->firstRow(DATASET_TYPE_ARRAY);
+                ->getWhere("Comment", ["DiscussionID" => $discussionID])
+                ->firstRow(DATASET_TYPE_ARRAY);
 
             $counts += [
-                'FirstCommentID' => $firstComment['CommentID'],
-                'LastCommentID' => $lastComment['CommentID'],
-                'LastCommentUserID' => $lastComment['InsertUserID'],
+                "FirstCommentID" => $firstComment["CommentID"],
+                "LastCommentID" => $lastComment["CommentID"],
+                "LastCommentUserID" => $lastComment["InsertUserID"],
             ];
         }
 
-        $this->assertPartialArray($counts, $discussion, "discussionID: {$discussionID}, name: {$discussion['Name']}");
+        $this->assertPartialArray($counts, $discussion, "discussionID: {$discussionID}, name: {$discussion["Name"]}");
     }
 
     /**
@@ -171,35 +187,39 @@ SQL
      *
      * @param int $categoryID
      */
-    public function assertCategoryCounts(int $categoryID): void {
-        $category = $this->sql->getWhere('Category', ['CategoryID' => $categoryID])->firstRow(DATASET_TYPE_ARRAY);
+    public function assertCategoryCounts(int $categoryID): void
+    {
+        $category = $this->sql->getWhere("Category", ["CategoryID" => $categoryID])->firstRow(DATASET_TYPE_ARRAY);
         $this->assertNotEmpty($category);
 
-        $counts = $this->query(<<<SQL
+        $counts = $this->query(
+            <<<SQL
 select
     count(d.DiscussionID) as CountDiscussions,
     sum(d.CountComments) as CountComments
 from GDN_Discussion d
 where d.CategoryID = :id
 SQL
-            , ['id' => $categoryID])->firstRow(DATASET_TYPE_ARRAY);
+            ,
+            ["id" => $categoryID]
+        )->firstRow(DATASET_TYPE_ARRAY);
 
         if (empty($counts)) {
             $counts = [
-                'CountDiscussions' => 0,
-                'CountComments' => 0
+                "CountDiscussions" => 0,
+                "CountComments" => 0,
             ];
         } else {
-            $counts['CountComments'] = (int)($counts['CountComments'] ?? 0);
+            $counts["CountComments"] = (int) ($counts["CountComments"] ?? 0);
             // Get the last comment to fix the last discussion ID.
-//            if ($counts['LastCommentID'] !== null) {
-//                $lastComment = $this->sql->getWhere('Comment', ['CommentID' => $counts['LastCommentID']])->firstRow(DATASET_TYPE_ARRAY);
-//                $this->assertNotEmpty($lastComment);
-//                $counts['LastDiscussionID'] = $lastComment['DiscussionID'];
-//            }
+            //            if ($counts['LastCommentID'] !== null) {
+            //                $lastComment = $this->sql->getWhere('Comment', ['CommentID' => $counts['LastCommentID']])->firstRow(DATASET_TYPE_ARRAY);
+            //                $this->assertNotEmpty($lastComment);
+            //                $counts['LastDiscussionID'] = $lastComment['DiscussionID'];
+            //            }
         }
 
-        $this->assertPartialArray($counts, $category, "categoryID: $categoryID, name: {$category['Name']}");
+        $this->assertPartialArray($counts, $category, "categoryID: $categoryID, name: {$category["Name"]}");
     }
 
     /**
@@ -209,7 +229,8 @@ SQL
      * @param array $full
      * @param string $message
      */
-    public static function assertPartialArray(array $partial, array $full, string $message = ''): void {
+    public static function assertPartialArray(array $partial, array $full, string $message = ""): void
+    {
         $full = array_intersect_key($full, $partial);
         ksort($partial);
         ksort($full);
@@ -224,7 +245,8 @@ SQL
      * @param array $params
      * @return \Gdn_DataSet
      */
-    protected function query(string $sql, array $params = []): \Gdn_DataSet {
+    protected function query(string $sql, array $params = []): \Gdn_DataSet
+    {
         $px = $this->sql->Database->DatabasePrefix;
         $sql = str_replace("GDN_", $px, $sql);
 

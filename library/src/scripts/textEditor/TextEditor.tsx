@@ -10,13 +10,17 @@ import { DarkThemeIcon, LightThemeIcon } from "@library/icons/common";
 import textEditorClasses from "./textEditorStyles";
 import { assetUrl, getMeta, siteUrl } from "@library/utility/appUtils";
 import { editor as Monaco } from "monaco-editor/esm/vs/editor/editor.api";
+import { cx } from "@emotion/css";
 
-monaco.config({
-    paths: {
-        // @ts-ignore: DIST_NAME comes from webpack.
-        vs: assetUrl(`/${__DIST__NAME__}/monaco-editor-30-1/min/vs`),
-    },
-});
+// FIXME: [VNLA-1206] https://higherlogic.atlassian.net/browse/VNLA-1206
+if (process.env.NODE_ENV !== "test") {
+    monaco.config({
+        paths: {
+            // @ts-ignore: DIST_NAME comes from webpack.
+            vs: assetUrl(`/${__DIST__NAME__}/monaco-editor-30-1/min/vs`),
+        },
+    });
+}
 export interface ITextEditorProps {
     language: string;
     // A URI pointing to a JSON schema to validate the document with.
@@ -26,6 +30,7 @@ export interface ITextEditorProps {
     editorDidMount?: DiffEditorDidMount;
     minimal?: boolean;
     noPadding?: boolean;
+    className?: string;
 }
 
 type VsTheme = "vs-light" | "vs-dark";
@@ -122,7 +127,7 @@ export default function TextEditor(props: ITextEditorProps) {
             onClick={(e) => {
                 e.stopPropagation();
             }}
-            className={classes.root(theme, props.minimal, props.noPadding)}
+            className={cx(classes.root(theme, props.minimal, props.noPadding), props.className)}
         >
             <button type="button" onClick={toggleTheme} className={classes.themeToggleIcon} disabled={!isEditorReady}>
                 {themeModeButton}

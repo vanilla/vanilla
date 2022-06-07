@@ -174,9 +174,10 @@ export default function BrandingAndSEOPage() {
     const settings = useConfigsByKeys(Object.keys(BRANDING_SETTINGS["properties"]));
 
     // Load state for the setting values
-    const isLoaded = useMemo<boolean>(() => [LoadStatus.SUCCESS, LoadStatus.ERROR].includes(settings.status), [
-        settings,
-    ]);
+    const isLoaded = useMemo<boolean>(
+        () => [LoadStatus.SUCCESS, LoadStatus.ERROR].includes(settings.status),
+        [settings],
+    );
 
     const [value, setValue] = useState<JsonSchema>(
         Object.fromEntries(

@@ -4,47 +4,62 @@
  * @license gpl-2.0-only
  */
 
+import { LayoutOverviewRoute, LegacyLayoutsRoute } from "@dashboard/appearance/routes/appearanceRoutes";
 import { LayoutEditor } from "@dashboard/layout/editor/LayoutEditor";
 import { useLayoutDraft, useTextEditorJsonBuffer } from "@dashboard/layout/editor/LayoutEditor.hooks";
 import { LayoutEditorTitleBar } from "@dashboard/layout/editor/LayoutEditorTitleBar";
 import { useLayoutCatalog } from "@dashboard/layout/layoutSettings/LayoutSettings.hooks";
-import { ILayoutDetails, LayoutViewType } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
+import { LayoutViewType } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { LayoutOverviewSkeleton } from "@dashboard/layout/overview/LayoutOverviewSkeleton";
+import { useToast } from "@library/features/toaster/ToastContext";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import Message from "@library/messages/Message";
 import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
 import TextEditor from "@library/textEditor/TextEditor";
-import { siteUrl, t } from "@library/utility/appUtils";
-import React from "react";
+import { getRelativeUrl, siteUrl, t } from "@library/utility/appUtils";
+import React, { useState } from "react";
 import { RouteComponentProps } from "react-router-dom";
 
 export default function LayoutTextEditorPage(
     props: RouteComponentProps<{
         layoutViewType: LayoutViewType;
         layoutID?: string;
-    }> & {
-        draftID?: ILayoutDetails["layoutID"];
-    },
+    }>,
 ) {
+    const { history } = props;
     const { layoutViewType, layoutID } = props.match.params;
     const { layoutDraft, persistDraft, updateDraft } = useLayoutDraft(layoutID, layoutViewType);
-    const {
-        textContent,
-        setTextContent,
-        loadTextDraft,
-        validateTextDraft,
-        dismissJsonError,
-        jsonErrorMessage,
-    } = useTextEditorJsonBuffer();
+    const toast = useToast();
+
+    const [isSaving, setIsSaving] = useState(false);
+
+    const { textContent, setTextContent, loadTextDraft, validateTextDraft, dismissJsonError, jsonErrorMessage } =
+        useTextEditorJsonBuffer();
     const catalog = useLayoutCatalog(layoutViewType);
 
     async function handleSave() {
         if (!layoutDraft) {
             return;
         }
-        await persistDraft(layoutDraft);
+
+        try {
+            setIsSaving(true);
+            const savedLayout = await persistDraft(layoutDraft);
+            if (savedLayout) {
+                history.replace(getRelativeUrl(LayoutOverviewRoute.url(savedLayout)));
+                toast.addToast({
+                    autoDismiss: true,
+                    body: <>{t("Layout saved.")}</>,
+                });
+            }
+        } catch (e) {
+            toast.addToast({
+                autoDismiss: true,
+                body: <>{e.description}</>,
+            });
+        }
     }
 
     function openTextEditor() {
@@ -78,9 +93,22 @@ export default function LayoutTextEditorPage(
                     </Button>
                 }
                 onSave={handleSave}
-                layoutViewType={layoutViewType}
-                layoutID={layoutID}
-                isSaveDisabled={!!jsonErrorMessage}
+                cancelPath={
+                    layoutID == null
+                        ? LegacyLayoutsRoute.url(layoutViewType)
+                        : LayoutOverviewRoute.url({
+                              name: layoutDraft?.name ?? t("My Layout"),
+                              layoutID,
+                              layoutViewType,
+                          })
+                }
+                autoFocusTitleInput={layoutID == null}
+                title={layoutDraft?.name ?? t("My Layout")}
+                onTitleChange={(newTitle) => {
+                    updateDraft({ name: newTitle });
+                }}
+                disableSave={!!jsonErrorMessage}
+                isSaving={isSaving}
             />
             {!layoutDraft || !catalog ? (
                 <LayoutOverviewSkeleton />

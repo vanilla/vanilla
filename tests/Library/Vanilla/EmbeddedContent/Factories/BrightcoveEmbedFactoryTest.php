@@ -14,15 +14,16 @@ use VanillaTests\MinimalContainerTestCase;
 /**
  * Tests for the Brightcove embed factory.
  */
-class BrightcoveEmbedFactoryTest extends MinimalContainerTestCase {
-
+class BrightcoveEmbedFactoryTest extends MinimalContainerTestCase
+{
     /** @var BrightcoveEmbedFactory */
     private $factory;
 
     /**
      * Set the factory.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         $this->factory = new BrightcoveEmbedFactory();
     }
@@ -33,7 +34,8 @@ class BrightcoveEmbedFactoryTest extends MinimalContainerTestCase {
      * @param string $urlToTest
      * @dataProvider supportedUrlsProvider
      */
-    public function testSupportedUrls(string $urlToTest) {
+    public function testSupportedUrls(string $urlToTest)
+    {
         $this->assertTrue($this->factory->canHandleUrl($urlToTest));
     }
 
@@ -42,10 +44,9 @@ class BrightcoveEmbedFactoryTest extends MinimalContainerTestCase {
      *
      * @return array
      */
-    public function supportedUrlsProvider(): array {
-        return [
-            ['https://players.brightcove.net/1160438696001/hUGC1VhwM_default/index.html?videoId=5842888344001']
-        ];
+    public function supportedUrlsProvider(): array
+    {
+        return [["https://players.brightcove.net/1160438696001/hUGC1VhwM_default/index.html?videoId=5842888344001"]];
     }
 
     /**
@@ -54,27 +55,29 @@ class BrightcoveEmbedFactoryTest extends MinimalContainerTestCase {
      * @param string $urlToTest
      * @dataProvider supportedUrlsProvider
      */
-    public function testCreateEmbedForUrl(string $urlToTest) {
+    public function testCreateEmbedForUrl(string $urlToTest)
+    {
         $parameters = [];
-        parse_str(
-            parse_url($urlToTest, PHP_URL_QUERY) ?? "",
-            $parameters
+        parse_str(parse_url($urlToTest, PHP_URL_QUERY) ?? "", $parameters);
+        preg_match(
+            "`^/(?<account>[\w]+)\/(?<player>[\w]+)_(?<embed>[\w]+)\/index\.html$`",
+            parse_url($urlToTest, PHP_URL_PATH),
+            $matches
         );
-        preg_match("`^/(?<account>[\w]+)\/(?<player>[\w]+)_(?<embed>[\w]+)\/index\.html$`", parse_url($urlToTest, PHP_URL_PATH), $matches);
 
         $data = [
-            'embedType' => BrightcoveEmbed::TYPE,
-            'url' => $urlToTest,
-            'videoID' => $parameters['videoId'] ?? null,
-            'account' => $matches['account'] ?? null,
-            'playerID' => $matches['player'] ?? null,
-            'playerEmbed' => $matches['embed'] ?? null,
+            "embedType" => BrightcoveEmbed::TYPE,
+            "url" => $urlToTest,
+            "videoID" => $parameters["videoId"] ?? null,
+            "account" => $matches["account"] ?? null,
+            "playerID" => $matches["player"] ?? null,
+            "playerEmbed" => $matches["embed"] ?? null,
         ];
 
         $BrightcoveEmbed = $this->factory->createEmbedForUrl($urlToTest);
         $embedData = $BrightcoveEmbed->jsonSerialize();
 
-        $this->assertEquals($data, $embedData, 'Data can be used to render embed.');
+        $this->assertEquals($data, $embedData, "Data can be used to render embed.");
 
         $embed = new BrightcoveEmbed($embedData);
         $this->assertInstanceOf(BrightcoveEmbed::class, $embed);

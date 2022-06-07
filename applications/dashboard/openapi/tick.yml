@@ -4,6 +4,12 @@ paths:
     /tick:
         post:
             summary: Register a page view for statistical and analytical purpose.
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/PageView"
+                required: true
             responses:
                 "201":
                     description: Success
@@ -11,3 +17,21 @@ paths:
                 - Statistics
 components:
     schemas:
+        PageView:
+            properties:
+                url:
+                    description: URL of page view to track for analytics
+                    minLength: 1
+                    type: string
+                referrer:
+                    description: URL of referrer
+                    type: string
+                type:
+                    description: The type of page view event (i.e. page_view, discussion_view)
+                    type: string
+                discussionID:
+                    description: The ID of a discussion to include in analytics
+                    type: integer
+            required:
+                - url
+            type: object

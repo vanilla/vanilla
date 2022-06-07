@@ -10,7 +10,8 @@ namespace VanillaTests\Fixtures\Aliases;
 /**
  * Dummy class fixture.
  */
-class NewClass {
+class NewClass
+{
 }
 
 TestAliasLoader::createAliases(NewClass::class);

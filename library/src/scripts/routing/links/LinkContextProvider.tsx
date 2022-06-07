@@ -7,7 +7,8 @@
 import React, { useContext, useCallback } from "react";
 import { formatUrl } from "@library/utility/appUtils";
 import { createPath, LocationDescriptor, LocationDescriptorObject } from "history";
-import { useHistory } from "react-router";
+import { useHistory, useRouteMatch } from "react-router";
+import { isLayoutRoute } from "@library/features/Layout/LayoutPage";
 
 export interface IWithLinkContext {
     linkContexts: string[];
@@ -44,11 +45,12 @@ interface IProps {
     linkContexts: string[];
     children: React.ReactNode;
     urlFormatter?: (url: string, withDomain?: boolean) => string;
+    useLayoutRouting?: boolean;
 }
 
 export const LinkContextProvider = (props: IProps) => {
     const history = useHistory();
-    const { urlFormatter, linkContexts } = props;
+    const { urlFormatter, linkContexts, useLayoutRouting } = props;
 
     const makeHref = useCallback(
         (location: LocationDescriptor): string => {
@@ -70,6 +72,9 @@ export const LinkContextProvider = (props: IProps) => {
      */
     const isDynamicNavigation = useCallback(
         (href: string): boolean => {
+            if (useLayoutRouting) {
+                return isLayoutRoute(href);
+            }
             const link = new URL(href, window.location.href);
             const isCurrentPage = link.pathname === window.location.pathname && link.search === window.location.search;
 
@@ -83,7 +88,7 @@ export const LinkContextProvider = (props: IProps) => {
 
             return matchesContext && !isCurrentPage;
         },
-        [linkContexts],
+        [linkContexts, useLayoutRouting],
     );
 
     const pushSmartLocation = useCallback(

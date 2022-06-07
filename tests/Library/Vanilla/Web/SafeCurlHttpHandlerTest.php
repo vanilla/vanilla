@@ -16,15 +16,15 @@ use VanillaTests\BootstrapTestCase;
  * Class SafeCurlHttpHandlerTest
  * @package VanillaTests\Library\Vanilla\Web
  */
-class SafeCurlHttpHandlerTest extends BootstrapTestCase {
-
-
+class SafeCurlHttpHandlerTest extends BootstrapTestCase
+{
     /**
      * Provide test data for testNoExceptionThrown.
      *
      * @return string[][]
      */
-    public function provideTestNoExceptionThrownData(): array {
+    public function provideTestNoExceptionThrownData(): array
+    {
         $r = [
             "notUrl" => ["not-a-url"],
             "badIP" => ["http://0.0.0.0:123"],
@@ -42,7 +42,8 @@ class SafeCurlHttpHandlerTest extends BootstrapTestCase {
      * @throws \Garden\Container\NotFoundException Not Found exception.
      * @dataProvider provideTestNoExceptionThrownData
      */
-    public function testNoExceptionThrown(string $url) {
+    public function testNoExceptionThrown(string $url)
+    {
         $request = Gdn::getContainer()->get(HttpRequest::class);
         $request->setMethod("POST");
         $request->setUrl($url);
@@ -51,9 +52,9 @@ class SafeCurlHttpHandlerTest extends BootstrapTestCase {
         try {
             $response = $safeCurl->send($request);
             $rawBody = json_decode($response->getRawBody(), true);
-            $this->assertArrayHasKey('error', $rawBody);
+            $this->assertArrayHasKey("error", $rawBody);
         } catch (\Exception $e) {
-            $this->fail('SafeCurl should catch all exceptions');
+            $this->fail("SafeCurl should catch all exceptions");
         }
     }
 }

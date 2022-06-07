@@ -17,17 +17,18 @@ use VanillaTests\SiteTestCase;
 /**
  * Tests for the page controller route.
  */
-class PageControllerRouteTest extends SiteTestCase {
-
+class PageControllerRouteTest extends SiteTestCase
+{
     /**
      * Configure the container before addons are started.
      *
      * @param Container $container
      */
-    public static function configureContainerBeforeStartup(Container $container) {
+    public static function configureContainerBeforeStartup(Container $container)
+    {
         PageControllerRoute::configurePageRoutes(self::container(), [
-            '/test/nested' => TestPageController::class,
-            '/not-nested' => TestPageController::class,
+            "/test/nested" => TestPageController::class,
+            "/not-nested" => TestPageController::class,
         ]);
     }
 
@@ -36,19 +37,20 @@ class PageControllerRouteTest extends SiteTestCase {
      *
      * @return void
      */
-    public function testResolvesRoute() {
+    public function testResolvesRoute()
+    {
         $dispatcher = self::container()->get(Dispatcher::class);
 
         $expectedTitles = [
-            '/test/nested/hello' => 200,
-            '/test/nested/world' => 200,
-            '/not-nested/hello' => 200,
-            '/not-nested/world' => 200,
+            "/test/nested/hello" => 200,
+            "/test/nested/world" => 200,
+            "/not-nested/hello" => 200,
+            "/not-nested/world" => 200,
 
             // Bad
-            '/test/nested/test/nested/hello' => 404,
-            '/test/nested' => 404,
-            '/test/nested/other' => 404,
+            "/test/nested/test/nested/hello" => 404,
+            "/test/nested" => 404,
+            "/test/nested/other" => 404,
         ];
 
         foreach ($expectedTitles as $url => $responseCode) {

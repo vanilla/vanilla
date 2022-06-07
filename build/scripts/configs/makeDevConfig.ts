@@ -31,6 +31,7 @@ export async function makeDevConfig(entryModel: EntryModel, section: string) {
     baseConfig.plugins!.push(
         new ReactRefreshPlugin({
             forceEnable: true,
+            overlay: false,
         }),
     );
     baseConfig.plugins!.push(

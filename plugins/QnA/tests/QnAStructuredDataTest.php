@@ -16,17 +16,16 @@ use VanillaTests\SiteTestCase;
 use VanillaTests\SiteTestTrait;
 use VanillaTests\EventSpyTestTrait;
 
-
 use VanillaTests\VanillaTestCase;
 
 /**
  * Test QnA page structured data.
  */
-class QnAStructuredDataTest extends SiteTestCase {
+class QnAStructuredDataTest extends SiteTestCase
+{
     use SetupTraitsTrait, EventSpyTestTrait, QnaApiTestTrait;
 
-    public static $addons = ['qna'];
-
+    public static $addons = ["qna"];
 
     /** @var AnswerModel */
     private $answerModel;
@@ -42,7 +41,8 @@ class QnAStructuredDataTest extends SiteTestCase {
     /**
      * Instantiate fixtures.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         $this->categoryID = $this->createCategory()["categoryID"];
@@ -56,60 +56,60 @@ class QnAStructuredDataTest extends SiteTestCase {
     /**
      * Tests we have QAPage structured data in the response.
      */
-    public function testQnaPageStructuredData() {
+    public function testQnaPageStructuredData()
+    {
         $question = $this->createQuestion([
-            'categoryID' => $this->categoryID,
-            'name' => 'Question 1',
-            'body' => 'Question 1',
+            "categoryID" => $this->categoryID,
+            "name" => "Question 1",
+            "body" => "Question 1",
         ]);
 
         $this->createAnswer([
-            'discussionID' => $question['discussionID'],
-            'name' => 'Answer 1',
-            'body' => 'Answer 1',
+            "discussionID" => $question["discussionID"],
+            "name" => "Answer 1",
+            "body" => "Answer 1",
         ]);
 
         $answer2 = $this->createAnswer([
-            'discussionID' => $question['discussionID'],
-            'name' => 'Answer 2',
-            'body' => 'Answer 2',
+            "discussionID" => $question["discussionID"],
+            "name" => "Answer 2",
+            "body" => "Answer 2",
         ]);
         $this->createAnswer([
-            'discussionID' => $question['discussionID'],
-            'name' => 'Answer 3',
-            'body' => 'Answer 3',
+            "discussionID" => $question["discussionID"],
+            "name" => "Answer 3",
+            "body" => "Answer 3",
         ]);
         $answer4 = $this->createAnswer([
-            'discussionID' => $question['discussionID'],
-            'name' => 'Answer 4',
-            'body' => 'Answer 4',
+            "discussionID" => $question["discussionID"],
+            "name" => "Answer 4",
+            "body" => "Answer 4",
         ]);
 
-        $this->answerModel->updateCommentQnA($question, $answer2, 'Accepted');
-        $this->answerModel->updateCommentQnA($question, $answer4, 'Accepted');
+        $this->answerModel->updateCommentQnA($question, $answer2, "Accepted");
+        $this->answerModel->updateCommentQnA($question, $answer4, "Accepted");
 
-        $this->commentModel->setField($answer4['commentID'], 'Score', 1234);
+        $this->commentModel->setField($answer4["commentID"], "Score", 1234);
 
         $this->recalculateDiscussionQnA($question);
 
-
-        $response = $this->bessy()->get('/discussion/'.$question['discussionID']);
+        $response = $this->bessy()->get("/discussion/" . $question["discussionID"]);
         $jsonLDItems = array_map(function (AbstractJsonLDItem $item) {
             return $item->calculateValue()->getData();
         }, $response->Head->getJsonLDItems());
-        $schemaTypes = array_column($jsonLDItems, '@type');
+        $schemaTypes = array_column($jsonLDItems, "@type");
         $index = array_keys($schemaTypes, "QAPage");
         $this->assertContains("QAPage", $schemaTypes);
         $answerJson = $jsonLDItems[$index[0]];
         $this->assertCount(1, $index);
-        $this->assertCount(2, $answerJson['mainEntity']['acceptedAnswer']);
+        $this->assertCount(2, $answerJson["mainEntity"]["acceptedAnswer"]);
 
         $found = false;
-        foreach ($answerJson['mainEntity']['acceptedAnswer'] as $answer) {
-            $this->assertArrayHasKey('upvoteCount', $answer);
-            if ($answer['url'] === $answer4['url']) {
+        foreach ($answerJson["mainEntity"]["acceptedAnswer"] as $answer) {
+            $this->assertArrayHasKey("upvoteCount", $answer);
+            if ($answer["url"] === $answer4["url"]) {
                 $found = true;
-                $this->assertSame(1234, $answer['upvoteCount']);
+                $this->assertSame(1234, $answer["upvoteCount"]);
             }
         }
         $this->assertTrue($found, "Answer 4 was not found in the JSON LD.");

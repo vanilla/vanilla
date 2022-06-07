@@ -16,7 +16,8 @@ use ReflectionMethod;
 /**
  * Maps a PHP controller method to an open API action.
  */
-class ReflectionAction {
+class ReflectionAction
+{
     /**
      * @var ReflectionMethod
      */
@@ -114,29 +115,32 @@ class ReflectionAction {
      * [map requests to methods](http://docs.vanillaforums.com/developer/framework/apiv2/resource-routing/#methods-names-actions).
      * @throws \InvalidArgumentException Throws an exception if the object in the callback is not named with the *ApiController suffix.
      */
-    private function reflectAction() {
+    private function reflectAction()
+    {
         $method = $this->method;
         $controllerPattern = $this->route->getControllerPattern();
         if (is_array($controllerPattern)) {
             $controllerPattern = reset($controllerPattern);
         }
-        $resourceRegex = str_replace(['%s', '*\\'], ['([a-z][a-z0-9]*)', '(?:^|\\\\)'], $controllerPattern);
+        $resourceRegex = str_replace(["%s", "*\\"], ["([a-z][a-z0-9]*)", "(?:^|\\\\)"], $controllerPattern);
 
         // Regex the method name against event handler syntax or regular method syntax.
-        if (preg_match(
-            "`^(?:(?<class>$resourceRegex)_)?(?<method>get|post|patch|put|options|delete|index)(?:_(?<path>[a-z0-9]+?))?$`i",
-            $method->getName(),
-            $m
-        )) {
-            $controller = $m['class'] ?: get_class($this->controllerInstance);
-            $httpMethod = $m['method'];
-            $subpath = isset($m['path']) ? $m['path'] : '';
+        if (
+            preg_match(
+                "`^(?:(?<class>$resourceRegex)_)?(?<method>get|post|patch|put|options|delete|index)(?:_(?<path>[a-z0-9]+?))?$`i",
+                $method->getName(),
+                $m
+            )
+        ) {
+            $controller = $m["class"] ?: get_class($this->controllerInstance);
+            $httpMethod = $m["method"];
+            $subpath = isset($m["path"]) ? $m["path"] : "";
         } else {
             throw new \InvalidArgumentException("The method name does not match an action's pattern", 500);
         }
 
-        if (strcasecmp($httpMethod, 'index') === 0) {
-            $httpMethod = 'GET';
+        if (strcasecmp($httpMethod, "index") === 0) {
+            $httpMethod = "GET";
         }
 
         // Check against the controller pattern.
@@ -148,7 +152,7 @@ class ReflectionAction {
 
         $this->httpMethod = strtoupper($httpMethod);
         $this->resource = $this->dashCase($resource);
-        $this->subpath = ltrim('/'.$this->dashCase($subpath), '/');
+        $this->subpath = ltrim("/" . $this->dashCase($subpath), "/");
 
         $this->args = [];
         $eventBound = $method->class !== $controller;
@@ -168,20 +172,20 @@ class ReflectionAction {
             } elseif ($param->hasType()) {
                 $type = $param->getType();
                 switch (strtolower($type->__toString())) {
-                    case 'bool':
+                    case "bool":
                         $arg = false;
-                        $schemaType = 'boolean';
+                        $schemaType = "boolean";
                         break;
-                    case 'int':
+                    case "int":
                         $arg = 0;
-                        $schemaType = 'integer';
+                        $schemaType = "integer";
                         break;
-                    case 'float':
+                    case "float":
                         $arg = 0.0;
-                        $schemaType = 'float';
+                        $schemaType = "float";
                         break;
-                    case 'string':
-                        $arg = '';
+                    case "string":
+                        $arg = "";
                         break;
                     default:
                         $arg = null;
@@ -194,14 +198,14 @@ class ReflectionAction {
             $p = null;
             if ($this->route->isMapped($param, Route::MAP_BODY)) {
                 $this->bodyParam = $param->getName();
-                $p = ['name' => $param->getName(), 'in' => 'body', 'required' => true];
+                $p = ["name" => $param->getName(), "in" => "body", "required" => true];
             } elseif (!$param->getClass() && !$this->route->isMapped($param)) {
-                $p = ['name' => $param->getName(), 'in' => 'path', 'required' => true];
+                $p = ["name" => $param->getName(), "in" => "path", "required" => true];
                 if (isset($schemaType)) {
-                    $p['type'] = $schemaType;
+                    $p["type"] = $schemaType;
                 }
 
-                $constraint = (array)$this->route->getConstraint($param->getName()) + ['position' => '*'];
+                $constraint = (array) $this->route->getConstraint($param->getName()) + ["position" => "*"];
 
                 $position = $param->getPosition();
                 if ($eventBound) {
@@ -209,17 +213,17 @@ class ReflectionAction {
                 }
 
                 // Check if the "first" parameter is an idParam.
-                if ($position === 0 && $constraint['position'] === $position) {
+                if ($position === 0 && $constraint["position"] === $position) {
                     $this->idParam = $param->getName();
                 }
             }
 
             if ($p !== null) {
                 if ($param->isDefaultValueAvailable()) {
-                    $p['default'] = $param->getDefaultValue();
+                    $p["default"] = $param->getDefaultValue();
                 }
 
-                $this->params[$p['name']] = $p;
+                $this->params[$p["name"]] = $p;
             }
         }
     }
@@ -230,7 +234,8 @@ class ReflectionAction {
      * @return array Returns an operation array.
      * @see https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#operationObject
      */
-    public function getOperation() {
+    public function getOperation()
+    {
         if ($this->operation === null) {
             $this->operation = $this->makeOperation();
         }
@@ -243,20 +248,21 @@ class ReflectionAction {
      * @return array Returns an operation array.
      * @see https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#operationObject
      */
-    private function makeOperation() {
+    private function makeOperation()
+    {
         /* @var Schema $in, $allIn */
         /* @var Schema $out */
         /* @var Schema $allIn */
         $in = $out = $allIn = null;
-        $summary = '';
+        $summary = "";
         $other = [];
 
         // Set up an event handler that will capture the schemas.
-        $fn  = function ($controller, Schema $schema, $type) use (&$in, &$out, &$allIn) {
+        $fn = function ($controller, Schema $schema, $type) use (&$in, &$out, &$allIn) {
             $this->massageSchema($schema);
 
             switch ($type) {
-                case 'in':
+                case "in":
                     if (empty($this->bodyParam)) {
                         if ($allIn instanceof Schema) {
                             $allIn = $allIn->merge($schema);
@@ -268,25 +274,25 @@ class ReflectionAction {
                     }
                     $in = $schema;
                     break;
-                case 'out':
+                case "out":
                     $out = $schema;
                     throw new ShortCircuitException();
             }
         };
 
         try {
-            $this->eventManager->bind('controller_schema', $fn, EventManager::PRIORITY_LOW);
+            $this->eventManager->bind("controller_schema", $fn, EventManager::PRIORITY_LOW);
 
             $r = $this->method->invoke($this->methodInstance, ...array_values($this->args));
-
         } catch (ShortCircuitException $ex) {
             // We should have everything we need now.
         } catch (\Throwable $ex) {
-            $other['deprecated'] = true;
+            $other["deprecated"] = true;
             // We shouldn't get here, but let's allow it.
-            $summary = "Something happened before the output schema was found. The endpoint most likely didn't define its output properly.";
+            $summary =
+                "Something happened before the output schema was found. The endpoint most likely didn't define its output properly.";
         } finally {
-            $this->eventManager->unbind('controller_schema', $fn);
+            $this->eventManager->unbind("controller_schema", $fn);
         }
 
         // Fill in information about the parameters from the input schema.
@@ -297,40 +303,43 @@ class ReflectionAction {
             }
             $inArr = $this->jsonSerializeSchema($in);
             $allInArr = $allIn !== null ? $allIn->jsonSerialize() : [];
-            unset($inArr['description']);
+            unset($inArr["description"]);
 
             if (!empty($this->bodyParam)) {
-                $this->params[$this->bodyParam]['schema'] = $inArr;
+                $this->params[$this->bodyParam]["schema"] = $inArr;
                 /* @var array $property */
-                foreach ($allInArr['properties'] as $name => $property) {
+                foreach ($allInArr["properties"] as $name => $property) {
                     if (isset($this->params[$name])) {
-                        $this->params[$name] = (array)$this->params[$name] + (array)$property;
+                        $this->params[$name] = (array) $this->params[$name] + (array) $property;
                     }
                 }
             } else {
                 /* @var array $property */
-                foreach ($allInArr['properties'] as $name => $property) {
+                foreach ($allInArr["properties"] as $name => $property) {
                     if (isset($this->params[$name])) {
-                        $this->params[$name] = (array)$this->params[$name] + (array)$property;
+                        $this->params[$name] = (array) $this->params[$name] + (array) $property;
                     } else {
-                        $this->params[$name] = ['name' => $name, 'in' => 'query'] + $property;
+                        $this->params[$name] = ["name" => $name, "in" => "query"] + $property;
                     }
                     $param = &$this->params[$name];
 
-                    if (isset($property['enum']) && is_array($property['enum'])) {
-                        $enumDescription = 'Must be one of: '.implode(', ', array_map('json_encode', $property['enum'])).'.';
+                    if (isset($property["enum"]) && is_array($property["enum"])) {
+                        $enumDescription =
+                            "Must be one of: " . implode(", ", array_map("json_encode", $property["enum"])) . ".";
 
-                        $param['description'] = (empty($param['description']) ? '' : rtrim($param['description'], '.').".\n").$enumDescription;
+                        $param["description"] =
+                            (empty($param["description"]) ? "" : rtrim($param["description"], ".") . ".\n") .
+                            $enumDescription;
                     }
 
-                    if (isset($param['description'])) {
-                        $param['description'] = \Gdn_Format::to($param['description'], 'markdown');
+                    if (isset($param["description"])) {
+                        $param["description"] = \Gdn_Format::to($param["description"], "markdown");
                     }
 
-                    if (isset($allInArr['required']) && in_array($name, $allInArr['required'])) {
-                        $param['required'] = true;
-                    } elseif (isset($param['required'])) {
-                        unset($param['required']);
+                    if (isset($allInArr["required"]) && in_array($name, $allInArr["required"])) {
+                        $param["required"] = true;
+                    } elseif (isset($param["required"])) {
+                        unset($param["required"]);
                     }
                 }
             }
@@ -338,35 +347,36 @@ class ReflectionAction {
 
         // Make sure the parameters have a type now.
         foreach ($this->params as $name => &$param) {
-            if ($param['in'] === 'path') {
-                $param += ['type' => $name === $this->idParam ? 'integer' : 'string'];
-                $param['required'] = true;
+            if ($param["in"] === "path") {
+                $param += ["type" => $name === $this->idParam ? "integer" : "string"];
+                $param["required"] = true;
             }
 
-            if (array_key_exists('default', $param) && $param['default'] === null) {
-                $param['x-default'] = null;
-                unset($param['default']);
+            if (array_key_exists("default", $param) && $param["default"] === null) {
+                $param["x-default"] = null;
+                unset($param["default"]);
             }
         }
 
         // Fill in the responses.
         $responses = [];
         if ($out instanceof Schema && !empty($out->getSchemaArray())) {
-            $status = $this->httpMethod === 'POST' && empty($this->idParam) ? '201' : '200';
+            $status = $this->httpMethod === "POST" && empty($this->idParam) ? "201" : "200";
 
-            $responses[$status]['description'] = $out->getDescription() ?: 'Success';
-            $responses[$status]['schema'] = $this->jsonSerializeSchema($out);
+            $responses[$status]["description"] = $out->getDescription() ?: "Success";
+            $responses[$status]["schema"] = $this->jsonSerializeSchema($out);
         } else {
-            $status = $this->httpMethod === 'POST' && empty($this->idParam) ? '201' : '204';
-            $responses[$status]['description'] = 'Success';
+            $status = $this->httpMethod === "POST" && empty($this->idParam) ? "201" : "204";
+            $responses[$status]["description"] = "Success";
         }
 
-        $r = [
-            'tags' => [$this->getNiceResourceName()],
-            'summary' => $summary,
-            'parameters' => array_values($this->params),
-            'responses' => $responses
-        ] + $other;
+        $r =
+            [
+                "tags" => [$this->getNiceResourceName()],
+                "summary" => $summary,
+                "parameters" => array_values($this->params),
+                "responses" => $responses,
+            ] + $other;
 
         return array_filter($r);
     }
@@ -377,10 +387,11 @@ class ReflectionAction {
      * @param string $str The string to convert.
      * @return string Returns a dash-case string.
      */
-    private function dashCase($str) {
-        $str = preg_replace('`(?<![A-Z0-9])([A-Z0-9])`', '-$1', $str);
-        $str = preg_replace('`(?<!-)([A-Z0-9])(?=[a-z])`', '-$1', $str);
-        $str = trim($str, '-');
+    private function dashCase($str)
+    {
+        $str = preg_replace("`(?<![A-Z0-9])([A-Z0-9])`", '-$1', $str);
+        $str = preg_replace("`(?<!-)([A-Z0-9])(?=[a-z])`", '-$1', $str);
+        $str = trim($str, "-");
 
         return strtolower($str);
     }
@@ -390,7 +401,8 @@ class ReflectionAction {
      *
      * @return string Returns the name of an HTTP method.
      */
-    public function getHttpMethod() {
+    public function getHttpMethod()
+    {
         return $this->httpMethod;
     }
 
@@ -399,14 +411,17 @@ class ReflectionAction {
      *
      * @return string Returns the path as a string.
      */
-    public function getPath() {
-        $r = '/'.$this->resource.
-            ($this->idParam ? '/{'.$this->idParam.'}' : '').
-            (empty($this->subpath) ? '' : '/'.$this->subpath);
+    public function getPath()
+    {
+        $r =
+            "/" .
+            $this->resource .
+            ($this->idParam ? "/{" . $this->idParam . "}" : "") .
+            (empty($this->subpath) ? "" : "/" . $this->subpath);
 
         foreach ($this->params as $key => $param) {
-            if ($param['in'] === 'path' && $key !== $this->idParam) {
-                $r .= '/{'.$key.'}';
+            if ($param["in"] === "path" && $key !== $this->idParam) {
+                $r .= "/{" . $key . "}";
             }
         }
 
@@ -421,7 +436,8 @@ class ReflectionAction {
      *
      * @return string Returns the subpath.
      */
-    public function getSubpath() {
+    public function getSubpath()
+    {
         return $this->subpath;
     }
 
@@ -430,35 +446,36 @@ class ReflectionAction {
      *
      * @param Schema $schema The schema to massage.
      */
-    private function massageSchema(Schema $schema) {
+    private function massageSchema(Schema $schema)
+    {
         $arr = $schema->getSchemaArray();
         $this->walkSchemas($arr, function (&$sch, $key, $parent) {
-            if (is_array($sch['type'])) {
+            if (is_array($sch["type"])) {
                 // Check for a null type.
-                if (count($sch['type']) === 2 && in_array('null', $sch['type'])) {
-                    $sch['x-nullable'] = true;
-                    $arr = array_filter($sch['type'], function ($v) {
-                        return $v !== 'null';
+                if (count($sch["type"]) === 2 && in_array("null", $sch["type"])) {
+                    $sch["x-nullable"] = true;
+                    $arr = array_filter($sch["type"], function ($v) {
+                        return $v !== "null";
                     });
-                    $sch['type'] = array_pop($arr);
+                    $sch["type"] = array_pop($arr);
                 }
 
                 // Remove the boolean type from expand.
-                if ($key === 'expand' && count($sch['type']) === 2 && in_array('boolean', $sch['type'])) {
-                    $sch['type'] = 'array';
-                    if (isset($sch['default'])) {
-                        if ($sch['default'] === false) {
-                            unset($sch['default']);
-                        } elseif ($sch['default'] === 'true') {
-                            $sch['default'] = [\Vanilla\ApiUtils::EXPAND_ALL];
+                if ($key === "expand" && count($sch["type"]) === 2 && in_array("boolean", $sch["type"])) {
+                    $sch["type"] = "array";
+                    if (isset($sch["default"])) {
+                        if ($sch["default"] === false) {
+                            unset($sch["default"]);
+                        } elseif ($sch["default"] === "true") {
+                            $sch["default"] = [\Vanilla\ApiUtils::EXPAND_ALL];
                         }
                     }
                 }
             }
 
-            if ($sch['style'] ?? '' === 'form') {
-                $sch['collectionFormat'] = 'csv';
-                unset($sch['style']);
+            if ($sch["style"] ?? "" === "form") {
+                $sch["collectionFormat"] = "csv";
+                unset($sch["style"]);
             }
         });
 
@@ -472,14 +489,15 @@ class ReflectionAction {
      * @param callable $callback The callback to execute on each schema array.
      * @param int $depth The current depth.
      */
-    private function walkSchemas(array &$array, callable $callback, $depth = 0, array &$seen = null) {
+    private function walkSchemas(array &$array, callable $callback, $depth = 0, array &$seen = null)
+    {
         if ($seen === null) {
             $seen = [];
         }
 
         foreach ($array as $key => &$value) {
             if (is_array($value)) {
-                if (isset($value['type']) && $key !== 'properties') {
+                if (isset($value["type"]) && $key !== "properties") {
                     $callback($value, $key, $array);
                 }
                 $this->walkSchemas($value, $callback, $depth + 1, $seen);
@@ -488,14 +506,14 @@ class ReflectionAction {
 
                 if (!isset($seen[$key])) {
                     $arr = $value->getSchemaArray();
-                    $seen[$key] = $arr['id'] ?? true;
-                    if (isset($value['type']) && $key !== 'properties') {
+                    $seen[$key] = $arr["id"] ?? true;
+                    if (isset($value["type"]) && $key !== "properties") {
                         $callback($arr, $key, $array);
                     }
                     $this->walkSchemas($arr, $callback, $depth + 1, $seen);
                     $value->setField([], $arr);
                 } else {
-                    $foo = 'bar';
+                    $foo = "bar";
                 }
             }
         }
@@ -507,13 +525,14 @@ class ReflectionAction {
      * @param Schema $schema The schema to serialize.
      * @return mixed Returns a JSON serializable value.
      */
-    private function jsonSerializeSchema(Schema $schema) {
+    private function jsonSerializeSchema(Schema $schema)
+    {
         // Fix recursive schemas.
         $arr = $schema->getSchemaArray();
 
         array_walk_recursive($arr, function (&$value, $key) use ($schema) {
             if ($value === $schema) {
-                $value = ['$ref' => '#/definitions/'.$schema->getID()];
+                $value = ['$ref' => "#/definitions/" . $schema->getID()];
             } elseif ($value instanceof Schema) {
                 $value = $this->jsonSerializeSchema($value);
             }
@@ -529,7 +548,8 @@ class ReflectionAction {
      *
      * @return string Returns a resource name.
      */
-    private function getNiceResourceName(): string {
-        return implode(' ', array_map('ucfirst', explode('-', $this->resource)));
+    private function getNiceResourceName(): string
+    {
+        return implode(" ", array_map("ucfirst", explode("-", $this->resource)));
     }
 }

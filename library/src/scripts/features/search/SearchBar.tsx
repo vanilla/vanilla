@@ -364,8 +364,11 @@ function SearchBarControl(props: IControlProps) {
     const { optionsItems = [], value, onChange } = scope;
     const hasScope = scope.optionsItems.length > 1;
     const searchButtonIsVisible = !hasScope ? !hideSearchButton : false;
-    const { compact = false, borderRadius = searchBarVars.border.radius, preset = searchBarVars.options.preset } =
-        overwriteSearchBar || {};
+    const {
+        compact = false,
+        borderRadius = searchBarVars.border.radius,
+        preset = searchBarVars.options.preset,
+    } = overwriteSearchBar || {};
 
     // In case we'll need to use ID
     const ID = useMemo(() => uniqueIDFromPrefix("search"), []);

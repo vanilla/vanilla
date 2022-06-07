@@ -11,13 +11,14 @@
 /**
  * Handles regarding data.
  */
-class RegardingModel extends Gdn_Model {
-
+class RegardingModel extends Gdn_Model
+{
     /**
      * Class constructor. Defines the related database table name.
      */
-    public function __construct() {
-        parent::__construct('Regarding');
+    public function __construct()
+    {
+        parent::__construct("Regarding");
     }
 
     /**
@@ -28,8 +29,9 @@ class RegardingModel extends Gdn_Model {
      * @param array $options
      * @return array|bool|stdClass
      */
-    public function getID($id, $datasetType = false, $options = []) {
-        $regarding = $this->getWhere(['RegardingID' => $id])->firstRow();
+    public function getID($id, $datasetType = false, $options = [])
+    {
+        $regarding = $this->getWhere(["RegardingID" => $id])->firstRow();
         return $regarding;
     }
 
@@ -42,7 +44,8 @@ class RegardingModel extends Gdn_Model {
      * @param int|false $pageNumber
      * @return array|bool|stdClass
      */
-    public function get($orderFields = '', $orderDirection = 0, $limit = false, $pageNumber = false) {
+    public function get($orderFields = "", $orderDirection = 0, $limit = false, $pageNumber = false)
+    {
         // Kludge for PHP 8 compatibility.
         $foreignType = $orderFields;
         $foreignID = $orderDirection;
@@ -50,8 +53,8 @@ class RegardingModel extends Gdn_Model {
         \Webmozart\Assert\Assert::integer($foreignID);
 
         return $this->getWhere([
-            'ForeignType' => $foreignType,
-            'ForeignID' => $foreignID
+            "ForeignType" => $foreignType,
+            "ForeignID" => $foreignID,
         ])->firstRow(DATASET_TYPE_ARRAY);
     }
 
@@ -63,11 +66,12 @@ class RegardingModel extends Gdn_Model {
      * @param $foreignID
      * @return array|bool|stdClass
      */
-    public function getRelated($type, $foreignType, $foreignID) {
+    public function getRelated($type, $foreignType, $foreignID)
+    {
         return $this->getWhere([
-            'Type' => $type,
-            'ForeignType' => $foreignType,
-            'ForeignID' => $foreignID
+            "Type" => $type,
+            "ForeignType" => $foreignType,
+            "ForeignID" => $foreignID,
         ])->firstRow(DATASET_TYPE_ARRAY);
     }
 
@@ -78,15 +82,17 @@ class RegardingModel extends Gdn_Model {
      * @param array $foreignIDs
      * @return Gdn_DataSet
      */
-    public function getAll($foreignType, $foreignIDs = []) {
+    public function getAll($foreignType, $foreignIDs = [])
+    {
         if (count($foreignIDs) == 0) {
             return new Gdn_DataSet([]);
         }
 
-        return Gdn::sql()->select('*')
-            ->from('Regarding')
-            ->where('ForeignType', $foreignType)
-            ->whereIn('ForeignID', $foreignIDs)
+        return Gdn::sql()
+            ->select("*")
+            ->from("Regarding")
+            ->where("ForeignType", $foreignType)
+            ->whereIn("ForeignID", $foreignIDs)
             ->get();
     }
 }

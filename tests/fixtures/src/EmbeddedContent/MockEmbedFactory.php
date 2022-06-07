@@ -13,8 +13,8 @@ use Vanilla\EmbeddedContent\AbstractEmbedFactory;
 /**
  * Configurable mock implementation of an embed factory for usage in tests.
  */
-class MockEmbedFactory extends AbstractEmbedFactory {
-
+class MockEmbedFactory extends AbstractEmbedFactory
+{
     /** @var AbstractEmbed */
     private $embedToCreate;
 
@@ -27,14 +27,16 @@ class MockEmbedFactory extends AbstractEmbedFactory {
     /**
      * @param AbstractEmbed $embedToCreate
      */
-    public function __construct(AbstractEmbed $embedToCreate) {
+    public function __construct(AbstractEmbed $embedToCreate)
+    {
         $this->embedToCreate = $embedToCreate;
     }
 
     /**
      * @param bool $canHandleEmptyPaths
      */
-    public function setCanHandleEmptyPaths(bool $canHandleEmptyPaths): void {
+    public function setCanHandleEmptyPaths(bool $canHandleEmptyPaths): void
+    {
         $this->canHandleEmptyPaths = $canHandleEmptyPaths;
     }
 
@@ -42,7 +44,8 @@ class MockEmbedFactory extends AbstractEmbedFactory {
      * Configure the embed that will be returned by createEmbedForUrl and createEmbedFromData.
      * @param AbstractEmbed $embedToCreate
      */
-    public function setEmbedToCreate(AbstractEmbed $embedToCreate): void {
+    public function setEmbedToCreate(AbstractEmbed $embedToCreate): void
+    {
         $this->embedToCreate = $embedToCreate;
     }
 
@@ -53,7 +56,8 @@ class MockEmbedFactory extends AbstractEmbedFactory {
      *
      * @return $this
      */
-    public function setSupportedDomains(array $supportedDomains): MockEmbedFactory {
+    public function setSupportedDomains(array $supportedDomains): MockEmbedFactory
+    {
         $this->supportedDomains = $supportedDomains;
         return $this;
     }
@@ -65,7 +69,8 @@ class MockEmbedFactory extends AbstractEmbedFactory {
      *
      * @return $this
      */
-    public function setSupportedPathRegex(string $supportedPathRegex): MockEmbedFactory {
+    public function setSupportedPathRegex(string $supportedPathRegex): MockEmbedFactory
+    {
         $this->supportedPathRegex = $supportedPathRegex;
         return $this;
     }
@@ -73,21 +78,24 @@ class MockEmbedFactory extends AbstractEmbedFactory {
     /**
      * @inheritdoc
      */
-    protected function getSupportedDomains(): array {
+    protected function getSupportedDomains(): array
+    {
         return $this->supportedDomains;
     }
 
     /**
      * @inheritdoc
      */
-    protected function getSupportedPathRegex(string $domain): string {
+    protected function getSupportedPathRegex(string $domain): string
+    {
         return $this->supportedPathRegex;
     }
 
     /**
      * @inheritdoc
      */
-    public function createEmbedForUrl(string $url): AbstractEmbed {
+    public function createEmbedForUrl(string $url): AbstractEmbed
+    {
         return $this->embedToCreate;
     }
 }

@@ -8,6 +8,10 @@ namespace Vanilla\Dashboard\Models;
 
 use Garden\Schema\Schema;
 use Garden\Web\Exception\ClientException;
+use Gdn;
+use Gdn_Cache;
+use Gdn_DataSet;
+use Traversable;
 use Vanilla\Database\Operation\BooleanFieldProcessor;
 use Vanilla\Database\Operation\CurrentDateFieldProcessor;
 use Vanilla\Database\Operation\CurrentIPAddressProcessor;
@@ -18,10 +22,16 @@ use Vanilla\Utility\ArrayUtils;
 /**
  * Model for managing the recordStatus table.
  */
-class RecordStatusModel extends PipelineModel {
+class RecordStatusModel extends PipelineModel
+{
+    const RECORD_STATUS_ID_CACHE_KEY = "recordStatusIDs";
 
     //region Properties
     private const TABLE_NAME = "recordStatus";
+    /**
+     * @var array An array representation of all the record statuses in the database, indexed by StatusID.
+     */
+    protected $recordStatuses;
 
     public const DISCUSSION_STATUS_NONE = 0;
     public const DISCUSSION_STATUS_UNANSWERED = 1;
@@ -48,94 +58,94 @@ class RecordStatusModel extends PipelineModel {
 
     /** @var array */
     private const DEFAULT_DISCUSSION_STATUS = [
-        'statusID' => RecordStatusModel::DISCUSSION_STATUS_NONE,
-        'name' => 'None',
-        'state' => 'open',
-        'recordType' => 'discussion',
-        'recordSubtype' => 'discussion',
-        'isDefault' => 1,
-        'isSystem' => 1
+        "statusID" => RecordStatusModel::DISCUSSION_STATUS_NONE,
+        "name" => "None",
+        "state" => "open",
+        "recordType" => "discussion",
+        "recordSubtype" => "discussion",
+        "isDefault" => 1,
+        "isSystem" => 1,
     ];
 
     /** @var array */
     private const DEFAULT_QUESTION_UNANSWERED_STATUS = [
-        'statusID' => RecordStatusModel::DISCUSSION_STATUS_UNANSWERED,
-        'name' => 'Unanswered',
-        'state' => 'open',
-        'recordType' => 'discussion',
-        'recordSubtype' => 'question',
-        'isDefault' => 1,
-        'isSystem' => 1
+        "statusID" => RecordStatusModel::DISCUSSION_STATUS_UNANSWERED,
+        "name" => "Unanswered",
+        "state" => "open",
+        "recordType" => "discussion",
+        "recordSubtype" => "question",
+        "isDefault" => 1,
+        "isSystem" => 1,
     ];
     /** @var array */
     private const DEFAULT_QUESTION_ANSWERED_STATUS = [
-        'statusID' => RecordStatusModel::DISCUSSION_STATUS_ANSWERED,
-        'name' => 'Answered',
-        'state' => 'open',
-        'recordType' => 'discussion',
-        'recordSubtype' => 'question',
-        'isDefault' => 0,
-        'isSystem' => 1
+        "statusID" => RecordStatusModel::DISCUSSION_STATUS_ANSWERED,
+        "name" => "Answered",
+        "state" => "open",
+        "recordType" => "discussion",
+        "recordSubtype" => "question",
+        "isDefault" => 0,
+        "isSystem" => 1,
     ];
     /** @var array */
     private const DEFAULT_QUESTION_ACCEPTED_STATUS = [
-        'statusID' => RecordStatusModel::DISCUSSION_STATUS_ACCEPTED,
-        'name' => 'Accepted',
-        'state' => 'closed',
-        'recordType' => 'discussion',
-        'recordSubtype' => 'question',
-        'isDefault' => 0,
-        'isSystem' => 1
+        "statusID" => RecordStatusModel::DISCUSSION_STATUS_ACCEPTED,
+        "name" => "Accepted",
+        "state" => "closed",
+        "recordType" => "discussion",
+        "recordSubtype" => "question",
+        "isDefault" => 0,
+        "isSystem" => 1,
     ];
     /** @var array */
     protected const DEFAULT_QUESTION_REJECTED_STATUS = [
-        'statusID' => RecordStatusModel::DISCUSSION_STATUS_REJECTED,
-        'name' => 'Rejected',
-        'state' => 'open',
-        'recordType' => 'discussion',
-        'recordSubtype' => 'question',
-        'isDefault' => 0,
-        'isSystem' => 1
+        "statusID" => RecordStatusModel::DISCUSSION_STATUS_REJECTED,
+        "name" => "Rejected",
+        "state" => "open",
+        "recordType" => "discussion",
+        "recordSubtype" => "question",
+        "isDefault" => 0,
+        "isSystem" => 1,
     ];
     /** @var array */
     protected const DEFAULT_COMMENT_ACCEPTED_STATUS = [
-        'statusID' => RecordStatusModel::COMMENT_STATUS_ACCEPTED,
-        'name' => 'Accepted',
-        'state' => 'closed',
-        'recordType' => 'comment',
-        'recordSubtype' => 'answer',
-        'isDefault' => 0,
-        'isSystem' => 1
+        "statusID" => RecordStatusModel::COMMENT_STATUS_ACCEPTED,
+        "name" => "Accepted",
+        "state" => "closed",
+        "recordType" => "comment",
+        "recordSubtype" => "answer",
+        "isDefault" => 0,
+        "isSystem" => 1,
     ];
     /** @var array */
     protected const DEFAULT_COMMENT_REJECTED_STATUS = [
-        'statusID' => RecordStatusModel::COMMENT_STATUS_REJECTED,
-        'name' => 'Rejected',
-        'state' => 'closed',
-        'recordType' => 'comment',
-        'recordSubtype' => 'answer',
-        'isDefault' => 0,
-        'isSystem' => 1
+        "statusID" => RecordStatusModel::COMMENT_STATUS_REJECTED,
+        "name" => "Rejected",
+        "state" => "closed",
+        "recordType" => "comment",
+        "recordSubtype" => "answer",
+        "isDefault" => 0,
+        "isSystem" => 1,
     ];
     /** @var array */
     protected const DEFAULT_DISCUSSION_UNRESOLVED_STATUS = [
-        'statusID' => RecordStatusModel::DISCUSSION_STATUS_UNRESOLVED,
-        'name' => 'Unresolved',
-        'state' => 'open',
-        'recordType' => 'discussion',
-        'recordSubtype' => 'discussion',
-        'isDefault' => 1,
-        'isSystem' => 1
+        "statusID" => RecordStatusModel::DISCUSSION_STATUS_UNRESOLVED,
+        "name" => "Unresolved",
+        "state" => "open",
+        "recordType" => "discussion",
+        "recordSubtype" => "discussion",
+        "isDefault" => 1,
+        "isSystem" => 1,
     ];
     /** @var array */
     protected const DEFAULT_DISCUSSION_RESOLVED_STATUS = [
-        'statusID' => self::DISCUSSION_STATUS_RESOLVED,
-        'name' => 'Resolved',
-        'state' => 'closed',
-        'recordType' => 'discussion',
-        'recordSubtype' => 'discussion',
-        'isDefault' => 0,
-        'isSystem' => 1
+        "statusID" => self::DISCUSSION_STATUS_RESOLVED,
+        "name" => "Resolved",
+        "state" => "closed",
+        "recordType" => "discussion",
+        "recordSubtype" => "discussion",
+        "isDefault" => 0,
+        "isSystem" => 1,
     ];
 
     /** @var array[] DEFAULT_STATUSES */
@@ -159,7 +169,8 @@ class RecordStatusModel extends PipelineModel {
      * @param CurrentUserFieldProcessor $userFields
      * @param CurrentIPAddressProcessor $ipFields
      */
-    public function __construct(CurrentUserFieldProcessor $userFields, CurrentIPAddressProcessor $ipFields) {
+    public function __construct(CurrentUserFieldProcessor $userFields, CurrentIPAddressProcessor $ipFields)
+    {
         parent::__construct(self::TABLE_NAME);
 
         $userFields->camelCase();
@@ -184,8 +195,9 @@ class RecordStatusModel extends PipelineModel {
      * @param \Gdn_Database $database Database handle
      * @throws \Exception Query error.
      */
-    public static function structure(\Gdn_Database $database): void {
-        $tableExists = $database->structure()->tableExists('recordStatus');
+    public static function structure(\Gdn_Database $database): void
+    {
+        $tableExists = $database->structure()->tableExists("recordStatus");
         // TODO: remove block and method below once unique index has been propagated to all sites, post sprint 2022.01
         if ($tableExists) {
             self::dropObsoleteUniqueIndex($database);
@@ -197,7 +209,11 @@ class RecordStatusModel extends PipelineModel {
             ->primaryKey("statusID")
             ->column("name", "varchar(100)", false, ["unique.recordTypeName"])
             ->column("state", ["open", "closed"], "open")
-            ->column("recordType", "varchar(100)", false, ["index.recordType", "index.recordTypeSubType", "unique.recordTypeName"])
+            ->column("recordType", "varchar(100)", false, [
+                "index.recordType",
+                "index.recordTypeSubType",
+                "unique.recordTypeName",
+            ])
             ->column("recordSubtype", "varchar(100)", null, ["index.recordTypeSubType", "unique.recordTypeName"])
             ->column("isDefault", "tinyint", 0)
             ->column("isSystem", "tinyint", 0)
@@ -218,16 +234,14 @@ class RecordStatusModel extends PipelineModel {
     /**
      * @return Schema
      */
-    public function getSchema(): Schema {
+    public function getSchema(): Schema
+    {
         $schema = Schema::parse([
             "statusID" => ["type" => "integer"],
             "name" => ["type" => "string"],
             "state" => [
                 "type" => "string",
-                "enum" => [
-                    "closed",
-                    "open",
-                ],
+                "enum" => ["closed", "open"],
             ],
             "recordType" => ["type" => "string"],
             "recordSubtype" => [
@@ -247,7 +261,8 @@ class RecordStatusModel extends PipelineModel {
      *
      * @return Schema
      */
-    public static function getSchemaFragment(): Schema {
+    public static function getSchemaFragment(): Schema
+    {
         $schema = Schema::parse([
             "statusID" => ["type" => "integer"],
             "name" => ["type" => "string"],
@@ -270,8 +285,9 @@ class RecordStatusModel extends PipelineModel {
      * @throws ClientException Attempting to insert a system-defined record status.
      * @throws \Exception If an error is encountered while performing the query.
      */
-    public function insert(array $set, array $options = []) {
-        if (!empty($set['isSystem'])) {
+    public function insert(array $set, array $options = [])
+    {
+        if (!empty($set["isSystem"])) {
             throw new ClientException("Cannot insert a system defined record status");
         }
         $result = parent::insert($set, $options);
@@ -291,12 +307,13 @@ class RecordStatusModel extends PipelineModel {
      * @throws ClientException If attempting to update a system defined record status.
      * @throws \Exception If an error is encountered while performing the query.
      */
-    public function update(array $set, array $where, array $options = []): bool {
-        if (!empty($set['isSystem']) || !empty($where['isSystem'])) {
+    public function update(array $set, array $where, array $options = []): bool
+    {
+        if (!empty($set["isSystem"]) || !empty($where["isSystem"])) {
             throw new ClientException("Cannot update system defined statuses");
         }
         $matchingSystemRecords = array_filter(parent::select($where), function ($candidate) {
-            return !empty($candidate['isSystem']);
+            return !empty($candidate["isSystem"]);
         });
         if (!empty($matchingSystemRecords)) {
             throw new ClientException("Cannot update system defined statuses");
@@ -319,19 +336,20 @@ class RecordStatusModel extends PipelineModel {
      * @throws ClientException Attempting to delete system defined status.
      * @throws ClientException Attempting to delete default status.
      */
-    public function delete(array $where, array $options = []): bool {
+    public function delete(array $where, array $options = []): bool
+    {
         $candidates = parent::select($where, $options);
         if (empty($candidates)) {
             return true;
         }
         $matchingSystemRecords = array_filter($candidates, function (array $candidate) {
-            return !empty($candidate['isSystem']);
+            return !empty($candidate["isSystem"]);
         });
         if (!empty($matchingSystemRecords)) {
             throw new ClientException("Cannot delete system defined statuses");
         }
         $matchingDefaults = array_filter($candidates, function (array $candidate) {
-            return !empty($candidate['isDefault']);
+            return !empty($candidate["isDefault"]);
         });
         if (!empty($matchingDefaults)) {
             throw new ClientException("Default status cannot be deleted");
@@ -352,15 +370,18 @@ class RecordStatusModel extends PipelineModel {
      * @throws \Vanilla\Exception\Database\NoResultsException If ideation status references
      * a recordStatus record value that cannot be found.
      */
-    public function convertFromIdeationStatus(array $ideationStatus): array {
+    public function convertFromIdeationStatus(array $ideationStatus): array
+    {
         //StatusID excluded from required properties check to allow for converting pending inserts
-        if (empty($ideationStatus['Name'])
-            || empty($ideationStatus['State'])
-            || !array_key_exists('IsDefault', $ideationStatus)) {
+        if (
+            empty($ideationStatus["Name"]) ||
+            empty($ideationStatus["State"]) ||
+            !array_key_exists("IsDefault", $ideationStatus)
+        ) {
             throw new \InvalidArgumentException("Status provided does not include one or more required properties");
         }
-        if (!empty($ideationStatus['recordStatusID'])) {
-            $row = $this->selectSingle(['statusID' => $ideationStatus['recordStatusID']]);
+        if (!empty($ideationStatus["recordStatusID"])) {
+            $row = $this->selectSingle(["statusID" => $ideationStatus["recordStatusID"]]);
             return $row;
         }
 
@@ -368,12 +389,12 @@ class RecordStatusModel extends PipelineModel {
         // but the older GDN_Status column names contain an initial capital letter that
         // we're normalizing to an initial lowercase letter.
         $ideationStatus = ArrayUtils::camelCase($ideationStatus);
-        $schemaProps = $this->getSchema()->getSchemaArray()['properties'];
+        $schemaProps = $this->getSchema()->getSchemaArray()["properties"];
         $convertedStatus = array_intersect_key($ideationStatus, $schemaProps);
-        $convertedStatus['state'] = isset($convertedStatus['state']) ? lcfirst($convertedStatus['state']) : 'open';
-        $defaults = ['recordType' => 'discussion', 'recordSubtype' => 'ideation', 'isSystem' => 0];
+        $convertedStatus["state"] = isset($convertedStatus["state"]) ? lcfirst($convertedStatus["state"]) : "open";
+        $defaults = ["recordType" => "discussion", "recordSubtype" => "ideation", "isSystem" => 0];
         $convertedStatus = array_merge($convertedStatus, $defaults);
-        unset($convertedStatus['statusID']);
+        unset($convertedStatus["statusID"]);
 
         return $convertedStatus;
     }
@@ -391,11 +412,19 @@ class RecordStatusModel extends PipelineModel {
      * @return void
      * @throws \Exception Query error.
      */
-    private static function dropObsoleteUniqueIndex(\Gdn_Database $database): void {
-        $indicies = $database->structure()->table('recordStatus')->indexSqlDb();
-        $candidates = array_filter($indicies, function ($value, $key) {
-            return str_starts_with($key, 'UX') && !str_contains($value, 'recordSubtype');
-        }, ARRAY_FILTER_USE_BOTH);
+    private static function dropObsoleteUniqueIndex(\Gdn_Database $database): void
+    {
+        $indicies = $database
+            ->structure()
+            ->table("recordStatus")
+            ->indexSqlDb();
+        $candidates = array_filter(
+            $indicies,
+            function ($value, $key) {
+                return str_starts_with($key, "UX") && !str_contains($value, "recordSubtype");
+            },
+            ARRAY_FILTER_USE_BOTH
+        );
         foreach ($candidates as $indexName => $_) {
             $dropIndexStatement = "drop index {$indexName} on {$database->DatabasePrefix}recordStatus";
             $database->sql()->query($dropIndexStatement);
@@ -410,25 +439,32 @@ class RecordStatusModel extends PipelineModel {
      * @param bool $tableExists True if the table already exists, false if the table does not yet exist
      * @throws \Exception Query error.
      */
-    private static function processDefaultStatuses(\Gdn_Database $database, array $default, bool $tableExists): void {
-        $defaultInsertProps = ['insertUserID' => 1, 'dateInserted' => date('Y-m-d H:i:s')];
+    private static function processDefaultStatuses(\Gdn_Database $database, array $default, bool $tableExists): void
+    {
+        $defaultInsertProps = ["insertUserID" => 1, "dateInserted" => date("Y-m-d H:i:s")];
         /** @var \Gdn_DataSet $dataSet */
         $dataSet = $tableExists
-            ? $database->sql()->getWhere('recordStatus', ['statusID' => $default['statusID']])
+            ? $database->sql()->getWhere("recordStatus", ["statusID" => $default["statusID"]])
             : new \Gdn_DataSet([], DATASET_TYPE_ARRAY);
         if ($dataSet->numRows() == 0) {
             // Add the default statuses if they're not already there.
             $default = array_merge($default, $defaultInsertProps);
             // Some default statuses have an ID of 0 and need this mode set.
-            $database->runWithSqlMode([\Gdn_Database::SQL_MODE_NO_AUTO_VALUE_ZERO], function () use ($default, $database) {
-                $database->sql()->insert('recordStatus', $default);
+            $database->runWithSqlMode([\Gdn_Database::SQL_MODE_NO_AUTO_VALUE_ZERO], function () use (
+                $default,
+                $database
+            ) {
+                $database->sql()->insert("recordStatus", $default);
             });
         } else {
             // Ensure the row matches this definition
             $row = array_intersect_key($dataSet->firstRow(DATASET_TYPE_ARRAY), $default);
             $defaultDiff = array_diff_assoc($default, $row);
             if (!empty($defaultDiff)) {
-                $database->sql()->update('recordStatus', $defaultDiff, ['statusID' => $default['statusID']])->put();
+                $database
+                    ->sql()
+                    ->update("recordStatus", $defaultDiff, ["statusID" => $default["statusID"]])
+                    ->put();
             }
         }
     }
@@ -440,12 +476,17 @@ class RecordStatusModel extends PipelineModel {
      * @return void
      * @throws \Exception Query error.
      */
-    private static function adjustAutoIncrement(\Gdn_Database $database): void {
+    private static function adjustAutoIncrement(\Gdn_Database $database): void
+    {
         $databaseName = $database->sql()->databaseName();
-        $tableName = $database->sql()->prefixTable('recordStatus');
-        $recordStatusAutoIncrementQuery = "SELECT `AUTO_INCREMENT` FROM INFORMATION_SCHEMA.TABLES ".
+        $tableName = $database->sql()->prefixTable("recordStatus");
+        $recordStatusAutoIncrementQuery =
+            "SELECT `AUTO_INCREMENT` FROM INFORMATION_SCHEMA.TABLES " .
             "WHERE TABLE_SCHEMA = '{$databaseName}' AND TABLE_NAME = '{$tableName}'";
-        $dataSet = $database->sql()->query($recordStatusAutoIncrementQuery, "select")->firstRow('array');
+        $dataSet = $database
+            ->sql()
+            ->query($recordStatusAutoIncrementQuery, "select")
+            ->firstRow("array");
         $autoIncVal = $dataSet === false ? 0 : intval(array_values($dataSet)[0]);
         if ($autoIncVal < 10000) {
             $recordStatusIDQuery = "alter table {$tableName} AUTO_INCREMENT=10000";
@@ -460,7 +501,8 @@ class RecordStatusModel extends PipelineModel {
      * @param string|null $recordType
      * @param array $set
      */
-    private function updateRecordTypeStatus($statusID, ?string $recordType = null, array $set = []): void {
+    private function updateRecordTypeStatus($statusID, ?string $recordType = null, array $set = []): void
+    {
         if (is_int($statusID) === false) {
             return;
         }
@@ -492,6 +534,53 @@ class RecordStatusModel extends PipelineModel {
                 "statusID <>" => $statusID,
             ]
         );
+    }
+
+    /**
+     * Add Status data to an array.
+     *
+     * @param array|iterable $rows Results we need to associate user data with.
+     * @param array $columns Database columns containing StatusID to get data for.
+     * @param array $properties List of properties to add to the array.
+     */
+    public function expandStatuses(&$rows, array $columns, array $properties)
+    {
+        // How are we supposed to lookup status by column if we don't have any columns?
+        if (count($rows) === 0 || count($columns) === 0) {
+            return;
+        }
+
+        reset($rows);
+        $single = !($rows instanceof Traversable) && is_string(key($rows));
+
+        // Retrieve all record statuses, and put them int an index array by StatusID, for easy retrieval.
+        $statuses = $this->select();
+        $statuses = Gdn_DataSet::index($statuses, ["statusID"]);
+
+        $populate = function (&$row) use ($statuses, $columns, $properties) {
+            foreach ($columns as $key) {
+                $statusID = $row[$key] ?? null;
+                // if status is not found default to ... DEFAULT_DISCUSSION_STATUS=0.
+                if ($statusID !== null) {
+                    $status = $statuses[$statusID] ?? RecordStatusModel::DEFAULT_DISCUSSION_STATUS;
+                } else {
+                    $status = RecordStatusModel::DEFAULT_DISCUSSION_STATUS;
+                }
+                // Populate properties from status record.
+                foreach ($properties as $property) {
+                    $row[$property] = $status[$property];
+                }
+            }
+        };
+
+        // Inject those user records.
+        if ($single) {
+            $populate($rows);
+        } else {
+            foreach ($rows as &$row) {
+                $populate($row);
+            }
+        }
     }
     //endregion
 }

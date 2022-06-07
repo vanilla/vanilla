@@ -13,13 +13,14 @@ use UserModel;
 /**
  * Used for testing `Gdn_OAuth2` functionality.
  */
-class TestOAuthPlugin extends \Gdn_OAuth2 {
-    public const PROVIDER_KEY = 'testOAuth';
-    public const GOOD_UNIQUE_ID = '133';
+class TestOAuthPlugin extends \Gdn_OAuth2
+{
+    public const PROVIDER_KEY = "testOAuth";
+    public const GOOD_UNIQUE_ID = "133";
 
-    public const GOOD_ACCESS_TOKEN = 'good';
-    public const NO_USER_ACCESS_TOKEN = 'no-user';
-    public const NO_ID_ACCESS_TOKEN = 'no-id';
+    public const GOOD_ACCESS_TOKEN = "good";
+    public const NO_USER_ACCESS_TOKEN = "no-user";
+    public const NO_ID_ACCESS_TOKEN = "no-id";
 
     /**
      * @var UserModel
@@ -28,16 +29,16 @@ class TestOAuthPlugin extends \Gdn_OAuth2 {
 
     public $profiles = [
         self::GOOD_ACCESS_TOKEN => [
-            'UniqueID' => self::GOOD_UNIQUE_ID,
-            'Name' => 'Test',
-            'Email' => 'test@exmple.com',
+            "UniqueID" => self::GOOD_UNIQUE_ID,
+            "Name" => "Test",
+            "Email" => "test@exmple.com",
         ],
         self::NO_ID_ACCESS_TOKEN => [
-            'Name' => 'Foo',
-            'Email' => 'foo@example.com',
+            "Name" => "Foo",
+            "Email" => "foo@example.com",
         ],
         self::NO_USER_ACCESS_TOKEN => [
-            'UniqueID' => 'dsdssf',
+            "UniqueID" => "dsdssf",
         ],
     ];
 
@@ -46,9 +47,10 @@ class TestOAuthPlugin extends \Gdn_OAuth2 {
      *
      * @param UserModel $userModel
      */
-    public function __construct(UserModel $userModel) {
+    public function __construct(UserModel $userModel)
+    {
         parent::__construct(self::PROVIDER_KEY);
-        $this->settingsView = 'plugins/settings/oauth2';
+        $this->settingsView = "plugins/settings/oauth2";
         $this->userModel = $userModel;
     }
 
@@ -57,7 +59,8 @@ class TestOAuthPlugin extends \Gdn_OAuth2 {
      *
      * @return array
      */
-    public function getProfile() {
+    public function getProfile()
+    {
         if (isset($this->profiles[$this->accessToken()])) {
             return $this->profiles[$this->accessToken()];
         }
@@ -67,11 +70,12 @@ class TestOAuthPlugin extends \Gdn_OAuth2 {
     /**
      * Delete the dummy user.
      */
-    public function cleanUp() {
-        $user = $this->userModel->getWhere(['Email' => 'test@example.com'])->firstRow(DATASET_TYPE_ARRAY);
+    public function cleanUp()
+    {
+        $user = $this->userModel->getWhere(["Email" => "test@example.com"])->firstRow(DATASET_TYPE_ARRAY);
 
         if ($user) {
-            $this->userModel->deleteID($user['UserID']);
+            $this->userModel->deleteID($user["UserID"]);
         }
 
         // Make sure our caches aren't messing with us.

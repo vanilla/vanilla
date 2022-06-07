@@ -22,28 +22,27 @@ use Vanilla\Scheduler\TrackingSlip;
  *
  * @package VanillaTests\Library\Vanilla\Scheduler
  */
-class CallbackTest extends SchedulerTestCase {
-
+class CallbackTest extends SchedulerTestCase
+{
     /**
      * Test callback job
      *
      * @throws ContainerException On error.
      * @throws NotFoundException On error.
      */
-    public function testCallbackJob() {
+    public function testCallbackJob()
+    {
         $container = $this->getConfiguredContainer();
 
         /* @var $dummyScheduler SchedulerInterface */
         $dummyScheduler = $container->get(SchedulerInterface::class);
 
         $callbackJobDescriptor = new NormalJobDescriptor(CallbackJob::class);
-        $callbackJobDescriptor->setMessage(
-            [
-                "callback" => function () {
-                    return true;
-                },
-            ]
-        );
+        $callbackJobDescriptor->setMessage([
+            "callback" => function () {
+                return true;
+            },
+        ]);
 
         $dummyScheduler->addJobDescriptor($callbackJobDescriptor);
     }
@@ -54,9 +53,10 @@ class CallbackTest extends SchedulerTestCase {
      * @throws ContainerException On error.
      * @throws NotFoundException On error.
      */
-    public function testCallbackJobWithWrongCallback() {
+    public function testCallbackJobWithWrongCallback()
+    {
         $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Invalid parameter configuration for Vanilla\Scheduler\Job\CallbackJob');
+        $this->expectExceptionMessage("Invalid parameter configuration for Vanilla\Scheduler\Job\CallbackJob");
 
         $container = $this->getConfiguredContainer();
 
@@ -64,14 +64,12 @@ class CallbackTest extends SchedulerTestCase {
         $dummyScheduler = $container->get(SchedulerInterface::class);
 
         $callbackJobDescriptor = new NormalJobDescriptor(CallbackJob::class);
-        $callbackJobDescriptor->setMessage(
-            [
-                "callback" => function () {
-                    return true;
-                },
-                "parameters" => true,
-            ]
-        );
+        $callbackJobDescriptor->setMessage([
+            "callback" => function () {
+                return true;
+            },
+            "parameters" => true,
+        ]);
 
         $dummyScheduler->addJobDescriptor($callbackJobDescriptor);
     }
@@ -82,9 +80,10 @@ class CallbackTest extends SchedulerTestCase {
      * @throws ContainerException On error.
      * @throws NotFoundException On error.
      */
-    public function testCallbackJobWithWrongParameters() {
+    public function testCallbackJobWithWrongParameters()
+    {
         $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Invalid callback configuration for Vanilla\Scheduler\Job\CallbackJob');
+        $this->expectExceptionMessage("Invalid callback configuration for Vanilla\Scheduler\Job\CallbackJob");
 
         $container = $this->getConfiguredContainer();
 
@@ -92,11 +91,9 @@ class CallbackTest extends SchedulerTestCase {
         $dummyScheduler = $container->get(SchedulerInterface::class);
 
         $callbackJobDescriptor = new NormalJobDescriptor(CallbackJob::class);
-        $callbackJobDescriptor->setMessage(
-            [
-                "callback" => true,
-            ]
-        );
+        $callbackJobDescriptor->setMessage([
+            "callback" => true,
+        ]);
 
         $dummyScheduler->addJobDescriptor($callbackJobDescriptor);
     }
@@ -107,20 +104,19 @@ class CallbackTest extends SchedulerTestCase {
      * @throws ContainerException On error.
      * @throws NotFoundException On error.
      */
-    public function testDispatchedCallbackJob() {
+    public function testDispatchedCallbackJob()
+    {
         $container = $this->getConfiguredContainer();
 
         /* @var $dummyScheduler SchedulerInterface */
         $dummyScheduler = $container->get(SchedulerInterface::class);
 
         $callbackJobDescriptor = new NormalJobDescriptor(CallbackJob::class);
-        $callbackJobDescriptor->setMessage(
-            [
-                "callback" => function () {
-                    return true;
-                },
-            ]
-        );
+        $callbackJobDescriptor->setMessage([
+            "callback" => function () {
+                return true;
+            },
+        ]);
 
         $dummyScheduler->addJobDescriptor($callbackJobDescriptor);
 
@@ -142,22 +138,21 @@ class CallbackTest extends SchedulerTestCase {
      * @throws ContainerException On error.
      * @throws NotFoundException On error.
      */
-    public function testFailedCallbackJob() {
+    public function testFailedCallbackJob()
+    {
         $container = $this->getConfiguredContainer();
 
         /* @var $dummyScheduler SchedulerInterface */
         $dummyScheduler = $container->get(SchedulerInterface::class);
 
         $callbackJobDescriptor = new NormalJobDescriptor(CallbackJob::class);
-        $callbackJobDescriptor->setMessage(
-            [
-                "callback" => function () {
-                    /** @noinspection PhpUndefinedFunctionInspection */
-                    /** @psalm-suppress UndefinedFunction */
-                    NonExistentFunction();
-                },
-            ]
-        );
+        $callbackJobDescriptor->setMessage([
+            "callback" => function () {
+                /** @noinspection PhpUndefinedFunctionInspection */
+                /** @psalm-suppress UndefinedFunction */
+                NonExistentFunction();
+            },
+        ]);
 
         $dummyScheduler->addJobDescriptor($callbackJobDescriptor);
 

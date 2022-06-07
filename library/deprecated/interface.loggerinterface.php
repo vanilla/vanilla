@@ -25,7 +25,8 @@
  *
  * @deprecated
  */
-interface LoggerInterface {
+interface LoggerInterface
+{
     /**
      * System is unusable.
      *

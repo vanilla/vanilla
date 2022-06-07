@@ -15,19 +15,21 @@ use VanillaTests\Fixtures\Formatting\FormatFixtureFactory;
 /**
  * Tests for the TextExFormat.
  */
-class TextExFormatTest extends AbstractFormatTestCase {
-
+class TextExFormatTest extends AbstractFormatTestCase
+{
     /**
      * @inheritDoc
      */
-    protected function prepareFormatter(): FormatInterface {
+    protected function prepareFormatter(): FormatInterface
+    {
         return self::container()->get(TextExFormat::class);
     }
 
     /**
      * @inheritDoc
      */
-    protected function prepareFixtures(): array {
-        return (new FormatFixtureFactory('textex'))->getAllFixtures();
+    protected function prepareFixtures(): array
+    {
+        return (new FormatFixtureFactory("textex"))->getAllFixtures();
     }
 }

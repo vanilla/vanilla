@@ -15,8 +15,8 @@ use Vanilla\Permissions;
 /**
  * Trait for checking permissions in controllers.
  */
-trait PermissionCheckTrait {
-
+trait PermissionCheckTrait
+{
     /**
      * Get the users permissions object.
      *
@@ -39,28 +39,25 @@ trait PermissionCheckTrait {
      *
      * @return $this
      */
-    public function permission($permissionToCheck = null, $id = null): self {
+    public function permission($permissionToCheck = null, $id = null): self
+    {
         $permissions = $this->getPermissions();
         if ($permissions === null) {
             throw new ServerException("Permissions not available.", 500);
         }
-        $permissionToCheck = (array)$permissionToCheck;
+        $permissionToCheck = (array) $permissionToCheck;
 
         /**
          * First check to see if the user is banned.
          */
         if ($ban = $permissions->getBan($permissionToCheck)) {
-            $ban += ['code' => 401, 'msg' => 'Access denied.'];
+            $ban += ["code" => 401, "msg" => "Access denied."];
 
-            throw HttpException::createFromStatus($ban['code'], $ban['msg'], $ban);
+            throw HttpException::createFromStatus($ban["code"], $ban["msg"], $ban);
         }
 
         if ($id === null) {
-            $hasPermission = $permissions->hasAny(
-                $permissionToCheck,
-                null,
-                Permissions::CHECK_MODE_GLOBAL_OR_RESOURCE
-            );
+            $hasPermission = $permissions->hasAny($permissionToCheck, null, Permissions::CHECK_MODE_GLOBAL_OR_RESOURCE);
         } else {
             $hasPermission = $permissions->hasAny(
                 $permissionToCheck,

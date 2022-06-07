@@ -10,8 +10,8 @@ namespace Garden\Events;
 /**
  * Provide a standard way for making an event trackable.
  */
-interface TrackingEventInterface {
-
+interface TrackingEventInterface
+{
     /**
      * Get the name of the collection.
      *
@@ -39,12 +39,12 @@ interface TrackingEventInterface {
      *
      * @return array
      */
-//    public function getTrackablePayload(...dependencies): array;
+    //    public function getTrackablePayload(...dependencies): array;
 
     /**
      * If the expected tracking action differs from our event action, implement this method to return the desired action.
      *
      * @return string
      */
-//    public function getTrackableAction(): string;
+    //    public function getTrackableAction(): string;
 }

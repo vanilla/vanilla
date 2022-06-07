@@ -10,7 +10,8 @@ namespace Vanilla\Formatting;
 /**
  * A text fragment that points to a specific HTML attribute like a title or alt.
  */
-class HtmlDomAttributeFragment implements TextFragmentInterface {
+class HtmlDomAttributeFragment implements TextFragmentInterface
+{
     /**
      * @var \DOMAttr
      */
@@ -21,28 +22,32 @@ class HtmlDomAttributeFragment implements TextFragmentInterface {
      *
      * @param \DOMAttr $attr
      */
-    public function __construct(\DOMAttr $attr) {
+    public function __construct(\DOMAttr $attr)
+    {
         $this->attr = $attr;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getInnerContent(): string {
+    public function getInnerContent(): string
+    {
         return $this->attr->nodeValue;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function setInnerContent(string $text) {
+    public function setInnerContent(string $text)
+    {
         $this->attr->nodeValue = $text;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getFragmentType(): string {
+    public function getFragmentType(): string
+    {
         return TextFragmentType::TEXT;
     }
 
@@ -51,7 +56,8 @@ class HtmlDomAttributeFragment implements TextFragmentInterface {
      *
      * @return \DOMAttr
      */
-    public function getAttr(): \DOMAttr {
+    public function getAttr(): \DOMAttr
+    {
         return $this->attr;
     }
 
@@ -60,7 +66,8 @@ class HtmlDomAttributeFragment implements TextFragmentInterface {
      *
      * @param \DOMAttr $attr
      */
-    public function setAttr(\DOMAttr $attr): void {
+    public function setAttr(\DOMAttr $attr): void
+    {
         $this->attr = $attr;
     }
 }

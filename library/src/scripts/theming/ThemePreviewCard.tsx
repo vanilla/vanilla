@@ -207,20 +207,19 @@ export default function ThemePreviewCard(props: IProps) {
             <DropDownItemSeparator />
             {props.canDelete && props.active ? (
                 <DropDownItemButton onClick={props.onDelete} disabled={props.active}>
-                    <span className={classNames("selectBox-itemLabel", classes.itemLabel)}>Delete</span>
-                    <span className={classNames("sc-only")}>
-                        <ToolTip label={t("This theme cannot be deleted because it is the currently applied theme.")}>
-                            <ToolTipIcon>
-                                <span>
-                                    <Icon
-                                        className={classNames(iconClasses().errorFgColor)}
-                                        icon={"status-warning"}
-                                        size={"compact"}
-                                    />
-                                </span>
-                            </ToolTipIcon>
-                        </ToolTip>
-                    </span>
+                    <span className={classNames(classes.itemLabel)}>Delete</span>
+
+                    <ToolTip label={t("This theme cannot be deleted because it is the currently applied theme.")}>
+                        <ToolTipIcon>
+                            <span>
+                                <Icon
+                                    className={classNames(iconClasses().errorFgColor)}
+                                    icon={"status-warning"}
+                                    size={"compact"}
+                                />
+                            </span>
+                        </ToolTipIcon>
+                    </ToolTip>
                 </DropDownItemButton>
             ) : (
                 <DropDownItemButton name={t("Delete")} onClick={props.onDelete} />

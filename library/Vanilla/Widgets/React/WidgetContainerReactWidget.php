@@ -23,29 +23,31 @@ use Vanilla\Widgets\Schema\ReactChildrenSchema;
  * ------------------
  *       View All
  */
-class WidgetContainerReactWidget implements ReactWidgetInterface, CombinedPropsWidgetInterface {
-
+class WidgetContainerReactWidget implements ReactWidgetInterface, CombinedPropsWidgetInterface
+{
     use HomeWidgetContainerSchemaTrait;
     use CombinedPropsWidgetTrait;
 
     /**
      * @inheritdoc
      */
-    public static function getComponentName(): string {
-        return 'WidgetContainer';
+    public static function getComponentName(): string
+    {
+        return "WidgetContainer";
     }
 
     /**
      * @inheritdoc
      */
-    public static function getWidgetSchema(): Schema {
+    public static function getWidgetSchema(): Schema
+    {
         return SchemaUtils::composeSchemas(
             self::widgetTitleSchema(),
-            self::widgetSubtitleSchema('subtitle'),
+            self::widgetSubtitleSchema("subtitle"),
             self::widgetDescriptionSchema(),
             self::containerOptionsSchema(),
             Schema::parse([
-                'children' => new ReactChildrenSchema(),
+                "children" => new ReactChildrenSchema(),
             ])
         );
     }
@@ -53,21 +55,24 @@ class WidgetContainerReactWidget implements ReactWidgetInterface, CombinedPropsW
     /**
      * @inheritdoc
      */
-    public static function getWidgetName(): string {
-        return 'Widget Container';
+    public static function getWidgetName(): string
+    {
+        return "Widget Container";
     }
 
     /**
      * @inheritdoc
      */
-    public static function getWidgetID(): string {
-        return 'widget-container';
+    public static function getWidgetID(): string
+    {
+        return "widget-container";
     }
 
     /**
      * @return string
      */
-    public static function getWidgetIconPath(): string {
+    public static function getWidgetIconPath(): string
+    {
         return "";
     }
 }

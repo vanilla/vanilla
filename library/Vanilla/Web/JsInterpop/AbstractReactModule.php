@@ -16,21 +16,24 @@ use Vanilla\Widgets\React\ReactWidgetInterface;
 /**
  * Module using the new events UI.
  */
-abstract class AbstractReactModule extends AbstractWidgetModule implements ReactWidgetInterface {
+abstract class AbstractReactModule extends AbstractWidgetModule implements ReactWidgetInterface
+{
     use TwigRenderTrait;
 
     /**
      * Optional class for div
      * @return string
      */
-    public function cssWrapperClass(): string {
+    public function cssWrapperClass(): string
+    {
         return "";
     }
 
     /**
      * @return string
      */
-    public static function getWidgetIconPath(): string {
+    public static function getWidgetIconPath(): string
+    {
         return "";
     }
 
@@ -39,13 +42,18 @@ abstract class AbstractReactModule extends AbstractWidgetModule implements React
      *
      * @return string
      */
-    public function toString(): string {
+    public function toString(): string
+    {
         try {
             $props = $this->getProps();
             if ($props === null) {
                 return "";
             }
-            return TwigStaticRenderer::renderReactModule($this->getComponentName(), $this->getProps(), $this->cssWrapperClass());
+            return TwigStaticRenderer::renderReactModule(
+                $this->getComponentName(),
+                $this->getProps(),
+                $this->cssWrapperClass()
+            );
         } catch (\Garden\Web\Exception\HttpException $e) {
             trigger_error($e->getMessage(), E_USER_NOTICE);
             return "";

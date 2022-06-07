@@ -27,17 +27,18 @@ use Gdn_Configuration;
 /**
  * Class BootstrapTest
  */
-final class BootstrapTest extends TestCase {
-
+final class BootstrapTest extends TestCase
+{
     /**
      * Test scheduler injection with missing rule throws NotFoundException.
      *
      * @throws ContainerException On error.
      * @throws NotFoundException On error.
      */
-    public function testSchedulerInjectionWithMissingRule() {
+    public function testSchedulerInjectionWithMissingRule()
+    {
         $this->expectException(NotFoundException::class);
-        $this->expectExceptionMessage('Class Vanilla\Scheduler\SchedulerInterface does not exist.');
+        $this->expectExceptionMessage("Class Vanilla\Scheduler\SchedulerInterface does not exist.");
 
         $container = new Container();
         $container->get(SchedulerInterface::class);
@@ -49,7 +50,8 @@ final class BootstrapTest extends TestCase {
      * @throws ContainerException On error.
      * @throws NotFoundException On error.
      */
-    public function testSchedulerInjectionWithMissingDependencies() {
+    public function testSchedulerInjectionWithMissingDependencies()
+    {
         $this->expectException(MissingArgumentException::class);
         $msg = 'Missing argument $container for Vanilla\Scheduler\DummyScheduler::__construct().';
         $this->expectExceptionMessage($msg);
@@ -57,8 +59,7 @@ final class BootstrapTest extends TestCase {
         $container = (new Container())
             ->rule(SchedulerInterface::class)
             ->setClass(DummyScheduler::class)
-            ->setShared(true)
-        ;
+            ->setShared(true);
 
         $this->expectException(MissingArgumentException::class);
         $msg = 'Missing argument $container for Vanilla\Scheduler\DummyScheduler::__construct().';
@@ -73,7 +74,8 @@ final class BootstrapTest extends TestCase {
      * @throws ContainerException On error.
      * @throws NotFoundException On error.
      */
-    public function testSchedulerInjectionWithMissingLogger() {
+    public function testSchedulerInjectionWithMissingLogger()
+    {
         $this->expectException(MissingArgumentException::class);
         $this->expectExceptionMessage('Missing argument $logger for Vanilla\Scheduler\DummyScheduler::__construct().');
 
@@ -84,8 +86,7 @@ final class BootstrapTest extends TestCase {
             ->setShared(true)
             ->rule(SchedulerInterface::class)
             ->setClass(DummyScheduler::class)
-            ->setShared(true)
-        ;
+            ->setShared(true);
 
         $this->expectException(MissingArgumentException::class);
         $this->expectExceptionMessage('Missing argument $logger for Vanilla\Scheduler\DummyScheduler::__construct().');
@@ -99,7 +100,8 @@ final class BootstrapTest extends TestCase {
      * @throws ContainerException On error.
      * @throws NotFoundException On error.
      */
-    public function testSchedulerInjectionWithMissingEventManager() {
+    public function testSchedulerInjectionWithMissingEventManager()
+    {
         // This test will pass always because EventManager is a concrete class nor an interface
         // Container will inject a new class instance in case the class is not previously ruled inside the container
         // The only condition for this test to fail is if vanilla/vanilla is not composed-in
@@ -119,8 +121,7 @@ final class BootstrapTest extends TestCase {
             //
             ->rule(SchedulerInterface::class)
             ->setClass(DummyScheduler::class)
-            ->setShared(true)
-        ;
+            ->setShared(true);
 
         $this->assertNotNull($container->get(SchedulerInterface::class));
     }
@@ -132,7 +133,8 @@ final class BootstrapTest extends TestCase {
      * @throws NotFoundException On error.
      * @throws ContainerException On error.
      */
-    public function testSchedulerInjection() {
+    public function testSchedulerInjection()
+    {
         $container = new Container();
         $container
             ->setInstance(ContainerInterface::class, $container)
@@ -152,8 +154,7 @@ final class BootstrapTest extends TestCase {
             //
             ->rule(SchedulerInterface::class)
             ->setClass(DummyScheduler::class)
-            ->setShared(true)
-        ;
+            ->setShared(true);
 
         $dummyScheduler = $container->get(SchedulerInterface::class);
         $this->assertTrue(get_class($dummyScheduler) == DummyScheduler::class);
@@ -167,7 +168,8 @@ final class BootstrapTest extends TestCase {
      * @param SchedulerInterface $dummyScheduler
      * @depends testSchedulerInjection
      */
-    public function testSetDriver(SchedulerInterface $dummyScheduler) {
+    public function testSetDriver(SchedulerInterface $dummyScheduler)
+    {
         $bool = $dummyScheduler->addDriver(LocalDriver::class);
         $this->assertTrue($bool);
     }
@@ -178,8 +180,9 @@ final class BootstrapTest extends TestCase {
      * @param SchedulerInterface $dummyScheduler
      * @depends testSchedulerInjection
      */
-    public function testSetDispatchEventName(SchedulerInterface $dummyScheduler) {
-        $bool = $dummyScheduler->setDispatchEventName('dispatchEvent');
+    public function testSetDispatchEventName(SchedulerInterface $dummyScheduler)
+    {
+        $bool = $dummyScheduler->setDispatchEventName("dispatchEvent");
         $this->assertTrue($bool);
     }
 
@@ -189,8 +192,9 @@ final class BootstrapTest extends TestCase {
      * @param SchedulerInterface $dummyScheduler
      * @depends testSchedulerInjection
      */
-    public function testSetDispatchedEventName(SchedulerInterface $dummyScheduler) {
-        $bool = $dummyScheduler->setDispatchedEventName('dispatchedEvent');
+    public function testSetDispatchedEventName(SchedulerInterface $dummyScheduler)
+    {
+        $bool = $dummyScheduler->setDispatchedEventName("dispatchedEvent");
         $this->assertTrue($bool);
     }
 }

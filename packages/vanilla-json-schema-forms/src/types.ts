@@ -4,6 +4,7 @@
  * @license GPL-2.0-only
  */
 
+import { InputSize } from "@vanilla/ui/src/types";
 import { JSONSchemaType } from "ajv";
 import { ErrorObject } from "ajv/dist/core";
 import { SomeJSONSchema } from "ajv/dist/types/json-schema";
@@ -36,6 +37,7 @@ interface ICheckBoxControl extends ICommonControl {
 interface IDropdownControl extends ICommonControl {
     inputType: "dropDown";
     choices: IChoices;
+    multiple?: boolean;
 }
 
 interface IRadioControl extends ICommonControl {
@@ -130,6 +132,9 @@ export interface IControlProps extends IBaseSchemaFormProps {
     required?: boolean;
     disabled?: boolean;
     onChange(instance: any): void;
+    onBlur?(): void;
+    size?: InputSize;
+    autocompleteClassName?: string;
 }
 
 export interface IValidationResult {

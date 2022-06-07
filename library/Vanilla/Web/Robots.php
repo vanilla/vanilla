@@ -10,7 +10,8 @@ namespace Vanilla\Web;
 /**
  * A data collector for robots.txt data.
  */
-class Robots implements \JsonSerializable {
+class Robots implements \JsonSerializable
+{
     /**
      * @var array
      */
@@ -25,7 +26,8 @@ class Robots implements \JsonSerializable {
      * Add a site map to the robots file.
      * @param string $url The URL to add. This will be wrapped in `url()` when rendered.
      */
-    public function addSitemap(string $url) {
+    public function addSitemap(string $url)
+    {
         $this->sitemaps[] = $url;
     }
 
@@ -34,7 +36,8 @@ class Robots implements \JsonSerializable {
      *
      * @param string $rule The rule to add.
      */
-    public function addRule(string $rule) {
+    public function addRule(string $rule)
+    {
         $this->rules[] = trim($rule);
     }
 
@@ -46,8 +49,9 @@ class Robots implements \JsonSerializable {
      * which is a value of any type other than a resource.
      * @since 5.4.0
      */
-    public function jsonSerialize() {
-        return ['sitemaps' => $this->sitemaps, 'rules' => $this->rules];
+    public function jsonSerialize()
+    {
+        return ["sitemaps" => $this->sitemaps, "rules" => $this->rules];
     }
 
     /**
@@ -55,7 +59,8 @@ class Robots implements \JsonSerializable {
      *
      * @return array Returns an array of URLs.
      */
-    public function getSitemaps(): array {
+    public function getSitemaps(): array
+    {
         return $this->sitemaps;
     }
 
@@ -64,7 +69,8 @@ class Robots implements \JsonSerializable {
      *
      * @return array Returns an array of rules.
      */
-    public function getRules(): array {
+    public function getRules(): array
+    {
         return $this->rules;
     }
 }

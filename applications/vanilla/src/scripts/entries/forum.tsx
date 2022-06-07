@@ -19,7 +19,7 @@ import { SearchWidget } from "@library/searchWidget/SearchWidget";
 import { CategoryPicker } from "@library/forms/select/CategoryPicker";
 import { CategoryFollowDropDown } from "@vanilla/addon-vanilla/categories/CategoryFollowDropdown";
 import TabWidget from "@library/tabWidget/TabWidget";
-import NewPostMenu from "@library/flyouts/NewPostMenu";
+import NewPostMenu from "@library/newPostMenu/NewPostMenu";
 import { triggerLegacyHashScrolling } from "@vanilla/addon-vanilla/legacy/legacyHashScrolling";
 import "@vanilla/addon-vanilla/forms/autosave";
 import { LeaderboardWidget } from "@library/leaderboardWidget/LeaderboardWidget";

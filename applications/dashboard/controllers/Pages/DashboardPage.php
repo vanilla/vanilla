@@ -8,24 +8,26 @@
 use Vanilla\Models\DashboardPreloadProvider;
 use Vanilla\Web\ThemedPage;
 
- /**
+/**
  * Base page for rendering new admin layouts built in react.
  */
-class DashboardPage extends ThemedPage {
-
+class DashboardPage extends ThemedPage
+{
     protected $forcedThemeKey = "theme-dashboard";
 
     /**
      * @inheritdoc
      */
-    public function initialize(): self {
+    public function initialize(): self
+    {
         // Nothing for now.
     }
 
     /**
      * @inheritdoc
      */
-    public function getAssetSection(): string {
+    public function getAssetSection(): string
+    {
         return "admin-new";
     }
 
@@ -33,7 +35,8 @@ class DashboardPage extends ThemedPage {
      * Initialize data that is shared among the controllers.
      * Overwriting the base method to add actions from DashboardPreloadProvider.
      */
-    protected function initAssets() {
+    protected function initAssets()
+    {
         // Preload for frontend
         /** @var DashboardPreloadProvider $dashboardProvider */
         $dashboardProvider = \Gdn::getContainer()->get(DashboardPreloadProvider::class);

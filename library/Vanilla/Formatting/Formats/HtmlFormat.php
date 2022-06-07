@@ -8,6 +8,7 @@
 namespace Vanilla\Formatting\Formats;
 
 use Exception;
+use UserModel;
 use Vanilla\Formatting\BaseFormat;
 use Vanilla\Formatting\Exception\FormattingException;
 use Vanilla\Formatting\Html\HtmlDocument;
@@ -20,12 +21,16 @@ use Vanilla\Formatting\Html\Processor\ImageHtmlProcessor;
 use Vanilla\Formatting\Html\Processor\UserContentCssProcessor;
 use Vanilla\Formatting\ParsableDOMInterface;
 use Vanilla\Formatting\TextDOMInterface;
+use Vanilla\Formatting\UserMentionInterface;
+use Vanilla\Formatting\UserPIIRemoveTrait;
 use Vanilla\InjectableInterface;
 
 /**
  * Format definition for HTML based formats.
  */
-class HtmlFormat extends BaseFormat implements InjectableInterface, ParsableDOMInterface {
+class HtmlFormat extends BaseFormat implements InjectableInterface, ParsableDOMInterface
+{
+    use UserPIIRemoveTrait;
 
     const FORMAT_KEY = "html";
 
@@ -53,6 +58,12 @@ class HtmlFormat extends BaseFormat implements InjectableInterface, ParsableDOMI
     /** @var bool allowExtendedContent */
     protected $allowExtendedContent;
 
+    /** @var string */
+    protected $anonymizeUsername;
+
+    /** @var string */
+    protected $anonymizeUrl;
+
     /**
      * Constructor for dependency injection.
      *
@@ -74,6 +85,8 @@ class HtmlFormat extends BaseFormat implements InjectableInterface, ParsableDOMI
         $this->plainTextConverter = $plainTextConverter;
         $this->shouldCleanupLineBreaks = $shouldCleanupLineBreaks;
         $this->allowExtendedContent = $allowExtendedContent;
+        $this->anonymizeUsername = $this->getAnonymizeUserName();
+        $this->anonymizeUrl = $this->getAnonymizeUserUrl();
     }
 
     /**
@@ -101,7 +114,8 @@ class HtmlFormat extends BaseFormat implements InjectableInterface, ParsableDOMI
     /**
      * @inheritdoc
      */
-    public function renderHtml(string $content, bool $enhance = true): string {
+    public function renderHtml(string $content, bool $enhance = true): string
+    {
         $result = $this->htmlSanitizer->filter($content, $this->allowExtendedContent);
 
         if ($this->shouldCleanupLineBreaks) {
@@ -111,7 +125,7 @@ class HtmlFormat extends BaseFormat implements InjectableInterface, ParsableDOMI
         $result = $this->legacySpoilers($result);
 
         if ($enhance) {
-            $result = $this->htmlEnhancer->enhance($result, true, !c('Garden.Format.DisableUrlEmbeds', false));
+            $result = $this->htmlEnhancer->enhance($result, true, !c("Garden.Format.DisableUrlEmbeds", false));
         }
 
         $result = $this->applyHtmlProcessors($result);
@@ -121,7 +135,8 @@ class HtmlFormat extends BaseFormat implements InjectableInterface, ParsableDOMI
     /**
      * @inheritdoc
      */
-    public function renderPlainText(string $content): string {
+    public function renderPlainText(string $content): string
+    {
         $html = $this->renderHtml($content, false);
         return $this->plainTextConverter->convert($html);
     }
@@ -129,7 +144,8 @@ class HtmlFormat extends BaseFormat implements InjectableInterface, ParsableDOMI
     /**
      * @inheritdoc
      */
-    public function renderQuote(string $content): string {
+    public function renderQuote(string $content): string
+    {
         $result = $this->htmlSanitizer->filter($content);
 
         if ($this->shouldCleanupLineBreaks) {
@@ -147,7 +163,8 @@ class HtmlFormat extends BaseFormat implements InjectableInterface, ParsableDOMI
     /**
      * @inheritdoc
      */
-    public function filter(string $content): string {
+    public function filter(string $content): string
+    {
         try {
             $this->renderHtml($content);
         } catch (Exception $e) {
@@ -160,7 +177,8 @@ class HtmlFormat extends BaseFormat implements InjectableInterface, ParsableDOMI
     /**
      * @inheritdoc
      */
-    public function parseAttachments(string $content): array {
+    public function parseAttachments(string $content): array
+    {
         $document = new HtmlDocument($content);
         return $this->attachmentHtmlProcessor->getAttachments($document);
     }
@@ -168,7 +186,8 @@ class HtmlFormat extends BaseFormat implements InjectableInterface, ParsableDOMI
     /**
      * @inheritdoc
      */
-    public function parseHeadings(string $content): array {
+    public function parseHeadings(string $content): array
+    {
         $rendered = $this->renderHtml($content);
         $document = new HtmlDocument($rendered);
         return $this->headingHtmlProcessor->getHeadings($document);
@@ -177,7 +196,8 @@ class HtmlFormat extends BaseFormat implements InjectableInterface, ParsableDOMI
     /**
      * @inheritdoc
      */
-    public function parseImageUrls(string $content): array {
+    public function parseImageUrls(string $content): array
+    {
         $rendered = $this->renderHtml($content, false);
         $document = new HtmlDocument($rendered);
         return $this->imageHtmlProcessor->getImageURLs($document);
@@ -186,7 +206,8 @@ class HtmlFormat extends BaseFormat implements InjectableInterface, ParsableDOMI
     /**
      * @inheritdoc
      */
-    public function parseImages(string $content): array {
+    public function parseImages(string $content): array
+    {
         $rendered = $this->renderHtml($content, false);
         $document = new HtmlDocument($rendered);
         return $this->imageHtmlProcessor->getImages($document);
@@ -195,12 +216,12 @@ class HtmlFormat extends BaseFormat implements InjectableInterface, ParsableDOMI
     /**
      * @inheritdoc
      */
-    public function parseMentions(string $content): array {
+    public function parseMentions(string $content, $skipTaggedContent = true): array
+    {
         // Legacy Mention Fetcher.
         // This should get replaced in a future refactoring.
-        return getMentions($content);
+        return getMentions($content, $skipTaggedContent, $skipTaggedContent);
     }
-
 
     const BLOCK_WITH_OWN_WHITESPACE =
         "(?:table|dl|ul|ol|pre|blockquote|address|p|h[1-6]|" .
@@ -216,19 +237,20 @@ class HtmlFormat extends BaseFormat implements InjectableInterface, ParsableDOMI
      * @return string
      * @internal Marked public for internal backwards compatibility only.
      */
-    public function cleanupLineBreaks(string $html): string {
+    public function cleanupLineBreaks(string $html): string
+    {
         $zeroWidthWhitespaceRemoved = preg_replace(
             "/(?!<code[^>]*?>)(\015\012|\012|\015)(?![^<]*?<\/code>)/",
             "<br />",
             $html
         );
         $breakBeforeReplaced = preg_replace(
-            '!(?:<br\s*/>){1,2}\s*(<' . self::BLOCK_WITH_OWN_WHITESPACE. '[^>]*>)!',
+            "!(?:<br\s*/>){1,2}\s*(<" . self::BLOCK_WITH_OWN_WHITESPACE . "[^>]*>)!",
             "\n$1",
             $zeroWidthWhitespaceRemoved
         );
         $breakAfterReplaced = preg_replace(
-            '!(</' . self::BLOCK_WITH_OWN_WHITESPACE . '[^>]*>)\s*(?:<br\s*/>){1,2}!',
+            "!(</" . self::BLOCK_WITH_OWN_WHITESPACE . "[^>]*>)\s*(?:<br\s*/>){1,2}!",
             "$1\n",
             $breakBeforeReplaced
         );
@@ -243,7 +265,8 @@ class HtmlFormat extends BaseFormat implements InjectableInterface, ParsableDOMI
      * @param string $html
      * @return string
      */
-    protected function legacySpoilers(string $html): string {
+    protected function legacySpoilers(string $html): string
+    {
         if ($this->hasLegacySpoilers($html) !== false) {
             $count = 0;
             do {
@@ -265,7 +288,8 @@ class HtmlFormat extends BaseFormat implements InjectableInterface, ParsableDOMI
      * @param string $html The HTML to test.
      * @return bool
      */
-    private function hasLegacySpoilers(string $html): bool {
+    private function hasLegacySpoilers(string $html): bool
+    {
         // Check for an inline spoiler.
         if (preg_match('`(\[spoiler\])[^\n]+(\[\/spoiler\])`', $html)) {
             return true;
@@ -282,9 +306,29 @@ class HtmlFormat extends BaseFormat implements InjectableInterface, ParsableDOMI
     /**
      * {@inheritDoc}
      */
-    public function parseDOM(string $content): TextDOMInterface {
+    public function parseDOM(string $content): TextDOMInterface
+    {
         $html = $this->renderHtml($content, false);
         $dom = new HtmlDocument($html);
         return $dom;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function removeUserPII(string $username, string $body): string
+    {
+        [$pattern["atMention"], $replacement["atMention"]] = $this->getNonRichAtMentionPattern(
+            $username,
+            $this->anonymizeUsername
+        );
+
+        [$pattern["url"], $replacement["url"]] = $this->getUrlPattern($username, $this->anonymizeUrl);
+
+        $pattern["quote"] = "~<blockquote class=\"Quote\" rel=\"$username\">~";
+        $replacement["quote"] = "<blockquote class=\"Quote\" rel=\"$this->anonymizeUsername\">";
+
+        $body = preg_replace($pattern, $replacement, $body);
+        return $body;
     }
 }

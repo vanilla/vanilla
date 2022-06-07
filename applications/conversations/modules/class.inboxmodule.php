@@ -11,36 +11,39 @@
 /**
  * Handles displaying the inbox.
  */
-class InboxModule extends Gdn_Module {
-
+class InboxModule extends Gdn_Module
+{
     /** @var int */
     public $Limit = 10;
 
     /** @var int */
     public $UserID = null;
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
-        $this->_ApplicationFolder = 'conversations';
+        $this->_ApplicationFolder = "conversations";
         $this->UserID = Gdn::session()->UserID;
     }
 
-    public function getData() {
+    public function getData()
+    {
         // Fetch from model.
         $model = new ConversationModel();
         $result = $model->getInbox($this->UserID, $this->Limit, 0);
 
         // Join in the participants.
         $model->joinParticipants($result);
-        $this->setData('Conversations', $result);
+        $this->setData("Conversations", $result);
     }
 
-    public function toString() {
+    public function toString()
+    {
         if (!Gdn::session()->isValid()) {
-            return '';
+            return "";
         }
 
-        if (!$this->data('Conversations')) {
+        if (!$this->data("Conversations")) {
             $this->getData();
         }
 

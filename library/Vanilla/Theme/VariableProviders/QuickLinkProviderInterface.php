@@ -10,8 +10,8 @@ namespace Vanilla\Theme\VariableProviders;
 /**
  * Interface to implement to provide custom default quick-links.
  */
-interface QuickLinkProviderInterface {
-
+interface QuickLinkProviderInterface
+{
     /**
      * Provide some quick links.
      *

@@ -11,14 +11,16 @@ use Vanilla\Contracts\Analytics\ClientInterface;
 /**
  * Provide basic event tracking as an analytics client.
  */
-class Client implements ClientInterface {
+class Client implements ClientInterface
+{
     /**
      * Get configuration details relevant to the analytics service.
      *
      * @param bool $includeDangerous Include sensitive values (i.e. read keys) in the config.
      * @return array
      */
-    public function config(bool $includeDangerous = false): array {
+    public function config(bool $includeDangerous = false): array
+    {
         return [];
     }
 
@@ -27,7 +29,8 @@ class Client implements ClientInterface {
      *
      * @return array
      */
-    public function eventDefaults(): array {
+    public function eventDefaults(): array
+    {
         return [];
     }
 
@@ -36,7 +39,8 @@ class Client implements ClientInterface {
      *
      * @param array $data
      */
-    public function recordEvent(array $data) {
+    public function recordEvent(array $data)
+    {
         // To be implemented at a later date.
     }
 }

@@ -20,33 +20,36 @@ use VanillaTests\Fixtures\Request;
  * Test for functions of CacheControlMiddleWare
  */
 
-class CacheControlMiddleWareTest extends TestCase implements CacheControlConstantsInterface {
-
+class CacheControlMiddleWareTest extends TestCase implements CacheControlConstantsInterface
+{
     use CacheControlTrait;
 
     /**
      * Test getHttp10Headers() with max-time set to 0.
      */
-    public function testGetHttp10HeadersWithMaxTimeZero() {
-        $actual = static::getHttp10Headers('private, max-age=0, no-cache');
-        $expected = ['Expires' => 'Sat, 01 Jan 2000 00:00:00 GMT', 'Pragma' => 'no-cache'];
+    public function testGetHttp10HeadersWithMaxTimeZero()
+    {
+        $actual = static::getHttp10Headers("private, max-age=0, no-cache");
+        $expected = ["Expires" => "Sat, 01 Jan 2000 00:00:00 GMT", "Pragma" => "no-cache"];
         $this->assertSame($expected, $actual);
     }
 
     /**
      * Test getHttp10Headers() with max-time not set to zero.
      */
-    public function testGetHttpHeadersWithMaxTimeGreaterThanZero() {
-        $actual = static::getHttp10Headers('private, max-age=120');
-        $expected = ['Expires' => gmdate('D, d M Y H:i:s T', time() + 120)];
+    public function testGetHttpHeadersWithMaxTimeGreaterThanZero()
+    {
+        $actual = static::getHttp10Headers("private, max-age=120");
+        $expected = ["Expires" => gmdate("D, d M Y H:i:s T", time() + 120)];
         $this->assertSame($expected, $actual);
     }
 
     /**
      * Test getHttpHeaders() with empty array.
      */
-    public function testGetHttpHeadersWithEmptyArray() {
-        $actual = static::getHttp10Headers('');
+    public function testGetHttpHeadersWithEmptyArray()
+    {
+        $actual = static::getHttp10Headers("");
         $expected = [];
         $this->assertSame($expected, $actual);
     }
@@ -60,10 +63,11 @@ class CacheControlMiddleWareTest extends TestCase implements CacheControlConstan
      * @param mixed $expected The expected result.
      * @dataProvider provideTestInvokeArrays
      */
-    public function testInvoke(int $userID, array $headers, array $meta, $expected) {
+    public function testInvoke(int $userID, array $headers, array $meta, $expected)
+    {
         $testSession = new Gdn_Session();
         $testSession->UserID = $userID;
-        $testRequest = new Request('/', 'GET', [1, 2, 3]);
+        $testRequest = new Request("/", "GET", [1, 2, 3]);
         $testObject = new CacheControlMiddleware($testSession);
         $modifiedObject = $testObject($testRequest, function (RequestInterface $request) use ($headers, $meta) {
             $r = new Data([]);
@@ -80,8 +84,8 @@ class CacheControlMiddleWareTest extends TestCase implements CacheControlConstan
         });
         $actual = $modifiedObject->getHeaders();
 
-        if ($actual['Expires'] !== 'Sat, 01 Jan 2000 00:00:00 GMT') {
-            unset($actual['Expires']);
+        if ($actual["Expires"] !== "Sat, 01 Jan 2000 00:00:00 GMT") {
+            unset($actual["Expires"]);
         }
 
         $this->assertSame($expected, $actual);
@@ -92,73 +96,74 @@ class CacheControlMiddleWareTest extends TestCase implements CacheControlConstan
      *
      * @return array Returns an array of test data.
      */
-    public function provideTestInvokeArrays() {
+    public function provideTestInvokeArrays()
+    {
         $r = [
-            'userIDZeroAndPublicCache' => [
+            "userIDZeroAndPublicCache" => [
                 0,
-                ['Cache-Control' => self::PUBLIC_CACHE],
+                ["Cache-Control" => self::PUBLIC_CACHE],
                 [],
                 [
-                    'Cache-Control' => 'public, max-age=120',
-                    'Vary' => 'Accept-Encoding, Cookie',
+                    "Cache-Control" => "public, max-age=120",
+                    "Vary" => "Accept-Encoding, Cookie",
                 ],
             ],
-            'userIDZeroAndNoCache' => [
+            "userIDZeroAndNoCache" => [
                 0,
-                ['Cache-Control' => self::NO_CACHE],
+                ["Cache-Control" => self::NO_CACHE],
                 [],
                 [
-                    'Cache-Control' => 'private, no-cache, max-age=0, must-revalidate',
-                    'Expires' => 'Sat, 01 Jan 2000 00:00:00 GMT',
-                    'Pragma' => 'no-cache',
+                    "Cache-Control" => "private, no-cache, max-age=0, must-revalidate",
+                    "Expires" => "Sat, 01 Jan 2000 00:00:00 GMT",
+                    "Pragma" => "no-cache",
                 ],
             ],
-            'userIDZeroAndNoCacheControlHeaderAtAll' => [
+            "userIDZeroAndNoCacheControlHeaderAtAll" => [
                 0,
-                ['Foo' => 'bar'],
+                ["Foo" => "bar"],
                 [],
                 [
-                    'Foo' => 'bar',
-                    'Cache-Control' => 'public, max-age=120',
-                    'Vary' => 'Accept-Encoding, Cookie'
+                    "Foo" => "bar",
+                    "Cache-Control" => "public, max-age=120",
+                    "Vary" => "Accept-Encoding, Cookie",
                 ],
             ],
-            'userID1AndPublicCache' => [
+            "userID1AndPublicCache" => [
                 1,
-                ['Cache-Control' => self::PUBLIC_CACHE],
+                ["Cache-Control" => self::PUBLIC_CACHE],
                 [],
                 [
-                    'Cache-Control' => 'public, max-age=120',
-                    'Vary' => 'Accept-Encoding, Cookie',
+                    "Cache-Control" => "public, max-age=120",
+                    "Vary" => "Accept-Encoding, Cookie",
                 ],
             ],
-            'userID1AndPublicCacheNoVary' => [
+            "userID1AndPublicCacheNoVary" => [
                 1,
-                ['Cache-Control' => self::PUBLIC_CACHE],
+                ["Cache-Control" => self::PUBLIC_CACHE],
                 [self::META_NO_VARY => true],
                 [
-                    'Cache-Control' => 'public, max-age=120',
+                    "Cache-Control" => "public, max-age=120",
                 ],
             ],
-            'userID1AndNoCache' => [
+            "userID1AndNoCache" => [
                 1,
-                ['Cache-Control' => self::NO_CACHE],
+                ["Cache-Control" => self::NO_CACHE],
                 [],
                 [
-                    'Cache-Control' => 'private, no-cache, max-age=0, must-revalidate',
-                    'Expires' => 'Sat, 01 Jan 2000 00:00:00 GMT',
-                    'Pragma' => 'no-cache',
+                    "Cache-Control" => "private, no-cache, max-age=0, must-revalidate",
+                    "Expires" => "Sat, 01 Jan 2000 00:00:00 GMT",
+                    "Pragma" => "no-cache",
                 ],
             ],
-            'userID1AndNoCacheControlHeaderAtAll' => [
+            "userID1AndNoCacheControlHeaderAtAll" => [
                 1,
-                ['Foo' => 'bar'],
+                ["Foo" => "bar"],
                 [],
                 [
-                    'Foo' => 'bar',
-                    'Cache-Control' => 'private, no-cache, max-age=0, must-revalidate',
-                    'Expires' => 'Sat, 01 Jan 2000 00:00:00 GMT',
-                    'Pragma' => 'no-cache',
+                    "Foo" => "bar",
+                    "Cache-Control" => "private, no-cache, max-age=0, must-revalidate",
+                    "Expires" => "Sat, 01 Jan 2000 00:00:00 GMT",
+                    "Pragma" => "no-cache",
                 ],
             ],
         ];

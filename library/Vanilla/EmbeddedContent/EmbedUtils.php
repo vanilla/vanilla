@@ -13,14 +13,15 @@ use Vanilla\Web\Asset\AssetPreloadModel;
 /**
  * Simple static embed utilities.
  */
-class EmbedUtils {
-
+class EmbedUtils
+{
     /**
      * Quick access so embed instances can easily preload assets.
      *
      * @return AssetPreloadModel
      */
-    public static function getPreloadModel(): AssetPreloadModel {
+    public static function getPreloadModel(): AssetPreloadModel
+    {
         return \Gdn::getContainer()->get(AssetPreloadModel::class);
     }
 
@@ -32,10 +33,11 @@ class EmbedUtils {
      *
      * @return array A tuple of [$height, $width].
      */
-    public static function extractDimensions($response): array {
+    public static function extractDimensions($response): array
+    {
         // Parse the ID out of the URL.
-        $width = $response['width'] ?? null;
-        $height = $response['height'] ?? null;
+        $width = $response["width"] ?? null;
+        $height = $response["height"] ?? null;
 
         // If we don't have our width/height ratio, fall back to a 16/9 ratio.
         if ($width === null || $response === null) {
@@ -52,10 +54,11 @@ class EmbedUtils {
      * @param array $data The data to check.
      * @return array The normalized data.
      */
-    public static function ensureDimensions(array $data): array {
+    public static function ensureDimensions(array $data): array
+    {
         [$height, $width] = self::extractDimensions($data);
-        $data['height'] = $height;
-        $data['width'] = $width;
+        $data["height"] = $height;
+        $data["width"] = $width;
         return $data;
     }
 
@@ -68,7 +71,8 @@ class EmbedUtils {
      *
      * @deprecated Use ArrayUtils::remapProperties.
      */
-    public static function remapProperties(array $data, array $modifications): array {
+    public static function remapProperties(array $data, array $modifications): array
+    {
         return ArrayUtils::remapProperties($data, $modifications);
     }
 }

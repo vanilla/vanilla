@@ -20,8 +20,12 @@ use Vanilla\Widgets\React\ReactWidgetInterface;
  *
  * Assets may have restrictions on where they can be placed and in what views.
  */
-abstract class AbstractLayoutAsset implements ReactWidgetInterface, CombinedPropsWidgetInterface, PageHeadAwareInterface, LayoutAssetAwareInterface {
-
+abstract class AbstractLayoutAsset implements
+    ReactWidgetInterface,
+    CombinedPropsWidgetInterface,
+    PageHeadAwareInterface,
+    LayoutAssetAwareInterface
+{
     use CombinedPropsWidgetTrait;
     use LayoutAssetAwareTrait;
     use PageHeadAwareTrait;

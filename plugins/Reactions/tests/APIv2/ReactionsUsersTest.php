@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -13,8 +13,8 @@ use VanillaTests\UsersAndRolesApiTestTrait;
 /**
  * Test integrations between Reactions and the users API endpoint.
  */
-class ReactionsUsersTest extends AbstractAPIv2Test {
-
+class ReactionsUsersTest extends AbstractAPIv2Test
+{
     use CommunityApiTestTrait, UsersAndRolesApiTestTrait;
 
     /** @var ReactionModel */
@@ -25,7 +25,8 @@ class ReactionsUsersTest extends AbstractAPIv2Test {
     /**
      * @inheritdoc
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         $this->createUserFixtures();
         $this->container()->call(function (ReactionModel $reactionModel) {
@@ -37,8 +38,11 @@ class ReactionsUsersTest extends AbstractAPIv2Test {
     /**
      * Verify expanding reactions on the users API index.
      */
-    public function testExpandReceivedUsersIndex(): void {
-        $response = $this->api()->get("users", ["expand" => "reactionsReceived"])->getBody();
+    public function testExpandReceivedUsersIndex(): void
+    {
+        $response = $this->api()
+            ->get("users", ["expand" => "reactionsReceived"])
+            ->getBody();
         $user = reset($response);
         $actual = $user["reactionsReceived"];
         $expected = $this->reactionModel->compoundTypeFragmentSchema()->validate($actual);
@@ -48,8 +52,11 @@ class ReactionsUsersTest extends AbstractAPIv2Test {
     /**
      * Verify not expanding reactions on the users API index does not include the field.
      */
-    public function testNoExpandReceivedUsersIndex(): void {
-        $response = $this->api()->get("users")->getBody();
+    public function testNoExpandReceivedUsersIndex(): void
+    {
+        $response = $this->api()
+            ->get("users")
+            ->getBody();
         $user = reset($response);
         $this->assertArrayNotHasKey("reactionsReceived", $user);
     }
@@ -57,7 +64,8 @@ class ReactionsUsersTest extends AbstractAPIv2Test {
     /**
      * Verify expanding reactions when getting a single user from the API.
      */
-    public function testExpandReceivedUsersGet(): void {
+    public function testExpandReceivedUsersGet(): void
+    {
         $discussion = null;
 
         $this->createUser();
@@ -65,13 +73,12 @@ class ReactionsUsersTest extends AbstractAPIv2Test {
             $discussion = $this->createDiscussion(["categoryID" => 1]);
         }, $this->lastUserID);
         $this->runWithUser(function () use ($discussion) {
-            $this->api->post(
-                "discussions/{$discussion['discussionID']}/reactions",
-                ["reactionType" => "Like"]
-            );
+            $this->api->post("discussions/{$discussion["discussionID"]}/reactions", ["reactionType" => "Like"]);
         }, $this->adminID);
 
-        $response = $this->api()->get("users/{$this->lastUserID}", ["expand" => "reactionsReceived"])->getBody();
+        $response = $this->api()
+            ->get("users/{$this->lastUserID}", ["expand" => "reactionsReceived"])
+            ->getBody();
 
         // Verify the shape.
         $actual = $response["reactionsReceived"];
@@ -86,16 +93,20 @@ class ReactionsUsersTest extends AbstractAPIv2Test {
     /**
      * Verify not expanding reactions when getting a single user from the API does not include the field.
      */
-    public function testNoExpandReceivedUsersGet(): void {
+    public function testNoExpandReceivedUsersGet(): void
+    {
         $user = $this->insertDummyUser();
-        $actual = $this->api()->get("users/{$user['UserID']}")->getBody();
+        $actual = $this->api()
+            ->get("users/{$user["UserID"]}")
+            ->getBody();
         $this->assertArrayNotHasKey("reactionsReceived", $actual);
     }
 
     /**
      * Test that the profile reactions page is not in edit mode.
      */
-    public function testReactionProfilePage(): void {
+    public function testReactionProfilePage(): void
+    {
         $discussion = null;
 
         $user = $this->createUser();
@@ -103,15 +114,12 @@ class ReactionsUsersTest extends AbstractAPIv2Test {
             $discussion = $this->createDiscussion(["categoryID" => 1]);
         }, $this->lastUserID);
         $this->runWithUser(function () use ($discussion) {
-            $this->api->post(
-                "discussions/{$discussion['discussionID']}/reactions",
-                ["reactionType" => "Like"]
-            );
+            $this->api->post("discussions/{$discussion["discussionID"]}/reactions", ["reactionType" => "Like"]);
         }, $this->adminID);
 
-        $profileController = $this->bessy()->get("/profile/reactions/{$user['name']}?reaction=like");
+        $profileController = $this->bessy()->get("/profile/reactions/{$user["name"]}?reaction=like");
         // Make sure the profile options module doesn't come through.
-        $this->assertIsNotObject($profileController->getAsset('Content'));
+        $this->assertIsNotObject($profileController->getAsset("Content"));
         // Make sure we aren't, and never have been, in edit mode.
         $this->assertFalse($profileController->EditMode);
         // The Css class will be "EditMode Profile" if edit mode has been set to true.

@@ -15,8 +15,8 @@ use VanillaTests\Fixtures\Database\ProcessorFixture;
 /**
  * Tests for the PipelineModel class.
  */
-class PipelineModelTest extends ModelTest {
-
+class PipelineModelTest extends ModelTest
+{
     /**
      * @var PipelineModel
      */
@@ -25,19 +25,21 @@ class PipelineModelTest extends ModelTest {
     /**
      * @inheritDoc
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         /** @var PipelineModel $model */
-        $model = $this->container()->getArgs(PipelineModel::class, ['model']);
-        $model->addPipelineProcessor(new JsonFieldProcessor(['attributes']));
+        $model = $this->container()->getArgs(PipelineModel::class, ["model"]);
+        $model->addPipelineProcessor(new JsonFieldProcessor(["attributes"]));
         $this->model = $model;
     }
 
     /**
      * Verify primary action persists when making additional calls to the pipeline within adjacent processors.
      */
-    public function testPersistentAction(): void {
+    public function testPersistentAction(): void
+    {
         $model = $this->container()->getArgs(PipelineModel::class, ["model"]);
         $rowID = $model->insert(["name" => __FUNCTION__]);
         $processor = new ProcessorFixture(function (Operation $operation) {
@@ -47,9 +49,14 @@ class PipelineModelTest extends ModelTest {
         });
         $model->addPipelineProcessor($processor);
         $result = $model->get(["modelID" => $rowID]);
-        $this->assertSame([[
-            "modelID" => $rowID,
-            "name" => __FUNCTION__,
-        ]], $result);
+        $this->assertSame(
+            [
+                [
+                    "modelID" => $rowID,
+                    "name" => __FUNCTION__,
+                ],
+            ],
+            $result
+        );
     }
 }

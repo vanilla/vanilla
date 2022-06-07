@@ -15,8 +15,8 @@ use Vanilla\EmbeddedContent\EmbedUtils;
 /**
  * Factory for the GiphyEmbed.
  */
-class GiphyEmbedFactory extends AbstractEmbedFactory {
-
+class GiphyEmbedFactory extends AbstractEmbedFactory
+{
     const GPH_IS = "gph.is";
     const GIPHY_COM = "giphy.com";
     const MEDIA_GIPHY_COM = "media.giphy.com";
@@ -36,14 +36,16 @@ class GiphyEmbedFactory extends AbstractEmbedFactory {
      *
      * @param HttpClient $httpClient
      */
-    public function __construct(HttpClient $httpClient) {
+    public function __construct(HttpClient $httpClient)
+    {
         $this->httpClient = $httpClient;
     }
 
     /**
      * @inheritdoc
      */
-    protected function getSupportedDomains(): array {
+    protected function getSupportedDomains(): array
+    {
         return [self::GPH_IS, self::GIPHY_COM];
     }
 
@@ -51,7 +53,8 @@ class GiphyEmbedFactory extends AbstractEmbedFactory {
      * We pass along to the oembed service. If it can't parse the URL, then we definitely can't.
      * @inheritdoc
      */
-    protected function getSupportedPathRegex(string $domain): string {
+    protected function getSupportedPathRegex(string $domain): string
+    {
         switch ($domain) {
             case self::GPH_IS:
                 // Anything goes here. This is giphy's URL shortening service.
@@ -71,11 +74,9 @@ class GiphyEmbedFactory extends AbstractEmbedFactory {
      * @inheritdoc
      * @throws \Exception If the scrape fails.
      */
-    public function createEmbedForUrl(string $url): AbstractEmbed {
-        $response = $this->httpClient->get(
-            self::OEMBED_URL_BASE,
-            [ 'url' => $url ]
-        );
+    public function createEmbedForUrl(string $url): AbstractEmbed
+    {
+        $response = $this->httpClient->get(self::OEMBED_URL_BASE, ["url" => $url]);
 
         // Example Response JSON
         // {
@@ -92,19 +93,19 @@ class GiphyEmbedFactory extends AbstractEmbedFactory {
         // }
 
         // Parse the ID out of the URL.
-        $fullUrl = $response['url'] ?? null;
+        $fullUrl = $response["url"] ?? null;
         preg_match(self::FULL_SLUG_REGEX, $fullUrl, $matches);
-        $id = $matches['postID'] ?? null;
+        $id = $matches["postID"] ?? null;
 
         [$height, $width] = EmbedUtils::extractDimensions($response);
 
         $data = [
-            'embedType' => GiphyEmbed::TYPE,
-            'url' => $url,
-            'name' => $response['title'] ?? '',
-            'height' => $height,
-            'width' => $width,
-            'giphyID' => $id,
+            "embedType" => GiphyEmbed::TYPE,
+            "url" => $url,
+            "name" => $response["title"] ?? "",
+            "height" => $height,
+            "width" => $width,
+            "giphyID" => $id,
         ];
 
         return new GiphyEmbed($data);

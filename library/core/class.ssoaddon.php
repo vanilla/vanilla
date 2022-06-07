@@ -8,8 +8,8 @@
 /**
  * Sub-class of plugins for SSO authentication.
  */
-abstract class SSOAddon extends Gdn_Plugin {
-
+abstract class SSOAddon extends Gdn_Plugin
+{
     /**
      * Gets the AuthenticationScheme to match the db's 'AuthenticationSchemeAlias' column.
      *
@@ -20,9 +20,13 @@ abstract class SSOAddon extends Gdn_Plugin {
     /**
      * Sets the value of 'IsDefault' to 0 when the plugin is disabled.
      */
-    public function onDisable() {
+    public function onDisable()
+    {
         /** @var Gdn_AuthenticationProviderModel $authenticationProvider */
         $authenticationProvider = Gdn::getContainer()->get(Gdn_AuthenticationProviderModel::class);
-        $authenticationProvider->update(['IsDefault' => 0], ['AuthenticationSchemeAlias' => $this->getAuthenticationSchemeAlias()]);
+        $authenticationProvider->update(
+            ["IsDefault" => 0],
+            ["AuthenticationSchemeAlias" => $this->getAuthenticationSchemeAlias()]
+        );
     }
 }

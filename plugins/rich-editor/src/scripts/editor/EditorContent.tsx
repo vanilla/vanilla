@@ -351,11 +351,11 @@ function useUpdateHandler() {
         }
 
         HeaderBlot.resetCounters();
-        const headers = (quill.scroll.descendants(
+        const headers = quill.scroll.descendants(
             (blot) => blot instanceof HeaderBlot,
             0,
             quill.scroll.length(),
-        ) as any) as HeaderBlot[]; // Explicit mapping of types because the parchments types suck.
+        ) as any as HeaderBlot[]; // Explicit mapping of types because the parchments types suck.
 
         headers.forEach((header) => header.setGeneratedID());
         quill.update(Quill.sources.API);

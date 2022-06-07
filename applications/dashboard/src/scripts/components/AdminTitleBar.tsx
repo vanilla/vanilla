@@ -9,6 +9,7 @@ import { cx } from "@emotion/css";
 import TruncatedText from "@library/content/TruncatedText";
 import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
 import { userContentClasses } from "@library/content/UserContent.styles";
+import { useStackingContext } from "@vanilla/react-utils";
 
 export interface IProps {
     title: string;
@@ -21,7 +22,9 @@ export interface IProps {
 }
 
 export default function AdminTitleBar(props: IProps) {
-    const classes = adminTitleBarClasses();
+    const { zIndex } = useStackingContext();
+
+    const classes = adminTitleBarClasses({ zIndex });
 
     return (
         <div className={classes.root}>

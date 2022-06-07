@@ -10,14 +10,15 @@ namespace VanillaTests\Fixtures;
 /**
  * Fixture that serializes itself recursively.
  */
-final class RecursiveSerializable implements \JsonSerializable {
-
+final class RecursiveSerializable implements \JsonSerializable
+{
     /**
      * @inheritdoc
      */
-    public function jsonSerialize() {
+    public function jsonSerialize()
+    {
         return [
-            'self' => $this,
+            "self" => $this,
         ];
     }
 }

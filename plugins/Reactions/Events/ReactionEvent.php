@@ -12,8 +12,8 @@ use Garden\Events\ResourceEvent;
 /**
  * Represent a reaction resource event.
  */
-class ReactionEvent extends ResourceEvent {
-
+class ReactionEvent extends ResourceEvent
+{
     /**
      * ReactionEvent constructor.
      *
@@ -21,35 +21,40 @@ class ReactionEvent extends ResourceEvent {
      * @param array $payload
      * @param array|null $sender
      */
-    public function __construct(string $action, array $payload, ?array $sender = null) {
+    public function __construct(string $action, array $payload, ?array $sender = null)
+    {
         parent::__construct($action, $payload, $sender);
     }
 
     /**
      * Get the user that made the reaction.
      */
-    public function getReactionUserID(): ?int {
-        return $this->payload['reaction']['user']['userID'] ?? null;
+    public function getReactionUserID(): ?int
+    {
+        return $this->payload["reaction"]["user"]["userID"] ?? null;
     }
 
     /**
      * @return string
      */
-    public function getRecordType(): string {
-        return strtolower($this->payload['reaction']['recordType']);
+    public function getRecordType(): string
+    {
+        return strtolower($this->payload["reaction"]["recordType"]);
     }
 
     /**
      * @return int
      */
-    public function getRecordID(): int {
-        return $this->payload['reaction']['recordID'];
+    public function getRecordID(): int
+    {
+        return $this->payload["reaction"]["recordID"];
     }
 
     /**
      * @return string
      */
-    public function getReactionName(): string {
-        return $this->payload['reaction']['reactionType']['name'];
+    public function getReactionName(): string
+    {
+        return $this->payload["reaction"]["reactionType"]["name"];
     }
 }

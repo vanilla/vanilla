@@ -11,11 +11,13 @@ use Garden\Hydrate\DataHydrator;
 use Monolog\Test\TestCase;
 use Vanilla\Layout\LayoutHydrator;
 
-trait LayoutTestTrait {
+trait LayoutTestTrait
+{
     /**
      * @return LayoutHydrator
      */
-    private function getLayoutService(): LayoutHydrator {
+    private function getLayoutService(): LayoutHydrator
+    {
         return self::container()->get(LayoutHydrator::class);
     }
 
@@ -46,10 +48,11 @@ trait LayoutTestTrait {
      *
      * @return array
      */
-    protected function layoutSection(array $content, array $middleware = []): array {
+    protected function layoutSection(array $content, array $middleware = []): array
+    {
         $node = [
-            DataHydrator::KEY_HYDRATE => 'react.section.1-column',
-            'children' => $content,
+            DataHydrator::KEY_HYDRATE => "react.section.1-column",
+            "children" => $content,
         ];
         if (!empty($middleware)) {
             $node[DataHydrator::KEY_MIDDLEWARE] = $middleware;
@@ -65,10 +68,11 @@ trait LayoutTestTrait {
      *
      * @return string[]
      */
-    protected function layoutHtml(string $html, array $middleware = []) {
+    protected function layoutHtml(string $html, array $middleware = [])
+    {
         $node = [
-            DataHydrator::KEY_HYDRATE => 'react.html',
-            'html' => $html,
+            DataHydrator::KEY_HYDRATE => "react.html",
+            "html" => $html,
         ];
 
         if (!empty($middleware)) {

@@ -14,14 +14,14 @@ use VanillaTests\Fixtures\MockConfig;
 /**
  * Tests for the deployment cache buster.
  */
-class DeploymentCacheBusterTest extends TestCase {
+class DeploymentCacheBusterTest extends TestCase
+{
     /**
      * Test that it falls back if the config value is not set.
      */
-    public function testFallback() {
-        $buster = new DeploymentCacheBuster(
-            null
-        );
+    public function testFallback()
+    {
+        $buster = new DeploymentCacheBuster(null);
 
         $this->assertEquals(APPLICATION_VERSION, $buster->value());
     }
@@ -29,18 +29,13 @@ class DeploymentCacheBusterTest extends TestCase {
     /**
      * Test that the generated value is accurate.
      */
-    public function testValue() {
-        $firstValue = (new DeploymentCacheBuster(
-            900
-        ))->value();
-        $secondValue = (new DeploymentCacheBuster(
-            900
-        ))->value();
+    public function testValue()
+    {
+        $firstValue = (new DeploymentCacheBuster(900))->value();
+        $secondValue = (new DeploymentCacheBuster(900))->value();
         $this->assertEquals($firstValue, $secondValue, "Busters should be consistent between each other");
 
-        $thirdValue = (new DeploymentCacheBuster(
-            500
-        ))->value();
+        $thirdValue = (new DeploymentCacheBuster(500))->value();
         $this->assertNotEquals(
             $secondValue,
             $thirdValue,
@@ -51,10 +46,9 @@ class DeploymentCacheBusterTest extends TestCase {
     /**
      * Test that subsequent calls for the buster's value should be equal.
      */
-    public function testConsistentValue() {
-        $buster = new DeploymentCacheBuster(
-            500
-        );
+    public function testConsistentValue()
+    {
+        $buster = new DeploymentCacheBuster(500);
 
         $valueA = $buster->value();
         $valueB = $buster->value();

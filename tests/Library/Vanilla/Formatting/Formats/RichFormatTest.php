@@ -19,32 +19,35 @@ use VanillaTests\SiteTestTrait;
 /**
  * Tests for the RichFormat.
  */
-class RichFormatTest extends TestCase {
-
+class RichFormatTest extends TestCase
+{
     use SiteTestTrait;
     use EventSpyTestTrait;
 
     /**
      * @inheritDoc
      */
-    protected function prepareFormatter(): FormatInterface {
+    protected function prepareFormatter(): FormatInterface
+    {
         self::container()
             ->rule(EmbedService::class)
-            ->addCall('registerEmbed', [ImageEmbed::class, ImageEmbed::TYPE]);
+            ->addCall("registerEmbed", [ImageEmbed::class, ImageEmbed::TYPE]);
         return self::container()->get(RichFormat::class);
     }
 
     /**
      * @inheritDoc
      */
-    protected function prepareFixtures(): array {
-        return (new FormatFixtureFactory('rich'))->getAllFixtures();
+    protected function prepareFixtures(): array
+    {
+        return (new FormatFixtureFactory("rich"))->getAllFixtures();
     }
 
     /**
      * Test parseImageUrls excludes emojis.
      */
-    public function testParseImageUrlsExcludeEmojis() {
+    public function testParseImageUrlsExcludeEmojis()
+    {
         $formatService = $this->prepareFormatter();
         $content = '[{"insert":{"emoji":{"emojiChar":"😀"}}},{"insert":"\n"}]';
         $result = $formatService->parseImageUrls($content);

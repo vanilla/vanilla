@@ -13,8 +13,8 @@ use Vanilla\Scheduler\SchedulerInterface;
 /**
  * Class SiteTotalsModule
  */
-class SiteTotalsModule extends Gdn_Module {
-
+class SiteTotalsModule extends Gdn_Module
+{
     /** @var int */
     const CACHE_TTL = 43200;
 
@@ -25,16 +25,16 @@ class SiteTotalsModule extends Gdn_Module {
     const LOCK_INTERVAL = 60;
 
     /** @var string */
-    const CACHE_KEY = 'module.sitetotals';
+    const CACHE_KEY = "module.sitetotals";
 
     /** @var string */
-    const COUNTS_KEY = self::CACHE_KEY.'.counts';
+    const COUNTS_KEY = self::CACHE_KEY . ".counts";
 
     /** @var string */
-    const LOCK_KEY = self::CACHE_KEY.'.lock';
+    const LOCK_KEY = self::CACHE_KEY . ".lock";
 
     /** @var string */
-    const RECALCULATE_KEY = self::CACHE_KEY.'.recalculate';
+    const RECALCULATE_KEY = self::CACHE_KEY . ".recalculate";
 
     /** @var bool Will add online users count to module data */
     public $onlineUsers = false;
@@ -45,16 +45,18 @@ class SiteTotalsModule extends Gdn_Module {
     /**
      * SiteTotalsModule constructor.
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
-        $this->_ApplicationFolder = 'dashboard';
+        $this->_ApplicationFolder = "dashboard";
     }
 
     /**
      * @return string
      */
-    public function assetTarget() {
-        return 'Panel';
+    public function assetTarget()
+    {
+        return "Panel";
     }
 
     /**
@@ -62,11 +64,13 @@ class SiteTotalsModule extends Gdn_Module {
      *
      * @return mixed
      */
-    public function getTotals() {
+    public function getTotals()
+    {
         // check recalculate flag
         $recalculateFlag = Gdn::cache()->get(self::RECALCULATE_KEY);
 
-        if ($recalculateFlag === Gdn_Cache::CACHEOP_FAILURE) {  // expired
+        if ($recalculateFlag === Gdn_Cache::CACHEOP_FAILURE) {
+            // expired
             $this->tryRecalculate();
         }
 
@@ -82,23 +86,24 @@ class SiteTotalsModule extends Gdn_Module {
      *
      * @return bool
      */
-    private function tryRecalculate():bool {
+    private function tryRecalculate(): bool
+    {
         $lock = Gdn::cache()->get(self::LOCK_KEY);
 
-        if ($lock === Gdn_Cache::CACHEOP_FAILURE) { //already locked
-            $added = Gdn::cache()->add(self::LOCK_KEY, mt_rand(1, 999999), [Gdn_Cache::FEATURE_EXPIRY => self::LOCK_INTERVAL]);
+        if ($lock === Gdn_Cache::CACHEOP_FAILURE) {
+            //already locked
+            $added = Gdn::cache()->add(self::LOCK_KEY, mt_rand(1, 999999), [
+                Gdn_Cache::FEATURE_EXPIRY => self::LOCK_INTERVAL,
+            ]);
 
             if ($added) {
                 /** @var Vanilla\Scheduler\SchedulerInterface $scheduler */
                 $scheduler = Gdn::getContainer()->get(Vanilla\Scheduler\SchedulerInterface::class);
-                $scheduler->addJob(
-                    Vanilla\Scheduler\Job\CallbackJob::class,
-                    [
-                        "callback" => function () {
-                            $this->getAllCounts();
-                        }
-                    ]
-                );
+                $scheduler->addJob(Vanilla\Scheduler\Job\CallbackJob::class, [
+                    "callback" => function () {
+                        $this->getAllCounts();
+                    },
+                ]);
 
                 return true;
             }
@@ -110,8 +115,9 @@ class SiteTotalsModule extends Gdn_Module {
     /**
      * Triggers getCount to request the DB
      */
-    private function getAllCounts() {
-        $counts = ['User' => 0, 'Discussion' => 0, 'Comment' => 0];
+    private function getAllCounts()
+    {
+        $counts = ["User" => 0, "Discussion" => 0, "Comment" => 0];
 
         foreach ($counts as $name => $value) {
             $count = $this->getCount($name);
@@ -119,13 +125,13 @@ class SiteTotalsModule extends Gdn_Module {
         }
 
         if (in_array(null, $counts)) {
-            Logger::log('sitetotalsmodule_request_error', 'DB request returning unexpected values', $counts);
-            return false;    //bail without overriding the cache
+            Logger::log("sitetotalsmodule_request_error", "DB request returning unexpected values", $counts);
+            return false; //bail without overriding the cache
         }
 
         //total of discussions and comments, as posts
         if ($this->totalPosts) {
-            $counts['Post'] = $counts['Discussion'] + $counts['Comment'];
+            $counts["Post"] = $counts["Discussion"] + $counts["Comment"];
         }
 
         // cache counts
@@ -141,11 +147,13 @@ class SiteTotalsModule extends Gdn_Module {
      * @param string $table
      * @return int
      */
-    protected function getCount($table): ?int {
+    protected function getCount($table): ?int
+    {
         $count = Gdn::sql()
-            ->select($table.'ID', 'count', 'CountRows')
+            ->select($table . "ID", "count", "CountRows")
             ->from($table)
-            ->get()->value('CountRows', null);
+            ->get()
+            ->value("CountRows", null);
 
         return $count;
     }
@@ -153,16 +161,17 @@ class SiteTotalsModule extends Gdn_Module {
     /**
      * @return string
      */
-    public function toString() {
+    public function toString()
+    {
         $totals = $this->getTotals();
 
         if (empty($totals)) {
-            return '';   //don't render the module
+            return ""; //don't render the module
         }
 
-        $this->setData('Totals', $totals);
-        $this->EventArguments['OnlineUsers'] = $this->onlineUsers;
-        $this->FireEvent('BeforeRender');
+        $this->setData("Totals", $totals);
+        $this->EventArguments["OnlineUsers"] = $this->onlineUsers;
+        $this->FireEvent("BeforeRender");
         return parent::toString();
     }
 }

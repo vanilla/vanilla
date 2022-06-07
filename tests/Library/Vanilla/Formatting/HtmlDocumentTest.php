@@ -13,7 +13,8 @@ use VanillaTests\VanillaTestCase;
 /**
  * Tests for the `HtmlDocument` class.
  */
-class HtmlDocumentTest extends VanillaTestCase {
+class HtmlDocumentTest extends VanillaTestCase
+{
     use HtmlNormalizeTrait;
 
     public const HTML_FULL = <<<HTML
@@ -35,12 +36,11 @@ HTML;
 <div>٩(-̮̮̃-̃)۶ <b>٩(●̮̮̃•̃)۶</b> ٩(͡๏̯͡๏)۶ ٩(-̮̮̃•̃).</div>
 HTML;
 
-
-
     /**
      * Test the fragment without wrapping.
      */
-    public function testNoWrap(): void {
+    public function testNoWrap(): void
+    {
         $doc = new HtmlDocument(self::HTML_FULL, false);
         $actual = $doc->getInnerHtml();
         $this->assertHtmlStringEqualsHtmlString(self::HTML_FULL, $actual);
@@ -52,7 +52,8 @@ HTML;
      * @param string $html
      * @dataProvider provideHtmlSnippets
      */
-    public function testWrap(string $html): void {
+    public function testWrap(string $html): void
+    {
         $doc = new HtmlDocument($html);
         $actual = $doc->getInnerHtml();
         $this->assertHtmlStringEqualsHtmlString($html, $actual);
@@ -63,10 +64,11 @@ HTML;
      *
      * @return \string[][]
      */
-    public function provideHtmlSnippets(): array {
+    public function provideHtmlSnippets(): array
+    {
         return [
-            'text' => [self::HTML_TEXT],
-            'snippet' => [self::HTML_SNIPPET],
+            "text" => [self::HTML_TEXT],
+            "snippet" => [self::HTML_SNIPPET],
         ];
     }
 }

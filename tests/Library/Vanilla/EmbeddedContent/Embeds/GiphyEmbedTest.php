@@ -13,12 +13,14 @@ use VanillaTests\MinimalContainerTestCase;
 /**
  * Validation logic test.
  */
-class GiphyEmbedTest extends MinimalContainerTestCase {
+class GiphyEmbedTest extends MinimalContainerTestCase
+{
     /**
      * Ensure we can create giphy embed from the old data format that might still
      * live in the DB.
      */
-    public function testLegacyDataFormat() {
+    public function testLegacyDataFormat()
+    {
         $oldDataJSON = <<<JSON
 {
     "url": "https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif",

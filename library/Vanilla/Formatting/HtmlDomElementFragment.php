@@ -12,8 +12,8 @@ use Vanilla\Formatting\Html\DomUtils;
 /**
  * A text fragment that points to an element in a single `DOMDocument` node.
  */
-class HtmlDomElementFragment implements TextFragmentInterface {
-
+class HtmlDomElementFragment implements TextFragmentInterface
+{
     /**
      * @var \DOMElement
      */
@@ -30,7 +30,8 @@ class HtmlDomElementFragment implements TextFragmentInterface {
      * @param \DOMElement $parent The parent node that owns the content.
      * @param string $type The fragment type, usually HTML.
      */
-    public function __construct(\DOMElement $parent, string $type = TextFragmentType::HTML) {
+    public function __construct(\DOMElement $parent, string $type = TextFragmentType::HTML)
+    {
         $this->parent = $parent;
         $this->type = $type;
     }
@@ -38,35 +39,40 @@ class HtmlDomElementFragment implements TextFragmentInterface {
     /**
      * @inheritDoc
      */
-    public function getInnerContent(): string {
+    public function getInnerContent(): string
+    {
         return DomUtils::getInnerHTML($this->parent);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function setInnerContent(string $text) {
+    public function setInnerContent(string $text)
+    {
         DomUtils::setInnerHTML($this->parent, $text);
     }
 
     /**
      * @inheritDoc
      */
-    public function getFragmentType(): string {
+    public function getFragmentType(): string
+    {
         return $this->type;
     }
 
     /**
      * @return \DOMElement
      */
-    public function getParent(): \DOMElement {
+    public function getParent(): \DOMElement
+    {
         return $this->parent;
     }
 
     /**
      * @param \DOMElement $parent
      */
-    public function setParent(\DOMElement $parent): void {
+    public function setParent(\DOMElement $parent): void
+    {
         $this->parent = $parent;
     }
 }

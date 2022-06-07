@@ -7,29 +7,29 @@
 
 namespace Vanilla\Formatting\Quill\Formats;
 
-class Bold extends AbstractFormat {
-
+class Bold extends AbstractFormat
+{
     /**
      * @inheritDoc
      */
-    protected static function getAttributeLookupKey(): string {
+    protected static function getAttributeLookupKey(): string
+    {
         return "bold";
     }
 
     /**
      * @inheritDoc
      */
-    protected function getBlackListedNestedFormats(): array {
-        return [
-            Link::class,
-            Code::class,
-        ];
+    protected function getBlackListedNestedFormats(): array
+    {
+        return [Link::class, Code::class];
     }
 
     /**
      * @inheritDoc
      */
-    protected function getTagName(): string {
+    protected function getTagName(): string
+    {
         return "strong";
     }
 }

@@ -12,8 +12,8 @@ use Vanilla\AddonStructure;
 /**
  * Bad structure.
  */
-class BadStructureStructure extends AddonStructure {
-
+class BadStructureStructure extends AddonStructure
+{
     /**
      * Structure fails when we aren't enabling.
      *
@@ -21,9 +21,10 @@ class BadStructureStructure extends AddonStructure {
      *
      * @return void
      */
-    public function structure(bool $isEnable): void {
+    public function structure(bool $isEnable): void
+    {
         if (!$isEnable) {
-            throw new \Exception('Fail in structure');
+            throw new \Exception("Fail in structure");
         }
     }
 }

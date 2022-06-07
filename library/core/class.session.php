@@ -19,19 +19,22 @@ use Vanilla\Permissions;
 /**
  * Handles user information throughout a session. This class is a singleton.
  */
-class Gdn_Session implements LoggerAwareInterface {
+class Gdn_Session implements LoggerAwareInterface
+{
     use StaticCacheConfigTrait;
     use LoggerAwareTrait;
 
     /**
      * Parameter name for incoming CSRF tokens.
      */
-    const CSRF_NAME = 'TransientKey';
+    const CSRF_NAME = "TransientKey";
 
     /** Maximum length of inactivity, in seconds, before a visit is considered new. */
     const VISIT_LENGTH = 1200; // 20 minutes
 
     public const FEATURE_SESSION_ID_COOKIE = "sessionIDCookie";
+
+    public const FEATURE_ENFORCE_SESSION_ID_COOKIE = "enforceSessionIDCookie";
 
     /** @var int Unique user identifier. */
     public $UserID;
@@ -63,7 +66,8 @@ class Gdn_Session implements LoggerAwareInterface {
      * Private constructor prevents direct instantiation of object
      *
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->UserID = 0;
         $this->SessionID = 0;
         $this->User = false;
@@ -74,13 +78,13 @@ class Gdn_Session implements LoggerAwareInterface {
         $this->permissions = new Permissions();
     }
 
-
     /**
      * Add the permissions from a permissions array to this session's permissions.
      *
      * @param array $perms The permissions to add.
      */
-    public function addPermissions($perms) {
+    public function addPermissions($perms)
+    {
         $newPermissions = new Permissions($perms);
         $this->permissions->merge($newPermissions);
     }
@@ -92,7 +96,8 @@ class Gdn_Session implements LoggerAwareInterface {
      * @return boolean True on valid authorization, false on failure to authorize.
      * @deprecated Use `Permissions::hasRanked()` instead.
      */
-    public function checkRankedPermission($permission) {
+    public function checkRankedPermission($permission)
+    {
         if ($permission === true) {
             return true;
         } elseif ($permission === false) {
@@ -119,17 +124,16 @@ class Gdn_Session implements LoggerAwareInterface {
     public function checkPermission(
         $permission,
         $fullMatch = true,
-        $junctionTable = '',
-        $junctionID = '',
+        $junctionTable = "",
+        $junctionID = "",
         string $mode = Permissions::CHECK_MODE_GLOBAL_OR_RESOURCE
     ) {
-        if ($junctionID === 'any' || $junctionID === '' ||
-            self::c("Garden.Permissions.Disabled.{$junctionTable}")) {
+        if ($junctionID === "any" || $junctionID === "" || self::c("Garden.Permissions.Disabled.{$junctionTable}")) {
             $junctionID = null;
             $junctionTable = null;
         }
 
-        if ($junctionTable === '') {
+        if ($junctionTable === "") {
             $junctionTable = null;
             $junctionID = null;
         }
@@ -150,21 +154,25 @@ class Gdn_Session implements LoggerAwareInterface {
      *
      * @param Gdn_Authenticator $authenticator
      */
-    public function end($authenticator = null) {
+    public function end($authenticator = null)
+    {
+        $eventManager = Gdn::getContainer()->get(\Garden\EventManager::class);
+        $eventManager->fire("Gdn_Session_beginEnd", $this);
+
         if ($authenticator == null) {
             $authenticator = Gdn::authenticator();
         }
 
         if ($this->UserID) {
-            $this->logger->info('Session ended for {username}.', [
-                Logger::FIELD_EVENT => 'session_end',
-                Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY
+            $this->logger->info("Session ended for {username}.", [
+                Logger::FIELD_EVENT => "session_end",
+                Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
             ]);
         }
         if ($this->SessionID) {
             $this->logger->info("Session ended for $this->SessionID.", [
-                Logger::FIELD_EVENT => 'session_end',
-                Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY
+                Logger::FIELD_EVENT => "session_end",
+                Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
             ]);
 
             $sessionModel = new SessionModel();
@@ -172,11 +180,11 @@ class Gdn_Session implements LoggerAwareInterface {
         }
 
         $authenticator->authenticateWith()->deauthenticate();
-        $this->setCookie('-Vv', null, -3600);
-        $this->setCookie('-sid', null, -3600);
-        $this->setCookie('-tk', null, -3600);
+        $this->setCookie("-Vv", null, -3600);
+        $this->setCookie("-sid", null, -3600);
+        $this->setCookie("-tk", null, -3600);
 
-        Gdn::pluginManager()->callEventHandlers($this, 'Gdn_Session', 'End');
+        $eventManager->fire("Gdn_Session_end", $this, []);
 
         $this->UserID = 0;
         $this->SessionID = 0;
@@ -192,7 +200,8 @@ class Gdn_Session implements LoggerAwareInterface {
      *
      * @return Permissions Returns a {@link Permissions} object with the permissions for the current user.
      */
-    public function getPermissions() {
+    public function getPermissions()
+    {
         return $this->permissions;
     }
 
@@ -201,7 +210,8 @@ class Gdn_Session implements LoggerAwareInterface {
      *
      * @return array
      */
-    public function getPermissionsArray() {
+    public function getPermissionsArray()
+    {
         return $this->permissions->getPermissions();
     }
 
@@ -212,8 +222,9 @@ class Gdn_Session implements LoggerAwareInterface {
      * @param null $default
      * @return mixed
      */
-    public function getCookie($suffix, $default = null) {
-        return getValue(c('Garden.Cookie.Name').$suffix, $_COOKIE, $default);
+    public function getCookie($suffix, $default = null)
+    {
+        return getValue(c("Garden.Cookie.Name") . $suffix, $_COOKIE, $default);
     }
 
     /**
@@ -221,14 +232,15 @@ class Gdn_Session implements LoggerAwareInterface {
      *
      * @return DateTimeZone Returns the current timezone.
      */
-    public function getTimeZone() {
+    public function getTimeZone()
+    {
         if ($this->timeZone === null) {
-            $timeZone = $this->getAttribute('TimeZone', c('Garden.GuestTimeZone'));
+            $timeZone = $this->getAttribute("TimeZone", c("Garden.GuestTimeZone"));
             $hourOffset = $this->hourOffset();
 
             if (!$timeZone) {
                 if (is_numeric($hourOffset)) {
-                    $timeZone = 'Etc/GMT'.sprintf('%+d', -$hourOffset);
+                    $timeZone = "Etc/GMT" . sprintf("%+d", -$hourOffset);
                 } else {
                     $timeZone = date_default_timezone_get();
                 }
@@ -236,7 +248,7 @@ class Gdn_Session implements LoggerAwareInterface {
             try {
                 $this->timeZone = new DateTimeZone($timeZone);
             } catch (\Exception $ex) {
-                $this->timeZone = new DateTimeZone('UTC');
+                $this->timeZone = new DateTimeZone("UTC");
             }
         }
 
@@ -247,18 +259,19 @@ class Gdn_Session implements LoggerAwareInterface {
      * Return the timezone hour difference between the user and utc.
      * @return int The hour offset.
      */
-    public function hourOffset() {
+    public function hourOffset()
+    {
         static $guestHourOffset;
 
         if ($this->UserID > 0) {
             return $this->User->HourOffset;
         } else {
             if (!isset($guestHourOffset)) {
-                $guestTimeZone = c('Garden.GuestTimeZone');
+                $guestTimeZone = c("Garden.GuestTimeZone");
                 if ($guestTimeZone) {
                     try {
                         $timeZone = new DateTimeZone($guestTimeZone);
-                        $offset = $timeZone->getOffset(new DateTime('now', new DateTimeZone('UTC')));
+                        $offset = $timeZone->getOffset(new DateTime("now", new DateTimeZone("UTC")));
                         $guestHourOffset = floor($offset / 3600);
                     } catch (Exception $ex) {
                         $guestHourOffset = 0;
@@ -278,15 +291,16 @@ class Gdn_Session implements LoggerAwareInterface {
      * @param $value
      * @param $expires
      */
-    public function setCookie($suffix, $value, $expires) {
-        $name = c('Garden.Cookie.Name').$suffix;
-        $path = c('Garden.Cookie.Path');
-        $domain = c('Garden.Cookie.Domain');
+    public function setCookie($suffix, $value, $expires)
+    {
+        $name = c("Garden.Cookie.Name") . $suffix;
+        $path = c("Garden.Cookie.Path");
+        $domain = c("Garden.Cookie.Domain");
 
         // If the domain being set is completely incompatible with the current domain then make the domain work.
         $currentHost = Gdn::request()->host();
-        if (!stringEndsWith($currentHost, trim($domain, '.'))) {
-            $domain = '';
+        if (!stringEndsWith($currentHost, trim($domain, "."))) {
+            $domain = "";
         }
 
         // Allow people to specify up to a year of expiry.
@@ -294,7 +308,7 @@ class Gdn_Session implements LoggerAwareInterface {
             $expires = time() + $expires;
         }
 
-        safeCookie($name, $value, $expires, $path, $domain);
+        safeCookie($name, $value == null ? "" : $value, $expires, $path, $domain);
         $_COOKIE[$name] = $value;
     }
 
@@ -303,15 +317,18 @@ class Gdn_Session implements LoggerAwareInterface {
      *
      * @return bool
      */
-    public function isNewVisit() {
+    public function isNewVisit()
+    {
         if ($this->User) {
-            $cookie = $this->getCookie('-Vv', false);
+            $cookie = $this->getCookie("-Vv", false);
             $userVisitExpiry = Gdn_Format::toTimeStamp($this->User->DateLastActive) + self::VISIT_LENGTH;
 
             if ($cookie) {
                 $result = false; // User has cookie, not a new visit.
-            } elseif ($userVisitExpiry > time())
-                $result = false; // User was last active less than 20 minutes ago, not a new visit.
+            } elseif ($userVisitExpiry > time()) {
+                $result = false;
+            }
+            // User was last active less than 20 minutes ago, not a new visit.
             else {
                 $result = true; // No cookie and not active in the last 20 minutes? New visit.
             }
@@ -327,12 +344,13 @@ class Gdn_Session implements LoggerAwareInterface {
      *
      * @return bool Is this a new visit?
      */
-    public function newVisit() {
+    public function newVisit()
+    {
         $newVisit = $this->isNewVisit();
 
         $now = time();
         $expiry = $now + self::VISIT_LENGTH;
-        $this->setCookie('-Vv', $now, $expiry);
+        $this->setCookie("-Vv", $now, $expiry);
 
         return $newVisit;
     }
@@ -345,7 +363,8 @@ class Gdn_Session implements LoggerAwareInterface {
      *
      * @return NULL
      */
-    public function setPermission($permissionName, $value = null) {
+    public function setPermission($permissionName, $value = null)
+    {
         if (is_string($permissionName)) {
             if ($value === null || $value === true) {
                 $this->permissions->overwrite($permissionName, true);
@@ -375,7 +394,8 @@ class Gdn_Session implements LoggerAwareInterface {
      * @param mixed $defaultValue The default value to return if the preference does not exist.
      * @return mixed
      */
-    public function getPreference($preferenceName, $defaultValue = false) {
+    public function getPreference($preferenceName, $defaultValue = false)
+    {
         // WARNING: THIS DOES NOT CHECK THE DEFAULT CONFIG-DEFINED SETTINGS.
         // IF A USER HAS NEVER SAVED THEIR PREFERENCES, THIS WILL RETURN
         // INCORRECT VALUES.
@@ -389,7 +409,8 @@ class Gdn_Session implements LoggerAwareInterface {
      * @param string|false $defaultValue The default value to return if the attribute does not exist.
      * @return mixed
      */
-    public function getAttribute($attributeName, $defaultValue = false) {
+    public function getAttribute($attributeName, $defaultValue = false)
+    {
         if (is_array($this->_Attributes)) {
             return val($attributeName, $this->_Attributes, $defaultValue);
         }
@@ -401,7 +422,8 @@ class Gdn_Session implements LoggerAwareInterface {
      *
      * @return array
      */
-    public function getAttributes() {
+    public function getAttributes()
+    {
         return is_array($this->_Attributes) ? $this->_Attributes : [];
     }
 
@@ -411,7 +433,8 @@ class Gdn_Session implements LoggerAwareInterface {
      *
      * @return self
      */
-    public static function getInstance() {
+    public static function getInstance()
+    {
         if (!isset(self::$_Instance)) {
             $c = __CLASS__;
 
@@ -427,7 +450,8 @@ class Gdn_Session implements LoggerAwareInterface {
      *
      * @return boolean
      */
-    public function isValid() {
+    public function isValid()
+    {
         return $this->UserID > 0;
     }
 
@@ -437,9 +461,11 @@ class Gdn_Session implements LoggerAwareInterface {
      * @param int|false $userID The UserID to start the session with.
      * @param bool $setIdentity Whether or not to set the identity (cookie) or make this a one request session.
      * @param bool $persist If setting an identity, should we persist it beyond browser restart?
+     * @param string|null $sessionID Session ID to use to start the session.
      */
-    public function start($userID = false, bool $setIdentity = true, bool $persist = false) {
-        if (!c('Garden.Installed', false)) {
+    public function start($userID = false, bool $setIdentity = true, bool $persist = false, $sessionID = null)
+    {
+        if (!c("Garden.Installed", false)) {
             return;
         }
 
@@ -466,33 +492,37 @@ class Gdn_Session implements LoggerAwareInterface {
                 $this->permissions->setAdmin($this->User->Admin > 0);
                 $this->permissions->setSysAdmin($this->User->Admin > 1);
                 if (!empty($this->User->Deleted)) {
-                    $this->permissions->addBan(Permissions::BAN_DELETED, ['msg' => t('Your account has been deleted.')]);
+                    $this->permissions->addBan(Permissions::BAN_DELETED, [
+                        "msg" => t("Your account has been deleted."),
+                    ]);
                 }
                 if (!empty($this->User->Banned)) {
-                    $this->permissions->addBan(Permissions::BAN_BANNED, ['msg' => t('You are banned.')]);
+                    $this->permissions->addBan(Permissions::BAN_BANNED, ["msg" => t("You are banned.")]);
                 }
 
-                if ($this->permissions->has('Garden.SignIn.Allow')) {
+                if ($this->permissions->has("Garden.SignIn.Allow")) {
                     // Fire a specific event for setting the session so that event handlers can override permissions.
-                    Gdn::getContainer()->get(\Garden\EventManager::class)->fire('gdn_session_set', $this);
+                    Gdn::getContainer()
+                        ->get(\Garden\EventManager::class)
+                        ->fire("gdn_session_set", $this);
                     if ($setIdentity) {
                         if (\Vanilla\FeatureFlagHelper::featureEnabled(self::FEATURE_SESSION_ID_COOKIE)) {
                             $sessionModel = new SessionModel();
-                            $session = $sessionModel->startNewSession($this->UserID);
-                            Gdn::authenticator()->setIdentity($this->UserID, $persist, $session['SessionID']);
-                            $this->SessionID = $session['SessionID'];
+                            $session = $sessionModel->startNewSession($this->UserID, $sessionID);
+                            Gdn::authenticator()->setIdentity($this->UserID, $persist, $session["SessionID"]);
+                            $this->SessionID = $session["SessionID"];
                         } else {
                             Gdn::authenticator()->setIdentity($this->UserID, $persist);
                         }
-                        $this->logger->info(
-                            'Session started for {username}.',
-                            [Logger::FIELD_EVENT => 'session_start', Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
-                        );
-                        Gdn::pluginManager()->callEventHandlers($this, 'Gdn_Session', 'Start');
+                        $this->logger->info("Session started for {username}.", [
+                            Logger::FIELD_EVENT => "session_start",
+                            Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
+                        ]);
+                        Gdn::pluginManager()->callEventHandlers($this, "Gdn_Session", "Start");
                     }
 
-                    $userModel->EventArguments['User'] =& $this->User;
-                    $userModel->fireEvent('AfterGetSession');
+                    $userModel->EventArguments["User"] = &$this->User;
+                    $userModel->fireEvent("AfterGetSession");
 
                     $this->_Preferences = $this->User->Preferences;
                     $this->_Attributes = $this->User->Attributes;
@@ -538,7 +568,8 @@ class Gdn_Session implements LoggerAwareInterface {
      * @param string|array $name
      * @param mixed $value
      */
-    public function setAttribute($name, $value = '') {
+    public function setAttribute($name, $value = "")
+    {
         if (!is_array($name)) {
             $name = [$name => $value];
         }
@@ -558,7 +589,8 @@ class Gdn_Session implements LoggerAwareInterface {
      * @param string|array $name
      * @param mixed $value
      */
-    public function setPreference($name, $value = '', $saveToDatabase = true) {
+    public function setPreference($name, $value = "", $saveToDatabase = true)
+    {
         if (!is_array($name)) {
             $name = [$name => $value];
         }
@@ -578,11 +610,12 @@ class Gdn_Session implements LoggerAwareInterface {
      *
      * @return string
      */
-    public function ensureTransientKey() {
+    public function ensureTransientKey()
+    {
         $transientKey = $this->loadTransientKey();
 
         if ($transientKey === false) {
-            $transientKey = $this->transientKey(betterRandomString(16, 'Aa0'));
+            $transientKey = $this->transientKey(betterRandomString(16, "Aa0"));
         }
 
         return $transientKey;
@@ -594,22 +627,23 @@ class Gdn_Session implements LoggerAwareInterface {
      * @param string $tkCookie
      * @return array|bool
      */
-    protected function decodeTKCookie($tkCookie) {
+    protected function decodeTKCookie($tkCookie)
+    {
         if (!is_string($tkCookie)) {
             return false;
         }
 
-        $elements = explode(':', $tkCookie);
+        $elements = explode(":", $tkCookie);
 
         if (count($elements) !== 4) {
             return false;
         }
 
         return [
-            'TransientKey' => $elements[0],
-            'UserID' => $elements[1],
-            'Timestamp' => $elements[2],
-            'Signature' => $elements[3]
+            "TransientKey" => $elements[0],
+            "UserID" => $elements[1],
+            "Timestamp" => $elements[2],
+            "Signature" => $elements[3],
         ];
     }
 
@@ -618,24 +652,21 @@ class Gdn_Session implements LoggerAwareInterface {
      *
      * @return bool|string
      */
-    public function loadTransientKey() {
-        $cookieString = getAppCookie('tk');
+    public function loadTransientKey()
+    {
+        $cookieString = getAppCookie("tk");
         $result = false;
 
         if ($cookieString !== null) {
             $cookie = $this->decodeTKCookie($cookieString);
             if ($cookie !== false) {
-                $payload = $this->generateTKPayload(
-                    $cookie['TransientKey'],
-                    $cookie['UserID'],
-                    $cookie['Timestamp']
-                );
+                $payload = $this->generateTKPayload($cookie["TransientKey"], $cookie["UserID"], $cookie["Timestamp"]);
 
-                $userValid = ($cookie['UserID'] == $this->UserID);
-                $signatureValid = $this->generateTKSignature($payload) == $cookie['Signature'];
-                $currentTKInvalid = $this->transientKey() != $cookie['TransientKey'];
+                $userValid = $cookie["UserID"] == $this->UserID;
+                $signatureValid = $this->generateTKSignature($payload) == $cookie["Signature"];
+                $currentTKInvalid = $this->transientKey() != $cookie["TransientKey"];
                 if ($userValid && $signatureValid && $currentTKInvalid) {
-                    $result = $this->transientKey($cookie['TransientKey'], false);
+                    $result = $this->transientKey($cookie["TransientKey"], false);
                 } else {
                     $result = $this->transientKey();
                 }
@@ -653,7 +684,8 @@ class Gdn_Session implements LoggerAwareInterface {
      * @param int|null $timestamp
      * @return string
      */
-    public function generateTKPayload($tk, $userID = null, $timestamp = null) {
+    public function generateTKPayload($tk, $userID = null, $timestamp = null)
+    {
         $userID = $userID ?: $this->UserID;
 
         $timestamp = $timestamp ?: time();
@@ -667,8 +699,9 @@ class Gdn_Session implements LoggerAwareInterface {
      * @param string $payload
      * @return string
      */
-    public function generateTKSignature($payload) {
-        return hash_hmac(c('Garden.Cookie.HashMethod'), $payload, c('Garden.Cookie.Salt'));
+    public function generateTKSignature($payload)
+    {
+        return hash_hmac(c("Garden.Cookie.HashMethod"), $payload, c("Garden.Cookie.Salt"));
     }
 
     /**
@@ -678,12 +711,13 @@ class Gdn_Session implements LoggerAwareInterface {
      * @param bool $updateCookie Update the browser cookie when changing the transient key?
      * @return string
      */
-    public function transientKey($newKey = null, $updateCookie = true) {
+    public function transientKey($newKey = null, $updateCookie = true)
+    {
         if (is_string($newKey)) {
             if ($updateCookie) {
                 $payload = $this->generateTKPayload($newKey);
                 $signature = $this->generateTKSignature($payload);
-                setAppCookie('tk', "{$payload}:{$signature}");
+                setAppCookie("tk", "{$payload}:{$signature}");
             }
 
             $this->_TransientKey = $newKey;
@@ -705,7 +739,8 @@ class Gdn_Session implements LoggerAwareInterface {
      * @param bool $validateUser Whether or not to validate that a user is signed in.
      * @return bool
      */
-    public function validateTransientKey($foreignKey, $validateUser = true) {
+    public function validateTransientKey($foreignKey, $validateUser = true)
+    {
         static $forceValid = false;
 
         if ($foreignKey === true) {
@@ -723,10 +758,10 @@ class Gdn_Session implements LoggerAwareInterface {
              * We are not doing `!empty()` first because that would skip hash_equals and would then enable a possible timing attack.
              */
             // Make sure we're testing a string.
-            $knownString = $this->_TransientKey ?: '';
-            $userString = $foreignKey ?: '';
+            $knownString = $this->_TransientKey ?: "";
+            $userString = $foreignKey ?: "";
 
-            $isCorrectHash = (hash_equals($knownString, $userString) && !empty($this->_TransientKey));
+            $isCorrectHash = hash_equals($knownString, $userString) && !empty($this->_TransientKey);
 
             // Checking the postback here is a kludge, but is absolutely necessary until we can test the ValidatePostBack more.
             $return = ($forceValid && Gdn::request()->isPostBack()) || $isCorrectHash;
@@ -734,20 +769,17 @@ class Gdn_Session implements LoggerAwareInterface {
 
         if (!$return && $forceValid !== true) {
             if (Gdn::session()->User) {
-                $this->logger->error(
-                    'Invalid transient key for {username}.',
-                    [
-                        Logger::FIELD_EVENT => 'csrf_failure',
-                        "User TK" => $foreignKey,
-                        "Site TK" => $this->_TransientKey,
-                        Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
-                    ]
-                );
+                $this->logger->error("Invalid transient key for {username}.", [
+                    Logger::FIELD_EVENT => "csrf_failure",
+                    "User TK" => $foreignKey,
+                    "Site TK" => $this->_TransientKey,
+                    Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
+                ]);
             } else {
-                $this->logger->error(
-                    'Invalid transient key.',
-                    [Logger::FIELD_EVENT => 'csrf_failure', Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
-                );
+                $this->logger->error("Invalid transient key.", [
+                    Logger::FIELD_EVENT => "csrf_failure",
+                    Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
+                ]);
             }
         }
         return $return;
@@ -760,8 +792,9 @@ class Gdn_Session implements LoggerAwareInterface {
      * @param bool $unset Whether or not to unset the stash.
      * @return mixed Returns the value of the stash.
      */
-    public function getPublicStash($name, $unset = false) {
-        return $this->stash('@public_'.$name, '', $unset);
+    public function getPublicStash($name, $unset = false)
+    {
+        return $this->stash("@public_" . $name, "", $unset);
     }
 
     /**
@@ -771,11 +804,12 @@ class Gdn_Session implements LoggerAwareInterface {
      * @param mixed $value The value of the stash to set. Pass null to clear the key.
      * @return Gdn_Session $this Returns $this for chaining.
      */
-    public function setPublicStash($name, $value) {
+    public function setPublicStash($name, $value)
+    {
         if ($value === null) {
-            $this->stash('@public_'.$name, '', true);
+            $this->stash("@public_" . $name, "", true);
         } else {
-            $this->stash('@public_'.$name, $value, false);
+            $this->stash("@public_" . $name, $value, false);
         }
 
         return $this;
@@ -790,8 +824,9 @@ class Gdn_Session implements LoggerAwareInterface {
      *
      * @return mixed Returns the value of the stash or null on failure.
      */
-    public function stash($name = '', $value = '', $unsetOnRetrieve = true) {
-        if ($name == '') {
+    public function stash($name = "", $value = "", $unsetOnRetrieve = true)
+    {
+        if ($name == "") {
             return;
         }
         $sessionModel = new SessionModel();
@@ -803,21 +838,21 @@ class Gdn_Session implements LoggerAwareInterface {
         }
 
         // Stash or unstash the value depending on inputs.
-        if ($value != '') {
-            $session['Attributes'][$name] = $value;
+        if ($value != "") {
+            $session["Attributes"][$name] = $value;
         } else {
-            $value = val($name, $session['Attributes']);
+            $value = val($name, $session["Attributes"]);
             if ($unsetOnRetrieve) {
-                unset($session['Attributes'][$name]);
+                unset($session["Attributes"][$name]);
             }
         }
         // Update the attributes.
         $sessionModel->update(
             [
-                'DateUpdated' => Gdn_Format::toDateTime(),
-                'Attributes' => $session['Attributes'],
+                "DateUpdated" => Gdn_Format::toDateTime(),
+                "Attributes" => $session["Attributes"],
             ],
-            ['SessionID' => $session['SessionID']]
+            ["SessionID" => $session["SessionID"]]
         );
 
         return $value;
@@ -834,17 +869,18 @@ class Gdn_Session implements LoggerAwareInterface {
      *
      * @return bool|array Current session.
      */
-    private function getStashSession($sessionModel, $valueToStash) {
-        $cookieName = c('Garden.Cookie.Name', 'Vanilla');
-        $name = $cookieName.'-sid';
+    private function getStashSession($sessionModel, $valueToStash)
+    {
+        $cookieName = c("Garden.Cookie.Name", "Vanilla");
+        $name = $cookieName . "-sid";
         if (\Vanilla\FeatureFlagHelper::featureEnabled(Gdn_Session::FEATURE_SESSION_ID_COOKIE)) {
             $sessionID = Gdn::session()->SessionID;
         } else {
             // Grab the entire session record.
-            $sessionID = val($name, $_COOKIE, '');
+            $sessionID = val($name, $_COOKIE, "");
         }
         // If there is no session, and no value for saving, return.
-        if ($sessionID == '' && $valueToStash == '') {
+        if ($sessionID == "" && $valueToStash == "") {
             return false;
         }
 
@@ -852,26 +888,26 @@ class Gdn_Session implements LoggerAwareInterface {
 
         if (!$session) {
             $session = [
-                'UserID' => Gdn::session()->UserID,
-                'DateInserted' => Gdn_Format::toDateTime(),
-                'Attributes' => [],
+                "UserID" => Gdn::session()->UserID,
+                "DateInserted" => Gdn_Format::toDateTime(),
+                "Attributes" => [],
             ];
 
             // Save the session information to the database.
             $sessionID = $sessionModel->insert($session);
-            $session['SessionID'] = $sessionID;
+            $session["SessionID"] = $sessionID;
             trace("Inserting session stash $sessionID");
 
             // Save a session cookie.
-            $path = c('Garden.Cookie.Path', '/');
-            $domain = c('Garden.Cookie.Domain', '');
+            $path = c("Garden.Cookie.Path", "/");
+            $domain = c("Garden.Cookie.Domain", "");
             $expire = 0;
 
             // If the domain being set is completely incompatible with the
             // current domain then make the domain work.
             $currentHost = Gdn::request()->host();
-            if (!stringEndsWith($currentHost, trim($domain, '.'))) {
-                $domain = '';
+            if (!stringEndsWith($currentHost, trim($domain, "."))) {
+                $domain = "";
             }
 
             safeCookie($name, $sessionID, $expire, $path, $domain);

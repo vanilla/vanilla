@@ -11,13 +11,15 @@ use Garden\Web\Exception\NotFoundException;
 /**
  * An exception to be thrown when results are expected, but not actually received.
  */
-class NoResultsException extends NotFoundException {
+class NoResultsException extends NotFoundException
+{
     /**
      * NoResultsException constructor.
      *
      * @param string $message
      */
-    public function __construct($message = 'Results') {
+    public function __construct($message = "Results")
+    {
         parent::__construct($message);
     }
 }

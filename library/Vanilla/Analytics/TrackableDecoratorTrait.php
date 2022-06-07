@@ -12,8 +12,8 @@ use Garden\Web\Data;
 /**
  * Trait for applying trackable decorators.
  */
-trait TrackableDecoratorTrait {
-
+trait TrackableDecoratorTrait
+{
     /**
      * Apply a set of decorators to a record.
      *
@@ -22,7 +22,8 @@ trait TrackableDecoratorTrait {
      *
      * @return array
      */
-    protected function applyDecorators($record, array $decorators): array {
+    protected function applyDecorators($record, array $decorators): array
+    {
         $record = Data::box($record);
         foreach ($decorators as $decorator) {
             $record = $decorator->decorateTrackableRecord($record);

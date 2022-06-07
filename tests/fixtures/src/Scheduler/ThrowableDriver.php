@@ -17,15 +17,16 @@ use Vanilla\Scheduler\Job\LocalJobInterface;
 /**
  * Class ThrowableDriver.
  */
-class ThrowableDriver implements DriverInterface {
-
+class ThrowableDriver implements DriverInterface
+{
     /**
      * Receive a job.
      *
      * @param JobInterface $job
      * @return DriverSlipInterface
      */
-    public function receive(JobInterface $job): DriverSlipInterface {
+    public function receive(JobInterface $job): DriverSlipInterface
+    {
         return new LocalDriverSlip($job);
     }
 
@@ -35,7 +36,8 @@ class ThrowableDriver implements DriverInterface {
      * @param DriverSlipInterface $driverSlip
      * @return JobExecutionStatus
      */
-    public function execute(DriverSlipInterface $driverSlip): JobExecutionStatus {
+    public function execute(DriverSlipInterface $driverSlip): JobExecutionStatus
+    {
         /** @noinspection PhpUndefinedFunctionInspection */
         /** @psalm-suppress UndefinedFunction */
         nonExistentFunction();
@@ -48,9 +50,8 @@ class ThrowableDriver implements DriverInterface {
      *
      * @return array
      */
-    public function getSupportedInterfaces(): array {
-        return [
-            LocalJobInterface::class,
-        ];
+    public function getSupportedInterfaces(): array
+    {
+        return [LocalJobInterface::class];
     }
 }

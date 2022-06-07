@@ -14,8 +14,8 @@ use VanillaTests\APIv0\TestDispatcher;
  *
  * @method TestDispatcher bessy()
  */
-trait TestModerationControllerTrait {
-
+trait TestModerationControllerTrait
+{
     /**
      * Post to moderation/confirmdiscussionmoves and return the new category discussions list
      *
@@ -24,18 +24,22 @@ trait TestModerationControllerTrait {
      * @param array $options
      * @return ?array
      */
-    public function moveDiscussion($discussionID = null, $category = null, $options = []): ?array {
+    public function moveDiscussion($discussionID = null, $category = null, $options = []): ?array
+    {
         if (empty($category)) {
             return null;
         }
 
-        $endpoint ='/moderation/confirmdiscussionmoves';
+        $endpoint = "/moderation/confirmdiscussionmoves";
         if ($discussionID) {
-            $endpoint .= '?discussionid='.$discussionID;
+            $endpoint .= "?discussionid=" . $discussionID;
         }
 
-        $options += ['CategoryID' => $category['CategoryID']];
+        $options += ["CategoryID" => $category["CategoryID"]];
         $this->bessy()->post($endpoint, $options);
-        return $this->bessy()->get('/categories/'.$category['UrlCode'])->data('Discussions')->resultArray();
+        return $this->bessy()
+            ->get("/categories/" . $category["UrlCode"])
+            ->data("Discussions")
+            ->resultArray();
     }
 }

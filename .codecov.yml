@@ -12,7 +12,7 @@ coverage:
                 informational: true
         patch:
             front-end:
-              informational: true
+                informational: true
         changes: no
 
 parsers:

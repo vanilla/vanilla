@@ -14,5 +14,6 @@ use Vanilla\Search\SearchResultItem;
  *
  * @package Vanilla\Forum\Search
  */
-class CommentSearchResultItem extends DiscussionSearchResultItem {
+class CommentSearchResultItem extends DiscussionSearchResultItem
+{
 }

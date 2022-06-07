@@ -11,9 +11,9 @@ namespace Vanilla;
  *
  * @package Vanilla
  */
-abstract class AbstractTypeHandler {
-
-    private $typeHandlerName = '';
+abstract class AbstractTypeHandler
+{
+    private $typeHandlerName = "";
 
     /**
      * Handler the type conversion
@@ -45,7 +45,8 @@ abstract class AbstractTypeHandler {
      *
      * @return string
      */
-    public function getTypeHandlerName() {
+    public function getTypeHandlerName()
+    {
         return $this->typeHandlerName;
     }
 
@@ -54,7 +55,8 @@ abstract class AbstractTypeHandler {
      *
      * @param string $name
      */
-    public function setTypeHandlerName($name = '') {
+    public function setTypeHandlerName($name = "")
+    {
         $this->typeHandlerName = $name;
     }
 }

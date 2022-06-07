@@ -15,8 +15,8 @@ use Vanilla\Web\TwigRenderTrait;
 /**
  * Class for instantiating widgets.
  */
-class WidgetFactory implements \JsonSerializable {
-
+class WidgetFactory implements \JsonSerializable
+{
     use TwigRenderTrait;
 
     /** @var string */
@@ -27,28 +27,31 @@ class WidgetFactory implements \JsonSerializable {
      *
      * @param string $widgetClass
      */
-    public function __construct(string $widgetClass) {
+    public function __construct(string $widgetClass)
+    {
         $this->widgetClass = $widgetClass;
     }
 
     /**
      * @return array
      */
-    public function getDefinition(): array {
+    public function getDefinition(): array
+    {
         /** @var WidgetInterface $class */
         $class = $this->widgetClass;
         return [
-            'widgetID' => $class::getWidgetID(),
-            'name' => $class::getWidgetName(),
-            'widgetClass' => $class,
-            'schema' => $class::getWidgetSchema(),
+            "widgetID" => $class::getWidgetID(),
+            "name" => $class::getWidgetName(),
+            "widgetClass" => $class,
+            "schema" => $class::getWidgetSchema(),
         ];
     }
 
     /**
      * @return Schema
      */
-    public function getSchema(): Schema {
+    public function getSchema(): Schema
+    {
         /** @var WidgetInterface $class */
         $class = $this->widgetClass;
         return $class::getWidgetSchema();
@@ -57,7 +60,8 @@ class WidgetFactory implements \JsonSerializable {
     /**
      * @return string
      */
-    public function getName(): string {
+    public function getName(): string
+    {
         /** @var WidgetInterface $class */
         $class = $this->widgetClass;
         return $class::getWidgetName();
@@ -66,7 +70,8 @@ class WidgetFactory implements \JsonSerializable {
     /**
      * @inheritdoc
      */
-    public function jsonSerialize() {
+    public function jsonSerialize()
+    {
         return $this->getDefinition();
     }
 
@@ -77,12 +82,13 @@ class WidgetFactory implements \JsonSerializable {
      *
      * @return string
      */
-    public function renderWidget(array $parameters): string {
+    public function renderWidget(array $parameters): string
+    {
         if (is_a($this->widgetClass, AbstractWidgetModule::class, true)) {
             // Use this until refactored.
             return \Gdn_Theme::module($this->widgetClass, $parameters);
         } else {
-            throw new \Exception('Not implemented yet');
+            throw new \Exception("Not implemented yet");
         }
     }
 
@@ -92,10 +98,11 @@ class WidgetFactory implements \JsonSerializable {
      * @param array $parameters
      * @return string
      */
-    public function renderWidgetSummary(array $parameters): string {
+    public function renderWidgetSummary(array $parameters): string
+    {
         return $this->renderTwig("@library/Vanilla/Widgets/WidgetFactorySummary.twig", [
-            'widgetName' => $this->getName(),
-            'parameters' => $this->getWidgetSummaryParameters($parameters),
+            "widgetName" => $this->getName(),
+            "parameters" => $this->getWidgetSummaryParameters($parameters),
         ]);
     }
 
@@ -105,7 +112,8 @@ class WidgetFactory implements \JsonSerializable {
      * @param array $parameters
      * @return array
      */
-    public function getWidgetSummaryParameters(array $parameters): array {
+    public function getWidgetSummaryParameters(array $parameters): array
+    {
         $schema = $this->getSchema();
         $widgetParameters = $this->getWidgetPropertiesInternal($schema, $parameters);
         return $widgetParameters;
@@ -118,27 +126,28 @@ class WidgetFactory implements \JsonSerializable {
      * @param array $parameters
      * @return array
      */
-    private function getWidgetPropertiesInternal($schema, array $parameters = []): array {
+    private function getWidgetPropertiesInternal($schema, array $parameters = []): array
+    {
         $widgetParameters = [];
         $schemaArray = is_array($schema) ? $schema : $schema->getSchemaArray();
-        if (!isset($schemaArray['properties'])) {
+        if (!isset($schemaArray["properties"])) {
             return [];
         }
-        foreach ($schemaArray['properties'] as $fieldName => $property) {
-            $type = $property['type'] ?? null;
-            $control = $property['x-control'] ?? null;
-            $label = $control['label'] ?? null;
+        foreach ($schemaArray["properties"] as $fieldName => $property) {
+            $type = $property["type"] ?? null;
+            $control = $property["x-control"] ?? null;
+            $label = $control["label"] ?? null;
             if (!$control || !$type || !$label) {
                 continue;
             }
 
-            if ($type === 'object') {
+            if ($type === "object") {
                 $widgetParameters[] = [
-                    'name' => $label,
-                    'value' => $this->getWidgetPropertiesInternal($property, $parameters[$fieldName] ?? []),
+                    "name" => $label,
+                    "value" => $this->getWidgetPropertiesInternal($property, $parameters[$fieldName] ?? []),
                 ];
             } elseif ($type === "array") {
-                $actualValue = $parameters[$fieldName] ?? $control['default'] ?? [];
+                $actualValue = $parameters[$fieldName] ?? ($control["default"] ?? []);
 
                 $formattedValue = "";
                 if (!is_array($actualValue)) {
@@ -158,18 +167,18 @@ class WidgetFactory implements \JsonSerializable {
                 }
 
                 $widgetParameters[] = [
-                    'name' => $label,
-                    'value' => $formattedValue,
+                    "name" => $label,
+                    "value" => $formattedValue,
                 ];
             } else {
-                $actualValue = $parameters[$fieldName] ?? $control['default'] ?? '(Default)';
-                $staticChoices = $control['choices']['staticOptions'] ?? null;
+                $actualValue = $parameters[$fieldName] ?? ($control["default"] ?? "(Default)");
+                $staticChoices = $control["choices"]["staticOptions"] ?? null;
                 if ($staticChoices !== null && isset($staticChoices[$actualValue])) {
-                    $actualValue = $staticChoices[$actualValue] ?? '(Unknown)';
+                    $actualValue = $staticChoices[$actualValue] ?? "(Unknown)";
                 }
                 $widgetParameters[] = [
-                    'name' => $label,
-                    'value' => $actualValue,
+                    "name" => $label,
+                    "value" => $actualValue,
                 ];
             }
         }

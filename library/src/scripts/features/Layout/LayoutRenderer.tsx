@@ -49,7 +49,7 @@ export function LayoutRenderer<T>(props: IProps<T>): React.ReactElement {
             </SectionBehaviourContext.Provider>
         );
     }
-    return <LayoutErrorBoundary>{content}</LayoutErrorBoundary>;
+    return <LayoutErrorBoundary componentName="Layout">{content}</LayoutErrorBoundary>;
 }
 
 function LayoutRendererImpl<T>(props: IProps<T>) {
@@ -132,7 +132,7 @@ function resolveDynamicComponent(
     let result: React.ReactNode = null;
     // Return an error boundary wrapped component
     if (registeredComponent) {
-        result = React.createElement(LayoutErrorBoundary, { key }, [
+        result = React.createElement(LayoutErrorBoundary, { key, componentName: componentConfig?.$reactComponent }, [
             React.createElement(registeredComponent.Component, {
                 ...resolveNestedComponents(componentConfig.$reactProps, context),
                 key: key,

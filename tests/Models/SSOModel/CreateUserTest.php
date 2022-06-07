@@ -19,23 +19,25 @@ use VanillaTests\SiteTestTrait;
 /**
  * Class CreateUserTest.
  */
-class CreateUserTest extends SharedBootstrapTestCase {
+class CreateUserTest extends SharedBootstrapTestCase
+{
     use SiteTestTrait;
     use SetsGeneratorTrait;
 
     /** @var SSOModel */
     private static $ssoModel;
 
-    private static $invalidEmails = [null, '' , 'not an email'];
-    private static $existingEmail = 'existingEmail@example.com';
+    private static $invalidEmails = [null, "", "not an email"];
+    private static $existingEmail = "existingEmail@example.com";
 
-    private static $invalidNames = [null, '', 'U'];
-    private static $existingName = 'ExistingUsername';
+    private static $invalidNames = [null, "", "U"];
+    private static $existingName = "ExistingUsername";
 
     /**
      * @inheritdoc
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         self::$ssoModel = self::container()->get(SSOModel::class);
@@ -43,19 +45,20 @@ class CreateUserTest extends SharedBootstrapTestCase {
         /** @var \UserModel $userModel */
         $userModel = self::container()->get(\UserModel::class);
         $userModel->insert([
-            'Name' => self::$existingName,
-            'Email' => self::$existingEmail,
-            'Password' => uniqid(),
+            "Name" => self::$existingName,
+            "Email" => self::$existingEmail,
+            "Password" => uniqid(),
         ]);
     }
 
     /**
      * @inheritdoc
      */
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         /** @var \Gdn_SQLDriver $driver */
-        $driver = self::container()->get('SqlDriver');
-        $driver->truncate('User');
+        $driver = self::container()->get("SqlDriver");
+        $driver->truncate("User");
 
         parent::tearDown();
     }
@@ -77,7 +80,8 @@ class CreateUserTest extends SharedBootstrapTestCase {
      * @throws \Garden\Web\Exception\NotFoundException
      * @throws \Garden\Web\Exception\ServerException
      */
-    public function testCreateUser($configurations, $ssoDataArray, $options, $expectedResult) {
+    public function testCreateUser($configurations, $ssoDataArray, $options, $expectedResult)
+    {
         /** @var \Gdn_Configuration $config */
         $config = self::container()->get(\Gdn_Configuration::class);
 
@@ -90,24 +94,22 @@ class CreateUserTest extends SharedBootstrapTestCase {
         /** @var \Vanilla\Models\AuthenticatorModel $authenticatorModel */
         $authenticatorModel = $this->container()->get(AuthenticatorModel::class);
         $authenticator = $authenticatorModel->createSSOAuthenticatorInstance([
-            'authenticatorID' => $ssoData->getAuthenticatorID(),
-            'type' => $ssoData->getAuthenticatorType(),
-            'SSOData' => json_decode(json_encode($ssoData), true),
+            "authenticatorID" => $ssoData->getAuthenticatorID(),
+            "type" => $ssoData->getAuthenticatorType(),
+            "SSOData" => json_decode(json_encode($ssoData), true),
         ]);
 
-        if (isset($expectedResult['exception'])) {
-            $this->expectException($expectedResult['exception']);
+        if (isset($expectedResult["exception"])) {
+            $this->expectException($expectedResult["exception"]);
         }
 
         try {
             $result = self::$ssoModel->createUser($ssoData, $options);
-            $expectedResult['dataCallback']($result);
+            $expectedResult["dataCallback"]($result);
         } finally {
             $authenticatorModel->deleteSSOAuthenticatorInstance($authenticator);
         }
-
     }
-
 
     /**
      * Determine, from the parameters,
@@ -119,54 +121,55 @@ class CreateUserTest extends SharedBootstrapTestCase {
      *
      * @return array
      */
-    public function determineExpectedResult($configurations, $ssoDataArray, $options, $expectedResult) {
+    public function determineExpectedResult($configurations, $ssoDataArray, $options, $expectedResult)
+    {
         $name = null;
         $email = null;
-        if ($options['useSSOData']) {
-            $name = $ssoDataArray['user']['name'];
-            $email = $ssoDataArray['user']['email'];
+        if ($options["useSSOData"]) {
+            $name = $ssoDataArray["user"]["name"];
+            $email = $ssoDataArray["user"]["email"];
         }
 
         // This always override.
-        if (isset($options['name'])) {
-            $name = $options['name'];
+        if (isset($options["name"])) {
+            $name = $options["name"];
         }
         // This always override.
-        if (isset($options['email'])) {
-            $email = $options['email'];
+        if (isset($options["email"])) {
+            $email = $options["email"];
         }
 
         $noName = !$name;
-        $duplicateUsername = $configurations['Garden.Registration.NameUnique'] && $name === self::$existingName;
+        $duplicateUsername = $configurations["Garden.Registration.NameUnique"] && $name === self::$existingName;
         $invalidName = in_array($name, self::$invalidNames, true);
         if ($noName || $duplicateUsername || $invalidName) {
             return [
-                'exception' => ValidationException::class,
-                'dataCallback' => function() {},
+                "exception" => ValidationException::class,
+                "dataCallback" => function () {},
             ];
         }
 
-        $noEmail = !$configurations['Garden.Registration.NoEmail'] && !$email;
+        $noEmail = !$configurations["Garden.Registration.NoEmail"] && !$email;
         // EmailUnique has priority over NoEmail if an email is set.
-        $duplicateEmail = $configurations['Garden.Registration.EmailUnique'] && $email === self::$existingEmail;
+        $duplicateEmail = $configurations["Garden.Registration.EmailUnique"] && $email === self::$existingEmail;
         $invalidEmail = in_array($name, self::$invalidEmails, true);
 
         if ($noEmail || $duplicateEmail || $invalidEmail) {
             return [
-                'exception' => ValidationException::class,
-                'dataCallback' => function() {},
+                "exception" => ValidationException::class,
+                "dataCallback" => function () {},
             ];
         }
 
         return [
-            'exception' => null,
-            'dataCallback' => function($data) use ($name, $email) {
-                $this->assertArrayHasKey('Name', $data);
-                $this->assertEquals($name, $data['Name']);
+            "exception" => null,
+            "dataCallback" => function ($data) use ($name, $email) {
+                $this->assertArrayHasKey("Name", $data);
+                $this->assertEquals($name, $data["Name"]);
 
-                $this->assertArrayHasKey('Email', $data);
-                $this->assertEquals($email, $data['Email']);
-            }
+                $this->assertArrayHasKey("Email", $data);
+                $this->assertEquals($email, $data["Email"]);
+            },
         ];
     }
 
@@ -175,56 +178,56 @@ class CreateUserTest extends SharedBootstrapTestCase {
      *
      * @return array
      */
-    public function provider() {
+    public function provider()
+    {
         $configsWEmail = [
-            'Garden.Registration.NoEmail' => [false],
-            'Garden.Registration.EmailUnique' => [false, true],
-            'Garden.Registration.NameUnique' => [false, true],
+            "Garden.Registration.NoEmail" => [false],
+            "Garden.Registration.EmailUnique" => [false, true],
+            "Garden.Registration.NameUnique" => [false, true],
         ];
         $configsNoEmail = [
-            'Garden.Registration.NoEmail' => [true],
-            'Garden.Registration.EmailUnique' => [false, true],
-            'Garden.Registration.NameUnique' => [false, true],
+            "Garden.Registration.NoEmail" => [true],
+            "Garden.Registration.EmailUnique" => [false, true],
+            "Garden.Registration.NameUnique" => [false, true],
         ];
         $configurationSets = array_merge(
             $this->combinatorialSetsGenerator($configsWEmail),
             $this->combinatorialSetsGenerator($configsNoEmail)
         );
 
-
         $ssoDataUserArray = array_merge(
             $this->combinatorialSetsGenerator([
-                'name' => ['User'],
-                'email' => ['user@example.com']
+                "name" => ["User"],
+                "email" => ["user@example.com"],
             ]),
             $this->combinatorialSetsGenerator([
-                'name' => ['User'],
-                'email' => array_merge(self::$invalidEmails, [self::$existingEmail]),
+                "name" => ["User"],
+                "email" => array_merge(self::$invalidEmails, [self::$existingEmail]),
             ]),
             $this->combinatorialSetsGenerator([
-                'name' => array_merge(self::$invalidNames, [self::$existingName]),
-                'email' => ['user@example.com'],
+                "name" => array_merge(self::$invalidNames, [self::$existingName]),
+                "email" => ["user@example.com"],
             ])
         );
 
         $ssoDataArray = $this->combinatorialSetsGenerator([
-            'authenticatorType' => [MockSSOAuthenticator::getType()],
-            'authenticatorID' => [MockSSOAuthenticator::getType()],
-            'uniqueID' => ['ssouniqueid'],
-            'user' => $ssoDataUserArray,
+            "authenticatorType" => [MockSSOAuthenticator::getType()],
+            "authenticatorID" => [MockSSOAuthenticator::getType()],
+            "uniqueID" => ["ssouniqueid"],
+            "user" => $ssoDataUserArray,
         ]);
 
         $options = $this->combinatorialSetsGenerator([
-            'useSSOData' => [true, false],
-            'name' => [null, 'OverriddenUser'],
-            'email' => [null, 'overriddenUser@example.com'],
+            "useSSOData" => [true, false],
+            "name" => [null, "OverriddenUser"],
+            "email" => [null, "overriddenUser@example.com"],
         ]);
 
-        $result =  $this->combinatorialSetsGenerator([
-            'configurations' => $configurationSets,
-            'ssoDataArray' => $ssoDataArray,
-            'options' => $options,
-            'expectedResult' => [[$this, 'determineExpectedResult']],
+        $result = $this->combinatorialSetsGenerator([
+            "configurations" => $configurationSets,
+            "ssoDataArray" => $ssoDataArray,
+            "options" => $options,
+            "expectedResult" => [[$this, "determineExpectedResult"]],
         ]);
 
         return $result;

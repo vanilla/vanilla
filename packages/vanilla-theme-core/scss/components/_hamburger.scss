@@ -8,15 +8,15 @@
     Variables
 \* -------------------------------------------------------------- */
 
-$hamburger-size:                         22px !default;
-$hamburger_padding:                      0 !default;
-$hamburger_bg:                           transparent !default;
-$hamburger_fg:                           $header_fg !default;
-$hamburger-stroke_height:                2px !default;
-$hamburger_borderRadius:                 $component_borderRadius !default;
-$hamburger-stroke_borderRadius:          $hamburger-stroke_height !default;
-$hamburger_transition:                   $global-default_timing !default;
-$hamburger_jstransform:                  "isToggled" !default;
+$hamburger-size: 22px !default;
+$hamburger_padding: 0 !default;
+$hamburger_bg: transparent !default;
+$hamburger_fg: $header_fg !default;
+$hamburger-stroke_height: 2px !default;
+$hamburger_borderRadius: $component_borderRadius !default;
+$hamburger-stroke_borderRadius: $hamburger-stroke_height !default;
+$hamburger_transition: $global-default_timing !default;
+$hamburger_jstransform: "isToggled" !default;
 
 /* -------------------------------------------------------------- *\
     Styles

@@ -15,8 +15,8 @@ use VanillaTests\Fixtures\MockHttpClient;
 /**
  * Tests for the embed and factory.
  */
-class InstagramEmbedFactoryTest extends MinimalContainerTestCase {
-
+class InstagramEmbedFactoryTest extends MinimalContainerTestCase
+{
     /** @var InstagramEmbedFactory */
     private $factory;
 
@@ -26,7 +26,8 @@ class InstagramEmbedFactoryTest extends MinimalContainerTestCase {
     /**
      * Set the factory and client.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         $this->httpClient = new MockHttpClient();
         $this->factory = new InstagramEmbedFactory($this->httpClient);
@@ -38,26 +39,24 @@ class InstagramEmbedFactoryTest extends MinimalContainerTestCase {
      * @param string $urlToTest
      * @dataProvider supportedDomainsProvider
      */
-    public function testSupportedDomains(string $urlToTest) {
+    public function testSupportedDomains(string $urlToTest)
+    {
         $this->assertTrue($this->factory->canHandleUrl($urlToTest));
     }
 
     /**
      * @return array
      */
-    public function supportedDomainsProvider(): array {
-        return [
-            [
-                "https://www.instagram.com/p/By_Et7NnKgL",
-                "https://instagr.am/p/By_Et7NnKgL",
-            ],
-        ];
+    public function supportedDomainsProvider(): array
+    {
+        return [["https://www.instagram.com/p/By_Et7NnKgL", "https://instagr.am/p/By_Et7NnKgL"]];
     }
 
     /**
      * Test network request fetching and handling.
      */
-    public function testCreateEmbedForUrl() {
+    public function testCreateEmbedForUrl()
+    {
         $url = "https://www.instagram.com/p/By_Et7NnKgL";
         $postID = "By_Et7NnKgL";
 

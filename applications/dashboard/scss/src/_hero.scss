@@ -24,31 +24,31 @@
 // Styleguide 16.1.
 
 .hero {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: ($spacer * 2) $spacer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: ($spacer * 2) $spacer;
 
-  > * {
-    flex-grow: 1;
-  }
+    > * {
+        flex-grow: 1;
+    }
 
-  .hero-content {
-    padding: 0 $spacer * 6 0 $spacer * 4;
-    font-size: $font-size-tables;
-    text-align: center;
-    flex-shrink: 1;
-  }
+    .hero-content {
+        padding: 0 $spacer * 6 0 $spacer * 4;
+        font-size: $font-size-tables;
+        text-align: center;
+        flex-shrink: 1;
+    }
 
-  .hero-title {
-    @extend .h2;
-  }
+    .hero-title {
+        @extend .h2;
+    }
 
-  .hero-media-wrapper {
-    flex-shrink: 0;
-  }
+    .hero-media-wrapper {
+        flex-shrink: 0;
+    }
 
-  .btn {
-    margin-top: $spacer * 2;
-  }
+    .btn {
+        margin-top: $spacer * 2;
+    }
 }

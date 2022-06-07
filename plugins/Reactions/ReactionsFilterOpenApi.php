@@ -8,24 +8,25 @@
 /**
  * Filter for the open api.
  */
-class ReactionsFilterOpenApi {
-
+class ReactionsFilterOpenApi
+{
     /**
      * Filter the open api to add reactions parameters.
      *
      * @param array $openApi
      */
-    public function __invoke(array &$openApi): void {
+    public function __invoke(array &$openApi): void
+    {
         // Add "reactionsReceived" to the userExpand options.
         $userExpandEnum = \Vanilla\Utility\ArrayUtils::getByPath(
-            'components.parameters.UserExpand.schema.items.enum',
+            "components.parameters.UserExpand.schema.items.enum",
             $openApi,
             []
         );
 
-        $userExpandEnum[] = 'reactionsReceived';
+        $userExpandEnum[] = "reactionsReceived";
         \Vanilla\Utility\ArrayUtils::setByPath(
-            'components.parameters.UserExpand.schema.items.enum',
+            "components.parameters.UserExpand.schema.items.enum",
             $openApi,
             $userExpandEnum
         );

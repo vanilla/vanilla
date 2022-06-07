@@ -25,8 +25,8 @@ use Vanilla\Web\RequestValidator;
 /**
  * Class for scraping pages of external sites.
  */
-class PageScraper implements LoggerAwareInterface {
-
+class PageScraper implements LoggerAwareInterface
+{
     use LoggerAwareTrait;
 
     /** @var HttpClient */
@@ -42,7 +42,7 @@ class PageScraper implements LoggerAwareInterface {
     private $metadataParsers = [];
 
     /** @var array Valid URL schemes. */
-    protected $validSchemes = ['http', 'https'];
+    protected $validSchemes = ["http", "https"];
 
     /**
      * PageInfo constructor.
@@ -51,7 +51,11 @@ class PageScraper implements LoggerAwareInterface {
      * @param RequestValidator $requestValidator
      * @param HttpCacheMiddleware $httpCache
      */
-    public function __construct(HttpClient $httpClient, RequestValidator $requestValidator, HttpCacheMiddleware $httpCache) {
+    public function __construct(
+        HttpClient $httpClient,
+        RequestValidator $requestValidator,
+        HttpCacheMiddleware $httpCache
+    ) {
         $this->httpClient = $httpClient;
         $this->requestValidator = $requestValidator;
         $this->httpCache = $httpCache;
@@ -67,13 +71,14 @@ class PageScraper implements LoggerAwareInterface {
      *
      * @throws ServerException If the page cannot be fetched.
      */
-    public function pageInfo(string $url): array {
+    public function pageInfo(string $url): array
+    {
         // Ensure that this function is never called during a GET request.
         // This function makes some potentially very expensive calls
         // It can also be used to force the site into an infinite loop (eg. GET page hits the scraper which hits the same page again).
         // @see https://github.com/vanilla/dev-inter-ops/issues/23
         // We've had some situations where the site gets in an infinite loop requesting itself.
-        $this->requestValidator->blockRequestType('GET', __METHOD__ . ' may not be called during a GET request.');
+        $this->requestValidator->blockRequestType("GET", __METHOD__ . " may not be called during a GET request.");
 
         $robotsAllowed = $this->validateRobotFileInUrl($url);
         $isError = false;
@@ -86,42 +91,47 @@ class PageScraper implements LoggerAwareInterface {
             $document = $this->createDom($rawBody);
 
             $metaData = $this->parseMetaData($document);
-            $info = array_merge([
-                'Title' => '',
-                'Description' => '',
-                'Images' => []
-            ], $metaData);
+            $info = array_merge(
+                [
+                    "Title" => "",
+                    "Description" => "",
+                    "Images" => [],
+                ],
+                $metaData
+            );
 
-            if (empty($info['Title'])) {
-                $titleTags = $document->getElementsByTagName('title');
+            if (empty($info["Title"])) {
+                $titleTags = $document->getElementsByTagName("title");
                 $titleTag = $titleTags->item(0);
                 if ($titleTag) {
-                    $info['Title'] = $titleTag->textContent;
+                    $info["Title"] = $titleTag->textContent;
                 }
             }
 
-            if (empty($info['Description'])) {
-                $metaTags = $document->getElementsByTagName('meta');
+            if (empty($info["Description"])) {
+                $metaTags = $document->getElementsByTagName("meta");
                 $description = $this->parseDescription($document, $metaTags);
                 if ($description) {
-                    $info['Description'] = $description;
+                    $info["Description"] = $description;
                 }
             }
 
             $isError = !$response->isResponseClass("2xx");
-            $info['Url'] = $url;
-            $info['Title'] = htmlEntityDecode($info['Title']);
-            $info['Description'] = htmlEntityDecode($info['Description']);
-            $info['isCacheable'] = empty($response->getHeader('x-no-cache'));
+            $info["Url"] = $url;
+            $info["Title"] = htmlEntityDecode($info["Title"]);
+            $info["Description"] = htmlEntityDecode($info["Description"]);
+            $info["isCacheable"] = empty($response->getHeader("x-no-cache"));
         }
 
         if ($isError || !$robotsAllowed) {
             $domain = parse_url($url, PHP_URL_HOST);
-            $sourceString = $isError ? "Site '%s' did not respond successfully." : "Site's '%s' robots.txt did not allow access to the url.";
+            $sourceString = $isError
+                ? "Site '%s' did not respond successfully."
+                : "Site's '%s' robots.txt did not allow access to the url.";
             $errorMessage = sprintft($sourceString, $domain);
             $this->logger->info($errorMessage);
             throw new ServerException($errorMessage, $isError ? $response->getStatusCode() : "403", [
-                HttpException::FIELD_DESCRIPTION => $isError ? $info['Title'] . ": " . $info['Description'] : null,
+                HttpException::FIELD_DESCRIPTION => $isError ? $info["Title"] . ": " . $info["Description"] : null,
             ]);
         }
         return $info;
@@ -133,16 +143,17 @@ class PageScraper implements LoggerAwareInterface {
      * @param string $url The URL where the request will be sent.
      * @return bool allowed to access url
      */
-    protected function validateRobotFileInUrl(string $url): bool {
+    protected function validateRobotFileInUrl(string $url): bool
+    {
         $urlParts = parse_url($url);
         if ($urlParts === false) {
-            throw new InvalidArgumentException('Invalid URL.');
-        } elseif (!in_array(val('scheme', $urlParts), $this->validSchemes)) {
-            throw new InvalidArgumentException('Unsupported URL scheme.');
+            throw new InvalidArgumentException("Invalid URL.");
+        } elseif (!in_array(val("scheme", $urlParts), $this->validSchemes)) {
+            throw new InvalidArgumentException("Unsupported URL scheme.");
         }
 
-        $host = val('host', $urlParts);
-        $schema = val('scheme', $urlParts);
+        $host = val("host", $urlParts);
+        $schema = val("scheme", $urlParts);
         $robotsUrl = "$schema://$host/robots.txt";
 
         $this->httpClient->addMiddleware($this->httpCache);
@@ -164,7 +175,8 @@ class PageScraper implements LoggerAwareInterface {
      * @param string $url string of the urn for http request.
      * @return HttpResponse html response
      */
-    protected function getUrl(string $url): HttpResponse {
+    protected function getUrl(string $url): HttpResponse
+    {
         // Make the actual request.
         return $this->httpClient->get($url);
     }
@@ -176,22 +188,23 @@ class PageScraper implements LoggerAwareInterface {
      * @param DOMNodeList $meta
      * @return string|null
      */
-    private function parseDescription(DOMDocument $document, DomNodeList $meta) {
+    private function parseDescription(DOMDocument $document, DomNodeList $meta)
+    {
         $result = null;
 
         // Try to get it from the meta.
         /** @var DOMElement $tag */
         foreach ($meta as $tag) {
-            if ($tag->hasAttribute('name') === false) {
+            if ($tag->hasAttribute("name") === false) {
                 continue;
-            } elseif ($tag->getAttribute('name') === 'description') {
-                $result = $tag->getAttribute('content');
+            } elseif ($tag->getAttribute("name") === "description") {
+                $result = $tag->getAttribute("content");
             }
         }
 
         // Try looking in paragraph tags.
         if ($result === null) {
-            $paragraphs = $document->getElementsByTagName('p');
+            $paragraphs = $document->getElementsByTagName("p");
             foreach ($paragraphs as $tag) {
                 if (strlen($tag->textContent) > 150) {
                     $result = $tag->textContent;
@@ -204,9 +217,9 @@ class PageScraper implements LoggerAwareInterface {
         }
 
         if ($result === null) {
-            $paragraphs = $paragraphs ?? $document->getElementsByTagName('p');
+            $paragraphs = $paragraphs ?? $document->getElementsByTagName("p");
             foreach ($paragraphs as $tag) {
-                if (trim($tag->textContent) !== '') {
+                if (trim($tag->textContent) !== "") {
                     $result = $tag->textContent;
                     break;
                 }
@@ -222,7 +235,8 @@ class PageScraper implements LoggerAwareInterface {
      * @param DOMDocument $document
      * @return array
      */
-    private function parseMetaData(DOMDocument $document): array {
+    private function parseMetaData(DOMDocument $document): array
+    {
         $result = [];
         /** @var Parser $parser */
         foreach ($this->metadataParsers as $parser) {
@@ -238,7 +252,8 @@ class PageScraper implements LoggerAwareInterface {
      * @param Metadata\Parser\Parser $parser
      * @return array
      */
-    public function registerMetadataParser(Parser $parser) {
+    public function registerMetadataParser(Parser $parser)
+    {
         $this->metadataParsers[] = $parser;
         return $this->metadataParsers;
     }
@@ -248,7 +263,8 @@ class PageScraper implements LoggerAwareInterface {
      *
      * @return string
      */
-    private function userAgent() {
+    private function userAgent()
+    {
         return "vanilla-forums-embed/1.0";
     }
 
@@ -259,16 +275,17 @@ class PageScraper implements LoggerAwareInterface {
      * @return DOMDocument Returns the document.
      * @throws Exception Throws an exception if the HTML is so malformed that it couldn't be parsed.
      */
-    private function createDom(string $html): DOMDocument {
+    private function createDom(string $html): DOMDocument
+    {
         // Add charset information for HTML 5 pages.
         // https://stackoverflow.com/questions/39148170/utf-8-with-php-domdocument-loadhtml#39148511
-        if (!preg_match('`^\s*<?xml`', $html) && $encoding = mb_detect_encoding($html)) {
+        if (!preg_match("`^\s*<?xml`", $html) && ($encoding = mb_detect_encoding($html))) {
             $html = "<?xml version=\"1.0\" encoding=\"$encoding\"?>$html";
         }
 
         $document = $this->loadDocument($html);
 
-        if (!$document->encoding && !in_array($encoding, ['ASCII'], true)) {
+        if (!$document->encoding && !in_array($encoding, ["ASCII"], true)) {
             $document = $this->fixDocumentEncoding($document, $html);
         }
 
@@ -283,11 +300,12 @@ class PageScraper implements LoggerAwareInterface {
      * @return DOMDocument Returns a newly loaded document or the same one if the encoding could not be fixed.
      * @throws Exception
      */
-    private function fixDocumentEncoding(DOMDocument $document, string $raw): DOMDocument {
+    private function fixDocumentEncoding(DOMDocument $document, string $raw): DOMDocument
+    {
         $encoding = $this->determineDocumentEncoding($document);
 
         if ($encoding) {
-            $raw = mb_convert_encoding($raw, 'UTF-8', $encoding);
+            $raw = mb_convert_encoding($raw, "UTF-8", $encoding);
             $result = $this->loadDocument($raw);
         } else {
             $result = $document;
@@ -302,7 +320,8 @@ class PageScraper implements LoggerAwareInterface {
      * @return DOMDocument Returns the loaded document.
      * @throws Exception Throws an exception if libxml can't load the document.
      */
-    private function loadDocument(string $html) {
+    private function loadDocument(string $html)
+    {
         $document = new DOMDocument();
 
         $err = libxml_use_internal_errors(true);
@@ -311,7 +330,7 @@ class PageScraper implements LoggerAwareInterface {
         libxml_use_internal_errors($err);
 
         if ($loadResult === false) {
-            throw new Exception('Failed to load document for parsing.', 400);
+            throw new Exception("Failed to load document for parsing.", 400);
         }
 
         return $document;
@@ -323,8 +342,9 @@ class PageScraper implements LoggerAwareInterface {
      * @param DOMDocument $document The document to check.
      * @return string Returns the encoding or an empty string if it can't be determined.
      */
-    private function determineDocumentEncoding(DOMDocument $document): string {
-        $encoding = '';
+    private function determineDocumentEncoding(DOMDocument $document): string
+    {
+        $encoding = "";
 
         // Look in an XML declaration.
         foreach ($document->childNodes as $node) {
@@ -336,12 +356,11 @@ class PageScraper implements LoggerAwareInterface {
             }
         }
 
-
         if (!$encoding) {
             // Look in a meta tag.
-            foreach ($document->getElementsByTagName('meta') as $node) {
+            foreach ($document->getElementsByTagName("meta") as $node) {
                 /* @var DOMElement $node */
-                if ($attr = $node->getAttribute('charset')) {
+                if ($attr = $node->getAttribute("charset")) {
                     $encoding = $attr;
                     break;
                 }
@@ -352,6 +371,6 @@ class PageScraper implements LoggerAwareInterface {
             return $encoding;
         }
 
-        return '';
+        return "";
     }
 }

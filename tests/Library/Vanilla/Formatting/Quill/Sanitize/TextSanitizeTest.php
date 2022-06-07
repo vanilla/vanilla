@@ -6,15 +6,14 @@
 
 namespace VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize;
 
-class TextSanitizeTest extends SanitizeTest {
-
+class TextSanitizeTest extends SanitizeTest
+{
     /**
      * @inheritdoc
      */
-    protected function insertContentOperations(string $content): array {
-        $operations = [
-            ["insert" => $content]
-        ];
+    protected function insertContentOperations(string $content): array
+    {
+        $operations = [["insert" => $content]];
         return $operations;
     }
 }

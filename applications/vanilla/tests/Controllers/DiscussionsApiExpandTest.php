@@ -7,32 +7,44 @@
 
 namespace VanillaTests\Cloud\ElasticSearch;
 
+use Vanilla\Dashboard\Models\RecordStatusModel;
 use VanillaTests\APIv2\AbstractAPIv2Test;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 
 /**
  * Search discussion content with sort: hot, top.
  */
-class DiscussionsApiExpandTest extends AbstractAPIv2Test {
+class DiscussionsApiExpandTest extends AbstractAPIv2Test
+{
     use CommunityApiTestTrait;
 
-    protected static $addons = ['vanilla'];
+    protected static $addons = ["vanilla"];
 
     /**
      * Prepare data for tests
      */
-    public function testPrepareData() {
+    public function testPrepareData()
+    {
         $discussions = [
-                ['name' => 'Discussion one', 'body' => 'Body one'],
-                ['name' => 'Discussion two', 'body' => 'Body two'],
+            ["name" => "Discussion one", "body" => "Body one"],
+            ["name" => "Discussion two", "body" => "Body two"],
         ];
 
         foreach ($discussions as $discussion) {
             $this->createDiscussion($discussion);
         }
 
-        $discussions = $this->api()->get("/discussions", ['limit' => 30])->getBody();
+        $discussions = $this->api()
+            ->get("/discussions", ["limit" => 30])
+            ->getBody();
         $this->assertEquals(2, count($discussions));
+
+        foreach ($discussions as $discussion) {
+            $this->api()->put("/discussions/{$discussion["discussionID"]}/status", [
+                "statusID" => RecordStatusModel::DISCUSSION_STATUS_UNANSWERED,
+                "statusNotes" => "Pending answer {$discussion["discussionID"]}",
+            ]);
+        }
     }
 
     /**
@@ -44,82 +56,69 @@ class DiscussionsApiExpandTest extends AbstractAPIv2Test {
      * @depends testPrepareData
      * @dataProvider queryDataProvider
      */
-    public function testDiscussionsExpand(array $params, array $expectedResults, string $paramKey = null) {
-        $this->assertApiResults('/discussions', $params, $expectedResults, false, count($expectedResults[$paramKey]));
+    public function testDiscussionsExpand(array $params, array $expectedResults, string $paramKey = null)
+    {
+        $this->assertApiResults("/discussions", $params, $expectedResults, false, count($expectedResults[$paramKey]));
     }
 
     /**
      * @return array
      */
-    public function queryDataProvider() {
+    public function queryDataProvider()
+    {
         return [
-            'no expand options' => [
+            "no expand options" => [
                 [
-                    'expand' => [],
+                    "expand" => [],
                 ],
                 [
-                    'name' => [
-                        'Discussion one',
-                        'Discussion two',
-                    ],
-                    'body' => [
-                        'Body one',
-                        'Body two',
-                    ],
-                    'excerpt' => null
+                    "name" => ["Discussion one", "Discussion two"],
+                    "body" => ["Body one", "Body two"],
+                    "excerpt" => null,
                 ],
-                'name'
+                "name",
             ],
-            'expand -body' => [
+            "expand -body" => [
                 [
-                    'expand' => ['-body'],
+                    "expand" => ["-body"],
                 ],
                 [
-                    'name' => [
-                        'Discussion one',
-                        'Discussion two',
-                    ],
-                    'body' => null,
-                    'excerpt' => null
+                    "name" => ["Discussion one", "Discussion two"],
+                    "body" => null,
+                    "excerpt" => null,
                 ],
-                'name'
+                "name",
             ],
-            'expand excerpt' => [
+            "expand excerpt" => [
                 [
-                    'expand' => ['excerpt'],
+                    "expand" => ["excerpt"],
                 ],
                 [
-                    'name' => [
-                        'Discussion one',
-                        'Discussion two',
-                    ],
-                    'body' => [
-                        'Body one',
-                        'Body two',
-                    ],
-                    'excerpt' => [
-                        'Body one',
-                        'Body two',
-                    ],
+                    "name" => ["Discussion one", "Discussion two"],
+                    "body" => ["Body one", "Body two"],
+                    "excerpt" => ["Body one", "Body two"],
                 ],
-                'name'
+                "name",
             ],
-            'expand: excerpt, -body' => [
+            "expand: excerpt, -body" => [
                 [
-                    'expand' => ['excerpt', '-body'],
+                    "expand" => ["excerpt", "-body"],
                 ],
                 [
-                    'name' => [
-                        'Discussion one',
-                        'Discussion two',
-                    ],
-                    'body' => null,
-                    'excerpt' => [
-                        'Body one',
-                        'Body two',
-                    ],
+                    "name" => ["Discussion one", "Discussion two"],
+                    "body" => null,
+                    "excerpt" => ["Body one", "Body two"],
                 ],
-                'name'
+                "name",
+            ],
+            "expand: status" => [
+                [
+                    "expand" => ["status"],
+                ],
+                [
+                    "status.reasonUpdated" => ["Pending answer 1", "Pending answer 2"],
+                ],
+                "status.reasonUpdated",
             ],
         ];
     }

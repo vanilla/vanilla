@@ -12,8 +12,8 @@ use PHPUnit\Framework\TestCase;
 /**
  * Tests for dateCompare().
  */
-class DateCompareTest extends TestCase {
-
+class DateCompareTest extends TestCase
+{
     /**
      * Test {@link dateCompare()} against several scenarios.
      *
@@ -22,7 +22,8 @@ class DateCompareTest extends TestCase {
      * @param int $expected Expected result.
      * @dataProvider provideDateCompareArrays
      */
-    public function testDateCompare($testDate1, $testDate2, int $expected) {
+    public function testDateCompare($testDate1, $testDate2, int $expected)
+    {
         $actual = dateCompare($testDate1, $testDate2);
         $this->assertSame($expected, $actual);
     }
@@ -32,23 +33,12 @@ class DateCompareTest extends TestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideDateCompareArrays() {
+    public function provideDateCompareArrays()
+    {
         $r = [
-            'americanStringDateLess' => [
-                '12/22/1978',
-                '1/17/2006',
-                -1,
-            ],
-            'dashedDayMonthYearEqual' => [
-                '30-6-2008',
-                '30-6-2008',
-                0,
-            ],
-            'alphaMonthGreater' => [
-                'June 2nd, 2001',
-                'June 1st, 2001',
-                1,
-            ],
+            "americanStringDateLess" => ["12/22/1978", "1/17/2006", -1],
+            "dashedDayMonthYearEqual" => ["30-6-2008", "30-6-2008", 0],
+            "alphaMonthGreater" => ["June 2nd, 2001", "June 1st, 2001", 1],
         ];
 
         return $r;

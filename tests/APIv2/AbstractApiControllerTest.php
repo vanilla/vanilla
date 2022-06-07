@@ -13,7 +13,8 @@ use VanillaTests\Fixtures\TestApiController;
 /**
  * Test some basic functionality of the **AbstractApiController**.
  */
-class AbstractApiControllerTest extends TestCase {
+class AbstractApiControllerTest extends TestCase
+{
     /**
      * @var TestApiController
      */
@@ -22,7 +23,8 @@ class AbstractApiControllerTest extends TestCase {
     /**
      * Include the abstract controller because it's in an addon.
      */
-    public static function setUpBeforeClass(): void {
+    public static function setUpBeforeClass(): void
+    {
         parent::setUpBeforeClass();
     }
 
@@ -31,7 +33,8 @@ class AbstractApiControllerTest extends TestCase {
      *
      * This can be modified later if injection is required.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         $this->controller = new TestApiController();
     }
@@ -43,8 +46,9 @@ class AbstractApiControllerTest extends TestCase {
      * @param bool $expected The expected result of **isExpandedField**.
      * @dataProvider provideIsExpandedFieldTests
      */
-    public function testIsExpandedField($expand, bool $expected) {
-        $actual = $this->controller->isExpandField('foo', $expand);
+    public function testIsExpandedField($expand, bool $expected)
+    {
+        $actual = $this->controller->isExpandField("foo", $expand);
         $this->assertSame($expected, $actual);
     }
 
@@ -53,20 +57,20 @@ class AbstractApiControllerTest extends TestCase {
      *
      * @return array Returns a data provider.
      */
-    public function provideIsExpandedFieldTests() {
+    public function provideIsExpandedFieldTests()
+    {
         $r = [
-            'bool true' => [true, true],
-            'field set' => [['foo'], true],
-            'field not set' => [['bar'], false],
-            'all' => [['all'], true],
-            'string "true"' => [['true'], true],
-            '1' => [['1'], true],
-            'empty expand' => [[], false],
+            "bool true" => [true, true],
+            "field set" => [["foo"], true],
+            "field not set" => [["bar"], false],
+            "all" => [["all"], true],
+            'string "true"' => [["true"], true],
+            "1" => [["1"], true],
+            "empty expand" => [[], false],
         ];
 
         return $r;
     }
-
 
     /**
      * Test **resolveExpandFields()**.
@@ -75,9 +79,10 @@ class AbstractApiControllerTest extends TestCase {
      * @param array $expected The expected result of **resolveExpandFields()**.
      * @dataProvider provideResolveExpandFieldsData
      */
-    public function testResolveExpandedFields($expand, array $expected) {
-        $map = ['foo' => 'fooID', 'bar' => 'barID'];
-        $request = ['expand' => $expand];
+    public function testResolveExpandedFields($expand, array $expected)
+    {
+        $map = ["foo" => "fooID", "bar" => "barID"];
+        $request = ["expand" => $expand];
 
         $actual = $this->controller->resolveExpandFieldsPublic($request, $map);
         $this->assertEquals($expected, $actual);
@@ -88,10 +93,11 @@ class AbstractApiControllerTest extends TestCase {
      *
      * @return array Returns a data provider array.
      */
-    public function provideResolveExpandFieldsData() {
+    public function provideResolveExpandFieldsData()
+    {
         $r = [
-            'true' => [true, ['fooID', 'barID']],
-            'all' => [['all'], ['fooID', 'barID']],
+            "true" => [true, ["fooID", "barID"]],
+            "all" => [["all"], ["fooID", "barID"]],
         ];
 
         return $r;

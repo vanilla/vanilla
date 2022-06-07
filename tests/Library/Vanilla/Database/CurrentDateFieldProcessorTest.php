@@ -15,8 +15,8 @@ use VanillaTests\Fixtures\BasicPipelineModel;
 /**
  * Class for testing the "current date field" database operation processor.
  */
-class CurrentDateFieldProcessorTest extends TestCase {
-
+class CurrentDateFieldProcessorTest extends TestCase
+{
     /**
      * Verify processor adds fields to insert operations.
      *
@@ -24,7 +24,8 @@ class CurrentDateFieldProcessorTest extends TestCase {
      * @param array|null $dateFields
      * @dataProvider provideOperations
      */
-    public function testAddInsertFields(string $type, $dateFields) {
+    public function testAddInsertFields(string $type, $dateFields)
+    {
         $model = new BasicPipelineModel("Example");
         $processor = new CurrentDateFieldProcessor();
         $model->addPipelineProcessor($processor);
@@ -61,7 +62,8 @@ class CurrentDateFieldProcessorTest extends TestCase {
      *
      * @return array
      */
-    public function provideOperations() {
+    public function provideOperations()
+    {
         return [
             [Operation::TYPE_DELETE, null],
             [Operation::TYPE_INSERT, ["DateInserted"]],
@@ -77,7 +79,8 @@ class CurrentDateFieldProcessorTest extends TestCase {
      * @param array $dateFields
      * @dataProvider provideOperationsDate
      */
-    public function testOperationModeDefault(string $type, $dateFields) {
+    public function testOperationModeDefault(string $type, $dateFields)
+    {
         $model = new BasicPipelineModel("Example");
         $processor = new CurrentDateFieldProcessor();
         $model->addPipelineProcessor($processor);
@@ -114,7 +117,8 @@ class CurrentDateFieldProcessorTest extends TestCase {
      * @param array $dateFields
      * @dataProvider provideOperationsDate
      */
-    public function testOperationModeImport(string $type, $dateFields) {
+    public function testOperationModeImport(string $type, $dateFields)
+    {
         $model = new BasicPipelineModel("Example");
         $processor = new CurrentDateFieldProcessor();
         $model->addPipelineProcessor($processor);
@@ -151,10 +155,9 @@ class CurrentDateFieldProcessorTest extends TestCase {
      *
      * @return array
      */
-    public function provideOperationsDate() {
-        $timestamp = (new DateTime())
-        ->modify('-1 hour')
-        ->format("Y-m-d H:i:s");
+    public function provideOperationsDate()
+    {
+        $timestamp = (new DateTime())->modify("-1 hour")->format("Y-m-d H:i:s");
         return [
             [Operation::TYPE_INSERT, ["DateInserted" => $timestamp]],
             [Operation::TYPE_UPDATE, ["DateUpdated" => $timestamp]],

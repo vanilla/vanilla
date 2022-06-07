@@ -14,8 +14,8 @@ use Vanilla\EmbeddedContent\Embeds\YouTubeEmbed;
 /**
  * Factory for YouTubeEmbed.
  */
-class YouTubeEmbedFactory extends AbstractEmbedFactory {
-
+class YouTubeEmbedFactory extends AbstractEmbedFactory
+{
     const SHORT_DOMAIN = "youtu.be";
 
     const PRIMARY_DOMAINS = ["youtube.com"];
@@ -30,14 +30,16 @@ class YouTubeEmbedFactory extends AbstractEmbedFactory {
      *
      * @param HttpClient $httpClient
      */
-    public function __construct(HttpClient $httpClient) {
+    public function __construct(HttpClient $httpClient)
+    {
         $this->httpClient = $httpClient;
     }
 
     /**
      * @inheritdoc
      */
-    protected function getSupportedDomains(): array {
+    protected function getSupportedDomains(): array
+    {
         $domains = self::PRIMARY_DOMAINS;
         $domains[] = self::SHORT_DOMAIN;
         return $domains;
@@ -46,7 +48,8 @@ class YouTubeEmbedFactory extends AbstractEmbedFactory {
     /**
      * @inheritdoc
      */
-    protected function getSupportedPathRegex(string $domain): string {
+    protected function getSupportedPathRegex(string $domain): string
+    {
         if ($domain === self::SHORT_DOMAIN) {
             return "`^/?[\w-]{11}$`";
         } else {
@@ -59,13 +62,11 @@ class YouTubeEmbedFactory extends AbstractEmbedFactory {
      *
      * @inheritdoc
      */
-    public function createEmbedForUrl(string $url): AbstractEmbed {
+    public function createEmbedForUrl(string $url): AbstractEmbed
+    {
         $videoID = $this->videoIDFromUrl($url);
 
-        $response = $this->httpClient->get(
-            self::OEMBED_URL_BASE,
-            ["url" => $url]
-        );
+        $response = $this->httpClient->get(self::OEMBED_URL_BASE, ["url" => $url]);
 
         // Example Response JSON
         // phpcs:disable Generic.Files.LineLength
@@ -100,7 +101,7 @@ class YouTubeEmbedFactory extends AbstractEmbedFactory {
             "photoUrl" => $response["thumbnail_url"] ?? null,
             "videoID" => $videoID,
             "listID" => $parameters["list"] ?? null,
-            "showRelated" => ($parameters["rel"] ?? false) ? true : false,
+            "showRelated" => $parameters["rel"] ?? false ? true : false,
             "start" => $start,
         ];
 
@@ -113,7 +114,8 @@ class YouTubeEmbedFactory extends AbstractEmbedFactory {
      * @param string $url
      * @return int|null
      */
-    private function startTime(string $url): ?int {
+    private function startTime(string $url): ?int
+    {
         $parameters = [];
         $fragment = parse_url($url, PHP_URL_FRAGMENT);
         parse_str(parse_url($url, PHP_URL_QUERY) ?? "", $parameters);
@@ -123,16 +125,22 @@ class YouTubeEmbedFactory extends AbstractEmbedFactory {
         }
 
         if (preg_match("/t=(?P<start>\d+)/", $fragment, $timeParts)) {
-            return (int)$timeParts["start"];
+            return (int) $timeParts["start"];
         }
 
-        if (preg_match("/^(?:(?P<ticks>\d+)|(?:(?P<minutes>\d*)m)?(?:(?P<seconds>\d*)s)?)$/", $parameters["t"] ?? "", $timeParts)) {
+        if (
+            preg_match(
+                "/^(?:(?P<ticks>\d+)|(?:(?P<minutes>\d*)m)?(?:(?P<seconds>\d*)s)?)$/",
+                $parameters["t"] ?? "",
+                $timeParts
+            )
+        ) {
             if (array_key_exists("ticks", $timeParts) && $timeParts["ticks"] !== "") {
                 return $timeParts["ticks"];
             } else {
-                $minutes = $timeParts["minutes"] ? (int)$timeParts["minutes"] : 0;
-                $seconds = $timeParts["seconds"] ? (int)$timeParts["seconds"] : 0;
-                return ($minutes * 60) + $seconds;
+                $minutes = $timeParts["minutes"] ? (int) $timeParts["minutes"] : 0;
+                $seconds = $timeParts["seconds"] ? (int) $timeParts["seconds"] : 0;
+                return $minutes * 60 + $seconds;
             }
         }
 
@@ -145,7 +153,8 @@ class YouTubeEmbedFactory extends AbstractEmbedFactory {
      * @param string $url
      * @return string|null
      */
-    private function videoIDFromUrl(string $url): ?string {
+    private function videoIDFromUrl(string $url): ?string
+    {
         $host = parse_url($url, PHP_URL_HOST);
 
         if ($host === self::SHORT_DOMAIN) {

@@ -13,7 +13,8 @@ use Vanilla\Utility\ArrayUtils;
 /**
  * Database operation processor for including current date fields.
  */
-class CurrentDateFieldProcessor implements Processor {
+class CurrentDateFieldProcessor implements Processor
+{
     /** @var array */
     private $insertFields = ["DateInserted"];
 
@@ -25,7 +26,8 @@ class CurrentDateFieldProcessor implements Processor {
      *
      * @return array
      */
-    public function getInsertFields(): array {
+    public function getInsertFields(): array
+    {
         return $this->insertFields;
     }
 
@@ -34,7 +36,8 @@ class CurrentDateFieldProcessor implements Processor {
      *
      * @return array
      */
-    public function getUpdateFields(): array {
+    public function getUpdateFields(): array
+    {
         return $this->updateFields;
     }
 
@@ -43,9 +46,10 @@ class CurrentDateFieldProcessor implements Processor {
      *
      * @return $this
      */
-    public function camelCase(): self {
-        $this->insertFields = array_map('lcfirst', $this->insertFields);
-        $this->updateFields = array_map('lcfirst', $this->updateFields);
+    public function camelCase(): self
+    {
+        $this->insertFields = array_map("lcfirst", $this->insertFields);
+        $this->updateFields = array_map("lcfirst", $this->updateFields);
         return $this;
     }
 
@@ -56,7 +60,8 @@ class CurrentDateFieldProcessor implements Processor {
      * @param callable $stack
      * @return mixed
      */
-    public function handle(Operation $operation, callable $stack) {
+    public function handle(Operation $operation, callable $stack)
+    {
         switch ($operation->getType()) {
             case Operation::TYPE_INSERT:
                 $fields = $this->getInsertFields();
@@ -70,7 +75,10 @@ class CurrentDateFieldProcessor implements Processor {
         }
 
         foreach ($fields as $field) {
-            $fieldExists = $operation->getCaller()->getWriteSchema()->getField("properties.{$field}");
+            $fieldExists = $operation
+                ->getCaller()
+                ->getWriteSchema()
+                ->getField("properties.{$field}");
             if ($fieldExists) {
                 $set = $operation->getSet();
                 if (empty($set[$field] ?? null) || $operation->getMode() === Operation::MODE_DEFAULT) {
@@ -93,7 +101,8 @@ class CurrentDateFieldProcessor implements Processor {
      * @param array $insertFields
      * @return self
      */
-    public function setInsertFields(array $insertFields): self {
+    public function setInsertFields(array $insertFields): self
+    {
         $this->insertFields = $insertFields;
         return $this;
     }
@@ -104,7 +113,8 @@ class CurrentDateFieldProcessor implements Processor {
      * @param array $updateFields
      * @return self
      */
-    public function setUpdateFields(array $updateFields): self {
+    public function setUpdateFields(array $updateFields): self
+    {
         $this->updateFields = $updateFields;
         return $this;
     }

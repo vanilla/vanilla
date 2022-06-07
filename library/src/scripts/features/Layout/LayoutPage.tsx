@@ -13,18 +13,20 @@ import { Router } from "@library/Router";
 import { Route, RouteComponentProps } from "react-router";
 import { WidgetLayout } from "@library/layout/WidgetLayout";
 import { ILayoutQuery } from "@library/features/Layout/LayoutRenderer.types";
+import { matchPath } from "react-router";
 
 interface IProps {
     layoutQuery: ILayoutQuery;
 }
 
 export function LayoutPage(props: IProps) {
-    //right now some of params are hardcoded, but should come through props
     const layout = useLayoutSpec({
         layoutViewType: props.layoutQuery.layoutViewType,
-        recordID: -1,
-        recordType: "global",
-        params: {},
+        recordID: props.layoutQuery.recordID ?? -1,
+        recordType: props.layoutQuery.recordType ?? "global",
+        params: {
+            ...props.layoutQuery.params,
+        },
     });
 
     if (layout.error) {
@@ -39,22 +41,34 @@ export function LayoutPage(props: IProps) {
 
     return (
         <WidgetLayout>
-            <LayoutRenderer layout={layout.data.layout} />;
+            <LayoutRenderer layout={layout.data.layout} />
         </WidgetLayout>
     );
 }
 
 type IPathLayoutQueryMapper = (params: RouteComponentProps) => ILayoutQuery;
 
+let layoutPaths: string[] = [];
+
 export function registerLayoutPage(path: string | string[], pathMapper: IPathLayoutQueryMapper) {
+    if (Array.isArray(path)) {
+        layoutPaths = [...layoutPaths, ...path];
+    } else {
+        layoutPaths = [...layoutPaths, path];
+    }
     Router.addRoutes([
         <Route
             key={[path].flat().join("-")}
             path={path}
+            exact={true}
             render={(params) => {
                 const mappedQuery = pathMapper(params);
                 return <LayoutPage layoutQuery={mappedQuery} />;
             }}
         />,
     ]);
+}
+
+export function isLayoutRoute(path: string): boolean {
+    return !!matchPath(path, layoutPaths);
 }

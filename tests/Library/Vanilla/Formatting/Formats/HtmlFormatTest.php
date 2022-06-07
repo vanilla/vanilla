@@ -14,19 +14,21 @@ use VanillaTests\Fixtures\Formatting\FormatFixtureFactory;
 /**
  * Tests for the HtmlFormat.
  */
-class HtmlFormatTest extends AbstractFormatTestCase {
-
+class HtmlFormatTest extends AbstractFormatTestCase
+{
     /**
      * @inheritDoc
      */
-    protected function prepareFormatter(): FormatInterface {
+    protected function prepareFormatter(): FormatInterface
+    {
         return self::container()->get(HtmlFormat::class);
     }
 
     /**
      * @inheritDoc
      */
-    protected function prepareFixtures(): array {
-        return (new FormatFixtureFactory('html'))->getAllFixtures();
+    protected function prepareFixtures(): array
+    {
+        return (new FormatFixtureFactory("html"))->getAllFixtures();
     }
 }

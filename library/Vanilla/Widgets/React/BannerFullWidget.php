@@ -11,13 +11,15 @@ use CategoryModel;
 use Garden\Schema\Schema;
 use Gdn_Upload;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Forms\FormOptions;
+use Vanilla\Forms\SchemaForm;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
 
 /**
  * Class BannerFullWidget
  */
-class BannerFullWidget implements ReactWidgetInterface, CombinedPropsWidgetInterface {
-
+class BannerFullWidget implements ReactWidgetInterface, CombinedPropsWidgetInterface
+{
     use CombinedPropsWidgetTrait;
     use HomeWidgetContainerSchemaTrait;
 
@@ -32,7 +34,8 @@ class BannerFullWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
      * @param CategoryModel $categoryModel
      * @param ConfigurationInterface $config
      */
-    public function __construct(CategoryModel $categoryModel, ConfigurationInterface $config) {
+    public function __construct(CategoryModel $categoryModel, ConfigurationInterface $config)
+    {
         $this->categoryModel = $categoryModel;
         $this->config = $config;
     }
@@ -40,61 +43,81 @@ class BannerFullWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
     /**
      * @inheritDoc
      */
-    public static function getWidgetName(): string {
+    public static function getWidgetName(): string
+    {
         return "Banner";
     }
 
     /**
      * @inheritDoc
      */
-    public static function getWidgetID(): string {
-        return "banner.full";
+    public static function getWidgetID(): string
+    {
+        return "app-banner";
     }
 
     /**
      * @return string
      */
-    public static function getWidgetIconPath(): string {
+    public static function getWidgetIconPath(): string
+    {
         return "/applications/dashboard/design/images/widgetIcons/banner.svg";
     }
 
     /**
      * @inheritDoc
      */
-    public static function getWidgetSchema(): Schema {
+    public static function getWidgetSchema(): Schema
+    {
         return Schema::parse([
-            'backgroundImage:s?' => 'URL for the background image.',
-            'categoryID:s?' => 'Category ID.',
-            'title:s?' => 'Title.',
-            'description:s?' => 'Description.',
+            "backgroundImage:s?" => [
+                "description" => "URL for the background image.",
+                "x-control" => SchemaForm::textBox(
+                    new FormOptions("Background Image", "URL for the background image.")
+                ),
+            ],
+            "categoryID:s?" => "Category ID.",
+            "title:s?" => [
+                "description" => "Banner title.",
+                "x-control" => SchemaForm::textBox(new FormOptions("Title", "Banner title.")),
+            ],
+            "description:s?" => [
+                "description" => "Banner description.",
+                "x-control" => SchemaForm::textBox(new FormOptions("Description", "Banner description.")),
+            ],
         ]);
     }
 
     /**
      * @inheritDoc
      */
-    public function getProps(): ?array {
-        $categoryID = $this->props['categoryID'] ?? null;
+    public function getProps(): ?array
+    {
+        $categoryID = $this->props["categoryID"] ?? null;
 
         $bgUrl = $this->categoryModel->getCategoryFieldRecursive(
             $categoryID,
-            'BannerImage',
+            "BannerImage",
             $this->config->get("Garden.BannerImage", null)
         );
         $bgUrl = $bgUrl ? Gdn_Upload::url($bgUrl) : null;
 
-        return array_merge([
-            'backgroundImage' => $bgUrl,
-            'options' => [
-                'enabled' => true,
+        return array_merge(
+            [
+                "backgroundImage" => $bgUrl,
+                "options" => [
+                    "enabled" => true,
+                ],
             ],
-        ], $this->props);
+            $this->props
+        );
     }
 
     /**
      * @inheritDoc
      */
-    public static function getComponentName(): string {
+    public static function getComponentName(): string
+    {
         return "Banner";
     }
 }

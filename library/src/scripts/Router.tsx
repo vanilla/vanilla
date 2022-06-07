@@ -11,11 +11,11 @@ import { createBrowserHistory, History } from "history";
 import NotFoundPage from "@library/routing/NotFoundPage";
 import { BackRoutingProvider } from "@library/routing/links/BackRoutingProvider";
 import { initPageViewTracking, usePageChangeListener } from "@library/pageViews/pageViewTracking";
-import { BannerContextProvider } from "./banner/BannerContext";
 
 interface IProps {
     disableDynamicRouting?: boolean;
     sectionRoots?: string[];
+    useLayoutRouting?: boolean;
     onRouteChange?: (history: History) => void;
 }
 
@@ -44,7 +44,10 @@ export function Router(props: IProps) {
     routes = <BackRoutingProvider>{routes}</BackRoutingProvider>;
     if (!props.disableDynamicRouting) {
         routes = (
-            <LinkContextProvider linkContexts={(props.sectionRoots ?? ["/"])?.map((root) => formatUrl(root, true))}>
+            <LinkContextProvider
+                useLayoutRouting={props.useLayoutRouting}
+                linkContexts={(props.sectionRoots ?? ["/"])?.map((root) => formatUrl(root, true))}
+            >
                 {routes}
             </LinkContextProvider>
         );

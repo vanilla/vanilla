@@ -1,9 +1,80 @@
+# vendor files
 bower_components
 node_modules
+vendor
+.yarn
+
+# App writeable directories
+uploads
 cache
-.idea
-*.min.js
-cgi-bin
+conf
+
+# Generally a totally separate repo
+locales
+
+# Build directory
 dist
+storyshots
+
+# IDE Config
+.vscode
+.idea
+
+# Legacy Frontend files
+design
+js
+resources
+
+# Test output
 .phpunit.result.cache
 .htaccess.dist
+.coverage
+coverage
+.storybookAppPages
+**/*.png
+**/*.jpg
+**/*.jpeg
+**/*.lock
+tests/fixtures/formats
+tests/fixtures/**/*.html
+tests/fixtures/**/*.htm
+
+# Plain JS Files (es5)
+**/js/**
+
+# Legacy Design directories (coming soon?)
+**/design/**
+applications/dashboard/scss/vendors
+
+# PHP files with mixed HTML
+**/views/**
+
+# These classes have mixed HTML.
+./applications/dashboard/models/class.attachmentmodel.php
+./cloud/applications/groups/modules/class.groupinfomodule.php
+./cloud/applications/groups/modules/class.groupleadersmodule.php
+./cloud/applications/groups/modules/class.groupmembersmodule.php
+./cloud/plugins/CustomProfileFields/class.customprofilefields.plugin.php
+./cloud/plugins/NoCaps/class.nocaps.plugin.php
+./cloud/plugins/Online/modules/class.onlinecountmodule.php
+./cloud/plugins/Online/modules/class.onlinemodule.php
+./cloud/plugins/TwitterFeeds/default.php
+./cloud/plugins/gigya/GSSDK.php
+./cloud/plugins/github/class.github.plugin.php
+./cloud/plugins/ideation/IdeaConterModule.php
+./cloud/plugins/samlsso/saml/Metadata.php
+./cloud/utility/invoiceparse/simple_html_dom.php
+./cloud/utility/sendup/library/class.rackspace.php
+./library/Vanilla/Formatting/FormatUtil.php
+./library/Vanilla/Formatting/Formats/HtmlFormat.php
+./library/Vanilla/Formatting/Formats/TextFormat.php
+./library/Vanilla/Formatting/Html/HtmlPlainTextConverter.php
+./library/Vanilla/PageScraper.php
+./library/core/class.configurationsource.php
+./library/core/class.controller.php
+./library/core/class.markdownvanilla.php
+./library/deprecated/functions.deprecated.php
+./plugins/OpenID/class.lightopenid.php
+./plugins/Quotes/class.quotes.plugin.php
+./plugins/Reactions/ReactionsPlugin.php
+./plugins/VanillaInThisDiscussion/class.inthisdiscussionmodule.php

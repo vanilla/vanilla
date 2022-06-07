@@ -19,8 +19,10 @@ import { ContainerContextReset } from "@library/layout/components/Container";
 import { DeviceProvider } from "@library/layout/DeviceContext";
 import { SectionBehaviourContext } from "@library/layout/SectionBehaviourContext";
 import { Widget } from "@library/layout/Widget";
+import { LinkContext } from "@library/routing/links/LinkContextProvider";
 import { IRegisteredComponent } from "@library/utility/componentRegistry";
 import React, { useMemo } from "react";
+import { MemoryRouter } from "react-router-dom";
 
 interface IProps {
     layoutID: ILayoutDetails["layoutID"];
@@ -80,11 +82,27 @@ export function LayoutOverview(props: IProps) {
         <DeviceProvider>
             <ContainerContextReset>
                 <SectionBehaviourContext.Provider value={{ isSticky: true, autoWrap: true, useMinHeight: false }}>
-                    <LayoutRenderer
-                        layout={contents.hydrate().layout}
-                        fallbackWidget={FauxWidget}
-                        componentFetcher={fetchOverviewComponent}
-                    />
+                    <MemoryRouter>
+                        <LinkContext.Provider
+                            value={{
+                                linkContexts: [""],
+                                isDynamicNavigation: () => {
+                                    return true;
+                                },
+                                pushSmartLocation: () => {},
+                                makeHref: () => {
+                                    return "";
+                                },
+                                areLinksDisabled: false,
+                            }}
+                        >
+                            <LayoutRenderer
+                                layout={contents.hydrate().layout}
+                                fallbackWidget={FauxWidget}
+                                componentFetcher={fetchOverviewComponent}
+                            />
+                        </LinkContext.Provider>
+                    </MemoryRouter>
                 </SectionBehaviourContext.Provider>
             </ContainerContextReset>
         </DeviceProvider>

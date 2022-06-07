@@ -16,6 +16,7 @@ interface IProps {
     value: string;
     onChange(hexCode: string): void;
     disabled?: boolean;
+    placeholder?: string;
 }
 
 export function DashboardColorPicker(props: IProps) {

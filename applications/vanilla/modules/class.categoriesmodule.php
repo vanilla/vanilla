@@ -11,8 +11,8 @@
 /**
  * Renders the discussion categories.
  */
-class CategoriesModule extends Gdn_Module {
-
+class CategoriesModule extends Gdn_Module
+{
     /** @var int Inclusive. */
     public $startDepth = 1;
 
@@ -30,23 +30,26 @@ class CategoriesModule extends Gdn_Module {
     /** @var bool Caring about if we are on top level categories. */
     public $topLevelCategoryOnly = true;
 
-    public function __construct($sender = '') {
+    public function __construct($sender = "")
+    {
         parent::__construct($sender);
-        $this->_ApplicationFolder = 'vanilla';
+        $this->_ApplicationFolder = "vanilla";
 
-        $this->Visible = c('Vanilla.Categories.Use') && !c('Vanilla.Categories.HideModule');
+        $this->Visible = c("Vanilla.Categories.Use") && !c("Vanilla.Categories.HideModule");
     }
 
-    public function assetTarget() {
-        return 'Panel';
+    public function assetTarget()
+    {
+        return "Panel";
     }
 
     /**
      * Get the data for this module.
      */
-    protected function getData() {
+    protected function getData()
+    {
         // Allow plugins to set different data.
-        $this->fireEvent('GetData');
+        $this->fireEvent("GetData");
         if ($this->Data) {
             return;
         }
@@ -54,11 +57,11 @@ class CategoriesModule extends Gdn_Module {
         $categoryModel = new CategoryModel();
         $categories = $categoryModel
             ->setJoinUserCategory(true)
-            ->getChildTree($this->root, ['collapseCategories' => $this->collapseCategories]);
+            ->getChildTree($this->root, ["collapseCategories" => $this->collapseCategories]);
         $categories = CategoryModel::flattenTree($categories);
 
         $categories = array_filter($categories, function ($category) {
-            return val('PermsDiscussionsView', $category) && val('Following', $category);
+            return val("PermsDiscussionsView", $category) && val("Following", $category);
         });
 
         $data = new Gdn_DataSet($categories, DATASET_TYPE_ARRAY);
@@ -66,17 +69,19 @@ class CategoriesModule extends Gdn_Module {
         $this->Data = $data;
     }
 
-    public function filterDepth(&$categories, $startDepth, $endDepth) {
+    public function filterDepth(&$categories, $startDepth, $endDepth)
+    {
         if ($startDepth != 1 || $endDepth) {
             foreach ($categories as $i => $category) {
-                if (val('Depth', $category) < $startDepth || ($endDepth && val('Depth', $category) > $endDepth)) {
+                if (val("Depth", $category) < $startDepth || ($endDepth && val("Depth", $category) > $endDepth)) {
                     unset($categories[$i]);
                 }
             }
         }
     }
 
-    public function toString() {
+    public function toString()
+    {
         if (!$this->Data) {
             $this->getData();
         }

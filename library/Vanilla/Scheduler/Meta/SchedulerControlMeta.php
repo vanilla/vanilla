@@ -10,8 +10,8 @@ namespace Vanilla\Scheduler\Meta;
 /**
  * Class SchedulerControlMeta
  */
-class SchedulerControlMeta {
-
+class SchedulerControlMeta
+{
     /**
      * @var int
      * Minimum amount of time between to consecutive cron run
@@ -27,22 +27,25 @@ class SchedulerControlMeta {
      * @param int $lockTime
      * @param string $hostname
      */
-    public function __construct(int $lockTime = 0, string $hostname = null) {
+    public function __construct(int $lockTime = 0, string $hostname = null)
+    {
         $this->lockTime = $lockTime === 0 ? time() : $lockTime;
-        $this->hostname = $hostname ?? (gethostname() ?: 'unknown');
+        $this->hostname = $hostname ?? (gethostname() ?: "unknown");
     }
 
     /**
      * @return int
      */
-    public function getLockTime(): int {
+    public function getLockTime(): int
+    {
         return $this->lockTime;
     }
 
     /**
      * @return string
      */
-    public function getHostname(): string {
+    public function getHostname(): string
+    {
         return $this->hostname;
     }
 }

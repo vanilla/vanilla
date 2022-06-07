@@ -17,8 +17,8 @@ use VanillaTests\Fixtures\Container;
 /**
  * Verify basic capabilities of SchemaFactory.
  */
-class SchemaFactoryTest extends TestCase {
-
+class SchemaFactoryTest extends TestCase
+{
     use BootstrapTrait;
 
     /** @var EventManager */
@@ -27,7 +27,8 @@ class SchemaFactoryTest extends TestCase {
     /**
      * This method is called before each test.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         $this->eventManager = $this->container()->get(EventManager::class);
     }
@@ -37,13 +38,10 @@ class SchemaFactoryTest extends TestCase {
      *
      * @return array
      */
-    public function provideGetEvents(): array {
+    public function provideGetEvents(): array
+    {
         $parameters = [
-            UserFragmentSchema::class => [
-                UserFragmentSchema::class,
-                "UserFragment",
-                "UserFragmentSchema_init",
-            ],
+            UserFragmentSchema::class => [UserFragmentSchema::class, "UserFragment", "UserFragmentSchema_init"],
         ];
         return $parameters;
     }
@@ -53,12 +51,10 @@ class SchemaFactoryTest extends TestCase {
      *
      * @return array
      */
-    public function provideParseEvents(): array {
+    public function provideParseEvents(): array
+    {
         $parameters = [
-            "array" => [
-                "ExampleA",
-                "ExampleASchema_init",
-            ],
+            "array" => ["ExampleA", "ExampleASchema_init"],
         ];
         return $parameters;
     }
@@ -72,7 +68,8 @@ class SchemaFactoryTest extends TestCase {
      * @return void
      * @dataProvider provideGetEvents
      */
-    public function testGetEventDispatched(string $class, string $id, string $event): void {
+    public function testGetEventDispatched(string $class, string $id, string $event): void
+    {
         $dispatched = false;
         $this->eventManager->bind($event, function () use (&$dispatched) {
             $dispatched = true;
@@ -90,7 +87,8 @@ class SchemaFactoryTest extends TestCase {
      * @return void
      * @dataProvider provideParseEvents
      */
-    public function testParseEventDispatched(string $id, string $event): void {
+    public function testParseEventDispatched(string $id, string $event): void
+    {
         $dispatched = false;
         $this->eventManager->bind($event, function () use (&$dispatched) {
             $dispatched = true;
@@ -105,7 +103,8 @@ class SchemaFactoryTest extends TestCase {
      *
      * @return void
      */
-    public function testPrepareEventDispatched(): void {
+    public function testPrepareEventDispatched(): void
+    {
         $dispatched = false;
         $this->eventManager->bind("fooSchema_init", function () use (&$dispatched) {
             $dispatched = true;

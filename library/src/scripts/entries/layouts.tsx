@@ -10,12 +10,12 @@ import { AppContext } from "@library/AppContext";
 import { ErrorPage } from "@library/errorPages/ErrorComponent";
 import { registerLayoutPage } from "@library/features/Layout/LayoutPage";
 import TitleBar from "@library/headers/TitleBar";
-import { HtmlWidget } from "@library/layout/HtmlWidget";
+import { HtmlWidget } from "@library/htmlWidget/HtmlWidget";
 import ThreeColumnSection from "@library/layout/ThreeColumnSection";
 import TwoColumnSection from "@library/layout/TwoColumnSection";
 import Breadcrumbs from "@library/navigation/Breadcrumbs";
 import { Router } from "@library/Router";
-import { addPageComponent, registerWidgets, registerLoadableWidgets } from "@library/utility/componentRegistry";
+import { addPageComponent, registerWidgets } from "@library/utility/componentRegistry";
 import { applySharedPortalContext } from "@vanilla/react-utils";
 import { registerReducer } from "@library/redux/reducerRegistry";
 import { layoutSlice } from "@library/features/Layout/LayoutPage.slice";
@@ -36,6 +36,11 @@ import { RSSWidget } from "@library/rssWidget/RSSWidget";
 import { UserSpotlightWidget } from "@library/userSpotlight/UserSpotlightWidget";
 import Banner from "@library/banner/Banner";
 import { SectionFullWidth } from "@library/layout/SectionFullWidth";
+import { LayoutError } from "@library/features/Layout/LayoutErrorBoundary";
+import { HamburgerMenuContextProvider } from "@library/contexts/HamburgerMenuContext";
+import { getSiteSection } from "@library/utility/appUtils";
+import NewPostMenu from "@library/newPostMenu/NewPostMenu";
+import LeaderboardWidget from "@library/leaderboardWidget/LeaderboardWidget";
 
 // App Setup
 applySharedPortalContext((props) => {
@@ -50,9 +55,11 @@ applySharedPortalContext((props) => {
 function LayoutApp() {
     return (
         <>
-            <Backgrounds />
-            <TitleBar />
-            <Router />
+            <HamburgerMenuContextProvider>
+                <Backgrounds />
+                <TitleBar />
+                <Router useLayoutRouting />
+            </HamburgerMenuContextProvider>
         </>
     );
 }
@@ -74,12 +81,10 @@ registerWidgets({
     TagWidget,
     RSSWidget,
     UserSpotlightWidget,
+    NewPostMenu,
     Banner,
-});
-
-registerLoadableWidgets({
-    LeaderboardWidget: () =>
-        import(/* webpackChunkName: "widgets/LeaderboardWidget" */ "@library/leaderboardWidget/LeaderboardWidget"),
+    LayoutError,
+    LeaderboardWidget,
 });
 
 // Reducers
@@ -87,10 +92,14 @@ registerReducer("notifications", new NotificationsModel().reducer);
 registerReducer("forum", forumReducer);
 registerReducer(layoutSlice.name, layoutSlice.reducer);
 
-// Route registration
 registerLayoutPage("/", () => {
     return {
         layoutViewType: "home",
-        params: {},
+        recordType: "siteSection",
+        recordID: getSiteSection().sectionID,
+        params: {
+            siteSectionID: getSiteSection().sectionID,
+            locale: getSiteSection().contentLocale,
+        },
     };
 });

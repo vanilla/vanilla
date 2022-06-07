@@ -5,5 +5,5 @@
  */
 
 @mixin defaultTransition($properties...) {
-  transition: $properties, $global-default_timing, $global-default_easing;
+    transition: $properties, $global-default_timing, $global-default_easing;
 }

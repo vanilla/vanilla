@@ -16,11 +16,11 @@ use Webmozart\Assert\Assert;
 /**
  * Basic model class with database operation pipeline support.
  */
-class PipelineModel extends Model implements InjectableInterface {
-
+class PipelineModel extends Model implements InjectableInterface
+{
     public const OPT_CALLBACK = "callback";
 
-    public const OPT_RUN_PIPELINE = 'runPipeline';
+    public const OPT_RUN_PIPELINE = "runPipeline";
 
     /** @var Pipeline */
     protected $pipeline;
@@ -30,7 +30,8 @@ class PipelineModel extends Model implements InjectableInterface {
      *
      * @param string $table Database table associated with this resource.
      */
-    public function __construct(string $table) {
+    public function __construct(string $table)
+    {
         parent::__construct($table);
         $this->pipeline = new Pipeline(function (Operation $op) {
             return $this->handleInnerOperation($op);
@@ -42,7 +43,8 @@ class PipelineModel extends Model implements InjectableInterface {
      *
      * @param Processor $processor
      */
-    public function addPipelineProcessor(Processor $processor) {
+    public function addPipelineProcessor(Processor $processor)
+    {
         $this->pipeline->addProcessor($processor);
     }
 
@@ -52,7 +54,8 @@ class PipelineModel extends Model implements InjectableInterface {
      * @param Processor $processor
      * @deprecated Avoid using post-processors.
      */
-    public function addPipelinePostProcessor(Processor $processor) {
+    public function addPipelinePostProcessor(Processor $processor)
+    {
         $this->pipeline->addPostProcessor($processor);
     }
 
@@ -67,7 +70,8 @@ class PipelineModel extends Model implements InjectableInterface {
      *    - offset (int): Row offset before capturing the result.
      * @return array Rows matching the conditions and within the parameters specified in the options.
      */
-    public function select(array $where = [], array $options = []): array {
+    public function select(array $where = [], array $options = []): array
+    {
         $operation = new Operation();
         $operation->setType(Operation::TYPE_SELECT);
         $operation->setCaller($this);
@@ -85,7 +89,8 @@ class PipelineModel extends Model implements InjectableInterface {
      * @return mixed ID of the inserted row.
      * @throws Exception If an error is encountered while performing the query.
      */
-    public function insert(array $set, array $options = []) {
+    public function insert(array $set, array $options = [])
+    {
         if (is_string($options)) {
             trigger_error("String options are deprecated in PipelineModel::insert().", E_USER_DEPRECATED);
             $options = [self::OPT_MODE => $options];
@@ -112,7 +117,8 @@ class PipelineModel extends Model implements InjectableInterface {
      * @throws Exception If an error is encountered while performing the query.
      * @return bool True.
      */
-    public function update(array $set, array $where, array $options = []): bool {
+    public function update(array $set, array $where, array $options = []): bool
+    {
         if (is_string($options)) {
             trigger_error("String options are deprecated in PipelineModel::update().", E_USER_DEPRECATED);
             $options = [self::OPT_MODE => $options];
@@ -151,7 +157,8 @@ class PipelineModel extends Model implements InjectableInterface {
      * @throws Exception If an error is encountered while performing the query.
      * @return bool True.
      */
-    public function delete(array $where, array $options = []): bool {
+    public function delete(array $where, array $options = []): bool
+    {
         $operation = new Operation();
         $operation->setType(Operation::TYPE_DELETE);
         $operation->setCaller($this);
@@ -167,11 +174,12 @@ class PipelineModel extends Model implements InjectableInterface {
      * @param Operation $op
      * @return mixed
      */
-    protected function handleInnerOperation(Operation $op) {
+    protected function handleInnerOperation(Operation $op)
+    {
         $callback = $op->getOptionItem(self::OPT_CALLBACK);
         if ($callback !== null) {
             Assert::isCallable($callback);
-            return ($callback)($op);
+            return $callback($op);
         }
 
         switch ($op->getType()) {
@@ -184,7 +192,7 @@ class PipelineModel extends Model implements InjectableInterface {
             case Operation::TYPE_SELECT:
                 return parent::select($op->getWhere(), $op->getOptions());
             default:
-                throw new \InvalidArgumentException("Invalid operation: ".$op->getType());
+                throw new \InvalidArgumentException("Invalid operation: " . $op->getType());
         }
     }
 
@@ -195,7 +203,8 @@ class PipelineModel extends Model implements InjectableInterface {
      * @param bool $runPipeline
      * @return mixed
      */
-    private function performOperation(Operation $op, bool $runPipeline = true) {
+    private function performOperation(Operation $op, bool $runPipeline = true)
+    {
         if ($runPipeline === false) {
             return $this->handleInnerOperation($op);
         }

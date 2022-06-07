@@ -11,8 +11,8 @@ namespace Vanilla\Models;
  *
  * Ideal for DB tables that are infrequently updated and have smaller record sets.
  */
-class FullRecordCacheModel extends PipelineModel {
-
+class FullRecordCacheModel extends PipelineModel
+{
     /** @var ModelCache $cache */
     protected $modelCache;
 
@@ -23,7 +23,8 @@ class FullRecordCacheModel extends PipelineModel {
      * @param \Gdn_Cache $cache The cache instance.
      * @param array $defaultCacheOptions Default options to apply for storing cache values.
      */
-    public function __construct(string $table, \Gdn_Cache $cache, array $defaultCacheOptions = []) {
+    public function __construct(string $table, \Gdn_Cache $cache, array $defaultCacheOptions = [])
+    {
         parent::__construct($table);
         $this->modelCache = new ModelCache($this->getTable(), $cache, $defaultCacheOptions);
         $this->addPipelineProcessor($this->modelCache->createInvalidationProcessor());
@@ -41,13 +42,14 @@ class FullRecordCacheModel extends PipelineModel {
      *    - cacheOptions (array): Feature options from `Gdn_Cache::FEATURE_*`.
      * @return array Rows matching the conditions and within the parameters specified in the options.
      */
-    public function select(array $where = [], array $options = []): array {
-        $cacheOptions = $options['cacheOptions'] ?? [];
+    public function select(array $where = [], array $options = []): array
+    {
+        $cacheOptions = $options["cacheOptions"] ?? [];
         return $this->modelCache->getCachedOrHydrate(
             [
-                'where' => $where,
-                'options' => $options,
-                'function' => __FUNCTION__, // For uniqueness.
+                "where" => $where,
+                "options" => $options,
+                "function" => __FUNCTION__, // For uniqueness.
             ],
             function () use ($where, $options) {
                 return parent::select($where, $options);
@@ -59,14 +61,16 @@ class FullRecordCacheModel extends PipelineModel {
     /**
      * Get all records.
      */
-    public function getAll() {
+    public function getAll()
+    {
         return $this->get();
     }
 
     /**
      * Clear the cache for the model.
      */
-    public function clearCache() {
+    public function clearCache()
+    {
         $this->modelCache->invalidateAll();
     }
 }

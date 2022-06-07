@@ -17,8 +17,8 @@ use Vanilla\Cli\Cloud\Utils\VanillaConsole;
 /**
  * Clone command.
  */
-class CloneCommand {
-
+class CloneCommand
+{
     /** @var boolean */
     private $auto;
 
@@ -47,32 +47,31 @@ class CloneCommand {
      * These are plugins that should be ignored when detecting plugins.
      * @var array
      */
-    protected static $ignoredPlugins = array(
+    protected static $ignoredPlugins = [
         // Internal vanilla tools.
         "vfspoof",
         "vfsupport",
         "customdomain", // Ops tool
         "privatecommunity", // Now part of core
-    );
+    ];
 
     /**
      * These are themes that should be ignored when detecting themes.
      * @var array
      */
-    protected static $ignoredThemes = array();
+    protected static $ignoredThemes = [];
 
     /**
      * These are repositories that should not be pulled.
      * @var string[]
      */
-    protected static $ignoredRepos = array(
-        "vanilla-cloud"
-    );
+    protected static $ignoredRepos = ["vanilla-cloud"];
 
     /**
      * Constructor.
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->logger = new SimpleScriptLogger();
         $this->vc = new VanillaConsole($this->logger);
     }
@@ -82,7 +81,8 @@ class CloneCommand {
      *
      * @param string $email
      */
-    public function setEmail(string $email): void {
+    public function setEmail(string $email): void
+    {
         $this->email = $email;
     }
 
@@ -91,7 +91,8 @@ class CloneCommand {
      *
      * @param string $password
      */
-    public function setPassword(string $password): void {
+    public function setPassword(string $password): void
+    {
         $this->password = $password;
     }
 
@@ -100,7 +101,8 @@ class CloneCommand {
      *
      * @param int $siteID
      */
-    public function setSiteID(int $siteID): void {
+    public function setSiteID(int $siteID): void
+    {
         $this->siteID = $siteID;
     }
 
@@ -109,7 +111,8 @@ class CloneCommand {
      *
      * @param bool $skipVersionCheck
      */
-    public function setSkipVersionCheck(bool $skipVersionCheck): void {
+    public function setSkipVersionCheck(bool $skipVersionCheck): void
+    {
         $this->skipVersionCheck = $skipVersionCheck;
     }
 
@@ -118,7 +121,8 @@ class CloneCommand {
      *
      * @param bool $auto
      */
-    public function setAuto(bool $auto): void {
+    public function setAuto(bool $auto): void
+    {
         $this->auto = $auto;
     }
 
@@ -127,34 +131,33 @@ class CloneCommand {
      *
      * @return Schema
      */
-    public function importSettingsSchema(): Schema {
+    public function importSettingsSchema(): Schema
+    {
         return Schema::parse([
-            'EnabledPlugins?',
-            'Garden?' => Schema::parse([
+            "EnabledPlugins?",
+            "Garden?" => Schema::parse([
                 // Basic site info
-                'Title?',
-                'Description?',
+                "Title?",
+                "Description?",
                 // Themes
-                'Theme?',
-                'Themes?' => Schema::parse([
-                    'Visible?'
-                ]),
-                'MobileTheme?',
-                'CurrentTheme?',
-                'HomepageTitle?',
+                "Theme?",
+                "Themes?" => Schema::parse(["Visible?"]),
+                "MobileTheme?",
+                "CurrentTheme?",
+                "HomepageTitle?",
                 // Formatter
-                'InputFormatter?',
+                "InputFormatter?",
                 // Advanced site info
-                'OrgName?',
-                'Profile?',
-                'Logo?',
-                'MobileLogo?',
-                'MobileAddressBarColor?',
-                'OrgName?',
-                'Format?',
-                'EmojiSet?',
-                'Thumbnail?',
-            ])
+                "OrgName?",
+                "Profile?",
+                "Logo?",
+                "MobileLogo?",
+                "MobileAddressBarColor?",
+                "OrgName?",
+                "Format?",
+                "EmojiSet?",
+                "Thumbnail?",
+            ]),
         ]);
     }
 
@@ -164,7 +167,8 @@ class CloneCommand {
      * @throws ValidationException Throws an exception if the configuration is invalid.
      * @throws ShellException Throws an exception is a command fails.
      */
-    public function clone() {
+    public function clone()
+    {
         $this->hubCheck();
 
         $this->vcLogin();
@@ -179,7 +183,7 @@ class CloneCommand {
         $this->symlinkPlugins($config);
         $this->symlinkThemes($config);
 
-        $filename = PATH_CONF."/$this->siteID.vanilla.localhost.php";
+        $filename = PATH_CONF . "/$this->siteID.vanilla.localhost.php";
         $this->saveConfig($config, $filename);
 
         $this->logger->title("🚀 Liftoff");
@@ -191,7 +195,8 @@ class CloneCommand {
     /**
      * Checks if the hub CLI is available
      */
-    public function hubCheck() {
+    public function hubCheck()
+    {
         $this->logger->title("Checking hub CLI availability");
         exec("hub --version", $output, $resultCode);
         if ($this->hasHub = $resultCode === 0 && count($output) > 1) {
@@ -204,7 +209,8 @@ class CloneCommand {
     /**
      * Check if we are logged into vanilla console and prompt credentials if needed
      */
-    public function vcLogin() {
+    public function vcLogin()
+    {
         $this->logger->title("Checking vanilla console credentials");
         if ($this->vc->checkLoggedIn()) {
             $this->logger->success("Logged in!");
@@ -218,7 +224,7 @@ class CloneCommand {
             $this->logger->info("Logging in...");
             if (!$this->vc->login($this->email, $this->password)) {
                 $this->logger->error("Exiting.");
-                exit;
+                exit();
             }
         }
     }
@@ -228,7 +234,8 @@ class CloneCommand {
      *
      * @return mixed
      */
-    public function fetchConfig() {
+    public function fetchConfig()
+    {
         $this->logger->title("Fetching site config");
         if (!$this->siteID) {
             $matches = ShellUtils::promptPreg("Please enter the site ID: (site ID or vanilla console URL) ", "/\d{7}/");
@@ -245,9 +252,10 @@ class CloneCommand {
      * @param array $config
      * @throws ShellException Throws an exception if a command fails.
      */
-    public function checkVersion(array $config) {
+    public function checkVersion(array $config)
+    {
         $this->logger->title("Site version");
-        $siteVer = $config['Garden']['Version'];
+        $siteVer = $config["Garden"]["Version"];
         ShellUtils::command("git fetch");
         $curBranch = ShellUtils::command("git branch --show-current")[0];
         if (str_ends_with($siteVer, $curBranch)) {
@@ -272,15 +280,16 @@ class CloneCommand {
      * @return \Gdn_Configuration
      * @throws ValidationException Throws an exception if the schema is invalid.
      */
-    public function importConfig($configArray): \Gdn_Configuration {
+    public function importConfig($configArray): \Gdn_Configuration
+    {
         $this->logger->title("Importing config file");
         $config = new \Gdn_Configuration();
-        $config->load(PATH_CONF.'/config-defaults.php');
+        $config->load(PATH_CONF . "/config-defaults.php");
         $this->logger->info("Applying import schema");
         try {
             $whitelistedConfig = $this->importSettingsSchema()->validate($configArray);
             $this->logger->info("Importing config");
-            $config->loadArray($whitelistedConfig, 'imported');
+            $config->loadArray($whitelistedConfig, "imported");
             //$this->logger->warning("Enabling debug flag");
             //$config->set("Debug", true);
             return $config;
@@ -297,7 +306,8 @@ class CloneCommand {
      * @param mixed $config
      * @param string $filename
      */
-    public function saveConfig($config, string $filename) {
+    public function saveConfig($config, string $filename)
+    {
         $this->logger->title("Saving config file");
         $this->logger->info("Checking if file exists");
         if (file_exists($filename)) {
@@ -317,7 +327,8 @@ class CloneCommand {
      * @param \Gdn_Configuration $config
      * @throws ShellException Throws an exception if a command fails.
      */
-    public function symlinkPlugins(\Gdn_Configuration $config) {
+    public function symlinkPlugins(\Gdn_Configuration $config)
+    {
         $this->logger->title("Checking enabled plugins");
         // Get enabled plugins.
         $enabledPlugins = array_map(
@@ -332,7 +343,7 @@ class CloneCommand {
         $existingPlugins = array_map("strtolower", scandir("plugins"));
         if (!$existingPlugins) {
             $this->logger->error("You must run this command from vanilla root directory. Exiting.");
-            exit;
+            exit();
         }
         // Check which plugins are missing by subtracting existing from and enabled plugins.
         $missingPlugins = array_diff($enabledPlugins, $existingPlugins, self::$ignoredPlugins);
@@ -346,7 +357,8 @@ class CloneCommand {
      * @param \Gdn_Configuration $config
      * @throws ShellException Throws an exception if a command fails.
      */
-    public function symlinkThemes(\Gdn_Configuration $config) {
+    public function symlinkThemes(\Gdn_Configuration $config)
+    {
         $this->logger->title("Checking theme");
         // Get visible themes.
         $requiredThemes = explode(",", $config->get("Garden.Themes.Visible"));
@@ -363,16 +375,10 @@ class CloneCommand {
         // Lowercase required themes.
         $requiredThemes = array_map("strtolower", $requiredThemes);
         // Get available themes.
-        $existingThemes = array_map(
-            "strtolower",
-            array_merge(
-                scandir("themes"),
-                scandir("addons/themes")
-            )
-        );
+        $existingThemes = array_map("strtolower", array_merge(scandir("themes"), scandir("addons/themes")));
         if (!$existingThemes) {
             $this->logger->error("You must run this command from vanilla root directory. Exiting.");
-            exit;
+            exit();
         }
         // Check which themes are missing by subtracting existing from and enabled themes.
         $missingThemes = array_diff($requiredThemes, $existingThemes, self::$ignoredThemes);
@@ -387,7 +393,8 @@ class CloneCommand {
      * @param string $type Either "plugin" or "theme"
      * @throws ShellException Throws an exception if a command fails.
      */
-    public function resolveMissingPlugin(array $missingPlugins, string $type) {
+    public function resolveMissingPlugin(array $missingPlugins, string $type)
+    {
         $missingPluginsCount = count($missingPlugins);
         if ($missingPluginsCount > 0) {
             $this->logger->warning("$missingPluginsCount missing $type");
@@ -400,7 +407,10 @@ class CloneCommand {
             $this->logger->warning("\n($i/$missingPluginsCount) $pluginName is missing");
             $symlinkablePlugins = $this->findSymlinkablePlugins($pluginName, $type);
             // If there are no symlinkable plugins, try to look for repos we can clone.
-            if (count($symlinkablePlugins) === 0 && $this->findRepositories($pluginName, $type, ["vanilla", "vanillaforums"])) {
+            if (
+                count($symlinkablePlugins) === 0 &&
+                $this->findRepositories($pluginName, $type, ["vanilla", "vanillaforums"])
+            ) {
                 // We should look for plugins to symlink again.
                 $symlinkablePlugins = $this->findSymlinkablePlugins($pluginName, $type);
             }
@@ -444,7 +454,8 @@ class CloneCommand {
      * @param string $path The path of a plugin to symlink, such as "../addons/plugins/AuthorSelector"
      * @throws ShellException Throws an exception if a command fails.
      */
-    public function symlinkPlugin(string $path) {
+    public function symlinkPlugin(string $path)
+    {
         // Get the target path.
         $parts = explode("/", $path);
         $dir = $parts[count($parts) - 2];
@@ -471,32 +482,32 @@ class CloneCommand {
      * @return bool
      * @throws ShellException Throws an exception if a command fails.
      */
-    public function findRepositories(string $pluginName, string $type, array $orgs): bool {
+    public function findRepositories(string $pluginName, string $type, array $orgs): bool
+    {
         $path = "$type/$pluginName";
         foreach ($orgs as $org) {
             $result = ShellUtils::command("hub api https://api.github.com/search/code\?q\=$path+in:path+org:$org")[0];
             $json = json_decode($result);
             // Get all found repositories.
-            $repositories = array_filter(
-                $json->items,
-                function ($item) use ($path) {
-                    return str_contains($item->path, $path);
-                }
-            );
+            $repositories = array_filter($json->items, function ($item) use ($path) {
+                return str_contains($item->path, $path);
+            });
             // Get the unique names of the repos.
             $repositoryNames = array_unique(
-                array_map(
-                    function ($item) {
-                        return $item->repository->full_name;
-                    },
-                    $repositories
-                )
+                array_map(function ($item) {
+                    return $item->repository->full_name;
+                }, $repositories)
             );
             // Exclude ignored repos.
             $repositoryNames = array_diff($repositoryNames, self::$ignoredRepos);
             // Prompt pulling the first found repo.
             if (count($repositoryNames) > 0) {
-                if ($this->auto || ShellUtils::promptYesNo("$path was found in $repositoryNames[0].\nWould you like to clone $repositoryNames[0]?")) {
+                if (
+                    $this->auto ||
+                    ShellUtils::promptYesNo(
+                        "$path was found in $repositoryNames[0].\nWould you like to clone $repositoryNames[0]?"
+                    )
+                ) {
                     ShellUtils::command("(cd .. && git clone git@github.com:$repositoryNames[0].git)");
                     $this->logger->success("Cloned repo successfully.\n");
                     return true;
@@ -513,7 +524,8 @@ class CloneCommand {
      * @param string $type Either "plugins" or "themes".
      * @return array|false
      */
-    public function findSymlinkablePlugins(string $pluginName, string $type): array {
+    public function findSymlinkablePlugins(string $pluginName, string $type): array
+    {
         return glob("../**/$type/$pluginName", GLOB_ONLYDIR);
     }
 }

@@ -10,8 +10,8 @@ namespace Vanilla\Dashboard\Events;
 /**
  * Defines an event related to defining a record status
  */
-class RecordStatusDefinitionEvent {
-
+class RecordStatusDefinitionEvent
+{
     //region Properties
     /** @var array $payload Event payload, typically API output corresponding to a database row */
     protected $payload;
@@ -40,7 +40,8 @@ class RecordStatusDefinitionEvent {
      * @param int $userID ID of the user performing the action on the status item
      * @param int|null $foreignID Optional foreign ID of the status related to this event
      */
-    public function __construct(string $action, int $id, array $payload, int $userID, ?int $foreignID = null) {
+    public function __construct(string $action, int $id, array $payload, int $userID, ?int $foreignID = null)
+    {
         $this->action = $action;
         $this->id = $id;
         $this->payload = $payload;
@@ -56,7 +57,8 @@ class RecordStatusDefinitionEvent {
      *
      * @return string
      */
-    public function getAction(): string {
+    public function getAction(): string
+    {
         return $this->action;
     }
 
@@ -65,7 +67,8 @@ class RecordStatusDefinitionEvent {
      *
      * @return int
      */
-    public function getID(): int {
+    public function getID(): int
+    {
         return $this->id;
     }
 
@@ -74,7 +77,8 @@ class RecordStatusDefinitionEvent {
      *
      * @return array
      */
-    public function getPayload(): array {
+    public function getPayload(): array
+    {
         return $this->payload;
     }
 
@@ -83,7 +87,8 @@ class RecordStatusDefinitionEvent {
      *
      * @return int
      */
-    public function getUserID(): int {
+    public function getUserID(): int
+    {
         return $this->userID;
     }
 
@@ -92,7 +97,8 @@ class RecordStatusDefinitionEvent {
      *
      * @return int|null
      */
-    public function getForeignID(): ?int {
+    public function getForeignID(): ?int
+    {
         return $this->foreignID;
     }
     //endregion

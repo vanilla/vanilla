@@ -14,8 +14,8 @@ use VanillaTests\APIv2\Authenticate\PasswordAuthenticatorTest;
  * Tests for safeImage().
  */
 
-class SafeImageTest extends TestCase {
-
+class SafeImageTest extends TestCase
+{
     /**
      * Tests {@link safeImage()} against various scenarios.
      *
@@ -25,7 +25,8 @@ class SafeImageTest extends TestCase {
      * @param int $testMinWidth (in pixels) of image. 0 means any width.
      * @dataProvider provideTestSafeImageArrays
      */
-    public function testSafeImage($expected, string $testImageUrl, int $testMinHeight = 0, int $testMinWidth = 0) {
+    public function testSafeImage($expected, string $testImageUrl, int $testMinHeight = 0, int $testMinWidth = 0)
+    {
         $actual = safeImage($testImageUrl, $testMinHeight, $testMinWidth);
         $this->assertSame($expected, $actual);
     }
@@ -35,38 +36,27 @@ class SafeImageTest extends TestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideTestSafeImageArrays() {
+    public function provideTestSafeImageArrays()
+    {
         $r = [
-            'basicTest' => [
-                PATH_ROOT.'/tests/fixtures/safe-image/super-cat.jpg',
-                PATH_ROOT.'/tests/fixtures/safe-image/super-cat.jpg',
+            "basicTest" => [
+                PATH_ROOT . "/tests/fixtures/safe-image/super-cat.jpg",
+                PATH_ROOT . "/tests/fixtures/safe-image/super-cat.jpg",
             ],
-            'noImage' => [
-                false,
-                PATH_ROOT.'/tests/fixtures/safe-image/empty-folder',
-            ],
-            'meetsMinHeight' => [
-                PATH_ROOT.'/tests/fixtures/safe-image/super-cat.jpg',
-                PATH_ROOT.'/tests/fixtures/safe-image/super-cat.jpg',
+            "noImage" => [false, PATH_ROOT . "/tests/fixtures/safe-image/empty-folder"],
+            "meetsMinHeight" => [
+                PATH_ROOT . "/tests/fixtures/safe-image/super-cat.jpg",
+                PATH_ROOT . "/tests/fixtures/safe-image/super-cat.jpg",
                 1,
             ],
-            'meetsMinWidth' => [
-                PATH_ROOT.'/tests/fixtures/safe-image/super-cat.jpg',
-                PATH_ROOT.'/tests/fixtures/safe-image/super-cat.jpg',
+            "meetsMinWidth" => [
+                PATH_ROOT . "/tests/fixtures/safe-image/super-cat.jpg",
+                PATH_ROOT . "/tests/fixtures/safe-image/super-cat.jpg",
                 0,
                 1,
             ],
-            'meetsMinHeight2' => [
-                false,
-                PATH_ROOT.'/tests/fixtures/safe-image/super-cat.jpg',
-                900,
-            ],
-            'meetsMinWidth2' => [
-                false,
-                PATH_ROOT.'/tests/fixtures/safe-image/super-cat.jpg',
-                0,
-                900,
-            ],
+            "meetsMinHeight2" => [false, PATH_ROOT . "/tests/fixtures/safe-image/super-cat.jpg", 900],
+            "meetsMinWidth2" => [false, PATH_ROOT . "/tests/fixtures/safe-image/super-cat.jpg", 0, 900],
         ];
 
         return $r;

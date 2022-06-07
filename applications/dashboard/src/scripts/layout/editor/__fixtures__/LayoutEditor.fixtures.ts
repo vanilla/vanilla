@@ -7,7 +7,7 @@
 import { LayoutEditorContents } from "@dashboard/layout/editor/LayoutEditorContents";
 import { ILayoutCatalog } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 
-type TestLayoutEditorStructure = Record<string, Record<string, string[] | string>>;
+type TestLayoutEditorStructure = Record<string, Record<string, string[] | string | object>>;
 
 /**
  * Utilities for testing layout editor.
@@ -42,7 +42,7 @@ export class LayoutEditorFixture {
                     name: "2 columns",
                 },
             },
-            middleware: {},
+            middlewares: {},
         };
     }
 

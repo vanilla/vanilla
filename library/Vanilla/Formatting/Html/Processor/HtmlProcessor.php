@@ -12,8 +12,8 @@ use Vanilla\Formatting\Html\HtmlDocument;
 /**
  * Processor an HtmlDocument.
  */
-abstract class HtmlProcessor {
-
+abstract class HtmlProcessor
+{
     use HtmlProcessorTrait;
 
     /**
@@ -31,7 +31,8 @@ abstract class HtmlProcessor {
      *
      * @return string One of TYPE_DYNAMIC or TYPE_STATIC.
      */
-    public function getProcessorType(): string {
+    public function getProcessorType(): string
+    {
         return self::TYPE_STATIC;
     }
 

@@ -9,7 +9,6 @@
 \* -------------------------------------------------------------- */
 
 body.Post .FormWrapper {
-
     .AvailableTags {
         a {
             line-height: $global-base_lineHeight;
@@ -56,7 +55,6 @@ body.Post,
 .Section-Post,
 body.Section-PostConversation,
 body.Messages.inbox {
-
     .SearchBox {
         display: none;
     }

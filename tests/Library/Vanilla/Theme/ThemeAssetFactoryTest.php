@@ -21,15 +21,16 @@ use function Amp\Iterator\concat;
 /**
  * Test ThemeAssetFactory.
  */
-class ThemeAssetFactoryTest extends BootstrapTestCase {
-
+class ThemeAssetFactoryTest extends BootstrapTestCase
+{
     /** @var ThemeAssetFactory */
     private $themeAssetFactory;
 
     /**
      * @inheritdoc
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         $this->themeAssetFactory = self::container()->get(ThemeAssetFactory::class);
     }
@@ -37,13 +38,14 @@ class ThemeAssetFactoryTest extends BootstrapTestCase {
     /**
      * Test merging Css assets.
      */
-    public function testMergeCSSAssets(): void {
-        $cssStyle1 = '.display { inline }';
-        $cssStyle2 = '.header { background: white }';
-        $cssAsset1 = new CssThemeAsset($cssStyle1, '');
-        $cssAsset2 = new CssThemeAsset($cssStyle2, '/discussions');
+    public function testMergeCSSAssets(): void
+    {
+        $cssStyle1 = ".display { inline }";
+        $cssStyle2 = ".header { background: white }";
+        $cssAsset1 = new CssThemeAsset($cssStyle1, "");
+        $cssAsset2 = new CssThemeAsset($cssStyle2, "/discussions");
         $mergedCssAssets = $this->themeAssetFactory->mergeAssets($cssAsset1, $cssAsset2);
-        $this->assertEquals($cssStyle1.$cssStyle2, $mergedCssAssets->getData());
+        $this->assertEquals($cssStyle1 . $cssStyle2, $mergedCssAssets->getData());
     }
 
     /**
@@ -54,9 +56,10 @@ class ThemeAssetFactoryTest extends BootstrapTestCase {
      * @param string $type
      * @param string $value
      */
-    public function testNonMergeableAssets(string $type, string $value): void {
-        $className = 'Vanilla\\Theme\Asset\\'.$type;
-        $asset = new $className($value, '');
+    public function testNonMergeableAssets(string $type, string $value): void
+    {
+        $className = "Vanilla\\Theme\Asset\\" . $type;
+        $asset = new $className($value, "");
         $mergedCssAssets = $this->themeAssetFactory->mergeAssets($asset);
         $this->assertFalse($mergedCssAssets->canMerge());
     }
@@ -64,22 +67,23 @@ class ThemeAssetFactoryTest extends BootstrapTestCase {
     /**
      * Test merging JS assets.
      */
-    public function testMergeJsAssets(): void {
+    public function testMergeJsAssets(): void
+    {
         $data = [
-            'js1' => [
-                'asset' => 'console.log("Hello world");',
+            "js1" => [
+                "asset" => 'console.log("Hello world");',
             ],
-            'js2' => [
-                'asset' => 'function myFunction(p1, p2) {
+            "js2" => [
+                "asset" => 'function myFunction(p1, p2) {
                 return p1 * p2;}',
-                'url' => '/categories,'
-            ]
+                "url" => "/categories,",
+            ],
         ];
-        $jsAsset1 = new JavascriptThemeAsset($data['js1']['asset'], '');
-        $jsAsset2 = new JavascriptThemeAsset($data['js2']['asset'], $data['js2']['url']);
+        $jsAsset1 = new JavascriptThemeAsset($data["js1"]["asset"], "");
+        $jsAsset2 = new JavascriptThemeAsset($data["js2"]["asset"], $data["js2"]["url"]);
         $mergedAssets = $this->themeAssetFactory->mergeAssets($jsAsset1, $jsAsset2);
-        $this->assertSame($data['js1']['asset'].$data['js2']['asset'], $mergedAssets->getValue());
-        $this->assertSame($data['js2']['url'], $mergedAssets->getUrl());
+        $this->assertSame($data["js1"]["asset"] . $data["js2"]["asset"], $mergedAssets->getValue());
+        $this->assertSame($data["js2"]["url"], $mergedAssets->getUrl());
     }
 
     /**
@@ -90,9 +94,10 @@ class ThemeAssetFactoryTest extends BootstrapTestCase {
      * @param array $asset1
      * @param array $asset2
      */
-    public function testMergeJsonAssets(array $asset1, array $asset2): void {
-        $jsonAsset1 = new JsonThemeAsset($asset1['asset'], $asset1['url']);
-        $jsonAsset2 = new JsonThemeAsset($asset2['asset'], $asset2['url']);
+    public function testMergeJsonAssets(array $asset1, array $asset2): void
+    {
+        $jsonAsset1 = new JsonThemeAsset($asset1["asset"], $asset1["url"]);
+        $jsonAsset2 = new JsonThemeAsset($asset2["asset"], $asset2["url"]);
         $mergedAssets = $this->themeAssetFactory->mergeAssets($jsonAsset1, $jsonAsset2);
         $expected = ArrayUtils::mergeRecursive($jsonAsset1->getValue(), $jsonAsset2->getValue());
         $this->assertEquals($expected, $mergedAssets->getValue());
@@ -101,19 +106,23 @@ class ThemeAssetFactoryTest extends BootstrapTestCase {
     /**
      * NonMergeableAssets data provider.
      */
-    public function provideNonMergeable(): array {
+    public function provideNonMergeable(): array
+    {
         $html = <<<HTML
 <div>Hello world.</div>
 HTML;
         return [
             [
-                'type' => 'HtmlThemeAsset', 'value' => $html
+                "type" => "HtmlThemeAsset",
+                "value" => $html,
             ],
             [
-              'type' => 'ImageThemeAsset', 'value' => 'https://example.com'
+                "type" => "ImageThemeAsset",
+                "value" => "https://example.com",
             ],
             [
-                'type' => 'TwigThemeAsset', 'value' => $html
+                "type" => "TwigThemeAsset",
+                "value" => $html,
             ],
         ];
     }
@@ -123,7 +132,8 @@ HTML;
      *
      * @return array
      */
-    public function provideJson(): array {
+    public function provideJson(): array
+    {
         $json1 = <<<JSON
 {
   "name": "test Json",
@@ -148,16 +158,16 @@ JSON;
 }
 JSON;
         return [
-            'merge-2' => [
+            "merge-2" => [
                 [
-                    'asset' => $json1,
-                    'url' => ''
+                    "asset" => $json1,
+                    "url" => "",
                 ],
                 [
-                    'asset' => $json2,
-                    'url' => '/discussions'
-                ]
-            ]
+                    "asset" => $json2,
+                    "url" => "/discussions",
+                ],
+            ],
         ];
     }
 }

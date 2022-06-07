@@ -12,16 +12,13 @@ use Psr\Log\LoggerInterface;
 /**
  * Provides easy logging of events.
  */
-class ResourceEventLogger {
-
+class ResourceEventLogger
+{
     /** @var array */
     private $exclude = [];
 
     /** @var array */
-    private $include = [
-        ["*", ResourceEvent::ACTION_DELETE],
-        ["*", ResourceEvent::ACTION_UPDATE],
-    ];
+    private $include = [["*", ResourceEvent::ACTION_DELETE], ["*", ResourceEvent::ACTION_UPDATE]];
 
     /** @var LoggerInterface */
     private $logger;
@@ -31,7 +28,8 @@ class ResourceEventLogger {
      *
      * @param LoggerInterface $logger
      */
-    public function __construct(LoggerInterface $logger) {
+    public function __construct(LoggerInterface $logger)
+    {
         $this->logger = $logger;
     }
 
@@ -41,16 +39,13 @@ class ResourceEventLogger {
      * @param LoggableEventInterface $event
      * @return ResourceEvent
      */
-    public function logResourceEvent(LoggableEventInterface $event): ResourceEvent {
+    public function logResourceEvent(LoggableEventInterface $event): ResourceEvent
+    {
         try {
             $entry = $event->getLogEntry();
 
             if ($event instanceof ResourceEvent && $this->shouldLogEvent($event)) {
-                $this->logger->log(
-                    $entry->getLevel(),
-                    $entry->getMessage(),
-                    $entry->getContext()
-                );
+                $this->logger->log($entry->getLevel(), $entry->getMessage(), $entry->getContext());
             }
 
             return $event;
@@ -67,7 +62,8 @@ class ResourceEventLogger {
      * @param string $action
      * @return bool
      */
-    public function includeAction(string $class, string $action): bool {
+    public function includeAction(string $class, string $action): bool
+    {
         foreach ($this->include as [$includeClass, $includeAction]) {
             if ($class === $includeClass && $action === $includeAction) {
                 return false;
@@ -85,7 +81,8 @@ class ResourceEventLogger {
      * @param string $action
      * @return bool
      */
-    public function excludeAction(string $class, string $action): bool {
+    public function excludeAction(string $class, string $action): bool
+    {
         foreach ($this->exclude as [$excludeClass, $excludeAction]) {
             if ($class === $excludeClass && $action === $excludeAction) {
                 return false;
@@ -102,7 +99,8 @@ class ResourceEventLogger {
      * @param ResourceEvent $event
      * @return bool
      */
-    private function shouldLogEvent(ResourceEvent $event): bool {
+    private function shouldLogEvent(ResourceEvent $event): bool
+    {
         $class = get_class($event);
         $action = $event->getAction();
 

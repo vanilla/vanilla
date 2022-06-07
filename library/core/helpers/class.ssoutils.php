@@ -13,15 +13,15 @@ use Vanilla\Events\EventAction;
 /**
  * Class SsoUtils
  */
-class SsoUtils {
-
+class SsoUtils
+{
     /**
      * State token time to live.
      */
     const STATE_TOKEN_TTL = 1200; // 20 minutes.
 
     /** Signing algorithm for JWT tokens. */
-    const JWT_ALGORITHM = 'HS256';
+    const JWT_ALGORITHM = "HS256";
 
     /** @var Cookie */
     private $cookie;
@@ -49,10 +49,15 @@ class SsoUtils {
      * @param \Gdn_Session $session
      * @param \Psr\Log\LoggerInterface $logger
      */
-    public function __construct(Gdn_Configuration $config, Cookie $cookie, Gdn_Session $session, ?\Psr\Log\LoggerInterface $logger = null) {
+    public function __construct(
+        Gdn_Configuration $config,
+        Cookie $cookie,
+        Gdn_Session $session,
+        ?\Psr\Log\LoggerInterface $logger = null
+    ) {
         $this->cookie = $cookie;
-        $this->cookieName = '-ssostatetoken';
-        $this->cookieSalt = $config->get('Garden.Cookie.Salt');
+        $this->cookieName = "-ssostatetoken";
+        $this->cookieSalt = $config->get("Garden.Cookie.Salt");
         $this->session = $session;
         if ($logger === null) {
             $logger = Gdn::getContainer()->get(\Psr\Log\LoggerInterface::class);
@@ -60,7 +65,7 @@ class SsoUtils {
         $this->logger = $logger;
 
         if (!$this->cookieSalt) {
-            throw new Gdn_UserException('Cookie salt is empty.');
+            throw new Gdn_UserException("Cookie salt is empty.");
         }
     }
 
@@ -70,14 +75,15 @@ class SsoUtils {
      * @param bool $forceNew Force a new token to be generated.
      * @return string A state token.
      */
-    public function getStateToken($forceNew = false) {
+    public function getStateToken($forceNew = false)
+    {
         if ($this->stateToken === null || $forceNew) {
             $expiration = time() + self::STATE_TOKEN_TTL;
             $this->stateToken = betterRandomString(32);
 
             $payload = [
-                'stateToken' => $this->stateToken,
-                'exp' => $expiration,
+                "stateToken" => $this->stateToken,
+                "exp" => $expiration,
             ];
 
             $jwt = JWT::encode($payload, $this->cookieSalt, self::JWT_ALGORITHM);
@@ -102,9 +108,10 @@ class SsoUtils {
      * @param string $stateToken
      * @throws Gdn_UserException If the state token is invalid/expired.
      */
-    public function verifyStateToken($context, $stateToken) {
+    public function verifyStateToken($context, $stateToken)
+    {
         if (empty($stateToken)) {
-            throw new Gdn_UserException(t('State token not found.'), 403);
+            throw new Gdn_UserException(t("State token not found."), 403);
         }
 
         $storedStateTokenData = null;
@@ -118,12 +125,12 @@ class SsoUtils {
         }
 
         if (!$storedStateTokenData) {
-            $storedStateTokenData = $this->session->stash("{$context}StateToken", '', false);
-            $isStateTokenValid = $this->isStateTokenValid($storedStateTokenData, $stateToken, 'stash');
+            $storedStateTokenData = $this->session->stash("{$context}StateToken", "", false);
+            $isStateTokenValid = $this->isStateTokenValid($storedStateTokenData, $stateToken, "stash");
         }
 
         if (!$isStateTokenValid) {
-            throw new Gdn_UserException(t('Invalid/Expired state token.'), 400);
+            throw new Gdn_UserException(t("Invalid/Expired state token."), 400);
         }
     }
 
@@ -134,21 +141,22 @@ class SsoUtils {
      * @return array The state token data.
      * @throws Exception Throws an exception when the token is invalid.
      */
-    protected function consumeStateToken($stateToken) {
+    protected function consumeStateToken($stateToken)
+    {
         $stateTokenData = null;
         $jwt = $this->cookie->get($this->cookieName);
         if ($jwt) {
             try {
-                $stateTokenData = (array)JWT::decode($jwt, $this->cookieSalt, [self::JWT_ALGORITHM]);
+                $stateTokenData = (array) JWT::decode($jwt, $this->cookieSalt, [self::JWT_ALGORITHM]);
             } catch (Exception $e) {
             }
         }
 
-        if (!$stateTokenData || empty($stateTokenData['stateToken'])) {
-            throw new Exception(t('The state token could not be validated or is expired.'));
+        if (!$stateTokenData || empty($stateTokenData["stateToken"])) {
+            throw new Exception(t("The state token could not be validated or is expired."));
         }
-        if (!$this->isStateTokenValid($stateTokenData, $stateToken, 'cookie')) {
-            throw new Exception('The state token is invalid.');
+        if (!$this->isStateTokenValid($stateTokenData, $stateToken, "cookie")) {
+            throw new Exception("The state token is invalid.");
         }
 
         $this->cookie->delete($this->cookieName);
@@ -164,41 +172,52 @@ class SsoUtils {
      * @param string $source For logging purposes, optionally pass which token is being validated.
      * @return bool true if the data is valid and false otherwise.
      */
-    protected function isStateTokenValid($stateTokenData, $stateToken, $source = '') {
+    protected function isStateTokenValid($stateTokenData, $stateToken, $source = "")
+    {
         $loggingContext = [
-            'source' => $source,
-            'event' => EventAction::eventName('stateToken', EventAction::FAILURE),
-            'timestamp' => time(),
+            "source" => $source,
+            "event" => EventAction::eventName("stateToken", EventAction::FAILURE),
+            "timestamp" => time(),
         ];
         // Validate expected data.
         if (!is_array($stateTokenData)) {
-            $this->logger->error('Missing stateTokenData', $loggingContext);
+            $this->logger->error("Missing stateTokenData", $loggingContext);
             return false;
         }
 
         // Validate it contains a stateToken.
-        if (empty($stateTokenData['stateToken'])) {
-            $this->logger->error('Missing stateToken from stateToken Array', ['stateTokenData' => $stateTokenData] + $loggingContext);
+        if (empty($stateTokenData["stateToken"])) {
+            $this->logger->error(
+                "Missing stateToken from stateToken Array",
+                ["stateTokenData" => $stateTokenData] + $loggingContext
+            );
             return false;
         }
 
         // Validate if exp exists.
-        if (empty($stateTokenData['exp'])) {
-            $this->logger->error('Missing Expiry from stateTokenArray', ['stateTokenData' => $stateTokenData] + $loggingContext);
+        if (empty($stateTokenData["exp"])) {
+            $this->logger->error(
+                "Missing Expiry from stateTokenArray",
+                ["stateTokenData" => $stateTokenData] + $loggingContext
+            );
             return false;
         }
 
         // Check for expiration.
-        if ($stateTokenData['exp'] < time()) {
-            $this->logger->error('StateToken Expired', ['stateTokenExp' => $stateTokenData['exp'], 'time' => time()] + $loggingContext);
+        if ($stateTokenData["exp"] < time()) {
+            $this->logger->error(
+                "StateToken Expired",
+                ["stateTokenExp" => $stateTokenData["exp"], "time" => time()] + $loggingContext
+            );
             return false;
         }
 
         // Check the token.
-        if ($stateToken !== $stateTokenData['stateToken']) {
+        if ($stateToken !== $stateTokenData["stateToken"]) {
             $this->logger->error(
-                'StateTokens do not match.',
-                ['storedStateToken' => $stateTokenData['stateToken'], 'receivedStateToken' => $stateToken] + $loggingContext
+                "StateTokens do not match.",
+                ["storedStateToken" => $stateTokenData["stateToken"], "receivedStateToken" => $stateToken] +
+                    $loggingContext
             );
             return false;
         }

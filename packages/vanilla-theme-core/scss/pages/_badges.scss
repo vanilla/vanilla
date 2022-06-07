@@ -9,7 +9,6 @@
 \* -------------------------------------------------------------- */
 
 body.Badges {
-
     .Cell {
         padding: 0;
     }
@@ -27,7 +26,6 @@ body.Badges {
     }
 
     .Content {
-
         h1 {
             display: block;
         }
@@ -35,7 +33,6 @@ body.Badges {
         h2 {
             margin-top: 50px;
             border-bottom: $component_border;
-
         }
 
         .Badge-Details {
@@ -43,7 +40,6 @@ body.Badges {
         }
 
         .Badge-Earned {
-
             .PhotoWrap {
                 @include photoWrap;
                 width: $theme-photo-small_size;

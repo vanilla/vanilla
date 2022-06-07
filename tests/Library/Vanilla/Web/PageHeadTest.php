@@ -19,13 +19,13 @@ use VanillaTests\SiteTestTrait;
 /**
  * Tests for the page head.
  */
-class PageHeadTest extends SiteTestCase {
-
+class PageHeadTest extends SiteTestCase
+{
     /**
      * Test that our proxy works the same as actual head.
      */
-    public function testProxy() {
-
+    public function testProxy()
+    {
         /** @var PageFixture $page */
         $page = self::container()->get(PageFixture::class);
 
@@ -39,16 +39,15 @@ class PageHeadTest extends SiteTestCase {
         /** @var PageHeadInterface $instance */
         foreach ($instances as $instance) {
             $instance
-                ->addScript(new ExternalAsset('https://test.com/javascript.js'))
+                ->addScript(new ExternalAsset("https://test.com/javascript.js"))
                 ->addInlineScript("console.log('Hello world')")
-                ->addLinkTag(['rel' => 'isLink'])
-                ->addMetaTag(['type' => 'isMeta'])
-                ->addOpenGraphTag('og:isOg', 'ogContent')
-                ->setSeoTitle('Test seo')
-                ->setSeoDescription('test test test')
+                ->addLinkTag(["rel" => "isLink"])
+                ->addMetaTag(["type" => "isMeta"])
+                ->addOpenGraphTag("og:isOg", "ogContent")
+                ->setSeoTitle("Test seo")
+                ->setSeoDescription("test test test")
                 ->setSeoBreadcrumbs([])
-                ->setCanonicalUrl('http://canonical.com')
-            ;
+                ->setCanonicalUrl("http://canonical.com");
         }
 
         $headHtml = $head->renderHtml();

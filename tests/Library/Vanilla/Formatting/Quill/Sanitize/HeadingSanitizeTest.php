@@ -6,22 +6,23 @@
 
 namespace VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize;
 
-class HeadingSanitizeTest extends SanitizeTest {
-
+class HeadingSanitizeTest extends SanitizeTest
+{
     use TestAttributesTrait;
 
     /**
      * @inheritdoc
      */
-    protected function attributeOperations(): array {
+    protected function attributeOperations(): array
+    {
         $result = [
             [
                 ["insert" => "Hello world."],
                 [
                     "attributes" => ["header" => "#VALUE#"],
-                    "insert" => "\n"
-                ]
-            ]
+                    "insert" => "\n",
+                ],
+            ],
         ];
         return $result;
     }
@@ -29,13 +30,14 @@ class HeadingSanitizeTest extends SanitizeTest {
     /**
      * @inheritdoc
      */
-    protected function insertContentOperations(string $content): array {
+    protected function insertContentOperations(string $content): array
+    {
         $operations = [
             ["insert" => $content],
             [
                 "attributes" => ["header" => 1],
-                "insert" => "$content"
-            ]
+                "insert" => "$content",
+            ],
         ];
         return $operations;
     }

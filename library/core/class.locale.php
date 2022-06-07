@@ -18,11 +18,12 @@ use Vanilla\Contracts\LocaleInterface;
  * The Locale class is used to load, define, change, and render translations
  * for different locales. It is a singleton class.
  */
-class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface {
+class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface
+{
     use \Garden\StaticCacheConfigTrait;
 
     /**  @var string The name of the currently loaded Locale. */
-    public $Locale = '';
+    public $Locale = "";
 
     /** @var Gdn_Configuration Holds all locale sources. */
     public $LocaleContainer = null;
@@ -43,51 +44,51 @@ class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface {
 
     /** @var array  */
     public static $SetLocales = [
-        'ar' => 'ar_SA',
-        'az' => 'az_AZ',
-        'bg' => 'bg_BG',
-        'bs' => 'bs_BA',
-        'ca' => 'ca_ES',
-        'cs' => 'cs_CZ',
-        'da' => 'da_DK',
-        'de' => 'de_DE',
-        'el' => 'el_GR',
-        'en' => 'en_US',
-        'es' => 'es_ES',
-        'fa' => 'fa_IR',
-        'fi' => 'fi_FI',
-        'fr' => 'fr_FR',
-        'gd' => 'gd_GB',
-        'gu' => 'gu_IN',
-        'he' => 'he_IL',
-        'hi' => 'hi_IN',
-        'hr' => 'hr_HR',
-        'hu' => 'hu_HU',
-        'id' => 'id_ID',
-        'it' => 'it_IT',
-        'ja' => 'ja_JP',
-        'km' => 'km_KH',
-        'ko' => 'ko_KR',
-        'lt' => 'lt_LT',
-        'my' => 'my_MM',
-        'nb' => 'nb_NO',
-        'nl' => 'nl_NL',
-        'no' => ['no_NO', 'nn_NO'],
-        'pl' => 'pl_PL',
-        'pt' => 'pt_BR',
-        'ro' => 'ro_RO',
-        'ru' => 'ru_RU',
-        'sk' => 'sk_SK',
-        'sl' => 'sl_SI',
-        'sr' => 'sr_RS',
-        'sv' => 'sv_SE',
-        'th' => 'th_TH',
-        'tl' => 'tl_PH',
-        'tr' => 'tr_TR',
-        'uk' => 'uk_UA',
-        'ur' => 'ur_PL',
-        'vi' => 'vi_VN',
-        'zh' => 'zh_CN'
+        "ar" => "ar_SA",
+        "az" => "az_AZ",
+        "bg" => "bg_BG",
+        "bs" => "bs_BA",
+        "ca" => "ca_ES",
+        "cs" => "cs_CZ",
+        "da" => "da_DK",
+        "de" => "de_DE",
+        "el" => "el_GR",
+        "en" => "en_US",
+        "es" => "es_ES",
+        "fa" => "fa_IR",
+        "fi" => "fi_FI",
+        "fr" => "fr_FR",
+        "gd" => "gd_GB",
+        "gu" => "gu_IN",
+        "he" => "he_IL",
+        "hi" => "hi_IN",
+        "hr" => "hr_HR",
+        "hu" => "hu_HU",
+        "id" => "id_ID",
+        "it" => "it_IT",
+        "ja" => "ja_JP",
+        "km" => "km_KH",
+        "ko" => "ko_KR",
+        "lt" => "lt_LT",
+        "my" => "my_MM",
+        "nb" => "nb_NO",
+        "nl" => "nl_NL",
+        "no" => ["no_NO", "nn_NO"],
+        "pl" => "pl_PL",
+        "pt" => "pt_BR",
+        "ro" => "ro_RO",
+        "ru" => "ru_RU",
+        "sk" => "sk_SK",
+        "sl" => "sl_SI",
+        "sr" => "sr_RS",
+        "sv" => "sv_SE",
+        "th" => "th_TH",
+        "tl" => "tl_PH",
+        "tr" => "tr_TR",
+        "uk" => "uk_UA",
+        "ur" => "ur_PL",
+        "vi" => "vi_VN",
+        "zh" => "zh_CN",
     ];
 
     /** @var int  */
@@ -100,11 +101,8 @@ class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface {
      * @param AddonManager|null $addonManager
      * @param ConfigurationInterface $config
      */
-    public function __construct(
-        $localeName,
-        AddonManager $addonManager = null,
-        ConfigurationInterface $config
-    ) {
+    public function __construct($localeName, AddonManager $addonManager = null, ConfigurationInterface $config)
+    {
         parent::__construct();
         $this->ClassName = __CLASS__;
 
@@ -118,7 +116,8 @@ class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface {
     /**
      * Fire an event to allow extra locale definitions to be loaded.
      */
-    public function loadExtraLocaleDefinitions(): void {
+    public function loadExtraLocaleDefinitions(): void
+    {
         // This used to be actually done in set, but we're doing it here since the locale could be constructed
         // and set very early if the locale is constructed before event binding.
         $this->fireEvent("afterSet");
@@ -135,19 +134,20 @@ class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface {
      * @param string $locale The locale code to canonicalize.
      * @return string Returns the canonicalized version of the locale code.
      */
-    public static function canonicalize($locale) {
-        $locale = str_replace(['-', '@'], ['_', '__'], $locale);
-        $parts = explode('_', $locale, 2);
+    public static function canonicalize($locale)
+    {
+        $locale = str_replace(["-", "@"], ["_", "__"], $locale);
+        $parts = explode("_", $locale, 2);
         if (isset($parts[1])) {
             $parts[1] = strtoupper($parts[1]);
         }
-        $result = implode('_', $parts);
+        $result = implode("_", $parts);
         // Remove everything from the string except letters, numbers, dashes, and underscores.
-        $result = preg_replace('/([^\w-])/', '', $result);
+        $result = preg_replace("/([^\w-])/", "", $result);
 
         // This is a bit of a kludge, but we are deprecating en_CA in favour of just en.
-        if ($result === 'en_CA') {
-            $result = 'en';
+        if ($result === "en_CA") {
+            $result = "en";
         }
 
         return $result;
@@ -156,7 +156,8 @@ class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface {
     /**
      * Reload the locale and its translations.
      */
-    public function refresh() {
+    public function refresh()
+    {
         $locale = $this->current();
         $this->set($locale);
     }
@@ -168,7 +169,8 @@ class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface {
      * @param bool $localeName
      * @throws Exception
      */
-    public function saveTranslations($translations, $localeName = false) {
+    public function saveTranslations($translations, $localeName = false)
+    {
         $this->LocaleContainer->save();
     }
 
@@ -184,7 +186,8 @@ class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface {
      *
      * @param string $localeName The name of the locale to load.
      */
-    public function set($localeName) {
+    public function set($localeName)
+    {
         $currentLocale = self::canonicalize($localeName);
 
         // Get locale sources
@@ -195,17 +198,13 @@ class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface {
             $localeSources = [];
         }
 
-        $codeset = c('Garden.LocaleCodeset', 'UTF8');
+        $codeset = c("Garden.LocaleCodeset", "UTF8");
 
-        $setLocale = [
-            LC_TIME,
-            "$currentLocale.$codeset",
-            $currentLocale
-        ];
+        $setLocale = [LC_TIME, "$currentLocale.$codeset", $currentLocale];
 
-        [$language] = explode('_', $currentLocale, 2);
+        [$language] = explode("_", $currentLocale, 2);
         if (isset(self::$SetLocales[$language])) {
-            $fullLocales = (array)self::$SetLocales[$language];
+            $fullLocales = (array) self::$SetLocales[$language];
 
             foreach ($fullLocales as $fullLocale) {
                 $setLocale[] = "$fullLocale.$codeset";
@@ -213,7 +212,7 @@ class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface {
             }
         }
 
-        $r = call_user_func_array('setlocale', $setLocale);
+        $r = call_user_func_array("setlocale", $setLocale);
 
         if (!is_array($localeSources)) {
             $localeSources = [];
@@ -222,9 +221,10 @@ class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface {
         // Create a locale config container
         $this->unload();
 
-        $confLocaleOverride = PATH_CONF.'/locale.php';
+        $confLocaleOverride = PATH_CONF . "/locale.php";
         foreach ($localeSources as $localeSource) {
-            if ($confLocaleOverride != $localeSource && file_exists($localeSource)) { // Don't double include the conf override file... and make sure it comes last
+            if ($confLocaleOverride != $localeSource && file_exists($localeSource)) {
+                // Don't double include the conf override file... and make sure it comes last
                 $this->load($localeSource, false);
             }
         }
@@ -235,23 +235,23 @@ class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface {
         }
 
         // Prepare developer mode if needed
-        $this->DeveloperMode = c('Garden.Locales.DeveloperMode', false);
+        $this->DeveloperMode = c("Garden.Locales.DeveloperMode", false);
         if ($this->DeveloperMode) {
             $this->DeveloperContainer = new Gdn_Configuration();
             $this->DeveloperContainer->splitting(false);
             $this->DeveloperContainer->caching(false);
 
-            $developerCodeFile = PATH_CACHE."/locale-developer-{$localeName}.php";
+            $developerCodeFile = PATH_CACHE . "/locale-developer-{$localeName}.php";
             if (!file_exists($developerCodeFile)) {
                 touch($developerCodeFile);
             }
 
-            $this->DeveloperContainer->load($developerCodeFile, 'Definition', true);
+            $this->DeveloperContainer->load($developerCodeFile, "Definition", true);
         }
 
         // Import core (static) translations
         if ($this->DeveloperMode) {
-            $this->DeveloperContainer->massImport($this->LocaleContainer->get('.'));
+            $this->DeveloperContainer->massImport($this->LocaleContainer->get("."));
         }
 
         $this->loadExtraLocaleDefinitions();
@@ -263,8 +263,9 @@ class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface {
      * @return array Returns an array keyed by locale names where each value is an array of translation paths for that locale.
      * @deprecated This methods was added to help debug locale canonicalization so should be able to be removed.
      */
-    public function crawlAllLocaleSources() {
-        deprecated('Gdn_Locale->crawlAllLocaleSources()');
+    public function crawlAllLocaleSources()
+    {
+        deprecated("Gdn_Locale->crawlAllLocaleSources()");
 
         $addons = array_reverse($this->getEnabled(), true);
 
@@ -288,8 +289,9 @@ class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface {
      * @return array Returns an array of paths to the translations for the locale.
      * @deprecated Use the {@link AddonManager} for this.
      */
-    public function getLocaleSources($locale) {
-        deprecated('Gdn_PluginManager->getLocaleSources()', 'AddonManager->getEnabledLocaleSources()');
+    public function getLocaleSources($locale)
+    {
+        deprecated("Gdn_PluginManager->getLocaleSources()", "AddonManager->getEnabledLocaleSources()");
         $result = $this->addonManager->getEnabledTranslationPaths($locale);
         return $result;
     }
@@ -300,16 +302,17 @@ class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface {
      * @param bool $iso6391 Attempt to use ISO 639-1 language codes.
      * @return bool|string Language code on success, false on failure.
      */
-    public function language($iso6391 = false) {
-        if ($this->Locale == '') {
+    public function language($iso6391 = false)
+    {
+        if ($this->Locale == "") {
             return false;
         } else {
             if ($iso6391) {
                 // ISO 639-1 has some special exceptions for language codes.
                 $locale = strtolower($this->Locale);
                 switch ($locale) {
-                    case 'zh_tw':
-                        return 'zh-Hant';
+                    case "zh_tw":
+                        return "zh-Hant";
                 }
             }
 
@@ -323,8 +326,9 @@ class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface {
      * @param string $path The path to the locale.
      * @param boolean $dynamic Whether this locale file should be the dynamic one.
      */
-    public function load($path, $dynamic = false) {
-        $this->LocaleContainer->load($path, 'Definition', $dynamic);
+    public function load($path, $dynamic = false)
+    {
+        $this->LocaleContainer->load($path, "Definition", $dynamic);
     }
 
     /**
@@ -337,7 +341,8 @@ class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface {
      * @param string $translation The definition associated with the specified code. If $code is an array
      *  of definitions, this value will not be used.
      */
-    public function setTranslation($code, $translation = '', $save = false) {
+    public function setTranslation($code, $translation = "", $save = false)
+    {
         if (!is_array($code)) {
             $code = [$code => $translation];
         }
@@ -353,16 +358,17 @@ class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface {
      * @param string|false $default The default value to be displayed if the translation code is not found.
      * @return string
      */
-    public function translate($code, $default = false) {
+    public function translate($code, $default = false)
+    {
         if (!is_string($code)) {
-            $code = '';
+            $code = "";
         }
         if ($default === false) {
             $default = $code;
         }
 
         // Codes that begin with @ are considered literals.
-        if (substr_compare('@', $code, 0, 1) == 0) {
+        if (substr_compare("@", $code, 0, 1) == 0) {
             return substr($code, 1);
         }
 
@@ -377,10 +383,10 @@ class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface {
             }
         }
 
-        if (self::c('Debug', false)) {
-            $this->EventArguments['Code'] = $code;
-            $this->EventArguments['Default'] = $default;
-            $this->fireEvent('BeforeTranslate');
+        if (self::c("Debug", false)) {
+            $this->EventArguments["Code"] = $code;
+            $this->EventArguments["Default"] = $default;
+            $this->fireEvent("BeforeTranslate");
         }
 
         return $translation;
@@ -389,7 +395,8 @@ class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface {
     /**
      *  Clears out the currently loaded locale settings.
      */
-    public function unload() {
+    public function unload()
+    {
         // If we're unloading, don't save first
         if ($this->LocaleContainer instanceof Gdn_Configuration) {
             $this->LocaleContainer->autoSave(false);
@@ -409,8 +416,9 @@ class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface {
      *
      * @return string
      */
-    public function current() {
-        if ($this->Locale == '') {
+    public function current()
+    {
+        if ($this->Locale == "") {
             return false;
         } else {
             return $this->Locale;
@@ -420,18 +428,20 @@ class Gdn_Locale extends Gdn_Pluggable implements LocaleInterface {
     /**
      * Get all definitions from the loaded locale.
      */
-    public function getDefinitions() {
-        return $this->LocaleContainer->get('.');
+    public function getDefinitions()
+    {
+        return $this->LocaleContainer->get(".");
     }
 
     /**
      * Get all known core.
      */
-    public function getDeveloperDefinitions() {
+    public function getDeveloperDefinitions()
+    {
         if (!$this->DeveloperMode) {
             return false;
         }
 
-        return $this->DeveloperContainer->get('.');
+        return $this->DeveloperContainer->get(".");
     }
 }

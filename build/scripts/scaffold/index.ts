@@ -11,7 +11,7 @@ yargs
     .command(
         "theme",
         "Scaffold out a theme",
-        yargs => {
+        (yargs) => {
             yargs
                 .option("rootDirectory", {
                     alias: "d",
@@ -30,7 +30,7 @@ yargs
                     demandOption: true,
                 });
         },
-        args => {
+        (args) => {
             scaffoldTheme({
                 directory: args["rootDirectory"] as string,
                 themeKey: args["key"] as string,

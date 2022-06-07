@@ -21,6 +21,7 @@ import { notEmpty } from "@vanilla/utils";
 import { DropDownPanelNav } from "@library/flyouts/panelNav/DropDownPanelNav";
 import { IPanelNavItemsProps } from "@library/flyouts/panelNav/PanelNavItems";
 import MobileOnlyNavigation from "@library/headers/MobileOnlyNavigation";
+import { useHamburgerMenuContext } from "@library/contexts/HamburgerMenuContext";
 
 interface IProps {
     className?: string;
@@ -53,6 +54,23 @@ export default function Hamburger(props: IProps) {
     };
 
     const { showCloseIcon = true } = props;
+
+    // Get all the widget components
+    const { dynamicComponents } = useHamburgerMenuContext();
+
+    // Create a single fragment containing all the widget components
+    const widgetComponents = useMemo(() => {
+        if (dynamicComponents) {
+            return (
+                <>
+                    {Object.values(dynamicComponents).map(({ component }, key) => (
+                        <React.Fragment key={key}>{component}</React.Fragment>
+                    ))}
+                </>
+            );
+        }
+        return <></>;
+    }, [dynamicComponents]);
 
     return (
         <>
@@ -88,6 +106,7 @@ export default function Hamburger(props: IProps) {
                     <SiteNavigation onClose={() => setIsOpen(false)} navigationItems={props.navigationItems} />
                     <MobileOnlyNavigation />
                     {props.extraNavTop}
+                    {widgetComponents}
                     {props.extraNavBottom}
                     {extraNavGroups.map((GroupComponent, i) => (
                         <GroupComponent key={i} />

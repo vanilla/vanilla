@@ -15,17 +15,18 @@
  * @param Smarty $smarty The smarty object rendering the template.
  * @return string The rendered asset.
  */
-function smarty_function_include_file($params, &$smarty) {
-    $name = ltrim(val('name', $params), '/');
-    if (strpos($name, '..') !== false) {
-        return '<!-- Error, moving up directory path not allowed -->';
+function smarty_function_include_file($params, &$smarty)
+{
+    $name = ltrim(val("name", $params), "/");
+    if (strpos($name, "..") !== false) {
+        return "<!-- Error, moving up directory path not allowed -->";
     }
     if (isUrl($name)) {
-        return '<!-- Error, urls are not allowed -->';
+        return "<!-- Error, urls are not allowed -->";
     }
-    $filename = rtrim($smarty->getTemplateDir(), '/').'/'.$name;
+    $filename = rtrim($smarty->getTemplateDir(), "/") . "/" . $name;
     if (!file_exists($filename)) {
-        return '<!-- Error, file does not exist -->';
+        return "<!-- Error, file does not exist -->";
     }
     return file_get_contents($filename);
 }

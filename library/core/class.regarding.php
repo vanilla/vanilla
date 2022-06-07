@@ -12,12 +12,13 @@
 /**
  * Handles relating external actions to comments and discussions. Flagging, Praising, Reporting, etc.
  */
-class Gdn_Regarding extends Gdn_Pluggable {
-
+class Gdn_Regarding extends Gdn_Pluggable
+{
     /**
      *
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
     }
 
@@ -33,10 +34,11 @@ class Gdn_Regarding extends Gdn_Pluggable {
      * @param $autoParent optional boolean whether or not to try to autoparent. default true.
      * @return Gdn_RegardingEntity
      */
-    public function comment($commentID, $verify = true, $autoParent = true) {
-        $regarding = $this->regarding('Comment', $commentID, $verify);
+    public function comment($commentID, $verify = true, $autoParent = true)
+    {
+        $regarding = $this->regarding("Comment", $commentID, $verify);
         if ($verify && $autoParent) {
-            $regarding->autoParent('discussion');
+            $regarding->autoParent("discussion");
         }
         return $regarding;
     }
@@ -48,8 +50,9 @@ class Gdn_Regarding extends Gdn_Pluggable {
      * @param $verify optional boolean whether or not to verify this. default true.
      * @return Gdn_RegardingEntity
      */
-    public function discussion($discussionID, $verify = true) {
-        return $this->regarding('Discussion', $discussionID, $verify);
+    public function discussion($discussionID, $verify = true)
+    {
+        return $this->regarding("Discussion", $discussionID, $verify);
     }
 
     /**
@@ -62,10 +65,11 @@ class Gdn_Regarding extends Gdn_Pluggable {
      * @param $autoParent optional boolean whether or not to try to autoparent. default true.
      * @return Gdn_RegardingEntity
      */
-    public function message($messageID, $verify = true, $autoParent = true) {
-        $regarding = $this->regarding('ConversationMessage', $messageID, $verify);
+    public function message($messageID, $verify = true, $autoParent = true)
+    {
+        $regarding = $this->regarding("ConversationMessage", $messageID, $verify);
         if ($verify && $autoParent) {
-            $regarding->autoParent('conversation');
+            $regarding->autoParent("conversation");
         }
         return $regarding;
     }
@@ -77,8 +81,9 @@ class Gdn_Regarding extends Gdn_Pluggable {
      * @param $verify optional boolean whether or not to verify this. default true.
      * @return Gdn_RegardingEntity
      */
-    public function conversation($conversationID, $verify = true) {
-        return $this->regarding('Conversation', $conversationID, $verify);
+    public function conversation($conversationID, $verify = true)
+    {
+        return $this->regarding("Conversation", $conversationID, $verify);
     }
 
     /**
@@ -90,22 +95,22 @@ class Gdn_Regarding extends Gdn_Pluggable {
      * @return Gdn_RegardingEntity
      * @throws Exception
      */
-    protected function regarding($thingType, $thingID, $verify = true) {
+    protected function regarding($thingType, $thingID, $verify = true)
+    {
         $verified = false;
         if ($verify) {
-            $modelName = ucfirst($thingType).'Model';
+            $modelName = ucfirst($thingType) . "Model";
 
             if (!class_exists($modelName)) {
                 throw new Exception(sprintf(t("Could not find a model for %s objects."), ucfirst($thingType)));
             }
 
             // If we can lookup this object, it is verified
-            $verifyModel = new $modelName;
+            $verifyModel = new $modelName();
             $sourceElement = $verifyModel->getID($thingID);
             if ($sourceElement !== false) {
                 $verified = true;
             }
-
         } else {
             $verified = null;
         }
@@ -119,7 +124,9 @@ class Gdn_Regarding extends Gdn_Pluggable {
             return $regarding;
         }
 
-        throw new Exception(sprintf(t("Could not verify entity relationship '%s(%d)' for Regarding call"), $modelName, $thingID));
+        throw new Exception(
+            sprintf(t("Could not verify entity relationship '%s(%d)' for Regarding call"), $modelName, $thingID)
+        );
     }
 
     /**
@@ -127,7 +134,8 @@ class Gdn_Regarding extends Gdn_Pluggable {
      *
      * @return mixed
      */
-    public function that() {
+    public function that()
+    {
         $args = func_get_args();
         $thingType = array_shift($args);
 
@@ -142,10 +150,11 @@ class Gdn_Regarding extends Gdn_Pluggable {
      * @param null $foreignID
      * @return array|bool
      */
-    public function matchEvent($regardingType, $foreignType, $foreignID = null) {
-        $regardingData = val('RegardingData', $this->EventArguments);
+    public function matchEvent($regardingType, $foreignType, $foreignID = null)
+    {
+        $regardingData = val("RegardingData", $this->EventArguments);
 
-        $foundRegardingType = strtolower(getValue('Type', $regardingData));
+        $foundRegardingType = strtolower(getValue("Type", $regardingData));
         if (!is_array($regardingType)) {
             $regardingType = [$regardingType];
         }
@@ -159,7 +168,7 @@ class Gdn_Regarding extends Gdn_Pluggable {
             return false;
         }
 
-        $foundForeignType = strtolower(val('ForeignType', $regardingData));
+        $foundForeignType = strtolower(val("ForeignType", $regardingData));
         if (!is_array($foreignType)) {
             $foreignType = [$foreignType];
         }
@@ -174,7 +183,7 @@ class Gdn_Regarding extends Gdn_Pluggable {
         }
 
         if (!is_null($foreignID)) {
-            $foundForeignID = val('ForeignID', $regardingData);
+            $foundForeignID = val("ForeignID", $regardingData);
             if ($foundForeignID != $foreignID) {
                 return false;
             }
@@ -188,21 +197,21 @@ class Gdn_Regarding extends Gdn_Pluggable {
      */
 
     // Cache regarding data for displayed comments
-//   public function discussionController_BeforeDiscussionRender_Handler($Sender) {
-//      if (getValue('RegardingCache', $Sender, NULL) != NULL) return;
-//
-//      $Comments = $Sender->data('Comments');
-//      $CommentIDList = array();
-//      if ($Comments && $Comments instanceof Gdn_DataSet) {
-//         $Comments->dataSeek(-1);
-//         while ($Comment = $Comments->nextRow()) {
-//            if (!isset($Comment->CommentID) || !is_numeric($Comment->CommentID))
-//               continue;
-//            $CommentIDList[] = $Comment->CommentID;
-//         }
-//      }
-//      $this->cacheRegarding($Sender, 'discussion', $Sender->Discussion->DiscussionID, 'comment', $CommentIDList);
-//   }
+    //   public function discussionController_BeforeDiscussionRender_Handler($Sender) {
+    //      if (getValue('RegardingCache', $Sender, NULL) != NULL) return;
+    //
+    //      $Comments = $Sender->data('Comments');
+    //      $CommentIDList = array();
+    //      if ($Comments && $Comments instanceof Gdn_DataSet) {
+    //         $Comments->dataSeek(-1);
+    //         while ($Comment = $Comments->nextRow()) {
+    //            if (!isset($Comment->CommentID) || !is_numeric($Comment->CommentID))
+    //               continue;
+    //            $CommentIDList[] = $Comment->CommentID;
+    //         }
+    //      }
+    //      $this->cacheRegarding($Sender, 'discussion', $Sender->Discussion->DiscussionID, 'comment', $CommentIDList);
+    //   }
 
     /**
      *
@@ -213,7 +222,8 @@ class Gdn_Regarding extends Gdn_Pluggable {
      * @param $foreignType
      * @param $foreignIDs
      */
-    protected function cacheRegarding($sender, $parentType, $parentID, $foreignType, $foreignIDs) {
+    protected function cacheRegarding($sender, $parentType, $parentID, $foreignType, $foreignIDs)
+    {
         $sender->RegardingCache = [];
         $childRegardingData = $this->regardingModel()->getAll($foreignType, $foreignIDs);
         $parentRegardingData = $this->regardingModel()->get($parentType, $parentID);
@@ -235,27 +245,28 @@ class Gdn_Regarding extends Gdn_Pluggable {
     /**
      * @param DiscussionController $sender
      */
-    public function beforeCommentBody($sender) {
-        $context = strtolower($sender->EventArguments['Type']);
+    public function beforeCommentBody($sender)
+    {
+        $context = strtolower($sender->EventArguments["Type"]);
 
-        $regardingID = val('RegardingID', $sender->EventArguments['Object'], null);
+        $regardingID = val("RegardingID", $sender->EventArguments["Object"], null);
         if (is_null($regardingID) || $regardingID < 0) {
             return;
         }
 
         try {
             $regardingData = $this->regardingModel()->getID($regardingID);
-            $entityModelName = ucfirst(val('ForeignType', $regardingData)).'Model';
+            $entityModelName = ucfirst(val("ForeignType", $regardingData)) . "Model";
             if (class_exists($entityModelName)) {
                 $entityModel = new $entityModelName();
-                $entity = $entityModel->getID(val('ForeignID', $regardingData));
+                $entity = $entityModel->getID(val("ForeignID", $regardingData));
                 $this->EventArguments = array_merge($this->EventArguments, [
-                    'EventSender' => $sender,
-                    'Entity' => $entity,
-                    'RegardingData' => $regardingData,
-                    'Options' => null
+                    "EventSender" => $sender,
+                    "Entity" => $entity,
+                    "RegardingData" => $regardingData,
+                    "Options" => null,
                 ]);
-                $this->fireEvent('RegardingDisplay');
+                $this->fireEvent("RegardingDisplay");
             }
         } catch (Exception $e) {
         }
@@ -266,7 +277,8 @@ class Gdn_Regarding extends Gdn_Pluggable {
      *
      * @return RegardingModel
      */
-    public function regardingModel() {
+    public function regardingModel()
+    {
         static $regardingModel = null;
         if (is_null($regardingModel)) {
             $regardingModel = new RegardingModel();
@@ -277,6 +289,7 @@ class Gdn_Regarding extends Gdn_Pluggable {
     /**
      * Do nothing.
      */
-    public function setup() {
+    public function setup()
+    {
     }
 }

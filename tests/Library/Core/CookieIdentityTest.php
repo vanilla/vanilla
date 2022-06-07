@@ -14,25 +14,27 @@ use VanillaTests\APIv2\AbstractAPIv2Test;
 /**
  * Integration tests for `Gdn_DirtyCache`.
  */
-class CookieIdentityTest extends AbstractAPIv2Test {
-
+class CookieIdentityTest extends AbstractAPIv2Test
+{
     /** @var Gdn_CookieIdentity */
     public $cookieIdentity;
 
     /**
      * @inheritDoc
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         $this->createUserFixtures();
-        $this->cookieIdentity = Gdn::factory('Identity');
+        $this->cookieIdentity = Gdn::factory("Identity");
         $this->cookieIdentity->init();
     }
 
     /**
      * @inheritDoc
      */
-    public function testGetIdentity() {
+    public function testGetIdentity()
+    {
         $this->enableFeature(\Gdn_Session::FEATURE_SESSION_ID_COOKIE);
         $origSessionID = betterRandomString(12);
         $this->cookieIdentity->setIdentity($this->memberID, true, $origSessionID);

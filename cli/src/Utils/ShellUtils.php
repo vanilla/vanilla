@@ -10,8 +10,8 @@ namespace Vanilla\Cli\Utils;
 /**
  * Utilities for scripts.
  */
-final class ShellUtils {
-
+final class ShellUtils
+{
     const YESSES = ["y", "yes"];
 
     /**
@@ -23,7 +23,12 @@ final class ShellUtils {
      * @param ?SimpleScriptLogger $logger
      * @return array
      */
-    public static function command(string $cmdFormat, array $args = [], ?string $errorMessage = null, ?SimpleScriptLogger $logger = null): array {
+    public static function command(
+        string $cmdFormat,
+        array $args = [],
+        ?string $errorMessage = null,
+        ?SimpleScriptLogger $logger = null
+    ): array {
         $args = array_map("escapeshellarg", $args);
         $cmd = sprintf($cmdFormat, ...$args);
 
@@ -48,7 +53,10 @@ final class ShellUtils {
      *
      * @return string The output of the script.
      */
-    public static function shellOrThrow(string $command, string $message = "An error was encountered while running."): string {
+    public static function shellOrThrow(
+        string $command,
+        string $message = "An error was encountered while running."
+    ): string {
         $outputLine = system($command, $code);
         if ($code !== 0) {
             throw new ShellException($message, $code);
@@ -64,7 +72,8 @@ final class ShellUtils {
      * @param string $command
      * @param callable $callback
      */
-    public static function shellOrCallback(string $command, callable $callback) {
+    public static function shellOrCallback(string $command, callable $callback)
+    {
         system($command, $result);
         if ($result !== 0) {
             call_user_func($callback);
@@ -78,7 +87,8 @@ final class ShellUtils {
      * @param array $choices Choices to select from. The key is the keyboard key to look for and the value is the label of the choice.
      * @returns string The key of the selected choice.
      */
-    public static function promptChoices(string $prompt, array $choices) {
+    public static function promptChoices(string $prompt, array $choices)
+    {
         foreach ($choices as $key => $label) {
             echo "$key = $label\n";
         }
@@ -97,7 +107,8 @@ final class ShellUtils {
      * @param string $prompt
      * @return string
      */
-    public static function promptString(string $prompt): string {
+    public static function promptString(string $prompt): string
+    {
         echo "$prompt ";
         return rtrim(fgets(STDIN));
     }
@@ -108,11 +119,12 @@ final class ShellUtils {
      * @param string $prompt
      * @return string
      */
-    public static function promptPassword(string $prompt): string {
+    public static function promptPassword(string $prompt): string
+    {
         echo "$prompt ";
-        system('stty -echo');
+        system("stty -echo");
         $password = rtrim(fgets(STDIN));
-        system('stty echo');
+        system("stty echo");
         return $password;
     }
 
@@ -124,12 +136,13 @@ final class ShellUtils {
      * @param string $pattern
      * @return mixed
      */
-    public static function promptPreg(string $prompt, string $pattern) {
+    public static function promptPreg(string $prompt, string $pattern)
+    {
         echo "$prompt ";
         $line = rtrim(fgets(STDIN));
         if (!preg_match($pattern, $line, $matches)) {
             echo "No match found. Exiting.\n";
-            exit;
+            exit();
         }
         return $matches;
     }
@@ -141,13 +154,14 @@ final class ShellUtils {
      * @param bool $exit
      * @return bool
      */
-    public static function promptYesNo(string $prompt, bool $exit = false): bool {
+    public static function promptYesNo(string $prompt, bool $exit = false): bool
+    {
         echo "$prompt (y/n)";
         $line = strtolower(trim(fgets(STDIN)));
         $isYes = in_array($line, self::YESSES);
         if (!$isYes && $exit) {
             echo "Exiting!\n";
-            exit;
+            exit();
         }
         return $isYes;
     }

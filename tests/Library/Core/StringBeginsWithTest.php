@@ -13,8 +13,8 @@ use PHPUnit\Framework\TestCase;
  * Tests for stringBeginsWith().
  */
 
-class StringBeginsWithTest extends TestCase {
-
+class StringBeginsWithTest extends TestCase
+{
     /**
      * Test {@link stringBeginsWith()} against several scenarios.
      *
@@ -25,7 +25,8 @@ class StringBeginsWithTest extends TestCase {
      * @param bool|string $expected The expected result.
      * @dataProvider provideTestStringBeginsWithArrays
      */
-    public function testStringBeginsWith($testHaystack, $testNeedle, $testCaseInsensitive, $testTrim, $expected) {
+    public function testStringBeginsWith($testHaystack, $testNeedle, $testCaseInsensitive, $testTrim, $expected)
+    {
         $actual = stringBeginsWith($testHaystack, $testNeedle, $testCaseInsensitive, $testTrim);
         $this->assertSame($expected, $actual);
     }
@@ -35,64 +36,17 @@ class StringBeginsWithTest extends TestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideTestStringBeginsWithArrays() {
+    public function provideTestStringBeginsWithArrays()
+    {
         $r = [
-            'twoEmptyStringsTrimTrue' => [
-                '',
-                '',
-                false,
-                true,
-                '',
-            ],
-            'twoEmptyStringsTrimFalse' => [
-                '',
-                '',
-                false,
-                false,
-                true,
-            ],
-            'emptyHaystackTrimTrue' => [
-                '',
-                'needle',
-                false,
-                true,
-                '',
-            ],
-            'emptyHaystackTrimFalse' => [
-                '',
-                'needle',
-                false,
-                false,
-                false,
-            ],
-            'needlePresentTrimTrue' => [
-                'needleBeginsTheHaystack',
-                'needle',
-                false,
-                true,
-                'BeginsTheHaystack',
-            ],
-            'needlePresentTrimFalse' => [
-                'needleBeginsTheHaystack',
-                'needle',
-                false,
-                false,
-                true,
-            ],
-            'needleComesLater' => [
-                'the needle comes later',
-                'needle',
-                false,
-                false,
-                false,
-            ],
-            'caseInsensitive' => [
-                'NeEdLeBeginsHaystack',
-                'needle',
-                true,
-                false,
-                true,
-            ],
+            "twoEmptyStringsTrimTrue" => ["", "", false, true, ""],
+            "twoEmptyStringsTrimFalse" => ["", "", false, false, true],
+            "emptyHaystackTrimTrue" => ["", "needle", false, true, ""],
+            "emptyHaystackTrimFalse" => ["", "needle", false, false, false],
+            "needlePresentTrimTrue" => ["needleBeginsTheHaystack", "needle", false, true, "BeginsTheHaystack"],
+            "needlePresentTrimFalse" => ["needleBeginsTheHaystack", "needle", false, false, true],
+            "needleComesLater" => ["the needle comes later", "needle", false, false, false],
+            "caseInsensitive" => ["NeEdLeBeginsHaystack", "needle", true, false, true],
         ];
 
         return $r;

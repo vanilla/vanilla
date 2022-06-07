@@ -32,31 +32,33 @@ use VanillaTests\SiteTestTrait;
 /**
  * Class SchedulerTestCase
  */
-class SchedulerTestCase extends SiteTestCase {
+class SchedulerTestCase extends SiteTestCase
+{
     use SetsGeneratorTrait;
     use EventSpyTestTrait;
 
-    const DISPATCH_EVENT = 'SchedulerDispatch';
-    const DISPATCHED_EVENT = 'SchedulerDispatched';
+    const DISPATCH_EVENT = "SchedulerDispatch";
+    const DISPATCHED_EVENT = "SchedulerDispatched";
 
     /**
      * Use the dummy/deferred scheduler instead of the usual instant scheduler in tests.
      *
      * @param Container $container
      */
-    public static function configureContainerBeforeStartup(Container $container) {
+    public static function configureContainerBeforeStartup(Container $container)
+    {
         $container
             ->rule(SchedulerInterface::class)
             ->setClass(DummyScheduler::class)
-            ->addCall('setFinalizeRequest', [false])
-            ->setShared(true)
-        ;
+            ->addCall("setFinalizeRequest", [false])
+            ->setShared(true);
     }
 
     /**
      * Cleanup some singletons between tests.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         // Clear the scheduler between tests.
@@ -66,7 +68,6 @@ class SchedulerTestCase extends SiteTestCase {
         $this->getEventManager()->unbindAll();
     }
 
-
     /**
      * Get a new, cleanly-configured container.
      *
@@ -74,12 +75,13 @@ class SchedulerTestCase extends SiteTestCase {
      * @throws ContainerException On error.
      * @throws NotFoundException On error.
      */
-    protected function getConfiguredContainer(): Container {
+    protected function getConfiguredContainer(): Container
+    {
         $container = self::container();
 
         /** @var Gdn_Configuration $config */
         $config = $container->get(Gdn_Configuration::class);
-        $config->set('Garden.Scheduler.CronMinimumTimeSpan', 0);
+        $config->set("Garden.Scheduler.CronMinimumTimeSpan", 0);
 
         /** @var SchedulerInterface $dummyScheduler */
         $dummyScheduler = $container->get(SchedulerInterface::class);
@@ -95,15 +97,15 @@ class SchedulerTestCase extends SiteTestCase {
      *
      * @return Container
      */
-    protected function getEmptyContainer() {
+    protected function getEmptyContainer()
+    {
         $container = new Container();
         $container
             ->setInstance(ContainerInterface::class, $container)
             //
             ->rule(LoggerInterface::class)
             ->setClass(Logger::class)
-            ->setShared(true)
-        ;
+            ->setShared(true);
 
         return $container;
     }

@@ -14,15 +14,16 @@ use Vanilla\Web\Middleware\RoleTokenAuthMiddleware;
 /**
  * Shared functionality related to authentication / authorization via role token
  */
-trait RoleTokenAuthTrait {
-
+trait RoleTokenAuthTrait
+{
     //region Public Static Methods
     /**
      * Get name of URL query string param where role token is expected
      *
      * @return string
      */
-    final public static function getRoleTokenParamName(): string {
+    final public static function getRoleTokenParamName(): string
+    {
         return RoleTokenAuthMiddleware::ROLE_TOKEN_QUERY_PARAM_NAME;
     }
 
@@ -34,10 +35,10 @@ trait RoleTokenAuthTrait {
      * @param RequestInterface $request Request being processed
      * @return bool True if encoded role token detected within request, false otherwise
      */
-    public static function isRoleTokenProvided(RequestInterface $request) : bool {
+    public static function isRoleTokenProvided(RequestInterface $request): bool
+    {
         $queryParams = $request->getQuery();
-        return !empty($queryParams) &&
-            array_key_exists(self::getRoleTokenParamName(), $queryParams);
+        return !empty($queryParams) && array_key_exists(self::getRoleTokenParamName(), $queryParams);
     }
 
     /**
@@ -45,7 +46,8 @@ trait RoleTokenAuthTrait {
      *
      * @return Schema
      */
-    public static function getRoleTokenAuthSchema(): Schema {
+    public static function getRoleTokenAuthSchema(): Schema
+    {
         $paramName = self::getRoleTokenParamName();
         return Schema::parse(["{$paramName}:s?"]);
     }

@@ -119,4 +119,66 @@ echo $form->errors();
             </div>
         </li>
     </ul>
+<h2 class="subheading"><?php echo t('Logins'); ?></h2>
+<ul>
+    <li>
+        <div class="info"><?php echo t('Configuration settings user logins in Vanilla'); ?></div>
+    </li>
+    <li class="form-group">
+        <div class="label-wrap-wide">
+            <?php echo $form->label('Session Timeout', 'Garden.Cookie.PersistExpiry'); ?>
+            <div class="info">
+                <?php
+                echo t(
+                        'Garden.Cookie.PersistExpiry.Description',
+                    'If a user does not visit the site within this time period they will be automatically signed out.'
+                );
+                ?>
+            </div>
+        </div>
+        <div class="input-wrap-right">
+            <div class="textbox-suffix">
+                <?php
+                $attributes = [
+                    'type' =>'number',
+                    'min' => SettingsController::DEFAULT_PASSWORD_LENGTH,
+                    'required' => 'required'
+                ];
+                echo $form->dropDown('Garden.Cookie.PersistExpiry', [
+                    '1 hour' => plural(1, '%s hour','%s hours'),
+                    '6 hours' => plural(6, '%s hour','%s hours'),
+                    '1 days' => plural(1, '%s day','%s days'),
+                    '1 week' => plural(1, '%s week','%s weeks'),
+                    '2 weeks' => plural(2, '%s week','%s weeks'),
+                    '1 month' => plural(1, '%s month','%s months'),
+                ]); ?>
+            </div>
+        </div>
+    </li>
+    <li class="form-group">
+        <div class="label-wrap-wide">
+            <?php echo $form->label('Password Minimum Length', 'Garden.Password.MinLength'); ?>
+            <div class="info">
+                <?php
+                    echo t(
+                        'Password.MinLength',
+                        'Minimum character length allowed for users passwords on password create and reset pages.'
+                    );
+                    ?>
+            </div>
+        </div>
+        <div class="input-wrap-right">
+            <div class="textbox-suffix">
+                <?php
+                $attributes = [
+                    'type' =>'number',
+                    'min' => SettingsController::DEFAULT_PASSWORD_LENGTH,
+                    'required' => 'required'
+                ];
+                echo $form->textBox('Garden.Password.MinLength', $attributes); ?>
+            </div>
+        </div>
+    </li>
+</ul>
+
 <?php echo $form->close('Save'); ?>

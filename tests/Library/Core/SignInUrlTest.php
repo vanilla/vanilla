@@ -13,8 +13,8 @@ use VanillaTests\SiteTestTrait;
 /**
  * Tests for signInUrl()
  */
-class SignInUrlTest extends TestCase {
-
+class SignInUrlTest extends TestCase
+{
     use SiteTestTrait;
 
     /**
@@ -24,7 +24,8 @@ class SignInUrlTest extends TestCase {
      * @param string $expected
      * @dataProvider provideSignInUrlTargets
      */
-    public function testSignInUrlTarget(string $target, string $expected): void {
+    public function testSignInUrlTarget(string $target, string $expected): void
+    {
         $actual = signInUrl($target);
         $this->assertSame($expected, $actual);
     }
@@ -34,11 +35,15 @@ class SignInUrlTest extends TestCase {
      *
      * @return array
      */
-    public function provideSignInUrlTargets(): array {
+    public function provideSignInUrlTargets(): array
+    {
         $result = [
             ["foo", "/entry/signin?Target=foo"],
             ["entry/register", "/entry/signin"],
-            ["discussion/1/the-word-entry-is-in-this-discussion-name", "/entry/signin?Target=discussion%2F1%2Fthe-word-entry-is-in-this-discussion-name"],
+            [
+                "discussion/1/the-word-entry-is-in-this-discussion-name",
+                "/entry/signin?Target=discussion%2F1%2Fthe-word-entry-is-in-this-discussion-name",
+            ],
         ];
         return $result;
     }

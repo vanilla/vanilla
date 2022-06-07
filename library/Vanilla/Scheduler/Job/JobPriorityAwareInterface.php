@@ -10,8 +10,8 @@ namespace Vanilla\Scheduler\Job;
 /**
  * Interface JobPriorityAwareInterface.
  */
-interface JobPriorityAwareInterface {
-
+interface JobPriorityAwareInterface
+{
     /**
      * Set job priority
      *

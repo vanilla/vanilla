@@ -12,8 +12,8 @@ use Vanilla\Web\Robots;
 /**
  * A controller for serving instructions to web crawlers.
  */
-class RobotsController extends Gdn_Controller {
-
+class RobotsController extends Gdn_Controller
+{
     /** Default robots.txt contents. */
     private const ROBOTS_DEFAULT = <<<ROBOTS_DEFAULT
 User-agent: *
@@ -48,7 +48,11 @@ ROBOTS_INVISIBLE;
      * @param EventManager $eventManager
      * @param SessionInterface $session
      */
-    public function __construct(ConfigurationInterface $configuration, EventManager $eventManager, SessionInterface $session) {
+    public function __construct(
+        ConfigurationInterface $configuration,
+        EventManager $eventManager,
+        SessionInterface $session
+    ) {
         $this->configuration = $configuration;
         $this->eventManager = $eventManager;
         $this->session = $session;
@@ -61,7 +65,8 @@ ROBOTS_INVISIBLE;
      *
      * @return string
      */
-    private function robotRules(): string {
+    private function robotRules(): string
+    {
         // Config lookup is backwards-compatible with Sitemaps addon.
         $rules = $this->configuration->get("Robots.Rules", $this->configuration->get("Sitemap.Robots.Rules", null));
         if ($rules === null) {
@@ -73,7 +78,8 @@ ROBOTS_INVISIBLE;
     /**
      * Generate the robots.txt body.
      */
-    public function index() {
+    public function index()
+    {
         // Clear the session to mimic a crawler.
         $this->session->UserID = 0;
         $this->session->User = false;

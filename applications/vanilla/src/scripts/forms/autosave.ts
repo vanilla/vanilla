@@ -119,8 +119,9 @@ const saveDraft = debounce(
 
             // If we have something to send and somewhere to send it
             if (requestBody && endpoint) {
-                const response = await apiv1.post(endpoint, getMergedRequestBody(), { params });
-
+                const response = await apiv1.post(`${window.location.origin}${endpoint}`, getMergedRequestBody(), {
+                    params,
+                });
                 // Initial forms do not have a draft ID
                 if (draftID.value != response.data["DraftID"]) {
                     draftID.value = response.data["DraftID"] ?? 0;

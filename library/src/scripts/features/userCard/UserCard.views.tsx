@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { ComponentProps, ComponentType } from "react";
+import React, { ComponentProps, ComponentType, useMemo } from "react";
 import { IUser, IUserFragment } from "@library/@types/api/users";
 import NumberFormatted from "@library/content/NumberFormatted";
 import Permission, { PermissionMode } from "@library/features/users/Permission";
@@ -84,7 +84,6 @@ export function UserCardView(props: IProps) {
     const currentUseID = useCurrentUserID();
     const isOwnUser = user.userID === currentUseID;
 
-    let label = user.title ?? user.label;
     const privateProfile = user?.private ?? false;
     const hasPersonalInfoView = hasPermission("personalInfo.view");
     const banned = user?.banned ?? 0;
@@ -94,7 +93,21 @@ export function UserCardView(props: IProps) {
     const privateBannedProfileEnabled = bannedPrivateProfile !== "0";
     const showPrivateBannedProfile = isBanned && privateBannedProfileEnabled;
 
-    label = isBanned ? t(BANNED) : label;
+    const labelSection = useMemo(() => {
+        const { label, title } = user;
+        if (isBanned) {
+            return <div className={classes.label}>{t(BANNED)}</div>;
+        }
+        if (title) {
+            /* Title can be input by the user. */
+            return <div className={classes.label}>{title}</div>;
+        }
+        if (!title && label) {
+            /* Labels (from rank label) are sanitized server side. */
+            return <div className={classes.label} dangerouslySetInnerHTML={{ __html: label }} />;
+        }
+        return null;
+    }, [isBanned, user]);
 
     if ((privateProfile || showPrivateBannedProfile) && !hasPersonalInfoView && !isOwnUser) {
         return <UserCardMinimal user={user} onClose={props.onClose} />;
@@ -121,16 +134,7 @@ export function UserCardView(props: IProps) {
                 </div>
                 {
                     /* We don't want this section to show at all if there's no label */
-                    label && (
-                        <div className={classes.row}>
-                            {
-                                /* HTML here is sanitized server side. */
-                                label ? (
-                                    <div className={classes.label} dangerouslySetInnerHTML={{ __html: label }} />
-                                ) : null
-                            }
-                        </div>
-                    )
+                    labelSection && <div className={classes.row}>{labelSection}</div>
                 }
 
                 {user.email && (

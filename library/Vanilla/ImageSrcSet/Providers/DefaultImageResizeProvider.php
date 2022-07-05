@@ -13,7 +13,8 @@ use Vanilla\ImageSrcSet\ImageResizeProviderInterface;
  * Provides a single image url based on its initial URL & desired maximum width.
  * Note: The default provider systematically return an empty string.
  */
-class DefaultImageResizeProvider implements ImageResizeProviderInterface {
+class DefaultImageResizeProvider implements ImageResizeProviderInterface
+{
     /**
      * Returns a resized image URL.
      *
@@ -21,7 +22,8 @@ class DefaultImageResizeProvider implements ImageResizeProviderInterface {
      * @param int $maxWidth
      * @return string|null
      */
-    public function getResizedImageUrl(?string $initialUrl, int $maxWidth): ?string {
-        return '';
+    public function getResizedImageUrl(?string $initialUrl, int $maxWidth): ?string
+    {
+        return "";
     }
 }

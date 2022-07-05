@@ -10,7 +10,8 @@ namespace VanillaTests\Models;
 use CategoryModel;
 use PHPUnit\Framework\TestCase;
 
-trait TestCategoryModelTrait {
+trait TestCategoryModelTrait
+{
     /**
      * @var CategoryModel
      */
@@ -21,7 +22,8 @@ trait TestCategoryModelTrait {
     /**
      * Instantiate a fresh model for each
      */
-    protected function setupTestCategoryModel() {
+    protected function setupTestCategoryModel()
+    {
         $this->categoryModel = $this->container()->get(CategoryModel::class);
 
         // This is necessary right now because the category model itself gets an instance from the container.
@@ -32,7 +34,8 @@ trait TestCategoryModelTrait {
     /**
      * Clear out the test category model instance.
      */
-    protected function tearDownTestCategoryModel() {
+    protected function tearDownTestCategoryModel()
+    {
         $this->container()->setInstance(CategoryModel::class, null);
     }
 
@@ -43,17 +46,18 @@ trait TestCategoryModelTrait {
      *
      * @return array
      */
-    public function newCategory(array $override): array {
+    public function newCategory(array $override): array
+    {
         $i = self::$categoryIndex++;
 
         $r = $override + [
-                'Name' => "Category %s",
-                'UrlCode' => "cat-%s",
-                'Description' => "Foo %s.",
-                'DateInserted' => TestDate::mySqlDate(),
-            ];
+            "Name" => "Category %s",
+            "UrlCode" => "cat-%s",
+            "Description" => "Foo %s.",
+            "DateInserted" => TestDate::mySqlDate(),
+        ];
 
-        foreach (['Name', 'UrlCode', 'Description'] as $field) {
+        foreach (["Name", "UrlCode", "Description"] as $field) {
             $r[$field] = sprintf($r[$field], $i);
         }
 
@@ -67,7 +71,8 @@ trait TestCategoryModelTrait {
      * @param array $overrides An array of row overrides.
      * @return array
      */
-    protected function insertCategories(int $count, array $overrides = []): array {
+    protected function insertCategories(int $count, array $overrides = []): array
+    {
         $ids = [];
         for ($i = 0; $i < $count; $i++) {
             $id = $this->categoryModel->save($this->newCategory($overrides));
@@ -76,7 +81,7 @@ trait TestCategoryModelTrait {
             }
             $ids[] = $id;
         }
-        $rows = $this->categoryModel->getWhere(['CategoryID' => $ids])->resultArray();
+        $rows = $this->categoryModel->getWhere(["CategoryID" => $ids])->resultArray();
         TestCase::assertCount($count, $rows, "Not enough test categories were inserted.");
 
         return $rows;
@@ -89,27 +94,28 @@ trait TestCategoryModelTrait {
      * @param array $overrides Overrides for the category record.
      * @return array Returns the category.
      */
-    protected function insertPrivateCategory(array $roleIDs, array $overrides = []): array {
-        $overrides['CustomPermissions'] = true;
+    protected function insertPrivateCategory(array $roleIDs, array $overrides = []): array
+    {
+        $overrides["CustomPermissions"] = true;
 
         $permissions = [];
         foreach ($roleIDs as $roleID) {
             $permissions[] = [
-                'RoleID' => $roleID,
-                'Vanilla.Discussions.View' => true,
-                'Vanilla.Discussions.Add' => true,
-                'Vanilla.Discussions.Edit' => true,
-                'Vanilla.Discussions.Delete' => true,
-                'Vanilla.Discussions.Announce' => true,
-                'Vanilla.Discussions.Close' => true,
-                'Vanilla.Discussions.Sink' => true,
-                'Vanilla.Comments.Add' => true,
-                'Vanilla.Comments.Edit' => true,
-                'Vanilla.Comments.Delete' => true,
+                "RoleID" => $roleID,
+                "Vanilla.Discussions.View" => true,
+                "Vanilla.Discussions.Add" => true,
+                "Vanilla.Discussions.Edit" => true,
+                "Vanilla.Discussions.Delete" => true,
+                "Vanilla.Discussions.Announce" => true,
+                "Vanilla.Discussions.Close" => true,
+                "Vanilla.Discussions.Sink" => true,
+                "Vanilla.Comments.Add" => true,
+                "Vanilla.Comments.Edit" => true,
+                "Vanilla.Comments.Delete" => true,
             ];
         }
 
-        $overrides['Permissions'] = $permissions;
+        $overrides["Permissions"] = $permissions;
 
         $rows = $this->insertCategories(1, $overrides);
         return $rows[0];
@@ -123,7 +129,8 @@ trait TestCategoryModelTrait {
      * @param bool|null $followed
      * @return bool
      */
-    protected function followCategory(int $userID, int $categoryID, ?bool $followed = null) {
+    protected function followCategory(int $userID, int $categoryID, ?bool $followed = null)
+    {
         return $this->categoryModel->follow($userID, $categoryID, $followed);
     }
 }

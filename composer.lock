@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ae401d5acf1de759be73ca95412462c7",
+    "content-hash": "f1e12d4ec97f1b9277afdb5f67240729",
     "packages": [
         {
             "name": "bopoda/robots-txt-parser",
@@ -1213,44 +1213,6 @@
                 "url"
             ],
             "time": "2020-02-08T12:10:37+00:00"
-        },
-        {
-            "name": "metasyntactical/composer-plugin-license-check",
-            "version": "v0.5.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/MetaSyntactical/composer-plugin-license-check.git",
-                "reference": "526172ce6659629bfc3d89bf1469b487e0577984"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/MetaSyntactical/composer-plugin-license-check/zipball/526172ce6659629bfc3d89bf1469b487e0577984",
-                "reference": "526172ce6659629bfc3d89bf1469b487e0577984",
-                "shasum": ""
-            },
-            "require": {
-                "composer-plugin-api": "^1.0",
-                "php": ">=7.1.0,<7.4.0"
-            },
-            "require-dev": {
-                "composer/composer": "^1.4",
-                "phpunit/phpunit": "^6.1"
-            },
-            "type": "composer-plugin",
-            "extra": {
-                "class": "Metasyntactical\\Composer\\LicenseCheck\\LicenseCheckPlugin"
-            },
-            "autoload": {
-                "psr-4": {
-                    "Metasyntactical\\Composer\\LicenseCheck\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "Plugin for Composer to restrict installation of packages to valid licenses via whitelist.",
-            "time": "2019-05-14T14:10:09+00:00"
         },
         {
             "name": "michelf/php-markdown",
@@ -3645,7 +3607,7 @@
         },
         {
             "name": "vanilla/garden-http",
-            "version": "v2.4",
+            "version": "v2.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/garden-http.git",
@@ -4326,55 +4288,6 @@
             },
             "abandoned": "symfony/filesystem",
             "time": "2015-12-17T08:42:14+00:00"
-        },
-        {
-            "name": "wikimedia/composer-merge-plugin",
-            "version": "v1.4.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/wikimedia/composer-merge-plugin.git",
-                "reference": "81c6ac72a24a67383419c7eb9aa2b3437f2ab100"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/wikimedia/composer-merge-plugin/zipball/81c6ac72a24a67383419c7eb9aa2b3437f2ab100",
-                "reference": "81c6ac72a24a67383419c7eb9aa2b3437f2ab100",
-                "shasum": ""
-            },
-            "require": {
-                "composer-plugin-api": "^1.0",
-                "php": ">=5.3.2"
-            },
-            "require-dev": {
-                "composer/composer": "~1.0.0",
-                "jakub-onderka/php-parallel-lint": "~0.8",
-                "phpunit/phpunit": "~4.8|~5.0",
-                "squizlabs/php_codesniffer": "~2.1.0"
-            },
-            "type": "composer-plugin",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.3.x-dev"
-                },
-                "class": "Wikimedia\\Composer\\MergePlugin"
-            },
-            "autoload": {
-                "psr-4": {
-                    "Wikimedia\\Composer\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Bryan Davis",
-                    "email": "bd808@wikimedia.org"
-                }
-            ],
-            "description": "Composer plugin to merge multiple composer.json files",
-            "time": "2017-04-25T02:31:25+00:00"
         }
     ],
     "packages-dev": [
@@ -4586,6 +4499,10 @@
                 "psr6",
                 "test"
             ],
+            "support": {
+                "issues": "https://github.com/php-cache/integration-tests/issues",
+                "source": "https://github.com/php-cache/integration-tests/tree/master"
+            },
             "time": "2021-02-04T19:17:10+00:00"
         },
         {
@@ -7508,57 +7425,6 @@
             "time": "2016-10-03T07:35:21+00:00"
         },
         {
-            "name": "squizlabs/php_codesniffer",
-            "version": "3.5.6",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/squizlabs/PHP_CodeSniffer.git",
-                "reference": "e97627871a7eab2f70e59166072a6b767d5834e0"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/e97627871a7eab2f70e59166072a6b767d5834e0",
-                "reference": "e97627871a7eab2f70e59166072a6b767d5834e0",
-                "shasum": ""
-            },
-            "require": {
-                "ext-simplexml": "*",
-                "ext-tokenizer": "*",
-                "ext-xmlwriter": "*",
-                "php": ">=5.4.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^4.0 || ^5.0 || ^6.0 || ^7.0"
-            },
-            "bin": [
-                "bin/phpcs",
-                "bin/phpcbf"
-            ],
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "3.x-dev"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Greg Sherwood",
-                    "role": "lead"
-                }
-            ],
-            "description": "PHP_CodeSniffer tokenizes PHP, JavaScript and CSS files and detects violations of a defined set of coding standards.",
-            "homepage": "https://github.com/squizlabs/PHP_CodeSniffer",
-            "keywords": [
-                "phpcs",
-                "standards"
-            ],
-            "time": "2020-08-10T04:50:15+00:00"
-        },
-        {
             "name": "symfony/console",
             "version": "v4.4.15",
             "source": {
@@ -7777,36 +7643,6 @@
                 }
             ],
             "time": "2021-07-28T10:34:58+00:00"
-        },
-        {
-            "name": "vanilla/standards",
-            "version": "1.3.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/vanilla/standards.git",
-                "reference": "f9fe9cb8dd15e09414ee27cab652085183c47d7e"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/standards/zipball/f9fe9cb8dd15e09414ee27cab652085183c47d7e",
-                "reference": "f9fe9cb8dd15e09414ee27cab652085183c47d7e",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.0",
-                "squizlabs/php_codesniffer": "~3.0"
-            },
-            "type": "library",
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-2.0"
-            ],
-            "description": "Rules for Vanilla forums' coding standards.",
-            "support": {
-                "issues": "https://github.com/vanilla/standards/issues",
-                "source": "https://github.com/vanilla/standards/tree/master"
-            },
-            "time": "2018-09-17T19:45:10+00:00"
         },
         {
             "name": "vimeo/psalm",
@@ -8078,6 +7914,55 @@
                 "source": "https://github.com/webmozarts/glob/tree/4.1.0"
             },
             "time": "2015-12-29T11:14:33+00:00"
+        },
+        {
+            "name": "wikimedia/composer-merge-plugin",
+            "version": "v2.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/wikimedia/composer-merge-plugin.git",
+                "reference": "8ca2ed8ab97c8ebce6b39d9943e9909bb4f18912"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/wikimedia/composer-merge-plugin/zipball/8ca2ed8ab97c8ebce6b39d9943e9909bb4f18912",
+                "reference": "8ca2ed8ab97c8ebce6b39d9943e9909bb4f18912",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "^1.1||^2.0",
+                "php": ">=7.2.0"
+            },
+            "require-dev": {
+                "composer/composer": "^1.1||^2.0",
+                "php-parallel-lint/php-parallel-lint": "~1.1.0",
+                "phpunit/phpunit": "^8.5||^9.0",
+                "squizlabs/php_codesniffer": "~3.5.4"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.x-dev"
+                },
+                "class": "Wikimedia\\Composer\\Merge\\V2\\MergePlugin"
+            },
+            "autoload": {
+                "psr-4": {
+                    "Wikimedia\\Composer\\Merge\\V2\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Bryan Davis",
+                    "email": "bd808@wikimedia.org"
+                }
+            ],
+            "description": "Composer plugin to merge multiple composer.json files",
+            "time": "2021-02-24T05:28:06+00:00"
         }
     ],
     "aliases": [],

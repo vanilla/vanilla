@@ -11,16 +11,18 @@
 /**
  * Renders the "Clear Conversation History" button.
  */
-class ClearHistoryModule extends Gdn_Module {
-
+class ClearHistoryModule extends Gdn_Module
+{
     /** @var int */
     protected $ConversationID;
 
-    public function conversationID($conversationID) {
+    public function conversationID($conversationID)
+    {
         $this->ConversationID = $conversationID;
     }
 
-    public function assetTarget() {
-        return 'Panel';
+    public function assetTarget()
+    {
+        return "Panel";
     }
 }

@@ -6,14 +6,63 @@
 }
 
 /* ================================================================ Reset CSS */
-html, body, div, span, applet, object, iframe,
-h1, h2, h3, h4, h5, h6, p, blockquote, pre,
-a, abbr, acronym, address, big, cite, code,
-del, dfn, em, font, img, ins, kbd, q, s, samp,
-small, strike, sub, sup, tt, var,
-dl, dt, dd, ol, ul, li,
-fieldset, form, label, legend,
-table, caption, tbody, tfoot, thead, tr, th, td {
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+font,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+sub,
+sup,
+tt,
+var,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td {
   margin: 0;
   padding: 0;
   border: 0;
@@ -23,14 +72,63 @@ table, caption, tbody, tfoot, thead, tr, th, td {
   font-family: inherit;
   vertical-align: baseline;
 }
-html:not(.focus-visible), body:not(.focus-visible), div:not(.focus-visible), span:not(.focus-visible), applet:not(.focus-visible), object:not(.focus-visible), iframe:not(.focus-visible),
-h1:not(.focus-visible), h2:not(.focus-visible), h3:not(.focus-visible), h4:not(.focus-visible), h5:not(.focus-visible), h6:not(.focus-visible), p:not(.focus-visible), blockquote:not(.focus-visible), pre:not(.focus-visible),
-a:not(.focus-visible), abbr:not(.focus-visible), acronym:not(.focus-visible), address:not(.focus-visible), big:not(.focus-visible), cite:not(.focus-visible), code:not(.focus-visible),
-del:not(.focus-visible), dfn:not(.focus-visible), em:not(.focus-visible), font:not(.focus-visible), img:not(.focus-visible), ins:not(.focus-visible), kbd:not(.focus-visible), q:not(.focus-visible), s:not(.focus-visible), samp:not(.focus-visible),
-small:not(.focus-visible), strike:not(.focus-visible), sub:not(.focus-visible), sup:not(.focus-visible), tt:not(.focus-visible), var:not(.focus-visible),
-dl:not(.focus-visible), dt:not(.focus-visible), dd:not(.focus-visible), ol:not(.focus-visible), ul:not(.focus-visible), li:not(.focus-visible),
-fieldset:not(.focus-visible), form:not(.focus-visible), label:not(.focus-visible), legend:not(.focus-visible),
-table:not(.focus-visible), caption:not(.focus-visible), tbody:not(.focus-visible), tfoot:not(.focus-visible), thead:not(.focus-visible), tr:not(.focus-visible), th:not(.focus-visible), td:not(.focus-visible) {
+html:not(.focus-visible),
+body:not(.focus-visible),
+div:not(.focus-visible),
+span:not(.focus-visible),
+applet:not(.focus-visible),
+object:not(.focus-visible),
+iframe:not(.focus-visible),
+h1:not(.focus-visible),
+h2:not(.focus-visible),
+h3:not(.focus-visible),
+h4:not(.focus-visible),
+h5:not(.focus-visible),
+h6:not(.focus-visible),
+p:not(.focus-visible),
+blockquote:not(.focus-visible),
+pre:not(.focus-visible),
+a:not(.focus-visible),
+abbr:not(.focus-visible),
+acronym:not(.focus-visible),
+address:not(.focus-visible),
+big:not(.focus-visible),
+cite:not(.focus-visible),
+code:not(.focus-visible),
+del:not(.focus-visible),
+dfn:not(.focus-visible),
+em:not(.focus-visible),
+font:not(.focus-visible),
+img:not(.focus-visible),
+ins:not(.focus-visible),
+kbd:not(.focus-visible),
+q:not(.focus-visible),
+s:not(.focus-visible),
+samp:not(.focus-visible),
+small:not(.focus-visible),
+strike:not(.focus-visible),
+sub:not(.focus-visible),
+sup:not(.focus-visible),
+tt:not(.focus-visible),
+var:not(.focus-visible),
+dl:not(.focus-visible),
+dt:not(.focus-visible),
+dd:not(.focus-visible),
+ol:not(.focus-visible),
+ul:not(.focus-visible),
+li:not(.focus-visible),
+fieldset:not(.focus-visible),
+form:not(.focus-visible),
+label:not(.focus-visible),
+legend:not(.focus-visible),
+table:not(.focus-visible),
+caption:not(.focus-visible),
+tbody:not(.focus-visible),
+tfoot:not(.focus-visible),
+thead:not(.focus-visible),
+tr:not(.focus-visible),
+th:not(.focus-visible),
+td:not(.focus-visible) {
   outline: 0;
 }
 
@@ -45,7 +143,8 @@ body {
   background: #fff;
 }
 
-ol, ul {
+ol,
+ul {
   list-style: none;
 }
 
@@ -59,16 +158,20 @@ table {
    text-align: left;
    font-weight: normal;
 }*/
-blockquote:before, blockquote:after,
-q:before, q:after {
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {
   content: "";
 }
 
-blockquote, q {
+blockquote,
+q {
   quotes: "" "";
 }
 
-textarea, input[type=text] {
+textarea,
+input[type=text] {
   box-sizing: border-box;
 }
 
@@ -187,7 +290,12 @@ body {
   text-align: right;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: "Helvetica Neue", Helvetica, arial, sans-serif;
   font-weight: bold;
   margin: 5px 0;
@@ -232,7 +340,8 @@ a:hover .TextColor {
   color: #ff0084;
 }
 
-a.TextColor, a .TextColor {
+a.TextColor,
+a .TextColor {
   color: #000;
 }
 
@@ -589,8 +698,7 @@ body:not(.dataDriven) .Button:active {
   border-width: 0 0 100px 200px;
   opacity: 0;
   filter: alpha(opacity=0);
-  -ms-transform: translate(-300px, 0) scale(4);
-      transform: translate(-300px, 0) scale(4);
+  transform: translate(-300px, 0) scale(4);
   direction: ltr;
   cursor: pointer;
 }
@@ -880,7 +988,8 @@ div.Warning {
   float: right;
 }
 
-.Pager a, .Pager span {
+.Pager a,
+.Pager span {
   display: inline-block;
   margin: 0 3px;
 }
@@ -1098,7 +1207,6 @@ body > #Frame > .Head {
 
 .OptionsTitle {
   -webkit-user-select: none;
-      -ms-user-select: none;
           user-select: none;
   background: url("images/ui_sprites.png") no-repeat 0 -101px;
   padding: 0;
@@ -1119,7 +1227,8 @@ body > #Frame > .Head {
   visibility: hidden;
 }
 
-.Item:hover .OptionsTitle, .Item.Open .OptionsTitle {
+.Item:hover .OptionsTitle,
+.Item.Open .OptionsTitle {
   visibility: visible;
 }
 
@@ -1156,7 +1265,10 @@ body > #Frame > .Head {
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }
 
-.MenuItems a, .MenuItems a:link, .MenuItems a:visited, .MenuItems a:active {
+.MenuItems a,
+.MenuItems a:link,
+.MenuItems a:visited,
+.MenuItems a:active {
   display: block;
   text-decoration: none;
   white-space: nowrap;
@@ -1849,7 +1961,10 @@ td.CheckBoxColumn {
   margin: 0 10px 10px 0;
 }
 
-.Item h2, .Item h3, .Item h4, .Item h5 {
+.Item h2,
+.Item h3,
+.Item h4,
+.Item h5 {
   margin: 0;
 }
 
@@ -1932,7 +2047,8 @@ td.CheckBoxColumn {
   opacity: 1;
 }
 
-.Item.Read .Title, .Item.Read .BlockTitle {
+.Item.Read .Title,
+.Item.Read .BlockTitle {
   font-weight: normal;
 }
 
@@ -2190,7 +2306,11 @@ body.Post .Popup a.Close {
   margin-top: 5px;
 }
 
-.Message h1, .Message h2, .Message h3, .Message p, .Message .P {
+.Message h1,
+.Message h2,
+.Message h3,
+.Message p,
+.Message .P {
   margin: 10px 0;
 }
 
@@ -2204,7 +2324,8 @@ blockquote {
   /* account for image padding */
 }
 
-blockquote.Quote, blockquote.UserQuote {
+blockquote.Quote,
+blockquote.UserQuote {
   padding: 1ex 16px;
   margin: 1em 0;
   background: #f3f3f3;
@@ -2253,7 +2374,8 @@ img.LeftAlign {
 }
 
 .codeBlock,
-code, pre {
+code,
+pre {
   background: #ff9;
   padding: 4px 8px;
   font-family: monospace;
@@ -2289,7 +2411,8 @@ mark {
   background: #ff6;
 }
 
-.Message strong, .Message b {
+.Message strong,
+.Message b {
   font-weight: bold;
 }
 
@@ -2315,7 +2438,8 @@ mark {
   max-width: 100%;
 }
 
-.Message td, .Message th {
+.Message td,
+.Message th {
   padding: 0.5em;
 }
 
@@ -2875,7 +2999,8 @@ div.Popup form ul li label.RadioLabel {
   vertical-align: top;
 }
 
-.DataTable thead td, .DataTable thead th {
+.DataTable thead td,
+.DataTable thead th {
   font-weight: bold;
   vertical-align: bottom;
 }
@@ -2989,7 +3114,8 @@ tr.CategoryHeading td {
   margin-top: 8px;
 }
 
-.DiscussionSorter .Flyout:before, .DiscussionSorter .Flyout:after {
+.DiscussionSorter .Flyout:before,
+.DiscussionSorter .Flyout:after {
   border: none;
 }
 
@@ -3134,7 +3260,8 @@ label.B {
   font-weight: normal;
 }
 
-.StructuredForm input.hasDatepicker, .StructuredForm input.hasDatepicker:focus {
+.StructuredForm input.hasDatepicker,
+.StructuredForm input.hasDatepicker:focus {
   background-image: url("images/calendar.png");
   background-repeat: no-repeat;
   background-position: center right;
@@ -3459,12 +3586,12 @@ body#dashboard_entry_index #Content input.Password,
 }
 
 .PasswordStrength.Score-4 .Strength {
-  background-color: #a6C060;
+  background-color: #a6c060;
   width: 80%;
 }
 
 .PasswordStrength.Score-4 .StrengthText {
-  color: #a6C060;
+  color: #a6c060;
 }
 
 .PasswordStrength.Score-5 .Strength {
@@ -5197,7 +5324,8 @@ input + .ReactSprite {
   margin: 5px 0 10px;
 }
 
-.Media, .Media .Media-Body {
+.Media,
+.Media .Media-Body {
   overflow: hidden;
   zoom: 1;
 }
@@ -5462,7 +5590,8 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
   text-align: left;
 }
 
-.AlignCenter, .bbcode_center {
+.AlignCenter,
+.bbcode_center {
   margin: 0 auto;
   display: block;
   text-align: center;
@@ -6062,8 +6191,7 @@ Styleguide Attachments
   width: 100%;
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
-  -ms-user-select: none;
-      user-select: none;
+  user-select: none;
   -webkit-user-select: none;
 }
 
@@ -6223,12 +6351,9 @@ img.jcrop-preview {
 }
 
 .flex {
-  display: -ms-flexbox;
   display: flex;
-  -ms-flex-pack: justify;
-      justify-content: space-between;
-  -ms-flex-align: center;
-      align-items: center;
+  justify-content: space-between;
+  align-items: center;
 }
 .flex > * {
   margin-right: 4.5px;
@@ -6238,28 +6363,23 @@ img.jcrop-preview {
 }
 
 .flex-wrap {
-  -ms-flex-wrap: wrap;
-      flex-wrap: wrap;
+  flex-wrap: wrap;
 }
 
 .shrink {
-  -ms-flex-negative: 1;
-      flex-shrink: 1;
+  flex-shrink: 1;
 }
 
 .grow {
-  -ms-flex-positive: 1;
-      flex-grow: 1;
+  flex-grow: 1;
 }
 
 .no-shrink {
-  -ms-flex-negative: 0;
-      flex-shrink: 0;
+  flex-shrink: 0;
 }
 
 .no-grow {
-  -ms-flex-positive: 0;
-      flex-grow: 0;
+  flex-grow: 0;
 }
 
 .pull-left {
@@ -6285,7 +6405,6 @@ img.jcrop-preview {
 }
 .foggy input {
   -webkit-user-select: none;
-      -ms-user-select: none;
           user-select: none;
 }
 .foggy::before {
@@ -6299,4 +6418,4 @@ img.jcrop-preview {
   content: "";
 }
 
-/*# sourceMappingURL=style.css.map */
+/*# sourceMappingURL=style.css.map*/

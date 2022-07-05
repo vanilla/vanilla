@@ -43,7 +43,7 @@ const BRANDING_SETTINGS: JsonSchema = {
             "x-control": {
                 label: "Site Description",
                 description:
-                    "The site description usually appears in search engines. You should try having a description that is 100–150 characters long.",
+                    "The site description usually appears in search engines. You should try having a description that is 100-150 characters long.",
                 inputType: "textBox",
                 type: "textarea",
             },
@@ -174,9 +174,10 @@ export default function BrandingAndSEOPage() {
     const settings = useConfigsByKeys(Object.keys(BRANDING_SETTINGS["properties"]));
 
     // Load state for the setting values
-    const isLoaded = useMemo<boolean>(() => [LoadStatus.SUCCESS, LoadStatus.ERROR].includes(settings.status), [
-        settings,
-    ]);
+    const isLoaded = useMemo<boolean>(
+        () => [LoadStatus.SUCCESS, LoadStatus.ERROR].includes(settings.status),
+        [settings],
+    );
 
     const [value, setValue] = useState<JsonSchema>(
         Object.fromEntries(
@@ -191,7 +192,7 @@ export default function BrandingAndSEOPage() {
         if (settings.data) {
             return Object.keys(value).reduce(
                 (delta: { [key: string]: string | number | boolean }, currentKey: string) => {
-                    if (!isEqual(value[currentKey], settings.data[currentKey])) {
+                    if (!isEqual(value[currentKey], settings.data?.[currentKey])) {
                         return { ...delta, [currentKey]: value[currentKey] };
                     }
                     return delta;

@@ -3,22 +3,24 @@
  * @license GPL-2.0-only
  */
 import React from "react";
-import { bannerVariables } from "@library/banner/Banner.variables";
+import { bannerVariables, IBannerOptions } from "@library/banner/Banner.variables";
 import { bannerClasses } from "@library/banner/Banner.styles";
 import { ensureColorHelper } from "@library/styles/styleHelpers";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { contentBannerClasses, contentBannerVariables } from "@library/banner/contentBannerStyles";
 import { useSection } from "@library/layout/LayoutContext";
+import { ColorHelper } from "csx";
 
 interface IProps {
     isContentBanner?: boolean;
+    bgColor?: ColorHelper | string;
 }
 
 export function DefaultBannerBg(props: IProps) {
     const { isContentBanner } = props;
-    const { mediaQueries } = useSection();
     const classes = isContentBanner ? contentBannerClasses() : bannerClasses();
     const vars = isContentBanner ? contentBannerVariables() : bannerVariables();
+    const bgColor = props.bgColor ?? vars.outerBackground.color;
 
     return (
         <svg
@@ -76,7 +78,7 @@ export function DefaultBannerBg(props: IProps) {
                 </clipPath>
             </defs>
             <g style={{ isolation: "isolate" }}>
-                <path fill={ColorsUtils.colorOut(vars.outerBackground.color)} d="M-0 0H1600V250H-0z" />
+                <path fill={ColorsUtils.colorOut(bgColor)} d="M-0 0H1600V250H-0z" />
                 <path
                     fill="url(#a)"
                     fillRule="evenodd"
@@ -120,7 +122,7 @@ export function DefaultBannerBg(props: IProps) {
                 />
                 <g
                     fill="none"
-                    stroke={ColorsUtils.colorOut(ensureColorHelper(vars.outerBackground.color!).darken("50%"))}
+                    stroke={ColorsUtils.colorOut(ensureColorHelper(bgColor!).darken("50%"))}
                     strokeDasharray="1,11"
                     strokeLinecap="round"
                     strokeLinejoin="round"

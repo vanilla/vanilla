@@ -12,8 +12,8 @@ use VanillaTests\SharedBootstrapTestCase;
 /**
  * Test array functions.
  */
-class ArrayFunctionsTest extends SharedBootstrapTestCase {
-
+class ArrayFunctionsTest extends SharedBootstrapTestCase
+{
     /**
      * Test {@link flattenArray()}.
      *
@@ -21,8 +21,9 @@ class ArrayFunctionsTest extends SharedBootstrapTestCase {
      * @param array $expected The expected flattened array.
      * @dataProvider provideFlattenArrayTests
      */
-    public function testFlattenArray($array, $expected) {
-        $value = flattenArray('.', $array);
+    public function testFlattenArray($array, $expected)
+    {
+        $value = flattenArray(".", $array);
         $this->assertEquals($expected, $value);
     }
 
@@ -31,22 +32,23 @@ class ArrayFunctionsTest extends SharedBootstrapTestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideFlattenArrayTests() {
+    public function provideFlattenArrayTests()
+    {
         $r = [
-            'threeDeep' => [['a' => ['b' => ['c' => 'foo']]], ['a.b.c' => 'foo']],
-            'emptyArray' => [[], []],
-            'emptyArrayElement' => [['a' => 1, 'b' => []], ['a' => 1]],
-            'realWorldExample' => [
+            "threeDeep" => [["a" => ["b" => ["c" => "foo"]]], ["a.b.c" => "foo"]],
+            "emptyArray" => [[], []],
+            "emptyArrayElement" => [["a" => 1, "b" => []], ["a" => 1]],
+            "realWorldExample" => [
                 [
-                    'a' => [
-                        'b' => ['c' => 'foo'],
-                        'd' => ['e' => 'bar'],
+                    "a" => [
+                        "b" => ["c" => "foo"],
+                        "d" => ["e" => "bar"],
                     ],
                 ],
                 [
-                    'a.b.c' => 'foo',
-                    'a.d.e' => 'bar'
-                ]
+                    "a.b.c" => "foo",
+                    "a.d.e" => "bar",
+                ],
             ],
         ];
 
@@ -65,7 +67,8 @@ class ArrayFunctionsTest extends SharedBootstrapTestCase {
      *
      * @param $expected
      */
-    public function testArrayPathExists($keys, $array, $expectedResult, $expectedValue) {
+    public function testArrayPathExists($keys, $array, $expectedResult, $expectedValue)
+    {
         $this->assertEquals($expectedResult, arrayPathExists($keys, $array, $value));
         $this->assertEquals($expectedValue, $value);
     }
@@ -75,50 +78,16 @@ class ArrayFunctionsTest extends SharedBootstrapTestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideArrayPathExistsTests() {
+    public function provideArrayPathExistsTests()
+    {
         return [
-            'noKeys' => [
-                [],
-                ['a' => ['aa' => null]],
-                false,
-                null,
-            ],
-            'noKeysWithNullTypeIndexOnFirstLevel' => [
-                [],
-                [null => true],
-                false,
-                null,
-            ],
-            'nullStringKeyWithNullTypeIndex' => [
-                ['a', 'null'],
-                ['a' => [null => null]],
-                false,
-                null,
-            ],
-            'nestedIsNotAnArray' => [
-                ['a', 'b', 'c'],
-                ['a' => ['b' => true, 'd' => ['c']]],
-                false,
-                null,
-            ],
-            'nullTypeKeyWithNullTypeIndex' => [
-                ['a', null],
-                ['a' => [null => null]],
-                true,
-                null,
-            ],
-            'nullStringKeyWithNullStringIndex' => [
-                ['a', 'null'],
-                ['a' => ['null' => 'Something']],
-                true,
-                'Something',
-            ],
-            'deeplyNested' => [
-                ['a', 'aa', 'aaa', 'aaaa'],
-                ['a' => ['aa' => ['aaa' => ['aaaa' => []]]]],
-                true,
-                [],
-            ],
+            "noKeys" => [[], ["a" => ["aa" => null]], false, null],
+            "noKeysWithNullTypeIndexOnFirstLevel" => [[], [null => true], false, null],
+            "nullStringKeyWithNullTypeIndex" => [["a", "null"], ["a" => [null => null]], false, null],
+            "nestedIsNotAnArray" => [["a", "b", "c"], ["a" => ["b" => true, "d" => ["c"]]], false, null],
+            "nullTypeKeyWithNullTypeIndex" => [["a", null], ["a" => [null => null]], true, null],
+            "nullStringKeyWithNullStringIndex" => [["a", "null"], ["a" => ["null" => "Something"]], true, "Something"],
+            "deeplyNested" => [["a", "aa", "aaa", "aaaa"], ["a" => ["aa" => ["aaa" => ["aaaa" => []]]]], true, []],
         ];
     }
 
@@ -129,8 +98,9 @@ class ArrayFunctionsTest extends SharedBootstrapTestCase {
      * @param array $expected The expected flattened array.
      * @dataProvider provideUnflattenArrayTests
      */
-    public function testUnflattenArray($array, $expected) {
-        $value = unflattenArray('.', $array);
+    public function testUnflattenArray($array, $expected)
+    {
+        $value = unflattenArray(".", $array);
         $this->assertEquals($expected, $value);
     }
 
@@ -139,19 +109,20 @@ class ArrayFunctionsTest extends SharedBootstrapTestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideUnflattenArrayTests() {
+    public function provideUnflattenArrayTests()
+    {
         $r = [
-            'threeDeep' => [['a.b.c' => 'foo'], ['a' => ['b' => ['c' => 'foo']]]],
-            'emptyArray' => [[], []],
-            'realWorldExample' => [
+            "threeDeep" => [["a.b.c" => "foo"], ["a" => ["b" => ["c" => "foo"]]]],
+            "emptyArray" => [[], []],
+            "realWorldExample" => [
                 [
-                    'a.b.c' => 'foo',
-                    'a.d.e' => 'bar'
+                    "a.b.c" => "foo",
+                    "a.d.e" => "bar",
                 ],
                 [
-                    'a' => [
-                        'b' => ['c' => 'foo'],
-                        'd' => ['e' => 'bar'],
+                    "a" => [
+                        "b" => ["c" => "foo"],
+                        "d" => ["e" => "bar"],
                     ],
                 ],
             ],
@@ -159,5 +130,4 @@ class ArrayFunctionsTest extends SharedBootstrapTestCase {
 
         return $r;
     }
-
 }

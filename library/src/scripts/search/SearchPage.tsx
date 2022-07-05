@@ -30,7 +30,7 @@ import debounce from "lodash/debounce";
 import qs from "qs";
 import React, { useCallback, useEffect, useMemo } from "react";
 import { useLocation, useHistory } from "react-router";
-import TwoColumnSection from "@library/layout/TwoColumnSection";
+import SectionTwoColumns from "@library/layout/TwoColumnSection";
 import { SectionProvider, useSection } from "@library/layout/LayoutContext";
 import PanelWidget from "@library/layout/components/PanelWidget";
 import PanelWidgetHorizontalPadding from "@library/layout/components/PanelWidgetHorizontalPadding";
@@ -58,15 +58,8 @@ interface IProps {
 }
 
 function SearchPage(props: IProps) {
-    const {
-        form,
-        updateForm,
-        search,
-        results,
-        getDomains,
-        getCurrentDomain,
-        getDefaultFormValues,
-    } = useSearchForm<{}>();
+    const { form, updateForm, search, results, getDomains, getCurrentDomain, getDefaultFormValues } =
+        useSearchForm<{}>();
 
     const { isCompact } = useSection();
     const classes = pageTitleClasses();
@@ -227,7 +220,7 @@ function SearchPage(props: IProps) {
                         }}
                         defaults={getDefaultFormValues()}
                     />
-                    <TwoColumnSection
+                    <SectionTwoColumns
                         className="hasLargePadding"
                         mainTop={
                             <>

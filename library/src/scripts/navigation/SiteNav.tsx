@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { useEffect } from "react";
 import classNames from "classnames";
 import SiteNavNode, { IActiveRecord } from "@library/navigation/SiteNavNode";
 import { siteNavClasses } from "@library/navigation/siteNavStyles";
@@ -16,6 +16,7 @@ import { TabHandler } from "@vanilla/dom-utils";
 import { panelListClasses } from "@library/layout/panelListStyles";
 import { useSection } from "@library/layout/LayoutContext";
 import { SiteNavNodeTypes } from "@library/navigation/SiteNavNodeTypes";
+import { useSiteNavContext } from "@library/navigation/SiteNavContext";
 
 interface IProps {
     activeRecord?: IActiveRecord;
@@ -30,6 +31,8 @@ interface IProps {
     hiddenTitle?: boolean;
     clickableCategoryLabels?: boolean;
     siteNavNodeTypes?: SiteNavNodeTypes;
+    initialOpenDepth?: number;
+    initialOpenType?: string;
 }
 
 /**
@@ -45,6 +48,17 @@ export function SiteNav(props: IProps) {
     const hasChildren = children && children.length > 0;
     const classes = siteNavClasses();
     const classesPanelList = panelListClasses(useSection().mediaQueries);
+
+    const siteNavContext = useSiteNavContext();
+    useEffect(() => {
+        if (siteNavContext.initialOpenType == props.initialOpenType) {
+            // No need to do this twice.
+            return;
+        }
+
+        const initialRecords = gatherInitialRecords(props.children, props.initialOpenDepth ?? 0);
+        siteNavContext.setInitialOpenItems(props.initialOpenType ?? null, initialRecords);
+    }, [props.initialOpenType, props.initialOpenDepth, siteNavContext.initialOpenType]);
 
     const handleKeyDown = useKeyboardHandler();
     const content = hasChildren
@@ -97,6 +111,21 @@ export function SiteNav(props: IProps) {
     } else {
         return <>{props.bottomCTA}</>;
     }
+}
+
+function gatherInitialRecords(records: INavigationTreeItem[], maxDepth: number): INavigationTreeItem[] {
+    const initialRecords: INavigationTreeItem[] = [];
+    let currentDepth = records;
+    let nextDepth: INavigationTreeItem[] = [];
+    for (let i = 0; i < maxDepth; i++) {
+        nextDepth = [];
+        currentDepth.forEach((item) => {
+            initialRecords.push(item);
+            nextDepth = [...nextDepth, ...item.children];
+        });
+        currentDepth = nextDepth;
+    }
+    return initialRecords;
 }
 
 function useKeyboardHandler() {

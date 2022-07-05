@@ -16,7 +16,8 @@ use VanillaTests\BootstrapTrait;
 /**
  * Test of basic logging.
  */
-class LoggerTest extends LoggerInterfaceTest {
+class LoggerTest extends LoggerInterfaceTest
+{
     use BootstrapTrait;
 
     /**
@@ -27,36 +28,40 @@ class LoggerTest extends LoggerInterfaceTest {
     /**
      * @inheritDoc
      */
-    protected function setUp(): void {
+    protected function setUp(): void
+    {
         $this->logger = new TestLogger();
     }
 
     /**
      * @return void
      */
-    public function testBasicLogging() {
+    public function testBasicLogging()
+    {
         $this->getTestLogger()->debug("Hello world");
         $this->assertLog([
-            'level' => Logger::DEBUG,
-            'message' => 'Hello world',
+            "level" => Logger::DEBUG,
+            "message" => "Hello world",
         ]);
     }
 
     /**
      * @return void
      */
-    public function testLowPriority() {
+    public function testLowPriority()
+    {
         $this->getTestLogger()->info("Hello world");
         $this->assertLog([
-            'level' => Logger::DEBUG,
-            'message' => 'Hello world',
+            "level" => Logger::DEBUG,
+            "message" => "Hello world",
         ]);
     }
 
     /**
      * Should throw when an invalid level is given.
      */
-    public function testThrowsOnInvalidLevel() {
+    public function testThrowsOnInvalidLevel()
+    {
         $this->expectException(InvalidArgumentException::class);
         parent::testThrowsOnInvalidLevel();
     }
@@ -69,7 +74,8 @@ class LoggerTest extends LoggerInterfaceTest {
      * @param string $message
      * @param array $context
      */
-    protected function assertLogExists(TestLogger $logger, $level, $message, $context) {
+    protected function assertLogExists(TestLogger $logger, $level, $message, $context)
+    {
         $logger->parent->log($level, $message, $context);
         [$lastLevel, $lastMessage, $lastContext] = $logger->last;
         $this->assertSame($level, $lastLevel);
@@ -79,7 +85,8 @@ class LoggerTest extends LoggerInterfaceTest {
         $this->assertSame($context, $common);
     }
 
-    protected function assertNotLog(TestLogger $logger, $level, $message, $context) {
+    protected function assertNotLog(TestLogger $logger, $level, $message, $context)
+    {
         $logger->parent->log($level, $message, $context);
         [$lastLevel, $lastMessage, $lastContext] = $logger->last;
         $this->assertNotSame($level, $lastLevel);
@@ -92,7 +99,8 @@ class LoggerTest extends LoggerInterfaceTest {
      *
      * @return LoggerInterface
      */
-    public function getLogger() {
+    public function getLogger()
+    {
         return $this->logger->parent;
     }
 
@@ -103,7 +111,8 @@ class LoggerTest extends LoggerInterfaceTest {
      *
      * @return string[]
      */
-    public function getLogs() {
+    public function getLogs()
+    {
         return $this->logger->logs;
     }
 }

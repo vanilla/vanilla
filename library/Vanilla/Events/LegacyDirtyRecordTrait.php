@@ -10,8 +10,8 @@ namespace Vanilla\Events;
 /**
  * Trait for fetching dirty records on old models.
  */
-trait LegacyDirtyRecordTrait {
-
+trait LegacyDirtyRecordTrait
+{
     use DirtyRecordTrait;
 
     /**
@@ -26,7 +26,8 @@ trait LegacyDirtyRecordTrait {
      *
      * @param string $prefix
      */
-    public function applyDirtyWheres(string $prefix = '') {
+    public function applyDirtyWheres(string $prefix = "")
+    {
         $model = $this->getLegacyModel();
         $type = strtolower($model->Name);
         $this->joinDirtyRecordTable($model->SQL, $model->PrimaryKey, $type, $prefix);

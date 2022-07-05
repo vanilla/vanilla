@@ -12,8 +12,8 @@ use Vanilla\Community\Schemas\AbstractTabSearchFormSchema;
 /**
  * Mock tag schema for tests.
  */
-class MockTagSearchFormSchema extends AbstractTabSearchFormSchema {
-
+class MockTagSearchFormSchema extends AbstractTabSearchFormSchema
+{
     /** @var array */
     private $schema;
 
@@ -34,7 +34,8 @@ class MockTagSearchFormSchema extends AbstractTabSearchFormSchema {
      * @param string $submitButtonText
      * @param string $title
      */
-    public function __construct(array $schema, string $tabID, string $submitButtonText, string $title) {
+    public function __construct(array $schema, string $tabID, string $submitButtonText, string $title)
+    {
         $this->schema = $schema;
         $this->tabID = $tabID;
         $this->submitButtonText = $submitButtonText;
@@ -44,28 +45,32 @@ class MockTagSearchFormSchema extends AbstractTabSearchFormSchema {
     /**
      * @return array
      */
-    public function schema(): array {
+    public function schema(): array
+    {
         return $this->schema;
     }
 
     /**
      * @return string
      */
-    public function getTabID(): string {
+    public function getTabID(): string
+    {
         return $this->tabID;
     }
 
     /**
      * @return string
      */
-    public function getSubmitButtonText(): string {
+    public function getSubmitButtonText(): string
+    {
         return $this->submitButtonText;
     }
 
     /**
      * @return string
      */
-    public function getTitle(): string {
+    public function getTitle(): string
+    {
         return $this->title;
     }
 }

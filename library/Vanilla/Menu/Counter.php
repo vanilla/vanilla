@@ -9,7 +9,8 @@ namespace Vanilla\Menu;
 /**
  * A class for dealing with Counter data.
  */
-class Counter implements \JsonSerializable {
+class Counter implements \JsonSerializable
+{
     /** @var string */
     private $name;
 
@@ -22,7 +23,8 @@ class Counter implements \JsonSerializable {
      * @param string $name
      * @param int $count
      */
-    public function __construct(string $name, int $count) {
+    public function __construct(string $name, int $count)
+    {
         $this->name = $name;
         $this->count = $count;
     }
@@ -30,21 +32,24 @@ class Counter implements \JsonSerializable {
     /**
      * @inheritdoc
      */
-    public function jsonSerialize() {
+    public function jsonSerialize()
+    {
         return $this->asArray();
     }
 
     /**
      * @return string
      */
-    public function getName(): string {
+    public function getName(): string
+    {
         return $this->name;
     }
 
     /**
      * @return int
      */
-    public function getCount(): int {
+    public function getCount(): int
+    {
         return $this->count;
     }
 
@@ -53,10 +58,11 @@ class Counter implements \JsonSerializable {
      *
      * @return array
      */
-    public function asArray(): array {
+    public function asArray(): array
+    {
         return [
-            'name' => $this->getName(),
-            'count' => $this->getCount(),
+            "name" => $this->getName(),
+            "count" => $this->getCount(),
         ];
     }
 }

@@ -12,8 +12,8 @@ use Vanilla\Contracts\RecordInterface;
 /**
  * Generic record for a given type.
  */
-class GenericRecord implements RecordInterface {
-
+class GenericRecord implements RecordInterface
+{
     /** @var string */
     private $recordType;
 
@@ -26,7 +26,8 @@ class GenericRecord implements RecordInterface {
      * @param string $recordType
      * @param int $recordID
      */
-    public function __construct(string $recordType, int $recordID) {
+    public function __construct(string $recordType, int $recordID)
+    {
         $this->recordType = $recordType;
         $this->recordID = $recordID;
     }
@@ -34,14 +35,16 @@ class GenericRecord implements RecordInterface {
     /**
      * @inheritdoc
      */
-    public function getRecordType(): string {
+    public function getRecordType(): string
+    {
         return $this->recordType;
     }
 
     /**
      * @inheritdoc
      */
-    public function getRecordID(): int {
+    public function getRecordID(): int
+    {
         return $this->recordID;
     }
 }

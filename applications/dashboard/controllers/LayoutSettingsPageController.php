@@ -14,8 +14,8 @@ use Vanilla\Web\PageDispatchController;
 /**
  * Controller for /layout-settings.
  */
-class LayoutSettingsPageController extends PageDispatchController {
-
+class LayoutSettingsPageController extends PageDispatchController
+{
     protected $assetSection = "admin";
 
     /**
@@ -23,13 +23,12 @@ class LayoutSettingsPageController extends PageDispatchController {
      *
      * @return Data
      */
-    public function get_playground(): Data {
-        $data = $this
-            ->useSimplePage("Layout Editor")
-            ->permission("settings.manage")
+    public function get_playground(): Data
+    {
+        $data = $this->useSimplePage("Layout Editor")
+            ->permission("site.manage")
             ->blockRobots()
-            ->render()
-        ;
+            ->render();
 
         // To load monaco.
         $data->setMeta(ContentSecurityPolicyMiddleware::SCRIPT_BYPASS, true);

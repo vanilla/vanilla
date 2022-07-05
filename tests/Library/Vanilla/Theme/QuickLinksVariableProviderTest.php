@@ -19,15 +19,16 @@ use VanillaTests\SiteTestCase;
  *
  * @package VanillaTests\Library\Vanilla\Theme
  */
-class QuickLinksVariableProviderTest extends SiteTestCase {
-
+class QuickLinksVariableProviderTest extends SiteTestCase
+{
     /** @var QuickLinksVariableProvider $quickLinksProviderInterface */
     private $quickLinksVariableProvider;
 
     /**
      * Setup.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         $this->quickLinksVariableProvider = self::container()->get(QuickLinksVariableProvider::class);
     }
@@ -35,18 +36,13 @@ class QuickLinksVariableProviderTest extends SiteTestCase {
     /**
      * Test adding Link providers.
      */
-    public function testAddProviders() {
+    public function testAddProviders()
+    {
         $this->quickLinksVariableProvider->resetProviders();
 
-        $this->quickLinksVariableProvider->addQuickLinkProvider(
-            new MockQuickLinkProviderInterface1()
-        );
-        $this->quickLinksVariableProvider->addQuickLinkProvider(
-            new MockQuickLinkProviderInterface2()
-        );
-        $this->quickLinksVariableProvider->addQuickLinkProvider(
-            new MockQuickLinkProviderInterface3()
-        );
+        $this->quickLinksVariableProvider->addQuickLinkProvider(new MockQuickLinkProviderInterface1());
+        $this->quickLinksVariableProvider->addQuickLinkProvider(new MockQuickLinkProviderInterface2());
+        $this->quickLinksVariableProvider->addQuickLinkProvider(new MockQuickLinkProviderInterface3());
 
         $this->assertEquals(3, count($this->quickLinksVariableProvider->getAllProviders()));
     }
@@ -54,7 +50,8 @@ class QuickLinksVariableProviderTest extends SiteTestCase {
     /**
      * Test getAllLinks
      */
-    public function testGetAllLinks() {
+    public function testGetAllLinks()
+    {
         $this->testAddProviders();
         $providerLinks = $this->quickLinksVariableProvider->getAllLinks();
         $expectedLinkIDs = $this->allLinkIDDataProvider();
@@ -70,45 +67,43 @@ class QuickLinksVariableProviderTest extends SiteTestCase {
     /**
      * Test getVariables.
      */
-    public function testGetVariables() {
+    public function testGetVariables()
+    {
         $this->testAddProviders();
         $variables = $this->quickLinksVariableProvider->getVariables();
 
         $expectedCounts = $this->countsDataProvider();
-        $this->assertArrayHasKey('counts', $variables['quickLinks']);
-        $this->assertEquals($expectedCounts, $variables['quickLinks']['counts']);
+        $this->assertArrayHasKey("counts", $variables["quickLinks"]);
+        $this->assertEquals($expectedCounts, $variables["quickLinks"]["counts"]);
     }
 
     /**
      * Test getVariables.
      */
-    public function testGetDefaults() {
+    public function testGetDefaults()
+    {
         $this->testAddProviders();
         $variables = $this->quickLinksVariableProvider->getVariableDefaults();
         $expectedLinkIDs = $this->allLinkIDDataProvider();
 
-        $this->assertArrayHasKey('quickLinks', $variables);
-        $this->assertArrayHasKey('links', $variables['quickLinks']);
+        $this->assertArrayHasKey("quickLinks", $variables);
+        $this->assertArrayHasKey("links", $variables["quickLinks"]);
 
         $linkData = [];
-        foreach ($variables['quickLinks']['links'] as $link) {
+        foreach ($variables["quickLinks"]["links"] as $link) {
             $linkData[] = $link->getID();
         }
         $this->assertEquals($expectedLinkIDs, $linkData);
     }
-
 
     /**
      * LinkIDs data provider.
      *
      * @return array
      */
-    protected function allLinkIDDataProvider() {
-        return [
-            'mock-quick-link-1',
-            'mock-quick-link-2',
-            'mock-quick-link-3',
-        ];
+    protected function allLinkIDDataProvider()
+    {
+        return ["mock-quick-link-1", "mock-quick-link-2", "mock-quick-link-3"];
     }
 
     /**
@@ -116,11 +111,12 @@ class QuickLinksVariableProviderTest extends SiteTestCase {
      *
      * @return array
      */
-    protected function countsDataProvider() {
+    protected function countsDataProvider()
+    {
         return [
-            'mock-quick-link-1' => null,
-            'mock-quick-link-2' => 4,
-            'mock-quick-link-3' => 5,
+            "mock-quick-link-1" => null,
+            "mock-quick-link-2" => 4,
+            "mock-quick-link-3" => 5,
         ];
     }
 }

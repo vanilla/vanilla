@@ -12,12 +12,13 @@ use PHPUnit\Framework\TestCase;
 /**
  * Test trait with database utilities.
  */
-trait DatabaseTestTrait {
-
+trait DatabaseTestTrait
+{
     /**
      * @return \Gdn_Database
      */
-    protected function getDb(): \Gdn_Database {
+    protected function getDb(): \Gdn_Database
+    {
         return \Gdn::database();
     }
 
@@ -27,11 +28,11 @@ trait DatabaseTestTrait {
      * @param string $table
      * @param array $where
      */
-    protected function assertNoRecordsFound(string $table, array $where) {
+    protected function assertNoRecordsFound(string $table, array $where)
+    {
         $count = $this->getDb()
             ->createSql()
-            ->getCount($table, $where)
-        ;
+            ->getCount($table, $where);
         TestCase::assertEquals(0, $count);
     }
 
@@ -44,16 +45,16 @@ trait DatabaseTestTrait {
      *
      * @return array The found records.
      */
-    protected function assertRecordsFound(string $table, array $where, ?int $expectedCount = null): array {
+    protected function assertRecordsFound(string $table, array $where, ?int $expectedCount = null): array
+    {
         $records = $this->getDb()
             ->createSql()
             ->getWhere($table, $where)
-            ->resultArray()
-        ;
+            ->resultArray();
         if ($expectedCount !== null) {
             TestCase::assertCount($expectedCount, $records);
         } else {
-            TestCase::assertTrue(count($records) > 0, 'No records were found.');
+            TestCase::assertTrue(count($records) > 0, "No records were found.");
         }
         return $records;
     }

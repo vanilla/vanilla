@@ -11,17 +11,20 @@
 /**
  * Renders the discussion filter menu.
  */
-class DiscussionFilterModule extends Gdn_Module {
-
-    public function __construct($sender) {
-        parent::__construct($sender, 'Vanilla');
+class DiscussionFilterModule extends Gdn_Module
+{
+    public function __construct($sender)
+    {
+        parent::__construct($sender, "Vanilla");
     }
 
-    public function assetTarget() {
-        return 'Panel';
+    public function assetTarget()
+    {
+        return "Panel";
     }
 
-    public function toString() {
+    public function toString()
+    {
         return parent::toString();
     }
 }

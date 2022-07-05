@@ -8,15 +8,15 @@ import chalk from "chalk";
 import fse from "fs-extra";
 import path from "path";
 import webpack, { Configuration, Stats } from "webpack";
-import WebpackDevServer, { Configuration as DevServerConfiguration } from "webpack-dev-server";
+import WebpackDevServer, { Configuration as DevServerConfiguration, ServerConfiguration } from "webpack-dev-server";
+import { BuildMode, getOptions, IBuildOptions } from "./buildOptions";
 import { makeDevConfig } from "./configs/makeDevConfig";
 import { makePolyfillConfig } from "./configs/makePolyfillConfig";
 import { makeProdConfig } from "./configs/makeProdConfig";
-import { DIST_DIRECTORY, DIST_ROOT_DIRECTORY, VANILLA_ROOT } from "./env";
-import { BuildMode, getOptions, IBuildOptions } from "./buildOptions";
+import { DIST_ROOT_DIRECTORY, VANILLA_ROOT } from "./env";
 import EntryModel from "./utility/EntryModel";
 import { copyMonacoEditorModule, installYarn } from "./utility/moduleUtils";
-import { fail, print, printSection } from "./utility/utils";
+import { fail, print } from "./utility/utils";
 
 /**
  * A class to build frontend assets.
@@ -76,24 +76,18 @@ export default class Builder {
         copyMonacoEditorModule();
         const sections = await this.entryModel.getSections();
         let configs: webpack.Configuration[];
-        if (this.options.modern) {
-            configs = await Promise.all([
-                ...sections.map((section) => makeProdConfig(this.entryModel, section, false)),
-                ...sections.map((section) => makeProdConfig(this.entryModel, section, true)),
-                makePolyfillConfig(this.entryModel),
-            ]);
-        } else {
-            configs = await Promise.all([
-                ...sections.map((section) => makeProdConfig(this.entryModel, section, true)),
-                makePolyfillConfig(this.entryModel),
-            ]);
-        }
+        configs = await Promise.all([
+            ...sections.map((section) => makeProdConfig(this.entryModel, section)),
+            makePolyfillConfig(this.entryModel),
+        ]);
 
         // Running the builds individually is actually faster since webpack 5
         // We can parellize many function per build and saturate the CPU.
         // This also lets you see individual sections errors faster.
-        for (const config of configs) {
-            await this.runBuild(config);
+        let currentConfig = configs.shift();
+        while (currentConfig) {
+            await this.runBuild(currentConfig);
+            currentConfig = configs.shift();
         }
     }
 
@@ -111,7 +105,6 @@ export default class Builder {
                     fail(`\nThe build encountered an error: ${err}`);
                 }
 
-                print(stats.toString(this.statOptions));
                 compiler.close(() => {
                     resolve();
                 });
@@ -142,47 +135,44 @@ ${chalk.yellowBright("$Configuration['HotReload']['Enabled'] = true;")}`);
         const certPath = path.resolve(VANILLA_ROOT, "../vanilla-docker/resources/certificates");
         const crtFile = path.resolve(certPath, "wildcard.vanilla.localhost.crt");
         const keyFile = path.resolve(certPath, "wildcard.vanilla.localhost.key");
+        const hasSslCerts = fse.existsSync(certPath);
 
-        const https = fse.existsSync(certPath)
-            ? {
-                  key: fse.readFileSync(keyFile),
-                  cert: fse.readFileSync(crtFile),
-              }
-            : false;
-
-        if (https) {
+        const serverOptions: ServerConfiguration = {};
+        if (hasSslCerts) {
             print(chalk.green("Found SSL certs. Serving over https://"));
+            serverOptions.type = "spdy";
+            serverOptions.options = {
+                key: fse.readFileSync(keyFile),
+                cert: fse.readFileSync(crtFile),
+            };
         }
 
         const devServerOptions: DevServerConfiguration = {
             host: "webpack.vanilla.localhost",
             port: 3030,
-            hotOnly: true,
+            hot: "only",
             open: false,
-            https,
-            disableHostCheck: true,
-            sockHost: "webpack.vanilla.localhost:3030",
-            public: "webpack.vanilla.localhost:3030",
+            static: false,
+            setupExitSignals: false,
+            server: serverOptions,
+            allowedHosts: ["vanilla.localhost", ".vanilla.localhost", "localhost", "127.0.0.1"],
             headers: {
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept",
                 "Access-Control-Allow-Methods": "POST, GET, PUT, DELETE, OPTIONS",
             },
-            publicPath: `https://webpack.vanilla.localhost:3030/`,
-            stats: this.statOptions,
         };
 
         const sections = await this.entryModel.getSections();
         const config = await Promise.all(
             sections.map(async (section) => {
                 const sectionConfig = await makeDevConfig(this.entryModel, section);
-                WebpackDevServer.addDevServerEntrypoints(sectionConfig as any, devServerOptions);
                 return sectionConfig;
             }),
         );
-        const compiler = webpack(config) as any;
+        const compiler = webpack(config);
 
-        const server = new WebpackDevServer(compiler, devServerOptions);
-        server.listen(3030, "127.0.0.1");
+        const server = new WebpackDevServer(devServerOptions, compiler as any);
+        server.start();
     }
 }

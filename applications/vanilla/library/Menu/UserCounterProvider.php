@@ -12,8 +12,8 @@ use Vanilla\Menu\Counter;
 /**
  * Menu counter provider for user.
  */
-class UserCounterProvider implements CounterProviderInterface {
-
+class UserCounterProvider implements CounterProviderInterface
+{
     /** @var \Gdn_Session */
     private $session;
 
@@ -22,14 +22,16 @@ class UserCounterProvider implements CounterProviderInterface {
      *
      * @param \Gdn_Session $session
      */
-    public function __construct(\Gdn_Session $session) {
+    public function __construct(\Gdn_Session $session)
+    {
         $this->session = $session;
     }
 
     /**
      * @inheritdoc
      */
-    public function getMenuCounters(): array {
+    public function getMenuCounters(): array
+    {
         $counters = [];
         if (is_object($this->session->User)) {
             $user = $this->session->User;

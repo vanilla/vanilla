@@ -16,8 +16,8 @@ use Vanilla\Formatting\Html\Processor\ZendeskWysiwygProcessor;
 /**
  * Class for rendering content of the markdown format.
  */
-class WysiwygFormat extends HtmlFormat {
-
+class WysiwygFormat extends HtmlFormat
+{
     const FORMAT_KEY = "wysiwyg";
 
     const ALT_FORMAT_KEY = "raw";
@@ -40,8 +40,9 @@ class WysiwygFormat extends HtmlFormat {
     /**
      * @inheritdoc
      */
-    public function renderHtml(string $content, bool $enhance = true): string {
-        $result = FormatUtil::replaceButProtectCodeBlocks('/\\\r\\\n/', '', $content);
+    public function renderHtml(string $content, bool $enhance = true): string
+    {
+        $result = FormatUtil::replaceButProtectCodeBlocks('/\\\r\\\n/', "", $content);
         return parent::renderHtml($result, $enhance);
     }
 
@@ -53,7 +54,27 @@ class WysiwygFormat extends HtmlFormat {
      *
      * @return string
      */
-    protected function legacySpoilers(string $html): string {
+    protected function legacySpoilers(string $html): string
+    {
         return $html;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function removeUserPII(string $username, string $body): string
+    {
+        [$pattern["atMention"], $replacement["atMention"]] = $this->getNonRichAtMentionPattern(
+            $username,
+            $this->anonymizeUsername
+        );
+
+        [$pattern["url"], $replacement["url"]] = $this->getUrlPattern($username, $this->anonymizeUrl);
+
+        $pattern["quote"] = "~>$username<~";
+        $replacement["quote"] = ">$this->anonymizeUsername<";
+
+        $body = preg_replace($pattern, $replacement, $body);
+        return $body;
     }
 }

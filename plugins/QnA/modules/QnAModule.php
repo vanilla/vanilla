@@ -14,9 +14,9 @@ use Vanilla\Widgets\AbstractWidgetModule;
 /**
  * Question & Answer Module
  */
-class QnAModule extends AbstractWidgetModule {
-
-    const ALL_QUESTIONS = 'all';
+class QnAModule extends AbstractWidgetModule
+{
+    const ALL_QUESTIONS = "all";
 
     /** @var int limit */
     private $limit = 10;
@@ -38,31 +38,34 @@ class QnAModule extends AbstractWidgetModule {
     /**
      * @param int $limit
      */
-    public function setLimit(int $limit = 10): void {
+    public function setLimit(int $limit = 10): void
+    {
         $this->limit = $limit;
     }
 
     /**
      * @param string $title
      */
-    public function setTitle(string $title): void {
+    public function setTitle(string $title): void
+    {
         $this->title = $title;
     }
 
     /**
      * @param bool $acceptedAnswer
      */
-    public function setAcceptedAnswer(bool $acceptedAnswer): void {
+    public function setAcceptedAnswer(bool $acceptedAnswer): void
+    {
         $this->questionFilter = $acceptedAnswer ? QnaModel::ACCEPTED : QnaModel::UNANSWERED;
     }
 
     /**
      * @param string $questionFilter
      */
-    public function setQuestionFilter(string $questionFilter = QnaModel::ACCEPTED): void {
+    public function setQuestionFilter(string $questionFilter = QnaModel::ACCEPTED): void
+    {
         $this->questionFilter = $questionFilter;
     }
-
 
     /**
      * QnaAnswersModule constructor.
@@ -70,7 +73,8 @@ class QnAModule extends AbstractWidgetModule {
      * @param DiscussionModel $discussionModel
      * @param CategoryModel $categoryModel
      */
-    public function __construct(DiscussionModel $discussionModel, CategoryModel $categoryModel) {
+    public function __construct(DiscussionModel $discussionModel, CategoryModel $categoryModel)
+    {
         $this->discussionModel = $discussionModel;
         $this->categoryModel = $categoryModel;
     }
@@ -78,16 +82,17 @@ class QnAModule extends AbstractWidgetModule {
     /**
      * Get the data for the module.
      */
-    public function getData() {
-        $where = ['Type' => 'Question'];
+    public function getData()
+    {
+        $where = ["Type" => "Question"];
 
         if ($this->questionFilter !== self::ALL_QUESTIONS) {
-            $where['QnA'] = $this->questionFilter;
+            $where["QnA"] = $this->questionFilter;
         }
 
-        $visibleCategoriesResult = $this->categoryModel->getVisibleCategoryIDs(['filterHideDiscussions' => true]);
+        $visibleCategoriesResult = $this->categoryModel->getVisibleCategoryIDs(["filterHideDiscussions" => true]);
         if ($visibleCategoriesResult !== true) {
-            $where['d.CategoryID'] = $visibleCategoriesResult;
+            $where["d.CategoryID"] = $visibleCategoriesResult;
         }
 
         $items = $this->discussionModel->getWhere($where, null, null, $this->limit)->resultObject();
@@ -100,16 +105,18 @@ class QnAModule extends AbstractWidgetModule {
      *
      * @return string
      */
-    public function assetTarget() {
-        return 'Content';
+    public function assetTarget()
+    {
+        return "Content";
     }
 
     /**
      * Get widget name.
      * @return string
      */
-    public static function getWidgetName(): string {
-        return t('Questions and Answers');
+    public static function getWidgetName(): string
+    {
+        return t("Questions and Answers");
     }
 
     /**
@@ -117,30 +124,26 @@ class QnAModule extends AbstractWidgetModule {
      *
      * @return Schema
      */
-    public static function getWidgetSchema(): Schema {
+    public static function getWidgetSchema(): Schema
+    {
         return Schema::parse([
-            'title' => [
-                'type' => 'string',
-                'nullable' => true,
-                'minLength' => 0,
-                'x-control' => SchemaForm::textBox(new FormOptions('Title', 'Set a custom title.')),
+            "title" => [
+                "type" => "string",
+                "nullable" => true,
+                "minLength" => 0,
+                "x-control" => SchemaForm::textBox(new FormOptions("Title", "Set a custom title.")),
             ],
-            'questionFilter' => [
-                'type' => 'string',
-                'default' => 'Accepted',
-                'x-control' => SchemaForm::dropDown(
-                    new FormOptions(
-                        'Question filter',
-                        'Set the filter'
-                    ),
-                    new StaticFormChoices(
-                        [
-                            QnaModel::ACCEPTED => t('Accepted answer only'),
-                            QnaModel::ANSWERED => t('Answered questions only'),
-                            QnaModel::UNANSWERED => t('Unanswered questions only'),
-                            self::ALL_QUESTIONS => t('All'),
-                        ]
-                    )
+            "questionFilter" => [
+                "type" => "string",
+                "default" => "Accepted",
+                "x-control" => SchemaForm::dropDown(
+                    new FormOptions("Question filter", "Set the filter"),
+                    new StaticFormChoices([
+                        QnaModel::ACCEPTED => t("Accepted answer only"),
+                        QnaModel::ANSWERED => t("Answered questions only"),
+                        QnaModel::UNANSWERED => t("Unanswered questions only"),
+                        self::ALL_QUESTIONS => t("All"),
+                    ])
                 ),
             ],
         ]);
@@ -151,10 +154,11 @@ class QnAModule extends AbstractWidgetModule {
      *
      * @return string
      */
-    public function toString() {
+    public function toString()
+    {
         $items = $this->getData();
-        $this->setData('discussions', $items);
-        $this->setData('title', $this->title);
+        $this->setData("discussions", $items);
+        $this->setData("title", $this->title);
 
         return parent::toString();
     }

@@ -13,8 +13,8 @@ use Vanilla\Web\TwigRenderTrait;
 /**
  * Model for manager which assets to preload in the page.
  */
-class AssetPreloadModel {
-
+class AssetPreloadModel
+{
     use TwigRenderTrait;
 
     /** @var AssetInterface[] */
@@ -38,7 +38,11 @@ class AssetPreloadModel {
      * The other REL constants on AssetPreloader are standard rel attribute values for a <link /> element.
      * @param string $uniqueKey An optional string key to prevent adding the same asset twice.
      */
-    public function addScript(AssetInterface $asset, string $rel = AssetPreloader::REL_PRELOAD, string $uniqueKey = null) {
+    public function addScript(
+        AssetInterface $asset,
+        string $rel = AssetPreloader::REL_PRELOAD,
+        string $uniqueKey = null
+    ) {
         if ($uniqueKey !== null) {
             if (in_array($uniqueKey, $this->uniqueKeys)) {
                 // The script has already been added.
@@ -64,7 +68,11 @@ class AssetPreloadModel {
      * The other REL constants on AssetPreloader are standard rel attribute values for a <link /> element.
      * @param string $uniqueKey An optional string key to prevent adding the same asset twice.
      */
-    public function addStylesheet(AssetInterface $asset, string $rel = AssetPreloader::REL_PRELOAD, string $uniqueKey = null) {
+    public function addStylesheet(
+        AssetInterface $asset,
+        string $rel = AssetPreloader::REL_PRELOAD,
+        string $uniqueKey = null
+    ) {
         if ($uniqueKey !== null) {
             if (in_array($uniqueKey, $this->uniqueKeys)) {
                 // The script has already been added.
@@ -86,17 +94,19 @@ class AssetPreloadModel {
      *
      * @param AssetPreloader $preload
      */
-    public function addPreload(AssetPreloader $preload) {
+    public function addPreload(AssetPreloader $preload)
+    {
         $this->preloads[] = $preload;
     }
 
     /**
      * Render HTMLf or the head element using all of the registered assets in the model.
      */
-    public function renderHtml(): string {
-        $viewPath = dirname(__FILE__) . '/AssetPreloadModel.twig';
+    public function renderHtml(): string
+    {
+        $viewPath = dirname(__FILE__) . "/AssetPreloadModel.twig";
         $html = $this->renderTwig($viewPath, [
-            'model' => $this,
+            "model" => $this,
         ]);
         return $html;
     }
@@ -104,21 +114,24 @@ class AssetPreloadModel {
     /**
      * @return AssetInterface[]
      */
-    public function getFullScripts(): array {
+    public function getFullScripts(): array
+    {
         return $this->fullScripts;
     }
 
     /**
      * @return AssetInterface[]
      */
-    public function getFullStylesheets(): array {
+    public function getFullStylesheets(): array
+    {
         return $this->fullStylesheets;
     }
 
     /**
      * @return AssetPreloader[]
      */
-    public function getPreloads(): array {
+    public function getPreloads(): array
+    {
         return $this->preloads;
     }
 }

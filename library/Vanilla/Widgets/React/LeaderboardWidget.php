@@ -12,8 +12,6 @@ use Vanilla\Dashboard\Models\UserLeaderQuery;
 use Vanilla\Dashboard\UserLeaderService;
 use Vanilla\Dashboard\UserPointsModel;
 use Vanilla\Forum\Controllers\Api\DiscussionsApiIndexSchema;
-use Vanilla\Layout\Section\SectionThreeColumns;
-use Vanilla\Layout\Section\SectionTwoColumns;
 use Vanilla\Models\UserFragmentSchema;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Web\JsInterpop\AbstractReactModule;
@@ -22,8 +20,8 @@ use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
 /**
  * Widget with the users having the top points.
  */
-class LeaderboardWidget extends AbstractReactModule implements ReactWidgetInterface, CombinedPropsWidgetInterface, SectionAwareInterface {
-
+class LeaderboardWidget extends AbstractReactModule implements ReactWidgetInterface, CombinedPropsWidgetInterface
+{
     use CombinedPropsWidgetTrait;
     use HomeWidgetContainerSchemaTrait;
 
@@ -39,7 +37,8 @@ class LeaderboardWidget extends AbstractReactModule implements ReactWidgetInterf
      * @param UserLeaderService $userLeaderService
      * @param \UserModel $userModel
      */
-    public function __construct(UserLeaderService $userLeaderService, \UserModel $userModel) {
+    public function __construct(UserLeaderService $userLeaderService, \UserModel $userModel)
+    {
         parent::__construct();
         $this->userLeaderService = $userLeaderService;
         $this->userModel = $userModel;
@@ -52,7 +51,8 @@ class LeaderboardWidget extends AbstractReactModule implements ReactWidgetInterf
      *
      * @return array
      */
-    private function mapUserToWidgetItem(array $user): array {
+    private function mapUserToWidgetItem(array $user): array
+    {
         $points = $user["Points"] ?? 0;
         $user = UserFragmentSchema::normalizeUserFragment($user);
 
@@ -65,11 +65,12 @@ class LeaderboardWidget extends AbstractReactModule implements ReactWidgetInterf
     /**
      * @inheritDoc
      */
-    public function getProps(): ?array {
+    public function getProps(): ?array
+    {
         $query = new UserLeaderQuery(
-            $this->props['apiParams']['slotType'],
-            $this->props['apiParams']['categoryID'] ?? null,
-            $this->props['apiParams']['limit']
+            $this->props["apiParams"]["slotType"],
+            $this->props["apiParams"]["categoryID"] ?? null,
+            $this->props["apiParams"]["limit"]
         );
         $users = $this->userLeaderService->getLeaders($query);
         if (count($users) === 0) {
@@ -77,7 +78,7 @@ class LeaderboardWidget extends AbstractReactModule implements ReactWidgetInterf
         }
         $users = array_map([$this, "mapUserToWidgetItem"], $users);
         $result = array_merge($this->props, [
-            "leaders" => $users
+            "leaders" => $users,
         ]);
 
         return $result;
@@ -86,7 +87,8 @@ class LeaderboardWidget extends AbstractReactModule implements ReactWidgetInterf
     /**
      * @inheritDoc
      */
-    public static function getWidgetSchema(): Schema {
+    public static function getWidgetSchema(): Schema
+    {
         $categoryIDSchema = Schema::parse([
             "type" => "integer",
             "default" => null,
@@ -95,58 +97,52 @@ class LeaderboardWidget extends AbstractReactModule implements ReactWidgetInterf
         ]);
 
         $widgetSpecificSchema = Schema::parse([
-            'apiParams?' => Schema::parse([
+            "apiParams?" => Schema::parse([
                 "slotType?" => UserPointsModel::slotTypeSchema(),
-                'LeaderboardType?' => UserPointsModel::leaderboardTypeSchema(),
+                "LeaderboardType?" => UserPointsModel::leaderboardTypeSchema(),
                 "limit?" => UserPointsModel::limitSchema(),
-                'categoryID:i?' => $categoryIDSchema,
-            ])
+                "categoryID:i?" => $categoryIDSchema,
+            ]),
         ]);
 
         return SchemaUtils::composeSchemas(
             self::widgetTitleSchema("All Time Leaders"),
             self::widgetSubtitleSchema("subtitle"),
             self::widgetDescriptionSchema(),
-            self::containerOptionsSchema("containerOptions"),
-            $widgetSpecificSchema
+            $widgetSpecificSchema,
+            self::containerOptionsSchema("containerOptions")
         );
     }
 
     /**
      * @inheritDoc
      */
-    public static function getComponentName(): string {
+    public static function getComponentName(): string
+    {
         return "LeaderboardWidget";
     }
 
     /**
      * @inheritDoc
      */
-    public static function getWidgetID(): string {
+    public static function getWidgetID(): string
+    {
         return "leaderboard";
     }
 
     /**
      * @inheritDoc
      */
-    public static function getWidgetName(): string {
+    public static function getWidgetName(): string
+    {
         return "Leaderboard";
     }
 
     /**
      * @return string
      */
-    public static function getWidgetIconPath(): string {
+    public static function getWidgetIconPath(): string
+    {
         return "/applications/dashboard/design/images/widgetIcons/leaderboard.svg";
-    }
-
-    /**
-     * @return array
-     */
-    public static function getRecommendedSectionIDs(): array {
-        return [
-            SectionTwoColumns::getWidgetID(),
-            SectionThreeColumns::getWidgetID(),
-        ];
     }
 }

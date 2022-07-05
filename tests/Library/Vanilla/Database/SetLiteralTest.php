@@ -14,11 +14,13 @@ use Vanilla\Database\SetLiterals\MinMax;
 /**
  * Basic object access for the various `SetLiteral` classes.
  */
-class SetLiteralTest extends TestCase {
+class SetLiteralTest extends TestCase
+{
     /**
      * Test `Increment::getAmount()`.
      */
-    public function testIncrementAccessors(): void {
+    public function testIncrementAccessors(): void
+    {
         $inc = new Increment(123);
         $this->assertSame(123, $inc->getAmount());
     }
@@ -26,7 +28,8 @@ class SetLiteralTest extends TestCase {
     /**
      * Test the accessors for the `MinMax` class.
      */
-    public function testMinMaxAccessors(): void {
+    public function testMinMaxAccessors(): void
+    {
         $min = new MinMax(MinMax::OP_MIN, 123);
         $this->assertSame(MinMax::OP_MIN, $min->getOp());
         $this->assertSame(123, $min->getValue());
@@ -39,8 +42,9 @@ class SetLiteralTest extends TestCase {
     /**
      * The `MinMax` class must have on of "min" or "max".
      */
-    public function testInvalidMinMax(): void {
+    public function testInvalidMinMax(): void
+    {
         $this->expectException(\InvalidArgumentException::class);
-        $invalid = new MinMax('foo', 123);
+        $invalid = new MinMax("foo", 123);
     }
 }

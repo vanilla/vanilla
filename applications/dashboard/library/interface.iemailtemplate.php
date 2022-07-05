@@ -11,8 +11,8 @@
  * @package Core
  * @since 2.3
  */
-interface Gdn_IEmailTemplate {
-
+interface Gdn_IEmailTemplate
+{
     /**
      * Set message string
      *
@@ -49,5 +49,4 @@ interface Gdn_IEmailTemplate {
      * @return string
      */
     public function toString();
-
 }

@@ -7,30 +7,28 @@
 
 namespace Vanilla\Formatting\Quill\Formats;
 
-class Strike extends AbstractFormat {
-
+class Strike extends AbstractFormat
+{
     /**
      * @inheritDoc
      */
-    protected static function getAttributeLookupKey(): string {
+    protected static function getAttributeLookupKey(): string
+    {
         return "strike";
     }
 
     /**
      * @inheritDoc
      */
-    protected function getBlackListedNestedFormats(): array {
-        return [
-            Link::class,
-            Code::class,
-            Italic::class,
-            Bold::class,
-        ];
+    protected function getBlackListedNestedFormats(): array
+    {
+        return [Link::class, Code::class, Italic::class, Bold::class];
     }
     /**
      * @inheritDoc
      */
-    protected function getTagName(): string {
+    protected function getTagName(): string
+    {
         return "s";
     }
 }

@@ -12,8 +12,8 @@ use PHPUnit\Framework\TestCase;
 /**
  * Tests for arrayTranslate().
  */
-class ArrayTranslateTest extends TestCase {
-
+class ArrayTranslateTest extends TestCase
+{
     /**
      * Test  {@link arrayTranslate()} against several scenarios.
      *
@@ -23,7 +23,8 @@ class ArrayTranslateTest extends TestCase {
      * @param array $expected
      * @dataProvider provideTranslateableArrays
      */
-    public function testArrayTranslate(array $testArray, array $testMap, bool $addRemaining, array $expected) {
+    public function testArrayTranslate(array $testArray, array $testMap, bool $addRemaining, array $expected)
+    {
         $value = arrayTranslate($testArray, $testMap, $addRemaining);
         $this->assertSame($expected, $value);
     }
@@ -33,61 +34,32 @@ class ArrayTranslateTest extends TestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideTranslateableArrays() {
+    public function provideTranslateableArrays()
+    {
         $r = [
-            'simpleAssocAdd' => [
-                ['badKey' => 'a.b'],
-                ['badKey' => 'fixedKey'],
+            "simpleAssocAdd" => [["badKey" => "a.b"], ["badKey" => "fixedKey"], true, ["fixedKey" => "a.b"]],
+            "longAssocAdd" => [
+                ["badKey" => "a.b", "anotherIndex" => "b.c"],
+                ["badKey" => "fixedKey"],
                 true,
-                ['fixedKey' => 'a.b'],
+                ["fixedKey" => "a.b", "anotherIndex" => "b.c"],
             ],
-            'longAssocAdd' => [
-                ['badKey' => 'a.b', 'anotherIndex' => 'b.c'],
-                ['badKey' => 'fixedKey'],
-                true,
-                ['fixedKey' => 'a.b', 'anotherIndex' => 'b.c'],
-            ],
-            'simpleAssocNoAdd' => [
-                ['badKey' => 'a.b'],
-                ['badKey' => 'fixedKey'],
+            "simpleAssocNoAdd" => [["badKey" => "a.b"], ["badKey" => "fixedKey"], false, ["fixedKey" => "a.b"]],
+            "longAssocNoAdd" => [
+                ["badKey" => "a.b", "anotherIndex" => "b.c"],
+                ["badKey" => "fixedKey"],
                 false,
-                ['fixedKey' => 'a.b'],
+                ["fixedKey" => "a.b"],
             ],
-            'longAssocNoAdd' => [
-                ['badKey' => 'a.b', 'anotherIndex' => 'b.c'],
-                ['badKey' => 'fixedKey'],
-                false,
-                ['fixedKey' => 'a.b'],
-            ],
-            'arraySub' => [
-                ['oneKey' => 'a.b', 'twoKey' => 'b.c'],
-                ['twoKey'],
-                false,
-                ['twoKey' => 'b.c'],
-            ],
-            'emptyMap' => [
-                ['oneKey' => 'a.b'],
-                [],
+            "arraySub" => [["oneKey" => "a.b", "twoKey" => "b.c"], ["twoKey"], false, ["twoKey" => "b.c"]],
+            "emptyMap" => [["oneKey" => "a.b"], [], true, ["oneKey" => "a.b"]],
+            "removeElements" => [["oneKey" => "a.b", "twoKey" => "b.c"], ["twoKey" => null], true, ["oneKey" => "a.b"]],
+            "replaceEmptyKey" => [["oneKey" => "a.b", "twoKey" => "b.c"], ["threeKey"], false, ["threeKey" => null]],
+            "addEmptyKey" => [
+                ["oneKey" => "a.b", "twoKey" => "b.c"],
+                ["threeKey"],
                 true,
-                ['oneKey' => 'a.b'],
-            ],
-            'removeElements' => [
-                ['oneKey' => 'a.b', 'twoKey' => 'b.c'],
-                ['twoKey' => null],
-                true,
-                ['oneKey' => 'a.b'],
-            ],
-            'replaceEmptyKey' => [
-                ['oneKey' => 'a.b', 'twoKey' => 'b.c'],
-                ['threeKey'],
-                false,
-                ['threeKey' => null],
-            ],
-            'addEmptyKey' => [
-                ['oneKey' => 'a.b', 'twoKey' => 'b.c'],
-                ['threeKey'],
-                true,
-                ['threeKey' => null, 'oneKey' => 'a.b', 'twoKey' => 'b.c'],
+                ["threeKey" => null, "oneKey" => "a.b", "twoKey" => "b.c"],
             ],
         ];
 

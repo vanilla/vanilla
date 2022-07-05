@@ -15,8 +15,8 @@ use Vanilla\Webhooks\Models\WebhookModel;
 /**
  * Controller for oauth2 settings.
  */
-class OAuth2SettingsController extends SettingsController {
-
+class OAuth2SettingsController extends SettingsController
+{
     /** @var Gdn_Request */
     private $request;
 
@@ -25,9 +25,8 @@ class OAuth2SettingsController extends SettingsController {
      *
      * @param Gdn_Request $request
      */
-    public function __construct(
-        Gdn_Request $request
-    ) {
+    public function __construct(Gdn_Request $request)
+    {
         parent::__construct();
         $this->request = $request;
     }
@@ -37,9 +36,10 @@ class OAuth2SettingsController extends SettingsController {
      *
      * @param string $path Any path.
      */
-    public function index(string $path = null) {
-        $this->permission('Garden.Settings.Manage');
-        $this->setHighlightRoute('oauth2-settings');
+    public function index(string $path = null)
+    {
+        $this->permission("Garden.Settings.Manage");
+        $this->setHighlightRoute("oauth2-settings");
         $this->title(t("OAuth2"));
 
         $this->render();

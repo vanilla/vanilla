@@ -12,16 +12,17 @@ use PHPMailer\PHPMailer\PHPMailer;
 /**
  * Shim class used for backward compatibility.
  */
-class VanillaMailer extends PHPMailer {
-
+class VanillaMailer extends PHPMailer
+{
     /**
      * Either set or get the value of "throwExceptions".
      *
      * @param bool $newValue Whether this instance should throw exceptions or not
      * @return bool The current value
      */
-    public function throwExceptions($newValue = null) {
-        deprecated('throwExceptions', 'getThrowExceptions/setThrowExceptions');
+    public function throwExceptions($newValue = null)
+    {
+        deprecated("throwExceptions", "getThrowExceptions/setThrowExceptions");
         if ($newValue !== null) {
             $this->exceptions = $newValue;
         }
@@ -33,7 +34,8 @@ class VanillaMailer extends PHPMailer {
      *
      * @return bool Is this instance set to throw exceptions or not.
      */
-    public function getThrowExceptions() {
+    public function getThrowExceptions()
+    {
         return $this->exceptions;
     }
 
@@ -43,8 +45,9 @@ class VanillaMailer extends PHPMailer {
      * @param bool $newValue The new value to set.
      * @return VanillaMailer
      */
-    public function setThrowExceptions($newValue) {
-        $this->exceptions = (bool)$newValue;
+    public function setThrowExceptions($newValue)
+    {
+        $this->exceptions = (bool) $newValue;
 
         return $this;
     }
@@ -54,8 +57,9 @@ class VanillaMailer extends PHPMailer {
      *
      * @return int
      */
-    public function countRecipients() {
-        deprecated('countRecipients', 'count($phpMailer->getAllRecipientAddresses())');
+    public function countRecipients()
+    {
+        deprecated("countRecipients", 'count($phpMailer->getAllRecipientAddresses())');
         return count($this->getAllRecipientAddresses());
     }
 
@@ -67,18 +71,14 @@ class VanillaMailer extends PHPMailer {
      * @param \PHPMailer\PHPMailer\Exception $e
      * @return bool
      */
-    public function isServerError(\PHPMailer\PHPMailer\Exception $e) {
-        $serverErrorMessages = [
-            'connect_host',
-            'data_not_accepted',
-            'smtp_connect_failed',
-            'execute',
-        ];
+    public function isServerError(\PHPMailer\PHPMailer\Exception $e)
+    {
+        $serverErrorMessages = ["connect_host", "data_not_accepted", "smtp_connect_failed", "execute"];
 
         foreach ($serverErrorMessages as $errorMessage) {
-           if (strpos($e->getMessage(), $this->lang($errorMessage)) !== false) {
-               return true;
-           }
+            if (strpos($e->getMessage(), $this->lang($errorMessage)) !== false) {
+                return true;
+            }
         }
 
         return false;

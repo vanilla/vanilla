@@ -10,14 +10,14 @@ use Vanilla\Web\CurlWrapper;
 /**
  * Class FacebookPlugin
  */
-class FacebookPlugin extends SSOAddon {
-
-    const API_VERSION = '2.7';
+class FacebookPlugin extends SSOAddon
+{
+    const API_VERSION = "2.7";
 
     /** Authentication table key. */
-    const PROVIDER_KEY = 'Facebook';
+    const PROVIDER_KEY = "Facebook";
 
-    private const AUTHENTICATION_SCHEME = 'facebook';
+    private const AUTHENTICATION_SCHEME = "facebook";
 
     /** @var string  */
     protected $_AccessToken = null;
@@ -33,7 +33,8 @@ class FacebookPlugin extends SSOAddon {
      *
      * @param SsoUtils $ssoUtils
      */
-    public function __construct(SsoUtils $ssoUtils) {
+    public function __construct(SsoUtils $ssoUtils)
+    {
         parent::__construct();
         $this->ssoUtils = $ssoUtils;
     }
@@ -43,7 +44,8 @@ class FacebookPlugin extends SSOAddon {
      *
      * @return string The AuthenticationSchemeAlias.
      */
-    protected function getAuthenticationSchemeAlias(): string {
+    protected function getAuthenticationSchemeAlias(): string
+    {
         return self::AUTHENTICATION_SCHEME;
     }
 
@@ -52,14 +54,15 @@ class FacebookPlugin extends SSOAddon {
      *
      * @return bool|mixed|null
      */
-    public function accessToken() {
+    public function accessToken()
+    {
         if (!$this->isConfigured()) {
             return false;
         }
 
         if ($this->_AccessToken === null) {
             if (Gdn::session()->isValid()) {
-                $this->_AccessToken = valr(self::PROVIDER_KEY.'.AccessToken', Gdn::session()->User->Attributes);
+                $this->_AccessToken = valr(self::PROVIDER_KEY . ".AccessToken", Gdn::session()->User->Attributes);
             } else {
                 $this->_AccessToken = false;
             }
@@ -73,7 +76,8 @@ class FacebookPlugin extends SSOAddon {
      *
      * @param bool $query
      */
-    public function authorize($query = false) {
+    public function authorize($query = false)
+    {
         $uri = $this->authorizeUri($query);
         redirectTo($uri, 302, false);
     }
@@ -87,21 +91,22 @@ class FacebookPlugin extends SSOAddon {
      * @return string|array Response from the API.
      * @throws Gdn_UserException
      */
-    public function api($path, $post = false) {
+    public function api($path, $post = false)
+    {
         // Build the url.
-        $url = 'https://graph.facebook.com/v'.self::API_VERSION.'/'.ltrim($path, '/');
+        $url = "https://graph.facebook.com/v" . self::API_VERSION . "/" . ltrim($path, "/");
         $accessToken = $this->accessToken();
         if (!$accessToken) {
             throw new Gdn_UserException("You don't have a valid Facebook connection.");
         }
 
-        if (strpos($url, '?') === false) {
-            $url .= '?';
+        if (strpos($url, "?") === false) {
+            $url .= "?";
         } else {
-            $url .= '&';
+            $url .= "&";
         }
 
-        $url .= 'access_token='.urlencode($accessToken);
+        $url .= "access_token=" . urlencode($accessToken);
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_HEADER, false);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -122,14 +127,14 @@ class FacebookPlugin extends SSOAddon {
         $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
         curl_close($ch);
 
-        Gdn::controller()->setJson('Type', $contentType);
+        Gdn::controller()->setJson("Type", $contentType);
 
-        if (strpos($contentType, 'javascript') !== false) {
+        if (strpos($contentType, "javascript") !== false) {
             $result = json_decode($response, true);
 
-            if (isset($result['error'])) {
-                Gdn::dispatcher()->passData('FacebookResponse', $result);
-                throw new Gdn_UserException($result['error']['message']);
+            if (isset($result["error"])) {
+                Gdn::dispatcher()->passData("FacebookResponse", $result);
+                throw new Gdn_UserException($result["error"]["message"]);
             }
         } else {
             $result = $response;
@@ -144,22 +149,23 @@ class FacebookPlugin extends SSOAddon {
      * @param Gdn_Controller $sender
      * @param array $args
      */
-    public function entryController_signIn_handler($sender, $args) {
+    public function entryController_signIn_handler($sender, $args)
+    {
         if (!$this->socialSignIn()) {
             return;
         }
 
-        if (isset($sender->Data['Methods'])) {
+        if (isset($sender->Data["Methods"])) {
             // pass the relative path, socialSigninButton handles the URL.
-            $url = '/entry/facebook';
+            $url = "/entry/facebook";
 
             // Add the facebook method to the controller.
             $fbMethod = [
-                'Name' => self::PROVIDER_KEY,
-                'SignInHtml' => socialSigninButton('Facebook', $url, 'button')
+                "Name" => self::PROVIDER_KEY,
+                "SignInHtml" => socialSigninButton("Facebook", $url, "button"),
             ];
 
-            $sender->Data['Methods'][] = $fbMethod;
+            $sender->Data["Methods"][] = $fbMethod;
         }
     }
 
@@ -169,7 +175,8 @@ class FacebookPlugin extends SSOAddon {
      * @param Gdn_Controller $sender
      * @param array $args
      */
-    public function base_afterReactions_handler($sender, $args) {
+    public function base_afterReactions_handler($sender, $args)
+    {
         if (!$this->socialReactions()) {
             return;
         }
@@ -191,7 +198,7 @@ class FacebookPlugin extends SSOAddon {
             return;
         }
 
-        echo Gdn_Theme::bulletItem('Share');
+        echo Gdn_Theme::bulletItem("Share");
         $this->addReactButton($url);
     }
 
@@ -200,15 +207,16 @@ class FacebookPlugin extends SSOAddon {
      *
      * @param string $url
      */
-    private function addReactButton(string $url) {
+    private function addReactButton(string $url)
+    {
         $query = http_build_query(["u" => $url]);
         $sharingUrl = "https://www.facebook.com/sharer/sharer.php?{$query}";
 
         echo anchor(
-            sprite('ReactFacebook', 'Sprite ReactSprite', t('Share on Facebook')),
+            sprite("ReactFacebook", "Sprite ReactSprite", t("Share on Facebook")),
             url($sharingUrl, true),
-            'ReactButton PopupWindow',
-            ['rel' => 'nofollow', 'role' => 'button']
+            "ReactButton PopupWindow",
+            ["rel" => "nofollow", "role" => "button"]
         );
     }
 
@@ -218,12 +226,13 @@ class FacebookPlugin extends SSOAddon {
      * @param Gdn_Controller $sender
      * @param array $args
      */
-    public function base_signInIcons_handler($sender, $args) {
+    public function base_signInIcons_handler($sender, $args)
+    {
         if (!$this->socialSignIn()) {
             return;
         }
 
-        echo "\n".$this->_getButton();
+        echo "\n" . $this->_getButton();
     }
 
     /**
@@ -232,12 +241,13 @@ class FacebookPlugin extends SSOAddon {
      * @param Gdn_Controller $sender
      * @param array $args
      */
-    public function base_beforeSignInButton_handler($sender, $args) {
+    public function base_beforeSignInButton_handler($sender, $args)
+    {
         if (!$this->socialSignIn()) {
             return;
         }
 
-        echo "\n".$this->_getButton();
+        echo "\n" . $this->_getButton();
     }
 
     /**
@@ -245,13 +255,14 @@ class FacebookPlugin extends SSOAddon {
      *
      * @param Gdn_Controller $sender
      */
-    public function base_beforeSignInLink_handler($sender) {
+    public function base_beforeSignInLink_handler($sender)
+    {
         if (!$this->socialSignIn()) {
             return;
         }
 
         if (!Gdn::session()->isValid()) {
-            echo "\n".wrap($this->_getButton(), 'li', ['class' => 'Connect FacebookConnect']);
+            echo "\n" . wrap($this->_getButton(), "li", ["class" => "Connect FacebookConnect"]);
         }
     }
 
@@ -261,18 +272,19 @@ class FacebookPlugin extends SSOAddon {
      * @param Gdn_Controller $sender
      * @param array $args
      */
-    public function base_getConnections_handler($sender, $args) {
-        $profile = valr('User.Attributes.'.self::PROVIDER_KEY.'.Profile', $args);
+    public function base_getConnections_handler($sender, $args)
+    {
+        $profile = valr("User.Attributes." . self::PROVIDER_KEY . ".Profile", $args);
 
         $sender->Data["Connections"][self::PROVIDER_KEY] = [
-            'Icon' => $this->getWebResource('icon.png', '/'),
-            'Name' => 'Facebook',
-            'ProviderKey' => self::PROVIDER_KEY,
-            'ConnectUrl' => $this->authorizeUri(false, self::profileConnectUrl()),
-            'Profile' => [
-                'Name' => val('name', $profile),
-                'Photo' => "//graph.facebook.com/{$profile['id']}/picture?width=200&height=200"
-            ]
+            "Icon" => $this->getWebResource("icon.png", "/"),
+            "Name" => "Facebook",
+            "ProviderKey" => self::PROVIDER_KEY,
+            "ConnectUrl" => $this->authorizeUri(false, self::profileConnectUrl()),
+            "Profile" => [
+                "Name" => val("name", $profile),
+                "Photo" => "//graph.facebook.com/{$profile["id"]}/picture?width=200&height=200",
+            ],
         ];
     }
 
@@ -286,15 +298,16 @@ class FacebookPlugin extends SSOAddon {
      *
      * @throws Gdn_UserException
      */
-    public function profileController_facebookConnect_create($sender, $userReference, $username, $code = false) {
-        $sender->permission('Garden.SignIn.Allow');
+    public function profileController_facebookConnect_create($sender, $userReference, $username, $code = false)
+    {
+        $sender->permission("Garden.SignIn.Allow");
 
-        $state = json_decode(Gdn::request()->get('state', ''), true);
-        $suppliedStateToken = val('token', $state);
-        $this->ssoUtils->verifyStateToken('facebookSocial', $suppliedStateToken);
+        $state = json_decode(Gdn::request()->get("state", ""), true);
+        $suppliedStateToken = val("token", $state);
+        $this->ssoUtils->verifyStateToken("facebookSocial", $suppliedStateToken);
 
-        $sender->getUserInfo($userReference, $username, '', true);
-        $sender->_setBreadcrumbs(t('Connections'), '/profile/connections');
+        $sender->getUserInfo($userReference, $username, "", true);
+        $sender->_setBreadcrumbs(t("Connections"), "/profile/connections");
 
         // Get the access token.
         $accessToken = $this->getAccessToken($code, self::profileConnectUrl());
@@ -304,20 +317,21 @@ class FacebookPlugin extends SSOAddon {
 
         // Save the authentication.
         Gdn::userModel()->saveAuthentication([
-            'UserID' => $sender->User->UserID,
-            'Provider' => self::PROVIDER_KEY,
-            'UniqueID' => $profile['id']]);
+            "UserID" => $sender->User->UserID,
+            "Provider" => self::PROVIDER_KEY,
+            "UniqueID" => $profile["id"],
+        ]);
 
         // Save the information as attributes.
         $attributes = [
-            'AccessToken' => $accessToken,
-            'Profile' => $profile
+            "AccessToken" => $accessToken,
+            "Profile" => $profile,
         ];
         Gdn::userModel()->saveAttribute($sender->User->UserID, self::PROVIDER_KEY, $attributes);
 
-        $this->EventArguments['Provider'] = self::PROVIDER_KEY;
-        $this->EventArguments['User'] = $sender->User;
-        $this->fireEvent('AfterConnection');
+        $this->EventArguments["Provider"] = self::PROVIDER_KEY;
+        $this->EventArguments["User"] = $sender->User;
+        $this->fireEvent("AfterConnection");
 
         redirectTo(self::profileConnectUrl());
     }
@@ -327,10 +341,11 @@ class FacebookPlugin extends SSOAddon {
      *
      * @return string
      */
-    private function _getButton() {
+    private function _getButton()
+    {
         // pass the relative path, socialSigninButton handles the URL.
-        $url = '/entry/facebook';
-        return socialSigninButton('Facebook', $url, 'icon', ['rel' => 'nofollow']);
+        $url = "/entry/facebook";
+        return socialSigninButton("Facebook", $url, "icon", ["rel" => "nofollow"]);
     }
 
     /**
@@ -339,32 +354,33 @@ class FacebookPlugin extends SSOAddon {
      * @param $sender
      * @param $args
      */
-    public function socialController_facebook_create($sender, $args) {
-        $sender->permission('Garden.Settings.Manage');
+    public function socialController_facebook_create($sender, $args)
+    {
+        $sender->permission("Garden.Settings.Manage");
         if ($sender->Form->authenticatedPostBack()) {
             $settings = [
-                'Plugins.Facebook.ApplicationID' => trim($sender->Form->getFormValue('ApplicationID')),
-                'Plugins.Facebook.Secret' => trim($sender->Form->getFormValue('Secret')),
-                'Plugins.Facebook.UseFacebookNames' => $sender->Form->getFormValue('UseFacebookNames'),
-                'Plugins.Facebook.SocialSignIn' => $sender->Form->getFormValue('SocialSignIn'),
-                'Plugins.Facebook.SocialReactions' => $sender->Form->getFormValue('SocialReactions'),
-                'Garden.Registration.SendConnectEmail' => $sender->Form->getFormValue('SendConnectEmail')];
+                "Plugins.Facebook.ApplicationID" => trim($sender->Form->getFormValue("ApplicationID")),
+                "Plugins.Facebook.Secret" => trim($sender->Form->getFormValue("Secret")),
+                "Plugins.Facebook.UseFacebookNames" => $sender->Form->getFormValue("UseFacebookNames"),
+                "Plugins.Facebook.SocialSignIn" => $sender->Form->getFormValue("SocialSignIn"),
+                "Plugins.Facebook.SocialReactions" => $sender->Form->getFormValue("SocialReactions"),
+                "Garden.Registration.SendConnectEmail" => $sender->Form->getFormValue("SendConnectEmail"),
+            ];
 
             saveToConfig($settings);
             $sender->informMessage(t("Your settings have been saved."));
-
         } else {
-            $sender->Form->setValue('ApplicationID', c('Plugins.Facebook.ApplicationID'));
-            $sender->Form->setValue('Secret', c('Plugins.Facebook.Secret'));
-            $sender->Form->setValue('UseFacebookNames', c('Plugins.Facebook.UseFacebookNames'));
-            $sender->Form->setValue('SendConnectEmail', c('Garden.Registration.SendConnectEmail', false));
-            $sender->Form->setValue('SocialSignIn', c('Plugins.Facebook.SocialSignIn', true));
-            $sender->Form->setValue('SocialReactions', $this->socialReactions());
+            $sender->Form->setValue("ApplicationID", c("Plugins.Facebook.ApplicationID"));
+            $sender->Form->setValue("Secret", c("Plugins.Facebook.Secret"));
+            $sender->Form->setValue("UseFacebookNames", c("Plugins.Facebook.UseFacebookNames"));
+            $sender->Form->setValue("SendConnectEmail", c("Garden.Registration.SendConnectEmail", false));
+            $sender->Form->setValue("SocialSignIn", c("Plugins.Facebook.SocialSignIn", true));
+            $sender->Form->setValue("SocialReactions", $this->socialReactions());
         }
 
-        $sender->setHighlightRoute('dashboard/social');
-        $sender->setData('Title', t('Facebook Settings'));
-        $sender->render('Settings', '', 'plugins/Facebook');
+        $sender->setHighlightRoute("dashboard/social");
+        $sender->setData("Title", t("Facebook Settings"));
+        $sender->render("Settings", "", "plugins/Facebook");
     }
 
     /**
@@ -373,28 +389,32 @@ class FacebookPlugin extends SSOAddon {
      * @param Gdn_Controller $sender
      * @param array $args
      */
-    public function base_connectData_handler($sender, $args) {
-        if (val(0, $args) != 'facebook') {
+    public function base_connectData_handler($sender, $args)
+    {
+        if (val(0, $args) != "facebook") {
             return;
         }
 
-        $state = json_decode(Gdn::request()->get('state', ''), true);
-        $suppliedStateToken = val('token', $state);
-        $this->ssoUtils->verifyStateToken('facebook', $suppliedStateToken);
+        $state = json_decode(Gdn::request()->get("state", ""), true);
+        $suppliedStateToken = val("token", $state);
+        $this->ssoUtils->verifyStateToken("facebook", $suppliedStateToken);
 
-        if (isset($_GET['error'])) { // TODO global nope x2
-            throw new Gdn_UserException(val('error_description', $_GET, t('There was an error connecting to Facebook')));
+        if (isset($_GET["error"])) {
+            // TODO global nope x2
+            throw new Gdn_UserException(
+                val("error_description", $_GET, t("There was an error connecting to Facebook"))
+            );
         }
 
-        $code = val('code', $_GET); // TODO nope
-        $query = '';
-        if ($sender->Request->get('display')) {
-            $query = 'display='.urlencode($sender->Request->get('display'));
+        $code = val("code", $_GET); // TODO nope
+        $query = "";
+        if ($sender->Request->get("display")) {
+            $query = "display=" . urlencode($sender->Request->get("display"));
         }
 
-        $redirectUri = concatSep('&', $this->redirectUri(), $query);
+        $redirectUri = concatSep("&", $this->redirectUri(), $query);
 
-        $accessToken = $sender->Form->getFormValue('AccessToken');
+        $accessToken = $sender->Form->getFormValue("AccessToken");
 
         // Get the access token.
         if (!$accessToken && $code) {
@@ -415,47 +435,51 @@ class FacebookPlugin extends SSOAddon {
                 if ($sender->deliveryType() == DELIVERY_TYPE_ALL) {
                     redirectTo($this->authorizeUri(), 302, false);
                 } else {
-                    $sender->setHeader('Content-type', 'application/json');
+                    $sender->setHeader("Content-type", "application/json");
                     $sender->deliveryMethod(DELIVERY_METHOD_JSON);
                     $sender->setRedirectTo($this->authorizeUri(), false);
                 }
             } else {
-                $sender->Form->addError('There was an error with the Facebook connection.');
+                $sender->Form->addError("There was an error with the Facebook connection.");
             }
         }
 
         // This isn't a trusted connection. Don't allow it to automatically connect a user account.
-        saveToConfig('Garden.Registration.AutoConnect', false, false);
+        saveToConfig("Garden.Registration.AutoConnect", false, false);
 
         $form = $sender->Form; //new gdn_Form();
-        $iD = val('id', $profile);
-        $form->setFormValue('UniqueID', $iD);
-        $form->setFormValue('Provider', self::PROVIDER_KEY);
-        $form->setFormValue('ProviderName', 'Facebook');
-        $form->setFormValue('FullName', val('name', $profile));
-        $form->setFormValue('Email', val('email', $profile));
-        $form->setFormValue('Photo', "//graph.facebook.com/{$iD}/picture?width=200&height=200");
-        $form->setFormValue('Target', val('target', $state, '/'));
-        $form->addHidden('AccessToken', $accessToken);
+        $iD = val("id", $profile);
+        $form->setFormValue("UniqueID", $iD);
+        $form->setFormValue("Provider", self::PROVIDER_KEY);
+        $form->setFormValue("ProviderName", "Facebook");
+        $form->setFormValue("FullName", val("name", $profile));
+        $form->setFormValue("Email", val("email", $profile));
+        $form->setFormValue("Photo", "//graph.facebook.com/{$iD}/picture?width=200&height=200");
+        $form->setFormValue("Target", val("target", $state, "/"));
+        $form->addHidden("AccessToken", $accessToken);
 
-        if (c('Plugins.Facebook.UseFacebookNames')) {
-            $form->setFormValue('Name', val('name', $profile));
-            saveToConfig([
-                'Garden.User.ValidationRegex' => UserModel::USERNAME_REGEX_MIN,
-                'Garden.User.ValidationLength' => '{3,50}',
-                'Garden.Registration.NameUnique' => false
-            ], '', false);
+        if (c("Plugins.Facebook.UseFacebookNames")) {
+            $form->setFormValue("Name", val("name", $profile));
+            saveToConfig(
+                [
+                    "Garden.User.ValidationRegex" => UserModel::USERNAME_REGEX_MIN,
+                    "Garden.User.ValidationLength" => "{3,50}",
+                    "Garden.Registration.NameUnique" => false,
+                ],
+                "",
+                false
+            );
         }
 
         // Save some original data in the attributes of the connection for later API calls.
         $attributes = [];
         $attributes[self::PROVIDER_KEY] = [
-            'AccessToken' => $accessToken,
-            'Profile' => $profile
+            "AccessToken" => $accessToken,
+            "Profile" => $profile,
         ];
-        $form->setFormValue('Attributes', $attributes);
+        $form->setFormValue("Attributes", $attributes);
 
-        $sender->setData('Verified', true);
+        $sender->setData("Verified", true);
     }
 
     /**
@@ -468,14 +492,16 @@ class FacebookPlugin extends SSOAddon {
      * @return mixed
      * @throws Gdn_UserException
      */
-    protected function getAccessToken($code, $redirectUri, $throwError = true) {
+    protected function getAccessToken($code, $redirectUri, $throwError = true)
+    {
         $get = [
-            'client_id' => c('Plugins.Facebook.ApplicationID'),
-            'client_secret' => c('Plugins.Facebook.Secret'),
-            'code' => $code,
-            'redirect_uri' => $redirectUri];
+            "client_id" => c("Plugins.Facebook.ApplicationID"),
+            "client_secret" => c("Plugins.Facebook.Secret"),
+            "code" => $code,
+            "redirect_uri" => $redirectUri,
+        ];
 
-        $url = 'https://graph.facebook.com/oauth/access_token?'.http_build_query($get);
+        $url = "https://graph.facebook.com/oauth/access_token?" . http_build_query($get);
 
         // Get the redirect URI.
         $c = curl_init();
@@ -486,19 +512,22 @@ class FacebookPlugin extends SSOAddon {
 
         $contents = CurlWrapper::curlExec($c, false);
         $info = curl_getinfo($c);
-        if (strpos(val('content_type', $info, ''), '/javascript') !== false) {
+        if (strpos(val("content_type", $info, ""), "/javascript") !== false) {
             $tokens = json_decode($contents, true);
-        } else if (strpos(val('content_type', $info, ''), '/json') !== false) {
+        } elseif (strpos(val("content_type", $info, ""), "/json") !== false) {
             $tokens = json_decode($contents, true);
         } else {
             parse_str($contents, $tokens);
         }
 
-        if (val('error', $tokens)) {
-            throw new Gdn_UserException('Facebook returned the following error: '.valr('error.message', $tokens, 'Unknown error.'), 400);
+        if (val("error", $tokens)) {
+            throw new Gdn_UserException(
+                "Facebook returned the following error: " . valr("error.message", $tokens, "Unknown error."),
+                400
+            );
         }
 
-        $accessToken = val('access_token', $tokens);
+        $accessToken = val("access_token", $tokens);
         return $accessToken;
     }
 
@@ -508,7 +537,8 @@ class FacebookPlugin extends SSOAddon {
      * @param $accessToken
      * @return mixed
      */
-    public function getProfile($accessToken) {
+    public function getProfile($accessToken)
+    {
         $url = "https://graph.facebook.com/me?access_token=$accessToken&fields=name,id,email";
         $c = curl_init();
         curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
@@ -529,12 +559,13 @@ class FacebookPlugin extends SSOAddon {
      *
      * @return string URL.
      */
-    public function authorizeUri($query = false, $redirectUri = false) {
-        $appID = c('Plugins.Facebook.ApplicationID');
-        $fBScope = c('Plugins.Facebook.Scope', 'email');
+    public function authorizeUri($query = false, $redirectUri = false)
+    {
+        $appID = c("Plugins.Facebook.ApplicationID");
+        $fBScope = c("Plugins.Facebook.Scope", "email");
 
         if (is_array($fBScope)) {
-            $scopes = implode(',', $fBScope);
+            $scopes = implode(",", $fBScope);
         } else {
             $scopes = $fBScope;
         }
@@ -544,22 +575,22 @@ class FacebookPlugin extends SSOAddon {
         }
 
         if ($query) {
-            $redirectUri .= (stripos($redirectUri, '?') === false) ? '?' : '&' .$query;
+            $redirectUri .= stripos($redirectUri, "?") === false ? "?" : "&" . $query;
         }
 
         // Get a state token.
         $stateToken = $this->ssoUtils->getStateToken();
 
         $authQuery = http_build_query([
-            'client_id' => $appID,
-            'redirect_uri' => $redirectUri,
-            'scope' => $scopes,
-            'state' => json_encode(['token' => $stateToken, 'target' => $this->getTargetUri()]),
+            "client_id" => $appID,
+            "redirect_uri" => $redirectUri,
+            "scope" => $scopes,
+            "state" => json_encode(["token" => $stateToken, "target" => $this->getTargetUri()]),
         ]);
         $signinHref = "https://graph.facebook.com/oauth/authorize?{$authQuery}";
 
         if ($query) {
-            $signinHref .= '&'.$query;
+            $signinHref .= "&" . $query;
         }
 
         return $signinHref;
@@ -572,16 +603,17 @@ class FacebookPlugin extends SSOAddon {
      *
      * @return null|string URL.
      */
-    public function redirectUri($newValue = null) {
+    public function redirectUri($newValue = null)
+    {
         if ($newValue !== null) {
             $this->_RedirectUri = $newValue;
         } elseif ($this->_RedirectUri === null) {
-            $redirectUri = url('/entry/connect/facebook', true);
-            if (strpos($redirectUri, '=') !== false) {
-                $p = strrchr($redirectUri, '=');
+            $redirectUri = url("/entry/connect/facebook", true);
+            if (strpos($redirectUri, "=") !== false) {
+                $p = strrchr($redirectUri, "=");
                 $uri = substr($redirectUri, 0, -strlen($p));
-                $p = urlencode(ltrim($p, '='));
-                $redirectUri = $uri.'='.$p;
+                $p = urlencode(ltrim($p, "="));
+                $redirectUri = $uri . "=" . $p;
             }
             $this->_RedirectUri = $redirectUri;
         }
@@ -594,10 +626,11 @@ class FacebookPlugin extends SSOAddon {
      *
      * @return mixed|string
      */
-    public function getTargetUri() {
-        $target = Gdn::request()->getValueFrom(Gdn_Request::INPUT_GET, 'Target', Gdn::request()->getPath());
-        if (ltrim($target, '/') == 'entry/signin' || ltrim($target, '/') == 'entry/facebook') {
-            $target = '/';
+    public function getTargetUri()
+    {
+        $target = Gdn::request()->getValueFrom(Gdn_Request::INPUT_GET, "Target", Gdn::request()->getPath());
+        if (ltrim($target, "/") == "entry/signin" || ltrim($target, "/") == "entry/facebook") {
+            $target = "/";
         }
         return $target;
     }
@@ -607,8 +640,9 @@ class FacebookPlugin extends SSOAddon {
      *
      * @return string URL.
      */
-    public static function profileConnectUrl() {
-        return url('entry/connect/facebook', true);
+    public static function profileConnectUrl()
+    {
+        return url("entry/connect/facebook", true);
     }
 
     /**
@@ -616,9 +650,10 @@ class FacebookPlugin extends SSOAddon {
      *
      * @return bool
      */
-    public function isConfigured() {
-        $appID = c('Plugins.Facebook.ApplicationID');
-        $secret = c('Plugins.Facebook.Secret');
+    public function isConfigured()
+    {
+        $appID = c("Plugins.Facebook.ApplicationID");
+        $secret = c("Plugins.Facebook.Secret");
 
         if (!$appID || !$secret) {
             return false;
@@ -632,8 +667,9 @@ class FacebookPlugin extends SSOAddon {
      *
      * @return bool
      */
-    public function socialSignIn() {
-        return c('Plugins.Facebook.SocialSignIn', true) && $this->isConfigured();
+    public function socialSignIn()
+    {
+        return c("Plugins.Facebook.SocialSignIn", true) && $this->isConfigured();
     }
 
     /**
@@ -641,14 +677,16 @@ class FacebookPlugin extends SSOAddon {
      *
      * @return bool
      */
-    public function socialReactions(): bool {
-        return (bool)c('Plugins.Facebook.SocialReactions', true);
+    public function socialReactions(): bool
+    {
+        return (bool) c("Plugins.Facebook.SocialReactions", true);
     }
 
     /**
      * Create an entry/facebook endpoint that redirects to the authorization URI.
      */
-    public function entryController_facebook_create() {
+    public function entryController_facebook_create()
+    {
         redirectTo($this->authorizeUri(), 302, false);
     }
 
@@ -657,10 +695,11 @@ class FacebookPlugin extends SSOAddon {
      *
      * @throws Gdn_UserException
      */
-    public function setup() {
-        $error = '';
-        if (!function_exists('curl_init')) {
-            $error = concatSep("\n", $error, 'This plugin requires curl.');
+    public function setup()
+    {
+        $error = "";
+        if (!function_exists("curl_init")) {
+            $error = concatSep("\n", $error, "This plugin requires curl.");
         }
 
         if ($error) {
@@ -673,17 +712,18 @@ class FacebookPlugin extends SSOAddon {
     /**
      * Run on utility/update.
      */
-    public function structure() {
+    public function structure()
+    {
         // Save the facebook provider type.
         Gdn::sql()->replace(
-            'UserAuthenticationProvider',
+            "UserAuthenticationProvider",
             [
-                'AuthenticationSchemeAlias' => self::AUTHENTICATION_SCHEME,
-                'URL' => '...',
-                'AssociationSecret' => '...',
-                'AssociationHashMethod' => '...'
+                "AuthenticationSchemeAlias" => self::AUTHENTICATION_SCHEME,
+                "URL" => "...",
+                "AssociationSecret" => "...",
+                "AssociationHashMethod" => "...",
             ],
-            ['AuthenticationKey' => self::PROVIDER_KEY],
+            ["AuthenticationKey" => self::PROVIDER_KEY],
             true
         );
     }

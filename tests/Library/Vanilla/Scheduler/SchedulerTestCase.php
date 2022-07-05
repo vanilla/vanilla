@@ -8,86 +8,61 @@
 namespace VanillaTests\Library\Vanilla\Scheduler;
 
 use Garden\Container\Container;
-use Garden\Container\ContainerException;
-use Garden\Container\NotFoundException;
-use Garden\Container\Reference;
-use Garden\EventManager;
-use Gdn_Cache;
 use Gdn_Configuration;
-use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
-use Vanilla\Bootstrap;
-use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Logger;
 use Vanilla\Scheduler\Driver\LocalDriver;
-use Vanilla\Scheduler\DummyScheduler;
+use Vanilla\Scheduler\DeferredScheduler;
 use Vanilla\Scheduler\SchedulerInterface;
 use VanillaTests\EventSpyTestTrait;
-use VanillaTests\Fixtures\NullCache;
 use VanillaTests\SetsGeneratorTrait;
 use VanillaTests\SiteTestCase;
-use VanillaTests\SiteTestTrait;
 
 /**
  * Class SchedulerTestCase
  */
-class SchedulerTestCase extends SiteTestCase {
+class SchedulerTestCase extends SiteTestCase
+{
     use SetsGeneratorTrait;
     use EventSpyTestTrait;
-
-    const DISPATCH_EVENT = 'SchedulerDispatch';
-    const DISPATCHED_EVENT = 'SchedulerDispatched';
 
     /**
      * Use the dummy/deferred scheduler instead of the usual instant scheduler in tests.
      *
      * @param Container $container
      */
-    public static function configureContainerBeforeStartup(Container $container) {
+    public static function configureContainerBeforeStartup(Container $container)
+    {
         $container
             ->rule(SchedulerInterface::class)
-            ->setClass(DummyScheduler::class)
-            ->addCall('setFinalizeRequest', [false])
-            ->setShared(true)
-        ;
+            ->setClass(DeferredScheduler::class)
+            ->setShared(true);
     }
 
     /**
      * Cleanup some singletons between tests.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
+        // Enable caching and clear out our instance.
+        self::enableCaching();
+        self::container()->setInstance(SchedulerInterface::class, null);
 
         // Clear the scheduler between tests.
-        /** @var DummyScheduler $scheduler */
+        /** @var DeferredScheduler $scheduler */
         $scheduler = self::container()->get(SchedulerInterface::class);
         $scheduler->reset();
-        $this->getEventManager()->unbindAll();
-    }
-
-
-    /**
-     * Get a new, cleanly-configured container.
-     *
-     * @return Container
-     * @throws ContainerException On error.
-     * @throws NotFoundException On error.
-     */
-    protected function getConfiguredContainer(): Container {
-        $container = self::container();
 
         /** @var Gdn_Configuration $config */
-        $config = $container->get(Gdn_Configuration::class);
-        $config->set('Garden.Scheduler.CronMinimumTimeSpan', 0);
+        $config = self::container()->get(Gdn_Configuration::class);
+        $config->saveToConfig("Garden.Scheduler.CronMinimumTimeSpan", 0);
 
-        /** @var SchedulerInterface $dummyScheduler */
-        $dummyScheduler = $container->get(SchedulerInterface::class);
+        /** @var SchedulerInterface $deferredScheduler */
+        $deferredScheduler = self::container()->get(SchedulerInterface::class);
 
-        $bool = $dummyScheduler->addDriver(LocalDriver::class);
-        $this->assertTrue($bool);
-
-        return $container;
+        $deferredScheduler->addDriver(LocalDriver::class);
     }
 
     /**
@@ -95,16 +70,25 @@ class SchedulerTestCase extends SiteTestCase {
      *
      * @return Container
      */
-    protected function getEmptyContainer() {
+    protected function getEmptyContainer()
+    {
         $container = new Container();
         $container
             ->setInstance(ContainerInterface::class, $container)
             //
             ->rule(LoggerInterface::class)
             ->setClass(Logger::class)
-            ->setShared(true)
-        ;
+            ->setShared(true);
 
         return $container;
+    }
+
+    /**
+     * @return DeferredScheduler
+     */
+    public function getDeferredScheduler(): DeferredScheduler
+    {
+        $deferredScheduler = $this->container()->get(SchedulerInterface::class);
+        return $deferredScheduler;
     }
 }

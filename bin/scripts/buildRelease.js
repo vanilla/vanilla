@@ -49,7 +49,7 @@ async function run() {
     shell.cd(buildDir);
     shell.exec(`env version=${newVersion} ${PHING_PATH}`);
 
-    printTitle("Copying & Cleanup")
+    printTitle("Copying & Cleanup");
     const builtFile = path.join(buildDir, "vanilla.zip");
     if (!fs.existsSync(builtFile)) {
         console.error(`Build failed. Unable to locate built file at ${builtFile}`);
@@ -57,7 +57,7 @@ async function run() {
 
     const outDir = path.join(BUILD_DIR, "releases");
     if (!outDir) {
-        console.log(`Creating release directory at\n${chalk.yellow(outDir)}`)
+        console.log(`Creating release directory at\n${chalk.yellow(outDir)}`);
         shell.mkdir(outDir);
     }
 

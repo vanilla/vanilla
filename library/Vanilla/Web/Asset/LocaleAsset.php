@@ -13,7 +13,8 @@ use Vanilla\Contracts;
 /**
  * An asset representing a script containing data for a particular locale.
  */
-class LocaleAsset extends SiteAsset {
+class LocaleAsset extends SiteAsset
+{
     /** @var string */
     private $localeKey;
 
@@ -24,7 +25,8 @@ class LocaleAsset extends SiteAsset {
      * @param string $localeKey The key of the locale for the asset to represent.
      * @param string $cacheBustingKey A cache busting string..
      */
-    public function __construct(RequestInterface $request, string $localeKey, $cacheBustingKey = "") {
+    public function __construct(RequestInterface $request, string $localeKey, $cacheBustingKey = "")
+    {
         parent::__construct($request, $cacheBustingKey);
         $this->localeKey = $localeKey;
     }
@@ -32,11 +34,8 @@ class LocaleAsset extends SiteAsset {
     /**
      * @inheritdoc
      */
-    public function getWebPath(): string {
-        return $this->makeAssetPath(
-            '/api/v2/locales',
-            $this->localeKey,
-            'translations.js'
-        );
+    public function getWebPath(): string
+    {
+        return $this->makeAssetPath("/api/v2/locales", $this->localeKey, "translations.js");
     }
 }

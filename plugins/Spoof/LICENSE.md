@@ -1,16 +1,13 @@
-The GNU General Public License, Version 2, June 1991 (GPLv2)
-============================================================
+# The GNU General Public License, Version 2, June 1991 (GPLv2)
 
 > Copyright &copy; 1989, 1991 Free Software Foundation, Inc.
 > 59 Temple Place, Suite 330
-> Boston, MA  02111-1307 USA
+> Boston, MA 02111-1307 USA
 
 Everyone is permitted to copy and distribute verbatim copies of this license
 document, but changing it is not allowed.
 
-
-Preamble
---------
+## Preamble
 
 The licenses for most software are designed to take away your freedom to share
 and change it. By contrast, the GNU General Public License is intended to
@@ -57,9 +54,7 @@ use or not licensed at all.
 The precise terms and conditions for copying, distribution and modification
 follow.
 
-
-Terms And Conditions For Copying, Distribution And Modification
----------------------------------------------------------------
+## Terms And Conditions For Copying, Distribution And Modification
 
 **0.** This License applies to any program or other work which contains a notice
 placed by the copyright holder saying it may be distributed under the terms of
@@ -91,15 +86,15 @@ thus forming a work based on the Program, and copy and distribute such
 modifications or work under the terms of Section 1 above, provided that you also
 meet all of these conditions:
 
-*   **a)** You must cause the modified files to carry prominent notices stating
+-   **a)** You must cause the modified files to carry prominent notices stating
     that you changed the files and the date of any change.
 
-*   **b)** You must cause any work that you distribute or publish, that in whole
+-   **b)** You must cause any work that you distribute or publish, that in whole
     or in part contains or is derived from the Program or any part thereof, to
     be licensed as a whole at no charge to all third parties under the terms of
     this License.
 
-*   **c)** If the modified program normally reads commands interactively when
+-   **c)** If the modified program normally reads commands interactively when
     run, you must cause it, when started running for such interactive use in the
     most ordinary way, to print or display an announcement including an
     appropriate copyright notice and a notice that there is no warranty (or
@@ -132,17 +127,17 @@ License.
 Section 2) in object code or executable form under the terms of Sections 1 and 2
 above provided that you also do one of the following:
 
-*   **a)** Accompany it with the complete corresponding machine-readable source
+-   **a)** Accompany it with the complete corresponding machine-readable source
     code, which must be distributed under the terms of Sections 1 and 2 above on
     a medium customarily used for software interchange; or,
 
-*   **b)** Accompany it with a written offer, valid for at least three years, to
+-   **b)** Accompany it with a written offer, valid for at least three years, to
     give any third party, for a charge no more than your cost of physically
     performing source distribution, a complete machine-readable copy of the
     corresponding source code, to be distributed under the terms of Sections 1
     and 2 above on a medium customarily used for software interchange; or,
 
-*   **c)** Accompany it with the information you received as to the offer to
+-   **c)** Accompany it with the information you received as to the offer to
     distribute corresponding source code. (This alternative is allowed only for
     noncommercial distribution and only if you received the program in object
     code or executable form with such an offer, in accord with Subsection b
@@ -242,9 +237,7 @@ Our decision will be guided by the two goals of preserving the free status of
 all derivatives of our free software and of promoting the sharing and reuse of
 software generally.
 
-
-No Warranty
------------
+## No Warranty
 
 **11.** BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY FOR
 THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN OTHERWISE

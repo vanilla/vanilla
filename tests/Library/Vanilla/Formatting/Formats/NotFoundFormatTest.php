@@ -13,20 +13,22 @@ use VanillaTests\MinimalContainerTestCase;
 /**
  * Tests for the notfound format.
  */
-class NotFoundFormatTest extends MinimalContainerTestCase {
-
+class NotFoundFormatTest extends MinimalContainerTestCase
+{
     /**
      * @return bool
      */
-    protected static function useCommonBootstrap(): bool {
+    protected static function useCommonBootstrap(): bool
+    {
         return false;
     }
 
     /**
      * Make sure we can construct the format it dying.
      */
-    public function testNotFatal() {
-        $format = new NotFoundFormat('FAKE_FORMAT');
+    public function testNotFatal()
+    {
+        $format = new NotFoundFormat("FAKE_FORMAT");
         $this->assertInstanceOf(NotFoundFormat::class, $format);
     }
 
@@ -38,21 +40,23 @@ class NotFoundFormatTest extends MinimalContainerTestCase {
      *
      * @dataProvider methodTesterProvider
      */
-    public function testMethods(string $methodName, $expected) {
-        $format = new NotFoundFormat('FAKE_FORMAT');
+    public function testMethods(string $methodName, $expected)
+    {
+        $format = new NotFoundFormat("FAKE_FORMAT");
 
         if ($expected instanceof \Exception) {
             $this->expectException($expected);
-            $format->{$methodName}('');
+            $format->{$methodName}("");
         } else {
-            $this->assertEquals($expected, $format->{$methodName}(''));
+            $this->assertEquals($expected, $format->{$methodName}(""));
         }
     }
 
     /**
      * @return array
      */
-    public function methodTesterProvider(): array {
+    public function methodTesterProvider(): array
+    {
         $stringError = "No formatter is installed for the format FAKE_FORMAT";
         $htmlError = <<<HTML
 <div class='DismissMessage Warning userContent-error'>
@@ -65,14 +69,14 @@ class NotFoundFormatTest extends MinimalContainerTestCase {
 HTML;
 
         return [
-            ['renderHtml', $htmlError],
-            ['renderQuote', $htmlError],
-            ['renderExcerpt', $stringError],
-            ['renderPlainText', $stringError],
-            ['parseImageUrls', []],
-            ['parseHeadings', []],
-            ['parseAttachments', []],
-            ['parseMentions', []],
+            ["renderHtml", $htmlError],
+            ["renderQuote", $htmlError],
+            ["renderExcerpt", $stringError],
+            ["renderPlainText", $stringError],
+            ["parseImageUrls", []],
+            ["parseHeadings", []],
+            ["parseAttachments", []],
+            ["parseMentions", []],
         ];
     }
 }

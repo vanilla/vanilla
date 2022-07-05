@@ -35,3 +35,5 @@ export function UserSpotlightWidget(props: IProps) {
         </Widget>
     );
 }
+
+export default UserSpotlightWidget;

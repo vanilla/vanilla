@@ -13,18 +13,19 @@ use Vanilla\Database\Operation;
 /**
  * A processor that watches a status field for changes and sets audit information on other fields.
  */
-class StatusFieldProcessor implements Processor {
+class StatusFieldProcessor implements Processor
+{
     /** @var string */
-    private $statusField = 'status';
+    private $statusField = "status";
 
     /** @var string */
-    private $dateField = 'dateOfStatus';
+    private $dateField = "dateOfStatus";
 
     /** @var string */
-    private $userField = 'statusUserID';
+    private $userField = "statusUserID";
 
     /** @var string */
-    private $ipAddressField = 'statusIPAddress';
+    private $ipAddressField = "statusIPAddress";
 
     /** @var bool */
     private $setOnInsert = true;
@@ -45,7 +46,8 @@ class StatusFieldProcessor implements Processor {
      * @param \Gdn_Request $request
      * @param \Gdn_Session $session
      */
-    public function __construct(\Gdn_Request $request, \Gdn_Session $session) {
+    public function __construct(\Gdn_Request $request, \Gdn_Session $session)
+    {
         $this->request = $request;
         $this->session = $session;
     }
@@ -55,7 +57,8 @@ class StatusFieldProcessor implements Processor {
      *
      * @return string
      */
-    public function getDateField(): string {
+    public function getDateField(): string
+    {
         return $this->dateField;
     }
 
@@ -65,7 +68,8 @@ class StatusFieldProcessor implements Processor {
      * @param string $dateField
      * @return self
      */
-    public function setDateField(string $dateField): self {
+    public function setDateField(string $dateField): self
+    {
         $this->dateField = $dateField;
         return $this;
     }
@@ -75,7 +79,8 @@ class StatusFieldProcessor implements Processor {
      *
      * @return string
      */
-    public function getUserIDField(): string {
+    public function getUserIDField(): string
+    {
         return $this->userField;
     }
 
@@ -85,7 +90,8 @@ class StatusFieldProcessor implements Processor {
      * @param string $userField
      * @return self
      */
-    public function setUserField(string $userField): self {
+    public function setUserField(string $userField): self
+    {
         $this->userField = $userField;
         return $this;
     }
@@ -93,7 +99,8 @@ class StatusFieldProcessor implements Processor {
     /**
      * {@inheritDoc}
      */
-    public function handle(Operation $operation, callable $stack) {
+    public function handle(Operation $operation, callable $stack)
+    {
         switch ($operation->getType()) {
             case Operation::TYPE_INSERT:
                 if ($this->getSetOnInsert() || $operation->hasSetItem($this->getStatusField())) {
@@ -125,7 +132,8 @@ class StatusFieldProcessor implements Processor {
      *
      * @return bool
      */
-    public function getSetOnInsert(): bool {
+    public function getSetOnInsert(): bool
+    {
         return $this->setOnInsert;
     }
 
@@ -135,7 +143,8 @@ class StatusFieldProcessor implements Processor {
      * @param bool $setOnInsert
      * @return $this
      */
-    public function setSetOnInsert(bool $setOnInsert): self {
+    public function setSetOnInsert(bool $setOnInsert): self
+    {
         $this->setOnInsert = $setOnInsert;
         return $this;
     }
@@ -145,7 +154,8 @@ class StatusFieldProcessor implements Processor {
      *
      * @return string
      */
-    public function getStatusField(): string {
+    public function getStatusField(): string
+    {
         return $this->statusField;
     }
 
@@ -155,7 +165,8 @@ class StatusFieldProcessor implements Processor {
      * @param string $statusField
      * @return self
      */
-    public function setStatusField(string $statusField): self {
+    public function setStatusField(string $statusField): self
+    {
         $this->statusField = $statusField;
         return $this;
     }
@@ -165,7 +176,8 @@ class StatusFieldProcessor implements Processor {
      *
      * @param Operation $op
      */
-    private function setStatusFields(Operation $op) {
+    private function setStatusFields(Operation $op)
+    {
         if (!empty($this->getUserIDField()) && !$op->hasSetItem($this->userField)) {
             $op->setSetItem($this->userField, $this->session->UserID);
         }
@@ -182,7 +194,8 @@ class StatusFieldProcessor implements Processor {
      *
      * @return string
      */
-    public function getIpAddressField(): string {
+    public function getIpAddressField(): string
+    {
         return $this->ipAddressField;
     }
 
@@ -192,7 +205,8 @@ class StatusFieldProcessor implements Processor {
      * @param string $ipAddressField
      * @return self
      */
-    public function setIpAddressField(string $ipAddressField): self {
+    public function setIpAddressField(string $ipAddressField): self
+    {
         $this->ipAddressField = $ipAddressField;
         return $this;
     }
@@ -202,7 +216,8 @@ class StatusFieldProcessor implements Processor {
      *
      * @return string|null
      */
-    public function getCurrentIPAddress(): ?string {
+    public function getCurrentIPAddress(): ?string
+    {
         return $this->request->getIP();
     }
 
@@ -211,7 +226,8 @@ class StatusFieldProcessor implements Processor {
      *
      * @return int
      */
-    public function getCurrentUserID(): int {
+    public function getCurrentUserID(): int
+    {
         return $this->session->UserID;
     }
 }

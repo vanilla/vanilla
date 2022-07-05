@@ -12,7 +12,8 @@ use PHPUnit\Framework\TestCase;
 /**
  * Use this trait to get some comment model test boilerplate.
  */
-trait TestCommentModelTrait {
+trait TestCommentModelTrait
+{
     /**
      * @var \CommentModel
      */
@@ -21,7 +22,8 @@ trait TestCommentModelTrait {
     /**
      * Instantiate the comment model fixture.
      */
-    public function setUpTestCommentModel() {
+    public function setUpTestCommentModel()
+    {
         $this->commentModel = $this->container()->get(\CommentModel::class);
     }
 
@@ -32,15 +34,16 @@ trait TestCommentModelTrait {
      *
      * @return array
      */
-    public function newComment(array $override): array {
+    public function newComment(array $override): array
+    {
         static $i = 1;
 
         $r = $override + [
-                'DiscussionID' => 1,
-                'Body' => "Foo $i.",
-                'Format' => 'Text',
-                'DateInserted' => TestDate::mySqlDate(),
-            ];
+            "DiscussionID" => 1,
+            "Body" => "Foo $i.",
+            "Format" => "Text",
+            "DateInserted" => TestDate::mySqlDate(),
+        ];
 
         return $r;
     }
@@ -52,7 +55,8 @@ trait TestCommentModelTrait {
      * @param array $overrides An array of row overrides.
      * @return array
      */
-    protected function insertComments(int $count, array $overrides = []): array {
+    protected function insertComments(int $count, array $overrides = []): array
+    {
         $ids = [];
         $rows = [];
         for ($i = 0; $i < $count; $i++) {

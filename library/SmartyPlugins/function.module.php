@@ -13,10 +13,11 @@
  * @param object $smarty
  * @return string
  */
-function smarty_function_module($params, &$smarty) {
-    $name = val('name', $params);
-    unset($params['name']);
+function smarty_function_module($params, &$smarty)
+{
+    $name = val("name", $params);
+    unset($params["name"]);
 
     $result = Gdn_Theme::module($name, $params);
-	return $result;
+    return $result;
 }

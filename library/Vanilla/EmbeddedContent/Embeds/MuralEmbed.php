@@ -13,21 +13,23 @@ use Vanilla\EmbeddedContent\EmbedUtils;
 /**
  * Embed data object for Mural.
  */
-class MuralEmbed extends AbstractEmbed {
-
+class MuralEmbed extends AbstractEmbed
+{
     const TYPE = "mural";
 
     /**
      * @inheritdoc
      */
-    protected function getAllowedTypes(): array {
+    protected function getAllowedTypes(): array
+    {
         return [self::TYPE];
     }
 
     /**
      * @inheritdoc
      */
-    protected function schema(): Schema {
+    protected function schema(): Schema
+    {
         return Schema::parse([]);
     }
 }

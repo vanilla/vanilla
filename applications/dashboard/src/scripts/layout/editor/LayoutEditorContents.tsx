@@ -176,6 +176,26 @@ export class LayoutEditorContents {
     };
 
     /**
+     *  Update a widget at a specified path.
+     *
+     * @param destination The path the widget will be at after modification.
+     * @param widgetSpec The widget specification.
+     *
+     * @returns A new editor contents instance.
+     */
+    public modifyWidget = (destination: ILayoutEditorPath, widgetSpec: IEditableLayoutWidget): LayoutEditorContents => {
+        return this.modifyLayout((draft) => {
+            LayoutEditorPath.assertDestinationPath(destination);
+            const section = draft[destination.sectionIndex];
+            let region = section[destination.sectionRegion] ?? [];
+            region[destination.sectionRegionIndex ?? region.length] = widgetSpec;
+            section[destination.sectionRegion] = region;
+
+            return draft;
+        });
+    };
+
+    /**
      * Move a widget from one path to another.
      *
      * @param sourcePath The original path of the widget.

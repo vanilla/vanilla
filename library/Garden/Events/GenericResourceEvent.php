@@ -12,12 +12,13 @@ use Vanilla\Events\EventAction;
 /**
  * An event affecting a specific resource.
  */
-class GenericResourceEvent extends ResourceEvent {
-
+class GenericResourceEvent extends ResourceEvent
+{
     /**
      * @param string $type
      */
-    public function setType(string $type): void {
+    public function setType(string $type): void
+    {
         $this->type = $type;
     }
 }

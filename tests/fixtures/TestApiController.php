@@ -10,11 +10,13 @@ namespace VanillaTests\Fixtures;
 /**
  * A fixture for testing some of the basic controller functionality.
  */
-class TestApiController extends \AbstractApiController {
+class TestApiController extends \AbstractApiController
+{
     /**
      * {@inheritdoc}
      */
-    public function resolveExpandFieldsPublic(array $request, array $map, $field = 'expand') {
+    public function resolveExpandFieldsPublic(array $request, array $map, $field = "expand")
+    {
         return $this->resolveExpandFields($request, $map, $field);
     }
 }

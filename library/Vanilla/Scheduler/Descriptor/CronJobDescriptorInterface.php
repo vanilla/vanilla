@@ -10,8 +10,8 @@ namespace Vanilla\Scheduler\Descriptor;
 /**
  * Interface CronDescriptorInterface
  */
-interface CronJobDescriptorInterface extends JobDescriptorInterface {
-
+interface CronJobDescriptorInterface extends JobDescriptorInterface
+{
     /**
      * Returns a crontab like schedule definition. EX: "* * * * *"
      *

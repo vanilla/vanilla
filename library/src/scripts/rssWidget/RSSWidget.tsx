@@ -3,29 +3,21 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import { HomeWidgetItemContentType, IHomeWidgetItemOptions } from "@library/homeWidget/HomeWidgetItem.styles";
-import { IHomeWidgetContainerOptions } from "@library/homeWidget/HomeWidgetContainer.styles";
-import { DeepPartial } from "redux";
-import { IHomeWidgetItemProps } from "@library/homeWidget/HomeWidgetItem";
+import React, { ComponentProps } from "react";
+import { HomeWidgetItemContentType } from "@library/homeWidget/HomeWidgetItem.styles";
 import { HomeWidget } from "@library/homeWidget/HomeWidget";
 
-interface IProps {
-    title?: string;
-    subtitle?: string;
-    description?: string;
-    containerOptions?: IHomeWidgetContainerOptions;
-    itemOptions?: DeepPartial<IHomeWidgetItemOptions>;
-    itemData: IHomeWidgetItemProps[];
-    maxItemCount?: number;
+export function RSSWidget(props: ComponentProps<typeof HomeWidget>) {
+    return (
+        <HomeWidget
+            {...props}
+            itemOptions={{
+                ...props.itemOptions,
+                contentType: props.itemOptions?.contentType
+                    ? props.itemOptions?.contentType
+                    : HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
+            }}
+        />
+    );
 }
-
-export function RSSWidget(props: IProps) {
-    const defaultItemOptions = {
-        ...props.itemOptions,
-        contentType: props.itemOptions?.contentType
-            ? props.itemOptions?.contentType
-            : HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
-    };
-    return <HomeWidget {...props} itemOptions={defaultItemOptions} />;
-}
+export default RSSWidget;

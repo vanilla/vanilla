@@ -13,8 +13,8 @@ use Vanilla\Theme\VariableProviders\QuickLinkProviderInterface;
 /**
  * Provide some quick links.
  */
-class QnaQuickLinksProvider implements QuickLinkProviderInterface {
-
+class QnaQuickLinksProvider implements QuickLinkProviderInterface
+{
     /** @var \QnaModel */
     private $qnaModel;
 
@@ -26,7 +26,8 @@ class QnaQuickLinksProvider implements QuickLinkProviderInterface {
      *
      * @param \QnaModel $qnaModel
      */
-    public function __construct(\QnaModel $qnaModel) {
+    public function __construct(\QnaModel $qnaModel)
+    {
         $this->qnaModel = $qnaModel;
     }
 
@@ -35,10 +36,11 @@ class QnaQuickLinksProvider implements QuickLinkProviderInterface {
      *
      * @return QuickLink[]
      */
-    public function provideQuickLinks(): array {
+    public function provideQuickLinks(): array
+    {
         $quickLink = new QuickLink(
-            t('Unanswered'),
-            '/discussions/unanswered',
+            t("Unanswered"),
+            "/discussions/unanswered",
             $this->qnaModel->getUnansweredCount($this->countLimit),
             null,
             "discussions.view"

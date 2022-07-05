@@ -13,6 +13,6 @@ namespace Vanilla\Dashboard\Events;
  * but until such time, these events are to be fired as ideation-specific statuses are defined and managed,
  * to enable synchronization between ideation-specific statuses and discussion statuses for ideation.
  */
-class IdeaStatusDefinitionEvent extends RecordStatusDefinitionEvent {
-
+class IdeaStatusDefinitionEvent extends RecordStatusDefinitionEvent
+{
 }

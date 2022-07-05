@@ -12,10 +12,10 @@ namespace Vanilla\Cli\Utils;
  *
  * This should probably be extended in the future. Right now we don't differentiate the different levels very well.
  */
-class SimpleScriptLogger implements \Psr\Log\LoggerInterface {
-
-    const CONTEXT_LINE_COUNT = 'lineCount';
-    const CONTEXT_ESCAPE_SEQUENCE = 'escapeSequence';
+class SimpleScriptLogger implements \Psr\Log\LoggerInterface
+{
+    const CONTEXT_LINE_COUNT = "lineCount";
+    const CONTEXT_ESCAPE_SEQUENCE = "escapeSequence";
 
     const ESCAPE_RED = "0;31";
     const ESCAPE_GREEN = "0;32";
@@ -26,15 +26,17 @@ class SimpleScriptLogger implements \Psr\Log\LoggerInterface {
     /**
      * @inheritdoc
      */
-    public function emergency($message, array $context = []) {
-        $this->logInternal($message, $context + [ self::CONTEXT_ESCAPE_SEQUENCE => self::ESCAPE_PURPLE ]);
+    public function emergency($message, array $context = [])
+    {
+        $this->logInternal($message, $context + [self::CONTEXT_ESCAPE_SEQUENCE => self::ESCAPE_PURPLE]);
     }
 
     /**
      * @inheritdoc
      */
-    public function alert($message, array $context = []) {
-        $this->logInternal($message, $context + [ self::CONTEXT_ESCAPE_SEQUENCE => self::ESCAPE_YELLOW ]);
+    public function alert($message, array $context = [])
+    {
+        $this->logInternal($message, $context + [self::CONTEXT_ESCAPE_SEQUENCE => self::ESCAPE_YELLOW]);
     }
 
     /**
@@ -43,8 +45,9 @@ class SimpleScriptLogger implements \Psr\Log\LoggerInterface {
      * @param string $message
      * @param array $context
      */
-    public function success($message, array $context = []) {
-        $this->logInternal($message, $context + [ self::CONTEXT_ESCAPE_SEQUENCE => self::ESCAPE_GREEN ]);
+    public function success($message, array $context = [])
+    {
+        $this->logInternal($message, $context + [self::CONTEXT_ESCAPE_SEQUENCE => self::ESCAPE_GREEN]);
     }
 
     /**
@@ -53,56 +56,67 @@ class SimpleScriptLogger implements \Psr\Log\LoggerInterface {
      * @param string $message
      * @param array $context
      */
-    public function title(string $message, array $context = []) {
-        $this->logInternal("\n======  $message  ======", [self::CONTEXT_ESCAPE_SEQUENCE => self::ESCAPE_CYAN] + $context);
+    public function title(string $message, array $context = [])
+    {
+        $this->logInternal(
+            "\n======  $message  ======",
+            [self::CONTEXT_ESCAPE_SEQUENCE => self::ESCAPE_CYAN] + $context
+        );
     }
 
     /**
      * @inheritdoc
      */
-    public function critical($message, array $context = []) {
-        $this->logInternal($message, $context + [ self::CONTEXT_ESCAPE_SEQUENCE => self::ESCAPE_RED ]);
+    public function critical($message, array $context = [])
+    {
+        $this->logInternal($message, $context + [self::CONTEXT_ESCAPE_SEQUENCE => self::ESCAPE_RED]);
     }
 
     /**
      * @inheritdoc
      */
-    public function warning($message, array $context = []) {
-        $this->logInternal($message, $context + [ self::CONTEXT_ESCAPE_SEQUENCE => self::ESCAPE_YELLOW ]);
+    public function warning($message, array $context = [])
+    {
+        $this->logInternal($message, $context + [self::CONTEXT_ESCAPE_SEQUENCE => self::ESCAPE_YELLOW]);
     }
 
     /**
      * @inheritdoc
      */
-    public function error($message, array $context = []) {
-        $this->logInternal($message, $context + [ self::CONTEXT_ESCAPE_SEQUENCE => self::ESCAPE_RED ]);
+    public function error($message, array $context = [])
+    {
+        $this->logInternal($message, $context + [self::CONTEXT_ESCAPE_SEQUENCE => self::ESCAPE_RED]);
     }
 
     /**
      * @inheritdoc
      */
-    public function notice($message, array $context = []) {
+    public function notice($message, array $context = [])
+    {
         $this->logInternal($message, $context);
     }
 
     /**
      * @inheritdoc
      */
-    public function info($message, array $context = []) {
+    public function info($message, array $context = [])
+    {
         $this->logInternal($message, $context);
     }
 
     /**
      * @inheritdoc
      */
-    public function debug($message, array $context = []) {
+    public function debug($message, array $context = [])
+    {
         $this->logInternal($message, $context);
     }
 
     /**
      * @inheritdoc
      */
-    public function log($level, $message, array $context = []) {
+    public function log($level, $message, array $context = [])
+    {
         $this->logInternal($message, $context);
     }
 
@@ -112,7 +126,8 @@ class SimpleScriptLogger implements \Psr\Log\LoggerInterface {
      * @param string $message
      * @param array $context
      */
-    private function logInternal($message, array $context = []) {
+    private function logInternal($message, array $context = [])
+    {
         $countNewLines = $context[self::CONTEXT_LINE_COUNT] ?? 1;
         $escapeSequence = $context[self::CONTEXT_ESCAPE_SEQUENCE] ?? null;
 
@@ -133,7 +148,8 @@ class SimpleScriptLogger implements \Psr\Log\LoggerInterface {
      *
      * @param string $prompt
      */
-    public function promptContinue(string $prompt) {
+    public function promptContinue(string $prompt)
+    {
         $result = readline($prompt . " (y\\n): ");
         if (strpos(strtolower($result), "y") === false) {
             $this->error("Exiting.");

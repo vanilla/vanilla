@@ -45,7 +45,7 @@ body {
     border-bottom-width: 0;
 }
 
-@if($staticVariables){
+@if ($staticVariables) {
     .Item .Author a {
         font-size: inherit;
         font-weight: inherit;
@@ -60,7 +60,6 @@ body {
 }
 
 .Item {
-
     .BlockTitle {
         font-size: inherit;
     }
@@ -71,7 +70,7 @@ body {
 }
 
 .DataTable td {
-  border-bottom: 0;
+    border-bottom: 0;
 }
 
 .CategoryTable,
@@ -101,7 +100,6 @@ body {
     }
 
     thead {
-
         tr {
             border-bottom: none;
         }
@@ -228,7 +226,6 @@ a.ChangePicture {
 }
 
 .Reactions {
-
     .ReactButton,
     .ReactButton.HasCount {
         vertical-align: baseline;
@@ -238,7 +235,6 @@ a.ChangePicture {
 }
 
 .MenuItems-Reactions {
-
     .PhotoWrapSmall {
         margin-right: 0;
     }
@@ -247,7 +243,6 @@ a.ChangePicture {
         font-size: $global-small_fontSize;
         @include ellipsis;
     }
-
 }
 
 .MenuItems a:hover .Gloss {
@@ -256,23 +251,22 @@ a.ChangePicture {
 
 #Form_Ban {
     @include Button(
-            $button-primary_bg,
-            $button-primary_fg,
-            $button-primary_border,
-            $button-primary-hover_bg,
-            $button-primary-hover_fg,
-            $button-primary-hover_border
+        $button-primary_bg,
+        $button-primary_fg,
+        $button-primary_border,
+        $button-primary-hover_bg,
+        $button-primary-hover_fg,
+        $button-primary-hover_border
     );
 }
 
 .Dropdown.MenuItems {
-
     @include maxWidth {
         min-width: auto;
     }
 }
 
-@if($staticVariables){
+@if ($staticVariables) {
     [class*="Status-Tag-"] {
         padding: 0 !important;
         background-color: transparent !important;
@@ -300,7 +294,6 @@ body > svg {
 table.PreferenceGroup th {
     min-width: 9ex;
 }
-
 
 .Popup #UserBadgeForm {
     p,
@@ -354,7 +347,7 @@ table.PreferenceGroup th {
 
 #Panel .FilterMenu li:first-child,
 .PanelInfo li:first-child {
-  border-top-width: 0;
+    border-top-width: 0;
 }
 
 .SocialIcon .Text {
@@ -410,15 +403,13 @@ table.PreferenceGroup th {
 
 // Fix buttons on social page
 .DataList-Connections {
-
     .Connection-Name {
         margin: 0;
         font-size: $global-medium_fontSize;
     }
 
     .Connection-Connect {
-
-        @include maxWidth($theme-breakpoint_base){
+        @include maxWidth($theme-breakpoint_base) {
             margin: 10px 0 0 auto;
         }
 

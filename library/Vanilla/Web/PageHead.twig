@@ -19,7 +19,7 @@
 {% endfor %}
 
 {% for script in scripts -%}
-    <script nonce="{{ nonce }}" defer src="{{ script.getWebPath() }}"></script>
+    <script crossorigin nonce="{{ nonce }}" defer src="{{ script.getWebPath() }}"></script>
 {% endfor %}
 
 {%- if jsonLD -%}

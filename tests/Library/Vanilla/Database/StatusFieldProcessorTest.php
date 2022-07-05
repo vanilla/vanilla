@@ -22,8 +22,9 @@ use VanillaTests\SetupTraitsTrait;
 /**
  * Test the `StatusFieldProcessor` class.
  */
-class StatusFieldProcessorTest extends BootstrapTestCase {
-    private const TEST_IP = '2001:db8:85a3::8a2e:370:7334';
+class StatusFieldProcessorTest extends BootstrapTestCase
+{
+    private const TEST_IP = "2001:db8:85a3::8a2e:370:7334";
 
     /**
      * @var StatusFieldProcessor
@@ -38,18 +39,18 @@ class StatusFieldProcessorTest extends BootstrapTestCase {
     /**
      * @inheritDoc
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         $this->container()->call(function (StatusFieldProcessor $processor, \Gdn_Request $request) {
             $request->setIP(self::TEST_IP);
             $this->processor = $processor;
-            $this->processor->setStatusField('state');
-            $this->processor->setDateField('date');
-            $this->processor->setIpAddressField('ip');
-            $this->processor->setUserField('userID');
-            $this->model = new class('test') extends Model {
-            };
+            $this->processor->setStatusField("state");
+            $this->processor->setDateField("date");
+            $this->processor->setIpAddressField("ip");
+            $this->processor->setUserField("userID");
+            $this->model = new class ("test") extends Model {};
         });
 
         CurrentTimeStamp::mockTime(time());
@@ -58,7 +59,8 @@ class StatusFieldProcessorTest extends BootstrapTestCase {
     /**
      * {@inheritDoc}
      */
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
         CurrentTimeStamp::clearMockTime();
     }
@@ -66,7 +68,8 @@ class StatusFieldProcessorTest extends BootstrapTestCase {
     /**
      * The status fields should be set on inserts by default.
      */
-    public function testInsertGeneration(): void {
+    public function testInsertGeneration(): void
+    {
         $op = new Operation();
         $op->setType(Operation::TYPE_INSERT);
         $r = $this->handleOperation($op);
@@ -76,14 +79,15 @@ class StatusFieldProcessorTest extends BootstrapTestCase {
     /**
      * The status fields should only be set on insert if the status is passed.
      */
-    public function testInsertNoStatus(): void {
+    public function testInsertNoStatus(): void
+    {
         $this->processor->setSetOnInsert(false);
         $op = new Operation();
         $op->setType(Operation::TYPE_INSERT);
         $r = $this->handleOperation($op);
         $this->assertSetItems($op, false);
 
-        $op->setSetItem($this->processor->getStatusField(), 'foo');
+        $op->setSetItem($this->processor->getStatusField(), "foo");
         $r = $this->handleOperation($op);
         $this->assertSetItems($op);
     }
@@ -91,13 +95,14 @@ class StatusFieldProcessorTest extends BootstrapTestCase {
     /**
      * The status fields should update when the status is set.
      */
-    public function testUpdate(): void {
+    public function testUpdate(): void
+    {
         $op = new Operation();
         $op->setType(Operation::TYPE_UPDATE);
         $r = $this->handleOperation($op);
         $this->assertSetItems($op, false);
 
-        $op->setSetItem($this->processor->getStatusField(), 'foo');
+        $op->setSetItem($this->processor->getStatusField(), "foo");
         $r = $this->handleOperation($op);
         $this->assertSetItems($op);
     }
@@ -105,7 +110,8 @@ class StatusFieldProcessorTest extends BootstrapTestCase {
     /**
      * Selects should give back a decoded IP address.
      */
-    public function testSelectDecode(): void {
+    public function testSelectDecode(): void
+    {
         $op = new Operation();
         $op->setType(Operation::TYPE_SELECT);
         $rows = $this->handleOperation($op);
@@ -119,12 +125,13 @@ class StatusFieldProcessorTest extends BootstrapTestCase {
      * @param string $setter
      * @dataProvider provideFieldSetters
      */
-    public function testSparseFields(string $setter): void {
-        call_user_func([$this->processor, $setter], '');
+    public function testSparseFields(string $setter): void
+    {
+        call_user_func([$this->processor, $setter], "");
 
         $op = new Operation();
         $op->setType(Operation::TYPE_INSERT);
-        $op->setSetItem($this->processor->getStatusField(), 'foo');
+        $op->setSetItem($this->processor->getStatusField(), "foo");
         $this->handleOperation($op);
         $this->assertSetItems($op);
     }
@@ -132,42 +139,43 @@ class StatusFieldProcessorTest extends BootstrapTestCase {
     /**
      * The processor shouldn't overwrite explicitly passed fields.
      */
-    public function testExistingFields(): void {
+    public function testExistingFields(): void
+    {
         $op = new Operation();
         $op->setType(Operation::TYPE_INSERT);
-        $op
-            ->setSetItem($this->processor->getDateField(), '2020-08-14')
+        $op->setSetItem($this->processor->getDateField(), "2020-08-14")
             ->setSetItem($this->processor->getUserIDField(), 123)
-            ->setSetItem($this->processor->getIpAddressField(), '127.0.0.1');
+            ->setSetItem($this->processor->getIpAddressField(), "127.0.0.1");
         $this->handleOperation($op);
 
-        $this->assertSame('2020-08-14', $op->getSetItem($this->processor->getDateField()));
+        $this->assertSame("2020-08-14", $op->getSetItem($this->processor->getDateField()));
         $this->assertSame(123, $op->getSetItem($this->processor->getUserIDField()));
-        $this->assertSame('127.0.0.1', $op->getSetItem($this->processor->getIpAddressField()));
+        $this->assertSame("127.0.0.1", $op->getSetItem($this->processor->getIpAddressField()));
     }
 
     /**
      * Test against an actual database table.
      */
-    public function testDbIntegration(): void {
+    public function testDbIntegration(): void
+    {
         $table = __FUNCTION__;
 
         $this->container()->call(function (\Gdn_DatabaseStructure $structure) use ($table) {
             $structure
                 ->table($table)
-                ->primaryKey($table.'ID')
-                ->column('name', 'varchar(255)')
-                ->column($this->processor->getDateField(), 'datetime')
-                ->column($this->processor->getUserIDField(), 'int')
-                ->column($this->processor->getIpAddressField(), 'ipaddress')
+                ->primaryKey($table . "ID")
+                ->column("name", "varchar(255)")
+                ->column($this->processor->getDateField(), "datetime")
+                ->column($this->processor->getUserIDField(), "int")
+                ->column($this->processor->getIpAddressField(), "ipaddress")
                 ->set();
         });
 
         $model = $this->container()->getArgs(PipelineModel::class, [$table]);
         $model->addPipelineProcessor($this->processor);
 
-        $id = $model->insert(['name' => __FUNCTION__]);
-        $this->assertNotFalse($id, 'The sample row did not insert.');
+        $id = $model->insert(["name" => __FUNCTION__]);
+        $this->assertNotFalse($id, "The sample row did not insert.");
         $row = $model->selectSingle($model->primaryWhere($id));
         $this->assertSame($this->processor->getCurrentIPAddress(), $row[$this->processor->getIpAddressField()]);
         $this->assertSame($this->processor->getCurrentUserID(), $row[$this->processor->getUserIDField()]);
@@ -178,15 +186,15 @@ class StatusFieldProcessorTest extends BootstrapTestCase {
      *
      * @return array|\string[][]
      */
-    public function provideFieldSetters(): array {
+    public function provideFieldSetters(): array
+    {
         $r = [
-            'date' => ['setDateField'],
-            'user' => ['setUserField'],
-            'ip' => ['setIPAddressField'],
+            "date" => ["setDateField"],
+            "user" => ["setUserField"],
+            "ip" => ["setIPAddressField"],
         ];
         return $r;
     }
-
 
     /**
      * A test handler for the processor.
@@ -194,7 +202,8 @@ class StatusFieldProcessorTest extends BootstrapTestCase {
      * @param Operation $op
      * @return array[]|bool
      */
-    public function handleOperation(Operation $op) {
+    public function handleOperation(Operation $op)
+    {
         $r = $this->processor->handle($op, function (Operation $op) {
             switch ($op->getType()) {
                 case Operation::TYPE_INSERT:
@@ -202,7 +211,7 @@ class StatusFieldProcessorTest extends BootstrapTestCase {
                 case Operation::TYPE_DELETE:
                     return true;
                 case Operation::TYPE_SELECT:
-                    return [['ip' => ipEncode($this->processor->getCurrentIPAddress())], []];
+                    return [["ip" => ipEncode($this->processor->getCurrentIPAddress())], []];
                 default:
                     throw new \InvalidArgumentException("Invalid test operation: " . $op->getType());
             }
@@ -216,23 +225,42 @@ class StatusFieldProcessorTest extends BootstrapTestCase {
      * @param Operation $op
      * @param bool $exists
      */
-    private function assertSetItems(Operation $op, bool $exists = true): void {
+    private function assertSetItems(Operation $op, bool $exists = true): void
+    {
         if (!empty($this->processor->getDateField())) {
-            $this->assertSame($exists, $op->hasSetItem($this->processor->getDateField()), "Operation missing status date.");
+            $this->assertSame(
+                $exists,
+                $op->hasSetItem($this->processor->getDateField()),
+                "Operation missing status date."
+            );
             if ($exists) {
                 $this->assertSame(CurrentTimeStamp::getMySQL(), $op->getSetItem($this->processor->getDateField()));
             }
         }
         if (!empty($this->processor->getUserIDField())) {
-            $this->assertSame($exists, $op->hasSetItem($this->processor->getUserIDField()), "Operation missing user field.");
+            $this->assertSame(
+                $exists,
+                $op->hasSetItem($this->processor->getUserIDField()),
+                "Operation missing user field."
+            );
             if ($exists) {
-                $this->assertSame($this->processor->getCurrentUserID(), $op->getSetItem($this->processor->getUserIDField()));
+                $this->assertSame(
+                    $this->processor->getCurrentUserID(),
+                    $op->getSetItem($this->processor->getUserIDField())
+                );
             }
         }
         if (!empty($this->processor->getIpAddressField())) {
-            $this->assertSame($exists, $op->hasSetItem($this->processor->getIpAddressField()), "Operation missing the IP Address field.");
+            $this->assertSame(
+                $exists,
+                $op->hasSetItem($this->processor->getIpAddressField()),
+                "Operation missing the IP Address field."
+            );
             if ($exists) {
-                $this->assertSame($this->processor->getCurrentIPAddress(), ipDecode($op->getSetItem($this->processor->getIpAddressField())));
+                $this->assertSame(
+                    $this->processor->getCurrentIPAddress(),
+                    ipDecode($op->getSetItem($this->processor->getIpAddressField()))
+                );
             }
         }
     }

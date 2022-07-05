@@ -8,29 +8,28 @@
     Variables
 \* -------------------------------------------------------------- */
 
-$datepicker_bg:                             $global-color_white !default;
-$datepicker-hover_bg:                       darken($global-color_white, 7%) !default;
-$datepicker_fg:                             $global-color_grey !default;
+$datepicker_bg: $global-color_white !default;
+$datepicker-hover_bg: darken($global-color_white, 7%) !default;
+$datepicker_fg: $global-color_grey !default;
 
-$datepicker-date_fg:                        $button-basic_fg !default;
-$datepicker-date_bg:                        $button-basic_bg !default;
-$datepicker-date_borderColor:               $button-basic_border !default;
+$datepicker-date_fg: $button-basic_fg !default;
+$datepicker-date_bg: $button-basic_bg !default;
+$datepicker-date_borderColor: $button-basic_border !default;
 
-$datepicker-date-hover_fg:                  $button-basic-hover_fg !default;
-$datepicker-date-hover_bg:                  $button-basic-hover_bg !default;
-$datepicker-date-hover_borderColor:         $button-basic-hover_border !default;
+$datepicker-date-hover_fg: $button-basic-hover_fg !default;
+$datepicker-date-hover_bg: $button-basic-hover_bg !default;
+$datepicker-date-hover_borderColor: $button-basic-hover_border !default;
 
-$datepicker-link-alt_color:                 $global-color_secondary !default;
-$datepicker-link-altHover_color:            darken($global-color_secondary, 8%) !default;
+$datepicker-link-alt_color: $global-color_secondary !default;
+$datepicker-link-altHover_color: darken($global-color_secondary, 8%) !default;
 
-$datepicker_border:                         1px solid $theme-border_color !default;
-$datepicker_borderRadius:                   3px !default;
-$datepicker_boxShadow:                      1px 1px 4px rgba($global-color_black, 0.2) !default;
+$datepicker_border: 1px solid $theme-border_color !default;
+$datepicker_borderRadius: 3px !default;
+$datepicker_boxShadow: 1px 1px 4px rgba($global-color_black, 0.2) !default;
 
 /* -------------------------------------------------------------- *\
     Styles
 \* -------------------------------------------------------------- */
-
 
 .ui-datepicker {
     border-radius: $datepicker_borderRadius;
@@ -61,7 +60,7 @@ $datepicker_boxShadow:                      1px 1px 4px rgba($global-color_black
     }
 
     .ui-datepicker-today a {
-        background-color: rgba(0,0,0, 0.03);
+        background-color: rgba(0, 0, 0, 0.03);
     }
 
     .ui-datepicker-current-day a {

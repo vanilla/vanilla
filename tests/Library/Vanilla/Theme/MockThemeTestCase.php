@@ -21,8 +21,8 @@ use VanillaTests\MinimalContainerTestCase;
 /**
  * Tests for getting the current theme from the theme model.
  */
-abstract class MockThemeTestCase extends MinimalContainerTestCase {
-
+abstract class MockThemeTestCase extends MinimalContainerTestCase
+{
     /** @var MockThemeProvider */
     protected $mockThemeProvider;
 
@@ -34,14 +34,16 @@ abstract class MockThemeTestCase extends MinimalContainerTestCase {
      *
      * @return bool
      */
-    protected static function useCommonBootstrap(): bool {
+    protected static function useCommonBootstrap(): bool
+    {
         return false;
     }
 
     /**
      * Prepare the container.
      */
-    public function configureContainer(): void {
+    public function configureContainer(): void
+    {
         // Fresh container.
         parent::configureContainer();
 
@@ -50,22 +52,21 @@ abstract class MockThemeTestCase extends MinimalContainerTestCase {
             ->rule(AddonManager::class)
             ->setShared(true)
             ->setClass(MockAddonManager::class)
-            ->setInstance(\Gdn_Cache::class, new \Gdn_Dirtycache())
-        ;
+            ->setInstance(\Gdn_Cache::class, new \Gdn_Dirtycache());
 
         $this->addonManager = self::container()->get(AddonManager::class);
         $this->mockThemeProvider = self::container()->get(MockThemeProvider::class);
 
         self::container()
             ->rule(ThemeService::class)
-            ->addCall('addThemeProvider', [$this->mockThemeProvider])
-        ;
+            ->addCall("addThemeProvider", [$this->mockThemeProvider]);
     }
 
     /**
      * @inheritdoc
      */
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
         isMobile(null);
     }
@@ -73,7 +74,8 @@ abstract class MockThemeTestCase extends MinimalContainerTestCase {
     /**
      * @return ThemeService
      */
-    protected function themeService(): ThemeService {
+    protected function themeService(): ThemeService
+    {
         return self::container()->get(ThemeService::class);
     }
 }

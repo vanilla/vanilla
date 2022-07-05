@@ -14,8 +14,8 @@ use Vanilla\Formatting\Html\HtmlSanitizer;
 /**
  * Class for rendering content with the source format BBCode.
  */
-class BBCodeFormat extends HtmlFormat {
-
+class BBCodeFormat extends HtmlFormat
+{
     const FORMAT_KEY = "bbcode";
 
     /** @var \BBCode */
@@ -45,7 +45,8 @@ class BBCodeFormat extends HtmlFormat {
     /**
      * @inheritdoc
      */
-    public function renderHtml(string $content, bool $enhance = true): string {
+    public function renderHtml(string $content, bool $enhance = true): string
+    {
         $renderedBBCode = $this->bbcodeParser->format($content);
         return parent::renderHtml($renderedBBCode, $enhance);
     }
@@ -53,8 +54,28 @@ class BBCodeFormat extends HtmlFormat {
     /**
      * @inheritdoc
      */
-    public function renderQuote(string $value): string {
+    public function renderQuote(string $value): string
+    {
         $renderedBBCode = $this->bbcodeParser->format($value);
         return parent::renderQuote($renderedBBCode);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function removeUserPII(string $username, string $body): string
+    {
+        [$pattern["atMention"], $replacement["atMention"]] = $this->getNonRichAtMentionPattern(
+            $username,
+            $this->anonymizeUsername
+        );
+
+        [$pattern["url"], $replacement["url"]] = $this->getUrlPattern($username, $this->anonymizeUrl);
+
+        $pattern["quote"] = "~quote=\"$username;~";
+        $replacement["quote"] = "quote=\"$this->anonymizeUsername;";
+
+        $body = preg_replace($pattern, $replacement, $body);
+        return $body;
     }
 }

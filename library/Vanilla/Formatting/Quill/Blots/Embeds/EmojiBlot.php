@@ -10,28 +10,31 @@ namespace Vanilla\Formatting\Quill\Blots\Embeds;
 /**
  * Blot for rendering out safe browser-compatible emoijs.
  */
-class EmojiBlot extends AbstractInlineEmbedBlot {
-
+class EmojiBlot extends AbstractInlineEmbedBlot
+{
     /**
      * @inheritDoc
      */
-    protected static function getInsertKey(): string {
+    protected static function getInsertKey(): string
+    {
         return "insert.emoji.emojiChar";
     }
 
     /**
      * @inheritDoc
      */
-    protected function getContainerHTMLTag(): string {
+    protected function getContainerHTMLTag(): string
+    {
         return "span";
     }
 
     /**
      * @inheritDoc
      */
-    protected function getContainerHMTLAttributes(): array {
+    protected function getContainerHMTLAttributes(): array
+    {
         return [
-            "class" => "safeEmoji nativeEmoji"
+            "class" => "safeEmoji nativeEmoji",
         ];
     }
 }

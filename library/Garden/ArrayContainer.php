@@ -13,7 +13,8 @@ use Psr\Container\ContainerInterface;
 /**
  * A basic container that stores its objects in an array.
  */
-class ArrayContainer extends \ArrayObject implements ContainerInterface {
+class ArrayContainer extends \ArrayObject implements ContainerInterface
+{
     /**
      * @var bool
      */
@@ -24,8 +25,9 @@ class ArrayContainer extends \ArrayObject implements ContainerInterface {
      *
      * @param bool $lazy Whether or not to lazy instantiate objects that aren't in the container.
      */
-    public function __construct($lazy = false) {
-        parent::__construct([], 0, 'ArrayIterator');
+    public function __construct($lazy = false)
+    {
+        parent::__construct([], 0, "ArrayIterator");
         $this->lazy = $lazy;
     }
 
@@ -35,8 +37,9 @@ class ArrayContainer extends \ArrayObject implements ContainerInterface {
      * @param string $id The ID to normalize.
      * @return string Returns a normalized ID as a string.
      */
-    private function normalizeID($id) {
-        return ltrim($id, '\\');
+    private function normalizeID($id)
+    {
+        return ltrim($id, "\\");
     }
 
     /**
@@ -48,12 +51,13 @@ class ArrayContainer extends \ArrayObject implements ContainerInterface {
      *
      * @return mixed Entry.
      */
-    public function get($id) {
+    public function get($id)
+    {
         $id = $this->normalizeID($id);
 
         if (!isset($this[$id])) {
             if ($this->lazy) {
-                $this[$id] = new $id;
+                $this[$id] = new $id();
             } else {
                 throw new ContainerNotFoundException("$id not found.", 404);
             }
@@ -69,7 +73,8 @@ class ArrayContainer extends \ArrayObject implements ContainerInterface {
      *
      * @return boolean
      */
-    public function has($id) {
+    public function has($id)
+    {
         $id = $this->normalizeID($id);
 
         return $this->offsetExists($id) || ($this->lazy && class_exists($id));

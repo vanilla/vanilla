@@ -9,17 +9,16 @@ namespace Vanilla\Web\ContentSecurityPolicy;
 /**
  * Vanilla whitelist content security policy provider
  */
-class VanillaWhitelistContentSecurityPolicyProvider implements ContentSecurityPolicyProviderInterface {
-
-    const VANILLA_WHITELIST = [
-        'https://www.google.com'
-    ];
+class VanillaWhitelistContentSecurityPolicyProvider implements ContentSecurityPolicyProviderInterface
+{
+    const VANILLA_WHITELIST = ["https://www.google.com"];
 
     /**
      * @inheritdoc
      */
-    public function getPolicies(): array {
-        $policies[] = new Policy(Policy::SCRIPT_SRC, implode(' ', self::VANILLA_WHITELIST));
+    public function getPolicies(): array
+    {
+        $policies[] = new Policy(Policy::SCRIPT_SRC, implode(" ", self::VANILLA_WHITELIST));
 
         return $policies;
     }

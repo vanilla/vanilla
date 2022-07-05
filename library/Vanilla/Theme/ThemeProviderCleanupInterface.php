@@ -10,7 +10,8 @@ namespace Vanilla\Theme;
 /**
  * Interface that indicates a theme provider requires additional cleanup when switched to another theme provider.
  */
-interface ThemeProviderCleanupInterface {
+interface ThemeProviderCleanupInterface
+{
     /**
      * Method to be called if active theme provider is changed to another theme.
      */

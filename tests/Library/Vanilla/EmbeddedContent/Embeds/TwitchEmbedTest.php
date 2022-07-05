@@ -12,11 +12,13 @@ use VanillaTests\MinimalContainerTestCase;
 /**
  * Verify embed class capabilities.
  */
-class TwitchEmbedTest extends MinimalContainerTestCase {
+class TwitchEmbedTest extends MinimalContainerTestCase
+{
     /**
      * Ensure we can create an embed from legacy data that might still live in the DB.
      */
-    public function testLegacyDataFormat() {
+    public function testLegacyDataFormat()
+    {
         $legacyJSON = <<<JSON
 {
     "url": "http://clips.twitch.tv/KnottyOddFishShazBotstix",

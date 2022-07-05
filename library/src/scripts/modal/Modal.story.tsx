@@ -5,7 +5,7 @@
 
 import React, { useState } from "react";
 import Modal from "@library/modal/Modal";
-import { STORY_IPSUM_LONG, STORY_IPSUM_SHORT, StoryTextContent } from "@library/storybook/storyData";
+import { StoryTextContent } from "@library/storybook/storyData";
 import ModalSizes from "@library/modal/ModalSizes";
 import Frame from "@library/layout/frame/Frame";
 import FrameHeader from "@library/layout/frame/FrameHeader";

@@ -17,21 +17,16 @@ use Vanilla\Web\SystemCallableInterface;
 /**
  * Fixture for testing the long runner.
  */
-class LongRunnerFixture implements SystemCallableInterface {
-
+class LongRunnerFixture implements SystemCallableInterface
+{
     private $doneIDs = [];
 
     /**
      * @inheritdoc
      */
-    public static function getSystemCallableMethods(): array {
-        return [
-            'canRunWithSameArgs',
-            'yieldIDs',
-            'notGenerator',
-            'catchAndReturn',
-            'catchAndYield',
-        ];
+    public static function getSystemCallableMethods(): array
+    {
+        return ["canRunWithSameArgs", "yieldIDs", "notGenerator", "catchAndReturn", "catchAndYield"];
     }
 
     /**
@@ -43,7 +38,8 @@ class LongRunnerFixture implements SystemCallableInterface {
      *
      * @return \Generator
      */
-    public function canRunWithSameArgs(array $idsToDo): \Generator {
+    public function canRunWithSameArgs(array $idsToDo): \Generator
+    {
         foreach ($idsToDo as $id) {
             if (in_array($id, $this->doneIDs)) {
                 continue;
@@ -103,7 +99,8 @@ class LongRunnerFixture implements SystemCallableInterface {
      *
      * @return \Generator
      */
-    public function notSystemCallable(): \Generator {
+    public function notSystemCallable(): \Generator
+    {
         yield 1;
         yield 2;
         yield 3;
@@ -113,7 +110,8 @@ class LongRunnerFixture implements SystemCallableInterface {
     /**
      * Not a generator function.
      */
-    public function notGenerator() {
+    public function notGenerator()
+    {
         return true;
     }
 
@@ -124,7 +122,8 @@ class LongRunnerFixture implements SystemCallableInterface {
      *
      * @return \Generator
      */
-    public function catchAndReturn($returnValue): \Generator {
+    public function catchAndReturn($returnValue): \Generator
+    {
         while (true) {
             sleep(1);
             try {
@@ -142,7 +141,8 @@ class LongRunnerFixture implements SystemCallableInterface {
      *
      * @return \Generator
      */
-    public function catchAndYield($returnValue): \Generator {
+    public function catchAndYield($returnValue): \Generator
+    {
         while (true) {
             sleep(1);
             try {

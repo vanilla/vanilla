@@ -18,27 +18,45 @@ use Vanilla\Formatting\TextFragmentInterface;
 /**
  * Class for parsing and modifying HTML.
  */
-class HtmlDocument implements TextDOMInterface {
-
+class HtmlDocument implements TextDOMInterface
+{
     use HtmlProcessorTrait;
 
     /**
      * @var string[]
      */
-    const FRAGMENT_ATTRIBUTES = ['alt', 'title'];
+    const FRAGMENT_ATTRIBUTES = ["alt", "title"];
 
     /** @var string[]  */
     private const TAG_INLINE_TEXT = [
-        'a', 'abbr', 'acronym', 'b', 'bdo', 'big', 'br', 'cite', 'code', 'dfn', 'em', 'i',  'kbd', 'q',
-        'samp', 'small', 'strong', 'sub', 'sup', 'time', 'tt', 'var',
+        "a",
+        "abbr",
+        "acronym",
+        "b",
+        "bdo",
+        "big",
+        "br",
+        "cite",
+        "code",
+        "dfn",
+        "em",
+        "i",
+        "kbd",
+        "q",
+        "samp",
+        "small",
+        "strong",
+        "sub",
+        "sup",
+        "time",
+        "tt",
+        "var",
     ];
 
     /**
      * @var string[]
      */
-    private const TAG_STOP = [
-        'iframe', 'object', 'head', 'video', 'style', 'img', 'pre'
-    ];
+    private const TAG_STOP = ["iframe", "object", "head", "video", "style", "img", "pre"];
 
     /** @var \DOMDocument */
     private $dom;
@@ -52,8 +70,9 @@ class HtmlDocument implements TextDOMInterface {
      * @param string $innerHtml HTML to construct the DOM with.
      * @param bool $wrap Whether or not to wrap in our own fragment prefix/suffix.
      */
-    public function __construct(string $innerHtml, bool $wrap = true) {
-        $this->dom = new \DOMDocument('1.0', 'UTF-8');
+    public function __construct(string $innerHtml, bool $wrap = true)
+    {
+        $this->dom = new \DOMDocument("1.0", "UTF-8");
         $this->wrap = $wrap;
 
         // DomDocument will automatically add html, head and body wrapper if we don't.
@@ -67,7 +86,8 @@ class HtmlDocument implements TextDOMInterface {
     /**
      * @return HtmlDocument
      */
-    protected function getDocument(): HtmlDocument {
+    protected function getDocument(): HtmlDocument
+    {
         return $this;
     }
 
@@ -79,7 +99,8 @@ class HtmlDocument implements TextDOMInterface {
      *
      * @return \DOMNodeList
      */
-    public function queryXPath(string $xpathQuery) {
+    public function queryXPath(string $xpathQuery)
+    {
         $xpath = new \DOMXPath($this->getDom());
         return $xpath->query($xpathQuery) ?: new \DOMNodeList();
     }
@@ -89,7 +110,8 @@ class HtmlDocument implements TextDOMInterface {
      *
      * @return \DOMDocument
      */
-    public function getDom(): \DOMDocument {
+    public function getDom(): \DOMDocument
+    {
         return $this->dom;
     }
 
@@ -98,9 +120,10 @@ class HtmlDocument implements TextDOMInterface {
      *
      * @return \DOMElement
      */
-    public function getRoot(): \DOMElement {
+    public function getRoot(): \DOMElement
+    {
         if ($this->wrap) {
-            return $this->dom->getElementsByTagName('body')->item(0);
+            return $this->dom->getElementsByTagName("body")->item(0);
         } else {
             return $this->dom->parentNode;
         }
@@ -112,19 +135,20 @@ class HtmlDocument implements TextDOMInterface {
      *
      * @return string
      */
-    public function getInnerHtml(): string {
+    public function getInnerHtml(): string
+    {
         if ($this->wrap) {
-            $content = $this->dom->getElementsByTagName('body');
+            $content = $this->dom->getElementsByTagName("body");
             $result = @$this->dom->saveXML($content[0], LIBXML_NOEMPTYTAG);
 
             // The DOM Document added starting body and ending tags. We need to remove them.
-            $result = preg_replace('/^<body>/', '', $result);
-            $result = preg_replace('/<\/body>$/', '', $result);
+            $result = preg_replace("/^<body>/", "", $result);
+            $result = preg_replace('/<\/body>$/', "", $result);
         } else {
             $result = @$this->dom->saveXML(null, LIBXML_NOEMPTYTAG);
         }
         // saveXML adds closing <br> tags, which breaks formatting.
-        $result = preg_replace('/<\/br>/', '', $result);
+        $result = preg_replace("/<\/br>/", "", $result);
         return $result;
     }
 
@@ -133,7 +157,8 @@ class HtmlDocument implements TextDOMInterface {
      *
      * @return string
      */
-    private function getDocumentPrefix() {
+    private function getDocumentPrefix()
+    {
         return <<<HTML
     <html><head><meta content="text/html; charset=utf-8" http-equiv="Content-Type"></head>
     <body>
@@ -144,14 +169,16 @@ HTML;
      * Get the closing tag of the document.
      * @return string
      */
-    private function getDocumentSuffix() {
+    private function getDocumentSuffix()
+    {
         return "</body></html>";
     }
 
     /**
      * @inheritDoc
      */
-    public function stringify(): FormatText {
+    public function stringify(): FormatText
+    {
         $r = new FormatText($this->renderHTML(), WysiwygFormat::FORMAT_KEY);
         return $r;
     }
@@ -159,14 +186,16 @@ HTML;
     /**
      * @inheritDoc
      */
-    public function renderHTML(): string {
+    public function renderHTML(): string
+    {
         return $this->getInnerHtml();
     }
 
     /**
      * @inheritDoc
      */
-    public function getFragments(): array {
+    public function getFragments(): array
+    {
         $fragments = [];
         $this->domToFragments($this->getRoot(), $fragments);
         return $fragments;
@@ -182,7 +211,8 @@ HTML;
      * @param TextFragmentInterface[] $fragments A working array of fragments.
      * @psalm-suppress ConflictingReferenceConstraint I tried to see if this was really a bug, but I can't for the life of me see it.
      */
-    private function domToFragments(\DOMElement $node, array &$fragments): void {
+    private function domToFragments(\DOMElement $node, array &$fragments): void
+    {
         $this->attributesToFragments($node, $fragments);
         if (in_array($node->tagName, self::TAG_STOP, true)) {
             return;
@@ -234,7 +264,8 @@ HTML;
      * @param \DOMElement $node
      * @param array $fragments
      */
-    private function attributesToFragments(\DOMElement $node, array &$fragments) {
+    private function attributesToFragments(\DOMElement $node, array &$fragments)
+    {
         foreach ($node->attributes as $key => $attr) {
             /** @var \DOMAttr $attr */
             if (in_array($key, self::FRAGMENT_ATTRIBUTES)) {

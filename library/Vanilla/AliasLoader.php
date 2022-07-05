@@ -15,17 +15,18 @@ namespace Vanilla;
  * This class provides an autoloader for usage with spl_autoload_register to autoload these aliases
  * which will then autoload their new classes if they are not loaded yet.
  */
-class AliasLoader {
-
+class AliasLoader
+{
     use AliasProviderTrait;
 
     /**
      * @inheritdoc
      */
-    protected static function provideAliases(): array {
+    protected static function provideAliases(): array
+    {
         return [
-            \Vanilla\Web\Asset\LegacyAssetModel::class => ['AssetModel'],
-            \Vanilla\Dashboard\Models\BannerImageModel::class => ['HeroImagePlugin'],
+            \Vanilla\Web\Asset\LegacyAssetModel::class => ["AssetModel"],
+            \Vanilla\Dashboard\Models\BannerImageModel::class => ["HeroImagePlugin"],
             \Vanilla\Dashboard\Events\UserEvent::class => ["Vanilla\Community\Events\UserEvent"],
             \Vanilla\Theme\ThemeService::class => ["Vanilla\Models\ThemeModel"],
             \Vanilla\Web\Pagination\WebLinking::class => ["\Vanilla\Web\WebLinking"],

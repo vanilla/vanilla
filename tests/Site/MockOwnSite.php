@@ -13,14 +13,15 @@ use Vanilla\Site\OwnSite;
 /**
  * Mockable own site.
  */
-class MockOwnSite extends OwnSite {
-
+class MockOwnSite extends OwnSite
+{
     /**
      * Apply properties from a site to the ownsite instance.r
      *
      * @param Site $site
      */
-    public function applyFrom(Site $site) {
+    public function applyFrom(Site $site)
+    {
         $this->siteID = $site->getSiteID();
         $this->accountID = $site->getAccountID();
         $this->name = $site->getName();

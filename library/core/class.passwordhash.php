@@ -27,8 +27,8 @@ use Garden\Password\XenforoPassword;
 /**
  * Wrapper for Garden Password.
  */
-class Gdn_PasswordHash {
-
+class Gdn_PasswordHash
+{
     /** @var array */
     protected $algorithms = [];
 
@@ -51,7 +51,8 @@ class Gdn_PasswordHash {
      * @throws Gdn_UserException If the password needs to be reset.
      * @throws Gdn_UserException If the password has a method of "random".
      */
-    public function checkPassword($password, $storedHash, $method = false) {
+    public function checkPassword($password, $storedHash, $method = false)
+    {
         $result = false;
 
         if (empty($password) || empty($storedHash)) {
@@ -62,70 +63,79 @@ class Gdn_PasswordHash {
         $request = new Gdn_Request();
 
         switch (strtolower($method)) {
-            case 'crypt':
-                $result = (crypt($password, $storedHash) === $storedHash);
+            case "crypt":
+                $result = crypt($password, $storedHash) === $storedHash;
                 break;
-            case 'django':
-                $result = $this->getAlgorithm('Django')->verify($password, $storedHash);
+            case "django":
+                $result = $this->getAlgorithm("Django")->verify($password, $storedHash);
                 break;
-            case 'drupal':
-                $result = $this->getAlgorithm('Drupal')->verify($password, $storedHash);
+            case "drupal":
+                $result = $this->getAlgorithm("Drupal")->verify($password, $storedHash);
                 break;
-            case 'ipb':
-                $result = $this->getAlgorithm('Ipb')->verify($password, $storedHash);
+            case "ipb":
+                $result = $this->getAlgorithm("Ipb")->verify($password, $storedHash);
                 break;
-            case 'joomla':
-                $result = $this->getAlgorithm('Joomla')->verify($password, $storedHash);
+            case "joomla":
+                $result = $this->getAlgorithm("Joomla")->verify($password, $storedHash);
                 break;
-            case 'mybb':
-                $result = $this->getAlgorithm('Mybb')->verify($password, $storedHash);
+            case "mybb":
+                $result = $this->getAlgorithm("Mybb")->verify($password, $storedHash);
                 break;
-            case 'phpass':
-                $result = $this->getAlgorithm('Phpass')->verify($password, $storedHash);
+            case "phpass":
+                $result = $this->getAlgorithm("Phpass")->verify($password, $storedHash);
                 break;
-            case 'phpbb':
-                $result = $this->getAlgorithm('Phpbb')->verify($password, $storedHash);
+            case "phpbb":
+                $result = $this->getAlgorithm("Phpbb")->verify($password, $storedHash);
                 break;
-            case 'punbb':
-                $result = $this->getAlgorithm('Punbb')->verify($password, $storedHash);
+            case "punbb":
+                $result = $this->getAlgorithm("Punbb")->verify($password, $storedHash);
                 break;
-            case 'reset':
-                $resetUrl = url('entry/passwordrequest'.(Gdn::request()->get('display') ? '?display='
-                        .urlencode(Gdn::request()->get('display')) : ''));
+            case "reset":
+                $resetUrl = url(
+                    "entry/passwordrequest" .
+                        (Gdn::request()->get("display") ? "?display=" . urlencode(Gdn::request()->get("display")) : "")
+                );
                 $messageReset = 'You need to reset your password. 
                 This is most likely because an administrator recently changed your account information.
                 Click <a href="%s">here</a> to reset your password.';
-                throw new Gdn_SanitizedUserException(sprintf(t('You need to reset your password.', $messageReset), $request->url($resetUrl)));
+                throw new Gdn_SanitizedUserException(
+                    sprintf(t("You need to reset your password.", $messageReset), $request->url($resetUrl))
+                );
                 break;
-            case 'random':
-                $resetUrl = url('entry/passwordrequest'.(Gdn::request()->get('display') ? '?display='
-                        .urlencode(Gdn::request()->get('display')) : ''));
-                $messageRandom ='Your account does not have a password assigned to it yet. Click <a href="%s">here</a> to set your password.';
-                throw new Gdn_SanitizedUserException(sprintf(t('You don\'t have a password.', $messageRandom), $request->url($resetUrl)));
+            case "random":
+                $resetUrl = url(
+                    "entry/passwordrequest" .
+                        (Gdn::request()->get("display") ? "?display=" . urlencode(Gdn::request()->get("display")) : "")
+                );
+                $messageRandom =
+                    'Your account does not have a password assigned to it yet. Click <a href="%s">here</a> to set your password.';
+                throw new Gdn_SanitizedUserException(
+                    sprintf(t('You don\'t have a password.', $messageRandom), $request->url($resetUrl))
+                );
                 break;
-            case 'smf':
-                $result = $this->getAlgorithm('Smf')->verify($password, $storedHash);
+            case "smf":
+                $result = $this->getAlgorithm("Smf")->verify($password, $storedHash);
                 break;
-            case 'vbulletin':
-                $result = $this->getAlgorithm('Vbulletin')->verify($password, $storedHash);
+            case "vbulletin":
+                $result = $this->getAlgorithm("Vbulletin")->verify($password, $storedHash);
                 break;
-            case 'vbulletin5': // Since 5.1
+            case "vbulletin5": // Since 5.1
                 // md5 sum the raw password before crypt. Nice work as usual vb.
                 $result = $storedHash === crypt(md5($password), $storedHash);
                 break;
-            case 'xenforo':
-                $result = $this->getAlgorithm('Xenforo')->verify($password, $storedHash);
+            case "xenforo":
+                $result = $this->getAlgorithm("Xenforo")->verify($password, $storedHash);
                 break;
-            case 'yaf':
+            case "yaf":
                 $result = $this->checkYAF($password, $storedHash);
                 break;
-            case 'webwiz':
-                $result = $this->getAlgorithm('WebWiz')->verify($password, $storedHash);
+            case "webwiz":
+                $result = $this->getAlgorithm("WebWiz")->verify($password, $storedHash);
                 break;
-            case 'vanilla':
+            case "vanilla":
             default:
-                $this->Weak = $this->getAlgorithm('Vanilla')->needsRehash($storedHash);
-                $result = $this->getAlgorithm('Vanilla')->verify($password, $storedHash);
+                $this->Weak = $this->getAlgorithm("Vanilla")->needsRehash($storedHash);
+                $result = $this->getAlgorithm("Vanilla")->verify($password, $storedHash);
         }
 
         return $result;
@@ -138,24 +148,25 @@ class Gdn_PasswordHash {
      * @param string $storedHash The password hash stored in the database.
      * @return bool Returns **true** if the password matches the hash or **false** if it doesn't.
      */
-    protected function checkYAF($password, $storedHash) {
+    protected function checkYAF($password, $storedHash)
+    {
         if (strpos($storedHash, '$') === false) {
             return md5($password) == $storedHash;
         } else {
-            ini_set('mbstring.func_overload', "0");
-            list($method, $salt, $hash, $compare) = explode('$', $storedHash);
+            ini_set("mbstring.func_overload", "0");
+            [$method, $salt, $hash, $compare] = explode('$', $storedHash);
 
             $salt = base64_decode($salt);
             $hash = bin2hex(base64_decode($hash));
-            $password = mb_convert_encoding($password, 'UTF-16LE');
+            $password = mb_convert_encoding($password, "UTF-16LE");
 
             // There are two ways of building the hash string in yaf.
-            if ($compare == 's') {
+            if ($compare == "s") {
                 // Compliant with ASP.NET Membership method of hash/salt
-                $hashString = $salt.$password;
+                $hashString = $salt . $password;
             } else {
                 // The yaf algorithm has a quirk where they knock a
-                $hashString = substr($password, 0, -1).$salt.chr(0);
+                $hashString = substr($password, 0, -1) . $salt . chr(0);
             }
 
             $calcHash = hash($method, $hashString);
@@ -171,23 +182,24 @@ class Gdn_PasswordHash {
      * @throws Exception If a matching class cannot be found.
      * @throws Exception If the found class is not an instance of PasswordInterface.
      */
-    protected function getAlgorithm($algorithm) {
-        if (!stringEndsWith($algorithm, 'Password')) {
-            $algorithm .= 'Password';
+    protected function getAlgorithm($algorithm)
+    {
+        if (!stringEndsWith($algorithm, "Password")) {
+            $algorithm .= "Password";
         }
 
         if (!array_key_exists($algorithm, $this->algorithms)) {
             $class = "\\Garden\\Password\\{$algorithm}";
 
             if (!class_exists($class)) {
-                throw new Exception(sprintf(t('Password hashing algorithm does not exist: %s'), $algorithm));
+                throw new Exception(sprintf(t("Password hashing algorithm does not exist: %s"), $algorithm));
             }
 
             $instance = new $class();
             if ($instance instanceof PasswordInterface) {
                 $this->algorithms[$algorithm] = $instance;
             } else {
-                throw new Exception(sprintf(t('Invalid password hashing algorithm: %s')), $algorithm);
+                throw new Exception(sprintf(t("Invalid password hashing algorithm: %s")), $algorithm);
             }
         }
 
@@ -200,9 +212,10 @@ class Gdn_PasswordHash {
      * @param string $algorithm
      * @return bool
      */
-    public function hasAlgorithm(string $algorithm): bool {
-        if (!str_ends_with($algorithm, 'Password')) {
-            $algorithm .= 'Password';
+    public function hasAlgorithm(string $algorithm): bool
+    {
+        if (!str_ends_with($algorithm, "Password")) {
+            $algorithm .= "Password";
         }
         $algorithm = ucfirst($algorithm);
         $class = "\\Garden\\Password\\{$algorithm}";
@@ -219,8 +232,9 @@ class Gdn_PasswordHash {
      * @param string $password The plaintext password to hash.
      * @return string Returns a secure hash of {@link $password}.
      */
-    public function hashPassword($password) {
-        if (!$this->portable_hashes && function_exists('password_hash')) {
+    public function hashPassword($password)
+    {
+        if (!$this->portable_hashes && function_exists("password_hash")) {
             // Use PHP's native password hashing function.
             $result = password_hash($password, PASSWORD_DEFAULT);
         } else {
@@ -235,8 +249,9 @@ class Gdn_PasswordHash {
      * @param string $password The plaintext password to hash.
      * @return string Returns a password hash.
      */
-    public function hashPasswordPhpass($password) {
-        $phpass = $this->getAlgorithm('Phpass');
+    public function hashPasswordPhpass($password)
+    {
+        $phpass = $this->getAlgorithm("Phpass");
 
         if ($this->portable_hashes) {
             $phpass->setHashMethod(PhpassPassword::HASH_PHPASS);

@@ -18,7 +18,8 @@ use Vanilla\Utility\SchemaUtils;
 /**
  * Tests for the `SchemaUtils` class.
  */
-class SchemaUtilsTest extends TestCase {
+class SchemaUtilsTest extends TestCase
+{
     /**
      * Test some only one of error cases.
      *
@@ -26,14 +27,15 @@ class SchemaUtilsTest extends TestCase {
      * @param int $count
      * @dataProvider provideOnlyOneOfErrors
      */
-    public function testOnlyOneOfErrors(array $properties, int $count = 1) {
-        $field = new ValidationField(new Validation(), [], '');
+    public function testOnlyOneOfErrors(array $properties, int $count = 1)
+    {
+        $field = new ValidationField(new Validation(), [], "");
         $fn = SchemaUtils::onlyOneOf($properties, $count);
 
-        $value = $fn(new \ArrayObject(['a' => 1, 'b' => 1, 'c' => 1]), $field);
+        $value = $fn(new \ArrayObject(["a" => 1, "b" => 1, "c" => 1]), $field);
         $this->assertSame(Invalid::value(), $value);
         $this->assertFalse($field->isValid());
-        $this->assertStringContainsString(implode(', ', $properties), $field->getValidation()->getMessage());
+        $this->assertStringContainsString(implode(", ", $properties), $field->getValidation()->getMessage());
     }
 
     /**
@@ -41,10 +43,11 @@ class SchemaUtilsTest extends TestCase {
      *
      * @return array
      */
-    public function provideOnlyOneOfErrors(): array {
+    public function provideOnlyOneOfErrors(): array
+    {
         $r = [
-            'a, b' => [['a', 'b']],
-            'a, b, c' => [['a', 'b', 'c'], 2],
+            "a, b" => [["a", "b"]],
+            "a, b, c" => [["a", "b", "c"], 2],
         ];
         return $r;
     }
@@ -56,12 +59,13 @@ class SchemaUtilsTest extends TestCase {
      * @param int $count
      * @dataProvider provideOnlyOneOfHappy
      */
-    public function testOnlyOneOfHappy(array $properties, int $count = 1) {
-        $field = new ValidationField(new Validation(), [], '');
+    public function testOnlyOneOfHappy(array $properties, int $count = 1)
+    {
+        $field = new ValidationField(new Validation(), [], "");
         $fn = SchemaUtils::onlyOneOf($properties, $count);
 
-        $value = $fn(['a' => 1, 'b' => 1], $field);
-        $this->assertSame(['a' => 1, 'b' => 1], $value);
+        $value = $fn(["a" => 1, "b" => 1], $field);
+        $this->assertSame(["a" => 1, "b" => 1], $value);
         $this->assertTrue($field->isValid());
     }
 
@@ -70,10 +74,11 @@ class SchemaUtilsTest extends TestCase {
      *
      * @return array
      */
-    public function provideOnlyOneOfHappy(): array {
+    public function provideOnlyOneOfHappy(): array
+    {
         $r = [
-            'a, c' => [['a', 'c']],
-            'a, b, c' => [['a', 'b', 'c'], 2],
+            "a, c" => [["a", "c"]],
+            "a, b, c" => [["a", "b", "c"], 2],
         ];
         return $r;
     }
@@ -81,20 +86,22 @@ class SchemaUtilsTest extends TestCase {
     /**
      * The only one of validator should only validate arrayish values.
      */
-    public function testOnlyOneOfNotArray(): void {
-        $field = new ValidationField(new Validation(), [], '');
-        $fn = SchemaUtils::onlyOneOf(['a', 'b']);
+    public function testOnlyOneOfNotArray(): void
+    {
+        $field = new ValidationField(new Validation(), [], "");
+        $fn = SchemaUtils::onlyOneOf(["a", "b"]);
 
-        $value = $fn('foo', $field);
-        $this->assertSame('foo', $value);
+        $value = $fn("foo", $field);
+        $this->assertSame("foo", $value);
     }
 
     /**
      * Validating an array should work with valid data.
      */
-    public function testValidateArrayValid(): void {
-        $schema = Schema::parse([':i']);
-        $arr = ['1', '2'];
+    public function testValidateArrayValid(): void
+    {
+        $schema = Schema::parse([":i"]);
+        $arr = ["1", "2"];
         SchemaUtils::validateArray($arr, $schema);
         $this->assertSame([1, 2], $arr);
     }
@@ -102,23 +109,25 @@ class SchemaUtilsTest extends TestCase {
     /**
      * The validate array should throw an exception when the value isn't an array.
      */
-    public function testValidateArrayNotArray(): void {
-        $schema  = Schema::parse([':i']);
+    public function testValidateArrayNotArray(): void
+    {
+        $schema = Schema::parse([":i"]);
         $this->expectException(ValidationException::class);
-        $this->expectExceptionMessage('is not a valid integer');
-        $arr = 'a';
+        $this->expectExceptionMessage("is not a valid integer");
+        $arr = "a";
         SchemaUtils::validateArray($arr, $schema);
     }
 
     /**
      * Validating an array should throw an exception for single items.
      */
-    public function testValidateInvalidItem(): void {
-        $schema  = Schema::parse([':i']);
+    public function testValidateInvalidItem(): void
+    {
+        $schema = Schema::parse([":i"]);
 
         $this->expectException(ValidationException::class);
-        $this->expectExceptionMessage('is not a valid integer');
-        $arr = [1, 'a'];
+        $this->expectExceptionMessage("is not a valid integer");
+        $arr = [1, "a"];
         SchemaUtils::validateArray($arr, $schema);
     }
 
@@ -129,65 +138,50 @@ class SchemaUtilsTest extends TestCase {
      * @param Schema $expected
      * @dataProvider provideFlatten
      */
-    public function testFlatten(Schema $input, Schema $expected) {
-        $actual = SchemaUtils::flattenSchema($input, '/');
+    public function testFlatten(Schema $input, Schema $expected)
+    {
+        $actual = SchemaUtils::flattenSchema($input, "/");
         $this->assertEquals($expected->getSchemaArray(), $actual->getSchemaArray());
     }
 
     /**
      * @return iterable
      */
-    public function provideFlatten(): iterable {
-        $alreadyFlatSchema = Schema::parse(['key1:s']);
+    public function provideFlatten(): iterable
+    {
+        $alreadyFlatSchema = Schema::parse(["key1:s"]);
         yield "already flat" => [$alreadyFlatSchema, $alreadyFlatSchema];
 
         yield "flatten nested objects" => [
-            Schema::parse([
-                'flat:s',
-                'nested' => Schema::parse([
-                    'level2:s'
-                ])
-            ]),
-            Schema::parse([
-                'flat:s',
-                'nested/level2:s'
-            ])
+            Schema::parse(["flat:s", "nested" => Schema::parse(["level2:s"])]),
+            Schema::parse(["flat:s", "nested/level2:s"]),
         ];
 
         yield "optional items" => [
             Schema::parse([
-                'flat:s?',
-                'nestedOuterInnerOptional?' => Schema::parse([
-                    'level2:s?'
-                ]),
-                'nestedOuterRequiredInnerOptional' => Schema::parse([
-                    'level2:s?'
-                ]),
-                'nestedOuterOptionalInnerRequired?' => Schema::parse([
-                    'level2:s'
-                ])
+                "flat:s?",
+                "nestedOuterInnerOptional?" => Schema::parse(["level2:s?"]),
+                "nestedOuterRequiredInnerOptional" => Schema::parse(["level2:s?"]),
+                "nestedOuterOptionalInnerRequired?" => Schema::parse(["level2:s"]),
             ]),
             Schema::parse([
-                'flat:s?',
-                'nestedOuterInnerOptional/level2:s?',
-                'nestedOuterRequiredInnerOptional/level2:s?',
-                'nestedOuterOptionalInnerRequired/level2:s?' => [
-                    'minLength' => 1,
+                "flat:s?",
+                "nestedOuterInnerOptional/level2:s?",
+                "nestedOuterRequiredInnerOptional/level2:s?",
+                "nestedOuterOptionalInnerRequired/level2:s?" => [
+                    "minLength" => 1,
                 ],
-            ])->setField('required', [])
+            ])->setField("required", []),
         ];
 
         yield "arrays" => [
             Schema::parse([
-                'flat:s',
-                'nested' => Schema::parse([
-                    'arr:a' => Schema::parse(['arrItem:s'])
+                "flat:s",
+                "nested" => Schema::parse([
+                    "arr:a" => Schema::parse(["arrItem:s"]),
                 ]),
             ]),
-            Schema::parse([
-                'flat:s',
-                'nested/arr:a' => Schema::parse(['arrItem:s']),
-            ]),
+            Schema::parse(["flat:s", "nested/arr:a" => Schema::parse(["arrItem:s"])]),
         ];
     }
 }

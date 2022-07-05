@@ -11,7 +11,7 @@ import { useCallback, useEffect } from "react";
  */
 export function useRouteChangePrompt(message: string, disabled: boolean = false) {
     const onWindowOrTabClose = useCallback(
-        event => {
+        (event) => {
             if (disabled) {
                 return;
             }

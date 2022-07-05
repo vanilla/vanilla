@@ -7,10 +7,12 @@
 
 namespace Vanilla\Web;
 
+use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\HttpException;
 use Garden\CustomExceptionHandler;
 use Garden\Web\Data;
 use Garden\Web\Exception\ServerException;
+use Garden\Web\Redirect;
 use Vanilla\InjectableInterface;
 use Vanilla\Models\SiteMeta;
 use Vanilla\Permissions;
@@ -20,8 +22,8 @@ use Vanilla\Web\JsInterpop\ReduxErrorAction;
 /**
  * Class representing a single page in the application.
  */
-abstract class Page implements InjectableInterface, CustomExceptionHandler, PageHeadInterface {
-
+abstract class Page implements InjectableInterface, CustomExceptionHandler, PageHeadInterface
+{
     use TwigRenderTrait, ReduxActionPreloadTrait, PageHeadProxyTrait, PermissionCheckTrait;
 
     /** @var bool */
@@ -52,10 +54,10 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler, Page
     protected $session;
 
     /** @var string */
-    protected $headerHtml = '';
+    protected $headerHtml = "";
 
     /** @var string */
-    protected $footerHtml = '';
+    protected $footerHtml = "";
 
     /** @var string|null */
     protected $seoContent;
@@ -96,21 +98,24 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler, Page
      *
      * @return Data Data object for global dispatcher.
      */
-    public function render(): Data {
+    public function render(): Data
+    {
         return $this->renderMasterView();
     }
 
     /**
      * @return PageHead
      */
-    public function getHead(): PageHead {
+    public function getHead(): PageHead
+    {
         return $this->pageHead;
     }
 
     /**
      * @return string
      */
-    public function getSeoContent(): ?string {
+    public function getSeoContent(): ?string
+    {
         return $this->seoContent;
     }
 
@@ -121,15 +126,16 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler, Page
      *
      * @return Data Data object for global dispatcher.
      */
-    private function renderMasterView(): Data {
+    private function renderMasterView(): Data
+    {
         $this->validateSeo();
         $this->addInlineScript($this->getReduxActionsAsJsVariable());
 
         $viewData = [
-            'themeHeader' => new \Twig\Markup($this->headerHtml, 'utf-8'),
-            'themeFooter' => new \Twig\Markup($this->footerHtml, 'utf-8'),
-            'cssClasses' => ['isLoading'],
-            'seoContent' => $this->seoContent,
+            "themeHeader" => new \Twig\Markup($this->headerHtml, "utf-8"),
+            "themeFooter" => new \Twig\Markup($this->footerHtml, "utf-8"),
+            "cssClasses" => ["isLoading"],
+            "seoContent" => $this->seoContent,
         ];
 
         $viewContent = $this->masterViewRenderer->renderPage($this, $viewData);
@@ -142,19 +148,18 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler, Page
      *
      * @throws ServerException If the page has not implemented valid SEO metrics in debug mode.
      */
-    private function validateSeo() {
+    private function validateSeo()
+    {
         $hasInvalidSeo =
             $this->siteMeta->getDebugModeEnabled() &&
             $this->requiresSeo &&
-            (
-                $this->getSeoTitle() === null ||
+            ($this->getSeoTitle() === null ||
                 $this->getSeoBreadcrumbs() === null ||
                 $this->seoContent === null ||
                 $this->getSeoDescription() === null ||
-                $this->getCanonicalUrl() === null
-            );
+                $this->getCanonicalUrl() === null);
         if ($hasInvalidSeo) {
-            throw new ServerException('Page SEO data is not fully implemented');
+            throw new ServerException("Page SEO data is not fully implemented");
         }
     }
 
@@ -164,10 +169,11 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler, Page
      * @param string $content
      * @return $this Own instance for chaining.
      */
-    public function blockRobots($content = 'noindex'): self {
+    public function blockRobots($content = "noindex"): self
+    {
         $this->setSeoRequired(false);
-        safeHeader('X-Robots-Tag: noindex', true);
-        $this->addMetaTag(['name' => 'robots', 'content' => $content]);
+        safeHeader("X-Robots-Tag: noindex", true);
+        $this->addMetaTag(["name" => "robots", "content" => $content]);
 
         return $this;
     }
@@ -179,7 +185,8 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler, Page
      *
      * @return $this Own instance for chaining.
      */
-    public function setSeoRequired(bool $required = true): self {
+    public function setSeoRequired(bool $required = true): self
+    {
         $this->requiresSeo = $required;
 
         return $this;
@@ -193,7 +200,8 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler, Page
      *
      * @return $this Own instance for chaining.
      */
-    protected function setSeoContent(string $viewPathOrView, array $viewData = null): self {
+    protected function setSeoContent(string $viewPathOrView, array $viewData = null): self
+    {
         // No view data so assume the view is rendered already.
         if ($viewData === null) {
             $this->seoContent = $viewPathOrView;
@@ -208,24 +216,30 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler, Page
     /**
      * @inheritdoc
      */
-    public function hasExceptionHandler(\Throwable $e): bool {
+    public function hasExceptionHandler(\Throwable $e): bool
+    {
         return $e instanceof HttpException;
     }
 
     /**
      * @inheritdoc
      */
-    public function handleException(\Throwable $e): Data {
+    public function handleException(\Throwable $e): Data
+    {
+        if ($e instanceof ForbiddenException && !$this->session->isValid()) {
+            $signinUrl = url("/entry/signin?Target=" . urlencode($this->request->getUrl()), true);
+            return new Redirect($signinUrl);
+        }
+
         $this->requiresSeo = false;
         $this->statusCode = $e->getCode();
         $this->addReduxAction(new ReduxErrorAction($e))
             ->setSeoTitle($e->getMessage())
-            ->addMetaTag(['name' => 'robots', 'content' => 'noindex'])
-            ->setSeoContent('resources/views/error.twig', [
-                'errorMessage' => $e->getMessage(),
-                'errorCode' => $e->getCode()
-            ])
-        ;
+            ->addMetaTag(["name" => "robots", "content" => "noindex"])
+            ->setSeoContent("resources/views/error.twig", [
+                "errorMessage" => $e->getMessage(),
+                "errorCode" => $e->getCode(),
+            ]);
 
         return $this->renderMasterView();
     }
@@ -237,14 +251,11 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler, Page
      *
      * @return $this
      */
-    public function requiresSession(string $redirectTarget = null): self {
+    public function requiresSession(string $redirectTarget = null): self
+    {
         $redirectTarget = $redirectTarget ?? \Gdn::request()->getUrl();
         if (!$this->session->isValid()) {
-            header(
-                'Location: /entry/signin?Target=' . urlencode($redirectTarget),
-                true,
-                302
-            );
+            header("Location: /entry/signin?Target=" . urlencode($redirectTarget), true, 302);
             exit();
         } else {
             return $this;
@@ -254,7 +265,8 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler, Page
     /**
      * @inheridoc
      */
-    protected function getPermissions(): ?Permissions {
+    protected function getPermissions(): ?Permissions
+    {
         if ($this->session === null) {
             return null;
         }

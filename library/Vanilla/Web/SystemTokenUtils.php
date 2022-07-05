@@ -16,8 +16,8 @@ use Vanilla\Utility\ArrayUtils;
 /**
  * Utility class for handling system tokens.
  */
-class SystemTokenUtils {
-
+class SystemTokenUtils
+{
     public const JWT_ALGO = "HS512";
 
     public const CLAIM_REQUEST_BODY = "body";
@@ -37,7 +37,8 @@ class SystemTokenUtils {
      *
      * @param string $secret
      */
-    public function __construct(string $secret, Gdn_Session $session) {
+    public function __construct(string $secret, Gdn_Session $session)
+    {
         $this->secret = $secret;
         $this->session = $session;
     }
@@ -49,7 +50,8 @@ class SystemTokenUtils {
      * @param RequestInterface $context
      * @return array
      */
-    public function decode(string $jwt, RequestInterface $context): array {
+    public function decode(string $jwt, RequestInterface $context): array
+    {
         $payload = JWT::decode($jwt, $this->secret, [self::JWT_ALGO]);
         $payload = ArrayUtils::objToArrayRecursive($payload);
 
@@ -75,12 +77,13 @@ class SystemTokenUtils {
      * @param array|null $query
      * @return string
      */
-    public function encode(?array $body = null, ?array $query = null): string {
+    public function encode(?array $body = null, ?array $query = null): string
+    {
         $timestamp = CurrentTimeStamp::get();
         $payload = [
             "exp" => $timestamp + self::TOKEN_TTL,
             "iat" => $timestamp,
-            "sub" => $this->session->UserID
+            "sub" => $this->session->UserID,
         ];
 
         if (is_array($body)) {
@@ -98,7 +101,8 @@ class SystemTokenUtils {
      *
      * @return string
      */
-    public function getSecret(): string {
+    public function getSecret(): string
+    {
         return $this->secret;
     }
 
@@ -107,7 +111,8 @@ class SystemTokenUtils {
      *
      * @param string $secret
      */
-    public function setSecret(string $secret): void {
+    public function setSecret(string $secret): void
+    {
         $this->secret = $secret;
     }
 }

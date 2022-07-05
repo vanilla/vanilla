@@ -13,8 +13,8 @@ use PHPUnit\Framework\TestCase;
  * Tests for buildUrl().
  */
 
-class BuildUrlTest extends TestCase {
-
+class BuildUrlTest extends TestCase
+{
     /**
      * Tests {@link buildUrl()} against several scenarios.
      *
@@ -22,7 +22,8 @@ class BuildUrlTest extends TestCase {
      * @param string $expected The expected result.
      * @dataProvider provideTestBuildUrlArrays
      */
-    public function testBuildUrlArrays($testParts, $expected) {
+    public function testBuildUrlArrays($testParts, $expected)
+    {
         $actual = buildUrl($testParts);
         $this->assertSame($expected, $actual);
     }
@@ -32,29 +33,34 @@ class BuildUrlTest extends TestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideTestBuildUrlArrays() {
+    public function provideTestBuildUrlArrays()
+    {
         $r = [
-            'allPartsAccountedFor' => [
-                ['scheme' => 'http',
-                    'user' => 'dick',
-                    'pass' => 'secret',
-                    'host' => 'dicks-house',
-                    'port' => '1980',
-                    'path' => 'dinner',
-                    'query' => 'what-are-we-having?',
-                    'fragment' => 'tacos-again',],
-                'http://dick:secret@dicks-house:1980/dinner?what-are-we-having?#tacos-again',
+            "allPartsAccountedFor" => [
+                [
+                    "scheme" => "http",
+                    "user" => "dick",
+                    "pass" => "secret",
+                    "host" => "dicks-house",
+                    "port" => "1980",
+                    "path" => "dinner",
+                    "query" => "what-are-we-having?",
+                    "fragment" => "tacos-again",
+                ],
+                "http://dick:secret@dicks-house:1980/dinner?what-are-we-having?#tacos-again",
             ],
-            'noValues' => [
-                ['scheme' => '',
-                    'user' => '',
-                    'pass' => '',
-                    'host' => '',
-                    'port' => '',
-                    'path' => '',
-                    'query' => '',
-                    'fragment' => '',],
-                '://',
+            "noValues" => [
+                [
+                    "scheme" => "",
+                    "user" => "",
+                    "pass" => "",
+                    "host" => "",
+                    "port" => "",
+                    "path" => "",
+                    "query" => "",
+                    "fragment" => "",
+                ],
+                "://",
             ],
         ];
 

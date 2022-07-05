@@ -7,12 +7,17 @@ import { logWarning, RecordID } from "@vanilla/utils";
 import React, { useState, useContext } from "react";
 
 type RecordToggle = (recordType: string, recordID: RecordID) => void;
-
+type Record = {
+    recordType: string;
+    recordID: RecordID;
+};
 interface ISiteNavCtx {
     categoryRecordType: string;
     toggleItem: RecordToggle;
     openItem: RecordToggle;
     closeItem: RecordToggle;
+    setInitialOpenItems(initialOpenType: string | null, items: Array<Record>): void;
+    initialOpenType: string | null;
     openRecords: {
         [recordType: string]: Set<RecordID>;
     };
@@ -28,7 +33,7 @@ const noop = () => {
 };
 
 interface IOpenRecords {
-    [recordType: string]: Set<number>;
+    [recordType: string]: Set<RecordID>;
 }
 
 const defaultContext: ISiteNavCtx = {
@@ -36,6 +41,8 @@ const defaultContext: ISiteNavCtx = {
     toggleItem: noop,
     openItem: noop,
     closeItem: noop,
+    setInitialOpenItems: noop,
+    initialOpenType: null,
     openRecords: {},
 };
 
@@ -52,12 +59,13 @@ export function useSiteNavContext() {
  * This helps to keep nav toggles consistent across page navigations.
  */
 export default function SiteNavProvider(props: IProps) {
+    const [initialOpenType, setInitialOpenType] = useState<string | null>(null);
     const [openRecords, setOpenRecords] = useState<IOpenRecords>({});
 
     /**
      * Open an item in the nav.
      */
-    const openItem = (recordType: string, recordID: number) => {
+    const openItem = (recordType: string, recordID: RecordID) => {
         setOpenRecords((existingState) => {
             const records = existingState[recordType] || new Set();
             records.add(recordID);
@@ -71,7 +79,7 @@ export default function SiteNavProvider(props: IProps) {
     /**
      * Close an item in the nav.
      */
-    const closeItem = (recordType: string, recordID: number) => {
+    const closeItem = (recordType: string, recordID: RecordID) => {
         const records = openRecords[recordType];
         if (!records) {
             return;
@@ -88,13 +96,20 @@ export default function SiteNavProvider(props: IProps) {
     /**
      * Toggle an item in the nav.
      */
-    const toggleItem = (recordType: string, recordID: number) => {
+    const toggleItem = (recordType: string, recordID: RecordID) => {
         const records = openRecords[recordType];
         if (records && records.has(recordID)) {
             closeItem(recordType, recordID);
         } else {
             openItem(recordType, recordID);
         }
+    };
+
+    const setInitialOpenItems = (newInitialOpenType: string | null, initialOpenItems: Array<Record>): void => {
+        setInitialOpenType(newInitialOpenType);
+        initialOpenItems.forEach((item) => {
+            openItem(item.recordType, item.recordID);
+        });
     };
 
     return (
@@ -105,6 +120,8 @@ export default function SiteNavProvider(props: IProps) {
                 closeItem: closeItem,
                 toggleItem: toggleItem,
                 openRecords: openRecords,
+                initialOpenType,
+                setInitialOpenItems,
             }}
         >
             {props.children}

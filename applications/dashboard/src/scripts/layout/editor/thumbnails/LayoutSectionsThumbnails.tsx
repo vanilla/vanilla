@@ -65,12 +65,7 @@ export default function LayoutSectionsThumbnails(props: IProps) {
                     .reverse()
                     .map((sectionID: LayoutSectionID) => {
                         const label = t(sections[sectionID].name);
-                        const accessibleDescription =
-                            t("Widget Type: ") +
-                            sections[sectionID].recommendedWidgets
-                                ?.map((recommendedWidget) => recommendedWidget.widgetName)
-                                .join(", ") +
-                            t(" etc");
+                        const accessibleDescription = t(sections[sectionID].name);
 
                         return (
                             <CustomRadioInput
@@ -105,14 +100,7 @@ export default function LayoutSectionsThumbnails(props: IProps) {
                                             />
                                         </span>
 
-                                        <div className={classes.labelContainer}>
-                                            {t(label)}
-                                            <ToolTip label={accessibleDescription}>
-                                                <div className={classes.informationIcon}>
-                                                    <InformationIcon />
-                                                </div>
-                                            </ToolTip>
-                                        </div>
+                                        <div className={classes.labelContainer}>{t(label)}</div>
                                     </>
                                 )}
                             </CustomRadioInput>

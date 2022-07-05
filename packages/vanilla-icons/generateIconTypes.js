@@ -56,6 +56,6 @@ export type IconType =${Object.keys(svgsByPrefix)
 `;
 
 const filePath = path.resolve(__dirname, "./src/IconType.ts");
-resultJs = prettier.format(resultJs, {...vanillaPrettier, filepath: filePath});
+resultJs = prettier.format(resultJs, { ...vanillaPrettier, filepath: filePath });
 
 fse.writeFileSync(filePath, resultJs);

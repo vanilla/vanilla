@@ -10,8 +10,8 @@ namespace Vanilla\Web;
 /**
  * Helper class to pass in PageHeadInterface.
  */
-interface PageHeadAwareInterface {
-
+interface PageHeadAwareInterface
+{
     /**
      * Set PageHeadInterface for data population.
      *

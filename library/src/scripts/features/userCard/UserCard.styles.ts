@@ -22,7 +22,7 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean; zIndex
     // Global for reach
     injectGlobal({
         "[data-reach-popover]": {
-            zIndex: props.zIndex ?? 1051, // Get above our modals.
+            zIndex: props.zIndex ?? 1050, // Just like our modals.
         },
     });
 

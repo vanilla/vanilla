@@ -11,19 +11,18 @@ import { hasUserViewPermission } from "@library/features/users/modules/hasUserVi
 import { useUser, useCurrentUserID } from "@library/features/users/userHooks";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import { useDevice, Devices } from "@library/layout/DeviceContext";
-import LazyModal from "@library/modal/LazyModal";
+import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
 import { UserCardContext, useUserCardContext } from "@library/features/userCard/UserCard.context";
 import { UserCardMinimal, UserCardSkeleton, UserCardView } from "@library/features/userCard/UserCard.views";
 import { useUniqueID } from "@library/utility/idUtils";
 import Popover, { positionDefault } from "@reach/popover";
 import { t } from "@vanilla/i18n";
-import { useFocusWatcher } from "@vanilla/react-utils";
+import { StackingContextProvider, useFocusWatcher } from "@vanilla/react-utils";
 import React, { useCallback, useRef, useState } from "react";
 import { UserCardError } from "@library/features/userCard/UserCard.views";
 import { hasPermission } from "@library/features/users/Permission";
 import { getMeta } from "@library/utility/appUtils";
-import { StackingContextProvider } from "@library/modal/StackingContext";
 
 interface IProps {
     /** UserID of the user being loaded. */
@@ -106,7 +105,7 @@ export function UserCardPopup(props: React.PropsWithChildren<IProps> & { forceOp
                             )}
                             {forceModal && (
                                 // On mobile we are forced into a modal, which is controlled by the `isVisible` param instead of conditional rendering.
-                                <LazyModal
+                                <Modal
                                     isVisible={isOpen}
                                     size={ModalSizes.SMALL}
                                     exitHandler={() => {
@@ -119,7 +118,7 @@ export function UserCardPopup(props: React.PropsWithChildren<IProps> & { forceOp
                                             setIsOpen(false);
                                         }}
                                     />
-                                </LazyModal>
+                                </Modal>
                             )}
                         </>
                     ),
@@ -191,7 +190,10 @@ export function useUserCardTrigger(): {
 /**
  * Calculate a position for the user card that is centered if possible.
  */
-function positionPreferTopMiddle(targetRect?: DOMRect | null, popoverRect?: DOMRect | null): React.CSSProperties {
+export function positionPreferTopMiddle(
+    targetRect?: DOMRect | null,
+    popoverRect?: DOMRect | null,
+): React.CSSProperties {
     const posDefault = positionDefault(targetRect, popoverRect);
 
     const halfPopoverWidth = (popoverRect?.width ?? 0) / 2;

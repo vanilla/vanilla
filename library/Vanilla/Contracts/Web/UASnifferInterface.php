@@ -14,8 +14,8 @@ namespace Vanilla\Contracts\Web;
  * WE DO NOT VARY CACHE HEADERS BY USER-AGENT.
  * THIS WILL NOT WORK IN ANY CACHED CONTENT.
  */
-interface UASnifferInterface {
-
+interface UASnifferInterface
+{
     /**
      * DO NOT USE THIS FOR CACHED CONTENT.
      * WE DO NOT VARY CACHE HEADERS BY USER-AGENT.

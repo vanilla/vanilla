@@ -13,8 +13,8 @@ use VanillaTests\MinimalContainerTestCase;
 /**
  * Tests for PlainTextLengthValidator class.
  */
-class PlainTextLengthValidatorTest extends MinimalContainerTestCase {
-
+class PlainTextLengthValidatorTest extends MinimalContainerTestCase
+{
     /** @var int Number of characters to test for. */
     const TEST_MAX_COMMENT_LENGTH = 10;
 
@@ -26,13 +26,14 @@ class PlainTextLengthValidatorTest extends MinimalContainerTestCase {
      *
      * @dataProvider providePostContent
      */
-    public function testPlainTextLengthValidator(array $post, bool $isValid) {
+    public function testPlainTextLengthValidator(array $post, bool $isValid)
+    {
         $validator = $this->container()->get(PlainTextLengthValidator::class);
-        $field = (object)[
-            'Name' => 'Body',
-            'maxPlainTextLength' => self::TEST_MAX_COMMENT_LENGTH,
+        $field = (object) [
+            "Name" => "Body",
+            "maxPlainTextLength" => self::TEST_MAX_COMMENT_LENGTH,
         ];
-        $result = $validator($post['Body'] ?? '', $field, $post);
+        $result = $validator($post["Body"] ?? "", $field, $post);
         $actual = !($result instanceof Invalid);
         $this->assertEquals($isValid, $actual);
     }
@@ -42,68 +43,71 @@ class PlainTextLengthValidatorTest extends MinimalContainerTestCase {
      *
      * @return array Formatted posts with expected validation results (true or false).
      */
-    public static function providePostContent() {
+    public static function providePostContent()
+    {
         return [
-            'Empty Body' => [
+            "Empty Body" => [
                 [
-                    'Body' => '',
-                    'Format' => 'markdown',
+                    "Body" => "",
+                    "Format" => "markdown",
                 ],
                 true,
             ],
-            'Empty Format' => [
+            "Empty Format" => [
                 [
-                    'Body' => 'Word up!',
-                    'Format' => '',
+                    "Body" => "Word up!",
+                    "Format" => "",
                 ],
                 false,
             ],
-            'Short Plain' => [
+            "Short Plain" => [
                 [
-                    'Body' => 'Word Up',
-                    'Format' => 'markdown',
+                    "Body" => "Word Up",
+                    "Format" => "markdown",
                 ],
                 true,
             ],
-            'Short Formatted' => [
+            "Short Formatted" => [
                 [
-                    'Body' => '**Word** *Up*',
-                    'Format' => 'markdown',
+                    "Body" => "**Word** *Up*",
+                    "Format" => "markdown",
                 ],
                 true,
             ],
-            'Long Markdown' => [
+            "Long Markdown" => [
                 [
-                    'Body' => '**Many** Words *Up*',
-                    'Format' => 'markdown',
+                    "Body" => "**Many** Words *Up*",
+                    "Format" => "markdown",
                 ],
                 false,
             ],
-            'Short Rich' => [
+            "Short Rich" => [
                 [
-                    'Body' => '[{"insert":"Word "},{"attributes":{"link":"https:\/\/up.org"},"insert":"Up"},{"insert":"\n"}]',
-                    'Format' => 'rich',
+                    "Body" =>
+                        '[{"insert":"Word "},{"attributes":{"link":"https:\/\/up.org"},"insert":"Up"},{"insert":"\n"}]',
+                    "Format" => "rich",
                 ],
                 true,
             ],
-            'Long Rich' => [
+            "Long Rich" => [
                 [
-                    'Body' => '[{"insert":"Many words"},{"attributes":{"link":"https:\/\/up.org"},"insert":"Up"}]',
-                    'Format' => 'rich',
+                    "Body" => '[{"insert":"Many words"},{"attributes":{"link":"https:\/\/up.org"},"insert":"Up"}]',
+                    "Format" => "rich",
                 ],
                 false,
             ],
-            'Short WYSYWIG' => [
+            "Short WYSYWIG" => [
                 [
-                    'Body' => '<p>Word<span class="Test"><a rel="nofollow" href="https://up.org">up</a></span></p>',
-                    'Format' => 'wysiwyg',
+                    "Body" => '<p>Word<span class="Test"><a rel="nofollow" href="https://up.org">up</a></span></p>',
+                    "Format" => "wysiwyg",
                 ],
                 true,
             ],
-            'Long WYSYWIG' => [
+            "Long WYSYWIG" => [
                 [
-                    'Body' => '<p>Many words<span class="Test"><a rel="nofollow" href="https://up.org">up</a></span></p>',
-                    'Format' => 'wysiwyg',
+                    "Body" =>
+                        '<p>Many words<span class="Test"><a rel="nofollow" href="https://up.org">up</a></span></p>',
+                    "Format" => "wysiwyg",
                 ],
                 false,
             ],

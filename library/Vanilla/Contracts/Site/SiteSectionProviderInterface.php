@@ -12,7 +12,8 @@ namespace Vanilla\Contracts\Site;
  * This is called a "provider" because it does not contain any methods for creating/modifying sections.
  * Some implementations may contain this behaviour but it is not strictly defined for this interface.
  */
-interface SiteSectionProviderInterface {
+interface SiteSectionProviderInterface
+{
     /**
      * Returns all sections of the site.
      *

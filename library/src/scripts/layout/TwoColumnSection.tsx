@@ -19,11 +19,12 @@ interface IProps
     isInverted?: boolean;
 }
 
-function TwoColumnSection(props: IProps) {
-    const leftTopContent = props.isInverted ? props.secondaryTop : undefined;
-    const leftBottomContent = props.isInverted ? props.secondaryBottom : undefined;
-    const rightTopContent = props.isInverted ? undefined : props.secondaryTop;
-    const rightBottomContent = props.isInverted ? undefined : props.secondaryBottom;
+function SectionTwoColumns(_props: IProps) {
+    const { isInverted, secondaryBottom, secondaryTop, ...props } = _props;
+    const leftTopContent = isInverted ? secondaryTop ?? [] : undefined;
+    const leftBottomContent = isInverted ? secondaryBottom ?? [] : undefined;
+    const rightTopContent = isInverted ? undefined : secondaryTop ?? [];
+    const rightBottomContent = isInverted ? undefined : secondaryBottom ?? [];
 
     return (
         <SectionProvider type={SectionTypes.TWO_COLUMNS}>
@@ -35,9 +36,11 @@ function TwoColumnSection(props: IProps) {
                 leftBottom={leftBottomContent}
                 rightTop={rightTopContent}
                 rightBottom={rightBottomContent}
+                displayLeftColumn={isInverted}
+                displayRightColumn={!isInverted}
             />
         </SectionProvider>
     );
 }
 
-export default TwoColumnSection;
+export default SectionTwoColumns;

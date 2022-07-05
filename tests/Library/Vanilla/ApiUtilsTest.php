@@ -17,7 +17,8 @@ use Vanilla\ApiUtils;
 /**
  * Class ApiUtilsTest
  */
-class ApiUtilsTest extends BootstrapTestCase {
+class ApiUtilsTest extends BootstrapTestCase
+{
     /**
      * Basic tests for `ApiUtils::queryToFilters()`.
      *
@@ -26,7 +27,8 @@ class ApiUtilsTest extends BootstrapTestCase {
      * @param array $expectedResult
      * @dataProvider queryToFiltersProvider
      */
-    public function testQueryToFilters(Schema $schema, array $validatedQuery, array $expectedResult) {
+    public function testQueryToFilters(Schema $schema, array $validatedQuery, array $expectedResult)
+    {
         $actual = ApiUtils::queryToFilters($schema, $validatedQuery);
         $this->assertEquals($expectedResult, $actual);
     }
@@ -35,87 +37,74 @@ class ApiUtilsTest extends BootstrapTestCase {
      * Provider function for testQueryToFilters.
      * @return array
      */
-    public function queryToFiltersProvider() {
+    public function queryToFiltersProvider()
+    {
         $fieldOnlySchema = Schema::parse([
-            'parameter:s' => [
-                'x-filter' => [
-                    'field' => 'FilterFieldName',
+            "parameter:s" => [
+                "x-filter" => [
+                    "field" => "FilterFieldName",
                 ],
             ],
         ]);
         $fieldWProcessorSchema = Schema::parse([
-            'parameter:s' => [
-                'x-filter' => [
-                    'field' => 'FilterFieldName',
-                    'processor' => function ($fieldName, $value) {
-                        return [$fieldName.'Processed' => $value.'Processed'];
-                    }
+            "parameter:s" => [
+                "x-filter" => [
+                    "field" => "FilterFieldName",
+                    "processor" => function ($fieldName, $value) {
+                        return [$fieldName . "Processed" => $value . "Processed"];
+                    },
                 ],
             ],
         ]);
 
         return [
-            'FieldOnly w data' => [
-                $fieldOnlySchema,
-                ['parameter' => 'test'],
-                ['FilterFieldName' => 'test'],
-            ],
-            'FieldOnly no data' => [
-                $fieldOnlySchema,
-                ['somethingElse' => 'test'],
-                [],
-            ],
-            'FieldAndProcessor w data' => [
+            "FieldOnly w data" => [$fieldOnlySchema, ["parameter" => "test"], ["FilterFieldName" => "test"]],
+            "FieldOnly no data" => [$fieldOnlySchema, ["somethingElse" => "test"], []],
+            "FieldAndProcessor w data" => [
                 $fieldWProcessorSchema,
-                ['parameter' => 'test'],
-                ['FilterFieldNameProcessed' => 'testProcessed'],
+                ["parameter" => "test"],
+                ["FilterFieldNameProcessed" => "testProcessed"],
             ],
-            'FieldAndProcessor no data' => [
-                $fieldWProcessorSchema,
-                ['somethingElse' => 'test'],
-                []
-            ],
-            'Simple field as true' => [
-                Schema::parse(['id:i' => ['x-filter' => true]]),
-                ['id' => 123],
-                ['id' => 123],
-            ]
+            "FieldAndProcessor no data" => [$fieldWProcessorSchema, ["somethingElse" => "test"], []],
+            "Simple field as true" => [Schema::parse(["id:i" => ["x-filter" => true]]), ["id" => 123], ["id" => 123]],
         ];
     }
 
     /**
      * Test the `x-filter` schema modifier.
      */
-    public function testQueryToFiltersWInvalidProcessor() {
+    public function testQueryToFiltersWInvalidProcessor()
+    {
         $this->expectException(\Exception::class);
 
         $schema = Schema::parse([
-            'parameter:s' => [
-                'x-filter' => [
-                    'field' => 'FilterFieldName',
-                    'processor' => [$this, uniqid('non_existing_method')],
+            "parameter:s" => [
+                "x-filter" => [
+                    "field" => "FilterFieldName",
+                    "processor" => [$this, uniqid("non_existing_method")],
                 ],
             ],
         ]);
 
-        ApiUtils::queryToFilters($schema, ['parameter' => 'test']);
+        ApiUtils::queryToFilters($schema, ["parameter" => "test"]);
     }
 
     /**
      * Do a basic test of the page header parsing functionality.
      */
-    public function testParsePageHeader() {
+    public function testParsePageHeader()
+    {
         $link = <<<EOT
 <http://vanilla.test/categoriestest/api/v2/categories?page=1&limit=1>; rel="first",
 <http://vanilla.test/categoriestest/api/v2/categories?page=2&limit=1>; rel="next",
 <http://vanilla.test/categoriestest/api/v2/categories?page=2&limit=1>; rel="last"
 EOT;
 
-        $expected = array (
-            'first' => 'http://vanilla.test/categoriestest/api/v2/categories?page=1&limit=1',
-            'next' => 'http://vanilla.test/categoriestest/api/v2/categories?page=2&limit=1',
-            'last' => 'http://vanilla.test/categoriestest/api/v2/categories?page=2&limit=1',
-        );
+        $expected = [
+            "first" => "http://vanilla.test/categoriestest/api/v2/categories?page=1&limit=1",
+            "next" => "http://vanilla.test/categoriestest/api/v2/categories?page=2&limit=1",
+            "last" => "http://vanilla.test/categoriestest/api/v2/categories?page=2&limit=1",
+        ];
 
         $actual = ApiUtils::parsePageHeader($link);
 
@@ -125,8 +114,9 @@ EOT;
     /**
      * A garbled link header should just return null.
      */
-    public function testParsePageHeaderNull() {
-        $link = 'garbled';
+    public function testParsePageHeaderNull()
+    {
+        $link = "garbled";
         $actual = ApiUtils::parsePageHeader($link);
 
         $this->assertNull($actual);
@@ -135,27 +125,30 @@ EOT;
     /**
      * Test a basic call of `ApiUtils::sortEnum()`.
      */
-    public function testSortEnum(): void {
-        $r = ApiUtils::sortEnum('a', 'b');
-        $this->assertSame(['a', 'b', '-a', '-b'], $r);
+    public function testSortEnum(): void
+    {
+        $r = ApiUtils::sortEnum("a", "b");
+        $this->assertSame(["a", "b", "-a", "-b"], $r);
     }
 
     /**
      * You should be able to pass `"-$field"` to `ApiUtils::sortEnum()`.
      */
-    public function testSortEnumException(): void {
+    public function testSortEnumException(): void
+    {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('-a');
-        $r = ApiUtils::sortEnum('-a');
+        $this->expectExceptionMessage("-a");
+        $r = ApiUtils::sortEnum("-a");
     }
 
     /**
      * Verify objects in a query will be converted to strings when building pagination headers.
      */
-    public function testPagerUrlFormatStringify(): void {
+    public function testPagerUrlFormatStringify(): void
+    {
         $range = "1..10";
         $schema = Schema::parse([
-            'range' => RangeExpression::createSchema([':int'])
+            "range" => RangeExpression::createSchema([":int"]),
         ]);
         $parameters = [
             "limit" => 10,
@@ -177,8 +170,9 @@ EOT;
      * @param int $expectedOffset
      * @dataProvider provideOffsetLimitTests
      */
-    public function testOffsetLimit(array $query, int $expectedOffset): void {
-        $query['limit'] = 10;
+    public function testOffsetLimit(array $query, int $expectedOffset): void
+    {
+        $query["limit"] = 10;
         [$offset, $limit] = ApiUtils::offsetLimit($query);
         $this->assertSame(10, $limit);
         $this->assertSame($expectedOffset, $offset);
@@ -189,12 +183,13 @@ EOT;
      *
      * @return array[]
      */
-    public function provideOffsetLimitTests(): array {
+    public function provideOffsetLimitTests(): array
+    {
         $r = [
-            'offset' => [['offset' => 0], 0],
-            'page' => [['page' => 2], 10],
-            'offset overrides page' => [['offset' => 2, 'page' => 3], 2],
-            'empty' => [[], 0],
+            "offset" => [["offset" => 0], 0],
+            "page" => [["page" => 2], 10],
+            "offset overrides page" => [["offset" => 2, "page" => 3], 2],
+            "empty" => [[], 0],
         ];
         return $r;
     }

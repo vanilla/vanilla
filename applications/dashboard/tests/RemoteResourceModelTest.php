@@ -23,8 +23,8 @@ use VanillaTests\SiteTestCase;
  *
  * @package VanillaTests\Dashboard
  */
-class RemoteResourceModelTest extends SiteTestCase {
-
+class RemoteResourceModelTest extends SiteTestCase
+{
     /** @var RemoteResourceModel */
     private $remoteResourceModel;
 
@@ -34,7 +34,8 @@ class RemoteResourceModelTest extends SiteTestCase {
     /**
      * @inheritDoc
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         $this->remoteResourceModel = \Gdn::getContainer()->get(RemoteResourceModel::class);
     }
@@ -47,7 +48,8 @@ class RemoteResourceModelTest extends SiteTestCase {
      *
      * @dataProvider getByUrlDataProvider
      */
-    public function testGetByURL($url, $content) {
+    public function testGetByURL($url, $content)
+    {
         $this->remoteResourceModel->insert(["url" => $url, "content" => $content]);
         $result = $this->remoteResourceModel->getByUrl($url);
         $this->assertEquals($content, $result);
@@ -60,7 +62,8 @@ class RemoteResourceModelTest extends SiteTestCase {
      *
      * @dataProvider getByUrlDataProvider
      */
-    public function testGetByURLCaching($url, $content) {
+    public function testGetByURLCaching($url, $content)
+    {
         $this->remoteResourceModel->insert(["url" => $url, "content" => $content]);
         $this->remoteResourceModel->getByUrl($url);
 
@@ -75,63 +78,52 @@ class RemoteResourceModelTest extends SiteTestCase {
      *
      * @return array
      */
-    public function getByUrlDataProvider(): array {
+    public function getByUrlDataProvider(): array
+    {
         return [
-            [
-                "www.test.com",
-                "This valid content",
-            ],
-            [
-                "www.twotimes.com",
-                "some more valid content"
-            ],
-            [
-                "www.twotimes.com",
-                "some more valid content"
-            ],
-            [
-                "www.anothertest.com",
-                "more valid content"
-            ],
-            [
-                "www.firsttimerequest.com",
-                null
-            ]
+            ["www.test.com", "This valid content"],
+            ["www.twotimes.com", "some more valid content"],
+            ["www.twotimes.com", "some more valid content"],
+            ["www.anothertest.com", "more valid content"],
+            ["www.firsttimerequest.com", null],
         ];
     }
 
     /**
      * Test remote resource job gets add.
      */
-    public function testRemoteResourceJobExecutedFirstTime() {
-        $this->resetTable('remoteResource', false);
+    public function testRemoteResourceJobExecutedFirstTime()
+    {
+        $this->resetTable("remoteResource", false);
         $this->assertIfJobIsRun($this->once(), "addJobDescriptor", "http://test.com");
     }
 
     /**
      * Test getByUrl Content already in DB
      */
-    public function testRemoteResourceJobNotExecutedContentExisting() {
-        $this->resetTable('remoteResource', false);
+    public function testRemoteResourceJobNotExecutedContentExisting()
+    {
+        $this->resetTable("remoteResource", false);
         $url = "http://amazing.com";
 
         $this->remoteResourceModel->insert(["url" => $url, "content" => "amazing content"]);
         $this->assertIfJobIsRun($this->never(), "addJobDescriptor", $url);
 
         // Check cache
-        $this->resetTable('remoteResource', false);
+        $this->resetTable("remoteResource", false);
         $this->assertIfJobIsRun($this->never(), "addJobDescriptor", $url);
     }
 
     /**
      * Test getByUrl Content already in DB
      */
-    public function testRemoteResourceJobExecuteStaleContent() {
-        $this->resetTable('remoteResource', false);
+    public function testRemoteResourceJobExecuteStaleContent()
+    {
+        $this->resetTable("remoteResource", false);
         $url = "http://amazing.com";
-        CurrentTimeStamp::mockTime('Jan 01 2020 01:01:01');
+        CurrentTimeStamp::mockTime("Jan 01 2020 01:01:01");
         $this->remoteResourceModel->insert(["url" => $url, "content" => "amazing content"]);
-        CurrentTimeStamp::mockTime('Jan 01 2020 02:02:01');
+        CurrentTimeStamp::mockTime("Jan 01 2020 02:02:01");
         $this->assertIfJobIsRun($this->once(), "addJobDescriptor", $url);
     }
 
@@ -142,10 +134,10 @@ class RemoteResourceModelTest extends SiteTestCase {
      * @param string $method
      * @param string $url
      */
-    private function assertIfJobIsRun($expects, $method, $url) {
+    private function assertIfJobIsRun($expects, $method, $url)
+    {
         /** @var SchedulerInterface */
-        $this->mockScheduler = $this->getMockBuilder(SchedulerInterface::class)
-            ->getMock();
+        $this->mockScheduler = $this->getMockBuilder(SchedulerInterface::class)->getMock();
 
         $jobDescriptor = new NormalJobDescriptor(LocalRemoteResourceJob::class);
         $jobDescriptor->setMessage(["url" => $url]);

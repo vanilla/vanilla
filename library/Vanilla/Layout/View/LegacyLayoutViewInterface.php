@@ -10,7 +10,8 @@ namespace Vanilla\Layout\View;
 /**
  * Defines methods for legacy layout views.
  */
-interface LegacyLayoutViewInterface extends LayoutViewInterface {
+interface LegacyLayoutViewInterface extends LayoutViewInterface
+{
     /**
      * Get the legacy type name. Eg. Vanilla/Post/Question.
      *

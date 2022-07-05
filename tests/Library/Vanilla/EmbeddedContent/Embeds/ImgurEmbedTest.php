@@ -12,11 +12,13 @@ use VanillaTests\MinimalContainerTestCase;
 /**
  * Verify embed class capabilities.
  */
-class ImgurEmbedTest extends MinimalContainerTestCase {
+class ImgurEmbedTest extends MinimalContainerTestCase
+{
     /**
      * Ensure we can create an embed from legacy data that might still live in the DB.
      */
-    public function testLegacyDataFormat() {
+    public function testLegacyDataFormat()
+    {
         $legacyJSON = <<<JSON
 {
     "url": "https://imgur.com/gallery/arP2Otg",

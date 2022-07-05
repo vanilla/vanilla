@@ -16,6 +16,7 @@ import SmartLink from "@library/routing/links/SmartLink";
 import { t } from "@vanilla/i18n";
 import React from "react";
 import { MemoryRouter } from "react-router";
+import { CustomLayoutLabItem } from "@dashboard/labs/CustomLayoutLabItem";
 
 export function VanillaLabsPage() {
     return (
@@ -31,6 +32,7 @@ export function VanillaLabsPage() {
                     <NewSearchPageLabItem />
                     <NewQuickLinksLabItem />
                     <NewPostMenuLabItem />
+                    <CustomLayoutLabItem />
                 </AddonList>
             </div>
             <DashboardHelpAsset>

@@ -1,8 +1,8 @@
 <?php
 /**
-* @copyright 2009-2019 Vanilla Forums Inc.
-* @license GPLv2
-*/
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPLv2
+ */
 
 use Garden\Schema\Schema;
 use Garden\Web\Data;
@@ -14,8 +14,8 @@ use Vanilla\ApiUtils;
 /**
  * API Controller for managing applicants.
  */
-class ApplicantsApiController extends AbstractApiController {
-
+class ApplicantsApiController extends AbstractApiController
+{
     /** @var Schema */
     private $idParamSchema;
 
@@ -29,10 +29,11 @@ class ApplicantsApiController extends AbstractApiController {
      * @param UserModel $userModel
      * @throws ClientException if the registration method on the site is not approval.
      */
-    public function __construct(Gdn_Configuration $configuration, UserModel $userModel) {
-        $registrationMethod = strtolower($configuration->get('Garden.Registration.Method'));
-        if ($registrationMethod !== 'approval') {
-            throw new ClientException('The site is not configured for the approval registration method.');
+    public function __construct(Gdn_Configuration $configuration, UserModel $userModel)
+    {
+        $registrationMethod = strtolower($configuration->get("Garden.Registration.Method"));
+        if ($registrationMethod !== "approval") {
+            throw new ClientException("The site is not configured for the approval registration method.");
         }
         $this->userModel = $userModel;
     }
@@ -43,16 +44,17 @@ class ApplicantsApiController extends AbstractApiController {
      * @param int $id The ID of the applicant.
      * @throws ClientException if the applicant has been approved.
      */
-    public function delete($id) {
-        $this->permission('Garden.Users.Approve');
+    public function delete($id)
+    {
+        $this->permission("Garden.Users.Approve");
 
-        $this->idParamSchema()->setDescription('Delete an applicant.');
-        $this->schema([], 'out');
+        $this->idParamSchema()->setDescription("Delete an applicant.");
+        $this->schema([], "out");
 
         $this->userByID($id);
 
         if ($this->userModel->isApplicant($id) === false) {
-            throw new ClientException('The specified applicant is already an active user.');
+            throw new ClientException("The specified applicant is already an active user.");
         }
 
         $this->userModel->decline($id);
@@ -63,21 +65,22 @@ class ApplicantsApiController extends AbstractApiController {
      *
      * @return Schema Returns a schema object.
      */
-    public function fullSchema() {
+    public function fullSchema()
+    {
         static $fullSchema;
 
         if ($fullSchema === null) {
             $fullSchema = Schema::parse([
-                'applicantID:i' => 'Unique ID associated with the applicant.',
-                'email:s' => 'Email address associated with the applicant.',
-                'name:s' => 'Username on the applicant.',
-                'discoveryText:s' => 'Reason why you want to join.',
-                'status:s' => [
-                    'description' => 'Current status of the applicant.',
-                    'enum' => ['approved', 'declined', 'pending']
+                "applicantID:i" => "Unique ID associated with the applicant.",
+                "email:s" => "Email address associated with the applicant.",
+                "name:s" => "Username on the applicant.",
+                "discoveryText:s" => "Reason why you want to join.",
+                "status:s" => [
+                    "description" => "Current status of the applicant.",
+                    "enum" => ["approved", "declined", "pending"],
                 ],
-                'insertIPAddress:s' => 'IP address of the user who created the applicant.',
-                'dateInserted:dt' => 'When the applicant was created.'
+                "insertIPAddress:s" => "IP address of the user who created the applicant.",
+                "dateInserted:dt" => "When the applicant was created.",
             ]);
         }
 
@@ -91,17 +94,18 @@ class ApplicantsApiController extends AbstractApiController {
      * @throws NotFoundException if the applicant could not be found.
      * @return Data
      */
-    public function get($id) {
-        $this->permission('Garden.Users.Approve');
+    public function get($id)
+    {
+        $this->permission("Garden.Users.Approve");
 
-        $this->idParamSchema()->setDescription('Get an applicant.');
-        $out = $this->schema($this->fullSchema(), 'out');
+        $this->idParamSchema()->setDescription("Get an applicant.");
+        $out = $this->schema($this->fullSchema(), "out");
 
         $row = $this->userByID($id);
         $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);
-        $result = new Data($result, ['api-allow' => ['email', 'insertipaddress']]);
+        $result = new Data($result, ["api-allow" => ["email", "insertipaddress"]]);
         return $result;
     }
 
@@ -111,12 +115,10 @@ class ApplicantsApiController extends AbstractApiController {
      * @param string $type The type of schema.
      * @return Schema Returns a schema object.
      */
-    public function idParamSchema($type = 'in') {
+    public function idParamSchema($type = "in")
+    {
         if ($this->idParamSchema === null) {
-            $this->idParamSchema = $this->schema(
-                Schema::parse(['id:i' => 'The applicant ID.']),
-                $type
-            );
+            $this->idParamSchema = $this->schema(Schema::parse(["id:i" => "The applicant ID."]), $type);
         }
         return $this->schema($this->idParamSchema, $type);
     }
@@ -127,40 +129,41 @@ class ApplicantsApiController extends AbstractApiController {
      * @param $query
      * @return Data
      */
-    public function index(array $query) {
-        $this->permission('Garden.Users.Approve');
+    public function index(array $query)
+    {
+        $this->permission("Garden.Users.Approve");
 
-        $in = $this->schema([
-            'page:i?' => [
-                'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
-                'default' => 1,
-                'minimum' => 1,
-                'maximum' => 100
+        $in = $this->schema(
+            [
+                "page:i?" => [
+                    "description" => "Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).",
+                    "default" => 1,
+                    "minimum" => 1,
+                    "maximum" => 100,
+                ],
+                "limit:i?" => [
+                    "description" => "Desired number of items per page.",
+                    "default" => 30,
+                    "minimum" => 1,
+                    "maximum" => 100,
+                ],
             ],
-            'limit:i?' => [
-                'description' => 'Desired number of items per page.',
-                'default' => 30,
-                'minimum' => 1,
-                'maximum' => 100
-            ]
-        ], 'in')->setDescription('Get a list of current applicants.');
-        $out = $this->schema(
-            [':a' => $this->fullSchema()],
-            'out'
-        );
+            "in"
+        )->setDescription("Get a list of current applicants.");
+        $out = $this->schema([":a" => $this->fullSchema()], "out");
 
         $query = $in->validate($query);
 
-        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+        [$offset, $limit] = offsetLimit("p{$query["page"]}", $query["limit"]);
         $rows = $this->userModel->getApplicants($limit, $offset)->resultArray();
 
-        $rows = array_map([$this, 'normalizeOutput'], $rows);
+        $rows = array_map([$this, "normalizeOutput"], $rows);
 
         $result = $out->validate($rows);
 
-        $paging = ApiUtils::numberedPagerInfo($this->userModel->getApplicantCount(), '/api/v2/applicants', $query, $in);
+        $paging = ApiUtils::numberedPagerInfo($this->userModel->getApplicantCount(), "/api/v2/applicants", $query, $in);
 
-        return new Data($result, ['paging' => $paging, 'api-allow' => ['email', 'insertipaddress']]);
+        return new Data($result, ["paging" => $paging, "api-allow" => ["email", "insertipaddress"]]);
     }
 
     /**
@@ -171,36 +174,40 @@ class ApplicantsApiController extends AbstractApiController {
      * @throws ClientException if the user record is not an applicant.
      * @return Data
      */
-    public function patch($id, array $body) {
-        $this->permission('Garden.Users.Approve');
+    public function patch($id, array $body)
+    {
+        $this->permission("Garden.Users.Approve");
 
-        $this->idParamSchema('in');
-        $in = $this->schema([
-            'status:s' => [
-                'description' => 'Current status of the applicant.',
-                'enum' => ['approved', 'declined']
-            ]
-        ], 'in')->setDescription('Modify an applicant.');
-        $out = $this->schema($this->fullSchema(), 'out');
+        $this->idParamSchema("in");
+        $in = $this->schema(
+            [
+                "status:s" => [
+                    "description" => "Current status of the applicant.",
+                    "enum" => ["approved", "declined"],
+                ],
+            ],
+            "in"
+        )->setDescription("Modify an applicant.");
+        $out = $this->schema($this->fullSchema(), "out");
 
         $row = $this->userByID($id);
 
         if ($this->userModel->isApplicant($id) === false) {
-            throw new ClientException('The applicant specified is already an active user.');
+            throw new ClientException("The applicant specified is already an active user.");
         }
 
         $body = $in->validate($body, true);
 
-        if (array_key_exists('status', $body)) {
-            switch ($body['status']) {
-                case 'approved':
+        if (array_key_exists("status", $body)) {
+            switch ($body["status"]) {
+                case "approved":
                     if ($this->userModel->approve($id)) {
-                        $row['status'] = 'approved';
+                        $row["status"] = "approved";
                     }
                     break;
-                case 'declined':
+                case "declined":
                     if ($this->userModel->decline($id)) {
-                        $row['status'] = 'declined';
+                        $row["status"] = "declined";
                     }
                     break;
             }
@@ -210,7 +217,7 @@ class ApplicantsApiController extends AbstractApiController {
 
         $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
-        $result = new Data($result, ['api-allow' => ['email', 'insertipaddress']]);
+        $result = new Data($result, ["api-allow" => ["email", "insertipaddress"]]);
         return $result;
     }
 
@@ -222,16 +229,20 @@ class ApplicantsApiController extends AbstractApiController {
      * @throws ServerException if a valid user ID is not returned when creating the applicant record.
      * @return Data
      */
-    public function post(array $body) {
+    public function post(array $body)
+    {
         $this->permission([\Vanilla\Permissions::BAN_CSRF, \Vanilla\Permissions::BAN_PRIVATE]);
 
-        $in = $this->schema([
-            'email:s' => 'The email address for the user.',
-            'name:s' => 'A username for the user.',
-            'password:s' => 'A password for the user.',
-            'discoveryText:s' => 'Why does the user wish to join?'
-        ], 'in')->setDescription('Create an applicant.');
-        $out = $this->schema($this->fullSchema(), 'out');
+        $in = $this->schema(
+            [
+                "email:s" => "The email address for the user.",
+                "name:s" => "A username for the user.",
+                "password:s" => "A password for the user.",
+                "discoveryText:s" => "Why does the user wish to join?",
+            ],
+            "in"
+        )->setDescription("Create an applicant.");
+        $out = $this->schema($this->fullSchema(), "out");
 
         $body = $in->validate($body);
 
@@ -242,12 +253,12 @@ class ApplicantsApiController extends AbstractApiController {
         if (filter_var($userID, FILTER_VALIDATE_INT)) {
             $row = $this->userByID($userID);
         } else {
-            throw new ServerException('An unknown error occurred while attempting to create the applicant.', 500);
+            throw new ServerException("An unknown error occurred while attempting to create the applicant.", 500);
         }
         $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);
-        $result = new Data($result, ['api-allow' => ['email', 'insertipaddress']]);
+        $result = new Data($result, ["api-allow" => ["email", "insertipaddress"]]);
         return $result;
     }
 
@@ -257,10 +268,11 @@ class ApplicantsApiController extends AbstractApiController {
      * @param array $dbRecord Database record.
      * @return array Return a Schema record.
      */
-    public function normalizeOutput(array $dbRecord) {
-        $dbRecord['ApplicantID'] = $dbRecord['UserID'];
-        unset($dbRecord['UserID']);
-        $dbRecord['Status'] = 'pending';
+    public function normalizeOutput(array $dbRecord)
+    {
+        $dbRecord["ApplicantID"] = $dbRecord["UserID"];
+        unset($dbRecord["UserID"]);
+        $dbRecord["Status"] = "pending";
 
         $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
         return $schemaRecord;
@@ -273,10 +285,11 @@ class ApplicantsApiController extends AbstractApiController {
      * @throws NotFoundException if the user could not be found.
      * @return array
      */
-    public function userByID($id) {
+    public function userByID($id)
+    {
         $row = $this->userModel->getID($id, DATASET_TYPE_ARRAY);
-        if (!$row || $row['Deleted'] > 0) {
-            throw new NotFoundException('Applicant');
+        if (!$row || $row["Deleted"] > 0) {
+            throw new NotFoundException("Applicant");
         }
         return $row;
     }

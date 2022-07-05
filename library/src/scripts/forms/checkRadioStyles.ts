@@ -227,6 +227,10 @@ export const checkRadioClasses = useThemeCache(() => {
         },
     });
 
+    const fullWidth = css({
+        width: "100%",
+    });
+
     const grid = css({
         display: "flex",
         flexWrap: "wrap",
@@ -260,6 +264,7 @@ export const checkRadioClasses = useThemeCache(() => {
         iconContainer,
         radioIcon,
         checkIcon,
+        fullWidth,
         disk,
         diskIcon,
         input,

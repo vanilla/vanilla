@@ -11,7 +11,6 @@ import { searchBarClasses } from "@library/features/search/SearchBar.styles";
 import { ClearButton } from "@library/forms/select/ClearButton";
 import SmartLink from "@library/routing/links/SmartLink";
 import { useUniqueID } from "@library/utility/idUtils";
-import { delegateEvent } from "@vanilla/dom-utils";
 import { t } from "@vanilla/i18n";
 import { Icon } from "@vanilla/icons";
 import { CustomRadioGroup, CustomRadioInput } from "@vanilla/ui";

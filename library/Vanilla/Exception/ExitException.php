@@ -15,13 +15,15 @@ use Throwable;
  * If a method deep inside a controller needs to exit it can throw this exception which will be caught up in the
  * dispatcher where the application will actually exit unless we are in debug mode.
  */
-class ExitException extends \Exception {
+class ExitException extends \Exception
+{
     /**
      * Constructor.
      *
      * @param int $code
      */
-    public function __construct($code = 0) {
-        parent::__construct('Exit', $code);
+    public function __construct($code = 0)
+    {
+        parent::__construct("Exit", $code);
     }
 }

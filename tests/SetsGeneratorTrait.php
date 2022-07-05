@@ -7,12 +7,11 @@
 
 namespace VanillaTests;
 
-
 /**
  * Trait SetsGeneratorTrait.
  */
-trait SetsGeneratorTrait {
-
+trait SetsGeneratorTrait
+{
     /**
      * Generate all possible set combinations from a list of properties and their value(s).
      *
@@ -27,7 +26,8 @@ trait SetsGeneratorTrait {
      * @param array $properties List of properties and their possible values.
      * @return array Sets of all the possible combination or property/value
      */
-    protected function combinatorialSetsGenerator($properties) {
+    protected function combinatorialSetsGenerator($properties)
+    {
         $propertiesCurrentIndex = [];
         $propertiesMaxIndex = [];
         $setsCount = 1;

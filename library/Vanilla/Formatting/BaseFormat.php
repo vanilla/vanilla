@@ -14,8 +14,8 @@ use Vanilla\Formatting\Html\Processor\HtmlProcessor;
 /**
  * Base format with simple simple implementations.
  */
-abstract class BaseFormat implements FormatInterface {
-
+abstract class BaseFormat implements FormatInterface
+{
     /** @var int */
     const EXCERPT_MAX_LENGTH = 325;
 
@@ -38,7 +38,8 @@ abstract class BaseFormat implements FormatInterface {
      *
      * @return $this For chaining.
      */
-    public function addHtmlProcessor(HtmlProcessor $processor): BaseFormat {
+    public function addHtmlProcessor(HtmlProcessor $processor): BaseFormat
+    {
         if ($processor->getProcessorType() === HtmlProcessor::TYPE_DYNAMIC) {
             $this->dynamicProcessors[] = $processor;
         } else {
@@ -51,7 +52,8 @@ abstract class BaseFormat implements FormatInterface {
     /**
      * @inheritdoc
      */
-    public function setContext(?array $context = []): FormatInterface {
+    public function setContext(?array $context = []): FormatInterface
+    {
         $this->context = $context;
         return $this;
     }
@@ -63,7 +65,8 @@ abstract class BaseFormat implements FormatInterface {
      * @param string|null $processorType The type of HTML processors to apply. See HtmlProcessor::TYPE constants.
      * @return string The processed HTML.
      */
-    public function applyHtmlProcessors(string $html, ?string $processorType = null): string {
+    public function applyHtmlProcessors(string $html, ?string $processorType = null): string
+    {
         $document = new HtmlDocument($html);
 
         if ($processorType === HtmlProcessor::TYPE_STATIC || $processorType === null) {
@@ -86,17 +89,18 @@ abstract class BaseFormat implements FormatInterface {
      *
      * @inheritdoc
      */
-    public function renderExcerpt(string $content): string {
+    public function renderExcerpt(string $content): string
+    {
         $plainText = $this->renderPlainText($content);
 
-        $excerpt = mb_ereg_replace("\n", ' ', $plainText);
-        $excerpt = mb_ereg_replace("\s{2,}", ' ', $excerpt);
+        $excerpt = mb_ereg_replace("\n", " ", $plainText);
+        $excerpt = mb_ereg_replace("\s{2,}", " ", $excerpt);
         if (mb_strlen($excerpt) > self::EXCERPT_MAX_LENGTH) {
             $excerpt = mb_substr($excerpt, 0, self::EXCERPT_MAX_LENGTH);
-            if ($lastSpace = mb_strrpos($excerpt, ' ')) {
+            if ($lastSpace = mb_strrpos($excerpt, " ")) {
                 $excerpt = mb_substr($excerpt, 0, $lastSpace);
             }
-            $excerpt .= '…';
+            $excerpt .= "…";
         }
         return $excerpt;
     }
@@ -104,15 +108,17 @@ abstract class BaseFormat implements FormatInterface {
     /**
      * @inheritdoc
      */
-    public function renderQuote(string $content): string {
+    public function renderQuote(string $content): string
+    {
         return $this->renderHTML($content);
     }
 
     /**
      * @inheritdoc
      */
-    public function getPlainTextLength(string $content): int {
-        return mb_strlen(trim($this->renderPlainText($content), 'UTF-8'));
+    public function getPlainTextLength(string $content): int
+    {
+        return mb_strlen(trim($this->renderPlainText($content), "UTF-8"));
     }
 
     /**
@@ -120,7 +126,33 @@ abstract class BaseFormat implements FormatInterface {
      *
      * @param bool $extendContent
      */
-    public function setAllowExtendedContent(bool $extendContent): void {
+    public function setAllowExtendedContent(bool $extendContent): void
+    {
         $this->allowExtendedContent = $extendContent;
     }
+
+    /**
+     * Return the anonymize username.
+     *
+     * @return string
+     */
+    public function getAnonymizeUserName(): string
+    {
+        return t("[Deleted User]");
+    }
+
+    /**
+     * Return the anonymize User url.
+     *
+     * @return string
+     */
+    public function getAnonymizeUserUrl(): string
+    {
+        return \UserModel::getProfileUrl(["name" => t("[Deleted User]")]);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    abstract public function removeUserPII(string $username, string $body): string;
 }

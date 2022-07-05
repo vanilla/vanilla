@@ -16,9 +16,9 @@ namespace Vanilla\Scheduler;
  * yield new LongRunnerFailedID($someRecordID)
  * yield new LongRunnerFailedID($someRecordID, new Exception('Why it failed'));
  */
-final class LongRunnerFailedID implements LongRunnerItemResultInterface {
-
-    /** @var int */
+final class LongRunnerFailedID implements LongRunnerItemResultInterface
+{
+    /** @var int|string */
     private $recordID;
 
     /** @var \Exception|null */
@@ -27,10 +27,11 @@ final class LongRunnerFailedID implements LongRunnerItemResultInterface {
     /**
      * Constructor.
      *
-     * @param int $recordID
+     * @param int|string $recordID
      * @param \Exception|null $exception
      */
-    public function __construct(int $recordID, ?\Exception $exception = null) {
+    public function __construct($recordID, ?\Exception $exception = null)
+    {
         $this->recordID = $recordID;
         $this->exception = $exception;
     }
@@ -38,14 +39,16 @@ final class LongRunnerFailedID implements LongRunnerItemResultInterface {
     /**
      * @inheritdoc
      */
-    public function getRecordID(): int {
+    public function getRecordID()
+    {
         return $this->recordID;
     }
 
     /**
      * @return \Exception|null
      */
-    public function getException(): ?\Exception {
+    public function getException(): ?\Exception
+    {
         return $this->exception;
     }
 }

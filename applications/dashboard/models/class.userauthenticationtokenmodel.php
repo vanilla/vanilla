@@ -6,25 +6,28 @@
  * @license GPL-2.0-only
  */
 
-class UserAuthenticationTokenModel extends Gdn_Model {
+class UserAuthenticationTokenModel extends Gdn_Model
+{
     use \Vanilla\PrunableTrait;
 
     /**
      * Class constructor. Defines the related database table name.
      */
-    public function __construct() {
-        parent::__construct('UserAuthenticationToken');
-        $this->setPruneField('Timestamp');
+    public function __construct()
+    {
+        parent::__construct("UserAuthenticationToken");
+        $this->setPruneField("Timestamp");
     }
 
     /**
      * @inheritdoc
      */
-    public function insert($fields) {
+    public function insert($fields)
+    {
         $this->prune();
 
-        if (!isset($fields['Timestamp'])) {
-            $fields['Timestamp'] = date(MYSQL_DATE_FORMAT);
+        if (!isset($fields["Timestamp"])) {
+            $fields["Timestamp"] = date(MYSQL_DATE_FORMAT);
         }
 
         return parent::insert($fields) !== false;
@@ -37,14 +40,16 @@ class UserAuthenticationTokenModel extends Gdn_Model {
      * @param string $authKey
      * @return bool|array A UserAuthenticationToken row on success, false on failure.
      */
-    public function getByAuth($userID, $authKey) {
+    public function getByAuth($userID, $authKey)
+    {
         $result = false;
 
-        $row = $this->SQL->select('uat.*')
-            ->from('UserAuthenticationToken uat')
-            ->join('UserAuthentication ua', 'ua.ForeignUserKey = uat.ForeignUserKey')
-            ->where('ua.UserID', $userID)
-            ->where('ua.ProviderKey', $authKey)
+        $row = $this->SQL
+            ->select("uat.*")
+            ->from("UserAuthenticationToken uat")
+            ->join("UserAuthentication ua", "ua.ForeignUserKey = uat.ForeignUserKey")
+            ->where("ua.UserID", $userID)
+            ->where("ua.ProviderKey", $authKey)
             ->limit(1)
             ->get();
         if ($row->numRows()) {
@@ -62,21 +67,23 @@ class UserAuthenticationTokenModel extends Gdn_Model {
      * @param string|null $tokenType
      * @return array|bool|stdClass
      */
-    public function lookup($providerKey, $userKey, $tokenType = null) {
-        $row = Gdn::database()->sql()
-            ->select('uat.*')
-            ->from('UserAuthenticationToken uat')
-            ->where('uat.ForeignUserKey', $userKey)
-            ->where('uat.ProviderKey', $providerKey)
+    public function lookup($providerKey, $userKey, $tokenType = null)
+    {
+        $row = Gdn::database()
+            ->sql()
+            ->select("uat.*")
+            ->from("UserAuthenticationToken uat")
+            ->where("uat.ForeignUserKey", $userKey)
+            ->where("uat.ProviderKey", $providerKey)
             ->beginWhereGroup()
-            ->where('(uat.Timestamp + uat.Lifetime) >=', 'NOW()', true, false)
-            ->orWhere('uat.Lifetime', 0)
+            ->where("(uat.Timestamp + uat.Lifetime) >=", "NOW()", true, false)
+            ->orWhere("uat.Lifetime", 0)
             ->endWhereGroup()
             ->get()
             ->firstRow(DATASET_TYPE_ARRAY);
         $result = false;
 
-        if ($row && ($tokenType === null || strtolower($tokenType) == strtolower($row['TokenType']))) {
+        if ($row && ($tokenType === null || strtolower($tokenType) == strtolower($row["TokenType"]))) {
             $result = $row;
         }
 

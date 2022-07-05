@@ -16,13 +16,13 @@ use VanillaTests\UsersAndRolesApiTestTrait;
 /**
  * Tests for the QnA model.
  */
-class QnaModelTest extends SiteTestCase {
-
+class QnaModelTest extends SiteTestCase
+{
     use QnaApiTestTrait;
     use EventSpyTestTrait;
     use UsersAndRolesApiTestTrait;
 
-    public static $addons = ['vanilla', 'QnA'];
+    public static $addons = ["vanilla", "QnA"];
 
     /** @var QnaQuickLinksProvider */
     private $linksProvider;
@@ -30,7 +30,8 @@ class QnaModelTest extends SiteTestCase {
     /**
      * Test unanswered count fetching, caching, and permissions.
      */
-    public function testUnansweredCounts() {
+    public function testUnansweredCounts()
+    {
         // Create an accepted answer question.
         $question = $this->createQuestion();
         $answer = $this->createAnswer();
@@ -64,10 +65,8 @@ class QnaModelTest extends SiteTestCase {
         $handler = [
             "getAlternateVisibleCategories",
             function () use ($permCat) {
-                return [
-                    \CategoryModel::categories($permCat['categoryID']),
-                ];
-            }
+                return [\CategoryModel::categories($permCat["categoryID"])];
+            },
         ];
         $this->getEventManager()->bind(...$handler);
         // Different set of categories again.
@@ -76,7 +75,7 @@ class QnaModelTest extends SiteTestCase {
 
         // Other use with same category access as guest will get the same cache.
         $memberUser = $this->createUser();
-        $this->resetTable('Discussion', false);
+        $this->resetTable("Discussion", false);
         $this->runWithUser(function () {
             // CategoryModel doesn't recognize the session changing mid-request.
             \CategoryModel::clearCache();
@@ -91,7 +90,8 @@ class QnaModelTest extends SiteTestCase {
     /**
      * Test that questions are added to allowed discussion types.
      */
-    public function testCategoryModelAllowedDiscussionTypes(): void {
+    public function testCategoryModelAllowedDiscussionTypes(): void
+    {
         $category = $this->createCategory();
         $allowedTypes = \CategoryModel::getAllowedDiscussionTypes($category);
         $this->assertEqualsCanonicalizing($allowedTypes, ["discussion", "question"]);
@@ -104,7 +104,8 @@ class QnaModelTest extends SiteTestCase {
      * @param int|null $limit
      * @param string $message
      */
-    private function assertCounts(int $expected, int $limit = null, string $message = "") {
+    private function assertCounts(int $expected, int $limit = null, string $message = "")
+    {
         $actual = $this->getQnaModel()->getUnansweredCount($limit);
         $this->assertEquals($expected, $actual, $message);
     }

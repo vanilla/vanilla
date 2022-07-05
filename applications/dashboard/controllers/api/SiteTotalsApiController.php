@@ -17,7 +17,8 @@ use Vanilla\Site\SiteSectionModel;
 /**
  * /api/v2/site-totals
  */
-class SiteTotalsApiController extends AbstractApiController {
+class SiteTotalsApiController extends AbstractApiController
+{
     /** @var SiteTotalService */
     private $siteTotalService;
 
@@ -30,7 +31,8 @@ class SiteTotalsApiController extends AbstractApiController {
      * @param SiteTotalService $siteTotalService
      * @param SiteSectionModel $siteSectionModel
      */
-    public function __construct(SiteTotalService $siteTotalService, SiteSectionModel $siteSectionModel) {
+    public function __construct(SiteTotalService $siteTotalService, SiteSectionModel $siteSectionModel)
+    {
         $this->siteTotalService = $siteTotalService;
         $this->siteSectionModel = $siteSectionModel;
     }
@@ -42,11 +44,12 @@ class SiteTotalsApiController extends AbstractApiController {
      * @return Data
      * @throws NotFoundException Throws an exception if the siteSection is not found.
      */
-    public function index(array $query) {
+    public function index(array $query)
+    {
         // No permission check.
         $siteSection = null;
         if ($query["siteSectionID"] ?? null) {
-            $siteSection = $this->siteSectionModel->getByID($query['siteSectionID']);
+            $siteSection = $this->siteSectionModel->getByID($query["siteSectionID"]);
             if ($siteSection === null) {
                 throw new NotFoundException("Site section");
             }
@@ -62,8 +65,10 @@ class SiteTotalsApiController extends AbstractApiController {
             $count = $this->siteTotalService->getTotalForType($countItem, $siteSection ?? null);
             $result["counts"][$countItem]["count"] = $count;
             $result["counts"][$countItem]["isCalculating"] = $count === -1;
-            $result["counts"][$countItem]["isFiltered"] = $siteSection !== null &&
-                $this->siteTotalService->getSiteTotalProviders()[$countItem] instanceof SiteSectionTotalProviderInterface;
+            $result["counts"][$countItem]["isFiltered"] =
+                $siteSection !== null &&
+                $this->siteTotalService->getSiteTotalProviders()[$countItem] instanceof
+                    SiteSectionTotalProviderInterface;
         }
 
         $out = $this->siteTotalService->getCountsOutputSchema();

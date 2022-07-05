@@ -416,6 +416,8 @@ export const dropDownClasses = useThemeCache(() => {
             ...{
                 "&&": {
                     minHeight: styleUnit(vars.item.mobile.minHeight),
+                    minWidth: styleUnit(vars.item.mobile.minHeight),
+                    transform: "none",
                 },
             },
         }),
@@ -669,7 +671,6 @@ export const actionMixin = (classBasedStates?: IStateSelectors): CSSObject => {
         ),
         ...mediaQueries.oneColumnDown({
             fontSize: styleUnit(vars.item.mobile.fontSize),
-            fontWeight: globalVars.fonts.weights.semiBold,
             minHeight: styleUnit(vars.item.mobile.minHeight),
         }),
     };

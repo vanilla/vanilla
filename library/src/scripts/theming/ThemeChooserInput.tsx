@@ -49,7 +49,7 @@ export function ThemeChooserInput(props: IProps) {
     const defaultOption: IComboBoxOption = {
         value: "",
         label: defaultTheme
-            ? (((<Translate source="Default <0/>" c0={`(${defaultTheme.name})`} />) as unknown) as string)
+            ? ((<Translate source="Default <0/>" c0={`(${defaultTheme.name})`} />) as unknown as string)
             : t("Loading"),
     };
 

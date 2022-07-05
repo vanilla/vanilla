@@ -10,7 +10,8 @@ namespace Garden\Web;
 /**
  * Represents a class that can render the result of a dispatch to the output buffer.
  */
-interface ViewInterface {
+interface ViewInterface
+{
     /**
      * Write the view to the output buffer.
      *

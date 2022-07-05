@@ -3,14 +3,12 @@
  * @license GPL-2.0-only
  */
 
-import { cx } from "@emotion/css";
 import Permission from "@library/features/users/Permission";
 import { INavigationVariableItem } from "@library/headers/navigationVariables";
 import { IHomeWidgetContainerOptions } from "@library/homeWidget/HomeWidgetContainer.styles";
 import { PageBox } from "@library/layout/PageBox";
 import { PageHeadingBox } from "@library/layout/PageHeadingBox";
 import { Widget } from "@library/layout/Widget";
-import { useWidgetSectionClasses } from "@library/layout/WidgetLayout.context";
 import { quickLinksClasses } from "@library/navigation/QuickLinks.classes";
 import { quickLinksVariables } from "@library/navigation/QuickLinks.variables";
 import SmartLink from "@library/routing/links/SmartLink";

@@ -75,7 +75,7 @@ function LayoutPreviewCard(props: ILayoutPreviewCardProps) {
                         </Button>
                         <ModalConfirm
                             isVisible={editModalVisible}
-                            title={t("Edit Discussion Layout")}
+                            title={t("Edit Layout")}
                             onCancel={() => setEditModalVisible(false)}
                             confirmLinkTo={editUrl}
                             confirmTitle={t("Continue")}

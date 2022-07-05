@@ -111,6 +111,9 @@ export const modalClasses = useThemeCache(() => {
         right: 0,
         bottom: 0,
         zIndex: 10,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
     };
 
     const overlayScrim = style("overlayScrim", {
@@ -150,8 +153,6 @@ export const modalClasses = useThemeCache(() => {
         backgroundColor: ColorsUtils.colorOut(vars.colors.bg),
         color: ColorsUtils.colorOut(vars.colors.fg),
         position: "fixed",
-        top: percent(50),
-        left: percent(50),
         bottom: "initial",
         overflow: "hidden",
         borderRadius: styleUnit(vars.border.radius),
@@ -159,8 +160,7 @@ export const modalClasses = useThemeCache(() => {
         // See http://meyerweb.com/eric/thoughts/2011/09/12/un-fixing-fixed-elements-with-css-transforms/
         // See also https://www.w3.org/TR/2009/WD-css3-2d-transforms-20091201/#introduction
         // This is why fullscreen unsets the transforms.
-        transform: translate(`-50%`, `-50%`),
-        perspective: 1,
+        transform: "translate3d(0,0,0)",
         ...Mixins.margin({ all: "auto" }),
         ...{
             "&&.isFullScreen": {
@@ -234,6 +234,9 @@ export const modalClasses = useThemeCache(() => {
                 marginLeft: styleUnit(-16),
                 marginRight: styleUnit(-16),
                 width: `calc(100% + (${styleUnit(16)} * 2))`,
+            },
+            "&.noTransform": {
+                transform: "none !important",
             },
         },
     });

@@ -11,7 +11,7 @@ import ProfileLink from "@library/navigation/ProfileLink";
 import { IUserFragment } from "@library/@types/api/users";
 import { UserPhoto } from "@library/headers/mebox/pieces/UserPhoto";
 import { useMeasure } from "@vanilla/react-utils/src";
-import { forumLayoutVariables } from "@dashboard/compatibilityStyles/forumLayoutStyles";
+import { twoColumnVariables } from "@library/layout/types/layout.twoColumns";
 
 export interface IUserSpotlightProps {
     title?: string;
@@ -24,7 +24,7 @@ export function UserSpotlight(props: IUserSpotlightProps) {
     const { title, description, options, userInfo } = props;
     const rootRef = useRef<HTMLDivElement | null>(null);
     const rootMeasure = useMeasure(rootRef);
-    const shouldWrap = rootMeasure.width > 0 && rootMeasure.width < forumLayoutVariables().panel.paddedWidth;
+    const shouldWrap = rootMeasure.width > 0 && rootMeasure.width < twoColumnVariables().panel.paddedWidth;
     const vars = userSpotlightVariables(options);
     const classes = userSpotlightClasses(shouldWrap, options);
 

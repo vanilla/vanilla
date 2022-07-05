@@ -12,8 +12,8 @@
 /**
  * Module collection.
  */
-class Gdn_ModuleCollection extends Gdn_Module {
-
+class Gdn_ModuleCollection extends Gdn_Module
+{
     /** @var array  */
     public $Items = [];
 
@@ -22,22 +22,23 @@ class Gdn_ModuleCollection extends Gdn_Module {
      *
      * @throws Exception
      */
-    public function render() {
+    public function render()
+    {
         $renderedCount = 0;
         foreach ($this->Items as $item) {
-            $this->EventArguments['AssetName'] = $this->AssetName;
+            $this->EventArguments["AssetName"] = $this->AssetName;
 
             if (is_string($item)) {
                 if (!empty($item)) {
                     if ($renderedCount > 0) {
-                        $this->fireEvent('BetweenRenderAsset');
+                        $this->fireEvent("BetweenRenderAsset");
                     }
 
                     echo $item;
                     $renderedCount++;
                 }
             } elseif ($item instanceof Gdn_IModule) {
-                if (!getValue('Visible', $item, true)) {
+                if (!getValue("Visible", $item, true)) {
                     continue;
                 }
 
@@ -45,13 +46,13 @@ class Gdn_ModuleCollection extends Gdn_Module {
                 try {
                     $item->render();
                 } catch (\Throwable $ex) {
-                    echo \Vanilla\Utility\DebugUtils::renderException($ex, "Error rendering ".get_class($item));
+                    echo \Vanilla\Utility\DebugUtils::renderException($ex, "Error rendering " . get_class($item));
                 }
                 $lengthAfter = ob_get_length();
 
                 if ($lengthBefore !== false && $lengthAfter > $lengthBefore) {
                     if ($renderedCount > 0) {
-                        $this->fireEvent('BetweenRenderAsset');
+                        $this->fireEvent("BetweenRenderAsset");
                     }
                     $renderedCount++;
                 }
@@ -59,7 +60,7 @@ class Gdn_ModuleCollection extends Gdn_Module {
                 throw new Exception();
             }
         }
-        unset($this->EventArguments['AssetName']);
+        unset($this->EventArguments["AssetName"]);
     }
 
     /**
@@ -68,7 +69,8 @@ class Gdn_ModuleCollection extends Gdn_Module {
      * @return string
      * @throws Exception
      */
-    public function toString() {
+    public function toString()
+    {
         ob_start();
         try {
             $this->render();

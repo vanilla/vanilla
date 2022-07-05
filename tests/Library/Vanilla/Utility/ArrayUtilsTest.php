@@ -16,7 +16,8 @@ use VanillaTests\Fixtures\IterableArray;
 /**
  * Tests for the `ArrayUtils` class.
  */
-class ArrayUtilsTest extends TestCase {
+class ArrayUtilsTest extends TestCase
+{
     /**
      * Test `ArrayUtils::walkRecursiveArray()` with array updates.
      *
@@ -24,11 +25,12 @@ class ArrayUtilsTest extends TestCase {
      * @param mixed $expected
      * @dataProvider  provideWalkArrayUpdateTests
      */
-    public function testWalkArrayUpdates($input, $expected): void {
+    public function testWalkArrayUpdates($input, $expected): void
+    {
         $actual = $input;
 
         ArrayUtils::walkRecursiveArray($actual, function (&$a, $path) {
-            $a['p'] = $path;
+            $a["p"] = $path;
         });
 
         $this->assertEquals($expected, $actual);
@@ -39,18 +41,19 @@ class ArrayUtilsTest extends TestCase {
      *
      * @return array
      */
-    public function provideWalkArrayUpdateTests(): array {
+    public function provideWalkArrayUpdateTests(): array
+    {
         $r = [
-            'basic' => [['a' => 'b'], ['a' => 'b', 'p' => []]],
-            'recursive' => [['a' => ['a' => 'b']], ['a' => ['a' => 'b', 'p' => ['a']], 'p' => []]],
-            'object' => [new \ArrayObject(['a' => 'b']), new \ArrayObject(['a' => 'b', 'p' => []])],
-            'recursive object' => [
-                new \ArrayObject(['a' => ['a' => 'b']]),
-                new \ArrayObject(['a' => ['a' => 'b', 'p' => ['a']], 'p' => []]),
+            "basic" => [["a" => "b"], ["a" => "b", "p" => []]],
+            "recursive" => [["a" => ["a" => "b"]], ["a" => ["a" => "b", "p" => ["a"]], "p" => []]],
+            "object" => [new \ArrayObject(["a" => "b"]), new \ArrayObject(["a" => "b", "p" => []])],
+            "recursive object" => [
+                new \ArrayObject(["a" => ["a" => "b"]]),
+                new \ArrayObject(["a" => ["a" => "b", "p" => ["a"]], "p" => []]),
             ],
-            'recursive dumb' => [
-                ['a' => new DumbArray(['a' => 'b'])],
-                ['a' => new DumbArray(['a' => 'b', 'p' => ['a']]), 'p' => []],
+            "recursive dumb" => [
+                ["a" => new DumbArray(["a" => "b"])],
+                ["a" => new DumbArray(["a" => "b", "p" => ["a"]]), "p" => []],
             ],
         ];
 
@@ -64,7 +67,8 @@ class ArrayUtilsTest extends TestCase {
      * @param string $expected
      * @dataProvider provideEscapeKeyTests
      */
-    public function testEscapeKey(string $key, string $expected): void {
+    public function testEscapeKey(string $key, string $expected): void
+    {
         $actual = ArrayUtils::escapeKey($key);
         $this->assertSame($expected, $actual);
     }
@@ -74,7 +78,8 @@ class ArrayUtilsTest extends TestCase {
      *
      * @return array
      */
-    public function provideEscapeKeyTests(): array {
+    public function provideEscapeKeyTests(): array
+    {
         $result = [
             "basic" => ["foo.bar", "foo\\.bar"],
         ];
@@ -90,7 +95,8 @@ class ArrayUtilsTest extends TestCase {
      * @param mixed $expected
      * @dataProvider  provideGetByPathTests
      */
-    public function testGetByPath(string $path, $array, $expected): void {
+    public function testGetByPath(string $path, $array, $expected): void
+    {
         $actual = ArrayUtils::getByPath($path, $array);
         $this->assertSame($expected, $actual);
     }
@@ -100,41 +106,30 @@ class ArrayUtilsTest extends TestCase {
      *
      * @return array
      */
-    public function provideGetByPathTests(): array {
+    public function provideGetByPathTests(): array
+    {
         $result = [
-            "simple path" => [
-                "foo",
-                ["foo" => "Hello world."],
-                "Hello world.",
-            ],
+            "simple path" => ["foo", ["foo" => "Hello world."], "Hello world."],
             "complex path" => [
                 "a.b.c",
                 [
                     "a" => [
                         "b" => ["c" => 123],
-                    ]
+                    ],
                 ],
                 123,
             ],
-            "unknown path" => [
-                "foo.bar",
-                ["foo" => "xyz"],
-                null
-            ],
-            "unknown key" => [
-                "foo.bar",
-                ["foo" => ["xyz" => "Hello world."]],
-                null,
-            ],
+            "unknown path" => ["foo.bar", ["foo" => "xyz"], null],
+            "unknown key" => ["foo.bar", ["foo" => ["xyz" => "Hello world."]], null],
             "array object" => [
                 "w.x.y",
                 new \ArrayObject([
                     "w" => [
                         "x" => ["y" => "Hello world."],
-                    ]
+                    ],
                 ]),
                 "Hello world.",
-            ]
+            ],
         ];
         return $result;
     }
@@ -146,7 +141,8 @@ class ArrayUtilsTest extends TestCase {
      * @param bool $expected
      * @dataProvider provideIsAssociativeTests
      */
-    public function testIsAssociative($array, bool $expected): void {
+    public function testIsAssociative($array, bool $expected): void
+    {
         $actual = ArrayUtils::isAssociative($array);
         $this->assertSame($expected, $actual);
     }
@@ -156,7 +152,8 @@ class ArrayUtilsTest extends TestCase {
      *
      * @return array
      */
-    public function provideIsAssociativeTests(): array {
+    public function provideIsAssociativeTests(): array
+    {
         $result = [
             "associative" => [["foo" => "bar"], true],
             "indexed" => [["Hello world."], false],
@@ -179,7 +176,8 @@ class ArrayUtilsTest extends TestCase {
      * @param bool $expected
      * @dataProvider provideSerializesAsNumericArray
      */
-    public function testSerializesAsNumericArray($array, bool $expected): void {
+    public function testSerializesAsNumericArray($array, bool $expected): void
+    {
         $actual = ArrayUtils::serializesAsNumericArray($array);
         $this->assertSame($expected, $actual);
     }
@@ -189,11 +187,12 @@ class ArrayUtilsTest extends TestCase {
      *
      * @return array
      */
-    public function provideSerializesAsNumericArray(): array {
+    public function provideSerializesAsNumericArray(): array
+    {
         $result = [
             "associative" => [["foo" => "bar"], false],
             "indexed" => [["Hello world."], true],
-            "explicit indexed" => [[0 => "Hello world.", 1 => 'foo'], true],
+            "explicit indexed" => [[0 => "Hello world.", 1 => "foo"], true],
             "mixed" => [["foo" => "bar", "Hello world."], false],
             "empty" => [[], true],
             "ArrayObject" => [new \ArrayObject(["foo" => "bar"]), false],
@@ -201,8 +200,8 @@ class ArrayUtilsTest extends TestCase {
             "number" => [42, false],
             "null" => [null, false],
             "object" => [new \stdClass(), false],
-            "holes" => [[0 => 'foo', 2 => 'bar'], false],
-            'out of order' => [[1 => 'foo', 0 => 'bar'], false],
+            "holes" => [[0 => "foo", 2 => "bar"], false],
+            "out of order" => [[1 => "foo", 0 => "bar"], false],
         ];
 
         return $result;
@@ -217,7 +216,8 @@ class ArrayUtilsTest extends TestCase {
      * @param array|ArrayAccess $expected
      * @dataProvider provideSetByPathTests
      */
-    public function testSetByPath(string $path, $array, $value, $expected): void {
+    public function testSetByPath(string $path, $array, $value, $expected): void
+    {
         $actual = ArrayUtils::setByPath($path, $array, $value);
         $this->assertSame($expected, $actual);
     }
@@ -227,7 +227,8 @@ class ArrayUtilsTest extends TestCase {
      *
      * @return array
      */
-    public function provideSetByPathTests(): array {
+    public function provideSetByPathTests(): array
+    {
         $result = [
             "new leaf" => [
                 "foo.bar.baz",
@@ -253,12 +254,7 @@ class ArrayUtilsTest extends TestCase {
                 "Hello world.",
                 ["foo" => ["bar" => ["A" => "one", "B" => "two", "C" => "three", "baz" => "Hello world."]]],
             ],
-            "create root" => [
-                "foo",
-                ["foo" => "not bar"],
-                "bar",
-                ["foo" => "bar"],
-            ]
+            "create root" => ["foo", ["foo" => "not bar"], "bar", ["foo" => "bar"]],
         ];
         return $result;
     }
@@ -272,7 +268,8 @@ class ArrayUtilsTest extends TestCase {
      *
      * @dataProvider provideUnsetByPath
      */
-    public function testUnsetByPath(string $path, array $initial, $expected) {
+    public function testUnsetByPath(string $path, array $initial, $expected)
+    {
         $actual = $initial;
 
         if (is_string($expected)) {
@@ -286,42 +283,28 @@ class ArrayUtilsTest extends TestCase {
     /**
      * @return iterable
      */
-    public function provideUnsetByPath(): iterable {
+    public function provideUnsetByPath(): iterable
+    {
         yield "unset leaf" => [
-            'parent.leaf',
-            ['parent' => ['leaf' => true], 'other' => false],
-            ['parent' => [], 'other' => false],
+            "parent.leaf",
+            ["parent" => ["leaf" => true], "other" => false],
+            ["parent" => [], "other" => false],
         ];
 
-        yield "unset parent" => [
-            'parent',
-            ['parent' => ['leaf' => true], 'other' => false],
-            ['other' => false],
-        ];
+        yield "unset parent" => ["parent", ["parent" => ["leaf" => true], "other" => false], ["other" => false]];
 
-        yield "unset null" => [
-            'key',
-            ['key' => null],
-            [],
-        ];
+        yield "unset null" => ["key", ["key" => null], []];
 
-        yield "unset not isset" => [
-            'notthere',
-            ['key' => 'value'],
-            ['key' => 'value'],
-        ];
+        yield "unset not isset" => ["notthere", ["key" => "value"], ["key" => "value"]];
 
-        yield "bad-path" => [
-            'not-a-parent.leaf',
-            ['not-a-parent' => true],
-            'Expected an array or array-like object'
-        ];
+        yield "bad-path" => ["not-a-parent.leaf", ["not-a-parent" => true], "Expected an array or array-like object"];
     }
 
     /**
      * Test setting a value by path where an existing segment is not an array.
      */
-    public function testSetByPathInvalidElement(): void {
+    public function testSetByPathInvalidElement(): void
+    {
         $array = ["foo" => ["bar" => "Hello world."]];
 
         $this->expectException(\InvalidArgumentException::class);
@@ -332,7 +315,8 @@ class ArrayUtilsTest extends TestCase {
     /**
      * Calling `ArrayUtils::walkRecursiveArray()` without an array is an exception.
      */
-    public function testWalkArrayRecursiveNotArray(): void {
+    public function testWalkArrayRecursiveNotArray(): void
+    {
         $s = "hello";
 
         $this->expectException(\InvalidArgumentException::class);
@@ -348,8 +332,9 @@ class ArrayUtilsTest extends TestCase {
      * @param mixed $arr
      * @dataProvider provideKeysTests
      */
-    public function testKeys($arr): void {
-        $expected = ['a', 'b', 'c'];
+    public function testKeys($arr): void
+    {
+        $expected = ["a", "b", "c"];
         $actual = ArrayUtils::keys($arr);
         $this->assertSame($expected, $actual);
     }
@@ -359,13 +344,14 @@ class ArrayUtilsTest extends TestCase {
      *
      * @return array
      */
-    public function provideKeysTests(): array {
-        $arr = ['a' => 1, 'b' => 1, 'c' => 1];
+    public function provideKeysTests(): array
+    {
+        $arr = ["a" => 1, "b" => 1, "c" => 1];
 
         $r = [
-            'array' => [$arr],
-            'ArrayObject' => [new \ArrayObject($arr)],
-            'custom' => [new IterableArray($arr)]
+            "array" => [$arr],
+            "ArrayObject" => [new \ArrayObject($arr)],
+            "custom" => [new IterableArray($arr)],
         ];
 
         return $r;
@@ -374,55 +360,56 @@ class ArrayUtilsTest extends TestCase {
     /**
      * The `ArrayUtils::keys()` method should throw an exception when it doesn't get an array.
      */
-    public function testKeysException() : void {
+    public function testKeysException(): void
+    {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('expects argument 1 to be an array or array-like object');
+        $this->expectExceptionMessage("expects argument 1 to be an array or array-like object");
         ArrayUtils::keys("foo");
     }
 
     /**
      * Test `ArrayUtils::flattenArray()`.
      */
-    public function testFlattenArray(): void {
+    public function testFlattenArray(): void
+    {
         // The source array that we'll flatten in various ways.
         $sourceArray = [
-            'firstElement' => [
-                1 => 'First Sub Element',
-                2 => 'Second Sub Element'
+            "firstElement" => [
+                1 => "First Sub Element",
+                2 => "Second Sub Element",
             ],
-            'secondElement' => [
-                'one' => 'Third Sub Element',
-                'two' => 'Fourth Sub Element'
-            ]
+            "secondElement" => [
+                "one" => "Third Sub Element",
+                "two" => "Fourth Sub Element",
+            ],
         ];
 
         // First expected result.
         $expectedFlattenedArray1 = [
-            'firstElement+1' => 'First Sub Element',
-            'firstElement+2' => 'Second Sub Element',
-            'secondElement+one' => 'Third Sub Element',
-            'secondElement+two' => 'Fourth Sub Element',
+            "firstElement+1" => "First Sub Element",
+            "firstElement+2" => "Second Sub Element",
+            "secondElement+one" => "Third Sub Element",
+            "secondElement+two" => "Fourth Sub Element",
         ];
 
         // Second expected result.
         $expectedFlattenedArray2 = [
-            'firstElement' => [
-                1 => 'First Sub Element',
-                2 => 'Second Sub Element',
+            "firstElement" => [
+                1 => "First Sub Element",
+                2 => "Second Sub Element",
             ],
-            'secondElement.one' => 'Third Sub Element',
-            'secondElement.two' => 'Fourth Sub Element',
+            "secondElement.one" => "Third Sub Element",
+            "secondElement.two" => "Fourth Sub Element",
         ];
 
         // Flatten the array using a `+` separator.
-        $flattenedArray1 = ArrayUtils::flattenArray('+', $sourceArray);
+        $flattenedArray1 = ArrayUtils::flattenArray("+", $sourceArray);
         $this->assertEquals($expectedFlattenedArray1, $flattenedArray1);
 
         // Flatten the array using a `.` separator, minding(halting at) the sequential array values.
-        $flattenedArray2 = ArrayUtils::flattenArray('.', $sourceArray, true);
+        $flattenedArray2 = ArrayUtils::flattenArray(".", $sourceArray, true);
         $this->assertEquals($expectedFlattenedArray2, $flattenedArray2);
     }
-
 
     /**
      * Test `ArrayUtils::ArrayMergeRecursiveFancy()`.
@@ -432,10 +419,11 @@ class ArrayUtilsTest extends TestCase {
      * @param array $expected
      * @dataProvider provideArrayMergeRecursiveTests
      */
-    public function testArrayMergeRecursiveFancy(array $arr1, array $arr2, array $expected): void {
+    public function testArrayMergeRecursiveFancy(array $arr1, array $arr2, array $expected): void
+    {
         $tree = function (array &$arr) {
-            $arr['child'] = $arr;
-            unset($arr['child']['child']);
+            $arr["child"] = $arr;
+            unset($arr["child"]["child"]);
         };
         $tree($arr1);
         $tree($arr2);
@@ -453,35 +441,18 @@ class ArrayUtilsTest extends TestCase {
      *
      * @return array
      */
-    public function provideArrayMergeRecursiveTests(): array {
+    public function provideArrayMergeRecursiveTests(): array
+    {
         $r = [
-            'overwrite' => [
-                ['a' => 'a'], ['a' => 'b'], ['a' => 'b']
-            ],
-            'just 1' => [
-                ['a' => 'a'], [], ['a' => 'a']
-            ],
-            'just 2' => [
-                [], ['a' => 'a'], ['a' => 'a']
-            ],
-            'numeric' => [
-                ['a' => ['a', 'b']], ['a' => ['a', 'c']], ['a' => ['a', 'b', 'c']]
-            ],
-            'just recurse 1' => [
-                ['a' => ['b' => 'c']], [], ['a' => ['b' => 'c']]
-            ],
-            'just recurse 2' => [
-                [], ['a' => ['b' => 'c']], ['a' => ['b' => 'c']]
-            ],
-            'empty numeric' => [
-                ['a' => []], ['a' => ['a']], ['a' => ['a']]
-            ],
-            'numeric empty' => [
-                ['a' => ['a']], ['a' => []], ['a' => ['a']]
-            ],
-            'mismatch' => [
-                ['a' => ['a']], ['a' => 'a'], ['a' => 'a']
-            ],
+            "overwrite" => [["a" => "a"], ["a" => "b"], ["a" => "b"]],
+            "just 1" => [["a" => "a"], [], ["a" => "a"]],
+            "just 2" => [[], ["a" => "a"], ["a" => "a"]],
+            "numeric" => [["a" => ["a", "b"]], ["a" => ["a", "c"]], ["a" => ["a", "b", "c"]]],
+            "just recurse 1" => [["a" => ["b" => "c"]], [], ["a" => ["b" => "c"]]],
+            "just recurse 2" => [[], ["a" => ["b" => "c"]], ["a" => ["b" => "c"]]],
+            "empty numeric" => [["a" => []], ["a" => ["a"]], ["a" => ["a"]]],
+            "numeric empty" => [["a" => ["a"]], ["a" => []], ["a" => ["a"]]],
+            "mismatch" => [["a" => ["a"]], ["a" => "a"], ["a" => "a"]],
         ];
         return $r;
     }
@@ -493,9 +464,10 @@ class ArrayUtilsTest extends TestCase {
      * @param int $expected
      * @dataProvider provideSortCallbackTests
      */
-    public function testSortCallback(array $fields, int $expected) {
-        $a = ['a' => 1, 'b' => 'B', 'c' => 1];
-        $b = ['a' => 1, 'b' => 'a', 'c' => 2];
+    public function testSortCallback(array $fields, int $expected)
+    {
+        $a = ["a" => 1, "b" => "B", "c" => 1];
+        $b = ["a" => 1, "b" => "a", "c" => 2];
 
         $fn = ArrayUtils::sortCallback(...$fields);
 
@@ -508,13 +480,14 @@ class ArrayUtilsTest extends TestCase {
      *
      * @return array
      */
-    public function provideSortCallbackTests(): array {
+    public function provideSortCallbackTests(): array
+    {
         $r = [
-            'same' => [['a'], 0],
-            'case insensitive' => [['b'], 1],
-            'multi' => [['a', 'b'], 1],
-            'multi bail' => [['c', 'b'], -1],
-            'desc' => [['-c'], 1],
+            "same" => [["a"], 0],
+            "case insensitive" => [["b"], 1],
+            "multi" => [["a", "b"], 1],
+            "multi bail" => [["c", "b"], -1],
+            "desc" => [["-c"], 1],
         ];
         return $r;
     }
@@ -526,19 +499,21 @@ class ArrayUtilsTest extends TestCase {
      * @param array $expected
      * @dataProvider provideExplodeMixedTests
      */
-    public function testExplodeMixed($in, $expected = ['a', 'b', 'c']): void {
-        $this->assertSame($expected, ArrayUtils::explodeMixed(',', $in));
+    public function testExplodeMixed($in, $expected = ["a", "b", "c"]): void
+    {
+        $this->assertSame($expected, ArrayUtils::explodeMixed(",", $in));
     }
 
     /**
      * @return array
      */
-    public function provideExplodeMixedTests(): array {
+    public function provideExplodeMixedTests(): array
+    {
         $r = [
-            'array' => [['a', 'b', 'c']],
-            'csv' => ['a,b, c'],
-            'int' => [1, [1]],
-            'empty' => ['', []],
+            "array" => [["a", "b", "c"]],
+            "csv" => ["a,b, c"],
+            "int" => [1, [1]],
+            "empty" => ["", []],
         ];
         return $r;
     }
@@ -551,12 +526,9 @@ class ArrayUtilsTest extends TestCase {
      * @param int $expectedCount
      * @dataProvider provideFilterCallbackTests
      */
-    public function testFilterCallback(array $filter, bool $strict, int $expectedCount): void {
-        $arr = [
-            ['id' => 1, 'a' => 'a'],
-            ['id' => 2, 'a' => 'a'],
-            ['id' => 3, 'a' => 'b'],
-        ];
+    public function testFilterCallback(array $filter, bool $strict, int $expectedCount): void
+    {
+        $arr = [["id" => 1, "a" => "a"], ["id" => 2, "a" => "a"], ["id" => 3, "a" => "b"]];
 
         $result = array_filter($arr, ArrayUtils::filterCallback($filter, $strict));
         $this->assertCount($expectedCount, $result);
@@ -567,14 +539,15 @@ class ArrayUtilsTest extends TestCase {
      *
      * @return array[]
      */
-    public function provideFilterCallbackTests(): array {
+    public function provideFilterCallbackTests(): array
+    {
         $r = [
-            'id' => [['id' => '1'], false, 1],
-            'id strict' => [['id' => '1'], true, 0],
-            'id strict match' => [['id' => 1], true, 1],
-            'multi rows' => [['a' => 'a'], true, 2],
-            'multi filter' => [['a' => 'a', 'id' => 2], true, 1],
-            'no key' => [['foo' => 'a'], true, 0],
+            "id" => [["id" => "1"], false, 1],
+            "id strict" => [["id" => "1"], true, 0],
+            "id strict match" => [["id" => 1], true, 1],
+            "multi rows" => [["a" => "a"], true, 2],
+            "multi filter" => [["a" => "a", "id" => 2], true, 1],
+            "no key" => [["foo" => "a"], true, 0],
         ];
 
         return $r;
@@ -587,16 +560,11 @@ class ArrayUtilsTest extends TestCase {
      * @param array $pascal
      * @dataProvider provideCamelPascal
      */
-    public function testCamelCase(array $camel, array $pascal): void {
-        $this->assertSame(
-            $camel,
-            ArrayUtils::camelCase($pascal)
-        );
+    public function testCamelCase(array $camel, array $pascal): void
+    {
+        $this->assertSame($camel, ArrayUtils::camelCase($pascal));
 
-        $this->assertSame(
-            $camel,
-            ArrayUtils::camelCase($camel)
-        );
+        $this->assertSame($camel, ArrayUtils::camelCase($camel));
     }
 
     /**
@@ -606,15 +574,10 @@ class ArrayUtilsTest extends TestCase {
      * @param array $pascal
      * @dataProvider provideCamelPascal
      */
-    public function testPascalCase(array $camel, array $pascal): void {
-        $this->assertSame(
-            $pascal,
-            ArrayUtils::pascalCase($camel)
-        );
-        $this->assertSame(
-            $pascal,
-            ArrayUtils::pascalCase($pascal)
-        );
+    public function testPascalCase(array $camel, array $pascal): void
+    {
+        $this->assertSame($pascal, ArrayUtils::pascalCase($camel));
+        $this->assertSame($pascal, ArrayUtils::pascalCase($pascal));
     }
 
     /**
@@ -622,71 +585,58 @@ class ArrayUtilsTest extends TestCase {
      *
      * @return \array[][]
      */
-    public function provideCamelPascal(): array {
+    public function provideCamelPascal(): array
+    {
         return [
-            'basic' => [
-                ['sID' => 'b', 'foo' => ['bar' => 'a']],
-                ['SID' => 'b', 'Foo' => ['Bar' => 'a']],
+            "basic" => [["sID" => "b", "foo" => ["bar" => "a"]], ["SID" => "b", "Foo" => ["Bar" => "a"]]],
+            "includes both numeric and string keys" => [
+                ["blahBlah", "sID" => "b", "MooCow", "foo" => ["bar" => "a", "b", "c"]],
+                ["blahBlah", "SID" => "b", "MooCow", "Foo" => ["Bar" => "a", "b", "c"]],
             ],
-            'includes both numeric and string keys' => [
-                ['blahBlah', 'sID' => 'b', 'MooCow', 'foo' => ['bar' => 'a', 'b', 'c']],
-                ['blahBlah', 'SID' => 'b', 'MooCow', 'Foo' => ['Bar' => 'a', 'b', 'c']],
+            "values in camelCase are not converted" => [
+                ["sID" => "fooBarBaz", "fooBarBaz" => ["fizzBuzz" => "flipFlop"]],
+                ["SID" => "fooBarBaz", "FooBarBaz" => ["FizzBuzz" => "flipFlop"]],
             ],
-            'values in camelCase are not converted' => [
-                ['sID' => 'fooBarBaz', 'fooBarBaz' => ['fizzBuzz' => 'flipFlop']],
-                ['SID' => 'fooBarBaz', 'FooBarBaz' => ['FizzBuzz' => 'flipFlop']],
+            "values in PascalCase are not converted" => [
+                ["sID" => "FooBarBaz", "fooBarBaz" => ["fizzBuzz" => "FlipFlop"]],
+                ["SID" => "FooBarBaz", "FooBarBaz" => ["FizzBuzz" => "FlipFlop"]],
             ],
-            'values in PascalCase are not converted' => [
-                ['sID' => 'FooBarBaz', 'fooBarBaz' => ['fizzBuzz' => 'FlipFlop']],
-                ['SID' => 'FooBarBaz', 'FooBarBaz' => ['FizzBuzz' => 'FlipFlop']],
-            ]
         ];
     }
 
     /**
      * Tests for array columning by array.
      */
-    public function testArrayColumnArrays() {
+    public function testArrayColumnArrays()
+    {
         $foo = [
-            'key' => 'fooKey',
-            'val' => 'fooVal'
+            "key" => "fooKey",
+            "val" => "fooVal",
         ];
         $foo2 = [
-            'key' => 'fooKey',
-            'val' => 'foo2Val'
+            "key" => "fooKey",
+            "val" => "foo2Val",
         ];
         $missingKey = [
-            'val' => 'missingKeyVal',
+            "val" => "missingKeyVal",
         ];
 
         // By val.
         $this->assertEquals(
-            ['fooVal' => [$foo], 'foo2Val' => [$foo2], 'missingKeyVal' => [$missingKey]],
-            ArrayUtils::arrayColumnArrays(
-                [$foo, $foo2, $missingKey],
-                null,
-                'val'
-            )
+            ["fooVal" => [$foo], "foo2Val" => [$foo2], "missingKeyVal" => [$missingKey]],
+            ArrayUtils::arrayColumnArrays([$foo, $foo2, $missingKey], null, "val")
         );
 
         // By key.
         $this->assertEquals(
-            ['fooKey' => [$foo, $foo2], '' => [$missingKey]],
-            ArrayUtils::arrayColumnArrays(
-                [$foo, $foo2, $missingKey],
-                null,
-                'key'
-            )
+            ["fooKey" => [$foo, $foo2], "" => [$missingKey]],
+            ArrayUtils::arrayColumnArrays([$foo, $foo2, $missingKey], null, "key")
         );
 
         // By key extract
         $this->assertEquals(
-            ['fooKey' => ['fooVal', 'foo2Val'], '' => ['missingKeyVal']],
-            ArrayUtils::arrayColumnArrays(
-                [$foo, $foo2, $missingKey],
-                'val',
-                'key'
-            )
+            ["fooKey" => ["fooVal", "foo2Val"], "" => ["missingKeyVal"]],
+            ArrayUtils::arrayColumnArrays([$foo, $foo2, $missingKey], "val", "key")
         );
     }
 
@@ -697,7 +647,8 @@ class ArrayUtilsTest extends TestCase {
      * @param array $expected
      * @dataProvider provideObjectsToArrays
      */
-    public function testObjToArrayRecursive(object $obj, array $expected): void {
+    public function testObjToArrayRecursive(object $obj, array $expected): void
+    {
         $actual = ArrayUtils::objToArrayRecursive($obj);
         $this->assertSame($expected, $actual);
     }
@@ -707,16 +658,11 @@ class ArrayUtilsTest extends TestCase {
      *
      * @return array
      */
-    public function provideObjectsToArrays(): array {
+    public function provideObjectsToArrays(): array
+    {
         return [
-            "Basic" => [
-                (object)["a" => 1, "b" => 2],
-                ["a" => 1, "b" => 2],
-            ],
-            "Nested" => [
-                (object)["foo" => (object)["hello" => "world"]],
-                ["foo" => ["hello" => "world"]],
-            ]
+            "Basic" => [(object) ["a" => 1, "b" => 2], ["a" => 1, "b" => 2]],
+            "Nested" => [(object) ["foo" => (object) ["hello" => "world"]], ["foo" => ["hello" => "world"]]],
         ];
     }
 
@@ -727,12 +673,13 @@ class ArrayUtilsTest extends TestCase {
      * @param array $expected
      * @dataProvider provideFilterRecursiveArrayTests
      */
-    public function testFilterRecursiveArray($array, $expected): void {
+    public function testFilterRecursiveArray($array, $expected): void
+    {
         $fn = function (&$array) {
-            if (!empty($array['hidden'])) {
+            if (!empty($array["hidden"])) {
                 return false;
             } else {
-                $array['hidden'] = false;
+                $array["hidden"] = false;
                 return true;
             }
         };
@@ -744,12 +691,13 @@ class ArrayUtilsTest extends TestCase {
     /**
      * Make sure the array can filter itself if desired.
      */
-    public function testFilterRecursiveArrayRoot(): void {
+    public function testFilterRecursiveArrayRoot(): void
+    {
         $fn = function ($array) {
-            return isset($array['foo']);
+            return isset($array["foo"]);
         };
 
-        $actual = ArrayUtils::filterRecursiveArray(['a'], $fn, true);
+        $actual = ArrayUtils::filterRecursiveArray(["a"], $fn, true);
         $this->assertNull($actual);
     }
 
@@ -758,41 +706,43 @@ class ArrayUtilsTest extends TestCase {
      *
      * @return array
      */
-    public function provideFilterRecursiveArrayTests(): array {
+    public function provideFilterRecursiveArrayTests(): array
+    {
         $r = [
-            'flat' => [['a', 'b'], ['a', 'b']],
-            'no-filter' => [[['a'], ['b']], [[0 => 'a', 'hidden' => false], [0 => 'b', 'hidden' => false]]],
-            'one-filter' => [['a', ['hidden' => true]], ['a']],
-            'recursive' => [
-                ['a' => [
-                    'b' => [
-                        'hidden' => true,
-                    ],
-                    'c' => [
-                    ],
-                ]],
+            "flat" => [["a", "b"], ["a", "b"]],
+            "no-filter" => [[["a"], ["b"]], [[0 => "a", "hidden" => false], [0 => "b", "hidden" => false]]],
+            "one-filter" => [["a", ["hidden" => true]], ["a"]],
+            "recursive" => [
                 [
-                    'a' => [
-                        'c' => [
-                            'hidden' => false,
+                    "a" => [
+                        "b" => [
+                            "hidden" => true,
                         ],
-                        'hidden' => false,
+                        "c" => [],
+                    ],
+                ],
+                [
+                    "a" => [
+                        "c" => [
+                            "hidden" => false,
+                        ],
+                        "hidden" => false,
                     ],
                 ],
             ],
-            'handlesHoles' => [
+            "handlesHoles" => [
                 // Input
                 [
-                    0 => ['foo' => 'foo1'],
-                    1 => ['foo' => 'foo2', 'hidden' => true],
-                    2 => ['foo' => 'foo3'],
+                    0 => ["foo" => "foo1"],
+                    1 => ["foo" => "foo2", "hidden" => true],
+                    2 => ["foo" => "foo3"],
                 ],
                 // Expected
                 [
-                    0 => ['foo' => 'foo1', 'hidden' => false],
-                    1 => ['foo' => 'foo3', 'hidden' => false],
+                    0 => ["foo" => "foo1", "hidden" => false],
+                    1 => ["foo" => "foo3", "hidden" => false],
                 ],
-            ]
+            ],
         ];
         return $r;
     }

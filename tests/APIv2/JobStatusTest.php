@@ -23,8 +23,8 @@ use VanillaTests\UsersAndRolesApiTestTrait;
 /**
  * Tests for the /api/v2/job-statuses endpoints.
  */
-class JobStatusTest extends SiteTestCase {
-
+class JobStatusTest extends SiteTestCase
+{
     use SchedulerTestTrait;
     use UsersAndRolesApiTestTrait;
     use ExpectExceptionTrait;
@@ -32,24 +32,25 @@ class JobStatusTest extends SiteTestCase {
     /**
      * @param Container $container
      */
-    public static function configureContainerBeforeStartup(Container $container) {
-        $container->rule(JobStatusModel::class)
-            ->setShared(false)
-        ;
+    public static function configureContainerBeforeStartup(Container $container)
+    {
+        $container->rule(JobStatusModel::class)->setShared(false);
     }
 
     /**
      * Cleanup before test.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
-        $this->resetTable('jobStatus');
+        $this->resetTable("jobStatus");
     }
 
     /**
      * Test our index endpoint.
      */
-    public function testIndex() {
+    public function testIndex()
+    {
         $scheduler = $this->getScheduler();
 
         $slip1 = $scheduler->addJobDescriptor(self::trackableDescriptor(JobExecutionStatus::complete()));
@@ -58,13 +59,13 @@ class JobStatusTest extends SiteTestCase {
         $scheduler->pause();
         $slip3 = $scheduler->addJobDescriptor(self::trackableDescriptor(JobExecutionStatus::abandoned()));
 
-        $response = $this->api()->get('/job-statuses');
+        $response = $this->api()->get("/job-statuses");
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertRowsLike(
             [
                 // Item 3 wasn't executed because we were paused.
-                'jobExecutionStatus' => ['complete', 'error', 'received'],
-                'jobTrackingID' => [$slip1->getTrackingID(), $slip2->getTrackingID(), $slip3->getTrackingID()],
+                "jobExecutionStatus" => ["complete", "error", "received"],
+                "jobTrackingID" => [$slip1->getTrackingID(), $slip2->getTrackingID(), $slip3->getTrackingID()],
             ],
             $response->getBody(),
             true,
@@ -73,15 +74,15 @@ class JobStatusTest extends SiteTestCase {
 
         // Test filtering.
         $scheduler->resume();
-        $response = $this->api()->get('/job-statuses', [
-            'jobTrackingID' => $slip3->getTrackingID(),
+        $response = $this->api()->get("/job-statuses", [
+            "jobTrackingID" => $slip3->getTrackingID(),
         ]);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertRowsLike(
             [
                 // Item 3 wasn't executed because we were paused.
-                'jobExecutionStatus' => ['abandoned'],
-                'jobTrackingID' => [ $slip3->getTrackingID()],
+                "jobExecutionStatus" => ["abandoned"],
+                "jobTrackingID" => [$slip3->getTrackingID()],
             ],
             $response->getBody(),
             true,
@@ -92,37 +93,42 @@ class JobStatusTest extends SiteTestCase {
     /**
      * Test validation of our user.
      */
-    public function testUserValidation() {
+    public function testUserValidation()
+    {
         $scheduler = $this->getScheduler();
         $otherUser = $this->createUser();
-        $otherAdmin = $this->createUser(['roleID' => [\RoleModel::ADMIN_ID]]);
+        $otherAdmin = $this->createUser(["roleID" => [\RoleModel::ADMIN_ID]]);
 
-        $otherUserSlip = $scheduler->addJobDescriptor(self::trackableDescriptor(JobExecutionStatus::complete(), $otherUser['userID']));
-        $otherAdminSlip = $scheduler->addJobDescriptor(self::trackableDescriptor(JobExecutionStatus::complete(), $otherAdmin['userID']));
+        $otherUserSlip = $scheduler->addJobDescriptor(
+            self::trackableDescriptor(JobExecutionStatus::complete(), $otherUser["userID"])
+        );
+        $otherAdminSlip = $scheduler->addJobDescriptor(
+            self::trackableDescriptor(JobExecutionStatus::complete(), $otherAdmin["userID"])
+        );
 
         $this->runWithUser(function () use ($otherUserSlip, $otherAdminSlip, $otherAdmin) {
             $this->assertIndexSlips([$otherUserSlip], []);
 
             // Can't get the other users slips.
-            $this->assertIndexSlips([], ['jobTrackingID' => $otherAdminSlip->getTrackingID()]);
+            $this->assertIndexSlips([], ["jobTrackingID" => $otherAdminSlip->getTrackingID()]);
 
             // Permission error when getting other users slips.
             $this->runWithExpectedExceptionCode(400, function () use ($otherAdmin) {
-                $this->api()->get('/job-statuses', [
-                    'trackingUserID' => $otherAdmin['userID']
+                $this->api()->get("/job-statuses", [
+                    "trackingUserID" => $otherAdmin["userID"],
                 ]);
             });
         }, $otherUser);
 
         $this->runWithUser(function () use ($otherUserSlip, $otherUser) {
             // Able to fetch slips of other users.
-            $this->assertIndexSlips([$otherUserSlip], ['trackingUserID' => $otherUser['userID']]);
+            $this->assertIndexSlips([$otherUserSlip], ["trackingUserID" => $otherUser["userID"]]);
         }, $otherAdmin);
 
         // Non-existent user.
         $this->runWithExpectedExceptionCode(400, function () use ($otherAdmin) {
-            $this->api()->get('/job-statuses', [
-                'trackingUserID' => 523141414210
+            $this->api()->get("/job-statuses", [
+                "trackingUserID" => 523141414210,
             ]);
         });
     }
@@ -130,39 +136,44 @@ class JobStatusTest extends SiteTestCase {
     /**
      * Test polling on the poll endpoint.
      */
-    public function testPoll() {
+    public function testPoll()
+    {
         $scheduler = $this->getScheduler();
         $scheduler->pause();
         $slip = $scheduler->addJobDescriptor(self::trackableDescriptor(JobExecutionStatus::complete()));
 
-        JobStatusesApiController::$callAfterPollIterationsDoNotUseInProduction = [JobStatusTest::class, 'resumePauseRequeueJob'];
+        JobStatusesApiController::$callAfterPollIterationsDoNotUseInProduction = [
+            JobStatusTest::class,
+            "resumePauseRequeueJob",
+        ];
 
-        $response = $this->api()->post('/job-statuses/poll', ['maxDuration' => 1]);
+        $response = $this->api()->post("/job-statuses/poll", ["maxDuration" => 1]);
         $this->assertEquals(200, $response->getStatusCode());
         $body = $response->getBody();
-        $this->assertRowsLike(['jobTrackingID' => [$slip->getTrackingID()]], $body['updatedJobs'], true, 1);
-        $this->assertEquals(1, $body['incompleteJobCount']);
+        $this->assertRowsLike(["jobTrackingID" => [$slip->getTrackingID()]], $body["updatedJobs"], true, 1);
+        $this->assertEquals(1, $body["incompleteJobCount"]);
 
         // Go for the full duration and get nothing.
-        $response = $this->api()->post('/job-statuses/poll', ['maxDuration' => 1]);
+        $response = $this->api()->post("/job-statuses/poll", ["maxDuration" => 1]);
         $this->assertEquals(200, $response->getStatusCode());
         $body = $response->getBody();
-        $this->assertEmpty($body['updatedJobs']);
-        $this->assertEquals(1, $body['incompleteJobCount']);
+        $this->assertEmpty($body["updatedJobs"]);
+        $this->assertEquals(1, $body["incompleteJobCount"]);
 
         // Now wrap it all up.
-        JobStatusesApiController::$callAfterPollIterationsDoNotUseInProduction = [$scheduler, 'resume'];
-        $response = $this->api()->post('/job-statuses/poll', ['maxDuration' => 1]);
+        JobStatusesApiController::$callAfterPollIterationsDoNotUseInProduction = [$scheduler, "resume"];
+        $response = $this->api()->post("/job-statuses/poll", ["maxDuration" => 1]);
         $this->assertEquals(200, $response->getStatusCode());
         $body = $response->getBody();
-        $this->assertCount(1, $body['updatedJobs']);
-        $this->assertEquals(0, $body['incompleteJobCount']);
+        $this->assertCount(1, $body["updatedJobs"]);
+        $this->assertEquals(0, $body["incompleteJobCount"]);
     }
 
     /**
      * Resume jobs, pause and requeue another.
      */
-    public static function resumePauseRequeueJob() {
+    public static function resumePauseRequeueJob()
+    {
         /** @var InstantScheduler $scheduler */
         $scheduler = \Gdn::scheduler();
         $scheduler->resume();
@@ -174,21 +185,22 @@ class JobStatusTest extends SiteTestCase {
     /**
      * Test that various cases are not allowed to poll.
      */
-    public function testPollNotAllowed() {
+    public function testPollNotAllowed()
+    {
         $this->runWithExpectedExceptionCode(500, function () {
-            $this->runWithConfig(['Cache.Enabled' => false], function () {
-                $this->api()->post('/job-statuses/poll');
+            $this->runWithConfig(["Cache.Enabled" => false], function () {
+                $this->api()->post("/job-statuses/poll");
             });
         });
 
         $this->runWithExpectedExceptionCode(403, function () {
             // We don't have any statuses to track.
-            $this->api()->post('/job-statuses/poll');
+            $this->api()->post("/job-statuses/poll");
         });
 
         $this->runWithExpectedExceptionCode(400, function () {
             // Bad user ID.
-            $this->api()->post('/job-statuses/poll', ['trackingUserID' => 1241414]);
+            $this->api()->post("/job-statuses/poll", ["trackingUserID" => 1241414]);
         });
 
         // No permission for other users.
@@ -197,7 +209,7 @@ class JobStatusTest extends SiteTestCase {
         $this->runWithUser(function () use ($adminUserID) {
             $this->runWithExpectedExceptionCode(400, function () use ($adminUserID) {
                 // Bad user ID.
-                $this->api()->post('/job-statuses/poll', ['trackingUserID' => $adminUserID]);
+                $this->api()->post("/job-statuses/poll", ["trackingUserID" => $adminUserID]);
             });
         }, $otherUser);
     }
@@ -208,15 +220,16 @@ class JobStatusTest extends SiteTestCase {
      * @param array $expectedSlips
      * @param array $query
      */
-    private function assertIndexSlips(array $expectedSlips, array $query) {
-        $response = $this->api()->get('/job-statuses', $query);
+    private function assertIndexSlips(array $expectedSlips, array $query)
+    {
+        $response = $this->api()->get("/job-statuses", $query);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertRowsLike(
             [
                 // Item 3 wasn't executed because we were paused.
-                'jobTrackingID' => array_map(function (TrackingSlipInterface $slip) {
+                "jobTrackingID" => array_map(function (TrackingSlipInterface $slip) {
                     return $slip->getTrackingID();
-                }, $expectedSlips)
+                }, $expectedSlips),
             ],
             $response->getBody(),
             true,
@@ -231,13 +244,11 @@ class JobStatusTest extends SiteTestCase {
      * @param int|null $userID
      * @return NormalJobDescriptor
      */
-    private static function trackableDescriptor(JobExecutionStatus $jobStatus, int $userID = null): NormalJobDescriptor {
-        $descriptor = new NormalJobDescriptor(
-            MockTrackableJob::class,
-            [
-                'status' => $jobStatus->getStatus(),
-            ]
-        );
+    private static function trackableDescriptor(JobExecutionStatus $jobStatus, int $userID = null): NormalJobDescriptor
+    {
+        $descriptor = new NormalJobDescriptor(MockTrackableJob::class, [
+            "status" => $jobStatus->getStatus(),
+        ]);
         $descriptor->setTrackingUserID($userID ?? \Gdn::session()->UserID);
         return $descriptor;
     }

@@ -13,8 +13,8 @@ use Vanilla\Contracts\Site\SiteSectionInterface;
 /**
  * Provide site totals for posts.
  */
-class PostSiteTotalProvider implements SiteSectionTotalProviderInterface {
-
+class PostSiteTotalProvider implements SiteSectionTotalProviderInterface
+{
     private $database;
 
     /**
@@ -22,14 +22,16 @@ class PostSiteTotalProvider implements SiteSectionTotalProviderInterface {
      *
      * @param \Gdn_Database $database
      */
-    public function __construct(\Gdn_Database $database) {
+    public function __construct(\Gdn_Database $database)
+    {
         $this->database = $database;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function calculateSiteTotalCount(SiteSectionInterface $siteSection = null): int {
+    public function calculateSiteTotalCount(SiteSectionInterface $siteSection = null): int
+    {
         $rootCategoryID = $siteSection === null ? \CategoryModel::ROOT_ID : $siteSection->getCategoryID();
 
         $countDiscussionsAndComments = $this->database
@@ -38,10 +40,11 @@ class PostSiteTotalProvider implements SiteSectionTotalProviderInterface {
             ->from($this->getTableName())
             ->where("CategoryID", $rootCategoryID)
             ->get()
-            ->resultArray()
-        ;
+            ->resultArray();
 
-        $postCount = $countDiscussionsAndComments[0]["CountAllDiscussions"] + $countDiscussionsAndComments[0]["CountAllComments"];
+        $postCount =
+            $countDiscussionsAndComments[0]["CountAllDiscussions"] +
+            $countDiscussionsAndComments[0]["CountAllComments"];
 
         return $postCount;
     }
@@ -49,14 +52,16 @@ class PostSiteTotalProvider implements SiteSectionTotalProviderInterface {
     /**
      * {@inheritDoc}
      */
-    public function getTableName(): string {
+    public function getTableName(): string
+    {
         return "Category";
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getSiteTotalRecordType(): string {
+    public function getSiteTotalRecordType(): string
+    {
         return "post";
     }
 }

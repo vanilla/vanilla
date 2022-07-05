@@ -3,7 +3,7 @@
     "license": "MIT",
     "devDependencies": {
         "react": "16",
-        "react-redux": "^7.2.6",
-        "redux": "^4.1.2"
+        "react-redux": "^7.2.8",
+        "redux": "^4.2.0"
     }
 }

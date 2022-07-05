@@ -31,6 +31,7 @@ export interface IAuthenticator {
     useBasicAuthToken: boolean;
     postProfileRequest: boolean;
     allowAccessTokens: boolean;
+    isOIDC?: boolean;
     active: boolean;
     default: boolean;
     visible: boolean;

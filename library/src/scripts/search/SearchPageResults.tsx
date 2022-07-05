@@ -42,14 +42,6 @@ export function SearchPageResults(props: IProps) {
         }
     }, [status, lastStatus]);
 
-    //this way, search page_view event won't be triggered multiple times with component rerendering, but only once when we visit the page
-    const isInitial = useRef(true);
-    useEffect(() => {
-        if (isInitial.current && status === LoadStatus.SUCCESS) {
-            isInitial.current = false;
-        }
-    });
-
     let content = <></>;
     switch (results.status) {
         case LoadStatus.PENDING:
@@ -81,9 +73,6 @@ export function SearchPageResults(props: IProps) {
             }
             content = (
                 <>
-                    {isInitial.current && (
-                        <AnalyticsData uniqueKey={hashString(form.query + JSON.stringify(results.data!.pagination))} />
-                    )}
                     <ResultList
                         resultComponent={isCommunity ? currentDomain.ResultComponent : DEFAULT_RESULT_COMPONENT}
                         results={results.data!.results.map(mapResult)}

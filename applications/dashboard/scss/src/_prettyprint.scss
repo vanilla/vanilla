@@ -1,17 +1,16 @@
-
 .main-row pre.prettyprint {
-  padding: $spacer / 2;
-  font-size: $font-size-sm;
-  border: $border-width solid $border-color !important;
-  border-radius: $border-radius;
-  background-color: transparent;
+    padding: $spacer * 0.5;
+    font-size: $font-size-sm;
+    border: $border-width solid $border-color !important;
+    border-radius: $border-radius;
+    background-color: transparent;
 }
 
 // Make code blocks in forms look disabled.
 .input-wrap pre.prettyprint {
-  min-height: 36px;
-  padding-top: 6.5px;
-  padding-bottom: 6.5px;
-  line-height: $font-size-root * 1.5;
-  background-color: $input-bg-disabled;
+    min-height: 36px;
+    padding-top: 6.5px;
+    padding-bottom: 6.5px;
+    line-height: $font-size-root * 1.5;
+    background-color: $input-bg-disabled;
 }

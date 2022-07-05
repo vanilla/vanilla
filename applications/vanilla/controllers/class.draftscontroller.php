@@ -11,10 +11,10 @@
 /**
  * Handles displaying saved drafts of unposted comments via /drafts endpoint.
  */
-class DraftsController extends VanillaController {
-
+class DraftsController extends VanillaController
+{
     /** @var array Models to include. */
-    public $Uses = ['Database', 'DraftModel'];
+    public $Uses = ["Database", "DraftModel"];
 
     /** @var int $offset */
     public $offset;
@@ -24,16 +24,17 @@ class DraftsController extends VanillaController {
      *
      * @param int $offset Number of drafts to skip.
      */
-    public function index($offset = 0) {
+    public function index($offset = 0)
+    {
         $this->offset = $offset;
-        Gdn_Theme::section('DiscussionList');
+        Gdn_Theme::section("DiscussionList");
 
         // Setup head
-        $this->permission('Garden.SignIn.Allow');
-        $this->addJsFile('jquery.gardenmorepager.js');
+        $this->permission("Garden.SignIn.Allow");
+        $this->addJsFile("jquery.gardenmorepager.js");
 
-        $this->addJsFile('discussions.js');
-        $this->title(t('My Drafts'));
+        $this->addJsFile("discussions.js");
+        $this->title(t("My Drafts"));
 
         // Validate $Offset
         if (!is_numeric($offset) || $offset < 0) {
@@ -41,11 +42,11 @@ class DraftsController extends VanillaController {
         }
 
         // Set criteria & get drafts data
-        $limit = Gdn::config('Vanilla.Discussions.PerPage', 30);
+        $limit = Gdn::config("Vanilla.Discussions.PerPage", 30);
         $session = Gdn::session();
-        $wheres = ['d.InsertUserID' => $session->UserID];
+        $wheres = ["d.InsertUserID" => $session->UserID];
         $countDrafts = $this->DraftModel->getCountByUser($session->UserID);
-        $offsetCalculated = (int)(($countDrafts - 2) / $limit) * $limit;
+        $offsetCalculated = (int) (($countDrafts - 2) / $limit) * $limit;
         if ($offset >= $offsetCalculated) {
             $this->offset = $offsetCalculated;
         }
@@ -53,28 +54,23 @@ class DraftsController extends VanillaController {
 
         // Build a pager
         $pagerFactory = new Gdn_PagerFactory();
-        $this->Pager = $pagerFactory->getPager('MorePager', $this);
-        $this->Pager->MoreCode = 'More drafts';
-        $this->Pager->LessCode = 'Newer drafts';
-        $this->Pager->ClientID = 'Pager';
-        $this->Pager->configure(
-            $offset,
-            $limit,
-            $countDrafts,
-            'drafts/%1$s'
-        );
+        $this->Pager = $pagerFactory->getPager("MorePager", $this);
+        $this->Pager->MoreCode = "More drafts";
+        $this->Pager->LessCode = "Newer drafts";
+        $this->Pager->ClientID = "Pager";
+        $this->Pager->configure($offset, $limit, $countDrafts, 'drafts/%1$s');
 
         // Deliver JSON data if necessary
         if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
-            $this->setJson('LessRow', $this->Pager->toString('less'));
-            $this->setJson('MoreRow', $this->Pager->toString('more'));
-            $this->View = 'drafts';
+            $this->setJson("LessRow", $this->Pager->toString("less"));
+            $this->setJson("MoreRow", $this->Pager->toString("more"));
+            $this->View = "drafts";
         }
         // Add modules
-        $this->addModule('DiscussionFilterModule');
-        $this->addModule('NewDiscussionModule');
-        $this->addModule('CategoriesModule');
-        $this->addModule('BookmarkedModule');
+        $this->addModule("DiscussionFilterModule");
+        $this->addModule("NewDiscussionModule");
+        $this->addModule("CategoriesModule");
+        $this->addModule("BookmarkedModule");
 
         // Render default view (drafts/index.php)
         $this->render();
@@ -91,39 +87,41 @@ class DraftsController extends VanillaController {
      * @param int $draftID Unique ID of draft to be deleted.
      * @param string $transientKey Single-use hash to prove intent.
      */
-    public function delete($draftID = 0, $transientKey = '') {
-        $form = Gdn::factory('Form');
+    public function delete($draftID = 0, $transientKey = "")
+    {
+        $form = Gdn::factory("Form");
         $session = Gdn::session();
         if (is_numeric($draftID) && $draftID > 0) {
             $draft = $this->DraftModel->getID($draftID);
         }
         if (!empty($draft)) {
-            if ($session->validateTransientKey($transientKey)
-                && ((val('InsertUserID', $draft) == $session->UserID) || checkPermission('Garden.Community.Manage'))
+            if (
+                $session->validateTransientKey($transientKey) &&
+                (val("InsertUserID", $draft) == $session->UserID || checkPermission("Garden.Community.Manage"))
             ) {
                 // Delete the draft
                 if (!$this->DraftModel->deleteID($draftID)) {
-                    $form->addError('Failed to delete draft');
+                    $form->addError("Failed to delete draft");
                 }
             } else {
-                throw permissionException('Garden.Community.Manage');
+                throw permissionException("Garden.Community.Manage");
             }
         } else {
-            throw notFoundException('Draft');
+            throw notFoundException("Draft");
         }
 
         // Redirect
         if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
-            $target = getIncomingValue('Target', '/drafts');
+            $target = getIncomingValue("Target", "/drafts");
             redirectTo($target);
         }
 
         // Return any errors
         if ($form->errorCount() > 0) {
-            $this->setJson('ErrorMessage', $form->errors());
+            $this->setJson("ErrorMessage", $form->errors());
         }
 
         // Render default view.
-        $this->render('blank', 'utility', 'dashboard');
+        $this->render("blank", "utility", "dashboard");
     }
 }

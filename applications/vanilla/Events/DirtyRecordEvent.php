@@ -10,5 +10,6 @@ namespace Vanilla\Community\Events;
 /**
  * Represent a dirty record event.
  */
-class DirtyRecordEvent {
+class DirtyRecordEvent
+{
 }

@@ -5,6 +5,21 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Debug Production Build Process",
+            "request": "launch",
+            "runtimeArgs": [
+                "run-script",
+                "build:assets",
+                "--sections layouts"
+            ],
+            "runtimeExecutable": "npm",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "node"
+        },
+
+        {
             // Execute "yarn test:browser:debug" prior to attaching.
             "type": "chrome",
             "request": "attach",

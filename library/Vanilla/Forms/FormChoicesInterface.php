@@ -11,8 +11,8 @@ namespace Vanilla\Forms;
  *
  * @package Vanilla\Forms
  */
-interface FormChoicesInterface {
-
+interface FormChoicesInterface
+{
     /**
      * Get all choices.
      *

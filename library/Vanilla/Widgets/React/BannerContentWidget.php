@@ -8,60 +8,88 @@
 namespace Vanilla\Widgets\React;
 
 use Garden\Schema\Schema;
-use Vanilla\Utility\SchemaUtils;
-use Vanilla\Widgets\React\BannerFullWidget as ReactBannerFullWidget;
-use Gdn_Upload;
+use Vanilla\Forms\FieldMatchConditional;
+use Vanilla\Forms\FormOptions;
+use Vanilla\Forms\SchemaForm;
+use Vanilla\Layout\Section\SectionFullWidth;
 
 /**
  * Class BannerContentWidget
  */
-class BannerContentWidget extends ReactBannerFullWidget {
-
+class BannerContentWidget extends BannerFullWidget
+{
     /**
      * @inheritDoc
      */
-    public static function getWidgetName(): string {
+    public static function getWidgetName(): string
+    {
         return "Content Banner";
     }
 
     /**
      * @inheritDoc
      */
-    public static function getWidgetID(): string {
-        return "banner.content";
+    public static function getWidgetID(): string
+    {
+        return "app.content-banner";
     }
 
     /**
      * @return string
      */
-    public static function getWidgetIconPath(): string {
+    public static function getWidgetIconPath(): string
+    {
         return "/applications/dashboard/design/images/widgetIcons/contentbanner.svg";
     }
 
     /**
-     * @inheritDoc
+     * Only allow placement in a full width section.
      */
-    public function getProps(): ?array {
-        $parentProps = parent::getProps();
-        $categoryID = $this->props['categoryID'] ?? null;
-        $iconUrl = $this->categoryModel->getCategoryFieldRecursive($categoryID, 'Photo', null);
-        $iconUrl = $iconUrl ? Gdn_Upload::url($iconUrl) : null;
-        $props = array_merge($parentProps, [
-            'isContentBanner' => true,
-            'iconImage' => $iconUrl,
-        ], $this->props);
-        return $props;
+    public static function getAllowedSectionIDs(): array
+    {
+        return [SectionFullWidth::getWidgetID()];
     }
 
     /**
      * @inheritDoc
      */
-    public static function getWidgetSchema(): Schema {
-        return SchemaUtils::composeSchemas(
-            parent::getWidgetSchema(),
-            Schema::parse([
-                'iconImage:s?' => 'URL for the icon image.'
-            ])
-        );
+    public static function getComponentName(): string
+    {
+        return "BannerContentWidget";
+    }
+
+    public static function getWidgetSchema(): Schema
+    {
+        $schema = parent::getWidgetSchema()->getSchemaArray();
+        unset($schema["properties"]["showSearch"]);
+        unset($schema["properties"]["searchPlacement"]);
+        $schema["properties"]["showTitle"]["default"] = false;
+        $schema["properties"]["showTitle"]["x-control"] = SchemaForm::toggle(new FormOptions("Title"));
+        $schema["properties"]["title"]["label"] = "";
+        $showTitleConditions = [
+            (new FieldMatchConditional(
+                "showTitle",
+                Schema::parse([
+                    "type" => "boolean",
+                    "const" => true,
+                    "default" => false,
+                ])
+            ))->getCondition(),
+        ];
+        $schema["properties"]["title"]["x-control"]["conditions"] = $showTitleConditions;
+        $schema["properties"]["textColor"]["x-control"]["conditions"] = $showTitleConditions;
+        $schema["properties"]["alignment"]["x-control"]["conditions"] = $showTitleConditions;
+        $schema["properties"]["showDescription"]["default"] = false;
+        $schema["properties"]["description"]["x-control"]["conditions"] = [
+            (new FieldMatchConditional(
+                "showDescription",
+                Schema::parse([
+                    "type" => "boolean",
+                    "const" => true,
+                    "default" => false,
+                ])
+            ))->getCondition(),
+        ];
+        return new Schema($schema);
     }
 }

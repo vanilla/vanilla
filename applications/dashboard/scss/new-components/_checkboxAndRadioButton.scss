@@ -1,20 +1,18 @@
 // This is only for new pages, with new form element markup.
 
-
 .checkbox-box {
-  display: none; // for old themes
+    display: none; // for old themes
 }
 
-
 label.checkbox {
-  input.checkbox-input {
-    float: none;
-    margin: 0;
-  }
+    input.checkbox-input {
+        float: none;
+        margin: 0;
+    }
 }
 
 .checkbox-label {
-  user-select: none;
-  margin-left: 6px;
-  line-height: inherit;
+    user-select: none;
+    margin-left: 6px;
+    line-height: inherit;
 }

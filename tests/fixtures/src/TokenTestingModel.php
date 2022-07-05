@@ -9,15 +9,16 @@ namespace VanillaTests\Fixtures;
 
 use Vanilla\TokenSigningTrait;
 
-class TokenTestingModel {
-
+class TokenTestingModel
+{
     use TokenSigningTrait;
 
     /**
      * TokenModel constructor.
      */
-    public function __construct() {
-        $this->setSecret('sss');
-        $this->tokenIdentifier = 'nonce';
+    public function __construct()
+    {
+        $this->setSecret("sss");
+        $this->tokenIdentifier = "nonce";
     }
 }

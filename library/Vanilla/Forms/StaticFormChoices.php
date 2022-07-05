@@ -11,8 +11,8 @@ namespace Vanilla\Forms;
  *
  * @package Vanilla\Forms
  */
-class StaticFormChoices implements FormChoicesInterface {
-
+class StaticFormChoices implements FormChoicesInterface
+{
     /**
      * @var array $choices
      */
@@ -23,9 +23,8 @@ class StaticFormChoices implements FormChoicesInterface {
      *
      * @param array $choices
      */
-    public function __construct(
-        array $choices = []
-    ) {
+    public function __construct(array $choices = [])
+    {
         $this->choices = $choices;
     }
 
@@ -34,7 +33,8 @@ class StaticFormChoices implements FormChoicesInterface {
      *
      * @return array
      */
-    public function getChoices(): array {
+    public function getChoices(): array
+    {
         return ["staticOptions" => $this->choices];
     }
 }

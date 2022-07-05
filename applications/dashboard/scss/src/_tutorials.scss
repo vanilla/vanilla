@@ -1,63 +1,63 @@
 .video-section-heading {
-  @include full-border;
-  padding: $spacer 0;
-  font-weight: 600;
+    @include full-border;
+    padding: $spacer 0;
+    font-weight: 600;
 }
 
 .Section-Tutorials {
-  .label-selector {
-    margin-left: 0;
-    margin-right: 0;
-  }
-
-  .hero {
-    .label-selector-item {
-      flex: 0 0 100%;
-    }
-  }
-
-  .tagline {
-    font-size: $font-size-sm;
-    font-weight: 600;
-  }
-
-  .vanilla-logo {
-    width: $spacer * 6;
-    height: $spacer * 4;
-  }
-
-  .video.label-selector-item {
-    a {
-      color: $white;
+    .label-selector {
+        margin-left: 0;
+        margin-right: 0;
     }
 
-    .video-title {
-      font-size: $font-size-sm;
-      text-align: left;
+    .hero {
+        .label-selector-item {
+            flex: 0 0 100%;
+        }
     }
 
-    .overlay {
-      background-color: rgba(0,0,0,.75);
+    .tagline {
+        font-size: $font-size-sm;
+        font-weight: 600;
     }
 
-    &.current .overlay {
-      height: 100%;
+    .vanilla-logo {
+        width: $spacer * 6;
+        height: $spacer * 4;
     }
 
-    svg {
-      width: 40%;
-    }
-  }
+    .video.label-selector-item {
+        a {
+            color: $white;
+        }
 
-  .video-section {
-    .info {
-      padding-top: $spacer;
+        .video-title {
+            font-size: $font-size-sm;
+            text-align: left;
+        }
+
+        .overlay {
+            background-color: rgba(0, 0, 0, 0.75);
+        }
+
+        &.current .overlay {
+            height: 100%;
+        }
+
+        svg {
+            width: 40%;
+        }
     }
 
-    &:first-child {
-      .video-section-heading {
-        border-top: $border-width solid $grey-light;
-      }
+    .video-section {
+        .info {
+            padding-top: $spacer;
+        }
+
+        &:first-child {
+            .video-section-heading {
+                border-top: $border-width solid $grey-light;
+            }
+        }
     }
-  }
 }

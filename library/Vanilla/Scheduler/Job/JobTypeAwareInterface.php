@@ -10,8 +10,8 @@ namespace Vanilla\Scheduler\Job;
 /**
  * Interface JobTypeAwareInterface
  */
-interface JobTypeAwareInterface {
-
+interface JobTypeAwareInterface
+{
     /**
      * Set Job Type
      *

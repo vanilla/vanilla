@@ -16,12 +16,13 @@ use VanillaTests\SiteTestCase;
 /**
  * Tests for the Language Resolver.
  */
-class TranslateResolverTest extends SiteTestCase {
-
+class TranslateResolverTest extends SiteTestCase
+{
     /**
      * Enable the test-fr locale.
      */
-    public static function setUpBeforeClass(): void {
+    public static function setUpBeforeClass(): void
+    {
         parent::setUpBeforeClass();
         self::enableLocaleFixtures();
     }
@@ -31,19 +32,20 @@ class TranslateResolverTest extends SiteTestCase {
      *
      * @return void
      */
-    public function testHydrateLocaleParam() {
+    public function testHydrateLocaleParam()
+    {
         $input = [
-            'layout' => [
-                '$hydrate' => 'translate',
-                'code' => 'foo'
+            "layout" => [
+                '$hydrate' => "translate",
+                "code" => "foo",
             ],
         ];
 
         $expected = [
-            'layout' => 'bar-fr'
+            "layout" => "bar-fr",
         ];
 
-        $actual = $this->getHydrator()->resolve($input, ['locale' => 'fr']);
+        $actual = $this->getHydrator()->resolve($input, ["locale" => "fr"]);
         $this->assertEquals($expected, $actual);
     }
 
@@ -52,17 +54,18 @@ class TranslateResolverTest extends SiteTestCase {
      *
      * @return void
      */
-    public function testHydrateFromSpecificLocale() {
+    public function testHydrateFromSpecificLocale()
+    {
         $input = [
-            'layout' => [
-                '$hydrate' => 'translate',
-                'code' => 'foo',
-                'locale' => 'fr',
+            "layout" => [
+                '$hydrate' => "translate",
+                "code" => "foo",
+                "locale" => "fr",
             ],
         ];
 
         $expected = [
-            'layout' => 'bar-fr'
+            "layout" => "bar-fr",
         ];
 
         $actual = $this->getHydrator()->resolve($input);
@@ -74,17 +77,18 @@ class TranslateResolverTest extends SiteTestCase {
      *
      * @return void
      */
-    public function testImplicitDefault() {
+    public function testImplicitDefault()
+    {
         $input = [
-            'layout' => [
-                '$hydrate' => 'translate',
-                'code' => 'Dashboard',
-                'locale' => 'es'
+            "layout" => [
+                '$hydrate' => "translate",
+                "code" => "Dashboard",
+                "locale" => "es",
             ],
         ];
 
         $expected = [
-            'layout' => 'Dashboard'
+            "layout" => "Dashboard",
         ];
 
         $actual = $this->getHydrator()->resolve($input);
@@ -96,18 +100,19 @@ class TranslateResolverTest extends SiteTestCase {
      *
      * @return void
      */
-    public function testDefault() {
+    public function testDefault()
+    {
         $input = [
-            'layout' => [
-                '$hydrate' => 'translate',
-                'code' => 'Dashboard',
-                'default' => 'Defaulted',
-                'locale' => 'es'
+            "layout" => [
+                '$hydrate' => "translate",
+                "code" => "Dashboard",
+                "default" => "Defaulted",
+                "locale" => "es",
             ],
         ];
 
         $expected = [
-            'layout' => 'Defaulted'
+            "layout" => "Defaulted",
         ];
 
         $actual = $this->getHydrator()->resolve($input);
@@ -117,7 +122,10 @@ class TranslateResolverTest extends SiteTestCase {
     /**
      * @return DataHydrator
      */
-    private function getHydrator(): DataHydrator {
-        return self::container()->get(LayoutHydrator::class)->getHydrator(null);
+    private function getHydrator(): DataHydrator
+    {
+        return self::container()
+            ->get(LayoutHydrator::class)
+            ->getHydrator(null);
     }
 }

@@ -5,23 +5,23 @@
  */
 
 @mixin shadow-embed($baseColor: $global-color_fg) {
-  box-shadow: 0 1px 3px 0 rgba($baseColor, .3);
+    box-shadow: 0 1px 3px 0 rgba($baseColor, 0.3);
 }
 
 @mixin shadow-embed-hover($baseColor: $global-color_fg) {
-  box-shadow: 0 1px 3px 0 rgba($baseColor, .7);
+    box-shadow: 0 1px 3px 0 rgba($baseColor, 0.7);
 }
 
 @mixin shadow-dropDown($baseColor: #000) {
-  box-shadow: 0 5px 10px 0 rgba($baseColor, .3);
+    box-shadow: 0 5px 10px 0 rgba($baseColor, 0.3);
 }
 
 @mixin shadow-modal($baseColor: #000) {
-  box-shadow: 0 5px 20px rgba($baseColor, .5);
+    box-shadow: 0 5px 20px rgba($baseColor, 0.5);
 }
 
 @mixin shadow-contrast($baseColor: $global-color_fg, $border: false, $borderRadius: 0) {
-    $shadowColor : rgba($baseColor, .2);
+    $shadowColor: rgba($baseColor, 0.2);
     box-shadow: 0 0 3px 0 $shadowColor;
     @if ($border) {
         outline: solid $shadowColor 1px;

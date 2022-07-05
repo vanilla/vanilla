@@ -32,7 +32,7 @@ if (!function_exists('CategoryPhoto')):
 
         if ($photoUrl) {
             $result = anchor(
-                '<img src="'.$photoUrl.'" class="CategoryPhoto" alt="'.htmlspecialchars(val('Name', $row, '')).'" />',
+                '<img src="'.$photoUrl.'" class="CategoryPhoto" height="200" width="200" alt="'.htmlspecialchars(val('Name', $row, '')).'" />',
                 categoryUrl($row, '', '//'),
                 'Item-Icon PhotoWrap PhotoWrap-Category');
         } else {

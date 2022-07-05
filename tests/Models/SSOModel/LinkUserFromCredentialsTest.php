@@ -19,7 +19,8 @@ use VanillaTests\SiteTestTrait;
 /**
  * Class LinkUserFromCredentialsTest.
  */
-class LinkUserFromCredentialsTest extends SharedBootstrapTestCase {
+class LinkUserFromCredentialsTest extends SharedBootstrapTestCase
+{
     use SiteTestTrait {
         SiteTestTrait::setUpBeforeClass as siteSetUpBeforeClass;
     }
@@ -29,42 +30,43 @@ class LinkUserFromCredentialsTest extends SharedBootstrapTestCase {
 
     /** @var array  */
     private static $users = [
-        'default' => [
+        "default" => [
             // 'UserID' // Will be filled in setUpBeforeClass()
-            'Name' => 'TypicalUser1',
-            'Email' => 'typicalUser1@example.com',
-            'Password' => 'trustno1',
+            "Name" => "TypicalUser1",
+            "Email" => "typicalUser1@example.com",
+            "Password" => "TypicalUserPassword",
         ],
-        'reset' => [
+        "reset" => [
             //'UserID' // Will be filled in setUpBeforeClass()
-            'Name' => 'TypicalUser2',
-            'Email' => 'typicalUser2@example.com',
-            'Password' => 'trustno1',
-            'HashMethod' => 'reset',
+            "Name" => "TypicalUser2",
+            "Email" => "typicalUser2@example.com",
+            "Password" => "TypicalUserPassword",
+            "HashMethod" => "reset",
         ],
-        'random' => [
+        "random" => [
             //'UserID' // Will be filled in setUpBeforeClass()
-            'Name' => 'TypicalUser3',
-            'Email' => 'typicalUser3@example.com',
-            'Password' => 'trustno1',
-            'HashMethod' => 'random',
+            "Name" => "TypicalUser3",
+            "Email" => "typicalUser3@example.com",
+            "Password" => "TypicalUserPassword",
+            "HashMethod" => "random",
         ],
     ];
 
     /**
      * @inheritdoc
      */
-    public static function setUpBeforeClass(): void {
+    public static function setUpBeforeClass(): void
+    {
         self::siteSetUpBeforeClass();
 
         /** @var \UserModel $userModel */
         $userModel = self::container()->get(\UserModel::class);
         foreach (self::$users as &$user) {
-            $userID = $userModel->save($user, ['NoConfirmEmail' => true]);
+            $userID = $userModel->save($user, ["NoConfirmEmail" => true]);
             if ($userID) {
-                $user['UserID'] = $userID;
+                $user["UserID"] = $userID;
             } else {
-                self::fail('Something went wrong in setUp.'.PHP_EOL.print_r($userModel->validationResults(), true));
+                self::fail("Something went wrong in setUp." . PHP_EOL . print_r($userModel->validationResults(), true));
                 break;
             }
         }
@@ -73,7 +75,8 @@ class LinkUserFromCredentialsTest extends SharedBootstrapTestCase {
     /**
      * @inheritdoc
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         // Let's get a new SSOModel for this test.
@@ -83,10 +86,11 @@ class LinkUserFromCredentialsTest extends SharedBootstrapTestCase {
     /**
      * @inheritdoc
      */
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         /** @var \Gdn_SQLDriver $driver */
-        $driver = self::container()->get('SqlDriver');
-        $driver->truncate('UserAuthentication');
+        $driver = self::container()->get("SqlDriver");
+        $driver->truncate("UserAuthentication");
 
         parent::tearDown();
     }
@@ -100,14 +104,15 @@ class LinkUserFromCredentialsTest extends SharedBootstrapTestCase {
      * @return \Vanilla\Models\SSOData
      * @throws \Exception
      */
-    private function createSSOData($name, $email) {
+    private function createSSOData($name, $email)
+    {
         return SSOData::fromArray([
-            'authenticatorType' => MockSSOAuthenticator::getType(),
-            'authenticatorID' => MockSSOAuthenticator::getType(),
-            'uniqueID' => 'ssouniqueid',
-            'user' => [
-                'name' => $name,
-                'email' => $email,
+            "authenticatorType" => MockSSOAuthenticator::getType(),
+            "authenticatorID" => MockSSOAuthenticator::getType(),
+            "uniqueID" => "ssouniqueid",
+            "user" => [
+                "name" => $name,
+                "email" => $email,
             ],
         ]);
     }
@@ -115,20 +120,21 @@ class LinkUserFromCredentialsTest extends SharedBootstrapTestCase {
     /**
      * Link a user using its credentials.
      */
-    public function testLinkUser() {
-        $user = self::$users['default'];
+    public function testLinkUser()
+    {
+        $user = self::$users["default"];
 
         $linkedUser = self::$ssoModel->linkUserFromCredentials(
-            $this->createSSOData($user['Name'], $user['Email']),
+            $this->createSSOData($user["Name"], $user["Email"]),
             SSOModel::IDENTIFIER_TYPE_ID,
-            $user['UserID'],
-            $user['Password']
+            $user["UserID"],
+            $user["Password"]
         );
 
         $this->assertIsArray($linkedUser);
 
-        foreach($user as $field => $value) {
-            if ($field === 'Password') {
+        foreach ($user as $field => $value) {
+            if ($field === "Password") {
                 continue;
             }
             $this->assertArrayHasKey($field, $linkedUser);
@@ -139,17 +145,18 @@ class LinkUserFromCredentialsTest extends SharedBootstrapTestCase {
     /**
      * Try to link a user with bad credentials.
      */
-    public function testLinkUserBadPassword() {
+    public function testLinkUserBadPassword()
+    {
         $this->expectException(ClientException::class);
-        $this->expectExceptionMessage('The password validation failed.');
+        $this->expectExceptionMessage("The password validation failed.");
 
-        $user = self::$users['default'];
+        $user = self::$users["default"];
 
         self::$ssoModel->linkUserFromCredentials(
-            $this->createSSOData($user['Name'], $user['Email']),
+            $this->createSSOData($user["Name"], $user["Email"]),
             SSOModel::IDENTIFIER_TYPE_ID,
-            $user['UserID'],
-            'DefinitelyNotHisPassword'
+            $user["UserID"],
+            "DefinitelyNotHisPassword"
         );
     }
 
@@ -163,59 +170,62 @@ class LinkUserFromCredentialsTest extends SharedBootstrapTestCase {
      * @throws \Garden\Web\Exception\NotFoundException
      * @throws \Garden\Web\Exception\ServerException
      */
-    public function testAllowConnectDisabled() {
+    public function testAllowConnectDisabled()
+    {
         $this->expectException(ServerException::class);
-        $this->expectExceptionMessage('Liking user is not allowed.');
+        $this->expectExceptionMessage("Liking user is not allowed.");
 
         /** @var \Gdn_Configuration $config */
         $config = self::container()->get(\Gdn_Configuration::class);
-        $config->set('Garden.Registration.AllowConnect', false);
+        $config->set("Garden.Registration.AllowConnect", false);
 
-        $user = self::$users['default'];
+        $user = self::$users["default"];
 
         try {
             self::$ssoModel->linkUserFromCredentials(
-                $this->createSSOData($user['Name'], $user['Email']),
+                $this->createSSOData($user["Name"], $user["Email"]),
                 SSOModel::IDENTIFIER_TYPE_ID,
-                $user['UserID'],
-                $user['Password']
+                $user["UserID"],
+                $user["Password"]
             );
         } finally {
-            $config->set('Garden.Registration.AllowConnect', true);
+            $config->set("Garden.Registration.AllowConnect", true);
         }
     }
 
     /**
      * You need to reset your password.
      */
-    public function testUserHashMethodReset() {
+    public function testUserHashMethodReset()
+    {
         $this->expectException(ValidationException::class);
-        $this->expectExceptionMessage('You need to reset your password.');
+        $this->expectExceptionMessage("You need to reset your password.");
 
-        $user = self::$users['reset'];
+        $user = self::$users["reset"];
 
         self::$ssoModel->linkUserFromCredentials(
-            $this->createSSOData($user['Name'], $user['Email']),
+            $this->createSSOData($user["Name"], $user["Email"]),
             SSOModel::IDENTIFIER_TYPE_ID,
-            $user['UserID'],
-            $user['Password']
+            $user["UserID"],
+            $user["Password"]
         );
     }
 
     /**
      * Your account does not have a password assigned to it yet.
      */
-    public function testUserHashMethodRandom() {
+    public function testUserHashMethodRandom()
+    {
         $this->expectException(ValidationException::class);
-        $this->expectExceptionMessage('Your account does not have a password assigned to it yet.');
+        $this->expectExceptionMessage("Your account does not have a password assigned to it yet.");
 
-        $user = self::$users['random'];
+        $user = self::$users["random"];
 
         self::$ssoModel->linkUserFromCredentials(
-            $this->createSSOData($user['Name'], $user['Email']),
+            $this->createSSOData($user["Name"], $user["Email"]),
             SSOModel::IDENTIFIER_TYPE_ID,
-            $user['UserID'],
-            $user['Password']
+            $user["UserID"],
+            $user["Password"]
         );
     }
 }

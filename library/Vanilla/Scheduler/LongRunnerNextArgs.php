@@ -10,8 +10,8 @@ namespace Vanilla\Scheduler;
 /**
  * Class used to wrap the arguments for the next run in a long runner.
  */
-final class LongRunnerNextArgs {
-
+final class LongRunnerNextArgs
+{
     /** @var array */
     private $nextArgs;
 
@@ -20,14 +20,16 @@ final class LongRunnerNextArgs {
      *
      * @param array $nextArgs The arguments to pass for the next invocation of the method.
      */
-    public function __construct(array $nextArgs) {
+    public function __construct(array $nextArgs)
+    {
         $this->nextArgs = $nextArgs;
     }
 
     /**
      * @return array
      */
-    public function getNextArgs(): array {
+    public function getNextArgs(): array
+    {
         return $this->nextArgs;
     }
 }

@@ -13,31 +13,83 @@ use DOMDocument;
 /**
  * Class for stripping images and truncating text from a Dom.
  */
-final class DomUtils {
+final class DomUtils
+{
+    /** @var string[] */
+    private const EMBED_CLASSES = ["js-embed", "embedResponsive", "embedExternal", "embedImage", "VideoWrap", "iframe"];
 
     /** @var string[] */
-    private const EMBED_CLASSES = ['js-embed', 'embedResponsive', 'embedExternal', 'embedImage', 'VideoWrap', 'iframe'];
-
-    /** @var string[] */
-    private const TEXT_ATTRIBUTES = ['title', 'alt', 'aria-label'];
+    private const TEXT_ATTRIBUTES = ["title", "alt", "aria-label"];
 
     /** @var string[] */
     public const TAG_BLOCK = [
-        'address', 'article', 'aside', 'blockquote', 'canvas', 'dd', 'div', 'dl', 'dt', 'fieldset', 'figcaption',
-        'figure', 'footer', 'form', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'hr', 'li', 'main', 'nav', 'noscript',
-        'ol', 'p', 'pre', 'section', 'table', 'tfoot', 'ul', 'video',
+        "address",
+        "article",
+        "aside",
+        "blockquote",
+        "canvas",
+        "dd",
+        "div",
+        "dl",
+        "dt",
+        "fieldset",
+        "figcaption",
+        "figure",
+        "footer",
+        "form",
+        "h1",
+        "h2",
+        "h3",
+        "h4",
+        "h5",
+        "h6",
+        "header",
+        "hr",
+        "li",
+        "main",
+        "nav",
+        "noscript",
+        "ol",
+        "p",
+        "pre",
+        "section",
+        "table",
+        "tfoot",
+        "ul",
+        "video",
     ];
 
     /** @var string[]  */
     public const TAG_INLINE_TEXT = [
-        'a', 'abbr', 'acronym', 'b', 'bdo', 'big', 'br', 'cite', 'code', 'dfn', 'em', 'i', 'img',  'kbd', 'map', 'q',
-        'samp', 'small', 'span', 'strong', 'sub', 'sup', 'time', 'tt', 'var',
+        "a",
+        "abbr",
+        "acronym",
+        "b",
+        "bdo",
+        "big",
+        "br",
+        "cite",
+        "code",
+        "dfn",
+        "em",
+        "i",
+        "img",
+        "kbd",
+        "map",
+        "q",
+        "samp",
+        "small",
+        "span",
+        "strong",
+        "sub",
+        "sup",
+        "time",
+        "tt",
+        "var",
     ];
 
     /** @var string[] */
-    public const TAG_INLINE_OTHER = [
-        'button', 'input', 'label', 'object', 'output', 'script', 'select', 'textarea',
-    ];
+    public const TAG_INLINE_OTHER = ["button", "input", "label", "object", "output", "script", "select", "textarea"];
 
     /**
      * Remove embeds from the dom.
@@ -45,7 +97,8 @@ final class DomUtils {
      * @param DOMDocument $dom
      * @param array $embedClasses
      */
-    public static function stripEmbeds(DOMDocument $dom, array $embedClasses = self::EMBED_CLASSES): void {
+    public static function stripEmbeds(DOMDocument $dom, array $embedClasses = self::EMBED_CLASSES): void
+    {
         $xpath = new \DomXPath($dom);
         foreach ($embedClasses as $key => $value) {
             $xpathQuery = $xpath->query(".//*[contains(@class, '$embedClasses[$key]')]");
@@ -65,8 +118,9 @@ final class DomUtils {
      *
      * @param DOMDocument $dom
      */
-    public static function stripImages(DOMDocument $dom): void {
-        $domImages = $dom->getElementsByTagName('img');
+    public static function stripImages(DOMDocument $dom): void
+    {
+        $domImages = $dom->getElementsByTagName("img");
         $imagesArray = [];
         foreach ($domImages as $domImage) {
             $imagesArray[] = $domImage;
@@ -82,7 +136,8 @@ final class DomUtils {
      * @param DOMDocument $dom
      * @param int $wordCount Number of words to truncate to
      */
-    public static function trimWords(DOMDocument $dom, int $wordCount = 100): void {
+    public static function trimWords(DOMDocument $dom, int $wordCount = 100): void
+    {
         $wordCounter = $wordCount;
         self::truncateWordsRecursive($dom->documentElement, $wordCounter, $wordCount);
     }
@@ -95,18 +150,23 @@ final class DomUtils {
      * @param int $wordCount Number of words to truncate to.
      * @return int Return limit used to count remaining tags.
      */
-    private static function truncateWordsRecursive($element, int $wordCounter, int $wordCount): int {
+    private static function truncateWordsRecursive($element, int $wordCounter, int $wordCount): int
+    {
         if ($wordCounter > 0) {
             // Nodetype text
             if ($element->nodeType == XML_TEXT_NODE) {
                 $wordCounter -= str_word_count($element->data);
                 if ($wordCounter < 0) {
-                    $element->nodeValue = implode(' ', array_slice(explode(' ', $element->data), 0, $wordCount));
+                    $element->nodeValue = implode(" ", array_slice(explode(" ", $element->data), 0, $wordCount));
                 }
             } else {
                 for ($i = 0; $i < $element->childNodes->length; $i++) {
                     if ($wordCounter > 0) {
-                        $wordCounter = self::truncateWordsRecursive($element->childNodes->item($i), $wordCounter, $wordCount);
+                        $wordCounter = self::truncateWordsRecursive(
+                            $element->childNodes->item($i),
+                            $wordCounter,
+                            $wordCount
+                        );
                     } else {
                         $element->removeChild($element->childNodes->item($i));
                         $i--;
@@ -136,7 +196,7 @@ final class DomUtils {
         array $attributes = self::TEXT_ATTRIBUTES
     ): int {
         $xpath = new \DOMXPath($dom);
-        $xpathQuery = $xpath->query('//text() | //@'.implode(' | //@', $attributes));
+        $xpathQuery = $xpath->query("//text() | //@" . implode(" | //@", $attributes));
         $replacementCount = 0;
         if ($xpathQuery->length > 0) {
             foreach ($xpathQuery as $node) {
@@ -161,8 +221,9 @@ final class DomUtils {
      * @param \DOMNode $node The parent node to get the content of.
      * @return string Returns an HTML encoded string.
      */
-    public static function getInnerHTML(\DOMNode $node): string {
-        $result = '';
+    public static function getInnerHTML(\DOMNode $node): string
+    {
+        $result = "";
         if ($node->hasChildNodes() === false) {
             return $result;
         }
@@ -181,15 +242,16 @@ final class DomUtils {
      * @param \DOMNode $to The range to go to.
      * @return string Returns an HTML string.
      */
-    public static function getHtmlRange(\DOMNode $from, \DOMNode $to): string {
+    public static function getHtmlRange(\DOMNode $from, \DOMNode $to): string
+    {
         if ($from->parentNode !== $to->parentNode) {
             throw new \InvalidArgumentException(
-                __CLASS__ . '::' . __FUNCTION__ . '() expects $from and $to to be siblings.',
+                __CLASS__ . "::" . __FUNCTION__ . '() expects $from and $to to be siblings.',
                 400
             );
         }
 
-        $result = '';
+        $result = "";
 
         $sanity = $from->parentNode->childNodes->count();
         for ($node = $from, $i = 0; $node !== $to->nextSibling && $i < $sanity; $node = $node->nextSibling, $i++) {
@@ -199,14 +261,14 @@ final class DomUtils {
         return $result;
     }
 
-
     /**
      * Sets inner html of an existing node.
      *
      * @param \DOMNode $node
      * @param string $content Content to add to the dom.
      */
-    public static function setInnerHTML(\DOMNode $node, string $content): void {
+    public static function setInnerHTML(\DOMNode $node, string $content): void
+    {
         while ($node->hasChildNodes()) {
             $node->removeChild($node->firstChild);
         }
@@ -223,7 +285,8 @@ final class DomUtils {
      * @param \DOMNode $node The node to replace.
      * @param string $content Content to add to the dom.
      */
-    public static function setOuterHTML(\DOMNode $node, string $content): void {
+    public static function setOuterHTML(\DOMNode $node, string $content): void
+    {
         $fragment = $node->ownerDocument->createDocumentFragment();
         $fragment->appendXML($content);
         $newNode = $node->ownerDocument->importNode($fragment, true);
@@ -238,10 +301,11 @@ final class DomUtils {
      * @param string $content The new content of the replacement.
      * @return \DOMNode[] Returns an array in the form `[$newFrom, $newTo]`.
      */
-    public static function setHtmlRange(\DOMNode $from, \DOMNode $to, string $content): array {
+    public static function setHtmlRange(\DOMNode $from, \DOMNode $to, string $content): array
+    {
         if ($from->parentNode !== $to->parentNode) {
             throw new \InvalidArgumentException(
-                __CLASS__ . '::' . __FUNCTION__ . '() expects $from and $to to be siblings.',
+                __CLASS__ . "::" . __FUNCTION__ . '() expects $from and $to to be siblings.',
                 400
             );
         }
@@ -274,10 +338,11 @@ final class DomUtils {
      * @param \DOMNode $to The range to go to.
      * @return ?\DOMNode[] Returns the trimmed range in the form `[$from, $to]` or **null** if the range is completely trimmed.
      */
-    public static function trimRange(\DOMNode $from, \DOMNode $to): ?array {
+    public static function trimRange(\DOMNode $from, \DOMNode $to): ?array
+    {
         if ($from->parentNode !== $to->parentNode) {
             throw new \InvalidArgumentException(
-                __CLASS__ . '::' . __FUNCTION__ . '() expects $from and $to to be siblings.',
+                __CLASS__ . "::" . __FUNCTION__ . '() expects $from and $to to be siblings.',
                 400
             );
         }
@@ -286,7 +351,7 @@ final class DomUtils {
         while ($from !== $to->nextSibling) {
             switch ($from->nodeType) {
                 case XML_COMMENT_NODE:
-                    // Skip.
+                // Skip.
                 case XML_TEXT_NODE:
                     if (!preg_match('`^\s*$`', $from->nodeValue)) {
                         break 2;
@@ -306,7 +371,7 @@ final class DomUtils {
         while ($to !== $from->previousSibling) {
             switch ($to->nodeType) {
                 case XML_COMMENT_NODE:
-                    // Skip.
+                // Skip.
                 case XML_TEXT_NODE:
                     if (!preg_match('`^\s*$`', $to->nodeValue)) {
                         break 2;

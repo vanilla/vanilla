@@ -11,12 +11,13 @@
 /**
  * Renders user drafts. If rendered within a discussion, it only shows drafts related to that discussion.
  */
-class DraftsModule extends Gdn_Module {
-
+class DraftsModule extends Gdn_Module
+{
     /** @var  Gdn_Form */
     public $Form;
 
-    public function getData($limit = 20, $discussionID = '') {
+    public function getData($limit = 20, $discussionID = "")
+    {
         $session = Gdn::session();
         if ($session->isValid()) {
             $draftModel = new DraftModel();
@@ -25,15 +26,17 @@ class DraftsModule extends Gdn_Module {
         $this->Form = $this->_Sender->Form;
     }
 
-    public function assetTarget() {
-        return 'Panel';
+    public function assetTarget()
+    {
+        return "Panel";
     }
 
-    public function toString() {
+    public function toString()
+    {
         if (is_object($this->Data) && $this->Data->numRows() > 0) {
             return parent::toString();
         }
 
-        return '';
+        return "";
     }
 }

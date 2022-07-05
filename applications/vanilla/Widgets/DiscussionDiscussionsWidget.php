@@ -9,64 +9,59 @@ namespace Vanilla\Forum\Widgets;
 
 use Garden\Schema\Schema;
 use Vanilla\Forum\Modules\DiscussionWidgetModule;
-use Vanilla\Layout\Section\SectionOneColumn;
-use Vanilla\Layout\Section\SectionTwoColumns;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Widgets\React\ReactWidgetInterface;
-use Vanilla\Widgets\React\SectionAwareInterface;
 
 /**
  * Class DiscussionDiscussionsWidget
  */
-class DiscussionDiscussionsWidget extends DiscussionWidgetModule implements ReactWidgetInterface, SectionAwareInterface {
+class DiscussionDiscussionsWidget extends DiscussionWidgetModule implements ReactWidgetInterface
+{
+    use DiscussionsWidgetSchemaTrait;
 
     /**
      * @inheridoc
      */
-    public static function getWidgetID(): string {
+    public static function getWidgetID(): string
+    {
         return "discussion.discussions";
     }
 
     /**
      * @inheridoc
      */
-    public static function getWidgetName(): string {
+    public static function getWidgetName(): string
+    {
         return "Discussions";
     }
 
     /**
      * @inheridoc
      */
-    public static function getComponentName(): string {
-        // Temporarily this until we make a version supported grids and carousels.
-        return "DiscussionListModule";
+    public static function getComponentName(): string
+    {
+        return "DiscussionsWidget";
     }
 
     /**
      * @return string
      */
-    public static function getWidgetIconPath(): string {
+    public static function getWidgetIconPath(): string
+    {
         return "/applications/dashboard/design/images/widgetIcons/discussions.svg";
-    }
-
-    /**
-     * @return array
-     */
-    public static function getRecommendedSectionIDs(): array {
-        return [
-            SectionOneColumn::getWidgetID(),
-            SectionTwoColumns::getWidgetID(),
-        ];
     }
 
     /**
      * @inheridoc
      */
-    public static function getWidgetSchema(): Schema {
+    public static function getWidgetSchema(): Schema
+    {
         $schema = SchemaUtils::composeSchemas(
             parent::getWidgetSchema(),
-            self::containerOptionsSchema('containerOptions')
+            self::optionsSchema(),
+            self::containerOptionsSchema("containerOptions")
         );
+
         return $schema;
     }
 }

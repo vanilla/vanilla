@@ -19,7 +19,7 @@ const PACKAGE_DIR = path.resolve(VANILLA_ROOT, "packages");
 const tsconfigContents = JSON.parse(fs.readFileSync(TSCONFIG, "utf-8"));
 
 // Add all packages.
-fs.readdirSync(PACKAGE_DIR).forEach(dir => {
+fs.readdirSync(PACKAGE_DIR).forEach((dir) => {
     const packageJsonFile = path.resolve(PACKAGE_DIR, dir, "package.json");
     if (fs.existsSync(packageJsonFile)) {
         const packageJson = JSON.parse(fs.readFileSync(packageJsonFile, "utf-8"));
@@ -29,7 +29,7 @@ fs.readdirSync(PACKAGE_DIR).forEach(dir => {
             tsconfigContents.compilerOptions.paths[name] = [`./packages/${dir}/*`];
         }
     }
-})
+});
 
 // Write back tsconfig.
 fs.writeFileSync(TSCONFIG, JSON.stringify(tsconfigContents, null, 4));

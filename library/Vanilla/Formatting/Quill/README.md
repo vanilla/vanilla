@@ -6,7 +6,7 @@ This renderer allows rendering of a [Quill Delta](https://github.com/quilljs/del
 
 ## Blot
 
-In `Quill` a Blot maps to a DOM Node. When `Delta`s are rendered in the browser they need to be able to mutate and handle complex state changes. This server side renderer should be lighter and faster as it does not need to handle mutations. Instead Blots map to a particular type of editor format option. 
+In `Quill` a Blot maps to a DOM Node. When `Delta`s are rendered in the browser they need to be able to mutate and handle complex state changes. This server side renderer should be lighter and faster as it does not need to handle mutations. Instead Blots map to a particular type of editor format option.
 
 All Blots inherit from the `AbstractBlot` class.
 
@@ -19,21 +19,21 @@ These formats are bold, italic, strike-through, link, and inline code. The `Text
 ### LineTerminatorBlots
 
 A text blot is an "inline" type of blot. Multiple can `TextBlots` and `InlineEmbedBlots` can be contained in a single
- line. In a delta a line is generally delineated by an insert with and insert of `\n` or multiple `\n\n\n` characters
- . A line blot terminator provides the wrapping tag for the line such as `<p>` `<li>` `<blockquote>` etc. If an 
- additional wrapping tag is need this should be provided by the group.
- 
- A few implementations of `AbstractLineTerminatorBlot` include
- 
- - `BlockquoteLineTerminatorBlot`
- - `ParagraphLineTerminatorBlot`
- - `ListLineTerminatorBlot` 
+line. In a delta a line is generally delineated by an insert with and insert of `\n` or multiple `\n\n\n` characters
+. A line blot terminator provides the wrapping tag for the line such as `<p>` `<li>` `<blockquote>` etc. If an
+additional wrapping tag is need this should be provided by the group.
+
+A few implementations of `AbstractLineTerminatorBlot` include
+
+-   `BlockquoteLineTerminatorBlot`
+-   `ParagraphLineTerminatorBlot`
+-   `ListLineTerminatorBlot`
 
 ### Embed Blots
 
-Embed blots contain user contain, but are not directly editable text content. There are two types of embed 
+Embed blots contain user contain, but are not directly editable text content. There are two types of embed
 `ExternalBlot` and `AbstractInlineEmbedBlot`. The external blot uses the EmbedManager to render some external content
- in an embedded context.
+in an embedded context.
 
 These generally contain deeply nested and complex HTML structures. The inputs are nested JSON structures, none of which is currently validated on insert to the database, so be sure to carefully sanitize any information coming in here.
 
@@ -44,16 +44,11 @@ A group is a concept that does have a direct concept in the client side renderer
 ```html
 <p>This is a group</p>
 <p>Another group <strong>Bold</strong></p>
-<blockquote>
-...
-...
-Multiple lines is all one group.
-...
-</blockquote>
+<blockquote>... ... Multiple lines is all one group. ...</blockquote>
 <ul>
-... Multiple list elements are all one group.
-<li></li>
-...
+    ... Multiple list elements are all one group.
+    <li></li>
+    ...
 </ul>
 ```
 

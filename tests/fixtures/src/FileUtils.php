@@ -6,13 +6,14 @@
 
 namespace VanillaTests\Fixtures;
 
-class FileUtils extends \Vanilla\FileUtils {
-
+class FileUtils extends \Vanilla\FileUtils
+{
     /**
      * {@inheritdoc}
      */
-    public function isUploadedFile($filename) {
-        $uploadedFiles = array_column($_FILES, 'tmp_name');
+    public function isUploadedFile($filename)
+    {
+        $uploadedFiles = array_column($_FILES, "tmp_name");
         $result = in_array($filename, $uploadedFiles);
         return $result;
     }
@@ -20,7 +21,8 @@ class FileUtils extends \Vanilla\FileUtils {
     /**
      * {@inheritdoc}
      */
-    public function moveUploadedFile($filename, $destination) {
+    public function moveUploadedFile($filename, $destination)
+    {
         $result = rename($filename, $destination);
         return $result;
     }

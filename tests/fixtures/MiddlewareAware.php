@@ -12,7 +12,8 @@ use Garden\Web\MiddlewareAwareTrait;
 /**
  * Class MiddlewareAware
  */
-class MiddlewareAware {
+class MiddlewareAware
+{
     use MiddlewareAwareTrait;
 
     /**
@@ -20,7 +21,8 @@ class MiddlewareAware {
      *
      * @param callable $callback
      */
-    public function setHandler(callable $callback) {
+    public function setHandler(callable $callback)
+    {
         $this->middleware = $callback;
     }
 }

@@ -6,21 +6,12 @@
 
 import apiv2 from "@library/apiv2";
 import { IHydratedLayoutSpec, ILayoutQuery } from "@library/features/Layout/LayoutRenderer.types";
-import { getSiteSection } from "@library/utility/appUtils";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { getCurrentLocale } from "@vanilla/i18n";
 
-export const lookupLayout = createAsyncThunk("@@layouts/lookup", async (query?: ILayoutQuery) => {
-    const layoutSpec = await apiv2.get("/layouts/lookup-hydrate", {
-        params: {
-            layoutViewType: query?.layoutViewType,
-            recordID: query?.recordID,
-            recordType: query?.recordType,
-            params: {
-                siteSectionID: getSiteSection().sectionID,
-                locale: getCurrentLocale(),
-            },
-        },
+export const lookupLayout = createAsyncThunk("@@layouts/lookup", async (query: ILayoutQuery) => {
+    const layoutSpec = await apiv2.get<IHydratedLayoutSpec>("/layouts/lookup-hydrate", {
+        params: query,
     });
-    return layoutSpec.data as IHydratedLayoutSpec;
+    return layoutSpec.data;
 });

@@ -20,8 +20,8 @@ use Vanilla\Models\AddonModel;
  *
  * @deprecated 3.0 Use Vanilla\AddonManager.
  */
-class Gdn_ApplicationManager {
-
+class Gdn_ApplicationManager
+{
     /** @var array Available applications. Never access this directly, instead use $this->availableApplications(); */
     private $availableApplications = null;
 
@@ -39,7 +39,8 @@ class Gdn_ApplicationManager {
     /**
      *
      */
-    public function __construct(AddonManager $addonManager = null) {
+    public function __construct(AddonManager $addonManager = null)
+    {
         $this->addonManager = $addonManager;
     }
 
@@ -51,19 +52,20 @@ class Gdn_ApplicationManager {
      * "Application Info Array". It also adds a "Folder" definition to the
      * Application Info Array for each application.
      */
-    public function availableApplications() {
+    public function availableApplications()
+    {
         if (!is_array($this->availableApplications)) {
             $applications = [];
             $addons = $this->addonManager->lookupAllByType(Addon::TYPE_ADDON);
 
             foreach ($addons as $addon) {
                 /* @var Addon $addon */
-                if ($addon->getInfoValue('oldType') !== 'application') {
+                if ($addon->getInfoValue("oldType") !== "application") {
                     continue;
                 }
 
                 $info = $this->calcOldInfoArray($addon);
-                $applications[$info['Index']] = $info;
+                $applications[$info["Index"]] = $info;
             }
 
             $this->availableApplications = $applications;
@@ -77,19 +79,20 @@ class Gdn_ApplicationManager {
      *
      * @return array
      */
-    public function enabledApplications() {
+    public function enabledApplications()
+    {
         if (!is_array($this->enabledApplications)) {
             $applications = [];
             $addons = $this->addonManager->getEnabled();
 
             foreach ($addons as $addon) {
                 /* @var Addon $addon */
-                if ($addon->getInfoValue('oldType') !== 'application') {
+                if ($addon->getInfoValue("oldType") !== "application") {
                     continue;
                 }
 
                 $info = $this->calcOldInfoArray($addon);
-                $applications[$info['Index']] = $info;
+                $applications[$info["Index"]] = $info;
             }
 
             $this->enabledApplications = $applications;
@@ -104,10 +107,11 @@ class Gdn_ApplicationManager {
      * @param Addon $addon
      * @return array the old information.
      */
-    private function calcOldInfoArray(Addon $addon) {
+    private function calcOldInfoArray(Addon $addon)
+    {
         $info = Gdn_pluginManager::calcOldInfoArray($addon);
-        $directories = explode('/', $addon->getSubdir());
-        $info['Folder'] = $directories[count($directories) - 1];
+        $directories = explode("/", $addon->getSubdir());
+        $info["Folder"] = $directories[count($directories) - 1];
 
         return $info;
     }
@@ -118,7 +122,8 @@ class Gdn_ApplicationManager {
      * @param string $applicationName The name of the application to check.
      * @return bool Returns true if the application is enabled, otherwise false.
      */
-    public function checkApplication($applicationName) {
+    public function checkApplication($applicationName)
+    {
         if (array_key_exists($applicationName, $this->enabledApplications())) {
             return true;
         }
@@ -133,7 +138,8 @@ class Gdn_ApplicationManager {
      * @param string $key The key of a field in the application info to return.
      * @return bool|mixed Returns the application's info, a specific value, or false if the application cannot be found.
      */
-    public function getApplicationInfo($applicationName, $key = null) {
+    public function getApplicationInfo($applicationName, $key = null)
+    {
         $applicationInfo = val($applicationName, $this->availableApplications(), null);
         if (is_null($applicationInfo)) {
             return false;
@@ -151,10 +157,11 @@ class Gdn_ApplicationManager {
      *
      * @return array Returns an array of application info arrays.
      */
-    public function availableVisibleApplications() {
+    public function availableVisibleApplications()
+    {
         $availableApplications = $this->availableApplications();
         foreach ($availableApplications as $applicationName => $info) {
-            if (!val('AllowEnable', $info, true) || !val('AllowDisable', $info, true)) {
+            if (!val("AllowEnable", $info, true) || !val("AllowDisable", $info, true)) {
                 unset($availableApplications[$applicationName]);
             }
         }
@@ -166,12 +173,13 @@ class Gdn_ApplicationManager {
      *
      * @return array Returns an array of application info arrays.
      */
-    public function enabledVisibleApplications() {
+    public function enabledVisibleApplications()
+    {
         $availableApplications = $this->availableApplications();
         $enabledApplications = $this->enabledApplications();
         foreach ($availableApplications as $applicationName => $info) {
             if (array_key_exists($applicationName, $enabledApplications)) {
-                if (!val('AllowEnable', $info, true) || !val('AllowDisable', $info, true)) {
+                if (!val("AllowEnable", $info, true) || !val("AllowDisable", $info, true)) {
                     unset($availableApplications[$applicationName]);
                 }
             } else {
@@ -187,13 +195,14 @@ class Gdn_ApplicationManager {
      * @return array Returns an array of all of the enabled application folders.
      * @deprecated
      */
-    public function enabledApplicationFolders() {
-        deprecated('Gdn_ApplicationManager->enabledApplicationFolders()');
+    public function enabledApplicationFolders()
+    {
+        deprecated("Gdn_ApplicationManager->enabledApplicationFolders()");
 
         $addons = $this->addonManager->getEnabled();
-        $applications = array_filter($addons, Addon::makeFilterCallback(['oldType' => 'application']));
+        $applications = array_filter($addons, Addon::makeFilterCallback(["oldType" => "application"]));
 
-        $result = ['dashboard'];
+        $result = ["dashboard"];
         /* @var Addon $application */
         foreach ($applications as $application) {
             $result[] = $application->getKey();
@@ -206,15 +215,12 @@ class Gdn_ApplicationManager {
      *
      * @param string $applicationName The name of the application to check.
      */
-    public function checkRequirements($applicationName) {
+    public function checkRequirements($applicationName)
+    {
         $availableApplications = $this->availableApplications();
-        $requiredApplications = val(
-            'RequiredApplications',
-            val($applicationName, $availableApplications, []),
-            false
-        );
+        $requiredApplications = val("RequiredApplications", val($applicationName, $availableApplications, []), false);
         $enabledApplications = $this->enabledApplications();
-        checkRequirements($applicationName, $requiredApplications, $enabledApplications, 'application');
+        checkRequirements($applicationName, $requiredApplications, $enabledApplications, "application");
     }
 
     /**
@@ -222,12 +228,13 @@ class Gdn_ApplicationManager {
      *
      * @param string $addonKey The name of the application to enable.
      */
-    public function enableApplication(string $addonKey) {
+    public function enableApplication(string $addonKey)
+    {
         $addonModel = \Gdn::getContainer()->get(AddonModel::class);
         $addon = $this->addonManager->lookupAddon($addonKey);
         if ($addon === null) {
-            throw new NotFoundException('Application', [
-                'addonKey' => $addonKey
+            throw new NotFoundException("Application", [
+                "addonKey" => $addonKey,
             ]);
         }
 
@@ -240,12 +247,13 @@ class Gdn_ApplicationManager {
      * @param string $addonKey The name of the application to disable.
      * @throws \Exception Throws an exception if the application can't be disabled.
      */
-    public function disableApplication($addonKey) {
+    public function disableApplication($addonKey)
+    {
         $addonModel = \Gdn::getContainer()->get(AddonModel::class);
         $addon = $this->addonManager->lookupAddon($addonKey);
         if ($addon === null) {
-            throw new NotFoundException('Application', [
-                'addonKey' => $addonKey
+            throw new NotFoundException("Application", [
+                "addonKey" => $addonKey,
             ]);
         }
 
@@ -260,8 +268,9 @@ class Gdn_ApplicationManager {
      * @since 2.2
      * @deprecated
      */
-    public function isEnabled($name) {
-        deprecated('Gdn_ApplicationManager->isEnabled()', 'AddonManager->isEnabled()');
+    public function isEnabled($name)
+    {
+        deprecated("Gdn_ApplicationManager->isEnabled()", "AddonManager->isEnabled()");
         return $this->addonManager->isEnabled($name, Addon::TYPE_ADDON);
     }
 
@@ -270,10 +279,11 @@ class Gdn_ApplicationManager {
      *
      * @param string $applicationName The name of the application.
      */
-    public function registerPermissions($applicationName) {
+    public function registerPermissions($applicationName)
+    {
         $addon = $this->addonManager->lookupAddon($applicationName);
 
-        if ($permissions = $addon->getInfoValue('registerPermissions')) {
+        if ($permissions = $addon->getInfoValue("registerPermissions")) {
             Gdn::permissionModel()->define($permissions);
         }
     }

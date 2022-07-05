@@ -16,11 +16,11 @@ use Vanilla\Utility\HtmlParserTrait;
 /**
  * Factory for the CodePenEmbed.
  */
-class CodePenEmbedFactory extends AbstractEmbedFactory {
-
+class CodePenEmbedFactory extends AbstractEmbedFactory
+{
     use HtmlParserTrait;
 
-    const CODEPEN_UI = 'codepen.io';
+    const CODEPEN_UI = "codepen.io";
     const OEMBED_URL_BASE = "https://codepen.io/api/oembed";
 
     /** @var HttpClient */
@@ -31,14 +31,16 @@ class CodePenEmbedFactory extends AbstractEmbedFactory {
      *
      * @param HttpClient $httpClient
      */
-    public function __construct(HttpClient $httpClient) {
+    public function __construct(HttpClient $httpClient)
+    {
         $this->httpClient = $httpClient;
     }
 
     /**
      * @inheritdoc
      */
-    protected function getSupportedDomains(): array {
+    protected function getSupportedDomains(): array
+    {
         return [self::CODEPEN_UI];
     }
 
@@ -46,7 +48,8 @@ class CodePenEmbedFactory extends AbstractEmbedFactory {
      * We pass along to the oembed service. If it can't parse the URL, then we definitely can't.
      * @inheritdoc
      */
-    protected function getSupportedPathRegex(string $domain): string {
+    protected function getSupportedPathRegex(string $domain): string
+    {
         return '/\/pen\/[a-zA-Z0-9]+$/';
     }
 
@@ -56,14 +59,12 @@ class CodePenEmbedFactory extends AbstractEmbedFactory {
      * @inheritdoc
      * @throws \Exception If the scrape fails.
      */
-    public function createEmbedForUrl(string $url): AbstractEmbed {
-        $response = $this->httpClient->get(
-            self::OEMBED_URL_BASE,
-            [
-                'url' => $url,
-                'format' => 'json'
-            ]
-        );
+    public function createEmbedForUrl(string $url): AbstractEmbed
+    {
+        $response = $this->httpClient->get(self::OEMBED_URL_BASE, [
+            "url" => $url,
+            "format" => "json",
+        ]);
 
         // Example Response JSON
         // phpcs:disable Generic.Files.LineLength
@@ -89,18 +90,18 @@ class CodePenEmbedFactory extends AbstractEmbedFactory {
         // phpcs:enable Generic.Files.LineLength
 
         [$height, $width] = EmbedUtils::extractDimensions($response);
-        $frameAttributes = $this->parseSimpleAttrs($response['html'] ?? '', 'iframe') ?? [];
+        $frameAttributes = $this->parseSimpleAttrs($response["html"] ?? "", "iframe") ?? [];
         $embedPath = parse_url($frameAttributes["src"] ?? "", PHP_URL_PATH) ?? "";
         preg_match("`/?(?<author>[\w-]+)/embed/(?:preview/)?(?<codePenID>[\w-]+)`", $embedPath, $pathMatches);
 
         $data = [
-            'embedType' => CodePenEmbed::TYPE,
-            'url' => $url,
-            'name' => $response['title'] ?? null,
-            'height' => $height,
-            'width' => $width,
-            'codePenID' => $pathMatches["codePenID"] ?? null,
-            'author' => $pathMatches["author"] ?? null,
+            "embedType" => CodePenEmbed::TYPE,
+            "url" => $url,
+            "name" => $response["title"] ?? null,
+            "height" => $height,
+            "width" => $width,
+            "codePenID" => $pathMatches["codePenID"] ?? null,
+            "author" => $pathMatches["author"] ?? null,
         ];
 
         return new CodePenEmbed($data);

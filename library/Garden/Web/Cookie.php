@@ -12,23 +12,24 @@ use Delight\Cookie\Cookie as DelightCookie;
 /**
  * A class for reading/writing cookies.
  */
-class Cookie {
+class Cookie
+{
     const EXPIRE_THRESHOLD = 631152000; // 20 years
 
     /**
      * @var string
      */
-    const SAME_SITE_NONE = 'None';
+    const SAME_SITE_NONE = "None";
 
     /**
      * @var string
      */
-    const SAME_SITE_LAX = 'Lax';
+    const SAME_SITE_LAX = "Lax";
 
     /**
      * @var string
      */
-    const SAME_SITE_STRICT = 'Strict';
+    const SAME_SITE_STRICT = "Strict";
 
     /**
      * @var string[]
@@ -48,12 +49,12 @@ class Cookie {
     /**
      * @var string
      */
-    private $path = '/';
+    private $path = "/";
 
     /**
      * @var string
      */
-    private $domain = '';
+    private $domain = "";
 
     /**
      * @var bool
@@ -68,14 +69,15 @@ class Cookie {
     /**
      * @var string
      */
-    private $prefix = '';
+    private $prefix = "";
 
     /**
      * Construct a {@link Cookie} objects.
      *
      * @param array $cookies The initial cookies array or **null** to use the **$_COOKIE** super global.
      */
-    public function __construct(array $cookies = null) {
+    public function __construct(array $cookies = null)
+    {
         if ($cookies === null) {
             $cookies = $_COOKIE;
         }
@@ -90,7 +92,8 @@ class Cookie {
      * @param int|null $timestamp If calculating a relative expiry, use this timestamp as the offset.
      * @return int
      */
-    public function calculateExpiry($expire, $timestamp = null) {
+    public function calculateExpiry($expire, $timestamp = null)
+    {
         if ($expire === 0) {
             return $expire;
         } elseif ($expire > self::EXPIRE_THRESHOLD) {
@@ -113,7 +116,8 @@ class Cookie {
      * @param mixed $default The default value if the cookie isn't set.
      * @return null
      */
-    public function get($name, $default = null) {
+    public function get($name, $default = null)
+    {
         return $this->cookies[$this->cookieName($name)] ?? $default;
     }
 
@@ -132,7 +136,8 @@ class Cookie {
      * @param string|null $sameSite Set the same site value of SAME_SITE_NONE, _LAX, or _STRICT.
      * @return $this
      */
-    public function set($name, $value, $expire = 0, $secure = null, $httpOnly = true, $sameSite = null) {
+    public function set($name, $value, $expire = 0, $secure = null, $httpOnly = true, $sameSite = null)
+    {
         $this->setCookie($name, $value, $expire, $this->path, $this->domain, $secure, $httpOnly, $sameSite);
         return $this;
     }
@@ -163,12 +168,21 @@ class Cookie {
      * @param string|null $sameSite Set the same site value of SAME_SITE_NONE, _LAX, or _STRICT.
      * @return $this
      */
-    public function setCookie($name, $value, $expire = 0, $path = null, $domain = null, $secure = null, $httpOnly = false, $sameSite = null) {
+    public function setCookie(
+        $name,
+        $value,
+        $expire = 0,
+        $path = null,
+        $domain = null,
+        $secure = null,
+        $httpOnly = false,
+        $sameSite = null
+    ) {
         $name = $this->cookieName($name);
         $isSecure = $secure ?? $this->isSecure();
 
-        $sameSite = (empty($sameSite)) ? self::SAME_SITE_NONE : $sameSite;
-        $sameSite = (!$isSecure && $sameSite === self::SAME_SITE_NONE) ? null : $sameSite;
+        $sameSite = empty($sameSite) ? self::SAME_SITE_NONE : $sameSite;
+        $sameSite = !$isSecure && $sameSite === self::SAME_SITE_NONE ? null : $sameSite;
 
         if ($value === null) {
             $this->delete($name);
@@ -181,7 +195,7 @@ class Cookie {
                 $domain === null ? $this->domain : $domain,
                 $isSecure,
                 $httpOnly,
-                $sameSite
+                $sameSite,
             ];
         }
         return $this;
@@ -195,7 +209,8 @@ class Cookie {
      * @param string $name The name of the cookie to delete.
      * @return $this
      */
-    public function delete($name) {
+    public function delete($name)
+    {
         $name = $this->cookieName($name);
 
         unset($this->cookies[$name]);
@@ -207,7 +222,8 @@ class Cookie {
      *
      * @codeCoverageIgnore
      */
-    public function flush() {
+    public function flush()
+    {
         $calls = array_merge($this->makeNewCookieCalls(), $this->makeDeleteCookieCalls());
 
         foreach ($calls as $name => $args) {
@@ -218,13 +234,14 @@ class Cookie {
     /**
      * Flush cookie delete headers.
      */
-    public function makeDeleteCookieCalls() {
+    public function makeDeleteCookieCalls()
+    {
         $deletes = array_diff_key($this->inCookies, $this->cookies);
 
         $expire = time() - 3600;
         $result = [];
         foreach ($deletes as $name => $_) {
-            $result[$name] = ['', $expire, $this->path];
+            $result[$name] = ["", $expire, $this->path];
         }
         return $result;
     }
@@ -232,7 +249,8 @@ class Cookie {
     /**
      * Flush set-cookie headers.
      */
-    public function makeNewCookieCalls() {
+    public function makeNewCookieCalls()
+    {
         if ($this->flushAll) {
             $sets = $this->sets;
         } else {
@@ -252,13 +270,14 @@ class Cookie {
      * @param array $array The cookie value array.
      * @return string Returns a string suitable to be passed to a cookie header.
      */
-    private function cookieEncode(array $array) {
+    private function cookieEncode(array $array)
+    {
         $pairs = [];
         foreach ($array as $key => $value) {
-            $pairs[] = "$key=".rawurlencode($value);
+            $pairs[] = "$key=" . rawurlencode($value);
         }
 
-        $result = implode('; ', $pairs);
+        $result = implode("; ", $pairs);
         return $result;
     }
 
@@ -267,7 +286,8 @@ class Cookie {
      *
      * @return string Returns a cookie string.
      */
-    public function makeCookieHeader() {
+    public function makeCookieHeader()
+    {
         return $this->cookieEncode($this->cookies);
     }
 
@@ -276,7 +296,8 @@ class Cookie {
      *
      * @return string Returns the path.
      */
-    public function getPath() {
+    public function getPath()
+    {
         return $this->path;
     }
 
@@ -285,7 +306,8 @@ class Cookie {
      *
      * @return string Returns the domain.
      */
-    public function getDomain() {
+    public function getDomain()
+    {
         return $this->domain;
     }
 
@@ -295,7 +317,8 @@ class Cookie {
      * @param string $domain The new cookie domain.
      * @return $this
      */
-    public function setDomain($domain) {
+    public function setDomain($domain)
+    {
         $this->domain = $domain;
         return $this;
     }
@@ -305,7 +328,8 @@ class Cookie {
      *
      * @return bool Returns **true** if HTTP-only cookies should be secure or **false** otherwise.
      */
-    public function isSecure() {
+    public function isSecure()
+    {
         return $this->secure;
     }
 
@@ -315,7 +339,8 @@ class Cookie {
      * @param bool $secure The new value.
      * @return $this
      */
-    public function setSecure($secure) {
+    public function setSecure($secure)
+    {
         $this->secure = $secure;
         return $this;
     }
@@ -330,7 +355,8 @@ class Cookie {
      *
      * @return bool Returns **true** all unique sets are flushed or **false** otherwise.
      */
-    public function getFlushAll() {
+    public function getFlushAll()
+    {
         return $this->flushAll;
     }
 
@@ -341,7 +367,8 @@ class Cookie {
      * @return $this
      * @see Cookie::getFlushAll()
      */
-    public function setFlushAll($flushAll) {
+    public function setFlushAll($flushAll)
+    {
         $this->flushAll = $flushAll;
         return $this;
     }
@@ -351,7 +378,8 @@ class Cookie {
      *
      * @return string
      */
-    public function getPrefix(): string {
+    public function getPrefix(): string
+    {
         return $this->prefix;
     }
 
@@ -361,7 +389,8 @@ class Cookie {
      * @param string $prefix
      * @return $this
      */
-    public function setPrefix(string $prefix) {
+    public function setPrefix(string $prefix)
+    {
         $this->prefix = $prefix;
         return $this;
     }
@@ -372,11 +401,12 @@ class Cookie {
      * @param string $name
      * @return string
      */
-    protected function cookieName(string $name): string {
-        if (substr($name, 0, 1) === '/') {
+    protected function cookieName(string $name): string
+    {
+        if (substr($name, 0, 1) === "/") {
             return substr($name, 1);
         } else {
-            return $this->getPrefix().$name;
+            return $this->getPrefix() . $name;
         }
     }
 }

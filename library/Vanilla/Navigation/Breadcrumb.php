@@ -10,7 +10,8 @@ namespace Vanilla\Navigation;
 /**
  * A class for dealing with Breadcrumb data.
  */
-class Breadcrumb implements \JsonSerializable {
+class Breadcrumb implements \JsonSerializable
+{
     /** @var string */
     private $name;
 
@@ -23,7 +24,8 @@ class Breadcrumb implements \JsonSerializable {
      * @param string $name
      * @param string $url
      */
-    public function __construct(string $name, string $url) {
+    public function __construct(string $name, string $url)
+    {
         $this->name = $name;
         $this->url = $url;
     }
@@ -31,21 +33,24 @@ class Breadcrumb implements \JsonSerializable {
     /**
      * @inheritdoc
      */
-    public function jsonSerialize() {
+    public function jsonSerialize()
+    {
         return $this->asArray();
     }
 
     /**
      * @return string
      */
-    public function getName(): string {
+    public function getName(): string
+    {
         return $this->name;
     }
 
     /**
      * @return string
      */
-    public function getUrl(): string {
+    public function getUrl(): string
+    {
         return $this->url;
     }
 
@@ -54,10 +59,11 @@ class Breadcrumb implements \JsonSerializable {
      *
      * @return array
      */
-    public function asArray(): array {
+    public function asArray(): array
+    {
         return [
-            'name' => $this->getName(),
-            'url' => $this->getUrl(),
+            "name" => $this->getName(),
+            "url" => $this->getUrl(),
         ];
     }
 }

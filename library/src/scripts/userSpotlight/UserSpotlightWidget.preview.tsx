@@ -14,12 +14,13 @@ export function UserSpotlightWidgetPreview(props: IProps) {
     return (
         <UserSpotlightWidget
             title={props.title ?? "Customer Spotlight"}
+            subtitle={props.subtitle ?? ""}
             description={
                 props.description ??
                 "“Use this space to add a Customer Spotlight by telling the customer's story using their unique language, share what problems they experienced, and how they conquered it by using your product(s).”"
             }
             userInfo={LayoutEditorPreviewData.user()}
-            containerOptions={props.containerOptions ?? { borderType: BorderType.SHADOW }}
+            containerOptions={props.containerOptions}
         />
     );
 }

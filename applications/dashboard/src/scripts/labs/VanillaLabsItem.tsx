@@ -9,21 +9,36 @@ import Addon, { IAddon } from "@library/addons/Addon";
 import { useConfigPatcher, useConfigsByKeys } from "@library/config/configHooks";
 import { useToast } from "@library/features/toaster/ToastContext";
 import { getMeta, setMeta, t } from "@library/utility/appUtils";
-import React, { useDebugValue, useState } from "react";
+import React, { useDebugValue, useMemo, useState } from "react";
 
 interface IProps extends Omit<IAddon, "onEnabledChange" | "enabled" | "isLoading"> {
     labName: string;
     themeFeatureName?: string;
     reloadPageAfterToggle?: boolean; //in some cases we need tu reload the page so the legacy links (or other code) update
+    disabled?: boolean;
+    disabledNote?: string;
 }
 
 export function VanillaLabsItem(props: IProps) {
-    const { labName, themeFeatureName, reloadPageAfterToggle, ...passthru } = props;
+    const { labName, themeFeatureName, reloadPageAfterToggle, disabled, disabledNote, ...passthru } = props;
     const { enabled, toggleEnabled, isLoading, isAddonFeatureEnabled } = useLab(
         labName,
         themeFeatureName,
         reloadPageAfterToggle,
     );
+
+    const disabledProps = useMemo(() => {
+        if (disabled) {
+            return {
+                disabled,
+                disabledNote,
+            };
+        }
+        return {
+            disabled: isAddonFeatureEnabled,
+            disabledNote: t("This lab cannot be disabled because it is required by the current theme."),
+        };
+    }, [isAddonFeatureEnabled, disabled, disabledNote]);
 
     return (
         <Addon
@@ -31,8 +46,7 @@ export function VanillaLabsItem(props: IProps) {
             isLoading={isLoading}
             enabled={enabled}
             onEnabledChange={toggleEnabled}
-            disabled={isAddonFeatureEnabled}
-            disabledNote={t("This lab cannot be disabled because it is required by the current theme.")}
+            {...disabledProps}
         />
     );
 }

@@ -14,8 +14,8 @@ use VanillaTests\SiteTestCase;
 /**
  * Some basic tests for the `ActivityModel`.
  */
-class ActivityModelTest extends SiteTestCase {
-
+class ActivityModelTest extends SiteTestCase
+{
     /** @var NotificationEvent */
     private $lastEvent;
 
@@ -28,7 +28,8 @@ class ActivityModelTest extends SiteTestCase {
      * @param NotificationEvent $e
      * @return NotificationEvent
      */
-    public function handleNotificationEvent(NotificationEvent $e): NotificationEvent {
+    public function handleNotificationEvent(NotificationEvent $e): NotificationEvent
+    {
         $this->lastEvent = $e;
         return $e;
     }
@@ -36,7 +37,8 @@ class ActivityModelTest extends SiteTestCase {
     /**
      * Get a new model for each test.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         $this->model = $this->container()->get(ActivityModel::class);
@@ -56,17 +58,68 @@ class ActivityModelTest extends SiteTestCase {
      *
      * @return void
      */
-    public function testNotificationEventNotDispatched(): void {
+    public function testNotificationEventNotDispatched(): void
+    {
         $this->model->save([
             "ActivityUserID" => 1,
             "Body" => "Hello world.",
             "Format" => "markdown",
             "HeadlineFormat" => __FUNCTION__,
             "Notified" => ActivityModel::SENT_SKIPPED,
-            "NotifyUserID" => 2
+            "NotifyUserID" => 2,
         ]);
 
         $this->assertNull($this->lastEvent);
+    }
+
+    public function testGetWhereBatchedByRecordID(): void
+    {
+        $baseRecord = [
+            "Body" => "batchByRecordID1",
+            "Format" => "markdown",
+            "HeadlineFormat" => __FUNCTION__,
+            "Notified" => ActivityModel::SENT_PENDING,
+            "NotifyUserID" => 3,
+            "ActivityType" => "Default",
+            "RecordID" => 9999,
+        ];
+
+        $this->model->save(array_merge($baseRecord, ["ActivityUserID" => 1]));
+        $this->model->save(array_merge($baseRecord, ["ActivityUserID" => 2]));
+
+        $activityTypeID = ActivityModel::getActivityType("Default");
+
+        $batch = $this->model
+            ->getWhere(["NotifyUserID" => 3, "ActivityTypeID" => $activityTypeID], "", "", false, false, true)
+            ->resultArray();
+
+        $this->assertCount(1, $batch);
+        $this->assertSame($batch[0]["count"], 2);
+    }
+
+    public function testGetWhereBatchedByParentRecordID(): void
+    {
+        $baseRecord = [
+            "Body" => "batchByRecordID1",
+            "Format" => "markdown",
+            "HeadlineFormat" => __FUNCTION__,
+            "Notified" => ActivityModel::SENT_PENDING,
+            "NotifyUserID" => 3,
+            "ActivityType" => "Default",
+            "ParentRecordID" => 9999,
+        ];
+
+        $this->model->save(array_merge($baseRecord, ["ActivityUserID" => 1]));
+        $this->model->save(array_merge($baseRecord, ["ActivityUserID" => 2]));
+
+        $activityTypeID = ActivityModel::getActivityType("Default");
+
+        $batch = $this->model
+            ->getWhere(["NotifyUserID" => 3, "ActivityTypeID" => $activityTypeID], "", "", false, false, true)
+            ->resultArray();
+
+        $this->assertCount(1, $batch);
+        $this->assertSame($batch[0]["count"], 2);
     }
 
     /**
@@ -74,14 +127,15 @@ class ActivityModelTest extends SiteTestCase {
      *
      * @return void
      */
-    public function testNotificationEventDispatched(): void {
+    public function testNotificationEventDispatched(): void
+    {
         $this->model->save([
             "ActivityUserID" => 1,
             "Body" => "Hello world.",
             "Format" => "markdown",
             "HeadlineFormat" => __FUNCTION__,
             "Notified" => ActivityModel::SENT_PENDING,
-            "NotifyUserID" => 2
+            "NotifyUserID" => 2,
         ]);
 
         $this->assertInstanceOf(NotificationEvent::class, $this->lastEvent);
@@ -93,7 +147,8 @@ class ActivityModelTest extends SiteTestCase {
     /**
      * Verify sending to a nonexistent user doesn't trigger an error and doesn't dispatch an event.
      */
-    public function testNotifyInvalidUser(): void {
+    public function testNotifyInvalidUser(): void
+    {
         $this->model->save([
             "HeadlineFormat" => __FUNCTION__,
             "NotifyUserID" => 999999,
@@ -107,7 +162,8 @@ class ActivityModelTest extends SiteTestCase {
      *
      * @return void
      */
-    public function testNotificationCount(): void {
+    public function testNotificationCount(): void
+    {
         $this->notifyUser(3);
         $this->notifyUser(3, ActivityModel::SENT_OK); // Already "sent".
         $this->notifyUser(4);
@@ -126,7 +182,8 @@ class ActivityModelTest extends SiteTestCase {
      * @param int $userID
      * @param int $status
      */
-    private function notifyUser(int $userID, int $status = ActivityModel::SENT_PENDING) {
+    private function notifyUser(int $userID, int $status = ActivityModel::SENT_PENDING)
+    {
         $this->model->save([
             "ActivityUserID" => 1,
             "Body" => "Hello world.",

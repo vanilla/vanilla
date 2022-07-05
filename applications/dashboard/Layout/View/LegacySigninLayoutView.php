@@ -12,26 +12,29 @@ use Vanilla\Layout\View\LegacyLayoutViewInterface;
 /**
  * Legacy view type for signin.
  */
-class LegacySigninLayoutView implements LegacyLayoutViewInterface {
-
+class LegacySigninLayoutView implements LegacyLayoutViewInterface
+{
     /**
      * @inheritDoc
      */
-    public function getName(): string {
+    public function getName(): string
+    {
         return "Sign In";
     }
 
     /**
      * @inheritDoc
      */
-    public function getType(): string {
+    public function getType(): string
+    {
         return "signin";
     }
 
     /**
      * @inheritDoc
      */
-    public function getLegacyType(): string {
+    public function getLegacyType(): string
+    {
         return "Dashboard/Entry/Signin";
     }
 }

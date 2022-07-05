@@ -11,7 +11,7 @@ import { NO_WRAPPER_CONFIG, storyWithConfig } from "@library/storybook/StoryCont
 import React from "react";
 import { MemoryRouter } from "react-router";
 import PanelWidget from "./components/PanelWidget";
-import ThreeColumnSection from "./ThreeColumnSection";
+import SectionThreeColumns from "./ThreeColumnSection";
 
 export default {
     title: "Layout/PanelLayout",
@@ -30,7 +30,7 @@ const DummyPanel = (props: { bg?: string; children?: React.ReactNode }) => {
 
 export const SimplePanels = storyWithConfig(NO_WRAPPER_CONFIG, () => {
     return (
-        <ThreeColumnSection
+        <SectionThreeColumns
             leftTop={<DummyPanel>Left Top{largeIpsum}</DummyPanel>}
             middleTop={<DummyPanel>Middle Top</DummyPanel>}
             middleBottom={<DummyPanel>Middle Bottom{largeIpsum}</DummyPanel>}
@@ -41,7 +41,7 @@ export const SimplePanels = storyWithConfig(NO_WRAPPER_CONFIG, () => {
 
 export const LargeContent = storyWithConfig(NO_WRAPPER_CONFIG, () => {
     return (
-        <ThreeColumnSection
+        <SectionThreeColumns
             leftTop={<DummyPanel>Left Top</DummyPanel>}
             leftBottom={<DummyPanel>Left Bottom</DummyPanel>}
             middleTop={<DummyPanel>Middle Top</DummyPanel>}
@@ -77,7 +77,7 @@ export const WithThingsAbove = storyWithConfig(NO_WRAPPER_CONFIG, () => {
                 >
                     <Container fullGutter>Arbitrary Sized height</Container>
                 </div>
-                <ThreeColumnSection
+                <SectionThreeColumns
                     leftTop={<DummyPanel>Left Top</DummyPanel>}
                     leftBottom={<DummyPanel>Left Bottom</DummyPanel>}
                     middleTop={<DummyPanel>Middle Top</DummyPanel>}
@@ -98,7 +98,7 @@ WithThingsAbove.parameters = {
 
 export const LargeLeftPanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
     return (
-        <ThreeColumnSection
+        <SectionThreeColumns
             leftTop={<DummyPanel>Left Top {largeIpsum}</DummyPanel>}
             leftBottom={<DummyPanel>Left Bottom</DummyPanel>}
             middleTop={<DummyPanel>Middle Top</DummyPanel>}
@@ -111,7 +111,7 @@ export const LargeLeftPanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
 
 export const LargeRightTopPanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
     return (
-        <ThreeColumnSection
+        <SectionThreeColumns
             leftTop={<DummyPanel>Left Top</DummyPanel>}
             leftBottom={<DummyPanel>Left Bottom</DummyPanel>}
             middleTop={<DummyPanel>Middle Top</DummyPanel>}
@@ -124,7 +124,7 @@ export const LargeRightTopPanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
 
 export const LargeRightBottomPanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
     return (
-        <ThreeColumnSection
+        <SectionThreeColumns
             leftTop={<DummyPanel>Left Top</DummyPanel>}
             leftBottom={<DummyPanel>Left Bottom</DummyPanel>}
             middleTop={<DummyPanel>Middle Top</DummyPanel>}
@@ -143,7 +143,7 @@ export const LargeRightBottomPanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
 export const NoMinHeight = storyWithConfig(NO_WRAPPER_CONFIG, () => {
     return (
         <SectionBehaviourContext.Provider value={{ isSticky: false, autoWrap: false, useMinHeight: false }}>
-            <ThreeColumnSection
+            <SectionThreeColumns
                 leftTop={<DummyPanel>Left Top</DummyPanel>}
                 leftBottom={<DummyPanel>Left Bottom</DummyPanel>}
                 middleTop={<DummyPanel>Middle Top{smallIpsum}</DummyPanel>}
@@ -163,7 +163,7 @@ NoMinHeight.parameters = {
 
 export const LargeEverything = storyWithConfig(NO_WRAPPER_CONFIG, () => {
     return (
-        <ThreeColumnSection
+        <SectionThreeColumns
             leftTop={<DummyPanel>Left Top{largeIpsum}</DummyPanel>}
             leftBottom={<DummyPanel>Left Bottom{largeIpsum}</DummyPanel>}
             middleTop={<DummyPanel>Middle Top{largeIpsum}</DummyPanel>}
@@ -194,7 +194,7 @@ export const DarkMode = storyWithConfig(
     },
     () => {
         return (
-            <ThreeColumnSection
+            <SectionThreeColumns
                 leftTop={<DummyPanel>Left Top{largeIpsum}</DummyPanel>}
                 leftBottom={<DummyPanel>Left Bottom{largeIpsum}</DummyPanel>}
                 middleTop={<DummyPanel>Middle Top{largeIpsum}</DummyPanel>}

@@ -12,13 +12,14 @@ namespace VanillaTests\Fixtures;
  *
  * @package VanillaTests\Fixtures
  */
-class ArticlesHelpController {
-
+class ArticlesHelpController
+{
     /**
      * Dummy GET method.
      *
      * @param int $id
      */
-    public function get(int $id) {
+    public function get(int $id)
+    {
     }
 }

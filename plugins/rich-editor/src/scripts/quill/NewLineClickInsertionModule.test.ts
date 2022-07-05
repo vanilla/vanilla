@@ -24,11 +24,11 @@ describe("NewLineClickInsertionModule", () => {
         // Quill automatically puts a newline at the end. Trim it off.
         quill.deleteText(quill.scroll.length() - 1, 1);
 
-        const event = ({
+        const event = {
             y: 10000,
             target: quill.root,
             currentTarget: quill.root,
-        } as any) as MouseEvent;
+        } as any as MouseEvent;
 
         insertModule.handleClick(event);
         expect(quill.getContents().ops).deep.eq([...ops, OpUtils.newline()]);
@@ -37,10 +37,10 @@ describe("NewLineClickInsertionModule", () => {
         const ops = [OpUtils.op("test\n")];
         quill.setContents(ops);
 
-        const event = ({
+        const event = {
             y: 10000,
             target: quill.root,
-        } as any) as MouseEvent;
+        } as any as MouseEvent;
 
         insertModule.handleClick(event);
         expect(quill.getContents().ops).deep.eq(ops);
@@ -53,10 +53,10 @@ describe("NewLineClickInsertionModule", () => {
 
         const setOps = quill.getContents();
 
-        const event = ({
+        const event = {
             y: 10000,
             target: document.createElement("div"),
-        } as any) as MouseEvent;
+        } as any as MouseEvent;
 
         insertModule.handleClick(event);
         expect(quill.getContents().ops).deep.eq(ops);

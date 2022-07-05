@@ -18,6 +18,12 @@ paths:
                       default: 30
                       maximum: 100
                       minimum: 1
+                - name: shouldBatch
+                  in: query
+                  description: |
+                      Whether to batch notifications.
+                  schema:
+                      type: boolean
                 - $ref: "#/components/parameters/Page"
             responses:
                 "200":

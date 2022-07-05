@@ -10,15 +10,16 @@ namespace Vanilla\ImageSrcSet;
 /**
  * Service that provides Image's srcset.
  */
-class ImageSrcSetService {
-
+class ImageSrcSetService
+{
     /** @var ImageResizeProviderInterface|null */
     private $provider;
 
     /**
      * @param ImageResizeProviderInterface $provider
      */
-    public function setImageResizeProvider(ImageResizeProviderInterface $provider) {
+    public function setImageResizeProvider(ImageResizeProviderInterface $provider)
+    {
         $this->provider = $provider;
     }
 
@@ -28,7 +29,8 @@ class ImageSrcSetService {
      * @param string|null $initialUrl
      * @return ImageSrcSet|null
      */
-    public function getResizedSrcSet(?string $initialUrl): ?ImageSrcSet {
+    public function getResizedSrcSet(?string $initialUrl): ?ImageSrcSet
+    {
         $requiredSizes = [10, 300, 800, 1200];
 
         if (!$this->provider) {
@@ -42,7 +44,10 @@ class ImageSrcSetService {
         $imageSrcSet = new ImageSrcSet();
 
         foreach ($requiredSizes as $requiredSize) {
-            $imageSrcSet->addUrl($requiredSize, $this->provider->getResizedImageUrl($initialUrl, $requiredSize));
+            $url = $this->provider->getResizedImageUrl($initialUrl, $requiredSize);
+            if (!is_null($url)) {
+                $imageSrcSet->addUrl($requiredSize, $url);
+            }
         }
 
         return $imageSrcSet;

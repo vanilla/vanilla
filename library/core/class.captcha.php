@@ -1,9 +1,10 @@
 <?php
-
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
+
+use Vanilla\ReCaptchaVerification;
 
 /**
  * Captcha handler
@@ -15,28 +16,17 @@
  * @subpackage core
  * @since 2.2
  */
-class Captcha {
-
-    private static $enabled;
-
+class Captcha
+{
     /**
      * Should we expect captcha submissions?
      *
      * @return boolean
      */
-    public static function enabled() {
-        if (!isset(static::$enabled)) {
-            $enabled = !c('Garden.Registration.SkipCaptcha', false);
-            $handlersAvailable = false;
-
-            Gdn::pluginManager()->fireAs('captcha')->fireEvent('IsEnabled', [
-                'Enabled' => &$handlersAvailable
-            ]);
-
-            static::$enabled = $enabled && $handlersAvailable;
-        }
-
-        return static::$enabled;
+    public static function enabled()
+    {
+        $enabled = !Gdn::config("Garden.Registration.SkipCaptcha", false);
+        return $enabled;
     }
 
     /**
@@ -44,16 +34,51 @@ class Captcha {
      *
      * Allows conditional ignoring of captcha settings if disabled in the config.
      *
-     * @param Gdn_Controller $controller
+     * @param SettingsController $settingsController
      * @return null
      */
-    public static function settings($controller) {
-        if (!c('Garden.Registration.ManageCaptcha', true)) {
+    public static function settings(SettingsController $settingsController)
+    {
+        $recaptchaFields = [
+            "Recaptcha.PrivateKey",
+            "Recaptcha.PublicKey",
+            "RecaptchaV3.PublicKey",
+            "RecaptchaV3.PrivateKey",
+        ];
+
+        // If the ManageCaptcha config is explicitly set to false, we do not carry on.
+        if (!Gdn::config("Garden.Registration.ManageCaptcha", true)) {
             return null;
         }
 
-        // Hook to allow rendering of captcha settings form
-        $controller->fireAs('captcha')->fireEvent('settings');
+        $validation = new Gdn_Validation();
+        $configurationModel = new Gdn_ConfigurationModel($validation);
+
+        $manageCaptcha = Gdn::config("Garden.Registration.ManageCaptcha", true);
+        $settingsController->setData("_ManageCaptcha", $manageCaptcha);
+
+        if ($manageCaptcha) {
+            foreach ($recaptchaFields as $recaptchaField) {
+                $configurationModel->setField($recaptchaField);
+            }
+
+            if (!$settingsController->Form->authenticatedPostBack()) {
+                // Apply the config settings to the form.
+                $settingsController->Form->setData($configurationModel->Data);
+            } else {
+                $config = \Gdn::config();
+
+                // Save every config value.
+                foreach ($recaptchaFields as $recaptchaField) {
+                    $recaptchaFieldValue = $settingsController->Form->getFormValue($recaptchaField, "");
+                    $config->saveToConfig($recaptchaField, $recaptchaFieldValue);
+                }
+            }
+
+            // Rendering captcha settings form.
+            echo $settingsController->fetchView("recaptchaoptions");
+        }
+
         return null;
     }
 
@@ -65,49 +90,68 @@ class Captcha {
      * @param Gdn_Controller $controller
      * @return null;
      */
-    public static function render($controller) {
+    public static function render($controller)
+    {
         if (!Captcha::enabled()) {
             return null;
         }
 
-        // Hook to allow rendering of captcha form
-        $controller->fireAs('captcha')->fireEvent('render');
+        // Rendering of captcha form.
+        echo $controller->fetchView("recaptcha");
         return null;
     }
 
     /**
      * Validate captcha.
      *
-     * @param mixed $value
+     * @param mixed $captchaText
      * @return boolean validity of captcha submission
      */
-    public static function validate($value = null) {
-        if (is_null($value)) {
-            // Get captcha text
-            $captchaText = null;
-            Gdn::pluginManager()->EventArguments['captchatext'] = &$captchaText;
-            Gdn::pluginManager()->fireAs('captcha')->fireEvent('get', [
-                'captcha' => $value
-            ]);
-            $value = $captchaText;
+    public static function validate($captchaText = null)
+    {
+        if (!Captcha::enabled()) {
+            return null;
         }
 
-        if (is_null($value)) {
+        if (is_null($captchaText)) {
+            // Get captcha text.
+            $recaptchaResponse = Gdn::request()->post("g-recaptcha-response");
+            if ($recaptchaResponse) {
+                $captchaText = $recaptchaResponse;
+            }
+        }
+
+        if (is_null($captchaText)) {
             return false;
         }
 
         // Validate captcha text
-
         // Assume invalid submission
-        $valid = false;
+        $isValid = false;
 
-        Gdn::pluginManager()->EventArguments['captchavalid'] = &$valid;
-        Gdn::pluginManager()->fireAs('captcha')->fireEvent('validate', [
-            'captcha' => $value
-        ]);
-        $isValid = $valid ? true : false;
-        unset(Gdn::pluginManager()->EventArguments['captchavalid']);
-        return $isValid;
+        $api = new Garden\Http\HttpClient("https://www.google.com/recaptcha/api");
+        $data = [
+            "secret" => Gdn::config("Recaptcha.PrivateKey"),
+            "response" => $captchaText,
+        ];
+        $response = $api->get("/siteverify", $data);
+
+        if ($response->isSuccessful()) {
+            $result = $response->getBody();
+            $errorCodes = val("error_codes", $result);
+            if ($result && val("success", $result)) {
+                $isValid = true;
+            } elseif (!empty($errorCodes) && $errorCodes != ["invalid-input-response"]) {
+                throw new Exception(
+                    formatString(t("No response from reCAPTCHA.") . " {ErrorCodes}", [
+                        "ErrorCodes" => join(", ", $errorCodes),
+                    ])
+                );
+            }
+        } else {
+            throw new Exception(t("No response from reCAPTCHA."));
+        }
+
+        return (bool) $isValid;
     }
-
 }

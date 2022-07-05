@@ -13,7 +13,8 @@ use Garden\Web\Route;
 /**
  * A route that matches exact paths and
  */
-class ExactRoute extends Route {
+class ExactRoute extends Route
+{
     /**
      * @var string
      */
@@ -30,10 +31,9 @@ class ExactRoute extends Route {
      * @param string $path The path to match.
      * @param callable $callback The callback to execute on the match.
      */
-    public function __construct(string $path, callable $callback) {
-        $this
-            ->setPath($path)
-            ->setCallback($callback);
+    public function __construct(string $path, callable $callback)
+    {
+        $this->setPath($path)->setCallback($callback);
     }
 
     /**
@@ -42,7 +42,8 @@ class ExactRoute extends Route {
      * @param RequestInterface $request The request to match against.
      * @return mixed Returns match information or **null** if the route doesn't match.
      */
-    public function match(RequestInterface $request) {
+    public function match(RequestInterface $request)
+    {
         if ($request->getPath() === $this->getPath()) {
             return function () use ($request) {
                 return call_user_func($this->getCallback(), $request);
@@ -55,7 +56,8 @@ class ExactRoute extends Route {
      *
      * @return string Returns the path.
      */
-    public function getPath(): string {
+    public function getPath(): string
+    {
         return $this->path;
     }
 
@@ -65,8 +67,9 @@ class ExactRoute extends Route {
      * @param string $path
      * @return $this
      */
-    public function setPath(string $path) {
-        $this->path = '/'.ltrim($path, '/');
+    public function setPath(string $path)
+    {
+        $this->path = "/" . ltrim($path, "/");
         return $this;
     }
 
@@ -75,7 +78,8 @@ class ExactRoute extends Route {
      *
      * @return callable Returns the callback.
      */
-    public function getCallback(): callable {
+    public function getCallback(): callable
+    {
         return $this->callback;
     }
 
@@ -85,7 +89,8 @@ class ExactRoute extends Route {
      * @param callable $callback
      * @return $this
      */
-    public function setCallback(callable $callback) {
+    public function setCallback(callable $callback)
+    {
         $this->callback = $callback;
         return $this;
     }

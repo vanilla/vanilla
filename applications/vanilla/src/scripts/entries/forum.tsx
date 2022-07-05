@@ -19,21 +19,22 @@ import { SearchWidget } from "@library/searchWidget/SearchWidget";
 import { CategoryPicker } from "@library/forms/select/CategoryPicker";
 import { CategoryFollowDropDown } from "@vanilla/addon-vanilla/categories/CategoryFollowDropdown";
 import TabWidget from "@library/tabWidget/TabWidget";
-import NewPostMenu from "@library/flyouts/NewPostMenu";
+import NewPostMenu from "@library/newPostMenu/NewPostMenu";
 import { triggerLegacyHashScrolling } from "@vanilla/addon-vanilla/legacy/legacyHashScrolling";
 import "@vanilla/addon-vanilla/forms/autosave";
 import { LeaderboardWidget } from "@library/leaderboardWidget/LeaderboardWidget";
 import { CategoriesWidget } from "@library/categoriesWidget/CategoriesWidget";
 import { RSSWidget } from "@library/rssWidget/RSSWidget";
 import { UserSpotlightWidget } from "@library/userSpotlight/UserSpotlightWidget";
+import { DiscussionsWidget } from "@library/features/discussions/DiscussionsWidget";
 
 registerReducer("forum", forumReducer);
 registerCommunitySearchDomain();
 
 addComponent("HomeWidget", HomeWidget, { overwrite: true });
 addComponent("DiscussionListModule", DiscussionListModule, { overwrite: true });
-addComponent("DiscussionDiscussionsWidget", DiscussionListModule, { overwrite: true });
-addComponent("DiscussionAnnouncementsWidget", DiscussionListModule, { overwrite: true });
+addComponent("DiscussionDiscussionsWidget", DiscussionsWidget, { overwrite: true });
+addComponent("DiscussionAnnouncementsWidget", DiscussionsWidget, { overwrite: true });
 addComponent("QuickLinks", QuickLinks, { overwrite: true });
 addComponent("CallToAction", CallToAction, { overwrite: true });
 addComponent("UserSpotlight", UserSpotlight, { overwrite: true });

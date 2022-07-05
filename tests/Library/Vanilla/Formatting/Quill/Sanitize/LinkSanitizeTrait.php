@@ -6,8 +6,8 @@
 
 namespace VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize;
 
-trait LinkSanitizeTrait {
-
+trait LinkSanitizeTrait
+{
     /**
      * Get an array of operations to test a CSS values.
      *
@@ -21,7 +21,8 @@ trait LinkSanitizeTrait {
      *
      * @return array
      */
-    public function provideBadHrefs(): array {
+    public function provideBadHrefs(): array
+    {
         $result = [
             ["https://example.com/pwned.jpg);position:relative;top:0;left:0;width:1000px;height:1000px;"],
             ["position:relative;top:0;left:0;width:1000px;height:1000px;"],
@@ -37,7 +38,8 @@ trait LinkSanitizeTrait {
      *
      * @throws Exception If the parser or render could not be instantiated.
      */
-    protected function assertLinksSanitized(array $operations, string $badHref) {
+    protected function assertLinksSanitized(array $operations, string $badHref)
+    {
         $result = $this->render($operations);
 
         // The contents should've had a unsafe: prepended onto them.
@@ -46,14 +48,14 @@ trait LinkSanitizeTrait {
         $this->assertNotContains(htmlentities($badHref), $result);
     }
 
-
     /**
      * Test sanitizing dynamic CSS in a blot.
      *
      * @param string $href
      * @dataProvider provideBadHrefs
      */
-    public function testSanitizeLinks(string $href) {
+    public function testSanitizeLinks(string $href)
+    {
         $operations = $this->linkOperations($href);
         $this->assertLinksSanitized($operations, $href);
     }

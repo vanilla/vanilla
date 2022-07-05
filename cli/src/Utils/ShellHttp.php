@@ -12,7 +12,8 @@ namespace Vanilla\Cli\Utils;
 /**
  * Http utilities for scripts.
  */
-final class ShellHttp {
+final class ShellHttp
+{
     /** @var SimpleScriptLogger */
     private $logger;
 
@@ -24,7 +25,8 @@ final class ShellHttp {
      *
      * @param SimpleScriptLogger $logger
      */
-    public function __construct(SimpleScriptLogger $logger) {
+    public function __construct(SimpleScriptLogger $logger)
+    {
         $this->logger = $logger;
         $this->cookie_jar = $this->getCookieJarFile();
     }
@@ -34,12 +36,13 @@ final class ShellHttp {
      *
      * @return string
      */
-    private function getCookieJarFile(): string {
+    private function getCookieJarFile(): string
+    {
         $cwd = getcwd();
         $path = "$cwd/vanilla-clone.cookiejar";
         if (!is_writable($cwd)) {
             $this->logger->error("Can't write to $path. Please make sure this user has write permissions.");
-            exit;
+            exit();
         }
         return $path;
     }
@@ -49,7 +52,8 @@ final class ShellHttp {
      *
      * @return array
      */
-    private function getBaseCurlOpts(): array {
+    private function getBaseCurlOpts(): array
+    {
         return [
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HEADER => true,
@@ -66,7 +70,8 @@ final class ShellHttp {
      * @param resource $ch
      * @return array
      */
-    private function getResponse($ch): array {
+    private function getResponse($ch): array
+    {
         $data = curl_exec($ch);
         $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
         $body = substr($data, $header_size);
@@ -74,7 +79,7 @@ final class ShellHttp {
             "body" => $body,
             "httpCode" => curl_getinfo($ch, CURLINFO_HTTP_CODE),
             "url" => curl_getinfo($ch, CURLINFO_EFFECTIVE_URL),
-            "request" => curl_getinfo($ch, CURLINFO_HEADER_OUT)
+            "request" => curl_getinfo($ch, CURLINFO_HEADER_OUT),
         ];
     }
 
@@ -85,7 +90,8 @@ final class ShellHttp {
      * @param array $curlopts
      * @return array
      */
-    public function sendCurlRequest(string $url, array $curlopts = []): array {
+    public function sendCurlRequest(string $url, array $curlopts = []): array
+    {
         $ch = curl_init($url);
         $opts = $this->getBaseCurlOpts() + $curlopts;
         curl_setopt_array($ch, $opts);
@@ -101,10 +107,11 @@ final class ShellHttp {
      * @param array $opts
      * @return array
      */
-    public function post(string $url, array $opts = []): array {
+    public function post(string $url, array $opts = []): array
+    {
         return $this->sendCurlRequest($url, [
             CURLOPT_POST => true,
-            CURLOPT_POSTFIELDS => $opts["form"]
+            CURLOPT_POSTFIELDS => $opts["form"],
         ]);
     }
 
@@ -115,7 +122,8 @@ final class ShellHttp {
      * @param array $opts
      * @return array
      */
-    public function get(string $url, array $opts = []): array {
+    public function get(string $url, array $opts = []): array
+    {
         return $this->sendCurlRequest($url);
     }
 }

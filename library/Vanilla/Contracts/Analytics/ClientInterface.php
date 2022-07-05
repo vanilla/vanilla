@@ -9,8 +9,8 @@ namespace Vanilla\Contracts\Analytics;
 /**
  * An interface for an analytics client to track events.
  */
-interface ClientInterface {
-
+interface ClientInterface
+{
     /**
      * Get configuration details relevant to the analytics service.
      *

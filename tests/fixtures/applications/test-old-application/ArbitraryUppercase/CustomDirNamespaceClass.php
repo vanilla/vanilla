@@ -11,6 +11,6 @@ namespace Test\OldApplication\ArbitraryUppercase;
  * This class is in a arbitrary subdirectory of the addon.
  * It is in a namespace so it should still be loaded.
  */
-class CustomDirNamespaceClass {
-
+class CustomDirNamespaceClass
+{
 }

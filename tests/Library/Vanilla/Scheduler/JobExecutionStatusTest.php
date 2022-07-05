@@ -13,96 +13,109 @@ use Vanilla\Scheduler\Job\JobExecutionStatus;
 /**
  * Class JobExecutionStatusTest.
  */
-final class JobExecutionStatusTest extends TestCase {
-
+final class JobExecutionStatusTest extends TestCase
+{
     /**
      * Verifying positive assertion of "abandoned" status.
      */
-    public function testStatusAbandoned() {
+    public function testStatusAbandoned()
+    {
         $this->assertTrue(JobExecutionStatus::abandoned()->is(JobExecutionStatus::abandoned()));
     }
 
     /**
      * Verifying positive assertion of "complete" status.
      */
-    public function testStatusComplete() {
+    public function testStatusComplete()
+    {
         $this->assertTrue(JobExecutionStatus::complete()->is(JobExecutionStatus::complete()));
     }
 
     /**
      * Verifying positive assertion of "error" status.
      */
-    public function testStatusError() {
+    public function testStatusError()
+    {
         $this->assertTrue(JobExecutionStatus::error()->is(JobExecutionStatus::error()));
     }
 
     /**
      * Verifying positive assertion of "failed" status.
      */
-    public function testStatusFailed() {
+    public function testStatusFailed()
+    {
         $this->assertTrue(JobExecutionStatus::failed()->is(JobExecutionStatus::failed()));
     }
 
     /**
      * Verifying positive assertion of "invalid" status.
      */
-    public function testStatusInvalid() {
+    public function testStatusInvalid()
+    {
         $this->assertTrue(JobExecutionStatus::invalid()->is(JobExecutionStatus::invalid()));
     }
 
     /**
      * Verifying positive assertion of "mismatch" status.
      */
-    public function testStatusMismatch() {
+    public function testStatusMismatch()
+    {
         $this->assertTrue(JobExecutionStatus::mismatch()->is(JobExecutionStatus::mismatch()));
     }
 
     /**
      * Verifying positive assertion of "progress" status.
      */
-    public function testStatusProgress() {
+    public function testStatusProgress()
+    {
         $this->assertTrue(JobExecutionStatus::progress()->is(JobExecutionStatus::progress()));
     }
 
     /**
      * Verifying positive assertion of "received" status.
      */
-    public function testStatusReceived() {
+    public function testStatusReceived()
+    {
         $this->assertTrue(JobExecutionStatus::received()->is(JobExecutionStatus::received()));
     }
 
     /**
      * Verifying positive assertion of "retry" status.
      */
-    public function testStatusRetry() {
+    public function testStatusRetry()
+    {
         $this->assertTrue(JobExecutionStatus::retry()->is(JobExecutionStatus::retry()));
     }
 
     /**
      * Verifying positive assertion of "intended" status.
      */
-    public function testStatusIntended() {
+    public function testStatusIntended()
+    {
         $this->assertTrue(JobExecutionStatus::intended()->is(JobExecutionStatus::intended()));
     }
 
     /**
      * Verifying positive assertion of "intended" status.
      */
-    public function testStatusUnknown() {
+    public function testStatusUnknown()
+    {
         $this->assertTrue(JobExecutionStatus::unknown()->is(JobExecutionStatus::unknown()));
     }
 
     /**
      * Verifying positive assertion of "execution error" status.
      */
-    public function testStatusStackExecutionError() {
+    public function testStatusStackExecutionError()
+    {
         $this->assertTrue(JobExecutionStatus::stackExecutionError()->is(JobExecutionStatus::stackExecutionError()));
     }
 
     /**
      * Verifying positive assertion of custom status.
      */
-    public function testValidLooseStatusComparison() {
+    public function testValidLooseStatusComparison()
+    {
         $status = JobExecutionStatus::retry()->getStatus();
         $this->assertTrue(JobExecutionStatus::looseStatus($status)->is(JobExecutionStatus::retry()));
     }
@@ -110,7 +123,8 @@ final class JobExecutionStatusTest extends TestCase {
     /**
      * Verifying negative assertion of custom status.
      */
-    public function testInvalidLooseStatusComparison() {
+    public function testInvalidLooseStatusComparison()
+    {
         $status = JobExecutionStatus::retry()->getStatus();
         $this->assertFalse(JobExecutionStatus::looseStatus($status)->is(JobExecutionStatus::complete()));
     }

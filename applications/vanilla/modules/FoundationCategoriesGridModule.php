@@ -14,8 +14,8 @@ use Vanilla\Site\SiteSectionModel;
  * Class for shimming the old category page into the new category view.
  * Map the old legacy data into the new react view.
  */
-class FoundationCategoriesGridModule extends CategoriesModule {
-
+class FoundationCategoriesGridModule extends CategoriesModule
+{
     /** @var array */
     private $widgetItems = [];
 
@@ -25,7 +25,8 @@ class FoundationCategoriesGridModule extends CategoriesModule {
      * @param \CategoriesApiController $categoriesApi
      * @param SiteSectionModel $siteSectionModel
      */
-    public function __construct(\CategoriesApiController $categoriesApi, SiteSectionModel $siteSectionModel) {
+    public function __construct(\CategoriesApiController $categoriesApi, SiteSectionModel $siteSectionModel)
+    {
         parent::__construct($categoriesApi, $siteSectionModel);
         $this->title = null;
     }
@@ -33,14 +34,16 @@ class FoundationCategoriesGridModule extends CategoriesModule {
     /**
      * Map the legacy category data and render it into a view that the can be mounted.
      */
-    public function getData(): array {
+    public function getData(): array
+    {
         return $this->widgetItems;
     }
 
     /**
      * @param array $widgetItems
      */
-    public function setWidgetItems(array $widgetItems): void {
+    public function setWidgetItems(array $widgetItems): void
+    {
         $this->widgetItems = $widgetItems;
     }
 }

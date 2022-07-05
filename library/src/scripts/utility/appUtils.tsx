@@ -6,7 +6,7 @@
  */
 
 import gdn from "@library/gdn";
-import { PromiseOrNormalCallback } from "@vanilla/utils";
+import { logError, PromiseOrNormalCallback } from "@vanilla/utils";
 import { ensureScript } from "@vanilla/dom-utils";
 import { sprintf } from "sprintf-js";
 
@@ -227,7 +227,13 @@ export function onReady(callback: PromiseOrNormalCallback) {
  */
 export function _executeReady(before?: () => void | Promise<void>): Promise<any[]> {
     return new Promise((resolve) => {
-        const handlerPromises = _readyHandlers.map((handler) => handler());
+        const handlerPromises = _readyHandlers.map((handler) => {
+            let result = handler();
+            if (result instanceof Promise) {
+                result.catch((err) => logError(err));
+            }
+            return result;
+        });
         const exec = () => {
             before?.();
             return Promise.all(handlerPromises).then(resolve);

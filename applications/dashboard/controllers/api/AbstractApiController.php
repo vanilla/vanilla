@@ -16,8 +16,8 @@ use Vanilla\Utility\ModelUtils;
 /**
  * Base API controller for APIv2.
  */
-abstract class AbstractApiController extends \Vanilla\Web\Controller implements \Vanilla\InjectableInterface {
-
+abstract class AbstractApiController extends \Vanilla\Web\Controller implements \Vanilla\InjectableInterface
+{
     use FormatFieldTrait;
 
     /** @var Schema */
@@ -35,10 +35,11 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller implements 
      * @param array $values
      * @return array
      */
-    public function filterValues(array $values) {
-        $result = array_filter($values, function($val) {
+    public function filterValues(array $values)
+    {
+        $result = array_filter($values, function ($val) {
             $valid = true;
-            if ($val === '') {
+            if ($val === "") {
                 $valid = false;
             }
             return $valid;
@@ -51,9 +52,10 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller implements 
      *
      * @return Schema Returns a schema.
      */
-    public function getCategoryFragmentSchema() {
+    public function getCategoryFragmentSchema()
+    {
         if ($this->categoryFragmentSchema === null) {
-            $this->categoryFragmentSchema = $this->schema(new CategoryFragmentSchema(), 'CategoryFragment');
+            $this->categoryFragmentSchema = $this->schema(new CategoryFragmentSchema(), "CategoryFragment");
         }
         return $this->categoryFragmentSchema;
     }
@@ -63,7 +65,8 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller implements 
      *
      * @return Schema Returns a schema.
      */
-    public function getUserFragmentSchema() {
+    public function getUserFragmentSchema()
+    {
         if ($this->userFragmentSchema === null) {
             $this->userFragmentSchema = SchemaFactory::get(UserFragmentSchema::class, "UserFragment");
         }
@@ -77,9 +80,10 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller implements 
      *
      * @return Schema Returns a schema.
      */
-    public function getPostFragmentSchema() {
+    public function getPostFragmentSchema()
+    {
         if ($this->postFragmentSchema === null) {
-            $this->postFragmentSchema = $this->schema(new PostFragmentSchema(), 'PostFragment');
+            $this->postFragmentSchema = $this->schema(new PostFragmentSchema(), "PostFragment");
         }
         return $this->postFragmentSchema;
     }
@@ -91,13 +95,15 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller implements 
      * @param array|bool $expand An array of fields to expand, or true for all.
      * @return bool
      */
-    public function isExpandField($field, $expand) {
+    public function isExpandField($field, $expand)
+    {
         $result = ModelUtils::isExpandOption($field, $expand);
         return $result;
     }
 
-    public function options($path) {
-        return '';
+    public function options($path)
+    {
+        return "";
     }
 
     /**
@@ -108,7 +114,8 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller implements 
      * @param string $field The name of the field where the expand fields can be found.
      * @return array Returns an array of field names that were expanded from the `$map` argument.
      */
-    protected function resolveExpandFields(array $request, array $map, $field = 'expand') {
+    protected function resolveExpandFields(array $request, array $map, $field = "expand")
+    {
         $result = [];
         if (array_key_exists($field, $request)) {
             $expand = $request[$field];
@@ -134,7 +141,8 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller implements 
      * @param string|array $permission A required permissions.
      * @param int|null $id The ID of the record we are checking the permission of (e.g. category ID).
      */
-    public function fieldPermission(array $data, $field, $permission, $id = null) {
+    public function fieldPermission(array $data, $field, $permission, $id = null)
+    {
         if (array_key_exists($field, $data)) {
             $this->permission($permission, $id);
         }

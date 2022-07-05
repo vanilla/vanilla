@@ -24,8 +24,8 @@ use Vanilla\Utility\StringUtils;
  * @see \Garden\Web\Dispatcher
  * @see \Vanilla\Web\Page
  */
-class PageDispatchController implements CustomExceptionHandler, InjectableInterface {
-
+class PageDispatchController implements CustomExceptionHandler, InjectableInterface
+{
     /** @var Page The active page. */
     private $activePage;
 
@@ -41,7 +41,8 @@ class PageDispatchController implements CustomExceptionHandler, InjectableInterf
      *
      * @param Container $container The container object for locating and creating page classes.
      */
-    public function setDependencies(Container $container) {
+    public function setDependencies(Container $container)
+    {
         $this->container = $container;
     }
 
@@ -55,7 +56,8 @@ class PageDispatchController implements CustomExceptionHandler, InjectableInterf
      * @throws NotFoundException If the page class couldn't be located.
      * @throws ContainerException Error while retrieving the entry.
      */
-    protected function usePage(string $pageClass): Page {
+    protected function usePage(string $pageClass): Page
+    {
         $page = $this->container->get($pageClass);
         $this->activePage = $page;
         return $page;
@@ -71,7 +73,8 @@ class PageDispatchController implements CustomExceptionHandler, InjectableInterf
      *
      * @return Page
      */
-    protected function useSimplePage(string $title): Page {
+    protected function useSimplePage(string $title): Page
+    {
         /** @var Page $page */
         $page = $this->container->get($this->simplePageClass);
 
@@ -88,7 +91,8 @@ class PageDispatchController implements CustomExceptionHandler, InjectableInterf
      * Forward the call onto our active page if we have one.
      * @inheritdoc
      */
-    public function hasExceptionHandler(\Throwable $e): bool {
+    public function hasExceptionHandler(\Throwable $e): bool
+    {
         return true;
     }
 
@@ -96,7 +100,8 @@ class PageDispatchController implements CustomExceptionHandler, InjectableInterf
      * Use or active pages handler.
      * @inheritdoc
      */
-    public function handleException(\Throwable $e): Data {
+    public function handleException(\Throwable $e): Data
+    {
         $activePage = $this->activePage ?? $this->container->get(SimpleTitlePage::class);
         return $activePage->handleException($e);
     }

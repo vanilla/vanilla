@@ -56,8 +56,8 @@ export const compactSearchVariables = useThemeCache((forcedVars?: IThemeVariable
     const backgrounds = makeThemeVars("backgrounds", {
         useOverlay: false,
         overlayColor: isContrastLight
-            ? globalVars.elementaryColors.black.fade(0.3)
-            : globalVars.elementaryColors.white.fade(0.3),
+            ? globalVars.elementaryColors.black.fade(0.25)
+            : globalVars.elementaryColors.white.fade(0.25),
     });
 
     const bgColor = isTransparentButton ? rgba(0, 0, 0, 0) : colors.primary;

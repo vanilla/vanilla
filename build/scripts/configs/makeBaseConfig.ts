@@ -7,22 +7,23 @@
 import chalk from "chalk";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import * as path from "path";
-import { svgLoader } from "./svgLoader";
 import webpack from "webpack";
 import WebpackBar from "webpackbar";
 import { BuildMode, getOptions } from "../buildOptions";
-import { DIST_DIRECTORY, DIST_NAME, VANILLA_APPS, VANILLA_ROOT } from "../env";
+import { DIST_NAME, VANILLA_ROOT } from "../env";
 import EntryModel from "../utility/EntryModel";
 import { printVerbose } from "../utility/utils";
-const CircularDependencyPlugin = require("circular-dependency-plugin");
+import { svgLoader } from "./svgLoader";
 import globby from "globby";
+import { notEmpty } from "@vanilla/utils";
+const CircularDependencyPlugin = require("circular-dependency-plugin");
 
 /**
  * Create the core webpack config.
  *
  * @param section - The section of the app to build. Eg. forum | admin | knowledge.
  */
-export async function makeBaseConfig(entryModel: EntryModel, section: string, isLegacy: boolean = true) {
+export async function makeBaseConfig(entryModel: EntryModel, section: string) {
     const options = await getOptions();
 
     const customModulePaths = [
@@ -37,57 +38,23 @@ export async function makeBaseConfig(entryModel: EntryModel, section: string, is
 ${chalk.green(aliases)}`;
     printVerbose(message);
 
-    const babelPlugins: any[] = [];
-    const hotLoaders: any[] = [];
-    const hotAliases: any = {};
-    if (options.mode === BuildMode.DEVELOPMENT) {
-        // This plugin has very flaky detection of env variables.
-        // It can't seem to detect that we are no in production mode.
-        // So we need to disable the ENV check.
-        babelPlugins.push([require.resolve("react-refresh/babel"), { skipEnvCheck: true }]);
-    }
-
-    section = isLegacy ? section : `${section}-modern`;
     const config: any = {
         context: VANILLA_ROOT,
         parallelism: 50, // Intentionally brought down from 50 to reduce memory usage.
-        cache: options.lowMemory
-            ? false
-            : {
-                  type: "filesystem",
-                  allowCollectingMemory: true, // Required to keep memory usage down.
-                  buildDependencies: {
-                      config: [...globby.sync(path.resolve(__dirname, "*"))],
-                  },
-                  // This will cause cache inconsistencies if manually modifying these without
-                  // changing the package.json (which is used to avoid hashing node_modules).
-                  managedPaths: customModulePaths,
-                  name: `${section}-${options.mode}-${options.debug}`,
-                  maxMemoryGenerations: options.lowMemory ? 3 : Infinity,
-              },
+        cache: options.mode === BuildMode.DEVELOPMENT,
         module: {
             rules: [
                 {
                     test: /\.(m?jsx?|tsx?)$/,
                     exclude: (modulePath: string) => {
                         const modulesRequiringTranspilation = [
-                            "quill",
-                            "p-debounce",
                             "@vanilla/.*",
                             "@monaco-editor/react.*",
                             "ajv.*",
-                            "d3-.*",
-                            "@reduxjs/toolkit.*",
                             "@?react-spring.*",
-                            "delaunator.*",
-                            "buffer",
-                            "rafz",
                             "highlight.js",
-                            "@reach/.*",
-                            "react-markdown",
                             "@simonwep.*",
-                            "swagger-ui-react",
-                            "is-plain-obj",
+                            "serialize-error", // Comes from swagger-ui
                         ];
                         const exclusionRegex = new RegExp(`node_modules/(${modulesRequiringTranspilation.join("|")})/`);
 
@@ -99,23 +66,36 @@ ${chalk.green(aliases)}`;
                         return /node_modules/.test(modulePath) && !exclusionRegex.test(modulePath);
                     },
                     use: [
-                        ...hotLoaders,
+                        BuildMode.PRODUCTION === options.mode && section !== "storybook"
+                            ? {
+                                  loader: "babel-loader",
+                                  options: {
+                                      plugins: [
+                                          [
+                                              "@emotion",
+                                              {
+                                                  autoLabel: "always",
+                                                  labelFormat: "[filename]-[local]",
+                                              },
+                                          ],
+                                      ],
+                                  },
+                              }
+                            : null,
                         {
-                            loader: "babel-loader",
+                            loader: "swc-loader",
                             options: {
-                                presets: [
-                                    [
-                                        require.resolve("@vanilla/babel-preset"),
-                                        {
-                                            isLegacy,
+                                jsc: {
+                                    transform: {
+                                        react: {
+                                            // Enable react refresh in development.
+                                            refresh: options.mode === BuildMode.DEVELOPMENT,
                                         },
-                                    ],
-                                ],
-                                plugins: babelPlugins,
-                                cacheDirectory: true,
+                                    },
+                                },
                             },
                         },
-                    ],
+                    ].filter(notEmpty),
                 },
                 {
                     test: /\.html$/,
@@ -157,7 +137,6 @@ ${chalk.green(aliases)}`;
                                 sourceMap: true,
                                 postcssOptions: {
                                     config: path.resolve(VANILLA_ROOT, "build/scripts/configs/postcss.config.js"),
-                                    isLegacy,
                                 },
                             },
                         },
@@ -174,10 +153,13 @@ ${chalk.green(aliases)}`;
         },
         performance: { hints: false },
         plugins: [
-            new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /en/),
             new webpack.DefinePlugin({
                 __DIST__NAME__: JSON.stringify(DIST_NAME),
                 __BUILD__SECTION__: JSON.stringify(section),
+            }),
+            new webpack.IgnorePlugin({
+                resourceRegExp: /^\.\/locale$/,
+                contextRegExp: /moment$/,
             }),
         ] as any[],
         resolve: {
@@ -192,7 +174,6 @@ ${chalk.green(aliases)}`;
                     VANILLA_ROOT,
                     "library/src/scripts/leaderboardWidget/LeaderboardWidget.styles.ts",
                 ),
-                ...hotAliases,
                 ...entryModel.aliases,
                 "library-scss": path.resolve(VANILLA_ROOT, "library/src/scss"),
                 "react-select": require.resolve("react-select/dist/react-select.esm.js"),
@@ -221,8 +202,18 @@ ${chalk.green(aliases)}`;
     if (options.mode === BuildMode.PRODUCTION) {
         config.plugins.push(
             new MiniCssExtractPlugin({
-                filename: "[name].[contenthash].min.css",
-                chunkFilename: "async/[name].[contenthash].min.css",
+                filename: "[contenthash].min.css",
+                chunkFilename: "async/[contenthash].min.css",
+                insert: (linkTag) => {
+                    // Make sure the static stylesheets (even async ones), get inserted before emotion styles.
+                    // Emotion styles are newer and should be more specific.
+                    const emotionCSSLink = document.head.querySelector("[data-emotion='css']");
+                    if (emotionCSSLink) {
+                        document.head.insertBefore(linkTag, emotionCSSLink);
+                    } else {
+                        document.head.appendChild(linkTag);
+                    }
+                },
             }),
         );
     }

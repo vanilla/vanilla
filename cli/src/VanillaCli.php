@@ -17,32 +17,33 @@ use Vanilla\Cli\Utils\SimpleScriptLogger;
 /**
  * Entrypoint for the vanilla-scripts cli.
  */
-class VanillaCli extends CliApplication {
-
+class VanillaCli extends CliApplication
+{
     /**
      * Configure the commands.
      */
-    protected function configureCli(): void {
+    protected function configureCli(): void
+    {
         parent::configureCli();
 
-        $this->addMethod(Commands\BackportCommand::class, 'backport', [self::OPT_SETTERS => true]);
-        $this->addMethod(Commands\InstallCommand::class, 'install');
-        $this->addMethod(Commands\VanillaCacheCommand::class, 'clearCaches', [self::OPT_SETTERS => true]);
-        $this->addMethod(Commands\LintCommand::class, 'lint', [self::OPT_SETTERS => true]);
+        $this->addMethod(Commands\BackportCommand::class, "backport", [self::OPT_SETTERS => true]);
+        $this->addMethod(Commands\InstallCommand::class, "install");
+        $this->addMethod(Commands\VanillaCacheCommand::class, "clearCaches", [self::OPT_SETTERS => true]);
+        $this->addMethod(Commands\LintCommand::class, "lint", [self::OPT_SETTERS => true]);
     }
 
     /**
      * @return Container
      */
-    protected function createContainer(): Container {
+    protected function createContainer(): Container
+    {
         $container = parent::createContainer();
 
         $container
             ->rule(LoggerAwareInterface::class)
-            ->addCall('setLogger')
+            ->addCall("setLogger")
             ->rule(LoggerInterface::class)
-            ->setClass(SimpleScriptLogger::class)
-        ;
+            ->setClass(SimpleScriptLogger::class);
 
         return $container;
     }

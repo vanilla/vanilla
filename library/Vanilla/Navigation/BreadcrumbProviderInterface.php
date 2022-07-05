@@ -12,7 +12,8 @@ use Vanilla\Contracts\RecordInterface;
 /**
  * Some class that can map breadcrumbs to records.
  */
-interface BreadcrumbProviderInterface {
+interface BreadcrumbProviderInterface
+{
     /**
      * Get a breadcrumb array for a particular record.
      *

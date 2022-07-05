@@ -14,8 +14,8 @@ use VanillaTests\UsersAndRolesApiTestTrait;
 /**
  * Test CategoriesWidget.
  */
-class HtmlReactWidgetTest extends SiteTestCase {
-
+class HtmlReactWidgetTest extends SiteTestCase
+{
     use LayoutTestTrait, CommunityApiTestTrait, UsersAndRolesApiTestTrait;
 
     /**
@@ -27,9 +27,9 @@ class HtmlReactWidgetTest extends SiteTestCase {
      *
      * @dataProvider provideHtmlDatasTo
      */
-    public function testHydrateCategoriesWidget(array $input, array $expected = null, array $permissions = []) {
+    public function testHydrateCategoriesWidget(array $input, array $expected = null, array $permissions = [])
+    {
         $this->runWithPermissions(function () use ($input, $expected) {
-
             $this->assertHydratesTo($input, [], $expected);
         }, $permissions);
     }
@@ -37,63 +37,81 @@ class HtmlReactWidgetTest extends SiteTestCase {
     /**
      * @return iterable
      */
-    public function provideHtmlDatasTo(): iterable {
-
+    public function provideHtmlDatasTo(): iterable
+    {
         yield "Html with isAdvertisement is false without noAdd.use permission" => [
             [
-                '$hydrate' => 'react.html',
-                'html' => "<h1 style='margin-top: 0'>Hello Layout Editor</h1>",
-                'isAdvertisement' => false
+                '$hydrate' => "react.html",
+                "html" => "<h1 style='margin-top: 0'>Hello Layout Editor</h1>",
+                "isAdvertisement" => false,
             ],
             [
-                '$reactComponent' => 'HtmlWidget',
+                '$reactComponent' => "HtmlWidget",
                 '$reactProps' => [
-                    'html' => "<h1 style='margin-top: 0'>Hello Layout Editor</h1>",
-                    'isAdvertisement' => false
-                ]
+                    "html" => "<h1 style='margin-top: 0'>Hello Layout Editor</h1>",
+                    "isAdvertisement" => false,
+                ],
             ],
-            ['noAds.use' => false]
+            ["noAds.use" => false],
         ];
 
         yield "Html with isAdvertisement is false with noAdd.use permission" => [
             [
-                '$hydrate' => 'react.html',
-                'html' => "<h1 style='margin-top: 0'>Hello Layout Editor</h1>",
-                'isAdvertisement' => false
+                '$hydrate' => "react.html",
+                "html" => "<h1 style='margin-top: 0'>Hello Layout Editor</h1>",
+                "isAdvertisement" => false,
             ],
             [
-                '$reactComponent' => 'HtmlWidget',
+                '$reactComponent' => "HtmlWidget",
                 '$reactProps' => [
-                    'html' => "<h1 style='margin-top: 0'>Hello Layout Editor</h1>",
-                    'isAdvertisement' => false
-                ]
+                    "html" => "<h1 style='margin-top: 0'>Hello Layout Editor</h1>",
+                    "isAdvertisement" => false,
+                ],
             ],
-            ['noAds.use' => true]
+            ["noAds.use" => true],
         ];
         yield "Html with isAdvertisement is true without noAdd.use permission" => [
             [
-                '$hydrate' => 'react.html',
-                'html' => "<h1 style='margin-top: 0'>Hello Layout Editor</h1>",
-                'isAdvertisement' => true
+                '$hydrate' => "react.html",
+                "html" => "<h1 style='margin-top: 0'>Hello Layout Editor</h1>",
+                "isAdvertisement" => true,
             ],
             [
-                '$reactComponent' => 'HtmlWidget',
+                '$reactComponent' => "HtmlWidget",
                 '$reactProps' => [
-                    'html' => "<h1 style='margin-top: 0'>Hello Layout Editor</h1>",
-                    'isAdvertisement' => true
-                ]
+                    "html" => "<h1 style='margin-top: 0'>Hello Layout Editor</h1>",
+                    "isAdvertisement" => true,
+                ],
             ],
-            ['noAds.use' => false]
+            ["noAds.use" => false],
         ];
 
         yield "Html with isAdvertisement is true with noAdd.use permission" => [
             [
-                '$hydrate' => 'react.html',
-                'html' => "<h1 style='margin-top: 0'>Hello Layout Editor</h1>",
-                'isAdvertisement' => true
+                '$hydrate' => "react.html",
+                "html" => "<h1 style='margin-top: 0'>Hello Layout Editor</h1>",
+                "isAdvertisement" => true,
             ],
             null,
-            ['noAds.use' => true]
+            ["noAds.use" => true],
+        ];
+
+        yield "Adding javascript adds a nonce" => [
+            [
+                '$hydrate' => "react.html",
+                "html" => "<h1 style='margin-top: 0'>Hello Layout Editor</h1>",
+                "javascript" => "console.log('hello world')",
+            ],
+            [
+                '$reactComponent' => "HtmlWidget",
+                '$reactProps' => [
+                    "html" => "<h1 style='margin-top: 0'>Hello Layout Editor</h1>",
+                    "javascript" => "console.log('hello world')",
+                    "javascriptNonce" => "TEST_NONCE",
+                    "isAdvertisement" => false,
+                ],
+            ],
+            ["noAds.use" => true],
         ];
     }
 }

@@ -14,38 +14,39 @@ use Vanilla\Forms\FormOptions;
 /**
  * Class NavLinkSchema
  */
-class NavLinkSchema extends Schema {
-
+class NavLinkSchema extends Schema
+{
     /**
      * Configure the class.
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct([
-            'type' => 'object',
-            'properties' => [
-                'name' => [
-                    'type' => 'string',
-                    'minLength' => 1,
-                    'x-control' => SchemaForm::textBox(new FormOptions('Name', 'Link Name.')),
+            "type" => "object",
+            "properties" => [
+                "name" => [
+                    "type" => "string",
+                    "minLength" => 1,
+                    "x-control" => SchemaForm::textBox(new FormOptions("Name", "Link Name.")),
                 ],
-                'url' => [
-                    'type' => 'string',
-                    'minLength' => 1,
-                    'x-control' => SchemaForm::textBox(new FormOptions('URL', 'Link URL.')),
+                "url" => [
+                    "type" => "string",
+                    "minLength" => 1,
+                    "x-control" => SchemaForm::textBox(new FormOptions("URL", "Link URL.")),
                 ],
-                'id' => [
-                    'type' => 'string',
-                    'minLength' => 1,
+                "id" => [
+                    "type" => "string",
+                    "minLength" => 1,
                 ],
-                'permission' => [
-                    'type' => 'string',
-                    'minLength' => 1,
+                "permission" => [
+                    "type" => "string",
+                    "minLength" => 1,
                 ],
-                'isHidden' => [
-                    'type' => 'boolean',
+                "isHidden" => [
+                    "type" => "boolean",
                 ],
             ],
-            'required' => ['name', 'url'],
+            "required" => ["name", "url"],
         ]);
     }
 }

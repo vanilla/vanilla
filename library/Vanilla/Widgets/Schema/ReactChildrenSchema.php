@@ -13,21 +13,22 @@ use Garden\Schema\Schema;
 /**
  * Schema for react component props.
  */
-class ReactChildrenSchema extends Schema {
-
+class ReactChildrenSchema extends Schema
+{
     /**
      * Constructor.
      *
      * @param string|null $description Set a custom description.
      */
-    public function __construct(string $description = null) {
+    public function __construct(string $description = null)
+    {
         $childSchema = (new ReactSingleChildSchema())->getSchemaArray();
         parent::__construct([
-            'description' => $description ?? 'Render a list of react components.',
+            "description" => $description ?? "Render a list of react components.",
             HydrateableSchema::X_NO_HYDRATE => true,
             HydrateableSchema::X_FORCE_HYDRATE_ITEMS => true,
-            'type' => 'array',
-            'items' => $childSchema,
+            "type" => "array",
+            "items" => $childSchema,
         ]);
         $this->addFilter("", function ($field) {
             // Some children might have become null after a middleware.

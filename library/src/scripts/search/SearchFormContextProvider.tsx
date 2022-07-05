@@ -244,7 +244,7 @@ export function SearchFormContextProvider(props: IProps) {
      * Generate and store a hash representing the form query and the search source
      */
     const updateHashedEventStore = (form: ISearchForm, source: ISearchSource): void => {
-        const hash = stableObjectHash({ query: form.query, key: source.key });
+        const hash = stableObjectHash({ query: form.query, domain: form.domain, key: source.key });
         setHashedSearchEvents((prevValues) => {
             return [...new Set([...prevValues, hash])];
         });
@@ -256,7 +256,7 @@ export function SearchFormContextProvider(props: IProps) {
      * spams the search button
      */
     const shouldDispatchAnalyticsEvent = (form: ISearchForm, source: ISearchSource): boolean => {
-        const hash = stableObjectHash({ query: form.query, key: source.key });
+        const hash = stableObjectHash({ query: form.query, domain: form.domain, key: source.key });
         return !hashedSearchEvents.includes(hash);
     };
 

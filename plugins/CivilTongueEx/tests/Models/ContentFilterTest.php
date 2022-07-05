@@ -17,8 +17,8 @@ use VanillaTests\SiteTestTrait;
 /**
  * Class ContentFilterTest
  */
-class ContentFilterTest extends SiteTestCase {
-
+class ContentFilterTest extends SiteTestCase
+{
     use SetupTraitsTrait;
 
     /** @var ContentFilter */
@@ -29,8 +29,9 @@ class ContentFilterTest extends SiteTestCase {
      *
      * @return string[] Returns an array of addon names.
      */
-    protected static function getAddons(): array {
-        return ['civiltongueex'];
+    protected static function getAddons(): array
+    {
+        return ["civiltongueex"];
     }
 
     /**
@@ -38,7 +39,8 @@ class ContentFilterTest extends SiteTestCase {
      *
      * @param Container $container
      */
-    public static function configureContainerBeforeStartup(Container $container) {
+    public static function configureContainerBeforeStartup(Container $container)
+    {
         self::$contentFilter = new ContentFilter();
         $container->setInstance(ContentFilter::class, self::$contentFilter);
     }
@@ -51,8 +53,9 @@ class ContentFilterTest extends SiteTestCase {
      * @param string string $expected
      * @dataProvider providePatternList
      */
-    public function testReplace(string $patternList, string $text, string $expected) {
-        self::$contentFilter->setReplacement('****');
+    public function testReplace(string $patternList, string $text, string $expected)
+    {
+        self::$contentFilter->setReplacement("****");
         self::$contentFilter->setWords($patternList);
         $result = self::$contentFilter->replace($text);
         $this->AssertSame($expected, $result);
@@ -62,18 +65,19 @@ class ContentFilterTest extends SiteTestCase {
     /**
      * Test Civil Tongue via APIs for integration testing.
      */
-    public function testActivityItems(): void {
-        self::$contentFilter->setReplacement('dog');
-        self::$contentFilter->setWords('cat');
-        $response = $this->bessy()->post('/activity/post/public', [
-            'Format' => 'Markdown',
-            'Comment' => 'cat food'
+    public function testActivityItems(): void
+    {
+        self::$contentFilter->setReplacement("dog");
+        self::$contentFilter->setWords("cat");
+        $response = $this->bessy()->post("/activity/post/public", [
+            "Format" => "Markdown",
+            "Comment" => "cat food",
         ]);
-        $activityID = $response->Data['Activities'][0]['ActivityID'] ?? null;
+        $activityID = $response->Data["Activities"][0]["ActivityID"] ?? null;
         $this->assertNotNull($activityID);
 
-        $activity = $this->bessy()->getJsonData('/activity/item/' . $activityID);
-        $this->assertSame('dog food', $activity['Activities'][0]['Story']);
+        $activity = $this->bessy()->getJsonData("/activity/item/" . $activityID);
+        $this->assertSame("dog food", $activity["Activities"][0]["Story"]);
     }
 
     /**
@@ -81,21 +85,26 @@ class ContentFilterTest extends SiteTestCase {
      *
      * @return array Provider data.
      */
-    public function providePatternList() {
+    public function providePatternList()
+    {
         $provider = [
-            'General' => ['poop;$hit;a$$', 'This poop is the text.', 'This **** is the text.'],
-            'TextBeginsWithSwear' => ['poop;$hit;a$$', 'poop the text', '**** the text'],
-            'TextEndsWithSwear' => ['poop;$hit;a$$', 'The text is poop', 'The text is ****'],
-            'SwearEndsWithDollarSign' => ['poop;$hit;a$$', 'The text is a$$', 'The text is ****'],
-            'SwearStartsWithDollarSign' => ['poop;$hit;a$$', '$hit the text', '**** the text'],
-            'SwearHasDollarSign' => ['poop;$hit;a$$', '$hithead the text', '$hithead the text'],
-            'SwearHasCamelCase' => ['poop;$hit;a$$', 'PoOp the text', '**** the text'],
-            'Thai 1' => ['อี', 'อี', '****'],
-            'Thai 2' => ['อี เหี้ย', 'อี เหี้ย', '****'],
-            'Thai 3' => ['อี เหี้ย', 'อี เหี้ย', '****'],
-            'Thai 3 multiple ' => ['หน้าตัวเมีย;อี', 'หน้าตัวเมีย อี', '**** ****'],
-            'Thai 3 multiple eng' => ['หน้าตัวเมีย;อี;block', 'หน้าตัวเมีย อี block', '**** **** ****'],
-            'Thai 3 multiple eng 2' => ['หน้าตัวเมีย;อี;block', 'หน้าตัวเมีย อี block not blocked', '**** **** **** not blocked']
+            "General" => ['poop;$hit;a$$', "This poop is the text.", "This **** is the text."],
+            "TextBeginsWithSwear" => ['poop;$hit;a$$', "poop the text", "**** the text"],
+            "TextEndsWithSwear" => ['poop;$hit;a$$', "The text is poop", "The text is ****"],
+            "SwearEndsWithDollarSign" => ['poop;$hit;a$$', 'The text is a$$', "The text is ****"],
+            "SwearStartsWithDollarSign" => ['poop;$hit;a$$', '$hit the text', "**** the text"],
+            "SwearHasDollarSign" => ['poop;$hit;a$$', '$hithead the text', '$hithead the text'],
+            "SwearHasCamelCase" => ['poop;$hit;a$$', "PoOp the text", "**** the text"],
+            "Thai 1" => ["อี", "อี", "****"],
+            "Thai 2" => ["อี เหี้ย", "อี เหี้ย", "****"],
+            "Thai 3" => ["อี เหี้ย", "อี เหี้ย", "****"],
+            "Thai 3 multiple " => ["หน้าตัวเมีย;อี", "หน้าตัวเมีย อี", "**** ****"],
+            "Thai 3 multiple eng" => ["หน้าตัวเมีย;อี;block", "หน้าตัวเมีย อี block", "**** **** ****"],
+            "Thai 3 multiple eng 2" => [
+                "หน้าตัวเมีย;อี;block",
+                "หน้าตัวเมีย อี block not blocked",
+                "**** **** **** not blocked",
+            ],
         ];
         return $provider;
     }

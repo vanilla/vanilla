@@ -13,17 +13,17 @@
  * Class Gdn_Condition
  * @deprecated
  */
-class Gdn_Condition {
+class Gdn_Condition
+{
+    const PERMISSION = "permission";
 
-    const PERMISSION = 'permission';
+    const REQUEST = "request";
 
-    const REQUEST = 'request';
+    const ROLE = "role";
 
-    const ROLE = 'role';
+    const COMPARE_AND = "and";
 
-    const COMPARE_AND = 'and';
-
-    const COMPARE_OR = 'or';
+    const COMPARE_OR = "or";
 
     public static $compareType = self::COMPARE_OR;
 
@@ -32,7 +32,8 @@ class Gdn_Condition {
      *
      * @return array
      */
-    public static function allTypes() {
+    public static function allTypes()
+    {
         return [self::PERMISSION => self::PERMISSION, self::ROLE => self::ROLE];
     }
 
@@ -41,8 +42,9 @@ class Gdn_Condition {
      *
      * @return array
      */
-    public static function blank() {
-        return ['', '', ''];
+    public static function blank()
+    {
+        return ["", "", ""];
     }
 
     /**
@@ -54,15 +56,16 @@ class Gdn_Condition {
      * @return array A conditions array suitable to be passed to Gdn_Condition::test().
      * @see Gdn_Condition::toString().
      */
-    public static function fromString($string) {
+    public static function fromString($string)
+    {
         $result = [];
 
         // Each condition is delimited by a newline.
         $conditions = explode("\n", $string);
         foreach ($conditions as $conditionString) {
             // Each part of the condition is delimited by a comma.
-            $condition = explode(',', $conditionString, 3);
-            $result[] = array_map('trim', $condition);
+            $condition = explode(",", $conditionString, 3);
+            $result[] = array_map("trim", $condition);
         }
         return $result;
     }
@@ -76,7 +79,8 @@ class Gdn_Condition {
      *  - 2: The expression to test against (optional).
      * @return bool
      */
-    public static function test($conditions) {
+    public static function test($conditions)
+    {
         if (!is_array($conditions)) {
             return false;
         }
@@ -111,7 +115,8 @@ class Gdn_Condition {
      * @param string $expr The expression to test with.
      * @return bool
      */
-    public static function testOne($type, $field, $expr = null) {
+    public static function testOne($type, $field, $expr = null)
+    {
         switch (strtolower($type)) {
             case PERMISSION:
                 // Check to see if the user has the given permission.
@@ -123,12 +128,12 @@ class Gdn_Condition {
             case REQUEST:
                 // See if the field is a specific value.
                 switch (strtolower($field)) {
-                    case 'path':
+                    case "path":
                         $value = Gdn::request()->path();
                         break;
                     default:
                         // See if the field is targetting a specific part of the request.
-                        $fields = explode('.', $field, 2);
+                        $fields = explode(".", $field, 2);
                         if (count($fields) >= 2) {
                             $value = Gdn::request()->getValueFrom($fields[0], $fields[1], null);
                         } else {
@@ -145,9 +150,9 @@ class Gdn_Condition {
                 $roles = $roleModel->getByUserID(Gdn::session()->UserID)->resultArray();
                 foreach ($roles as $role) {
                     if (is_numeric($expr)) {
-                        $result = $expr == val('RoleID', $role);
+                        $result = $expr == val("RoleID", $role);
                     } else {
-                        $result = Gdn_Condition::testValue(val('Name', $role), $expr);
+                        $result = Gdn_Condition::testValue(val("Name", $role), $expr);
                     }
                     if ($result) {
                         return true;
@@ -166,12 +171,13 @@ class Gdn_Condition {
      *  - <b>Enclosed in backticks (`..`): A preg_match() is performed.
      *  - <b>Otherwise</b>: A simple $value == $expr is tested.
      */
-    public static function testValue($value, $expr) {
+    public static function testValue($value, $expr)
+    {
         if (!is_string($expr)) {
             return false;
         }
 
-        if (strlen($expr) > 1 && $expr[0] === '`' && $expr[strlen($expr) - 1] == '`') {
+        if (strlen($expr) > 1 && $expr[0] === "`" && $expr[strlen($expr) - 1] == "`") {
             $result = preg_match($expr, $value);
         } else {
             $result = $value == $expr;
@@ -186,8 +192,9 @@ class Gdn_Condition {
      * @return string
      * @see Gdn_Condition::test()
      */
-    public static function toString($conditions) {
-        $result = '';
+    public static function toString($conditions)
+    {
+        $result = "";
 
         foreach ($conditions as $condition) {
             if (!is_array($condition) || count($condition) < 2) {

@@ -57,12 +57,7 @@ yargs
         string: true,
         default: "",
     })
-    .options("debug", { default: false, boolean: true })
-    .options("modern", {
-        alias: "m",
-        default: false,
-        boolean: true,
-    });
+    .options("debug", { default: false, boolean: true });
 
 export interface IBuildOptions {
     mode: BuildMode;
@@ -78,7 +73,6 @@ export interface IBuildOptions {
     debug: boolean;
     circular: boolean;
     sections: string[] | null;
-    modern: boolean;
 }
 
 /**
@@ -145,6 +139,5 @@ export async function getOptions(): Promise<IBuildOptions> {
         debug: yargs.argv.debug as boolean,
         circular: yargs.argv.circular as boolean,
         sections,
-        modern: yargs.argv.modern as boolean,
     };
 }

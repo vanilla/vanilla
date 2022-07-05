@@ -4,9 +4,10 @@
  * @license gpl-2.0-only
  */
 
-const enzyme = require('enzyme');
-const Adapter = require('enzyme-adapter-react-16');
-const registerRequireContextHook = require('babel-plugin-require-context-hook/register');
+const enzyme = require("enzyme");
+const Adapter = require("enzyme-adapter-react-16");
+const registerRequireContextHook = require("babel-plugin-require-context-hook/register");
+require("@testing-library/jest-dom/extend-expect");
 
 enzyme.configure({ adapter: new Adapter() });
 registerRequireContextHook();

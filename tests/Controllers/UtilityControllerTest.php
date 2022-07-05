@@ -16,9 +16,9 @@ use VanillaTests\SiteTestCase;
 /**
  * Tests for the utility controller.
  */
-class UtilityControllerTest extends SiteTestCase {
-
-    public static $addons = ['bad-structure'];
+class UtilityControllerTest extends SiteTestCase
+{
+    public static $addons = ["bad-structure"];
 
     /**
      * Test that failures in the UpdateModel are reported properly.
@@ -28,7 +28,8 @@ class UtilityControllerTest extends SiteTestCase {
      *
      * @dataProvider provideUpdateFailureResponse
      */
-    public function testUpdateFailureResponse(array $config, array $requestBody = []) {
+    public function testUpdateFailureResponse(array $config, array $requestBody = [])
+    {
         $this->runWithConfig($config, function () use ($requestBody) {
             $response = $this->bessy()->postJsonData("/utility/update", $requestBody);
             $this->assertEquals(500, $response->getStatus());
@@ -43,18 +44,17 @@ class UtilityControllerTest extends SiteTestCase {
     /**
      * @return array[]
      */
-    public function provideUpdateFailureResponse(): array {
+    public function provideUpdateFailureResponse(): array
+    {
         return [
-            'With update token, debug' => [
+            "With update token, debug" => [
                 [
-                    'Feature.updateTokens.Enabled' => true,
-                    'Garden.UpdateToken' => 'secret',
+                    "Feature.updateTokens.Enabled" => true,
+                    "Garden.UpdateToken" => "secret",
                 ],
-                ['updateToken' => 'secret'],
+                ["updateToken" => "secret"],
             ],
-            'No update token, debug' => [
-                ['Feature.updateTokens.Enabled' => false],
-            ],
+            "No update token, debug" => [["Feature.updateTokens.Enabled" => false]],
         ];
     }
 }

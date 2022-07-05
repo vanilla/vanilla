@@ -12,8 +12,8 @@ use Vanilla\Utility\SchemaUtils;
 /**
  * Item to handle search results.
  */
-class SearchResults implements \IteratorAggregate, \JsonSerializable, \Countable {
-
+class SearchResults implements \IteratorAggregate, \JsonSerializable, \Countable
+{
     /** @var SearchResultItem[] */
     private $resultItems;
 
@@ -37,7 +37,8 @@ class SearchResults implements \IteratorAggregate, \JsonSerializable, \Countable
      * @param int $offset
      * @param int $limit
      */
-    public function __construct(array $resultItems, int $totalCount, int $offset, int $limit, array $terms = []) {
+    public function __construct(array $resultItems, int $totalCount, int $offset, int $limit, array $terms = [])
+    {
         $this->resultItems = $resultItems;
         $this->totalCount = $totalCount;
         $this->offset = $offset;
@@ -48,7 +49,8 @@ class SearchResults implements \IteratorAggregate, \JsonSerializable, \Countable
     /**
      * @return SearchResultItem[]
      */
-    public function getResultItems(): array {
+    public function getResultItems(): array
+    {
         return $this->resultItems;
     }
 
@@ -57,44 +59,50 @@ class SearchResults implements \IteratorAggregate, \JsonSerializable, \Countable
      *
      * @param int $key
      */
-    public function removeResultItem(int $key) {
-         unset($this->resultItems[$key]);
-         $this->resultItems = array_values($this->resultItems);
-         $this->totalCount--;
+    public function removeResultItem(int $key)
+    {
+        unset($this->resultItems[$key]);
+        $this->resultItems = array_values($this->resultItems);
+        $this->totalCount--;
     }
 
     /**
      * @return int
      */
-    public function getResultCount(): int {
+    public function getResultCount(): int
+    {
         return count($this->resultItems);
     }
 
     /**
      * @return int
      */
-    public function getTotalCount(): int {
+    public function getTotalCount(): int
+    {
         return $this->totalCount;
     }
 
     /**
      * @return int
      */
-    public function getOffset(): int {
+    public function getOffset(): int
+    {
         return $this->offset;
     }
 
     /**
      * @return int
      */
-    public function getLimit(): int {
+    public function getLimit(): int
+    {
         return $this->limit;
     }
 
     /**
      * @return string[]
      */
-    public function getTerms(): array {
+    public function getTerms(): array
+    {
         return $this->terms;
     }
 
@@ -105,21 +113,24 @@ class SearchResults implements \IteratorAggregate, \JsonSerializable, \Countable
     /**
      * @inheritdoc
      */
-    public function jsonSerialize() {
+    public function jsonSerialize()
+    {
         return $this->resultItems;
     }
 
     /**
      * @inheritdoc
      */
-    public function getIterator() {
+    public function getIterator()
+    {
         return new \ArrayIterator($this->resultItems);
     }
 
     /**
      * @inheritdoc
      */
-    public function count() {
+    public function count()
+    {
         return count($this->resultItems);
     }
 
@@ -128,7 +139,8 @@ class SearchResults implements \IteratorAggregate, \JsonSerializable, \Countable
      *
      * @return array
      */
-    public function asLegacyResults(): array {
+    public function asLegacyResults(): array
+    {
         $results = [];
         $schema = SearchResultItem::legacySchema();
         foreach ($this->resultItems as $serviceResult) {

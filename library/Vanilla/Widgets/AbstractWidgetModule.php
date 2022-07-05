@@ -14,31 +14,34 @@ use Vanilla\Contracts\Addons\WidgetInterface;
  *
  * @package Vanilla\Widgets
  */
-abstract class AbstractWidgetModule extends Gdn_Module implements WidgetInterface {
-
+abstract class AbstractWidgetModule extends Gdn_Module implements WidgetInterface
+{
     /**
      * @var string $moduleName
      */
-    public $moduleName = '';
+    public $moduleName = "";
 
     /**
      * Construct
      */
-    public function __construct() {
-        parent::__construct('', false);
+    public function __construct()
+    {
+        parent::__construct("", false);
     }
 
     /**
      * @inheritDoc
      */
-    public static function getWidgetClass():string {
+    public static function getWidgetClass(): string
+    {
         return static::class;
     }
 
     /**
      * @inheritDoc
      */
-    public static function getWidgetID():string {
+    public static function getWidgetID(): string
+    {
         return slugify(static::getWidgetName());
     }
 
@@ -47,7 +50,8 @@ abstract class AbstractWidgetModule extends Gdn_Module implements WidgetInterfac
      *
      * @return string
      */
-    public function assetTarget() {
-        return 'Content';
+    public function assetTarget()
+    {
+        return "Content";
     }
 }

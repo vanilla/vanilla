@@ -10,8 +10,8 @@ namespace Vanilla\Widgets;
 /**
  * Service for collecting registrations of TabWidgetTabFactory.
  */
-class TabWidgetTabService {
-
+class TabWidgetTabService
+{
     /** @var AbstractTabWidgetTabFactory[] */
     private $tabFactories = [];
 
@@ -20,7 +20,8 @@ class TabWidgetTabService {
      *
      * @param AbstractTabWidgetTabFactory $tabFactory
      */
-    public function registerTabFactory(AbstractTabWidgetTabFactory $tabFactory): void {
+    public function registerTabFactory(AbstractTabWidgetTabFactory $tabFactory): void
+    {
         $this->tabFactories[$tabFactory->getTabPresetID()] = $tabFactory;
     }
 
@@ -29,7 +30,8 @@ class TabWidgetTabService {
      *
      * @return AbstractTabWidgetTabFactory[]
      */
-    public function getTabFactories(): array {
+    public function getTabFactories(): array
+    {
         return $this->tabFactories;
     }
 
@@ -38,7 +40,8 @@ class TabWidgetTabService {
      *
      * @return AbstractTabWidgetTabFactory[]
      */
-    public function getDefaultFactories(): array {
+    public function getDefaultFactories(): array
+    {
         $defaults = [];
         foreach ($this->getTabFactories() as $key => $factory) {
             if ($factory->isDefault()) {
@@ -55,7 +58,8 @@ class TabWidgetTabService {
      *
      * @return AbstractTabWidgetTabFactory|null
      */
-    public function findTabFactory(string $tabPresetID): ?AbstractTabWidgetTabFactory {
+    public function findTabFactory(string $tabPresetID): ?AbstractTabWidgetTabFactory
+    {
         return $this->tabFactories[$tabPresetID] ?? null;
     }
 }

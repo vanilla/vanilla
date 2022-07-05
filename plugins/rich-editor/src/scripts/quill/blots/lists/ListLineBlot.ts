@@ -279,9 +279,9 @@ export class ListLineBlot extends LineBlot implements Blot {
             }
             const split = parent.split(this.offset(parent));
             parent.reverseOptimizeUnwrapping(true);
-            const replacement = (typeof formatName === "string"
-                ? Parchment.create(formatName, value)
-                : formatName) as Container;
+            const replacement = (
+                typeof formatName === "string" ? Parchment.create(formatName, value) : formatName
+            ) as Container;
             this.moveChildren(replacement);
             this.scroll.insertBefore(replacement, split);
             this.remove();

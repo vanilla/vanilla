@@ -16,6 +16,7 @@ import { colorPickerClasses } from "@dashboard/components/ColorPicker.styles";
 import "./ColorPicker.scss";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { cx } from "@emotion/css";
+import { ClearButton } from "@library/forms/select/ClearButton";
 
 interface IProps extends Omit<React.HTMLAttributes<HTMLInputElement>, "type" | "id" | "tabIndex" | "onChange"> {
     rootClassName?: string;
@@ -27,7 +28,10 @@ interface IProps extends Omit<React.HTMLAttributes<HTMLInputElement>, "type" | "
     inputID?: string;
     labelID?: string;
     isInvalid?: (invalid: boolean) => void;
+    placeholder?: string;
 }
+
+const PICKER_DEFAULT_BACKGROUND = "#037DBC";
 
 export function ColorPicker(_props: IProps) {
     const {
@@ -40,6 +44,7 @@ export function ColorPicker(_props: IProps) {
         inputID,
         labelID,
         isInvalid,
+        placeholder,
     } = _props;
 
     const classes = colorPickerClasses();
@@ -67,7 +72,8 @@ export function ColorPicker(_props: IProps) {
         if (colorString === "") {
             // we are clearing our color to the default.
             setCurrentlySelectedColor(colorString);
-            setLastValidColor(value ?? null);
+            onChange && onChange(colorString);
+            setLastValidColor("");
         } else if (stringIsValidColor(colorString)) {
             setCurrentlySelectedColor(colorString); // Only set valid color if passes validation
             setLastValidColor(colorString);
@@ -105,7 +111,11 @@ export function ColorPicker(_props: IProps) {
     // Handle updates from the color picker.
     const onPickerChange = (newColor: string) => {
         // Will always be valid color, since it's a real picker
-        if (newColor) {
+        //in case its our default picker color, we need to make sure we actually want that color and its not just empty input
+        if (
+            newColor &&
+            (newColor !== PICKER_DEFAULT_BACKGROUND || currentlySelectedColor === PICKER_DEFAULT_BACKGROUND)
+        ) {
             handleColorChangeRef.current = handleColorChange;
             _debouncedPickerUpdate(newColor);
         }
@@ -113,7 +123,7 @@ export function ColorPicker(_props: IProps) {
 
     const defaultColorString = currentlySelectedColor
         ? ensureColorHelper(currentlySelectedColor).toHexString()
-        : "#037dbc";
+        : PICKER_DEFAULT_BACKGROUND;
     const validColorString = lastValidColor ? ensureColorHelper(lastValidColor).toHexString() : defaultColorString;
 
     return (
@@ -126,13 +136,16 @@ export function ColorPicker(_props: IProps) {
                     aria-describedby={labelID}
                     aria-hidden={true}
                     className={cx(inputClassName)}
-                    placeholder={defaultColorString}
+                    placeholder={placeholder ?? defaultColorString}
                     value={textInputValue ?? ""} // Null is not an allowed value for an input.
                     onChange={onTextChange}
                     auto-correct="false"
                     disabled={disabled}
                     aria-disabled={disabled}
                 />
+                {textInputValue && (
+                    <ClearButton className={classes.clearButton} onClick={(e) => handleColorChange("")} />
+                )}
                 <Picker
                     onChange={onPickerChange}
                     validColorString={validColorString}

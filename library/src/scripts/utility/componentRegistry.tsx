@@ -5,7 +5,7 @@
 
 import { resetThemeCache } from "@library/styles/themeCache";
 import { IComponentMountOptions, IMountable, mountReact, mountReactMultiple } from "@vanilla/react-utils";
-import { logDebug, logWarning } from "@vanilla/utils";
+import { logDebug, logError, logWarning } from "@vanilla/utils";
 import React from "react";
 
 let useTheme = true;
@@ -112,8 +112,8 @@ export function componentExists(name: string): boolean {
  * @param name The name of the component.
  * @returns Returns the component or **undefined** if there is no registered component.
  */
-export function getComponent(name: string): IRegisteredComponent | undefined {
-    return _components[name.toLowerCase()];
+export function getComponent(name: string): IRegisteredComponent | null {
+    return _components[name.toLowerCase()] ?? null;
 }
 
 /**
@@ -124,6 +124,8 @@ export function getComponent(name: string): IRegisteredComponent | undefined {
  * @param parent - The parent element to search. This element is not included in the search.
  */
 export async function _mountComponents(parent: Element) {
+    performance.mark("Mount Components - Start");
+    logDebug("Mounting react components");
     const awaiting: Array<Promise<any>> = [];
     const parentPage = parent.querySelector("#app");
     let mountables: IMountable[] = [];
@@ -131,6 +133,7 @@ export async function _mountComponents(parent: Element) {
     if (parentPage instanceof HTMLElement && _pageComponent !== null && !_mountedPage) {
         _mountedPage = true;
         let PageComponentToMount = _pageComponent;
+        logDebug("Found page component to mount", _pageComponent);
         mountables.push({
             target: parentPage,
             component: <PageComponentToMount />,
@@ -151,7 +154,7 @@ export async function _mountComponents(parent: Element) {
             try {
                 props = JSON.parse(props);
             } catch (err) {
-                console.error(err, { node, name, props });
+                logError(err, { node, name, props });
                 return;
             }
         }
@@ -175,7 +178,16 @@ export async function _mountComponents(parent: Element) {
         if (registeredComponent.mountOptions?.bypassPortalManager) {
             awaiting.push(
                 new Promise<void>((resolve) => {
-                    mountReact(reactNode, node, () => resolve(), registeredComponent.mountOptions);
+                    performance.mark(`Mount Components - ${name} - Start`);
+                    mountReact(
+                        reactNode,
+                        node,
+                        () => {
+                            performance.mark(`Mount Components - ${name} - End`);
+                            resolve();
+                        },
+                        registeredComponent.mountOptions,
+                    );
                 }),
             );
         } else {
@@ -198,5 +210,7 @@ export async function _mountComponents(parent: Element) {
         }),
     );
 
-    await Promise.all(awaiting);
+    await Promise.all(awaiting).finally(() => {
+        performance.mark("Mount Components - End");
+    });
 }

@@ -16,9 +16,10 @@ import { getOptions } from "../buildOptions";
  * @param section - The section of the app to build. Eg. forum | admin | knowledge.
  */
 export async function makeDevConfig(entryModel: EntryModel, section: string) {
-    const baseConfig: Configuration = await makeBaseConfig(entryModel, section, false);
+    const baseConfig: Configuration = await makeBaseConfig(entryModel, section);
     const sectionEntries = await entryModel.getDevEntries(section);
     baseConfig.mode = "development";
+    baseConfig.stats = "none";
     baseConfig.entry = sectionEntries;
     baseConfig.devtool = "cheap-module-source-map";
     baseConfig.output = {
@@ -26,13 +27,14 @@ export async function makeDevConfig(entryModel: EntryModel, section: string) {
         chunkFilename: `[name]-[chunkhash]-${section}.chunk.js`,
         publicPath: `https://webpack.vanilla.localhost:3030/`,
     };
+    baseConfig.experiments = {
+        lazyCompilation: {
+            entries: true,
+            imports: false,
+        },
+    };
 
-    baseConfig.plugins!.push(new webpack.HotModuleReplacementPlugin());
-    baseConfig.plugins!.push(
-        new ReactRefreshPlugin({
-            forceEnable: true,
-        }),
-    );
+    baseConfig.plugins!.push(new ReactRefreshPlugin({}));
     baseConfig.plugins!.push(
         new webpack.DefinePlugin({
             "process.env.NODE_ENV": JSON.stringify("development"),

@@ -8,26 +8,26 @@
  */
 
 // Environment
-define('ENVIRONMENT_PHP_VERSION', '7.2');
-define('ENVIRONMENT_PHP_NEXT_VERSION', '7.3');
+define("ENVIRONMENT_PHP_VERSION", "7.2");
+define("ENVIRONMENT_PHP_NEXT_VERSION", "7.3");
 
 if (version_compare(phpversion(), ENVIRONMENT_PHP_VERSION) < 0) {
-    die('Vanilla requires PHP '.ENVIRONMENT_PHP_VERSION.' or greater.');
+    die("Vanilla requires PHP " . ENVIRONMENT_PHP_VERSION . " or greater.");
 }
 
 // Define the constants we need to get going.
-if (!defined('APPLICATION')) {
-    define('APPLICATION', 'Vanilla');
+if (!defined("APPLICATION")) {
+    define("APPLICATION", "Vanilla");
 }
-if (!defined('DS')) {
-    define('DS', DIRECTORY_SEPARATOR);
+if (!defined("DS")) {
+    define("DS", DIRECTORY_SEPARATOR);
 }
-if (!defined('PATH_ROOT')) {
-    define('PATH_ROOT', getcwd());
+if (!defined("PATH_ROOT")) {
+    define("PATH_ROOT", getcwd());
 }
 
 // Disable Phar stream
-stream_wrapper_unregister('phar');
+stream_wrapper_unregister("phar");
 
 /**
  * Bootstrap Before
@@ -36,9 +36,9 @@ stream_wrapper_unregister('phar');
  * real work has been done. Nothing has been included yet, aside from this file.
  * No Garden features are available yet.
  */
-$isWeb = PHP_SAPI !== 'cli' && isset($_SERVER['REQUEST_METHOD']);
-if ($isWeb && file_exists(PATH_ROOT.'/conf/bootstrap.before.php')) {
-    require_once PATH_ROOT.'/conf/bootstrap.before.php';
+$isWeb = PHP_SAPI !== "cli" && isset($_SERVER["REQUEST_METHOD"]);
+if ($isWeb && file_exists(PATH_ROOT . "/conf/bootstrap.before.php")) {
+    require_once PATH_ROOT . "/conf/bootstrap.before.php";
 }
 
 /**
@@ -50,37 +50,37 @@ if ($isWeb && file_exists(PATH_ROOT.'/conf/bootstrap.before.php')) {
  */
 
 // Path to the primary configuration file.
-if (!defined('PATH_CONF')) {
-    define('PATH_CONF', PATH_ROOT.'/conf');
+if (!defined("PATH_CONF")) {
+    define("PATH_CONF", PATH_ROOT . "/conf");
 }
 
 // Include default constants.
-require_once PATH_CONF.'/constants.php';
+require_once PATH_CONF . "/constants.php";
 
 // Make sure a default time zone is set.
 // Do NOT edit this. See config `Garden.GuestTimeZone`.
-date_default_timezone_set('UTC');
+date_default_timezone_set("UTC");
 
 // Make sure the mb_* functions are utf8.
-if (function_exists('mb_internal_encoding')) {
-    mb_internal_encoding('UTF-8');
+if (function_exists("mb_internal_encoding")) {
+    mb_internal_encoding("UTF-8");
 }
 ini_set("default_charset", "UTF-8");
 
 // Include the core autoloader.
-if (!include_once PATH_ROOT.'/vendor/autoload.php') {
-    die("Could not find the autoloader. Did you forget to run 'composer install' in '".PATH_ROOT."' ?\n");
+if (!include_once PATH_ROOT . "/vendor/autoload.php") {
+    die("Could not find the autoloader. Did you forget to run 'composer install' in '" . PATH_ROOT . "' ?\n");
 }
-spl_autoload_register([Vanilla\AliasLoader::class, 'autoload']);
+spl_autoload_register([Vanilla\AliasLoader::class, "autoload"]);
 
 // Classes are autoloaded
 // Let's load up the application version.
-if (!defined('APPLICATION_VERSION')) {
+if (!defined("APPLICATION_VERSION")) {
     $version = "unknown";
     try {
-        $version = \Vanilla\FileUtils::getCached(PATH_CACHE . '/version.php', function () {
-            $versionJsonContents = \Vanilla\FileUtils::getArray(PATH_ROOT . '/version.json');
-            return $versionJsonContents['version'] ?? 'unknown';
+        $version = \Vanilla\FileUtils::getCached(PATH_CACHE . "/version.php", function () {
+            $versionJsonContents = \Vanilla\FileUtils::getArray(PATH_ROOT . "/version.json");
+            return $versionJsonContents["version"] ?? "unknown";
         });
     } catch (Throwable $e) {
         // Don't completely blow up if we can't load this file.
@@ -89,5 +89,5 @@ if (!defined('APPLICATION_VERSION')) {
 
     // Rules for the versioning
     // {Release version}-{? SNAPSHOT if it's a dev build}
-    define('APPLICATION_VERSION', $version);
+    define("APPLICATION_VERSION", $version);
 }

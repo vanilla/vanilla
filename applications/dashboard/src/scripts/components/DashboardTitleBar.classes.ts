@@ -17,7 +17,7 @@ export const DashboardTitleBarClasses = useThemeCache(() => {
         height: 48,
         position: "sticky",
         top: 0,
-        zIndex: 5,
+        zIndex: 1051,
     });
 
     const flexContainer = css({
@@ -55,18 +55,20 @@ export const DashboardTitleBarClasses = useThemeCache(() => {
         minWidth: 168,
     });
 
-    const logo = css({
-        width: 65,
+    const logoContainer = css({
+        width: 79,
+        color: ColorsUtils.colorOut(globalVars.elementaryColors.white),
+
         height: "100%",
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",
+    });
 
-        svg: {
-            width: "100%",
-            height: "auto",
-        },
+    const logo = css({
+        width: 79,
+        height: 32,
     });
 
     const nav = css({
@@ -118,6 +120,7 @@ export const DashboardTitleBarClasses = useThemeCache(() => {
         flexContainer,
         brand,
         backBtn,
+        logoContainer,
         logo,
         nav,
         link,

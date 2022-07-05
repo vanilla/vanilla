@@ -15,8 +15,8 @@ use Vanilla\Web\JsInterpop\ReduxActionProviderInterface;
 /**
  * Page preloader for current user.
  */
-class CurrentUserPreloadProvider implements ReduxActionProviderInterface {
-
+class CurrentUserPreloadProvider implements ReduxActionProviderInterface
+{
     /** @var InternalClient */
     private $internalClient;
 
@@ -29,7 +29,8 @@ class CurrentUserPreloadProvider implements ReduxActionProviderInterface {
      * @param InternalClient $internalClient
      * @param \Gdn_Session $session
      */
-    public function __construct(InternalClient $internalClient, \Gdn_Session $session) {
+    public function __construct(InternalClient $internalClient, \Gdn_Session $session)
+    {
         $this->internalClient = $internalClient;
         $this->session = $session;
     }
@@ -37,12 +38,15 @@ class CurrentUserPreloadProvider implements ReduxActionProviderInterface {
     /**
      * @inheritdoc
      */
-    public function createActions(): array {
+    public function createActions(): array
+    {
         $user = $this->internalClient->get("/api/v2/users/me")->getBody();
-        $permissions = $this->internalClient->get("/api/v2/users/{$this->session->UserID}/permissions", ['expand' => 'junctions'])->getBody();
+        $permissions = $this->internalClient
+            ->get("/api/v2/users/{$this->session->UserID}/permissions", ["expand" => "junctions"])
+            ->getBody();
         return [
             new ReduxAction(\UsersApiController::ME_ACTION_CONSTANT, Data::box($user), []),
-            new ReduxAction(\UsersApiController::PERMISSIONS_ACTION_CONSTANT, Data::box($permissions), [])
+            new ReduxAction(\UsersApiController::PERMISSIONS_ACTION_CONSTANT, Data::box($permissions), []),
         ];
     }
 }

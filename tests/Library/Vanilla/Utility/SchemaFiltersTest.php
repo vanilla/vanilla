@@ -17,16 +17,17 @@ use Vanilla\Utility\SchemaFilters;
  * Tests for SchemaFilters class
  */
 
-class SchemaFiltersTest extends TestCase {
-
+class SchemaFiltersTest extends TestCase
+{
     /**
      * Test encodeValue() and decodeValue() with empty string.
      */
-    public function testEncodeEmptyString() {
+    public function testEncodeEmptyString()
+    {
         $testValidation = new Validation();
-        $testSchema = new Schema('foo');
+        $testSchema = new Schema("foo");
         $testField = new ValidationField($testValidation, $testSchema, $testSchema);
-        $testValue = '';
+        $testValue = "";
         $encoded = SchemaFilters::encodeValue($testValue, $testField);
         $this->assertSame(null, $encoded);
 
@@ -37,11 +38,12 @@ class SchemaFiltersTest extends TestCase {
     /**
      * Test encodeValue() and decodeValue() with array.
      */
-    public function testEncodeString() {
+    public function testEncodeString()
+    {
         $testValidation = new Validation();
-        $testSchema = new Schema('foo');
+        $testSchema = new Schema("foo");
         $testField = new ValidationField($testValidation, $testSchema, $testSchema);
-        $testValue = ['foo' => 'bar'];
+        $testValue = ["foo" => "bar"];
         $encoded = SchemaFilters::encodeValue($testValue, $testField);
         $this->assertSame('{"foo":"bar"}', $encoded);
 
@@ -52,9 +54,10 @@ class SchemaFiltersTest extends TestCase {
     /**
      * Test decodeValue() with "null" string.
      */
-    public function testDecodeWithNullString() {
+    public function testDecodeWithNullString()
+    {
         $testValidation = new Validation();
-        $testSchema = new Schema('foo');
+        $testSchema = new Schema("foo");
         $testField = new ValidationField($testValidation, $testSchema, $testSchema);
         $testValue = "null";
         $decoded = SchemaFilters::decodeValue($testValue, $testField);
@@ -64,9 +67,10 @@ class SchemaFiltersTest extends TestCase {
     /**
      * Test decodeValue() with un-unserializable string.
      */
-    public function testDecodeWithUnUnserializableString() {
+    public function testDecodeWithUnUnserializableString()
+    {
         $testValidation = new Validation();
-        $testSchema = new Schema('foo');
+        $testSchema = new Schema("foo");
         $testField = new ValidationField($testValidation, $testSchema, $testSchema);
         $testValue = "apos'trophe";
         $decoded = SchemaFilters::decodeValue($testValue, $testField);

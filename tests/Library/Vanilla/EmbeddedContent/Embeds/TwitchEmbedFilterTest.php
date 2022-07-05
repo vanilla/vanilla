@@ -16,7 +16,8 @@ use VanillaTests\Fixtures\Request;
 /**
  * Test twitch embed filter.
  */
-class TwitchEmbedFilterTest extends TestCase {
+class TwitchEmbedFilterTest extends TestCase
+{
     /** @var \Gdn_Request */
     private $request;
 
@@ -26,7 +27,8 @@ class TwitchEmbedFilterTest extends TestCase {
     /**
      * Setup
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         $this->request = new Request();
         $this->twitchEmbedFilter = new TwitchEmbedFilter($this->request);
@@ -39,7 +41,8 @@ class TwitchEmbedFilterTest extends TestCase {
      * @param bool $expected
      * @dataProvider provideEmbedTypes
      */
-    public function testCanHandleEmbedType(string $embedType, bool $expected): void {
+    public function testCanHandleEmbedType(string $embedType, bool $expected): void
+    {
         $this->assertSame($expected, $this->twitchEmbedFilter->canHandleEmbedType($embedType));
     }
 
@@ -48,7 +51,8 @@ class TwitchEmbedFilterTest extends TestCase {
      *
      * @return array
      */
-    public function provideEmbedTypes(): array {
+    public function provideEmbedTypes(): array
+    {
         $result = [
             "Twitch" => [TwitchEmbed::TYPE, true],
             "YouTube" => [YouTubeEmbed::TYPE, false],
@@ -59,7 +63,8 @@ class TwitchEmbedFilterTest extends TestCase {
     /**
      * Verify ability to recognize an invalid embed when filtering.
      */
-    public function testFilterInvalidEmbed(): void {
+    public function testFilterInvalidEmbed(): void
+    {
         $this->expectException(EmbeddedContentException::class);
         $this->getExpectedExceptionMessage("Expected a twitch embed.");
 
@@ -74,14 +79,15 @@ class TwitchEmbedFilterTest extends TestCase {
     /**
      * Test twitch filter embed.
      */
-    public function testFilterValidEmbed(): void {
+    public function testFilterValidEmbed(): void
+    {
         $data = [
             "height" => 180,
             "width" => 320,
             "twitchID" => "video:441409883",
             "url" => "https://www.twitch.tv/videos/441409883",
             "embedType" => TwitchEmbed::TYPE,
-            "name" => 'Movie Magic'
+            "name" => "Movie Magic",
         ];
         $dataEmbed = new TwitchEmbed($data);
         $this->twitchEmbedFilter->filterEmbed($dataEmbed);

@@ -21,8 +21,8 @@ use Vanilla\Formatting\Quill\Parser;
  * Compatibility from the embed refactoring that occured in July 2019
  * https://github.com/vanilla/vanilla/pull/9002
  */
-class FormatCompatibilityService {
-
+class FormatCompatibilityService
+{
     /** @var EmbedService */
     private $embedService;
 
@@ -31,7 +31,8 @@ class FormatCompatibilityService {
      *
      * @param EmbedService $embedService
      */
-    public function __construct(EmbedService $embedService) {
+    public function __construct(EmbedService $embedService)
+    {
         $this->embedService = $embedService;
     }
 
@@ -43,7 +44,8 @@ class FormatCompatibilityService {
      *
      * @return string
      */
-    public function convert(string $content, string $format): string {
+    public function convert(string $content, string $format): string
+    {
         switch ($format) {
             case RichFormat::FORMAT_KEY:
                 return $this->convertRich($content);
@@ -59,12 +61,13 @@ class FormatCompatibilityService {
      * @param string $content
      * @return string
      */
-    private function convertRich(string $content): string {
+    private function convertRich(string $content): string
+    {
         $operations = Parser::jsonToOperations($content);
         foreach ($operations as $key => $operation) {
             if (!ExternalBlot::matches($operation)) {
                 continue;
-            };
+            }
             $data = ExternalBlot::getEmbedDataFromOperation($operation);
             $embed = $this->embedService->createEmbedFromData($data);
             if (!($embed instanceof ErrorEmbed)) {

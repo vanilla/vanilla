@@ -13,8 +13,8 @@ use PHPUnit\Framework\TestCase;
  * Tests for validateBoolean().
  */
 
-class ValidateBooleanTest extends TestCase {
-
+class ValidateBooleanTest extends TestCase
+{
     /**
      * Test {@link validateBoolean()} against several scenarios.
      *
@@ -22,7 +22,8 @@ class ValidateBooleanTest extends TestCase {
      * @param bool $expected The expected result.
      * @dataProvider provideTestValidateBooleanArrays
      */
-    public function testValidateBoolean($testValue, $expected) {
+    public function testValidateBoolean($testValue, $expected)
+    {
         $actual = validateBoolean($testValue);
         $this->assertSame($expected, $actual);
     }
@@ -32,32 +33,15 @@ class ValidateBooleanTest extends TestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideTestValidateBooleanArrays() {
+    public function provideTestValidateBooleanArrays()
+    {
         $r = [
-            'boolean' => [
-                false,
-                true,
-            ],
-            'intTrue' => [
-                1,
-                true,
-            ],
-            'intFalse' => [
-                100,
-                false,
-            ],
-            'emptyString' => [
-                '',
-                true,
-            ],
-            'stringTrue' => [
-                'false',
-                true,
-            ],
-            'stringFalse' => [
-                'notTrue',
-                false,
-            ],
+            "boolean" => [false, true],
+            "intTrue" => [1, true],
+            "intFalse" => [100, false],
+            "emptyString" => ["", true],
+            "stringTrue" => ["false", true],
+            "stringFalse" => ["notTrue", false],
         ];
 
         return $r;

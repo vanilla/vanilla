@@ -17,8 +17,8 @@ use Vanilla\ImageSrcSet\ImageSrcSetService;
 /**
  * Simple service for calling out to formatters registered in FormatFactory.
  */
-class FormatService {
-
+class FormatService
+{
     /** @var array */
     private $formats = [];
 
@@ -33,7 +33,8 @@ class FormatService {
      *
      * @param ImageSrcSetService $imageSrcSetService
      */
-    public function __construct(ImageSrcSetService $imageSrcSetService) {
+    public function __construct(ImageSrcSetService $imageSrcSetService)
+    {
         $this->imageSrcSetService = $imageSrcSetService;
     }
 
@@ -46,13 +47,13 @@ class FormatService {
      *
      * @return string
      */
-    public function renderHTML(string $content, ?string $format = null, ?array $context = null): string {
+    public function renderHTML(string $content, ?string $format = null, ?array $context = null): string
+    {
         if (empty($content) && empty($format)) {
-            return '';
+            return "";
         }
 
-        return $this
-            ->getFormatter($format)
+        return $this->getFormatter($format)
             ->setContext($context)
             ->renderHTML($content);
     }
@@ -68,10 +69,9 @@ class FormatService {
      * @throws FormattingException If the post content wasn't valid and couldn't be filtered.
      * @throws FormatterNotFoundException If the format doesn't have a match.
      */
-    public function filter(string $content, ?string $format): string {
-        return $this
-            ->getFormatter($format, true)
-            ->filter($content);
+    public function filter(string $content, ?string $format): string
+    {
+        return $this->getFormatter($format, true)->filter($content);
     }
 
     /**
@@ -82,14 +82,13 @@ class FormatService {
      *
      * @return string
      */
-    public function renderExcerpt(string $content, ?string $format): string {
+    public function renderExcerpt(string $content, ?string $format): string
+    {
         if (empty($format) && empty($content)) {
-            return '';
+            return "";
         }
 
-        return $this
-            ->getFormatter($format)
-            ->renderExcerpt($content);
+        return $this->getFormatter($format)->renderExcerpt($content);
     }
 
     /**
@@ -100,10 +99,9 @@ class FormatService {
      *
      * @return string
      */
-    public function renderPlainText(string $content, ?string $format): string {
-        return $this
-            ->getFormatter($format)
-            ->renderPlainText($content);
+    public function renderPlainText(string $content, ?string $format): string
+    {
+        return $this->getFormatter($format)->renderPlainText($content);
     }
 
     /**
@@ -114,10 +112,9 @@ class FormatService {
      *
      * @return int The number of visible characters in $content.
      */
-    public function getPlainTextLength(string $content, ?string $format): int {
-        return $this
-            ->getFormatter($format)
-            ->getPlainTextLength($content);
+    public function getPlainTextLength(string $content, ?string $format): int
+    {
+        return $this->getFormatter($format)->getPlainTextLength($content);
     }
 
     /**
@@ -128,10 +125,9 @@ class FormatService {
      *
      * @return string
      */
-    public function renderQuote(string $content, ?string $format): string {
-        return $this
-            ->getFormatter($format)
-            ->renderQuote($content);
+    public function renderQuote(string $content, ?string $format): string
+    {
+        return $this->getFormatter($format)->renderQuote($content);
     }
 
     /**
@@ -142,10 +138,9 @@ class FormatService {
      *
      * @return Attachment[]
      */
-    public function parseAttachments(string $content, ?string $format): array {
-        return $this
-            ->getFormatter($format)
-            ->parseAttachments($content);
+    public function parseAttachments(string $content, ?string $format): array
+    {
+        return $this->getFormatter($format)->parseAttachments($content);
     }
 
     /**
@@ -156,14 +151,15 @@ class FormatService {
      *
      * @return array|null
      */
-    public function parseMainImage(string $content, ?string $format): ?array {
+    public function parseMainImage(string $content, ?string $format): ?array
+    {
         $images = $this->parseImages($content, $format);
         if (empty($images)) {
             return null;
         }
 
         $result = $images[0];
-        $result['urlSrcSet'] = $this->imageSrcSetService->getResizedSrcSet($result['url']);
+        $result["urlSrcSet"] = $this->imageSrcSetService->getResizedSrcSet($result["url"]);
         return $result;
     }
 
@@ -175,10 +171,9 @@ class FormatService {
      *
      * @return string[]
      */
-    public function parseImageUrls(string $content, ?string $format): array {
-        return $this
-            ->getFormatter($format)
-            ->parseImageUrls($content);
+    public function parseImageUrls(string $content, ?string $format): array
+    {
+        return $this->getFormatter($format)->parseImageUrls($content);
     }
 
     /**
@@ -189,10 +184,9 @@ class FormatService {
      *
      * @return array
      */
-    public function parseImages(string $content, ?string $format): array {
-        return $this
-            ->getFormatter($format)
-            ->parseImages($content);
+    public function parseImages(string $content, ?string $format): array
+    {
+        return $this->getFormatter($format)->parseImages($content);
     }
 
     /**
@@ -203,10 +197,9 @@ class FormatService {
      *
      * @return Heading[]
      */
-    public function parseHeadings(string $content, ?string $format): array {
-        return $this
-            ->getFormatter($format)
-            ->parseHeadings($content);
+    public function parseHeadings(string $content, ?string $format): array
+    {
+        return $this->getFormatter($format)->parseHeadings($content);
     }
 
     /**
@@ -217,10 +210,9 @@ class FormatService {
      *
      * @return string[] A list of usernames.
      */
-    public function parseMentions(string $content, ?string $format): array {
-        return $this
-            ->getFormatter($format)
-            ->parseMentions($content);
+    public function parseMentions(string $content, ?string $format, bool $skipTaggedContent = true): array
+    {
+        return $this->getFormatter($format)->parseMentions($content, $skipTaggedContent);
     }
 
     /**
@@ -228,7 +220,8 @@ class FormatService {
      *
      * @param Container $dic
      */
-    public function registerBuiltInFormats(Container $dic) {
+    public function registerBuiltInFormats(Container $dic)
+    {
         $this->registerFormat(Formats\RichFormat::FORMAT_KEY, Formats\RichFormat::class)
             ->registerFormat(Formats\HtmlFormat::FORMAT_KEY, Formats\HtmlFormat::class)
             ->registerFormat(Formats\BBCodeFormat::FORMAT_KEY, Formats\BBCodeFormat::class)
@@ -237,8 +230,7 @@ class FormatService {
             ->registerFormat(Formats\TextExFormat::FORMAT_KEY, Formats\TextExFormat::class)
             ->registerFormat(Formats\WysiwygFormat::FORMAT_KEY, Formats\WysiwygFormat::class)
             ->registerFormat(Formats\WysiwygFormat::ALT_FORMAT_KEY, Formats\WysiwygFormat::class)
-            ->registerFormat(Formats\DisplayFormat::FORMAT_KEY, Formats\DisplayFormat::class)
-        ;
+            ->registerFormat(Formats\DisplayFormat::FORMAT_KEY, Formats\DisplayFormat::class);
     }
 
     /**
@@ -249,7 +241,8 @@ class FormatService {
      *
      * @return $this For method chaining.
      */
-    public function registerFormat(string $formatKey, $format): FormatService {
+    public function registerFormat(string $formatKey, $format): FormatService
+    {
         if (is_object($format)) {
             $this->formatInstances[$formatKey] = $format;
             $format = get_class($format);
@@ -265,7 +258,8 @@ class FormatService {
      * @param string|null $formatKey
      * @return bool
      */
-    public function hasFormat(?string $formatKey): bool {
+    public function hasFormat(?string $formatKey): bool
+    {
         if ($formatKey === null) {
             return false;
         }
@@ -281,7 +275,8 @@ class FormatService {
      * @return FormatInterface
      * @throws FormatterNotFoundException If $throw === true &&  the formatter that was requested could not be found.
      */
-    public function getFormatter(?string $formatKey, $throw = false): FormatInterface {
+    public function getFormatter(?string $formatKey, $throw = false): FormatInterface
+    {
         $formatKey = strtolower($formatKey) ?? null;
         $instance = $this->formatInstances[$formatKey] ?? null;
 
@@ -309,8 +304,34 @@ class FormatService {
      *
      * @return FormatInterface
      */
-    protected function constructFormat(string $formatClass): FormatInterface {
+    protected function constructFormat(string $formatClass): FormatInterface
+    {
         $instance = \Gdn::getContainer()->get($formatClass);
         return $instance;
+    }
+
+    /**
+     * Anonymize the username from body by replacing the username with the replacement value.
+     *
+     * @param string $username
+     * @param string $body
+     * @param string|null $format The format of the content.
+     *
+     * @return string
+     */
+    public function removeUserPII(string $username, string $body, ?string $format): string
+    {
+        return $this->getFormatter($format)->removeUserPII($username, $body);
+    }
+
+    /**
+     * Parse out every user mention from a post.
+     *
+     * @param string $body
+     * @return array Username mentioned in the post.
+     */
+    public function parseAllMentions(string $body, ?string $format): array
+    {
+        return $this->getFormatter($format)->parseAllMentions($body);
     }
 }

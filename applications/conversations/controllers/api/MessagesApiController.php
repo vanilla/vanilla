@@ -16,8 +16,8 @@ use Vanilla\ApiUtils;
 /**
  * API Controller for the `/messages` resource.
  */
-class MessagesApiController extends AbstractApiController {
-
+class MessagesApiController extends AbstractApiController
+{
     /** @var Gdn_Configuration */
     private $config;
 
@@ -55,11 +55,12 @@ class MessagesApiController extends AbstractApiController {
      *
      * @throw Exception
      */
-    private function checkModerationPermission() {
-        if (!$this->config->get('Conversations.Moderation.Allow', false)) {
-            throw new ConfigurationException(t('The site is not configured for moderating conversations.'));
+    private function checkModerationPermission()
+    {
+        if (!$this->config->get("Conversations.Moderation.Allow", false)) {
+            throw new ConfigurationException(t("The site is not configured for moderating conversations."));
         }
-        $this->permission('Conversations.Moderation.Manage');
+        $this->permission("Conversations.Moderation.Manage");
     }
 
     /**
@@ -69,59 +70,64 @@ class MessagesApiController extends AbstractApiController {
      * @throws NotFoundException if the conversation could not be found.
      * @return array
      */
-    private function conversationByID($id) {
+    private function conversationByID($id)
+    {
         $row = $this->conversationModel->getID($id, DATASET_TYPE_ARRAY);
         if (!$row) {
-            throw new NotFoundException('Conversation');
+            throw new NotFoundException("Conversation");
         }
 
         return $row;
     }
 
-//
-//    Uncomment once ConversationMessagesModel::delete() is properly implemented.
-//    See https://github.com/vanilla/vanilla/issues/5897 for details.
-//
-//    /**
-//     * Delete a message.
-//     *
-//     * @param int $id The ID of the message.
-//     * @throws NotFoundException if the message could not be found.
-//     * @throws MethodNotAllowedException if Conversations.Moderation.Allow !== true.
-//     */
-//    public function delete($id) {
-//        if (!$this->config->get('Conversations.Moderation.Allow', false)) {
-//            throw new MethodNotAllowedException();
-//        }
-//
-//        $this->permission('Conversations.Moderation.Manage');
-//
-//        $this->schema(['id:i' => 'The message ID'])->setDescription('Delete a message.');
-//        $this->schema([], 'out');
-//
-//        $this->messageByID($id);
-//        $this->conversationMessagesModel->deleteID($id);
-//    }
+    //
+    //    Uncomment once ConversationMessagesModel::delete() is properly implemented.
+    //    See https://github.com/vanilla/vanilla/issues/5897 for details.
+    //
+    //    /**
+    //     * Delete a message.
+    //     *
+    //     * @param int $id The ID of the message.
+    //     * @throws NotFoundException if the message could not be found.
+    //     * @throws MethodNotAllowedException if Conversations.Moderation.Allow !== true.
+    //     */
+    //    public function delete($id) {
+    //        if (!$this->config->get('Conversations.Moderation.Allow', false)) {
+    //            throw new MethodNotAllowedException();
+    //        }
+    //
+    //        $this->permission('Conversations.Moderation.Manage');
+    //
+    //        $this->schema(['id:i' => 'The message ID'])->setDescription('Delete a message.');
+    //        $this->schema([], 'out');
+    //
+    //        $this->messageByID($id);
+    //        $this->conversationMessagesModel->deleteID($id);
+    //    }
 
     /**
      * Get the schema definition comprised of all available message fields.
      *
      * @return Schema
      */
-    private function fullSchema() {
+    private function fullSchema()
+    {
         /** @var Schema $schema */
         static $schema;
 
         if ($schema === null) {
             // Name this schema so that it can be read by swagger.
-            $schema = $this->schema([
-                'messageID:i' => 'The ID of the message.',
-                'conversationID:i' => 'The ID of the conversation.',
-                'body:s' => 'The body of the message.',
-                'insertUserID:i' => 'The user that created the message.',
-                'insertUser?' => $this->getUserFragmentSchema(),
-                'dateInserted:dt' => 'When the message was created.',
-            ], 'Message');
+            $schema = $this->schema(
+                [
+                    "messageID:i" => "The ID of the message.",
+                    "conversationID:i" => "The ID of the conversation.",
+                    "body:s" => "The body of the message.",
+                    "insertUserID:i" => "The user that created the message.",
+                    "insertUser?" => $this->getUserFragmentSchema(),
+                    "dateInserted:dt" => "When the message was created.",
+                ],
+                "Message"
+            );
         }
 
         return $schema;
@@ -134,23 +140,30 @@ class MessagesApiController extends AbstractApiController {
      * @throws NotFoundException if the message could not be found.
      * @return array
      */
-    public function get($id) {
+    public function get($id)
+    {
         $this->permission("Garden.SignIn.Allow");
 
-        $this->schema([
-            'id:i' => 'The message ID.'
-        ], 'in')->setDescription('Get a message.');
-        $out = $this->schema($this->fullSchema(), 'out');
+        $this->schema(
+            [
+                "id:i" => "The message ID.",
+            ],
+            "in"
+        )->setDescription("Get a message.");
+        $out = $this->schema($this->fullSchema(), "out");
 
         $message = $this->messageByID($id);
 
-        $isInConversation = $this->conversationModel->inConversation($message['ConversationID'], $this->getSession()->UserID);
+        $isInConversation = $this->conversationModel->inConversation(
+            $message["ConversationID"],
+            $this->getSession()->UserID
+        );
 
         if (!$isInConversation) {
             $this->checkModerationPermission();
         }
 
-        $this->userModel->expandUsers($message, ['InsertUserID']);
+        $this->userModel->expandUsers($message, ["InsertUserID"]);
 
         $message = $this->normalizeOutput($message);
         return $out->validate($message);
@@ -162,28 +175,32 @@ class MessagesApiController extends AbstractApiController {
      * @param array $query The query string.
      * @return Data
      */
-    public function index(array $query) {
+    public function index(array $query)
+    {
         $this->permission("Garden.SignIn.Allow");
 
-        $in = $this->schema([
-                'conversationID:i?'=> 'Filter by conversation.',
-                'insertUserID:i?' => 'Filter by author.',
-                'page:i?' => [
-                'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
-                    'default' => 1,
-                    'minimum' => 1,
+        $in = $this->schema(
+            [
+                "conversationID:i?" => "Filter by conversation.",
+                "insertUserID:i?" => "Filter by author.",
+                "page:i?" => [
+                    "description" => "Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).",
+                    "default" => 1,
+                    "minimum" => 1,
                 ],
-                'limit:i?' => [
-                    'description' => 'Desired number of items per page.',
-                    'default' => $this->config->get('Conversations.Messages.PerPage', 50),
-                    'minimum' => 1,
-                    'maximum' => 100
+                "limit:i?" => [
+                    "description" => "Desired number of items per page.",
+                    "default" => $this->config->get("Conversations.Messages.PerPage", 50),
+                    "minimum" => 1,
+                    "maximum" => 100,
                 ],
-                'expand?' => ApiUtils::getExpandDefinition(['insertUser'])
-            ], 'in')
-            ->requireOneOf(['conversationID', 'insertUserID'])
-            ->setDescription('List user messages.');
-        $out = $this->schema([':a' => $this->fullSchema()], 'out');
+                "expand?" => ApiUtils::getExpandDefinition(["insertUser"]),
+            ],
+            "in"
+        )
+            ->requireOneOf(["conversationID", "insertUserID"])
+            ->setDescription("List user messages.");
+        $out = $this->schema([":a" => $this->fullSchema()], "out");
 
         $query = $this->filterValues($query);
         $query = $in->validate($query);
@@ -191,46 +208,42 @@ class MessagesApiController extends AbstractApiController {
         $where = [];
         $requireModerationPermission = false;
 
-        if (!empty($query['insertUserID'])) {
-            if ($query['insertUserID'] !== $this->getSession()->UserID) {
+        if (!empty($query["insertUserID"])) {
+            if ($query["insertUserID"] !== $this->getSession()->UserID) {
                 $requireModerationPermission = true;
             }
-            $userID = $query['insertUserID'];
-            $where['InsertUserID'] = $userID;
+            $userID = $query["insertUserID"];
+            $where["InsertUserID"] = $userID;
         }
 
-        if (!empty($query['conversationID'])) {
-            $this->conversationByID($query['conversationID']);
+        if (!empty($query["conversationID"])) {
+            $this->conversationByID($query["conversationID"]);
 
-            $isInConversation = $this->conversationModel->inConversation($query['conversationID'], $this->getSession()->UserID);
+            $isInConversation = $this->conversationModel->inConversation(
+                $query["conversationID"],
+                $this->getSession()->UserID
+            );
             if (!$isInConversation) {
                 $requireModerationPermission = true;
             }
 
-            $where['ConversationID'] = $query['conversationID'];
+            $where["ConversationID"] = $query["conversationID"];
         }
 
         if ($requireModerationPermission) {
             $this->checkModerationPermission();
         }
 
-        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+        [$offset, $limit] = offsetLimit("p{$query["page"]}", $query["limit"]);
 
-        $messages = $this->conversationMessageModel->getWhere(
-            $where,
-            'DateInserted',
-            'desc',
-            $limit,
-            $offset
-        )->resultArray();
+        $messages = $this->conversationMessageModel
+            ->getWhere($where, "DateInserted", "desc", $limit, $offset)
+            ->resultArray();
 
         // Expand associated rows.
-        $this->userModel->expandUsers(
-            $messages,
-            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID'])
-        );
+        $this->userModel->expandUsers($messages, $this->resolveExpandFields($query, ["insertUser" => "InsertUserID"]));
 
-        array_walk($messages, function(&$message) {
+        array_walk($messages, function (&$message) {
             $message = $this->normalizeOutput($message);
         });
 
@@ -238,12 +251,12 @@ class MessagesApiController extends AbstractApiController {
 
         $paging = ApiUtils::numberedPagerInfo(
             $this->conversationMessageModel->getCountWhere($where),
-            '/api/v2/messages',
+            "/api/v2/messages",
             $query,
             $in
         );
 
-        return new Data($result, ['paging' => $paging]);
+        return new Data($result, ["paging" => $paging]);
     }
 
     /**
@@ -253,10 +266,11 @@ class MessagesApiController extends AbstractApiController {
      * @throws NotFoundException if the message could not be found.
      * @return array
      */
-    private function messageByID($id) {
+    private function messageByID($id)
+    {
         $message = $this->conversationMessageModel->getID($id, DATASET_TYPE_ARRAY);
         if (!$message) {
-            throw new NotFoundException('Message');
+            throw new NotFoundException("Message");
         }
 
         return $message;
@@ -268,45 +282,46 @@ class MessagesApiController extends AbstractApiController {
      * @param array $dbRecord Database record.
      * @return array Return a Schema record.
      */
-    public function normalizeOutput(array $dbRecord) {
-        $this->formatField($dbRecord, 'Body', $dbRecord['Format']);
+    public function normalizeOutput(array $dbRecord)
+    {
+        $this->formatField($dbRecord, "Body", $dbRecord["Format"]);
 
         $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
         return $schemaRecord;
     }
 
-//
-//    Uncomment and test once ConversationMessagesModel handles messages update.
-//    See https://github.com/vanilla/vanilla/issues/5913 for details.
-//
-//    /**
-//     * Update a message.
-//     *
-//     * @param int $id The ID of the message.
-//     * @param array $body The request body.
-//     * @throws NotFoundException If the message was not found.
-//     * @throws ServerException If the message could not be updated.
-//     */
-//    public function patch($id, array $body) {
-//        $this->permission('Conversations.Conversations.Add');
-//
-//        $in = $this->schema(['format', 'body'],'in')
-//            ->add($this->fullSchema())
-//            ->setDescription('Update a message.');
-//        $out = $this->schema($this->fullSchema(), 'out');
-//
-//        $body = $in->validate($body);
-//
-//        $message = $this->messageByID($id);
-//
-//        if ($message['InsertUserID'] !== $this->getSession()->UserID) {
-//            $this->checkModerationPermission();
-//        }
-//
-//        $conversation = $this->conversationByID($message['ConversationID']);
-//
-//        $this->conversationMessageModel->save($body, $conversation);
-//    }
+    //
+    //    Uncomment and test once ConversationMessagesModel handles messages update.
+    //    See https://github.com/vanilla/vanilla/issues/5913 for details.
+    //
+    //    /**
+    //     * Update a message.
+    //     *
+    //     * @param int $id The ID of the message.
+    //     * @param array $body The request body.
+    //     * @throws NotFoundException If the message was not found.
+    //     * @throws ServerException If the message could not be updated.
+    //     */
+    //    public function patch($id, array $body) {
+    //        $this->permission('Conversations.Conversations.Add');
+    //
+    //        $in = $this->schema(['format', 'body'],'in')
+    //            ->add($this->fullSchema())
+    //            ->setDescription('Update a message.');
+    //        $out = $this->schema($this->fullSchema(), 'out');
+    //
+    //        $body = $in->validate($body);
+    //
+    //        $message = $this->messageByID($id);
+    //
+    //        if ($message['InsertUserID'] !== $this->getSession()->UserID) {
+    //            $this->checkModerationPermission();
+    //        }
+    //
+    //        $conversation = $this->conversationByID($message['ConversationID']);
+    //
+    //        $this->conversationMessageModel->save($body, $conversation);
+    //    }
 
     /**
      * Add a message.
@@ -317,24 +332,25 @@ class MessagesApiController extends AbstractApiController {
      * @throws ServerException If the message could not be created.
      * @return array
      */
-    public function post(array $body) {
+    public function post(array $body)
+    {
         $this->permission("Garden.SignIn.Allow");
 
-        $in = $this->postSchema('in')->setDescription('Add a message.');
-        $out = $this->schema($this->fullSchema(), 'out');
+        $in = $this->postSchema("in")->setDescription("Add a message.");
+        $out = $this->schema($this->fullSchema(), "out");
 
         $body = $in->validate($body);
 
-        $conversation = $this->conversationByID($body['conversationID']);
-        if (!$this->conversationModel->inConversation($conversation['ConversationID'], $this->getSession()->UserID)) {
-            throw new ClientException('You can not add a message to a conversation that you are not a participant of.');
+        $conversation = $this->conversationByID($body["conversationID"]);
+        if (!$this->conversationModel->inConversation($conversation["ConversationID"], $this->getSession()->UserID)) {
+            throw new ClientException("You can not add a message to a conversation that you are not a participant of.");
         }
 
         $messageData = ApiUtils::convertInputKeys($body);
-        $messageID = $this->conversationMessageModel->save($messageData, ['conversation' => $conversation]);
+        $messageID = $this->conversationMessageModel->save($messageData, ["conversation" => $conversation]);
         $this->validateModel($this->conversationMessageModel, true);
         if (!$messageID) {
-            throw new ServerException('Unable to insert message.', 500);
+            throw new ServerException("Unable to insert message.", 500);
         }
 
         $message = $this->messageByID($messageID);
@@ -348,23 +364,23 @@ class MessagesApiController extends AbstractApiController {
      * @param string $type The type of schema.
      * @return Schema Returns a schema object.
      */
-    public function postSchema($type) {
+    public function postSchema($type)
+    {
         static $postSchema;
 
         if ($postSchema === null) {
             $postSchema = $this->schema(
                 Schema::parse([
-                    'conversationID',
-                    'body:s' => [
-                        'maxLength' => $this->config->get('Conversations.Message.MaxLength', 2000),
+                    "conversationID",
+                    "body:s" => [
+                        "maxLength" => $this->config->get("Conversations.Message.MaxLength", 2000),
                     ],
-                    'format' => new \Vanilla\Models\FormatSchema(),
+                    "format" => new \Vanilla\Models\FormatSchema(),
                 ])->add($this->fullSchema()),
-                'MessagePost'
+                "MessagePost"
             );
         }
 
         return $this->schema($postSchema, $type);
     }
-
 }

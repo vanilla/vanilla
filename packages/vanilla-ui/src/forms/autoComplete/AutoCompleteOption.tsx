@@ -15,6 +15,7 @@ export interface IAutoCompleteOption {
     value: any;
     label?: string;
     data?: any;
+    group?: string;
 }
 
 export interface IAutoCompleteOptionProps

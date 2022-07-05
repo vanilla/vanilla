@@ -7,34 +7,41 @@
 
 namespace VanillaTests\Fixtures;
 
-class Tuple {
+class Tuple
+{
     public $a;
     public $b;
 
-    public function __construct($a = null, $b = null) {
+    public function __construct($a = null, $b = null)
+    {
         $this->a = $a;
         $this->b = $b;
     }
 
-    public function getA() {
+    public function getA()
+    {
         return $this->a;
     }
 
-    public function setA($value) {
+    public function setA($value)
+    {
         $this->a = $value;
         return $this;
     }
 
-    public function getB() {
+    public function getB()
+    {
         return $this->b;
     }
 
-    public function setB($value) {
+    public function setB($value)
+    {
         $this->b = $value;
         return $this;
     }
 
-    public static function create($a = 'a', $b = 'b') {
+    public static function create($a = "a", $b = "b")
+    {
         return new Tuple($a, $b);
     }
 }

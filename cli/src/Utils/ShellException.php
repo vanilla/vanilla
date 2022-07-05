@@ -10,5 +10,6 @@ namespace Vanilla\Cli\Utils;
 /**
  * Exception thrown when a shell error has occured.
  */
-class ShellException extends \Exception {
+class ShellException extends \Exception
+{
 }

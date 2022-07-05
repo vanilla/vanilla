@@ -8,4 +8,5 @@ module.exports = {
     tabWidth: 4,
     semi: true,
     trailingComma: "all",
+    phpVersion: "7.2",
 };

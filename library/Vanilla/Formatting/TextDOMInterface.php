@@ -13,7 +13,8 @@ namespace Vanilla\Formatting;
  * This interface abstracts various text DOMs so that they can be updated programmatically and then serialized back.
  * You can think of this as a light weight adaptor to the built in `DOMDocument` that would wrap it for HTML documents.
  */
-interface TextDOMInterface {
+interface TextDOMInterface
+{
     /**
      * Serialize the DOM back into its native string.
      *

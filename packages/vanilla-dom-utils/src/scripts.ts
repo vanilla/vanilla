@@ -40,10 +40,10 @@ export function ensureScript(scriptUrl: string): Promise<void> {
 
             loadEventCallbacks.set(script, [resolve]);
 
-            script.onload = event => {
+            script.onload = (event) => {
                 clearTimeout(timeout);
                 const callbacks = loadEventCallbacks.get(script);
-                callbacks && callbacks.forEach(callback => callback(event));
+                callbacks && callbacks.forEach((callback) => callback(event));
                 loadEventCallbacks.delete(script);
             };
 

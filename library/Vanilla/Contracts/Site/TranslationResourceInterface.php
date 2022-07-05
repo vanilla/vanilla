@@ -10,7 +10,8 @@ namespace Vanilla\Contracts\Site;
 /**
  * Interface TranslationResourceInterface
  */
-interface TranslationResourceInterface {
+interface TranslationResourceInterface
+{
     /**
      * Returns translation resource key (url-code)
      *

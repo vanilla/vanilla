@@ -11,6 +11,7 @@ import { useToast } from "@library/features/toaster/ToastContext";
 import { BulkActionsToast } from "@library/features/discussions/BulkActionsToast";
 import { BulkActionTypes } from "@library/features/discussions/BulkActionsModal";
 import { BulkActionsManager } from "@library/features/discussions/BulkActionsManager";
+import { IDiscussion } from "@dashboard/@types/api/discussion";
 
 /**
  * Context provider to manage the state of checkboxes when
@@ -18,17 +19,17 @@ import { BulkActionsManager } from "@library/features/discussions/BulkActionsMan
  */
 interface IDiscussionCheckboxContext {
     /** Record of all checked discussions */
-    checkedDiscussionIDs: RecordID[];
+    checkedDiscussionIDs: Array<IDiscussion["discussionID"]>;
     /** Record of all discussions that have a pending action */
-    pendingActionIDs: RecordID[];
+    pendingActionIDs: Array<IDiscussion["discussionID"]>;
     /** Function to add discussion to checked list */
-    addCheckedDiscussionsByIDs(discussionID: RecordID | RecordID[]): void;
+    addCheckedDiscussionsByIDs(discussionID: IDiscussion["discussionID"] | Array<IDiscussion["discussionID"]>): void;
     /** Function to remove discussion to checked list */
-    removeCheckedDiscussionsByIDs(discussionID: RecordID | RecordID[]): void;
+    removeCheckedDiscussionsByIDs(discussionID: IDiscussion["discussionID"] | Array<IDiscussion["discussionID"]>): void;
     /** Function to add discussion to checked list */
-    addPendingDiscussionByIDs(discussionID: RecordID | RecordID[]): void;
+    addPendingDiscussionByIDs(discussionID: IDiscussion["discussionID"] | Array<IDiscussion["discussionID"]>): void;
     /** Function to remove discussion to checked list */
-    removePendingDiscussionByIDs(discussionID: RecordID | RecordID[]): void;
+    removePendingDiscussionByIDs(discussionID: IDiscussion["discussionID"] | Array<IDiscussion["discussionID"]>): void;
 }
 
 const DiscussionCheckboxContext = React.createContext<IDiscussionCheckboxContext>({
@@ -77,19 +78,27 @@ export function DiscussionCheckboxProvider(props: IProps) {
         return Array.isArray(arg) ? arg : [arg];
     };
 
-    const addCheckedDiscussionsByIDs = (discussionIDs: RecordID | RecordID[]) => {
+    const addCheckedDiscussionsByIDs = (
+        discussionIDs: IDiscussion["discussionID"] | Array<IDiscussion["discussionID"]>,
+    ) => {
         setCheckedDiscussionIDs([...new Set([...checkedDiscussionIDs, ...normalizeToArray(discussionIDs)])]);
     };
 
-    const removeCheckedDiscussionsByIDs = (discussionIDs: RecordID | RecordID[]) => {
+    const removeCheckedDiscussionsByIDs = (
+        discussionIDs: IDiscussion["discussionID"] | Array<IDiscussion["discussionID"]>,
+    ) => {
         setCheckedDiscussionIDs((prevState) => prevState.filter((id) => !normalizeToArray(discussionIDs).includes(id)));
     };
 
-    const addPendingDiscussionByIDs = (discussionIDs: RecordID | RecordID[]) => {
+    const addPendingDiscussionByIDs = (
+        discussionIDs: IDiscussion["discussionID"] | Array<IDiscussion["discussionID"]>,
+    ) => {
         setPendingActionIDs([...new Set([...pendingActionIDs, ...normalizeToArray(discussionIDs)])]);
     };
 
-    const removePendingDiscussionByIDs = (discussionIDs: RecordID | RecordID[]) => {
+    const removePendingDiscussionByIDs = (
+        discussionIDs: IDiscussion["discussionID"] | Array<IDiscussion["discussionID"]>,
+    ) => {
         removeCheckedDiscussionsByIDs(discussionIDs);
         setPendingActionIDs((prevState) => prevState.filter((id) => !normalizeToArray(discussionIDs).includes(id)));
     };

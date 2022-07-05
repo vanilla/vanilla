@@ -15,22 +15,24 @@ use Vanilla\Contracts\Site\ApplicationProviderInterface;
  *
  * @see ApplicationProviderInterface
  */
-class ApplicationProvider implements ApplicationProviderInterface {
-
+class ApplicationProvider implements ApplicationProviderInterface
+{
     /** @var ApplicationInterface[] */
     private $apps;
 
     /**
      * @inheritdoc
      */
-    public function getAll(): array {
+    public function getAll(): array
+    {
         return $this->apps;
     }
 
     /**
      * @inheritdoc
      */
-    public function getReservedSlugs(): array {
+    public function getReservedSlugs(): array
+    {
         $reservedSlugs = [];
         foreach ($this->apps as $app) {
             $reservedSlugs = array_merge($reservedSlugs, $app->getReservedSlugs());
@@ -41,7 +43,8 @@ class ApplicationProvider implements ApplicationProviderInterface {
     /**
      * @inheritdoc
      */
-    public function add(ApplicationInterface $application): ApplicationProviderInterface {
+    public function add(ApplicationInterface $application): ApplicationProviderInterface
+    {
         $this->apps[] = $application;
         return $this;
     }

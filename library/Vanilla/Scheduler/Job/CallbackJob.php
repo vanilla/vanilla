@@ -11,8 +11,8 @@ use Exception;
 /**
  * Execute a callback as a job.
  */
-class CallbackJob implements LocalJobInterface {
-
+class CallbackJob implements LocalJobInterface
+{
     /** @var callable */
     private $callback;
 
@@ -22,7 +22,8 @@ class CallbackJob implements LocalJobInterface {
     /**
      * Execute the configured callback function.
      */
-    public function run(): JobExecutionStatus {
+    public function run(): JobExecutionStatus
+    {
         call_user_func_array($this->callback, $this->parameters);
 
         return JobExecutionStatus::complete();
@@ -34,17 +35,18 @@ class CallbackJob implements LocalJobInterface {
      * @param array $message
      * @throws Exception With an invalid Message configuration.
      */
-    public function setMessage(array $message) {
+    public function setMessage(array $message)
+    {
         $callback = $message["callback"] ?? null;
         $parameters = $message["parameters"] ?? [];
 
         if (is_callable($callback) === false) {
-            throw new Exception("Invalid callback configuration for ".__CLASS__);
+            throw new Exception("Invalid callback configuration for " . __CLASS__);
         }
         $this->callback = $callback;
 
         if (!is_array($parameters)) {
-            throw new Exception("Invalid parameter configuration for ".__CLASS__);
+            throw new Exception("Invalid parameter configuration for " . __CLASS__);
         }
         $this->parameters = $parameters;
     }

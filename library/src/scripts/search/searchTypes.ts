@@ -9,6 +9,7 @@ import { PublishStatus } from "@library/@types/api/core";
 import { IUserFragment, IUser } from "@library/@types/api/users";
 import { ILinkPages } from "@library/navigation/SimplePagerModel";
 import { ISelectBoxItem } from "@library/forms/select/SelectBox";
+import { IDiscussion } from "@dashboard/@types/api/discussion";
 
 export interface ISearchSource {
     /** Key used to identify the search source */
@@ -81,7 +82,7 @@ export interface ISearchResult {
     userInfo?: IUser;
     counts?: ICountResult[];
     isForeign?: boolean;
-    discussionID?: number;
+    discussionID?: IDiscussion["discussionID"];
     subqueryMatchCount?: number;
     subqueryExtraParams?: Record<string, any>;
     searchScore?: number;

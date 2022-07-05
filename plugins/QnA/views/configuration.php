@@ -20,7 +20,7 @@ if (!$featureFollowUpEnabled) {
     <li class="form-group"><?php
         echo $this->Form->toggle(
                 'QnA.Points.Enabled',
-                t('Enables points award. This will gives users points for answering questions.'),
+                t('Enables points award. This awards points to users who answer questions.'),
                 [
                     'id' => 'IsPointsAwardEnabled',
                     'data-children' => 'js-point-awards-inputs'

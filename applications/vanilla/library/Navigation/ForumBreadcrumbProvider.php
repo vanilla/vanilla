@@ -16,8 +16,8 @@ use Vanilla\Site\SiteSectionModel;
 /**
  * Breadcrumb provider for the forum application.
  */
-class ForumBreadcrumbProvider implements BreadcrumbProviderInterface {
-
+class ForumBreadcrumbProvider implements BreadcrumbProviderInterface
+{
     use StaticCacheTranslationTrait;
 
     /** @var \CategoryModel */
@@ -35,7 +35,8 @@ class ForumBreadcrumbProvider implements BreadcrumbProviderInterface {
      * @param \CategoryModel $categoryModel
      * @param SiteSectionModel $siteSectionModel
      */
-    public function __construct(\CategoryModel $categoryModel, SiteSectionModel $siteSectionModel) {
+    public function __construct(\CategoryModel $categoryModel, SiteSectionModel $siteSectionModel)
+    {
         $this->categoryModel = $categoryModel;
         $this->siteSectionModel = $siteSectionModel;
     }
@@ -43,14 +44,13 @@ class ForumBreadcrumbProvider implements BreadcrumbProviderInterface {
     /**
      * @inheritdoc
      */
-    public function getForRecord(RecordInterface $record, string $locale = null): array {
+    public function getForRecord(RecordInterface $record, string $locale = null): array
+    {
         $ancestors = $this->categoryModel->getAncestors($record->getRecordID());
 
-        $crumbs = [
-            new Breadcrumb(self::t('Home'), \Gdn::request()->url('/', true)),
-        ];
+        $crumbs = [new Breadcrumb(self::t("Home"), \Gdn::request()->url("/", true))];
         foreach ($ancestors as $ancestor) {
-            $categoryID = $ancestor['CategoryID'];
+            $categoryID = $ancestor["CategoryID"];
             $existingCrumb = $this->crumbsByCategoryID[$categoryID] ?? null;
             if ($existingCrumb !== null) {
                 $crumbs[] = $existingCrumb;
@@ -62,13 +62,15 @@ class ForumBreadcrumbProvider implements BreadcrumbProviderInterface {
                 // We actually just want the categories page.
 
                 // However, if the homepage is categories, we don't want to duplicate that either.
-                if ($this->siteSectionModel->getCurrentSiteSection()->getDefaultRoute()['Destination'] === 'categories') {
+                if (
+                    $this->siteSectionModel->getCurrentSiteSection()->getDefaultRoute()["Destination"] === "categories"
+                ) {
                     continue;
                 }
 
-                $newCrumb = new Breadcrumb(t('Categories'), url('/categories', true));
+                $newCrumb = new Breadcrumb(t("Categories"), url("/categories", true));
             } else {
-                $newCrumb = new Breadcrumb($ancestor['Name'] ?? t('Category'), categoryUrl($ancestor, '', true));
+                $newCrumb = new Breadcrumb($ancestor["Name"] ?? t("Category"), categoryUrl($ancestor, "", true));
             }
             $this->crumbsByCategoryID[$categoryID] = $newCrumb;
             $crumbs[] = $newCrumb;
@@ -79,7 +81,8 @@ class ForumBreadcrumbProvider implements BreadcrumbProviderInterface {
     /**
      * @inheritdoc
      */
-    public static function getValidRecordTypes(): array {
+    public static function getValidRecordTypes(): array
+    {
         return [ForumCategoryRecordType::TYPE];
     }
 }

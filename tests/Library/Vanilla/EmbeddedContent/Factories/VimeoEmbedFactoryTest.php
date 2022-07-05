@@ -15,8 +15,8 @@ use VanillaTests\Fixtures\MockHttpClient;
 /**
  * Tests for the embed and factory.
  */
-class VimeoEmbedFactoryTest extends MinimalContainerTestCase {
-
+class VimeoEmbedFactoryTest extends MinimalContainerTestCase
+{
     /** @var VimeoEmbedFactory */
     private $factory;
 
@@ -26,7 +26,8 @@ class VimeoEmbedFactoryTest extends MinimalContainerTestCase {
     /**
      * Set the factory and client.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         $this->httpClient = new MockHttpClient();
         $this->factory = new VimeoEmbedFactory($this->httpClient);
@@ -38,28 +39,31 @@ class VimeoEmbedFactoryTest extends MinimalContainerTestCase {
      * @param string $urlToTest
      * @dataProvider supportedDomainsProvider
      */
-    public function testSupportedDomains(string $urlToTest) {
+    public function testSupportedDomains(string $urlToTest)
+    {
         $this->assertTrue($this->factory->canHandleUrl($urlToTest));
     }
 
     /**
      * @return array
      */
-    public function supportedDomainsProvider(): array {
+    public function supportedDomainsProvider(): array
+    {
         return [
-            [ "https://vimeo.com/207028770" ],
-            [ "https://vimeo.com/344997253/ab1b6f2867" ], // Alternate video syntax
+            ["https://vimeo.com/207028770"],
+            ["https://vimeo.com/344997253/ab1b6f2867"], // Alternate video syntax
         ];
     }
 
     /**
      * Test network request fetching and handling.
      */
-    public function testCreateEmbedForUrl() {
+    public function testCreateEmbedForUrl()
+    {
         $url = "https://vimeo.com/207028770";
         $frameSrc = "https://player.vimeo.com/video/207028770?autoplay=1";
 
-        $oembedParams = http_build_query([ "url" => $url ]);
+        $oembedParams = http_build_query(["url" => $url]);
         $oembedUrl = VimeoEmbedFactory::OEMBED_URL_BASE . "?" . $oembedParams;
 
         // phpcs:disable Generic.Files.LineLength
@@ -73,15 +77,18 @@ class VimeoEmbedFactoryTest extends MinimalContainerTestCase {
             "author_url" => "https://vimeo.com/diegodiapolo",
             "is_plus" => "0",
             "account_type" => "basic",
-            "html" => "<iframe src=\"https://player.vimeo.com/video/207028770?app_id=122963\" width=\"640\" height=\"300\" frameborder=\"0\" title=\"Glycol\" allow=\"autoplay; fullscreen\" allowfullscreen></iframe>",
+            "html" =>
+                "<iframe src=\"https://player.vimeo.com/video/207028770?app_id=122963\" width=\"640\" height=\"300\" frameborder=\"0\" title=\"Glycol\" allow=\"autoplay; fullscreen\" allowfullscreen></iframe>",
             "width" => 640,
             "height" => 300,
             "duration" => 70,
-            "description" => "Glycol decomposes in contact with the air in about ten days, in water or soil in just a couple of weeks. Plastic spaces and living things are made of it, habitating in an artificial world created by humans, a world of perpetual motion and random algorithms. It is aesthetic, mathematical and physical. Glycol is an experiment I did to communicate with you.\n\nAll by Diego Diapolo\n\nmore at \nwww.diegodiapolo.com\nwww.instagram.com/diegodiapolo",
+            "description" =>
+                "Glycol decomposes in contact with the air in about ten days, in water or soil in just a couple of weeks. Plastic spaces and living things are made of it, habitating in an artificial world created by humans, a world of perpetual motion and random algorithms. It is aesthetic, mathematical and physical. Glycol is an experiment I did to communicate with you.\n\nAll by Diego Diapolo\n\nmore at \nwww.diegodiapolo.com\nwww.instagram.com/diegodiapolo",
             "thumbnail_url" => "https://i.vimeocdn.com/video/740788474_640.jpg",
             "thumbnail_width" => 640,
             "thumbnail_height" => 300,
-            "thumbnail_url_with_play_button" => "https://i.vimeocdn.com/filter/overlay?src0=https%3A%2F%2Fi.vimeocdn.com%2Fvideo%2F740788474_640.jpg&src1=http%3A%2F%2Ff.vimeocdn.com%2Fp%2Fimages%2Fcrawler_play.png",
+            "thumbnail_url_with_play_button" =>
+                "https://i.vimeocdn.com/filter/overlay?src0=https%3A%2F%2Fi.vimeocdn.com%2Fvideo%2F740788474_640.jpg&src1=http%3A%2F%2Ff.vimeocdn.com%2Fp%2Fimages%2Fcrawler_play.png",
             "upload_date" => "2017-03-05 17:33:52",
             "video_id" => 207028770,
             "uri" => "/videos/207028770",
@@ -90,11 +97,7 @@ class VimeoEmbedFactoryTest extends MinimalContainerTestCase {
 
         $this->httpClient->addMockResponse(
             $oembedUrl,
-            new HttpResponse(
-                200,
-                "Content-Type: application/json",
-                json_encode($data)
-            )
+            new HttpResponse(200, "Content-Type: application/json", json_encode($data))
         );
 
         // Check over the network.

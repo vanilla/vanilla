@@ -10,7 +10,7 @@ import Builder from "./Builder";
 /**
  * Run just the install phase of the build.
  */
-void getOptions().then(options => {
+void getOptions().then((options) => {
     const builder = new Builder(options);
     return builder.installOnly();
 });

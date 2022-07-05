@@ -10,8 +10,8 @@ namespace Vanilla\Formatting\Quill;
 /**
  * Class for rendering BlotGroups into HTML.
  */
-class Renderer {
-
+class Renderer
+{
     /**
      * Render operations into HTML.
      *
@@ -19,7 +19,8 @@ class Renderer {
      *
      * @return string
      */
-    public function render(BlotGroupCollection $blotGroups): string {
+    public function render(BlotGroupCollection $blotGroups): string
+    {
         $result = "";
         foreach ($blotGroups as $index => $group) {
             $result .= $group->render();

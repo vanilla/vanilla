@@ -10,12 +10,13 @@ namespace VanillaTests\Library\Vanilla;
 /**
  * Test enabling/disabling every 3rd addon from 1.
  */
-class AddonsEnableDisablePart2Test extends AbstractAddonEnableDisableTest {
-
+class AddonsEnableDisablePart2Test extends AbstractAddonEnableDisableTest
+{
     /**
      * @inheritdoc
      */
-    public function getDisibilityRemainder(): int {
+    public function getDisibilityRemainder(): int
+    {
         return 1;
     }
 }

@@ -10,8 +10,8 @@ namespace Vanilla\Logging;
 /**
  * Collector for debug traces.
  */
-class TraceCollector {
-
+class TraceCollector
+{
     /** @var array */
     private $traces = [];
 
@@ -23,14 +23,16 @@ class TraceCollector {
      * - other: A variable to output.
      * @param string $type One of the `TRACE_*` constants or a string label for the trace.
      */
-    public function addTrace($value, string $type = TRACE_INFO) {
+    public function addTrace($value, string $type = TRACE_INFO)
+    {
         $this->traces[] = [$value, $type];
     }
 
     /**
      * @return array
      */
-    public function getTraces(): array {
+    public function getTraces(): array
+    {
         return $this->traces;
     }
 }

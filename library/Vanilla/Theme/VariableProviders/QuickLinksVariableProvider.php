@@ -13,8 +13,8 @@ use Vanilla\Theme\VariablesProviderInterface;
 /**
  * Variable provider to apply quick links variables to the current theme.
  */
-class QuickLinksVariableProvider implements VariablesProviderInterface, VariableDefaultsProviderInterface {
-
+class QuickLinksVariableProvider implements VariablesProviderInterface, VariableDefaultsProviderInterface
+{
     /** @var QuickLinkProviderInterface[] */
     protected $providers = [];
 
@@ -24,14 +24,16 @@ class QuickLinksVariableProvider implements VariablesProviderInterface, Variable
     /**
      * @param QuickLinkProviderInterface $linkProvider
      */
-    public function addQuickLinkProvider(QuickLinkProviderInterface $linkProvider) {
+    public function addQuickLinkProvider(QuickLinkProviderInterface $linkProvider)
+    {
         $this->providers[] = $linkProvider;
     }
 
     /**
      * @return QuickLink[]
      */
-    public function getAllLinks(): array {
+    public function getAllLinks(): array
+    {
         if ($this->allLinks === null) {
             $this->allLinks = [];
             foreach ($this->providers as $provider) {
@@ -40,7 +42,7 @@ class QuickLinksVariableProvider implements VariablesProviderInterface, Variable
                 }
             }
             usort($this->allLinks, function (QuickLink $a, QuickLink $b) {
-                return ($a->getSort() <=> $b->getSort());
+                return $a->getSort() <=> $b->getSort();
             });
         }
 
@@ -50,7 +52,8 @@ class QuickLinksVariableProvider implements VariablesProviderInterface, Variable
     /**
      * @return array
      */
-    public function getVariables(): array {
+    public function getVariables(): array
+    {
         $allLinks = $this->getAllLinks();
         $counts = [];
         foreach ($allLinks as $link) {
@@ -58,8 +61,8 @@ class QuickLinksVariableProvider implements VariablesProviderInterface, Variable
         }
 
         return [
-            'quickLinks' => [
-                'counts' => $counts,
+            "quickLinks" => [
+                "counts" => $counts,
             ],
         ];
     }
@@ -67,10 +70,11 @@ class QuickLinksVariableProvider implements VariablesProviderInterface, Variable
     /**
      * @return array
      */
-    public function getVariableDefaults(): array {
+    public function getVariableDefaults(): array
+    {
         return [
-            'quickLinks' => [
-                'links' => $this->getAllLinks(),
+            "quickLinks" => [
+                "links" => $this->getAllLinks(),
             ],
         ];
     }
@@ -78,7 +82,8 @@ class QuickLinksVariableProvider implements VariablesProviderInterface, Variable
     /**
      * Reset all providers
      */
-    public function resetProviders() {
+    public function resetProviders()
+    {
         $this->providers = [];
     }
     /**
@@ -86,7 +91,8 @@ class QuickLinksVariableProvider implements VariablesProviderInterface, Variable
      *
      * @return QuickLinkProviderInterface[]
      */
-    public function getAllProviders(): array {
+    public function getAllProviders(): array
+    {
         return $this->providers;
     }
 }

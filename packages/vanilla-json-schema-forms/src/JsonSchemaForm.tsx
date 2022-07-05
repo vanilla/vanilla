@@ -12,15 +12,35 @@ import produce from "immer";
 import { VanillaUIFormControl } from "./vanillaUIControl/VanillaUIFormControl";
 import { VanillaUIFormControlGroup } from "./vanillaUIControl/VanillaUIFormControlGroup";
 
-interface IProps extends ISchemaRenderProps {
+interface ICommonProps extends ISchemaRenderProps {
     schema: JsonSchema | string;
     instance: any;
-    /** true by default */
+    /** false by default */
     autoValidate?: boolean;
+    /** false by default */
+    validateOnBlur?: boolean;
     onChange(instance: any): void;
     disabled?: boolean;
     vanillaUI?: boolean;
+    onValidationStatusChange?(valid: boolean): void;
+    hideDescriptionInLabels?: boolean;
+    size?: "small" | "default";
+    autocompleteClassName?: string;
 }
+
+export type IProps = ICommonProps &
+    (
+        | {
+              formGroupWrapper?: React.FunctionComponent<any>; // will wrap formgroups, normally an accordion with expand/collapse
+              expandableFormGroups?: string[]; //only those passed here will be wrapped with expandableWrapper
+              rootExpandable?: boolean;
+          }
+        | {
+              formGroupWrapper?: undefined;
+              expandableFormGroups?: never;
+              rootExpandable?: never;
+          }
+    );
 
 export interface IJsonSchemaFormHandle {
     validate(): IValidationResult;
@@ -37,7 +57,8 @@ export const JsonSchemaForm = forwardRef(function JsonSchemaFormImpl(
     ref: React.Ref<IJsonSchemaFormHandle>,
 ) {
     const {
-        autoValidate,
+        autoValidate = false,
+        validateOnBlur = false,
         instance,
         onChange,
         Form,
@@ -46,7 +67,15 @@ export const JsonSchemaForm = forwardRef(function JsonSchemaFormImpl(
         FormControl,
         FormControlGroup,
         vanillaUI = false,
+        formGroupWrapper,
+        expandableFormGroups,
+        rootExpandable = false,
+        onValidationStatusChange,
+        hideDescriptionInLabels = false,
+        size = "default",
+        autocompleteClassName,
     } = props;
+
     const [validation, setValidation] = useState<IValidationResult>();
 
     const schema = useMemo<JsonSchema>(
@@ -79,6 +108,7 @@ export const JsonSchemaForm = forwardRef(function JsonSchemaFormImpl(
 
     const ajv = useMemo(() => {
         const ajv = new Ajv({
+            allErrors: true,
             // Will remove additional properties if a schema has { additionalProperties: false }.
             removeAdditional: true,
             // Will set defaults automatically.
@@ -94,6 +124,10 @@ export const JsonSchemaForm = forwardRef(function JsonSchemaFormImpl(
         ajv.addKeyword("x-control");
         // Add x-form as a suppported keyword of the schema.
         ajv.addKeyword("x-form");
+        ajv.addFormat(
+            "url",
+            /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/,
+        );
         return ajv;
     }, []);
 
@@ -116,7 +150,13 @@ export const JsonSchemaForm = forwardRef(function JsonSchemaFormImpl(
         };
         setValidation(result);
         return result;
-    }, [ajv, onChange]);
+    }, [ajv]);
+
+    useEffect(() => {
+        if (!!validation && typeof validation?.isValid !== undefined) {
+            onValidationStatusChange?.(validation.isValid);
+        }
+    }, [validation]);
 
     // Validate the form every time value changes.
     useEffect(() => {
@@ -143,6 +183,13 @@ export const JsonSchemaForm = forwardRef(function JsonSchemaFormImpl(
             rootSchema={schema}
             rootInstance={instance}
             validation={validation}
+            onBlur={validateOnBlur ? () => validate() : undefined}
+            hideDescriptionInLabels={hideDescriptionInLabels}
+            size={size}
+            autocompleteClassName={autocompleteClassName}
+            formGroupWrapper={formGroupWrapper}
+            expandableFormGroups={expandableFormGroups}
+            rootExpandable={rootExpandable}
         />
     );
 });

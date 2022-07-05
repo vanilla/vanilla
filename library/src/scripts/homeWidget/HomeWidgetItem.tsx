@@ -16,14 +16,11 @@ import Heading from "@library/layout/Heading";
 import TruncatedText from "@library/content/TruncatedText";
 import { ICountResult } from "@library/search/searchTypes";
 import { ResultMeta } from "@library/result/ResultMeta";
-import { metasClasses } from "@library/metas/Metas.styles";
-import classNames from "classnames";
 import { getClassForButtonType } from "@library/forms/Button";
 import { t } from "@library/utility/appUtils";
 import { ArrowIcon } from "@library/icons/common";
 import { DeepPartial } from "redux";
 import { MetaItem, Metas } from "@library/metas/Metas";
-import { Devices, useDevice } from "@library/layout/DeviceContext";
 import { cx } from "@emotion/css";
 import { buttonClasses } from "@library/forms/Button.styles";
 
@@ -48,7 +45,8 @@ export interface IHomeWidgetItemProps {
 }
 
 export function HomeWidgetItem(props: IHomeWidgetItemProps) {
-    const options = homeWidgetItemVariables(props.options).options;
+    const vars = homeWidgetItemVariables(props.options);
+    const options = vars.options;
     const classes = homeWidgetItemClasses(props.options);
 
     useDebugValue({ opts: options });
@@ -126,7 +124,13 @@ export function HomeWidgetItem(props: IHomeWidgetItemProps) {
                     <div className={classes.imageContainerWrapper}>
                         <div className={classes.imageContainer}>
                             {imageUrl && (
-                                <img className={classes.image} src={imageUrl} alt={props.name} loading="lazy" />
+                                <img
+                                    height={vars.icon.size}
+                                    className={classes.image}
+                                    src={imageUrl}
+                                    alt={props.name}
+                                    loading="lazy"
+                                />
                             )}
                         </div>
                     </div>

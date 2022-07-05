@@ -12,8 +12,8 @@ use Garden\Web\Exception\NotFoundException;
 /**
  * Defines methods for objects that can provide layout definitions
  */
-interface LayoutProviderInterface {
-
+interface LayoutProviderInterface
+{
     /**
      * Determine whether a layout with the ID specified is supported by the layout provider using the id's type
      *

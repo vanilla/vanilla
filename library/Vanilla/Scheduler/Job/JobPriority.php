@@ -10,8 +10,8 @@ namespace Vanilla\Scheduler\Job;
 /**
  * JobPriority
  */
-class JobPriority {
-    
+class JobPriority
+{
     /**
      * @var string
      */
@@ -22,14 +22,16 @@ class JobPriority {
      *
      * @param string $priority
      */
-    protected function __construct(string $priority) {
+    protected function __construct(string $priority)
+    {
         $this->myPriority = $priority;
     }
 
     /**
      * @return string
      */
-    public function getValue(): string {
+    public function getValue(): string
+    {
         return $this->myPriority;
     }
 
@@ -39,29 +41,33 @@ class JobPriority {
      * @param JobPriority $jpr
      * @return bool
      */
-    public function is(JobPriority $jpr): bool {
+    public function is(JobPriority $jpr): bool
+    {
         return $this->myPriority == $jpr->getValue();
     }
 
     /**
      * @return JobPriority
      */
-    public static function high() {
-        return new JobPriority('high');
+    public static function high()
+    {
+        return new JobPriority("high");
     }
 
     /**
      * @return JobPriority
      */
-    public static function normal() {
-        return new JobPriority('normal');
+    public static function normal()
+    {
+        return new JobPriority("normal");
     }
 
     /**
      * @return JobPriority
      */
-    public static function low() {
-        return new JobPriority('low');
+    public static function low()
+    {
+        return new JobPriority("low");
     }
 
     /**
@@ -70,7 +76,8 @@ class JobPriority {
      * @param string $priority
      * @return JobPriority
      */
-    public static function loosePriority(string $priority) {
+    public static function loosePriority(string $priority)
+    {
         return new JobPriority($priority);
     }
 }

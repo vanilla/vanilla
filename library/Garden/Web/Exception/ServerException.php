@@ -10,12 +10,13 @@ namespace Garden\Web\Exception;
 /**
  * Represents a 5xx server exception.
  */
-class ServerException extends HttpException {
-
+class ServerException extends HttpException
+{
     /**
      * @inheritdoc
      */
-    public function __construct($message, $code = 500, array $context = []) {
-        parent::__construct($message, $code, $context);
+    public function __construct($message, $code = 500, array $context = [], ?\Throwable $previous = null)
+    {
+        parent::__construct($message, $code, $context, $previous);
     }
 }

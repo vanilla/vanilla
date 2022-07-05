@@ -8,8 +8,8 @@
     Variables
 \* -------------------------------------------------------------- */
 
-$mebox-photo_size:                      28px !default;
-$mebox-button_borderRadius:             3px !default;
+$mebox-photo_size: 28px !default;
+$mebox-button_borderRadius: 3px !default;
 
 /* -------------------------------------------------------------- *\
     Styles
@@ -18,7 +18,6 @@ $mebox-button_borderRadius:             3px !default;
 .SpNotifications,
 .SpInbox,
 .SpBookmarks {
-
     &::before {
         @include kbicon();
     }
@@ -40,7 +39,6 @@ $mebox-button_borderRadius:             3px !default;
 }
 
 .Open {
-
     .SpNotifications::before {
         content: $kbicon-notifications;
     }
@@ -125,19 +123,18 @@ $mebox-button_borderRadius:             3px !default;
 }
 
 // Reset base theme style
-.UserBox .WhoIs, .MeBox .WhoIs {
+.UserBox .WhoIs,
+.MeBox .WhoIs {
     min-height: initial;
     line-height: inherit;
 }
 
 .MeBox-header {
-
     @include maxWidth($theme-breakpoint_base) {
         display: none;
     }
 
     .SignInLinks {
-
         .Bullet {
             display: none;
         }

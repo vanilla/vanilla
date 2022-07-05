@@ -12,11 +12,13 @@ use VanillaTests\MinimalContainerTestCase;
 /**
  * Verify embed class capabilities.
  */
-class WistiaEmbedTest extends MinimalContainerTestCase {
+class WistiaEmbedTest extends MinimalContainerTestCase
+{
     /**
      * Ensure we can create an embed from legacy data that might still live in the DB.
      */
-    public function testLegacyDataFormat() {
+    public function testLegacyDataFormat()
+    {
         $legacyJSON = <<<JSON
 {
     "url": "https://dave.wistia.com/medias/0k5h1g1chs",

@@ -14,7 +14,8 @@ use Vanilla\Formatting\TextFragmentType;
 /**
  * An adaptor for blot groups that allow updating the text in each blot.
  */
-final class BlotGroupTextFragment implements TextFragmentInterface {
+final class BlotGroupTextFragment implements TextFragmentInterface
+{
     /**
      * @var BlotGroup
      */
@@ -42,7 +43,8 @@ final class BlotGroupTextFragment implements TextFragmentInterface {
      * @param int $from The starting ordinal in the group that the text represents.
      * @param ?int $to The ending ordinal in the group that the text represents.
      */
-    public function __construct(BlotGroup $blotGroup, BlotGroupCollection $parent, int $from = 0, int $to = null) {
+    public function __construct(BlotGroup $blotGroup, BlotGroupCollection $parent, int $from = 0, int $to = null)
+    {
         $this->blotGroup = $blotGroup;
         $this->parent = $parent;
 
@@ -60,7 +62,8 @@ final class BlotGroupTextFragment implements TextFragmentInterface {
     /**
      * @inheritDoc
      */
-    public function getInnerContent(): string {
+    public function getInnerContent(): string
+    {
         $r = $this->blotGroup->renderPartialLineGroupContent($this->getFromIndex());
         return $r;
     }
@@ -68,7 +71,8 @@ final class BlotGroupTextFragment implements TextFragmentInterface {
     /**
      * {@inheritDoc}
      */
-    public function setInnerContent(string $text) {
+    public function setInnerContent(string $text)
+    {
         $blots = HtmlToBlotsParser::parseInlineHtml($text, $this->parent);
 
         $from = $this->getFromIndex();
@@ -79,7 +83,8 @@ final class BlotGroupTextFragment implements TextFragmentInterface {
     /**
      * @inheritDoc
      */
-    public function getFragmentType(): string {
+    public function getFragmentType(): string
+    {
         if ($this->to instanceof CodeLineTerminatorBlot) {
             return TextFragmentType::CODE;
         }
@@ -89,14 +94,16 @@ final class BlotGroupTextFragment implements TextFragmentInterface {
     /**
      * @return false|int|string
      */
-    private function getFromIndex() {
+    private function getFromIndex()
+    {
         return array_search($this->from, $this->blotGroup->getBlotsAndGroups(), true);
     }
 
     /**
      * @return false|int|string
      */
-    private function getToIndex() {
+    private function getToIndex()
+    {
         return array_search($this->to, $this->blotGroup->getBlotsAndGroups(), true);
     }
 }

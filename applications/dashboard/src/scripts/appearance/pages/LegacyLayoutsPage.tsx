@@ -9,6 +9,7 @@ import { RouteComponentProps } from "react-router-dom";
 import CategoriesLegacyLayoutsPage from "@dashboard/appearance/pages/CategoriesLegacyLayoutsPage";
 import DiscussionsLegacyLayoutsPage from "@dashboard/appearance/pages/DiscussionsLegacyLayoutsPage";
 import HomepageLegacyLayoutsPage from "@dashboard/appearance/pages/HomepageLegacyLayoutsPage";
+import NotFoundPage from "@library/routing/NotFoundPage";
 
 export default function LegacyLayoutsPage(
     props: RouteComponentProps<{
@@ -19,11 +20,11 @@ export default function LegacyLayoutsPage(
     switch (layoutViewType) {
         case "home":
             return <HomepageLegacyLayoutsPage />;
-        case "categories":
+        case "categoryList":
             return <CategoriesLegacyLayoutsPage />;
-        case "discussions":
+        case "discussionList":
             return <DiscussionsLegacyLayoutsPage />;
         default:
-            return <HomepageLegacyLayoutsPage />;
+            return <NotFoundPage />;
     }
 }

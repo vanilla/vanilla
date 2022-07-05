@@ -14,8 +14,8 @@ use VanillaTests\SiteTestCase;
 /**
  * Class LocalRemoteResourceJobTest
  */
-class LocalRemoteResourceJobTest extends SiteTestCase {
-
+class LocalRemoteResourceJobTest extends SiteTestCase
+{
     /** @var RemoteResourceModel */
     private $remoteResourceModel;
 
@@ -28,11 +28,12 @@ class LocalRemoteResourceJobTest extends SiteTestCase {
     /**
      * {@inheritDoc}
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         /** @var Gdn_Cache cache */
-        $this->cache =$this->enableCaching();
+        $this->cache = $this->enableCaching();
 
         /** @var RemoteResourceModel $remoteResourceModel */
         $this->remoteResourceModel = Gdn::getContainer()->get(RemoteResourceModel::class);
@@ -49,7 +50,8 @@ class LocalRemoteResourceJobTest extends SiteTestCase {
      * @param array $expected
      * @dataProvider remoteResourceJobDataProvider
      */
-    public function testRemoteResourceJobRun($url, $urlContent, $expected) {
+    public function testRemoteResourceJobRun($url, $urlContent, $expected)
+    {
         $client = $this->getMockClient($url, $urlContent, $expected);
         $localRemoteResourceJob = $this->getLocalRemoteResourceJob($client);
         $localRemoteResourceJob->setMessage(["url" => $url]);
@@ -57,16 +59,17 @@ class LocalRemoteResourceJobTest extends SiteTestCase {
         /** \Vanilla\Scheduler\Job\JobExecutionStatus $test */
         $status = $localRemoteResourceJob->run();
 
-        $this->assertEquals($expected['jobStatus'], $status->getStatus());
+        $this->assertEquals($expected["jobStatus"], $status->getStatus());
 
         $resource = $this->remoteResourceModel->select(["url" => $url]);
-        $this->assertEquals($expected['expectContent'], $resource[0]["content"]);
+        $this->assertEquals($expected["expectContent"], $resource[0]["content"]);
     }
 
     /**
      * DataProvider for testRemoteResourceJobRun
      */
-    public function remoteResourceJobDataProvider() {
+    public function remoteResourceJobDataProvider()
+    {
         return [
             [
                 "http://test.com",
@@ -75,7 +78,7 @@ class LocalRemoteResourceJobTest extends SiteTestCase {
                     "code" => 200,
                     "jobStatus" => JobExecutionStatus::complete()->getStatus(),
                     "expectContent" => "<h1>Test Test</h1>",
-                ]
+                ],
             ],
             [
                 "http://fail.com",
@@ -83,8 +86,8 @@ class LocalRemoteResourceJobTest extends SiteTestCase {
                 [
                     "code" => 404,
                     "jobStatus" => JobExecutionStatus::error()->getStatus(),
-                    "expectContent" =>  null,
-                ]
+                    "expectContent" => null,
+                ],
             ],
         ];
     }
@@ -92,18 +95,15 @@ class LocalRemoteResourceJobTest extends SiteTestCase {
     /**
      * Test the that remote resource job is locked.
      */
-    public function testLocalRemoteResourceJobLock() {
+    public function testLocalRemoteResourceJobLock()
+    {
         $url = "test123.com";
         $client = $this->getMockClient($url, "<h1>LOCKED</h1>", ["code" => 404]);
         $localRemoteResourceJob = $this->getLocalRemoteResourceJob($client);
         $key = sprintf(LocalRemoteResourceJob::REMOTE_RESOURCE_LOCK, $url);
-        $this->cache->add(
-            $key,
-            $url,
-            [
-                Gdn_Cache::FEATURE_EXPIRY => RemoteResourceHttpClient::REQUEST_TIMEOUT
-            ]
-        );
+        $this->cache->add($key, $url, [
+            Gdn_Cache::FEATURE_EXPIRY => RemoteResourceHttpClient::REQUEST_TIMEOUT,
+        ]);
 
         $localRemoteResourceJob->setMessage(["url" => $url]);
 
@@ -120,16 +120,16 @@ class LocalRemoteResourceJobTest extends SiteTestCase {
      * @param array $expected
      * @return RemoteResourceHttpClient
      */
-    private function getMockClient($url, $urlContent, $expected): RemoteResourceHttpClient {
+    private function getMockClient($url, $urlContent, $expected): RemoteResourceHttpClient
+    {
         $mockHandler = new MockHttpHandler();
         /** @var RemoteResourceHttpClient $client */
         $client = $this->container()->get(RemoteResourceHttpClient::class);
         $client->setHandler($mockHandler);
-        $mockHandler->addMockResponse($url, new \Garden\Http\HttpResponse(
-            $expected['code'],
-            ['content-type' => 'application/html'],
-            $urlContent
-        ));
+        $mockHandler->addMockResponse(
+            $url,
+            new \Garden\Http\HttpResponse($expected["code"], ["content-type" => "application/html"], $urlContent)
+        );
 
         return $client;
     }
@@ -140,7 +140,8 @@ class LocalRemoteResourceJobTest extends SiteTestCase {
      * @param RemoteResourceHttpClient $client
      * @return LocalRemoteResourceJob
      */
-    private function getLocalRemoteResourceJob($client): LocalRemoteResourceJob {
+    private function getLocalRemoteResourceJob($client): LocalRemoteResourceJob
+    {
         $localRemoteResourceJob = new LocalRemoteResourceJob($this->remoteResourceModel, $client, $this->cache);
         return $localRemoteResourceJob;
     }

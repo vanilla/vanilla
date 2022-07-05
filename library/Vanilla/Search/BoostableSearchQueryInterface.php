@@ -10,8 +10,8 @@ namespace Vanilla\Search;
 /**
  * Interface to apply on a query type that supports boosting various fields at query time.
  */
-interface BoostableSearchQueryInterface {
-
+interface BoostableSearchQueryInterface
+{
     /**
      * Boost a date field by it's recency.
      *

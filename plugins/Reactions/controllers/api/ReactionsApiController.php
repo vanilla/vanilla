@@ -11,8 +11,8 @@ use Vanilla\ApiUtils;
 /**
  * API Controller for the `/reactions` resource.
  */
-class ReactionsApiController extends AbstractApiController {
-
+class ReactionsApiController extends AbstractApiController
+{
     /** @var ReactionModel */
     private $reactionModel;
 
@@ -21,7 +21,8 @@ class ReactionsApiController extends AbstractApiController {
      *
      * @param ReactionModel $reactionModel
      */
-    public function __construct(ReactionModel $reactionModel) {
+    public function __construct(ReactionModel $reactionModel)
+    {
         $this->reactionModel = $reactionModel;
     }
 
@@ -30,11 +31,12 @@ class ReactionsApiController extends AbstractApiController {
      *
      * @return Schema
      */
-    public function fullReactionTypeSchema() {
+    public function fullReactionTypeSchema()
+    {
         static $schema;
 
         if ($schema === null) {
-            $schema = $this->schema($this->reactionModel->typeSchema(), 'ReactionType');
+            $schema = $this->schema($this->reactionModel->typeSchema(), "ReactionType");
         }
 
         return $schema;
@@ -46,11 +48,12 @@ class ReactionsApiController extends AbstractApiController {
      * @param string $urlCode
      * @return array
      */
-    public function get($urlCode) {
-        $this->permission('Garden.Community.Manage');
+    public function get($urlCode)
+    {
+        $this->permission("Garden.Community.Manage");
 
-        $in = $this->schema($this->idParamSchema(), 'in')->setDescription('Get a single reaction type.');
-        $out = $this->schema($this->fullReactionTypeSchema(), 'out');
+        $in = $this->schema($this->idParamSchema(), "in")->setDescription("Get a single reaction type.");
+        $out = $this->schema($this->fullReactionTypeSchema(), "out");
 
         $row = $this->normalizeOutput($this->reactionByUrlCode($urlCode));
         $result = $out->validate($row);
@@ -63,13 +66,17 @@ class ReactionsApiController extends AbstractApiController {
      * @param string $urlCode
      * @return array
      */
-    public function get_edit($urlCode) {
-        $this->permission('Garden.Community.Manage');
+    public function get_edit($urlCode)
+    {
+        $this->permission("Garden.Community.Manage");
 
-        $in = $this->schema($this->idParamSchema(), 'in')->setDescription('Get a reaction type for editing.');
-        $out = $this->schema(Schema::parse([
-            'urlCode', 'name', 'description', 'class', 'points', 'active'
-        ])->add($this->fullReactionTypeSchema()), 'out');
+        $in = $this->schema($this->idParamSchema(), "in")->setDescription("Get a reaction type for editing.");
+        $out = $this->schema(
+            Schema::parse(["urlCode", "name", "description", "class", "points", "active"])->add(
+                $this->fullReactionTypeSchema()
+            ),
+            "out"
+        );
 
         $row = $this->normalizeOutput($this->reactionByUrlCode($urlCode));
         $result = $out->validate($row);
@@ -81,8 +88,9 @@ class ReactionsApiController extends AbstractApiController {
      *
      * @return Schema Returns a schema object.
      */
-    public function idParamSchema() {
-        return $this->schema(['id:i' => 'The reaction type ID.'], 'in');
+    public function idParamSchema()
+    {
+        return $this->schema(["id:i" => "The reaction type ID."], "in");
     }
 
     /**
@@ -90,11 +98,12 @@ class ReactionsApiController extends AbstractApiController {
      *
      * @return array
      */
-    public function index() {
-        $this->permission('Garden.Community.Manage');
+    public function index()
+    {
+        $this->permission("Garden.Community.Manage");
 
-        $in = $this->schema([], 'in')->setDescription('Get a list of reaction types.');
-        $out = $this->schema([':a' => $this->fullReactionTypeSchema()], 'out');
+        $in = $this->schema([], "in")->setDescription("Get a list of reaction types.");
+        $out = $this->schema([":a" => $this->fullReactionTypeSchema()], "out");
 
         $rows = array_values(ReactionModel::reactionTypes());
         foreach ($rows as &$row) {
@@ -110,7 +119,8 @@ class ReactionsApiController extends AbstractApiController {
      * @param array $row
      * @return array
      */
-    public function normalizeInput(array $row) {
+    public function normalizeInput(array $row)
+    {
         $row = ApiUtils::convertInputKeys($row);
         return $row;
     }
@@ -121,7 +131,8 @@ class ReactionsApiController extends AbstractApiController {
      * @param array $row
      * @return array
      */
-    public function normalizeOutput(array $row) {
+    public function normalizeOutput(array $row)
+    {
         $row = $this->reactionModel->normalizeTypeRow($row);
         return $row;
     }
@@ -133,12 +144,13 @@ class ReactionsApiController extends AbstractApiController {
      * @param array $body
      * @return array
      */
-    public function patch($urlCode, array $body) {
-        $this->permission('Garden.Community.Manage');
+    public function patch($urlCode, array $body)
+    {
+        $this->permission("Garden.Community.Manage");
 
         $this->idParamSchema();
-        $in = $this->schema($this->postSchema(), 'in')->setDescription('Update a reaction type.');
-        $out = $this->schema($this->fullReactionTypeSchema(), 'out');
+        $in = $this->schema($this->postSchema(), "in")->setDescription("Update a reaction type.");
+        $out = $this->schema($this->fullReactionTypeSchema(), "out");
 
         $body = $in->validate($body, true);
 
@@ -146,8 +158,8 @@ class ReactionsApiController extends AbstractApiController {
         $row = $this->reactionByUrlCode($urlCode);
 
         // Prepare to save. Flag as custom, so future updates won't wipe out changes.
-        $body['urlCode'] = $row['UrlCode']; // Maintain original URL code casing.
-        $body['custom'] = true;
+        $body["urlCode"] = $row["UrlCode"]; // Maintain original URL code casing.
+        $body["custom"] = true;
         $data = $this->normalizeInput($body);
         $this->reactionModel->save($data);
         ReactionModel::$ReactionTypes = null; // Wipe the types cache.
@@ -163,14 +175,15 @@ class ReactionsApiController extends AbstractApiController {
      *
      * @return Schema
      */
-    public function postSchema() {
+    public function postSchema()
+    {
         static $schema;
 
         if ($schema === null) {
-            $schema = Schema::parse([
-                'name', 'description', 'class', 'points', 'active'
-            ])->add($this->fullReactionTypeSchema());
-            $schema->setField('properties.class.enum', ['Flag', 'Negative', 'Positive']);
+            $schema = Schema::parse(["name", "description", "class", "points", "active"])->add(
+                $this->fullReactionTypeSchema()
+            );
+            $schema->setField("properties.class.enum", ["Flag", "Negative", "Positive"]);
         }
 
         return $schema;
@@ -183,13 +196,14 @@ class ReactionsApiController extends AbstractApiController {
      * @throws NotFoundException If the reaction could not be found.
      * @return array
      */
-    public function reactionByUrlCode($urlCode) {
+    public function reactionByUrlCode($urlCode)
+    {
         $row = ReactionModel::reactionTypes($urlCode);
 
         if (!$row) {
-            throw new NotFoundException('Reaction');
+            throw new NotFoundException("Reaction");
         }
-        $row['reactionValue'] = $row['IncrementValue'] ?? $row['Points'] ?? 0;
+        $row["reactionValue"] = $row["IncrementValue"] ?? ($row["Points"] ?? 0);
         return $row;
     }
 }

@@ -53,7 +53,7 @@ export function Menu(props: MenuProps<any>) {
     return (
         <components.Menu
             {...props}
-            className={classNames("suggestedTextInput-menu", "dropDown-contents", "isParentWidth", classes.contents)}
+            className={classNames("suggestedTextInput-menu", "dropDown-contents", classes.contents)}
         />
     );
 }

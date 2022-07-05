@@ -13,8 +13,8 @@ use Vanilla\Site\OwnSiteProvider;
 /**
  * Mock site provider for tests.
  */
-class MockSiteProvider extends OwnSiteProvider {
-
+class MockSiteProvider extends OwnSiteProvider
+{
     /** @var Site */
     private $mockSites = [];
 
@@ -23,28 +23,32 @@ class MockSiteProvider extends OwnSiteProvider {
      *
      * @param Site $site
      */
-    public function addMockSite(Site $site): void {
+    public function addMockSite(Site $site): void
+    {
         $this->mockSites[] = $site;
     }
 
     /**
      * @return array
      */
-    public function getAllSites(): array {
+    public function getAllSites(): array
+    {
         return array_merge([$this->ownSite], $this->mockSites);
     }
 
     /**
      * @param Site $ownSite
      */
-    public function setOwnSite(Site $ownSite): void {
+    public function setOwnSite(Site $ownSite): void
+    {
         $this->ownSite = $ownSite;
     }
 
     /**
      * @param Site $unknownSite
      */
-    public function setUnknownSite(Site $unknownSite): void {
+    public function setUnknownSite(Site $unknownSite): void
+    {
         $this->unknownSite = $unknownSite;
     }
 }

@@ -13,9 +13,12 @@
  * @param object $smarty
  * @return string
  */
-function smarty_function_activity_link($params, &$smarty) {
-      $wrap = val('wrap', $params, 'li');
-      return Gdn_Theme::link('activity',
-         val('text', $params, t('Activity')),
-         val('format', $params, wrap('<a href="%url" class="%class">%text</a>', $wrap)));
+function smarty_function_activity_link($params, &$smarty)
+{
+    $wrap = val("wrap", $params, "li");
+    return Gdn_Theme::link(
+        "activity",
+        val("text", $params, t("Activity")),
+        val("format", $params, wrap('<a href="%url" class="%class">%text</a>', $wrap))
+    );
 }

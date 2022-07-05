@@ -273,12 +273,9 @@ button.Close {
   border: 0;
   cursor: pointer;
   background: none;
-  display: -ms-flexbox;
   display: flex;
-  -ms-flex-align: center;
-      align-items: center;
-  -ms-flex-pack: center;
-      justify-content: center;
+  align-items: center;
+  justify-content: center;
   height: 36px;
   width: 36px;
   min-width: 36px;
@@ -341,7 +338,9 @@ button.Close {
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-.Popup .Content > h1:first-child, .Popup .Content > h2:first-child, .Popup .Content > h3:first-child {
+.Popup .Content > h1:first-child,
+.Popup .Content > h2:first-child,
+.Popup .Content > h3:first-child {
   font-size: 20px;
   margin-top: 0;
   margin-bottom: 14px;
@@ -432,12 +431,9 @@ button.Close {
 }
 
 .rememberMeAndForgot {
-  display: -ms-flexbox;
   display: flex;
-  -ms-flex-wrap: wrap;
-      flex-wrap: wrap;
-  -ms-flex-align: center;
-      align-items: center;
+  flex-wrap: wrap;
+  align-items: center;
   font-size: 12px;
 }
 .rememberMeAndForgot a {
@@ -446,8 +442,7 @@ button.Close {
 }
 
 .rememberMeAndForgot-rememberMe {
-  -ms-flex-positive: 1;
-      flex-grow: 1;
+  flex-grow: 1;
   padding-right: 6px;
 }
 
@@ -466,14 +461,10 @@ button.Close {
 
 .button.Button.Primary.buttonCTA, .button.Button.button-sso {
   -webkit-user-select: none;
-      -ms-user-select: none;
           user-select: none;
-  display: -ms-flexbox;
   display: flex;
-  -ms-flex-align: center;
-      align-items: center;
-  -ms-flex-pack: center;
-      justify-content: center;
+  align-items: center;
+  justify-content: center;
   background-image: none;
   box-sizing: border-box;
   text-decoration: none !important;
@@ -501,14 +492,10 @@ button.Close {
 }
 
 .button-ssoContents {
-  display: -ms-flexbox;
   display: flex;
-  -ms-flex-align: center;
-      align-items: center;
-  -ms-flex-pack: justify;
-      justify-content: space-between;
-  -ms-flex-wrap: wrap;
-      flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
   width: 100%;
   max-width: 100%;
 }
@@ -554,34 +541,26 @@ button.Close {
 .PageControls .selectBox {
   margin-right: 15px;
   float: left;
-  display: -ms-flexbox;
   display: flex;
-  -ms-flex-align: center;
-      align-items: center;
-  -ms-flex-pack: start;
-      justify-content: flex-start;
+  align-items: center;
+  justify-content: flex-start;
 }
 
 .selectBox-label {
   position: relative;
   cursor: pointer;
   -webkit-user-select: none;
-      -ms-user-select: none;
           user-select: none;
   margin-right: 5px;
 }
 
 .selectBox-main {
-  display: -ms-flexbox;
   display: flex;
-  -ms-flex-pack: start;
-      justify-content: flex-start;
-  -ms-flex-align: center;
-      align-items: center;
+  justify-content: flex-start;
+  align-items: center;
   position: relative;
   cursor: pointer;
   -webkit-user-select: none;
-      -ms-user-select: none;
           user-select: none;
 }
 
@@ -598,7 +577,6 @@ button.Close {
   vertical-align: inherit;
   cursor: pointer;
   -webkit-user-select: none;
-      -ms-user-select: none;
           user-select: none;
   outline: none;
   -webkit-appearance: none;
@@ -669,10 +647,8 @@ body.Categories.isMobile .PageControls.Top {
 }
 
 .ButtonGroup.discussion-sort-filter-module {
-  display: -ms-flexbox;
   display: flex;
-  -ms-flex-align: center;
-      align-items: center;
+  align-items: center;
 }
 
 .inputBlock {
@@ -680,10 +656,8 @@ body.Categories.isMobile .PageControls.Top {
   margin-bottom: 24px;
 }
 .inputBlock .checkbox {
-  display: -ms-flexbox;
   display: flex;
-  -ms-flex-align: center;
-      align-items: center;
+  align-items: center;
 }
 .inputBlock.inputBlock-tighter {
   margin-top: -12px;
@@ -758,10 +732,8 @@ body.Categories.isMobile .PageControls.Top {
   margin-bottom: 6px;
 }
 .FormWrapper .file-upload {
-  display: -ms-flexbox;
   display: flex;
-  -ms-flex-align: start;
-      align-items: flex-start;
+  align-items: flex-start;
   position: relative;
   width: 100%;
   font-weight: 400;
@@ -785,14 +757,12 @@ body.Categories.isMobile .PageControls.Top {
   text-align: center;
   white-space: nowrap;
   vertical-align: middle;
-  -ms-touch-action: manipulation;
-      touch-action: manipulation;
+  touch-action: manipulation;
   min-width: 96px;
   line-height: 36px;
   height: 36px;
   font-weight: 400;
   -webkit-user-select: none;
-      -ms-user-select: none;
           user-select: none;
   overflow: hidden;
   cursor: pointer;
@@ -802,8 +772,7 @@ body.Categories.isMobile .PageControls.Top {
   border-radius: 6px;
   border-style: solid;
   border-color: #d6d7d9;
-  -ms-flex-order: -1;
-      order: -1;
+  order: -1;
   margin-right: 6px;
 }
 .FormWrapper .file-upload-choose {
@@ -825,7 +794,6 @@ label.checkbox input.checkbox-input {
 
 .checkbox-label {
   -webkit-user-select: none;
-      -ms-user-select: none;
           user-select: none;
   margin-left: 6px;
   line-height: inherit;
@@ -854,13 +822,10 @@ label.checkbox input.checkbox-input {
 }
 
 .pageHeading {
-  display: -ms-flexbox;
   display: flex;
   width: 100%;
-  -ms-flex-align: center;
-      align-items: center;
-  -ms-flex-wrap: wrap;
-      flex-wrap: wrap;
+  align-items: center;
+  flex-wrap: wrap;
 }
 .pageHeading .pageHeading-title {
   display: block;
@@ -872,15 +837,12 @@ label.checkbox input.checkbox-input {
   position: relative;
   display: block;
   max-width: 100%;
-  -ms-flex-positive: 1;
-      flex-grow: 1;
+  flex-grow: 1;
 }
 
 .pageHeading-actions {
-  display: -ms-flexbox;
   display: flex;
-  -ms-flex-item-align: center;
-      align-self: center;
+  align-self: center;
   max-width: 100%;
 }
 
@@ -980,12 +942,14 @@ body {
 .userContent .embedResponsive {
   margin-bottom: 0 !important;
 }
-.userContent .float-left, .userContent .float-right {
+.userContent .float-left,
+.userContent .float-right {
   margin: 0 !important;
   border: 0 !important;
   box-shadow: none !important;
 }
-.userContent .float-left .embedExternal-content, .userContent .float-right .embedExternal-content {
+.userContent .float-left .embedExternal-content,
+.userContent .float-right .embedExternal-content {
   margin-bottom: 14px;
 }
 .userContent .embedExternal {
@@ -1029,14 +993,10 @@ body {
   margin-right: 6px;
 }
 .userContent .metas.isFlexed {
-  display: -ms-flexbox;
   display: flex;
-  -ms-flex-wrap: wrap;
-      flex-wrap: wrap;
-  -ms-flex-pack: start;
-      justify-content: flex-start;
-  -ms-flex-align: center;
-      align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
 }
 .userContent .meta {
   display: inline-block;
@@ -1059,7 +1019,6 @@ body {
 
 .richEditor-button {
   -webkit-user-select: none;
-      -ms-user-select: none;
           user-select: none;
   cursor: pointer;
 }
@@ -1076,9 +1035,7 @@ body.hasRichEditor .richEditor .buttonClose {
   border: 0;
 }
 body.hasRichEditor .richEditor .spoiler .iconButton {
-  -ms-flex-pack: center;
-      justify-content: center;
-  display: -ms-flexbox;
+  justify-content: center;
   display: flex;
 }
 
@@ -1377,10 +1334,8 @@ body.isMobile .Popup.hasRichEditor .Border {
   max-width: 100%;
   width: 640px;
   position: relative;
-  -ms-flex-pack: center;
-      justify-content: center;
-  -ms-flex-align: center;
-      align-items: center;
+  justify-content: center;
+  align-items: center;
   box-sizing: border-box;
   clear: both;
 }
@@ -1424,7 +1379,6 @@ body.isMobile .Popup.hasRichEditor .Border {
   margin: 0;
   vertical-align: -0.14em;
   -webkit-user-select: none;
-      -ms-user-select: none;
           user-select: none;
 }
 
@@ -1464,7 +1418,6 @@ body.isMobile .Popup.hasRichEditor .Border {
 
 .richEditor .embedExternal {
   -webkit-user-select: none;
-      -ms-user-select: none;
           user-select: none;
 }
 .richEditor .embedExternal-content,
@@ -1525,13 +1478,11 @@ body.isMobile .Popup.hasRichEditor .Border {
   margin: auto;
 }
 .embedVideo .embedExternal-content:focus .embedVideo-playIcon, .embedVideo .embedExternal-content:hover .embedVideo-playIcon {
-  -ms-transform: scale(1.1);
-      transform: scale(1.1);
+  transform: scale(1.1);
 }
 
 .richEditor .embedVideo .embedExternal-content:focus .embedVideo-playIcon, .richEditor .embedVideo .embedExternal-content:hover .embedVideo-playIcon {
-  -ms-transform: scale(1);
-      transform: scale(1);
+  transform: scale(1);
 }
 
 .embedVideo-iframe,
@@ -1654,7 +1605,6 @@ body.isMobile .Popup.hasRichEditor .Border {
 .Message img .embedImage-img,
 .embedImage-img {
   height: auto;
-  display: -ms-inline-flexbox;
   display: inline-flex;
   position: relative;
   margin-left: auto;
@@ -1674,10 +1624,8 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedImage-link {
-  display: -ms-inline-flexbox;
   display: inline-flex;
-  -ms-flex-direction: column;
-      flex-direction: column;
+  flex-direction: column;
 }
 
 /*!
@@ -1698,14 +1646,10 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedText-header {
-  display: -ms-flexbox;
   display: flex;
-  -ms-flex-wrap: wrap;
-      flex-wrap: wrap;
-  -ms-flex-align: center;
-      align-items: center;
-  -ms-flex-pack: start;
-      justify-content: flex-start;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
   font-size: 14px;
   line-height: 1.25;
 }
@@ -1785,7 +1729,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedLink-excerpt {
-  color: #555A62;
+  color: #555a62;
   overflow: hidden;
   text-overflow: ellipsis;
   word-break: break-word;
@@ -1809,8 +1753,7 @@ body.isMobile .Popup.hasRichEditor .Border {
   display: inline-block;
   width: 24px;
   height: 24px;
-  -ms-flex-preferred-size: 24px;
-      flex-basis: 24px;
+  flex-basis: 24px;
 }
 
 .embedLoader {
@@ -1819,13 +1762,10 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedLoader-box {
-  display: -ms-flexbox;
   display: flex;
-  -ms-flex-align: center;
-      align-items: center;
-  -ms-flex-pack: center;
-      justify-content: center;
-  background: #FFFFFF;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
   box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.3);
   width: 135px;
   height: 135px;
@@ -1856,11 +1796,9 @@ body.isMobile .Popup.hasRichEditor .Border {
 
 .embedLoader-error {
   box-shadow: 0 1px 3px 0 rgba(85, 90, 98, 0.3);
-  display: -ms-flexbox;
   display: flex;
   overflow: hidden;
-  -ms-flex-align: center;
-      align-items: center;
+  align-items: center;
   list-style: none;
   margin: 0;
   padding: 15px;
@@ -1878,17 +1816,14 @@ body.isMobile .Popup.hasRichEditor .Border {
   margin-top: 12px;
 }
 .embedLoader-error .embedLoader-warningIcon {
-  -ms-flex-item-align: start;
-      align-self: flex-start;
+  align-self: flex-start;
 }
 .embedLoader-error .closeButton {
   opacity: 0.7;
   width: 24px;
   height: 24px;
-  -ms-flex-preferred-size: 24px;
-      flex-basis: 24px;
-  -ms-flex-item-align: start;
-      align-self: flex-start;
+  flex-basis: 24px;
+  align-self: flex-start;
   margin: 0 0 0 auto;
   cursor: pointer;
   position: relative;
@@ -2182,4 +2117,4 @@ body:not(.dashboard) svg {
   pointer-events: none !important;
 }
 
-/*# sourceMappingURL=style-compat.css.map */
+/*# sourceMappingURL=style-compat.css.map*/

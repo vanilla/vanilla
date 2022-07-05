@@ -13,7 +13,8 @@ use Vanilla\CurrentTimeStamp;
 /**
  * Some basic tests for the `CurrentTimeStamp` class.
  */
-class CurrentTimeStampTest extends TestCase {
+class CurrentTimeStampTest extends TestCase
+{
     /**
      * @var \DateTimeImmutable
      */
@@ -22,22 +23,25 @@ class CurrentTimeStampTest extends TestCase {
     /**
      * @inheritDoc
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
     }
 
     /**
      * @inheritDoc
      */
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         CurrentTimeStamp::clearMockTime();
     }
 
     /**
      * Test basic mock time equivalence.
      */
-    public function testCurrentTime() {
-        $this->mockTime = new \DateTimeImmutable('2020-08-04 11:39:15', new \DateTimeZone('UTC'));
+    public function testCurrentTime()
+    {
+        $this->mockTime = new \DateTimeImmutable("2020-08-04 11:39:15", new \DateTimeZone("UTC"));
         CurrentTimeStamp::mockTime($this->mockTime);
 
         $this->assertSame($this->mockTime->getTimestamp(), CurrentTimeStamp::get());
@@ -53,8 +57,9 @@ class CurrentTimeStampTest extends TestCase {
      * @throws \Exception Emitted by DateTimeImmutable.
      * @dataProvider toWindowStartExceptionDataProvider
      */
-    public function testToWindowStartExceptions(\DateInterval $window, string $expectedException): void {
-        $this->mockTime = new \DateTimeImmutable('2020-08-04 11:39:15', new \DateTimeZone('UTC'));
+    public function testToWindowStartExceptions(\DateInterval $window, string $expectedException): void
+    {
+        $this->mockTime = new \DateTimeImmutable("2020-08-04 11:39:15", new \DateTimeZone("UTC"));
         CurrentTimeStamp::mockTime($this->mockTime);
 
         $this->expectException($expectedException);
@@ -67,18 +72,19 @@ class CurrentTimeStampTest extends TestCase {
      * @return iterable
      * @codeCoverageIgnore
      */
-    public function toWindowStartExceptionDataProvider() : iterable {
+    public function toWindowStartExceptionDataProvider(): iterable
+    {
         $expectedException = \InvalidArgumentException::class;
         yield "zero window" => [
             "window" => new \DateInterval("PT0S"),
-            "expectedException" => $expectedException
+            "expectedException" => $expectedException,
         ];
         $negativeOneMinInterval = new \DateInterval("PT1M");
         $negativeOneMinInterval->invert = 1;
 
         yield "negative window" => [
             "window" => $negativeOneMinInterval,
-            "expectedException" => $expectedException
+            "expectedException" => $expectedException,
         ];
     }
 
@@ -94,7 +100,7 @@ class CurrentTimeStampTest extends TestCase {
         \DateTimeInterface $now,
         \DateInterval $window,
         \DateTimeInterface $expected
-    ) : void {
+    ): void {
         $this->mockTime = $now;
         CurrentTimeStamp::mockTime($this->mockTime);
         $windowStart = CurrentTimeStamp::toWindowStart($window);
@@ -108,47 +114,48 @@ class CurrentTimeStampTest extends TestCase {
      * @throws \Exception Emitted by DateTimeImmutable.
      * @codeCoverageIgnore
      */
-    public function toWindowStartDataProvider(): iterable {
-        $mockDateTime = new \DateTimeImmutable('2020-08-04 11:39:15', new \DateTimeZone('UTC'));
+    public function toWindowStartDataProvider(): iterable
+    {
+        $mockDateTime = new \DateTimeImmutable("2020-08-04 11:39:15", new \DateTimeZone("UTC"));
         $twoMinuteInterval = new \DateInterval("PT2M");
         $oneMin30SecInterval = new \DateInterval("PT1M30S");
-        $windowStart = new \DateTimeImmutable('2020-08-04 11:38:00', new \DateTimeZone('UTC'));
+        $windowStart = new \DateTimeImmutable("2020-08-04 11:38:00", new \DateTimeZone("UTC"));
 
         yield "2 min window, ahead of window start" => [
             "now" => $mockDateTime,
             "window" => $twoMinuteInterval,
-            "expected" => $windowStart
+            "expected" => $windowStart,
         ];
-        $mockDateTime = new \DateTimeImmutable('2020-08-04 11:38:00', new \DateTimeZone('UTC'));
+        $mockDateTime = new \DateTimeImmutable("2020-08-04 11:38:00", new \DateTimeZone("UTC"));
         yield "2 min window, on window start" => [
             "now" => $mockDateTime,
             "window" => $twoMinuteInterval,
-            "expected" => $windowStart
+            "expected" => $windowStart,
         ];
-        $mockDateTime = new \DateTimeImmutable('2020-08-04 11:39:59', new \DateTimeZone('UTC'));
+        $mockDateTime = new \DateTimeImmutable("2020-08-04 11:39:59", new \DateTimeZone("UTC"));
         yield "2 min window, at window end" => [
             "now" => $mockDateTime,
             "window" => $twoMinuteInterval,
-            "expected" => $windowStart
+            "expected" => $windowStart,
         ];
-        $mockDateTime = new \DateTimeImmutable('2020-08-04 11:39:15', new \DateTimeZone('UTC'));
-        $windowStart = new \DateTimeImmutable('2020-08-04 11:39:00', new \DateTimeZone('UTC'));
+        $mockDateTime = new \DateTimeImmutable("2020-08-04 11:39:15", new \DateTimeZone("UTC"));
+        $windowStart = new \DateTimeImmutable("2020-08-04 11:39:00", new \DateTimeZone("UTC"));
         yield "1 min 30 sec window, ahead of window start" => [
             "now" => $mockDateTime,
             "window" => $oneMin30SecInterval,
-            "expected" => $windowStart
+            "expected" => $windowStart,
         ];
-        $mockDateTime = new \DateTimeImmutable('2020-08-04 11:39:00', new \DateTimeZone('UTC'));
+        $mockDateTime = new \DateTimeImmutable("2020-08-04 11:39:00", new \DateTimeZone("UTC"));
         yield "1 min 30 sec window, at window start" => [
             "now" => $mockDateTime,
             "window" => $oneMin30SecInterval,
-            "expected" => $windowStart
+            "expected" => $windowStart,
         ];
-        $mockDateTime = new \DateTimeImmutable('2020-08-04 11:40:29', new \DateTimeZone('UTC'));
+        $mockDateTime = new \DateTimeImmutable("2020-08-04 11:40:29", new \DateTimeZone("UTC"));
         yield "1 min 30 sec window, at window end" => [
             "now" => $mockDateTime,
             "window" => $oneMin30SecInterval,
-            "expected" => $windowStart
+            "expected" => $windowStart,
         ];
     }
 
@@ -165,8 +172,8 @@ class CurrentTimeStampTest extends TestCase {
         \DateInterval $window,
         ?\DateInterval $rollover,
         string $expectedException
-    ) : void {
-        $this->mockTime = new \DateTimeImmutable('2020-08-04 11:39:15', new \DateTimeZone('UTC'));
+    ): void {
+        $this->mockTime = new \DateTimeImmutable("2020-08-04 11:39:15", new \DateTimeZone("UTC"));
         CurrentTimeStamp::mockTime($this->mockTime);
 
         $this->expectException($expectedException);
@@ -179,24 +186,25 @@ class CurrentTimeStampTest extends TestCase {
      * @return iterable
      * @codeCoverageIgnore
      */
-    public function toNextWindowExceptionDataProvider() : iterable {
+    public function toNextWindowExceptionDataProvider(): iterable
+    {
         $expectedException = \InvalidArgumentException::class;
         $oneSecInterval = new \DateInterval("PT1S");
         $oneMinInterval = new \DateInterval("PT1M");
         yield "zero window" => [
             "window" => new \DateInterval("PT0S"),
             "rollover" => null,
-            "expectedException" => $expectedException
+            "expectedException" => $expectedException,
         ];
         yield "rollover equals window" => [
             "window" => $oneSecInterval,
             "rollover" => $oneSecInterval,
-            "expectedException" => $expectedException
+            "expectedException" => $expectedException,
         ];
         yield "rollover greater than window" => [
             "window" => $oneSecInterval,
             "rollover" => $oneMinInterval,
-            "expectedException" => $expectedException
+            "expectedException" => $expectedException,
         ];
         $negativeOneMinInterval = new \DateInterval("PT1M");
         $negativeOneMinInterval->invert = 1;
@@ -204,12 +212,12 @@ class CurrentTimeStampTest extends TestCase {
         yield "negative window" => [
             "window" => $negativeOneMinInterval,
             "rollover" => $oneMinInterval,
-            "expectedException" => $expectedException
+            "expectedException" => $expectedException,
         ];
         yield "negative rollover" => [
             "window" => $oneMinInterval,
             "rollover" => $negativeOneMinInterval,
-            "expectedException" => $expectedException
+            "expectedException" => $expectedException,
         ];
     }
 
@@ -227,7 +235,7 @@ class CurrentTimeStampTest extends TestCase {
         \DateInterval $window,
         ?\DateInterval $rollover,
         \DateTimeInterface $expected
-    ) : void {
+    ): void {
         $this->mockTime = $now;
         CurrentTimeStamp::mockTime($this->mockTime);
         $nextWindowStart = CurrentTimeStamp::toNextWindow($window, $rollover);
@@ -241,77 +249,78 @@ class CurrentTimeStampTest extends TestCase {
      * @throws \Exception Emitted by DateTimeImmutable.
      * @codeCoverageIgnore
      */
-    public function toNextWindowDataProvider(): iterable {
-        $mockDateTime = new \DateTimeImmutable('2020-08-04 11:39:15', new \DateTimeZone('UTC'));
+    public function toNextWindowDataProvider(): iterable
+    {
+        $mockDateTime = new \DateTimeImmutable("2020-08-04 11:39:15", new \DateTimeZone("UTC"));
         $twoMinuteInterval = new \DateInterval("PT2M");
         $oneMin30SecInterval = new \DateInterval("PT1M30S");
         $oneMinuteInterval = new \DateInterval("PT1M");
         $thirtySecInterval = new \DateInterval("PT30S");
         $twentyMinuteInterval = new \DateInterval("PT20M");
 
-        $nextWindowStart = new \DateTimeImmutable('2020-08-04 11:40:00', new \DateTimeZone('UTC'));
-        $twoMinuteWindowRolloverStart = new \DateTimeImmutable('2020-08-04 11:42:00', new \DateTimeZone('UTC'));
-        $twentyMinuteWindowRolloverStart = new \DateTimeImmutable('2020-08-04 12:00:00', new \DateTimeZone('UTC'));
+        $nextWindowStart = new \DateTimeImmutable("2020-08-04 11:40:00", new \DateTimeZone("UTC"));
+        $twoMinuteWindowRolloverStart = new \DateTimeImmutable("2020-08-04 11:42:00", new \DateTimeZone("UTC"));
+        $twentyMinuteWindowRolloverStart = new \DateTimeImmutable("2020-08-04 12:00:00", new \DateTimeZone("UTC"));
 
         yield "2 min window, no rollover interval" => [
             "now" => $mockDateTime,
             "window" => $twoMinuteInterval,
             "rollover" => null,
-            "expected" => $nextWindowStart
+            "expected" => $nextWindowStart,
         ];
         yield "2 min window, 1 min rollover => rollover past next window" => [
             "now" => $mockDateTime,
             "window" => $twoMinuteInterval,
             "rollover" => $oneMinuteInterval,
-            "expected" => $twoMinuteWindowRolloverStart
+            "expected" => $twoMinuteWindowRolloverStart,
         ];
         yield "2 min window, 30 sec rollover => does not rollover past next window" => [
             "now" => $mockDateTime,
             "window" => $twoMinuteInterval,
             "rollover" => $thirtySecInterval,
-            "expected" => $nextWindowStart
+            "expected" => $nextWindowStart,
         ];
         yield "2 min window, 1 min 30 sec rollover => rollover past next window" => [
             "now" => $mockDateTime,
             "window" => $twoMinuteInterval,
             "rollover" => $oneMin30SecInterval,
-            "expected" => $twoMinuteWindowRolloverStart
+            "expected" => $twoMinuteWindowRolloverStart,
         ];
         yield "20 min window, 30 sec rollover => no rollover past next window" => [
             "now" => $mockDateTime,
             "window" => $twentyMinuteInterval,
             "rollover" => $thirtySecInterval,
-            "expected" => $nextWindowStart
+            "expected" => $nextWindowStart,
         ];
         yield "20 min window, 1 min rollover => rollover past next window" => [
             "now" => $mockDateTime,
             "window" => $twentyMinuteInterval,
             "rollover" => $oneMinuteInterval,
-            "expected" => $twentyMinuteWindowRolloverStart
+            "expected" => $twentyMinuteWindowRolloverStart,
         ];
 
-        $mockDateTime = new \DateTimeImmutable('2020-08-04 11:40:00', new \DateTimeZone('UTC'));
-        $nextWindowStart = new \DateTimeImmutable('2020-08-04 11:42:00', new \DateTimeZone('UTC'));
+        $mockDateTime = new \DateTimeImmutable("2020-08-04 11:40:00", new \DateTimeZone("UTC"));
+        $nextWindowStart = new \DateTimeImmutable("2020-08-04 11:42:00", new \DateTimeZone("UTC"));
         yield "date time divisible by window, 2 min window, no rollover" => [
             "now" => $mockDateTime,
             "window" => $twoMinuteInterval,
             "rollover" => $oneMin30SecInterval,
             "expected" => $nextWindowStart,
         ];
-        $nextWindowStart = new \DateTimeImmutable('2020-08-04 12:00:00', new \DateTimeZone('UTC'));
+        $nextWindowStart = new \DateTimeImmutable("2020-08-04 12:00:00", new \DateTimeZone("UTC"));
         yield "date time divisible by window, 20 min window" => [
             "now" => $mockDateTime,
             "window" => $twentyMinuteInterval,
             "rollover" => null,
             "expected" => $nextWindowStart,
         ];
-        $mockDateTime = new \DateTimeImmutable('2020-08-04 11:39:30', new \DateTimeZone('UTC'));
-        $rolloverWindowStart = new \DateTimeImmutable('2020-08-04 11:42:00', new \DateTimeZone('UTC'));
+        $mockDateTime = new \DateTimeImmutable("2020-08-04 11:39:30", new \DateTimeZone("UTC"));
+        $rolloverWindowStart = new \DateTimeImmutable("2020-08-04 11:42:00", new \DateTimeZone("UTC"));
         yield "date time at rollover threshold, 2 min window" => [
             "now" => $mockDateTime,
             "window" => $twoMinuteInterval,
             "rollover" => $thirtySecInterval,
-            "expected" => $rolloverWindowStart
+            "expected" => $rolloverWindowStart,
         ];
     }
 }

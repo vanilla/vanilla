@@ -12,26 +12,26 @@ use Vanilla\Formatting\Attachment;
 use Vanilla\Formatting\Html\HtmlDocument;
 
 /**
- * Processor of HMTL headings.
+ * Processor of HMTL attachments.
  */
 class AttachmentHtmlProcessor extends HtmlProcessor {
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
-    public function processDocument(): HtmlDocument {
-        return $this->document;
+    public function processDocument(HtmlDocument $document): HtmlDocument {
+        return $document;
     }
 
     /**
-     * Get all the headings in the document.
+     * Get all the attachments in the document.
      *
-     * @param bool $applyToDom Whether or not to apply the heading ids into the dom.
+     * @param HtmlDocument $document The document to parse.
      *
-     * @return Heading[]
+     * @return Attachment[]
      */
-    public function getAttachments(bool $applyToDom = false): array {
-        $domLinks = $this->queryXPath('.//a[@download]');
+    public function getAttachments(HtmlDocument $document): array {
+        $domLinks = $document->queryXPath('.//a[@download]');
 
         /** @var Attachment[] $attachemnts */
         $attachemnts = [];

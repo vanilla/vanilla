@@ -1,24 +1,80 @@
+/**
+ * @author Adam Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2020 Vanilla Forums Inc.
+ * @license gpl-2.0-only
+ */
+
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { unit, colorOut, borders, margins, absolutePosition } from "@library/styles/styleHelpers";
+import { variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
 import { shadowHelper } from "@library/styles/shadowHelpers";
-import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
-import { calc, color } from "csx";
+import { calc, color, px } from "csx";
+import { Mixins } from "@library/styles/Mixins";
+import { forumLayoutVariables } from "@dashboard/compatibilityStyles/forumLayoutStyles";
+import { Variables } from "@library/styles/Variables";
+import { css } from "@emotion/css";
+import { buttonVariables } from "@library/forms/Button.variables";
 
 export const newPostMenuVariables = useThemeCache(() => {
-    const globalVars = globalVariables();
     const themeVars = variableFactory("newPostMenu");
 
-    const position = themeVars("position", {
-        bottom: 40,
-        right: 24,
+    /**
+     * @var newPostMenu.button
+     * @title NewPostMenu button
+     * @description To apply some border and color styling to NewPostMenu button
+     */
+    const button = themeVars("button", {
+        /**
+         * @varGroup newPostMenu.button.border
+         * @title Border
+         * @expand border
+         */
+        border: Variables.border({ radius: 24, width: 0 }),
+
+        /**
+         * @varGroup newPostMenu.button.font
+         * @title Font
+         * @expand font
+         */
+        font: Variables.font({ size: 16, weight: 700 }),
     });
 
-    const item = themeVars("item", {
-        position: {
-            top: 16,
-            right: 6,
+    /**
+     * @var newPostMenu.fab
+     * @title Floating Action Button
+     * @description On smaller views, NewPostMenu will be rendered as a FAB at bottom right section of the view
+     */
+    const fab = themeVars("fab", {
+        size: 56,
+        spacing: Variables.spacing({ top: 24 }),
+        opacity: {
+            open: 1,
+            close: 0,
         },
+        degree: {
+            open: -135,
+            close: 0,
+        },
+        /**
+         * @var newPostMenu.fab.iconsOnly
+         * @title FAB Icons Only
+         * @description If true, labels won't be shown, only icons
+         */
+        iconsOnly: false,
+        position: {
+            bottom: 40,
+            right: 24,
+        },
+    });
+
+    /**
+     * @var newPostMenu.fabItem
+     * @title FAB Item
+     * @description Apply some dynamic styles for fab item.
+     */
+    const fabItem = themeVars("fabItem", {
         opacity: {
             open: 1,
             close: 0,
@@ -29,42 +85,28 @@ export const newPostMenuVariables = useThemeCache(() => {
         },
     });
 
-    const action = themeVars("action", {
-        borderRadius: 21.5,
-        padding: {
-            horizontal: 18,
-        },
+    /**
+     * @var newPostMenu.fabAction
+     * @title FAB Action
+     * @description Styles for fab actions (normally urls)
+     */
+    const fabAction = themeVars("fabAction", {
+        border: Variables.border({ radius: fab.iconsOnly ? "50%" : 21.5, width: 0 }),
+        spacing: Variables.spacing({
+            horizontal: fab.iconsOnly ? 9 : 18,
+        }),
         size: {
             height: 44,
+            width: fab.iconsOnly ? 44 : undefined,
         },
     });
 
-    const toggle = themeVars("toggle", {
-        size: 56,
-        margin: {
-            top: 24,
-        },
-        opacity: {
-            open: 1,
-            close: 0,
-        },
-        degree: {
-            open: -135,
-            close: 0,
-        },
-        scale: {
-            open: 0.9,
-            close: 1,
-        },
-    });
-
-    const label = themeVars("label", {
-        margin: {
-            left: 10,
-        },
-    });
-
-    const menu = themeVars("menu", {
+    /**
+     * @var newPostMenu.fabMenu
+     * @title FAB Menu
+     * @description Some dynamic styles for fab menu
+     */
+    const fabMenu = themeVars("fabMenu", {
         display: {
             open: "block",
             close: "none",
@@ -76,109 +118,162 @@ export const newPostMenuVariables = useThemeCache(() => {
     });
 
     return {
-        position,
-        item,
-        action,
-        toggle,
-        label,
-        menu,
+        button,
+        fabItem,
+        fabAction,
+        fab,
+        fabMenu,
     };
 });
 
 export const newPostMenuClasses = useThemeCache(() => {
     const vars = newPostMenuVariables();
     const globalVars = globalVariables();
-    const style = styleFactory("newPostMenu");
+    const buttonVars = buttonVariables();
 
-    const root = style("root", {
+    const root = css({
         position: "fixed",
-        bottom: unit(vars.position.bottom),
-        right: unit(vars.position.right),
+        bottom: styleUnit(vars.fab.position.bottom),
+        right: styleUnit(vars.fab.position.right),
         textAlign: "right",
     });
 
-    const item = style("item", {
-        marginTop: unit(vars.item.position.top),
-        marginRight: unit(vars.item.position.right),
+    const fabItem = css({
+        ...Mixins.margin({ top: 16, right: 6 }),
     });
 
-    const itemFocus = style("itemFocus", {
-        ...absolutePosition.fullSizeOfParent(),
-        margin: unit(1),
+    const focusStyles = {
+        ...Mixins.absolute.fullSizeOfParent(),
+        ...Mixins.margin({ all: 1 }),
         maxWidth: calc(`100% - 2px`),
         maxHeight: calc(`100% - 2px`),
-        borderRadius: unit(vars.action.borderRadius),
+    };
+
+    const fabItemFocus = css({
+        ...focusStyles,
+        ...Mixins.border(vars.fabAction.border),
     });
 
-    const action = style("action", {
+    const fabAction = css({
         position: "relative",
-        borderRadius: unit(vars.action.borderRadius),
+        ...Mixins.border(vars.fabAction.border),
         ...shadowHelper().floatingButton(),
-        minHeight: unit(vars.action.size.height),
-        backgroundColor: colorOut(globalVars.mainColors.bg),
-        paddingLeft: unit(vars.action.padding.horizontal),
-        paddingRight: unit(vars.action.padding.horizontal),
+        minHeight: styleUnit(vars.fabAction.size.height),
+        width: styleUnit(vars.fabAction.size.width),
+        backgroundColor: ColorsUtils.colorOut(globalVars.mainColors.bg),
+        ...Mixins.padding({ horizontal: vars.fabAction.spacing.horizontal }),
         display: "inline-flex",
         alignItems: "center",
-        ...clickableItemStates({ default: globalVars.mainColors.fg }),
-        $nest: {
+        ...Mixins.clickable.itemState({ default: globalVars.mainColors.fg }),
+        ...{
             "&.focus-visible": {
                 outline: 0,
             },
-            [`&.focus-visible .${itemFocus}`]: {
-                boxShadow: `0 0 0 1px ${colorOut(globalVars.mainColors.primary)} inset`,
+            [`&.focus-visible .${fabItemFocus}`]: {
+                boxShadow: `0 0 0 1px ${ColorsUtils.colorOut(globalVars.mainColors.primary)} inset`,
             },
+        },
+        "& svg": {
+            margin: "auto",
         },
     });
 
-    const toggleFocus = style("toggleFocus", {
-        ...absolutePosition.fullSizeOfParent(),
-        margin: unit(1),
-        maxWidth: calc(`100% - 2px`),
-        maxHeight: calc(`100% - 2px`),
+    const fabFocus = css({
+        ...focusStyles,
         borderRadius: "50%",
     });
 
-    const toggle = style("toggle", {
+    const fab = css({
         display: "inline-flex",
         alignItems: "center",
         justifyItems: "center",
-        height: unit(vars.toggle.size),
-        width: unit(vars.toggle.size),
-        backgroundColor: colorOut(globalVars.mainColors.primary),
+        height: styleUnit(vars.fab.size),
+        width: styleUnit(vars.fab.size),
+        backgroundColor: ColorsUtils.colorOut(buttonVars.primary.colors?.bg),
         borderRadius: "50%",
-        $nest: {
+        border: 0,
+        cursor: "pointer",
+        ...{
             [`&.focus-visible`]: {
                 outline: 0,
             },
-            [`&.focus-visible .${toggleFocus}`]: {
-                boxShadow: `0 0 0 1px ${colorOut(globalVars.mainColors.primaryContrast)} inset`,
+            [`&.focus-visible .${fabFocus}`]: {
+                boxShadow: `0 0 0 1px ${ColorsUtils.colorOut(globalVars.mainColors.primaryContrast)} inset`,
+            },
+        },
+        "& svg": {
+            color: ColorsUtils.colorOut(vars.button.font.color),
+        },
+    });
+
+    const newPostButtonBorderAndShadow = {
+        ...Mixins.border(vars.button.border),
+        ...shadowHelper().dropDown(),
+    };
+
+    const button = css({
+        minWidth: buttonVars.primary.sizing?.minWidth ?? styleUnit(148),
+        height: styleUnit(48),
+        ...newPostButtonBorderAndShadow,
+        ...{
+            [`&:not([disabled]):focus-visible, &:not([disabled]):focus, &:not([disabled]):hover, &:not([disabled]):active`]: {
+                ...newPostButtonBorderAndShadow,
             },
         },
     });
 
-    const label = style("label", {
-        marginLeft: unit(vars.label.margin.left),
+    const buttonContents = css({
+        display: "flex",
+        justifyContent: "space-around",
+        alignItems: "center",
+        width: "100%",
+        "& svg": {
+            margin: 0,
+            color: ColorsUtils.colorOut(vars.button.font.color),
+        },
+    });
+    const buttonIcon = css({
+        display: "flex",
+        marginRight: styleUnit(4),
+    });
+    const buttonLabel = css({
+        ...Mixins.font(vars.button.font),
+    });
+    const buttonDropdownContents = css({
+        ...Mixins.padding({ vertical: globalVars.gutter.half }),
+        ...Mixins.margin({ top: 4 }),
+        "&&": {
+            width: styleUnit(forumLayoutVariables().panel.paddedWidth - globalVars.gutter.size),
+        },
+    });
+
+    const fabLabel = css({
+        ...Mixins.margin({ left: 10 }),
         display: "inline-block",
     });
 
-    const toggleWrap = style("toggleShadow", {
+    const fabWrap = css({
         display: "inline-flex",
         borderRadius: "50%",
-        ...shadowHelper().floatingButton(),
-        height: unit(vars.toggle.size),
-        width: unit(vars.toggle.size),
-        ...margins(vars.toggle.margin),
+        ...shadowHelper().dropDown(),
+        height: styleUnit(vars.fab.size),
+        width: styleUnit(vars.fab.size),
+        ...Mixins.margin(vars.fab.spacing),
     });
 
     return {
         root,
-        item,
-        itemFocus,
-        action,
-        toggle,
-        label,
-        toggleWrap,
-        toggleFocus,
+        fabItem,
+        fabItemFocus,
+        fabAction,
+        fab,
+        fabLabel,
+        fabWrap,
+        fabFocus,
+        button,
+        buttonContents,
+        buttonIcon,
+        buttonLabel,
+        buttonDropdownContents,
     };
 });

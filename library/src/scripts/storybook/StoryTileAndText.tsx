@@ -4,21 +4,18 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { ColorValues, margins, singleBorder, unit } from "@library/styles/styleHelpers";
 import { storyBookClasses } from "@library/storybook/StoryBookStyles";
-import classNames from "classnames";
-import ConditionalWrap from "@library/layout/ConditionalWrap";
-import { IStoryTileProps, StoryTile } from "@library/storybook/StoryTile";
-import { StoryHeading } from "@library/storybook/StoryHeading";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
+import { IStoryTileProps, StoryTile } from "@library/storybook/StoryTile";
+import classNames from "classnames";
+import { ColorHelper } from "csx";
+import React from "react";
 
 export interface IStoryTileAndTextProps extends IStoryTileProps {
     text?: string;
     title?: string;
     compact?: boolean;
-    backgroundColor?: ColorValues;
+    backgroundColor?: ColorHelper;
 }
 
 /**

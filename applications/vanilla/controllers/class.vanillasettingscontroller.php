@@ -2,16 +2,20 @@
 /**
  * Settings controller
  *
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Vanilla
  * @since 2.0
  */
 
+use Vanilla\Utility\ArrayUtils;
+
 /**
  * Handles displaying the dashboard "settings" pages for Vanilla via /settings endpoint.
  */
 class VanillaSettingsController extends Gdn_Controller {
+
+    const CONFIG_KALTURA_DOMAINS = "embeds.kaltura.customDomains";
 
     /** @var array Models to include. */
     public $Uses = ['Database', 'Form', 'CategoryModel'];
@@ -73,10 +77,10 @@ class VanillaSettingsController extends Gdn_Controller {
             'ImageUpload.Limits.Enabled',
             'ImageUpload.Limits.Width',
             'ImageUpload.Limits.Height',
-            'Vanilla.Email.FullPost',
+            self::CONFIG_KALTURA_DOMAINS => [],
         ]);
 
-        // Fire an filter event gather extra form HTML for specific format items.
+        // Fire a filter event to gather extra form HTML for specific format items.
         // The form is added so the form can be enhanced and the config model needs to passed to add extra fields.
         $extraFormatFormHTML = $eventManager->fireFilter('postingSettings_formatSpecificFormItems', "",
             $this->Form,
@@ -91,6 +95,13 @@ class VanillaSettingsController extends Gdn_Controller {
             // Apply the config settings to the form.
             $this->Form->setData($configurationModel->Data);
         } else {
+            // Format the Kaltura domains as an array based on newlines & spaces
+            $kalturaDomains = $this->Form->getValue(self::CONFIG_KALTURA_DOMAINS);
+            $kalturaDomains = ArrayUtils::explodeTrim("\n", $kalturaDomains);
+            $kalturaDomains = array_unique(array_filter($kalturaDomains));
+
+            $this->Form->setFormValue(self::CONFIG_KALTURA_DOMAINS, $kalturaDomains);
+
             // This is a "reverse" field on the form. Disabling URL embeds is associated with a toggle that enables them.
             $disableUrlEmbeds = $this->Form->getFormValue('Garden.Format.DisableUrlEmbeds', true);
             $this->Form->setFormValue('Garden.Format.DisableUrlEmbeds', !$disableUrlEmbeds);
@@ -120,12 +131,45 @@ class VanillaSettingsController extends Gdn_Controller {
             }
         }
 
+        Gdn_Theme::section('Settings');
         $this->setHighlightRoute('vanilla/settings/posting');
         $this->addJsFile('settings.js');
         $this->title(t('Posting'));
 
         // Render default view (settings/posting.php)
         $this->render();
+    }
+
+    /**
+     * Create a toggle for reinterpretting one format as another.
+     *
+     * @param Gdn_Form $form The form instance.
+     * @param string $fieldName The key of the formField.
+     * @param string $formatName The name format. Ex: Rich.
+     *
+     * @return string
+     */
+    public static function postFormatReintrerpretToggle(Gdn_Form $form, string $fieldName, string $formatName): string {
+        $keyLabel = "Reinterpret All Posts As %s";
+        $keyNoteLine0 = "Tell the editor to reinterpret all old posts as %s";
+        $keyNoteLine1 = "This setting will only take effect if %s was chosen as the Post Format above.";
+        $keyNoteLine2 = "This option is to normalize the editor format";
+        $defaultNoteLine2 = "This option is to normalize the editor format, if older posts edited with another format,"
+                           ." such as markdown or BBCode, are loaded, this option will force %s.";
+
+        $formatName = t($formatName);
+        $label = sprintft($keyLabel, $formatName);
+        $description =
+            "<p>".sprintft($keyNoteLine0, $formatName)."</p>"
+            ."<p>"
+            ."<strong>" . t('Note:') . "</strong> "
+            .sprintft($keyNoteLine1, $formatName)
+            . " "
+            . sprintf(t($keyNoteLine2, $defaultNoteLine2), $formatName)
+            ."</p>"
+        ;
+
+        return $form->toggle($fieldName, $label, [], $description);
     }
 
     /**
@@ -633,22 +677,18 @@ class VanillaSettingsController extends Gdn_Controller {
     }
 
     /**
+     * Set a Category's allowed discussion types.
      *
-     *
-     * @param $category
+     * @param mixed $category
+     * @return void
      */
-    protected function setupDiscussionTypes($category) {
-        $discussionTypes = DiscussionModel::discussionTypes();
+    protected function setupDiscussionTypes($category): void {
+        $discussionTypes = DiscussionModel::discussionTypes($category);
         $this->setData('DiscussionTypes', $discussionTypes);
 
         if (!$this->Form->isPostBack()) {
             $pCatID = val('PermissionCategoryID', $category, -1);
-            if ($pCatID == val('CategoryID', $category)) {
-                $pCat = $category;
-            } else {
-                $pCat = CategoryModel::categories($pCatID);
-            }
-            $allowedTypes = val('AllowedDiscussionTypes', $pCat);
+            $allowedTypes = CategoryModel::getAllowedDiscussionData($pCatID, (array)$category);
             if (empty($allowedTypes)) {
                 $allowedTypes = array_keys($discussionTypes);
             }
@@ -748,6 +788,10 @@ class VanillaSettingsController extends Gdn_Controller {
                 $this->Form->addError('Cannot display as a heading when your parent category is displayed flat.', 'DisplayAs');
             }
 
+            if ($this->Form->getFormValue("CustomPermissions", null) === false) {
+                $this->Form->setFormValue("Permissions", null);
+            }
+
             if ($this->Form->save()) {
                 $category = CategoryModel::categories($categoryID);
                 $this->setData('Category', $category);
@@ -771,7 +815,7 @@ class VanillaSettingsController extends Gdn_Controller {
         $permissions = $permissionModel->getJunctionPermissions(['JunctionID' => $categoryID], 'Category', '', ['AddDefaults' => !$this->Category->CustomPermissions]);
         $permissions = $permissionModel->unpivotPermissions($permissions, true);
 
-        if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
+        if (in_array($this->deliveryType(), [DELIVERY_TYPE_ALL, DELIVERY_TYPE_VIEW])) {
             $this->setData('PermissionData', $permissions, true);
         }
 
@@ -798,7 +842,7 @@ class VanillaSettingsController extends Gdn_Controller {
         $usePagination = false;
         $perPage = 30;
         $page = Gdn::request()->get('Page', Gdn::request()->get('page', null));
-        list($offset, $limit) = offsetLimit($page, $perPage);
+        [$offset, $limit] = offsetLimit($page, $perPage);
 
         if (!empty($parent)) {
             $categoryRow = $collection->get((string)$parent);
@@ -821,7 +865,7 @@ class VanillaSettingsController extends Gdn_Controller {
         if ($parentDisplayAs === 'Flat') {
             $categories = $this->CategoryModel->getTreeAsFlat($parentID, $offset, $limit);
         } else {
-            $categories = $collection->getTree($parentID, ['maxdepth' => 10, 'collapsecategories' => true]);
+            $categories = $collection->getTree($parentID, ['maxdepth' => 10, 'collapsecategories' => true, 'permission' => false]);
         }
 
         $this->addJsFile('categoryfilter.js', 'vanilla');
@@ -847,6 +891,7 @@ class VanillaSettingsController extends Gdn_Controller {
         $this->addJsFile('jquery.nestable.js');
         require_once $this->fetchViewLocation('category-settings-functions');
         $this->addAsset('Content', $this->fetchView('symbols'));
+        Gdn_Theme::section('Settings');
         $this->render();
     }
 
@@ -860,7 +905,7 @@ class VanillaSettingsController extends Gdn_Controller {
         $cf = new ConfigurationModule($this);
 
         $cf->initialize([
-            'Vanilla.EnableCategoryFollowing' => [
+            \CategoryModel::CONF_CATEGORY_FOLLOWING => [
                 'LabelCode' => 'Category Following',
                 'Control' => 'toggle',
                 'Description' => t(
@@ -871,6 +916,29 @@ class VanillaSettingsController extends Gdn_Controller {
         ]);
 
         $this->setData('Title', t('Advanced Category Settings'));
+        $cf->renderAll();
+    }
+
+    /**
+     * Banned users private profiles.
+     */
+    public function banSettings() {
+        $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
+        $this->setHighlightRoute('vanilla/settings/bansettings');
+
+        $cf = new ConfigurationModule($this);
+
+        $cf->initialize([
+            'Vanilla.BannedUsers.PrivateProfiles' => [
+                'LabelCode' => 'Private Profiles',
+                'Control' => 'toggle',
+                'Description' => t(
+                    'When enabled, Banned user profiles will be private. Private profiles can only be viewed by authorized users.'
+                )
+            ],
+        ]);
+
+        $this->setData('Title', t('Advanced Ban Settings'));
         $cf->renderAll();
     }
 
@@ -936,12 +1004,13 @@ class VanillaSettingsController extends Gdn_Controller {
 
         $this->title(t('Categories'));
 
-        // Get category data
+        // Get category data.
+        /** @var Gdn_DataSet $categoryData */
         $categoryData = $this->CategoryModel->getAll();
 
         // Set CanDelete per-category so we can override later if we want.
         $canDelete = checkPermission(['Garden.Community.Manage', 'Garden.Settings.Manage']);
-        array_walk($categoryData->result(), function(&$value) use ($canDelete) {
+        array_walk($categoryData->result(), function (&$value) use ($canDelete) {
             setvalr('CanDelete', $value, $canDelete);
         });
 

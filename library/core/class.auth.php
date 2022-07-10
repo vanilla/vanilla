@@ -424,6 +424,19 @@ class Gdn_Auth extends Gdn_Pluggable {
     }
 
     /**
+     * Returns the unique id assigned to the session in the database.
+     *
+     * This is retrieved from the session cookie if the cookie authenticates or false if not found or authentication fails.
+     *
+     * @return string
+     */
+    public function getSession() : string {
+        $result = $this->_Identity->getSession();
+
+        return stringIsNullOrEmpty($result) ? "" : $result;
+    }
+
+    /**
      *
      *
      * @return mixed
@@ -458,13 +471,14 @@ class Gdn_Auth extends Gdn_Pluggable {
     }
 
     /**
+     * Sets identity in the session cookie.
      *
-     *
-     * @param $value
-     * @param bool $persist
+     * @param int|null $value User ID .
+     * @param bool $persist Is this sessions persistent.
+     * @param string|null $sessionID DB Session ID.
      */
-    public function setIdentity($value, $persist = false) {
-        $this->_Identity->setIdentity($value, $persist);
+    public function setIdentity(int $value = null, bool $persist = false, string $sessionID = null) {
+        $this->_Identity->setIdentity($value, $persist, $sessionID);
     }
 
     /**

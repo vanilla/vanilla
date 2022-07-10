@@ -39,9 +39,9 @@ describe("metaDataFunctions", () => {
 
 describe("formatUrl", () => {
     it("passes absolute URLs through directly", () => {
-        const paths = ["https://test.com", "//test.com", "http://test.com"];
+        const paths = ["https://test.com", "//test.com", "http://test.com", "   http://test.com", " https://test.com"];
 
-        paths.forEach(path => {
+        paths.forEach((path) => {
             expect(application.formatUrl(path)).toEqual(path);
         });
     });
@@ -58,4 +58,30 @@ describe("formatUrl", () => {
         expect(application.formatUrl("/discussions")).toEqual("/community/subcommunity/discussions");
         expect(application.formatUrl("~/discussions")).toEqual("/community/discussions");
     });
+});
+
+describe("isUrl", () => {
+    const urls = [
+        "https://example.com",
+        "http://some-other-site.thing/place/place////more?otherThing%22&otherThing=true&query=[]1",
+    ];
+    for (const url of urls) {
+        it(`"${url} is a URL"`, () => {
+            expect(application.isURL(url)).toBe(true);
+        });
+    }
+
+    const notUrls = [
+        "www.thing.com", // No protocol.
+        "./relative/path.html", // No TLD.
+        "/absolute/path.html", // No TLD.
+        "javascript:alert('hello')", // Bad protocol,
+        "ftp://ftp.somePlace.com", // Bad protocol.
+    ];
+
+    for (const notUrl of notUrls) {
+        it(`"${notUrl} is not a URL"`, () => {
+            expect(application.isURL(notUrl)).toBe(false);
+        });
+    }
 });

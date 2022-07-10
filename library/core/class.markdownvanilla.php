@@ -224,4 +224,54 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
         $code = str_replace(["\r", "\n"], ' ', $code);
         return parent::makeCodeSpan($code);
     }
+
+    /**
+     * Overrides the main function to add some processing before $this->hashHTMLBlocks()
+     * Changes done:
+     * - Add $this->doSpoilers()
+     * - Add $this->doBlockQuotes()
+     *
+     * @param  string $text
+     * @return string
+     */
+    public function transform($text) {
+        $this->setup();
+
+        # Remove UTF-8 BOM and marker character in input, if present.
+        $text = preg_replace('{^\xEF\xBB\xBF|\x1A}', '', $text);
+
+        # Standardize line endings:
+        #   DOS to Unix and Mac to Unix
+        $text = preg_replace('{\r\n?}', "\n", $text);
+
+        # Make sure $text ends with a couple of newlines:
+        $text .= "\n\n";
+
+        # Convert all tabs to spaces.
+        $text = $this->detab($text);
+
+        # Parse spoilers before quotes
+        $text = $this->doSpoilers($text);
+
+        # Parse block-level quotes before hashing block HTML
+        $text = $this->doBlockQuotes($text);
+
+        # Turn block-level HTML blocks into hash entries
+        $text = $this->hashHTMLBlocks($text);
+
+        # Strip any lines consisting only of spaces and tabs.
+        # This makes subsequent regexen easier to write, because we can
+        # match consecutive blank lines with /\n+/ instead of something
+        # contorted like /[ ]*\n+/ .
+        $text = preg_replace('/^[ ]+$/m', '', $text);
+
+        # Run document gamut methods.
+        foreach ($this->document_gamut as $method => $priority) {
+            $text = $this->$method($text);
+        }
+
+        $this->teardown();
+
+        return $text . "\n";
+    }
 }

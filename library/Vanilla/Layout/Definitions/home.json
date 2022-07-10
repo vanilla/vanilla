@@ -1,0 +1,64 @@
+{
+    "$schema": "https://dev.vanilla.localhost/api/v2/layouts/schema?layoutViewType=home&cacheBuster=4",
+    "dateInserted": "2022-01-01T00:00:00Z",
+    "layoutViewType": "home",
+    "layoutID": "home",
+    "name": "Playground Home Default",
+    "layout": [
+        {
+            "$hydrate": "react.section.1-column",
+            "contents": [
+                {
+                    "$hydrate": "react.categories",
+                    "title": "Categories",
+                    "apiParams": {}
+                }
+            ]
+        },
+        {
+            "$hydrate": "react.section.2-columns",
+            "mainTop": [
+                {
+                    "$hydrate": "react.html",
+                    "html": "<h1 style='margin-top: 0'>Hello Layout Editor</h1>"
+                }
+            ],
+            "mainBottom": [
+                {
+                    "$hydrate": "react.discussion.discussions",
+                    "title": "Recent discussion",
+                    "apiParams": {
+                        "sort": "-dateLastComment"
+                    }
+                }
+            ],
+            "rightBottom": [
+                {
+                    "$hydrate": "react.leaderboard",
+                    "title": "Community Leaders",
+                    "apiParams": {
+                        "slotType": "a"
+                    }
+                },
+                {
+                    "$hydrate": "react.quick-links",
+                    "title": "Quick Links",
+                    "links": [
+                        {
+                            "name": "Link 1",
+                            "url": "/link1"
+                        },
+                        {
+                            "name": "Link 2",
+                            "url": "/link2"
+                        },
+                        {
+                            "name": "Link 3",
+                            "url": "/link3"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

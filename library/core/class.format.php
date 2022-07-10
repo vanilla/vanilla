@@ -12,6 +12,8 @@
  */
 
 use Garden\EventManager;
+use Garden\StaticCacheConfigTrait;
+use Vanilla\CurrentTimeStamp;
 use \Vanilla\Formatting;
 use \Vanilla\Formatting\Formats;
 use \Vanilla\Formatting\FormatUtil;
@@ -24,6 +26,12 @@ use Vanilla\Formatting\DateTimeFormatter;
  * Utility class that helps to format strings, objects, and arrays.
  */
 class Gdn_Format {
+
+    use StaticCacheConfigTrait;
+    const INVALID_FIRST_MENTION_CHARS = [
+        "{",
+        "}",
+    ];
 
     /**
      * @var bool Flag which allows plugins to decide if the output should include rel="nofollow" on any <a> links.
@@ -64,8 +72,8 @@ class Gdn_Format {
      *  %9$s = gender suffix (some languages require this).
      *
      * @param object $activity An object representation of the activity being formatted.
-     * @param int $profileUserID If looking at a user profile, this is the UserID of the profile we are
-     *  looking at.
+     * @param int|string $profileUserID If looking at a user profile, this is the UserID of the profile we are looking at.
+     * @param int|string $viewingUserID The user viewing the headline.
      * @return string
      */
     public static function activityHeadline($activity, $profileUserID = '', $viewingUserID = '') {
@@ -155,7 +163,8 @@ class Gdn_Format {
             }
         } else {
             $activityRouteLink = url($activity->Route);
-            $route = anchor(t($activity->RouteCode), $activity->Route);
+            $routeCode = is_string($activity->RouteCode) ? $activity->RouteCode : $activity->ActivityName;
+            $route = anchor(t($routeCode, $activity->Name), $activity->Route);
         }
 
         // Translate the gender suffix.
@@ -377,7 +386,7 @@ class Gdn_Format {
             }
 
             if (!$timestamp) {
-                $timestamp = time();
+                $timestamp = CurrentTimeStamp::get();
             }
 
             return formatDateCustom($timestamp, $format);
@@ -751,7 +760,8 @@ class Gdn_Format {
             return $mixed;
         }
 
-        $linksCallback = function ($matches) use ($isHtml, $doEmbeds) {
+        $warnLeaving = (bool)Gdn::config("Garden.Format.WarnLeaving", true);
+        $linksCallback = function ($matches) use ($isHtml, $doEmbeds, $warnLeaving) {
             static $inTag = 0;
             static $inAnchor = false;
 
@@ -760,9 +770,7 @@ class Gdn_Format {
 
             if ($inOut == '<') {
                 $inTag++;
-                if ($tag == 'a') {
-                    $inAnchor = true;
-                }
+                $inAnchor = $tag == 'a';
             } elseif ($inOut == '</') {
                 $inTag++;
                 if ($tag == 'a') {
@@ -772,16 +780,19 @@ class Gdn_Format {
                 $inTag--;
             }
 
-            if (c('Garden.Format.WarnLeaving', false) && isset($matches[4]) && $inTag && $inAnchor) {
+            if (isset($matches[4]) && $inTag && $inAnchor) {
                 // This is a the href url value in an anchor tag.
                 $url = $matches[4];
                 $domain = parse_url($url, PHP_URL_HOST);
-                if (!isTrustedDomain($domain)) {
+                if ($warnLeaving && !isTrustedDomain($domain)) {
                     // If this is valid HTMl, the link text's HTML special characters should be encoded. Decode them to their raw state for URL encoding.
                     if ($isHtml) {
                         $url = htmlspecialchars_decode($url);
                     }
-                    return url('/home/leaving?target='.urlencode($url)).'" class="Popup';
+                    return url("/home/leaving?" . http_build_query([
+                        "allowTrusted" => 1,
+                        "target" => $url,
+                    ]));
                 }
             }
 
@@ -831,16 +842,14 @@ class Gdn_Format {
 
             $nofollow = (self::$DisplayNoFollow) ? ' rel="nofollow"' : '';
 
-            if (c('Garden.Format.WarnLeaving', false)) {
-                // This is a plaintext url we're converting into an anchor.
-                $domain = parse_url($url, PHP_URL_HOST);
-                if (!isTrustedDomain($domain)) {
-                    // If this is valid HTMl, the link text's HTML special characters should be encoded. Decode them to their raw state for URL encoding.
-                    if ($isHtml) {
-                        $url = htmlspecialchars_decode($url);
-                    }
-                    return '<a href="'.url('/home/leaving?target='.urlencode($url)).'" class="Popup">'.$text.'</a>'.$punc;
-                }
+            // If this is valid HTMl, the link text's HTML special characters should be encoded. Decode them to their raw state for URL encoding.
+            $plainUrl = !$isHtml ? $url : htmlspecialchars_decode($url);
+            if ($warnLeaving && isExternalUrl($plainUrl)) {
+                $href = "/home/leaving?" . http_build_query([
+                    "allowTrusted" => 1,
+                    "target" => $plainUrl,
+                ]);
+                return anchor($text, $href) . $punc;
             }
 
             return '<a href="'.$url.'"'.$nofollow.'>'.$text.'</a>'.$punc;
@@ -848,9 +857,11 @@ class Gdn_Format {
         // Strip  Right-To-Left override.
         $mixed = str_replace("\xE2\x80\xAE", '', $mixed);
         if (unicodeRegexSupport()) {
-            $regex = "`(?:(</?)([!a-z]+))|(/?\s*>)|((?:(?:https?|ftp):)?//[\(\)@\p{L}\p{N}\x21\x23-\x27\x2a-\x2e\x3a\x3b\/\x3f-\x7a\x7e\x3d]+)`iu";
+            $regex =
+                "`(?:(</?)([!a-z]+))|(>)|((?:(?:https?|ftp):)?//[\{\}\(\)@\p{L}\p{N}\x21\x23-\x27\x2a-\x2e\x3a\x3b\/\x3f-\x7a\x7e\x3d]+)`iu";
         } else {
-            $regex = "`(?:(</?)([!a-z]+))|(/?\s*>)|((?:(?:https?|ftp):)?//[\(\)@a-z0-9\x21\x23-\x27\x2a-\x2e\x3a\x3b\/\x3f-\x7a\x7e\x3d]+)`i";
+            $regex =
+                "`(?:(</?)([!a-z]+))|(>)|((?:(?:https?|ftp):)?//[\{\}\(\)@a-z0-9\x21\x23-\x27\x2a-\x2e\x3a\x3b\/\x3f-\x7a\x7e\x3d]+)`i";
         }
 
         $mixed = FormatUtil::replaceButProtectCodeBlocks(
@@ -960,12 +971,23 @@ class Gdn_Format {
     protected static function formatMentionsCallback($str) {
         $parts = preg_split('`\B@`', $str);
 
+        $partCount = count($parts);
         // We have no mentions here.
-        if (count($parts) == 1) {
+        if ($partCount == 1) {
+            return $str;
+        }
+
+        if ($partCount > self::c('Garden.Format.MaxMentions', 50)) {
+            // This post has more mentions than we can efficiently format in the current system.
             return $str;
         }
 
         foreach ($parts as $i => $str) {
+            $firstChar = substr($str, 0, 1);
+            if (in_array($firstChar, self::INVALID_FIRST_MENTION_CHARS)) {
+                $parts[$i] = "@$str";
+                continue;
+            }
             // Text before the mention.
             if ($i == 0) {
                 if (!empty($str)) {
@@ -1130,8 +1152,8 @@ class Gdn_Format {
      * array of $Array[Property] => Value sets.
      *
      * @param object $object The object to be converted to an array.
-     * @return unknown
-     * @todo could be just "return (array) $object;"?
+     * @return array
+     * @deprecated
      */
     public static function objectAsArray($object) {
         if (!is_object($object)) {
@@ -1238,8 +1260,11 @@ class Gdn_Format {
      */
     private static function formatToInternal(&$mixed, $formatMethod, $seen = []) {
         // Process $Mixed based on its type.
+        $formatService = Gdn::formatService();
         if (is_string($mixed)) {
-            if (in_array(strtolower($formatMethod), self::$SanitizedFormats) && method_exists('Gdn_Format', $formatMethod)) {
+            if (is_string($formatMethod) && $formatService->hasFormat($formatMethod)) {
+                $mixed = $formatService->renderHTML($mixed, $formatMethod);
+            } elseif (in_array(strtolower($formatMethod), self::$SanitizedFormats) && method_exists('Gdn_Format', $formatMethod)) {
                 $mixed = self::$formatMethod($mixed);
             } elseif (function_exists('gdn_formatter_'.$formatMethod)) {
                 $formatMethod = 'gdn_formatter_'.$formatMethod;
@@ -1275,7 +1300,7 @@ class Gdn_Format {
      */
     public static function toDate($timestamp = '') {
         if ($timestamp == '') {
-            $timestamp = time();
+            $timestamp = CurrentTimeStamp::get();
         } elseif (!is_numeric($timestamp)) {
             $timestamp = DateTimeFormatter::dateTimeToTimeStamp($timestamp);
         }
@@ -1292,7 +1317,7 @@ class Gdn_Format {
      */
     public static function toDateTime($timestamp = '') {
         if ($timestamp == '') {
-            $timestamp = time();
+            $timestamp = CurrentTimeStamp::get();
         }
         return DateTimeFormatter::timeStampToDateTime((int) $timestamp);
     }
@@ -1336,7 +1361,38 @@ class Gdn_Format {
     }
 
     /** @var array  */
-    protected static $_UrlTranslations = ['–' => '-', '—' => '-', 'À' => 'A', 'Á' => 'A', 'Â' => 'A', 'Ã' => 'A', 'Ä' => 'Ae', 'Ä' => 'A', 'Å' => 'A', 'Ā' => 'A', 'Ą' => 'A', 'Ă' => 'A', 'Æ' => 'Ae', 'Ç' => 'C', 'Ć' => 'C', 'Č' => 'C', 'Ĉ' => 'C', 'Ċ' => 'C', 'Ď' => 'D', 'Đ' => 'D', 'Ð' => 'D', 'È' => 'E', 'É' => 'E', 'Ê' => 'E', 'Ë' => 'E', 'Ē' => 'E', 'Ě' => 'E', 'Ĕ' => 'E', 'Ė' => 'E', 'Ĝ' => 'G', 'Ğ' => 'G', 'Ġ' => 'G', 'Ģ' => 'G', 'Ĥ' => 'H', 'Ħ' => 'H', 'Ì' => 'I', 'Í' => 'I', 'Î' => 'I', 'Ï' => 'I', 'Ī' => 'I', 'Ĩ' => 'I', 'Ĭ' => 'I', 'Į' => 'I', 'İ' => 'I', 'Ĳ' => 'IJ', 'Ĵ' => 'J', 'Ķ' => 'K', 'Ł' => 'K', 'Ľ' => 'K', 'Ĺ' => 'K', 'Ļ' => 'K', 'Ŀ' => 'K', 'Ñ' => 'N', 'Ń' => 'N', 'Ň' => 'N', 'Ņ' => 'N', 'Ŋ' => 'N', 'Ò' => 'O', 'Ó' => 'O', 'Ô' => 'O', 'Õ' => 'O', 'Ö' => 'Oe', 'Ö' => 'Oe', 'Ō' => 'O', 'Ő' => 'O', 'Ŏ' => 'O', 'Œ' => 'OE', 'Ŕ' => 'R', 'Ŗ' => 'R', 'Ś' => 'S', 'Š' => 'S', 'Ş' => 'S', 'Ŝ' => 'S', 'Ť' => 'T', 'Ţ' => 'T', 'Ŧ' => 'T', 'Ț' => 'T', 'Ù' => 'U', 'Ú' => 'U', 'Û' => 'U', 'Ü' => 'Ue', 'Ū' => 'U', 'Ü' => 'Ue', 'Ů' => 'U', 'Ű' => 'U', 'Ŭ' => 'U', 'Ũ' => 'U', 'Ų' => 'U', 'Ŵ' => 'W', 'Ý' => 'Y', 'Ŷ' => 'Y', 'Ÿ' => 'Y', 'Ź' => 'Z', 'Ž' => 'Z', 'Ż' => 'Z', 'Þ' => 'T', 'à' => 'a', 'á' => 'a', 'â' => 'a', 'ã' => 'a', 'ä' => 'ae', 'ä' => 'ae', 'å' => 'a', 'ā' => 'a', 'ą' => 'a', 'ă' => 'a', 'æ' => 'ae', 'ç' => 'c', 'ć' => 'c', 'č' => 'c', 'ĉ' => 'c', 'ċ' => 'c', 'ď' => 'd', 'đ' => 'd', 'ð' => 'd', 'è' => 'e', 'é' => 'e', 'ê' => 'e', 'ë' => 'e', 'ē' => 'e', 'ę' => 'e', 'ě' => 'e', 'ĕ' => 'e', 'ė' => 'e', 'ƒ' => 'f', 'ĝ' => 'g', 'ğ' => 'g', 'ġ' => 'g', 'ģ' => 'g', 'ĥ' => 'h', 'ħ' => 'h', 'ì' => 'i', 'í' => 'i', 'î' => 'i', 'ï' => 'i', 'ī' => 'i', 'ĩ' => 'i', 'ĭ' => 'i', 'į' => 'i', 'ı' => 'i', 'ĳ' => 'ij', 'ĵ' => 'j', 'ķ' => 'k', 'ĸ' => 'k', 'ł' => 'l', 'ľ' => 'l', 'ĺ' => 'l', 'ļ' => 'l', 'ŀ' => 'l', 'ñ' => 'n', 'ń' => 'n', 'ň' => 'n', 'ņ' => 'n', 'ŉ' => 'n', 'ŋ' => 'n', 'ò' => 'o', 'ó' => 'o', 'ô' => 'o', 'õ' => 'o', 'ö' => 'oe', 'ö' => 'oe', 'ø' => 'o', 'ō' => 'o', 'ő' => 'o', 'ŏ' => 'o', 'œ' => 'oe', 'ŕ' => 'r', 'ř' => 'r', 'ŗ' => 'r', 'š' => 's', 'ù' => 'u', 'ú' => 'u', 'û' => 'u', 'ü' => 'ue', 'ū' => 'u', 'ü' => 'ue', 'ů' => 'u', 'ű' => 'u', 'ŭ' => 'u', 'ũ' => 'u', 'ų' => 'u', 'ŵ' => 'w', 'ý' => 'y', 'ÿ' => 'y', 'ŷ' => 'y', 'ž' => 'z', 'ż' => 'z', 'ź' => 'z', 'þ' => 't', 'ß' => 'ss', 'ſ' => 'ss', 'А' => 'A', 'Б' => 'B', 'В' => 'V', 'Г' => 'G', 'Д' => 'D', 'Е' => 'E', 'Ё' => 'YO', 'Ж' => 'ZH', 'З' => 'Z', 'И' => 'I', 'И' => 'I', 'І' => 'I', 'Й' => 'Y', 'К' => 'K', 'Л' => 'L', 'М' => 'M', 'Н' => 'N', 'О' => 'O', 'П' => 'P', 'Р' => 'R', 'С' => 'S', 'ș' => 's', 'ț' => 't', 'Ț' => 'T', 'Т' => 'T', 'У' => 'U', 'Ф' => 'F', 'Х' => 'H', 'Ц' => 'C', 'Ч' => 'CH', 'Ш' => 'SH', 'Щ' => 'SCH', 'Ъ' => '', 'Ы' => 'Y', 'Ь' => '', 'Э' => 'E', 'Ю' => 'YU', 'Я' => 'YA', 'Є' => 'YE', 'Ї' => 'YI', 'а' => 'a', 'б' => 'b', 'в' => 'v', 'г' => 'g', 'д' => 'd', 'е' => 'e', 'ё' => 'yo', 'ж' => 'zh', 'з' => 'z', 'и' => 'i', 'і' => 'i', 'й' => 'y', 'к' => 'k', 'л' => 'l', 'м' => 'm', 'н' => 'n', 'о' => 'o', 'п' => 'p', 'р' => 'r', 'с' => 's', 'т' => 't', 'у' => 'u', 'ф' => 'f', 'х' => 'h', 'ц' => 'c', 'ч' => 'ch', 'ш' => 'sh', 'щ' => 'sch', 'ъ' => '', 'ы' => 'y', 'ь' => '', 'э' => 'e', 'ю' => 'yu', 'я' => 'ya', 'є' => 'ye', 'ї' => 'yi'];
+    protected static $_UrlTranslations = [
+        '–' => '-', '—' => '-', 'À' => 'A', 'Á' => 'A', 'Â' => 'A', 'Ã' => 'A', 'Ä' => 'Ae', 'Å' => 'A',
+        'Ā' => 'A', 'Ą' => 'A', 'Ă' => 'A', 'Æ' => 'Ae', 'Ç' => 'C', 'Ć' => 'C', 'Č' => 'C', 'Ĉ' => 'C', 'Ċ' => 'C',
+        'Ď' => 'D', 'Đ' => 'D', 'Ð' => 'D', 'È' => 'E', 'É' => 'E', 'Ê' => 'E', 'Ë' => 'E', 'Ē' => 'E', 'Ě' => 'E',
+        'Ĕ' => 'E', 'Ė' => 'E', 'Ĝ' => 'G', 'Ğ' => 'G', 'Ġ' => 'G', 'Ģ' => 'G', 'Ĥ' => 'H', 'Ħ' => 'H', 'Ì' => 'I',
+        'Í' => 'I', 'Î' => 'I', 'Ï' => 'I', 'Ī' => 'I', 'Ĩ' => 'I', 'Ĭ' => 'I', 'Į' => 'I', 'İ' => 'I', 'Ĳ' => 'IJ',
+        'Ĵ' => 'J', 'Ķ' => 'K', 'Ł' => 'K', 'Ľ' => 'K', 'Ĺ' => 'K', 'Ļ' => 'K', 'Ŀ' => 'K', 'Ñ' => 'N', 'Ń' => 'N',
+        'Ň' => 'N', 'Ņ' => 'N', 'Ŋ' => 'N', 'Ò' => 'O', 'Ó' => 'O', 'Ô' => 'O', 'Õ' => 'O', 'Ö' => 'Oe',
+        'Ō' => 'O', 'Ő' => 'O', 'Ŏ' => 'O', 'Œ' => 'OE', 'Ŕ' => 'R', 'Ŗ' => 'R', 'Ś' => 'S', 'Š' => 'S', 'Ş' => 'S',
+        'Ŝ' => 'S', 'Ť' => 'T', 'Ţ' => 'T', 'Ŧ' => 'T', 'Ț' => 'T', 'Ù' => 'U', 'Ú' => 'U', 'Û' => 'U', 'Ü' => 'Ue',
+        'Ū' => 'U', 'Ů' => 'U', 'Ű' => 'U', 'Ŭ' => 'U', 'Ũ' => 'U', 'Ų' => 'U', 'Ŵ' => 'W', 'Ý' => 'Y',
+        'Ŷ' => 'Y', 'Ÿ' => 'Y', 'Ź' => 'Z', 'Ž' => 'Z', 'Ż' => 'Z', 'Þ' => 'T', 'à' => 'a', 'á' => 'a', 'â' => 'a',
+        'ã' => 'a', 'ä' => 'ae', 'å' => 'a', 'ā' => 'a', 'ą' => 'a', 'ă' => 'a', 'æ' => 'ae', 'ç' => 'c',
+        'ć' => 'c', 'č' => 'c', 'ĉ' => 'c', 'ċ' => 'c', 'ď' => 'd', 'đ' => 'd', 'ð' => 'd', 'è' => 'e', 'é' => 'e',
+        'ê' => 'e', 'ë' => 'e', 'ē' => 'e', 'ę' => 'e', 'ě' => 'e', 'ĕ' => 'e', 'ė' => 'e', 'ƒ' => 'f', 'ĝ' => 'g',
+        'ğ' => 'g', 'ġ' => 'g', 'ģ' => 'g', 'ĥ' => 'h', 'ħ' => 'h', 'ì' => 'i', 'í' => 'i', 'î' => 'i', 'ï' => 'i',
+        'ī' => 'i', 'ĩ' => 'i', 'ĭ' => 'i', 'į' => 'i', 'ı' => 'i', 'ĳ' => 'ij', 'ĵ' => 'j', 'ķ' => 'k', 'ĸ' => 'k',
+        'ł' => 'l', 'ľ' => 'l', 'ĺ' => 'l', 'ļ' => 'l', 'ŀ' => 'l', 'ñ' => 'n', 'ń' => 'n', 'ň' => 'n', 'ņ' => 'n',
+        'ŉ' => 'n', 'ŋ' => 'n', 'ò' => 'o', 'ó' => 'o', 'ô' => 'o', 'õ' => 'o', 'ö' => 'oe', 'ø' => 'o',
+        'ō' => 'o', 'ő' => 'o', 'ŏ' => 'o', 'œ' => 'oe', 'ŕ' => 'r', 'ř' => 'r', 'ŗ' => 'r', 'š' => 's', 'ù' => 'u',
+        'ú' => 'u', 'û' => 'u', 'ü' => 'ue', 'ū' => 'u', 'ů' => 'u', 'ű' => 'u', 'ŭ' => 'u', 'ũ' => 'u',
+        'ų' => 'u', 'ŵ' => 'w', 'ý' => 'y', 'ÿ' => 'y', 'ŷ' => 'y', 'ž' => 'z', 'ż' => 'z', 'ź' => 'z', 'þ' => 't',
+        'ß' => 'ss', 'ſ' => 'ss', 'А' => 'A', 'Б' => 'B', 'В' => 'V', 'Г' => 'G', 'Д' => 'D', 'Е' => 'E', 'Ё' => 'YO',
+        'Ж' => 'ZH', 'З' => 'Z', 'И' => 'I', 'І' => 'I', 'Й' => 'Y', 'К' => 'K', 'Л' => 'L', 'М' => 'M', 'Н' => 'N',
+        'О' => 'O', 'П' => 'P', 'Р' => 'R', 'С' => 'S', 'ș' => 's', 'ț' => 't', 'Т' => 'T', 'У' => 'U', 'Ф' => 'F',
+        'Х' => 'H', 'Ц' => 'C', 'Ч' => 'CH', 'Ш' => 'SH', 'Щ' => 'SCH', 'Ъ' => '', 'Ы' => 'Y', 'Ь' => '', 'Э' => 'E',
+        'Ю' => 'YU', 'Я' => 'YA', 'Є' => 'YE', 'Ї' => 'YI', 'а' => 'a', 'б' => 'b', 'в' => 'v', 'г' => 'g', 'д' => 'd',
+        'е' => 'e', 'ё' => 'yo', 'ж' => 'zh', 'з' => 'z', 'и' => 'i', 'і' => 'i', 'й' => 'y', 'к' => 'k', 'л' => 'l',
+        'м' => 'm', 'н' => 'n', 'о' => 'o', 'п' => 'p', 'р' => 'r', 'с' => 's', 'т' => 't', 'у' => 'u', 'ф' => 'f',
+        'х' => 'h', 'ц' => 'c', 'ч' => 'ch', 'ш' => 'sh', 'щ' => 'sch', 'ъ' => '', 'ы' => 'y', 'ь' => '', 'э' => 'e',
+        'ю' => 'yu', 'я' => 'ya', 'є' => 'ye', 'ї' => 'yi'
+    ];
 
     /**
      * Creates URL codes containing only lowercase Roman letters, digits, and hyphens.

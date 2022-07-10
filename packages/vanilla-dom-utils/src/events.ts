@@ -21,7 +21,7 @@ export function delegateEvent(
     eventName: string,
     filterSelector: string,
     callback: (event: Event, triggeringElement: HTMLElement) => boolean | void,
-    scopeSelector?: string | HTMLElement,
+    scopeSelector?: string | Node,
 ): string {
     let functionKey = eventName + filterSelector + callback.toString();
 
@@ -35,7 +35,7 @@ export function delegateEvent(
         } else {
             functionKey += scopeSelector;
         }
-    } else if (scopeSelector instanceof HTMLElement) {
+    } else if (scopeSelector instanceof Node) {
         scope = scopeSelector;
     } else {
         scope = document;
@@ -44,10 +44,10 @@ export function delegateEvent(
     const eventHash = hashString(functionKey).toString();
 
     if (!Object.keys(delegatedEventListeners).includes(eventHash)) {
-        const wrappedCallback = event => {
+        const wrappedCallback = (event) => {
             // Get the nearest DOMNode that matches the given selector.
-            const match = filterSelector ? event.target.closest(filterSelector) : event.target;
-
+            const target: Element | null = event.target;
+            const match = filterSelector ? target?.closest(filterSelector) || target?.matches(filterSelector) : target;
             if (match) {
                 // Call the callback with the matching element as the context.
                 return callback.call(match, event, match);
@@ -82,7 +82,7 @@ export function removeDelegatedEvent(eventHash: string) {
  * Remove all delegated event listeners that have been registered.
  */
 export function removeAllDelegatedEvents() {
-    Object.keys(delegatedEventListeners).forEach(key => {
+    Object.keys(delegatedEventListeners).forEach((key) => {
         removeDelegatedEvent(key);
     });
 }

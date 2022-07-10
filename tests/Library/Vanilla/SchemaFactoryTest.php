@@ -21,6 +21,17 @@ class SchemaFactoryTest extends TestCase {
 
     use BootstrapTrait;
 
+    /** @var EventManager */
+    private $eventManager;
+
+    /**
+     * This method is called before each test.
+     */
+    public function setUp(): void {
+        parent::setUp();
+        $this->eventManager = $this->container()->get(EventManager::class);
+    }
+
     /**
      * Provide type prameters to verify the associated events are properly dispatched.
      *
@@ -53,14 +64,6 @@ class SchemaFactoryTest extends TestCase {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public function setUp(): void {
-        SchemaFactory::setContainer($this->container());
-        SchemaFactory::setEventManager($this->container()->get(EventManager::class));
-    }
-
-    /**
      * Verify the expected events are dispatched when the schema is retrieved from the container.
      *
      * @param string $class
@@ -70,12 +73,8 @@ class SchemaFactoryTest extends TestCase {
      * @dataProvider provideGetEvents
      */
     public function testGetEventDispatched(string $class, string $id, string $event): void {
-        // Start with a clean slate.
-        $eventManager = new EventManager($this->container());
-        SchemaFactory::setEventManager($eventManager);
-
         $dispatched = false;
-        $eventManager->bind($event, function () use (&$dispatched) {
+        $this->eventManager->bind($event, function () use (&$dispatched) {
             $dispatched = true;
         });
 
@@ -92,12 +91,8 @@ class SchemaFactoryTest extends TestCase {
      * @dataProvider provideParseEvents
      */
     public function testParseEventDispatched(string $id, string $event): void {
-        // Start with a clean slate.
-        $eventManager = new EventManager($this->container());
-        SchemaFactory::setEventManager($eventManager);
-
         $dispatched = false;
-        $eventManager->bind($event, function () use (&$dispatched) {
+        $this->eventManager->bind($event, function () use (&$dispatched) {
             $dispatched = true;
         });
 
@@ -111,11 +106,8 @@ class SchemaFactoryTest extends TestCase {
      * @return void
      */
     public function testPrepareEventDispatched(): void {
-        $eventManager = new EventManager($this->container());
-        SchemaFactory::setEventManager($eventManager);
-
         $dispatched = false;
-        $eventManager->bind("fooSchema_init", function () use (&$dispatched) {
+        $this->eventManager->bind("fooSchema_init", function () use (&$dispatched) {
             $dispatched = true;
         });
 
@@ -128,61 +120,5 @@ class SchemaFactoryTest extends TestCase {
         $schema->setID("bar");
         SchemaFactory::prepare($schema, "foo");
         $this->assertTrue($dispatched, "Overwriting an existing schema ID.");
-    }
-
-    /**
-     * Verify the container will automatically be retrieved when not explicitly set.
-     *
-     * @return void
-     */
-    public function testGetContainerDefault(): void {
-        // Unset the existing container.
-        SchemaFactory::setContainer(null);
-        $this->assertSame(
-            $this->container(),
-            SchemaFactory::getContainer()
-        );
-    }
-
-    /**
-     * Verify the event manager will automatically be retrieved when not explicitly set.
-     *
-     * @return void
-     */
-    public function testGetEventManagerDefault(): void {
-        // Unset the existing event manager.
-        SchemaFactory::setEventManager(null);
-        $this->assertSame(
-            $this->container()->get(EventManager::class),
-            SchemaFactory::getEventManager()
-        );
-    }
-
-    /**
-     * Test configuring the container dependency.
-     *
-     * @return void
-     */
-    public function testSetContainer(): void {
-        $container = new Container();
-        SchemaFactory::setContainer($container);
-        $this->assertSame(
-            $container,
-            SchemaFactory::getContainer()
-        );
-    }
-
-    /**
-     * Test configuring the event manager dependency.
-     *
-     * @return void
-     */
-    public function testSetEventManager(): void {
-        $eventManager = new EventManager($this->container());
-        SchemaFactory::setEventManager($eventManager);
-        $this->assertSame(
-            $eventManager,
-            SchemaFactory::getEventManager()
-        );
     }
 }

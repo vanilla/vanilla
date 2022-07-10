@@ -78,7 +78,7 @@ echo $this->Form->errors(); ?>
         </div>
     </div>
     <div class="input-wrap invite-url-code">
-        <?php echo $this->Form->textBox('Garden.Registration.InviteTarget', ['value' => $this->InviteTarget, 'placeholder' => 'https://']); ?>
+        <?php echo $this->Form->textBox('Garden.Registration.InviteTarget', ['value' => $this->InviteTarget, 'placeholder' => t('Url')]); ?>
     </div>
 </div>
 <div id="InvitationExpiration" class="form-group">

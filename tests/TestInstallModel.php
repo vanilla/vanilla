@@ -8,8 +8,10 @@
 namespace VanillaTests;
 
 use Psr\Container\ContainerInterface;
+use Vanilla\FeatureFlagHelper;
 use Vanilla\Models\AddonModel;
 use Vanilla\Models\InstallModel;
+use Vanilla\SchemaFactory;
 
 /**
  * A Vanilla installer that handles uninstalling.
@@ -25,10 +27,8 @@ class TestInstallModel extends InstallModel {
      */
     private $dbName;
 
-    /**
-     * @var string $sphinxHost Sphinx host name.
-     */
-    private $sphinxHost;
+    /** @var array Default site config values. */
+    private $configDefaults = [];
 
     /**
      * {@inheritdoc}
@@ -55,6 +55,15 @@ class TestInstallModel extends InstallModel {
      */
     public function getBaseUrl() {
         return $this->baseUrl;
+    }
+
+    /**
+     * Get any site config defaults.
+     *
+     * @return array
+     */
+    public function getConfigDefaults(): array {
+        return $this->configDefaults;
     }
 
     /**
@@ -89,7 +98,8 @@ class TestInstallModel extends InstallModel {
 
         $result = parent::install($data);
 
-        $this->config->set('Plugins.Sphinx.Server', $this->getSphinxHost(), true, true);
+        // Some plugins being enabled directly at site install time breaks things in various tests.
+        \PermissionModel::resetAllRoles();
 
         // Flush the config.
         $this->config->shutdown();
@@ -124,20 +134,6 @@ class TestInstallModel extends InstallModel {
     }
 
     /**
-     * Get the sphinx host.
-     *
-     * Enable server for test environment.
-     *
-     * @return string
-     */
-    public function getSphinxHost() {
-        if (empty($this->sphinxHost)) {
-            $this->sphinxHost = getenv('TEST_SPHINX_HOST') ?: 'sphinx';
-        }
-        return $this->sphinxHost;
-    }
-
-    /**
      * Get the dbName.
      *
      * @return mixed Returns the dbName.
@@ -155,6 +151,15 @@ class TestInstallModel extends InstallModel {
         }
 
         return $this->dbName;
+    }
+
+    /**
+     * Set the default site config.
+     *
+     * @param array $config
+     */
+    public function setConfigDefaults(array $config): void {
+        $this->configDefaults = $config;
     }
 
     /**
@@ -201,6 +206,29 @@ class TestInstallModel extends InstallModel {
     }
 
     /**
+     * Clear various in-memory static caches.
+     */
+    public static function clearMemoryCaches() {
+        FeatureFlagHelper::clearCache();
+        \Gdn_Theme::resetSection();
+        if (class_exists(\DiscussionModel::class)) {
+            \DiscussionModel::cleanForTests();
+        }
+
+        if (class_exists(\CategoryModel::class)) {
+            \CategoryModel::reset();
+        }
+
+        if (class_exists(\SubcommunityModel::class)) {
+            \SubcommunityModel::clearStaticCache();
+        }
+
+        if (class_exists(\ReactionModel::class)) {
+            \ReactionModel::resetStaticCache();
+        }
+    }
+
+    /**
      * Uninstall the application.
      */
     public function uninstall() {
@@ -217,10 +245,15 @@ class TestInstallModel extends InstallModel {
         }
 
         // Reset the config to defaults.
-        $this->config->Data = [];
+        $this->config->Data = $this->getConfigDefaults();
         $this->config->load(PATH_ROOT.'/conf/config-defaults.php');
 
+        self::clearMemoryCaches();
         // Clear all database related objects from the container.
 
+        // Clear anything that got stuck in the cookie superglobal.
+        foreach ($_COOKIE as $key => $value) {
+            unset($_COOKIE[$key]);
+        }
     }
 }

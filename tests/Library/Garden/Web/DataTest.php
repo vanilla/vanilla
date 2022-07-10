@@ -15,21 +15,33 @@ use PHPUnit\Framework\TestCase;
  */
 
 class DataTest extends TestCase {
+    const TEST_DATE = '1980-06-17T20:00:00+00:00';
 
+    /**
+     * @var Data
+     */
     private $data;
+
+    /**
+     * @var \DateTimeImmutable
+     */
+    private $dateTime;
 
     /**
      * Construct a Data object for testing.
      */
     public function setUp(): void {
         parent::setUp();
+        $this->dateTime = new \DateTimeImmutable(self::TEST_DATE, new \DateTimeZone('UTC'));
         $this->data = new Data(
             [
                 'userID' => 123,
                 'email' => 'rich@example.com',
-                'time' => date_create_immutable('1980-06-17 20:00', new \DateTimeZone('UTC')),
-                'IPAddress' => ipEncode('127.0.0.1'),
+                'time' => $this->dateTime,
+                'encodedIPAddress' => ipEncode('127.0.0.1'),
+                'regularIPAddress' => '127.0.0.1',
                 'items' => [
+                    ['encodedIPAddress' => ipEncode('127.0.0.1')],
                     ['v' => 'a'],
                     ['v' => 'b'],
                     ['v' => ['c' => 'd']],
@@ -39,6 +51,33 @@ class DataTest extends TestCase {
 
             ]
         );
+    }
+
+    /**
+     * Test some of the JSON filter functions.
+     */
+    public function testJsonFilter(): void {
+        $data = $this->data->jsonSerialize();
+        $this->assertSame('127.0.0.1', $data['encodedIPAddress']);
+        $this->assertSame('127.0.0.1', $data['regularIPAddress']);
+        $this->assertSame('127.0.0.1', $data['items'][0]['encodedIPAddress']);
+        $this->assertSame(self::TEST_DATE, $data['time']);
+    }
+
+    /**
+     * Test JSON filtering of a non-array.
+     */
+    public function testJsonFilterNonArray(): void {
+        $data = new Data($this->dateTime);
+        $this->assertSame(self::TEST_DATE, $data->jsonSerialize());
+    }
+
+    /**
+     * Filtering a bad IP address shouldn't cause an error and shouldn't be encoded.
+     */
+    public function testJsonFilterBadIP(): void {
+        $data = new Data(['ipAddress' => 'foo']);
+        $this->assertSame($data->getData(), $data->jsonSerialize());
     }
 
     /**
@@ -311,9 +350,9 @@ class DataTest extends TestCase {
      * Test for {@link count()}.
      */
     public function testCount() {
-        $this->assertCount(5, $this->data);
+        $this->assertCount(6, $this->data);
         $this->data->offsetUnset('userID');
-        $this->assertCount(4, $this->data);
+        $this->assertCount(5, $this->data);
     }
 
     /**
@@ -441,5 +480,14 @@ class DataTest extends TestCase {
     public function testIntStatusConstructor() {
         $data = new Data([], 200);
         $this->assertSame(200, $data->getStatus());
+    }
+
+    /**
+     * Test `Data::mergeData()`.
+     */
+    public function testMergeData(): void {
+        $data = new Data(['conf' => ['foo' => 'bar']]);
+        $data->mergeData(['conf' => ['baz' => 'qux']]);
+        $this->assertSame(['conf' => ['foo' => 'bar', 'baz' => 'qux']], $data->getData());
     }
 }

@@ -32,21 +32,24 @@ class DashboardApiController extends Controller {
             'Garden.Users.Edit',
             'Garden.Users.Delete',
             'Garden.Users.Approve',
+            'Analytics.Data.View',
+            'Analytics.Dashboards.Manage'
         ]);
 
         $in = $this->schema([], 'in')->setDescription('List the dashboard menus.');
         $out = $this->schema([
             ':a' => [
                 'name:s' => 'The title of the menu.',
-                'key:s' => 'The ID of the menu.',
+                'id:s' => 'The ID of the menu.',
                 'description:s' => 'The menu description.',
                 'url:s?' =>  'The URL to the menu if it doesn\'t have a submenu.',
-                'groups:a' => [
-                    'name:s' => 'The title of the group.',
-                    'key:s' => 'The key of the group.',
-                    'links:a' => [
+                'children:a' => [
+                    'name:s?' => 'The title of the group.',
+                    'id:s?' => 'The key of the group.',
+                    'children:a' => [
                         'name:s' => 'The title of the link.',
-                        'key:s' => 'The key of the link.',
+                        'id:s' => 'The key of the link.',
+                        'parentID:s' => 'The key of the parent.',
                         'url:s' => 'The URL of the link.',
                         'react:b' => 'Whether or not the link represents a React component.',
                         'badge?' => [

@@ -27,6 +27,9 @@ class Gdn_CookieIdentity {
     /** @var int|null */
     public $UserID = null;
 
+    /** @var int|null */
+    public $SessionID = null;
+
     /** @var string */
     public $CookieName;
 
@@ -68,8 +71,9 @@ class Gdn_CookieIdentity {
     public function init($config = null) {
         if (is_null($config)) {
             $config = Gdn::config('Garden.Cookie');
-        } elseif (is_string($config))
+        } elseif (is_string($config)) {
             $config = Gdn::config($config);
+        }
 
         $defaultConfig = array_replace(
             ['PersistExpiry' => '30 days', 'SessionExpiry' => '2 days'],
@@ -85,7 +89,7 @@ class Gdn_CookieIdentity {
             $this->CookieDomain = '';
             trigger_error(
                 sprintf('Config "Garden.Cookie.Domain" is incompatible with the current host (%s vs %s).', $currentHost, $this->CookieDomain),
-                E_USER_WARNING
+                E_USER_NOTICE
             );
         }
 
@@ -102,6 +106,7 @@ class Gdn_CookieIdentity {
     protected function _clearIdentity() {
         // Destroy the cookie.
         $this->UserID = 0;
+        $this->SessionID = "";
         $this->_deleteCookie($this->CookieName);
     }
 
@@ -111,9 +116,11 @@ class Gdn_CookieIdentity {
      * found or authentication fails.
      *
      * @return int
+     * @throws \Garden\Schema\ValidationException Exception of the validation.
+     * @throws Exception Exception from validation.
      */
     public function getIdentity() {
-        if (!is_null($this->UserID)) {
+        if (!is_null($this->UserID) && $this->UserID > 0) {
             return $this->UserID;
         }
 
@@ -136,6 +143,27 @@ class Gdn_CookieIdentity {
                 default:
                     $payload = $this->getJWTPayload($name);
                     $userID = val('sub', $payload, 0);
+                    if (\Vanilla\FeatureFlagHelper::featureEnabled(Gdn_Session::FEATURE_SESSION_ID_COOKIE)) {
+                        $sessionName = 'sid';
+                        $this->SessionID = val($sessionName, $payload, "");
+                        $sessionModel = new SessionModel();
+                        // If session was created before this session, lets convert it.
+                        if (stringIsNullOrEmpty($this->SessionID) && $userID != 0) {
+                            $sessionModel = new SessionModel();
+                            $session = $sessionModel->startNewSession($userID);
+                            $this->SessionID = $session['SessionID'];
+                            // $this->_clearIdentity();
+                            $this->setIdentity($userID, true, $this->SessionID);
+                        } else {
+                            $session = $sessionModel->getID($this->SessionID, DATASET_TYPE_ARRAY);
+                            if (!$sessionModel->refreshSession($this->SessionID)) {
+                                $this->_clearIdentity();
+                                $userID = 0;
+                            } else {
+                                $userID = val('UserID', $session, 0);
+                            }
+                        }
+                    }
             }
 
             // The identity cookie set, but we couldn't find a user in it? Nuke it.
@@ -156,6 +184,20 @@ class Gdn_CookieIdentity {
             $this->UserID = $userID;
         }
         return $userID;
+    }
+
+    /**
+     * Returns the unique id assigned to the session in the database (retrieved
+     * from the session cookie if the cookie authenticates) or blank if not
+     * found or authentication fails.
+     *
+     * @return int
+     */
+    public function getSession() {
+        if (stringIsNullOrEmpty($this->SessionID)) {
+            $this->getIdentity();
+        }
+        return $this->SessionID;
     }
 
     /**
@@ -252,14 +294,14 @@ class Gdn_CookieIdentity {
     /**
      * Generates the user's session cookie.
      *
-     * @throws Exception If the cookie salt is empty.
-     * @param int $userID The unique id assigned to the user in the database.
+     * @param int|null $userID The unique id assigned to the user in the database.
      * @param boolean $persist Should the user's session remain persistent across visits?
-     * @param array $data Additional data to include in the token.
+     * @param string|null $sessionID The unique id assigned to the session in the database.
      *
+     * @throws Exception If the cookie salt is empty.
      * @return array|bool
      */
-    public function setIdentity($userID, $persist = false) {
+    public function setIdentity(int $userID = null, bool $persist = false, string $sessionID = null) {
         if (empty($this->CookieSalt)) {
             throw new Exception('Cookie salt is empty.', 500);
         }
@@ -270,7 +312,7 @@ class Gdn_CookieIdentity {
         }
 
         $this->UserID = $userID;
-
+        $this->SessionID = $sessionID;
         // If we're persisting, both the cookie and its payload expire in 30days
         if ($persist) {
             $expiry = strtotime($this->PersistExpiry);
@@ -279,14 +321,18 @@ class Gdn_CookieIdentity {
             // Note: $CookieExpires = 0 causes cookie to die when browser closes.
             $expiry = 0;
         }
-
-        // Generate the token.
         $timestamp = time();
         $payload = [
             'exp' => strtotime($this->PersistExpiry), // Expiration
             'iat' => $timestamp, // Issued at
-            'sub' => $userID // Subject
         ];
+        if (\Vanilla\FeatureFlagHelper::featureEnabled(Gdn_Session::FEATURE_SESSION_ID_COOKIE)) {
+            $payload['sid'] = $sessionID; // Session ID
+        }
+        $payload['sub'] = $userID; // Subject
+
+        // Generate the token.
+
         Gdn::pluginManager()
             ->fireAs(self::class)
             ->fireEvent('setIdentity', ['payload' => &$payload]);
@@ -379,7 +425,6 @@ class Gdn_CookieIdentity {
             $cookieContents = (array)$cookieContents;
             $cookie = array_merge($cookie, $cookieContents);
         }
-
         $cookieContents = implode('|', $cookie);
 
         // Create the cookie.

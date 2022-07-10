@@ -10,7 +10,8 @@ import { expect } from "chai";
 import OpUtils, { inlineFormatOps, blockFormatOps } from "@rich-editor/__tests__/OpUtils";
 import registerQuill from "./registerQuill";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
-import { ListType, ListItem } from "@rich-editor/quill/blots/blocks/ListBlot";
+import { ListLineBlot } from "@rich-editor/quill/blots/lists/ListLineBlot";
+import { ListType } from "@rich-editor/quill/blots/lists/ListUtils";
 import cloneDeep from "lodash/cloneDeep";
 
 describe("Formatter", () => {
@@ -132,7 +133,7 @@ describe("Formatter", () => {
         formattingFunction();
 
         // Kludge out the dynamically generated refs.
-        const stripRefs = op => {
+        const stripRefs = (op) => {
             if (op.attributes && op.attributes.header && op.attributes.header.ref) {
                 op.attributes.header.ref = "";
             }
@@ -151,7 +152,7 @@ describe("Formatter", () => {
                         typeof lastValue.insert === "string" &&
                         typeof current.insert === "string"
                     ) {
-                        lastValue.insert += current.insert;
+                        acc[acc.length - 1].insert += current.insert;
                     } else {
                         acc.push(current);
                     }
@@ -180,7 +181,7 @@ describe("Formatter", () => {
         enableValue: any = true,
     ) {
         describe(`Adding ${formatToTest} to existing inline formats`, () => {
-            testAgainst.forEach(opName => {
+            testAgainst.forEach((opName) => {
                 it(opName + " + " + formatToTest, () => {
                     const opMethod = OpUtils[opName] as () => any;
                     const initial = [opMethod()];
@@ -363,7 +364,19 @@ describe("Formatter", () => {
 
         describe(`can apply the ${lineFormatName} format to single line of all other multiline blots`, () => {
             blockFormatOps
-                .filter(({ name }) => name !== lineFormatName)
+                .filter(({ name }) => {
+                    if (name === lineFormatName) {
+                        // It's ourself.
+                        return false;
+                    }
+
+                    const both = [name, lineFormatName];
+                    if (both.includes("bulletedList") && both.includes("orderedList")) {
+                        // these complete override each other.
+                        return false;
+                    }
+                    return true;
+                })
                 .forEach(({ op, name }) => {
                     const one = OpUtils.op("1");
                     const two = OpUtils.op("2");

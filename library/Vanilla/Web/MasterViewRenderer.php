@@ -7,10 +7,12 @@
 
 namespace Vanilla\Web;
 
+use Garden\EventManager;
 use Garden\Web\Data;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Models\SiteMeta;
-use Vanilla\Models\ThemePreloadProvider;
+use Vanilla\Theme\ThemePreloadProvider;
+use Vanilla\Web\Events\PageRenderBeforeEvent;
 
 /**
  * Class for mapping data inside of a Gdn_Controller for the twig master view.
@@ -36,37 +38,51 @@ class MasterViewRenderer {
     /** @var ConfigurationInterface */
     private $config;
 
+    /** @var EventManager */
+    private $eventManager;
+
     /**
      * DI.
      *
      * @param ThemePreloadProvider $themePreloader
      * @param SiteMeta $siteMeta
      * @param ConfigurationInterface $config
+     * @param EventManager $eventManager
      */
-    public function __construct(ThemePreloadProvider $themePreloader, SiteMeta $siteMeta, ConfigurationInterface $config) {
+    public function __construct(
+        ThemePreloadProvider $themePreloader,
+        SiteMeta $siteMeta,
+        ConfigurationInterface $config,
+        EventManager $eventManager
+    ) {
         $this->themePreloader = $themePreloader;
         $this->siteMeta = $siteMeta;
         $this->config = $config;
+        $this->eventManager = $eventManager;
     }
 
     /**
-     * Render the master template using a `Page` instance.
+     * Render a master template using a `Page` instance.
      *
      * @param Page $page
      * @param array $viewData
      *
      * @return string
      */
-    public function renderPage(Page $page, array $viewData): string {
+    public function renderPage(Page $page, array $viewData, $masterViewPath = self::MASTER_VIEW_PATH): string {
+        $head = $page->getHead();
+        $this->eventManager->fire('pageRenderBefore', new PageRenderBeforeEvent($head, $page));
+
         $extraData = [
             'seoContent' => new \Twig\Markup($page->getSeoContent(), 'utf-8'),
-            'cssClasses' => 'isLoading',
+            'cssClasses' => ['isLoading'],
             'pageHead' => $page->getHead()->renderHtml(),
             'title' => $page->getSeoTitle(),
         ];
-        $data = array_merge($viewData, $extraData, $this->getSharedData());
+        $data = array_merge($this->getSharedData(), $extraData, $viewData);
+        $data['cssClasses'] = implode(" ", $data['cssClasses']);
 
-        return $this->renderTwig(self::MASTER_VIEW_PATH, $data);
+        return $this->renderTwig($masterViewPath, $data);
     }
 
     /**
@@ -87,7 +103,7 @@ class MasterViewRenderer {
 
         $extraData = [
             $bodyHtmlKey => $this->renderThemeContentView($data) ?? $controller->renderAssetForTwig('Content'),
-            'cssClasses' => $controller->data('CssClass') . ' isLoading',
+            'cssClasses' => $controller->data('CssClass') . ' isLoading' . (\Gdn::themeFeatures()->useDataDrivenTheme() ? ' dataDriven' : ''),
             'pageHead' => $controller->renderAssetForTwig('Head'),
         ];
 

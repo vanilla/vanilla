@@ -12,3 +12,8 @@ export interface IRole {
     canSession: boolean;
     personalInfo: boolean;
 }
+
+export interface IRoleFragment {
+    roleID: number;
+    name: string;
+}

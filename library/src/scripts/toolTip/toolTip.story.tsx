@@ -5,20 +5,22 @@
  */
 
 import { StoryHeading } from "@library/storybook/StoryHeading";
-import { storiesOf } from "@storybook/react";
 import React from "react";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { color } from "csx";
 import { StoryContent } from "@library/storybook/StoryContent";
-import SearchContext from "@library/contexts/SearchContext";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
 import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
-import { WarningIcon } from "@library/icons/common";
+import { Icon } from "@vanilla/icons";
+import Modal from "@library/modal/Modal";
+import ModalSizes from "@library/modal/ModalSizes";
+import { StoryTextContent } from "@library/storybook/storyData";
 
-const story = storiesOf("Components", module);
+export default {
+    title: "Components/Tool Tips",
+    parameters: {},
+};
 
-story.add("Tool Tips", () => {
-    const globalVars = globalVariables();
+export const Default = () => {
     return (
         <>
             <div
@@ -56,7 +58,7 @@ story.add("Tool Tips", () => {
                         <ToolTip label={"This one's an icon"}>
                             <ToolTipIcon>
                                 <span style={{ backgroundColor: "#CACACA", width: "20px", height: "20px" }}>
-                                    <WarningIcon />
+                                    <Icon icon={"status-warning"} size={"compact"} />
                                 </span>
                             </ToolTipIcon>
                         </ToolTip>
@@ -150,4 +152,26 @@ story.add("Tool Tips", () => {
             </div>
         </>
     );
-});
+};
+
+export const StackedTooltip = () => {
+    return (
+        <Modal isVisible={true} size={ModalSizes.LARGE}>
+            <StoryTextContent />
+            <Modal isVisible={true} size={ModalSizes.MEDIUM}>
+                <StoryTextContent />
+                <Modal isVisible={true} size={ModalSizes.SMALL}>
+                    <ToolTip
+                        label={
+                            "Toto, we're not in Kansas anymoreToto, we're not in Kansas anymoreToto, we're not in Kansas anymore"
+                        }
+                    >
+                        <span tabIndex={0} style={{ width: "100%", textAlign: "center", display: "inline-block" }}>
+                            Hover over me
+                        </span>
+                    </ToolTip>
+                </Modal>
+            </Modal>
+        </Modal>
+    );
+};

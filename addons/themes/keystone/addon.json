@@ -2,8 +2,7 @@
     "key": "keystone",
     "name": "Keystone",
     "description": "A responsive Vanilla theme with customization options.",
-    "version": "2.0.0",
-    "hidden": false,
+    "version": "2.0.1",
     "authors": [
         {
             "name": "Isis Graziatto",
@@ -59,5 +58,8 @@
             "type": "json",
             "file": "variables_cerulean.json"
         }
+    },
+    "Features": {
+        "LegacyDataDrivenTheme": true
     }
 }

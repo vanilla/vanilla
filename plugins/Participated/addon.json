@@ -1,0 +1,19 @@
+{
+    "name": "Participated Discussions",
+    "description": "Users may view a list of all discussions they have participated in. This is a more user-friendly version of an auto-subscribe option.",
+    "version": "2.0",
+    "mobileFriendly": true,
+    "requiredTheme": false,
+    "hasLocale": true,
+    "registerPermissions": false,
+    "icon": "participated-discussions.png",
+    "key": "participated",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Tim Gunter",
+            "email": "tim@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.com"
+        }
+    ]
+}

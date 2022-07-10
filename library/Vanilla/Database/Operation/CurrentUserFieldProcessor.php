@@ -8,6 +8,7 @@ namespace Vanilla\Database\Operation;
 
 use Gdn_Session;
 use Vanilla\Database\Operation;
+use Vanilla\Utility\ArrayUtils;
 
 /**
  * Database operation processor for including current user ID fields.
@@ -53,12 +54,12 @@ class CurrentUserFieldProcessor implements Processor {
     /**
      * Add current user ID to write operations.
      *
-     * @param Operation $databaseOperation
+     * @param Operation $operation
      * @param callable $stack
      * @return mixed
      */
-    public function handle(Operation $databaseOperation, callable $stack) {
-        switch ($databaseOperation->getType()) {
+    public function handle(Operation $operation, callable $stack) {
+        switch ($operation->getType()) {
             case Operation::TYPE_INSERT:
                 $fields = $this->getInsertFields();
                 break;
@@ -67,21 +68,30 @@ class CurrentUserFieldProcessor implements Processor {
                 break;
             default:
                 // Nothing to do here. Shortcut return.
-                return $stack($databaseOperation);
+                return $stack($operation);
         }
 
         foreach ($fields as $field) {
-            $fieldExists = $databaseOperation->getCaller()->getWriteSchema()->getField("properties.{$field}");
+            $fieldExists = $operation->getCaller()->getWriteSchema()->getField("properties.{$field}");
             if ($fieldExists) {
-                $set = $databaseOperation->getSet();
-                if (empty($set[$field] ?? null) || $databaseOperation->getMode() === Operation::MODE_DEFAULT) {
+                $set = $operation->getSet();
+                if (empty($set[$field] ?? null) || $operation->getMode() === Operation::MODE_DEFAULT) {
                     $set[$field] = $this->session->UserID;
                 };
-                $databaseOperation->setSet($set);
+                $operation->setSet($set);
             }
         }
 
-        return $stack($databaseOperation);
+        return $stack($operation);
+    }
+
+    /**
+     * Get the current user ID that will be applied to fields.
+     *
+     * @return int
+     */
+    public function getCurrentUserID(): int {
+        return $this->session->UserID;
     }
 
     /**
@@ -103,6 +113,17 @@ class CurrentUserFieldProcessor implements Processor {
      */
     public function setUpdateFields(array $updateFields): self {
         $this->updateFields = $updateFields;
+        return $this;
+    }
+
+    /**
+     * Camel case the default fields.
+     *
+     * @return $this
+     */
+    public function camelCase(): self {
+        $this->insertFields = array_map('lcfirst', $this->insertFields);
+        $this->updateFields = array_map('lcfirst', $this->updateFields);
         return $this;
     }
 }

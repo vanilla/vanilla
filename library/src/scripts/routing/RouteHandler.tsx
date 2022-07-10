@@ -32,11 +32,14 @@ export default class RouteHandler<GeneratorProps> {
         componentPromise: LoadFunction,
         public path: string | string[],
         url: (data: GeneratorProps) => string,
-        loadingComponent: React.ReactNode = Loader,
+        LoadingComponent: React.ComponentType = Loader,
         key?: string,
     ) {
+        function LoaderWrapper() {
+            return <LoadingComponent />;
+        }
         this.loadable = Loadable({
-            loading: loadingComponent as any,
+            loading: LoaderWrapper,
             loader: componentPromise,
         });
         this.url = (data: GeneratorProps) => formatUrl(url(data), true);
@@ -53,7 +56,7 @@ export default class RouteHandler<GeneratorProps> {
     public Link = (props: Omit<NavLinkProps, "to"> & { data: GeneratorProps }) => {
         return (
             <Hoverable duration={50} onHover={this.preload}>
-                {provided => <SmartLink {...provided} {...props} to={this.url(props.data)} />}
+                {(provided) => <SmartLink {...provided} {...props} to={this.url(props.data)} />}
             </Hoverable>
         );
     };

@@ -10,11 +10,16 @@
  */
 
 use Garden\Container\Container;
+use Garden\Web\Data;
 use Garden\Web\Dispatcher;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
+use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\FeatureFlagHelper;
+use Vanilla\Utility\DebugUtils;
+use Vanilla\Utility\Timers;
 
 /**
  * Handles all requests and routing.
@@ -30,11 +35,12 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     /** Free to be blocked. */
     const BLOCK_ANY = 2;
 
+    private $wasBlockExceptionEventTriggered = false;
+
     /** @var array List of exceptions not to block */
     private $blockExceptions = [
-        '#^api/v\d+/applicants(/|$)#' => self::BLOCK_NEVER,
-        '#^api/v\d+/locales.*#' => self::BLOCK_NEVER,
         '#^api/v2/#' => self::BLOCK_PERMISSION,
+        '#^dist(/|$)#' => self::BLOCK_NEVER,
         '#^asset(/|$)#' => self::BLOCK_NEVER,
         '#^authenticate(/|$)#' => self::BLOCK_NEVER,
         '#^discussions/getcommentcounts(/|$)#' => self::BLOCK_NEVER,
@@ -42,6 +48,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         '#^home/error(/|$)#' => self::BLOCK_NEVER,
         '#^home/leaving(/|$)#' => self::BLOCK_NEVER,
         '#^home/termsofservice(/|$)#' => self::BLOCK_PERMISSION,
+        '#^home/updatemode(/|$)#' => self::BLOCK_NEVER,
+        '#^home/unauthorized(/|$)#' => self::BLOCK_NEVER,
         '#^plugin(/|$)#' => self::BLOCK_NEVER,
         '#^settings/analyticstick.json$#' => self::BLOCK_PERMISSION,
         '#^sso(/|$)#' => self::BLOCK_NEVER,
@@ -102,6 +110,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     /** @var LoggerInterface */
     private $logger;
 
+    /** @var array */
+    private $sentHeaders = [];
+
     /**
      * @var array An associative collection of variables that will get passed into the
      * controller as properties once it has been instantiated.
@@ -124,6 +135,15 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     /** @var bool */
     private $isHomepage;
 
+    /** @var Timers */
+    private $timers;
+
+    /** @var ConfigurationInterface */
+    private $config;
+
+    /** @var bool */
+    private $rethrowExceptions = false;
+
     /**
      * Gdn_Dispatcher constructor.
      *
@@ -137,7 +157,16 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         $this->container = $container;
         $this->dispatcher = $dispatcher;
         $this->logger = $this->container->get(LoggerInterface::class);
+        $this->timers = $this->container->get(Timers::class);
+        $this->config = $this->container->get(ConfigurationInterface::class);
         $this->reset();
+    }
+
+    /**
+     * @param bool $rethrowExceptions
+     */
+    public function setRethrowExceptions(bool $rethrowExceptions): void {
+        $this->rethrowExceptions = $rethrowExceptions;
     }
 
     /**
@@ -311,6 +340,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             // Now that the controller has been found, dispatch to a method on it.
             $this->dispatchController($request, $routeArgs);
         } else {
+            $this->applyTimeHeaders($response);
             $this->dispatcher->render($request, $response);
         }
     }
@@ -410,7 +440,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         $result['deliveryType'] = self::requestVal('DeliveryType', $result['query'], $result['post'], $deliveryType);
 
         // Figure out the controller.
-        list($controllerName, $pathArgs) = $this->findController($parts);
+        [$controllerName, $pathArgs] = $this->findController($parts);
         $result['pathArgs'] = $pathArgs;
 
         if ($controllerName) {
@@ -696,15 +726,28 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      * @return array
      */
     public function getBlockExceptions() {
-        static $eventTriggered = false;
-
-        if (!$eventTriggered) {
+        if (!$this->wasBlockExceptionEventTriggered) {
             $this->EventArguments['BlockExceptions'] = &$this->blockExceptions;
             $this->fireEvent('BeforeBlockDetect');
-            $eventTriggered = true;
+            $this->wasBlockExceptionEventTriggered = true;
         }
 
         return $this->blockExceptions;
+    }
+
+    /**
+     * Adds a dispatcher block exception.
+     *
+     * @param string $exceptionMatch Exception string to match.
+     * @param int $exceptionType Type of block exception.
+     * @throws InvalidArgumentException Throws and exception if exception type is not found.
+     */
+    public function addBlockException(string $exceptionMatch, int $exceptionType) {
+        $allowedExceptionTypes = [self::BLOCK_NEVER, self::BLOCK_PERMISSION, self::BLOCK_ANY];
+        if (!in_array($exceptionType, $allowedExceptionTypes)) {
+            throw new InvalidArgumentException('Exception type could not be found.', 500);
+        }
+        $this->blockExceptions[$exceptionMatch] = $exceptionType;
     }
 
     /**
@@ -763,19 +806,21 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                 case 'Test':
                     decho($matchRoute, 'Route');
                     decho([
-                        'Path' => $request->path(),
+                        'Path' => $request->getPath(),
                         'Get' => $request->get()
                     ], 'Request');
                     die();
             }
-        } elseif (in_array($request->path(), ['', '/'])) {
+        } elseif (in_array($request->getPath(), ['', '/'])) {
             $this->isHomepage = true;
-            $defaultController = Gdn::router()->getDefaultRoute();
-            $originalGet = $request->get();
-            $request->pathAndQuery($defaultController['Destination']);
-            if (is_array($originalGet) && count($originalGet) > 0) {
-                $request->setQuery(array_merge($request->get(), $originalGet));
+            if (FeatureFlagHelper::featureEnabled("CustomLayoutHomePage")) {
+                // With custom layout homepages, leave the request alone.
+                return $request;
             }
+
+            // Otherwise grab the home route destination from the router.
+            $homePath = Gdn::router()->getDefaultRoute()['Destination'];
+            $request->setPath($homePath);
         }
 
         return $request;
@@ -839,6 +884,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      * @return mixed Returns the result of a dispatch not found if the controller wasn't found or is disabled.
      */
     private function dispatchController($request, $routeArgs) {
+        // Clean this out between dispatches.
+        $this->sentHeaders = [];
+
         // Create the controller first.
         $controllerName = $routeArgs['controller'];
         $controller = $this->createController($controllerName, $request, $routeArgs);
@@ -852,7 +900,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             }
         }
         // Find the method to call.
-        list($controllerMethod, $pathArgs) = $this->findControllerMethod($controller, $routeArgs['pathArgs']);
+        [$controllerMethod, $pathArgs] = $this->findControllerMethod($controller, $routeArgs['pathArgs']);
         if (!$controllerMethod) {
             // The controller method was not found.
             return $this->dispatchNotFound('method_notfound', $request);
@@ -892,7 +940,16 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             $this->fireEvent('BeforeControllerMethod');
             Gdn::pluginManager()->callEventHandlers($controller, $controllerName, $controllerMethod, 'before');
             call_user_func_array($callback, $args);
+            $this->applyTimeHeaders();
+        } catch (\Vanilla\Exception\ExitException $ex) {
+            // The controller wanted to exit.
+            if (!DebugUtils::isTestMode()) {
+                exit();
+            }
         } catch (\Throwable $ex) {
+            if ($this->rethrowExceptions) {
+                throw $ex;
+            }
             if ($this->dispatchException === null) {
                 $this->dispatchException = $ex;
                 $controller->renderException($ex);
@@ -911,9 +968,82 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                 ]);
                 safeHeader("HTTP/1.0 500", true, 500);
             }
-            exit();
+            if (!DebugUtils::isTestMode()) {
+                exit();
+            }
         }
     }
+
+    /**
+     * @return array|null
+     */
+    private function getAllTimerHeaders(): ?array {
+        $headers = [];
+        foreach ($this->timers->getTimers() as $timer) {
+            $headers += $this->getTimerHeadersForKey($timer);
+        }
+        return $headers;
+    }
+
+    /**
+     * Get timer entry headers for a key.
+     *
+     * @param string $key
+     * @return array
+     */
+    private function getTimerHeadersForKey(string $key): array {
+        $timer = $this->timers->get($key);
+        if ($timer === null) {
+            return [];
+        }
+        $result = [
+            "x-app-$key-count" => $timer['count'],
+            "x-app-$key-time" => Timers::formatDuration($timer['time']),
+            "x-app-$key-max" => Timers::formatDuration($timer['max']),
+        ];
+        return $result;
+    }
+
+    /**
+     * Keep track of the headers from the last response.
+     *
+     * @param array $headers The headers that were sent.
+     *
+     * @return void
+     */
+    public function setSentHeaders(array $headers): void {
+        $this->sentHeaders = $headers;
+    }
+
+    /**
+     * @return array
+     */
+    public function getSentHeaders(): array {
+        return $this->sentHeaders;
+    }
+
+    /**
+     * Apply our cache trace headers.
+     *
+     * @param Data|null $data
+     */
+    private function applyTimeHeaders(?Data $data = null) {
+        if (!$this->config->get('trace.headers', debug())) {
+            return;
+        }
+        $headers = $this->getAllTimerHeaders();
+        if ($headers === null) {
+            return;
+        }
+        foreach ($headers as $header => $value) {
+            if ($data !== null) {
+                $data->setHeader($header, $value);
+            } else {
+                safeHeader("{$header}: {$value}");
+            }
+        }
+    }
+
 
     /**
      * This is the old default implementation of canonical URL calculation from `Gdn_Controller`.

@@ -4,19 +4,24 @@
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Core
  * @since 2.0
  */
 
+use Garden\StaticCacheConfigTrait;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Vanilla\Logger;
 use Vanilla\Permissions;
 
 /**
  * Handles user information throughout a session. This class is a singleton.
  */
-class Gdn_Session {
-    use \Garden\StaticCacheConfigTrait;
+class Gdn_Session implements LoggerAwareInterface {
+    use StaticCacheConfigTrait;
+    use LoggerAwareTrait;
 
     /**
      * Parameter name for incoming CSRF tokens.
@@ -26,8 +31,13 @@ class Gdn_Session {
     /** Maximum length of inactivity, in seconds, before a visit is considered new. */
     const VISIT_LENGTH = 1200; // 20 minutes
 
+    public const FEATURE_SESSION_ID_COOKIE = "sessionIDCookie";
+
     /** @var int Unique user identifier. */
     public $UserID;
+
+    /** @var int Unique session identifier. */
+    public $SessionID;
 
     /** @var object A User object containing properties relevant to session */
     public $User;
@@ -51,14 +61,16 @@ class Gdn_Session {
 
     /**
      * Private constructor prevents direct instantiation of object
+     *
      */
     public function __construct() {
         $this->UserID = 0;
+        $this->SessionID = 0;
         $this->User = false;
         $this->_Attributes = [];
         $this->_Preferences = [];
         $this->_TransientKey = false;
-
+        $this->logger = Gdn::getContainer()->get(\Psr\Log\LoggerInterface::class);
         $this->permissions = new Permissions();
     }
 
@@ -100,22 +112,36 @@ class Gdn_Session {
      * If false, the user only needs one of the specified permissions.
      * @param string $junctionTable The name of the junction table for a junction permission.
      * @param int|string $junctionID The JunctionID associated with $Permission (ie. A discussion category identifier).
+     * @param string $mode One of the permission modes.
+     *
      * @return boolean Returns **true** if the user has permission or **false** otherwise.
      */
-    public function checkPermission($permission, $fullMatch = true, $junctionTable = '', $junctionID = '') {
-        if ($junctionID === 'any' || $junctionID === '' || empty($junctionTable) ||
+    public function checkPermission(
+        $permission,
+        $fullMatch = true,
+        $junctionTable = '',
+        $junctionID = '',
+        string $mode = Permissions::CHECK_MODE_GLOBAL_OR_RESOURCE
+    ) {
+        if ($junctionID === 'any' || $junctionID === '' ||
             self::c("Garden.Permissions.Disabled.{$junctionTable}")) {
+            $junctionID = null;
+            $junctionTable = null;
+        }
+
+        if ($junctionTable === '') {
+            $junctionTable = null;
             $junctionID = null;
         }
 
         if (is_array($permission)) {
             if ($fullMatch) {
-                return $this->permissions->hasAll($permission, $junctionID);
+                return $this->permissions->hasAll($permission, $junctionID, $mode, $junctionTable);
             } else {
-                return $this->permissions->hasAny($permission, $junctionID);
+                return $this->permissions->hasAny($permission, $junctionID, $mode, $junctionTable);
             }
         } else {
-            return $this->permissions->has($permission, $junctionID);
+            return $this->permissions->has($permission, $junctionID, $mode, $junctionTable);
         }
     }
 
@@ -130,7 +156,19 @@ class Gdn_Session {
         }
 
         if ($this->UserID) {
-            Logger::event('session_end', Logger::INFO, 'Session ended for {username}.', [Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]);
+            $this->logger->info('Session ended for {username}.', [
+                Logger::FIELD_EVENT => 'session_end',
+                Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY
+            ]);
+        }
+        if ($this->SessionID) {
+            $this->logger->info("Session ended for $this->SessionID.", [
+                Logger::FIELD_EVENT => 'session_end',
+                Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY
+            ]);
+
+            $sessionModel = new SessionModel();
+            $sessionModel->expireSession($this->SessionID);
         }
 
         $authenticator->authenticateWith()->deauthenticate();
@@ -141,6 +179,7 @@ class Gdn_Session {
         Gdn::pluginManager()->callEventHandlers($this, 'Gdn_Session', 'End');
 
         $this->UserID = 0;
+        $this->SessionID = 0;
         $this->User = false;
         $this->_Attributes = [];
         $this->_Preferences = [];
@@ -344,11 +383,10 @@ class Gdn_Session {
     }
 
     /**
-     * Gets the currently authenticated user's attribute for the specified
-     * $attributeName.
+     * Gets the currently authenticated user's attribute for the specified $attributeName.
      *
-     * @param unknown_type $attributeName The name of the attribute to get.
-     * @param string $defaultValue The default value to return if the attribute does not exist.
+     * @param string $attributeName The name of the attribute to get.
+     * @param string|false $defaultValue The default value to return if the attribute does not exist.
      * @return mixed
      */
     public function getAttribute($attributeName, $defaultValue = false) {
@@ -359,7 +397,7 @@ class Gdn_Session {
     }
 
     /**
-     *
+     * Get all of the session attributes.
      *
      * @return array
      */
@@ -371,11 +409,12 @@ class Gdn_Session {
      * This is the singleton method that return the static
      * Configuration::Instance.
      *
-     * @return Session
+     * @return self
      */
     public static function getInstance() {
         if (!isset(self::$_Instance)) {
             $c = __CLASS__;
+
             self::$_Instance = new $c();
         }
         return self::$_Instance;
@@ -395,20 +434,22 @@ class Gdn_Session {
     /**
      * Authenticates the user with the provided Authenticator class.
      *
-     * @param int $userID The UserID to start the session with.
+     * @param int|false $userID The UserID to start the session with.
      * @param bool $setIdentity Whether or not to set the identity (cookie) or make this a one request session.
      * @param bool $persist If setting an identity, should we persist it beyond browser restart?
      */
-    public function start($userID = false, $setIdentity = true, $persist = false) {
+    public function start($userID = false, bool $setIdentity = true, bool $persist = false) {
         if (!c('Garden.Installed', false)) {
             return;
         }
 
-        $this->permissions = new Permissions();
+        $this->permissions = Gdn::permissionModel()->createPermissionInstance();
 
         // Retrieve the authenticated UserID from the Authenticator module.
         $userModel = Gdn::authenticator()->getUserModel();
-        $this->UserID = $userID !== false ? $userID : Gdn::authenticator()->getIdentity();
+        $this->UserID = $userID !== false ? (int) $userID : Gdn::authenticator()->getIdentity();
+        $this->SessionID = Gdn::authenticator()->getSession();
+
         $this->User = false;
         $this->loadTransientKey();
 
@@ -422,7 +463,8 @@ class Gdn_Session {
                 $this->permissions->setPermissions($this->User->Permissions);
 
                 // Set permission overrides.
-                $this->permissions->setAdmin($this->User->Admin);
+                $this->permissions->setAdmin($this->User->Admin > 0);
+                $this->permissions->setSysAdmin($this->User->Admin > 1);
                 if (!empty($this->User->Deleted)) {
                     $this->permissions->addBan(Permissions::BAN_DELETED, ['msg' => t('Your account has been deleted.')]);
                 }
@@ -431,13 +473,20 @@ class Gdn_Session {
                 }
 
                 if ($this->permissions->has('Garden.SignIn.Allow')) {
+                    // Fire a specific event for setting the session so that event handlers can override permissions.
+                    Gdn::getContainer()->get(\Garden\EventManager::class)->fire('gdn_session_set', $this);
                     if ($setIdentity) {
-                        Gdn::authenticator()->setIdentity($this->UserID, $persist);
-                        Logger::event(
-                            'session_start',
-                            Logger::INFO,
+                        if (\Vanilla\FeatureFlagHelper::featureEnabled(self::FEATURE_SESSION_ID_COOKIE)) {
+                            $sessionModel = new SessionModel();
+                            $session = $sessionModel->startNewSession($this->UserID);
+                            Gdn::authenticator()->setIdentity($this->UserID, $persist, $session['SessionID']);
+                            $this->SessionID = $session['SessionID'];
+                        } else {
+                            Gdn::authenticator()->setIdentity($this->UserID, $persist);
+                        }
+                        $this->logger->info(
                             'Session started for {username}.',
-                            [Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
+                            [Logger::FIELD_EVENT => 'session_start', Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
                         );
                         Gdn::pluginManager()->callEventHandlers($this, 'Gdn_Session', 'Start');
                     }
@@ -661,6 +710,7 @@ class Gdn_Session {
 
         if ($foreignKey === true) {
             $forceValid = true;
+            $return = true;
         }
 
         if (!$forceValid && $validateUser && $this->UserID <= 0) {
@@ -684,22 +734,19 @@ class Gdn_Session {
 
         if (!$return && $forceValid !== true) {
             if (Gdn::session()->User) {
-                Logger::event(
-                    'csrf_failure',
-                    Logger::ERROR,
+                $this->logger->error(
                     'Invalid transient key for {username}.',
                     [
+                        Logger::FIELD_EVENT => 'csrf_failure',
                         "User TK" => $foreignKey,
                         "Site TK" => $this->_TransientKey,
                         Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
                     ]
                 );
             } else {
-                Logger::event(
-                    'csrf_failure',
-                    Logger::ERROR,
+                $this->logger->error(
                     'Invalid transient key.',
-                    [Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
+                    [Logger::FIELD_EVENT => 'csrf_failure', Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
                 );
             }
         }
@@ -790,10 +837,12 @@ class Gdn_Session {
     private function getStashSession($sessionModel, $valueToStash) {
         $cookieName = c('Garden.Cookie.Name', 'Vanilla');
         $name = $cookieName.'-sid';
-
-        // Grab the entire session record.
-        $sessionID = val($name, $_COOKIE, '');
-
+        if (\Vanilla\FeatureFlagHelper::featureEnabled(Gdn_Session::FEATURE_SESSION_ID_COOKIE)) {
+            $sessionID = Gdn::session()->SessionID;
+        } else {
+            // Grab the entire session record.
+            $sessionID = val($name, $_COOKIE, '');
+        }
         // If there is no session, and no value for saving, return.
         if ($sessionID == '' && $valueToStash == '') {
             return false;

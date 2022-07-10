@@ -1,0 +1,165 @@
+openapi: 3.0.2
+info:
+paths:
+components:
+    responses:
+        NotFound:
+            description: The record does not exist or was not found.
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            message:
+                                type: string
+                                description: More information about the error.
+                            status:
+                                type: number
+                                description: The HTTP status code for the error.
+                                format: int32
+                        required:
+                            - message
+                    example:
+                        status: 404
+                        message: Page Not Found
+        PermissionError:
+            description: You don't have adequate permissions to access this resource.
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required: [message, status, permissions]
+                        properties:
+                            message:
+                                type: string
+                                description: A message that tells you the permissions you need.
+                            status:
+                                type: number
+                                description: The HTTP status code for the error.
+                                format: int32
+                            permissions:
+                                description: The permissions the requesting user is missing.
+                                type: array
+                                items:
+                                    type: string
+                            recordIDs:
+                                description: The recordIDs the user didn't have permission on.
+                                type: array
+                                items:
+                                    type: integer
+                    example:
+                        status: 403
+                        message: Permission Problem
+                        permissions: ["Vanilla.Discussions.Edit", "Vanilla.Community.Manage"]
+                        recordIDs: [2425, 1342]
+        LongRunnerResponse:
+            description: |
+                Endpoints that may time out and require the client to
+                progress them with the `/api/v2/calls` endpoints may return this.
+            content:
+                application/json:
+                    schema:
+                        $ref: "#/components/schemas/LongRunnerResult"
+        TrackingSlipResponse:
+            description: |
+                Endpoints may queue a job to perform a task in the background.
+                This response allows you track that progress with the `/api/v2/job-statuses` endpoints.
+            content:
+                application/json:
+                    schema:
+                        $ref: "#/components/schemas/TrackingSlipData"
+    schemas:
+        LongRunnerResult:
+            description: |
+                Endpoints will return this if they may time out and require the client
+                to progress the task with additional requests.
+            type: object
+            required: [progress, callbackPayload]
+            properties:
+                callbackPayload:
+                    description: |
+                        A signed JWT payload to pass to the /api/v2/calls endpoint in order to continue
+                        progression of the task.
+                    type: string
+                    example: |
+                        eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+                progress:
+                    $ref: "#/components/schemas/LongRunnerProgress"
+        TrackingSlipData:
+            type: object
+            description: |
+                Represents a scheduled server-side job.
+            properties:
+                jobID:
+                    description: The ID of a particular job.
+                    type: string
+                    example: 10232183.longrunnerjob.5fa1a178cfe1b9.07902191
+                jobTrackingID:
+                    description: |
+                        A shared ID that can be used to track the status of a job.
+                        This ID persists even if jobs fail and retry, or spawn child jobs.
+                    type: string
+                    example: 42adsf424::613fda84bdea32.25565677
+                status:
+                    description: The current status of the job.
+                    type: string
+                    enum:
+                        - abandoned
+                        - complete
+                        - error
+                        - failed
+                        - intended
+                        - invalid
+                        - stackError
+                        - progress
+                        - retry
+                        - received
+                        - unknown
+                    example: received
+        BasicError:
+            type: object
+            properties:
+                message:
+                    description: Verbose description of the error.
+                    type: string
+                status:
+                    description: Response status code.
+                    type: integer
+            required:
+                - message
+                - status
+        LongRunnerProgress:
+            description: Progress of the task.
+            type: object
+            required: [successIDs, failedIDs, exceptionsByID]
+            properties:
+                successIDs:
+                    description: |
+                        The IDs of records for which an action has succeeded.
+                    example: [25, 145, 11431, 1313]
+                    type: array
+                    items:
+                        type: integer
+                failedIDs:
+                    description: |
+                        The IDs of records for which and action has failed.
+                    example: [14424, 1264524]
+                    type: array
+                    items:
+                        type: integer
+                exceptionsByID:
+                    description: Detailed errors by failedID during the action.
+                    example:
+                        14424:
+                            message: Discussions of type "redirect" can't be moved.
+                            code: 400
+                    type: object
+                    required: [message, type]
+                    properties:
+                        message:
+                            type: string
+                        code:
+                            type: number
+                countTotalIDs:
+                    description: Total count of records that can be progressed.
+                    type: integer

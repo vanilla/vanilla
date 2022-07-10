@@ -16,20 +16,22 @@ class DraftsController extends VanillaController {
     /** @var array Models to include. */
     public $Uses = ['Database', 'DraftModel'];
 
+    /** @var int $offset */
+    public $offset;
+
     /**
      * Default all drafts view: chronological by time saved.
      *
-     * @since 2.0.0
-     * @access public
-     *
      * @param int $offset Number of drafts to skip.
      */
-    public function index($offset = '0') {
+    public function index($offset = 0) {
+        $this->offset = $offset;
         Gdn_Theme::section('DiscussionList');
 
         // Setup head
         $this->permission('Garden.SignIn.Allow');
         $this->addJsFile('jquery.gardenmorepager.js');
+
         $this->addJsFile('discussions.js');
         $this->title(t('My Drafts'));
 
@@ -42,8 +44,12 @@ class DraftsController extends VanillaController {
         $limit = Gdn::config('Vanilla.Discussions.PerPage', 30);
         $session = Gdn::session();
         $wheres = ['d.InsertUserID' => $session->UserID];
-        $this->DraftData = $this->DraftModel->getByUser($session->UserID, $offset, $limit);
         $countDrafts = $this->DraftModel->getCountByUser($session->UserID);
+        $offsetCalculated = (int)(($countDrafts - 2) / $limit) * $limit;
+        if ($offset >= $offsetCalculated) {
+            $this->offset = $offsetCalculated;
+        }
+        $this->DraftData = $this->DraftModel->getByUser($session->UserID, $offset, $limit);
 
         // Build a pager
         $pagerFactory = new Gdn_PagerFactory();
@@ -64,7 +70,6 @@ class DraftsController extends VanillaController {
             $this->setJson('MoreRow', $this->Pager->toString('more'));
             $this->View = 'drafts';
         }
-
         // Add modules
         $this->addModule('DiscussionFilterModule');
         $this->addModule('NewDiscussionModule');
@@ -86,13 +91,13 @@ class DraftsController extends VanillaController {
      * @param int $draftID Unique ID of draft to be deleted.
      * @param string $transientKey Single-use hash to prove intent.
      */
-    public function delete($draftID = '', $transientKey = '') {
+    public function delete($draftID = 0, $transientKey = '') {
         $form = Gdn::factory('Form');
         $session = Gdn::session();
         if (is_numeric($draftID) && $draftID > 0) {
             $draft = $this->DraftModel->getID($draftID);
         }
-        if ($draft) {
+        if (!empty($draft)) {
             if ($session->validateTransientKey($transientKey)
                 && ((val('InsertUserID', $draft) == $session->UserID) || checkPermission('Garden.Community.Manage'))
             ) {
@@ -118,7 +123,7 @@ class DraftsController extends VanillaController {
             $this->setJson('ErrorMessage', $form->errors());
         }
 
-        // Render default view
-        $this->render();
+        // Render default view.
+        $this->render('blank', 'utility', 'dashboard');
     }
 }

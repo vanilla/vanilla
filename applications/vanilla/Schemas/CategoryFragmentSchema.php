@@ -20,6 +20,14 @@ class CategoryFragmentSchema extends Schema {
             'categoryID:i' => 'The ID of the category.',
             'name:s' => 'The name of the category.',
             'url:s' => 'Full URL to the category.',
+            'allowedDiscussionTypes:a?' => 'An array of discussion types allowed on the category.'
         ]));
+    }
+
+    /**
+     * @return string[]
+     */
+    public static function fieldNames(): array {
+        return ['categoryID', 'name', 'url', 'allowedDiscussionTypes'];
     }
 }

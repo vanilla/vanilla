@@ -14,6 +14,7 @@ use UserModel;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Permissions;
 use Vanilla\Utility\ArrayUtils;
+use Vanilla\Utility\ModelUtils;
 
 /**
  * Middleware to lookup foreign user IDs and add them to API responses.
@@ -30,40 +31,30 @@ class APIExpandMiddleware {
 
     private const EXPAND_FIELD = "expand";
 
-    private const ID_FIELD = "ssoID";
-
-    /** @var string[] */
-    private $supportedFields = [
-        "firstInsertUser.ssoID" => "firstInsertUserID",
-        "insertUser.ssoID" => "insertUserID",
-        "lastInsertUser.ssoID" => "lastInsertUserID",
-        "lastPost.insertUser.ssoID" => "lastPost.insertUserID",
-        "updateUser.ssoID" => "updateUserID",
-        "user.ssoID" => "userID",
-    ];
-
-    /** @var string */
-    private $permission;
+    /** @var array<string, AbstractApiExpander> */
+    private $expanders;
 
     /** @var Gdn_Session */
     private $session;
-
-    /** @var UserModel */
-    private $userModel;
 
     /**
      * Setup the middleware.
      *
      * @param string $basePath
-     * @param string $permission
-     * @param UserModel $userModel
      * @param Gdn_Session $session
      */
-    public function __construct(string $basePath, string $permission, UserModel $userModel, Gdn_Session $session) {
+    public function __construct(string $basePath, Gdn_Session $session) {
         $this->setBasePath($basePath);
-        $this->permission = $permission;
-        $this->userModel = $userModel;
         $this->session = $session;
+    }
+
+    /**
+     * Add an expander.
+     *
+     * @param AbstractApiExpander $expander
+     */
+    public function addExpander(AbstractApiExpander $expander) {
+        $this->expanders[$expander->getFullKey()] = $expander;
     }
 
     /**
@@ -75,12 +66,18 @@ class APIExpandMiddleware {
      */
     public function __invoke(RequestInterface $request, callable $next) {
         $expands = $this->inBasePath($request->getPath()) ? $this->extractExpands($request) : [];
+        $keysToExpand = [];
+        foreach ($expands as $nestedExpands) {
+            foreach ($nestedExpands as $expandedKey) {
+                $keysToExpand[] = $expandedKey;
+            }
+        }
+        $this->verifyPermissions($keysToExpand);
 
         $response = $next($request);
 
         if (!empty($expands) &&
             (is_array($response) || ($response instanceof Data && $response->isSuccessful()))) {
-            $this->verifyPermission();
             $response = $this->updateResponse($response, $expands);
         }
 
@@ -97,10 +94,24 @@ class APIExpandMiddleware {
         $result = [];
 
         $expand = $this->readExpand($request);
-        $supportedFields = array_keys($this->supportedFields);
+        if ($expand === null) {
+            return [];
+        }
+
         foreach ($expand as $expandField) {
-            if (in_array($expandField, $supportedFields)) {
-                $result[] = $expandField;
+            $wholeMatchingExpandSpec = $this->expanders[$expandField] ?? null;
+            if ($wholeMatchingExpandSpec instanceof AbstractApiExpander) {
+                $fields = $wholeMatchingExpandSpec->getExpandFields();
+                // We need to flip these because our result is "sourcefield" => "destinationField"
+                // And our input is inverted.
+                $result[$expandField] = array_flip($fields);
+            }
+
+            foreach ($this->expanders as $key => $expander) {
+                $sourceField = $expander->getFieldByDestination($expandField);
+                if ($sourceField !== null) {
+                    $result[$key][$sourceField] = $expandField;
+                }
             }
         }
 
@@ -109,14 +120,52 @@ class APIExpandMiddleware {
     }
 
     /**
+     * Get all expand fields for a single depth one key.
+     *
+     * @param string $pk
+     * @param bool $firstLevel
+     * @return array
+     */
+    public function getExpandFieldsByKey(string $pk, bool $firstLevel = false): array {
+        $result = [];
+
+        foreach ($this->expanders as $key => $expander) {
+            foreach ($expander->getExpandFields() as $destination => $field) {
+                if ($field === $pk && (!$firstLevel || strpos($destination, '.') === false)) {
+                    $result[$key][$field] = $destination;
+                }
+            }
+        }
+        return $result;
+    }
+
+    /**
      * Does the current user have permission to use this functionality?
+     *
+     * @param array<string> $keysToExpand The expands from the request.
      *
      * @throws PermissionException If current user does not have the configured permission.
      */
-    protected function verifyPermission(): void {
-        if ($this->session->getPermissions()->hasRanked($this->permission) !== true) {
-            $permission = Permissions::resolveRankedPermissionAlias($this->permission);
-            throw new PermissionException($permission);
+    protected function verifyPermissions(array $keysToExpand): void {
+        foreach ($this->expanders as $expander) {
+            $permissionToCheck = $expander->getPermission();
+            if ($permissionToCheck === null) {
+                // No permissions to check for this expander.
+                continue;
+            }
+
+            $allValidExpands = array_merge([$expander->getFullKey()], array_keys($expander->getExpandFields()));
+            if (empty(array_intersect($keysToExpand, $allValidExpands))) {
+                // This expander didn't match.
+                continue;
+            }
+
+            if ($this->session->getPermissions()->hasRanked($permissionToCheck) !== true) {
+                $permission = Permissions::resolveRankedPermissionAlias($permissionToCheck);
+                throw new PermissionException($permission, [
+                    'expandFields' => $allValidExpands,
+                ]);
+            }
         }
     }
 
@@ -124,11 +173,16 @@ class APIExpandMiddleware {
      * Extract the API expand array from a request.
      *
      * @param RequestInterface $request
-     * @return array
+     * @return array| null
      */
-    private function readExpand(RequestInterface $request): array {
+    private function readExpand(RequestInterface $request): ?array {
         $query = $request->getQuery();
-        $expand = $query[self::EXPAND_FIELD] ?? "";
+        $expand = $query[self::EXPAND_FIELD] ?? null;
+
+        if ($expand === null) {
+            return null;
+        }
+
         $fields = is_string($expand) ? explode(",", $expand) : [];
         array_walk($fields, "trim");
         return $fields;
@@ -147,11 +201,10 @@ class APIExpandMiddleware {
             return;
         }
 
-        $scrubbedExpand = [];
-        foreach ($expand as $field) {
-            if (!in_array($field, $fields)) {
-                $scrubbedExpand[] = $field;
-            }
+        $scrubbedExpand = $expand;
+        foreach ($fields as $fieldTopLevel => $fieldValues) {
+            $fieldValues[] = $fieldTopLevel;
+            $scrubbedExpand = array_diff($scrubbedExpand, array_values($fieldValues));
         }
 
         if (empty($scrubbedExpand)) {
@@ -163,7 +216,7 @@ class APIExpandMiddleware {
     }
 
     /**
-     * Add the extra SSO ID expand parameters to the
+     * Add the extra expand parameters to the
      *
      * @param array $openAPI
      */
@@ -175,9 +228,8 @@ class APIExpandMiddleware {
                         if (self::EXPAND_FIELD === ($parameter['name'] ?? '') && is_array($parameter['schema']['items']['enum'] ?? null)) {
                             $enum = $parameter['schema']['items']['enum'];
                             foreach ($enum as $item) {
-                                if (array_key_exists($item . '.' . self::ID_FIELD, $this->supportedFields)) {
-                                    $enum[] = $item . '.' . self::ID_FIELD;
-                                }
+                                $expandFields = $this->getExpandFields($item);
+                                $enum = array_merge($enum, $expandFields);
                             }
                             $parameter['schema']['items']['enum'] = $enum;
                         }
@@ -200,104 +252,67 @@ class APIExpandMiddleware {
     }
 
     /**
-     * Generate an array of resources, grouped by field.
-     *
-     * @param Data $response
-     * @param array $fields
-     * @return array
-     */
-    private function resourceIDs(Data $response, array $fields): array {
-        if (empty($this->supportedFields)) {
-            return [];
-        }
-
-        $idFields = [];
-        foreach ($fields as $field) {
-            if (array_key_exists($field, $this->supportedFields)) {
-                $idFields[$field] = $this->supportedFields[$field];
-            }
-        }
-
-        $result = [];
-        $idLookup = function (array $array) use ($idFields, &$result) {
-            foreach ($idFields as $field => $idField) {
-                $id = ArrayUtils::getByPath($idField, $array);
-                if ($id !== null) {
-                    if (!array_key_exists($field, $result)) {
-                        $result[$field] = [];
-                    }
-                    if (!in_array($id, $result[$field])) {
-                        $result[$field][] = $id;
-                    }
-                }
-            }
-        };
-
-        $data = $response->getData();
-        if (ArrayUtils::isAssociative($data)) {
-            $idLookup($data);
-        } else {
-            foreach ($data as $row) {
-                $idLookup($row);
-            }
-        }
-        return $result;
-    }
-
-    /**
      * Update a response to include the expanded fields.
      *
      * @param array|Data $response
-     * @param array $fields
+     * @param array $fields The expand fields that were chosen with spec keys and join field values.
      * @return mixed
      */
     private function updateResponse($response, array $fields): Data {
-        if (empty($fields)) {
-            return Data::box($response);
-        }
-
         $response = Data::box($response);
-        $resourceIDs = $this->resourceIDs($response, $fields);
-        $resources = [];
-        foreach ($resourceIDs as $field => $IDs) {
-            $resources[$field] = $this->joinSSOIDs($IDs);
-        }
-
-        $updateRow = function (array &$row) use ($resources, $fields) {
-            foreach ($fields as $field) {
-                $idField = $this->supportedFields[$field] ?? null;
-                if (!$idField) {
-                    continue;
-                }
-                $id = ArrayUtils::getByPath($idField, $row);
-                if ($id !== null) {
-                    $fieldResources = $resources[$field] ?? [];
-                    $rowResource = $fieldResources[$id] ?? null;
-                    $row = ArrayUtils::setByPath($rowResource, $field, $row);
-                }
-            }
-        };
 
         $data = $response->getData();
         if (ArrayUtils::isAssociative($data)) {
-            $updateRow($data);
+            $dataset = [&$data];
         } else {
-            foreach ($data as &$row) {
-                $updateRow($row);
-            }
+            $dataset = &$data;
         }
+        foreach ($fields as $key => $currentFields) {
+            $expander = $this->expanders[$key];
+            ModelUtils::leftJoin($dataset, $currentFields, [$expander, 'resolveFragements'], $expander->getDefaultRecord());
+        }
+
         $response->setData($data);
         return $response;
     }
 
     /**
-     * Grab users SSO IDs and return them mapped to the original user IDs.
+     * Expand all the fields possible based on a single primary key.
      *
-     * @param array $userIDs
-     * @return array
+     * @param array|Data $response
+     * @param string $pk
+     * @param bool $firstLevel
+     * @param string[] $excludedExpanders An array of expander names to exclude. Exaple: 'users', 'users.extended'
+     *
+     * @return Data
      */
-    protected function joinSSOIDs(array $userIDs): array {
-        $result = $this->userModel->getDefaultSSOIDs($userIDs);
+    public function updateResponseByKey($response, string $pk, bool $firstLevel = false, array $excludedExpanders = []):
+    Data {
+        $fields = $this->getExpandFieldsByKey($pk, $firstLevel);
+        foreach ($excludedExpanders as $excludedExpander) {
+            unset($fields[$excludedExpander]);
+        }
+        $response = $this->updateResponse($response, $fields);
+        return $response;
+    }
+
+    /**
+     * Given an accepted expand field, return a nested expand field supported by this middleware.
+     *
+     * Example: If a resource has an expand field "insertUser" this would return "insertUser.ssoID".
+     *
+     * @param string $currentExpandField
+     * @return string[]
+     */
+    private function getExpandFields(string $currentExpandField): array {
+        $result = [];
+        foreach ($this->expanders as $key => $expander) {
+            foreach ($expander->getExpandFields() as $expandField => $_) {
+                if (str_starts_with($expandField, $currentExpandField.'.')) {
+                    $result[] = $expandField;
+                }
+            }
+        }
         return $result;
     }
 }

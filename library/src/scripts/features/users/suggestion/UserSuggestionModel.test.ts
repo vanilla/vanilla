@@ -10,7 +10,7 @@ import UserSuggestionModel from "@library/features/users/suggestion/UserSuggesti
 import UserSuggestionActions from "@library/features/users/suggestion/UserSuggestionActions";
 import { expect } from "chai";
 import sinon from "sinon";
-import moment, { Moment } from "moment";
+import { getDateBysubStractDays } from "@library/content/DateTimeHelpers";
 
 type SortProviderTuple = [string[], string, string[]];
 interface ISortTestData {
@@ -18,7 +18,7 @@ interface ISortTestData {
     search: string;
     expected: IMentionSuggestionData[];
 }
-function makeMentionSuggestion(username: string, dateLastActive: Moment | null = null): IMentionSuggestionData {
+function makeMentionSuggestion(username: string, dateLastActive: Date | null = null): IMentionSuggestionData {
     return {
         name: username,
         domID: "",
@@ -29,12 +29,12 @@ function makeMentionSuggestion(username: string, dateLastActive: Moment | null =
 }
 
 function createSortTestData(basicData: SortProviderTuple[]): ISortTestData[] {
-    return basicData.map(data => {
+    return basicData.map((data) => {
         const [input, search, expected] = data;
         return {
-            input: input.map(name => makeMentionSuggestion(name)),
+            input: input.map((name) => makeMentionSuggestion(name)),
             search,
-            expected: expected.map(name => makeMentionSuggestion(name)),
+            expected: expected.map((name) => makeMentionSuggestion(name)),
         };
     });
 }
@@ -61,7 +61,7 @@ describe("UserSuggestionModel", () => {
 
             it("invalidates the previous successful username", () => {
                 const users = {
-                    data: ["test", "test2"].map(name => makeMentionSuggestion(name)),
+                    data: ["test", "test2"].map((name) => makeMentionSuggestion(name)),
                     status: 200,
                 };
                 const successState = model.reducer(
@@ -79,7 +79,7 @@ describe("UserSuggestionModel", () => {
 
             it("does not invalidate the previous successful username if the new one is a superset of that name", () => {
                 const users = {
-                    data: ["test", "test2"].map(name => makeMentionSuggestion(name)),
+                    data: ["test", "test2"].map((name) => makeMentionSuggestion(name)),
                     status: 200,
                 };
                 const successState = model.reducer(
@@ -182,21 +182,21 @@ describe("UserSuggestionModel", () => {
         });
 
         it("sorts users active in the last 90 days to the top with exact matches first", () => {
-            const currentTime = moment();
+            const currentTime = new Date();
             const data = [
-                makeMentionSuggestion("start-a-old2", currentTime.clone().subtract(100, "day")),
-                makeMentionSuggestion("start-a-old1", currentTime.clone().subtract(100, "day")),
-                makeMentionSuggestion("stárt-b-new1", currentTime.clone().subtract(1, "day")),
-                makeMentionSuggestion("stârt-b-new2", currentTime.clone().subtract(1, "day")),
-                makeMentionSuggestion("Start", currentTime.clone().subtract(1000, "day")),
+                makeMentionSuggestion("start-a-old2", getDateBysubStractDays(currentTime, 100)),
+                makeMentionSuggestion("start-a-old1", getDateBysubStractDays(currentTime, 100)),
+                makeMentionSuggestion("stárt-b-new1", getDateBysubStractDays(currentTime, 1)),
+                makeMentionSuggestion("stârt-b-new2", getDateBysubStractDays(currentTime, 1)),
+                makeMentionSuggestion("Start", getDateBysubStractDays(currentTime, 1000)),
             ];
 
             const expected = [
-                makeMentionSuggestion("Start", currentTime.clone().subtract(1000, "day")), // Capitalization doesn't matter. It's "exact".
-                makeMentionSuggestion("stárt-b-new1", currentTime.clone().subtract(1, "day")), // Even though the accents are different these users are newer.
-                makeMentionSuggestion("stârt-b-new2", currentTime.clone().subtract(1, "day")),
-                makeMentionSuggestion("start-a-old1", currentTime.clone().subtract(100, "day")),
-                makeMentionSuggestion("start-a-old2", currentTime.clone().subtract(100, "day")),
+                makeMentionSuggestion("Start", getDateBysubStractDays(currentTime, 1000)), // Capitalization doesn't matter. It's "exact".
+                makeMentionSuggestion("stárt-b-new1", getDateBysubStractDays(currentTime, 1)), // Even though the accents are different these users are newer.
+                makeMentionSuggestion("stârt-b-new2", getDateBysubStractDays(currentTime, 1)),
+                makeMentionSuggestion("start-a-old1", getDateBysubStractDays(currentTime, 100)),
+                makeMentionSuggestion("start-a-old2", getDateBysubStractDays(currentTime, 100)),
             ];
 
             expect(UserSuggestionModel.sortSuggestions(data, "start")).deep.eq(expected);

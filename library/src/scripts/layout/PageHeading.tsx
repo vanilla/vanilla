@@ -15,23 +15,32 @@ import backLinkClasses from "@library/routing/links/backLinkStyles";
 import { iconClasses } from "@library/icons/iconStyles";
 
 interface IPageHeading {
-    title: React.ReactNode;
+    title?: React.ReactNode;
+    depth?: number;
     children?: React.ReactNode;
     className?: string;
     headingClassName?: string;
     actions?: React.ReactNode;
     includeBackLink?: boolean;
     isCompactHeading?: boolean;
+    titleCount?: React.ReactNode;
 }
 
 /**
  * A component representing a top level page heading.
  * Can be configured with an options menu and a backlink.
  */
-// export class PageHeading extends React.Component<IPageHeading> {
-
 export function PageHeading(props: IPageHeading) {
-    const { includeBackLink = true, actions, children, headingClassName, title, className, isCompactHeading } = props;
+    const {
+        includeBackLink = true,
+        actions,
+        children,
+        headingClassName,
+        title,
+        className,
+        isCompactHeading,
+        titleCount,
+    } = props;
     const { fontSize } = useFontSizeCalculator();
 
     const classes = pageHeadingClasses();
@@ -51,12 +60,19 @@ export function PageHeading(props: IPageHeading) {
             <div className={classes.main}>
                 {includeBackLink && backLink}
                 <ConditionalWrap condition={!!actions} className={classes.titleWrap}>
-                    <Heading depth={1} title={title} className={headingClassName}>
+                    <Heading depth={props.depth} title={title} className={headingClassName}>
                         {children}
                     </Heading>
                 </ConditionalWrap>
             </div>
-            {actions && <div className={classes.actions(fontSize)}>{actions}</div>}
+            {(actions || titleCount) && (
+                <div className={classes.actions}>
+                    {titleCount}
+                    {actions}
+                </div>
+            )}
         </div>
     );
 }
+
+export default PageHeading;

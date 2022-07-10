@@ -126,13 +126,7 @@ class BBCode extends Gdn_Pluggable {
         if (isset($params['name'])) {
             $username = trim($params['name']);
             $username = html_entity_decode($username, ENT_QUOTES, 'UTF-8');
-
-            $User = Gdn::userModel()->getByUsername($username);
-            if ($User) {
-                $userAnchor = userAnchor($User);
-            } else {
-                $userAnchor = anchor(htmlspecialchars($username, null, 'UTF-8'), '/profile/' . rawurlencode($username));
-            }
+            $userAnchor = anchor(htmlspecialchars($username, null, 'UTF-8'), '/profile/' . rawurlencode($username));
 
             $title = concatSep(' ', $title, $userAnchor, t('Quote wrote', 'wrote'));
         }
@@ -156,7 +150,7 @@ class BBCode extends Gdn_Pluggable {
                 }
             } elseif (is_numeric($url)) {
                 $url = "/discussion/comment/$url#Comment_{$url}";
-            } elseif (!$bbcode->isValidURL($url)) {
+            } elseif (!$this->isValidURL($bbcode, $url)) {
                 $url = '';
             }
 
@@ -212,22 +206,21 @@ class BBCode extends Gdn_Pluggable {
      * @param string $content Value between the open and close tags, if any.
      * @return bool|string Formatted value.
      */
-    function doURL($bbcode, $action, $name, $default, $params, $content) {
+    public function doURL($bbcode, $action, $name, $default, $params, $content) {
         if ($action == Nbbc::BBCODE_CHECK) {
             return true;
         }
 
         $url = is_string($default) ? $default : $bbcode->unHtmlEncode(strip_tags($content));
 
-        if ($bbcode->isValidURL($url)) {
+        if ($this->isValidURL($bbcode, $url)) {
             if ($bbcode->getDebug()) {
                 print "ISVALIDURL<br />";
             }
 
             if ($bbcode->getUrlTargetable() !== false && isset($params['target'])) {
                 $target = " target=\"".htmlspecialchars($params['target'])."\"";
-            }
-            else {
+            } else {
                 $target = "";
             }
 
@@ -376,6 +369,8 @@ class BBCode extends Gdn_Pluggable {
             $nbbc = new Nbbc();
             $nbbc->setEnableSmileys(false);
             $nbbc->setAllowAmpersand(true);
+
+            $nbbc->setDebug(false);
 
             $nbbc->addRule('attach', [
                 'allow_in' => ['listitem', 'block', 'columns', 'inline', 'link'],
@@ -539,5 +534,20 @@ class BBCode extends Gdn_Pluggable {
     public function removeAttachment() {
         // We dont need this since we show attachments.
         return '<!-- phpBB Attachments -->';
+    }
+
+    /**
+     * Check to see if a URL is valid.
+     *
+     * @param Nbbc $bbcode The BBCode class to check the URL with.
+     * @param string $url The URL being checked.
+     * @return bool
+     */
+    protected function isValidURL($bbcode, string $url): bool {
+        $parsed = parse_url($url);
+        if ($parsed !== false && in_array($parsed['scheme'], ['http', 'https', 'ftp'], true)) {
+            return true;
+        }
+        return $bbcode->isValidURL($url);
     }
 }

@@ -16,7 +16,9 @@ interface INotificationServerManaged {
     notificationID: number;
     body: string;
     photoUrl: string | null;
+    activityName?: string;
     url: string;
     dateInserted: string;
     dateUpdated: string;
+    readUrl?: string;
 }

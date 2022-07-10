@@ -50,7 +50,11 @@ abstract class AbstractEmbedFactory implements EmbedCreatorInterface {
         $domain = $pieces['host'] ?? '';
         $domainMatches = false;
         foreach ($this->getSupportedDomains() as $supportedDomain) {
-            if ($supportedDomain === self::WILDCARD_DOMAIN || $domain === $supportedDomain || stringEndsWith($domain, ".{$supportedDomain}")) {
+            if ($supportedDomain === self::WILDCARD_DOMAIN
+                || $domain === $supportedDomain
+                || stringEndsWith($domain, ".{$supportedDomain}")
+                || fnmatch($supportedDomain, $domain)
+            ) {
                 $domainMatches = true;
                 break;
             }

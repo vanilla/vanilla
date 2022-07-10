@@ -9,13 +9,11 @@ echo $form->open();
 echo $form->errors();
 ?>
     <ul>
-        <li class="form-group">
-            <?php
+        <li class="form-group"><?php
             $leavingLabel = 'Warn users if a link in a post will cause them to leave the forum';
             $leavingDesc = '@'.t('Alert users if they click external link.');
             echo $form->toggle('Garden.Format.WarnLeaving', $leavingLabel, [], $leavingDesc);
-            ?>
-        </li>
+        ?></li>
         <li class="form-group">
             <div class="label-wrap">
             <?php echo $form->label('Trusted Domains', 'Garden.TrustedDomains'); ?>
@@ -23,8 +21,8 @@ echo $form->errors();
                     <p>
                     <?php
                     echo t(
-                        'You can specify a whitelist of trusted domains.',
-                        'You can specify a whitelist of trusted domains (ex. yourdomain.com) that are safe for redirects and embedding.'
+                        'You can specify a allow list of trusted domains.',
+                        'You can specify a allow list of trusted domains (ex. yourdomain.com) that are safe for redirects and embedding.'
                     );
                     ?>
                     </p>
@@ -33,6 +31,25 @@ echo $form->errors();
             </div>
             <div class="input-wrap">
             <?php echo $form->textBox('Garden.TrustedDomains', ['MultiLine' => true]); ?>
+            </div>
+        </li>
+        <li class="form-group">
+            <div class="label-wrap">
+                <?php echo $form->label('Content Security Domains', SettingsController::CONFIG_CSP_DOMAINS); ?>
+                <div class="info">
+                    <p>
+                        <?php
+                        echo t(
+                            'You can specify an allow list of trusted domains. (CSP)',
+                            'You can specify an allow list of trusted domains (ex. yourdomain.com) that are safe to load javascript from.'
+                        );
+                        ?>
+                    </p>
+                    <p><?php echo t('Specify one domain per line. Use * for wildcard matches.'); ?></p>
+                </div>
+            </div>
+            <div class="input-wrap">
+                <?php echo $form->textBox(SettingsController::CONFIG_CSP_DOMAINS, ['MultiLine' => true, "implode" => "\n"]); ?>
             </div>
         </li>
     </ul>

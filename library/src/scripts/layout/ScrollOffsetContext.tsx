@@ -5,7 +5,7 @@
 
 import React, { useContext, useDebugValue } from "react";
 import { logWarning } from "@vanilla/utils";
-import { style } from "typestyle";
+import { css } from "@emotion/css";
 
 type ScollOffsetSetter = (offset: number) => void;
 
@@ -13,6 +13,7 @@ interface IContextParams {
     setScrollOffset: ScollOffsetSetter;
     resetScrollOffset: () => void;
     scrollOffset: number | null;
+    rawScrollOffset: number | null;
     offsetClass: string;
     getCalcedHashOffset(): number;
     hashOffsetRef: React.RefObject<HTMLDivElement>;
@@ -29,6 +30,7 @@ export const SCROLL_OFFSET_DEFAULTS: IContextParams = {
         logWarning("Reset scroll offset called, but a proper provider was not configured.");
     },
     scrollOffset: null,
+    rawScrollOffset: null,
     topOffset: 0,
     setTopOffset: (pixels: number) => {
         logWarning("Set scroll offset called, but a proper provider was not configured.");
@@ -96,11 +98,11 @@ export class ScrollOffsetProvider extends React.Component<IProps, IState> {
 
         // Generate a CSS based on our calculated values.
         const { scrollOffset, isScrolledOff } = this.state;
-        const offsetClass = style({
+        const offsetClass = css({
             transition: "transform 0.3s ease",
             willChange: "transform",
             transform: isScrolledOff ? `translateY(-${scrollOffset}px)` : "none",
-            $debugName: "offsetClass",
+            label: "offsetClass",
         });
 
         // Render out the context with all values and methods.
@@ -110,6 +112,7 @@ export class ScrollOffsetProvider extends React.Component<IProps, IState> {
                     setScrollOffset: this.setScrollOffset,
                     resetScrollOffset: this.resetScrollOffset,
                     scrollOffset: isScrolledOff && scrollWatchingEnabled ? scrollOffset : 0,
+                    rawScrollOffset: scrollOffset,
                     topOffset: this.state.topOffset,
                     setTopOffset: this.setTopOffset,
                     offsetClass: scrollWatchingEnabled ? offsetClass : "",
@@ -192,7 +195,7 @@ export class ScrollOffsetProvider extends React.Component<IProps, IState> {
     /**
      * Set the value items will be translated by.
      */
-    private setScrollOffset: ScollOffsetSetter = offset => {
+    private setScrollOffset: ScollOffsetSetter = (offset) => {
         window.__VANILLA_GLOBAL_SCROLL_OFFSET__ = offset;
         this.setState({ scrollOffset: offset });
     };
@@ -200,7 +203,7 @@ export class ScrollOffsetProvider extends React.Component<IProps, IState> {
     /**
      * Set the value items will be translated by.
      */
-    private setTopOffset: ScollOffsetSetter = offset => {
+    private setTopOffset: ScollOffsetSetter = (offset) => {
         this.setState({ topOffset: offset });
     };
 

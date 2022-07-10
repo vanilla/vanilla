@@ -58,11 +58,10 @@
   align-items: flex-start;
   justify-content: space-between;
   padding-top: $spacer / 2;
-  padding-bottom: $spacer;
+  padding-bottom: $spacer / 2;
   padding-right: 0;
 
   > * {
-    margin-top: $spacer / 2;
     padding-right: $spacer;
     flex-shrink: 2;
   }
@@ -137,5 +136,17 @@
   flex-wrap: nowrap;
   align-items: center;
   justify-content: flex-end;
+
+  // Fixes for pager react component.
+  &.pager-react {
+    .pager-previous {
+      padding-left: 13px;
+      padding-right: 7px;
+    }
+    .pager-next {
+      padding-left: 7px;
+      padding-right: 13px;
+    }
+  }
 }
 

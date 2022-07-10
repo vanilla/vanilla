@@ -1,0 +1,422 @@
+openapi: 3.0.2
+info:
+paths:
+    /pockets/:
+        x-hidden: true
+        get:
+            summary: Get a list of pockets.
+            tags:
+                - Pockets
+            parameters:
+                - description: "The expand."
+                  in: query
+                  name: expand
+                  schema:
+                      type: string
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/fullPocketSchema"
+                                type: array
+                    description: Success
+        post:
+            responses:
+                "201":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/fullPocketSchema"
+                    description: Success
+            tags:
+                - Pockets
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/PocketPost"
+                required: true
+            summary: Add a pocket.
+    "/pockets/{id}/edit":
+        x-hidden: true
+        get:
+            summary: Get a pocket for editing.
+            tags:
+                - Pockets
+            parameters:
+                - description: Pocket ID.
+                  in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: integer
+                - description: The expand.
+                  in: query
+                  name: expand
+                  schema:
+                      type: string
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                properties:
+                                    pocketID:
+                                        description: The pocket ID
+                                        type: integer
+                                    widgetID:
+                                        description: The widget type.
+                                        type: string
+                                    name:
+                                        description: The name of the pocket
+                                        type: string
+                                    page:
+                                        description: Which page to display the Pocket on.
+                                        type: string
+                                    body:
+                                        description: The body of the pocket.
+                                        type: string
+                                    format:
+                                        enum:
+                                            - raw
+                                            - widget
+                                        type: string
+                                    repeatType:
+                                        enum:
+                                            - once
+                                            - after
+                                            - before
+                                            - every
+                                            - index
+                                        type: string
+                                        description: Pocket repeat type.
+                                    repeatIndexes:
+                                        description: Repeat indexes
+                                        type: integer
+                                    mobileType:
+                                        enum:
+                                            - only
+                                            - never
+                                            - default
+                                        type: string
+                                        description: Whether or not pocket is active on mobile.
+                                    sort:
+                                        description: Pocket sort order.
+                                        type: integer
+                                        default: 0
+                                    isEmbeddable:
+                                        description: Pocket can be embedded.
+                                        type: boolean
+                                        default: false
+                                    location:
+                                        description: Location of the pocket on the page.
+                                        type: string
+                                    isAd:
+                                        description: If the pocket is an ad.
+                                        type: boolean
+                                        default: false
+                                    enabled:
+                                        description: Pocket enabled/disabled.
+                                        type: boolean
+                                        default: false
+                                    categoryID:
+                                        description: Pocket active in this category.
+                                        type: integer
+                                    includeChildCategories:
+                                        description: Incldue category child categories.
+                                        type: integer
+                                    roleIDs:
+                                        description: RoleIDs that the pocket will apply to.
+                                        type: array
+                                        items:
+                                            type: integer
+                                required:
+                                    - pocketID
+                                    - name
+                                    - repeatType
+                                    - body
+                                    - format
+                                type: object
+                    description: Success
+    "/pockets/{id}":
+        x-hidden: true
+        get:
+            summary: Get a pocket by id.
+            tags:
+                - Pockets
+            parameters:
+                - description: Pocket ID.
+                  in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: integer
+                - description: "The expand."
+                  in: query
+                  name: expand
+                  schema:
+                      type: string
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/fullPocketSchema"
+                    description: Success
+        patch:
+            parameters:
+                - description: The pocket ID.
+                  in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/PocketPatch"
+                    description: Success
+            tags:
+                - Pockets
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/PocketPatch"
+                required: true
+            summary: Update a pocket.
+        delete:
+            parameters:
+                - description: The pocket ID.
+                  in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                "204":
+                    description: Success
+            tags:
+                - Pockets
+            summary: Delete a Pocket.
+components:
+    schemas:
+        fullPocketSchema:
+            properties:
+                pocketID:
+                    type: integer
+                widgetID:
+                    type: string
+                    description: The widget type.
+                name:
+                    description: The name of the pocket
+                    type: string
+                page:
+                    description: Which page to display the Pocket on.
+                    type: string
+                body:
+                    description: The body of the pocket.
+                    type: string
+                enabled:
+                    type: integer
+                    description: Pocket enabled/disabled.
+                sort:
+                    type: integer
+                    description: The pocket sort order.
+                repeatType:
+                    enum:
+                        - once
+                        - after
+                        - before
+                        - every
+                        - index
+                    type: string
+                    description: Pocket repeat type.
+                mobileType:
+                    enum:
+                        - only
+                        - never
+                        - default
+                    type: string
+                    description: Whether or not pocket is active on mobile.
+                isEmbeddable:
+                    type: boolean
+                    description: Whether or not pocket is embeddable.
+                isDashboard:
+                    type: boolean
+                    description: Whether or not pocket is active in dashboard.
+                testMode:
+                    type: integer
+                    description: If the pocket is in test mode.
+                format:
+                    enum:
+                        - raw
+                        - widget
+                    type: string
+                location:
+                    type: string
+                    description: Location of the pocket on the page.
+                isAd:
+                    type: boolean
+                    description: Whether or not pocket is of type ad.
+            required:
+                - pocketID
+                - widgetID
+                - name
+                - repeatType
+        PocketPost:
+            type: object
+            properties:
+                name:
+                    type: string
+                    description: The name of the pocket
+                body:
+                    type: string
+                    description: The body of the pocket.
+                repeatType:
+                    enum:
+                        - once
+                        - after
+                        - before
+                        - every
+                        - index
+                widgetID:
+                    type: string
+                    description: The widget type.
+                page:
+                    description: Which page to display the Pocket on.
+                    type: string
+                repeatEvery:
+                    description: Repeat frequency.
+                    type: integer
+                repeatIndexes:
+                    description: Repeat indexes
+                    type: integer
+                mobileType:
+                    enum:
+                        - only
+                        - never
+                        - default
+                isDashboard:
+                    description: Pocket active in the dasboard.
+                    type: boolean
+                    default: false
+                sort:
+                    description: Pocket sort order.
+                    type: integer
+                    default: 0
+                isEmbeddable:
+                    description: Pocket can be embedded.
+                    type: boolean
+                    default: false
+                location:
+                    description: Location of the pocket on the page.
+                    type: string
+                isAd:
+                    description: If the pocket is an ad.
+                    type: boolean
+                    default: false
+                enabled:
+                    description: Pocket enabled/disabled.
+                    type: boolean
+                    default: false
+                categoryID:
+                    description: Pocket active in this category.
+                    type: integer
+                includeChildCategories:
+                    description: Incldue category child categories.
+                    type: integer
+                format:
+                    description: Format of the pocket
+                    enum:
+                        - raw
+                        - widget
+                    type: string
+                roleIDs:
+                    description: RoleIDs that the pocket will apply to.
+                    type: array
+                    items:
+                        type: integer
+            required:
+                - pocketID
+                - widgetID
+                - name
+                - repeatType
+        PocketPatch:
+            type: object
+            properties:
+                name:
+                    description: The name of the pocket
+                    type: string
+                body:
+                    type: string
+                    description: The body of the pocket.
+                repeatType:
+                    enum:
+                        - once
+                        - after
+                        - before
+                        - every
+                        - index
+                widgetID:
+                    type: string
+                    description: The widget type.
+                page:
+                    description: Which page to display the Pocket on.
+                    type: string
+                repeatEvery:
+                    description: Repeat frequency.
+                    type: integer
+                repeatIndexes:
+                    description: Repeat indexes
+                    type: integer
+                mobileType:
+                    enum:
+                        - only
+                        - never
+                        - default
+                    type: string
+                isDashboard:
+                    description: Pocket active in the dasboard.
+                    type: boolean
+                    default: false
+                sort:
+                    description: Pocket sort order.
+                    type: integer
+                    default: 0
+                isEmbeddable:
+                    description: Pocket can be embedded.
+                    type: boolean
+                    default: false
+                location:
+                    description: Location of the pocket on the page.
+                    type: string
+                isAd:
+                    description: If the pocket is an ad.
+                    type: boolean
+                    default: false
+                enabled:
+                    description: Pocket enabled/disabled.
+                    type: boolean
+                    default: false
+                categoryID:
+                    description: Pocket active in this category.
+                    type: integer
+                includeChildCategories:
+                    description: Incldue category child categories.
+                    type: integer
+                format:
+                    description: Format of the pocket
+                    enum:
+                        - raw
+                        - widget
+                    type: string
+                roleIDs:
+                    description: RoleIDs that the pocket will apply to.
+                    type: array
+                    items:
+                        type: integer

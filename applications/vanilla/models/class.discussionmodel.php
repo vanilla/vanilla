@@ -8,26 +8,67 @@
  * @since 2.0
  */
 
+use Garden\Events\BulkUpdateEvent;
 use Garden\Events\ResourceEvent;
 use Garden\Events\EventFromRowInterface;
 use Garden\Schema\Schema;
+use Garden\Schema\ValidationException;
+use Garden\Web\Exception\ClientException;
+use Garden\Web\Exception\NotFoundException;
+use Garden\Web\Exception\PartialCompletionException;
+use Vanilla\AdvancedRedirector\AdvancedRedirectorPlugin;
 use Vanilla\Attributes;
 use Vanilla\Community\Events\DiscussionEvent;
+use Vanilla\Community\Events\DiscussionStatusEvent;
 use Vanilla\Community\Schemas\PostFragmentSchema;
 use Vanilla\Contracts\Formatting\FormatFieldInterface;
+use Vanilla\Contracts\Models\CrawlableInterface;
+use Vanilla\Contracts\Models\FragmentFetcherInterface;
+use Vanilla\CurrentTimeStamp as DiscussionTimeStamp;
+use Vanilla\Dashboard\Models\RecordStatusModel;
+use Vanilla\Events\LegacyDirtyRecordTrait;
+use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Exception\PermissionException;
+use Vanilla\Formatting\DateTimeFormatter;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\FormatFieldTrait;
 use Vanilla\Formatting\UpdateMediaTrait;
+use Vanilla\ImageSrcSet\ImageSrcSet;
+use Vanilla\ImageSrcSet\ImageSrcSetService;
+use Vanilla\ImageSrcSet\MainImageSchema;
+use Vanilla\Logging\ErrorLogger;
+use Vanilla\Scheduler\LongRunner;
+use Vanilla\Scheduler\LongRunnerFailedID;
+use Vanilla\Scheduler\LongRunnerItemResultInterface;
+use Vanilla\Scheduler\LongRunnerNextArgs;
+use Vanilla\Models\DirtyRecordModel;
+use Vanilla\Models\LegacyModelUtils;
 use Vanilla\Models\UserFragmentSchema;
+use Vanilla\Navigation\Breadcrumb;
+use Vanilla\Scheduler\LongRunnerQuantityTotal;
+use Vanilla\Scheduler\LongRunnerSuccessID;
+use Vanilla\Scheduler\LongRunnerTimeoutException;
+use Vanilla\Scheduler\TrackingSlipInterface;
 use Vanilla\SchemaFactory;
+use Vanilla\Search\SearchService;
+use Vanilla\Search\SearchTypeQueryExtenderInterface;
+use Vanilla\Site\OwnSite;
+use Vanilla\Site\SiteSectionModel;
 use Vanilla\Utility\CamelCaseScheme;
+use Vanilla\Utility\Deprecation;
+use Vanilla\Utility\InstanceValidatorSchema;
 use Vanilla\Utility\ModelUtils;
+use Vanilla\Web\SystemCallableInterface;
 
 /**
  * Manages discussions data.
  */
-class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFromRowInterface {
+class DiscussionModel extends Gdn_Model implements
+    FormatFieldInterface,
+    EventFromRowInterface,
+    CrawlableInterface,
+    FragmentFetcherInterface,
+    SystemCallableInterface {
 
     use StaticInitializer;
 
@@ -36,6 +77,8 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
     use FormatFieldTrait;
 
     use UpdateMediaTrait;
+
+    use LegacyDirtyRecordTrait;
 
     /** Cache key. */
     const CACHE_DISCUSSIONVIEWS = 'discussion.%s.countviews';
@@ -52,14 +95,47 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
     /** Max comments on a discussion before it cannot be auto-deleted by SPAM or moderation actions. */
     const DELETE_COMMENT_THRESHOLD = 10;
 
-    /** @var int The maximum length*/
+    /** @var int The maximum length */
     const MAX_POST_LENGTH = 50000;
+
+    /** @var string for type redirect */
+    const REDIRECT_TYPE = 'redirect';
+
+    /** @var string for type discussion */
+    const DISCUSSION_TYPE = 'Discussion';
+
+    /** @var string announced discussion */
+    const ANNOUNCEMENT_LABEL = 'Announcement';
+
+    /** @var string closed discussion */
+    const CLOSED_LABEL = 'Closed';
+
+    /** @var string record type */
+    public const RECORD_TYPE = "discussion";
+
+    /** @var int */
+    public const DEFAULT_STATUS_ID = 0;
+
+    /** @var CategoryModel */
+    private $categoryModel;
 
     /** @var array|bool */
     private static $categoryPermissions = null;
 
     /** @var array */
     private static $discussionTypes = null;
+
+    // Maximum number of seconds a batch of deletes should last before a new batch needs to be scheduled.
+    public const MAX_TIME_BATCH = 10;
+
+    // Maximum number of discussions to delete.
+    private const MAX_DELETE_LIMIT = 30;
+
+    // Maximum number of discussions to move.
+    private const MAX_MOVE_LIMIT = 30;
+
+    // Use to continue a long-running action to delete a discussion with the same transaction ID.
+    private const OPT_DELETE_SINGLE_TRANSACTION_ID = "deleteSingleTransactionID";
 
     /**
      * @deprecated 2.6
@@ -104,7 +180,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
     protected static $allowedFilters = [];
 
     /**
-     * @var DiscussionModel $instance;
+     * @var DiscussionModel $instance ;
      */
     private static $instance;
 
@@ -119,7 +195,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
     protected $filters = [];
 
     /**
-     * @var \Vanilla\CacheInterface Object used to store the FloodControl data.
+     * @var \Psr\SimpleCache\CacheInterface Object used to store the FloodControl data.
      */
     protected $floodGate;
 
@@ -131,6 +207,30 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
     /** @var UserModel */
     private $userModel;
 
+    /** @var TagModel */
+    private $tagModel;
+
+    /** @var SiteSectionModel */
+    private $siteSectionModel;
+
+    /** @var OwnSite */
+    private $ownSite;
+
+    /** @var array */
+    private $options;
+
+    /** @var ImageSrcSetService */
+    private $imageSrcSetService;
+
+    /**
+     * Clear out the statically cached values for tests.
+     */
+    public static function cleanForTests() {
+        self::$instance = null;
+        self::$discussionTypes = null;
+        self::$categoryPermissions = null;
+    }
+
     /**
      * Class constructor. Defines the related database table name.
      *
@@ -138,13 +238,25 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
      */
     public function __construct(Gdn_Validation $validation = null) {
         parent::__construct('Discussion', $validation);
+        $this->imageSrcSetService = Gdn::getContainer()->get(ImageSrcSetService::class);
         $this->floodGate = FloodControlHelper::configure($this, 'Vanilla', 'Discussion');
 
-        $this->userModel = Gdn::getContainer()->get(UserModel::class);
+        Gdn::getContainer()->call(function (
+            UserModel $userModel,
+            CategoryModel $categoryModel,
+            TagModel $tagModel,
+            SiteSectionModel $siteSectionModel
+        ) {
+            $this->categoryModel = $categoryModel;
+            $this->userModel = $userModel;
+            $this->tagModel = $tagModel;
+            $this->siteSectionModel = $siteSectionModel;
+        });
         $this->setFormatterService(Gdn::getContainer()->get(FormatService::class));
         $this->setMediaForeignTable($this->Name);
         $this->setMediaModel(Gdn::getContainer()->get(MediaModel::class));
         $this->setSessionInterface(Gdn::getContainer()->get("Session"));
+        $this->ownSite = \Gdn::getContainer()->get(OwnSite::class);
 
         $this->addFilterField([
             'Sink',
@@ -159,6 +271,18 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
     }
 
     /**
+     * @inheritdoc
+     */
+    public static function getSystemCallableMethods(): array {
+        return [
+            'deleteDiscussionsIterator',
+            'deleteDiscussionIterator',
+            'moveDiscussionsIterator',
+            'closeDiscussionsIterator'
+        ];
+    }
+
+    /**
      * The shared instance of this object.
      *
      * @return DiscussionModel Returns the instance.
@@ -167,7 +291,29 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
         if (self::$instance === null) {
             self::$instance = new DiscussionModel();
         }
+
         return self::$instance;
+    }
+
+    /**
+     * Set model option
+     *
+     * @param string $option
+     * @param mixed $value
+     */
+    public function setOption(string $option, $value) {
+        $this->options[$option] = $value;
+    }
+
+    /**
+     * Get model option
+     *
+     * @param string $option
+     * @param null $default
+     * @return mixed|null
+     */
+    public function getOption(string $option, $default = null) {
+        return $this->options[$option] ?? $default;
     }
 
     /**
@@ -183,6 +329,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
         } catch (\Exception $ex) {
             $date = null;
         }
+
         return $date;
     }
 
@@ -212,6 +359,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
      */
     public static function getAllowedSorts() {
         self::initStatic();
+
         return self::$allowedSorts;
     }
 
@@ -224,6 +372,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
      */
     public static function getAllowedFilters() {
         self::initStatic();
+
         return self::$allowedFilters;
     }
 
@@ -283,6 +432,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
                 return val('key', $sort, '');
             }
         }
+
         return '';
     }
 
@@ -394,14 +544,14 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
                     ->update('Discussion')
                     ->set('DateLastComment', 'DateInserted', false, false)
                     ->where('DateLastComment', null)
-                    ->orWhere('DateLastComment',$defaultDate)
+                    ->orWhere('DateLastComment', $defaultDate)
                     ->put();
                 break;
             case 'LastCommentUserID':
                 if (!$max) {
                     // Get the range for this update.
                     $dBAModel = new DBAModel();
-                    list($min, $max) = $dBAModel->primaryKeyRange('Discussion');
+                    [$min, $max] = $dBAModel->primaryKeyRange('Discussion');
 
                     if (!$from) {
                         $from = $min;
@@ -421,7 +571,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
                 if ($percent > 100 || $result['Complete']) {
                     $result['Percent'] = '100%';
                 } else {
-                    $result['Percent'] = $percent.'%';
+                    $result['Percent'] = $percent . '%';
                 }
 
 
@@ -434,6 +584,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
             default:
                 throw new Gdn_UserException("Unknown column $column");
         }
+
         return $result;
     }
 
@@ -442,15 +593,15 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
      *
      * Events: AfterDiscussionSummaryQuery.
      *
+     * @param array $additionalFields Allows selection of additional fields as Alias=>Table.Fieldname.
+     * @param bool $join
      * @since 2.0.0
      * @access public
      *
-     * @param array $additionalFields Allows selection of additional fields as Alias=>Table.Fieldname.
-     * @param bool $join
      */
     public function discussionSummaryQuery($additionalFields = [], $join = true) {
         // Verify permissions (restricting by category if necessary)
-        $perms = CategoryModel::instance()->getVisibleCategoryIDs();
+        $perms = $this->categoryModel->getVisibleCategoryIDs();
 
         if ($perms !== true) {
             $this->SQL->whereIn('d.CategoryID', $perms);
@@ -498,23 +649,27 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
     /**
      * Get the allowed discussion types.
      *
+     * @param stdClass $category
      * @return array Returns an array of discussion type definitions.
      */
-    public static function discussionTypes() {
+    public static function discussionTypes($category = null) {
         if (self::$discussionTypes === null) {
             $discussionTypes = ['Discussion' => [
+                'apiType' => 'discussion',
                 'Singular' => 'Discussion',
                 'Plural' => 'Discussions',
                 'AddUrl' => '/post/discussion',
-                'AddText' => 'New Discussion'
+                'AddText' => 'New Discussion',
+                'AddIcon' => 'new-discussion'
             ]];
 
-
+            Gdn::pluginManager()->EventArguments['Category'] = &$category;
             Gdn::pluginManager()->EventArguments['Types'] = &$discussionTypes;
             Gdn::pluginManager()->fireAs('DiscussionModel')->fireEvent('DiscussionTypes');
             self::$discussionTypes = $discussionTypes;
             unset(Gdn::pluginManager()->EventArguments['Types']);
         }
+
         return self::$discussionTypes;
     }
 
@@ -525,17 +680,21 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
      * and Vanilla.Discussions.SortDirection.
      * Events: BeforeGet, AfterAddColumns.
      *
-     * @since 2.0.0
-     * @access public
-     *
-     * @param int $offset Number of discussions to skip.
-     * @param int $limit Max number of discussions to return.
-     * @param array $wheres SQL conditions.
-     * @param array $additionalFields Allows selection of additional fields as Alias=>Table.Fieldname.
+     * @param int $orderFields Number of discussions to skip.
+     * @param int|false $orderDirection Max number of discussions to return.
+     * @param array $limit SQL conditions.
+     * @param array $pageNumber Allows selection of additional fields as Alias=>Table.Fieldname.
      * @return Gdn_DataSet SQL result.
+     * @deprecated Don't use this method. It is not defined properly. Use `getWhere()` instead.
      */
-    public function get($offset = '0', $limit = '', $wheres = '', $additionalFields = null) {
-        if ($limit == '') {
+    public function get($orderFields = 0, $orderDirection = false, $limit = [], $pageNumber = []) {
+        // These are kludges for PHP 8 compatibility.
+        $offset = $orderFields;
+        $wheres = $limit;
+        $limit = $orderDirection;
+        $additionalFields = $pageNumber;
+
+        if ($limit == false) {
             $limit = Gdn::config('Vanilla.Discussions.PerPage', 50);
         }
 
@@ -551,7 +710,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
                 ->select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
                 ->select('w.CountComments', '', 'CountCommentWatch')
                 ->select('w.Participated')
-                ->join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.$userID, 'left');
+                ->join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = ' . $userID, 'left');
         } else {
             $this->SQL
                 ->select('0', '', 'WatchUserID')
@@ -573,6 +732,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
 
         $this->EventArguments['OrderFields'] = &$orderBy;
         $this->EventArguments['Wheres'] = &$wheres;
+        $this->EventArguments['sql'] = &$this->SQL;
         $this->fireEvent('BeforeGet'); // @see 'BeforeGetCount' for consistency in results vs. counts
 
         $includeAnnouncements = false;
@@ -636,6 +796,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
      */
     public function getWhereRecent($where = [], $limit = false, $offset = false, $expand = true) {
         $result = $this->getWhere($where, '', '', $limit, $offset, $expand);
+
         return $result;
     }
 
@@ -643,8 +804,8 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
      * Returns an array in the format [field => direction]. You can safely use return values from this function
      * in the orderBy() SQL function.
      *
-     * @since 2.3
      * @return array An array of field => direction values.
+     * @since 2.3
      */
     protected function getOrderBy() {
         if ($key = self::getSort()) {
@@ -652,6 +813,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
         } else {
             $orderBy = self::getDefaultOrderBy();
         }
+
         return $orderBy;
     }
 
@@ -695,6 +857,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
             }
             $wheres = $this->combineWheres(val('wheres', $filter, []), $wheres);
         }
+
         return $wheres;
     }
 
@@ -718,6 +881,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
                 }
             }
         }
+
         return $wheres;
     }
 
@@ -745,6 +909,10 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
      * @return Gdn_DataSet Returns a {@link Gdn_DataSet} of discussions.
      */
     public function getWhere($where = false, $orderFields = '', $orderDirection = '', $limit = false, $offset = false, $expand = true) {
+        $joinDirtyRecords = $where[DirtyRecordModel::DIRTY_RECORD_OPT] ?? false;
+        if (isset($where[DirtyRecordModel::DIRTY_RECORD_OPT])) {
+            unset($where[DirtyRecordModel::DIRTY_RECORD_OPT]);
+        }
         // Add backwards compatibility for the old way getWhere() was called.
         if (is_numeric($orderFields)) {
             deprecated('DiscussionModel->getWhere($where, $limit, ...)', 'DiscussionModel->getWhereRecent()');
@@ -799,6 +967,10 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
 
         $sql = $this->SQL;
 
+        if ($joinDirtyRecords) {
+            $this->applyDirtyWheres('d');
+        }
+
         // Build up the base query. Self-join for optimization.
         $sql->select('d.DiscussionID')
             ->from('Discussion d')
@@ -847,13 +1019,18 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
         foreach ($where as $key => $value) {
             $safeWheres[$this->addFieldPrefix($key)] = $value;
         }
+        $this->EventArguments['SQL'] = $sql;
+        $this->fireEvent('BeforeGetSubQuery');
+        $this->modifyTypeDiscussionQueryClause($safeWheres);
         $sql->where($safeWheres);
+
         $subQuery = $sql->getSelect(true);
 
         $sql->reset();
         $sql->select('d2.*')
             ->from('Discussion d2')
             ->join('_TBL_ d', 'd.DiscussionID = d2.DiscussionID');
+        $this->fireEvent('AfterGetSubQuery');
 
         // Add the UserDiscussion query.
         if (($userID = Gdn::session()->UserID) > 0) {
@@ -872,12 +1049,21 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
 
         $outerQuery = $sql->getSelect();
         $finalQuery = str_replace(
-            '`'.$this->Database->DatabasePrefix.'_TBL_`',
-            '('.$subQuery.')',
+            '`' . $this->Database->DatabasePrefix . '_TBL_`',
+            '(' . $subQuery . ')',
             $outerQuery
         );
 
         $data = $sql->query($finalQuery);
+
+        if (!empty([$orderBy])) {
+            // This is pseudo foreach loop.
+            // We only take the first pair of $orderField => $orderDirection here.
+            // So the loop will only entered ones
+            foreach (array_slice($orderBy, 0, 1, true) as $orderField => $orderDirection) {
+                $this->fixOrder($data, $orderField, $orderDirection);
+            }
+        }
 
         // Change discussions returned based on additional criteria
         $this->addDiscussionColumns($data);
@@ -914,8 +1100,9 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
     public function addFieldPrefix($fieldName, $prefix = 'd') {
         // Make sure there aren't any ambiguous discussion references.
         if (strpos($fieldName, '.') === false) {
-            $fieldName = $prefix.'.'.$fieldName;
+            $fieldName = ($fieldName[0] === '-' ? '-' : '') . $prefix . '.' . ltrim($fieldName, '-');
         }
+
         return $fieldName;
     }
 
@@ -926,18 +1113,17 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
      * and Vanilla.Discussions.SortDirection.
      * Events: BeforeGet, AfterAddColumns.
      *
-     * @deprecated since 2.4, reason: doesn't scale
-     *
      * @param int $offset Number of discussions to skip.
-     * @param int $limit Max number of discussions to return.
+     * @param int|false $limit Max number of discussions to return.
      * @param array $wheres SQL conditions.
      * @param array $additionalFields Allows selection of additional fields as Alias=>Table.Fieldname.
      * @return Gdn_DataSet SQL result.
+     * @deprecated since 2.4, reason: doesn't scale
      */
-    public function getUnread($offset = '0', $limit = '', $wheres = '', $additionalFields = null) {
+    public function getUnread($offset = 0, $limit = false, $wheres = [], $additionalFields = []) {
         deprecated(__METHOD__);
 
-        if ($limit == '') {
+        if ($limit == false) {
             $limit = Gdn::config('Vanilla.Discussions.PerPage', 50);
         }
 
@@ -953,7 +1139,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
                 ->select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
                 ->select('w.CountComments', '', 'CountCommentWatch')
                 ->select('w.Participated')
-                ->join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.$userID, 'left')
+                ->join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = ' . $userID, 'left')
                 ->beginWhereGroup()
                 ->where('d.CountComments >', 'COALESCE(w.CountComments, 0)', true, false)
                 ->orWhere('w.DateLastViewed', null)
@@ -1030,10 +1216,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
     /**
      * Removes undismissed announcements from the data.
      *
-     * @since 2.0.0
-     * @access public
-     *
-     * @param object $data SQL result.
+     * @param Gdn_DataSet $data SQL result.
      */
     public function removeAnnouncements($data) {
         $result = &$data->result();
@@ -1060,7 +1243,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
     /**
      * Add denormalized views to discussions.
      *
-     * @param Gdn_DataSet|stdClass $discussions
+     * @param Gdn_DataSet $discussions
      */
     public function addDenormalizedViews(&$discussions) {
 
@@ -1090,10 +1273,10 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
      *
      * Takes archiving into account and fixes inaccurate comment counts.
      *
+     * @param object $data SQL result.
      * @since 2.0.0
      * @access public
      *
-     * @param object $data SQL result.
      */
     public function addDiscussionColumns($data) {
         // Change discussions based on archiving.
@@ -1101,6 +1284,26 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
         foreach ($result as &$discussion) {
             $this->calculate($discussion);
         }
+    }
+
+    /**
+     * Fix order in sql result set.
+     *
+     * @param Gdn_DataSet $data
+     * @param string $orderField
+     * @param string $orderDirection
+     */
+    public function fixOrder(Gdn_DataSet $data, string $orderField, string $orderDirection) {
+        // Change discussions order.
+        $result = &$data->result();
+        usort($result, function ($a, $b) use ($orderField, $orderDirection) {
+            $order = ($orderDirection === 'asc') ? 1 : -1;
+            if (is_array($a)) {
+                return $order * (($a[$orderField] ?? $a[ucfirst($orderField)]) <=> ($b[$orderField] ?? $b[ucfirst($orderField)]));
+            } else {
+                return $order * (($a->$orderField ?? $a->{ucfirst($orderField)}) <=> ($b->$orderField ?? $b->{ucfirst($orderField)}));
+            }
+        });
     }
 
     /**
@@ -1168,7 +1371,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
                 }
             }
 
-            list($read, $count) = $this->calculateCommentReadData(
+            [$read, $count] = $this->calculateCommentReadData(
                 $discussion->CountComments,
                 $discussion->DateLastComment,
                 $discussion->CountCommentWatch,
@@ -1274,12 +1477,14 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
             $result = $dateTwo;
         } elseif (empty($dateOne) && empty($dateTwo)) {
             $result = null;
+
             return $result;
         } else {
             $result = $dateOne;
         }
 
         $maxDate = $result->format(MYSQL_DATE_FORMAT);
+
         return $maxDate;
     }
 
@@ -1297,20 +1502,21 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
     /**
      * Gets announced discussions.
      *
-     * @since 2.0.0
-     * @access public
-     *
      * @param array $wheres SQL conditions.
      * @param int $offset The number of records to skip.
-     * @param int $limit The number of records to limit the query to.
-     * @return object SQL result.
+     * @param int|false $limit The number of records to limit the query to.
+     * @param string|string[]|null $orderBy An array of column names for sorting.
+     * @return Gdn_DataSet SQL result.
      */
-    public function getAnnouncements($wheres = '', $offset = 0, $limit = false) {
-
+    public function getAnnouncements($wheres = [], $offset = 0, $limit = false, $orderBy = null) {
+        $joinDirtyRecords = $wheres[DirtyRecordModel::DIRTY_RECORD_OPT] ?? false;
+        if (isset($wheres[DirtyRecordModel::DIRTY_RECORD_OPT])) {
+            unset($wheres[DirtyRecordModel::DIRTY_RECORD_OPT]);
+        }
         $wheres = $this->combineWheres($this->getWheres(), $wheres);
         $session = Gdn::session();
         if ($limit === false) {
-            c('Vanilla.Discussions.PerPage', 30);
+            $limit = c('Vanilla.Discussions.PerPage', 30);
         }
         $userID = $session->UserID > 0 ? $session->UserID : 0;
         $categoryID = val('d.CategoryID', $wheres, 0);
@@ -1347,16 +1553,23 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
             $this->SQL->where('d.CategoryID', $categoryID);
         }
 
+        if ($joinDirtyRecords) {
+            $this->applyDirtyWheres('d');
+        }
+
         $announcementIDs = $this->SQL->get()->resultArray();
         $announcementIDs = array_column($announcementIDs, 'DiscussionID');
 
         // Short circuit querying when there are no announcements.
         if (count($announcementIDs) == 0) {
             $this->_AnnouncementIDs = $announcementIDs;
+
             return new Gdn_DataSet();
         }
 
         $this->discussionSummaryQuery([], false);
+
+        $this->modifyTypeDiscussionQueryClause($wheres);
 
         if (!empty($wheres)) {
             $this->SQL->where($wheres);
@@ -1367,7 +1580,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
                 ->select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
                 ->select('w.CountComments', '', 'CountCommentWatch')
                 ->select('w.Participated')
-                ->join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.$userID, 'left');
+                ->join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = ' . $userID, 'left');
         } else {
             // Don't join in the user table when we are a guest.
             $this->SQL->select('null as WatchUserID, null as DateLastViewed, null as Dismissed, null as Bookmarked, null as CountCommentWatch');
@@ -1391,10 +1604,8 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
 
         $this->SQL->limit($limit, $offset);
 
-        $orderBy = $this->getOrderBy();
-        foreach ($orderBy as $field => $direction) {
-            $this->SQL->orderBy($this->addFieldPrefix($field), $direction);
-        }
+        $orderBy = $orderBy ?? $this->getOrderBy();
+        $this->SQL->orderByPrefix('d.', $orderBy);
         $this->EventArguments['Wheres'] = &$wheres;
         $this->fireEvent('beforeGetAnnouncements');
 
@@ -1432,19 +1643,20 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
     public function getAnnouncementCacheKey($categoryID = 0) {
         $key = 'Announcements';
         if (!is_array($categoryID) && $categoryID > 0) {
-            $key .= ':'.$categoryID;
+            $key .= ':' . $categoryID;
         }
+
         return $key;
     }
 
     /**
      * Gets all users who have bookmarked the specified discussion.
      *
+     * @param int $discussionID Unique ID to find bookmarks for.
+     * @return object SQL result.
      * @since 2.0.0
      * @access public
      *
-     * @param int $discussionID Unique ID to find bookmarks for.
-     * @return object SQL result.
      */
     public function getBookmarkUsers($discussionID) {
         return $this->SQL
@@ -1456,22 +1668,49 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
     }
 
     /**
+     * Get the ids of users that have bookmarked a discussion.
+     *
+     * @param int $discussionID
+     *
+     * @return int[]
+     */
+    public function getBookmarkUserIDs(int $discussionID): array {
+        $result = $this->SQL
+            ->select('UserID')
+            ->from('UserDiscussion')
+            ->where('DiscussionID', $discussionID)
+            ->where('Bookmarked', true)
+            ->get()
+            ->column('UserID')
+        ;
+        return $result;
+    }
+
+    /**
      * Get discussions for a user.
      *
      * Events: BeforeGetByUser
      *
-     * @since 2.1
-     * @access public
-     *
      * @param int $userID Which user to get discussions for.
      * @param int $limit Max number to get.
      * @param int $offset Number to skip.
-     * @param int $lastDiscussionID A hint for quicker paging.
-     * @param int $watchUserID User to use for read/unread data.
+     * @param int|false $lastDiscussionID A hint for quicker paging.
+     * @param int|false $watchUserID User to use for read/unread data.
+     * @param string $permission Permission to filter categories by.
      * @return Gdn_DataSet SQL results.
+     * @since 2.1
+     * @access public
+     *
      */
-    public function getByUser($userID, $limit, $offset, $lastDiscussionID = false, $watchUserID = false) {
-        $perms = DiscussionModel::categoryPermissions();
+    public function getByUser($userID, $limit, $offset, $lastDiscussionID = false, $watchUserID = false, string $permission = '') {
+        // This will load all categories. (do not use unless necessary).
+        if (!empty($permission)) {
+            $categories = CategoryModel::categories();
+            $perms = CategoryModel::filterExistingCategoryPermissions($categories, $permission);
+            $perms = array_column($perms, 'CategoryID');
+        } else {
+            $perms = DiscussionModel::categoryPermissions();
+        }
 
         if (is_array($perms) && empty($perms)) {
             return new Gdn_DataSet([]);
@@ -1493,7 +1732,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
             ->from('Discussion d')
             ->join('Discussion d2', 'd.DiscussionID = d2.DiscussionID')
             ->where('d.InsertUserID', $userID)
-            ->orderBy('d.DiscussionID', 'desc');
+            ->orderBy('d.DateLastComment', 'desc');
 
         // Join in the watch data.
         if ($watchUserID > UserModel::GUEST_USER_ID) {
@@ -1502,10 +1741,10 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
                 ->select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
                 ->select('w.CountComments', '', 'CountCommentWatch')
                 ->select('w.Participated')
-                ->join('UserDiscussion w', 'd2.DiscussionID = w.DiscussionID and w.UserID = '.$watchUserID, 'left');
+                ->join('UserDiscussion w', 'd2.DiscussionID = w.DiscussionID and w.UserID = ' . $watchUserID, 'left');
         } else {
             $this->SQL
-                ->select((string) UserModel::GUEST_USER_ID, '', 'WatchUserID')
+                ->select((string)UserModel::GUEST_USER_ID, '', 'WatchUserID')
                 ->select('now()', '', 'DateLastViewed')
                 ->select('0', '', 'Dismissed')
                 ->select('0', '', 'Bookmarked')
@@ -1587,14 +1826,40 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
     }
 
     /**
-     * Identify current user's category permissions and set as local array.
+     * Add category IDs to the current user's category-view permissions.
      *
-     * @since 2.0.0
-     * @access public
+     * @param int[] $categoryIDs
+     * @return array|bool
+     */
+    public static function addCategoryPermissions(array $categoryIDs) {
+        $permissions = self::categoryPermissions();
+
+        if (!is_array($permissions)) {
+            return $permissions;
+        }
+
+        $permissions = array_merge($permissions, $categoryIDs);
+        self::$categoryPermissions = array_unique($permissions);
+
+        return self::$categoryPermissions;
+    }
+
+    /**
+     * Clear the category-view permissions cache.
+     */
+    public static function clearCategoryPermissions(): void {
+        self::$categoryPermissions = null;
+    }
+
+    /**
+     * Identify current user's category-view permissions and set as local array.
      *
      * @param bool $escape Prepends category IDs with @
      * @param bool $forceRefresh Reset the cache and pull fresh permission values.
      * @return array Protected local _CategoryPermissions
+     * @since 2.0.0
+     * @access public
+     *
      */
     public static function categoryPermissions($escape = false, $forceRefresh = false) {
         if (is_null(self::$categoryPermissions) || $forceRefresh) {
@@ -1609,30 +1874,45 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
                     self::$categoryPermissions = []; // no permission
                 }
             } else {
-                $categories = CategoryModel::categories();
-                $iDs = [];
+                $ids = CategoryModel::instance()->getVisibleCategoryIDs();
 
-                foreach ($categories as $iD => $category) {
-                    if ($category['PermsDiscussionsView']) {
-                        $iDs[] = $iD;
-                    }
-                }
-
-                // Check to see if the user has permission to all categories. This is for speed.
-                $categoryCount = count($categories);
-
-                if (count($iDs) == $categoryCount) {
+                if ($ids === true) {
                     self::$categoryPermissions = true;
                 } else {
                     self::$categoryPermissions = [];
-                    foreach ($iDs as $iD) {
-                        self::$categoryPermissions[] = ($escape ? '@' : '').$iD;
+                    foreach ($ids as $id) {
+                        self::$categoryPermissions[] = ($escape ? '@' : '') . $id;
                     }
                 }
             }
         }
 
         return self::$categoryPermissions;
+    }
+
+    /**
+     * Get discussion fragments for one or more IDs.
+     *
+     * @param int[] $ids The discussion IDs to search for.
+     * @param array $options Custom options for the operation.
+     * @return array
+     * @throws ValidationException If there was an error encountered during fragment schema validation.
+     */
+    public function fetchFragments(array $ids, array $options = []): array {
+        $ids = array_values($ids);
+        $rows = $this->getWhere(["DiscussionID" => $ids, "Announce" => "all"])->resultArray();
+        $fragments = [];
+
+        $schema = SchemaFactory::get(PostFragmentSchema::class);
+        foreach ($rows as $row) {
+            $id = $row["DiscussionID"] ?? null;
+            if ($id === null) {
+                continue;
+            }
+            $fragments[$id] = $schema->validate($row);
+        }
+
+        return $fragments;
     }
 
     public function fetchPageInfo($url, $throwError = false) {
@@ -1691,18 +1971,19 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
             $category = CategoryModel::categories((int)$id);
             $count += (int)val('CountDiscussions', $category, 0);
         }
+
         return $count;
     }
 
     /**
      * Count how many discussions match the given criteria.
      *
-     * @since 2.0.0
-     * @access public
-     *
      * @param array $wheres SQL conditions.
      * @param null $unused Not used.
      * @return int Number of discussions.
+     * @since 2.0.0
+     * @access public
+     *
      */
     public function getCount($wheres = [], $unused = null) {
         // Get permissions.
@@ -1743,19 +2024,25 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
 
         // Use the cache if we are requesting only by categories or have no where at all.
         // In those cases we are gonna use the cached count on the categories we have permission to.
-        if (!$hasWhere || $whereOnCategoriesOnly) {
-            $categories = CategoryModel::categories();
+        if ($whereOnCategoriesOnly) {
+            $count = 0;
+            foreach ($perms as $categoryID) {
+                $category = CategoryModel::categories($categoryID);
+                if ($category) {
+                    $count += (int)$category['CountDiscussions'];
+                }
+            }
 
-            // We have permission to everything.
-            if ($perms === true) {
-                $perms = array_keys($categories);
+            return $count;
+        } elseif (!$hasWhere) {
+            $categories = CategoryModel::instance()->getVisibleCategories();
+            if ($categories === true) {
+                $categories = CategoryModel::categories();
             }
 
             $count = 0;
-            foreach ($perms as $categoryID) {
-                if (isset($categories[$categoryID])) {
-                    $count += (int)$categories[$categoryID]['CountDiscussions'];
-                }
+            foreach ($categories as $category) {
+                $count += (int)$category['CountDiscussions'];
             }
 
             return $count;
@@ -1766,11 +2053,15 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
             $this->SQL->whereIn('c.CategoryID', $perms);
         }
 
+        if ($wheres[DirtyRecordModel::DIRTY_RECORD_OPT] ?? false) {
+            $this->applyDirtyWheres('d');
+        }
+
         return $this->SQL
             ->select('d.DiscussionID', 'count', 'CountDiscussions')
             ->from('Discussion d')
             ->join('Category c', 'd.CategoryID = c.CategoryID')
-            ->join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.Gdn::session()->UserID, 'left')
+            ->join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = ' . Gdn::session()->UserID, 'left')
             ->where($wheres)
             ->get()
             ->firstRow()
@@ -1780,10 +2071,10 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
     /**
      * Count how many discussions match the given criteria.
      *
+     * @param array|'' $wheres SQL conditions.
+     * @return int Number of discussions.
      * @deprecated since 2.3
      *
-     * @param array $wheres SQL conditions.
-     * @return int Number of discussions.
      * @since 2.0.0
      */
     public function getUnreadCount($wheres = '') {
@@ -1820,6 +2111,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
                 }
                 $count += (int)$cat['CountDiscussions'];
             }
+
             return $count;
         }
 
@@ -1834,7 +2126,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
             ->select('d.DiscussionID', 'count', 'CountDiscussions')
             ->from('Discussion d')
             ->join('Category c', 'd.CategoryID = c.CategoryID')
-            ->join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.Gdn::session()->UserID, 'left')
+            ->join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = ' . Gdn::session()->UserID, 'left')
             ->where('d.CountComments >', 'COALESCE(w.CountComments, 0)', true, false)
             ->where($wheres);
 
@@ -1863,6 +2155,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
             ->select('ca.Name', '', 'Category')
             ->select('ca.UrlCode', '', 'CategoryUrlCode')
             ->select('ca.PermissionCategoryID')
+            ->select('w.UserID', '', 'WatchUserID')
             ->select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
             ->select('w.CountComments', '', 'CountCommentWatch')
             ->select('w.Participated')
@@ -1873,7 +2166,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
             ->select('iu.Photo', '', 'InsertPhoto')
             ->from('Discussion d')
             ->join('Category ca', 'd.CategoryID = ca.CategoryID', 'left')
-            ->join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.$session->UserID, 'left')
+            ->join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = ' . $session->UserID, 'left')
             ->join('User iu', 'd.InsertUserID = iu.UserID', 'left')// Insert user
             ->join('Comment lc', 'd.LastCommentID = lc.CommentID', 'left')// Last comment
             ->join('User lcu', 'lc.InsertUserID = lcu.UserID', 'left')// Last comment user
@@ -1897,12 +2190,12 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
     /**
      * Get data for a single discussion by ID.
      *
-     * @param int $discussionID Unique ID of discussion to get.
-     * @param string $dataSetType One of the **DATASET_TYPE_*** constants.
+     * @param int $id Unique ID of discussion to get.
+     * @param string $datasetType One of the **DATASET_TYPE_*** constants.
      * @param array $options An array of extra options for the query.
      * @return mixed SQL result.
      */
-    public function getID($discussionID, $dataSetType = DATASET_TYPE_OBJECT, $options = []) {
+    public function getID($id, $datasetType = DATASET_TYPE_OBJECT, $options = []) {
         $session = Gdn::session();
 
         $selects = [];
@@ -1913,6 +2206,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
 
         $this->SQL
             ->select('d.*')
+            ->select('w.UserID', '', 'WatchUserID')
             ->select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
             ->select('w.CountComments', '', 'CountCommentWatch')
             ->select('w.Participated')
@@ -1926,8 +2220,8 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
 
         $discussion = $this->SQL
             ->from('Discussion d')
-            ->join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.$session->UserID, 'left')
-            ->where('d.DiscussionID', $discussionID)
+            ->join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = ' . $session->UserID, 'left')
+            ->where('d.DiscussionID', $id)
             ->get()
             ->firstRow();
 
@@ -1946,7 +2240,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
             $this->addDenormalizedViews($discussion);
         }
 
-        return $dataSetType == DATASET_TYPE_ARRAY ? (array)$discussion : $discussion;
+        return $datasetType == DATASET_TYPE_ARRAY ? (array)$discussion : $discussion;
     }
 
     /**
@@ -1967,6 +2261,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
             ->select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
             ->select('w.CountComments', '', 'CountCommentWatch')
             ->select('w.Participated')
+            ->select('w.UserID', '', 'WatchUserID')
             ->select('d.DateLastComment', '', 'LastDate')
             ->select('d.LastCommentUserID', '', 'LastUserID')
             ->select('lcu.Name', '', 'LastName')
@@ -1974,7 +2269,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
             ->select('iu.Photo', '', 'InsertPhoto')
             ->from('Discussion d')
             ->join('Category ca', 'd.CategoryID = ca.CategoryID', 'left')
-            ->join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.$session->UserID, 'left')
+            ->join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = ' . $session->UserID, 'left')
             ->join('User iu', 'd.InsertUserID = iu.UserID', 'left')// Insert user
             ->join('Comment lc', 'd.LastCommentID = lc.CommentID', 'left')// Last comment
             ->join('User lcu', 'lc.InsertUserID = lcu.UserID', 'left')// Last comment user
@@ -2028,6 +2323,21 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
     }
 
     /**
+     * If a query asks for only discussion-type records, modifies the query to get 'discussion' and null values.
+     *
+     * @param array $wheres
+     */
+    public function modifyTypeDiscussionQueryClause(&$wheres) {
+        if (isset($wheres['d.Type']) && strtolower($wheres['d.Type']) === 'discussion') {
+            $this->SQL->beginWhereGroup()
+                ->where('d.Type', 'discussion')
+                ->orWhere('d.Type is null')
+                ->endWhereGroup();
+            unset($wheres['d.Type']);
+        }
+    }
+
+    /**
      * Marks the specified announcement as dismissed by the specified user.
      *
      * @param int $discussionID Unique ID of discussion being affected.
@@ -2054,7 +2364,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
             $this->SQL
                 ->update('UserDiscussion')
                 ->set('CountComments', $countComments)
-                ->set('DateLastViewed', Gdn_Format::toDateTime())
+                ->set('DateLastViewed', DateTimeFormatter::getCurrentDateTime())
                 ->set('Dismissed', '1')
                 ->where('DiscussionID', $discussionID)
                 ->where('UserID', $userID)
@@ -2067,7 +2377,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
                     'UserID' => $userID,
                     'DiscussionID' => $discussionID,
                     'CountComments' => $countComments,
-                    'DateLastViewed' => Gdn_Format::toDateTime(),
+                    'DateLastViewed' => DateTimeFormatter::getCurrentDateTime(),
                     'Dismissed' => '1'
                 ]
             );
@@ -2078,23 +2388,93 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
      * An event firing wrapper for Gdn_Model::setField().
      *
      * @param int $rowID
-     * @param string $property
+     * @param string|array $property
      * @param mixed $value
+     * @param bool $isPostInsert Set this if we are just doing some modification after the initial insert.
+     * In that case we don't want to fire any update events.
      */
-    public function setField($rowID, $property, $value = false) {
+    public function setField($rowID, $property, $value = false, bool $isPostInsert = false) {
         if (!is_array($property)) {
             $property = [$property => $value];
         }
 
         $this->EventArguments['DiscussionID'] = $rowID;
-        if (!is_array($property)) {
-            $this->EventArguments['SetField'] = [$property => $value];
-        } else {
-            $this->EventArguments['SetField'] = $property;
+        $this->EventArguments['SetField'] = $property;
+
+        // Grab the existing row for comparison.
+        if (isset($property['statusID'])) {
+            $existingRow = $this->getID($rowID, DATASET_TYPE_ARRAY);
         }
 
         parent::setField($rowID, $property, $value);
+        if (!$isPostInsert) {
+            $this->addDirtyRecord('discussion', $rowID);
+        }
+
+        if (isset($property['Score']) || isset($property['CountComments'])) {
+            $px = $this->Database->DatabasePrefix;
+            $sql = <<<SQL
+    UPDATE {$px}Discussion d
+    SET d.hot = d.CountComments + COALESCE(d.Score, 0)
+    WHERE d.DiscussionID = :discussionID
+SQL;
+            $this->Database->query($sql, [":discussionID" => $rowID]);
+        }
+
+        if (!$isPostInsert) {
+            if (!empty($existingRow) && isset($property['statusID']) && $existingRow['statusID'] != $property['statusID']) {
+                $event = $this->statusChangeUpdate($rowID);
+                $statusEvent = new DiscussionStatusEvent(
+                    DiscussionStatusEvent::ACTION_DISCUSSION_STATUS,
+                    $event->getPayload(),
+                    $event->getSender()
+                );
+                $this->getEventManager()->dispatch($statusEvent);
+            }
+        }
+
         $this->fireEvent('AfterSetField');
+    }
+
+    /**
+     * Dispatch an update event for a discussion whose status has changed.
+     *
+     * @param int $discussionID
+     */
+    private function statusChangeUpdate(int $discussionID): DiscussionEvent {
+        // Fetch the row again.
+        $newRow = $this->getID($discussionID, DATASET_TYPE_ARRAY);
+
+        // KLUDGE: In the future this should just be an expand that gets expanded out on discussions by default.
+        $discussionEvent = $this->eventFromRow(
+            (array)$newRow,
+            DiscussionStatusEvent::ACTION_DISCUSSION_STATUS,
+            $this->userModel->currentFragment()
+        );
+        return $discussionEvent;
+    }
+
+    /**
+     * Try to get a record status fragment.
+     *
+     * @param int $statusID
+     *
+     * @return array|null
+     */
+    private function tryGetStatusFragment(int $statusID): ?array {
+        try {
+            $recordStatusModel = \Gdn::getContainer()->get(RecordStatusModel::class);
+            $status = $recordStatusModel->selectSingle(['statusID' => $statusID]);
+            $statusFragment = RecordStatusModel::getSchemaFragment()->validate($status);
+            return $statusFragment;
+        } catch (NoResultsException $nre) {
+            ErrorLogger::error("Discussion Status Not Found", ['recordStatus'], ['statusID' => $statusID]);
+            return null;
+        } catch (ValidationException $e) {
+            $context = ['status' => $status];
+            ErrorLogger::error("Discussion Status Validation Failure", ['recordStatus'], $context);
+            return null;
+        }
     }
 
     /**
@@ -2103,7 +2483,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
      * Events: BeforeSaveDiscussion, AfterValidateDiscussion, AfterSaveDiscussion.
      *
      * @param array $formPostValues Data sent from the form model.
-     * @param array $settings
+     * @param array|false $settings
      * - CheckPermission - Check permissions during insert. Default true.
      *
      * @return int $discussionID Unique ID of the discussion.
@@ -2117,27 +2497,35 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
             unset($formPostValues['CategoryID']);
         }
 
+        // Get the DiscussionID from the form so we know if we are inserting or updating.
+        $discussionID = val('DiscussionID', $formPostValues, '');
+        $insert = $discussionID == '' ? true : false;
+
+        // Avoid polluting validation rules between operation types (e.g. persisting insert rules for an update).
+        $this->Validation->reset();
+        $validation = clone $this->Validation;
+
         // Add & apply any extra validation rules:
         if (array_key_exists('Body', $formPostValues)) {
-            $this->Validation->applyRule('Body', 'Required');
-            $this->Validation->addRule('MeAction', 'function:ValidateMeAction');
-            $this->Validation->applyRule('Body', 'MeAction');
+            $validation->applyRule('Body', 'Required');
+            $validation->addRule('MeAction', 'function:ValidateMeAction');
+            $validation->applyRule('Body', 'MeAction');
             $maxCommentLength = Gdn::config('Vanilla.Comment.MaxLength');
             $minCommentLength = Gdn::config('Vanilla.Comment.MinLength');
-
+            $ignoreMinLength = $settings['ignoreMinLength'] ?? false;
             if (is_numeric($maxCommentLength) && $maxCommentLength > 0) {
-                $this->Validation->setSchemaProperty('Body', 'maxPlainTextLength', $maxCommentLength);
-                $this->Validation->applyRule('Body', 'plainTextLength');
+                $validation->setSchemaProperty('Body', 'maxPlainTextLength', $maxCommentLength);
+                $validation->applyRule('Body', 'plainTextLength');
             }
 
-            if ($minCommentLength && is_numeric($minCommentLength)) {
-                $this->Validation->setSchemaProperty('Body', 'MinTextLength', $minCommentLength);
-                $this->Validation->applyRule('Body', 'MinTextLength');
+            if ($minCommentLength && is_numeric($minCommentLength) && !$ignoreMinLength) {
+                $validation->setSchemaProperty('Body', 'MinTextLength', $minCommentLength);
+                $validation->applyRule('Body', 'MinTextLength');
             } else {
                 // Add min length if body is required.
-                if (Gdn::config('Vanilla.DiscussionBody.Required', true)) {
-                    $this->Validation->setSchemaProperty('Body', 'MinTextLength', 1);
-                    $this->Validation->applyRule('Body', 'MinTextLength');
+                if (Gdn::config('Vanilla.DiscussionBody.Required', true) && !$ignoreMinLength) {
+                    $validation->setSchemaProperty('Body', 'MinTextLength', 1);
+                    $validation->applyRule('Body', 'MinTextLength');
                 }
             }
         }
@@ -2145,15 +2533,14 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
         // Validate category permissions.
         $categoryID = val('CategoryID', $formPostValues);
         if ($categoryID !== false) {
+            // Trim any leading '0's to prevent inserting discussion into restricted category (https://github.com/vanilla/vanilla-patches/issues/716)
+            $categoryID = ltrim($categoryID, '0');
             $checkPermission = val('CheckPermission', $settings, true);
             $category = CategoryModel::categories($categoryID);
             if ($category && $checkPermission && !CategoryModel::checkPermission($category, 'Vanilla.Discussions.Add')) {
-                $this->Validation->addValidationResult('CategoryID', 'You do not have permission to post in this category');
+                $validation->addValidationResult('CategoryID', 'You do not have permission to post in this category');
             }
         }
-
-        // Get the DiscussionID from the form so we know if we are inserting or updating.
-        $discussionID = val('DiscussionID', $formPostValues, '');
 
         // See if there is a source ID.
         if (val('SourceID', $formPostValues)) {
@@ -2168,7 +2555,6 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
             }
         }
 
-        $insert = $discussionID == '' ? true : false;
         $this->EventArguments['Insert'] = $insert;
 
         if ($insert) {
@@ -2190,6 +2576,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
         } else {
             // Add the update fields.
             $this->addUpdateFields($formPostValues);
+            $this->EventArguments['oldDiscussion'] = $this->getID($formPostValues['DiscussionID']);
         }
 
         // Pinned-to-Announce translation
@@ -2228,11 +2615,15 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
         //	Prep and fire event
         $this->EventArguments['FormPostValues'] = &$formPostValues;
         $this->EventArguments['DiscussionID'] = $discussionID;
+        $this->EventArguments['Validation'] = $validation;
         $this->fireEvent('BeforeSaveDiscussion');
 
+
         // Validate the form posted values
-        $this->validate($formPostValues, $insert);
-        $validationResults = $this->validationResults();
+        $validation->validate($formPostValues, $insert);
+        // We are merging validation results for backward compatibility.
+        $validationResults = array_merge($this->Validation->results(), $validation->results());
+        $this->Validation->setResults($validationResults);
 
         // If the body is not required, remove it's validation errors.
         $bodyRequired = c('Vanilla.DiscussionBody.Required', true);
@@ -2251,7 +2642,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
             if (!$insert || !$this->checkUserSpamming(Gdn::session()->UserID, $this->floodGate)) {
                 $forcedFormat = $formPostValues['forcedFormat'] ?? false;
                 // Get all fields on the form that relate to the schema
-                $fields = $this->Validation->schemaValidationFields();
+                $fields = $validation->schemaValidationFields();
 
                 // Check for spam.
                 $spam = SpamModel::isSpam('Discussion', $fields);
@@ -2264,8 +2655,8 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
 
                 // Remove the primary key from the fields for saving.
                 unset($fields['DiscussionID']);
-                $storedCategoryID = false;
-
+                $oldCategoryID = false;
+                $hasCategoryUpdate = false;
                 if ($discussionID > 0) {
                     // Updating
                     $stored = $this->getID($discussionID, DATASET_TYPE_OBJECT);
@@ -2279,7 +2670,11 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
                     $invalidReturnType = false;
                     $insertUserID = val('InsertUserID', $stored);
                     $dateInserted = val('DateInserted', $stored);
-                    $this->EventArguments['DiscussionData'] = array_merge($fields, ['DiscussionID' => $discussionID, 'InsertUserID' => $insertUserID,'DateInserted' => $dateInserted]);
+                    $this->EventArguments['DiscussionData'] = array_merge($fields, [
+                        'DiscussionID' => $discussionID,
+                        'InsertUserID' => $insertUserID,
+                        'DateInserted' => $dateInserted
+                    ]);
                     $this->EventArguments['IsValid'] = &$isValid;
                     $this->EventArguments['InvalidReturnType'] = &$invalidReturnType;
                     $this->fireEvent('AfterValidateDiscussion');
@@ -2305,10 +2700,25 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
                     LogModel::logChange('Edit', 'Discussion', array_merge($fields, ['DiscussionID' => $discussionID]));
 
                     self::serializeRow($fields);
+                    $oldCategoryID = $stored->CategoryID ?? null;
+                    $newCategoryID = $fields['CategoryID'] ?? null;
+                    $hasCategoryUpdate = $oldCategoryID !== $newCategoryID;
+                    if ($hasCategoryUpdate) {
+                        $this->getEventManager()->dispatch(new BulkUpdateEvent(
+                            'comment',
+                            [
+                                'discussionID' => (int)$discussionID,
+                            ],
+                            [
+                                'categoryID' => (int)$newCategoryID,
+                            ]
+                        ));
+                    }
+
                     $this->SQL->put($this->Name, $fields, [$this->PrimaryKey => $discussionID]);
 
                     if (val('CategoryID', $stored) != val('CategoryID', $fields)) {
-                        $storedCategoryID = val('CategoryID', $stored);
+                        $oldCategoryID = val('CategoryID', $stored);
                     }
 
                 } else {
@@ -2324,6 +2734,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
                     $approvalRequired = checkRestriction('Vanilla.Approval.Require');
                     if ($approvalRequired && !val('Verified', Gdn::session()->User)) {
                         LogModel::insert('Pending', 'Discussion', $fields);
+
                         return UNAPPROVED;
                     }
 
@@ -2362,7 +2773,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
                     // Mark the user as participated and update DateLastViewed.
                     $this->SQL->replace(
                         'UserDiscussion',
-                        ['Participated' => 1, 'DateLastViewed' => Gdn_Format::toDateTime()],
+                        ['Participated' => 1, 'DateLastViewed' => DateTimeFormatter::getCurrentDateTime()],
                         ['DiscussionID' => $discussionID, 'UserID' => val('InsertUserID', $fields)]
                     );
 
@@ -2378,28 +2789,31 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
                 $discussion = $this->getID($discussionID, DATASET_TYPE_OBJECT);
 
                 // Update discussion counter for affected categories.
-                if ($insert || $storedCategoryID) {
-                    CategoryModel::instance()->incrementLastDiscussion($discussion);
+                if ($insert || $oldCategoryID && $hasCategoryUpdate) {
+                    $this->categoryModel->onDiscussionAdd((array)$discussion);
                 }
 
-                if ($storedCategoryID) {
-                    $this->updateDiscussionCount($storedCategoryID);
+                if ($oldCategoryID && !empty($stored) && $hasCategoryUpdate) {
+                    $this->categoryModel->onDiscussionRemove((array)$stored);
                 }
 
                 $this->calculateMediaAttachments($discussionID, !$insert);
-
-                $discussionEvent = $this->eventFromRow(
-                    (array)$discussion,
-                    $insert ? DiscussionEvent::ACTION_INSERT : DiscussionEvent::ACTION_UPDATE,
-                    $this->userModel->currentFragment()
-                );
-                $this->getEventManager()->dispatch($discussionEvent);
 
                 // Fire an event that the discussion was saved.
                 $this->EventArguments['FormPostValues'] = $formPostValues;
                 $this->EventArguments['Fields'] = $fields;
                 $this->EventArguments['DiscussionID'] = $discussionID;
                 $this->fireEvent('AfterSaveDiscussion');
+
+                // Fetch the discussion again.
+                // It may have been modified in the event handler.
+                $discussion = $this->getID($discussionID, DATASET_TYPE_ARRAY);
+                $discussionEvent = $this->eventFromRow(
+                    (array)$discussion,
+                    $insert ? DiscussionEvent::ACTION_INSERT : DiscussionEvent::ACTION_UPDATE,
+                    $this->userModel->currentFragment()
+                );
+                $this->getEventManager()->dispatch($discussionEvent);
             }
         }
 
@@ -2411,11 +2825,12 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
      *
      * @param array $row
      * @param string $action
-     * @param array $sender
+     * @param array|object|null $sender
      * @return DiscussionEvent
      */
-    public function eventFromRow(array $row, string $action, ?array $sender = null): ResourceEvent {
+    public function eventFromRow(array $row, string $action, $sender = null): ResourceEvent {
         $this->userModel->expandUsers($row, ["InsertUserID", "LastUserID"]);
+        $this->tagModel->expandTagIDs($row);
         $discussion = $this->normalizeRow($row, true);
         $discussion = $this->schema()->validate($discussion);
 
@@ -2429,6 +2844,11 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
             ["discussion" => $discussion],
             $sender
         );
+        $statusFragment = $this->tryGetStatusFragment($result->getStatusID());
+        if ($statusFragment !== null) {
+            $result->setStatus($statusFragment);
+        }
+
         return $result;
     }
 
@@ -2530,14 +2950,19 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
         $advancedActivity = $data;
         $advancedActivity["Data"]["Reason"] = "advanced";
         $this->recordAdvancedNotications($activityModel, $advancedActivity, $discussion);
-
+        $isValid = true;
         // Throw an event for users to add their own events.
         $this->EventArguments["Discussion"] = $discussion;
+        $this->EventArguments["UserModel"] = $userModel;
+        $this->EventArguments["IsValid"] = &$isValid;
         $this->EventArguments["NotifiedUsers"] = array_keys(ActivityModel::$Queue);
         $this->EventArguments["MentionedUsers"] = $mentions;
         $this->EventArguments["ActivityModel"] = $activityModel;
         $this->fireEvent("BeforeNotification");
 
+        if (!$isValid) {
+            return;
+        }
         if (\Vanilla\FeatureFlagHelper::featureEnabled("deferredNotifications")) {
             // Queue sending notifications.
             /** @var Vanilla\Scheduler\SchedulerInterface $scheduler */
@@ -2556,22 +2981,14 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
      * @param array $activity
      * @param array $discussion
      */
-    private function recordAdvancedNotications(ActivityModel $activityModel, array $activity, array $discussion) {
+    public function recordAdvancedNotications(ActivityModel $activityModel, array $activity, array $discussion) {
         $categoryID = $discussion["CategoryID"] ?? null;
         $insertUserID = $discussion["InsertUserID"] ?? null;
 
-        // Figure out the category that governs this notification preference.
+        // Make sure the category exists.
         $category = CategoryModel::categories($categoryID);
         if ($category === null) {
             return;
-        }
-        $i = 0;
-        while ($category["Depth"] > 2 && $i < 20) {
-            if (!$category || $category["Archived"]) {
-                return;
-            }
-            $i++;
-            $category = CategoryModel::categories($category["ParentCategoryID"]);
         }
 
         // Grab all of the users that need to be notified.
@@ -2590,15 +3007,22 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
             }
 
             $userID = $row["UserID"];
+
+            if (!Gdn::config(\CategoryModel::CONF_CATEGORY_FOLLOWING) &&
+                !$this->userModel->checkPermission($userID, 'Garden.AdvancedNotifications.Allow')
+            ) {
+                continue;
+            }
+
             // Check user can still see the discussion.
             if (!$this->canView($discussion, $userID)) {
                 continue;
             }
 
             $name = $row["Name"];
-            if (strpos($name, ".Email.") !== false) {
+            if (str_contains($name, ".Email.")) {
                 $notifyUsers[$userID]["Emailed"] = ActivityModel::SENT_PENDING;
-            } elseif (strpos($name, ".Popup.") !== false) {
+            } elseif (str_contains($name, ".Popup.")) {
                 $notifyUsers[$userID]["Notified"] = ActivityModel::SENT_PENDING;
             }
         }
@@ -2623,9 +3047,6 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
      */
     public function updateDiscussionCount($categoryID, $discussion = false) {
         if (strcasecmp($categoryID, 'All') == 0) {
-            $params = [];
-            $where = '';
-
             // Update all categories.
             $sql = "update :_Category c
             left join (
@@ -2634,7 +3055,6 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
                 coalesce(count(d.DiscussionID), 0) as CountDiscussions,
                 coalesce(sum(d.CountComments), 0) as CountComments
               from :_Discussion d
-              $where
               group by d.CategoryID
             ) d
               on c.CategoryID = d.CategoryID
@@ -2642,13 +3062,11 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
                c.CountDiscussions = coalesce(d.CountDiscussions, 0),
                c.CountComments = coalesce(d.CountComments, 0)";
             $sql = str_replace(':_', $this->Database->DatabasePrefix, $sql);
-            $this->Database->query($sql, $params, 'DiscussionModel_UpdateDiscussionCount');
+            $this->Database->query($sql, [], 'DiscussionModel_UpdateDiscussionCount');
 
         } elseif (is_numeric($categoryID)) {
-            /** @var Vanilla\Scheduler\SchedulerInterface $scheduler */
-            $discussion = (array)$discussion ?: null;
-            $scheduler = Gdn::getContainer()->get(Vanilla\Scheduler\SchedulerInterface::class);
-            $scheduler->addJob(Vanilla\Library\Jobs\UpdateDiscussionCount::class, ['categoryID' => $categoryID, 'discussion' => $discussion]);
+            $discussion = is_object($discussion) || is_array($discussion) ? (array)$discussion : null;
+            $this->categoryModel->updateDiscussionCount($categoryID, $discussion);
         }
     }
 
@@ -2660,7 +3078,62 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
     public function incrementNewDiscussion($discussion) {
         deprecated('DiscussionModel::incrementNewDiscussion', 'CategoryModel::incrementLastDiscussion');
 
-        CategoryModel::instance()->incrementLastDiscussion($discussion);
+        $this->categoryModel->incrementLastDiscussion($discussion);
+    }
+
+    /**
+     * Given a comment, update it's discussion last post info and counts.
+     *
+     * Usually, this method shouldn't be called directly. It is meant mainly to be called from other models.
+     *
+     * @param array $discussion The discussion being incremented.
+     * @param array $comment The comment that prompted the increment.
+     * @param int $offset Pass 1 if the comment was added to the discussion or -1 if it was removed.
+     * @param bool $updateCategory Whether or not to update aggregates on the category too.
+     */
+    public function adjustLastComment(array $discussion, array $comment, int $offset = 1, $updateCategory = true) {
+        $this->incrementCommentCount($discussion, $offset, $updateCategory);
+
+        // Update the cached last post info with whatever we have.
+        $this->updateLastComment($comment, $updateCategory);
+    }
+
+    /**
+     * Recursively increment counts for a discussion & it's ancestors.
+     *
+     * @param array $discussion
+     * @param int $offset
+     * @param bool $updateCategory
+     */
+    private function incrementCommentCount(array $discussion, int $offset = 1, bool $updateCategory = true) {
+        $discussionID = $discussion['DiscussionID'];
+        $this->SQL->put('Discussion', ['CountComments+' => $offset], ['DiscussionID' => $discussionID]);
+
+        $categoryID = $discussion['CategoryID'] ?? false;
+
+        if ($updateCategory && $categoryID) {
+            if ($offset > 0) {
+                CategoryModel::incrementAggregateCount($categoryID, CategoryModel::AGGREGATE_COMMENT, $offset);
+            } else {
+                CategoryModel::decrementAggregateCount($categoryID, CategoryModel::AGGREGATE_COMMENT, -$offset);
+            }
+        }
+    }
+
+    /**
+     * Update the latest post info for a Discussion
+     *
+     * @param array $comment
+     * @param bool $updateCategory Whether or not to check the categories for the comment.
+     */
+    private function updateLastComment(array $comment, bool $updateCategory = true) {
+        $discussionID = $comment['DiscussionID'] ?? false;
+
+        // TODO: Update the last comment on the discussion itself.
+
+        if ($updateCategory) {
+            CategoryModel::updateLastPost($discussionID, $comment);
+        }
     }
 
     /**
@@ -2670,9 +3143,8 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
      * @param bool $inc Whether to increment of recalculate from scratch.
      */
     public function updateUserDiscussionCount($userID, $inc = false) {
+        $user = $this->userModel->getID($userID, DATASET_TYPE_ARRAY);
         if ($inc) {
-            $user = $this->userModel->getID($userID);
-
             $countDiscussions = val('CountDiscussions', $user);
             // Increment if 100 or greater; Recalculate on 120, 140 etc.
             if ($countDiscussions >= 100 && $countDiscussions % 20 !== 0) {
@@ -2682,6 +3154,8 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
                     ->put();
 
                 $this->userModel->updateUserCache($userID, 'CountDiscussions', $countDiscussions + 1);
+                $this->addDirtyRecord('user', $userID);
+
                 return;
             }
         }
@@ -2716,22 +3190,22 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
      * is provided, the field is set to this value instead. An example use is
      * announcing and unannouncing a discussion.
      *
-     * @param int $discussionID Unique ID of discussion being updated.
+     * @param int $rowID Unique ID of discussion being updated.
      * @param string $property Name of field to be updated.
      * @param mixed $forceValue If set, overrides toggle behavior with this value.
      * @return mixed Value that was ultimately set for the field.
      */
-    public function setProperty($discussionID, $property, $forceValue = null) {
+    public function setProperty($rowID, $property, $forceValue = null) {
         if ($forceValue !== null) {
             $value = $forceValue;
         } else {
-            $discussion = $this->getID($discussionID);
+            $discussion = $this->getID($rowID);
             $value = ($discussion->$property == '1' ? '0' : '1');
         }
         $this->SQL
             ->update('Discussion')
             ->set($property, $value)
-            ->where('DiscussionID', $discussionID)
+            ->where('DiscussionID', $rowID)
             ->put();
 
         return $value;
@@ -2802,11 +3276,8 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
             $writebackLimit = c('Vanilla.Views.DenormalizeWriteback', 10);
             $cacheKey = sprintf(DiscussionModel::CACHE_DISCUSSIONVIEWS, $discussionID);
 
-            // Increment. If not success, create key.
-            $views = Gdn::cache()->increment($cacheKey);
-            if ($views === Gdn_Cache::CACHEOP_FAILURE) {
-                Gdn::cache()->store($cacheKey, 1);
-            }
+            // Increment.
+            $views = Gdn::cache()->increment($cacheKey, 1, [Gdn_Cache::FEATURE_INITIAL => 1]);
 
             // Every X views, writeback to Discussions
             if (($views % $writebackLimit) == 0) {
@@ -2824,7 +3295,6 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
                 ->where('DiscussionID', $discussionID)
                 ->put();
         }
-
     }
 
     /**
@@ -2867,6 +3337,8 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
                 ]);
         }
 
+        $this->recalculateBookmarkCounts($discussionID, [$userID]);
+
         $this->EventArguments['DiscussionID'] = $discussionID;
         $this->EventArguments['UserID'] = $userID;
         $this->EventArguments['Bookmarked'] = $bookmarked;
@@ -2874,6 +3346,52 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
 
         return (bool)$bookmarked;
     }
+
+    /**
+     * Get the count of discussions a user has participated in.
+     *
+     * @param int|null $userID
+     *
+     * @return int
+     */
+    public function getCountParticipated(?int $userID = null): int {
+        $session = $this->getSessionInterface();
+        if ($userID === null) {
+            if (!$session->isValid()) {
+                throw new Exception(t('Could not get participated discussions for non logged-in user.'));
+            }
+            $userID = $session->UserID;
+        }
+
+        $cache = \Gdn::cache();
+        $key = "discussion/participatedCount/" . $userID;
+        $count = $cache->get($key);
+        if ($count === \Gdn_Cache::CACHEOP_FAILURE) {
+            $sql = clone $this->SQL;
+            $sql->reset();
+
+            $sqlResult = $sql
+                ->select('c.DiscussionID', 'distinct', 'NumDiscussions')
+                ->from('Comment c')
+                ->where('c.InsertUserID', $userID)
+                // We dont' do a full count here, because it can easily time out in MySQL.
+                ->groupBy('c.DiscussionID')
+                ->get();
+
+            if (!($sqlResult instanceof Gdn_DataSet)) {
+                $count = 0;
+            } else {
+                $count = $sqlResult->numRows();
+            }
+
+            $cache->store($key, $count, [
+                \Gdn_Cache::FEATURE_EXPIRY => 60 * 10, // 10 minutes.
+            ]);
+        }
+
+        return $count;
+    }
+
 
     /**
      * Bookmarks (or unbookmarks) a discussion for specified user.
@@ -2944,6 +3462,51 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
     }
 
     /**
+     * Recalculate userIDs for a discussion in bulk.
+     *
+     * Note: This may encounter difficulties in 50k+ users have bookmarked a discussion.
+     * If this edge case ever comes to pass, or we want to make something recalculate bookmark counts for all users
+     * then something more robust that batches users will need to be done.
+     * An event like that would probably be better paired with an entire cache flush though.
+     *
+     * @param int $discussionID The discussion ID to recalculate users for.
+     * @param int[] $userIDs Optional: Only recalculate bookmark counts for these users.
+     * If omitted, recalculates bookmark counts for all users that bookmarked the discussion.
+     */
+    public function recalculateBookmarkCounts(int $discussionID, ?array $userIDs = null) {
+        $userModel = \Gdn::userModel();
+        $prefix = $this->Database->DatabasePrefix;
+        $userIDsToUpdate = $userIDs ?? $this->getBookmarkUserIDs($discussionID);
+
+        if (count($userIDsToUpdate) === 0) {
+            // Nothing to do here.
+            return;
+        }
+
+        $userIDPlaceholder = $this->SQL->parameterizeGroupValue($userIDsToUpdate);
+
+        $sql = <<<SQL
+            update {$prefix}User u
+            left join (
+                select UserID, COUNT(UserID) as CountBookmarks
+                from {$prefix}UserDiscussion
+                where Bookmarked = true
+                and UserID in {$userIDPlaceholder}
+                group by UserID
+            ) ud on u.UserID = ud.UserID
+            set
+                u.CountBookmarks = coalesce(ud.CountBookmarks, 0)
+            where u.UserID in {$userIDPlaceholder}
+SQL;
+        $this->Database->query($sql, array_merge($userIDsToUpdate, $userIDsToUpdate));
+
+        // Many caches to clear.
+        foreach ($userIDsToUpdate as $userID) {
+            $userModel->clearCache($userID, ['user']);
+        }
+    }
+
+    /**
      * Gets number of bookmarks specified discussion has (all users).
      *
      * @param int $discussionID Unique ID of discussion for which to tally bookmarks.
@@ -2988,6 +3551,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
             deprecated('DiscussionModel->delete(int)', 'DiscussionModel->deleteID(int)');
 
             $result = $this->deleteID($where, $options);
+
             return $result;
         }
 
@@ -2995,99 +3559,190 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
     }
 
     /**
+     * Given a list of discussionIDs, filter out discussions the user does not have category permissions on.
+     *
+     * @param array $discussionIDs
+     * @param string $categoryPermission
+     * @return array
+     */
+    public function filterCategoryPermissions(array $discussionIDs, string $categoryPermission): array {
+        $checked = $this->checkCategoryPermission($discussionIDs, $categoryPermission);
+        return $checked['validIDs'];
+    }
+
+    /**
+     * Check permissions on a list of discussionIDs.
+     *
+     * @param array $discussionIDs The discussionIDs to check.
+     * @param string $categoryPermission The category permission to check for.
+     *
+     * @return array{validIDs: Array<int>, nonexistentIDs: Array<int>, noPermissionIDs: Array<int>}
+     */
+    public function checkCategoryPermission(array $discussionIDs, string $categoryPermission): array {
+        $discussionData = $this->SQL
+            ->select('DiscussionID, CategoryID')
+            ->from('Discussion')
+            ->whereIn('DiscussionID', $discussionIDs)
+            ->get()
+            ->resultArray();
+        $foundDiscussionIDs = array_column($discussionData, 'DiscussionID');
+        $noPermissionIDs = [];
+
+        foreach ($discussionData as $discussion) {
+            if (!CategoryModel::checkPermission($discussion['CategoryID'], $categoryPermission)) {
+                $noPermissionIDs[] = $discussion['DiscussionID'];
+            }
+        }
+
+        return [
+            'validIDs' => array_diff($foundDiscussionIDs, $noPermissionIDs),
+            'nonexistentIDs' => array_diff($discussionIDs, $foundDiscussionIDs),
+            'noPermissionIDs' => $noPermissionIDs,
+        ];
+    }
+
+    /**
+     * Given a list of discussionIDs, filter out discussions that don't exist.
+     *
+     * @param array $discussionIDs
+     *
+     * @return array
+     */
+    public function filterExistingDiscussionIDs(array $discussionIDs): array {
+        $existingIDs = $this->createSql()
+            ->select('DiscussionID')
+            ->from('Discussion')
+            ->whereIn('DiscussionID', $discussionIDs)
+            ->get()
+            ->column('DiscussionID');
+        return $existingIDs;
+    }
+
+    /**
+     * Get Max batch time.
+     */
+    public function getMaxBatchTime(): int {
+        return Gdn::config('Vanilla.MaxBatchTime', self::MAX_TIME_BATCH);
+    }
+
+    /**
+     * Create a redirect discussion.
+     *
+     * @param array $targetDiscussion Discussion to create a redirect for.
+     * @param array|null $existingDiscussion An existing discussions to create the redirect from.
+     * @param string|null $redirectUrl Force a specific redirect url.
+     *
+     * @return int|bool Redirect ID or false on failure.
+     */
+    public function createRedirect(array $targetDiscussion, array $existingDiscussion = null, string $redirectUrl = null) {
+        $this->defineSchema();
+        $maxNameLength = $this->Schema->getField('Name')->Length;
+
+        $redirectDiscussion = [
+            'Name' => sliceString(sprintf(t('Moved: %s'), $targetDiscussion['Name']), $maxNameLength),
+            'Type' => 'redirect',
+            'Body' => formatString(
+                t('This discussion has been <a href="{url,html}">moved</a>.'),
+                ['url' => discussionUrl($targetDiscussion)]
+            ),
+            'Format' => 'Html',
+            'Closed' => true,
+            // Preserve the previous insertion time (Should place it in the same spot of the list).
+            'DateInserted' => $targetDiscussion['DateLastComment'],
+            'CategoryID' => $targetDiscussion['CategoryID'],
+        ];
+
+        $this->EventArguments['redirectDiscussion'] = &$redirectDiscussion;
+
+        // fire event
+        $this->fireEvent('beforeRedirectDiscussionSave', $this->EventArguments);
+        $forceFormatter = Gdn::config('Garden.ForceInputFormatter');
+        // Pass a forced input formatter around this exception.
+        if ($forceFormatter) {
+            $inputFormat = Gdn::config('Garden.InputFormatter');
+            Gdn::config()->saveToConfig('Garden.InputFormatter', 'Html', false);
+        }
+        $redirectID = $this->save($redirectDiscussion);
+        // Reset the input formatter
+        if ($forceFormatter) {
+            Gdn::config()->saveToConfig('Garden.InputFormatter', $inputFormat, false);
+        }
+        return $redirectID;
+    }
+
+    /**
      * Delete a discussion. Update and/or delete all related data.
      *
      * Events: DeleteDiscussion.
      *
-     * @param int|array $discussionID Unique ID of discussion to delete or an array of discussion IDs.
+     * @param int $id Unique ID of discussion to delete.
      * @param array $options Additional options to control the delete behavior. Not used for discussions.
-     * @return bool Always returns **true**.
+     * @return bool Always returns true.
+     * @deprecated User DiscussionModel::deleteDiscussionIterator().
      */
-    public function deleteID($discussionID, $options = []) {
-        // Retrieve the users who have bookmarked this discussion.
-        $bookmarkData = $this->getBookmarkUsers($discussionID);
-
-        $data = $this->SQL
-            ->select('*')
-            ->from('Discussion')
-            ->where('DiscussionID', $discussionID)
-            ->get()->firstRow(DATASET_TYPE_ARRAY);
-
-        $userID = false;
-        $categoryID = false;
-        if ($data) {
-            $userID = $data['InsertUserID'];
-            $categoryID = $data['CategoryID'];
-        }
-
-        // Prep and fire event
-        $this->EventArguments['DiscussionID'] = $discussionID;
-        $this->EventArguments['Discussion'] = $data;
-        $this->fireEvent('DeleteDiscussion');
-
-        // Setup logging.
-        $log = val('Log', $options, true);
-        $logOptions = val('LogOptions', $options, []);
-        if ($log === true) {
-            $log = 'Delete';
-        }
-
-        LogModel::beginTransaction();
-
-        // Log all of the comment deletes.
-        $comments = $this->SQL->getWhere('Comment', ['DiscussionID' => $discussionID])->resultArray();
-        $totalComments = count($comments);
-
-        if ($totalComments > 0 && $totalComments <= 25) {
-            // A smaller number of comments should just be stored with the record.
-            $data['_Data']['Comment'] = $comments;
-            LogModel::insert($log, 'Discussion', $data, $logOptions);
-        } else {
-            LogModel::insert($log, 'Discussion', $data, $logOptions);
-            foreach ($comments as $comment) {
-                LogModel::insert($log, 'Comment', $comment, $logOptions);
-            }
-        }
-
-        LogModel::endTransaction();
-
-        $this->SQL->delete('Comment', ['DiscussionID' => $discussionID]);
-        $this->SQL->delete('Discussion', ['DiscussionID' => $discussionID]);
-
-        $this->SQL->delete('UserDiscussion', ['DiscussionID' => $discussionID]);
-        $this->updateDiscussionCount($categoryID);
-
-        // Update the last post info for the category and its parents.
-        CategoryModel::instance()->refreshAggregateRecentPost($categoryID, true);
-
-        // Decrement CountAllDiscussions for category and its parents.
-        CategoryModel::decrementAggregateCount($categoryID, CategoryModel::AGGREGATE_DISCUSSION);
-
-        // Decrement CountAllDiscussions for category and its parents.
-        if ($totalComments > 0) {
-            CategoryModel::decrementAggregateCount($categoryID, CategoryModel::AGGREGATE_COMMENT, $totalComments);
-        }
-
-        // Get the user's discussion count.
-        $this->updateUserDiscussionCount($userID);
-
-        // Update bookmark counts for users who had bookmarked this discussion
-        foreach ($bookmarkData->result() as $user) {
-            $this->setUserBookmarkCount($user->UserID);
-        }
-
-        if ($data) {
-            $dataObject = (object)$data;
-            $this->calculate($dataObject);
-
-            $discussionEvent = $this->eventFromRow(
-                (array)$dataObject,
-                DiscussionEvent::ACTION_DELETE,
-                $this->userModel->currentFragment()
+    public function deleteID($id, $options = []) {
+        if (is_array($id)) {
+            Deprecation::unsupportedParam(
+                "id",
+                json_encode($id),
+                "Don't call DiscussionModel::deleteID() with multiple ids. Use DiscussionModel::deleteDiscussions()"
             );
-            $this->getEventManager()->dispatch($discussionEvent);
+            $r = true;
+            foreach ($id as $dID) {
+                $result = $this->deleteID($dID, $options);
+                $r &= $result;
+            }
+            return $r;
         }
+
+        ModelUtils::consumeGenerator($this->deleteDiscussionIterator($id, $options));
         return true;
+    }
+
+    /**
+     * Iteratively delete each discussion within a category with a generator.
+     *
+     * This method uses a generator so that it can be timed out if it takes too long to run, in which case it can be
+     * run again, picking up where it left off.
+     *
+     * @param int $categoryID
+     * @param array $options
+     * @return iterable
+     */
+    public function deleteByCategory(int $categoryID, array $options = []): iterable {
+        $discussions = LegacyModelUtils::reduceTable($this, [
+            "d.CategoryID" => $categoryID,
+            "Announce" => "all"
+        ]);
+        foreach ($discussions as $discussion) {
+            $this->deleteID($discussion['DiscussionID'], $options);
+            yield $discussion;
+        }
+    }
+
+    /**
+     * Iteratively move each discussion within a category using a generator.
+     *
+     * This method uses a generator so that it can be timed out if it takes too long to run, in which case it can be
+     * run again, picking up where it left off.
+     *
+     * @param int $categoryID
+     * @param int $newCategoryID
+     * @param array $options
+     * @return iterable
+     */
+    public function moveByCategory(int $categoryID, int $newCategoryID, array $options = []): iterable {
+        $discussions = LegacyModelUtils::reduceTable($this, [
+            "d.CategoryID" => $categoryID,
+            "Announce" => "all"
+        ]);
+        foreach ($discussions as $discussion) {
+            $this->save([
+                "DiscussionID" => $discussion["DiscussionID"],
+                "CategoryID" => $newCategoryID,
+            ], $options);
+            yield $discussion;
+        }
     }
 
     /**
@@ -3193,7 +3848,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
         $userModel = $this->userModel;
         // Get category permission.
         $categoryID = val('CategoryID', $discussion);
-        if ($userID && Gdn::session()->UserID === $userID) {
+        if ($userID && Gdn::session()->UserID === $userID && $categoryID) {
             $hasPermission = CategoryModel::checkPermission($categoryID, $permission);
         } else {
             $hasPermission = $userID && $userModel->getCategoryViewPermission($userID, $categoryID, $permission);
@@ -3328,6 +3983,58 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
     }
 
     /**
+     * Resolve a discussion argument that could be either a discussion ID or a discussion row.
+     *
+     * @param array|int $discussion The discussion to resolve.
+     * @return array Returns an array in the form `[$discussionID, $discussion]`.
+     * @throws NotFoundException If a discussion is not found.
+     */
+    public function resolveDiscussionArg($discussion): array {
+        if (is_numeric($discussion)) {
+            $discussionID = $discussion;
+            $discussion = $this->getID($discussionID, DATASET_TYPE_ARRAY);
+            if (!$discussion) {
+                throw new NotFoundException("Discussion is not found", ['discussion' => $discussion]);
+            }
+        } elseif (is_array($discussion)) {
+            $discussionID = $discussion['DiscussionID'] ?? null;
+        } else {
+            throw new \InvalidArgumentException("DiscussionModel::resolveDiscussionArg() expects an integer or array.", 400);
+        }
+        return [$discussionID, $discussion];
+    }
+
+    /**
+     * Move "every" comments from a discussion to another.
+     *
+     * @param int $sourceDiscussionID
+     * @param int $destDiscussionID
+     * @param int $limit
+     * @return bool
+     */
+    private function moveComments(int $sourceDiscussionID, int $destDiscussionID, $limit = 100): bool {
+        $done = false;
+
+        /** @var CommentModel $commentModel */
+        $commentModel = Gdn::getContainer()->get(CommentModel::class);
+
+        // Obtain the comments for the discussion.
+        $comments = $commentModel->getByDiscussion($sourceDiscussionID, $limit)->result(DATASET_TYPE_ARRAY);
+
+        if (count($comments) > 0) {
+            foreach ($comments as $comment) {
+                $comment = (array)$comment;
+                $comment['DiscussionID'] = $destDiscussionID;
+                $commentModel->save($comment);
+            }
+        } else {
+            $done = true;
+        }
+
+        return $done;
+    }
+
+    /**
      * Takes a collection of filters and returns the corresponding filter key/value array [setKey => filterKey].
      *
      * @param array $filters The filters to get the keys for.
@@ -3457,14 +4164,16 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
      * @param string $setKey The key name of the filter set.
      * @param string $setName The name of the filter set. Appears in the UI.
      * @param array $categoryIDs The IDs of the categories that this filter will work on. If empty, filter is global.
+     * @param bool $display Display a UI filter.
      */
-    public static function addFilterSet($setKey, $setName = '', $categoryIDs = []) {
+    public static function addFilterSet($setKey, $setName = '', $categoryIDs = [], $display = true) {
         if (!$setName) {
             $setName = t('All Discussions');
         }
         self::$allowedFilters[$setKey]['key'] = $setKey;
         self::$allowedFilters[$setKey]['name'] = $setName;
         self::$allowedFilters[$setKey]['categories'] = $categoryIDs;
+        self::$allowedFilters[$setKey]['display'] = $display;
 
         // Add a way to let users clear any filters they've added.
         self::addClearFilter($setKey, $setName);
@@ -3626,9 +4335,34 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
      * @return array
      */
     public function normalizeRow(array $row, $expand = []): array {
+        $this->fixRow($row);
+        $session = \Gdn::session();
+        if ($session->User) {
+            $row['unread'] = $row['CountUnreadComments'] !== 0
+                && ($row['CountUnreadComments'] !== true || dateCompare(val('DateFirstVisit', $session->User), $row['DateInserted']) <= 0);
+            if ($row['CountUnreadComments'] !== true && $row['CountUnreadComments'] > 0) {
+                $row['countUnread'] = $row['CountUnreadComments'];
+            }
+        } else {
+            $row['unread'] = false;
+        }
+
+        // The Category key will hold a category fragment in API responses. Ditch the default string.
+        if (array_key_exists('Category', $row) && !is_array($row['Category'])) {
+            unset($row['Category']);
+        }
+
+
         $row['Announce'] = (bool)$row['Announce'];
         $row['Url'] = discussionUrl($row);
-        $this->formatField($row, "Body", $row["Format"]);
+        $row['CanonicalUrl'] = (isset($row['CanonicalUrl']) && is_string($row['CanonicalUrl'])) ?
+            $row['CanonicalUrl'] :
+            $row['Url'];
+
+        $rawBody = $row['Body'];
+        $format = $row['Format'];
+
+        $this->formatField($row, "Body", $format);
         $row['Attributes'] = new Attributes($row['Attributes']);
 
         if (array_key_exists("Bookmarked", $row)) {
@@ -3638,11 +4372,12 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
         if (ModelUtils::isExpandOption('lastPost', $expand)) {
             $lastPost = [
                 'discussionID' => $row['DiscussionID'],
-                'dateInserted' => $row['DateLastComment'],
-                "insertUserID" => $row["LastUserID"],
+                "insertUserID" => $row["LastUserID"]
             ];
+            $lastPost['dateInserted'] = $row['DateLastComment'] ?? $row['DateInserted'];
             if ($row['LastCommentID']) {
                 $lastPost['CommentID'] = $row['LastCommentID'];
+                $lastPost['CategoryID'] = $row['CategoryID'];
                 $lastPost['name'] = sprintft('Re: %s', $row['Name']);
                 $lastPost['url'] = commentUrl($lastPost, true);
             } else {
@@ -3650,7 +4385,10 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
                 $lastPost['url'] = $row['Url'];
             }
 
-            if (ModelUtils::isExpandOption('lastPost.insertUser', $expand) || ModelUtils::isExpandOption('lastUser', $expand) && array_key_exists('LastUser', $row)) {
+            if (ModelUtils::isExpandOption('lastPost.insertUser', $expand)
+                || ModelUtils::isExpandOption('lastUser', $expand)
+                && array_key_exists('LastUser', $row)
+            ) {
                 $lastPost['insertUser'] = $row['LastUser'];
                 if (!ModelUtils::isExpandOption('lastUser', $expand)) {
                     unset($row['LastUser']);
@@ -3665,11 +4403,67 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
             $row['DateLastComment'] = $row['DateInserted'];
         }
 
+        if (ModelUtils::isExpandOption('excerpt', $expand)) {
+            $row['excerpt'] = $this->formatterService->renderExcerpt($rawBody, $format);
+        }
+        if (ModelUtils::isExpandOption('-body', $expand)) {
+            unset($row['Body']);
+        }
+
+        $row['Closed'] = isset($row['Closed']) ? (bool) $row['Closed'] : false;
+
+        if (ModelUtils::isExpandOption(ModelUtils::EXPAND_CRAWL, $expand)) {
+            $row['recordCollapseID'] = "site{$this->ownSite->getSiteID()}_discussion{$row['DiscussionID']}";
+            $row['excerpt'] = $row['excerpt'] ?? $this->formatterService->renderExcerpt($rawBody, $format);
+            $row['bodyPlainText'] = Gdn::formatService()->renderPlainText($rawBody, $format);
+            $row['image'] = $this->formatterService->parseImageUrls($rawBody, $format)[0] ?? null;
+            $row['scope'] = $this->categoryModel->getRecordScope($row['CategoryID']);
+            $row['score'] = $row['Score'] ?? 0;
+            $row['hot'] = $row['Score'] + $row['CountComments'];
+            $type = $row['Type'] ?? '';
+            $row['Type'] = ($type === self::REDIRECT_TYPE) ? self::DISCUSSION_TYPE : $type;
+            $siteSection = $this->siteSectionModel
+                ->getSiteSectionForAttribute('allCategories', $row['CategoryID']);
+            $row['locale'] = $siteSection->getContentLocale();
+
+            if ($row['Closed'] ?? false) {
+                $row['labelCodes'][] = self::CLOSED_LABEL;
+            }
+
+            if ($row['pinned'] ?? false) {
+                $row['labelCodes'][] = self::ANNOUNCEMENT_LABEL;
+            }
+
+            $searchService = Gdn::getContainer()->get(SearchService::class);
+            /** @var SearchTypeQueryExtenderInterface $extender */
+            foreach ($searchService->getExtenders() as $extender) {
+                $extender->extendRecord($row, 'discussion');
+            }
+        }
+
         $scheme = new CamelCaseScheme();
         $result = $scheme->convertArrayKeys($row);
-        $result['type'] = !empty($result['type']) ? lcfirst($result['type']) : null;
+        $result['type'] = self::normalizeDiscussionType($result['type'] ?? null);
+
+        // Get the discussion's parsed body's first image & get the srcset for it.
+        $result['image'] = $this->formatterService->parseMainImage($rawBody, $format);
 
         return $result;
+    }
+
+    /**
+     * Normalize a discussion type for output.
+     *
+     * @param string|null $discussionType
+     *
+     * @return string
+     */
+    public static function normalizeDiscussionType(?string $discussionType): string {
+        if (!empty($discussionType)) {
+            return lcfirst($discussionType);
+        } else {
+            return 'discussion';
+        }
     }
 
     /**
@@ -3683,7 +4477,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
      * @param array $row The discussion record to fix.
      * @return array
      */
-    public function fixRow(array $row): array {
+    public function fixRow(array &$row): array {
         if (array_key_exists('Name', $row)) {
             $row['Name'] = htmlspecialchars_decode($row['Name']);
         }
@@ -3721,18 +4515,33 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
     public function schema(): Schema {
         $result = Schema::parse([
             'discussionID:i' => 'The ID of the discussion.',
+            'discussionCollapseID:s?',
             'type:s|n' => [
                 'description' => 'The type of this discussion if any.',
             ],
-            'name:s' => 'The title of the discussion.',
-            'body:s' => 'The body of the discussion.',
+            'name:s' => [
+                'description' => 'The title of the discussion.',
+                'x-localize' => true,
+            ],
+            'body:s?' => [
+                'description' => 'The body of the discussion.',
+            ],
+            'excerpt:s?' => [
+                'description' => 'Plain-text excerpt of the current discussion body.',
+            ],
+            'bodyRaw:s?',
+            'bodyPlainText:s?' => [
+                'description' => 'The body of the discussion in plain text.',
+                'x-localize' => true,
+            ],
             'categoryID:i' => 'The category the discussion is in.',
             'dateInserted:dt' => 'When the discussion was created.',
             'dateUpdated:dt|n' => 'When the discussion was last updated.',
             'dateLastComment:dt|n' => 'When the last comment was posted.',
             'insertUserID:i' => 'The user that created the discussion.',
-            'updateUserID:i|n',
             'insertUser?' => SchemaFactory::get(UserFragmentSchema::class, "UserFragment"),
+            'updateUserID:i|n',
+            'lastUserID:i',
             'lastUser?' => SchemaFactory::get(UserFragmentSchema::class, "UserFragment"),
             'pinned:b?' => 'Whether or not the discussion has been pinned.',
             'pinLocation:s|n' => [
@@ -3746,9 +4555,21 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
             'countComments:i' => 'The number of comments on the discussion.',
             'countViews:i' => 'The number of views on the discussion.',
             'score:i|n' => 'Total points associated with this post.',
+            'hot:i|n?' => 'Score points plus comments count.',
             'url:s?' => 'The full URL to the discussion.',
             'canonicalUrl:s' => 'The full canonical URL to the discussion.',
+            'format:s?' => 'Format of the discussion',
+            'tagIDs:a?' => ['items' => ['type' => 'integer']],
+            'labelCodes:a?' => ['items' => ['type' => 'string']],
             'lastPost?' => SchemaFactory::get(PostFragmentSchema::class, "PostFragment"),
+            'breadcrumbs:a?' => new InstanceValidatorSchema(Breadcrumb::class),
+            'groupID:i?' => [
+                'x-null-value' => -1,
+            ],
+            'statusID:i' => [
+                'default' => 0,
+            ],
+            'image?' => new MainImageSchema(),
         ]);
         return $result;
     }
@@ -3790,7 +4611,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
         }
 
         // This discussion looks familiar...
-        if ($discussion->CountCommentWatch > 0 | !is_null($discussion->DateLastViewed)) {
+        if ($discussion->CountCommentWatch > 0 || !empty($discussion->WatchUserID ?? null) || $discussion->Bookmarked) {
             if ($countWatch < $discussion->CountCommentWatch) {
                 $countWatch = (int)min($discussion->CountCommentWatch, $totalComments);
             }
@@ -3799,7 +4620,9 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
                 $newComments |= Gdn_Format::toTimestamp($discussion->DateLastComment) > Gdn_Format::toTimestamp($discussion->DateLastViewed);
             }
 
-            if ($totalComments > $discussion->CountCommentWatch || $countWatch != $discussion->CountCommentWatch) {
+            if ($totalComments > $discussion->CountCommentWatch ||
+                $countWatch != $discussion->CountCommentWatch ||
+                is_null($discussion->DateLastViewed)) {
                 $newComments = true;
             }
 
@@ -3811,6 +4634,66 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
         $dateLastViewed = self::maxDate($discussion->DateLastViewed, $maxDateInserted);
 
         return [$countWatch, $dateLastViewed, $operation];
+    }
+
+    /**
+     * Change a discussion's Closed value to 0.
+     *
+     * @param int $discussionID
+     * @return int Unique ID of the saved discussion.
+     */
+    public function openDiscussion(int $discussionID) : bool {
+        $save = [
+            "DiscussionID" => $discussionID,
+            "Closed" => 0,
+        ];
+        // Fire event in case some addon needs to change other data during the opening.
+        $this->EventArguments = ['save' => &$save];
+        $this->fireEvent("beforeOpenDiscussion");
+
+        // Remove the `ClosedByUserID` attribute, if it exists.
+        $discussion = $this->getID($discussionID);
+        if (isset($discussion->Attributes[self::CLOSED_BY_USER_ID])) {
+            unset($discussion->Attributes[self::CLOSED_BY_USER_ID]);
+            $this->setProperty($discussionID, 'Attributes', dbencode($discussion->Attributes));
+        }
+
+        // Save the discussion
+        return $this->save($this->EventArguments['save']);
+    }
+
+    /**
+     * Change a discussion's Closed value to 0.
+     *
+     * @param int $discussionID
+     * @return int Unique ID of the saved discussion.
+     */
+    public function closeDiscussion(int $discussionID) : bool {
+        $save = [
+            "DiscussionID" => $discussionID,
+            "Closed" => 1,
+        ];
+        // Fire event in case some addon needs to change other data during the close.
+        $this->EventArguments = ['save' => &$save];
+        $this->fireEvent("beforeCloseDiscussion");
+
+        // Set the `ClosedByUserID` attribute.
+        $discussion = $this->getID($discussionID);
+        $discussion->Attributes[DiscussionModel::CLOSED_BY_USER_ID] = Gdn::session()->UserID;
+        $this->setProperty($discussionID, 'Attributes', dbencode($discussion->Attributes));
+
+        // Save the discussion
+        $saveSuccess = $this->save($this->EventArguments['save']);
+
+        // Dispatch a Discussion event (close)
+        $senderUserID = Gdn::session()->UserID;
+        $sender = $senderUserID ? Gdn::userModel()->getFragmentByID($senderUserID) : null;
+
+        $discussion = $this->getID($discussionID, DATASET_TYPE_ARRAY);
+        $discussionEvent = $this->eventFromRow($discussion, DiscussionEvent::ACTION_CLOSE, $sender);
+        $this->getEventManager()->dispatch($discussionEvent);
+
+        return $saveSuccess;
     }
 
     /**
@@ -3832,7 +4715,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
             return;
         }
 
-        list($countWatch, $dateLastViewed, $op) = $this->calculateWatch($discussion, $limit, $offset, $totalComments, $maxDateInserted);
+        [$countWatch, $dateLastViewed, $op] = $this->calculateWatch($discussion, $limit, $offset, $totalComments, $maxDateInserted);
 
         switch ($op) {
             case 'update':
@@ -3866,7 +4749,17 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
         // If there is a discrepancy between $countWatch and $discussion->CountCommentWatch,
         // update CountCommentWatch with the correct value.
         $discussion->CountCommentWatch = $countWatch;
+        $this->markCategoryReadFuzzy($discussion);
+    }
 
+    /**
+     * Mark categories that this discussion was in as read.
+     *
+     * This method was extracted from `DiscussionModel::setWatch()`.
+     *
+     * @param object $discussion
+     */
+    protected function markCategoryReadFuzzy($discussion): void {
         /**
          * Fuzzy way of trying to automatically mark a category read again
          * if the user reads all the comments on the first few pages.
@@ -3910,7 +4803,416 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
 
         // Mark this category read if all the new content is read.
         $categoryModel = new CategoryModel();
-        $categoryModel->saveUserTree($categoryID, ['DateMarkedRead' => Gdn_Format::toDateTime()]);
+        $categoryModel->saveUserTree($categoryID, ['DateMarkedRead' => DateTimeFormatter::getCurrentDateTime()]);
         unset($categoryModel);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getCrawlInfo(): array {
+        $r = LegacyModelUtils::getCrawlInfoFromPrimaryKey(
+            $this,
+            '/api/v2/discussions?pinOrder=mixed&sort=-discussionID&expand[]=crawl&expand[]=tagIDs',
+            'discussionID'
+        );
+        return $r;
+    }
+
+    /**
+     * Return a URL for a discussion. This function is in here and not functions.general so that plugins can override.
+     *
+     * @param object|array $discussion
+     * @param int|string $page
+     * @param bool $withDomain
+     * @return string
+     */
+    public static function discussionUrl($discussion, $page = '', $withDomain = true) {
+        if (function_exists('discussionUrl')) {
+            // Legacy overrides.
+            return discussionUrl($discussion, $page, $withDomain);
+        } else {
+            return self::createRawDiscussionUrl($discussion, $page, $withDomain);
+        }
+    }
+
+    /**
+     * Build the default url for a discussion.
+     *
+     * @param object|array $discussion
+     * @param int|string $page
+     * @param bool $withDomain
+     * @return string
+     *
+     * @internal Don't use unless you are the global discussionUrl function.
+     */
+    public static function createRawDiscussionUrl($discussion, $page = '', $withDomain = true) {
+        $eventManager = \Gdn::eventManager();
+        if ($eventManager->hasHandler('customDiscussionUrl')) {
+            return $eventManager->fireFilter('customDiscussionUrl', '', $discussion, $page, $withDomain);
+        }
+
+        $discussion = (object)$discussion;
+        $name = Gdn_Format::url($discussion->Name);
+
+        // Disallow an empty name slug in discussion URLs.
+        if (empty($name)) {
+            $name = 'x';
+        }
+
+        $result = '/discussion/'.$discussion->DiscussionID.'/'.$name;
+
+        if ($page) {
+            if ($page > 1 || Gdn::session()->UserID) {
+                $result .= '/p'.$page;
+            }
+        }
+
+        return url($result, $withDomain);
+    }
+
+    /**
+     * Generator for deleting multiple discussions, which can be a long-running process.
+     *
+     * User with LongRunner::run* methods.
+     *
+     * @param array $discussionIDs The discussionIDs to delete.
+     * @param array $options Options for deletion.
+     *
+     * @return Generator<int, LongRunnerItemResultInterface, string, string|LongRunnerNextArgs>
+     */
+    public function deleteDiscussionsIterator(array $discussionIDs, array $options = []): Generator {
+        $completedDiscussionIDs = [];
+
+        try {
+            $discussionIDs = array_unique($discussionIDs);
+            $count = $this->getCount(['d.DiscussionID' => $discussionIDs]);
+            yield new LongRunnerQuantityTotal($count);
+
+            foreach ($discussionIDs as $discussionID) {
+                try {
+                    // Loop through and yield values from the single delete iterator.
+                    // Notably we can't use "yield from" here because when WE need to handle the yield return value.
+                    // And using yield from means that we only get the return value when the inner iterator finishes.
+                    foreach ($this->deleteDiscussionIterator($discussionID, $options) as $discussionDeleteYielded) {
+                        if ($discussionDeleteYielded instanceof LongRunnerSuccessID) {
+                            // A discussion was deleted.
+                            $completedDiscussionIDs[] = $discussionDeleteYielded->getRecordID();
+                        }
+                        yield $discussionDeleteYielded;
+                    }
+                    $completedDiscussionIDs[] = $discussionID;
+
+                    // These transacton IDs are forwarded only for a single discussion.
+                    unset($options[self::OPT_DELETE_SINGLE_TRANSACTION_ID]);
+                } catch (Exception $e) {
+                    if ($e instanceof LongRunnerTimeoutException) {
+                        // Throw it back up to our next catch block.
+                        throw $e;
+                    }
+                    yield new LongRunnerFailedID($discussionID, $e);
+                }
+            }
+        } catch (LongRunnerTimeoutException $e) {
+            // We might have been in the middle of a log transaction.
+            // Preserve it for when we continue.
+            $options[self::OPT_DELETE_SINGLE_TRANSACTION_ID] = LogModel::getTransactionID();
+
+            return new LongRunnerNextArgs([
+                array_diff($discussionIDs, $completedDiscussionIDs),
+                $options,
+            ]);
+        }
+
+        return LongRunner::FINISHED;
+    }
+
+    /**
+     * Generator for deleting a discussion, which can be a long-running process.
+     *
+     * User with LongRunner::run* methods.
+     *
+     * @param int $discussionID The discussionID to delete.
+     * @param array $options Options for deletion.
+     *
+     * @return Generator<int, LongRunnerItemResultInterface, string, string|LongRunnerNextArgs>
+     */
+    public function deleteDiscussionIterator(int $discussionID, array $options = []): Generator {
+        // Prepare some dependencies that we can't inject because this is a legacy model.
+        /** @var CommentModel $commentModel */
+        $commentModel = \Gdn::getContainer()->get(CommentModel::class);
+
+        $sql = $this->createSql();
+        $db = $sql->Database;
+
+        // Grab the existing row.
+        $existingDiscussion = $sql
+            ->select('*')
+            ->from('Discussion')
+            ->where('DiscussionID', $discussionID)
+            ->get()
+            ->firstRow(DATASET_TYPE_ARRAY)
+        ;
+        if (!$existingDiscussion) {
+            // Discussion may have already been deleted.
+            yield new LongRunnerSuccessID($discussionID);
+            return LongRunner::FINISHED;
+        }
+
+        $insertUserID = $existingDiscussion['InsertUserID'];
+        $categoryID = $existingDiscussion['CategoryID'];
+
+        // Let other things know the discussion has been deleted.
+        $this->fireEvent('deleteDiscussion', [
+            'DiscussionID' => $discussionID,
+            'Discussion' => $existingDiscussion,
+        ]);
+
+        // Prepare logging
+        $logMethod = $options['Log'] ?? true;
+        $logMethod = $logMethod === true ? 'Delete' : $logMethod;
+        $logOptions = $options['LogOptions'] ?? [];
+        $logTransactionID = $options[self::OPT_DELETE_SINGLE_TRANSACTION_ID] ?? null;
+
+        // Start up a common log transaction to tie all the deleted items together.
+        $transactionID = LogModel::beginTransaction($logTransactionID);
+
+        // Make sure if we get stopped while iterating, the next call will have the same transactionID.
+        $options[self::OPT_DELETE_SINGLE_TRANSACTION_ID] = $transactionID;
+
+        // Begin delete comments.
+        $commentIDs = $sql
+            ->select('CommentID')
+            ->where(['DiscussionID' => $discussionID])
+            ->get('Comment')
+            ->column('CommentID')
+        ;
+
+        // Note: No exception catching in this loop.
+        // If some comment fails to delete, we cannot proceed with deleting the discussion.
+        // These runs counter to some other bulk actions which may wish to proceed (that don't have dependencies on each other).
+        foreach ($commentIDs as $commentID) {
+            // Use the comment model to delete the row.
+            // This should ensure that all aggregate info is updated properly
+            // And is in fact the reason this whole thing is an iterator.
+            $deleteResult = $commentModel->deleteID($commentID, $options);
+
+            try {
+                // Yield for the generator in case we hit a timeout.
+                yield;
+            } catch (LongRunnerTimeoutException $e) {
+                return new LongRunnerNextArgs([$discussionID, $options]);
+            }
+        }
+
+        // Now delete the discussion.
+        $bookmarkedUserIDs = $this->getBookmarkUserIDs($discussionID);
+        try {
+            $db->beginTransaction();
+            $this->SQL->delete('Discussion', ['DiscussionID' => $discussionID]);
+            $this->SQL->delete('UserDiscussion', ['DiscussionID' => $discussionID]);
+            LogModel::insert($logMethod, 'Discussion', $existingDiscussion, $logOptions);
+            LogModel::endTransaction();
+            $db->commitTransaction();
+        } catch (Throwable $t) {
+            // Rollback the transaction.
+            $db->rollbackTransaction();
+
+            // Rethrow.
+            throw $t;
+        }
+
+        // Fire of an action indicating the record was deleted.
+        $dataObject = (object)$existingDiscussion;
+        $this->calculate($dataObject);
+
+        $discussionEvent = $this->eventFromRow(
+            (array)$dataObject,
+            ResourceEvent::ACTION_DELETE,
+            $this->userModel->currentFragment()
+        );
+        $this->getEventManager()->dispatch($discussionEvent);
+
+        // Update some ancillary counts.
+        $this->updateDiscussionCount($categoryID);
+
+        // Update the last post info for the category and its parents.
+        $this->categoryModel->refreshAggregateRecentPost($categoryID, true);
+
+        // Decrement CountAllDiscussions for category and its parents.
+        CategoryModel::decrementAggregateCount($categoryID, CategoryModel::AGGREGATE_DISCUSSION);
+
+        // Get the user's discussion count.
+        $this->updateUserDiscussionCount($insertUserID);
+
+        // Update bookmark counts for users who had bookmarked this discussion.
+        $this->recalculateBookmarkCounts($discussionID, $bookmarkedUserIDs);
+
+        yield new LongRunnerSuccessID($discussionID);
+    }
+
+    /**
+     * Move a single discussion into another category.
+     *
+     * @param array|int $discussionOrDiscussionID What discussion or discussionID should we move the discussion into.
+     * @param array|int $categoryOrCategoryID What category or categoryID should we move the discussion into.
+     * @param bool $addRedirects Should we create a redirect from this discussion.
+     * @return bool True on success. Throws on failures.
+     *
+     * @throws ValidationException If saving didn't work.
+     * @throws ClientException If the discussion can't be moved to that category.
+     * @throws NotFoundException If the discussion or category didn't exist.
+     */
+    public function moveDiscussion($discussionOrDiscussionID, $categoryOrCategoryID, bool $addRedirects): bool {
+        $newCategory = is_numeric($categoryOrCategoryID) ? CategoryModel::categories($categoryOrCategoryID) : $categoryOrCategoryID;
+        if (!$newCategory) {
+            throw new NotFoundException('Category', ['categoryID' => $categoryOrCategoryID]);
+        }
+
+        $discussion = is_numeric($discussionOrDiscussionID) ? $this->getID($discussionOrDiscussionID, DATASET_TYPE_ARRAY) : $discussionOrDiscussionID;
+        if (!$discussion) {
+            throw new NotFoundException('Discussion', ['discussionID' => $discussionOrDiscussionID]);
+        }
+
+        $discussionID = $discussion['DiscussionID'];
+        $newCategoryID = $newCategory['CategoryID'];
+
+        // Discussion is already in the correct category, skip.
+        $discussionCategoryID = $discussion['CategoryID'] ?? null;
+        if ($discussionCategoryID === $newCategory['CategoryID']) {
+            return true;
+        } else {
+            $postingCategory = CategoryModel::doesCategoryAllowPosts($newCategoryID);
+            if (!$postingCategory) {
+                throw new ClientException("Destination category does not allow discussions.", 400, [
+                    'discussionID' => $discussionID,
+                    'destinationCategoryID' => $newCategoryID,
+                ]);
+            }
+        }
+
+        $allowedDiscussionTypes = $newCategory['AllowedDiscussionTypes'];
+        if (isset($discussion['Type'])
+            && !empty($allowedDiscussionTypes)
+            && !in_array($discussion['Type'], $allowedDiscussionTypes)
+        ) {
+            throw new ClientException("Discussion type is not allowed in the destination category.", 400, [
+                'discussionID' => $discussionID,
+                'discussionType' => $discussion['Type'],
+                'allowedDiscussionTypes' => $allowedDiscussionTypes,
+            ]);
+        }
+
+        // Create the redirect.
+        if ($addRedirects) {
+            $this->createRedirect($discussion);
+            ModelUtils::validationResultToValidationException($this);
+        }
+
+        $save = [
+            "CategoryID" => $newCategory['CategoryID'],
+            "DiscussionID" => $discussionID,
+        ];
+        // Fire event in case some addon needs to change other data during the move.
+        $this->EventArguments = [
+            'discussion' => &$discussion,
+            'save' => &$save,
+        ];
+        $this->fireEvent("beforeDiscussionMoveSave");
+
+        // Move the discussion.
+        $this->save($this->EventArguments['save']);
+
+        // throw any validation errors.
+        ModelUtils::validationResultToValidationException($this);
+
+        // Dispatch a Discussion event (move)
+        $senderUserID = Gdn::session()->UserID;
+        $sender = $senderUserID ? Gdn::userModel()->getFragmentByID($senderUserID) : null;
+
+        $discussion = $this->getID($discussionID, DATASET_TYPE_ARRAY);
+        $discussionEvent = $this->eventFromRow($discussion, DiscussionEvent::ACTION_MOVE, $sender);
+        $discussionEvent->setSourceCategoryID($discussionCategoryID);
+        $this->getEventManager()->dispatch($discussionEvent);
+
+        return true;
+    }
+
+    /**
+     * Create an iterable for moving discussions.
+     *
+     * @param array $discussionIDs DiscussionIDs to move.
+     * @param int $categoryID CategoryID to move discussions into.
+     * @param bool $addRedirects If a redirect needs to be created.
+     *
+     * @return Generator<int, LongRunnerItemResultInterface, null, string|LongRunnerNextArgs>
+     *
+     * @throws NotFoundException If the category we are moving into doesn't exist.
+     */
+    public function moveDiscussionsIterator(array $discussionIDs, int $categoryID, bool $addRedirects): Generator {
+        $discussionIDs = array_unique($discussionIDs);
+        $handledDiscussionIDs = [];
+        try {
+            yield new LongRunnerQuantityTotal(count($discussionIDs));
+
+            foreach ($discussionIDs as $discussionID) {
+                try {
+                    $this->moveDiscussion($discussionID, $categoryID, $addRedirects);
+                    $handledDiscussionIDs[] = $discussionID;
+                    yield new LongRunnerSuccessID($discussionID);
+                } catch (Exception $e) {
+                    if ($e instanceof LongRunnerTimeoutException) {
+                        // Rethrow up to hit the outer catch.
+                        throw $e;
+                    }
+                    $handledDiscussionIDs[] = $discussionID;
+                    yield new LongRunnerFailedID($discussionID, $e);
+                }
+            }
+        } catch (LongRunnerTimeoutException $e) {
+            $remainingDiscussionIDs = array_diff($discussionIDs, $handledDiscussionIDs);
+            return new LongRunnerNextArgs([$remainingDiscussionIDs, $categoryID, $addRedirects]);
+        }
+    }
+
+    /**
+     * Create an iterable for closing/opening discussions. Assumes caller has validated existence of discussions and associated user permissions.
+     *
+     * @param array $discussionIDs DiscussionIDs to close/open.
+     * @param bool $closing Close (true) or open (false) this set of discussions
+     *
+     * @return Generator<int, LongRunnerItemResultInterface, null, string|LongRunnerNextArgs>
+     *
+     * @throws NotFoundException If the category we are closing/opening doesn't exist.
+     */
+    public function closeDiscussionsIterator(array $discussionIDs, bool $closing): Generator {
+        $discussionIDs = array_unique($discussionIDs);
+        $handledDiscussionIDs = [];
+        try {
+            yield new LongRunnerQuantityTotal(count($discussionIDs));
+
+            foreach ($discussionIDs as $discussionID) {
+                try {
+                    if ($closing) {
+                        $this->closeDiscussion($discussionID);
+                    } else {
+                        $this->openDiscussion($discussionID);
+                    }
+                    $handledDiscussionIDs[] = $discussionID;
+                    yield new LongRunnerSuccessID($discussionID);
+                } catch (Exception $e) {
+                    if ($e instanceof LongRunnerTimeoutException) {
+                        // Rethrow up to hit the outer catch.
+                        throw $e;
+                    }
+                    $handledDiscussionIDs[] = $discussionID;
+                    yield new LongRunnerFailedID($discussionID, $e);
+                }
+            }
+        } catch (LongRunnerTimeoutException $e) {
+            $remainingDiscussionIDs = array_diff($discussionIDs, $handledDiscussionIDs);
+            return new LongRunnerNextArgs([$remainingDiscussionIDs, $closing]);
+        }
+        return LongRunner::FINISHED;
     }
 }

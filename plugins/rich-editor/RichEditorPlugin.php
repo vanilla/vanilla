@@ -7,6 +7,8 @@
 
 use Vanilla\Formatting\Formats\RichFormat;
 use \Vanilla\Formatting\Formats;
+use Vanilla\Web\TwigStaticRenderer;
+use Vanilla\Formatting\Quill\Parser;
 
 /**
  * Plugin class for the Rich Editor.
@@ -14,7 +16,8 @@ use \Vanilla\Formatting\Formats;
 class RichEditorPlugin extends Gdn_Plugin {
 
     const FORMAT_NAME = RichFormat::FORMAT_KEY;
-    const QUOTE_CONFIG_ENABLE = "RichEditor.Quote.Enable";
+    const CONFIG_QUOTE_ENABLE = "RichEditor.Quote.Enable";
+    const CONFIG_REINTERPRET_ENABLE = "RichEditor.Reinterpret.Enable";
 
     /** @var integer */
     private static $editorID = 0;
@@ -39,7 +42,7 @@ class RichEditorPlugin extends Gdn_Plugin {
     public function setup() {
         saveToConfig('Garden.InputFormatter', RichFormat::FORMAT_KEY);
         saveToConfig('Garden.MobileInputFormatter', RichFormat::FORMAT_KEY);
-        saveToConfig(self::QUOTE_CONFIG_ENABLE, true);
+        saveToConfig(self::CONFIG_QUOTE_ENABLE, true);
         saveToConfig('EnabledPlugins.Quotes', false);
     }
 
@@ -70,11 +73,42 @@ class RichEditorPlugin extends Gdn_Plugin {
             return $this->isInputFormatterRich();
         }
 
+        return $this->isFormatRich($format);
+    }
+
+    /**
+     * Determine if we are forcing the format to be rich.
+     *
+     * @param Gdn_Form $form
+     *
+     * @return bool
+     */
+    private function isForcedRich(Gdn_Form $form): bool {
+        return
+            // The form itself is not rich.
+            !$this->isFormRich($form)
+            // The current input formatter is rich.
+            && $this->isInputFormatterRich()
+            // The config setting to force rich is enabled.
+            && Gdn::config(self::CONFIG_REINTERPRET_ENABLE)
+        ;
+    }
+
+    /**
+     * Determine if the format string corresponds to rich format
+     *
+     * @param string $format - Format string to check
+     * @return bool
+     */
+    private function isFormatRich(string $format): bool {
         return strcasecmp($format, RichFormat::FORMAT_KEY) === 0;
     }
 
+    /**
+     * @return bool
+     */
     public function isInputFormatterRich(): bool {
-        return strcasecmp(Gdn_Format::defaultFormat(), RichFormat::FORMAT_KEY) === 0;
+        return $this->isFormatRich(Gdn_Format::defaultFormat());
     }
 
     /**
@@ -98,25 +132,56 @@ class RichEditorPlugin extends Gdn_Plugin {
      * @param array $args Arguments from the event.
      */
     public function gdn_form_beforeBodyBox_handler(Gdn_Form $sender, array $args) {
-        if ($this->isFormRich($sender)) {
-            /** @var Gdn_Controller $controller */
+        $isRich = $this->isFormRich($sender);
+        $originalRecord = $sender->formData();
+        $body = $originalRecord['Body'] ?? false;
+        $originalFormat = $originalRecord['Format'] ?? false;
+        $isForcedRich = $this->isForcedRich($sender);
+
+        if ($isRich || $isForcedRich) {
             $controller = Gdn::controller();
-            $controller->CssClass .= ' hasRichEditor';
+            if ($controller) {
+                $controller->CssClass .= ' hasRichEditor';
+            }
+
             $editorID = $this->getEditorID();
-            $controller->setData('editorData', [
+            $viewData = [
                 'editorID' => $editorID,
-                'editorDescriptionID' => 'richEditor-'.$editorID.'-description',
+                'descriptionID' => 'richEditor-'.$editorID.'-description',
                 'hasUploadPermission' => checkPermission('uploads.add'),
-            ]);
+                'uploadEnabled' => $args['Attributes']['UploadEnabled'] ?? true,
+            ];
+
+            if (!Gdn::session()->User->Admin) {
+                // If a category is set check for AllowFileUploads. (admins bypass this condition)
+                $categoryID = $controller->data('Category.CategoryID', $controller->data('ContextualCategoryID'));
+                // Check the category exists.
+                $category = CategoryModel::categories($categoryID);
+                $viewData['uploadEnabled'] = CategoryModel::checkAllowFileUploads($category);
+            }
+
+            if ($isForcedRich) {
+                $viewData['needsHtmlConversion'] = true;
+
+                $newBodyValue = $this->formatService->renderHTML($body, $originalFormat);
+                $sender->setValue("Body", $newBodyValue);
+                $sender->setValue("Format", RichFormat::FORMAT_KEY);
+            }
+            if ($this->isFormatRich($originalFormat)) {
+                // Filter out empty arrays from JSON. See https://higherlogic.atlassian.net/browse/VNLA-640
+                try {
+                    $newBodyValue = $this->formatService->filter($body, RichFormat::FORMAT_KEY);
+                    $sender->setValue("Body", $newBodyValue);
+                } catch (\Exception $e) {
+                    // Ignore
+                }
+            }
+
+            $rendered = TwigStaticRenderer::renderTwigStatic("@rich-editor/rich-editor.twig", $viewData);
 
             // Render the editor view.
-            $args['BodyBox'] .= $controller->fetchView('rich-editor', '', 'plugins/rich-editor');
+            $args['BodyBox'] .= $rendered;
         } elseif (c('Garden.ForceInputFormatter')) {
-            $originalRecord = $sender->formData();
-            $newBodyValue = null;
-            $body = $originalRecord['Body'] ?? false;
-            $originalFormat = $originalRecord['Format'] ?? false;
-
             /*
                 Allow rich content to be rendered and modified if the InputFormat
                 is different from the original format in no longer applicable or
@@ -147,7 +212,7 @@ class RichEditorPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function base_afterFlag_handler($sender, $args) {
-        if ($this->isInputFormatterRich() && c(self::QUOTE_CONFIG_ENABLE, true)) {
+        if ($this->isInputFormatterRich() && c(self::CONFIG_QUOTE_ENABLE, true)) {
             $this->addQuoteButton($sender, $args);
         }
     }
@@ -189,7 +254,7 @@ class RichEditorPlugin extends Gdn_Plugin {
         $classes = 'ReactButton Quote Visible js-quoteButton';
 
         echo Gdn_Theme::bulletItem('Flags');
-        echo "<a href='#' data-scrape-url='$url' role='button' class='$classes'>$linkText</a>";
+        echo "<a href='#' role='button' data-scrape-url='$url' role='button' class='$classes'>$linkText</a>";
         echo ' ';
     }
 
@@ -207,15 +272,27 @@ class RichEditorPlugin extends Gdn_Plugin {
         Gdn_Form $form,
         Gdn_ConfigurationModel $configModel
     ): string {
-        $enableRichQuotes = t('Enable Rich Quotes');
-        $richEditorQuotesNotes =  t('RichEditor.QuoteEnable.Notes', 'Use the following option to enable quotes for the Rich Editor. This will only apply if the default formatter is "Rich".');
-        $label = '<p class="info">'.$richEditorQuotesNotes.'</p>';
-        $configModel->setField(self::QUOTE_CONFIG_ENABLE);
+        $configModel->setField(self::CONFIG_QUOTE_ENABLE);
+        $form->setValue(self::CONFIG_QUOTE_ENABLE, c(self::CONFIG_QUOTE_ENABLE));
+        $configModel->setField(self::CONFIG_REINTERPRET_ENABLE);
+        $form->setValue(self::CONFIG_REINTERPRET_ENABLE, c(self::CONFIG_REINTERPRET_ENABLE));
 
-        $form->setValue(self::QUOTE_CONFIG_ENABLE, c(self::QUOTE_CONFIG_ENABLE));
-        $formToggle = $form->toggle(self::QUOTE_CONFIG_ENABLE, $enableRichQuotes, [], $label);
+        $openingLiTag = "<li class='form-group js-richFormGroup Hidden' data-formatter-type='Rich'>";
+        $additionalFormItemHTML .= $openingLiTag
+            .VanillaSettingsController::postFormatReintrerpretToggle($form, self::CONFIG_REINTERPRET_ENABLE, "Rich")
+        ."</li>";
 
-        $additionalFormItemHTML .= "<li class='form-group js-richFormGroup Hidden' data-formatter-type='Rich'>$formToggle</li>";
+        $additionalFormItemHTML .= $openingLiTag
+            .$form->toggle(
+                self::CONFIG_QUOTE_ENABLE,
+                t('Enable Rich Quotes'),
+                [],
+                t(
+                    'RichEditor.QuoteEnable.Notes',
+                    'Use the following option to enable quotes for the Rich Editor. This will only apply if the default formatter is "Rich".'
+                )
+            )
+            ."</li>";
         return $additionalFormItemHTML;
     }
 }

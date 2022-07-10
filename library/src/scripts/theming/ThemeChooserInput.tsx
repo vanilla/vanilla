@@ -11,18 +11,19 @@ import { useThemeSettingsState } from "@library/theming/themeSettingsReducer";
 import { LoadStatus } from "@library/@types/api/core";
 import { DashboardSelect } from "@dashboard/forms/DashboardSelect";
 import Translate from "@library/content/Translate";
+import { RecordID } from "@vanilla/utils";
 
 interface IProps {
-    value?: number | string | null;
-    initialValue: number | string;
-    onChange?: (value: number | string) => void;
+    value?: RecordID | null;
+    initialValue: RecordID;
+    onChange?: (value: RecordID) => void;
 }
 
 /**
  * An Input that allows for users to select an available theme.
  */
 export function ThemeChooserInput(props: IProps) {
-    const [ownValue, setOwnValue] = useState<number | string | null | undefined>(
+    const [ownValue, setOwnValue] = useState<RecordID | null | undefined>(
         typeof props.initialValue === "boolean" ? null : props.initialValue,
     );
     const setValue = props.onChange ?? setOwnValue;
@@ -52,14 +53,14 @@ export function ThemeChooserInput(props: IProps) {
             : t("Loading"),
     };
 
-    const dbThemeGroupOptions: IComboBoxOption[] = themes.map(function(theme, index) {
+    const dbThemeGroupOptions: IComboBoxOption[] = themes.map(function (theme, index) {
         return {
             value: theme.themeID,
             label: theme.name,
         };
     });
 
-    const templateThemeGroupOptions: IComboBoxOption[] = templates.map(function(template, index) {
+    const templateThemeGroupOptions: IComboBoxOption[] = templates.map(function (template, index) {
         return {
             value: template.themeID,
             label: template.name,
@@ -67,11 +68,11 @@ export function ThemeChooserInput(props: IProps) {
     });
 
     let themeGroupOptions: IComboBoxOption[] = [...dbThemeGroupOptions, ...templateThemeGroupOptions];
-    themeGroupOptions = themeGroupOptions.filter(option => option.value !== defaultTheme?.themeID);
+    themeGroupOptions = themeGroupOptions.filter((option) => option.value !== defaultTheme?.themeID);
     themeGroupOptions.push(defaultOption);
 
     const selectedTheme =
-        themeGroupOptions.find(option => {
+        themeGroupOptions.find((option) => {
             if (
                 props.initialValue !== null &&
                 props.initialValue !== undefined &&
@@ -88,7 +89,7 @@ export function ThemeChooserInput(props: IProps) {
         <>
             <DashboardSelect
                 options={themeGroupOptions}
-                onChange={value => {
+                onChange={(value) => {
                     setValue(value ? value.value : "");
                 }}
                 value={selectedTheme}

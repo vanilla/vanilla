@@ -122,6 +122,8 @@ class RecaptchaPlugin extends Gdn_Plugin {
         if ($manageCaptcha) {
             $configurationModel->setField('Recaptcha.PrivateKey');
             $configurationModel->setField('Recaptcha.PublicKey');
+            $configurationModel->setField('RecaptchaV3.PublicKey');
+            $configurationModel->setField('RecaptchaV3.PrivateKey');
         }
     }
 

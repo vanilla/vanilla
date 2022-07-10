@@ -13,23 +13,30 @@ use Garden\Schema\ValidationException;
 use Garden\Web\Exception\HttpException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\Pass;
+use Logger;
 use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Vanilla\Contracts\LocaleInterface;
+use Vanilla\Logging\ErrorLogger;
 use Vanilla\Permissions;
 use Garden\CustomExceptionHandler;
 
 /**
  * Dispatches requests and receives responses.
  */
-class Dispatcher {
+class Dispatcher implements LoggerAwareInterface {
+
+    use LoggerAwareTrait;
     use MiddlewareAwareTrait;
 
-    /** @var Gdn_Locale */
+    /** @var LocaleInterface */
     private $locale;
 
     /**
-     * @var array
+     * @var Route[]
      */
-    private $routes;
+    private $routes = [];
 
     /**
      * @var string|array|callable
@@ -44,10 +51,10 @@ class Dispatcher {
     /**
      * Dispatcher constructor.
      *
-     * @param Gdn_Locale $locale
+     * @param LocaleInterface $locale
      * @param ContainerInterface $container The container is used to fetch view handlers.
      */
-    public function __construct(Gdn_Locale $locale = null, ContainerInterface $container = null) {
+    public function __construct(LocaleInterface $locale = null, ContainerInterface $container = null) {
         $this->middleware = function (RequestInterface $request): Data {
             return $this->dispatchInternal($request);
         };
@@ -68,6 +75,10 @@ class Dispatcher {
         } else {
             $this->routes[] = $route;
         }
+        uasort($this->routes, function (Route $routeA, Route $routeB) {
+            // Inverted priority sort.
+            return -($routeA->getPriority() <=> $routeB->getPriority());
+        });
         return $this;
     }
 
@@ -139,7 +150,7 @@ class Dispatcher {
                                 Permissions::BAN_CSRF,
                                 [
                                     'msg' => $this->locale->translate('Invalid CSRF token.', 'Invalid CSRF token. Please try again.'),
-                                    'code' => 403
+                                    'code' => 403,
                                 ]
                             );
                         }
@@ -173,6 +184,16 @@ class Dispatcher {
                 // Pass to the next route.
                 continue;
             } catch (\Throwable $dispatchEx) {
+                if ($dispatchEx->getCode() >= 400 && $dispatchEx->getCode() < 500) {
+                    $this->logger->error($dispatchEx->getMessage(), [
+                        "event" => "api_error",
+                        "exception" => $dispatchEx,
+                    ]);
+                } else {
+                    ErrorLogger::error($dispatchEx, ['api_error', 'dispatcher-caught'], [
+                        'responseCode' => $dispatchEx->getCode(),
+                    ]);
+                }
                 $response = null;
                 if (is_object($action ?? null) && $action instanceof Action) {
                     $obj = $action->getCallback()[0] ?? false;
@@ -291,6 +312,9 @@ class Dispatcher {
             }
 
             $data = $raw instanceof \JsonSerializable ? $raw->jsonSerialize() : ['message' => $raw->getMessage()];
+            if (debug() && is_array($data)) {
+                $data['trace'] = $raw->getTrace();
+            }
             $result = new Data($data, $errorCode);
             // Provide stack trace as meta information.
             $result->setMeta('exception', $raw);

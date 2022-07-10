@@ -1,4 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
+use Vanilla\Theme\BoxThemeShim;
 
 $Controller = Gdn::controller();
 $Session = Gdn::session();
@@ -19,8 +20,8 @@ foreach ($Controller->ProfileTabs as $TabCode => $TabInfo) {
         $SortOrder[] = $TabCode;
 }
 ?>
-<div class="BoxFilter BoxProfileFilter">
-    <ul class="FilterMenu">
+<div class="BoxFilter BoxProfileFilter widget-dontUseCssOnMe">
+    <ul class="FilterMenu <?php BoxThemeShim::activeHtml('pageBox') ?>">
         <?php
         // Get sorted filter links
         foreach ($SortOrder as $TabCode) {
@@ -29,7 +30,7 @@ foreach ($Controller->ProfileTabs as $TabCode => $TabInfo) {
             if (array_key_exists($TabCode, $Controller->ProfileTabs)) {
                 $TabInfo = val($TabCode, $Controller->ProfileTabs, []);
                 $CssClass .= val('CssClass', $TabInfo, '');
-                echo '<li'.($CssClass == '' ? '' : ' class="'.$CssClass.'"').'>'.anchor(val('TabHtml', $TabInfo, $TabCode), val('TabUrl', $TabInfo))."</li>\r\n";
+                echo '<li class="' . ($CssClass == '' ? '' : $CssClass).'">'.anchor(val('TabHtml', $TabInfo, $TabCode), val('TabUrl', $TabInfo))."</li>\r\n";
             }
         }
         ?>

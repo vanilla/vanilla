@@ -4,13 +4,18 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { PropsWithChildren } from "react";
 import { currentThemeClasses } from "./currentThemeStyles";
-import DateTime from "@library/content/DateTime";
 import { ThemePreviewTitle } from "@library/theming/ThemePreviewTitle";
 import { ITheme } from "@library/theming/themeReducer";
 import { t } from "@vanilla/i18n";
+import DateTime from "@library/content/DateTime";
+import { cx } from "@emotion/css";
 
+export function Flag(props: PropsWithChildren<{ className?: string }>) {
+    const classes = currentThemeClasses();
+    return <div className={cx(classes.flag, props.className)}>{props.children ?? t("Current")}</div>;
+}
 export interface IThemeInfo {
     [key: string]: {
         type: string;
@@ -33,7 +38,7 @@ export default function CurrentThemeInfo(props: IProps) {
         <React.Fragment>
             <section className={classes.themeContainer}>
                 <div className={classes.themeInfo}>
-                    <div className={classes.flag}>{t("Current Theme")}</div>
+                    <Flag>{t("Current Theme")}</Flag>
                     <div className={classes.name}>
                         <ThemePreviewTitle theme={props.theme} />
                     </div>
@@ -42,7 +47,7 @@ export default function CurrentThemeInfo(props: IProps) {
                             <div key={i} className={classes.description}>
                                 <p>
                                     <strong>{key === "Description" ? "" : `${key}:`}</strong>{" "}
-                                    {value.type === "date" ? <DateTime timestamp={value.info} /> : value.info}
+                                    {value.type === "date" ? <DateTime timestamp={value.value} /> : value.value}
                                 </p>
                             </div>
                         ))}

@@ -9,6 +9,9 @@
  */
 
 use Vanilla\Contracts\Site\SiteSectionInterface;
+use Vanilla\Formatting\Formats\HtmlFormat;
+use Vanilla\Formatting\Html\HtmlSanitizer;
+use Vanilla\Site\DefaultSiteSection;
 use Vanilla\Site\SiteSectionModel;
 
 /**
@@ -101,7 +104,7 @@ class CategoriesController extends VanillaController {
         Gdn_Theme::section(val('CssClass', $category));
         Gdn_Theme::section('DiscussionList');
 
-        $this->title(htmlspecialchars(val('Name', $category, '')));
+        $this->title(Gdn::formatService()->renderPlainText(val('Name', $category, ''), HtmlFormat::FORMAT_KEY));
         $this->description(sprintf(t("Archives for %s"), gmdate('F Y', strtotime($from))), true);
         $this->addJsFile('discussions.js');
         $this->Head->addTag('meta', ['name' => 'robots', 'content' => 'noindex']);
@@ -176,13 +179,6 @@ class CategoriesController extends VanillaController {
             throw new InvalidArgumentException('Filter IDs must be in an array.');
         }
 
-        $perPage = c('Vanilla.Categories.PerPage', 30);
-        $page = Gdn::request()->get(
-            'Page',
-            Gdn::request()->get('page', null)
-        );
-        list($offset, $limit) = offsetLimit($page, $perPage);
-
         $where = ['Followed' => true];
 
         if (!empty($filterIDs)) {
@@ -190,7 +186,7 @@ class CategoriesController extends VanillaController {
         }
 
         $result = $this->CategoryModel
-            ->getWhere($where, '', 'asc', $limit, $offset)
+            ->getWhere($where, '', 'asc')
             ->resultArray();
         $result = $this->CategoryModel->flattenCategories($result);
 
@@ -198,7 +194,7 @@ class CategoriesController extends VanillaController {
             $this->CategoryModel->joinRecent($result);
         }
 
-        $this->setData('_Limit', $perPage);
+        $this->setData('_Limit', count($result));
         $this->setData('_CurrentRecords', count($result));
 
         return $result;
@@ -252,6 +248,24 @@ class CategoriesController extends VanillaController {
         return $cdd->toArray();
     }
 
+    /**
+     * Switch params if page is provided as category slug
+     *
+     * @param string $categoryIdentifier
+     * @param string $page
+     * @return array
+     */
+    private function validatePagination(string $categoryIdentifier, string $page) {
+        if ($page === '0' && preg_match('/^p\d+$/', $categoryIdentifier)) {
+            // Just double check that it is not a category slug
+            $category = CategoryModel::categories($categoryIdentifier);
+            if (empty($category)) {
+                $page = $categoryIdentifier;
+                $categoryIdentifier = '';
+            }
+        }
+        return [$categoryIdentifier, $page];
+    }
 
     /**
      * Show all discussions in a particular category.
@@ -263,10 +277,13 @@ class CategoriesController extends VanillaController {
      * @param int $offset Number of discussions to skip.
      */
     public function index($categoryIdentifier = '', $page = '0') {
+        [$categoryIdentifier, $page] = $this->validatePagination($categoryIdentifier, $page);
         if (!$categoryIdentifier) {
             /** @var SiteSectionInterface $siteSection */
             $siteSection = Gdn::getContainer()->get(SiteSectionModel::class)->getCurrentSiteSection();
-            $categoryIdentifier = $siteSection->getAttributes()['CategoryID'] ?? '';
+            if (!($siteSection instanceof DefaultSiteSection)) {
+                $categoryIdentifier = $siteSection->getAttributes()['categoryID'] ?? '';
+            }
         }
 
         // Figure out which category layout to choose (Defined on "Homepage" settings page).
@@ -275,24 +292,26 @@ class CategoriesController extends VanillaController {
         if ($this->CategoryModel->followingEnabled()) {
             // Only use the following filter on the root category level.
             $this->enableFollowingFilter = $categoryIdentifier === '';
-            $this->fireEvent('EnableFollowingFilter', [
-                'CategoryIdentifier' => $categoryIdentifier,
-                'EnableFollowingFilter' => &$this->enableFollowingFilter
-            ]);
-
             $saveFollowing = Gdn::request()->get('save') && Gdn::session()->validateTransientKey(Gdn::request()->get('TransientKey', ''));
-            $followed = paramPreference(
+            // Only filter categories by "following" on the root category level.
+            $this->followed = $categoryIdentifier !== '' ? false : paramPreference(
                 'followed',
                 'FollowedCategories',
                 'Vanilla.SaveFollowingPreference',
                 null,
                 $saveFollowing
             );
+            $this->fireEvent('EnableFollowingFilter', [
+                'CategoryIdentifier' => $categoryIdentifier,
+                'EnableFollowingFilter' => &$this->enableFollowingFilter,
+                'Followed' => &$this->followed,
+                'SaveFollowing' => $saveFollowing
+            ]);
         } else {
-            $this->enableFollowingFilter = $followed = false;
+            $this->enableFollowingFilter = $this->followed = false;
         }
         $this->setData('EnableFollowingFilter', $this->enableFollowingFilter);
-        $this->setData('Followed', $followed);
+        $this->setData('Followed', $this->followed);
 
         if ($categoryIdentifier == '') {
             switch ($layout) {
@@ -310,12 +329,18 @@ class CategoriesController extends VanillaController {
             }
             return;
         } else {
+            CategoryModel::instance()->setJoinUserCategory(true);
             $category = CategoryModel::categories($categoryIdentifier);
 
             if (empty($category)) {
                 throw notFoundException();
             }
             $category = (object)$category;
+
+            // Check for Root Category.
+            if ($category->CategoryID === -1) {
+                redirectTo('/categories');
+            }
 
             // Check permission
             $this->permission('Vanilla.Discussions.View', true, 'Category', val('PermissionCategoryID', $category));
@@ -327,8 +352,9 @@ class CategoriesController extends VanillaController {
 
             $this->setData('Category', $category, true);
 
-            $this->title(htmlspecialchars(val('Name', $category, '')));
-            $this->description(val('Description', $category), true);
+            $this->title(Gdn::formatService()->renderPlainText(val('Name', $category, ''), HtmlFormat::FORMAT_KEY));
+
+            $this->description(val('Description', $category), false);
 
             switch ($category->DisplayAs) {
                 case 'Flat':
@@ -452,8 +478,8 @@ class CategoriesController extends VanillaController {
 
             // We don't wan't child categories in announcements.
             $wheres['d.CategoryID'] = $categoryID;
-            $announceData = $discussionModel->getAnnouncements($wheres, $offset, $limit);
-            $this->AnnounceData = $this->setData('Announcements', $announceData);
+            $announceData = $offset == 0 ? $discussionModel->getAnnouncements($wheres) : false;
+            $this->AnnounceData = $this->setData('Announcements', $announceData !== false ? $announceData : [], true);
             $wheres['d.CategoryID'] = $categoryIDs;
 
             // RSS should include announcements.
@@ -522,7 +548,7 @@ class CategoriesController extends VanillaController {
         // Setup head.
         $this->Menu->highlightRoute('/discussions');
         if (!$this->title()) {
-            $Title = c('Garden.HomepageTitle');
+            $Title = Gdn::formatService()->renderPlainText(c('Garden.HomepageTitle'), HtmlFormat::FORMAT_KEY);
             if ($Title) {
                 $this->title($Title, '');
             } else {
@@ -532,7 +558,7 @@ class CategoriesController extends VanillaController {
         Gdn_Theme::section('CategoryList');
 
         if (!$Category) {
-            $this->description(c('Garden.Description', null));
+            $this->description(Gdn::formatService()->renderPlainText(c('Garden.Description', ''), HtmlFormat::FORMAT_KEY));
         }
 
         $this->setData('Breadcrumbs', CategoryModel::getAncestors(val('CategoryID', $this->data('Category'))));
@@ -586,6 +612,7 @@ class CategoriesController extends VanillaController {
         $this->addModule('NewDiscussionModule');
         $this->addModule('DiscussionFilterModule');
         $this->addModule('BookmarkedModule');
+        $this->addModule('CategoriesModule');
         $this->addModule($CategoryFollowToggleModule);
         $this->addModule('TagModule');
 
@@ -616,7 +643,7 @@ class CategoriesController extends VanillaController {
         $this->Menu->highlightRoute('/discussions');
 
         if (!$this->title()) {
-            $Title = c('Garden.HomepageTitle');
+            $Title = Gdn::formatService()->renderPlainText(c('Garden.HomepageTitle'), HtmlFormat::FORMAT_KEY);
             if ($Title) {
                 $this->title($Title, '');
             } else {
@@ -625,7 +652,7 @@ class CategoriesController extends VanillaController {
         }
 
         if (!$Category) {
-            $this->description(c('Garden.Description', null));
+            $this->description(Gdn::formatService()->renderPlainText(c('Garden.Description', ''), HtmlFormat::FORMAT_KEY));
         }
 
         Gdn_Theme::section('CategoryDiscussionList');
@@ -659,15 +686,31 @@ class CategoriesController extends VanillaController {
         $this->setData('Filters', $DiscussionModel->getFilters());
 
         $this->CategoryDiscussionData = [];
+        $this->CategoryAnnounceData = [];
         $Discussions = [];
 
         foreach ($this->CategoryData->result() as $Category) {
-            if ($Category->CategoryID > 0 && $Category->CountDiscussions > 0) {
-                $this->CategoryDiscussionData[$Category->CategoryID] = $DiscussionModel->get(0, $this->DiscussionsPerCategory, ['d.CategoryID' => $Category->CategoryID, 'Announce' => 'all']);
+            $iD = $Category->CategoryID;
+            if ($iD > 0 && $Category->CountDiscussions > 0) {
+                $announcements = $DiscussionModel->getAnnouncements(
+                    ['d.CategoryID' => $iD],
+                    0,
+                    $this->DiscussionsPerCategory
+                );
+                $this->CategoryAnnounceData[$iD] = $announcements;
+                $newLimit = $this->DiscussionsPerCategory - count($announcements->result());
+
+                $this->CategoryDiscussionData[$iD] = $newLimit > 0 ?
+                    $DiscussionModel->getWhereRecent(['d.CategoryID' => $iD, 'd.Announce' => 0], $newLimit) :
+                    new Gdn_DataSet();
+
+                $categoryDiscussions = $announcements->resultObject();
+                $discussionsToAdd = $this->CategoryDiscussionData[$iD]->resultObject();
+                $categoryDiscussions = array_merge($categoryDiscussions, $discussionsToAdd);
 
                 $Discussions = array_merge(
                     $Discussions,
-                    $this->CategoryDiscussionData[$Category->CategoryID]->resultObject()
+                    $categoryDiscussions
                 );
             }
         }
@@ -719,7 +762,7 @@ class CategoriesController extends VanillaController {
      */
     public function initialize() {
         parent::initialize();
-        if (!c('Vanilla.Categories.Use')) {
+        if (!c('Vanilla.Categories.Use', true)) {
             redirectTo('/discussions');
         }
         if ($this->Menu) {

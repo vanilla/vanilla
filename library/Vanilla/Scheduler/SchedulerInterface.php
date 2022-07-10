@@ -1,12 +1,14 @@
 <?php
 /**
  * @author Eduardo Garcia Julia <eduardo.garciajulia@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace Vanilla\Scheduler;
 
+use Vanilla\Scheduler\Descriptor\JobDescriptorInterface;
+use Vanilla\Scheduler\Job\JobExecutionType;
 use Vanilla\Scheduler\Job\JobPriority;
 
 /**
@@ -68,6 +70,45 @@ interface SchedulerInterface {
      * @param int|null $delay
      *
      * @return TrackingSlipInterface
+     * @deprecated Please use `addJobDescriptor`
+     *
      */
-    public function addJob(string $jobType, $message = [], JobPriority $jobPriority = null, int $delay = null): TrackingSlipInterface;
+    public function addJob(
+        string $jobType,
+        $message = [],
+        JobPriority $jobPriority = null,
+        int $delay = null
+    ): TrackingSlipInterface;
+
+    /**
+     * Add a job to be scheduled using a Job Descriptor
+     *
+     * @param JobDescriptorInterface $jobDescriptor
+     * @return TrackingSlipInterface
+     */
+    public function addJobDescriptor(JobDescriptorInterface $jobDescriptor): TrackingSlipInterface;
+
+    /**
+     * Set the Execution Type
+     *
+     * @param JobExecutionType $executionType
+     */
+    public function setExecutionType(JobExecutionType $executionType): void;
+
+    /**
+     * Whether or not to finalize the request and flush output buffers.
+     *
+     * In a web request, you probably want to flush buffers,
+     * however in other environments, it's best not to flush buffers you didn't start.
+     *
+     * @return bool
+     */
+    public function getFinalizeRequest(): bool;
+
+    /**
+     * Set the finalize request flag.
+     *
+     * @param bool $finalizeRequest
+     */
+    public function setFinalizeRequest(bool $finalizeRequest): void;
 }

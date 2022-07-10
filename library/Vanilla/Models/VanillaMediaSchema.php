@@ -31,6 +31,14 @@ class VanillaMediaSchema extends Schema {
             // Images only.
             'width:i|n?', // Image width
             'height:i|n?', // Image height
+            'displaySize:s?' => [ // Image display size "large" | "medium" | "small"
+                'default' => 'large',
+                'enum' => ['large', 'medium', 'small']
+            ],
+            'float:s?' => [ // Image float "left" | "right"
+                'default' => 'none',
+                'enum' => ['none', 'left', 'right']
+            ],
         ];
 
         if ($withDbFields) {
@@ -47,6 +55,25 @@ class VanillaMediaSchema extends Schema {
         }
 
         parent::__construct($this->parseInternal($fields));
+    }
+
+    /**
+     * Returns the default display size of an image according to it's width.
+     * Small images will be less than 200px wide;
+     * Medium images will be less than 400px wide;
+     * Images are large by default.
+     *
+     * @param int $imageWidth
+     * @return string
+     */
+    public static function getDefaultDisplaySize(int $imageWidth): string {
+        if ($imageWidth <= 200) {
+            return "small";
+        } elseif ($imageWidth <= 400) {
+            return "medium";
+        } else {
+            return "large";
+        }
     }
 
     /**
@@ -70,6 +97,11 @@ class VanillaMediaSchema extends Schema {
             }
         } else {
             $row['url'] = null;
+        }
+
+        // Determine the default displaySize of the image from it's size.
+        if (!array_key_exists('displaySize', $row) && array_key_exists('width', $row)) {
+            $row['displaySize'] = self::getDefaultDisplaySize($row['width']);
         }
 
         $schemaRecord = ApiUtils::convertOutputKeys($row);

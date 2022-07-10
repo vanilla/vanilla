@@ -31,6 +31,8 @@ $quickSearch-hover_bg:                   $button-primary-hover_bg !default;
 $quickSearch-hover_fg:                   $button-primary-hover_fg !default;
 $quickSearch-hover_borderColor:          $button-primary-hover_border !default;
 
+$xs_breakpoint:                          320px;
+
 /* -------------------------------------------------------------- *\
     Styles
 \* -------------------------------------------------------------- */
@@ -86,6 +88,12 @@ $quickSearch-hover_borderColor:          $button-primary-hover_border !default;
 .PagerWrap {
     margin: 0;
     float: right;
+
+        @media (max-width: #{$xs_breakpoint}) {
+           float: none;
+        }
+
+
 }
 
 .PagerNub {
@@ -93,7 +101,9 @@ $quickSearch-hover_borderColor:          $button-primary-hover_border !default;
 }
 
 .CommentHeading {
-    float: left;
+    @if $staticVariables {
+        float: left;
+    }
     min-height: $pager_height;
     display: flex;
     align-items: center;
@@ -102,6 +112,9 @@ $quickSearch-hover_borderColor:          $button-primary-hover_border !default;
 
 .BeforeCommentHeading {
     margin-bottom: $global-block_margin;
+    @media (max-width: #{$xs_breakpoint}) {
+        float: none;
+     }
 }
 
 .PageControls {
@@ -199,14 +212,16 @@ a.MoreWrap,
         }
     }
 
-    > a.Highlight,
-    > a.Highlight:focus,
-    > a.Highlight:hover {
-        position: relative;
-        z-index: 1;
-        background: $pager-highlight_bg;
-        border: 1px solid $pager-highlight-border;
-        color: $pager-highlight_color;
+    @if($staticVariables) {
+        > a.Highlight,
+        > a.Highlight:focus,
+        > a.Highlight:hover {
+            position: relative;
+            z-index: 1;
+            background: $pager-highlight_bg;
+            border: 1px solid $pager-highlight-border;
+            color: $pager-highlight_color;
+        }
     }
 
     > a.Ellipsis {
@@ -335,7 +350,8 @@ a.MoreWrap,
     }
 
     .BoxNewConversation,
-    .BoxNewDiscussion {
+    .BoxNewDiscussion,
+    .QuickSearch {
         display: none;
     }
 
@@ -350,8 +366,10 @@ a.MoreWrap,
         float: none;
         height: #{$pager_height + 2px};
 
-        @include maxWidth {
-            margin: 0;
+        @if $staticVariables {
+            @include maxWidth {
+                margin: 0;
+            }
         }
     }
 }

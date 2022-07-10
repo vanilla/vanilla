@@ -7,54 +7,18 @@
 
 namespace VanillaTests;
 
-use Gdn;
-use PHPUnit\Framework\TestCase;
-use PHPUnit\Runner\Exception;
 use Garden\Container\Container;
-
 
 /**
  * Class SharedBootstrapTestCase.
+ *
+ * @deprecated Use the `BootstrapTestCase` instead.
  */
-class SharedBootstrapTestCase extends TestCase {
-
-    use BootstrapTrait {
-        setUpBeforeClass as bootstrapSetupBeforeClass;
-        teardownAfterClass as bootstrapTeardownAfterClass;
-    }
-
-    /**
-     * Bootstrap the first test cases and reuse the same container/bootstrap for subsequent test cases.
-     */
-    public static function setUpBeforeClass(): void {
-        /** @var Container $currentContainer */
-        $currentContainer = Gdn::getContainer();
-
-        $containerCorruption = false;
-
-        if (self::$container === null) {
-            if (!self::containerIsNull($currentContainer)) {
-                $containerCorruption = true;
-            } else {
-                self::bootstrapSetupBeforeClass();
-            }
-        } else {
-            if (!self::containerIsNull($currentContainer) && $currentContainer !== self::$container) {
-                $containerCorruption = true;
-            } else {
-                self::bootstrap()->setGlobals(self::$container);
-            }
-        }
-
-        if ($containerCorruption) {
-            throw new Exception('A container has not been properly cleaned by a previous test!');
-        }
-    }
-
+class SharedBootstrapTestCase extends BootstrapTestCase {
     /**
      * Whether or not the container is "null".
      *
-     * @param $container
+     * @param ?Container $container
      *
      * @return bool
      */
@@ -67,13 +31,5 @@ class SharedBootstrapTestCase extends TestCase {
      */
     protected static function getBootstrapFolderName() {
         return 'sharedbootstrap';
-    }
-
-    /**
-     * Cleanup the container after testing is done.
-     */
-    public static function tearDownAfterClass(): void {
-        Bootstrap::cleanUpGlobals();
-        self::bootstrapTeardownAfterClass();
     }
 }

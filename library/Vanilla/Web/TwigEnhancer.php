@@ -18,6 +18,7 @@ use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\LocaleInterface;
 use Vanilla\Dashboard\Models\BannerImageModel;
 use Vanilla\FeatureFlagHelper;
+use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\HtmlUtils;
 
 /**
@@ -107,10 +108,14 @@ class TwigEnhancer {
      */
     public function enhanceEnvironment(\Twig\Environment $twig) {
         foreach ($this->getFunctionMappings() as $key => $callable) {
-            if (is_int($key) && is_string($callable)) {
-                $key = $callable;
+            if (is_object($callable) && $callable instanceof TwigFunction) {
+                $twig->addFunction($callable);
+            } else {
+                if (is_int($key) && is_string($callable)) {
+                    $key = $callable;
+                }
+                $twig->addFunction(new TwigFunction($key, $callable));
             }
-            $twig->addFunction(new TwigFunction($key, $callable));
         }
     }
 
@@ -128,6 +133,7 @@ class TwigEnhancer {
     public function enhanceFileSystem(FilesystemLoader $loader) {
         $addons = $this->addonManager->getEnabled();
         $loader->addPath(PATH_ROOT . '/resources/views', 'resources');
+        $loader->addPath(PATH_ROOT . "/library", "library");
 
         foreach ($addons as $addon) {
             $viewDirectory = PATH_ROOT . $addon->getSubdir() . '/views';
@@ -147,9 +153,12 @@ class TwigEnhancer {
      */
     public function fireEchoEvent(string $eventName, array &$args = []): \Twig\Markup {
         ob_start();
-        $this->eventManager->fire($eventName, $args);
-        $echoedOutput = ob_get_contents();
-        ob_end_clean();
+        try {
+            $this->eventManager->fire($eventName, $args);
+            $echoedOutput = ob_get_contents();
+        } finally {
+            ob_end_clean();
+        }
         return new \Twig\Markup($echoedOutput, 'utf-8');
     }
 
@@ -166,12 +175,15 @@ class TwigEnhancer {
      */
     public function firePluggableEchoEvent(\Gdn_Pluggable $pluggable, string $eventName, array &$args = [], string $fireAs = ''): \Twig\Markup {
         ob_start();
-        if ($fireAs  !== '') {
-            $pluggable->fireAs($fireAs);
+        try {
+            if ($fireAs  !== '') {
+                $pluggable->fireAs($fireAs);
+            }
+            $pluggable->fireEvent($eventName, $args);
+            $echoedOutput = ob_get_contents();
+        } finally {
+            ob_end_clean();
         }
-        $pluggable->fireEvent($eventName, $args);
-        $echoedOutput = ob_get_contents();
-        ob_end_clean();
         return new \Twig\Markup($echoedOutput, 'utf-8');
     }
 
@@ -196,7 +208,11 @@ class TwigEnhancer {
      */
     public function renderControllerAsset(string $assetName): \Twig\Markup {
         $controller = Gdn::controller();
-        return $controller->renderAssetForTwig($assetName);
+        if (!$controller) {
+            return new \Twig\Markup("Could not render an asset without a Gdn_Controller instance", "utf-8");
+        }
+        $result = $controller->renderAssetForTwig($assetName);
+        return $result;
     }
 
     /**
@@ -250,14 +266,24 @@ class TwigEnhancer {
      * Check if a user has a permission or one of a group of permissions.
      *
      * @param string $permissionName The permission name.
+     * @param int|null $id The permission ID.
      *
      * @return bool
      */
-    public function hasPermission(string $permissionName): bool {
-        if (!key_exists($permissionName, $this->permissionCache)) {
-            $this->permissionCache[$permissionName] = $this->session->checkPermission($permissionName);
+    public function hasPermission(string $permissionName, $id = null): bool {
+        $key = "$permissionName-$id";
+        if (!array_key_exists($key, $this->permissionCache)) {
+            if (!empty($id) && is_numeric($id) || is_string($id)) {
+                $category = \CategoryModel::categories($id);
+
+                // Handle checking categories with the permissionCategoryID.
+                $has = \CategoryModel::checkPermission($category, $permissionName, false);
+            } else {
+                $has = $this->session->checkPermission($permissionName, false, '', $id);
+            }
+            $this->permissionCache[$key] = $has;
         }
-        return $this->permissionCache[$permissionName];
+        return $this->permissionCache[$key];
     }
 
     /**
@@ -304,6 +330,11 @@ class TwigEnhancer {
             // Utility`
             'sanitizeUrl' => [\Gdn_Format::class, 'sanitizeUrl'],
             'classNames' => [HtmlUtils::class, 'classNames'],
+            'renderHtml' => new TwigFunction('renderHtml', function (?string $body, ?string $format = null) {
+                return Gdn::formatService()->renderHTML((string)$body, $format);
+            }, ['is_safe' => ['html']]),
+            'isArray' => [ArrayUtils::class, 'isArray'],
+            'isAssociativeArray' => [ArrayUtils::class, 'isAssociative'],
 
             // Application interaction.
             'renderControllerAsset' => [$this, 'renderControllerAsset'],
@@ -318,11 +349,11 @@ class TwigEnhancer {
             // Session
             'hasPermission' => [$this, 'hasPermission'],
             'inSection' => [\Gdn_Theme::class, 'inSection'],
+            'isSignedIn' => [$this->session, 'isValid'],
 
             // Routing.
             'assetUrl' => [$this, 'assetUrl'],
             'url' => [$this->request, 'url'],
         ];
     }
-
 }

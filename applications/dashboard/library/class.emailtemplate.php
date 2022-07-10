@@ -427,6 +427,24 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
     }
 
     /**
+     * Get the URL for the button.
+     *
+     * @return string
+     */
+    public function getButtonUrl(): string {
+        return html_entity_decode($this->button['url'] ?? '');
+    }
+
+    /**
+     * Get the text of the button.
+     *
+     * @return string
+     */
+    public function getButtonText(): string {
+        return html_entity_decode($this->button['text'] ?? '');
+    }
+
+    /**
      * Remove the button.
      *
      * @return EmailTemplate $this The calling object.

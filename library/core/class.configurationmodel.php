@@ -124,23 +124,34 @@ class Gdn_ConfigurationModel {
      * from the form in the $_POST or $_GET collection.
      */
     public function save($formPostValues, $live = false) {
+        $config = \Gdn::config();
         // Fudge your way through the schema application. This will allow me to
         // force the validation object to expect the fieldnames contained in
         // $this->Data.
-        $this->Validation->setSchema($this->Data);
+        $schema = [];
+        foreach ($this->Data as $property => $value) {
+            $schema[$property] = [
+                'AutoIncrement' => false,
+                'AllowNull' => true,
+                'Type' => is_array($value) ? 'array' : 'text',
+                'Length' => ''
+            ];
+        }
+
+        $this->Validation->setSchema($schema);
         // Validate the form posted values
         if ($this->Validation->validate($formPostValues)) {
             // Merge the validation fields and the forced settings into a single array
             $settings = $this->Validation->validationFields();
             if (is_array($this->_ForceSettings)) {
-                $settings = mergeArrays($settings, $this->_ForceSettings);
+                $settings = array_merge_recursive($settings, $this->_ForceSettings);
             }
 
-            $saveResults = saveToConfig($settings);
+            $saveResults = $config->saveToConfig($settings);
 
             // If the Live flag is true, set these in memory too
             if ($saveResults && $live) {
-                Gdn::config()->set($settings, true);
+                $config->set($settings, true);
             }
 
             return $saveResults;

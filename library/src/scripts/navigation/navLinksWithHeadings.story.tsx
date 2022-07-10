@@ -9,16 +9,16 @@ import { navLinksWithHeadingsData } from "@library/navigation/navLinksWithHeadin
 import { t } from "@library/utility/appUtils";
 import React from "react";
 import { NavLinksPlaceholder } from "@library/navigation/NavLinksPlaceholder";
+import { storyWithConfig } from "@library/storybook/StoryContext";
 
 export default {
-    title: "NavLinksWithHeadings",
+    title: "Navigation/NavLinksWithHeadings",
+    includeStories: ["StandardNavLinksStory", "ThreeColumnsNavLinksStory", "Placeholder"],
 };
 
-export function StandardNavLinksStory() {
+export function StoryNavLinks() {
     return (
         <NavLinksWithHeadingsComponent
-            title={t("Browse Articles by Category")}
-            accessibleViewAllMessage={t(`View all articles from category: "<0/>".`)}
             {...navLinksWithHeadingsData}
             depth={2}
             ungroupedTitle={t("Other Articles")}
@@ -26,9 +26,49 @@ export function StandardNavLinksStory() {
         />
     );
 }
-StandardNavLinksStory.story = {
-    name: "Standard",
+
+export const StandardNavLinksStory = storyWithConfig({}, StoryNavLinks);
+StandardNavLinksStory.storyName = "Standard";
+
+const global = {
+    mainColors: {
+        primary: "#038FF4",
+        fg: "#6B829B",
+    },
 };
+
+export const ThreeColumnsNavLinksStory = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: {
+            navLinks: {
+                columns: {
+                    desktop: 3,
+                },
+                separator: {
+                    hidden: true,
+                },
+                link: {
+                    fg: global.mainColors.primary,
+                    fontWeight: 600,
+                },
+                title: {
+                    font: {
+                        color: global.mainColors.fg,
+                    },
+                },
+                viewAll: {
+                    color: global.mainColors.primary,
+                    fontWeight: 600,
+                    icon: true,
+                },
+            },
+        },
+    },
+    StoryNavLinks,
+);
+
+ThreeColumnsNavLinksStory.storyName = "Three Columns Hidden Hr Tag";
 
 export function Placeholder() {
     return <NavLinksPlaceholder title="Navigation Placeholder" showTitle />;

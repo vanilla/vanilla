@@ -176,12 +176,10 @@ class StubContentPlugin extends Gdn_Plugin {
 
             // If no receipt, add record
             if (!$record['receipt']) {
-
                 $record = $this->insertContent($content);
 
             // Otherwise, perhaps update
-            } else if ($record['row']) {
-
+            } else {
                 // Update if locale mismatch
                 $stubLocale = valr('Attributes.StubLocale', $record['row']);
                 if ($stubLocale != $activeLocale) {
@@ -225,6 +223,7 @@ class StubContentPlugin extends Gdn_Plugin {
                         'Photo'             => $content['photo'],
                         'Password'          => betterRandomString(24),
                         'HashMethod'        => 'Random',
+                        'Verified' => true,
                         'RoleID'            => [
                             $role['RoleID']
                         ],

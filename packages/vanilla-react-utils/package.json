@@ -2,7 +2,8 @@
     "name": "@vanilla/react-utils",
     "main": "./src/index.ts",
     "module": "./src/index.ts",
-    "version": "3.0.1",
+    "version": "3.0.2",
+    "license": "gpl-2.0-only",
     "dependencies": {
         "@vanilla/dom-utils": "^3.0.1",
         "lodash": "^4.17.11",
@@ -10,8 +11,7 @@
     },
     "peerDependencies": {
         "react": "^16.0.0",
-        "react-dom": "^16.0.0",
-        "typestyle": "^2.0.1"
+        "react-dom": "^16.0.0"
     },
     "devDependencies": {
         "@vanilla/tsconfig": "^3.0.1"

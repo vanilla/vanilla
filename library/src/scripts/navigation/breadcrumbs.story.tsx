@@ -10,34 +10,61 @@ import { StoryHeading } from "@library/storybook/StoryHeading";
 import Breadcrumbs from "@library/navigation/Breadcrumbs";
 import { CategoryIcon } from "@library/icons/common";
 import LocationBreadcrumbs from "@library/navigation/LocationBreadcrumbs";
+import { storyWithConfig } from "@library/storybook/StoryContext";
+import { STORY_CRUMBS } from "@library/storybook/storyData";
 
-const story = storiesOf("Navigation", module);
+export default {
+    title: "Navigation/Breadcrumbs",
+};
 
-story.add("Breadcrumbs", () => {
-    return (
+export const Defaults = storyWithConfig(
+    {
+        themeVars: {
+            breadcrumbs: {
+                link: {
+                    font: {
+                        size: "14px",
+                    },
+                },
+                separator: {
+                    font: {
+                        size: "14px",
+                    },
+                },
+            },
+        },
+    },
+    () => (
         <>
             <StoryHeading depth={1}>Breadcrumbs</StoryHeading>
             <StoryHeading>Standard</StoryHeading>
-            <Breadcrumbs forceDisplay={true}>
-                {[
-                    { name: "Success", url: "https://dev.vanilla.localhost/en-hutch/kb/success" },
-                    {
-                        name: "Appearance (Theming)",
-                        url: "https://dev.vanilla.localhost/en-hutch/kb/categories/37-appearance-theming",
-                    },
-                ]}
-            </Breadcrumbs>
+            <Breadcrumbs forceDisplay={true}>{STORY_CRUMBS}</Breadcrumbs>
             <StoryHeading>Location (Used in the location picker)</StoryHeading>
-            <LocationBreadcrumbs
-                locationData={[
-                    { name: "Success", url: "https://dev.vanilla.localhost/en-hutch/kb/success" },
-                    {
-                        name: "Appearance (Theming)",
-                        url: "https://dev.vanilla.localhost/en-hutch/kb/categories/37-appearance-theming",
-                    },
-                ]}
-                icon={<CategoryIcon className={"pageLocation-icon"} />}
-            />
+            <LocationBreadcrumbs locationData={STORY_CRUMBS} icon={<CategoryIcon className={"pageLocation-icon"} />} />
         </>
-    );
-});
+    ),
+);
+
+export const Theme = storyWithConfig(
+    {
+        themeVars: {
+            breadcrumbs: {
+                link: {
+                    font: {
+                        size: "16px",
+                        lineHeight: "24px",
+                        color: "#767676",
+                        transform: "capitalize",
+                    },
+                },
+                separator: {
+                    spacing: "28px",
+                    font: {
+                        size: "28px",
+                    },
+                },
+            },
+        },
+    },
+    () => <Breadcrumbs forceDisplay={true}>{STORY_CRUMBS}</Breadcrumbs>,
+);

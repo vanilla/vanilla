@@ -1,8 +1,12 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php use Vanilla\Theme\BoxThemeShim;
+
+if (!defined('APPLICATION')) exit();
 
 echo '<div class="DataListWrap">';
+BoxThemeShim::startHeading();
 echo '<h2 class="H">'.t('Comments').'</h2>';
-echo '<ul class="DataList Comments">';
+BoxThemeShim::endHeading();
+echo '<ul class="DataList Comments pageBox">';
 
 if (sizeof($this->data('Comments'))) {
     echo $this->fetchView('profilecomments', 'Discussion', 'Vanilla');

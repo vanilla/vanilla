@@ -10,6 +10,7 @@ use Garden\Schema\Schema;
 use Vanilla\EmbeddedContent\AbstractEmbed;
 use Vanilla\EmbeddedContent\EmbedUtils;
 use Vanilla\Models\VanillaMediaSchema;
+use Vanilla\Utility\ArrayUtils;
 
 /**
  * Image data object.

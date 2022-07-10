@@ -2,7 +2,7 @@
 /**
  * Spam model.
  *
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Dashboard
  * @since 2.0
@@ -47,6 +47,7 @@ class SpamModel extends Gdn_Pluggable {
 
     /**
      * Check whether or not the record is spam.
+     *
      * @param string $recordType By default, this should be one of the following:
      *  - Comment: A comment.
      *  - Discussion: A discussion.
@@ -54,19 +55,32 @@ class SpamModel extends Gdn_Pluggable {
      * @param array $data The record data.
      * @param array $options Options for fine-tuning this method call.
      *  - Log: Log the record if it is found to be spam.
+     *  - Operation: The log operation to use.
+     * @return bool Returns **true** if the record is spam or **false** otherwise.
      */
     public static function isSpam($recordType, $data, $options = []) {
         if (self::$Disabled) {
             return false;
         }
 
+        $options += [
+            'Log' => true,
+            'Operation' => LogModel::TYPE_SPAM,
+        ];
+
         // Set some information about the user in the data.
         if ($recordType == 'Registration') {
             touchValue('Username', $data, $data['Name']);
         } else {
-            touchValue('InsertUserID', $data, Gdn::session()->UserID);
+            $data += ['InsertUserID' => Gdn::session()->UserID];
 
-            $user = Gdn::userModel()->getID(val('InsertUserID', $data), DATASET_TYPE_ARRAY);
+            // Check moderation permissions for the user in session.
+            if (Gdn::session()->getPermissions()->hasRanked('Garden.Moderation.Manage')) {
+                // The user has moderation permissions and isn't a spammer.
+                return false;
+            }
+
+            $user = Gdn::userModel()->getID($data['InsertUserID'], DATASET_TYPE_ARRAY);
 
             if ($user) {
                 $verified = val('Verified', $user);
@@ -76,9 +90,11 @@ class SpamModel extends Gdn_Pluggable {
                     // The user has been verified or is an admin and isn't a spammer.
                     return false;
                 }
-                touchValue('Username', $data, $user['Name']);
-                touchValue('Email', $data, $user['Email']);
-                touchValue('IPAddress', $data, $user['LastIPAddress']);
+                $data += [
+                    'Username' => $user['Name'],
+                    'Email' => $user['Email'],
+                    'IPAddress' => $user['LastIPAddress'],
+                ];
             }
         }
 
@@ -102,7 +118,7 @@ class SpamModel extends Gdn_Pluggable {
         $spam = $sp->EventArguments['IsSpam'];
 
         // Log the spam entry.
-        if ($spam && val('Log', $options, true)) {
+        if ($spam && $options['Log']) {
             // Make sure all IP addresses are packed before insertion
             $data = ipEncodeRecursive($data);
 
@@ -129,13 +145,27 @@ class SpamModel extends Gdn_Pluggable {
                  * discussions and comments that have been flagged as SPAM after being edited.  If there's no valid ID,
                  * just treat it with regular SPAM logging.
                  */
-                if ($recordID) {
+                if (!empty($recordID) && $options['Operation'] === LogModel::TYPE_SPAM) {
+                    // Pass the source as a $data field, so we can propogate it to the LogPostEvent created in flagForReview()..
+                    $data['Source'] = $sp->EventArguments['Source'] ?? "unknown";
                     self::flagForReview($recordType, $recordID, $data);
                 } else {
-                    LogModel::insert('Spam', $recordType, $data, $logOptions);
+                    LogModel::insert($options['Operation'], $recordType, $data, $logOptions);
+
+                    $logPostEvent = LogModel::createLogPostEvent(
+                        $options['Operation'],
+                        $recordType,
+                        $data,
+                        $sp->EventArguments['Source'] ?? "unknown",
+                        $data["Log_InsertUserID"] ?? Gdn::session()->UserID,
+                        "negative",
+                        $data["InsertUserID"],
+                        ['recordID' => false]
+                    );
+                    Gdn::eventManager()->dispatch($logPostEvent);
                 }
             } else {
-                LogModel::insert('Spam', $recordType, $data, $logOptions);
+                LogModel::insert($options['Operation'], $recordType, $data, $logOptions);
             }
         }
 
@@ -205,6 +235,17 @@ class SpamModel extends Gdn_Pluggable {
             $model->deleteID($id);
         }
 
-        LogModel::insert('Spam', $recordType, $row, $logOptions);
+        LogModel::insert(LogModel::TYPE_SPAM, $recordType, $row, $logOptions);
+
+        $logPostEvent = LogModel::createLogPostEvent(
+            LogModel::TYPE_SPAM,
+            $recordType,
+            $row,
+            $data['Source'] ?? "unknown",
+            $data["Log_InsertUserID"] ?? Gdn::session()->UserID,
+            "negative",
+            $data["InsertUserID"]
+        );
+        Gdn::eventManager()->dispatch($logPostEvent);
     }
 }

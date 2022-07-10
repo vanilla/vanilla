@@ -7,13 +7,15 @@
 import React from "react";
 import classNames from "classnames";
 import { typographyClasses } from "@library/styles/typographyStyles";
+import { cx } from "@emotion/css";
 
 export interface ICommonHeadingProps {
     id?: string;
-    depth?: 1 | 2 | 3 | 4 | 5 | 6;
-    renderAsDepth?: 1 | 2 | 3 | 4 | 5 | 6;
+    depth?: number;
+    renderAsDepth?: number;
     className?: string;
     title?: React.ReactNode;
+    custom?: boolean;
 }
 
 export interface IHeadingProps extends ICommonHeadingProps, Omit<React.HTMLAttributes<HTMLHeadingElement>, "title"> {
@@ -25,9 +27,13 @@ export interface IHeadingProps extends ICommonHeadingProps, Omit<React.HTMLAttri
  * A component representing a element.
  */
 const Heading = React.forwardRef<HTMLHeadingElement, IHeadingProps>(function Heading(props: IHeadingProps, ref) {
-    const { children, title, depth, renderAsDepth, className, isLarge, ...restProps } = props;
+    const { children, title, depth, renderAsDepth, className, isLarge, custom, ...restProps } = props;
     const finalDepth = depth ?? 2;
     const finalRenderDepth = renderAsDepth ?? finalDepth;
+
+    const isPageTitle = finalRenderDepth === 1;
+    const isSubTitle = finalRenderDepth === 2;
+    const isComponentSubTitle = finalRenderDepth >= 3;
 
     const Tag = `h${finalDepth}` as "h1";
     const classes = typographyClasses();
@@ -36,16 +42,15 @@ const Heading = React.forwardRef<HTMLHeadingElement, IHeadingProps>(function Hea
         <Tag
             {...restProps}
             ref={ref}
-            className={classNames(
-                "heading",
-                `heading-${finalRenderDepth}`,
+            className={cx(
                 {
-                    [classes.pageTitle]: finalRenderDepth === 1,
-                    [classes.largeTitle]: isLarge,
-                    [classes.subTitle]: finalRenderDepth === 2,
-                    [classes.componentSubTitle]: finalRenderDepth >= 3,
+                    [classes.pageTitle]: isPageTitle && !custom,
+                    [classes.largeTitle]: isLarge && !custom,
+                    [classes.subTitle]: isSubTitle && !custom,
+                    [classes.componentSubTitle]: isComponentSubTitle && !custom,
                 },
-
+                !custom && "heading",
+                !custom && `heading-${finalRenderDepth}`,
                 className,
             )}
         >

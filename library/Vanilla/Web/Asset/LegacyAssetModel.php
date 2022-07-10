@@ -33,13 +33,13 @@ class LegacyAssetModel extends Gdn_Model {
     /**
      * LegacyAssetModel constructor.
      *
-     * @param string $cacheBuster
+     * @param DeploymentCacheBuster $cacheBuster
      */
-    public function __construct(string $cacheBuster) {
+    public function __construct(DeploymentCacheBuster $cacheBuster) {
         parent::__construct();
         // Set the old class name for Gdn_Pluggable.
         $this->ClassName = "AssetModel";
-        $this->cacheBuster = $cacheBuster;
+        $this->cacheBuster = $cacheBuster->value();
     }
 
     /**

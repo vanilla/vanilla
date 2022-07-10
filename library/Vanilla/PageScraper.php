@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -10,19 +10,33 @@ use DOMDocument;
 use DOMElement;
 use DOMNodeList;
 use Exception;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use RobotsTxtParser\RobotsTxtParser;
+use RobotsTxtParser\RobotsTxtValidator;
 use Garden\Http\HttpClient;
 use Garden\Http\HttpResponse;
+use Garden\Web\Exception\HttpException;
+use Garden\Web\Exception\ServerException;
 use InvalidArgumentException;
 use Vanilla\Metadata\Parser\Parser;
 use Vanilla\Web\RequestValidator;
 
-class PageScraper {
+/**
+ * Class for scraping pages of external sites.
+ */
+class PageScraper implements LoggerAwareInterface {
+
+    use LoggerAwareTrait;
 
     /** @var HttpClient */
     private $httpClient;
 
     /** @var RequestValidator */
     private $requestValidator;
+
+    /** @var HttpCacheMiddleware */
+    protected $httpCache;
 
     /** @var array */
     private $metadataParsers = [];
@@ -35,12 +49,14 @@ class PageScraper {
      *
      * @param HttpClient $httpClient
      * @param RequestValidator $requestValidator
+     * @param HttpCacheMiddleware $httpCache
      */
-    public function __construct(HttpClient $httpClient, RequestValidator $requestValidator) {
+    public function __construct(HttpClient $httpClient, RequestValidator $requestValidator, HttpCacheMiddleware $httpCache) {
         $this->httpClient = $httpClient;
         $this->requestValidator = $requestValidator;
-
+        $this->httpCache = $httpCache;
         $this->httpClient->setDefaultHeader("User-Agent", $this->userAgent());
+        $this->httpClient->setDefaultOption("timeout", 10);
     }
 
     /**
@@ -48,7 +64,8 @@ class PageScraper {
      *
      * @param string $url Target URL.
      * @return array Structured page information.
-     * @throws Exception
+     *
+     * @throws ServerException If the page cannot be fetched.
      */
     public function pageInfo(string $url): array {
         // Ensure that this function is never called during a GET request.
@@ -58,53 +75,65 @@ class PageScraper {
         // We've had some situations where the site gets in an infinite loop requesting itself.
         $this->requestValidator->blockRequestType('GET', __METHOD__ . ' may not be called during a GET request.');
 
-        $response = $this->getUrl($url);
+        $robotsAllowed = $this->validateRobotFileInUrl($url);
+        $isError = false;
+        $response = null;
+        if ($robotsAllowed) {
+            $response = $this->getUrl($url);
 
-        if (!$response->isResponseClass('2xx')) {
-            throw new Exception('Unable to get URL contents.');
-        }
+            $rawBody = $response->getRawBody();
 
-        $rawBody = $response->getRawBody();
+            $document = $this->createDom($rawBody);
 
-        $document = $this->createDom($rawBody);
+            $metaData = $this->parseMetaData($document);
+            $info = array_merge([
+                'Title' => '',
+                'Description' => '',
+                'Images' => []
+            ], $metaData);
 
-        $metaData = $this->parseMetaData($document);
-        $info = array_merge([
-            'Title' => '',
-            'Description' => '',
-            'Images' => []
-        ], $metaData);
-
-        if (empty($info['Title'])) {
-            $titleTags = $document->getElementsByTagName('title');
-            $titleTag = $titleTags->item(0);
-            if ($titleTag) {
-                $info['Title'] = $titleTag->textContent;
+            if (empty($info['Title'])) {
+                $titleTags = $document->getElementsByTagName('title');
+                $titleTag = $titleTags->item(0);
+                if ($titleTag) {
+                    $info['Title'] = $titleTag->textContent;
+                }
             }
-        }
 
-        if (empty($info['Description'])) {
-            $metaTags = $document->getElementsByTagName('meta');
-            $description = $this->parseDescription($document, $metaTags);
-            if ($description) {
-                $info['Description'] = $description;
+            if (empty($info['Description'])) {
+                $metaTags = $document->getElementsByTagName('meta');
+                $description = $this->parseDescription($document, $metaTags);
+                if ($description) {
+                    $info['Description'] = $description;
+                }
             }
+
+            $isError = !$response->isResponseClass("2xx");
+            $info['Url'] = $url;
+            $info['Title'] = htmlEntityDecode($info['Title']);
+            $info['Description'] = htmlEntityDecode($info['Description']);
+            $info['isCacheable'] = empty($response->getHeader('x-no-cache'));
         }
 
-        $info['Url'] = $url;
-        $info['Title'] = htmlEntityDecode($info['Title']);
-        $info['Description'] = htmlEntityDecode($info['Description']);
-
+        if ($isError || !$robotsAllowed) {
+            $domain = parse_url($url, PHP_URL_HOST);
+            $sourceString = $isError ? "Site '%s' did not respond successfully." : "Site's '%s' robots.txt did not allow access to the url.";
+            $errorMessage = sprintft($sourceString, $domain);
+            $this->logger->info($errorMessage);
+            throw new ServerException($errorMessage, $isError ? $response->getStatusCode() : "403", [
+                HttpException::FIELD_DESCRIPTION => $isError ? $info['Title'] . ": " . $info['Description'] : null,
+            ]);
+        }
         return $info;
     }
 
     /**
-     * Send an HTTP GET request.
+     * Read robots.txt file and validate if URL request is allowed.
      *
      * @param string $url The URL where the request will be sent.
-     * @return HttpResponse
+     * @return bool allowed to access url
      */
-    protected function getUrl(string $url): HttpResponse {
+    protected function validateRobotFileInUrl(string $url): bool {
         $urlParts = parse_url($url);
         if ($urlParts === false) {
             throw new InvalidArgumentException('Invalid URL.');
@@ -112,8 +141,32 @@ class PageScraper {
             throw new InvalidArgumentException('Unsupported URL scheme.');
         }
 
-        $result = $this->httpClient->get($url);
-        return $result;
+        $host = val('host', $urlParts);
+        $schema = val('scheme', $urlParts);
+        $robotsUrl = "$schema://$host/robots.txt";
+
+        $this->httpClient->addMiddleware($this->httpCache);
+        $robotsCallResult = $this->httpClient->get($robotsUrl);
+        $robotsResult = $robotsCallResult->getRawBody();
+
+        $parser = new RobotsTxtParser($robotsResult);
+        $validator = new RobotsTxtValidator($parser->getRules());
+        if (count($parser->getRules()) > 0) {
+            return $validator->isUrlAllow($url, $this->userAgent());
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * Get http response from the URL.
+     *
+     * @param string $url string of the urn for http request.
+     * @return HttpResponse html response
+     */
+    protected function getUrl(string $url): HttpResponse {
+        // Make the actual request.
+        return $this->httpClient->get($url);
     }
 
     /**
@@ -196,8 +249,7 @@ class PageScraper {
      * @return string
      */
     private function userAgent() {
-        $version = defined('APPLICATION_VERSION') ? APPLICATION_VERSION : '0.0';
-        return "Vanilla/{$version}";
+        return "vanilla-forums-embed/1.0";
     }
 
     /**

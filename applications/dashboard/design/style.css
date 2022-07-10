@@ -17,12 +17,21 @@ table, caption, tbody, tfoot, thead, tr, th, td {
   margin: 0;
   padding: 0;
   border: 0;
-  outline: 0;
   font-weight: inherit;
   font-style: inherit;
   font-size: 100%;
   font-family: inherit;
   vertical-align: baseline;
+}
+html:not(.focus-visible), body:not(.focus-visible), div:not(.focus-visible), span:not(.focus-visible), applet:not(.focus-visible), object:not(.focus-visible), iframe:not(.focus-visible),
+h1:not(.focus-visible), h2:not(.focus-visible), h3:not(.focus-visible), h4:not(.focus-visible), h5:not(.focus-visible), h6:not(.focus-visible), p:not(.focus-visible), blockquote:not(.focus-visible), pre:not(.focus-visible),
+a:not(.focus-visible), abbr:not(.focus-visible), acronym:not(.focus-visible), address:not(.focus-visible), big:not(.focus-visible), cite:not(.focus-visible), code:not(.focus-visible),
+del:not(.focus-visible), dfn:not(.focus-visible), em:not(.focus-visible), font:not(.focus-visible), img:not(.focus-visible), ins:not(.focus-visible), kbd:not(.focus-visible), q:not(.focus-visible), s:not(.focus-visible), samp:not(.focus-visible),
+small:not(.focus-visible), strike:not(.focus-visible), sub:not(.focus-visible), sup:not(.focus-visible), tt:not(.focus-visible), var:not(.focus-visible),
+dl:not(.focus-visible), dt:not(.focus-visible), dd:not(.focus-visible), ol:not(.focus-visible), ul:not(.focus-visible), li:not(.focus-visible),
+fieldset:not(.focus-visible), form:not(.focus-visible), label:not(.focus-visible), legend:not(.focus-visible),
+table:not(.focus-visible), caption:not(.focus-visible), tbody:not(.focus-visible), tfoot:not(.focus-visible), thead:not(.focus-visible), tr:not(.focus-visible), th:not(.focus-visible), td:not(.focus-visible) {
+  outline: 0;
 }
 
 /* remember to define focus styles! */
@@ -501,7 +510,7 @@ input.BigInput {
 }
 
 textarea {
-  line-height: 128%;
+  line-height: 128% !important;
 }
 
 select {
@@ -562,10 +571,10 @@ div.FileUpload .CurrentImage {
   border-right-width: 1px;
 }
 
-.Button.Active,
-.ButtonGroup.Open .Button.Handle,
-.Button:focus,
-.Button:active {
+body:not(.dataDriven) .Button.Active,
+body:not(.dataDriven) .ButtonGroup.Open .Button.Handle,
+body:not(.dataDriven) .Button:focus,
+body:not(.dataDriven) .Button:active {
   border-color: #aaa;
   color: #333;
   background: #f7f7f7;
@@ -580,9 +589,8 @@ div.FileUpload .CurrentImage {
   border-width: 0 0 100px 200px;
   opacity: 0;
   filter: alpha(opacity=0);
-  -webkit-transform: translate(-300px, 0) scale(4);
-      -ms-transform: translate(-300px, 0) scale(4);
-          transform: translate(-300px, 0) scale(4);
+  -ms-transform: translate(-300px, 0) scale(4);
+      transform: translate(-300px, 0) scale(4);
   direction: ltr;
   cursor: pointer;
 }
@@ -634,7 +642,7 @@ div.FileUpload .CurrentImage {
   background-color: #fdfdfd;
 }
 
-.ButtonGroup.Open .NavButton.Handle {
+body:not(.dataDriven) .ButtonGroup.Open .NavButton.Handle {
   color: #333;
   background: #eee;
 }
@@ -948,6 +956,10 @@ a.Small img {
   padding: 10px;
 }
 
+.DismissMessage img {
+  max-width: 100%;
+}
+
 .DismissMessage.Info {
   background: #f3f4f8;
   border: 1px solid #ddd;
@@ -1086,7 +1098,6 @@ body > #Frame > .Head {
 
 .OptionsTitle {
   -webkit-user-select: none;
-     -moz-user-select: none;
       -ms-user-select: none;
           user-select: none;
   background: url("images/ui_sprites.png") no-repeat 0 -101px;
@@ -1726,47 +1737,37 @@ td.CheckBoxColumn {
 }
 
 .CategoryList .Depth2 {
-  padding-left: 25px !important;
+  padding-left: 25px;
 }
-
 .CategoryList .Depth3 {
-  padding-left: 50px !important;
+  padding-left: 50px;
 }
-
 .CategoryList .Depth4 {
-  padding-left: 75px !important;
+  padding-left: 75px;
 }
-
 .CategoryList .Depth5 {
-  padding-left: 100px !important;
+  padding-left: 100px;
 }
-
 .CategoryList .Depth6 {
-  padding-left: 125px !important;
+  padding-left: 125px;
 }
-
 .CategoryList .Depth7 {
-  padding-left: 150px !important;
+  padding-left: 150px;
 }
-
 .CategoryList .Depth8 {
-  padding-left: 175px !important;
+  padding-left: 175px;
 }
-
 .CategoryList .Depth9 {
-  padding-left: 200px !important;
+  padding-left: 200px;
 }
-
 .CategoryList .Depth10 {
-  padding-left: 225px !important;
+  padding-left: 225px;
 }
-
 .CategoryList .Depth11 {
-  padding-left: 250px !important;
+  padding-left: 250px;
 }
-
 .CategoryList .Depth12 {
-  padding-left: 275px !important;
+  padding-left: 275px;
 }
 
 .Box.RecentUsers {
@@ -2264,6 +2265,10 @@ code, pre {
 code {
   white-space: pre-wrap;
 }
+.code.focus-visible,
+code.focus-visible {
+  outline-offset: -1px;
+}
 
 .codeBlock,
 pre {
@@ -2685,6 +2690,10 @@ div.Popup form ul li label {
   font-weight: bold;
   margin: 10px 0 0;
 }
+body.Profile.EditMode ul li:first-child label,
+div.Popup form ul li:first-child label {
+  margin-top: 0;
+}
 
 body.Entry form ul li.Gender label.RadioLabel,
 body.Profile.EditMode ul li.Gender label.RadioLabel,
@@ -2995,7 +3004,7 @@ tr.CategoryHeading td {
 
 .BlockTitle {
   display: block;
-  font-weight: bold;
+  font-weight: normal;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -3050,6 +3059,7 @@ tr.CategoryHeading td {
   width: 14px;
 }
 
+.GroupForm label,
 .DiscussionForm label {
   font-size: 14px;
   font-weight: bold;
@@ -5358,7 +5368,7 @@ div.token-input-dropdown ul li em {
 }
 
 div.token-input-dropdown ul li.token-input-selected-dropdown-item {
-  background-color: #eee;
+  background-color: #eee !important;
 }
 
 /**
@@ -5983,14 +5993,6 @@ Styleguide Attachments
 }
 
 /* Effects */
-@-webkit-keyframes highlight {
-  0% {
-    background-color: #ff9;
-  }
-  10% {
-    background-color: #ff9;
-  }
-}
 @keyframes highlight {
   0% {
     background-color: #ff9;
@@ -6000,8 +6002,7 @@ Styleguide Attachments
   }
 }
 .highlight-effect {
-  -webkit-animation: highlight 0.8s;
-          animation: highlight 0.8s;
+  animation: highlight 0.8s;
 }
 
 /* Groups section tweaks */
@@ -6061,9 +6062,8 @@ Styleguide Attachments
   width: 100%;
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
-  -moz-user-select: none;
-   -ms-user-select: none;
-       user-select: none;
+  -ms-user-select: none;
+      user-select: none;
   -webkit-user-select: none;
 }
 
@@ -6223,15 +6223,12 @@ img.jcrop-preview {
 }
 
 .flex {
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-justify-content: space-between;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
+  -ms-flex-pack: justify;
+      justify-content: space-between;
+  -ms-flex-align: center;
+      align-items: center;
 }
 .flex > * {
   margin-right: 4.5px;
@@ -6241,33 +6238,28 @@ img.jcrop-preview {
 }
 
 .flex-wrap {
-  -webkit-flex-wrap: wrap;
-      -ms-flex-wrap: wrap;
-          flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
 }
 
 .shrink {
-  -webkit-flex-shrink: 1;
-      -ms-flex-negative: 1;
-          flex-shrink: 1;
+  -ms-flex-negative: 1;
+      flex-shrink: 1;
 }
 
 .grow {
-  -webkit-flex-grow: 1;
-      -ms-flex-positive: 1;
-          flex-grow: 1;
+  -ms-flex-positive: 1;
+      flex-grow: 1;
 }
 
 .no-shrink {
-  -webkit-flex-shrink: 0;
-      -ms-flex-negative: 0;
-          flex-shrink: 0;
+  -ms-flex-negative: 0;
+      flex-shrink: 0;
 }
 
 .no-grow {
-  -webkit-flex-grow: 0;
-      -ms-flex-positive: 0;
-          flex-grow: 0;
+  -ms-flex-positive: 0;
+      flex-grow: 0;
 }
 
 .pull-left {
@@ -6293,7 +6285,6 @@ img.jcrop-preview {
 }
 .foggy input {
   -webkit-user-select: none;
-     -moz-user-select: none;
       -ms-user-select: none;
           user-select: none;
 }

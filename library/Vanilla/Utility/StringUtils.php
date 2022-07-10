@@ -6,6 +6,8 @@
 
 namespace Vanilla\Utility;
 
+use Garden\Web\Exception\Pass;
+
 /**
  * A collection of string utilities.
  */
@@ -82,6 +84,66 @@ final class StringUtils {
             return substr($str, 0, -strlen($trim));
         } else {
             return $str;
+        }
+    }
+
+    /**
+     * Make a variable name title case for putting into a label.
+     *
+     * This method supports strings in the following formats.
+     *
+     * - camelCase
+     * - PascalCase
+     * - kebab-case
+     * - snake_case
+     * - space separated
+     *
+     * @param string $str The variable name to labelize.
+     * @return string
+     */
+    public static function labelize(string $str): string {
+        $str = preg_replace('`(?<![A-Z0-9])([A-Z0-9])`', ' $1', $str);
+        $str = preg_replace('`([A-Z0-9])(?=[a-z])`', ' $1', $str);
+        $str = preg_replace('`[_-]`', ' ', $str);
+        $str = preg_replace('`\s+`', ' ', $str);
+        $str = implode(' ', array_map('ucfirst', explode(' ', $str)));
+
+        return $str;
+    }
+
+    /**
+     * Check if a string contains another string.
+     *
+     * @param string $haystack
+     * @param string $needle
+     *
+     * @return bool
+     */
+    public static function contains(string $haystack, string $needle): bool {
+        if (empty($needle)) {
+            return false;
+        }
+        return strpos($haystack, $needle) !== false;
+    }
+
+    /**
+     * Take a formatted size (e.g. 128M) and convert it to bytes.
+     *
+     * @param string $formatted
+     * @return int|bool
+     */
+    public static function unformatSize(string $formatted) {
+        $units = ['B' => 1, 'K' => 1024, 'M' => 1024 * 1024, 'G' => 1024 * 1024 * 1024, 'T' => 1024 * 1024 * 1024 * 1024];
+
+        if (preg_match('/([0-9.]+)\s*([A-Z]*)/i', $formatted, $matches)) {
+            $number = floatval($matches[1]);
+            $unit = strtoupper(substr($matches[2], 0, 1));
+            $mult = val($unit, $units, 1);
+
+            $result = round($number * $mult, 0);
+            return $result;
+        } else {
+            return false;
         }
     }
 }

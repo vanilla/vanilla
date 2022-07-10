@@ -41,7 +41,7 @@ export function EditorEventWall(props: IProps) {
         <div
             ref={ref}
             {...props}
-            onClick={e => {
+            onClick={(e) => {
                 e.preventDefault();
             }}
             className={EDITOR_EVENT_WALL_CLASS}

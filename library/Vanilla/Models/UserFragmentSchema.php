@@ -8,6 +8,8 @@
 namespace Vanilla\Models;
 
 use Garden\Schema\Schema;
+use Garden\Schema\ValidationException;
+use Vanilla\Dashboard\Models\UserFragment;
 use Vanilla\ApiUtils;
 use Vanilla\SchemaFactory;
 
@@ -23,12 +25,16 @@ class UserFragmentSchema extends Schema {
         parent::__construct($this->parseInternal([
             'userID:i', // The ID of the user.
             'name:s', // The username of the user.
-            'photoUrl:s', // The URL of the user\'s avatar picture.
-            'dateLastActive:dt|n', // Time the user was last active.
+            'title:s?', // The title of the user.
+            'url:s?', // Full URL to the user profile page.
+            'photoUrl:s', // The URL of the user's avatar picture.
+            'dateLastActive:dt|n?', // Time the user was last active.
+            'banned:i?', // The banned status of the user.
+            'punished:i?', // The jailed status of the user.
+            'private:b?', // The private profile status of the user.
             'label:s?'
         ]));
     }
-
 
     /** @var UserFragmentSchema */
     private static $cache = null;
@@ -51,13 +57,48 @@ class UserFragmentSchema extends Schema {
      * @return array
      */
     public static function normalizeUserFragment(array $dbRecord) {
-        if (array_key_exists('Photo', $dbRecord)) {
+        $photo = $dbRecord['Photo'] ?? $dbRecord['photo'] ?? '';
+        if ($photo) {
             $photo = userPhotoUrl($dbRecord);
-            $dbRecord['PhotoUrl'] = $photo;
+            $photoUrl = $photo;
+        } else {
+            $url = \UserModel::getDefaultAvatarUrl($dbRecord);
+            $photoUrl = $url ?: \UserModel::getDefaultAvatarUrl();
         }
+        $privateProfile = \UserModel::getRecordAttribute($dbRecord, 'Private', "0");
 
-        $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
+        $schemaRecord = [
+            'userID' => $dbRecord['UserID'] ?? $dbRecord['userID'],
+            'photoUrl' => $photoUrl,
+            'url' => url(userUrl($dbRecord), true),
+            'name' => $dbRecord['Name'] ?? $dbRecord['name'] ?? 'Unknown',
+            'private' => (bool) $privateProfile,
+            'banned' => $dbRecord['Banned'] ?? 0,
+            'punished' => $dbRecord['Punished'] ?? 0,
+            'dateLastActive' => $dbRecord['DateLastActive'] ?? $dbRecord['dateLastActive'] ?? null,
+            'title' => $dbRecord['Title'] ?? null,
+            'label' => $dbRecord['Label'] ?? $dbRecord['label'] ?? null,
+        ];
+        $schemaRecord = ApiUtils::convertOutputKeys($schemaRecord);
         $schemaRecord = self::instance()->validate($schemaRecord);
         return $schemaRecord;
+    }
+
+    /**
+     * Validate data against the schema.
+     *
+     * @param mixed $data The data to validate.
+     * @param bool $sparse Whether or not this is a sparse validation.
+     * @return mixed Returns a cleaned version of the data.
+     * @throws ValidationException Throws an exception when the data does not validate against the schema.
+     */
+    public function validate($data, $sparse = false) {
+        if ($data instanceof UserFragment) {
+            $result = $data;
+        } else {
+            $result = parent::validate($data, $sparse);
+        }
+
+        return $result;
     }
 }

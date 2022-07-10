@@ -1,12 +1,22 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
+<?php if (!defined('APPLICATION')) exit();
+/** @var InThisConversationModule $this */
+use Vanilla\Theme\BoxThemeShim;
+?>
 <div class="Box InThisConversation">
-    <?php echo panelHeading(t('In this Conversation')); ?>
-    <ul class="PanelInfo">
+
+    <?php
+        BoxThemeShim::startHeading();
+        echo panelHeading(t('In this Conversation'));
+        BoxThemeShim::endHeading();
+    ?>
+    <ul class="PanelInfo  <?php BoxThemeShim::activeHtml(' pageBox')?>">
         <?php foreach ($this->data('Participants') as $User): ?>
             <li>
                 <?php
                 $Username = htmlspecialchars(val('Name', $User));
                 $Photo = val('Photo', $User);
+                $userID = $user->UserID ?? $user['UserID'];
+
 
                 if (val('Deleted', $User)) {
                     echo anchor(
@@ -16,7 +26,10 @@
                             'span', ['class' => 'Conversation-User',]
                         ),
                         userUrl($User),
-                        ['title' => sprintf(t('%s has left this conversation.'), $Username)]
+                        [
+                            'title' => sprintf(t('%s has left this conversation.'), $Username),
+                            "data-userid"=> $userID
+                        ]
                     );
                 } else {
                     echo anchor(
@@ -25,7 +38,10 @@
                             wrap($Username, 'span', ['class' => 'Username']),
                             'span', ['class' => 'Conversation-User']
                         ),
-                        userUrl($User)
+                        userUrl($User),
+                        [
+                            "data-userid"=> $userID
+                        ]
                     );
                 }
                 ?>

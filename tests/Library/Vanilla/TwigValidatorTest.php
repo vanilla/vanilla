@@ -22,6 +22,13 @@ class TwigValidatorTest extends MinimalContainerTestCase {
     private static $twigCache;
 
     /**
+     * @return bool
+     */
+    protected static function useCommonBootstrap(): bool {
+        return false;
+    }
+
+    /**
      * Get a twig instance.
      *
      * @return Environment

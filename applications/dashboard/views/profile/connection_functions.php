@@ -4,11 +4,12 @@ function writeConnection($row) {
     $c = Gdn::controller();
     $connected = val('Connected', $row);
     ?>
-    <li id="<?php echo "Provider_{$row['ProviderKey']}"; ?>" class="Item">
+    <li id="<?php echo "Provider_{$row['ProviderKey']}"; ?>" class="Item pageBox">
         <div class="Connection-Header">
          <span class="IconWrap">
             <?php
-            echo img(val('Icon', $row, asset('/applications/dashboard/design/images/connection-64.png')));
+            $imgPath = !empty($row['Icon']) ? $row['Icon'] : asset('/applications/dashboard/design/images/connection-64.png');
+            echo '<img src="'.htmlspecialchars($imgPath, ENT_QUOTES).'" alt="'.$row['ProviderKey'].'" />';
             ?>
          </span>
          <span class="Connection-Name">

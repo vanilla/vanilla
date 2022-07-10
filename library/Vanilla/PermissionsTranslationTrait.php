@@ -7,7 +7,9 @@
 
 namespace Vanilla;
 
+use Gdn;
 use Vanilla\Utility\NameScheme;
+use PermissionModel;
 
 /**
  * Translates permission names between the old and new formats.
@@ -15,6 +17,7 @@ use Vanilla\Utility\NameScheme;
  * Vanilla is changing the naming convention of permissions so this class is necessary to aid in that.
  */
 trait PermissionsTranslationTrait {
+
     /** @var NameScheme */
     private $nameScheme;
 
@@ -42,7 +45,9 @@ trait PermissionsTranslationTrait {
             "discussions.announce",
             "discussions.sink",
             "discussions.close",
-            "discussions.delete"
+            "discussions.delete",
+            "events.view",
+            "events.manage",
         ],
     ];
 
@@ -72,7 +77,6 @@ trait PermissionsTranslationTrait {
     private $deprecatedPermissions = [
         'Garden.Activity.Delete',
         'Garden.Activity.View',
-        'Garden.SignIn.Allow',
         'Garden.Curation.Manage',
         'Vanilla.Approval.Require',
         'Vanilla.Comments.Me'
@@ -90,15 +94,31 @@ trait PermissionsTranslationTrait {
         'Garden.Users.Approve' => 'applicants.manage',
         'Groups.Group.Add' => 'groups.add',
         'Groups.Moderation.Manage' => 'groups.moderate',
-        'Plugins.Attachments.Upload.Allow' => 'uploads.add',
         'Reputation.Badges.Give' => 'badges.moderate',
         'Vanilla.Tagging.Add' => 'tags.add',
+        'Garden.SignIn.Allow' => 'session.valid',
+    ];
+
+    private $reverseRenamedPermissions = [
+        'conversations.moderate' => 'Conversations.Moderation.Manage',
+        'comments.email' => 'Email.Comments.Add',
+        'conversations.email' => 'Email.Conversations.Add',
+        'discussions.email' => 'Email.Discussions.Add',
+        'community.moderate' => 'Garden.Moderation.Manage',
+        'noads.use' => 'Garden.NoAds.Allow',
+        'site.manage' => 'Garden.Settings.Manage',
+        'applicants.manage' => 'Garden.Users.Approve',
+        'groups.add' => 'Groups.Group.Add',
+        'groups.moderate' => 'Groups.Moderation.Manage',
+        'badges.moderate' => 'Reputation.Badges.Give',
+        'tags.add' => 'Vanilla.Tagging.Add',
+        'session.valid' => "Garden.SignIn.Allow",
     ];
 
     /** @var array These permissions should not be renamed. */
     private $fixedPermissions = [
         'Reactions.Negative.Add',
-        'Reactions.Positive.Add'
+        'Reactions.Positive.Add',
     ];
 
     /**
@@ -151,7 +171,7 @@ trait PermissionsTranslationTrait {
      * @return bool
      */
     private function isPermissionDeprecated($permission) {
-        $result = in_array($permission, $this->deprecatedPermissions);
+        $result = str_starts_with($permission, '_') || in_array($permission, $this->deprecatedPermissions);
         return $result;
     }
 
@@ -181,8 +201,52 @@ trait PermissionsTranslationTrait {
             // Cache the renamed permission for this request.
             $result = implode('.', $segments);
             $this->renamedPermissions[$permission] = $result;
+            $this->reverseRenamedPermissions[$result] = $permission;
         }
 
+        return $result;
+    }
+
+    /**
+     * Check if permission is 2 part
+     *
+     * @param string $permission
+     * @return boolean
+     */
+    private function isTwoPartPermission($permission) {
+        $segments = explode('.', $permission);
+        return count($segments) == 2;
+    }
+
+    /**
+     * Untranslate a permission name from the new API style name to the old permission name.
+     *
+     * @param string $newName
+     * @return string
+     */
+    public function untranslatePermission(string $newName): string {
+        $newName = strtolower($newName);
+        if (array_key_exists($newName, $this->reverseRenamedPermissions)) {
+            return $this->reverseRenamedPermissions[$newName];
+        }
+
+        $segments = explode('.', $newName);
+        $updatedPermission = implode('.', array_map('ucfirst', $segments));
+        if (in_array($updatedPermission, $this->fixedPermissions) && count($segments) == 3) {
+            return $updatedPermission;
+        }
+
+        $result = $newName;
+        $permissionModel = Gdn::getContainer()->get(PermissionModel::class);
+        $permissionList = $permissionModel->getAllPermissions();
+        foreach ($permissionList as $permission) {
+            if (str_ends_with(strtolower($permission), strtolower($updatedPermission))) {
+                $result = $permission;
+                $this->renamedPermissions[$result] = $newName;
+                $this->reverseRenamedPermissions[$newName] = $result;
+                break;
+            }
+        }
         return $result;
     }
 }

@@ -58,6 +58,38 @@ class KeystoneThemeHooks extends \Gdn_Plugin {
     }
 
     /**
+     * Set sanitized description to the view
+     *
+     * @param \DiscussionsController $sender
+     */
+    public function discussionsController_render_before($sender) {
+        $this->setSanitizedDescription($sender);
+    }
+
+    /**
+     * Set sanitized description to the view
+     *
+     * @param \CategoriesController $sender
+     */
+    public function categoriesController_render_before($sender) {
+        $this->setSanitizedDescription($sender);
+    }
+
+    /**
+     * Set sanitized description to the view
+     *
+     * @param \Gdn_Controller $sender
+     */
+    private function setSanitizedDescription($sender) {
+        if ($sender->Data['_Description']) {
+            /** @var $htmlSanitizer */
+            $htmlSanitizer = \Gdn::getContainer()->get(\Vanilla\Formatting\Html\HtmlSanitizer::class);
+            $description = $htmlSanitizer->filter($sender->Data['_Description']);
+        }
+        $sender->setData('sanitizedDescription', $description);
+    }
+
+    /**
      * Add custom toggles "hasHeroBanner", "hasFeatureSearchbox", "panelToLeft" to Theme Options
      *
      * @param \SettingsController $sender

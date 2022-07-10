@@ -36,22 +36,22 @@ describe("UserSuggestionActions.filterSuggestions()", () => {
     });
 
     it("removes strings that are shorter than the current string", () => {
-        SHORTER_STRINGS.forEach(short => {
+        SHORTER_STRINGS.forEach((short) => {
             expect(results).not.to.contain(short);
         });
     });
     it("keeps strings that are longer than the current string", () => {
-        LONGER_STRINGS.forEach(long => {
+        LONGER_STRINGS.forEach((long) => {
             expect(results).to.contain(long);
         });
     });
     it("removes non-matching string", () => {
-        NON_MATCHING.forEach(nonMatch => {
+        NON_MATCHING.forEach((nonMatch) => {
             expect(results).not.to.contain(nonMatch);
         });
     });
     it("allows matching string", () => {
-        LONGER_STRINGS.forEach(long => {
+        LONGER_STRINGS.forEach((long) => {
             expect(results).to.contain(long);
         });
     });

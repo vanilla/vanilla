@@ -9,11 +9,14 @@ namespace Vanilla\Scheduler\Driver;
 
 use Vanilla\Scheduler\Job\JobExecutionStatus;
 use Vanilla\Scheduler\Job\LocalJobInterface;
+use Vanilla\Scheduler\Job\TrackableJobAwareTrait;
 
 /**
  * LocalDriverSlip
  */
 class LocalDriverSlip implements DriverSlipInterface {
+
+    use TrackableJobAwareTrait;
 
     /** @var string */
     protected $id;
@@ -27,32 +30,43 @@ class LocalDriverSlip implements DriverSlipInterface {
     /** @var string */
     protected $errorMessage = null;
 
+    /** @var string|null */
+    protected $trackingId = null;
+
     /**
      * LocalDriverSlip constructor.
      *
      * @param LocalJobInterface $job
      */
     public function __construct(LocalJobInterface $job) {
-        $this->id = uniqid('localDriverId_', true);
+        $this->id = uniqid('localDriverId::', true);
         $this->status = JobExecutionStatus::received();
         $this->job = $job;
     }
 
     /**
-     * Get id
+     * Get the underlying job.
+     */
+    public function getJob(): LocalJobInterface {
+        return $this->job;
+    }
+
+    /**
+     * Get ID.
      *
      * @return string
      */
-    public function getId(): string {
+    public function getID(): string {
         return $this->id;
     }
 
     /**
-     * Get status
+     * GetStatus
      *
+     * @param bool $forceUpdate
      * @return JobExecutionStatus
      */
-    public function getStatus(): JobExecutionStatus {
+    public function getStatus(bool $forceUpdate = false): JobExecutionStatus {
         return $this->status;
     }
 
@@ -84,13 +98,43 @@ class LocalDriverSlip implements DriverSlipInterface {
     /**
      * Set Stack Execution Problem
      *
-     * @param string $msg
-     * @return bool
+     * @param string $errorMessage
+     * @return $this|DriverSlipInterface
      */
-    public function setStackExecutionFailed(string $msg): bool {
+    public function setStackExecutionFailed(string $errorMessage): DriverSlipInterface {
         $this->status = JobExecutionStatus::stackExecutionError();
-        $this->errorMessage = $msg;
+        $this->errorMessage = $errorMessage;
 
-        return true;
+        return $this;
+    }
+
+    /**
+     * Set the job status
+     *
+     * @param JobExecutionStatus $status
+     * @return $this|DriverSlipInterface
+     */
+    public function setStatus(JobExecutionStatus $status): DriverSlipInterface {
+        $this->status = $status;
+
+        return $this;
+    }
+
+    /**
+     * Get the Error Message (if exists)
+     *
+     * @return string|null
+     */
+    public function getErrorMessage(): ?string {
+        return $this->errorMessage;
+    }
+
+    /**
+     * GetType
+     *
+     * @return string
+     */
+    public function getType(): string {
+        return preg_replace('/\\\\/', '_', get_class($this->job));
     }
 }

@@ -1,4 +1,4 @@
-import { logError } from "@vanilla/utils";
+import { logError, logWarning } from "@vanilla/utils";
 
 /**
  * @copyright 2009-2019 Vanilla Forums Inc.
@@ -38,7 +38,7 @@ export function loadTranslations(translations: ITranslations) {
  * Clear all translation resources.
  */
 export function clearTranslations() {
-    translationStore = {};
+    translationStore = null;
 }
 
 /**
@@ -58,8 +58,17 @@ export function translate(str: string, defaultTranslation?: string): string {
     const fallback = defaultTranslation !== undefined ? defaultTranslation : str;
 
     if (!translationStore) {
-        if (process.env.NODE_ENV !== "test") {
-            logError("Attempted to translate a value before the translation store was initialized");
+        // Test environment allows top level static initialization.
+        const message = `Attempted to translate a value '${str}' before the translation store was initialized.`;
+        switch (process.env.NODE_ENV) {
+            case "production":
+                logWarning(message);
+                break;
+            case "development":
+                throw new Error(message + " Don't use t() in the top level of a file or a static property.");
+            case "test":
+                // Tests (like storybook and unit testing) don't need to actually bootstrap a full translation store all the time.
+                break;
         }
         return fallback;
     }

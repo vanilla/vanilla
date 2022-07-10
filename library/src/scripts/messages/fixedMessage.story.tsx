@@ -11,22 +11,23 @@ import { messagesClasses } from "@library/messages/messageStyles";
 import Translate from "@library/content/Translate";
 import classNames from "classnames";
 import { t } from "@library/utility/appUtils";
-import { titleBarVariables } from "@library/headers/titleBarStyles";
-import { unit, negative, negativeUnit } from "@library/styles/styleHelpers";
+import { titleBarVariables } from "@library/headers/TitleBar.variables";
+import { negative, negativeUnit } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
 import { ErrorIcon } from "@library/icons/common";
 
-const story = storiesOf("Messages", module);
+const story = storiesOf("Alerts", module);
 
 const message = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce blandit lorem ac dui porta, scelerisque placerat felis finibus.`;
 
-story.add("Fixed Message", () => {
+story.add("Message (Fixed Position)", () => {
     const classesMessages = messagesClasses();
     const [fixedMessageFlag, setFixedMessageFlag] = useState(true);
 
     const _fixedMessage = fixedMessageFlag && (
         <div
             style={{
-                height: unit(titleBarVariables().sizing.height),
+                height: styleUnit(titleBarVariables().sizing.height),
                 position: "relative",
                 marginTop: negativeUnit(titleBarVariables().sizing.height),
             }}
@@ -52,7 +53,7 @@ story.add("Fixed Message", () => {
                 {_fixedMessage}
                 <div
                     style={{
-                        paddingTop: unit(70),
+                        paddingTop: styleUnit(70),
                     }}
                 >
                     <div>

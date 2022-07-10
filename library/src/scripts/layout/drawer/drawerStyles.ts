@@ -1,13 +1,15 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
+import { css } from "@emotion/css";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { debugHelper, unit } from "@library/styles/styleHelpers";
-import { componentThemeVariables, useThemeCache } from "@library/styles/styleUtils";
-import { style } from "typestyle";
+import { debugHelper } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
+import { componentThemeVariables } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { percent } from "csx";
 
 export const drawerVariables = useThemeCache(() => {
@@ -22,13 +24,13 @@ export const drawerVariables = useThemeCache(() => {
     };
 
     const fonts = {
-        size: globalVars.userContent.font.sizes.default,
+        size: globalVars.fonts.size.medium,
         weight: globalVars.fonts.weights.semiBold,
         ...themeVars.subComponentStyles("fonts"),
     };
 
     const sizing = {
-        icon: globalVars.userContent.font.sizes.default,
+        icon: globalVars.fonts.size.medium,
         ...themeVars.subComponentStyles("sizing"),
     };
 
@@ -39,29 +41,29 @@ export const drawerClasses = useThemeCache(() => {
     const vars = drawerVariables();
     const debug = debugHelper("drawer");
 
-    const root = style({
+    const root = css({
         display: "block",
         position: "relative",
         ...debug.name(),
     });
 
-    const contents = style({
+    const contents = css({
         position: "relative",
         width: percent(100),
         ...debug.name("contents"),
     });
 
-    const toggle = style({
+    const toggle = css({
         fontWeight: vars.fonts.weight,
-        padding: `${unit(vars.spacing.button.padding)} 0`,
+        padding: `${styleUnit(vars.spacing.button.padding)} 0`,
         width: percent(100),
         textAlign: "left",
         ...debug.name("toggle"),
     });
-    const icon = style({
+    const icon = css({
         display: "inline-flex",
-        minWidth: unit(vars.sizing.icon),
-        fontSize: unit(vars.fonts.size),
+        minWidth: styleUnit(vars.sizing.icon),
+        fontSize: styleUnit(vars.fonts.size),
         ...debug.name("icon"),
     });
 

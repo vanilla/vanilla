@@ -13,15 +13,15 @@ import { StoryHeading } from "@library/storybook/StoryHeading";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
 import { StoryExampleDropDown } from "@library/flyouts/StoryExampleDropDown";
 import { FlyoutType } from "@library/flyouts/DropDown";
-import { titleBarVariables } from "@library/headers/titleBarStyles";
+import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import StoryExampleMessagesDropDown from "@library/flyouts/StoryExampleDropDownMessages";
 import StorybookExampleNotificationsDropDown from "@library/headers/mebox/pieces/StorybookExampleNotificationsDropDown";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { oneColumnVariables } from "@library/layout/Section.variables";
 
-const story = storiesOf("Components", module);
+const story = storiesOf("Components/Dropdowns", module);
 
 story.add(
-    "Dropdowns",
+    "All",
     () => {
         const doNothing = () => {
             return;
@@ -61,7 +61,7 @@ story.add(
     },
     {
         chromatic: {
-            viewports: [layoutVariables().panelLayoutBreakPoints.noBleed, layoutVariables().panelLayoutBreakPoints.xs],
+            viewports: [oneColumnVariables().breakPoints.noBleed, oneColumnVariables().breakPoints.xs],
         },
     },
 );

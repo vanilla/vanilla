@@ -18,6 +18,9 @@ class MediaModel extends Gdn_Model implements FileUploadHandler {
     /** @var Gdn_Upload */
     private $upload;
 
+    /** @var int Bypass values set in ImageUpload.Limits config even if ImageUpload.Limits is enabled */
+    const NO_IMAGE_DIMENSIONS_LIMIT = 0;
+
     /**
      * MediaModel constructor.
      */
@@ -29,24 +32,24 @@ class MediaModel extends Gdn_Model implements FileUploadHandler {
     /**
      * Get a media row by ID.
      *
-     * @param int $mediaID The ID of the media entry.
-     * @param string $datasetType The format of the result dataset.
+     * @param int $id The ID of the media entry.
+     * @param string|false $datasetType The format of the result dataset.
      * @param array $options options to pass to the database.
      * @return array|object|false Returns the media row or **false** if it isn't found.
      */
-    public function getID($mediaID, $datasetType = false, $options = []) {
+    public function getID($id, $datasetType = false, $options = []) {
         $this->fireEvent('BeforeGetID');
-        return parent::getID($mediaID, $datasetType, $options);
+        return parent::getID($id, $datasetType, $options);
     }
 
     /**
      * Assing an attachment to another record.
      *
-     * @param $foreignID
-     * @param $foreignTable
-     * @param $newForeignID
-     * @param $newForeignTable
-     * @return Gdn_Dataset
+     * @param int $foreignID
+     * @param string $foreignTable
+     * @param int $newForeignID
+     * @param string $newForeignTable
+     * @return bool
      */
     public function reassign($foreignID, $foreignTable, $newForeignID, $newForeignTable) {
         $this->fireEvent('BeforeReassign');
@@ -109,14 +112,14 @@ class MediaModel extends Gdn_Model implements FileUploadHandler {
     /**
      * Delete record by ID.
      *
-     * @param int $mediaID ID of the record to delete
+     * @param int $id ID of the record to delete
      * @param array $options An array of options to control the delete.
      * - deleteFile: Delete the file from the disk. True by default
      *
      * @return Gdn_Dataset
      */
-    public function deleteID($mediaID, $options = []) {
-        return $this->delete(['MediaID' => $mediaID], $options);
+    public function deleteID($id, $options = []) {
+        return $this->delete(['MediaID' => $id], $options);
     }
 
     /**
@@ -194,16 +197,32 @@ class MediaModel extends Gdn_Model implements FileUploadHandler {
      * @return array
      */
     private function normalizeAndValidate(array $row): array {
-        $schema = new VanillaMediaSchema(true);
-        $result = VanillaMediaSchema::normalizeFromDbRecord($row);
-        $result = $schema->validate($result);
-        return $result;
+        return VanillaMediaSchema::normalizeFromDbRecord($row);
     }
 
     /**
      * @inheritdoc
      */
     public function saveUploadedFile(UploadedFile $file, array $extraArgs = []): array {
+        $extraArgs += [
+            'maxImageHeight' => self::NO_IMAGE_DIMENSIONS_LIMIT,
+            'maxImageWidth' => self::NO_IMAGE_DIMENSIONS_LIMIT,
+        ];
+
+        if ($extraArgs['maxImageHeight']) {
+            $maxImageHeight = $extraArgs['maxImageHeight'] === self::NO_IMAGE_DIMENSIONS_LIMIT ?
+                $file::MAX_IMAGE_HEIGHT :
+                $extraArgs['maxImageHeight'];
+            $file->setMaxImageHeight($maxImageHeight);
+        }
+
+        if ($extraArgs['maxImageWidth']) {
+            $maxImageWidth = $extraArgs['maxImageWidth'] === self::NO_IMAGE_DIMENSIONS_LIMIT ?
+                $file::MAX_IMAGE_WIDTH :
+                $extraArgs['maxImageWidth'];
+            $file->setMaxImageWidth($maxImageWidth);
+        }
+
         // Casen extra args for the DB.
         if (isset($extraArgs['foreignID'])) {
             $extraArgs['ForeignID'] = $extraArgs['foreignID'];

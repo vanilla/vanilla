@@ -341,7 +341,8 @@
 
     embed.height = embed.fn.height = function(height) {
         this.iframe.height = height;
-        this.iframe.style.height = height + 'px';
+        this.iframe.style.minHeight = height + 'px';
+        this.iframe.style.height = "100%";
     }
 
     embed.notifyLocation = embed.fn.notifyLocation = function(path) {

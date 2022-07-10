@@ -135,7 +135,7 @@ class MessagesApiController extends AbstractApiController {
      * @return array
      */
     public function get($id) {
-        $this->permission('Conversations.Conversations.Add');
+        $this->permission("Garden.SignIn.Allow");
 
         $this->schema([
             'id:i' => 'The message ID.'
@@ -163,7 +163,7 @@ class MessagesApiController extends AbstractApiController {
      * @return Data
      */
     public function index(array $query) {
-        $this->permission('Conversations.Conversations.Add');
+        $this->permission("Garden.SignIn.Allow");
 
         $in = $this->schema([
                 'conversationID:i?'=> 'Filter by conversation.',
@@ -318,7 +318,7 @@ class MessagesApiController extends AbstractApiController {
      * @return array
      */
     public function post(array $body) {
-        $this->permission('Conversations.Conversations.Add');
+        $this->permission("Garden.SignIn.Allow");
 
         $in = $this->postSchema('in')->setDescription('Add a message.');
         $out = $this->schema($this->fullSchema(), 'out');
@@ -331,7 +331,7 @@ class MessagesApiController extends AbstractApiController {
         }
 
         $messageData = ApiUtils::convertInputKeys($body);
-        $messageID = $this->conversationMessageModel->save($messageData, $conversation);
+        $messageID = $this->conversationMessageModel->save($messageData, ['conversation' => $conversation]);
         $this->validateModel($this->conversationMessageModel, true);
         if (!$messageID) {
             throw new ServerException('Unable to insert message.', 500);

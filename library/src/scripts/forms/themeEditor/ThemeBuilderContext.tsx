@@ -1,21 +1,26 @@
 /**
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import React, { useMemo, useContext, useState, useCallback, useDebugValue, useRef } from "react";
+import React, { useMemo, useContext, useState, useDebugValue, useRef } from "react";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { buttonVariables, buttonGlobalVariables } from "@library/forms/buttonStyles";
+import { buttonVariables, buttonGlobalVariables } from "@library/forms/Button.variables";
 import get from "lodash/get";
 import set from "lodash/set";
 import cloneDeep from "lodash/cloneDeep";
 import unset from "lodash/unset";
-import { bannerVariables } from "@library/banner/bannerStyles";
-import { titleBarVariables } from "@library/headers/titleBarStyles";
+import { bannerVariables } from "@library/banner/Banner.variables";
+import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { contentBannerVariables } from "@library/banner/contentBannerStyles";
-import { userContentVariables, userContentClasses } from "@library/content/userContentStyles";
-import { all } from "q";
+import { userContentVariables } from "@library/content/UserContent.variables";
+import { navigationVariables } from "@library/headers/navigationVariables";
+import { homeWidgetItemVariables } from "@library/homeWidget/HomeWidgetItem.styles";
+import { homeWidgetContainerVariables } from "@library/homeWidget/HomeWidgetContainer.styles";
+import { quickLinksVariables } from "@library/navigation/QuickLinks.variables";
+import { discussionListVariables } from "@library/features/discussions/DiscussionList.variables";
+import { listItemVariables } from "@library/lists/ListItem.variables";
 
 ///
 /// Types
@@ -115,8 +120,7 @@ export function ThemeBuilderContextProvider(props: IProps) {
         let cloned = cloneDeep(rawValueRef.current);
         rawValueRef.current = cloned;
 
-        if ((value === "" || value === undefined) && !allowEmpty) {
-            // Null does not clear this. Null is a valid value.
+        if ((value === "" || value == null) && !allowEmpty) {
             unset(cloned, variableKey);
         } else {
             cloned = set(cloned, variableKey, value);
@@ -195,10 +199,16 @@ function variableGenerator(variables: IThemeVariables) {
         global: globalVariables(variables),
         buttonGlobals: buttonGlobalVariables(variables),
         button: buttonVariables(variables),
-        banner: bannerVariables(variables),
-        contentBanner: contentBannerVariables(variables),
+        banner: bannerVariables({}, variables),
+        contentBanner: contentBannerVariables({}, variables),
         titleBar: titleBarVariables(variables),
         userContent: userContentVariables(variables),
+        navigation: navigationVariables(variables),
+        homeWidgetItem: homeWidgetItemVariables({}, variables),
+        homeWidgetContainer: homeWidgetContainerVariables({}, variables),
+        quickLinks: quickLinksVariables({}, variables),
+        discussionList: discussionListVariables(variables),
+        listItem: listItemVariables(undefined, variables),
     };
 
     // Mix in the addons generator variables.

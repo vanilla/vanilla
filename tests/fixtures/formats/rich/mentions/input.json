@@ -5,6 +5,7 @@
                 "data": {
                     "url": "https://vanillaforums.example/discussion/comment/1#Comment_1",
                     "type": "quote",
+                    "embedType": "quote",
                     "recordID": 4,
                     "recordType": "comment",
                     "bodyRaw": [
@@ -25,6 +26,21 @@
                 "loaderData": {
                     "type": "link",
                     "link": "https://vanillaforums.example/discussion/comment/1#Comment_1"
+                }
+            }
+        }
+    },
+    {
+        "insert": {
+            "embed-external": {
+                "data": {
+                    "url": "https://vanillaforums.example/uploads/image.png",
+                    "name": "image.png",
+                    "type": "image",
+                    "embedType": "image",
+                    "size": 1020,
+                    "width": 100,
+                    "height": 100
                 }
             }
         }

@@ -8,7 +8,7 @@
  * @since 2.0
  */
 
-use Vanilla\Web\WebLinking;
+use Vanilla\Web\Pagination\WebLinking;
 
 /**
  * Builds a pager control related to a dataset.
@@ -268,11 +268,11 @@ class PagerModule extends Gdn_Module {
      * Format a URL for the pager.
      *
      * @param string $url The URL format. Use either `{Page}` or `%s` to specify the page.
-     * @param string $page The page number string.
-     * @param string $limit The limit for specifying the size.
+     * @param int $page The page number string.
+     * @param int $limit The limit for specifying the size.
      * @return string Returns a pager URL.
      */
-    public static function formatUrl($url, $page, $limit = '') {
+    public static function formatUrl($url, $page, $limit = 0) {
         // Check for new style page.
         if (strpos($url, '{Page}') !== false) {
             $r = str_replace(['{Page}', '{Size}'], [$page, $limit], $url);
@@ -323,6 +323,7 @@ class PagerModule extends Gdn_Module {
     private static function makeAttributes(int $page, int $currentPage): array {
         $attrs = [
             'aria-label' => sprintf(t('Page %s'), $page),
+            'tabindex' => '0'
         ];
 
         if ($page === $currentPage - 1) {
@@ -354,12 +355,15 @@ class PagerModule extends Gdn_Module {
      * Builds page navigation links.
      *
      * @param string $type Type of link to return: 'more' or 'less'.
+     * @param array $attributes Extra attributes
      * @return string HTML page navigation links.
      */
-    public function toString($type = 'more') {
+    public function toString($type = 'more', $attributes = []) {
         if ($this->_PropertiesDefined === false) {
             trigger_error(errorMessage('You must configure the pager with $Pager->configure() before retrieving the pager.', 'MorePager', 'GetSimple'), E_USER_ERROR);
         }
+
+        $isAfter = $type == 'more';
 
         // Urls with url-encoded characters will break sprintf, so we need to convert them for backwards compatibility.
         $this->Url = str_replace(['%1$s', '%2$s', '%s'], '{Page}', $this->Url);
@@ -367,7 +371,7 @@ class PagerModule extends Gdn_Module {
         $this->addRelLinks(Gdn::controller());
 
         if ($this->TotalRecords === false) {
-            return $this->toStringPrevNext($type);
+            return $this->toStringPrevNext($type, $attributes);
         }
 
         // Get total page count, allowing override
@@ -382,7 +386,7 @@ class PagerModule extends Gdn_Module {
             return sprintf(
                 $this->Wrapper,
                 attribute(['class' => concatSep(' ', $this->CssClass, static::PREV_NEXT_CLASS)]),
-                $this->previousLink($pageCount + 1)
+                $this->previousLink(($pageCount + 1), t('Previous'))
             );
         }
 
@@ -399,16 +403,18 @@ class PagerModule extends Gdn_Module {
             $pagesToDisplay = $pageCount;
         }
 
-        $pager = '';
+        $clientID = $this->ClientID;
         $previousText = t($this->LessCode);
         $nextText = t($this->MoreCode);
         $linkCount = $pagesToDisplay + 2;
+        $pager = "";
 
         // Previous
         if ($currentPage == 1) {
-            $pager = '<span class="Previous Pager-nav" aria-disabled="true">'.$previousText.'</span>';
+            $pager .= '<span class="Previous Pager-nav" aria-disabled="true">'.$previousText.'</span>';
         } else {
-            $pager .= anchor($previousText, $this->pageUrl($currentPage - 1), 'Previous Pager-nav', ['rel' => 'prev']);
+            $attr = ['title' => t('Previous Page'), 'aria-label' => t('Previous Page')];
+            $pager .= $this->previousLink($currentPage, $previousText, $attr);
         }
 
         // Build Pager based on number of pages (Examples assume $Range = 3)
@@ -479,19 +485,17 @@ class PagerModule extends Gdn_Module {
         if ($currentPage == $pageCount) {
             $pager .= '<span class="Next Pager-nav" aria-disabled="true">'.$nextText.'</span>';
         } else {
-            $pager .= anchor(
-                $nextText,
-                $this->pageUrl($currentPage + 1),
-                'Next Pager-nav',
-                ['rel' => 'next']
-            ); // extra sprintf parameter in case old url style is set
+            $nextAttr = [
+                'title' => t('Next Page'),
+                'aria-label' => t('Next Page')
+            ];
+            $pager .= $this->nextLink($currentPage, $nextText, $nextAttr);
         }
         if ($pageCount <= 1) {
             $pager = '';
         }
 
-        $clientID = $this->ClientID;
-        $clientID = $type == 'more' ? $clientID.'After' : $clientID.'Before';
+        $clientID = $isAfter ? $clientID.'After' : $clientID.'Before';
 
         if ($pager) {
             if (isset($this->HtmlBefore)) {
@@ -505,19 +509,20 @@ class PagerModule extends Gdn_Module {
         if ($pager === '') {
             return $pager;
         } else {
+            $attributes = [
+                'role' => 'navigation',
+                'id' => $clientID,
+                'aria-label' => t('Pagination') . " - " . ($isAfter ? t("Bottom") : t('Top')) ,
+                'class' => concatSep(
+                    ' ',
+                    $this->CssClass,
+                    'PagerLinkCount-' . $linkCount,
+                    static::NUMBERED_CLASS
+                ),
+            ];
             return sprintf(
                 $this->Wrapper,
-                attribute([
-                    'role' => 'navigation',
-                    'aria-label' => 'pagination',
-                    'id' => $clientID,
-                    'class' => concatSep(
-                        ' ',
-                        $this->CssClass,
-                        'PagerLinkCount-' . $linkCount,
-                        static::NUMBERED_CLASS
-                    ),
-                ]),
+                attribute($attributes),
                 $pager
             );
         }
@@ -527,16 +532,18 @@ class PagerModule extends Gdn_Module {
      *
      *
      * @param string $type
+     * @param array $attributes
      * @return string
      */
-    public function toStringPrevNext($type = 'more') {
+    public function toStringPrevNext($type = 'more', $attributes = []) {
         $currentPage = pageNumber($this->Offset, $this->Limit);
+        $isAfter = $type == "more";
 
         $pager = '';
 
         if ($currentPage > 1) {
             $pageParam = 'p'.($currentPage - 1);
-            $pager .= $this->previousLink($currentPage);
+            $pager .= $this->previousLink($currentPage, t('Previous'));
         }
 
         $hasNext = true;
@@ -546,11 +553,11 @@ class PagerModule extends Gdn_Module {
 
         if ($hasNext) {
             $pageParam = 'p'.($currentPage + 1);
-            $pager = concatSep(' ', $pager, anchor(t('Next'), $this->pageUrl($currentPage + 1), 'Next', ['rel' => 'next']));
+            $pager = concatSep(' ', $pager, $this->nextLink($currentPage, t('Next')));
         }
 
         $clientID = $this->ClientID;
-        $clientID = $type == 'more' ? $clientID.'After' : $clientID.'Before';
+        $clientID = $isAfter ? $clientID.'After' : $clientID.'Before';
 
         if (isset($this->HtmlBefore)) {
             $pager = $this->HtmlBefore.$pager;
@@ -558,7 +565,7 @@ class PagerModule extends Gdn_Module {
 
         return $pager == '' ? '' : sprintf(
             $this->Wrapper,
-            attribute(['id' => $clientID, 'class' => concatSep(' ', $this->CssClass, static::PREV_NEXT_CLASS)]),
+            attribute(['id' => $clientID, 'class' => concatSep(' ', $this->CssClass, static::PREV_NEXT_CLASS), ['tabindex' =>  '0']]),
             $pager
         );
     }
@@ -664,10 +671,48 @@ class PagerModule extends Gdn_Module {
     }
 
     /**
-     * @param $currentPage
+     * Returns next page link.
+     *
+     * @param int $currentPage
+     * @param string $linkLabel
+     * @param array $extraAttributes
      * @return string
      */
-    private function previousLink($currentPage): string {
-        return anchor(t('Previous'), $this->pageUrl($currentPage - 1), 'Previous', ['rel' => 'prev']);
+    private function nextLink($currentPage, $linkLabel, $extraAttributes = []): string {
+        $attr = [
+            'rel' => 'next',
+            'tabindex' => "0"
+        ];
+        $attr = array_merge($attr, $extraAttributes);
+
+        return anchor(
+            $linkLabel,
+            $this->pageUrl($currentPage + 1),
+            'Next',
+            $attr
+        );
+    }
+
+    /**
+     * Returns previous page link.
+     *
+     * @param int $currentPage
+     * @param string $linkLabel
+     * @param array $extraAttributes
+     * @return string
+     */
+    private function previousLink($currentPage, $linkLabel, $extraAttributes = []): string {
+        $attr = [
+            'rel' => 'prev',
+            'tabindex' => '0'
+        ];
+        $attr = array_merge($attr, $extraAttributes);
+
+        return anchor(
+            $linkLabel,
+            $this->pageUrl($currentPage - 1),
+            'Previous',
+            $attr
+        );
     }
 }

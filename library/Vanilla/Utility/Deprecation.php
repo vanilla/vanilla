@@ -96,7 +96,6 @@ class Deprecation {
      */
     private static function logErrorMessage(string $message) {
         trigger_error($message, E_USER_DEPRECATED);
-        error_log($message, E_USER_ERROR);
 
         if (self::c('Debug', false)) {
             throw new \Exception($message);

@@ -58,7 +58,6 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase {
         );
     }
 
-
     /**
      * PHPUnit data provider.
      *
@@ -183,12 +182,35 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase {
      *
      * @dataProvider imageProvider
      */
+    public function testParseImages(string $input, array $expectedOutput) {
+        $format = $this->prepareFormatter();
+        $images = $format->parseImages($input);
+        $this->assertEquals($expectedOutput, $images);
+    }
+
+    /**
+     * PHPUnit data provider.
+     *
+     * @return array
+     */
+    public function imageUrlProvider(): array {
+        return $this->makeDataProvider('getImageUrls', 'Images');
+    }
+
+    /**
+     * Test heading parsing of the format against fixtures.
+     *
+     * @param string $input
+     * @param array $expectedOutput
+     *
+     * @dataProvider imageUrlProvider
+     */
     public function testParseImageUrls(string $input, array $expectedOutput) {
         $format = $this->prepareFormatter();
-        $headings = $format->parseImageUrls($input);
+        $images = $format->parseImageUrls($input);
         $this->assertEquals(
             json_encode($expectedOutput, JSON_PRETTY_PRINT),
-            json_encode($headings, JSON_PRETTY_PRINT)
+            json_encode($images, JSON_PRETTY_PRINT)
         );
     }
 
@@ -250,6 +272,16 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase {
         $formatService =  self::container()->get(FormatService::class);
         $result = $formatService->parseImageUrls('test content', null);
         $this->assertEquals([], $result, 'NotFoundFormat::parseImageUrl returns an empty array');
+    }
+
+    /**
+     * Test parseImageUrls excludes emojis.
+     */
+    public function testParseImageUrlsExcludeEmojis() {
+        $formatService = $this->prepareFormatter();
+        $content = '<img class="emoji" src="http://dev.vanilla.localhost/resources/emoji/smile.png" title=":)" alt=":)" height="20">';
+        $result = $formatService->parseImageUrls($content);
+        $this->assertEquals([], $result);
     }
 
     /**

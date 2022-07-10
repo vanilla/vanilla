@@ -10,24 +10,29 @@ import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import classNames from "classnames";
 import React, { useMemo, useRef, useState, useLayoutEffect, useCallback } from "react";
 import ScrollLock, { TouchScrollable } from "react-scrolllock";
-import { forceRenderStyles } from "typestyle";
 import { EntranceAnimation, ITargetTransform, FromDirection } from "@library/animation/EntranceAnimation";
 import { useLastValue } from "@vanilla/react-utils";
+import { useDropdownContext } from "../flyouts/DropDown";
+import { StackingContextProvider, useStackingContext } from "@library/modal/StackingContext";
 
 interface IProps {
+    id?: string;
     onOverlayClick: React.MouseEventHandler;
     onModalClick: React.MouseEventHandler;
     onKeyDown: React.KeyboardEventHandler;
     description?: string;
     titleID?: string;
     label?: string;
-    className?: boolean;
+    className?: string;
     scrollable?: boolean;
     size: ModalSizes;
     modalRef?: React.RefObject<HTMLDivElement>;
     children?: React.ReactNode;
     isVisible: boolean;
     onDestroyed: () => void;
+    onKeyPress?: (e) => void;
+    // The ID of the real place the modal is mounted.
+    realRootID: string;
 }
 
 /**
@@ -36,11 +41,17 @@ interface IProps {
 export function ModalView(props: IProps) {
     const { titleID, label, size, isVisible, onDestroyed } = props;
     const [isAnimatingOut, setIsAnimatingOut] = useState(false);
+    const dropdownContext = useDropdownContext();
 
     const lastVisible = useLastValue(isVisible);
     useLayoutEffect(() => {
         if (lastVisible && !isVisible) {
+            // Lose visibility
             setIsAnimatingOut(true);
+            dropdownContext.setIsForcedOpen(false);
+        } else if (!lastVisible && isVisible) {
+            // Gain visibility
+            dropdownContext.setIsForcedOpen(true);
         }
     }, [isVisible, lastVisible]);
 
@@ -54,7 +65,7 @@ export function ModalView(props: IProps) {
 
     const ownRef = useRef<HTMLDivElement>(null);
     const modalRef = props.modalRef || ownRef;
-
+    const { zIndex } = useStackingContext();
     const classes = modalClasses();
 
     let contents = (
@@ -115,6 +126,7 @@ export function ModalView(props: IProps) {
                     fromDirection: FromDirection.TOP,
                 };
             case ModalSizes.MODAL_AS_SIDE_PANEL_RIGHT:
+            case ModalSizes.MODAL_AS_SIDE_PANEL_RIGHT_LARGE:
                 return {
                     fade: false,
                     fromDirection: FromDirection.RIGHT,
@@ -127,60 +139,66 @@ export function ModalView(props: IProps) {
         }
     })();
 
-    // We HAVE to render force the styles to render before componentDidMount
-    // And our various focusing tricks or the page will jump.
-    forceRenderStyles();
     return (
-        <div>
-            <EntranceAnimation
-                fade
-                isEntered={props.isVisible}
-                className={classes.overlayScrim}
-                onDestroyed={handleDestroy}
+        <StackingContextProvider>
+            <div
+                onKeyPress={props.onKeyPress}
+                data-modal-real-root-id={props.realRootID}
+                className={classes.stackingZindex(zIndex)}
             >
-                <span></span>
-            </EntranceAnimation>
-            <ScrollLock isActive={props.isVisible || lastVisible || isAnimatingOut}>
-                <div
-                    className={classes.overlayContent}
-                    onClick={props.onOverlayClick}
-                    style={{ pointerEvents: props.isVisible ? "initial" : "none" }}
+                <EntranceAnimation
+                    fade
+                    isEntered={props.isVisible}
+                    className={classes.overlayScrim}
+                    onDestroyed={handleDestroy}
                 >
-                    <EntranceAnimation
-                        {...contentTransition}
-                        targetTransform={targetTransform}
-                        isEntered={props.isVisible}
-                        role="dialog"
-                        aria-modal={true}
-                        className={classNames(
-                            classes.root,
-                            {
-                                isFullScreen:
-                                    size === ModalSizes.FULL_SCREEN ||
-                                    size === ModalSizes.MODAL_AS_SIDE_PANEL_RIGHT ||
-                                    size === ModalSizes.MODAL_AS_SIDE_PANEL_LEFT,
-                                isSidePanelRight: size === ModalSizes.MODAL_AS_SIDE_PANEL_RIGHT,
-                                isSidePanelLeft: size === ModalSizes.MODAL_AS_SIDE_PANEL_LEFT,
-                                isDropDown: size === ModalSizes.MODAL_AS_DROP_DOWN,
-                                isXL: size === ModalSizes.XL,
-                                isLarge: size === ModalSizes.LARGE,
-                                isMedium: size === ModalSizes.MEDIUM,
-                                isSmall: size === ModalSizes.SMALL,
-                                isShadowed: size === ModalSizes.LARGE || ModalSizes.MEDIUM || ModalSizes.SMALL,
-                            },
-                            props.className,
-                        )}
-                        ref={modalRef}
-                        onKeyDown={props.onKeyDown}
-                        onClick={props.onModalClick}
-                        aria-label={label}
-                        aria-labelledby={titleID}
-                        aria-describedby={props.description ? descriptionID : undefined}
+                    <span />
+                </EntranceAnimation>
+                <ScrollLock isActive={props.isVisible || lastVisible || isAnimatingOut}>
+                    <div
+                        className={classes.overlayContent}
+                        onClick={props.onOverlayClick}
+                        style={{ pointerEvents: props.isVisible ? "initial" : "none" }}
                     >
-                        {contents}
-                    </EntranceAnimation>
-                </div>
-            </ScrollLock>
-        </div>
+                        <EntranceAnimation
+                            id={props.id}
+                            {...contentTransition}
+                            tabIndex={-1}
+                            targetTransform={targetTransform}
+                            isEntered={props.isVisible}
+                            role="dialog"
+                            aria-modal={true}
+                            className={classNames(
+                                classes.root,
+                                {
+                                    isFullScreen:
+                                        size === ModalSizes.FULL_SCREEN ||
+                                        size === ModalSizes.MODAL_AS_SIDE_PANEL_RIGHT ||
+                                        size === ModalSizes.MODAL_AS_SIDE_PANEL_LEFT,
+                                    isSidePanelRight: size === ModalSizes.MODAL_AS_SIDE_PANEL_RIGHT,
+                                    isSidePanelRightLarge: size === ModalSizes.MODAL_AS_SIDE_PANEL_RIGHT_LARGE,
+                                    isSidePanelLeft: size === ModalSizes.MODAL_AS_SIDE_PANEL_LEFT,
+                                    isDropDown: size === ModalSizes.MODAL_AS_DROP_DOWN,
+                                    isXL: size === ModalSizes.XL,
+                                    isLarge: size === ModalSizes.LARGE,
+                                    isMedium: size === ModalSizes.MEDIUM,
+                                    isSmall: size === ModalSizes.SMALL,
+                                    isShadowed: size === ModalSizes.LARGE || ModalSizes.MEDIUM || ModalSizes.SMALL,
+                                },
+                                props.className,
+                            )}
+                            ref={modalRef}
+                            onKeyDown={props.onKeyDown}
+                            onClick={props.onModalClick}
+                            aria-label={label}
+                            aria-labelledby={titleID}
+                            aria-describedby={props.description ? descriptionID : undefined}
+                        >
+                            {contents}
+                        </EntranceAnimation>
+                    </div>
+                </ScrollLock>
+            </div>
+        </StackingContextProvider>
     );
 }

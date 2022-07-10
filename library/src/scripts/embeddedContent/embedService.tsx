@@ -1,44 +1,34 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import { mountReact } from "@vanilla/react-utils";
+import { BrightcoveEmbed } from "@library/embeddedContent/BrightcoveEmbed";
 import { CodePenEmbed } from "@library/embeddedContent/CodePenEmbed";
+import { EmbedErrorBoundary } from "@library/embeddedContent/components/EmbedErrorBoundary";
 import { FileEmbed } from "@library/embeddedContent/FileEmbed";
 import { GettyImagesEmbed } from "@library/embeddedContent/GettyImagesEmbed";
 import { GiphyEmbed } from "@library/embeddedContent/GiphyEmbed";
+import { IFrameEmbed, supportsFrames } from "@library/embeddedContent/IFrameEmbed";
+import { MuralEmbed } from "@library/embeddedContent/MuralEmbed";
 import { ImageEmbed } from "@library/embeddedContent/ImageEmbed";
 import { ImgurEmbed } from "@library/embeddedContent/ImgurEmbed";
 import { InstagramEmbed } from "@library/embeddedContent/InstagramEmbed";
 import { LinkEmbed } from "@library/embeddedContent/LinkEmbed";
+import { PanoptoEmbed } from "@library/embeddedContent/PanoptoEmbed";
 import { QuoteEmbed } from "@library/embeddedContent/QuoteEmbed";
 import { SoundCloudEmbed } from "@library/embeddedContent/SoundCloudEmbed";
 import { convertTwitterEmbeds, TwitterEmbed } from "@library/embeddedContent/TwitterEmbed";
 import { VideoEmbed } from "@library/embeddedContent/VideoEmbed";
-import { PanoptoEmbed } from "@library/embeddedContent/PanoptoEmbed";
-import { onContent, t } from "@library/utility/appUtils";
-import { logWarning } from "@vanilla/utils";
-import React, { useContext } from "react";
-import Quill from "quill/core";
-import { EmbedErrorBoundary } from "@library/embeddedContent/EmbedErrorBoundary";
-import { useUniqueID, uniqueIDFromPrefix } from "@library/utility/idUtils";
-import { visibility } from "@library/styles/styleHelpers";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
+import { onContent, t } from "@library/utility/appUtils";
+import { uniqueIDFromPrefix } from "@library/utility/idUtils";
+import { mountReact } from "@vanilla/react-utils";
+import { logError, logWarning } from "@vanilla/utils";
+import React from "react";
+import { EmbedContext, IEmbedContext } from "./IEmbedContext";
 
-export const FOCUS_CLASS = "embed-focusableElement";
-export const EMBED_DESCRIPTION_ID = uniqueIDFromPrefix("embed-description");
-
-interface IEmbedContext {
-    inEditor?: boolean;
-    descriptionID?: string;
-    onRenderComplete?: () => void;
-    syncBackEmbedValue?: (values: object) => void;
-    quill?: Quill | null;
-    isSelected?: boolean;
-    selectSelf?: () => void;
-    deleteSelf?: () => void;
-}
+const EMBED_DESCRIPTION_ID = uniqueIDFromPrefix("embed-description");
 
 export interface IBaseEmbedData {
     embedType: string;
@@ -46,7 +36,9 @@ export interface IBaseEmbedData {
     name?: string;
 }
 
-export interface IBaseEmbedProps extends IEmbedContext, IBaseEmbedData {}
+export interface IBaseEmbedProps extends IEmbedContext, IBaseEmbedData {
+    [key: string]: any;
+}
 
 type EmbedComponentType = React.ComponentType<IBaseEmbedProps> & {
     async?: boolean;
@@ -62,13 +54,9 @@ export function getEmbedForType(embedType: string): EmbedComponentType | null {
     return registeredEmbeds.get(embedType) || null;
 }
 
-export const EmbedContext = React.createContext<IEmbedContext>({});
-export function useEmbedContext() {
-    return useContext(EmbedContext);
-}
-
 export async function mountEmbed(mountPoint: HTMLElement, data: IBaseEmbedProps, inEditor: boolean) {
-    return new Promise((resolve, reject) => {
+    ensureBuiltinEmbeds();
+    return new Promise<void>((resolve, reject) => {
         const type = data.embedType || null;
         if (type === null) {
             logWarning(`Found embed with data`, data, `and no type on element`, mountPoint);
@@ -92,9 +80,7 @@ export async function mountEmbed(mountPoint: HTMLElement, data: IBaseEmbedProps,
 
         const isAsync = EmbedClass.async;
         const onMountComplete = () => resolve();
-        if (inEditor) {
-            ensureEmbedDescription();
-        }
+        ensureEmbedDescription();
 
         data = {
             ...data,
@@ -139,32 +125,55 @@ function ensureEmbedDescription() {
 }
 
 export async function mountAllEmbeds(root: HTMLElement = document.body) {
-    const mountPoints = root.querySelectorAll("[data-embedjson]");
-    const promises = Array.from(mountPoints).map(mountPoint => {
-        const parsedData = JSON.parse(mountPoint.getAttribute("data-embedjson") || "{}");
-        return mountEmbed(mountPoint as HTMLElement, parsedData, false);
+    const mountPoints = root.querySelectorAll(".js-embed[data-embedjson]");
+    const promises = Array.from(mountPoints).map((mountPoint) => {
+        try {
+            const parsedData = JSON.parse(mountPoint.getAttribute("data-embedjson") || "{}");
+            return mountEmbed(mountPoint as HTMLElement, parsedData, false);
+        } catch (e) {
+            logError("failed to mountEmbed", { error: e, mountPoint });
+            return Promise.resolve();
+        }
     });
     await Promise.all(promises);
 }
 
-// Default embed registration
-registerEmbed("codepen", CodePenEmbed);
-registerEmbed("file", FileEmbed);
-registerEmbed("gettyimages", GettyImagesEmbed);
-registerEmbed("getty", GettyImagesEmbed);
-registerEmbed("giphy", GiphyEmbed);
-registerEmbed("imgur", ImgurEmbed);
-registerEmbed("instagram", InstagramEmbed);
-registerEmbed("link", LinkEmbed);
-registerEmbed("quote", QuoteEmbed);
-registerEmbed("soundcloud", SoundCloudEmbed);
-registerEmbed("twitch", VideoEmbed);
-registerEmbed("twitter", TwitterEmbed);
-registerEmbed("vimeo", VideoEmbed);
-registerEmbed("wistia", VideoEmbed);
-registerEmbed("youtube", VideoEmbed);
-registerEmbed("panopto", PanoptoEmbed);
-registerEmbed("image", ImageEmbed);
+let builtinsRegistered = false;
+
+/**
+ * Mount the built-in embeds if they aren't already.
+ */
+function ensureBuiltinEmbeds() {
+    if (builtinsRegistered) {
+        return;
+    }
+    builtinsRegistered = true;
+    // Default embed registration
+    registerEmbed("codepen", CodePenEmbed);
+    registerEmbed("file", FileEmbed);
+    registerEmbed("gettyimages", GettyImagesEmbed);
+    registerEmbed("getty", GettyImagesEmbed);
+    registerEmbed("giphy", GiphyEmbed);
+    registerEmbed("imgur", ImgurEmbed);
+    registerEmbed("instagram", InstagramEmbed);
+    registerEmbed("link", LinkEmbed);
+    registerEmbed("quote", QuoteEmbed);
+    registerEmbed("soundcloud", SoundCloudEmbed);
+    registerEmbed("twitch", VideoEmbed);
+    registerEmbed("twitter", TwitterEmbed);
+    registerEmbed("vimeo", VideoEmbed);
+    registerEmbed("wistia", VideoEmbed);
+    registerEmbed("youtube", VideoEmbed);
+    registerEmbed("kaltura", VideoEmbed);
+    registerEmbed("panopto", PanoptoEmbed);
+    registerEmbed("image", ImageEmbed);
+    registerEmbed("brightcove", BrightcoveEmbed);
+    registerEmbed("mural", MuralEmbed);
+
+    if (supportsFrames()) {
+        registerEmbed("iframe", IFrameEmbed);
+    }
+}
 
 // This is specifically required because of some legacy formats that don't render
 // The embed json format. Twitter was converted out of global JS and merged here.

@@ -17,7 +17,9 @@ export const VANILLA_THEMES = resolve(VANILLA_ROOT, "addons/themes");
 export const VANILLA_ADDONS = resolve(VANILLA_ROOT, "addons/addons");
 
 export const PACKAGES_DIRECTORY = resolve(VANILLA_ROOT, "packages");
-export const DIST_DIRECTORY = resolve(VANILLA_ROOT, "dist");
+export const DIST_NAME = "dist/v1";
+export const DIST_ROOT_DIRECTORY = resolve(VANILLA_ROOT, "dist");
+export const DIST_DIRECTORY = resolve(VANILLA_ROOT, DIST_NAME);
 export const LIBRARY_SRC_DIRECTORY = resolve(VANILLA_ROOT, "library/src/scripts");
 
 // Config files
@@ -27,6 +29,7 @@ export const TS_LINT_FILE = resolve(VANILLA_ROOT, "tslint.json");
 
 // Special entries
 export const BOOTSTRAP_SOURCE_FILE = resolve(VANILLA_ROOT, "library/src/scripts/bootstrap.ts");
+export const EMOTION_DEV_SPEEDUP_FILE = resolve(VANILLA_ROOT, "library/src/scripts/emotionDevSpeedup.ts");
 export const POLYFILL_SOURCE_FILE = "@vanilla/polyfill";
 export const PUBLIC_PATH_SOURCE_FILE = resolve(VANILLA_ROOT, "build/entries/public-path.ts");
 

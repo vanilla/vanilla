@@ -36,6 +36,12 @@ class SiteTotalsModule extends Gdn_Module {
     /** @var string */
     const RECALCULATE_KEY = self::CACHE_KEY.'.recalculate';
 
+    /** @var bool Will add online users count to module data */
+    public $onlineUsers = false;
+
+    /** @var bool A combination of discussions and comments in data as posts*/
+    public $totalPosts = false;
+
     /**
      * SiteTotalsModule constructor.
      */
@@ -117,6 +123,11 @@ class SiteTotalsModule extends Gdn_Module {
             return false;    //bail without overriding the cache
         }
 
+        //total of discussions and comments, as posts
+        if ($this->totalPosts) {
+            $counts['Post'] = $counts['Discussion'] + $counts['Comment'];
+        }
+
         // cache counts
         Gdn::cache()->store(self::COUNTS_KEY, $counts, [Gdn_Cache::FEATURE_EXPIRY => self::CACHE_TTL]);
 
@@ -150,6 +161,8 @@ class SiteTotalsModule extends Gdn_Module {
         }
 
         $this->setData('Totals', $totals);
+        $this->EventArguments['OnlineUsers'] = $this->onlineUsers;
+        $this->FireEvent('BeforeRender');
         return parent::toString();
     }
 }

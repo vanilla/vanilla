@@ -26,9 +26,11 @@ export interface ISelectOneProps extends IMenuPlacement {
     defaultValue?: IComboBoxOption;
     className?: string;
     placeholder?: string;
+    forceOpen?: boolean;
     options: IComboBoxOption[] | undefined;
     onChange: (data: IComboBoxOption) => void;
     onInputChange?: (value: string) => void;
+    onMenuOpen?: () => void;
     labelNote?: string;
     noteAfterInput?: string;
     errors?: IFieldError[];
@@ -40,6 +42,8 @@ export interface ISelectOneProps extends IMenuPlacement {
     isClearable?: boolean;
     describedBy?: string;
     selectRef?: React.RefObject<Select>;
+    onFocus?: () => void;
+    maxHeight?: number;
 }
 
 export enum MenuPlacement {
@@ -66,7 +70,7 @@ export default function SelectOne(props: ISelectOneProps) {
     const inputID = props.inputID || id + "-input";
     const errorID = id + "-errors";
 
-    const { className, disabled, options, searchable } = props;
+    const { className, disabled, options, searchable, forceOpen } = props;
     let describedBy;
     const hasErrors = props.errors && props.errors!.length > 0;
     if (hasErrors) {
@@ -76,7 +80,14 @@ export default function SelectOne(props: ISelectOneProps) {
     const classes = selectOneClasses();
     const classesInputBlock = inputBlockClasses();
     return (
-        <div className={classNames(classesInputBlock.root, props.className)}>
+        <div
+            className={classNames(classesInputBlock.root, props.className)}
+            onClick={() => {
+                if (!isFocused && props.selectRef?.current) {
+                    props.selectRef?.current.focus();
+                }
+            }}
+        >
             {props.label !== null && (
                 <label htmlFor={inputID} className={classesInputBlock.labelAndDescription}>
                     <span className={classNames(classesInputBlock.labelText, props.label)}>{props.label}</span>
@@ -103,13 +114,18 @@ export default function SelectOne(props: ISelectOneProps) {
                     aria-describedby={describedBy}
                     isSearchable={searchable}
                     value={props.value}
-                    menuIsOpen={isFocused === false ? false : undefined}
+                    menuIsOpen={forceOpen ? true : isFocused === false ? false : undefined}
                     placeholder={props.placeholder}
                     isLoading={props.isLoading}
-                    onFocus={() => setIsFocused(true)}
+                    onMenuOpen={props.onMenuOpen}
+                    onFocus={() => {
+                        setIsFocused(true);
+                        props.onFocus?.();
+                    }}
                     onBlur={() => setIsFocused(false)}
                     menuPlacement={props.menuPlacement ?? "auto"}
                     ref={props.selectRef}
+                    maxMenuHeight={props.maxHeight}
                 />
                 <Paragraph className={classesInputBlock.labelNote}>{props.noteAfterInput}</Paragraph>
                 <ErrorMessages id={errorID} errors={props.errors} />
@@ -135,6 +151,9 @@ function useOverrideProps(props: ISelectOneProps) {
             ValueContainer: function CustomValueContainer(localProps) {
                 return <selectOverrides.ValueContainer {...localProps} className={inputClassName} />;
             },
+            DropdownIndicator: function CustomDropdownIndicator(localProps) {
+                return <selectOverrides.DropdownIndicator {...localProps} />;
+            },
             NoOptionsMessage: noOptionsMessage || selectOverrides.NoOptionsMessage,
             LoadingMessage: selectOverrides.OptionLoader,
         };
@@ -143,7 +162,7 @@ function useOverrideProps(props: ISelectOneProps) {
     const customStyles = useMemo(() => {
         return {
             option: () => ({}),
-            menu: base => {
+            menu: (base) => {
                 return { ...base, backgroundColor: null, boxShadow: null };
             },
             control: () => ({
@@ -153,7 +172,7 @@ function useOverrideProps(props: ISelectOneProps) {
     }, []);
 
     // Overwrite theme in Select component
-    const getTheme = useCallback(theme => {
+    const getTheme = useCallback((theme) => {
         return {
             ...theme,
             borderRadius: {},

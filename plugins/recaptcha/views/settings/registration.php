@@ -17,6 +17,14 @@
                 <th><?php echo t('Private Key'); ?></th>
                 <td class="Alt"><?php echo $this->Form->textBox('Recaptcha.PrivateKey'); ?></td>
             </tr>
+            <tr>
+                <th><?php echo t('reCAPTCHA v3 Public Key'); ?></th>
+                <td class="Alt"><?php echo $this->Form->textBox('RecaptchaV3.PublicKey'); ?></td>
+            </tr>
+            <tr>
+                <th><?php echo t('reCAPTCHA v3 Private Key'); ?></th>
+                <td class="Alt"><?php echo $this->Form->textBox('RecaptchaV3.PrivateKey'); ?></td>
+            </tr>
             </tbody>
         </table>
     </div>

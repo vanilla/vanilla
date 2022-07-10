@@ -9,6 +9,8 @@ namespace Vanilla\Theme;
 
 use Vanilla\Addon;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Controllers\SearchRootController;
+use Vanilla\FeatureFlagHelper;
 
 /**
  * Class to hold information about a theme and it's configuration options.
@@ -23,13 +25,52 @@ class ThemeFeatures implements \JsonSerializable {
 
     private $forcedFeatures = [];
 
-    const FEATURE_DEFAULTS = [
-        'NewFlyouts' => false,
-        'SharedMasterView' => false,
-        'ProfileHeader' => false,
-        'DataDrivenTheme' => false,
-        'DisableKludgedVars' => false,
-        'NewEventsPage' => false,
+    private const FEATURE_NAMES = [
+        // Used for keystone and newer to allow flyouts to convert to Modals o mobile.
+        'NewFlyouts',
+
+        // Use twig master templates. You do not have access to the full master view.
+        'SharedMasterView',
+
+        // Used foundation and some other themes, adds extra header information on top of the profile page.
+        'ProfileHeader',
+
+        // Applies the Variabler driven CSS across the forum. (Eg. foundation based).
+        'DataDrivenTheme',
+
+        // Turn on user cards.
+        'UserCards',
+
+        // Disable legacy based variables.json.
+        'DisableKludgedVars',
+
+        // Use the new event list page, and new event view page.
+        'NewEventsPage',
+
+        // Enable the new search UI (member directory, places, new interface).
+        SearchRootController::ENABLE_FLAG,
+
+        // Make backwards-incompatbile view changes for better accessibility.
+        'EnhancedAccessibility',
+
+        // Use the new themeable quicklinks.
+        'NewQuickLinks',
+
+        // New button style dropdown
+        'NewCategoryDropdown',
+
+
+        // New badges module.
+        'NewBadgesModule',
+
+        // NewReactionsModule (icons and count) to replace writeProfileCounts()
+        'NewReactionsModule',
+
+        // NewGuestModule to replace the view with react component
+        'NewGuestModule',
+
+        // NewPostMenu for NewDiscussionModule
+        'NewPostMenu',
     ];
 
     /**
@@ -59,28 +100,59 @@ class ThemeFeatures implements \JsonSerializable {
         return $this->allFeatures();
     }
 
+    /**
+     * Get theme features pulled directly from the addon.
+     */
+    public function allAddonFeatures(): array {
+        $rawInfoFeatures = [];
+        if ($this->theme !== null) {
+            $rawInfoFeatures = $this->theme->getInfoValue('Features', []);
+        }
+        $defaultEnabled = (bool) ($rawInfoFeatures['DataDrivenTheme'] ?? false);
+
+        $addonFeatures = [];
+        foreach (self::FEATURE_NAMES as $featureName) {
+            $addonFeatures[$featureName] = (bool) ($rawInfoFeatures[$featureName] ?? $defaultEnabled);
+        }
+
+        return $addonFeatures;
+    }
 
     /**
      * Get all of the current theme features.
      */
     public function allFeatures(): array {
-        if ($this->theme === null) {
-            return self::FEATURE_DEFAULTS;
-        }
-        $configValues = [
-            'NewFlyouts' => $this->config->get('Feature.NewFlyouts.Enabled'),
-        ];
-        $themeValues = $this->theme->getInfoValue('Features', []);
-        if ($themeValues['DataDrivenTheme'] ?? false) {
-            // Data driven themes automatically enables other theme features.
-            $themeValues['DisableKludgedVars'] = true;
-            $themeValues['ProfileHeader'] = true;
-            $themeValues['SharedMasterView'] = true;
-            $themeValues['NewFlyouts'] = true;
-            $themeValues['NewEventsPage'] = true;
+        $addonFeatures = $this->allAddonFeatures();
+
+        $featureFlagEnabledFeatures = [];
+        foreach (self::FEATURE_NAMES as $featureName) {
+            if (FeatureFlagHelper::featureEnabled($featureName)) {
+                $featureFlagEnabledFeatures[$featureName] = true;
+            }
         }
 
-        return array_merge(self::FEATURE_DEFAULTS, $configValues, $themeValues, $this->forcedFeatures);
+        $features = array_merge(
+            // Features from the theme first.
+            $addonFeatures,
+            // A feature flags that may have been turned on in the config or through Vanilla Labs.
+            $featureFlagEnabledFeatures,
+            // Feature flags that were dynamically forced at runtime.
+            $this->forcedFeatures
+        );
+
+        return $features;
+    }
+
+    /**
+     * Get a theme feature.
+     *
+     * @param string $featureName The name of the feature.
+     *
+     * @return bool
+     */
+    public function get(string $featureName): bool {
+        $result = $this->allFeatures()[$featureName] ?? false;
+        return (bool) $result;
     }
 
     /**
@@ -102,6 +174,13 @@ class ThemeFeatures implements \JsonSerializable {
      */
     public function useProfileHeader(): bool {
         return (bool) $this->allFeatures()['ProfileHeader'];
+    }
+
+    /**
+     * @return bool
+     */
+    public function useNewQuickLinks(): bool {
+        return (bool) $this->allFeatures()['NewQuickLinks'];
     }
 
     /**

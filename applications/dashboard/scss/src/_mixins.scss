@@ -88,6 +88,9 @@
 
   &.disabled,
   &:disabled {
+    color: $btn-link-disabled-color;
+    border-color: $btn-link-disabled-color;
+
     &:focus,
     &.focus {
       background-color: $background;

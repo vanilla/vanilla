@@ -65,11 +65,17 @@ class AddonsApiController extends Controller {
                     'description' => 'The addon\'s icon.',
                     'format' => 'uri',
                 ],
-                'version:s' => 'The addon\'s version.',
+                'version:s' => [
+                    'description' => 'The addon\'s version.',
+                    'default' => 'unknown',
+                ],
                 'require:a?' => [
                     'type' => 'array',
                     'description' => 'An array of addons that are required to enable the addon.',
                     'items' => $requirementSchema,
+                ],
+                'attributes:o' => [
+                    'locale:s?',
                 ],
                 'conflict:a?' => [
                     'type' => 'array',
@@ -108,6 +114,10 @@ class AddonsApiController extends Controller {
         }
         if (!empty($r['conflict'])) {
             $r['conflict'] = $this->filterRequirements($r['conflict']);
+        }
+        $r['attributes'] = new \Vanilla\Attributes();
+        if ($addon->getType() === Addon::TYPE_LOCALE) {
+            $r['attributes']['locale'] = $r['locale'];
         }
 
         return $r;

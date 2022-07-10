@@ -148,4 +148,26 @@ class GdnConfigurationTest extends TestCase {
 
         $this->assertEquals("myValue", $config->get("Other.Value"));
     }
+
+    /**
+     * Assert that you can touch multiple values and they will not be persisted.
+     */
+    public function testTouchMultipleNoPersist() {
+        // Quick check with falsy value.
+        $config = $this->config();
+        $config->loadArray(["Nested" => ["Value" => "existing"]], "test");
+        $config->touch([
+            "Nested.Value" => "myValue",
+            "Other.Value" => 'otherValue',
+        ], null, false);
+
+        $this->assertEquals("existing", $config->get("Nested.Value"));
+        $this->assertEquals("otherValue", $config->get("Other.Value"));
+
+        $dynamic = $config->getDynamic();
+        $this->assertEquals("existing", $dynamic->get("Nested.Value"));
+
+        // Value will not be persisted.
+        $this->assertEquals(false, $dynamic->get("Other.Value"));
+    }
 }

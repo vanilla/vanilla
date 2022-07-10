@@ -13,6 +13,7 @@ use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\RequestInterface;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Exception\PermissionException;
+use Vanilla\Web\CacheControlConstantsInterface;
 use Vanilla\Web\SmartIDMiddleware;
 use Vanilla\Web\UserSmartIDResolver;
 use VanillaTests\BootstrapTrait;
@@ -295,5 +296,33 @@ class SmartIDMiddlewareTest extends TestCase {
     public function testBasePathAccessors() {
         $this->middleware->setBasePath('/foo');
         $this->assertSame('/foo', $this->middleware->getBasePath());
+    }
+
+    /**
+     * @return array
+     */
+    public function provideMeNoCacheData(): array {
+        $r = [
+            'users' => ['/users/$me'],
+            'discussion' => ['/api/v2/discussions?insertUserID=$me'],
+            'comment' => ['/api/v2/comments?insertUserID=$me']];
+        return array_column($r, null, 0);
+    }
+
+    /**
+     * Test that no cache is set when the smartID $me is used.
+     *
+     * @param string $path
+     * @dataProvider provideMeNoCacheData
+     */
+    public function testMeNoCache(string $path) {
+        $this->session->UserID = 0;
+
+        $request = new Request($path);
+        $data = call_user_func($this->middleware, $request, function ($request) {
+            return new Data([], ['request' => $request]);
+        });
+
+        $this->assertEquals(CacheControlConstantsInterface::NO_CACHE, $data->getHeader('cache-control'));
     }
 }

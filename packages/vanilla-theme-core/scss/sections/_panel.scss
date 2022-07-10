@@ -20,6 +20,7 @@
 
         .BoxNewDiscussion.BoxNewDiscussion {
             margin: $utility-baseUnitTriple 0;
+            text-align: center;
         }
 
         .ButtonGroup.Multi,
@@ -55,7 +56,6 @@
         background: transparent;
 
         li {
-            margin: 0;
             padding: 0;
             background: transparent;
         }
@@ -338,9 +338,7 @@ body.Section-EditProfile .Box,
     a {
         display: flex;
         align-items: center;
-        @if ($staticVariables) {
-            padding: $panel-item_padding;
-        }
+        padding: $panel-item_padding;
         border: $panel-item_border;
         @if ($staticVariables) {
             border-radius: $panel_item-borderRadius;

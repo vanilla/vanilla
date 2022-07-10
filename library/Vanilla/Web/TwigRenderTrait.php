@@ -24,30 +24,7 @@ trait TwigRenderTrait {
      * Initialize the twig environment.
      */
     private function prepareTwig(): \Twig\Environment {
-        /** @var TwigEnhancer $enhancer */
-        $enhancer = \Gdn::getContainer()->get(TwigEnhancer::class);
-
-        $loader = new \Twig\Loader\FilesystemLoader(self::$twigDefaultFolder);
-
-        $isDebug = \Gdn::config('Debug') === true;
-        $envArgs = [
-            'cache' => $isDebug ? false : $enhancer->getCompileCacheDirectory() ?? false, // Null not allowed. Only false or string.
-            'debug' => $isDebug,
-            // Automatically controlled by the debug value.
-            // This causes twig to check the FS timestamp before going to cache.
-            // It will rebuild that file's cache if an update had occured.
-            // 'auto_reload' => $isDebug
-            'strict_variables' => $isDebug, // Surface template errors in debug mode.
-        ];
-        $environment = new \Twig\Environment($loader, $envArgs);
-
-        if ($isDebug) {
-            $environment->addExtension(new \Twig\Extension\DebugExtension());
-        }
-
-        $enhancer->enhanceEnvironment($environment);
-        $enhancer->enhanceFileSystem($loader);
-        return $environment;
+        return \Gdn::getContainer()->get(TwigRenderer::class);
     }
 
     /**

@@ -19,7 +19,12 @@ interface IProps {
 export function StoryLink(props: IProps) {
     const classes = storyBookClasses();
     return (
-        <a href={props.href} target={props.newTab ? "_blank" : undefined} className={classes.link}>
+        <a
+            href={props.href}
+            target={props.newTab ? "_blank" : undefined}
+            rel="noopener noreferrer"
+            className={classes.link}
+        >
             {props.children}
         </a>
     );

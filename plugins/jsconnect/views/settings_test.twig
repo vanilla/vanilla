@@ -1,0 +1,54 @@
+<div class="js-form">
+   <header class="header-block">
+      <div class="title-block">
+         <a href="{{ url('/settings/jsconnect') }}" class="btn btn-icon btn-return" aria-label="Back to jsConnect Settings">
+            <svg class="icon icon-svg " alt="chevron-left" viewBox="0 0 17 17">
+               <use xlink:href="#chevron-left"></use>
+            </svg>
+         </a>
+
+         {# TODO: Back chevron here to go back to /settings/jsconnect #}
+         <h1>JsConnect Test</h1>
+      </div>
+   </header>
+   <section>
+      {{ form.open({'id': 'jsConnect'}) | raw }}
+      {{ form.errors() | raw }}
+
+      <div class="padded">
+      {%  if message is defined %}
+         <p class="alert {{ messageClass|default('alert-info') }}">{{ message }}</p>
+      {% endif %}
+      {% if user is defined %}
+         {% if user is empty %}
+            <p>There is no user signed in. Click <a href="{{ signinUrl }}">here</a> to continue the signing in.</p>
+         {% else %}
+            <p>The user is signed in. Here are the details:</p>
+
+            <h2>Known User Fields</h2>
+            <pre>{{ known|json_encode(constant('JSON_PRETTY_PRINT') b-or constant('JSON_FORCE_OBJECT')) }}</pre>
+
+            <h2>Unknown User Fields</h2>
+            {% if unknown is empty %}
+               <p><i>Your user doesn't have any unknown fields.</i></p>
+            {% else %}
+            <p>Unknown fields are not specifically known by jsConnect. They may still work for SSO if they are present in the user table.</p>
+            <pre>{{ unknown|json_encode(constant('JSON_PRETTY_PRINT') b-or constant('JSON_FORCE_OBJECT')) }}</pre>
+            {% endif %}
+
+            <h2>Token Details</h2>
+            <pre>{{ tokenDetails|json_encode(constant('JSON_PRETTY_PRINT') b-or constant('JSON_FORCE_OBJECT')) }}</pre>
+
+             <h2>Embed Token for Embedded SSO</h2>
+             <p>This is a sample token for embedded SSO. You can use this to compare to the embedded SSO tokens you generate if you
+                 are embedding your forum in an iFrame.</p>
+             <pre>{{ embedToken|json_encode(constant('JSON_PRETTY_PRINT') b-or constant('JSON_FORCE_OBJECT')) }}</pre>
+            <br />
+            <p class="alert alert-info">To perform a full test, sign out of your site and then run this test again.</p>
+         {% endif %}
+      {% endif %}
+      </div>
+
+      {{ form.close() | raw }}
+   </section>
+</div>

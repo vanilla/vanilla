@@ -4,8 +4,9 @@
  * @license GPL-2.0-only
  */
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { unit } from "@library/styles/styleHelpers";
-import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 
 export const emojiGroupsClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -22,8 +23,8 @@ export const emojiGroupsClasses = useThemeCache(() => {
         position: "relative",
         margin: "auto",
         padding: 0,
-        width: unit(globalVars.icon.sizes.default),
-        height: unit(globalVars.icon.sizes.default),
+        width: styleUnit(globalVars.icon.sizes.default),
+        height: styleUnit(globalVars.icon.sizes.default),
     });
 
     return { root, icon };

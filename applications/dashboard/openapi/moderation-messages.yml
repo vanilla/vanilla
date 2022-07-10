@@ -1,0 +1,285 @@
+openapi: 3.0.3
+info:
+paths:
+    /moderation-messages:
+        post:
+            summary: Post a moderation message.
+            tags:
+                - Moderation Messages
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/ModerationMessagePost"
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ModerationMessage"
+                                type: array
+                    description: Success
+        get:
+            summary: Get a list of moderation messages.
+            tags:
+                - Moderation Messages
+            parameters:
+                - name: isEnabled
+                  description: Whether the message is enabled or not.
+                  in: query
+                  schema:
+                      type: boolean
+                - name: recordID
+                  description: Filter by recordID
+                  in: query
+                  schema:
+                      $ref: "#/components/schemas/RangeExpression"
+                - name: type
+                  in: query
+                  description: Filter by message type.
+                  schema:
+                      type: string
+                      enum:
+                          - casual
+                          - info
+                          - alert
+                          - warning
+                - name: layoutViewType
+                  in: query
+                  description: Filter messages by the layoutViewType
+                  schema:
+                      $ref: "#/components/schemas/LayoutViewType"
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        "application/json":
+                            schema:
+                                type: array
+                                items:
+                                    $ref: "#/components/schemas/ModerationMessage"
+    /moderation-messages/{id}:
+        parameters:
+            - name: id
+              in: path
+              required: true
+              schema:
+                  type: integer
+        get:
+            summary: Get a moderation message by its ID.
+            tags:
+                - Moderation Messages
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/ModerationMessage"
+                    description: Success
+                "403":
+                    $ref: "#/components/responses/PermissionError"
+                "404":
+                    $ref: "#/components/responses/NotFound"
+        patch:
+            summary: Edit a moderation message.
+            tags:
+                - Moderation Messages
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/ModerationMessagePatch"
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/ModerationMessage"
+                    description: Success
+                "403":
+                    $ref: "#/components/responses/PermissionError"
+                "404":
+                    $ref: "#/components/responses/NotFound"
+        delete:
+            summary: Delete a moderation message.
+            tags:
+                - Moderation Messages
+            responses:
+                "204":
+                    description: Success
+                "403":
+                    $ref: "#/components/responses/PermissionError"
+                "404":
+                    $ref: "#/components/responses/NotFound"
+    /moderation-messages/{id}/dismiss:
+        parameters:
+            - name: id
+              in: path
+              required: true
+              schema:
+                  type: integer
+        put:
+            summary: Dismiss a moderation message for the session user.
+            tags:
+                - Moderation Messages
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        "application/json":
+                            schema:
+                                type: object
+                                properties:
+                                    dismissed:
+                                        type: boolean
+components:
+    schemas:
+        ModerationMessage:
+            type: object
+            properties:
+                moderationMessageID:
+                    type: integer
+                    description: The id of the message.
+                body:
+                    type: string
+                    description: The content of the message.
+                format:
+                    $ref: "#/components/schemas/Format"
+                isDismissible:
+                    type: boolean
+                    description: Whether the moderation message can be dismissed by a user.
+                isEnabled:
+                    type: boolean
+                    description: Whether the message is enabled.
+                recordType:
+                    type: string
+                    nullable: true
+                    enum:
+                        - category
+                    description: The record type (i.e., category) associated with the message, if any.
+                recordID:
+                    type: integer
+                    nullable: true
+                    description: The recordID associated with the message, if any.
+                includeDescendants:
+                    type: boolean
+                    description: Whether to display the message for descendants of the record it's associated with (i.e., subcategories).
+                type:
+                    type: string
+                    description: The type of moderation message.
+                    enum:
+                        - casual
+                        - info
+                        - alert
+                        - warning
+                viewLocation:
+                    type: string
+                    description: Where on the page the message should appear.
+                    enum:
+                        - content
+                        - panel
+                layoutViewType:
+                    $ref: "#/components/schemas/LayoutViewType"
+            required:
+                - body
+                - format
+                - viewLocation
+                - moderationMessageID
+                - isEnabled
+                - isDismissible
+        ModerationMessagePost:
+            type: object
+            properties:
+                body:
+                    type: string
+                    description: The content of the message.
+                format:
+                    $ref: "#/components/schemas/Format"
+                isDismissible:
+                    type: boolean
+                    description: Whether the moderation message can be dismissed by a user.
+                isEnabled:
+                    type: boolean
+                    description: Whether the message is enabled.
+                recordType:
+                    type: string
+                    nullable: true
+                    enum:
+                        - category
+                    description: The record type (i.e., category) associated with the message, if any.
+                recordID:
+                    type: integer
+                    nullable: true
+                    description: The recordID associated with the message, if any.
+                includeDescendants:
+                    type: boolean
+                    description: Whether to display the message for descendants of the record it's associated with (i.e., subcategories).
+                type:
+                    type: string
+                    description: The type of moderation message.
+                    enum:
+                        - casual
+                        - info
+                        - alert
+                        - warning
+                viewLocation:
+                    type: string
+                    description: Where on the page the message should appear.
+                    enum:
+                        - content
+                        - panel
+                layoutViewType:
+                    $ref: "#/components/schemas/LayoutViewType"
+            required:
+                - body
+                - format
+                - layoutViewType
+                - viewLocation
+        ModerationMessagePatch:
+            type: object
+            properties:
+                body:
+                    type: string
+                    description: The content of the message.
+                format:
+                    $ref: "#/components/schemas/Format"
+                isDismissible:
+                    type: boolean
+                    description: Whether the moderation message can be dismissed by a user.
+                    default: false
+                isEnabled:
+                    type: boolean
+                    description: Whether the message is enabled.
+                    default: false
+                recordType:
+                    type: string
+                    nullable: true
+                    enum:
+                        - category
+                    description: The record type (i.e., category) associated with the message, if any.
+                    default: null
+                recordID:
+                    type: integer
+                    nullable: true
+                    description: The recordID associated with the message, if any.
+                    default: null
+                includeDescendants:
+                    type: boolean
+                    description: Whether to display the message for descendants of the record it's associated with (i.e., subcategories).
+                type:
+                    type: string
+                    description: The type of moderation message.
+                    enum:
+                        - casual
+                        - info
+                        - alert
+                        - warning
+                viewLocation:
+                    type: string
+                    description: Where on the page the message should appear.
+                    enum:
+                        - content
+                        - panel
+                layoutViewType:
+                    $ref: "#/components/schemas/LayoutViewType"

@@ -36,7 +36,7 @@ export default function SignInPage(props: IProps) {
 
     let showPassword = false;
     const ssoMethods =
-        authenticatorState.data?.filter(a => {
+        authenticatorState.data?.filter((a) => {
             if (a.type === "password") {
                 showPassword = true;
                 return false;

@@ -1,5 +1,19 @@
 <?php if (!defined('APPLICATION')) exit();
-echo heading($this->data('Title'), t('Add Ban Rule'), '/dashboard/settings/bans/add', 'btn btn-primary js-modal');
+echo heading(
+    $this->data('Title'),
+    [
+        [
+            'text' => dashboardSymbol('settings'),
+            'url' => '/vanilla/settings/bansettings',
+            'attributes' => [
+                'class' => 'btn btn-icon-border js-modal',
+                'aria-label' => t('Advanced Ban Settings'),
+            ]
+        ],
+        ['text' => t('Add Ban Rule'), 'url' => '/dashboard/settings/bans/add'],
+    ]
+);
+
 $help = t('You can ban IP addresses, email addresses and usernames.');
 $help .= ' '.t('Specify a partial or full match when creating a ban.');
 $help .= ' '.t('For example, you can ban all users with emails addresses from "example.com" by adding an email-type ban with the value "*@example.com".');

@@ -1,0 +1,102 @@
+openapi: 3.0.2
+info:
+paths:
+    /users/{id}/reacted:
+        get:
+            summary: Get a user's posts that have received a certain reaction.
+            tags:
+                - Users
+            parameters:
+                - description: The user ID.
+                  in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: integer
+                - description: The reaction to filter by.
+                  in: query
+                  name: reactionUrlcode
+                  required: true
+                  schema:
+                      type: string
+                - description: expand parameters
+                  in: query
+                  name: expand
+                  schema:
+                      items:
+                          enum:
+                              - insertUser
+                              - updateUser
+                              - reactions
+                              - all
+                          type: string
+                      type: array
+                  style: form
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                type: array
+                                items:
+                                    $ref: "#/components/schemas/ReactedRecord"
+                    description: Success
+components:
+    schemas:
+        ReactedRecord:
+            type: object
+            properties:
+                name:
+                    description: The name of the record
+                    type: string
+                body:
+                    description: The body of the record
+                    type: string
+                insertUserID:
+                    description: The author of the record
+                    type: integer
+                dateUpdated:
+                    format: date-time
+                    type: string
+                recordID:
+                    type: integer
+                recordType:
+                    type: string
+                    enum:
+                        - Comment
+                        - Discussion
+                discussionID:
+                    type: integer
+                commentID:
+                    type: integer
+                url:
+                    type: string
+                insertUser:
+                    $ref: "#/components/schemas/UserFragment"
+                updateUser:
+                    $ref: "#/components/schemas/UserFragment"
+                reactions:
+                    type: array
+                    items:
+                        $ref: "#/components/schemas/ReactionFragment"
+            required:
+                - name
+                - body
+                - insertUserID
+                - recordID
+                - recordType
+                - discussionID
+                - url
+        ReactionFragment:
+            type: object
+            properties:
+                tagID:
+                    type: integer
+                urlcode:
+                    type: string
+                name:
+                    type: string
+                class:
+                    type: string
+                count:
+                    type: integer

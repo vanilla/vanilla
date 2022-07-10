@@ -2,15 +2,18 @@
 /**
  * Managing core Dashboard settings.
  *
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Dashboard
  * @since 2.0
  */
 use Vanilla\Addon;
+use Vanilla\Models\AddonModel;
+use Vanilla\Theme\ThemeServiceHelper;
+use Vanilla\Utility\ArrayUtils;
 use Vanilla\Web\HttpStrictTransportSecurityModel as HstsModel;
-use Vanilla\Models\ThemeModelHelper;
-use Vanilla\Models\FsThemeProvider;
+use Vanilla\Theme\FsThemeProvider;
+use Vanilla\Widgets\WidgetService;
 
 /**
  * Handles /settings endpoint.
@@ -18,6 +21,8 @@ use Vanilla\Models\FsThemeProvider;
 class SettingsController extends DashboardController {
 
     const DEFAULT_AVATAR_FOLDER = 'defaultavatar';
+    const CONFIG_CSP_DOMAINS = "ContentSecurityPolicy.ScriptSrc.AllowedDomains";
+    const CONFIG_TRUSTED_DOMAINS = "Garden.TrustedDomains";
 
     /** @var array Models to automatically instantiate. */
     public $Uses = ['Form', 'Database'];
@@ -35,6 +40,39 @@ class SettingsController extends DashboardController {
     private $_BanModel;
 
     /**
+     * @var \Vanilla\Models\AddonModel
+     */
+    private $addonModel;
+
+    /** @var WidgetService */
+    private $widgetService;
+
+    /**
+     * SettingsController constructor.
+     */
+    public function __construct() {
+        parent::__construct();
+        $this->addonModel = \Gdn::getContainer()->get(AddonModel::class);
+        $this->widgetService = \Gdn::getContainer()->get(WidgetService::class);
+    }
+
+    /**
+     * Render the labs page.
+     */
+    public function labs() {
+        $this->permission('Garden.Settings.Manage');
+        $this->render('labs');
+    }
+
+    /**
+     * Render the language settings page.
+     */
+    public function language() {
+        $this->permission('Garden.Settings.Manage');
+        $this->render('language');
+    }
+
+    /**
      * Highlight menu path. Automatically run on every use.
      *
      * @since 2.0.0
@@ -42,10 +80,10 @@ class SettingsController extends DashboardController {
      */
     public function initialize() {
         parent::initialize();
-        Gdn_Theme::section('Dashboard');
         if ($this->Menu) {
             $this->Menu->highlightRoute('/dashboard/settings');
         }
+        Gdn_Theme::section('Settings');
 
         // Many dashboard pages display a pretty style flash when deferring all scripts.
         // Disable deferred scripts on these pages until this is resolved.
@@ -474,123 +512,30 @@ class SettingsController extends DashboardController {
      */
     public function branding() {
         $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
-        $this->setHighlightRoute('dashboard/settings/branding');
-        $this->title(t('Branding & SEO'));
+        redirectTo('appearance/branding', 302);
+    }
+
+    /**
+     * Settings page for user profile redirection.
+     */
+    public function profile() {
+        $this->permission(['Garden.Settings.Manage'], false);
+        $this->setHighlightRoute('dashboard/settings/profile');
+        $this->title(t('User Profile'));
+
         $items = [
-            'Garden.HomepageTitle' => [
-                'LabelCode' => t('Homepage Title'),
+            'Garden.Profile.RedirectUrl' => [
                 'Control' => 'textbox',
-                'Description' => t('The homepage title is displayed on your home page.', 'The homepage title is displayed on your home page. Pick a title that you would want to see appear in search engines.')
+                'LabelCode' => t('"Profile" redirection URL'),
+                'Description' => t('Custom URL to redirect the user instead of rendering Vanilla\'s "Profile" page.')
             ],
-            'Garden.Description' => [
-                'LabelCode' => t('Site Description'),
+            'Garden.Messages.Add.RedirectUrl' => [
                 'Control' => 'textbox',
-                'Description' => t("The site description usually appears in search engines.", 'The site description usually appears in search engines. You should try having a description that is 100–150 characters long.'),
-                'Options' => [
-                    'Multiline' => true,
-                ]
-            ],
-            'Garden.Title' => [
-                'LabelCode' => t('Banner Title'),
-                'Control' => 'textbox',
-                'Description' => t("The banner title appears on your site's banner and in your browser's title bar.",
-                    "The banner title appears on your site's banner and in your browser's title bar. It should be less than 20 characters. If a banner logo is uploaded, it will replace the banner title on user-facing forum pages. Also, keep in mind some themes may hide this title.")
-            ],
-            'Garden.OrgName' => [
-                'LabelCode' => t('Organization'),
-                'Control' => 'textbox',
-                'Description' => t("OrgDescription", "Your organization name is used for SEO microdata and JSON+LD"),
-            ],
-            'Garden.Logo' => [
-                'Label' => t('Banner Logo'),
-                'Control' => 'imageUploadReact',
-                'Description' => t(
-                    'LogoDescription',
-                    'The banner logo appears at the top of your site. Some themes may not display this logo.'
-                ),
-            ],
-            'Garden.MobileLogo' => [
-                'Label' => t('Mobile Banner Logo'),
-                'Control' => 'imageUploadReact',
-                'Description' => t(
-                    'MobileLogoDescription',
-                    'The mobile banner logo appears at the top of your site. Some themes may not display this logo.'
-                ),
-            ],
-            'Garden.BannerImage' => [
-                'Label' => t('Banner Image'),
-                'Control' => 'imageUploadReact',
-                'Description' => t('The default banner image across the site. This can be overriden on a per category basis.'),
-            ],
-            'Garden.FavIcon' => [
-                'LabelCode' => t('Favicon'),
-                'Control' => 'imageupload',
-                'Size' => '48x48',
-                'OutputType' => 'ico',
-                'Prefix' => 'favicon_',
-                'Crop' => true,
-                'Description' => t(
-                    'FaviconDescription',
-                    "Your site's favicon appears in your browser's title bar. It will be scaled down appropriately."
-                ),
-                'Options' => [
-                    'RemoveConfirmText' => sprintf(t('Are you sure you want to delete your %s?'), t('favicon'))
-                ]
-            ],
-            'Garden.TouchIcon' => [
-                'LabelCode' => t('Touch Icon'),
-                'Control' => 'imageupload',
-                'Size' => '152x152',
-                'OutputType' => 'png',
-                'Prefix' => 'favicon-152-',
-                'Crop' => true,
-                'Description' => t('TouchIconDescription', "The touch icon appears when you bookmark a website on the homescreen of an Apple device. These are usually 152 pixels. Apple adds rounded corners and lighting effect automatically."),
-                'Options' => [
-                    'RemoveConfirmText' => sprintf(t('Are you sure you want to delete your %s?'), t('Touch Icon'))
-                ]
-            ],
-            'Garden.ShareImage' => [
-                'Label' => t('Share Image'),
-                'Control' => 'imageUploadReact',
-                'Description' => t(
-                    'ShareImageDescription',
-                    "When someone shares a link from your site we try and grab an image from the page. "
-                    . "If there isn't an image on the page then we'll use this image instead. "
-                    . "The image should be at least 50×50, but we recommend 200×200."
-                ),
-            ],
-            'Garden.MobileAddressBarColor' => [
-                'LabelCode' => t('Mobile Address Bar Color'),
-                'Control' => 'color',
-                'Description' => t('AddressBarColorDescription', 'Some browsers support a color for the address bar. Mobile only.'),
-                'Options' => [
-                    'AllowEmpty' => true,
-                ]
-            ],
-            'Feature.DeferredLegacyScripts.Enabled' => [
-                'LabelCode' => t('Defer Javascript Loading'),
-                'Control' => 'toggle',
-                'Default' => true,
-                'Description' => t('This setting loads the page before executing Javascript.') . " " .
-                    anchor(t('More information'), 'https://success.vanillaforums.com/kb/articles/140-defer-javascript-loading-feature'),
-                'Options' => [
-                    'UseRealBoolean' => true
-                ]
+                'LabelCode' => t('"New Message" redirection URL'),
+                'Description' => t('Custom URL to redirect the user instead of rendering Vanilla\'s "New Message" page.')
             ]
         ];
-        /** @var \Vanilla\Site\SiteSectionModel $siteSectionModel */
-        $siteSectionModel = Gdn::getContainer()->get(\Vanilla\Site\SiteSectionModel::class);
-        $options = $siteSectionModel->getDefaultRoutes();
-        if (count($options) > 0) {
-            $items['Vanilla.Forum.Disabled'] = [
-                'LabelCode' => t('Disable forum pages'),
-                'Control' => 'toggle',
-                'Description' => t("Remove discussion and categories links from menus.<br /> Set discussion and category related pages to return not found page 404."),
-                'Options' => [
-                    'ForumDisabled' => true,
-                ]
-            ];
-        }
+
         $configurationModule = new ConfigurationModule($this);
         $configurationModule->initialize($items);
         $this->setData('ConfigurationModule', $configurationModule);
@@ -604,16 +549,17 @@ class SettingsController extends DashboardController {
      * @access public
      * @param string $action Add, edit, delete, or none.
      * @param string $search Term to filter ban list by.
-     * @param int $page Page number.
-     * @param int $iD Ban ID we're editing or deleting.
+     * @param int|string $page Page number.
+     * @param int|string $iD Ban ID we're editing or deleting.
      */
     public function bans($action = '', $search = '', $page = '', $iD = '') {
         $this->permission('Garden.Settings.Manage');
 
         // Page setup
         $this->title(t('Ban Rules'));
+        Gdn_Theme::section('Moderation');
 
-        list($offset, $limit) = offsetLimit($page, 20);
+        [$offset, $limit] = offsetLimit($page, 20);
 
         $banModel = $this->getBanModel();
 
@@ -650,7 +596,18 @@ class SettingsController extends DashboardController {
                         $this->Form->setData($banModel->getID($iD));
                     }
                 }
-                $this->setData('_BanTypes', ['IPAddress' => t('IP Address'), 'Email' => t('Email'), 'Name' => t('Name')]);
+
+                $banTypes = [
+                    'IPAddress' => t('IP Address'),
+                    'Email' => t('Email'),
+                    'Name' => t('Name'),
+                ];
+
+                $eventManager = Gdn::getContainer()->get(\Garden\EventManager::class);
+                $banTypes = $eventManager->fireFilter('settingsController_listBanTypes', $banTypes);
+
+                $this->setData('_BanTypes', $banTypes);
+
                 $this->View = 'Ban';
                 break;
             case 'delete':
@@ -668,8 +625,6 @@ class SettingsController extends DashboardController {
                 $this->setData('Bans', $bans);
                 break;
         }
-
-        Gdn_Theme::section('Moderation');
         $this->render();
     }
 
@@ -681,67 +636,7 @@ class SettingsController extends DashboardController {
      */
     public function layout() {
         $this->permission('Garden.Settings.Manage');
-
-        // Page setup
-        $this->setHighlightRoute('dashboard/settings/layout');
-        $this->title(t('Homepage'));
-
-        $currentRoute = val('Destination', Gdn::router()->getRoute('DefaultController'), '');
-        $this->setData('CurrentTarget', $currentRoute);
-        if (!$this->Form->authenticatedPostBack()) {
-            $this->Form->setData([
-                'Target' => $currentRoute
-            ]);
-        } else {
-            $newRoute = val('Target', $this->Form->formValues(), '');
-            Gdn::router()->deleteRoute('DefaultController');
-            Gdn::router()->setRoute('DefaultController', $newRoute, 'Internal');
-            $this->setData('CurrentTarget', $newRoute);
-
-            // Save the preferred layout setting
-            saveToConfig([
-                'Vanilla.Discussions.Layout' => val('DiscussionsLayout', $this->Form->formValues(), ''),
-                'Vanilla.Categories.Layout' => val('CategoriesLayout', $this->Form->formValues(), '')
-            ]);
-
-            $this->informMessage(t("Your changes were saved successfully."));
-        }
-
-        /** @var \Vanilla\Site\SiteSectionModel $siteSectionModel */
-        $siteSectionModel = Gdn::getContainer()->get(\Vanilla\Site\SiteSectionModel::class);
-        $this->setData('defaultRouteOptions', $siteSectionModel->getDefaultRoutes());
-
-        // Add warnings for layouts that have been specified by the theme.
-        $themeManager = Gdn::themeManager();
-        $theme = $themeManager->enabledThemeInfo();
-        $layout = val('Layout', $theme);
-
-        $warningText = t('Your theme has specified the layout selected below. Changing the layout may make your theme look broken.');
-        $warningAlert = wrap($warningText, 'div', ['class' => 'alert alert-warning padded']);
-        $dangerText = t('Your theme recommends the %s layout, but you\'ve selected the %s layout. This may make your theme look broken.');
-        $dangerAlert = wrap($dangerText, 'div', ['class' => 'alert alert-danger padded']);
-
-        if (val('Discussions', $layout)) {
-            $dicussionsLayout = strtolower(val('Discussions', $layout));
-            if ($dicussionsLayout != c('Vanilla.Discussions.Layout')) {
-                $discussionsAlert = sprintf($dangerAlert, $dicussionsLayout, c('Vanilla.Discussions.Layout'));
-            } else {
-                $discussionsAlert = $warningAlert;
-            }
-            $this->setData('DiscussionsAlert', $discussionsAlert);
-        }
-
-        if (val('Categories', $layout)) {
-            $categoriesLayout = strtolower(val('Categories', $layout));
-            if ($categoriesLayout != c('Vanilla.Categories.Layout')) {
-                $categoriesAlert = sprintf($dangerAlert, $categoriesLayout, c('Vanilla.Categories.Layout'));
-            } else {
-                $categoriesAlert = $warningAlert;
-            }
-            $this->setData('CategoriesAlert', $categoriesAlert);
-        }
-
-        $this->render();
+        redirectTo('/appearance/layouts', 302);
     }
 
     /**
@@ -767,8 +662,9 @@ class SettingsController extends DashboardController {
         $validation = new Gdn_Validation();
         $configurationModel = new Gdn_ConfigurationModel($validation);
         $configurationModel->setField([
-            'Garden.TrustedDomains',
-            'Garden.Format.WarnLeaving',
+            self::CONFIG_TRUSTED_DOMAINS,
+            self::CONFIG_CSP_DOMAINS,
+            "Garden.Format.WarnLeaving",
             HstsModel::MAX_AGE_KEY,
             HstsModel::INCLUDE_SUBDOMAINS_KEY,
             HstsModel::PRELOAD_KEY,
@@ -780,22 +676,29 @@ class SettingsController extends DashboardController {
         // If seeing the form for the first time...
         if ($this->Form->authenticatedPostBack() === false) {
             // Format trusted domains as a string
-            $trustedDomains = val('Garden.TrustedDomains', $configurationModel->Data);
+            $trustedDomains = val(self::CONFIG_TRUSTED_DOMAINS, $configurationModel->Data);
             if (is_array($trustedDomains)) {
                 $trustedDomains = implode("\n", $trustedDomains);
             }
 
-            $configurationModel->Data['Garden.TrustedDomains'] = $trustedDomains;
+            $configurationModel->Data[self::CONFIG_TRUSTED_DOMAINS] = $trustedDomains;
 
             // Apply the config settings to the form.
             $this->Form->setData($configurationModel->Data);
         } else {
             // Format the trusted domains as an array based on newlines & spaces
-            $trustedDomains = $this->Form->getValue('Garden.TrustedDomains');
-            $trustedDomains = explodeTrim("\n", $trustedDomains);
+            $trustedDomains = $this->Form->getValue(self::CONFIG_TRUSTED_DOMAINS);
+            $trustedDomains = ArrayUtils::explodeTrim("\n", $trustedDomains);
             $trustedDomains = array_unique(array_filter($trustedDomains));
             $trustedDomains = implode("\n", $trustedDomains);
-            $this->Form->setFormValue('Garden.TrustedDomains', $trustedDomains);
+            $this->Form->setFormValue(self::CONFIG_TRUSTED_DOMAINS, $trustedDomains);
+
+            // Join CSP domains with newlines.
+            $cspDomains = $this->Form->getValue("ContentSecurityPolicy.ScriptSrc.AllowedDomains", '');
+            $cspDomains = explode("\n", $cspDomains);
+            $cspDomains = array_unique(array_filter($cspDomains));
+            $this->Form->setFormValue("ContentSecurityPolicy.ScriptSrc.AllowedDomains", $cspDomains);
+
             $this->Form->setFormValue('Garden.Format.DisableUrlEmbeds', $this->Form->getValue('Garden.Format.DisableUrlEmbeds') !== '1');
 
             $this->Form->setFormValue(HstsModel::INCLUDE_SUBDOMAINS_KEY, $this->Form->getValue(HstsModel::INCLUDE_SUBDOMAINS_KEY) === '1');
@@ -808,7 +711,7 @@ class SettingsController extends DashboardController {
             }
 
             // Reformat array as string so it displays properly in the form
-            $this->Form->setFormValue('Garden.TrustedDomains', $trustedDomains);
+            $this->Form->setFormValue(self::CONFIG_TRUSTED_DOMAINS, $trustedDomains);
         }
 
         $this->render();
@@ -829,7 +732,7 @@ class SettingsController extends DashboardController {
      * @deprecated 2.4 Legacy redirect. Use SettingsController::branding instead.
      */
     public function banner() {
-        redirectTo('/settings/branding');
+        redirectTo('/appearance/branding');
     }
 
 
@@ -898,6 +801,10 @@ class SettingsController extends DashboardController {
      * @throws Gdn_UserException
      */
     public function emailStyles() {
+        // Set default value for fullpost inclusions in email digests to `false`.
+        if (!c('Vanilla.Email.FullPost')) {
+            saveToConfig('Vanilla.Email.FullPost', false, false);
+        }
         // Set default colors
         if (!c('Garden.EmailTemplate.TextColor')) {
             saveToConfig('Garden.EmailTemplate.TextColor', EmailTemplate::DEFAULT_TEXT_COLOR, false);
@@ -919,6 +826,7 @@ class SettingsController extends DashboardController {
         $this->addJsFile('email.js');
 
         $configurationModule = new ConfigurationModule($this);
+
         $configurationModule->initialize([
             'Garden.EmailTemplate.Image' => [
                 'Control' => 'imageupload',
@@ -1094,6 +1002,51 @@ class SettingsController extends DashboardController {
     }
 
     /**
+     * Manages the Vanilla.Email.FullPost setting.
+     *
+     * @param int $value Whether to enable full posts in emails.
+     * @throws Exception If it's not PostBack.
+     * @throws Gdn_UserException When an error is encountered.
+     */
+    public function toggleEmailFullpost(int $value): void {
+        Gdn::request()->isAuthenticatedPostBack(true);
+
+        $value = (bool)$value;
+
+        $this->permission('Garden.Community.Manage');
+        // We save the new config value.
+        saveToConfig('Vanilla.Email.FullPost', $value);
+        if ($value) {
+            // The new toggle would be ON & allow to turn OFF.
+            $newToggle = wrap(
+                anchor(
+                    '<div class="toggle-well"></div><div class="toggle-slider"></div>',
+                    '/dashboard/settings/toggleemailfullpost/0',
+                    'Hijack'
+                ),
+                'span',
+                ['class' => "toggle-wrap toggle-wrap-on"]
+            );
+            $this->informMessage(sprintf(t('%s enabled.'), t('Full post in email notifications')));
+        } else {
+            // The new toggle would be OFF & allow to turn ON.
+            $newToggle = wrap(
+                anchor(
+                    '<div class="toggle-well"></div><div class="toggle-slider"></div>',
+                    '/dashboard/settings/toggleemailfullpost/1',
+                    'Hijack'
+                ),
+                'span',
+                ['class' => "toggle-wrap toggle-wrap-off"]
+            );
+            $this->informMessage(sprintf(t('%s disabled.'), t('Full post in email notifications')));
+        }
+        // We replace the current toggle with a new one.
+        $this->jsonTarget("#enable-email-full-post-toggle", $newToggle);
+        $this->render('Blank', 'Utility');
+    }
+
+    /**
      * Manages the Tagging.Discussions.Enabled setting.
      *
      * @param String $value Either 'true' or 'false', whether to enable tagging.
@@ -1118,6 +1071,13 @@ class SettingsController extends DashboardController {
             }
             $this->jsonTarget("#enable-tagging-toggle", $newToggle);
         }
+
+        if (Gdn::config('Tagging.Discussions.Enabled', false)) {
+            $this->widgetService->registerWidget(TagModule::class);
+        } else {
+            $this->widgetService->unregisterWidget(TagModule::class);
+        }
+
         $this->render('blank', 'utility');
     }
 
@@ -1208,7 +1168,25 @@ class SettingsController extends DashboardController {
         }
 
         // Still here?
-        redirectTo('dashboard/settings/home');
+        redirectTo($this->getHomeUrl());
+    }
+
+    /**
+     * Get new home url
+     */
+    private function getHomeUrl() {
+        $url = 'dashboard/settings/home';
+
+        if (Gdn::session()->checkPermission('Analytics.Data.View') &&
+            Gdn::addonManager()->isEnabled('vanillaanalytics', Vanilla\Addon::TYPE_ADDON) &&
+            !(bool)Gdn::config('VanillaAnalytics.DisableDashboard', false)
+        ) {
+            $url = (bool)Gdn::config('Feature.NewAnalytics.Enabled', false) ?
+                '/analytics/v2/dashboards' :
+                '/analytics';
+        }
+
+        return $url;
     }
 
     public function home() {
@@ -1241,6 +1219,7 @@ class SettingsController extends DashboardController {
 
         Gdn_Theme::section('DashboardHome');
         $this->setData('IsWidePage', true);
+        $this->CssClass .= " dashboard";
 
         $this->render('index');
     }
@@ -1470,6 +1449,12 @@ class SettingsController extends DashboardController {
         $this->render('blank', 'utility', 'dashboard');
     }
 
+    /**
+     * Enable a plugin.
+     *
+     * @param string $pluginName The key of the plugin.
+     * @param string $filter
+     */
     public function enablePlugin($pluginName, $filter = 'all') {
         if (!Gdn::request()->isAuthenticatedPostBack(true)) {
             throw new Exception('Requires POST', 405);
@@ -1484,8 +1469,9 @@ class SettingsController extends DashboardController {
 
         $addon = Gdn::addonManager()->lookupAddon($pluginName);
         $requirementsEnabled = [];
-
         try {
+            $this->addonModel->validateEnable($addon);
+
             $validation = new Gdn_Validation();
             $result = Gdn::pluginManager()->enablePlugin($pluginName, $validation);
             if (!$result) {
@@ -2181,7 +2167,6 @@ class SettingsController extends DashboardController {
         }
 
         $name = val('Name', $user);
-        Gdn_Theme::section('Moderation');
         $this->setHighlightRoute('dashboard/settings/bans');
         $this->setData('Title', sprintf(t('Ban rules matching %s'), htmlspecialchars($name)));
         $this->setData('Bans', $matchingBans);
@@ -2206,11 +2191,12 @@ class SettingsController extends DashboardController {
         $this->permission('Garden.Settings.Manage');
 
         if (Gdn::session()->validateTransientKey($transientKey)) {
-            /** @var ThemeModelHelper $themeHelper */
-            $themeHelper = Gdn::getContainer()->get(ThemeModelHelper::class);
+            /** @var ThemeServiceHelper $themeHelper */
+            $themeHelper = Gdn::getContainer()->get(ThemeServiceHelper::class);
+            /** @var FsThemeProvider $themeProvider */
             $themeProvider = Gdn::getContainer()->get(FsThemeProvider::class);
-            $themeInfo = $themeHelper->setSessionPreviewTheme($themeName, $themeProvider);
-            $this->fireEvent('PreviewTheme', ['ThemeInfo' => $themeInfo]);
+            $theme = $themeProvider->getTheme($themeName);
+            $themeHelper->setSessionPreviewTheme($theme);
 
             redirectTo('/');
         } else {
@@ -2232,8 +2218,8 @@ class SettingsController extends DashboardController {
         $isMobile = false;
 
         if (Gdn::session()->validateTransientKey($transientKey)) {
-            /** @var ThemeModelHelper $themeHelper */
-            $themeHelper = Gdn::getContainer()->get(ThemeModelHelper::class);
+            /** @var ThemeServiceHelper $themeHelper */
+            $themeHelper = Gdn::getContainer()->get(ThemeServiceHelper::class);
             $themeHelper->cancelSessionPreviewTheme();
         }
 

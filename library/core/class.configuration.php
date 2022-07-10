@@ -109,7 +109,7 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      * @param string|bool $value The value of the option you want to update.
      */
     public function setFormatOption($formatOption, $value) {
-        $allowedOptions = ['VariableName', 'WrapPHP', 'SafePHP', 'Headings', 'ByLine', 'FormatStyle'];
+        $allowedOptions = ['VariableName', 'WrapPHP', 'SafePHP', 'Headings', 'FormatStyle'];
 
         if (in_array($formatOption, $allowedOptions)) {
             $this->formatOptions[$formatOption] = $value;
@@ -274,14 +274,12 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
             'WrapPHP' => true,
             'SafePHP' => true,
             'Headings' => true,
-            'ByLine' => true,
             'FormatStyle' => 'Array'
         ];
         $options = array_merge($defaults, $options);
         $variableName = val('VariableName', $options);
         $wrapPHP = val('WrapPHP', $options, true);
         $safePHP = val('SafePHP', $options, true);
-        $byLine = val('ByLine', $options, false);
         $headings = val('Headings', $options, true);
         $formatStyle = val('FormatStyle', $options);
         $formatter = "Format{$formatStyle}Assignment";
@@ -321,13 +319,6 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
             $formatter($lines, $prefix, $value);
         }
 
-        if ($byLine) {
-            $session = Gdn::session();
-            $user = $session->UserID > 0 && is_object($session->User) ? $session->User->Name : 'Unknown';
-            $lines[] = '';
-            self::formatComment('Last edited by '.$user.' ('.remoteIp().') '.Gdn_Format::toDateTime(), $lines);
-        }
-
         $result = implode(PHP_EOL, $lines);
         return $result;
     }
@@ -355,23 +346,23 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
     /**
      * Gets a setting from the configuration array. Returns $defaultValue if the value isn't found.
      *
-     * @param string $name The name of the configuration setting to get. If the setting is contained
+     * @param string $key The name of the configuration setting to get. If the setting is contained
      * within an associative array, use dot denomination to get the setting. ie.
      * <code>$this->get('Database.Host')</code> would retrieve <code>$Configuration[$Group]['Database']['Host']</code>.
      * @param mixed $defaultValue If the parameter is not found in the group, this value will be returned.
      * @return mixed The configuration value.
      */
-    public function get($name, $defaultValue = false) {
+    public function get($key, $defaultValue = false) {
         // Shortcut, get the whole config
-        if ($name == '.') {
+        if ($key == '.') {
             return $this->Data;
         }
 
-        if (!is_string($name)) {
-            Deprecation::unsupportedParam('$name', $name, "Only string parameters are allowed.");
+        if (!is_string($key)) {
+            Deprecation::unsupportedParam('$name', $key, "Only string parameters are allowed.");
         }
 
-        $keys = $this->splitConfigKey((string) $name);
+        $keys = $this->splitConfigKey((string) $key);
         $keyCount = count($keys);
 
         $value = $this->Data;
@@ -424,7 +415,7 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      *
      * @param string $type 'file' or 'string'
      * @param string $identifier filename or string tag
-     * @return ConfigurationSource
+     * @return Gdn_ConfigurationSource
      */
     public function getSource($type, $identifier) {
         $sourceTag = "{$type}:{$identifier}";
@@ -444,7 +435,7 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      *   $Configuration[$Group]['Database']['Host'] = $value
      * @param mixed $value The value of the configuration setting.
      * @param boolean $overwrite If the setting already exists, should it's value be overwritten? Defaults to true.
-     * @param boolean $AddToSave Whether or not to queue the value up for the next call to Gdn_Config::save().
+     * @param boolean $save Whether or not to queue the value up for the next call to Gdn_Config::save().
      */
     public function set($name, $value, $overwrite = true, $save = true) {
         // Make sure the config settings are in the right format
@@ -697,7 +688,7 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      *
      * NOTE: ONLY WORKS WHEN SPLITTING IS OFF!
      *
-     * @param type $data
+     * @param array $data
      */
     public function massImport($data) {
         if ($this->splitting) {
@@ -840,7 +831,6 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
         $fileContents = $this->format($data, [
             'VariableName' => $group,
             'Headers' => true,
-            'ByLine' => true,
             'WrapPHP' => true
         ]);
 
@@ -920,8 +910,9 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      *
      * @param string|array $name The name of the config key or an array of config key value pairs.
      * @param mixed $default The default value to set in the config.
+     * @param bool $persist Whether or not the configurations should be persisted.
      */
-    public function touch($name, $default = null) {
+    public function touch($name, $default = null, bool $persist = true) {
         if (!is_array($name)) {
             $name = [$name => $default];
         }
@@ -934,7 +925,7 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
         }
 
         if (!empty($save)) {
-            $this->saveToConfig($save);
+            $this->saveToConfig($save, null, $persist);
         }
     }
 
@@ -954,6 +945,16 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
         foreach ($this->sources as $source) {
             $source->shutdown();
         }
+    }
+
+    /**
+     * Get the dynamic source.
+     *
+     * @internal
+     * @return Gdn_ConfigurationSource
+     */
+    public function getDynamic(): Gdn_ConfigurationSource {
+        return $this->dynamic;
     }
 
     /**

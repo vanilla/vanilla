@@ -11,42 +11,85 @@ import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
 import { StoryTileAndTextCompact } from "@library/storybook/StoryTileAndTextCompact";
 import * as EditorIcons from "@library/icons/editorIcons";
-import * as titleBarIcons from "@library/icons/titleBar";
+import * as TitleBarIcons from "@library/icons/titleBar";
 import * as CommonIcons from "@library/icons/common";
-import {
-    EmojiGroupSmileysPeopleIcon,
-    EmojiGroupAnimalsNatureIcon,
-    EmojiGroupFoodDrinkIcon,
-    EmojiGroupTravelPlacesIcon,
-    EmojiGroupActivitiesIcon,
-    EmojiGroupObjectsIcon,
-    EmojiGroupSymbolsIcon,
-    EmojiGroupFlagsIcon,
-} from "./emojiGroups";
-import {
-    FileTypeGenericIcon,
-    FileTypeWordIcon,
-    FileTypeExcelIcon,
-    FileTypeImageIcon,
-    FileTypePowerPointIcon,
-    FileTypePDFIcon,
-    FileTypeZipIcon,
-} from "@library/icons/fileTypes";
-import {
-    RevisionStatusPublishedIcon,
-    RevisionStatusPendingIcon,
-    RevisionStatusDraftIcon,
-} from "@library/icons/revision";
+import * as EmojiGroupIcons from "@library/icons/emojiGroups";
+import * as FileTypeIcons from "@library/icons/fileTypes";
+import * as RevisionIcons from "@library/icons/revision";
+import * as SearchIcons from "@library/icons/searchIcons";
 import { StoryTiles } from "@library/storybook/StoryTiles";
-import { storyBookClasses } from "@library/storybook/StoryBookStyles";
-import { ErrorIcon, WarningIcon, InformationIcon, BookmarkIcon } from "@library/icons/common";
-import { iconClasses } from "@library/icons/iconStyles";
-import { ColorHelper, color } from "csx";
+import { color } from "csx";
+import { Icon, iconRegistry } from "@vanilla/icons";
+import { css } from "@emotion/css";
+import groupBy from "lodash/groupBy";
+import { labelize } from "@vanilla/utils";
+import { IconType } from "@vanilla/icons";
 
 const story = storiesOf("Components", module);
 
+const invert = ["NewPostMenuIcon"];
+
+function IconSet({ icons }) {
+    return (
+        <StoryTiles>
+            {Object.entries(icons)
+                .filter(([name]) => name.endsWith("Icon") || name.endsWith("Logo"))
+                .map(([name, Icon]: [string, any]) => (
+                    <StoryTileAndTextCompact
+                        key={name}
+                        text={name}
+                        backgroundColor={invert.includes(name) ? color("#555") : undefined}
+                    >
+                        <Icon />
+                    </StoryTileAndTextCompact>
+                ))}
+        </StoryTiles>
+    );
+}
+
+const vanillaIconsStyle = css({
+    display: "flex",
+    maxHeight: 600, // Adjust this to fit more icons.
+    flexFlow: "column wrap",
+    width: "calc(100% + 240px)",
+    transform: "translateX(-105px)",
+
+    h3: { marginBottom: 8, fontWeight: "bold", fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.75px" },
+    section: { margin: 16 },
+    li: { display: "flex", alignItems: "center", margin: "16px 0", fontSize: "14px" },
+    svg: { marginRight: 16 },
+    input: { appearance: "none", border: 0 },
+});
+
+function VanillaIconsSet({ icons }) {
+    const iconTypes = Object.keys(icons) as IconType[];
+    const grouped = groupBy(iconTypes, (icon) => icon.split("-")[0]);
+    return (
+        <div className={vanillaIconsStyle}>
+            {Object.entries(grouped).map(([key, values]) => {
+                return (
+                    <section key={key}>
+                        <h3>{labelize(key)}</h3>
+                        <ul>
+                            {values.map((value) => (
+                                <li key={value}>
+                                    <Icon icon={value} />
+                                    <input
+                                        type="text"
+                                        onClick={(event) => (event.target as HTMLInputElement).select()}
+                                        value={value}
+                                    />
+                                </li>
+                            ))}
+                        </ul>
+                    </section>
+                );
+            })}
+        </div>
+    );
+}
+
 story.add("Icons", () => {
-    const classes = storyBookClasses();
     return (
         <StoryContent>
             <StoryHeading depth={1}>Global Icons</StoryHeading>
@@ -55,287 +98,22 @@ story.add("Icons", () => {
                 versions, which just means they have less padding for tighter spaces. Most icons render in a box 24px by
                 24px.
             </StoryParagraph>
-
+            <StoryHeading>@vanilla/icons</StoryHeading>
+            <VanillaIconsSet icons={iconRegistry.getAllIcons()} />
             <StoryHeading>Common</StoryHeading>
-            <StoryTiles>
-                <StoryTileAndTextCompact text={`RightChevronIcon`}>
-                    <CommonIcons.RightChevronIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`LeftChevronIcon`}>
-                    <CommonIcons.LeftChevronIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`TopChevronIcon`}>
-                    <CommonIcons.TopChevronIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`BottomChevronIcon`}>
-                    <CommonIcons.BottomChevronIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`ClearIcon`}>
-                    <CommonIcons.ClearIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`CheckIcon`}>
-                    <CommonIcons.CheckIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`DropDownMenuIcon`}>
-                    <CommonIcons.DropDownMenuIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`NewFolderIcon`}>
-                    <CommonIcons.NewFolderIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`CategoryIcon`}>
-                    <CommonIcons.CategoryIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`CheckCompactIcon`}>
-                    <CommonIcons.CheckCompactIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`DownTriangleIcon`}>
-                    <CommonIcons.DownTriangleIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`RightTriangleIcon`}>
-                    <CommonIcons.RightTriangleIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`HelpIcon`}>
-                    <CommonIcons.HelpIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`ComposeIcon`}>
-                    <CommonIcons.ComposeIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`PlusCircleIcon`}>
-                    <CommonIcons.PlusCircleIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`SignInIcon`}>
-                    <CommonIcons.SignInIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`ChevronUpIcon`}>
-                    <CommonIcons.ChevronUpIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`SearchErrorIcon`}>
-                    <CommonIcons.SearchErrorIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`CloseIcon`}>
-                    <CommonIcons.CloseIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`ClearIcon`}>
-                    <CommonIcons.ClearIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`CloseTinyIcon`}>
-                    <CommonIcons.CloseTinyIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`EditIcon`}>
-                    <CommonIcons.EditIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`DeleteIcon`}>
-                    <CommonIcons.DeleteIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`DiscussionIcon`}>
-                    <CommonIcons.DiscussionIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`GlobeIcon`}>
-                    <CommonIcons.GlobeIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`ErrorIcon`}>
-                    <ErrorIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`WarningIcon`}>
-                    <WarningIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`InformationIcon`}>
-                    <InformationIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`DocumentationIcon`}>
-                    <CommonIcons.DocumentationIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`BookmarkIcon`}>
-                    <a href="#" className={iconClasses().bookmark()}>
-                        <BookmarkIcon />
-                    </a>
-                </StoryTileAndTextCompact>
-            </StoryTiles>
+            <IconSet icons={CommonIcons} />
             <StoryHeading>Editor</StoryHeading>
-            <StoryTiles>
-                <StoryTileAndTextCompact text={`BoldIcon`}>
-                    <EditorIcons.BoldIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`ItalicIcon`}>
-                    <EditorIcons.ItalicIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`StrikeIcon`}>
-                    <EditorIcons.StrikeIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`CodeIcon`}>
-                    <EditorIcons.CodeIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`LinkIcon`}>
-                    <EditorIcons.LinkIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`EmojiIcon`}>
-                    <EditorIcons.EmojiIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`EmbedErrorIcon`}>
-                    <EditorIcons.EmbedErrorIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`PilcrowIcon`}>
-                    <EditorIcons.PilcrowIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`Heading2Icon`}>
-                    <EditorIcons.Heading2Icon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`Heading3Icon`}>
-                    <EditorIcons.Heading3Icon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`Heading4Icon`}>
-                    <EditorIcons.Heading4Icon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`Heading5Icon`}>
-                    <EditorIcons.Heading5Icon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`BlockquoteIcon`}>
-                    <EditorIcons.BlockquoteIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`CodeBlockIcon`}>
-                    <EditorIcons.CodeBlockIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`SpoilerIcon`}>
-                    <EditorIcons.SpoilerIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`EmbedIcon`}>
-                    <EditorIcons.EmbedIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`ImageIcon`}>
-                    <EditorIcons.ImageIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`AttachmentIcon`}>
-                    <EditorIcons.AttachmentIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`ListUnorderedIcon`}>
-                    <EditorIcons.ListUnorderedIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`ListOrderedIcon`}>
-                    <EditorIcons.ListOrderedIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`IndentIcon`}>
-                    <EditorIcons.IndentIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`OutdentIcon`}>
-                    <EditorIcons.OutdentIcon />
-                </StoryTileAndTextCompact>
-            </StoryTiles>
+            <IconSet icons={EditorIcons} />
             <StoryHeading>Emoji Groups</StoryHeading>
-            <StoryTiles>
-                <StoryTileAndTextCompact text={`EmojiGroupSmileysPeopleIcon`}>
-                    <EmojiGroupSmileysPeopleIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`EmojiGroupAnimalsNatureIcon`}>
-                    <EmojiGroupAnimalsNatureIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`EmojiGroupFoodDrinkIcon`}>
-                    <EmojiGroupFoodDrinkIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`EmojiGroupTravelPlacesIcon`}>
-                    <EmojiGroupTravelPlacesIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`EmojiGroupActivitiesIcon`}>
-                    <EmojiGroupActivitiesIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`EmojiGroupObjectsIcon`}>
-                    <EmojiGroupObjectsIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`EmojiGroupSymbolsIcon`}>
-                    <EmojiGroupSymbolsIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`EmojiGroupFlagsIcon`}>
-                    <EmojiGroupFlagsIcon />
-                </StoryTileAndTextCompact>
-            </StoryTiles>
+            <IconSet icons={EmojiGroupIcons} />
             <StoryHeading>File Types</StoryHeading>
-            <StoryTiles>
-                <StoryTileAndTextCompact text={`FileTypeGenericIcon`}>
-                    <FileTypeGenericIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`FileTypeWordIcon`}>
-                    <FileTypeWordIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`FileTypeExcelIcon`}>
-                    <FileTypeExcelIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`FileTypePDFIcon`}>
-                    <FileTypePDFIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`FileTypeImageIcon`}>
-                    <FileTypeImageIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`FileTypePowerPointIcon`}>
-                    <FileTypePowerPointIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`FileTypeZipIcon`}>
-                    <FileTypeZipIcon />
-                </StoryTileAndTextCompact>
-            </StoryTiles>
-            <StoryHeading>title Bar</StoryHeading>
-            <StoryTiles>
-                <StoryTileAndTextCompact text={`HelpIcon`}>
-                    <titleBarIcons.HelpIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`ComposeIcon`}>
-                    <titleBarIcons.ComposeIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`DownloadIcon`}>
-                    <titleBarIcons.DownloadIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`SettingsIcon`}>
-                    <titleBarIcons.SettingsIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`SearchIcon`}>
-                    <titleBarIcons.SearchIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`NotificationsIcon`}>
-                    <titleBarIcons.NotificationsIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`MessagesIcon`}>
-                    <titleBarIcons.MessagesIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`UserIcon`}>
-                    <titleBarIcons.UserIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`UserWarningIcon`}>
-                    <titleBarIcons.UserWarningIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`NoUserPhotoIcon`}>
-                    <div className={"icon"}>
-                        <titleBarIcons.NoUserPhotoIcon />
-                    </div>
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`VanillaLogo`}>
-                    {<titleBarIcons.VanillaLogo className={classes.smallerLogo} isMobile={true} />}
-                </StoryTileAndTextCompact>
-            </StoryTiles>
+            <IconSet icons={FileTypeIcons} />
+            <StoryHeading>Title Bar</StoryHeading>
+            <IconSet icons={TitleBarIcons} />
             <StoryHeading>Revisions</StoryHeading>
-            <StoryTiles>
-                <StoryTileAndTextCompact text={`RevisionStatusDraftIcon`}>
-                    <RevisionStatusDraftIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`RevisionStatusPendingIcon`}>
-                    <RevisionStatusPendingIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`RevisionStatusPublishedIcon`}>
-                    <RevisionStatusPublishedIcon />
-                </StoryTileAndTextCompact>
-            </StoryTiles>
-            <StoryHeading>New Post Menu</StoryHeading>
-            <StoryTiles>
-                <StoryTileAndTextCompact backgroundColor={color("#ccc")} text={`NewPostMenuIcon`}>
-                    <CommonIcons.NewPostMenuIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`NewDiscussionIcon`}>
-                    <CommonIcons.NewDiscussionIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`NewIdeaIcon`}>
-                    <CommonIcons.NewIdeaIcon />
-                </StoryTileAndTextCompact>
-                <StoryTileAndTextCompact text={`NewPollIcon`}>
-                    <CommonIcons.NewPollIcon />
-                </StoryTileAndTextCompact>
-            </StoryTiles>
+            <IconSet icons={RevisionIcons} />
+            <StoryHeading>Search Icons</StoryHeading>
+            <IconSet icons={SearchIcons} />
         </StoryContent>
     );
 });

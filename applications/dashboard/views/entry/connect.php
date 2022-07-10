@@ -1,5 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 
+/** @var \EntryController $this */
+
 // Get the connection information.
 if (!($ConnectName = $this->Form->getFormValue('FullName'))) {
     $ConnectName = $this->Form->getFormValue('Name');
@@ -22,7 +24,7 @@ if (!$hasUserID) {
     $NoConnectName = $this->data('NoConnectName');
 
     // You just landed on this page.
-    $firstTimeHere = !($this->Form->isPostBack() && $this->Form->getFormValue('Connect', null) !== null);
+    $firstTimeHere = !$this->isConnectPostBack();
     $connectNameProvided = (bool)$this->Form->getFormValue('ConnectName');
 
     $validationResults = $this->Form->validationResults();
@@ -81,7 +83,7 @@ if (!$hasUserID) {
                     '<span class="Name">'.htmlspecialchars($ConnectName).'</span>',
                     '<span class="Source">'.htmlspecialchars($ConnectSource).'</span>');
 
-                echo wrap(t('ConnectCreateAccount', 'Add Info &amp; Create Account'), 'h3');
+                echo wrap(t('ConnectCreateAccount', 'Add Info &amp; Create Account'), 'h3', ["aria-level" => 2]);
 
                 echo '</div>';
                 ?>
@@ -110,7 +112,6 @@ if (!$hasUserID) {
 
                     // One User was found in GDN_User based on the Email.
                     if (count($ExistingUsers) == 1 && $NoConnectName) {
-                        $PasswordMessage = t('ConnectExistingPassword', 'Enter your existing account password.');
                         $Row = reset($ExistingUsers);
 
                         echo '<div class="FinePrint">', t('ConnectAccountExists', 'You already have an account here.'), '</div>',
@@ -135,8 +136,10 @@ if (!$hasUserID) {
                     // No Name was passed over SSO and...
                     // No Users were found in GDN_User
                     if (count($ExistingUsers) === 0 && !$NoConnectName) {
-                        echo \Gdn::translate('ConnectChooseName', 'Choose a name to identify yourself on the site.');
-                        echo $this->Form->textbox('ConnectName');
+                        echo $this->Form->label('Username', 'ConnectName');
+                        echo wrap(\Gdn::translate('ConnectChooseName', 'Choose a name to identify yourself on the site.'), 'div', ['class' => 'FinePrint']);
+                        echo $this->Form->textbox('ConnectName', ["aria-label" => t("Username")]);
+
                     }
                     ?>
                 </li>
@@ -153,6 +156,7 @@ if (!$hasUserID) {
                 if (!$this->data('HidePassword')) {
                     echo '<li id="ConnectPassword">';
                     echo $this->Form->label('Password', 'ConnectPassword');
+                    $PasswordMessage = t('ConnectExistingPassword', 'Enter your existing account password.');
                     echo wrap($PasswordMessage, 'div', ['class' => 'FinePrint']);
                     echo $this->Form->input('ConnectPassword', 'password');
                     echo '</li>';

@@ -10,32 +10,32 @@ foreach ($this->DraftData->resultArray() as $Draft) {
 
     $draftID = val('DraftID', $Draft);
     $discussionID = val('DiscussionID', $Draft);
-    $excerpt = sliceString(Gdn_Format::plainText(val('Body', $Draft), val('Format', $Draft)), 200);
+    $excerpt = sliceString(Gdn_Format::plainText(val('Body', $Draft), val('Format', $Draft)), 200) ?: t('(No Body)');
 
     $isDiscussion = (!is_numeric($discussionID) || $discussionID <= 0);
     $orphaned = !val('DiscussionExists', $Draft);
 
     $editUrl = ($isDiscussion || $orphaned) ? '/post/editdiscussion/0/'.$draftID : '/discussion/'.$discussionID.'/'.$Offset.'/#Form_Comment';
-    $deleteUrl = 'vanilla/drafts/delete/'.$draftID.'/'.Gdn::session()->transientKey().'?Target='.urlencode($this->SelfUrl);
+    $deleteUrl = 'vanilla/drafts/delete/'.$draftID.'/'.Gdn::session()->transientKey().'?Target='.urlencode('/drafts/'.$this->offset);
+    $deleteText = t('Draft.Delete', '&times;');
+    $deleteContent = \Gdn::themeFeatures()->useDataDrivenTheme() ? '&times;' : $deleteText;
     ?>
-    <li class="Item Draft">
+    <li class="Item Draft pageBox">
         <div
             class="Options"><?php
-                echo anchor(t('Draft.Delete', '&times;'), $deleteUrl, 'Delete'); ?></div>
+                echo anchor($deleteContent, $deleteUrl, 'Delete', ['title' => $deleteText]); ?></div>
         <div class="ItemContent">
             <?php
             $anchorText = htmlspecialchars(val('Name', $Draft));
             if (!empty($anchorText)) {
                 echo anchor(wrap($anchorText, "span", ['class' => 'Draft-Title', 'role' => 'heading', 'aria-level' => '2']), $editUrl, 'Title DraftLink');
-            } else {
-                echo anchor(wrap(t('No Title'), "h2"), $editUrl, 'sr-only');
+            } else if (!$isDiscussion) {
+                echo anchor(wrap(t('(Untitled)'), "h2"), $editUrl);
             }
             ?>
-            <?php if ($excerpt) : ?>
-                <div class="Excerpt">
-                    <?php echo anchor($excerpt, $editUrl); ?>
-                </div>
-            <?php endif; ?>
+            <div class="Excerpt">
+                <?php echo anchor($excerpt, $editUrl); ?>
+            </div>
         </div>
     </li>
 <?php

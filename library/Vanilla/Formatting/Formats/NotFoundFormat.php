@@ -24,6 +24,9 @@ class NotFoundFormat implements FormatInterface {
     /** @var string */
     private $searchedFormat;
 
+    /** @var array context*/
+    private $context;
+
     /**
      * Constructor.
      *
@@ -31,6 +34,14 @@ class NotFoundFormat implements FormatInterface {
      */
     public function __construct(string $searchedFormat) {
         $this->searchedFormat = $searchedFormat;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setContext(?array $context): FormatInterface {
+        $this->context = $context;
+        return $this;
     }
 
     /**
@@ -96,6 +107,13 @@ class NotFoundFormat implements FormatInterface {
      * @inheritdoc
      */
     public function parseImageUrls(string $content): array {
+        return [];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function parseImages(string $content): array {
         return [];
     }
 

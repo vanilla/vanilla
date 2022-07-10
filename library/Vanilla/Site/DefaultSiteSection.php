@@ -9,6 +9,7 @@ namespace Vanilla\Site;
 
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\Site\SiteSectionInterface;
+use Vanilla\Dashboard\Models\BannerImageModel;
 
 /**
  * Site section definition for a site with only a single section.
@@ -17,6 +18,8 @@ use Vanilla\Contracts\Site\SiteSectionInterface;
 class DefaultSiteSection implements SiteSectionInterface {
 
     const DEFAULT_ID = 0;
+
+    const DEFAULT_CATEGORY_ID = -1;
 
     const EMPTY_BASE_PATH = "";
 
@@ -35,6 +38,11 @@ class DefaultSiteSection implements SiteSectionInterface {
     private $apps;
 
     /**
+     * @var string
+     */
+    private $bannerImageLink;
+
+    /**
      * DI.
      *
      * @param ConfigurationInterface $config
@@ -45,6 +53,7 @@ class DefaultSiteSection implements SiteSectionInterface {
         $configDefaultController = $config->get('Routes.DefaultController');
         $this->defaultRoute = $router->parseRoute($configDefaultController);
         $this->apps = ['forum' => !(bool)$config->get('Vanilla.Forum.Disabled')];
+        $this->bannerImageLink = $config->get(BannerImageModel::DEFAULT_CONFIG_KEY, '');
     }
 
     /**
@@ -121,7 +130,9 @@ class DefaultSiteSection implements SiteSectionInterface {
      * @inheritdoc
      */
     public function getAttributes(): array {
-        return [];
+        return [
+            'categoryID' => -1,
+        ];
     }
 
     /**
@@ -129,5 +140,21 @@ class DefaultSiteSection implements SiteSectionInterface {
      */
     public function getSectionThemeID() {
         return null;
+    }
+
+    /**
+     * Get categoryID associated to site-section.
+     *
+     * @return int|null
+     */
+    public function getCategoryID() {
+        return self::DEFAULT_CATEGORY_ID;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getBannerImageLink(): string {
+        return $this->bannerImageLink;
     }
 }

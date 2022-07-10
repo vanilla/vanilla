@@ -11,7 +11,9 @@ namespace Garden\Web\Exception;
  * The base class for all HTTP related exceptions.
  */
 abstract class HttpException extends \Exception implements \JsonSerializable {
-    private $context;
+    public const FIELD_DESCRIPTION = 'description';
+
+    protected $context;
 
     /**
      * @var array HTTP response codes and messages.
@@ -91,7 +93,26 @@ abstract class HttpException extends \Exception implements \JsonSerializable {
         }
         parent::__construct($message, $code);
 
-        $this->context = $context + ['description' => null];
+        $this->context = $context + [self::FIELD_DESCRIPTION => null];
+    }
+
+    /**
+     * @return array
+     */
+    public function getContext(): array {
+        return $this->context;
+    }
+
+    /**
+     * Apply a context to the message.
+     *
+     * @param array $context
+     *
+     * @return $this
+     */
+    public function withContext(array $context): self {
+        $this->context = array_merge_recursive($this->context, $context);
+        return $this;
     }
 
     /**
@@ -127,12 +148,25 @@ abstract class HttpException extends \Exception implements \JsonSerializable {
     }
 
     /**
+     * Make sure an existing throwable is an HttpException.
+     *
+     * @param \Throwable $e
+     */
+    public static function createFromThrowable(\Throwable $e): HttpException {
+        if ($e instanceof HttpException) {
+            return $e;
+        }
+
+        return self::createFromStatus($e->getCode(), $e->getMessage());
+    }
+
+    /**
      * Gets a longer description for the exception.
      *
      * @return string Returns the description of the exception or an empty string if there isn't one.
      */
     public function getDescription() {
-        return $this->context['description'];
+        return $this->context[self::FIELD_DESCRIPTION];
     }
 
     /**

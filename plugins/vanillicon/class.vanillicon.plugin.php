@@ -8,6 +8,8 @@
  * @package vanillicon
  */
 
+use Vanilla\Utility\DebugUtils;
+
 /**
  * Class VanilliconPlugin
  */
@@ -93,7 +95,7 @@ class VanilliconPlugin extends Gdn_Plugin {
     }
 }
 
-if (!function_exists('userPhotoDefaultUrl')) {
+if (!function_exists('userPhotoDefaultUrl') && !DebugUtils::isTestMode()) {
     /**
      * Calculate the user's default photo url.
      *
@@ -122,10 +124,10 @@ if (!function_exists('userPhotoDefaultUrl')) {
 
         switch ($type) {
             case 'v2':
-                $photoUrl = "//w$px.vanillicon.com/v2/{$hash}.svg";
+                $photoUrl = "https://w$px.vanillicon.com/v2/{$hash}.svg";
                 break;
             default:
-                $photoUrl = "//w$px.vanillicon.com/{$hash}_{$size}.png";
+                $photoUrl = "https://w$px.vanillicon.com/{$hash}_{$size}.png";
                 break;
         }
 

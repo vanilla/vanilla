@@ -8,15 +8,14 @@ import React from "react";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import titleBarNavClasses from "@library/headers/titleBarNavStyles";
 import SmartLink from "@library/routing/links/SmartLink";
-import { getButtonStyleFromBaseClass } from "@library/forms/Button";
-import { RouteComponentProps, withRouter } from "react-router";
+import Button, { getClassForButtonType } from "@library/forms/Button";
 import classNames from "classnames";
 import TitleBarListItem from "@library/headers/mebox/pieces/TitleBarListItem";
-import { formatUrl, siteUrl } from "@library/utility/appUtils";
 
-export interface ITitleBarNav {
+export interface ITitleBarNav extends React.AnchorHTMLAttributes<HTMLAnchorElement | HTMLButtonElement> {
     className?: string;
     to: string;
+    isActive?: boolean;
     children: React.ReactNode;
     linkClassName?: string;
     linkContentClassName?: string;
@@ -24,50 +23,81 @@ export interface ITitleBarNav {
     permission?: string;
 }
 
-interface IProps extends ITitleBarNav, RouteComponentProps<{}> {}
+interface IProps extends ITitleBarNav {
+    hasPopupMenu?: boolean;
+}
 
 /**
  * Implements Navigation item component for header
  */
-export class TitleBarNavItem extends React.Component<IProps> {
-    public render() {
-        const isCurrent = this.currentPage();
-        const classes = titleBarNavClasses();
-        return (
-            <TitleBarListItem className={classNames(this.props.className, classes.root, { isCurrent })}>
+export const TitleBarNavItem = React.forwardRef(function TitleBarNavItem(
+    props: IProps,
+    ref: React.Ref<HTMLAnchorElement | HTMLButtonElement>,
+) {
+    const {
+        isActive,
+        to,
+        className,
+        buttonType,
+        linkClassName,
+        linkContentClassName,
+        children,
+        permission,
+        hasPopupMenu,
+        ...passthru
+    } = props;
+
+    const classes = titleBarNavClasses();
+    const content = (
+        <div
+            className={classNames({
+                linkContentClassName: true,
+                [classes.linkActive]: isActive,
+            })}
+        >
+            {children}
+        </div>
+    );
+
+    return (
+        <TitleBarListItem className={classNames(className, classes.root, { isActive })}>
+            {to && (
                 <SmartLink
-                    to={this.props.to}
+                    {...passthru}
+                    ref={(ref as unknown) as React.Ref<HTMLAnchorElement>}
+                    to={to}
                     className={classNames(
-                        this.props.linkClassName,
+                        linkClassName,
                         classes.link,
-                        this.props.buttonType ? getButtonStyleFromBaseClass(this.props.buttonType) : "",
+                        buttonType ? getClassForButtonType(buttonType) : "",
                     )}
+                    role="menulink"
+                    aria-haspopup={hasPopupMenu}
+                    aria-expanded={(hasPopupMenu && isActive) ?? undefined}
                 >
-                    <div
-                        className={classNames(
-                            this.props.linkContentClassName,
-                            classes.linkContent,
-                            isCurrent ? classes.linkActive : "",
-                        )}
-                    >
-                        {this.props.children}
-                    </div>
+                    {content}
                 </SmartLink>
-            </TitleBarListItem>
-        );
-    }
-
-    /**
-     * Checks if we're on the current page
-     * Note that this won't work with non-canonical URLHeaderLogo.tsxs
-     */
-    public currentPage = (): boolean => {
-        if (this.props.location && this.props.location.pathname) {
-            return siteUrl(window.location.pathname) === formatUrl(this.props.to, true);
-        } else {
-            return false;
-        }
-    };
-}
-
-export default withRouter(TitleBarNavItem);
+            )}
+            {!to && (
+                <Button
+                    buttonRef={(ref as unknown) as React.Ref<HTMLButtonElement>}
+                    onFocus={passthru.onFocus}
+                    onMouseEnter={passthru.onMouseEnter}
+                    onKeyDown={passthru.onKeyDown}
+                    buttonType={ButtonTypes.TEXT}
+                    role="menubutton"
+                    className={classNames(
+                        classes.navLinkAsButton,
+                        linkClassName,
+                        classes.link,
+                        buttonType ? getClassForButtonType(buttonType) : "",
+                    )}
+                    aria-haspopup={hasPopupMenu}
+                    aria-expanded={(hasPopupMenu && isActive) ?? undefined}
+                >
+                    {content}
+                </Button>
+            )}
+        </TitleBarListItem>
+    );
+});

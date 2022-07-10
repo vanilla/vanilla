@@ -8,6 +8,8 @@
  * @since 2.0
  */
 
+use Garden\Web\Exception\ResponseException;
+
 /**
  * Handles /activity endpoint.
  */
@@ -62,8 +64,29 @@ class ActivityController extends Gdn_Controller {
         $this->addModule('GuestModule');
         $this->addModule('SignedInModule');
         parent::initialize();
+        $this->handleNotSuitableActivityRoute();
         Gdn_Theme::section('ActivityList');
         $this->setData('Breadcrumbs', [['Name' => t('Activity'), 'Url' => '/activity']]);
+    }
+
+    /**
+     * Handle custom activity routing instead of going to index().
+     */
+    private function handleNotSuitableActivityRoute() {
+        $args = Gdn::dispatcher()->controllerArguments();
+        // Check custom route with activity ID.
+        if (isset($args[0]) && is_numeric($args[0])) {
+            $id = array_shift($args);
+            // Check custom path.
+            $path = array_shift($args);
+            switch ($path) {
+                case 'mark-read-and-redirect':
+                    Gdn::dispatcher()->EventArguments['ControllerMethod'] = 'markReadAnRedirect';
+                    Gdn::dispatcher()->ControllerMethod = 'markReadAnRedirect';
+                    return;
+            }
+        }
+        Gdn::dispatcher()->controllerArguments($args);
     }
 
     /**
@@ -167,7 +190,7 @@ class ActivityController extends Gdn_Controller {
         }
 
         if (!is_numeric($iD)) {
-            throw gdn_UserException('Invalid ID');
+            throw new Gdn_UserException('Invalid ID');
         }
 
         $comment = $this->ActivityModel->getComment($iD);
@@ -194,10 +217,7 @@ class ActivityController extends Gdn_Controller {
     /**
      * Delete an activity item.
      *
-     * @since 2.0.0
-     * @access public
-     *
-     * @param int $activityID Unique ID of item to delete.
+     * @param int|string $activityID Unique ID of item to delete.
      * @param string $transientKey Verify intent.
      */
     public function delete($activityID = '', $transientKey = '') {
@@ -207,7 +227,7 @@ class ActivityController extends Gdn_Controller {
         }
 
         if (!is_numeric($activityID)) {
-            throw gdn_UserException('Invalid ID');
+            throw new Gdn_UserException('Invalid ID');
         }
 
         if (!$this->ActivityModel->canDelete($this->ActivityModel->getID($activityID))) {
@@ -263,7 +283,8 @@ class ActivityController extends Gdn_Controller {
                 $activityComment = [
                     'ActivityID' => $activityID,
                     'Body' => $body,
-                    'Format' => 'Text'];
+                    'Format' => $this->Form->getValue('Format', '')
+                ];
 
                 $iD = $this->ActivityModel->comment($activityComment);
 
@@ -399,5 +420,31 @@ class ActivityController extends Gdn_Controller {
 
         $this->setData('Activities', $activities);
         $this->render('Activities');
+    }
+
+    /**
+     * Set notification as read then redirects logged user to the target of the notification.
+     *
+     * @param int $activityID Unique ID of activity item to display.
+     * @param string $transientKey Transient Key.
+     * @throws Gdn_UserException Transient key is not valid orr the user is not the activity owner.
+     * @throws ResponseException An exception on redirect.
+     */
+    public function markReadAnRedirect(int $activityID, string $transientKey = '') {
+        $session = Gdn::session();
+        if (!$session->validateTransientKey($transientKey)) {
+            throw permissionException();
+        }
+        $userID = $session->UserID;
+        $activity = $this->ActivityModel->getID($activityID, DATASET_TYPE_ARRAY);
+        if (!$activity) {
+            throw notFoundException('Activity');
+        }
+        $notifyUserId = $activity['NotifyUserID'];
+        if ($userID === $notifyUserId) {
+            $this->ActivityModel->markSingleRead($activityID);
+            redirectTo($activity['Url']);
+        }
+        throw permissionException();
     }
 }

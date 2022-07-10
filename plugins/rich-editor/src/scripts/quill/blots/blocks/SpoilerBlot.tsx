@@ -4,8 +4,6 @@
  * @license GPL-2.0-only
  */
 
-/* tslint:disable:max-classes-per-file */
-
 import ReactDOM from "react-dom";
 import React from "react";
 import WrapperBlot from "@rich-editor/quill/blots/abstract/WrapperBlot";

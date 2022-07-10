@@ -14,6 +14,7 @@ use Garden\EventManager;
 use Psr\Container\ContainerInterface;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
+use Vanilla\Models\AddonModel;
 
 /**
  * Plugin Manager.
@@ -602,6 +603,8 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      *  - Gdn_PluginManager::ACCESS_CLASSNAME
      * @param mixed $sender An object to pass to a new plugin instantiation.
      * @return Gdn_IPlugin The plugin instance.
+     * @throws \Garden\Container\NotFoundException  No entry was found for this identifier.
+     * @throws \Garden\Container\ContainerException Error while retrieving the entry.
      */
     public function getPluginInstance($name, $accessType = self::ACCESS_CLASSNAME, $sender = null) {
         $className = null;
@@ -870,8 +873,7 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      *
      * @param string $className The name of the class throwing the event.
      * @param string $methodName The name of the event.
-     * @return callback|null
-     * @since 2.1
+     * @return callable|null
      */
     public function getCallback($className, $methodName) {
         $eventKey = "{$className}_{$methodName}_method";
@@ -1078,8 +1080,6 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      * @throws Gdn_UserException
      */
     public function enablePlugin($pluginName, $validation, $options = []) {
-
-        $setup = val('Setup', $options, true);
         $force = val('Force', $options, false);
 
         // Check to see if the plugin is already enabled.
@@ -1092,29 +1092,8 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
             throw notFoundException('Plugin');
         }
 
-        if (!$validation instanceof Gdn_Validation) {
-            $validation = new Gdn_Validation();
-        }
-
-        try {
-            $this->addonManager->checkRequirements($addon, true);
-            $addon->test(true);
-        } catch (\Exception $ex) {
-            $validation->addValidationResult('addon', '@'.$ex->getMessage());
-            return false;
-        }
-
-        // Enable this addon's requirements.
-        $requirements = $this->addonManager->lookupRequirements($addon, AddonManager::REQ_DISABLED);
-        $enabledRequirements = [];
-        foreach ($requirements as $addonKey => $row) {
-            $requiredAddon = $this->addonManager->lookupAddon($addonKey);
-            $this->enableAddon($requiredAddon, $setup);
-            $enabledRequirements[] = $requiredAddon;
-        }
-
-        // Enable the addon.
-        $this->enableAddon($addon, $setup);
+        $addonModel = \Gdn::getContainer()->get(AddonModel::class);
+        $enabled = $addonModel->enable($addon, ['force' => $force]);
 
         // Refresh the locale just in case there are some translations needed this request.
         Gdn::locale()->refresh();
@@ -1124,7 +1103,9 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
 
         $result = [
             'AddonEnabled' => true,
-            'RequirementsEnabled' => $enabledRequirements
+            'RequirementsEnabled' => array_filter($enabled, function (Addon $addon) use ($pluginName) {
+                return $addon->getKey() !== $pluginName;
+            })
         ];
         return $result;
     }
@@ -1143,42 +1124,8 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
             return false;
         }
 
-        $pluginClassName = $addon->getPluginClass();
-        $pluginName = $addon->getRawKey();
-        $enabled = $this->addonManager->isEnabled($pluginName, Addon::TYPE_ADDON);
-
-        try {
-            $this->addonManager->checkDependents($addon, true);
-        } catch (\Exception $ex) {
-            throw new Gdn_UserException($ex->getMessage(), 400);
-        }
-
-        // 2. Perform necessary hook action
-        $this->pluginHook($pluginName, self::ACTION_DISABLE, true);
-
-        // 3. Disable it.
-        saveToConfig("EnabledPlugins.{$pluginName}", false);
-
-        $this->addonManager->stopAddon($addon);
-
-        // 4. Unregister the plugin properly.
-        $this->unregisterPlugin($pluginClassName);
-
-        if ($enabled) {
-            Logger::event(
-                'addon_disabled',
-                Logger::INFO,
-                'The {addonName} plugin was disabled.',
-                ['addonName' => $pluginName, Logger::FIELD_CHANNEL => Logger::CHANNEL_ADMIN]
-            );
-        }
-
-        // Redefine the locale manager's settings $Locale->set($CurrentLocale, $EnabledApps, $EnabledPlugins, TRUE);
-        Gdn::locale()->refresh();
-
-        $this->EventArguments['AddonName'] = $pluginName;
-        $this->fireEvent('AddonDisabled');
-
+        $addonModel = \Gdn::getContainer()->get(AddonModel::class);
+        $addonModel->disable($addon);
         return true;
     }
 
@@ -1196,12 +1143,13 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
         foreach ($authors as $authorString) {
             $parts = explode(',', $authorString, 3);
             $author = [];
-            $author['Name'] = trim($author[0]);
+            $author['Name'] = trim($parts[0]);
             for ($i = 1; $i < count($parts); $i++) {
                 if (strpos($parts[$i], '@') !== false) {
                     $author['Email'] = $parts[$i];
-                } elseif (preg_match('`^https?://`', $parts[$i]))
+                } elseif (preg_match('`^https?://`', $parts[$i])) {
                     $author['Url'] = $parts[$i];
+                }
             }
             $result[] = $author;
         }
@@ -1213,8 +1161,9 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
                 $name = $author['Name'];
                 if (isset($author['Url'])) {
                     $url = $author['Url'];
-                } elseif (isset($author['Email']))
+                } elseif (isset($author['Email'])) {
                     $url = "mailto:{$author['Email']}";
+                }
 
                 if (isset($url)) {
                     $htmls[] = '<a href="'.htmlspecialchars($url).'">'.htmlspecialchars($name).'</a>';
@@ -1223,7 +1172,6 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
             $result = implode(', ', $htmls);
         }
         return $result;
-
     }
 
     /**
@@ -1268,33 +1216,11 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      * Enable an addon and do all the stuff that's entailed there.
      *
      * @param Addon $addon The addon to enable.
-     * @param bool $setup Whether or not to set the plugin up.
      * @throws Exception Throws an exception if something goes bonkers during the process.
      */
-    private function enableAddon(Addon $addon, $setup) {
-        if ($setup) {
-            $this->addonManager->startAddon($addon);
-            $this->pluginHook($addon->getRawKey(), self::ACTION_ENABLE, true);
-
-            // If setup succeeded, register any specified permissions
-            $permissions = $addon->getInfoValue('registerPermissions');
-            if (!empty($permissions)) {
-                $permissionModel = Gdn::permissionModel();
-                $permissionModel->define($permissions);
-            }
-
-            // Write enabled state to config.
-            saveToConfig("EnabledPlugins.".$addon->getRawKey(), true);
-            Logger::event(
-                'addon_enabled',
-                Logger::INFO,
-                'The {addonName} plugin was enabled.',
-                ['addonName' => $addon->getRawKey(), Logger::FIELD_CHANNEL => Logger::CHANNEL_ADMIN]
-            );
-        }
-
-        $pluginClassName = $addon->getPluginClass();
-        $this->registerPlugin($pluginClassName, $addon->getPriority());
+    private function enableAddon(Addon $addon) {
+        $addonModel = \Gdn::getContainer()->get(AddonModel::class);
+        $addonModel->enable($addon, ['force' => true]);
     }
 
     /**
@@ -1302,8 +1228,8 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      *
      * @param string $id Identifier of the entry to look for.
      *
-     * @throws \Interop\Container\Exception\NotFoundException  No entry was found for this identifier.
-     * @throws \Interop\Container\Exception\ContainerException Error while retrieving the entry.
+     * @throws \Garden\Container\NotFoundException  No entry was found for this identifier.
+     * @throws \Garden\Container\ContainerException Error while retrieving the entry.
      *
      * @return mixed Entry.
      */

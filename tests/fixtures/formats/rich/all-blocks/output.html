@@ -1,5 +1,5 @@
 <h2 data-id="testRef">Block operations H2 Title here. Code Block next.</h2>
-<pre class="code codeBlock" spellcheck="false">/**
+<pre class="code codeBlock" spellcheck="false" tabindex=0>/**
  *adds locale data to the view, and adds a respond button to the discussion page.
  */
 class MyThemeNameThemeHooks extends Gdn_Plugin {
@@ -11,14 +11,14 @@ class MyThemeNameThemeHooks extends Gdn_Plugin {
      * @param  Controller $sender The sending controller object.
      */
     public function base_render_beforebase_render_beforebase_render_beforebase_render_beforebase_render_before($sender) {
-        // Bail out if we&#039;re in the dashboard
-        if (inSection(&#039;Dashboard&#039;)) {
+        // Bail out if we're in the dashboard
+        if (inSection('Dashboard')) {
             return;
         }
 
         // Fetch the currently enabled locale (en by default)
         $locale = Gdn::locale()-&gt;current();
-        $sender-&gt;setData(&#039;locale&#039;, $locale);
+        $sender-&gt;setData('locale', $locale);
     }
 }
 </pre>
@@ -79,10 +79,7 @@ class MyThemeNameThemeHooks extends Gdn_Plugin {
 </p>
 <div class="blockquote">
     <div class="blockquote-content">
-        <p class="blockquote-line">Some Block quote content
-            <strong>bold</strong>
-            <em>italic </em>
-            <s>strike</s>
+        <p class="blockquote-line">Some Block quote content<strong>bold</strong><em>italic </em><s>strike</s>
         </p>
         <p class="blockquote-line">
             <s>More blockquote content</s>

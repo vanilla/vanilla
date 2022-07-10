@@ -4,39 +4,48 @@
  * @license Proprietary
  */
 
-import { useThemeCache, styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { cssRule } from "typestyle";
-import { colorOut } from "@library/styles/styleHelpersColors";
-import { absolutePosition, margins, paddings, unit } from "@library/styles/styleHelpers";
+import { cssRule } from "@library/styles/styleShim";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
 import { percent } from "csx";
+import { Mixins } from "@library/styles/Mixins";
 
 export const accessibilityCSS = useThemeCache(() => {
     const globalVars = globalVariables();
 
+    const fallbackContent = document.getElementById("fallbackPageContent");
+    if (fallbackContent) {
+        fallbackContent.remove(); // for accessibility, we can't have 2 <h1>s in the page.
+    }
+
     cssRule(".accessibility-jumpTo", {
-        border: unit(0),
+        border: styleUnit(0),
         clip: `rect(0 0 0 0)`,
-        height: unit(1),
-        margin: unit(-1),
+        height: styleUnit(1),
+        margin: styleUnit(-1),
         overflow: "hidden",
-        padding: unit(0),
+        padding: styleUnit(0),
         position: "absolute",
-        width: unit(1),
-        $nest: {
+        width: styleUnit(1),
+        ...{
             "&:focus": {
                 position: "absolute",
-                top: unit(50),
-                left: unit(0),
-                textAlign: "left",
-                backgroundColor: colorOut(globalVars.elementaryColors.white),
-                color: colorOut(globalVars.elementaryColors.black),
+                top: styleUnit(50),
+                left: styleUnit(0),
+                backgroundColor: ColorsUtils.colorOut(globalVars.elementaryColors.white),
                 display: "block",
-                fontSize: unit(globalVars.fonts.size.medium),
+                ...Mixins.font({
+                    ...globalVars.fontSizeAndWeightVars("medium"),
+                    color: ColorsUtils.colorOut(globalVars.elementaryColors.black),
+                    align: "left",
+                }),
                 clip: "auto",
-                margin: unit(0),
+                margin: styleUnit(0),
                 height: "auto",
-                ...paddings({
+                ...Mixins.padding({
                     vertical: 0,
                     horizontal: 12,
                 }),

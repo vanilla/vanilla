@@ -8,8 +8,10 @@
 
 export * from "./src/debugUtils";
 export * from "./src/fileUtils";
+export * from "./src/logicUtils";
 export * from "./src/mathUtils";
 export * from "./src/promiseUtils";
 export * from "./src/stringUtils";
+export * from "./src/ArrayUtils";
 export * from "./src/systemUtils";
 export * from "./src/typeUtils";

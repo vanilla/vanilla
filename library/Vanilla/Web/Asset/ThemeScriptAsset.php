@@ -7,37 +7,31 @@
 
 namespace Vanilla\Web\Asset;
 
-use Garden\Web\RequestInterface;
+use Vanilla\Contracts\Web\AssetInterface;
+use Vanilla\Theme\Asset\JavascriptThemeAsset;
 
 /**
  * An asset representing a script containing data for a particular locale.
  */
-class ThemeScriptAsset extends SiteAsset {
+class ThemeScriptAsset implements AssetInterface {
 
-    /** @var string */
-    private $themeKey;
+    /** @var JavascriptThemeAsset */
+    private $asset;
 
     /**
      * Constructor.
      *
-     * @param RequestInterface $request The current request.
-     * @param string $themeKey The key of the locale for the asset to represent.
-     * @param string $cacheBustingKey A cache busting string..
+     * @param JavascriptThemeAsset $asset
      */
-    public function __construct(RequestInterface $request, string $themeKey, $cacheBustingKey = "") {
-        parent::__construct($request, $cacheBustingKey);
-        $this->themeKey = $themeKey;
+    public function __construct(JavascriptThemeAsset $asset) {
+        $this->asset = $asset;
     }
 
     /**
      * @inheritdoc
      */
     public function getWebPath(): string {
-        return $this->makeAssetPath(
-            '/api/v2/themes',
-            $this->themeKey,
-            '/assets/javascript.js'
-        );
+        return $this->asset->getUrl();
     }
 
     /**

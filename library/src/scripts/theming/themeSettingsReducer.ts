@@ -5,19 +5,20 @@
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { produce } from "immer";
 import { reducerWithInitialState } from "typescript-fsa-reducers";
-import ThemeActions, { IManageTheme } from "@library/theming/ThemeActions";
+import ThemeActions from "@library/theming/ThemeActions";
 import { useSelector } from "react-redux";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
-import { ThemeType } from "@library/theming/themeReducer";
+import { ThemeType, ITheme } from "@library/theming/themeReducer";
+import { RecordID } from "@vanilla/utils";
 
 export interface IThemesState {
     themes: ILoadable<{
-        currentTheme: IManageTheme;
-        templates: IManageTheme[];
-        themes: IManageTheme[];
+        currentTheme: ITheme;
+        templates: ITheme[];
+        themes: ITheme[];
     }>;
-    applyStatus: ILoadable<{ themeID: number | string }>;
-    previewStatus: ILoadable<{ themeID: number | string }>;
+    applyStatus: ILoadable<{ themeID: RecordID }>;
+    previewStatus: ILoadable<{ themeID: RecordID }>;
     deleteThemeByID: {
         [themeID: number]: ILoadable<{}>;
     };
@@ -48,8 +49,8 @@ export const themeSettingsReducer = produce(
         })
         .case(ThemeActions.getAllThemes_ACS.done, (nextState, payload) => {
             let currentTheme;
-            let templates: IManageTheme[] = [];
-            let themes: IManageTheme[] = [];
+            let templates: ITheme[] = [];
+            let themes: ITheme[] = [];
 
             for (const theme of payload.result) {
                 if (theme.current) {
@@ -89,14 +90,14 @@ export const themeSettingsReducer = produce(
             if (nextState.themes.data) {
                 nextState.themes.data.currentTheme = payload.result;
 
-                nextState.themes.data.themes = nextState.themes.data.themes.map(theme => {
+                nextState.themes.data.themes = nextState.themes.data.themes.map((theme) => {
                     return {
                         ...theme,
                         current: theme.themeID === payload.result.themeID,
                     };
                 });
 
-                nextState.themes.data.templates = nextState.themes.data.templates.map(templates => {
+                nextState.themes.data.templates = nextState.themes.data.templates.map((templates) => {
                     return {
                         ...templates,
                         current: templates.themeID === payload.result.themeID,
@@ -140,7 +141,7 @@ export const themeSettingsReducer = produce(
                 status: LoadStatus.SUCCESS,
             };
             if (nextState.themes.data) {
-                nextState.themes.data.themes = nextState.themes.data?.themes.filter(existingTemplate => {
+                nextState.themes.data.themes = nextState.themes.data?.themes.filter((existingTemplate) => {
                     if (existingTemplate.themeID === payload.params.themeID) {
                         return false;
                     } else {

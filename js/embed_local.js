@@ -30,7 +30,8 @@ jQuery(document).ready(function($) {
         isEmbeddedComments = gdn.definition('Embedded', '') != '',
         webroot = gdn.definition('WebRoot'),
         path = gdn.getMeta('Path', '/'),
-        query = gdn.getMeta('Query', []);
+        query = gdn.getMeta('Query', []),
+        dataDrivenTheme = gdn.meta.themeFeatures ? gdn.meta.themeFeatures.DataDrivenTheme : false;
 
     if (path.length === 0 || path[0] !== '/') {
         path = '/' + path;
@@ -153,11 +154,11 @@ jQuery(document).ready(function($) {
             document.body.style.cssText += 'height:auto !important;';
 
             var newHeight = explicitHeight > 0 ? explicitHeight : document.body.offsetHeight;
-            if (newHeight > minHeight && newHeight != currentHeight) {
+            if (newHeight > minHeight && newHeight !== currentHeight) {
                 currentHeight = newHeight;
                 remotePostMessage('height:' + currentHeight, '*');
             }
-        }
+        };
 
         setInterval(setHeight, 300);
 
@@ -218,6 +219,11 @@ jQuery(document).ready(function($) {
                 return;
             }
         });
+
+        // Set CSS class to contain height for foundation-like themes.
+        if (dataDrivenTheme) {
+            document.querySelector('.Frame').classList.add('EmbeddedFrame');
+        }
     }
 
 

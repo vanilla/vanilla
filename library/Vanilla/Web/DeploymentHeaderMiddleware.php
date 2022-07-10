@@ -14,7 +14,8 @@ use Vanilla\Web\Asset\DeploymentCacheBuster;
  * Deployment middleware for handling deployment key headers.
  */
 class DeploymentHeaderMiddleware {
-    const VANILLA_DEPLOYMENT_KEY = 'Vdk';
+    public const VANILLA_DEPLOYMENT_KEY = 'Vdk';
+    public const APPLICATION_VERSION_KEY = 'X-Vanilla-Version';
 
     /** @var DeploymentCacheBuster */
     public $deploymentCacheBuster;
@@ -41,6 +42,10 @@ class DeploymentHeaderMiddleware {
         $response->setHeader(
             self::VANILLA_DEPLOYMENT_KEY,
             $this->deploymentCacheBuster->value()
+        );
+        $response->setHeader(
+            self::APPLICATION_VERSION_KEY,
+            APPLICATION_VERSION
         );
         return $response;
     }

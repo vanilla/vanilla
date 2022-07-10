@@ -10,6 +10,7 @@
 
 use Vanilla\Formatting\Formats;
 use Vanilla\Web\TwigStaticRenderer;
+use Vanilla\Utility\HtmlUtils;
 
 if (!function_exists('alternate')) {
     /**
@@ -262,7 +263,7 @@ if (!function_exists('buttonDropDown')) {
      *  - Text: The text of the link.
      *  - Url: The url of the link.
      * @param string|array $cssClass The css class of the link. This can be a two-item array where the second element will be added to the buttons.
-     * @param string $label The text of the button.
+     * @param string|false $label The text of the button.
      * @since 2.1
      */
     function buttonDropDown($links, $cssClass = 'Button', $label = false) {
@@ -293,7 +294,7 @@ if (!function_exists('buttonDropDown')) {
             // Strip "Button" or "NavButton" off the group class.
             echo '<div class="ButtonGroup'.str_replace(['NavButton', 'Button'], ['', ''], $cssClass).'">';
 
-            echo '<ul class="Dropdown MenuItems">';
+            echo '<ul role="menu" class="Dropdown MenuItems">';
             foreach ($links as $link) {
                 echo wrap(anchor($link['Text'], $link['Url'], val('CssClass', $link, '')), 'li');
             }
@@ -368,7 +369,7 @@ if (!function_exists('buttonGroup')) {
                 echo $toggleButton;
             }
 
-            echo '<ul class="Dropdown MenuItems">';
+            echo '<ul class="Dropdown MenuItems" role="menu">';
             foreach ($links as $link) {
                 echo wrap(anchor($link['Text'], $link['Url'], val('CssClass', $link, '')), 'li');
             }
@@ -450,12 +451,7 @@ if (!function_exists('categoryFilters')) {
         if (Gdn::request()->get('followed')) {
             $defaultParams['followed'] = 0;
         }
-
-        if (!empty($defaultParams)) {
-            $defaultUrl = $baseUrl.'?'.http_build_query($defaultParams);
-        } else {
-            $defaultUrl = $baseUrl;
-        }
+        $defaultUrl = url($baseUrl.'?'.http_build_query($defaultParams));
 
         return filtersDropDown(
             $baseUrl,
@@ -472,22 +468,15 @@ if (!function_exists('categoryUrl')) {
     /**
      * Return a url for a category. This function is in here and not functions.general so that plugins can override.
      *
-     * @param string|array $category
-     * @param string|int $page The page number.
-     * @param bool $withDomain Whether to add the domain to the URL
+     * @param array|object|string|int $category A category object/array, slug, or ID.
+     * @param string|int $page The page of the categories.
+     * @param bool|string $withDomain What domain type to apply.
      * @return string The url to a category.
+     *
+     * @deprecated CategoryModel::categoryUrl
      */
     function categoryUrl($category, $page = '', $withDomain = true) {
-        if (is_string($category)) {
-            $category = CategoryModel::categories($category);
-        }
-        $category = (array)$category;
-
-        $result = '/categories/'.rawurlencode($category['UrlCode']);
-        if ($page && $page > 1) {
-            $result .= '/p'.$page;
-        }
-        return url($result, $withDomain);
+        return CategoryModel::createRawCategoryUrl($category, $page, $withDomain);
     }
 }
 
@@ -715,11 +704,11 @@ if (!function_exists('commentUrl')) {
      * @param object|array $comment
      * @param bool $withDomain
      * @return string
+     *
+     * @deprecated CommentModel::commentUrl()
      */
     function commentUrl($comment, $withDomain = true) {
-        $comment = (object)$comment;
-        $result = "/discussion/comment/{$comment->CommentID}#Comment_{$comment->CommentID}";
-        return url($result, $withDomain);
+        return CommentModel::createRawCommentUrl($comment, $withDomain);
     }
 }
 
@@ -751,9 +740,9 @@ if (!function_exists('discussionFilters')) {
         }
 
         if (!empty($defaultParams)) {
-            $defaultUrl = $baseUrl.'?'.http_build_query($defaultParams);
+            $defaultUrl = url($baseUrl.'?'.http_build_query($defaultParams));
         } else {
-            $defaultUrl = $baseUrl;
+            $defaultUrl = url($baseUrl);
         }
 
         return filtersDropDown(
@@ -775,25 +764,11 @@ if (!function_exists('discussionUrl')) {
      * @param int|string $page
      * @param bool $withDomain
      * @return string
+     *
+     * @deprecated  DiscussionModel::discussionUrl().
      */
     function discussionUrl($discussion, $page = '', $withDomain = true) {
-        $discussion = (object)$discussion;
-        $name = Gdn_Format::url($discussion->Name);
-
-        // Disallow an empty name slug in discussion URLs.
-        if (empty($name)) {
-            $name = 'x';
-        }
-
-        $result = '/discussion/'.$discussion->DiscussionID.'/'.$name;
-
-        if ($page) {
-            if ($page > 1 || Gdn::session()->UserID) {
-                $result .= '/p'.$page;
-            }
-        }
-
-        return url($result, $withDomain);
+        return DiscussionModel::createRawDiscussionUrl($discussion, $page, $withDomain);
     }
 }
 
@@ -836,7 +811,7 @@ if (!function_exists('filtersDropDown')) {
             $default = t('All');
         }
         $output = '';
-        if (c('Vanilla.EnableCategoryFollowing')) {
+        if (c(\CategoryModel::CONF_CATEGORY_FOLLOWING)) {
             $links = [];
             $active = null;
 
@@ -885,8 +860,11 @@ if (!function_exists('filtersDropDown')) {
 
         if (Gdn::themeFeatures()->useDataDrivenTheme()) {
             if (Gdn_Theme::inSection('DiscussionList')) {
-                include_once Gdn::controller()->fetchViewLocation('helper_functions', 'discussions', 'vanilla');
-                $output .= adminCheck();
+                $controller = \Gdn::controller();
+                if ($controller !== null) {
+                    include_once Gdn::controller()->fetchViewLocation('helper_functions', 'discussions', 'vanilla');
+                    $output .= adminCheck();
+                }
             }
             $output = "<div class='PageControls-filters'>$output</div>";
         }
@@ -1080,7 +1058,7 @@ if (!function_exists('img')) {
             $image = smartAsset($image, $withDomain);
         }
 
-        return '<img src="'.htmlspecialchars($image, ENT_QUOTES).'"'.$attributes.' />';
+        return '<img src="'.htmlspecialchars($image, ENT_QUOTES).'"'.$attributes.' loading="lazy" />';
     }
 }
 
@@ -1160,6 +1138,8 @@ if (!function_exists('linkDropDown')) {
         $selectedLink = val($selectedKey, $links);
         $extraClasses = trim($extraClasses);
         $linkName = val('name', $selectedLink);
+        $downChevronLabel = t("Down Arrow");
+        $label = t($label);
 
         $output .= <<<EOT
         <span class="ToggleFlyout selectBox {$extraClasses}">
@@ -1167,9 +1147,9 @@ if (!function_exists('linkDropDown')) {
           <span class="selectBox-main">
               <a href="#" role="button" rel="nofollow" class="FlyoutButton selectBox-toggle" tabindex="0">
                 <span class="selectBox-selected">{$linkName}</span>
-                <span class="vanillaDropDown-arrow">▾</span>
+                <span class="vanillaDropDown-arrow" aria-label="{$downChevronLabel}">▾</span>
               </a>
-              <ul class="Flyout MenuItems selectBox-content" role="presentation">
+              <ul class="Flyout MenuItems selectBox-content" role="menu">
 EOT;
         foreach($links as $i => $link) {
                 if (val('separator', $link)) {
@@ -1178,8 +1158,8 @@ EOT;
                     $output .= '</li>';
                 } else {
                     if (val('active', $link)) {
-                        $output .= '<li class="selectBox-item isActive" role="presentation">';
-                        $output .= '  <a href="'.htmlspecialchars(val('url', $link)).'" role="menuitem" class="dropdown-menu-link selectBox-link" tabindex="0" aria-current="location">';
+                        $output .= '<li class="selectBox-item isActive" role="menuitem">';
+                        $output .= '  <a href="'.htmlspecialchars(val('url', $link)).'" class="dropdown-menu-link selectBox-link" tabindex="0">';
                         $output .= '    <svg class="vanillaIcon selectBox-selectedIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18">';
                         $output .= '      <title>✓</title>';
                         $output .= '      <polygon fill="currentColor" points="1.938,8.7 0.538,10.1 5.938,15.5 17.337,3.9 15.938,2.5 5.938,12.8"></polygon>';
@@ -1190,8 +1170,8 @@ EOT;
                         $output .= '  </a>';
                         $output .= '</li>';
                     } else {
-                        $output .= '<li class="selectBox-item" role="presentation">';
-                        $output .= '  <a href="'.htmlspecialchars(val('url', $link)).'" role="menuitem" class="dropdown-menu-link selectBox-link" tabindex="0" href="#">';
+                        $output .= '<li class="selectBox-item" role="menuitem">';
+                        $output .= '  <a href="'.htmlspecialchars(val('url', $link)).'" class="dropdown-menu-link selectBox-link" tabindex="0" href="#">';
                         $output .=      val('name', $link);
                         $output .= '  </a>';
                         $output .= '</li>';
@@ -1214,7 +1194,7 @@ if (!function_exists('panelHeading')) {
      * Define default head tag for the side panel.
      *
      * @param string $content The content of the tag.
-     * @param string $attributes The attributes of the tag.
+     * @param array $attributes The attributes of the tag.
      * @return string The full tag.
      */
     function panelHeading($content, $attributes = []) {
@@ -1397,13 +1377,25 @@ if (!function_exists('userAnchor')) {
             $options = ['Px' => $options];
         }
 
-        $px = val('Px', $options, '');
-        $name = val($px.'Name', $user, t('Unknown'));
-        $text = val('Text', $options, htmlspecialchars($name)); // Allow anchor text to be overridden.
+        $px = $options["Px"] ?? "";
+
+        if (is_array($user)) {
+            $name = $user["{$px}Name"] ?? t("Unknown");
+            $userID = $user["{$px}UserID"] ?? null;
+        } elseif (is_object($user)) {
+            $name = $user->{"{$px}Name"} ?? t("Unknown");
+            $userID = $user->{"{$px}UserID"} ?? null;
+        } else {
+            $name = t("Unknown");
+            $userID = null;
+        }
+
+        $text = $options["Text"] ?? htmlspecialchars($name); // Allow anchor text to be overridden.
 
         $attributes = [
-            'class' => $cssClass,
-            'rel' => val('Rel', $options)
+            'class' => trim(($cssClass ?? "") . " js-userCard"),
+            'rel' => val('Rel', $options),
+            'data-userid' => $userID,
         ];
         if (isset($options['title'])) {
             $attributes['title'] = $options['title'];
@@ -1471,14 +1463,20 @@ if (!function_exists('userPhoto')) {
         if (is_string($options)) {
             $options = ['LinkClass' => $options];
         }
+        $px = $options["Px"] ?? "";
 
-        if ($px = val('Px', $options)) {
-            $user = userBuilder($user, $px);
+        if (is_array($user)) {
+            $name = $user["{$px}Name"] ?? t("Unknown");
+            $userID = $user["{$px}UserID"] ?? null;
+        } elseif (is_object($user)) {
+            $name = $user->{"{$px}Name"} ?? t("Unknown");
+            $userID = $user->{"{$px}UserID"} ?? null;
         } else {
-            $user = (object)$user;
+            $name = t("Unknown");
+            $userID = null;
         }
 
-        $linkClass = concatSep(' ', val('LinkClass', $options, ''), 'PhotoWrap');
+        $linkClass = concatSep(' ', val('LinkClass', $options, ''), 'PhotoWrap', 'js-userCard');
         $imgClass = val('ImageClass', $options, 'ProfilePhoto');
 
         $size = val('Size', $options);
@@ -1489,7 +1487,17 @@ if (!function_exists('userPhoto')) {
             $imgClass .= " {$imgClass}Medium"; // backwards compat
         }
 
-        $fullUser = Gdn::userModel()->getID(val('UserID', $user), DATASET_TYPE_ARRAY);
+        if (!empty($userID)) {
+            $fullUser = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
+        }
+
+        if (!empty($fullUser)) {
+            $profileHref = url(userUrl($fullUser));
+        } else {
+            $fullUser = [];
+            $profileHref = '/renderfunctionstest/profile/';
+        }
+        $href = (val('NoLink', $options)) ? '' : ' href="'.$profileHref.'"';
         $userCssClass = val('_CssClass', $fullUser);
         if ($userCssClass) {
             $linkClass .= ' '.$userCssClass;
@@ -1497,29 +1505,18 @@ if (!function_exists('userPhoto')) {
 
         $linkClass = $linkClass == '' ? '' : ' class="'.$linkClass.'"';
 
-        $photo = val('Photo', $fullUser, val('PhotoUrl', $user));
-        $name = val('Name', $fullUser);
         $title = htmlspecialchars(val('Title', $options, $name));
 
         if ($fullUser && $fullUser['Banned']) {
-            $photo = c('Garden.BannedPhoto', 'https://images.v-cdn.net/banned_large.png');
             $title .= ' ('.t('Banned').')';
         }
 
-        if ($photo) {
-            if (!isUrl($photo)) {
-                $photoUrl = Gdn_Upload::url(changeBasename($photo, 'n%s'));
-            } else {
-                $photoUrl = $photo;
-            }
-        } else {
-            $photoUrl = UserModel::getDefaultAvatarUrl($fullUser, 'thumbnail');
-        }
+        $photoUrl = userPhotoUrl($fullUser);
 
-        $href = (val('NoLink', $options)) ? '' : ' href="'.url(userUrl($fullUser)).'"';
+        $accessibleLabel = HtmlUtils::accessibleLabel('User: "%s"', [$name]);
 
-        return '<a title="'.$title.'"'.$href.$linkClass.'>'
-                .img($photoUrl, ['alt' => $name, 'class' => $imgClass])
+        return '<a title="'.$title.'"'.$href.$linkClass.' aria-label="' . $accessibleLabel . '" data-userid="'.$userID.'">'
+                .img($photoUrl, ['alt' => $name, 'class' => $imgClass, 'data-fallback' => 'avatar'])
             .'</a>';
     }
 }
@@ -1529,24 +1526,32 @@ if (!function_exists('userPhotoUrl')) {
      * Take a user object an return the URL to their photo.
      *
      * @param object|array $user
+     * @param string $size
      * @return string
      */
-    function userPhotoUrl($user) {
-        $fullUser = Gdn::userModel()->getID(val('UserID', $user), DATASET_TYPE_ARRAY);
-        $photo = val('Photo', $user);
-        if ($fullUser && $fullUser['Banned']) {
-            $photo = 'https://images.v-cdn.net/banned_100.png';
+    function userPhotoUrl($user, $size = UserModel::AVATAR_SIZE_THUMBNAIL) {
+        if (is_numeric($user)) {
+            $user = Gdn::userModel()->getID($user, DATASET_TYPE_ARRAY);
+        } else {
+            $user = (array) $user;
         }
 
-        if ($photo) {
-            if (!isUrl($photo)) {
-                $photoUrl = Gdn_Upload::url(changeBasename($photo, 'n%s'));
-            } else {
-                $photoUrl = $photo;
-            }
-            return $photoUrl;
+        // The $size parameter is recent. Protect against a call with an extraneous arg.
+        if (!is_string($size)) {
+            $size = UserModel::AVATAR_SIZE_THUMBNAIL;
         }
-        return UserModel::getDefaultAvatarUrl($user);
+
+        if (!array_key_exists('Photo', $user) && array_key_exists('UserID', $user)) {
+            // Don't go back to the DB unless we absolutely have to.
+            $user = Gdn::userModel()->getID($user['UserID'], DATASET_TYPE_ARRAY);
+        }
+
+        if (empty($user) || !is_array($user)) {
+            return UserModel::getDefaultAvatarUrl([], $size);
+        }
+
+        $url = UserModel::getUserPhotoUrl($user, $size);
+        return $url;
     }
 }
 
@@ -1643,7 +1648,7 @@ if (!function_exists('registerUrl')) {
     function registerUrl($target = '', $force = false) {
         $registrationMethod = strtolower(c('Garden.Registration.Method'));
 
-        if ($registrationMethod === 'closed') {
+        if ($registrationMethod === 'closed' || $registrationMethod === 'invitation') {
             return '';
         }
 

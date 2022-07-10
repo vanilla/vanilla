@@ -6,12 +6,11 @@
 
 import React from "react";
 import { titleBarClasses } from "@library/headers/titleBarStyles";
-import { t } from "@library/utility/appUtils";
+import { getMeta, t } from "@library/utility/appUtils";
 import MessagesCount from "@library/headers/mebox/pieces/MessagesCount";
 import MessagesContents from "@library/headers/mebox/pieces/MessagesContents";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
-import classNames from "classnames";
 
 interface IProps {
     buttonClassName?: string;
@@ -41,10 +40,15 @@ export default class MessagesDropDown extends React.Component<IProps, IState> {
      * @returns A DropDown component, configured to display notifications.
      */
     public render() {
+        const conversations = getMeta("context.conversationsEnabled", false);
         const classesHeader = titleBarClasses();
+
+        if (!conversations) return null;
+
         return (
             <DropDown
-                id={this.id}
+                contentID={this.id + "-content"}
+                handleID={this.id + "-handle"}
                 name={t("Messages")}
                 renderLeft={true}
                 buttonClassName={classesHeader.button}
@@ -52,6 +56,7 @@ export default class MessagesDropDown extends React.Component<IProps, IState> {
                 buttonContents={<MessagesCount open={this.state.open} compact={false} />}
                 onVisibilityChange={this.setOpen}
                 flyoutType={FlyoutType.FRAME}
+                onHover={MessagesContents.preload}
             >
                 <MessagesContents countClass={this.props.countClass} />
             </DropDown>
@@ -59,11 +64,11 @@ export default class MessagesDropDown extends React.Component<IProps, IState> {
     }
 
     /**
-     * Assign the open (visibile) state of this component.
+     * Assign the open (visible) state of this component.
      *
      * @param open Is this menu open and visible?
      */
-    private setOpen = open => {
+    private setOpen = (open) => {
         this.setState({
             open,
         });

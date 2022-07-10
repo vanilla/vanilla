@@ -7,6 +7,8 @@
 
 namespace Garden;
 
+use Vanilla\Utility\DebugUtils;
+
 /**
  * For classes that need to cache some static values and configs.
  *
@@ -31,6 +33,10 @@ trait StaticCacheTrait {
      * @return mixed
      */
     public static function sc(string $key, $default = false) {
+        if (DebugUtils::isTestMode()) {
+            return self::f($key, $default);
+        }
+
         if (empty($key)) {
             throw new \Exception('Static cache key can not be empty!');
         } else {

@@ -24,7 +24,6 @@ export default class VanillaTheme extends ThemeBase {
      * @param options - The current options for the instance.
      */
     constructor(quill: Quill, options: QuillOptionsStatic) {
-        const classesRichEditor = richEditorClasses(false);
         const themeOptions = {
             ...options,
             placeholder: "Create a new post...",
@@ -35,9 +34,12 @@ export default class VanillaTheme extends ThemeBase {
         this.applyLastSelectionHack();
         this.applyFocusFixHack();
 
-        this.quill.root.classList.add(classesRichEditor.text);
         this.quill.root.classList.add("richEditor-text");
         this.quill.root.classList.add("userContent");
+        this.quill.root.setAttribute("tabindex", 0);
+        this.quill.container.addEventListener("click", (e) => {
+            e.preventDefault();
+        });
 
         // Add keyboard bindings to options.
         this.addModule("embed/insertion");
@@ -80,7 +82,7 @@ export default class VanillaTheme extends ThemeBase {
         const { root } = this.quill.selection;
         const initialFocus: typeof HTMLElement.prototype.focus = root.focus;
 
-        root.focus = function(options = {}) {
+        root.focus = function (options = {}) {
             initialFocus.call(root, {
                 ...options,
                 preventScroll: true,

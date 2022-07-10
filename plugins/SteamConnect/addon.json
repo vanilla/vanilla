@@ -1,0 +1,22 @@
+{
+    "name": "Steam Connect",
+    "description": "Allow users to sign in with their Steam Account. Requires &lsquo;OpenID&rsquo; plugin to be enabled first.",
+    "version": "1.0.0",
+    "mobileFriendly": true,
+    "icon": "steam_connect.png",
+    "settingsUrl": "/settings/steamconnect",
+    "socialConnect": true,
+    "settingsPermission": "Garden.Settings.Manage",
+    "key": "steamconnect",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Becky Van Bussel",
+            "email": "becky@vanillaforums.com",
+            "homepage": "http://vanillaforums.com"
+        }
+    ],
+    "require": {
+        "openid": ">=0.1a"
+    }
+}

@@ -14,7 +14,7 @@ import classNames from "classnames";
 import Frame from "@library/layout/frame/Frame";
 import FrameHeaderWithAction from "@library/layout/frame/FrameHeaderWithAction";
 import LinkAsButton from "@library/routing/LinkAsButton";
-import { buttonUtilityClasses } from "@library/forms/buttonStyles";
+import { buttonUtilityClasses } from "@library/forms/Button.styles";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { ComposeIcon } from "@library/icons/titleBar";
 import FrameBody from "@library/layout/frame/FrameBody";
@@ -305,7 +305,8 @@ export default class StoryExampleMessagesDropDown extends React.Component<IProps
         const buttonUtils = buttonUtilityClasses();
         return (
             <DropDown
-                id={this.id}
+                contentID={this.id + "-content"}
+                handleID={this.id + "-handle"}
                 name={t("Messages")}
                 buttonClassName={classesHeader.button}
                 contentsClassName={classesHeader.dropDownContents}
@@ -321,7 +322,7 @@ export default class StoryExampleMessagesDropDown extends React.Component<IProps
                             <LinkAsButton
                                 title={t("New Message")}
                                 to={"#"}
-                                baseClass={ButtonTypes.ICON}
+                                buttonType={ButtonTypes.ICON}
                                 className={classNames(buttonUtils.pushRight)}
                             >
                                 <ComposeIcon />
@@ -343,7 +344,7 @@ export default class StoryExampleMessagesDropDown extends React.Component<IProps
                             <LinkAsButton
                                 className={classNames(buttonUtils.pushLeft)}
                                 to={"/messages/inbox"}
-                                baseClass={ButtonTypes.TEXT_PRIMARY}
+                                buttonType={ButtonTypes.TEXT_PRIMARY}
                             >
                                 {t("All Messages")}
                             </LinkAsButton>
@@ -359,7 +360,7 @@ export default class StoryExampleMessagesDropDown extends React.Component<IProps
      *
      * @param open Is this menu open and visible?
      */
-    private setOpen = open => {
+    private setOpen = (open) => {
         this.setState({
             open,
         });

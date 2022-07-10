@@ -56,6 +56,7 @@ class ResourceEventLogger {
             return $event;
         } catch (\Exception $ex) {
             trigger_error($ex->getMessage(), E_USER_WARNING);
+            return $event;
         }
     }
 

@@ -20,10 +20,20 @@ class FeatureFlagHelper {
      */
     public static function featureEnabled(string $feature): bool {
         // We're going to enforce the root "Feature" namespace.
-        $configValue = self::c("Feature.{$feature}.Enabled");
+        $configValue = self::c(self::featureConfigKey($feature));
         // Force a true boolean.
         $result = filter_var($configValue, FILTER_VALIDATE_BOOLEAN);
         return $result;
+    }
+
+    /**
+     * Get the config key for a feature flag.
+     *
+     * @param string $feature
+     * @return string
+     */
+    public static function featureConfigKey(string $feature): string {
+        return "Feature.{$feature}.Enabled";
     }
 
     /**
@@ -48,6 +58,7 @@ class FeatureFlagHelper {
      *
      * @param string $feature The config-friendly name of the feature.
      * @param string $exceptionClass The fully-qualified class name of the exception to throw.
+     * @psalm-param class-string<\Exception> $exceptionClass
      * @param array $exceptionArguments Any parameters to be passed to the exception class's constructor.
      * @deprecated 2.7 Use FeatureFlagHelper::ensureFeature instead.
      */
@@ -59,5 +70,12 @@ class FeatureFlagHelper {
             }
             throw new $exceptionClass(...$exceptionArguments);
         }
+    }
+
+    /**
+     * Clear the cache on the feature flag helper.
+     */
+    public static function clearCache() {
+        self::$sCache = [];
     }
 }

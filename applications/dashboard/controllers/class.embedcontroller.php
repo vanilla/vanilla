@@ -28,7 +28,7 @@ class EmbedController extends DashboardController {
      */
     public function initialize() {
         parent::initialize();
-        Gdn_Theme::section('Dashboard');
+        Gdn_Theme::section('Settings');
     }
 
     /**

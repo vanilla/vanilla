@@ -5,16 +5,20 @@
  * @license GPL-2.0-only
  */
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut } from "@library/styles/styleHelpersColors";
-import { cssOut } from "@dashboard/compatibilityStyles/index";
-import { unit } from "@library/styles/styleHelpers";
-import { metaContainerStyles } from "@library/styles/metasStyles";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
+import { styleUnit } from "@library/styles/styleUnit";
+import { forumLayoutVariables } from "@dashboard/compatibilityStyles/forumLayoutStyles";
+import { userPhotoVariables } from "@library/headers/mebox/pieces/userPhotoStyles";
+import { Mixins } from "@library/styles/Mixins";
 
 export const messagesCSS = () => {
     const globalVars = globalVariables();
+    const layoutVars = forumLayoutVariables();
+    const userPhotoVars = userPhotoVariables();
 
     cssOut(`.DismissMessage`, {
-        color: colorOut(globalVars.elementaryColors.black),
+        color: ColorsUtils.colorOut(globalVars.elementaryColors.black),
     });
 
     cssOut(
@@ -24,7 +28,7 @@ export const messagesCSS = () => {
 
         `,
         {
-            paddingLeft: unit(45),
+            paddingLeft: styleUnit(userPhotoVars.sizing.medium + layoutVars.cell.paddings.horizontal),
         },
     );
 
@@ -32,7 +36,15 @@ export const messagesCSS = () => {
         paddingLeft: 0,
     });
 
-    cssOut(`.Condensed.DataList .ItemContent.Conversation .Meta`, {
-        ...metaContainerStyles(),
+    cssOut(`.Condensed.DataList .ItemContent.Conversation .Excerpt a`, {
+        textDecoration: "none",
+    });
+
+    cssOut(`.DataList.Conversations .Author.Photo`, {
+        ...Mixins.absolute.topLeft(layoutVars.cell.paddings.vertical, layoutVars.cell.paddings.horizontal),
+    });
+
+    cssOut(`.DataList.Conversations .Author.Photo .PhotoWrap`, {
+        position: "static",
     });
 };

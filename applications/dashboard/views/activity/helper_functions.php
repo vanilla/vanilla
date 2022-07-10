@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
-
+use Vanilla\Utility\HtmlUtils;
 function writeActivity($activity, $sender, $session) {
     $activity = (object)$activity;
     // If this was a status update or a wall comment, don't bother with activity strings
@@ -7,11 +7,14 @@ function writeActivity($activity, $sender, $session) {
     $activityType = $activityType[0];
     $author = userBuilder($activity, 'Activity');
     $photoAnchor = '';
+    $userName = is_array($author) ? $author["Name"] : $author->Name;
+
+    $accessibleLinkLabel = HtmlUtils::accessibleLabel('User: "%s"', [$userName]);
 
     if ($activity->Photo) {
         $photoAnchor = anchor(
-            img($activity->Photo, ['class' => 'ProfilePhoto ProfilePhotoMedium', 'aria-hidden' => 'true']),
-            $activity->PhotoUrl, 'PhotoWrap');
+            img($activity->Photo, ['class' => 'ProfilePhoto ProfilePhotoMedium', 'alt' => $userName]),
+            $activity->PhotoUrl, 'PhotoWrap', ['aria-label' => $accessibleLinkLabel]);
     }
 
     $cssClass = 'Item Activity Activity-'.$activityType;
@@ -48,7 +51,7 @@ function writeActivity($activity, $sender, $session) {
     $sender->EventArguments['CssClass'] = &$cssClass;
     $sender->fireEvent('BeforeActivity');
     ?>
-<li id="Activity_<?php echo $activity->ActivityID; ?>" class="<?php echo $cssClass; ?>">
+<li id="Activity_<?php echo $activity->ActivityID; ?>" class="<?php echo $cssClass; ?> pageBox">
    <?php
     if (ActivityModel::canDelete($activity)) {
         echo '<div class="Options">'.anchor('&times;', 'dashboard/activity/delete/'.$activity->ActivityID.'/'.$session->transientKey().'?Target='.urlencode($sender->SelfUrl), 'Delete').'</div>';
@@ -59,7 +62,7 @@ function writeActivity($activity, $sender, $session) {
     <?php } ?>
    <div class="ItemContent Activity">
       <?php echo $title; ?>
-    <?php echo wrapIf($excerpt, 'div', ['class' => 'Excerpt userContent']); ?>
+    <?php echo wrapIf($excerpt, 'div', ['class' => 'userContent']); ?>
     <?php
     $sender->EventArguments['Activity'] = $activity;
     $sender->fireAs('ActivityController')->fireEvent('AfterActivityBody');
@@ -104,7 +107,7 @@ function writeActivity($activity, $sender, $session) {
             writeActivityComment($comment, $activity);
         }
     } else {
-        echo '<ul class="DataList ActivityComments Hidden">';
+        echo '<ul class="DataList ActivityComments Hidden pageBox">';
     }
 
     if ($session->checkPermission('Garden.Profiles.Edit')):
@@ -117,7 +120,7 @@ function writeActivity($activity, $sender, $session) {
             $commentForm->addHidden('ActivityID', $activity->ActivityID);
             $commentForm->addHidden('Return', Gdn_Url::request());
             echo $commentForm->open(['action' => url('/dashboard/activity/comment'), 'class' => 'Hidden']);
-            echo '<div class="TextBoxWrapper">'.$commentForm->textBox('Body', ['MultiLine' => true, 'value' => '']).'</div>';
+            echo '<div class="TextBoxWrapper">'.$commentForm->bodyBox('Body', ['MultiLine' => true, 'value' => '', 'placeholder' => t('Write a comment')]).'</div>';
 
             echo '<div class="Buttons">';
             echo $commentForm->button('Comment', ['class' => 'Button Primary']);
@@ -156,7 +159,7 @@ if (!function_exists('WriteActivityComment')):
                     <span class="DateCreated"><?php echo Gdn_Format::date($comment['DateInserted'], 'html'); ?></span>
                     <?php
                     if (ActivityModel::canDelete($activity)) {
-                        echo anchor(t('Delete'), "dashboard/activity/deletecomment?id={$comment['ActivityCommentID']}&tk=".$session->transientKey().'&target='.urlencode(Gdn_Url::request()), 'DeleteComment');
+                        echo anchor(t('Delete'), "dashboard/activity/deletecomment?id={$comment['ActivityCommentID']}&tk=".$session->transientKey().'&target='.urlencode(Gdn_Url::request()), 'DeleteComment', ["role" => "button"]);
                     }
                     ?>
                 </div>

@@ -12,11 +12,11 @@ import WebpackDevServer, { Configuration as DevServerConfiguration } from "webpa
 import { makeDevConfig } from "./configs/makeDevConfig";
 import { makePolyfillConfig } from "./configs/makePolyfillConfig";
 import { makeProdConfig } from "./configs/makeProdConfig";
-import { DIST_DIRECTORY } from "./env";
+import { DIST_DIRECTORY, DIST_ROOT_DIRECTORY, VANILLA_ROOT } from "./env";
 import { BuildMode, getOptions, IBuildOptions } from "./buildOptions";
 import EntryModel from "./utility/EntryModel";
-import { copyMonacoEditorModule, installLerna } from "./utility/moduleUtils";
-import { fail, print } from "./utility/utils";
+import { copyMonacoEditorModule, installYarn } from "./utility/moduleUtils";
+import { fail, print, printSection } from "./utility/utils";
 
 /**
  * A class to build frontend assets.
@@ -44,15 +44,19 @@ export default class Builder {
      */
     public async installOnly() {
         await this.entryModel.init();
-        await installLerna();
+        await installYarn();
     }
 
     /**
      * Run the build based on the provided options.
      */
     public async build() {
+        if (this.options.cleanCache) {
+            await fse.emptyDir(path.join(VANILLA_ROOT, "node_modules/.cache"));
+        }
+
         await this.entryModel.init();
-        await installLerna();
+        await installYarn();
         switch (this.options.mode) {
             case BuildMode.PRODUCTION:
             case BuildMode.ANALYZE:
@@ -68,22 +72,28 @@ export default class Builder {
      */
     private async runProd() {
         // Cleanup
-        await fse.emptyDir(path.join(DIST_DIRECTORY));
+        await fse.emptyDir(path.join(DIST_ROOT_DIRECTORY));
         copyMonacoEditorModule();
         const sections = await this.entryModel.getSections();
-        const configs = await Promise.all([
-            ...sections.map(section => makeProdConfig(this.entryModel, section)),
-            makePolyfillConfig(this.entryModel),
-        ]);
-
-        if (this.options.lowMemory) {
-            // In low memory environments we build sequentially instead of in parallel.
-            for (const config of configs) {
-                await this.runBuild(config);
-            }
+        let configs: webpack.Configuration[];
+        if (this.options.modern) {
+            configs = await Promise.all([
+                ...sections.map((section) => makeProdConfig(this.entryModel, section, false)),
+                ...sections.map((section) => makeProdConfig(this.entryModel, section, true)),
+                makePolyfillConfig(this.entryModel),
+            ]);
         } else {
-            // Otherwise we build all configs at once.
-            await this.runBuild(configs);
+            configs = await Promise.all([
+                ...sections.map((section) => makeProdConfig(this.entryModel, section, true)),
+                makePolyfillConfig(this.entryModel),
+            ]);
+        }
+
+        // Running the builds individually is actually faster since webpack 5
+        // We can parellize many function per build and saturate the CPU.
+        // This also lets you see individual sections errors faster.
+        for (const config of configs) {
+            await this.runBuild(config);
         }
     }
 
@@ -93,7 +103,7 @@ export default class Builder {
      * @param config The config to build.
      */
     private async runBuild(config: Configuration | Configuration[]) {
-        return new Promise(resolve => {
+        return new Promise<void>((resolve) => {
             const compiler = webpack(config as Configuration);
             compiler.run((err: Error, stats: Stats) => {
                 if (err || stats.hasErrors()) {
@@ -102,7 +112,9 @@ export default class Builder {
                 }
 
                 print(stats.toString(this.statOptions));
-                resolve();
+                compiler.close(() => {
+                    resolve();
+                });
             });
         });
     }
@@ -127,25 +139,42 @@ ${chalk.yellowBright("$Configuration['HotReload']['Enabled'] = true;")}`);
             fail(message);
         }
 
+        const certPath = path.resolve(VANILLA_ROOT, "../vanilla-docker/resources/certificates");
+        const crtFile = path.resolve(certPath, "wildcard.vanilla.localhost.crt");
+        const keyFile = path.resolve(certPath, "wildcard.vanilla.localhost.key");
+
+        const https = fse.existsSync(certPath)
+            ? {
+                  key: fse.readFileSync(keyFile),
+                  cert: fse.readFileSync(crtFile),
+              }
+            : false;
+
+        if (https) {
+            print(chalk.green("Found SSL certs. Serving over https://"));
+        }
+
         const devServerOptions: DevServerConfiguration = {
-            host: this.options.devIp,
+            host: "webpack.vanilla.localhost",
             port: 3030,
             hotOnly: true,
             open: false,
-            https: false,
+            https,
             disableHostCheck: true,
+            sockHost: "webpack.vanilla.localhost:3030",
+            public: "webpack.vanilla.localhost:3030",
             headers: {
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept",
                 "Access-Control-Allow-Methods": "POST, GET, PUT, DELETE, OPTIONS",
             },
-            publicPath: `http://${this.options.devIp}:3030/`,
+            publicPath: `https://webpack.vanilla.localhost:3030/`,
             stats: this.statOptions,
         };
 
         const sections = await this.entryModel.getSections();
         const config = await Promise.all(
-            sections.map(async section => {
+            sections.map(async (section) => {
                 const sectionConfig = await makeDevConfig(this.entryModel, section);
                 WebpackDevServer.addDevServerEntrypoints(sectionConfig as any, devServerOptions);
                 return sectionConfig;
@@ -154,6 +183,6 @@ ${chalk.yellowBright("$Configuration['HotReload']['Enabled'] = true;")}`);
         const compiler = webpack(config) as any;
 
         const server = new WebpackDevServer(compiler, devServerOptions);
-        server.listen(3030, devServerOptions.host || "127.0.0.1");
+        server.listen(3030, "127.0.0.1");
     }
 }

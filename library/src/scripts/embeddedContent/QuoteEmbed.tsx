@@ -7,15 +7,15 @@ import { IUserFragment, IUserFragmentAndRoles } from "@library/@types/api/users"
 import { CollapsableContent } from "@library/content/CollapsableContent";
 import UserContent from "@library/content/UserContent";
 import { UserLabel } from "@library/content/UserLabel";
-import { EmbedContainer } from "@library/embeddedContent/EmbedContainer";
-import { EmbedContent } from "@library/embeddedContent/EmbedContent";
+import { EmbedContainer } from "@library/embeddedContent/components/EmbedContainer";
+import { EmbedContent } from "@library/embeddedContent/components/EmbedContent";
 import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
 import { quoteEmbedClasses } from "@library/embeddedContent/quoteEmbedStyles";
 import { DiscussionIcon, RightChevronIcon } from "@library/icons/common";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import SmartLink from "@library/routing/links/SmartLink";
 import { t } from "@library/utility/appUtils";
-import { ICategoryFragment } from "@vanilla/addon-vanilla/@types/api/categories";
+import { ICategoryFragment } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import classNames from "classnames";
 import React from "react";
 
@@ -77,58 +77,51 @@ export function QuoteEmbed(props: IProps) {
         <EmbedContainer withPadding={false} className={classes.root}>
             <EmbedContent type="Quote">
                 <article className={classes.body}>
-                    <div
-                        onClick={e => {
-                            e.preventDefault();
-                        }}
+                    {showHeader && (
+                        <header className={classes.header}>
+                            {showUserLabel && (
+                                <UserLabel
+                                    user={insertUser}
+                                    date={dateInserted}
+                                    dateLink={url}
+                                    category={category}
+                                    displayOptions={{
+                                        showCategory: showCategoryLink,
+                                        showRole: true,
+                                    }}
+                                />
+                            )}
+
+                            {name && (
+                                <SmartLink
+                                    to={url}
+                                    className={classNames(classes.titleLink, { [classes.isPadded]: showUserLabel })}
+                                >
+                                    <h2 className={classes.title}>{name}</h2>
+                                </SmartLink>
+                            )}
+
+                            {!showUserLabel && showCompactUserInfo && (
+                                <UserLabel
+                                    user={insertUser}
+                                    date={dateInserted}
+                                    dateLink={url}
+                                    compact={true}
+                                    category={category}
+                                    displayOptions={{ showCategory: showCategoryLink }}
+                                    fixLineHeight={!showUserLabel && !name}
+                                />
+                            )}
+                        </header>
+                    )}
+                    <CollapsableContent
+                        className={classNames(classes.content, { [classes.paddingAdjustment]: showHeader })}
+                        isExpandedDefault={!!expandByDefault}
                     >
-                        {showHeader && (
-                            <header className={classes.header}>
-                                {showUserLabel && (
-                                    <UserLabel
-                                        user={insertUser}
-                                        date={dateInserted}
-                                        dateLink={url}
-                                        category={category}
-                                        displayOptions={{
-                                            showCategory: showCategoryLink,
-                                            showRole: true,
-                                        }}
-                                    />
-                                )}
-
-                                {name && (
-                                    <SmartLink
-                                        to={url}
-                                        className={classNames(classes.titleLink, { [classes.isPadded]: showUserLabel })}
-                                    >
-                                        <h2 className={classes.title}>{name}</h2>
-                                    </SmartLink>
-                                )}
-
-                                {!showUserLabel && showCompactUserInfo && (
-                                    <UserLabel
-                                        user={insertUser}
-                                        date={dateInserted}
-                                        dateLink={url}
-                                        compact={true}
-                                        category={category}
-                                        displayOptions={{ showCategory: showCategoryLink }}
-                                        fixLineHeight={!showUserLabel && !name}
-                                    />
-                                )}
-                            </header>
-                        )}
-                        <CollapsableContent
-                            className={classNames(classes.content, { [classes.paddingAdjustment]: showHeader })}
-                            isExpandedDefault={!!expandByDefault}
-                        >
-                            <blockquote className={classes.blockquote} cite={url}>
-                                <UserContent content={body} />
-                            </blockquote>
-                        </CollapsableContent>
-                    </div>
-
+                        <blockquote className={classes.blockquote} cite={url}>
+                            <UserContent content={body} />
+                        </blockquote>
+                    </CollapsableContent>
                     {(linkToDiscussion || linkToPost) && (
                         <footer className={classes.footer}>
                             <hr className={classes.footerSeparator} aria-hidden={true} />

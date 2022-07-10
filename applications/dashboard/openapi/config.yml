@@ -1,0 +1,317 @@
+openapi: 3.0.2
+info:
+    description: API access to your community.
+    title: Vanilla API
+    version: "2.0"
+servers:
+    - url: /api/v2
+paths:
+    /config:
+        get:
+            summary: Get the site's config.
+            tags:
+                - Config
+            parameters:
+                - name: select
+                  in: query
+                  description: |
+                      A CSV of config key names to select a sparse set of items. Use * as a wildcard to match multiple keys.
+                  style: form
+                  schema:
+                      type: array
+                      items:
+                          type: string
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/Config"
+                    description: Success
+        patch:
+            summary: Update one or more config settings.
+            tags:
+                - Config
+            requestBody:
+                content:
+                    "application/json":
+                        schema:
+                            $ref: "#/components/schemas/Config"
+            responses:
+                204:
+                    description: Success
+components:
+    schemas:
+        Config:
+            type: object
+            properties:
+                "branding.addressBarColor":
+                    description: |
+                        Some browsers support a color for the address bar.
+                    type: string
+                    default: ""
+                    example: "#C0FFEE"
+                    maxLength: 9
+                    x-key: Garden.MobileAddressBarColor
+                    x-read: public
+                    x-write: community.manage
+                "branding.bannerImage":
+                    description: |
+                        The default banner image across the site. This can be overridden on a per category basis.
+                    type: string
+                    default: ""
+                    example: ""
+                    maxLength: 500
+                    x-key: Garden.BannerImage
+                    x-read: public
+                    x-write: community.manage
+                "branding.favicon":
+                    description: |
+                        Your site's favicon appears in your browser's title bar. It will be scaled down appropriately.
+                    type: string
+                    default: ""
+                    example: ""
+                    maxLength: 500
+                    x-key: Garden.FavIcon
+                    x-read: public
+                    x-write: community.manage
+                "branding.logo":
+                    description: |
+                        The banner logo appears at the top of your site. Themes made with the theme editor and some custom themes don't use this setting.
+                    type: string
+                    default: ""
+                    example: ""
+                    maxLength: 500
+                    x-key: Garden.Logo
+                    x-read: public
+                    x-write: community.manage
+                "branding.mobileLogo":
+                    description: |
+                        The mobile banner logo appears at the top of your site. Themes made with the theme editor and some custom themes don't use this setting.
+                    type: string
+                    default: ""
+                    example: ""
+                    maxLength: 500
+                    x-key: Garden.MobileLogo
+                    x-read: public
+                    x-write: community.manage
+                "branding.shareImage":
+                    description: >-
+                        When someone shares a link from your site we try and grab an image from the page. If there isn't an image on the page then we'll use this image instead. The image should be at least 50×50, but we recommend 200×200.
+                    type: string
+                    default: ""
+                    example: ""
+                    maxLength: 500
+                    x-key: Garden.ShareImage
+                    x-read: public
+                    x-write: community.manage
+                "branding.touchIcon":
+                    description: |
+                        The touch icon appears when you bookmark a website on the homescreen of a mobile device. These are usually 152 pixels.
+                    type: string
+                    default: ""
+                    example: ""
+                    maxLength: 500
+                    x-key: Garden.TouchIcon
+                    x-read: public
+                    x-write: community.manage
+                "forum.disabled":
+                    description: |
+                        Remove discussion and categories links from menus. Set discussion and category related pages to return not found page 404.
+                    type: boolean
+                    default: false
+                    example: true
+                    x-key: Vanilla.Forum.Disabled
+                    x-read: public
+                    x-write: community.manage
+                "garden.description":
+                    description: |
+                        The site description usually appears in search engines. You should try having a description that is 100–150
+                        characters long.
+                    type: string
+                    default: ""
+                    maxLength: 350
+                    x-key: Garden.Description
+                    x-read: public
+                    x-write: community.manage
+                "garden.externalUrlFormat":
+                    description: |
+                        The format used to generate URLs to pages from external sources, typically emails. Set this config setting
+                        your site is embedded or uses a reverse proxy. Place a "%s" in the URL and it will be replaced with the path
+                        being generated.
+                    type: string
+                    default: ""
+                    example: https://example.com/community/%s
+                    pattern: (^$)|(^https?://.+%s)
+                    x-key: Garden.ExternalUrlFormat
+                    x-read: community.manage
+                "garden.homepageTitle":
+                    description: |
+                        The homepage title is displayed on your home page. Pick a title that you would want to see appear in search
+                        engines.
+                    type: string
+                    default: ""
+                    example: Welcome To Our Support Community
+                    maxLength: 100
+                    x-key: Garden.HomepageTitle
+                    x-read: public
+                    x-write: community.manage
+                "garden.locale":
+                    description: |
+                        The default locale for your site. This will be the source language for your community.
+                    type: string
+                    default: "en"
+                    maxLength: 100
+                    x-key: Garden.Locale
+                    x-read: public
+                    x-write: site.manage
+                "garden.orgName":
+                    description: |
+                        Your organization name is used for SEO microdata and JSON+LD.
+                    type: string
+                    default: ""
+                    maxLength: 50
+                    x-key: Garden.OrgName
+                    x-read: public
+                    x-write: community.manage
+                "garden.privacy.ips":
+                    description: >-
+                        Anonymize IP addresses on users so they aren't tracked. You can specify "partial" to remove the last octet or
+                        full to anonymize the entire IP address.
+                    type: string
+                    default: ""
+                    enum:
+                        - ""
+                        - partial
+                        - full
+                    x-key: Garden.Privacy.IPs
+                    x-read: community.manage
+                "garden.title":
+                    description: |
+                        The banner title appears on your site's banner and in your browser's title bar.
+                    type: string
+                    default: ""
+                    example: Support Community
+                    maxLength: 50
+                    x-key: Garden.Title
+                    x-read: public
+                    x-write: community.manage
+                "labs.customLayouts":
+                    description: Create and manage layouts for your community through the layout editor.
+                    type: boolean
+                    default: false
+                    example: false
+                    x-key: Feature.CustomLayoutHomePage.Enabled
+                    x-read: public
+                    x-write: community.manage
+                "labs.deferredLegacyScripts":
+                    description: >-
+                        This setting loads the page before executing Javascript which can improve your SEO.
+                        Warning: Enabling this feature may cause Javascript errors on your site.
+                        See https://success.vanillaforums.com/kb/articles/140-defer-javascript-loading-feature for more information.
+                    type: boolean
+                    default: true
+                    example: true
+                    x-key: Feature.DeferredLegacyScripts.Enabled
+                    x-read: public
+                    x-write: community.manage
+                "labs.newAnalytics":
+                    description: |
+                        Enable new analytics.
+                    type: boolean
+                    default: false
+                    example: true
+                    x-key: Feature.NewAnalytics.Enabled
+                    x-read: public
+                    x-write: site.manage
+                "labs.userCards":
+                    description: |
+                        Enable user cards on older themes.
+                    type: boolean
+                    default: false
+                    example: true
+                    x-key: Feature.UserCards.Enabled
+                    x-read: public
+                    x-write: site.manage
+                "labs.newSearchPage":
+                    description: |
+                        Enable the new search UI on older themes.
+                    type: boolean
+                    default: false
+                    example: true
+                    x-key: Feature.useNewSearchPage.Enabled
+                    x-read: public
+                    x-write: site.manage
+                "labs.newQuickLinks":
+                    description: |
+                        Enable the new quick links UI on older themes.
+                    type: boolean
+                    default: false
+                    example: true
+                    x-key: Feature.NewQuickLinks.Enabled
+                    x-read: public
+                    x-write: site.manage
+                "labs.newPostMenu":
+                    description: |
+                        Enable the new post menu UI on older themes.
+                    type: boolean
+                    default: false
+                    example: true
+                    x-key: Feature.NewPostMenu.Enabled
+                    x-read: public
+                    x-write: site.manage
+                "labs.customLayoutHomePage":
+                    x-hidden: true
+                    description: |
+                        Use the layout playground page.
+                    type: boolean
+                    default: false
+                    example: true
+                    x-key: Feature.CustomLayoutHomePage.Enabled
+                    x-read: public
+                    x-write: site.manage
+                "discussions.layout":
+                    description: |
+                        Choose the preferred layout for lists of discussions.
+                    type: string
+                    default: "foundation"
+                    enum:
+                        - "modern"
+                        - "table"
+                        - "foundation"
+                    x-key: Vanilla.Discussions.Layout
+                    x-read: public
+                    x-write: site.manage
+                "categories.layout":
+                    description: |
+                        Choose the preferred layout for lists of categories.
+                    type: string
+                    default: "modern"
+                    enum:
+                        - "modern"
+                        - "table"
+                        - "mixed"
+                        - "foundation"
+                    x-key: Vanilla.Categories.Layout
+                    x-read: public
+                    x-write: site.manage
+                "routes.defaultController":
+                    type: array
+                    minItems: 2
+                    maxItems: 2
+                    items:
+                        type: string
+                    description: >-
+                        Define the routing rule for the home page.
+                        The first item is the URL or route to send the home page to.
+                        The second item is the type of redirect to perform. It must be one of "Internal", "Temporary" and "Permanent"
+                    x-key: Routes.DefaultController
+                    x-read: public
+                    x-write: site.manage
+                "vanilla.siteID":
+                    description: |
+                        The community siteID.
+                    type: number
+                    default: 0
+                    x-key: Vanilla.SiteID
+                    x-read: public

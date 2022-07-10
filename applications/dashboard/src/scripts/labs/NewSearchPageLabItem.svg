@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="232" height="168" viewBox="0 0 232 168">
+    <defs>
+        <filter id="57ja5kd93a" width="103%" height="104.2%" x="-1.5%" y="-1.5%" filterUnits="objectBoundingBox">
+            <feOffset dy="1" in="SourceAlpha" result="shadowOffsetOuter1"/>
+            <feGaussianBlur in="shadowOffsetOuter1" result="shadowBlurOuter1" stdDeviation="1"/>
+            <feColorMatrix in="shadowBlurOuter1" values="0 0 0 0 0.333333333 0 0 0 0 0.352941176 0 0 0 0 0.384313725 0 0 0 0.304660184 0"/>
+        </filter>
+        <rect id="m7ggoxvg1b" width="232" height="168" x="0" y="0" rx="1.497"/>
+    </defs>
+    <g fill="none" fill-rule="evenodd">
+        <g>
+            <g transform="translate(-295 -430) translate(295 430)">
+                <g>
+                    <g>
+                        <use fill="#000" filter="url(#57ja5kd93a)" xlink:href="#m7ggoxvg1b"/>
+                        <use fill="#FFF" xlink:href="#m7ggoxvg1b"/>
+                    </g>
+                    <g fill="#D8D8D8" transform="translate(5.987 3.733)">
+                        <ellipse cx="1.31" cy="1.307" rx="1.31" ry="1.307"/>
+                        <ellipse cx="6.174" cy="1.307" rx="1.31" ry="1.307"/>
+                        <ellipse cx="11.039" cy="1.307" rx="1.31" ry="1.307"/>
+                    </g>
+                    <g>
+                        <path fill="#0291DB" d="M0 0H232V7.467H0z" transform="translate(0 9.707)"/>
+                        <path fill="#FFF" d="M36.671 2.987H48.644999999999996V4.48H36.671zM54.632 2.987H66.606V4.48H54.632z" transform="translate(0 9.707)"/>
+                        <g>
+                            <g fill="#FFF" stroke="#ADB2BB" stroke-width=".5">
+                                <path d="M112.315.25v5.897H.956c-.194 0-.37-.08-.497-.21C.33 5.805.25 5.624.25 5.426h0V.972c0-.2.08-.38.209-.512C.586.33.762.25.956.25h111.36z" transform="translate(0 9.707) translate(20.206 28.373)"/>
+                            </g>
+                            <path fill="#0291DB" stroke="#0291DB" stroke-width=".5" d="M133.748.25c.196 0 .374.08.503.209.129.128.209.306.209.503h0v4.423c0 .196-.08.374-.209.503s-.307.209-.503.209h0-21.24V.25z" transform="translate(0 9.707) translate(20.206 28.373)"/>
+                            <path fill="#FFF" d="M116.748 2.613H130.219V4.106H116.748z" transform="translate(0 9.707) translate(20.206 28.373)"/>
+                        </g>
+                        <path fill="#FFF" d="M19.458 2.987H31.432V4.48H19.458z" transform="translate(0 9.707)"/>
+                    </g>
+                    <g transform="translate(19.458 29.867)">
+                        <path fill="#ADB2BB" d="M152.671 0H184.10299999999998V2.987H152.671zM152.671 8.96H178.11599999999999V10.453000000000001H152.671zM152.671 23.893H178.11599999999999V25.386H152.671z"/>
+                        <rect width="46.4" height="5.973" x="152.671" y="13.44" stroke="#ADB2BB" stroke-width=".5" rx="1.497"/>
+                        <rect width="46.4" height="5.973" x="152.671" y="28.373" stroke="#ADB2BB" stroke-width=".5" rx="1.497"/>
+                        <path fill="#ADB2BB" d="M152.671 38.827H178.11599999999999V40.32H152.671z"/>
+                        <rect width="46.4" height="5.973" x="152.671" y="43.307" stroke="#ADB2BB" stroke-width=".5" rx="1.497"/>
+                        <rect width="18.71" height="5.973" x="180.361" y="55.253" stroke="#B8BDC5" stroke-width=".5" rx="1.497"/>
+                        <g transform="translate(0 30.613)">
+                            <path fill="#ADB2BB" d="M10.477 11.2H29.187V14.187H10.477z"/>
+                            <path fill="#ADB2BB" d="M0.748 0H19.458000000000002V1.493H0.748z" transform="matrix(1 0 0 -1 0 1.493)"/>
+                            <path fill="#ADB2BB" d="M11.226 17.173H61.368V18.665999999999997H11.226zM64.361 17.173H86.06400000000001V18.665999999999997H64.361zM64.361 73.173H86.06400000000001V74.666H64.361zM74.09 35.84H95.793V37.333000000000006H74.09z"/>
+                            <ellipse cx="4.49" cy="32.107" fill="#DADDE1" rx="2.245" ry="2.24"/>
+                            <ellipse cx="4.49" cy="50.773" fill="#DADDE1" rx="2.245" ry="2.24"/>
+                            <ellipse cx="4.49" cy="69.44" fill="#DADDE1" rx="2.245" ry="2.24"/>
+                            <ellipse cx="4.49" cy="13.44" fill="#DADDE1" rx="2.245" ry="2.24"/>
+                            <path stroke="#ADB2BB" stroke-linecap="square" stroke-width=".5" d="M0.361 5.6L138.091 5.6"/>
+                            <path fill="#ADB2BB" d="M10.477 67.2H29.187V70.187H10.477zM11.226 73.173H61.368V74.666H11.226z"/>
+                            <path stroke="#ADB2BB" stroke-linecap="square" stroke-width=".5" d="M0.361 61.6L138.091 61.6"/>
+                            <path fill="#ADB2BB" d="M10.477 29.867H29.187V32.854H10.477zM10.477 35.84H39.664V37.333000000000006H10.477zM42.658 35.84H71.845V37.333000000000006H42.658z"/>
+                            <path stroke="#ADB2BB" stroke-linecap="square" stroke-width=".5" d="M0.361 24.267L138.091 24.267"/>
+                            <path fill="#ADB2BB" d="M10.477 85.867H29.187V88.854H10.477zM11.226 91.84H61.368V93.333H11.226zM64.361 91.84H86.06400000000001V93.333H64.361z"/>
+                            <ellipse cx="4.49" cy="88.107" fill="#DADDE1" rx="2.245" ry="2.24"/>
+                            <path stroke="#ADB2BB" stroke-linecap="square" stroke-width=".5" d="M.361 80.267L138.091 80.267M.361 98.933L138.091 98.933"/>
+                            <path fill="#ADB2BB" d="M10.477 48.533H29.187V51.52H10.477zM10.477 54.507H97.29V56H10.477z"/>
+                            <path stroke="#ADB2BB" stroke-linecap="square" stroke-width=".5" d="M0.361 42.933L138.091 42.933"/>
+                            <rect width="21.703" height="13.44" x="113.755" y="26.88" fill="#DADDE1" rx=".748"/>
+                            <rect width="21.703" height="13.44" x="113.755" y="64.213" fill="#DADDE1" rx=".748"/>
+                        </g>
+                    </g>
+                    <path fill="#ADB2BB" d="M20.206 29.867H39.664V32.854H20.206z"/>
+                </g>
+                <rect width="13.471" height="4.48" x="20.206" y="47.787" fill="#B8BDC5" stroke="#B8BDC5" stroke-width=".5" opacity=".53" rx="2.24"/>
+                <rect width="14.219" height="4.48" x="121.239" y="47.787" stroke="#B8BDC5" stroke-width=".5" rx="2.24"/>
+                <rect width="14.219" height="4.48" x="101.032" y="47.787" stroke="#B8BDC5" stroke-width=".5" rx="2.24"/>
+                <rect width="13.471" height="4.48" x="80.826" y="47.787" stroke="#B8BDC5" stroke-width=".5" rx="2.24"/>
+                <rect width="14.219" height="4.48" x="59.871" y="47.787" stroke="#B8BDC5" stroke-width=".5" rx="2.24"/>
+                <rect width="14.219" height="4.48" x="39.665" y="47.787" stroke="#B8BDC5" stroke-width=".5" rx="2.24"/>
+            </g>
+        </g>
+    </g>
+</svg>

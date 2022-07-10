@@ -6,20 +6,41 @@
  */
 
 use Garden\Schema\Schema;
+use Garden\Schema\ValidationException;
 use Garden\Web\Data;
+use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
-use Vanilla\DateFilterSchema;
 use Vanilla\ApiUtils;
 use Vanilla\Community\Schemas\CategoryFragmentSchema;
+use Vanilla\Dashboard\Events\DiscussionStatusDefinitionEvent;
+use Vanilla\Dashboard\Models\RecordStatusModel;
+use Vanilla\DiscussionTypeConverter;
+use Vanilla\Events\EventAction;
+use Vanilla\Exception\Database\NoResultsException;
+use Vanilla\Exception\PermissionException;
 use Vanilla\Formatting\Formats\RichFormat;
+use Vanilla\Forum\Controllers\Api\DiscussionsApiIndexSchema;
+use Vanilla\Forum\Models\DiscussionMergeModel;
+use Vanilla\Forum\Navigation\ForumCategoryRecordType;
+use Vanilla\Models\CrawlableRecordSchema;
+use Vanilla\Models\DirtyRecordModel;
+use Vanilla\Models\Model;
+use Vanilla\Navigation\BreadcrumbModel;
+use Vanilla\Scheduler\LongRunner;
+use Vanilla\Scheduler\LongRunnerAction;
 use Vanilla\SchemaFactory;
+use Vanilla\Search\SearchOptions;
+use Vanilla\Search\SearchResultItem;
+use Vanilla\Site\SiteSectionModel;
+use Vanilla\Utility\ArrayUtils;
+use Vanilla\Utility\ModelUtils;
 
 /**
  * API Controller for the `/discussions` resource.
  */
 class DiscussionsApiController extends AbstractApiController {
-
+    use CommunitySearchSchemaTrait;
     use \Vanilla\Formatting\FormatCompatTrait;
 
     /** @var CategoryModel */
@@ -46,6 +67,31 @@ class DiscussionsApiController extends AbstractApiController {
     /** @var CommentModel */
     private $commentModel;
 
+    /** @var TagModel */
+    private $tagModel;
+
+    /** @var SiteSectionModel */
+    private $siteSectionModel;
+
+    /** @var DiscussionTypeConverter */
+    private $discussionTypeConverter;
+
+    /**
+     * @var DiscussionExpandSchema
+     */
+    private $discussionExpandSchema;
+
+    /**
+     * @var Schema
+     */
+    private $discussionPatchSchema;
+
+    /** @var RecordStatusModel */
+    private $recordStatusModel;
+
+    /** @var LongRunner */
+    private $longRunner;
+
     /**
      * DiscussionsApiController constructor.
      *
@@ -53,17 +99,35 @@ class DiscussionsApiController extends AbstractApiController {
      * @param UserModel $userModel
      * @param CategoryModel $categoryModel
      * @param CommentModel $commentModel
+     * @param TagModel $tagModel
+     * @param SiteSectionModel $siteSectionModel
+     * @param DiscussionTypeConverter $discussionTypeConverter
+     * @param DiscussionExpandSchema $discussionExpandableSchema
+     * @param RecordStatusModel $recordStatusModel
+     * @param LongRunner $longRunner
      */
     public function __construct(
         DiscussionModel $discussionModel,
         UserModel $userModel,
         CategoryModel $categoryModel,
-        CommentModel $commentModel
+        CommentModel $commentModel,
+        TagModel $tagModel,
+        SiteSectionModel $siteSectionModel,
+        DiscussionTypeConverter $discussionTypeConverter,
+        DiscussionExpandSchema $discussionExpandableSchema,
+        RecordStatusModel $recordStatusModel,
+        LongRunner $longRunner
     ) {
         $this->categoryModel = $categoryModel;
         $this->discussionModel = $discussionModel;
         $this->userModel = $userModel;
         $this->commentModel = $commentModel;
+        $this->tagModel = $tagModel;
+        $this->siteSectionModel = $siteSectionModel;
+        $this->discussionTypeConverter = $discussionTypeConverter;
+        $this->discussionExpandSchema = $discussionExpandableSchema;
+        $this->recordStatusModel = $recordStatusModel;
+        $this->longRunner = $longRunner;
     }
 
     /**
@@ -86,14 +150,14 @@ class DiscussionsApiController extends AbstractApiController {
                 'description' => 'Desired number of items per page.',
                 'default' => $this->discussionModel->getDefaultLimit(),
                 'minimum' => 1,
-                'maximum' => 100
+                'maximum' => ApiUtils::getMaxLimit(100),
             ],
             'expand?' => ApiUtils::getExpandDefinition(['insertUser', 'lastUser', 'lastPost', 'lastPost.body', 'lastPost.insertUser', 'reactions'])
         ], 'in')->setDescription('Get a list of the current user\'s bookmarked discussions.');
         $out = $this->schema([':a' => $this->discussionSchema()], 'out');
 
         $query = $in->validate($query);
-        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+        [$offset, $limit] = offsetLimit("p{$query['page']}", $query['limit']);
 
         $rows = $this->discussionModel->get($offset, $limit, [
             'w.Bookmarked' => 1,
@@ -107,7 +171,7 @@ class DiscussionsApiController extends AbstractApiController {
         );
 
         foreach ($rows as &$currentRow) {
-            $currentRow = $this->normalizeOutput($currentRow, $query['expand'] ?? []);
+            $currentRow = $this->normalizeOutput($currentRow, $query['expand']);
         }
         $this->expandLastCommentBody($rows, $query['expand']);
 
@@ -124,31 +188,212 @@ class DiscussionsApiController extends AbstractApiController {
      * Delete a discussion.
      *
      * @param int $id The ID of the discussion.
+     *
+     * @return Data
      */
-    public function delete($id) {
+    public function delete(int $id): Data {
         $this->permission('Garden.SignIn.Allow');
 
-        $in = $this->idParamSchema()->setDescription('Delete a discussion.');
-        $out = $this->schema([], 'out');
-
         $row = $this->discussionByID($id);
-        if ($row['InsertUserID'] !== $this->getSession()->UserID) {
-            $this->discussionModel->categoryPermission('Vanilla.Discussions.Delete', $row['CategoryID']);
+        $this->discussionModel->categoryPermission('Vanilla.Discussions.Delete', $row['CategoryID']);
+        $result = $this->longRunner->runApi(new LongRunnerAction(DiscussionModel::class, 'deleteDiscussionIterator', [$id]));
+        if ($result->getStatus() === 200) {
+            $result->setStatus(204);
         }
-        $this->discussionModel->deleteID($id);
+        return $result;
+    }
+
+    /**
+     * Delete a list of discussions.
+     *
+     * @param array $body The request body.
+     */
+    public function delete_list(array $body) {
+        $this->permission('Vanilla.Discussions.Delete');
+        $in = Schema::parse([
+            'discussionIDs:a' => [
+                'items' => [
+                    'type' => 'integer',
+                ],
+                'description' => 'List of discussion IDs to delete.',
+                'maxItems' => 50,
+            ],
+        ]);
+        $body = $in->validate($body);
+
+        // Make sure we filter out duplicates.
+        $discussionIDs = array_unique($body['discussionIDs']);
+
+        // Make sure we have permission to take action on all records.
+        // Note some of these IDs may not actually exist (for example if they were already deleted)
+        // The long-runner method will handle these.
+        $checked = $this->discussionModel->checkCategoryPermission($discussionIDs, 'Vanilla.Discussions.Delete');
+        if (!empty($checked['noPermissionIDs'])) {
+            throw new PermissionException('Vanilla.Discussions.Delete', ['recordIDs' => $checked['noPermissionIDs']]);
+        }
+
+        // Defer to the LongRunner for execution.
+        $result = $this->longRunner->runApi(new LongRunnerAction(DiscussionModel::class, 'deleteDiscussionsIterator', [
+            $checked['validIDs'],
+        ]));
+        return $result;
+    }
+
+    /**
+     * Move a list of discussions.
+     *
+     * @param array $body The request body.
+     *
+     * @return Data the HTTP response.
+     */
+    public function patch_move(array $body): Data {
+        // Permissions are checked per-row in the model.
+        $this->permission('Vanilla.Discussions.Edit');
+        $in = Schema::parse([
+            'discussionIDs:a' => [
+                'items' => [
+                    'type' => 'integer',
+                ],
+                'description' => 'List of discussion IDs to move.',
+                'maxItems' => 50,
+            ],
+            'categoryID:i',
+            'addRedirects:b' => [
+                'default' => false
+            ]
+        ]);
+        $body = $in->validate($body);
+
+        $discussionIDs = $body['discussionIDs'];
+        $categoryID = $body['categoryID'];
+
+        // Check new category permission.
+        $this->permission('Vanilla.Discussions.Edit', $categoryID);
+
+        // Make sure we have permission to take action on all discussions.
+        $filtered = $this->discussionModel->filterCategoryPermissions($discussionIDs, 'Vanilla.Discussions.Edit');
+        $missingPermissionIDs = array_diff($discussionIDs, $filtered);
+        if (!empty($missingPermissionIDs)) {
+            throw new PermissionException('Vanilla.Discussions.Edit', ['recordIDs' => $missingPermissionIDs]);
+        }
+
+        // Defer to the LongRunner for execution.
+        $result = $this->longRunner->runApi(new LongRunnerAction(
+            DiscussionModel::class,
+            'moveDiscussionsIterator',
+            [
+                $discussionIDs,
+                $categoryID,
+                $body['addRedirects'],
+            ]
+        ));
+        return $result;
+    }
+
+    /**
+     * Close(or Open) a list of discussions.
+     *
+     * @param array $body The request body.
+     *
+     * @return Data the HTTP response.
+     */
+    public function patch_close(array $body): Data {
+        $in = Schema::parse([
+            'discussionIDs:a' => [
+                'items' => [
+                    'type' => 'integer',
+                ],
+                'description' => 'List of discussion IDs to close(or open).',
+                'maxItems' => 50,
+            ],
+            'closed:b' => [
+                'default' => true
+            ]
+        ]);
+        $body = $in->validate($body);
+
+        $discussionIDs = $body['discussionIDs'];
+
+        // Make sure we have permission to take action on all discussions.
+        $checkedPerms = $this->discussionModel->checkCategoryPermission($discussionIDs, 'Vanilla.Discussions.Close');
+        if (!empty($checkedPerms['noPermissionIDs'])) {
+            throw new PermissionException('Vanilla.Discussions.Close', ['recordIDs' => $checkedPerms['noPermissionIDs']]);
+        }
+
+        // Defer to the LongRunner for execution.
+        $result = $this->longRunner->runApi(new LongRunnerAction(
+            DiscussionModel::class,
+            'closeDiscussionsIterator',
+            [
+                $checkedPerms['validIDs'],
+                $body['closed'],
+            ]
+        ));
+        return $result;
+    }
+
+    /**
+     * Merge discussions.
+     *
+     * @param array $body The request's body.
+     *
+     * @return Data
+     */
+    public function patch_merge(array $body): Data {
+        $this->permission('Vanilla.Discussions.Edit');
+        $in = Schema::parse([
+            'discussionIDs:a' => [
+                'items' => [
+                    'type' => 'integer',
+                ],
+                'maxItems' => 50,
+            ],
+            'destinationDiscussionID:i',
+            'addRedirects:b' => [
+                'default' => false
+            ]
+        ]);
+        $body = $in->validate($body);
+        $discussionIDs = $body['discussionIDs'];
+        $destinationDiscussionID = $body['destinationDiscussionID'];
+        $destinationDiscussion = $this->discussionByID($destinationDiscussionID);
+
+        $this->permission('Vanilla.Discussions.Edit', $destinationDiscussion['CategoryID']);
+
+        // Make sure we have permission to take action on all discussions.
+        $checked = $this->discussionModel->checkCategoryPermission($discussionIDs, 'Vanilla.Discussions.Delete');
+        if (!empty($checked['nonexistentIDs'])) {
+            throw new NotFoundException('Discussion', ['recordIDs' => $checked['nonexistentIDs']]);
+        }
+        if (!empty($checked['noPermissionIDs'])) {
+            throw new PermissionException('Vanilla.Discussions.Edit', ['recordIDs' => $checked['noPermissionIDs']]);
+        }
+
+        // Defer to the LongRunner for execution.
+        $result = $this->longRunner->runApi(new LongRunnerAction(
+            DiscussionMergeModel::class,
+            'mergeDiscussionsIterator',
+            [
+                $discussionIDs,
+                $destinationDiscussionID,
+                $body['addRedirects'],
+            ]
+        ));
+        return $result;
     }
 
     /**
      * Get a discussion by its numeric ID.
      *
      * @param int $id The discussion ID.
-     * @throws NotFoundException if the discussion could not be found.
      * @return array
+     *
+     * @throws NotFoundException If the discussion could not be found.
      */
-    public function discussionByID($id) {
+    public function discussionByID(int $id): array {
         $row = $this->discussionModel->getID($id, DATASET_TYPE_ARRAY);
         if (!$row) {
-            throw new NotFoundException('Discussion');
+            throw new NotFoundException('Discussion', ['discussionID' => $id]);
         }
         return $row;
     }
@@ -171,11 +416,38 @@ class DiscussionsApiController extends AbstractApiController {
                     'sink?',
                     'pinned?',
                     'pinLocation?',
-                ])->add($this->fullSchema()),
+                ])->add(DiscussionExpandSchema::commonExpandSchema())
+                    ->add($this->fullSchema()),
                 'DiscussionPost'
             );
         }
         return $this->schema($this->discussionPostSchema, $type);
+    }
+
+    /**
+     * Get a discussion schema with minimal editable fields.
+     *
+     * @param string $type The type of schema.
+     * @return Schema Returns a schema object.
+     */
+    public function discussionPatchSchema($type = '') {
+        if ($this->discussionPatchSchema === null) {
+            $this->discussionPatchSchema = $this->schema(
+                Schema::parse([
+                    'name?',
+                    'body?',
+                    'format?' => new \Vanilla\Models\FormatSchema(),
+                    'categoryID?',
+                    'closed?',
+                    'sink?',
+                    'pinned?',
+                    'pinLocation?',
+                ])->add(DiscussionExpandSchema::commonExpandSchema())
+                    ->add($this->fullSchema()),
+                'DiscussionPatch'
+            );
+        }
+        return $this->schema($this->discussionPatchSchema, $type);
     }
 
     /**
@@ -220,6 +492,7 @@ class DiscussionsApiController extends AbstractApiController {
             ->merge($this->discussionModel->userDiscussionSchema())
             ->merge(Schema::parse([
                 'category?' => SchemaFactory::get(CategoryFragmentSchema::class, 'CategoryFragment'),
+                'recordID:i?',
             ]));
         return $result;
     }
@@ -232,16 +505,18 @@ class DiscussionsApiController extends AbstractApiController {
      * @throws NotFoundException if the discussion could not be found.
      * @return array
      */
-    public function get($id, array $query) {
+    public function get(int $id, array $query) {
         $this->permission();
 
         $this->idParamSchema();
-        $in = $this->schema([
-            'expand?' => ApiUtils::getExpandDefinition(['lastPost', 'lastPost.body', 'lastPost.insertUser']) // Allow addons to expand additional fields.
-        ], ['DiscussionGet', 'in'])->setDescription('Get a discussion.');
-        $out = $this->schema($this->discussionSchema(), 'out');
-
+        $in = $this->schema(
+            DiscussionExpandSchema::commonExpandSchema(), // Allow addons to expand additional fields.
+            ['DiscussionGet', 'in']
+        )->setDescription('Get a discussion.');
         $query = $in->validate($query);
+        $discussionSchema = CrawlableRecordSchema::applyExpandedSchema($this->discussionSchema(), 'discussion', $query['expand']);
+
+        $out = $this->schema($discussionSchema, 'out');
 
         $this->getEventManager()->fireFilter('discussionsApiController_getFilters', $this, $id, $query);
 
@@ -252,15 +527,23 @@ class DiscussionsApiController extends AbstractApiController {
 
         $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $row['CategoryID']);
 
-        $this->userModel->expandUsers($row, ['InsertUserID', 'LastUserID']);
-        $row = $this->normalizeOutput($row, $query["expand"] ?? []);
+        $this->userModel->expandUsers(
+            $row,
+            $this->resolveExpandFields(
+                $query,
+                ['insertUser' => 'InsertUserID', 'lastUser' => 'LastUserID']
+            )
+        );
+        $this->discussionExpandSchema->commonExpand($row, $query['expand'] ?? []);
+        $row = $this->normalizeOutput($row, $query["expand"]);
         $rows = [&$row];
-        $this->expandLastCommentBody($rows, $query['expand'] ?? []);
-
+        $this->expandLastCommentBody($rows, $query['expand']);
         $result = $out->validate($row);
-
+        if ($this->isExpandField('tags', $query['expand']) ?? false) {
+            $this->tagModel->expandTags($result);
+        }
         // Allow addons to modify the result.
-        $result = $this->getEventManager()->fireFilter('discussionsApiController_getOutput', $result, $this, $in, $query, $row);
+        $result = $this->getEventManager()->fireFilter('discussionsApiController_getOutput', $result, $this, $in, $query, $row, true);
         return $result;
     }
 
@@ -268,26 +551,18 @@ class DiscussionsApiController extends AbstractApiController {
      * Normalize a database record to match the Schema definition.
      *
      * @param array $dbRecord Database record.
-     * @param array|bool $expand
+     * @param array|string|bool $expand
      * @return array Return a Schema record.
      */
     public function normalizeOutput(array $dbRecord, $expand = []) {
-        if ($this->getSession()->User) {
-            $dbRecord['unread'] = $dbRecord['CountUnreadComments'] !== 0
-                && ($dbRecord['CountUnreadComments'] !== true || dateCompare(val('DateFirstVisit', $this->getSession()->User), $dbRecord['DateInserted']) <= 0);
-            if ($dbRecord['CountUnreadComments'] !== true && $dbRecord['CountUnreadComments'] > 0) {
-                $dbRecord['countUnread'] = $dbRecord['CountUnreadComments'];
-            }
-        } else {
-            $dbRecord['unread'] = false;
-        }
-
-        // The Category key will hold a category fragment in API responses. Ditch the default string.
-        if (array_key_exists('Category', $dbRecord) && !is_array($dbRecord['Category'])) {
-            unset($dbRecord['Category']);
-        }
-
         $normalizedRow = $this->discussionModel->normalizeRow($dbRecord, $expand);
+
+        // Fetch the crumb model lazily to prevent DI issues.
+        /** @var BreadcrumbModel $breadcrumbModel */
+        $breadcrumbModel =\Gdn::getContainer()->get(BreadcrumbModel::class);
+        if ($this->isExpandField('breadcrumbs', $expand)) {
+            $normalizedRow['breadcrumbs'] = $breadcrumbModel->getForRecord(new ForumCategoryRecordType($normalizedRow['categoryID']));
+        }
 
         // Allow addons to hook into the normalization process.
         $options = ['expand' => $expand];
@@ -309,25 +584,27 @@ class DiscussionsApiController extends AbstractApiController {
      * @return array The discussion quote data.
      *
      * @throws NotFoundException If the record with the given ID can't be found.
-     * @throws \Exception if no session is available.
-     * @throws \Vanilla\Exception\PermissionException if the user does not have the specified permission(s).
-     * @throws \Garden\Schema\ValidationException If the output schema is configured incorrectly.
+     * @throws \Exception Throws an exception if no session is available.
+     * @throws PermissionException Throws an exception if the user does not have the specified permission(s).
+     * @throws ValidationException If the output schema is configured incorrectly.
      */
-    public function get_quote($id) {
+    public function get_quote(int $id) {
         $this->permission();
 
         $this->idParamSchema();
-        $in = $this->schema([], ['in'])->setDescription('Get a discussions embed data.');
+        $in = $this->schema([], 'in')->setDescription('Get a discussions embed data.');
         $out = $this->schema($this->quoteSchema(), 'out');
 
         $discussion = $this->discussionByID($id);
         $discussion['Url'] = discussionUrl($discussion);
 
+        $this->getEventManager()->fireFilter('discussionsApiController_getFilters', $this, $id, []);
+
         if ($discussion['InsertUserID'] !== $this->getSession()->UserID) {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
         }
 
-        $isRich = strcasecmp($$discussion['Format'], RichFormat::FORMAT_KEY) === 0;
+        $isRich = strcasecmp($discussion['Format'], RichFormat::FORMAT_KEY) === 0;
         $discussion['bodyRaw'] = $isRich ? json_decode($discussion['Body'], true) : $discussion['Body'];
         $discussion = $this->discussionModel->fixRow($discussion);
 
@@ -361,7 +638,7 @@ class DiscussionsApiController extends AbstractApiController {
      * @throws NotFoundException if the discussion could not be found.
      * @return array
      */
-    public function get_edit($id) {
+    public function get_edit(int $id) {
         $this->permission('Garden.SignIn.Allow');
 
         $this->idParamSchema()->setDescription('Get a discussion for editing.');
@@ -383,6 +660,7 @@ class DiscussionsApiController extends AbstractApiController {
         $row = $this->discussionByID($id);
         $row['Url'] = discussionUrl($row);
 
+        $this->getEventManager()->fireFilter('discussionsApiController_getFilters', $this, $id, []);
         if ($row['InsertUserID'] !== $this->getSession()->UserID) {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.Edit', $row['CategoryID']);
         }
@@ -416,127 +694,90 @@ class DiscussionsApiController extends AbstractApiController {
      */
     public function index(array $query) {
         $this->permission();
-
-        $in = $this->schema([
-            'categoryID:i?' => [
-                'description' => 'Filter by a category.',
-                'x-filter' => [
-                    'field' => 'd.CategoryID'
-                ],
-            ],
-            'dateInserted?' => new DateFilterSchema([
-                'description' => 'When the discussion was created.',
-                'x-filter' => [
-                    'field' => 'd.DateInserted',
-                    'processor' => [DateFilterSchema::class, 'dateFilterField'],
-                ],
-            ]),
-            'dateUpdated?' => new DateFilterSchema([
-                'description' => 'When the discussion was updated.',
-                'x-filter' => [
-                    'field' => 'd.DateUpdated',
-                    'processor' => [DateFilterSchema::class, 'dateFilterField'],
-                ],
-            ]),
-            'dateLastComment?' => new DateFilterSchema([
-                'description' => 'When the last comment was posted.',
-                'x-filter' => [
-                    'field' => 'd.DateLastComment',
-                    'processor' => [DateFilterSchema::class, 'dateFilterField'],
-                ],
-            ]),
-            'type:s?' => [
-                'description' => 'Filter by discussion type.',
-                'x-filter' => [
-                    'field' => 'd.Type'
-                ],
-            ],
-            'followed:b' => [
-                'default' => false,
-                'description' => 'Only fetch discussions from followed categories. Pinned discussions are mixed in.'
-            ],
-            'pinned:b?' => 'Whether or not to include pinned discussions. If true, only return pinned discussions. Cannot be used with the pinOrder parameter.',
-            'pinOrder:s?' => [
-                'default' => 'first',
-                'description' => 'If including pinned posts, in what order should they be integrated? When "first", discussions pinned to a specific category will only be affected if the discussion\'s category is passed as the categoryID parameter. Cannot be used with the pinned parameter.',
-                'enum' => ['first', 'mixed'],
-            ],
-            'page:i?' => [
-                'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
-                'default' => 1,
-                'minimum' => 1,
-                'maximum' => $this->discussionModel->getMaxPages()
-            ],
-            'limit:i?' => [
-                'description' => 'Desired number of items per page.',
-                'default' => $this->discussionModel->getDefaultLimit(),
-                'minimum' => 1,
-                'maximum' => 100
-            ],
-            'insertUserID:i?' => [
-                'description' => 'Filter by author.',
-                'x-filter' => [
-                    'field' => 'd.InsertUserID',
-                ],
-            ],
-            'expand?' => ApiUtils::getExpandDefinition(['category', 'insertUser', 'lastUser', 'lastPost', 'lastPost.body', 'lastPost.insertUser'])
-        ], ['DiscussionIndex', 'in'])->setDescription('List discussions.');
-        $out = $this->schema([':a' => $this->discussionSchema()], 'out');
-
-        $query = $this->filterValues($query);
+        $in = $this->schema(
+            new DiscussionsApiIndexSchema($this->discussionModel->getDefaultLimit()),
+            ['DiscussionIndex', 'in']
+        )->setDescription('List discussions.');
+        $query['followed'] = $query['followed'] ?? false;
         $query = $in->validate($query);
+        $query = $this->filterValues($query);
+
+        $discussionSchema = CrawlableRecordSchema::applyExpandedSchema($this->discussionSchema(), 'discussion', $query['expand']);
+        $out = $this->schema([':a' => $discussionSchema], 'out');
 
         $where = ApiUtils::queryToFilters($in, $query);
 
-        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+        [$offset, $limit] = offsetLimit("p{$query['page']}", $query['limit']);
 
-        if (array_key_exists('categoryID', $where)) {
-            $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $where['categoryID']);
+        $followed = $query['followed'] ?? false;
+        $siteSectionID = $query["siteSectionID"] ?? '';
+
+        if (array_key_exists('d.CategoryID', $where)) {
+            $includeChildCategories = $query['includeChildCategories'] ?? false;
+            if ($includeChildCategories) {
+                $where['d.CategoryID'] = $this->getNestedCategoriesIDs($where['d.CategoryID'], $followed);
+            } else {
+                $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $where['d.CategoryID']);
+            }
+        } elseif ($siteSectionID) {
+            $siteSection = $this->siteSectionModel->getByID($query['siteSectionID']);
+            $categoryID = ($siteSection) ? $siteSection->getCategoryID() : null;
+            if ($categoryID) {
+                $where['d.CategoryID'] = $this->getNestedCategoriesIDs($categoryID, $followed);
+            }
         }
 
         // Allow addons to update the where clause.
         $where = $this->getEventManager()->fireFilter('discussionsApiController_indexFilters', $where, $this, $in, $query);
 
-        if ($query['followed']) {
+        if ($followed) {
             $where['Followed'] = true;
             $query['pinOrder'] = 'mixed';
         }
 
-        $pinned = array_key_exists('pinned', $query) ? $query['pinned'] : null;
+        $joinDirtyRecords = $query[DirtyRecordModel::DIRTY_RECORD_OPT] ?? false;
+        if ($joinDirtyRecords) {
+            $where[DirtyRecordModel::DIRTY_RECORD_OPT] = $joinDirtyRecords;
+        }
+
+        $pinned = $query['pinned'] ?? null;
         if ($pinned === true) {
             $announceWhere = array_merge($where, ['d.Announce >' => '0']);
-            $rows = $this->discussionModel->getAnnouncements($announceWhere, $offset, $limit)->resultArray();
+            $rows = $this->discussionModel->getAnnouncements($announceWhere, $offset, $limit, $query['sort'] ?? '')->resultArray();
         } else {
-            $pinOrder = array_key_exists('pinOrder', $query) ? $query['pinOrder'] : null;
+            $pinOrder = $query['pinOrder'] ?? null;
+            [$orderField, $orderDirection] = \Vanilla\Models\LegacyModelUtils::orderFieldDirection($query['sort'] ?? '');
             if ($pinOrder == 'first') {
-                $announcements = $this->discussionModel->getAnnouncements($where, $offset, $limit)->resultArray();
-                $discussions = $this->discussionModel->getWhereRecent($where, $limit, $offset, false)->resultArray();
+                $announcements = $this->discussionModel->getAnnouncements($where, $offset, $limit, $query['sort'] ?? '')->resultArray();
+                $discussions = $this->discussionModel->getWhere($where, $orderField, $orderDirection, $limit, $offset, false)->resultArray();
                 $rows = array_merge($announcements, $discussions);
             } else {
                 $where['Announce'] = 'all';
-                $rows = $this->discussionModel->getWhereRecent($where, $limit, $offset, false)->resultArray();
+                $rows = $this->discussionModel->getWhere($where, $orderField, $orderDirection, $limit, $offset, false)->resultArray();
             }
         }
 
         // Expand associated rows.
         $this->userModel->expandUsers(
             $rows,
-            $this->resolveExpandFields($query, ['insertUser' => 'InsertUserID', 'lastUser' => 'LastUserID', 'lastPost.insertUser' => 'LastUserID'])
+            $this->resolveExpandFields($query, [
+                'insertUser' => 'InsertUserID',
+                'lastUser' => 'LastUserID',
+                'lastPost.insertUser' => 'LastUserID',
+            ])
         );
-        if ($this->isExpandField('category', $query['expand'])) {
-            $this->categoryModel->expandCategories($rows);
-        }
-
+        $this->discussionExpandSchema->commonExpand($rows, $query['expand'] ?? []);
         foreach ($rows as &$currentRow) {
             $currentRow = $this->normalizeOutput($currentRow, $query['expand']);
         }
         $this->expandLastCommentBody($rows, $query['expand']);
 
-        $result = $out->validate($rows, true);
-
+        $result = $out->validate($rows);
         // Allow addons to modify the result.
         $result = $this->getEventManager()->fireFilter('discussionsApiController_getOutput', $result, $this, $in, $query, $rows);
-
+        if ($this->isExpandField('tags', $query['expand']) ?? false) {
+            $this->tagModel->expandTags($result);
+        }
         $whereCount = count($where);
         $isWhereOptimized = (isset($where['d.CategoryID']) && ($whereCount === 1 || ($whereCount === 2 && isset($where['Announce']))));
         if ($whereCount === 0 || $isWhereOptimized) {
@@ -548,24 +789,191 @@ class DiscussionsApiController extends AbstractApiController {
         return new Data($result, ['paging' => $paging]);
     }
 
+    // region Status Management
+
+    /**
+     * Delete a single status by its numeric ID.
+     *
+     * @param int $statusID
+     * @return Data
+     * @throws ClientException Attempting to delete a system defined status.
+     * @throws ValidationException Row fails to validate against schema.
+     * @throws NoResultsException Row to delete not found.
+     * @throws \Garden\Web\Exception\HttpException Ban applied on permission(s) for session.
+     * @throws PermissionException User does not have permission to delete discussion status.
+     */
+    public function delete_statuses(int $statusID): Data {
+        $this->permission("Garden.Settings.Manage");
+
+        $where = [
+            "recordType" => "discussion",
+            "statusID" => $statusID,
+        ];
+        $status = $this->recordStatusModel->selectSingle($where);
+        $this->recordStatusModel->delete($where, [Model::OPT_LIMIT => 1]);
+
+        $out = $this->schema($this->recordStatusModel->getSchema());
+        $result = $out->validate($status);
+
+        $deleteEvent = new DiscussionStatusDefinitionEvent(EventAction::DELETE, $statusID, $result, $this->getSession()->UserID);
+        $this->getEventManager()->dispatch($deleteEvent);
+
+        return new Data(null);
+    }
+
+    /**
+     * Get a single status by its numeric ID.
+     *
+     * @param int $statusID
+     * @return Data
+     */
+    public function get_statuses(int $statusID): Data {
+        $this->permission();
+
+        $in = $this->schema([]);
+        $out = $this->schema($this->recordStatusModel->getSchema());
+
+        $where = [
+            "recordType" => "discussion",
+            "statusID" => $statusID,
+        ];
+        $row = $this->recordStatusModel->selectSingle($where);
+
+        $result = $out->validate($row);
+        return new Data($result);
+    }
+
+    /**
+     * Get all available statuses.
+     *
+     * @param array $query
+     * @return Data
+     */
+    public function index_statuses($query = []): Data {
+        $this->permission();
+
+        $in = $this->schema([
+            "state",
+            "subType",
+        ])->add($this->recordStatusModel->getSchema());
+        $out = $this->schema([":a" => $this->recordStatusModel->getSchema()]);
+
+        $where = $in->validate($query, true) + ["recordType" => "discussion"];
+        if (isset($where['subType'])) {
+            //Mismatch between API field name and database column name
+            $where['recordSubtype'] = $where['subType'];
+            unset($where['subType']);
+        }
+        $rows = $this->recordStatusModel->select($where);
+
+        $result = $out->validate($rows);
+        return new Data($result);
+    }
+
+    /**
+     * Update a single status by its numeric ID.
+     *
+     * @param int $statusID
+     * @param array $body
+     * @return Data
+     * @throws ClientException Attempting to update a system defined status.
+     * @throws ValidationException Row fails to validate against the schema.
+     * @throws NoResultsException Status to update not found.
+     * @throws \Garden\Web\Exception\HttpException Ban applied to permission for this session.
+     * @throws PermissionException User does not have permission to update discussion status.
+     */
+    public function patch_statuses(int $statusID, array $body = []): Data {
+        $this->permission("Garden.Settings.Manage");
+
+        $in = $this->schema(Schema::parse([
+            "isDefault",
+            "name",
+            "state",
+            "recordSubtype",
+        ])->add($this->recordStatusModel->getSchema()));
+        $out = $this->schema($this->recordStatusModel->getSchema());
+
+        $body = $in->validate($body, true);
+
+        $where = [
+            "recordType" => "discussion",
+            "statusID" => $statusID,
+        ];
+        $row = $this->recordStatusModel->selectSingle($where);
+        $result = $out->validate($row);
+
+        if (!empty($body)) {
+            $this->recordStatusModel->update($body, $where, [Model::OPT_LIMIT => 1]);
+            $row = $this->recordStatusModel->selectSingle($where);
+            $result = $out->validate($row);
+
+            $updateEvent =
+                new DiscussionStatusDefinitionEvent(EventAction::UPDATE, $statusID, $result, $this->getSession()->UserID);
+            $this->getEventManager()->dispatch($updateEvent);
+        }
+
+        return new Data($result);
+    }
+
+    /**
+     * Create a new status.
+     *
+     * @param array $body
+     * @return Data
+     * @throws ValidationException Error when validating post body against schema.
+     * @throws ClientException Error during record insert.
+     * @throws \Garden\Web\Exception\HttpException Ban applied to permission for this session.
+     * @throws PermissionException User does not have permission to create discussion status.
+     */
+    public function post_statuses(array $body = []): Data {
+        $this->permission("Garden.Settings.Manage");
+
+        $in = $this->schema(Schema::parse([
+            "name",
+            "isDefault?",
+            "state?",
+            "recordSubtype?",
+        ])->add($this->recordStatusModel->getSchema()));
+        $out = $this->schema($this->recordStatusModel->getSchema());
+
+        $body = $in->validate($body) + ["recordType" => "discussion"];
+        $statusID = intval($this->recordStatusModel->insert($body));
+        $row = $this->recordStatusModel->selectSingle(["statusID" => $statusID]);
+
+        $result = $out->validate($row);
+
+        $insertEvent = new DiscussionStatusDefinitionEvent(EventAction::ADD, $statusID, $result, $this->getSession()->UserID);
+        $this->getEventManager()->dispatch($insertEvent);
+
+        return new Data($result, 201);
+    }
+
+    // endregion
+
     /**
      * Update a discussion.
      *
      * @param int $id The ID of the discussion.
      * @param array $body The request body.
-     * @throws NotFoundException if unable to find the discussion.
+     * @param array $query The request query.
      * @return array
+     * @throws ClientException If discussion editing is not allowed.
+     * @throws NotFoundException If unable to find the discussion.
      */
-    public function patch($id, array $body) {
+    public function patch(int $id, array $body, array $query = []) {
         $this->permission('Garden.SignIn.Allow');
 
         $this->idParamSchema('in');
-        $in = $this->discussionPostSchema('in')->setDescription('Update a discussion.');
+        $in = $this->discussionPatchSchema('in')->setDescription('Update a discussion.');
         $out = $this->schema($this->discussionSchema(), 'out');
 
         $body = $in->validate($body, true);
 
         $row = $this->discussionByID($id);
+        $canEdit = $this->discussionModel::canEdit($row);
+        if (!$canEdit) {
+            throw new ClientException('Editing discussions is not allowed.');
+        }
         $discussionData = ApiUtils::convertInputKeys($body);
         $discussionData['DiscussionID'] = $id;
         $categoryID = $row['CategoryID'];
@@ -574,6 +982,7 @@ class DiscussionsApiController extends AbstractApiController {
         }
         if (array_key_exists('CategoryID', $discussionData) && $categoryID !== $discussionData['CategoryID']) {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.Add', $discussionData['CategoryID']);
+            $this->checkCategoryAllowsPosting($discussionData['CategoryID']);
             $categoryID = $discussionData['CategoryID'];
         }
 
@@ -583,10 +992,12 @@ class DiscussionsApiController extends AbstractApiController {
         $this->fieldPermission($body, 'pinned', 'Vanilla.Discussions.Announce', $permissionCategoryID);
         $this->fieldPermission($body, 'sink', 'Vanilla.Discussions.Sink', $permissionCategoryID);
 
-        $this->discussionModel->save($discussionData);
+        $saveResult = $this->discussionModel->save($discussionData);
         $this->validateModel($this->discussionModel);
+        ModelUtils::validateSaveResultPremoderation($saveResult, "discussion");
 
         $result = $this->discussionByID($id);
+        $this->discussionExpandSchema->commonExpand($result, $query['expand'] ?? []);
         $result = $this->normalizeOutput($result);
         return $out->validate($result);
     }
@@ -610,10 +1021,12 @@ class DiscussionsApiController extends AbstractApiController {
      * Add a discussion.
      *
      * @param array $body The request body.
-     * @throws ServerException if the discussion could not be created.
-     * @return array
+     * @param array $query The request query.
+     * @return Data
+     * @throws NotFoundException If a category is not found.
+     * @throws ServerException If the discussion could not be created.
      */
-    public function post(array $body) {
+    public function post(array $body, array $query = []): Data {
         $this->permission('Garden.SignIn.Allow');
 
         $in = $this->discussionPostSchema('in')->setDescription('Add a discussion.');
@@ -621,6 +1034,12 @@ class DiscussionsApiController extends AbstractApiController {
 
         $body = $in->validate($body);
         $categoryID = $body['categoryID'];
+        $category = CategoryModel::categories($categoryID);
+        if (!$category) {
+            throw new NotFoundException('Category');
+        }
+        $this->checkCategoryAllowsPosting($category);
+
         $categoryPermissionID = self::getPermissionID($categoryID);
         $this->discussionModel->categoryPermission('Vanilla.Discussions.Add', $categoryID);
         $this->fieldPermission($body, 'closed', 'Vanilla.Discussions.Close', $categoryPermissionID);
@@ -630,6 +1049,7 @@ class DiscussionsApiController extends AbstractApiController {
         $discussionData = ApiUtils::convertInputKeys($body);
         $id = $this->discussionModel->save($discussionData);
         $this->validateModel($this->discussionModel);
+        ModelUtils::validateSaveResultPremoderation($id, "discussion");
 
         if (!$id) {
             throw new ServerException('Unable to insert discussion.', 500);
@@ -637,9 +1057,10 @@ class DiscussionsApiController extends AbstractApiController {
 
         $row = $this->discussionByID($id);
         $this->userModel->expandUsers($row, ['InsertUserID', 'LastUserID']);
+        $this->discussionExpandSchema->commonExpand($row, $query['expand'] ?? []);
         $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
-        return $result;
+        return new Data($result, ['status' => 201]);
     }
 
     /**
@@ -649,7 +1070,7 @@ class DiscussionsApiController extends AbstractApiController {
      * @param array $body The request body.
      * @return array
      */
-    public function put_bookmark($id, array $body) {
+    public function put_bookmark(int $id, array $body) {
         $this->permission('Garden.SignIn.Allow');
 
         $this->idParamSchema('in');
@@ -677,7 +1098,7 @@ class DiscussionsApiController extends AbstractApiController {
      * @throws NotFoundException If unable to find the discussion.
      * @return array
      */
-    public function put_canonicalUrl($id, array $body) {
+    public function put_canonicalUrl(int $id, array $body) {
         $this->permission('Garden.SignIn.Allow');
 
         $this->idParamSchema('in');
@@ -687,9 +1108,6 @@ class DiscussionsApiController extends AbstractApiController {
         $body = $in->validate($body);
 
         $row = $this->discussionByID($id);
-        if (!empty($row['Attributes']['CanonicalUrl'] ?? '')) {
-            throw new \Garden\Web\Exception\ClientException('Canonical url already set for this discussion.', 409);
-        };
         $categoryID = $row['CategoryID'];
         if ($row['InsertUserID'] !== $this->getSession()->UserID) {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.Edit', $categoryID);
@@ -711,10 +1129,10 @@ class DiscussionsApiController extends AbstractApiController {
      * @throws NotFoundException If unable to find the discussion.
      * @return array
      */
-    public function delete_canonicalUrl($id) {
+    public function delete_canonicalUrl(int $id) {
         $this->permission('Garden.SignIn.Allow');
 
-        $in =$this->schema(
+        $in = $this->schema(
             Schema::parse(['id:i' => 'The discussion ID.']),
             'in'
         );
@@ -733,13 +1151,111 @@ class DiscussionsApiController extends AbstractApiController {
     }
 
     /**
+     * Search discussions.
+     *
+     * @param array $query
+     * @return Data
+     */
+    public function get_search(array $query) {
+        $this->permission();
+
+        $in = $this
+            ->schema([
+                'categoryID:i?' => 'The numeric ID of a category to limit search results to.',
+                'followed:b?' => 'Limit results to those in followed categories. Cannot be used with the categoryID parameter.',
+            ], 'in')
+            ->merge($this->searchSchema())
+            ->setDescription('Search discussions.');
+        $query = $in->validate($query);
+
+        [$offset, $limit] = offsetLimit(
+            "p{$query['page']}",
+            $query['limit']
+        );
+        $searchQuery = [
+            'recordTypes' => ['discussion'],
+            'query' => $query['query'],
+        ];
+
+        if (array_key_exists('categoryID', $query)) {
+            $searchQuery['categoryID'] = $query['categoryID'];
+        } elseif ($this->getSession()->isValid() && !empty($query['followed'])) {
+            $searchQuery['followedCategories'] = true;
+        }
+
+        $results = $this->getSearchService()->search($searchQuery, new SearchOptions($offset, $limit));
+        $discussionIDs = [];
+        /** @var SearchResultItem $result */
+        foreach ($results as $result) {
+            $discussionIDs[] = $result->getRecordID();
+        }
+
+        // Hit the discussion API back for formatting.
+        return $this->index([
+            'discussionID' => $discussionIDs,
+            'expand' => $query['expand'] ?? null,
+            'limit' => $query['limit'] ?? null,
+        ]);
+    }
+
+    /**
+     * PUT /discussions/:id/type
+     *
+     * Convert a discussions record type.
+     *
+     * @param int $id
+     * @param array $body
+     *
+     * @return mixed
+     * @throws ClientException When record not found.
+     */
+    public function put_type(int $id, array $body) {
+        $this->permission('Vanilla.Discussions.Edit');
+
+        $in = $this
+            ->schema([
+                'type:s' => 'The type to convert the discussion to',
+            ], 'in')
+            ->setDescription('Change a discussions type. ie. idea, question');
+        $out = $this->schema($this->discussionSchema(), 'out');
+        $body = $in->validate($body);
+
+        $from = $this->discussionModel->getID($id, DATASET_TYPE_ARRAY);
+        if (!$from) {
+            throw new ClientException("Record not found.");
+        }
+
+        $fromType = strtolower($from['Type']) ?? "";
+        $toType = strtolower($body['type']) ?? null;
+        $isDiscussionType = empty($fromType);
+        $noChange = ($fromType === $toType ||
+            ($isDiscussionType && $toType === 'discussion')
+        );
+
+        if ($noChange) {
+            $result = $this->normalizeOutput($from);
+            return $out->validate($result);
+        }
+
+        $this->discussionTypeConverter->convert($from, $toType);
+        $record = $this->discussionModel->getID($id, DATASET_TYPE_ARRAY);
+        $result = $this->normalizeOutput($record);
+        $result = $out->validate($result);
+        $this->tagModel->expandTags($result);
+        return $result;
+    }
+
+    /**
      * Expand the body of the last comment.
      *
      * @param array $rows
      * @param array|bool $expand
      */
     private function expandLastCommentBody(array &$rows, $expand): void {
-        if (!$this->isExpandField('lastPost', $expand) || !$this->isExpandField('lastPost.body', $expand)) {
+        if (!$this->isExpandField('lastPost', $expand)
+            || !$this->isExpandField('lastPost.body', $expand)
+            || $this->isExpandField('-body', $expand)
+        ) {
             return;
         }
 
@@ -760,10 +1276,137 @@ class DiscussionsApiController extends AbstractApiController {
         foreach ($rows as &$row) {
             $id = $row['lastPost']['commentID'] ?? null;
             if (isset($comments[$id])) {
-                $row['lastPost']['body'] = \Gdn::formatService()->renderHTML($comments[$id]['Body'], $comments[$id]['Format']);
-            } else {
+                $row['lastPost']['body'] = \Gdn::formatService()->renderHTML($comments[$id]['Body'], $comments[$id]['Format'], ['recordID' => $id, 'recordType' => 'comment']);
+            } elseif (isset($row['body'])) {
                 $row['lastPost']['body'] = $row['body'];
             }
         }
+    }
+
+    /**
+     * Add tags to a discussion.
+     *
+     * @param int $id The discussion ID
+     * @param array $body The tags to add.
+     * @return Data
+     * @throws Gdn_UserException User exception.
+     * @throws NotFoundException Throws an exception if a tag isn't found.
+     * @throws ValidationException Throws a validation exception.
+     * @throws ClientException Throws an exception if you try to add a tag that's there already.
+     * @throws \Garden\Web\Exception\HttpException Http Exception.
+     * @throws PermissionException Permission Exception.
+     */
+    public function post_tags(int $id, array $body): Data {
+        $this->permission('Vanilla.Tagging.Add');
+        $this->canEditDiscussion($id);
+
+        // Validate the body.
+        $validatedBody = $this->tagModel->validateTagReference($body);
+
+        // Get the tags.
+        $tags = $this->tagModel->getTagsFromReferences($validatedBody);
+
+        // Make sure each tag is of an allowed type and throw an error if not.
+        $this->tagModel->checkAllowedDiscussionTagTypes($tags);
+
+        // Add the tags to the discussion.
+        $this->tagModel->addDiscussion($id, array_column($tags, 'TagID'));
+
+        // Get all the discussion tags.
+        $discussionTags = $this->tagModel->getDiscussionTags($id, false);
+
+        // Normalize and validate the tags to send back.
+        $normalizedTags = $this->tagModel->normalizeOutput($discussionTags);
+        $validatedTags = $this->tagModel->validateTagFragmentsOutput($normalizedTags);
+
+        $result = new Data($validatedTags);
+        return $result;
+    }
+
+    /**
+     * Set the tags on a discussion.
+     *
+     * @param int $id The discussion ID.
+     * @param array $body The tags to set.
+     * @return Data
+     * @throws PermissionException Permission Exception.
+     * @throws NotFoundException Throws an exception if a tag isn't found.
+     * @throws ValidationException Throws a validation exception.
+     */
+    public function put_tags(int $id, array $body): Data {
+        $this->permission('Vanilla.Tagging.Add');
+        $this->canEditDiscussion($id);
+
+        // Validate the body.
+        $validatedBody = $this->tagModel->validateTagReference($body);
+
+        // Get the tags.
+        $tags = $this->tagModel->getTagsFromReferences($validatedBody);
+
+        // Make sure each tag is of an allowed type and throw an error if not.
+        $this->tagModel->checkAllowedDiscussionTagTypes($tags);
+
+        // Set the tags on the discussion.
+        $this->tagModel->saveDiscussion($id, array_column($tags, 'TagID'));
+
+        // Get all discussion tags.
+        $discussionTags = $this->tagModel->getDiscussionTags($id, false);
+
+        // Normalize and validate the tags to send back.
+        $normalizedTags = $this->tagModel->normalizeOutput($discussionTags);
+        $validatedTags = $this->tagModel->validateTagFragmentsOutput($normalizedTags);
+
+        $result = new Data($validatedTags);
+        return $result;
+    }
+
+    /**
+     * Check to make sure the user can edit a discussion.
+     *
+     * @param int $id The discussion ID to check permissions for.
+     * @throws NotFoundException Throws an exception if the discussion can't be found.
+     * @throws PermissionException Throws an exception if no permission.
+     */
+    public function canEditDiscussion(int $id): void {
+        $row = $this->discussionByID($id);
+        if ($row['InsertUserID'] !== $this->getSession()->UserID) {
+            $this->discussionModel->categoryPermission('Vanilla.Discussions.Edit', $row['CategoryID']);
+        }
+    }
+
+
+    /**
+     * Check to make sure the category is a discussion-type category. Throw an error if not.
+     *
+     * @param int|array $categoryOrCategoryID
+     * @throws \Garden\Web\Exception\ForbiddenException Throws if the category is a non-discussion type.
+     */
+    public function checkCategoryAllowsPosting($categoryOrCategoryID): void {
+        $category = is_numeric($categoryOrCategoryID)
+            ? $this->categoryModel->getID($categoryOrCategoryID, DATASET_TYPE_ARRAY)
+            : ArrayUtils::PascalCase($categoryOrCategoryID);
+        $canPost = CategoryModel::doesCategoryAllowPosts($categoryOrCategoryID);
+        if (!$canPost) {
+            throw new \Garden\Web\Exception\ForbiddenException(
+                sprintft('You are not allowed to post in categories with a display type of %s.', t($category["DisplayAs"]))
+            );
+        }
+    }
+
+    /**
+     * Get all nested categoryIDs.
+     *
+     * @param int|null $categoryID
+     * @param bool $followed
+     *
+     * @return array
+     */
+    protected function getNestedCategoriesIDs(?int $categoryID, bool $followed): array {
+        $categoryIDs = $this->categoryModel->getSearchCategoryIDs(
+            $categoryID,
+            $followed,
+            true
+        );
+        return $categoryIDs;
     }
 }

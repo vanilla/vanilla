@@ -8,6 +8,7 @@ namespace Vanilla\EmbeddedContent\Factories;
 
 use Garden\Http\HttpClient;
 use Vanilla\EmbeddedContent\AbstractEmbed;
+use Vanilla\EmbeddedContent\Embeds\ErrorEmbed;
 use Vanilla\EmbeddedContent\Embeds\ImageEmbed;
 use Vanilla\EmbeddedContent\Embeds\LinkEmbed;
 use Vanilla\EmbeddedContent\FallbackEmbedFactory;
@@ -103,7 +104,10 @@ class ScrapeEmbedFactory extends FallbackEmbedFactory {
             'body' => $scraped['Description'] ?? null,
             'photoUrl' => !empty($images) ? $images[0] : null,
         ];
-        return new LinkEmbed($data);
+        $linkEmbed = new LinkEmbed($data);
+        $linkEmbed->setCacheable(!empty($scraped['isCacheable']));
+
+        return $linkEmbed;
     }
 
     /**

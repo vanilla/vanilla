@@ -31,7 +31,12 @@ export default class SSOMethods extends React.Component<IProps> {
                     style={methodStyles}
                 >
                     <span className="button-ssoContents">
-                        <img src={method.ui.photoUrl || undefined} className="ssoMethod-icon" aria-hidden={true} />
+                        <img
+                            src={method.ui.photoUrl || undefined}
+                            className="ssoMethod-icon"
+                            aria-hidden={true}
+                            loading="lazy"
+                        />
                         <span className="button-ssoLabel">{t(method.ui.buttonName)}</span>
                         <span className="ssoMethod-icon ssoMethod-iconSpacer" aria-hidden="true" />
                     </span>

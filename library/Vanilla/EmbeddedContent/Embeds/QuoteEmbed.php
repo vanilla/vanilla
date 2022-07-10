@@ -57,11 +57,18 @@ class QuoteEmbed extends AbstractEmbed {
             $data['recordType'] = 'comment';
         }
 
-        if (!isset($data['displayOptions'])) {
-            $hasTitle = isset($data['name']);
-            $data['displayOptions'] = QuoteEmbedDisplayOptions::minimal($hasTitle);
-        } elseif (is_array($data['displayOptions'])) {
-            $data['displayOptions'] = QuoteEmbedDisplayOptions::from($data['displayOptions']);
+        // values from the config take priority
+        $configDisplayOptions = c('embed.quote.displayOptions.'.$data['recordType']);
+
+        if (is_array($configDisplayOptions)) {
+            $data['displayOptions'] = QuoteEmbedDisplayOptions::from($configDisplayOptions);
+        } else {
+            if (!isset($data['displayOptions'])) {
+                $hasTitle = isset($data['name']);
+                $data['displayOptions'] = QuoteEmbedDisplayOptions::minimal($hasTitle);
+            } elseif (is_array($data['displayOptions'])) {
+                $data['displayOptions'] = QuoteEmbedDisplayOptions::from($data['displayOptions']);
+            }
         }
 
         // Normalize the body into a string.

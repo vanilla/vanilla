@@ -3,7 +3,7 @@
  * Quotes Plugin.
  *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Quotes
  */
@@ -179,9 +179,9 @@ class QuotesPlugin extends Gdn_Plugin {
      *
      * Old and busted method.
      *
-     * @param $sender
+     * @param Gdn_Controller $sender
      */
-    public function controller_getquote($sender) {
+    public function controller_getQuote($sender) {
         $this->discussionController_getQuote_create($sender);
     }
 
@@ -189,10 +189,10 @@ class QuotesPlugin extends Gdn_Plugin {
      * Retrieve text of a quote.
      *
      * @param discussionController $sender
-     * @param $selector
+     * @param string $selector
      * @param bool $format
      */
-    public function discussionController_getQuote_create($sender, $selector, $format = false) {
+    public function discussionController_getQuote_create($sender, $selector = '', $format = false) {
         $sender->permission('Garden.SignIn.Allow');
 
         $sender->deliveryMethod(DELIVERY_METHOD_JSON);
@@ -276,7 +276,12 @@ class QuotesPlugin extends Gdn_Plugin {
         }
 
         echo Gdn_Theme::bulletItem('Flags');
-        echo anchor(sprite('ReactQuote', 'ReactSprite').' '.t('Quote'), url("post/quote/{$object->DiscussionID}/{$objectID}", true), 'ReactButton Quote Visible').' ';
+        echo anchor(
+            sprite('ReactQuote', 'ReactSprite').' '.t('Quote'),
+            url("post/quote/{$object->DiscussionID}/{$objectID}", true),
+            'ReactButton Quote Visible',
+            ['role' => 'button']
+        ).' ';
     }
 
     /**

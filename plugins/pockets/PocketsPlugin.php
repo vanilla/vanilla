@@ -4,6 +4,10 @@
  * @license GPL-2.0-only
  */
 
+use Vanilla\Addons\Pockets\PocketsModel;
+use Vanilla\Widgets\WidgetFactory;
+use Vanilla\Widgets\WidgetService;
+
 /**
  * Class PocketsPlugin
  */
@@ -34,18 +38,35 @@ class PocketsPlugin extends Gdn_Plugin {
     /** Whether or not to display test items for all pockets. */
     public $ShowPocketLocations = null;
 
+    /** @var array */
+    private $userRoleIDs = null;
+
+    /** @var PocketsModel  */
+    private $pocketsModel;
+
+    /**
+     * @var WidgetService
+     */
+    private $widgetService;
+
     /**
      * PocketsPlugin constructor.
      */
-    public function __construct() {
+    public function __construct(PocketsModel $pocketsModel, WidgetService $widgetService) {
         parent::__construct();
+        $this->pocketsModel = $pocketsModel;
+        $this->widgetService = $widgetService;
 
         // Switch our HTML wrapper when we're in a table view.
         if (c('Vanilla.Discussions.Layout') == 'table') {
             // Admin checks add a column.
             $useAdminChecks = c('Vanilla.AdminCheckboxes.Use') && Gdn::session()->checkPermission('Garden.Moderation.Manage');
             $colspan = c('Plugins.Pockets.Colspan', ($useAdminChecks) ? 6 : 5);
-            $this->Locations['BetweenDiscussions']['Wrap'] = ['<tr><td colspan="'.$colspan.'">', '</td></tr>'];
+            $this->pocketsModel->locations['BetweenDiscussions']['Wrap'] = ['<tr><td colspan="'.$colspan.'">', '</td></tr>'];
+        }
+
+        if (Gdn::themeFeatures()->useDataDrivenTheme()) {
+            $this->pocketsModel->locations['AfterBanner'] = ['Name' => 'After Banner'];
         }
     }
 
@@ -131,6 +152,20 @@ class PocketsPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Hook into after banner pocket location
+     *
+     * @param Gdn_Controller $sender
+     * @param array $args
+     * @return string
+     */
+    public function afterBanner_handler($sender, $args = []) {
+        ob_start();
+        $this->processPockets($sender, "AfterBanner");
+        $output = ob_get_clean();
+        return $output;
+    }
+
+    /**
      * Main list for a pocket management.
      *
      * @param SettingsController $sender
@@ -177,10 +212,11 @@ class PocketsPlugin extends Gdn_Plugin {
         $sender->setData('Title', t('Pockets'));
 
         // Grab the pockets from the DB.
-        $pocketData = Gdn::sql()
-            ->get('Pocket', 'Location, `Sort`')
-            ->resultArray();
+        $model = new PocketsModel();
+        $pocketData = $model->getAll();
 
+        /** @var WidgetService $widgetService */
+        $widgetService = \Gdn::getContainer()->get(WidgetService::class);
         // Add notes to the pockets data.
         foreach ($pocketData as $index => &$pocketRow) {
             $mobileOnly = $pocketRow['MobileOnly'];
@@ -237,6 +273,18 @@ class PocketsPlugin extends Gdn_Plugin {
             }
 
             $pocketRow['Meta'] = $meta;
+
+            if ($pocketRow['Format'] === PocketsModel::FORMAT_WIDGET && ($pocketRow['WidgetID'] ?? false)) {
+                $widgetFactory = $widgetService->getFactoryByID($pocketRow['WidgetID']);
+                if ($widgetFactory !== null) {
+                    $pocketRow['RenderedSummary'] = $widgetFactory->renderWidgetSummary($pocketRow['WidgetParameters'] ?? []);
+                }
+            }
+            // If there was no widget
+            if (!isset($pocketRow['RenderedSummary'])) {
+                $bodyContent = nl2br(htmlspecialchars(substr($pocketRow['Body'], 0, 200)));
+                $pocketRow['RenderedSummary'] = '<pre style="white-space: pre-wrap;">' . $bodyContent . '</pre>';
+            }
         }
 
         $sender->setData('PocketData', $pocketData);
@@ -278,7 +326,7 @@ class PocketsPlugin extends Gdn_Plugin {
             'Disabled' => $disabledState
         ];
 
-        $pocketModel = new Gdn_Model('Pocket');
+        $pocketModel = \Gdn::getContainer()->get(PocketsModel::class);
         $pocketModel->save($values);
 
         $newToggle = renderPocketToggle($values);
@@ -315,19 +363,31 @@ class PocketsPlugin extends Gdn_Plugin {
      */
     protected function _addEdit($sender, $pocketID = false) {
         $form = new Gdn_Form();
-        $pocketModel = new Gdn_Model('Pocket');
+        $pocketModel = new PocketsModel();
         $form->setModel($pocketModel);
         $sender->ConditionModule = new ConditionModule($sender);
         $sender->Form = $form;
 
         if ($form->authenticatedPostBack()) {
+
             // Save the pocket.
             if ($pocketID !== false) {
                 $form->setFormValue('PocketID', $pocketID);
             }
 
+            $name = $form->getValue('Name');
+            if (empty($name)) {
+                $form->setFormValue('Name', t('Untitled'));
+            }
+
+
             // Convert the form data into a format digestable by the database.
             $repeat = $form->getFormValue('RepeatType');
+            $location = $form->getFormValue("Location");
+            if ($location === "AfterBanner" || !$repeat) {
+                $repeat = Pocket::REPEAT_ONCE;
+            }
+
             switch ($repeat) {
                 case Pocket::REPEAT_EVERY:
                     $pocketModel->Validation->applyRule('EveryFrequency', 'Integer');
@@ -351,9 +411,9 @@ class PocketsPlugin extends Gdn_Plugin {
                 default:
                     break;
             }
+
             $form->setFormValue('Repeat', $repeat);
             $form->setFormValue('Sort', 0);
-            $form->setFormValue('Format', 'Raw');
             $condition = Gdn_Condition::toString($sender->ConditionModule->conditions(true));
             $form->setFormValue('Condition', $condition);
             if ($form->getFormValue('Ad', 0)) {
@@ -377,49 +437,59 @@ class PocketsPlugin extends Gdn_Plugin {
                 $sender->StatusMessage = t('Your changes have been saved.');
                 $sender->setRedirectTo('settings/pockets');
             }
-        } else {
-            if ($pocketID !== false) {
-                // Load the pocket.
-                $pocket = $pocketModel->getWhere(['PocketID' => $pocketID])->firstRow(DATASET_TYPE_ARRAY);
-                if (!$pocket) {
-                    return Gdn::dispatcher()->dispatch('Default404');
-                }
-
-                // Convert some of the pocket data into a format digestable by the form.
-                list($repeatType, $repeatFrequency) = Pocket::parseRepeat($pocket['Repeat']);
-                $repeatFrequency += [1, 1];
-
-                $pocket['RepeatType'] = $repeatType;
-                $pocket['EveryFrequency'] = $repeatFrequency[0];
-                $pocket['EveryBegin'] = $repeatFrequency[1];
-                $pocket['Indexes'] = implode(',', $repeatFrequency);
-                $pocket['Ad'] = $pocket['Type'] == Pocket::TYPE_AD;
-                $pocket['TestMode'] = Pocket::inTestMode($pocket);
-
-                // The frontend displays an enable/disable toggle, so we need this value to be turned around.
-                $pocket['Enabled'] = $pocket['Disabled'] !== Pocket::DISABLED;
-                $sender->ConditionModule->conditions(Gdn_Condition::fromString($pocket['Condition']));
-                $form->setData($pocket);
-            } else {
-                // Default the repeat.
-                $form->setFormValue('RepeatType', Pocket::REPEAT_ONCE);
+        }
+        if ($pocketID !== false) {
+            // Load the pocket.
+            $pocket = $pocketModel->getID($pocketID);
+            if (!$pocket) {
+                return Gdn::dispatcher()->dispatch('Default404');
             }
+
+            // Convert some of the pocket data into a format digestible by the form.
+            [$repeatType, $repeatFrequency] = Pocket::parseRepeat($pocket['Repeat']);
+
+            $pocket['RepeatType'] = $repeatType;
+            $pocket['EveryFrequency'] = $repeatFrequency[0];
+            $pocket['EveryBegin'] = $repeatFrequency[1];
+            $pocket['Indexes'] = implode(',', $repeatFrequency);
+            $pocket['Ad'] = $pocket['Type'] == Pocket::TYPE_AD;
+            $pocket['TestMode'] = Pocket::inTestMode($pocket);
+
+            // The frontend displays an enable/disable toggle, so we need this value to be turned around.
+            $pocket['Enabled'] = $pocket['Disabled'] !== Pocket::DISABLED;
+            $sender->ConditionModule->conditions(Gdn_Condition::fromString($pocket['Condition']));
+            $form->setData($pocket);
+
+            $contentProps = [
+                'widgetID' => $pocket['WidgetID'] ?? null,
+                'initialWidgetParameters' => $pocket['WidgetParameters'] ?? new stdClass(),
+                'initialBody' => $pocket['Body'] ?? '',
+                'format' => strtolower($pocket['Format']),
+            ];
+            $sender->setData('contentProps', json_encode($contentProps, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES));
+        } else {
+            // Default the repeat.
+            $form->setValue('RepeatType', Pocket::REPEAT_BEFORE);
+            $form->setValue('Location', 'Panel');
         }
 
         $sender->Form = $form;
 
-        $sender->setData('Locations', $this->Locations);
-        $sender->setData('LocationsArray', $this->getLocationsArray());
+        $sender->setData('Locations', $this->pocketsModel->locations);
+        $sender->setData('LocationsArray', $this->pocketsModel->getLocationsArray());
+        $sender->setData('Attributes', json_decode($form->getFormValue("Attributes", '[]')));
         $sender->setData(
             'Pages',
             [
                 '' => '('.t('All').')',
-                'activity' => 'activity',
-                'comments' => 'comments',
-                'dashboard' => 'dashboard',
-                'discussions' => 'discussions',
-                'inbox' => 'inbox',
-                'profile' => 'profile',
+                'home' => 'Home',
+                'activity' => 'Activity',
+                'comments' => 'Comments',
+                'dashboard' => 'Dashboard',
+                'discussions' => 'Discussions',
+                'categories' => 'Categories',
+                'inbox' => 'Inbox',
+                'profile' => 'Profile',
             ]
         );
 
@@ -448,7 +518,8 @@ class PocketsPlugin extends Gdn_Plugin {
 
         $form = new Gdn_Form();
         if ($form->authenticatedPostBack()) {
-            Gdn::sql()->delete('Pocket', ['PocketID' => $pocketID]);
+            $model = new PocketsModel();
+            $model->delete(['PocketID' => $pocketID]);
             $sender->StatusMessage = sprintf(t('The %s has been deleted.'), strtolower(t('Pocket')));
             $sender->setRedirectTo('settings/pockets');
         }
@@ -473,19 +544,6 @@ class PocketsPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Get an array mapping location keys to visual display names.
-     *
-     * @return array
-     */
-    public function getLocationsArray() {
-        $result = [];
-        foreach ($this->Locations as $key => $value) {
-            $result[$key] = val('Name', $value, $key);
-        }
-        return $result;
-    }
-
-    /**
      * Get all with a particular name.
      *
      * @param string $name The name of the pocket.
@@ -498,6 +556,33 @@ class PocketsPlugin extends Gdn_Plugin {
     }
 
     /**
+     * @return array
+     */
+    private function getUserRoleIDs(): array {
+        if ($this->userRoleIDs) {
+            return $this->userRoleIDs;
+        }
+        $roleModel = Gdn::getContainer()->get(RoleModel::class);
+        if (Gdn::session()->isValid()) {
+            $userID = Gdn::session()->UserID;
+            $roles = $roleModel->getByUserID($userID)->resultArray();
+            $this->userRoleIDs = array_column($roles, 'RoleID');
+        } else {
+            $roles = $roleModel->getByType('guest')->resultArray();
+            $this->userRoleIDs = array_column($roles, 'RoleID');
+        }
+
+        return $this->userRoleIDs;
+    }
+
+    /**
+     * @param array|null $roleIDs
+     */
+    public function setUserRoleIDs(?array $roleIDs): void {
+        $this->userRoleIDs = $roleIDs;
+    }
+
+    /**
      * Load all pockets from the database.
      *
      * @param bool $force If true, re-load data from DB even if it's loaded.
@@ -507,14 +592,82 @@ class PocketsPlugin extends Gdn_Plugin {
             return;
         }
 
-        $pockets = Gdn::sql()->get('Pocket', 'Location, Sort, Name')->resultArray();
+        $widgetService = \Gdn::getContainer()->get(WidgetService::class);
+        $model = \Gdn::getContainer()->get(PocketsModel::class);
+        $pockets = $model->getEnabled();
         foreach ($pockets as $row) {
-            $pocket = new Pocket();
+            $pocket = new Pocket($widgetService);
             $pocket->load($row);
             $this->addPocket($pocket);
         }
 
         $this->StateLoaded = true;
+    }
+
+    /**
+     * Clear the internal pockets state.
+     */
+    public function resetState() {
+        $this->StateLoaded = false;
+        $this->_PocketNames = [];
+        $this->_Pockets = [];
+    }
+
+    /**
+     * Remove default Module if pocket will use them.
+     *
+     * @param Gdn_Controller $sender
+     */
+    public function base_afterAddModule_handler(Gdn_Controller $sender) {
+        $this->removeModulesInAssets($sender);
+    }
+
+    /**
+     * Remove existing modules/widgets from assets controller if pocket will use the widget.
+     *
+     * @param Gdn_Controller $sender
+     */
+    private function removeModulesInAssets(Gdn_Controller $sender) {
+        $this->_loadState();
+        foreach ($sender->Assets as $location => $modules) {
+            if (array_key_exists($location, $this->_Pockets)) {
+                foreach ($this->_Pockets[$location] as $pocket) {
+                    $widgetID = $pocket->Data['WidgetID'] ?? null;
+                    // Only apply for modules displaying as widget.
+                    if (!$widgetID) {
+                        continue;
+                    }
+                    $data = $this->generateDataForPocket($sender);
+                    /** @var Pocket $pocket */
+                    if (!$pocket->canRender($data)) {
+                        continue;
+                    }
+                    /** @var WidgetFactory | null $widget */
+                    $widgetFactory = $this->widgetService->getFactoryByID($widgetID);
+                    $definition = $widgetFactory ? $widgetFactory->getDefinition() : null;
+                    $widgetClass = $definition['widgetClass'] ?? null;
+                    $modulesInLocation = array_keys($modules);
+                    if (in_array($widgetClass, $modulesInLocation)) {
+                        unset($sender->Assets[$location][$widgetClass]);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Get data for pocket.
+     *
+     * @param Gdn_Controller $controller
+     * @return array
+     */
+    private function generateDataForPocket(Gdn_Controller $controller) {
+        // Build up the data for filtering.
+        $data = [];
+        $data['Request'] = Gdn::request();
+        $data['PageName'] = Pocket::pageName($controller);
+        $data['isHomepage'] = $controller->data('isHomepage');
+        return $data;
     }
 
     /**
@@ -525,20 +678,25 @@ class PocketsPlugin extends Gdn_Plugin {
      * @param number|null $countHint
      */
     public function processPockets($sender, $location, $countHint = null) {
-        if (Gdn::controller()->deliveryMethod() != DELIVERY_METHOD_XHTML) {
+        $controller = $sender;
+        if ((!$controller instanceof Gdn_Controller)) {
+            $controller = Gdn::controller();
+        }
+
+        //if we are in unauthorized page, homecontroller will render error page, so no pockets on error page
+        $isOnUnauthorizedPage = $controller instanceof HomeController && $controller->RequestMethod === "unauthorized";
+
+        if ($controller->deliveryMethod() != DELIVERY_METHOD_XHTML || $isOnUnauthorizedPage) {
             return;
         }
-        if (Gdn::controller()->data('_NoMessages') && $location != 'Head') {
+
+        if ($controller->data('_NoMessages') && $location != 'Head' && $location !== 'AfterBanner') {
             return;
         }
 
         // Since plugins can't currently maintain their state we have to stash it in the Gdn object.
         $this->_loadState();
-
-        // Build up the data for filtering.
-        $data = [];
-        $data['Request'] = Gdn::request();
-
+        $data = $this->generateDataForPocket($controller);
         // Increment the counter.
         if ($countHint != null) {
             $count = $countHint;
@@ -548,28 +706,27 @@ class PocketsPlugin extends Gdn_Plugin {
         } else {
             $count = $this->_Counters[$location] = 1;
         }
-
         $data['Count'] = $count;
-        $data['PageName'] = Pocket::pageName($sender);
+        $locationOptions = val($location, $this->pocketsModel->locations, []);
 
-        $locationOptions = val($location, $this->Locations, []);
-
-        if ($this->ShowPocketLocations && array_key_exists($location, $this->Locations) && checkPermission('Plugins.Pockets.Manage') && $sender->MasterView != 'admin') {
-            $locationName = val("Name", $this->Locations, $location);
+        if ($this->ShowPocketLocations &&
+            array_key_exists($location, $this->pocketsModel->locations) &&
+            checkPermission('Plugins.Pockets.Manage') && $controller->MasterView != 'admin') {
+            $locationName = val("Name", $this->pocketsModel->locations, $location);
             echo
                 valr('Wrap.0', $locationOptions, ''),
                 "<div class=\"TestPocket\"><h3>$locationName ($count)</h3></div>",
                 valr('Wrap.1', $locationOptions, '');
 
             if ($location == 'Foot' && strcasecmp($count, 'after') == 0) {
-                echo $this->testData($sender);
+                echo $this->testData($controller);
             }
         }
 
         // Process all of the pockets.
         if (array_key_exists($location, $this->_Pockets)) {
             foreach ($this->_Pockets[$location] as $pocket) {
-                /** @var Pocket $Pocket */
+                /** @var Pocket $pocket */
 
                 if ($pocket->canRender($data)) {
                     $wrap = val('Wrap', $locationOptions, []);
@@ -669,15 +826,16 @@ class PocketsPlugin extends Gdn_Plugin {
         $St = Gdn::structure();
         $St->table('Pocket')
             ->primaryKey('PocketID')
+            ->column('WidgetID', 'varchar(300)', null, 'index.WidgetID')
             ->column('Name', 'varchar(255)')
             ->column('Page', 'varchar(50)', null)
             ->column('Location', 'varchar(50)')
             ->column('Sort', 'smallint')
             ->column('Repeat', 'varchar(25)')
-            ->column('Body', 'text')
-            ->column('Format', 'varchar(20)')
+            ->column('Body', 'mediumtext')
+            ->column('Format', 'varchar(20)', 'index.Format')
             ->column('Condition', 'varchar(500)', null)
-            ->column('Disabled', 'smallint', '0') // set to a constant in class Pocket
+            ->column('Disabled', 'smallint', '0', 'index') // set to a constant in class Pocket
             ->column('Attributes', 'text', null)
             ->column('MobileOnly', 'tinyint', '0')
             ->column('MobileNever', 'tinyint', '0')
@@ -686,11 +844,6 @@ class PocketsPlugin extends Gdn_Plugin {
             ->column('TestMode', 'tinyint', '0')
             ->column('Type', [Pocket::TYPE_DEFAULT, Pocket::TYPE_AD], Pocket::TYPE_DEFAULT)
             ->set();
-
-        $PermissionModel = Gdn::permissionModel();
-        $PermissionModel->define([
-            'Garden.NoAds.Allow' => 0
-        ]);
     }
 
     /**
@@ -756,6 +909,148 @@ class PocketsPlugin extends Gdn_Plugin {
 
         $sender->jsonTarget('#pocket-locations-toggle', static::locationsToggle($on), 'Html');
         $sender->render('blank', 'utility', 'dashboard');
+    }
+
+    /**
+     * Add multi role input to pocket filters
+     *
+     * @param array $args
+     */
+    public function settingsController_additionalPocketFilterInputs_handler($args) {
+        $Form = $args['form'];
+
+        echo $Form->react(
+            "RoleIDs",
+            "pocket-multi-role-input",
+            [
+                "tag" => "li",
+            ]
+        );
+
+        $data = $Form->formData();
+        $categoryID = $data["CategoryID"];
+        $categoryLabel = null;
+        if (!empty($categoryID)) {
+            $currentCategory = CategoryModel::categories($categoryID);
+            $categoryLabel = $currentCategory['Name'];
+        }
+
+        echo $Form->react(
+            "CategoryID",
+            "pocket-category-input",
+            [
+                "tag" => "li",
+                "label" => $categoryLabel,
+                "inheritCategory" => boolval($data["InheritCategory"] ?? 0)
+            ]
+        );
+    }
+
+
+    /**
+     * Add some event handling for pocket rendering. - Roles
+     *
+     * @param bool $existingCanRender
+     * @param Pocket $pocket
+     * @param array $requestData
+     *
+     *
+     * @return bool
+     */
+    private function canRenderRoles(bool $existingCanRender, Pocket $pocket, array $requestData) {
+        if (!$existingCanRender) {
+            return $existingCanRender;
+        }
+
+        $testMode = Pocket::inTestMode($pocket);
+        $pocketAdmin = checkPermission('Plugins.Pockets.Manage');
+        $pocketData = $pocket->Data;
+        $roleIDs = $pocketData['RoleIDs'] ?? [];
+
+        if (empty($roleIDs)) {
+            return $existingCanRender;
+        }
+
+        if ($testMode && $pocketAdmin) {
+            return $existingCanRender;
+        }
+
+        $intersections = array_intersect($this->getUserRoleIDs(), $roleIDs);
+        if (count($intersections) === 0) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Add some event handling for pocket rendering. - Categories
+     *
+     * @param bool $existingCanRender
+     * @param Pocket $pocket
+     * @param array $requestData
+     *
+     *
+     * @return bool
+     */
+    private function canRenderCategories(bool $existingCanRender, Pocket $pocket, array $requestData) {
+        if (!$existingCanRender) {
+            return $existingCanRender;
+        }
+
+        $pocketData = $pocket->Data;
+        $categoryID = $pocketData['CategoryID'] ?? null;
+
+        if (empty($categoryID)) {
+            return $existingCanRender;
+        }
+
+        if (!is_numeric($categoryID)) {
+            return false;
+        } else {
+            $categoryID = (int) $categoryID;
+        }
+
+        $controller = \Gdn::controller();
+        if (!$controller) {
+            return false;
+        }
+
+        $currentCategoryID = $controller->data('Category.CategoryID', $controller->data('ContextualCategoryID'));
+
+        if (!$currentCategoryID) {
+            return false;
+        }
+
+        if (!($pocketData["InheritCategory"] ?? false)) {
+            if ($currentCategoryID !== $categoryID) {
+                return false;
+            }
+        } else {
+            $ancestors = CategoryModel::getAncestors($currentCategoryID, true);
+            $ancestorIDs = array_column($ancestors, 'CategoryID');
+            $ancestorIDs[] = $currentCategoryID;
+            $ancestorIDs[] = -1;
+            $result = array_search($categoryID, $ancestorIDs, true) !== false;
+            return (bool) $result;
+        }
+
+        return $existingCanRender;
+    }
+
+    /**
+     * Add some event handling for pocket rendering. - Roles
+     *
+     * @param bool $existingCanRender
+     * @param Pocket $pocket
+     * @param array $requestData
+     *
+     *
+     * @return bool
+     */
+    public function pocket_canRender_handler(bool $existingCanRender, Pocket $pocket, array $requestData): bool {
+        $existingCanRender = $this->canRenderRoles($existingCanRender, $pocket, $requestData);
+        $existingCanRender = $this->canRenderCategories($existingCanRender, $pocket, $requestData);
+        return $existingCanRender;
     }
 }
 

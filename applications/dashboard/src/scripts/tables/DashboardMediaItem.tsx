@@ -4,11 +4,13 @@
  */
 
 import React from "react";
+import classNames from "classnames";
 
 interface IProps {
     imgSrc?: string;
     title: string;
     info: string;
+    className?: string;
 }
 
 export function DashboardMediaItem(props: IProps) {
@@ -17,11 +19,11 @@ export function DashboardMediaItem(props: IProps) {
             {props.imgSrc !== undefined && (
                 <div className="media-left">
                     <div className="media-image-wrap">
-                        <img src={props.imgSrc} />
+                        <img src={props.imgSrc} loading="lazy" />
                     </div>
                 </div>
             )}
-            <div className="media-body">
+            <div className={classNames("media-body", props.className, props.className)}>
                 <div className="media-title">{props.title}</div>
                 <div className="info user-email">{props.info}</div>
             </div>

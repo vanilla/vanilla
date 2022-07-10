@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -13,16 +13,16 @@ use Garden\Web\Dispatcher;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\RequestInterface;
 use Garden\Web\ResourceRoute;
+use VanillaTests\BootstrapTestCase;
 use VanillaTests\Fixtures\Locale;
 use VanillaTests\Fixtures\Tuple;
-use VanillaTests\SharedBootstrapTestCase;
 use VanillaTests\Fixtures\Request;
 use VanillaTests\Fixtures\ExactRoute;
 
 /**
  * Test methods on the Dispatcher class.
  */
-class DispatcherTest extends SharedBootstrapTestCase {
+class DispatcherTest extends BootstrapTestCase {
     private static $locale;
 
     /**

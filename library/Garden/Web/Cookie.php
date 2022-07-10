@@ -7,11 +7,28 @@
 
 namespace Garden\Web;
 
+use Delight\Cookie\Cookie as DelightCookie;
+
 /**
  * A class for reading/writing cookies.
  */
 class Cookie {
     const EXPIRE_THRESHOLD = 631152000; // 20 years
+
+    /**
+     * @var string
+     */
+    const SAME_SITE_NONE = 'None';
+
+    /**
+     * @var string
+     */
+    const SAME_SITE_LAX = 'Lax';
+
+    /**
+     * @var string
+     */
+    const SAME_SITE_STRICT = 'Strict';
 
     /**
      * @var string[]
@@ -47,6 +64,11 @@ class Cookie {
      * @var bool
      */
     private $flushAll = false;
+
+    /**
+     * @var string
+     */
+    private $prefix = '';
 
     /**
      * Construct a {@link Cookie} objects.
@@ -92,7 +114,7 @@ class Cookie {
      * @return null
      */
     public function get($name, $default = null) {
-        return isset($this->cookies[$name]) ? $this->cookies[$name] : $default;
+        return $this->cookies[$this->cookieName($name)] ?? $default;
     }
 
     /**
@@ -107,10 +129,11 @@ class Cookie {
      * - A value of zero will expire at the end of the browser session.
      * @param bool $secure Indicates that the cookie should only be transmitted over a secure HTTPS connection from the client.
      * @param bool $httpOnly Whether or not the cookie should be httpOnly.
+     * @param string|null $sameSite Set the same site value of SAME_SITE_NONE, _LAX, or _STRICT.
      * @return $this
      */
-    public function set($name, $value, $expire = 0, $secure = false, $httpOnly = true) {
-        $this->setCookie($name, $value, $expire, $this->path, $this->domain, $secure, $httpOnly);
+    public function set($name, $value, $expire = 0, $secure = null, $httpOnly = true, $sameSite = null) {
+        $this->setCookie($name, $value, $expire, $this->path, $this->domain, $secure, $httpOnly, $sameSite);
         return $this;
     }
 
@@ -135,11 +158,18 @@ class Cookie {
      * - A value of zero will expire at the end of the browser session.
      * @param string|null $path The path of the cookie or **null** to use this object's path.
      * @param string|null $domain The domain of the cookie or **null** to use this object's path.
-     * @param bool $secure Indicates that the cookie should only be transmitted over a secure HTTPS connection from the client.
+     * @param bool|null $secure Indicates that the cookie should only be transmitted over a secure HTTPS connection from the client.
      * @param bool $httpOnly Whether or not the cookie should be httpOnly.
+     * @param string|null $sameSite Set the same site value of SAME_SITE_NONE, _LAX, or _STRICT.
      * @return $this
      */
-    public function setCookie($name, $value, $expire = 0, $path = null, $domain = null, $secure = false, $httpOnly = false) {
+    public function setCookie($name, $value, $expire = 0, $path = null, $domain = null, $secure = null, $httpOnly = false, $sameSite = null) {
+        $name = $this->cookieName($name);
+        $isSecure = $secure ?? $this->isSecure();
+
+        $sameSite = (empty($sameSite)) ? self::SAME_SITE_NONE : $sameSite;
+        $sameSite = (!$isSecure && $sameSite === self::SAME_SITE_NONE) ? null : $sameSite;
+
         if ($value === null) {
             $this->delete($name);
         } else {
@@ -149,8 +179,9 @@ class Cookie {
                 $this->calculateExpiry($expire),
                 $path === null ? $this->path : $path,
                 $domain === null ? $this->domain : $domain,
-                $secure,
-                $httpOnly
+                $isSecure,
+                $httpOnly,
+                $sameSite
             ];
         }
         return $this;
@@ -165,6 +196,8 @@ class Cookie {
      * @return $this
      */
     public function delete($name) {
+        $name = $this->cookieName($name);
+
         unset($this->cookies[$name]);
         return $this;
     }
@@ -178,7 +211,7 @@ class Cookie {
         $calls = array_merge($this->makeNewCookieCalls(), $this->makeDeleteCookieCalls());
 
         foreach ($calls as $name => $args) {
-            setcookie($name, ...$args);
+            DelightCookie::setcookie($name, ...$args);
         }
     }
 
@@ -311,5 +344,39 @@ class Cookie {
     public function setFlushAll($flushAll) {
         $this->flushAll = $flushAll;
         return $this;
+    }
+
+    /**
+     * Get the cookie prefix.
+     *
+     * @return string
+     */
+    public function getPrefix(): string {
+        return $this->prefix;
+    }
+
+    /**
+     * Set the cookie prefix.
+     *
+     * @param string $prefix
+     * @return $this
+     */
+    public function setPrefix(string $prefix) {
+        $this->prefix = $prefix;
+        return $this;
+    }
+
+    /**
+     * Calculate the full cookie named based on the prefix.
+     *
+     * @param string $name
+     * @return string
+     */
+    protected function cookieName(string $name): string {
+        if (substr($name, 0, 1) === '/') {
+            return substr($name, 1);
+        } else {
+            return $this->getPrefix().$name;
+        }
     }
 }

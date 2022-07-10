@@ -184,7 +184,7 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
 
                     case self::DATA_COOKIE:
                         $this->_DataHooks[$dataTarget]['value'] = $this->_DataSource->getValueFrom(
-                            Gdn_Authenticator::INPUT_COOKIES,
+                            Gdn_Request::INPUT_COOKIES,
                             $dataHook['lookup'],
                             false
                         );

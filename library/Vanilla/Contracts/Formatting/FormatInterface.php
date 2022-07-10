@@ -9,7 +9,6 @@ namespace Vanilla\Contracts\Formatting;
 
 use Vanilla\Formatting\Attachment;
 use Vanilla\Formatting\Exception\FormattingException;
-use Vanilla\Formatting\Heading;
 
 /**
  * An interface for rendering, filtering, and parsing user content.
@@ -24,6 +23,15 @@ interface FormatInterface {
      * @return string
      */
     public function renderHTML(string $content): string;
+
+    /**
+     * Render a safe, sanitized, HTML version of some content.
+     *
+     * @param ?array $context The context related to rendered content.
+     *
+     * @return FormatInterface
+     */
+    public function setContext(?array $context): FormatInterface;
 
     /**
      * Render a safe, sanitized, short version of some content.
@@ -96,6 +104,15 @@ interface FormatInterface {
      * @return string[]
      */
     public function parseImageUrls(string $content): array;
+
+    /**
+     * Parse image data from post content.
+     *
+     * @param string $content
+     *
+     * @return array
+     */
+    public function parseImages(string $content): array;
 
     /**
      * Parse out a list of usernames mentioned in the post contents.

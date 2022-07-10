@@ -1,15 +1,13 @@
 <?php
 /**
- * Gdn_Model.
- *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
- * @package Core
- * @since 2.0
  */
 
 use Garden\EventManager;
+use Vanilla\Events\LegacyDirtyRecordTrait;
+use Vanilla\Formatting\DateTimeFormatter;
 
 /**
  * Model base class.
@@ -19,6 +17,11 @@ use Garden\EventManager;
  * complicated procedures related to different tables.
  */
 class Gdn_Model extends Gdn_Pluggable {
+
+    use LegacyDirtyRecordTrait;
+
+    /** @var string[] These are text fields that extra values are collapsed into as JSON. */
+    private const COLLAPSEABLE_FIELDS = ['Attributes', 'Data'];
 
     /**  @var Gdn_DataSet An object representation of the current working dataset. */
     public $Data;
@@ -89,7 +92,6 @@ class Gdn_Model extends Gdn_Pluggable {
      */
     public $Validation;
 
-
     /**
      * Class constructor. Defines the related database table name.
      *
@@ -130,6 +132,24 @@ class Gdn_Model extends Gdn_Pluggable {
         $this->eventManager = Gdn::getContainer()->get(EventManager::class);
 
         parent::__construct();
+    }
+
+    /**
+     * Get the table name.
+     *
+     * @return string
+     */
+    public function getTableName(): string {
+        return $this->Name;
+    }
+
+    /**
+     * Get a clean SQL driver instance.
+     *
+     * @return \Gdn_SQLDriver
+     */
+    protected function createSql(): \Gdn_SQLDriver {
+        return $this->Database->createSql();
     }
 
     /**
@@ -183,7 +203,21 @@ class Gdn_Model extends Gdn_Pluggable {
     }
 
     /**
-     * Take all of the values that aren't in the schema and put them into the attributes column.
+     * Returns an array of fields that aren't part of the Schema & would be bundled up in the "Attributes" field.
+     *
+     * @param array $formPostValues
+     * @return array
+     */
+    protected function getAttributes(array $formPostValues): array {
+        $this->defineSchema();
+        $row = array_intersect_key($formPostValues, $this->Schema->fields());
+        return array_diff_key($formPostValues, $row);
+    }
+
+    /**
+     * Take every values that aren't in the schema and put them into the "Attributes" column.
+     * DISCLAIMER: This function is unaware of any pre-existing "Attributes" values at the record's level.
+     * If $data doesn't have any extra values from the schema, this function will return an empty array.
      *
      * @param array $data
      * @param string $name
@@ -243,6 +277,17 @@ class Gdn_Model extends Gdn_Pluggable {
                 $this->PrimaryKey = $this->PrimaryKey[0];
             }
 
+            // Since validation happens before collapsable fields are collapsed, remove the length validation on them.
+            foreach (self::COLLAPSEABLE_FIELDS as $collapsableField) {
+                $field = $this->Schema->getField($collapsableField);
+                if ($field) {
+                    // 10 years of code is expecting this be an "empty" string to represent a null/empty value.
+                    $field->Length = "";
+                    // This one is new and things are aware it can be null.
+                    unset($field->ByteLength);
+                }
+            }
+
             $this->Validation->setSchema($this->Schema);
         }
         return $this->Schema;
@@ -282,7 +327,7 @@ class Gdn_Model extends Gdn_Pluggable {
     }
 
     /**
-     *  Takes a set of form data ($Form->_PostValues), validates them, and
+     * Takes a set of form data ($Form->_PostValues), validates them, and
      * inserts or updates them to the datatabase.
      *
      * @param array $formPostValues An associative array of $Field => $Value pairs that represent data posted
@@ -323,7 +368,6 @@ class Gdn_Model extends Gdn_Pluggable {
     /**
      * Update a row in the database.
      *
-     * @since 2.1
      * @param int $rowID
      * @param array|string $property
      * @param mixed $value
@@ -337,6 +381,7 @@ class Gdn_Model extends Gdn_Pluggable {
         $set = array_intersect_key($property, $this->Schema->fields());
         self::serializeRow($set);
         $this->SQL->put($this->Name, $set, [$this->PrimaryKey => $rowID]);
+        $this->onUpdate();
     }
 
     /**
@@ -354,11 +399,10 @@ class Gdn_Model extends Gdn_Pluggable {
      * Serialize Attributes and Data columns in a row.
      *
      * @param array $row
-     * @since 2.1
      */
     public static function serializeRow(&$row) {
         foreach ($row as $name => &$value) {
-            if (is_array($value) && in_array($name, ['Attributes', 'Data'])) {
+            if (is_array($value) && in_array($name, self::COLLAPSEABLE_FIELDS)) {
                 $value = empty($value) ? null : dbencode($value);
             }
         }
@@ -432,7 +476,7 @@ class Gdn_Model extends Gdn_Pluggable {
             // Quote all of the fields.
             $quotedFields = [];
             foreach ($fields as $name => $value) {
-                if (is_array($value) && in_array($name, ['Attributes', 'Data'])) {
+                if (is_array($value) && in_array($name, self::COLLAPSEABLE_FIELDS)) {
                     $value = empty($value) ? null : dbencode($value);
                 }
 
@@ -440,17 +484,18 @@ class Gdn_Model extends Gdn_Pluggable {
             }
 
             $result = $this->SQL->insert($this->Name, $quotedFields);
+            $this->onUpdate();
         }
         return $result;
     }
 
 
     /**
-     *
+     * Update a record or records.
      *
      * @param array $fields
-     * @param array $where
-     * @param array $limit
+     * @param array|false $where
+     * @param int|false $limit
      * @return Gdn_Dataset
      */
     public function update($fields, $where = false, $limit = false) {
@@ -473,7 +518,7 @@ class Gdn_Model extends Gdn_Pluggable {
             // Quote all of the fields.
             $quotedFields = [];
             foreach ($fields as $name => $value) {
-                if (is_array($value) && in_array($name, ['Attributes', 'Data'])) {
+                if (is_array($value) && in_array($name, self::COLLAPSEABLE_FIELDS)) {
                     $value = empty($value) ? null : dbencode($value);
                 }
 
@@ -481,16 +526,16 @@ class Gdn_Model extends Gdn_Pluggable {
             }
 
             $result = $this->SQL->put($this->Name, $quotedFields, $where, $limit);
+            $this->onUpdate();
         }
         return $result;
     }
-
 
     /**
      * Delete records from a table.
      *
      * @param array|int $where The where clause to delete or an integer value.
-     * @param array|true $options An array of options to control the delete.
+     * @param array $options An array of options to control the delete.
      *
      *  - limit: A limit to the number of records to delete.
      *  - reset: Deprecated. Whether or not to reset this SQL statement after the delete. Defaults to false.
@@ -502,23 +547,16 @@ class Gdn_Model extends Gdn_Pluggable {
             $where = [$this->PrimaryKey => $where];
         }
 
-        $resetData = false;
-        if ($options === true || val('reset', $options)) {
-            deprecated('Gdn_Model->delete() with reset true');
-            $resetData = true;
-        } elseif (is_numeric($options)) {
+        if (is_numeric($options)) {
             deprecated('The $limit parameter is deprecated in Gdn_Model->delete(). Use the limit option.');
-            $limit = $options;
-        } else {
-            $options += ['rest' => true, 'limit' => null];
-            $limit = $options['limit'];
+            $options = ['limit' => $options];
+        } elseif (!is_array($options)) {
+            $options = [];
         }
+        $options += ['limit' => null];
 
-        if ($resetData) {
-            $result = $this->SQL->delete($this->Name, $where, $limit);
-        } else {
-            $result = $this->SQL->noReset()->delete($this->Name, $where, $limit);
-        }
+        $result = $this->SQL->delete($this->Name, $where, $options['limit']);
+        $this->onUpdate();
         return $result;
     }
 
@@ -603,18 +641,16 @@ class Gdn_Model extends Gdn_Pluggable {
     /**
      * Get the data from the model based on its primary key.
      *
-     * @param mixed $iD The value of the primary key in the database.
-     * @param string $datasetType The format of the result dataset.
+     * @param mixed $id The value of the primary key in the database.
+     * @param string|false $datasetType The format of the result dataset.
      * @param array $options options to pass to the database.
      * @return array|object
-     *
-     * @since 2.3 Added the $options parameter.
      */
-    public function getID($iD, $datasetType = false, $options = []) {
+    public function getID($id, $datasetType = false, $options = []) {
         $this->options($options);
-        $result = $this->getWhere([$this->PrimaryKey => $iD])->firstRow($datasetType);
+        $result = $this->getWhere([$this->PrimaryKey => $id])->firstRow($datasetType);
 
-        $fields = ['Attributes', 'Data'];
+        $fields = self::COLLAPSEABLE_FIELDS;
 
         foreach ($fields as $field) {
             if (is_array($result)) {
@@ -654,6 +690,40 @@ class Gdn_Model extends Gdn_Pluggable {
     public function getWhere($where = false, $orderFields = '', $orderDirection = 'asc', $limit = false, $offset = false) {
         $this->_beforeGet();
         return $this->SQL->getWhere($this->Name, $where, $orderFields, $orderDirection, $limit, $offset);
+    }
+
+    /**
+     * Iterator version of Gdn_Model::getWhere() where results are fetched in batches.
+     *
+     * @param array $where
+     * @param string $orderFields
+     * @param string $orderDirection
+     * @param bool $expand
+     * @param int $batchSize
+     * @return Generator<int, array>
+     */
+    public function getWhereIterator(
+        array $where = [],
+        string $orderFields = '',
+        string $orderDirection = '',
+        bool $expand = true,
+        int $batchSize = 100
+    ): Generator {
+        $offset = 0;
+        while (true) {
+            $results = $this->getWhere($where, $orderFields, $orderDirection, $batchSize, $offset, $expand)->resultArray();
+            foreach ($results as $result) {
+                $primaryKey = $result[$this->PrimaryKey];
+                yield $primaryKey => $result;
+            }
+
+            $offset += $batchSize;
+
+            if (count($results) < $batchSize) {
+                // We made it to the end.
+                return;
+            }
+        }
     }
 
     /**
@@ -763,7 +833,7 @@ class Gdn_Model extends Gdn_Pluggable {
         $this->defineSchema();
         if ($this->Schema->fieldExists($this->Name, $this->DateInserted)) {
             if (!isset($fields[$this->DateInserted])) {
-                $fields[$this->DateInserted] = Gdn_Format::toDateTime();
+                $fields[$this->DateInserted] =  DateTimeFormatter::getCurrentDateTime();
             }
         }
 
@@ -779,7 +849,6 @@ class Gdn_Model extends Gdn_Pluggable {
         }
     }
 
-
     /**
      * Adds $this->UpdateUserID and $this->DateUpdated fields to an associative
      * array of fieldname/values if those fields exist on the table being updated.
@@ -790,7 +859,7 @@ class Gdn_Model extends Gdn_Pluggable {
         $this->defineSchema();
         if ($this->Schema->fieldExists($this->Name, $this->DateUpdated)) {
             if (!isset($fields[$this->DateUpdated])) {
-                $fields[$this->DateUpdated] = Gdn_Format::toDateTime();
+                $fields[$this->DateUpdated] =  DateTimeFormatter::getCurrentDateTime();
             }
         }
 
@@ -812,7 +881,6 @@ class Gdn_Model extends Gdn_Pluggable {
      * @param string|array $key The key of the option.
      * @param mixed $value The value of the option or not specified just to get the current value.
      * @return mixed The value of the option or $this if $value is specified.
-     * @since 2.3
      */
     public function options($key, $value = null) {
         if (is_array($key)) {
@@ -871,11 +939,13 @@ class Gdn_Model extends Gdn_Pluggable {
         $values = dbencode(array_merge($values, $name));
 
         // Save the values back to the db
-        return $this->SQL
+        $result = $this->SQL
             ->from($this->Name)
             ->where($fieldName, $rowID)
             ->set($column, $values)
             ->put();
+        $this->onUpdate();
+        return $result;
     }
 
     /**
@@ -904,6 +974,7 @@ class Gdn_Model extends Gdn_Pluggable {
             ->set($property, $value)
             ->where($primaryKey, $rowID)
             ->put();
+        $this->onUpdate();
         return $value;
     }
 
@@ -1021,5 +1092,30 @@ class Gdn_Model extends Gdn_Pluggable {
         }
         $keyReleased = Gdn::cache()->remove($lockKey);
         return $keyReleased;
+    }
+
+    /**
+     * Get the approximate total row count of the model's table.
+     *
+     * @return int
+     */
+    public function getTotalRowCount(): int {
+        return $this->Database->getEstimatedRowCount($this->Name);
+    }
+
+    /**
+     * Called whenever a record is updated.
+     */
+    protected function onUpdate() {
+        $this->fireEvent('onUpdate');
+    }
+
+    /**
+     * Return a model.
+     *
+     * @return Gdn_Model
+     */
+    public function getLegacyModel(): \Gdn_Model {
+        return $this;
     }
 }

@@ -8,7 +8,9 @@
  * @since 2.0
  */
 
-use Vanilla\Models\ThemeModelHelper;
+use Vanilla\Scheduler\Job\JobStatusModel;
+use Vanilla\Theme\ThemeService;
+use Vanilla\Theme\ThemeServiceHelper;
 
 if (!defined('APPLICATION')) {
     exit();
@@ -38,7 +40,15 @@ $Construct
     ->primaryKey('RoleID')
     ->column('Name', 'varchar(100)')
     ->column('Description', 'varchar(500)', true)
-    ->column('Type', [RoleModel::TYPE_GUEST, RoleModel::TYPE_UNCONFIRMED, RoleModel::TYPE_APPLICANT, RoleModel::TYPE_MEMBER, RoleModel::TYPE_MODERATOR, RoleModel::TYPE_ADMINISTRATOR], true)
+    ->column('Type', [
+        RoleModel::TYPE_GUEST,
+        RoleModel::TYPE_UNCONFIRMED,
+        RoleModel::TYPE_APPLICANT,
+        RoleModel::TYPE_MEMBER,
+        RoleModel::TYPE_MODERATOR,
+        RoleModel::TYPE_ADMINISTRATOR
+    ], true)
+    ->column('Sync', 'varchar(20)', '')
     ->column('Sort', 'int', true)
     ->column('Deletable', 'tinyint(1)', '1')
     ->column('CanSession', 'tinyint(1)', '1')
@@ -104,7 +114,7 @@ $Construct
     ->column('Confirmed', 'tinyint(1)', '1')// 1 means email confirmed, otherwise not confirmed
     ->column('Verified', 'tinyint(1)', '0')// 1 means verified (non spammer), otherwise not verified
     ->column('Banned', 'tinyint(1)', '0')// 1 means banned, otherwise not banned
-    ->column('Deleted', 'tinyint(1)', '0')
+    ->column('Deleted', 'tinyint(1)', '0', 'index')
     ->column('Points', 'int', 0)
     ->set($Explicit, $Drop);
 
@@ -229,11 +239,60 @@ if (!$UserRoleExists) {
     }
 }
 
+$Construct
+    ->table('roleRequestMeta')
+    ->column('roleID', 'int', false, 'primary')
+    ->column('type', ['application', 'invitation'], false, 'primary')
+    ->column('name', 'varchar(150)')
+    ->column('body', 'mediumtext')
+    ->column('format', 'varchar(10)')
+    ->column('attributesSchema', 'text')
+    ->column('attributes', 'json', true)
+
+    ->column('dateInserted', 'datetime')
+    ->column('insertUserID', 'int')
+    ->column('insertIPAddress', 'ipaddress', true)
+    ->column('dateUpdated', 'datetime', true)
+    ->column('updateUserID', 'int', true)
+    ->column('updateIPAddress', 'ipaddress', true)
+    ->set($Explicit, $Drop);
+
+$Construct
+    ->table('roleRequest')
+    ->primaryKey('roleRequestID')
+    ->column('type', ['application', 'invitation'])
+    ->column('roleID', 'int', false, ['unique'])
+    ->column('userID', 'int', false, ['unique', 'key'])
+
+    ->column('status', ['pending', 'approved', 'denied'])
+    ->column('dateOfStatus', 'datetime')
+    ->column('statusUserID', 'int')
+    ->column('statusIPAddress', 'ipaddress', true)
+    ->column('dateExpires', 'datetime', true)
+    ->column('attributes', 'json', true)
+
+    ->column('dateInserted', 'datetime')
+    ->column('insertUserID', 'int')
+    ->column('insertIPAddress', 'ipaddress', true)
+    ->column('dateUpdated', 'datetime', true)
+    ->column('updateUserID', 'int', true)
+    ->column('updateIPAddress', 'ipaddress', true)
+
+    ->set($Explicit, $Drop);
+
 // User Meta Table
 $Construct->table('UserMeta')
     ->column('UserID', 'int', false, 'primary')
     ->column('Name', 'varchar(100)', false, ['primary', 'index'])
     ->column('Value', 'text', true)
+    ->set($Explicit, $Drop);
+
+// Similar to the user meta table, but without the need to cache the entire dataset.
+$Construct
+    ->table('userAttributes')
+    ->column('userID', 'int', false, 'primary')
+    ->column('key', 'varchar(100)', false, ['primary', 'index'])
+    ->column('attributes', 'json', true)
     ->set($Explicit, $Drop);
 
 // User Points Table
@@ -253,8 +312,24 @@ $Construct->table('UserAuthentication')
     ->column('UserID', 'int', false, 'key')
     ->set($Explicit, $Drop);
 
-$Construct->table('UserAuthenticationProvider')
-    ->column('AuthenticationKey', 'varchar(64)', false, 'primary')
+$Construct->table('UserAuthenticationProvider');
+
+if ($Construct->tableExists("UserAuthenticationProvider") && !$Construct->columnExists("UserAuthenticationProviderID")) {
+    $userAuthenticationProvider = $SQL->prefixTable("UserAuthenticationProvider");
+    $addAuthenticationProviderID = <<<SQL
+alter table {$userAuthenticationProvider}
+drop primary key,
+add `UserAuthenticationProviderID` int not null auto_increment primary key first
+SQL;
+
+    $Construct->executeQuery($addAuthenticationProviderID);
+    $Construct->reset();
+}
+
+$Construct
+    ->table('UserAuthenticationProvider')
+    ->primaryKey('UserAuthenticationProviderID')
+    ->column('AuthenticationKey', 'varchar(64)', false, 'unique')
     ->column('AuthenticationSchemeAlias', 'varchar(32)', false)
     ->column('Name', 'varchar(50)', true)
     ->column('URL', 'varchar(255)', true)
@@ -269,6 +344,7 @@ $Construct->table('UserAuthenticationProvider')
     ->column('Attributes', 'text', true)
     ->column('Active', 'tinyint', '1')
     ->column('IsDefault', 'tinyint', 0)
+    ->column('Visible', 'tinyint', 1)
     ->set($Explicit, $Drop);
 
 $Construct->table('UserAuthenticationNonce')
@@ -321,7 +397,6 @@ if (c('Garden.SSO.SynchRoles')) {
     );
 }
 
-
 $Construct->table('Session');
 
 $transientKeyExists = $Construct->columnExists('TransientKey');
@@ -354,6 +429,7 @@ $Construct->table('AnalyticsLocal')
 
 $uploadPermission = 'Garden.Uploads.Add';
 $uploadPermissionExists = $Construct->table('Permission')->columnExists($uploadPermission);
+$oldUploadPermission = 'Plugins.Attachments.Upload.Allow';
 
 // Only Create the permission table if we are using Garden's permission model.
 $PermissionModel = Gdn::permissionModel();
@@ -388,6 +464,7 @@ $PermissionModel->define([
     'Garden.Activity.View' => 1,
     'Garden.Profiles.View' => 1,
     'Garden.Profiles.Edit' => 'Garden.SignIn.Allow',
+    'Garden.ProfilePicture.Edit' => 'Garden.Profiles.Edit',
     'Garden.Curation.Manage' => 'Garden.Moderation.Manage',
     'Garden.Moderation.Manage',
     'Garden.PersonalInfo.View' => 'Garden.Moderation.Manage',
@@ -423,6 +500,22 @@ if ($uploadPermissionExists === false) {
             }
         }
     }
+}
+
+if ($Construct->table('Permission')->columnExists($oldUploadPermission) &&
+    $Construct->table('Permission')->columnExists($uploadPermission)) {
+    // We aren't using the old upload permission anymore and should just rely on the new one.
+    // We'll migrate the old permission values to the new permission values to preserve the settings.
+    // That means if a role currently has one permission and not the other, the permission value may
+    // change.
+
+    $SQL->update("Permission")
+        ->set("`".$uploadPermission."`", 1)
+        ->where("`".$uploadPermission."`", 0)
+        ->where("`".$oldUploadPermission."`", 1)
+        ->put();
+
+    $Construct->table('Permission')->dropColumn($oldUploadPermission);
 }
 
 // Invitation Table
@@ -549,7 +642,7 @@ $Construct
     ->table('ActivityComment')
     ->primaryKey('ActivityCommentID')
     ->column('ActivityID', 'int', false, 'key')
-    ->column('Body', 'text')
+    ->column('Body', 'mediumtext')
     ->column('Format', 'varchar(20)')
     ->column('InsertUserID', 'int')
     ->column('DateInserted', 'datetime')
@@ -616,6 +709,11 @@ if ($SQL->getWhere('ActivityType', ['Name' => 'Applicant'])->numRows() == 0) {
     $SQL->insert('ActivityType', ['AllowComments' => '0', 'Name' => 'Applicant', 'FullHeadline' => '%1$s applied for membership.', 'ProfileHeadline' => '%1$s applied for membership.', 'Notify' => '1', 'Public' => '0']);
 }
 
+// roleRequest activity
+if ($SQL->getWhere('ActivityType', ['Name' => 'roleRequest'])->numRows() == 0) {
+    $SQL->insert('ActivityType', ['AllowComments' => '0', 'Name' => 'roleRequest', 'Notify' => '1', 'Public' => '0']);
+}
+
 $WallPostType = $SQL->getWhere('ActivityType', ['Name' => 'WallPost'])->firstRow(DATASET_TYPE_ARRAY);
 if (!$WallPostType) {
     $WallPostTypeID = $SQL->insert('ActivityType', ['AllowComments' => '1', 'ShowIcon' => '1', 'Name' => 'WallPost', 'FullHeadline' => '%3$s wrote on %2$s %5$s.', 'ProfileHeadline' => '%3$s wrote:']);
@@ -637,22 +735,9 @@ $ActivityModel->defineType('Registration');
 $ActivityModel->defineType('Status');
 $ActivityModel->defineType('Ban');
 
-// Message Table
-$Construct->table('Message')
-    ->primaryKey('MessageID')
-    ->column('Content', 'text')
-    ->column('Format', 'varchar(20)', true)
-    ->column('AllowDismiss', 'tinyint(1)', '1')
-    ->column('Enabled', 'tinyint(1)', '1')
-    ->column('Application', 'varchar(255)', true)
-    ->column('Controller', 'varchar(255)', true)
-    ->column('Method', 'varchar(255)', true)
-    ->column('CategoryID', 'int', true)
-    ->column('IncludeSubcategories', 'tinyint', '0')
-    ->column('AssetTarget', 'varchar(20)', true)
-    ->column('CssClass', 'varchar(20)', true)
-    ->column('Sort', 'int', true)
-    ->set($Explicit, $Drop);
+
+$modMessageStructure = new \Vanilla\Dashboard\Models\ModerationMessageStructure($Database);
+$modMessageStructure->structure();
 
 $Prefix = $SQL->Database->DatabasePrefix;
 
@@ -754,6 +839,9 @@ if ($Construct->columnExists('Plugins.Tagging.Add')) {
     $PermissionModel->define(['Vanilla.Tagging.Add' => 'Garden.Profiles.Edit']);
 }
 
+// Job status table.
+JobStatusModel::structure($Construct);
+
 $Construct->table('Log')
     ->primaryKey('LogID')
     ->column('Operation', ['Delete', 'Edit', 'Spam', 'Moderate', 'Pending', 'Ban', 'Error'], false, 'index')
@@ -793,7 +881,7 @@ $Construct->table('Regarding')
 
 $Construct->table('Ban')
     ->primaryKey('BanID')
-    ->column('BanType', ['IPAddress', 'Name', 'Email'], false, 'unique')
+    ->column('BanType', ['IPAddress', 'Name', 'Email', 'Fingerprint'], false, 'unique')
     ->column('BanValue', 'varchar(50)', false, 'unique')
     ->column('Notes', 'varchar(255)', null)
     ->column('CountUsers', 'uint', 0)
@@ -918,6 +1006,20 @@ $Construct
     ->column("insertUserID", "int", false, ["index"])
     ->column("dateInserted", "datetime")
     ->set($Explicit, $Drop);
+
+$Construct
+    ->table("remoteResource")
+    ->primaryKey("remoteResourceID")
+    ->column("url", "varchar(255)", false, ["index", "unique"])
+    ->column("content", "mediumtext", true)
+    ->column("lastError", "text", true)
+    ->column("dateInserted", "datetime")
+    ->column("dateUpdated", "datetime", false, ["index"])
+    ->set($Explicit, $Drop);
+
+\Vanilla\Dashboard\Models\RecordStatusModel::structure($Database);
+\Vanilla\Layout\LayoutModel::structure($Database, $Explicit, $Drop);
+\Vanilla\Layout\LayoutViewModel::structure($Database, $Explicit, $Drop);
 
 // If the AllIPAddresses column exists, attempt to migrate legacy IP data to the UserIP table.
 if (!$captureOnly && $AllIPAddressesExists) {
@@ -1048,7 +1150,15 @@ if (Gdn::config()->get("Robots.Rules") === false && $sitemapsRobotsRules = Gdn::
 // Save current theme value into the visible themes. This way existing sites will continue to see them even if they get hidden.
 
 /**
- * @var ThemeModelHelper $themeHelper
+ * @var ThemeServiceHelper $themeHelper
  */
-$themeHelper = Gdn::getContainer()->get(ThemeModelHelper::class);
+$themeHelper = Gdn::getContainer()->get(ThemeServiceHelper::class);
 $themeHelper->saveCurrentThemeToVisible();
+
+
+// Clear out the theme cache in case any file based themes were updated.
+$themeService = Gdn::getContainer()->get(ThemeService::class);
+$themeService->invalidateCache();
+
+// Ensure we have a secret setup in the site context.
+Gdn::config()->touch("Context.Secret", betterRandomString(32, "Aa0"));

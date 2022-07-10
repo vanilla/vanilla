@@ -10,7 +10,14 @@ namespace Vanilla\Web;
 /**
  * Page class that only require a title. Useful for when the page doesn't need SEO and content is rendered in JS.
  */
-class SimpleTitlePage extends Page {
+class SimpleTitlePage extends ThemedPage {
+
+    /**
+     * @return string
+     */
+    public function getAssetSection(): string {
+        return "forum";
+    }
 
     /**
      * @inheritdoc

@@ -1,0 +1,45 @@
+openapi: 3.0.2
+info:
+    description: API access to your community.
+    title: Vanilla API
+    version: "2.0"
+servers:
+    - url: /api/v2
+paths:
+    /calls/run:
+        post:
+            summary: Continue running a callbackPayload from a previous API call.
+            description: |
+                Various endoints may return a 202 status response with
+                `callbackPayload` property in the body. Simply pass that
+                response to this endpoint to continue processing.
+
+                Endpoints with responses like this are structured as follows:
+                1. Call other endpoint.
+                2. Endpoint may return 202 with "callbackPayload" and progress.
+                3. Pass the callback payload to this endpoint.
+                4. This endpoint may return a 202 with another `callbackPayload`
+                5. Repeat until task is complete.
+            tags:
+                - Calls
+            requestBody:
+                required: true
+                description: |
+                    A secured JWT token containing:
+                    - The original request userID.
+                    - Instructions for the server on how to resume the original task.
+                    - Context about the result of previous attempts.
+
+                    The only way to get one of these payloads is to have it returned
+                    from an /api/v2 endpoint as a `callbackPayload`.
+                content:
+                    application/system+jwt:
+                        schema:
+                            type: string
+                            example: |
+                                eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+            responses:
+                200:
+                    $ref: "./responses.yml#/components/responses/LongRunnerResponse"
+                408:
+                    $ref: "./responses.yml#/components/responses/LongRunnerResponse"

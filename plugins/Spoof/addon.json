@@ -1,0 +1,19 @@
+{
+    "name": "Spoof",
+    "description": "Administrators may \"spoof\" other users, meaning they temporarily sign in as that user. Helpful for debugging permission problems.",
+    "version": "1.3",
+    "icon": "spoof.png",
+    "key": "spoof",
+    "type": "addon",
+    "license": "GPL-2.0-only",
+    "authors": [
+        {
+            "name": "Mark O'Sullivan",
+            "email": "mark@vanillaforums.com",
+            "homepage": "http://vanillaforums.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.5"
+    }
+}

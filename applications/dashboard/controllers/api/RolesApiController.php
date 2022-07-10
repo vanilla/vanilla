@@ -5,6 +5,7 @@
  */
 
 use Garden\Schema\Schema;
+use Garden\Schema\ValidationField;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
@@ -22,14 +23,13 @@ class RolesApiController extends AbstractApiController {
     /** Maximum number of permission rows that can be displayed before an error is reported. */
     const MAX_PERMISSIONS = 100;
 
-    /** @var CategoryModel */
+    const ERROR_PERMISSION_PATCH =  'Body must be formatted as follows : [{"type", "id", "permissions"}, {"type", "id", "permissions"}, ...]';
+
+/** @var CategoryModel */
     private $categoryModel;
 
     /** @var PermissionModel */
     private $permissionModel;
-
-    /** @var bool Have all permissions been loaded into $renamedPermissions? */
-    private $permissionsLoaded = false;
 
     /** @var RoleModel */
     private $roleModel;
@@ -149,6 +149,19 @@ class RolesApiController extends AbstractApiController {
     }
 
     /**
+     * Get a roles schema with minimal fields.
+     *
+     * @return Schema Returns a schema object.
+     */
+    public function minimalRolesSchema() {
+        return $this->schema(Schema::parse([
+            'roleID:i',
+            'name:s',
+            'description:s|n',
+        ])->add($this->fullSchema()), 'minimalRanksSchema');
+    }
+
+    /**
      * Get a single role.
      *
      * @param int $id The ID of the role.
@@ -254,20 +267,28 @@ class RolesApiController extends AbstractApiController {
      * @return array
      */
     public function index(array $query) {
-        $this->permission('Garden.Settings.Manage');
+        $session = $this->getSession();
+        $showFullSchema = false;
+        $canViewPersonalInfo = $session->checkPermission('Garden.PersonalInfo.View');
+        if ($session->checkPermission('Garden.Settings.Manage')) {
+            $showFullSchema = true;
+        }
 
         $in = $this->schema([
             'expand?' => ApiUtils::getExpandDefinition(['permissions'])
         ], 'in')->setDescription('List roles.');
-        $out = $this->schema([':a' => $this->roleSchema()], 'out');
+        $out = $showFullSchema ? $this->schema([':a' => $this->roleSchema()], 'out') :
+            $this->schema([':a' => $this->minimalRolesSchema()], 'out');
 
         $query = $in->validate($query);
 
         $rows = $this->roleModel->getWithRankPermissions()->resultArray();
+        $rows = $canViewPersonalInfo ? $rows : array_filter($rows, 'RoleModel::filterPersonalInfo');
         foreach ($rows as &$row) {
             $row = $this->normalizeOutput($row, $query['expand']);
         }
 
+        $rows = array_values($rows);
         $result = $out->validate($rows);
         return $result;
     }
@@ -276,18 +297,14 @@ class RolesApiController extends AbstractApiController {
      * Fill the $renamedPermissions property with all known permissions.
      */
     private function loadAllPermissions() {
-        if ($this->permissionsLoaded !== true) {
-            $permissions = array_keys($this->permissionModel->permissionColumns());
-            unset($permissions[array_search('PermissionID', $permissions)]);
+        $permissions = array_keys($this->permissionModel->permissionColumns());
+        unset($permissions[array_search('PermissionID', $permissions)]);
 
-            foreach ($permissions as $permission) {
-                if (!in_array($permissions, $this->deprecatedPermissions)) {
-                    // This function will cache a copy of the renamed permission in the property.
-                    $this->renamePermission($permission);
-                }
+        foreach ($permissions as $permission) {
+            if (!in_array($permissions, $this->deprecatedPermissions)) {
+                // This function will cache a copy of the renamed permission in the property.
+                $this->renamePermission($permission);
             }
-
-            $this->permissionsLoaded = true;
         }
     }
 
@@ -361,8 +378,14 @@ class RolesApiController extends AbstractApiController {
     public function patch_permissions($id, array $body) {
         $this->permission('Garden.Settings.Manage');
 
-        $in = $this->schema([':a', $this->getPermissionFragment()], 'in')->setDescription('Update permissions on a role');
-        $out = $this->schema([':a', $this->getPermissionFragment()], 'out');
+        $in = $this->schema([':a' => $this->getPermissionFragment()])
+            ->setDescription('Update permissions on a role')
+            ->addValidator('', function ($data, ValidationField $field) {
+                if (empty($data)) {
+                    $field->addError('Validation Failed', ['messageCode' => self::ERROR_PERMISSION_PATCH, 'code' => 403]);
+                }
+            });
+        $out = $this->schema([':a' => $this->getPermissionFragment()], 'out');
 
         $this->roleByID($id);
 
@@ -419,8 +442,14 @@ class RolesApiController extends AbstractApiController {
     public function put_permissions($id, array $body) {
         $this->permission('Garden.Settings.Manage');
 
-        $in = $this->schema([':a', $this->getPermissionFragment()], 'in')->setDescription('Overwrite all permissions for a role.');
-        $out = $this->schema([':a', $this->getPermissionFragment()], 'out');
+        $in = $this->schema([':a' => $this->getPermissionFragment()])
+            ->setDescription('Update permissions on a role')
+            ->addValidator('', function ($data, ValidationField $field) {
+                if (empty($data)) {
+                    $field->addError('Validation Failed', ['messageCode' => self::ERROR_PERMISSION_PATCH, 'code' => 403]);
+                }
+            });
+        $out = $this->schema([':a' => $this->getPermissionFragment()], 'out');
 
         $this->roleByID($id);
 

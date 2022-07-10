@@ -1,0 +1,32 @@
+div.Popup {
+    .Button:not(.GroupOptionsTitle),
+    .Buttons .btn-primary.Close,
+    #Form_Cancel {
+        @include Button(
+                        $global-color_white,
+                        $global-color_primary,
+                        $global-color_primary,
+                        $global-color_primary,
+                        $global-color_white,
+                        $global-color_primary
+        );
+    }
+
+    #Form_OK,
+    .Buttons .Button.Primary,
+    .Buttons .btn-primary,
+    .Button-Controls .Button.Primary,
+    .BigButton:not(.Danger),
+    .NewConversation.NewConversation,
+    .groupToolbar .Button.Primary,
+    .BoxButtons .Button.Primary {
+        @include Button(
+                        $global-color_primary,
+                        $global-color_white,
+                        $global-color_primary,
+                        $global-color_primaryAlt,
+                        $global-color_white,
+                        $global-color_primaryAlt
+        );
+    }
+}

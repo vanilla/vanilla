@@ -5,7 +5,7 @@
  * @license GPL-2.0-only
  */
 
-namespace VanillaTests\Library\Theme;
+namespace VanillaTests\Library\Vanilla\Theme;
 
 use Vanilla\Theme\ThemeFeatures;
 use VanillaTests\Fixtures\MockAddon;
@@ -26,7 +26,6 @@ class ThemeFeaturesTest extends MinimalContainerTestCase {
         $this->assertTrue($features->useSharedMasterView());
         $this->assertTrue($features->useNewFlyouts());
         $this->assertTrue($features->useProfileHeader());
-        $this->assertTrue($features->disableKludgedVars());
     }
 
     /**
@@ -39,7 +38,17 @@ class ThemeFeaturesTest extends MinimalContainerTestCase {
         $this->assertTrue($features->useSharedMasterView());
         $this->assertTrue($features->useNewFlyouts());
         $this->assertFalse($features->useProfileHeader());
-        $this->assertFalse($features->disableKludgedVars());
+    }
+
+    /**
+     * Test that data driven themes can opt out of features.
+     */
+    public function testOverrideDataDrivenDefaults() {
+        $addon = new MockAddon('test', ['Features' => ['DataDrivenTheme' => true, 'NewQuickLinks' => false]]);
+        $features = new ThemeFeatures($this->getConfig(), $addon);
+        $this->assertTrue($features->useDataDrivenTheme());
+        $this->assertTrue($features->useSharedMasterView());
+        $this->assertFalse($features->useNewQuickLinks());
     }
 
     /**
@@ -54,6 +63,5 @@ class ThemeFeaturesTest extends MinimalContainerTestCase {
         $this->assertTrue($features->useSharedMasterView());
         $this->assertFalse($features->useNewFlyouts());
         $this->assertFalse($features->useProfileHeader());
-        $this->assertFalse($features->disableKludgedVars());
     }
 }

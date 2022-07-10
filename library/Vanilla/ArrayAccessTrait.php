@@ -19,7 +19,7 @@ trait ArrayAccessTrait {
      * Returns the source from which ArrayAccess will be based on.
      * @return array|object
      */
-    protected abstract function getArrayAccessSource();
+    abstract protected function & getArrayAccessSource();
 
     /**
      * Whether an offset exists.
@@ -55,7 +55,7 @@ trait ArrayAccessTrait {
      * @link http://php.net/manual/en/arrayaccess.offsetset.php
      */
     public function offsetSet($offset, $value) {
-        $source = $this->getArrayAccessSource();
+        $source = &$this->getArrayAccessSource();
         if (is_array($source)) {
             $source[$offset] = $value;
         } else {

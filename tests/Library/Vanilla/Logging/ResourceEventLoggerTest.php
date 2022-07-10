@@ -83,12 +83,39 @@ class ResourceEventLoggerTest extends TestCase {
 
         $expected = [
             "info",
-            "{username} updated {resourceType}",
+            "Comment updated.",
             [
+                Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
                 "event" => $event->getType() . "_" . $event->getAction(),
-                "payload" => $payload,
+                "comment" => $payload['comment'],
                 "resourceAction" => $event->getAction(),
                 "resourceType" => $event->getType(),
+            ]
+        ];
+
+        $this->eventLogger->logResourceEvent($event);
+        $this->assertLogEventEqual($expected, $this->logger->last);
+    }
+
+    /**
+     * Verify basic ability to log resource events.
+     */
+    public function testBasicLogWithSender(): void {
+        $action = ResourceEvent::ACTION_UPDATE;
+        $payload = ["comment" => []];
+        $event = new CommentEvent($action, $payload, ['userID' => 123, 'name' => 'foo']);
+
+        $expected = [
+            "info",
+            "Comment updated by {username}.",
+            [
+                Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
+                "event" => $event->getType() . "_" . $event->getAction(),
+                "comment" => $payload['comment'],
+                "resourceAction" => $event->getAction(),
+                "resourceType" => $event->getType(),
+                Logger::FIELD_USERID => 123,
+                Logger::FIELD_USERNAME => 'foo'
             ]
         ];
 
@@ -132,6 +159,8 @@ class ResourceEventLoggerTest extends TestCase {
      * @param array $actual
      */
     private function assertLogEventEqual(array $expected, array $actual) {
-        $this->assertEqualsCanonicalizing($expected, $actual);
+        $this->assertSame($expected[0], $actual[0], "Log levels not the same.");
+        $this->assertSame($expected[1], $actual[1], "Log messages are not the same.");
+        $this->assertEquals($expected[2], $actual[2], "Log contexts are not the same.");
     }
 }

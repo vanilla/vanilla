@@ -10,12 +10,13 @@
 
 use Garden\Container\Container;
 use Garden\Container\Reference;
-use Vanilla\Models\ThemeSectionModel;
+use Vanilla\DiscussionTypeHandler;
+use Vanilla\Theme\ThemeSectionModel;
 
 /**
  * Vanilla's event handlers.
  */
-class VanillaHooks implements Gdn_IPlugin {
+class VanillaHooks extends Gdn_Plugin {
 
     /**
      * Handle the container init event to register things with the container.
@@ -25,13 +26,24 @@ class VanillaHooks implements Gdn_IPlugin {
     public function container_init(Container $dic) {
         $dic->rule(\Vanilla\Navigation\BreadcrumbModel::class)
             ->addCall('addProvider', [new Reference(\Vanilla\Forum\Navigation\ForumBreadcrumbProvider::class)])
-        ;
-        $dic->rule(\Vanilla\Menu\CounterModel::class)
+
+            ->rule(\Vanilla\Menu\CounterModel::class)
             ->addCall('addProvider', [new Reference(\Vanilla\Forum\Menu\UserCounterProvider::class)])
+
+            ->rule(ThemeSectionModel::class)
+            ->addCall('registerLegacySection', [t('Forum')])
+
+            ->rule(\Vanilla\DiscussionTypeConverter::class)
+            ->addCall('addTypeHandler', [new Reference(DiscussionTypeHandler::class)])
+
+            ->rule(PermissionModel::class)
+            ->addCall('addJunctionModel', ['Category', new Reference(CategoryModel::class)])
         ;
 
-        $dic->rule(ThemeSectionModel::class)
-            ->addCall('registerLegacySection', [t('Forum')]);
+        $mf = \Vanilla\Models\ModelFactory::fromContainer($dic);
+        $mf->addModel('category', CategoryModel::class, 'cat');
+        $mf->addModel('discussion', DiscussionModel::class, 'd');
+        $mf->addModel('comment', CommentModel::class, 'c');
     }
 
     /**
@@ -81,7 +93,16 @@ class VanillaHooks implements Gdn_IPlugin {
     public function dbaController_countJobs_handler($sender) {
         $counts = [
             'Discussion' => ['CountComments', 'FirstCommentID', 'LastCommentID', 'DateLastComment', 'LastCommentUserID'],
-            'Category' => ['CountDiscussions', 'CountAllDiscussions', 'CountComments', 'CountAllComments', 'LastDiscussionID', 'LastCommentID', 'LastDateInserted'],
+            'Category' => [
+                'CountChildCategories',
+                'CountDiscussions',
+                'CountAllDiscussions',
+                'CountComments',
+                'CountAllComments',
+                'LastDiscussionID',
+                'LastCommentID',
+                'LastDateInserted'
+            ],
             'Tag' => ['CountDiscussions'],
         ];
 
@@ -105,6 +126,12 @@ class VanillaHooks implements Gdn_IPlugin {
      */
     public function deleteUserData($userID, $options = [], &$data = null) {
         $sql = Gdn::sql();
+
+        $deleteMethod = $options['DeleteMethod'] ?? false;
+        $isMethodKeep = $deleteMethod && $deleteMethod === 'keep';
+        if (!$isMethodKeep) {
+            Gdn::userModel()->getDelete('UserPoints', ['UserID' => $userID], $data);
+        }
 
         // Remove discussion watch records and drafts.
         $sql->delete('UserDiscussion', ['UserID' => $userID]);
@@ -279,6 +306,7 @@ class VanillaHooks implements Gdn_IPlugin {
             // Break apart our tags and lowercase them all for comparisons.
             $tags = TagModel::splitTags($tagsString);
             $tags = array_map('strtolower', $tags);
+            /** @psalm-suppress EmptyArrayAccess $reservedTags */
             $reservedTags = array_map('strtolower', $reservedTags);
             $maxTags = c('Vanilla.Tagging.Max', 5);
 
@@ -288,7 +316,7 @@ class VanillaHooks implements Gdn_IPlugin {
                 $sender->Validation->addValidationResult('Tags', '@'.sprintf(t('These tags are reserved and cannot be used: %s'), $names));
             }
             if (!TagModel::validateTags($tags)) {
-                $sender->Validation->addValidationResult('Tags', '@'.t('ValidateTag', 'Tags cannot contain commas.'));
+                $sender->Validation->addValidationResult('Tags', '@'.t('ValidateTag', 'Tags cannot contain commas or underscores.'));
             }
             if (count($tags) > $maxTags) {
                 $sender->Validation->addValidationResult('Tags', '@'.sprintf(t('You can only specify up to %s tags.'), $maxTags));
@@ -306,7 +334,14 @@ class VanillaHooks implements Gdn_IPlugin {
         $discussionID = val('DiscussionID', $sender->EventArguments, 0);
         $categoryID = valr('Fields.CategoryID', $sender->EventArguments, 0);
         $rawFormTags = val('Tags', $formPostValues, '');
+        $newDiscussion = $formPostValues['IsNewDiscussion'] ?? false;
         $formTags = TagModel::splitTags($rawFormTags);
+
+        // Don't change tags if there's no "Tags" field (this prevents tags from being lost when moving discussion to
+        // a new category).
+        if (!isset($formPostValues['Tags']) && !$newDiscussion) {
+            return;
+        }
 
         // If we're associating with categories
         $categorySearch = c('Vanilla.Tagging.CategorySearch', false);
@@ -389,7 +424,7 @@ class VanillaHooks implements Gdn_IPlugin {
                 // The tags should be set on the data.
                 $tags = array_column($Sender->data('Tags', []), 'FullName', 'TagID');
                 $xtags = $Sender->data('XTags', []);
-                foreach (TagModel::instance()->defaultTypes() as $key => $row) {
+                foreach (TagModel::instance()->getAllowedTagTypes() as $key) {
                     if (isset($xtags[$key])) {
                         $xtags2 = array_column($xtags[$key], 'FullName', 'TagID');
                         foreach ($xtags2 as $id => $name) {
@@ -613,7 +648,6 @@ class VanillaHooks implements Gdn_IPlugin {
         $options = val('Options', $sender->EventArguments, []);
         $options = is_array($options) ? $options : [];
         $content = &$sender->EventArguments['Content'];
-
         $this->deleteUserData($userID, $options, $content);
     }
 
@@ -795,64 +829,6 @@ class VanillaHooks implements Gdn_IPlugin {
         $sender->Preferences['Notifications']['Popup.BookmarkComment'] = t('Notify me when people comment on my bookmarked discussions.');
         $sender->Preferences['Notifications']['Popup.Mention'] = t('Notify me when people mention me.');
         $sender->Preferences['Notifications']['Popup.ParticipateComment'] = t('Notify me when people comment on discussions I\'ve participated in.');
-
-        if (Gdn::session()->checkPermission('Garden.AdvancedNotifications.Allow')) {
-            $postBack = $sender->Form->authenticatedPostBack();
-            $set = [];
-
-            // Add the category definitions to for the view to pick up.
-            $doHeadings = c('Vanilla.Categories.DoHeadings');
-            // Grab all of the categories.
-            $categories = [];
-            $prefixes = ['Email.NewDiscussion', 'Popup.NewDiscussion', 'Email.NewComment', 'Popup.NewComment'];
-            foreach (CategoryModel::categories() as $category) {
-                if (!$category['PermsDiscussionsView'] || $category['Depth'] <= 0 || $category['Depth'] > 2 || $category['Archived']) {
-                    continue;
-                }
-
-                $category['Heading'] = ($doHeadings && $category['Depth'] <= 1);
-                $categories[] = $category;
-
-                if ($postBack) {
-                    foreach ($prefixes as $prefix) {
-                        $fieldName = "$prefix.{$category['CategoryID']}";
-                        $value = $sender->Form->getFormValue($fieldName, null);
-                        if (!$value) {
-                            $value = null;
-                        }
-                        $set[$fieldName] = $value;
-                    }
-                }
-            }
-            $sender->setData('CategoryNotifications', $categories);
-            if ($postBack) {
-                UserModel::setMeta($sender->User->UserID, $set, 'Preferences.');
-            }
-        }
-    }
-
-    /**
-     * Add the advanced notifications view to profiles.
-     *
-     * @param ProfileController $Sender
-     */
-    public function profileController_customNotificationPreferences_handler($Sender) {
-        if (Gdn::session()->checkPermission('Garden.AdvancedNotifications.Allow')) {
-            include $Sender->fetchViewLocation('notificationpreferences', 'vanillasettings', 'vanilla');
-        }
-    }
-
-    /**
-     * Add the discussion search to the search.
-     *
-     * @since 2.0.0
-     * @package Vanilla
-     *
-     * @param object $sender SearchModel
-     */
-    public function searchModel_search_handler($sender) {
-        $searchModel = new VanillaSearchModel();
-        $searchModel->search($sender);
     }
 
     /**
@@ -919,7 +895,8 @@ class VanillaHooks implements Gdn_IPlugin {
         [$offset, $limit] = offsetLimit($page, $pageSize);
 
         $commentModel = new CommentModel();
-        $comments = $commentModel->getByUser2($sender->User->UserID, $limit, $offset, $sender->Request->get('lid'));
+        /** @var Gdn_DataSet $comments */
+        $comments = $commentModel->getByUser2($sender->User->UserID, $limit, $offset, $sender->Request->get('lid'), null, 'desc', 'PermsDiscussionsView');
         $totalRecords = $offset + $commentModel->LastCommentCount + 1;
 
         // Build a pager
@@ -980,7 +957,7 @@ class VanillaHooks implements Gdn_IPlugin {
         [$offset, $limit] = offsetLimit($page, c('Vanilla.Discussions.PerPage', 30));
 
         $discussionModel = new DiscussionModel();
-        $discussions = $discussionModel->getByUser($sender->User->UserID, $limit, $offset, false, Gdn::session()->UserID);
+        $discussions = $discussionModel->getByUser($sender->User->UserID, $limit, $offset, false, Gdn::session()->UserID, 'PermsDiscussionsView');
         $countDiscussions = $offset + $discussionModel->LastDiscussionCount + 1;
 
         $sender->setData('UnfilteredDiscussionsCount', $discussionModel->LastDiscussionCount);
@@ -1094,7 +1071,7 @@ class VanillaHooks implements Gdn_IPlugin {
             ->addLinkIf('Garden.Settings.Manage', t('Posting'), '/vanilla/settings/posting', 'forum.posting', 'nav-forum-posting', $sort)
             ->addLinkIf(c('Vanilla.Archive.Date', false) &&  Gdn::session()->checkPermission('Garden.Settings.Manage'), t('Archive Discussions'), '/vanilla/settings/archive', 'forum.archive', 'nav-forum-archive', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Embedding'), 'embed/forum', 'site-settings.embed-site', 'nav-embed nav-embed-site', $sort)
-            ->addLinkToSectionIf('Garden.Settings.Manage', 'Moderation', t('Flood Control'), '/vanilla/settings/floodcontrol', 'moderation.flood-control', 'nav-flood-control', $sort);
+            ->addLinkToSectionIf('Garden.Settings.Manage', 'Moderation', t('Flood Control'), '/vanilla/settings/floodcontrol', 'content.flood-control', 'nav-flood-control', $sort);
     }
 
     /**
@@ -1158,6 +1135,10 @@ class VanillaHooks implements Gdn_IPlugin {
         $Database = Gdn::database();
         $Config = Gdn::factory(Gdn::AliasConfig);
         $Drop = false;
+
+        // NOTE: Currently some structure elements don't occur the first time around
+        // So the Vanilla addon actually slightly depends on this getting run twice.
+        // If you remove this go take a look at the failures in AddonEnableDisableTest.
 
         // Call structure.php to update database
         $Validation = new Gdn_Validation(); // Needed by structure.php to validate permission names

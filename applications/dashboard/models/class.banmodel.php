@@ -16,6 +16,12 @@
  */
 class BanModel extends Gdn_Model {
 
+    const ACTION_BAN = 'ban';
+    const ACTION_UNBAN = 'unban';
+
+    const CACHE_KEY = "allBans";
+    const CACHE_TTL = 60 * 30; // 30 minutes.
+
     /** Manually banned by a moderator. */
     const BAN_MANUAL = 0x1;
 
@@ -62,12 +68,32 @@ class BanModel extends Gdn_Model {
      */
     public static function &allBans() {
         if (!self::$_AllBans) {
-            self::$_AllBans = Gdn::sql()->get('Ban')->resultArray();
-            self::$_AllBans = Gdn_DataSet::index(self::$_AllBans, ['BanID']);
+            $cache = \Gdn::cache();
+            $bans = $cache->get(self::CACHE_KEY);
+            if ($bans === \Gdn_Cache::CACHEOP_FAILURE) {
+                $bans = Gdn::sql()->get('Ban')->resultArray();
+                $bans = array_column($bans, null, 'BanID');
+                $cache->store(self::CACHE_KEY, $bans, [Gdn_Cache::FEATURE_EXPIRY => self::CACHE_KEY]);
+            }
+            self::$_AllBans = $bans;
         }
-//      $AllBans =& self::$_AllBans;
         return self::$_AllBans;
     }
+
+    /**
+     * Clean the ban cache.
+     */
+    public static function clearCache() {
+        \Gdn::cache()->remove(self::CACHE_KEY);
+    }
+
+    /**
+     * Clear the cache on updates.
+     */
+    protected function onUpdate() {
+        self::clearCache();
+    }
+
 
     /**
      * Convert bans to new type.
@@ -176,6 +202,9 @@ class BanModel extends Gdn_Model {
             case 'name':
                 $result['u.Name like'] = $ban['BanValue'];
                 break;
+            default:
+                $result = $this->getEventManager()->fireFilter('banModel_banWhere', $result, $ban);
+                break;
         }
         return $result;
     }
@@ -208,7 +237,7 @@ class BanModel extends Gdn_Model {
      */
     public static function checkUser($User, $Validation = null, $UpdateBlocks = false, &$BansFound = null) {
         $Bans = self::allBans();
-        $Fields = ['Name' => 'Name', 'Email' => 'Email', 'IPAddress' => 'LastIPAddress'];
+
         $Banned = [];
 
         if (!$BansFound) {
@@ -221,9 +250,10 @@ class BanModel extends Gdn_Model {
             $Parts = array_map('preg_quote', $Parts);
             $Regex = '`^'.implode('.*', $Parts).'$`i';
 
-            $value = val($Fields[$Ban['BanType']], $User);
             if ($Ban['BanType'] === 'IPAddress') {
-                $value = ipDecode($value);
+                $value = ipDecode(val('LastIPAddress', $User));
+            } else {
+                $value = val($Ban['BanType'], $User);
             }
 
             if (preg_match($Regex, $value)) {
@@ -236,6 +266,7 @@ class BanModel extends Gdn_Model {
                         ->set('CountBlockedRegistrations', 'CountBlockedRegistrations + 1', false, false)
                         ->where('BanID', $Ban['BanID'])
                         ->put();
+                    self::clearCache();
                 }
             }
         }
@@ -336,11 +367,8 @@ class BanModel extends Gdn_Model {
     /**
      * Save data about ban from form.
      *
-     * @since 2.0.18
-     * @access public
-     *
      * @param array $formPostValues
-     * @param array $settings
+     * @param array|false $settings
      */
     public function save($formPostValues, $settings = false) {
         $currentBanID = val('BanID', $formPostValues);
@@ -382,11 +410,54 @@ class BanModel extends Gdn_Model {
         }
 
         $newBanned = static::setBanned($banned, $bannedValue, self::BAN_AUTOMATIC);
-        Gdn::userModel()->setField($user['UserID'], 'Banned', $newBanned);
+        Gdn::userModel()->save(["UserID" => $user['UserID'], 'Banned' => $newBanned]);
         $banningUserID = Gdn::session()->UserID;
         // This is true when a session is started and the session user has a new ip address and it matches a banning rule ip address
         if ($user['UserID'] == $banningUserID) {
             $banningUserID = val('InsertUserID', $ban, Gdn::userModel()->getSystemUserID());
+        }
+
+        // Create and dispatch a UserDisciplineEvent
+        $action = $bannedValue ? self::ACTION_BAN : self::ACTION_UNBAN;
+        $disciplineType = $bannedValue ?
+            \Vanilla\Dashboard\Events\UserDisciplineEvent::DISCIPLINE_TYPE_NEGATIVE :
+            \Vanilla\Dashboard\Events\UserDisciplineEvent::DISCIPLINE_TYPE_POSITIVE;
+        $source  = $ban ? "ban_rules" : null;
+        $banEvent = Gdn::userModel()->createUserDisciplineEvent($user["UserID"], $action, $disciplineType, $source, $banningUserID);
+        if ($ban) {
+            $banEvent->setReason("{$ban["BanType"]} matches {$ban["BanValue"]}");
+        }
+        $eventManager = $this->getEventManager();
+        $eventManager->dispatch($banEvent);
+
+        // Log the ban.
+        $bannedString = $bannedValue ? 'banned' : 'unbanned';
+        if (is_array($ban)) {
+            Logger::event(
+                \Vanilla\Events\EventAction::eventName('user', \Vanilla\Events\EventAction::BAN),
+                \Psr\Log\LogLevel::INFO,
+                "{".Logger::FIELD_TARGET_USERNAME."} was auto-$bannedString by {banType}.",
+                [
+                    Logger::FIELD_CHANNEL => Logger::CHANNEL_MODERATION,
+                    Logger::FIELD_TARGET_USERID => $user['UserID'],
+                    Logger::FIELD_USERID => $banningUserID,
+                    'banned' => $bannedValue,
+                    'banType' => strtolower($ban['BanType']),
+                    'banValue' => $ban['BanValue'],
+                ]
+            );
+        } else {
+            Logger::event(
+                \Vanilla\Events\EventAction::eventName('user', \Vanilla\Events\EventAction::BAN),
+                \Psr\Log\LogLevel::INFO,
+                "{".Logger::FIELD_TARGET_USERNAME."} was auto-$bannedString.",
+                [
+                    Logger::FIELD_CHANNEL => Logger::CHANNEL_MODERATION,
+                    Logger::FIELD_TARGET_USERID => $user['UserID'],
+                    Logger::FIELD_USERID => $banningUserID,
+                    'banned' => $bannedValue,
+                ]
+            );
         }
 
         // Add the activity.
@@ -397,8 +468,6 @@ class BanModel extends Gdn_Model {
             'RegardingUserID' => $banningUserID,
             'NotifyUserID' => ActivityModel::NOTIFY_MODS
         ];
-
-        $bannedString = $bannedValue ? 'banned' : 'unbanned';
         if ($ban) {
             $activity['HeadlineFormat'] = '{ActivityUserID,user} was '.$bannedString.' (based on {Data.BanType}: {Data.BanValue}).';
             $activity['Data'] = arrayTranslate($ban, ['BanType', 'BanValue']);

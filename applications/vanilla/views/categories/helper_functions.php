@@ -1,4 +1,10 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+if (!defined('APPLICATION')) exit();
+
+use Vanilla\Forum\Modules\FoundationCategoriesShim;
+use Vanilla\Theme\BoxThemeShim;
+use Vanilla\Utility\HtmlUtils;
+use Vanilla\Web\TwigStaticRenderer;
 
 if (!function_exists('CategoryHeading')):
 
@@ -26,7 +32,7 @@ if (!function_exists('CategoryPhoto')):
 
         if ($photoUrl) {
             $result = anchor(
-                '<img src="'.$photoUrl.'" class="CategoryPhoto" alt="'.htmlspecialchars(val('Name', $row)).'" />',
+                '<img src="'.$photoUrl.'" class="CategoryPhoto" alt="'.htmlspecialchars(val('Name', $row, '')).'" />',
                 categoryUrl($row, '', '//'),
                 'Item-Icon PhotoWrap PhotoWrap-Category');
         } else {
@@ -75,7 +81,7 @@ if (!function_exists('getOptions')):
 
         $dropdown->addLink(t('Mark Read'), "/category/markread?categoryid={$categoryID}&tkey={$tk}", 'mark-read');
 
-        if (c('Vanilla.EnableCategoryFollowing') && val('DisplayAs', $category) == 'Discussions') {
+        if (c(\CategoryModel::CONF_CATEGORY_FOLLOWING) && val('DisplayAs', $category) == 'Discussions') {
             $dropdown->addLink(
                 t($followed ? 'Unfollow' : 'Follow'),
                 "/category/followed?tkey={$tk}&categoryid={$categoryID}&value=" . ($followed ? 0 : 1),
@@ -149,6 +155,8 @@ if (!function_exists('writeListItem')):
         $writeChildren = getWriteChildrenMethod($category, $depth);
         $rssIcon = '';
         $headingLevel = $depth + 2;
+        /** @var Vanilla\Formatting\Html\HtmlSanitizer */
+        $htmlSanitizer = Gdn::getContainer()->get(Vanilla\Formatting\Html\HtmlSanitizer::class);
 
         if (val('DisplayAs', $category) === 'Discussions') {
             $rssImage = img('applications/dashboard/design/images/rss.gif', ['alt' => t('RSS Feed')]);
@@ -156,14 +164,18 @@ if (!function_exists('writeListItem')):
         }
 
         if (val('DisplayAs', $category) === 'Heading') : ?>
-            <li id="Category_<?php echo $categoryID; ?>" class="CategoryHeading <?php echo $cssClass; ?>">
+            <li id="Category_<?php echo $categoryID; ?>" class="CategoryHeading pageHeadingBox <?php echo $cssClass; ?>">
                 <div role="heading" aria-level="<?php echo $headingLevel; ?>" class="ItemContent Category">
                     <div class="Options"><?php echo getOptions($category); ?></div>
-                    <?php echo Gdn_Format::text(val('Name', $category)); ?>
+                    <?php echo Gdn_Format::text(val('Name', $category));
+                    Gdn::controller()->EventArguments['ChildCategories'] = &$children;
+                    Gdn::controller()->EventArguments['Category'] = &$category;
+                    Gdn::controller()->fireEvent('AfterCategoryHeadingTitle');
+                    ?>
                 </div>
             </li>
         <?php else: ?>
-            <li id="Category_<?php echo $categoryID; ?>" class="<?php echo $cssClass; ?>">
+            <li id="Category_<?php echo $categoryID; ?>" class="<?php echo $cssClass; ?> pageBox">
                 <?php
                 Gdn::controller()->EventArguments['ChildCategories'] = &$children;
                 Gdn::controller()->EventArguments['Category'] = &$category;
@@ -184,7 +196,7 @@ if (!function_exists('writeListItem')):
                         ?>
                     </div>
                     <div class="CategoryDescription">
-                        <?php echo val('Description', $category) ?>
+                        <?php echo $htmlSanitizer->filter((string)val('Description', $category, '')); ?>
                     </div>
                     <div class="Meta">
                         <span class="MItem RSS"><?php echo $rssIcon ?></span>
@@ -264,6 +276,11 @@ if (!function_exists('WriteTableRow')):
         $writeChildren = getWriteChildrenMethod($row, $depth);
         $h = 'h'.($depth + 1);
         $level = 3;
+        /** @var Vanilla\Formatting\Html\HtmlSanitizer */
+        $htmlSanitizer = Gdn::getContainer()->get(Vanilla\Formatting\Html\HtmlSanitizer::class);
+        /** @var Vanilla\Formatting\DateTimeFormatter */
+        $dateTimeFormatter = Gdn::getContainer()->get(\Vanilla\Formatting\DateTimeFormatter::class);
+
         ?>
         <tr class="<?php echo cssClass($row, true); ?>">
             <td class="CategoryName">
@@ -279,14 +296,14 @@ if (!function_exists('WriteTableRow')):
                     }
 
                     echo "<{$h} aria-level='".$level."' class='".$headingClass."'>";
-                    $safeName = htmlspecialchars($row['Name']);
+                    $safeName = htmlspecialchars($row['Name'] ?? '');
                     echo $row['DisplayAs'] === 'Heading' ? $safeName : anchor($safeName, $row['Url']);
                     Gdn::controller()->EventArguments['Category'] = $row;
                     Gdn::controller()->fireEvent('AfterCategoryTitle');
                     echo "</{$h}>";
                     ?>
                     <div class="CategoryDescription">
-                        <?php echo $row['Description']; ?>
+                        <?php echo $htmlSanitizer->filter($row['Description'] ?? ''); ?>
                     </div>
                     <?php if ($writeChildren === 'list'): ?>
                         <div class="ChildCategories">
@@ -334,15 +351,18 @@ if (!function_exists('WriteTableRow')):
                             echo anchor(
                                 Gdn_Format::date($row['LastDateInserted'], 'html'),
                                 $row['LastUrl'],
-                                'CommentDate MItem');
+                                'CommentDate MItem', [
+                                    "aria-label" => HtmlUtils::accessibleLabel('Most recent comment on date %s, in discussion "%s", by user "%s"', [$dateTimeFormatter->formatDate($row['LastDateInserted'] , false), $row['Name'], $row['LastName']]),
+                                ]);
 
-                            if (isset($row['LastCategoryID'])) {
+                            if (!empty($row['LastCategoryID'])) {
                                 $lastCategory = CategoryModel::categories($row['LastCategoryID']);
 
-                                echo ' <span>',
-                                sprintf('in %s', anchor($lastCategory['Name'], categoryUrl($lastCategory, '', '//'))),
-                                '</span>';
-
+                                if (is_array($lastCategory)) {
+                                    echo ' <span>',
+                                    sprintf('in %s', anchor(htmlspecialchars($lastCategory['Name'] ?? ''), categoryUrl($lastCategory, '', '//'))),
+                                    '</span>';
+                                }
                             }
                             ?>
                         </div>
@@ -368,20 +388,26 @@ if (!function_exists('writeCategoryList')):
      */
     function writeCategoryList($categories, $depth = 1) {
         if (empty($categories)) {
+            BoxThemeShim::startBox();
             echo '<div class="Empty">'.t('No categories were found.').'</div>';
+            BoxThemeShim::endBox();
             return;
         }
 
         ?>
+        <h2 class="sr-only"><?php echo t('Category List'); ?></h2>
         <div class="DataListWrap">
-            <h2 class="sr-only"><?php echo t('Category List'); ?></h2>
-            <ul class="DataList CategoryList">
-                <?php
-                foreach ($categories as $category) {
-                    writeListItem($category, $depth);
+            <?php
+                if (FoundationCategoriesShim::isEnabled()) {
+                    FoundationCategoriesShim::printLegacyShim($categories);
+                } else {
+                    echo '<ul class="DataList CategoryList pageBox">';
+                    foreach ($categories as $category) {
+                        writeListItem($category, $depth);
+                    }
+                    echo '</ul>';
                 }
-                ?>
-            </ul>
+            ?>
         </div>
         <?php
     }
@@ -390,7 +416,9 @@ endif;
 if (!function_exists('writeCategoryTable')):
     function writeCategoryTable($categories, $depth = 1, $inTable = false) {
         if (empty($categories)) {
+            BoxThemeShim::startBox();
             echo '<div class="Empty">'.t('No categories were found.').'</div>';
+            BoxThemeShim::endBox();
             return;
         }
 
@@ -398,7 +426,7 @@ if (!function_exists('writeCategoryTable')):
             $displayAs = val('DisplayAs', $category);
             $urlCode = $category['UrlCode'];
             $class = val('CssClass', $category);
-            $name = htmlspecialchars($category['Name']);
+            $name = htmlspecialchars($category['Name'] ?? '');
 
             if ($displayAs === 'Heading') :
                 if ($inTable) {
@@ -407,15 +435,17 @@ if (!function_exists('writeCategoryTable')):
                 }
                 ?>
                 <div id="CategoryGroup-<?php echo $urlCode; ?>" class="CategoryGroup <?php echo $class; ?>">
+                    <?php BoxThemeShim::startHeading(); ?>
                     <h2 class="H categoryList-heading"><?php echo $name; ?></h2>
+                    <?php BoxThemeShim::endHeading(); ?>
                     <?php writeCategoryTable($category['Children'], $depth + 1, $inTable); ?>
                 </div>
                 <?php
             else :
                 if (!$inTable) { ?>
                     <div class="DataTableWrap">
-                        <h2 class="sr-only categoryList-genericHeading"><?php echo t('Category List') ?></h2>
-                        <table class="DataTable CategoryTable">
+                    <h2 class="sr-only categoryList-genericHeading"><?php echo t('Category List') ?></h2>
+                    <table class="DataTable CategoryTable">
                             <thead>
                             <?php writeTableHead(); ?>
                             </thead>
@@ -468,29 +498,29 @@ if (!function_exists('followButton')) :
      */
     function followButton($categoryID) {
         $output = ' ';
+        if (!is_numeric($categoryID)) {
+            return $output;
+        }
+
         $userID = Gdn::session()->UserID;
         $category = CategoryModel::categories($categoryID);
 
-        if (c('Vanilla.EnableCategoryFollowing') && $userID && $category && $category['DisplayAs'] == 'Discussions') {
+        if (c(\CategoryModel::CONF_CATEGORY_FOLLOWING) && $userID && $category && $category['DisplayAs'] == 'Discussions') {
             $categoryModel = new CategoryModel();
             $following = $categoryModel->isFollowed($userID, $categoryID);
+            $isEmailDisabled = Gdn::config('Garden.Email.Disabled') || !Gdn::session()->checkPermission('Garden.Email.View');
+            $emailNotificationsByDefault = Gdn::config('Vanilla.CategoryFollowing.EmailNotificationsByDefault');
 
-            $iconTitle = t('Follow');
+            //we determine email notifications state through various permission/config check
+            $emailNotificationsMode = $isEmailDisabled ? "disabled" : ($emailNotificationsByDefault ? "defaultOn" : "defaultOff");
 
-            $icon = <<<EOT
-                <svg xmlns="http://www.w3.org/2000/svg" class="followButton-icon" viewBox="0 0 16 16" aria-hidden="true">
-                    <title>{$iconTitle}</title>
-                    <path d="M7.568,14.317a.842.842,0,0,1-1.684,0,4.21,4.21,0,0,0-4.21-4.21h0a.843.843,0,0,1,0-1.685A5.9,5.9,0,0,1,7.568,14.317Zm4.21,0a.842.842,0,0,1-1.684,0A8.421,8.421,0,0,0,1.673,5.9h0a.842.842,0,0,1,0-1.684,10.1,10.1,0,0,1,10.105,10.1Zm4.211,0a.842.842,0,0,1-1.684,0A12.633,12.633,0,0,0,1.673,1.683.842.842,0,0,1,1.673,0,14.315,14.315,0,0,1,15.989,14.315ZM1.673,16a1.684,1.684,0,1,1,1.684-1.684h0A1.684,1.684,0,0,1,1.673,16Z" transform="translate(0.011 0.001)" style="fill: currentColor;"/>
-                </svg>
-EOT;
-
-            $text = $following ? t('Following') : t('Follow');
-            $output .= anchor(
-                $icon.$text,
-                "/category/followed/{$categoryID}/".Gdn::session()->transientKey(),
-                'Hijack followButton'.($following ? ' TextColor isFollowing' : ''),
-                ['title' => $text, 'aria-pressed' => $following ? 'true' : 'false', 'role' => 'button', 'tabindex' => '0']
-            );
+            $output = TwigStaticRenderer::renderReactModule('CategoryFollowDropDown', [
+                "userID" => $userID,
+                "categoryID" => $categoryID,
+                "isFollowed" => $following,
+                'notificationPreferences' => $categoryModel->getPreferences($userID)[$categoryID]['preferences'] ?? null,
+                'emailNotificationsMode' => $emailNotificationsMode,
+            ]);
         }
         return $output;
     }

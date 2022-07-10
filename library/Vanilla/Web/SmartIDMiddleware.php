@@ -55,6 +55,11 @@ class SmartIDMiddleware {
     private $fullSuffixesRegex;
 
     /**
+     * @var array Header to set for the response.
+     */
+    private $responseHeaders = [];
+
+    /**
      * SmartIDMiddleware constructor.
      *
      * @param string $basePath The base path to match in order to apply the middleware.
@@ -135,8 +140,8 @@ class SmartIDMiddleware {
             $this->replaceBody($request);
             $this->replacePath($request);
         }
-
         $response = $next($request);
+        $response = $this->setResponseHeader(\Garden\Web\Data::box($response));
         return $response;
     }
 
@@ -235,7 +240,7 @@ class SmartIDMiddleware {
      * @return array|false Returns the replaced array of **false** if no replacements were made.
      */
     private function replaceArray($arr) {
-        if (empty($arr)) {
+        if (empty($arr) || !is_array($arr)) {
             return false;
         }
 
@@ -269,9 +274,13 @@ class SmartIDMiddleware {
      * @param string $smartID The smart ID to lookup.
      * @return mixed Returns the resulting value of the smart ID.
      */
-    private function replaceSmartID(string $pk, string $smartID) {
+    public function replaceSmartID(string $pk, string $smartID) {
         list($column, $value) = explode(':', ltrim($smartID, static::SMART)) + ['', ''];
         list($pk, $columns, $resolver) = $this->pks[strtolower($pk)];
+
+        if ($smartID == '$me') {
+            $this->responseHeaders = [CacheControlConstantsInterface::HEADER_CACHE_CONTROL => CacheControlConstantsInterface::NO_CACHE];
+        }
 
         if ($columns !== '*' && !in_array(strtolower($column), $columns)) {
             throw new ClientException("Unknown column in smart ID expression: $column.", 400);
@@ -318,5 +327,27 @@ class SmartIDMiddleware {
      */
     public function hasFullSuffix(string $suffix): bool {
         return isset($this->fullSuffixes[$suffix]);
+    }
+
+    /**
+     * Basic validation of whether or not a value meets the basic smart ID format.
+     *
+     * @param string $value
+     * @return bool
+     */
+    public static function valueIsSmartID(string $value): bool {
+        return !empty($value) && $value[0] === self::SMART;
+    }
+
+    /**
+     * Overwrite the response header.
+     *
+     * @param mixed $response
+     */
+    private function setResponseHeader(\Garden\Web\Data $response) {
+        foreach ($this->responseHeaders as $headerName => $headerValue) {
+            $response->setHeader($headerName, $headerValue);
+        }
+        return $response;
     }
 }

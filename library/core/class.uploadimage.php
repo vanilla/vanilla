@@ -63,7 +63,7 @@ class Gdn_UploadImage extends Gdn_Upload {
      * Gets the image size of a file.
      *
      * @param string $path The path to the file.
-     * @param string $filename The name of the file.
+     * @param string|false $filename The name of the file.
      * @return array An array of [width, height, image type].
      * @since 2.1
      */
@@ -85,13 +85,13 @@ class Gdn_UploadImage extends Gdn_Upload {
     /**
      * Validates the uploaded image. Returns the temporary name of the uploaded file.
      */
-    public function validateUpload($inputName, $throwError = true) {
+    public function validateUpload($inputName, $throwException = true) {
         if (!function_exists('gd_info')) {
             throw new Exception(t('The uploaded file could not be processed because GD is not installed.'));
         }
 
         // Make sure that all standard file upload checks are performed.
-        $tmpFileName = parent::validateUpload($inputName, $throwError);
+        $tmpFileName = parent::validateUpload($inputName, $throwException);
 
         // Now perform image-specific checks.
         if ($tmpFileName) {

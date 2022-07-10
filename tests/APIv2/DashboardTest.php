@@ -18,6 +18,6 @@ class DashboardTest extends AbstractAPIv2Test {
     public function testIndexMenusSmoke() {
         $r = $this->api()->get('/dashboard/menus');
         $data = $r->getBody();
-        $this->assertSame(3, count($data));
+        $this->assertSame(4, count($data));
     }
 }

@@ -17,13 +17,19 @@ use Vanilla\Utility\ArrayUtils;
  * Basic model class.
  */
 class Model implements InjectableInterface {
-    const OPT_LIMIT = "limit";
-    const OPT_OFFSET = "offset";
-    const OPT_SELECT = "select";
-    const OPT_ORDER = 'order';
+
+    public const OPT_LIMIT = "limit";
+    public const OPT_OFFSET = "offset";
+    public const OPT_SELECT = "select";
+    public const OPT_ORDER = 'order';
+    public const OPT_MODE = 'mode';
+    public const OPT_REPLACE = 'replace';
+    public const OPT_IGNORE = 'ignore';
+    public const OPT_META = 'meta';
+    public const OPT_JOINS = 'joins';
 
     /** @var \Gdn_Database */
-    private $database;
+    protected $database;
 
     /** @var Schema */
     protected $readSchema;
@@ -55,6 +61,15 @@ class Model implements InjectableInterface {
     }
 
     /**
+     * Get the name of the table.
+     *
+     * @return string
+     */
+    public function getTableName(): string {
+        return $this->table;
+    }
+
+    /**
      * Configure a Garden Schema instance for read operations by the model.
      *
      * @param Schema $schema Schema representing the resource's database table.
@@ -72,7 +87,7 @@ class Model implements InjectableInterface {
      */
     public function getReadSchema(): Schema {
         if ($this->readSchema === null) {
-            $schema = $this->getDatabaseSchema();
+            $schema = clone $this->getDatabaseSchema();
             $this->configureReadSchema($schema);
             $this->readSchema = $schema;
         }
@@ -86,7 +101,7 @@ class Model implements InjectableInterface {
      */
     public function getWriteSchema(): Schema {
         if ($this->writeSchema === null) {
-            $schema = $this->getDatabaseSchema();
+            $schema = clone $this->getDatabaseSchema();
             $this->configureWriteSchema($schema);
             $this->writeSchema = $schema;
         }
@@ -143,13 +158,15 @@ class Model implements InjectableInterface {
      *    - offset (int): Row offset before capturing the result.
      * @return array Rows matching the conditions and within the parameters specified in the options.
      * @throws ValidationException If a row fails to validate against the schema.
+     * @todo Document support for the "order" option.
+     * @todo Add support for a "page" option to set the limit.
      */
     public function select(array $where = [], array $options = []): array {
         $orderFields = $options[self::OPT_ORDER] ?? ($options["orderFields"] ?? []);
         $orderDirection = $options["orderDirection"] ?? "asc";
         $limit = $options[self::OPT_LIMIT] ?? false;
         $offset = $options[self::OPT_OFFSET] ?? 0;
-        $selects =  $options[self::OPT_SELECT] ?? [];
+        $selects = $options[self::OPT_SELECT] ?? [];
 
         $sqlDriver = $this->createSql();
 
@@ -161,17 +178,29 @@ class Model implements InjectableInterface {
 
             $sqlDriver->select($selects);
         }
+
+        $joins = $options[self::OPT_JOINS] ?? false;
+        if ($joins) {
+            $this->applyJoins($joins, $sqlDriver);
+        }
+
         $result = $sqlDriver->getWhere($this->table, $where, $orderFields, $orderDirection, $limit, $offset)
             ->resultArray();
 
         if (empty($selects)) {
-            $schema = Schema::parse([":a" => $this->getReadSchema()]);
+            $schema = $this->getReadSchema();
         } else {
-            $schema = Schema::parse([":a" =>  Schema::parse($selects)->add($this->getReadSchema())]);
-        }
-        // What if a processor goes here?
+            $selectExpressions = $sqlDriver->parseSelectExpression($selects);
+            $selectFinalFieldNames = [];
+            foreach ($selectExpressions as $selectExpression) {
+                $selectFinalFieldNames[] = $selectExpression['Alias'] ?: $selectExpression['Field'];
+            }
 
-        $result = $schema->validate($result);
+            $schema = Schema::parse($selectFinalFieldNames)->add($this->getReadSchema());
+        }
+        foreach ($result as &$row) {
+            $row = $schema->validate($row);
+        }
 
         return $result;
     }
@@ -182,6 +211,7 @@ class Model implements InjectableInterface {
      * @param array $where
      * @param array $options
      * @return array
+     * @deprecated Use Model::select
      */
     public function get(array $where = [], array $options = []): array {
         return $this->select($where, $options);
@@ -231,6 +261,20 @@ class Model implements InjectableInterface {
     }
 
     /**
+     * Extract the primary key out of a row.
+     *
+     * @param array $row The row to pluck.
+     * @return array Returns an array suitable to pass as a where parameter.
+     */
+    public function pluckPrimaryWhere(array $row): array {
+        $where = [];
+        foreach ($this->getPrimaryKey() as $column) {
+            $where[$column] = $row[$column];
+        }
+        return $where;
+    }
+
+    /**
      * Select a single row.
      *
      * @param array $where Conditions for the select query.
@@ -245,7 +289,7 @@ class Model implements InjectableInterface {
      */
     public function selectSingle(array $where = [], array $options = []): array {
         $options[self::OPT_LIMIT] = 1;
-        $rows = $this->get($where, $options);
+        $rows = $this->select($where, $options);
         if (empty($rows)) {
             throw new NoResultsException("No rows matched the provided criteria.");
         }
@@ -257,12 +301,25 @@ class Model implements InjectableInterface {
      * Add a resource row.
      *
      * @param array $set Field values to set.
+     * @param array $options An array of options to affect the insert.
      * @return int|true ID of the inserted row.
      * @throws Exception If an error is encountered while performing the query.
      */
-    public function insert(array $set) {
+    public function insert(array $set, array $options = []) {
+        $options += [
+            self::OPT_REPLACE => false,
+            self::OPT_IGNORE => false,
+        ];
+
         $set = $this->getWriteSchema()->validate($set);
-        $result = $this->createSql()->insert($this->table, $set);
+
+        $sql = $this->createSql();
+        if ($options[self::OPT_REPLACE]) {
+            $sql->options('Replace', true);
+        } elseif ($options[self::OPT_IGNORE]) {
+            $sql->options('Ignore', true);
+        }
+        $result = $sql->insert($this->table, $set);
         if ($result === false) {
             // @codeCoverageIgnoreStart
             throw new Exception("An unknown error was encountered while inserting the row.");
@@ -288,9 +345,7 @@ class Model implements InjectableInterface {
      * @return \Gdn_SQLDriver
      */
     protected function createSql(): \Gdn_SQLDriver {
-        $sql = clone $this->database->sql();
-        $sql->reset();
-        return $sql;
+        return $this->database->createSql();
     }
 
     /**
@@ -309,10 +364,11 @@ class Model implements InjectableInterface {
      *
      * @param array $set Field values to set.
      * @param array $where Conditions to restrict the update.
+     * @param array $options Options to control the update.
      * @throws Exception If an error is encountered while performing the query.
      * @return bool True.
      */
-    public function update(array $set, array $where): bool {
+    public function update(array $set, array $where, array $options = []): bool {
         $set = $this->getWriteSchema()->validate($set, true);
         $this->createSql()->put($this->table, $set, $where);
         // If fully executed without an exception bubbling up, consider this a success.
@@ -350,5 +406,21 @@ class Model implements InjectableInterface {
             $this->databaseSchema = $this->database->simpleSchema($this->getTable());
         }
         return $this->databaseSchema;
+    }
+
+    /**
+     * Apply joins to sql query.
+     *
+     * @param array $joins
+     * @param \Gdn_SQLDriver $sqlDriver
+     */
+    protected function applyJoins(array $joins, \Gdn_SQLDriver $sqlDriver): void {
+        foreach ($joins as $join) {
+            $tableName = $join['tableName'] ?? '';
+            $on = $join['on'] ?? '';
+            $joinType = $join['joinType'] ?? '';
+
+            $sqlDriver->join($tableName, $on, $joinType);
+        }
     }
 }

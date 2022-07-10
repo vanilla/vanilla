@@ -8,39 +8,49 @@
  */
 
 import { IThemeState, themeReducer } from "@library/theming/themeReducer";
-import { IUsersStoreState, usersReducer } from "@library/features/users/userModel";
+import { usersReducer } from "@library/features/users/userModel";
+import { IUsersStoreState } from "@library/features/users/userTypes";
 import { Reducer, ReducersMapObject, combineReducers } from "redux";
 import { ILocaleState, localeReducer } from "@library/locales/localeReducer";
-import getStore from "@library/redux/getStore";
+import getStore, { hasStore } from "@library/redux/getStore";
 import NotificationsModel from "@library/features/notifications/NotificationsModel";
 import ConversationsModel from "@library/features/conversations/ConversationsModel";
+import { tagsReducer } from "@library/features/tags/TagsReducer";
+import { discussionsReducer } from "@library/features/discussions/discussionsReducer";
+import { configSlice, IConfigState } from "@library/config/configReducer";
 
 let dynamicReducers = {};
 
 export function registerReducer(name: string, reducer: Reducer) {
     dynamicReducers[name] = reducer;
-    const store = getStore();
-    store.replaceReducer(combineReducers(getReducers()));
+    if (hasStore()) {
+        const store = getStore();
+        store.replaceReducer(combineReducers(getReducers()));
 
-    const initialActions = window.__ACTIONS__ || [];
+        const initialActions = window.__ACTIONS__ || [];
 
-    // Re-apply initial actions.
-    initialActions.forEach(store.dispatch);
+        // Re-apply initial actions.
+        initialActions.forEach(store.dispatch);
+    }
 }
 
 export interface ICoreStoreState extends IUsersStoreState {
     theme: IThemeState;
     locales: ILocaleState;
+    config: IConfigState;
 }
 
 export function getReducers(): ReducersMapObject<any, any> {
     return {
         // We have a few static reducers.
         users: usersReducer,
-        theme: themeReducer,
+        discussions: discussionsReducer,
         locales: localeReducer,
+        tags: tagsReducer,
         notifications: new NotificationsModel().reducer,
         conversations: new ConversationsModel().reducer,
+        theme: themeReducer,
+        [configSlice.name]: configSlice.reducer,
         ...dynamicReducers,
     };
 }

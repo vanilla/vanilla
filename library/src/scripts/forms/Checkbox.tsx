@@ -4,13 +4,13 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import { getRequiredID, IOptionalComponentID, useUniqueID } from "@library/utility/idUtils";
-import { checkRadioClasses } from "./checkRadioStyles";
-import classNames from "classnames";
-import { t } from "@library/utility/appUtils";
-import { srOnly, visibility } from "@library/styles/styleHelpers";
+import { visibility } from "@library/styles/styleHelpers";
 import { ToolTip } from "@library/toolTip/ToolTip";
+import { t } from "@library/utility/appUtils";
+import { IOptionalComponentID, useUniqueID } from "@library/utility/idUtils";
+import classNames from "classnames";
+import React from "react";
+import { checkRadioClasses } from "./checkRadioStyles";
 
 interface IProps extends IOptionalComponentID {
     id?: string;
@@ -18,18 +18,23 @@ interface IProps extends IOptionalComponentID {
     checked?: boolean;
     disabled?: boolean;
     onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
-    label: React.ReactNode;
+    label?: React.ReactNode;
+    "aria-labelledby"?: string;
+    labelBold?: boolean;
+    hideLabel?: boolean;
     isHorizontal?: boolean;
     fakeFocus?: boolean;
     defaultChecked?: boolean;
     tooltipLabel?: boolean;
+    excludeFromICheck?: boolean;
 }
 
 export default function CheckBox(props: IProps) {
-    const labelID = useUniqueID("checkbox_label");
+    const ownLabelID = useUniqueID("checkbox_label");
+    const labelID = props["aria-labelledby"] ?? ownLabelID;
     const classes = checkRadioClasses();
 
-    const { isHorizontal } = props;
+    const { isHorizontal, labelBold = true } = props;
 
     const icon = (
         <span className={classes.iconContainer} aria-hidden="true">
@@ -46,7 +51,9 @@ export default function CheckBox(props: IProps) {
     return (
         <label className={classNames(props.className, classes.root, { isHorizontal })}>
             <input
-                className={classNames(classes.input, props.fakeFocus && "focus-visible")}
+                className={classNames(classes.input, props.fakeFocus && "focus-visible", {
+                    "exclude-icheck": props.excludeFromICheck,
+                })}
                 aria-labelledby={labelID}
                 type="checkbox"
                 onChange={props.onChange}
@@ -59,7 +66,14 @@ export default function CheckBox(props: IProps) {
             {props.label && (
                 <span
                     id={labelID}
-                    className={classNames(classes.label, props.tooltipLabel && visibility().visuallyHidden)}
+                    className={classNames(
+                        classes.label,
+                        props.tooltipLabel && visibility().visuallyHidden,
+                        props.hideLabel === true && visibility().visuallyHidden,
+                        {
+                            [classes.labelBold]: labelBold,
+                        },
+                    )}
                 >
                     {props.label}
                 </span>

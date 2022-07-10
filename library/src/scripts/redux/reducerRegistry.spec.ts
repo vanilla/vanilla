@@ -6,7 +6,7 @@
 import getStore, { resetStore } from "@library/redux/getStore";
 import { registerReducer, resetReducers } from "@library/redux/reducerRegistry";
 
-describe.only("reducerRegistry", () => {
+describe("reducerRegistry", () => {
     afterEach(() => {
         resetStore();
         resetReducers();
@@ -26,7 +26,7 @@ describe.only("reducerRegistry", () => {
         expect(state["reducer2"]).toEqual(2);
     });
 
-    it.only("Can apply initial state", () => {
+    it("Can apply initial state", () => {
         window.__ACTIONS__ = [
             {
                 type: "update",

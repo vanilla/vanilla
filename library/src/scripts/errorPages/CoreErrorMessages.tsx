@@ -3,9 +3,9 @@
  * @license Proprietary
  */
 
-import { IApiError, LoadStatus } from "@library/@types/api/core";
+import { LoadStatus } from "@library/@types/api/core";
 import { isUserGuest, useUsersState } from "@library/features/users/userModel";
-import { buttonClasses } from "@library/forms/buttonStyles";
+import { buttonClasses } from "@library/forms/Button.styles";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { SearchErrorIcon } from "@library/icons/common";
 import Heading from "@library/layout/Heading";
@@ -15,6 +15,8 @@ import { formatUrl, t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React, { ReactNode } from "react";
 import { pageErrorMessageClasses } from "@library/errorPages/pageErrorMessageStyles";
+import { DetailedErrors } from "@library/errorPages/DetailedErrorMessages";
+import { debug } from "@vanilla/utils";
 
 export function CoreErrorMessages(props: IProps) {
     const classes = pageErrorMessageClasses();
@@ -24,13 +26,14 @@ export function CoreErrorMessages(props: IProps) {
     };
     const { message, messageAsParagraph, description } = error;
     return (
-        <div className={classNames(props.className, classes.root)}>
+        <main className={classNames(props.className, classes.root)}>
             {error.icon}
             {!messageAsParagraph && <Heading depth={1} className={classes.title} title={message} />}
             {messageAsParagraph && <Paragraph className={classes.titleAsParagraph}>{message}</Paragraph>}
             {error.description && <Paragraph className={classes.description}>{description}</Paragraph>}
+            {debug() && <DetailedErrors detailedErrors={error?.response?.data?.errors} />}
             {error.actionItem && <div className={classes.cta}>{error.actionItem}</div>}
-        </div>
+        </main>
     );
 }
 
@@ -55,7 +58,7 @@ export function parseErrorCode(errorCode?: string | number): IError {
                 message,
                 description: t("The page you were looking for could not be found."),
                 actionItem: (
-                    <LinkAsButton baseClass={ButtonTypes.PRIMARY} to={"/"}>
+                    <LinkAsButton buttonType={ButtonTypes.PRIMARY} to={"/"}>
                         {t("Back to home page")}
                     </LinkAsButton>
                 ),
@@ -82,7 +85,7 @@ function ErrorSignIn() {
     const { currentUser } = useUsersState();
     if (currentUser.status === LoadStatus.SUCCESS && currentUser.data && isUserGuest(currentUser.data)) {
         return (
-            <LinkAsButton to={formatUrl(`/entry/signin?Target=${encodeURIComponent(window.location.href)}`)}>
+            <LinkAsButton to={`/entry/signin?Target=${encodeURIComponent(window.location.href)}`}>
                 {t("Sign In")}
             </LinkAsButton>
         );
@@ -104,7 +107,7 @@ export function messageFromErrorCode(errorCode?: string | number) {
 }
 
 export function getErrorCode(errorMessageProps: IErrorMessageProps) {
-    if (errorMessageProps.apiError) {
+    if (errorMessageProps.apiError && errorMessageProps.apiError.response) {
         return errorMessageProps.apiError.response.status;
     } else if (errorMessageProps.error && errorMessageProps.error.status) {
         return errorMessageProps.error.status;
@@ -115,10 +118,16 @@ export function getErrorCode(errorMessageProps: IErrorMessageProps) {
     }
 }
 
+export interface IAPIErrorFragment {
+    response: {
+        status: number;
+    };
+}
+
 export interface IErrorMessageProps {
     defaultError?: string;
     error?: Partial<IError>;
-    apiError?: IApiError;
+    apiError?: IAPIErrorFragment;
 }
 
 export interface IError {
@@ -128,6 +137,7 @@ export interface IError {
     description?: ReactNode;
     actionItem?: ReactNode;
     icon?: ReactNode;
+    response?: any;
 }
 
 export enum DefaultError {

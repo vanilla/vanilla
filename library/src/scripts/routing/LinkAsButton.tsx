@@ -7,10 +7,12 @@
 import React from "react";
 import classNames from "classnames";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import { getButtonStyleFromBaseClass } from "@library/forms/Button";
+import { getClassForButtonType } from "@library/forms/Button";
 import SmartLink from "@library/routing/links/SmartLink";
 import { IOptionalComponentID } from "@library/utility/idUtils";
 import { LinkProps } from "react-router-dom";
+import ConditionalWrap from "@library/layout/ConditionalWrap";
+import { buttonLabelWrapClass } from "@library/forms/Button.styles";
 
 interface IProps extends IOptionalComponentID, LinkProps {
     children: React.ReactNode;
@@ -18,8 +20,10 @@ interface IProps extends IOptionalComponentID, LinkProps {
     to: string;
     title?: string;
     ariaLabel?: string;
-    baseClass?: ButtonTypes;
+    buttonType?: ButtonTypes;
     tabIndex?: number;
+    disabled?: boolean;
+    addWrap?: boolean; // Adds wrapper class to help with overflowing text
 }
 
 /**
@@ -31,18 +35,35 @@ export default class LinkAsButton extends React.Component<IProps> {
     };
 
     public render() {
-        const { baseClass, className, title, ariaLabel, to, children, tabIndex, ...restProps } = this.props;
-        const componentClasses = classNames(getButtonStyleFromBaseClass(baseClass || ButtonTypes.STANDARD), className);
+        const {
+            buttonType = ButtonTypes.STANDARD,
+            className,
+            title,
+            ariaLabel,
+            to,
+            children,
+            tabIndex,
+            addWrap = false,
+            disabled,
+            ...restProps
+        } = this.props;
+        const componentClasses = classNames(getClassForButtonType(buttonType), className);
+
+        const fallbackTitle = typeof children === "string" ? children : undefined;
         return (
             <SmartLink
                 className={componentClasses}
-                title={title}
-                aria-label={ariaLabel || title}
+                title={title ?? fallbackTitle}
+                aria-label={ariaLabel || title || fallbackTitle}
                 tabIndex={tabIndex}
-                to={to}
+                role={"button"}
+                to={disabled ? "" : to}
+                disabled={disabled}
                 {...restProps}
             >
-                {children}
+                <ConditionalWrap className={buttonLabelWrapClass().root} condition={addWrap}>
+                    {children}
+                </ConditionalWrap>
             </SmartLink>
         );
     }

@@ -9,6 +9,8 @@
  * @since 2.0
  */
 
+use Vanilla\SmartyBC;
+
 /**
  * Vanilla implementation of Smarty templating engine.
  */
@@ -110,44 +112,14 @@ class Gdn_Smarty implements \Vanilla\Contracts\Web\LegacyViewHandlerInterface {
         // Assign the controller data last so the controllers override any default data.
         $smarty->assign($controller->Data);
 
-        $security = new SmartySecurityVanilla($smarty);
-
-        $security->php_handling = Smarty::PHP_REMOVE;
-        $security->allow_constants = false;
-        $security->allow_super_globals = false;
-        $security->streams = null;
-
-        $security->setPhpFunctions(array_merge($security->php_functions, [
-            'array', // Yes, Smarty really blocks this.
-            'category',
-            'categoryUrl',
-            'checkPermission',
-            'commentUrl',
-            'discussionUrl',
-            'inSection',
-            'inCategory',
-            'ismobile',
-            'multiCheckPermission',
-            'getValue',
-            'setValue',
-            'url',
-            'useragenttype',
-            'userUrl',
-        ]));
-
-        $security->php_modifiers = array_merge(
-            $security->php_functions,
-            ['sprintf']
-        );
-
-        $smarty->enableSecurity($security);
+        $this->enableSecurity($smarty);
     }
 
     /**
      * Render the given view.
      *
      * @param string $path The path to the view's file.
-     * @param Controller $controller The controller that is rendering the view.
+     * @param Gdn_Controller $controller The controller that is rendering the view.
      */
     public function render($path, $controller) {
         $smarty = $this->smarty();
@@ -200,7 +172,7 @@ class Gdn_Smarty implements \Vanilla\Contracts\Web\LegacyViewHandlerInterface {
     /**
      * See if the provided template causes any errors.
      *
-     * @param type $path Path of template file to test.
+     * @param string $path Path of template file to test.
      * @return boolean TRUE if template loads successfully.
      */
     public function testTemplate($path) {
@@ -271,5 +243,44 @@ class Gdn_Smarty implements \Vanilla\Contracts\Web\LegacyViewHandlerInterface {
             }
         }
         return $r;
+    }
+
+    /**
+     * Enable the security features on a Smarty object.
+     *
+     * @param Smarty $smarty
+     */
+    public function enableSecurity(Smarty $smarty): void {
+        $security = new SmartySecurityVanilla($smarty);
+
+        $security->php_handling = Smarty::PHP_REMOVE;
+        $security->allow_constants = false;
+        $security->allow_super_globals = false;
+        $security->streams = null;
+
+        $security->setPhpFunctions(array_merge($security->php_functions, [
+            'array', // Yes, Smarty really blocks this.
+            'category',
+            'categoryUrl',
+            'checkPermission',
+            'commentUrl',
+            'discussionUrl',
+            'inSection',
+            'inCategory',
+            'ismobile',
+            'multiCheckPermission',
+            'getValue',
+            'setValue',
+            'url',
+            'useragenttype',
+            'userUrl',
+        ]));
+
+        $security->php_modifiers = array_merge(
+            $security->php_functions,
+            ['sprintf']
+        );
+
+        $smarty->enableSecurity($security);
     }
 }

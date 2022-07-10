@@ -163,9 +163,9 @@ export function initializeAtComplete(editorElement, iframe?: any) {
                 }
             }
 
-            const filterSuccessHandler = data => {
+            const filterSuccessHandler = (data) => {
                 if (Array.isArray(data)) {
-                    data.forEach(result => {
+                    data.forEach((result) => {
                         if (typeof result === "object" && typeof result.name === "string") {
                             // Convert special characters to safely insert into template.
                             result.name = result.name
@@ -218,7 +218,7 @@ export function initializeAtComplete(editorElement, iframe?: any) {
     /**
      * Pre-insert handler for atwho.
      *
-     * Note, in contenteditable mode (iframe for us), the value is surrounded by span tags.
+     * Note, in content editable mode (iframe for us), the value is surrounded by span tags.
      */
     function beforeInsertHandler(value: string, $li: JQuery<any>): string {
         // It's better to use the value provided, as it may have

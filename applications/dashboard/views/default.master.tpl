@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="{$CurrentLocale.Lang}">
 <head>
+    <meta charset="utf-8">
     {asset name="Head"}
 </head>
 <body id="{$BodyID}" class="{$BodyClass}">

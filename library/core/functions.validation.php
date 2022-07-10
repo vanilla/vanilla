@@ -423,6 +423,18 @@ if (!function_exists('validateInteger')) {
     }
 }
 
+if (!function_exists('validatePositiveNumber')) {
+    /**
+     * Validate if number is positive
+     *
+     * @param int|string $number
+     * @return bool
+     */
+    function validatePositiveNumber($number): bool {
+        return (is_numeric($number) && (int)$number > 0);
+    }
+}
+
 if (!function_exists('validateBoolean')) {
     /**
      * Validate that a value can be converted into a boolean (true or false).
@@ -514,16 +526,21 @@ if (!function_exists('validateLength')) {
      * @return bool|string
      */
     function validateLength($value, $field) {
-        if (function_exists('mb_strlen')) {
+        $useByteLength = isset($field->ByteLength);
+
+        if (function_exists('mb_strlen') && !$useByteLength) {
             $diff = mb_strlen($value, 'UTF-8') - $field->Length;
         } else {
-            $diff = strlen($value) - $field->Length;
+            $diff = strlen($value) - $field->ByteLength;
         }
 
         if ($diff <= 0) {
             return true;
         } else {
-            return sprintf(t('ValidateLength'), t($field->Name), $diff);
+            $translationCode = $useByteLength
+                ? t('ValidateByteLength', '%1$s is %2$s bytes too long.')
+                : t('ValidateLength', '%1$s is %2$s characters too long.');
+            return sprintf($translationCode, t($field->Name), $diff);
         }
     }
 }
@@ -625,7 +642,12 @@ if (!function_exists('validateMinTextLength')) {
      */
     function validateMinTextLength($value, $field, $post) {
         if (isset($post['Format'])) {
+            $original = $value;
             $value = Gdn::formatService()->renderPlainText($value, $post['Format']);
+            // We need to simulate non-empty string if initial value was not empty
+            if (!empty($original) && empty($value)) {
+                $value = '.';
+            }
         }
 
         $value = html_entity_decode(trim(strip_tags($value)));

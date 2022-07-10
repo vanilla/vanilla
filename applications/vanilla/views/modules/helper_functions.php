@@ -1,4 +1,8 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+if (!defined('APPLICATION')) exit();
+
+use Vanilla\Utility\HtmlUtils;
+use Vanilla\Theme\BoxThemeShim;
 
 if (!function_exists('WriteModuleDiscussion')):
     function writeModuleDiscussion($discussion, $px = 'Bookmark', $showPhotos = false) {
@@ -6,7 +10,9 @@ if (!function_exists('WriteModuleDiscussion')):
         $htmlSanitizer = Gdn::getContainer()->get(Vanilla\Formatting\Html\HtmlSanitizer::class);
 
         ?>
-        <li id="<?php echo "{$px}_{$discussion->DiscussionID}"; ?>" class="<?php echo cssClass($discussion); ?>">
+        <li id="<?php echo "{$px}_{$discussion->DiscussionID}"; ?>"
+            class="<?php echo cssClass($discussion);?>  <?php BoxThemeShim::activeHtml("pageBox"); ?>">
+
             <?php if ($showPhotos) :
                 $firstUser = userBuilder($discussion, 'First');
                 echo userPhoto($firstUser, ['LinkClass' => 'IndexPhoto']);
@@ -62,7 +68,7 @@ if (!function_exists('WritePromotedContent')):
         $sender->EventArguments['Content'] = &$content;
         $sender->EventArguments['ContentUrl'] = &$contentURL;
         ?>
-        <div id="<?php echo "Promoted_{$contentType}_{$contentID}"; ?>" class="<?php echo cssClass($content); ?>">
+        <div id="<?php echo "Promoted_{$contentType}_{$contentID}"; ?>" class="<?php echo cssClass($content); ?> <?php BoxThemeShim::activeHtml('pageBox'); ?>">
             <div class="AuthorWrap">
          <span class="Author">
             <?php
@@ -184,6 +190,8 @@ if (!function_exists('writePromotedContentRow')):
         $userPhoto = val('PhotoUrl', $author);
         $cssClass = val('CssClass', $author);
 
+        $accessibleLabel = HtmlUtils::accessibleLabel('Category: "%s"', [$categoryName]);
+
         if ($view == 'table') {
             ?>
             <tr id="Promoted_<?php echo $type.'_'.$id; ?>" class="Item PromotedContent-Item <?php echo $cssClass; ?>">
@@ -192,7 +200,7 @@ if (!function_exists('writePromotedContentRow')):
                         <a class="Title" href="<?php echo $url; ?>">
                             <?php echo $title; ?>
                         </a>
-                        <span class="MItem Category"><?php echo t('in'); ?> <a href="<?php echo $categoryUrl; ?>"
+                        <span class="MItem Category"><?php echo t('in'); ?> <a href="<?php echo $categoryUrl; ?>" aria-label="<?php echo $accessibleLabel; ?>"
                                                                                class="MItem-CategoryName"><?php echo $categoryName; ?></a></span>
 
                         <div class="Description"><?php echo $body; ?></div>
@@ -201,7 +209,10 @@ if (!function_exists('writePromotedContentRow')):
                 <td class="BlockColumn BlockColumn-User User">
                     <div class="Block Wrap">
                         <a class="PhotoWrap PhotoWrapSmall" href="<?php echo $userUrl; ?>">
-                            <img class="ProfilePhoto ProfilePhotoSmall" src="<?php echo $userPhoto; ?>">
+                            <?php
+                                $accessibleLabel = HtmlUtils::accessibleLabel('User: "%s"', [$username]);
+                            ?>
+                            <img class="ProfilePhoto ProfilePhotoSmall" src="<?php echo $userPhoto; ?>" alt="<?php echo $accessibleLabel; ?>" loading="lazy" />
                         </a>
                         <a class="UserLink BlockTitle" href="<?php echo $userUrl; ?>"><?php echo $username; ?></a>
 
@@ -231,7 +242,7 @@ if (!function_exists('writePromotedContentRow')):
                     <div class="Meta">
                         <span class="MItem DiscussionAuthor"><ahref="<?php echo $userUrl; ?>
                             "><?php echo $username; ?></a></span>
-                        <span class="MItem Category"><?php echo t('in'); ?> <a href="<?php echo $categoryUrl; ?>"
+                        <span class="MItem Category"><?php echo t('in'); ?> <a href="<?php echo $categoryUrl; ?>" aria-label="<?php echo $accessibleLabel; ?>"
                                                                                class="MItem-CategoryName"><?php echo $categoryName; ?></a></span>
                     </div>
                 </div>

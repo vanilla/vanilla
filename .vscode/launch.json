@@ -1,0 +1,36 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            // Execute "yarn test:browser:debug" prior to attaching.
+            "type": "chrome",
+            "request": "attach",
+            "name": "Attach to \"yarn test:browser:debug\"",
+            "port": 9333,
+            "webRoot": "${workspaceFolder}",
+            "sourceMapPathOverrides": {
+                "webpack:///./~/*": "${webRoot}/node_modules/*",
+                "webpack:///./*": "${webRoot}/*"
+            }
+        },
+        {
+            "name": "Listen for XDebug",
+            "type": "php",
+            "request": "launch",
+            "port": 9000,
+            "pathMappings": {
+                "/srv/vanilla-repositories/vanilla": "${workspaceFolder}",
+                "/srv/vanilla-repositories/vanilla/cloud/plugins": "${workspaceFolder}/plugins"
+            },
+            "xdebugSettings": {
+                "max_data": 65535,
+                "show_hidden": 1,
+                "max_children": 100,
+                "max_depth": 5
+            }
+        }
+    ]
+}

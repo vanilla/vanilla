@@ -7,8 +7,12 @@
 use Garden\Schema\Schema;
 use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
+use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
+use Garden\Web\RequestInterface;
 use Vanilla\ApiUtils;
+use Vanilla\CurrentTimeStamp;
+use Vanilla\Web\RoleTokenFactory;
 
 /**
  * API Controller for the `/tokens` resource.
@@ -27,6 +31,12 @@ class TokensApiController extends AbstractApiController {
     /** @var AccessTokenModel */
     private $accessTokenModel;
 
+    /** @var UserModel $userModel */
+    private $userModel;
+
+    /** @var RoleTokenFactory $roleTokenFactory */
+    private $roleTokenFactory;
+
     /** @var Schema */
     private $fullSchema;
 
@@ -37,16 +47,24 @@ class TokensApiController extends AbstractApiController {
      * TokensApiController constructor.
      *
      * @param AccessTokenModel $accessTokenModel
+     * @param UserModel $userModel
+     * @param RoleTokenFactory $roleTokenFactory
      */
-    public function __construct(AccessTokenModel $accessTokenModel) {
+    public function __construct(
+        AccessTokenModel $accessTokenModel,
+        UserModel $userModel,
+        RoleTokenFactory $roleTokenFactory
+    ) {
         $this->accessTokenModel = $accessTokenModel;
+        $this->userModel = $userModel;
+        $this->roleTokenFactory = $roleTokenFactory;
     }
 
     /**
      * Revoke an access token.
      *
      * @param int $id
-     * @throws ClientException if current user isn't authorized to delete the token.
+     * @throws ClientException Throws an exception if current user isn't authorized to delete the token.
      */
     public function delete($id) {
         $this->idParamSchema()->setDescription('Revoke an access token.');
@@ -65,8 +83,7 @@ class TokensApiController extends AbstractApiController {
      *
      * @param int|string|array $token Full token row.
      * @param bool $throw Should relevant exceptions be thrown on an error?
-     * @throws ClientException if the token has been revoked.
-     * @throws ClientException if the token has expired.
+     * @throws ClientException Throws an exception if the token has been revoked or has expired.
      * @return bool
      */
     public function isActiveToken($token, $throw = false) {
@@ -132,7 +149,7 @@ class TokensApiController extends AbstractApiController {
      *
      * @param int $id
      * @param array $query
-     * @throws NotFoundException if this is not an active token.
+     * @throws NotFoundException Throws an exception if this is not an active token.
      * @return array
      */
     public function get($id, array $query) {
@@ -244,6 +261,36 @@ class TokensApiController extends AbstractApiController {
     }
 
     /**
+     * Create a new time-scoped role token (JWT) based on the current user's roles
+     *
+     * @param RequestInterface $request Initiating request
+     * @return array
+     * @throws ForbiddenException Request initiated from guest user.
+     * @throws \Garden\Schema\ValidationException Validation Failed.
+     */
+    public function post_roles(RequestInterface $request) : array {
+        if (!$this->getSession()->isValid()) {
+            throw new ForbiddenException("Must be logged in to create a role token");
+        }
+
+        $in = $this->schema([], 'in')->setDescription("Issue a role token for the current user");
+        $out = $this->schema([
+            'roleToken:s' => "A signed JWT issued for the current user containing the set of roles assigned ".
+                "to this user in its claims",
+            'expires:dt' => 'DateTime when issued JWT expires'
+        ], 'out');
+
+        $roleIDs = $this->userModel->getRoleIDs($this->getSession()->UserID);
+        $roleToken = $this->roleTokenFactory->forEncoding($roleIDs, $request);
+        $response = [
+            'roleToken' => $roleToken->encode(),
+            'expires' => $roleToken->getExpires()
+        ];
+
+        return $out->validate($response);
+    }
+
+    /**
      * Normalize a database record to match the Schema definition.
      *
      * @param array $dbRecord Database record.
@@ -285,7 +332,7 @@ class TokensApiController extends AbstractApiController {
      * Get an access token by its numeric ID.
      *
      * @param int $accessTokenID
-     * @throws NotFoundException when the token cannot be located by its ID.
+     * @throws NotFoundException Throws an exception when the token cannot be located by its ID.
      * @return array
      */
     protected function token($accessTokenID) {
@@ -300,7 +347,7 @@ class TokensApiController extends AbstractApiController {
      * Validate the transient key for the current request.
      *
      * @param string $transientKey
-     * @throws ClientException
+     * @throws ClientException Throws an exception when the transient key is invalid.
      */
     public function validateTransientKey($transientKey) {
         if ($this->getSession()->transientKey() === false) {
@@ -310,5 +357,14 @@ class TokensApiController extends AbstractApiController {
         if ($this->getSession()->transientKey() != $transientKey) {
             throw new ClientException('Invalid transient key.', 401);
         }
+    }
+
+    /**
+     * Get the access token model dependency.
+     *
+     * @return AccessTokenModel
+     */
+    public function getAccessTokenModel(): AccessTokenModel {
+        return $this->accessTokenModel;
     }
 }

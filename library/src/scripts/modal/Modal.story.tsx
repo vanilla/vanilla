@@ -16,7 +16,7 @@ import FrameBody from "@library/layout/frame/FrameBody";
 import { Tabs } from "@library/sectioning/Tabs";
 
 export default {
-    title: "Modals",
+    title: "Layout/Modals",
 };
 
 export function DismissableModal() {
@@ -26,7 +26,7 @@ export function DismissableModal() {
     return (
         <>
             <StoryContent>
-                <Button onClick={() => setIsVisible(true)} baseClass={ButtonTypes.PRIMARY}>
+                <Button onClick={() => setIsVisible(true)} buttonType={ButtonTypes.PRIMARY}>
                     Open Modal
                 </Button>
             </StoryContent>

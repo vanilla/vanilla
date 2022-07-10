@@ -9,14 +9,20 @@
  * @license GPL-2.0-only
  */
 
-use Vanilla\Models\ThemePreloadProvider;
+use Vanilla\Models\DashboardPreloadProvider;
+use Vanilla\Site\SiteSectionModel;
+use Vanilla\Theme\ThemePreloadProvider;
+use Vanilla\Utility\DebugUtils;
 use Vanilla\Utility\HtmlUtils;
 use \Vanilla\Web\Asset\LegacyAssetModel;
+use Vanilla\Web\CacheControlConstantsInterface;
+use Vanilla\Web\CacheControlTrait;
 use Vanilla\Web\HttpStrictTransportSecurityModel;
 use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
 use Vanilla\Web\ContentSecurityPolicy\Policy;
 use Vanilla\Web\JsInterpop\ReduxActionPreloadTrait;
 use Vanilla\Web\MasterViewRenderer;
+use Vanilla\Dashboard\Pages\LegacyDashboardPage;
 
 /**
  * Controller base class.
@@ -25,11 +31,14 @@ use Vanilla\Web\MasterViewRenderer;
  *
  * @method void render($view = '', $controllerName = false, $applicationFolder = false, $assetName = 'Content') Render the controller's view.
  */
-class Gdn_Controller extends Gdn_Pluggable {
-    use \Garden\MetaTrait, ReduxActionPreloadTrait;
+class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInterface {
+    use \Garden\MetaTrait, ReduxActionPreloadTrait, CacheControlTrait;
 
     /** Seconds before reauthentication is required for protected operations. */
     const REAUTH_TIMEOUT = 1200; // 20 minutes
+
+    /** @var bool Check if user is already re-authenticated. */
+    protected static $isAuthenticated = false;
 
     /** @var string The name of the application that this controller can be found in. */
     public $Application;
@@ -43,7 +52,7 @@ class Gdn_Controller extends Gdn_Pluggable {
      * the master view. If an asset's key is not called by the master view,
      * that asset will not be rendered.
      */
-    public $Assets;
+    public $Assets = [];
 
     /** @var string */
     protected $_CanonicalUrl;
@@ -140,7 +149,7 @@ class Gdn_Controller extends Gdn_Pluggable {
      */
     public $StatusMessage;
 
-    /** @var stringDefined by the dispatcher: SYNDICATION_RSS, SYNDICATION_ATOM, or SYNDICATION_NONE (default). */
+    /** @var string Defined by the dispatcher: SYNDICATION_RSS, SYNDICATION_ATOM, or SYNDICATION_NONE (default). */
     public $SyndicationMethod;
 
     /**
@@ -265,24 +274,30 @@ class Gdn_Controller extends Gdn_Pluggable {
         $this->_FormSaved = '';
         $this->_Json = [];
         $this->_Headers = [
-            'X-Garden-Version' => APPLICATION.' '.APPLICATION_VERSION,
+            'X-Vanilla-Version' => APPLICATION_VERSION,
             'Content-Type' => Gdn::config('Garden.ContentType', '').'; charset=utf-8' // PROPERLY ENCODE THE CONTENT
 //         'Last-Modified' => gmdate('D, d M Y H:i:s') . ' GMT', // PREVENT PAGE CACHING (this can be overridden by specific controllers)
         ];
 
         if (Gdn::session()->isValid() || Gdn::request()->getMethod() !== 'GET') {
             $this->_Headers = array_merge($this->_Headers, [
-                'Cache-Control' => \Vanilla\Web\CacheControlMiddleware::NO_CACHE, // PREVENT PAGE CACHING: HTTP/1.1
+                self::HEADER_CACHE_CONTROL => self::NO_CACHE, // PREVENT PAGE CACHING: HTTP/1.1
             ]);
         } else {
             $this->_Headers = array_merge($this->_Headers, [
-                'Cache-Control' => \Vanilla\Web\CacheControlMiddleware::PUBLIC_CACHE,
-                'Vary' => \Vanilla\Web\CacheControlMiddleware::VARY_COOKIE,
+                self::HEADER_CACHE_CONTROL => self::PUBLIC_CACHE,
+                'Vary' => self::VARY_COOKIE,
             ]);
         }
 
-        $hsts = Gdn::getContainer()->get('HstsModel');
+        $hsts = Gdn::getContainer()->get(HttpStrictTransportSecurityModel::class);
         $this->_Headers[HttpStrictTransportSecurityModel::HSTS_HEADER] = $hsts->getHsts();
+
+        //get additional security headers added in HttpStrictTransportSecurityModel::class
+        foreach ($hsts->getAdditionalSecurityHeaders() as $header) {
+            [$name,$value] = $hsts->getSecurityHeaderEntry($header);
+            $this->_Headers[$name] = $value;
+        }
 
         $cspModel = Gdn::getContainer()->get(ContentSecurityPolicyModel::class);
         $this->_Headers[ContentSecurityPolicyModel::CONTENT_SECURITY_POLICY] = $cspModel->getHeaderString(Policy::FRAME_ANCESTORS);
@@ -302,6 +317,20 @@ class Gdn_Controller extends Gdn_Pluggable {
         if ($currentTheme instanceof \Vanilla\Addon) {
             $this->addDefinition('currentThemePath', $currentTheme->getSubdir());
         }
+    }
+
+    /**
+     * @return bool
+     */
+    public static function isReauthenticated(): bool {
+        return self::$isAuthenticated;
+    }
+
+    /**
+     * @param bool $isAuthenticated
+     */
+    public static function setIsReauthenticated(bool $isAuthenticated): void {
+        self::$isAuthenticated = $isAuthenticated;
     }
 
     /**
@@ -495,6 +524,19 @@ class Gdn_Controller extends Gdn_Pluggable {
     }
 
     /**
+     * Check to see if we've gone off the end of the page.
+     *
+     * @param int $offset The offset requested.
+     * @param int $totalCount The total count of records.
+     * @throws Exception Throws an exception if the offset is past the last page.
+     */
+    protected function checkPageRange(int $offset, int $totalCount) {
+        if ($offset > 0 && $offset >= $totalCount) {
+            throw notFoundException();
+        }
+    }
+
+    /**
      * Get/set the canonical URL.
      *
      * @param ?string $value
@@ -591,6 +633,9 @@ class Gdn_Controller extends Gdn_Pluggable {
      */
     public function definitionList($wrap = true) {
         $session = Gdn::session();
+        /** @var \Vanilla\Models\SiteMeta $siteMeta */
+        $siteMeta = Gdn::getContainer()->get(\Vanilla\Models\SiteMeta::class);
+        $siteValue = $siteMeta->value();
         if (!array_key_exists('TransportError', $this->_Definitions)) {
             $this->_Definitions['TransportError'] = t(
                 'Transport error: %s',
@@ -600,6 +645,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
         if (!array_key_exists('TransientKey', $this->_Definitions)) {
             $this->_Definitions['TransientKey'] = $session->transientKey();
+            unset($siteValue['TransientKey']);
         }
 
         if (!array_key_exists('WebRoot', $this->_Definitions)) {
@@ -685,9 +731,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             'ui' => []
         ];
 
-        /** @var \Vanilla\Models\SiteMeta $siteMeta */
-        $siteMeta = Gdn::getContainer()->get(\Vanilla\Models\SiteMeta::class);
-        $this->_Definitions = array_merge_recursive($this->_Definitions, $siteMeta->value());
+        $this->_Definitions = array_merge_recursive($this->_Definitions, $siteValue);
 
         $this->_Definitions['useNewFlyouts'] = \Vanilla\FeatureFlagHelper::featureEnabled('NewFlyouts');
 
@@ -726,6 +770,15 @@ class Gdn_Controller extends Gdn_Pluggable {
         }
 
         return $this->_DeliveryType;
+    }
+
+    /**
+     * Check if this request is rendering a masterview.
+     *
+     * @returns bool
+     */
+    public function isRenderingMasterView(): bool {
+        return $this->deliveryType() === DELIVERY_TYPE_ALL;
     }
 
     /**
@@ -777,6 +830,58 @@ class Gdn_Controller extends Gdn_Pluggable {
     }
 
     /**
+     * Get the contextual title.
+     *
+     * If this page is part of a site section, it will return the section's name.
+     * Otherwise, it will return title()
+     *
+     * @return string
+     */
+    public function contextualTitle() {
+        $category = $this->data('Category', null);
+        if (!$category) {
+            $siteSection = Gdn::getContainer()->get(SiteSectionModel::class)->getCurrentSiteSection();
+            $categoryIdentifier = $siteSection->getAttributes()['categoryID'] ?? null;
+            if ($categoryIdentifier && $categoryIdentifier > 0) {
+                $category = CategoryModel::categories($categoryIdentifier);
+            }
+        }
+        if (is_object($category)) {
+            $category = (array) $category;
+        }
+        if ($category) {
+            return $category['Name'] ?? '';
+        }
+        return $this->title();
+    }
+
+    /**
+     * Get the contextual description.
+     *
+     * If this page is part of a site section, it will return the section's description.
+     * Otherwise, it will return description()
+     *
+     * @return string
+     */
+    public function contextualDescription() {
+        $category = $this->data('Category', null);
+        if (!$category) {
+            $siteSection = Gdn::getContainer()->get(SiteSectionModel::class)->getCurrentSiteSection();
+            $categoryIdentifier = $siteSection->getAttributes()['categoryID'] ?? null;
+            if ($categoryIdentifier && $categoryIdentifier > 0) {
+                $category = CategoryModel::categories($categoryIdentifier);
+            }
+        }
+        if (is_object($category)) {
+            $category = (array) $category;
+        }
+        if ($category) {
+            return $category['Description'] ?? '';
+        }
+        return $this->description();
+    }
+
+    /**
      * Add error messages to be displayed to the user.
      *
      * @since 2.0.18
@@ -794,9 +899,10 @@ class Gdn_Controller extends Gdn_Pluggable {
      * @param string $View The name of the view to fetch. If not specified, it will use the value
      * of $this->View. If $this->View is not specified, it will use the value
      * of $this->RequestMethod (which is defined by the dispatcher class).
-     * @param string $ControllerName The name of the controller that owns the view if it is not $this.
-     * @param string $ApplicationFolder The name of the application folder that contains the requested controller
+     * @param string|false $ControllerName The name of the controller that owns the view if it is not $this.
+     * @param string|false $ApplicationFolder The name of the application folder that contains the requested controller
      * if it is not $this->ApplicationFolder.
+     * @return string Returns the view contents.
      */
     public function fetchView($View = '', $ControllerName = false, $ApplicationFolder = false) {
         $ViewPath = $this->fetchViewLocation($View, $ControllerName, $ApplicationFolder);
@@ -1027,6 +1133,15 @@ class Gdn_Controller extends Gdn_Pluggable {
      */
     public function getHead() {
         return $this->Head;
+    }
+
+    /**
+     * Get Inform messages.
+     *
+     * @return array
+     */
+    public function getInformMessages(): array {
+        return $this->_InformMessages;
     }
 
     /**
@@ -1279,15 +1394,18 @@ class Gdn_Controller extends Gdn_Pluggable {
             Logger::logAccess(
                 'security_denied',
                 Logger::NOTICE,
-                '{username} was denied access to {path}.',
+                '{username} was denied access to {requestPath}.',
                 [
                     'permission' => $permission,
                     Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
+                    'trace' => \Vanilla\Utility\DebugUtils::stackTraceString(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3)),
                 ]
             );
 
-            if (!$session->isValid() && $this->deliveryType() == DELIVERY_TYPE_ALL) {
+            if (!$session->isValid() && $this->isRenderingMasterView()) {
                 redirectTo('/entry/signin?Target='.urlencode($this->Request->pathAndQuery()));
+            } elseif (DebugUtils::isTestMode()) {
+                throw permissionException();
             } else {
                 Gdn::dispatcher()->dispatch('DefaultPermission');
                 exit();
@@ -1298,7 +1416,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                 Logger::logAccess(
                     'security_access',
                     Logger::INFO,
-                    "{username} accessed {path}.",
+                    "{username} accessed {requestPath}.",
                     [Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY]
                 );
             }
@@ -1311,26 +1429,37 @@ class Gdn_Controller extends Gdn_Pluggable {
      * @param array $options Setting key 'ForceTimeout' to `true` will ignore the cooldown window between prompts.
      */
     public function reauth($options = []) {
-        // Make sure we're logged in...
+        // If we've already gone through this then we are good.
+        if (self::isReauthenticated()) {
+            return;
+        }
+
+        // Make sure we're logged in.
         if (Gdn::session()->UserID == 0) {
             return;
         }
 
-        // ...aren't in an API v1 call...
+        // Make sure we aren't in an API v1 call.
         if ($this->isLegacyAPI()) {
             return;
         }
 
-        // ...and have a proper password.
-        $user = Gdn::userModel()->getID(Gdn::session()->UserID);
-        if (val('HashMethod', $user) === 'Random') {
+        // Don't ask for re-authentication on connect-only sites.
+        if (Gdn::config('Garden.Registration.Method') === 'Connect') {
+            return;
+        }
+
+        // Random passwords created by SSO cannot be re-authenticated.
+        $user = Gdn::userModel()->getID(Gdn::session()->UserID, DATASET_TYPE_ARRAY);
+        if (($user['HashMethod'] ?? '') === 'Random') {
             return;
         }
 
         // If the user has logged in recently enough, don't make them login again.
         $lastAuthenticated = Gdn::authenticator()->identity()->getAuthTime();
         $forceTimeout = $options['ForceTimeout'] ?? false;
-        if ($lastAuthenticated > 0 && !$forceTimeout) {
+        $inReauth = $this->Request->post('DoReauthenticate');
+        if ($lastAuthenticated > 0 && !$forceTimeout && !$inReauth) {
             $sinceAuth = time() - $lastAuthenticated;
             if ($sinceAuth < self::REAUTH_TIMEOUT) {
                 return;
@@ -1338,7 +1467,7 @@ class Gdn_Controller extends Gdn_Pluggable {
         }
 
         Gdn::dispatcher()->dispatch('/profile/authenticate', false);
-        exit();
+        throw new \Vanilla\Exception\ExitException();
     }
 
     /**
@@ -1374,8 +1503,8 @@ class Gdn_Controller extends Gdn_Pluggable {
      * them to the screen.
      *
      * @param string $view
-     * @param string $controllerName
-     * @param string $applicationFolder
+     * @param string|false $controllerName
+     * @param string|false $applicationFolder
      * @param string $assetName The name of the asset container that the content should be rendered in.
      */
     public function xRender($view = '', $controllerName = false, $applicationFolder = false, $assetName = 'Content') {
@@ -1400,7 +1529,6 @@ class Gdn_Controller extends Gdn_Pluggable {
                 ob_clean();
             }
             $this->contentType('application/json; charset=utf-8');
-            $this->setHeader('X-Content-Type-Options', 'nosniff');
 
             // Cross-Origin Resource Sharing (CORS)
             $this->setAccessControl();
@@ -1409,9 +1537,6 @@ class Gdn_Controller extends Gdn_Pluggable {
         if ($this->_DeliveryMethod == DELIVERY_METHOD_TEXT) {
             $this->contentType('text/plain');
         }
-
-        // Send headers to the browser
-        $this->sendHeaders();
 
         // Make sure to clear out the content asset collection if this is a syndication request
         if ($this->SyndicationMethod !== SYNDICATION_NONE) {
@@ -1447,6 +1572,9 @@ class Gdn_Controller extends Gdn_Pluggable {
             if ($exitRender) {
                 return;
             }
+        } else {
+            // Headers are ready now.
+            $this->sendHeaders();
         }
 
         if ($this->_DeliveryMethod == DELIVERY_METHOD_JSON) {
@@ -1481,7 +1609,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             $json = ipDecodeRecursive($this->_Json);
             $json = json_encode($json, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
             $this->_Json['Data'] = $json;
-            exit($this->_Json['Data']);
+            echo $json;
         } else {
             if ($this->SyndicationMethod === SYNDICATION_NONE) {
                 if (count($this->_InformMessages) > 0) {
@@ -1503,7 +1631,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             // Render
             if ($this->_DeliveryType == DELIVERY_TYPE_BOOL) {
                 echo $view ? 'TRUE' : 'FALSE';
-            } elseif ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
+            } elseif ($this->isRenderingMasterView()) {
                 // Render
                 $this->renderMaster();
             } else {
@@ -1571,9 +1699,12 @@ class Gdn_Controller extends Gdn_Pluggable {
      */
     public function renderAssetForTwig(string $assetName): \Twig\Markup {
         ob_start();
-        $this->renderAsset($assetName);
-        $echoedOutput = ob_get_contents();
-        ob_end_clean();
+        try {
+            $this->renderAsset($assetName);
+            $echoedOutput = ob_get_contents();
+        } finally {
+            ob_end_clean();
+        }
         return new \Twig\Markup($echoedOutput, 'utf-8');
     }
 
@@ -1597,7 +1728,8 @@ class Gdn_Controller extends Gdn_Pluggable {
                 }
                 $data[$key] = $value;
             }
-            unset($this->Data);
+            // Wipe the data.
+            $this->Data = [];
         }
 
         // Massage the data for better rendering.
@@ -1765,7 +1897,7 @@ class Gdn_Controller extends Gdn_Pluggable {
         if (!$node) {
             return;
         }
-
+        $node = htmlspecialchars($node, ENT_XML1);
         echo "$indent<$node>";
 
         if (is_scalar($data)) {
@@ -1804,6 +1936,19 @@ class Gdn_Controller extends Gdn_Pluggable {
                         $route = '/home/error';
                 }
 
+                // Log forbidden exceptions as security events.
+                if (in_array($ex->getCode(), [401, 403])) {
+                    Logger::logAccess(
+                        'security_denied',
+                        Logger::NOTICE,
+                        $ex->getMessage(),
+                        [
+                            Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
+                            'trace' => \Vanilla\Utility\DebugUtils::stackTraceString($ex->getTrace(), 3),
+                        ]
+                    );
+                }
+
                 // Redispatch to our error handler.
                 if (is_a($ex, 'Gdn_UserException')) {
                     // UserExceptions provide more info.
@@ -1819,14 +1964,20 @@ class Gdn_Controller extends Gdn_Pluggable {
                     // Default forbidden & not found codes.
                     Gdn::dispatcher()
                         ->passData('Message', $ex->getMessage())
-                        ->passData('Url', url())
+                        ->passData('Url', url());
+
+                    if ($ex instanceof Garden\Web\Exception\HttpException) {
+                        Gdn::dispatcher()->passData('Description', $ex->getDescription());
+                    }
+
+                    Gdn::dispatcher()
                         ->dispatch($route);
                 } else {
                     // I dunno! Barf.
-                    gdn_ExceptionHandler($ex);
+                    gdnExceptionHandler($ex);
                 }
             } catch (Exception $ex2) {
-                gdn_ExceptionHandler($ex);
+                gdnExceptionHandler($ex);
             }
             return;
         }
@@ -1881,7 +2032,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                 }
                 break;
 //         case DELIVERY_METHOD_XHTML:
-//            gdn_ExceptionHandler($Ex);
+//            gdnExceptionHandler($Ex);
 //            break;
             case DELIVERY_METHOD_XML:
                 safeHeader('Content-Type: text/xml; charset=utf-8', true);
@@ -1899,7 +2050,7 @@ class Gdn_Controller extends Gdn_Pluggable {
      */
     public function renderMaster() {
         // Build the master view if necessary
-        if (in_array($this->_DeliveryType, [DELIVERY_TYPE_ALL])) {
+        if ($this->isRenderingMasterView()) {
             $this->MasterView = $this->masterView();
 
             // Only get css & ui Components if this is NOT a syndication request
@@ -1946,8 +2097,9 @@ class Gdn_Controller extends Gdn_Pluggable {
                         continue;
                     } else {
                         // Check to see if there is a CSS cacher.
-                        $cssCacher = Gdn::factory('CssCacher');
-                        if (!is_null($cssCacher)) {
+                        $hasCacher = Gdn::getContainer()->has('CssCacher');
+                        if ($hasCacher) {
+                            $cssCacher = Gdn::getContainer()->get('CssCacher');
                             $path = $cssCacher->get($path, $appFolder);
                         }
 
@@ -2012,6 +2164,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
                 $this->addWebpackAssets();
                 $this->addThemeAssets();
+                $this->registerDashboardReduxActions();
 
                 // Add preloaded redux actions.
                 $this->Head->addScript(
@@ -2084,13 +2237,6 @@ class Gdn_Controller extends Gdn_Pluggable {
         $this->EventArguments['MasterViewPath'] = &$masterViewPath;
         $this->fireEvent('BeforeFetchMaster');
 
-        if ($masterViewPath === false) {
-            trigger_error(
-                errorMessage("Could not find master view: {$this->MasterView}.master*", $this->ClassName, '_FetchController'),
-                E_USER_ERROR
-            );
-        }
-
         /// A unique identifier that can be used in the body tag of the master view if needed.
         $controllerName = $this->ClassName;
         // Strip "Controller" from the body identifier.
@@ -2118,7 +2264,15 @@ class Gdn_Controller extends Gdn_Pluggable {
         );
         $this->setData('CssClass', $cssClass, true);
 
-        if ($this->MasterView === 'default' && Gdn::themeFeatures()->useSharedMasterView()) {
+        if ($this->MasterView === 'admin') {
+            /** @var LegacyDashboardPage $page */
+            $page = Gdn::getContainer()->get(LegacyDashboardPage::class);
+            $page->initialize($this);
+            echo $page->renderPage();
+            return;
+        }
+
+        if ($this->MasterView === 'default' && ($this->isReactView || Gdn::themeFeatures()->useSharedMasterView())) {
             /** @var MasterViewRenderer $viewRenderer */
             $viewRenderer = Gdn::getContainer()->get(MasterViewRenderer::class);
             $result = $viewRenderer->renderGdnController($this);
@@ -2143,7 +2297,7 @@ class Gdn_Controller extends Gdn_Pluggable {
      * Get theming assets for the page.
      */
     private function addThemeAssets() {
-        if (!$this->allowCustomTheming || $this->_DeliveryType !== DELIVERY_TYPE_ALL) {
+        if (!$this->allowCustomTheming || !$this->isRenderingMasterView() || $this->MasterView === 'admin') {
             // We only want to load theme data for full page loads & controllers that require theming data.
             return;
         }
@@ -2194,6 +2348,25 @@ class Gdn_Controller extends Gdn_Pluggable {
     }
 
     /**
+     * Register actions for DashboardApiController
+     */
+    private function registerDashboardReduxActions() {
+        if ($this->MasterView === 'admin') {
+            $dashboardProvider = \Gdn::getContainer()->get(DashboardPreloadProvider::class);
+            $this->registerReduxActionProvider($dashboardProvider);
+        }
+    }
+
+    /**
+     * Get the headers from the controller.
+     *
+     * @return array
+     */
+    public function getHeaders(): array {
+        return $this->_Headers ?? [];
+    }
+
+    /**
      * Sends all headers in $this->_Headers (defined with $this->setHeader()) to the browser.
      */
     public function sendHeaders() {
@@ -2202,14 +2375,19 @@ class Gdn_Controller extends Gdn_Pluggable {
             if ($name !== 'Status') {
                 safeHeader("$name: $value", true);
             } else {
-                $code = array_shift($shift = explode(' ', $value));
+                $shift = explode(' ', $value);
+                $code = array_shift($shift);
                 safeHeader("$name: $value", true, $code);
             }
         }
 
-        if (!empty($this->_Headers['Cache-Control'])) {
-            \Vanilla\Web\CacheControlMiddleware::sendCacheControlHeaders($this->_Headers['Cache-Control']);
+        if (!empty($this->_Headers[self::HEADER_CACHE_CONTROL])) {
+            static::sendCacheControlHeaders($this->_Headers[self::HEADER_CACHE_CONTROL]);
         }
+
+        // Keep track of the last rendered headers.
+        // This is primarily for tests.
+        \Gdn::dispatcher()->setSentHeaders($this->getHeaders());
 
         // Empty the collection after sending
         $this->_Headers = [];
@@ -2492,6 +2670,15 @@ class Gdn_Controller extends Gdn_Pluggable {
         }
 
         return $this->data('Title');
+    }
+
+    /**
+     * Get the destination URL where the page will be redirected after an ajax request.
+     *
+     * @return string|null
+     */
+    public function getRedirectTo(): ?string {
+        return $this->redirectTo;
     }
 
     /**

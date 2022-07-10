@@ -12,15 +12,13 @@
  * Renders the dashboard nav.
  *
  * Handles the manipulation of the Dashboard sections, which are the top-level nav items appearing in the dashboard nav bar.
- * Handles implementing the user preferences for the section landing page and the collapse state of the panel nav.
- *
  * Rendering this module will render only the side nav. The section menu needs to be rendered manually using the
  * `getSectionsInfo()` function.
  */
 class DashboardNavModule extends SiteNavModule {
 
     /** @var string The active section if the theme section we're in doesn't match any section in the dashboard. */
-    const ACTIVE_SECTION_DEFAULT = 'Settings';
+    const ACTIVE_SECTION_DEFAULT = 'Analytics';
 
     /** @var string The default section when adding items to the navigation. */
     const SECTION_DEFAULT = 'Settings';
@@ -41,17 +39,14 @@ class DashboardNavModule extends SiteNavModule {
      * @var array
      */
     private static $sectionsInfo = [
-        'DashboardHome' => [
+        'Appearance' => [
             'permission' => [
-                'Garden.Settings.View',
                 'Garden.Settings.Manage',
-                'Garden.Community.Manage',
             ],
-            'section' => 'DashboardHome',
-            'title' => 'Dashboard',
-            'description' => 'Site Overview',
-            'url' => '/dashboard/settings/home',
-            'empty' => true
+            'section' => 'Appearance',
+            'title' => 'Appearance',
+            'description' => 'Customize your community',
+            'url' => '/appearance'
         ],
         'Moderation' => [
             'permission' => [
@@ -68,12 +63,12 @@ class DashboardNavModule extends SiteNavModule {
             'title' => 'Moderation',
             'description' => 'Community Management',
             'url' => [
-                'Garden.Moderation.Manage' => 'dashboard/log/moderation',
-                'Moderation.ModerationQueue.Manage' => 'dashboard/log/moderation',
+                'Garden.Users.Add' => '/dashboard/user',
+                'Garden.Users.Edit' => '/dashboard/user',
+                'Garden.Users.Delete' => '/dashboard/user',
+                'Garden.Moderation.Manage' => '/dashboard/log/moderation',
+                'Moderation.ModerationQueue.Manage' => '/dashboard/log/moderation',
                 'Garden.Community.Manage' => '/dashboard/message',
-                'Garden.Users.Add' => 'dashboard/user',
-                'Garden.Users.Edit' => 'dashboard/user',
-                'Garden.Users.Delete' => 'dashboard/user',
                 'Garden.Settings.Manage' => '/dashboard/settings/bans',
                 'Garden.Users.Approve' => '/dashboard/user/applicants',
             ],
@@ -86,8 +81,20 @@ class DashboardNavModule extends SiteNavModule {
             'section' => 'Settings',
             'title' => 'Settings',
             'description' => 'Configuration & Addons',
-            'url' => '/dashboard/settings/branding'
-        ]
+            'url' => '/dashboard/role'
+        ],
+        'Analytics' => [
+            'permission' => [
+                'Garden.Settings.View',
+                'Garden.Settings.Manage',
+                'Garden.Community.Manage',
+            ],
+            'section' => 'Analytics',
+            'title' => 'Analytics',
+            'description' => 'Visualize Your Community',
+            'url' => '/dashboard/settings/home',
+            'empty' => true
+        ],
     ];
 
     /**
@@ -115,16 +122,19 @@ class DashboardNavModule extends SiteNavModule {
      * Compiles our section info and filters it according to a user's permissions. Info is properly sanitized
      * to be rendered in a view.
      *
+     * @param bool $handleLandingPreference Backwards compatibility, new components should not carry this feature moving forward.
      * @return array The sections to display in the main dashboard nav.
      * @throws Exception
      */
-    public function getSectionsInfo() {
+    public function getSectionsInfo($handleLandingPreference = true) {
         if (!self::isInitStaticFired()) {
             self::setInitStaticFired(true);
             $this->fireEvent('init');
         }
 
-        $this->handleUserPreferencesSectionLandingPage();
+        if ($handleLandingPreference) {
+            $this->handleUserPreferencesSectionLandingPage();
+        }
         $session = Gdn::session();
 
         $sections = self::$sectionsInfo;
@@ -170,7 +180,7 @@ class DashboardNavModule extends SiteNavModule {
      *
      * @return string The active section.
      */
-    private function getActiveSection() {
+    public function getActiveSection() {
         $currentSections = Gdn_Theme::section('', 'get');
         foreach ($currentSections as $currentSection) {
             if (array_key_exists($currentSection, self::$sectionsInfo)) {
@@ -339,19 +349,17 @@ class DashboardNavModule extends SiteNavModule {
             $fetched = true;
         }
 
-        $rawSections = $this->getSectionsInfo();
+        $rawSections = $this->getSectionsInfo(false);
         $items = DashboardNavModule::getSectionItems();
 
         $menus = [];
         foreach ($rawSections as $s) {
             $menu = [
                 'name' => $s['title'],
-                'key' => $sectionID = strtolower($s['section']),
+                'id' => $sectionID = strtolower($s['section']),
                 'description' => $s['description'],
+                'url' => $s['url'],
             ];
-            if (!empty($s['empty'])) {
-                $menu['url'] = $s['url'];
-            }
 
             $groups = [];
             if (isset($items[$sectionID])) {
@@ -359,12 +367,12 @@ class DashboardNavModule extends SiteNavModule {
 
                 foreach ($rawSection['groups'] as $g) {
                     $section = [
-                        'key' => $g['key'],
+                        'id' => $g['key'],
                         'name' => $g['text'] ?? '',
                         'links' => [],
                     ];
 
-                    $groups[$section['key']] = $section;
+                    $groups[$section['id']] = $section;
                 }
 
                 $this->sortItems($rawSection['links']);
@@ -372,7 +380,8 @@ class DashboardNavModule extends SiteNavModule {
                     list($groupID, $linkID) = explode('.', $k);
                     $link = [
                         'name' => strip_tags($l['text']),
-                        'key' => $linkID,
+                        'id' => $linkID,
+                        'parentID' => $sectionID,
                         'url' => $l['url'],
                         'react' => false,
                     ];
@@ -389,16 +398,16 @@ class DashboardNavModule extends SiteNavModule {
                         ];
                     }
 
-                    $groups[$groupID]['links'][] = $link;
+                    $groups[$groupID]['children'][] = $link;
                 }
 
                 // Remove sections with no links.
                 $groups = array_filter($groups, function ($s) {
-                    return !empty($s['links']);
+                    return !empty($s['children']);
                 });
             }
             if (!empty($groups) || !empty($menu['url'])) {
-                $menu['groups'] = array_values($groups);
+                $menu['children'] = array_values($groups);
                 $menus[] = $menu;
             }
         }

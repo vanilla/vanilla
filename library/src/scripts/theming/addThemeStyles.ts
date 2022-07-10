@@ -3,11 +3,14 @@
  * @license GPL-2.0-only
  */
 
-import { unit, paddings, flexHelper } from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { flexHelper } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { themeCardVariables } from "./themePreviewCardStyles";
+import previewCardVariables from "@library/theming/PreviewCard.variables";
 import { percent, color } from "csx";
+import { Mixins } from "@library/styles/Mixins";
 
 export const addthemeVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("currentThemeInfo");
@@ -30,14 +33,13 @@ export const addThemeClasses = useThemeCache(() => {
     const style = styleFactory("addTheme");
 
     const addTheme = style("addTheme", {
-        display: "block",
         ...flexHelper().middle(),
-        ...paddings({
+        ...Mixins.padding({
             all: vars.addTheme.padding,
         }),
-        width: unit(vars.addTheme.width),
-        height: unit(vars.addTheme.height),
-        $nest: {
+        width: styleUnit(vars.addTheme.width),
+        height: styleUnit(vars.addTheme.height),
+        ...{
             "&:hover": {
                 backgroundColor: color("#fff").toString(),
             },
@@ -47,12 +49,12 @@ export const addThemeClasses = useThemeCache(() => {
     const button = style("button", {
         padding: 0,
         minHeight: 200,
-        minWidth: themeCardVariables().container.minWidth,
-        maxWidth: themeCardVariables().container.maxWidth,
-        $nest: {
+        minWidth: previewCardVariables().container.minWidth,
+        maxWidth: previewCardVariables().container.maxWidth,
+        ...{
             "&&": {
-                width: unit(vars.addTheme.width),
-                height: unit(vars.addTheme.height),
+                width: styleUnit(vars.addTheme.width),
+                height: styleUnit(vars.addTheme.height),
                 border: "1px dashed #979797",
             },
             "&&:hover": {

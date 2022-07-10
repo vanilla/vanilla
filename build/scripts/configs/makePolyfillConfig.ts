@@ -20,24 +20,14 @@ export async function makePolyfillConfig(entryModel: EntryModel) {
     baseConfig.mode = "production";
     baseConfig.devtool = "source-map";
     baseConfig.entry = POLYFILL_SOURCE_FILE;
+    baseConfig.target = ["web", "es5"];
     baseConfig.output = {
         filename: `polyfills.min.js`,
         path: DIST_DIRECTORY,
     };
     baseConfig.optimization = {
         splitChunks: false,
-        minimize: !options.debug,
-        namedChunks: options.debug,
-        namedModules: options.debug,
-        minimizer: options.debug
-            ? []
-            : [
-                  new TerserWebpackPlugin({
-                      cache: true,
-                      parallel: true,
-                      sourceMap: true, // set to true if you want JS source maps
-                  }),
-              ],
+        minimizer: options.debug ? [] : [new TerserWebpackPlugin()],
     };
 
     return baseConfig;

@@ -192,10 +192,11 @@ window.vanilla.embed = function(host) {
     }
 
     setHeight = function(height) {
-        if (optStr('height'))
+        if (optStr('height')) {
             return;
+        }
 
-        document.getElementById('vanilla' + id).style['height'] = height + "px";
+        document.getElementById('vanilla' + id).style.height = height + "px";
         if (window.gadgets && gadgets.window && gadgets.window.adjustHeight) {
             try {
                 gadgets.window.adjustHeight();
@@ -203,7 +204,7 @@ window.vanilla.embed = function(host) {
                 // Do nothing...
             }
         }
-    }
+    };
 
     vanillaUrl = function(path) {
         // What type of embed are we performing?
@@ -242,17 +243,21 @@ window.vanilla.embed = function(host) {
             + '&vanilla_identifier=' + encodeURIComponent(foreign_id)
             + '&vanilla_url=' + encodeURIComponent(foreign_url);
 
-            if (typeof(vanilla_type) != 'undefined')
+            if (typeof(vanilla_type) != 'undefined') {
                 result += '&vanilla_type=' + encodeURIComponent(vanilla_type)
-
-            if (typeof(vanilla_discussion_id) != 'undefined')
+            }
+            if (typeof(vanilla_discussion_id) != 'undefined') {
                 result += '&vanilla_discussion_id=' + encodeURIComponent(vanilla_discussion_id);
-
-            if (typeof(vanilla_category_id) != 'undefined')
+            }
+            if (typeof(vanilla_category_id) != 'undefined') {
                 result += '&vanilla_category_id=' + encodeURIComponent(vanilla_category_id);
-
-            if (typeof(vanilla_title) != 'undefined')
+            }
+            if (typeof(vanilla_title) != 'undefined') {
                 result += '&title=' + encodeURIComponent(vanilla_title);
+            }
+            if (typeof(vanilla_embed_locale) != 'undefined') {
+                result += '&locale=' + encodeURIComponent(vanilla_embed_locale);
+            }
         } else {
             result = '//'
             + host

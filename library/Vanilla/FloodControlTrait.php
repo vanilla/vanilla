@@ -7,6 +7,8 @@
 
 namespace Vanilla;
 
+use Psr\SimpleCache\CacheInterface;
+
 /**
  * Utility methods for models that want to implement flood control.
  *
@@ -50,8 +52,10 @@ trait FloodControlTrait {
     }
 
     /**
+     * Set the post count threshold.
+     *
      * @param int $postCountThreshold
-     * @return FloodControlTrait
+     * @return $this
      */
     public function setPostCountThreshold($postCountThreshold) {
         $this->postCountThreshold = $this->normalizeInput(__METHOD__, $postCountThreshold, 1);
@@ -66,8 +70,10 @@ trait FloodControlTrait {
     }
 
     /**
+     * Set the timespan.
+     *
      * @param int $timeSpan >= 30
-     * @return FloodControlTrait
+     * @return $this
      */
     public function setTimeSpan($timeSpan) {
         $this->timeSpan = $this->normalizeInput(__METHOD__, $timeSpan, 30);
@@ -82,8 +88,10 @@ trait FloodControlTrait {
     }
 
     /**
+     * Set the lock time.
+     *
      * @param int $lockTime
-     * @return FloodControlTrait
+     * @return $this
      */
     public function setLockTime($lockTime) {
         $this->lockTime = $this->normalizeInput(__METHOD__, $lockTime, 60);
@@ -105,8 +113,10 @@ trait FloodControlTrait {
     }
 
     /**
+     * Set the cache key of the post count.
+     *
      * @param string $keyCurrentPostCount
-     * @return FloodControlTrait
+     * @return $this
      */
     public function setKeyCurrentPostCount($keyCurrentPostCount) {
         $this->keyCurrentPostCount = $keyCurrentPostCount;
@@ -117,7 +127,7 @@ trait FloodControlTrait {
      * @return string
      */
     public function getKeyLastDateChecked() {
-        return $this->keyLastDateChecked ?: $this->getDefaultKeyLastDateChecked;
+        return $this->keyLastDateChecked ?: $this->getDefaultKeyLastDateChecked();
     }
 
     /**
@@ -128,8 +138,10 @@ trait FloodControlTrait {
     }
 
     /**
+     * Set the cache key of the date last checked.
+     *
      * @param string $keyLastDateChecked
-     * @return FloodControlTrait
+     * @return $this
      */
     public function setKeyLastDateChecked($keyLastDateChecked) {
         $this->keyLastDateChecked = $keyLastDateChecked;
@@ -144,8 +156,10 @@ trait FloodControlTrait {
     }
 
     /**
+     * Enable/disable the flood control.
+     *
      * @param bool $floodControlEnabled
-     * @return FloodControlTrait
+     * @return $this
      */
     public function setFloodControlEnabled($floodControlEnabled) {
         $this->floodControlEnabled = $floodControlEnabled;
@@ -206,11 +220,14 @@ trait FloodControlTrait {
      */
     protected function getFloodControlWarningMessage() {
         return sprintf(
-                t('You have posted %1$s times within %2$s seconds. A spam block is now in effect on your account. You must wait at least %3$s seconds before attempting to post again.'),
-                $this->postCountThreshold,
-                $this->timeSpan,
-                $this->lockTime
-            );
+            t(
+                'You have posted %1$s times within %2$s seconds. A spam block is now in effect on your account. '.
+                'You must wait at least %3$s seconds before attempting to post again.'
+            ),
+            $this->postCountThreshold,
+            $this->timeSpan,
+            $this->lockTime
+        );
     }
 
     /**

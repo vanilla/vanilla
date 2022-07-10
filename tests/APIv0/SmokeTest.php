@@ -7,10 +7,12 @@
 
 namespace VanillaTests\APIv0;
 
+use VanillaTests\SiteTestCase;
+
 /**
  * Test some basic Vanilla functionality to make sure nothing is horribly broken.
  */
-class SmokeTest extends BaseTest {
+class SmokeTest extends SiteTestCase {
 
     /** @var  int */
     protected static $restrictedCategoryID;
@@ -19,6 +21,28 @@ class SmokeTest extends BaseTest {
      * @var array
      */
     protected static $testUser;
+
+    /**
+     * @var \Gdn_Configuration
+     */
+    private $config;
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setUp(): void {
+        parent::setUp();
+
+        $this->container()->call(function (
+            \Gdn_Configuration $config
+        ) {
+            $this->config = $config;
+        });
+        $this->config->saveToConfig([
+            "Garden.User.ValidationLength" => "{3,50}"
+        ]);
+        $this->createUserFixtures();
+    }
 
     /**
      * Get the ID of the restricted category.
@@ -53,7 +77,7 @@ class SmokeTest extends BaseTest {
      * Set the testUser.
      *
      * @param array $testUser The user to set.
-     * @return StandardTest Returns `$this` for fluent calls.
+     * @return $this
      * @see APIv0::queryUserKey()
      */
     public function setTestUser($testUser) {
@@ -63,11 +87,9 @@ class SmokeTest extends BaseTest {
 
     /**
      * Test registering a user with the basic method.
-     *
-     * @large
      */
     public function testRegisterBasic() {
-        $this->api()->saveToConfig([
+        $this->config->saveToConfig([
             'Garden.Registration.Method' => 'Basic',
             'Garden.Registration.ConfirmEmail' => false,
             'Garden.Registration.SkipCaptcha' => true
@@ -76,24 +98,23 @@ class SmokeTest extends BaseTest {
         $user = [
             'Name' => 'frank',
             'Email' => 'frank@example.com',
-            'Password' => 'frankwantsin',
-            'PasswordMatch' => 'frankwantsin',
+            'Password' => '123fr@nkwantsin+NewPassword',
+            'PasswordMatch' => '123fr@nkwantsin+NewPassword',
             'Gender' => 'm',
-            'TermsOfService' => true
+            'TermsOfService' => '1',
         ];
 
         // Register the user.
-        $r = $this->api()->post('/entry/register.json', $user);
-        $body = $r->getBody();
+        $body = $this->bessy()->postJsonData('/entry/register.json', $user);
         $this->assertSame('Basic', $body['Method']);
 
         // Look for the user in the database.
-        $dbUser = $this->api()->queryUserKey($user['Name'], true);
+        $dbUser = (array)$this->userModel->getByUsername($user['Name']);
         $this->assertSame($user['Email'], $dbUser['Email']);
         $this->assertSame($user['Gender'], $dbUser['Gender']);
 
         // Look up the user for confirmation.
-        $siteUser = $this->api()->get('/profile.json', ['username' => $user['Name']]);
+        $siteUser = $this->bessy()->getJsonData('/profile.json', ['username' => $user['Name']]);
         $siteUser = $siteUser['Profile'];
 
         $this->assertEquals($user['Name'], $siteUser['Name']);
@@ -104,12 +125,9 @@ class SmokeTest extends BaseTest {
 
     /**
      * Test adding an admin user.
-     *
-     * @large
      */
     public function testAddAdminUser() {
-        $system = $this->api()->querySystemUser(true);
-        $this->api()->setUser($system);
+        $this->getSession()->start($this->adminID);
 
         $adminUser = [
             'Name' => 'Admin',
@@ -118,27 +136,20 @@ class SmokeTest extends BaseTest {
         ];
 
         // Get the admin roles.
-        $adminRole = $this->api()->queryOne("select * from GDN_Role where Name = :name", [':name' => 'Administrator']);
-        $this->assertNotEmpty($adminRole);
-        $adminUser['RoleID'] = [$adminRole['RoleID']];
+        $adminRoleID = $this->roleID(self::ROLE_ADMIN);
+        $this->assertNotEmpty($adminRoleID);
+        $adminUser['RoleID'] = [$adminRoleID];
 
-        $this->api()->saveToConfig([
-            'Garden.Email.Disabled' => true,
-        ]);
-        $r = $this->api()->post(
+        $b = $this->bessy()->postJsonData(
             '/user/add.json',
-            http_build_query($adminUser)
+            $adminUser
         );
-        $b = $r->getBody();
-        $this->assertResponseSuccess($r);
 
         // Query the user in the database.
-        $dbUser = $this->api()->queryUserKey('Admin', true);
+        $dbUser = (array)$this->userModel->getByUsername('Admin');
 
         // Query the admin role.
-        $userRoles = $this->api()->query("select * from GDN_UserRole where UserID = :userID", [':userID' => $dbUser['UserID']]);
-        $userRoleIDs = array_column($userRoles, 'RoleID');
-        $this->assertEquals($adminUser['RoleID'], $userRoleIDs);
+        $this->assertUserHasRoles($dbUser['UserID'], [$adminRoleID]);
 
         return $dbUser;
     }
@@ -149,27 +160,30 @@ class SmokeTest extends BaseTest {
      * @large
      */
     public function testCreateRestrictedCategory() {
-        $r = $this->api()->post('/vanilla/settings/addcategory.json', [
-            'Name' => 'Moderators Only',
-            'UrlCode' => 'moderators-only',
-            'DisplayAs' => 'Discussions',
-            'CustomPermissions' => 1,
-            'Permission' => http_build_query([
-                'Category/PermissionCategoryID/0/32//Vanilla.Comments.Add',
-                'Category/PermissionCategoryID/0/32//Vanilla.Comments.Delete',
-                'Category/PermissionCategoryID/0/32//Vanilla.Comments.Edit',
-                'Category/PermissionCategoryID/0/32//Vanilla.Discussions.Add',
-                'Category/PermissionCategoryID/0/32//Vanilla.Discussions.Announce',
-                'Category/PermissionCategoryID/0/32//Vanilla.Comments.Add',
-                'Category/PermissionCategoryID/0/32//Vanilla.Discussions.Close',
-                'Category/PermissionCategoryID/0/32//Vanilla.Discussions.Delete',
-                'Category/PermissionCategoryID/0/32//Vanilla.Discussions.Edit',
-                'Category/PermissionCategoryID/0/32//Vanilla.Discussions.Sink',
-                'Category/PermissionCategoryID/0/32//Vanilla.Discussions.View'
-            ])
-        ]);
+        $body = $this->bessy()->postJsonData(
+            '/vanilla/settings/addcategory.json',
+            [
+                'Name' => 'Moderators Only',
+                'UrlCode' => 'moderators-only',
+                'DisplayAs' => 'Discussions',
+                'CustomPermissions' => 1,
+                'Permission' => [
+                    'Category/PermissionCategoryID/0/32//Vanilla.Comments.Add',
+                    'Category/PermissionCategoryID/0/32//Vanilla.Comments.Delete',
+                    'Category/PermissionCategoryID/0/32//Vanilla.Comments.Edit',
+                    'Category/PermissionCategoryID/0/32//Vanilla.Discussions.Add',
+                    'Category/PermissionCategoryID/0/32//Vanilla.Discussions.Announce',
+                    'Category/PermissionCategoryID/0/32//Vanilla.Comments.Add',
+                    'Category/PermissionCategoryID/0/32//Vanilla.Discussions.Close',
+                    'Category/PermissionCategoryID/0/32//Vanilla.Discussions.Delete',
+                    'Category/PermissionCategoryID/0/32//Vanilla.Discussions.Edit',
+                    'Category/PermissionCategoryID/0/32//Vanilla.Discussions.Sink',
+                    'Category/PermissionCategoryID/0/32//Vanilla.Discussions.View'
+                ]
+            ],
+            ['content-type' => 'application/json']
+        );
 
-        $body = $r->getBody();
         $category = $body['Category'];
         $this->assertArrayHasKey('CategoryID', $category);
 
@@ -178,112 +192,71 @@ class SmokeTest extends BaseTest {
 
     /**
      * Test that a photo can be saved to a user.
-     *
-     * @param array $admin An admin user with permission to add a photo.
-     * @param array $user The user to test against.
-     * @depends testAddAdminUser
-     * @depends testRegisterBasic
-     * @large
      */
-    public function testSetPhoto($admin, $user) {
-        $this->api()->setUser($admin);
+    public function testSetPhoto() {
+        $this->getSession()->start($this->adminID);
 
         $photo = 'http://example.com/u.gif';
-        $r = $this->api()->post('/profile/edit.json?userid='.$user['UserID'], ['Photo' => $photo]);
+        $r = $this->bessy()->postJsonData('/profile/edit.json?userid='.$this->memberID, ['Photo' => $photo]);
 
-        $dbUser = $this->api()->queryUserKey($user['UserID'], true);
+        $dbUser = $this->userModel->getID($this->memberID, DATASET_TYPE_ARRAY);
         $this->assertSame($photo, $dbUser['Photo']);
     }
 
     /**
      * Test an invalid photo URL on a user.
-     *
-     * @param array $admin The user that will set the photo.
-     * @param array $user The user to test against.
-     * @depends testAddAdminUser
-     * @depends testRegisterBasic
-     * @large
      */
-    public function testSetInvalidPhoto($admin, $user) {
+    public function testSetInvalidPhoto() {
+        $this->getSession()->start($this->adminID);
+
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Invalid photo URL.');
 
-        $this->api()->setUser($admin);
-
         $photo = 'javascript: alert("Xss");';
-        $r = $this->api()->post('/profile/edit.json?userid='.$user['UserID'], ['Photo' => $photo]);
-
-        $dbUser = $this->api()->queryUserKey($user['UserID'], true);
-        $this->assertSame($photo, $dbUser['Photo']);
+        $r = $this->bessy()->postJsonData('/profile/edit.json?userid='.$this->memberID, ['Photo' => $photo]);
     }
 
     /**
      * Test a permission error when adding a photo.
-     *
-     * @param array $user The user to test against.
-     * @depends testRegisterBasic
-     * @large
      */
-    public function testSetPhotoPermission($user) {
-        $this->api()->setUser($user);
+    public function testSetPhotoPermission() {
+        $this->getSession()->start($this->memberID);
 
-        $dbUser = $this->api()->queryUserKey($user['UserID'], true);
+        $dbUser = $this->userModel->getID($this->memberID, DATASET_TYPE_ARRAY);
 
         $photo = 'http://foo.com/bar.png';
-        $r = $this->api()->post('/profile/edit.json?userid='.$user['UserID'], ['Photo' => $photo]);
+        $r = $this->bessy()->post('/profile/edit.json?userid='.$this->memberID, ['Photo' => $photo]);
 
-        $dbUser2 = $this->api()->queryUserKey($user['UserID'], true);
+        $dbUser2 = $this->userModel->getID($this->memberID, DATASET_TYPE_ARRAY);
         $this->assertNotEquals($photo, $dbUser2['Photo']);
         $this->assertSame($dbUser['Photo'], $dbUser2['Photo']);
     }
 
     /**
      * Test setting an uploaded photo that isn't a valid URL.
-     *
-     * @param array $user The user to test against.
-     * @depends testRegisterBasic
-     * @large
      */
-    public function testSetPhotoPermissionLocal($user) {
-        $this->api()->setUser($user);
+    public function testSetPhotoPermissionLocal() {
+        $this->getSession()->start($this->memberID);
 
-        $dbUser = $this->api()->queryUserKey($user['UserID'], true);
+        $dbUser = $this->userModel->getID($this->memberID, DATASET_TYPE_ARRAY);
 
         // This is a valid upload URL and should be allowed.
         $photo = 'userpics/679/FPNH7GFCMGBA.jpg';
         $this->assertNotEquals($dbUser['Photo'], $photo);
-        $r = $this->api()->post('/profile/edit.json?userid='.$user['UserID'], ['Photo' => $photo]);
+        $r = $this->bessy()->post('/profile/edit.json?userid='.$this->memberID, ['Photo' => $photo]);
 
-        $dbUser2 = $this->api()->queryUserKey($user['UserID'], true);
+        $dbUser2 = $this->userModel->getID($this->memberID, DATASET_TYPE_ARRAY);
         $this->assertSame($photo, $dbUser2['Photo']);
         $this->assertNotEquals($dbUser['Photo'], $dbUser2['Photo']);
     }
 
     /**
-     * Test that the APIv0 can actually send a correctly formatted user cookie.
-     *
-     * @depends testRegisterBasic
-     * @large
-     */
-    public function testUserCookie() {
-        $testUser = $this->getTestUser();
-        $this->api()->setUser($testUser);
-        $profile = $this->api()->get('/profile.json');
-
-        $user = $profile['Profile'];
-        $this->assertEquals($testUser['UserID'], $user['UserID']);
-    }
-
-    /**
      * Test posting a discussion.
      *
-     * @depends testRegisterBasic
-     * @large
      * @return array Single discussion.
      */
     public function testPostDiscussion() {
-        $api = $this->api();
-        $api->setUser($this->getTestUser());
+        $this->getSession()->start($this->memberID);
 
         $discussion = [
             'CategoryID' => 1,
@@ -292,12 +265,11 @@ class SmokeTest extends BaseTest {
             'Format' => 'Text'
         ];
 
-        $r = $api->post(
+        $postedDiscussion = $this->bessy()->postJsonData(
             '/post/discussion.json',
             $discussion
         );
 
-        $postedDiscussion = $r->getBody();
         $postedDiscussion = $postedDiscussion['Discussion'];
         $this->assertEquals($discussion, array_intersect_assoc($discussion, $postedDiscussion));
 
@@ -307,20 +279,17 @@ class SmokeTest extends BaseTest {
     /**
      * Test posting a single comment.
      *
-     * @throws \Exception Throws an exception when there are no discussions.
      * @depends testPostDiscussion
-     * @large
      */
     public function testPostComment() {
-        $this->api()->setUser($this->getTestUser());
+        $this->getSession()->start($this->memberID);
 
-        $discussions = $this->api()->get('/discussions.json')->getBody();
-        $discussions = val('Discussions', $discussions);
+        $discussions = $this->bessy()->getJsonData('/discussions.json');
+        $discussions = $discussions['Discussions'];
         if (empty($discussions)) {
             throw new \Exception("There are no discussions to post to.");
         }
         $discussion = reset($discussions);
-
 
         $comment = [
             'DiscussionID' => $discussion['DiscussionID'],
@@ -328,12 +297,11 @@ class SmokeTest extends BaseTest {
             'Format' => 'Text'
         ];
 
-        $r = $this->api()->post(
+        $postedComment = $this->bessy()->postJsonData(
             '/post/comment.json',
             $comment
         );
 
-        $postedComment = $r->getBody();
         $postedComment = $postedComment['Comment'];
         $this->assertEquals($comment, array_intersect_assoc($comment, $postedComment));
     }
@@ -342,7 +310,6 @@ class SmokeTest extends BaseTest {
      * Test posting a discussion in a restricted category.
      *
      * @depends testCreateRestrictedCategory
-     * @large
      */
     public function testPostRestrictedDiscussion() {
         $this->expectException(\Exception::class);
@@ -354,8 +321,7 @@ class SmokeTest extends BaseTest {
             throw new \Exception('Invalid restricted category ID.');
         }
 
-        $api = $this->api();
-        $api->setUser($this->getTestUser());
+        $this->getSession()->start($this->memberID);
 
         $discussion = [
             'CategoryID' => $categoryID,
@@ -363,7 +329,7 @@ class SmokeTest extends BaseTest {
             'Body' => 'Test '.date('r')
         ];
 
-        $api->post(
+        $this->bessy()->post(
             '/post/discussion.json',
             $discussion
         );
@@ -372,13 +338,10 @@ class SmokeTest extends BaseTest {
     /**
      * Test saving a draft.
      *
-     * @depends testRegisterBasic
      * @return array $postedDraft
-     * @large
      */
     public function testSaveDraft() {
-        $api = $this->api();
-        $api->setUser($this->getTestUser());
+        $this->getSession()->start($this->memberID);
 
         $draft = [
             'DiscussionID' => '',
@@ -389,18 +352,14 @@ class SmokeTest extends BaseTest {
             'Body' => 'Test posting a new draft',
             'DeliveryType' => 'VIEW',
             'DeliveryMethod' => 'JSON',
-            'Save Draft' => 'Save Draft',
+            'Save_Draft' => 'Save Draft',
 
         ];
 
-        $r = $api->post(
+        $responseBody = $this->bessy()->postJsonData(
             '/post/discussion.json',
             $draft
         );
-
-        $responseBody = $r->getBody();
-        $statusCode = $r->getStatusCode();
-        $this->assertEquals(200, $statusCode);
 
         $draftModel = new \DraftModel();
         $postedDraft = $draftModel->getWhere(['DraftID' => $responseBody['DraftID']])->firstRow(DATASET_TYPE_ARRAY);
@@ -414,13 +373,9 @@ class SmokeTest extends BaseTest {
 
     /**
      * Test posting a Discussion from a Draft.
-     *
-     * @depends testRegisterBasic
-     * @large
      */
     public function testPostDiscussionFromDraft() {
-        $api = $this->api();
-        $api->setUser($this->getTestUser());
+        $this->getSession()->start($this->memberID);
 
         $draft = $this->testSaveDraft();
 
@@ -432,14 +387,11 @@ class SmokeTest extends BaseTest {
             'Format' => 'Text'
         ];
 
-        $r2 = $api->post(
+        $postedDiscussion = $this->bessy()->postJsonData(
             "/post/editdiscussion/0/{$draft['DraftID']}.json",
             $discussion
         );
-        $statusCode = $r2->getStatusCode();
-        $this->assertEquals(200, $statusCode);
 
-        $postedDiscussion = $r2->getBody();
         $postedDiscussion = $postedDiscussion['Discussion'];
         $this->assertEquals($discussion['Name'], $postedDiscussion['Name']);
         $this->assertEquals($discussion['Body'], $postedDiscussion['Body']);
@@ -448,51 +400,43 @@ class SmokeTest extends BaseTest {
 
     /**
      * Delete a Draft.
-     *
-     * @depends testRegisterBasic
-     * @large
      */
     public function testDeleteDraft() {
-        $api = $this->api();
-        $api->setUser($this->getTestUser());
-        $user = $api->getUser();
+        $this->getSession()->start($this->memberID);
 
         $draft = $this->testSaveDraft();
+        $tk = __FUNCTION__;
+        $this->getSession()->transientKey($tk, false);
 
-        $r2 = $api->get("drafts/delete/{$draft['DraftID']}/{$user['tk']}");
-        $statusCode2 = $r2->getStatusCode();
-        $this->assertEquals(200, $statusCode2);
+        $r2 = $this->bessy()->getJsonData("drafts/delete/{$draft['DraftID']}/$tk");
+
+        $draftModel = new \DraftModel();
+        $draft = $draftModel->getID($draft['DraftID']);
+        $this->assertFalse($draft);
     }
 
     /**
      * Test modifying a category of a draft.
      *
-     * @depends testRegisterBasic
-     * @large
      */
     public function testModifyDraftCategory() {
-        $api = $this->api();
-        $api->setUser($this->getTestUser());
         $category = $this->createCategory('Modify Draft', 'modifydraft');
-
         $draft =  $this->testSaveDraft();
 
         $draftUpdate = [
-            'CategoryID' =>  $draft['CategoryID'],
+            'CategoryID' =>  $category['Category']['CategoryID'],
             'DiscussionID' => $draft['DiscussionID'],
             'DraftID' => $draft['DraftID'],
-            'CategoryID' => $category['Category']['CategoryID'],
             'Name' => $draft['Name'],
             'Format' => 'Markdown',
             'Body' => $draft['Body'],
             'DeliveryType' => 'VIEW',
             'DeliveryMethod' => 'JSON',
-            'Save Draft' => 'Save Draft',
+            'Save_Draft' => 'Save Draft',
         ];
 
         $draftModel = new \DraftModel();
-        $r = $api->post("/post/editdiscussion/0/{$draft['DraftID']}.json", $draftUpdate);
-        $responseBody = $r->getBody();
+        $responseBody = $this->bessy()->postJsonData("/post/editdiscussion/0/{$draft['DraftID']}.json", $draftUpdate);
         $modifiedDraft = $draftModel->getWhere(['DraftID' => $responseBody['DraftID']])->firstRow(DATASET_TYPE_ARRAY);
 
         $this->assertEquals($category['Category']['CategoryID'], $modifiedDraft['CategoryID']);
@@ -501,13 +445,11 @@ class SmokeTest extends BaseTest {
     /**
      * Test saving a comment draft
      *
-     * @depends testRegisterBasic
      * @return array $postedComment
      * @large
      */
     public function testSavingCommentDraft() {
-        $api = $this->api();
-        $api->setUser($this->getTestUser());
+        $this->getSession()->start($this->memberID);
 
         $discussion = $this->testPostDiscussion();
         $discussionID = $discussion['DiscussionID'];
@@ -524,10 +466,7 @@ class SmokeTest extends BaseTest {
             'LastCommentID' => 0,
         ];
 
-        $r = $api->post("/post/comment/?discussionid={$discussionID}.json", $comment);
-        $responseCode = $r->getStatusCode();
-        $this->assertEquals(200, $responseCode);
-        $responseBody = $r->getBody();
+        $responseBody = $this->bessy()->postJsonData("/post/comment/?discussionid={$discussionID}.json", $comment);
 
         $draftModel = new \DraftModel();
         $postedComment = $draftModel->getWhere(['DraftID' => $responseBody['DraftID']])->firstRow(DATASET_TYPE_ARRAY);
@@ -539,13 +478,9 @@ class SmokeTest extends BaseTest {
 
     /**
      * Test posting a comment draft
-     *
-     * @depends testRegisterBasic
-     * @large
      */
     public function testPostCommentFromDraft() {
-        $api = $this->api();
-        $api->setUser($this->getTestUser());
+        $this->getSession()->start($this->memberID);
 
         $draft = $this->testSavingCommentDraft();
 
@@ -561,15 +496,10 @@ class SmokeTest extends BaseTest {
             'LastCommentID' => 0,
         ];
 
-        $r1 = $api->post("/post/comment/?discussionid={$draft['DiscussionID']}.json", $postComment);
-        $responseCode1 = $r1->getStatusCode();
-        $this->assertEquals(200, $responseCode1);
-        $responseBody1 = $r1->getBody();
+        $responseBody1 = $this->bessy()->postJsonData("/post/comment/?discussionid={$draft['DiscussionID']}.json", $postComment);
 
         $commentID = $responseBody1['CommentID'];
-        $r2 = $api->post("/post/comment2.json?commentid={$commentID}&inserted=1");
-        $responseCode2 = $r2->getStatusCode();
-        $this->assertEquals(200, $responseCode2);
+        $r2 = $this->bessy()->post("/post/comment2.json?commentid={$commentID}&inserted=1");
 
         $commentModel = new \CommentModel();
         $dbComment = $commentModel->getWhere(['CommentID' => $commentID ])->firstRow(DATASET_TYPE_ARRAY);
@@ -585,17 +515,14 @@ class SmokeTest extends BaseTest {
      * @return array $category
      */
     private function createCategory($name = null, $url = null) {
-        $api = $this->api();
-        $admin = $api->querySystemUser(true);
-        $api->setUser($admin);
+        $this->getSession()->start($this->adminID);
 
-        $r = $this->api()->post('/vanilla/settings/addcategory.json', [
+        $category = $this->bessy()->postJsonData('/vanilla/settings/addcategory.json', [
             'Name' => 'Test Category '.$name,
             'UrlCode' => 'test'.$url,
             'DisplayAs' => 'Discussions',
         ]);
 
-        $category = $r->getBody();
         return $category;
     }
 
@@ -604,76 +531,50 @@ class SmokeTest extends BaseTest {
      * Test viewing a restricted category.
      *
      * @depends testCreateRestrictedCategory
-     * @large
      */
     public function testViewRestrictedCategory() {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('You don\'t have permission to do that.');
-
         $categoryID = $this->getRestrictedCategoryID();
 
         if (!is_numeric($categoryID)) {
             throw new \Exception('Invalid restricted category ID.');
         }
 
-        $api = $this->api();
-        $api->setUser($this->getTestUser());
+        $this->getSession()->start($this->memberID);
 
-        $api->get("categories.json?CategoryIdentifier={$categoryID}");
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('You don\'t have permission to do that.');
+        $this->bessy()->get("categories.json?CategoryIdentifier={$categoryID}");
     }
 
     /**
      * Test adding a bookmark to a discussion.
-     *
-     * @depends testRegisterBasic
-     * @depends testPostDiscussion
-     * @large
      */
     public function testDiscussionAddBookMark() {
-        $api = $this->api();
-        $api->setUser($this->getTestUser());
-        $user = $api->getUser();
-
         $discussion = $this->testPostDiscussion();
         $discussionID = val('DiscussionID', $discussion);
-        $r = $api->post("/discussion/bookmark/{$discussionID}/{$user['tk']}");
-        $statusCode = $r->getStatusCode();
-        $this->assertEquals(200, $statusCode);
+        $r = $this->bessy()->post("/discussion/bookmark/{$discussionID}");
 
-        $postedBookMark = $this->api()->get("/discussion/{$discussionID}.json")->getBody();
+        $postedBookMark = $this->bessy()->getJsonData("/discussion/{$discussionID}.json");
         $isBookMarked = $postedBookMark['Discussion']['Bookmarked'];
         $this->assertEquals(1, $isBookMarked);
     }
 
     /**
      * Test removing a bookmark from a discussion.
-     *
-     * @depends testRegisterBasic
-     * @depends testPostDiscussion
-     * @large
      */
     public function testRemoveDiscussionBookMark() {
-        $api = $this->api();
-        $api->setUser($this->getTestUser());
-        $user = $api->getUser();
-
-
         $discussion = $this->testPostDiscussion();
         $discussionID = val('DiscussionID', $discussion);
 
-        $r = $api->post("/discussion/bookmark/{$discussionID}/{$user['tk']}");
-        $statusCode = $r->getStatusCode();
-        $this->assertEquals(200, $statusCode);
+        $r = $this->bessy()->post("/discussion/bookmark/{$discussionID}");
 
-        $bookMarkedDiscussion = $this->api()->get("/discussion/{$discussionID}.json")->getBody();
+        $bookMarkedDiscussion = $this->bessy()->getJsonData("/discussion/{$discussionID}.json");
         $isBookMarked = $bookMarkedDiscussion['Discussion']['Bookmarked'];
         $this->assertEquals(1, $isBookMarked);
 
-        $r = $api->post("/discussion/bookmark/{$discussionID}/{$user['tk']}");
-        $statusCode = $r->getStatusCode();
-        $this->assertEquals(200, $statusCode);
+        $r = $this->bessy()->post("/discussion/bookmark/{$discussionID}");
 
-        $unBookMarkedDiscussion = $this->api()->get("/discussion/{$discussionID}.json")->getBody();
+        $unBookMarkedDiscussion = $this->bessy()->getJsonData("/discussion/{$discussionID}.json");
         $isNotBookMarked = $unBookMarkedDiscussion['Discussion']['Bookmarked'];
         $this->assertEquals(0, $isNotBookMarked);
     }

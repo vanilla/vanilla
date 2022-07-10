@@ -7,6 +7,7 @@
 
 namespace Vanilla\Models;
 
+use Garden\Container\Container;
 use Garden\Schema\Schema;
 use Garden\Schema\Validation;
 use Garden\Schema\ValidationException;
@@ -26,7 +27,7 @@ class InstallModel {
     /** @var AddonModel  */
     protected $addonModel;
 
-    /** @var ContainerInterface  */
+    /** @var Container  */
     protected $container;
 
     /** @var \Gdn_Session  */
@@ -37,12 +38,12 @@ class InstallModel {
      *
      * @param \Gdn_Configuration $config The configuration dependency used to load/save configuration information.
      * @param AddonModel $addonModel The addon model dependency used to enable installation addons.
-     * @param ContainerInterface $container The container used to create additional dependencies once they are enabled.
+     * @param Container $container The container used to create additional dependencies once they are enabled.
      */
     public function __construct(
         \Gdn_Configuration $config,
         AddonModel $addonModel,
-        ContainerInterface $container,
+        Container $container,
         \Gdn_Session $session
     ) {
         $this->config = $config;
@@ -133,7 +134,11 @@ class InstallModel {
             }
 
             // TODO: Once we are using this addon model we can remove the force and tweak the config defaults.
-            $this->addonModel->enable($addon, ['force' => true]);
+            $this->addonModel->enable($addon, [
+                'force' => true,
+                // We already enabled the dashboard. No need to run its container configuration twice.
+                'skipContainer' => $addon->getKey() === 'dashboard',
+            ]);
         }
 
         // Now that all of the addons are are enabled we should set the default roles.

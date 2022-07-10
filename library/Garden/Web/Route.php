@@ -8,6 +8,7 @@
 namespace Garden\Web;
 
 use Garden\MetaTrait;
+use Vanilla\FeatureFlagHelper;
 
 /**
  * The base class for routes.
@@ -29,11 +30,28 @@ abstract class Route {
      */
     private $middlewares = [];
 
+    /** @var int */
+    private $priority = 0;
+
     /**
      * Route constructor.
      */
     public function __construct() {
         // This is here so that subclasses can call parent::__construct() to be forwards compatible with any code added later.
+    }
+
+    /**
+     * @return int
+     */
+    public function getPriority(): int {
+        return $this->priority;
+    }
+
+    /**
+     * @param int $priority
+     */
+    public function setPriority(int $priority): void {
+        $this->priority = $priority;
     }
 
     /**
@@ -49,10 +67,37 @@ abstract class Route {
         'args' => Route::MAP_ARGS | Route::MAP_QUERY,
         'body' => Route::MAP_BODY,
         'data' => Route::MAP_ARGS | Route::MAP_QUERY | Route::MAP_BODY,
-        'path' => Route::MAP_PATH
+        'path' => Route::MAP_PATH,
     ];
 
     private $defaults = [];
+
+    /** @var string|null */
+    private $featureFlag = null;
+
+    /**
+     * Whether or not the route is enabled.
+     *
+     * @return bool
+     */
+    public function isEnabled(): bool {
+        if ($this->featureFlag === null) {
+            return true;
+        }
+
+        // Fetch as late as possible.
+        $themeFeatures = \Gdn::themeFeatures();
+        return $themeFeatures->get($this->featureFlag) || FeatureFlagHelper::featureEnabled($this->featureFlag);
+    }
+
+    /**
+     * Apply a theme feature flag to a route. If the feature flag isn't enabled, the route will not activate.
+     *
+     * @param string $themeFeatureFlag
+     */
+    public function setFeatureFlag(string $themeFeatureFlag) {
+        $this->featureFlag = $themeFeatureFlag;
+    }
 
     /**
      * Get the conditions.

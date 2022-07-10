@@ -8,6 +8,7 @@
 namespace Vanilla\Formatting\Html\Processor;
 
 use Vanilla\Formatting\Html\HtmlDocument;
+use Vanilla\Utility\HtmlUtils;
 
 /**
  * Process user content to ensure certain CSS classes are applied.
@@ -15,21 +16,24 @@ use Vanilla\Formatting\Html\HtmlDocument;
 class UserContentCssProcessor extends HtmlProcessor {
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
-    public function processDocument(): HtmlDocument {
-        $this->cleanupBlockquotes();
-        $this->cleanupImages();
-        $this->cleanupCodeBlocks();
-        $this->cleanupInlineCodeBlocks();
-        return $this->document;
+    public function processDocument(HtmlDocument $document): HtmlDocument {
+        $this->cleanupBlockquotes($document);
+        $this->cleanupImages($document);
+        $this->cleanupIFrames($document);
+        $this->cleanupCodeBlocks($document);
+        $this->cleanupInlineCodeBlocks($document);
+        return $document;
     }
 
     /**
      * Format HTML of code blocks imported from other formats.
+     *
+     * @param HtmlDocument $document The document to parse.
      */
-    private function cleanupCodeBlocks() {
-        $blockCodeBlocks = $this->queryXPath('.//*[self::pre]');
+    private function cleanupCodeBlocks(HtmlDocument $document) {
+        $blockCodeBlocks = $document->queryXPath('.//*[self::pre]');
         foreach ($blockCodeBlocks as $codeBlock) {
             if (!($codeBlock instanceof \DOMElement)) {
                 continue;
@@ -47,6 +51,7 @@ class UserContentCssProcessor extends HtmlProcessor {
                 }
             }
 
+
             $classes = $this->getClasses($codeBlock);
             if (!$this->hasClass($classes, "code")) {
                 $this->appendClass($codeBlock, "code");
@@ -57,51 +62,67 @@ class UserContentCssProcessor extends HtmlProcessor {
             }
 
             $this->setAttribute($codeBlock, "spellcheck", "false");
+            $this->setAttribute($codeBlock, "tabindex", "0");
         }
     }
 
     /**
      * Format HTML of inline code blocks imported from other formats.
+     *
+     * @param HtmlDocument $document The document to parse.
      */
-    private function cleanupInlineCodeBlocks() {
-        $inlineCodeBlocks = $this->queryXPath('.//*[self::code]');
+    private function cleanupInlineCodeBlocks(HtmlDocument $document) {
+        $inlineCodeBlocks = $document->queryXPath('.//*[self::code]');
         foreach ($inlineCodeBlocks as $c) {
             $this->appendClass($c, "code");
             $this->appendClass($c, "codeInline");
             $this->setAttribute($c, "spellcheck", "false");
+            $this->setAttribute($c, "tabindex", "0");
         }
     }
 
     /**
      * Format HTML of images imported from other formats.
+     *
+     * @param HtmlDocument $document The document to parse.
      */
-    private function cleanupImages() {
-        $images = $this->queryXPath(ImageHtmlProcessor::EMBED_IMAGE_XPATH);
+    private function cleanupImages(HtmlDocument $document) {
+        $images = $document->queryXPath(ImageHtmlProcessor::EMBED_IMAGE_XPATH);
         foreach ($images as $image) {
-            $this->appendClass($image, "embedImage-img");
-            $this->appendClass($image, "importedEmbed-img");
+            HtmlUtils::appendClass($image, 'embedImage-img');
+            HtmlUtils::appendClass($image, 'importedEmbed-img');
+        }
+    }
+
+    /**
+     * Format HTML of iframes imported from other formats.
+     *
+     * @param HtmlDocument $document The document to parse.
+     */
+    private function cleanupIFrames(HtmlDocument $document) {
+        $iFrames = $document->queryXPath(('.//*[self::iframe]'));
+        foreach ($iFrames as $iFrame) {
+            HtmlUtils::appendClass($iFrame, 'importedEmbed-iframe');
         }
     }
 
     /**
      * Format HTML of blockquotes imported from other formats.
+     *
+     * @param HtmlDocument $document The document to parse.
      */
-    private function cleanupBlockquotes() {
-        $blockQuotes = $this->queryXPath('.//*[self::blockquote]');
-        foreach ($blockQuotes as $b) {
-            self::appendClass($b, "blockquote");
-            $children = $b->childNodes;
+    private function cleanupBlockquotes(HtmlDocument $document) {
+        $blockQuotes = $document->queryXPath('.//*[self::blockquote]');
+        foreach ($blockQuotes as $blockQuote) {
+            HtmlUtils::appendClass($blockQuote, 'blockquote');
+            $children = $blockQuote->childNodes;
             foreach ($children as $child) {
-                if (property_exists($child, "tagName")) {
-                    if ($child->tagName === "div") {
-                        self::setAttribute($child, "class", "blockquote-content");
-                        $grandChildren = $child->childNodes;
-                        foreach ($grandChildren as $grandChild) {
-                            if (property_exists($grandChild, "tagName")) {
-                                if ($grandChild->tagName === "p") {
-                                    self::appendClass($grandChild, "blockquote-line");
-                                }
-                            }
+                if (property_exists($child, "tagName") && $child->tagName === "div") {
+                    HtmlUtils::appendClass($child, "blockquote-content");
+                    $grandChildren = $child->childNodes;
+                    foreach ($grandChildren as $grandChild) {
+                        if (property_exists($grandChild, "tagName") && $grandChild->tagName === "p") {
+                            HtmlUtils::appendClass($grandChild, "blockquote-line");
                         }
                     }
                 }

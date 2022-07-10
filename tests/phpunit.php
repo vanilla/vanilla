@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -13,6 +13,7 @@ date_default_timezone_set("UTC");
 
 ini_set("default_charset", "UTF-8");
 error_reporting(E_ALL);
+ini_set('log_errors', '0');
 
 // Alias classes for some limited PHPUnit v5 compatibility with v6.
 $classCompatibility = [
@@ -34,7 +35,9 @@ $files = glob(PATH_ROOT."/.circleci/scripts/templates/vanilla/cgi-bin/*.php");
 foreach ($files as $file) {
     $dest = $dir.'/'.basename($file);
     $r = copy($file, $dest);
-    echo "Copy $file to $dest";
+    if (!$r) {
+        throw new \Exception("Could not copy $dest.", 500);
+    }
 }
 
 // ===========================================================================
@@ -45,6 +48,8 @@ require PATH_ROOT.'/environment.php';
 // Allow any addon class to be auto-loaded.
 \VanillaTests\Bootstrap::registerAutoloader();
 
+// Add some helper functions.
+require_once PATH_PLUGINS.'/Reactions/views/reaction_functions.php';
 
 // Allow a test before.
 $bootstrapTestFile = PATH_CONF . '/bootstrap.tests.php';

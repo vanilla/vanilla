@@ -5,14 +5,14 @@
  * @license GPL-2.0-only
  */
 
-import { useThemeCache } from "@vanilla/library/src/scripts/styles/styleUtils";
-import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyleVars";
-import { colorOut, importantColorOut } from "@vanilla/library/src/scripts/styles/styleHelpersColors";
-import { borders, unit } from "@library/styles/styleHelpers";
+import { useThemeCache } from "@library/styles/themeCache";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { Mixins } from "@library/styles/Mixins";
 import { calc, percent, quote } from "csx";
-import { cssOut } from "@dashboard/compatibilityStyles/index";
-import { buttonGlobalVariables, buttonVariables } from "@library/forms/buttonStyles";
-import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
+import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
+import { buttonGlobalVariables, buttonVariables } from "@library/forms/Button.variables";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss
@@ -26,10 +26,10 @@ export const signInMethodsCSS = useThemeCache(() => {
 
     cssOut(`.Methods .SocialIcon .Text`, {
         border: 0,
-        paddingLeft: unit(textOffset),
+        paddingLeft: styleUnit(textOffset),
         lineHeight: vars.lineHeights.condensed,
         minWidth: 0,
-        maxWidth: calc(`100% - ${unit(formElements.sizing.height - buttonGlobals.padding.horizontal)}`),
+        maxWidth: calc(`100% - ${styleUnit(formElements.sizing.height - buttonGlobals.padding.horizontal)}`),
         float: "none",
         whiteSpace: "normal",
         textAlign: "left",
@@ -60,16 +60,16 @@ export const signInMethodsCSS = useThemeCache(() => {
     );
 
     cssOut(`.Method a`, {
-        $nest: {
+        ...{
             "&.Button.Primary, &.SocialIcon, &.SocialIcon.HasText": {
                 display: "flex",
                 justifyContent: "flex-start",
                 alignItems: "center",
                 flexWrap: "nowrap",
-                width: unit(210),
+                width: styleUnit(210),
                 maxWidth: percent(100),
-                ...borders({
-                    radius: unit(vars.borderType.formElements.buttons.radius),
+                ...Mixins.border({
+                    radius: styleUnit(vars.borderType.formElements.buttons.radius),
                 }),
             },
         },
@@ -77,10 +77,10 @@ export const signInMethodsCSS = useThemeCache(() => {
 
     // // Low specificity here to not style branded options
     // cssOut(`.SocialIcon`, {
-    //     color: colorOut(vars.mainColors.fg),
+    //     color: ColorsUtils.colorOut(vars.mainColors.fg),
     // });
 
-    const standardSignInMethod = clickableItemStates({
+    const standardSignInMethod = Mixins.clickable.itemState({
         default: buttonVars.standard.colors ? buttonVars.standard.colors.fg : vars.mainColors.fg,
     });
 
@@ -92,13 +92,15 @@ export const signInMethodsCSS = useThemeCache(() => {
     // visited: {},
 
     cssOut(`body.Section-Entry .Methods .SocialIcon`, {
-        color: importantColorOut(standardSignInMethod.color as string),
-        $nest: standardSignInMethod.$nest,
+        ...standardSignInMethod,
+        color: ColorsUtils.colorOut(standardSignInMethod.color as string, {
+            makeImportant: true,
+        }),
     });
 
     // SAML
     cssOut(`body.Section-Entry .Methods .SignInLink.Button.Primary,`, {
-        paddingLeft: unit(formElements.sizing.height + textOffset),
+        paddingLeft: styleUnit(formElements.sizing.height + textOffset),
     });
 
     // Workaround for important style in core
@@ -114,7 +116,9 @@ export const signInMethodsCSS = useThemeCache(() => {
         body.Section-Entry .Methods .SocialIcon.SocialIcon-GitHub
         `,
         {
-            color: importantColorOut(vars.elementaryColors.white),
+            color: ColorsUtils.colorOut(vars.elementaryColors.white, {
+                makeImportant: true,
+            }),
             whiteSpace: "normal",
             textAlign: "left",
             lineHeight: vars.lineHeights.condensed,
@@ -135,7 +139,7 @@ export const signInMethodsCSS = useThemeCache(() => {
         body.Section-Entry .Methods .SocialIcon.SocialIcon-Disqus .Icon::after,
         body.Section-Entry .Methods .SocialIcon.SocialIcon-GitHub .Icon::after`,
         {
-            backgroundColor: colorOut(vars.mainColors.primaryContrast.fade(0.2)),
+            backgroundColor: ColorsUtils.colorOut(vars.mainColors.primaryContrast.fade(0.2)),
         },
     );
 
@@ -153,10 +157,10 @@ export const signInMethodsCSS = useThemeCache(() => {
     cssOut(`.Method .Icon::after`, {
         content: quote(``),
         position: "absolute",
-        top: unit(lineOffset),
+        top: styleUnit(lineOffset),
         right: 0,
-        width: unit(vars.border.width),
-        height: calc(`100% - ${unit(lineOffset * 2)}`),
+        width: styleUnit(vars.border.width),
+        height: calc(`100% - ${styleUnit(lineOffset * 2)}`),
     });
 
     cssOut(
@@ -165,8 +169,55 @@ export const signInMethodsCSS = useThemeCache(() => {
         .Method .SocialIcon
         `,
         {
-            paddingTop: unit(4),
-            paddingBottom: unit(4),
+            paddingTop: styleUnit(4),
+            paddingBottom: styleUnit(4),
         },
     );
+
+    //Accessibility colour contrast on register form
+    cssOut(`.TextBoxWrapper .PasswordStrength`, {
+        width: "100% !important",
+        marginTop: "4",
+        marginBottom: "10",
+    });
+
+    cssOut(`.PasswordStrength.Score-0 .StrengthText`, {
+        color: "#949499",
+    });
+    cssOut(`.PasswordStrength.Score-2 .Strength`, {
+        backgroundColor: "#949499",
+    });
+    cssOut(`.PasswordStrength .Background`, {
+        backgroundColor: "#949499",
+    });
+    cssOut(`.PasswordStrength.Score-1 .StrengthText`, {
+        color: "#c81818",
+    });
+    cssOut(`.PasswordStrength.Score-1 .Strength`, {
+        backgroundColor: "#c81818",
+    });
+    cssOut(`.PasswordStrength.Score-2 .StrengthText`, {
+        color: "#c81818",
+    });
+    cssOut(`.PasswordStrength.Score-2 .Strength`, {
+        backgroundColor: "#c81818",
+    });
+    cssOut(`.PasswordStrength.Score-3 .StrengthText`, {
+        color: "#DE7802",
+    });
+    cssOut(`.PasswordStrength.Score-3 .Strength`, {
+        backgroundColor: "#DE7802",
+    });
+    cssOut(`.PasswordStrength.Score-4 .StrengthText`, {
+        color: "#05A882",
+    });
+    cssOut(`.PasswordStrength.Score-4 .Strength`, {
+        backgroundColor: "#05A882",
+    });
+    cssOut(`.PasswordStrength.Score-5 .StrengthText`, {
+        color: "#049372",
+    });
+    cssOut(`.PasswordStrength.Score-5 .Strength`, {
+        backgroundColor: "#049372",
+    });
 });

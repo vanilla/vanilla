@@ -24,15 +24,15 @@ import { RangeStatic } from "quill/core";
 import { t } from "@library/utility/appUtils";
 import ParagraphMenuListsTabContent from "@rich-editor/menuBar/paragraph/tabs/ParagraphMenuListsTabContent";
 import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
-import { srOnly, unit } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
+import { Mixins } from "@library/styles/Mixins";
 import { IMenuBarRadioButton } from "@rich-editor/menuBar/paragraph/items/ParagraphMenuBarRadioGroup";
 import ParagraphMenuSpecialBlockTabContent from "@rich-editor/menuBar/paragraph/tabs/ParagraphMenuSpecialBlockTabContent";
-import { style } from "typestyle";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { IParagraphMenuState } from "@rich-editor/menuBar/paragraph/formats/formatting";
 import Formatter from "@rich-editor/quill/Formatter";
 import { TabHandler } from "@vanilla/dom-utils";
-import ScreenReaderContent from "@library/layout/ScreenReaderContent";
+import { css } from "@emotion/css";
 
 interface IProps {
     className?: string;
@@ -97,9 +97,9 @@ export default class ParagraphMenuBar extends React.PureComponent<IProps, IState
         const { menuActiveFormats, formatter } = this.props;
         const classes = richEditorClasses(this.props.legacyMode);
         const globalStyles = globalVariables();
-        const iconStyle = style({
-            width: unit(globalStyles.icon.sizes.default),
-            height: unit(globalStyles.icon.sizes.default),
+        const iconStyle = css({
+            width: styleUnit(globalStyles.icon.sizes.default),
+            height: styleUnit(globalStyles.icon.sizes.default),
         });
 
         const menuContents: IMenuBarContent[] = [
@@ -156,20 +156,12 @@ export default class ParagraphMenuBar extends React.PureComponent<IProps, IState
                         icon: <ListUnorderedIcon className={iconStyle} />,
                         text: t("Bulleted List"),
                         checked: menuActiveFormats.lists.unordered,
-                        disabled:
-                            !!menuActiveFormats.lists.depth &&
-                            menuActiveFormats.lists.depth > 0 &&
-                            menuActiveFormats.lists.ordered,
                     },
                     {
                         formatFunction: formatter.orderedList,
                         icon: <ListOrderedIcon className={iconStyle} />,
                         text: t("Ordered List"),
                         checked: menuActiveFormats.lists.ordered,
-                        disabled:
-                            !!menuActiveFormats.lists.depth &&
-                            menuActiveFormats.lists.depth > 0 &&
-                            menuActiveFormats.lists.unordered,
                     },
                 ],
                 indent: formatter.indentList,
@@ -227,7 +219,7 @@ export default class ParagraphMenuBar extends React.PureComponent<IProps, IState
                 <div
                     id={MyContent.get}
                     role="menu"
-                    className={!menu.open ? style(srOnly()) : undefined}
+                    className={!menu.open ? css(Mixins.absolute.srOnly()) : undefined}
                     aria-hidden={!menu.open}
                     key={`menuBarPanel-${index}`}
                 >
@@ -403,7 +395,7 @@ export default class ParagraphMenuBar extends React.PureComponent<IProps, IState
         }
     };
 
-    private tabIndex = index => {
+    private tabIndex = (index) => {
         return this.props.rovingIndex === index ? 0 : -1;
     };
 
@@ -561,7 +553,7 @@ export default class ParagraphMenuBar extends React.PureComponent<IProps, IState
                     const tabHandler = new TabHandler(this.props.panelsRef.current);
                     const items = tabHandler.getAll(this.props.panelsRef.current);
                     if (items && items.length > 0) {
-                        items.reverse().forEach(item => {
+                        items.reverse().forEach((item) => {
                             const letter = item.dataset.firstletter || null;
                             if (letter && letter === event.key.toLowerCase()) {
                                 item.focus();

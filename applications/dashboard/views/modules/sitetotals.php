@@ -3,7 +3,7 @@
 <ul class="SiteTotals">
     <h2><?php echo t('Forum Stats'); ?></h2>
     <?php foreach ($this->data('Totals') as $Name => $Value): ?>
-        <li class="SiteTotal-Row">
+        <li class="SiteTotal-Row SiteTotal-<?php echo slugify($Name); ?>">
       <span class="SiteTotal-Number">
          <?php echo number_format($Value); ?>
       </span>

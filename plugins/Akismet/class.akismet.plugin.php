@@ -1,7 +1,7 @@
 <?php
 /**
- * @copyright 2008-2016 Vanilla Forums, Inc.
- * @license Proprietary
+ * @copyright 2008-2022 Vanilla Forums, Inc.
+ * @license GPLv2
  */
 
 /**
@@ -33,8 +33,8 @@ class AkismetPlugin extends Gdn_Plugin {
      * Build an Akismet object.
      *
      * @param string $key Authentication key.
-     * @param string $server Remote URL.
-     * @return Aksimet
+     * @param string|false $server Remote URL.
+     * @return Akismet
      */
     private static function buildAkismet($key, $server = false) {
         $akismet = new Akismet(Gdn::request()->url('/', true), $key);
@@ -81,19 +81,11 @@ class AkismetPlugin extends Gdn_Plugin {
      * Do we have a valid key?
      *
      * @param string $key The config key.
-     *
      * @return bool If config key is valid.
      */
     protected function validateKey($key) {
         $server = c('Plugins.Akismet.Server');
         return self::buildAkismet($key, $server)->isKeyValid();
-    }
-
-    /**
-     * Run once on enable.
-     */
-    public function setup() {
-        $this->structure();
     }
 
     /**
@@ -129,7 +121,7 @@ class AkismetPlugin extends Gdn_Plugin {
     /**
      * Hook into Vanilla to run checks.
      *
-     * @param Controller $sender The controller firing the event.
+     * @param Gdn_Controller $sender The controller firing the event.
      * @param array $args The arguments sent by the event.
      */
     public function base_checkSpam_handler($sender, $args) {
@@ -160,6 +152,7 @@ class AkismetPlugin extends Gdn_Plugin {
             case 'Activity':
             case 'ActivityComment':
                 $result = $this->checkAkismet($recordType, $data);
+//                $result = true;
                 if ($result) {
                     $data['Log_InsertUserID'] = $this->userID();
                 }
@@ -169,6 +162,7 @@ class AkismetPlugin extends Gdn_Plugin {
                 $result = false;
         }
         $sender->EventArguments['IsSpam'] = $result;
+        $sender->EventArguments['Source'] = 'akismet';
     }
 
     /**

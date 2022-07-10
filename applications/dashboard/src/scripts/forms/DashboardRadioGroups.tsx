@@ -4,7 +4,7 @@
  */
 
 import React, { useContext } from "react";
-import { useFormGroup } from "@dashboard/forms/DashboardFormGroup";
+import { useFormGroup } from "@dashboard/forms/DashboardFormGroupContext";
 import classNames from "classnames";
 import { useThrowError } from "@vanilla/react-utils";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
@@ -48,7 +48,7 @@ export function DashboardRadioGroup(props: IProps) {
         <RadioGroupContext.Provider value={props}>
             <div
                 className={classNames(rootClass, { inline: props.isInline }, { grid: props.isGrid })}
-                role={props.type}
+                role={type}
                 aria-labelledby={labelID}
             >
                 {props.children}

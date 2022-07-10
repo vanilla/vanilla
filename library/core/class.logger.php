@@ -15,13 +15,15 @@ use Psr\Log\LoggerInterface;
  *
  * If nothing sets logger then Logger will be set to BaseLogger which is a dry loop.
  *
- * @see BaseLogger
+ * @deprecated Inject a PSR logger into your class instead.
  */
 class Logger {
     public const FIELD_EVENT = \Vanilla\Logger::FIELD_EVENT;
     public const FIELD_CHANNEL = \Vanilla\Logger::FIELD_CHANNEL;
     public const FIELD_TARGET_USERID = \Vanilla\Logger::FIELD_TARGET_USERID;
     public const FIELD_TARGET_USERNAME = \Vanilla\Logger::FIELD_TARGET_USERNAME;
+    public const FIELD_USERID = \Vanilla\Logger::FIELD_USERID;
+    public const FIELD_USERNAME = \Vanilla\Logger::FIELD_USERNAME;
 
     public const CHANNEL_ADMIN = \Vanilla\Logger::CHANNEL_ADMIN;
     public const CHANNEL_APPLICATION = \Vanilla\Logger::CHANNEL_APPLICATION;
@@ -70,9 +72,10 @@ class Logger {
      *
      * @param LoggerInterface $logger The logger to add.
      * @param string $level One of the **Logger::*** constants.
+     * @param callable|null $filter Signature: (int $level, string $message, array $context)
      */
-    public static function addLogger(LoggerInterface $logger, $level = null) {
-        static::getLogger()->addLogger($logger, $level);
+    public static function addLogger(LoggerInterface $logger, $level = null, callable $filter = null) {
+        static::getLogger()->addLogger($logger, $level, $filter);
     }
 
     /**
@@ -91,7 +94,11 @@ class Logger {
      * @param LoggerInterface $logger Specify a new value to set the logger to.
      */
     public static function setLogger($logger = null) {
-        if ($logger instanceof \Vanilla\Logger) {
+        self::$realLogger = null;
+
+        if ($logger === null) {
+            self::$instance = null;
+        } elseif ($logger instanceof \Vanilla\Logger) {
             self::$instance = $logger;
         } else {
             deprecated('Logger::setLogger()', 'Logger::addLogger');
@@ -155,7 +162,7 @@ class Logger {
      * Log a debug message.
      *
      * @param string $message The message to log.
-     * @param string $context The message data.
+     * @param array $context The message data.
      */
     public static function debug($message, $context = []) {
         static::log(Logger::DEBUG, $message, $context);
@@ -165,7 +172,7 @@ class Logger {
      * Log an info message.
      *
      * @param string $message The message to log.
-     * @param string $context The message data.
+     * @param array $context The message data.
      */
     public static function info($message, $context = []) {
         static::log(Logger::INFO, $message, $context);
@@ -175,7 +182,7 @@ class Logger {
      * Log a notice.
      *
      * @param string $message The message to log.
-     * @param string $context The message data.
+     * @param array $context The message data.
      */
     public static function notice($message, $context = []) {
         static::log(Logger::NOTICE, $message, $context);
@@ -185,7 +192,7 @@ class Logger {
      * Log a warning.
      *
      * @param string $message The message to log.
-     * @param string $context The message data.
+     * @param array $context The message data.
      */
     public static function warning($message, $context = []) {
         static::log(Logger::WARNING, $message, $context);
@@ -195,7 +202,7 @@ class Logger {
      * Log an error.
      *
      * @param string $message The message to log.
-     * @param string $context The message data.
+     * @param array $context The message data.
      */
     public static function error($message, $context = []) {
         static::log(Logger::ERROR, $message, $context);
@@ -205,7 +212,7 @@ class Logger {
      * Log a critical message.
      *
      * @param string $message The message to log.
-     * @param string $context The message data.
+     * @param array $context The message data.
      */
     public static function critical($message, $context = []) {
         static::log(Logger::CRITICAL, $message, $context);
@@ -215,7 +222,7 @@ class Logger {
      * Log an alert.
      *
      * @param string $message The message to log.
-     * @param string $context The message data.
+     * @param array $context The message data.
      */
     public static function alert($message, $context = []) {
         static::log(Logger::ALERT, $message, $context);
@@ -225,7 +232,7 @@ class Logger {
      * Log an emergency.
      *
      * @param string $message The message to log.
-     * @param string $context The message data.
+     * @param array $context The message data.
      */
     public static function emergency($message, $context = []) {
         static::log(Logger::EMERGENCY, $message, $context);
@@ -270,8 +277,7 @@ class Logger {
         } elseif (isset($priorities[$level])) {
             return $priorities[$level];
         } else {
-            error_log($level);
-            self::log(Logger::NOTICE, "Unknown log level {unknownLevel}.", ['unknownLevel' => $level]);
+            trigger_error("Unknown log level: $level.", E_USER_NOTICE);
             return LOG_DEBUG + 1;
         }
     }
@@ -322,25 +328,17 @@ class Logger {
      * @return string Returns one of the constants from this class or "unknown" if the priority isn't known.
      */
     public static function priorityLabel($priority) {
-        switch ($priority) {
-            case LOG_DEBUG:
-                return self::DEBUG;
-            case LOG_INFO:
-                return self::INFO;
-            case LOG_NOTICE:
-                return self::NOTICE;
-            case LOG_WARNING:
-                return self::WARNING;
-            case LOG_ERR:
-                return self::ERROR;
-            case LOG_CRIT:
-                return self::CRITICAL;
-            case LOG_ALERT:
-                return self::ALERT;
-            case LOG_EMERG:
-                return self::EMERGENCY;
-            default:
-                return 'unknown';
-        }
+        static $labels = [
+            LOG_DEBUG => self::DEBUG,
+            LOG_INFO => self::INFO,
+            LOG_NOTICE => self::NOTICE,
+            LOG_WARNING => self::WARNING,
+            LOG_ERR => self::ERROR,
+            LOG_CRIT => self::CRITICAL,
+            LOG_ALERT => self::ALERT,
+            LOG_EMERG => self::EMERGENCY,
+        ];
+
+        return $labels[$priority] ?? 'unknown';
     }
 }

@@ -8,6 +8,9 @@ if (!defined('APPLICATION')) {
     exit();
 }
 
+use Vanilla\Theme\BoxThemeShim;
+use Vanilla\Utility\HtmlUtils;
+
 
 if (!function_exists('formatBody')) :
     /**
@@ -38,14 +41,18 @@ if (!function_exists('writeBookmarkLink')) :
         }
 
         $discussion = Gdn::controller()->data('Discussion');
+        $isBookmarked = $discussion->Bookmarked == '1';
 
         // Bookmark link
-        $title = t($discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark');
+        $title = t($isBookmarked ? 'Unbookmark' : 'Bookmark');
+
+        $accessibleLabel= HtmlUtils::accessibleLabel('%s for discussion: "%s"', [t($isBookmarked? 'Unbookmark' : 'Bookmark'), is_array($discussion) ? $discussion["Name"] : $discussion->Name]);
+
         echo anchor(
             $title,
             '/discussion/bookmark/'.$discussion->DiscussionID.'/'.Gdn::session()->transientKey().'?Target='.urlencode(Gdn::controller()->SelfUrl),
-            'Hijack Bookmark'.($discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
-            ['title' => $title]
+            'Hijack Bookmark'.($isBookmarked ? ' Bookmarked' : ''),
+            ['title' => $title, 'aria-label' => $accessibleLabel]
         );
     }
 endif;
@@ -103,7 +110,7 @@ if (!function_exists('writeComment')) :
 
         // First comment template event
         $sender->fireEvent('BeforeCommentDisplay'); ?>
-        <li class="<?php echo $cssClass; ?>" id="<?php echo 'Comment_'.$comment->CommentID; ?>">
+        <li class="<?php echo $cssClass; ?> pageBox" id="<?php echo 'Comment_'.$comment->CommentID; ?>">
             <div class="Comment">
 
                 <?php
@@ -112,37 +119,41 @@ if (!function_exists('writeComment')) :
                     echo '<span id="latest"></span>';
                 }
                 ?>
-                <div class="Options">
-                    <?php writeCommentOptions($comment); ?>
-                </div>
+                <?php if (!BoxThemeShim::isActive()) { ?>
+                    <div class="Options">
+                        <?php writeCommentOptions($comment); ?>
+                    </div>
+                <?php } ?>
                 <?php $sender->fireEvent('BeforeCommentMeta'); ?>
                 <div class="Item-Header CommentHeader">
+                    <?php BoxThemeShim::activeHtml(userPhoto($author)); ?>
+                    <?php BoxThemeShim::activeHtml('<div class="Item-HeaderContent">'); ?>
                     <div class="AuthorWrap">
-            <span class="Author">
-               <?php
-               if ($userPhotoFirst) {
-                   echo userPhoto($author);
-                   echo userAnchor($author, 'Username');
-               } else {
-                   echo userAnchor($author, 'Username');
-                   echo userPhoto($author);
-               }
-               echo formatMeAction($comment);
-               $sender->fireEvent('AuthorPhoto');
-               ?>
-            </span>
-            <span class="AuthorInfo">
-               <?php
-               echo ' '.wrapIf(htmlspecialchars(val('Title', $author)), 'span', ['class' => 'MItem AuthorTitle']);
-               echo ' '.wrapIf(htmlspecialchars(val('Location', $author)), 'span', ['class' => 'MItem AuthorLocation']);
-               $sender->fireEvent('AuthorInfo');
-               ?>
-            </span>
+                        <span class="Author">
+                           <?php
+                           if ($userPhotoFirst) {
+                               BoxThemeShim::inactiveHtml(userPhoto($author));
+                               echo userAnchor($author, 'Username');
+                           } else {
+                               echo userAnchor($author, 'Username');
+                               BoxThemeShim::inactiveHtml(userPhoto($author));
+                           }
+                           echo formatMeAction($comment);
+                           $sender->fireEvent('AuthorPhoto');
+                           ?>
+                        </span>
+                        <span class="AuthorInfo">
+                           <?php
+                           echo ' '.wrapIf(htmlspecialchars(val('Title', $author)), 'span', ['class' => 'MItem AuthorTitle']);
+                           echo ' '.wrapIf(htmlspecialchars(val('Location', $author)), 'span', ['class' => 'MItem AuthorLocation']);
+                           $sender->fireEvent('AuthorInfo');
+                           ?>
+                        </span>
                     </div>
                     <div class="Meta CommentMeta CommentInfo">
-            <span class="MItem DateCreated">
-               <?php echo anchor(Gdn_Format::date($comment->DateInserted, 'html'), $permalink, 'Permalink', ['name' => 'Item_'.($currentOffset), 'rel' => 'nofollow']); ?>
-            </span>
+                        <span class="MItem DateCreated">
+                           <?php echo anchor(Gdn_Format::date($comment->DateInserted, 'html'), $permalink, 'Permalink', ['name' => 'Item_'.($currentOffset), 'rel' => 'nofollow']); ?>
+                        </span>
                         <?php
                         echo dateUpdated($comment, ['<span class="MItem">', '</span>']);
                         ?>
@@ -162,6 +173,12 @@ if (!function_exists('writeComment')) :
                         $sender->fireEvent('AfterCommentMeta'); // DEPRECATED
                         ?>
                     </div>
+                    <?php BoxThemeShim::activeHtml("</div>"); ?>
+                    <?php if (BoxThemeShim::isActive()) { ?>
+                        <div class="Options">
+                            <?php writeCommentOptions($comment); ?>
+                        </div>
+                    <?php } ?>
                 </div>
                 <div class="Item-BodyWrap">
                     <div class="Item-Body">
@@ -425,7 +442,7 @@ if (!function_exists('WriteAdminCheck')):
         if (!Gdn::controller()->CanEditComments || !c('Vanilla.AdminCheckboxes.Use')) {
             return;
         }
-        echo '<span class="AdminCheck"><input type="checkbox" name="Toggle"></span>';
+        echo '<span class="AdminCheck"><input type="checkbox" aria-label="'.t("Select Discussion").'" name="Toggle"></span>';
     }
 endif;
 
@@ -435,9 +452,14 @@ endif;
  * @since 2.1
  */
 if (!function_exists('writeDiscussionOptions')):
-    function writeDiscussionOptions($discussion = null) {
-        deprecated('writeDiscussionOptions', 'getDiscussionOptionsDropdown', 'March 2016');
 
+    /**
+     * Prints an options dropdown menu for a discussion.
+     *
+     * @param object|array|null $discussion The discussion to get the dropdown options for.
+     * @deprecated
+     */
+    function writeDiscussionOptions($discussion = null) {
         $options = getDiscussionOptions($discussion);
 
         if (empty($options)) {
@@ -560,7 +582,7 @@ if (!function_exists('writeCommentOptions')) :
                     $controller->CheckedComments = $session->getAttribute('CheckedComments', []);
                 }
                 $itemSelected = inSubArray($id, $controller->CheckedComments);
-                echo '<span class="AdminCheck"><input type="checkbox" name="'.'Comment'.'ID[]" value="'.$id.'"'.($itemSelected ? ' checked="checked"' : '').' /></span>';
+                echo '<span class="AdminCheck"><input type="checkbox" aria-label="'.t("Select Discussion").'" name="'.'Comment'.'ID[]" value="'.$id.'"'.($itemSelected ? ' checked="checked"' : '').' /></span>';
             }
         }
     }
@@ -584,14 +606,21 @@ if (!function_exists('writeCommentForm')) :
         // Closed notification
         if ($discussion->Closed == '1') {
             ?>
-            <div class="Foot Closed">
+            <div class="Foot Closed pageBox">
                 <div class="Note Closed"><?php echo t('This discussion has been closed.'); ?></div>
             </div>
         <?php
         } elseif (!$userCanComment) {
             if (!Gdn::session()->isValid()) {
+                if (Gdn::themeFeatures()->get("NewGuestModule")) {
+                    /** @var GuestModule  $guestModule */
+                    $guestModule = Gdn::getContainer()->get(GuestModule::class);
+                    $guestModule->setWidgetAlignment("center");
+                    $guestModule->setDesktopOnlyWidget(true);
+                    echo $guestModule;
+                } else {
                 ?>
-                <div class="Foot Closed">
+                <div class="Foot Closed pageBox">
                     <div class="Note Closed SignInOrRegister"><?php
                         $popup = (c('Garden.SignIn.Popup')) ? ' class="Popup"' : '';
                         $returnUrl = Gdn::request()->pathAndQuery();
@@ -607,6 +636,7 @@ if (!function_exists('writeCommentForm')) :
                     <?php //echo anchor(t('All Discussions'), 'discussions', 'TabLink'); ?>
                 </div>
             <?php
+                }
             }
         }
 

@@ -29,4 +29,18 @@ class BBCodeFormatTest extends AbstractFormatTestCase {
     protected function prepareFixtures(): array {
         return (new FormatFixtureFactory('bbcode'))->getAllFixtures();
     }
+
+    /**
+     * Umlauts should be allowed in URLs.
+     */
+    public function testUmlautLinks(): void {
+        $bbcode = '[url=https://de.wikipedia.org/wiki/Prüfsumme]a[/url]';
+        $actual = $this->prepareFormatter()->renderHTML($bbcode);
+        $expectedHref = url("/home/leaving?" . http_build_query([
+            "allowTrusted" => 1,
+            "target" => "https://de.wikipedia.org/wiki/Prüfsumme",
+        ]));
+        $expected = '<a href="' . htmlspecialchars($expectedHref). '" rel="nofollow">a</a>';
+        $this->assertHtmlStringEqualsHtmlString($expected, $actual);
+    }
 }

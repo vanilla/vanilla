@@ -114,7 +114,7 @@ body.Section-BestOf {
             margin-right: -#{$component-base_padding};
             margin-bottom: -#{$component-base_padding};
             padding: $component-base_padding;
-            min-height: calc(#{$theme-photo_size} + #{$component-base_padding} * 2);
+            min-height: calc(#{$theme-photo_size} + #{$component-vertical_padding} * 2);
             background-color: $component-header_bg;
 
             @if ($component_borderRadius == 0) {
@@ -196,16 +196,18 @@ body.Section-BestOf {
         .Author {
             display: block;
 
-            a {
-                line-height: inherit;
-                color: $component-meta-link_color;
-                font-size: $component-meta_fontSize;
-                font-weight: $component-meta_fontWeight;
+            @if ($staticVariables) {
+                a {
+                    line-height: inherit;
+                    color: $component-meta-link_color;
+                    font-size: $component-meta_fontSize;
+                    font-weight: $component-meta_fontWeight;
 
-                &:hover,
-                &:focus,
-                &:active {
-                    color: $component-meta-link-hover_color;
+                    &:hover,
+                    &:focus,
+                    &:active {
+                        color: $component-meta-link-hover_color;
+                    }
                 }
             }
 

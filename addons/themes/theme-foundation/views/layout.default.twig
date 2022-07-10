@@ -1,6 +1,6 @@
-<div class="Frame" id="page">
+<div class="Frame">
     <div class="Frame-top">
-        <div class="Frame-body">
+        <main class="Frame-body">
             {{ renderBanner() }}
             <div class="Frame-content">
                 <div class="Container">
@@ -8,31 +8,32 @@
                         <div class="Frame-details">
                             {% if not isHomepage %}
                                 <div class="Frame-row">
-                                    <nav class="BreadcrumbsBox">
+                                    <nav class="BreadcrumbsBox" aria-label={{ t("Breadcrumb") }}>
                                         {{ renderBreadcrumbs() }}
                                     </nav>
                                 </div>
                             {% endif %}
-                            <div
-                                class="Frame-row">
+                            <div class="Frame-row">
 
                                 <!-- Main Content -->
-                                <main class="Content MainContent">
+                                <section class="Content MainContent">
                                     {{ renderControllerAsset("Content") }}
-                                </main>
+                                </section>
                                 <!-- Main Content END -->
 
                                 <!-- Main Panel -->
-                                <aside class="Panel Panel-main">
+                                <div class="Panel Panel-main">
                                     {{ renderControllerAsset("Panel") }}
-                                </aside>
+                                </div>
                                 <!-- Main Panel END -->
 
                             </div>
+                            {{ renderControllerAsset("AfterBody") }}
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </main>
     </div>
+    {{ renderControllerAsset('Foot') }}
 </div>

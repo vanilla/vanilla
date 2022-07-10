@@ -8,6 +8,7 @@
     display: block;
     max-width: 100%;
     margin: auto;
+    box-shadow: none !important;
 
     .embedGiphy-iframe {
         @include absolute-fullSizeOfParent;

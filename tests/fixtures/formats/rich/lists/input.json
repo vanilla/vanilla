@@ -175,5 +175,45 @@
             }
         },
         "insert": "\n"
+    },
+    { "insert": "\n(exp 1) First item" },
+    {
+        "attributes": { "list": { "depth": 0, "type": "ordered" } },
+        "insert": "\n"
+    },
+    { "insert": "(exp a) First indented item" },
+    {
+        "attributes": { "list": { "depth": 3, "type": "ordered" } },
+        "insert": "\n"
+    },
+    { "insert": "(exp 2) Second item" },
+    {
+        "attributes": { "list": { "depth": 0, "type": "ordered" } },
+        "insert": "\n"
+    },
+    { "insert": "(exp 3) Third item" },
+    {
+        "attributes": { "list": { "depth": 0, "type": "ordered" } },
+        "insert": "\n"
+    },
+    { "insert": "(exp a) First indented item" },
+    {
+        "attributes": { "list": { "depth": 1, "type": "ordered" } },
+        "insert": "\n"
+    },
+    { "insert": "(exp i) Second indented item" },
+    {
+        "attributes": { "list": { "depth": 2, "type": "ordered" } },
+        "insert": "\n"
+    },
+    { "insert": "(exp ii) Third indented item" },
+    {
+        "attributes": { "list": { "depth": 2, "type": "ordered" } },
+        "insert": "\n"
+    },
+    { "insert": "(exp 4) Fourth item" },
+    {
+        "attributes": { "list": { "depth": 0, "type": "ordered" } },
+        "insert": "\n"
     }
 ]

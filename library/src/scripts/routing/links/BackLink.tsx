@@ -14,6 +14,7 @@ import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React from "react";
 import { useHistory } from "react-router";
+import LinkAsButton from "@library/routing/LinkAsButton";
 
 interface IProps {
     ///
@@ -80,7 +81,7 @@ export default function BackLink(props: IProps) {
     if (props.onClick) {
         content = (
             <Button
-                baseClass={ButtonTypes.RESET}
+                buttonType={ButtonTypes.TEXT}
                 className={className}
                 aria-label={title as string}
                 title={title as string}
@@ -93,7 +94,7 @@ export default function BackLink(props: IProps) {
         // We can go back.
         content = (
             <Button
-                baseClass={ButtonTypes.RESET}
+                buttonType={ButtonTypes.TEXT}
                 className={className}
                 aria-label={title as string}
                 title={title as string}
@@ -108,7 +109,8 @@ export default function BackLink(props: IProps) {
         );
     } else {
         content = (
-            <SmartLink
+            <LinkAsButton
+                buttonType={ButtonTypes.TEXT}
                 to={props.fallbackUrl ?? backFallbackUrl} // Only here for showing the URL on hover.
                 className={className}
                 aria-label={title as string}
@@ -121,7 +123,7 @@ export default function BackLink(props: IProps) {
                 }}
             >
                 {content}
-            </SmartLink>
+            </LinkAsButton>
         );
     }
 

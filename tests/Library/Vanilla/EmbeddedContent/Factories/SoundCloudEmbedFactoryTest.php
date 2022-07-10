@@ -116,4 +116,47 @@ class SoundCloudEmbedFactoryTest extends MinimalContainerTestCase {
         $dataEmbed = new SoundCloudEmbed($embedData);
         $this->assertInstanceOf(SoundCloudEmbed::class, $dataEmbed);
     }
+
+    /**
+     * Provide data for Create Embed error tests
+     *
+     * @return array[]
+     */
+    public function createEmbedErrorsDataProvider(): array {
+        return [
+            '500 Internal Server Error' => [
+                'statusCode' => 500,
+                'url' => 'https://soundcloud.com/',
+                'rawBody' => json_encode("<!DOCTYPE html><html><head></head><body>Hey, I'm the body</body></html>"),
+                'expectedExceptionMessage' => 'Client exception: "Internal Server Error".'
+            ],
+            '200 OK with malformed body' => [
+                'statusCode' => 200,
+                'url' => 'https://soundcloud.com/officialfreqrecords/darshdhaliwalnogoo',
+                'rawBody' => json_encode("<!DOCTYPE html><html><head></head><body>Hey, I'm the body</body></html>"),
+                'expectedExceptionMessage' => 'URL did not yield an appropriate response.'
+            ],
+        ];
+    }
+
+    /**
+     * Test errors upon embed creation.
+     *
+     * @param int $statusCode HTTP status code.
+     * @param string $url Embed url.
+     * @param string $rawBody Returned raw body.
+     * @param string $expectedExceptionMessage Expected exception message
+     * @dataProvider createEmbedErrorsDataProvider
+     */
+    public function testCreateEmbedErrors(int $statusCode, string $url, string $rawBody, string $expectedExceptionMessage): void {
+        $oembedParams = http_build_query(["format" => "json", "url" => $url]);
+        $oembedUrl = SoundCloudEmbedFactory::OEMBED_URL_BASE . "?" . $oembedParams;
+        $this->httpClient->addMockResponse(
+            $oembedUrl,
+            new HttpResponse($statusCode, "Content-Type: application/json", $rawBody)
+        );
+
+        $this->expectExceptionMessage($expectedExceptionMessage);
+        $this->factory->createEmbedForUrl($url);
+    }
 }

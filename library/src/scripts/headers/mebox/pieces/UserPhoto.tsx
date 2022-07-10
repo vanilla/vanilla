@@ -4,57 +4,95 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import { IUserFragment } from "@library/@types/api/users";
+import React, { useState } from "react";
+import { IUser, IUserFragment } from "@library/@types/api/users";
 import { userPhotoClasses } from "@library/headers/mebox/pieces/userPhotoStyles";
 import classNames from "classnames";
-import { UserIcon } from "@library/icons/titleBar";
+import { UserIcon, UserIconTypes } from "@library/icons/titleBar";
+import { accessibleLabel, t } from "@library/utility/appUtils";
+import { LoadingCircle } from "@library/loaders/LoadingRectangle";
 
 export enum UserPhotoSize {
     SMALL = "small",
     MEDIUM = "medium",
     LARGE = "large",
+    XLARGE = "xlarge",
 }
 
-interface IProps {
+interface IProps extends React.HTMLAttributes<HTMLDivElement> {
     className?: string;
     size?: UserPhotoSize;
-    open?: boolean; // Only useful when using as flyouts button with SVG.
-    userInfo: IUserFragment;
+    styleType?: UserIconTypes;
+    userInfo?: Partial<IUserFragment>;
 }
 
 /**
  * Implements User Photo Component
  */
-export class UserPhoto extends React.Component<IProps> {
-    public render() {
-        const { className, userInfo } = this.props;
-        const photoUrl = userInfo ? userInfo.photoUrl : null;
-        const name = userInfo ? userInfo.name : null;
-        const open = !!this.props.open;
-        const classes = userPhotoClasses();
-        let sizeClass = classes.small;
-        switch (this.props.size) {
-            case UserPhotoSize.LARGE:
-                sizeClass = classes.large;
-                break;
-            case UserPhotoSize.MEDIUM:
-                sizeClass = classes.medium;
-                break;
-        }
+export function UserPhoto(props: IProps) {
+    const { className, userInfo = {}, size, styleType, ...spreadProps } = props;
+    const { name = t("Unknown"), photoUrl } = userInfo;
+    const classes = userPhotoClasses();
+    const [badImage, setBadImage] = useState(!photoUrl);
 
-        return (
-            <div className={classNames("userPhoto", className, sizeClass, classes.root, { isOpen: open })}>
-                {!!photoUrl && (
-                    <img
-                        src={photoUrl}
-                        title={name || ""}
-                        alt={name || ""}
-                        className={classNames("userPhoto-photo", classes.photo)}
-                    />
-                )}
-                {!photoUrl && <UserIcon filled={open} className={classNames("userPhoto-photo", classes.photo)} />}
-            </div>
-        );
+    let sizeClass = classes.small;
+    switch (size) {
+        case UserPhotoSize.XLARGE:
+            sizeClass = classes.xlarge;
+            break;
+        case UserPhotoSize.LARGE:
+            sizeClass = classes.large;
+            break;
+        case UserPhotoSize.MEDIUM:
+            sizeClass = classes.medium;
+            break;
     }
+
+    const commonProps = {
+        title: name,
+        alt: accessibleLabel(`User: "%s"`, [name]),
+    };
+
+    return (
+        <div {...spreadProps} className={classNames(className, sizeClass, classes.root, { isOpen: open })}>
+            {!badImage ? (
+                <img
+                    {...commonProps}
+                    src={photoUrl}
+                    className={classNames(classes.photo)}
+                    onError={(e) => {
+                        setBadImage(true);
+                    }}
+                    loading="lazy"
+                />
+            ) : (
+                <UserIcon
+                    {...commonProps}
+                    styleType={styleType}
+                    className={classNames(classes.photo, classes.noPhoto)}
+                />
+            )}
+        </div>
+    );
+}
+
+export function UserPhotoSkeleton(props: { className?: string; size?: UserPhotoSize }) {
+    const classes = userPhotoClasses();
+    let sizeClass = classes.small;
+    switch (props.size) {
+        case UserPhotoSize.XLARGE:
+            sizeClass = classes.xlarge;
+            break;
+        case UserPhotoSize.LARGE:
+            sizeClass = classes.large;
+            break;
+        case UserPhotoSize.MEDIUM:
+            sizeClass = classes.medium;
+            break;
+    }
+    return (
+        <div className={classNames(props.className, sizeClass, classes.root)}>
+            <LoadingCircle height={50} className={classNames(classes.photo, classes.noPhoto)} />
+        </div>
+    );
 }

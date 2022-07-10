@@ -8,32 +8,35 @@ import { produce } from "immer";
 import CategorySuggestionActions from "@vanilla/addon-vanilla/categories/CategorySuggestionActions";
 import { reducerWithInitialState } from "typescript-fsa-reducers";
 import clone from "lodash/clone";
-import { ICategory } from "@vanilla/addon-vanilla/@types/api/categories";
+import { ICategory } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 
 export interface ICategoriesState {
-    suggestions: ILoadable<ICategory[]>;
+    suggestionsByQuery: Record<string, ILoadable<ICategory[]>>;
 }
 
 const INITIAL_STATE: ICategoriesState = {
-    suggestions: {
-        status: LoadStatus.PENDING,
-    },
+    suggestionsByQuery: {},
 };
 
 export const categoriesReducer = produce(
     reducerWithInitialState(clone(INITIAL_STATE))
         .case(CategorySuggestionActions.loadCategories.started, (nextState, payload) => {
-            nextState.suggestions.status = LoadStatus.LOADING;
+            const { query } = payload;
+            nextState.suggestionsByQuery[query] = {
+                status: LoadStatus.LOADING,
+            };
             return nextState;
         })
         .case(CategorySuggestionActions.loadCategories.done, (nextState, payload) => {
-            nextState.suggestions.status = LoadStatus.SUCCESS;
-            nextState.suggestions.data = payload.result;
+            const { query } = payload.params;
+            nextState.suggestionsByQuery[query].status = LoadStatus.SUCCESS;
+            nextState.suggestionsByQuery[query].data = payload.result;
             return nextState;
         })
         .case(CategorySuggestionActions.loadCategories.failed, (nextState, payload) => {
-            nextState.suggestions.status = LoadStatus.ERROR;
-            nextState.suggestions.error = payload.error;
+            const { query } = payload.params;
+            nextState.suggestionsByQuery[query].status = LoadStatus.ERROR;
+            nextState.suggestionsByQuery[query].error = payload.error;
             return nextState;
         }),
 );

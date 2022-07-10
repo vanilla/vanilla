@@ -29,7 +29,7 @@ export function mockAPI() {
  * @param adapter
  */
 export function applyAnyFallbackError(adapter: MockAdapter) {
-    adapter.onAny().reply(config => {
+    adapter.onAny().reply((config) => {
         const query = config.paramsSerializer!(config.params);
         throw new Error(
             "No matching found for " + config.method!.toUpperCase() + " " + config.url + (query ? "?" + query : ""),

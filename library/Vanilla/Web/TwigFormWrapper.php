@@ -24,6 +24,7 @@ class TwigFormWrapper {
         'close',
         'errors',
         'label',
+        'labelWrap',
         'inputWrap',
         'inlineError',
 
@@ -37,6 +38,7 @@ class TwigFormWrapper {
         'input',
         'hidden',
         'textBox',
+        'textBoxWrap',
         'bodyBox',
         'button',
         'linkButton',
@@ -56,6 +58,7 @@ class TwigFormWrapper {
         'currentImage',
         'imageUpload',
         'fileUpload',
+        'react',
     ];
 
     /**

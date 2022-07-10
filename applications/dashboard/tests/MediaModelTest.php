@@ -9,6 +9,7 @@ namespace VanillaTests\Dashboard;
 
 use Vanilla\UploadedFile;
 use VanillaTests\APIv2\AbstractAPIv2Test;
+use VanillaTests\Library\Vanilla\UploadedFileTest;
 
 /**
  * Tests for the media model.
@@ -28,7 +29,9 @@ class MediaModelTest extends AbstractAPIv2Test {
      * Test saving and finding of uploads.
      */
     public function testSaveUpload() {
-        $file = UploadedFile::fromRemoteResourceUrl('https://vanillaforums.com/svgs/logo.svg');
+        $file = UploadedFile::fromRemoteResourceUrl(
+            UploadedFileTest::TEST_REMOTE_FILE_URL
+        );
         $model = $this->getMediaModel();
 
         $insertedMedia = $model->saveUploadedFile($file);

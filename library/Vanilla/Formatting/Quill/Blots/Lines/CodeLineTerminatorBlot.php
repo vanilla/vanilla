@@ -42,7 +42,7 @@ class CodeLineTerminatorBlot extends AbstractLineTerminatorBlot {
      * @inheritDoc
      */
     public function getGroupOpeningTag(): string {
-        return '<pre class="code codeBlock" spellcheck="false">';
+        return '<pre class="code codeBlock" spellcheck="false" tabindex="0">';
     }
 
     /**

@@ -63,6 +63,15 @@ class CookieTest extends SharedBootstrapTestCase {
     }
 
     /**
+     * Test the cookie prefix accessors.
+     */
+    public function testGetSetPrefix() {
+        $cookie = new Cookie();
+        $cookie->setPrefix('px');
+        $this->assertSame('px', $cookie->getPrefix());
+    }
+
+    /**
      * Test deleting a cookie.
      */
     public function testDelete() {
@@ -255,6 +264,108 @@ class CookieTest extends SharedBootstrapTestCase {
     }
 
     /**
+     * Test setting a cookie with sameSite attribute.
+     *
+     * @param string|null $expected
+     * @param string $name
+     * @param mixed $value
+     * @param int $expire
+     * @param string $path
+     * @param string $domain
+     * @param bool|null $secure
+     * @param bool $httpOnly
+     * @param string|null $sameSite
+     * @dataProvider provideCookieSetSameSite
+     */
+    public function testSetCookieSameSite($expected, $name, $value, $expire, $path, $domain, $secure, $httpOnly, $sameSite = null) {
+        $cookie = new Cookie([]);
+        $cookie->setCookie($name, $value, $expire, $path, $domain, $secure, $httpOnly, $sameSite);
+
+        $result = $cookie->makeNewCookieCalls();
+        $this->assertEquals($expected, $result[$name][6]);
+    }
+
+    /**
+     * Provide parameters for setting cookie security.
+     *
+     * @return array
+     */
+    public function provideCookieSetSecurity(): array {
+
+        // Parameter order: expected, security
+        $data = [
+            'cookie-security-false' => [false, false],
+            'cookie-security-true' => [true, true],
+            'cookie-security-null' => [false, null],
+        ];
+        return $data;
+    }
+
+    /**
+     * Test setting cookie security.
+     *
+     * @param bool|null $expected
+     * @param bool|null $security
+     * @dataProvider provideCookieSetSecurity
+     */
+    public function testSetCookieSecurityStatic($expected, $security): void {
+        $cookie = new Cookie();
+        $cookieName = 'foo';
+        $cookie->setCookie($cookieName, 'bar', 0, '/site', 'vanillaforums.com', $security, true, null);
+        $result = $cookie->makeNewCookieCalls();
+        [$value, $expiry, $path, $domain, $secure, $httpOnly, $sameSite] = $result[$cookieName];
+        $this->assertSame($expected, $secure);
+    }
+
+    /**
+     * Test cookie::setSecure().
+     *
+     * @param bool $expected
+     * @param bool $setSecure
+     * @dataProvider provideCookieSetSecurityDynamic
+     */
+    public function testSetCookieSecurityDynamic(bool $expected, bool $setSecure): void {
+        $cookie = new Cookie();
+        $cookie->setSecure($setSecure);
+        $cookieName = 'foo';
+        $cookie->setCookie($cookieName, 'bar', 0, '/site', 'vanillaforums.com', null, true, null);
+
+        $result = $cookie->makeNewCookieCalls();
+        [$value, $expiry, $path, $domain, $secure, $httpOnly, $sameSite] = $result[$cookieName];
+        $this->assertSame($expected, $secure);
+    }
+    /**
+     * Provide parameters for setting cookie::setSecure().
+     *
+     * @return array
+     */
+    public function provideCookieSetSecurityDynamic(): array {
+
+        // Parameter order: expected, Cookie::setSecure()
+        $data = [
+            'cookie-security-false' => [false, false],
+            'cookie-security-true' => [true, true],
+        ];
+        return $data;
+    }
+
+    /**
+     * Provide parameters for cookie-setting functions.
+     *
+     * @return array
+     */
+    public function provideCookieSetSameSite() {
+        // Parameter order: expected, name, value, expire, path, domain, secure, httpOnly, sameSite
+        $data = [
+            'not-secure-samesite-null' => [null, 'foo', 'bar', 500, '/site', 'vanillaforums.com', false, true, null],
+            'secure-samesite-null' => ['None', 'foo', 'bar', 500, '/site', 'vanillaforums.com', true, true, null],
+            'not-secure-samesite' => [null, 'foo', 'bar', 500, '/site', 'vanillaforums.com', false, true, 'None'],
+            'secure-samesite' => ['None', 'foo', 'bar', 500, '/site', 'vanillaforums.com', true, true, 'None']
+        ];
+        return $data;
+    }
+
+    /**
      * Setting a cookie with a null value deletes it.
      */
     public function testDeleteWithSet(): void {
@@ -263,5 +374,31 @@ class CookieTest extends SharedBootstrapTestCase {
 
         $r = $cookie->makeDeleteCookieCalls();
         $this->assertArrayHasKey('foo', $r);
+    }
+
+    /**
+     * The cookie prefix should be prepended to cookie names.
+     */
+    public function testCookiePrefix() {
+        $cookie = new Cookie();
+        $cookie->setPrefix('_');
+
+        $cookie->set('a', 'b');
+        $this->assertSame('b', $cookie->get('a'));
+        $this->assertSame('b', $cookie->get('/_a'));
+
+        $cookie->delete('a');
+        $this->assertSame('foo', $cookie->get('a', 'foo'));
+    }
+
+    /**
+     * I should be able to specify an absolute cookie name by prefixing with a "/".
+     */
+    public function testCookiePrefixRoot() {
+        $cookie = new Cookie();
+        $cookie->setPrefix('f');
+
+        $cookie->set('/foo', 'bar');
+        $this->assertSame('bar', $cookie->get('oo'));
     }
 }

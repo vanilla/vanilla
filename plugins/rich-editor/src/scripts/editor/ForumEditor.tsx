@@ -3,22 +3,28 @@
  * @license GPL-2.0-only
  */
 
-import React, { useState } from "react";
+import { hasPermission } from "@library/features/users/Permission";
+import { DeviceProvider } from "@library/layout/DeviceContext";
 import getStore from "@library/redux/getStore";
+import { IEditorProps } from "@rich-editor/editor/context";
 import { Editor } from "@rich-editor/editor/Editor";
 import EditorContent from "@rich-editor/editor/EditorContent";
+import { EditorEmbedBar } from "@rich-editor/editor/EditorEmbedBar";
 import { EditorInlineMenus } from "@rich-editor/editor/EditorInlineMenus";
 import { EditorParagraphMenu } from "@rich-editor/editor/EditorParagraphMenu";
-import { EditorEmbedBar } from "@rich-editor/editor/EditorEmbedBar";
+import { FormatConversionNotice } from "@rich-editor/editor/FormatConversionNotice";
+import EditorDescriptions from "@rich-editor/editor/pieces/EditorDescriptions";
 import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import classNames from "classnames";
+import React, { useLayoutEffect, useRef, useState } from "react";
 import { Provider } from "react-redux";
-import { DeviceProvider } from "@library/layout/DeviceContext";
-import { useUniqueID } from "@library/utility/idUtils";
-import { hasPermission } from "@library/features/users/Permission";
 
 interface IProps {
     legacyTextArea: HTMLInputElement;
+    descriptionID?: string;
+    uploadEnabled?: boolean;
+    placeholder?: string;
+    needsHtmlConversion?: boolean;
 }
 
 /**
@@ -30,18 +36,51 @@ export function ForumEditor(props: IProps) {
     const store = getStore();
     const classes = richEditorClasses(true);
     const [hasFocus, setHasFocus] = useState(false);
+    const uploadEnabled = props.uploadEnabled ?? true;
 
-    const embedOptionsID = useUniqueID("embedOptions");
+    const [operationsQueue, setOperationsQueue] = useState<IEditorProps["operationsQueue"]>();
+    const [showConversionNotice, setShowConversionNotice] = useState(false);
+    const messageRef = useRef<HTMLDivElement | null>(null);
+
+    // Only occurs on the first run.
+    useLayoutEffect(() => {
+        if (props.needsHtmlConversion) {
+            setOperationsQueue([props.legacyTextArea.value]);
+            props.legacyTextArea.value = "";
+            setShowConversionNotice(true);
+        }
+    }, []);
+
+    function cancelForm() {
+        const form = messageRef.current?.closest("form");
+        if (!(form instanceof HTMLFormElement)) {
+            return;
+        }
+
+        const cancelButton = form.querySelector(".Button.Cancel");
+        if (cancelButton instanceof HTMLElement) {
+            cancelButton.click();
+        }
+    }
 
     return (
         <Provider store={store}>
             <DeviceProvider>
+                {showConversionNotice && (
+                    <FormatConversionNotice
+                        ref={messageRef}
+                        className={classes.conversionNotice}
+                        onCancel={cancelForm}
+                        onConfirm={() => setShowConversionNotice(false)}
+                    />
+                )}
                 <Editor
                     isPrimaryEditor={true}
                     legacyMode={true}
                     allowUpload={hasPermission("uploads.add")}
                     isLoading={false}
                     onFocus={setHasFocus}
+                    operationsQueue={operationsQueue}
                 >
                     <div
                         className={classNames(
@@ -52,10 +91,11 @@ export function ForumEditor(props: IProps) {
                             hasFocus && "focus-visible",
                         )}
                     >
-                        <EditorContent legacyTextArea={props.legacyTextArea} />
+                        {props.descriptionID && <EditorDescriptions id={props.descriptionID} />}
+                        <EditorContent placeholder={props.placeholder} legacyTextArea={props.legacyTextArea} />
                         <EditorParagraphMenu />
                         <EditorInlineMenus />
-                        <EditorEmbedBar />
+                        <EditorEmbedBar uploadEnabled={uploadEnabled} />
                     </div>
                 </Editor>
             </DeviceProvider>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="{{ locale }}">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        {{ renderControllerAsset("Head") }}
+        <noscript>
+            <style>
+                .fullPageLoader { display: none }
+                body.isLoading .page {
+                    max-height: initial;
+                    height: initial;
+                }
+            </style>
+        </noscript>
+    </head>
+    <body class="{{ cssClass }}">
+        {{ renderControllerAsset("Symbols") }}
+        <div class="main-container">
+            <header id="titleBar" class="navbar" data-react="title-bar-hamburger"></header>
+            <div class="main-row pusher {{ IsWidePage|default(false) ? "main-row-wide" }}" id="main-row">
+                <div class="panel panel-left">
+                    <div class="panel-nav panel-content-wrapper">
+                        <div class="js-fluid-fixed panel-content">
+                            <a href="/" class="title">
+                                {{ forumLinkLabel }}
+                                <svg class="icon icon-svg icon-16" alt="external-link" viewBox="0 0 17 17">
+                                    <use xlink:href="#external-link"></use>
+                                </svg>
+                            </a>
+                            <div id="panel-nav" class="js-panel-nav">
+                                {{ dashboardNav|raw }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-help panel-right">
+                    <div class="panel-content-wrapper">
+                        <div id="fixed-help" class="js-fluid-fixed panel-content">
+                            {{ renderControllerAsset("Help") }}
+                        </div>
+                    </div>
+                </div>
+                <div class="dashboard-main">
+                    <section role="main" class="content">
+                        {{ renderControllerAsset("Content") }}
+                    </section>
+                    <footer class="footer">
+                        {{ renderControllerAsset("Foot") }}
+                        <div class="footer-logo logo-wrap">
+                            <a href="{{ vanillaUrl }}" class="vanilla-logo">Vanilla Forums</a>
+                            <div class="footer-logo-powered">
+                                <div class="footer-logo-powered-text">— {{t("Powered")}} —</div>
+                            </div>
+                        </div>
+                        <div class="footer-nav nav">
+                            {{ fireEchoEvent("dashboard_footerNav") }}
+                            {% if showVanillaVersion %}
+                                <div class="vanilla-version footer-nav-item nav-item">
+                                    {{ t('Version') }} {{ applicationVersion }}</div>
+                            {%  endif %}
+                        </div>
+                    </footer>
+                </div>
+            </div>
+        </div>
+        <div id="modals"></div>
+    </body>
+</html>

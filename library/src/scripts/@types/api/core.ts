@@ -5,6 +5,7 @@
 
 import { AxiosError, AxiosResponse } from "axios";
 import { IUserFragment } from "@library/@types/api/users";
+import { RecordID } from "@vanilla/utils";
 
 export enum LoadStatus {
     PENDING = "PENDING",
@@ -13,7 +14,24 @@ export enum LoadStatus {
     ERROR = "ERROR",
 }
 
-export interface ILoadable<T, E = IApiError> {
+export type Loadable<T, E = any> =
+    | {
+          status: LoadStatus.PENDING | LoadStatus.LOADING;
+          error?: undefined;
+          data?: undefined;
+      }
+    | {
+          status: LoadStatus.SUCCESS;
+          error?: undefined;
+          data: T;
+      }
+    | {
+          status: LoadStatus.ERROR;
+          error: E;
+          data?: undefined;
+      };
+
+export interface ILoadable<T = never, E = IApiError> {
     status: LoadStatus;
     error?: E;
     data?: T;
@@ -27,7 +45,7 @@ export interface IApiResponse<DataType = any> {
 
 export interface IFieldError {
     message: string; // translated message
-    code: string; // translation code
+    code?: string; // translation code
     field: string;
     status?: number; // HTTP status
 }
@@ -52,14 +70,26 @@ interface IMultiType<T> {
 export type MultiTypeRecord<T, Subtract extends keyof T, TypeName extends string> = Omit<T, Subtract> &
     IMultiType<TypeName>;
 
+export interface INavigationItemBadge {
+    type: navigationItemBadgeType;
+    text: string;
+    url?: string;
+}
+
+export enum navigationItemBadgeType {
+    TEXT = "text",
+    VIEW = "view",
+}
+
 export interface INavigationItem {
     name: string;
-    url: string;
-    parentID: number;
-    recordID: number;
+    url?: string;
+    parentID: RecordID;
+    recordID: RecordID;
     sort: number | null;
     recordType: string;
     isLink?: boolean;
+    badge?: INavigationItemBadge;
 }
 
 export interface IApiDateInfo {
@@ -92,4 +122,14 @@ export enum PublishStatus {
     DELETED = "deleted",
     UNDELETED = "undeleted",
     PUBLISHED = "published",
+}
+
+export enum Format {
+    TEXT = "text",
+    TEXTEX = "textex",
+    MARKDOWN = "markdown",
+    WYSIWYG = "wysiwyg",
+    HTML = "html",
+    BBCODE = "bbcode",
+    RICH = "rich",
 }

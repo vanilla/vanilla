@@ -1,11 +1,11 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import { delegateEvent, removeDelegatedEvent } from "@vanilla/dom-utils";
-import { debug } from "@vanilla/utils";
+import { debug, logError } from "@vanilla/utils";
 import { useEditorContents } from "@rich-editor/editor/contentContext";
 import { useEditor } from "@rich-editor/editor/context";
 import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
@@ -18,7 +18,7 @@ import throttle from "lodash/throttle";
 import Quill, { DeltaOperation, QuillOptionsStatic, Sources } from "quill/core";
 import React, { useCallback, useEffect, useRef, useMemo } from "react";
 import { useLastValue } from "@vanilla/react-utils";
-import { userContentClasses } from "@library/content/userContentStyles";
+import { userContentClasses } from "@library/content/UserContent.styles";
 
 const DEFAULT_CONTENT = [{ insert: "\n" }];
 
@@ -26,6 +26,7 @@ interface IProps {
     legacyTextArea?: HTMLInputElement | HTMLTextAreaElement;
     placeholder?: string;
     placeholderClassName?: string;
+    needsHtmlConversion?: boolean;
 }
 
 /**
@@ -112,6 +113,7 @@ function useQuillAttributeSync(placeholder?: string, placeholderClass?: string) 
         if (quill) {
             // Initialize some CSS classes onto the quill root.quillRootClasses
             // quill && quill.root.classList.value,
+            quill.root.tabIndex = 0;
             quill.root.classList.value += " " + quillRootClasses;
         }
     }, [quill, quillRootClasses]);
@@ -154,7 +156,12 @@ function useInitialValue() {
         if (quill && initialValue && initialValue.length > 0) {
             const initializeChangedToTrue = !prevReinitialize && reinitialize;
             if (prevInitialValue !== initialValue && initializeChangedToTrue) {
-                quill.setContents(initialValue);
+                try {
+                    quill.setContents(initialValue);
+                } catch (err) {
+                    console.error(err);
+                }
+
                 quill.setSelection(0, 0);
                 quill.history.clear();
             }
@@ -171,18 +178,22 @@ function useOperationsQueue() {
         if (!operationsQueue || !quill || operationsQueue.length === 0) {
             return;
         }
-        operationsQueue.forEach(operation => {
+        operationsQueue.forEach((operation) => {
             const scrollLength = quill.scroll.length();
 
-            if (typeof operation === "string") {
-                quill.clipboard.dangerouslyPasteHTML(scrollLength, operation);
-                // Trim starting whitespace if we have it.
-                if (quill.getText(0, 1) === "\n") {
-                    quill.updateContents([{ delete: 1 }]);
+            try {
+                if (typeof operation === "string") {
+                    quill.clipboard.dangerouslyPasteHTML(scrollLength, operation);
+                    // Trim starting whitespace if we have it.
+                    if (quill.getText(0, 1) === "\n") {
+                        quill.updateContents([{ delete: 1 }]);
+                    }
+                } else {
+                    const offsetOperations = scrollLength > 1 ? { retain: scrollLength } : { delete: 1 };
+                    quill.updateContents([offsetOperations, ...operation]);
                 }
-            } else {
-                const offsetOperations = scrollLength > 1 ? { retain: scrollLength } : { delete: 1 };
-                quill.updateContents([offsetOperations, ...operation]);
+            } catch (err) {
+                logError("There was an error converting html into rich format. Content may not be accurate", err);
             }
         });
         clearOperationsQueue && clearOperationsQueue();
@@ -216,6 +227,7 @@ function useLegacyTextAreaSync(textArea?: HTMLInputElement | HTMLTextAreaElement
         const handleChange = throttle(() => {
             requestAnimationFrame(() => {
                 textArea.value = JSON.stringify(quill.getContents().ops);
+                textArea.dispatchEvent(new Event("input", { bubbles: true, cancelable: false }));
             });
         }, 1000 / 60); // 60FPS
         quill.on(Quill.events.TEXT_CHANGE, handleChange);
@@ -256,7 +268,9 @@ function useQuoteButtonHandler() {
             event.preventDefault();
             const embedInserter: EmbedInsertionModule = quill.getModule("embed/insertion");
             const url = triggeringElement.getAttribute("data-scrape-url") || "";
-            embedInserter.scrapeMedia(url);
+
+            // A slight min-time to ensure the user's page is finished scrolling before the new content loads in.
+            embedInserter.scrapeMedia(url, 500);
 
             // Just in case the browser doesn't support this API.
             if (quill.root.scrollIntoView) {
@@ -338,17 +352,34 @@ function useUpdateHandler() {
 
         HeaderBlot.resetCounters();
         const headers = (quill.scroll.descendants(
-            blot => blot instanceof HeaderBlot,
+            (blot) => blot instanceof HeaderBlot,
             0,
             quill.scroll.length(),
         ) as any) as HeaderBlot[]; // Explicit mapping of types because the parchments types suck.
 
-        headers.forEach(header => header.setGeneratedID());
+        headers.forEach((header) => header.setGeneratedID());
         quill.update(Quill.sources.API);
         return quill.getContents().ops!;
     }, [quill]);
 
     const handleUpdate = useMemo(() => {
+        // This is an incredibly performance sensitive operation
+        // As it can trigger re-renders of a lot of react components
+        // and also change very rapidly.
+        const triggerSelectionUpdate = throttle(() => {
+            if (!quill) {
+                return;
+            }
+            updateSelection(quill.getSelection());
+        }, 1000 / 60); // Throttle to 60 FPS.
+
+        const triggerTextUpdate = throttle(() => {
+            if (!onChange) {
+                return;
+            }
+            onChange(getOperations());
+        }, 1000 / 60); // Throttle to 60 FPS.
+
         const updateFn = (type: string, newValue, oldValue, source: Sources) => {
             if (!quill) {
                 return;
@@ -356,13 +387,13 @@ function useUpdateHandler() {
             if (source === Quill.sources.SILENT) {
                 return;
             }
-            if (onChange && type === Quill.events.TEXT_CHANGE) {
-                onChange(getOperations());
+            if (type === Quill.events.TEXT_CHANGE) {
+                triggerTextUpdate();
             }
 
-            updateSelection(quill.getSelection());
+            triggerSelectionUpdate();
         };
-        return throttle(updateFn, 1000 / 60); // Throttle to 60 FPS.
+        return updateFn;
     }, [quill, onChange, getOperations, updateSelection]);
 
     return handleUpdate;

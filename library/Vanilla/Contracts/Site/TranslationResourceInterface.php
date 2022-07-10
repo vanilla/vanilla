@@ -24,4 +24,11 @@ interface TranslationResourceInterface {
      * @return array
      */
     public function resourceRecord(): array;
+
+    /**
+     * Notify resource model about translation happened
+     *
+     * @param TranslationItem $translationItem
+     */
+    public function notify(TranslationItem $translationItem);
 }

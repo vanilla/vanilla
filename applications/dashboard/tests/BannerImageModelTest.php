@@ -9,6 +9,11 @@ namespace VanillaTests\Dashboard\Models;
 
 use PHPUnit\Framework\TestCase;
 use Vanilla\Dashboard\Models\BannerImageModel;
+use Vanilla\Site\DefaultSiteSection;
+use VanillaTests\BootstrapTrait;
+use VanillaTests\Fixtures\MockConfig;
+use VanillaTests\Fixtures\MockSiteSection;
+use VanillaTests\Fixtures\MockSiteSectionProvider;
 use VanillaTests\SiteTestTrait;
 
 /**
@@ -37,6 +42,11 @@ class BannerImageModelTest extends TestCase {
     private $cat2_2_1;
 
     /**
+     * @var MockSiteSectionProvider;
+     */
+    protected $siteSectionProvider;
+
+    /**
      * Setup some categories.
      */
     public function setUp(): void {
@@ -46,38 +56,40 @@ class BannerImageModelTest extends TestCase {
         $model = new \CategoryModel();
         $this->cat1 = $model->save([
             'Name' => 'Cat 1',
-            'UrlCode' => randomString(5),
+            'UrlCode' => randomString(10),
         ]);
         $this->cat1_1 = $model->save([
             'Name' => 'Cat 1.1',
             'ParentCategoryID' => $this->cat1,
-            'UrlCode' => randomString(5),
+            'UrlCode' => randomString(10),
         ]);
 
         $this->cat2 = $model->save([
             'Name' => 'Cat 2',
             'BannerImage' => "2.png",
-            'UrlCode' => randomString(5),
+            'UrlCode' => randomString(10),
         ]);
 
         $this->cat2_1 = $model->save([
             'Name' => 'Cat 2.1',
             'ParentCategoryID' => $this->cat2,
             'BannerImage' => "2_1.png",
-            'UrlCode' => randomString(5),
+            'UrlCode' => randomString(10),
         ]);
 
         $this->cat2_2 = $model->save([
             'Name' => 'Cat 2.2',
             'ParentCategoryID' => $this->cat2,
-            'UrlCode' => randomString(5),
+            'UrlCode' => randomString(10),
         ]);
 
         $this->cat2_2_1 = $model->save([
             'Name' => 'Cat 2.2.1',
             'ParentCategoryID' => $this->cat2_2,
-            'UrlCode' => randomString(5),
+            'UrlCode' => randomString(10),
         ]);
+        /** @var MockSiteSectionProvider $siteSectionProvider */
+        $this->siteSectionProvider = self::container()->get(MockSiteSectionProvider::class);
     }
 
     /**
@@ -108,7 +120,11 @@ class BannerImageModelTest extends TestCase {
      */
     public function testGetCurrent() {
         $uploadPrefix = 'http://vanilla.test/bannerimagemodeltest/uploads/';
-
+        $router = self::container()->get(\Gdn_Router::class);
+        $defaultSection = new DefaultSiteSection(new MockConfig([
+            BannerImageModel::DEFAULT_CONFIG_KEY => $uploadPrefix.'default.png',
+        ]), $router);
+        $this->siteSectionProvider->setCurrentSiteSection($defaultSection);
         // No controller
         $this->assertEquals(
             $uploadPrefix.'default.png',

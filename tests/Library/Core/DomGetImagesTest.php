@@ -18,7 +18,7 @@ class DomGetImagesTest extends TestCase {
     /**
      * Tests {@link domGetImages()} against several scenarios.
      *
-     * @param pQuery $testDom The DOM to search.
+     * @param \pQuery $testDom The DOM to search.
      * @param string $testUrl The URL of the document to add to relative URLs.
      * @param int $testMaxImages The maximum number of images to return.
      * @param array $expected The expected result.

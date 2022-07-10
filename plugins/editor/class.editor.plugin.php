@@ -942,11 +942,11 @@ class EditorPlugin extends Gdn_Plugin {
      *
      * @access protected
      * @param int $fileID
-     * @param int $foreignID
-     * @param string $foreignType Lowercase.
+     * @param int|null $foreignID
+     * @param string|null $foreignType Lowercase.
      * @return bool Whether attach was successful.
      */
-    protected function attachEditorUploads($fileID, $foreignID, $foreignType) {
+    protected function attachEditorUploads(int $fileID, ?int $foreignID, ?string $foreignType) {
         // Save data to database using model with media table
         $model = new MediaModel();
         $media = $model->getID($fileID, DATASET_TYPE_ARRAY);
@@ -971,12 +971,10 @@ class EditorPlugin extends Gdn_Plugin {
     /**
      * Remove file from filesystem, and clear db entry.
      *
-     * @param type $mediaID
-     * @param type $foreignID
-     * @param type $foreignType
+     * @param int $mediaID
      * @return boolean
      */
-    protected function deleteEditorUploads($mediaID, $foreignID = '', $foreignType = '') {
+    protected function deleteEditorUploads(int $mediaID) {
         // Save data to database using model with media table
         $model = new MediaModel();
         $media = $model->getID($mediaID, DATASET_TYPE_ARRAY);
@@ -989,7 +987,6 @@ class EditorPlugin extends Gdn_Plugin {
             try {
                 $model->deleteID($mediaID, ['deleteFile' => true]);
             } catch (Exception $e) {
-                die($e->getMessage());
                 return false;
             }
             return true;
@@ -1014,14 +1011,14 @@ class EditorPlugin extends Gdn_Plugin {
             $categoryID = $discussion->CategoryID;
             $category = CategoryModel::categories($categoryID);
 
-            if ($category && $category['AllowFileUploads'] != 1  && Gdn::request()->getValue('MediaIDs') !== false) {
+            if (!CategoryModel::checkAllowFileUploads($category) && Gdn::request()->getValue('MediaIDs') !== false) {
                 throw new Exception(t('You are not allowed to upload files in this category.'));
             }
         }
-        
+
         if (count($mediaIds)) {
-            foreach ($mediaIds as $mediaId) {
-                $this->attachEditorUploads($mediaId, $id, $type);
+            foreach ($mediaIds as $mediaID) {
+                $this->attachEditorUploads($mediaID, $id, $type);
             }
         }
 
@@ -1031,8 +1028,8 @@ class EditorPlugin extends Gdn_Plugin {
         $removeMediaIds = array_filter($removeMediaIds);
 
         if (count($removeMediaIds)) {
-            foreach ($removeMediaIds as $mediaId) {
-                $this->deleteEditorUploads($mediaId, $id, $type);
+            foreach ($removeMediaIds as $mediaID) {
+                $this->deleteEditorUploads($mediaID);
             }
         }
     }
@@ -1128,6 +1125,14 @@ class EditorPlugin extends Gdn_Plugin {
      * @param array|object $row The row of data being attached to.
      */
     protected function attachUploadsToComment($sender, $type = 'comment', $row = null) {
+
+        // We need to do this because other addons needs to be able to control
+        // whether attachments should be rendered (for example, private discussions).
+        $shouldAttach = Gdn::eventManager()->fireFilter('shouldAttachUploads', true);
+        if (!$shouldAttach) {
+            return;
+        }
+
         $param = ucfirst($type).'ID';
         $foreignId = val($param, val(ucfirst($type), $sender->EventArguments));
 
@@ -1460,16 +1465,12 @@ class EditorPlugin extends Gdn_Plugin {
         Gdn_Form $form,
         Gdn_ConfigurationModel $configModel
     ): string {
-        //WYSIWYG form items
-        $forceWysiwygLabel = 'Reinterpret All Posts As Wysiwyg';
-        $forceWysiwygNote1 =  t('ForceWysiwyg.Notes1', 'Check the below option to tell the editor to reinterpret all old posts as Wysiwyg.');
-        $forceWysiwygNote2 = t('ForceWysiwyg.Notes2', 'This setting will only take effect if Wysiwyg was chosen as the Post Format above. The purpose of this option is to normalize the editor format. If older posts edited with another format, such as markdown or BBCode, are loaded, this option will force Wysiwyg.');
-        $label = '<p class="info">'.$forceWysiwygNote1.'</p><p class="info"><strong>'.t('Note:').' </strong>'.$forceWysiwygNote2.'</p>';
         $configModel->setField('Plugins.editor.ForceWysiwyg');
         $form->setValue('Plugins.editor.ForceWysiwyg', c('Plugins.editor.ForceWysiwyg'));
-        $formToggle = $form->toggle('Plugins.editor.ForceWysiwyg', $forceWysiwygLabel, [], $label);
-
-        $additionalFormItemHTML .= "<div class='form-group forceWysiwyg'>$formToggle</div>";
+        $additionalFormItemHTML .= "<div class='form-group forceWysiwyg'>"
+            .VanillaSettingsController::postFormatReintrerpretToggle($form, 'Plugins.editor.ForceWysiwyg', 'Wysiwyg')
+            ."</div>"
+        ;
 
         return $additionalFormItemHTML;
     }
@@ -1627,7 +1628,7 @@ class EditorPlugin extends Gdn_Plugin {
             return $this->canUpload;
         } else {
             // Check config and user role upload permission
-            if (c('Garden.AllowFileUploads', true) && Gdn::session()->checkPermission('Plugins.Attachments.Upload.Allow', false)) {
+            if (c('Garden.AllowFileUploads', true) && Gdn::session()->checkPermission('Garden.Uploads.Add', false)) {
                 // Check category-specific permission
                 $permissionCategory = CategoryModel::permissionCategory(Gdn::controller()->data('Category'));
                 $this->canUpload = val('AllowFileUploads', $permissionCategory, true);

@@ -474,7 +474,7 @@ abstract class SSOAuthenticator extends Authenticator {
      * @return $this
      * @throws \Garden\Schema\ValidationException
      */
-    protected function setTrusted(bool $trusted) {
+    public function setTrusted(bool $trusted) {
         $this->trusted = $trusted;
 
         if ($this->saveState) {

@@ -1,0 +1,25 @@
+{
+    "name": "Sitemaps",
+    "description": "Creates an XML sitemap based on http://www.sitemaps.org.",
+    "version": "2.3",
+    "mobileFriendly": true,
+    "requiredTheme": false,
+    "hasLocale": true,
+    "registerPermissions": false,
+    "settingsUrl": "/settings/sitemaps",
+    "settingsPermission": "Garden.Settings.Manage",
+    "icon": "site-maps.png",
+    "key": "sitemaps",
+    "type": "addon",
+    "license": "GPL-2.0-only",
+    "authors": [
+        {
+            "name": "Tim Gunter",
+            "email": "tim@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=3.1"
+    }
+}

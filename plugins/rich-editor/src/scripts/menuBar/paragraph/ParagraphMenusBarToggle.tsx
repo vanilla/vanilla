@@ -16,7 +16,7 @@ import {
     Heading4Icon,
     Heading5Icon,
 } from "@library/icons/editorIcons";
-import { srOnly } from "@library/styles/styleHelpers";
+import { Mixins } from "@library/styles/Mixins";
 import { t } from "@library/utility/appUtils";
 import { IWithEditorProps } from "@rich-editor/editor/context";
 import { withEditor } from "@rich-editor/editor/withEditor";
@@ -29,12 +29,12 @@ import ActiveFormatIcon from "@rich-editor/toolbars/pieces/ActiveFormatIcon";
 import classNames from "classnames";
 import Quill, { RangeStatic } from "quill/core";
 import React from "react";
-import { style } from "typestyle";
 import uniqueId from "lodash/uniqueId";
 import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 import { FocusWatcher, TabHandler } from "@vanilla/dom-utils";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
+import { css } from "@emotion/css";
 
 export enum IMenuBarItemTypes {
     CHECK = "checkbox",
@@ -91,7 +91,7 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
      * @inheritDoc
      */
     public componentDidMount() {
-        this.focusWatcher = new FocusWatcher(this.selfRef.current!, newHasFocusState => {
+        this.focusWatcher = new FocusWatcher(this.selfRef.current!, (newHasFocusState) => {
             if (!newHasFocusState) {
                 this.setState({ hasFocus: false });
             }
@@ -163,7 +163,10 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
                 </button>
                 <div
                     id={this.menuID}
-                    className={classNames(this.dropDownClasses, this.isMenuVisible ? "" : style(srOnly()))}
+                    className={classNames(
+                        this.dropDownClasses,
+                        this.isMenuVisible ? "" : css(Mixins.absolute.srOnly()),
+                    )}
                     style={this.toolbarStyles}
                     role="menu"
                 >
@@ -194,7 +197,7 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
         return this.props.currentSelection;
     }
 
-    private topLevelIcons = menuActiveFormats => {
+    private topLevelIcons = (menuActiveFormats) => {
         let headingMenuIcon = <Heading2Icon />;
         if (menuActiveFormats.headings.heading3) {
             headingMenuIcon = <Heading3Icon />;

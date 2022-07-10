@@ -4,8 +4,11 @@
  * @license GPL-2.0-only
  */
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { singleBorder, colorOut, unit, userSelect } from "@library/styles/styleHelpers";
-import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
+import { singleBorder, userSelect } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { translateX } from "csx";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 
@@ -17,8 +20,8 @@ export const nubClasses = useThemeCache(() => {
     const root = style({
         position: "relative",
         display: "block",
-        width: unit(vars.nub.width),
-        height: unit(vars.nub.width),
+        width: styleUnit(vars.nub.width),
+        height: styleUnit(vars.nub.width),
         borderTop: singleBorder({
             width: vars.menu.borderWidth,
         }),
@@ -26,7 +29,7 @@ export const nubClasses = useThemeCache(() => {
             width: vars.menu.borderWidth,
         }),
         boxShadow: globalVars.overlay.dropShadow,
-        background: colorOut(vars.colors.bg),
+        background: ColorsUtils.colorOut(vars.colors.bg),
     });
 
     const position = style("position", {
@@ -35,8 +38,8 @@ export const nubClasses = useThemeCache(() => {
         alignItems: "flex-start",
         justifyContent: "center",
         overflow: "hidden",
-        width: unit(vars.nub.width * 2),
-        height: unit(vars.nub.width * 2),
+        width: styleUnit(vars.nub.width * 2),
+        height: styleUnit(vars.nub.width * 2),
         ...userSelect(),
         transform: translateX("-50%"),
         pointerEvents: "none",

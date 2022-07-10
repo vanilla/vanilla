@@ -8,15 +8,15 @@ import { actionCreatorFactory } from "typescript-fsa";
 import { IApiError } from "@library/@types/api/core";
 import { ITheme, IThemeAssets, IThemeRevision } from "@library/theming/themeReducer";
 import { IThemeInfo } from "@library/theming/CurrentThemeInfo";
-import { resetThemeCache } from "@library/styles/styleUtils";
-import { reinit, forceRenderStyles } from "typestyle";
+import { resetThemeCache } from "@library/styles/themeCache";
 import { setMeta } from "@library/utility/appUtils";
+import { RecordID } from "@vanilla/utils";
 
 const createAction = actionCreatorFactory("@@themes");
 
 type IGetThemeResponse = ITheme;
 export interface IPatchThemeRequest {
-    themeID: string | number;
+    themeID: RecordID;
     name?: string;
     parentTheme?: string;
     parentVersion?: string;
@@ -30,18 +30,12 @@ export enum PreviewStatusType {
     APPLY = "apply",
     CANCEL = "cancel",
 }
-export interface IManageTheme extends ITheme {
-    preview: {
-        info: IThemeInfo;
-        [key: string]: any;
-    };
-}
 
-type IGetAllThemeResponse = IManageTheme[];
+type IGetAllThemeResponse = ITheme[];
 type IPatchThemeResponse = ITheme;
 
 interface IPutCurrentThemeRequest {
-    themeID: number | string;
+    themeID: RecordID;
     revisionID?: number;
     type: PreviewStatusType;
 }
@@ -77,26 +71,21 @@ export default class ThemeActions extends ReduxActions {
 
         // Clear the cache of variables.
         resetThemeCache();
-        forceRenderStyles();
     };
 
     public static readonly getAllThemes_ACS = createAction.async<{}, IGetAllThemeResponse, IApiError>("GET_ALL_THEMES");
 
-    public static readonly putCurrentThemeACs = createAction.async<
-        { themeID: number | string },
-        IManageTheme,
-        IApiError
-    >("PUT_CURRENT");
+    public static readonly putCurrentThemeACs = createAction.async<{ themeID: RecordID }, ITheme, IApiError>(
+        "PUT_CURRENT",
+    );
 
-    public static readonly putPreviewThemeACs = createAction.async<IPutCurrentThemeRequest, IManageTheme, IApiError>(
+    public static readonly putPreviewThemeACs = createAction.async<IPutCurrentThemeRequest, ITheme, IApiError>(
         "PUT_PREVIEW",
     );
 
-    public static readonly deleteThemeACs = createAction.async<{ themeID: number | string }, undefined, IApiError>(
-        "DELETE",
-    );
+    public static readonly deleteThemeACs = createAction.async<{ themeID: RecordID }, undefined, IApiError>("DELETE");
 
-    public static getThemeRevisions_ACs = createAction.async<{ themeID: number | string }, IThemeRevision[], IApiError>(
+    public static getThemeRevisions_ACs = createAction.async<{ themeID: RecordID }, IThemeRevision[], IApiError>(
         "GET_THEME",
     );
 
@@ -106,15 +95,13 @@ export default class ThemeActions extends ReduxActions {
 
     public getAllThemes = () => {
         const thunk = bindThunkAction(ThemeActions.getAllThemes_ACS, async () => {
-            const params = { expand: "all" };
-            const response = await this.api.get(`/themes/`, { params });
-
+            const response = await this.api.get(`/themes`);
             return response.data;
         })();
         return this.dispatch(thunk);
     };
 
-    public putCurrentTheme = (themeID: number | string) => {
+    public putCurrentTheme = (themeID: RecordID) => {
         const body = { themeID };
         const thunk = bindThunkAction(ThemeActions.putCurrentThemeACs, async () => {
             const response = await this.api.put(`/themes/current`, body);
@@ -135,7 +122,7 @@ export default class ThemeActions extends ReduxActions {
         return this.dispatch(thunk);
     };
 
-    public deleteTheme = (themeID: number | string) => {
+    public deleteTheme = (themeID: RecordID) => {
         const apiThunk = bindThunkAction(ThemeActions.deleteThemeACs, async () => {
             const response = await this.api.delete(`/themes/${themeID}`);
             return response.data;
@@ -143,7 +130,7 @@ export default class ThemeActions extends ReduxActions {
         return this.dispatch(apiThunk);
     };
 
-    public getThemeRevisions(themeID: number | string) {
+    public getThemeRevisions(themeID: RecordID) {
         const thunk = bindThunkAction(ThemeActions.getThemeRevisions_ACs, async () => {
             const response = await this.api.get(`/themes/${themeID}/revisions`);
             return response.data;

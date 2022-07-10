@@ -2,12 +2,15 @@ import React from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import NewPostMenu, { PostTypes, IAddPost } from "@library/flyouts/NewPostMenu";
-import { NewDiscussionIcon, NewIdeaIcon, NewPollIcon } from "@library/icons/common";
 import { logDebug } from "@vanilla/utils";
+import { Icon } from "@vanilla/icons";
+import { testStoreState } from "@library/__tests__/testStoreState";
+import { Provider } from "react-redux";
+import getStore from "@library/redux/getStore";
 
 export default {
     component: NewPostMenu,
-    title: "NewPostMenu",
+    title: "Components/Post Menu",
 };
 
 const items: IAddPost[] = [
@@ -17,7 +20,7 @@ const items: IAddPost[] = [
         action: () => {
             logDebug("Some Action");
         },
-        icon: <NewPollIcon />,
+        icon: "new-poll",
         label: "New Poll",
     },
     {
@@ -26,7 +29,7 @@ const items: IAddPost[] = [
         action: () => {
             logDebug("Some Action");
         },
-        icon: <NewIdeaIcon />,
+        icon: "new-idea",
         label: "New Idea",
     },
     {
@@ -35,26 +38,67 @@ const items: IAddPost[] = [
         action: () => {
             logDebug("Some Action");
         },
-        icon: <NewDiscussionIcon />,
+        icon: "new-discussion",
         label: "New Discussion",
     },
     {
         id: "4",
         type: PostTypes.LINK,
-        action: "http://google.ca",
-        icon: <NewDiscussionIcon />,
-        label: "to Google",
+        action: () => {
+            logDebug("Some Action");
+        },
+        icon: "new-question",
+        label: "New Question",
+    },
+    {
+        id: "5",
+        type: PostTypes.LINK,
+        action: () => {
+            logDebug("Some Action");
+        },
+        icon: "new-event",
+        label: "New Event",
     },
 ];
 
-export const Basic = () => (
+const stateWithVarsApplied = testStoreState({
+    theme: {
+        assets: {
+            data: {
+                variables: {
+                    type: "json",
+                    data: {
+                        newPostMenu: {
+                            fab: {
+                                iconsOnly: true,
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    },
+});
+
+export const OnDesktop = () => (
     <StoryContent>
+        <StoryHeading depth={1}>New Post Menu on desktop (as button)</StoryHeading>
         <NewPostMenu items={items} />
     </StoryContent>
 );
 
-export const Empty = () => (
+export const OnSmallerViews = () => (
     <StoryContent>
-        <NewPostMenu items={[]} />
+        <StoryHeading depth={1}>New Post Menu on smaller views (as toggle)</StoryHeading>
+        <NewPostMenu items={items} />
     </StoryContent>
+);
+
+export const OnSmallerViewsWithIconsOnly = () => (
+    <Provider store={getStore(stateWithVarsApplied, true)}>
+        <StoryContent>
+            <StoryHeading depth={1}>New Post Menu on smaller views (as toggle), only icons</StoryHeading>
+            <NewPostMenu items={items} />
+        </StoryContent>
+    </Provider>
 );

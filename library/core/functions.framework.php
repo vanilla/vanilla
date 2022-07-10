@@ -6,8 +6,14 @@
  * @since 4.0
  */
 
-use Vanilla\Models\ThemeModel;
+use Garden\Web\Exception\ResponseException;
+use Garden\Web\Redirect;
+use Vanilla\Logging\TraceCollector;
+use Vanilla\Models\TrustedDomainModel;
+use Vanilla\Theme\ThemeService;
+use Vanilla\Utility\DebugUtils;
 use Vanilla\Web\Asset\DeploymentCacheBuster;
+use Vanilla\Web\CacheControlConstantsInterface;
 use Vanilla\Web\CacheControlMiddleware;
 
 if (!function_exists('asset')) {
@@ -330,6 +336,15 @@ if (!function_exists('externalUrl')) {
         $urlFormat = c('Garden.ExternalUrlFormat');
 
         if ($urlFormat && !isUrl($path)) {
+            if (false !== ($qpos = strpos($urlFormat, '?'))) {
+                $spos = strpos($urlFormat, '%s');
+                $hpos = strpos($urlFormat, '#');
+
+                if ($qpos < $spos && ($hpos === false || $hpos < $qpos)) {
+                    $path = str_replace('?', '&', $path);
+                }
+            }
+
             $result = sprintf($urlFormat, ltrim($path, '/'));
         } elseif (stringBeginsWith($path, '//')) {
             $result = Gdn::request()->scheme().':'.$path;
@@ -371,7 +386,7 @@ if (!function_exists('fetchPageInfo')) {
                 throw new Exception('Invalid URL.', 400);
             }
 
-            $request = new ProxyRequest();
+            $request = Gdn::getContainer()->get(\ProxyRequest::class);
             $pageHtml = $request->request([
                 'URL' => $url,
                 'Timeout' => $timeout,
@@ -913,7 +928,7 @@ if (!function_exists('getRecord')) {
                         if (!$discussionModel->canView($discussion)) {
                             throw permissionException();
                         }
-                        $discussion->Url = discussionUrl($discussion);
+                        $discussion['Url'] = discussionUrl($discussion);
                         $row['ShareUrl'] = $row['Url'];
                         $row['Name'] = $discussion['Name'];
                         $row['Discussion'] = $discussion;
@@ -976,7 +991,7 @@ if (!function_exists('isTrustedDomain')) {
     function isTrustedDomain($url) {
         static $trusted = null;
 
-        if (defined('TESTMODE_ENABLED') && constant('TESTMODE_ENABLED')) {
+        if (DebugUtils::isTestMode()) {
             $trusted = null;
         }
 
@@ -992,7 +1007,8 @@ if (!function_exists('isTrustedDomain')) {
         // If we haven't already compiled an array of trusted domains, grab them.
         if ($trusted === null) {
             $trusted = [];
-            $trustedDomains = trustedDomains();
+            $trustedDomainModel = \Gdn::getContainer()->get(TrustedDomainModel::class);
+            $trustedDomains = $trustedDomainModel->getAll();
             foreach ($trustedDomains as $domain) {
                 // Store the trusted domain by its host name.
                 if (strpos($domain, '//') === false) {
@@ -1277,8 +1293,6 @@ if (!function_exists('redirectTo')) {
         if ($database instanceof Gdn_Database) {
             $database->closeConnection();
         }
-        // Clear out any previously sent content
-        @ob_end_clean();
 
         if (!in_array($statusCode, [301, 302])) {
             $statusCode = 302;
@@ -1288,8 +1302,15 @@ if (!function_exists('redirectTo')) {
         // This would cause http://evil.domain\@trusted.domain/ to be converted to http://evil.domain/@trusted.domain/
         $url = str_replace('\\', '%5c', $url);
 
+        if (DebugUtils::isTestMode()) {
+            throw new ResponseException(new Redirect($url, $statusCode));
+        }
+
+        // Clear out any previously sent content
+        @ob_end_clean();
+
         if ($statusCode === 302) {
-            CacheControlMiddleware::sendCacheControlHeaders(CacheControlMiddleware::NO_CACHE);
+            CacheControlMiddleware::sendCacheControlHeaders(CacheControlConstantsInterface::NO_CACHE);
         }
 
         if (Gdn::controller() !== null
@@ -1341,22 +1362,13 @@ if (!function_exists('safeURL')) {
      * "Safe" means that the domain of the URL is trusted.
      *
      * @param string $destination Destination URL or path.
+     * @param bool $withDomain
      * @return string The destination if safe, /home/leaving?Target=$destination if not.
      */
-    function safeURL($destination) {
-        $url = url($destination, true);
-
-        $trustedDomains = trustedDomains();
-        $isTrustedDomain = false;
-
-        foreach ($trustedDomains as $trustedDomain) {
-            if (urlMatch($trustedDomain, $url)) {
-                $isTrustedDomain = true;
-                break;
-            }
-        }
-
-        return ($isTrustedDomain ? $url : url('/home/leaving?Target='.urlencode($destination)));
+    function safeURL($destination, $withDomain = false) {
+        /** @var TrustedDomainModel $trustedDomainModel */
+        $trustedDomainModel = Gdn::getContainer()->get(TrustedDomainModel::class);
+        return $trustedDomainModel->safeUrl($destination, $withDomain);
     }
 }
 
@@ -1532,7 +1544,7 @@ if (!function_exists('translateContent')) {
      *
      * @param string $code The code related to the language-specific definition.
      * Codes that begin with an '@' symbol are treated as literals and not translated.
-     * @param string $default The default value to be displayed if the translation code is not found.
+     * @param string|false $default The default value to be displayed if the translation code is not found.
      * @return string The translated string or $code if there is no value in $default.
      * @see Gdn::translate()
      * @deprecated
@@ -1550,9 +1562,9 @@ if (!function_exists('theme')) {
      * @return string Returns the name of the current theme.
      */
     function theme() {
-        /** @var ThemeModel $themeModel */
-        $themeModel = Gdn::getContainer()->get(ThemeModel::class);
-        return $themeModel->getCurrentThemeAddon()->getKey();
+        /** @var ThemeService $themeService */
+        $themeService = Gdn::getContainer()->get(ThemeService::class);
+        return $themeService->getCurrentThemeAddon()->getKey();
     }
 }
 
@@ -1566,16 +1578,19 @@ if (!function_exists('trace')) {
      * - string: A trace message.
      * - other: A variable to output.
      * @param string $type One of the `TRACE_*` constants or a string label for the trace.
-     * @return array Returns the array of traces.
+     * @return array|void Returns the array of traces.
      */
     function trace($value = null, $type = TRACE_INFO) {
-        static $traces = [];
+        if (!debug()) {
+            return [];
+        }
+        $traceCollector = \Gdn::getContainer()->get(TraceCollector::class);
 
         if ($value === null) {
-            return $traces;
+            return $traceCollector->getTraces();
+        } else {
+            $traceCollector->addTrace($value, $type);
         }
-
-        $traces[] = [$value, $type];
     }
 }
 
@@ -1584,54 +1599,14 @@ if (!function_exists('trustedDomains')) {
      * Get an array of all of the trusted domains in the application.
      *
      * @return array
+     *
+     * @deprecated TrustedDomainModel
      */
     function trustedDomains() {
-        // This domain is safe.
-        $trustedDomains = [Gdn::request()->host()];
-
-        $configuredDomains = c('Garden.TrustedDomains', []);
-        if (!is_array($configuredDomains)) {
-            $configuredDomains = is_string($configuredDomains) ? explode("\n", $configuredDomains) : [];
-        }
-        $configuredDomains = array_filter($configuredDomains);
-
-        $trustedDomains = array_merge($trustedDomains, $configuredDomains);
-
-        if (!c('Garden.Installed')) {
-            // Bail out here because we don't have a database yet.
-            return $trustedDomains;
-        }
-
-        // Build a collection of authentication provider URLs.
-        $authProviderModel = new Gdn_AuthenticationProviderModel();
-        $providers = $authProviderModel->getProviders();
-        $providerUrls = [
-            'PasswordUrl',
-            'ProfileUrl',
-            'RegisterUrl',
-            'SignInUrl',
-            'SignOutUrl',
-            'URL'
-        ];
-
-        // Iterate through the providers, only grabbing URLs if they're not empty and not already present.
-        if (is_array($providers) && count($providers) > 0) {
-            foreach ($providers as $key => $record) {
-                foreach ($providerUrls as $urlKey) {
-                    $providerUrl = $record[$urlKey];
-                    if ($providerUrl && $providerDomain = parse_url($providerUrl, PHP_URL_HOST)) {
-                        if (!in_array($providerDomain, $trustedDomains)) {
-                            $trustedDomains[] = $providerDomain;
-                        }
-                    }
-                }
-            }
-        }
-
-        Gdn::pluginManager()->EventArguments['TrustedDomains'] = &$trustedDomains;
-        Gdn::pluginManager()->fireAs('EntryController')->fireEvent('BeforeTargetReturn');
-
-        return array_unique($trustedDomains);
+        deprecated(__FUNCTION__, TrustedDomainModel::class);
+        /** @var TrustedDomainModel $domainModel */
+        $domainModel = \Gdn::getContainer()->get(TrustedDomainModel::class);
+        return $domainModel->getAll();
     }
 }
 

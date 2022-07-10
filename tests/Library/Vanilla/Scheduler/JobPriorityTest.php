@@ -1,18 +1,19 @@
 <?php
 /**
  * @author Eduardo Garcia Julia <eduardo.garciajulia@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-namespace VanillaTests\Vanilla\Library\Scheduler;
+namespace VanillaTests\Library\Vanilla\Scheduler;
 
-use \Vanilla\Scheduler\Job\JobPriority;
+use PHPUnit\Framework\TestCase;
+use Vanilla\Scheduler\Job\JobPriority;
 
 /**
  * Class JobPriorityTest
  */
-final class JobPriorityTest extends \PHPUnit\Framework\TestCase {
+final class JobPriorityTest extends TestCase {
 
     /**
      * Verify positive assertion of high priority.

@@ -30,7 +30,7 @@ $trigger = $dropdown->getTrigger();
             <?php }
         } ?>
     </ul>
-    <a href="#" class="NavButton Handle <?php echo val('cssClass', $trigger); ?>">
+    <a href="#" class="NavButton Handle <?php echo val('cssClass', $trigger); ?>" <?php echo (!empty($trigger['attributes']) && !empty($trigger['attributes']['aria-label']) ? "aria-label='". $trigger['attributes']['aria-label']  . "'" : ""); ?>>
         <span><?php echo val('text', $trigger); ?></span>
         <?php if (val('icon', $trigger)) {
             echo icon(val('icon', $trigger));

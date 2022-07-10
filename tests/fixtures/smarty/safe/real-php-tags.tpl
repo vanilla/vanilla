@@ -1,0 +1,1 @@
+Halp: <?php echo "foo"; ?>

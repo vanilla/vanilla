@@ -18,6 +18,7 @@ import {
     VANILLA_THEMES,
     VANILLA_ADDONS,
     VANILLA_THEMES_LEGACY,
+    EMOTION_DEV_SPEEDUP_FILE,
 } from "../env";
 import { BuildMode, IBuildOptions } from "../buildOptions";
 const readDir = promisify(fs.readdir);
@@ -124,6 +125,8 @@ export default class EntryModel {
     public async getDevEntries(section: string): Promise<string[]> {
         const entries: string[] = [];
 
+        entries.push(EMOTION_DEV_SPEEDUP_FILE);
+
         for (const entryDir of this.entryDirs) {
             const commonEntry = await this.lookupEntry(entryDir, "common");
             if (commonEntry !== null) {
@@ -158,12 +161,17 @@ export default class EntryModel {
         }
 
         names = names
-            .filter(name => name.match(EntryModel.TS_REGEX))
-            .map(name => name.replace(EntryModel.TS_REGEX, ""))
+            .filter((name) => name.match(EntryModel.TS_REGEX))
+            .map((name) => name.replace(EntryModel.TS_REGEX, ""))
             // Filter out unwanted sections (special cases).
-            .filter(name => !this.excludedSections.includes(name));
+            .filter((name) => !this.excludedSections.includes(name));
 
         names = Array.from(new Set(names));
+
+        const { sections } = this.options;
+        if (sections != null) {
+            names = names.filter((name) => sections.includes(name));
+        }
 
         return names;
     }
@@ -172,14 +180,14 @@ export default class EntryModel {
      * Get the directories of all addons being built.
      */
     public get addonDirs(): string[] {
-        return Object.values(this.buildAddons!).map(addon => addon.addonDir);
+        return Object.values(this.buildAddons!).map((addon) => addon.addonDir);
     }
 
     /**
      * Get all of the src directories in the project.
      */
     public get srcDirs(): string[] {
-        return Object.values(this.buildAddons!).map(addon => addon.srcDir);
+        return Object.values(this.buildAddons!).map((addon) => addon.srcDir);
     }
 
     /**
@@ -209,7 +217,7 @@ export default class EntryModel {
     private async initPackages() {
         const dirNames = await readDir(PACKAGES_DIRECTORY);
         this.packageDirs = [
-            ...dirNames.map(name => path.resolve(PACKAGES_DIRECTORY, name)),
+            ...dirNames.map((name) => path.resolve(PACKAGES_DIRECTORY, name)),
             path.resolve(VANILLA_ROOT, "library"),
         ];
     }
@@ -230,11 +238,11 @@ export default class EntryModel {
 
         // Filter only the enabled addons for a development build.
         if (this.options.mode === BuildMode.DEVELOPMENT) {
-            addonKeyList = addonKeyList.filter(addonPath => {
+            addonKeyList = addonKeyList.filter((addonPath) => {
                 const addonKey = path.basename(addonPath).toLowerCase();
 
                 // Check if we have a case-insensitive addon key match.
-                return this.options.enabledAddonKeys.some(val => {
+                return this.options.enabledAddonKeys.some((val) => {
                     if (val.toLowerCase() === addonKey) {
                         return true;
                     }
@@ -263,6 +271,7 @@ export default class EntryModel {
      * Look up all of the entry directories. This is quite expensive in terms of IO so don't run it more than once.
      */
     private async initEntries() {
+        this.entryDirs.push(path.join(LIBRARY_SRC_DIRECTORY, "/entries"));
         for (const addon of Object.values(this.buildAddons)) {
             const entriesExists = await fileExists(addon.entriesDir);
             if (entriesExists) {

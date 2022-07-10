@@ -7,22 +7,26 @@
 import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
+import { EmbedIcon } from "@library/icons/editorIcons";
 import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";
 import FrameFooter from "@library/layout/frame/FrameFooter";
-import { isAllowedUrl, t } from "@library/utility/appUtils";
-import { uniqueIDFromPrefix } from "@library/utility/idUtils";
+import ScreenReaderContent from "@library/layout/ScreenReaderContent";
+import { t, isURL } from "@library/utility/appUtils";
+import { useUniqueID } from "@library/utility/idUtils";
 import { useEditor } from "@rich-editor/editor/context";
 import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap";
 import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import { insertMediaClasses } from "@rich-editor/flyouts/pieces/insertMediaClasses";
-import { forceSelectionUpdate } from "@rich-editor/quill/utility";
+import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
+import { supportsFrames } from "@library/embeddedContent/IFrameEmbed";
+import InputTextBlock from "@library/forms/InputTextBlock";
+import { forceInt } from "@vanilla/utils";
 import classNames from "classnames";
+import debounce from "lodash/debounce";
 import KeyboardModule from "quill/modules/keyboard";
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { style } from "typestyle";
-import { EmbedIcon } from "@library/icons/editorIcons";
-import ScreenReaderContent from "@library/layout/ScreenReaderContent";
+import React, { useCallback, useMemo, useRef, useState } from "react";
+import { css } from "@emotion/css";
 
 interface IProps {
     disabled?: boolean;
@@ -33,16 +37,29 @@ interface IProps {
 export default function EmbedFlyout(props: IProps) {
     const { quill, legacyMode } = useEditor();
     const inputRef = useRef<HTMLInputElement>(null);
-    const embedModule = useMemo(() => quill && quill.getModule("embed/insertion"), [quill]);
-    const id = useMemo(() => uniqueIDFromPrefix("embedPopover"), []);
-    const titleID = id + "-title";
-    const descriptionID = id + "-description";
+    const embedModule: EmbedInsertionModule = useMemo(() => quill && quill.getModule("embed/insertion"), [quill]);
+    const ID = useUniqueID("embedPopover");
+    const handleID = ID + "-handle";
+    const contentID = ID + "-contents";
+    const descriptionID = ID + "-description";
 
-    const [isInputValid, setInputValid] = useState(false);
-    const [url, setUrl] = useState("");
+    const [isFrame, setIsFrame] = useState(false);
+    const [frameHeight, setFrameHeight] = useState<number>(900);
+    const [frameWidth, setFrameWidth] = useState(1600);
+    const [url, setUrl] = useState<string | null>(null);
+    const [inputValue, setInputValue] = useState("");
+    const isInputValid = !!url;
+
+    const clearState = () => {
+        setIsFrame(false);
+        setFrameHeight(900);
+        setFrameWidth(1600);
+        setUrl(null);
+    };
 
     const clearInput = () => {
-        setUrl("");
+        clearState();
+        setInputValue("");
     };
 
     /**
@@ -54,8 +71,27 @@ export default function EmbedFlyout(props: IProps) {
     };
 
     const submitUrl = () => {
+        if (!url) {
+            return;
+        }
+
         clearInput();
-        embedModule.scrapeMedia(normalizeUrl(url));
+
+        if (isFrame) {
+            embedModule.createEmbed({
+                loaderData: {
+                    type: "link",
+                },
+                data: {
+                    url,
+                    embedType: "iframe",
+                    height: frameHeight,
+                    width: frameWidth,
+                },
+            });
+        } else {
+            embedModule.scrapeMedia(url);
+        }
     };
 
     /**
@@ -77,21 +113,56 @@ export default function EmbedFlyout(props: IProps) {
         submitUrl();
     };
 
+    const handleFrameHtml = (html: string) => {
+        const container = document.createElement("div");
+        container.innerHTML = html;
+        const iframe = container.querySelector("iframe");
+        if (!iframe) {
+            clearState();
+        } else {
+            const src = iframe.getAttribute("src");
+
+            if (!src) {
+                clearState();
+                return;
+            }
+            setUrl(normalizeUrl(src));
+
+            // See if our height/width are relevant
+            const height = forceInt(iframe.getAttribute("height"), 900);
+            const width = forceInt(iframe.getAttribute("width"), 1600);
+            setFrameHeight(height);
+            setFrameWidth(width);
+        }
+        setIsFrame(true);
+    };
+
+    const parseInput = useCallback(
+        debounce((value: string) => {
+            const isFrame = /<iframe/.test(value) && supportsFrames();
+            if (isFrame) {
+                handleFrameHtml(value);
+            } else {
+                setIsFrame(false);
+                const normalized = normalizeUrl(value);
+                setUrl(isURL(normalized) ? normalized : null);
+            }
+        }, 100),
+        [],
+    );
+
     /**
      * Control the inputs value.
      */
     const inputChangeHandler = (event: React.ChangeEvent<any>) => {
-        setUrl(normalizeUrl(event.target.value));
+        const { value } = event.target;
+        setInputValue(value);
+        parseInput(value);
     };
-
-    // We need to check the value after we've set it with setUrl
-    useEffect(() => {
-        setInputValid(isAllowedUrl(url));
-    }, [url]);
 
     const classesRichEditor = richEditorClasses(legacyMode);
     const classesInsertMedia = insertMediaClasses();
-    const placeholderText = `https://`;
+    const placeholderText = supportsFrames() ? t(`Url or Embed Code`) : t(`Url`);
 
     function handleVisibilityChange(newVisibility: boolean) {
         if (newVisibility) {
@@ -99,13 +170,16 @@ export default function EmbedFlyout(props: IProps) {
         }
     }
 
+    const title = t("Insert Media");
+
     return (
         <>
             <DropDown
-                id={id}
-                name={t("Insert Media")}
+                handleID={handleID}
+                contentID={contentID}
                 buttonClassName={classNames("richEditor-button", "richEditor-embedButton", classesRichEditor.button)}
-                title={t("Insert Media")}
+                title={title}
+                name={title}
                 onVisibilityChange={handleVisibilityChange}
                 disabled={props.disabled}
                 buttonContents={
@@ -114,7 +188,7 @@ export default function EmbedFlyout(props: IProps) {
                         <IconForButtonWrap icon={<EmbedIcon />} />
                     </>
                 }
-                buttonBaseClass={ButtonTypes.CUSTOM}
+                buttonType={ButtonTypes.CUSTOM}
                 renderAbove={!!props.renderAbove}
                 renderLeft={!!props.renderLeft}
                 initialFocusElement={inputRef.current}
@@ -124,20 +198,29 @@ export default function EmbedFlyout(props: IProps) {
                 <Frame
                     body={
                         <FrameBody>
-                            <p className={style({ marginTop: 6, marginBottom: 6 })}>
+                            <p id={descriptionID} className={css({ marginTop: 12, marginBottom: 6 })}>
                                 {t("Paste the URL of the media you want.")}
+                                {supportsFrames() && <> {t("You can also use an <iframe /> embed code here.")}</>}
                             </p>
-                            <input
-                                className={classNames("InputBox", classesInsertMedia.insert, {
-                                    inputText: !legacyMode,
-                                })}
-                                placeholder={placeholderText}
-                                value={url}
-                                onChange={inputChangeHandler}
-                                onKeyDown={buttonKeyDownHandler}
-                                aria-labelledby={titleID}
-                                aria-describedby={descriptionID}
-                                ref={inputRef}
+                            <InputTextBlock
+                                className={classNames(
+                                    classesInsertMedia.insert,
+                                    isFrame && classesInsertMedia.insertCode,
+                                )}
+                                descriptionID={descriptionID}
+                                multiLineProps={{
+                                    rows: 1,
+                                }}
+                                inputProps={{
+                                    "aria-label": title,
+                                    "aria-describedby": descriptionID,
+                                    onKeyPress: buttonKeyDownHandler,
+                                    inputRef,
+                                    placeholder: placeholderText,
+                                    multiline: supportsFrames(),
+                                    value: inputValue,
+                                    onChange: inputChangeHandler,
+                                }}
                             />
                         </FrameBody>
                     }
@@ -145,7 +228,7 @@ export default function EmbedFlyout(props: IProps) {
                         <FrameFooter>
                             <Button
                                 className={classNames("insertMedia-insert", classesInsertMedia.button)}
-                                baseClass={ButtonTypes.TEXT_PRIMARY}
+                                buttonType={ButtonTypes.TEXT_PRIMARY}
                                 disabled={!isInputValid}
                                 onClick={buttonClickHandler}
                             >

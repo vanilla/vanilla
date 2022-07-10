@@ -16,22 +16,41 @@
  * Class Gdn_MySQLStructure
  */
 class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
-    /**
-     * @var array[int] An array of table names to row count estimates.
-     */
-    private $rowCountEstimates;
 
     /** Default options when creating MySQL table indexes. */
     private const INDEX_OPTIONS = "algorithm=inplace, lock=none";
 
     /**
-     *
-     *
-     * @param null $database
+     * @var array[int] An array of table names to row count estimates.
      */
-    public function __construct($database = null) {
+    private $rowCountEstimates;
+
+    /** @var Gdn_MySQLDriver */
+    private $sqlDriver;
+
+    /**
+     * Gdn_MySQLStructure constructor.
+     *
+     * @param Gdn_MySQLDriver $sqlDriver
+     * @param Gdn_Database|null $database
+     */
+    public function __construct(Gdn_MySQLDriver $sqlDriver, $database = null) {
+        $this->sqlDriver = $sqlDriver;
         parent::__construct($database);
     }
+
+    /**
+     * Execute a query. Clears the mysql driver cache afterwards.
+     * @inheritdoc
+     */
+    public function executeQuery($sql, $checkThreshold = false) {
+        try {
+            return parent::executeQuery($sql, $checkThreshold);
+        } finally {
+            $this->sqlDriver->clearSchemaCache();
+        }
+    }
+
 
     /**
      * Drops $this->table() from the database.
@@ -57,9 +76,9 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     }
 
     /**
+     * Determine whether or not a storage engine exists.
      *
-     *
-     * @param $engine
+     * @param string $engine
      * @return bool
      */
     public function hasEngine($engine) {
@@ -82,9 +101,9 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     }
 
     /**
+     * Set the storage engine of the table.
      *
-     *
-     * @param $engine
+     * @param string $engine
      * @param bool $checkAvailability
      * @return $this
      */
@@ -184,20 +203,19 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
      * Specifies the name of the view to create or modify.
      *
      * @param string $name The name of the view.
-     * @param string $Query The actual query to create as the view. Typically
-     * this can be generated with the $Database object.
+     * @param string $sql The actual query to create as the view. Typically this can be generated with the $Database object.
      */
-    public function view($name, $sQL) {
-        if (is_string($sQL)) {
-            $sQLString = $sQL;
-            $sQL = null;
+    public function view($name, $sql) {
+        if (is_string($sql)) {
+            $sQLString = $sql;
+            $sql = null;
         } else {
-            $sQLString = $sQL->getSelect();
+            $sQLString = $sql->getSelect();
         }
 
         $result = $this->executeQuery('create or replace view '.$this->_DatabasePrefix.$name." as \n".$sQLString);
-        if (!is_null($sQL)) {
-            $sQL->reset();
+        if (!is_null($sql)) {
+            $sql->reset();
         }
     }
 
@@ -219,65 +237,21 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
      * @return string Returns a DDL statement.
      */
     final protected function getCreateTable(): string {
-        $primaryKey = [];
-        $uniqueKey = [];
-        $fullTextKey = [];
-        $indexes = [];
         $keys = '';
         $sql = '';
         $tableName = Gdn_Format::alphaNumeric($this->_TableName);
 
-        foreach ($this->_Columns as $columnName => $column) {
+        foreach ($this->_Columns as $column) {
             if ($sql != '') {
                 $sql .= ',';
             }
 
             $sql .= "\n" . $this->_defineColumn($column);
+        }
 
-            $columnKeyTypes = (array)$column->KeyType;
-
-            foreach ($columnKeyTypes as $columnKeyType) {
-                $keyTypeParts = explode('.', $columnKeyType, 2);
-                $columnKeyType = $keyTypeParts[0];
-                $indexGroup = val(1, $keyTypeParts, '');
-
-                if ($columnKeyType == 'primary') {
-                    $primaryKey[] = $columnName;
-                } elseif ($columnKeyType == 'key') {
-                    $indexes['FK'][$indexGroup][] = $columnName;
-                } elseif ($columnKeyType == 'index') {
-                    $indexes['IX'][$indexGroup][] = $columnName;
-                } elseif ($columnKeyType == 'unique') {
-                    $uniqueKey[] = $columnName;
-                } elseif ($columnKeyType == 'fulltext') {
-                    $fullTextKey[] = $columnName;
-                }
-            }
-        }
-        // Build primary keys
-        if (count($primaryKey) > 0) {
-            $keys .= ",\nprimary key (`" . implode('`, `', $primaryKey) . "`)";
-        }
-        // Build unique keys.
-        if (count($uniqueKey) > 0) {
-            $keys .= ",\nunique index `UX_{$tableName}` (`" . implode('`, `', $uniqueKey) . "`)";
-        }
-        // Build full text index.
-        if (count($fullTextKey) > 0) {
-            $keys .= ",\nfulltext index `TX_{$tableName}` (`" . implode('`, `', $fullTextKey) . "`)";
-        }
-        // Build the rest of the keys.
-        foreach ($indexes as $indexType => $indexGroups) {
-            $createString = val($indexType, ['FK' => 'key', 'IX' => 'index']);
-            foreach ($indexGroups as $indexGroup => $columnNames) {
-                if (!$indexGroup) {
-                    foreach ($columnNames as $columnName) {
-                        $keys .= ",\n{$createString} `{$indexType}_{$tableName}_{$columnName}` (`{$columnName}`)";
-                    }
-                } else {
-                    $keys .= ",\n{$createString} `{$indexType}_{$tableName}_{$indexGroup}` (`" . implode('`, `', $columnNames) . '`)';
-                }
-            }
+        $keyDefs = $this->_indexSql($this->_Columns);
+        foreach ($keyDefs as $keyDef) {
+            $keys .= ",\n" . $keyDef;
         }
 
         $sql = 'create table `' . $this->_DatabasePrefix . $tableName . '` ('
@@ -297,11 +271,13 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         }
 
         $sql .= ';';
+
         return $sql;
     }
 
     /**
      * Get the character set for a  collation.
+     *
      * @param string $collation The name of the collation.
      * @return string Returns the name of the character set or an empty string if the collation was not found.
      */
@@ -388,7 +364,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             $createType = val($columnKeyType, ['index' => 'index', 'key' => 'key', 'unique' => 'unique index', 'fulltext' => 'fulltext index', 'primary' => 'primary key']);
 
             if ($columnKeyType == 'primary') {
-                $result['PRIMARY'] = 'primary key (`'.implode('`, `', $indexGroups['']).'`)';
+                $result['primary'] = 'primary key (`'.implode('`, `', $indexGroups['']).'`)';
             } else {
                 foreach ($indexGroups as $indexGroup => $columnNames) {
                     $multi = (strlen($indexGroup) > 0 || in_array($columnKeyType, ['unique', 'fulltext']));
@@ -396,12 +372,12 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
                     if ($multi) {
                         $indexName = "{$prefixes[$columnKeyType]}{$this->_TableName}".($indexGroup ? '_'.$indexGroup : '');
 
-                        $result[$indexName] = "$createType $indexName (`".implode('`, `', $columnNames).'`)';
+                        $result[strtolower($indexName)] = "$createType $indexName (`".implode('`, `', $columnNames).'`)';
                     } else {
                         foreach ($columnNames as $columnName) {
                             $indexName = "{$prefixes[$columnKeyType]}{$this->_TableName}_$columnName";
 
-                            $result[$indexName] = "$createType $indexName (`$columnName`)";
+                            $result[strtolower($indexName)] = "$createType $indexName (`$columnName`)";
                         }
                     }
                 }
@@ -412,7 +388,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     }
 
     /**
-     *
+     * Get the SQL used to generate the indexes for this table.
      *
      * @return array
      */
@@ -421,7 +397,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     }
 
     /**
-     *
+     * Get the SQL used to generate the indexes for this table.
      *
      * @return array
      */
@@ -431,8 +407,10 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
 
         $result = [];
         foreach ($data as $row) {
-            if (array_key_exists($row->Key_name, $result)) {
-                $result[$row->Key_name] .= ', `'.$row->Column_name.'`';
+            $keyName = strtolower($row->Key_name);
+
+            if (array_key_exists($keyName, $result)) {
+                $result[$keyName] .= ', `'.$row->Column_name.'`';
             } else {
                 switch (strtoupper(substr($row->Key_name, 0, 2))) {
                     case 'PR':
@@ -454,15 +432,15 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
                         // Try and guess the index type.
                         if (strcasecmp($row->Index_type, 'fulltext') == 0) {
                             $type = 'fulltext index '.$row->Key_name;
-                        } elseif ($row->Non_unique)
-                            $type = 'index '.$row->Key_name;
-                        else {
+                        } elseif ($row->Non_unique) {
+                            $type = 'index ' . $row->Key_name;
+                        } else {
                             $type = 'unique index '.$row->Key_name;
                         }
 
                         break;
                 }
-                $result[$row->Key_name] = $type.' (`'.$row->Column_name.'`';
+                $result[$keyName] = $type.' (`'.$row->Column_name.'`';
             }
         }
 
@@ -477,8 +455,9 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     /**
      * Modifies $this->table() with the columns specified with $this->column().
      *
-     * @param boolean $explicit If TRUE, this method will remove any columns from the table that were not
+     * @param bool $explicit If TRUE, this method will remove any columns from the table that were not
      * defined with $this->column().
+     * @return bool
      */
     protected function _modify($explicit = false) {
         $px = $this->_DatabasePrefix;
@@ -542,7 +521,6 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
                 }
 
                 $alterSql[] = $addColumnSql;
-
             } else {
                 $existingColumn = $existingColumns[$columnKey];
 
@@ -551,13 +529,11 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
                 $comment = "-- [Existing: $existingColumnDef, New: $columnDef]";
 
                 if ($existingColumnDef !== $columnDef) {
-
                     // The existing & new column types do not match, so modify the column.
                     $changeSql = "$comment\nchange `{$existingColumn->Name}` $columnDef";
 
                     if (strcasecmp($existingColumn->Type, 'varchar') === 0 && strcasecmp($column->Type, 'varchar') === 0
                             && $existingColumn->Length > $column->Length) {
-
                         $charLength = $this->Database->query("select max(char_length(`$columnName`)) as MaxLength from `$px{$this->_TableName}`;")
                             ->firstRow(DATASET_TYPE_ARRAY);
 
@@ -641,9 +617,9 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         // Go through the indexes to add or modify.
         foreach ($indexes as $name => $sql) {
             if (array_key_exists($name, $indexesDb)) {
-                if ($indexes[$name] != $indexesDb[$name]) {
+                if (strcasecmp($indexes[$name], $indexesDb[$name]) !== 0) {
 //               $IndexSql[$Name][] = "/* '{$IndexesDb[$Name]}' => '{$Indexes[$Name]}' */\n";
-                    if ($name == 'PRIMARY') {
+                    if ($name == 'primary') {
                         $indexSql[$name][] = $alterSqlPrefix."drop primary key;\n";
                     } else {
                         $indexSql[$name][] = $alterSqlPrefix.'drop index '.$name.";\n";
@@ -658,7 +634,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         // Go through the indexes to drop.
         if ($explicit) {
             foreach ($indexesDb as $name => $sql) {
-                if ($name == 'PRIMARY') {
+                if ($name == 'primary') {
                     $indexSql[$name][] = $alterSqlPrefix."drop primary key;\n";
                 } else {
                     $indexSql[$name][] = $alterSqlPrefix.'drop index '.$name.";\n";
@@ -697,10 +673,11 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     }
 
     /**
+     * Get the DDL expression for a column definition.
      *
-     *
-     * @param stdClass $column
+     * @param object $column
      * @param string $newColumnName For rename action only.
+     * @return string
      */
     protected function _defineColumn($column, $newColumnName = null) {
         $column = clone $column;
@@ -723,6 +700,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             'mediumtext',
             'longtext',
             'text',
+            'tinytext',
             'decimal',
             'numeric',
             'float',
@@ -759,7 +737,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
 
         $return .= "{$column->Type}";
 
-        $lengthTypes = $this->types('length');
+        $lengthTypes = $this->types('defineLength');
         if ($column->Length != '' && in_array($column->Type, $lengthTypes)) {
             if ($column->Precision != '') {
                 $return .= '('.$column->Length.', '.$column->Precision.')';
@@ -799,9 +777,9 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     }
 
     /**
+     * Quote a value for the database.
      *
-     *
-     * @param $value
+     * @param mixed $value
      * @return string
      */
     protected static function _quoteValue($value) {

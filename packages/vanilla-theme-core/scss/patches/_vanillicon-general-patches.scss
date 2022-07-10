@@ -4,6 +4,8 @@
  * @license GPL-2.0-only
  */
 
+@import "../mixins/mixins";
+
 /* -------------------------------------------------------------- *\
     Styles
 \* -------------------------------------------------------------- */
@@ -167,6 +169,10 @@
     content: $icon-quote;
 }
 
+.ReactMessage::before {
+    content: $icon-mail;
+}
+
 .ReactWarn::before {
     content: $icon-warn;
 }
@@ -254,7 +260,8 @@
 }
 
 .OptionsTitle {
-    display: none;
+    @include sr-only;
+    font-size: inherit !important; // The title will be properly hidden with the sr-only mixin, but it needs a font size to be detectable by the screen reader.
 }
 
 .SocialIcon {
@@ -264,6 +271,15 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+}
+
+.SocialIcon-MicrosoftAccount {
+    background-color: $global-color_primary;
+    &:active,
+    &:focus,
+    &:hover {
+        background-color: $global-color_primaryAlt;
+    }
 }
 
 .Methods,
@@ -297,6 +313,10 @@
         content: $icon-linkedin-alt;
     }
 
+    .SocialIcon-MicrosoftAccount .Icon::before {
+        content:  $icon-windows-alt;
+    }
+
     .SocialIcon-Steam .Icon::before {
         left: 1px;
     }
@@ -319,9 +339,7 @@ a.Bookmark {
     &::before {
         @include icon;
         font-size: $global-base_lineHeight;
-        @if ($staticVariables) {
-            color: $global-color_primary;
-        }
+        color: $global-color_primary;
         content: $icon-star-empty;
     }
 

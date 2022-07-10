@@ -2,15 +2,17 @@
 /**
  * @author Todd Burry <todd@vanillaforums.com>
  * @copyright 2009-2019 Vanilla Forums Inc.
- * @license Proprietary
+ * @license GPLv2
  */
 
 namespace VanillaTests\APIv0;
 
-
 use Garden\Http\HttpResponse;
 use VanillaTests\SharedBootstrapTestCase;
 
+/**
+ * Best test for old-school cURL tests.
+ */
 abstract class BaseTest extends SharedBootstrapTestCase {
     /** @var APIv0  $api */
     protected static $api;
@@ -27,7 +29,8 @@ abstract class BaseTest extends SharedBootstrapTestCase {
         self::$api = $api;
 
         self::$api->saveToConfig([
-            'Vanilla.Discussion.SpamCount' => 100,
+            'Vanilla.Discussion.SpamCount' => 1000,
+            'Vanilla.Comment.SpamCount' => 1000,
         ]);
 
         $r = $api->get('/discussions.json');

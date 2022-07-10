@@ -1,10 +1,12 @@
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { IThemeVariables } from "@library/theming/themeReducer";
-import { defaultFontFamily, globalVariables } from "@library/styles/globalStyleVars";
-import { borders } from "@library/styles/styleHelpersBorders";
-import { paddings } from "@library/styles/styleHelpersSpacing";
-import { colorOut, fonts, unit, userSelect } from "@library/styles/styleHelpers";
-import { TextTransformProperty } from "csstype";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { userSelect } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { Mixins } from "@library/styles/Mixins";
+import { Variables } from "@library/styles/Variables";
 
 export const dateTimeVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeVars = variableFactory("dateTime", forcedVars);
@@ -19,18 +21,18 @@ export const dateTimeVariables = useThemeCache((forcedVars?: IThemeVariables) =>
             },
         },
         month: {
-            font: {
+            font: Variables.font({
                 size: 10,
-                transform: "uppercase" as TextTransformProperty,
+                transform: "uppercase",
                 lineHeight: 1,
-            },
+            }),
         },
         day: {
-            font: {
+            font: Variables.font({
                 size: 16,
                 weight: globalVars.fonts.weights.bold,
                 lineHeight: 1,
-            },
+            }),
         },
     });
 
@@ -47,19 +49,23 @@ export const dateTimeClasses = useThemeCache(() => {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: colorOut(compactVars.container.bg),
-        minWidth: unit(compactVars.container.size),
-        minHeight: unit(compactVars.container.size),
+        backgroundColor: ColorsUtils.colorOut(compactVars.container.bg),
+        minWidth: styleUnit(compactVars.container.size),
+        minHeight: styleUnit(compactVars.container.size),
         ...userSelect(),
-        borderRadius: unit(compactVars.container.border.radius),
+        ...{
+            "&&": {
+                borderRadius: styleUnit(compactVars.container.border.radius),
+            },
+        },
     });
 
     const compactDay = style("compactDay", {
-        ...fonts(compactVars.day.font),
+        ...Mixins.font(compactVars.day.font),
     });
 
     const compactMonth = style("compactMonth", {
-        ...fonts(compactVars.month.font),
+        ...Mixins.font(compactVars.month.font),
     });
 
     return { compactRoot, compactDay, compactMonth };

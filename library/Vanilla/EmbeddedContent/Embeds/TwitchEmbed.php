@@ -17,6 +17,9 @@ class TwitchEmbed extends AbstractEmbed {
 
     const TYPE = "twitch";
 
+    /** @var string */
+    private $host;
+
     /**
      * Generate an embed frame URL from a type and ID.
      *
@@ -25,12 +28,35 @@ class TwitchEmbed extends AbstractEmbed {
      * @return string|null
      */
     private function frameSourceFromID(string $id, string $type): ?string {
-        if ($type === "clip") {
-            return "https://clips.twitch.tv/embed?clip=".urlencode($id);
-        } else {
-            $query = http_build_query([$type => $id]);
-            return "https://player.twitch.tv/?" . $query;
+        $params = [];
+        if (!empty($this->host)) {
+            $params['parent'] = $this->host;
         }
+        if ($type === "clip") {
+            $params['clip'] = $id;
+            return "https://clips.twitch.tv/embed?".http_build_query($params);
+        } else {
+            $params[$type] = $id;
+            return "https://player.twitch.tv/?" . http_build_query($params);
+        }
+    }
+
+    /**
+     * Sets the hostname from the request.
+     *
+     * @param string $host
+     */
+    public function setHost(string $host): void {
+        $this->host = $host;
+    }
+
+    /**
+     * Get the hostname from the request.
+     *
+     * @return string|null
+     */
+    public function getHost(): ?string {
+        return $this->host;
     }
 
     /**

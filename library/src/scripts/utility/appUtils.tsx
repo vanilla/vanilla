@@ -7,10 +7,14 @@
 
 import gdn from "@library/gdn";
 import { PromiseOrNormalCallback } from "@vanilla/utils";
-import isUrl from "validator/lib/isURL";
+import { ensureScript } from "@vanilla/dom-utils";
+import { sprintf } from "sprintf-js";
 
 // Re-exported for backwards compatibility
 export { t, translate } from "@vanilla/i18n";
+
+// Absolute path pattern
+const ABSOLUTE_PATH_REGEX = /^\s*(https?:)?\/\//i;
 
 /**
  * Get a piece of metadata passed from the server.
@@ -63,6 +67,22 @@ export function setMeta(key: string, value: any) {
 }
 
 /**
+ * @see https://stackoverflow.com/questions/5717093/check-if-a-javascript-string-is-a-url#answer-5717133
+ * @param url
+ */
+export function isURL(url: string): boolean {
+    let constructed;
+
+    try {
+        constructed = new URL(url);
+    } catch (_) {
+        return false;
+    }
+
+    return constructed.protocol === "http:" || constructed.protocol === "https:";
+}
+
+/**
  * Determine if a string is an allowed URL.
  *
  * In the future this may be extended to check if we want to whitelist/blacklist various URLs.
@@ -70,26 +90,17 @@ export function setMeta(key: string, value: any) {
  * @param input - The string to check.
  */
 export function isAllowedUrl(input: string): boolean {
-    // Options https://github.com/chriso/validator.js#validators
-    const options = {
-        protocols: ["http", "https"],
-        require_tld: true,
-        require_protocol: true,
-        require_host: true,
-        require_valid_protocol: true,
-        allow_trailing_dot: false,
-        allow_protocol_relative_urls: false,
-    };
-    return isUrl(input, options);
+    return isURL(input);
 }
 
-interface ISiteSection {
+export interface ISiteSection {
     basePath: string;
     contentLocale: string;
     sectionGroup: string;
     sectionID: string;
     name: string;
-    apps: { [key: string]: boolean };
+    apps: Record<string, boolean>;
+    attributes: Record<string, any>;
 }
 
 /**
@@ -107,9 +118,10 @@ export function getSiteSection(): ISiteSection {
  * @returns Returns a URL that can be used in the APP.
  */
 export function formatUrl(path: string, withDomain: boolean = false): string {
-    if (path.indexOf("//") >= 0) {
+    // Test if this is an absolute path
+    if (ABSOLUTE_PATH_REGEX.test(path)) {
         return path;
-    } // this is an absolute path.
+    }
 
     // Subcommunity slug OR subcommunity
     let siteRoot = getMeta("context.basePath", "");
@@ -132,9 +144,10 @@ export function formatUrl(path: string, withDomain: boolean = false): string {
  * No site section will be included.
  */
 export function siteUrl(path: string): string {
-    if (path.indexOf("//") >= 0) {
+    // Test if this is an absolute path
+    if (ABSOLUTE_PATH_REGEX.test(path)) {
         return path;
-    } // this is an absolute path.
+    }
 
     // The context paths that come down are expect to have no / at the end of them.
     // Normally a domain like so: https://someforum.com
@@ -168,10 +181,10 @@ export function getRelativeUrl(fullUrl: string): string {
  * @returns Returns a URL that can be used for a static asset.
  */
 export function assetUrl(path: string): string {
-    if (path.indexOf("//") >= 0) {
+    // Test if this is an absolute path
+    if (ABSOLUTE_PATH_REGEX.test(path)) {
         return path;
-    } // this is an absolute path.
-
+    }
     // The context paths that come down are expect to have no / at the end of them.
     // Normally a domain like so: https://someforum.com
     // When we don't have that we want to fallback to "" so that our path with a / can get passed.
@@ -212,10 +225,11 @@ export function onReady(callback: PromiseOrNormalCallback) {
  *
  * @returns A Promise when the events have all fired.
  */
-export function _executeReady(): Promise<any[]> {
-    return new Promise(resolve => {
-        const handlerPromises = _readyHandlers.map(handler => handler());
+export function _executeReady(before?: () => void | Promise<void>): Promise<any[]> {
+    return new Promise((resolve) => {
+        const handlerPromises = _readyHandlers.map((handler) => handler());
         const exec = () => {
+            before?.();
             return Promise.all(handlerPromises).then(resolve);
         };
 
@@ -252,4 +266,46 @@ export function removeOnContent(callback: (event: CustomEvent) => void) {
 export function makeProfileUrl(username: string) {
     const userPath = `/profile/${encodeURIComponent(username)}`;
     return formatUrl(userPath, true);
+}
+
+/**
+ * Make a URL to a user's discussions.
+ */
+export function makeProfileDiscussionsUrl(username: string) {
+    const discussionsPath = `/profile/discussions/${encodeURIComponent(username)}`;
+    return formatUrl(discussionsPath, true);
+}
+
+/**
+ * Make a URL to a user's comments.
+ */
+export function makeProfileCommentsUrl(username: string) {
+    const commentsPath = `/profile/comments/${encodeURIComponent(username)}`;
+    return formatUrl(commentsPath, true);
+}
+
+interface IRecaptcha {
+    execute: (string) => string;
+}
+
+/**
+ * Ensure that we have loaded the rec
+ */
+export async function ensureReCaptcha(): Promise<IRecaptcha | null> {
+    const siteKey = getMeta("reCaptchaKey");
+    if (!siteKey) {
+        return null;
+    }
+    await ensureScript(`https://www.google.com/recaptcha/api.js?render=${siteKey}`);
+
+    return { execute: (siteKey) => window.grecaptcha.execute(siteKey) };
+}
+
+/**
+ * Translation helper for accessible labels, because <Translate/> doesn't return as string
+ * @param template - the template for the string (must be translated ahead of time)
+ * @param variable - the variable to insert in the template
+ */
+export function accessibleLabel(template: string, variable: string[]) {
+    return sprintf(template, variable);
 }

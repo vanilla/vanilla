@@ -3,6 +3,7 @@
  * @license GPL-2.0-only
  */
 
+import { notEmpty } from "@vanilla/utils";
 import yargs from "yargs";
 import { getVanillaConfig } from "./utility/configUtils";
 
@@ -13,6 +14,7 @@ export enum BuildMode {
     TEST = "test",
     TEST_WATCH = "testwatch",
     TEST_DEBUG = "testdebug",
+    TEST_COVERAGE = "coverage",
 }
 
 yargs
@@ -27,8 +29,17 @@ yargs
     .options("config", {
         default: "config.php",
     })
+    .options("clean-cache", {
+        default: false,
+        boolean: true,
+    })
     .options("fix", {
         alias: "f",
+        default: false,
+        boolean: true,
+    })
+    .options("circular", {
+        alias: "c",
         default: false,
         boolean: true,
     })
@@ -41,12 +52,23 @@ yargs
         default: false,
         boolean: true,
     })
-    .options("debug", { default: false, boolean: true });
+    .options("section", {
+        alias: "s",
+        string: true,
+        default: "",
+    })
+    .options("debug", { default: false, boolean: true })
+    .options("modern", {
+        alias: "m",
+        default: false,
+        boolean: true,
+    });
 
 export interface IBuildOptions {
     mode: BuildMode;
     verbose: boolean;
     fix: boolean;
+    cleanCache: boolean;
     install: boolean;
     lowMemory: boolean;
     enabledAddonKeys: string[];
@@ -54,6 +76,9 @@ export interface IBuildOptions {
     phpConfig: any;
     devIp: string;
     debug: boolean;
+    circular: boolean;
+    sections: string[] | null;
+    modern: boolean;
 }
 
 /**
@@ -95,9 +120,21 @@ export async function getOptions(): Promise<IBuildOptions> {
         enabledAddonKeys = parseEnabledAddons(config);
     }
 
+    let sections: string[] | null = null;
+    if (typeof yargs.argv.sections === "string") {
+        const splitSections = yargs.argv.sections
+            .split(",")
+            .map((section) => section.trim())
+            .filter(notEmpty);
+        if (splitSections.length > 0) {
+            sections = splitSections;
+        }
+    }
+
     return {
         mode: yargs.argv.mode as BuildMode,
         verbose: yargs.argv.verbose as boolean,
+        cleanCache: yargs.argv["clean-cache"] as boolean,
         enabledAddonKeys,
         lowMemory: yargs.argv["low-memory"] as boolean,
         configFile: yargs.argv.config as string,
@@ -106,5 +143,8 @@ export async function getOptions(): Promise<IBuildOptions> {
         install: yargs.argv.install as boolean,
         devIp,
         debug: yargs.argv.debug as boolean,
+        circular: yargs.argv.circular as boolean,
+        sections,
+        modern: yargs.argv.modern as boolean,
     };
 }

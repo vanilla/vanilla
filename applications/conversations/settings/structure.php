@@ -16,6 +16,7 @@ if (!isset($Explicit)) {
     $Explicit = false;
 }
 
+/** @var Gdn_Database $Database */
 $SQL = $Database->sql();
 $Construct = $Database->structure();
 $Px = $Database->DatabasePrefix;
@@ -90,7 +91,7 @@ if (!$CountParticipantsExists && $UserConversationExists) {
 $Construct->table('ConversationMessage')
     ->primaryKey('MessageID')
     ->column('ConversationID', 'int', false, 'key')
-    ->column('Body', 'text')
+    ->column('Body', 'mediumtext')
     ->column('Format', 'varchar(20)', null)
     ->column('InsertUserID', 'int', null, 'key')
     ->column('DateInserted', 'datetime', false)

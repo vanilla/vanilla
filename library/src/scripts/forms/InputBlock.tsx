@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -9,7 +9,6 @@ import ErrorMessages from "@library/forms/ErrorMessages";
 import { getRequiredID, IOptionalComponentID } from "@library/utility/idUtils";
 import classNames from "classnames";
 import Paragraph from "@library/layout/Paragraph";
-import { IFieldError } from "@library/@types/api/core";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import { IError } from "@library/errorPages/CoreErrorMessages";
 
@@ -40,6 +39,8 @@ export interface IInputBlockProps extends IOptionalComponentID {
     baseClass?: InputTextBlockBaseClass;
     legacyMode?: boolean;
     noMargin?: boolean;
+    grid?: boolean;
+    tight?: boolean;
 }
 
 interface IState {
@@ -94,8 +95,10 @@ export default class InputBlock extends React.Component<IInputBlockProps, IState
                 <span
                     className={classNames(
                         classesInputBlock.inputWrap,
-                        this.props.wrapClassName,
                         [classesInputBlock.fieldsetGroup],
+                        this.props.wrapClassName,
+                        { [classesInputBlock.grid]: this.props.grid },
+                        { [classesInputBlock.tight]: this.props.tight },
                         { noMargin: this.props.noMargin },
                     )}
                 >

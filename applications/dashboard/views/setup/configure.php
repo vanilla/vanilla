@@ -87,7 +87,7 @@ echo $this->Form->open();
             </li>
         </ul>
         <div>
-            <?php echo $this->Form->button('Continue &rarr;'); ?>
+            <?php echo $this->Form->button('Continue'); ?>
         </div>
     </div>
 <?php

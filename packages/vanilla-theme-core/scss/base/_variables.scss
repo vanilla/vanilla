@@ -282,7 +282,7 @@ $MobileMeBoxAlert_borderColor:             $global-color_secondary !default;
     Content
 \* -------------------------------------------------------------- */
 
-$content_bg:                             transparent !default;
+$content_bg:                             $body_bg !default;
 $content_border:                         none !default;
 $content_padding:                        0 !default;
 $content_borderRadius:                   0 !default;
@@ -329,8 +329,10 @@ $footer-base_lineHeight:                 $global-base_lineHeight !default;
 \* -------------------------------------------------------------- */
 
 $component-item_spacing:                 0 !default;
-$component-base_padding:                 $global-medium_fontSize !default;
-$component_bg:                           $global-color_bg !default;
+$component-vertical_padding:             16px !default;
+$component-horizontal_padding:           8px !default;
+$component-base_padding:                 #{$component-vertical_padding} #{$component-horizontal_padding} !default;
+$component_bg:                           $content_bg !default;
 $component_borderWidth:                  1px !default;
 $component_lateralBorder:                false !default;
 $component_borderColor:                  $theme-border_color !default;

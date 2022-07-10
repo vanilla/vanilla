@@ -223,7 +223,7 @@ class ApplicantsApiController extends AbstractApiController {
      * @return Data
      */
     public function post(array $body) {
-        $this->permission(\Vanilla\Permissions::BAN_CSRF);
+        $this->permission([\Vanilla\Permissions::BAN_CSRF, \Vanilla\Permissions::BAN_PRIVATE]);
 
         $in = $this->schema([
             'email:s' => 'The email address for the user.',
@@ -234,8 +234,6 @@ class ApplicantsApiController extends AbstractApiController {
         $out = $this->schema($this->fullSchema(), 'out');
 
         $body = $in->validate($body);
-
-        $this->userModel->validatePasswordStrength($body['password'], $body['name']);
 
         $userData = ApiUtils::convertInputKeys($body);
         $userID = $this->userModel->register($userData);

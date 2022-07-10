@@ -13,17 +13,21 @@
  */
 export class FocusWatcher {
     /**
-     * @param rootNode - The root dom node to watch on.
+     * @param watchedNode - The watched dom node.
      * @param callback - A callback for when the tree focuses and blurs.
      */
-    public constructor(private rootNode: Element, private changeHandler: (hasFocus: boolean) => void) {}
+    public constructor(
+        private watchedNode: Element,
+        private changeHandler: (hasFocus: boolean, newActiveElement?: Element) => void,
+    ) {}
 
     /**
      * Register the event listeners from this class.
      */
     public start = () => {
-        this.rootNode.addEventListener("focusout", this.handleFocusOut, true);
-        this.rootNode.addEventListener("focusin", this.handleFocusIn, true);
+        this.watchedNode.addEventListener("focusout", this.handleFocusOut, true);
+        this.watchedNode.addEventListener("focusin", this.handleFocusIn, true);
+
         document.addEventListener("click", this.handleClick);
     };
 
@@ -31,8 +35,9 @@ export class FocusWatcher {
      * Remove the event listeners from this class.
      */
     public stop = () => {
-        this.rootNode.removeEventListener("focusout", this.handleFocusOut, true);
-        this.rootNode.removeEventListener("focusin", this.handleFocusIn, true);
+        this.watchedNode.removeEventListener("focusout", this.handleFocusOut, true);
+        this.watchedNode.removeEventListener("focusin", this.handleFocusIn, true);
+
         document.removeEventListener("click", this.handleClick);
     };
 
@@ -65,20 +70,30 @@ export class FocusWatcher {
      * Determine whether or not our DOM tree was clicked.
      */
     private checkDomTreeWasClicked(clickedElement: Element) {
+        const elementIsInModal = this.isElementInModal(clickedElement);
+
         return (
-            this.rootNode &&
-            clickedElement &&
-            (this.rootNode.contains(clickedElement as Element) || this.rootNode === clickedElement)
+            elementIsInModal ||
+            (this.watchedNode &&
+                clickedElement &&
+                (this.watchedNode.contains(clickedElement as Element) || this.watchedNode === clickedElement))
         );
+    }
+
+    /**
+     * Determine whether or not an element is nested in the modals container
+     */
+    private isElementInModal(element: Element) {
+        return Boolean(document.getElementById("modals")?.contains(element));
     }
 
     /**
      * Determine if the currently focused element is somewhere inside of (or the same as)
      * a given Element.
      *
-     * @param rootNode - The root node to look in.
+     * @param watchedNode - The watched node to look in.
      */
-    private checkDomTreeHasFocus(event: FocusEvent, callback: (hasFocus: boolean) => void) {
+    private checkDomTreeHasFocus(event: FocusEvent, callback: (hasFocus: boolean, newActiveElement?: Element) => void) {
         setTimeout(() => {
             const possibleTargets = [
                 // NEEDS TO COME FIRST, because safari will populate relatedTarget on focusin, and its not what we're looking for.
@@ -87,7 +102,7 @@ export class FocusWatcher {
                 (event as any).explicitOriginalTarget, // Firefox
             ];
 
-            let activeElement = null;
+            let activeElement: HTMLElement | null = null;
             for (const target of possibleTargets) {
                 if (target && target !== document.body) {
                     activeElement = target;
@@ -96,16 +111,39 @@ export class FocusWatcher {
             }
 
             if (activeElement !== null) {
-                const hasFocus =
-                    this.rootNode &&
-                    activeElement &&
-                    (activeElement === this.rootNode || this.rootNode.contains(activeElement));
+                const isWatchedInBody = document.body.contains(this.watchedNode);
+                const isFocusedInBody = document.body.contains(activeElement);
+                const closestModal = activeElement.closest("[data-modal-real-root-id]");
+                const closestModalRealRootID = closestModal?.getAttribute("data-modal-real-root-id");
+                const closestModalRealRoot = closestModalRealRootID
+                    ? document.getElementById(closestModalRealRootID)
+                    : null;
+                const isFocusInChildModal =
+                    (closestModalRealRoot != null && this.watchedNode === closestModalRealRoot) ||
+                    this.watchedNode.contains(closestModalRealRoot);
+                const isReachComboxBox =
+                    activeElement.matches("[data-reach-popover]") || activeElement.closest("[data-reach-popover]");
+
+                const hasFocus = Boolean(
+                    this.watchedNode &&
+                        activeElement &&
+                        (activeElement === this.watchedNode || this.watchedNode.contains(activeElement)),
+                );
+
+                if (!hasFocus && (isReachComboxBox || isFocusInChildModal)) {
+                    // If the thing that just took focus was a reach popover
+                    // Don't report losing focus.
+                    // Someone moving focus to the body (trying to focus any non-focusable elemtent)
+                    // will still clear focus though, so thing like clicking the background of a modal will clear focus.
+                    return false;
+                }
 
                 // We will only invalidate based on something actually getting focus.
                 // Make sure we are still mounted before calling this.
                 // It could happen that our flyout is unmounted in between the setTimeout call.
-                if (document.body.contains(this.rootNode)) {
-                    callback(!!hasFocus);
+                // We might have focused on a modal which can't be in the watched tree.
+                if (isWatchedInBody && isFocusedInBody) {
+                    callback(hasFocus, activeElement as Element);
                 }
             }
         }, 0);

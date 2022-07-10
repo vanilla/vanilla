@@ -27,6 +27,9 @@ class CategoriesModule extends Gdn_Module {
      */
     public $root = null;
 
+    /** @var bool Caring about if we are on top level categories. */
+    public $topLevelCategoryOnly = true;
+
     public function __construct($sender = '') {
         parent::__construct($sender);
         $this->_ApplicationFolder = 'vanilla';
@@ -78,6 +81,7 @@ class CategoriesModule extends Gdn_Module {
             $this->getData();
         }
 
+        /** @psalm-suppress InvalidPassByReference */
         $this->filterDepth($this->Data->result(), $this->startDepth, $this->endDepth);
 
         return parent::toString();

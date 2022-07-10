@@ -9,8 +9,11 @@
  * @package Core
  * @since 2.0
  */
+
+use Garden\Web\Exception\NotFoundException;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
+use Vanilla\Models\AddonModel;
 
 /**
  * Manages available applications, enabling and disabling them.
@@ -217,110 +220,36 @@ class Gdn_ApplicationManager {
     /**
      * Enable an application.
      *
-     * @param string $applicationName The name of the application to enable.
-     * @return bool Returns true if the application was enabled or false otherwise.
+     * @param string $addonKey The name of the application to enable.
      */
-    public function enableApplication($applicationName) {
-        $this->testApplication($applicationName);
-        $applicationInfo = arrayValueI($applicationName, $this->availableApplications(), []);
-        $applicationName = $applicationInfo['Index'];
-        $applicationFolder = val('Folder', $applicationInfo, '');
-
-        saveToConfig('EnabledApplications'.'.'.$applicationName, $applicationFolder);
-        Logger::event(
-            'addon_enabled',
-            Logger::NOTICE,
-            'The {addonName} application was enabled.',
-            ['addonName' => $applicationName, Logger::FIELD_CHANNEL => Logger::CHANNEL_ADMIN]
-        );
-
-        $this->EventArguments['AddonName'] = $applicationName;
-        Gdn::pluginManager()->callEventHandlers($this, 'ApplicationManager', 'AddonEnabled');
-
-        return true;
-    }
-
-    /**
-     * Test if an application can be enabled.
-     *
-     * @param string $applicationName The name of the application to test.
-     * @return bool Returns true if the application can be enabled or false otherwise.
-     * @throws Exception Throws an exception if the application is not in the correct format.
-     */
-    public function testApplication($applicationName) {
-        // Add the application to the $EnabledApplications array in conf/applications.php
-        $ApplicationInfo = arrayValueI($applicationName, $this->availableApplications(), []);
-        $applicationName = $ApplicationInfo['Index'];
-        $ApplicationFolder = val('Folder', $ApplicationInfo, '');
-        if ($ApplicationFolder == '') {
-            throw new Exception(t('The application folder was not properly defined.'));
+    public function enableApplication(string $addonKey) {
+        $addonModel = \Gdn::getContainer()->get(AddonModel::class);
+        $addon = $this->addonManager->lookupAddon($addonKey);
+        if ($addon === null) {
+            throw new NotFoundException('Application', [
+                'addonKey' => $addonKey
+            ]);
         }
 
-        // Hook directly into the autoloader and force it to load the newly tested application
-        $this->addonManager->startAddonsByKey([$applicationName], \Vanilla\Addon::TYPE_ADDON);
-
-        // Call the application's setup method
-        $hooks = $applicationName.'Hooks';
-        if (!class_exists($hooks)) {
-            $hooksPath = PATH_APPLICATIONS.DS.$ApplicationFolder.'/settings/class.hooks.php';
-            if (file_exists($hooksPath)) {
-                include_once $hooksPath;
-            }
-        }
-        if (class_exists($hooks)) {
-            /* @var Gdn_IPlugin $hooks The hooks object should be a plugin. */
-            $hooks = Gdn::getContainer()->get($hooks);
-
-            if (method_exists($hooks, 'setup')) {
-                $hooks->setup();
-            }
-        }
-
-        return true;
+        $addonModel->enable($addon);
     }
 
     /**
      * Disable an application.
      *
-     * @param string $applicationName The name of the application to disable.
+     * @param string $addonKey The name of the application to disable.
      * @throws \Exception Throws an exception if the application can't be disabled.
      */
-    public function disableApplication($applicationName) {
-        $addon = $this->addonManager->lookupAddon($applicationName);
-        if (!$addon) {
-            throw notFoundException('Application');
+    public function disableApplication($addonKey) {
+        $addonModel = \Gdn::getContainer()->get(AddonModel::class);
+        $addon = $this->addonManager->lookupAddon($addonKey);
+        if ($addon === null) {
+            throw new NotFoundException('Application', [
+                'addonKey' => $addonKey
+            ]);
         }
 
-        $applicationName = $addon->getRawKey();
-
-        // 1. Check to make sure that this application is allowed to be disabled
-        if (!$addon->getInfoValue('allowDisable', true)) {
-            throw new Exception(sprintf(t('You cannot disable the %s application.'), $applicationName));
-        }
-
-        // 2. Check to make sure that no other enabled applications rely on this one.
-        try {
-            $this->addonManager->checkDependents($addon, true);
-        } catch (Exception $ex) {
-            throw new Gdn_UserException($ex->getMessage(), $ex->getCode());
-        }
-
-        // 2. Disable it
-        removeFromConfig("EnabledApplications.{$applicationName}");
-
-        Logger::event(
-            'addon_disabled',
-            Logger::NOTICE,
-            'The {addonName} application was disabled.',
-            ['addonName' => $applicationName, Logger::FIELD_CHANNEL => Logger::CHANNEL_ADMIN]
-        );
-
-        // Clear the object caches.
-        $this->addonManager->stopAddonsByKey([$applicationName], \Vanilla\Addon::TYPE_ADDON);
-
-        /** @var \Garden\EventManager $eventManager */
-        $eventManager = Gdn::getContainer()->get(\Garden\EventManager::class);
-        $this->addonManager->unbindAddonEvents($addon, $eventManager);
+        $addonModel->disable($addon);
     }
 
     /**

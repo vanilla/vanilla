@@ -16,6 +16,13 @@ use VanillaTests\MinimalContainerTestCase;
 class NotFoundFormatTest extends MinimalContainerTestCase {
 
     /**
+     * @return bool
+     */
+    protected static function useCommonBootstrap(): bool {
+        return false;
+    }
+
+    /**
      * Make sure we can construct the format it dying.
      */
     public function testNotFatal() {

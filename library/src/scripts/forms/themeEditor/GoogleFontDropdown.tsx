@@ -4,13 +4,13 @@
  */
 
 import React from "react";
-import { ThemeDropDown } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeDropDown";
-import { useThemeBuilder } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderContext";
+import { ThemeDropDown } from "@library/forms/themeEditor/ThemeDropDown";
+import { useThemeBuilder } from "@library/forms/themeEditor/ThemeBuilderContext";
 
 export const fontKey = "global.fonts.googleFontFamily";
 
 export function GoogleFontDropdown(props: { forceDefaultKey?: string; disabled?: boolean }) {
-    const { setVariableValue, rawThemeVariables } = useThemeBuilder();
+    const { setVariableValue } = useThemeBuilder();
     const { forceDefaultKey, disabled } = props;
 
     return (
@@ -19,7 +19,7 @@ export function GoogleFontDropdown(props: { forceDefaultKey?: string; disabled?:
             variableKey={fontKey}
             forceDefaultKey={forceDefaultKey}
             disabled={!!props.forceDefaultKey || disabled}
-            afterChange={value => {
+            afterChange={(value) => {
                 setVariableValue("global.fonts.forceGoogleFont", value === "custom" ? false : !!value);
             }}
             options={[

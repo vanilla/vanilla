@@ -9,20 +9,22 @@ import classNames from "classnames";
 import { flyoutPosition } from "@rich-editor/flyouts/pieces/flyoutPosition";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import { TabHandler } from "@vanilla/dom-utils";
+import { PageBoxDepthContextProvider } from "@library/layout/PageBox.context";
 
 export interface IProps {
     id: string;
-    parentID: string;
     className?: string;
     children: React.ReactNode;
     isVisible?: boolean;
     renderAbove: boolean;
     renderLeft: boolean;
+    renderCenter: boolean;
     legacyMode?: boolean;
     openAsModal?: boolean;
     selfPadded?: boolean;
     size: DropDownContentSize;
     horizontalOffset?: boolean;
+    contentRef?: React.RefObject<HTMLDivElement>;
 }
 
 export enum DropDownContentSize {
@@ -35,8 +37,6 @@ export enum DropDownContentSize {
  * Note that it renders an empty, hidden div when closed so that the aria-labelledby points to an element in the DOM.
  */
 export default class DropDownContents extends React.Component<IProps> {
-    private selfRef = React.createRef<HTMLDivElement>();
-
     public render() {
         const classes = dropDownClasses();
         const asDropDownClasses = !this.props.openAsModal
@@ -50,27 +50,29 @@ export default class DropDownContents extends React.Component<IProps> {
         }
 
         return (
-            <div
-                ref={this.selfRef}
-                id={this.props.id}
-                aria-labelledby={this.props.parentID}
-                className={classNames(
-                    asDropDownClasses,
-                    asModalClasses,
-                    this.props.className,
-                    !this.props.selfPadded ? classes.verticalPadding : "",
-                    {
+            <PageBoxDepthContextProvider depth={3}>
+                <div
+                    ref={this.props.contentRef}
+                    id={this.props.id}
+                    className={classNames(asDropDownClasses, asModalClasses, this.props.className, {
+                        [classes.verticalPadding]: !this.props.selfPadded,
+                        [classes.contentOffsetCenter]: this.props.renderCenter,
                         [classes.contentOffsetLeft]: this.props.horizontalOffset && this.props.renderLeft,
                         [classes.contentOffsetRight]: this.props.horizontalOffset && !this.props.renderLeft,
-                    },
-                )}
-                style={flyoutPosition(this.props.renderAbove, this.props.renderLeft, !!this.props.legacyMode)}
-                onClick={this.doNothing}
-                tabIndex={-1}
-                onMouseDown={this.forceTryFocus}
-            >
-                {this.props.children}
-            </div>
+                    })}
+                    style={flyoutPosition(
+                        this.props.renderAbove,
+                        this.props.renderLeft,
+                        !!this.props.legacyMode,
+                        this.props.renderCenter,
+                    )}
+                    onClick={this.doNothing}
+                    tabIndex={-1}
+                    onMouseDown={this.forceTryFocus}
+                >
+                    {this.props.children}
+                </div>
+            </PageBoxDepthContextProvider>
         );
     }
 

@@ -8,10 +8,16 @@
  * @since 2.0
  */
 
+use Garden\Schema\Schema;
+use Vanilla\Schema\RangeExpression;
+use Vanilla\Utility\ArrayUtils;
+
 /**
  * Handles message data.
  */
 class MessageModel extends Gdn_Model {
+
+    const MESSAGE_TYPES = ["casual", "info", "warning", "alert"];
 
     /** @var array Non-standard message location allowed. */
     private $_SpecialLocations = ['[Base]', '[NonAdmin]'];
@@ -19,50 +25,26 @@ class MessageModel extends Gdn_Model {
     /** @var array Current message data. */
     protected static $Messages;
 
+    /** @var \Vanilla\Models\ModelCache */
+    private $modelCache;
+
+    /** @var \Vanilla\Layout\LayoutService */
+    private $layoutService;
+
     /**
      * Class constructor. Defines the related database table name.
      */
     public function __construct() {
         parent::__construct('Message');
+        $this->modelCache = new \Vanilla\Models\ModelCache('moderationMessages', \Gdn::cache());
+        $this->layoutService = Gdn::getContainer()->get(\Vanilla\Layout\LayoutService::class);
     }
 
     /**
-     * Delete a message.
-     *
-     * @param array|int $where The where clause to delete or an integer value.
-     * @param array|true $options An array of options to control the delete.
-     * @return bool Returns **true** on success or **false** on failure.
+     * Invalidate the cache on update.
      */
-    public function delete($where = [], $options = []) {
-        $result = parent::delete($where, $options);
-        self::messages(null);
-        return $result;
-    }
-
-    /**
-     * Returns a single message object for the specified id or FALSE if not found.
-     *
-     * @param int $messageID The MessageID to filter to.
-     * @param string|false $datasetType The format of the message.
-     * @param array $options Options to modify the behavior of the get.
-     * @return array Requested message.
-     */
-    public function getID($messageID, $datasetType = false, $options = []) {
-        if (Gdn::cache()->activeEnabled()) {
-            $message = self::messages($messageID);
-            if (!$message) {
-                return $message;
-            }
-            if ($message instanceof Gdn_DataSet) {
-                $message->datasetType($datasetType);
-            } elseif ($datasetType === DATASET_TYPE_OBJECT) {
-                return (object)$message;
-            } else {
-                return (array)$message;
-            }
-        } else {
-            return parent::getID($messageID, $datasetType, $options);
-        }
+    protected function onUpdate(): void {
+        $this->modelCache->invalidateAll();
     }
 
     /**
@@ -129,83 +111,44 @@ class MessageModel extends Gdn_Model {
     /**
      * Get what messages are active for a template location.
      *
-     * @param $Location
-     * @param array $Exceptions
-     * @param null $CategoryID
+     * @param string $location
+     * @param array $exceptions
+     * @param null $categoryID
      * @return array|null
      */
-    public function getMessagesForLocation($Location, $Exceptions = ['[Base]'], $CategoryID = null) {
-        $Session = Gdn::session();
-        $Prefs = $Session->getPreference('DismissedMessages', []);
+    public function getMessagesForLocation(string $location, array $exceptions = ['[Base]'], $categoryID = null) {
+        $session = Gdn::session();
+        $prefs = $session->getPreference('DismissedMessages', []);
 
         $category = null;
-        if (!empty($CategoryID)) {
-            $category = CategoryModel::categories($CategoryID);
+        if (!empty($categoryID)) {
+            $category = CategoryModel::categories($categoryID);
         }
 
-        $Exceptions = array_map('strtolower', $Exceptions);
+        $exceptions = array_map('strtolower', $exceptions);
 
-        list($Application, $Controller, $Method) = explode('/', strtolower($Location));
-
-        if (Gdn::cache()->activeEnabled()) {
-            // Get the messages from the cache.
-            $Messages = self::messages();
-            $Result = [];
-            foreach ($Messages as $MessageID => $Message) {
-                if (in_array($MessageID, $Prefs) || !$Message['Enabled']) {
-                    continue;
-                }
-
-                $MApplication = strtolower($Message['Application']);
-                $MController = strtolower($Message['Controller']);
-                $MMethod = strtolower($Message['Method']);
-
-                $Visible = false;
-
-                if (in_array($MController, $Exceptions)) {
-                    $Visible = true;
-                } elseif ($MApplication == $Application && $MController == $Controller && $MMethod == $Method) {
-                    $Visible = true;
-                }
-
-                $Visible = $Visible && self::inCategory($CategoryID, val('CategoryID', $Message), val('IncludeSubcategories', $Message));
-                if ($category !== null) {
-                    $Visible &= CategoryModel::checkPermission($category, 'Vanilla.Discussions.View');
-                }
-
-                if ($Visible) {
-                    $Result[] = $Message;
-                }
+        // Get the messages from the cache.
+        $messages = self::messages();
+        $messagesByID = array_column($messages, null, "MessageID");
+        $result = [];
+        foreach ($messagesByID as $messageID => $message) {
+            if (in_array($messageID, $prefs) || !$message['Enabled']) {
+                continue;
             }
-            return $Result;
-        }
 
-        $Result = $this->SQL
-            ->select()
-            ->from('Message')
-            ->where('Enabled', '1')
-            ->beginWhereGroup()
-            ->whereIn('Controller', $Exceptions)
-            ->orOp()
-            ->beginWhereGroup()
-            ->orWhere('Application', $Application)
-            ->where('Controller', $Controller)
-            ->where('Method', $Method)
-            ->endWhereGroup()
-            ->endWhereGroup()
-            ->whereNotIn('MessageID', $Prefs)
-            ->orderBy('Sort', 'asc')
-            ->get()->resultArray();
+            $legacyLocationMap = $this->getLocationMap();
+            $visible = strtolower($location) === strtolower($message["LayoutViewType"]) || in_array(strtolower($message["LayoutViewType"]), $exceptions);
 
-        $Result = array_filter($Result, function($Message) use ($Session, $category) {
-            $visible = MessageModel::inCategory(val('CategoryID', $category, null), val('CategoryID', $Message), val('IncludeSubcategories', $Message));
+            $visible = $visible && self::inCategory($categoryID, val('RecordID', $message), val('IncludeSubcategories', $message));
             if ($category !== null) {
-                $visible = $visible && CategoryModel::checkPermission($category, 'Vanilla.Discussions.View');
+                $visible &= CategoryModel::checkPermission($category, 'Vanilla.Discussions.View');
             }
-            return $visible;
-        });
 
-        return $Result;
+            if ($visible) {
+                $result[] = $message;
+            }
+        }
+        return $result;
     }
 
     /**
@@ -215,53 +158,45 @@ class MessageModel extends Gdn_Model {
      */
     public function getEnabledLocations() {
         $data = $this->SQL
-            ->select('Application,Controller,Method')
+            ->select('LayoutViewType')
             ->from('Message')
-            ->where('Enabled', '1')
-            ->groupBy('Application,Controller,Method')
-            ->get();
+            ->where('Enabled', 1)
+            ->get()->resultArray();
 
-        $locations = [];
-        foreach ($data as $row) {
-            if (in_array($row->Controller, $this->_SpecialLocations)) {
-                $locations[] = $row->Controller;
-            } else {
-                $location = $row->Application;
-                if ($row->Controller != '') {
-                    $location .= '/'.$row->Controller;
-                }
-                if ($row->Method != '') {
-                    $location .= '/'.$row->Method;
-                }
-                $locations[] = $location;
-            }
-        }
-        return $locations;
+        return array_column($data, "LayoutViewType");
     }
+
+    // Kludge back in static messages
 
     /**
      * Get all messages or one message.
      *
-     * @param int|bool $iD ID of message to get.
+     * @param int|null $id ID of message to get.
      * @return array|null
      */
-    public static function messages($iD = false) {
-        if ($iD === null) {
-            Gdn::cache()->remove('Messages');
-            return;
-        }
-
-        $messages = Gdn::cache()->get('Messages');
-        if ($messages === Gdn_Cache::CACHEOP_FAILURE) {
-            $messages = Gdn::sql()->get('Message', 'Sort')->resultArray();
-            $messages = Gdn_DataSet::index($messages, ['MessageID']);
-            Gdn::cache()->store('Messages', $messages);
-        }
-        if ($iD === false) {
-            return $messages;
+    public static function messages($id = null) {
+        $messageModel = \Gdn::getContainer()->get(MessageModel::class);
+        if (isset($id)) {
+            return $messageModel->getID($id);
         } else {
-            return val($iD, $messages);
+            return $messageModel->getMessages([]);
         }
+    }
+
+    /**
+     * Get messages (from the cache if possible).
+     *
+     * @param array $where
+     * @return mixed
+     */
+    public function getMessages($where = []) {
+        $messages = $this->modelCache->getCachedOrHydrate(
+            [__FUNCTION__, "where" => $where],
+            function () use ($where) {
+                return $this->getWhere($where)->resultArray();
+            }
+        );
+        return $messages;
     }
 
     /**
@@ -269,34 +204,222 @@ class MessageModel extends Gdn_Model {
      *
      * @param array $formPostValues Message data.
      * @param bool $settings
-     * @return int The MessageID.
+     * @return int|bool The MessageID or false on failure.
      */
     public function save($formPostValues, $settings = false) {
-        // The "location" is packed into a single input with a / delimiter. Need to explode it into three different fields for saving
-        $location = val('Location', $formPostValues, '');
-        if ($location != '') {
-            $location = explode('/', $location);
-            $application = val(0, $location, '');
-            if (in_array($application, $this->_SpecialLocations)) {
-                $formPostValues['Application'] = null;
-                $formPostValues['Controller'] = $application;
-                $formPostValues['Method'] = null;
-            } else {
-                $formPostValues['Application'] = $application;
-                $formPostValues['Controller'] = val(1, $location, '');
-                $formPostValues['Method'] = val(2, $location, '');
-            }
-        }
         Gdn::cache()->remove('Messages');
 
-        return parent::save($formPostValues, $settings);
+        $input = $this->normalizeInput($formPostValues);
+
+        try {
+            $this->getNormalizedInputSchema()->validate($input);
+        } catch (\Garden\Schema\ValidationException $e) {
+            $this->Validation->addResults($e);
+            return false;
+        }
+
+        return parent::save($input, $settings);
     }
 
     /**
-     * Save our current message locations in the config.
+     * Normalize data for api output.
+     *
+     * @param array $data
+     * @return array
      */
-    public function setMessageCache() {
-        // Retrieve an array of all controllers that have enabled messages associated
-        saveToConfig('Garden.Messages.Cache', $this->getEnabledLocations());
+    public function normalizeOutput(array $data): array {
+        $outputData = ArrayUtils::camelCase($data);
+        $outputData["moderationMessageID"] = $outputData["messageID"];
+        $outputData["body"] = $outputData["content"];
+        $outputData["isDismissible"] = $outputData["allowDismiss"];
+        $outputData["isEnabled"] = $outputData["enabled"];
+        $outputData["includeDescendants"] = $outputData["includeSubcategories"];
+        $outputData["viewLocation"] = strtolower($outputData["assetTarget"]);
+        $outputData = $this->getOutputSchema()->validate($outputData);
+        return $outputData;
+    }
+
+    /**
+     * Normalize data for saving to the database.
+     *
+     * @param array $data
+     * @return array
+     */
+    public function normalizeInput(array $data) {
+        $inputData = ArrayUtils::pascalCase($data);
+
+        if (isset($inputData["ModerationMessageID"])) {
+            $inputData["MessageID"] = $inputData["ModerationMessageID"];
+        }
+        $inputData["Format"] = $inputData["Format"] ?? "text";
+        $inputData["Content"] = $inputData["Body"] ?? $inputData["Content"];
+        $inputData["AllowDismiss"] = intval($inputData["IsDismissible"] ?? $inputData["AllowDismiss"]);
+        $inputData["Enabled"] = intval($inputData["IsEnabled"] ?? $inputData["Enabled"]);
+        $inputData["IncludeSubcategories"] = intval($inputData["IncludeDescendants"] ?? $inputData["IncludeSubcategories"]);
+        $inputData["AssetTarget"] = ucfirst($inputData['ViewLocation'] ?? $inputData["AssetTarget"]);
+        $inputData["LayoutViewType"] = $inputData["LayoutViewType"] ?? $this->getLocationMap()[$inputData["Location"]] ?? "all";
+        $inputData["RecordID"] = $inputData["RecordID"] ?? $inputData["CategoryID"] ?? null;
+        $inputData["RecordID"] = empty($inputData["RecordID"]) ? null : $inputData["RecordID"];
+        $inputData["RecordType"] = $inputData["RecordType"] ?? !is_null($inputData["RecordID"]) ? "category" : null;
+
+        return $inputData;
+    }
+
+    /**
+     * Get the post schema.
+     *
+     * @return Schema
+     */
+    public function getPostSchema(): Schema {
+        $schema = Schema::parse([
+            "body:s",
+            "format:s" => new \Vanilla\Models\FormatSchema(true),
+            "isDismissible:b?" => ["default" => false],
+            "isEnabled:b?" => ["default" => true],
+            "recordType:s|n?" => [
+                "enum" => ["category"],
+                "default" => null,
+            ],
+            "recordID:i|n?" => ["default" => null], // add custom validator to check both recordType and recordID are there.
+            "includeDescendants:b?" => ["default" => false],
+            "sort:i?",
+            "type:s?" => [
+                "enum" => self::MESSAGE_TYPES,
+                "default" => "casual"
+            ],
+            "viewLocation:s" => [
+                "enum" => ["content", "panel"],
+            ],
+            "layoutViewType:s",
+        ]);
+
+        $schema->addValidator("", function ($data, \Garden\Schema\ValidationField $field): void {
+            if ($data["recordID"] !== null && $data["recordType"] ===  null) {
+                $field->addError("recordType is required when saving a recordID.", ['code' => 403]);
+            }
+
+            if ($data["recordType"] !== null && $data["recordID"] === null) {
+                $field->addError("recordID is required when saving a recordType.", ['code' => 403]);
+            }
+        });
+
+        return $schema;
+    }
+
+    /**
+     * Get the schema for the api index query.
+     *
+     * @return Schema
+     */
+    public function getIndexSchema(): Schema {
+        $schema = Schema::parse(
+            [
+                "isEnabled:b|n" => ["default" => Gdn::session()->checkPermission("community.moderate") ? null : true],
+                "recordID?" => RangeExpression::createSchema([':int']),
+                "type:s?" => [
+                    "enum" => [
+                        "casual",
+                        "info",
+                        "alert",
+                        "warning",
+                    ],
+                ],
+                "layoutViewType:s?" => [
+                    "enum" => $this->getLayoutViewTypes(),
+                ],
+                "recordType:s?" => ["enum" => ["category"]],
+            ]
+        );
+
+        $schema->addValidator("isEnabled", function ($data, \Garden\Schema\ValidationField $field): void {
+            if (isset($data["isEnabled"]) && $data["isEnabled"] === false && !Gdn::session()->checkPermission('community.moderate')) {
+                $this->addError("You need the 'community.moderate' permission to view disabled messages.");
+            }
+        });
+
+        return $schema;
+    }
+
+    /**
+     * Get the output schema.
+     *
+     * @return Schema
+     */
+    public function getOutputSchema(): Schema {
+        return Schema::parse([
+            "moderationMessageID:i",
+            "body:s",
+            "format:s|n",
+            "isDismissible:b",
+            "isEnabled:b",
+            "recordType:s|n" => [
+                "enum" => ["category"],
+            ],
+            "recordID:i|n",
+            "includeDescendants:b?",
+            "sort:i?",
+            "type:s?",
+            "viewLocation:s" => [
+                "enum" => ["content", "panel"],
+            ],
+            "layoutViewType:s?",
+        ]);
+    }
+
+    /**
+     * Get the input schema.
+     *
+     * @return Schema
+     */
+    public function getNormalizedInputSchema(): Schema {
+        return Schema::parse([
+            "MessageID:i?",
+            "Content:s",
+            "Format:s?",
+            "AllowDismiss:i",
+            "Enabled:i",
+            "RecordID:i|n?",
+            "RecordType:s|n?",
+            "IncludeSubcategories:i",
+            "AssetTarget:s",
+            "LayoutViewType:s",
+            "Type:s"
+        ]);
+    }
+
+    /**
+     * Get all the registered legacy layout views.
+     *
+     * @return array
+     */
+    public function getLegacyLayoutViews() {
+        return $this->layoutService->getLegacyLayoutViews();
+    }
+
+    /**
+     * Get all available layout view types.
+     *
+     * @return array
+     */
+    public function getLayoutViewTypes() {
+        $viewTypes = ["all"];
+        foreach ($this->layoutService->getLayoutViews() as $view) {
+            $viewTypes[] = $view->getType();
+        }
+        return $viewTypes;
+    }
+
+    /**
+     * Get an array mapping the old locations to the new locations.
+     *
+     * @return string[]
+     */
+    public function getLocationMap(): array {
+        $layoutViews = $this->layoutService->getLegacyLayoutViews();
+        $map = ["[Base]" => "all", "[NonAdmin]" => "all"];
+        foreach ($layoutViews as $view) {
+            $map[$view->getLegacyType()] = $view->getType();
+        }
+        return $map;
     }
 }

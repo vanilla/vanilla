@@ -12,6 +12,7 @@
  * Manages conversation data.
  */
 class ConversationModel extends ConversationsModel {
+    public const OPT_CONVERSATION_ONLY = 'ConversationOnly';
 
     /**
      * Class constructor. Defines the related database table name.
@@ -26,12 +27,11 @@ class ConversationModel extends ConversationsModel {
     /**
      * Build generic part of conversation query.
      *
-     * @since 2.0.0
-     * @access public
-     *
      * @param int $viewingUserID Unique ID of current user.
+     * @deprecated
+     * @codeCoverageIgnore
      */
-    public function conversationQuery($viewingUserID, $join = '') {
+    public function conversationQuery($viewingUserID) {
         $this->SQL
             ->select('c.*')
             ->select('lm.InsertUserID', '', 'LastMessageUserID')
@@ -62,6 +62,15 @@ class ConversationModel extends ConversationsModel {
         }
     }
 
+    /**
+     * Calculate DBA counts for the conversations.
+     *
+     * @param string $column
+     * @param false $from
+     * @param false $to
+     * @param false $max
+     * @return array
+     */
     public function counts($column, $from = false, $to = false, $max = false) {
         $result = ['Complete' => true];
         switch ($column) {
@@ -69,9 +78,7 @@ class ConversationModel extends ConversationsModel {
                 $this->Database->query(DBAModel::getCountSQL('count', 'Conversation', 'ConversationMessage', $column, 'MessageID'));
                 break;
             case 'CountParticipants':
-                $this->SQL->update('Conversation c')
-                    ->set('c.CountParticipants', '(select count(uc.ConversationID) from GDN_UserConversation uc where uc.ConversationID = c.ConversationID and uc.Deleted = 0)', false, false)
-                    ->put();
+                $this->Database->query(DBAModel::getCountSQL('count', 'Conversation', 'UserConversation', 'CountParticipants', 'UserID'));
                 break;
             case 'FirstMessageID':
                 $this->Database->query(DBAModel::getCountSQL('min', 'Conversation', 'ConversationMessage', $column, 'MessageID'));
@@ -216,7 +223,7 @@ class ConversationModel extends ConversationsModel {
      * @param array $wheres SQL conditions.
      * @return int Number of messages.
      */
-    public function getCountInbox($viewingUserID, $wheres = '') {
+    public function getCountInbox($viewingUserID, $wheres = []) {
         if (is_array($wheres)) {
             $this->SQL->where($wheres);
         }
@@ -238,7 +245,7 @@ class ConversationModel extends ConversationsModel {
      * @param array $wheres SQL conditions.
      * @return int Number of messages.
      */
-    public function getCountWhere($wheres = '') {
+    public function getCountWhere($wheres = []) {
         if (is_array($wheres)) {
             $this->SQL->where($wheres);
         }
@@ -258,12 +265,12 @@ class ConversationModel extends ConversationsModel {
     /**
      * Get meta data of a single conversation.
      *
-     * @param int $conversationID Unique ID of conversation.
-     * @param string $datasetType The format of the resulting conversation.
+     * @param int $id Unique ID of conversation.
+     * @param string|false $datasetType The format of the resulting conversation.
      * @param array $options Options to modify the get. Currently supports `viewingUserID`.
      * @return array|stdClass|false Returns a conversation or false on failure.
      */
-    public function getID($conversationID, $datasetType = false, $options = []) {
+    public function getID($id, $datasetType = false, $options = []) {
         if (is_numeric($datasetType)) {
             deprecated('ConversationModel->getID(int, int)', 'ConversationModel->getID(int, string, array)');
             $viewingUserID = $datasetType;
@@ -274,13 +281,13 @@ class ConversationModel extends ConversationsModel {
         $datasetType = $datasetType ?: DATASET_TYPE_OBJECT;
 
         // Get the conversation.
-        $conversation = $this->getWhere(['ConversationID' => $conversationID])->firstRow(DATASET_TYPE_ARRAY);
+        $conversation = $this->getWhere(['ConversationID' => $id])->firstRow(DATASET_TYPE_ARRAY);
 
         if ($conversation) {
             if ($viewingUserID) {
                 $data = $this->SQL->getWhere(
                     'UserConversation',
-                    ['ConversationID' => $conversationID, 'UserID' => $viewingUserID]
+                    ['ConversationID' => $id, 'UserID' => $viewingUserID]
                 )->firstRow(DATASET_TYPE_ARRAY);
 
                 // Convert the array.
@@ -290,7 +297,11 @@ class ConversationModel extends ConversationsModel {
                     unset($userConversation['LastMessageID']);
                 }
             } else {
-                $userConversation = ['CountNewMessages' => 0, 'CountReadMessages' => $conversation['CountMessages'], 'DateLastViewed' => $conversation['DateUpdated']];
+                $userConversation = [
+                    'CountNewMessages' => 0,
+                    'CountReadMessages' => $conversation['CountMessages'],
+                    'DateLastViewed' => $conversation['DateUpdated']
+                ];
             }
             $conversation = array_merge($conversation, $userConversation);
 
@@ -354,10 +365,11 @@ class ConversationModel extends ConversationsModel {
     }
 
     /**
-     *
+     * Join the particpants of a conversation to its row.
      *
      * @param array $data
      * @param int $max
+     * @param array $fields
      */
     public function joinParticipants(&$data, $max = 5, array $fields = ["Name", "Email", "Photo"]) {
         // Loop through the data and find the conversations with >= $Max participants.
@@ -394,6 +406,7 @@ class ConversationModel extends ConversationsModel {
 
     /**
      * Figure out whether or not a user is in a conversation.
+     *
      * @param int $conversationID
      * @param int $userID
      * @return bool
@@ -408,6 +421,11 @@ class ConversationModel extends ConversationsModel {
         return empty($row['Deleted']);
     }
 
+    /**
+     * Join the last message to a conversation.
+     *
+     * @param array[] $data
+     */
     public function joinLastMessages(&$data) {
         // Grab all of the last message IDs.
         $iDs = [];
@@ -430,7 +448,6 @@ class ConversationModel extends ConversationsModel {
                 $row['DateLastMessage'] = $m['DateInserted'];
                 $row['LastMessage'] = $m['Body'];
                 $row['Format'] = $m['Format'];
-
             } else {
                 $row['LastMessageUserID'] = $row['InsertUserID'];
                 $row['DateLastMessage'] = $row['DateInserted'];
@@ -470,7 +487,7 @@ class ConversationModel extends ConversationsModel {
             }
             if ($html) {
                 $users[] = userAnchor($row);
-            } else {
+            } else if (!is_null(val('Name', $row))) {
                 $users[] = val('Name', $row);
             }
 
@@ -485,9 +502,9 @@ class ConversationModel extends ConversationsModel {
         if ($count === 0) {
             if ($foundMe) {
                 $result = t('Just you');
-            } elseif ($total)
+            } elseif ($total) {
                 $result = plural($total, '%s person', '%s people');
-            else {
+            } else {
                 $result = t('Nobody');
             }
         } else {
@@ -512,20 +529,19 @@ class ConversationModel extends ConversationsModel {
      *
      * @param array $formPostValues Values submitted via form.
      * @param array $settings
-     * @param array $options
      *   - ConversationOnly If set, no message will be created.
      * @return int Unique ID of conversation created or updated.
      */
-    public function save($formPostValues, $settings = [], $options = []) {
-        if (!is_array($options)) {
-            $options = [];
+    public function save($formPostValues, $settings = []) {
+        if (!is_array($settings)) {
+            $settings = [];
         }
         // Remove any conversationID that might have been added to the form.
         if (array_key_exists('ConversationID', $formPostValues)) {
             unset($formPostValues['ConversationID']);
         }
         $deprecated = $settings instanceof ConversationMessageModel;
-        $createMessage =  $deprecated || empty($settings['ConversationOnly']);
+        $createMessage =  $deprecated || empty($settings[self::OPT_CONVERSATION_ONLY]);
 
         if ($createMessage) {
             if ($deprecated) {
@@ -565,6 +581,8 @@ class ConversationModel extends ConversationsModel {
             // Add & apply any extra validation rules:
             $this->Validation->applyRule('Body', 'Required');
             $messageModel->Validation->applyRule('Body', 'Required');
+        } else {
+            $this->Validation->unapplyRule('Body', 'Required');
         }
 
         // Make sure that there is at least one recipient
@@ -586,8 +604,8 @@ class ConversationModel extends ConversationsModel {
         // Validate the form posted values
         $conversationID = false;
         if ($conversationValid && $isValidMessageModel
-            && !$this->checkUserSpamming(Gdn::session()->UserID, $this->floodGate)) {
-
+            && !$this->checkUserSpamming(Gdn::session()->UserID, $this->floodGate)
+        ) {
             $fields = $this->Validation->validationFields(); // All fields on the form that relate to the schema
 
             // Define the recipients, and make sure that the sender is in the list
@@ -611,7 +629,7 @@ class ConversationModel extends ConversationsModel {
                 // messages each have a separate counter. Without this, a new
                 // conversation will cause itself AND the message model spam counter
                 // to increment by 1.
-                $messageID = $messageModel->save($formPostValues, null, [
+                $messageID = $messageModel->save($formPostValues, [
                     'NewConversation' => true
                 ]);
 
@@ -665,7 +683,6 @@ class ConversationModel extends ConversationsModel {
 
             // Add notifications
             if ($createMessage) {
-
                 $unreadData = $this->SQL
                     ->select('uc.UserID')
                     ->from('UserConversation uc')
@@ -676,10 +693,10 @@ class ConversationModel extends ConversationsModel {
 
                 $notifyUserIDs = array_column($unreadData, 'UserID');
 
-                $this->notifyUsers($conversation, $message, $notifyUserIDs, $options + ['FirstMessage' => true]);
+                $this->notifyUsers($conversation, $message, $notifyUserIDs, $settings + ['FirstMessage' => true]);
             }
 
-        } else if ($createMessage) {
+        } elseif ($createMessage) {
             // Make sure that all of the validation results from both validations are present for view by the form
             foreach ($messageModel->validationResults() as $fieldName => $results) {
                 foreach ($results as $result) {
@@ -746,7 +763,7 @@ class ConversationModel extends ConversationsModel {
      * @param int $readingUserID Unique ID of current user.
      */
     public function markRead($conversationID, $readingUserID) {
-        // Update the the read conversation count for the user.
+        // Update the read conversation count for the user.
         $this->SQL->update('UserConversation uc')
             ->join('Conversation c', 'c.ConversationID = uc.ConversationID')
             ->set('uc.CountReadMessages', 'c.CountMessages', false)
@@ -860,7 +877,10 @@ class ConversationModel extends ConversationsModel {
                     [
                     'ActivityType' => 'AddedToConversation',
                     'NotifyUserID' => $addedUserID,
-                    'HeadlineFormat' => t('You were added to a conversation.', '{ActivityUserID,User} added you to a <a href="{Url,htmlencode}">conversation</a>.'),
+                    'HeadlineFormat' => t(
+                        'You were added to a conversation.',
+                        '{ActivityUserID,User} added you to a <a href="{Url,htmlencode}">conversation</a>.'
+                    ),
                     'Route' => '/messages/'.$conversationID
                     ],
                     'ConversationMessage'

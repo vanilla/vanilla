@@ -29,8 +29,8 @@ class ProcessorFixture implements Processor {
     /**
      * @inheritdoc
      */
-    public function handle(Operation $databaseOperation, callable $stack) {
-        $operation = call_user_func($this->callable, $databaseOperation);
-        return $stack($databaseOperation);
+    public function handle(Operation $operation, callable $stack) {
+        $r = call_user_func($this->callable, $operation);
+        return $stack($operation);
     }
 }

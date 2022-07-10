@@ -1,0 +1,64 @@
+openapi: 3.0.3
+info:
+paths:
+    /site-totals:
+        get:
+            summary: Get a list of site-total counts.
+            tags:
+                - Site Totals
+            parameters:
+                - name: siteSectionID
+                  description: Get the counts only for a specific site section (subcommunity).
+                  in: query
+                  schema:
+                      type: string
+                - $ref: "#/components/parameters/SiteTotalsCounts"
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/SiteTotalsCountsResponseFields"
+                    description: Success
+
+components:
+    parameters:
+        SiteTotalsCounts:
+            name: counts[]
+            description: Choose the site counts you want by choosing one or more valid field names. Choosing "all" will return all available counts.
+            in: query
+            schema:
+                type: array
+                items:
+                    type: string
+                    enum:
+                        - all
+            style: form
+    schemas:
+        Count:
+            type: object
+            properties:
+                count:
+                    type: integer
+                isCalculating:
+                    type: boolean
+                    description: Whether the value is currently being calculated.
+                isFiltered:
+                    type: boolean
+                    description: Indicates whether the count value has been filtered by siteSection
+        SiteTotalsCountsResponseFields:
+            type: object
+            properties:
+                siteSectionID:
+                    type: integer
+                counts:
+                    type: object
+                    properties:
+                        discussion:
+                            $ref: "#/components/schemas/Count"
+                        comment:
+                            $ref: "#/components/schemas/Count"
+                        category:
+                            $ref: "#/components/schemas/Count"
+                        user:
+                            $ref: "#/components/schemas/Count"

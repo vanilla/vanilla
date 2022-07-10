@@ -21,17 +21,12 @@ class ComposerHelper {
     const DISABLE_AUTO_BUILD = "VANILLA_BUILD_DISABLE_AUTO_BUILD";
 
     /**
-     * Clear the addon manager cache.
+     * Clear cached php files.
      */
-    private static function clearAddonManagerCache() {
+    public static function clearPhpCache() {
         $cacheDir = realpath(__DIR__.'/../../cache');
 
-        $paths = array_merge(
-            [$cacheDir.'/addon.php', $cacheDir.'/openapi.php'],
-            glob($cacheDir.'/locale/*.php'),
-            glob($cacheDir.'/theme/*.php'),
-            glob($cacheDir.'/*-index.php')
-        );
+        $paths = array_merge(glob($cacheDir.'/**/*.php'), glob($cacheDir.'/*.php'));
         foreach ($paths as $path) {
             if (file_exists($path)) {
                 unlink($path);
@@ -42,7 +37,7 @@ class ComposerHelper {
     /**
      * Clear the twig cache.
      */
-    private static function clearTwigCache() {
+    public static function clearTwigCache() {
         $cacheDir = realpath(__DIR__.'/../../cache');
 
         // Clear twig cache if it exists.
@@ -92,7 +87,9 @@ class ComposerHelper {
      * - VANILLA_BUILD_DISABLE_AUTO_BUILD - Prevent the build from running on composer install.
      */
     public static function postUpdate() {
-        $vanillaRoot = realpath(__DIR__ . "/../../");
+        require_once __DIR__ . "/../../environment.php";
+
+        $vanillaRoot = PATH_ROOT;
         $skipBuild = getenv(self::DISABLE_AUTO_BUILD) === 'true';
         if ($skipBuild) {
             printf("\nSkipping automatic JS build because " . self::DISABLE_AUTO_BUILD . " env variable is set to \"true\".\n");
@@ -101,29 +98,11 @@ class ComposerHelper {
 
         printf("\nInstalling core node_modules\n");
 
-        // --ignore-engines is used until https://github.com/vanilla/dev-inter-ops/issues/38 is resolved.
-        // Node 10.11.0 is run there and our linter has an engine requirement of 10.13.0
-        // We don't even run the linter as part of this process.
-        // It even technically works but many packages that support node 10 only want to support the LTS version (10.13.x).
-        passthru('yarn install --pure-lockfile --ignore-engines', $installReturn);
-
-        // Generate our vendor license file.
-        $distDir = $vanillaRoot . '/dist';
-        $licensePath = $distDir . '/VENDOR_LICENSES.txt';
-        if (!file_exists($distDir)) {
-            mkdir($distDir);
-        }
-        printf("\nGererating Vendor Licenses for build\n");
-        passthru("yarn licenses generate-disclaimer --prod --ignore-engines > $licensePath");
-
+        passthru('yarn install', $installReturn);
         if ($installReturn !== 0) {
             printf("Installing core node_modules failed\n");
             exit($installReturn);
         }
-
-        $buildScript = realpath($vanillaRoot . "/build/scripts/build.ts");
-        $tsNodeRegister = realpath($vanillaRoot . "/node_modules/ts-node/register");
-        $tsConfig = realpath($vanillaRoot . "/build/tsconfig.json");
 
         // Build bootstrap can be used to configure this build if env variables are not available.
         $buildBootstrap = realpath($vanillaRoot . "/conf/build-bootstrap.php");
@@ -131,17 +110,43 @@ class ComposerHelper {
             include $buildBootstrap;
         }
 
+        $buildScript = realpath($vanillaRoot . "/build/scripts/build.ts");
+        $buildDocsScript = realpath($vanillaRoot . "/build/scripts/variables/buildVariableDocs.ts");
+        $tsNodeRegister = realpath($vanillaRoot . "/node_modules/ts-node/register");
+        $tsConfig = realpath($vanillaRoot . "/build/tsconfig.json");
         $nodeArgs = getenv(self::NODE_ARGS_ENV) ?: "";
+        $lowMemoryFlag = getenv(self::DISABLE_VALIDATION_ENV) || getenv(self::LOW_MEMORY_ENV) ? "--low-memory" : "";
+
+        // Stderr gets swalled in some environments.
+        $stdoutRedirect = " 2>&1";
+
+        // Run build
+        $buildCommand = "TS_NODE_PROJECT=$tsConfig node $nodeArgs -r $tsNodeRegister $buildScript -i $lowMemoryFlag $stdoutRedirect";
+        printf("\nBuilding frontend assets\n");
+        printf("\n$buildCommand\n");
+        system($buildCommand, $buildResult);
+        if ($buildResult !== 0) {
+            printf("The build failed with code $buildResult");
+            exit($buildResult);
+        }
+
+        // Generate our vendor license file.
+        $distDir = PATH_DIST;
+        $licensePath = $distDir . '/VENDOR_LICENSES.txt';
+        if (!file_exists($distDir)) {
+            mkdir($distDir);
+        }
+        printf("\nGererating Vendor Licenses for build\n");
+        passthru("yarn licenses generate-disclaimer --production > $licensePath");
 
         // The disable validation flag was used to enable low memory optimizations.
         // The build no longer does any validation, however, so a new env variable has been added.
         // So, we check for both.
-        $lowMemoryFlag = getenv(self::DISABLE_VALIDATION_ENV) || getenv(self::LOW_MEMORY_ENV) ? "--low-memory" : "";
-        $buildCommand = "TS_NODE_PROJECT=$tsConfig node $nodeArgs -r $tsNodeRegister $buildScript -i $lowMemoryFlag";
+        $docsCommand = "TS_NODE_PROJECT=$tsConfig node $nodeArgs -r $tsNodeRegister $buildDocsScript -i $lowMemoryFlag $stdoutRedirect";
 
-        printf("\nBuilding frontend assets\n");
-        printf("\n$buildCommand\n");
-        system($buildCommand, $buildResult);
+        printf("\nBuilding variable documentation\n");
+        printf("\n$docsCommand\n");
+        system($docsCommand, $buildResult);
 
         if ($buildResult !== 0) {
             printf("The build failed with code $buildResult");
@@ -158,7 +163,7 @@ class ComposerHelper {
      * @param Event $event The event being fired.
      */
     public static function preUpdate(Event $event) {
-        self::clearAddonManagerCache();
+        self::clearPhpCache();
         self::clearTwigCache();
 
         // Check for a composer-local.json.

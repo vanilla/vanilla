@@ -5,14 +5,12 @@
  */
 
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
-import { IUsersStoreState } from "@library/features/users/userModel";
+import { IUsersStoreState } from "@library/features/users/userTypes";
 import SuggestionTrie from "@library/features/users/suggestion/SuggestionTrie";
 import { IUserSuggestion } from "@library/features/users/suggestion/IUserSuggestion";
 import UserSuggestionActions from "@library/features/users/suggestion/UserSuggestionActions";
 import ReduxReducer from "@library/redux/ReduxReducer";
-import moment from "moment";
-import { IUserFragment } from "@library/@types/api/users";
-
+import { getDateBysubStractDays, isSameOrAfterDate } from "@library/content/DateTimeHelpers";
 export interface IUserSuggestionState {
     lastSuccessfulUsername: string | null;
     currentUsername: string | null;
@@ -76,9 +74,9 @@ export default class UserSuggestionModel implements ReduxReducer<IUserSuggestion
      *
      * @param users The users to sort.
      * @param searchName The current search text.
-     * @param currentMoment The current time.
+     * @param currentDate The current time.
      */
-    public static sortSuggestions(users: IUserSuggestion[], searchName: string, currentMoment = moment()) {
+    public static sortSuggestions(users: IUserSuggestion[], searchName: string, currentDate = new Date()) {
         const looseCollator = Intl.Collator("en", {
             usage: "sort",
             sensitivity: "variant",
@@ -93,7 +91,7 @@ export default class UserSuggestionModel implements ReduxReducer<IUserSuggestion
         let recentlyActive: IUserSuggestion[] = [];
         let lessActive: IUserSuggestion[] = [];
 
-        const daysAgo90 = currentMoment.subtract(ACTIVE_THRESHOLD, "days");
+        const daysAgo90 = getDateBysubStractDays(currentDate, ACTIVE_THRESHOLD);
 
         for (const user of users) {
             if (!user.dateLastActive) {
@@ -101,8 +99,8 @@ export default class UserSuggestionModel implements ReduxReducer<IUserSuggestion
                 continue;
             }
 
-            const lastActiveMoment = moment(user.dateLastActive);
-            if (lastActiveMoment.isSameOrAfter(daysAgo90)) {
+            const lastActiveDate = user.dateLastActive ? new Date(user.dateLastActive) : new Date();
+            if (isSameOrAfterDate(lastActiveDate, daysAgo90)) {
                 recentlyActive.push(user);
             } else {
                 lessActive.push(user);

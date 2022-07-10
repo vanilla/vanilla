@@ -14,7 +14,7 @@ interface IProps {
     className?: string;
     disabled?: boolean;
     onClick: any;
-    baseClass?: ButtonTypes;
+    buttonType?: ButtonTypes;
     title?: string;
     compact?: boolean;
 }
@@ -24,7 +24,7 @@ interface IProps {
  */
 export default class CloseButton extends React.PureComponent<IProps> {
     public static defaultProps = {
-        baseClass: ButtonTypes.ICON,
+        buttonType: ButtonTypes.ICON,
         compact: false,
     };
 
@@ -40,7 +40,7 @@ export default class CloseButton extends React.PureComponent<IProps> {
                 className={componentClasses}
                 title={closeLabel}
                 onClick={this.props.onClick}
-                baseClass={this.props.baseClass}
+                buttonType={this.props.buttonType}
             >
                 {this.props.compact ? <CloseCompactIcon /> : <CloseIcon />}
             </Button>

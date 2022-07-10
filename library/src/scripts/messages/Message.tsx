@@ -4,8 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import classNames from "classnames";
+import React, { RefObject } from "react";
 import { t } from "@library/utility/appUtils";
 import { LiveMessage } from "react-aria-live";
 import { messagesClasses } from "@library/messages/messageStyles";
@@ -13,25 +12,39 @@ import Button from "@library/forms/Button";
 import Container from "@library/layout/components/Container";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import ButtonLoader from "@library/loaders/ButtonLoader";
-import ConditionalWrap from "@library/layout/ConditionalWrap";
+import { cx } from "@emotion/css";
 
 export interface IMessageProps {
+    /** Classes to be applied to the root of the component */
     className?: string;
+    /** The message content as rendered by the component */
     contents?: React.ReactNode;
+    /** Message content for screen readers */
     stringContents: string;
-    clearOnUnmount?: boolean; // reannounces the message if the page gets rerendered. This is an important message, so we want this by default.
+    /** Re-announces the message if the page gets rerendered. This is an important message, so we want this by default. */
+    clearOnUnmount?: boolean;
+    /** Handler for the confirm button */
     onConfirm?: () => void;
+    /** Optional confirm label, defaults to "OK" */
     confirmText?: React.ReactNode;
+    /** Handler for the cancel button */
     onCancel?: () => void;
+    /** Optional confirm label, defaults to "Cancel" */
     cancelText?: React.ReactNode;
+    /** Should the message be fixed to the top of the viewport */
     isFixed?: boolean;
     isContained?: boolean;
-    title?: string;
+    /** Title displayed above the message content */
+    title?: React.ReactNode;
+    /** Boolean which switches confirmation and cancel text with a spinner */
     isActionLoading?: boolean;
+    /** Icons that could be displayed beside the message */
     icon?: React.ReactNode | false;
+    /** The kind of message */
+    type?: "warning" | "error";
 }
 
-export default function Message(props: IMessageProps) {
+export const Message = React.forwardRef(function Message(props: IMessageProps, ref: RefObject<HTMLDivElement>) {
     const classes = messagesClasses();
 
     // When fixed we need to apply an extra layer for padding.
@@ -47,22 +60,30 @@ export default function Message(props: IMessageProps) {
 
     const icon_content = !hasTitle && hasIcon; //case - if message has icon and content.
     const icon_title_content = hasTitle && hasIcon; //case - if message has icon, title and content.
-    const noIcon = !hasIcon; // //case - if message has title, content and no icon
+    const noIcon = !hasIcon; //case - if message has title, content and no icon
 
     const iconMarkup = <div className={classes.iconPosition}>{props.icon}</div>;
+
+    const isError: boolean = !!props.type && props.type === "error";
 
     return (
         <>
             <div
-                className={classNames(classes.root, props.className, {
-                    [classes.fixed]: props.isFixed,
-                })}
+                ref={ref}
+                className={cx(
+                    classes.root,
+                    props.className,
+                    {
+                        [classes.fixed]: props.isFixed,
+                    },
+                    { [classes.error]: isError },
+                )}
             >
                 <OuterWrapper>
                     <div
-                        className={classNames(classes.wrap, props.className, {
+                        className={cx(classes.wrap, {
                             [classes.fixed]: props.isContained,
-                            [classes.hasIcon]: !!props.icon,
+                            [classes.wrapWithIcon]: !!props.icon,
                         })}
                     >
                         <InnerWrapper>
@@ -89,7 +110,7 @@ export default function Message(props: IMessageProps) {
                             </div>
                             {props.onCancel && (
                                 <Button
-                                    baseClass={ButtonTypes.TEXT}
+                                    buttonType={ButtonTypes.TEXT}
                                     onClick={props.onCancel}
                                     className={classes.actionButton}
                                     disabled={!!props.isActionLoading}
@@ -99,9 +120,9 @@ export default function Message(props: IMessageProps) {
                             )}
                             {props.onConfirm && (
                                 <Button
-                                    baseClass={ButtonTypes.TEXT}
+                                    buttonType={ButtonTypes.TEXT}
                                     onClick={props.onConfirm}
-                                    className={classNames(classes.actionButton, classes.actionButtonPrimary)}
+                                    className={cx(classes.actionButton, classes.actionButtonPrimary)}
                                     disabled={!!props.isActionLoading}
                                 >
                                     {props.isActionLoading ? <ButtonLoader /> : props.confirmText || t("OK")}
@@ -115,4 +136,6 @@ export default function Message(props: IMessageProps) {
             <LiveMessage clearOnUnmount={!!props.clearOnUnmount} message={props.stringContents} aria-live="assertive" />
         </>
     );
-}
+});
+
+export default Message;

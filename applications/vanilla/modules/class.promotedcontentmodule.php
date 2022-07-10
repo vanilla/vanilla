@@ -8,6 +8,10 @@
  * @since 2.0.17.9
  */
 
+use Garden\Schema\Schema;
+use Vanilla\Formatting\FormatService;
+use Vanilla\Web\TwigStaticRenderer;
+
 /**
  * Renders "Promoted" discussions and comments according to criteria.
  *
@@ -19,6 +23,15 @@ class PromotedContentModule extends Gdn_Module {
 
     /** @var integer Max number of records to be fetched. */
     const MAX_LIMIT = 50;
+
+    /** @var bool */
+    private $asHomeWidget = false;
+
+    /** @var string */
+    private $title;
+
+    /** @var FormatService */
+    private $formatService;
 
     /**
      * @var string How should we choose the content?
@@ -69,6 +82,28 @@ class PromotedContentModule extends Gdn_Module {
     public function __construct() {
         parent::__construct();
         $this->_ApplicationFolder = 'vanilla';
+        $this->formatService = \Gdn::formatService();
+    }
+
+    /**
+     * @param bool $asHomeWidget
+     */
+    public function setAsHomeWidget(bool $asHomeWidget): void {
+        $this->asHomeWidget = $asHomeWidget;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTitle(): string {
+        return $this->title ?? t('Promoted Content');
+    }
+
+    /**
+     * @param string $title
+     */
+    public function setTitle(string $title): void {
+        $this->title = $title;
     }
 
     /**
@@ -567,12 +602,15 @@ class PromotedContentModule extends Gdn_Module {
             }
 
             foreach ($section as $item) {
-                $itemField = val($field, $item);
-                $interleaved[$itemField] = array_merge($item, ['RecordType' => $sectionType]);
+                $interleaved[] = array_merge($item, ['RecordType' => $sectionType]);
 
                 ksort($interleaved);
             }
         }
+
+        usort($interleaved, function ($a, $b) use ($field) {
+            return $a[$field] <=> $b[$field];
+        });
 
         $interleaved = array_reverse($interleaved);
         return array_values($interleaved);
@@ -629,7 +667,7 @@ class PromotedContentModule extends Gdn_Module {
             }
             // check
             $rankName = null;
-            if (class_exists('RankModel')) {
+            if (class_exists('RankModel') && \Gdn::addonManager()->isEnabled('Ranks', 'addon')) {
                 $rankName = val('Name', RankModel::ranks(val('RankID', $user)), null);
             }
             $userProperties = [
@@ -718,6 +756,21 @@ class PromotedContentModule extends Gdn_Module {
     }
 
     /**
+     * Get the view all url if possible.
+     *
+     * @return string|null
+     */
+    private function getViewAllUrl(): ?string {
+        switch (strtolower($this->Selector)) {
+            case 'category':
+                return categoryUrl($this->Selection, true);
+            default:
+                // Other's not implemented or don't have pages available.
+                return null;
+        }
+    }
+
+    /**
      * Render.
      *
      * @return string
@@ -727,6 +780,42 @@ class PromotedContentModule extends Gdn_Module {
             $this->getData();
         }
 
-        return parent::toString();
+        if ($this->asHomeWidget) {
+            /** @var $content */
+            $content = $this->data('Content', []);
+            if (empty($content)) {
+                return '';
+            }
+
+            $cleanData = array_map([$this, 'mapLegacyItemToWidget'], $content);
+            $props = [
+                'title' => $this->getTitle(),
+                'itemData' => $cleanData,
+                'containerOptions' => [
+                    'maxColumnCount' => $this->Group,
+                    'viewAll' => [
+                        'to' => $this->getViewAllUrl(),
+                    ],
+                ]
+            ];
+
+            return TwigStaticRenderer::renderReactModule('HomeWidget', $props);
+        } else {
+            return parent::toString();
+        }
+    }
+
+    /**
+     * Map a legacy promoted content item into data for HomeWidget.
+     *
+     * @param array $legacyItem
+     * @return array
+     */
+    private function mapLegacyItemToWidget(array $legacyItem): array {
+        return [
+            'to' => $legacyItem['Url'],
+            'name' => $legacyItem['Name'],
+            'description' => $this->formatService->renderExcerpt($legacyItem['Body'], $legacyItem['Format']),
+        ];
     }
 }

@@ -11,6 +11,8 @@
  * @since 2.0.17
  */
 
+use Vanilla\CurrentTimeStamp;
+
 /**
  * Handles install-side analytics gathering and sending.
  */
@@ -43,13 +45,13 @@ class Gdn_Statistics extends Gdn_Pluggable {
     }
 
     /**
+     * Call the analytics server.
      *
-     *
-     * @param $method
-     * @param $requestParameters
+     * @param string $method
+     * @param array $requestParameters
      * @param bool $callback
      * @param bool $parseResponse
-     * @return array|bool|mixed|type
+     * @return array|bool|mixed
      * @throws Exception
      */
     public function analytics($method, $requestParameters, $callback = false, $parseResponse = true) {
@@ -58,7 +60,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
             array_unshift($fullMethod, "analytics");
         }
 
-        list($apiController, $apiMethod) = $fullMethod;
+        [$apiController, $apiMethod] = $fullMethod;
         $apiController = strtolower($apiController);
         $apiMethod = stringEndsWith(strtolower($apiMethod), '.json', true, true).'.json';
 
@@ -123,7 +125,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
      *
      * @param $method
      * @param $parameters
-     * @return array|bool|mixed|type
+     * @return array|bool|mixed
      */
     public function api($method, $parameters) {
         $apiResponse = $this->analytics($method, $parameters, false, false);
@@ -306,7 +308,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
      * @return bool
      */
     public static function cidrCheck($iP, $cIDR) {
-        list ($net, $mask) = explode("/", $cIDR);
+        [$net, $mask] = explode("/", $cIDR);
 
         // Allow non-standard /0 syntax
         if ($mask == 0) {
@@ -757,7 +759,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
         }
 
         if (Gdn::session()->checkPermission('Garden.Settings.Manage')) {
-            if (Gdn::get('Garden.Analytics.Notify', false) !== false) {
+            if (Gdn::get('Garden.Analytics.Notify', false) !== false && Gdn::controller() !== null) {
                 $callMessage = sprite('Bandaid', 'InformSprite');
                 $callMessage .= sprintf(t("There's a problem with Vanilla Analytics that needs your attention.<br/> Handle it <a href=\"%s\">here &raquo;</a>"), url('dashboard/statistics'));
                 Gdn::controller()->informMessage($callMessage, ['CssClass' => 'HasSprite']);
@@ -773,7 +775,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
             $confFile = PATH_CONF.'/config.php';
             if (!is_writable($confFile)) {
                 // Admins see a helpful notice
-                if (Gdn::session()->checkPermission('Garden.Settings.Manage')) {
+                if (Gdn::session()->checkPermission('Garden.Settings.Manage') && Gdn::controller() !== null) {
                     $warning = sprite('Sliders', 'InformSprite');
                     $warning .= t('Your config.php file is not writable.');
                     Gdn::controller()->informMessage($warning, ['CssClass' => 'HasSprite']);
@@ -813,16 +815,12 @@ class Gdn_Statistics extends Gdn_Pluggable {
 
         try {
             if (c('Garden.Analytics.Views.Denormalize', false) &&
-                Gdn::cache()->activeEnabled() &&
-                Gdn::cache()->type() != Gdn_Cache::CACHE_TYPE_NULL
+                Gdn::cache()->activeEnabled()
             ) {
                 $cacheKey = "QueryCache.Analytics.CountViews";
 
-                // Increment. If not success, create key.
-                $incremented = Gdn::cache()->increment($cacheKey);
-                if ($incremented === Gdn_Cache::CACHEOP_FAILURE) {
-                    Gdn::cache()->store($cacheKey, 1);
-                }
+                // Increment.
+                $incremented = Gdn::cache()->increment($cacheKey, 1, [Gdn_Cache::FEATURE_INITIAL => 1]);
 
                 // Get current cache value
                 $views = Gdn::cache()->get($cacheKey);
@@ -830,11 +828,8 @@ class Gdn_Statistics extends Gdn_Pluggable {
                 if ($viewType == 'embed') {
                     $embedCacheKey = "QueryCache.Analytics.CountEmbedViews";
 
-                    // Increment. If not success, create key.
-                    $embedIncremented = Gdn::cache()->increment($embedCacheKey);
-                    if ($embedIncremented === Gdn_Cache::CACHEOP_FAILURE) {
-                        Gdn::cache()->store($embedCacheKey, 1);
-                    }
+                    // Increment.
+                    $embedIncremented = Gdn::cache()->increment($embedCacheKey, 1, [Gdn_Cache::FEATURE_INITIAL => 1]);
 
                     // Get current cache value
                     $embedViews = Gdn::cache()->get($embedCacheKey);
@@ -843,8 +838,10 @@ class Gdn_Statistics extends Gdn_Pluggable {
                 // Every X views, writeback to AnalyticsLocal
                 $denormalizeWriteback = c('Garden.Analytics.Views.DenormalizeWriteback', 10);
                 if (($views % $denormalizeWriteback) == 0) {
-                    Gdn::controller()->setData('WritebackViews', $views);
-                    Gdn::controller()->setData('WritebackEmbed', $embedViews);
+                    if (Gdn::controller() !== null) {
+                        Gdn::controller()->setData('WritebackViews', $views);
+                        Gdn::controller()->setData('WritebackEmbed', $embedViews);
+                    }
 
                     Gdn::database()->query(
                         "insert into {$px}AnalyticsLocal (TimeSlot, Views, EmbedViews) values (:TimeSlot, {$views}, {$embedViews})
@@ -893,7 +890,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
      * @return int
      */
     public static function time() {
-        return time();
+        return CurrentTimeStamp::get();
     }
 
     /**
@@ -1004,7 +1001,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
             return 0;
         }
 
-        list($year, $month, $day, $hour, $minute) = [1, 1, 1, 0, 0];
+        [$year, $month, $day, $hour, $minute] = [1, 1, 1, 0, 0];
         if ($resolution == 'auto') {
             $timeslotLength = strlen($timeSlot);
         } else {
@@ -1082,7 +1079,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
      * THIS METHOD USES ALL SUPPLIED ARGUMENTS IN ITS SIGNATURE HASH ALGORITHM
      * ****
      *
-     * @param type $request Array of request parameters
+     * @param array $request Array of request parameters
      * @return boolean Status of verification check, or null if no VanillaID
      */
     protected function verifySignature($request) {

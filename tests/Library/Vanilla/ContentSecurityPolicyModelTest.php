@@ -141,7 +141,7 @@ class ContentSecurityPolicyModelTest extends MinimalContainerTestCase {
         $uaSniffer = new MockUASniffer($isIE11);
         $logger = new Logger();
 
-        $cspModel = new ContentSecurityPolicyModel($uaSniffer, $logger);
+        $cspModel = new ContentSecurityPolicyModel($uaSniffer, $logger, \Gdn::config());
         $provider = new DefaultContentSecurityPolicyProvider($config);
         $cspModel->addProvider($provider);
 

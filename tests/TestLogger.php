@@ -9,6 +9,7 @@ namespace VanillaTests;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
+use Vanilla\Utility\ArrayUtils;
 
 /**
  * A test logger that collects all messages in an array.
@@ -16,10 +17,12 @@ use Psr\Log\LoggerTrait;
 class TestLogger implements LoggerInterface {
     use LoggerTrait;
 
+    private const SEARCH_FALLBACK = '_FALLBACK_DONT_USE';
+
     /**
      * @var array
      */
-    private $log;
+    private $log = [];
 
     /**
      * {@inheritdoc}
@@ -58,9 +61,17 @@ class TestLogger implements LoggerInterface {
         foreach ($this->log as $item) {
             $found = true;
             foreach ($filter as $key => $value) {
-                if (!array_key_exists($key, $item) || $item[$key] != $value) {
-                    $found = false;
-                    break;
+                if (str_contains($key, ".")) {
+                    $actual = ArrayUtils::getByPath($key, $item, self::SEARCH_FALLBACK);
+                    if ($actual != $value) {
+                        $found = false;
+                        break;
+                    }
+                } else {
+                    if (!array_key_exists($key, $item) || $item[$key] != $value) {
+                        $found = false;
+                        break;
+                    }
                 }
             }
             if ($found) {
@@ -68,6 +79,21 @@ class TestLogger implements LoggerInterface {
             }
         }
         return null;
+    }
+
+    /**
+     * Checks to see if the log has a message, doing a substring match.
+     *
+     * @param string $message
+     * @return bool
+     */
+    public function hasMessage(string $message): bool {
+        foreach ($this->log as $item) {
+            if (strpos($item['message'], $message) !== false) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

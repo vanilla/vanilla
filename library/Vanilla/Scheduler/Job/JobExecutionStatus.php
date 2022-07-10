@@ -1,23 +1,26 @@
 <?php
 /**
  * @author Eduardo Garcia Julia <eduardo.garciajulia@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace Vanilla\Scheduler\Job;
 
+use JsonSerializable;
+
 /**
  * Job Status
  */
-class JobExecutionStatus {
+class JobExecutionStatus implements JsonSerializable {
+
     /**
      * @var string
      */
     protected $myStatus;
 
     /**
-     * HandledJobStatus constructor.
+     * JobExecutionStatus constructor
      *
      * @param string $status
      */
@@ -29,6 +32,13 @@ class JobExecutionStatus {
      * @return string
      */
     public function getStatus(): string {
+        return $this->myStatus;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function jsonSerialize() {
         return $this->myStatus;
     }
 
@@ -124,6 +134,19 @@ class JobExecutionStatus {
      */
     public static function unknown() {
         return new JobExecutionStatus('unknown');
+    }
+
+    /**
+     * Get a list of incomplete statuses.
+     *
+     * @return string[]
+     */
+    public static function incompleteStatuses(): array {
+        return [
+            self::received()->getStatus(),
+            self::progress()->getStatus(),
+            self::intended()->getStatus(),
+        ];
     }
 
     /**

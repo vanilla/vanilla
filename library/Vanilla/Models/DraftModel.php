@@ -59,6 +59,6 @@ class DraftModel extends PipelineModel {
             ->groupBy('insertUserID')
             ->get()->nextRow(DATASET_TYPE_ARRAY);
 
-         return $countRecord['draftCount'];
+        return $countRecord['draftCount'] ?? 0;
     }
 }

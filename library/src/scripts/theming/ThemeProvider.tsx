@@ -16,7 +16,8 @@ import { useSelector } from "react-redux";
 import { loadThemeFonts } from "./loadThemeFonts";
 import { Backgrounds, BackgroundsProvider } from "@library/layout/Backgrounds";
 import { BrowserRouter } from "react-router-dom";
-import { useThemeCacheID } from "@library/styles/styleUtils";
+import { useThemeCacheID } from "@library/styles/themeCache";
+import { loadThemeShadowDom } from "@library/theming/loadThemeShadowDom";
 
 interface IProps {
     children: React.ReactNode;
@@ -54,18 +55,11 @@ export const ThemeProvider: React.FC<IProps> = (props: IProps) => {
 
         if (assets.data && !hasMounted) {
             hasMounted = true;
-            let themeHeader = document.getElementById("themeHeader");
-            const themeFooter = document.getElementById("themeFooter");
-
+            loadThemeShadowDom();
+            const themeHeader = document.getElementById("themeHeader");
             if (themeHeader) {
-                themeHeader = prepareShadowRoot(themeHeader, true);
-
                 // Apply the theme's header height to offset our panel layouts.
                 setTopOffset(themeHeader.getBoundingClientRect().height);
-            }
-
-            if (themeFooter) {
-                prepareShadowRoot(themeFooter, true);
             }
 
             loadThemeFonts();

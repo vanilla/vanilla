@@ -1,71 +1,115 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php use Vanilla\Theme\BoxThemeShim;
+use Vanilla\Utility\HtmlUtils;
+
+if (!defined('APPLICATION')) exit();
 $Session = Gdn::session();
 if (!function_exists('WriteComment'))
     include $this->fetchViewLocation('helper_functions', 'discussion');
 
-// Wrap the discussion related content in a div.
-echo '<div class="MessageList Discussion">';
 
-// Write the page title.
-echo '<!-- Page Title -->
-<div id="Item_0" class="PageTitle">';
+$writeDiscussionPageHeader = function ($sender) {
+    $writeOptionsMenu = function ($withFireEvent = true) use ($sender) {
+        echo '<div class="Options">';
+        if ($withFireEvent) {
+            $sender->fireEvent('BeforeDiscussionOptions');
+        }
+        writeBookmarkLink();
+        echo getDiscussionOptionsDropdown();
+        writeAdminCheck();
+        echo '</div>';
+    };
 
-echo '<div class="Options">';
+    // Write the page title.
+    echo '<div id="Item_0" class="PageTitle pageHeadingBox isLarge">';
+        if (!BoxThemeShim::isActive()) {
+            $writeOptionsMenu();
+        }
+        //this is for data driven themes, to add the resolved status/icon before title
+        if (BoxThemeShim::isActive()) {
+            $sender->fireEvent('BeforeDiscussionOptions');
+        }
+        echo '<h1>'.($sender->data('Discussion.displayName') ? $sender->data('Discussion.displayName') : $sender->data('Discussion.Name')).'</h1>';
+        if (BoxThemeShim::isActive()) {
+            $writeOptionsMenu(false);
+        }
+    echo "</div>";
 
-$this->fireEvent('BeforeDiscussionOptions');
-writeBookmarkLink();
-echo getDiscussionOptionsDropdown();
-writeAdminCheck();
+    $sender->fireEvent('AfterDiscussionTitle');
+    $sender->fireEvent('AfterPageTitle');
+};
 
-echo '</div>';
-
-echo '<h1>'.$this->data('Discussion.Name').'</h1>';
-
-echo "</div>\n\n";
-
-$this->fireEvent('AfterDiscussionTitle');
-$this->fireEvent('AfterPageTitle');
-
-// Write the initial discussion.
-if ($this->data('Page') == 1) {
-    include $this->fetchViewLocation('discussion', 'discussion');
-    echo '</div>'; // close discussion wrap
-
-    $this->fireEvent('AfterDiscussion');
-} else {
-    echo '</div>'; // close discussion wrap
+if (BoxThemeShim::isActive()) {
+    // With the shim, the h1 goes outside the top level box.
+    $writeDiscussionPageHeader($this);
 }
 
-echo '<div class="CommentsWrap">';
+BoxThemeShim::startBox();
 
-// Write the comments.
-$this->Pager->Wrapper = '<span %1$s>%2$s</span>';
-echo '<span class="BeforeCommentHeading">';
-$this->fireEvent('CommentHeading');
-echo $this->Pager->toString('less');
-echo '</span>';
+    // Wrap the discussion related content in a div.
+    echo '<div class="MessageList Discussion">';
 
-echo '<div class="DataBox DataBox-Comments">';
-if ($this->data('Comments')->numRows() > 0)
-    echo '<h2 class="CommentHeading">'.$this->data('_CommentsHeader', t('Comments')).'</h2>';
-?>
-    <ul class="MessageList DataList Comments">
-        <?php include $this->fetchViewLocation('comments'); ?>
-    </ul>
-<?php
-$this->fireEvent('AfterComments');
-if ($this->Pager->lastPage()) {
-    $LastCommentID = $this->addDefinition('LastCommentID');
-    if (!$LastCommentID || $this->Data['Discussion']->LastCommentID > $LastCommentID)
-        $this->addDefinition('LastCommentID', (int)$this->Data['Discussion']->LastCommentID);
-    $this->addDefinition('Vanilla_Comments_AutoRefresh', Gdn::config('Vanilla.Comments.AutoRefresh', 0));
-}
-echo '</div>';
+        if (!BoxThemeShim::isActive()) {
+            // Without the shim the h1 goes inside the box for compatibility reasons.
+            $writeDiscussionPageHeader($this);
+        }
 
-echo '<div class="P PagerWrap">';
-$this->Pager->Wrapper = '<div %1$s>%2$s</div>';
-echo $this->Pager->toString('more');
-echo '</div>';
-echo '</div>';
+        $isFirstPage = $this->data('Page') == 1;
 
-writeCommentForm();
+        if ($isFirstPage) {
+            // First page renders the discussion itself.
+            include $this->fetchViewLocation('discussion', 'discussion');
+        }
+    echo '</div>'; // close discussion wrap
+
+    if ($isFirstPage) {
+        //for dataDriven themes we render GuestModule after discussion as well, if there are at least some comments
+        if (!Gdn::session()->isValid() && Gdn::themeFeatures()->get("DataDrivenTheme") && $this->data('Comments')->numRows() > 2) {
+            /** @var GuestModule  $guestModule */
+            $guestModule = Gdn::getContainer()->get(GuestModule::class);
+            $guestModule->setWidgetAlignment("center");
+            echo $guestModule;
+        }
+        // First page may have plugins to render after the discussion.
+        $this->fireEvent('AfterDiscussion');
+    }
+
+    // Comments
+    BoxThemeShim::inactiveHtml('<div class="CommentsWrap">');
+
+        // Write the comments.
+        $this->Pager->Wrapper = '<span %1$s>%2$s</span>';
+        echo '<span class="BeforeCommentHeading">';
+            $this->fireEvent('CommentHeading');
+            echo $this->Pager->toString('less');
+        echo '</span>';
+
+        BoxThemeShim::inactiveHtml('<div class="DataBox DataBox-Comments">');
+            $hasComments = $this->data('Comments')->numRows() > 0;
+            if ($hasComments) {
+                BoxThemeShim::startHeading();
+                echo '<h2 class="CommentHeading">' . $this->data('_CommentsHeader', t('Comments')) . '</h2>';
+                BoxThemeShim::endHeading();
+            }
+            $listClasses = HtmlUtils::classNames("MessageList DataList Comments", $hasComments ? 'pageBox' : '');
+            ?>
+            <ul class="<?php echo $listClasses ?>">
+                <?php include $this->fetchViewLocation('comments'); ?>
+            </ul>
+            <?php
+            $this->fireEvent('AfterComments');
+            if ($this->Pager->lastPage()) {
+                $LastCommentID = $this->addDefinition('LastCommentID');
+                if (!$LastCommentID || $this->Data['Discussion']->LastCommentID > $LastCommentID)
+                    $this->addDefinition('LastCommentID', (int)$this->Data['Discussion']->LastCommentID);
+                $this->addDefinition('Vanilla_Comments_AutoRefresh', Gdn::config('Vanilla.Comments.AutoRefresh', 0));
+            }
+        BoxThemeShim::inactiveHtml('</div>');
+
+        echo '<div class="P PagerWrap">';
+            $this->Pager->Wrapper = '<div %1$s>%2$s</div>';
+            echo $this->Pager->toString('more');
+        echo '</div>'; // End pager.
+    BoxThemeShim::inactiveHtml('</div>');
+    writeCommentForm();
+
+BoxThemeShim::endBox();

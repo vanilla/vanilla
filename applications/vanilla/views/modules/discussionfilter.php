@@ -1,8 +1,12 @@
 <?php
+if (!defined('APPLICATION')) exit();
 
 use Vanilla\Utility\HtmlUtils;
 
-if (!defined('APPLICATION')) exit();
+if (\Gdn::themeFeatures()->useNewQuickLinks()) {
+    echo \Gdn_Theme::module(\Vanilla\Theme\VariableProviders\QuickLinksModule::class);
+    return;
+}
 
 $Controller = Gdn::controller();
 $Session = Gdn::session();
@@ -18,9 +22,9 @@ $CountDiscussions = 0;
 $CountDrafts = 0;
 
 if ($Session->isValid()) {
-    $CountBookmarks = $Session->User->CountBookmarks;
-    $CountDiscussions = $Session->User->CountDiscussions;
-    $CountDrafts = $Session->User->CountDrafts;
+    $CountBookmarks = $Session->User->CountBookmarks ?? 0;
+    $CountDiscussions = $Session->User->CountDiscussions ?? 0;
+    $CountDrafts = $Session->User->CountDrafts ?? 0;
 }
 
 if (!function_exists('FilterCountString')) {
@@ -38,15 +42,15 @@ $titleClasses = HtmlUtils::classNames(
     !Gdn::themeFeatures()->useDataDrivenTheme() && "sr-only",
     "BoxFilter-HeadingWrap"
 );
-
+$titleID = "BoxFilterTitle";
 ?>
-<div class="BoxFilter BoxDiscussionFilter">
+<div class="BoxFilter BoxDiscussionFilter" role="navigation" aria-labelledby="<?php echo $titleID ?>">
     <span class="<?php echo $titleClasses ?>">
-        <h2 class="BoxFilter-Heading">
+        <h2 id="<?php echo $titleID ?>" class="BoxFilter-Heading">
             <?php echo t('Quick Links'); ?>
         </h2>
     </span>
-    <ul role="nav" class="FilterMenu">
+    <ul class="FilterMenu">
         <?php
         $Controller->fireEvent('BeforeDiscussionFilters');
         //      if (c('Vanilla.Categories.ShowTabs')) {

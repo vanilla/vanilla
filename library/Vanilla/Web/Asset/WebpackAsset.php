@@ -20,50 +20,27 @@ class WebpackAsset extends SiteAsset {
     protected $fsRoot = PATH_ROOT;
 
     /** @var string */
-    protected $assetName;
-
-    /** @var string */
-    protected $extension;
-
-    /** @var string The subpath between the script name and the DIST root on the filesystem. */
-    protected $fileSubpath;
-
-    /** @var string The subpath between the script name and the DIST root on the web server.  */
-    protected $webSubpath;
+    protected $assetPath;
 
     /**
      * Constructor.
      *
      * @param RequestInterface $request The current request.
-     * @param string $extension The file extension to use.
-     * @param string $section The section of the site to get scripts for.
-     * @see https://docs.vanillaforums.com/developer/tools/building-frontend/#site-sections
-     * @param string $assetName The name of the asset to get.
-     * @param string $cacheBusterKey A key to bust the cache.
+     * @param string $assetPath
      */
     public function __construct(
         RequestInterface $request,
-        string $extension,
-        string $section,
-        string $assetName,
-        $cacheBusterKey = ""
+        string $assetPath
     ) {
-        parent::__construct($request, $cacheBusterKey);
-        $this->extension = $extension;
-        $this->assetName = $assetName;
-        $this->fileSubpath = $section;
-        $this->webSubpath = $section;
+        parent::__construct($request);
+        $this->assetPath = $assetPath;
     }
 
     /**
      * @inheritdoc
      */
     public function getWebPath(): string {
-        return $this->makeAssetPath(
-            'dist',
-            $this->webSubpath,
-            $this->assetName . $this->extension
-        );
+        return $this->makeAssetPath($this->assetPath);
     }
 
     /**
@@ -81,9 +58,7 @@ class WebpackAsset extends SiteAsset {
     private function getFilePath(): string {
         return SiteAsset::joinFilePath(
             $this->fsRoot,
-            "dist",
-            $this->fileSubpath,
-            $this->assetName . $this->extension
+            $this->assetPath
         );
     }
 

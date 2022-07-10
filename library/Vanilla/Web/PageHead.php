@@ -12,6 +12,7 @@ use Garden\Web\RequestInterface;
 use Twig\Markup;
 use Vanilla\Contracts\Web\AssetInterface;
 use Vanilla\Models\SiteMeta;
+use Vanilla\Models\SiteMetaExtra;
 use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Web\Asset\AssetPreloadModel;
 use Vanilla\Web\Asset\WebpackAssetProvider;
@@ -22,7 +23,6 @@ use Vanilla\Web\JsInterpop\PhpAsJsVariable;
  * Class for holding information for rendering and HMTL page head.
  */
 final class PageHead implements PageHeadInterface {
-
     use TwigRenderTrait;
 
     /** @var ContentSecurityPolicyModel */
@@ -108,6 +108,9 @@ final class PageHead implements PageHeadInterface {
     /** @var AbstractJsonLDItem */
     private $jsonLDItems = [];
 
+    /** @var SiteMetaExtra */
+    private $siteMetaExtras = [];
+
     /**
      * @return Markup
      */
@@ -119,7 +122,7 @@ final class PageHead implements PageHeadInterface {
         $this->styles = array_merge($this->styles, $this->assetProvider->getStylesheets($this->assetSection));
 
         $this->inlineScripts[] = new PhpAsJsVariable('gdn', [
-            'meta' => $this->siteMeta,
+            'meta' => $this->siteMeta->value($this->siteMetaExtras),
         ]);
         $viewData = [
             'nonce' => $this->cspModel->getNonce(),
@@ -273,9 +276,17 @@ final class PageHead implements PageHeadInterface {
     }
 
     /**
+     * @inheritdoc
+     */
+    public function addSiteMetaExtra(SiteMetaExtra $extra) {
+        $this->siteMetaExtras[] = $extra;
+        return $this;
+    }
+
+    /**
      * Use existing site data to create open graph meta tags.
      */
-    private function applyMetaTags() {
+    public function applyMetaTags() {
 
         // Standard meta tags
         if ($this->seoDescription) {
@@ -315,12 +326,30 @@ final class PageHead implements PageHeadInterface {
      * Get the content of the page's JSON-LD script.
      * @return string
      */
-    private function getJsonLDScriptContent(): string {
+    public function getJsonLDScriptContent(): string {
         $data = [
             '@context' => "https://schema.org",
             "@graph" => $this->jsonLDItems,
         ];
 
         return json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+    }
+
+    /**
+     * Return MetaTags.
+     *
+     * @return array
+     */
+    public function getMetaTags(): array {
+        return $this->metaTags;
+    }
+
+    /**
+     * Return MetaTags.
+     *
+     * @return array
+     */
+    public function getLinkTags(): array {
+        return $this->linkTags;
     }
 }

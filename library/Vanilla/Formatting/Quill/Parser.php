@@ -24,6 +24,7 @@ class Parser {
         'insert' => "\n",
     ]];
 
+    const PARSE_MODE_EXTENDED = "extended";
     const PARSE_MODE_NORMAL = "normal";
     const PARSE_MODE_QUOTE = "quote";
 
@@ -196,10 +197,9 @@ class Parser {
      */
     public function getFormatsForOperations(array $currentOp, array $previousOp = [], array $nextOp = []) {
         $formats = [];
-        /** @var Formats\AbstractFormat $format */
         foreach ($this->formatClasses as $format) {
             if ($format::matches([$currentOp])) {
-                /** @var Formats\AbstractFormat $formatInstance */
+                // @psalm-suppress UndefinedClass
                 $formats[] = new $format($currentOp, $previousOp, $nextOp);
             }
         }

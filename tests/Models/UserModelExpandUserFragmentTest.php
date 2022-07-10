@@ -8,14 +8,14 @@
 namespace VanillaTests\Models;
 
 use PHPUnit\Framework\TestCase;
-use VanillaTests\ExpectErrorTrait;
+use VanillaTests\ExpectExceptionTrait;
 use VanillaTests\SiteTestTrait;
 
 /**
  * Some basic tests for the `UserModel`.
  */
 class UserModelExpandUserFragmentTest extends TestCase {
-    use SiteTestTrait, ExpectErrorTrait;
+    use SiteTestTrait, ExpectExceptionTrait;
 
     /**
      * @var \UserModel
@@ -58,7 +58,8 @@ class UserModelExpandUserFragmentTest extends TestCase {
             'email' => $name.'@mail.com',
             'Password' => 'test',
             'HashMethod' => 'text',
-            'DateInserted' => date("Y-m-d H:i:s")
+            'DateInserted' => date("Y-m-d H:i:s"),
+            'DateLastActive' => date("Y-m-d H:i:s"),
         ];
         $userID = (int)$this->model->SQL->insert($this->model->Name, $user);
         $this->assertGreaterThan(0, $userID);
@@ -94,6 +95,23 @@ class UserModelExpandUserFragmentTest extends TestCase {
     }
 
     /**
+     * Test that empty username are replaced by 'Unknown' by UserModel::expandUsers.
+     */
+    public function testExpandUserNoUserName() {
+        $user = [
+            'name' => '',
+            'email' => 'noUserName@mail.com',
+            'Password' => 'test',
+            'HashMethod' => 'text',
+            'DateInserted' => date("Y-m-d H:i:s")
+        ];
+        $userID = (int)$this->model->SQL->insert($this->model->Name, $user);
+        $row = ['insertUser' => $userID];
+        $this->model->expandUsers($row, ['insertUser']);
+        $this->assertEquals('Unknown', $row['insertUser']['name']);
+    }
+
+    /**
      * Test UserModel->getFragmnetById method
      */
     public function testGetFragmentById() {
@@ -103,7 +121,8 @@ class UserModelExpandUserFragmentTest extends TestCase {
             'email' => $name.'@mail.com',
             'Password' => 'test',
             'HashMethod' => 'text',
-            'DateInserted' => date("Y-m-d H:i:s")
+            'DateInserted' => date("Y-m-d H:i:s"),
+            'DateLastActive' => date("Y-m-d H:i:s")
         ];
         $userID = (int)$this->model->SQL->insert($this->model->Name, $user);
         $this->assertGreaterThan(0, $userID);

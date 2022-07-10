@@ -11,11 +11,11 @@ import FrameFooter from "@library/layout/frame/FrameFooter";
 import { t } from "@library/utility/appUtils";
 import { EditorEventWall } from "@rich-editor/editor/pieces/EditorEventWall";
 import { embedMenuClasses } from "@rich-editor/editor/pieces/embedMenuStyles";
-import Frame from "@vanilla/library/src/scripts/layout/frame/Frame";
-import FrameHeader from "@vanilla/library/src/scripts/layout/frame/FrameHeader";
-import Modal from "@vanilla/library/src/scripts/modal/Modal";
-import ModalSizes from "@vanilla/library/src/scripts/modal/ModalSizes";
-import { useUniqueID } from "@vanilla/library/src/scripts/utility/idUtils";
+import Frame from "@library/layout/frame/Frame";
+import FrameHeader from "@library/layout/frame/FrameHeader";
+import LazyModal from "@library/modal/LazyModal";
+import ModalSizes from "@library/modal/ModalSizes";
+import { useUniqueID } from "@library/utility/idUtils";
 import { useLastValue } from "@vanilla/react-utils";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
@@ -39,7 +39,7 @@ export function ImageEmbedModal(props: IProps) {
     const [alt, setAlt] = useState(props.initialAlt);
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const handleTextChange = useCallback(event => {
+    const handleTextChange = useCallback((event) => {
         if (event) {
             event.stopPropagation();
             event.preventDefault();
@@ -63,7 +63,7 @@ export function ImageEmbedModal(props: IProps) {
     const titleID = useUniqueID("modalTitle");
 
     return (
-        <Modal isVisible={props.isVisible} size={ModalSizes.SMALL} titleID={titleID} exitHandler={props.onClose}>
+        <LazyModal isVisible={props.isVisible} size={ModalSizes.SMALL} titleID={titleID} exitHandler={props.onClose}>
             <EditorEventWall>
                 <form className={classes.form}>
                     <Frame
@@ -95,8 +95,8 @@ export function ImageEmbedModal(props: IProps) {
                         footer={
                             <FrameFooter justifyRight={true}>
                                 <Button
-                                    baseClass={ButtonTypes.TEXT_PRIMARY}
-                                    onClick={e => {
+                                    buttonType={ButtonTypes.TEXT_PRIMARY}
+                                    onClick={(e) => {
                                         e.preventDefault();
                                         e.stopPropagation();
                                         saveAndClose();
@@ -109,6 +109,6 @@ export function ImageEmbedModal(props: IProps) {
                     />
                 </form>
             </EditorEventWall>
-        </Modal>
+        </LazyModal>
     );
 }

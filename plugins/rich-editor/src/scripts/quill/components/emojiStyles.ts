@@ -4,11 +4,11 @@
  * @license Proprietary
  */
 
-import { useThemeCache } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { cssRule } from "typestyle";
+import { cssRule } from "@library/styles/styleShim";
 import { em, percent } from "csx";
-import { margins } from "@library/styles/styleHelpers";
+import { Mixins } from "@library/styles/Mixins";
 
 export const emojiCSS = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -31,7 +31,7 @@ export const emojiCSS = useThemeCache(() => {
         display: "inline-block",
         height: em(1),
         width: em(1),
-        ...margins({
+        ...Mixins.margin({
             vertical: 0,
             right: em(0.05),
             left: em(0.1),

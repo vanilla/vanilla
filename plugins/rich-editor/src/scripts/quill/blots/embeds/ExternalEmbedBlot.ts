@@ -4,7 +4,8 @@
  * @license GPL-2.0-only
  */
 
-import { FOCUS_CLASS, IBaseEmbedProps } from "@library/embeddedContent/embedService";
+import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
+import { EMBED_FOCUS_CLASS } from "@library/embeddedContent/embedConstants";
 import { getData, setData } from "@vanilla/dom-utils";
 import { mountEmbed } from "@library/embeddedContent/embedService";
 import ProgressEventEmitter from "@library/utility/ProgressEventEmitter";
@@ -13,6 +14,7 @@ import LoadingBlot from "@rich-editor/quill/blots/embeds/LoadingBlot";
 import { forceSelectionUpdate } from "@rich-editor/quill/utility";
 import { logError } from "@vanilla/utils";
 import { SelectableEmbedBlot } from "@rich-editor/quill/blots/abstract/SelectableEmbedBlot";
+import { extractServerError } from "@library/apiv2";
 
 const DATA_KEY = "__embed-data__";
 
@@ -153,7 +155,7 @@ export default class ExternalEmbedBlot extends SelectableEmbedBlot {
 
         // Remove the focus class. It should be handled by the mounted embed at this point.
         loaderElement && loaderElement.remove();
-        jsEmbed.classList.remove(FOCUS_CLASS);
+        jsEmbed.classList.remove(EMBED_FOCUS_CLASS);
         // Trigger an update.
         forceSelectionUpdate();
     }
@@ -187,7 +189,7 @@ export default class ExternalEmbedBlot extends SelectableEmbedBlot {
         }
 
         resolvedPromise
-            .then(data => {
+            .then((data) => {
                 // DOM node has been removed from the document.
                 if (!document.contains(this.domNode)) {
                     return;
@@ -201,14 +203,14 @@ export default class ExternalEmbedBlot extends SelectableEmbedBlot {
                 const loader = (this.domNode as Element).querySelector(".embedLinkLoader");
                 void this.createEmbedFromData(data, loader, newValue);
             })
-            .catch(e => {
+            .catch((e) => {
                 logError(e);
                 // DOM node has been removed from the document.
                 if (!document.contains(this.domNode)) {
                     return;
                 }
                 const errorData: IErrorData = {
-                    error: e,
+                    error: extractServerError(e),
                     type: value.loaderData.type === "file" ? ErrorBlotType.FILE : ErrorBlotType.STANDARD,
                     file: value.loaderData.file,
                 };

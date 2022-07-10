@@ -6,33 +6,32 @@
 
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { storiesOf } from "@storybook/react";
-import React from "react";
+import React, { CSSProperties } from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
-import RadioTabs from "@library/forms/radioTabs/RadioTabs";
 import { t } from "@library/utility/appUtils";
-import RadioTab from "@library/forms/radioTabs/RadioTab";
 import InputBlock from "@library/forms/InputBlock";
 import InputTextBlock from "@library/forms/InputTextBlock";
 import MultiUserInput from "@library/features/users/MultiUserInput";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
-import DateRange from "@library/forms/DateRange";
 import Checkbox from "@library/forms/Checkbox";
 import StoryExampleDropDownSearch from "@library/flyouts/StoryExampleDropDownSearch";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import RadioButton from "@library/forms/RadioButton";
-import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import "@library/forms/datePicker.scss";
 import RadioButtonGroup from "@library/forms/RadioButtonGroup";
 import CheckboxGroup from "@library/forms/CheckboxGroup";
 import { StorySmallContent } from "@library/storybook/StorySmallContent";
 import { FormToggle } from "@library/forms/FormToggle";
 import { flexHelper } from "@library/styles/styleHelpers";
+import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
+import { suggestedTextStyleHelper } from "@library/features/search/suggestedTextStyles";
+import LazyDateRange from "@library/forms/LazyDateRange";
 
 const story = storiesOf("Forms/User Facing", module);
 
 story.add("Elements", () => {
-    let activeTab = "Tab A";
+    let activeItem = "Tab A";
 
     /**
      * Simple form setter.
@@ -45,6 +44,8 @@ story.add("Elements", () => {
     // To avoid clashing with other components also using these radio buttons, you need to generate a unique ID for the group.
 
     const radioButtonGroup1 = uniqueIDFromPrefix("radioButtonGroupA");
+
+    cssOut(`.suggestedTextInput-option`, suggestedTextStyleHelper().option);
 
     return (
         <StoryContent>
@@ -67,14 +68,14 @@ story.add("Elements", () => {
                 <Checkbox label="Option D" />
             </CheckboxGroup>
             <StoryHeading>Toggles</StoryHeading>
-            <div style={flexHelper().middle()}>
+            <div style={flexHelper().middle() as CSSProperties}>
                 <StoryToggle accessibleLabel="Enabled" enabled={true} />
                 <StoryToggle accessibleLabel="Disabled" enabled={false} />
                 <StoryToggle accessibleLabel="Indeterminate" indeterminate enabled={true} />
                 <StoryToggle accessibleLabel="Indeterminate" indeterminate enabled={false} />
             </div>
             <StoryHeading>Toggles (Slim)</StoryHeading>
-            <div style={flexHelper().middle()}>
+            <div style={flexHelper().middle() as CSSProperties}>
                 <StoryToggle accessibleLabel="Enabled" enabled={true} slim />
                 <StoryToggle accessibleLabel="Disabled" enabled={false} slim />
                 <StoryToggle accessibleLabel="Indeterminate" indeterminate enabled={true} slim />
@@ -103,17 +104,6 @@ story.add("Elements", () => {
             <StoryParagraph>
                 The state for this component needs to be managed by the parent. (Will not update here when you click)
             </StoryParagraph>
-            <RadioTabs
-                accessibleTitle={t("Search in:")}
-                groupName="advancedSearchDomain"
-                setData={doNothing}
-                activeTab={activeTab}
-                childClass="advancedSearchDomain-tab"
-            >
-                <RadioTab label={t("Tab A")} position="left" data={"Tab A"} />
-                <RadioTab label={t("Tab B")} position="right" data={"Tab B"} />
-                <RadioTab label={t("Tab C")} position="right" data={"Tab C"} />
-            </RadioTabs>
             <StoryHeading>Tokens Input</StoryHeading>
             <MultiUserInput
                 onChange={handleUserChange}
@@ -140,7 +130,7 @@ story.add("Elements", () => {
             <StoryExampleDropDownSearch />
             <StoryHeading>Date Range</StoryHeading>
             <StorySmallContent>
-                <DateRange onStartChange={doNothing} onEndChange={doNothing} start={undefined} end={undefined} />
+                <LazyDateRange onStartChange={doNothing} onEndChange={doNothing} start={undefined} end={undefined} />
             </StorySmallContent>
         </StoryContent>
     );
@@ -153,7 +143,7 @@ const doNothing = () => {
 function StoryToggle(props: Omit<React.ComponentProps<typeof FormToggle>, "onChange">) {
     return (
         <InputBlock label={props.accessibleLabel}>
-            <FormToggle {...props} onChange={doNothing} />
+            <FormToggle {...props} enabled={false} onChange={doNothing} />
         </InputBlock>
     );
 }

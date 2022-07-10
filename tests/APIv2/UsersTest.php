@@ -8,16 +8,25 @@ namespace VanillaTests\APIv2;
 
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\ForbiddenException;
-use PHPUnit\Framework\AssertionFailedError;
+use UserModel;
+use UsersApiController;
+use Vanilla\Events\EventAction;
 use Vanilla\Models\PermissionFragmentSchema;
+use Vanilla\Web\CacheControlConstantsInterface;
 use Vanilla\Web\PrivateCommunityMiddleware;
 use VanillaTests\Fixtures\TestUploader;
+use VanillaTests\UsersAndRolesApiTestTrait;
 
 /**
  * Test the /api/v2/users endpoints.
  */
 class UsersTest extends AbstractResourceTest {
     use TestPutFieldTrait;
+    use AssertLoggingTrait;
+    use TestPrimaryKeyRangeFilterTrait;
+    use TestSortingTrait;
+    use TestFilterDirtyRecordsTrait;
+    use UsersAndRolesApiTestTrait;
 
     /** @var int A value to ensure new records are unique. */
     protected static $recordCounter = 1;
@@ -34,19 +43,16 @@ class UsersTest extends AbstractResourceTest {
     private $configuration;
 
     /**
-     * @var \UserModel
-     */
-    private $userModel;
-
-    /**
      * {@inheritdoc}
      */
     public function __construct($name = null, array $data = [], $dataName = '') {
         $this->baseUrl = '/users';
+        $this->resourceName = 'user';
         $this->record = [
             'name' => null,
             'email' => null
         ];
+        $this->sortFields = ['dateInserted', 'dateLastActive', 'name', 'userID'];
 
         parent::__construct($name, $data, $dataName);
     }
@@ -55,13 +61,10 @@ class UsersTest extends AbstractResourceTest {
      * Disable email before running tests.
      */
     public function setUp(): void {
-        $this->backupSession();
         parent::setUp();
 
         $this->configuration = static::container()->get('Config');
         $this->configuration->set('Garden.Email.Disabled', true);
-
-        $this->userModel = static::container()->get(\UserModel::class);
 
         /* @var PrivateCommunityMiddleware $middleware */
         $middleware = static::container()->get(PrivateCommunityMiddleware::class);
@@ -73,7 +76,6 @@ class UsersTest extends AbstractResourceTest {
      */
     public function tearDown(): void {
         parent::tearDown();
-        $this->restoreSession();
     }
 
     /**
@@ -162,14 +164,14 @@ class UsersTest extends AbstractResourceTest {
         $this->assertEquals(204, $response->getStatusCode());
 
         $user = $this->api()->get("{$this->baseUrl}/{$userID}")->getBody();
-        $this->assertStringEndsWith('/applications/dashboard/design/images/defaulticon.png', $user['photoUrl']);
+        $this->assertStringEndsWith(UserModel::PATH_DEFAULT_AVATAR, $user['photoUrl']);
     }
 
     /**
      * Test confirm email is successful.
      */
     public function testConfirmEmailSucceed() {
-        /** @var \UserModel $userModel */
+        /** @var UserModel $userModel */
         $userModel = self::container()->get('UserModel');
 
         $emailKey = ['confirmationCode' =>'test123'];
@@ -190,7 +192,7 @@ class UsersTest extends AbstractResourceTest {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('We couldn\'t confirm your email. Check the link in the email we sent you or try sending another confirmation email.');
 
-        /** @var \UserModel $userModel */
+        /** @var UserModel $userModel */
         $userModel = self::container()->get('UserModel');
 
         $emailKey = ['confirmationCode' =>'test123'];;
@@ -218,18 +220,24 @@ class UsersTest extends AbstractResourceTest {
         $response = $this->api()->get("{$this->baseUrl}/me");
         $this->assertSame(200, $response->getStatusCode());
 
+        $header = $response->getHeader('cache-control');
+        $this->assertSame(CacheControlConstantsInterface::NO_CACHE, $header);
+
         $expected = [
             "userID" => 0,
             "name" => "Guest",
-            "photoUrl" => \UserModel::getDefaultAvatarUrl(),
+            "photoUrl" => UserModel::getDefaultAvatarUrl(),
             "dateLastActive" => null,
             "isAdmin" => false,
             "countUnreadNotifications" => 0,
+            "countUnreadConversations" => 0,
             "permissions" => [
                 "activity.view",
                 "discussions.view",
                 "profiles.view",
             ],
+            "email" => null,
+            "ssoID" => null,
         ];
         $actual = $response->getBody();
 
@@ -252,7 +260,7 @@ class UsersTest extends AbstractResourceTest {
      * Test getting current user info when the user is a valid member.
      */
     public function testMeMember() {
-        /** @var \UserModel $userModel */
+        /** @var UserModel $userModel */
         $userModel = self::container()->get('UserModel');
         $userID = $this->api()->getUserID();
         $user = $userModel->getID($userID, DATASET_TYPE_ARRAY);
@@ -265,9 +273,12 @@ class UsersTest extends AbstractResourceTest {
             "userID" => $userID,
             "name" => $user["Name"],
             "photoUrl" => userPhotoUrl($user),
+            'email' => $user['Email'],
+            'ssoID' => null,
             "dateLastActive" => $dateLastActive,
             "isAdmin" => true,
             "countUnreadNotifications" => 0,
+            "countUnreadConversations" => 0,
             "permissions" => [
                 "activity.delete",
                 "activity.view",
@@ -291,8 +302,8 @@ class UsersTest extends AbstractResourceTest {
                 "personalInfo.view",
                 "profiles.edit",
                 "profiles.view",
+                "session.valid",
                 "settings.view",
-                "signIn.allow",
                 "site.manage",
                 "uploads.add",
                 "users.add",
@@ -302,78 +313,7 @@ class UsersTest extends AbstractResourceTest {
         ];
         $actual = $response->getBody();
 
-        $this->assertSame($expected, $actual);
-    }
-
-    /**
-     * Test the users me endpoint with some custom roles.
-     */
-    public function testPermissions() {
-        $customCategory = $this->api()->post('/categories', [
-            'name' => 'Custom Perms',
-            'urlCode' => 'test-permissions-api',
-        ])->getBody();
-
-        $customRole = $this->api()->post('/roles', [
-            'name' => 'Custom Role',
-            'type' => 'member',
-            'permissions' => [
-                [
-                    'type' => PermissionFragmentSchema::TYPE_GLOBAL,
-                    'permissions' => [
-                        'community.manage' => true,
-                    ],
-                ],
-                // I would add some root category permissions here, but it's not possible to insert them through the API.
-                // https://github.com/vanilla/vanilla/issues/10184
-                [
-                    'type' => 'category',
-                    'id' => $customCategory['categoryID'],
-                    'permissions' => [
-                        "comments.add" => true,
-                        "comments.delete" => true,
-                        "comments.edit" => true,
-                        "discussions.add" => true,
-                        "discussions.manage" => false,
-                        "discussions.moderate" => false,
-                    ],
-                ],
-            ],
-        ])->getBody();
-
-        $user = $this->api()->post('/users', [
-            "email" => "testy@test.com",
-            "emailConfirmed" => true,
-            "name" => "TestTest",
-            "password" => "password",
-            "roleID" => [
-                $customRole['roleID'],
-            ],
-        ])->getBody();
-
-        $permissions = $this->api()->get('/users/' . $user['userID'] . '/permissions')->getBody();
-
-        $this->assertEquals([
-            'isAdmin' => false,
-            'permissions' => [
-                [
-                    'type' => PermissionFragmentSchema::TYPE_GLOBAL,
-                    'permissions' => [
-                        'community.manage' => true,
-                    ],
-                ],
-                [
-                    'type' => 'category',
-                    'id' => $customCategory['categoryID'],
-                    'permissions' => [
-                        "comments.add" => true,
-                        "comments.delete" => true,
-                        "comments.edit" => true,
-                        "discussions.add" => true,
-                    ],
-                ],
-            ]
-        ], $permissions);
+        $this->assertArraySubsetRecursive($expected, $actual);
     }
 
     /**
@@ -388,6 +328,18 @@ class UsersTest extends AbstractResourceTest {
         $searchFull = $request->getBody();
         $row = reset($searchFull);
         $this->assertEquals($testUser['userID'], $row['userID']);
+    }
+
+    /**
+     * Test name search exact match.
+     */
+    public function testNameSearch(): void {
+        $user1 = $this->createUser(['name' => 'test1_test1']);
+        $user2 = $this->createUser(['name' => 'test1_test']);
+        $result = $this->api()->get('/users/by-names', ['name' => $user1['name']])->getBody();
+        $this->assertEquals(1, count($result));
+        $result = $this->api()->get('/users/by-names', ['name' => "{$user2['name']}*"])->getBody();
+        $this->assertEquals(2, count($result));
     }
 
     /**
@@ -441,6 +393,8 @@ class UsersTest extends AbstractResourceTest {
         unset($newRow['photo']);
 
         $this->assertRowsEqual($newRow, $r->getBody());
+        $this->assertSame($r['photoUrl'], $r['profilePhotoUrl']);
+        $this->assertLog(['event' => EventAction::eventName($this->resourceName, EventAction::UPDATE)]);
 
         return $r->getBody();
     }
@@ -502,8 +456,15 @@ class UsersTest extends AbstractResourceTest {
         $this->assertArrayHasKey('photoUrl', $responseBody);
         $this->assertNotEmpty($responseBody['photoUrl']);
         $this->assertNotFalse(filter_var($responseBody['photoUrl'], FILTER_VALIDATE_URL), 'Photo is not a valid URL.');
-        $this->assertStringEndsNotWith('/applications/dashboard/design/images/defaulticon.png', $responseBody['photoUrl']);
+        $this->assertStringEndsNotWith(UserModel::PATH_DEFAULT_AVATAR, $responseBody['photoUrl'], 'The response returned the default avatar URL.');
         $this->assertNotEquals($user['photoUrl'], $responseBody['photoUrl']);
+
+        $this->assertUploadedFileUrlExists($responseBody['photoUrl']);
+
+        $user = $this->api()->get("{$this->baseUrl}/{$user['userID']}")->getBody();
+        $this->assertUploadedFileUrlExists($user['photoUrl']);
+        $this->assertUploadedFileUrlExists($user['profilePhotoUrl']);
+        $this->assertNotEquals($user['photoUrl'], $user['profilePhotoUrl']);
 
         return $user['userID'];
     }
@@ -583,6 +544,9 @@ class UsersTest extends AbstractResourceTest {
         $this->runWithPrivateCommunity([$this, 'testRegisterInvitation']);
     }
 
+    /**
+     * Test the full request of a lost password workflow.
+     */
     public function testRequestPassword() {
         static $i = 1;
 
@@ -600,14 +564,14 @@ class UsersTest extends AbstractResourceTest {
         });
         $r = $this->api()->post('/users/request-password', ['email' => $user['email']]);
 
-        $this->assertLog(['event' => 'password_reset_skipped', 'email' => $user['email']]);
+        $this->assertLog(['event' => 'password_reset_skipped', 'data.email' => $user['email']]);
 
         try {
             $this->runWithConfig([
                 'Garden.Registration.NameUnique' => true,
                 'Garden.Registration.EmailUnique' => true,
             ], function () use ($user) {
-                $this->logger->clear();
+                $this->getTestLogger()->clear();
                 $r = $this->api()->post('/users/request-password', ['email' => $user['name']]);
             });
             $this->fail('You shouldn\'t be able to reset a password with a username.');
@@ -619,9 +583,9 @@ class UsersTest extends AbstractResourceTest {
             'Garden.Registration.NameUnique' => true,
             'Garden.Registration.EmailUnique' => false,
         ], function () use ($user) {
-            $this->logger->clear();
+            $this->getTestLogger()->clear();
             $r = $this->api()->post('/users/request-password', ['email' => $user['name']]);
-            $this->assertLog(['event' => 'password_reset_skipped', 'email' => $user['email']]);
+            $this->assertLog(['event' => 'password_reset_skipped', 'data.email' => $user['email']]);
         });
     }
 
@@ -638,8 +602,13 @@ class UsersTest extends AbstractResourceTest {
     public function testBanWithPermission() {
         $this->createUserFixtures('testBanWithPermission');
         $this->api()->setUserID($this->moderatorID);
-        $r = $this->api()->put("/users/{$this->memberID}/ban", ['banned' => true]);
+        $r = $this->api()->put("{$this->baseUrl}/{$this->memberID}/ban", ['banned' => true]);
         $this->assertTrue($r['banned']);
+
+        // Make sure the user has the banned photo.
+        $user = $this->api()->get("{$this->baseUrl}/{$this->memberID}")->getBody();
+        $this->assertStringEndsWith(UserModel::PATH_BANNED_AVATAR, $user['photoUrl']);
+        $this->assertSame($user['photoUrl'], $user['profilePhotoUrl']);
     }
 
     /**
@@ -673,7 +642,6 @@ class UsersTest extends AbstractResourceTest {
      */
     private function verifyRegistration(array $fields) {
         $registration = $this->api()->post('/users/register', $fields)->getBody();
-        $registration = $registration->getData();
         $user = $this->runWithAdminUser(function () use ($registration) {
             return $this->api()->get("/users/{$registration[$this->pk]}")->getBody();
         });
@@ -681,5 +649,135 @@ class UsersTest extends AbstractResourceTest {
         ksort($registration);
         ksort($registeredUser);
         $this->assertEquals($registration, $registeredUser);
+    }
+
+    /**
+     * Test the users role filter.
+     */
+    public function testRoleFilter(): void {
+        $roleID = $this->getRoles()['Moderator'];
+
+        $users = $this->api()->get('/users', ['roleID' => $roleID])->getBody();
+        $this->assertNotEmpty($users);
+        foreach ($users as $user) {
+            $this->assertTrue(in_array($roleID, array_column($user['roles'], 'roleID')), 'The user does not satisfy the roleID filter.');
+        }
+    }
+
+    /**
+     * Test GET /:ID with a member role
+     */
+    public function testGetUserViewProfileOnly() {
+        $user = $this->testPost();
+        $user2 = $this->testPost();
+
+        /** @var UserModel $userModel */
+        $userModel =  static::container()->get(UserModel::class);
+        $userModel->setField($user2['userID'], 'ShowEmail', 1);
+
+        $this->api()->setUserID($user['userID']);
+
+        $response = $this->api()->get("/users/{$user2['userID']}")->getBody();
+
+        /** @var UsersApiController $userApiController */
+        $userApiController = static::container()->get(UsersApiController::class);
+        $viewProfileSchema = $userApiController->viewProfileSchema();
+        $viewProfileSchema->validate($response);
+
+        $this->assertArrayHasKey('name', $response);
+        $this->assertArrayHasKey('email', $response);
+        $this->assertArrayHasKey('photoUrl', $response);
+        $this->assertArrayHasKey('dateInserted', $response);
+        $this->assertArrayHasKey('dateLastActive', $response);
+        $this->assertArrayHasKey('countDiscussions', $response);
+        $this->assertArrayHasKey('countComments', $response);
+    }
+
+    /**
+     * Ensure that there are dirtyRecords for a specific resource.
+     */
+    protected function triggerDirtyRecords() {
+        $this->resetTable('dirtyRecord');
+        $user = $this->createUser();
+        $this->givePoints($user["userID"], 10);
+    }
+
+    /**
+     * Get the resource type.
+     *
+     * @return array
+     */
+    protected function getResourceInformation(): array {
+        return [
+            "resourceType" => "user",
+            "primaryKey" => "userID"
+        ];
+    }
+
+    /**
+     * Test GET /:ID user with personal info role.
+     */
+    public function testGetPersonalInfoProfile(): void {
+        $role = $this->createRole([
+            'name' => 'New Role',
+            'personalInfo' => true,
+            'permissions' => [
+                [
+                    'type' => 'global',
+                    'permissions' => [
+                        'session.valid' => true
+                    ]
+                ]
+            ]
+        ]);
+        // Create a user with personalInfo set to true.
+        $userA = $this->createUser(['name' => 'userA', 'roleID' => [$role['roleID']]]);
+        // a user without personalInfo.View permission should not be able to view role info.
+        $userB = $this->createUser(['name' => 'userB']);
+        $this->runWithUser(function () use ($userA) {
+            $result = $this->api()->get("/users/{$userA['userID']}")->getBody();
+            $this->assertArrayNotHasKey('roles', $result);
+        }, $userB);
+        // As an admin, role info should be visible.
+        $result =  $this->api()->get("/users/{$userA['userID']}")->getBody();
+        $this->assertArrayHasKey('roles', $result);
+    }
+    /**
+     * Primarily used for obtaining a role token for tests that utilize a role token via the **depends** annotation
+     *
+     * @return array
+     */
+    public function testGetRoleTokenQueryParam() {
+        $tokenResponseBody = $this->getRoleTokenResponseBody();
+        $this->assertArrayHasKey('roleToken', $tokenResponseBody);
+        return [static::getRoleTokenParamName() => $tokenResponseBody["roleToken"]];
+    }
+
+    /**
+     * Test that the get users/{id} endpoint accepts role token auth
+     *
+     * @param array $roleTokenQueryParam
+     * @depends testGetRoleTokenQueryParam
+     */
+    public function testIndexWithRoleTokenAuth(array $roleTokenQueryParam) {
+        $user = $this->testPost();
+
+        $this->api()->setUserID(0);
+        $response = $this->api()->get("/users/{$user['userID']}", $roleTokenQueryParam)->getBody();
+
+        /** @var UsersApiController $userApiController */
+        $userApiController = static::container()->get(UsersApiController::class);
+        $viewProfileSchema = $userApiController->viewProfileSchema();
+
+        $this->assertArrayHasKey('name', $response);
+        $this->assertArrayHasKey('email', $response);
+        $this->assertArrayHasKey('photoUrl', $response);
+        $this->assertArrayHasKey('dateInserted', $response);
+        $this->assertArrayHasKey('dateLastActive', $response);
+        $this->assertArrayHasKey('countDiscussions', $response);
+        $this->assertArrayHasKey('countComments', $response);
+
+        $this->assertSame($user['name'], $response['name']);
+        $this->assertSame($user['email'], $response['email']);
     }
 }

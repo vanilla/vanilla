@@ -3,10 +3,10 @@
  * @license GPL-2.0-only
  */
 
-import { logWarning } from "@vanilla/utils";
+import { logWarning, RecordID } from "@vanilla/utils";
 import React, { useState, useContext } from "react";
 
-type RecordToggle = (recordType: string, recordID: number) => void;
+type RecordToggle = (recordType: string, recordID: RecordID) => void;
 
 interface ISiteNavCtx {
     categoryRecordType: string;
@@ -14,7 +14,7 @@ interface ISiteNavCtx {
     openItem: RecordToggle;
     closeItem: RecordToggle;
     openRecords: {
-        [recordType: string]: Set<number>;
+        [recordType: string]: Set<RecordID>;
     };
 }
 
@@ -58,11 +58,13 @@ export default function SiteNavProvider(props: IProps) {
      * Open an item in the nav.
      */
     const openItem = (recordType: string, recordID: number) => {
-        const records = openRecords[recordType] || new Set();
-        records.add(recordID);
-        setOpenRecords({
-            ...openRecords,
-            [recordType]: records,
+        setOpenRecords((existingState) => {
+            const records = existingState[recordType] || new Set();
+            records.add(recordID);
+            return {
+                ...existingState,
+                [recordType]: records,
+            };
         });
     };
 

@@ -47,7 +47,7 @@
                         echo wrap(t('Marking things as NOT spam will put them back in your forum.'), 'p');
                         $AfterHtml = plural($ItemCount, t('Are you sure this isn\'t spam?'), t('Are you sure these %s items aren\'t spam?'));
                         $ShowUsers = TRUE;
-                        $UsersHtml = t("Check the box next to the user to mark them as <b>Verified</b> so their posts don't get marked as spam again.");
+                        $UsersHtml = t("VerifyUser", "Check the box next to the user to mark them as <b>Verified</b> so their posts don't get marked as spam again. This will also restore all of their pending posts.");
                         break;
                 }
                 if ($ShowUsers && sizeof($this->data('Users'))) {
@@ -82,7 +82,7 @@
                             'span',
                             ['class' => 'checkbox-painted-wrapper']
                         );
-                        echo ' <span class="Count">'.plural($RecordUser['CountDiscussions'] + $RecordUser['CountComments'], '%s post', '%s posts').'</span>';
+                        echo ' <span class="Count">'.plural($RecordUser['CountDiscussions'] + $RecordUser['CountComments'], '%s existing post', '%s existing posts').'</span>';
 
                         echo '</div>';
                     } ?>
@@ -94,7 +94,8 @@
             </div>
             <div class="modal-footer">
                 <?php
-                echo anchor(t("No, get me outta here!"), '#', ['class' => 'btn btn-text ConfirmNo']);
+                $destination = $_SERVER['HTTP_REFERER'];
+                echo anchor(t("No, get me outta here!"), $destination, ['class' => 'btn btn-text ConfirmNo']);
                 echo $this->Form->button('Yes, continue', ['class' => 'btn btn-primary ConfirmYes']);
                 ?>
             </div>

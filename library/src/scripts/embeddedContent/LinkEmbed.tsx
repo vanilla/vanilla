@@ -7,11 +7,11 @@ import React from "react";
 import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
 import SmartLink from "@library/routing/links/SmartLink";
 import classNames from "classnames";
-import { metasClasses } from "@library/styles/metasStyles";
-import { EmbedContainer } from "@library/embeddedContent/EmbedContainer";
+import { metasClasses } from "@library/metas/Metas.styles";
+import { EmbedContainer } from "@library/embeddedContent/components/EmbedContainer";
 import TruncatedText from "@library/content/TruncatedText";
-import { EmbedTitle } from "@library/embeddedContent/EmbedTitle";
-import { EmbedContent } from "@library/embeddedContent/EmbedContent";
+import { EmbedTitle } from "@library/embeddedContent/components/EmbedTitle";
+import { EmbedContent } from "@library/embeddedContent/components/EmbedContent";
 
 interface IProps extends IBaseEmbedProps {
     photoUrl?: string;
@@ -27,7 +27,7 @@ export function LinkEmbed(props: IProps) {
 
     let linkImage: JSX.Element | null = null;
     if (photoUrl) {
-        linkImage = <img src={photoUrl} className="embedLink-image" aria-hidden="true" />;
+        linkImage = <img src={photoUrl} className="embedLink-image" aria-hidden="true" loading="lazy" />;
     }
 
     return (
@@ -38,6 +38,7 @@ export function LinkEmbed(props: IProps) {
                     to={url}
                     rel="nofollow noreferrer ugc"
                     tabIndex={props.inEditor ? -1 : 0}
+                    aria-label={name}
                 >
                     <article className="embedText-body embedLink-body">
                         {linkImage}

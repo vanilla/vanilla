@@ -8,9 +8,11 @@ namespace Vanilla\Formatting;
 
 use Garden\Container\Container;
 use Vanilla\Contracts\Formatting\FormatInterface;
+use Vanilla\Contracts\Formatting\Heading;
 use Vanilla\Formatting\Exception\FormatterNotFoundException;
 use Vanilla\Formatting\Exception\FormattingException;
 use Vanilla\Formatting\Formats\NotFoundFormat;
+use Vanilla\ImageSrcSet\ImageSrcSetService;
 
 /**
  * Simple service for calling out to formatters registered in FormatFactory.
@@ -20,17 +22,38 @@ class FormatService {
     /** @var array */
     private $formats = [];
 
+    /** @var FormatInterface[] */
+    private $formatInstances = [];
+
+    /** @var ImageSrcSetService */
+    private $imageSrcSetService;
+
+    /**
+     * DI.
+     *
+     * @param ImageSrcSetService $imageSrcSetService
+     */
+    public function __construct(ImageSrcSetService $imageSrcSetService) {
+        $this->imageSrcSetService = $imageSrcSetService;
+    }
+
     /**
      * Render a safe, sanitized, HTML version of some content.
      *
      * @param string $content The content to render.
      * @param string $format The format of the content.
+     * @param array $context context for logging.
      *
      * @return string
      */
-    public function renderHTML(string $content, ?string $format): string {
+    public function renderHTML(string $content, ?string $format = null, ?array $context = null): string {
+        if (empty($content) && empty($format)) {
+            return '';
+        }
+
         return $this
             ->getFormatter($format)
+            ->setContext($context)
             ->renderHTML($content);
     }
 
@@ -51,7 +74,6 @@ class FormatService {
             ->filter($content);
     }
 
-
     /**
      * Render a safe, sanitized, short version of some content.
      *
@@ -61,6 +83,10 @@ class FormatService {
      * @return string
      */
     public function renderExcerpt(string $content, ?string $format): string {
+        if (empty($format) && empty($content)) {
+            return '';
+        }
+
         return $this
             ->getFormatter($format)
             ->renderExcerpt($content);
@@ -123,6 +149,25 @@ class FormatService {
     }
 
     /**
+     * Parse out the main image from some content.
+     *
+     * @param string $content
+     * @param string|null $format
+     *
+     * @return array|null
+     */
+    public function parseMainImage(string $content, ?string $format): ?array {
+        $images = $this->parseImages($content, $format);
+        if (empty($images)) {
+            return null;
+        }
+
+        $result = $images[0];
+        $result['urlSrcSet'] = $this->imageSrcSetService->getResizedSrcSet($result['url']);
+        return $result;
+    }
+
+    /**
      * Parse images out of the post contents.
      *
      * @param string $content
@@ -134,6 +179,20 @@ class FormatService {
         return $this
             ->getFormatter($format)
             ->parseImageUrls($content);
+    }
+
+    /**
+     * Parse image attributes out of the post contents.
+     *
+     * @param string $content
+     * @param string|null $format The format of the content.
+     *
+     * @return array
+     */
+    public function parseImages(string $content, ?string $format): array {
+        return $this
+            ->getFormatter($format)
+            ->parseImages($content);
     }
 
     /**
@@ -170,18 +229,15 @@ class FormatService {
      * @param Container $dic
      */
     public function registerBuiltInFormats(Container $dic) {
-        $this->registerFormat(Formats\RichFormat::FORMAT_KEY, $dic->get(Formats\RichFormat::class))
-            ->registerFormat(Formats\HtmlFormat::FORMAT_KEY, $dic->get(Formats\HtmlFormat::class))
-            ->registerFormat(Formats\BBCodeFormat::FORMAT_KEY, $dic->get(Formats\BBCodeFormat::class))
-            ->registerFormat(Formats\MarkdownFormat::FORMAT_KEY, $dic->get(Formats\MarkdownFormat::class))
-            ->registerFormat(Formats\TextFormat::FORMAT_KEY, $dic->get(Formats\TextFormat::class))
-            ->registerFormat(Formats\TextExFormat::FORMAT_KEY, $dic->get(Formats\TextExFormat::class))
-        ;
-
-        $wysiwyg = $dic->get(Formats\WysiwygFormat::class);
-        $this
-            ->registerFormat(Formats\WysiwygFormat::FORMAT_KEY, $wysiwyg)
-            ->registerFormat(Formats\WysiwygFormat::ALT_FORMAT_KEY, $wysiwyg)
+        $this->registerFormat(Formats\RichFormat::FORMAT_KEY, Formats\RichFormat::class)
+            ->registerFormat(Formats\HtmlFormat::FORMAT_KEY, Formats\HtmlFormat::class)
+            ->registerFormat(Formats\BBCodeFormat::FORMAT_KEY, Formats\BBCodeFormat::class)
+            ->registerFormat(Formats\MarkdownFormat::FORMAT_KEY, Formats\MarkdownFormat::class)
+            ->registerFormat(Formats\TextFormat::FORMAT_KEY, Formats\TextFormat::class)
+            ->registerFormat(Formats\TextExFormat::FORMAT_KEY, Formats\TextExFormat::class)
+            ->registerFormat(Formats\WysiwygFormat::FORMAT_KEY, Formats\WysiwygFormat::class)
+            ->registerFormat(Formats\WysiwygFormat::ALT_FORMAT_KEY, Formats\WysiwygFormat::class)
+            ->registerFormat(Formats\DisplayFormat::FORMAT_KEY, Formats\DisplayFormat::class)
         ;
     }
 
@@ -189,13 +245,31 @@ class FormatService {
      * Register a format type and the class name handles it.
      *
      * @param string $formatKey
-     * @param FormatInterface $format
+     * @param FormatInterface}string $format
      *
      * @return $this For method chaining.
      */
-    public function registerFormat(string $formatKey, FormatInterface $format): FormatService {
+    public function registerFormat(string $formatKey, $format): FormatService {
+        if (is_object($format)) {
+            $this->formatInstances[$formatKey] = $format;
+            $format = get_class($format);
+        }
+
         $this->formats[$formatKey] = $format;
         return $this;
+    }
+
+    /**
+     * Check if we have a registered format.
+     *
+     * @param string|null $formatKey
+     * @return bool
+     */
+    public function hasFormat(?string $formatKey): bool {
+        if ($formatKey === null) {
+            return false;
+        }
+        return array_key_exists(strtolower($formatKey), $this->formats);
     }
 
     /**
@@ -207,18 +281,36 @@ class FormatService {
      * @return FormatInterface
      * @throws FormatterNotFoundException If $throw === true &&  the formatter that was requested could not be found.
      */
-    private function getFormatter(?string $formatKey, $throw = false): FormatInterface {
+    public function getFormatter(?string $formatKey, $throw = false): FormatInterface {
         $formatKey = strtolower($formatKey) ?? null;
-        $format = $this->formats[$formatKey] ?? null;
-        $errorMessage = "Unable to find a formatter for the formatKey $formatKey.";
-        if (!$format) {
-            if ($throw) {
-                throw new FormatterNotFoundException($errorMessage);
-            } else {
-                return new NotFoundFormat($formatKey);
+        $instance = $this->formatInstances[$formatKey] ?? null;
+
+        if ($instance === null) {
+            $formatClass = $this->formats[$formatKey] ?? null;
+            $errorMessage = "Unable to find a formatter for the formatKey $formatKey.";
+            if (!$formatClass) {
+                if ($throw) {
+                    throw new FormatterNotFoundException($errorMessage);
+                } else {
+                    return new NotFoundFormat($formatKey);
+                }
             }
+
+            $instance = $this->constructFormat($formatClass);
         }
 
-        return $format;
+        return $instance;
+    }
+
+    /**
+     * Constuct a formatter.
+     *
+     * @param string $formatClass
+     *
+     * @return FormatInterface
+     */
+    protected function constructFormat(string $formatClass): FormatInterface {
+        $instance = \Gdn::getContainer()->get($formatClass);
+        return $instance;
     }
 }

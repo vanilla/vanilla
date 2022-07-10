@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
- namespace Vanilla\Dashboard\Models;
+namespace Vanilla\Dashboard\Models;
 
 /**
   * Dumb data object representing an email notification for an activity.
@@ -24,6 +24,9 @@ class ActivityEmail {
 
     /** @var string */
     private $body = "";
+
+    /** @var string */
+    private $title = "";
 
     /** @var string */
     private $internalRoute;
@@ -93,6 +96,15 @@ class ActivityEmail {
      */
     public function getBody(): string {
         return $this->body;
+    }
+
+    /**
+     * Get the email title.
+     *
+     * @return string
+     */
+    public function getTitle(): string {
+        return $this->title;
     }
 
     /**
@@ -189,6 +201,15 @@ class ActivityEmail {
      */
     public function setBody(string $body) {
         $this->body = $body;
+    }
+
+    /**
+     * Set the email title.
+     *
+     * @param string $title
+     */
+    public function setTitle(string $title) {
+        $this->title = $title;
     }
 
     /**

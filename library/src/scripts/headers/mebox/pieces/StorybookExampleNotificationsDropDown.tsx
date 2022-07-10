@@ -5,7 +5,6 @@
  */
 
 import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
-import NotificationsContents, { INotificationsProps } from "@library/headers/mebox/pieces/NotificationsContents";
 import NotificationsCount from "@library/headers/mebox/pieces/NotificationsCount";
 import { titleBarClasses } from "@library/headers/titleBarStyles";
 import { t } from "@library/utility/appUtils";
@@ -15,7 +14,7 @@ import Frame from "@library/layout/frame/Frame";
 import classNames from "classnames";
 import FrameHeaderWithAction from "@library/layout/frame/FrameHeaderWithAction";
 import LinkAsButton from "@library/routing/LinkAsButton";
-import { buttonUtilityClasses } from "@library/forms/buttonStyles";
+import { buttonUtilityClasses } from "@library/forms/Button.styles";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { SettingsIcon } from "@library/icons/titleBar";
 import FrameBody from "@library/layout/frame/FrameBody";
@@ -23,11 +22,7 @@ import FrameFooter from "@library/layout/frame/FrameFooter";
 import Button from "@library/forms/Button";
 import { frameFooterClasses } from "@library/layout/frame/frameFooterStyles";
 import MeBoxDropDownItemList from "@library/headers/mebox/pieces/MeBoxDropDownItemList";
-import {
-    IMeBoxMessageItem,
-    IMeBoxNotificationItem,
-    MeBoxItemType,
-} from "@library/headers/mebox/pieces/MeBoxDropDownItem";
+import { IMeBoxNotificationItem, MeBoxItemType } from "@library/headers/mebox/pieces/MeBoxDropDownItem";
 
 interface IState {
     open: boolean;
@@ -37,6 +32,7 @@ const notificationsData = [
     {
         message: "<strong>Stephane</strong> commented on <strong>Resolved</strong>",
         photo: "https://dev.vanilla.localhost/applications/dashboard/design/images/defaulticon.png",
+        photoAlt: 'Guest: "Test"',
         to: "https://dev.vanilla.localhost/en-hutch/discussion/comment/1007#Comment_1007",
         recordID: 332,
         timestamp: "2018-11-27T18:32:43+00:00",
@@ -67,7 +63,8 @@ export default class StorybookExampleNotificationsDropDown extends React.Compone
         const buttonUtils = buttonUtilityClasses();
         return (
             <DropDown
-                id={this.id}
+                contentID={this.id + "-content"}
+                handleID={this.id + "-handle"}
                 name={t("Notifications")}
                 renderLeft={true}
                 buttonClassName={classesHeader.button}
@@ -80,7 +77,7 @@ export default class StorybookExampleNotificationsDropDown extends React.Compone
                     canGrow={true}
                     header={
                         <FrameHeaderWithAction className="hasAction" title={title}>
-                            <LinkAsButton title={t("Notification Preferences")} baseClass={ButtonTypes.ICON} to={`#`}>
+                            <LinkAsButton title={t("Notification Preferences")} buttonType={ButtonTypes.ICON} to={`#`}>
                                 <SettingsIcon />
                             </LinkAsButton>
                         </FrameHeaderWithAction>
@@ -100,7 +97,7 @@ export default class StorybookExampleNotificationsDropDown extends React.Compone
                             <LinkAsButton
                                 className={classNames(buttonUtils.pushLeft)}
                                 to={"/profile/notifications"}
-                                baseClass={ButtonTypes.TEXT}
+                                buttonType={ButtonTypes.TEXT}
                             >
                                 {t("All Notifications")}
                             </LinkAsButton>
@@ -108,7 +105,7 @@ export default class StorybookExampleNotificationsDropDown extends React.Compone
                                 onClick={() => {
                                     return;
                                 }}
-                                baseClass={ButtonTypes.TEXT_PRIMARY}
+                                buttonType={ButtonTypes.TEXT_PRIMARY}
                                 className={classNames("frameFooter-markRead", classesFrameFooter.markRead)}
                             >
                                 {t("Mark All Read")}
@@ -125,7 +122,7 @@ export default class StorybookExampleNotificationsDropDown extends React.Compone
      *
      * @param open Is this menu open and visible?
      */
-    private setOpen = open => {
+    private setOpen = (open) => {
         this.setState({
             open,
         });

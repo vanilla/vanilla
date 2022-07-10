@@ -2,20 +2,38 @@
 /**
  * Contains useful functions for cleaning up the database.
  *
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Dashboard
  * @since 2.1
  */
 
+use Garden\EventManager;
+use Garden\Events\GenericResourceEvent;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Vanilla\Community\Events\CommentEvent;
+use Vanilla\Community\Events\DiscussionEvent;
+use Vanilla\Dashboard\Events\LogPostEvent;
 use Vanilla\PrunableTrait;
+use Vanilla\Utility\ArrayUtils;
+use Vanilla\Web\Middleware\LogTransactionMiddleware;
 
 /**
  * Handles additional logging.
  */
-class LogModel extends Gdn_Pluggable {
+class LogModel extends Gdn_Pluggable implements LoggerAwareInterface {
 
     use PrunableTrait;
+    use LoggerAwareTrait;
+
+    const TYPE_EDIT = 'Edit';
+    const TYPE_DELETE = 'Delete';
+    const TYPE_SPAM = 'Spam';
+    const TYPE_MODERATE = 'Moderate';
+    const TYPE_PENDING = 'Pending';
+    const TYPE_BAN = 'Ban';
+    const TYPE_ERROR = 'Error';
 
     /** @var int Timestamp of when to prune delete logs. */
     private $deletePruneAfter;
@@ -26,16 +44,24 @@ class LogModel extends Gdn_Pluggable {
     ];
     private static $transactionID = null;
 
+    /** @var array Keep track of table structures we've already fetched. */
+    private $columns = [];
+
+    /**
+     * Constructor.
+     */
     public function __construct() {
         parent::__construct();
+        // Needed because many places do not instantiate this class from the container.
+        $this->logger = Gdn::getContainer()->get(\Psr\Log\LoggerInterface::class);
         try {
             $this->setPruneAfter(c('Logs.Common.PruneAfter', '3 months'));
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             $this->setPruneAfter('3 months');
         }
         try {
             $this->setDeletePruneAfter(c('Logs.Delete.PruneAfter', '1 year'));
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             $this->setDeletePruneAfter('1 year');
         }
     }
@@ -84,10 +110,38 @@ class LogModel extends Gdn_Pluggable {
     }
 
     /**
-     * Begin a log transaction.
+     * @return int
      */
-    public static function beginTransaction() {
-        self::$transactionID = true;
+    public static function generateTransactionID(): int {
+        return  random_int(0, 1000000000);
+    }
+
+    /**
+     * Begin a log transaction.
+     *
+     * @return int The transactionID.
+     */
+    public static function beginTransaction(?int $transactionID = null): int {
+        self::$transactionID = $transactionID ?? self::generateTransactionID();
+        return self::$transactionID;
+    }
+
+    /**
+     * Get a transactionID.
+     *
+     * Static because way to much stuff in this class is already static.
+     *
+     * @return int|null
+     */
+    public static function getTransactionID(): ?int {
+        /** @var LogTransactionMiddleware $logTransactionMiddleware */
+        $logTransactionMiddleware = \Gdn::getContainer()->get(LogTransactionMiddleware::class);
+        $middlewareID = $logTransactionMiddleware->getTransactionID();
+        if ($middlewareID) {
+            return $middlewareID;
+        }
+
+        return self::$transactionID;
     }
 
     /**
@@ -95,24 +149,19 @@ class LogModel extends Gdn_Pluggable {
      *
      * @param array $where The where clause.
      * @param array $options Options for the delete.
-     * @return mixed
      */
     public function delete($where = [], $options = []) {
-        if (!is_array($where)) {
-            $logIDs = explode(',', $logIDs);
-        } else {
-            $keysAreIDs = true;
-            $keys = array_keys($where);
-            foreach ($keys as $key) {
-                if (!filter_var($key, FILTER_VALIDATE_INT, ['min_range' => '1'])) {
-                    $keysAreIDs = false;
-                    break;
-                }
+        $keysAreIDs = true;
+        $keys = array_keys($where);
+        foreach ($keys as $key) {
+            if (!filter_var($key, FILTER_VALIDATE_INT, ['min_range' => '1'])) {
+                $keysAreIDs = false;
+                break;
             }
+        }
 
-            if ($keysAreIDs) {
-                $logIDs = $keys;
-            }
+        if ($keysAreIDs) {
+            $logIDs = $keys;
         }
 
         if (isset($logIDs)) {
@@ -143,14 +192,14 @@ class LogModel extends Gdn_Pluggable {
         $this->delete(
             [
                 $this->getPruneField().' <' => $dateCommonPrune->format('Y-m-d H:i:s'),
-                'Operation' => ['Edit','Spam','Moderate','Error'],
+                'Operation' => [self::TYPE_EDIT, self::TYPE_SPAM, self::TYPE_MODERATE, self::TYPE_ERROR],
             ],
             $options
         );
         $this->delete(
             [
                 $this->getPruneField().' <' => $dateDeletePrune->format('Y-m-d H:i:s'),
-                'Operation' => 'Delete',
+                'Operation' => self::TYPE_DELETE,
             ],
             $options
         );
@@ -174,7 +223,8 @@ class LogModel extends Gdn_Pluggable {
 
         foreach ($logs as $log) {
             $recordType = $log['RecordType'];
-            if (in_array($log['Operation'], ['Spam', 'Moderate']) && array_key_exists($recordType, $models)) {
+            $record = false;
+            if (in_array($log['Operation'], [self::TYPE_SPAM, self::TYPE_MODERATE]) && array_key_exists($recordType, $models)) {
                 /** @var Gdn_Model $model */
                 $model = $models[$recordType];
                 $recordID = $log['RecordID'];
@@ -182,6 +232,18 @@ class LogModel extends Gdn_Pluggable {
 
                 // Determine if the original record, if still available, should be deleted too.
                 $record = $model->getID($recordID, DATASET_TYPE_ARRAY);
+
+                // Create a log post event here, so we can grab the record (if there is one) before it's deleted.
+                $logPostEvent = self::createLogPostEvent(
+                    $log["Operation"]."_".\Garden\Events\ResourceEvent::ACTION_DELETE,
+                    $recordType,
+                    $record != false ? $record : $log["Data"],
+                    "user",
+                    Gdn::session()->UserID,
+                    "negative",
+                    $log["RecordUserID"]
+                );
+
                 if ($record) {
                     switch ($recordType) {
                         case 'Discussion':
@@ -190,12 +252,25 @@ class LogModel extends Gdn_Pluggable {
                             }
                             break;
                     }
-                }
 
-                if ($deleteRecord) {
-                    $model->deleteID($recordID, ['Log' => false]);
+                    if ($deleteRecord) {
+                        $model->deleteID($recordID, ['Log' => false]);
+                    }
                 }
+            } else {
+                $logPostEvent = self::createLogPostEvent(
+                    $log["Operation"]."_".\Garden\Events\ResourceEvent::ACTION_DELETE,
+                    $recordType,
+                    $log["Data"],
+                    "user",
+                    Gdn::session()->UserID,
+                    "negative",
+                    $log["RecordUserID"],
+                    ["recordID" => false]
+                );
             }
+
+            Gdn::eventManager()->dispatch($logPostEvent);
         }
 
         Gdn::sql()->whereIn('LogID', $logIDs)->delete('Log');
@@ -473,6 +548,15 @@ class LogModel extends Gdn_Pluggable {
         return $count;
     }
 
+    /**
+     * Clear specific operation counts cache key
+     *
+     * @param string $operation
+     */
+    public static function clearOperationCountCache($operation) {
+        Gdn::cache()->remove('Moderation.LogCount.'.$operation);
+    }
+
 
     /**
      * Log an operation into the log table.
@@ -550,6 +634,7 @@ class LogModel extends Gdn_Pluggable {
             }
         }
 
+        $logRow2 = null;
         if ($groupBy) {
             $groupBy[] = 'Operation';
             $groupBy[] = 'RecordType';
@@ -557,90 +642,52 @@ class LogModel extends Gdn_Pluggable {
             // Check to see if there is a record already logged here.
             $where = array_combine($groupBy, arrayTranslate($logRow, $groupBy));
             $logRow2 = Gdn::sql()->getWhere('Log', $where)->firstRow(DATASET_TYPE_ARRAY);
-            if ($logRow2) {
-                $logID = $logRow2['LogID'];
-                $set = [];
+        }
 
-                $data = array_merge(dbdecode($logRow2['Data']), $data);
+        if ($logRow2) {
+            $logID = $logRow2['LogID'];
+            $set = [];
 
-                $otherUserIDs = explode(',', $logRow2['OtherUserIDs']);
-                if (!is_array($otherUserIDs)) {
-                    $otherUserIDs = [];
-                }
+            $data = array_merge(dbdecode($logRow2['Data']), $data);
 
-                if (!$logRow2['InsertUserID']) {
-                    $set['InsertUserID'] = $insertUserID;
-                } elseif ($insertUserID != $logRow2['InsertUserID'] && !in_array($insertUserID, $otherUserIDs)) {
-                    $otherUserIDs[] = $insertUserID;
-                }
+            $otherUserIDs = explode(',', $logRow2['OtherUserIDs']);
+            if (!is_array($otherUserIDs)) {
+                $otherUserIDs = [];
+            }
 
-                if (array_key_exists('OtherUserIDs', $options)) {
-                    $otherUserIDs = array_merge($otherUserIDs, $options['OtherUserIDs']);
-                    $otherUserIDs = array_unique($otherUserIDs);
-                    $otherUserIDs = array_diff($otherUserIDs, [$insertUserID]);
+            if (!$logRow2['InsertUserID']) {
+                $set['InsertUserID'] = $insertUserID;
+            } elseif ($insertUserID != $logRow2['InsertUserID'] && !in_array($insertUserID, $otherUserIDs)) {
+                $otherUserIDs[] = $insertUserID;
+            }
 
-                    $count = count($otherUserIDs) + 1;
-                } else {
-                    $count = (int)$logRow2['CountGroup'] + 1;
-                }
-                $set['OtherUserIDs'] = implode(',', $otherUserIDs);
-                $set['CountGroup'] = $count;
-                $set['Data'] = dbencode($data);
-                $set['DateUpdated'] = Gdn_Format::toDateTime();
+            if (array_key_exists('OtherUserIDs', $options)) {
+                $otherUserIDs = array_merge($otherUserIDs, $options['OtherUserIDs']);
+                $otherUserIDs = array_unique($otherUserIDs);
+                $otherUserIDs = array_diff($otherUserIDs, [$insertUserID]);
 
-                if (self::$transactionID > 0) {
-                    $set['TransactionLogID'] = self::$transactionID;
-                } elseif (self::$transactionID === true) {
-                    if ($logRow2['TransactionLogID']) {
-                        self::$transactionID = $logRow2['TransactionLogID'];
-                    } else {
-                        self::$transactionID = $logID;
-                        $set['TransactionLogID'] = $logID;
-                    }
-                }
-
-                Gdn::sql()->put(
-                    'Log',
-                    $set,
-                    ['LogID' => $logID]
-                );
+                $count = count($otherUserIDs) + 1;
             } else {
-                $l = self::instance();
-                $l->EventArguments['Log'] =& $logRow;
-                $l->fireEvent('BeforeInsert');
-
-                if (self::$transactionID > 0) {
-                    $logRow['TransactionLogID'] = self::$transactionID;
-                }
-
-                $logID = Gdn::sql()->insert('Log', $logRow);
-
-                if (self::$transactionID === true) {
-                    // A new transaction was started and needs to assigned.
-                    self::$transactionID = $logID;
-                    Gdn::sql()->put('Log', ['TransactionLogID' => $logID], ['LogID' => $logID]);
-                }
-
-                $l->EventArguments['LogID'] = $logID;
-                $l->fireEvent('AfterInsert');
+                $count = (int)$logRow2['CountGroup'] + 1;
             }
+            $set['OtherUserIDs'] = implode(',', $otherUserIDs);
+            $set['CountGroup'] = $count;
+            $set['Data'] = dbencode($data);
+            $set['DateUpdated'] = Gdn_Format::toDateTime();
+            $set['TransactionLogID'] = self::getTransactionID();
+
+            Gdn::sql()->put(
+                'Log',
+                $set,
+                ['LogID' => $logID]
+            );
         } else {
-            if (self::$transactionID > 0) {
-                $logRow['TransactionLogID'] = self::$transactionID;
-            }
-
-            // Insert the log entry.
             $l = self::instance();
             $l->EventArguments['Log'] =& $logRow;
             $l->fireEvent('BeforeInsert');
 
+            $logRow['TransactionLogID'] = self::getTransactionID();
             $logID = Gdn::sql()->insert('Log', $logRow);
-
-            if (self::$transactionID === true) {
-                // A new transaction was started and needs to assigned.
-                self::$transactionID = $logID;
-                Gdn::sql()->put('Log', ['TransactionLogID' => $logID], ['LogID' => $logID]);
-            }
 
             $l->EventArguments['LogID'] = $logID;
             $l->fireEvent('AfterInsert');
@@ -849,8 +896,13 @@ class LogModel extends Gdn_Pluggable {
      * @throws Exception Throws an exception if restoring the record causes a validation error.
      */
     private function restoreOne($log, $deleteLog = true) {
-        // Keep track of table structures we've already fetched.
-        static $columns = [];
+        $sqlColumnSchema = [];
+        $loggerContext = [
+            "recordType" => $log['RecordType'],
+            "recordID" => $log['RecordID'],
+            "logID" => $log['LogID'],
+        ];
+        $this->logger->info("Restore Log Record: Start", $loggerContext);
 
         // Throw an event to see if the restore is being overridden.
         $handled = false;
@@ -872,9 +924,9 @@ class LogModel extends Gdn_Pluggable {
 
         $data = ipEncodeRecursive($log['Data']);
 
-        if (isset($data['Attributes'])) {
+        if (array_key_exists('Attributes', $data)) {
             $attr = 'Attributes';
-        } elseif (isset($data['Data'])) {
+        } elseif (array_key_exists('Data', $data)) {
             $attr = 'Data';
         } else {
             $attr = '';
@@ -892,27 +944,34 @@ class LogModel extends Gdn_Pluggable {
             $data[$attr]['RestoreUserID'] = Gdn::session()->UserID;
             $data[$attr]['DateRestored'] = Gdn_Format::toDateTime();
         }
-
-        if (!isset($columns[$tableName])) {
-            $columns[$tableName] = Gdn::sql()->fetchColumns($tableName);
+        if (!isset($sqlColumnSchema[$tableName]) || empty($this->columns[$tableName])) {
+            $sqlTableSchema[$tableName] = Gdn::sql()->fetchTableSchema($tableName);
+            foreach ($sqlTableSchema[$tableName] as $key => $value) {
+                $this->columns[$tableName][] = $value->Name;
+            }
         }
 
-        $set = array_flip($columns[$tableName]);
+        $set = array_flip($this->columns[$tableName]);
         // Set the sets from the data.
         foreach ($set as $key => $value) {
             if (isset($data[$key])) {
-                $value = $data[$key];
+                $value = $this->validateColumnValue($sqlTableSchema[$tableName], $key, $data[$key]);
                 if (is_array($value)) {
                     $value = dbencode($value);
                 }
                 $set[$key] = $value;
             } else {
-                unset($set[$key]);
+                $value = $this->validateColumnNullValue($sqlTableSchema[$tableName], $key);
+                if ($value) {
+                    $set[$key] = '';
+                } else {
+                    unset($set[$key]);
+                }
             }
         }
 
         switch ($log['Operation']) {
-            case 'Edit':
+            case self::TYPE_EDIT:
                 // We are restoring an edit so just update the record.
                 $iDColumn = $log['RecordType'].'ID';
                 $where = [$iDColumn => $log['RecordID']];
@@ -924,11 +983,11 @@ class LogModel extends Gdn_Pluggable {
                 );
 
                 break;
-            case 'Delete':
-            case 'Spam':
-            case 'Moderate':
-            case 'Pending':
-            case 'Ban':
+            case self::TYPE_DELETE:
+            case self::TYPE_SPAM:
+            case self::TYPE_MODERATE:
+            case self::TYPE_PENDING:
+            case self::TYPE_BAN:
                 if (!$log['RecordID']) {
                     // This log entry was never in the table.
                     if (isset($set['DateInserted'])) {
@@ -937,7 +996,7 @@ class LogModel extends Gdn_Pluggable {
                 }
 
                 // Insert the record back into the db.
-                if ($log['Operation'] == 'Spam' && $log['RecordType'] == 'Registration') {
+                if ($log['Operation'] == self::TYPE_SPAM && $log['RecordType'] == 'Registration') {
                     saveToConfig(['Garden.Registration.NameUnique' => false, 'Garden.Registration.EmailUnique' => false], '', false);
                     if (isset($data['Username'])) {
                         $set['Name'] = $data['Username'];
@@ -964,6 +1023,14 @@ class LogModel extends Gdn_Pluggable {
                         }
                     }
                 } else {
+                    // Kludge, manually setting this to service a ticket because this is getting tossed in
+                    // via straight SQL instead of a model
+                    if (empty($log['RecordID']) && 'Discussion' === $log['RecordType']) {
+                        // This log entry was never in the table.
+                        if (empty($set['DateLastComment'])) {
+                            $set['DateLastComment'] = $set['DateInserted'];
+                        }
+                    }
                     $iD = Gdn::sql()
                         ->options('Replace', true)
                         ->insert($tableName, $set);
@@ -972,8 +1039,8 @@ class LogModel extends Gdn_Pluggable {
                     }
 
                     // Unban a user.
-                    if ($log['RecordType'] == 'User' && $log['Operation'] == 'Ban') {
-                        Gdn::userModel()->setField($iD, 'Banned', 0);
+                    if ($log['RecordType'] == 'User' && $log['Operation'] == self::TYPE_BAN) {
+                        Gdn::userModel()->save(["UserID" => $iD, "Banned" => 0]);
                     }
 
                     // Keep track of discussions and categories so that their counts can be recalculated.
@@ -987,7 +1054,7 @@ class LogModel extends Gdn_Pluggable {
                             break;
                     }
 
-                    if ($log['Operation'] == 'Pending') {
+                    if ($log['Operation'] == self::TYPE_PENDING) {
                         switch ($log['RecordType']) {
                             case 'Discussion':
                                 if (val('UserDiscussion', $this->recalcIDs) && val($log['RecordUserID'], $this->recalcIDs['UserDiscussion'])) {
@@ -1013,12 +1080,181 @@ class LogModel extends Gdn_Pluggable {
         // Fire 'after' event
         if (isset($iD)) {
             $this->EventArguments['InsertID'] = $iD;
+
+            // Dispatch CommentEvent if it's a comment being approved
+            if ('Comment' === $log['RecordType']) {
+                $commentModel = new CommentModel();
+                $comment = $commentModel->getID($iD, DATASET_TYPE_ARRAY);
+
+                if ($comment) {
+                    $sender = $data['InsertUserID'] ? Gdn::userModel()->getFragmentByID($data['InsertUserID']) : null;
+                    $commentEvent = $commentModel->eventFromRow($comment, CommentEvent::ACTION_INSERT, $sender);
+                    $eventManager = Gdn::getContainer()->get(EventManager::class);
+                    $eventManager->dispatch($commentEvent);
+                }
+            } elseif ('Discussion' === $log['RecordType']) {
+                $discussionModel = new DiscussionModel();
+                $discussion = $discussionModel->getID($iD, DATASET_TYPE_ARRAY);
+
+                if ($discussion) {
+                    $sender = $data['InsertUserID'] ? Gdn::userModel()->getFragmentByID($data['InsertUserID']) : null;
+                    $discussionEvent = $discussionModel->eventFromRow($discussion, DiscussionEvent::ACTION_INSERT, $sender);
+                    $eventManager = Gdn::getContainer()->get(EventManager::class);
+                    $eventManager->dispatch($discussionEvent);
+                }
+            }
         }
+
+        if (in_array(strtolower($log["RecordType"]), ["comment", "discussion"])) {
+            $logPostEvent = LogModel::createLogPostEvent(
+                $log["Operation"]."_approve",
+                $log["RecordType"],
+                $log["Data"],
+                "user",
+                Gdn::session()->UserID,
+                "positive",
+                $log["RecordUserID"],
+                !empty($log["RecordID"]) ? [] : ["recordID" => false]
+            );
+
+            Gdn::eventManager()->dispatch($logPostEvent);
+        }
+
         $this->fireEvent('AfterRestore');
 
         if ($deleteLog) {
             Gdn::sql()->delete('Log', ['LogID' => $log['LogID']]);
         }
+        $this->logger->info("Restore Log Record: Complete", $loggerContext);
+    }
+    /**
+     * Compare a cupplied log value to schema before restoring. Apply a specific fix if necessary.
+     *
+     * @param array $sqlSchema The sql table schema for inserting into.
+     * @param string $key The column name and log data property name.
+     * @param string $dataKey The value to be inserted from log record.
+     * @returns mixed The value, corrected for schema where necessary.
+     */
+    private function validateColumnValue($sqlSchema, $key, $dataKey) {
+        //align supplied value from changelog record with sql schema requirements
+        $type = $sqlSchema[$key]->Type;
+        $allowNull = $sqlSchema[$key]->AllowNull;
+        $default = $sqlSchema[$key]->Default;
+        if ($type == 'enum' && !$allowNull && is_null($default) && !in_array($dataKey, $sqlSchema[$key]->Enum)) {
+            $dataKey = $sqlSchema[$key]->Enum[0];
+        } elseif ($type == 'enum' && is_null($default) && !in_array($dataKey, $sqlSchema[$key]->Enum)) {
+            $dataKey = null;
+        }
+        return $dataKey;
+    }
 
+    /**
+     * Compare a missing log value to schema before restoring. Apply a specific fix if necessary.
+     *
+     * @param array $sqlSchema The sql table schema for inserting into.
+     * @param string $key The column name and log data property name.
+     * @returns bool Does column require empty string or will it accept null.
+     */
+    private function validateColumnNullValue($sqlSchema, $key) {
+        $allowNull = $sqlSchema[$key]->AllowNull;
+        $default = $sqlSchema[$key]->Default;
+        $autoIncrement = $sqlSchema[$key]->AutoIncrement;
+        if (!$autoIncrement && !$allowNull && is_null($default)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Create an event for logged posts.
+     *
+     * @param string $operation The log operation being carried out.
+     * @param string $recordType The type of record being logged (we currently only support comments and discussions).
+     * @param array $data The data to be dispatched in the event.
+     * @param string $source The source responsible for logging the post (either "User" or a plugin).
+     * @param int $discipliningUserID The id of the user inserting or editing the post.
+     * @param string $disciplineType The discipline type (positive or negative).
+     * @param int $disciplinedUserID The id of the disciplining user.
+     * @param array $options Array of options.
+     * @return LogPostEvent
+     */
+    public static function createLogPostEvent(
+        string $operation,
+        string $recordType,
+        array  $data,
+        string $source,
+        int $discipliningUserID,
+        string $disciplineType,
+        int $disciplinedUserID = null,
+        array  $options = []
+    ): LogPostEvent {
+        $discipliningUser = Gdn::userModel()->getFragmentByID($discipliningUserID);
+        $disciplinedUser = Gdn::userModel()->getFragmentByID($disciplinedUserID ?? -1, true);
+        $hasRecordID = (!isset($options["recordID"]) || $options["recordID"] !== false);
+
+        $resourceEvent = null;
+
+        switch (strtolower($recordType)) {
+            case "comment":
+                if ($hasRecordID) {
+                    $commentModel = CommentModel::instance();
+                    $payloadData = $commentModel->getID($data["CommentID"] ?? $data["RecordID"], DATASET_TYPE_ARRAY);
+                    if ($payloadData !== false) {
+                        $resourceEvent = $commentModel->eventFromRow($payloadData, "log{$operation}");
+                    }
+                }
+                if (!isset($resourceEvent)) {
+                    $payloadData = self::normalizeLogPostDataWithNoRecordID($recordType, $data);
+                    $resourceEvent = new CommentEvent("log{$operation}", $payloadData);
+                }
+                break;
+            case "discussion":
+                if ($hasRecordID) {
+                    $discussionModel = DiscussionModel::instance();
+                    $payloadData = $discussionModel->getID($data["DiscussionID"] ?? $data["RecordID"], DATASET_TYPE_ARRAY);
+                    if ($payloadData !== false) {
+                        $resourceEvent = $discussionModel->eventFromRow($payloadData, "log{$operation}");
+                    }
+                }
+
+                if (!isset($resourceEvent)) {
+                    $payloadData = self::normalizeLogPostDataWithNoRecordID($recordType, $data);
+                    $resourceEvent = new DiscussionEvent("log{$operation}", $payloadData);
+                }
+                break;
+            default:
+                $resourceEvent = new GenericResourceEvent(
+                    $operation,
+                    [$recordType => $data],
+                    $discipliningUser
+                );
+                $resourceEvent->setType($recordType);
+                break;
+        }
+        return new LogPostEvent($resourceEvent, $source, $discipliningUser, $disciplinedUser, $disciplineType, $options);
+    }
+
+    /**
+     * Normalize data for LogPostEvents.
+     *
+     * @param string $recordType
+     * @param array $data
+     * @return array
+     */
+    public static function normalizeLogPostDataWithNoRecordID(string $recordType, array $data): array {
+        $data = ArrayUtils::camelCase($data);
+
+        $data["recordType"] = strtolower($recordType);
+
+        if (isset($data["categoryID"])) {
+            $data["categoryID"] = (int) $data["categoryID"];
+        }
+
+        if (isset($data["discussionID"])) {
+            $data["discussionID"] = (int) $data["discussionID"];
+        }
+
+        return [strtolower($recordType) => $data];
     }
 }

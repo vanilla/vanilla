@@ -108,24 +108,34 @@ class HomeController extends Gdn_Controller {
      */
     private function clearNavigationPreferences() {
         if (Gdn::session()->isValid()) {
-            $uri = Gdn::request()->getRequestArguments('server')['REQUEST_URI'];
+            $uri = Gdn::request()->getRequestArguments('server')['REQUEST_URI'] ?? '';
             $userModel = new UserModel();
             $userModel->clearSectionNavigationPreference($uri);
         }
     }
 
     /**
+     * Present the user with a confirmation page that they are leaving the site.
+     *
      * @param string $target
+     * @param bool $allowTrusted
      *
      * @throws Gdn_UserException Throw an exception if the domain is invalid.
      */
-    public function leaving($target = '') {
+    public function leaving($target = '', $allowTrusted = false) {
         $target = str_replace("\xE2\x80\xAE", '', $target);
+
+        $canAutoRedirect = $allowTrusted && $this->canAutoRedirect($target);
+        if ($canAutoRedirect) {
+            redirectTo($target, 302, false);
+        }
+
         try {
             $target = UrlUtils::domainAsAscii($target);
         } catch (Exception $e) {
             throw new Gdn_UserException(t('Url is invalid.'));
         }
+
         $this->setData('Target', anchor(htmlspecialchars($target), $target, '', ['rel' => 'nofollow']));
         $this->title(t('Leaving'));
         $this->removeCssFile('admin.css');
@@ -169,7 +179,7 @@ class HomeController extends Gdn_Controller {
      * @access public
      */
     public function termsOfService() {
-        $this->canonicalUrl(url('/home/termsofservices', true));
+        $this->canonicalUrl(url('/home/termsofservice', true));
         $this->render();
     }
 
@@ -249,5 +259,37 @@ class HomeController extends Gdn_Controller {
         } else {
             $this->renderException(permissionException());
         }
+    }
+
+    /**
+     * Can a URL be safely redirect to? Compares the target URL domain against trusted and upload domains.
+     *
+     * @param string $target
+     * @return bool
+     */
+    private function canAutoRedirect(string $target): bool {
+        $targetDomain = parse_url($target, PHP_URL_HOST);
+
+        if ($target === null) {
+            return true;
+        }
+
+        if (!is_string($target)) {
+            return false;
+        }
+
+        if (isTrustedDomain($targetDomain)) {
+            return true;
+        }
+
+        $upload = new \Gdn_Upload();
+        foreach ($upload->getUploadWebPaths() as $uploadPath) {
+            $uploadDomain = parse_url($uploadPath, PHP_URL_HOST);
+            if ($targetDomain === $uploadDomain) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

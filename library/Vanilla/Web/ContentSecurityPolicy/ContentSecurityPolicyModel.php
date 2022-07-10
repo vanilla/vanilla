@@ -6,13 +6,18 @@
 
 namespace Vanilla\Web\ContentSecurityPolicy;
 
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
+use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\Web\UASnifferInterface;
 
 /**
  * Content security policies model.
  */
-class ContentSecurityPolicyModel {
+class ContentSecurityPolicyModel implements LoggerAwareInterface {
+
+    use LoggerAwareTrait;
     const CONTENT_SECURITY_POLICY = 'Content-Security-Policy';
 
     const X_FRAME_OPTIONS = 'X-Frame-Options';
@@ -26,19 +31,21 @@ class ContentSecurityPolicyModel {
     /** @var UASnifferInterface */
     private $isIE11;
 
-    /** @var LoggerInterface */
-    private $logger;
+    /** @var ConfigurationInterface */
+    private $config;
 
     /**
      * ContentSecurityPolicyModel constructor.
      *
      * @param UASnifferInterface $ieDetector
      * @param LoggerInterface $logger
+     * @param ConfigurationInterface $config
      */
-    public function __construct(UASnifferInterface $ieDetector, LoggerInterface $logger) {
+    public function __construct(UASnifferInterface $ieDetector, LoggerInterface $logger, ConfigurationInterface $config) {
         $this->isIE11 = $ieDetector->isIE11();
         $this->logger = $logger;
         $this->nonce = md5(base64_encode(APPLICATION_VERSION.rand(1, 1000000)));
+        $this->config = $config;
     }
 
     /**
@@ -55,14 +62,20 @@ class ContentSecurityPolicyModel {
      */
     public function getPolicies(): array {
         $nonce = $this->getNonce();
-        // Note:
-        // In modern browsers that support `nonce-` unsafe-inline is ignored.
-        // Older browsers need unsafe inline applied.
-        // @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/script-src
-        // "Specifying nonce makes a modern browser ignore 'unsafe-inline' which could still be set for older browsers without nonce support."
-        $policies[] = new Policy(Policy::SCRIPT_SRC, "'nonce-$nonce' 'unsafe-inline'");
-        foreach ($this->providers as $provider) {
-            $policies = array_merge($policies, $provider->getPolicies());
+
+        $policies = [];
+
+            // Note:
+            // In modern browsers that support `nonce-` unsafe-inline is ignored.
+            // Older browsers need unsafe inline applied.
+            // @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/script-src
+            // "Specifying nonce makes a modern browser ignore 'unsafe-inline' which could still be set for older browsers without nonce support."
+            $policies[] = new Policy(Policy::SCRIPT_SRC, "'nonce-$nonce' 'unsafe-inline'");
+            foreach ($this->providers as $provider) {
+                $policies = array_merge($policies, $provider->getPolicies());
+            }
+        if ($this->config->get('HotReload.Enabled', false)) {
+            $policies[] = new Policy(Policy::SCRIPT_SRC, "'unsafe-eval' 'https://webpack.vanilla.localhost'");
         }
         return $policies;
     }
@@ -86,10 +99,11 @@ class ContentSecurityPolicyModel {
         foreach ($policies as $policy) {
             $directive = $policy->getDirective();
             if ($filter === 'all' || $directive === $filter) {
+                $policyArgument = str_replace(["\r","\n"], "", $policy->getArgument());
                 if (array_key_exists($directive, $directives)) {
-                    $directives[$directive] .= ' ' . $policy->getArgument();
+                    $directives[$directive] .= ' ' . $policyArgument;
                 } else {
-                    $directives[$directive] = $directive . ' ' . $policy->getArgument();
+                    $directives[$directive] = $directive . ' ' . $policyArgument;
                 }
             }
         }
@@ -126,7 +140,7 @@ class ContentSecurityPolicyModel {
 
         // If we have just one, we can support ALLOW_FROM.
         // See https://tools.ietf.org/html/rfc7034#section-2.3.2.3
-        if (count($ancestorArguments) <= 1) {
+        if (count($ancestorArguments) === 1) {
             return Policy::X_FRAME_ALLOW_FROM . ' ' . $ancestorArguments[0];
         }
 

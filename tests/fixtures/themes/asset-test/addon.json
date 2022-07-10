@@ -2,9 +2,10 @@
     "key": "asset-test",
     "name": "Asset Test Theme",
     "type": "theme",
+    "parent": "asset-parent-test",
     "assets": {
         "fonts": {
-            "type": "data",
+            "type": "json",
             "file": "fonts.json"
         },
         "footer": {
@@ -20,7 +21,7 @@
             "file": "javascript.js"
         },
         "scripts": {
-            "type": "data",
+            "type": "json",
             "file": "scripts.json"
         },
         "styles": {

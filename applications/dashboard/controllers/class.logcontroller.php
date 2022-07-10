@@ -154,10 +154,9 @@ class LogController extends DashboardController {
     /**
      * View list of edits (edit/delete actions).
      *
-     * @since 2.0.?
-     * @access public
-     *
-     * @param int $page Page number.
+     * @param string $type
+     * @param string $page Page number.
+     * @param string|false $op
      */
     public function edits($type = '', $page = '', $op = false) {
         $this->permission('Garden.Moderation.Manage');
@@ -212,13 +211,18 @@ class LogController extends DashboardController {
      *
      * @param string $recordType
      * @param int $recordID
+     * @throws Gdn_UserException If non-system user accesses recordType configuration.
      */
     public function record($recordType, $recordID, $page = '') {
         $this->permission('Garden.Moderation.Manage');
+
         list($offset, $limit) = offsetLimit($page, 10);
         $this->setData('Title', t('Change Log'));
 
         $recordType = ucfirst($recordType);
+        if ($recordType === 'Configuration' && Gdn::session()->User->Admin !== 2) {
+            throw forbiddenException('@'.t('You do not have permission to access the requested resource.'));
+        }
         $where = [
             'Operation' => ['Edit', 'Delete', 'Ban'],
             'RecordType' => $recordType,
@@ -302,7 +306,7 @@ class LogController extends DashboardController {
      */
     public function initialize() {
         parent::initialize();
-        Gdn_Theme::section('Dashboard');
+        Gdn_Theme::section('Moderation');
         $this->addJsFile('log.js');
         $this->addJsFile('jquery.expander.js');
         $this->addJsFile('jquery-ui.min.js');
@@ -312,11 +316,7 @@ class LogController extends DashboardController {
     /**
      * View moderation logs.
      *
-     * @since 2.0.?
-     * @access public
-     *
-     * @param mixed $CategoryUrl Slug.
-     * @param int $page Page number.
+     * @param string $page Page number.
      */
     public function moderation($page = '') {
         $this->permission(['Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'], false);
@@ -367,15 +367,12 @@ class LogController extends DashboardController {
 
         // Grab the logs.
         $logs = $this->LogModel->getIDs($logIDs);
-        try {
-            foreach ($logs as $log) {
-                $this->LogModel->restore($log);
-            }
-        } catch (Exception $ex) {
-            $this->Form->addError($ex->getMessage());
+        foreach ($logs as $log) {
+            $this->LogModel->restore($log);
         }
         $this->LogModel->recalculate();
         $this->render('Blank', 'Utility');
+
     }
 
     public function notSpam() {
@@ -400,9 +397,14 @@ class LogController extends DashboardController {
 
         // Grab the logs.
         $logs = array_merge($logs, $this->LogModel->getIDs($logIDs));
+        $logs = array_column($logs, null, "LogID");
 
 //      try {
         foreach ($logs as $log) {
+            if ($this->checkUserRecord($log) && $log['RecordType'] === 'Registration') {
+                $this->LogModel->delete(['LogID' => $log['LogID']]);
+                continue;
+            }
             $this->LogModel->restore($log);
         }
 //      } catch (Exception $Ex) {
@@ -410,18 +412,38 @@ class LogController extends DashboardController {
 //      }
         $this->LogModel->recalculate();
 
+        // Clear LogCount's cache
+        $this->LogModel::clearOperationCountCache('spam');
+
         $this->setData('Complete');
         $this->setData('Count', count($logs));
         $this->render('Blank', 'Utility');
     }
 
     /**
+     * Check if a user log record already exists in user table.
+     *
+     * @param array $log
+     * @return bool If a user record already exists.
+     */
+    private function checkUserRecord(array $log): bool {
+        $isUserDuplicate = $userEmailExists = false;
+        $emailUnique = Gdn::userModel()->isEmailUnique();
+        if (isset($log['Data']['Email'])) {
+            $userLogEmail = $log['Data']['Email'];
+            $userEmailExists = Gdn::userModel()->getByEmail($userLogEmail, false, ['dataType' => DATASET_TYPE_ARRAY]);
+        }
+
+        if ($userEmailExists && $emailUnique) {
+            $isUserDuplicate = true;
+        }
+        return $isUserDuplicate;
+    }
+
+    /**
      * View spam logs.
      *
-     * @since 2.0.?
-     * @access public
-     *
-     * @param int $page Page number.
+     * @param string $page Page number.
      */
     public function spam($page = '') {
         $this->permission(['Garden.Moderation.Manage', 'Moderation.Spam.Manage'], false);

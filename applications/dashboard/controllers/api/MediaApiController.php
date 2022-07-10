@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -8,13 +8,10 @@ use Garden\SafeCurl\Exception\InvalidURLException;
 use Garden\Schema\Schema;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
-use Vanilla\ApiUtils;
 use Vanilla\Contracts\ConfigurationInterface;
 use \Vanilla\EmbeddedContent\EmbedService;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\ImageResizer;
-use Vanilla\Models\VanillaMediaSchema;
-use Vanilla\UploadedFile;
 use Vanilla\UploadedFileSchema;
 use \Vanilla\EmbeddedContent\AbstractEmbed;
 
@@ -23,14 +20,10 @@ use \Vanilla\EmbeddedContent\AbstractEmbed;
  */
 class MediaApiController extends AbstractApiController {
 
-    /**
-     * @deprecated
-     */
+    /** @deprecated */
     const TYPE_IMAGE = 'image';
 
-    /**
-     * @deprecated
-     */
+    /** @deprecated */
     const TYPE_FILE = 'file';
 
     /** @var Schema */
@@ -48,6 +41,18 @@ class MediaApiController extends AbstractApiController {
     /** @var ConfigurationInterface */
     private $config;
 
+    /** @var bool */
+    private $resizeImages;
+
+    /** @var ?int Max image upload height */
+    private $maxImageHeight;
+
+    /** @var ?int Max image upload width */
+    private $maxImageWidth;
+
+    // Supplementary allowed file extensions for upload, given the user has the `Garden.Community.Manage` permission.
+    const UPLOAD_RESTRICTED_ALLOWED_FILE_EXTENSIONS = ['svg'];
+
     /**
      * DI.
      * @inheritdoc
@@ -57,6 +62,9 @@ class MediaApiController extends AbstractApiController {
         $this->embedService = $embedService;
         $this->imageResizer = $imageResizer;
         $this->config =  $config;
+        $this->resizeImages = $this->config->get('ImageUpload.Limits.Enabled');
+        $this->maxImageHeight = $this->config->get('ImageUpload.Limits.Height');
+        $this->maxImageWidth = $this->config->get('ImageUpload.Limits.Width');
     }
 
     /**
@@ -238,6 +246,10 @@ class MediaApiController extends AbstractApiController {
         $this->permission('Garden.Uploads.Add');
 
         $allowedExtensions = $this->config->get('Garden.Upload.AllowedFileExtensions', []);
+        // Users with the `Garden.Community.Manage` permission have some extra allowed file extensions to upload.
+        if ($this->getSession()->getPermissions()->has('Garden.Community.Manage')) {
+            $allowedExtensions = array_merge($allowedExtensions, $this::UPLOAD_RESTRICTED_ALLOWED_FILE_EXTENSIONS);
+        }
         $uploadSchema = new UploadedFileSchema([
             UploadedFileSchema::OPTION_ALLOWED_EXTENSIONS => $allowedExtensions,
             UploadedFileSchema::OPTION_VALIDATE_CONTENT_TYPES => FeatureFlagHelper::featureEnabled('validateContentTypes'),
@@ -250,10 +262,26 @@ class MediaApiController extends AbstractApiController {
         ], 'in')->setDescription('Add a media item.');
 
         $body = $in->validate($body);
-        $row = $this->mediaModel->saveUploadedFile(
-            $body['file'],
-            ['foreignType' => 'embed', 'foreignID' => $this->getSession()->UserID ]
-        );
+
+        $fileData = [
+            'foreignType' => 'embed',
+            'foreignID' => $this->getSession()->UserID
+        ];
+
+        if ($this->resizeImages) {
+            //Bypass ImageUpload.Limits if user has 'Garden.Community.Manage' permission or higher
+            $bypassUploadLimits = $this->getSession()->getPermissions()->hasRanked('Garden.Community.Manage');
+
+            if ($bypassUploadLimits) {
+                $fileData['maxImageHeight'] = MediaModel::NO_IMAGE_DIMENSIONS_LIMIT;
+                $fileData['maxImageWidth'] = MediaModel::NO_IMAGE_DIMENSIONS_LIMIT;
+            } else {
+                $fileData['maxImageHeight'] = $this->maxImageHeight;
+                $fileData['maxImageWidth'] = $this->maxImageWidth;
+            }
+        }
+
+        $row = $this->mediaModel->saveUploadedFile($body['file'], $fileData);
         return $row;
     }
 

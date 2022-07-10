@@ -9,25 +9,27 @@ import classNames from "classnames";
 import SiteNavNode, { IActiveRecord } from "@library/navigation/SiteNavNode";
 import { siteNavClasses } from "@library/navigation/siteNavStyles";
 import Heading from "@library/layout/Heading";
-import { PanelWidgetVerticalPadding } from "@library/layout/PanelLayout";
 import { t } from "@library/utility/appUtils";
 import { useUniqueID } from "@library/utility/idUtils";
 import { INavigationTreeItem } from "@library/@types/api/core";
-import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { TabHandler } from "@vanilla/dom-utils";
 import { panelListClasses } from "@library/layout/panelListStyles";
+import { useSection } from "@library/layout/LayoutContext";
+import { SiteNavNodeTypes } from "@library/navigation/SiteNavNodeTypes";
 
 interface IProps {
-    activeRecord: IActiveRecord;
+    activeRecord?: IActiveRecord;
     id?: string;
     className?: string;
     children: INavigationTreeItem[];
     collapsible: boolean;
     bottomCTA?: React.ReactNode;
+    onSelectItem?(item: INavigationTreeItem);
     onItemHover?(item: INavigationTreeItem);
     title?: string;
     hiddenTitle?: boolean;
     clickableCategoryLabels?: boolean;
+    siteNavNodeTypes?: SiteNavNodeTypes;
 }
 
 /**
@@ -39,10 +41,10 @@ export function SiteNav(props: IProps) {
 
     const titleID = id + "-title";
 
-    const { activeRecord, collapsible, onItemHover, children } = props;
+    const { activeRecord, collapsible, onItemHover, onSelectItem, children, siteNavNodeTypes } = props;
     const hasChildren = children && children.length > 0;
     const classes = siteNavClasses();
-    const classesPanelList = panelListClasses();
+    const classesPanelList = panelListClasses(useSection().mediaQueries);
 
     const handleKeyDown = useKeyboardHandler();
     const content = hasChildren
@@ -55,8 +57,10 @@ export function SiteNav(props: IProps) {
                       key={child.recordType + child.recordID}
                       titleID={titleID}
                       depth={0}
+                      onSelectItem={onSelectItem}
                       onItemHover={onItemHover}
                       clickableCategoryLabels={!!props.clickableCategoryLabels}
+                      siteNavNodeTypes={siteNavNodeTypes}
                   />
               );
           })
@@ -64,19 +68,17 @@ export function SiteNav(props: IProps) {
 
     if (hasChildren) {
         return (
-            <nav onKeyDownCapture={handleKeyDown} className={classNames("siteNav", props.className, classes.root)}>
+            <nav
+                aria-labelledby={titleID}
+                onKeyDownCapture={handleKeyDown}
+                className={classNames("siteNav", props.className, classes.root)}
+            >
                 {props.title ? (
-                    <>
-                        <Heading
-                            title={props.title}
-                            className={classNames(classesPanelList.title, "panelList-title", "tableOfContents-title")}
-                        />
-                        <ConditionalWrap condition={!!props.hiddenTitle} className={"sr-only"}>
-                            <PanelWidgetVerticalPadding>
-                                <Heading title={props.title} className={classNames("siteNav-title", classes.title)} />
-                            </PanelWidgetVerticalPadding>
-                        </ConditionalWrap>
-                    </>
+                    <Heading
+                        id={titleID}
+                        title={props.title}
+                        className={classNames(classesPanelList.title, "panelList-title", "tableOfContents-title")}
+                    />
                 ) : (
                     <h2 id={titleID} className="sr-only">
                         {t("Navigation")}

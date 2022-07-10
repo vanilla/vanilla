@@ -36,6 +36,8 @@ $global-color_secondary:                $global-color_apricot !default;
 
 $global-color_bg:                       $global-color_white !default;
 $global-color_fg:                       darken(desaturate($global-color_cerulean, 1%), 10%) !default; // text color | should have high contrast between $global-color_bg
+$global-medium_fontSize:                14px !default;
+$global-block_margin:                   $global-medium_fontSize !default;
 
 /* -------------------------------------------------------------- *\
     Theme
@@ -100,6 +102,8 @@ $hamburger_color:                         $global-color_white !default;
     Components
 \* -------------------------------------------------------------- */
 
+$component-vertical_padding:             $global-block_margin !default;
+$component-horizontal_padding:           $global-block_margin !default;
 $component_lateralBorder:                true !default;
 $component-item_spacing:                 $utility-baseUnitDouble !default;
 $component_borderWidth:                  0 !default;

@@ -9,6 +9,9 @@
  * @since 2.0
  */
 
+use Vanilla\Logging\ErrorLogger;
+use Vanilla\Site\SiteSectionModel;
+
 /**
  * Allows access to theme controls from within views, to give themers a unified
  * toolset for interacting with Vanilla from within views.
@@ -89,18 +92,20 @@ class Gdn_Theme {
             array_pop($data);
         }
 
-        $defaultRoute = ltrim(val('Destination', Gdn::router()->getRoute('DefaultController'), ''), '/');
-
+        /** @var  SiteSectionModel $siteSectionModel */
+        $siteSectionModel = Gdn::getContainer()->get(SiteSectionModel::class);
+        $currentSection = $siteSectionModel->getCurrentSiteSection();
+        $defaultRoute = ltrim($currentSection->getDefaultRoute()['Destination']?? '', '/');
         $count = 0;
         $dataCount = 0;
-        $homeLinkFound = false;
         $position = 1;
         $displayStructuredData = false;
+        $homeLinkFound = false;
 
         foreach ($data as $row) {
             $dataCount++;
 
-            if ($homeLinkFound && Gdn::request()->urlCompare($row['Url'], $defaultRoute) === 0) {
+            if ($homeLinkFound && Gdn::request()->urlCompare($row['Url'] ?? '', $defaultRoute) === 0) {
                 continue; // don't show default route twice.
             } else {
                 $homeLinkFound = true;
@@ -113,7 +118,7 @@ class Gdn_Theme {
                 $displayStructuredData = true;
             }
 
-            $row['Url'] = $row['Url'] ? url($row['Url']) : '#';
+            $row['Url'] = !empty($row['Url']) ? url($row['Url']) : '#';
             $cssClass = 'CrumbLabel '.val('CssClass', $row);
             if ($dataCount == count($data)) {
                 $cssClass .= ' Last';
@@ -158,7 +163,7 @@ class Gdn_Theme {
     /**
      * Call before starting a row of bullet-seperated items.
      *
-     * @param strng|bool $sep The seperator used to seperate each section.
+     * @param string|bool $sep The seperator used to seperate each section.
      * @since 2.1
      */
     public static function bulletRow($sep = false) {
@@ -434,7 +439,7 @@ class Gdn_Theme {
         if ($logo) {
             return img(Gdn_Upload::url($logo), ['alt' => $title]);
         } else {
-            return $title;
+            return htmlEsc($title);
         }
     }
 
@@ -464,19 +469,32 @@ class Gdn_Theme {
                     $result = "<!-- Error: $name doesn't exist -->";
                 }
             } else {
-                $module = new $name(Gdn::controller(), '');
+                if (!Gdn::controller()) {
+                    return "<!-- Error: Could not render module without a Gdn_Controller instance. -->";
+                }
+
+                if (is_a($name, \Vanilla\Web\JsInterpop\AbstractReactModule::class)) {
+                    $module = \Gdn::getContainer()->get($name);
+                } else {
+                    $module = \Gdn::getContainer()->getArgs($name, [Gdn::controller(), '']);
+                }
+
                 $module->Visible = true;
 
-                // Add properties passed in from the controller.
-                $controllerProperties = Gdn::controller()->data('_properties.'.strtolower($name), []);
-                $properties = array_merge($controllerProperties, $properties);
+                if ($module instanceof \Vanilla\Widgets\React\CombinedPropsWidgetInterface) {
+                    $module->setProps($properties);
+                } else {
+                    // Add properties passed in from the controller.
+                    $controllerProperties = Gdn::controller()->data('_properties.'.strtolower($name), []);
+                    $properties = array_merge($controllerProperties, $properties);
 
-                foreach ($properties as $name => $value) {
-                    // Check for a setter method
-                    if (method_exists($module, $method = 'set'.ucfirst($name))) {
-                        $module->$method($value);
-                    } else {
-                        $module->$name = $value;
+                    foreach ($properties as $name => $value) {
+                        // Check for a setter method
+                        if (method_exists($module, $method = 'set'.ucfirst($name))) {
+                            $module->$method($value);
+                        } else {
+                            $module->$name = $value;
+                        }
                     }
                 }
 
@@ -486,7 +504,8 @@ class Gdn_Theme {
             if (debug()) {
                 $result = '<pre class="Exception">'.htmlspecialchars($ex->getMessage()."\n".$ex->getTraceAsString()).'</pre>';
             } else {
-                $result = $ex->getMessage();
+                $result = '';
+                ErrorLogger::error($ex, [$name]);
             }
         }
 
@@ -527,6 +546,13 @@ class Gdn_Theme {
         }
 
         return 'unknown';
+    }
+
+    /**
+     * Reset the current section.
+     */
+    public static function resetSection() {
+        self::$_Section = [];
     }
 
     /**

@@ -9,24 +9,31 @@ namespace Vanilla\Formatting\Formats;
 
 use Garden\Schema\ValidationException;
 use Garden\StaticCacheTranslationTrait;
+use Logger;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\EmbeddedContent\AbstractEmbed;
 use Vanilla\EmbeddedContent\Embeds\FileEmbed;
 use Vanilla\EmbeddedContent\Embeds\ImageEmbed;
 use Vanilla\Contracts\Formatting\HeadingProviderInterface;
-use Vanilla\Formatting\Attachment;
 use Vanilla\Formatting\BaseFormat;
 use Vanilla\Formatting\Exception\FormattingException;
 use Vanilla\Contracts\Formatting\Heading;
+use Vanilla\Formatting\Html\Processor\ExternalLinksProcessor;
+use Vanilla\Formatting\ParsableDOMInterface;
 use Vanilla\Formatting\Quill\Blots\Embeds\ExternalBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\HeadingTerminatorBlot;
+use Vanilla\Formatting\TextDOMInterface;
+use Vanilla\Logging\ErrorLogger;
 use Vanilla\Web\TwigRenderTrait;
 use Vanilla\Formatting\Quill;
 
 /**
  * Format service for the rich editor format. Rendered and parsed using Quill.
  */
-class RichFormat extends BaseFormat {
-
+class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAwareInterface {
+    use LoggerAwareTrait;
     use TwigRenderTrait;
     use StaticCacheTranslationTrait;
 
@@ -55,6 +62,7 @@ class RichFormat extends BaseFormat {
         $this->parser = $parser;
         $this->renderer = $renderer;
         $this->filterer = $filterer;
+        $this->setLogger(Logger::getLogger());
     }
 
 
@@ -65,8 +73,14 @@ class RichFormat extends BaseFormat {
         try {
             $content = $this->filterer->filter($content);
             $operations = Quill\Parser::jsonToOperations($content);
-            $blotGroups = $this->parser->parse($operations);
-            return $this->renderer->render($blotGroups);
+
+            $blotGroups = $this->parser->parse(
+                $operations,
+                $this->allowExtendedContent ? Quill\Parser::PARSE_MODE_EXTENDED : Quill\Parser::PARSE_MODE_NORMAL
+            );
+            $html = $this->renderer->render($blotGroups);
+            $html = $this->applyHtmlProcessors($html);
+            return $html;
         } catch (\Throwable $e) {
             $this->logBadInput($e);
             if ($throw) {
@@ -182,6 +196,27 @@ class RichFormat extends BaseFormat {
     /**
      * @inheritdoc
      */
+    public function parseImages(string $content): array {
+        $props = [];
+        try {
+            $embeds = $this->parseEmbedsOfType($content, ImageEmbed::class);
+
+            /** @var ImageEmbed $imageEmbed */
+            foreach ($embeds as $imageEmbed) {
+                $props[] = [
+                    "url" => $imageEmbed->getUrl(),
+                    "alt" => $imageEmbed->getAlt()
+                ];
+            }
+        } catch (\Throwable $e) {
+            $this->logBadInput($e);
+        }
+        return $props;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function parseAttachments(string $content): array {
         $attachments = [];
 
@@ -272,14 +307,10 @@ class RichFormat extends BaseFormat {
      * @param string $input
      */
     private function logBadInput(string $input) {
-        trigger_error(
-            errorMessage(
-                "Bad input encountered",
-                self::class,
-                __METHOD__,
-                $input
-            ),
-            E_USER_WARNING
+        ErrorLogger::notice(
+            "Malformed rich text encounted.",
+            ['formatService'],
+            ['input' => $input] + ($this->context ?? [])
         );
     }
 
@@ -330,5 +361,20 @@ class RichFormat extends BaseFormat {
         }
         $output = json_encode($operations, JSON_UNESCAPED_UNICODE);
         return $output;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function parseDOM(string $content): TextDOMInterface {
+        $content = $this->filterer->filter($content);
+        $operations = Quill\Parser::jsonToOperations($content);
+
+        $blotGroups = $this->parser->parse(
+            $operations,
+            $this->allowExtendedContent ? Quill\Parser::PARSE_MODE_EXTENDED : Quill\Parser::PARSE_MODE_NORMAL
+        );
+
+        return $blotGroups;
     }
 }

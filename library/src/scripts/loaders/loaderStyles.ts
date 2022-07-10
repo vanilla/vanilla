@@ -4,11 +4,14 @@
  * @license GPL-2.0-only
  */
 
-import { absolutePosition, flexHelper, ISpinnerProps, spinnerLoader, unit } from "@library/styles/styleHelpers";
+import { flexHelper, ISpinnerProps, spinnerLoader } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { TLength } from "typestyle/lib/types";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { TLength } from "@library/styles/styleShim";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { percent } from "csx";
+import { Mixins } from "@library/styles/Mixins";
 
 export const loaderVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -50,9 +53,9 @@ export const loaderClasses = useThemeCache(() => {
         right: 0,
         bottom: 0,
         margin: "auto",
-        height: unit(vars.fullPage.size),
-        width: unit(vars.fullPage.size),
-        $nest: {
+        height: styleUnit(vars.fullPage.size),
+        width: styleUnit(vars.fullPage.size),
+        ...{
             "&:after": {
                 ...spinnerLoader(vars.fullPage),
             },
@@ -60,11 +63,11 @@ export const loaderClasses = useThemeCache(() => {
         zIndex: 1,
     });
     const mediumLoader = style("mediumLoader", {
-        ...absolutePosition.fullSizeOfParent(),
+        ...Mixins.absolute.fullSizeOfParent(),
         ...flex.middle(),
         height: percent(100),
         width: percent(100),
-        $nest: {
+        ...{
             "&:after": {
                 ...spinnerLoader(vars.medium),
             },
@@ -75,7 +78,7 @@ export const loaderClasses = useThemeCache(() => {
         height: percent(46),
         width: percent(46),
         margin: "auto",
-        $nest: {
+        ...{
             "&:after": {
                 ...spinnerLoader(vars.small),
             },
@@ -87,8 +90,8 @@ export const loaderClasses = useThemeCache(() => {
             position: "relative",
             display: "block",
             margin: "auto",
-            height: unit(size),
-            width: unit(size),
+            height: styleUnit(size),
+            width: styleUnit(size),
         });
     };
 

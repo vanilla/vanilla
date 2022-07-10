@@ -1,7 +1,6 @@
 {
     "extends": "@vanilla/tsconfig/base.json",
     "compilerOptions": {
-        "baseUrl": ".",
         "paths": {
             "@library/*": ["./library/src/scripts/*"],
             "@vanilla/addon-vanilla/*": ["./applications/vanilla/src/scripts/*"],
@@ -9,13 +8,50 @@
             "@rich-editor/*": ["./plugins/rich-editor/src/scripts/*"],
             "@openapi-embed/*": ["./plugins/openapi-embed/src/scripts/*"],
             "@knowledge/*": ["./plugins/knowledge/src/scripts/*"],
+            "@vanillaanalytics/*": ["./plugins/vanillaanalytics/src/scripts/*"],
+            "@oauth2/*": ["./plugins/oauth2/src/scripts/*"],
             "@webhooks/*": ["./plugins/webhooks/src/scripts/*"],
             "@themingapi/*": ["./plugins/themingapi/src/scripts/*"],
             "@subcommunities/*": ["./plugins/subcommunities/src/scripts/*"],
-            "@groups/*": ["./applications/groups/src/scripts/*"]
+            "@groups/*": ["./applications/groups/src/scripts/*"],
+            "@Ranks/*": ["./plugins/Ranks/src/scripts/*"],
+            "@Reactions/*": ["./plugins/Reactions/src/scripts/*"],
+            "@badges/*": ["./plugins/badges/src/scripts/*"],
+            "@Online/*": ["./plugins/Online/src/scripts/*"],
+            "@ElasticSearch/*": ["./plugins/ElasticSearch/src/scripts/*"],
+            "typestyle": ["./library/src/scripts/styles/styleShim.ts"],
+            "@vanilla/babel-preset": ["./packages/vanilla-babel-preset/*"],
+            "@vanilla/dom-utils": ["./packages/vanilla-dom-utils/*"],
+            "@vanilla/eslint-config": ["./packages/vanilla-eslint-config/*"],
+            "@vanilla/i18n": ["./packages/vanilla-i18n/*"],
+            "@vanilla/polyfill": ["./packages/vanilla-polyfill/*"],
+            "@vanilla/prettier-config": ["./packages/vanilla-prettier-config/*"],
+            "@vanilla/react-utils": ["./packages/vanilla-react-utils/*"],
+            "@vanilla/redux-utils": ["./packages/vanilla-redux-utils/*"],
+            "@vanilla/theme-core": ["./packages/vanilla-theme-core/*"],
+            "@vanilla/tsconfig": ["./packages/vanilla-tsconfig/*"],
+            "@vanilla/utils": ["./packages/vanilla-utils/*"],
+            "@vanilla/icons": ["./packages/vanilla-icons/*"]
         },
-        "typeRoots": ["@types", "./node_modules/@types"]
+        // Turning incremental on add 10+ minutes of emit time (because it requires emitting declarations).
+        // Our typecheck time is ~30 seconds. When we emit it takes much longer.
+        "incremental": false,
+        "skipLibCheck": true,
+        "skipDefaultLibCheck": true
     },
-    "include": ["**/*.ts", "**/*.tsx"],
-    "exclude": ["**/*.js", "**/*.jsx"]
+    "include": [
+        "build/scripts/**/*.ts",
+        "library/src/scripts/**/*.ts",
+        "library/src/scripts/**/*.tsx",
+        "applications/*/src/scripts/**/*.ts",
+        "applications/*/src/scripts/**/*.tsx",
+        "plugins/*/src/scripts/**/*.ts",
+        "plugins/*/src/scripts/**/*.tsx",
+        "themes/*/src/scripts/**/*.ts",
+        "themes/*/src/scripts/**/*.tsx",
+        "addons/themes/*/src/scripts/**/*.ts",
+        "addons/themes/*/src/scripts/**/*.tsx",
+        ".storybookAppPages/*.ts*"
+    ],
+    "exclude": ["**/*.js", "**/*.jsx", "cloud/**/*", "node_modules/**/*", "node_modules", "packages/*/src/*"]
 }

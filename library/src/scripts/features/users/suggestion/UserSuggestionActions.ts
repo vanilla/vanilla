@@ -6,7 +6,7 @@
 
 import { logError } from "@vanilla/utils";
 import { LoadStatus } from "@library/@types/api/core";
-import { IUsersStoreState } from "@library/features/users/userModel";
+import { IUsersStoreState } from "@library/features/users/userTypes";
 import ReduxActions, { ActionsUnion } from "@library/redux/ReduxActions";
 import { IUserSuggestion } from "@library/features/users/suggestion/IUserSuggestion";
 import UserSuggestionModel from "@library/features/users/suggestion/UserSuggestionModel";
@@ -142,13 +142,13 @@ export default class UserSuggestionActions extends ReduxActions {
             };
             return apiv2
                 .get("/users/by-names/", { params /*, cancelToken: this.apiCancelSource.token*/ })
-                .then(response => {
+                .then((response) => {
                     if (response.status >= 500) {
                         throw new Error(response.data);
                     }
 
                     // Add unique domIDs to each user.
-                    response.data = response.data.map(data => {
+                    response.data = response.data.map((data) => {
                         data.domID = "mentionSuggestion" + data.userID;
                         return data;
                     });
@@ -156,7 +156,7 @@ export default class UserSuggestionActions extends ReduxActions {
                     // Result is good. Lets GO!
                     dispatch(UserSuggestionActions.loadUsersACs.response(response, { username }));
                 })
-                .catch(error => {
+                .catch((error) => {
                     logError(error);
                     dispatch(UserSuggestionActions.loadUsersACs.error(error, { username }));
                 });

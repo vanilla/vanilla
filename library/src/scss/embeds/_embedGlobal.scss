@@ -22,6 +22,7 @@
     justify-content: center;
     align-items: center;
     box-sizing: border-box;
+    clear: both;
 }
 
 .embedExternal-content {
@@ -110,6 +111,17 @@
             &:after {
                 box-shadow: 0 0 0 $embedded-select_borderWidth rgba($embed_focus_color, 0.5) inset;
             }
+        }
+    }
+
+    .embedImage {
+        .embedExternal-content:after {
+            @include absolute-fullSizeOfParent;
+            content: "";
+            cursor: "pointer";
+            z-index: 2;
+            transition: 0.2s ease box-shadow;
+            pointer-events: all;
         }
     }
 

@@ -13,7 +13,8 @@ use Vanilla\AddonManager;
 use Vanilla\Contracts;
 use Vanilla\Web\TwigRenderTrait;
 use Vanilla\Contracts\ConfigurationInterface;
-use Vanilla\Models\ThemeModel;
+use Vanilla\Theme\ThemeService;
+use Webmozart\PathUtil\Path;
 
 /**
  * Class to provide assets from the webpack build process.
@@ -21,6 +22,8 @@ use Vanilla\Models\ThemeModel;
 class WebpackAssetProvider {
 
     use TwigRenderTrait;
+
+    const COLLECTION_SECTION = "async";
 
     /** @var RequestInterface */
     private $request;
@@ -34,8 +37,8 @@ class WebpackAssetProvider {
     /** @var ConfigurationInterface */
     private $config;
 
-    /** @var ThemeModel */
-    private $themeModel;
+    /** @var ThemeService */
+    private $themeService;
 
     /** @var string */
     private $cacheBustingKey = '';
@@ -47,10 +50,13 @@ class WebpackAssetProvider {
     private $hotReloadEnabled = false;
 
     /** @var string */
-    private $hotReloadIP;
-
-    /** @var string */
     private $fsRoot = PATH_ROOT;
+
+    /** @var WebpackAssetDefinitionCollection[] */
+    private $collectionForSection = [];
+
+    /** @var string[] */
+    private $enabledAddonKeys = null;
 
     /**
      * WebpackAssetProvider constructor.
@@ -59,31 +65,36 @@ class WebpackAssetProvider {
      * @param AddonManager $addonManager
      * @param \Gdn_Session $session
      * @param ConfigurationInterface $config
-     * @param ThemeModel $themeModel
+     * @param ThemeService $themeService
      */
     public function __construct(
         RequestInterface $request,
         AddonManager $addonManager,
         \Gdn_Session $session,
         ConfigurationInterface $config,
-        ThemeModel $themeModel
+        ThemeService $themeService
     ) {
         $this->request = $request;
         $this->addonManager = $addonManager;
         $this->session = $session;
         $this->config = $config;
-        $this->themeModel = $themeModel;
+        $this->themeService = $themeService;
+    }
+
+    /**
+     * Clear the collections in memory.
+     */
+    public function clearCollections() {
+        $this->collectionForSection = [];
     }
 
     /**
      * Enable loading of hot reloading assets in place of the normal ones.
      *
      * @param bool $enabled The enable value.
-     * @param string $ip Optionally override the ip address the hot bundle is served from.
      */
-    public function setHotReloadEnabled(bool $enabled, string $ip = "") {
+    public function setHotReloadEnabled(bool $enabled) {
         $this->hotReloadEnabled = $enabled;
-        $this->hotReloadIP = $ip ?: "127.0.0.1";
     }
 
     /**
@@ -91,13 +102,6 @@ class WebpackAssetProvider {
      */
     public function isHotReloadEnabled(): bool {
         return $this->hotReloadEnabled;
-    }
-
-    /**
-     * @return string
-     */
-    public function getHotReloadSocketAddress(): string {
-        return 'http://'.$this->hotReloadIP.':3030';
     }
 
     /**
@@ -132,7 +136,7 @@ class WebpackAssetProvider {
      * @param string $section - The section of the site to lookup.
      * @return WebpackAsset[] The assets files for all webpack scripts.
      */
-    public function getScripts(string $section): array {
+    public function getScripts(string $section, bool $includeAsync = false): array {
         $scripts = [];
 
         // Locale asset is always included if we have a locale set.
@@ -143,56 +147,51 @@ class WebpackAssetProvider {
 
         // Return early with the hot build if that flag is enabled.
         if ($this->hotReloadEnabled) {
-            $scripts[] = new HotBuildAsset($section, $this->hotReloadIP);
+            $scripts[] = new HotBuildAsset($section);
             return $scripts;
         }
 
-        // A couple of required assets.
-        $scripts[] = $this->makeScript($section, 'runtime');
-        $scripts[] = $this->makeScript($section, 'vendors');
-
-        // The library chunk is not always created if there is nothing shared between entry-points.
-        $shared = $this->makeScript($section, 'shared');
-        if ($shared->existsOnFs()) {
-            $scripts[] = $shared;
-        }
-
-        // Grab all of the addon based assets.
-        foreach ($this->addonManager->getEnabled() as $addon) {
-            $addon = $this->checkReplacePreview($addon);
-            // See if we have a common bundle
-            $commonAsset = new WebpackAddonAsset(
-                $this->request,
-                WebpackAsset::SCRIPT_EXTENSION,
-                $section,
-                $addon,
-                $this->cacheBustingKey,
-                true
-            );
-            $commonAsset->setFsRoot($this->fsRoot);
-
-            if ($commonAsset->existsOnFs()) {
-                $scripts[] = $commonAsset;
-            }
-
-            $asset = new WebpackAddonAsset(
-                $this->request,
-                WebpackAsset::SCRIPT_EXTENSION,
-                $section,
-                $addon,
-                $this->cacheBustingKey
-            );
-            $asset->setFsRoot($this->fsRoot);
-
-            if ($asset->existsOnFs()) {
-                $scripts[] = $asset;
-            }
-        }
-
-        // The bootstrap asset ties everything together.
-        $scripts[] = $this->makeScript($section, 'bootstrap');
-
+        $collection = $this->getCollectionForSection($section, $includeAsync);
+        $scripts =
+            array_merge($scripts, $collection->createAssets($this->request, $this->getEnabledAddonKeys(), 'js'));
         return $scripts;
+    }
+
+    /**
+     * Get a colleciton for the current section.
+     *
+     * @param string $section
+     * @param bool $includeAsync Include async assets.
+     *
+     * @return WebpackAssetDefinitionCollection
+     */
+    private function getCollectionForSection(string $section, bool $includeAsync = false): WebpackAssetDefinitionCollection {
+        $key = $section . ($includeAsync ? self::COLLECTION_SECTION : "");
+        if (!isset($this->collectionForSection[$key])) {
+            $distPath = Path::join($this->fsRoot, PATH_DIST_NAME);
+            if (WebpackAssetDefinitionCollection::sectionExists($section, $distPath)) {
+                $this->collectionForSection[$key] = WebpackAssetDefinitionCollection::loadFromDist($section, $distPath, $includeAsync);
+            } else {
+                $this->collectionForSection[$key] = new WebpackAssetDefinitionCollection($section);
+            }
+        }
+        return $this->collectionForSection[$key];
+    }
+
+    /**
+     * Get the enabled addon keys.
+     *
+     * @return string[]
+     */
+    private function getEnabledAddonKeys(): array {
+        if ($this->enabledAddonKeys === null) {
+            $this->enabledAddonKeys = [];
+            foreach ($this->addonManager->getEnabled() as $addon) {
+                $addon = $this->checkReplacePreview($addon);
+                $this->enabledAddonKeys[] = $addon->getKey();
+            }
+        }
+        return $this->enabledAddonKeys;
     }
 
     /**
@@ -202,14 +201,13 @@ class WebpackAssetProvider {
      * @return Addon
      */
     private function checkReplacePreview(Addon $addon): Addon {
-        $currentConfigThemeKey = $this->config->get('Garden.CurrentTheme', $this->config->get('Garden.Theme'));
-        $currentThemeKey = $this->themeModel->getMasterThemeKey($currentConfigThemeKey);
+        if ($addon->getType() !== 'theme') {
+            return $addon;
+        }
         if ($previewThemeKey = $this->session->getPreference('PreviewThemeKey')) {
-            if ($addon->getKey() === $currentThemeKey) {
-                $addonKey = $this->themeModel->getMasterThemeKey($previewThemeKey);
-                if ($previewTheme = $this->addonManager->lookupTheme($addonKey)) {
-                    $addon = $previewTheme;
-                }
+            $addonKey = $this->themeService->getMasterThemeKey($previewThemeKey);
+            if ($previewTheme = $this->addonManager->lookupTheme($addonKey)) {
+                $addon = $previewTheme;
             }
         }
         return $addon;
@@ -219,58 +217,18 @@ class WebpackAssetProvider {
      * Get all stylesheets for a particular site section.
      *
      * @param string $section
+     * @param bool $includeAsync Include async assets.
      *
      * @return WebpackAsset[]
      */
-    public function getStylesheets(string $section): array {
+    public function getStylesheets(string $section, bool $includeAsync = false): array {
         if ($this->hotReloadEnabled) {
             // All style sheets are managed by the hot javascript bundle.
             return [];
         }
 
-        $styles = [];
-
-        $sharedStyles = new WebpackAsset(
-            $this->request,
-            WebpackAsset::STYLE_EXTENSION,
-            $section,
-            'shared',
-            $this->cacheBustingKey
-        );
-
-        $vendorStyles = new WebpackAsset(
-            $this->request,
-            WebpackAsset::STYLE_EXTENSION,
-            $section,
-            'vendors',
-            $this->cacheBustingKey
-        );
-
-        if ($sharedStyles->existsOnFs()) {
-            $styles[] = $sharedStyles;
-        }
-
-        if ($vendorStyles->existsOnFs()) {
-            $styles[] = $vendorStyles;
-        }
-
-        // Grab all of the addon based assets.
-        foreach ($this->addonManager->getEnabled() as $addon) {
-            $addon = $this->checkReplacePreview($addon);
-            $asset = new WebpackAddonAsset(
-                $this->request,
-                WebpackAsset::STYLE_EXTENSION,
-                $section,
-                $addon,
-                $this->cacheBustingKey
-            );
-            $asset->setFsRoot($this->fsRoot);
-
-            if ($asset->existsOnFs()) {
-                $styles[] = $asset;
-            }
-        }
-
+        $collection = $this->getCollectionForSection($section, $includeAsync);
+        $styles = $collection->createAssets($this->request, $this->getEnabledAddonKeys(), 'css');
         return $styles;
     }
 
@@ -283,26 +241,6 @@ class WebpackAssetProvider {
      */
     public function setFsRoot(string $fsRoot) {
         $this->fsRoot = $fsRoot;
-    }
-
-    /**
-     * Make a script asset.
-     *
-     * @param string $section The section of the script.
-     * @param string $name The name of the script.
-     *
-     * @return WebpackAsset A webpack script asset.
-     */
-    private function makeScript(string $section, string $name): WebpackAsset {
-        $asset = new WebpackAsset(
-            $this->request,
-            WebpackAsset::SCRIPT_EXTENSION,
-            $section,
-            $name,
-            $this->cacheBustingKey
-        );
-        $asset->setFsRoot($this->fsRoot);
-        return $asset;
     }
 
     /**

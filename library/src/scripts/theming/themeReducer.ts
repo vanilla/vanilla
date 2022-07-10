@@ -9,8 +9,8 @@ import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import produce from "immer";
 import { useSelector } from "react-redux";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
-import { IThemesState } from "@library/theming/themeSettingsReducer";
 import { IUserFragment } from "@library/@types/api/users";
+import { RecordID } from "@vanilla/utils";
 
 export enum ThemeType {
     DB = "themeDB",
@@ -21,8 +21,8 @@ export interface ITheme {
     assets: IThemeAssets;
     features: Record<string, boolean>;
     supportedSections?: string[];
-    preview: Record<string, any> & { info: Record<string, any> };
-    themeID: string | number;
+    preview: IThemePreview;
+    themeID: RecordID;
     name: string;
     type: ThemeType;
     parentTheme?: string;
@@ -33,39 +33,51 @@ export interface ITheme {
     revisionID: number | null;
 }
 
+export interface IThemePreview {
+    info?: Record<
+        string,
+        {
+            type: string;
+            value: string;
+        }
+    >;
+    imageUrl?: string | null;
+    variables?: {
+        globalBg?: string | null;
+        globalFg?: string | null;
+        globalPrimary?: string | null;
+        titleBarBg?: string | null;
+        titleBarFg?: string | null;
+        backgroundImage?: string | null;
+    };
+}
+
 export interface IThemeRevision extends ITheme {
     active: boolean;
     revisionID: number;
 }
 
+interface IThemeAsset<DataType = string> {
+    type: string;
+    url?: string;
+    data?: DataType;
+}
+
 export interface IThemeAssets {
-    fonts?: { data: IThemeFont[] };
-    logo?: IThemeExternalAsset;
-    mobileLogo?: IThemeExternalAsset;
-    variables?: IThemeVariables;
-    header?: IThemeHeader;
-    footer?: IThemeFooter;
-    javascript?: string;
-    styles?: string;
-}
-export interface IThemeHeader {
-    data?: string;
-    type: string;
-}
-export interface IThemeFooter {
-    data?: string;
-    type: string;
+    fonts?: IThemeAsset<IThemeFont[]>;
+    logo?: IThemeAsset;
+    mobileLogo?: IThemeAsset;
+    variables?: IThemeAsset<IThemeVariables>;
+    header?: IThemeAsset;
+    footer?: IThemeAsset;
+    javascript?: IThemeAsset;
+    styles?: IThemeAsset;
 }
 
 export interface IThemeFont {
     name: string;
     url: string;
     fallbacks?: string[];
-}
-
-export interface IThemeExternalAsset {
-    type: string;
-    url: string;
 }
 
 export type IThemeVariables = Record<string, any>;
@@ -96,7 +108,7 @@ export const INITIAL_THEME_STATE: IThemeState = {
 
 export const themeReducer = produce(
     reducerWithInitialState(INITIAL_THEME_STATE)
-        .case(ThemeActions.getAssets.started, state => {
+        .case(ThemeActions.getAssets.started, (state) => {
             state.assets.status = LoadStatus.LOADING;
             return state;
         })
@@ -155,7 +167,7 @@ export const themeReducer = produce(
 
             // Go through any active revisions if we have them, and modify their active status.
             if (state.themeRevisions.data) {
-                state.themeRevisions.data = state.themeRevisions.data.map(revision => {
+                state.themeRevisions.data = state.themeRevisions.data.map((revision) => {
                     if (revision.themeID !== themeID) {
                         return revision;
                     }

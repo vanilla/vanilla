@@ -17,6 +17,11 @@ if (!defined('PATH_UPLOADS')) {
 }
 
 // You should not change these paths.
+// The dist directory is no longer purely "/dist" because some way of invalidating all assets is required.
+// /dist assets rely on a content hash to invalidate, but there are situations where an item is cached incorrectly
+// And the we need to bulk invalidate without
+define('PATH_DIST_NAME', 'dist/v1');
+define('PATH_DIST', PATH_ROOT.'/'.PATH_DIST_NAME);
 define('PATH_ADDONS_THEMES', PATH_ROOT.'/addons/themes');
 define('PATH_ADDONS_ADDONS', PATH_ROOT.'/addons/addons');
 define('PATH_APPLICATIONS', PATH_ROOT.'/applications');
@@ -30,6 +35,7 @@ define('DELIVERY_TYPE_ALL', 'ALL'); // Deliver an entire page
 define('DELIVERY_TYPE_ASSET', 'ASSET'); // Deliver all content for the requested asset
 define('DELIVERY_TYPE_VIEW', 'VIEW'); // Deliver only the view
 define('DELIVERY_TYPE_BOOL', 'BOOL'); // Deliver only the success status (or error) of the request
+/**  @deprecated - Use dashboard\views\utility\raw.twig */
 define('DELIVERY_TYPE_NONE', 'NONE'); // Deliver nothing
 define('DELIVERY_TYPE_MESSAGE', 'MESSAGE'); // Just deliver messages.
 define('DELIVERY_TYPE_DATA', 'DATA'); // Just deliver the data.
@@ -62,10 +68,10 @@ define('SYNDICATION_RSS', 'RSS');
 define('SYNDICATION_ATOM', 'ATOM');
 
 // Debug error types.
-define('TRACE_INFO', 'Info');
-define('TRACE_ERROR', 'Error');
-define('TRACE_WARNING', 'Warning');
-define('TRACE_NOTICE', 'Notice');
+define('TRACE_INFO', 'info');
+define('TRACE_ERROR', 'error');
+define('TRACE_WARNING', 'warning');
+define('TRACE_NOTICE', 'notice');
 
 if (!defined('E_USER_DEPRECATED')) {
     define('E_USER_DEPRECATED', E_USER_WARNING);

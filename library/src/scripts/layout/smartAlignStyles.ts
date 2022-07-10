@@ -4,20 +4,19 @@
  * @license GPL-2.0-only
  */
 
-import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { css } from "@emotion/css";
+import { useThemeCache } from "@library/styles/themeCache";
 import { percent } from "csx";
 
 export const smartAlignClasses = useThemeCache(() => {
-    const style = styleFactory("smartAlign");
-
-    const root = style({
+    const root = css({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         width: percent(100),
     });
 
-    const inner = style("inner", {
+    const inner = css({
         textAlign: "left",
     });
 

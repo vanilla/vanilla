@@ -7,6 +7,7 @@
 namespace Vanilla\Database\Operation;
 
 use Vanilla\Database\Operation;
+use Vanilla\Logging\LoggerUtils;
 
 /**
  * Database operation processor for packing and unpacking JSON fields.
@@ -48,6 +49,8 @@ class JsonFieldProcessor implements Processor {
         } elseif ($operation->getType() === Operation::TYPE_SELECT) {
             $result = $stack($operation);
             return $this->unpackFields($result);
+        } else {
+            return $stack($operation);
         }
     }
 
@@ -61,11 +64,15 @@ class JsonFieldProcessor implements Processor {
         $set = $operation->getSet();
         foreach ($this->getFields() as $field) {
             if (array_key_exists($field, $set)) {
-                $packed = json_encode($set[$field]);
-                if ($packed === false) {
-                    throw new \Exception("Unable to encode field as JSON.");
+                $json = $set[$field];
+                if (is_array($json)) {
+                    $json = LoggerUtils::stringifyDates($json);
                 }
-                $set[$field] = $packed;
+                $json = json_encode($json, JSON_FORCE_OBJECT);
+                if ($json === false) {
+                    throw new \InvalidArgumentException("Unable to encode field as JSON.", 400);
+                }
+                $set[$field] = $json;
             }
         }
         $operation->setSet($set);

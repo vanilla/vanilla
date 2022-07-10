@@ -8,6 +8,7 @@
  * @since 2.0
  */
 
+use Garden\Web\Exception\ServerException;
 use Vanilla\Formatting\DateTimeFormatter;
 
 /**
@@ -43,7 +44,7 @@ class UtilityController extends DashboardController {
      */
     public function __construct() {
         parent::__construct();
-        $this->setHeader('Cache-Control', \Vanilla\Web\CacheControlMiddleware::NO_CACHE);
+        $this->setHeader(self::HEADER_CACHE_CONTROL, self::NO_CACHE);
     }
 
     /**
@@ -84,7 +85,7 @@ class UtilityController extends DashboardController {
 
                     foreach ($rows as $sort => $iD) {
                         if (strpos($iD, '_') !== false) {
-                            list(, $iD) = explode('_', $iD, 2);
+                            [, $iD] = explode('_', $iD, 2);
                         }
                         if (!$iD) {
                             continue;
@@ -235,7 +236,7 @@ class UtilityController extends DashboardController {
         // This permission is run again to be sure someone doesn't accidentally call this method incorrectly.
         $this->permission('Garden.Settings.Manage');
 
-        $updateModel = new UpdateModel();
+        $updateModel = \Gdn::getContainer()->get(UpdateModel::class);
         $capturedSql = $updateModel->runStructure($captureOnly);
         $this->setData('CapturedSql', $capturedSql);
 
@@ -288,7 +289,7 @@ class UtilityController extends DashboardController {
         }
         try {
             // Run the structure.
-            $updateModel = new UpdateModel();
+            $updateModel = \Gdn::getContainer()->get(UpdateModel::class);
             $updateModel->runStructure();
             $this->setData('Success', true);
         } catch (Exception $ex) {
@@ -296,7 +297,7 @@ class UtilityController extends DashboardController {
             $this->setData('Success', false);
             $this->setData('Error', $ex->getMessage());
             if (debug()) {
-                throw $ex;
+                throw \Garden\Web\Exception\HttpException::createFromThrowable($ex);
             }
         }
         if (Gdn::session()->checkPermission('Garden.Settings.Manage')) {
@@ -573,10 +574,12 @@ class UtilityController extends DashboardController {
         if (!in_array($feedFormat, $validFormats)) {
             $feedFormat = 'normal';
         }
-
-        echo file_get_contents("https://open.vanillaforums.com/vforg/home/getfeed/{$type}/{$length}/{$feedFormat}/?DeliveryType=VIEW");
-        $this->deliveryType(DELIVERY_TYPE_NONE);
-        $this->render();
+        $url = "https://open.vanillaforums.com/vforg/home/getfeed/{$type}/{$length}/{$feedFormat}/?DeliveryType=VIEW";
+        $request = new Garden\Http\HttpClient();
+        $responseBody = $request->get($url)->getBody();
+        $this->setData('data', $responseBody);
+        $this->deliveryType(DELIVERY_TYPE_VIEW);
+        $this->render('raw', 'utility', 'dashboard');
     }
 
     /**
@@ -683,7 +686,7 @@ class UtilityController extends DashboardController {
         }
 
         // Run the structure.
-        $updateModel = new UpdateModel();
+        $updateModel = \Gdn::getContainer()->get(UpdateModel::class);
         try {
             if (isset($isTokenUpdate)) {
                 $updateModel->setRunAsSystem(true);
@@ -697,7 +700,7 @@ class UtilityController extends DashboardController {
             $this->setData('Error', $ex->getMessage());
 
             if (debug()) {
-                throw $ex;
+                throw \Garden\Web\Exception\HttpException::createFromThrowable($ex);
             }
             return false;
         }

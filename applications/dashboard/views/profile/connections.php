@@ -40,18 +40,7 @@
 </style>
 
 <h1 class="H"><?php echo $this->data('Title'); ?></h1>
-
-<div class="Hero">
-    <h3><?php echo t("What's This?"); ?></h3>
-
-    <p>
-        <?php
-        echo Gdn_Format::markdown(t('Connect your profile to social networks.', "Connect your profile to social networks to be notified of activity here and share your activity with your friends and followers."));
-        ?>
-    </p>
-</div>
-
-<ul class="DataList DataList-Connections">
+<ul class="DataList DataList-Connections pageBox">
     <?php
     foreach ($this->data('Connections') as $Key => $Row) {
         writeConnection($Row);

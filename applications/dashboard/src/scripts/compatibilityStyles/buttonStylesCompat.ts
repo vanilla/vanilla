@@ -1,30 +1,27 @@
 /**
  * Compatibility styles, using the color variables.
  *
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import { cssOut, trimTrailingCommas } from "@dashboard/compatibilityStyles/index";
-import { buttonGlobalVariables, buttonUtilityClasses, buttonVariables } from "@library/forms/buttonStyles";
-import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
-import {
-    absolutePosition,
-    borders,
-    colorOut,
-    importantUnit,
-    offsetLightness,
-    paddings,
-    unit,
-} from "@library/styles/styleHelpers";
+import { trimTrailingCommas } from "@dashboard/compatibilityStyles/trimTrailingCommas";
+import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
+import { buttonUtilityClasses } from "@library/forms/Button.styles";
+import { buttonGlobalVariables, buttonVariables } from "@library/forms/Button.variables";
+import { absolutePosition, importantUnit } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
+import { Mixins } from "@library/styles/Mixins";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { important, percent, rgba } from "csx";
 import { ButtonTypes } from "@library/forms/buttonTypes";
+import { injectGlobal } from "@emotion/css";
 
 export const buttonCSS = () => {
     const globalVars = globalVariables();
     const formElementVars = formElementsVariables();
+    const buttonVars = buttonGlobalVariables();
 
     // @mixin Button
     mixinButton(".Button-Options", ButtonTypes.ICON_COMPACT);
@@ -34,14 +31,18 @@ export const buttonCSS = () => {
     mixinButton(".Button.Primary", ButtonTypes.PRIMARY);
     mixinButton(".FormTitleWrapper .Buttons .Button", ButtonTypes.PRIMARY);
     mixinButton(".FormWrapper .Buttons .Button", ButtonTypes.PRIMARY);
+    mixinButton(".FormWrapper .file-upload-browse", ButtonTypes.PRIMARY);
     mixinButton(".FormTitleWrapper .Buttons .Button.Primary", ButtonTypes.PRIMARY);
+    mixinButton(".FormTitleWrapper .file-upload-browse", ButtonTypes.PRIMARY);
     mixinButton(".FormWrapper .Buttons .Button.Primary", ButtonTypes.PRIMARY);
     mixinButton(".Button-Controls .Button.Primary", ButtonTypes.PRIMARY);
     mixinButton(".BigButton:not(.Danger)", ButtonTypes.PRIMARY);
     mixinButton(".NewConversation.NewConversation", ButtonTypes.PRIMARY);
     mixinButton(".groupToolbar .Button.Primary", ButtonTypes.PRIMARY);
     mixinButton(".BoxButtons .ButtonGroup.Multi .Button.Primary", ButtonTypes.PRIMARY);
-    mixinButton(".Section-Members .Group-RemoveMember", ButtonTypes.PRIMARY);
+    mixinButton(".Section-Members .Group-RemoveMember.Group-RemoveMember", ButtonTypes.PRIMARY);
+    mixinButton(".Section-Members .Buttons .Group-RemoveMember.Group-RemoveMember", ButtonTypes.PRIMARY);
+    mixinButton(".Section-Members .Buttons .Group-Leader.Group-Leader", ButtonTypes.STANDARD);
     mixinButton(".group-members-filter-box .Button.search", ButtonTypes.PRIMARY);
     mixinButton("#Form_Ban", ButtonTypes.PRIMARY);
     mixinButton(".Popup #UserBadgeForm button", ButtonTypes.PRIMARY);
@@ -51,74 +52,96 @@ export const buttonCSS = () => {
     mixinButton(".ButtonGroup.Multi .Button.Handle .Sprite.SpDropdownHandle", ButtonTypes.PRIMARY);
     mixinButton(".AdvancedSearch .InputAndButton .bwrap .Button", ButtonTypes.PRIMARY);
 
-    const buttonBorderRadius = parseInt(globalVars.borderType.formElements.buttons.toString(), 10);
-    const borderOffset = globalVars.border.width * 2;
-    const handleSize = formElementVars.sizing.height - borderOffset;
+    const buttonBorderRadius = buttonVars.border.radius;
+    const borderOffset = buttonVars.border.width * 2;
+    const handleSize = buttonVars.sizing.minHeight - borderOffset;
 
     if (buttonBorderRadius && buttonBorderRadius > 0) {
-        cssOut(`.ButtonGroup.Multi.NewDiscussion .Button.Handle .SpDropdownHandle::before`, {
-            marginTop: unit((formElementVars.sizing.height * 2) / 36), // center vertically
-            marginRight: unit(buttonBorderRadius * 0.035), // offset based on border radius. No radius will give no offset.
-            maxHeight: unit(handleSize),
-            height: unit(handleSize),
-            lineHeight: unit(handleSize),
+        cssOut(`.Frame .ButtonGroup.Multi.NewDiscussion .Button.Handle .SpDropdownHandle::before`, {
+            marginTop: styleUnit((formElementVars.sizing.height * 2) / 36), // center vertically
+            marginRight: styleUnit(buttonBorderRadius * 0.035), // offset based on border radius. No radius will give no offset.
+            maxHeight: styleUnit(handleSize),
+            height: styleUnit(handleSize),
+            lineHeight: styleUnit(handleSize),
+            maxWidth: styleUnit(handleSize),
+            minWidth: styleUnit(handleSize),
         });
     }
 
-    cssOut(`.ButtonGroup.Multi .Button.Handle .Sprite.SpDropdownHandle`, {
-        height: unit(handleSize),
-        maxHeight: unit(handleSize),
-        width: unit(handleSize),
-        maxWidth: unit(handleSize),
+    cssOut(`.FormWrapper .file-upload-browse, .FormTitleWrapper .file-upload-browse`, {
+        marginRight: styleUnit(0),
+    });
+
+    cssOut(`.Group-Box .BlockColumn .Buttons a:first-child`, {
+        marginRight: styleUnit(globalVars.gutter.quarter),
+    });
+
+    cssOut(`.Frame .ButtonGroup.Multi .Button.Handle .Sprite.SpDropdownHandle`, {
+        height: styleUnit(handleSize),
+        maxHeight: styleUnit(handleSize),
+        width: styleUnit(handleSize),
         background: important("transparent"),
         backgroundColor: important("none"),
-        ...borders({
+        ...Mixins.border({
             color: rgba(0, 0, 0, 0),
         }),
+        maxWidth: styleUnit(handleSize),
+        minWidth: styleUnit(handleSize),
     });
 
-    cssOut(`.ButtonGroup.Multi.NewDiscussion .Button.Handle.Handle`, {
-        top: unit(0),
-        right: unit(formElementVars.border.width),
-        minWidth: importantUnit(handleSize),
-        maxWidth: importantUnit(handleSize),
-        maxHeight: importantUnit(handleSize),
-        minHeight: importantUnit(handleSize),
-        height: importantUnit(handleSize),
-        width: importantUnit(handleSize),
-        borderTopRightRadius: unit(buttonBorderRadius),
-        borderBottomRightRadius: unit(buttonBorderRadius),
+    injectGlobal({
+        ".Frame .ButtonGroup.Multi.NewDiscussion .Button.Primary": {
+            paddingLeft: importantUnit(handleSize + 4),
+            paddingRight: importantUnit(handleSize + 4),
+        },
+        ".Frame .ButtonGroup.Multi.NewDiscussion .Button.Handle.Handle": {
+            position: "absolute",
+            top: styleUnit(0),
+            right: styleUnit(formElementVars.border.width),
+            bottom: styleUnit(0),
+            minWidth: importantUnit(handleSize),
+            maxWidth: importantUnit(handleSize),
+            maxHeight: importantUnit(handleSize),
+            minHeight: importantUnit(handleSize),
+            height: importantUnit(handleSize),
+            width: importantUnit(handleSize),
+            borderTopRightRadius: styleUnit(buttonBorderRadius),
+            borderBottomRightRadius: styleUnit(buttonBorderRadius),
+            display: "block",
+            boxShadow: "none",
+        },
     });
 
-    cssOut(`.ButtonGroup.Multi.Open .Button.Handle`, {
-        backgroundColor: colorOut(offsetLightness(globalVars.mainColors.primary, 0.2)),
-        width: unit(formElementVars.sizing.height),
+    cssOut(`.Frame .ButtonGroup.Multi.Open .Button.Handle`, {
+        width: styleUnit(formElementVars.sizing.height),
+    });
+
+    cssOut(`.Frame .ButtonGroup.Multi.NewDiscussion .Sprite.SpDropdownHandle`, {
+        ...absolutePosition.fullSizeOfParent(),
+        padding: important(0),
+        border: important(0),
+        borderRadius: important(0),
+        minWidth: styleUnit(handleSize),
     });
 
     cssOut(`.ButtonGroup.Multi.NewDiscussion`, {
         position: "relative",
         maxWidth: percent(100),
         boxSizing: "border-box",
-        $nest: {
-            "& .Button.Primary": {
+        ...{
+            ".Button.Primary": {
                 maxWidth: percent(100),
                 width: percent(100),
-                ...paddings({
+                ...Mixins.padding({
                     horizontal: formElementVars.sizing.height,
                 }),
             },
-            "& .Sprite.SpDropdownHandle": {
-                ...absolutePosition.fullSizeOfParent(),
-                padding: important(0),
-                border: important(0),
-                borderRadius: important(0),
-            },
-            "& .Button.Handle": {
+            ".Button.Handle": {
                 ...absolutePosition.middleRightOfParent(),
-                width: unit(formElementVars.sizing.height),
-                maxWidth: unit(formElementVars.sizing.height),
-                minWidth: unit(formElementVars.sizing.height),
-                height: unit(formElementVars.sizing.height),
+                width: styleUnit(formElementVars.sizing.height),
+                maxWidth: styleUnit(formElementVars.sizing.height),
+                minWidth: styleUnit(formElementVars.sizing.height),
+                height: styleUnit(formElementVars.sizing.height),
                 padding: 0,
                 display: "flex",
                 alignItems: "center",
@@ -127,14 +150,14 @@ export const buttonCSS = () => {
                 borderTopLeftRadius: important(0),
                 borderBottomLeftRadius: important(0),
             },
-            "& .Button.Handle .SpDropdownHandle::before": {
+            ".Button.Handle .SpDropdownHandle::before": {
                 padding: important(0),
             },
         },
     });
 
     cssOut(`.ButtonGroup.Multi > .Button:first-child`, {
-        borderTopLeftRadius: unit(buttonBorderRadius),
+        borderTopLeftRadius: styleUnit(buttonBorderRadius),
     });
 
     // Standard
@@ -151,6 +174,10 @@ export const buttonCSS = () => {
     mixinButton("body.Section-Profile .ProfileOptions .ProfileButtons-BackToProfile", ButtonTypes.STANDARD);
     mixinButton(".Button.Close", ButtonTypes.STANDARD);
     mixinButton(".viewPollResults", ButtonTypes.STANDARD);
+
+    mixinButton(".FormWrapper .Buttons .Button.Cancel", ButtonTypes.STANDARD);
+    mixinButton(".FormWrapper .Buttons .Button.DraftButton", ButtonTypes.STANDARD);
+    mixinButton(".FormWrapper .Buttons .Button.PreviewButton", ButtonTypes.STANDARD);
 
     cssOut(".Panel-main .ApplyButton", {
         width: "auto",
@@ -177,9 +204,9 @@ export const mixinButton = (selector: string, buttonType: ButtonTypes = ButtonTy
     selector = trimTrailingCommas(selector);
 
     if (buttonType === ButtonTypes.PRIMARY) {
-        cssOut(selector, generateButtonStyleProperties(vars.primary));
+        injectGlobal({ [selector]: Mixins.button(vars.primary) });
     } else if (buttonType === ButtonTypes.STANDARD) {
-        cssOut(selector, generateButtonStyleProperties(vars.standard));
+        injectGlobal({ [selector]: Mixins.button(vars.standard) });
     } else if (buttonType === ButtonTypes.ICON_COMPACT) {
         cssOut(selector, buttonUtilityClasses().iconMixin(buttonGlobalVariables().sizing.compactHeight));
     } else {

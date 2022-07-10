@@ -9,6 +9,8 @@ use Garden\Schema\Schema;
 use Vanilla\Community\Schemas\CategoryFragmentSchema;
 use Vanilla\Community\Schemas\PostFragmentSchema;
 use Vanilla\Formatting\FormatFieldTrait;
+use Vanilla\Models\UserFragmentSchema;
+use Vanilla\SchemaFactory;
 use Vanilla\Utility\ModelUtils;
 
 /**
@@ -63,7 +65,7 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller implements 
      */
     public function getUserFragmentSchema() {
         if ($this->userFragmentSchema === null) {
-            $this->userFragmentSchema = $this->schema(new \Vanilla\Models\UserFragmentSchema(), 'UserFragment');
+            $this->userFragmentSchema = SchemaFactory::get(UserFragmentSchema::class, "UserFragment");
         }
         return $this->userFragmentSchema;
     }

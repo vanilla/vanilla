@@ -76,8 +76,6 @@ abstract class AbstractFormat {
      * @inheritDoc
      */
     public static function matches(array $operations): bool {
-        $result = false;
-
         foreach($operations as $op) {
             $attributes = val("attributes", $op, []);
             $lookupKeys = static::getAttributeLookupKey();
@@ -87,12 +85,12 @@ abstract class AbstractFormat {
 
             foreach ($lookupKeys as $lookupKey) {
                 if (array_key_exists($lookupKey, $attributes)) {
-                    $result = true;
+                    return true;
                 }
             }
         }
 
-        return $result;
+        return false;
     }
 
     /**

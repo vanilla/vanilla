@@ -1,0 +1,15 @@
+{
+    "key": "theme-options",
+    "name": "Theme with options.",
+    "type": "theme",
+    "assets": {
+        "option1_variables": {
+            "type": "json",
+            "file": "option1_variables.json"
+        },
+        "option2_variables": {
+            "type": "json",
+            "file": "option2_variables.json"
+        }
+    }
+}

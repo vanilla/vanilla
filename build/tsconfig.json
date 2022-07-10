@@ -4,18 +4,20 @@
         "esModuleInterop": true,
         "target": "es6",
         "moduleResolution": "node",
-        "strict": true,
         "skipLibCheck": true,
         "sourceMap": true,
-        "lib": ["es2017"],
-        "baseUrl": ".",
+        "lib": ["es2019", "dom"],
         "isolatedModules": false,
+        "strictNullChecks": true,
+        "jsx": "react",
         "paths": {
-            "happypack": ["scripts/@types/happypack"],
-            "prettier-webpack-plugin": ["scripts/@types/prettier-webpack-plugin"],
-            "terser-webpack-plugin": ["scripts/@types/terser-webpack-plugin"],
-            "react-docgen-typescript-webpack-plugin": ["scripts/@types/react-docgen-typescript-webpack-plugin"]
+            "@library/*": ["../library/src/scripts/*"],
+            "@dashboard/*": ["../applications/dashboard/src/scripts/*"],
+            "@rich-editor/*": ["../plugins/rich-editor/src/scripts/*"],
+            "happypack": ["./scripts/@types/happypack"],
+            "prettier-webpack-plugin": ["./scripts/@types/prettier-webpack-plugin"],
+            "terser-webpack-plugin": ["./scripts/@types/terser-webpack-plugin"],
+            "react-docgen-typescript-webpack-plugin": ["./scripts/@types/react-docgen-typescript-webpack-plugin"]
         }
-    },
-    "include": ["scripts/**/*.ts"],
+    }
 }

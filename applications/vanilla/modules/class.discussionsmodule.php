@@ -19,8 +19,21 @@ class DiscussionsModule extends Gdn_Module {
     /** @var string  */
     public $Prefix = 'Discussion';
 
+    /** @var bool */
+    public $showTitle = true;
+
     /** @var bool Whether to show the discussion author avatar. */
     private $showPhotos = false;
+
+    /** @var string */
+    private $title = 'Recent Discussions';
+
+    /**
+     * Render the full discussion item instead of the minimal module version.
+     *
+     * @var bool
+     */
+    private $fullView = false;
 
     /** @var array Limit the discussions to just this list of categories, checked for view permission. */
     protected $categoryIDs;
@@ -53,6 +66,34 @@ class DiscussionsModule extends Gdn_Module {
     }
 
     /**
+     * @param bool $fullView
+     */
+    public function setFullView(bool $fullView): void {
+        $this->fullView = $fullView;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTitle(): string {
+        return $this->title;
+    }
+
+    /**
+     * @param string $title
+     */
+    public function setTitle(string $title): void {
+        $this->title = $title;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFullView(): bool {
+        return $this->fullView;
+    }
+
+    /**
      * Get the data for the module.
      *
      * @param int|bool $limit Override the number of discussions to display.
@@ -68,12 +109,11 @@ class DiscussionsModule extends Gdn_Module {
         $where = ['Announce' => 'all'];
 
         if ($categoryIDs) {
-            $where['d.CategoryID'] = CategoryModel::filterCategoryPermissions($categoryIDs);
-        } else {
-            $visibleCategoriesResult = CategoryModel::instance()->getVisibleCategoryIDs(['filterHideDiscussions' => true]);
-            if ($visibleCategoriesResult !== true) {
-                $where['d.CategoryID'] = $visibleCategoriesResult;
+            $visibleCategoryIDs = CategoryModel::instance()->getVisibleCategoryIDs(['filterHideDiscussions' => true]);
+            if ($visibleCategoryIDs !== true) {
+                $categoryIDs = array_intersect($visibleCategoryIDs, $categoryIDs);
             }
+            $where['d.CategoryID'] = $categoryIDs;
         }
 
         $this->setData('Discussions', $discussionModel->get(0, $limit, $where));
@@ -97,6 +137,7 @@ class DiscussionsModule extends Gdn_Module {
      * Get a list of category IDs to limit.
      *
      * @return array
+     *
      */
     public function getCategoryIDs() {
         return $this->categoryIDs;

@@ -120,6 +120,9 @@ Follow the link below to check it out:
 %2$s
 
 Have a great day!';
+$Definition['HeadlineFormat.Discussion'] = '{ActivityUserID,user} Started a new discussion. <a href="{Url,html}">{Data.Name,text}</a>';
+$Definition['HeadlineFormat.Discussion.Poll'] = '{ActivityUserID,user} started a new poll in {Data.Category}: <a href="{Url,html}">{Data.Name,text}</a>';
+$Definition['HeadlineFormat.Discussion.Question'] = '{ActivityUserID,user} posted a new question in {Data.Category}: <a href="{Url,html}">{Data.Name,text}</a>';
 $Definition['permissions.member'] = 'Member';
 $Definition['permissions.moderator'] = 'Moderator';
 $Definition['permissions.communityManager'] = 'Community Manager';
@@ -183,5 +186,7 @@ $Definition['Test Email Message'] = '<p>This is a test email message.</p>'.
 $Definition['This setting loads the page before executing Javascript.'] =
     'This setting loads the page before executing Javascript which can improve your SEO.<br><strong>**Warning: Enabling this feature may cause Javascript errors on your site.**</strong> ';
 $Definition['oauth2Instructions'] = '<p>Configure your forum to connect with an OAuth2 application by putting your unique Client ID, Client Secret, and required endpoints. You will probably need to provide your SSO application with an allowed callback URL, in part, to validate requests. The callback url for this forum is <code>%s</code></p>';
+$Definition['LogoDisclaimer'] = 'Themes made with the theme editor and some custom themes don\'t use this setting.';
+$Definition['UserMatchNeedsPassword'] = 'You are trying to connect with a username that is already assigned to a user on this forum. If this is your account, please enter the account password.';
 
 // TODO: PROVIDE TRANSLATIONS FOR ALL CONFIGURATION SETTINGS THAT ARE EDITABLE ON ADMIN FORMS (ie. Vanilla.Comments.MaxLength, etc).

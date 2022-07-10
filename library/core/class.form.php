@@ -10,6 +10,13 @@
  * @since 2.0
  */
 
+use Garden\Schema\Validation;
+use Garden\Schema\ValidationException;
+use Vanilla\Utility\ModelUtils;
+use Vanilla\Web\TwigStaticRenderer;
+use Vanilla\Forum\Navigation\ForumCategoryRecordType;
+use Vanilla\Navigation\BreadcrumbModel;
+
 /**
  * Form validation layer
  *
@@ -58,7 +65,7 @@ class Gdn_Form extends Gdn_Pluggable {
             'textarea' => 'form-control',
             'dropdown' => 'form-control',
             'input-wrap' => 'input-wrap',
-            'form-group' => 'form-group',
+            'form-group' => 'form-group row',
             'form-footer' => 'js-modal-footer form-footer'
         ]
     ];
@@ -150,9 +157,26 @@ class Gdn_Form extends Gdn_Pluggable {
     }
 
     /**
+     * Checks a category against an array of permissions. Returns true if all permissions are true, otherwise, returns false.
+     *
+     * @param array $permissions
+     * @param array $category
+     * @return bool
+     */
+    public static function verifyAdditionalPermissions(array $permissions, array $category): bool {
+        $allowCategory = true;
+        foreach ($permissions as $permission) {
+            if (!isset($category[$permission]) || !$category[$permission]) {
+                $allowCategory = false;
+            }
+        }
+        return $allowCategory;
+    }
+
+    /**
      * Backwards compatibility getter.
      *
-     * @param strig $name The property to get.
+     * @param string $name The property to get.
      * @return mixed Returns the value of the property.
      */
     public function __get($name) {
@@ -448,10 +472,9 @@ class Gdn_Form extends Gdn_Pluggable {
     }
 
     /**
-     * Returns XHTML for a select list containing categories that the user has
-     * permission to use.
+     * Returns XHTML for a select list containing categories that the user has permission to use.
      *
-     * @param array $fieldName An array of category data to render.
+     * @param string $fieldName The name of the category ID field.
      * @param array $options An associative array of options for the select. Here
      * is a list of "special" options and their default values:
      *
@@ -468,6 +491,7 @@ class Gdn_Form extends Gdn_Pluggable {
      *                  display.
      *   Headings       Whether or not do display headings.
      *   EnableHeadings Whether or not headings should be enabled for selection.
+     *   FancyDisplay   Whether or not to try to use NewCategoryDropdown
      *
      * @return string
      */
@@ -478,6 +502,8 @@ class Gdn_Form extends Gdn_Pluggable {
 
         $value = arrayValueI('Value', $options); // The selected category id
         $categoryData = val('CategoryData', $options);
+        $includeArchived = $options['IncludeArchived'] ?? false;
+        $filterArchived = $includeArchived ? [] : ['Archived' => 0];
 
         if (!$categoryData && val('Context', $options)) {
             $categoryData = val('Context', $options);
@@ -499,7 +525,7 @@ class Gdn_Form extends Gdn_Pluggable {
             $categoryData = CategoryModel::getByPermission(
                 'Discussions.View',
                 $value,
-                val('Filter', $options, ['Archived' => 0]),
+                val('Filter', $options, $filterArchived),
                 val('PermFilter', $options, [])
             );
         }
@@ -520,8 +546,15 @@ class Gdn_Form extends Gdn_Pluggable {
                 // Filter out categories that don't allow our discussion type, if specified
                 if ($discussionType) {
                     $permissionCategory = CategoryModel::permissionCategory($category);
-                    $allowedDiscussionTypes = CategoryModel::allowedDiscussionTypes($permissionCategory, $category);
+                    $allowedDiscussionTypes = CategoryModel::getAllowedDiscussionData($permissionCategory, $category);
                     if (!array_key_exists($discussionType, $allowedDiscussionTypes)) {
+                        continue;
+                    }
+                }
+
+                // Check if any other permissions are required, and filter out the category if the user doesn't have any.
+                if (isset($options['AdditionalPermissions'])) {
+                    if (!self::verifyAdditionalPermissions($options['AdditionalPermissions'], $category)) {
                         continue;
                     }
                 }
@@ -538,11 +571,20 @@ class Gdn_Form extends Gdn_Pluggable {
         }
 
         // Opening select tag
+        $idAttr = $this->_idAttribute($fieldName, $options);
+        $nameAttr = $this->_nameAttribute($fieldName, $options);
+
         $return = '<select';
-        $return .= $this->_idAttribute($fieldName, $options);
-        $return .= $this->_nameAttribute($fieldName, $options);
+        $return .= $idAttr;
+        $return .= $nameAttr;
         $return .= $this->_attributesToString($options);
         $return .= ">\n";
+
+        //this one is for react component
+        $selectAttributes = [
+            'id' => $idAttr,
+            'name' => $nameAttr,
+        ];
 
         // Get value from attributes
         if ($value === false) {
@@ -557,14 +599,20 @@ class Gdn_Form extends Gdn_Pluggable {
 
         // Start with null option?
         $includeNull = val('IncludeNull', $options);
+        $defaultItemValue  = "";
+        $defaultItemLabel  = t('Select a category...');
         if ($includeNull === true) {
             $return .= '<option value="">'.t('Select a category...').'</option>';
-        } elseif (is_array($includeNull))
+        } elseif (is_array($includeNull)) {
             $return .= "<option value=\"{$includeNull[0]}\">{$includeNull[1]}</option>\n";
-        elseif ($includeNull)
+            $defaultItemValue = $includeNull[0];
+            $defaultItemLabel = $includeNull[1];
+        } elseif ($includeNull) {
             $return .= "<option value=\"\">$includeNull</option>\n";
-        elseif (!$hasValue)
+            $defaultItemLabel = $includeNull;
+        } elseif (!$hasValue) {
             $return .= '<option value=""></option>';
+        }
 
         // Show root categories as headings (ie. you can't post in them)?
         $doHeadings = val('Headings', $options, c('Vanilla.Categories.DoHeadings'));
@@ -576,6 +624,10 @@ class Gdn_Form extends Gdn_Pluggable {
 
         // Write out the category options.
         $enableHeadings = $options['EnableHeadings'] ?? false;
+
+        // This one is for react props
+        $items = [];
+
         if (is_array($safeCategoryData)) {
             foreach ($safeCategoryData as $categoryID => $category) {
                 $depth = val('Depth', $category, 0);
@@ -594,10 +646,12 @@ class Gdn_Form extends Gdn_Pluggable {
                 }
 
                 $return .= '<option value="'.$categoryID.'"';
+                $initialValue = "";
                 if ($disabled) {
                     $return .= ' disabled="disabled"';
                 } elseif ($selected) {
                     $return .= ' selected="selected"'; // only allow selection if NOT disabled
+                    $initialValue = $categoryID;
                 }
 
                 $name = htmlspecialchars(val('Name', $category, 'Blank Category Name'));
@@ -606,9 +660,59 @@ class Gdn_Form extends Gdn_Pluggable {
                 }
 
                 $return .= '>'.$name."</option>\n";
+
+                $breadCrumbModel = Gdn::getContainer()->get(BreadcrumbModel::class);
+                $breadcrumbs = $breadCrumbModel->getForRecord(new ForumCategoryRecordType($category['CategoryID']));
+
+                array_push($items, [
+                    'label' => $category['Name'],
+                    'value' => $category['CategoryID'],
+                    'description' => $category['Description'],
+                    'depth' => $category['Depth'],
+                    'disabled'=> $disabled,
+                    'breadcrumbs' => $breadcrumbs
+                ]);
             }
         }
-        return $return.'</select>';
+
+        $props =  [
+            'selectAttributes' => $selectAttributes,
+            'initialValue' => $initialValue,
+            'defaultItem' => [
+                'value' => $defaultItemValue,
+                'label' => $defaultItemLabel,
+                'breadcrumbs' => null
+            ],
+            'items' => $items,
+        ];
+        $canUseFancyDisplay = $options['FancyDisplay'] ?? !inSection('Dashboard');
+        $useNewCategoryDropdown = $canUseFancyDisplay && Gdn::themeFeatures()->get("NewCategoryDropdown");
+        if ($useNewCategoryDropdown) {
+            return TwigStaticRenderer::renderReactModule('CategoryPicker', $props);
+        } else {
+            return $return.'</select>';
+        }
+    }
+
+    /**
+     * Returns structure for CategoryPicker react component, will be used to render Category Info(name, description) only.
+     *
+     * @param array $category Category data.
+     * @return array Structure for the component.
+     */
+    public function getSingleCategoryInfoProps(array $category): array {
+        $items = [[
+            'value' => $category['CategoryID'],
+            'label' => $category['Name'],
+            'depth' => $category['Depth'],
+            'description' => $category['Description'],
+        ]];
+
+        return $props = [
+            'categoryInfoOnly' => true,
+            'items' => $items,
+            'initialValue' => $category['CategoryID'],
+        ];
     }
 
     /**
@@ -640,7 +744,7 @@ class Gdn_Form extends Gdn_Pluggable {
         }
 
         if ($reverse) {
-            if ($attributes['checked'] === 'checked') {
+            if (isset($attributes['checked']) && ($attributes['checked'] === 'checked')) {
                 unset($attributes['checked']);
             } else {
                 $attributes['checked'] = 'checked';
@@ -1461,13 +1565,6 @@ class Gdn_Form extends Gdn_Pluggable {
             $return = '<div class="'.$this->getStyle('input-wrap').'">';
         }
 
-        // Opening select tag
-        $return .= '<select';
-        $return .= $this->_idAttribute($fieldName, $attributes);
-        $return .= $this->_nameAttribute($fieldName, $attributes);
-        $return .= $this->_attributesToString($attributes);
-        $return .= ">\n";
-
         // Get value from attributes and ensure it's an array
         $value = arrayValueI('Value', $attributes);
         if ($value === false) {
@@ -1479,6 +1576,14 @@ class Gdn_Form extends Gdn_Pluggable {
 
         // Prevent default $Value from matching key of zero
         $hasValue = ($value !== [false] && $value !== ['']) ? true : false;
+        $attributes['data-value'] = $value[0] ?? "";
+
+        // Opening select tag
+        $return .= '<select';
+        $return .= $this->_idAttribute($fieldName, $attributes);
+        $return .= $this->_nameAttribute($fieldName, $attributes);
+        $return .= $this->_attributesToString($attributes);
+        $return .= ">\n";
 
         // Start with null option?
         $includeNull = arrayValueI('IncludeNull', $attributes, false);
@@ -1616,7 +1721,7 @@ class Gdn_Form extends Gdn_Pluggable {
     public function errors() {
         $return = '';
         if (is_array($this->_ValidationResults) && count($this->_ValidationResults) > 0) {
-            $return = "<div class=\"Messages Errors\">\n<ul>\n";
+            $return = "<div class=\"Messages Errors\" role=\"alert\" aria-label=\"".htmlspecialchars(t('Validation Failed'))."\">\n<ul>\n";
             foreach ($this->_ValidationResults as $fieldName => $problems) {
                 $count = count($problems);
                 for ($i = 0; $i < $count; ++$i) {
@@ -1793,18 +1898,18 @@ class Gdn_Form extends Gdn_Pluggable {
      * should related directly to a field name in $this->_DataArray.
      * @param string $componentKey The key of the of the component registered in the frontend with addComponent.
      * @param array $props Extra props to pass to the component.
-     *
+     * @param string $child
      * @return string
      */
-    public function react(string $fieldName, string $componentKey, array $props = []) {
-        $value = $attributes['value'] ?? $this->getValue($fieldName);
+    public function react(string $fieldName, string $componentKey, array $props = [], string $child = "") {
+        $value = $props['value'] ?? $this->getValue($fieldName);
+        $tag = $props['tag'] ?? "div";
         $props = $props + [
             'initialValue' => $value,
             'fieldName'  => $this->escapeFieldName($fieldName),
         ];
         $props = htmlspecialchars(json_encode($props), ENT_QUOTES);
-
-        return "<div data-react='$componentKey' data-props='$props'></div>";
+        return "<$tag data-react='$componentKey' data-props='$props'>$child</$tag>";
     }
 
     /**
@@ -2288,6 +2393,9 @@ PASSWORDMETER;
             $attributes = [];
         }
 
+        $shouldImplode = array_key_exists("implode", $attributes);
+        $implodeGlue = ($attributes["implode"] ?? false) ?: "\n";
+
         $multiLine = arrayValueI('MultiLine', $attributes);
 
         if ($multiLine) {
@@ -2329,6 +2437,10 @@ PASSWORDMETER;
         $return .= $this->_attributesToString($attributes);
 
         $value = arrayValueI('value', $attributes, $this->getValue($fieldName));
+        if (is_array($value) && $shouldImplode) {
+            $value = implode($implodeGlue, $value);
+        }
+
 
         $return .= $multiLine === true ? '>'.htmlentities($value, ENT_COMPAT, 'UTF-8').'</textarea>' : ' />';
 
@@ -2723,10 +2835,15 @@ PASSWORDMETER;
      *
      * @param string $fieldName The name of the field to get the value of.
      * @param mixed $default The default value to return if $fieldName isn't found.
-     * @return unknown
+     * @return mixed
      */
     public function getFormValue($fieldName, $default = '') {
-        return val($fieldName, $this->formValues(), $default);
+        if (strpos($fieldName, '[') !== false) {
+            $fieldName = str_replace(['[]', '[', ']'], ['.', '.', ''], $fieldName);
+            return valr($fieldName, $this->formValues(), $default);
+        } else {
+            return val($fieldName, $this->formValues(), $default);
+        }
     }
 
     /**
@@ -2808,7 +2925,7 @@ PASSWORDMETER;
      * It uses the assigned model to save the sent form fields.
      * If saving fails, it populates $this->_ValidationResults with validation errors & related fields.
      *
-     * @return unknown
+     * @return mixed
      */
     public function save() {
         $saveResult = false;
@@ -2950,13 +3067,13 @@ PASSWORDMETER;
     /**
      * Assign a set of data to be displayed in the form elements.
      *
-     * @param array $data A result resource or associative array containing data to be filled in
+     * @param array|object $data A result resource or associative array containing data to be filled in
      */
     public function setData($data) {
         if (is_object($data) === true) {
             // If this is a result object (/garden/library/database/class.dataset.php)
             // retrieve it's values as arrays
-            if ($data instanceof DataSet) {
+            if ($data instanceof Gdn_DataSet) {
                 $resultSet = $data->resultArray();
                 if (count($resultSet) > 0) {
                     $this->_DataArray = $resultSet[0];
@@ -3024,6 +3141,22 @@ PASSWORDMETER;
     }
 
     /**
+     * Validate the form as APIv2 would.
+     *
+     * @param bool $throw
+     *
+     * @return Validation
+     * @throws ValidationException Throws the exception if `$throw` is true.
+     */
+    public function validateApi(bool $throw = true): Validation {
+        if (!$this->_Model) {
+            return new Validation();
+        }
+
+        return ModelUtils::validationResultToValidationException($this->_Model, \Gdn::locale(), $throw);
+    }
+
+    /**
      * Set the validation results on the form.
      *
      * @param array $validationResults
@@ -3087,36 +3220,44 @@ PASSWORDMETER;
      * @param array $options Additional options to pass into the form.
      *  - Wrap: A two item array specifying the text to wrap the form in.
      *  - ItemWrap: A two item array specifying the text to wrap each form item in.
+     *  - NameFormat: A sprintf format that wil apply to each control name. Useful for prefixes or object nesting.
+     *  - ForceLabelWrap: True for dashboard forms that must have a `.label-wrap` label.
      * @return string
      */
     public function simple($schema, $options = []) {
-        $result = valr('Wrap.0', $options, '<ul>');
+        $options = array_change_key_case($options) + [
+            'wrap' => ['<ul>', '</ul>'],
+            'itemwrap' => ['<li class="'.$this->getStyle('form-group')."\">\n", "\n</li>\n"],
+            'nameformat' => null,
+        ];
+
+        $result = $options['wrap'][0];
 
         foreach ($schema as $index => $row) {
             if (is_string($row)) {
                 $row = ['Name' => $index, 'Control' => $row];
             }
 
-            if (!isset($row['Name'])) {
-                $row['Name'] = $index;
-            }
-            if (!isset($row['Options'])) {
-                $row['Options'] = [];
-            }
+            $row += [
+                'Name' => $index,
+                'Options' => [],
+                'Control' => 'TextBox',
+            ];
 
-            touchValue('Control', $row, 'TextBox');
+            if (!empty($options['nameformat'])) {
+                $row['Name'] = sprintf($options['nameformat'], $row['Name']);
+            }
 
             if (strtolower($row['Control']) === 'react') {
                 $result .= $this->react($row['Name'], $row['Component']);
                 continue;
-            } elseif (strtolower($row['Control']) === 'imageUploadReact') {
+            } elseif (strtolower($row['Control']) === 'imageuploadreact') {
                 $result .= $this->imageUploadReact($row['Name'], $row['Label'], $row['Description'] ?? '');
                 continue;
             } elseif (strtolower($row['Control']) == 'callback' || strtolower($row['Control']) == 'imageuploadpreview') {
                 $itemWrap = '';
             } else {
-                $defaultWrap = ['<li class="'.$this->getStyle('form-group')."\">\n", "\n</li>\n"];
-                $itemWrap = val('ItemWrap', $row, val('ItemWrap', $options, $defaultWrap));
+                $itemWrap = val('ItemWrap', $row, $options['itemwrap']);
             }
 
             $result .= $itemWrap[0];
@@ -3142,21 +3283,27 @@ PASSWORDMETER;
             if (arrayValueI('id', $row['Options'])) {
                 $labelOptions['for'] = arrayValueI('id', $row['Options']);
             }
+            $control = strtolower($row['Control']);
+
             if ($description) {
-                $labelWrap = wrap($this->label($labelCode, $row['Name'], $labelOptions).$description, 'div', ['class' => 'label-wrap']);
+                $labelWrap = wrap($this->label($labelCode, $row['Name'], $labelOptions) . $description, 'div', ['class' => 'label-wrap']);
             } else {
                 $labelWrap = wrap($this->label($labelCode, $row['Name'], $labelOptions), 'div', ['class' => 'label-wrap']);
             }
 
-            switch (strtolower($row['Control'])) {
+            switch ($control) {
                 case 'categorydropdown':
                     $result .= $this->label($labelCode, $row['Name'])
                         .$description
                         .$this->categoryDropDown($row['Name'], $row['Options']);
                     break;
                 case 'checkbox':
-                    $result .= $labelWrap
-                        .wrap($this->checkBox($row['Name'], $labelCode, $row['Options']), 'div', ['class' => 'input-wrap']);
+                    $result .= ($description ? $labelWrap : '')
+                        .wrap(
+                            $this->checkBox($row['Name'], $labelCode, $row['Options']),
+                            'div',
+                            ['class' => 'input-wrap'.(($description ? '' : ' no-label'))]
+                        );
                     break;
                 case 'toggle':
                     $result .= $this->toggle($row['Name'], $labelCode, $row['Options'], $description);
@@ -3197,8 +3344,40 @@ PASSWORDMETER;
             }
             $result .= $itemWrap[1];
         }
-        $result .= valr('Wrap.1', $options, '</ul>');
+        $result .= $options['wrap'][1];
         return $result;
+    }
+
+    /**
+     * Render a basic schema as defined by the `BasicSchemaSchema`.
+     *
+     * @param array $schema The schema array to render.
+     * @param array $options Additional options to pass along to `Gdn_Form::simple()`.
+     * @return string Returns a string containing form HTML.
+     */
+    public function renderSchema(array $schema, array $options = []): string {
+        $simple = [];
+        foreach ($schema['properties'] as $key => $prop) {
+            $control = $prop['x-control'] ?? ($prop['type'] === 'boolean' ? 'checkbox' : 'textbox');
+            $opts = [];
+
+            if ($control === 'textarea') {
+                $control = 'textbox';
+                $opts['Multiline'] = true;
+            }
+
+            $row = [
+                'LabelCode' => isset($prop['x-label']) ? '@'.$prop['x-label'] : self::labelCode($key),
+                'Control' => $control,
+                'Description' => $prop['description'] ?? '',
+                'Options' => $opts,
+            ];
+
+            $simple[$key] = $row;
+        }
+
+        $str = $this->simple($simple, $options);
+        return $str;
     }
 
     /**
@@ -3287,7 +3466,7 @@ PASSWORDMETER;
         if (is_array($attributes)) {
             foreach ($attributes as $attribute => $value) {
                 // Ignore reserved attributes
-                if (!in_array(strtolower($attribute), $reservedAttributes)) {
+                if (!in_array(strtolower($attribute), $reservedAttributes) && !is_array($value)) {
                     $return .= ' '.$attribute.($value === true ? '' : '="'.htmlspecialchars($value, ENT_COMPAT, 'UTF-8').'"');
                 }
             }

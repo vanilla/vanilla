@@ -1,0 +1,33 @@
+openapi: 3.0.2
+info: {}
+paths:
+    /users/{id}/extended:
+        patch:
+            summary: Update a user's extended fields.
+            tags:
+                - Users
+            parameters:
+                - description: The user ID.
+                  in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: integer
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/ExtendedUserFields"
+                required: true
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/ExtendedUserFields"
+                    description: Success
+components:
+    schemas:
+        ExtendedUserFields:
+            type: object
+            description: The user's profile extender fields.

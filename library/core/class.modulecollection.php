@@ -42,7 +42,11 @@ class Gdn_ModuleCollection extends Gdn_Module {
                 }
 
                 $lengthBefore = ob_get_length();
-                $item->render();
+                try {
+                    $item->render();
+                } catch (\Throwable $ex) {
+                    echo \Vanilla\Utility\DebugUtils::renderException($ex, "Error rendering ".get_class($item));
+                }
                 $lengthAfter = ob_get_length();
 
                 if ($lengthBefore !== false && $lengthAfter > $lengthBefore) {
@@ -66,7 +70,12 @@ class Gdn_ModuleCollection extends Gdn_Module {
      */
     public function toString() {
         ob_start();
-        $this->render();
-        return ob_get_clean();
+        try {
+            $this->render();
+            $output = ob_get_contents();
+        } finally {
+            ob_end_clean();
+        }
+        return $output;
     }
 }

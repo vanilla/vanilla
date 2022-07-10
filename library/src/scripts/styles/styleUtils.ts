@@ -4,24 +4,24 @@
  * @license GPL-2.0-only
  */
 
-import { NestedCSSProperties } from "typestyle/lib/types";
-import { style } from "typestyle";
-import getStore from "@library/redux/getStore";
-import { getMeta } from "@library/utility/appUtils";
-import memoize from "lodash/memoize";
+import { CSSObject, css } from "@emotion/css";
 import merge from "lodash/merge";
-import { color, rgba, rgb, hsla, hsl, ColorHelper, list } from "csx";
-import { logDebug, logWarning, hashString, logError } from "@vanilla/utils";
+import { color, rgba, rgb, hsla, hsl, ColorHelper } from "csx";
+import { logDebug, logWarning, logError, notEmpty } from "@vanilla/utils";
 import { getThemeVariables } from "@library/theming/getThemeVariables";
-import { isArray } from "util";
-import isNumeric from "validator/lib/isNumeric";
-import { useEffect, useState } from "react";
 import { IThemeVariables } from "@library/theming/themeReducer";
+import { GlobalVariableMapping, LocalVariableMapping } from "@library/styles/VariableMapping";
+
+// Re-export for compatibility.
+export { useThemeCache } from "@library/styles/themeCache";
 
 export const DEBUG_STYLES = Symbol.for("Debug");
 
+// Use this type to allow people to to pass conditional styles in.
+type CSSObjectOrFalsy = CSSObject | null | false | undefined;
+
 /**
- * A better helper to generate human readable classes generated from TypeStyle.
+ * A better helper to generate human readable classes generated from Emotion.
  *
  * This works like debugHelper but automatically. The generated function behaves just like `style()`
  * but can automatically adds a debug name & allows the first argument to be a string subcomponent name.
@@ -35,17 +35,17 @@ export const DEBUG_STYLES = Symbol.for("Debug");
  * const withDebugMode = style(true, "subcomponent", {color: "red"}).
  */
 export function styleFactory(componentName: string) {
-    function styleCreator(subcomponentName: string, ...objects: NestedCSSProperties[]): string;
-    function styleCreator(debug: symbol, subcomponentName: string, ...objects: NestedCSSProperties[]): string;
-    function styleCreator(...objects: NestedCSSProperties[]): string;
-    function styleCreator(...objects: Array<NestedCSSProperties | string | symbol>): string {
+    function styleCreator(subcomponentName: string, ...objects: CSSObjectOrFalsy[]): string;
+    function styleCreator(debug: symbol, subcomponentName: string, ...objects: CSSObjectOrFalsy[]): string;
+    function styleCreator(...objects: CSSObjectOrFalsy[]): string;
+    function styleCreator(...objects: Array<CSSObjectOrFalsy | string | symbol>): string {
+        objects = objects.filter((val) => !!val);
         if (objects.length === 0) {
-            return style();
+            return css();
         }
-
         let debugName = componentName;
         let shouldLogDebug = false;
-        let styleObjs: Array<NestedCSSProperties | undefined> = objects as any;
+        let styleObjs: CSSObject[] = objects as any;
         if (objects[0] === DEBUG_STYLES) {
             styleObjs.shift();
             shouldLogDebug = true;
@@ -56,65 +56,20 @@ export function styleFactory(componentName: string) {
             styleObjs = restObjects;
         }
 
+        styleObjs.forEach((obj) => (obj["label"] = debugName));
+
         if (shouldLogDebug) {
             logWarning(`Debugging component ${debugName}`);
             logDebug(styleObjs);
         }
 
-        const hasNestedStyles = !!objects.find(obj => typeof obj === "object" && "$nest" in obj);
-
-        // Applying $unique generally gives better consistency, but it can cause issues with nested styles.
-        // As a result we don't apply it if the class has any nested styles.
-        return style({ $debugName: debugName, $unique: !hasNestedStyles }, ...styleObjs);
+        return css(...styleObjs);
     }
 
     return styleCreator;
 }
 
-// A unique identifier that represents the current state of the theme.
-let _themeCacheID = hashString(Math.random().toString());
-
-// Event name for resetting the theme cacheID.
-export const THEME_CACHE_EVENT = "V-Clear-Theme-Cache";
-
-export function resetThemeCache() {
-    _themeCacheID = hashString(Math.random().toString());
-    document.dispatchEvent(new CustomEvent(THEME_CACHE_EVENT, { detail: _themeCacheID }));
-    return _themeCacheID;
-}
-
-export function useThemeCacheID() {
-    const [cacheID, setCacheID] = useState(_themeCacheID);
-    useEffect(() => {
-        const listener = (e: CustomEvent) => {
-            setCacheID(e.detail);
-        };
-        document.addEventListener(THEME_CACHE_EVENT, listener);
-
-        return () => {
-            document.removeEventListener(THEME_CACHE_EVENT, listener);
-        };
-    });
-
-    return { cacheID, resetThemeCache };
-}
-
-/**
- * Wrap a callback so that it will only run once with a particular set of global theme variables.
- *
- * @param callback The function to wrap.
- */
-export function useThemeCache<Cb>(callback: Cb): Cb {
-    const makeCacheKey = (...args) => {
-        const storeState = getStore().getState();
-        const themeKey = getMeta("ui.themeKey", "default");
-        const status = storeState.theme.assets.status;
-        const cacheKey = themeKey + status + _themeCacheID;
-        const result = cacheKey + JSON.stringify(args);
-        return result;
-    };
-    return memoize(callback as any, makeCacheKey);
-}
+export type VariableMapping = GlobalVariableMapping | LocalVariableMapping;
 
 /**
  * A helper class for declaring variables while mixing server defined variables from context.
@@ -151,6 +106,7 @@ export function useThemeCache<Cb>(callback: Cb): Cb {
 export function variableFactory(
     componentNames: string | string[],
     themeVars?: IThemeVariables,
+    mappings?: VariableMapping | VariableMapping[],
     mergeWithGlobals = false,
 ) {
     if (!themeVars) {
@@ -161,11 +117,23 @@ export function variableFactory(
 
     componentNames = typeof componentNames === "string" ? [componentNames] : componentNames;
 
-    const componentThemeVars = componentNames
-        .map(name => themeVars?.[name] ?? {})
+    let componentThemeVars = componentNames
+        .map((name) => themeVars?.[name] ?? {})
         .reduce((prev, curr) => {
             return merge(prev, curr);
         }, {});
+
+    if (mappings) {
+        mappings = Array.isArray(mappings) ? mappings : [mappings];
+        let initialVars = componentThemeVars;
+        for (const mapping of mappings) {
+            if (mapping instanceof LocalVariableMapping) {
+                componentThemeVars = mapping.map(componentThemeVars, initialVars);
+            } else {
+                componentThemeVars = mapping.map(componentThemeVars, themeVars);
+            }
+        }
+    }
 
     return function makeThemeVars<T extends object>(subElementName: string, declaredVars: T, overrides?: any): T {
         const customVars = componentThemeVars?.[subElementName] ?? null;
@@ -182,11 +150,18 @@ export function variableFactory(
 }
 
 function stripUndefinedKeys(obj: any) {
+    if (!obj || obj instanceof ColorHelper) {
+        return obj;
+    }
     if (typeof obj === "object") {
         const newObj = {};
         for (const [key, value] of Object.entries(obj)) {
-            if (value !== undefined) {
-                newObj[key] = value;
+            if (value !== undefined && value !== null) {
+                if (typeof value === "object") {
+                    newObj[key] = stripUndefinedKeys(value);
+                } else {
+                    newObj[key] = value;
+                }
             }
         }
         return newObj;
@@ -208,12 +183,19 @@ const hexRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
  *
  * - Strings starting with `#` get wrapped in `color()`;
  */
-function normalizeVariables(customVariable: any, defaultVariable: any) {
+export function normalizeVariables(customVariable: any, defaultVariable: any) {
+    const customVariableType: string = Array.isArray(customVariable) === false ? typeof customVariable : "array";
+    const defaultVariableType: string = Array.isArray(defaultVariable) === false ? typeof defaultVariable : "array";
+    const argumentTypes = [...new Set([customVariableType, defaultVariableType])];
     try {
-        if (Array.isArray(customVariable) && isArray(defaultVariable)) {
+        if (Array.isArray(customVariable) && Array.isArray(defaultVariable)) {
             // We currently can't pre-process arrays.
             return customVariable;
-        } else if (defaultVariable instanceof ColorHelper) {
+        }
+        if (
+            defaultVariable instanceof ColorHelper ||
+            (defaultVariable === undefined && typeof customVariable === "string" && customVariable.startsWith("#"))
+        ) {
             if (customVariable instanceof ColorHelper) {
                 return customVariable;
             } else if (typeof customVariable === "string" && customVariable.startsWith("linear-gradient")) {
@@ -222,17 +204,20 @@ function normalizeVariables(customVariable: any, defaultVariable: any) {
                 const color = colorStringToInstance(customVariable, defaultVariable instanceof ColorHelper);
                 return color;
             }
-        } else if (
-            typeof customVariable === "object" &&
-            typeof defaultVariable === "object" &&
-            defaultVariable !== null
-        ) {
+        } else if (customVariableType === "object" && defaultVariableType === "object" && defaultVariable !== null) {
             const newObj: any = {};
             for (const [key, defaultValue] of Object.entries(defaultVariable)) {
                 const mergedValue = key in customVariable ? customVariable[key] : defaultValue;
                 newObj[key] = normalizeVariables(mergedValue, defaultValue);
             }
             return newObj;
+        } else if (
+            argumentTypes.length > 1 &&
+            argumentTypes.includes("object") &&
+            argumentTypes.includes("array") &&
+            defaultVariable !== null
+        ) {
+            return defaultVariable;
         } else {
             return customVariable;
         }
@@ -304,10 +289,7 @@ export function stringIsLinearGradient(colorValue) {
     return (
         typeof colorValue === "string" &&
         !stringIsValidColor(colorValue) &&
-        colorValue
-            .toString()
-            .trim()
-            .startsWith("linear-gradient(")
+        colorValue.toString().trim().startsWith("linear-gradient(")
     );
 }
 
@@ -315,7 +297,7 @@ export function stringIsLinearGradient(colorValue) {
  * Check if string or ColorHelper is valid
  * @param colorString
  */
-export const isValidColor = colorValue => {
+export const isValidColor = (colorValue) => {
     return colorValue && (colorValue instanceof ColorHelper || stringIsValidColor(colorValue));
 };
 
@@ -423,4 +405,46 @@ function getDebugVars(vars: any): any {
     }
 
     return result;
+}
+
+/**
+ * For classes that allow overwriting variables, it can be difficult to trace where bugs come from.
+ * This function appends a string to the class name with the file it's from.
+ * Example: You've got a class: "searchBar-closeButton_fhrk8tj"
+ * If you pass a source to this function, the classnames becomes: "searchBar-closeButton:fromTitleBar_fhrk8tj"
+ */
+export function appendSource(className: string, source?: string) {
+    return `${className}${source ? "--" + source : ""}`;
+}
+
+export function getPixelNumber(val: string | number | undefined, fallback: number = 0): number {
+    if (val == undefined) {
+        return fallback;
+    }
+    if (typeof val === "number") {
+        return val;
+    } else {
+        val = val.replace("px", "");
+        const parsed = Number.parseInt(val);
+        if (Number.isNaN(parsed)) {
+            return fallback;
+        } else {
+            return parsed;
+        }
+    }
+}
+
+/**
+ * Make all active selectors.
+ *
+ * @example
+ * ```
+ * activeSelector("&") -> &:active, &:hover, &:focus, &.focus-visible
+ * activeSelector(".thing", "&")
+ *   -> .thing:active &, .thing:hover &, .thing:focus & .thing.focus-visible &
+ * ```
+ */
+export function activeSelector(baseSelector: string = "&", suffix: string = ""): string {
+    const selectors = [":active", ":hover", ":focus", ".focus-visible"];
+    return selectors.map((selector) => `${baseSelector}${selector} ${suffix}`).join(", ");
 }

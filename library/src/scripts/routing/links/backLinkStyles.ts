@@ -5,13 +5,15 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { absolutePosition, colorOut, margins, negative, srOnly, unit, userSelect } from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { important, px, translateY } from "csx";
-import { titleBarVariables } from "@library/headers/titleBarStyles";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { media } from "typestyle";
-import { lineHeightAdjustment } from "@library/styles/textUtils";
+import { negative, userSelect } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { Mixins } from "@library/styles/Mixins";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
+import { important, percent, px, translateY } from "csx";
+import { titleBarVariables } from "@library/headers/TitleBar.variables";
+import { oneColumnVariables } from "@library/layout/Section.variables";
 
 const backLinkVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -36,7 +38,7 @@ const backLinkVariables = useThemeCache(() => {
 
 const backLinkClasses = useThemeCache(() => {
     const globalVars = globalVariables();
-    const mediaQueries = layoutVariables().mediaQueries();
+    const mediaQueries = oneColumnVariables().mediaQueries();
     const style = styleFactory("backLink");
     const titleBarVars = titleBarVariables();
     const vars = backLinkVariables();
@@ -48,16 +50,16 @@ const backLinkClasses = useThemeCache(() => {
             alignItems: "center",
             justifyContent: "flex-start",
             overflow: "visible",
-            height: unit(vars.sizing.height),
-            minWidth: unit(vars.sizing.width),
-            ...margins({
-                left: negative(22),
+            height: styleUnit(vars.sizing.height),
+            minWidth: styleUnit(vars.sizing.width),
+            ...Mixins.margin({
+                left: negative(24),
                 right: globalVars.gutter.half,
             }),
             transform: translateY("-0.1em"),
         },
         mediaQueries.oneColumnDown({
-            ...margins({
+            ...Mixins.margin({
                 left: 0,
             }),
         }),
@@ -68,10 +70,10 @@ const backLinkClasses = useThemeCache(() => {
         alignItems: "center",
         justifyContent: "flex-start",
         color: "inherit",
-        height: unit(vars.sizing.height),
-        $nest: {
+        height: styleUnit(vars.sizing.height),
+        ...{
             "&:hover, &:focus": {
-                color: colorOut(globalVars.mainColors.primary),
+                color: ColorsUtils.colorOut(globalVars.mainColors.primary),
                 outline: 0,
             },
         },
@@ -80,10 +82,10 @@ const backLinkClasses = useThemeCache(() => {
     const inHeading = (fontSize?: number | null) => {
         if (fontSize) {
             return style("inHeading", {
-                ...absolutePosition.topLeft(".5em"),
-                fontSize: unit(fontSize),
+                ...Mixins.absolute.topLeft(".5em"),
+                fontSize: styleUnit(fontSize),
                 transform: `translateY(-50%)`,
-                marginTop: unit(vars.position.verticalOffset),
+                marginTop: styleUnit(vars.position.verticalOffset),
             });
         } else {
             return "";
@@ -93,17 +95,16 @@ const backLinkClasses = useThemeCache(() => {
     const label = style(
         "label",
         {
-            lineHeight: px(globalVars.icon.sizes.default),
             fontWeight: globalVars.fonts.weights.semiBold,
             whiteSpace: "nowrap",
             paddingLeft: px(12),
         },
-        mediaQueries.xs(srOnly()),
+        mediaQueries.xs(Mixins.absolute.srOnly()),
     );
 
     const icon = style("icon", {
-        height: unit(vars.sizing.height),
-        width: unit(vars.sizing.width),
+        height: styleUnit(vars.sizing.height),
+        width: styleUnit(vars.sizing.width),
     });
 
     // Since the back link needs to be outside the heading, we need a way to get the height of one line of text to center the link vertically.

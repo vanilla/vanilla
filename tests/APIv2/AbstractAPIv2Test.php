@@ -7,21 +7,18 @@
 
 namespace VanillaTests\APIv2;
 
-use PHPUnit\Framework\TestCase;
 use Vanilla\Formatting\Formats\TextFormat;
 use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Web\PrivateCommunityMiddleware;
-use VanillaTests\InternalClient;
-use VanillaTests\SiteTestTrait;
-use VanillaTests\TestLogger;
+use Vanilla\Web\RoleTokenAuthTrait;
+use VanillaTests\SiteTestCase;
 
-abstract class AbstractAPIv2Test extends TestCase {
-    use SiteTestTrait;
+/**
+ * Base API test case.
+ */
+abstract class AbstractAPIv2Test extends SiteTestCase {
 
-    /**
-     * @var InternalClient
-     */
-    private $api;
+    use RoleTokenAuthTrait;
 
     /**
      * @var bool Set to false before setUp() to skip the session->start();
@@ -32,11 +29,6 @@ abstract class AbstractAPIv2Test extends TestCase {
      * @var array Fields that are getting formatted using the format column.
      */
     protected $formattedFields = ['body'];
-
-    /**
-     * @var TestLogger
-     */
-    protected $logger;
 
     /**
      * Whether to start a session on setUp() or not.
@@ -52,33 +44,9 @@ abstract class AbstractAPIv2Test extends TestCase {
      */
     public function setUp(): void {
         parent::setUp();
-
-        $this->api = static::container()->getArgs(InternalClient::class, [static::container()->get('@baseUrl').'/api/v2']);
-
         if ($this->startSessionOnSetup) {
             $this->setAdminApiUser();
             $this->api->setTransientKey(md5(now()));
-        }
-
-        $this->logger = new TestLogger();
-        \Logger::addLogger($this->logger);
-        $this->setUpTestTraits();
-    }
-
-    /**
-     * Setup test traits.
-     *
-     * Any trait that defines a method `setUpNameOfTrait` will be called.
-     */
-    public function setUpTestTraits() {
-        $uses = array_flip(class_uses(static::class));
-        foreach ($uses as $traitName) {
-            $shortName = (new \ReflectionClass($traitName))->getShortName();
-            $methodName = 'setUp'.$shortName;
-
-            if (method_exists($this, $methodName)) {
-                call_user_func([$this, $methodName]);
-            }
         }
     }
 
@@ -88,17 +56,6 @@ abstract class AbstractAPIv2Test extends TestCase {
     public function tearDown(): void {
         parent::tearDown();
         $this->api = null;
-        \Logger::removeLogger($this->logger);
-        $this->logger = null;
-    }
-
-    /**
-     * Get the API client for internal requests.
-     *
-     * @return InternalClient Returns the API client.
-     */
-    public function api() {
-        return $this->api;
     }
 
     public function assertRowsEqual(array $expected, array $actual) {
@@ -152,7 +109,7 @@ abstract class AbstractAPIv2Test extends TestCase {
         $pagingTestUrl = $resourceUrl.(strpos($resourceUrl, '?') === false ? '?' : '&').'limit=1';
         $resourcePath = parse_url($resourceUrl, PHP_URL_PATH);
 
-        $result = $this->api()->get($pagingTestUrl);
+        $result = $this->api()->get($pagingTestUrl, ['pinOrder' => 'mixed']);
         $link = $result->getHeader('Link');
         $this->assertNotEmpty($link);
         $this->assertTrue(preg_match('/<([^;]*?'.preg_quote($resourcePath, '/').'[^>]+)>; rel="first"/', $link) === 1);
@@ -166,16 +123,6 @@ abstract class AbstractAPIv2Test extends TestCase {
 
         $this->assertEquals(200, $result->getStatusCode());
         $this->assertEquals(1, count($result->getBody()));
-    }
-
-    /**
-     * Assert that something was logged.
-     *
-     * @param array $filter The log filter.
-     */
-    public function assertLog($filter = []) {
-        $item = $this->logger->search($filter);
-        $this->assertNotNull($item, "Could not find expected log: ".json_encode($filter));
     }
 
     /**
@@ -254,5 +201,60 @@ abstract class AbstractAPIv2Test extends TestCase {
         } finally {
             $this->api()->setUserID($userID);
         }
+    }
+
+    /**
+     * Execute api request and check results.
+     *
+     * @param string $api API endpoint to call
+     * @param array $params API params to pass
+     * @param array $expectedFields Mapping of expectedField => expectedValues.
+     * @param bool $strictOrder Whether or not the fields should be returned in a strict order.
+     * @param int|null $count Expected count of result items
+     */
+    public function assertApiResults(string $api, array $params, array $expectedFields, bool $strictOrder = false, int $count = null) {
+        $response = $this->api()->get($api, $params);
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $results = $response->getBody();
+
+        foreach ($expectedFields as $expectedField => $expectedValues) {
+            if ($expectedValues === null) {
+                foreach ($results as $result) {
+                    $this->assertArrayNotHasKey($expectedField, $result);
+                }
+            } else {
+                $actualValues = array_column($results, $expectedField);
+                if (!$strictOrder) {
+                    sort($actualValues);
+                    sort($expectedValues);
+                }
+
+                $this->assertEquals($expectedValues, $actualValues);
+            }
+        }
+
+        if (is_int($count)) {
+            $this->assertEquals($count, count($results));
+        }
+    }
+
+    /**
+     * Get the response from the role token endpoint associated to the current user. Note that the role token issued
+     * is time-constrained so the tests that utilize this token must pass this token prior to its expiration,
+     * i.e. within two minutes or so, otherwise the test will fail due to token expiration.
+     *
+     * @return array Associative single element array containing the role token's query param name as the key
+     * and the encoded role token JWT as the value.
+     * @throws \Garden\Container\ContainerException Container Exception.
+     * @throws \Garden\Container\NotFoundException Not Found Exception.
+     */
+    public function getRoleTokenResponseBody(): array {
+        /* @var \Gdn_Session $session */
+        $session = static::container()->get(\Gdn_Session::class);
+        $this->assertTrue($session->isValid(), "Cannot obtain a role token without a user specified in the session");
+        $tokenResponse = $this->api()->post("/tokens/roles");
+        $this->assertTrue($tokenResponse->isSuccessful());
+        return $tokenResponse->getBody();
     }
 }

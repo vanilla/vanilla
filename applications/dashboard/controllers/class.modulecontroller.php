@@ -12,6 +12,24 @@
  * Handles /module endpoint.
  */
 class ModuleController extends Gdn_Controller {
+    /**
+     * {@inheritDoc}
+     */
+    public function initialize() {
+        $this->Head = new HeadModule($this);
+        $this->addJsFile('jquery.js');
+        $this->addJsFile('jquery.form.js');
+        $this->addJsFile('jquery.popup.js');
+        $this->addJsFile('jquery.gardenhandleajaxform.js');
+        $this->addJsFile('jquery.autosize.min.js');
+        $this->addJsFile('global.js');
+        $this->addJsFile('cropimage.js');
+        $this->addJsFile('vendors/clipboard.min.js');
+
+        $this->addCssFile('style.css');
+        $this->addCssFile('vanillicon.css', 'static');
+        parent::initialize();
+    }
 
     /**
      * Creates and renders an instance of a module.
@@ -19,7 +37,6 @@ class ModuleController extends Gdn_Controller {
      * @param string $module
      * @param string $appFolder
      * @param string $deliveryType
-     * @throws NotFoundException
      */
     public function index($module, $appFolder = '', $deliveryType = '') {
         if (!$deliveryType) {

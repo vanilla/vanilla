@@ -16,18 +16,18 @@ echo '<div class="Entry'.$CssClass.'">';
 // Render the main signin form.
 echo '<div class="MainForm">';
 ?>
-    <ul>
-        <li>
+    <ul role="presentation">
+        <li role="presentation">
             <?php
             echo $this->Form->label('Email/Username', 'Email');
             echo $this->Form->textBox('Email', ['id' => 'Form_Email', 'autocorrect' => 'off', 'autocapitalize' => 'off', 'Wrap' => TRUE]);
             ?>
         </li>
-        <li>
+        <li role="presentation">
             <?php
             echo $this->Form->label('Password', 'Password');
             echo $this->Form->input('Password', 'password', ['class' => 'InputBox Password']);
-            echo anchor(t('Forgot?'), '/entry/passwordrequest', 'ForgotPassword');
+            echo anchor(t('Forgot?'), '/entry/passwordrequest', 'ForgotPassword', ['title' => t('Forgot your password?')]);
             ?>
         </li>
     </ul>
@@ -69,7 +69,7 @@ echo '</div>';
                 }
 
                 if (c('Garden.Registration.Method') != 'Invitation') {
-                    printf(t("Don't have an account? %s"), anchor(t('Create One.'), '/entry/register'.$Target));
+                    printf(t("Don't have an account? %s"), anchor(t('Create One.'), '/entry/register'.$Target, '', ['title' => t('Create an Account')]));
                 }
                 ?>
             </div>

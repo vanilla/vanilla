@@ -13,7 +13,7 @@ import { formatUrl } from "@library/utility/appUtils";
 const defaultOptionProvider: ISearchOptionProvider = {
     supportsAutoComplete: false,
     autocomplete: () => Promise.resolve([]),
-    makeSearchUrl: query => formatUrl(`/search?search=${query}`),
+    makeSearchUrl: (query) => formatUrl(`/search?search=${query}`),
 };
 
 const SearchContext = React.createContext<IWithSearchProps>({
@@ -36,8 +36,8 @@ SearchContextProvider.setOptionProvider = (provider: ISearchOptionProvider) => {
 
 export interface ISearchOptionProvider {
     supportsAutoComplete?: boolean;
-    autocomplete(query: string, options?: { [key: string]: any }): Promise<Array<IComboBoxOption<ISearchOptionData>>>;
-    makeSearchUrl(query: string): string;
+    autocomplete(query: string, options?: Record<string, any>): Promise<Array<IComboBoxOption<ISearchOptionData>>>;
+    makeSearchUrl(query: string, options?: Record<string, any>): string;
 }
 
 export interface IWithSearchProps {
@@ -60,7 +60,7 @@ export function withSearch<T extends IWithSearchProps = IWithSearchProps>(Wrappe
         public render() {
             return (
                 <SearchContext.Consumer>
-                    {context => {
+                    {(context) => {
                         // https://github.com/Microsoft/TypeScript/issues/28938
                         return <WrappedComponent {...context} {...(this.props as T)} />;
                     }}

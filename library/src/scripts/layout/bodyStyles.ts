@@ -4,111 +4,155 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { percent, viewHeight } from "csx";
-import { cssRule, style } from "typestyle";
-import { colorOut, backgroundHelper, margins, paddings, fonts } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { homePageVariables } from "@library/layout/homePageStyles";
 import isEmpty from "lodash/isEmpty";
-import { NestedCSSProperties } from "typestyle/lib/types";
+import { CSSObject, injectGlobal } from "@emotion/css";
+import { Mixins } from "@library/styles/Mixins";
+import { useEffect } from "react";
 
-export const bodyCSS = useThemeCache(() => {
+export const bodyStyleMixin = useThemeCache(() => {
     const globalVars = globalVariables();
 
-    cssRule("html", {
-        "-ms-overflow-style": "-ms-autohiding-scrollbar",
-    });
-
-    const htmlBodyMixin: NestedCSSProperties = {
-        background: colorOut(globalVars.body.backgroundImage.color),
-        ...fonts({
-            size: globalVars.fonts.size.medium,
+    const style: CSSObject = {
+        background: ColorsUtils.colorOut(globalVars.body.backgroundImage.color),
+        ...Mixins.font({
+            ...globalVars.fontSizeAndWeightVars("medium"),
             family: globalVars.fonts.families.body,
             color: globalVars.mainColors.fg,
         }),
         wordBreak: "break-word",
-        overscrollBehavior: "none", // For IE -> https://developer.mozilla.org/en-US/docs/Web/CSS/overscroll-behavior
-        $unique: true, // This doesn't refresh without this for some reason.
+
+        "h1, h2, h3, h4, h5, h6": {
+            lineHeight: globalVars.lineHeights.condensed,
+            color: ColorsUtils.colorOut(globalVars.mainColors.fgHeading),
+        },
     };
 
-    cssRule("html", htmlBodyMixin);
-    const bodyClass = style({
-        ...htmlBodyMixin,
-        $debugName: "vanillaBodyReset",
-    });
-    document.body.classList.add(bodyClass);
+    return style;
+});
 
-    cssRule("*", {
-        // For Mobile Safari -> https://developer.mozilla.org/en-US/docs/Web/CSS/overscroll-behavior
-        "-webkit-overflow-scrolling": "touch",
-    });
+export const useBodyCSS = () => {
+    const globalVars = globalVariables();
 
-    cssRule("h1, h2, h3, h4, h5, h6", {
-        display: "block",
-        lineHeight: globalVars.lineHeights.condensed,
-        ...margins({
-            all: 0,
-        }),
-        ...paddings({
-            all: 0,
-        }),
-    });
+    useEffect(() => {
+        const bodyStyle = bodyStyleMixin();
+        const stylesheet = document.createElement("style");
+        stylesheet.innerHTML = `
+            body {
+                background: ${bodyStyle.background};
+                font-size: ${bodyStyle.fontSize};
+                font-family: ${bodyStyle.fontFamily};
+                color: ${bodyStyle.color};
+                word-break: ${bodyStyle.wordBreak};
+            }
 
-    cssRule("p", {
-        ...margins({
-            all: 0,
-        }),
-        ...paddings({
-            all: 0,
-        }),
-    });
+            h1, h2, h3, h4, h5, h6 {
+                line-height: ${globalVars.lineHeights.condensed};
+                color: ${ColorsUtils.colorOut(globalVars.mainColors.fgHeading)};
+            }
+        `;
 
-    cssRule(".page", {
-        display: "flex",
-        overflow: "visible",
-        flexDirection: "column",
-        width: percent(100),
-        minHeight: viewHeight(100),
-        position: "relative",
-        zIndex: 0,
+        document.head.prepend(stylesheet);
+
+        return function cleanup() {
+            document.head.removeChild(stylesheet);
+        };
+    }, [globalVars]);
+};
+
+export const globalCSS = useThemeCache(() => {
+    injectGlobal({
+        html: {
+            msOverflowStyle: "-ms-autohiding-scrollbar",
+        },
     });
 
-    cssRule("button", {
-        "-webkit-appearance": "none",
-        "-moz-appearance": "none",
+    injectGlobal({
+        "*": {
+            // For Mobile Safari -> https://developer.mozilla.org/en-US/docs/Web/CSS/overscroll-behavior
+            WebkitOverflowScrolling: "touch",
+        },
     });
 
-    cssRule(".page-minHeight", {
-        flexGrow: 1,
-        display: "flex",
-        flexDirection: "column",
+    injectGlobal({
+        "h1, h2, h3, h4, h5, h6": {
+            display: "block",
+            ...Mixins.margin({
+                all: 0,
+            }),
+            ...Mixins.padding({
+                all: 0,
+            }),
+        },
     });
 
-    cssRule(`input[type="number"]`, {
-        [`-webkit-appearance`]: "none",
-        [`-moz-appearance`]: "textfield",
-        $nest: {
-            [`&::-webkit-inner-spin-button`]: {
-                [`-webkit-appearance`]: "none",
-                margin: 0,
-            },
-            [`&::-webkit-outer-spin-button`]: {
-                [`-webkit-appearance`]: "none",
-                margin: 0,
+    injectGlobal({
+        p: {
+            ...Mixins.margin({
+                all: 0,
+            }),
+            ...Mixins.padding({
+                all: 0,
+            }),
+        },
+    });
+
+    injectGlobal({
+        ".page": {
+            display: "flex",
+            overflow: "visible",
+            flexDirection: "column",
+            width: percent(100),
+            minHeight: viewHeight(100),
+            position: "relative",
+            zIndex: 0,
+        },
+    });
+
+    injectGlobal({
+        button: {
+            WebkitAppearance: "none",
+            MozAppearance: "none",
+        },
+    });
+
+    injectGlobal({
+        ".page-minHeight": {
+            flexGrow: 1,
+            display: "flex",
+            flexDirection: "column",
+        },
+    });
+
+    injectGlobal({
+        [`input[type="number"]`]: {
+            WebkitAppearance: "none",
+            MozAppearance: "textfield",
+            ...{
+                [`&::-webkit-inner-spin-button`]: {
+                    WebkitAppearance: "none",
+                    margin: 0,
+                },
+                [`&::-webkit-outer-spin-button`]: {
+                    WebkitAppearance: "none",
+                    margin: 0,
+                },
             },
         },
     });
 
-    cssRule(
-        `input::-webkit-search-decoration,
-        input::-webkit-search-cancel-button,
-        input::-webkit-search-results-button,
-        input::-webkit-search-results-decoration,
-        input::-ms-clear`,
-        {
+    injectGlobal({
+        [`input:-webkit-search-decoration,
+        input:-webkit-search-cancel-button,
+        input:-webkit-search-results-button,
+        input:-webkit-search-results-decoration`]: {
             display: "none",
         },
-    );
+    });
 });
 
 export const fullBackgroundClasses = useThemeCache((isRootPage = false) => {
@@ -128,7 +172,7 @@ export const fullBackgroundClasses = useThemeCache((isRootPage = false) => {
             height: viewHeight(100),
             zIndex: -1,
         },
-        backgroundHelper(source.backgroundImage),
+        Mixins.background(source.backgroundImage),
     );
 
     return { root };

@@ -465,10 +465,10 @@ $flyout-progress_size:                  24px !default;
         border-radius: $flyout_borderRadius;
         background-color: $flyout_bg;
     }
-    z-index: 1;
+    z-index: 2;
 
     @include maxWidth {
-        z-index: 1;
+        z-index: 2;
     }
 
     &::before,
@@ -530,6 +530,10 @@ $flyout-progress_size:                  24px !default;
 .selectBox-item .dropdown-menu-link.selectBox-link {
     padding-left: 30px !important;
     position: static;
+}
+
+.dropdown-menu-link .Alert {
+    margin-left: auto;
 }
 
 .richEditorFlyout {

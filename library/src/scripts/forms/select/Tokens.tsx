@@ -14,10 +14,9 @@ import Paragraph from "@library/layout/Paragraph";
 import classNames from "classnames";
 import * as selectOverrides from "@library/forms/select/overwrites";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
-import MutationObserver from "react-mutation-observer";
 
 export interface ITokenProps extends IOptionalComponentID {
-    label: string;
+    label: string | null;
     labelNote?: string;
     disabled?: boolean;
     className?: string;
@@ -25,8 +24,12 @@ export interface ITokenProps extends IOptionalComponentID {
     options: IComboBoxOption[] | undefined;
     isLoading?: boolean;
     value: IComboBoxOption[];
+    onFocus?: () => void;
     onChange: (tokens: IComboBoxOption[]) => void;
     onInputChange?: (value: string) => void;
+    menuPlacement?: string;
+    showIndicator?: boolean;
+    maxHeight?: number;
 }
 
 interface IState {
@@ -54,11 +57,17 @@ export default class Tokens extends React.Component<ITokenProps, IState> {
 
         return (
             <>
-                <div className={classNames("tokens", classesInputBlock.root, this.props.className, classes.root)}>
-                    <label htmlFor={this.inputID} className={classesInputBlock.labelAndDescription}>
-                        <span className={classesInputBlock.labelText}>{this.props.label}</span>
-                        <Paragraph className={classesInputBlock.labelNote}>{this.props.labelNote}</Paragraph>
-                    </label>
+                <div
+                    className={classNames("tokens", classesInputBlock.root, this.props.className, classes.root, {
+                        [classes.withIndicator]: this.props.showIndicator,
+                    })}
+                >
+                    {this.props.label !== null && (
+                        <label htmlFor={this.inputID} className={classesInputBlock.labelAndDescription}>
+                            <span className={classesInputBlock.labelText}>{this.props.label}</span>
+                            <Paragraph className={classesInputBlock.labelNote}>{this.props.labelNote}</Paragraph>
+                        </label>
+                    )}
 
                     <div
                         className={classNames(classesInputBlock.inputWrap, classes.inputWrap, {
@@ -89,24 +98,16 @@ export default class Tokens extends React.Component<ITokenProps, IState> {
                             isMulti={true}
                             onFocus={this.onFocus}
                             onBlur={this.onBlur}
+                            maxMenuHeight={this.props.maxHeight}
                         />
                     </div>
-
-                    <MutationObserver
-                        onAttributeChange={e => {
-                            if (e.to && e.to !== e.from) {
-                                this.props.onChange(JSON.parse(e.to));
-                            }
-                        }}
-                    >
-                        <input
-                            className={"js-" + this.prefix + "-tokenInput"}
-                            aria-hidden={true}
-                            value={JSON.stringify(this.props.value)}
-                            type="hidden"
-                            tabIndex={-1}
-                        />
-                    </MutationObserver>
+                    <input
+                        className={"js-" + this.prefix + "-tokenInput"}
+                        aria-hidden={true}
+                        value={JSON.stringify(this.props.value)}
+                        type="hidden"
+                        tabIndex={-1}
+                    />
                 </div>
             </>
         );
@@ -116,7 +117,7 @@ export default class Tokens extends React.Component<ITokenProps, IState> {
         return !!this.props.isLoading && this.state.inputValue.length > 0;
     }
 
-    private handleInputChange = val => {
+    private handleInputChange = (val) => {
         this.setState({ inputValue: val });
         this.props.onInputChange?.(val);
     };
@@ -125,9 +126,8 @@ export default class Tokens extends React.Component<ITokenProps, IState> {
      * Overwrite components in Select component
      */
     private get componentOverwrites() {
-        return {
+        const overwrites = {
             ClearIndicator: selectOverrides.NullComponent,
-            DropdownIndicator: selectOverrides.NullComponent,
             LoadingMessage: selectOverrides.OptionLoader,
             Menu:
                 !this.props.options || this.props.options?.length > 0
@@ -144,13 +144,20 @@ export default class Tokens extends React.Component<ITokenProps, IState> {
                 ? selectOverrides.NoOptionsMessage
                 : selectOverrides.NullComponent,
             LoadingIndicator: selectOverrides.NullComponent,
+            DropdownIndicator: selectOverrides.DropdownIndicator,
         };
+
+        if (!this.props.showIndicator) {
+            overwrites["DropdownIndicator"] = selectOverrides.NullComponent;
+        }
+
+        return overwrites;
     }
 
     /**
      * Overwrite theme in Select component
      */
-    private getTheme = theme => {
+    private getTheme = (theme) => {
         return {
             ...theme,
             border: {},
@@ -163,6 +170,9 @@ export default class Tokens extends React.Component<ITokenProps, IState> {
      * Set class for focus
      */
     private onFocus = () => {
+        if (this.props.onFocus) {
+            this.props.onFocus();
+        }
         this.setState({
             focus: true,
         });

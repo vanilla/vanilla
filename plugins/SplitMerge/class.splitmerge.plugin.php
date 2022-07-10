@@ -2,10 +2,12 @@
 /**
  * SplitMerge plugin.
  *
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package SplitMerge
  */
+
+use Vanilla\Community\Events\DiscussionEvent;
 
 /**
  * Class SplitMergePlugin
@@ -91,6 +93,8 @@ class SplitMergePlugin extends Gdn_Plugin {
             // Use the System user as the author.
             $data['InsertUserID'] = Gdn::userModel()->getSystemUserID();
 
+            $destinationCategoryID = $data['CategoryID'];
+
             // Pass a forced input formatter around this exception.
             if (c('Garden.ForceInputFormatter')) {
                 $inputFormat = c('Garden.InputFormatter');
@@ -121,6 +125,15 @@ class SplitMergePlugin extends Gdn_Plugin {
                 $commentModel->updateCommentCount($newDiscussionID);
                 $commentModel->removePageCache($discussionID, 1);
 
+                // Dispatch a Discussion event (split)
+                $senderUserID = Gdn::session()->UserID;
+                $senderFragment = $senderUserID ? Gdn::userModel()->getFragmentByID($senderUserID) : null;
+                $discussion = $discussionModel->getID($newDiscussionID, DATASET_TYPE_ARRAY);
+                $discussionEvent = $discussionModel->eventFromRow($discussion, DiscussionEvent::ACTION_SPLIT, $senderFragment);
+                $discussionEvent->setSourceDiscussionID($discussionID);
+                $discussionEvent->setDestinationDiscussionID($newDiscussionID);
+                $discussionEvent->setCommentIDs($commentIDs);
+                $discussionModel->getEventManager()->dispatch($discussionEvent);
 
                 // Clear selections
                 unset($checkedComments[$discussionID]);
@@ -221,8 +234,17 @@ class SplitMergePlugin extends Gdn_Plugin {
                     if ($CommentID) {
                         $Comment['CommentID'] = $CommentID;
                         $this->EventArguments['SourceDiscussion'] = $Discussion;
+                        $this->EventArguments['DestinationDiscussion'] = $MergeDiscussion;
                         $this->EventArguments['TargetComment'] = $Comment;
                         $this->fireEvent('TransformDiscussionToComment');
+
+                        // Dispatch a Discussion event (merge)
+                        $senderUserID = Gdn::session()->UserID;
+                        $sender = $senderUserID ? Gdn::userModel()->getFragmentByID($senderUserID) : null;
+                        $discussion = $DiscussionModel->getID($Discussion['DiscussionID'], DATASET_TYPE_ARRAY);
+                        $discussionEvent = $DiscussionModel->eventFromRow($discussion, DiscussionEvent::ACTION_MERGE, $sender);
+                        $discussionEvent->setDestinationDiscussionID($MergeDiscussionID);
+                        $DiscussionModel->getEventManager()->dispatch($discussionEvent);
 
                         if ($RedirectLink) {
                             // The discussion needs to be changed to a moved link.

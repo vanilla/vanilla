@@ -47,6 +47,15 @@ $code-block_padding:                    $userContent_fontSize !default;
         display: block;
     }
 
+    .post-text-align-left,
+    .post-text-align-justify,
+    .post-text-align-left,
+    .post-text-align-right {
+        .embedImage-img {
+            display: initial;
+        }
+    }
+
     .bbcode_right,
     .bbcode_center,
     .bbcode_left {

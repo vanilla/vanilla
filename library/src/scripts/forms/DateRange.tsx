@@ -17,6 +17,7 @@ interface IProps {
     onStartChange: (value: string) => void;
     onEndChange: (value: string) => void;
     className?: string;
+    label?: string;
 }
 
 interface IState {}
@@ -37,7 +38,9 @@ export default class DateRange extends React.PureComponent<IProps> {
             <fieldset
                 className={classNames("dateRange", classesInputBlock.root, this.props.className, rangeClasses.root)}
             >
-                <legend className={classNames(classesInputBlock.sectionTitle)}>{t("Date Updated")}</legend>
+                <legend className={classNames(classesInputBlock.sectionTitle)}>
+                    {this.props.label || t("Date Updated")}
+                </legend>
                 <label className={classNames("dateRange-boundary", rangeClasses.boundary)}>
                     <span className={classNames("dateRange-label", rangeClasses.label)}>{fromLabel}</span>
                     <DatePicker

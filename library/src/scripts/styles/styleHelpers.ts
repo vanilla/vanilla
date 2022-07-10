@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { important, px } from "csx";
+import { ColorHelper, px } from "csx";
 import isNumeric from "validator/lib/isNumeric";
 export * from "@library/styles/styleHelpersAnimation";
 export * from "@library/styles/styleHelpersBackgroundStyling";
@@ -20,6 +20,14 @@ export * from "@library/styles/styleHelpersReset";
 export * from "@library/styles/styleHelpersSpinner";
 export * from "@library/styles/styleHelpersTypography";
 export * from "@library/styles/styleHelpersVisibility";
+export * from "@library/styles/styleUnit";
+
+import { styleUnit } from "@library/styles/styleUnit";
+import { internalAbsoluteMixins } from "@library/styles/MixinsAbsolute";
+export const unit = styleUnit;
+
+/** @deprecated Use Mixins.absolute instead */
+export const absolutePosition = internalAbsoluteMixins;
 
 /*
  * Helper to generate human readable classes generated from TypeStyle
@@ -29,15 +37,15 @@ export const debugHelper = (componentName: string) => {
     return {
         name: (subElementName?: string) => {
             if (subElementName) {
-                return { $debugName: `${componentName}-${subElementName}` };
+                return { label: `${componentName}-${subElementName}` };
             } else {
-                return { $debugName: componentName };
+                return { label: componentName };
             }
         },
     };
 };
 
-export const ifExistsWithFallback = checkProp => {
+export const ifExistsWithFallback = (checkProp) => {
     if (checkProp && checkProp.length > 0) {
         const next = checkProp.pop();
         return next ? next : ifExistsWithFallback(checkProp);
@@ -46,47 +54,34 @@ export const ifExistsWithFallback = checkProp => {
     }
 };
 
-export const unit = (val: string | number | undefined, unitFunction = px) => {
-    const valIsNumeric = val || val === 0 ? isNumeric(val.toString().trim()) : false;
+export const processValue = (variable) => {
+    const importantString = " !important";
+    const isImportant: boolean = typeof variable === "string" && variable.endsWith(importantString);
+    let value = variable;
 
-    if (typeof val === "string" && !valIsNumeric) {
-        return val;
-    } else if (val !== undefined && val !== null && valIsNumeric) {
-        return unitFunction(val as number);
-    } else {
-        return val;
-    }
-};
-
-export const importantUnit = (val: string | number | undefined, unitFunction = px) => {
-    const withUnit = unit(val);
-    return withUnit ? important(withUnit.toString()) : withUnit;
-};
-
-export const negativeImportantUnit = (val: string | number | undefined, unitFunction = px) => {
-    const withUnit = unit(val);
-    return withUnit ? important(negative(withUnit).toString()) : withUnit;
-};
-
-export const negativeUnit = (val: string | number | undefined, unitFunction = px) => {
-    return negative(unit(val));
-};
-
-export const negative = val => {
-    if (typeof val === "string") {
-        val = val.trim();
-        if (val.startsWith("-")) {
-            return val.substring(1, val.length).trim();
-        } else {
-            return `-${val}`;
+    if (isImportant) {
+        if (isNumeric(value as string)) {
+            value = Number(value);
         }
-    } else if (!!val && !isNaN(val)) {
-        return val * -1;
-    } else {
-        return val;
     }
+
+    return {
+        value,
+        isImportant,
+    };
 };
 
 export const unitIfDefined = (val: string | number | undefined, unitFunction = px) => {
-    return val !== undefined ? unit(val) : undefined;
+    return val !== undefined ? styleUnit(val) : undefined;
 };
+
+export interface IStateColors {
+    allStates?: ColorHelper; // Applies to all
+    noState?: ColorHelper; // Applies to stateless link
+    hover?: ColorHelper;
+    focus?: ColorHelper;
+    clickFocus?: ColorHelper; // Focused, not through keyboard
+    keyboardFocus?: ColorHelper; // Optionally different state for keyboard accessed element. Will default to "focus" state if not set.
+    active?: ColorHelper;
+    source?: string; // for debugging
+}

@@ -3,4 +3,6 @@
  * @license GPL-2.0-only
  */
 
-module.exports = "test-file-stub";
+module.exports = {
+    "test-file-stub": "test-file-stub",
+};

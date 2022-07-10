@@ -329,8 +329,7 @@ class AuthenticatorModel {
 
     /**
      * @param string $authenticatorType
-     *
-     * @return string|bool
+     * @return string|false
      */
     private function getAuthenticatorClassFromType(string $authenticatorType) {
         foreach ($this->getAuthenticatorClasses() as $currentAuthenticatorClass) {
@@ -429,6 +428,7 @@ class AuthenticatorModel {
      * @throws \Garden\Web\Exception\NotFoundException
      */
     public function getSSOAuthenticatorData(string $authenticatorType, string $authenticatorID) {
+        /** @psalm-assert string $authenticatorClass */
         $authenticatorClass = $this->getAuthenticatorClassFromType($authenticatorType);
 
         if (!$authenticatorClass) {

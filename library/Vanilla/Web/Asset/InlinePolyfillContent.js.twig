@@ -1,6 +1,7 @@
 {%- autoescape false -%}
 var supportsAllFeatures =
     window.Promise &&
+    window.Promise.prototype.finally &&
     window.fetch &&
     window.Symbol &&
     window.CustomEvent &&
@@ -9,7 +10,8 @@ var supportsAllFeatures =
     Element.prototype.closest &&
     Element.prototype.attachShadow &&
     window.NodeList &&
-    NodeList.prototype.forEach
+    NodeList.prototype.forEach &&
+    Object.fromEntries
 ;
 
 if (!supportsAllFeatures) {
@@ -28,5 +30,24 @@ if (!supportsAllFeatures) {
     document.write(script.outerHTML);
 } else {
     {{ debugModeLiteral }} && console.log("Modern browser detected. No polyfills necessary");
+}
+
+if (!window.onVanillaReady) {
+    window.onVanillaReady = function (handler) {
+        if (typeof handler !== "function") {
+            console.error("Cannot register a vanilla ready handler that is not a function.");
+            return;
+        }
+        document.addEventListener("X-DOMContentReady", function () {
+            if (!window.__VANILLA_INTERNAL_IS_READY__) {
+                return;
+            }
+            handler(window.__VANILLA_GLOBALS_DO_NOT_USE_DIRECTLY__);
+        })
+
+        if (window.__VANILLA_INTERNAL_IS_READY__) {
+            handler(window.__VANILLA_GLOBALS_DO_NOT_USE_DIRECTLY__);
+        }
+    }
 }
 {%- endautoescape -%}

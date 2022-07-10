@@ -1,4 +1,4 @@
-<div class="Trace">
+<div class="Trace" aria-hidden="true">
     <style>
         .Trace {
             width: 100%;
@@ -23,25 +23,25 @@
         }
 
         .Trace .TagColumn {
-            width: 50px;
+            width: 100px;
         }
 
-        .Trace .Tag-Info {
+        .Trace .Tag-info {
             background: #00A6FF;
             color: #fff;
         }
 
-        .Trace .Tag-Warning {
+        .Trace .Tag-warning {
             background: #FF9000;
             color: #fff;
         }
 
-        .Trace .Tag-Notice {
+        .Trace .Tag-notice {
             background: #FF9000;
             color: #fff;
         }
 
-        .Trace .Tag-Error {
+        .Trace .Tag-error {
             background: #f00;
             color: #fff;
         }

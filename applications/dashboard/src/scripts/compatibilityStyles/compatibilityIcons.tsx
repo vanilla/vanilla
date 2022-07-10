@@ -1,14 +1,15 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import React from "react";
 import ReactDOM from "react-dom";
-import { DropDownMenuIcon, DocumentationIcon, BookmarkIcon } from "@vanilla/library/src/scripts/icons/common";
-import { cssRule } from "typestyle";
+import { DocumentationIcon, _BookmarkIcon } from "@library/icons/common";
+import { cssRule } from "@library/styles/styleShim";
 import { important } from "csx";
 import { iconClasses } from "@library/icons/iconStyles";
+import { Icon } from "@vanilla/icons";
 
 export function applyCompatibilityIcons(scope: HTMLElement | Document | undefined = document) {
     if (scope === undefined) {
@@ -18,13 +19,13 @@ export function applyCompatibilityIcons(scope: HTMLElement | Document | undefine
     cssRule(".Arrow.SpFlyoutHandle::before", { display: important("none") });
 
     const cogWheels = scope.querySelectorAll(".Arrow.SpFlyoutHandle:not(.compatIcons)");
-    cogWheels.forEach(wheel => {
+    cogWheels.forEach((wheel) => {
         wheel.classList.add("compatIcons");
-        ReactDOM.render(<DropDownMenuIcon />, wheel);
+        ReactDOM.render(<Icon icon="navigation-ellipsis" />, wheel);
     });
 
     const docLinks = scope.querySelectorAll("a.documentationLink");
-    docLinks.forEach(doc => {
+    docLinks.forEach((doc) => {
         doc.classList.add("compatIcons");
         ReactDOM.render(<DocumentationIcon />, doc);
     });
@@ -35,10 +36,10 @@ export function applyCompatibilityIcons(scope: HTMLElement | Document | undefine
     });
 
     const bookmarks = scope.querySelectorAll(".Bookmark:not(.compatIcons)");
-    const bookmarkLinkClass = iconClasses().bookmark();
-    bookmarks.forEach(bookmark => {
+    const bookmarkLinkClass = iconClasses()._bookmark();
+    bookmarks.forEach((bookmark) => {
         bookmark.classList.add(bookmarkLinkClass);
         bookmark.classList.add("compatIcons");
-        ReactDOM.render(<BookmarkIcon />, bookmark);
+        ReactDOM.render(<_BookmarkIcon />, bookmark);
     });
 }

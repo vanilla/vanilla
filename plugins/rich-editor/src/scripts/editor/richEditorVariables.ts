@@ -7,7 +7,8 @@
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { standardAnimations } from "@library/styles/animationHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { viewHeight } from "csx";
 
 export const richEditorVariables = useThemeCache(() => {
@@ -35,7 +36,7 @@ export const richEditorVariables = useThemeCache(() => {
     });
 
     const menuButton = makeThemeVars("menuButton", {
-        size: 42,
+        size: 36,
     });
 
     const paragraphMenuHandle = makeThemeVars("paragraphMenuHandle", {

@@ -21,24 +21,34 @@ class RegardingModel extends Gdn_Model {
     }
 
     /**
+     * Get a single record by ID.
      *
-     *
-     * @param mixed $regardingID
+     * @param mixed $id
+     * @param string|false $datasetType
+     * @param array $options
      * @return array|bool|stdClass
      */
-    public function getID($regardingID) {
-        $regarding = $this->getWhere(['RegardingID' => $regardingID])->firstRow();
+    public function getID($id, $datasetType = false, $options = []) {
+        $regarding = $this->getWhere(['RegardingID' => $id])->firstRow();
         return $regarding;
     }
 
     /**
+     * Get everything for the foreign ID.
      *
-     *
-     * @param string|unknown_type $foreignType
-     * @param string|unknown_type $foreignID
+     * @param string $orderFields
+     * @param int $orderDirection
+     * @param int|false $limit
+     * @param int|false $pageNumber
      * @return array|bool|stdClass
      */
-    public function get($foreignType, $foreignID) {
+    public function get($orderFields = '', $orderDirection = 0, $limit = false, $pageNumber = false) {
+        // Kludge for PHP 8 compatibility.
+        $foreignType = $orderFields;
+        $foreignID = $orderDirection;
+        \Webmozart\Assert\Assert::notEmpty($foreignType);
+        \Webmozart\Assert\Assert::integer($foreignID);
+
         return $this->getWhere([
             'ForeignType' => $foreignType,
             'ForeignID' => $foreignID

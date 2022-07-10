@@ -38,9 +38,9 @@ class CommentEmbedFactoryTest extends AbstractAPIv2Test {
         $request = self::container()->get(RequestInterface::class);
         $request->setAssetRoot($customRoot);
 
-        $sectionProvider = new MockSiteSectionProvider(new DefaultSiteSection(new MockConfig()));
+        $sectionProvider = new MockSiteSectionProvider(new DefaultSiteSection(new MockConfig(), new \Gdn_Router()));
         $sectionProvider->addSiteSections($siteSections);
-        $sectionModel = new SiteSectionModel(new MockConfig());
+        $sectionModel = new SiteSectionModel(new MockConfig(), new \Gdn_Router());
         $sectionModel->addProvider($sectionProvider);
 
         $factory = new CommentEmbedFactory($request, $sectionModel, $commentsApi);

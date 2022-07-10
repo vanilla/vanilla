@@ -17,6 +17,7 @@ class ApplicantsTest extends AbstractResourceTest {
     public function __construct($name = null, array $data = [], $dataName = '') {
         $this->baseUrl = '/applicants';
         $this->patchFields = ['status'];
+        $this->editFields = ['status'];
         $this->pk = 'applicantID';
 
         parent::__construct($name, $data, $dataName);
@@ -149,5 +150,12 @@ class ApplicantsTest extends AbstractResourceTest {
         ];
         $result = parent::testPost($record, $fields);
         return $result;
+    }
+
+    /**
+     * Make sure a user can apply as guest in a private community.
+     */
+    public function testPostPrivateCommunity() {
+        $this->runWithPrivateCommunity([$this, 'testPost']);
     }
 }

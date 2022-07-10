@@ -20,7 +20,7 @@ export function AddTheme(props: IProps) {
     const classes = addThemeClasses();
     return (
         <Button
-            baseClass={ButtonTypes.ICON}
+            buttonType={ButtonTypes.ICON}
             className={classNames(classes.button, props.className)}
             title={t("Add Theme")}
         >

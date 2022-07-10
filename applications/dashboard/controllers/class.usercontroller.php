@@ -9,6 +9,7 @@
  */
 
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Web\RoleTokenAuthTrait;
 
 /**
  * Handles /user endpoint.
@@ -31,7 +32,7 @@ class UserController extends DashboardController {
      * Configure the controller.
      *
      * @param ConfigurationInterface $config
-     * @param Gdn_UserModel $userModel
+     * @param UserModel $userModel
      */
     public function __construct(ConfigurationInterface $config = null, UserModel $userModel = null) {
         $this->config = $config instanceof ConfigurationInterface ? $config : Gdn::getContainer()->get(ConfigurationInterface::class);
@@ -47,7 +48,7 @@ class UserController extends DashboardController {
      */
     public function initialize() {
         parent::initialize();
-        Gdn_Theme::section('Dashboard');
+        Gdn_Theme::section('Moderation');
         if ($this->Menu) {
             $this->Menu->highlightRoute('/dashboard/settings');
         }
@@ -57,10 +58,8 @@ class UserController extends DashboardController {
     /**
      * User management list.
      *
-     * @since 2.0.0
-     * @access public
-     * @param mixed $keywords Term or array of terms to filter list of users.
-     * @param int $page Page number.
+     * @param string|string[] $keywords Term or array of terms to filter list of users.
+     * @param string $page Page number.
      * @param string $order Sort order for list.
      */
     public function index($keywords = '', $page = '', $order = '') {
@@ -116,9 +115,19 @@ class UserController extends DashboardController {
         $filter['Optimize'] = Gdn::userModel()->pastUserThreshold();
 
         // Sorting
-        if (in_array($order, ['DateInserted', 'DateFirstVisit', 'DateLastActive'])) {
+        $allowedSorting = [
+            'Name' => 'asc',
+            'DateInserted' => 'desc',
+            'DateFirstVisit' => 'desc',
+            'DateLastActive' => 'desc'
+        ];
+
+        $eventManager = Gdn::getContainer()->get(\Garden\EventManager::class);
+        $allowedSorting = $eventManager->fireFilter('userController_usersListAllowedSorting', $allowedSorting);
+
+        if (isset($allowedSorting[$order])) {
+            $orderDir = $allowedSorting[$order];
             $order = 'u.'.$order;
-            $orderDir = 'desc';
         } else {
             $order = 'u.Name';
             $orderDir = 'asc';
@@ -142,7 +151,7 @@ class UserController extends DashboardController {
                 $this->setData('_CurrentRecords', 0);
                 if (!Gdn::userModel()->pastUserMegaThreshold()) {
                     // Restoring this semi-optimized counter is our compromise to let non-mega sites know their exact total users.
-                    $this->setData('UserCount', $userModel->getCount());
+                    $this->setData('UserCount', $userModel->getCount(['Deleted' => 0]));
                 } else {
                     // Dang, yo. Get a table status guess instead of really counting.
                     $this->setData('UserEstimate', Gdn::userModel()->countEstimate());
@@ -239,6 +248,9 @@ class UserController extends DashboardController {
             $this->Form->clearInputs();
         }
 
+        $this->addDefinition('ApprovedTranslation', t('Approved'));
+        $this->addDefinition('DeniedTranslation', t('Denied'));
+
         $this->setData('UserRoles', $userRoleData);
         $this->render('edit', 'user');
     }
@@ -293,9 +305,7 @@ class UserController extends DashboardController {
     /**
      * Approve a user application.
      *
-     * @since 2.0.0
-     * @access public
-     * @param int $userID Unique ID.
+     * @param int|string $userID Unique ID.
      * @param string $TransientKey Security token.
      */
     public function approve($userID = '') {
@@ -463,10 +473,8 @@ class UserController extends DashboardController {
     /**
      * Page thru user list.
      *
-     * @since 2.0.0
-     * @access public
-     * @param mixed $keywords Term or list of terms to limit search.
-     * @param int $page Page number.
+     * @param string|string[] $keywords Term or list of terms to limit search.
+     * @param string $page Page number.
      * @param string $order Sort order.
      */
     public function browse($keywords = '', $page = '', $order = '') {
@@ -477,9 +485,7 @@ class UserController extends DashboardController {
     /**
      * Decline a user application.
      *
-     * @since 2.0.0
-     * @access public
-     * @param int $userID Unique ID.
+     * @param int|string $userID Unique ID.
      * @param string $TransientKey Security token.
      */
     public function decline($userID = '') {
@@ -501,9 +507,7 @@ class UserController extends DashboardController {
     /**
      * Delete a user account.
      *
-     * @since 2.0.0
-     * @access public
-     * @param int $userID Unique ID.
+     * @param int|string $userID Unique ID.
      * @param string $method Type of deletion to do (delete, keep, or wipe).
      */
     public function delete($userID = '', $method = '') {

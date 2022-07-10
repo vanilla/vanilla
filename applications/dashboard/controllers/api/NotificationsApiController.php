@@ -9,10 +9,13 @@ namespace Vanilla\Dashboard\Api;
 use AbstractApiController;
 use ActivityModel;
 use Garden\Schema\Schema;
+use Garden\Schema\ValidationException;
 use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
+use Garden\Web\Exception\HttpException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\ApiUtils;
+use Vanilla\Exception\PermissionException;
 
 /**
  * Manage notifications for the current user.
@@ -42,10 +45,10 @@ class NotificationsApiController extends AbstractApiController {
      *
      * @param int $id
      * @return array
-     * @throws \Garden\Schema\ValidationException If the request fails validation.
-     * @throws \Garden\Schema\ValidationException If the response fails validation.
-     * @throws \Garden\Web\Exception\HttpException If the user has a permission-based ban in their session.
-     * @throws \Vanilla\Exception\PermissionException If the user does not have permission to access the notification.
+     * @throws ValidationException If the request fails validation.
+     * @throws ValidationException If the response fails validation.
+     * @throws HttpException If the user has a permission-based ban in their session.
+     * @throws PermissionException If the user does not have permission to access the notification.
      */
     public function get(int $id): array {
         $this->permission("Garden.SignIn.Allow");
@@ -83,10 +86,10 @@ class NotificationsApiController extends AbstractApiController {
      *
      * @param array $query
      * @return Data
-     * @throws \Garden\Schema\ValidationException If the request fails validation.
-     * @throws \Garden\Schema\ValidationException If the response fails validation.
-     * @throws \Garden\Web\Exception\HttpException If the user has a permission-based ban in their session.
-     * @throws \Vanilla\Exception\PermissionException If the user does not have permission to access notifications.
+     * @throws ValidationException If the request fails validation.
+     * @throws ValidationException If the response fails validation.
+     * @throws HttpException If the user has a permission-based ban in their session.
+     * @throws PermissionException If the user does not have permission to access notifications.
      * @throws \Exception If unable to parse pagination input.
      */
     public function index(array $query): Data {
@@ -110,7 +113,7 @@ class NotificationsApiController extends AbstractApiController {
         ], "out");
 
         $query = $in->validate($query);
-        list($offset, $limit) = offsetLimit("p".$query["page"], $query["limit"]);
+        [$offset, $limit] = offsetLimit("p".$query["page"], $query["limit"]);
 
         $rows = $this->activityModel->getWhere([
             "NotifyUserID" => $this->getSession()->UserID
@@ -134,15 +137,7 @@ class NotificationsApiController extends AbstractApiController {
      * @return array
      */
     private function normalizeOutput(array $row): array {
-        $row["notificationID"] = $row["ActivityID"];
-        $row["photoUrl"] = $row["Photo"];
-        $row["read"] = $row["Notified"] === ActivityModel::SENT_OK;
-
-        $body = formatString($row["Headline"], $row);
-        // Replace anchors with bold text until notifications can be spun off from activities.
-        $row["body"] = preg_replace("#<a [^>]+>(.+)</a>#Ui", "<strong>$1</strong>", $body);
-
-        $row = ApiUtils::convertOutputKeys($row);
+        $row = $this->activityModel->normalizeNotificationRow($row);
         return $row;
     }
 
@@ -185,38 +180,7 @@ class NotificationsApiController extends AbstractApiController {
         static $schema;
 
         if ($schema === null) {
-            $schema = $this->schema([
-                "notificationID" => [
-                    "description" => "A unique ID to identify the notification.",
-                    "type" => "integer",
-                ],
-                "body" => [
-                    "description" => "The notification text. This contains some HTML, but only <b> tags.",
-                    "type" => "string",
-                ],
-                "photoUrl" => [
-                    "allowNull" => true,
-                    "description" => "An avatar or thumbnail associated with the notification.",
-                    "type" => "string",
-                ],
-                "url" => [
-                    "description" => "The target of the notification.",
-                    "type" => "string",
-                ],
-                "dateInserted" => [
-                    "description" => "When the notification was first made.",
-                    "type" => "datetime",
-                ],
-                "dateUpdated" => [
-                    // phpcs:ignore
-                    "description" => "When the notification was last updated.\n\nNotifications on the same record will group together into a single notification, updating just the dateUpdated property.",
-                    "type" => "datetime",
-                ],
-                "read" => [
-                    "description" => "Whether or not the notification has been seen.",
-                    "type" => "boolean",
-                ],
-            ], "NotificationSchema");
+            $schema = $this->schema($this->activityModel->notificationSchema(), "NotificationSchema");
         }
 
         return $schema;
@@ -228,10 +192,10 @@ class NotificationsApiController extends AbstractApiController {
      * @param int $id
      * @param array $body
      * @return array
-     * @throws \Garden\Schema\ValidationException If the request fails validation.
-     * @throws \Garden\Schema\ValidationException If the response fails validation.
-     * @throws \Garden\Web\Exception\HttpException If the user has a permission-based ban in their session.
-     * @throws \Vanilla\Exception\PermissionException If the user does not have permission to access the notification.
+     * @throws ValidationException If the request fails validation.
+     * @throws ValidationException If the response fails validation.
+     * @throws HttpException If the user has a permission-based ban in their session.
+     * @throws PermissionException If the user does not have permission to access the notification.
      */
     public function patch(int $id, array $body): array {
         $this->permission("Garden.SignIn.Allow");
@@ -260,14 +224,45 @@ class NotificationsApiController extends AbstractApiController {
     }
 
     /**
+     * Read a notification.
+     *
+     * @param int $id
+     * @param array $body
+     * @return array
+     * @throws ValidationException If the request fails validation.
+     * @throws ValidationException If the response fails validation.
+     * @throws HttpException If the user has a permission-based ban in their session.
+     * @throws PermissionException If the user does not have permission to access the notification.
+     */
+    public function put_read(int $id, array $body): array {
+        $this->permission("Garden.SignIn.Allow");
+
+        $this->idParamSchema();
+        $in = $this->schema([], "in")->setDescription("Update a notification.");
+        $out = $this->schema($this->notificationSchema(), "out");
+
+        $in->validate($body);
+
+        $row = $this->notificationByID($id);
+        $this->notificationPermission($row);
+
+        $this->activityModel->markSingleRead($id);
+
+        $row = $this->notificationByID($id);
+        $row = $this->normalizeOutput($row);
+        $result = $out->validate($row);
+        return $result;
+    }
+
+    /**
      * Update all notifications.
      *
      * @param array $body
      * @return Data
-     * @throws \Garden\Schema\ValidationException If the request fails validation.
-     * @throws \Garden\Schema\ValidationException If the response fails validation.
-     * @throws \Garden\Web\Exception\HttpException If the user has a permission-based ban in their session.
-     * @throws \Vanilla\Exception\PermissionException If the user does not have permission to access notifications.
+     * @throws ValidationException If the request fails validation.
+     * @throws ValidationException If the response fails validation.
+     * @throws HttpException If the user has a permission-based ban in their session.
+     * @throws PermissionException If the user does not have permission to access notifications.
      */
     public function patch_index(array $body): Data {
         $this->permission("Garden.SignIn.Allow");

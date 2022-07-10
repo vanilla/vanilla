@@ -8,10 +8,14 @@
 namespace VanillaTests;
 
 use Garden\Container\Container;
+use Garden\Container\Reference;
+use Garden\EventManager;
 use Garden\Http\HttpClient;
+use Garden\Http\Mocks\MockHttpHandler;
 use Garden\Web\RequestInterface;
 use Gdn;
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Vanilla\AddonManager;
@@ -34,6 +38,7 @@ use VanillaTests\Fixtures\MockHttpClient;
 use VanillaTests\Fixtures\MockLocale;
 use VanillaTests\Fixtures\Models\MockUserProvider;
 use VanillaTests\Fixtures\NullCache;
+use VanillaTests\Fixtures\SpyingEventManager;
 
 /**
  * A very minimal PHPUnit test case using Garden\Container.
@@ -54,15 +59,33 @@ class MinimalContainerTestCase extends TestCase {
     protected $baseUrl = 'http://vanilla.test/minimal-container-test/';
 
     /**
+     * Whether or not we should apply the common bootstrap.
+     *
+     * @return bool
+     */
+    protected static function useCommonBootstrap(): bool {
+        return true;
+    }
+
+    /**
      * Setup the container.
      */
     protected function configureContainer() {
-        \Gdn::setContainer(new Container());
+        $container = new Container();
 
-        self::container()
+        if (static::useCommonBootstrap()) {
+            \Vanilla\Bootstrap::configureContainer($container);
+        }
+
+        $container
+            ->rule(\Gdn_Session::class)
+            ->setShared(true)
+            ->rule(Container::class)
+            ->addAlias(ContainerInterface::class)
+            ->setInstance(Container::class, $container)
             ->rule(FormatService::class)
             ->setShared(true)
-            ->addCall('registerBuiltInFormats', [self::container()])
+            ->addCall('registerBuiltInFormats')
 
             ->rule(Parser::class)
             ->addCall('addCoreBlotsAndFormats')
@@ -102,6 +125,8 @@ class MinimalContainerTestCase extends TestCase {
             ->setAliasOf(LocaleInterface::class)
             ->setShared(true)
 
+            ->setInstance('@baseUrl', $this->baseUrl)
+
             ->rule(\Vanilla\Web\Asset\DeploymentCacheBuster::class)
             ->setShared(true)
             ->setConstructorArgs([
@@ -110,7 +135,12 @@ class MinimalContainerTestCase extends TestCase {
 
             // Prevent real HTTP requests.
             ->rule(HttpClient::class)
-            ->setClass(MockHttpClient::class)
+            ->addCall('setHandler', [new Reference(MockHttpHandler::class)])
+
+            // Prevent real HTTP requests.
+            ->rule(EventManager::class)
+            ->setClass(SpyingEventManager::class)
+            ->setShared(true)
 
             ->rule(UASnifferInterface::class)
             ->setClass(MockUASniffer::class)
@@ -153,6 +183,8 @@ class MinimalContainerTestCase extends TestCase {
 
             ->setInstance(\Gdn_PluginManager::class, $this->createMock(\Gdn_PluginManager::class))
         ;
+
+        \Gdn::setContainer($container);
     }
 
     /**
@@ -160,7 +192,7 @@ class MinimalContainerTestCase extends TestCase {
      * @param array $info The user information to set.
      */
     public function setUserInfo(array $info) {
-        $session = new \Gdn_Session();
+        $session = $this->container()->get(\Gdn_Session::class);
 
         foreach ($info as $key => $value) {
             if ($key === 'UserID') {
@@ -174,7 +206,6 @@ class MinimalContainerTestCase extends TestCase {
             $session->User = new \stdClass();
             $session->User->{$key} = $value;
         }
-        self::container()->setInstance(\Gdn_Session::class, $session);
     }
 
     /**

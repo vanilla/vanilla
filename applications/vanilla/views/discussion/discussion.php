@@ -7,6 +7,9 @@
 if (!defined('APPLICATION')) {
     exit();
 }
+
+use Vanilla\Theme\BoxThemeShim;
+use Vanilla\Utility\HtmlUtils;
 $UserPhotoFirst = c('Vanilla.Comment.UserPhotoFirst', true);
 
 $Discussion = $this->data('Discussion');
@@ -25,36 +28,44 @@ $this->EventArguments['Type'] = 'Discussion';
 // Discussion template event
 $this->fireEvent('BeforeDiscussionDisplay');
 ?>
-<div id="<?php echo 'Discussion_'.$Discussion->DiscussionID; ?>" class="<?php echo $CssClass; ?>">
+<div id="<?php echo 'Discussion_'.$Discussion->DiscussionID; ?>" class="<?php echo $CssClass; ?> pageBox">
     <div class="Discussion">
         <div class="Item-Header DiscussionHeader">
-            <div class="AuthorWrap">
-            <span class="Author">
-                <?php
-                if ($UserPhotoFirst) {
-                    echo userPhoto($Author);
-                    echo userAnchor($Author, 'Username');
-                } else {
-                    echo userAnchor($Author, 'Username');
-                    echo userPhoto($Author);
+            <?php
+                if (!$this->data('noAuthor')) {
+                    BoxThemeShim::activeHtml(userPhoto($Author));
                 }
-                echo formatMeAction($Discussion);
-?>
-            </span>
-            <span class="AuthorInfo">
-                <?php
-                echo wrapIf(htmlspecialchars(val('Title', $Author)), 'span', ['class' => 'MItem AuthorTitle']);
-                echo wrapIf(htmlspecialchars(val('Location', $Author)), 'span', ['class' => 'MItem AuthorLocation']);
-                $this->fireEvent('AuthorInfo');
-                ?>
-            </span>
+            ?>
+            <?php BoxThemeShim::activeHtml('<div class="Item-HeaderContent">'); ?>
+            <?php if (!$this->data('noAuthor')) { ?>
+            <div class="AuthorWrap">
+                <span class="Author">
+                    <?php
+                    if ($UserPhotoFirst) {
+                        BoxThemeShim::inactiveHtml(userPhoto($Author));
+                        echo userAnchor($Author, 'Username');
+                    } else {
+                        echo userAnchor($Author, 'Username');
+                        BoxThemeShim::inactiveHtml(userPhoto($Author));
+                    }
+                    echo formatMeAction($Discussion);
+    ?>
+                </span>
+                <span class="AuthorInfo">
+                    <?php
+                    echo wrapIf(htmlspecialchars(val('Title', $Author)), 'span', ['class' => 'MItem AuthorTitle']);
+                    echo wrapIf(htmlspecialchars(val('Location', $Author)), 'span', ['class' => 'MItem AuthorLocation']);
+                    $this->fireEvent('AuthorInfo');
+                    ?>
+                </span>
             </div>
+            <?php } ?>
             <div class="Meta DiscussionMeta">
-            <span class="MItem DateCreated">
-                <?php
-                echo anchor(Gdn_Format::date($Discussion->DateInserted, 'html'), $Discussion->Url, 'Permalink', ['rel' => 'nofollow']);
-                ?>
-            </span>
+                <span class="MItem DateCreated">
+                    <?php
+                    echo anchor(Gdn_Format::date($Discussion->DateInserted, 'html'), $Discussion->Url, 'Permalink', ['rel' => 'nofollow']);
+                    ?>
+                </span>
                 <?php
                 echo dateUpdated($Discussion, ['<span class="MItem">', '</span>']);
                 ?>
@@ -65,9 +76,10 @@ $this->fireEvent('BeforeDiscussionDisplay');
                 }
                 // Category
                 if (c('Vanilla.Categories.Use')) {
+                    $accessibleLabel = HtmlUtils::accessibleLabel('Category: "%s"', [$this->data('Discussion.Category')]);
                     echo ' <span class="MItem Category">';
                     echo ' '.t('in').' ';
-                    echo anchor(htmlspecialchars($this->data('Discussion.Category')), categoryUrl($this->data('Discussion.CategoryUrlCode')));
+                    echo anchor(htmlspecialchars($this->data('Discussion.Category')), categoryUrl($this->data('Discussion.CategoryUrlCode')), ["aria-label" => $accessibleLabel]);
                     echo '</span> ';
                 }
 
@@ -80,6 +92,7 @@ $this->fireEvent('BeforeDiscussionDisplay');
                 $this->fireEvent('AfterDiscussionMeta'); // DEPRECATED
                 ?>
             </div>
+            <?php BoxThemeShim::activeHtml("</div>"); ?>
         </div>
         <?php $this->fireEvent('BeforeDiscussionBody'); ?>
         <div class="Item-BodyWrap">

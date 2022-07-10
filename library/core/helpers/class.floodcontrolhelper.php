@@ -5,6 +5,8 @@
  * @license GPL-2.0-only
  */
 
+use Vanilla\Utility\DebugUtils;
+
 /**
  * Class FloodControlHelper
  *
@@ -12,12 +14,16 @@
  */
 class FloodControlHelper {
     /**
+     * Configure a flood controlled class.
+     *
+     * @psalm-suppress UndefinedDocblockClass
+     *
      * @param \Vanilla\FloodControlTrait $instance
      * @param string $configScope Scope under with the configurations are sets ('Vanilla', 'Conversations').
      * @param string $type Type of record that will be used to configure to trait.
      * @param bool $skipAdmins Whether to skip flood control for admins/moderators or not. Default is true.
      *
-     * @return \Vanilla\CacheInterface
+     * @return \Psr\SimpleCache\CacheInterface
      */
     public static function configure($instance, $configScope, $type, $skipAdmins = true) {
         $session = Gdn::session();
@@ -35,8 +41,11 @@ class FloodControlHelper {
         if (!Gdn::session()->isValid()) {
             $instance->setFloodControlEnabled(false);
 
-        // Let's deactivate flood control if the user is an admin :)
+            // Let's deactivate flood control if the user is an admin :)
         } elseif ($skipAdmins && ($session->User->Admin || $session->checkPermission('Garden.Moderation.Manage'))) {
+            $instance->setFloodControlEnabled(false);
+        } elseif (DebugUtils::isTestMode()) {
+            // Here too
             $instance->setFloodControlEnabled(false);
         }
 
@@ -46,12 +55,12 @@ class FloodControlHelper {
         }
 
         if (c('Cache.Enabled')) {
-            $storageObject = new CacheCacheAdapter(Gdn::cache());
+            $storageObject = new \Vanilla\Cache\CacheCacheAdapter(Gdn::cache());
 
             $keyPostCount = $instance->getDefaultKeyCurrentPostCount();
             $keyLastDateChecked = $instance->getDefaultKeyLastDateChecked();
             // Add the type in the key in case that a model do multiple types (activityModel for example).
-            foreach([&$keyPostCount, &$keyLastDateChecked] as &$key) {
+            foreach ([&$keyPostCount, &$keyLastDateChecked] as &$key) {
                 $key = str_replace('%s.%s', '%s.'.strtolower($type).'.%s', $key);
             }
         } else {

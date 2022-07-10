@@ -75,7 +75,7 @@ $Construct->primaryKey('CategoryID')
     ->column('CanDelete', 'tinyint', '1')
     ->column('Name', 'varchar(255)')
     ->column('UrlCode', 'varchar(255)', true)
-    ->column('Description', 'varchar(500)', true)
+    ->column('Description', 'varchar(1000)', true)
     ->column('Sort', 'int', true)
     ->column('CssClass', 'varchar(50)', true)
     ->column('Photo', 'varchar(255)', true)
@@ -93,6 +93,8 @@ $Construct->primaryKey('CategoryID')
     ->column('LastDateInserted', 'datetime', null)
     ->column('AllowedDiscussionTypes', 'varchar(255)', null)
     ->column('DefaultDiscussionType', 'varchar(10)', null)
+    ->column('Featured', 'tinyint', '0')
+    ->column('SortFeatured', 'int', '0', 'index')
     ->set($Explicit, $Drop);
 
 $RootCategoryInserted = false;
@@ -130,7 +132,6 @@ if ($Drop || !$CategoryExists) {
 if ($CategoryExists) {
     CategoryModel::instance()->rebuildTree();
     CategoryModel::instance()->recalculateTree();
-    unset($CategoryModel);
 }
 
 // Construct the discussion table.
@@ -141,6 +142,7 @@ $BodyExists = $Construct->columnExists('Body');
 $LastCommentIDExists = $Construct->columnExists('LastCommentID');
 $LastCommentUserIDExists = $Construct->columnExists('LastCommentUserID');
 $CountBookmarksExists = $Construct->columnExists('CountBookmarks');
+$hotExists = $Construct->columnExists('hot');
 
 $Construct
     ->primaryKey('DiscussionID')
@@ -151,8 +153,8 @@ $Construct
     ->column('UpdateUserID', 'int', true)
     ->column('FirstCommentID', 'int', true)
     ->column('LastCommentID', 'int', true)
-    ->column('Name', 'varchar(100)', false)
-    ->column('Body', 'text', false)
+    ->column('Name', 'varchar(100)', false, 'fulltext')
+    ->column('Body', 'mediumtext', false, 'fulltext')
     ->column('Format', 'varchar(20)', true)
     ->column('Tags', 'text', null)
     ->column('CountComments', 'int', '0')
@@ -167,9 +169,12 @@ $Construct
     ->column('UpdateIPAddress', 'ipaddress', true)
     ->column('DateLastComment', 'datetime', null, ['index', 'index.CategoryPages'])
     ->column('LastCommentUserID', 'int', true)
-    ->column('Score', 'float', null)
+    ->column('Score', 'float', null, ['index'])
     ->column('Attributes', 'text', true)
-    ->column('RegardingID', 'int(11)', true, 'index');
+    ->column('RegardingID', 'int(11)', true, 'index')
+    ->column('hot', 'int(11)', 0, 'index')
+    ->column("statusID", "int(11)", 0, ["index"])
+;
 //->column('Source', 'varchar(20)', true)
 
 $Construct
@@ -198,13 +203,13 @@ $Construct->table('UserDiscussion');
 
 $ParticipatedExists = $Construct->columnExists('Participated');
 
-$Construct->column('UserID', 'int', false, 'primary')
+$Construct->column('UserID', 'int', false, ['primary', 'index.UserID_Bookmarked'])
     ->column('DiscussionID', 'int', false, ['primary', 'key'])
     ->column('Score', 'float', null)
     ->column('CountComments', 'int', '0')
     ->column('DateLastViewed', 'datetime', null)// null signals never
     ->column('Dismissed', 'tinyint(1)', '0')// relates to dismissed announcements
-    ->column('Bookmarked', 'tinyint(1)', '0')
+    ->column('Bookmarked', 'tinyint(1)', '0', 'index.UserID_Bookmarked')
     ->column('Participated', 'tinyint(1)', '0')// whether or not the user has participated in the discussion.
     ->set($Explicit, $Drop);
 
@@ -219,13 +224,13 @@ if ($Construct->tableExists()) {
 $Construct
     ->table('Comment')
     ->primaryKey('CommentID')
-    ->column('DiscussionID', 'int', false, 'index.1')
     //->column('Type', 'varchar(10)', true)
     //->column('ForeignID', 'varchar(32)', TRUE, 'index') // For relating foreign records to discussions
-    ->column('InsertUserID', 'int', true, 'key')
+    ->column('InsertUserID', 'int', true, 'index.InsertUserID_DiscussionID')
+    ->column('DiscussionID', 'int', false, ['index.1', 'index.InsertUserID_DiscussionID'])
     ->column('UpdateUserID', 'int', true)
     ->column('DeleteUserID', 'int', true)
-    ->column('Body', 'text', false)
+    ->column('Body', 'mediumtext', false, 'fulltext')
     ->column('Format', 'varchar(20)', true)
     ->column('DateInserted', 'datetime', null, ['index.1', 'index'])
     ->column('DateDeleted', 'datetime', true)
@@ -286,7 +291,7 @@ $Construct->table('Draft')
     ->column('Closed', 'tinyint(1)', '0')
     ->column('Announce', 'tinyint(1)', '0')
     ->column('Sink', 'tinyint(1)', '0')
-    ->column('Body', 'text')
+    ->column('Body', 'mediumtext')
     ->column('Format', 'varchar(20)', true)
     ->column('DateInserted', 'datetime')
     ->column('DateUpdated', 'datetime', true)
@@ -345,6 +350,7 @@ $PermissionModel->define([
     'Vanilla.Approval.Require',
     'Vanilla.Comments.Me' => 1,
     'Vanilla.Discussions.CloseOwn' => 0,
+    'Garden.NoAds.Allow' => 0
 ]);
 $PermissionModel->undefine(['Vanilla.Settings.Manage', 'Vanilla.Categories.Manage']);
 
@@ -415,7 +421,7 @@ $DateInsertedExists = $Construct->columnExists('DateInserted');
 
 $Construct
     ->column('TagID', 'int', false, 'primary')
-    ->column('DiscussionID', 'int', false, 'primary')
+    ->column('DiscussionID', 'int', false, ['primary', 'index.DiscussionID'])
     ->column('CategoryID', 'int', false, 'index')
     ->column('DateInserted', 'datetime', !$DateInsertedExists)
     ->engine('InnoDB')
@@ -469,6 +475,12 @@ if ($maxCommentLength > DiscussionModel::MAX_POST_LENGTH) {
     saveToConfig('Vanilla.Comment.MaxLength', DiscussionModel::MAX_POST_LENGTH);
 }
 
+$Construct->table('dirtyRecord')
+    ->column('recordType', 'varchar(50)', false, ['primary', 'index.recordType'])
+    ->column('recordID', 'int', false, ['primary'])
+    ->column('dateInserted', 'datetime', false, ['index.recordType'])
+    ->set();
+
 // Add stub content
 include(PATH_APPLICATIONS.DS.'vanilla'.DS.'settings'.DS.'stub.php');
 
@@ -499,4 +511,10 @@ foreach ($users as $user) {
             ->where('email', $user['Email'])
             ->put();
     }
+}
+
+if (!$hotExists) {
+    $SQL->update('Discussion')
+        ->set('hot', '0 + COALESCE(Score, 0) + COALESCE(CountComments, 0)', false)
+        ->put();
 }

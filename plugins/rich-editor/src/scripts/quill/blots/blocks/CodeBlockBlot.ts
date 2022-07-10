@@ -52,7 +52,7 @@ export default class CodeBlockBlot extends CodeBlock {
         replacement.attach();
         const element = replacement.domNode as HTMLElement;
         const innerSpans = element.querySelectorAll("*");
-        innerSpans.forEach(span => {
+        innerSpans.forEach((span) => {
             span.setAttribute("class", "");
         });
         return replacement;

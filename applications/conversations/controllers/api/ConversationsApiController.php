@@ -143,6 +143,7 @@ class ConversationsApiController extends AbstractApiController {
                 'conversationID:i' => 'The ID of the conversation.',
                 'name:s' => 'The name of the conversation.',
                 'body:s' => 'The most recent unread message in the conversation.',
+                'excerpt:s?' => 'An excerpt of the most recent unread message.',
                 'url:s' => 'The URL of the conversation.',
                 'dateInserted:dt' => 'When the conversation was created.',
                 'insertUserID:i' => 'The user that created the conversation.',
@@ -181,7 +182,7 @@ class ConversationsApiController extends AbstractApiController {
      * @return array
      */
     public function get($id) {
-        $this->permission('Conversations.Conversations.Add');
+        $this->permission("Garden.SignIn.Allow");
 
         $this->idParamSchema()->setDescription('Get a conversation.');
         $out = $this->schema($this->fullSchema(), 'out');
@@ -215,7 +216,7 @@ class ConversationsApiController extends AbstractApiController {
      * @return Data
      */
     public function get_participants($id, array $query) {
-        $this->permission('Conversations.Conversations.Add');
+        $this->permission("Garden.SignIn.Allow");
 
         $this->idParamSchema();
 
@@ -288,7 +289,7 @@ class ConversationsApiController extends AbstractApiController {
      * @return Data
      */
     public function index(array $query) {
-        $this->permission('Conversations.Conversations.Add');
+        $this->permission("Garden.SignIn.Allow");
 
         $in = $this->schema([
             'insertUserID:i?' => 'Filter by author.',
@@ -511,6 +512,7 @@ class ConversationsApiController extends AbstractApiController {
      * Normalize a database record to match the Schema definition.
      *
      * @param array $dbRecord Database record.
+     *
      * @return array Return a Schema record.
      */
     public function normalizeOutput(array $dbRecord) {
@@ -520,9 +522,16 @@ class ConversationsApiController extends AbstractApiController {
         } else {
             $dbRecord['name'] = ConversationModel::participantTitle($dbRecord, false);
         }
-        $dbRecord['body'] = isset($dbRecord['LastBody'])
-            ? Gdn_Format::to($dbRecord['LastBody'], $dbRecord['LastFormat'])
-            : t('No messages.');
+
+        if (!empty($dbRecord['LastBody'])) {
+            $dbRecord['excerpt'] = \Gdn::formatService()->renderExcerpt($dbRecord['LastBody'], $dbRecord['LastFormat']);
+            $dbRecord['body'] = $dbRecord['LastBody'];
+            $this->formatField($dbRecord, 'body', $dbRecord['LastFormat']);
+        } else {
+            $dbRecord['body'] = t('No messages.');
+            $dbRecord['excerpt'] = t('No messages.');
+        }
+
         $dbRecord['url'] = url("/messages/{$dbRecord['ConversationID']}", true);
 
         if (array_key_exists('CountNewMessages', $dbRecord)) {

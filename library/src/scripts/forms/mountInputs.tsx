@@ -17,7 +17,7 @@ import { logDebug } from "@vanilla/utils";
 export function mountInputs() {
     const inputs = document.querySelectorAll("[data-react-input]");
     logDebug(`Mounting React inputs over ${inputs.length} existing inputs.`);
-    inputs.forEach(input => {
+    inputs.forEach((input) => {
         if (input instanceof HTMLInputElement) {
             const validationFilter = input.getAttribute("data-validation-filter") as InputValidationFilter;
             mountReact(

@@ -12,7 +12,7 @@ import FrameFooter from "@library/layout/frame/FrameFooter";
 import FrameHeader from "@library/layout/frame/FrameHeader";
 import SmartAlign from "@library/layout/SmartAlign";
 import ButtonLoader from "@library/loaders/ButtonLoader";
-import Modal, { MODAL_CONTAINER_ID } from "@library/modal/Modal";
+import LazyModal from "@library/modal/LazyModal";
 import ModalSizes from "@library/modal/ModalSizes";
 import { t } from "@library/utility/appUtils";
 import { getRequiredID, uniqueIDFromPrefix } from "@library/utility/idUtils";
@@ -20,19 +20,25 @@ import classNames from "classnames";
 import React from "react";
 import { frameBodyClasses } from "@library/layout/frame/frameBodyStyles";
 import { frameFooterClasses } from "@library/layout/frame/frameFooterStyles";
+import LinkAsButton from "@library/routing/LinkAsButton";
+import { cx } from "@emotion/css";
 
 interface IProps {
     title: React.ReactNode; // required for accessibility
     srOnlyTitle?: boolean;
     className?: string;
-    onCancel?: (e: Event) => void;
-    onConfirm: (e: Event) => void;
+    onCancel?: (e: React.SyntheticEvent) => void;
+    onConfirm?: (e: React.SyntheticEvent) => void;
+    confirmLinkTo?: string;
     confirmTitle?: string;
     children: React.ReactNode;
     isConfirmLoading?: boolean;
+    isConfirmDisabled?: boolean;
     elementToFocusOnExit?: HTMLElement;
     size?: ModalSizes;
     isVisible: boolean;
+    fullWidthContent?: boolean;
+    bodyClassName?: string;
 }
 
 /**
@@ -43,12 +49,22 @@ export default class ModalConfirm extends React.Component<IProps> {
     private id = uniqueIDFromPrefix("confirmModal");
 
     public render() {
-        const { onConfirm, srOnlyTitle, isConfirmLoading, title, children, size } = this.props;
+        const {
+            onConfirm,
+            confirmLinkTo,
+            srOnlyTitle,
+            isConfirmLoading,
+            isConfirmDisabled,
+            title,
+            children,
+            size,
+            fullWidthContent,
+        } = this.props;
         const onCancel = this.handleCancel;
         const classesFrameBody = frameBodyClasses();
         const classFrameFooter = frameFooterClasses();
         return (
-            <Modal
+            <LazyModal
                 isVisible={this.props.isVisible}
                 size={size ? size : ModalSizes.SMALL}
                 elementToFocus={this.cancelRef.current as HTMLElement}
@@ -67,37 +83,67 @@ export default class ModalConfirm extends React.Component<IProps> {
                     }
                     body={
                         <FrameBody>
-                            <SmartAlign className={classNames("frameBody-contents", classesFrameBody.contents)}>
-                                {children}
-                            </SmartAlign>
+                            {fullWidthContent ? (
+                                <div
+                                    className={cx(
+                                        "frameBody-contents",
+                                        classesFrameBody.contents,
+                                        this.props.bodyClassName,
+                                    )}
+                                >
+                                    {children}
+                                </div>
+                            ) : (
+                                <SmartAlign
+                                    className={cx(
+                                        "frameBody-contents",
+                                        classesFrameBody.contents,
+                                        this.props.bodyClassName,
+                                    )}
+                                >
+                                    {children}
+                                </SmartAlign>
+                            )}
                         </FrameBody>
                     }
                     footer={
                         <FrameFooter justifyRight={true}>
                             <Button
                                 className={classFrameFooter.actionButton}
-                                baseClass={ButtonTypes.TEXT}
+                                buttonType={ButtonTypes.TEXT}
                                 buttonRef={this.cancelRef}
                                 onClick={onCancel}
                             >
                                 {t("Cancel")}
                             </Button>
-                            <Button
-                                className={classFrameFooter.actionButton}
-                                onClick={onConfirm}
-                                baseClass={ButtonTypes.TEXT_PRIMARY}
-                                disabled={isConfirmLoading}
-                            >
-                                {isConfirmLoading ? <ButtonLoader /> : this.props.confirmTitle || t("OK")}
-                            </Button>
+                            {!!onConfirm && (
+                                <Button
+                                    className={classFrameFooter.actionButton}
+                                    onClick={onConfirm}
+                                    buttonType={ButtonTypes.TEXT_PRIMARY}
+                                    disabled={isConfirmLoading || isConfirmDisabled}
+                                >
+                                    {isConfirmLoading ? <ButtonLoader /> : this.props.confirmTitle || t("OK")}
+                                </Button>
+                            )}
+                            {!!confirmLinkTo && (
+                                <LinkAsButton
+                                    className={classFrameFooter.actionButton}
+                                    to={confirmLinkTo}
+                                    buttonType={ButtonTypes.TEXT_PRIMARY}
+                                    disabled={isConfirmLoading || isConfirmDisabled}
+                                >
+                                    {this.props.confirmTitle || t("OK")}
+                                </LinkAsButton>
+                            )}
                         </FrameFooter>
                     }
                 />
-            </Modal>
+            </LazyModal>
         );
     }
 
-    private handleCancel = e => {
+    private handleCancel = (e) => {
         this.props.onCancel && this.props.onCancel(e);
     };
 

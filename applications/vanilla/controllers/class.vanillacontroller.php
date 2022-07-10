@@ -57,16 +57,16 @@ class VanillaController extends Gdn_Controller {
     }
 
     /**
-     * Check to see if we've gone off the end of the page.
+     * Get current site section locale
      *
-     * @param int $offset The offset requested.
-     * @param int $totalCount The total count of records.
-     * @throws Exception Throws an exception if the offset is past the last page.
+     * @return string
      */
-    protected function checkPageRange(int $offset, int $totalCount) {
-        if ($offset > 0 && $offset >= $totalCount) {
-            throw notFoundException();
-        }
+    protected function getContentLocale(): string {
+        /** @var \Vanilla\Site\SiteSectionModel $siteSectionModel */
+        $siteSectionModel = Gdn::getContainer()->get(\Vanilla\Site\SiteSectionModel::class);
+        /** @var \Vanilla\Contracts\Site\SiteSectionInterface $siteSection */
+        $siteSection = $siteSectionModel->getCurrentSiteSection();
+        return $siteSection->getContentLocale();
     }
 
     /**

@@ -41,7 +41,7 @@ foreach ($this->data('Conversations') as $Conversation) {
 
     $this->EventArguments['Conversation'] = $Conversation;
     ?>
-    <li class="<?php echo $CssClass; ?>">
+    <li class="<?php echo $CssClass; ?> pageBox">
         <?php
         $Names = ConversationModel::participantTitle($Conversation, false);
         ?>
@@ -49,7 +49,7 @@ foreach ($this->data('Conversations') as $Conversation) {
             <?php
             $Url = '/messages/'.$Conversation->ConversationID.'/#Item_'.$JumpToItem;
 
-            echo '<h3 aria-level="2" class="Users">';
+            echo '<h3 aria-level="2" class="Users Title">';
 
             if ($Names) {
                 if ($LastPhoto) {

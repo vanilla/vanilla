@@ -1,16 +1,21 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import { absolutePosition, flexHelper, unit, sticky, colorOut, negativeUnit } from "@library/styles/styleHelpers";
+import { flexHelper, sticky, negativeUnit } from "@library/styles/styleHelpers";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 import { calc, percent, viewHeight } from "csx";
-import { buttonResetMixin } from "@library/forms/buttonStyles";
+import { buttonResetMixin } from "@library/forms/buttonMixins";
 import { userPhotoVariables } from "@library/headers/mebox/pieces/userPhotoStyles";
-import { titleBarVariables } from "@library/headers/titleBarStyles";
+import { titleBarVariables } from "@library/headers/TitleBar.variables";
+import { Mixins } from "@library/styles/Mixins";
+import { css } from "@emotion/css";
 
 export const compactMeBoxVariables = useThemeCache(() => {
     const themeVars = variableFactory("compactMeBox");
@@ -31,70 +36,69 @@ export const compactMeBoxVariables = useThemeCache(() => {
 export const compactMeBoxClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = compactMeBoxVariables();
-    const style = styleFactory("compactMeBox");
 
-    const root = style({
+    const root = css({
         display: "block",
         marginRight: negativeUnit((titleBarVariables().sizing.mobile.width - userPhotoVariables().sizing.small) / 2),
     });
 
-    const openButton = style("openButton", {
+    const openButton = css({
         color: globalVars.elementaryColors.white.toString(),
     });
 
-    const contents = style("contents", {
+    const contents = css({
         position: "relative",
         height: percent(100),
     });
 
-    const closeModal = style("closeModal", {
-        $nest: {
+    const closeModal = css({
+        ...{
             "&&": {
-                ...absolutePosition.topRight(),
-                width: unit(vars.tab.width),
-                height: unit(vars.tab.height),
+                ...Mixins.absolute.topRight(),
+                width: styleUnit(vars.tab.width),
+                height: styleUnit(vars.tab.height),
             },
         },
     });
 
-    const tabList = style("tabList", sticky(), {
+    const tabList = css(sticky(), {
         top: 0,
-        background: colorOut(vars.colors.bg),
+        background: ColorsUtils.colorOut(vars.colors.bg),
         zIndex: 2,
-        paddingRight: unit(vars.tab.width),
-        height: unit(vars.tab.height),
-        flexBasis: unit(vars.tab.width),
+        paddingRight: styleUnit(vars.tab.width),
+        height: styleUnit(vars.tab.height),
+        flexBasis: styleUnit(vars.tab.width),
         color: globalVars.mainColors.fg.toString(),
     });
 
-    const tabButtonContent = style("tabButtonContent", {
+    const tabButtonContent = css({
         ...flexHelper().middle(),
         position: "relative",
-        width: unit(vars.tab.width),
-        height: unit(vars.tab.height),
+        width: styleUnit(vars.tab.width),
+        height: styleUnit(vars.tab.height),
     });
 
-    const tabPanels = style("tabPanels", {
+    const tabPanels = css({
         height: calc(`100% - ${vars.tab.height}px`),
         position: "relative",
     });
 
-    const tabButton = style("tabButton", {
+    const tabButton = css({
         ...buttonResetMixin(),
         ...flexHelper().middle(),
     });
 
-    const panel = style("panel", {
+    const panel = css({
         maxHeight: percent(100),
         borderTop: 0,
         borderRadius: 0,
     });
 
-    const body = style("body", {
+    const body = css({
         flexGrow: 1,
     });
 
-    const scrollContainer = style("scrollContainer", {
+    const scrollContainer = css({
         overflow: "auto",
     });
 

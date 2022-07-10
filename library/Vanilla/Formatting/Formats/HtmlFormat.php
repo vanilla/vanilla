@@ -7,33 +7,25 @@
 
 namespace Vanilla\Formatting\Formats;
 
-use DOMDocument;
-use DOMElement;
-use DOMNode;
-use DOMNodeList;
-use DOMXPath;
 use Exception;
-use Garden\StaticCacheTranslationTrait;
 use Vanilla\Formatting\BaseFormat;
 use Vanilla\Formatting\Exception\FormattingException;
-use Vanilla\Contracts\Formatting\Heading;
 use Vanilla\Formatting\Html\HtmlDocument;
 use Vanilla\Formatting\Html\HtmlEnhancer;
 use Vanilla\Formatting\Html\HtmlPlainTextConverter;
 use Vanilla\Formatting\Html\HtmlSanitizer;
-use Vanilla\Formatting\Html\LegacySpoilerTrait;
 use Vanilla\Formatting\Html\Processor\AttachmentHtmlProcessor;
 use Vanilla\Formatting\Html\Processor\HeadingHtmlProcessor;
 use Vanilla\Formatting\Html\Processor\ImageHtmlProcessor;
-use Vanilla\Formatting\Html\Processor\ZendeskWysiwygProcessor;
 use Vanilla\Formatting\Html\Processor\UserContentCssProcessor;
+use Vanilla\Formatting\ParsableDOMInterface;
+use Vanilla\Formatting\TextDOMInterface;
+use Vanilla\InjectableInterface;
 
 /**
  * Format definition for HTML based formats.
  */
-class HtmlFormat extends BaseFormat {
-
-    use StaticCacheTranslationTrait;
+class HtmlFormat extends BaseFormat implements InjectableInterface, ParsableDOMInterface {
 
     const FORMAT_KEY = "html";
 
@@ -49,10 +41,17 @@ class HtmlFormat extends BaseFormat {
     /** @var HtmlPlainTextConverter */
     private $plainTextConverter;
 
-    /** @var bool allowExtendedContent */
-    private $allowExtendedContent;
+    /** @var HeadingHtmlProcessor */
+    private $headingHtmlProcessor;
 
-    protected $processors = [UserContentCssProcessor::class, HeadingHtmlProcessor::class];
+    /** @var AttachmentHtmlProcessor */
+    private $attachmentHtmlProcessor;
+
+    /** @var ImageHtmlProcessor */
+    private $imageHtmlProcessor;
+
+    /** @var bool allowExtendedContent */
+    protected $allowExtendedContent;
 
     /**
      * Constructor for dependency injection.
@@ -78,6 +77,28 @@ class HtmlFormat extends BaseFormat {
     }
 
     /**
+     * Dependency injection.
+     *
+     * @param AttachmentHtmlProcessor $attachmentHtmlProcessor
+     * @param HeadingHtmlProcessor $headingHtmlProcessor
+     * @param ImageHtmlProcessor $imageHtmlProcessor
+     * @param UserContentCssProcessor $userContentCssProcessor
+
+     */
+    public function setDependencies(
+        AttachmentHtmlProcessor $attachmentHtmlProcessor,
+        HeadingHtmlProcessor $headingHtmlProcessor,
+        ImageHtmlProcessor $imageHtmlProcessor,
+        UserContentCssProcessor $userContentCssProcessor
+    ) {
+        $this->attachmentHtmlProcessor = $attachmentHtmlProcessor;
+        $this->headingHtmlProcessor = $headingHtmlProcessor;
+        $this->imageHtmlProcessor = $imageHtmlProcessor;
+        $this->addHtmlProcessor($headingHtmlProcessor);
+        $this->addHtmlProcessor($userContentCssProcessor);
+    }
+
+    /**
      * @inheritdoc
      */
     public function renderHtml(string $content, bool $enhance = true): string {
@@ -90,10 +111,10 @@ class HtmlFormat extends BaseFormat {
         $result = $this->legacySpoilers($result);
 
         if ($enhance) {
-            $result = $this->htmlEnhancer->enhance($result);
+            $result = $this->htmlEnhancer->enhance($result, true, !c('Garden.Format.DisableUrlEmbeds', false));
         }
 
-        $result = $this->processDocument($result);
+        $result = $this->applyHtmlProcessors($result);
         return $result;
     }
 
@@ -119,7 +140,7 @@ class HtmlFormat extends BaseFormat {
 
         // No Embeds
         $result = $this->htmlEnhancer->enhance($result, true, false);
-        $result = $this->processDocument($result);
+        $result = $this->applyHtmlProcessors($result);
         return $result;
     }
 
@@ -141,8 +162,7 @@ class HtmlFormat extends BaseFormat {
      */
     public function parseAttachments(string $content): array {
         $document = new HtmlDocument($content);
-        $processor = new AttachmentHtmlProcessor($document);
-        return $processor->getAttachments();
+        return $this->attachmentHtmlProcessor->getAttachments($document);
     }
 
     /**
@@ -151,31 +171,25 @@ class HtmlFormat extends BaseFormat {
     public function parseHeadings(string $content): array {
         $rendered = $this->renderHtml($content);
         $document = new HtmlDocument($rendered);
-        $headingProcessor = new HeadingHtmlProcessor($document);
-        return $headingProcessor->getHeadings();
+        return $this->headingHtmlProcessor->getHeadings($document);
     }
 
     /**
      * @inheritdoc
      */
     public function parseImageUrls(string $content): array {
-        $rendered = $this->renderHtml($content);
+        $rendered = $this->renderHtml($content, false);
         $document = new HtmlDocument($rendered);
-        $processor = new ImageHtmlProcessor($document);
-        return $processor->getImageURLs();
+        return $this->imageHtmlProcessor->getImageURLs($document);
     }
 
     /**
-     * Apply HTML processors.
-     *
-     * @param string $content
-     * @return string
+     * @inheritdoc
      */
-    private function processDocument(string $content) {
-        // Normalization
-        $document = new HtmlDocument($content);
-        $document = $document->applyProcessors($this->processors);
-        return $document->getInnerHtml();
+    public function parseImages(string $content): array {
+        $rendered = $this->renderHtml($content, false);
+        $document = new HtmlDocument($rendered);
+        return $this->imageHtmlProcessor->getImages($document);
     }
 
     /**
@@ -266,11 +280,11 @@ class HtmlFormat extends BaseFormat {
     }
 
     /**
-     * Set allowExtendedContent.
-     *
-     * @param bool $extendContent
+     * {@inheritDoc}
      */
-    public function setAllowExtendedContent(bool $extendContent): void {
-        $this->allowExtendedContent = $extendContent;
+    public function parseDOM(string $content): TextDOMInterface {
+        $html = $this->renderHtml($content, false);
+        $dom = new HtmlDocument($html);
+        return $dom;
     }
 }

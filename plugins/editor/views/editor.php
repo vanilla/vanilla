@@ -63,7 +63,7 @@ foreach ($this->data('_EditorToolbar') as $button) {
             $html_toolbar .= wrap(
                wrap($html_arrow_down.$screenReaderMarkup, 'span', $button['attr']).''.
                '<div class="editor-insert-dialog Flyout MenuItems" data-wysihtml5-dialog="createLink">
-                     <input class="InputBox editor-input-url" data-wysihtml5-dialog-field="href" placeholder="https://" />
+                     <input class="InputBox editor-input-url" data-wysihtml5-dialog-field="href" placeholder="'. t("Url") .'" />
                       <div class="MenuButtons">
                       <input type="button" data-wysihtml5-dialog-action="save" class="Button Flyout-Button editor-dialog-fire-close" value="'.t('OK').'"/>
                       <input type="button" data-wysihtml5-dialog-action="cancel" class="Button Flyout-Button Cancel editor-dialog-fire-close" value="'.t('Cancel').'"/>

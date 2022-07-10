@@ -1,8 +1,12 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php use Vanilla\Theme\BoxThemeShim;
+
+if (!defined('APPLICATION')) exit();
 
 echo '<div class="DataListWrap">';
+BoxThemeShim::startHeading();
 echo '<h2 class="H">'.t('Discussions').'</h2>';
-echo '<ul class="DataList Discussions">';
+BoxThemeShim::endHeading();
+echo '<ul class="DataList Discussions pageBox">';
 
 // Create some variables so that they aren't defined in every loop.
 $ViewLocation = $this->fetchViewLocation('discussions', 'discussions', 'vanilla');

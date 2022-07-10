@@ -3,13 +3,15 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import { useFormGroup } from "@dashboard/forms/DashboardFormGroup";
+import React, { useContext } from "react";
+import { FormGroupContext, useFormGroup } from "@dashboard/forms/DashboardFormGroupContext";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import classNames from "classnames";
-import { visibility, srOnly } from "@library/styles/styleHelpers";
+import { visibility } from "@library/styles/styleHelpers";
 import { IFieldError } from "@library/@types/api/core";
 import ErrorMessages from "@library/forms/ErrorMessages";
+import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
+import { cx } from "@emotion/css";
 
 interface IProps {
     checked: boolean;
@@ -20,11 +22,15 @@ interface IProps {
 }
 
 export function DashboardToggle(props: IProps) {
-    const { inputID, labelType } = useFormGroup();
+    const formGroup = useContext(FormGroupContext);
+
+    const classes = dashboardClasses();
+
+    const { inputID, labelType } = formGroup || {};
     const rootClass = labelType === DashboardLabelType.WIDE ? "input-wrap-right" : "input-wrap";
 
     return (
-        <div className={rootClass}>
+        <div className={cx(rootClass, props.disabled && classes.disabled)}>
             <label
                 className={classNames("toggle-wrap", {
                     "toggle-wrap-on": props.checked,
@@ -42,7 +48,7 @@ export function DashboardToggle(props: IProps) {
                         type="checkbox"
                         className={classNames(visibility().visuallyHidden, "toggle-input")}
                         checked={props.checked}
-                        onChange={event => props.onChange(!!event.target.checked)}
+                        onChange={(event) => props.onChange(!!event.target.checked)}
                     />
                     <div className="toggle-well" />
                     <div className="toggle-slider" />

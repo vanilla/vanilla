@@ -17,6 +17,7 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
+use Vanilla\AddonStructure;
 use Vanilla\Logger;
 
 /**
@@ -53,6 +54,9 @@ class AddonModel implements LoggerAwareInterface {
      */
     private $events;
 
+    /** @var \UpdateModel */
+    private $updateModel;
+
     /**
      * AddonModel constructor.
      *
@@ -60,17 +64,20 @@ class AddonModel implements LoggerAwareInterface {
      * @param EventManager $events The event manager dependency.
      * @param Gdn_Configuration $config The config dependency.
      * @param Container $container The container dependency.
+     * @param \UpdateModel $updateModel
      */
     public function __construct(
         AddonManager $addonManager,
         EventManager $events,
         Gdn_Configuration $config,
-        Container $container
+        Container $container,
+        \UpdateModel $updateModel
     ) {
         $this->addonManager = $addonManager;
         $this->events = $events;
         $this->config = $config;
         $this->container = $container;
+        $this->updateModel = $updateModel;
     }
 
     /**
@@ -82,7 +89,7 @@ class AddonModel implements LoggerAwareInterface {
      * @param array $options Additional options.
      *
      * - **themeType**: Specify "mobile" for the mobile theme.
-     * @return Returns an array of all of the addons that were enabled.
+     * @return array Returns an array of all of the addons that were enabled.
      */
     public function enable(Addon $addon, array $options = []) {
         $this->validateEnable($addon, $options);
@@ -151,7 +158,7 @@ class AddonModel implements LoggerAwareInterface {
      * @param array $options Additional options for the check.
      * @return bool Returns **true** if the addon is enabled or **false** otherwise.
      */
-    private function isEnabledConfig(Addon $addon, array $options = []) {
+    public function isEnabledConfig(Addon $addon, array $options = []) {
         $enabled = false;
         switch ($addon->getType()) {
             case Addon::TYPE_ADDON:
@@ -187,20 +194,19 @@ class AddonModel implements LoggerAwareInterface {
         $this->addonManager->startAddon($addon);
 
         // Load bootstrap file.
-        if ($bootstrap = $addon->getSpecial('bootstrap')) {
-            include_once $addon->path($bootstrap, Addon::PATH_FULL);
+        $force = !empty($options['force']);
+        $shouldSkipContainer = !empty($options['skipContainer']);
+        if (!$wasEnabled || ($force && !$shouldSkipContainer)) {
+            $addon->configureContainer($this->container);
+
+            $addon->bindEvents($this->events);
+            if ($pluginClass = $addon->getPluginClass()) {
+                $this->callBootstrapEvents($pluginClass);
+            }
         }
 
         $this->runSetup($addon);
         $this->enableInConfig($addon, true, $options);
-        if ($pluginClass = $addon->getPluginClass()) {
-            $this->events->bindClass($pluginClass, $addon->getPriority());
-
-            // Fire some main events on the plugin.
-            if (!$wasEnabled) {
-                $this->callBootstrapEvents($pluginClass);
-            }
-        }
 
         if (!$wasEnabled) {
             $this->logger->info(
@@ -222,8 +228,10 @@ class AddonModel implements LoggerAwareInterface {
      *
      * @param string $pluginClass The name of the plugin class.
      */
-    private function callBootstrapEvents($pluginClass) {
+    public function callBootstrapEvents($pluginClass) {
         $instance = $this->container->get($pluginClass);
+        // Kludge: Force the plugin class as shared. This should be done in the EventManager eventually.
+        $this->container->setInstance($pluginClass, $instance);
 
         $this->events->fireClass($instance, 'container_init', $this->container);
     }
@@ -235,26 +243,8 @@ class AddonModel implements LoggerAwareInterface {
      */
     private function runSetup(Addon $addon) {
         // Look for a setup method.
-        $called = $this->callPluginMethod($addon, 'setup');
-
-        // @TODO This if is a kludge because Vanilla's core applications are inconsistent.
-        // Once the InstallModel is in use this code can be cleaned up by manual structure inclusion in addons.
-        if (($structure = $addon->getSpecial('structure')) && (!$called || !in_array($addon->path($structure, Addon::PATH_FULL), get_included_files())) || $addon->getKey() === 'dashboard') {
-            $this->logger->debug(
-                "Executing structure for {addonKey}.",
-                [
-                    'event' => 'addon_structure',
-                    'addonKey' => $addon->getKey(),
-                    'structureType' => 'file',
-                    Logger::FIELD_CHANNEL => Logger::CHANNEL_SYSTEM,
-                ]
-            );
-
-            $this->includeFile($addon->path($structure, Addon::PATH_FULL));
-        }
-
-        // Register permissions.
-        $this->registerPermissions($addon);
+        $this->callPluginMethod($addon, 'setup');
+        $this->runStructure($addon);
     }
 
     /**
@@ -284,48 +274,6 @@ class AddonModel implements LoggerAwareInterface {
             return true;
         }
         return false;
-    }
-
-    /**
-     * Include an file with optional dependency injection.
-     *
-     * If the included file returns a callable then that callable will be called through the dependency injection container.
-     *
-     * @param string $path The full path of the file.
-     */
-    private function includeFile($path) {
-        // Legacy structure files require global variables.
-
-        /* @var \Gdn_Database $Database */
-        $Database = $this->container->get(\Gdn_Database::class);
-        $SQL = $Database->sql();
-        $Structure = $Database->structure();
-
-        $r = require $path;
-        if (is_callable($r)) {
-            $this->container->call($r);
-        }
-    }
-
-    /**
-     * Register an addon's permissions.
-     *
-     * @param Addon $addon The addon to register.
-     */
-    private function registerPermissions(Addon $addon) {
-        if ($permissions = $addon->getInfoValue('registerPermissions')) {
-            $this->logger->info(
-                "Defining permissions for {addonKey}.",
-                [
-                    'event' => 'addon_permissions',
-                    'addonKey' => $addon->getKey(),
-                    'permissions' => $permissions,
-                    Logger::FIELD_CHANNEL => Logger::CHANNEL_SYSTEM,
-                ]
-            );
-            $permissionModel = $this->container->get(PermissionModel::class);
-            $permissionModel->define($permissions);
-        }
     }
 
     /**
@@ -398,10 +346,8 @@ class AddonModel implements LoggerAwareInterface {
 
         // 3. Disable it.
         $this->enableInConfig($addon, false, $options);
-        if ($addon->getPluginClass()) {
-            $this->events->unbindClass($addon->getPluginClass());
-        }
-        $this->addonManager->stopAddon($addon);
+        $addon->unbindEvents($this->events);
+        $this->addonManager->stopAddon($addon, false);
 
         // 4. Log the disable.
         if ($wasEnabled) {
@@ -428,26 +374,7 @@ class AddonModel implements LoggerAwareInterface {
      * @param Addon $addon The addon to run.
      */
     public function runStructure(Addon $addon) {
-        // Look for a file.
-        if ($structure = $addon->getSpecial('structure')) {
-            $this->logger->debug(
-                "Executing structure for {addonKey}.",
-                [
-                    'event' => 'addon_structure',
-                    'addonKey' => $addon->getKey(),
-                    'structureType' => 'file',
-                    Logger::FIELD_CHANNEL => Logger::CHANNEL_SYSTEM,
-                ]
-            );
-
-            $this->includeFile($addon->path($structure));
-        }
-
-        // Look for a structure method on the addon.
-        $this->callPluginMethod($addon, 'structure');
-
-        // Register permissions.
-        $this->registerPermissions($addon);
+        $this->updateModel->runStructureForAddon($addon);
     }
 
     /**
@@ -490,7 +417,7 @@ class AddonModel implements LoggerAwareInterface {
 
         // Do a bit of optimization depending on the filter.
         if ($where['addonID']) {
-            list($key, $type) = Addon::splitGlobalKey($where['addonID']);
+            [$key, $type] = Addon::splitGlobalKey($where['addonID']);
             $addons = [$am->lookupByType($key, $type)];
         } elseif ($where['enabled'] && $where['type'] === Addon::TYPE_THEME) {
             $addons = [$am->lookupTheme($this->getThemeKey($where['themeType']))];

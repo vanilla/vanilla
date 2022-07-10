@@ -14,6 +14,7 @@ let addonModuleDirs = [path.join(VANILLA_ROOT, "node_modules"), path.join(VANILL
 let addonModuleMaps = {
     [`^@library/(.*)$`]: path.join(VANILLA_ROOT, "library/src/scripts/$1"),
 };
+let packageDirectoryMaps = {};
 
 function scanAddons(addonDir) {
     const keys = glob
@@ -22,9 +23,6 @@ function scanAddons(addonDir) {
 
     keys.forEach(key => {
         let root = path.join(VANILLA_ROOT, addonDir, key);
-        if (fs.existsSync(root)) {
-            root = fs.realpathSync(root);
-        }
         if (fs.existsSync(path.join(root, "src/scripts/entries")) && key !== "vanilla") {
             addonRootDirs.push(root);
             const nodeModules = path.join(root, "node_modules");
@@ -34,8 +32,25 @@ function scanAddons(addonDir) {
     });
 }
 
+function scanPackages(packagesDir) {
+    const keys = glob
+    // Get the directory contents
+    .sync(path.join(VANILLA_ROOT, packagesDir + "/*"))
+    // Filter out any files
+    .filter((path) => fs.lstatSync(path).isDirectory())
+    // Rectify the paths
+    .map(dir => dir.replace(path.join(VANILLA_ROOT, packagesDir + "/"), ""));
+
+    keys.forEach((key) => {
+        // Split into groups of prefix and package name
+        const nameArray = key.split(new RegExp("(vanilla).(.*)")).filter((group) => group.length);
+        packageDirectoryMaps[`^@${nameArray[0]}/${nameArray[1]}/(.*)$`] = path.join(VANILLA_ROOT, packagesDir,key, "$1");
+    });
+}
+
 scanAddons("applications");
 scanAddons("plugins");
+scanPackages("packages");
 
 module.exports = {
     // All imported modules in your tests should be mocked automatically
@@ -54,26 +69,32 @@ module.exports = {
     clearMocks: true,
 
     // Indicates whether the coverage information should be collected while executing the test
-    // collectCoverage: false,
+    collectCoverage: true,
 
     // An array of glob patterns indicating a set of files for which coverage information should be collected
-    // collectCoverageFrom: null,
+    collectCoverageFrom: ['<rootDir>/**/*.tsx', '<rootDir>/**/*.ts', '!<rootDir>/**/*.d.ts'],
 
     // The directory where Jest should output its coverage files
-    coverageDirectory: "coverage",
+    coverageDirectory: "coverage/jest",
 
     // An array of regexp pattern strings used to skip coverage collection
-    // coveragePathIgnorePatterns: [
-    //   "/node_modules/"
-    // ],
+    coveragePathIgnorePatterns: [
+      ".github",
+      ".vscode",
+      ".yarn",
+      "/build",
+      "/node_modules/",
+      "/cache/",
+      "/vendor/"
+    ],
 
     // A list of reporter names that Jest uses when writing coverage reports
-    // coverageReporters: [
+    coverageReporters: [
     //   "json",
     //   "text",
-    //   "lcov",
+      "lcov",
     //   "clover"
-    // ],
+    ],
 
     // An object that configures minimum threshold enforcement for coverage results
     // coverageThreshold: null,
@@ -99,24 +120,26 @@ module.exports = {
     // The maximum amount of workers used to run your tests. Can be specified as % or a number. E.g. maxWorkers: 10% will use 10% of your CPU amount + 1 as the maximum worker number. maxWorkers: 2 will use a maximum of 2 workers.
     // maxWorkers: "50%",
 
-    // An array of directory names to be searched recursively up from the requiring module's location
-    moduleDirectories: ["node_modules", ...addonModuleDirs],
+    // // An array of directory names to be searched recursively up from the requiring module's location
+    // moduleDirectories: ["node_modules", ...addonModuleDirs],
 
     // An array of file extensions your modules use
-    // moduleFileExtensions: [
-    //   "js",
-    //   "json",
-    //   "jsx",
-    //   "ts",
-    //   "tsx",
-    //   "node"
-    // ],
+    moduleFileExtensions: [
+        "js",
+        "cjs",
+        "json",
+        "jsx",
+        "ts",
+        "tsx",
+        "node"
+    ],
 
     // A map from regular expressions to module names that allow to stub out resources with a single module
     moduleNameMapper: {
         "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$":
-            "<rootDir>/__mocks__/fileMock.js",
-        "\\.(css|less)$": "<rootDir>/__mocks__/styleMock.js",
+            "<rootDir>/library/src/scripts/__tests__/fileMock.js",
+        "\\.(css|less|scss)$": "<rootDir>/library/src/scripts/__tests__/styleMock.js",
+        ...packageDirectoryMaps,
         ...addonModuleMaps,
     },
 
@@ -151,10 +174,10 @@ module.exports = {
     // restoreMocks: false,
 
     // The root directory that Jest should scan for tests and modules within
-    // rootDir: null,
+    rootDir: VANILLA_ROOT,
 
     // A list of paths to directories that Jest should use to search for files in
-    roots: ["<rootDir>", ...addonRootDirs],
+    // roots: ["<rootDir>", ...addonRootDirs],
 
     // Allows you to use a custom runner instead of Jest's default test runner
     // runner: "jest-runner",
@@ -163,13 +186,15 @@ module.exports = {
     // setupFiles: [],
 
     // A list of paths to modules that run some code to configure or set up the testing framework before each test
-    // setupFilesAfterEnv: [],
+    setupFilesAfterEnv: [
+        "<rootDir>/jest.setup.js"
+    ],
 
     // A list of paths to snapshot serializer modules Jest should use for snapshot testing
     // snapshotSerializers: [],
 
     // The test environment that will be used for testing
-    // testEnvironment: "jest-environment-jsdom",
+    testEnvironment: "jest-environment-jsdom",
 
     // Options that will be passed to the testEnvironment
     // testEnvironmentOptions: {},
@@ -184,9 +209,7 @@ module.exports = {
     ],
 
     // An array of regexp pattern strings that are matched against all test paths, matched tests are skipped
-    // testPathIgnorePatterns: [
-    //   "/node_modules/"
-    // ],
+    // testPathIgnorePatterns: ["/cloud/"],
 
     // The regexp pattern or array of patterns that Jest uses to detect test files
     // testRegex: [],
@@ -207,9 +230,9 @@ module.exports = {
     // transform: null,
 
     // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
-    // transformIgnorePatterns: [
-    //   "/node_modules/"
-    // ],
+    transformIgnorePatterns: [
+      "/node_modules/"
+    ],
 
     // An array of regexp pattern strings that are matched against all modules before the module loader will automatically return a mock for them
     // unmockedModulePathPatterns: undefined,

@@ -58,7 +58,7 @@ class FormTest extends MinimalContainerTestCase {
 
         // Make sure we are escaped properly.
         $expectedHtml = <<<HTML
-<div class="Messages Errors">
+<div aria-label="Validation Failed" class="Messages Errors" role="alert">
 <ul>
 <li>&lt;script&gt;alert(document.cookie)&lt;/script&gt;</li>
 <li>&lt;script&gt;alert(document.cookie)&lt;/script&gt;</li>
@@ -412,9 +412,7 @@ EOT;
     public function testDefaultRadio(): void {
         $actual = $this->form->radio('fo>"', 'bar', ['value' => '2']);
         $expected = <<<EOT
-<label>
-    <input id=Form_fo name=fo&gt;&quot; type=radio value=2> bar
-</label>
+<label><input id=Form_fo name=fo&gt;&quot; type=radio value=2> bar</label>
 EOT;
         $this->assertHtmlStringEqualsHtmlString($expected, $actual);
     }
@@ -427,16 +425,10 @@ EOT;
         $expected = <<<EOT
 <ul class="CheckBoxList">
     <li><div class="checkbox">
-        <label for="foo1">
-            <input type="hidden" name="Checkboxes[]" value="foo" />
-            <input type="checkbox" id="foo1" name="foo[]" value="b" class="" /> a
-        </label>
+        <label for="foo1"><input type="hidden" name="Checkboxes[]" value="foo" /><input type="checkbox" id="foo1" name="foo[]" value="b" class="" /> a</label>
     </div></li>
     <li><div class="checkbox">
-        <label for="foo2">
-            <input type="hidden" name="Checkboxes[]" value="foo" />
-            <input type="checkbox" id="foo2" name="foo[]" value="d" class="" /> c
-        </label>
+        <label for="foo2"><input type="hidden" name="Checkboxes[]" value="foo" /><input type="checkbox" id="foo2" name="foo[]" value="d" class="" /> c</label>
     </div></li>
 </ul>
 EOT;
@@ -450,14 +442,9 @@ EOT;
         $actual = $this->form->radioList('foo', ['a' => 'b', 'c' => 'd']);
         $expected = <<<EOT
 <div class="radio">
-    <label>
-        <input type="radio" id="Form_foo" name="foo" value="a" class="" /> b
-    </label>
-</div>
+    <label><input type="radio" id="Form_foo" name="foo" value="a" class="" /> b</label></div>
 <div class="radio">
-    <label>
-        <input type="radio" id="Form_foo1" name="foo" value="c" class="" /> d
-    </label>
+    <label><input type="radio" id="Form_foo1" name="foo" value="c" class="" /> d</label>
 </div>
 EOT;
         $this->assertHtmlStringEqualsHtmlString($expected, $actual);
@@ -469,7 +456,7 @@ EOT;
     public function testDefaultDropdown(): void {
         $actual = $this->form->dropDown('foo', ['>' => 'b', '"' => 'd']);
         $expected = <<<EOT
-<select id="Form_foo" name="foo" class="form-control">
+<select id="Form_foo" data-value="" name="foo" class="form-control">
 <option value="&gt;">b</option>
 <option value="&quot;">d</option>
 </select>
@@ -519,7 +506,7 @@ EOT;
     public function testDefaultDate(): void {
         $actual = $this->form->date('fo>"', ['YearRange' => '2019-2020']);
         $expected = <<<EOT
-<select id="Form_fo_Month" name="fo&gt;&quot;_Month" class="Month">
+<select id="Form_fo_Month" data-value="" name="fo&gt;&quot;_Month" class="Month">
     <option value="0">Month</option>
     <option value="1">Jan</option>
     <option value="2">Feb</option>
@@ -534,7 +521,7 @@ EOT;
     <option value="11">Nov</option>
     <option value="12">Dec</option>
 </select>
-<select id="Form_fo_Day" name="fo&gt;&quot;_Day" class="Day">
+<select id="Form_fo_Day" data-value="" name="fo&gt;&quot;_Day" class="Day">
     <option value="0">Day</option>
     <option value="1">1</option>
     <option value="2">2</option>
@@ -568,7 +555,7 @@ EOT;
     <option value="30">30</option>
     <option value="31">31</option>
 </select>
-<select id="Form_fo_Year" name="fo&gt;&quot;_Year" class="Year">
+<select id="Form_fo_Year" data-value="" name="fo&gt;&quot;_Year" class="Year">
     <option value="0">Year</option>
     <option value="2019">2019</option>
     <option value="2020">2020</option>
@@ -576,5 +563,114 @@ EOT;
 <input type="hidden" name="DateFields[]" value="fo&gt;&quot;" />
 EOT;
         $this->assertHtmlStringEqualsHtmlString($expected, $actual);
+    }
+
+    /**
+     * Make sure that `Gd_Form::getFormValue()` supports `"[]"` style form access.
+     *
+     * @param string $name
+     * @param string $expected
+     * @dataProvider provideNestedFormValueNames
+     */
+    public function testGetFormValueNesting(string $name, string $expected) {
+        $this->form->formValues(['a' => 'a', 'b' => ['a' => 'b', 'b' => ['a' => 'c']]]);
+
+        $this->assertSame($expected, $this->form->getFormValue($name));
+    }
+
+    /**
+     * Data provider.
+     *
+     * @return array
+     */
+    public function provideNestedFormValueNames(): array {
+        $r = [
+            ['a', 'a'],
+            ['b[a]', 'b'],
+            ['b[b][a]', 'c'],
+        ];
+        return array_column($r, null, 0);
+    }
+
+    /**
+     * Test Gdn_Form::verifyAdditionalPermissions()
+     *
+     * @param array $testPermissions
+     * @param array $testCategory
+     * @param bool $expected Expected result
+     * @dataProvider provideTestVerifyAdditionalPermissionsData
+     */
+    public function testVerifyAdditionalPermissions(array $testPermissions, array $testCategory, bool $expected) {
+        $actual = Gdn_Form::verifyAdditionalPermissions($testPermissions, $testCategory);
+        $this->assertSame($actual, $expected);
+    }
+
+    /**
+     * Provide test data for testVerifyAdditionalPermissions.
+     *
+     * @return array
+     */
+    public function provideTestVerifyAdditionalPermissionsData() {
+        $r = [
+            'hasPermission' => [
+                ["CanAdd"],
+                [
+                    "CategoryID" => 1,
+                    "CategoryName" => 'Test',
+                    "CanAdd" => true,
+                ],
+                true,
+            ],
+            'doesntHavePermission' => [
+                ["CanAdd"],
+                [
+                    "CategoryID" => 1,
+                    "CategoryName" => 'Test',
+                    "CanAdd" => false,
+                ],
+                false,
+            ],
+            'hasMultiple' => [
+                ["CanAdd", "CanEdit"],
+                [
+                    "CategoryID" => 1,
+                    "CategoryName" => 'Test',
+                    "CanAdd" => true,
+                    "CanEdit" => true,
+                ],
+                true,
+            ],
+            'hasOneOfTwo' => [
+                ["CanAdd", "CanEdit"],
+                [
+                    "CategoryID" => 1,
+                    "CategoryName" => 'Test',
+                    "CanAdd" => true,
+                    "CanEdit" => false,
+                ],
+                false,
+            ],
+            'hasNeither' => [
+                ["CanAdd", "CanEdit"],
+                [
+                    "CategoryID" => 1,
+                    "CategoryName" => 'Test',
+                    "CanAdd" => false,
+                    "CanEdit" => false,
+                ],
+                false,
+            ],
+            'noCategoryKey' => [
+                ["CanAdd"],
+                [
+                    "CategoryID" => 1,
+                    "CategoryName" => 'Test',
+                    "CanEdit" => false,
+                ],
+                false,
+            ],
+        ];
+
+        return $r;
     }
 }

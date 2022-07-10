@@ -1,6 +1,8 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
-    <h1><?php echo $this->data('Title'); ?></h1>
 <?php
+if (!defined('APPLICATION')) exit();
+
+echo "<h2>" . $this->data('Title') . "</h2>";
+
 /** @var Gdn_Form $form */
 $form = $this->Form;
 echo $form->open(['id' => 'DiscussionAddTagForm']);

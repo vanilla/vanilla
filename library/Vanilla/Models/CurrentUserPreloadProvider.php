@@ -8,6 +8,7 @@
 namespace Vanilla\Models;
 
 use Garden\Web\Data;
+use Vanilla\Http\InternalClient;
 use Vanilla\Web\JsInterpop\ReduxAction;
 use Vanilla\Web\JsInterpop\ReduxActionProviderInterface;
 
@@ -16,30 +17,29 @@ use Vanilla\Web\JsInterpop\ReduxActionProviderInterface;
  */
 class CurrentUserPreloadProvider implements ReduxActionProviderInterface {
 
-    /** @var \UsersApiController */
-    private $usersApi;
+    /** @var InternalClient */
+    private $internalClient;
 
-    /** @var \SessionController */
+    /** @var \Gdn_Session */
     private $session;
 
     /**
      * DI.
      *
-     * @param \UsersApiController $usersApi
+     * @param InternalClient $internalClient
      * @param \Gdn_Session $session
      */
-    public function __construct(\UsersApiController $usersApi, \Gdn_Session $session) {
-        $this->usersApi = $usersApi;
+    public function __construct(InternalClient $internalClient, \Gdn_Session $session) {
+        $this->internalClient = $internalClient;
         $this->session = $session;
     }
-
 
     /**
      * @inheritdoc
      */
     public function createActions(): array {
-        $user = $this->usersApi->get_me([]);
-        $permissions = $this->usersApi->get_permissions($this->session->UserID);
+        $user = $this->internalClient->get("/api/v2/users/me")->getBody();
+        $permissions = $this->internalClient->get("/api/v2/users/{$this->session->UserID}/permissions", ['expand' => 'junctions'])->getBody();
         return [
             new ReduxAction(\UsersApiController::ME_ACTION_CONSTANT, Data::box($user), []),
             new ReduxAction(\UsersApiController::PERMISSIONS_ACTION_CONSTANT, Data::box($permissions), [])

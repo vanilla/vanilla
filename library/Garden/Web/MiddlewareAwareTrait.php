@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -39,7 +39,7 @@ trait MiddlewareAwareTrait {
         $this->middleware = function (RequestInterface $request) use ($middleware, $next): Data {
             $response = $middleware($request, $next);
             if (!$response instanceof Data) {
-                throw new \BadFunctionCallException('Middware must return a '.Data::class.' object.', 500);
+                throw new \BadFunctionCallException('Middleware must return a '.Data::class.' object.', 500);
             }
             return $response;
         };

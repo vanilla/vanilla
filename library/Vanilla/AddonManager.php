@@ -7,8 +7,12 @@
 
 namespace Vanilla;
 
+use Garden\Container\Container;
 use Garden\EventManager;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Vanilla\Contracts;
+use Vanilla\Utility\ArrayUtils;
 
 /**
  * A class to manage all of the addons in the application.
@@ -20,7 +24,9 @@ use Vanilla\Contracts;
  * - The addon can declare a class ending in "Plugin" and its events will be registered.
  * - Any translations the addon has declared will be loaded for the currently enabled locale.
  */
-class AddonManager {
+class AddonManager implements LoggerAwareInterface {
+
+    use LoggerAwareTrait;
 
     /// Constants ///
 
@@ -120,6 +126,19 @@ class AddonManager {
     }
 
     /**
+     * Get the default directories to scan.
+     *
+     * @return array
+     */
+    public static function getDefaultScanDirectories(): array {
+        return [
+            Addon::TYPE_ADDON => ['/addons/addons', '/applications', '/plugins'],
+            Addon::TYPE_THEME => ['/addons/themes', '/themes'],
+            Addon::TYPE_LOCALE => '/locales'
+        ];
+    }
+
+    /**
      * Test whether an addon type uses multi-caching.
      *
      * @param string $type One of the **Addon::TYPE_*** constatns.
@@ -206,6 +225,20 @@ class AddonManager {
             }
         }
         return null;
+    }
+
+    /**
+     * Filter data by "x-addon" key
+     *
+     * @param array $data
+     * @return array|null
+     */
+    public function filterDataByAddon($data) {
+        $filter = function ($data) {
+            return (empty($data['x-addon']) || $this->checkAddonsEnabled($data['x-addon']));
+        };
+
+        return ArrayUtils::filterRecursiveArray($data, $filter);
     }
 
     /**
@@ -317,7 +350,7 @@ class AddonManager {
         if (!isset($this->multiCache)) {
             $cachePath = $this->cacheDir.'/'.Addon::TYPE_ADDON.'.php';
             if ($this->isCacheEnabled() && is_readable($cachePath)) {
-                $this->multiCache = require $cachePath;
+                $this->multiCache = FileUtils::getExport($cachePath);
             } else {
                 $this->multiCache = $this->scan(Addon::TYPE_ADDON, $this->isCacheEnabled());
             }
@@ -348,7 +381,7 @@ class AddonManager {
                 $addon = new Addon($subdir);
                 $key = $addon->getKey();
                 if (!static::validateKey($key)) {
-                    trigger_error("The $type in $subdir has an invalid key: $key.", E_USER_WARNING);
+                    $this->logAddonWarning("The $type in $subdir has an invalid key: $key.");
                 } elseif (!array_key_exists($key, $addons)) {
                     $addons[$key] = $addon;
                 } else {
@@ -356,7 +389,7 @@ class AddonManager {
                 }
             } catch (\Exception $ex) {
                 $exceptionMessage = $ex->getMessage();
-                trigger_error("The $type in $subdir is invalid. $exceptionMessage", E_USER_WARNING);
+                $this->logAddonWarning("The $type in $subdir is invalid. $exceptionMessage");
             }
         }
         $this->multiCache = $addons;
@@ -414,52 +447,8 @@ class AddonManager {
      */
     private function saveArrayCache($path, $array) {
         if ($this->isCacheEnabled()) {
-            $varString = '<?php return '.var_export($array, true).";\n";
-            $this->filePutContents($this->cacheDir.'/'.$path, $varString);
+            FileUtils::putExport($this->cacheDir.'/'.$path, $array);
         }
-    }
-
-    /**
-     * A version of file_put_contents() that is multi-thread safe.
-     *
-     * @param string $filename Path to the file where to write the data.
-     * @param mixed $data The data to write. Can be either a string, an array or a stream resource.
-     * @param int $mode The permissions to set on a new file.
-     * @return boolean
-     * @category Filesystem Functions
-     * @see http://php.net/file_put_contents
-     */
-    private function filePutContents($filename, $data, $mode = 0644) {
-        $temp = tempnam(dirname($filename), 'atomic');
-
-        if (!($fp = @fopen($temp, 'wb'))) {
-            $temp = dirname($filename).DIRECTORY_SEPARATOR.uniqid('atomic');
-            if (!($fp = @fopen($temp, 'wb'))) {
-                trigger_error("AddonManager::filePutContents(): error writing temporary file '$temp'", E_USER_WARNING);
-                return false;
-            }
-        }
-
-        fwrite($fp, $data);
-        fclose($fp);
-
-        if (!@rename($temp, $filename)) {
-            $r = @unlink($filename);
-            $r &= @rename($temp, $filename);
-            if (!$r) {
-                trigger_error("AddonManager::filePutContents(): error writing file '$filename'", E_USER_WARNING);
-                return false;
-            }
-        }
-        if (function_exists('apc_delete_file')) {
-            // This fixes a bug with some configurations of apc.
-            apc_delete_file($filename);
-        } elseif (function_exists('opcache_invalidate')) {
-            opcache_invalidate($filename);
-        }
-
-        @chmod($filename, $mode);
-        return true;
     }
 
     /**
@@ -473,7 +462,7 @@ class AddonManager {
             $cachePath = "$type-index.php";
 
             if ($this->isCacheEnabled() && is_readable("$this->cacheDir/$cachePath")) {
-                $this->singleIndex[$type] = require "$this->cacheDir/$cachePath";
+                $this->singleIndex[$type] = FileUtils::getExport("$this->cacheDir/$cachePath");
             } else {
                 $addonDirs = $this->scanAddonDirs($type);
 
@@ -526,7 +515,7 @@ class AddonManager {
         if ($this->isCacheEnabled()) {
             $cachePath = "{$this->cacheDir}/$type/$addonDirName.php";
             if (is_readable($cachePath)) {
-                $addon = require $cachePath;
+                $addon = FileUtils::getExport($cachePath);
                 $this->singleCache[$type][$addonDirName] = $addon;
                 return $addon === false ? null : $addon;
             }
@@ -774,6 +763,23 @@ class AddonManager {
     }
 
     /**
+     * Checks whether the addon in the x-addon field is enabled and handles cases where the field is an array.
+     *
+     * @param string|string[] $addons
+     * @return bool
+     */
+    public function checkAddonsEnabled($addons): bool {
+        $addons = is_array($addons) ? $addons : [$addons];
+        foreach ($addons as $addon) {
+            $enabled = $this->isEnabled($addon, Addon::TYPE_ADDON);
+            if (!$enabled) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Check the enabled dependents of an addon.
      *
      * Addons should always check their dependents before being disabled. This check does not consider dependents that
@@ -854,7 +860,7 @@ class AddonManager {
     }
 
     /**
-     * @inheritdoc
+     * @return Addon[]
      */
     public function getEnabled(): array {
         if (!$this->enabledSorted) {
@@ -1061,8 +1067,9 @@ class AddonManager {
      * Stop an addon and make it unavailable.
      *
      * @param Addon $addon The addon to stop.
+     * @param bool $removeClasses If set to false, we won't remove classes from the autoloader.
      */
-    public function stopAddon(Addon $addon) {
+    public function stopAddon(Addon $addon, bool $removeClasses = true) {
         if (empty($addon)) {
             trigger_error("Null addon supplied to AddonManager->stopAddon().", E_USER_NOTICE);
             return;
@@ -1071,11 +1078,13 @@ class AddonManager {
         unset($this->enabled[$addon->getType().'/'.$addon->getKey()]);
 
         // Remove all of the addon's classes from the autoloader.
-        foreach ($addon->getClasses() as $classKey => $classInfo) {
-            if (isset($this->autoloadClasses[$classKey])) {
-                foreach ($this->autoloadClasses[$classKey] as $namespaceKey => $classData) {
-                    if (strtolower($classData['namespace']) === $namespaceKey) {
-                        unset($this->autoloadClasses[$classKey][$namespaceKey]);
+        if ($removeClasses) {
+            foreach ($addon->getClasses() as $classKey => $classInfo) {
+                if (isset($this->autoloadClasses[$classKey])) {
+                    foreach ($this->autoloadClasses[$classKey] as $namespaceKey => $classData) {
+                        if (strtolower($classData['namespace']) === $namespaceKey) {
+                            unset($this->autoloadClasses[$classKey][$namespaceKey]);
+                        }
                     }
                 }
             }
@@ -1106,7 +1115,7 @@ class AddonManager {
             }
             $addon = $this->lookupByType($lookup, $type);
             if (empty($addon)) {
-                trigger_error("The $type with key $lookup could not be found and will not be started.");
+                trigger_error("The $type with key $lookup could not be found and will not be started.", E_USER_NOTICE);
             } else {
                 $this->startAddon($addon);
                 $count++;
@@ -1210,7 +1219,7 @@ class AddonManager {
      * @return AddonManager Returns `$this` for fluent calls.
      */
     public function setCacheDir($cacheDir) {
-        if ($cacheDir !== null && strpos($cacheDir, PATH_ROOT) !== 0 && Gdn::config('Cache.DirRelative', true)) {
+        if ($cacheDir !== null && strpos($cacheDir, PATH_ROOT) !== 0) {
             $cacheDir = PATH_ROOT.$cacheDir;
         }
         $this->cacheDir = $cacheDir;
@@ -1247,13 +1256,7 @@ class AddonManager {
         $enabled = $this->getEnabled();
 
         foreach ($enabled as $addon) {
-            /* @var \Vanilla\Addon $addon */
-            if ($pluginClass = $addon->getPluginClass()) {
-                // Include the plugin here, rather than wait for it to hit the autoloader. This way is much faster.
-                include_once $addon->getClassPath($pluginClass);
-
-                $this->bindAddonEvents($addon, $eventManager);
-            }
+            $addon->bindEvents($eventManager);
         }
     }
 
@@ -1264,19 +1267,11 @@ class AddonManager {
      *
      * @param Addon $addon The addon to bind.
      * @param EventManager $eventManager The event manager to bind the plugin classes to.
+     *
+     * @deprecated Use the Addon::bindEvents()
      */
     public function bindAddonEvents(Addon $addon, EventManager $eventManager) {
-        // Check that the addon has a plugin.
-        if (!($pluginClass = $addon->getPluginClass())) {
-            return;
-        }
-
-        // Only register the plugin if it implements the Gdn_IPlugin interface.
-        if (is_a($pluginClass, 'Gdn_IPlugin', true)) {
-            $eventManager->bindClass($pluginClass, $addon->getPriority());
-        } else {
-            trigger_error("$pluginClass does not implement Gdn_IPlugin", E_USER_DEPRECATED);
-        }
+        $addon->bindEvents($eventManager);
     }
 
     /**
@@ -1288,16 +1283,57 @@ class AddonManager {
      * @param EventManager $eventManager The event manager to bind the plugin classes to.
      */
     public function unbindAddonEvents(Addon $addon, EventManager $eventManager) {
-        // Check that the addon has a plugin.
-        if (!($pluginClass = $addon->getPluginClass())) {
+        $specialClasses = $addon->getSpecialClasses();
+        if ($specialClasses === null) {
+            // Nothing to do here.
             return;
         }
+        foreach ($specialClasses->getEventHandlersClasses() as $eventHandlerClass) {
+            $eventManager->unbindClass($eventHandlerClass);
+        }
+    }
 
-        // Only register the plugin if it implements the Gdn_IPlugin interface.
-        if (is_a($pluginClass, 'Gdn_IPlugin', true)) {
-            $eventManager->unbindClass($pluginClass);
-        } else {
-            trigger_error("$pluginClass does not implement Gdn_IPlugin", E_USER_DEPRECATED);
+    /**
+     * Apply addon configuration defaults, then reapply site specific configuration.
+     *
+     * @param \Gdn_Configuration $config
+     */
+    public function applyConfigDefaults(\Gdn_Configuration $config) {
+        // Load the configurations for enabled addons.
+        foreach ($this->getEnabled() as $addon) {
+            if ($specialClasses = $addon->getSpecialClasses()) {
+                foreach ($specialClasses->getAddonConfigurationClasses() as $configurationClass) {
+                    /** @var AddonConfigurationDefaults $instance */
+                    $instance = new $configurationClass;
+                    $config->touch($instance->getDefaults(), null, false);
+                }
+            }
+
+
+            if ($configPath = $addon->getSpecial('config')) {
+                $config->load($addon->path($configPath));
+            }
+        }
+
+        // Re-apply loaded user settings.
+        $config->overlayDynamic();
+    }
+
+    /**
+     * Configure addon container rules.
+     *
+     * @param Container $container
+     */
+    public function configureContainer(Container $container) {
+        $enabled = $this->getEnabled();
+        // do new ones first.
+        foreach ($enabled as $addon) {
+            $addon->configureContainer($container, 'new');
+        }
+
+        // Then the old ones.
+        foreach ($enabled as $addon) {
+            $addon->configureContainer($container, 'old');
         }
     }
 
@@ -1332,6 +1368,19 @@ class AddonManager {
         }
 
         return $this;
+    }
+
+    /**
+     * Log a warning about a bad addon.
+     *
+     * - Site warning. Have site try to continue running.
+     * - Syslog is critical because these can only be actioned by sysadmins, and may be the result of a bad deploy.
+     *
+     * @param string $message
+     */
+    private function logAddonWarning(string $message) {
+        trigger_error($message, E_USER_WARNING);
+        $this->logger->critical($message);
     }
 
     /**

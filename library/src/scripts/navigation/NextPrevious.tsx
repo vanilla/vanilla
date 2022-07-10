@@ -13,7 +13,7 @@ import { nextPreviousClasses } from "@library/navigation/nextPreviousStyles";
 
 interface IUrlItem {
     name: string;
-    url: string;
+    url?: string;
 }
 
 interface IProps {
@@ -44,7 +44,7 @@ export default class NextPrevious extends React.Component<IProps> {
                         className={classes.previous}
                         classes={classes}
                         direction={LeftRight.LEFT}
-                        to={prevItem.url}
+                        to={prevItem.url || ""}
                         title={prevItem.name}
                     />
                 )}
@@ -54,7 +54,7 @@ export default class NextPrevious extends React.Component<IProps> {
                         className={classes.next}
                         classes={classes}
                         direction={LeftRight.RIGHT}
-                        to={nextItem.url}
+                        to={nextItem.url || ""}
                         title={nextItem.name}
                     />
                 )}

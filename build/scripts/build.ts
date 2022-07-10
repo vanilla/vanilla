@@ -4,29 +4,35 @@
  * @license GPL-2.0-only
  */
 
+import fs from "fs";
 import { getOptions, BuildMode } from "./buildOptions";
 import { spawnChildProcess } from "./utility/moduleUtils";
 import Builder from "./Builder";
 import path from "path";
-import { DIST_DIRECTORY } from "./env";
+import { DIST_DIRECTORY, VANILLA_ROOT } from "./env";
 
 /**
  * Run the build. Options are passed as arguments from the command line.
  * @see https://docs.vanillaforums.com/developer/tools/building-frontend/
  */
-void getOptions().then(async options => {
+void getOptions().then(async (options) => {
     const builder = new Builder(options);
     await builder.build();
 
     if (options.mode === BuildMode.PRODUCTION) {
-        const filesToCheck = [
-            path.join(DIST_DIRECTORY, "polyfills.min.js"),
-            path.join(DIST_DIRECTORY, "forum/vendors.min.js"),
-            path.join(DIST_DIRECTORY, "forum/shared.min.js"),
-            path.join(DIST_DIRECTORY, "admin/vendors.min.js"),
-            path.join(DIST_DIRECTORY, "admin/shared.min.js"),
-        ];
+        const exceptions = ["modern", "polyfills", "monaco", "."];
+        const dirs = fs
+            .readdirSync(DIST_DIRECTORY)
+            .filter((dir) => exceptions.every((exp) => !dir.includes(exp)))
+            .map((dir) => {
+                return path.join(DIST_DIRECTORY, dir, "**/*.js");
+            });
+        dirs.push(path.join(VANILLA_ROOT, "js/**/*.js"));
 
-        await spawnChildProcess("npx", ["es-check", "es5", ...filesToCheck], { stdio: "inherit" });
+        await spawnChildProcess("yarn", ["es-check", "es5", ...dirs], {
+            stdio: "inherit",
+        }).catch((e) => {
+            process.exit(1);
+        });
     }
 });

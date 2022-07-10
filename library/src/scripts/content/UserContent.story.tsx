@@ -1,6 +1,6 @@
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -9,7 +9,7 @@ import React from "react";
 import { STORY_CONTENT_RICH, STORY_CONTENT_LEGACY, STORY_CONTENT_TABLES } from "@library/content/UserContent.storyData";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import { legacyCssDecorator } from "@dashboard/__tests__/legacyCssDecorator";
-import { TableStyle } from "@library/content/userContentStyles";
+import { TableStyle } from "@library/content/UserContent.variables";
 
 export default {
     title: "User Content/Content",
@@ -23,9 +23,7 @@ export const Legacy = storyWithConfig({}, () => {
     return <UserContent content={STORY_CONTENT_LEGACY} />;
 });
 
-Legacy.story = {
-    decorators: [legacyCssDecorator],
-};
+Legacy.decorators = [legacyCssDecorator];
 
 function makeTableStory(tableStyle: TableStyle) {
     const storyFn = storyWithConfig(
@@ -42,11 +40,9 @@ function makeTableStory(tableStyle: TableStyle) {
             return <UserContent content={STORY_CONTENT_TABLES} />;
         },
     );
-    storyFn.story = {
-        parameters: {
-            chromatic: {
-                viewports: [1200, 500],
-            },
+    storyFn.parameters = {
+        chromatic: {
+            viewports: [1200, 500],
         },
     };
     return storyFn;

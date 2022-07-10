@@ -8,6 +8,8 @@
  * @since 2.0
  */
 
+use Vanilla\Formatting\Formats\HtmlFormat;
+
 /**
  * Handles displaying discussions in most contexts via /discussions endpoint.
  *
@@ -15,7 +17,7 @@
  */
 class DiscussionsController extends VanillaController {
 
-    /** @var arrayModels to include. */
+    /** @var array Models to include. */
     public $Uses = ['Database', 'DiscussionModel', 'Form'];
 
     /** @var boolean Value indicating if discussion options should be displayed when rendering the discussion view.*/
@@ -36,7 +38,7 @@ class DiscussionsController extends VanillaController {
     /**
      * "Table" layout for discussions. Mimics more traditional forum discussion layout.
      *
-     * @param int $page Multiplied by PerPage option to determine offset.
+     * @param string $page Multiplied by PerPage option to determine offset.
      */
     public function table($page = '0') {
         if ($this->SyndicationMethod == SYNDICATION_NONE) {
@@ -51,7 +53,7 @@ class DiscussionsController extends VanillaController {
      * @since 2.0.0
      * @access public
      *
-     * @param int $Page Multiplied by PerPage option to determine offset.
+     * @param string|false $Page Multiplied by PerPage option to determine offset.
      */
     public function index($Page = false) {
         $this->allowJSONP(true);
@@ -101,7 +103,7 @@ class DiscussionsController extends VanillaController {
 
         // Setup head.
         if (!$this->data('Title')) {
-            $Title = c('Garden.HomepageTitle');
+            $Title = Gdn::formatService()->renderPlainText(c('Garden.HomepageTitle'), HtmlFormat::FORMAT_KEY);
             $DefaultControllerRoute = val('Destination', Gdn::router()->getRoute('DefaultController'));
             if ($Title && ($DefaultControllerRoute == 'discussions')) {
                 $this->title($Title, '');
@@ -110,7 +112,7 @@ class DiscussionsController extends VanillaController {
             }
         }
         if (!$this->description()) {
-            $this->description(c('Garden.Description', null));
+            $this->description(Gdn::formatService()->renderPlainText(c('Garden.Description', ''), HtmlFormat::FORMAT_KEY));
         }
         if ($this->Head) {
             $this->Head->addRss(url('/discussions/feed.rss', true), $this->Head->title());
@@ -128,26 +130,37 @@ class DiscussionsController extends VanillaController {
         $categoryModel = new CategoryModel();
         $followingEnabled = $categoryModel->followingEnabled();
         if ($followingEnabled) {
-            $saveFollowing = Gdn::request()->get('save') && Gdn::session()->validateTransientKey(Gdn::request()->get('TransientKey', ''));
-            $followed = paramPreference(
-                'followed',
-                'FollowedDiscussions',
-                'Vanilla.SaveFollowingPreference',
-                null,
-                $saveFollowing
-            );
-            if ($this->SelfUrl === "discussions") {
-                $this->enableFollowingFilter = true;
+
+            // some other controller has already set this value, so just take what's there
+            if (array_key_exists('EnableFollowingFilter', $this->Data)) {
+                $this->enableFollowingFilter = $this->data('EnableFollowingFilter');
+            } else {
+                $saveFollowing = Gdn::request()->get('save') && Gdn::session()->validateTransientKey(Gdn::request()->get('TransientKey', ''));
+                $followed = paramPreference(
+                    'followed',
+                    'FollowedDiscussions',
+                    'Vanilla.SaveFollowingPreference',
+                    null,
+                    $saveFollowing
+                );
+                if (strpos($this->SelfUrl, "discussions") !== false) {
+                    $this->enableFollowingFilter = true;
+                }
             }
         } else {
             $followed = false;
         }
         $this->setData('EnableFollowingFilter', $this->enableFollowingFilter);
-        $this->setData('Followed', $followed);
+        if ($this->enableFollowingFilter) {
+            $this->setData('Followed', $followed);
+        }
 
         // Set criteria & get discussions data
         $this->setData('Category', false, true);
         $DiscussionModel = new DiscussionModel();
+        if ($this->data('ApplyRestrictions') === true) {
+            $DiscussionModel->setOption('ApplyRestrictions', true);
+        }
         $DiscussionModel->setSort(Gdn::request()->get());
         $DiscussionModel->setFilters(Gdn::request()->get());
         $this->setData('Sort', $DiscussionModel->getSort());
@@ -167,6 +180,7 @@ class DiscussionsController extends VanillaController {
                 $visibleFollowedCategories = array_intersect($followedCategories, $visibleCategoriesResult);
             }
             $where['d.CategoryID'] = $visibleFollowedCategories;
+            $announcementsWhere['d.CategoryID'] = $visibleFollowedCategories;
         } elseif ($categoryIDs) {
             $where['d.CategoryID'] = $announcementsWhere['d.CategoryID'] = CategoryModel::filterCategoryPermissions($categoryIDs);
         } else {
@@ -266,7 +280,7 @@ class DiscussionsController extends VanillaController {
 
         // Setup head.
         if (!$this->data('Title')) {
-            $title = c('Garden.HomepageTitle');
+            $title = Gdn::formatService()->renderPlainText(c('Garden.HomepageTitle'), HtmlFormat::FORMAT_KEY);
             if ($title) {
                 $this->title($title, '');
             } else {
@@ -274,7 +288,7 @@ class DiscussionsController extends VanillaController {
             }
         }
         if (!$this->description()) {
-            $this->description(c('Garden.Description', null));
+            $this->description(Gdn::formatService()->renderPlainText(c('Garden.Description', ''), HtmlFormat::FORMAT_KEY));
         }
         if ($this->Head) {
             $this->Head->addRss(url('/discussions/unread/feed.rss', true), $this->Head->title());

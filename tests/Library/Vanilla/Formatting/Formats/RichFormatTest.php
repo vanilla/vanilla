@@ -7,17 +7,22 @@
 
 namespace VanillaTests\Library\Vanilla\Formatting\Formats;
 
+use PHPUnit\Framework\TestCase;
 use Vanilla\Contracts\Formatting\FormatInterface;
 use Vanilla\EmbeddedContent\Embeds\ImageEmbed;
 use Vanilla\EmbeddedContent\EmbedService;
 use Vanilla\Formatting\Formats\RichFormat;
-use Vanilla\Formatting\Quill\Parser;
+use VanillaTests\EventSpyTestTrait;
 use VanillaTests\Fixtures\Formatting\FormatFixtureFactory;
+use VanillaTests\SiteTestTrait;
 
 /**
  * Tests for the RichFormat.
  */
-class RichFormatTest extends AbstractFormatTestCase {
+class RichFormatTest extends TestCase {
+
+    use SiteTestTrait;
+    use EventSpyTestTrait;
 
     /**
      * @inheritDoc
@@ -34,5 +39,15 @@ class RichFormatTest extends AbstractFormatTestCase {
      */
     protected function prepareFixtures(): array {
         return (new FormatFixtureFactory('rich'))->getAllFixtures();
+    }
+
+    /**
+     * Test parseImageUrls excludes emojis.
+     */
+    public function testParseImageUrlsExcludeEmojis() {
+        $formatService = $this->prepareFormatter();
+        $content = '[{"insert":{"emoji":{"emojiChar":"😀"}}},{"insert":"\n"}]';
+        $result = $formatService->parseImageUrls($content);
+        $this->assertEquals([], $result);
     }
 }

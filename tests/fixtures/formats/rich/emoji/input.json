@@ -5,5 +5,8 @@
     { "insert": { "emoji": { "emojiChar": "😏" } } },
     { "insert": "\n" },
     { "insert": { "emoji": { "emojiChar": "😮" } } },
-    { "insert": "\n" }
+    { "insert": "\n" },
+    { "attributes": { "bold": true }, "insert": "Bold text " },
+    { "attributes": { "bold": true }, "insert": { "emoji": { "emojiChar": "🔥" } } },
+    { "insert": " This should not be bold\n" }
 ]

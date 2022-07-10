@@ -4,15 +4,12 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut, debugHelper, unit } from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
-import { containerVariables } from "@library/layout/components/containerStyles";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { calc, percent, translateX, viewWidth } from "csx";
-import { dropDownClasses } from "@library/flyouts/dropDownStyles";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { styleUnit } from "@library/styles/styleUnit";
+import { styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 
 export const dayPickerVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -30,10 +27,13 @@ export const dayPickerVariables = useThemeCache(() => {
     const colors = makeThemeVars("colors", {
         today: globalVars.mainColors.primary,
         selected: {
-            color: globalVars.states.selected.highlight,
+            color: globalVars.mainColors.primary,
+            bg: globalVars.states.hover.highlight,
         },
         hover: {
             bg: globalVars.states.hover.highlight,
+            //fix accessibility
+            color: globalVars.elementaryColors.darkText,
         },
     });
 
@@ -55,33 +55,43 @@ export const dayPickerClasses = useThemeCache(() => {
 
     // From third party, so we're targetting them this way
     const root = style({
-        $nest: {
-            "& .DayPicker-wrapper": {
+        ...{
+            ".DayPicker-wrapper": {
                 padding: 0,
             },
-            "& .DayPicker-Month": {
-                margin: unit(vars.spacing.padding),
+            ".DayPicker-Month": {
+                margin: styleUnit(vars.spacing.padding),
             },
-            "& .DayPicker-Day": {
-                borderRadius: unit(vars.border.radius),
-                padding: unit(vars.spacing.padding),
+            ".DayPicker-Day": {
+                borderRadius: styleUnit(vars.border.radius),
+                padding: styleUnit(vars.spacing.padding),
                 whiteSpace: "nowrap",
-                $nest: {
+                ...{
                     "&:hover": {
                         backgroundColor: vars.colors.hover.bg.toString(),
                     },
                 },
             },
-            "& .DayPicker-Day--selected:not(.DayPicker-Day--disabled):not(.DayPicker-Day--outside)": {
-                backgroundColor: vars.colors.selected.color.toString(),
-                $nest: {
+            ".DayPicker-Day--selected:not(.DayPicker-Day--disabled):not(.DayPicker-Day--outside)": {
+                backgroundColor: vars.colors.selected.bg.toString(),
+                color: vars.colors.selected.color.toString(),
+                //fix accessibility
+                fontWeight: "bold",
+                ...{
                     "&:hover": {
-                        backgroundColor: vars.colors.selected.color.toString(),
+                        backgroundColor: vars.colors.selected.bg.toString(),
+                        //fix accessibility
+                        color: vars.colors.hover.color.toString(),
+                        fontWeight: "normal",
                     },
                 },
             },
-            "& .DayPicker-Day.DayPicker-Day--today": {
-                color: colorOut(vars.colors.today),
+            ".DayPicker-Day.DayPicker-Day--today": {
+                color: ColorsUtils.colorOut(vars.colors.today),
+            },
+            //fix accessibility
+            ".DayPicker-Weekday, .DayPicker-Day--outside": {
+                color: "#767676",
             },
         },
     });
@@ -89,14 +99,14 @@ export const dayPickerClasses = useThemeCache(() => {
     const header = style("header", {
         display: "flex",
         alignItems: "center",
-        height: unit(vars.sizing.height),
-        paddingLeft: unit(vars.spacing.padding),
-        marginTop: unit(vars.spacing.padding),
+        height: styleUnit(vars.sizing.height),
+        paddingLeft: styleUnit(vars.spacing.padding),
+        marginTop: styleUnit(vars.spacing.padding),
     });
 
     const title = style("title", {
         flex: 1,
-        padding: unit(vars.spacing.padding),
+        padding: styleUnit(vars.spacing.padding),
     });
 
     const navigation = style("navigation", {

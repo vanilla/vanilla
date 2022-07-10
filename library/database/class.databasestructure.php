@@ -13,6 +13,15 @@
  * Used by any given database driver to build, modify, and create tables and views.
  */
 abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
+
+    public const KEY_TYPE_FULLTEXT = "fulltext";
+
+    public const KEY_TYPE_INDEX = "index";
+
+    public const KEY_TYPE_PRIMARY = "primary";
+
+    public const KEY_TYPE_UNIQUE = "unique";
+
     /**
      * @var int The maximum number of rows allowed for an alter table.
      */
@@ -53,11 +62,13 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
     /** @var string The name of the storage engine for this table. */
     protected $_TableStorageEngine;
 
+    /** @var bool */
+    private $fullTextIndexingEnabled = false;
+
     /**
      * The constructor for this class. Automatically fills $this->ClassName.
      *
-     * @param string $database
-     * @todo $database needs a description.
+     * @param Gdn_Database|null $database
      */
     public function __construct($database = null) {
         parent::__construct();
@@ -103,14 +114,14 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
     }
 
     /**
+     * Create a column and return its object representation.
      *
-     *
-     * @param $name
-     * @param $type
-     * @param $null
-     * @param $default
-     * @param $keyType
-     * @return stdClass
+     * @param string $name
+     * @param string $type
+     * @param bool $null
+     * @param mixed $default
+     * @param string|array|false $keyType
+     * @return object
      */
     protected function _createColumn($name, $type, $null, $default, $keyType) {
         $length = '';
@@ -175,7 +186,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
      * * TRUE: Nulls are allowed.
      * * FALSE: Nulls are not allowed.
      * * Any other value: Nulls are not allowed, and the specified value will be used as the default.
-     * @param string $keyType What type of key is this column on the table? Options
+     * @param string|false $keyType What type of key is this column on the table? Options
      * are primary, key, and FALSE (not a key).
      * @return $this
      */
@@ -200,15 +211,15 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
         foreach ($keyTypes as $keyType1) {
             $parts = explode('.', $keyType1, 2);
 
-            if (in_array($parts[0], ['primary', 'key', 'index', 'unique', 'fulltext', false])) {
+            if (in_array($parts[0], $this->validKeyTypes())) {
                 $keyTypes1[] = $keyType1;
             }
         }
         if (count($keyTypes1) == 0) {
             $keyType = false;
-        } elseif (count($keyTypes1) == 1)
+        } elseif (count($keyTypes1) == 1) {
             $keyType = $keyTypes1[0];
-        else {
+        } else {
             $keyType = $keyTypes1;
         }
 
@@ -239,7 +250,8 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
     /**
      * An associative array of $ColumnName => $ColumnProperties columns for the table.
      *
-     * @return array
+     * @param string $name The name of the column to fetch. Specify an empty string to get them all.
+     * @return array|object
      */
     public function columns($name = '') {
         if (strlen($name) > 0) {
@@ -280,13 +292,13 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
 
         if ($type && $length && $precision) {
             $result = "$type($length, $precision)";
-        } elseif ($type && $length)
+        } elseif ($type && $length) {
             $result = "$type($length)";
-        elseif (strtolower($type) == 'enum') {
+        } elseif (strtolower($type) == 'enum') {
             $result = val('Enum', $column, []);
-        } elseif ($type)
+        } elseif ($type) {
             $result = $type;
-        else {
+        } else {
             $result = 'int';
         }
 
@@ -297,7 +309,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
      * Gets and/or sets the database prefix.
      *
      * @param string $databasePrefix
-     * @todo $databasePrefix needs a description.
+     * @return string
      */
     public function databasePrefix($databasePrefix = '') {
         if ($databasePrefix != '') {
@@ -324,9 +336,9 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
     }
 
     /**
+     * Set the storage engine for the table.
      *
-     *
-     * @param $engine
+     * @param string $engine
      * @param bool $checkAvailability
      * @return $this
      */
@@ -334,6 +346,23 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
         trigger_error(errorMessage('The selected database engine does not perform the requested task.', $this->ClassName, 'Engine'), E_USER_ERROR);
     }
 
+    /**
+     * Is full-text indexing of columns allowed?
+     *
+     * @return bool
+     */
+    public function isFullTextIndexingEnabled(): bool {
+        return $this->fullTextIndexingEnabled;
+    }
+
+    /**
+     * Should full-text indexing of columns be allowed?
+     *
+     * @param bool $fullTextIndexing
+     */
+    public function setFullTextIndexingEnabled(bool $fullTextIndexing): void {
+        $this->fullTextIndexingEnabled = $fullTextIndexing;
+    }
 
     /**
      * Load the schema for this table from the database.
@@ -381,50 +410,19 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
     /**
      * Send a query to the database and return the result.
      *
-     * @deprecated since 2.3. Was incorrectly public. Replaced by executeQuery().
-     * @param string $sql The sql to execute.
-     * @param bool $checkTreshold Should not be used
-     * @return Gdn_Dataset
-     */
-    public function query($sql, $checkTreshold = false) {
-
-        $class = null;
-        $internalCall = false;
-
-        // Detect the origin of this call.
-        $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-        if (count($backtrace) > 1) {
-            $class = val('class', $backtrace[1]);
-            if ($class) {
-                $internalCall = is_a($class, __CLASS__, true);
-            }
-        }
-
-        // Give appropriate message based on whether we're using it internally.
-        if ($internalCall) {
-            deprecated("$class::query()", "$class::executeQuery()");
-            return $this->executeQuery($sql, $checkTreshold);
-        } else {
-            deprecated(__CLASS__.'::query()', 'Gdn_SQLDriver::query()');
-            return $this->Database->query($sql);
-        }
-    }
-
-    /**
-     * Send a query to the database and return the result.
-     *
      * @param string $sql The sql to execute.
      * @param bool $checkThreshold Whether or not to check the alter table threshold before altering the table.
      * @return bool Whether or not the query succeeded.
      */
-    protected function executeQuery($sql, $checkThreshold = false) {
+    public function executeQuery($sql, $checkThreshold = false) {
         if ($this->CaptureOnly) {
             if (!property_exists($this->Database, 'CapturedSql')) {
                 $this->Database->CapturedSql = [];
             }
             $this->Database->CapturedSql[] = $sql;
             return true;
-        } elseif ($checkThreshold && $this->getAlterTableThreshold() && $this->getRowCountEstimate($this->tableName()) >= $this->getAlterTableThreshold()) {
+        } elseif ($checkThreshold && $this->getAlterTableThreshold() &&
+            $this->getRowCountEstimate($this->tableName()) >= $this->getAlterTableThreshold()) {
             $this->addIssue("The table was past its threshold. Run the alter manually.", $sql);
 
             // Log an event to be captured and analysed later.
@@ -541,6 +539,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
     /**
      * Whether or not the table exists in the database.
      *
+     * @param string|null $tableName
      * @return bool
      */
     public function tableExists($tableName = null) {
@@ -583,6 +582,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
      *  - <b>string</b>: String types.
      *  - <b>date</b>: Date types.
      *  - <b>length</b>: Types that have a length.
+     *  - <b>defineLength</b>: Types that MUST be defined with a length.
      *  - <b>precision</b>: Types that have a precision.
      *  - <b>other</b>: Types that don't fit into any other category on their own.
      *  - <b>all</b>: All recognized types.
@@ -592,7 +592,8 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
         $decimal = ['decimal', 'numeric'];
         $float = ['float', 'double'];
         $int = ['int', 'tinyint', 'smallint', 'mediumint', 'bigint'];
-        $string = ['varchar', 'char', 'mediumtext', 'text'];
+        $char = ['varchar', 'char'];
+        $text = ['tinytext', 'text', 'mediumtext', 'longtext'];
         $length = ['varbinary'];
         $other = ['enum', 'tinyblob', 'blob', 'mediumblob', 'longblob', 'ipaddress'];
 
@@ -600,22 +601,22 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
             case 'date':
                 return $date;
             case 'decimal':
+            case 'precision':
                 return $decimal;
             case 'float':
                 return $float;
             case 'int':
                 return $int;
             case 'string':
-                return $string;
+                return array_merge($char, $text);
             case 'other':
                 return array_merge($length, $other);
-
             case 'numeric':
                 return array_merge($float, $int, $decimal);
             case 'length':
-                return array_merge($string, $length, $decimal);
-            case 'precision':
-                return $decimal;
+                return array_merge($char, $text, $length, $decimal);
+            case 'definelength':
+                return array_merge($char, $length, $decimal);
             default:
                 return [];
         }
@@ -625,9 +626,9 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
      * Specifies the name of the view to create or modify.
      *
      * @param string $name The name of the view.
-     * @param string $query Query to create as the view. Typically this can be generated with the $Database object.
+     * @param string $sql Query to create as the view. Typically this can be generated with the $Database object.
      */
-    public function view($name, $query) {
+    public function view($name, $sql) {
         trigger_error(errorMessage('The selected database engine can not create or modify views.', $this->ClassName, 'View'), E_USER_ERROR);
     }
 
@@ -699,5 +700,24 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
      */
     public function getIssues() {
         return $this->issues;
+    }
+
+    /**
+     * Get all valid key types.
+     *
+     * @return array
+     */
+    private function validKeyTypes(): array {
+        $result = [
+            self::KEY_TYPE_PRIMARY,
+            self::KEY_TYPE_INDEX,
+            self::KEY_TYPE_UNIQUE,
+            'key',
+            false
+        ];
+        if ($this->isFullTextIndexingEnabled()) {
+            $result[] = self::KEY_TYPE_FULLTEXT;
+        }
+        return $result;
     }
 }

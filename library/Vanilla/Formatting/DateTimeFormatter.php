@@ -8,6 +8,7 @@
 namespace Vanilla\Formatting;
 
 use Garden\StaticCacheTranslationTrait;
+use Vanilla\CurrentTimeStamp;
 
 /**
  * Formatting methods related to dates & times.
@@ -35,7 +36,7 @@ class DateTimeFormatter {
      *
      * @link http://us.php.net/manual/en/function.strftime.php
      *
-     * @param string|number $timestamp A timestamp or string in Mysql DateTime format. ie. YYYY-MM-DD HH:MM:SS
+     * @param string|int $timestamp A timestamp or string in Mysql DateTime format. ie. YYYY-MM-DD HH:MM:SS
      * @param bool $isHtml Whether or not to output this as an HTML string.
      * @param string $format The format string to use. Defaults to the application's default format.
      * @return string
@@ -279,6 +280,15 @@ class DateTimeFormatter {
      */
     public static function timeStampToDateTime(int $timestamp): string {
         return date('Y-m-d H:i:s', $timestamp);
+    }
+
+    /**
+     * Get the current time formatted as time string.
+     *
+     * @return string
+     */
+    public static function getCurrentDateTime(): string {
+        return self::timeStampToDateTime(CurrentTimeStamp::get());
     }
 
 

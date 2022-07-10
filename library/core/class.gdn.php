@@ -11,8 +11,15 @@
  * @since 2.0
  */
 
+use Garden\Container\ContainerException;
+use Garden\Container\NotFoundException;
+use Garden\EventManager;
+use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Formatting\DateTimeFormatter;
 use Vanilla\Formatting\FormatService;
+use Vanilla\Scheduler\SchedulerInterface;
 use Vanilla\Theme\ThemeFeatures;
+use Vanilla\Utility\Timers;
 
 /**
  * Framework superobject.
@@ -87,12 +94,35 @@ class Gdn {
     protected static $_Session = null;
 
     /**
+     * @var Gdn_Controller|null
+     */
+    protected static $controller = null;
+
+    /**
      * Get the addon manager.
      *
      * @return \Vanilla\AddonManager
      */
     public static function addonManager() {
         return self::factory(self::AliasAddonManager);
+    }
+
+    /**
+     * Get the addon manager.
+     *
+     * @return SchedulerInterface
+     */
+    public static function scheduler(): SchedulerInterface {
+        return self::getContainer()->get(SchedulerInterface::class);
+    }
+
+    /**
+     * Get the event manager.
+     *
+     * @return EventManager
+     */
+    public static function eventManager(): EventManager {
+        return self::getContainer()->get(EventManager::class);
     }
 
     /**
@@ -135,7 +165,7 @@ class Gdn {
     /**
      * Get a configuration setting for the application.
      *
-     * @param string $name The name of the configuration setting. Settings in different sections are seperated by a dot ('.')
+     * @param string|false $name The name of the configuration setting. Settings in different sections are seperated by a dot ('.')
      * @param mixed $default The result to return if the configuration setting is not found.
      * @return Gdn_Configuration|mixed The configuration setting.
      */
@@ -157,14 +187,21 @@ class Gdn {
      * @param Gdn_Controller $value
      * @return Gdn_Controller
      */
-    public static function controller($value = null) {
-        static $controller = null;
-
-        if ($value !== null) {
-            $controller = $value;
+    public static function controller($value = null): ?Gdn_Controller {
+        if ($value instanceof Gdn_Controller) {
+            self::$controller = $value;
         }
 
-        return $controller;
+        return self::$controller;
+    }
+
+    /**
+     * Set the controller to an explicit value.
+     *
+     * @param Gdn_Controller|null $controller
+     */
+    public static function setController(?Gdn_Controller $controller) {
+        self::$controller = $controller;
     }
 
     /**
@@ -183,6 +220,13 @@ class Gdn {
      */
     public static function database() {
         return self::factory(self::AliasDatabase);
+    }
+
+    /**
+     * @return DateTimeFormatter
+     */
+    public static function dateTimeFormatter(): DateTimeFormatter {
+        return self::getContainer()->get(DateTimeFormatter::class);
     }
 
     /**
@@ -209,7 +253,7 @@ class Gdn {
 
             $result = $dic->getArgs($alias, (array)$args);
             return $result;
-        } catch (\Garden\Container\NotFoundException $ex) {
+        } catch (NotFoundException $ex) {
             return null;
         }
     }
@@ -451,10 +495,25 @@ class Gdn {
         return self::$_Session;
     }
 
+    /**
+     * Set a usermeta item for user 0.
+     *
+     * @param string $key
+     * @param null $value
+     * @deprecated Use UserMetaModel
+     */
     public static function set($key, $value = null) {
         return Gdn::userMetaModel()->setUserMeta(0, $key, $value);
     }
 
+    /**
+     * Get a usermeta item for user 0.
+     *
+     * @param string $key
+     * @param null $default
+     * @return false|mixed|null
+     * @deprecated Use UserMetaModel.
+     */
     public static function get($key, $default = null) {
         $response = Gdn::userMetaModel()->getUserMeta(0, $key, $default);
         if (sizeof($response) == 1) {
@@ -516,7 +575,7 @@ class Gdn {
      * Translates a code into the selected locale's definition.
      *
      * @param string $code The code related to the language-specific definition.
-     * @param string $default The default value to be displayed if the translation code is not found.
+     * @param string|false $default The default value to be displayed if the translation code is not found.
      * @return string The translated string or $code if there is no value in $default.
      */
     public static function translate($code, $default = false) {
@@ -590,5 +649,31 @@ class Gdn {
         self::$_Request = null;
         self::$_PluginManager = null;
         self::$_Session = null;
+    }
+
+    /**
+     * GetTimers
+     *
+     * @return Timers
+     */
+    public static function getTimers(): Timers {
+        try {
+            return self::getContainer()->get(Timers::class);
+        } catch (Throwable $e) {
+            throw new RuntimeException('error instantiating Timers');
+        }
+    }
+
+    /**
+     * GetScheduler
+     *
+     * @return SchedulerInterface
+     */
+    public static function getScheduler(): SchedulerInterface {
+        try {
+            return self::getContainer()->get(SchedulerInterface::class);
+        } catch (Throwable $e) {
+            throw new RuntimeException('error instantiating SchedulerInterface');
+        }
     }
 }

@@ -23,8 +23,10 @@ class LegacyTwigViewHandler implements LegacyViewHandlerInterface {
      */
     public function render($path, $controller) {
         // Extra data to merge into the controllers data for every render.
+        $form = $controller->Form ?? ($controller->form ?? null);
+
         $extraData = [
-            'form' => isset($controller->Form) ? new TwigFormWrapper($controller->Form) : null,
+            'form' => is_a($form, \Gdn_Form::class) ? new TwigFormWrapper($form) : null,
             'category' => $controller->Category ?? null,
             'discussion' => $controller->Discussion ?? null,
             'pluggable' => $controller instanceof \Gdn_Pluggable ? $controller : null,

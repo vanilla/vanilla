@@ -2,7 +2,7 @@
 /**
  * Comment model
  *
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Vanilla
  * @since 2.0
@@ -11,26 +11,45 @@
 use Garden\Events\ResourceEvent;
 use Garden\Events\EventFromRowInterface;
 use Garden\Schema\Schema;
+use Garden\Web\Exception\NotFoundException;
+use Psr\SimpleCache\CacheInterface;
 use Vanilla\Attributes;
+use Vanilla\Community\Schemas\PostFragmentSchema;
+use Vanilla\Events\LegacyDirtyRecordTrait;
+use Vanilla\Exception\Database\NoResultsException;
+use Vanilla\Exception\PermissionException;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\FormatFieldTrait;
 use Vanilla\Formatting\UpdateMediaTrait;
+use Vanilla\ImageSrcSet\ImageSrcSet;
+use Vanilla\ImageSrcSet\ImageSrcSetService;
+use Vanilla\ImageSrcSet\MainImageSchema;
+use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Models\UserFragmentSchema;
 use Vanilla\SchemaFactory;
 use Vanilla\Community\Events\CommentEvent;
 use Vanilla\Contracts\Formatting\FormatFieldInterface;
+use Vanilla\Site\OwnSite;
+use Vanilla\Site\SiteSectionModel;
 use Vanilla\Utility\CamelCaseScheme;
+use Vanilla\Utility\InstanceValidatorSchema;
+use Vanilla\Utility\ModelUtils;
+use Webmozart\Assert\Assert;
+use Vanilla\Search\SearchService;
+use Vanilla\Search\SearchTypeQueryExtenderInterface;
 
 /**
  * Manages discussion comments data.
  */
-class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromRowInterface {
+class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromRowInterface, \Vanilla\Contracts\Models\CrawlableInterface {
 
     use \Vanilla\FloodControlTrait;
 
     use UpdateMediaTrait;
 
     use FormatFieldTrait;
+
+    use LegacyDirtyRecordTrait;
 
     /** Threshold. */
     const COMMENT_THRESHOLD_SMALL = 1000;
@@ -53,8 +72,11 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
     /** @var bool */
     public $pageCache;
 
+    /** @var array */
+    private $options;
+
     /**
-     * @var \Vanilla\CacheInterface Object used to store the FloodControl data.
+     * @var CacheInterface Object used to store the FloodControl data.
      */
     protected $floodGate;
 
@@ -69,6 +91,18 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
     /** @var UserModel */
     private $userModel;
 
+    /** @var CategoryModel */
+    private $categoryModel;
+
+    /** @var SiteSectionModel */
+    private $siteSectionModel;
+
+    /** @var OwnSite */
+    private $ownSite;
+
+    /** @var ImageSrcSetService */
+    private $imageSrcSetService;
+
     /**
      * Class constructor. Defines the related database table name.
      *
@@ -77,15 +111,20 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
     public function __construct(Gdn_Validation $validation = null) {
         parent::__construct('Comment', $validation);
 
+        $this->imageSrcSetService = Gdn::getContainer()->get(ImageSrcSetService::class);
+
         $this->floodGate = FloodControlHelper::configure($this, 'Vanilla', 'Comment');
         $this->pageCache = Gdn::cache()->activeEnabled() && c('Properties.CommentModel.pageCache', false);
 
         $this->discussionModel = Gdn::getContainer()->get(DiscussionModel::class);
         $this->userModel = Gdn::getContainer()->get(UserModel::class);
+        $this->categoryModel = Gdn::getContainer()->get(CategoryModel::class);
+        $this->siteSectionModel = Gdn::getContainer()->get(SiteSectionModel::class);
         $this->setFormatterService(Gdn::getContainer()->get(FormatService::class));
         $this->setMediaForeignTable($this->Name);
         $this->setMediaModel(Gdn::getContainer()->get(MediaModel::class));
         $this->setSessionInterface(Gdn::getContainer()->get("Session"));
+        $this->ownSite = \Gdn::getContainer()->get(OwnSite::class);
 
         $this->fireEvent('AfterConstruct');
     }
@@ -160,13 +199,21 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
      * @access public
      *
      * @param bool $fireEvent Kludge to fix VanillaCommentReplies plugin.
+     * @param bool $join Whether or not to join in insertUser/updateUser information.
      */
     public function commentQuery($fireEvent = true, $join = true) {
         $this->SQL->select('c.*')
-//         ->select('du.Name', '', 'DeleteName')
-//         ->selectCase('c.DeleteUserID', array('null' => '0', '' => '1'), 'Deleted')
-//         ->join('User du', 'c.DeleteUserID = du.UserID', 'left');
-            ->from('Comment c');
+            ->select(['d.CategoryID', 'd.Name as DiscussionName', 'd.Type as DiscussionType'])
+            ->join('Discussion d', 'c.DiscussionID = d.DiscussionID')
+            ->from('Comment c')
+            ->where('d.DiscussionID is not NULL')
+            ->where('d.CategoryID is not NUll')
+        ;
+
+        $extraSelects = \Gdn::eventManager()->fireFilter("commentModel_extraSelects", []);
+        if (!empty($extraSelects)) {
+            $this->SQL->select($extraSelects);
+        }
 
         if ($join) {
             $this->SQL
@@ -232,7 +279,7 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
         } else {
             // Fallback to the configured sort fields on the object.
             foreach ($this->_OrderBy as $defaultOrder) {
-                list($field, $dir) = $defaultOrder;
+                [$field, $dir] = $defaultOrder;
                 // Reset any potential table prefixes, if we have an alias.
                 if ($alias) {
                     $parts = explode('.', $field);
@@ -252,7 +299,7 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
      */
     public function getWhere($where = false, $orderFields = '', $orderDirection = 'asc', $limit = false, $offset = false) {
         $where = $this->stripWherePrefixes($where);
-        list($where, $options) = $this->splitWhere($where, ['joinUsers' => true, 'joinDiscussions' => false]);
+        [$where, $options] = $this->splitWhere($where, ['joinUsers' => true, 'joinDiscussions' => false]);
 
         // Build up an inner select of comments to force late-loading.
         $innerSelect = $this->select($where, $orderFields, $orderDirection, $limit, $offset, 'c3');
@@ -367,7 +414,6 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
         $this->fireEvent('BeforeGet');
         $this->SQL
             ->select('d.Name', '', 'DiscussionName')
-            ->join('Discussion d', 'c.DiscussionID = d.DiscussionID')
             ->where('c.InsertUserID', $userID)
             ->orderBy('c.CommentID', 'desc')
             ->limit($limit, $offset);
@@ -401,10 +447,18 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
      * @param int|bool $lastCommentID A hint for quicker paging.
      * @param string|null $after Only pull comments following this date.
      * @param string $order Order comments ascending (asc) or descending (desc) by ID.
+     * @param string $permission Permission to filter categories by.
      * @return Gdn_DataSet SQL results.
      */
-    public function getByUser2($userID, $limit, $offset, $lastCommentID = false, $after = null, $order = 'desc') {
-        $perms = DiscussionModel::categoryPermissions();
+    public function getByUser2($userID, $limit, $offset, $lastCommentID = false, $after = null, $order = 'desc', string $permission = '') {
+        // This will load all categories. (do not use unless necessary).
+        if (!empty($permission)) {
+            $categories = CategoryModel::categories();
+            $perms = CategoryModel::filterExistingCategoryPermissions($categories, $permission);
+            $perms = array_column($perms, 'CategoryID');
+        } else {
+            $perms = DiscussionModel::categoryPermissions();
+        }
 
         if (is_array($perms) && empty($perms)) {
             return new Gdn_DataSet([]);
@@ -434,7 +488,7 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
         } else {
             $this->SQL->limit($limit, $offset);
         }
-
+        $this->fireEvent('BeforeGetByUser');
         $data = $this->SQL->get();
 
 
@@ -474,6 +528,28 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
     }
 
     /**
+     * Set model option
+     *
+     * @param string $option
+     * @param mixed $value
+     */
+    public function setOption(string $option, $value) {
+        $this->options[$option] = $value;
+    }
+
+
+    /**
+     * Get model option
+     *
+     * @param string $option
+     * @param null $default
+     * @return mixed|null
+     */
+    public function getOption(string $option, $default = null) {
+        return $this->options[$option] ?? $default;
+    }
+
+    /**
      * @inheritdoc
      */
     public function getDefaultLimit() {
@@ -496,7 +572,10 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
         if ($limit === null) {
             $limit = $this->getDefaultLimit();
         }
-
+        $joinDirtyRecords = $where[DirtyRecordModel::DIRTY_RECORD_OPT] ?? false;
+        if (isset($where[DirtyRecordModel::DIRTY_RECORD_OPT])) {
+            unset($where[DirtyRecordModel::DIRTY_RECORD_OPT]);
+        }
         $perms = DiscussionModel::categoryPermissions();
 
         if (is_array($perms) && empty($perms)) {
@@ -511,15 +590,19 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
             }
         }
 
-        $this->orderBy('c.'.$sort);
-        $orderBy = $this->orderBy();
+        $query = $this->SQL;
+        // Apply the base of the query.
+        $this->commentQuery(false, false);
 
-        $query = $this->SQL
-            ->select('c.*')
-            ->select('d.CategoryID')
-            ->from('Comment c')
-            ->join('Discussion d', 'c.DiscussionID = d.DiscussionID')
-            ->orderBy($orderBy[0][0], $order);
+        if ($sort === 'dateUpdated') {
+            $this->orderBy('sortDateUpdated');
+            $query->select('c.dateUpdated, c.dateInserted', 'COALESCE', 'sortDateUpdated');
+        } else {
+            $this->orderBy('c.'.$sort);
+        }
+        $orderBy = $this->orderBy();
+        $query->orderBy($orderBy[0][0], $order);
+
         if (!empty($where)) {
             $query->where($where);
         }
@@ -529,6 +612,10 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
         if ($offset) {
             $query->offset($offset);
         }
+        if ($joinDirtyRecords) {
+            $this->applyDirtyWheres('c');
+        }
+
         $result = $query->get();
         $data =& $result->result();
         $this->LastCommentCount = $result->numRows();
@@ -693,15 +780,20 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
         $advancedActivity = $data;
         $advancedActivity["Data"]["Reason"] = "advanced";
         $this->recordAdvancedNotications($activityModel, $advancedActivity, $discussion);
-
+        $isValid = true;
         // Throw an event for users to add their own events.
         $this->EventArguments["Comment"] = $comment;
         $this->EventArguments["Discussion"] = $discussion;
         $this->EventArguments["NotifiedUsers"] = array_keys(ActivityModel::$Queue);
+        $this->EventArguments["UserModel"] = $this->userModel;
+        $this->EventArguments["IsValid"] = &$isValid;
         $this->EventArguments["MentionedUsers"] = $mentions;
         $this->EventArguments["ActivityModel"] = $activityModel;
         $this->fireEvent("BeforeNotification");
 
+        if (!$isValid) {
+            return ;
+        }
         if (\Vanilla\FeatureFlagHelper::featureEnabled("deferredNotifications")) {
             // Queue sending notifications.
             /** @var Vanilla\Scheduler\SchedulerInterface $scheduler */
@@ -879,15 +971,34 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
         $result = Schema::parse([
             'commentID:i' => 'The ID of the comment.',
             'discussionID:i' => 'The ID of the discussion.',
-            'body:s' => 'The body of the comment.',
+            'discussionCollapseID:s?',
+            'name:s?' => [
+                'description' => 'The name of the comment',
+                'x-localize' => true,
+            ],
+            'categoryID:i?' => 'The ID of the category of the comment',
+            'body:s?' => [
+                'description' => 'The body of the comment.',
+            ],
+            'bodyRaw:s?',
+            'bodyPlainText:s?' => [
+                'description' => 'The body of the comment in plain text.',
+                'x-localize' => true,
+            ],
             'dateInserted:dt' => 'When the comment was created.',
             'dateUpdated:dt|n' => 'When the comment was last updated.',
             'insertUserID:i' => 'The user that created the comment.',
             'updateUserID:i|n',
-            'name:s?', // Should be represented relative to the discussion (e.g. "Re: My Discussion")
             'score:i|n' => 'Total points associated with this post.',
             'insertUser?' => SchemaFactory::get(UserFragmentSchema::class, "UserFragment"),
-            'url:s?' => 'The full URL to the comment.'
+            'url:s?' => 'The full URL to the comment.',
+            'labelCodes:a?' => ['items' => ['type' => 'string']],
+            'type:s?' => 'Record type for search drivers.',
+            'format:s?' => 'The format of the comment',
+            'groupID:i?' => [
+                'x-null-value' => -1,
+            ],
+            'image?' => new MainImageSchema(),
         ]);
         return $result;
     }
@@ -918,10 +1029,7 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
     /**
      * Count total comments in a discussion specified by $where conditions.
      *
-     * @since 2.0.0
-     * @access public
-     *
-     * @param array $where Conditions
+     * @param array|false $where Conditions
      * @return object SQL result.
      */
     public function getCountWhere($where = false) {
@@ -939,22 +1047,19 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
     /**
      * Get single comment by ID. Allows you to pick data format of return value.
      *
-     * @since 2.0.0
-     * @access public
-     *
-     * @param int $commentID Unique ID of the comment.
-     * @param string $resultType Format to return comment in.
+     * @param int $id Unique ID of the comment.
+     * @param string $datasetType Format to return comment in.
      * @param array $options options to pass to the database.
      * @return mixed SQL result in format specified by $resultType.
      */
-    public function getID($commentID, $resultType = DATASET_TYPE_OBJECT, $options = []) {
+    public function getID($id, $datasetType = DATASET_TYPE_OBJECT, $options = []) {
         $this->options($options);
 
         $this->commentQuery(false); // FALSE supresses FireEvent
         $comment = $this->SQL
-            ->where('c.CommentID', $commentID)
+            ->where('c.CommentID', $id)
             ->get()
-            ->firstRow($resultType);
+            ->firstRow($datasetType);
 
         if ($comment) {
             $this->calculate($comment);
@@ -965,11 +1070,9 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
     /**
      * Get single comment by ID as SQL result data.
      *
-     * @since 2.0.0
-     * @access public
-     *
      * @param int $commentID Unique ID of the comment.
-     * @return object SQL result.
+     * @param array $options
+     * @return Gdn_DataSet SQL result.
      */
     public function getIDData($commentID, $options = []) {
         $this->fireEvent('BeforeGetIDData');
@@ -1034,7 +1137,7 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
         // Figure out the where clause based on the sort.
         foreach ($this->_OrderBy as $part) {
             //$Op = count($this->_OrderBy) == 1 || isset($PrevWhere) ? '=' : '';
-            list($expr, $value) = $this->_WhereFromOrderBy($part, $comment, '');
+            [$expr, $value] = $this->_WhereFromOrderBy($part, $comment, '');
 
             if (!isset($prevWhere)) {
                 $this->SQL->where($expr, $value);
@@ -1121,28 +1224,13 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
      * Events: BeforeSaveComment, AfterValidateComment, AfterSaveComment.
      *
      * @param array $formPostValues Data from the form model.
-     * @param array $settings Currently unused.
+     * @param array|false $settings Currently unused.
      * @return int $commentID
      * @since 2.0.0
      */
     public function save($formPostValues, $settings = false) {
         // Define the primary key in this model's table.
         $this->defineSchema();
-
-        // Add & apply any extra validation rules:
-        $this->Validation->applyRule('Body', 'Required');
-        $this->Validation->addRule('MeAction', 'function:ValidateMeAction');
-        $this->Validation->applyRule('Body', 'MeAction');
-        $maxCommentLength = Gdn::config('Vanilla.Comment.MaxLength');
-        if (is_numeric($maxCommentLength) && $maxCommentLength > 0) {
-            $this->Validation->setSchemaProperty('Body', 'maxPlainTextLength', $maxCommentLength);
-            $this->Validation->applyRule('Body', 'plainTextLength');
-        }
-        $minCommentLength = c('Vanilla.Comment.MinLength');
-        if ($minCommentLength && is_numeric($minCommentLength)) {
-            $this->Validation->setSchemaProperty('Body', 'MinTextLength', $minCommentLength);
-            $this->Validation->applyRule('Body', 'MinTextLength');
-        }
 
         // Validate $CommentID and whether this is an insert
         $commentID = val('CommentID', $formPostValues);
@@ -1154,13 +1242,37 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
             $this->addUpdateFields($formPostValues);
         }
 
+        if ($insert || isset($formPostValues['Body'])) {
+            // Apply body validation rules.
+            $this->Validation->applyRule('Body', 'Required');
+            $this->Validation->addRule('MeAction', 'function:ValidateMeAction');
+            $this->Validation->applyRule('Body', 'MeAction');
+            $maxCommentLength = Gdn::config('Vanilla.Comment.MaxLength');
+            if (is_numeric($maxCommentLength) && $maxCommentLength > 0) {
+                $this->Validation->setSchemaProperty('Body', 'maxPlainTextLength', $maxCommentLength);
+                $this->Validation->applyRule('Body', 'plainTextLength');
+            }
+            $minCommentLength = c('Vanilla.Comment.MinLength');
+            if ($minCommentLength && is_numeric($minCommentLength)) {
+                $this->Validation->setSchemaProperty('Body', 'MinTextLength', $minCommentLength);
+                $this->Validation->applyRule('Body', 'MinTextLength');
+            }
+        } else {
+            $this->Validation->unapplyRule('Body');
+        }
+
+        $isValidUser = true;
         // Prep and fire event
         $this->EventArguments['FormPostValues'] = &$formPostValues;
         $this->EventArguments['CommentID'] = $commentID;
+        $this->EventArguments['IsValid'] = &$isValidUser;
+        $this->EventArguments['UserModel'] = $this->userModel;
         $this->fireEvent('BeforeSaveComment');
 
         // Validate the form posted values
         if ($this->validate($formPostValues, $insert)) {
+            $prevDiscussionID = false;
+
             // Backward compatible check for flood control
             if (!val('SpamCheck', $this, true)) {
                 deprecated('DiscussionModel->SpamCheck attribute', 'FloodControlTrait->setFloodControlEnabled()');
@@ -1180,7 +1292,9 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
                     $dateInserted = $fields['DateInserted'];
                 }
 
-                $commentData = $commentID ? array_merge($fields, ['CommentID' => $commentID, 'InsertUserID' => $insertUserID, 'DateInserted' => $dateInserted]) : $fields;
+                $commentData = $commentID ?
+                    array_merge($fields, ['CommentID' => $commentID, 'InsertUserID' => $insertUserID, 'DateInserted' => $dateInserted]) :
+                    $fields;
                 // Check for spam
                 $spam = SpamModel::isSpam('Comment', $commentData);
                 if ($spam) {
@@ -1198,7 +1312,19 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
                     return $invalidReturnType;
                 }
 
+                // Make sure the discussion actually exists (https://github.com/vanilla/vanilla-patches/issues/716).
+                if (isset($formPostValues['DiscussionID'])) {
+                    $discussion = $this->discussionModel->getID($formPostValues['DiscussionID']);
+                    if (!$discussion) {
+                        throw new NotFoundException('Discussion');
+                    }
+                }
+
                 if ($insert === false) {
+                    // Fetch the discussion's data before we save, for comparison's sake.
+                    $previousDiscussion = $this->getID($commentID, DATASET_TYPE_ARRAY);
+                    $prevDiscussionID = $previousDiscussion['DiscussionID'] ?? false;
+
                     // Log the save.
                     LogModel::logChange('Edit', 'Comment', array_merge($fields, ['CommentID' => $commentID]));
 
@@ -1245,17 +1371,19 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
             }
 
             // Update discussion's comment count.
-            if (isset($formPostValues['DiscussionID'])) {
-                $this->updateCommentCount($formPostValues['DiscussionID'], ['Slave' => false]);
+            if (isset($formPostValues['DiscussionID']) && $isValidUser) {
+                // If we have a previous discussion ID & it's different from the current one, it's been changed.
+                $discussionIDChanged = $prevDiscussionID && ($formPostValues['DiscussionID'] !== $prevDiscussionID);
+                if ($insert || !$discussionIDChanged) {
+                    $this->updateCommentCount($formPostValues['DiscussionID'], ['Slave' => false]);
+                } else {
+                    $newDiscussion = $this->discussionModel->getID($formPostValues['DiscussionID'], DATASET_TYPE_ARRAY);
+                    $this->incrementCountsMovedComment($commentData, $previousDiscussion, $newDiscussion);
+                }
             }
         }
         $comment = $commentID ? $this->getID($commentID, DATASET_TYPE_ARRAY) : false;
         if ($comment) {
-            $discussionID = $comment["DiscussionID"] ?? null;
-            if ($discussion = $this->discussionModel->getID($discussionID, DATASET_TYPE_ARRAY)) {
-                $comment["Name"] = sprintf(t("Re: %s"), $discussion["Name"]);
-            }
-
             $commentEvent = $this->eventFromRow(
                 $comment,
                 $insert ? CommentEvent::ACTION_INSERT : CommentEvent::ACTION_UPDATE,
@@ -1267,17 +1395,44 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
     }
 
     /**
+     * Increments count values for the discussion to which a comment has recently been moved to.
+     * Decrement count values  for the discussion from which a comment was removed from.
+     *
+     * @param array $comment
+     * @param array $prevDiscussion
+     * @param array $newDiscussion
+     */
+    private function incrementCountsMovedComment(array $comment, array $prevDiscussion, array $newDiscussion): void {
+        $prevDiscussionID = $prevDiscussion['DiscussionID'] ?? null;
+        $newDiscussionID = $comment['DiscussionID'] ?? null;
+        Assert::notNull($prevDiscussionID, "Expected \$prevDiscussion['DiscussionID']");
+        Assert::notNull($newDiscussionID, "Expected \$comment['DiscussionID']");
+
+        $categoryChanged = $prevDiscussion['CategoryID'] != $newDiscussion['CategoryID'];
+        $this->discussionModel->adjustLastComment($newDiscussion, $comment, 1, $categoryChanged);
+        $this->discussionModel->adjustLastComment($prevDiscussion, $comment, -1, $categoryChanged);
+
+        if ($categoryChanged) {
+            // We've already adjusted the aggregate counts, but we didn't update the normal counts.
+            $this->categoryModel->setField($prevDiscussion['CategoryID'], 'CountComments-', 1);
+            $this->categoryModel->setField($newDiscussion['CategoryID'], 'CountComments+', 1);
+        }
+    }
+
+    /**
      * Generate a comment event object, based on a database row.
      *
      * @param array $row
      * @param string $action
-     * @param array $sender
+     * @param array|object|null $sender
      * @return CommentEvent
      */
-    public function eventFromRow(array $row, string $action, ?array $sender = null): ResourceEvent {
+    public function eventFromRow(array $row, string $action, $sender = null): ResourceEvent {
         $this->userModel->expandUsers($row, ["InsertUserID"]);
-        $comment = $this->normalizeRow($row, true);
-        $comment = $this->schema()->validate($comment);
+        $row = $this->addDiscussionData($row);
+        $comment = $this->normalizeRow($row);
+        $out = $this->schema()->merge(Schema::parse(['discussion:o' => SchemaFactory::get(PostFragmentSchema::class, "PostFragment")]));
+        $comment = $out->validate($comment);
 
         if ($sender) {
             $senderSchema = new UserFragmentSchema();
@@ -1296,16 +1451,54 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
      * Given a database row, massage the data into a more externally-useful format.
      *
      * @param array $row
+     * @param array|string|bool $expand Expand fields.
+     *
      * @return array
      */
-    public function normalizeRow(array $row): array {
+    public function normalizeRow(array $row, $expand = []): array {
+        $rawBody = $row['Body'];
+        $format = $row['Format'];
         $this->formatField($row, "Body", $row["Format"]);
+        $row['Name'] = self::generateCommentName($row["DiscussionName"]);
         $row['Url'] = commentUrl($row);
-        $row['Attributes'] = new Attributes($row['Attributes']);
+        $row['Attributes'] = new Attributes($row['Attributes'] ?? null);
+        $row['InsertUserID'] = $row['InsertUserID'] ?? 0;
+        $row['DateInserted'] = $row['DateInserted'] ?? $row['DateUpdated'] ?? new DateTime();
         $scheme = new CamelCaseScheme();
         $result = $scheme->convertArrayKeys($row);
+        if (ModelUtils::isExpandOption(ModelUtils::EXPAND_CRAWL, $expand)) {
+            $result['recordCollapseID'] = "site{$this->ownSite->getSiteID()}_discussion{$result['discussionID']}";
+            $result['excerpt'] = $this->formatterService->renderExcerpt($rawBody, $format);
+            $result['image'] = $this->formatterService->parseImageUrls($rawBody, $format)[0] ?? null;
+            $result['bodyPlainText'] = \Gdn::formatService()->renderPlainText($rawBody, $format);
+            $result['scope'] = $this->categoryModel->getRecordScope($row['CategoryID']);
+            $result['score'] = $row['Score'] ?? 0;
+            $siteSection = $this->siteSectionModel
+                ->getSiteSectionForAttribute('allCategories', $row['CategoryID']);
+            $result['locale'] = $siteSection->getContentLocale();
+            $searchService = Gdn::getContainer()->get(SearchService::class);
+            /** @var SearchTypeQueryExtenderInterface $extender */
+            foreach ($searchService->getExtenders() as $extender) {
+                $extender->extendRecord($result, 'comment');
+            }
+        }
+
+        // Get the comment's parsed content's first image & get the srcset for it.
+        $result['image'] = $this->formatterService->parseMainImage($rawBody, $format);
+
         return $result;
     }
+
+    /**
+     * Generate a comment name from a discussion name. This will return 'Untitled' if passed a null value.
+     *
+     * @param string|null $discussionName
+     * @return string
+     */
+    public static function generateCommentName(?string $discussionName): string {
+        return sprintf(t('Re: %s'), $discussionName ?? t('Untitled'));
+    }
+
     /**
      * Update the attachment status of attachemnts in particular comment.
      *
@@ -1327,29 +1520,29 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
      *
      * Updates unread comment totals, bookmarks, and activity. Sends notifications.
      *
+     * @param int $commentID Unique ID for this comment.
+     * @param int $insert Used as a boolean for whether this is a new comment.
+     * @param bool $checkExisting Not used.
+     * @param bool $incUser Whether or not to just increment the user's comment count rather than recalculate it.
      * @since 2.0.0
      * @access public
-     *
-     * @param array $CommentID Unique ID for this comment.
-     * @param int $Insert Used as a boolean for whether this is a new comment.
-     * @param bool $CheckExisting Not used.
-     * @param bool $IncUser Whether or not to just increment the user's comment count rather than recalculate it.
      */
-    public function save2($CommentID, $Insert, $CheckExisting = true, $IncUser = false) {
-        $Session = Gdn::session();
+    public function save2($commentID, $insert, $checkExisting = true, $incUser = false) {
+        $session = Gdn::session();
 
         // Load comment data
-        $Fields = $this->getID($CommentID, DATASET_TYPE_ARRAY);
+        $fields = $this->getID($commentID, DATASET_TYPE_ARRAY);
 
         // Clear any session stashes related to this discussion
-        $DiscussionModel = $this->discussionModel;
-        $DiscussionID = val('DiscussionID', $Fields);
-        $Discussion = $DiscussionModel->getID($DiscussionID);
-        $Session->setPublicStash('CommentForForeignID_'.getValue('ForeignID', $Discussion), null);
+        $discussionModel = $this->discussionModel;
+        $discussionID = $fields['DiscussionID'] ?? null;
+        $discussion = $discussionModel->getID($discussionID);
+        $session->setPublicStash('CommentForForeignID_'.getValue('ForeignID', $discussion), null);
 
         // Make a quick check so that only the user making the comment can make the notification.
         // This check may be used in the future so should not be depended on later in the method.
-        if (Gdn::controller()->deliveryType() === DELIVERY_TYPE_ALL && $Fields['InsertUserID'] != $Session->UserID) {
+        $validController = Gdn::controller() instanceof Gdn_Controller;
+        if ($validController && Gdn::controller()->deliveryType() === DELIVERY_TYPE_ALL && $fields['InsertUserID'] != $session->UserID) {
             return;
         }
 
@@ -1357,23 +1550,20 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
         // the number of discussions created by the user that s/he has
         // unread messages in) if this comment was not added by the
         // discussion author.
-        $this->updateUser($Fields['InsertUserID'], $IncUser && $Insert);
+        $this->updateUser($fields['InsertUserID'], $incUser && $insert);
 
         // Mark the user as participated and update DateLastViewed.
         $this->SQL->replace(
             'UserDiscussion',
-            ['Participated' => 1, 'DateLastViewed' => $Fields['DateInserted']],
-            ['DiscussionID' => $DiscussionID, 'UserID' => val('InsertUserID', $Fields)]
+            ['Participated' => 1, 'DateLastViewed' => $fields['DateInserted']],
+            ['DiscussionID' => $discussionID, 'UserID' => val('InsertUserID', $fields)]
         );
 
-        if ($Insert) {
-            // UPDATE COUNT AND LAST COMMENT ON CATEGORY TABLE
-            if ($Discussion->CategoryID > 0) {
-                CategoryModel::instance()->incrementLastComment($Fields);
-            }
+        if ($insert) {
+            CategoryModel::instance()->incrementLastComment($fields);
             $this->notifyNewComment(
-                $Fields ? (array)$Fields : null,
-                $Discussion ? (array)$Discussion : null
+                $fields ? (array)$fields : null,
+                $discussion ? (array)$discussion : null
             );
         }
     }
@@ -1393,19 +1583,10 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
 
         $categoryID = val('CategoryID', $discussion);
 
-        // Figure out the category that governs this notification preference.
-        $i = 0;
+        // Make sure the category actually exists.
         $category = CategoryModel::categories($categoryID);
         if (!$category) {
             return;
-        }
-
-        while ($category['Depth'] > 2 && $i < 20) {
-            if (!$category || $category['Archived']) {
-                return;
-            }
-            $i++;
-            $category = CategoryModel::categories($category['ParentCategoryID']);
         }
 
         // Grab all of the users that need to be notified.
@@ -1422,14 +1603,21 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
             $userID = $row['UserID'];
             // Check user can still see the discussion.
             $discussionModel = $this->discussionModel;
+
+            if (!Gdn::config(CategoryModel::CONF_CATEGORY_FOLLOWING) &&
+                !$this->userModel->checkPermission($userID, 'Garden.AdvancedNotifications.Allow')
+            ) {
+                continue;
+            }
+
             if (!$discussionModel->canView($discussion, $userID)) {
                 continue;
             }
 
             $name = $row['Name'];
-            if (strpos($name, '.Email.') !== false) {
+            if (str_contains($name, '.Email.')) {
                 $notifyUsers[$userID]['Emailed'] = ActivityModel::SENT_PENDING;
-            } elseif (strpos($name, '.Popup.') !== false) {
+            } elseif (str_contains($name, '.Popup.')) {
                 $notifyUsers[$userID]['Notified'] = ActivityModel::SENT_PENDING;
             }
         }
@@ -1462,11 +1650,11 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
      *
      * Events: BeforeUpdateCommentCount.
      *
+     * @param array|int $discussion
+     * @param array $options
+     *
      * @since 2.0.0
      * @access public
-     *
-     * @param int $discussionID Unique ID of the discussion we are updating.
-     * @param array $options
      *
      * @since 2.3 Added the $options parameter.
      */
@@ -1476,19 +1664,32 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
             $this->options($options);
             $discussion = $this->SQL->getWhere('Discussion', ['DiscussionID' => $discussion])->firstRow(DATASET_TYPE_ARRAY);
         }
-        $discussionID = $discussion['DiscussionID'];
+        $discussionID = $discussion['DiscussionID'] ?? null;
 
         $this->fireEvent('BeforeUpdateCommentCountQuery');
 
         $this->options($options);
-        $data = $this->SQL
-            ->select('c.CommentID', 'min', 'FirstCommentID')
-            ->select('c.CommentID', 'max', 'LastCommentID')
-            ->select('c.DateInserted', 'max', 'DateLastComment')
-            ->select('c.CommentID', 'count', 'CountComments')
-            ->from('Comment c')
-            ->where('c.DiscussionID', $discussionID)
-            ->get()->firstRow(DATASET_TYPE_ARRAY);
+
+        $sql = clone $this->SQL;
+        $sql->reset();
+
+        $firstComment = $sql
+            ->orderBy(['DateInserted', 'CommentID'])
+            ->limit(1)
+            ->getWhere('Comment', ['DiscussionID' => $discussionID])->firstRow(DATASET_TYPE_ARRAY);
+
+        $lastComment = $sql
+            ->orderBy(['-DateInserted', '-CommentID'])
+            ->limit(1)
+            ->getWhere('Comment', ['DiscussionID' => $discussionID])->firstRow(DATASET_TYPE_ARRAY);
+
+        $data = [
+            'FirstCommentID' => $firstComment['CommentID'] ?? false,
+            'LastCommentID' => $lastComment['CommentID'] ?? false,
+            'LastCommentUserID' => $lastComment['InsertUserID'] ?? false,
+            'DateLastComment' => $lastComment['DateInserted'] ?? false,
+            'CountComments' => $this->getCount(['DiscussionID' => $discussionID])
+        ];
 
         $this->EventArguments['Discussion'] =& $discussion;
         $this->EventArguments['Counts'] =& $data;
@@ -1499,13 +1700,15 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
                 $this->SQL->update('Discussion');
                 if (!$discussion['Sink'] && $data['DateLastComment']) {
                     $this->SQL->set('DateLastComment', $data['DateLastComment']);
-                } elseif (!$data['DateLastComment'])
+                } elseif (!$data['DateLastComment']) {
                     $this->SQL->set('DateLastComment', $discussion['DateInserted']);
+                }
 
                 $this->SQL
                     ->set('FirstCommentID', $data['FirstCommentID'])
                     ->set('LastCommentID', $data['LastCommentID'])
                     ->set('CountComments', $data['CountComments'])
+                    ->set('hot', ($discussion['Score'] ?? 0) + ($data['CountComments'] ?? 0))
                     ->where('DiscussionID', $discussionID)
                     ->put();
 
@@ -1529,6 +1732,7 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
                     ->where('DiscussionID', $discussionID)
                     ->put();
             }
+            $this->addDirtyRecord('discussion', $discussionID);
         }
     }
 
@@ -1560,26 +1764,42 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
      * @param int $userID Unique ID of the user to be updated.
      */
     public function updateUser($userID, $inc = false) {
+        $user = $this->userModel->getID($userID, DATASET_TYPE_ARRAY);
         if ($inc) {
-            // Just increment the comment count.
-            $this->SQL
-                ->update('User')
-                ->set('CountComments', 'CountComments + 1', false)
-                ->where('UserID', $userID)
-                ->put();
-        } else {
-            // Retrieve a comment count
-            $countComments = $this->SQL
-                ->select('c.CommentID', 'count', 'CountComments')
-                ->from('Comment c')
-                ->where('c.InsertUserID', $userID)
-                ->get()
-                ->firstRow()
-                ->CountComments;
+            $countComments = val('CountComments', $user);
+            // Increment if 100 or greater; Recalculate on 120, 140 etc.
+            if ($countComments >= 100 && $countComments % 20 !== 0) {
+                $this->SQL->update('User')
+                    ->set('CountComments', 'CountComments + 1', false)
+                    ->where('UserID', $userID)
+                    ->put();
 
-            // Save to the attributes column of the user table for this user.
-            $this->userModel->setField($userID, 'CountComments', $countComments);
+                $this->userModel->updateUserCache($userID, 'CountComments', $countComments + 1);
+                $this->addDirtyRecord('user', $userID);
+                return;
+            }
         }
+
+        $countComments = $this->SQL
+            ->select('CommentID', 'count', 'CountComments')
+            ->from('Comment')
+            ->where('InsertUserID', $userID)
+            ->get()->value('CountComments', 0);
+
+        // Save the count to the user table
+        $this->userModel->setField($userID, 'CountComments', $countComments);
+    }
+
+    /**
+     * Override of parent::setField
+     *
+     * @param int $rowID
+     * @param array|string $property
+     * @param bool $value
+     */
+    public function setField($rowID, $property, $value = false) {
+        parent::setField($rowID, $property, $value);
+        $this->addDirtyRecord('comment', $rowID);
     }
 
     /**
@@ -1604,24 +1824,24 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
      * This is a hard delete that completely removes it from the database.
      * Events: DeleteComment, BeforeDeleteComment.
      *
-     * @since 2.0.0
-     * @access public
-     *
-     * @param int $commentID Unique ID of the comment to be deleted.
+     * @param int $id Unique ID of the comment to be deleted.
      * @param array $options Additional options for the delete.
-     * @param bool Always returns TRUE.
+     * @return bool Always returns true.
      */
-    public function deleteID($commentID, $options = []) {
-        $this->EventArguments['CommentID'] = $commentID;
+    public function deleteID($id, $options = []) {
+        Assert::integerish($id);
+        Assert::isArray($options);
 
-        $comment = $this->getID($commentID, DATASET_TYPE_ARRAY);
+        $this->EventArguments['CommentID'] = $id;
+
+        $comment = $this->getID($id, DATASET_TYPE_ARRAY);
         if (!$comment) {
             return false;
         }
         $discussion = $this->SQL->getWhere('Discussion', ['DiscussionID' => $comment['DiscussionID']])->firstRow(DATASET_TYPE_ARRAY);
 
         // Decrement the UserDiscussion comment count if the user has seen this comment
-        $offset = $this->getOffset($commentID);
+        $offset = $this->getOffset($id);
         $this->SQL->update('UserDiscussion')
             ->set('CountComments', 'CountComments - 1', false)
             ->where('DiscussionID', $comment['DiscussionID'])
@@ -1638,7 +1858,7 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
         LogModel::insert($log, 'Comment', $comment, val('LogOptions', $options, []));
 
         // Delete the comment.
-        $this->SQL->delete('Comment', ['CommentID' => $commentID]);
+        $this->SQL->delete('Comment', ['CommentID' => $id]);
 
         // Update the comment count
         $this->updateCommentCount($discussion, ['Slave' => false]);
@@ -1649,7 +1869,7 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
         // Update the category.
         $categoryID = val('CategoryID', $discussion);
         $category = CategoryModel::categories($categoryID);
-        if ($category && $category['LastCommentID'] == $commentID) {
+        if ($category && $category['LastCommentID'] == $id) {
             $categoryModel = new CategoryModel();
             $categoryModel->setRecentPost($category['CategoryID']);
         }
@@ -1671,6 +1891,34 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
             $this->getEventManager()->dispatch($commentEvent);
         }
         return true;
+    }
+
+    /**
+     * Check if the user has the correct permissions to delete a comment. Throws an error if not.
+     *
+     * @param int $commentID
+     *
+     * @throws NoResultsException If the record wasn't found.
+     * @throws PermissionException If the user doesn't have permission to delete.
+     */
+    public function checkCanDelete(int $commentID) {
+        $comment = $this->getID($commentID);
+        if ($comment === false) {
+            throw new NoResultsException('Comment');
+        }
+
+        $discussion = $this->discussionModel->getID($comment->DiscussionID);
+        if ($discussion === false) {
+            throw new NoResultsException('Discussion');
+        }
+
+        $allowsSelfDelete = Gdn::config('Vanilla.Comments.AllowSelfDelete');
+        $isOwnPost = $comment->InsertUserID === Gdn::session()->UserID;
+
+
+        if (!$allowsSelfDelete || !$isOwnPost) {
+            $this->discussionModel->categoryPermission('Vanilla.Comments.Delete', $discussion->CategoryID);
+        }
     }
 
     /**
@@ -1763,5 +2011,65 @@ class CommentModel extends Gdn_Model implements FormatFieldInterface, EventFromR
         }
 
         return parent::editContentTimeout($comment, $timeLeft);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getCrawlInfo(): array {
+        $r = \Vanilla\Models\LegacyModelUtils::getCrawlInfoFromPrimaryKey(
+            $this,
+            '/api/v2/comments?sort=-commentID&expand[]=crawl',
+            'commentID'
+        );
+        return $r;
+    }
+
+    /**
+     * Return a URL for a comment. This function is in here and not functions.general so that plugins can override.
+     *
+     * @param object|array $comment
+     * @param bool $withDomain
+     * @return string
+     */
+    public static function commentUrl($comment, $withDomain = true) {
+        if (function_exists('commentUrl')) {
+            // Legacy overrides.
+            return commentUrl($comment, $withDomain);
+        } else {
+            return self::createRawCommentUrl($comment, $withDomain);
+        }
+    }
+
+    /**
+     * Return a URL for a comment. This function is in here and not functions.general so that plugins can override.
+     *
+     * @param object|array $comment
+     * @param bool $withDomain
+     * @return string
+     *
+     * @internal Don't use unless you are the global commentUrl function.
+     */
+    public static function createRawCommentUrl($comment, $withDomain = true) {
+        $eventManager = \Gdn::eventManager();
+        if ($eventManager->hasHandler('customCommentUrl')) {
+            return $eventManager->fireFilter('customCommentUrl', '', $comment, $withDomain);
+        }
+
+        $comment = (object)$comment;
+        $result = "/discussion/comment/{$comment->CommentID}#Comment_{$comment->CommentID}";
+        return url($result, $withDomain);
+    }
+
+    /**
+     * Add a 'discussion' field to the comment that contains the discussion data.
+     *
+     * @param array $row The row of comment data.
+     * @return array
+     */
+    private function addDiscussionData(array $row): array {
+        $row['discussion'] = $this->discussionModel->getID($row['DiscussionID'], DATASET_TYPE_ARRAY);
+        $row['discussion']['Type'] = $row['discussion']['Type'] ?? 'discussion';
+        return $row;
     }
 }

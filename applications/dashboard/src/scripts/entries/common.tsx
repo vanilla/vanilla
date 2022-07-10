@@ -4,20 +4,26 @@
  */
 
 import React from "react";
-import { onReady } from "@library/utility/appUtils";
+import { onReady, t } from "@library/utility/appUtils";
 import { addComponent } from "@library/utility/componentRegistry";
-import Toast from "@library/features/toaster/Toast";
+import { Toast } from "@library/features/toaster/Toast";
 import { ThemePreviewToast } from "@library/features/toaster/themePreview/ThemePreviewToast";
 import { themePreviewToastReducer } from "@library/features/toaster/themePreview/ThemePreviewToastReducer";
 import { registerReducer } from "@library/redux/reducerRegistry";
-import { AppContext } from "@library/AppContext";
 import { mountPortal } from "@vanilla/react-utils";
+import { roleReducer } from "@dashboard/roles/roleReducer";
+import { SearchService } from "@library/search/SearchService";
+import { TypeGroupsIcon } from "@library/icons/searchIcons";
+import { PLACES_GROUP_TYPE } from "@library/search/searchConstants";
+import { PlacesSearchTypeFilter } from "@dashboard/components/panels/PlacesSearchTypeFilter";
 
 const PREVIEW_CONTAINER = "previewContainer";
 
 // Routing
 
 registerReducer("themePreviewToaster", themePreviewToastReducer);
+registerReducer("roles", roleReducer);
+
 addComponent("toaster", Toast);
 onReady(() => {
     mountPortal(<ThemePreviewToast />, PREVIEW_CONTAINER);

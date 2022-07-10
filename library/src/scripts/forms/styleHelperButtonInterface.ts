@@ -4,23 +4,46 @@
  * @license GPL-2.0-only
  */
 
-import { IBorderStyles } from "@library/styles/styleHelpersBorders";
-import { IFont } from "@library/styles/styleHelpersTypography";
-import { ColorValues } from "@library/styles/styleHelpersColors";
-import { TLength } from "typestyle/lib/types";
-import { ButtonPreset } from "@library/forms/buttonStyles";
+import { IBorderStyles, IFont } from "@library/styles/cssUtilsTypes";
+import { CSSObject } from "@emotion/css";
+import { TLength } from "@library/styles/styleShim";
+import { ButtonPreset } from "@library/forms/ButtonPreset";
 import { ButtonTypes } from "@library/forms/buttonTypes";
+import { ColorHelper } from "csx";
 
-export interface IButtonType {
-    name: ButtonTypes | string;
-    preset?: {
-        style: ButtonPreset;
-    };
+export interface ILegacyButtonPresetOptions {
+    style?: ButtonPreset;
+    bg?: ColorHelper | string;
+    fg?: ColorHelper | string;
+    fgState?: ColorHelper | string;
+    bgState?: ColorHelper | string;
+    borders?: ColorHelper | string;
+    borderState?: ColorHelper | string;
+}
+
+export const EMPTY_LEGACY_BUTTON_PRESET: ILegacyButtonPresetOptions = {
+    style: undefined,
+    bg: undefined,
+    fg: undefined,
+    fgState: undefined,
+    bgState: undefined,
+    borders: undefined,
+    borderState: undefined,
+};
+interface IButtonOptions {
     colors?: {
-        bg?: ColorValues;
-        fg?: ColorValues;
+        fg?: ColorHelper | string;
+        bg?: ColorHelper | string;
     };
     borders?: IBorderStyles;
+    fonts?: IFont;
+    useShadow?: boolean;
+    opacity?: number;
+}
+export interface IButton extends IButtonOptions {
+    name: ButtonTypes | string;
+    preset?: ILegacyButtonPresetOptions;
+    presetName?: ButtonPreset;
     sizing?: {
         minHeight?: TLength;
         minWidth?: TLength;
@@ -30,45 +53,12 @@ export interface IButtonType {
         bottom?: TLength;
         horizontal?: TLength;
     };
-    fonts?: IFont;
-    state?: {
-        colors?: {
-            fg?: ColorValues;
-            bg?: ColorValues;
-        };
-        borders?: IBorderStyles;
-        fonts?: IFont;
-    };
-    hover?: {
-        colors?: {
-            fg?: ColorValues;
-            bg?: ColorValues;
-        };
-        borders?: IBorderStyles;
-        fonts?: IFont;
-    };
-    focus?: {
-        colors?: {
-            fg?: ColorValues;
-            bg?: ColorValues;
-        };
-        borders?: IBorderStyles;
-        fonts?: IFont;
-    };
-    active?: {
-        colors?: {
-            fg?: ColorValues;
-            bg?: ColorValues;
-        };
-        borders?: IBorderStyles;
-        fonts?: IFont;
-    };
-    focusAccessible?: {
-        colors?: {
-            fg?: ColorValues;
-            bg?: ColorValues;
-        };
-        borders?: IBorderStyles;
-        fonts?: IFont;
-    };
+    state?: IButtonOptions;
+    hover?: IButtonOptions;
+    focus?: IButtonOptions;
+    active?: IButtonOptions;
+    focusAccessible?: IButtonOptions;
+    disabled?: IButtonOptions;
+    skipDynamicPadding?: boolean;
+    extraNested?: CSSObject; // special case CSS
 }

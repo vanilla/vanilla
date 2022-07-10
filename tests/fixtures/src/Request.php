@@ -8,6 +8,7 @@
 namespace VanillaTests\Fixtures;
 
 use Garden\Web\RequestInterface;
+use Vanilla\Cache\InvalidArgumentException;
 
 /**
  * A mock request object for testing.
@@ -31,11 +32,16 @@ class Request implements RequestInterface {
      * @param array $data The query for **GET** requests or the body for other requests.
      */
     public function __construct($path = '/', $method = 'GET', array $data = []) {
+        if (isUrl($path) || strpos($path, '?') !== false) {
+            $parts = parse_url($path);
+        } else {
+            $parts = ['path' => $path];
+        }
+        $path = $parts['path'] ?? '/';
         $query = [];
 
-        if (strpos($path, '?')) {
-            list($path, $queryString) = explode('?', $path, 2);
-            parse_str($queryString, $query);
+        if (!empty($parts['query'])) {
+            parse_str($parts['query'], $query);
         }
 
         if (in_array($method, ['GET'])) {
@@ -45,6 +51,8 @@ class Request implements RequestInterface {
             $body = $data;
         }
 
+        $this->scheme = $parts['scheme'] ?? 'http';
+        $this->host = $parts['host'] ?? 'example.com';
         $this->root = '';
         $this->path = '/'.ltrim($path, '/');
         $this->method = $method;
@@ -111,6 +119,14 @@ class Request implements RequestInterface {
     public function getBody() {
         return $this->body;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getRawBody(): string {
+        return is_string($this->body) ? $this->body : json_encode($this->body, JSON_UNESCAPED_UNICODE);
+    }
+
 
     /**
      * Set the body of the message.
@@ -245,5 +261,39 @@ class Request implements RequestInterface {
             return "";
         }
         return $this->scheme . "://" . $this->host;
+    }
+
+    /**
+     * Get the URL without the querystring.
+     *
+     * @return string
+     */
+    public function getDomainAndPath(): string {
+        return $this->urlDomain().$this->getRoot().$this->getPath();
+    }
+
+    /**
+     * Box a request.
+     *
+     * @param Request|string $request
+     * @return Request
+     * @throws InvalidArgumentException Throws an exception when `$request` is the wrong type.
+     */
+    public static function box($request): Request {
+        if ($request instanceof Request) {
+            return $request;
+        } elseif (is_string($request)) {
+            return new Request($request);
+        }
+        throw new InvalidArgumentException("Request::box() expects a Request or a string.", 400);
+    }
+
+    /**
+     * Remove an item from the query array.
+     *
+     * @param string $key The key of the item to remove.
+     */
+    public function removeQueryItem(string $key): void {
+        unset($this->query[$key]);
     }
 }

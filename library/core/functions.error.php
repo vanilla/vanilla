@@ -8,97 +8,17 @@
  * @since 2.0
  */
 
-/**
- * This class is for internal use within the global error handler only. Don't use this class elsewhere.
- *
- * An extension of the **ErrorException** that includes context variables.
- */
-class Gdn_ErrorException extends ErrorException {
-
-    /** @var array */
-    protected $_Context;
-
-    /**
-     * Constructs the exception.
-     *
-     * @param string $message The Exception message to throw.
-     * @param int $code The Exception code.
-     * @param string $filename The filename where the exception is thrown.
-     * @param int $line The line number where the exception is thrown.
-     * @param array $context The currently defined variables.
-     */
-    public function __construct($message = "", $code = 0, $filename = __FILE__, $line = __LINE__, $context = []) {
-        parent::__construct($message, $code, 0, $filename, $line);
-        $this->_Context = $context;
-    }
-
-    /**
-     *
-     *
-     * @return int|string
-     */
-    public function getContext() {
-        return $this->_Context;
-    }
-}
-
-/**
- *
- *
- * @param $errorNumber
- * @param $message
- * @param $file
- * @param $line
- * @param $arguments
- * @return bool|null
- * @throws Gdn_ErrorException
- */
-function gdn_ErrorHandler($errorNumber, $message, $file, $line, $arguments) {
-    $errorReporting = error_reporting();
-
-    // Don't do anything for @supressed errors.
-    if ($errorReporting === 0) {
-        return null;
-    }
-
-    if (($errorReporting & $errorNumber) !== $errorNumber) {
-        if (function_exists('trace')) {
-            trace(new \ErrorException($message, $errorNumber, $errorNumber, $file, $line), TRACE_NOTICE);
-        }
-
-        // Ignore errors that are below the current error reporting level.
-        return false;
-    }
-
-    $fatalErrorBitmask = E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR;
-    if ($errorNumber & $fatalErrorBitmask) {
-        // Convert all fatal errors to an exception
-        throw new Gdn_ErrorException($message, $errorNumber, $file, $line, $arguments);
-    }
-
-    // All other unprocessed non-fatal PHP errors are possibly Traced and logged to the PHP error log file
-    $nonFatalErrorException = new \ErrorException($message, $errorNumber, $errorNumber, $file, $line);
-    if (function_exists('trace')) {
-        trace($nonFatalErrorException, TRACE_NOTICE);
-    }
-
-    errorLog(formatErrorException($nonFatalErrorException));
-}
+use Vanilla\Logging\ErrorLogger;
 
 /**
  * A custom error handler that displays much more, very useful information when
  * errors are encountered in Garden.
  *
- * @param Exception $Exception The exception that was thrown.
+ * @param Throwable $Exception The exception that was thrown.
  */
-function gdn_ExceptionHandler($Exception) {
+function gdnExceptionHandler(Throwable $Exception) {
     try {
-        // Attempt to log the exception as early as possible
-        if ($Exception instanceof \ErrorException) {
-            errorLog(formatErrorException($Exception));
-        } else {
-            errorLog(formatException($Exception, true));
-        }
+        ErrorLogger::handleException($Exception);
 
         $ErrorNumber = $Exception->getCode();
         $Message = $Exception->getMessage();
@@ -115,7 +35,7 @@ function gdn_ExceptionHandler($Exception) {
         @ob_end_clean();
         // prevent headers already sent error
         if (!headers_sent()) {
-            if ($ErrorNumber >= 100 && $ErrorNumber < 600) {
+            if ($ErrorNumber >= 400 && $ErrorNumber < 600) {
                 $Code = $ErrorNumber;
             } else {
                 $Code = 500;
@@ -139,9 +59,9 @@ function gdn_ExceptionHandler($Exception) {
         $MessageInfo = explode('|', $Message);
         $MessageCount = count($MessageInfo);
         if ($MessageCount == 4) {
-            list($SenderMessage, $SenderObject, $SenderMethod, $SenderCode) = $MessageInfo;
+            [$SenderMessage, $SenderObject, $SenderMethod, $SenderCode] = $MessageInfo;
         } elseif ($MessageCount == 3) {
-            list($SenderMessage, $SenderObject, $SenderMethod) = $MessageInfo;
+            [$SenderMessage, $SenderObject, $SenderMethod] = $MessageInfo;
         } elseif (function_exists('GetValueR')) {
             $IsError = (getValueR('0.function', $SenderTrace) == 'Gdn_ErrorHandler'); // not exception
             $N = ($IsError) ? '1' : '0';
@@ -383,10 +303,12 @@ if (!function_exists('errorMessage')) {
      * function can understand (allows a little more information to be displayed
      * on errors).
      *
-     * @param string The actual error message.
-     * @param string The name of the object that encountered the error.
-     * @param string The name of the method that encountered the error.
-     * @param string Any additional information that could be useful to debuggers.
+     * @param string $message The actual error message.
+     * @param string $senderObject The name of the object that encountered the error.
+     * @param string $senderMethod The name of the method that encountered the error.
+     * @param string $code Any additional information that could be useful to debuggers.
+     * @return string
+     * @deprecated This function should just be replaced with a human-readable error message.
      */
     function errorMessage($message, $senderObject, $senderMethod, $code = '') {
         return $message.'|'.$senderObject.'|'.$senderMethod.'|'.$code;
@@ -397,18 +319,10 @@ if (!function_exists('errorLog')) {
     /**
      * Attempt to log an error message to the PHP error log.
      *
-     * @access private
      * @param string|\Exception $message
+     * @deprecated ErrorLogger::writeErrorLog
      */
     function errorLog($message) {
-        $errorLogFile = class_exists('Gdn', false) ? Gdn::config('Garden.Errors.LogFile', '') : '';
-
-        // Log only if the PHP setting "log_errors" is enabled
-        // OR if the Garden config "Garden.Errors.LogFile" is provided
-        if (!$errorLogFile && !ini_get('log_errors')) {
-            return;
-        }
-
         // Make sure the message can be converted to a string otherwise bail out
         if (!is_string($message) && !method_exists($message, '__toString')) {
             return;
@@ -419,22 +333,7 @@ if (!function_exists('errorLog')) {
             $message = (string) $message;
         }
 
-        $destination = null;
-        if (!$errorLogFile) {
-            // sends to PHP's system logger
-            $messageType = 0;
-        } else {
-            // appends to a file
-            $messageType = 3;
-            $destination = $errorLogFile;
-
-            // Need to prepend the date when appending to an error log file
-            // and also add a newline manually
-            $date = date('d-M-Y H:i:s e');
-            $message = sprintf('[%s] %s', $date, $message) . PHP_EOL;
-        }
-
-        @error_log($message, $messageType, $destination);
+        ErrorLogger::writeErrorLog($message);
     }
 }
 
@@ -442,9 +341,9 @@ if (!function_exists('formatErrorException')) {
     /**
      * Format an \ErrorException into a string destined for PHP error_log()
      *
-     * @access private
      * @param \ErrorException $exception The error exception to format
      * @return string The formatted error message
+     * @access private
      */
     function formatErrorException($exception) {
         if (!($exception instanceof \ErrorException)) {
@@ -487,10 +386,10 @@ if (!function_exists('formatException')) {
      * Format an \Exception or any object implementing \Throwable
      * into a string destined for PHP error_log()
      *
-     * @access private
      * @param mixed $exception The Exception to format
      * @param boolean $uncaught Whether the exception was uncaught or not
      * @return string The formatted error message
+     * @access private
      */
     function formatException($exception, $uncaught = false) {
         if (!($exception instanceof \Exception) && !($exception instanceof \Throwable)) {
@@ -519,13 +418,13 @@ if (!function_exists('formatPHPErrorLog')) {
     /**
      * Format an error message to be sent to PHP error_log()
      *
-     * @access private
      * @param string $errorMsg The error message
      * @param string $errorType Optional error type such as "PHP Fatal error" or "PHP Notice".  It will be prefixed to the $errorMsg
      * @param string $file Optional file path where the error occured
      * @param string $line Optional line number where the error occured
      * @param array $stackTrace Optional stack trace of the error
      * @return string The formatted error message
+     * @access private
      */
     function formatPHPErrorLog($errorMsg, $errorType = null, $file = null, $line = null, $stackTrace = null) {
         $formattedMessage = $errorMsg;
@@ -560,7 +459,7 @@ if (!function_exists('formatStackTrace')) {
         ];
 
         if (is_array($stackTrace) && count($stackTrace)) {
-            foreach($stackTrace as &$trace) {
+            foreach ($stackTrace as &$trace) {
                 if (!isset($trace['file'])) {
                     continue;
                 }
@@ -599,7 +498,7 @@ if (!function_exists('logException')) {
             return;
         }
 
-        if ($ex instanceof Gdn_UserException) {
+        if ($ex instanceof Gdn_UserException || $ex instanceof \Garden\Web\Exception\ClientException) {
             return;
         }
 
@@ -613,12 +512,12 @@ if (!function_exists('logMessage')) {
      * Logs errors to a file. This function does not throw errors because it is
      * a last-ditch effort after errors have already been rendered.
      *
-     * @param string The file to save the error log in.
-     * @param int The line number that encountered the error.
-     * @param string The name of the object that encountered the error.
-     * @param string The name of the method that encountered the error.
-     * @param string The error message.
-     * @param string Any additional information that could be useful to debuggers.
+     * @param string $file The file to save the error log in.
+     * @param int $line The line number that encountered the error.
+     * @param string $object The name of the object that encountered the error.
+     * @param string $method The name of the method that encountered the error.
+     * @param string $message The error message.
+     * @param string $code Any additional information that could be useful to debuggers.
      */
     function logMessage($file, $line, $object, $method, $message, $code = '') {
         if (!class_exists('Gdn', false)) {
@@ -639,41 +538,11 @@ if (!function_exists('logMessage')) {
     }
 }
 
-if (!function_exists('boop')) {
-    /**
-     * Logs a message or print_r()'s an array to the screen.
-     *
-     * @param mixed $message The object or string to log to the screen
-     * @param optional $arguments A list of arguments to log to the screen as if from a function call
-     */
-    function boop($message, $arguments = [], $vardump = false) {
-        if (!defined('BOOP') || !BOOP) {
-            return;
-        }
-
-        if (is_array($message) || is_object($message) || $vardump === true) {
-            if ($vardump) {
-                var_dump($message);
-            } else {
-                print_r($message);
-            }
-        } else {
-            echo $message;
-        }
-
-        if (!is_null($arguments) && sizeof($arguments)) {
-            echo " (".implode(', ', $arguments).")";
-        }
-
-        echo "\n";
-    }
-}
-
 if (!function_exists('cleanErrorArguments')) {
     /**
+     * Deprecated.
      *
-     *
-     * @param $var
+     * @param mixed $var
      * @param array $blackList
      * @deprecated
      */
@@ -701,8 +570,9 @@ if (!function_exists('__cleanErrorArguments')) {
     /**
      * This is an internal function not to be used outside of error printing.
      *
-     * @param $var
+     * @param mixed $var
      * @param array $blackList
+     * @return mixed
      */
     function __cleanErrorArguments($var, $blackList = ['configuration', 'config', 'database', 'password']) {
         $seen = [];
@@ -741,26 +611,22 @@ if (!function_exists('__cleanErrorArguments')) {
 }
 
 /**
- * Set up Garden to handle php errors.
- *
- * You can remove the "& ~E_STRICT" from time to time to clean up some easy strict errors.
- */
-function setHandlers() {
-    set_error_handler('Gdn_ErrorHandler', E_ALL & ~E_STRICT);
-    set_exception_handler('Gdn_ExceptionHandler');
-}
-
-/**
  * Create a new not found exception. This is a convenience function that will create an exception with a standard message.
  *
- * @param string $Code The translation code of the type of object that wasn't found.
+ * @param string $recordType The translation code of the type of object that wasn't found.
  * @return Exception
  */
 function notFoundException($recordType = 'Page') {
     Gdn::dispatcher()
         ->passData('RecordType', $recordType)
-        ->passData('Description', sprintf(t('The %s you were looking for could not be found.'), t(strtolower($recordType))));
-    return new Gdn_UserException(sprintf(t('%s not found.'), t($recordType)), 404);
+        ->passData(
+            'Description',
+            t(
+                sprintf('The %s you were looking for could not be found.', strtolower($recordType)),
+                t('The page you were looking for could not be found.')
+            )
+        );
+    return new Gdn_UserException(t(sprintf('%s Not Found', $recordType), sprintf(t('%s Not Found'), t($recordType))), 404);
 }
 
 /**
@@ -772,11 +638,11 @@ function notFoundException($recordType = 'Page') {
 function permissionException($permission = null) {
     if (!$permission) {
         $message = t('PermissionErrorMessage', "You don't have permission to do that.");
-    } elseif ($permission == 'Banned')
+    } elseif ($permission == 'Banned') {
         $message = t("You've been banned.");
-    elseif (stringBeginsWith($permission, '@'))
+    } elseif (stringBeginsWith($permission, '@')) {
         $message = stringBeginsWith($permission, '@', true, true);
-    else {
+    } else {
         $message = t(
             "PermissionRequired.$permission",
             sprintf(t('You need the %s permission to do that.'), $permission)
@@ -788,15 +654,15 @@ function permissionException($permission = null) {
 /**
  * Create a new permission exception. This is a convenience function that will create an exception with a standard message.
  *
- * @param string|null $Permission The name of the permission that was required.
+ * @param string|null $resource The name of the permission that was required.
  * @return Exception
  */
 function forbiddenException($resource = null) {
     if (!$resource) {
         $message = t('ForbiddenErrorMessage', "You are not allowed to do that.");
-    } elseif (stringBeginsWith($resource, '@'))
+    } elseif (stringBeginsWith($resource, '@')) {
         $message = stringBeginsWith($resource, '@', true, true);
-    else {
+    } else {
         $message = sprintf(t('You are not allowed to %s.'), $resource);
     }
     return new Gdn_UserException($message, 403);

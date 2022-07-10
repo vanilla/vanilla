@@ -8,6 +8,7 @@ namespace VanillaTests\Fixtures;
 
 use Garden\Schema\Schema;
 use Vanilla\Database\Operation;
+use Vanilla\Database\Operation\Pipeline;
 use Vanilla\Models\PipelineModel;
 
 /**
@@ -31,31 +32,31 @@ class BasicPipelineModel extends PipelineModel {
         ]);
     }
 
-
     /**
      * Perform a dummy database operation using the configured pipeline.
      *
-     * @param Operation $databaseOperation
-     * @return Operation
+     * @param Operation $operation
      */
-    public function doOperation(Operation $databaseOperation): Operation {
-        $this->pipeline->process($databaseOperation, function () {
-            return;
-        });
-        return $databaseOperation;
+    public function doOperation(Operation $operation) {
+        $result = $this->pipeline->processOperation($operation);
+        return $result;
     }
 
     /**
-     * Perform a dummy "select" database operation using the configured pipeline.
+     * No-op for database operations..
      *
-     * @param Operation $databaseOperation
-     * @param array $dummyResult
-     * @return Operation
+     * @param Operation $op
      */
-    public function doSelectOperation(Operation $databaseOperation, array $dummyResult): array {
-        $result = $this->pipeline->process($databaseOperation, function () use ($dummyResult) {
-            return $dummyResult;
-        });
-        return $result;
+    protected function handleInnerOperation(Operation $op) {
+        return;
+    }
+
+    /**
+     * Directly set a configured Pipeline instance.
+     *
+     * @param Pipeline $pipeline
+     */
+    public function setPipeline(Pipeline $pipeline): void {
+        $this->pipeline = $pipeline;
     }
 }

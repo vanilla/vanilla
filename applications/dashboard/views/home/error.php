@@ -12,8 +12,8 @@
     <?php if (debug() && $this->data('Trace')): ?>
         <h2>Error</h2>
         <?php echo $this->data('Code').' '.htmlspecialchars(Gdn_Controller::getStatusMessage($this->data('Code'))); ?>
-        <h2>Trace</h2>
-        <pre stye="text-align"><?php echo htmlspecialchars($this->data('Trace')); ?></pre>
+        <h2 class="Trace-Title">Trace</h2>
+        <pre class="Trace"><?php echo htmlspecialchars($this->data('Trace')); ?></pre>
     <?php endif; ?>
     <!-- Code: <?php $this->data('Code', 400); ?> -->
 </div>

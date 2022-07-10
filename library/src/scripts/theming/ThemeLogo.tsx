@@ -7,7 +7,8 @@ import { VanillaLogo } from "@library/icons/titleBar";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import React from "react";
 import { connect } from "react-redux";
-import { titleBarVariables } from "@library/headers/titleBarStyles";
+import { titleBarVariables } from "@library/headers/TitleBar.variables";
+import { t } from "@library/utility/appUtils";
 
 export enum LogoType {
     DESKTOP = "logo",
@@ -23,10 +24,10 @@ class ThemeLogo extends React.Component<IProps> {
 
         const isDesktop = this.props.type === LogoType.DESKTOP;
         const themeUrl = isDesktop ? themeDesktopUrl : themeMobileUrl;
-        const finalUrl = themeUrl ?? this.props.logoUrl;
+        const finalUrl = this.props.overwriteLogo ?? themeUrl ?? this.props.logoUrl;
 
         if (finalUrl) {
-            content = <img className={this.props.className} src={finalUrl} />;
+            content = <img className={this.props.className} src={finalUrl} alt={t("Home")} />;
         } else {
             content = <VanillaLogo className={this.props.className} isMobile={!isDesktop} />;
         }
@@ -56,6 +57,7 @@ interface IOwnProps {
     alt: string;
     className?: string;
     type: LogoType;
+    overwriteLogo?: string; // for storybook only
 }
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps>;

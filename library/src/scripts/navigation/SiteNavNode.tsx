@@ -1,12 +1,11 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import React from "react";
-import classNames from "classnames";
-import { siteNavNodeClasses } from "@library/navigation/siteNavStyles";
+import { siteNavNodeClasses, siteNavNodeDashboardClasses } from "@library/navigation/siteNavStyles";
 import { t } from "@library/utility/appUtils";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
@@ -15,22 +14,27 @@ import { SiteNavContext } from "@library/navigation/SiteNavContext";
 import { INavigationTreeItem } from "@library/@types/api/core";
 import { Hoverable } from "@vanilla/react-utils";
 import { TabHandler } from "@vanilla/dom-utils";
-import { DownTriangleIcon, RightTriangleIcon } from "@library/icons/common";
-import { colorOut } from "@library/styles/styleHelpersColors";
+import { CheckCompactIcon, DownTriangleIcon, RightTriangleIcon } from "@library/icons/common";
+import { RecordID } from "@vanilla/utils";
+import { SiteNavNodeTypes } from "@library/navigation/SiteNavNodeTypes";
+import { cx } from "@emotion/css";
 
 interface IProps extends INavigationTreeItem {
-    activeRecord: IActiveRecord;
+    activeRecord: IActiveRecord | undefined;
     className?: string;
     titleID?: string;
     openParent?: () => void;
     depth: number;
+    onSelectItem?(item: INavigationTreeItem);
     onItemHover?(item: INavigationTreeItem);
     clickableCategoryLabels?: boolean;
     collapsible: boolean;
+    siteNavNodeTypes?: SiteNavNodeTypes;
+    withCheckMark?: boolean;
 }
 
 export interface IActiveRecord {
-    recordID: number;
+    recordID: RecordID;
     recordType: string;
 }
 
@@ -42,55 +46,73 @@ export default class SiteNavNode extends React.Component<IProps> {
     public context!: React.ContextType<typeof SiteNavContext>;
 
     public render() {
-        const depthClass = `hasDepth-${this.props.depth + 1}`;
+        const { siteNavNodeTypes } = this.props;
         const collapsible = this.props.collapsible && this.context.categoryRecordType === this.props.recordType; // blocking collapsible
-        const classes = siteNavNodeClasses();
-        const { activeRecord } = this.props;
+        const isCurrent = this.isActiveRecord();
+        const isFirstLevel = this.props.depth === 0;
+        const hasChildren = collapsible;
+        const classes =
+            siteNavNodeTypes && siteNavNodeTypes === SiteNavNodeTypes.DASHBOARD
+                ? siteNavNodeDashboardClasses(isCurrent, isFirstLevel, hasChildren)
+                : siteNavNodeClasses(isCurrent, isFirstLevel, hasChildren);
 
         let linkContents;
-        const linkContentClasses = classNames("siteNavNode-link", classes.link, {
-            hasChildren: collapsible,
-            isFirstLevel: this.props.depth === 0,
-        });
 
         if (this.props.clickableCategoryLabels && collapsible) {
             linkContents = (
                 <Button
-                    baseClass={ButtonTypes.CUSTOM}
+                    buttonType={ButtonTypes.CUSTOM}
                     onKeyDownCapture={this.handleKeyDown}
-                    className={linkContentClasses}
-                    onClick={this.handleClick as any}
+                    className={classes.link}
+                    onClick={this.handleToggleClick as any}
                 >
-                    <span className={classNames(classes.label)}>{this.props.name}</span>
+                    <span className={classes.label}>{this.props.name}</span>
                 </Button>
             );
         } else {
+            const linkOrButtonContents = (
+                <span className={cx(classes.label, { [`${classes.activeLink}`]: this.props.isLink })}>
+                    {this.props.name}
+                    {this.props.withCheckMark && <CheckCompactIcon className={siteNavNodeClasses().checkMark} />}
+                </span>
+            );
             linkContents = (
                 <Hoverable onHover={this.handleHover} duration={50}>
-                    {provided => (
-                        <SmartLink
-                            {...provided}
-                            onKeyDownCapture={this.handleKeyDown}
-                            className={classNames("siteNavNode-link", classes.link, {
-                                hasChildren: collapsible,
-                                isFirstLevel: this.props.depth === 0,
-                            })}
-                            tabIndex={0}
-                            to={this.props.url}
-                        >
-                            <span className={classNames(classes.label, this.props.isLink && classes.activeLink)}>
-                                {this.props.name}
-                            </span>
-                        </SmartLink>
-                    )}
+                    {(provided) => {
+                        return this.props.url ? (
+                            <SmartLink
+                                {...provided}
+                                active={isCurrent}
+                                aria-current={isCurrent ? "page" : undefined}
+                                onKeyDownCapture={this.handleKeyDown}
+                                onClick={this.handleSelect}
+                                className={classes.link}
+                                tabIndex={0}
+                                to={this.props.url!}
+                            >
+                                {linkOrButtonContents}
+                            </SmartLink>
+                        ) : (
+                            <Button
+                                {...provided}
+                                buttonType={ButtonTypes.CUSTOM}
+                                onKeyDownCapture={this.handleKeyDown}
+                                onClick={this.handleSelect}
+                                className={classes.link}
+                                tabIndex={0}
+                            >
+                                {linkOrButtonContents}
+                            </Button>
+                        );
+                    }}
                 </Hoverable>
             );
         }
 
         const childrenContents =
             collapsible &&
-            this.props.children.map(child => {
-                const key = activeRecord.recordType + activeRecord.recordID + "-" + child.recordType + child.recordID;
+            this.props.children.map((child) => {
+                const key = child.recordType + child.recordID;
                 return (
                     <SiteNavNode
                         {...child}
@@ -99,22 +121,23 @@ export default class SiteNavNode extends React.Component<IProps> {
                         openParent={this.openSelfAndParents}
                         depth={this.props.depth + 1}
                         collapsible={collapsible}
+                        onSelectItem={this.props.onSelectItem}
                         onItemHover={this.props.onItemHover}
                         clickableCategoryLabels={!!this.props.clickableCategoryLabels}
+                        aria-current="page"
+                        siteNavNodeTypes={siteNavNodeTypes}
                     />
                 );
             });
         return (
             <li
-                className={classNames("siteNavNode", this.props.className, depthClass, classes.root, {
-                    isCurrent: this.isActiveRecord(),
-                })}
+                className={cx("siteNavNode", this.props.className, classes.root)}
                 role="treeitem"
                 aria-expanded={this.isOpen}
             >
                 {collapsible && this.props.children.length > 0 ? (
                     <div
-                        className={classNames("siteNavNode-buttonOffset", classes.buttonOffset, {
+                        className={cx(classes.buttonOffset, {
                             hasNoOffset: this.props.depth === 1,
                         })}
                     >
@@ -123,9 +146,9 @@ export default class SiteNavNode extends React.Component<IProps> {
                             ariaHidden={true}
                             title={t("Toggle Category")}
                             ariaLabel={t("Toggle Category")}
-                            onClick={this.handleClick as any}
-                            baseClass={ButtonTypes.CUSTOM}
-                            className={classNames("siteNavNode-toggle", classes.toggle)}
+                            onClick={this.handleToggleClick as any}
+                            buttonType={ButtonTypes.CUSTOM}
+                            className={classes.toggle}
                         >
                             {this.isOpen ? (
                                 <DownTriangleIcon title={t("Expand")} />
@@ -135,11 +158,11 @@ export default class SiteNavNode extends React.Component<IProps> {
                         </Button>
                     </div>
                 ) : null}
-                <div className={classNames("siteNavNode-contents", classes.contents)}>
+                <div className={classes.contents}>
                     {linkContents}
                     {collapsible && (
                         <ul
-                            className={classNames("siteNavNode-children", depthClass, classes.children, {
+                            className={cx(classes.children, {
                                 isHidden: collapsible ? !this.isOpen : false,
                             })}
                             role="group"
@@ -218,7 +241,18 @@ export default class SiteNavNode extends React.Component<IProps> {
      * Handles clicking on the chevron to toggle node
      * @param e
      */
-    private handleClick = e => {
+    private handleSelect = (e) => {
+        e.stopPropagation();
+        if (this.props.onSelectItem) {
+            this.props.onSelectItem(this.props);
+        }
+    };
+
+    /**
+     * Handles clicking on the chevron to toggle node
+     * @param e
+     */
+    private handleToggleClick = (e) => {
         e.stopPropagation();
         this.toggle();
     };
@@ -227,8 +261,9 @@ export default class SiteNavNode extends React.Component<IProps> {
      * Checks if we're on the current page
      * Note that this won't work with non-canonical URLs
      */
-    private isActiveRecord(): boolean {
+    private isActiveRecord(): boolean | undefined {
         return (
+            this.props.activeRecord &&
             this.props.recordType === this.props.activeRecord.recordType &&
             this.props.recordID === this.props.activeRecord.recordID
         );
@@ -281,7 +316,7 @@ export default class SiteNavNode extends React.Component<IProps> {
      * Note that some of the events are on SiteNav.tsx
      * @param event
      */
-    private handleKeyDown = event => {
+    private handleKeyDown = (event) => {
         if (document.activeElement === null) {
             return;
         }

@@ -8,6 +8,7 @@
 namespace Vanilla\Web;
 
 use Vanilla\Contracts\Web\AssetInterface;
+use Vanilla\Models\SiteMetaExtra;
 
 /**
  * Class for proxying one page head interface to another.
@@ -39,6 +40,14 @@ trait PageHeadProxyTrait { // implements PageHeadInterface
      */
     public function addJsonLDItem(AbstractJsonLDItem $item) {
         $this->proxy->addJsonLDItem($item);
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function addJsonLDItems(array $item) {
+        $this->proxy->addJsonLDItems($item);
         return $this;
     }
 
@@ -111,6 +120,14 @@ trait PageHeadProxyTrait { // implements PageHeadInterface
      */
     public function addOpenGraphTag(string $property, string $content) {
         $this->proxy->addOpenGraphTag($property, $content);
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function addSiteMetaExtra(SiteMetaExtra $extra) {
+        $this->proxy->addSiteMetaExtra($extra);
         return $this;
     }
 

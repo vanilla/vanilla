@@ -9,19 +9,20 @@ import { ButtonTypes } from "@library/forms/buttonTypes";
 import MobileDropDown from "@library/headers/pieces/MobileDropDown";
 import Container from "@library/layout/components/Container";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
-import { PanelArea, PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { modalClasses } from "@library/modal/modalStyles";
 import BackLink from "@library/routing/links/BackLink";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React, { ReactNode, useRef } from "react";
-import { unit } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { useMeasure } from "@vanilla/react-utils";
 import { actionBarClasses } from "@library/headers/ActionBarStyles";
+import PanelArea from "@library/layout/components/PanelArea";
+import PanelWidgetHorizontalPadding from "@library/layout/components/PanelWidgetHorizontalPadding";
 
-interface IProps {
+type IProps = {
     callToActionTitle?: string;
     anotherCallToActionTitle?: string;
     isCallToActionDisabled?: boolean;
@@ -37,10 +38,19 @@ interface IProps {
     selfPadded?: boolean;
     title?: React.ReactNode;
     fullWidth?: boolean;
-    backTitle?: string;
     handleCancel?: (e: React.MouseEvent) => void;
     handleAnotherSubmit?: (e: React.MouseEvent) => void;
-}
+    additionalActions?: React.ReactNode;
+} & (
+    | {
+          backTitle?: string;
+          noBackLink?: boolean;
+      }
+    | {
+          backTitle?: never;
+          noBackLink: false;
+      }
+);
 
 /**
  * Implement editor header component
@@ -60,19 +70,21 @@ export function ActionBar(props: IProps) {
 
     const minButtonSizeStyles: React.CSSProperties =
         restoreSize.width && backSize.width
-            ? { minWidth: unit(largerWidth) }
-            : { minWidth: unit(globalVars.icon.sizes.default) };
+            ? { minWidth: styleUnit(largerWidth) }
+            : { minWidth: styleUnit(globalVars.icon.sizes.default) };
 
     const content = (
         <ul className={classNames(classes.items)}>
-            <li className={classNames(classes.item, "isPullLeft")} ref={backRef} style={minButtonSizeStyles}>
-                <BackLink
-                    title={props.backTitle || t("Cancel")}
-                    visibleLabel={true}
-                    className={classes.backLink}
-                    onClick={props.handleCancel}
-                />
-            </li>
+            {!props.noBackLink && (
+                <li className={classNames(classes.item, "isPullLeft")} ref={backRef} style={minButtonSizeStyles}>
+                    <BackLink
+                        title={props.backTitle || t("Cancel")}
+                        visibleLabel={true}
+                        className={classes.backLink}
+                        onClick={props.handleCancel}
+                    />
+                </li>
+            )}
             {props.statusItem}
             {showMobileDropDown ? (
                 <li className={classes.centreColumn}>
@@ -82,6 +94,9 @@ export function ActionBar(props: IProps) {
                 </li>
             ) : null}
             {props.title}
+            {props.additionalActions && (
+                <li className={classNames(classes.item, "isPullRight")}>{props.additionalActions}</li>
+            )}
             {props.anotherCallToActionTitle && (
                 <li
                     ref={restoreRef}
@@ -93,7 +108,7 @@ export function ActionBar(props: IProps) {
                         onClick={props.handleAnotherSubmit}
                         title={props.anotherCallToActionTitle}
                         disabled={props.anotherCallToActionDisabled}
-                        baseClass={ButtonTypes.TEXT_PRIMARY}
+                        buttonType={ButtonTypes.TEXT_PRIMARY}
                         className={classNames(classes.callToAction, classes.itemMarginLeft)}
                     >
                         {props.anotherCallToActionLoading ? <ButtonLoader /> : props.anotherCallToActionTitle}
@@ -109,7 +124,7 @@ export function ActionBar(props: IProps) {
                     submit={true}
                     title={props.callToActionTitle}
                     disabled={props.isCallToActionDisabled}
-                    baseClass={ButtonTypes.TEXT_PRIMARY}
+                    buttonType={ButtonTypes.TEXT_PRIMARY}
                     className={classNames(classes.callToAction, classes.itemMarginLeft)}
                 >
                     {props.isCallToActionLoading ? <ButtonLoader /> : props.callToActionTitle}

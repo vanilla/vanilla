@@ -8,11 +8,21 @@ import ModalSizes from "@library/modal/ModalSizes";
 import { ModalView } from "@library/modal/ModalView";
 import { logWarning, debug } from "@vanilla/utils";
 import React, { ReactElement } from "react";
-import ReactDOM from "react-dom";
 import { TabHandler } from "@vanilla/dom-utils";
 import { mountPortal } from "@vanilla/react-utils";
+import { uniqueIDFromPrefix } from "@library/utility/idUtils";
+
+React.memo(
+    function MyComponent() {
+        return <div></div>;
+    },
+    () => {
+        return true;
+    },
+);
 
 interface IProps {
+    id?: string;
     className?: string;
     exitHandler?: (event?: React.SyntheticEvent<any>) => void;
     pageContainer?: Element | null;
@@ -22,16 +32,19 @@ interface IProps {
     elementToFocus?: HTMLElement;
     size: ModalSizes;
     scrollable?: boolean;
+    noFocusOnExit?: boolean;
     elementToFocusOnExit?: HTMLElement; // Should either be a specific element or use document.activeElement
     isWholePage?: boolean;
     isVisible: boolean;
     afterContent?: React.ReactNode;
     titleID?: string;
     label?: string; // Necessary if there's no proper title
+    onKeyPress?: (e) => void;
 }
 
 interface IState {
     wasDestroyed: boolean;
+    realRootID: string;
 }
 
 export const MODAL_CONTAINER_ID = "modals";
@@ -63,6 +76,7 @@ export default class Modal extends React.Component<IProps, IState> {
 
     public state: IState = {
         wasDestroyed: !this.props.isVisible,
+        realRootID: uniqueIDFromPrefix("realModalRoot"),
     };
 
     /**
@@ -73,9 +87,11 @@ export default class Modal extends React.Component<IProps, IState> {
             return null;
         }
 
-        return mountPortal(
+        const portal = mountPortal(
             <>
                 <ModalView
+                    id={this.props.id}
+                    className={this.props.className}
                     onDestroyed={this.handleDestroyed}
                     scrollable={this.props.scrollable}
                     onKeyDown={this.handleTabbing}
@@ -87,6 +103,8 @@ export default class Modal extends React.Component<IProps, IState> {
                     titleID={"titleID" in this.props ? this.props.titleID : undefined}
                     label={"label" in this.props ? this.props.label : undefined}
                     isVisible={this.props.isVisible}
+                    onKeyPress={this.props.onKeyPress}
+                    realRootID={this.state.realRootID}
                 >
                     {this.props.children}
                 </ModalView>
@@ -94,6 +112,13 @@ export default class Modal extends React.Component<IProps, IState> {
             </>,
             MODAL_CONTAINER_ID,
             true,
+        );
+        return (
+            <>
+                {/* This is just here so we can find where a modal really came from in the dom. */}
+                <span id={this.state.realRootID} style={{ display: "none" }} />
+                {portal}
+            </>
         );
     }
 
@@ -120,6 +145,14 @@ A modal was mounted, but the page container could not be found.
 Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it can be hidden to screenreaders.
             `);
         }
+        document.addEventListener("keydown", this.handleDocumentEscapePress);
+    }
+
+    /**
+     * Handle unmount.
+     */
+    public componentWillUnmount() {
+        document.removeEventListener("keydown", this.handleDocumentEscapePress);
     }
 
     public onMountIn = () => {
@@ -128,10 +161,6 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
         this.focusInitialElement();
         pageContainer && pageContainer.setAttribute("aria-hidden", true);
 
-        // Add the escape keyboard listener only on the first modal in the stack.
-        if (Modal.stack.length === 0) {
-            document.addEventListener("keydown", this.handleDocumentEscapePress);
-        }
         Modal.stack.push(this);
     };
 
@@ -147,16 +176,14 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
         Modal.stack.pop();
         if (Modal.stack.length === 0) {
             pageContainer && pageContainer.removeAttribute("aria-hidden");
-
-            // This event listener is only added once (on the top modal).
-            // So we only remove when clearing the last one.
-            document.removeEventListener("keydown", this.handleDocumentEscapePress);
         } else {
             pageContainer && pageContainer.setAttribute("aria-hidden", true);
         }
 
         // We were destroyed so we should focus back to the last element.
-        this.closeFocusElement?.focus();
+        if (!this.props.noFocusOnExit) {
+            this.closeFocusElement?.focus();
+        }
     };
 
     public componentDidUpdate(prevProps: IProps, prevState: IState) {
@@ -230,7 +257,6 @@ It seems auto-detection isn't working, so you'll need to specify the "elementToF
      * Because of this we have to be smarter and call only the top modal's escape handler.
      */
     private handleDocumentEscapePress = (event: React.SyntheticEvent | KeyboardEvent) => {
-        const topModal = Modal.stack[Modal.stack.length - 1];
         const escKey = 27;
 
         if ("keyCode" in event && event.keyCode === escKey) {
@@ -239,8 +265,8 @@ It seems auto-detection isn't working, so you'll need to specify the "elementToF
             if (Modal.stack.length === 1 && this.props.isWholePage) {
                 return;
             } else {
-                if (topModal.props.exitHandler) {
-                    topModal.props.exitHandler(event as any);
+                if (this.props.exitHandler && this.props.isVisible) {
+                    this.props.exitHandler(event as any);
                 }
             }
         }
@@ -273,12 +299,11 @@ It seems auto-detection isn't working, so you'll need to specify the "elementToF
      * @param event The react event.
      */
     private handleShiftTab(event: React.KeyboardEvent) {
-        const nextElement = this.tabHandler?.getNext(undefined, true);
-        if (nextElement) {
+        const previousElement = this.tabHandler?.getNext(undefined, true);
+        if (previousElement) {
             event.preventDefault();
-
             event.stopPropagation();
-            nextElement.focus();
+            previousElement.focus();
         }
     }
 
@@ -291,11 +316,11 @@ It seems auto-detection isn't working, so you'll need to specify the "elementToF
      * @param event The react event.
      */
     private handleTab(event: React.KeyboardEvent) {
-        const previousElement = this.tabHandler?.getNext();
-        if (previousElement) {
+        const nextElement = this.tabHandler?.getNext();
+        if (nextElement) {
             event.preventDefault();
             event.stopPropagation();
-            previousElement.focus();
+            nextElement.focus();
         }
     }
 }

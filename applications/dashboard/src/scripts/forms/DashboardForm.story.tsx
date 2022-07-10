@@ -19,15 +19,22 @@ import { StoryHeading } from "@library/storybook/StoryHeading";
 import React, { useState } from "react";
 import { DashboardFormList } from "@dashboard/forms/DashboardFormList";
 import { DashboardFormSubheading } from "@dashboard/forms/DashboardFormSubheading";
-import { t } from "@vanilla/library/src/scripts/utility/appUtils";
-import Translate from "@vanilla/library/src/scripts/content/Translate";
+import { t } from "@library/utility/appUtils";
+import Translate from "@library/content/Translate";
+import { DashboardFormListItem } from "@dashboard/forms/DashboardFormListItem";
+import { Icon } from "@vanilla/icons";
+import { DashboardMediaAddonListItem } from "@dashboard/forms/DashboardMediaAddonListItem";
+import { AutoWidthInput } from "@library/forms/AutoWidthInput";
+import { autoWidthInputClasses } from "@library/forms/AutoWidthInput.classes";
+import { cx } from "@emotion/css";
+import { DashboardColorPicker } from "@dashboard/forms/DashboardFormColorPicker";
 
 export default {
     title: "Dashboard/Forms",
     decorators: [dashboardCssDecorator],
 };
 
-function SimpleInputItems() {
+export function SimpleInputItems() {
     const [dropdownValue, setDropdownValue] = useState<IComboBoxOption | null>(null);
     const [image, setImage] = useState<string | null>(null);
     return (
@@ -38,34 +45,6 @@ function SimpleInputItems() {
             </DashboardFormGroup>
             <DashboardFormGroup label="Another (fake) Label">
                 <DashboardInput inputProps={{ placeholder: "Placeholder Here" }} />
-            </DashboardFormGroup>
-            <DashboardFormGroup label="Select input">
-                <DashboardSelect
-                    options={[
-                        {
-                            label: "Development",
-                            value: 4,
-                        },
-                        {
-                            label: "Information Security",
-                            value: 7,
-                        },
-                        {
-                            label: "Internal Testing",
-                            value: 6,
-                        },
-                        {
-                            label: "Success",
-                            value: 5,
-                        },
-                        {
-                            label: "Support",
-                            value: 8,
-                        },
-                    ]}
-                    value={dropdownValue!}
-                    onChange={setDropdownValue}
-                />
             </DashboardFormGroup>
             <DashboardImageUploadGroup
                 value={image}
@@ -92,6 +71,53 @@ function SimpleInputItems() {
                 labelType={DashboardLabelType.WIDE}
             >
                 <DashboardInput inputProps={{ placeholder: "Placeholder Here" }} />
+            </DashboardFormGroup>
+            <DashboardFormGroup label="label for color picker" description="This will allow user to pick a color">
+                <DashboardColorPicker value={""} onChange={(color) => null} />
+            </DashboardFormGroup>
+        </>
+    );
+}
+
+const options = [
+    {
+        label: "Development",
+        value: 4,
+    },
+    {
+        label: "Information Security",
+        value: 7,
+    },
+    {
+        label: "Internal Testing",
+        value: 6,
+    },
+    {
+        label: "Success",
+        value: 5,
+    },
+    {
+        label: "Support",
+        value: 8,
+    },
+];
+
+export function DropDowns() {
+    const [dropdownValue, setDropdownValue] = useState<IComboBoxOption | null>(null);
+    const [dropdown2Value, setDropdown2Value] = useState<IComboBoxOption | null>(options[0]);
+    const [dropdown3Value, setDropdown3Value] = useState<IComboBoxOption | null>(options[1]);
+    const [image, setImage] = useState<string | null>(null);
+    return (
+        <>
+            <DashboardFormSubheading>Dropdowns</DashboardFormSubheading>
+            <DashboardFormGroup label="Select input">
+                <DashboardSelect options={options} value={dropdownValue!} onChange={setDropdownValue} />
+            </DashboardFormGroup>
+            <DashboardFormGroup label="Select input (with value)">
+                <DashboardSelect options={options} value={dropdown2Value!} onChange={setDropdown2Value} />
+            </DashboardFormGroup>
+            <DashboardFormGroup label="Select input (opened)">
+                <DashboardSelect forceOpen options={options} value={dropdown3Value!} onChange={setDropdown3Value} />
             </DashboardFormGroup>
         </>
     );
@@ -153,6 +179,18 @@ export function RadioGroups() {
                             <DashboardCheckBox label="Option 3" disabled />
                         </DashboardCheckGroup>
                     </DashboardFormGroup>
+                </DashboardFormList>
+            </form>
+        </StoryContent>
+    );
+}
+
+export function Toggles() {
+    return (
+        <StoryContent>
+            <StoryHeading depth={1}>Toggles</StoryHeading>
+            <form>
+                <DashboardFormList>
                     <DashboardFormSubheading>Toggles</DashboardFormSubheading>
                     <DashboardFormGroup
                         labelType={DashboardLabelType.WIDE}
@@ -200,7 +238,7 @@ export function BlurEnableForm() {
                     description={
                         <Translate
                             source="When enabled, this will use custom permissions instead of the global defaults. <0>Read More</0>"
-                            c0={text => <a href="#">{text}</a>}
+                            c0={(text) => <a href="#">{text}</a>}
                         />
                     }
                 >
@@ -211,5 +249,90 @@ export function BlurEnableForm() {
                 </DashboardFormList>
             </form>
         </StoryContent>
+    );
+}
+
+export function ListItemsWithStatus() {
+    const [isEnabled, setIsEnabled] = useState(false);
+    return (
+        <StoryContent>
+            <StoryHeading depth={1}>List Items with Status</StoryHeading>
+            <DashboardFormList>
+                <DashboardFormListItem
+                    title={"Google Translate"}
+                    status={"Configured"}
+                    action={(e) => e}
+                    actionLabel={"Edit Google translate"}
+                    actionIcon={<Icon icon={"dashboard-edit"} />}
+                />
+                <DashboardFormListItem title={"Deep L"} status={"Not Configured"} />
+                <DashboardFormListItem
+                    title={"Transifex"}
+                    action={(e) => e}
+                    actionLabel={"Edit Transifex"}
+                    actionIcon={<Icon icon={"dashboard-edit"} />}
+                />
+            </DashboardFormList>
+        </StoryContent>
+    );
+}
+
+export function MediaAddonListItems() {
+    const [isEnabled, setIsEnabled] = useState({
+        one: true,
+        two: false,
+        three: true,
+    });
+    return (
+        <>
+            <StoryHeading depth={1}>Media Addon List Items</StoryHeading>
+            <DashboardFormList>
+                <DashboardMediaAddonListItem
+                    iconUrl={"https://staff.vanillaforums.com/locales/vf_en_GB/en_GB.svg"}
+                    title={"English (United Kingdom)"}
+                    description={
+                        "Official English (United Kingdom) language translations for Vanilla. Help contribute to this translation by going to its translation site here. This locale is for British English. If you want to use the default American English you don't need to enable a specific locale pack."
+                    }
+                    isEnabled={isEnabled.one}
+                    onChange={(bool) => setIsEnabled((prevState) => ({ ...prevState, one: bool }))}
+                    action={() => null}
+                    actionLabel={"Configure"}
+                    actionIcon={<Icon icon={"dashboard-edit"} />}
+                />
+                <DashboardMediaAddonListItem
+                    title={"A Locale Pack without and icon"}
+                    description={"Custom translations made for a specific client"}
+                    isEnabled={isEnabled.two}
+                    onChange={(bool) => setIsEnabled((prevState) => ({ ...prevState, two: bool }))}
+                />
+                <DashboardMediaAddonListItem
+                    iconUrl={"https://staff.vanillaforums.com/locales/vf_fr_CA/fr_CA.svg"}
+                    title={"Français (Canada) / French (Canada)"}
+                    description={
+                        "Official French (Canada) language translations for Vanilla. Help contribute to this translation by going to its translation site here."
+                    }
+                    isEnabled={isEnabled.three}
+                    onChange={(bool) => setIsEnabled((prevState) => ({ ...prevState, three: bool }))}
+                    action={() => null}
+                    actionLabel={"Configure"}
+                    actionIcon={<Icon icon={"dashboard-edit"} />}
+                />
+            </DashboardFormList>
+        </>
+    );
+}
+
+export function InputWithAutoWidth() {
+    return (
+        <>
+            <StoryHeading depth={1}>Auto with input component</StoryHeading>
+            <StoryHeading depth={2}>Input width should increase while typing but not exceed 300px</StoryHeading>
+            <form>
+                <AutoWidthInput
+                    placeholder={"Type your text here"}
+                    className={cx(autoWidthInputClasses().themeInput)}
+                />
+            </form>
+        </>
     );
 }

@@ -8957,8 +8957,8 @@ $(document).on('contentLoad', function(e) {
         // Selectors
         var drawer = '.js-drawer';
         var drawerToggle = '.js-drawer-toggle';
-        var content = '.main-row .main';
-        var container = '.main-container';
+        var content = '.main-row .dashboard-main';
+        var container = '.dashboard-main-container';
 
         $(drawer, element).drawer({
             toggle: drawerToggle,

@@ -4,11 +4,17 @@
  * @license GPL-2.0-only
  */
 
+// You can think of this file as patches/improvements for "style.scss". The reason it isn't in there is because some themes
+// namely the Bootstrap theme, have their own "style.scss" file and won't load it. Put any styles you wish across all themes
+// here.
+
 // This CSS file should always be added after style.css and not be overridden.
 // Variables
 @import "../../../library/src/scss/coreVariables";
 @import "../../../library/src/scss/social/socialMediaVariables";
-@import "../../../library/src/scss/mixins/mixins";
+
+// Need a special path for this old build process.
+@import "../../../packages/vanilla-theme-core/scss/mixins/_mixins.scss";
 
 $staticVariables: true;
 
@@ -50,8 +56,6 @@ $staticVariables: true;
 @import "../../../library/src/scss/userContent/animations";
 @import "../../../library/src/scss/userContent/lists";
 
-svg {
+body:not(.dashboard) svg {
     pointer-events: none !important;
 }
-
-

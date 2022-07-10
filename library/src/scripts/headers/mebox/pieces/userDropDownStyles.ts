@@ -1,13 +1,14 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
+import { css } from "@emotion/css";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { debugHelper, unit } from "@library/styles/styleHelpers";
-import { componentThemeVariables, styleFactory, useThemeCache } from "@library/styles/styleUtils";
-import { style } from "typestyle";
+import { styleUnit } from "@library/styles/styleUnit";
+import { componentThemeVariables } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
 
 export const userDropDownVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -49,40 +50,39 @@ export const userDropDownVariables = useThemeCache(() => {
 export const userDropDownClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = userDropDownVariables();
-    const style = styleFactory("userDropDown");
 
-    const userCard = style("userCard", {
+    const userCard = css({
         listStyle: "none",
     });
 
-    const userCardPhotoLink = style("userCardPhotoLink", {
+    const userCardPhotoLink = css({
         display: "block",
     });
 
-    const userCardPhoto = style("userCardPhoto", {
+    const userCardPhoto = css({
         border: `solid 1px ${globalVars.mixBgAndFg(0.3)}`,
-        marginTop: unit(vars.userCard.topMargin),
+        marginTop: styleUnit(vars.userCard.topMargin),
         marginLeft: "auto",
         marginRight: "auto",
     });
 
-    const userCardName = style("userCardName", {
+    const userCardName = css({
         display: "block",
         color: "inherit",
         fontWeight: vars.userName.fontWeight,
-        fontSize: unit(vars.userName.fontSize),
+        fontSize: styleUnit(vars.userName.fontSize),
         lineHeight: vars.userName.lineHeight,
         textAlign: "center",
-        marginTop: unit(vars.userName.topMargin),
+        marginTop: styleUnit(vars.userName.topMargin),
         marginRight: "auto",
-        marginBottom: unit(vars.userName.bottomMargin),
+        marginBottom: styleUnit(vars.userName.bottomMargin),
         marginLeft: "auto",
-        paddingRight: unit(vars.userName.paddingRight),
-        paddingLeft: unit(vars.userName.paddingLeft),
+        paddingRight: styleUnit(vars.userName.paddingRight),
+        paddingLeft: styleUnit(vars.userName.paddingLeft),
     });
 
-    const contents = style("contents", {
-        width: unit(vars.contents.width),
+    const contents = css({
+        width: styleUnit(vars.contents.width),
     });
 
     return {

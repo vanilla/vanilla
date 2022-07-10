@@ -1,8 +1,14 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php use Vanilla\Theme\BoxThemeShim;
 
-echo '<div class="DataListWrap">';
+if (!defined('APPLICATION')) exit();
+
+
+echo '<div class="DataListWrap widget-dontUseCssOnMe">';
+BoxThemeShim::startHeading();
 echo '<h2 class="H">'.t('Activity').'</h2>';
+BoxThemeShim::endHeading();
 
+BoxThemeShim::startBox();
 $Session = Gdn::session();
 if ($Session->isValid() && checkPermission('Garden.Profiles.Edit')) {
     $this->fireEvent('BeforeStatusForm');
@@ -20,6 +26,11 @@ if ($Session->isValid() && checkPermission('Garden.Profiles.Edit')) {
     echo '</div>';
 }
 
+
+// We already have our own box. We don't want activity applying another one.
+$this->setData('activityBoxIsSet', true);
+
 // Include the activities
 include($this->fetchViewLocation('index', 'activity', 'dashboard'));
+BoxThemeShim::endBox();
 echo '</div>';

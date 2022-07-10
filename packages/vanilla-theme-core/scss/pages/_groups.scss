@@ -172,16 +172,16 @@ $GroupIcon-overlap: #{50px + $utility-baseUnitTriple};
 
         @include maxWidth {
             display: flex;
-            flex-direction: column;
+            flex-direction: row-reverse;
+            flex-wrap: wrap;
+            align-items: flex-start;
+            justify-content: space-between;
 
-            > .PhotoWrap {
-                display: none;
-            }
 
-            .Options {
-                margin-top: $utility-baseUnitDouble;
-                justify-content: flex-end;
-                order: 2;
+            .ItemContent {
+                flex: 1;
+                padding-left: 0;
+                padding-right: 0;
             }
 
             .Excerpt {
@@ -195,8 +195,15 @@ $GroupIcon-overlap: #{50px + $utility-baseUnitTriple};
     }
 }
 
-.Group-Box {
-    clear: both;
+@if ($staticVariables) {
+    .Group-Box {
+        clear: both;
+
+        .Meta {
+            margin-right: -$utility-baseUnit;
+            margin-left: -$utility-baseUnit;
+        }
+    }
 }
 
 @if ($staticVariables) {
@@ -250,9 +257,10 @@ $GroupIcon-overlap: #{50px + $utility-baseUnitTriple};
         height: calc(#{$GroupBanner-height} - 50px);
     }
 }
-
 .Button-Controls.Button-Controls {
-    order: 2;
+    @if ($staticVariables) {
+        order: 2;
+    }
     margin-right: 0;
     display: flex;
     justify-content: flex-end;
@@ -265,23 +273,24 @@ $GroupIcon-overlap: #{50px + $utility-baseUnitTriple};
         }
     }
 
-    .Button:nth-child(2) {
-        margin-left: $utility-baseUnitHalf;
-        background-color: transparent;
-        border-color: $global-color_primary;
-        color: $global-color_primary;
+    @if ($staticVariables) {
 
-        @if ($staticVariables) {
+        .Button:nth-child(2) {
+            margin-left: $utility-baseUnitHalf;
+            background-color: transparent;
+            border-color: $global-color_primary;
+            color: $global-color_primary;
+
             &:focus,
             &:hover {
                 border-color: $global-color_primary;
                 background-color: $global-color_primary;
                 color: $global-color_white;
             }
-        }
 
-        @include maxWidth {
-            margin-left: 0;
+            @include maxWidth {
+                margin-left: 0;
+            }
         }
     }
 }
@@ -297,12 +306,12 @@ $GroupIcon-overlap: #{50px + $utility-baseUnitTriple};
 }
 
 .Group-Icon-Big-Wrap {
-    position: absolute;
-    top: $GroupBanner-height;
-    height: $GroupIcon-size;
-    width: $GroupIcon-size;
-    background-color: $global-color_white;
     @if ($staticVariables) {
+        position: absolute;
+        top: $GroupBanner-height;
+        height: $GroupIcon-size;
+        width: $GroupIcon-size;
+        background-color: $global-color_white;
         margin: -$GroupIcon-overlap $utility-baseUnitTriple $utility-baseUnitTriple $utility-baseUnitTriple;
         border-radius: $component_borderRadius;
         box-shadow: 0 0 0 1px rgba($global-color_black, 0.2);
@@ -317,8 +326,10 @@ $GroupIcon-overlap: #{50px + $utility-baseUnitTriple};
         }
     }
 
-    @include maxWidth {
-        display: none;
+    @if ($staticVariables) {
+        @include maxWidth {
+            display: none;
+        }
     }
 }
 
@@ -344,8 +355,10 @@ $GroupIcon-overlap: #{50px + $utility-baseUnitTriple};
 .Group-Description {
     margin-bottom: $utility-baseUnitTriple;
 
-    @include maxWidth {
-        display: none;
+    @if ($staticVariables) {
+        @include maxWidth {
+            display: none;
+        }
     }
 }
 
@@ -366,50 +379,54 @@ body.noGroupIcon {
     }
 }
 
-.Group-Meta.Group-Meta {
-    margin: 0 -#{$utility-baseUnitHalf};
-    font-size: $global-small_fontSize;
+@if ($staticVariables) {
 
-    a {
-        font-size: inherit;
-        color: $component-meta-link_color;
+    .Group-Meta.Group-Meta {
+        margin: 0 -#{$utility-baseUnitHalf};
+        font-size: $global-small_fontSize;
 
-        &:focus,
-        &:hover {
-            text-decoration: $theme-link-hover_textDecoration;
-            color: $component-meta-link-hover_color;
+        a {
+            font-size: inherit;
+            color: $component-meta-link_color;
+
+            &:focus,
+            &:hover {
+                text-decoration: $theme-link-hover_textDecoration;
+                color: $component-meta-link-hover_color;
+            }
+        }
+
+        .MItem {
+            margin: 0 $utility-baseUnitHalf;
+        }
+
+        .MItem:nth-child(-n+2) .label {
+            font-weight: $global-bold_fontWeight;
         }
     }
 
-    .MItem {
-        margin: 0 $utility-baseUnitHalf;
-    }
-
-    .MItem:nth-child(-n+2) .label {
-        font-weight: $global-bold_fontWeight;
-    }
-}
-
-.Group-Content {
-    display: inline-block;
-    width: 100%;
-}
-
-.Group-Box .MItem {
-    line-height: $global-base_lineHeight;
-    white-space: normal;
-
-    &.Hidden {
-        display: none;
-    }
-
-    a {
-        @include ellipsis;
-        max-width: 300px;
+    .Group-Content {
         display: inline-block;
-        vertical-align: bottom;
+        width: 100%;
+    }
+
+    .Group-Box .MItem {
+        line-height: $global-base_lineHeight;
+        white-space: normal;
+
+        &.Hidden {
+            display: none;
+        }
+
+        a {
+            @include ellipsis;
+            max-width: 300px;
+            display: inline-block;
+            vertical-align: bottom;
+        }
     }
 }
+
 
 // Over selected on core...
 .Group-Header.Group-Header.Group-Header.NoBanner {
@@ -452,17 +469,22 @@ body.noGroupIcon {
     }
 }
 
+.Group-GuestModule {
+    border-top: 1px solid #dddee0;
+    padding-top: calc(#{$component-vertical_padding} + #{$component-vertical_padding});
+}
+
 .Section-Members {
 
     .DataList .Item {
 
         @include maxWidth {
             display: flex;
-            flex-direction: column;
+            flex-direction: row-reverse;
+            flex-wrap: wrap;
 
-            .Options {
-                order: 2;
-            }
+            align-items: flex-start;
+            justify-content: space-between;
 
             @if ($staticVariables) {
                 .PhotoWrap {

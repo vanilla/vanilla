@@ -37,6 +37,10 @@ input {
 input,
 select,
 textarea {
+    /* Omitting radio inputs since they are generally inline if not overwritten */
+    &[type="radio"], &[type="checkbox"] {
+        width: inherit;
+    }
     width: 100%;
 }
 
@@ -115,6 +119,12 @@ fieldset {
     margin: 0;
     padding: 0;
     border: 0;
+    margin-inline-end: 0;
+    padding-block-start: 0;
+    padding-inline-start: 0;
+    padding-inline-end: 0;
+    padding-block-end: 0;
+    min-inline-size: 0;
 }
 
 body.js-focus-visible:not(.hasNativeFocus) :focus:not(.focus-visible) {
@@ -141,6 +151,6 @@ iframe {
     border: 0;
 }
 
-svg {
+body:not(.dashboard) svg {
     pointer-events: none !important;
 }

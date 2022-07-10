@@ -4,8 +4,6 @@
  * @license GPL-2.0-only
  */
 
-/* tslint:disable:max-classes-per-file */
-
 import WrapperBlot from "@rich-editor/quill/blots/abstract/WrapperBlot";
 import ContentBlot from "@rich-editor/quill/blots/abstract/ContentBlot";
 import LineBlot from "@rich-editor/quill/blots/abstract/LineBlot";

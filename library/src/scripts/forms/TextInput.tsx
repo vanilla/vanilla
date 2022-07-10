@@ -24,6 +24,7 @@ interface IProps extends React.InputHTMLAttributes<HTMLInputElement> {
     validationFilter?: InputValidationFilter; // A live filter to apply.
     type?: never; // The type is controlled by the component and validationFilter.
     inputRef?: React.RefObject<HTMLInputElement>;
+    onChangeFiltered?: (value: string) => void;
 }
 
 /**
@@ -32,7 +33,17 @@ interface IProps extends React.InputHTMLAttributes<HTMLInputElement> {
  * Can optionaly take validation filters that will live filter the input.
  */
 export function TextInput(props: IProps) {
-    const { inputStyle, validationFilter, className, onChange, value, defaultValue, inputRef, ...rest } = props;
+    const {
+        inputStyle,
+        validationFilter,
+        className,
+        onChange,
+        onChangeFiltered,
+        value,
+        defaultValue,
+        inputRef,
+        ...rest
+    } = props;
     const [ownValue, setOwnValue] = useState(defaultValue);
 
     // Get our change handler together.
@@ -40,15 +51,17 @@ export function TextInput(props: IProps) {
     // Or this should be fully controlled by the outer component (takes value and onChange).
     let actualValue = ownValue;
     let actualOnChange: React.ChangeEventHandler<HTMLInputElement> | undefined = useCallback(
-        event => {
+        (event) => {
+            onChange?.(event);
             const filterMethod = getFilterMethodForMode(validationFilter);
-            setOwnValue(filterMethod(event.target.value));
+            const filtered = filterMethod(event.target.value);
+            setOwnValue(filtered);
+            onChangeFiltered?.(filtered);
         },
-        [setOwnValue, validationFilter],
+        [setOwnValue, validationFilter, onChange, onChangeFiltered],
     );
     if ("value" in props) {
         actualValue = props.value;
-        actualOnChange = props.onChange;
     }
 
     // Input type is determined by strictly by the validation filter.

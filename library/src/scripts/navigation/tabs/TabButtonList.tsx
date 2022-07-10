@@ -7,9 +7,9 @@
 import React from "react";
 import classNames from "classnames";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import { tabButtonListClasses } from "@library/forms/radioTabs/tabButtonListStyles";
 import TabButton from "@library/navigation/tabs/TabButton";
 import { TabHandler } from "@vanilla/dom-utils";
+import { tabButtonListClasses } from "@library/navigation/tabs/tabButtonListStyles";
 
 export interface ITabButton {
     buttonContent: React.ReactNode;
@@ -53,7 +53,7 @@ export default class TabButtonList extends React.Component<IProps, IState> {
                     ariaControls={getTabPanelID(index)}
                     ariaSelected={isSelected}
                     key={`tabButton-${index}`}
-                    baseClass={ButtonTypes.CUSTOM}
+                    buttonType={ButtonTypes.CUSTOM}
                     className={classNames(isSelected, buttonClass, classes.button)}
                     tabIndex={isSelected || this.state.setAllTabIndexes ? 0 : -1}
                     index={index}

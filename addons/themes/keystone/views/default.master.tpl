@@ -33,15 +33,15 @@
             </div>
         {/if}
     {/if}
-   
+
     {if !$DataDrivenTitleBar}
         {activity_link format=$linkFormat}
         {categories_link format=$linkFormat}
         {discussions_link format=$linkFormat}
         {knowledge_link format=$linkFormat}
         {custom_menu format=$linkFormat}
-       
-       
+
+
     {/if}
 {/capture}
 
@@ -51,7 +51,7 @@
         {categories_link format=$linkFormat}
         {discussions_link format=$linkFormat}
         {custom_menu format=$linkFormat}
-       
+
     {/if}
 {/capture}
 {assign var="SectionGroups" value=(isset($Groups) || isset($Group))}
@@ -63,7 +63,9 @@
     {if $ThemeOptions.Options.hasFeatureSearchbox}
         ThemeOptions-hasFeatureSearchbox
     {else}
-        hideHomepageTitle
+        {if !inSection(["DiscussionList"])}
+            hideHomepageTitle
+        {/if}
     {/if}
 
     {if $ThemeOptions.Options.panelToLeft}
@@ -87,13 +89,13 @@
     locale-{$CurrentLocale.Lang}
 "}
 <body id="{$BodyID}" class="{$BodyClass}{$TemplateCss|strip:" "}">
+<a href="#MainContent" class="Button Primary btn button-skipToContent sr-only SrOnly">{t c="Skip to content"}</a>
 
     <!--[if lt IE 9]>
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
 
-    <div class="Frame" id="page">
-
+    <div class="Frame">
         {if $DataDrivenTitleBar}
             <header id="titleBar" data-react="title-bar-hamburger" style="display: none!important;" data-unhide="true">
                 {$smarty.capture.menu}
@@ -157,7 +159,7 @@
                                     </div>
                                 {/if}
                                {$smarty.capture.navLinks}
-                               
+
                                 <div class='Navigation-linkContainer'>
                                     {community_chooser buttonType='reset' fullWidth=true buttonClass='Navigation-link'}
                                 </div>
@@ -179,7 +181,7 @@
                 </div>
             {/if}
             <div class="Frame-body">
-                
+
                 <!---------- Hero Banner ---------->
                 {if $ThemeOptions.Options.hasHeroBanner && inSection(["CategoryList", "DiscussionList", "CategoryDiscussionList"])}
                     <div class="Herobanner">
@@ -197,14 +199,15 @@
                                 </div>
                             {else}
                                 {if $Category}
-                                    <h2 class="H HomepageTitle">{$Category.Name}{follow_button}</h2>
-                                    <p class="P PageDescription">{$Category.Description}</p>
+                                    <h2 class="H HomepageTitle">{$Category.Name|strip_tags}{follow_button}</h2>
+                                    {if $sanitizedDescription}
+                                        <p class="P PageDescription">{$sanitizedDescription}</p>
+                                    {/if}
+                                {elseif $Subcommunity && inSection(["DiscussionList"])}
+                                    <h2 class="H HomepageTitle">{$Subcommunity.Name|strip_tags}</h2>
                                 {else}
                                     {if {homepage_title} !== ""}
                                         <h2 class="H HomepageTitle">{homepage_title}</h2>
-                                    {/if}
-                                    {if $_Description}
-                                        <p class="P PageDescription">{$_Description}</p>
                                     {/if}
                                 {/if}
                             {/if}
@@ -240,7 +243,7 @@
                                 <div class="Frame-row">
 
                                     <!---------- Main Content ---------->
-                                    <main class="Content MainContent">
+                                    <main id="MainContent" class="Content MainContent">
                                         <!---------- Profile Page Header ---------->
                                         {if inSection("Profile")}
                                             <div class="Profile-header">

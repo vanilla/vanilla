@@ -45,15 +45,17 @@ body {
     border-bottom-width: 0;
 }
 
-.Item .Author a {
-    font-size: inherit;
-    font-weight: inherit;
-    color: $component-meta_color;
+@if($staticVariables){
+    .Item .Author a {
+        font-size: inherit;
+        font-weight: inherit;
+        color: $component-meta_color;
 
-    &:focus,
-    &:hover {
-        text-decoration: $theme-link-hover_textDecoration;
-        color: $component-meta-link-hover_color;
+        &:focus,
+        &:hover {
+            text-decoration: $theme-link-hover_textDecoration;
+            color: $component-meta-link-hover_color;
+        }
     }
 }
 
@@ -174,6 +176,7 @@ body {
 
     input {
         margin: 0;
+        width: auto;
     }
 }
 
@@ -369,7 +372,6 @@ table.PreferenceGroup th {
 
 // Fix connection page of profile
 .DataList-Connections {
-    .Connection-Name,
     .Connection-Header {
         display: flex;
         align-items: center;
@@ -377,25 +379,17 @@ table.PreferenceGroup th {
     }
 
     .Connection-Header {
-        justify-content: space-between;
-
         @include maxWidth {
             justify-content: center;
         }
     }
 
     .Connection-Name {
-        flex: 1;
-        min-width: 200px;
         margin: $utility-baseUnitDouble 0;
-
-        @include maxWidth {
-            flex: initial;
-            min-width: 0;
-        }
     }
 
     .Connection-Connect {
+        margin-left: auto;
         position: static;
         padding: 0;
     }

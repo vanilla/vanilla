@@ -52,7 +52,7 @@ abstract class Gdn_Pluggable {
 
 
     /**
-     * @var enumerator An enumerator indicating what type of handler the method being called is.
+     * @var string An enum indicating what type of handler the method being called is.
      * Options are:
      *  HANDLER_TYPE_NORMAL: Standard call to a method on the object (DEFAULT).
      *  HANDLER_TYPE_OVERRIDE: Call to a method override.

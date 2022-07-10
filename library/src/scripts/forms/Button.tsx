@@ -6,38 +6,28 @@
 
 import React from "react";
 import { getOptionalID, IOptionalComponentID } from "@library/utility/idUtils";
-import { buttonClasses, buttonUtilityClasses } from "../forms/buttonStyles";
-import classNames from "classnames";
+import { buttonClasses, buttonUtilityClasses } from "./Button.styles";
 import { titleBarClasses } from "@library/headers/titleBarStyles";
 import { ButtonTypes } from "@library/forms/buttonTypes";
+import { cx } from "@emotion/css";
 
-interface IProps extends IOptionalComponentID, React.HTMLAttributes<HTMLButtonElement> {
-    children: React.ReactNode;
-    className?: string;
-    disabled?: boolean;
+export interface IButtonProps extends IOptionalComponentID, React.ButtonHTMLAttributes<HTMLButtonElement> {
     prefix?: string;
     legacyMode?: boolean;
-    onClick?: (e) => void;
-    onKeyDown?: (e) => void;
-    title?: string;
-    submit?: boolean;
     ariaLabel?: string;
-    baseClass?: ButtonTypes;
+    buttonType?: ButtonTypes;
     ariaHidden?: boolean;
     tabIndex?: number;
-    lang?: string;
-    buttonRef?: React.RefObject<HTMLButtonElement>;
-    role?: string;
-    onKeyDownCapture?: (event: any) => void;
+    buttonRef?: React.Ref<HTMLButtonElement>;
     controls?: string;
-    style?: {};
+    submit?: boolean;
 }
 
 interface IState {
     id?: string;
 }
 
-export const getButtonStyleFromBaseClass = (type: ButtonTypes | undefined) => {
+export const getClassForButtonType = (type: ButtonTypes | undefined) => {
     if (type) {
         const buttonUtils = buttonUtilityClasses();
         const classes = buttonClasses();
@@ -56,6 +46,8 @@ export const getButtonStyleFromBaseClass = (type: ButtonTypes | undefined) => {
                 return classes.primary;
             case ButtonTypes.TRANSPARENT:
                 return classes.transparent;
+            case ButtonTypes.OUTLINE:
+                return classes.outline;
             case ButtonTypes.TRANSLUCID:
                 return classes.translucid;
             case ButtonTypes.TITLEBAR_LINK:
@@ -72,6 +64,8 @@ export const getButtonStyleFromBaseClass = (type: ButtonTypes | undefined) => {
                 return "btn btn-secondary";
             case ButtonTypes.DASHBOARD_LINK:
                 return "btn btn-link";
+            case ButtonTypes.NOT_STANDARD:
+                return classes.notStandard;
             default:
                 return "";
         }
@@ -83,13 +77,13 @@ export const getButtonStyleFromBaseClass = (type: ButtonTypes | undefined) => {
 /**
  * A stylable, configurable button component.
  */
-export default class Button extends React.Component<IProps, IState> {
-    public static defaultProps: Partial<IProps> = {
+export default class Button extends React.Component<IButtonProps, IState> {
+    public static defaultProps: Partial<IButtonProps> = {
         id: undefined,
         disabled: false,
         prefix: "button",
         legacyMode: false,
-        baseClass: ButtonTypes.STANDARD,
+        buttonType: ButtonTypes.STANDARD,
     };
 
     constructor(props) {
@@ -101,7 +95,7 @@ export default class Button extends React.Component<IProps, IState> {
 
     public render() {
         const {
-            baseClass,
+            buttonType,
             legacyMode,
             className,
             id,
@@ -112,7 +106,8 @@ export default class Button extends React.Component<IProps, IState> {
             buttonRef,
             ...restProps
         } = this.props;
-        const componentClasses = classNames(getButtonStyleFromBaseClass(baseClass), { Button: legacyMode }, className);
+
+        const componentClasses = cx(getClassForButtonType(buttonType), { Button: legacyMode }, className);
 
         return (
             <button

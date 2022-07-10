@@ -1,69 +1,126 @@
 /*
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import { debugHelper, objectFitWithFallback, unit } from "@library/styles/styleHelpers";
-import { componentThemeVariables, useThemeCache } from "@library/styles/styleUtils";
-import { style } from "typestyle";
+import { objectFitWithFallback } from "@library/styles/styleHelpers";
+import { styleUnit } from "@library/styles/styleUnit";
+import { Mixins } from "@library/styles/Mixins";
+import { Variables } from "@library/styles/Variables";
+import { variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/themeCache";
+import { IThemeVariables } from "@library/theming/themeReducer";
+import { css, CSSObject } from "@emotion/css";
+import { important, percent } from "csx";
+import { globalVariables } from "@library/styles/globalStyleVars";
 
-/**
- * @copyright 2009-2019 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */
+export const userPhotoVariables = useThemeCache((forcedVars?: IThemeVariables) => {
+    const makeThemeVars = variableFactory("userPhoto", forcedVars);
+    const globalVars = globalVariables();
 
-export const userPhotoVariables = useThemeCache(() => {
-    const themeVars = componentThemeVariables("userPhoto");
+    const border = makeThemeVars(
+        "border",
+        Variables.border({
+            radius: "50%",
+            width: 1,
+            color: globalVars.mixBgAndFg(0.5).fade(0.3),
+        }),
+    );
 
-    const border = {
-        radius: "50%",
-        ...themeVars.subComponentStyles("border"),
-    };
-
-    const sizing = {
+    const sizing = makeThemeVars("sizing", {
         small: 28,
         medium: 40,
         large: 100,
-        ...themeVars.subComponentStyles("sizing"),
-    };
+        xlarge: 145,
+    });
 
     return { border, sizing };
 });
 
+export const userPhotoMixins = (vars = userPhotoVariables()) => {
+    // wrapper of image
+    const root: CSSObject = {
+        position: "relative",
+        overflow: "hidden",
+        ...Mixins.border(vars.border),
+    };
+
+    const photo = {
+        ...objectFitWithFallback(),
+        padding: important(0),
+        margin: important(0),
+        ...{
+            "&&": {
+                width: percent(100),
+                height: "auto",
+            },
+        },
+    };
+
+    const small = {
+        width: styleUnit(vars.sizing.small),
+        height: styleUnit(vars.sizing.small),
+        flexBasis: styleUnit(vars.sizing.small),
+    };
+
+    const medium = {
+        width: styleUnit(vars.sizing.medium),
+        height: styleUnit(vars.sizing.medium),
+        flexBasis: styleUnit(vars.sizing.medium),
+    };
+
+    const large = {
+        width: styleUnit(vars.sizing.large),
+        height: styleUnit(vars.sizing.large),
+        flexBasis: styleUnit(vars.sizing.large),
+    };
+
+    const xlarge = {
+        width: styleUnit(vars.sizing.xlarge),
+        height: styleUnit(vars.sizing.xlarge),
+        flexBasis: styleUnit(vars.sizing.xlarge),
+    };
+
+    return {
+        root,
+        photo,
+        small,
+        medium,
+        large,
+        xlarge,
+    };
+};
+
 export const userPhotoClasses = useThemeCache(() => {
     const vars = userPhotoVariables();
-    const debug = debugHelper("userPhoto");
 
-    const root = style({
-        ...debug.name(),
-        position: "relative",
-        borderRadius: vars.border.radius,
-        overflow: "hidden",
+    // I'm doing this so we can import the styles in the compatibility styles.
+    const mixinStyles = userPhotoMixins(vars);
+
+    const root = css(mixinStyles.root);
+    const photo = css(mixinStyles.photo);
+    const small = css(mixinStyles.small);
+    const medium = css(mixinStyles.medium);
+    const large = css(mixinStyles.large);
+    const xlarge = css(mixinStyles.xlarge);
+
+    const noPhoto = css({
+        display: "block",
+        ...{
+            "&&": {
+                width: percent(100),
+            },
+        },
     });
 
-    const photo = style({
-        ...objectFitWithFallback(),
-        ...debug.name("photo"),
-    });
-
-    const small = style({
-        width: unit(vars.sizing.small),
-        height: unit(vars.sizing.small),
-        ...debug.name("small"),
-    });
-
-    const medium = style({
-        width: unit(vars.sizing.medium),
-        height: unit(vars.sizing.medium),
-        ...debug.name("medium"),
-    });
-
-    const large = style({
-        width: unit(vars.sizing.large),
-        height: unit(vars.sizing.large),
-        ...debug.name("large"),
-    });
-
-    return { root, small, medium, large, photo };
+    return {
+        root,
+        small,
+        medium,
+        large,
+        xlarge,
+        photo,
+        noPhoto,
+    };
 });

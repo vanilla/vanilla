@@ -28,8 +28,8 @@ echo heading(t('Custom Profile Fields'), t('Add Field'), '/settings/profilefield
                 <td class="options">
                     <div class="btn-group">
                     <?php
-                    echo anchor(dashboardSymbol('edit'), '/settings/profilefieldaddedit/'.$Name, 'js-modal btn btn-icon', ['aria-label' => t('Edit'), 'title' => t('Edit')]);
-                    echo anchor(dashboardSymbol('delete'), '/settings/profilefielddelete/'.$Name, 'js-modal btn btn-icon',
+                    echo anchor(dashboardSymbol('edit'), '/settings/profilefieldaddedit/'.$Field['Name'], 'js-modal btn btn-icon', ['aria-label' => t('Edit'), 'title' => t('Edit')]);
+                    echo anchor(dashboardSymbol('delete'), '/settings/profilefielddelete/'.$Field['Name'], 'js-modal btn btn-icon',
                         ['aria-label' => t('Delete'), 'title' => t('Delete'), 'data-css-class' => 'modal-sm modal-confirm']);
                     ?>
                     </div>

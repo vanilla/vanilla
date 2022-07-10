@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import { useFormGroup } from "@dashboard/forms/DashboardFormGroup";
+import { useFormGroup } from "@dashboard/forms/DashboardFormGroupContext";
 import classNames from "classnames";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import InputTextBlock, { IInputTextProps } from "@library/forms/InputTextBlock";
@@ -13,6 +13,7 @@ import ErrorMessages from "@library/forms/ErrorMessages";
 
 interface IProps extends IInputTextProps {
     errors?: IFieldError[];
+    afterInput?: React.ReactNode;
 }
 
 export const DashboardInput: React.FC<IProps> = (props: IProps) => {
@@ -30,6 +31,7 @@ export const DashboardInput: React.FC<IProps> = (props: IProps) => {
                 noMargin={true}
             />
             {props.errors && <ErrorMessages errors={props.errors} />}
+            {props.afterInput}
         </div>
     );
 };

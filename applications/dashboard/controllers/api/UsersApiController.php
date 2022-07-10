@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -11,9 +11,15 @@ use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
+use Vanilla\Dashboard\Models\UserLeaderQuery;
+use Vanilla\Dashboard\UserLeaderService;
+use Vanilla\Dashboard\UserPointsModel;
 use Vanilla\DateFilterSchema;
 use Vanilla\ImageResizer;
+use Vanilla\Models\CrawlableRecordSchema;
+use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Models\PermissionFragmentSchema;
+use Vanilla\Permissions;
 use Vanilla\UploadedFile;
 use Vanilla\UploadedFileSchema;
 use Vanilla\PermissionsTranslationTrait;
@@ -22,6 +28,8 @@ use Vanilla\Utility\DelimitedScheme;
 use Vanilla\Menu\CounterModel;
 use Vanilla\Utility\InstanceValidatorSchema;
 use Vanilla\Menu\Counter;
+use Vanilla\Utility\ModelUtils;
+use Vanilla\Utility\SchemaUtils;
 
 /**
  * API Controller for the `/users` resource.
@@ -32,7 +40,6 @@ class UsersApiController extends AbstractApiController {
 
     const ME_ACTION_CONSTANT = "@@users/GET_ME_DONE";
     const PERMISSIONS_ACTION_CONSTANT = "@@users/GET_PERMISSIONS_DONE";
-
 
     /** @var ActivityModel */
     private $activityModel;
@@ -62,18 +69,27 @@ class UsersApiController extends AbstractApiController {
     private $menuCountsSchema;
 
     /**
+     * @var \Vanilla\Web\APIExpandMiddleware
+     */
+    private $expandMiddleware;
+
+    /**
      * UsersApiController constructor.
      *
      * @param UserModel $userModel
      * @param Gdn_Configuration $configuration
+     * @param CounterModel $counterModel
      * @param ImageResizer $imageResizer
+     * @param ActivityModel $activityModel
+     * @param \Vanilla\Web\APIExpandMiddleware $expandMiddleware
      */
     public function __construct(
         UserModel $userModel,
         Gdn_Configuration $configuration,
         CounterModel $counterModel,
         ImageResizer $imageResizer,
-        ActivityModel $activityModel
+        ActivityModel $activityModel,
+        \Vanilla\Web\APIExpandMiddleware $expandMiddleware
     ) {
         $this->configuration = $configuration;
         $this->counterModel = $counterModel;
@@ -81,6 +97,7 @@ class UsersApiController extends AbstractApiController {
         $this->imageResizer = $imageResizer;
         $this->nameScheme =  new DelimitedScheme('.', new CamelCaseScheme());
         $this->activityModel = $activityModel;
+        $this->expandMiddleware = $expandMiddleware;
     }
 
     /**
@@ -164,34 +181,76 @@ class UsersApiController extends AbstractApiController {
     }
 
     /**
+     * Check if current session user has just Profile.View permission
+     * or advanced permissions as well
+     *
+     * @param string|null $permissionToCheck The permissions you are requiring.
+     *
+     * @return bool
+     */
+    public function checkPermission(string $permissionToCheck = null): bool {
+        $session = $this->getSession();
+
+        $showFullSchema = false;
+        $permissions = [
+            'Garden.Users.Add',
+            'Garden.Users.Edit',
+            'Garden.Users.Delete',
+            'Garden.PersonalInfo.View'];
+        if ($permissionToCheck !== null) {
+            $permissions[] = $permissionToCheck;
+        }
+        if ($session->checkPermission($permissions, false)) {
+            $showFullSchema = true;
+        } else {
+            $permissions = ['Garden.Profiles.View'];
+            if ($permissionToCheck !== null) {
+                $permissions[] = $permissionToCheck;
+            }
+
+            $this->permission($permissions);
+        }
+
+        return $showFullSchema;
+    }
+
+    /**
      * Get a single user.
      *
      * @param int $id The ID of the user.
      * @param array $query The request query.
-     * @throws NotFoundException if the user could not be found.
      * @return Data
+     * @throws ServerException If session isn't found.
+     * @throws NotFoundException If the user could not be found.
      */
-    public function get($id, array $query) {
-        $this->permission([
-            'Garden.Users.Add',
-            'Garden.Users.Edit',
-            'Garden.Users.Delete'
-        ]);
+    public function get(int $id, array $query): Data {
+        $showFullSchema = $this->checkPermission(Permissions::BAN_ROLE_TOKEN);
+
+        $queryIn = $this->schema([
+            'expand?' => ApiUtils::getExpandDefinition([]),
+        ], ['UserGet', 'in'])->setDescription('Get a user.');
 
         $this->idParamSchema();
-        $in = $this->schema([], ['UserGet', 'in'])->setDescription('Get a user.');
-        $out = $this->schema($this->userSchema(), 'out');
-
-        $query = $in->validate($query);
+        $query = $queryIn->validate($query);
+        $expand = $query['expand'] ?? [];
+        $outSchema = $showFullSchema ? $this->userSchema() : $this->viewProfileSchema();
         $row = $this->userByID($id);
-        $row = $this->normalizeOutput($row);
+        $outSchema = CrawlableRecordSchema::applyExpandedSchema($outSchema, 'user', $expand);
+        $out =  $this->schema($outSchema, 'out');
+        $row = $this->normalizeOutput($row, $expand);
 
+        $showEmail = $row['showEmail'] ?? false;
+        if (!$showEmail && !$showFullSchema) {
+            unset($row['email']);
+        }
+
+        $this->userModel->filterPrivateUserRecord($row);
         $result = $out->validate($row);
 
         // Allow addons to modify the result.
-        $result = $this->getEventManager()->fireFilter('usersApiController_getOutput', $result, $this, $in, $query, $row);
-        $result = new Data($result, ['api-allow' => ['email']]);
-        return $result;
+        $result = $this->getEventManager()->fireFilter('usersApiController_getOutput', $result, $this, $queryIn, $query, $row);
+
+        return new Data($result, ['api-allow' => ['email']]);
     }
 
     /**
@@ -276,7 +335,7 @@ class UsersApiController extends AbstractApiController {
                 'description' => 'Desired number of items per page.',
                 'default' => 30,
                 'minimum' => 1,
-                'maximum' => 100,
+                'maximum' => ApiUtils::getMaxLimit(),
             ]
         ], 'in')->setDescription('Search for users by full or partial name matching.');
         $out = $this->schema([
@@ -308,6 +367,8 @@ class UsersApiController extends AbstractApiController {
         foreach ($rows as &$row) {
             $row = $this->normalizeOutput($row);
         }
+
+        $this->userModel->filterPrivateUserRecord($rows);
         $result = $out->validate($rows);
 
         $paging = ApiUtils::morePagerInfo($result, '/api/v2/users/names', $query, $in);
@@ -319,16 +380,25 @@ class UsersApiController extends AbstractApiController {
      * Get a user's permissions.
      *
      * @param int $id The user's ID.
+     * @param array $query Query parameters.
      *
      * @return Data
      */
-    public function get_permissions(int $id): Data {
+    public function get_permissions(int $id, array $query = []): Data {
         $requestedUserID = $id;
         $this->permission();
+        $in = Schema::parse([
+            'expand?' => ApiUtils::getExpandDefinition(['junctions'])
+        ]);
         $out = $this->schema([
             "isAdmin:b",
+            "isSysAdmin:b",
             'permissions:a' => new PermissionFragmentSchema(),
+            'junctions?',
+            'junctionAliases?',
         ]);
+
+        $query = $in->validate($query);
 
         if (is_object($this->getSession()->User)) {
             $sessionUser = (array)$this->getSession()->User;
@@ -347,18 +417,11 @@ class UsersApiController extends AbstractApiController {
             ]);
         }
 
-        $requestedUser = $requestedUserID === UserModel::GUEST_USER_ID
-            ? $this->getGuestFragment()
-            : $this->normalizeOutput($this->userByID($requestedUserID));
-
         // Build the permissions
         // This endpoint is heavily used (every page request), so we rely on caching in the model.
         $permissions = $this->userModel->getPermissions($requestedUserID);
 
-        $result = ([
-            'isAdmin' => $requestedUser['isAdmin'],
-            'permissions' => $permissions->asPermissionFragments(),
-        ]);
+        $result = $permissions->asApiOutput(ModelUtils::isExpandOption('junctions', $query['expand'] ?? []));
         $result = $out->validate($result);
 
         return Data::box($result);
@@ -368,7 +431,7 @@ class UsersApiController extends AbstractApiController {
      * Get a fragment representing the current user.
      *
      * @param array $query
-     * @return array
+     * @return Data
      * @throws ValidationException If output validation fails.
      * @throws \Garden\Web\Exception\HttpException If a ban has been applied on the permission(s) for this session.
      * @throws \Vanilla\Exception\PermissionException If the user does not have valid permission to access this action.
@@ -381,10 +444,15 @@ class UsersApiController extends AbstractApiController {
             "userID",
             "name",
             "photoUrl",
+            "email:s|n" => ['default' => null],
             "dateLastActive",
             "isAdmin:b",
             "countUnreadNotifications" => [
                 "description" => "Total number of unread notifications for the current user.",
+                "type" => "integer",
+            ],
+            "countUnreadConversations" => [
+                "description" => "Total number of unread conversations for the current user.",
                 "type" => "integer",
             ],
             "permissions" => [
@@ -408,9 +476,14 @@ class UsersApiController extends AbstractApiController {
         // Expand permissions for the current user.
         $user["permissions"] = $this->globalPermissions();
         $user["countUnreadNotifications"] = $this->activityModel->getUserTotalUnread($this->getSession()->UserID);
-
+        $user["countUnreadConversations"] = $user['countUnreadConversations'] ?? 0;
         $result = $out->validate($user);
-        return $result;
+
+        $response = $this->expandMiddleware->updateResponseByKey($result, 'userID', true, ['users']);
+        $response->setMeta(\Vanilla\Web\ApiFilterMiddleware::FIELD_ALLOW, ['email']);
+        $response->setHeader(self::HEADER_CACHE_CONTROL, self::NO_CACHE);
+
+        return $response;
     }
 
     /**
@@ -453,11 +526,7 @@ class UsersApiController extends AbstractApiController {
      * @return Data
      */
     public function index(array $query) {
-        $this->permission([
-            'Garden.Users.Add',
-            'Garden.Users.Edit',
-            'Garden.Users.Delete'
-        ]);
+        $showFullSchema = $this->checkPermission();
 
         $in = $this->schema([
             'dateInserted?' => new DateFilterSchema([
@@ -474,39 +543,69 @@ class UsersApiController extends AbstractApiController {
                     'processor' => [DateFilterSchema::class, 'dateFilterField'],
                 ],
             ]),
-            'userID:a?' => [
-                'description' => 'One or more user IDs to lookup.',
-                'items' => ['type' => 'integer'],
-                'style' => 'form',
+            'dateLastActive?' => new DateFilterSchema([
                 'x-filter' => [
-                    'field' => 'u.UserID',
+                    'field' => 'u.DateLastActive',
+                    'processor' => [DateFilterSchema::class, 'dateFilterField'],
                 ],
+            ]),
+            'roleID:i?' => [
+                'x-filter' => ['field' => 'roleID']
             ],
+            'userID?' => \Vanilla\Schema\RangeExpression::createSchema([':int'])->setField('x-filter', ['field' => 'u.UserID']),
             'page:i?' => [
                 'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
                 'default' => 1,
                 'minimum' => 1,
             ],
+            'dirtyRecords:b?',
             'limit:i?' => [
                 'description' => 'Desired number of items per page.',
                 'default' => 30,
                 'minimum' => 1,
-                'maximum' => 100,
-            ]
-        ], ['UserIndex', 'in'])->setDescription('List users.');
-        $out = $this->schema([':a' => $this->userSchema()], 'out');
+                'maximum' => ApiUtils::getMaxLimit(),
+            ],
+            'sort:s?' => [
+                'enum' => ApiUtils::sortEnum('dateInserted', 'dateLastActive', 'name', 'userID')
+            ],
+            'expand?' => ApiUtils::getExpandDefinition([]),
+        ], ['UserIndex', 'in'])
+            ->addValidator("", SchemaUtils::onlyOneOf(["dateInserted", "dateUpdated", "roleID", "userID"]));
 
         $query = $in->validate($query);
+
+        $expand = $query['expand'] ?? [];
+        $outSchema = $showFullSchema ? $this->userSchema() : $this->viewProfileSchema();
+        $outSchema = CrawlableRecordSchema::applyExpandedSchema($outSchema, 'user', $expand);
+        $out = $this->schema([':a' => $outSchema], 'out');
+
         $where = ApiUtils::queryToFilters($in, $query);
 
         [$offset, $limit] = offsetLimit("p{$query['page']}", $query['limit']);
 
-        $rows = $this->userModel->search($where, '', '', $limit, $offset)->resultArray();
-        foreach ($rows as &$row) {
-            $this->userModel->setCalculatedFields($row);
-            $row = $this->normalizeOutput($row);
+        $joinDirtyRecords = $query[DirtyRecordModel::DIRTY_RECORD_OPT] ?? false;
+        if ($joinDirtyRecords) {
+            $where[DirtyRecordModel::DIRTY_RECORD_OPT] = $query[DirtyRecordModel::DIRTY_RECORD_OPT];
         }
 
+        $rows = $this->userModel->search($where, $query['sort'] ?? '', '', $limit, $offset)->resultArray();
+
+        // Join in the roles more efficiently for the index.
+        // Attempting to join roles from cache works well for single records where a user might be coming back over and over,
+        // But isn't really appropriate for iterating over lists of users where the same user will not likely be seen twice.
+        // Fetch all roles at once.
+        $this->userModel->joinRoles($rows);
+
+        foreach ($rows as &$row) {
+            $this->userModel->setCalculatedFields($row);
+            $row = $this->normalizeOutput($row, $expand);
+            $showEmail = $row['showEmail'] ?? false;
+            if (!$showEmail && !$showFullSchema) {
+                unset($row['email']);
+            }
+        }
+
+        $this->userModel->filterPrivateUserRecord($rows);
         $result = $out->validate($rows);
 
         // Determine if we are gonna use the "numbered" or "more" pageInfo.
@@ -515,6 +614,10 @@ class UsersApiController extends AbstractApiController {
                 $totalCount = $this->userModel->getCount();
             }
         } elseif (!Gdn::userModel()->pastUserThreshold()) {
+            if ($joinDirtyRecords) {
+                $this->userModel->applyDirtyWheres('u');
+                unset($where[DirtyRecordModel::DIRTY_RECORD_OPT]);
+            }
             $totalCount = $this->userModel->searchCount($where);
         }
 
@@ -526,18 +629,21 @@ class UsersApiController extends AbstractApiController {
 
         // Allow addons to modify the result.
         $result = $this->getEventManager()->fireFilter('usersApiController_indexOutput', $result, $this, $in, $query, $rows);
-        return new Data($result, ['paging' => $paging, 'api-allow' => ['email']]);
 
+        return new Data($result, ['paging' => $paging, 'api-allow' => ['email']]);
     }
 
     /**
      * Normalize a database record to match the Schema definition.
      *
      * @param array $dbRecord Database record.
+     * @param array|string|bool $expand
+     *
      * @return array Return a Schema record.
      */
-    protected function normalizeOutput(array $dbRecord) {
-        $result = $this->userModel->normalizeRow($dbRecord, []);
+    protected function normalizeOutput(array $dbRecord, $expand = []) {
+        $result = $this->userModel->normalizeRow($dbRecord, $expand);
+        $result['url'] = $this->userModel->getProfileUrl($result);
         return $result;
     }
 
@@ -614,16 +720,16 @@ class UsersApiController extends AbstractApiController {
     /**
      * Set a new photo on a user.
      *
-     * @param $id A valid user ID.
+     * @param ?int $id A valid user ID.
      * @param array $body The request body.
-     * @throws ClientException if the image provided is not supported.
+     * @param \Garden\Web\RequestInterface|null $request
      * @return array
      */
-    public function post_photo($id = null, array $body) {
+    public function post_photo($id = null, array $body = [], \Garden\Web\RequestInterface $request = null) {
         $this->permission('Garden.SignIn.Allow');
 
         $photoUploadSchema = new UploadedFileSchema([
-            'allowedExtensions' => array_values(ImageResizer::getTypeExt())
+            'allowedExtensions' => ImageResizer::getAllExtensions()
         ]);
 
         $in = $this->schema([
@@ -640,7 +746,9 @@ class UsersApiController extends AbstractApiController {
         if ($id !== $this->getSession()->UserID) {
             $this->permission('Garden.Users.Edit');
         }
-
+        if ($request !== null) {
+            UploadedFileSchema::validateUploadSanity($body, 'photo', $request);
+        }
         $body = $in->validate($body);
 
         $photo = $this->processPhoto($body['photo']);
@@ -694,8 +802,6 @@ class UsersApiController extends AbstractApiController {
         );
 
         $in->validate($body);
-
-        $this->userModel->validatePasswordStrength($userData['Password'], $userData['Name']);
 
         switch ($registrationMethod) {
             case 'invitation':
@@ -817,6 +923,86 @@ class UsersApiController extends AbstractApiController {
     }
 
     /**
+     * Get a list of point leaders by slotType/categoryID/limit criteria.
+     *
+     * @param array $query
+     * @return array
+     * @throws \Garden\Web\Exception\HttpException Exception.
+     * @throws \Vanilla\Exception\PermissionException Permission Exception.
+     */
+    public function get_leaders(array $query = []): array {
+        $this->permission();
+        // Inbound data schema validation.
+        $query = $this->schema([
+            'leaderboardType:s' =>[
+                'description' => 'Type of data to use for a leaderboard.',
+                'enum' => [
+                    UserLeaderService::LEADERBOARD_TYPE_POSTS,
+                    UserLeaderService::LEADERBOARD_TYPE_REPUTATION,
+                    UserLeaderService::LEADERBOARD_TYPE_ACCEPTED_ANSWERS
+                ],
+            ],
+            'slotType:s' => [
+                'description' => 'Slot type ("d" = day, "w" = week, "m" = month, "y" = year, "a" = all).',
+                'enum' => ['d', 'w', 'm', 'y', 'a'],
+            ],
+            'categoryID:i?' => [
+                'description' => 'The numeric ID of a category to limit search results to.',
+            ],
+            'limit:i?' => [
+                'description' => 'The maximum amount of records to be returned.',
+                "minimum" => 1,
+                'maximum' => ApiUtils::getMaxLimit(),
+            ],
+            'includedRoleIDs?' => \Vanilla\Schema\RangeExpression::createSchema([':int']),
+            'excludedRoleIDs?' => \Vanilla\Schema\RangeExpression::createSchema([':int']),
+        ])->validate($query);
+
+        $includedUserIDs = [];
+        if (isset($query['includedRoleIDs'])) {
+            $includedRoleIDS = $query['includedRoleIDs']->getValue('=');
+            $includedUsers = $this->userModel->getByRole($includedRoleIDS)->resultArray();
+            $includedUserIDs = array_column($includedUsers, 'UserID');
+        }
+        $excludedUserIDs = [];
+        if (isset($query['excludedRoleIDs'])) {
+            $excludedRoleIDS = $query['excludedRoleIDs']->getValue('=');
+            $excludedUsers = $this->userModel->getByRole($excludedRoleIDS)->resultArray();
+            $excludedUserIDs = array_column($excludedUsers, 'UserID');
+        }
+
+        $query = new UserLeaderQuery(
+            $query['slotType'] ?? UserPointsModel::SLOT_TYPE_ALL,
+            $query['categoryID'] ?? null,
+            $query['limit'] ?? null,
+            $includedUserIDs,
+            $excludedUserIDs,
+            $query['leaderboardType'] ?? UserLeaderService::LEADERBOARD_TYPE_REPUTATION
+        );
+        $userLeaderService = Gdn::getContainer()->get(UserLeaderService::class);
+        $leaders = $userLeaderService->getLeaders($query);
+
+        // Outbound data schema validation.
+        $leaders = $this->schema(
+            [
+                ':a' => [
+                    'slotType:s',
+                    'timeSlot:',
+                    'source:s',
+                    'categoryID:i',
+                    'userID:i',
+                    'points:i',
+                    'name:s',
+                    'photo:s'
+                ]
+            ],
+            'out'
+        )->validate($leaders);
+
+        return $leaders;
+    }
+
+    /**
      * Normalize a Schema record to match the database definition.
      *
      * @param array $schemaRecord Schema record.
@@ -838,7 +1024,7 @@ class UsersApiController extends AbstractApiController {
      * Process a user photo upload.
      *
      * @param UploadedFile $photo
-     * @throws Exception if there was an error encountered when saving the upload.
+     * @throws Exception If there was an error encountered when saving the upload.
      * @return string
      */
     private function processPhoto(UploadedFile $photo) {
@@ -856,10 +1042,10 @@ class UsersApiController extends AbstractApiController {
         $destination = $photo->generatePersistedUploadPath(ProfileController::AVATAR_FOLDER);
 
         // Resize/crop the photo, then save it. Save by copying so upload can be used again for the thumbnail.
-        $this->savePhoto($photo, $size, 'p', true);
+        $this->savePhoto($photo, $size, changeBasename($destination, 'p%s'), true);
 
         // Resize and save the thumbnail.
-        $this->savePhoto($photo, $thumbSize, 'n');
+        $this->savePhoto($photo, $thumbSize, changeBasename($destination, 'n%s'), false);
 
         return $destination;
     }
@@ -869,13 +1055,12 @@ class UsersApiController extends AbstractApiController {
      *
      * @param UploadedFile $upload An instance of an uploaded file.
      * @param int $size Maximum size, in pixels, for the photo.
-     * @param string $prefix An optional prefix (e.g. p for full-size or n for thumbnail).
+     * @param string $destination
      * @param bool $copy Should the upload be saved by copying, instead of moving?
      */
-    private function savePhoto(UploadedFile $upload, $size, $prefix = '', $copy = false) {
-        $upload->setImageConstraints(
-            ['crop' => true, 'height' => $size, 'width' => $size]
-        )->persistUpload($copy, ProfileController::AVATAR_FOLDER, "{$prefix}%s");
+    private function savePhoto(UploadedFile $upload, int $size, string $destination = ProfileController::AVATAR_FOLDER, bool $copy = false) {
+        $upload->setImageConstraints(['crop' => true, 'height' => $size, 'width' => $size]);
+        $upload->persistUploadToPath($copy, $destination);
     }
 
     /**
@@ -949,5 +1134,29 @@ class UsersApiController extends AbstractApiController {
             $this->userSchema = $this->schema($this->userModel->readSchema(), 'User');
         }
         return $this->schema($this->userSchema, $type);
+    }
+
+    /**
+     * Get a user schema with minimal profile fields.
+     *
+     * @return Schema Returns a schema object.
+     */
+    public function viewProfileSchema() {
+        return $this->schema(Schema::parse([
+                'userID:i',
+                'name:s?',
+                'sortName?',
+                'email:s?',
+                'photoUrl:s?',
+                'profilePhotoUrl:s?',
+                'url:s?',
+                'dateInserted?',
+                'dateLastActive:dt?',
+                'countDiscussions?',
+                'countComments?',
+                'label:s?',
+                'banned:i?',
+                'private:b?' => ['default' => false]
+        ])->add($this->fullSchema()), 'ViewProfile');
     }
 }

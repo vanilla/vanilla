@@ -7,7 +7,7 @@
 namespace Vanilla\Web;
 
 use Vanilla\Models\SiteMeta;
-use Vanilla\Models\ThemePreloadProvider;
+use Vanilla\Theme\ThemePreloadProvider;
 
 /**
  * A Web\Page that makes use of custom theme data from the theming API.
@@ -15,7 +15,10 @@ use Vanilla\Models\ThemePreloadProvider;
 abstract class ThemedPage extends Page {
 
     /** @var ThemePreloadProvider */
-    private $themeProvider;
+    protected $themeProvider;
+
+    /** @var string|null */
+    protected $forcedThemeKey;
 
     /**
      * @inheritdoc
@@ -30,6 +33,9 @@ abstract class ThemedPage extends Page {
     ) {
         parent::setDependencies($siteMeta, $request, $session, $pageHead, $masterViewRenderer);
         $this->themeProvider = $themeProvider;
+        if ($this->forcedThemeKey !== null) {
+            $this->themeProvider->setForcedThemeKey($this->forcedThemeKey);
+        }
         $this->initAssets();
     }
 

@@ -18,6 +18,7 @@ use UserAuthenticationNonceModel;
 use Vanilla\Authenticator\SSOAuthenticator;
 use Vanilla\Models\AuthenticatorModel;
 use Vanilla\Models\SSOData;
+use Vanilla\Models\TrustedDomainModel;
 
 /**
  * Class VanillaConnectAuthenticator
@@ -42,6 +43,9 @@ class VanillaConnectAuthenticator extends SSOAuthenticator {
     /** @var UserAuthenticationNonceModel */
     private $nonceModel;
 
+    /** @var TrustedDomainModel */
+    private $trustedDomainModel;
+
     /** @var VanillaConnect */
     private $vanillaConnect;
 
@@ -63,13 +67,15 @@ class VanillaConnectAuthenticator extends SSOAuthenticator {
         Gdn_Configuration $config,
         Cookie $cookie,
         RequestInterface $request,
-        UserAuthenticationNonceModel $nonceModel
+        UserAuthenticationNonceModel $nonceModel,
+        TrustedDomainModel $trustedDomainModel
     ) {
         $this->nonceModel = $nonceModel;
+        $this->trustedDomainModel = $trustedDomainModel;
         $this->request = $request;
 
         $this->cookie = $cookie;
-        $this->cookieName = $config->get('Garden.Cookie.Name', 'Vanilla').'-vanillaconnectnonce';
+        $this->cookieName = '-vanillaconnectnonce';
         $this->cookieSalt = $config->get('Garden.Cookie.Salt');
 
         parent::__construct($authenticatorID, $authenticatorModel);
@@ -171,7 +177,7 @@ class VanillaConnectAuthenticator extends SSOAuthenticator {
             unset($claim[$key]);
         }
 
-        list($userData, $extraData) = SSOData::splitProviderData($claim);
+        [$userData, $extraData] = SSOData::splitProviderData($claim);
 
         $ssoData = new SSOData(
             $this::getType(),
@@ -195,7 +201,7 @@ class VanillaConnectAuthenticator extends SSOAuthenticator {
         $url = $this->request->getScheme().'://'.$this->request->getHost().'/authenticate/'.$this::getType().'/'.rawurlencode($this->getID());
 
         if ($target) {
-            $target = safeURL($target);
+            $target = $this->trustedDomainModel->safeUrl($target);
             $url .= '?target='.rawurlencode($target);
         }
 
@@ -262,7 +268,7 @@ class VanillaConnectAuthenticator extends SSOAuthenticator {
      * @inheritdoc
      */
     public function initiateAuthentication() {
-        list($url, $target) = $this->extractTargetFromURL(parent::getSignInUrl());
+        [$url, $target] = $this->extractTargetFromURL(parent::getSignInUrl());
         $url .= (strpos($url, '?') === false ? '?' : '&');
         $url .= 'jwt='.$this->vanillaConnect->createRequestAuthJWT(
             $this->generateNonce(),

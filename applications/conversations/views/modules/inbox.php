@@ -1,4 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
+/** @var InboxModule $this */
 $SubjectsVisible = c('Conversations.Subjects.Visible');
 ?>
 <div id="InboxModule" class="Box BoxInbox">
@@ -60,7 +61,7 @@ $SubjectsVisible = c('Conversations.Subjects.Visible');
             if (checkPermission('Conversations.Conversations.Add'))
                 echo anchor(sprite('SpNewConversation SpAdd').t('New Message'), '/messages/add');
             ?>
-            <span class="Pager"><?php echo anchor(t('More…'), '/messages/inbox'); ?></span>
+            <span class="Pager"><?php echo anchor(t('More…'), '/messages/inbox', '', ['aria-label' => t('All messages')]); ?></span>
         </div>
     <?php else: ?>
         <?php

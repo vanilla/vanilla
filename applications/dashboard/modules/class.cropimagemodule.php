@@ -200,7 +200,7 @@ class CropImageModule extends Gdn_Module {
     /**
      * Adds the necessary fields to the form for jcrop.
      *
-     * @param Form $form The form the crop module is inserted into.
+     * @param Gdn_Form $form The form the crop module is inserted into.
      * @param int $width The width of the final cropped image.
      * @param int $height The height of the final cropped image.
      * @param string $source The path to the local copy of the image.
@@ -223,7 +223,7 @@ class CropImageModule extends Gdn_Module {
     /**
      * Updates the form's hidden crop width and crop height fields.
      *
-     * @param Form $form The form the crop module is inserted into.
+     * @param Gdn_Form $form The form the crop module is inserted into.
      * @param int $width The width of the final cropped image.
      * @param int $height The height of the final cropped image.
      */
